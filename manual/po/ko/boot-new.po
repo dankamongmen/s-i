@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-new.xml\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-02-07 15:07+0000\n"
+"POT-Creation-Date: 2006-07-09 14:07+0000\n"
 "PO-Revision-Date: 2006-04-22 21:44+0900\n"
 "Last-Translator: Seok-moon Jang <drssay97@gmail.com>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -334,11 +334,166 @@ msgstr ""
 #. Tag: title
 #: boot-new.xml:191
 #, no-c-format
+msgid "Mounting encrypted volumes"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:193
+#, no-c-format
+msgid ""
+"If you created encrypted volumes during the installation and assigned them "
+"mount points, you will be asked to enter the passphrase for each of these "
+"volumes during the boot. The actual procedure differs slightly between dm-"
+"crypt and loop-AES."
+msgstr ""
+
+#. Tag: title
+#: boot-new.xml:203
+#, no-c-format
+msgid "loop-AES"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:205
+#, no-c-format
+msgid ""
+"For partitions encrypted via loop-AES you will be shown the following prompt "
+"during the boot: <informalexample><screen>\n"
+"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
+"Password:\n"
+"</screen></informalexample> In the first line of the prompt, <replaceable>X</"
+"replaceable> is the number of the loop device. You are now probably "
+"wondering <emphasis>for which volume</emphasis> you are actually entering "
+"the passphrase. Does is relate to your <filename>/home</filename>? Or to "
+"<filename>/var</filename>? Of course, if you have just one encrypted volume, "
+"this is easy and you can just enter the passphrase you used when setting up "
+"this volume. If you set up more than one encrypted volume during the "
+"installation, the notes you wrote down as the last step in <xref linkend="
+"\"partman-crypto\"/> come in handy. If you did not make a note of the "
+"mapping between <filename>loop<replaceable>X</replaceable></filename> and "
+"the mount points before, you can still find it in <filename>/etc/fstab</"
+"filename> of your new system."
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:226
+#, no-c-format
+msgid ""
+"No characters (even asterisks) will be shown while entering the passphrase. "
+"Be careful, you have only <emphasis>one try</emphasis>. If you enter wrong "
+"passphrase, an error message will appear and the boot process will skip that "
+"volume and continue to mount the next filesystem. Please see <xref linkend="
+"\"crypto-troubleshooting\"/> for further information."
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:235
+#, no-c-format
+msgid "After entering all passphrases the boot should continue as usual."
+msgstr ""
+
+#. Tag: title
+#: boot-new.xml:243
+#, no-c-format
+msgid "dm-crypt"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:245
+#, no-c-format
+msgid "TODO: write something once it works."
+msgstr ""
+
+#. Tag: title
+#: boot-new.xml:253
+#, no-c-format
+msgid "Troubleshooting"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:255
+#, no-c-format
+msgid ""
+"If some of the encrypted volumes could not be mounted because a wrong "
+"passphrase was entered, you will have to mount them manually after the boot. "
+"There are several cases."
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:264
+#, no-c-format
+msgid ""
+"The first case concerns the root partition. When it is not mounted "
+"correctly, the boot process will halt and you will have to reboot the "
+"computer to try again."
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:271
+#, no-c-format
+msgid ""
+"The easiest case is for encrypted volumes holding data like <filename>/home</"
+"filename> or <filename>/srv</filename>. You can simply mount them manually "
+"after the boot. For loop-AES this is one-step operation: "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
+"userinput>\n"
+"<prompt>Password:</prompt>\n"
+"</screen></informalexample> where <replaceable>/mount_point</replaceable> "
+"should be replaced by the particular directory (e.g. <filename>/home</"
+"filename>). The only difference from an ordinary mount is that you will be "
+"asked to enter the passphrase for this volume."
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:285
+#, no-c-format
+msgid ""
+"For dm-crypt this is a bit trickier. First you need to register the volumes "
+"with <application>device mapper</application> by running: "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>\n"
+"</screen></informalexample> This will scan all volumes mentioned in "
+"<filename>/etc/crypttab</filename> and will create appropriate devices under "
+"the <filename>/dev</filename> directory after entering the correct "
+"passphrases. (Already registered volumes will be skipped, so you can repeat "
+"this command several times without worrying.) After successful registration "
+"you can simply mount the volumes the usual way:"
+msgstr ""
+
+#. Tag: screen
+#: boot-new.xml:300
+#, no-c-format
+msgid ""
+"<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
+"userinput>"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:303
+#, no-c-format
+msgid ""
+"If the volumes holding noncritical system files could not be mounted "
+"(<filename>/usr</filename> or <filename>/var</filename>), the system should "
+"still boot and you should be able to mount the volumes manually like in the "
+"previous case. However, you will also need to (re)start any services usually "
+"running in your default runlevel because it is very likely that they were "
+"not started. The easiest way to achieve this is by switching to the first "
+"runlevel and back by entering <informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>init 1</userinput>\n"
+"</screen></informalexample> at the shell prompt and pressing <keycombo> "
+"<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
+"root password."
+msgstr ""
+
+#. Tag: title
+#: boot-new.xml:326
+#, no-c-format
 msgid "Log In"
 msgstr "로긴"
 
 #. Tag: para
-#: boot-new.xml:193
+#: boot-new.xml:328
 #, no-c-format
 msgid ""
 "Once your system boots, you'll be presented with the login prompt. Log in "
@@ -350,7 +505,7 @@ msgstr ""
 "가 되었습니다."
 
 #. Tag: para
-#: boot-new.xml:199
+#: boot-new.xml:334
 #, no-c-format
 msgid ""
 "If you are a new user, you may want to explore the documentation which is "
@@ -363,7 +518,7 @@ msgstr ""
 "합하는 작업이 진행 중입니다. 이 문서 역시 몇 개의 시작 지점입니다."
 
 #. Tag: para
-#: boot-new.xml:207
+#: boot-new.xml:342
 #, no-c-format
 msgid ""
 "Documentation accompanying programs you have installed is in <filename>/usr/"
@@ -379,7 +534,7 @@ msgstr ""
 "에 위치해 있습니다."
 
 #. Tag: para
-#: boot-new.xml:216
+#: boot-new.xml:351
 #, no-c-format
 msgid ""
 "In addition, there are some special folders within the <filename>/usr/share/"
@@ -395,7 +550,7 @@ msgstr ""
 "html</filename> 안에 브라우징 할 수 있는 색인된 문서를 볼 수 있을 것입니다."
 
 #. Tag: para
-#: boot-new.xml:226
+#: boot-new.xml:361
 #, no-c-format
 msgid ""
 "One easy way to view these documents is to <userinput>cd /usr/share/doc/</"
@@ -407,7 +562,7 @@ msgstr ""
 "렉토리를 의미합니다.)을 입력하세요."
 
 #. Tag: para
-#: boot-new.xml:233
+#: boot-new.xml:368
 #, no-c-format
 msgid ""
 "You can also type <userinput>info <replaceable>command</replaceable></"
@@ -430,7 +585,7 @@ msgstr ""
 "모든 명령들의 목록을 보기 원한다면 특정 문자를 입력하고 탭을 두번 누릅니다."
 
 #. Tag: para
-#: boot-new.xml:248
+#: boot-new.xml:383
 #, no-c-format
 msgid ""
 "For a more complete introduction to Debian and GNU/Linux, see <filename>/usr/"

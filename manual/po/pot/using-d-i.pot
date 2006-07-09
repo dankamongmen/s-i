@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2006-06-24 19:23+0000\n"
+"POT-Creation-Date: 2006-07-09 14:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1012,598 +1012,845 @@ msgstr ""
 #: using-d-i.xml:1212
 #, no-c-format
 #. Tag: para
-msgid "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> from the main <command>partman</command> menu. On the first screen of <command>mdcfg</command> simply select <guimenuitem>Create MD device</guimenuitem>. You will be presented with a list of supported types of MD devices, from which you should choose one (e.g. RAID1). What follows depends on the type of MD you selected."
+msgid "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> from the main <command>partman</command> menu. (The menu will only appear after you mark at least one partition for use as <guimenuitem>physical volume for RAID</guimenuitem>.) On the first screen of <command>mdcfg</command> simply select <guimenuitem>Create MD device</guimenuitem>. You will be presented with a list of supported types of MD devices, from which you should choose one (e.g. RAID1). What follows depends on the type of MD you selected."
 msgstr ""
 
-#: using-d-i.xml:1223
+#: using-d-i.xml:1225
 #, no-c-format
 #. Tag: para
 msgid "RAID0 is simple &mdash; you will be issued with the list of available RAID partitions and your only task is to select the partitions which will form the MD."
 msgstr ""
 
-#: using-d-i.xml:1230
+#: using-d-i.xml:1232
 #, no-c-format
 #. Tag: para
 msgid "RAID1 is a bit more tricky. First, you will be asked to enter the number of active devices and the number of spare devices which will form the MD. Next, you need to select from the list of available RAID partitions those that will be active and then those that will be spare. The count of selected partitions must be equal to the number provided few seconds ago. Don't worry. If you make a mistake and select different number of partitions, the &d-i; won't let you continue until you correct the issue."
 msgstr ""
 
-#: using-d-i.xml:1242
+#: using-d-i.xml:1244
 #, no-c-format
 #. Tag: para
 msgid "RAID5 has similar setup procedure as RAID1 with the exception that you need to use at least <emphasis>three</emphasis> active partitions."
 msgstr ""
 
-#: using-d-i.xml:1250
+#: using-d-i.xml:1252
 #, no-c-format
 #. Tag: para
 msgid "It is perfectly possible to have several types of MD at once. For example if you have three 200 GB hard drives dedicated to MD, each containing two 100 GB partitions, you can combine first partitions on all three disk into the RAID0 (fast 300 GB video editing partition) and use the other three partitions (2 active and 1 spare) for RAID1 (quite reliable 100 GB partition for <filename>/home</filename>)."
 msgstr ""
 
-#: using-d-i.xml:1259
+#: using-d-i.xml:1261
 #, no-c-format
 #. Tag: para
 msgid "After you setup MD devices to your liking, you can <guimenuitem>Finish</guimenuitem> <command>mdcfg</command> to return back to the <command>partman</command> to create filesystems on your new MD devices and assign them the usual attributes like mountpoints."
 msgstr ""
 
-#: using-d-i.xml:1272
+#: using-d-i.xml:1276
 #, no-c-format
 #. Tag: title
-msgid "Setting up the System"
+msgid "Configuring Encrypted Volumes"
 msgstr ""
 
-#: using-d-i.xml:1273
+#: using-d-i.xml:1277
 #, no-c-format
 #. Tag: para
-msgid "After partitioning the installer asks a few more questions that will be used to set up the system it is about to install."
+msgid "&d-i; allows you to set up encrypted partitions. Every file you write to such a partition is immediately saved to the device in encrypted form. Access to the encrypted data is granted only after entering the <firstterm>passphrase</firstterm> used when the encrypted partition was originally created. This feature is useful to protect sensitive data in case your laptop or hard drive gets stolen. The thief might get physical access to the hard drive, but without knowing the right passphrase, the data on the hard drive will look like random characters."
 msgstr ""
 
-#: using-d-i.xml:1285
-#, no-c-format
-#. Tag: title
-msgid "Configuring Your Time Zone"
-msgstr ""
-
-#: using-d-i.xml:1287
+#: using-d-i.xml:1289
 #, no-c-format
 #. Tag: para
-msgid "Depending on the location selected at the beginning of the installation process, you might be shown a list of timezones relevant for that location. If your location has only one time zone, you will not be asked anything and the system will assume that time zone."
+msgid "The two most important partitions to encrypt are: the home partition, where your private data resides, and the swap partition, where sensitive data might be stored temporarily during operation. Of course, nothing prevents you from encrypting any other partitions that might be of interest. For example <filename>/var</filename> where database servers, mail servers or print servers store their data, or <filename>/tmp</filename> which is used by various programs to store potentially interesting temporary files. Some people may even want to encrypt their whole system. The only exception is the <filename>/boot</filename> partition which must remain unencrypted, because currently there is no way to load the kernel from an encrypted partition."
 msgstr ""
 
-#: using-d-i.xml:1303
-#, no-c-format
-#. Tag: title
-msgid "Configuring the Clock"
-msgstr ""
-
-#: using-d-i.xml:1305
+#: using-d-i.xml:1304
 #, no-c-format
 #. Tag: para
-msgid "The installer might ask you if the computer's clock is set to UTC. Normally this question is avoided if possible and the installer tries to work out whether the clock is set to UTC based on things like what other operating systems are installed."
+msgid "Please note that the performance of encrypted partitions will be less than that of unencrypted ones because the data needs to be decrypted or encrypted for every read or write. The performance impact depends on your CPU speed, chosen cipher and a key length."
 msgstr ""
 
-#: using-d-i.xml:1312
+#: using-d-i.xml:1311
 #, no-c-format
 #. Tag: para
-msgid "In expert mode you will always be able to choose whether or not the clock is set to UTC. <phrase arch=\"m68k;powerpc\">Macintosh hardware clocks are normally set to local time. If you want to dual-boot, select local time instead of GMT.</phrase> <phrase arch=\"i386\">Systems that (also) run Dos or Windows are normally set to local time. If you want to dual-boot, select local time instead of GMT.</phrase>"
+msgid "To use encryption, you have to create a new partition by selecting some free space in the main partitioning menu. Another option is to choose an existing partition (e.g. a regular partition, an LVM logical volume or a RAID volume). In the <guimenu>Partition setting</guimenu> menu, you need to select <guimenuitem>physical volume for encryption</guimenuitem> at the <menuchoice> <guimenu>Use as:</guimenu> </menuchoice> option. The menu will then change to include several cryptographic options for the partition."
 msgstr ""
 
-#: using-d-i.xml:1323
+#: using-d-i.xml:1322
 #, no-c-format
 #. Tag: para
-msgid "Note that the installer does not currently allow you to actually set the time in the computer's clock. You can set the clock to the current time after you have installed, if it is incorrect or if it was previously not set to UTC."
+msgid "&d-i; supports several encryption methods. The default method is <firstterm>dm-crypt</firstterm> (included in newer Linux kernels, able to host LVM physical volumes), the other is <firstterm>loop-AES</firstterm> (older, maintained separately from the Linux kernel tree). Unless you have compelling reasons to do otherwise, it is recommended to use the default."
 msgstr ""
 
-#: using-d-i.xml:1339
+#: using-d-i.xml:1334
 #, no-c-format
-#. Tag: title
-msgid "Setting Up Users And Passwords"
-msgstr ""
-
-#: using-d-i.xml:1342
-#, no-c-format
-#. Tag: title
-msgid "Set the Root Password"
+#. Tag: para
+msgid "First, let's have a look at available options available when you select <userinput>Device-mapper (dm-crypt)</userinput> as the encryption method. As always: when in doubt, use the defaults, because they have been carefully chosen with security in mind."
 msgstr ""
 
 #: using-d-i.xml:1344
 #, no-c-format
-#. Tag: para
-msgid "The <emphasis>root</emphasis> account is also called the <emphasis>super-user</emphasis>; it is a login that bypasses all security protection on your system. The root account should only be used to perform system administration, and only used for as short a time as possible."
+#. Tag: term
+msgid "Encryption: <userinput>aes</userinput>"
 msgstr ""
 
-#: using-d-i.xml:1352
+#: using-d-i.xml:1346
 #, no-c-format
 #. Tag: para
-msgid "Any password you create should contain at least 6 characters, and should contain both upper- and lower-case characters, as well as punctuation characters. Take extra care when setting your root password, since it is such a powerful account. Avoid dictionary words or use of any personal information which could be guessed."
+msgid "This option lets you select the encryption algorithm (<firstterm>cipher</firstterm>) which will be used to encrypt the data on the partition. &d-i; currently supports the following block ciphers: <firstterm>aes</firstterm>, <firstterm>blowfish</firstterm>, <firstterm>serpent</firstterm>, and <firstterm>twofish</firstterm>. It is beyond the scope of this document to discuss the qualities of these different algorithms, however, it might help your decision to know that in 2000, <emphasis>AES</emphasis> was chosen by the American National Institute of Standards and Technology as the standard encryption algorithm for protecting sensitive information in the 21st century."
 msgstr ""
 
-#: using-d-i.xml:1360
+#: using-d-i.xml:1364
+#, no-c-format
+#. Tag: term
+msgid "Key size: <userinput>256</userinput>"
+msgstr ""
+
+#: using-d-i.xml:1366
 #, no-c-format
 #. Tag: para
-msgid "If anyone ever tells you they need your root password, be extremely wary. You should normally never give your root password out, unless you are administering a machine with more than one system administrator."
+msgid "Here you can specify the length of the encryption key. With a larger key size, the strength of the encryption is generally improved. On the other hand, increasing the length of the key usually has a negative impact on performance. Available key sizes vary depending on the cipher."
 msgstr ""
 
-#: using-d-i.xml:1370
+#: using-d-i.xml:1378
 #, no-c-format
-#. Tag: title
-msgid "Create an Ordinary User"
+#. Tag: term
+msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
 msgstr ""
 
-#: using-d-i.xml:1372
-#, no-c-format
-#. Tag: para
-msgid "The system will ask you whether you wish to create an ordinary user account at this point. This account should be your main personal log-in. You should <emphasis>not</emphasis> use the root account for daily use or as your personal login."
-msgstr ""
-
-#: using-d-i.xml:1379
+#: using-d-i.xml:1380
 #, no-c-format
 #. Tag: para
-msgid "Why not? Well, one reason to avoid using root's privileges is that it is very easy to do irreparable damage as root. Another reason is that you might be tricked into running a <emphasis>Trojan-horse</emphasis> program &mdash; that is a program that takes advantage of your super-user powers to compromise the security of your system behind your back. Any good book on Unix system administration will cover this topic in more detail &mdash; consider reading one if it is new to you."
+msgid "The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</firstterm> algorithm is used in cryptography to ensure that applying the cipher on the same <firstterm>clear text</firstterm> data with the same key always produces a unique <firstterm>cipher text</firstterm>. The idea is to prevent the attacker from deducing information from repeated patterns in the encrypted data."
 msgstr ""
 
-#: using-d-i.xml:1389
+#: using-d-i.xml:1390
 #, no-c-format
 #. Tag: para
-msgid "You will first be prompted for the user's full name. Then you'll be asked for a name for the user account; generally your first name or something similar will suffice and indeed will be the default. Finally, you will be prompted for a password for this account."
+msgid "From the provided alternatives, the default <userinput>cbc-essiv:sha256</userinput> is currently the least vulnerable to known attacks. Use the other alternatives only when you need to ensure compatibility with some previously installed system that is not able to use newer algorithms."
 msgstr ""
 
-#: using-d-i.xml:1396
+#: using-d-i.xml:1402
+#, no-c-format
+#. Tag: term
+msgid "Encryption key: <userinput>Passphrase</userinput>"
+msgstr ""
+
+#: using-d-i.xml:1404
 #, no-c-format
 #. Tag: para
-msgid "If at any point after installation you would like to create another account, use the <command>adduser</command> command."
+msgid "Here you can choose the type of the encryption key for this partition."
 msgstr ""
 
-#: using-d-i.xml:1408
+#: using-d-i.xml:1410
 #, no-c-format
-#. Tag: title
-msgid "Installing the Base System"
+#. Tag: term
+msgid "Passphrase"
 msgstr ""
 
-#: using-d-i.xml:1409
-#, no-c-format
-#. Tag: para
-msgid "Although this stage is the least problematic, it consumes a significant fraction of the install because it downloads, verifies and unpacks the whole base system. If you have a slow computer or network connection, this could take some time."
-msgstr ""
-
-#: using-d-i.xml:1423
-#, no-c-format
-#. Tag: title
-msgid "Base System Installation"
-msgstr ""
-
-#: using-d-i.xml:1425
+#: using-d-i.xml:1411
 #, no-c-format
 #. Tag: para
-msgid "During the Base installation, package unpacking and setup messages are redirected to <userinput>tty4</userinput>. You can access this terminal by pressing <keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></keycombo>; get back to the main installer process with <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>."
+msgid "The encryption key will be computed<footnote> <para> Using a passphrase as the key currently means that the partition will be set up using <ulink url=\"&url-luks;\">LUKS</ulink>. </para></footnote> on the basis of a passphrase which you will be able to enter later in the process."
 msgstr ""
 
-#: using-d-i.xml:1435
+#: using-d-i.xml:1426 using-d-i.xml:1519
+#, no-c-format
+#. Tag: term
+msgid "Random key"
+msgstr ""
+
+#: using-d-i.xml:1427
 #, no-c-format
 #. Tag: para
-msgid "The unpack/setup messages generated by the base installation are saved in <filename>/var/log/syslog</filename> when the installation is performed over a serial console."
+msgid "A new encryption key will be generated from random data each time you try to bring up the encrypted partition. In other words: on every shutdown the content of the partition will be lost as the key is deleted from memory. (Of course, you could try to guess the key with a brute force attack, but unless there is an unknown weakness in the cipher algorithm, it is not achievable in our lifetime.)"
 msgstr ""
 
-#: using-d-i.xml:1441
+#: using-d-i.xml:1436
 #, no-c-format
 #. Tag: para
-msgid "As part of the installation, a Linux kernel will be installed. At the default priority, the installer will choose one for you that best matches your hardware. In lower priority modes, you will be able to choose from a list of available kernels."
+msgid "Random keys are useful for swap partitions because you do not need to bother yourself with remembering the passphrase or wiping sensitive information from the swap partition before shutting down your computer. However, it also means that you will <emphasis>not</emphasis> be able to use the <quote>suspend-to-disk</quote> functionality offered by newer Linux kernels as it will be impossible (during a subsequent boot) to recover the suspended data written to the swap partition."
 msgstr ""
 
-#: using-d-i.xml:1454
+#: using-d-i.xml:1455 using-d-i.xml:1532
 #, no-c-format
-#. Tag: title
-msgid "Installing Additional Software"
+#. Tag: term
+msgid "Erase data: <userinput>yes</userinput>"
 msgstr ""
 
-#: using-d-i.xml:1455
-#, no-c-format
-#. Tag: para
-msgid "After the base system is installed, you have a usable but limited system. Most users will want to add additional software to the system to tune it to their needs, and the installer lets you do so. This step can take even longer than installing the base system if you have a slow computer or network."
-msgstr ""
-
-#: using-d-i.xml:1469
-#, no-c-format
-#. Tag: title
-msgid "Configuring apt"
-msgstr ""
-
-#: using-d-i.xml:1471
+#: using-d-i.xml:1457
 #, no-c-format
 #. Tag: para
-msgid "The main means that people use to install packages on their system is via a program called <command>apt-get</command>, from the <classname>apt</classname> package.<footnote> <para> Note that the actual program that installs packages is called <command>dpkg</command>. However, this program is more of a low-level tool. <command>apt-get</command> is a higher-level tool as it will invoke <command>dpkg</command> as appropriate and also because it knows to install other packages which are required for the package you're trying to install, as well as how to retrieve the package from your CD, the network, or wherever. </para> </footnote> Other front-ends for package management, like <command>aptitude</command> and <command>synaptic</command> are also in use and depend on <command>apt-get</command>. These front-ends are recommended for new users, since they integrate some additional features (package searching and status checks) in a nice user interface."
+msgid "Determines whether the content of this partition should be overwritten with random data before setting up the encryption. This is recommended because it might otherwise be possible for an attacker to discern which parts of the partition are in use and which are not. In addition, this will make it harder to recover any leftover data from previous installations<footnote><para> It is believed that the guys from three-letter agencies can restore the data even after several rewrites of the magnetooptical media, though. </para></footnote>."
 msgstr ""
 
-#: using-d-i.xml:1495
+#: using-d-i.xml:1477
 #, no-c-format
 #. Tag: para
-msgid "<command>apt</command> must be configured so that it knows where to retrieve packages from. The installer largely takes care of this automatically based on what it knows about your installation medium. The results of this configuration are written to the file <filename>/etc/apt/sources.list</filename>, and you can examine and edit it to your liking after the install is complete."
+msgid "If you select <menuchoice> <guimenu>Encryption method:</guimenu> <guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice>, the menu changes to provide the following options:"
 msgstr ""
 
-#: using-d-i.xml:1511
+#: using-d-i.xml:1486
 #, no-c-format
-#. Tag: title
-msgid "Selecting and Installing Software"
+#. Tag: term
+msgid "Encryption: <userinput>AES256</userinput>"
 msgstr ""
 
-#: using-d-i.xml:1513
-#, no-c-format
-#. Tag: para
-msgid "During the installation process, you are given the opportunity to select additional software to install. Rather than picking individual software packages from the &num-of-distrib-pkgs; available packages, this stage of the installation process focuses on selecting and installing predefined collections of software to quickly set up your computer to perform various tasks."
-msgstr ""
-
-#: using-d-i.xml:1522
+#: using-d-i.xml:1488
 #, no-c-format
 #. Tag: para
-msgid "So, you have the ability to choose <emphasis>tasks</emphasis> first, and then add on more individual packages later. These tasks loosely represent a number of different jobs or things you want to do with your computer, such as <quote>Desktop environment</quote>, <quote>Web server</quote>, or <quote>Print server</quote><footnote> <para> You should know that to present this list, the installer is merely invoking the <command>tasksel</command> program. It can be run at any time after installation to install (or remove) more packages, or you can use a more fine-grained tool such as <command>aptitude</command>. If you are looking for a specific single package, after installation is complete, simply run <userinput>aptitude install <replaceable>package</replaceable></userinput>, where <replaceable>package</replaceable> is the name of the package you are looking for. </para> </footnote>. <xref linkend=\"tasksel-size-list\"/> lists the space requirements for the available tasks."
+msgid "For loop-AES, unlike dm-crypt, the options for cipher and key size are combined, so you can select both at the same time. Please see the above sections on ciphers and key sizes for further information."
 msgstr ""
 
-#: using-d-i.xml:1547
+#: using-d-i.xml:1498
 #, no-c-format
-#. Tag: para
-msgid "Once you've selected your tasks, select <guibutton>Ok</guibutton>. At this point, <command>aptitude</command> will install the packages you've selected."
+#. Tag: term
+msgid "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
 msgstr ""
 
-#: using-d-i.xml:1554
+#: using-d-i.xml:1500
 #, no-c-format
 #. Tag: para
-msgid "In the standard user interface of the installer, you can use the space bar to toggle selection of a task."
+msgid "Here you can select the type of the encryption key for this partition."
+msgstr ""
+
+#: using-d-i.xml:1506
+#, no-c-format
+#. Tag: term
+msgid "Keyfile (GnuPG)"
+msgstr ""
+
+#: using-d-i.xml:1507
+#, no-c-format
+#. Tag: para
+msgid "The encryption key will be generated from random data during the installation. Moreover this key will be encrypted with <application>GnuPG</application>, so to use it, you will need to enter the proper passphrase (you will be asked to provide one later in the process)."
+msgstr ""
+
+#: using-d-i.xml:1520
+#, no-c-format
+#. Tag: para
+msgid "Please see the the section on random keys above."
+msgstr ""
+
+#: using-d-i.xml:1534
+#, no-c-format
+#. Tag: para
+msgid "Please see the the section on erasing data above."
+msgstr ""
+
+#: using-d-i.xml:1543
+#, no-c-format
+#. Tag: para
+msgid "Please note that the <emphasis>graphical</emphasis> version of the installer still has some limitations when compared to the textual one. For cryptography it means you can set up only volumes using <emphasis>passphrases</emphasis> as the encryption keys."
+msgstr ""
+
+#: using-d-i.xml:1550
+#, no-c-format
+#. Tag: para
+msgid "After you have selected the desired parameters for your encrypted partitions, return back to the main partitioning menu. There should now be a new menu item called <guimenu>Configure encrypted volumes</guimenu>. After you select it, you will be asked to confirm the deletion of data on partitions marked to be erased and possibly other actions such as writing a new partition table. For large partitions this might take some time."
 msgstr ""
 
 #: using-d-i.xml:1561
 #, no-c-format
 #. Tag: para
-msgid "Note that some tasks may be pre-selected based on the characteristics of the computer you are installing. If you disagree with these selections you can un-select the tasks. You can even opt to install no tasks at all at this point."
+msgid "Next you will be asked to enter a passphrase for partitions configured to use one. Good passphrases should be longer than 8 characters, should be a mixture of letters, numbers and other characters and should not contain common dictionary words or information easily associable with you (such as birthdates, hobbies, pet names, names of family members or relatives, etc.)."
 msgstr ""
 
-#: using-d-i.xml:1569
+#: using-d-i.xml:1570
 #, no-c-format
 #. Tag: para
-msgid "Each package you selected with <command>tasksel</command> is downloaded, unpacked and then installed in turn by the <command>apt-get</command> and <command>dpkg</command> programs. If a particular program needs more information from the user, it will prompt you during this process."
+msgid "Before you input any passphrases, you should have made sure that your keyboard is configured correctly and generates the expected characters. If you are unsure, you can switch to the second virtual console and type some text at the prompt. This ensures that you won't be surprised later, e.g. by trying to input a passphrase using a qwerty keyboard layout when you used an azerty layout during the installation. This situation can have several causes. Maybe you switched to another keyboard layout during the installation, or the selected keyboard layout might not have been set up yet when entering the passphrase for the root file system."
 msgstr ""
 
-#: using-d-i.xml:1578
+#: using-d-i.xml:1583
+#, no-c-format
+#. Tag: para
+msgid "If you selected to use methods other than a passphrase to create encryption keys, they will be generated now. Because the kernel may not have gathered a sufficient amount of entropy at this early stage of the installation, the process may take a long time. You can help speed up the process by generating entropy: e.g. by pressing random keys, or by switching to the shell on the second virtual console and generating some network and disk traffic (downloading some files, feeding big files into <filename>/dev/null</filename>, etc.). This will be repeated for each partition to be encrypted."
+msgstr ""
+
+#: using-d-i.xml:1599
+#, no-c-format
+#. Tag: para
+msgid ""
+      "After returning to the main partitioning menu, you will see all encrypted volumes as additional partitions which can be configured in the same way as ordinary partitions. The following example shows two different volumes. The first one is encrypted via dm-crypt, the second one via loop-AES. <informalexample><screen>\n"
+      "Encrypted volume (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-mapper\n"
+      "     #1 115.1 GB  F ext3\n"
+      "\n"
+      "Loopback (<replaceable>loop0</replaceable>) - 515.2 MB AES256 keyfile\n"
+      "     #1 515.2 MB  F ext3\n"
+      "</screen></informalexample> Now is the time to assign mount points to the volumes and optionally change the file system types if the defaults do not suit you."
+msgstr ""
+
+#: using-d-i.xml:1612
+#, no-c-format
+#. Tag: para
+msgid "One thing to note here are the identifiers in parentheses (<replaceable>crypt0</replaceable> and <replaceable>loop0</replaceable> in this case) and the mount points you assigned to each encrypted volume. You will need this information later when booting the new system. The differences between ordinary boot process and boot process with encryption involved will be covered later in <xref linkend=\"mount-encrypted-volumes\"/>."
+msgstr ""
+
+#: using-d-i.xml:1622
+#, no-c-format
+#. Tag: para
+msgid "Once you are satisfied with the partitioning scheme, continue with the installation."
+msgstr ""
+
+#: using-d-i.xml:1633
 #, no-c-format
 #. Tag: title
-msgid "Configuring Your Mail Transport Agent"
+msgid "Setting up the System"
 msgstr ""
 
-#: using-d-i.xml:1580
+#: using-d-i.xml:1634
 #, no-c-format
 #. Tag: para
-msgid "Today, email is a very important part of many people's life, so it's no surprise Debian lets you configure your mail system right as a part of the installation process. The standard mail transport agent in Debian is <command>exim4</command>, which is relatively small, flexible, and easy to learn."
-msgstr ""
-
-#: using-d-i.xml:1588
-#, no-c-format
-#. Tag: para
-msgid "You may ask if this is needed even if your computer is not connected to any network. The short answer is: Yes. The longer explanation: Some system utilities (like <command>cron</command>, <command>quota</command>, <command>aide</command>, &hellip;) may send you important notices via email."
-msgstr ""
-
-#: using-d-i.xml:1596
-#, no-c-format
-#. Tag: para
-msgid "So on the first screen you will be presented with several common mail scenarios. Choose the one that most closely resembles your needs:"
-msgstr ""
-
-#: using-d-i.xml:1605
-#, no-c-format
-#. Tag: term
-msgid "internet site"
-msgstr ""
-
-#: using-d-i.xml:1606
-#, no-c-format
-#. Tag: para
-msgid "Your system is connected to a network and your mail is sent and received directly using SMTP. On the following screens you will be asked a few basic questions, like your machine's mail name, or a list of domains for which you accept or relay mail."
-msgstr ""
-
-#: using-d-i.xml:1617
-#, no-c-format
-#. Tag: term
-msgid "mail sent by smarthost"
-msgstr ""
-
-#: using-d-i.xml:1618
-#, no-c-format
-#. Tag: para
-msgid "In this scenario is your outgoing mail forwarded to another machine, called a <quote>smarthost</quote>, which does the actual job for you. Smarthost also usually stores incoming mail addressed to your computer, so you don't need to be permanently online. That also means you have to download your mail from the smarthost via programs like fetchmail. This option is suitable for dial-up users."
-msgstr ""
-
-#: using-d-i.xml:1631
-#, no-c-format
-#. Tag: term
-msgid "local delivery only"
-msgstr ""
-
-#: using-d-i.xml:1632
-#, no-c-format
-#. Tag: para
-msgid "Your system is not on a network and mail is sent or received only between local users. Even if you don't plan to send any messages, this option is highly recommended, because some system utilities may send you various alerts from time to time (e.g. beloved <quote>Disk quota exceeded</quote>). This option is also convenient for new users, because it doesn't ask any further questions."
-msgstr ""
-
-#: using-d-i.xml:1645
-#, no-c-format
-#. Tag: term
-msgid "no configuration at this time"
+msgid "After partitioning the installer asks a few more questions that will be used to set up the system it is about to install."
 msgstr ""
 
 #: using-d-i.xml:1646
 #, no-c-format
-#. Tag: para
-msgid "Choose this if you are absolutely convinced you know what you are doing. This will leave you with an unconfigured mail system &mdash; until you configure it, you won't be able to send or receive any mail and you may miss some important messages from your system utilities."
+#. Tag: title
+msgid "Configuring Your Time Zone"
 msgstr ""
 
-#: using-d-i.xml:1657
+#: using-d-i.xml:1648
 #, no-c-format
 #. Tag: para
-msgid "If none of these scenarios suits your needs, or if you need a finer setup, you will need to edit configuration files under the <filename>/etc/exim4</filename> directory after the installation is complete. More information about <command>exim4</command> may be found under <filename>/usr/share/doc/exim4</filename>."
+msgid "Depending on the location selected at the beginning of the installation process, you might be shown a list of timezones relevant for that location. If your location has only one time zone, you will not be asked anything and the system will assume that time zone."
 msgstr ""
 
-#: using-d-i.xml:1672
+#: using-d-i.xml:1664
 #, no-c-format
 #. Tag: title
-msgid "Making Your System Bootable"
+msgid "Configuring the Clock"
 msgstr ""
 
-#: using-d-i.xml:1674
+#: using-d-i.xml:1666
 #, no-c-format
 #. Tag: para
-msgid "If you are installing a diskless workstation, obviously, booting off the local disk isn't a meaningful option, and this step will be skipped. <phrase arch=\"sparc\">You may wish to set the OpenBoot to boot from the network by default; see <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
+msgid "The installer might ask you if the computer's clock is set to UTC. Normally this question is avoided if possible and the installer tries to work out whether the clock is set to UTC based on things like what other operating systems are installed."
 msgstr ""
 
-#: using-d-i.xml:1682
+#: using-d-i.xml:1673
 #, no-c-format
 #. Tag: para
-msgid "Note that multiple operating systems booting on a single machine is still something of a black art. This document does not even attempt to document the various boot managers, which vary by architecture and even by subarchitecture. You should see your boot manager's documentation for more information."
+msgid "In expert mode you will always be able to choose whether or not the clock is set to UTC. <phrase arch=\"m68k;powerpc\">Macintosh hardware clocks are normally set to local time. If you want to dual-boot, select local time instead of GMT.</phrase> <phrase arch=\"i386\">Systems that (also) run Dos or Windows are normally set to local time. If you want to dual-boot, select local time instead of GMT.</phrase>"
 msgstr ""
 
-#: using-d-i.xml:1697
+#: using-d-i.xml:1684
+#, no-c-format
+#. Tag: para
+msgid "Note that the installer does not currently allow you to actually set the time in the computer's clock. You can set the clock to the current time after you have installed, if it is incorrect or if it was previously not set to UTC."
+msgstr ""
+
+#: using-d-i.xml:1700
 #, no-c-format
 #. Tag: title
-msgid "Detecting other operating systems"
+msgid "Setting Up Users And Passwords"
 msgstr ""
 
-#: using-d-i.xml:1699
-#, no-c-format
-#. Tag: para
-msgid "Before a boot loader is installed, the installer will attempt to probe for other operating systems which are installed on the machine. If it finds a supported operating system, you will be informed of this during the boot loader installation step, and the computer will be configured to boot this other operating system in addition to Debian."
-msgstr ""
-
-#: using-d-i.xml:1707
-#, no-c-format
-#. Tag: para
-msgid "Note that multiple operating systems booting on a single machine is still something of a black art. The automatic support for detecting and setting up boot loaders to boot other operating systems varies by architecture and even by subarchitecture. If it does not work you should consult your boot manager's documentation for more information."
-msgstr ""
-
-#: using-d-i.xml:1725
+#: using-d-i.xml:1703
 #, no-c-format
 #. Tag: title
-msgid "Install <command>aboot</command> on a Hard Disk"
+msgid "Set the Root Password"
 msgstr ""
 
-#: using-d-i.xml:1726
+#: using-d-i.xml:1705
 #, no-c-format
 #. Tag: para
-msgid "If you have booted from SRM, if you select this option, the installer will write <command>aboot</command> to the first sector of the disk on which you installed Debian. Be <emphasis>very</emphasis> careful &mdash; it is <emphasis>not</emphasis> possible to boot multiple operating systems (e.g. GNU/Linux, Free/Open/NetBSD, OSF/1 a.k.a. Digital Unix a.k.a. Tru64 Unix, or OpenVMS) from the same disk. If you also have a different operating system installed on the disk where you have installed Debian, you will have to boot GNU/Linux from a floppy instead."
+msgid "The <emphasis>root</emphasis> account is also called the <emphasis>super-user</emphasis>; it is a login that bypasses all security protection on your system. The root account should only be used to perform system administration, and only used for as short a time as possible."
 msgstr ""
 
-#: using-d-i.xml:1746
+#: using-d-i.xml:1713
+#, no-c-format
+#. Tag: para
+msgid "Any password you create should contain at least 6 characters, and should contain both upper- and lower-case characters, as well as punctuation characters. Take extra care when setting your root password, since it is such a powerful account. Avoid dictionary words or use of any personal information which could be guessed."
+msgstr ""
+
+#: using-d-i.xml:1721
+#, no-c-format
+#. Tag: para
+msgid "If anyone ever tells you they need your root password, be extremely wary. You should normally never give your root password out, unless you are administering a machine with more than one system administrator."
+msgstr ""
+
+#: using-d-i.xml:1731
 #, no-c-format
 #. Tag: title
-msgid "<command>palo</command>-installer"
+msgid "Create an Ordinary User"
 msgstr ""
 
-#: using-d-i.xml:1747
+#: using-d-i.xml:1733
 #, no-c-format
 #. Tag: para
-msgid "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is similar in configuration and usage to <command>LILO</command>, with a few exceptions. First of all, <command>PALO</command> allows you to boot any kernel image on your boot partition. This is because <command>PALO</command> can actually read Linux partitions."
+msgid "The system will ask you whether you wish to create an ordinary user account at this point. This account should be your main personal log-in. You should <emphasis>not</emphasis> use the root account for daily use or as your personal login."
 msgstr ""
 
-#: using-d-i.xml:1756
+#: using-d-i.xml:1740
 #, no-c-format
 #. Tag: para
-msgid "hppa FIXME ( need more info )"
+msgid "Why not? Well, one reason to avoid using root's privileges is that it is very easy to do irreparable damage as root. Another reason is that you might be tricked into running a <emphasis>Trojan-horse</emphasis> program &mdash; that is a program that takes advantage of your super-user powers to compromise the security of your system behind your back. Any good book on Unix system administration will cover this topic in more detail &mdash; consider reading one if it is new to you."
 msgstr ""
 
-#: using-d-i.xml:1768
+#: using-d-i.xml:1750
+#, no-c-format
+#. Tag: para
+msgid "You will first be prompted for the user's full name. Then you'll be asked for a name for the user account; generally your first name or something similar will suffice and indeed will be the default. Finally, you will be prompted for a password for this account."
+msgstr ""
+
+#: using-d-i.xml:1757
+#, no-c-format
+#. Tag: para
+msgid "If at any point after installation you would like to create another account, use the <command>adduser</command> command."
+msgstr ""
+
+#: using-d-i.xml:1769
 #, no-c-format
 #. Tag: title
-msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
+msgid "Installing the Base System"
 msgstr ""
 
 #: using-d-i.xml:1770
 #, no-c-format
 #. Tag: para
-msgid "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a flexible and robust boot loader and a good default choice for newbies and old hands alike."
+msgid "Although this stage is the least problematic, it consumes a significant fraction of the install because it downloads, verifies and unpacks the whole base system. If you have a slow computer or network connection, this could take some time."
 msgstr ""
 
-#: using-d-i.xml:1776
+#: using-d-i.xml:1784
 #, no-c-format
-#. Tag: para
-msgid "By default, grub will be installed into the Master Boot Record (MBR), where it will take over complete control of the boot process. If you prefer, you can install it elsewhere. See the grub manual for complete information."
+#. Tag: title
+msgid "Base System Installation"
 msgstr ""
 
-#: using-d-i.xml:1782
+#: using-d-i.xml:1786
 #, no-c-format
 #. Tag: para
-msgid "If you do not want to install grub at all, use the Back button to get to the main menu, and from there select whatever bootloader you would like to use."
+msgid "During the Base installation, package unpacking and setup messages are redirected to <userinput>tty4</userinput>. You can access this terminal by pressing <keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></keycombo>; get back to the main installer process with <keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>."
 msgstr ""
 
 #: using-d-i.xml:1796
 #, no-c-format
+#. Tag: para
+msgid "The unpack/setup messages generated by the base installation are saved in <filename>/var/log/syslog</filename> when the installation is performed over a serial console."
+msgstr ""
+
+#: using-d-i.xml:1802
+#, no-c-format
+#. Tag: para
+msgid "As part of the installation, a Linux kernel will be installed. At the default priority, the installer will choose one for you that best matches your hardware. In lower priority modes, you will be able to choose from a list of available kernels."
+msgstr ""
+
+#: using-d-i.xml:1815
+#, no-c-format
 #. Tag: title
-msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
-msgstr ""
-
-#: using-d-i.xml:1798
-#, no-c-format
-#. Tag: para
-msgid "The second &architecture; boot loader is called <quote>LILO</quote>. It is an old complex program which offers lots of functionality, including DOS, Windows, and OS/2 boot management. Please carefully read the instructions in the directory <filename>/usr/share/doc/lilo/</filename> if you have special needs; also see the <ulink url=\"&url-lilo-howto;\">LILO mini-HOWTO</ulink>."
-msgstr ""
-
-#: using-d-i.xml:1808
-#, no-c-format
-#. Tag: para
-msgid "Currently the LILO installation will only create menu entries for other operating systems if these can be <firstterm>chainloaded</firstterm>. This means you may have to manually add a menu entry for operating systems like GNU/Linux and GNU/Hurd after the installation."
+msgid "Installing Additional Software"
 msgstr ""
 
 #: using-d-i.xml:1816
 #, no-c-format
 #. Tag: para
+msgid "After the base system is installed, you have a usable but limited system. Most users will want to add additional software to the system to tune it to their needs, and the installer lets you do so. This step can take even longer than installing the base system if you have a slow computer or network."
+msgstr ""
+
+#: using-d-i.xml:1830
+#, no-c-format
+#. Tag: title
+msgid "Configuring apt"
+msgstr ""
+
+#: using-d-i.xml:1832
+#, no-c-format
+#. Tag: para
+msgid "The main means that people use to install packages on their system is via a program called <command>apt-get</command>, from the <classname>apt</classname> package.<footnote> <para> Note that the actual program that installs packages is called <command>dpkg</command>. However, this program is more of a low-level tool. <command>apt-get</command> is a higher-level tool as it will invoke <command>dpkg</command> as appropriate and also because it knows to install other packages which are required for the package you're trying to install, as well as how to retrieve the package from your CD, the network, or wherever. </para> </footnote> Other front-ends for package management, like <command>aptitude</command> and <command>synaptic</command> are also in use and depend on <command>apt-get</command>. These front-ends are recommended for new users, since they integrate some additional features (package searching and status checks) in a nice user interface."
+msgstr ""
+
+#: using-d-i.xml:1856
+#, no-c-format
+#. Tag: para
+msgid "<command>apt</command> must be configured so that it knows where to retrieve packages from. The installer largely takes care of this automatically based on what it knows about your installation medium. The results of this configuration are written to the file <filename>/etc/apt/sources.list</filename>, and you can examine and edit it to your liking after the install is complete."
+msgstr ""
+
+#: using-d-i.xml:1872
+#, no-c-format
+#. Tag: title
+msgid "Selecting and Installing Software"
+msgstr ""
+
+#: using-d-i.xml:1874
+#, no-c-format
+#. Tag: para
+msgid "During the installation process, you are given the opportunity to select additional software to install. Rather than picking individual software packages from the &num-of-distrib-pkgs; available packages, this stage of the installation process focuses on selecting and installing predefined collections of software to quickly set up your computer to perform various tasks."
+msgstr ""
+
+#: using-d-i.xml:1883
+#, no-c-format
+#. Tag: para
+msgid "So, you have the ability to choose <emphasis>tasks</emphasis> first, and then add on more individual packages later. These tasks loosely represent a number of different jobs or things you want to do with your computer, such as <quote>Desktop environment</quote>, <quote>Web server</quote>, or <quote>Print server</quote><footnote> <para> You should know that to present this list, the installer is merely invoking the <command>tasksel</command> program. It can be run at any time after installation to install (or remove) more packages, or you can use a more fine-grained tool such as <command>aptitude</command>. If you are looking for a specific single package, after installation is complete, simply run <userinput>aptitude install <replaceable>package</replaceable></userinput>, where <replaceable>package</replaceable> is the name of the package you are looking for. </para> </footnote>. <xref linkend=\"tasksel-size-list\"/> lists the space requirements for the available tasks."
+msgstr ""
+
+#: using-d-i.xml:1908
+#, no-c-format
+#. Tag: para
+msgid "Once you've selected your tasks, select <guibutton>Ok</guibutton>. At this point, <command>aptitude</command> will install the packages you've selected."
+msgstr ""
+
+#: using-d-i.xml:1915
+#, no-c-format
+#. Tag: para
+msgid "In the standard user interface of the installer, you can use the space bar to toggle selection of a task."
+msgstr ""
+
+#: using-d-i.xml:1922
+#, no-c-format
+#. Tag: para
+msgid "Note that some tasks may be pre-selected based on the characteristics of the computer you are installing. If you disagree with these selections you can un-select the tasks. You can even opt to install no tasks at all at this point."
+msgstr ""
+
+#: using-d-i.xml:1930
+#, no-c-format
+#. Tag: para
+msgid "Each package you selected with <command>tasksel</command> is downloaded, unpacked and then installed in turn by the <command>apt-get</command> and <command>dpkg</command> programs. If a particular program needs more information from the user, it will prompt you during this process."
+msgstr ""
+
+#: using-d-i.xml:1939
+#, no-c-format
+#. Tag: title
+msgid "Configuring Your Mail Transport Agent"
+msgstr ""
+
+#: using-d-i.xml:1941
+#, no-c-format
+#. Tag: para
+msgid "Today, email is a very important part of many people's life, so it's no surprise Debian lets you configure your mail system right as a part of the installation process. The standard mail transport agent in Debian is <command>exim4</command>, which is relatively small, flexible, and easy to learn."
+msgstr ""
+
+#: using-d-i.xml:1949
+#, no-c-format
+#. Tag: para
+msgid "You may ask if this is needed even if your computer is not connected to any network. The short answer is: Yes. The longer explanation: Some system utilities (like <command>cron</command>, <command>quota</command>, <command>aide</command>, &hellip;) may send you important notices via email."
+msgstr ""
+
+#: using-d-i.xml:1957
+#, no-c-format
+#. Tag: para
+msgid "So on the first screen you will be presented with several common mail scenarios. Choose the one that most closely resembles your needs:"
+msgstr ""
+
+#: using-d-i.xml:1966
+#, no-c-format
+#. Tag: term
+msgid "internet site"
+msgstr ""
+
+#: using-d-i.xml:1967
+#, no-c-format
+#. Tag: para
+msgid "Your system is connected to a network and your mail is sent and received directly using SMTP. On the following screens you will be asked a few basic questions, like your machine's mail name, or a list of domains for which you accept or relay mail."
+msgstr ""
+
+#: using-d-i.xml:1978
+#, no-c-format
+#. Tag: term
+msgid "mail sent by smarthost"
+msgstr ""
+
+#: using-d-i.xml:1979
+#, no-c-format
+#. Tag: para
+msgid "In this scenario is your outgoing mail forwarded to another machine, called a <quote>smarthost</quote>, which does the actual job for you. Smarthost also usually stores incoming mail addressed to your computer, so you don't need to be permanently online. That also means you have to download your mail from the smarthost via programs like fetchmail. This option is suitable for dial-up users."
+msgstr ""
+
+#: using-d-i.xml:1992
+#, no-c-format
+#. Tag: term
+msgid "local delivery only"
+msgstr ""
+
+#: using-d-i.xml:1993
+#, no-c-format
+#. Tag: para
+msgid "Your system is not on a network and mail is sent or received only between local users. Even if you don't plan to send any messages, this option is highly recommended, because some system utilities may send you various alerts from time to time (e.g. beloved <quote>Disk quota exceeded</quote>). This option is also convenient for new users, because it doesn't ask any further questions."
+msgstr ""
+
+#: using-d-i.xml:2006
+#, no-c-format
+#. Tag: term
+msgid "no configuration at this time"
+msgstr ""
+
+#: using-d-i.xml:2007
+#, no-c-format
+#. Tag: para
+msgid "Choose this if you are absolutely convinced you know what you are doing. This will leave you with an unconfigured mail system &mdash; until you configure it, you won't be able to send or receive any mail and you may miss some important messages from your system utilities."
+msgstr ""
+
+#: using-d-i.xml:2018
+#, no-c-format
+#. Tag: para
+msgid "If none of these scenarios suits your needs, or if you need a finer setup, you will need to edit configuration files under the <filename>/etc/exim4</filename> directory after the installation is complete. More information about <command>exim4</command> may be found under <filename>/usr/share/doc/exim4</filename>."
+msgstr ""
+
+#: using-d-i.xml:2033
+#, no-c-format
+#. Tag: title
+msgid "Making Your System Bootable"
+msgstr ""
+
+#: using-d-i.xml:2035
+#, no-c-format
+#. Tag: para
+msgid "If you are installing a diskless workstation, obviously, booting off the local disk isn't a meaningful option, and this step will be skipped. <phrase arch=\"sparc\">You may wish to set the OpenBoot to boot from the network by default; see <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
+msgstr ""
+
+#: using-d-i.xml:2043
+#, no-c-format
+#. Tag: para
+msgid "Note that multiple operating systems booting on a single machine is still something of a black art. This document does not even attempt to document the various boot managers, which vary by architecture and even by subarchitecture. You should see your boot manager's documentation for more information."
+msgstr ""
+
+#: using-d-i.xml:2058
+#, no-c-format
+#. Tag: title
+msgid "Detecting other operating systems"
+msgstr ""
+
+#: using-d-i.xml:2060
+#, no-c-format
+#. Tag: para
+msgid "Before a boot loader is installed, the installer will attempt to probe for other operating systems which are installed on the machine. If it finds a supported operating system, you will be informed of this during the boot loader installation step, and the computer will be configured to boot this other operating system in addition to Debian."
+msgstr ""
+
+#: using-d-i.xml:2068
+#, no-c-format
+#. Tag: para
+msgid "Note that multiple operating systems booting on a single machine is still something of a black art. The automatic support for detecting and setting up boot loaders to boot other operating systems varies by architecture and even by subarchitecture. If it does not work you should consult your boot manager's documentation for more information."
+msgstr ""
+
+#: using-d-i.xml:2086
+#, no-c-format
+#. Tag: title
+msgid "Install <command>aboot</command> on a Hard Disk"
+msgstr ""
+
+#: using-d-i.xml:2087
+#, no-c-format
+#. Tag: para
+msgid "If you have booted from SRM, if you select this option, the installer will write <command>aboot</command> to the first sector of the disk on which you installed Debian. Be <emphasis>very</emphasis> careful &mdash; it is <emphasis>not</emphasis> possible to boot multiple operating systems (e.g. GNU/Linux, Free/Open/NetBSD, OSF/1 a.k.a. Digital Unix a.k.a. Tru64 Unix, or OpenVMS) from the same disk. If you also have a different operating system installed on the disk where you have installed Debian, you will have to boot GNU/Linux from a floppy instead."
+msgstr ""
+
+#: using-d-i.xml:2107
+#, no-c-format
+#. Tag: title
+msgid "<command>palo</command>-installer"
+msgstr ""
+
+#: using-d-i.xml:2108
+#, no-c-format
+#. Tag: para
+msgid "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is similar in configuration and usage to <command>LILO</command>, with a few exceptions. First of all, <command>PALO</command> allows you to boot any kernel image on your boot partition. This is because <command>PALO</command> can actually read Linux partitions."
+msgstr ""
+
+#: using-d-i.xml:2117
+#, no-c-format
+#. Tag: para
+msgid "hppa FIXME ( need more info )"
+msgstr ""
+
+#: using-d-i.xml:2129
+#, no-c-format
+#. Tag: title
+msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
+msgstr ""
+
+#: using-d-i.xml:2131
+#, no-c-format
+#. Tag: para
+msgid "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a flexible and robust boot loader and a good default choice for newbies and old hands alike."
+msgstr ""
+
+#: using-d-i.xml:2137
+#, no-c-format
+#. Tag: para
+msgid "By default, grub will be installed into the Master Boot Record (MBR), where it will take over complete control of the boot process. If you prefer, you can install it elsewhere. See the grub manual for complete information."
+msgstr ""
+
+#: using-d-i.xml:2143
+#, no-c-format
+#. Tag: para
+msgid "If you do not want to install grub at all, use the Back button to get to the main menu, and from there select whatever bootloader you would like to use."
+msgstr ""
+
+#: using-d-i.xml:2157
+#, no-c-format
+#. Tag: title
+msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
+msgstr ""
+
+#: using-d-i.xml:2159
+#, no-c-format
+#. Tag: para
+msgid "The second &architecture; boot loader is called <quote>LILO</quote>. It is an old complex program which offers lots of functionality, including DOS, Windows, and OS/2 boot management. Please carefully read the instructions in the directory <filename>/usr/share/doc/lilo/</filename> if you have special needs; also see the <ulink url=\"&url-lilo-howto;\">LILO mini-HOWTO</ulink>."
+msgstr ""
+
+#: using-d-i.xml:2169
+#, no-c-format
+#. Tag: para
+msgid "Currently the LILO installation will only create menu entries for other operating systems if these can be <firstterm>chainloaded</firstterm>. This means you may have to manually add a menu entry for operating systems like GNU/Linux and GNU/Hurd after the installation."
+msgstr ""
+
+#: using-d-i.xml:2177
+#, no-c-format
+#. Tag: para
 msgid "&d-i; presents you three choices where to install the <command>LILO</command> boot loader:"
 msgstr ""
 
-#: using-d-i.xml:1823
+#: using-d-i.xml:2184
 #, no-c-format
 #. Tag: term
 msgid "Master Boot Record (MBR)"
 msgstr ""
 
-#: using-d-i.xml:1823
+#: using-d-i.xml:2184
 #, no-c-format
 #. Tag: para
 msgid "This way the <command>LILO</command> will take complete control of the boot process."
 msgstr ""
 
-#: using-d-i.xml:1830
+#: using-d-i.xml:2191
 #, no-c-format
 #. Tag: term
 msgid "new Debian partition"
 msgstr ""
 
-#: using-d-i.xml:1830
+#: using-d-i.xml:2191
 #, no-c-format
 #. Tag: para
 msgid "Choose this if you want to use another boot manager. <command>LILO</command> will install itself at the beginning of the new Debian partition and it will serve as a secondary boot loader."
 msgstr ""
 
-#: using-d-i.xml:1839
+#: using-d-i.xml:2200
 #, no-c-format
 #. Tag: term
 msgid "Other choice"
 msgstr ""
 
-#: using-d-i.xml:1839
+#: using-d-i.xml:2200
 #, no-c-format
 #. Tag: para
 msgid "Useful for advanced users who want to install <command>LILO</command> somewhere else. In this case you will be asked for desired location. You can use devfs style names, such as those that start with <filename>/dev/ide</filename>, <filename>/dev/scsi</filename>, and <filename>/dev/discs</filename>, as well as traditional names, such as <filename>/dev/hda</filename> or <filename>/dev/sda</filename>."
 msgstr ""
 
-#: using-d-i.xml:1851
+#: using-d-i.xml:2212
 #, no-c-format
 #. Tag: para
 msgid "If you can no longer boot into Windows 9x (or DOS) after this step, you'll need to use a Windows 9x (MS-DOS) boot disk and use the <userinput>fdisk /mbr</userinput> command to reinstall the MS-DOS master boot record &mdash; however, this means that you'll need to use some other way to get back into Debian! For more information on this please read <xref linkend=\"reactivating-win\"/>."
 msgstr ""
 
-#: using-d-i.xml:1868
+#: using-d-i.xml:2229
 #, no-c-format
 #. Tag: title
 msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr ""
 
-#: using-d-i.xml:1870
+#: using-d-i.xml:2231
 #, no-c-format
 #. Tag: para
 msgid "The &architecture; boot loader is called <quote>elilo</quote>. It is modeled on the <quote>lilo</quote> boot loader for the x86 architecture and uses a similar configuration file. However, instead of writing an MBR or partition boot record to the disk, it copies the necessary files to a separate FAT formatted disk partition and modifies the <guimenuitem>EFI Boot Manager</guimenuitem> menu in the firmware to point to the files in the EFI partition. The <command>elilo</command> boot loader is really in two parts. The <filename>/usr/sbin/elilo</filename> command manages the partition and copies file into it. The <filename>elilo.efi</filename> program is copied into the EFI partition and then run by the <quote>EFI Boot Manager</quote> to actually do the work of loading and starting the Linux kernel."
 msgstr ""
 
-#: using-d-i.xml:1886
+#: using-d-i.xml:2247
 #, no-c-format
 #. Tag: para
 msgid "The <quote>elilo</quote> configuration and installation is done as the last step of installing the packages of the base installation. &d-i; will present you with a list of potential disk partitions that it has found suitable for an EFI partition. Select the partition you set up earlier in the installation, typically a partition on the same disk that contains your <emphasis>root</emphasis> filesystem."
 msgstr ""
 
-#: using-d-i.xml:1898
+#: using-d-i.xml:2259
 #, no-c-format
 #. Tag: title
 msgid "Choose the correct partition!"
 msgstr ""
 
-#: using-d-i.xml:1900
+#: using-d-i.xml:2261
 #, no-c-format
 #. Tag: para
 msgid "The criteria for selecting a partition is that it is FAT format filesystem with its <emphasis>boot</emphasis> flag set. &d-i; may show multiple choices depending on what it finds from scanning all of the disks of the system including EFI partitions of other system disks and EFI diagnostic partitions. Remember, the <command>elilo</command> may format the partition during the installation, erasing any previous contents!"
 msgstr ""
 
-#: using-d-i.xml:1915
+#: using-d-i.xml:2276
 #, no-c-format
 #. Tag: title
 msgid "EFI Partition Contents"
 msgstr ""
 
-#: using-d-i.xml:1917
+#: using-d-i.xml:2278
 #, no-c-format
 #. Tag: para
 msgid "The EFI partition is a FAT filesystem format partition on one of the hard disks of the system, usually the same disk that contains the <emphasis>root</emphasis> filesystem. It is normally not mounted on a running system as it is only needed by the <quote>EFI Boot Manager</quote> to load the system and the installer part of the <command>elilo</command> writes to the filesystem directly. The <command>/usr/sbin/elilo</command> utility writes the following files into the <filename>efi/debian</filename> directory of the EFI partition during the installation. Note that the <quote>EFI Boot Manager</quote> would find these files using the path <filename>fs<replaceable>n</replaceable>:\\efi\\debian</filename>. There may be other files in this filesystem as well over time as the system is updated or re-configured."
 msgstr ""
 
-#: using-d-i.xml:1939
+#: using-d-i.xml:2300
 #, no-c-format
 #. Tag: filename
 msgid "elilo.conf"
 msgstr ""
 
-#: using-d-i.xml:1940
+#: using-d-i.xml:2301
 #, no-c-format
 #. Tag: para
 msgid "This is the configuration file read by the boot loader when it starts. It is a copy of the <filename>/etc/elilo.conf</filename> with the filenames re-written to refer to files in the EFI partition."
 msgstr ""
 
-#: using-d-i.xml:1949
+#: using-d-i.xml:2310
 #, no-c-format
 #. Tag: filename
 msgid "elilo.efi"
 msgstr ""
 
-#: using-d-i.xml:1950
+#: using-d-i.xml:2311
 #, no-c-format
 #. Tag: para
 msgid "This is the boot loader program that the <quote>EFI Boot Manager</quote> runs to boot the system. It is the program behind the <guimenuitem>Debian GNU/Linux</guimenuitem> menu item of the <quote>EFI Boot Manager</quote> command menu."
 msgstr ""
 
-#: using-d-i.xml:1960
+#: using-d-i.xml:2321
 #, no-c-format
 #. Tag: filename
 msgid "initrd.img"
 msgstr ""
 
-#: using-d-i.xml:1961
+#: using-d-i.xml:2322
 #, no-c-format
 #. Tag: para
 msgid "This is the initial root filesystem used to boot the kernel. It is a copy of the file referenced in the <filename>/etc/elilo.conf</filename>. In a standard Debian installation it would be the file in <filename>/boot</filename> pointed to by the symbolic link <filename>/initrd.img</filename>."
 msgstr ""
 
-#: using-d-i.xml:1973
+#: using-d-i.xml:2334
 #, no-c-format
 #. Tag: filename
 msgid "readme.txt"
 msgstr ""
 
-#: using-d-i.xml:1974
+#: using-d-i.xml:2335
 #, no-c-format
 #. Tag: para
 msgid "This is a small text file warning you that the contents of the directory are managed by the <command>elilo</command> and that any local changes would be lost at the next time <filename>/usr/sbin/elilo</filename> is run."
 msgstr ""
 
-#: using-d-i.xml:1984
+#: using-d-i.xml:2345
 #, no-c-format
 #. Tag: filename
 msgid "vmlinuz"
 msgstr ""
 
-#: using-d-i.xml:1985
+#: using-d-i.xml:2346
 #, no-c-format
 #. Tag: para
 msgid "This is the compressed kernel itself. It is a copy of the file referenced in the <filename>/etc/elilo.conf</filename>. In a standard Debian installation it would be the file in <filename>/boot</filename> pointed to by the symbolic link <filename>/vmlinuz</filename>."
 msgstr ""
 
-#: using-d-i.xml:2005
+#: using-d-i.xml:2366
 #, no-c-format
 #. Tag: title
 msgid "<command>arcboot</command>-installer"
 msgstr ""
 
-#: using-d-i.xml:2006
+#: using-d-i.xml:2367
 #, no-c-format
 #. Tag: para
 msgid ""
@@ -1616,61 +1863,61 @@ msgid ""
       "</screen></informalexample> on the firmware prompt, and then typing <command>boot</command>."
 msgstr ""
 
-#: using-d-i.xml:2025
+#: using-d-i.xml:2386
 #, no-c-format
 #. Tag: replaceable
 msgid "scsi"
 msgstr ""
 
-#: using-d-i.xml:2026
+#: using-d-i.xml:2387
 #, no-c-format
 #. Tag: para
 msgid "is the SCSI bus to be booted from, this is <userinput>0</userinput> for the onboard controllers"
 msgstr ""
 
-#: using-d-i.xml:2034
+#: using-d-i.xml:2395
 #, no-c-format
 #. Tag: replaceable
 msgid "disk"
 msgstr ""
 
-#: using-d-i.xml:2035
+#: using-d-i.xml:2396
 #, no-c-format
 #. Tag: para
 msgid "is the SCSI ID of the hard disk on which <command>arcboot</command> is installed"
 msgstr ""
 
-#: using-d-i.xml:2043 using-d-i.xml:2112
+#: using-d-i.xml:2404 using-d-i.xml:2473
 #, no-c-format
 #. Tag: replaceable
 msgid "partnr"
 msgstr ""
 
-#: using-d-i.xml:2044
+#: using-d-i.xml:2405
 #, no-c-format
 #. Tag: para
 msgid "is the number of the partition on which <filename>/etc/arcboot.conf</filename> resides"
 msgstr ""
 
-#: using-d-i.xml:2052
+#: using-d-i.xml:2413
 #, no-c-format
 #. Tag: replaceable
 msgid "config"
 msgstr ""
 
-#: using-d-i.xml:2053
+#: using-d-i.xml:2414
 #, no-c-format
 #. Tag: para
 msgid "is the name of the configuration entry in <filename>/etc/arcboot.conf</filename>, which is <quote>linux</quote> by default."
 msgstr ""
 
-#: using-d-i.xml:2074
+#: using-d-i.xml:2435
 #, no-c-format
 #. Tag: title
 msgid "<command>delo</command>-installer"
 msgstr ""
 
-#: using-d-i.xml:2075
+#: using-d-i.xml:2436
 #, no-c-format
 #. Tag: para
 msgid ""
@@ -1679,247 +1926,247 @@ msgid ""
       "</screen></informalexample> on the firmware prompt."
 msgstr ""
 
-#: using-d-i.xml:2094
+#: using-d-i.xml:2455
 #, no-c-format
 #. Tag: replaceable
 msgid "<replaceable>#</replaceable>"
 msgstr ""
 
-#: using-d-i.xml:2095
+#: using-d-i.xml:2456
 #, no-c-format
 #. Tag: para
 msgid "is the TurboChannel device to be booted from, on most DECstations this is <userinput>3</userinput> for the onboard controllers"
 msgstr ""
 
-#: using-d-i.xml:2103
+#: using-d-i.xml:2464
 #, no-c-format
 #. Tag: replaceable
 msgid "<replaceable>id</replaceable>"
 msgstr ""
 
-#: using-d-i.xml:2104
+#: using-d-i.xml:2465
 #, no-c-format
 #. Tag: para
 msgid "is the SCSI ID of the hard disk on which <command>DELO</command> is installed"
 msgstr ""
 
-#: using-d-i.xml:2113
+#: using-d-i.xml:2474
 #, no-c-format
 #. Tag: para
 msgid "is the number of the partition on which <filename>/etc/delo.conf</filename> resides"
 msgstr ""
 
-#: using-d-i.xml:2121
+#: using-d-i.xml:2482
 #, no-c-format
 #. Tag: replaceable
 msgid "name"
 msgstr ""
 
-#: using-d-i.xml:2122
+#: using-d-i.xml:2483
 #, no-c-format
 #. Tag: para
 msgid "is the name of the configuration entry in <filename>/etc/delo.conf</filename>, which is <quote>linux</quote> by default."
 msgstr ""
 
-#: using-d-i.xml:2132
+#: using-d-i.xml:2493
 #, no-c-format
 #. Tag: para
 msgid "In case <filename>/etc/delo.conf</filename> is on the first partition on the disk and the default configuration shall be booted, it is sufficient to use"
 msgstr ""
 
-#: using-d-i.xml:2138
+#: using-d-i.xml:2499
 #, no-c-format
 #. Tag: screen
 msgid "<userinput>boot #/rz<replaceable>id</replaceable></userinput>"
 msgstr ""
 
-#: using-d-i.xml:2148
+#: using-d-i.xml:2509
 #, no-c-format
 #. Tag: title
 msgid "Install <command>Yaboot</command> on a Hard Disk"
 msgstr ""
 
-#: using-d-i.xml:2149
+#: using-d-i.xml:2510
 #, no-c-format
 #. Tag: para
 msgid "Newer (mid 1998 and on) PowerMacs use <command>yaboot</command> as their boot loader. The installer will set up <command>yaboot</command> automatically, so all you need is a small 820k partition named <quote>bootstrap</quote> with type <emphasis>Apple_Bootstrap</emphasis> created back in the partitioning component. If this step completes successfully then your disk should now be bootable and OpenFirmware will be set to boot &debian;."
 msgstr ""
 
-#: using-d-i.xml:2167
+#: using-d-i.xml:2528
 #, no-c-format
 #. Tag: title
 msgid "Install <command>Quik</command> on a Hard Disk"
 msgstr ""
 
-#: using-d-i.xml:2168
+#: using-d-i.xml:2529
 #, no-c-format
 #. Tag: para
 msgid "The boot loader for OldWorld Power Macintosh machines is <command>quik</command>. You can also use it on CHRP. The installer will attempt to set up <command>quik</command> automatically. The setup has been known to work on 7200, 7300, and 7600 Powermacs, and on some Power Computing clones."
 msgstr ""
 
-#: using-d-i.xml:2184
+#: using-d-i.xml:2545
 #, no-c-format
 #. Tag: title
 msgid "<command>zipl</command>-installer"
 msgstr ""
 
-#: using-d-i.xml:2185
+#: using-d-i.xml:2546
 #, no-c-format
 #. Tag: para
 msgid "The boot loader on &arch-title; is <quote>zipl</quote>. <command>ZIPL</command> is similar in configuration and usage to <command>LILO</command>, with a few exceptions. Please take a look at <quote>LINUX for &arch-title; Device Drivers and Installation Commands</quote> from IBM's developerWorks web site if you want to know more about <command>ZIPL</command>."
 msgstr ""
 
-#: using-d-i.xml:2202
+#: using-d-i.xml:2563
 #, no-c-format
 #. Tag: title
 msgid "Install the <command>SILO</command> Boot Loader on a Hard Disk"
 msgstr ""
 
-#: using-d-i.xml:2204
+#: using-d-i.xml:2565
 #, no-c-format
 #. Tag: para
 msgid "The standard &architecture; boot loader is called <quote>silo</quote>. It is documented in <filename>/usr/share/doc/silo/</filename>. <command>SILO</command> is similar in configuration and usage to <command>LILO</command>, with a few exceptions. First of all, <command>SILO</command> allows you to boot any kernel image on your drive, even if it is not listed in <filename>/etc/silo.conf</filename>. This is because <command>SILO</command> can actually read Linux partitions. Also, <filename>/etc/silo.conf</filename> is read at boot time, so there is no need to rerun <command>silo</command> after installing a new kernel like you would with <command>LILO</command>. <command>SILO</command> can also read UFS partitions, which means it can boot SunOS/Solaris partitions as well. This is useful if you want to install GNU/Linux alongside an existing SunOS/Solaris install."
 msgstr ""
 
-#: using-d-i.xml:2229
+#: using-d-i.xml:2590
 #, no-c-format
 #. Tag: title
 msgid "Continue Without Boot Loader"
 msgstr ""
 
-#: using-d-i.xml:2231
+#: using-d-i.xml:2592
 #, no-c-format
 #. Tag: para
 msgid "This option can be used to complete the installation even when no boot loader is to be installed, either because the arch/subarch doesn't provide one, or because none is desired (e.g. you will use existing boot loader). <phrase arch=\"m68k\">This option is especially useful for Macintosh, Atari, and Amiga systems, where the original operating system must be maintained on the box and used to boot GNU/Linux.</phrase>"
 msgstr ""
 
-#: using-d-i.xml:2240
+#: using-d-i.xml:2601
 #, no-c-format
 #. Tag: para
 msgid "If you plan to manually configure your bootloader, you should check the name of the installed kernel in <filename>/target/boot</filename>. You should also check that directory for the presence of an <firstterm>initrd</firstterm>; if one is present, you will probably have to instruct your bootloader to use it. Other information you will need are the disk and partition you selected for your <filename>/</filename> filesystem and, if you chose to install <filename>/boot</filename> on a separate partition, also your <filename>/boot</filename> filesystem."
 msgstr ""
 
-#: using-d-i.xml:2257
+#: using-d-i.xml:2618
 #, no-c-format
 #. Tag: title
 msgid "Finishing the Installation"
 msgstr ""
 
-#: using-d-i.xml:2258
+#: using-d-i.xml:2619
 #, no-c-format
 #. Tag: para
 msgid "These are the last bits to do before rebooting to your new system. It mostly consists of tidying up after the &d-i;."
 msgstr ""
 
-#: using-d-i.xml:2270
+#: using-d-i.xml:2631
 #, no-c-format
 #. Tag: title
 msgid "Finish the Installation and Reboot"
 msgstr ""
 
-#: using-d-i.xml:2272
+#: using-d-i.xml:2633
 #, no-c-format
 #. Tag: para
 msgid "This is the last step in the initial Debian installation process. You will be prompted to remove the boot media (CD, floppy, etc) that you used to boot the installer. The installer will do any last minute tasks, and then reboot into your new Debian system."
 msgstr ""
 
-#: using-d-i.xml:2279
+#: using-d-i.xml:2640
 #, no-c-format
 #. Tag: para
 msgid "Select the <guimenuitem>Finish the installation</guimenuitem> menu item which will halt the system because rebooting is not supported on &arch-title; in this case. You then need to IPL GNU/Linux from the DASD which you selected for the root filesystem during the first steps of the installation."
 msgstr ""
 
-#: using-d-i.xml:2293
+#: using-d-i.xml:2654
 #, no-c-format
 #. Tag: title
 msgid "Miscellaneous"
 msgstr ""
 
-#: using-d-i.xml:2294
+#: using-d-i.xml:2655
 #, no-c-format
 #. Tag: para
 msgid "The components listed in this section are usually not involved in the installation process, but are waiting in the background to help the user in case something goes wrong."
 msgstr ""
 
-#: using-d-i.xml:2307
+#: using-d-i.xml:2668
 #, no-c-format
 #. Tag: title
 msgid "Saving the installation logs"
 msgstr ""
 
-#: using-d-i.xml:2309
+#: using-d-i.xml:2670
 #, no-c-format
 #. Tag: para
 msgid "If the installation is successful, the logfiles created during the installation process will be automatically saved to <filename>/var/log/installer/</filename> on your new Debian system."
 msgstr ""
 
-#: using-d-i.xml:2316
+#: using-d-i.xml:2677
 #, no-c-format
 #. Tag: para
 msgid "Choosing <guimenuitem>Save debug logs</guimenuitem> from the main menu allows you to save the log files to a floppy disk, network, hard disk, or other media. This can be useful if you encounter fatal problems during the installation and wish to study the logs on another system or attach them to an installation report."
 msgstr ""
 
-#: using-d-i.xml:2336
+#: using-d-i.xml:2697
 #, no-c-format
 #. Tag: title
 msgid "Using the Shell and Viewing the Logs"
 msgstr ""
 
-#: using-d-i.xml:2339
+#: using-d-i.xml:2700
 #, no-c-format
 #. Tag: para
 msgid "There is an <guimenuitem>Execute a Shell</guimenuitem> item on the menu. If the menu is not available when you need to use the shell, press <keycombo><keycap>Left Alt</keycap> <keycap>F2</keycap></keycombo> (on a Mac keyboard, <keycombo><keycap>Option</keycap> <keycap>F2</keycap> </keycombo>) to switch to the second <emphasis>virtual console</emphasis>. That's the <keycap>Alt</keycap> key on the left-hand side of the <keycap>space bar</keycap>, and the <keycap>F2</keycap> function key, at the same time. This is a separate window running a Bourne shell clone called <command>ash</command>."
 msgstr ""
 
-#: using-d-i.xml:2351
+#: using-d-i.xml:2712
 #, no-c-format
 #. Tag: para
 msgid "At this point you are booted from the RAM disk, and there is a limited set of Unix utilities available for your use. You can see what programs are available with the command <command>ls /bin /sbin /usr/bin /usr/sbin</command> and by typing <command>help</command>. The text editor is <command>nano</command>. The shell has some nice features like autocompletion and history."
 msgstr ""
 
-#: using-d-i.xml:2360
+#: using-d-i.xml:2721
 #, no-c-format
 #. Tag: para
 msgid "Use the menus to perform any task that they are able to do &mdash; the shell and commands are only there in case something goes wrong. In particular, you should always use the menus, not the shell, to activate your swap partition, because the menu software can't detect that you've done this from the shell. Press <keycombo><keycap>Left Alt</keycap> <keycap>F1</keycap></keycombo> to get back to menus, or type <command>exit</command> if you used a menu item to open the shell."
 msgstr ""
 
-#: using-d-i.xml:2379
+#: using-d-i.xml:2740
 #, no-c-format
 #. Tag: title
 msgid "Installation Over the Network"
 msgstr ""
 
-#: using-d-i.xml:2381
+#: using-d-i.xml:2742
 #, no-c-format
 #. Tag: para
 msgid "One of the more interesting components is <firstterm>network-console</firstterm>. It allows you to do a large part of the installation over the network via SSH. The use of the network implies you will have to perform the first steps of the installation from the console, at least to the point of setting up the networking. (Although you can automate that part with <xref linkend=\"automatic-install\"/>.)"
 msgstr ""
 
-#: using-d-i.xml:2391
+#: using-d-i.xml:2752
 #, no-c-format
 #. Tag: para
 msgid "This component is not loaded into the main installation menu by default, so you have to explicitly ask for it. If you are installing from CD, you need to boot with medium priority or otherwise invoke the main installation menu and choose <guimenuitem>Load installer components from CD</guimenuitem> and from the list of additional components select <guimenuitem>network-console: Continue installation remotely using SSH</guimenuitem>. Successful load is indicated by a new menu entry called <guimenuitem>Continue installation remotely using SSH</guimenuitem>."
 msgstr ""
 
-#: using-d-i.xml:2404
+#: using-d-i.xml:2765
 #, no-c-format
 #. Tag: para
 msgid "For installations on &arch-title;, this is the default method after setting up the network."
 msgstr ""
 
-#: using-d-i.xml:2409
+#: using-d-i.xml:2770
 #, no-c-format
 #. Tag: para
 msgid "<phrase arch=\"not-s390\">After selecting this new entry, you</phrase> <phrase arch=\"s390\">You</phrase> will be asked for a new password to be used for connecting to the installation system and for its confirmation. That's all. Now you should see a screen which instructs you to login remotely as the user <emphasis>installer</emphasis> with the password you just provided. Another important detail to notice on this screen is the fingerprint of this system. You need to transfer the fingerprint securely to the <quote>person who will continue the installation remotely</quote>."
 msgstr ""
 
-#: using-d-i.xml:2421
+#: using-d-i.xml:2782
 #, no-c-format
 #. Tag: para
 msgid "Should you decide to continue with the installation locally, you can always press &enterkey;, which will bring you back to the main menu, where you can select another component."
 msgstr ""
 
-#: using-d-i.xml:2427
+#: using-d-i.xml:2788
 #, no-c-format
 #. Tag: para
 msgid ""
@@ -1928,25 +2175,25 @@ msgid ""
       "</screen></informalexample> Where <replaceable>install_host</replaceable> is either the name or IP address of the computer being installed. Before the actual login the fingerprint of the remote system will be displayed and you will have to confirm that it is correct."
 msgstr ""
 
-#: using-d-i.xml:2444
+#: using-d-i.xml:2805
 #, no-c-format
 #. Tag: para
 msgid "If you install several computers in turn and they happen to have the same IP address or hostname, <command>ssh</command> will refuse to connect to such host. The reason is that it will have different fingerprint, which is usually a sign of a spoofing attack. If you are sure this is not the case, you will need to delete the relevant line from <filename>~/.ssh/known_hosts</filename> and try again."
 msgstr ""
 
-#: using-d-i.xml:2453
+#: using-d-i.xml:2814
 #, no-c-format
 #. Tag: para
 msgid "After the login you will be presented with an initial screen where you have two possibilities called <guimenuitem>Start menu</guimenuitem> and <guimenuitem>Start shell</guimenuitem>. The former brings you to the main installer menu, where you can continue with the installation as usual. The latter starts a shell from which you can examine and possibly fix the remote system. You should only start one SSH session for the installation menu, but may start multiple sessions for shells."
 msgstr ""
 
-#: using-d-i.xml:2463
+#: using-d-i.xml:2824
 #, no-c-format
 #. Tag: para
 msgid "After you have started the installation remotely over SSH, you should not go back to the installation session running on the local console. Doing so may corrupt the database that holds the configuration of the new system. This in turn may result in a failed installation or problems with the installed system."
 msgstr ""
 
-#: using-d-i.xml:2471
+#: using-d-i.xml:2832
 #, no-c-format
 #. Tag: para
 msgid "Also, if you are running the SSH session from an X terminal, you should not resize the window as that will result in the connection being terminated."

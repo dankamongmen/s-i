@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: using-d-i\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2006-06-24 19:23+0000\n"
+"POT-Creation-Date: 2006-07-09 14:07+0000\n"
 "PO-Revision-Date: 2006-03-25 13:44+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -1987,14 +1987,16 @@ msgstr ""
 
 #. Tag: para
 #: using-d-i.xml:1212
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> "
-"from the main <command>partman</command> menu. On the first screen of "
-"<command>mdcfg</command> simply select <guimenuitem>Create MD device</"
-"guimenuitem>. You will be presented with a list of supported types of MD "
-"devices, from which you should choose one (e.g. RAID1). What follows depends "
-"on the type of MD you selected."
+"from the main <command>partman</command> menu. (The menu will only appear "
+"after you mark at least one partition for use as <guimenuitem>physical "
+"volume for RAID</guimenuitem>.) On the first screen of <command>mdcfg</"
+"command> simply select <guimenuitem>Create MD device</guimenuitem>. You will "
+"be presented with a list of supported types of MD devices, from which you "
+"should choose one (e.g. RAID1). What follows depends on the type of MD you "
+"selected."
 msgstr ""
 "Далее, вы должны выбрать <guimenuitem>Настройка программного RAID</"
 "guimenuitem> из главного меню <command>partman</command>. На первом экране "
@@ -2004,7 +2006,7 @@ msgstr ""
 "зависят от типа выбранного MD."
 
 #. Tag: para
-#: using-d-i.xml:1223
+#: using-d-i.xml:1225
 #, no-c-format
 msgid ""
 "RAID0 is simple &mdash; you will be issued with the list of available RAID "
@@ -2015,7 +2017,7 @@ msgstr ""
 "вашей задачей будет выбор разделов, из которых вы хотите сформировать MD."
 
 #. Tag: para
-#: using-d-i.xml:1230
+#: using-d-i.xml:1232
 #, no-c-format
 msgid ""
 "RAID1 is a bit more tricky. First, you will be asked to enter the number of "
@@ -2035,7 +2037,7 @@ msgstr ""
 "позволит вам продолжить, пока вы не исправите ошибку."
 
 #. Tag: para
-#: using-d-i.xml:1242
+#: using-d-i.xml:1244
 #, no-c-format
 msgid ""
 "RAID5 has similar setup procedure as RAID1 with the exception that you need "
@@ -2045,7 +2047,7 @@ msgstr ""
 "использовать как минимум <emphasis>три</emphasis> активных раздела."
 
 #. Tag: para
-#: using-d-i.xml:1250
+#: using-d-i.xml:1252
 #, no-c-format
 msgid ""
 "It is perfectly possible to have several types of MD at once. For example if "
@@ -2063,7 +2065,7 @@ msgstr ""
 "<filename>/home</filename>)."
 
 #. Tag: para
-#: using-d-i.xml:1259
+#: using-d-i.xml:1261
 #, no-c-format
 msgid ""
 "After you setup MD devices to your liking, you can <guimenuitem>Finish</"
@@ -2077,13 +2079,406 @@ msgstr ""
 "новых MD устройствах и назначить им обычные атрибуты типа точек монтирования."
 
 #. Tag: title
-#: using-d-i.xml:1272
+#: using-d-i.xml:1276
+#, fuzzy, no-c-format
+msgid "Configuring Encrypted Volumes"
+msgstr "Настройка времени"
+
+#. Tag: para
+#: using-d-i.xml:1277
+#, no-c-format
+msgid ""
+"&d-i; allows you to set up encrypted partitions. Every file you write to "
+"such a partition is immediately saved to the device in encrypted form. "
+"Access to the encrypted data is granted only after entering the "
+"<firstterm>passphrase</firstterm> used when the encrypted partition was "
+"originally created. This feature is useful to protect sensitive data in case "
+"your laptop or hard drive gets stolen. The thief might get physical access "
+"to the hard drive, but without knowing the right passphrase, the data on the "
+"hard drive will look like random characters."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1289
+#, no-c-format
+msgid ""
+"The two most important partitions to encrypt are: the home partition, where "
+"your private data resides, and the swap partition, where sensitive data "
+"might be stored temporarily during operation. Of course, nothing prevents "
+"you from encrypting any other partitions that might be of interest. For "
+"example <filename>/var</filename> where database servers, mail servers or "
+"print servers store their data, or <filename>/tmp</filename> which is used "
+"by various programs to store potentially interesting temporary files. Some "
+"people may even want to encrypt their whole system. The only exception is "
+"the <filename>/boot</filename> partition which must remain unencrypted, "
+"because currently there is no way to load the kernel from an encrypted "
+"partition."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1304
+#, no-c-format
+msgid ""
+"Please note that the performance of encrypted partitions will be less than "
+"that of unencrypted ones because the data needs to be decrypted or encrypted "
+"for every read or write. The performance impact depends on your CPU speed, "
+"chosen cipher and a key length."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1311
+#, no-c-format
+msgid ""
+"To use encryption, you have to create a new partition by selecting some free "
+"space in the main partitioning menu. Another option is to choose an existing "
+"partition (e.g. a regular partition, an LVM logical volume or a RAID "
+"volume). In the <guimenu>Partition setting</guimenu> menu, you need to "
+"select <guimenuitem>physical volume for encryption</guimenuitem> at the "
+"<menuchoice> <guimenu>Use as:</guimenu> </menuchoice> option. The menu will "
+"then change to include several cryptographic options for the partition."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1322
+#, no-c-format
+msgid ""
+"&d-i; supports several encryption methods. The default method is "
+"<firstterm>dm-crypt</firstterm> (included in newer Linux kernels, able to "
+"host LVM physical volumes), the other is <firstterm>loop-AES</firstterm> "
+"(older, maintained separately from the Linux kernel tree). Unless you have "
+"compelling reasons to do otherwise, it is recommended to use the default."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1334
+#, no-c-format
+msgid ""
+"First, let's have a look at available options available when you select "
+"<userinput>Device-mapper (dm-crypt)</userinput> as the encryption method. As "
+"always: when in doubt, use the defaults, because they have been carefully "
+"chosen with security in mind."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1344
+#, no-c-format
+msgid "Encryption: <userinput>aes</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1346
+#, no-c-format
+msgid ""
+"This option lets you select the encryption algorithm (<firstterm>cipher</"
+"firstterm>) which will be used to encrypt the data on the partition. &d-i; "
+"currently supports the following block ciphers: <firstterm>aes</firstterm>, "
+"<firstterm>blowfish</firstterm>, <firstterm>serpent</firstterm>, and "
+"<firstterm>twofish</firstterm>. It is beyond the scope of this document to "
+"discuss the qualities of these different algorithms, however, it might help "
+"your decision to know that in 2000, <emphasis>AES</emphasis> was chosen by "
+"the American National Institute of Standards and Technology as the standard "
+"encryption algorithm for protecting sensitive information in the 21st "
+"century."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1364
+#, no-c-format
+msgid "Key size: <userinput>256</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1366
+#, no-c-format
+msgid ""
+"Here you can specify the length of the encryption key. With a larger key "
+"size, the strength of the encryption is generally improved. On the other "
+"hand, increasing the length of the key usually has a negative impact on "
+"performance. Available key sizes vary depending on the cipher."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1378
+#, no-c-format
+msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1380
+#, no-c-format
+msgid ""
+"The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</"
+"firstterm> algorithm is used in cryptography to ensure that applying the "
+"cipher on the same <firstterm>clear text</firstterm> data with the same key "
+"always produces a unique <firstterm>cipher text</firstterm>. The idea is to "
+"prevent the attacker from deducing information from repeated patterns in the "
+"encrypted data."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1390
+#, no-c-format
+msgid ""
+"From the provided alternatives, the default <userinput>cbc-essiv:sha256</"
+"userinput> is currently the least vulnerable to known attacks. Use the other "
+"alternatives only when you need to ensure compatibility with some previously "
+"installed system that is not able to use newer algorithms."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1402
+#, no-c-format
+msgid "Encryption key: <userinput>Passphrase</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1404
+#, no-c-format
+msgid "Here you can choose the type of the encryption key for this partition."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1410
+#, no-c-format
+msgid "Passphrase"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1411
+#, no-c-format
+msgid ""
+"The encryption key will be computed<footnote> <para> Using a passphrase as "
+"the key currently means that the partition will be set up using <ulink url="
+"\"&url-luks;\">LUKS</ulink>. </para></footnote> on the basis of a passphrase "
+"which you will be able to enter later in the process."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1426 using-d-i.xml:1519
+#, no-c-format
+msgid "Random key"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1427
+#, no-c-format
+msgid ""
+"A new encryption key will be generated from random data each time you try to "
+"bring up the encrypted partition. In other words: on every shutdown the "
+"content of the partition will be lost as the key is deleted from memory. (Of "
+"course, you could try to guess the key with a brute force attack, but unless "
+"there is an unknown weakness in the cipher algorithm, it is not achievable "
+"in our lifetime.)"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1436
+#, no-c-format
+msgid ""
+"Random keys are useful for swap partitions because you do not need to bother "
+"yourself with remembering the passphrase or wiping sensitive information "
+"from the swap partition before shutting down your computer. However, it also "
+"means that you will <emphasis>not</emphasis> be able to use the "
+"<quote>suspend-to-disk</quote> functionality offered by newer Linux kernels "
+"as it will be impossible (during a subsequent boot) to recover the suspended "
+"data written to the swap partition."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1455 using-d-i.xml:1532
+#, no-c-format
+msgid "Erase data: <userinput>yes</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1457
+#, no-c-format
+msgid ""
+"Determines whether the content of this partition should be overwritten with "
+"random data before setting up the encryption. This is recommended because it "
+"might otherwise be possible for an attacker to discern which parts of the "
+"partition are in use and which are not. In addition, this will make it "
+"harder to recover any leftover data from previous "
+"installations<footnote><para> It is believed that the guys from three-letter "
+"agencies can restore the data even after several rewrites of the "
+"magnetooptical media, though. </para></footnote>."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1477
+#, no-c-format
+msgid ""
+"If you select <menuchoice> <guimenu>Encryption method:</guimenu> "
+"<guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice>, the menu "
+"changes to provide the following options:"
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1486
+#, no-c-format
+msgid "Encryption: <userinput>AES256</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1488
+#, no-c-format
+msgid ""
+"For loop-AES, unlike dm-crypt, the options for cipher and key size are "
+"combined, so you can select both at the same time. Please see the above "
+"sections on ciphers and key sizes for further information."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1498
+#, no-c-format
+msgid "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1500
+#, no-c-format
+msgid "Here you can select the type of the encryption key for this partition."
+msgstr ""
+
+#. Tag: term
+#: using-d-i.xml:1506
+#, no-c-format
+msgid "Keyfile (GnuPG)"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1507
+#, no-c-format
+msgid ""
+"The encryption key will be generated from random data during the "
+"installation. Moreover this key will be encrypted with <application>GnuPG</"
+"application>, so to use it, you will need to enter the proper passphrase "
+"(you will be asked to provide one later in the process)."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1520
+#, no-c-format
+msgid "Please see the the section on random keys above."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1534
+#, no-c-format
+msgid "Please see the the section on erasing data above."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1543
+#, no-c-format
+msgid ""
+"Please note that the <emphasis>graphical</emphasis> version of the installer "
+"still has some limitations when compared to the textual one. For "
+"cryptography it means you can set up only volumes using "
+"<emphasis>passphrases</emphasis> as the encryption keys."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1550
+#, no-c-format
+msgid ""
+"After you have selected the desired parameters for your encrypted "
+"partitions, return back to the main partitioning menu. There should now be a "
+"new menu item called <guimenu>Configure encrypted volumes</guimenu>. After "
+"you select it, you will be asked to confirm the deletion of data on "
+"partitions marked to be erased and possibly other actions such as writing a "
+"new partition table. For large partitions this might take some time."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1561
+#, no-c-format
+msgid ""
+"Next you will be asked to enter a passphrase for partitions configured to "
+"use one. Good passphrases should be longer than 8 characters, should be a "
+"mixture of letters, numbers and other characters and should not contain "
+"common dictionary words or information easily associable with you (such as "
+"birthdates, hobbies, pet names, names of family members or relatives, etc.)."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1570
+#, no-c-format
+msgid ""
+"Before you input any passphrases, you should have made sure that your "
+"keyboard is configured correctly and generates the expected characters. If "
+"you are unsure, you can switch to the second virtual console and type some "
+"text at the prompt. This ensures that you won't be surprised later, e.g. by "
+"trying to input a passphrase using a qwerty keyboard layout when you used an "
+"azerty layout during the installation. This situation can have several "
+"causes. Maybe you switched to another keyboard layout during the "
+"installation, or the selected keyboard layout might not have been set up yet "
+"when entering the passphrase for the root file system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1583
+#, no-c-format
+msgid ""
+"If you selected to use methods other than a passphrase to create encryption "
+"keys, they will be generated now. Because the kernel may not have gathered a "
+"sufficient amount of entropy at this early stage of the installation, the "
+"process may take a long time. You can help speed up the process by "
+"generating entropy: e.g. by pressing random keys, or by switching to the "
+"shell on the second virtual console and generating some network and disk "
+"traffic (downloading some files, feeding big files into <filename>/dev/null</"
+"filename>, etc.). This will be repeated for each partition to be encrypted."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1599
+#, no-c-format
+msgid ""
+"After returning to the main partitioning menu, you will see all encrypted "
+"volumes as additional partitions which can be configured in the same way as "
+"ordinary partitions. The following example shows two different volumes. The "
+"first one is encrypted via dm-crypt, the second one via loop-AES. "
+"<informalexample><screen>\n"
+"Encrypted volume (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-"
+"mapper\n"
+"     #1 115.1 GB  F ext3\n"
+"\n"
+"Loopback (<replaceable>loop0</replaceable>) - 515.2 MB AES256 keyfile\n"
+"     #1 515.2 MB  F ext3\n"
+"</screen></informalexample> Now is the time to assign mount points to the "
+"volumes and optionally change the file system types if the defaults do not "
+"suit you."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1612
+#, no-c-format
+msgid ""
+"One thing to note here are the identifiers in parentheses "
+"(<replaceable>crypt0</replaceable> and <replaceable>loop0</replaceable> in "
+"this case) and the mount points you assigned to each encrypted volume. You "
+"will need this information later when booting the new system. The "
+"differences between ordinary boot process and boot process with encryption "
+"involved will be covered later in <xref linkend=\"mount-encrypted-volumes\"/"
+">."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1622
+#, no-c-format
+msgid ""
+"Once you are satisfied with the partitioning scheme, continue with the "
+"installation."
+msgstr ""
+
+#. Tag: title
+#: using-d-i.xml:1633
 #, no-c-format
 msgid "Setting up the System"
 msgstr "Настройка системы"
 
 #. Tag: para
-#: using-d-i.xml:1273
+#: using-d-i.xml:1634
 #, no-c-format
 msgid ""
 "After partitioning the installer asks a few more questions that will be used "
@@ -2093,13 +2488,13 @@ msgstr ""
 "настройки устанавливаемой системы."
 
 #. Tag: title
-#: using-d-i.xml:1285
+#: using-d-i.xml:1646
 #, no-c-format
 msgid "Configuring Your Time Zone"
 msgstr "Настройка часового пояса"
 
 #. Tag: para
-#: using-d-i.xml:1287
+#: using-d-i.xml:1648
 #, no-c-format
 msgid ""
 "Depending on the location selected at the beginning of the installation "
@@ -2113,13 +2508,13 @@ msgstr ""
 "выберет этот часовой пояс."
 
 #. Tag: title
-#: using-d-i.xml:1303
+#: using-d-i.xml:1664
 #, no-c-format
 msgid "Configuring the Clock"
 msgstr "Настройка времени"
 
 #. Tag: para
-#: using-d-i.xml:1305
+#: using-d-i.xml:1666
 #, no-c-format
 msgid ""
 "The installer might ask you if the computer's clock is set to UTC. Normally "
@@ -2133,7 +2528,7 @@ msgstr ""
 "установлено других операционных систем."
 
 #. Tag: para
-#: using-d-i.xml:1312
+#: using-d-i.xml:1673
 #, no-c-format
 msgid ""
 "In expert mode you will always be able to choose whether or not the clock is "
@@ -2152,7 +2547,7 @@ msgstr ""
 "время вместо GMT.</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:1323
+#: using-d-i.xml:1684
 #, no-c-format
 msgid ""
 "Note that the installer does not currently allow you to actually set the "
@@ -2165,19 +2560,19 @@ msgstr ""
 "неправильное или если оно раньше показывало время не по Гринвичу."
 
 #. Tag: title
-#: using-d-i.xml:1339
+#: using-d-i.xml:1700
 #, no-c-format
 msgid "Setting Up Users And Passwords"
 msgstr "Добавление пользователей и паролей"
 
 #. Tag: title
-#: using-d-i.xml:1342
+#: using-d-i.xml:1703
 #, no-c-format
 msgid "Set the Root Password"
 msgstr "Установка пароля суперпользователя (root)"
 
 #. Tag: para
-#: using-d-i.xml:1344
+#: using-d-i.xml:1705
 #, no-c-format
 msgid ""
 "The <emphasis>root</emphasis> account is also called the <emphasis>super-"
@@ -2192,7 +2587,7 @@ msgstr ""
 "время."
 
 #. Tag: para
-#: using-d-i.xml:1352
+#: using-d-i.xml:1713
 #, no-c-format
 msgid ""
 "Any password you create should contain at least 6 characters, and should "
@@ -2208,7 +2603,7 @@ msgstr ""
 "персональной информации, которую можно угадать."
 
 #. Tag: para
-#: using-d-i.xml:1360
+#: using-d-i.xml:1721
 #, no-c-format
 msgid ""
 "If anyone ever tells you they need your root password, be extremely wary. "
@@ -2221,13 +2616,13 @@ msgstr ""
 "администраторами."
 
 #. Tag: title
-#: using-d-i.xml:1370
+#: using-d-i.xml:1731
 #, no-c-format
 msgid "Create an Ordinary User"
 msgstr "Создание учётной записи обычного пользователя"
 
 #. Tag: para
-#: using-d-i.xml:1372
+#: using-d-i.xml:1733
 #, no-c-format
 msgid ""
 "The system will ask you whether you wish to create an ordinary user account "
@@ -2242,7 +2637,7 @@ msgstr ""
 "персональной учётной записи."
 
 #. Tag: para
-#: using-d-i.xml:1379
+#: using-d-i.xml:1740
 #, no-c-format
 msgid ""
 "Why not? Well, one reason to avoid using root's privileges is that it is "
@@ -2263,7 +2658,7 @@ msgstr ""
 "прочтите одну из них, если это для вас в новинку."
 
 #. Tag: para
-#: using-d-i.xml:1389
+#: using-d-i.xml:1750
 #, no-c-format
 msgid ""
 "You will first be prompted for the user's full name. Then you'll be asked "
@@ -2276,7 +2671,7 @@ msgstr ""
 "вполне подойдёт. И, наконец, вас попросят ввести пароль учётной записи."
 
 #. Tag: para
-#: using-d-i.xml:1396
+#: using-d-i.xml:1757
 #, no-c-format
 msgid ""
 "If at any point after installation you would like to create another account, "
@@ -2286,13 +2681,13 @@ msgstr ""
 "запись, воспользуйтесь командой <command>adduser</command>."
 
 #. Tag: title
-#: using-d-i.xml:1408
+#: using-d-i.xml:1769
 #, no-c-format
 msgid "Installing the Base System"
 msgstr "Установка базовой системы"
 
 #. Tag: para
-#: using-d-i.xml:1409
+#: using-d-i.xml:1770
 #, no-c-format
 msgid ""
 "Although this stage is the least problematic, it consumes a significant "
@@ -2306,13 +2701,13 @@ msgstr ""
 "может занять определённое время."
 
 #. Tag: title
-#: using-d-i.xml:1423
+#: using-d-i.xml:1784
 #, no-c-format
 msgid "Base System Installation"
 msgstr "Установка базовой системы"
 
 #. Tag: para
-#: using-d-i.xml:1425
+#: using-d-i.xml:1786
 #, no-c-format
 msgid ""
 "During the Base installation, package unpacking and setup messages are "
@@ -2328,7 +2723,7 @@ msgstr ""
 "нажмите <keycombo><keycap>левый Alt</keycap><keycap>F1</keycap></keycombo>."
 
 #. Tag: para
-#: using-d-i.xml:1435
+#: using-d-i.xml:1796
 #, no-c-format
 msgid ""
 "The unpack/setup messages generated by the base installation are saved in "
@@ -2340,7 +2735,7 @@ msgstr ""
 "файле <filename>/var/log/syslog</filename>."
 
 #. Tag: para
-#: using-d-i.xml:1441
+#: using-d-i.xml:1802
 #, no-c-format
 msgid ""
 "As part of the installation, a Linux kernel will be installed. At the "
@@ -2354,13 +2749,13 @@ msgstr ""
 "списка доступных ядер."
 
 #. Tag: title
-#: using-d-i.xml:1454
+#: using-d-i.xml:1815
 #, no-c-format
 msgid "Installing Additional Software"
 msgstr "Установка дополнительного программного обеспечения"
 
 #. Tag: para
-#: using-d-i.xml:1455
+#: using-d-i.xml:1816
 #, no-c-format
 msgid ""
 "After the base system is installed, you have a usable but limited system. "
@@ -2377,13 +2772,13 @@ msgstr ""
 "с сетью."
 
 #. Tag: title
-#: using-d-i.xml:1469
+#: using-d-i.xml:1830
 #, no-c-format
 msgid "Configuring apt"
 msgstr "Настройка apt"
 
 #. Tag: para
-#: using-d-i.xml:1471
+#: using-d-i.xml:1832
 #, no-c-format
 msgid ""
 "The main means that people use to install packages on their system is via a "
@@ -2417,7 +2812,7 @@ msgstr ""
 "(поиск пакетов и отображение состояния) в отличном интерфейсе пользователя."
 
 #. Tag: para
-#: using-d-i.xml:1495
+#: using-d-i.xml:1856
 #, no-c-format
 msgid ""
 "<command>apt</command> must be configured so that it knows where to retrieve "
@@ -2434,13 +2829,13 @@ msgstr ""
 "его по желаю после завершения установки."
 
 #. Tag: title
-#: using-d-i.xml:1511
+#: using-d-i.xml:1872
 #, no-c-format
 msgid "Selecting and Installing Software"
 msgstr "Выбор и установка программного обеспечения"
 
 #. Tag: para
-#: using-d-i.xml:1513
+#: using-d-i.xml:1874
 #, no-c-format
 msgid ""
 "During the installation process, you are given the opportunity to select "
@@ -2457,7 +2852,7 @@ msgstr ""
 "настроить компьютер на выполнение определённых задач."
 
 #. Tag: para
-#: using-d-i.xml:1522
+#: using-d-i.xml:1883
 #, no-c-format
 msgid ""
 "So, you have the ability to choose <emphasis>tasks</emphasis> first, and "
@@ -2492,7 +2887,7 @@ msgstr ""
 "необходимое пространство для возможных задач."
 
 #. Tag: para
-#: using-d-i.xml:1547
+#: using-d-i.xml:1908
 #, no-c-format
 msgid ""
 "Once you've selected your tasks, select <guibutton>Ok</guibutton>. At this "
@@ -2502,7 +2897,7 @@ msgstr ""
 "<command>aptitude</command> начнёт установку выбранных пакетов. "
 
 #. Tag: para
-#: using-d-i.xml:1554
+#: using-d-i.xml:1915
 #, no-c-format
 msgid ""
 "In the standard user interface of the installer, you can use the space bar "
@@ -2512,7 +2907,7 @@ msgstr ""
 "отмены задач используется клавиша пробел."
 
 #. Tag: para
-#: using-d-i.xml:1561
+#: using-d-i.xml:1922
 #, no-c-format
 msgid ""
 "Note that some tasks may be pre-selected based on the characteristics of the "
@@ -2526,7 +2921,7 @@ msgstr ""
 "можете вообще ничего не устанавливать с помощью задач."
 
 #. Tag: para
-#: using-d-i.xml:1569
+#: using-d-i.xml:1930
 #, no-c-format
 msgid ""
 "Each package you selected with <command>tasksel</command> is downloaded, "
@@ -2541,13 +2936,13 @@ msgstr ""
 "этого процесса."
 
 #. Tag: title
-#: using-d-i.xml:1578
+#: using-d-i.xml:1939
 #, no-c-format
 msgid "Configuring Your Mail Transport Agent"
 msgstr "Настройка программы пересылки почты (MTA)"
 
 #. Tag: para
-#: using-d-i.xml:1580
+#: using-d-i.xml:1941
 #, no-c-format
 msgid ""
 "Today, email is a very important part of many people's life, so it's no "
@@ -2563,7 +2958,7 @@ msgstr ""
 "маленькая, гибкая и лёгкая в освоении программа."
 
 #. Tag: para
-#: using-d-i.xml:1588
+#: using-d-i.xml:1949
 #, no-c-format
 msgid ""
 "You may ask if this is needed even if your computer is not connected to any "
@@ -2578,7 +2973,7 @@ msgstr ""
 "электронной почте."
 
 #. Tag: para
-#: using-d-i.xml:1596
+#: using-d-i.xml:1957
 #, no-c-format
 msgid ""
 "So on the first screen you will be presented with several common mail "
@@ -2588,13 +2983,13 @@ msgstr ""
 "Выберите тот, который подходит вам больше всего:"
 
 #. Tag: term
-#: using-d-i.xml:1605
+#: using-d-i.xml:1966
 #, no-c-format
 msgid "internet site"
 msgstr "интернет-сайт"
 
 #. Tag: para
-#: using-d-i.xml:1606
+#: using-d-i.xml:1967
 #, no-c-format
 msgid ""
 "Your system is connected to a network and your mail is sent and received "
@@ -2608,13 +3003,13 @@ msgstr ""
 "которых вы принимаете или передаёте почту."
 
 #. Tag: term
-#: using-d-i.xml:1617
+#: using-d-i.xml:1978
 #, no-c-format
 msgid "mail sent by smarthost"
 msgstr "отправка почты через компьютер-шлюз (smarthost)"
 
 #. Tag: para
-#: using-d-i.xml:1618
+#: using-d-i.xml:1979
 #, no-c-format
 msgid ""
 "In this scenario is your outgoing mail forwarded to another machine, called "
@@ -2633,13 +3028,13 @@ msgstr ""
 "подключение по телефонной линии."
 
 #. Tag: term
-#: using-d-i.xml:1631
+#: using-d-i.xml:1992
 #, no-c-format
 msgid "local delivery only"
 msgstr "доставка только локальной почты"
 
 #. Tag: para
-#: using-d-i.xml:1632
+#: using-d-i.xml:1993
 #, no-c-format
 msgid ""
 "Your system is not on a network and mail is sent or received only between "
@@ -2657,13 +3052,13 @@ msgstr ""
 "пользователям, потому что далее не задаётся больше никаких вопросов."
 
 #. Tag: term
-#: using-d-i.xml:1645
+#: using-d-i.xml:2006
 #, no-c-format
 msgid "no configuration at this time"
 msgstr "в данный момент конфигурация отсутствует"
 
 #. Tag: para
-#: using-d-i.xml:1646
+#: using-d-i.xml:2007
 #, no-c-format
 msgid ""
 "Choose this if you are absolutely convinced you know what you are doing. "
@@ -2677,7 +3072,7 @@ msgstr ""
 "пропустить некоторые важные сообщения от ваших системных утилит."
 
 #. Tag: para
-#: using-d-i.xml:1657
+#: using-d-i.xml:2018
 #, no-c-format
 msgid ""
 "If none of these scenarios suits your needs, or if you need a finer setup, "
@@ -2693,13 +3088,13 @@ msgstr ""
 "filename>."
 
 #. Tag: title
-#: using-d-i.xml:1672
+#: using-d-i.xml:2033
 #, no-c-format
 msgid "Making Your System Bootable"
 msgstr "Установка и настройка системного загрузчика"
 
 #. Tag: para
-#: using-d-i.xml:1674
+#: using-d-i.xml:2035
 #, no-c-format
 msgid ""
 "If you are installing a diskless workstation, obviously, booting off the "
@@ -2713,7 +3108,7 @@ msgstr ""
 "умолчанию; смотрите <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:1682
+#: using-d-i.xml:2043
 #, no-c-format
 msgid ""
 "Note that multiple operating systems booting on a single machine is still "
@@ -2729,13 +3124,13 @@ msgstr ""
 "в документации по менеджеру загрузки."
 
 #. Tag: title
-#: using-d-i.xml:1697
+#: using-d-i.xml:2058
 #, no-c-format
 msgid "Detecting other operating systems"
 msgstr "Обнаружение операционных систем"
 
 #. Tag: para
-#: using-d-i.xml:1699
+#: using-d-i.xml:2060
 #, no-c-format
 msgid ""
 "Before a boot loader is installed, the installer will attempt to probe for "
@@ -2751,7 +3146,7 @@ msgstr ""
 "операционную систему в дополнении к Debian."
 
 #. Tag: para
-#: using-d-i.xml:1707
+#: using-d-i.xml:2068
 #, no-c-format
 msgid ""
 "Note that multiple operating systems booting on a single machine is still "
@@ -2767,13 +3162,13 @@ msgstr ""
 "информацию можно найти в документации по менеджеру загрузки."
 
 #. Tag: title
-#: using-d-i.xml:1725
+#: using-d-i.xml:2086
 #, no-c-format
 msgid "Install <command>aboot</command> on a Hard Disk"
 msgstr "Установка <command>aboot</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:1726
+#: using-d-i.xml:2087
 #, no-c-format
 msgid ""
 "If you have booted from SRM, if you select this option, the installer will "
@@ -2795,13 +3190,13 @@ msgstr ""
 "установлен Debian, то используйте загрузку GNU/Linux с дискеты."
 
 #. Tag: title
-#: using-d-i.xml:1746
+#: using-d-i.xml:2107
 #, no-c-format
 msgid "<command>palo</command>-installer"
 msgstr "Системный загрузчик <command>palo</command>"
 
 #. Tag: para
-#: using-d-i.xml:1747
+#: using-d-i.xml:2108
 #, no-c-format
 msgid ""
 "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is "
@@ -2817,20 +3212,20 @@ msgstr ""
 "есть <command>PALO</command> умеет работать с разделами Linux."
 
 #. Tag: para
-#: using-d-i.xml:1756
+#: using-d-i.xml:2117
 #, no-c-format
 msgid "hppa FIXME ( need more info )"
 msgstr "hppa FIXME (нужно больше информации)"
 
 #. Tag: title
-#: using-d-i.xml:1768
+#: using-d-i.xml:2129
 #, no-c-format
 msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>Grub</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:1770
+#: using-d-i.xml:2131
 #, no-c-format
 msgid ""
 "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a "
@@ -2842,7 +3237,7 @@ msgstr ""
 "хорошим выбором по умолчанию для новичков и опытных пользователей."
 
 #. Tag: para
-#: using-d-i.xml:1776
+#: using-d-i.xml:2137
 #, no-c-format
 msgid ""
 "By default, grub will be installed into the Master Boot Record (MBR), where "
@@ -2855,7 +3250,7 @@ msgstr ""
 "grub."
 
 #. Tag: para
-#: using-d-i.xml:1782
+#: using-d-i.xml:2143
 #, no-c-format
 msgid ""
 "If you do not want to install grub at all, use the Back button to get to the "
@@ -2866,14 +3261,14 @@ msgstr ""
 "использовать."
 
 #. Tag: title
-#: using-d-i.xml:1796
+#: using-d-i.xml:2157
 #, no-c-format
 msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>LILO</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:1798
+#: using-d-i.xml:2159
 #, no-c-format
 msgid ""
 "The second &architecture; boot loader is called <quote>LILO</quote>. It is "
@@ -2890,7 +3285,7 @@ msgstr ""
 "ulink>."
 
 #. Tag: para
-#: using-d-i.xml:1808
+#: using-d-i.xml:2169
 #, no-c-format
 msgid ""
 "Currently the LILO installation will only create menu entries for other "
@@ -2904,7 +3299,7 @@ msgstr ""
 "операционных систем, например GNU/Linux и GNU/Hurd после установки."
 
 #. Tag: para
-#: using-d-i.xml:1816
+#: using-d-i.xml:2177
 #, no-c-format
 msgid ""
 "&d-i; presents you three choices where to install the <command>LILO</"
@@ -2914,13 +3309,13 @@ msgstr ""
 "<command>LILO</command>:"
 
 #. Tag: term
-#: using-d-i.xml:1823
+#: using-d-i.xml:2184
 #, no-c-format
 msgid "Master Boot Record (MBR)"
 msgstr "Главная загрузочная запись (MBR)"
 
 #. Tag: para
-#: using-d-i.xml:1823
+#: using-d-i.xml:2184
 #, no-c-format
 msgid ""
 "This way the <command>LILO</command> will take complete control of the boot "
@@ -2930,13 +3325,13 @@ msgstr ""
 "загрузки."
 
 #. Tag: term
-#: using-d-i.xml:1830
+#: using-d-i.xml:2191
 #, no-c-format
 msgid "new Debian partition"
 msgstr "раздел, созданный для Debian"
 
 #. Tag: para
-#: using-d-i.xml:1830
+#: using-d-i.xml:2191
 #, no-c-format
 msgid ""
 "Choose this if you want to use another boot manager. <command>LILO</command> "
@@ -2948,13 +3343,13 @@ msgstr ""
 "Debian и будет играть роль вторичного системного загрузчика."
 
 #. Tag: term
-#: using-d-i.xml:1839
+#: using-d-i.xml:2200
 #, no-c-format
 msgid "Other choice"
 msgstr "Другой"
 
 #. Tag: para
-#: using-d-i.xml:1839
+#: using-d-i.xml:2200
 #, no-c-format
 msgid ""
 "Useful for advanced users who want to install <command>LILO</command> "
@@ -2972,7 +3367,7 @@ msgstr ""
 "filename> или <filename>/dev/sda</filename>."
 
 #. Tag: para
-#: using-d-i.xml:1851
+#: using-d-i.xml:2212
 #, no-c-format
 msgid ""
 "If you can no longer boot into Windows 9x (or DOS) after this step, you'll "
@@ -2990,14 +3385,14 @@ msgstr ""
 "читайте в <xref linkend=\"reactivating-win\"/>."
 
 #. Tag: title
-#: using-d-i.xml:1868
+#: using-d-i.xml:2229
 #, no-c-format
 msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>ELILO</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:1870
+#: using-d-i.xml:2231
 #, no-c-format
 msgid ""
 "The &architecture; boot loader is called <quote>elilo</quote>. It is modeled "
@@ -3025,7 +3420,7 @@ msgstr ""
 "quote>, чтобы загрузить и выполнить ядро Linux."
 
 #. Tag: para
-#: using-d-i.xml:1886
+#: using-d-i.xml:2247
 #, no-c-format
 msgid ""
 "The <quote>elilo</quote> configuration and installation is done as the last "
@@ -3042,13 +3437,13 @@ msgstr ""
 "диске что и <emphasis>корневая</emphasis> файловая система."
 
 #. Tag: title
-#: using-d-i.xml:1898
+#: using-d-i.xml:2259
 #, no-c-format
 msgid "Choose the correct partition!"
 msgstr "Выберите правильный раздел!"
 
 #. Tag: para
-#: using-d-i.xml:1900
+#: using-d-i.xml:2261
 #, no-c-format
 msgid ""
 "The criteria for selecting a partition is that it is FAT format filesystem "
@@ -3066,13 +3461,13 @@ msgstr ""
 "установки, стерев его содержимое!"
 
 #. Tag: title
-#: using-d-i.xml:1915
+#: using-d-i.xml:2276
 #, no-c-format
 msgid "EFI Partition Contents"
 msgstr "Содержимое EFI раздела"
 
 #. Tag: para
-#: using-d-i.xml:1917
+#: using-d-i.xml:2278
 #, no-c-format
 msgid ""
 "The EFI partition is a FAT filesystem format partition on one of the hard "
@@ -3102,13 +3497,13 @@ msgstr ""
 "настройки системы."
 
 #. Tag: filename
-#: using-d-i.xml:1939
+#: using-d-i.xml:2300
 #, no-c-format
 msgid "elilo.conf"
 msgstr "elilo.conf"
 
 #. Tag: para
-#: using-d-i.xml:1940
+#: using-d-i.xml:2301
 #, no-c-format
 msgid ""
 "This is the configuration file read by the boot loader when it starts. It is "
@@ -3120,13 +3515,13 @@ msgstr ""
 "указывающими на файлы в EFI разделе."
 
 #. Tag: filename
-#: using-d-i.xml:1949
+#: using-d-i.xml:2310
 #, no-c-format
 msgid "elilo.efi"
 msgstr "elilo.efi"
 
 #. Tag: para
-#: using-d-i.xml:1950
+#: using-d-i.xml:2311
 #, no-c-format
 msgid ""
 "This is the boot loader program that the <quote>EFI Boot Manager</quote> "
@@ -3140,13 +3535,13 @@ msgstr ""
 "<quote>менеджер загрузки EFI</quote>."
 
 #. Tag: filename
-#: using-d-i.xml:1960
+#: using-d-i.xml:2321
 #, no-c-format
 msgid "initrd.img"
 msgstr "initrd.img"
 
 #. Tag: para
-#: using-d-i.xml:1961
+#: using-d-i.xml:2322
 #, no-c-format
 msgid ""
 "This is the initial root filesystem used to boot the kernel. It is a copy of "
@@ -3161,13 +3556,13 @@ msgstr ""
 "символическая ссылка <filename>/initrd.img</filename>."
 
 #. Tag: filename
-#: using-d-i.xml:1973
+#: using-d-i.xml:2334
 #, no-c-format
 msgid "readme.txt"
 msgstr "readme.txt"
 
 #. Tag: para
-#: using-d-i.xml:1974
+#: using-d-i.xml:2335
 #, no-c-format
 msgid ""
 "This is a small text file warning you that the contents of the directory are "
@@ -3179,13 +3574,13 @@ msgstr ""
 "будут уничтожены при следующем запуске <filename>/usr/sbin/elilo</filename>."
 
 #. Tag: filename
-#: using-d-i.xml:1984
+#: using-d-i.xml:2345
 #, no-c-format
 msgid "vmlinuz"
 msgstr "vmlinuz"
 
 #. Tag: para
-#: using-d-i.xml:1985
+#: using-d-i.xml:2346
 #, no-c-format
 msgid ""
 "This is the compressed kernel itself. It is a copy of the file referenced in "
@@ -3199,13 +3594,13 @@ msgstr ""
 "символическая ссылка <filename>/vmlinuz</filename>."
 
 #. Tag: title
-#: using-d-i.xml:2005
+#: using-d-i.xml:2366
 #, no-c-format
 msgid "<command>arcboot</command>-installer"
 msgstr "Системный загрузчик <command>arcboot</command>"
 
 #. Tag: para
-#: using-d-i.xml:2006
+#: using-d-i.xml:2367
 #, no-c-format
 msgid ""
 "The boot loader on SGI machines is <command>arcboot</command>. It has to be "
@@ -3249,13 +3644,13 @@ msgstr ""
 "<command>boot</command>."
 
 #. Tag: replaceable
-#: using-d-i.xml:2025
+#: using-d-i.xml:2386
 #, no-c-format
 msgid "scsi"
 msgstr "scsi"
 
 #. Tag: para
-#: using-d-i.xml:2026
+#: using-d-i.xml:2387
 #, no-c-format
 msgid ""
 "is the SCSI bus to be booted from, this is <userinput>0</userinput> for the "
@@ -3265,13 +3660,13 @@ msgstr ""
 "userinput> для встроенных контроллеров"
 
 #. Tag: replaceable
-#: using-d-i.xml:2034
+#: using-d-i.xml:2395
 #, no-c-format
 msgid "disk"
 msgstr "disk"
 
 #. Tag: para
-#: using-d-i.xml:2035
+#: using-d-i.xml:2396
 #, no-c-format
 msgid ""
 "is the SCSI ID of the hard disk on which <command>arcboot</command> is "
@@ -3281,13 +3676,13 @@ msgstr ""
 
 # index.docbook:1600, index.docbook:1669
 #. Tag: replaceable
-#: using-d-i.xml:2043 using-d-i.xml:2112
+#: using-d-i.xml:2404 using-d-i.xml:2473
 #, no-c-format
 msgid "partnr"
 msgstr "partnr"
 
 #. Tag: para
-#: using-d-i.xml:2044
+#: using-d-i.xml:2405
 #, no-c-format
 msgid ""
 "is the number of the partition on which <filename>/etc/arcboot.conf</"
@@ -3296,13 +3691,13 @@ msgstr ""
 "это номер раздела, на котором хранится <filename>/etc/arcboot.conf</filename>"
 
 #. Tag: replaceable
-#: using-d-i.xml:2052
+#: using-d-i.xml:2413
 #, no-c-format
 msgid "config"
 msgstr "config"
 
 #. Tag: para
-#: using-d-i.xml:2053
+#: using-d-i.xml:2414
 #, no-c-format
 msgid ""
 "is the name of the configuration entry in <filename>/etc/arcboot.conf</"
@@ -3312,13 +3707,13 @@ msgstr ""
 "<quote>linux</quote>."
 
 #. Tag: title
-#: using-d-i.xml:2074
+#: using-d-i.xml:2435
 #, no-c-format
 msgid "<command>delo</command>-installer"
 msgstr "Системный загрузчик <command>delo</command>"
 
 #. Tag: para
-#: using-d-i.xml:2075
+#: using-d-i.xml:2436
 #, no-c-format
 msgid ""
 "The boot loader on DECstations is <command>DELO</command>. It has to be "
@@ -3346,13 +3741,13 @@ msgstr ""
 "</screen></informalexample> в приглашении микропрограммы."
 
 #. Tag: replaceable
-#: using-d-i.xml:2094
+#: using-d-i.xml:2455
 #, no-c-format
 msgid "<replaceable>#</replaceable>"
 msgstr "<replaceable>#</replaceable>"
 
 #. Tag: para
-#: using-d-i.xml:2095
+#: using-d-i.xml:2456
 #, no-c-format
 msgid ""
 "is the TurboChannel device to be booted from, on most DECstations this is "
@@ -3363,13 +3758,13 @@ msgstr ""
 "встроенных контроллеров"
 
 #. Tag: replaceable
-#: using-d-i.xml:2103
+#: using-d-i.xml:2464
 #, no-c-format
 msgid "<replaceable>id</replaceable>"
 msgstr "<replaceable>id</replaceable>"
 
 #. Tag: para
-#: using-d-i.xml:2104
+#: using-d-i.xml:2465
 #, no-c-format
 msgid ""
 "is the SCSI ID of the hard disk on which <command>DELO</command> is installed"
@@ -3377,7 +3772,7 @@ msgstr ""
 "это SCSI ID жёсткого диска, на котором установлен <command>DELO</command>"
 
 #. Tag: para
-#: using-d-i.xml:2113
+#: using-d-i.xml:2474
 #, no-c-format
 msgid ""
 "is the number of the partition on which <filename>/etc/delo.conf</filename> "
@@ -3386,13 +3781,13 @@ msgstr ""
 "это номер раздела, на котором хранится <filename>/etc/delo.conf</filename>"
 
 #. Tag: replaceable
-#: using-d-i.xml:2121
+#: using-d-i.xml:2482
 #, no-c-format
 msgid "name"
 msgstr "name"
 
 #. Tag: para
-#: using-d-i.xml:2122
+#: using-d-i.xml:2483
 #, no-c-format
 msgid ""
 "is the name of the configuration entry in <filename>/etc/delo.conf</"
@@ -3402,7 +3797,7 @@ msgstr ""
 "<quote>linux</quote>."
 
 #. Tag: para
-#: using-d-i.xml:2132
+#: using-d-i.xml:2493
 #, no-c-format
 msgid ""
 "In case <filename>/etc/delo.conf</filename> is on the first partition on the "
@@ -3412,20 +3807,20 @@ msgstr ""
 "должна быть загружена конфигурация по умолчанию, то достаточно набрать"
 
 #. Tag: screen
-#: using-d-i.xml:2138
+#: using-d-i.xml:2499
 #, no-c-format
 msgid "<userinput>boot #/rz<replaceable>id</replaceable></userinput>"
 msgstr "<userinput>boot #/rz<replaceable>id</replaceable></userinput>"
 
 #. Tag: title
-#: using-d-i.xml:2148
+#: using-d-i.xml:2509
 #, no-c-format
 msgid "Install <command>Yaboot</command> on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>Yaboot</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:2149
+#: using-d-i.xml:2510
 #, no-c-format
 msgid ""
 "Newer (mid 1998 and on) PowerMacs use <command>yaboot</command> as their "
@@ -3445,14 +3840,14 @@ msgstr ""
 "OpenFirmware установлена на загрузку &debian;."
 
 #. Tag: title
-#: using-d-i.xml:2167
+#: using-d-i.xml:2528
 #, no-c-format
 msgid "Install <command>Quik</command> on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>Quik</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:2168
+#: using-d-i.xml:2529
 #, no-c-format
 msgid ""
 "The boot loader for OldWorld Power Macintosh machines is <command>quik</"
@@ -3467,13 +3862,13 @@ msgstr ""
 "на некоторых клонах Power Computing."
 
 #. Tag: title
-#: using-d-i.xml:2184
+#: using-d-i.xml:2545
 #, no-c-format
 msgid "<command>zipl</command>-installer"
 msgstr "Установка системного загрузчика <command>zipl</command>"
 
 #. Tag: para
-#: using-d-i.xml:2185
+#: using-d-i.xml:2546
 #, no-c-format
 msgid ""
 "The boot loader on &arch-title; is <quote>zipl</quote>. <command>ZIPL</"
@@ -3489,14 +3884,14 @@ msgstr ""
 "developerWorks, если хотите узнать больше о <command>ZIPL</command>."
 
 #. Tag: title
-#: using-d-i.xml:2202
+#: using-d-i.xml:2563
 #, no-c-format
 msgid "Install the <command>SILO</command> Boot Loader on a Hard Disk"
 msgstr ""
 "Установка системного загрузчика <command>SILO</command> на жёсткий диск"
 
 #. Tag: para
-#: using-d-i.xml:2204
+#: using-d-i.xml:2565
 #, no-c-format
 msgid ""
 "The standard &architecture; boot loader is called <quote>silo</quote>. It is "
@@ -3527,13 +3922,13 @@ msgstr ""
 "Solaris."
 
 #. Tag: title
-#: using-d-i.xml:2229
+#: using-d-i.xml:2590
 #, no-c-format
 msgid "Continue Without Boot Loader"
 msgstr "Продолжение без системного загрузчика"
 
 #. Tag: para
-#: using-d-i.xml:2231
+#: using-d-i.xml:2592
 #, no-c-format
 msgid ""
 "This option can be used to complete the installation even when no boot "
@@ -3552,7 +3947,7 @@ msgstr ""
 "phrase>"
 
 #. Tag: para
-#: using-d-i.xml:2240
+#: using-d-i.xml:2601
 #, no-c-format
 msgid ""
 "If you plan to manually configure your bootloader, you should check the name "
@@ -3574,13 +3969,13 @@ msgstr ""
 "то также и раздел файловой системы с <filename>/boot</filename>."
 
 #. Tag: title
-#: using-d-i.xml:2257
+#: using-d-i.xml:2618
 #, no-c-format
 msgid "Finishing the Installation"
 msgstr "Завершение установки"
 
 #. Tag: para
-#: using-d-i.xml:2258
+#: using-d-i.xml:2619
 #, no-c-format
 msgid ""
 "These are the last bits to do before rebooting to your new system. It mostly "
@@ -3590,13 +3985,13 @@ msgstr ""
 "уборка за &d-i;."
 
 #. Tag: title
-#: using-d-i.xml:2270
+#: using-d-i.xml:2631
 #, no-c-format
 msgid "Finish the Installation and Reboot"
 msgstr "Завершение установки и перезагрузка"
 
 #. Tag: para
-#: using-d-i.xml:2272
+#: using-d-i.xml:2633
 #, no-c-format
 msgid ""
 "This is the last step in the initial Debian installation process. You will "
@@ -3610,7 +4005,7 @@ msgstr ""
 "действия, а затем перезагрузит машину в новую систему Debian."
 
 #. Tag: para
-#: using-d-i.xml:2279
+#: using-d-i.xml:2640
 #, no-c-format
 msgid ""
 "Select the <guimenuitem>Finish the installation</guimenuitem> menu item "
@@ -3624,13 +4019,13 @@ msgstr ""
 "качестве корневой файловой системы в самом начале установки."
 
 #. Tag: title
-#: using-d-i.xml:2293
+#: using-d-i.xml:2654
 #, no-c-format
 msgid "Miscellaneous"
 msgstr "Разное"
 
 #. Tag: para
-#: using-d-i.xml:2294
+#: using-d-i.xml:2655
 #, no-c-format
 msgid ""
 "The components listed in this section are usually not involved in the "
@@ -3642,13 +4037,13 @@ msgstr ""
 "пойдёт не так."
 
 #. Tag: title
-#: using-d-i.xml:2307
+#: using-d-i.xml:2668
 #, no-c-format
 msgid "Saving the installation logs"
 msgstr "Сохранение протокола установки"
 
 #. Tag: para
-#: using-d-i.xml:2309
+#: using-d-i.xml:2670
 #, no-c-format
 msgid ""
 "If the installation is successful, the logfiles created during the "
@@ -3660,7 +4055,7 @@ msgstr ""
 "installer/</filename> в новой системе Debian."
 
 #. Tag: para
-#: using-d-i.xml:2316
+#: using-d-i.xml:2677
 #, no-c-format
 msgid ""
 "Choosing <guimenuitem>Save debug logs</guimenuitem> from the main menu "
@@ -3676,13 +4071,13 @@ msgstr ""
 "протокол на другой системе или послать его вместе с отчётом об ошибке."
 
 #. Tag: title
-#: using-d-i.xml:2336
+#: using-d-i.xml:2697
 #, no-c-format
 msgid "Using the Shell and Viewing the Logs"
 msgstr "Использование командной строки и просмотр журнальных файлов"
 
 #. Tag: para
-#: using-d-i.xml:2339
+#: using-d-i.xml:2700
 #, no-c-format
 msgid ""
 "There is an <guimenuitem>Execute a Shell</guimenuitem> item on the menu. If "
@@ -3705,7 +4100,7 @@ msgstr ""
 "называемый <command>ash</command>."
 
 #. Tag: para
-#: using-d-i.xml:2351
+#: using-d-i.xml:2712
 #, no-c-format
 msgid ""
 "At this point you are booted from the RAM disk, and there is a limited set "
@@ -3723,7 +4118,7 @@ msgstr ""
 "такие как автодополнение и история команд."
 
 #. Tag: para
-#: using-d-i.xml:2360
+#: using-d-i.xml:2721
 #, no-c-format
 msgid ""
 "Use the menus to perform any task that they are able to do &mdash; the shell "
@@ -3744,13 +4139,13 @@ msgstr ""
 "меню для входа в режим командной строки."
 
 #. Tag: title
-#: using-d-i.xml:2379
+#: using-d-i.xml:2740
 #, no-c-format
 msgid "Installation Over the Network"
 msgstr "Установка по сети"
 
 #. Tag: para
-#: using-d-i.xml:2381
+#: using-d-i.xml:2742
 #, no-c-format
 msgid ""
 "One of the more interesting components is <firstterm>network-console</"
@@ -3768,7 +4163,7 @@ msgstr ""
 ">.)"
 
 #. Tag: para
-#: using-d-i.xml:2391
+#: using-d-i.xml:2752
 #, no-c-format
 msgid ""
 "This component is not loaded into the main installation menu by default, so "
@@ -3790,7 +4185,7 @@ msgstr ""
 "<guimenuitem>Продолжение установки через SSH</guimenuitem>."
 
 #. Tag: para
-#: using-d-i.xml:2404
+#: using-d-i.xml:2765
 #, no-c-format
 msgid ""
 "For installations on &arch-title;, this is the default method after setting "
@@ -3800,7 +4195,7 @@ msgstr ""
 "после настройки сети."
 
 #. Tag: para
-#: using-d-i.xml:2409
+#: using-d-i.xml:2770
 #, no-c-format
 msgid ""
 "<phrase arch=\"not-s390\">After selecting this new entry, you</phrase> "
@@ -3822,7 +4217,7 @@ msgstr ""
 "<quote>человеку, который будет продолжать установку удалённо</quote>."
 
 #. Tag: para
-#: using-d-i.xml:2421
+#: using-d-i.xml:2782
 #, no-c-format
 msgid ""
 "Should you decide to continue with the installation locally, you can always "
@@ -3834,7 +4229,7 @@ msgstr ""
 "компоненту."
 
 #. Tag: para
-#: using-d-i.xml:2427
+#: using-d-i.xml:2788
 #, no-c-format
 msgid ""
 "Now let's switch to the other side of the wire. As a prerequisite, you need "
@@ -3865,7 +4260,7 @@ msgstr ""
 "чтобы вы смогли убедиться, что это именно тот компьютер."
 
 #. Tag: para
-#: using-d-i.xml:2444
+#: using-d-i.xml:2805
 #, no-c-format
 msgid ""
 "If you install several computers in turn and they happen to have the same IP "
@@ -3883,7 +4278,7 @@ msgstr ""
 "<filename>~/.ssh/known_hosts</filename> и попробовать подключиться ещё раз."
 
 #. Tag: para
-#: using-d-i.xml:2453
+#: using-d-i.xml:2814
 #, no-c-format
 msgid ""
 "After the login you will be presented with an initial screen where you have "
@@ -3903,7 +4298,7 @@ msgstr ""
 "для установочного меню и несколько для оболочки командной строки."
 
 #. Tag: para
-#: using-d-i.xml:2463
+#: using-d-i.xml:2824
 #, no-c-format
 msgid ""
 "After you have started the installation remotely over SSH, you should not go "
@@ -3918,7 +4313,7 @@ msgstr ""
 "завершению установки или проблемам в установленной системой."
 
 #. Tag: para
-#: using-d-i.xml:2471
+#: using-d-i.xml:2832
 #, no-c-format
 msgid ""
 "Also, if you are running the SSH session from an X terminal, you should not "
