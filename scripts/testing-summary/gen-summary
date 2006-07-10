@@ -80,6 +80,8 @@ foreach my $dist (@dists) {
 			}
 			else {
 				my ($source)=m/Source: (.*)\n/;
+				# Source line can include a version if binNMU'ed
+				$source=~s/ .*$//;
 				if (! defined $source) {
 					$source=$package;
 				}
