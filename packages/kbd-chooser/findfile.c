@@ -66,11 +66,12 @@ maybe_pipe_open(void) {
 }
 
 static FILE *
-findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
+findfile_in_dir(const char *fnam, char *dir, int recdepth, char **suf) {
 	FILE *fp = NULL;
 	DIR *d;
 	struct dirent *de;
-	char *ff, *fdir, *p, *q, **sp;
+	char *ff, *fdir, *p, **sp;
+	const char *q;
 	struct decompressor *dc;
 	int secondpass = 0;
 
@@ -165,7 +166,7 @@ findfile_in_dir(char *fnam, char *dir, int recdepth, char **suf) {
 }
 
 /* find input file; leave name in pathname[] */
-FILE *findfile(char *fnam, char **dirpath, char **suffixes) {
+FILE *findfile(const char *fnam, char **dirpath, char **suffixes) {
         char **dp, *dir, **sp;
 	FILE *fp;
 	int dl, recdepth;
