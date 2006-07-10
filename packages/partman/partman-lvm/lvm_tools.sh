@@ -2,6 +2,10 @@
 
 . /lib/partman/definitions.sh
 
+# Avoid warnings from lvm2 tools about open file descriptors
+# Setting this here should avoid them for partman as a whole
+export LVM_SUPPRESS_FD_WARNINGS=1
+
 ###############################################################################
 #                                
 # Miscellaneous utility functions
