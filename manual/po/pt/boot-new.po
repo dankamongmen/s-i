@@ -1,10 +1,6 @@
 # Portuguese Translation Project
 # Nuno Sénica <njs@av.it.pt>, 2005
-#
-# 18-04-2005 - Miguel Figueiredo <elmig@debianpt.org> - 1f
-# 21-05-2005 - Miguel Figueiredo <elmig@debianpt.org> - Fixed typos.
-# 13-07-2005 - Nuno sénica <njs@av.it.pt> - 2f
-# 2006-01-14 - Miguel Figueiredo <elmig@debianpt.org> - 2f
+# Miguel Figueiredo <elmig@debianpt.org>, 2005-2006
 #
 msgid ""
 msgstr ""
@@ -342,7 +338,7 @@ msgstr ""
 #: boot-new.xml:191
 #, no-c-format
 msgid "Mounting encrypted volumes"
-msgstr ""
+msgstr "A montar volumes encriptados"
 
 #. Tag: para
 #: boot-new.xml:193
@@ -353,12 +349,16 @@ msgid ""
 "volumes during the boot. The actual procedure differs slightly between dm-"
 "crypt and loop-AES."
 msgstr ""
+"Se criou volumes encriptados durante a instalação e associou-lhes pontos de "
+"montagem, ser-lhe-á pedido para introduzir, durante o arranque, a frase-chave "
+"para cada um desses volumes. O procedimento difere ligeiramente entr dm-crypt "
+"e loop-AES."
 
 #. Tag: title
 #: boot-new.xml:203
 #, no-c-format
 msgid "loop-AES"
-msgstr ""
+msgstr "loop-AES"
 
 #. Tag: para
 #: boot-new.xml:205
@@ -381,6 +381,21 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/fstab</"
 "filename> of your new system."
 msgstr ""
+"Para partições encriptadas via loop-AES, durante o arranque, ser-lhe-á "
+"mostrada a seguinte pergunta: <informalexample><screen>\n"
+"mount: vai utilizar o dispositivo loop /dev/loop<replaceable>X</replaceable>\n"
+"Password:\n"
+"</screen></informalexample> Na primeira linha da pergunta, <replaceable>X"
+"</replaceable> é o número do dispositivo loop. Agora deve estar provavelmente "
+"a pensar <emphasis>para qual volume</emphasis> está a introduzir a frase-chave. "
+"Relaciona-se com o seu <filename>/home</filename>? Ou com o <filename>/var"
+"</filename>? Claro que, se tiver apenas um volume encriptado, isto é fácil e "
+"pode apenas introduzir a frase-chave que utilizou quando configurou este "
+"volume. Se durante a instalação configurou mais de um volume encriptado, as "
+"notas que escreveu na última etapa em <xref linkend=\"partman-crypto\"/> vêm "
+"a calhar. Se não tomou nota antes do mapeamento entre o <filename>loop"
+"<replaceable>X</replaceable></filename> e o ponto de montagem, ainda o pode "
+"encontrar em <filename>/etc/fstab</filename> do seu sistema."
 
 #. Tag: para
 #: boot-new.xml:226
@@ -392,30 +407,35 @@ msgid ""
 "volume and continue to mount the next filesystem. Please see <xref linkend="
 "\"crypto-troubleshooting\"/> for further information."
 msgstr ""
+"Não serão mostrados nenhuns caracteres (nem asteriscos) enquanto introduz "
+"a frase-chave. Tenha cuidado, tem apenas <emphasis>uma</emphasis> tentativa."
+"Se introduzir a frase-chave errada, irá aparecer uma mensagem de erro e o "
+"processo de aranque irá saltar esse volume e continuar a montar o próximo "
+"sistema de ficheiros. Para mais informações por favor veja <xref linkend=\"crypto-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-new.xml:235
 #, no-c-format
 msgid "After entering all passphrases the boot should continue as usual."
-msgstr ""
+msgstr "Após introduzir todas as frases-pass o arranque deve continuar como normalmente."
 
 #. Tag: title
 #: boot-new.xml:243
 #, no-c-format
 msgid "dm-crypt"
-msgstr ""
+msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:245
 #, no-c-format
 msgid "TODO: write something once it works."
-msgstr ""
+msgstr "PARA FAZER: escrever qualquer coisa assim que funcionar."
 
 #. Tag: title
 #: boot-new.xml:253
 #, no-c-format
 msgid "Troubleshooting"
-msgstr ""
+msgstr "Diagnóstico de problemas"
 
 #. Tag: para
 #: boot-new.xml:255
@@ -425,6 +445,9 @@ msgid ""
 "passphrase was entered, you will have to mount them manually after the boot. "
 "There are several cases."
 msgstr ""
+"Se alguns dos volumes encriptados não podem ser montados porque foi "
+"introduzida uma frase-chave errada, após o arranque terá de os montar manualmente."
+"Existem vários casos."
 
 #. Tag: para
 #: boot-new.xml:264
@@ -434,6 +457,9 @@ msgid ""
 "correctly, the boot process will halt and you will have to reboot the "
 "computer to try again."
 msgstr ""
+"O primeiro caso refere-se à partição raiz. Quando não está correctamente "
+"montada, o processo de arranque irá parar e você terá de reiniciar o "
+"computador para tentar novamente."
 
 #. Tag: para
 #: boot-new.xml:271
@@ -451,6 +477,14 @@ msgid ""
 "filename>). The only difference from an ordinary mount is that you will be "
 "asked to enter the passphrase for this volume."
 msgstr ""
+"O caso mais fácil é para volumes encriptados que contém dados como o "
+"<filename>/home</filename> ou <filename>/srv</filename>. Após o arranque pode "
+"simplesmente monta-los manualmente. Para loop-AES isto é feito numa operação:"
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable> "
+"deve ser trocado pelo directório em particular (e.g. <filename>/home</filename>). "
+"A única diferença de um mount usual é que lhe será pedido para introduzir a "
+"frase-chave para este volume."
 
 #. Tag: para
 #: boot-new.xml:285
@@ -467,6 +501,16 @@ msgid ""
 "this command several times without worrying.) After successful registration "
 "you can simply mount the volumes the usual way:"
 msgstr ""
+"Para o dm-crypt isto é um pouco mais complicado. Primeiro tem de registar os "
+"volumes com <application>device mapper</application> correndo: "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>\n"
+"</screen></informalexample> Isto irá pesquisar todos os volumes mencionados "
+"em <filename>/etc/crypttab</filename> e após introduzir as frases-chave "
+"correctas irá criar os dispositivos apropriados sob o directório <filename>"
+"/dev</filename>. (Volumes já registados serão passados à frente, para que "
+"possa repetir este comando várias vezes sem se preocupar.) Após o registo "
+"com sucesso pode simplesmente montar os volumes da forma usual:"
 
 #. Tag: screen
 #: boot-new.xml:300
@@ -475,6 +519,8 @@ msgid ""
 "<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
 "userinput>"
 msgstr ""
+"<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
+"userinput>"
 
 #. Tag: para
 #: boot-new.xml:303
@@ -492,6 +538,18 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
+"Se os volumes que contêm ficheiros de sistema não-críticos não puderem ser "
+"montados (<filename>/usr</filename> ou <filename>/var</filename>), o sistema "
+"deve mesmo assim arrancar e você deve conseguir montar manualmente os "
+"volumes como no caso anterior. No entanto, também necessitará de (re)iniciar "
+"todos os serviços que correm usualmente no runlevel por omissão porque é "
+"muito provável que estes não tenham iniciado. A forma mais fácil de "
+"conseguir isto é mudar para o primeiro runlevel e voltar, escrevendo "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>init 1</userinput>\n"
+"</screen></informalexample> na prompt da shell e carregando em <keycombo> "
+"<keycap>Control</keycap> <keycap>D</keycap> </keycombo> quando lhe for "
+"pedida a password de root."
 
 #. Tag: title
 #: boot-new.xml:326
