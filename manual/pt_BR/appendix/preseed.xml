@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 38595 -->
+<!-- original version: 38662 -->
 <!-- translated by Marco Carvalho (macs) 2005.12.30 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.02 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.07.09 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.11 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -623,6 +624,22 @@ inicializando pela rede antes de carregar um arquivo de pré-configuração
 pela rede, use um parâmetro de inicialização como
 <userinput>interface=<replaceable>eth1</replaceable></userinput>.
 
+</para><para>
+
+Embora pré-configurar a rede normalmente não seja possível quando
+se está usando a pré-configuração pelo método network (usando
+<quote>preseed/url</quote>), você pode usar o seguinte <quote>hack</quote>
+para contornar esta situação, por exemplo, se você gostaria de definir um
+endereço estático para a interface de rede. O <quote>hack</quote> é forçar a
+configuração de rede a ser realizada novamente após o arquivo de
+pré-configuração já ter sido carregado, isto é feito através da criação do
+script <quote>preseed/run</quote> contendo as seguintes linhas:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
+
 </para>
 
 <informalexample role="example"><screen>
@@ -653,12 +670,6 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_netmask string 255.255.255.0
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
-# To make it also work for "preseed/url"
-# you have to run `netcfg` a second time,
-# while `dhclient` is not running.
-# Add to your "preseed/run" script these lines:
-#killall.sh dhclient
-#netcfg
 
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
