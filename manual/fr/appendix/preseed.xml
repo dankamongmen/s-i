@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 38429 -->
+<!-- original version: 38662 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -610,6 +610,22 @@ avant de charger le fichier de préconfiguration, utilisez un paramètre comme cel
 
  </para>
 
+<para>
+
+Quand vous utilisez la préconfiguration de type network (avec <quote>preseed/url</quote>),
+il n'est pas possible normalement de préconfigurer le réseau. Cependant il existe un truc.
+Vous voudriez par exemple définir l'adresse de l'interface réseau&nbsp;: il suffit de
+forcer la configuration du réseau à s'exécuter une nouvelle fois après que le
+fichier de préconfiguration a été chargé. Le script <quote>preseed/run</quote> suivant
+fera l'affaire&nbsp;:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
+
+</para>
+ 
 <informalexample role="example"><screen>
 #Netcfg choisira une interface connectée si possible. Cela empêchera d'afficher
 #une liste s'il y a plusieurs interfaces.

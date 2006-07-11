@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33725 -->
+<!-- original version: 38703 -->
 
 <chapter id="boot-new">
  <title>Démarrer votre nouveau système Debian</title>
@@ -178,12 +178,148 @@ d'autres systèmes)
 dans le fichier <filename>/etc/yaboot.conf</filename> et démarrer
 <command>ybin</command> pour mettre à jour votre partition de démarrage avec
 la nouvelle configuration. Lisez le
-<ulink url="&url-powerpc-yaboot-faq;">yaboot HOWTO</ulink>.
+<ulink url="&url-powerpc-yaboot-faq;">HOWTO sur yaboot</ulink>.
 </para>
 </sect2>
 
  </sect1>
 
+ <sect1 id="mount-encrypted-volumes">
+ <title>Le montage des volumes chiffrés</title>
+
+<para>
+
+Si vous avez créé des volumes chiffrés et leurs points de montage pendant l'installation,
+vous devrez fournir pendant le démarrage la phrase de passe pour chaque volume.
+La procédure diffère légèrement pour les méthodes dm-crypt et loop-AES.
+
+</para>
+
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
+
+<para>
+
+Pour les partitions chiffrées avec loop-AES, l'invite pendant l'amorçage
+sera&nbsp;:
+
+<informalexample><screen>
+mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Password:
+</screen></informalexample>
+
+Le <replaceable>X</replaceable> sur la première ligne de l'invite
+est le chiffre du périphérique. Vous vous demandez probablement
+<emphasis>pour quel volume</emphasis> vous saisissez la phrase de passe.
+Est-ce pour <filename>/home</filename>, pour <filename>/var</filename>&nbsp;?
+Bien sûr si vous n'avez chiffré qu'un seul volume, c'est facile et vous n'avez
+qu'à saisir la phrase utilisée. Si vous avez chiffré plusieurs volumes, les notes
+que vous avez prises pendant l'installation (étape  <xref linkend="partman-crypto"/>)
+vous serviront bien. Si vous n'avez pas noté la correspondance entre
+<filename>loop<replaceable>X</replaceable></filename> et les points de montage,
+vous pouvez les trouver dans le fichier <filename>/etc/fstab</filename> de votre
+nouveau système.
+</para>
+
+<para>
+
+Quand vous saisissez la phrase, aucun caractère (même pas l'astérisque) n'est montré.
+Faites attention, vous n'avez qu'<emphasis>un seul essai</emphasis>. Si vous
+saisissez une mauvaise phrase, un message d'erreur apparaîtra et le processus de démarrage
+sautera ce volume et continuera avec les autres volumes. Veuillez consulter
+<xref linkend="crypto-troubleshooting"/> pour d'autres informations. 
+</para>
+
+<para>
+Une fois toutes les phrases saisies, le processus de démarrage se poursuit
+normalement.
+</para>
+</sect2>
+
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para condition="FIXME">
+
+TODO: write something once it works.
+</para>
+  </sect2>
+
+  <sect2 id="crypto-troubleshooting">
+  <title>En cas de problèmes</title>
+
+
+<para>
+
+Quand vous n'avez pas pu monter certains volumes à cause d'une mauvaise
+phrase de passe, vous devez les monter après le démarrage. Il y a plusieurs cas.
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+
+Le premier cas concerne la partition racine. Si elle n'est pas montée
+correctement, le processus de démarrage s'arrête et vous devez réamorcer la machine.
+
+</para></listitem>
+<listitem><para>
+
+Le cas le plus simple concerne les volumes contenant des données comme
+<filename>/home</filename> ou <filename>/srv</filename>. Vous pouvez
+les monter après le démarrage. Avec loop-AES, une seule opération est nécessaire&nbsp;:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+<prompt>Password:</prompt>
+</screen></informalexample>
+
+où <replaceable>/mount_point</replaceable> doit être remplacé par un répertoire
+(par exemple, <filename>/home</filename>). La différence avec le montage d'une partition
+ordinaire est qu'on vous demandera de saisir la phrase de passe.  
+
+</para><para>
+
+Avec dm-crypt, c'est un peu plus compliqué. Vous devez d'abord enregistrer
+les volumes avec <application>device mapper</application> de cette façon&nbsp;:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
+</screen></informalexample>
+
+Tous les volumes listés dans <filename>/etc/crypttab</filename> seront examinés
+et les périhériques seront créés dans le répertoire <filename>/dev</filename>
+après avoir entré les bonnes phrases de passe. Les volumes déjà enregistrés sont
+sautés et vous pouvez répéter cette commande sans souci. Quand l'enregistrement
+des volumes sera terminé, vous pouvez simplement les monter de la façon habituelle&nbsp;:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+Quand des volumes contenant des systèmes de fichiers non critiques
+(<filename>/usr</filename> ou <filename>/var</filename>) n'ont pas été montés, le
+système doit s'amorcer malgé tout et vous pouvez monter ces volumes
+comme dans le cas précédent. Mais vous aurez besoin de (re)lancer les
+services qui fonctionnent habituellement car il est probable qu'ils n'auront pas été
+lancés. Le plus simple est de passer sur le premier niveau de fonctionnement
+(<quote>runlevel</quote>) en entrant&nbsp;:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>init 1</userinput>
+</screen></informalexample>
+
+et en pressant les touches <keycombo> <keycap>Control</keycap><keycap>D</keycap> </keycombo>
+quand le mot de passe du superutilisateur est demandé.
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
 
  <sect1 id="login">
  <title>Se connecter</title>

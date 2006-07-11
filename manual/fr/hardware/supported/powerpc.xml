@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 30269 -->
+<!-- original version: 38791 -->
 
   <sect2 arch="powerpc">
 <title>Microprocesseurs, cartes mère et cartes vidéo</title>
@@ -7,14 +7,14 @@
 <para>
 
 Il y a quatre variantes principales de <emphasis>&architecture;</emphasis> 
-reconnues&nbsp;: PMac (Power-Macintosh), PReP, APUS (Amiga Power-UP System) et
+reconnues&nbsp;: PMac (Power-Macintosh ou PowerMac ), PReP, APUS (Amiga Power-UP System) et
 CHRP. Chacune de ces sous-architectures possède sa méthode d'amorçage. Les
 différents processeurs sont associés à quatre noyaux différents.
 </para>
 <para> 
 Des portages d'autres architectures <emphasis>&architecture;</emphasis>, 
 telles que Be-Box et MBX sont en cours, mais pas encore faits. Nous aurons
-peut-être aussi un portage 64 bits (Power3).
+peut-être aussi un portage 64 bits.
 </para>
 
 
@@ -30,32 +30,41 @@ processeur&nbsp;:
 <listitem><para>
 
 La plupart des systèmes utilisent cette variante qui reconnaît les processeurs
-PowerPC 601, 603, 604, 740, 750 et 7400. Tous les systèmes Apple Power 
-Macintosh jusqu'au G4 utilisent l'un de ces processeurs.
+PowerPC 601, 603, 604, 740, 750 et 7400. Toutes les machines Apple PowerMac
+jusqu'à G4 utilisent l'un de ces processeurs.
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>power3</term>
+<term>power64</term>
 <listitem><para>
+
+La variante power64 acceptent les processeurs suivants&nbsp;:
+
+</para><para>
 
 Le processeur POWER3 est utilisé par les anciens systèmes IBM 64 bits. 
 On trouve les machines IntelliStation POWER Model 265, les pSeries 610 et 640 
 et les RS/6000 7044-170, 7043-260, 7044-270. 
-</para></listitem>
-</varlistentry>
 
-<varlistentry>
-<term>power4</term>
-<listitem><para>
+</para><para>
 
 Le processeur POWER4 est utilisé par les nouveaux systèmes IBM 64 bits. On 
 trouve les machines pSeries 615, 630, 650, 655, 670 et 690.
 </para>
 <para>
 
-L'Apple G5 est aussi basé sur l'architecture POWER4 et utilise cette variante
-du noyau.
+L'Apple G5 (processeur PPC970FX) est aussi basé sur l'architecture POWER4
+et utilise cette variante du noyau.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>prep</term>
+<listitem><para>
+
+Cette variante du noyau est destiné à la sous-architecture PReP.
 
 </para></listitem>
 </varlistentry>
@@ -64,7 +73,8 @@ du noyau.
 <term>apus</term>
 <listitem><para>
 
-Cette variante est destinée au système Amiga Power-UP.
+Cette variante est destinée au système Amiga Power-UP. Elle est actuellement
+désactivée.
 
 </para></listitem>
 
@@ -78,81 +88,33 @@ Cette variante est destinée au système Amiga Power-UP.
 
 <para>
 Apple (et quelques autres constructeurs, Power Computing, par 
-exemple), produit une série d'ordinateurs Macintosh basés sur le processeur 
-PowerPC. On distingue trois catégories&nbsp;: Nubus, OldWorld PCI et NewWorld.
+exemple), a produit une série d'ordinateurs Macintosh basés sur le processeur 
+PowerPC. On distingue trois catégories&nbsp;: Nubus (non gérée par Debian), OldWorld PCI
+et NewWorld.
 </para>
 
 <para>
-Les ordinateurs Macintosh utilisant la série des microprocesseurs 680x0 ne 
-font pas partie de la famille des PowerPC mais de celle des machines m68k. 
-Ces modèles commencent avec les <quote>Mac II</quote> ou bien ont un
-numéro de modèle à trois chiffres comme «&nbsp;Centris 650&nbsp;» ou 
-«&nbsp;Quadra 950&nbsp;». Les numéros de modèles PowerPC pré-iMac de chez 
-Apple ont quatre chiffres.
-</para>
-
-<para>
-Les systèmes Nubus ne sont pas reconnus par debian/powerpc
-pour le moment. L'architecture monolithique du noyau
-Linux/PPC n'accepte pas ces machines&nbsp;; à la place, il faut
-utiliser le micronoyau MkLinux Mach, que Debian ne gère pas encore. 
-Cela inclut les modèles suivants&nbsp;:
-
-<itemizedlist>
-<listitem><para>
-
-Power Macintosh 6100, 7100, 8100
-
-
-</para></listitem>
-<listitem><para>
-
-Performa 5200, 6200, 6300
-
-</para></listitem>
-<listitem><para>
-
-Powerbook 1400, 2300 et 5300
-
-</para></listitem>
-<listitem><para>
-
-Workgroup Server 6150, 8150, 9150
-
-</para></listitem>
-
-</itemizedlist>
-
-Il existe un noyau Linux pour ces machines et on trouve un support limité 
-sur la <ulink url="http://nubus-pmac.sourceforge.net/">page</ulink>.
-
+Les systèmes OldWorld représentent la plupart des PowerMacintosh
+qui possèdent un lecteur de disquettes et un bus PCI. La plupart des Power Macintosh
+603,603e,604 et 604e sont des machines OldWorld. Les numéros de modèles PowerPC pré-iMac
+de chez Apple ont quatre chiffres, sauf les systèmes G3 de couleur beige qui sont aussi
+des OldWorld.
 
 </para>
-
-<para>
-Les systèmes OldWorld représentent la plupart des Power
-Macintosh qui possèdent un lecteur de disquettes et un bus
-PCI. La plupart des Power Macintoshs 603,603e,604 et 604e,
-en incluant les 7200, 7300, 7500, 7600, 8500, 8600, 9500 et
-9600 sont des machines OldWorld. Les systèmes G3 de couleur
-beige sont aussi des OldWorld.
-</para>
-
 <para>
 Les machines appelées PowerMacs NewWorld sont les PowerMacs
-avec un boîtier en plastique de couleur translucide&nbsp;: 
+avec un boîtier en plastique de couleur translucide&nbsp;:
 tous les iMacs, iBooks, G4, G3 de couleur bleue et
 la plupart des PowerBooks fabriqués à partir de 1999. Les
 PowerMacs NewWorld sont aussi connus pour utiliser le
 système <quote>Rom en Ram</quote> de MacOS et ont commencé
-à être fabriqués à partir de mi-1998.
+à être fabriqués à partir de 1998.
+
 </para>
-
 <para>
-
 Les spécifications pour le matériel Apple sont disponibles sur
 <ulink url="http://www.info.apple.com/support/applespec.html">AppleSpec</ulink>,
-et pour le matériel plus ancien, 
+et pour le matériel plus ancien,
 <ulink url="http://www.info.apple.com/support/applespec.legacy/index.html">AppleSpec Legacy</ulink>.
 </para>
 
@@ -172,7 +134,7 @@ et pour le matériel plus ancien,
 
 <tbody>
 <row>
-  <entry morerows="22">Apple</entry>
+  <entry morerows="27">Apple</entry>
   <entry>iMac Bondi Blue, 5 Flavors, Slot Loading</entry>
   <entry>NewWorld</entry>
 </row><row>
@@ -290,7 +252,7 @@ et pour le matériel plus ancien,
 
 </sect3>
 
-<sect3><title>La sous-subarchitecture PReP</title>
+<sect3><title>La sous-architecture PReP</title>
 
 <para>
 
@@ -380,5 +342,68 @@ et pour le matériel plus ancien,
 
 </para>
 
+</sect3>
+
+<sect3><title>Sous-architecture Nubus PowerMac (non gérée)</title>
+
+<para>
+Les systèmes Nubus ne sont pas reconnus par Debian/powerpc
+pour le moment. L'architecture monolithique du noyau
+Linux/PPC n'accepte pas ces machines&nbsp;; à la place, il faut
+utiliser le micronoyau MkLinux Mach, que Debian ne gère pas encore.
+Cela inclut les modèles suivants&nbsp;:
+
+<itemizedlist>
+<listitem><para>
+
+Power Macintosh 6100, 7100, 8100
+
+</para></listitem>
+<listitem><para>
+
+Performa 5200, 6200, 6300
+
+</para></listitem>
+<listitem><para>
+
+Powerbook 1400, 2300, et 5300
+
+</para></listitem>
+<listitem><para>
+
+Workgroup Server 6150, 8150, 9150
+
+</para></listitem>
+</itemizedlist>
+
+Il existe un noyau Linux pour ces machines et on trouve un support limité sur
+<ulink url="http://nubus-pmac.sourceforge.net/"></ulink>.
+
+</para>
+</sect3>
+
+<sect3><title>Mac non PowerPC</title>
+
+<para>
+
+Les ordinateurs Macintosh utilisant la série des microprocesseurs 680x0 ne
+font pas partie de la famille des PowerPC mais de celle des machines m68k.
+Ces modèles commencent avec les <quote>Mac II</quote>, continuent avec les
+<quote>LC</quote>, puis les <quote>Centris</quote> et les <quote>Quadras</quote>
+et <quote>Performas</quote>.Ces modèles ont un numéro à trois chiffres comme
+Mac IIcx, LCIII ou Quadra 950.
+</para>
+<para>
+Ces modèles commencent avec les Mac II (Mac II, IIx, IIcx, IIci,
+IIsi, IIvi, IIvx, IIfx), then the LC (LC, LCII, III, III+, 475, 520,
+550, 575, 580, 630), puis les Mac TV, puis les Centris (610, 650,
+660AV), les Quadra (605, 610, 630, 650, 660AV, 700, 800, 840AV, 900,
+950), et en fin  Performa 200-640CD.
+</para>
+<para>
+Pour les portables, ces modèles commencent avec le  Mac Portable, puis
+les PowerBook 100-190cs et les PowerBook Duo 210-550c (en excluant le
+PowerBook 500, qui est de type Nubus, voyez la section ci-dessus.
+</para>
 </sect3>
   </sect2>
