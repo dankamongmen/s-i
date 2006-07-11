@@ -18,10 +18,11 @@ get_size () {
 }
 
 # Create the raid devices
-for i in `grep ^md /proc/mdstat|grep -v inactive|sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'`; do
-	NUMBER=`echo ${i}|sed -e "s/^md//"`
+for i in $(grep ^md /proc/mdstat | grep -v inactive | \
+	   sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
+	NUMBER=$(echo ${i}|sed -e "s/^md//")
 	DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
-	mkdir ${DEVICE}
+	mkdir -p ${DEVICE}
 	cd ${DEVICE}
 	echo "/dev/md/${NUMBER}" > ${DEVICE}/device
 
