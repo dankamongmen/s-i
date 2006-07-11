@@ -14,6 +14,8 @@ my %pooldirs;
 my %poolfiles;
 my %lastbinfromsource;
 my %inconsistent;
+my %frozen;
+my %has_debs;
 my @annotations;
 
 sub markup {
@@ -87,6 +89,14 @@ foreach my $dist (@dists) {
 					# Source line can include a version if binNMU'ed
 					$source=~s/ .*$//;
 				}
+
+				# Assume that source packages maintained by d-i team don't
+				# have debs and others do; exceptions in deb-exceptions
+				my ($maintainer)=m/Maintainer: (.*)\n/;
+				if (defined $maintainer && $maintainer!~/debian-boot/) {
+					$has_debs{$source}=1;
+				}
+
 				if ($dist eq 'testing' && 
 				    exists $packageversions{$source}{$dist}{$arch} &&
 				    $packageversions{$source}{$dist}{$arch} ne $version) {
@@ -111,7 +121,24 @@ foreach my $dist (@dists) {
 	close PKG;
 }
 
-# collate transitions for multiple arches
+# Process exceptions for source packages with debs
+if (open (EXC, "deb-exceptions")) { 
+	while (<EXC>) {
+		next if /^#/;
+		next unless length;
+
+		my ($package)=m/^([^ ]*) [01]\n/;
+		my ($has_deb)=m/^[^ ]* ([01])\n/;
+		if (defined $package && defined $has_deb) {
+			$has_debs{$package}=$has_deb;
+		}
+	}
+	close EXC;
+} else {
+	print STDERR "failed to read package excepions file: $!\n";
+}
+
+# Collate transitions for multiple arches
 my %transitions;
 foreach my $package (keys %seenpackages) {
 	foreach my $arch (@arches) {
@@ -133,33 +160,57 @@ foreach my $package (keys %seenpackages) {
 	}
 }
 
-open (ANN, "annotations") || print STDERR "failed to read annotations: $!";
-while (<ANN>) {
-	chomp;
-	next if /^#/;
-	next unless length;
-	
-	my ($user, $package, $version, $annotation) = split(' ', $_, 4);
-	next unless defined $annotation && length $annotation;
-	push @annotations, {user => $user, package => $package,
-		version => $version, annotation => markup($annotation)};
+if (open (ANN, "annotations")) {
+	while (<ANN>) {
+		chomp;
+		next if /^#/;
+		next unless length;
+
+		my ($user, $package, $version, $annotation) = split(' ', $_, 4);
+		next unless defined $annotation && length $annotation;
+		push @annotations, {user => $user, package => $package,
+			version => $version, annotation => markup($annotation)};
+	}
+	close ANN;
+} else {
+	print STDERR "failed to read annotations: $!\n";
 }
-close ANN;
+
+# Read packages in freeze file
+if (open (FREEZE, "freeze")) {
+	while (<FREEZE>) {
+		next if /^#/;
+		next unless length;
+
+		my ($package)=m/block (.*)\n/;
+		if (defined $package) {
+			$frozen{$package}=1;
+		}
+	}
+	close FREEZE;
+} else {
+	#print STDERR "failed to read frozen packages file: $!\n";
+}
 
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
 print "<h1>udeb testing summary</h1>\n";
 	
-print "<table border=1><tr align=left><th>source package</th><th>arches</th>";
+print "<table border=1><tr align=left><th>source package</th><th>debs</th><th>arches</th>";
 foreach my $dist (@dists) {
 	print "<th>$dist</th>";
 }
-print "<th>age (days)</th></tr>\n";
-my $numcols=3 + @dists;
+print "<th>age (days)</th><th>frozen</th></tr>\n";
+my $numcols=5 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
 	foreach my $transition (keys %{$transitions{$package}}) {
 		print "<tr><td><a href=\"http://packages.debian.org/unstable/source/$package\">$package</a></td>";
+		if (exists $has_debs{$package} && $has_debs{$package}==1) {
+			print "<td align=\"center\">x</td>";
+		} else {
+			print "<td>\&nbsp;</td>";
+		}
 		print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
 		my $some_arch=@{$transitions{$package}{$transition}}[0];
 		my @vers;
@@ -195,7 +246,13 @@ foreach my $package (sort keys %seenpackages) {
 		else {
 			$minage=int($minage);
 		}
-		print "<td><a href=\"http://packages.qa.debian.org/$package\">".$minage."</a></td></tr>\n";
+		print "<td><a href=\"http://packages.qa.debian.org/$package\">".$minage."</a></td>";
+		if (exists $frozen{$package}) {
+			print "<td align=\"center\">x</td>";
+		} else {
+			print "<td>\&nbsp;</td>";
+		}
+		print "</tr>\n";
 			
 		foreach my $ann (@annotations) {
 			if ($package eq $ann->{package} && 
