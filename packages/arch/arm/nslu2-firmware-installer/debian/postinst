@@ -24,7 +24,7 @@ for file in $(find /lib/modules -type f |grep ixp400); do
 	mkdir -p /target/$dir
 	cp -a $file /target/$file
 done
-if [ "$ixp400_found" ]; then
+if [ $ixp400_found -gt 1 ]; then
 	log "copied ixp400 driver to /target"
 	chroot /target depmod -a
 fi
