@@ -75,18 +75,20 @@ md_createmain() {
 	db_go
 	if [ $? -ne "30" ]; then
 		db_get mdcfg/createmain
+		if [ "$RET" = Cancel ]; then
+			return
+		fi
+		RAID_SEL="$RET"
 		
 		get_partitions
 
-		case $RET in
+		case "$RAID_SEL" in
 			"RAID5")
 				md_create_raid5 ;;
 			"RAID1")
 				md_create_raid1 ;;
 			"RAID0")
 				md_create_raid0 ;;
-			"Cancel")
-				return ;;
 		esac
 	fi
 }
