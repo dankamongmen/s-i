@@ -36,13 +36,13 @@ lvm_get_info() {
 	if [ $? -ne 0 ]; then
 		return 1
 	fi
+	# NOTE: The last sed, s/:$// is necessary due to a bug in lvs which adds a
+	#       trailing separator even if there is only one field
 	output=$(echo "$output" | sed -e 's/^[:[:space:]]\+//g;s/[:[:space:]]\+$//g')
 	# Be careful here, we don't want to output only a newline
 	if [ -n "$output" ]; then
 		echo "$output"
 	fi
-	# NOTE: The last sed, s/:$// is necessary due to a bug in lvs which adds a
-	#       trailing separator even if there is only one field
 	return 0
 }
 
