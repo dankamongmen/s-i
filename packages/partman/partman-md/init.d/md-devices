@@ -2,6 +2,11 @@
 
 . /lib/partman/definitions.sh
 
+# Check if we have RAID
+if [ ! -f /proc/mdstat ]; then
+	exit 0
+fi
+
 # Obtain the size of an MD device
 get_size () {
     while [ -z "$(echo "$line" | grep "^md$NUMBER :")" ]; do
