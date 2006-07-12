@@ -42,7 +42,8 @@ md_delete_verify() {
 				echo ${DEV} >> /var/log/mdcfg.log
 			done
 			;;
-		"false") ;;
+		"false")
+			: ;;
 	esac
 }
 
@@ -62,8 +63,9 @@ md_delete() {
 
 	case $RET in
 		md*)
-			md_delete_verify $RET;;
-		*);;
+			md_delete_verify $RET ;;
+		*)
+			: ;;
 	esac
 }
 
@@ -78,11 +80,13 @@ md_createmain() {
 
 		case $RET in
 			"RAID5")
-			md_create_raid5;;
+				md_create_raid5 ;;
 			"RAID1")
-			md_create_raid1;;
+				md_create_raid1 ;;
 			"RAID0")
-			md_create_raid0;;
+				md_create_raid0 ;;
+			"Cancel")
+				return ;;
 		esac
 	fi
 }
@@ -170,11 +174,12 @@ md_create_raid0() {
 		let MD_NUM++
 	fi
 
-	echo "Number of devices in the RAID0 array md${MD_NUM}: ${SELECTED}"
+	logger -t mdcfg "Number of devices in the RAID0 array md${MD_NUM}: ${SELECTED}"
 
 	RAID_DEVICES="$(echo ${RET} | sed -e 's/,//g')"
-	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid0 -n ${SELECTED} ${RAID_DEVICES}`
+	log-output -t mdcfg \
+		mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid0 \
+		      -n ${SELECTED} ${RAID_DEVICES}
 }
 
 md_create_raid1() {
@@ -306,11 +311,13 @@ md_create_raid1() {
 		let MD_NUM++
 	fi
 
-	echo "Selected spare count: ${NAMED_SPARES}"
-	echo "Raid devices count: ${DEV_COUNT}"
-	echo "Spare devices count: ${SPARE_COUNT}"
-	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid1 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${MISSING_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
+	logger -t mdcfg "Selected spare count: ${NAMED_SPARES}"
+	logger -t mdcfg "Raid devices count: ${DEV_COUNT}"
+	logger -t mdcfg "Spare devices count: ${SPARE_COUNT}"
+	log-output -t mdcfg \
+		mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid1 \
+		      -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${MISSING_DEVICES} \
+		      ${SPARE_DEVICES} ${MISSING_SPARES}
 }
 
 md_create_raid5() {
@@ -446,11 +453,13 @@ md_create_raid5() {
 		let MD_NUM++
 	fi
 
-	echo "Selected spare count: ${NAMED_SPARES}"
-	echo "Raid devices count: ${DEV_COUNT}"
-	echo "Spare devices count: ${SPARE_COUNT}"
-	echo "Commandline:"
-	`mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid5 -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}`
+	logger -t mdcfg "Selected spare count: ${NAMED_SPARES}"
+	logger -t mdcfg "Raid devices count: ${DEV_COUNT}"
+	logger -t mdcfg "Spare devices count: ${SPARE_COUNT}"
+	log-output -t mdcfg \
+		mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid5 \
+		      -n ${DEV_COUNT} -x ${SPARE_COUNT} ${RAID_DEVICES} \
+		      ${SPARE_DEVICES} ${MISSING_SPARES}
 }
 
 md_mainmenu() {
@@ -464,11 +473,11 @@ md_mainmenu() {
 		db_get mdcfg/mainmenu
 		case $RET in
 			"Create MD device")
-				md_createmain;;
+				md_createmain ;;
 			"Delete MD device")
-				md_delete;;
+				md_delete ;;
 			"Finish")
-				break;;
+				break ;;
 		esac
 	done
 }
