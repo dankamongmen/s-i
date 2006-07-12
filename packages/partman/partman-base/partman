@@ -3,10 +3,10 @@
 . /lib/partman/definitions.sh
 
 abort () {
-    if [ -f /var/run/parted_server.pid ]; then
-	stop_parted_server
-    fi
-    exit $1
+	if [ -f /var/run/parted_server.pid ]; then
+		stop_parted_server
+	fi
+	exit $1
 }
 
 db_capb backup
@@ -30,63 +30,65 @@ export number_width
 deci='.'
 
 # Commented due to #240145
-#if [ -e /var/lib/partman ]; then 
-#    rm -rf /var/lib/partman 
+#if [ -e /var/lib/partman ]; then
+#	rm -rf /var/lib/partman
 #fi
 
 mkdir -p /var/lib/partman
 
 while true; do
-    
-    initcount=$(ls /lib/partman/init.d/* | wc -l)
-    db_progress START 0 $initcount partman/progress/init/title
-    for s in /lib/partman/init.d/*; do
-	if [ -x $s ]; then
-	    #logger -t "Running init.d/$s
+	initcount=$(ls /lib/partman/init.d/* | wc -l)
+	db_progress START 0 $initcount partman/progress/init/title
 
-	    base=$(basename $s | sed 's/[0-9]*//')
-	    # Not every init script has, or needs, its own progress
-	    # template. Add them to slow init scripts only.
-	    if ! db_progress INFO partman/progress/init/$base; then
-		db_progress INFO partman/progress/init/fallback
-	    fi
-	    if ! $s; then
-		db_progress STOP
-		abort 10
-	    fi
-	fi
-	db_progress STEP 1
-    done
-    db_progress STOP
-    
-    while true; do
-	ask_user /lib/partman/choose_partition
-	exitcode=$?
-	if [ $exitcode -eq 255 ]; then
-	    abort 10 # back up to main menu
-	elif [ $exitcode -ge 100 ] && confirm_changes "partman"; then
-	    break
-	fi
-    done
+	for s in /lib/partman/init.d/*; do
+		if [ -x $s ]; then
+			#logger -t "Running init.d/$s
 
-    for s in /lib/partman/commit.d/*; do
-	if [ -x $s ]; then
-	    $s || continue 2
-	fi
-    done
-    
-    for s in /lib/partman/finish.d/*; do
-	if [ -x $s ]; then
-	    $s || {
-		status=$?
-		if [ "$status" = 1 ]; then
-		    continue 2
-		else
-		    abort $status
+			base=$(basename $s | sed 's/[0-9]*//')
+			# Not every init script has, or needs, its own progress
+			# template. Add them to slow init scripts only.
+			if ! db_progress INFO partman/progress/init/$base; then
+				db_progress INFO partman/progress/init/fallback
+			fi
+			if ! $s; then
+				db_progress STOP
+				abort 10
+			fi
 		fi
-	    }
-	fi
-    done
+		db_progress STEP 1
+	done
+	db_progress STOP
 
-    break
-done    
+	while true; do
+		ask_user /lib/partman/choose_partition
+		exitcode=$?
+		if [ $exitcode -eq 255 ]; then
+			abort 10 # back up to main menu
+		elif [ $exitcode -ge 100 ] && confirm_changes "partman"; then
+			break
+		fi
+	done
+
+	for s in /lib/partman/commit.d/*; do
+		if [ -x $s ]; then
+			#logger -t "Running commit.d/$s
+			$s || continue 2
+		fi
+	done
+
+	for s in /lib/partman/finish.d/*; do
+		if [ -x $s ]; then
+			#logger -t "Running finish.d/$s
+			$s || {
+				status=$?
+				if [ "$status" = 1 ]; then
+					continue 2
+				else
+					abort $status
+				fi
+			}
+		fi
+	done
+
+	break
+done
