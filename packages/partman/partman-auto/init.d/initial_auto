@@ -33,17 +33,14 @@ fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto
 
-# See if any disks to autopartition (either classic or LVM) have been set
+# See if a disk to autopartition (either classic or LVM) has been set
 if db_get partman-auto/disk && [ -n "$RET" ]; then
-	disks="$RET"
-	for disk in $disks
-	do
-		id=$(dev_to_partman "$disk") || true
-		if [ -n "$id" ]; then
-			autopartition "$id"
-		fi
-	done
-	exit 0
+	disk="$RET"
+	id=$(dev_to_partman "$disk") || true
+	if [ -n "$id" ]; then
+		autopartition "$id"
+		exit 0
+	fi
 elif search-path autopartition-lvm && \
      db_get partman-auto-lvm/disk && [ -n "$RET" ]; then
 	disk="$RET"
