@@ -494,8 +494,7 @@ modprobe raid5 >/dev/null 2>&1
 mkdir -p /dev/md
 
 # Try to detect MD devices, and start them
-mdadm --examine --scan --config=partitions > /tmp/mdadm.conf
-mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
+mdrun
 
 # Make sure that we have md-support
 if [ ! -e /proc/mdstat ]; then
