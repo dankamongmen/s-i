@@ -38,12 +38,13 @@ mkdir -p /var/lib/partman
 
 while true; do
     
-    initcount=`ls /lib/partman/init.d/* | wc -l`
+    initcount=$(ls /lib/partman/init.d/* | wc -l)
     db_progress START 0 $initcount partman/progress/init/title
     for s in /lib/partman/init.d/*; do
 	if [ -x $s ]; then
+	    #logger -t "Running init.d/$s
+
 	    base=$(basename $s | sed 's/[0-9]*//')
-	    echo $base >&2
 	    # Not every init script has, or needs, its own progress
 	    # template. Add them to slow init scripts only.
 	    if ! db_progress INFO partman/progress/init/$base; then
