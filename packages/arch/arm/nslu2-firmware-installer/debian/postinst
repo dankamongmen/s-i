@@ -26,7 +26,7 @@ for file in $(find /lib/modules -type f |grep ixp400); do
 done
 if [ $ixp400_found -gt 1 ]; then
 	log "copied ixp400 driver to /target"
-	chroot /target depmod -a
+	chroot /target depmod -a || true
 fi
 
 apt-install initramfs-tools || true # probably already installed; make sure
