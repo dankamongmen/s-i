@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: boot-new\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
 "POT-Creation-Date: 2006-07-09 14:07+0000\n"
-"PO-Revision-Date: 2006-07-11 20:59+0300\n"
+"PO-Revision-Date: 2006-07-12 22:49+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -169,7 +169,7 @@ msgid ""
 "Linux instead of the RAMdisk installer system."
 msgstr ""
 "Теперь выберите <userinput>Boot Now</userinput> (<keycombo> <keycap>command</"
-"keycap> <keycap>B</keycap> </keycombo>), чтобы запустить установленую GNU/"
+"keycap> <keycap>B</keycap> </keycombo>), чтобы запустить установленную GNU/"
 "Linux, вместо установщика системы RAMdisk."
 
 #. Tag: para
@@ -348,6 +348,10 @@ msgid ""
 "volumes during the boot. The actual procedure differs slightly between dm-"
 "crypt and loop-AES."
 msgstr ""
+"Если вы создали шифрованные тома во время установки и назначили им точки "
+"монтирования, то во время загрузки машины вас попросят ввести ключевую фразу "
+"на каждый том. В процедуре ввода для dm-crypt и loop-AES есть "
+"некоторые различия."
 
 #. Tag: title
 #: boot-new.xml:203
@@ -376,6 +380,21 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/fstab</"
 "filename> of your new system."
 msgstr ""
+"Для разделов, зашифрованных loop-AES, во время загрузки вы увидите "
+"следующее сообщение: <informalexample><screen>\n"
+"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
+"Password:\n"
+"</screen></informalexample> В первой строке приглашения, вместо <replaceable>X</"
+"replaceable> будет указан номер loop устройства. Вы, вероятно, задумаетесь "
+"<emphasis>для какого тома</emphasis> нужно ввести ключевую фразу. "
+"Это для <filename>/home</filename>? Или для <filename>/var</filename>? "
+"Естественно, если у вас только один шифрованный том, это легко и вы можете "
+"просто ввести ключевую фразу, которую задали при настройке тома. "
+"Если же у вас несколько шифрованных томов, то пригодятся заметки, которые вы "
+"сделали на последнем этапе <xref linkend=\"partman-crypto\"/>. Если вы "
+"ранее не записали соответствие между <filename>loop<replaceable>X</replaceable></filename> "
+"и точкой монтирования, то можете выяснить это в файле <filename>/etc/fstab</"
+"filename>."
 
 #. Tag: para
 #: boot-new.xml:226
@@ -387,12 +406,18 @@ msgid ""
 "volume and continue to mount the next filesystem. Please see <xref linkend="
 "\"crypto-troubleshooting\"/> for further information."
 msgstr ""
+"Во время ввода ключевой фразы символы не отображаются (даже звёздочками). "
+"Осторожно, у вас есть только <emphasis>одна попытка</emphasis>. "
+"Если вы введёте неверную ключевую фразу, появиться сообщение об ошибке "
+"и процесс загрузки пропустит этот том и начнётся монтирование следующей "
+"файловой системы. Подробней смотрите в <xref linkend="
+"\"crypto-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-new.xml:235
 #, no-c-format
 msgid "After entering all passphrases the boot should continue as usual."
-msgstr ""
+msgstr "После ввода всех ключевых фраз загрузка продолжится как обычно."
 
 #. Tag: title
 #: boot-new.xml:243
@@ -410,7 +435,7 @@ msgstr "TODO: написать как это работает."
 #: boot-new.xml:253
 #, no-c-format
 msgid "Troubleshooting"
-msgstr ""
+msgstr "Устранение неполадок"
 
 #. Tag: para
 #: boot-new.xml:255
@@ -420,6 +445,9 @@ msgid ""
 "passphrase was entered, you will have to mount them manually after the boot. "
 "There are several cases."
 msgstr ""
+"Если некоторые шифрованные тома не были смонтированы из-за ввода неправильной "
+"ключевой фразы, их можно смонтировать вручную после загрузки. "
+"Но есть несколько случаев."
 
 #. Tag: para
 #: boot-new.xml:264
@@ -429,6 +457,9 @@ msgid ""
 "correctly, the boot process will halt and you will have to reboot the "
 "computer to try again."
 msgstr ""
+"Первый случай касается корневого раздела. Если он не смонтирован, то "
+"процесс загрузки остановится, а вам придётся перезагрузить компьютер "
+"чтобы попробовать ещё раз."
 
 #. Tag: para
 #: boot-new.xml:271
@@ -446,6 +477,17 @@ msgid ""
 "filename>). The only difference from an ordinary mount is that you will be "
 "asked to enter the passphrase for this volume."
 msgstr ""
+"Простейший случай &mdash; шифрованные тома с данными типа <filename>/home</"
+"filename> или <filename>/srv</filename>. Вы можете просто смонтировать "
+"их после загрузки. Для loop-AES это делается в одно действие: "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>mount <replaceable>/точка_монтирования</replaceable></"
+"userinput>\n"
+"<prompt>Password:</prompt>\n"
+"</screen></informalexample>, где <replaceable>/точку_монтирования</replaceable> "
+"нужно заменить именем каталога (например <filename>/home</filename>). "
+"Отличие от обычной операции монтирования только в запросе ключевой фразы для "
+"этого тома."
 
 #. Tag: para
 #: boot-new.xml:285
@@ -462,6 +504,16 @@ msgid ""
 "this command several times without worrying.) After successful registration "
 "you can simply mount the volumes the usual way:"
 msgstr ""
+"Для dm-crypt немного сложнее. Во-первых вам нужно зарегистрировать тома "
+"с помощью <application>device mapper</application>выполнив: "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>\n"
+"</screen></informalexample> Эта операция просканирует все тома указанные "
+"в <filename>/etc/crypttab</filename> и создаст соответствующие устройства "
+"в каталоге <filename>/dev</filename> после ввода правильных ключевых фраз. "
+"(Тома зарегистрированные ранее будут пропущены, поэтому вы можете спокойно запускать "
+"эту команду несколько раз.) После успешной регистрации вы можете смонтировать тома "
+"как обычно:"
 
 #. Tag: screen
 #: boot-new.xml:300
@@ -470,8 +522,8 @@ msgid ""
 "<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
 "userinput>"
 msgstr ""
-"<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
-"userinput>"
+"<prompt>#</prompt> <userinput>mount "
+"<replaceable>/точка_монтирования</replaceable></userinput>"
 
 #. Tag: para
 #: boot-new.xml:303
@@ -489,6 +541,18 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
+"Если на несмонтированных томах содержатся некритичные системные файлы "
+"(<filename>/usr</filename> или <filename>/var</filename>), система "
+"должна загрузиться и вы сможете смонтировать тома вручную как в предыдущем случае. "
+"Однако, может потребоваться (пере)запуск каждого сервиса, который обычно "
+"запускается на уровне выполнения по умолчанию, так как скорее всего они не "
+"смогли запуститься. Самый простой способ сделать это &mdash; перейти на "
+"первый уровень выполнения и вернуться назад с помощью запуска "
+"<informalexample><screen>\n"
+"<prompt>#</prompt> <userinput>init 1</userinput>\n"
+"</screen></informalexample> в оболочке и нажать <keycombo> "
+"<keycap>Control</keycap> <keycap>D</keycap> </keycombo> когда "
+"попросят ввести пароль суперпользователя."
 
 #. Tag: title
 #: boot-new.xml:326
