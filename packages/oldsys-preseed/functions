@@ -85,6 +85,15 @@ parse_network_interfaces() {
 	fi
 }
 
+# Parse a set of ifconfig/route/etc commands
+# $1 = ifconfig et al. commands
+parse_ifconfig() {
+	# UGH!
+	IPADDRESS=$(grep "ifconfig [-[:alpha:][:digit:]]* [[:digit:].]" $1 | sed 's/.*ifconfig [-[:alpha:][:digit:]]* \([.[:digit:]]*\) .*/\1/')
+	NETMASK=$(grep '\bnetmask\b' $1 | sed 's/.*netmask\s*//' | sed 's/\s.*//')
+	GATEWAY=$(grep "route add default gw" $1 | sed 's/.*gw\s*//')
+}
+
 # Get the value from a string in the form of var=value
 # $1 = string
 # $2 = var
