@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 38290 -->
+<!-- original version: 38662 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -648,6 +648,22 @@ auswählen müssen, bevor eine Voreinstellungsdatei vom Netzwerk geladen wurde,
 benutzen Sie einen Bootparameter wie
 <userinput>interface=<replaceable>eth1</replaceable></userinput>.
 
+</para><para>
+
+Obwohl das Voreinstellen der Netzwerkkonfiguration normalerweise nicht möglich
+ist, wenn Sie Voreinstellung über Netzwerk benutzen (mittels
+<quote>preseed/url</quote>), können Sie den folgenden Hack verwenden, um
+diese Einschränkung zu umgehen, wenn Sie zum Beispiel eine statische
+Adresse für die Netzwerk-Schnittstelle setzen möchten. Der Hack erzwingt, dass
+die Netzwerkkonfiguration erneut abläuft, nachdem die Voreinstellungsdatei
+geladen wurde. Dazu wird ein <quote>preseed/run</quote>-Script erzeugt
+mit den folgenden Zeilen:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
+
 </para>
 
 <informalexample role="example"><screen>
@@ -779,6 +795,8 @@ Voreinstellung nutzen.
 # traditionellen Format angegeben werden. Um z.B. die erste Platte zu
 # nutzen, die devfs kennt:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# Or, if you want to use LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
 # NOTE: this must be preseeded with a localized (translated) value.
