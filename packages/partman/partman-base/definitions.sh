@@ -753,7 +753,9 @@ enable_swap () {
 	close_dialog
     done
     for path in $swaps; do
-	swapon $path || true
+	if ! grep -q "$path" /proc/swaps; then
+	    swapon $path 2>/dev/null || true
+	fi
     done
     cd "$startdir"
 }
