@@ -13,7 +13,7 @@ log-output -t partman pvscan
 log-output -t partman vgscan
 
 if [ -x /sbin/vgdisplay ]; then
-	vgroups=$(/sbin/vgdisplay | grep '^[ ]*VG Name' | 
+	vgroups=$(/sbin/vgdisplay 2>/dev/null | grep '^[ ]*VG Name' | 
 		sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort)
 else
 	vgroups=''
