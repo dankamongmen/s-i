@@ -44,10 +44,14 @@ fi
 db_progress STEP 1
 db_progress INFO nslu2-firmware-installer/flashing
 
+# We need the udev /dev which has the MTD devices
+mount -o bind /dev /target/dev
 if ! in-target nslu2-flashkernel; then
+	umount /target/dev || true
 	error "nslu2-flashkernel failed"
 	exit 1
 fi
+umount /target/dev || true
 
 db_progress STEP 1
 db_progress STOP
