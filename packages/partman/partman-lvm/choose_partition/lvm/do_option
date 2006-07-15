@@ -547,42 +547,57 @@ while [ 1 ]; do
 	vgs=$(vg_list | wc -l)
 	lvs=$(lv_list | wc -l)
 
-	# Check choices to include
+	# Build menu options
 	choices="$menu_display"
 	# Create VG
-	[ $free_pvs -gt 0 ] && choices="${choices}, $menu_createvg"
-	# Extend VG
-	[ $free_pvs -gt 0 -a $vgs -gt 0 ] && choices="${choices}, $menu_extendvg"
-	# Reduce VG, Delete VG, Create LV
+	if [ $free_pvs -gt 0 ]; then
+		choices="${choices}, $menu_createvg"
+	fi
+	# Other options only if there is at least one VG
 	if [ $vgs -gt 0 ]; then
-		# First check, then add so that the order is constant
+		# First check, then add so the order is constant
 		do_reducevg=""
 		do_deletevg=""
 		do_createlv=""
-		# Check VG
+		# Check all VGs
 		for vg in $(vg_list); do
 			vg_get_info "$vg"
 			if [ $PVS -gt 1 ]; then
-				do_reducevg="true"
+				do_reducevg="1"
 			fi
 			if [ $LVS -eq 0 ]; then
-				do_deletevg="true"
+				do_deletevg="1"
 			fi
 			if [ $FREEPE -gt 0 ]; then
-				do_createlv="true"
+				do_createlv="1"
 			fi
 		done
-		# Checks done, add detected options
-		[ "$do_reducevg" = "true" ] && choices="${choices}, $menu_reducevg"
-		[ "$do_deletevg" = "true" ] && choices="${choices}, $menu_deletevg"
-		[ "$do_createlv" = "true" ] && choices="${choices}, $menu_createlv"
+
+		# Create LV
+		if [ -n "$do_createlv" ]; then
+			choices="${choices}, $menu_createlv"
+		fi
+		# Delete VG
+		if [ -n "$do_deletevg" ]; then
+			choices="${choices}, $menu_deletevg"
+		fi
+		# Delete LV
+		if [ $lvs -gt 0 ]; then
+			choices="${choices}, $menu_deletelv"
+		fi
+		# Extend VG
+		if [ $free_pvs -gt 0 ]; then
+			choices="${choices}, $menu_extendvg"
+		fi
+		# Reduce VG
+		if [ "-n $do_reducevg" ]; then
+			choices="${choices}, $menu_reducevg"
+		fi
 	fi
-	# Delete LV
-	[ $lvs -gt 0 ] && choices="${choices}, $menu_deletelv"
 	# Add Finish option
 	choices="${choices}, $menu_finish"
 
-	# Setup mainmenu template
+	# Setup main menu template
 	db_subst partman-lvm/mainmenu CHOICES "$choices"
 	db_subst partman-lvm/mainmenu FREE_PVS "$free_pvs"
 	db_subst partman-lvm/mainmenu USED_PVS "$used_pvs"
@@ -614,7 +629,7 @@ while [ 1 ]; do
 	elif [ "$option" = "$menu_finish" ]; then
 		break
 	else
-		# TODO: write log error for unknown menu option
+		logger -t partman-lvm "Unknown selection '$option'"
 		break
 	fi
 done
