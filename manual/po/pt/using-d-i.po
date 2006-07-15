@@ -1,7 +1,7 @@
 # translation of using-d-i.po to pt
 # Portuguese translation of the Debian Installer Manual
 # Miguel Figueiredo <elmig@debianpt.org>, Etur, Rui Branco <freedebian@netcabo.pt>, 2005.
-# Miguel Figueiredo <elmig@debianpt.org>, 2006
+# Miguel Figueiredo <elmig@debianpt.org>, 2005-2006
 #
 msgid ""
 msgstr ""
@@ -2019,7 +2019,7 @@ msgstr ""
 
 #. Tag: para
 #: using-d-i.xml:1212
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> "
 "from the main <command>partman</command> menu. (The menu will only appear "
@@ -2031,7 +2031,7 @@ msgid ""
 "selected."
 msgstr ""
 "Em seguida, deverá escolher <guimenuitem>Configurar RAID por software</"
-"guimenuitem> a partir do menu principal <command>partman</command>. No "
+"guimenuitem> a partir do menu principal do <command>partman</command>. (O menu apenas irá aparecer depois de marcar pelo menos uma partição para utilizar como <guimenuitem>volume físico para RAID</guimenuitem>) No "
 "primeiro ecrã do <command>mdcfg</command> escolha simplesmente "
 "<guimenuitem>Criar dispositivo MD</guimenuitem>. Deverá ser-lhe apresentada "
 "uma lista com os vários tipos de dispositivos MD suportados a partir dos "
@@ -2116,9 +2116,9 @@ msgstr ""
 
 #. Tag: title
 #: using-d-i.xml:1276
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Configuring Encrypted Volumes"
-msgstr "Configurar o Relógio"
+msgstr "Configurar Volumes Encriptados"
 
 #. Tag: para
 #: using-d-i.xml:1277
@@ -2133,6 +2133,14 @@ msgid ""
 "to the hard drive, but without knowing the right passphrase, the data on the "
 "hard drive will look like random characters."
 msgstr ""
+"O &d-i; permite-lhe configurar partições encriptadas. Cada ficheiro que "
+"escreva para cada uma dessas partições é imediatamente gravado no dispositivo "
+"sob a forma encriptada. O acesso aos dados encriptados é garantido apenas "
+"após introduzir a <firstterm>frase-chave</firstterm> utilizada quando a "
+"partição foi originalmente criada. Esta funcionalidade é útil para proteger "
+"dados sensíveis no caso do seu portátil ou disco rígido serem furtados. O "
+"ladrão pode ter acesso físico ao disco rígido, mas sem saber a frase-chave "
+"correcta, os dados no disco irão aparecer como caracteres aleatórios."
 
 #. Tag: para
 #: using-d-i.xml:1289
@@ -2150,6 +2158,17 @@ msgid ""
 "because currently there is no way to load the kernel from an encrypted "
 "partition."
 msgstr ""
+"As duas partições mais importantes para encriptar são a home, onde residem os "
+"seus dados privados, e a partição de swap, onde dados sensíveis podem ter "
+"sido guardados durante a operação. Claro que, ninguém o impede de encriptar "
+"outras partições de interesse. Por exemplo <filename>/var</filename> onde os "
+"servidores de bases de dados, os servidores de mail ou os servidores de "
+"impressão, guardam os seus dados, ou <filename>/tmp</filename> que é "
+"utilizado por vários programas para guardar temporariamente ficheiros "
+"potencialmente de interesse. Algumas pessoas podem até querer encriptar todo "
+"o seu sistema. A única excepção é a partição <filename>/boot</filename> que "
+"tem de permanecer não-encriptada, porque actualmente não existe maneira de "
+"carregar o kernel a partir de uma partição encriptada."
 
 #. Tag: para
 #: using-d-i.xml:1304
@@ -2160,6 +2179,10 @@ msgid ""
 "for every read or write. The performance impact depends on your CPU speed, "
 "chosen cipher and a key length."
 msgstr ""
+"Por favor tenha em conta que o desempenho de partições encriptadas será "
+"inferior ao das partições não-encriptadas porque os dados necessitam de ser "
+"desencriptados ou encriptados para cada escrita ou leitura. O impacto no "
+"desempenho depende da velocidade do seu CPU, da cifra escolhida e tamanho da chave."
 
 #. Tag: para
 #: using-d-i.xml:1311
@@ -2173,6 +2196,13 @@ msgid ""
 "<menuchoice> <guimenu>Use as:</guimenu> </menuchoice> option. The menu will "
 "then change to include several cryptographic options for the partition."
 msgstr ""
+"Para utilizar encriptação, você tem de criar uma nova partição escolhendo no "
+"menu principal do particionamento algum espaço livre. Outra opção é escolher "
+"uma partição existente (e.g. uma partição normal, um volume lógico LVM ou um "
+"volume RAID). No menu <guimenuitem>Configuração da partição</guimenuitem>, "
+"necessita escolher <guimenuitem>volume físico para encriptação</guimenuitem> "
+"na opção <menuchoice> <guimenu>Utilizar como:</guimenu> </menuchoice>. O menu "
+"irá então mudar para incluir várias opções de criptografia para a partição."
 
 #. Tag: para
 #: using-d-i.xml:1322
@@ -2184,6 +2214,12 @@ msgid ""
 "(older, maintained separately from the Linux kernel tree). Unless you have "
 "compelling reasons to do otherwise, it is recommended to use the default."
 msgstr ""
+"O &d-i suporta vários métodos de encriptação. O método por omissão é o "
+"<firstterm>dm-crypt</firstterm> (incluído nos kernels Linux recentes, capaz "
+"de alojar volumes físicos LVM), o outro é o <firstterm>loop-AES</firstterm> "
+"(mais antigo, mantido em separado da fonte do kernel Linux). A menos que "
+"tenha razões incontornáveis para fazer o contrário, é recomendado utilizar "
+"a escolha por omissão."
 
 #. Tag: para
 #: using-d-i.xml:1334
@@ -2194,12 +2230,16 @@ msgid ""
 "always: when in doubt, use the defaults, because they have been carefully "
 "chosen with security in mind."
 msgstr ""
+"Primeiro, vamos ver a lista de opções disponíveis quando você escolher "
+"<userinput>Device-mapper (dm-crypt)</userinput> como método de encriptação. "
+"Como sempre: em caso de dúvida, utilize os valores por omissão, porque estes "
+"foram cuidadosamente escolhidos com a segurança em mente."
 
 #. Tag: term
 #: using-d-i.xml:1344
 #, no-c-format
 msgid "Encryption: <userinput>aes</userinput>"
-msgstr ""
+msgstr "Encriptação: <userinput>aes</userinput>"
 
 #. Tag: para
 #: using-d-i.xml:1346
@@ -2216,12 +2256,21 @@ msgid ""
 "encryption algorithm for protecting sensitive information in the 21st "
 "century."
 msgstr ""
+"Esta opção deixa-o escolher o algoritmo de encriptação (<firstterm>cifra"
+"</firstterm>) que será utilizada para encriptar os dados na partição. O &d-i; "
+"actualmente suporta as seguintes cifras de blocos: <firstterm>aes</firstterm>"
+", <firstterm>blowfish</firstterm>, <firstterm>serpent</firstterm>, e "
+"<firstterm>twofish</firstterm>. Está fora do âmbito deste documento discutir "
+"as qualidades destes diferentes algoritmos, no entanto, pode ajudar a sua "
+"decisão saber que em 2000, o <emphasis>AES</emphasis> foi escolhido pelo "
+"American National Institute of Standards and Technology como o algoritmo de "
+"encriptação standard para proteger informação sensível no século XXI."
 
 #. Tag: term
 #: using-d-i.xml:1364
 #, no-c-format
 msgid "Key size: <userinput>256</userinput>"
-msgstr ""
+msgstr "Comprimento da chave: <userinput>256</userinput>"
 
 #. Tag: para
 #: using-d-i.xml:1366
@@ -2232,24 +2281,34 @@ msgid ""
 "hand, increasing the length of the key usually has a negative impact on "
 "performance. Available key sizes vary depending on the cipher."
 msgstr ""
+"Pode especificar aqui o comprimento da chave de encriptação. Com um "
+"comprimento maior da chave, o poder da encriptação é normalmente melhorado. "
+"Por outro lado, aumentar o comprimento da chave tem um impacto negativo no "
+"desempenho. Os comprimentos disponíveis das chaves variam consoante a cifra."
 
 #. Tag: term
 #: using-d-i.xml:1378
 #, no-c-format
 msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
-msgstr ""
+msgstr "Algoritmo IV: <userinput>cbc-essiv:sha256</userinput>"
 
 #. Tag: para
 #: using-d-i.xml:1380
 #, no-c-format
 msgid ""
 "The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</"
-"firstterm> algorithm is used in cryptography to ensure that applying the "
+"firstterm> algorithm cryptography to ensure that applying the "
 "cipher on the same <firstterm>clear text</firstterm> data with the same key "
 "always produces a unique <firstterm>cipher text</firstterm>. The idea is to "
 "prevent the attacker from deducing information from repeated patterns in the "
 "encrypted data."
 msgstr ""
+"O algoritmo de criptografia <firstterm>Vector de Inicialização</firstterm> "
+"ou <firstterm>IV</firstterm> para assegurar que assegurar que aplicando a "
+"mesma cifra para o mesmo <firstterm>texto em claro</firstterm> com a mesma "
+"chave produz sempre um <firstterm>texto cifrado</firstterm> único. A ideia é "
+"prevenir que o atacante deduza informação a partir de padrões repetidos nos "
+"dados encriptados."
 
 #. Tag: para
 #: using-d-i.xml:1390
@@ -2260,24 +2319,29 @@ msgid ""
 "alternatives only when you need to ensure compatibility with some previously "
 "installed system that is not able to use newer algorithms."
 msgstr ""
+"A partir das alternativas disponibilizadas, a escolha por omissão <userinput>"
+"cbc-essiv:sha256</userinput> é actualmente o menos vulnerável a ataques "
+"conhecidos. Utilize as outras alternativas apenas quando precisar de "
+"assegurar compatibilidade com algum sistema instalado anteriormente que não "
+"seja capaz de utilizar algoritmos mais recentes."
 
 #. Tag: term
 #: using-d-i.xml:1402
 #, no-c-format
 msgid "Encryption key: <userinput>Passphrase</userinput>"
-msgstr ""
+msgstr "Chave de encriptação: <userinput>Frase-chave</userinput>"
 
 #. Tag: para
 #: using-d-i.xml:1404
 #, no-c-format
 msgid "Here you can choose the type of the encryption key for this partition."
-msgstr ""
+msgstr "Pode escolher aqui o tipo de chave de encriptação para esta partição."
 
 #. Tag: term
 #: using-d-i.xml:1410
 #, no-c-format
 msgid "Passphrase"
-msgstr ""
+msgstr "Frase-chave"
 
 #. Tag: para
 #: using-d-i.xml:1411
@@ -2288,12 +2352,16 @@ msgid ""
 "\"&url-luks;\">LUKS</ulink>. </para></footnote> on the basis of a passphrase "
 "which you will be able to enter later in the process."
 msgstr ""
+"A chave de encriptação será processada<footnote> <para>Utilizar uma frase-"
+"chave como chave actualmente significa que a partição será criada utilizando "
+"<ulink url=\"&url-luks;\">LUKS</ulink>. </para></footnote> baseada numa "
+"frase-chave na qual poderá introduzir no processo, mais à frente."
 
 #. Tag: term
 #: using-d-i.xml:1426 using-d-i.xml:1519
 #, no-c-format
 msgid "Random key"
-msgstr ""
+msgstr "Chave aleatória"
 
 #. Tag: para
 #: using-d-i.xml:1427
@@ -2306,6 +2374,12 @@ msgid ""
 "there is an unknown weakness in the cipher algorithm, it is not achievable "
 "in our lifetime.)"
 msgstr ""
+"Será gerada uma nova chave de encriptação a partir de dados aleatórios cada "
+"vez que tentar chamar a partição encriptada. Por outras palavras: cada vez "
+"que desligar, o conteúdo da partição será perdido já que a chave é apagada "
+"da memória. (Claro que, pode tentar adivinhar a chave com um ataque de "
+"força bruta, mas a menos que exista uma fraqueza conhecida no algoritmo de "
+"cifragem, isto não é alcançável durante a nossa vida.)"
 
 #. Tag: para
 #: using-d-i.xml:1436
@@ -2319,12 +2393,19 @@ msgid ""
 "as it will be impossible (during a subsequent boot) to recover the suspended "
 "data written to the swap partition."
 msgstr ""
+"Chaves aleatórias são úteis para partições de swap porque assim você não tem "
+"de se preocupar em lembrar-se da frase-passe ou apagar informação sensível da "
+"partição de swap antes de desligar o seu computador. No entanto, também "
+"significa que você <emphasis>não</emphasis> poderá utilizar a funcionalidade "
+"<quote>suspend-to-disk</quote> oferecida pelos recentes kernels Linux já que "
+"é impossível (durante o arranque seguinte) recuperar os dados suspendidos "
+"escritos para a partição de swap."
 
 #. Tag: term
 #: using-d-i.xml:1455 using-d-i.xml:1532
 #, no-c-format
 msgid "Erase data: <userinput>yes</userinput>"
-msgstr ""
+msgstr "Apagar dados: <userinput>sim</userinput>"
 
 #. Tag: para
 #: using-d-i.xml:1457
