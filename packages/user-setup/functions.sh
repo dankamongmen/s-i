@@ -26,8 +26,8 @@ root_password () {
 	fi
 
 	if [ -e $ROOT/etc/shadow ] && \
-	   [ "`grep ^root: $ROOT/etc/shadow | cut -d : -f 2`" -a \
-	     "`grep ^root: $ROOT/etc/shadow | cut -d : -f 2`" != '*' ]; then
+	   [ "`grep ^root: $ROOT/etc/shadow | cut -d : -f 2`" ] && \
+	   [ "`grep ^root: $ROOT/etc/shadow | cut -d : -f 2`" != '*' ]; then
 		return 0
 	fi
 	
