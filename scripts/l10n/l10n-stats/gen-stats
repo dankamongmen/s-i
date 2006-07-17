@@ -258,6 +258,7 @@ if [ "$FETCH" ]; then
 			fi
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
 		done
+		echo ""
 	done
 
 	#get files from CVS:
@@ -294,11 +295,11 @@ echo "Computing the number of strings:"
 
 for dist in testing unstable ; do
 	echo "  In $dist:"
-	echo -n "    "
 	#check how many strings at all
 	eval "TOTAL_$dist=0"
 	LANG=C
 	mkdir -p $TARGET_DIR/POT
+	echo -n "    "
 	for path in `cat $WD/config/paths.$dist$LEVEL`; do
 		test -f $WD/material/packages.$dist$LEVEL/$path/*.pot || continue
 		U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
@@ -461,7 +462,7 @@ for dist in testing unstable ; do
 		# Data needed by graphs
 		test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
 	
-	  	echo "($P%) "
+	  	echo -n "($P%) "
 		
 	done # for lang...
 
@@ -483,8 +484,8 @@ if [ $LEVEL = 1 ]; then
 #		else
 #			echo "No master file" | tee -a $TARGET_DIR/$lang.txt
 		fi
-	echo ""
 	done
+	echo ""
 	fancy_output
 fi
 
@@ -506,13 +507,12 @@ for lang in `cat $WD/config/languages`; do #run for every language
    %3s codepoints
    %3s level-specific wrong msgstrs
 " $SPELLCHECK >> $TARGET_DIR/$lang.txt
-		echo "Done."
 	else
 		echo "No spellcheck available."  | tee -a  $TARGET_DIR/$lang.txt
 	fi
   	print_text
 done
-
+echo ""
 
 	
 # done
