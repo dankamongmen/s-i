@@ -1,41 +1,36 @@
 
 
-echo -n "    aptitude	..."
+echo -n "aptitude "
 mkdir -p aptitude/po
 rm -rf aptitude/po/*
 cd aptitude/po
 #cp ~dburrows/public_html/darcs/aptitude/po/* aptitude/po/
 wget -q -O - http://people.debian.org/~dburrows/darcs/aptitude/po/ | wget -q --force-html --base=http://people.debian.org/~dburrows/darcs/aptitude/po/ -i -
-echo "Done."
 cd ../..
 
-echo -n "    console-common	..."
+echo -n "console-common "
 svn -q co svn://svn.debian.org/console-common/trunk/console-common console-common
-echo "Done."
 
 
-echo -n "    debconf	..."
+echo -n "debconf "
 svn -q co svn://costa.wiggy.net/debconf/trunk/src/debconf debconf/ >/dev/null 2>&1
 cd debconf/po
 make debconf.pot > /dev/null 2>&1
-echo "Done."
 
 cd ../..
 
 
-echo -n "    dpkg	..."
+echo -n "dpkg "
 svn -q co svn://svn.debian.org/dpkg/trunk/po dpkg/po
-echo "Done."
 
 
 #get apt:
-echo -n "    apt	..."
+echo -n "apt "
 mkdir -p apt/po
 cd apt/po/
 rm -rf *
 wget -q -O - http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ | wget -q --force-html --base=http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ -i -
 rm *gif* *html*
-echo "Done."
 
 cd ../..
 
