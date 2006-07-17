@@ -28,6 +28,8 @@ try_load_module md
 try_load_module raid0
 try_load_module raid1
 try_load_module raid5
+# mdadm will fail if /dev/md does not already exist
+mkdir -p /dev/md
 log-output -t rescue --pass-stdout \
 	   mdadm --examine --scan --config=partitions > /tmp/mdadm.conf || true
 log-output -t rescue \
