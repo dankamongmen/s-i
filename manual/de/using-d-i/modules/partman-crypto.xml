@@ -1,177 +1,186 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 38703 untranslated -->
+<!-- original version: 38703 -->
 
    <sect3 id="partman-crypto">
-   <title>Configuring Encrypted Volumes</title>
+   <title>Verschlüsselte Dateisysteme konfigurieren (partman-crypto)</title>
 <para>
 
-&d-i; allows you to set up encrypted partitions. Every file you write
-to such a partition is immediately saved to the device in encrypted
-form. Access to the encrypted data is granted only after entering
-the <firstterm>passphrase</firstterm> used when the encrypted
-partition was originally created. This feature is useful to protect
-sensitive data in case your laptop or hard drive gets stolen. The
-thief might get physical access to the hard drive, but without knowing
-the right passphrase, the data on the hard drive will look like random
-characters.
+&d-i; erlaubt es, verschlüsselte Dateisysteme einzurichten. Jede
+Datei, die auf eine solche Partition geschrieben wird, wird direkt
+in verschlüsselter Form auf dem Gerät gespeichert. Zugriff auf die
+verschlüsselten Daten wird nur nach Eingabe der korrekten
+<firstterm>Passphrase</firstterm> gewährt, die bei der Erstellung der
+verschlüsselten Partition benutzt wurde. Diese Funktion ist z.B. sinnvoll,
+um sensible Daten zu schützen, wenn Ihr Laptop oder Ihre Festplatte
+gestohlen wird. Der Dieb kann zwar physikalischen Zugriff auf die Platte
+haben, aber ohne Kenntnis der richtigen Passphrase werden die Daten
+wie zufällig erzeugte Zeichen erscheinen.
 
 </para><para>
 
-The two most important partitions to encrypt are: the home partition,
-where your private data resides, and the swap partition, where
-sensitive data might be stored temporarily during operation. Of
-course, nothing prevents you from encrypting any other partitions that might
-be of interest. For example <filename>/var</filename> where database
-servers, mail servers or print servers store their data, or
-<filename>/tmp</filename> which is used by various programs to store
-potentially interesting temporary files. Some people may even want to
-encrypt their whole system.  The only exception is
-the <filename>/boot</filename> partition which must remain
-unencrypted, because currently there is no way to load the kernel from
-an encrypted partition.
+Die beiden wichtigsten Partitionen, die Sie verschlüsseln sollten, sind:
+Ihre Home-Partition, auf der Ihre privaten Daten liegen und die Swap-Partition,
+auf der möglicherweise sensible Daten vorübergehend während des Betriebes
+gespeichert werden könnten. Natürlich kann Sie nichts davon abhalten,
+auch irgendeine andere Partition zu verschlüsseln, die vielleicht von
+Interesse ist. Zum Beispiel <filename>/var</filename>, wo Datenbankserver,
+Mailserver oder Printserver ihre Daten ablegen, oder <filename>/tmp</filename>,
+das von verschiedensten Programmen genutzt, um potentiell interessante
+temporäre Dateien zu speichern. Einige Leute möchten vielleicht sogar ihr
+ganzes System verschlüsseln. Die einzige Ausnahme ist die
+<filename>/boot</filename>-Partition, die unverschlüsselt bleiben muss,
+da es derzeit keinen Weg gibt, einen Kernel von einer verschlüsselten
+Partition zu laden.
 
 </para><note><para>
 
-Please note that the performance of encrypted partitions will be
-less than that of unencrypted ones because the data needs to be
-decrypted or encrypted for every read or write. The performance impact
-depends on your CPU speed, chosen cipher and a key length.
+Bedenken Sie bitte, dass die Performance von verschlüsselten Partitionen
+geringer ist als die von unverschlüsselten, da die Daten für jeden
+Lese- und Schreibvorgang ent- oder verschlüsselt werden müssen. Der
+Performance-Unterschied ist abhängig von der Geschwindigkeit Ihrer CPU,
+der gewählten Verschlüsselung und der Schlüssellänge.
 
 </para></note><para>
 
-To use encryption, you have to create a new partition by selecting
-some free space in the main partitioning menu. Another option is to
-choose an existing partition (e.g. a regular partition, an LVM logical
-volume or a RAID volume). In the <guimenu>Partition setting</guimenu>
-menu, you need to select <guimenuitem>physical volume for
-encryption</guimenuitem> at the <menuchoice> <guimenu>Use
-as:</guimenu> </menuchoice> option. The menu will then change to
-include several cryptographic options for the partition.
+Um Verschlüsselung zu benutzen, müssen Sie evtl. eine neue Partition
+erstellen, indem Sie im Haupt-Partitionierungsmenu freien Speicher auswählen.
+Eine andere Möglichkeit ist, eine vorhandene Partition (wie z.B. eine
+reguläre Partition, ein logisches LVM-Volume oder ein RAID-Volume)
+zu verwenden. Im Menü <guimenu>Partitionseinstellungen</guimenu>
+müssen Sie unter <menuchoice> <guimenu>Benutzen
+als:</guimenu> </menuchoice> den Punkt <guimenuitem>Physikalisches
+Volume für Verschlüsselung</guimenuitem> wählen. Es wird dann in
+ein anderes Menü gewechselt, das verschiedene Verschlüsselungsoptionen
+für die Partition enthält.
 
 </para><para>
 
-&d-i; supports several encryption methods. The default method
-is <firstterm>dm-crypt</firstterm> (included in newer Linux kernels,
-able to host LVM physical volumes), the other
-is <firstterm>loop-AES</firstterm> (older, maintained separately from
-the Linux kernel tree). Unless you have compelling reasons to do
-otherwise, it is recommended to use the default.
+&d-i; unterstützt mehrere Verschlüsselungsmethoden. Die Standard-Methode
+ist <firstterm>dm-crypt</firstterm> (in neueren Linux-Kernels enthalten;
+hat die Fähigkeit, physikalische Volumes für LVM beherbergen zu können).
+Die ältere Methode ist <firstterm>loop-AES</firstterm> (älter; wird separat
+vom Linux-Kernel-Baum betreut/entwickelt). Wenn Sie keine zwingenden
+Gründe dagegen haben, wird empfohlen, den Standard zu verwenden.
 
 <!-- TODO: link to the "Debian block device encryption guide"
      once Max writes it :-) -->
 
 </para><para>
 
-First, let's have a look at available options available when you
-select <userinput>Device-mapper (dm-crypt)</userinput> as the
-encryption method. As always: when in doubt, use the defaults, because
-they have been carefully chosen with security in mind.
+Als erstes wollen wir die Optionen betrachten, die verfügbar sind,
+wenn Sie als Verschlüsselungsmethode <userinput>Device-mapper
+(dm-crypt)</userinput> wählen. Generell gilt: wenn Sie nicht sicher
+sind, verwenden Sie die Standardwerte, da sie unter
+Berücksichtigung von Sicherheitsaspekten sorgfältig ausgewählt wurden.
 
 <variablelist>
 
 <varlistentry>
-<term>Encryption: <userinput>aes</userinput></term>
+<term>Verschlüsselung: <userinput>aes</userinput></term>
 
 <listitem><para>
 
-This option lets you select the encryption algorithm
-(<firstterm>cipher</firstterm>) which will be used to encrypt the data
-on the partition. &d-i; currently supports the following block
-ciphers: <firstterm>aes</firstterm>, <firstterm>blowfish</firstterm>,
-<firstterm>serpent</firstterm>, and <firstterm>twofish</firstterm>.
-It is beyond the scope of this document to discuss the qualities of
-these different algorithms, however, it might help your decision to
-know that in 2000, <emphasis>AES</emphasis> was chosen by the American
-National Institute of Standards and Technology as the standard
-encryption algorithm for protecting sensitive information in the 21st
-century.
+Mit dieser Option können Sie den Verschlüsselungsalgorithmus
+(<firstterm>cipher</firstterm>) wählen, der genutzt wird, um die Daten
+auf der Partition zu verschlüsseln. &d-i; unterstützt derzeit die
+folgenden Blockverschlüsselungen: <firstterm>aes</firstterm>,
+<firstterm>blowfish</firstterm>, <firstterm>serpent</firstterm> und
+<firstterm>twofish</firstterm>. Es ist nicht Ziel dieses Dokuments,
+die Qualitäten dieser verschiedenen Algorithmen zu diskutieren, aber
+vielleicht hilft es Ihnen bei der Entscheidung, wenn Sie wissen, dass
+<emphasis>AES</emphasis> im Jahre 2000 vom American National Institute
+of Standards and Technology zum Standard-Verschlüsselungsalgorithmus
+für den Schutz sensibler Informationen im 21. Jahrhundert gewählt wurde.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Key size: <userinput>256</userinput></term>
+<term>Schlüssellänge: <userinput>256</userinput></term>
 
 <listitem><para>
 
-Here you can specify the length of the encryption key. With a larger
-key size, the strength of the encryption is generally improved. On the
-other hand, increasing the length of the key usually has a negative
-impact on performance. Available key sizes vary depending on the
-cipher.
+Hier können Sie die Länge des Schlüssels festlegen. Mit einem größeren
+Schlüssel wird generell die Stärke der Verschlüsselung erhöht. Auf der
+anderen Seite hat es für gewöhnlich einen negativen Einfluss auf die
+Performance, wenn die Länge des Schlüssels vergrößert wird. Die
+möglichen Schlüssellängen variieren abhängig vom gewählten Algorithmus.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>IV algorithm: <userinput>cbc-essiv:sha256</userinput></term>
+<term>IV-Algorithmus: <userinput>cbc-essiv:sha256</userinput></term>
 
 <listitem><para>
 
-The <firstterm>Initialization Vector</firstterm> or
-<firstterm>IV</firstterm> algorithm is used in cryptography to ensure
-that applying the cipher on the same <firstterm>clear text</firstterm>
-data with the same key always produces a unique
-<firstterm>cipher text</firstterm>. The idea is to prevent the
-attacker from deducing information from repeated patterns in the encrypted
-data.
+Der Initialisierungsvektor oder auch <firstterm>IV</firstterm>-Algorithmus
+wird in der Kryptographie verwendet, um sicherzustellen, dass die mehrfache
+Anwendung einer Verschlüsselung auf den gleichen <firstterm>Klartext</firstterm>
+immer unterschiedliche, einzigartige <firstterm>Geheimtexte</firstterm> ergibt.
+Dem liegt der Gedanke zugrunde, zu vermeiden, dass der Angreifer aufgrund
+von sich wiederholenden Mustern in den verschlüsselten Daten auf die
+zu schützenden Informationen schließen kann.
 
 </para><para>
 
-From the provided alternatives, the default
-<userinput>cbc-essiv:sha256</userinput> is currently the least
-vulnerable to known attacks. Use the other alternatives only when you
-need to ensure compatibility with some previously installed system
-that is not able to use newer algorithms.
+Der Standardwert <userinput>cbc-essiv:sha256</userinput> ist unter den
+auszuwählenden Möglichkeiten derzeit der gegen bekannte Angriffe am
+wenigsten verwundbare. Sie sollten die anderen Alternativen nur verwenden,
+wenn Sie Kompatibilität zu früher installierten Systemen gewährleisten
+müssen, die die neueren Algorithmen nicht nutzen können.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Encryption key: <userinput>Passphrase</userinput></term>
+<term>Schlüssel: <userinput>Passphrase</userinput></term>
 
 <listitem><para>
 
-Here you can choose the type of the encryption key for this partition.
+Hier können Sie den Typ des Schlüssels für diese Partition wählen.
 
  <variablelist>
  <varlistentry>
  <term>Passphrase</term>
  <listitem><para>
 
-The encryption key will be computed<footnote>
+Der Schlüssel wird errechnet<footnote>
 <para>
 
-Using a passphrase as the key currently means that the partition will
-be set up using <ulink url="&url-luks;">LUKS</ulink>.
+Das Verwenden einer Passphrase als Schlüssel bedeutet derzeit, dass
+die Partition unter Benutzung von <ulink url="&url-luks;">LUKS</ulink>
+eingerichtet wird.
 
-</para></footnote> on the basis of a passphrase which you will be able
-to enter later in the process.
+</para></footnote> auf Basis einer Passphrase, die Sie später im Prozess
+eingeben müssen.
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Random key</term>
+ <term>Zufälliger Schlüssel</term>
  <listitem><para>
 
-A new encryption key will be generated from random data each time you
-try to bring up the encrypted partition.  In other words: on every
-shutdown the content of the partition will be lost as the key is
-deleted from memory. (Of course, you could try to guess the key with a
-brute force attack, but unless there is an unknown weakness in the
-cipher algorithm, it is not achievable in our lifetime.)
+Jedes Mal, wenn Sie versuchen, die verschlüsselte Partition zu aktivieren,
+wird ein neuer Schlüssel aus zufälligen Daten erzeugt. Mit anderen Worten:
+nach jedem Herunterfahren des Systems ist der Inhalt der Partition
+verloren, da der Schlüssel aus dem Speicher gelöscht wird. (Sie könnten
+natürlich versuchen, mittels einer Brute-Force-Attacke den Schlüssel zu
+erraten, aber dies wird innerhalb eines Menschenlebens wohl nicht machbar
+sein, es sei denn, es gibt eine unbekannte Schwäche im
+Verschlüsselungsalgorithmus.)
 
  </para><para>
 
-Random keys are useful for swap partitions because you do not need to
-bother yourself with remembering the passphrase or wiping sensitive
-information from the swap partition before shutting down your
-computer. However, it also means that you
-will <emphasis>not</emphasis> be able to use
-the <quote>suspend-to-disk</quote> functionality offered by newer
-Linux kernels as it will be impossible (during a subsequent boot) to
-recover the suspended data written to the swap partition.
+Zufällige Schlüssel sind nützlich für Swap-Partitionen, da man sich nicht
+damit beschäftigen muss, sich an die Passphrase zu erinnern oder sensible
+Informationen vor dem Herunterfahren des Systems von der Swap-Partition
+zu löschen. Allerdings bedeutet dies, dass Sie <emphasis>nicht</emphasis>
+die <quote>Suspend-to-Disk</quote>-Funktion nutzen können, die von
+neueren Linux-Kernels angeboten wird, da es unmöglich sein wird, die Daten,
+die auf die Swap-Partition geschrieben wurden, nach dem nächsten Start
+wiederherzustellen.
 
  </para></listitem>
  </varlistentry>
@@ -181,20 +190,20 @@ recover the suspended data written to the swap partition.
 </varlistentry>
 
 <varlistentry>
-<term>Erase data: <userinput>yes</userinput></term>
+<term>Daten löschen: <userinput>ja</userinput></term>
 
 <listitem><para>
 
-Determines whether the content of this partition should be overwritten
-with random data before setting up the encryption. This is recommended
-because it might otherwise be possible for an attacker to discern
-which parts of the partition are in use and which are not. In
-addition, this will make it harder to recover any leftover data from
-previous installations<footnote><para>
+Legt fest, ob der Inhalt dieser Partition mit Zufallsdaten überschrieben
+werden soll, bevor die Verschlüsselung eingerichtet wird. Dies wird
+empfohlen, da es andernfalls für einen Angreifer möglich wäre, zu erkennen,
+welche Teile der Partition genutzt sind und welche nicht. Und zusätzlich
+wird hierdurch erschwert, übrig gebliebene Daten von früheren
+Installationen wiederherzustellen<footnote><para>
 
-It is believed that the guys from three-letter agencies can restore
-the data even after several rewrites of the magnetooptical media,
-though.
+Man glaubt allerdings, dass die Jungs vom Geheimdienst Daten sogar noch nach
+mehrfachem Überschreiben des magneto-optischen Mediums wiederherstellen
+können.
 
 </para></footnote>.
 
@@ -205,50 +214,51 @@ though.
 
 </para><para>
 
-If you select <menuchoice> <guimenu>Encryption method:</guimenu>
-<guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice>, the menu
-changes to provide the following options:
-
+Wenn Sie <menuchoice> <guimenu>Verschlüsselungsmethode:</guimenu>
+<guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice> wählen,
+werden im Menü andere Optionen angeboten, und zwar:
 
 <variablelist>
 <varlistentry>
-<term>Encryption: <userinput>AES256</userinput></term>
+<term>Verschlüsselung: <userinput>AES256</userinput></term>
 
 <listitem><para>
 
-For loop-AES, unlike dm-crypt, the options for cipher and key size are
-combined, so you can select both at the same time.  Please see the
-above sections on ciphers and key sizes for further information.
+Bei loop-AES werden, anders als bei dm-crypt, die Optionen für den
+Algorithmus (<firstterm>cipher</firstterm>) und die Schlüssellänge
+kombiniert, das heißt, Sie können beide Optionen gleichzeitig angeben.
+Lesen Sie die vorherigen Abschnitte über Verschlüsselungsalgorithmen
+und Schlüssellängen für weitere Infos.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Encryption key: <userinput>Keyfile (GnuPG)</userinput></term>
+<term>Schlüssel: <userinput>Schlüsseldatei (GnuPG)</userinput></term>
 
 <listitem><para>
 
-Here you can select the type of the encryption key for this partition.
+Hier können Sie den Typ des Schlüssels für diese Partition auswählen.
 
  <variablelist>
  <varlistentry>
- <term>Keyfile (GnuPG)</term>
+ <term>Schlüsseldatei (GnuPG)</term>
  <listitem><para>
 
-The encryption key will be generated from random data during the
-installation. Moreover this key will be encrypted
-with <application>GnuPG</application>, so to use it, you will need to
-enter the proper passphrase (you will be asked to provide one later in
-the process).
+Der Schlüssel wird während der Installation aus Zufallsdaten erzeugt.
+Ferner wird dieser Schlüssel mit <application>GnuPG</application>
+verschlüsselt, Sie müssen also die korrekte Passphrase eingeben, um
+ihn nutzen zu können (Sie werden später aufgefordert, eine Passphrase
+einzugeben).
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Random key</term>
+ <term>Zufälliger Schlüssel</term>
  <listitem><para>
 
-Please see the the section on random keys above.
+Lesen Sie bitte den Abschnitt weiter oben über zufällige Schlüssel.
 
  </para></listitem>
  </varlistentry>
@@ -258,11 +268,11 @@ Please see the the section on random keys above.
 </varlistentry>
 
 <varlistentry>
-<term>Erase data: <userinput>yes</userinput></term>
+<term>Daten löschen: <userinput>ja</userinput></term>
 
 <listitem><para>
 
-Please see the the section on erasing data above.
+Lesen Sie bitte den Abschnitt weiter oben über das Löschen der Daten.
 
 </para></listitem>
 </varlistentry>
@@ -271,93 +281,99 @@ Please see the the section on erasing data above.
 
 </para><note><para>
 
-Please note that the <emphasis>graphical</emphasis> version of the
-installer still has some limitations when compared to the textual
-one. For cryptography it means you can set up only volumes using
-<emphasis>passphrases</emphasis> as the encryption keys.
+Beachten Sie bitte, dass die <emphasis>grafische</emphasis> Version
+des Installers noch einige Einschränkungen hat im Vergleich zur
+Textversion. Im Bereich Verschlüsselung bedeutet das, dass Sie nur
+Dateisysteme einrichten können, die <emphasis>Passphrase</emphasis> als
+Schlüsseltyp verwenden.
 
 </para></note><para>
 
-
-After you have selected the desired parameters for your encrypted
-partitions, return back to the main partitioning menu. There should
-now be a new menu item called <guimenu>Configure encrypted
-volumes</guimenu>.  After you select it, you will be asked to confirm
-the deletion of data on partitions marked to be erased and possibly
-other actions such as writing a new partition table.  For large
-partitions this might take some time.
+Nachdem Sie die gewünschten Parameter für Ihre verschlüsselten
+Partitionen festgelegt haben, kehren Sie in das Haupt-Partitionierungsmenü
+zurück. Dort sollte es nun einen neuen Eintrag geben namens
+<guimenu>Verschlüsselte Datenträger konfigurieren</guimenu>. Wenn Sie
+ihn ausgewählt haben, werden Sie aufgefordert, das Löschen von zum
+Entfernen markierten Partitionen zu bestätigen sowie evtl. weiterer
+Aktionen wie dem Schreiben einer neuen Partitionstabelle. Bei großen
+Partitionen kann dies eine Weile dauern.
 
 </para><para>
 
-Next you will be asked to enter a passphrase for partitions configured
-to use one.  Good passphrases should be longer than 8 characters,
-should be a mixture of letters, numbers and other characters and
-should not contain common dictionary words or information easily
-associable with you (such as birthdates, hobbies, pet names, names of
-family members or relatives, etc.).
+Als nächstes müssen Sie für Partitionen, die konfiguriert sind, eine
+Passphrase zu verwenden, eine eben solche eingeben. Gute Passphrasen
+sollten länger als 8 Zeichen sein, aus einer Mischung von Buchstaben,
+Zahlen und anderen Zeichen bestehen und keine Wörter aus allgemeinen
+Wörterbüchern enthalten oder Informationen, die leicht mit Ihnen in
+Verbindung gebracht werden könnten (wie Geburtsdaten, Hobbies, Namen
+oder Kosenamen von Haustieren, Familienmitgliedern oder Angehörigen etc.)
 
 </para><warning><para>
 
-Before you input any passphrases, you should have made sure that your
-keyboard is configured correctly and generates the expected
-characters. If you are unsure, you can switch to the second virtual
-console and type some text at the prompt. This ensures that you won't be
-surprised later, e.g. by trying to input a passphrase using a qwerty 
-keyboard layout when you used an azerty layout during the installation.
-This situation can have several causes. Maybe you switched to another
-keyboard layout during the installation, or the selected keyboard layout
-might not have been set up yet when entering the passphrase for the
-root file system.
+Bevor Sie irgendeine Passphrase eingeben, sollten Sie sicherstellen,
+dass Ihre Tastatur korrekt konfiguriert ist und die erwarteten Zeichen
+erzeugt. Wenn Sie nicht sicher sind, können Sie auf die zweite virtuelle
+Konsole wechseln und dort an der Eingabeaufforderung einen Text eingeben.
+Dies stellt sicher, dass Sie später keine Überraschung erleben, wenn Sie
+z.B. versuchen, eine Passphrase auf einer qwerty-Tastatur einzugeben,
+während Sie bei der Installation ein azerty-Layout verwendet haben.
+Diese Situation kann durch mehrere Gründe hervorgerufen werden: vielleicht
+haben Sie während der Installation auf ein anderes Tastaturlayout gewechselt
+oder das gewählte Layout ist evtl. noch nicht eingerichtet gewesen, als
+Sie die Passphrase für das root-Dateisystem eingegeben haben.
 
 </para></warning><para>
 
-If you selected to use methods other than a passphrase to create
-encryption keys, they will be generated now. Because the kernel may
-not have gathered a sufficient amount of entropy at this early stage
-of the installation, the process may take a long time. You can help
-speed up the process by generating entropy: e.g. by pressing random
-keys, or by switching to the shell on the second virtual console and
-generating some network and disk traffic (downloading some files,
-feeding big files into <filename>/dev/null</filename>, etc.).
+Wenn Sie andere Verschlüsselungsmethoden statt Passphrase gewählt
+haben, um die Schlüssel zu erzeugen, werden sie jetzt erzeugt. Da der
+Kernel in diesem frühen Stadium der Installation evtl. noch nicht
+genügend Zufallsinformationen gesammelt hat, kann dieser Prozess recht
+lange dauern. Sie können die Erzeugung von Zufallsdaten beschleunigen:
+z.B. indem Sie zufällig irgendwelche Tasten drücken oder indem Sie
+auf die Shell der zweiten virtuellen Konsole wechseln und ein bisschen
+Netzwerk- und Festplattenverkehr erzeugen (z.B. durch das Herunterladen von
+Dateien, indem Sie einige große Dateien nach <filename>/dev/null</filename>
+schicken etc.)
 
 <!-- TODO: Mention hardware random generators when we will support
      them -->
 
-This will be repeated for each partition to be encrypted.
+Dies wird für jede zu verschlüsselnde Partition wiederholt.
 
 </para><para>
 
-After returning to the main partitioning menu, you will see all
-encrypted volumes as additional partitions which can be configured in
-the same way as ordinary partitions. The following example shows two
-different volumes. The first one is encrypted via dm-crypt, the second
-one via loop-AES.
+Nachdem Sie zum Partitionierungsmenü zurückgekehrt sind, werden Ihnen
+alle verschlüsselten Dateisysteme als zusätzliche Partitionen angezeigt,
+die auf die gleiche Art konfiguriert werden können wie gewöhnliche Partitionen.
+Im folgenden Beispiel sehen Sie zwei verschlüsselte Dateisysteme. Das
+erste ist mit dm-crypt verschlüsselt, das zweite mit loop-AES.
 
 <informalexample><screen>
-Encrypted volume (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-mapper
+Verschlüsseltes Volume (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-mapper
      #1 115.1 GB  F ext3
 
 Loopback (<replaceable>loop0</replaceable>) - 515.2 MB AES256 keyfile
      #1 515.2 MB  F ext3
 </screen></informalexample>
 
-Now is the time to assign mount points to the volumes and optionally
-change the file system types if the defaults do not suit you.
+Jetzt ist es Zeit, den Dateisystemen Einhängepunkte zuzuweisen und
+zusätzlich vielleicht die Dateisystemtypen zu ändern, falls die
+Standardwerte Ihnen nicht zusagen.
 
 </para><para>
 
-One thing to note here are the identifiers in parentheses
-(<replaceable>crypt0</replaceable>
-and <replaceable>loop0</replaceable> in this case) and the mount
-points you assigned to each encrypted volume. You will need this
-information later when booting the new system. The differences between
-ordinary boot process and boot process with encryption involved will
-be covered later in <xref linkend="mount-encrypted-volumes"/>.
+Sie sollten sich auch noch die Identifikationskennungen, die in Klammern
+stehen, notieren (in diesem Fall <replaceable>crypt0</replaceable>
+und <replaceable>loop0</replaceable>) sowie die Einhängepunkte, die Sie
+ihnen zugeordnet haben. Sie benötigen diese Informationen später, wenn Sie
+das neue System starten. Die Unterschiede zwischen einem normalen Boot-Prozess
+und einem Boot-Prozess mit beteiligten verschlüsselten Dateisystemen wird
+weiter unten im <xref linkend="mount-encrypted-volumes"/> behandelt.
 
 </para><para>
 
-Once you are satisfied with the partitioning scheme, continue with the
-installation.
+Wenn Sie mit dem Partitionierungsschema zufrieden sind, können Sie mit der
+Installation fortfahren.
 
 </para>
    </sect3>
