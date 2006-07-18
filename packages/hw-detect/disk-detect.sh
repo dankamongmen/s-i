@@ -49,6 +49,8 @@ disk_found() {
 			sleep 2
 		fi
 	done
+
+	return 1
 }
 
 module_probe() {
