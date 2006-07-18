@@ -24,6 +24,9 @@ TAR_FILE=all-po.tar.gz
 
 rm -fr ~/d-i/*
 cd ~/d-i
-wget --non-verbose http://d-i.alioth.debian.org/l10n-stats/${TAR_FILE}
+
+# wget --non-verbose http://d-i.alioth.debian.org/l10n-stats/${TAR_FILE}
+cp /var/lib/gforge/chroot/home/groups/d-i/htdocs/l10n-stats/${TAR_FILE} .
+
 tar xzf ${TAR_FILE}
 rm ${TAR_FILE}
