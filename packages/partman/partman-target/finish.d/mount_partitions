@@ -42,7 +42,11 @@ for f in $fstab; do
     esac
     for m in /lib/partman/mount.d/*; do
 	[ -x "$m" ] || continue
-	if $m "$f"; then
+
+	# partman-doc specifies that mount.d scripts output the command
+	# needed to umount the partition; currently this is unused
+	umount_cmd=$($m "$f")
+	if [ "$?" = 0 ]; then
 	    continue 2
 	fi
     done
