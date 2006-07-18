@@ -24,6 +24,6 @@ TAR_FILE=all-po.tar.gz
 
 rm -fr ~/d-i/*
 cd ~/d-i
-wget --non-verbose http://people.debian.org/~seppy/d-i/${TAR_FILE}
+wget --non-verbose http://d-i.alioth.debian.org/l10n-stats/${TAR_FILE}
 tar xzf ${TAR_FILE}
 rm ${TAR_FILE}
