@@ -42,7 +42,7 @@ if [ -n "$proxy" ]; then
 	fi
 fi
 
-RET=0
+CODE=0
 echo "deb http://$host/ $codename/updates $dists" >> $file
 if ! apt-setup-verify $file; then
 	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
@@ -50,9 +50,9 @@ if ! apt-setup-verify $file; then
 	if ! db_go; then
 		exit 10 # back up
 	fi
-	RET=9
+	CODE=9
 fi
 
 echo "deb-src http://$host/ $codename/updates $dists" >> $file
 
-exit $RET
+exit $CODE
