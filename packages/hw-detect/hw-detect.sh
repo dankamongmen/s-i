@@ -186,19 +186,19 @@ discover_hw () {
 
 hotplug_type () {
 	if [ -f /proc/sys/kernel/hotplug ]; then
-		if [ -d /etc/hotplug ]; then
-			HOTPLUG_TYPE=real
-		else
-			HOTPLUG_HANDLER="$(cat /proc/sys/kernel/hotplug)"
-			case $HOTPLUG_HANDLER in
-				''|/sbin/udevsend)
-					HOTPLUG_TYPE=udev
-					;;
-				*)
+		HOTPLUG_HANDLER="$(cat /proc/sys/kernel/hotplug)"
+		case $HOTPLUG_HANDLER in
+			''|/sbin/udevsend)
+				HOTPLUG_TYPE=udev
+				;;
+			*)
+				if [ -d /etc/hotplug ]; then
+					HOTPLUG_TYPE=real
+				else
 					HOTPLUG_TYPE=fake
-					;;
-			esac
-		fi
+				fi
+				;;
+		esac
 	else
 		HOTPLUG_TYPE=
 	fi
