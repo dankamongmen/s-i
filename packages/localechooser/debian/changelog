@@ -8,6 +8,11 @@ localechooser (1.21) UNRELEASED; urgency=low
     associated language.
   * Fix mktemplates.country to avoid bashisms and reliance on multiple
     counterintuitive backslash expansions.
+  * Unregister shortlist templates before registering new ones, to ensure
+    that the question gets effectively reset. The debconf specification does
+    not say what happens when you re-register an existing template, and
+    cdebconf and debconf have different (reasonable) interpretations;
+    unregistration forces the old question to go away.
 
  -- Christian Perrier <bubulle@kheops.perrier.eu.org>  Mon, 10 Jul 2006 17:23:07 +0200
 

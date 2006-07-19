@@ -144,11 +144,13 @@ do_preseed() {
 			if grep -q "^${LANGUAGE}_${COUNTRY}$" $SHORTLISTS ; then
 				db_set $shortlist-${LANGUAGE}_${COUNTRY} "$COUNTRY"
 				log "Set $shortlist-${LANGUAGE}_${COUNTRY} = '$COUNTRY'"
+				db_unregister $shortlist || true
 				db_register $shortlist-${LANGUAGE}_${COUNTRY} $shortlist
 				db_fset $shortlist seen $seenflag || true
 			elif grep -q "^$LANGUAGE$" $SHORTLISTS ; then
 				db_set $shortlist-$LANGUAGE "$COUNTRY"
 				log "Set $shortlist-$LANGUAGE = '$COUNTRY'"
+				db_unregister $shortlist || true
 				db_register $shortlist-$LANGUAGE $shortlist
 				db_fset $shortlist seen $seenflag || true
 			fi
@@ -353,6 +355,7 @@ while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 			# at medium priority then
 			if [ "$use_lang" ]; then
 				shortlist_template="$shortlist-$use_lang"
+				db_unregister $shortlist || true
 				db_register $shortlist_template $shortlist
 				db_input $shortprio $shortlist || [ $? -eq 30 ]
 				askedshort=1
