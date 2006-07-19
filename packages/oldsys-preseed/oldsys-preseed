@@ -12,30 +12,17 @@ log() {
 	logger -t oldsys-preseed "$@"
 }
 
+exit_unknown() {
+	log "Unknown system - not writing preseed file"
+	exit 0
+}
+
 # If this is set to "yes", the user *absolutely* cannot input anything
 # before network-console comes up.  Therefore, preseed some info which
 # is not optimal but which will ensure that network-console is reached
 # without prompting for user input.
 NONINTERACTIVE="yes"
 FILE=/preseed.cfg
-
-if [ "$NONINTERACTIVE" = "yes" ]; then
-	# localechooser yet needs a way to run after network-console;
-	# in the meantime, preseed this information.
-	add "$FILE" "debian-installer/locale" "string" "C"
-	add "$FILE" "countrychooser/country-name" "select" "United States"
-	# Just continue if d-i enters lowmem mode
-	add "$FILE" "lowmem/low" "note"
-	# Any hostname and domain names assigned from DHCP take precedence
-	# over values set here.  However, setting the values still prevents
-	# the questions from being shown, even if values come from dhcp.
-	add "$FILE" "netcfg/get_hostname" "string" "debian"
-	add "$FILE" "netcfg/get_domain" "string" "example.org"
-	# I'm not terribly happy to preseed a generic password but I guess
-	# there's no other way on some machines.
-	add "$FILE" "network-console/password" "password" "install"
-	add "$FILE" "network-console/password-again" "password" "install"
-fi
 
 case "`archdetect`" in
 	arm/nslu2 | armeb/nslu2)
@@ -108,6 +95,8 @@ case "`archdetect`" in
 			umount $path/mnt
 			rm -rf $path/defaults
 			rmdir $path/mnt $path || true
+		else
+			exit_unknown
 		fi
 	;;
 	mipsel/bcm947xx)
@@ -145,7 +134,28 @@ case "`archdetect`" in
 			parse_bcm947xx_nvram "$(nvram show)"
 		fi
 	;;
+	*)
+		exit_unknown
+	;;
 esac
+
+if [ "$NONINTERACTIVE" = "yes" ]; then
+	# localechooser yet needs a way to run after network-console;
+	# in the meantime, preseed this information.
+	add "$FILE" "debian-installer/locale" "string" "C"
+	add "$FILE" "countrychooser/country-name" "select" "United States"
+	# Just continue if d-i enters lowmem mode
+	add "$FILE" "lowmem/low" "note"
+	# Any hostname and domain names assigned from DHCP take precedence
+	# over values set here.  However, setting the values still prevents
+	# the questions from being shown, even if values come from dhcp.
+	add "$FILE" "netcfg/get_hostname" "string" "debian"
+	add "$FILE" "netcfg/get_domain" "string" "example.org"
+	# I'm not terribly happy to preseed a generic password but I guess
+	# there's no other way on some machines.
+	add "$FILE" "network-console/password" "password" "install"
+	add "$FILE" "network-console/password-again" "password" "install"
+fi
 
 generate_preseed_file $FILE
 
