@@ -15,15 +15,15 @@ ISO3166TRANSLATIONS=debian/iso-codes
 # according to the regionmap.
 #
 # We need to escape commas by preceding them with a backslash.
-CHOICES=$(./countrylist $ISO3166TAB ./regionmap  | \
-         sed 's/,/\\\\\\\\,/g' | \
-         (read a; echo -n "$a"; while read b; do echo -n ", $b"; done; echo))
+CHOICES="$(./countrylist $ISO3166TAB ./regionmap | \
+         sed 's/,/\\,/g' | \
+         perl -le '@lines = <>; chomp @lines; print join(", ", @lines)')"
 
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
 cat debian/templates.lang | \
     sed "/^Choices: \@countrylist/s/Choices:/__Choices:/g" | \
-    perl -pe 's/\@countrylist\@/'"$CHOICES"'/g' \
+    CHOICES="$CHOICES" perl -pe 's/\@countrylist\@/$ENV{CHOICES}/g' \
     >debian/templates.tmp
 
 # Create a temporary "pobuild" directory
