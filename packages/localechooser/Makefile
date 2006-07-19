@@ -33,7 +33,7 @@ check-utf8: $(L10NLIST)
 
 check-data:
 	# Check that the listed locale is supported, to make sure it will work.
-	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f2 | grep _` ; do \
+	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f5 | grep _` ; do \
 		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
 			: ; \
 		else \
