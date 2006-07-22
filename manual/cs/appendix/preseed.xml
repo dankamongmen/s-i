@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 37311 -->
+<!-- original version: 38662 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -323,8 +323,15 @@ Zaváděcí parametry:
 
 <para>
 
+Pokud zadáte <filename>preseed/url</filename>
+nebo <filename>preseed/file</filename> jako zaváděcí parametr, můžete
+použít zkrácenou verzi <filename>url</filename>, resp.
+<filename>file</filename>.
+
+</para><para>
+
 Když už upravujete soubor zavaděče, přidejte na stejné místo
-i parametr <userinput>debconf/priority=critical</userinput>, který
+i parametr <userinput>priority=critical</userinput>, který
 odchytí většinu případných otázek, které zde zapomenete nastavit.
 
 </para>
@@ -386,6 +393,11 @@ I když nemůžete přednastavit některé kroky, stále můžete dosáhnout
 plně automatické instalace, protože můžete zadat hodnoty pro
 přednastavení jako zaváděcí parametry jádra. Pro libovolnou proměnnou
 stačí zadat <userinput>cesta/k/promenne=hodnota</userinput>.
+
+</para><para>
+
+Některé často používané proměnné mohou mít i kratší variantu, Pokud je
+tato varianta dostupná, upřednostňujeme ji zde před úplnou formou.
 
 </para><para>
 
@@ -544,7 +556,7 @@ soubor s přednastavením nahraje až po zobrazení těchto otázek.
 
 Místní prostření (locale) slouží k současnému zadání jazyka
 i země. Například pomocí zaváděcího parametru jádra můžete zadat
-<userinput>debian-installer/locale=<replaceable>cs_CZ</replaceable></userinput>.
+<userinput>locale=<replaceable>cs_CZ</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 # Locale nastaví jazyk i zemi.
@@ -598,7 +610,16 @@ nastavení fungovat bez problémů.
 Potřebujete-li při zavádění ze sítě vybrat konkrétní síťové rozhraní
 ještě před nahráním souboru s přednastavením, použijte zaváděcí
 parametr
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
+
+</para><para>
+
+Přestože přednastavení síťování není běžně dostupné při přednastavení
+ze sítě (tj. při použití <quote>preseed/url</quote>), můžete to obejít
+následujícím hackem (např. pokud chcete síťovému rozhraní nastavit
+statickou adresu). Hack spočívá ve vynucení opětovné konfigurace sítě
+po načtení souboru s přednastavením. Stačí vytvořit skript pro
+<quote>preseed/run</quote> obsahující následující řádky:
 
 </para>
 
@@ -712,6 +733,8 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 # zařízení může být v tradičním formátu nebo ve formátu devfs.
 # Například pro použití prvního disku, který devfs najde:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# Nebo pokud si přejete použít LVM:
+#partman-auto-lvm/disk string /dev/discs/disc0/disc
 
 # Můžete vybrat libovolné z přednastavených schémat dělení.
 # Pozn: hodnota musí být lokalizována (přeložena).
@@ -792,7 +815,7 @@ a dříve zodpovězenými otázkami. Volitelně můžete přidat další
 
 # Další archivy, k dispozici jsou local[0-9]
 #d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/repository string \
+#d-i apt-setup/local0/source string \
 #       deb http://muj.server/debian stable main
 # URL k veřejnému klíči lokálního archivu
 #d-i apt-setup/local0/key string http://local.server/key

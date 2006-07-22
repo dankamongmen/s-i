@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 
    <sect3 id="partman">
    <title>Rozdělení disků</title>
@@ -19,12 +19,22 @@ z menu <guimenuitem>Ručně upravit tabulku oblastí</guimenuitem>.
 
 </para><para>
 
-Pokračujete-li v automatickém rozdělování, můžete si vybrat z několika
-připravených schémat rozdělení disku (viz tabulka níže). Všechny
-možnosti mají svá pro a proti, některé argumenty jsou zmíněny
-v dodatku <xref linkend="partitioning"/>. Pokud si nejste jisti,
-zvolte první možnost. Pamatujte však, že asistované dělení vyžaduje
-určitou minimální velikost volného místa, se kterým může
+Zvolíte-li automatické rozdělování, měli byste mít na výběr dvě
+možnosti: vytvořit oblasti přímo na disku (klasický způsob), nebo
+použít Logical Volume Management (LVM). Ve druhém případě vytvoří
+instalátor většinu oblastí uvnitř jedné veliké; výhoda je ta, že
+oblasti uvniř této veliké oblasti pak můžete relativně jednoduše
+zvětšovat a případně zmenšovat. Poznámka: LVM nemusí nemusí být
+k dispozici na všech architekturách.
+
+</para><para>
+
+Pokračujete-li v automatickém rozdělování (klasickém nebo LVM), můžete
+si vybrat z několika připravených schémat rozdělení disku (viz tabulka
+níže). Všechny možnosti mají svá pro a proti, některé argumenty jsou
+zmíněny v dodatku <xref linkend="partitioning"/>. Pokud si nejste
+jisti, zvolte první možnost. Pamatujte však, že asistované dělení
+vyžaduje určitou minimální velikost volného místa, se kterým může
 pracovat. Nemáte-li k dispozici zhruba 1GB volného místa (závisí na
 zvoleném způsobu dělení), asistované dělení selže.
 
@@ -46,13 +56,13 @@ zvoleném způsobu dělení), asistované dělení selže.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Desktopový počítač</entry>
+  <entry>Samostatná oblast pro /home</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Víceuživatelská pracovní stanice</entry>
+  <entry>Samostatné oblasti pro /home, /usr, /var a /tmp</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -63,6 +73,12 @@ zvoleném způsobu dělení), asistované dělení selže.
 </tbody></tgroup></informaltable>
 
 <para>
+
+Pokud jste zvolili automatické rozdělení pomocí LVM, vytvoří se také
+malá oblast pro <filename>/boot</filename>. Ostatní oblasti kromě
+odkládací budou vytvořeny uvnitř LVM.
+
+</para><para>
 
 Na další obrazovce se zobrazí tabulka rozdělení disku(ů) společně
 s informacemi o souborových systémech a přípojných bodech. Pokud jste
@@ -88,23 +104,22 @@ začátku disku malá nenaformátovaná oblast pro zavaděč
 
 Seznam oblastí může vypadat třeba takto:
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-       1. primární   16.4 MB    ext2       /boot
-       2. primární  551.0 MB    swap       swap
-       3. primární    5.8 GB    ntfs
-          pri/log     8.2 MB    VOLNÉ MÍSTO
+       1. primární   16.4 MB  B f ext2       /boot
+       2. primární  551.0 MB      swap       swap
+       3. primární    5.8 GB      ntfs
+          pri/log     8.2 MB      VOLNÉ MÍSTO
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-       1. primární   15.9 MB    ext3
-       2. primární  996.0 MB    fat16
-       3. primární    3.9 GB    xfs        /home
-       5. logická     6.0 GB    ext3       /
-       6. logická     1.0 GB    ext3       /var
-       7. logická   498.8 MB    ext3
-       8. logická   551.5 MB    swap       swap
-       9. logická    65.8 GB    ext2
+       1. primární   15.9 MB      ext3
+       2. primární  996.0 MB      fat16
+       3. primární    3.9 GB      xfs        /home
+       5. logická     6.0 GB    f ext3       /
+       6. logická     1.0 GB    f ext3       /var
+       7. logická   498.8 MB      ext3
+       8. logická   551.5 MB    f swap       swap
+       9. logická    65.8 GB      ext2
 </screen></informalexample>
 
 Jak je vidět, v počítači jsou dva pevné disky rozdělené na několik
@@ -147,7 +162,7 @@ obrazovky rozdělování disků.
 
 </para><para>
 
-Pokud se rozhodnete, že chcete něco změnit na stávajícíc oblasti,
+Pokud se rozhodnete, že chcete něco změnit na stávající oblasti,
 jednoduše ji vyberte a stiskněte &enterkey;. Ocitnete se ve stejné
 obrazovce jako při vytváření nové oblasti a tedy máte i stejné
 možnosti nastavení. Jedna věc, která nemusí být na první pohled zcela
@@ -180,7 +195,16 @@ vás pokračovat.
 Jestliže budete ve vytváření své tabulky oblastí příliš kreativní
 a uvedete ji do nepoužitelného stavu, můžete se vždy vrátit do
 výchozího bodu volbou <guimenuitem>Vrátit zpět změny provedené na
-oblastech</guimenuitem>.
+oblastech</guimenuitem><footnote>
+
+<para>
+
+V určitých případech (jako je použití LVM) nebudete moci
+vrátit <emphasis>všechny</emphasis> změny, protože některé z nich jsou
+již zapsány na disku. Naštěstí vás však instalační program bude před
+každou trvalou změnou varovat.
+
+</para></footnote>.
 
 </para><para>
 
