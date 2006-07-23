@@ -204,7 +204,7 @@ runtime.
 Another readable file <filename>/var/cache/debconf/questions.dat</filename>
 is used to store the values for variables and the answers given to questions.
 A question always refers to the template used to ask it. For obvious
-security reasons the values for templates of type <quote>password</quote>
+security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
 </para>
@@ -242,7 +242,7 @@ Tiene más detalles en <xref linkend="preseed-shell"/>.
 Es posible utilizar la preconfiguración para cambiar las respuestas por omisión
 a una pregunta, pero haciendo que esta pregunta se realice. Para hacer ésto
 debe definirse la marca <firstterm>seen</firstterm> (visto, n. del t.) a
-<quote>false</quote> una vez se ha fijado un valor para la plantilla.
+<quote>false</quote> una vez se ha fijado un valor para la pregunta.
 
 </para>
 
@@ -330,8 +330,14 @@ Párametros de arranque a especificar:
 
 <para>
 
+Tenga en cuenta que puede abreviar <filename>preseed/url</filename> a
+<filename>url</filename> y <filename>preseed/file</filename> a
+<filename>file</filename> cuando se pasan como parámetros al núcleo.
+
+</para><para>
+
 Cuando haga esto puede quere añadir el parámetro
-<userinput>debconf/priority=critical</userinput> en el arranque. Esto impedirá
+<userinput>priority=critical</userinput> en el arranque. Esto impedirá
 que se haga ninguna pregunta aunque la preconfiguración mostrada más abajo no
 responda a alguna.
 
@@ -403,12 +409,18 @@ ejemplos.
  	 
 </para><para>
 
-Un <quote>&ndash;&ndash;</quote> en las opciones de arranque tiene un 
+Tenga en cuenta que hay una abreviatura para las variables que se utilizan con
+más frecuencia en el indicador de arranque. Los ejemplos de este apéndice
+utilizan la abreviatura si hay una disponible en lugar de la variable completa.
+
+</para><para>
+
+Un <quote>--</quote> en las opciones de arranque tiene un 
 significado especial. Los parámetros que aparezcan tras éste se copiarán
 a la configuración del cargador de arranque que se instale (si el instalador
 proporciona soporte para esa opción con el cargador de arranque
 seleccionado). Tenga en cuenta que es posible que el caracter
-<quote>&ndash;&ndash;</quote> ya exista en los parámetros de arranque
+<quote>--</quote> ya exista en los parámetros de arranque
 por omisión.
 
 </para>
@@ -449,7 +461,7 @@ El fichero de preconfiguración tiene el formato que utiliza la orden
 El formato general para una línea del fichero de preconfiguración es:
 
 <informalexample><screen>
-&lt;propietario&gt; &lt;nombre de plantillas&gt; &lt;tipo de plantilla&gt; &lt;valor&gt;
+&lt;propietario&gt; &lt;nombre de la pregunta&gt; &lt;tipo de pregunta&gt; &lt;valor&gt;
 </screen></informalexample>
 
 </para><para>
@@ -469,17 +481,17 @@ de preconfiguración.
  Se puede dividir una línea en múltiples líneas si se añade un barra invertida
  (<quote><literal>\</literal></quote>) como caracter de continuación de línea.
  Un buen punto para la divisón de la linea es después del nombre de la
- plantilla. Es mala idea dividir la línea entre el tipo y el valor.
+ pregunta. Es mala idea dividir la línea entre el tipo y el valor.
  </para></listitem>
  <listitem><para>
-  La mayoría de las plantillas tienen que preconfigurarse con los
+  La mayoría de las preguntas tienen que preconfigurarse con los
   valores que sean válidos en inglés y no en las traducciones de esos mismos
-  valores. Hay algunas plantillas, sin embargo (como es el caso de 
+  valores. Hay algunas preguntas, sin embargo (como es el caso de 
   <classname>partman</classname>) donde se tienen que utilizar los valores
   traducidos.
  </para></listitem>
  <listitem><para>
-  Algunas plantillas toman un código como valor en lugar del campo 
+  Algunas preguntas toman un código como valor en lugar del campo 
   de texto mostrado durante la instalación (en inglés).
  </para></listitem>
 </itemizedlist>
@@ -530,7 +542,7 @@ incluidos de su sistema.
 <para>
 
 Puede utilizar <command>nano</command> para comprobar los posibles
-valores de las plantillas, examinando los ficheros en <filename>/var/lib/cdebconf</filename> durante una instalación que está en progreso. Consulte
+valores de las preguntas, examinando los ficheros en <filename>/var/lib/cdebconf</filename> durante una instalación que está en progreso. Consulte
 <filename>templates.dat</filename> si quiere las plantillas en crudo
 o <filename>questions.dat</filename> si quiere consultar los valores
 actuales y asignados a las variables.
@@ -573,14 +585,15 @@ el fichero de preconfiguración se cargará después de haber hecho estas preguntas
 
 </para><para>
 
+<!-- N del T: En el texto original utiliza en_US, aquí cambiamos a es_ES -->
 La localización puede utilizarse para espceificar tanto el idioma como el país.
 Puede utilizar
-<userinput>debian-installer/locale=<replaceable>en_US</replaceable></userinput>.
+<userinput>locale=<replaceable>es_ES</replaceable></userinput>.
 para especificar la localización como un parámetro de arranque.
 
 <informalexample role="example"><screen>
 # Configuración de localización para el idioma y país.
-d-i debian-installer/locale string en_US
+d-i debian-installer/locale string es_ES
 </screen></informalexample>
 
 </para><para>
@@ -630,9 +643,24 @@ a través de parámetro de arranque del núcleo.
 </para><para>
 
 Tiene que utilizar un parámetro de arranque similar a
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>
+<userinput>interface=<replaceable>eth1</replaceable></userinput>
 si tiene que escoger un interfaz particular durante el arranque vía red antes
 de cargar el fichero de preconfiguración de la red.
+
+</para><para>
+
+Aunque generalmente no es posible preconfigurar la red cuando se hace
+preconfiguración de red (al utilizar <quote>preseed/url</quote>), puede
+utilizar este truco para evitar ésto si, por ejemplo, quiere conifgurar una
+dirección estática a la interfaz de red. El truco es obligar a que la
+configuración de red se ejecute de nuevo después de haber cargado el fichero de
+preconfiguración creando un programa <quote>preseed/run</quote> con las
+siguientes líneas:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
 
 </para>
 
@@ -749,7 +777,7 @@ de configurarlo si el sistema tiene más de un disco.
 <informalexample role="example"><screen>
 # Si el sistema tiene espacio libre puede elegir particionar solamente
 # este espacio.
-# Nota: esta plantilla tiene que ser preconfigurada con el valor localizado
+# Nota: esta pregunta tiene que ser preconfigurada con el valor localizado
 # (traducido)
 #d-i partman-auto/init_automatically_partition \
 #    select Use the largest continuous free space
@@ -759,6 +787,8 @@ de configurarlo si el sistema tiene más de un disco.
 # formato devfs.
 #  Por ejemplo, puede utilizar este valor para usar el primer disco devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# O, si quiere utilizar LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 
 # Puede elegir cualquiera de las recetas de particionado predefinidas.
 # Nota: esta plantilla tiene que ser preconfigurada con el valor localizado
@@ -845,7 +875,7 @@ a continuación son relevantes para la preconfiguración. Desea ayudar
 
 # Repositorios adicionales, se dispone de local[0-9]
 #d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/repository string \
+#d-i apt-setup/local0/source string \
 #       deb http://local.server/debian stable main
 # URL de la clave pública en el repositorio local.
 #d-i apt-setup/local0/key string http://local.server/key
@@ -1041,7 +1071,7 @@ tasksel tasksel/first multiselect standard, desktop
 
 <informalexample role="example"><screen>
 # Omitir el mensaje final sobre la finalización de la instalación.
-d-i prebaseconfig/reboot_in_progress note
+d-i finish-install/reboot_in_progress note
 
 # Esta opción impedirá que el instalador expulse el CD durante 
 # el reinicio, y puede ser útil en algunas circunstancias:
@@ -1190,6 +1220,13 @@ ficheros.
 # ficheros de preconfiguración.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+
+# Lo más flexible es descargar un programa y ejecutarlo. El programa
+# puede utilizar órdenes como debconf-set para manipular la base de datos
+# de debconf. Tenga en cuenta que los nombres de los archivos son relativos,
+# se obtienen del mismo directorio donde está el archivo de preconfiguración
+# que los ejecuta.
+d-i preseed/run string foo.sh
 </screen></informalexample>
 
   </sect2>
