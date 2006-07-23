@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30269 -->
+<!-- original version: 38791 -->
 
 
   <sect2 arch="powerpc"><title>CPU・マザーボード・ビデオのサポート</title>
@@ -8,13 +8,14 @@
 
 <!--
 There are four major supported <emphasis>&architecture;</emphasis>
-subarchitectures: PMac (Power-Macintosh), PReP, APUS (Amiga Power-UP
-System), and CHRP machines. Each subarchitecture has its own boot
+subarchitectures: PMac (Power-Macintosh or PowerMac), PReP, APUS (Amiga 
+Power-UP System), and CHRP machines. Each subarchitecture has its own boot
 methods. In addition, there are four different kernel flavours,
 supporting different CPU variants.
 -->
 サポートされる主な <emphasis>&architecture;</emphasis> のサブアーキテクチャは、
-PMac (Power-Macintosh), PReP, APUS (Amiga Power-UP System), CHRP の 4 つです。
+PMac (Power-Macintosh や PowerMac), PReP, APUS (Amiga Power-UP System), 
+CHRP の 4 つです。
 いずれのサブアーキテクチャも自身で起動する方法があります。
 さらに、異なる CPU の変種をサポートする、4 種のカーネルフレーバーがあります。
 
@@ -49,20 +50,27 @@ powerpc カーネルのフレーバーが 4 種類あります。
 
 <!--
 Most systems use this kernel flavour, which supports the PowerPC 601,
-603, 604, 740, 750, and 7400 processors. All Apple Power Macintosh
-systems up to and including the G4 use one of these processors.
+603, 604, 740, 750, and 7400 processors. All Apple PowerMac machines 
+up to and including the one marketed as G4 use one of these processors.
 -->
 ほとんどのシステムはこのカーネルフレーバーを使用します。
 これは PowerPC 601, 603, 604, 740, 750, 7400 プロセッサをサポートしています。
-G4 を含む Apple の Power Macintosh システムは、
+G4 として発売されたものを含む Apple の PowerMac マシンは、
 このいずれかのプロセッサを使用しています。
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>power3</term>
+<term>power64</term>
 <listitem><para>
+
+<!--
+The power64 kernel flavour supports the following CPUs:
+-->
+power64 カーネルフレーバーは以下の CPU をサポートしています。
+
+</para><para>
 
 <!--
 The POWER3 processor is used in older IBM 64-bit server systems: known
@@ -73,12 +81,7 @@ POWER3 プロセッサは IBM の 64 ビットサーバシステムで使用されています。
 よく知られたモデルは、IntelliStation POWER Model 265 や pSeries 610/640、 
 RS/6000 7044-170, 7043-260, 7044-270 です。
 
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>power4</term>
-<listitem><para>
+</para><para>
 
 <!--
 The POWER4 processor is used in more recent IBM 64-bit server systems:
@@ -90,11 +93,23 @@ POWER4 プロセッサは、つい最近の IBM 64 ビットサーバシステムで使用されています。
 </para><para>
 
 <!--
-The Apple G5 is also based on the POWER4 architecture, and uses this
-kernel flavour.
+Systems using the Apple G5 (PPC970FX processor) are also based on the
+POWER4 architecture, and use this kernel flavour.
 -->
-Apple G5 も POWER4 アーキテクチャをベースにしており、
-このカーネルフレーバーを使用します。
+Apple G5 (PPC970FX processor) を使用したシステムも 
+POWER4 アーキテクチャをベースにしており、このカーネルフレーバーを使用します。
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>prep</term>
+<listitem><para>
+
+<!--
+This kernel flavour supports the PReP subarchitecture.
+-->
+このカーネルフレーバーは PReP サブアーキテクチャをサポートしています。
 
 </para></listitem>
 </varlistentry>
@@ -104,9 +119,11 @@ Apple G5 も POWER4 アーキテクチャをベースにしており、
 <listitem><para>
 
 <!--
-This kernel flavour supports the Amiga Power-UP System.
+This kernel flavour supports the Amiga Power-UP System, though it is
+currently disabled.
 -->
-このカーネルフレーバーは、Amiga Power-UP System をサポートしています。
+このカーネルフレーバーは、Amiga Power-UP System をサポートしていますが、
+現在無効になっています。
 
 </para></listitem>
 </varlistentry>
@@ -122,96 +139,40 @@ This kernel flavour supports the Amiga Power-UP System.
 
 <!--
 Apple (and briefly a few other manufacturers &mdash; Power Computing, for
-example) makes a series of Macintosh computers based on the PowerPC
+example) made a series of Macintosh computers based on the PowerPC
 processor. For purposes of architecture support, they are categorized
-as NuBus, OldWorld PCI, and NewWorld.
+as NuBus (not supported by Debian), OldWorld, and NewWorld.
 -->
 Apple (そしてたとえば Power Computing のような他のメーカー) は、
 PowerPC プロセッサベースの Macintosh コンピュータを製造しています。
-アーキテクチャのサポートの種類により、NuBus, OldWorld PCI, NewWorld に
-分類されています。
-
-</para><para>
-
-<!--
-Macintosh computers using the 680x0 series of processors are not in
-the PowerPC family but are instead m68k machines. Those models start
-with <quote>Mac II</quote> or have a 3-digit model number such as Centris 650
-or Quadra 950. Apple's pre-iMac PowerPC model numbers have four digits.
--->
-680x0 系の プロセッサを搭載した Macintosh コンピュータは、PowerPC 系ではなく
-代わりに m68k マシンとなります。
-<quote>Mac II</quote> から始まり Centris 650 や Quadra 950 のような
-3 桁のモデルナンバーのものがこれに該当します。
-Apple の iMac 以前の PowerPC モデルは 4 桁の数字になっています。
-
-</para><para>
-
-<!--
-NuBus systems are not currently supported by debian/powerpc. The
-monolithic Linux/PPC kernel architecture does not have support for
-these machines; instead, one must use the MkLinux Mach microkernel,
-which Debian does not yet support. These include the following:
--->
-Nubus システムは debian/powerpc では現在サポートされていません。
-モノリシック Linux/PPC カーネルアーキテクチャがこれをサポートしていないのです。
-代わりに、これを使うには Debian ではまだサポートしていない 
-MkLinux Mach マイクロカーネルを使う必要があります。
-これには以下のものが該当します。
-
-<itemizedlist>
-<listitem><para>
-
-Power Macintosh 6100, 7100, 8100
-
-</para></listitem>
-<listitem><para>
-
-Performa 5200, 6200, 6300
-
-</para></listitem>
-<listitem><para>
-
-Powerbook 1400, 2300, 5300
-
-</para></listitem>
-<listitem><para>
-
-Workgroup Server 6150, 8150, 9150
-
-</para></listitem>
-</itemizedlist>
-
-<!--
-A linux kernel for these machines and limited support is available at
-<ulink url="http://nubus-pmac.sourceforge.net/"></ulink>
--->
-以上のマシン用の Linux カーネルは
-<ulink url="http://nubus-pmac.sourceforge.net/"></ulink> で
-限定的にサポートされています。
+アーキテクチャのサポートの種類により、NuBus (Debian では未サポート), 
+OldWorld PCI, NewWorld に分類されています。
 
 </para><para>
 
 <!--
 OldWorld systems are most Power Macintoshes with a floppy drive and a
 PCI bus. Most 603, 603e, 604, and 604e based Power Macintoshes are
-OldWorld machines. The beige colored G3 systems are also OldWorld.
+OldWorld machines. Those pre-iMac PowerPC models from Apple use a 
+four digit naming scheme, except for the beige colored G3 systems, which 
+are also OldWorld.
 -->
 OldWorld システムはフロッピードライブと PCI バスを備えた、
 ほとんどの Power Macintosh のことです。
 603, 603e, 604, 604e ベースの Power Macintosh が OldWorld マシンです。
-ベージュの G3 システムも、OldWorld です。
+ベージュの G3 システムの他は、
+Apple の 4 桁の数字の命名規則を持つ iMac 以前の PowerPC モデルも OldWorld です。
 
 </para><para>
 
 <!--
 The so called NewWorld PowerMacs are any PowerMacs in translucent
-colored plastic cases. That includes all iMacs, iBooks, G4 systems,
-blue colored G3 systems, and most PowerBooks manufactured in and after
-1999. The NewWorld PowerMacs are also known for using the <quote>ROM in
+colored plastic cases and later models. That includes all iMacs, iBooks,
+G4 systems, blue colored G3 systems, and most PowerBooks manufactured in and
+after 1999. The NewWorld PowerMacs are also known for using the <quote>ROM in
 RAM</quote> system for MacOS, and were manufactured from mid-1998 onwards.
 -->
-対して NewWorld PowerMac と呼ばれるのが半透明の PowerMac です。
+対して NewWorld PowerMac と呼ばれるのが半透明の PowerMac 以降のものです。
 すべての iMac, iBook, G4 システム, 青い G3 システム, 
 1999 年以降に製造されたほとんどの PowerBook が含まれます。
 NewWorld PowerMac は、1998 年半ばから製造され、
@@ -247,7 +208,7 @@ Apple のハードウェアの仕様は、
 
 <tbody>
 <row>
-  <entry morerows="22">Apple</entry>
+  <entry morerows="27">Apple</entry>
   <entry>iMac Bondi Blue, 5 Flavors, Slot Loading</entry>
   <entry>NewWorld</entry>
 </row><row>
@@ -365,6 +326,9 @@ Apple のハードウェアの仕様は、
 
    </sect3>
 
+<!--
+   <sect3><title>PReP subarchitecture</title>
+-->
    <sect3><title>PReP サブアーキテクチャ</title>
 
 <para>
@@ -460,5 +424,112 @@ Apple のハードウェアの仕様は、
 </tbody></tgroup></informaltable>
 
 </para>
+
    </sect3>
-  </sect2>
+
+<!--
+   <sect3><title>Nubus PowerMac subarchitecture (unsupported)</title>
+-->
+   <sect3><title>Nubus PowerMac サブアーキテクチャ (未サポート)</title>
+
+<para>
+
+<!--
+NuBus systems are not currently supported by Debian/powerpc. The
+monolithic Linux/PPC kernel architecture does not have support for
+these machines; instead, one must use the MkLinux Mach microkernel,
+which Debian does not yet support. These include the following:
+-->
+NuBus システムは現在 Debian/powerpc でサポートされていません。
+モノリシック Linux/PPC カーネルアーキテクチャでは、
+マシンをサポートしておらず、Debian ではまだサポートしていない 
+MkLinux Mach マイクロカーネルを使用しなければならないものがあります。
+以下のものが含まれます。
+
+<itemizedlist>
+<listitem><para>
+
+Power Macintosh 6100, 7100, 8100
+
+</para></listitem>
+<listitem><para>
+
+Performa 5200, 6200, 6300
+
+</para></listitem>
+<listitem><para>
+
+Powerbook 1400, 2300, and 5300
+
+</para></listitem>
+<listitem><para>
+
+Workgroup Server 6150, 8150, 9150
+
+</para></listitem>
+</itemizedlist>
+
+<!--
+A linux kernel for these machines and limited support is available at
+<ulink url="http://nubus-pmac.sourceforge.net/"></ulink>.
+-->
+以上のマシン用 Linux カーネルは
+<ulink url="http://nubus-pmac.sourceforge.net/"></ulink>
+で限定的にサポートされています。
+
+</para>
+
+   </sect3>
+
+<!--
+   <sect3><title>Non-PowerPC Macs</title>
+-->
+   <sect3><title>非 PowerPC Mac</title>
+
+<para>
+
+<!--
+Macintosh computers using the 680x0 series of processors are
+<emphasis>not</emphasis> in the PowerPC family but are instead m68k
+machines. Those models start with <quote>Mac II</quote> series, go on
+to the <quote>LC</quote> family, then the Centris series, and culminate
+in the Quadras and Performas. These models usually have a Roman numeral
+or 3-digit model number such as Mac IIcx, LCIII or Quadra 950.
+-->
+680x0 系の プロセッサを搭載した Macintosh コンピュータは、
+PowerPC 系<emphasis>ではなく</emphasis>代わりに m68k マシンとなります。
+このシリーズは <quote>Mac II</quote> シリーズから始まり、
+<quote>LC</quote> 系、Centris シリーズ、Quadra や Performa で全盛となりました。
+以上のモデルは、Mac IIcx, LCIII, Quadra 950 のようにローマ数字や
+3 桁のモデルナンバーのものがほぼこれに該当します。
+
+</para><para>
+
+<!--
+This model range started with the Mac II (Mac II, IIx, IIcx, IIci,
+IIsi, IIvi, IIvx, IIfx), then the LC (LC, LCII, III, III+, 475, 520,
+550, 575, 580, 630), then the Mac TV, then the Centris (610, 650,
+660AV), the Quadra (605, 610, 630, 650, 660AV, 700, 800, 840AV, 900,
+950), and finally the Performa 200-640CD.
+-->
+このモデルの範囲は、Mac II (Mac II, IIx, IIcx, IIci, IIsi, IIvi, IIvx, IIfx) 
+ではじまり、LC (LC, LCII, III, III+, 475, 520, 550, 575, 580, 630)、
+Mac TV、Centris (610, 650, 660AV)、
+Quadra (605, 610, 630, 650, 660AV, 700, 800, 840AV, 900, 950)、
+最後に Performa 200-640CD となります。
+
+</para><para>
+
+<!--
+In laptops, it started with the Mac Portable, then the PowerBook
+100-190cs and the PowerBook Duo 210-550c (excluding PowerBook 500
+which is Nubus, please see the section above).
+-->
+ラップトップでは、Mac Portable からはじまり、PowerBook 100-190cs や 
+PowerBook Duo 210-550c (PowerBook 500 は Nubus からはずれます。
+前出の節をご覧ください)
+
+</para>
+
+   </sect3>
+ </sect2>
