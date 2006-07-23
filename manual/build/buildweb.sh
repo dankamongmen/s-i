@@ -10,7 +10,6 @@ if [ -z "$languages" ]; then
     # Based on list of languages used in official builds
     languages="$(cd ../debian; ./getfromlist langlist)"
 fi
-echo $languages
 
 if [ -z "$architectures" ]; then
     architectures="alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
