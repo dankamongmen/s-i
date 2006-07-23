@@ -1,8 +1,13 @@
 #!/bin/bash
 ROOT=/home/rfjp/d-i
 
-$ROOT/bin/build-manual
-$ROOT/bin/mail-logs
+RET=0
+$ROOT/bin/build-manual || RET=$?
+
+if [ $RET = 0 ] || [ $RET = 999 ]; then
+	$ROOT/bin/mail-logs
+else
+	echo "Build failed, not sending logs"
+fi
 
 exit 0
-
