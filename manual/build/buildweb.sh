@@ -7,8 +7,10 @@ set -e
 
 if [ -z "$languages" ]; then
     # Buildlist of languages to be included on the official website
-    languages="en cs de es fr ja pt pt_BR ru zh_CN zh_TW"
+    # Based on list of languages used in official builds
+    languages="$(cd ../debian; ./getfromlist langlist)"
 fi
+echo $languages
 
 if [ -z "$architectures" ]; then
     architectures="alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
