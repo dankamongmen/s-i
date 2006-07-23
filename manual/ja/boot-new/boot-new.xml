@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 -->
+<!-- original version: 38703 -->
 
 <chapter id="boot-new">
 <!--
@@ -343,6 +343,245 @@ for more information.
 </para>
    </sect2>
  </sect1>
+
+ <sect1 id="mount-encrypted-volumes">
+<!--
+ <title>Mounting encrypted volumes</title>
+-->
+ <title>暗号化ボリュームのマウント</title>
+
+<para>
+
+<!--
+If you created encrypted volumes during the installation and assigned
+them mount points, you will be asked to enter the passphrase for each
+of these volumes during the boot. The actual procedure differs
+slightly between dm-crypt and loop-AES.
+-->
+インストール中に暗号化ボリュームを作成し、マウントポイントに割り当てると、
+そのボリュームに対して、起動中にパスフレーズを入力するように訊いてきます。
+実際の手順は、dm-crypt と loop-AES では若干異なります。
+
+</para>
+
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
+
+<para>
+
+<!--
+For partitions encrypted via loop-AES you will be shown the following
+prompt during the boot:
+-->
+loop-AES で暗号化したパーティションでは、
+起動中に以下のようなプロンプトが表示されます。
+
+<informalexample><screen>
+mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Password:
+</screen></informalexample>
+
+<!--
+In the first line of the prompt, <replaceable>X</replaceable> is the
+number of the loop device. You are now probably wondering
+<emphasis>for which volume</emphasis> you are actually entering the
+passphrase. Does is relate to your <filename>/home</filename>? Or to
+<filename>/var</filename>? Of course, if you have just one encrypted
+volume, this is easy and you can just enter the passphrase you used
+when setting up this volume. If you set up more than one encrypted
+volume during the installation, the notes you wrote down as the last
+step in <xref linkend="partman-crypto"/> come in handy. If you did not
+make a note of the mapping between
+<filename>loop<replaceable>X</replaceable></filename> and the mount
+points before, you can still find it
+in <filename>/etc/fstab</filename> of your new system.
+-->
+プロンプトの最初の行の <replaceable>X</replaceable> は、
+ループデバイスの番号です。
+おそらく、<emphasis>ボリュームごとに</emphasis> パスフレーズを入力することに、
+違和感を感じるのではないでしょうか。
+<filename>/home</filename> について? 
+もしくは <filename>/var</filename> について?
+もちろん暗号化したボリュームであれば、
+セットアップしたときに入力したパスフレーズを入力するのが簡単です。
+インストール時に、暗号化ボリュームを少なくとも一つは設定しているなら、
+<xref linkend="partman-crypto"/> 
+の最後のステップの書き留めたメモが役に立つでしょう。
+以前の <filename>loop<replaceable>X</replaceable></filename> 
+とマウントポイントの間のマッピングを記録しない場合、
+新しいシステムの <filename>/etc/fstab</filename> にあります。
+
+</para><para>
+
+<!--
+No characters (even asterisks) will be shown while entering the
+passphrase. Be careful, you have only <emphasis>one try</emphasis>. If
+you enter wrong passphrase, an error message will appear and the boot
+process will skip that volume and continue to mount the next
+filesystem. Please see <xref linkend="crypto-troubleshooting"/> for
+further information.
+-->
+パスフレーズの入力時には文字が (アスタリスクも) 表示されません。
+<emphasis>試行は 1 回</emphasis>だけなことに注意してください。
+パスフレーズを間違えると、そのボリュームをスキップして、
+次のファイルシステムをマウントしようとします。
+詳細は、<xref linkend="crypto-troubleshooting"/> をご覧ください。
+
+</para><para>
+
+<!--
+After entering all passphrases the boot should continue as usual.
+-->
+パスフレーズをすべて入力すると、通常と同様に起動を継続します。
+
+</para>
+  </sect2>
+
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para condition="FIXME">
+
+<!--
+TODO: write something once it works.
+-->
+TODO: どのように動作するか書いてください。
+
+</para>
+  </sect2>
+
+  <sect2 id="crypto-troubleshooting">
+<!--
+  <title>Troubleshooting</title>
+-->
+  <title>トラブルシュート</title>
+
+<para>
+
+<!--
+If some of the encrypted volumes could not be mounted because a wrong
+passphrase was entered, you will have to mount them manually after the
+boot. There are several cases.
+-->
+パスフレーズを間違えて、暗号化ボリュームをマウントできなかった場合、
+ブート後に手動でマウントする必要があります。以下の状況が考えられます。
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+
+<!--
+The first case concerns the root partition. When it is not mounted
+correctly, the boot process will halt and you will have to reboot the
+computer to try again.
+-->
+まずはじめの状況は、ルートパーティションに関することです。
+正しくマウントできないとブートプロセスが停止し、
+再起動してもう一度行わなければなりません。
+
+</para></listitem>
+<listitem><para>
+
+<!--
+The easiest case is for encrypted volumes holding data like
+<filename>/home</filename> or <filename>/srv</filename>. You can
+simply mount them manually after the boot. For loop-AES this is
+one-step operation:
+-->
+最も簡単な状況は、<filename>/home</filename> や <filename>/srv</filename> 
+といったデータを保持している暗号化ボリュームの場合です。
+この場合は、ブート後に手動でマウントしてあげるだけです。
+loop-AES では、以下のように 1 ステップです。
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+<prompt>Password:</prompt>
+</screen></informalexample>
+
+<!--
+where <replaceable>/mount_point</replaceable> should be replaced by
+the particular directory (e.g. <filename>/home</filename>). The only
+difference from an ordinary mount is that you will be asked to enter
+the passphrase for this volume.
+-->
+<replaceable>/mount_point</replaceable> は、
+特定のディレクトリに置き換えてください。(例 <filename>/home</filename>)
+通常のマウントと違うのは、
+そのボリューム用にパスフレーズを入力するよう促される、ということだけです。
+
+
+</para><para>
+
+<!--
+For dm-crypt this is a bit trickier. First you need to register the
+volumes with <application>device mapper</application> by running:
+-->
+dm-crypt の場合は少しトリッキーです。
+まず <application>device mapper</application> を実行して、
+ボリュームを登録する必要があります。
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
+</screen></informalexample>
+
+<!--
+This will scan all volumes mentioned
+in <filename>/etc/crypttab</filename> and will create appropriate
+devices under the <filename>/dev</filename> directory after entering
+the correct passphrases. (Already registered volumes will be skipped,
+so you can repeat this command several times without worrying.) After
+successful registration you can simply mount the volumes the usual
+way:
+-->
+<filename>/etc/crypttab</filename> に記述されたボリュームすべてを検査し、
+正しいパスフレーズを入力すると、
+<filename>/dev</filename> ディレクトリ以下に、適切なデバイスを作成します。
+(既に登録されたボリュームはスキップするので、何度実行しても警告がでません)
+登録に成功すると、以下のように通常の方法でマウントできます。
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+<!--
+If the volumes holding noncritical system files could not be mounted
+(<filename>/usr</filename> or <filename>/var</filename>), the system
+should still boot and you should be able to mount the volumes manually
+like in the previous case. However, you will also need to (re)start
+any services usually running in your default runlevel because it is
+very likely that they were not started. The easiest way to achieve
+this is by switching to the first runlevel and back by entering
+-->
+クリティカルでないシステムファイルを扱うボリューム 
+(<filename>/usr</filename> や <filename>/var</filename>) 
+がマウントできなかった場合、それでもシステムが起動し、
+前述の状況のように手動でボリュームをマウントできるでしょう。
+しかし、デフォルトのランレベルで通常動作しているサービスを、
+起動していない可能性があるので、(再) 起動する必要があります。
+最も簡単なのは、最初のランレベルに以下のように切り替えることです。
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>init 1</userinput>
+</screen></informalexample>
+
+<!--
+at the shell prompt and pressing <keycombo> <keycap>Control</keycap>
+<keycap>D</keycap> </keycombo> when asked for the root password.
+-->
+rootのパスワードを訊かれたら <keycombo> <keycap>Control</keycap>
+<keycap>D</keycap> </keycombo> を押し、
+シェルのプロンプトで上記を入力してください。
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
+
 
  <sect1 id="login">
 <!--
