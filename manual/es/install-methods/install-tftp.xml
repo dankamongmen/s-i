@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 35613 -->
+<!-- original version: 36841 -->
 <!-- revisado por nahoo, 1 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 
@@ -199,7 +199,7 @@ Asegúrese de que su servidor DHCP está configurado para pasar
 Para DECstations existen ficheros «tftpimage» para cada subarquitectura
 que contienen tanto el núcleo como el instalador en un solo fichero. Por convención
 los nombres son del tipo
-<replaceable>subarquitectura</replaceable>/netboot-boot.img.
+<filename><replaceable>subarquitectura</replaceable>/netboot-boot.img</filename>.
 Copie el fichero «tftpimage» que desee usar a
 <userinput>/tftpboot/tftpboot.img</userinput> si está usando la configuración
 BOOTP/DHCP de ejemplo descrita anteriormente.
@@ -277,13 +277,14 @@ un nombre de fichero por cualquiera de estos métodos.
    <title>Arranque de TFTP en SPARC</title>
 <para>
 
-Las arquitecturas SPARC, por ejemplo, usan los nombres de las subarquitecturas,
-como «SUN4M» o «SUN4C»; en algunos casos, la arquitectura se deja en
-blanco, de modo que el fichero que el cliente busca es simplemente
-<filename>ip-del-cliente-en-hex</filename>. Esto es, si la subarquitectura
-de su sistema es «SUN4C» y su IP es 192.168.1.3, el nombre del fichero
-será <filename>C0A80103.SUN4C</filename>. Una forma sencilla de determinarlo es
-usar la siguiente orden en un línea de órdenes (asumiendo que la IP sea 10.0.0.4).
+Algunas arquitecturas SPARC añaden los nombres de las subarquitecturas,
+como «SUN4M» o «SUN4C» al fichero. Esto es, si la subarquitectura
+de su sistema es «SUN4C» y su IP es 192.168.1.3, el nombre del fichero será
+<filename>C0A80103.SUN4C</filename>. Hay algunas arquitecturas para las que el
+cliente busca simplemente el fichero
+<filename>ip-del-cliente-en-hex</filename>. Una forma sencilla de determinar
+el código hexadecimal del cliente es usar la siguiente orden en un línea de
+órdenes (asumiendo que la IP sea 10.0.0.4).
 
 <informalexample><screen>
 $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
