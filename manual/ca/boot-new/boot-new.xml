@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 -->
+<!-- original version: 38703 -->
 
 <chapter id="boot-new">
  <title>Arrancada en el vostra nou sistema Debian</title>
@@ -20,12 +20,12 @@ argument d'arrencada com
 <userinput>root=<replaceable>arrel</replaceable></userinput>, on
 <replaceable>l'arrel</replaceable> és la vostra partició arrel, com per
 exemple <filename>/dev/sda1</filename>.
-D'altra banda, vegeu <xref linkend="rescue"/> per instrucciones per a usar
+D'altra banda, vegeu <xref linkend="rescue"/> per instruccions per a usar
 el mode intern de rescat de l'instal·lador.
 
 </para>
 
-  <sect2 arch="m68k"><title>Arrencada en un BVME 6000</title>
+  <sect2 arch="m68k"><title>Arrencada en un BAVE'M 6000</title>
 <para>
 
 Si acabeu de realitzar una instal·lació sense disc en una màquina BVM o
@@ -84,7 +84,7 @@ canviar-ho en qualsevol moment.
 Si no voleu arrencar el GNU/Linux immediatament cada vegada que inicieu,
 desseleccioneu l'opció <userinput>Auto Arrencada</userinput>. Deseu el vostre
 arranjament al fitxer <filename>Prefs</filename> utilitzant l'opció
-<userinput>Desa l'arranjament com a perdeterminat</userinput>.
+<userinput>Desa l'arranjament com a predeterminat</userinput>.
 
 </para><para>
 
@@ -188,6 +188,151 @@ canviat. Si us plau, per més informació llegiu el
 </para>
    </sect2>
  </sect1>
+
+ <sect1 id="mount-encrypted-volumes">
+  <title>Muntar volums xifrats</title>
+
+<para>
+
+Si heu creat volums xifrats a la instal·lació i els heu assignat
+punts de muntatge, se us preguntarà que introduïu la contrasenya per
+cada volum a l'arrencada. El procediment actual canvia lleugerament entre
+dm-crypt i loop-AES.
+
+</para>
+
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
+
+<para>
+
+A les particions xifrades amb loop-AES se us mostrarà l'indicador
+següent a l'arrencada:
+
+<informalexample><screen>
+mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Password:
+</screen></informalexample>
+
+A la primera línia de d'indicador, <replaceable>X</replaceable> és el
+número del dispositiu loop. Us preguntareu probablement
+<emphasis>quin és el volum</emphasis> pel qual esteu introduint ara la
+contrasenya. És la que es refereix al vostre <filename>/home</filename>? O to
+<filename>/var</filename>? Per suposat, si xifreu tan sols un volum,
+és fàcil tan sols donant la paraula de pas que heu utilitzat quan heu
+configurat el volum. Si heu configurat més d'un volum xifrat a la
+instal·lació, us seran útils les notes que heu escrit a l'últim pas de
+<xref linkend="partman-crypto"/>. Si no vàreu fer una nota del mapatge
+dels <filename>loop<replaceable>X</replaceable></filename> i els punt
+de muntatge abans, encara podeu trobar-ho al <filename>/etc/fstab</filename>
+del vostre sistema.
+
+</para><para>
+
+No es mostrarà cap caràcter (ni asteriscs) quan introduïu la contrasenya.
+Aneu en compte, tan sols teniu <emphasis>un intent</emphasis>. Si
+introduïu una contrasenya incorrecta, us apareixerà un missatge d'error i
+el procés d'arrencada deixarà el volum actual per muntar i continuarà
+muntant el pròxim sistema de fitxers. Vegeu
+<xref linkend="crypto-troubleshooting"/> per obtenir més informació.
+
+</para><para>
+
+Després d'introduir totes les contrasenyes l'arrencada hauria de continuar
+de forma normal.
+
+</para>
+  </sect2>
+
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para condition="FIXME">
+
+TODO: write something once it works.
+
+</para>
+  </sect2>
+
+  <sect2 id="crypto-troubleshooting">
+  <title>Resolució de problemes</title>
+
+<para>
+
+Si algun volum xifrat no s'ha pogut muntar degut a que s'ha introduït una
+contrasenya incorrecta, haureu de muntar-los manualment després de
+l'arrencada. Hi ha casos diferents.
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+
+El primer cas fa referència a la partició arrel. Quan no es munta
+correctament, el procés d'arrencada s'aturarà i haureu de reiniciar
+l'ordinador per provar altra vegada.
+
+</para></listitem>
+<listitem><para>
+
+El cas més senzill és per volums xifrats que contenen dades com és
+<filename>/home</filename> o <filename>/srv</filename>. Podeu simplement
+muntar-lo manualment després de l'arrencada. Per loop-AES aquest és una
+operació d'un pas:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+<prompt>Password:</prompt>
+</screen></informalexample>
+
+on <replaceable>/mount_point</replaceable> hauria de reemplaçar-se pel
+directori particular(p.e. <filename>/home</filename>). L'única diferència
+de un punt de muntatge normal és que se us demanarà d'introduir la
+contrasenya per aquest volum.
+
+</para><para>
+
+Per dm-crypt açò és una mica més difícil. Primer necessitareu registrar
+els volums amb <application>device mapper</application> executant:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
+</screen></informalexample>
+
+Açò buscarà a tots els volums anomenats a
+<filename>/etc/crypttab</filename> i crearà els dispositius apropiats al
+directori <filename>/dev</filename> després d'introduir les contrasenyes
+correctes. (Als volums ja registrats no ho farà, així que podeu repetir
+aquesta ordre més vegades sense preocupar-se). Després d'un registre
+correcte podeu muntar els volums de la forma habitual:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+Si els volums que contenen sistemes de fitxers no crítics no es poden
+muntar (<filename>/usr</filename> o <filename>/var</filename>), el sistema
+encara podria arrencar i hauríeu de ser capaços de muntar els volums
+manualment com al cas anterior. Però, necessitareu tornar a iniciar alguns
+serveis que s'executen al vostre nivell d'execució per defecte ja que és
+molt probable que no s'haja engegat. La forma més senzilla d'aconseguir-ho
+és canviar al primer nivell d'execució i tornar a entrar amb
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>init 1</userinput>
+</screen></informalexample>
+a l'interpret d'ordres i prement  <keycombo> <keycap>Control</keycap>
+<keycap>D</keycap> </keycombo> quan us demane la contrasenya.
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
+
 
  <sect1 id="login">
  <title>L'entrada</title>

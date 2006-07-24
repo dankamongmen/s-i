@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 37512 -->
+<!-- original version: 38662 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -319,8 +319,14 @@ Paràmetres d'arrencada que cal especificar:
 
 <para>
 
+Adoneu-vos que <filename>preseed/url</filename> pot escurçar-se a tan sols
+<filename>url</filename> i <filename>preseed/file</filename> a
+<filename>file</filename> quan són passats com a paràmetres d'arrencada.
+
+</para><para>
+
 Podeu afegir a l'indicador d'arrencada el paràmetre
-<userinput>debconf/priority=critical</userinput>, que evitarà la majoria de
+<userinput>priority=critical</userinput>, que evitarà la majoria de
 preguntes fins i tot si la configuració prèvia no en contesta algunes.
 
 </para>
@@ -389,6 +395,13 @@ prèvia. Simplement indiqueu el <userinput>camí/a/var=valor</userinput> per
 a qualsevol de les variables de configuració prèvia llistades als exemples.
 
 </para><para>
+
+Adoneu-vos que algunes variables que s'estableixen amb freqüència a l'indicador
+de l'arrencada, tenen un àlies més curt. Si hi ha un de disponible, s'utilitza
+als exemples en aquest apèndix en comptes de la variable completa.
+
+</para><para>
+
 Un <quote>--</quote> a les opcions d'arranc té un significat especial.
 Els paràmetres del nucli que apareixen despres es copiaran a la
 configuració del carregador de l'arrencada instal·lat (si està suportat
@@ -553,7 +566,7 @@ sols es carregarà després d'haver respost aquestes preguntes.
 
 Es pot fer servir el locale per a especificar tant la llengua com el país.
 Per a especificar el locale com un paràmetre d'arrencada, empreu
-<userinput>debian-installer/locale=<replaceable>ca_ES</replaceable></userinput>.
+<userinput>locale=<replaceable>ca_ES</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 # El locale estableix la llengua i el país.
@@ -609,7 +622,23 @@ la xarxa.
 Si necessiteu seleccionar una interfície en concret per tal
 d'arrencar per xarxa abans de carregar un fitxer de configuració
 prèvia des de la xarxa, useu un paràmetre d'arrencada com
-<userinput>netcfg/choose_interface=<replaceable>eth1</replaceable></userinput>.
+<userinput>interface=<replaceable>eth1</replaceable></userinput>.
+
+</para><para>
+
+Malgrat que normalment la configuració prèvia de la xarxa no es possible
+quan s'està utilitzant una configuració prèvia (utilitzant
+<quote>preseed/url</quote>), en aquest cas podeu utilitzar
+el procediment per evitar-ho, per exemple si voleu configurar una adreça
+estàtica per la interfície de xarxa. Aquest procediment és per forçar que
+la configuració de xarxa s'execute altra vegada després de haver carregat
+el fitxer de preconfiguració creant un guió  <quote>preseed/run</quote> amb
+les línies següents:
+
+<informalexample><screen>
+killall.sh dhclient
+netcfg
+</screen></informalexample>
 
 </para>
 
@@ -732,6 +761,8 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 # es pot indicar bé en el format devfs o bé en el format tradicional.
 # Per exemple, per emprar el primer disc que detecta el devfs:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# O bé si voleu utilitzar LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
 # Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).

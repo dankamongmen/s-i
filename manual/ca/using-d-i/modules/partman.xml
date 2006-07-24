@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 
    <sect3 id="partman">
    <title>Particionant els discs</title>
@@ -20,10 +20,21 @@ automàtica escolliu l'opció del menú
 
 </para><para>
 
-Si escolliu la partició guiada podreu escollir entre els esquemes
-que es llisten a la taula següent. Tots els esquemes tenen els seus
-avantatges els seus inconvenients, alguns dels quals es discuteixen a
-<xref linkend="partitioning"/>. Si no n'esteu segurs, escolliu
+Si escolliu la partició guiada podreu escollir entre dos opcions: crear
+les particions al disc directament (mètode clàssic) o utilitzar
+L'Administrador de Volums Lògics (LVM).  En el segon cas, l'instal·lador
+crearà la major part de les particions dins una gran partició; l'advantatge
+d'aquest mètode és que les particions que estan dins d'aquesta gran
+partició es poden canviar la seva mida de forma relativament fàcil després.
+Avís: la opció d'utilitzar LVM pot no estar disponible a totes les
+arquitectures.
+
+</para><para>
+
+Després d'escollir el particionament guiat (tant el clàssic com LVM),
+podreu triar entre els esquemes llistats a la tabla de baix.
+Tots els esquemes tenen els seus pros i contres, alguns dels quals s'han
+discutit a <xref linkend="partitioning"/>. Si no n'esteu segurs escolliu
 la primera opció. Heu de tenir present que la partició guiada precisa
 d'un mínim d'espai lliure amb el qual treballar. Si no li assigneu
 un mínim de 1GB d'espai (en funció de l'esquema escollit), es
@@ -47,13 +58,13 @@ produirà un error en la partició guiada.
   <entry>600MB</entry>
   <entry><filename>/</filename>, swap</entry>
 </row><row>
-  <entry>Màquina d'escriptori</entry>
+  <entry>Partició /home separada</entry>
   <entry>500MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, swap
   </entry>
 </row><row>
-  <entry>Estació de treball multiusuari</entry>
+  <entry>Particions separades /home, /usr, /var i /tmp</entry>
   <entry>1GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -64,17 +75,23 @@ produirà un error en la partició guiada.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
 
-Si escolliu la partició automàtica per un sistema IA64 hi haurà
-una partició addicional formatejada com un sistema de fitxers
+Si escolliu el particionament guiat utilitzant LVM, l'instal·lador també
+crearà una partició /boot separada. Les altres particions, exepte la
+d'intercanvi (swap), es crearà dins de la partició LVM.
+
+</para><para arch="ia64">
+
+Si escolliu el particionament guiat pel vostre sistema IA64 hi haurà
+una partició addicional, formatejada amb un sistema de fitxers
 arrencable FAT16, pel carregador d'arrencada EFI.
 També hi ha un opció addicional del menú de formatat per
 configurar manualment una partició com a partició d'arrencada EFI.
 
 </para><para arch="alpha">
 
-Si escolliu la partició automàtica per un sistema Alpha, s'assignarà
+Si escolliu el particionament guiat pel vostre sistema Alpha, s'assignarà
 una partició no formatada addicional a l'inici del disc per reservar
 espai pel carregador d'arrencada aboot.
 
@@ -88,29 +105,31 @@ i com es formataran les particions i on es muntaran.
 
 La llista de particions hauria de ser similar a:
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     FREE SPACE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      FREE SPACE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 MB     ext3
-        #8 logical  551.5 MB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 MB      ext3
+        #8 logical  551.5 MB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 L'exemple mostra dos discs dur IDE dividits en múltiples particions;
 el primer disc disposa d'espai lliure. Cada línia de partició disposa
 del número de partició, el tipus, mida, senyaladors opcionals, sistema
-de fitxers i punt de muntatge (si n'hi ha).
+de fitxers i punt de muntatge (si n'hi ha). Avís: aquesta configuració
+particular no es pot crear amb el particionament guiat però mostra les
+possibles variacions que es poden aconseguir utilitzant el particionament
+manual).
 
 </para><para>
 
@@ -120,9 +139,19 @@ de menú
 <guimenuitem>Finalitza la partició i escriu els canvis al disc</guimenuitem>
 per desar la nova taula de particions (tal i com es descriu
 al final d'aquesta secció). Si no satisfà les vostres necessitats podeu
-escollir l'opció <guimenuitem>Desfés els canvis de les particions</guimenuitem>
-per tornar a executar la partició guiada o modifica els canvis proposats
-tal i com es descriu posteriorment en la partició manual.
+escollir l'opció <guimenuitem>Desfés els canvis de les
+particions</guimenuitem><footnote>
+
+<para>
+
+Si seleccioneu el particionament guiat utilitzant LVM, no podreu canviar
+els canvis fets com alguns canvis ja escrits al disc dur. L'instal·lador
+us avisarà abans de que açò passe.
+
+</para>
+
+</footnote> i executar el particionament guiat altra vegada, o modificar els
+canvis proposats com es descriu sota pel particionament manual.
 
 </para><para>
 
