@@ -778,6 +778,11 @@ if [ -d /proc/acpi ]; then
 	apt-install acpid || true
 fi
 
+# If hardware has support tp pmu, install pbbuttonsd
+if [ -d /sys/class/misc/pmu/ ]; then
+	apt-install pbbuttonsd || true
+fi
+
 db_progress SET $MAX_STEPS
 db_progress STOP
 
