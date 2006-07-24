@@ -22,12 +22,12 @@ characters.
 -->
 &d-i; では暗号化パーティションを設定できます。
 暗号化パーティションに保存したファイルはすべて、
-ただちに暗号化した形でデバイスに書き込まれます。
+暗号化した形で即座にデバイスに書き込まれます。
 暗号化したデータへのアクセスは、暗号化パーティションを作成した際に設定した
 <firstterm>パスフレーズ</firstterm> を入力した後で有効になります。
 この機能は、ノート PC やハードディスクが盗難に遭った際に、
 機密データを保護するのに便利です。
-盗人がハードディスクの物理データにアクセス仕様とする際、
+盗人がハードディスクの物理データにアクセスしようとする際、
 正しいパスフレーズを知らないと、
 ハードディスクのデータはランダムな文字列にしか見えません。
 
@@ -68,10 +68,11 @@ less than that of unencrypted ones because the data needs to be
 decrypted or encrypted for every read or write. The performance impact
 depends on your CPU speed, chosen cipher and a key length.
 -->
+データの読み書き時に常に暗号化・復号を行うため、
 暗号化パーティションのパフォーマンスは、
-データの読み書き時に、常に暗号化・復号を行うため、
 暗号化していないものよりも低下する事に注意してください。
-パフォーマンスは、CPU のスピード、選択した暗号方式、キー長に影響を受けます。
+パフォーマンスは、CPU のスピード、選択した暗号方式、
+暗号化キーの長さに影響を受けます。
 
 </para></note><para>
 
@@ -125,7 +126,7 @@ they have been carefully chosen with security in mind.
 -->
 はじめに、暗号化の方法として <userinput>Device-mapper (dm-crypt)</userinput> 
 を選択して、有効にできるオプションを有効にしましょう。
-いつものように、疑いがあればデフォルト値を指定してください。
+いつものように、よく分からなければデフォルト値を指定してください。
 セキュリティを念頭に置いて選択されています。
 
 <variablelist>
@@ -175,9 +176,9 @@ impact on performance. Available key sizes vary depending on the
 cipher.
 -->
 ここでは暗号化キーの長さを指定できます。
-一般的にキーが長くなると暗号強度が向上します。
-一方、キーが長くなると、大抵パフォーマンスにマイナスの影響を与えます。
-利用できるキーのサイズは暗号方式に依存します。
+一般的に暗号化キーが長くなると暗号強度が向上します。
+一方、暗号化キーが長くなると、大抵パフォーマンスにマイナスの影響を与えます。
+利用できる暗号化キーのサイズは暗号方式に依存します。
 
 </para></listitem>
 </varlistentry>
@@ -198,11 +199,11 @@ data.
 -->
 <firstterm>初期化ベクトル</firstterm> や 
 <firstterm>IV</firstterm> アルゴリズムは、
-同じ <firstterm>クリアテキスト</firstterm> データと同じキーで、
-常に一意の <firstterm>暗号化テキスト</firstterm> 得るのを保証して、
+同じ <firstterm>平文</firstterm> データと同一の暗号化キーで、
+常に異なる <firstterm>暗号文</firstterm> の出力を保証し、
 安全に暗号を解読するのに利用されます。
-これにより、攻撃者が暗号化データの繰り返されるパターンから、
-情報を推測するのを防ぎます。
+これにより、暗号化データ中に繰り返されるパターンから、
+攻撃者が情報を推測できないようにします。
 
 </para><para>
 
@@ -232,7 +233,7 @@ that is not able to use newer algorithms.
 <!--
 Here you can choose the type of the encryption key for this partition.
 -->
-ここでは、このパーティションの暗号化キーのタイプを選択でいきます。
+ここでは、このパーティションの暗号化キーのタイプを選択できます。
 
  <variablelist>
  <varlistentry>
@@ -252,7 +253,7 @@ to enter later in the process.
 暗号化キーを、プロセスの後で入力するパスフレーズに基づいて計算<footnote>
 <para>
 
-キーにパスフレーズを使用するのは、
+暗号化キーにパスフレーズを使用するのは、
 <ulink url="&url-luks;">LUKS</ulink> を使用して設定するという意味です。
 
 </para></footnote>します。
@@ -273,10 +274,11 @@ brute force attack, but unless there is an unknown weakness in the
 cipher algorithm, it is not achievable in our lifetime.)
 -->
 暗号化パーティションを作成するたびに、新しい暗号化キーをランダムに生成します。
-言い換えると、シャットダウンごとにキーがメモリから削除され、
+言い換えると、シャットダウンごとに暗号化キーがメモリから削除され、
 パーティションの内容を失うということです。
-(もちろん総当たりでキーを推測することはできますが、
-暗号アルゴリズムに未知の弱点がない限り、人生の中で達成できないでしょう)
+(もちろん総当たりで暗号化キーを推測することはできますが、
+暗号アルゴリズムに未知の弱点がない限り、
+生きているうちには解読されないでしょう)
 
  </para><para>
 
@@ -364,8 +366,8 @@ For loop-AES, unlike dm-crypt, the options for cipher and key size are
 combined, so you can select both at the same time.  Please see the
 above sections on ciphers and key sizes for further information.
 -->
-dm-crypt と違い loop-AES では、暗号形式とキーサイズのオプションを混ぜており、
-同時に指定できます。暗号形式とキーサイズについては、前節をご覧ください。
+dm-crypt と違い loop-AES では、暗号形式と暗号化キーサイズのオプションを混ぜており、
+同時に指定できます。暗号形式と暗号化キーサイズについては、前節をご覧ください。
 
 </para></listitem>
 </varlistentry>
@@ -393,7 +395,7 @@ enter the proper passphrase (you will be asked to provide one later in
 the process).
 -->
 暗号化キーはインストール時にランダムデータから生成されます。
-その上で、このキーを <application>GnuPG</application> で暗号化します。
+その上で、この暗号化キーを <application>GnuPG</application> で暗号化します。
 これを利用するには、適切なパスフレーズを入力する必要があります。
 (後のプロセスで要求されます)
 
