@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33725 -->
+<!-- original version: 38703 -->
 <!-- revisado por jfs, 28 octubre 2004 -->
 <!-- revisado Rudy Godoy, 24 feb. 2005 -->
 
@@ -198,6 +198,153 @@ Para más información, por favor lea el
 </para>
    </sect2>
  </sect1>
+
+ <sect1 id="mount-encrypted-volumes">
+ <title>Montaje de volúmenes cifrados</title>
+
+<para>
+
+Se le solicitará la contraseña para cada uno de los volúmenes cifrados durante
+el arranque si ha creado volúmenes cifrados durante la instalación y los ha asociado a puntos de montaje. El procedimiento difiere ligeramente en función de si se utiliza «dm-crypt» o «loop-AES».
+
+</para>
+
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
+<para>
+
+Se le mostrará el siguiente indicador durante el arranque en el caso
+de que tenga particiones cifradas con «loop-AES»:
+
+<informalexample><screen>
+mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Password:
+</screen></informalexample>
+
+
+<replaceable>X</replaceable> es el número del dispositivo «loop» en
+la primera línea del indicador. Seguramente se esté preguntando
+<emphasis>para qué volúmen</emphasis> está vd. introduciendo la clave.
+¿Se trata de <filename>/home</filename> o de <filename>/var</filename>? La
+respuesta es muy sencilla si sólo tiene un volúmen cifrado, sólo tiene
+que introducir la contraseña que utilizó cuando configuró dicho volúmen. Las
+notas que escribió como parte del último paso de <xref
+linkend="partman-crypto"/> serán útiles si ha configurado más de un volúmen
+cifrado durante la instalación.  Puede obtener esta información
+del <filename>/etc/fstab</filename> en su nuevo sitema sino guardó
+las notas de la asociación entre
+<filename>loop<replaceable>X</replaceable></filename> y los puntos de montaje.
+</para><para>
+
+No se mostrará ningún caracter (ni siquiera asteriscos) mientras vd.  introduce
+la clave. Tenga cuidado ya que sólo tiene <emphasis>un intento</emphasis>. Si
+introduce mal la clave se mostrará un mensaje de error y el arranque saltará
+ese volumen y continuará intentando montar el siguiente sistemas de ficheros.
+Para más información consulte <xref linkend="crypto-troubleshooting"/>.
+
+</para><para>
+
+El proceso de arranque debería continuar normalmente una vez haya introducido
+todas las claves.
+
+</para>
+  </sect2>
+
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para condition="FIXME">
+
+HACER: escribir algo cuando funcione.
+
+</para>
+  </sect2>
+
+  <sect2 id="crypto-troubleshooting">
+  <title>Solucionar problemas</title>
+
+<para>
+
+Tendrá que montar manualmente los volúmenes cifrados si no se pudieron montar
+porque no introdujo bien la clave. Aquí se dan ciertos casos distintos:
+
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+
+El primer caso está asociado a la partición raíz. El proceso de arranque no
+podrá continuar y se parará si no se monta ésta correctamente, con lo que
+tendrá que reiniciar el equipo e intentarlo de nuevo.
+
+</para></listitem>
+<listitem><para>
+
+El caso más sencillo se da en los volúmenes cifrados que guardan datos
+como pueda ser el caso de 
+<filename>/home</filename> or <filename>/srv</filename>. Simplemente
+puede intentar montarlso de nuevo tras el arranque. En el caso de
+«loop-AES» se hace con una sola operación:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+<prompt>Password:</prompt>
+</screen></informalexample>
+
+donde debería reemplazar <replaceable>/mount_point</replaceable> por el
+directorio correspondiente (p.ej. <filename>/home</filename>).  La única
+diferencia con el montaje normal de sistemas de ficheros es que se le
+preguntará la contraseña para este volumen.
+
+</para><para>
+
+Es un poco más complicado para el caso de «dm-crypt». Primero tendrá 
+que registrar los volúmenes con el <application>device mapper</application>
+ejecutando:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
+</screen></informalexample>
+
+Esto hará que se sondeen todos los volúmenes descritos
+en <filename>/etc/crypttab</filename> y se crearán todos los dispositivos
+necesarios en el directorio <filename>/dev</filename> tras introducir
+la contraseña correctamente. Se omitirán los volúmenes que ya estén
+registrados por lo que puede repetir esta orden tantas veces como
+necesite. Una vez que haya registrado con éxito el dispositivo sólo
+tiene que montarlos de la forma habitual:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+El sistema debería arrancar aún cuando no se puedan montar los
+sistemas de ficheros que no contengan ficheros del sistema críticos
+(<filename>/usr</filename> o <filename>/var</filename>). Por lo que debería
+poder montar los volúmenes manualmente como se ha descrito anteriormente. Sin
+embargo, tendrá que arrancar o reiniciar los servicios que se ejecutan en su
+nivel de ejecución normal porque es muy probable que no se hayan podido
+arrancar. La forma más fácil de conseguir ésto es cambiando al primer nivel de
+ejecución y volver al nivel actual introduciendo lo siguiente:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>init 1</userinput>
+</screen></informalexample>
+
+y en el indicador del intéprete de ordenes pulseo 
+<keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>
+cuando se le pregunte la contraseña de root.
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
+
 
  <sect1 id="login">
  <title>Acceso</title>

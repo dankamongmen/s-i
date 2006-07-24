@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 30158 -->
+<!-- original version: 38406 -->
 <!-- Revisado por Steve Langasek -->
 <!-- Revisado por Rudy Godoy, 22 feb. 2005 -->
 
@@ -19,7 +19,19 @@ particiones</guimenuitem> en el menú.
 
 </para><para>
 
-Si elije el particionado guiado, podrá elegir entre los distintos esquemas
+Si elije el particionado guiado, puede tener dos opciones: crear las
+particiones directamente en el disco duro (el método clásico) o utilizar el
+Gestor de Volúmenes Lógicos («Logical Volumen Manager», LVM).
+El instalador creará la mayoría de las particiones dentro de una partición
+si escoge la segunda opción, la ventaja de este método es que las 
+particiones dentro de una partición más grande pueden cambiarse de tamaño
+más adelante relativamente fácil. Nota: la opción de la utilización
+de LVM no está disponible para todas las arquitecturas.
+
+</para><para>
+
+<para>Una vez haya elegido el particionado guiado, tanto en el caso del 
+método clásico como en el caso de LVM, podrá elegir entre los distintos esquemas
 que se muestran en la tabla siguiente. Todos los esquemas tienen sus pros y sus
 contras, algunos de éstos se discuten en <xref linkend="partitioning"/>. Si
 no está seguro, escoja el primero. Tenga en mente, que el particionado guiado
@@ -45,13 +57,13 @@ fallará.
   <entry>600 MB</entry>
   <entry><filename>/</filename>, intercambio</entry>
 </row><row>
-  <entry>Ordenador de escritorio</entry>
+  <entry>Partición /home separada</entry>
   <entry>500 MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, intercambio
   </entry>
 </row><row>
-  <entry>Estación de trabajo multiusuario</entry>
+  <entry>Particiones /home, /usr, /var y /tmp separadas</entry>
   <entry>1 GB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>,
@@ -62,7 +74,12 @@ fallará.
 
 </tbody></tgroup></informaltable>
 
-<para arch="ia64">
+<para>
+El instalador creará una partición separada para /boot si escoge 
+el guiado particionado. Todas las demás particiones, salvo por la 
+partición de intercambio, se crearán dentro de la partición LVM.
+
+</para><para arch="ia64">
 
 Si escoge el particionado automático para su sistema IA64, habrá una
 partición adicional, con un sistema de ficheros FAT16 arrancable, para el
@@ -86,29 +103,30 @@ dónde se montarán.
 
 La lista de particiones podría ser como la siguiente:
 
-<!-- TODO: show some flags here (lightning, skull, smiley) -->
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
-        #1 primary   16.4 MB     ext2       /boot
-        #2 primary  551.0 MB     swap       swap
-        #3 primary    5.8 GB     ntfs
-           pri/log    8.2 MB     ESPACIO LIBRE
+        #1 primary   16.4 MB  B f ext2       /boot
+        #2 primary  551.0 MB      swap       swap
+        #3 primary    5.8 GB      ntfs
+           pri/log    8.2 MB      ESPACIO LIBRE
 
   IDE1 slave (hdb) - 80.0 GB ST380021A
-        #1 primary   15.9 MB     ext3
-        #2 primary  996.0 MB     fat16
-        #3 primary    3.9 GB     xfs        /home
-        #5 logical    6.0 GB     ext3       /
-        #6 logical    1.0 GB     ext3       /var
-        #7 logical  498.8 GB     ext3
-        #8 logical  551.5 GB     swap       swap
-        #9 logical   65.8 GB     ext2
+        #1 primary   15.9 MB      ext3
+        #2 primary  996.0 MB      fat16
+        #3 primary    3.9 GB      xfs        /home
+        #5 logical    6.0 GB    f ext3       /
+        #6 logical    1.0 GB    f ext3       /var
+        #7 logical  498.8 GB      ext3
+        #8 logical  551.5 GB      swap       swap
+        #9 logical   65.8 GB      ext2
 </screen></informalexample>
 
 Este ejemplo muestra dos discos duros IDE divididos en diversas particiones, el
 primer disco tiene algo de espacio libre. Cada línea de partición está
 conformada por el número de partición, su tipo, tamaño, banderas opcionales,
 sistema de ficheros y punto de montaje (si fuese el caso).
+Nota: esta configuración particular no puede crearse con el particionado guiado pero sí muestra una variación que puede conseguirse utilizando el particionado manual.
+
 
 </para><para>
 
@@ -117,7 +135,16 @@ particiones generada, puede elegir <guimenuitem>Finalizar el particionado y
 escribir los cambios en el disco</guimenuitem> desde el menú para implementar
 la nueva tabla de particiones (como se describe al final de esta sección). Si
 no le gusta, puede elegir <guimenuitem>Deshacer los cambios realizados a las
-particiones</guimenuitem>, para ejecutar nuevamente el particionado guiado o
+particiones</guimenuitem><footnote>
+<para>
+
+No podrá deshacer todos los cambios si selecciona el particionado guiado con
+LVM ya que algunos de los cambios se habrán escrito ya en el disco duro. En
+cualquier caso, el instalador le avisará antes de que eso vaya a suceder.
+
+</para>
+
+</footnote>, para ejecutar nuevamente el particionado guiado o
 modificar los cambios propuestos de forma manual tal y como se describe a
 continuación.
 
