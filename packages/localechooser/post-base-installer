@@ -64,31 +64,35 @@ if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ] ; then
 fi
 
 # If the locale isn't already valid, append it to locale.gen
-gen=
-if log-output -t localechooser --pass-stdout \
-    chroot /target/ /usr/sbin/validlocale "$LOCALE" \
-    >> /target/etc/locale.gen; then
-	: # Nothing to do
-else
-	# New locale added to locale.gen, generate it
-	gen=1
-fi
-for loc in $EXTRAS; do
-	if [ "$loc" = "$LOCALE" ]; then
-		continue
-	fi
+if [ -x /target/usr/sbin/validlocale ] ; then 
+	gen=
 	if log-output -t localechooser --pass-stdout \
-	    chroot /target/ /usr/sbin/validlocale "$loc" \
+	    chroot /target/ /usr/sbin/validlocale "$LOCALE" \
 	    >> /target/etc/locale.gen; then
 		: # Nothing to do
 	else
 		# New locale added to locale.gen, generate it
 		gen=1
 	fi
-done
-if [ "$gen" ]; then
-	log-output -t localechooser --pass-stdout \
-	    chroot /target /usr/sbin/locale-gen --keep-existing >/dev/null
+	for loc in $EXTRAS; do
+		if [ "$loc" = "$LOCALE" ]; then
+			continue
+		fi
+		if log-output -t localechooser --pass-stdout \
+		    chroot /target/ /usr/sbin/validlocale "$loc" \
+		    >> /target/etc/locale.gen; then
+			: # Nothing to do
+		else
+			# New locale added to locale.gen, generate it
+			gen=1
+		fi
+	done
+	if [ "$gen" ]; then
+		if [ -x /target/usr/sbin/locale-gen ] ; then 
+			log-output -t localechooser --pass-stdout \
+			    chroot /target /usr/sbin/locale-gen --keep-existing >/dev/null
+		fi
+	fi
 fi
-
+	
 exit 0
