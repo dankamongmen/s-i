@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: -39224 -->
-<!-- Traducido por Javier Fernandez-Sanguino -->
+<!-- original version: 39224 -->
+<!-- Traducido por Javier Fernandez-Sanguino, julio 2006 -->
 
    <sect3 id="partman-crypto">
    <title>Configurar volumenes cifrados</title>
@@ -95,88 +95,87 @@ sensible en el siglo XXI.
 <varlistentry>
 <term>Longitud de clave: <userinput>256</userinput></term>
 
-<!-- TODO: Continue translating here -->
-
 <listitem><para>
 
-Here you can specify the length of the encryption key. With a larger
-key size, the strength of the encryption is generally improved. On the
-other hand, increasing the length of the key usually has a negative
-impact on performance. Available key sizes vary depending on the
-cipher.
+En este punto puede especificar la longitud de la clave de cifrado.
+El cifrado es mejor cuanto mayor sea la longitud de cifrado. Pero, por otro
+lado, un incremento en el tamaño de la clave de cifrado tiene un impacto
+negativo en el rendimiento. En función del cifrado utilizado dispondrá
+de distintos tamaños de longitud de clave.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>IV algorithm: <userinput>cbc-essiv:sha256</userinput></term>
+<term>Algoritmo de VI: <userinput>cbc-essiv:sha256</userinput></term>
 
 <listitem><para>
 
-The <firstterm>Initialization Vector</firstterm> or
-<firstterm>IV</firstterm> algorithm is used in cryptography to ensure
-that applying the cipher on the same <firstterm>clear text</firstterm>
-data with the same key always produces a unique
-<firstterm>cipher text</firstterm>. The idea is to prevent the
-attacker from deducing information from repeated patterns in the encrypted
-data.
+El algorimo del <firstterm>Vector de Inicialización</firstterm> o
+<firstterm>VI</firstterm> (IV en inglés) se utiliza en criptografía
+para asegurar que la aplicación del cifrado en los mismos datos de
+<firstterm>texto en claro</firstterm> con la misma clave generan
+siempre un <firstterm>texto cifrado</firstterm> único. El objetivo es impedir
+que un atacante pueda deducir información en base a patrones repetidos en los
+datos cifrados.
 
 </para><para>
 
-From the provided alternatives, the default
-<userinput>cbc-essiv:sha256</userinput> is currently the least
-vulnerable to known attacks. Use the other alternatives only when you
-need to ensure compatibility with some previously installed system
-that is not able to use newer algorithms.
+De las alternativas disponibles el valor por omisión
+<userinput>cbc-essiv:sha256</userinput> es actualmente el menos vulnerable a
+ataques conocidos. Utilice las otras alternativas sólo si tiene que asegurar
+compatibilidad con algunos sistemas instalados previamente que no sean capaces
+de utilizar los nuevos algoritmos.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Encryption key: <userinput>Passphrase</userinput></term>
+<term>Clave de cifrado: <userinput>Frase de contraseña</userinput></term>
 
 <listitem><para>
 
-Here you can choose the type of the encryption key for this partition.
+Aquí puede introducir el tipo de clave de cifrado para esta partición.
 
  <variablelist>
  <varlistentry>
- <term>Passphrase</term>
+ <term>Frase de contraseña</term>
  <listitem><para>
 
-The encryption key will be computed<footnote>
+La clave de cifrado se computará<footnote>
 <para>
 
-Using a passphrase as the key currently means that the partition will
-be set up using <ulink url="&url-luks;">LUKS</ulink>.
+La utilización de una contraseña como clave significa que la partición
+se configurará utilizando <ulink url="&url-luks;">LUKS</ulink>.
 
-</para></footnote> on the basis of a passphrase which you will be able
-to enter later in the process.
+</para></footnote> basándose en la contraseña que podrá introducir
+en el proceso más adelante.
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Random key</term>
+ <term>Clave aleatoria</term>
  <listitem><para>
 
-A new encryption key will be generated from random data each time you
-try to bring up the encrypted partition.  In other words: on every
-shutdown the content of the partition will be lost as the key is
-deleted from memory. (Of course, you could try to guess the key with a
-brute force attack, but unless there is an unknown weakness in the
-cipher algorithm, it is not achievable in our lifetime.)
+Se generará una nueva clave de cifrado con valores aleatorios cada vez que se
+arranque la partición cifrada. En otras palabras: cada vez que se reinice el
+sistema el contenido de la partición se perderá al borrarse la clave de la
+memoria. Por supuesto, podría intentar adivinar la contraseña a través de un
+ataque de fuerza bruta pero, a no ser que haya una debilidad desconocida en el
+algoritmo de cifrado, no es algo realizable en un tiempo razonable.
 
  </para><para>
 
-Random keys are useful for swap partitions because you do not need to
-bother yourself with remembering the passphrase or wiping sensitive
-information from the swap partition before shutting down your
-computer. However, it also means that you
-will <emphasis>not</emphasis> be able to use
-the <quote>suspend-to-disk</quote> functionality offered by newer
-Linux kernels as it will be impossible (during a subsequent boot) to
-recover the suspended data written to the swap partition.
+Las claves aleatorias son útiles para las particiones de intercambio
+porque no es deseable acordarse de una frase de contraseña ni 
+es recomendable borrar la información sensible de dicha partición antes de 
+apagar su sistema. Sin embargo esto también significa que 
+<emphasis>no</emphasis> podrá utilizar la funcionalidad
+<quote>suspend-to-disk</quote> (suspensión a disco, N. del T.)
+ofrecida por los nuevos núcleos ya que será imposible (en el rearranque
+posterior del sistema) recuperar los datos de la suspensión del sistema
+guardados en la partición de intercambio.
 
  </para></listitem>
  </varlistentry>
@@ -186,20 +185,21 @@ recover the suspended data written to the swap partition.
 </varlistentry>
 
 <varlistentry>
-<term>Erase data: <userinput>yes</userinput></term>
+<term>Borrar los datos: <userinput>sí</userinput></term>
 
 <listitem><para>
 
-Determines whether the content of this partition should be overwritten
-with random data before setting up the encryption. This is recommended
-because it might otherwise be possible for an attacker to discern
-which parts of the partition are in use and which are not. In
-addition, this will make it harder to recover any leftover data from
-previous installations<footnote><para>
+Indica si debería borrarse el contenido de la partición con datos
+aleatorios antes de configurar el cifrado. Se recomienda hacer esto
+porque en caso contrario un posible atacante podría determinar qué partes de
+la partición se están utilizando y cuáles no. Además, esto hará más 
+difícil la recuperación de datos que permanecieran en la partición 
+asociados a instalaciones previas<footnote><para>
 
-It is believed that the guys from three-letter agencies can restore
-the data even after several rewrites of the magnetooptical media,
-though.
+Se cree, sin embargo, que las personas que trabajan en agencias gubernamentales
+de «tres letras» (FBI, NSA, CIA, N. del T.) pueden recuperar los
+datos aunque se hayan realizado varias escrituras en medios 
+magneto-ópticos.
 
 </para></footnote>.
 
@@ -210,50 +210,51 @@ though.
 
 </para><para>
 
-If you select <menuchoice> <guimenu>Encryption method:</guimenu>
-<guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice>, the menu
-changes to provide the following options:
+El menú cambiará si selecciona <menuchoice> <guimenu>Método de cifrado:</guimenu>
+<guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice> y se
+presentarán las siguientes opciones:
 
 
 <variablelist>
 <varlistentry>
-<term>Encryption: <userinput>AES256</userinput></term>
+<term>Cifrado: <userinput>AES256</userinput></term>
 
 <listitem><para>
 
-For loop-AES, unlike dm-crypt, the options for cipher and key size are
-combined, so you can select both at the same time.  Please see the
-above sections on ciphers and key sizes for further information.
+En el caso de loop-AES, y a diferencia de dm-crypt, están combinadas
+las opciones de cifrado y tamaño de clave de forma que puede
+seleccionar ambas al mismo tiempo. Consulte la información previa
+sobre cifrados y longitudes de clave para más información.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Encryption key: <userinput>Keyfile (GnuPG)</userinput></term>
+<term>Clave de cifrado: <userinput>Fichero de clave (GnuPG)</userinput></term>
 
 <listitem><para>
 
-Here you can select the type of the encryption key for this partition.
+Aquí puede seleccionar el tipo de clave de cifrado para esta partición.
 
  <variablelist>
  <varlistentry>
- <term>Keyfile (GnuPG)</term>
+ <term>Fichero de clave (GnuPG)</term>
  <listitem><para>
 
-The encryption key will be generated from random data during the
-installation. Moreover this key will be encrypted
-with <application>GnuPG</application>, so to use it, you will need to
-enter the proper passphrase (you will be asked to provide one later in
-the process).
+La clave de cifrado se generará en base a datos aleatorios durante
+la instalación. Sin embargo, esta clave se cifrará con 
+<application>GnuPG</application> por lo que, para poder utilizarla,
+se le preguntará una contraseña (que se le solicitará durante el proceso).
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Random key</term>
+ <term>Clave aleatoria</term>
  <listitem><para>
 
-Please see the the section on random keys above.
+Consulte la sección precedente si desea más información de las claves
+aleatorias.
 
  </para></listitem>
  </varlistentry>
@@ -263,11 +264,12 @@ Please see the the section on random keys above.
 </varlistentry>
 
 <varlistentry>
-<term>Erase data: <userinput>yes</userinput></term>
+<term>Borrar datos: <userinput>sí</userinput></term>
 
 <listitem><para>
 
-Please see the the section on erasing data above.
+Consulte la sección precedente si desea más información del borrado
+de datos.
 
 </para></listitem>
 </varlistentry>
@@ -276,93 +278,94 @@ Please see the the section on erasing data above.
 
 </para><note><para>
 
-Please note that the <emphasis>graphical</emphasis> version of the
-installer still has some limitations when compared to the textual
-one. For cryptography it means you can set up only volumes using
-<emphasis>passphrases</emphasis> as the encryption keys.
+Tenga en cuenta que la versión <emphasis>gráfica</emphasis> del
+instalador aún tiene algunas limitaciones frente a la versión en
+modo texto. En el caso del cifrado esto hace que sólo pueda configurar
+volúmenes con <emphasis>contraseña</emphasis> como clave de cifrado.
 
 </para></note><para>
 
-
-After you have selected the desired parameters for your encrypted
-partitions, return back to the main partitioning menu. There should
-now be a new menu item called <guimenu>Configure encrypted
-volumes</guimenu>.  After you select it, you will be asked to confirm
-the deletion of data on partitions marked to be erased and possibly
-other actions such as writing a new partition table.  For large
-partitions this might take some time.
+Una vez ha seleccionado los parámetros para su partición cifrada debe volver al
+menú de particionado principal. Aquí debería encontrar un nuevo elemento del
+menú llamado <guimenu>Configurar los volúmenes cifrados<guimenu>. Una vez lo
+seleccione se le pedirá confirmación para borrar los datos de las particiones
+marcadas para ser borradas así como otras opciones como, por ejemplo, la
+escritura de la tabla de particiones en disco.  Estas tareas tardarán un tiempo
+si está trabajando con particiones grandes.
 
 </para><para>
 
-Next you will be asked to enter a passphrase for partitions configured
-to use one.  Good passphrases should be longer than 8 characters,
-should be a mixture of letters, numbers and other characters and
-should not contain common dictionary words or information easily
-associable with you (such as birthdates, hobbies, pet names, names of
-family members or relatives, etc.).
+A continuación se le pedirá que introduzca una frase de contraseña
+para las particiones que haya configurado para que la utilicen.
+Una buena frase de contraseña tendrá más de ocho caracteres, será una
+mezcla de letras, números y otros caracteres que no se pueden encontrar en
+palabras comúnes del diccionario y que no estén relacionadas con información
+que pueda asociarse a vd. con facilidad (como son fecha de nacimiento,
+aficiones, nombre de mascotas, nombres de miembros de la familia, etc.).
 
 </para><warning><para>
 
-Before you input any passphrases, you should have made sure that your
-keyboard is configured correctly and generates the expected
-characters. If you are unsure, you can switch to the second virtual
-console and type some text at the prompt. This ensures that you won't be
-surprised later, e.g. by trying to input a passphrase using a qwerty 
-keyboard layout when you used an azerty layout during the installation.
-This situation can have several causes. Maybe you switched to another
-keyboard layout during the installation, or the selected keyboard layout
-might not have been set up yet when entering the passphrase for the
-root file system.
+Antes de introducir cualquier frase de contraseña debería asegurarse de que su
+teclado está configurado adecuadamente y genera los caracteres que vd. supone.
+Si no está seguro debería cambiar a la segunda consola virtual y escribir algún
+texto en el indicador. Esto asegura que no vaya a sorprenderse más adelante,
+por ejemplo, si introduce su frase de contraseña en un teclado configurado como
+QWERTY cuando en realidad ha utilizado una configuración de teclado AZERTY 
+durante la instalación. Esta situación puede provocarse por varias situaciones:
+quizás cambio de configuración de teclado durante la instalación, o la
+configuración de teclado que ha elegido no está disponible cuando vaya a
+introducir la frase de contraseña para el sistema de ficheros raíz.
 
 </para></warning><para>
 
-If you selected to use methods other than a passphrase to create
-encryption keys, they will be generated now. Because the kernel may
-not have gathered a sufficient amount of entropy at this early stage
-of the installation, the process may take a long time. You can help
-speed up the process by generating entropy: e.g. by pressing random
-keys, or by switching to the shell on the second virtual console and
-generating some network and disk traffic (downloading some files,
-feeding big files into <filename>/dev/null</filename>, etc.).
+Si ha seleccionado para generar las claves de cifrado métodos distintos de la
+frase de contraseña se generarán ahora. El proceso puede tomar mucho tiempo
+dado que el núcleo puede no haber dsido capaz de obtener suficiente información
+de entropía en este punto de la instalación. Puede ayudar a acelerar este
+proceso si genera entropía, por ejemplo: si pulsa teclas al azar o si cambia a
+la segunda consola virtual y genera tráfico de red o de disco (como pueda ser
+una descarga de algunos ficheros o enviar ficheros muy grandes a 
+<filename>/dev/null</filename>, etc.).
 
 <!-- TODO: Mention hardware random generators when we will support
      them -->
 
-This will be repeated for each partition to be encrypted.
+Este paso se repetirá para cada partición a cifrar.
 
 </para><para>
 
-After returning to the main partitioning menu, you will see all
-encrypted volumes as additional partitions which can be configured in
-the same way as ordinary partitions. The following example shows two
-different volumes. The first one is encrypted via dm-crypt, the second
-one via loop-AES.
+Verá todos los volúmenes cifrados como particiones adicionales que
+puede configurar igual que las particiones normales una vez vuelva
+al menú de particionado principal. El siguiente ejemplo muestra
+dos volúmenes distintos. El primero está cifrado con dm-crypt y
+el segundo con loop-AES.
 
 <informalexample><screen>
-Encrypted volume (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-mapper
+Volumen cifrado (<replaceable>crypt0</replaceable>) - 115.1 GB Linux device-mapper
      #1 115.1 GB  F ext3
 
 Loopback (<replaceable>loop0</replaceable>) - 515.2 MB AES256 keyfile
      #1 515.2 MB  F ext3
 </screen></informalexample>
 
-Now is the time to assign mount points to the volumes and optionally
-change the file system types if the defaults do not suit you.
+Ahora es cuando puede asignar los puntos de montaje a los volúmenes
+y cambiar, opcionalmente, los tipos de sistema de ficheros si los valores
+por omisión no se ajustan a sus necesidades.
 
 </para><para>
 
-One thing to note here are the identifiers in parentheses
-(<replaceable>crypt0</replaceable>
-and <replaceable>loop0</replaceable> in this case) and the mount
-points you assigned to each encrypted volume. You will need this
-information later when booting the new system. The differences between
-ordinary boot process and boot process with encryption involved will
-be covered later in <xref linkend="mount-encrypted-volumes"/>.
+Cabe destacar aquí la asociación entre  los identificadores entre paréntesis
+(<replaceable>crypt0</replaceable> y <replaceable>loop0</replaceable> en este
+caso) y los puntos de montaje asignados a cada volumen cifrado. Necesitará
+conocer esta información más adelante cuando vaya a arrancar el sistema. Podrá
+encontrar más información sobre las diferencias entre el proceso de arranque
+normal y el proceso de arranque con volúmenes cifrados en 
+<xref linkend="mount-encrypted-volumes"/>.
 
 </para><para>
 
-Once you are satisfied with the partitioning scheme, continue with the
-installation.
+Continúe con la instalación cuando esté satisfecho con el esquema
+de particionado.
 
 </para>
    </sect3>
