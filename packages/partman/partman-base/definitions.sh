@@ -45,7 +45,7 @@ debconf_select () {
 			debconf_select_lead="> "
 		fi
 		option=$(echo "${x#*$TAB}" | sed 's/ *$//g' | sed "s/^ /$debconf_select_lead/g")
-		newchoices="${newchoices}${NL}${key}${TAB}${option}"
+		newchoices="${newchoices:+${newchoices}${NL}}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
 		    default="$option"
 		fi
@@ -59,6 +59,7 @@ debconf_select () {
                 u="$u, `echo ${x#*$TAB} | sed 's/,/\\\\,/g' | sed 's/^ /\\\\ /'`"
         done
         u=${u#, }
+	restore_ifs
 	if [ -n "$default" ]; then
 	        db_set $template "$default"
 	fi
@@ -74,6 +75,7 @@ debconf_select () {
 			break
 		fi
 	done
+	restore_ifs
 	return $code
 }
 
