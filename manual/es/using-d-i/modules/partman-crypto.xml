@@ -1,96 +1,101 @@
-<!-- retain these comments for translator revision tracking -->
-<!-- $Id: partman-crypto.xml 39224 2006-07-20 12:26:10Z fjp $ -->
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- original version: -39224 -->
+<!-- Traducido por Javier Fernandez-Sanguino -->
 
    <sect3 id="partman-crypto">
-   <title>Configuring Encrypted Volumes</title>
+   <title>Configurar volumenes cifrados</title>
 <para>
 
-&d-i; allows you to set up encrypted partitions. Every file you write
-to such a partition is immediately saved to the device in encrypted
-form. Access to the encrypted data is granted only after entering
-the <firstterm>passphrase</firstterm> used when the encrypted
-partition was originally created. This feature is useful to protect
-sensitive data in case your laptop or hard drive gets stolen. The
-thief might get physical access to the hard drive, but without knowing
-the right passphrase, the data on the hard drive will look like random
-characters.
+&d-i; permite la configuración de particiones cifradas. Cualquier fichero que
+se guarde en una partición de estas características se guardará al dispositivo
+cifrado. El acceso a los datos sólo se puede conseguir una vez haya introducido
+la <firstterm>clave</firstterm> utilizada para crear originalmente la partición
+cifrada. Esta función es útil para proteger datos sensibles en caso
+de que alguien robe su portátil o disco duro. El ladrón podrá lograr acceder al
+disco duro pero los datos en el disco parecerán ser caracteres aleatorios y no
+podrá acceder a los mismos  si no sabe la clave correcta.
 
 </para><para>
 
-The two most important partitions to encrypt are: the home partition,
-where your private data resides, and the swap partition, where
-sensitive data might be stored temporarily during operation. Of
-course, nothing prevents you from encrypting any other partitions that might
-be of interest. For example <filename>/var</filename> where database
-servers, mail servers or print servers store their data, or
-<filename>/tmp</filename> which is used by various programs to store
-potentially interesting temporary files. Some people may even want to
-encrypt their whole system.  The only exception is
-the <filename>/boot</filename> partition which must remain
-unencrypted, because currently there is no way to load the kernel from
-an encrypted partition.
+Las particiones más importantes a cifrar son: la partición «home» que
+es donde se guardan sus datos privados y la partición de intercambio («swap»)
+ya que pueden guardarse datos sensibles en ésta durante la operación del
+sistema. Por supuesto, nada impide que vd. cifre otras particiones que podrían
+ser de interés. Por ejemplo <filename>/var</filename>, que es donde se guardan
+los datos de los sistemas de base de datos, servidores de correo o servidores
+de impresora, o <filename>/tmp</filename>, que lo utilizan algunos programas
+para almacenar algunos datos temporales que pudieran ser de interés. Algunos
+usuarios pueden quere incluso cifrar todo su sistema. La única excepción
+es que la partición <filename>/boot</filename> debe permanecer sin 
+cifrar ya que de momento no hay ninguna forma de cargar un núcleo de una
+partición cifrada.
 
 </para><note><para>
 
-Please note that the performance of encrypted partitions will be
-less than that of unencrypted ones because the data needs to be
-decrypted or encrypted for every read or write. The performance impact
-depends on your CPU speed, chosen cipher and a key length.
+Tenga en cuenta que el rendimiento de las particiones cifradas será
+peor que el de las particiones sin cifrar porque se tienen que 
+descifrar o cifrar los datos en cada acceso de lectura o escritura.
+El impacto en el rendimiento dependen de la velocidad de su CPU,
+y del cifrado y longitud de clave escogidos.
 
 </para></note><para>
 
-To use encryption, you have to create a new partition by selecting
-some free space in the main partitioning menu. Another option is to
-choose an existing partition (e.g. a regular partition, an LVM logical
-volume or a RAID volume). In the <guimenu>Partition setting</guimenu>
-menu, you need to select <guimenuitem>physical volume for
-encryption</guimenuitem> at the <menuchoice> <guimenu>Use
-as:</guimenu> </menuchoice> option. The menu will then change to
-include several cryptographic options for the partition.
+Debe crear una nueva partición en el menú de particionado seleccionando 
+espacio libre si quiere utilizar el cifrado. Otra opción es utilizar
+una partición existente (p.ej. una partición normal, o un volumen lógico
+LVM  o RAID). Tiene que seleccionar <guimenuitem>volumen físico
+para cifrado</guimenuitem> en el menú <guimenu>Configuración de la 
+partición</guimenu> en la opción <menuchoice> <guimenu>Utilizar como:</guimenu> </menuchoice>. El menú cambiará para mostrar distintas opciones
+criptográficas para la partición.
 
 </para><para>
 
-&d-i; supports several encryption methods. The default method
-is <firstterm>dm-crypt</firstterm> (included in newer Linux kernels,
-able to host LVM physical volumes), the other
-is <firstterm>loop-AES</firstterm> (older, maintained separately from
-the Linux kernel tree). Unless you have compelling reasons to do
-otherwise, it is recommended to use the default.
+Puede utilizar distintos métodos de cifrado en &d-i;. El
+método por omisión es <firstterm>dm-crypt</firstterm> (disponible
+en las últimas versiones del núcleo de Linux que pueden incluir
+volúmenes LVM físicos) y la otra es 
+<firstterm>loop-AES</firstterm> (más antigua y mantenida de forma
+separada del árbol del núcleo de Linux). Se le recomienda la primera
+opción a no ser que tenga razones importantes para no utilizarla.
 
 <!-- TODO: link to the "Debian block device encryption guide"
      once Max writes it :-) -->
 
 </para><para>
 
-First, let's have a look at available options available when you
-select <userinput>Device-mapper (dm-crypt)</userinput> as the
-encryption method. As always: when in doubt, use the defaults, because
-they have been carefully chosen with security in mind.
+En primer lugar veamos las opciones disponibles cuando seleccione
+como método de cifrado <userinput>Device-mapper (dm-crypt)</userinput>. Como
+siempre: cuando tenga dudas utilice los valores por omisión, se han escogido
+con mucho cuidado pensando en la seguridad de su sistema.
 
 <variablelist>
 
 <varlistentry>
-<term>Encryption: <userinput>aes</userinput></term>
+<term>Cifrado: <userinput>aes</userinput></term>
 
 <listitem><para>
 
-This option lets you select the encryption algorithm
-(<firstterm>cipher</firstterm>) which will be used to encrypt the data
-on the partition. &d-i; currently supports the following block
-ciphers: <firstterm>aes</firstterm>, <firstterm>blowfish</firstterm>,
-<firstterm>serpent</firstterm>, and <firstterm>twofish</firstterm>.
-It is beyond the scope of this document to discuss the qualities of
-these different algorithms, however, it might help your decision to
-know that in 2000, <emphasis>AES</emphasis> was chosen by the American
-National Institute of Standards and Technology as the standard
-encryption algorithm for protecting sensitive information in the 21st
-century.
+Esta opción le permite seleccionar el algoritmo de cifrado
+(<firstterm>cifra</firstterm>) que se utiliza para cifrar los datos
+en la partición. Actualmente &d-i; ofrece soporte para los siguientes
+cifrados de bloque: <firstterm>aes</firstterm>,
+<firstterm>blowfish</firstterm>,
+<firstterm>serpent</firstterm>, y <firstterm>twofish</firstterm>.
+La discusión de la calidad de los distintos algoritmos de cifrado
+queda fuera del alcance de este documento. Sin embargo, puede ayudarle
+a tomar una decisión el hecho de que en el año 2000 el 
+Instituto Nacional de Estándares y Tecnología Norteamericano («American
+National Institute of Standards and Technology», NIST) escogió AES
+como el algoritmo de cifrado estándar para proteger información
+sensible en el siglo XXI.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Key size: <userinput>256</userinput></term>
+<term>Longitud de clave: <userinput>256</userinput></term>
+
+<!-- TODO: Continue translating here -->
 
 <listitem><para>
 
