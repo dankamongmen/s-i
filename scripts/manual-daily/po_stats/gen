@@ -25,10 +25,11 @@
 #
 
        SCRIPTNAME="Installation Guide"
-       WD="/home/rfjp/d-i/bin/po_stats"
+       ROOT="/srv/d-i_daily"
+       WD="$ROOT/bin/po_stats"
        TEMP_DIR="$WD/temp"
        TARGET_DIR="$WD/out"
-       PO_DIR="/home/rfjp/d-i/manual/po"
+       PO_DIR="$ROOT/manual/po"
        ALIOTH_RSYNC="alioth:/var/lib/gforge/chroot/home/users/fjp/d-i_web/manual/po_stats/"
 
 # We want the manual files group writable
@@ -41,6 +42,7 @@ if [ -f manual.lock ]; then
 fi
 touch manual.lock
 
+mkdir -p out
 
 if [ `hostname` = "gluck" ]; then
 	GETTEXT="/home/barbier/extra/bin"
@@ -180,7 +182,7 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
 	OK=""
 
   	echo -e "Missing files:\n$MISSING\n" >>  $TARGET_DIR/$lang.txt
-	P=`echo "$TT * 100 / $TOTALU"|bc`
+	P=`echo "$TT * 100 / $TOTALU" | bc`
   	STR=`echo "$TT + $TU + $TF" | bc`
   	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
   	if [ "$STR" -gt "$TOTALU" ]; then
@@ -192,9 +194,12 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
   	print_shit
 
 	LEAD="000";
-  	P="${LEAD:0:${#LEAD}-${#P}}$P"
- 	echo -en "$P%\t $lang" >> $TEMP_DIR/rank.txt
-  	echo >> $TEMP_DIR/rank.txt
+	if [ ${#LEAD} -gt ${#P} ]; then
+	  	P="${LEAD:0:${#LEAD}-${#P}}$P"
+	else
+		P="$P"
+	fi
+ 	echo -e "$P%\t $lang" >> $TEMP_DIR/rank.txt
 
   	echo "$lang done. ($P%)"
 	echo
