@@ -6,7 +6,7 @@ set -e
 LANG=C
 export LANG
 
-DIVERTS='/usr/bin/scrollkeeper-update /usr/bin/scrollkeeper-rebuilddb'
+DIVERTS='/usr/bin/scrollkeeper-update /usr/bin/scrollkeeper-rebuilddb /usr/bin/fc-cache'
 
 log() {
 	logger -t pkgsel "$@"
@@ -99,6 +99,10 @@ db_progress STEP 2
 
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
 	log-output -t pkgsel chroot /target scrollkeeper-update -q || true
+fi
+if [ -x /target/usr/bin/fc-cache ]; then
+	chroot /target fc-cache -f -v >/target/var/log/fontconfig.log 2>&1 \
+		|| true
 fi
 
 db_progress STEP 3
