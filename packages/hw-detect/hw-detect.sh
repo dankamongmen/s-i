@@ -747,24 +747,21 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 	fi
 fi
 
-# Ask for discover to be installed into /target/, to make sure the
-# required drivers are loaded. We need to do this even if d-i isn't using
-# discover, since X's maintainer scripts use discover to find out what
-# video hardware is in use.
-case "$DISCOVER_VERSION" in
-	2)
-		apt-install discover || true
-		;;
-	1|'')
-		apt-install discover1 || true
-		;;
-esac
-
-# Install udev/hotplug as well, as appropriate.
+# Install appropriate hardware detection tool into target.
 if type udevd >/dev/null 2>&1; then
 	apt-install udev || true
-elif [ -f /proc/sys/kernel/hotplug ]; then 
-	apt-install hotplug || true
+else
+	case "$DISCOVER_VERSION" in
+		2)
+			apt-install discover || true
+			;;
+		1|'')
+			apt-install discover1 || true
+			;;
+	esac
+	if [ -f /proc/sys/kernel/hotplug ]; then
+		apt-install hotplug || true
+	fi
 fi
 
 # TODO: should this really be conditional on hotplug support?
@@ -778,7 +775,7 @@ if [ -d /proc/acpi ]; then
 	apt-install acpid || true
 fi
 
-# If hardware has support tp pmu, install pbbuttonsd
+# If hardware has support for pmu, install pbbuttonsd
 if [ -d /sys/class/misc/pmu/ ]; then
 	apt-install pbbuttonsd || true
 fi
