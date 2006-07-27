@@ -65,7 +65,7 @@ for dir in $(find "/proc/device-tree/" -type d); do
 						register-module dmasound_pmac
 						;;
 					2.6*)
-						# Loading dmasound_pmac locks up G5 systems
+						# Loading snd-powermac locks up G5 systems
 						if  [ "$name" != i2s-a ]; then
 							register-module snd-powermac
 						fi
