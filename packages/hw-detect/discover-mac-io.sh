@@ -62,7 +62,10 @@ for dir in $(find "/proc/device-tree/" -type d); do
 				if [ "$childname" = sound ]; then
 					case "$(uname -r)" in
 					2.4*)
-						register-module dmasound_pmac
+						# Loading dmasound_pmac locks up G5 systems
+						if  [ "$name" != i2s-a ]; then
+							register-module dmasound_pmac
+						fi
 						;;
 					2.6*)
 						# probably best to go for ALSA
