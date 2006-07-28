@@ -21,6 +21,12 @@ static struct map map_hardware[] = {
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
     { "Linksys NSLU2", "nslu2" },
+    { "Intel EP80219", "iop32x" },
+    { "Intel IQ31244", "iop32x" },
+    { "Intel IQ80321", "iop32x" },
+    { "Thecus N2100", "iop32x" },
+    { "Thecus N4100", "iop32x" },
+    { "GLAN Tank", "iop32x" },
     { NULL, NULL }
 };
 
