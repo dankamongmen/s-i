@@ -29,6 +29,15 @@ static struct map map_hardware[] = {
     { "GLAN Tank", "iop32x" },
     { "Intel IQ80331", "iop33x" },
     { "Intel IQ80332", "iop33x" },
+    { "ADI Engineering Coyote", "ixp4xx" },
+    { "Freecom Storage Gateway", "ixp4xx" },
+    { "Intel IXDPG425", "ixp4xx" },
+    { "Intel IXDP425 Development Platform", "ixp4xx" },
+    { "Intel IXDP465 Development Platform", "ixp4xx" },
+    { "Intel IXCDP1100 Development Platform", "ixp4xx" },
+    { "Gateworks Avila Network Platform", "ixp4xx" },
+    { "Gemtek GTWX5715 (Linksys WRV54G)", "ixp4xx" },
+    { "Iomega NAS 100d", "ixp4xx" },
     { NULL, NULL }
 };
 
