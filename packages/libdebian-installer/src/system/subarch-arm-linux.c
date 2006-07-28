@@ -27,6 +27,8 @@ static struct map map_hardware[] = {
     { "Thecus N2100", "iop32x" },
     { "Thecus N4100", "iop32x" },
     { "GLAN Tank", "iop32x" },
+    { "Intel IQ80331", "iop33x" },
+    { "Intel IQ80332", "iop33x" },
     { NULL, NULL }
 };
 
