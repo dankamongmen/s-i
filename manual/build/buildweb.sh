@@ -12,7 +12,8 @@ if [ -z "$languages" ]; then
 fi
 
 if [ -z "$architectures" ]; then
-    architectures="alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
+    # Based on list of architectures used in official builds
+    architectures="$(cd ../debian; ./getfromlist archlist)"
 fi
 
 if [ -z "$destination" ]; then

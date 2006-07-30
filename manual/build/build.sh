@@ -6,11 +6,13 @@ set -e
 . ./po_functions
 
 if [ -z "$languages" ]; then
-    # Buildlist of languages suitable for Etch
-    languages="en cs de es fr ja pt pt_BR ru zh_CN zh_TW"
+    # Buildlist of languages
+    # Note: this list is no longer being maintained; see debian/langlist instead
+    languages="en de es fr ja"
 fi
 
 if [ -z "$architectures" ]; then
+    # Note: this list is no longer being maintained; see debian/archlist instead
     architectures="alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
 fi
 
