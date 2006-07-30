@@ -158,7 +158,7 @@ create_text () {
             CHARSET=EUC-KR ;;
         ru)
             CHARSET=KOI8-R ;;
-        cs|el|ro|zh_CN|zh_TW)
+        cs|el|hu|ro|zh_CN|zh_TW)
             CHARSET=UTF-8 ;;
         *)
             CHARSET=ISO-8859-1 ;;
