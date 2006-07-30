@@ -6,7 +6,7 @@
 
 <para>
 
-This section explains how to install &debian; on a computer without
+This section explains how to install &debian; on a computer without an
 Ethernet card, but with just a remote gateway computer attached via
 a Null-Modem cable (also called Null-Printer cable). The gateway
 computer should be connected to a network that has a Debian mirror
@@ -100,6 +100,15 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 Boot the installation media. The installation needs to be run in
 expert mode; enter <userinput>expert</userinput> at the boot prompt.
+If you need to set paramenters for kernel modules, you also need to
+do this at the boot prompt. For example, to boot the installer and
+set values for the <quote>io</quote> and <quote>irq</quote> options
+for the parport_pc module, enter the following at the boot prompt:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
 Below are the answers that should be given during various stages of
 the installation.
 
@@ -134,25 +143,9 @@ show this list.
  </para></listitem>
  <listitem><para>
 
-Prompt for module parameters: Yes
-
- </para></listitem>
- <listitem><para>
-
 Because no network card was detected/selected earlier, the installer will
 ask you to select a network driver module from a list.
 Select the <userinput>plip</userinput> module.
-
- </para></listitem>
- <listitem><para>
-
-Additional parameters for module parport_pc:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-Additional parameters for module plip: leave empty
 
  </para></listitem>
  </itemizedlist>
