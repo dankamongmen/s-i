@@ -77,6 +77,12 @@ case "`archdetect`" in
 				fi
 			fi
 			parse_unix_tree $path/mnt
+			if grep -q udhcpc $path/mnt/cfg/cfg_nic0; then
+				NET_CONFIG=dhcp
+			else
+				NET_CONFIG=static
+				parse_ifconfig $path/mnt/cfg/cfg_nic0
+			fi
 			NET_CONFIG=static
 			parse_ifconfig $path/mnt/cfg/cfg_nic0
 			# Use DHCP if the original IP from the firmware has never been changed.
@@ -87,6 +93,13 @@ case "`archdetect`" in
 				unset NET_CONFIG
 				IPADDRESS=192.168.1.100
 				unset NETMASK GATEWAY
+			fi
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.1.100
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.1.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
+				dhcp_fallback $FILE
 			fi
 			HOSTNAME=$(cut -d . -f 1 $path/mnt/etc/HOSTNAME)
 			DOMAIN=$(cut -d . -f 2- $path/mnt/etc/HOSTNAME)
