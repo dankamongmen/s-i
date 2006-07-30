@@ -53,8 +53,8 @@ case "`archdetect`" in
 		fi
 	;;
 	arm/iop3xx | armeb/iop3xx)
-		# FIXME: test for Thecus
-		if [ 1 ]; then
+		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\t:\s*//')
+		if echo "$machine" | grep -q "^Thecus"; then
 			check_file /proc/mtd
 			config=$(get_mtdblock "user")
 			if [ -z "$config" ]; then
