@@ -18,42 +18,42 @@ else
 	ARCH=`udpkg --print-architecture`
 	case $ARCH in
 		arm)
-			level1=36 # not sure but more than 32
+			level1=64 # not sure but more than 32
 			level2=24
 			min=18
 		;;
 		armeb)
-			level1=36 # not sure but more than 32
+			level1=64 # not sure but more than 32
 			level2=24
 			min=18
 		;;
-		i386)
-			level1=45
-			level2=41
-			min=18
+		i386|amd64)
+			level1=64 # needs 68 in VMware for auto-LVM
+			level2=42
+			min=28    # Success with 32 in VMware
 		;;
 		mips)
-			level1=36
+			level1=64
 			level2=33
 			min=21
 		;;
 		mipsel)
-			level1=35
+			level1=64
 			level2=24
 			min=19
 		;;
 		m68k)
-			level1=25
-			level2=0 #FIXME
+			level1=64
+			level2=32
 			min=0 #FIXME
 		;;
 		s390)
-			level1=28
+			level1=44 # needs MAINSIZE=48 in Hercules
 			level2=28
 			min=20
 		;;
 		*)
-			level1=45
+			level1=64
 			level2=32
 			min=0 #FIXME
 		;;
