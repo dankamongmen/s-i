@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 29687 -->
+<!-- original version: 39463 -->
 
  <sect1 id="plip" arch="i386">
  <title>Installer &debian; grâce au protocole PLIP (IP sur port parallèle)</title>
@@ -38,18 +38,18 @@ Avant de commencer, vous devez vérifier la configuration du BIOS pour les ports 
 <itemizedlist>
 <listitem><para>
 
-Une machine cible, appelée <emphasis>target</emphasis>, où Debian sera installé ;
+Une machine cible, appelée <emphasis>target</emphasis>, où Debian sera installé&nbsp;;
 
 </para></listitem>
 <listitem><para>
 
-un support d'installation, voyez <xref linkend="installation-media"/> ;
+un support d'installation, voyez <xref linkend="installation-media"/>&nbsp;;
 
 </para></listitem>
 <listitem><para>
 
 une autre machine connectée à internet, appelée <emphasis>source</emphasis>,
-qui fonctionnera comme passerelle ;
+qui fonctionnera comme passerelle&nbsp;;
 
 </para></listitem>
 <listitem><para>
@@ -97,7 +97,16 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 Amorcez le support d'installation. L'installation doit se faire en mode expert. Pour cela,
 saisissez <userinput>expert</userinput> à l'invite d'amorçage.
-Voici les réponses que vous devrez donner à différents moments de l'installation.
+Si vous avez besoin de donner des paramètres pour le noyau, vous devez le faire aussi
+à ce moment. Par exemple, si vous voulez démarrer l'installateur avec des valeurs
+pour les options <quote>io</quote> et <quote>irq</quote> du module parport_pc,
+saisissez&nbsp;:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
+Voici maintenant les réponses que vous devrez donner à différents moments de l'installation.
 
 </para>
 
@@ -122,31 +131,15 @@ ainsi disponible pour le système d'installation.
  <listitem><para>
 
 Si la machine cible possède une carte réseau, une liste des modules pour la carte détectée sera
-affichée. Si vous voulez que l'installateur utilise plip, vous devez dé-sélectionner tous les
+affichée. Si vous voulez que l'installateur utilise plip, vous devez désélectionner tous les
 modules affichés. Il est évident que si la machine ne possède pas de carte réseau, cette liste 
 ne sera pas affichée.
 
  </para></listitem>
  <listitem><para>
 
-Invite pour les paramètres des modules : Yes
-
- </para></listitem>
- <listitem><para>
-
 Puisqu'aucune carte réseau n'a été détectée ou sélectionnée, l'installateur vous demande de
 choisir un pilote réseau dans une liste. Choisissez le module <userinput>plip</userinput>.
-
- </para></listitem>
- <listitem><para>
-
-Paramètres supplémentaires pour le module parport_pc :
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-Paramètres supplémentaires pour le module plip : ne rien mettre
 
  </para></listitem>
  </itemizedlist>
@@ -164,18 +157,18 @@ Configuration automatique du réseau avec DHCP : No
  </para></listitem>
  <listitem><para>
 
-Adresse IP : <userinput><replaceable>192.168.0.1</replaceable></userinput>
+Adresse IP&nbsp;: <userinput><replaceable>192.168.0.1</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Adresse Point-to-Point :
+Adresse Point-to-Point&nbsp;:
 <userinput><replaceable>192.168.0.2</replaceable></userinput>
 
  </para></listitem>
  <listitem><para>
 
-Adresses des serveurs de noms : vous pouvez mettre les adresses utilisées par le système
+Adresses des serveurs de noms&nbsp;: vous pouvez mettre les adresses utilisées par le système
 source, voyez <filename>/etc/resolv.conf</filename>.
 
  </para></listitem>
