@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33773 -->
+<!-- original version: 39465 -->
 
 
  <sect1 id="directory-tree">
@@ -86,6 +86,9 @@ Debian システムでは必ず以下のようなディレクトリが含まれます。
   <entry><filename>var</filename></entry>
   <entry>Variable data</entry>
 </row><row>
+  <entry><filename>srv</filename></entry>
+  <entry>Data for services provided by the system</entry>
+</row><row>
   <entry><filename>opt</filename></entry>
   <entry>Add-on application software packages</entry>
 </row>
@@ -136,6 +139,9 @@ Debian システムでは必ず以下のようなディレクトリが含まれます。
   <entry><filename>var</filename></entry>
   <entry>可変データ</entry>
 </row><row>
+  <entry><filename>srv</filename></entry>
+  <entry>システムによって割り当てられた、サービスのためのデータ</entry>
+</row><row>
   <entry><filename>opt</filename></entry>
   <entry>アドオンアプリケーションソフトウェアパッケージ</entry>
 </row>
@@ -166,7 +172,7 @@ The root partition <filename>/</filename> must always physically
 contain <filename>/etc</filename>, <filename>/bin</filename>,
 <filename>/sbin</filename>, <filename>/lib</filename> and
 <filename>/dev</filename>, otherwise you won't be able to boot.
-Typically 150&ndash;250 MB is needed for the root partition.
+Typically 150&ndash;250MB is needed for the root partition.
 -->
 ルートパーティション <filename>/</filename> は、必ず
 <filename>/etc</filename>、<filename>/bin</filename>、
@@ -174,7 +180,7 @@ Typically 150&ndash;250 MB is needed for the root partition.
 <filename>/dev</filename> を物理的に含んでいなければなりません
  (つまりこれらのディレクトリを別のパーティションにしてはいけません)。
 さもないと起動ができなくなります。
-一般的にここは 150&ndash;250 MB 程度を必要とします。
+一般的にここは 150&ndash;250MB 程度を必要とします。
 
 </para></listitem>
 <listitem><para>
@@ -185,20 +191,20 @@ Typically 150&ndash;250 MB is needed for the root partition.
 (<filename>/usr/lib</filename>), documentation
 (<filename>/usr/share/doc</filename>), etc.
 This is the part of the file system that generally takes up most space.
-You should provide at least 500 MB of disk space. This amount should
+You should provide at least 500MB of disk space. This amount should
 be increased depending on the number and type of packages you plan
 to install. A generous workstation or server installation should allow
-4-6 GB.
+4&ndash;6GB.
 -->
 <filename>/usr</filename>: すべてのユーザプログラムを含む
 (<filename>/usr/bin</filename>)、ライブラリ
 (<filename>/usr/lib</filename>)、文書
 (<filename>/usr/share/doc</filename>) など。
 ここは一般に、ファイルシステムの中でも最も容量を必要とするところです。
-少なくとも 500 MB のディスク容量を割り当てるべきでしょう。インストール
+少なくとも 500MB のディスク容量を割り当てるべきでしょう。インストール
 しようとするパッケージの数やタイプによっては、もっと多くのディスク容量を
 割り当てなければなりません。ディスク容量がたっぷりあるワークステーション
-やサーバのインストールでは 4〜6GB を割り当てるべきです。
+やサーバのインストールでは 4&ndash;6GB を割り当てるべきです。
 
 </para></listitem>
 <listitem><para>
@@ -210,7 +216,7 @@ under this directory. The size of this directory depends greatly on
 the usage of your system, but for most people will be dictated by
 the package management tool's overhead.  If you are going to do a full
 installation of just about everything Debian has to offer, all in one
-session, setting aside 2 or 3 gigabyte of space for
+session, setting aside 2 or 3 GB of space for
 <filename>/var</filename> should be sufficient. If you are going to
 install in pieces (that is to say, install services and utilities,
 followed by text stuff, then X, ...), you can get away with 300&ndash;500
@@ -223,19 +229,19 @@ major system updates, you can get by with as little as 30 or 40 MB.
 システムの利用方法に大きく左右されますが、たいていの場合はパッケージ管理
 ツールの使う分が最も大きな影響を持つことになるでしょう。Debian が提供する
 ものすべてをいっぺんにフルインストールする場合でも、
-<filename>/var</filename> には 2〜3 GB ほどの容量を割り当てておけば足りる
+<filename>/var</filename> には 2〜3GB ほどの容量を割り当てておけば足りる
 はずです。一度にすべてをインストールせず、部分部分を徐々に (例えば、まず
 サービスやユーティリティを、次にコンソール用のもの、次に X 用のもの…と
-いうように) インストールするなら、300〜500 MB の空き容量があれば良いでしょう。
+いうように) インストールするなら、300〜500MB の空き容量があれば良いでしょう。
 ハードディスクの空き容量が貴重で、メジャーアップデートをする予定がないならば、
-30〜40 MB ほどでもなんとかやっていけるでしょう。
+30〜40MB ほどでもなんとかやっていけるでしょう。
 
 </para></listitem>
 <listitem><para>
 
 <!--
 <filename>/tmp</filename>: temporary data created by programs will
-most likely go in this directory. 40&ndash;100 MB should usually
+most likely go in this directory. 40&ndash;100MB should usually
 be enough. Some applications &mdash; including archive manipulators,
 CD/DVD authoring tools, and multimedia software &mdash; may use
 <filename>/tmp</filename> to temporarily store image files. If you
@@ -243,7 +249,7 @@ plan to use such applications, you should adjust the space available
 in <filename>/tmp</filename> accordingly.
 -->
 <filename>/tmp</filename>: プログラムが作成する一時データは、普通この
-ディレクトリを利用します。通常は 40〜100MB あれば充分です。いくつかの
+ディレクトリを利用します。通常は 40&ndash;100MB あれば充分です。いくつかの
 アプリケーション (アーカイブマニピュレータ、CD/DVD オーサリングツール、
 およびマルチメディアソフトウェアを含む) が、一時イメージファイルを
 保存するのに <filename>/tmp</filename> を使用するかもしれません。
@@ -258,14 +264,14 @@ in <filename>/tmp</filename> accordingly.
 into a subdirectory of this directory. Its size depends on how many
 users will be using the system and what files are to be stored in
 their directories.  Depending on your planned usage you should reserve
-about 100 MB for each user, but adapt this value to your needs. Reserve
+about 100MB for each user, but adapt this value to your needs. Reserve
 a lot more space if you plan to save a lot of multimedia files (pictures, MP3, movies)
 in your home directory.
 -->
 <filename>/home</filename>: 各ユーザは、個人的なデータをこのディレクトリの
 サブディレクトリに収めます。その容量は、このシステムを利用するユーザの数や、
 ユーザディレクトリにどのようなファイルが収められるかによって異なってきます。
-システムの使い方にもよりますが、ユーザごとに約 100 MB ほどが必要でしょう。
+システムの使い方にもよりますが、ユーザごとに約 100MB ほどが必要でしょう。
 しかしこの値は必要に応じて調整しなければなりません。
 もし、たくさんのマルチメディアファイル (写真、MP3、動画) をホームディレクトリに
 保存するつもりなら、もっと多くの容量を確保しておいてください。
