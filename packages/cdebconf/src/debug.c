@@ -22,7 +22,9 @@ void debug_printf(int level, char *fmt, ...)
 			 * simultaneously.
 			 */
 			if (strcmp(loglevel_env, ".") == 0)
-				loglevel = 20;
+				loglevel = INFO_VERBOSE;
+			else if (strcmp(loglevel_env, "developer") == 0)
+				loglevel = INFO_DEBUG;
 			else
 				loglevel = atoi(loglevel_env);
 		} else
