@@ -488,15 +488,19 @@ md_mainmenu() {
 
 # Try to load the necesarry modules.
 # Supported schemes: RAID 0, RAID 1, RAID 5
-depmod -a 1>/dev/null 2>&1
-modprobe md 1>/dev/null 2>&1 || modprobe md-mod 1>/dev/null 2>&1
+depmod -a >/dev/null 2>&1
+modprobe md >/dev/null 2>&1 || modprobe md-mod >/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
-modprobe raid1 1>/dev/null 2>&1
+modprobe raid1 >/dev/null 2>&1
 modprobe raid5 >/dev/null 2>&1
-mkdir -p /dev/md
 
 # Try to detect MD devices, and start them
-mdrun
+# mdadm will fail if /dev/md does not already exist
+mkdir -p /dev/md
+log-output -t mdcfg --pass-stdout \
+	mdadm --examine --scan --config=partitions > /tmp/mdadm.conf
+log-output -t mdcfg \
+	mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
 
 # Make sure that we have md-support
 if [ ! -e /proc/mdstat ]; then
