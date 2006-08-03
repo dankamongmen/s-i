@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33725 -->
+<!-- original version: 39531 -->
 
 <sect3 id="partman-lvm">
    <title>Configuration du <quote>Logical Volume Manager</quote> (LVM)</title>
@@ -30,26 +30,73 @@ la partition <filename>/home</filename> et voilà, vos utilisateurs ont
 de nouveau de la place sur la partition de 460&nbsp;Go&nbsp;!
 Cet exemple est bien sûr un peu simplifié. Si vous ne l'avez pas encore lu,
 vous devriez consulter le <ulink url="&url-lvm-howto;">HOWTO LVM</ulink>.
+
 </para>
 <para>
+
 La configuration de LVM dans l'installateur debian est très simple. D'abord,
 vous devez marquer les partitions à utiliser comme volumes physiques par
 LVM. Cela se fait avec <command>partman</command> dans le menu 
-<guimenu>Partition settings</guimenu>, où vous choisissez
-<menuchoice><guimenu>Use as:</guimenu> 
+<guimenu>Configuration des partitions</guimenu>, où vous choisissez
+<menuchoice><guimenu>Utiliser comme :</guimenu> 
 <guimenuitem>volume physique pour LVM</guimenuitem></menuchoice>.
-Puis, vous lancez le module <command>lvmcfg</command> (soit directement dans
-<command>partman</command>, soit dans le menu principal de l'installateur) et
-vous combinez les volumes physiques dans un groupe de volumes dans le menu
-<guimenuitem>Modifier les groupes de volumes</guimenuitem>. Enfin vous
-devez créer les volumes logiques au dessus des groupes de volumes dans le
-menu <guimenuitem>Modifier les volumes logiques</guimenuitem>.
-</para>
 
+</para>
 <para>
 
-Quand vous aurez quitté <command>lvmcfg</command>, vous verrez dans 
-<command>partman</command> tous les volumes logiques créés comme si c'étaient
+Quand vous revenez à l'écran principal de <command>partman</command>, vous voyez
+une nouvelle option 
+<guimenuitem>Configurer LVM, le gestionnaire des volumes logiques</guimenuitem>.
+Quand vous la sélectionnez, on vous demande d'abord de confirmer les modifications en
+attente pour la table des partitions (s'il y en a) et le menu de configuration de LVM sera
+affiché. Le menu n'affiche que les actions valables selon le contexte.
+Les actions possibles sont&nbsp;:
+
+<itemizedlist>
+  <listitem><para>
+    <guimenuitem>Afficher la configuration précise</guimenuitem> :
+    montre la structure des volumes LVM, le nom et la taille des volumes, etc.
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Créer un groupe de volumes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Créer un volume logique</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Supprimer un groupe de volumes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Supprimer un volume logique</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Etendre un volume logique</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Réduire un volume logique</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Terminer</guimenuitem>:
+    retourne à l'écran principal de <command>partman</command>.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+<para>
+Utiliser les options de ce menu pour créer d'abord un groupe de volumes et pour
+créer ensuite les volumes logiques.
+</para>
+
+<note><para>
+
+Vous pouvez aussi utiliser ce menu pour supprimer une configuration LVM existante
+sur le disque dur avant de de choisir <quote>Partitionnement assisté avec LVM</quote>.
+Il n'est pas possible en effet d'utiliser le partitionnement assisté avec LVM quand
+existent des groupes de volumes. Il faut d'abord les supprimer.
+</para></note>
+<para>  
+Quand vous revenez à l'écran principal de <command>partman</command>,
+tous les volumes logiques créés sont affichés comme si c'étaient
 de simples partitions, et vous devez les traiter ainsi.
 </para>
 </sect3>
