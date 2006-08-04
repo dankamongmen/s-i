@@ -199,6 +199,61 @@ slightly between dm-crypt and loop-AES.
 
 </para>
 
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para>
+
+For partitions encrypted via dm-crypt you will be shown the following
+prompt during the boot:
+
+<informalexample><screen>
+Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Enter LUKS passphrase:
+</screen></informalexample>
+
+In the first line of the prompt, <replaceable>X</replaceable> is the
+number of the loop device. You are now probably wondering
+<emphasis>for which volume</emphasis> you are actually entering the
+passphrase. Does is relate to your <filename>/home</filename>? Or to
+<filename>/var</filename>? Of course, if you have just one encrypted
+volume, this is easy and you can just enter the passphrase you used
+when setting up this volume. If you set up more than one encrypted
+volume during the installation, the notes you wrote down as the last
+step in <xref linkend="partman-crypto"/> come in handy. If you did not
+make a note of the mapping between
+<filename>crypt<replaceable>X</replaceable></filename> and the mount
+points before, you can still find it
+in <filename>/etc/crypttab</filename>
+and <filename>/etc/fstab</filename> of your new system.
+
+</para><para>
+
+Small exception is the mounting of the root file system, which has
+slightly different prompt clearly indicating that you are going to
+mount <filesystem>/</filesystem>.
+
+<informalexample><screen>
+Begin: Mounting <emphasis>root file system</emphasis>... ...
+Begin: Running /scripts/local-top ...
+Enter LUKS passphrase:
+</screen></informalexample>
+
+</para><para>
+
+No characters (even asterisks) will be shown while entering the
+passphrase. If you enter wrong passphrase, you have two more
+tries. After the third try the boot process will skip this volume and
+continue to mount the next filesystem. Please see
+<xref linkend="crypto-troubleshooting"/> for further information.
+
+</para><para>
+
+After entering all passphrases the boot should continue as usual.
+
+</para>
+  </sect2>
+
   <sect2 id="mount-loop-aes">
   <title>loop-AES</title>
 
@@ -208,46 +263,22 @@ For partitions encrypted via loop-AES you will be shown the following
 prompt during the boot:
 
 <informalexample><screen>
-mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Checking loop-encrypted file systems.
+Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
 Password:
 </screen></informalexample>
-
-In the first line of the prompt, <replaceable>X</replaceable> is the
-number of the loop device. You are now probably wondering
-<emphasis>for which volume</emphasis> you are actually entering the
-passphrase. Does it relate to your <filename>/home</filename>? Or to
-<filename>/var</filename>? Of course, if you have just one encrypted
-volume, this is easy and you can just enter the passphrase you used
-when setting up this volume. If you set up more than one encrypted
-volume during the installation, the notes you wrote down as the last
-step in <xref linkend="partman-crypto"/> come in handy. If you did not
-make a note of the mapping between
-<filename>loop<replaceable>X</replaceable></filename> and the mount
-points before, you can still find it
-in <filename>/etc/fstab</filename> of your new system.
 
 </para><para>
 
 No characters (even asterisks) will be shown while entering the
-passphrase. Be careful, you have only <emphasis>one try</emphasis>. If
-you enter wrong passphrase, an error message will appear and the boot
-process will skip that volume and continue to mount the next
-filesystem. Please see <xref linkend="crypto-troubleshooting"/> for
-further information.
+passphrase. If you enter wrong passphrase, you have two more
+tries. After the third try the boot process will skip this volume and
+continue to mount the next filesystem. Please see
+<xref linkend="crypto-troubleshooting"/> for further information.
 
 </para><para>
 
 After entering all passphrases the boot should continue as usual.
-
-</para>
-  </sect2>
-
-  <sect2 id="mount-dm-crypt" condition="FIXME">
-  <title>dm-crypt</title>
-
-<para>
-
-TODO: write something once it works.
 
 </para>
   </sect2>
