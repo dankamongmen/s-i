@@ -87,7 +87,6 @@ EOF
 
 chroot_cleanup () {
 	rm -f /target/usr/sbin/policy-rc.d
-	rm /target/sbin/start-stop-daemon
 	mv /target/sbin/start-stop-daemon.REAL /target/sbin/start-stop-daemon
 
 	# Undo the mounts done by the packages during installation.
