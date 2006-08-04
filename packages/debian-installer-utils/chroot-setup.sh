@@ -6,6 +6,16 @@ mountpoints () {
 }
 
 chroot_setup () {
+	if [ -e /var/run/chroot-setup.lock ]; then
+		cat >&2 <<EOF
+apt-install or in-target is already running, so you cannot run either of
+them again until the other instance finishes. You may be able to use
+'chroot /target ...' instead.
+EOF
+		exit 1
+	fi
+	touch /var/run/chroot-setup.lock
+
 	# Create a policy-rc.d to stop maintainer scripts using invoke-rc.d 
 	# from running init scripts. In case of maintainer scripts that don't
 	# use invoke-rc.d, add a dummy start-stop-daemon.
@@ -91,4 +101,6 @@ chroot_cleanup () {
 		fi
 	done
 	rm -f /tmp/mount.pre
+
+	rm -f /var/run/chroot-setup.lock
 }
