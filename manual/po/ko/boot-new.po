@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-new.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-07-25 21:39+0000\n"
+"POT-Creation-Date: 2006-08-05 12:45+0000\n"
 "PO-Revision-Date: 2006-07-24 23:57+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -353,17 +353,17 @@ msgstr ""
 #. Tag: title
 #: boot-new.xml:203
 #, no-c-format
-msgid "loop-AES"
-msgstr "loop-AES"
+msgid "dm-crypt"
+msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"For partitions encrypted via loop-AES you will be shown the following prompt "
-"during the boot: <informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
+"For partitions encrypted using dm-crypt you will be shown the following "
+"prompt during the boot: <informalexample><screen>\n"
+"Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+"Enter LUKS passphrase:\n"
 "</screen></informalexample> In the first line of the prompt, <replaceable>X</"
 "replaceable> is the number of the loop device. You are now probably "
 "wondering <emphasis>for which volume</emphasis> you are actually entering "
@@ -373,9 +373,9 @@ msgid ""
 "this volume. If you set up more than one encrypted volume during the "
 "installation, the notes you wrote down as the last step in <xref linkend="
 "\"partman-crypto\"/> come in handy. If you did not make a note of the "
-"mapping between <filename>loop<replaceable>X</replaceable></filename> and "
-"the mount points before, you can still find it in <filename>/etc/fstab</"
-"filename> of your new system."
+"mapping between <filename>crypt<replaceable>X</replaceable></filename> and "
+"the mount points before, you can still find it in <filename>/etc/crypttab</"
+"filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
 "loop-AES로 암호화한 파티션의 경우 부팅할 때 다음과 같이 물어봅니다: "
 "<informalexample><screen>\n"
@@ -393,14 +393,33 @@ msgstr ""
 "볼 수도 있습니다."
 
 #. Tag: para
-#: boot-new.xml:226
+#: boot-new.xml:227
 #, no-c-format
 msgid ""
+"The prompt may look somewhat different when an encrypted root file system is "
+"mounted. This depends on which initramfs generator was used to generate the "
+"initrd used to boot the system. The example below is for an initrd generated "
+"using <classname>initramfs-tools</classname>:"
+msgstr ""
+
+#. Tag: screen
+#: boot-new.xml:234
+#, no-c-format
+msgid ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:236 boot-new.xml:261
+#, fuzzy, no-c-format
+msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
-"Be careful, you have only <emphasis>one try</emphasis>. If you enter wrong "
-"passphrase, an error message will appear and the boot process will skip that "
-"volume and continue to mount the next filesystem. Please see <xref linkend="
-"\"crypto-troubleshooting\"/> for further information."
+"If you enter the wrong passphrase, you have two more tries to correct it. "
+"After the third try the boot process will skip this volume and continue to "
+"mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting"
+"\"/> for further information."
 msgstr ""
 "열쇠글을 입력할 때는 아무런 글자도 (별표 조차도) 나타나지 않습니다. 오직 "
 "<emphasis>단 한번</emphasis>만 입력할 수 있으니 주의하십시오. 열쇠글이 틀리"
@@ -409,31 +428,43 @@ msgstr ""
 "부분을 보십시오."
 
 #. Tag: para
-#: boot-new.xml:235
+#: boot-new.xml:244 boot-new.xml:269
 #, no-c-format
 msgid "After entering all passphrases the boot should continue as usual."
 msgstr "모든 열쇠글을 입력하면 부팅은 평소와 같이 계속 진행합니다."
 
 #. Tag: title
-#: boot-new.xml:243
+#: boot-new.xml:252
 #, no-c-format
-msgid "dm-crypt"
-msgstr "dm-crypt"
+msgid "loop-AES"
+msgstr "loop-AES"
 
 #. Tag: para
-#: boot-new.xml:245
+#: boot-new.xml:254
 #, no-c-format
-msgid "TODO: write something once it works."
-msgstr "TODO: write something once it works."
+msgid ""
+"For partitions encrypted using loop-AES you will be shown the following "
+"prompt during the boot:"
+msgstr ""
+
+#. Tag: screen
+#: boot-new.xml:259
+#, no-c-format
+msgid ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</"
+"replaceable>)\n"
+"Password:"
+msgstr ""
 
 #. Tag: title
-#: boot-new.xml:253
+#: boot-new.xml:277
 #, no-c-format
 msgid "Troubleshooting"
 msgstr "문제 해결"
 
 #. Tag: para
-#: boot-new.xml:255
+#: boot-new.xml:279
 #, no-c-format
 msgid ""
 "If some of the encrypted volumes could not be mounted because a wrong "
@@ -444,7 +475,7 @@ msgstr ""
 "운트해야 합니다. 여러가지 경우가 있습니다."
 
 #. Tag: para
-#: boot-new.xml:264
+#: boot-new.xml:288
 #, no-c-format
 msgid ""
 "The first case concerns the root partition. When it is not mounted "
@@ -455,7 +486,7 @@ msgstr ""
 "추게 되고 컴퓨터를 다시 시작해서 열쇠글을 다시 입력해야 합니다."
 
 #. Tag: para
-#: boot-new.xml:271
+#: boot-new.xml:295
 #, no-c-format
 msgid ""
 "The easiest case is for encrypted volumes holding data like <filename>/home</"
@@ -481,7 +512,7 @@ msgstr ""
 "마운트와 다른점은 이 볼륨의 열쇠글을 입력해야 한다는 것 뿐입니다."
 
 #. Tag: para
-#: boot-new.xml:285
+#: boot-new.xml:309
 #, no-c-format
 msgid ""
 "For dm-crypt this is a bit trickier. First you need to register the volumes "
@@ -506,7 +537,7 @@ msgstr ""
 "을 마치면 해당 볼륨을 평소와 다름없이 마운트할 수 있습니다:"
 
 #. Tag: screen
-#: boot-new.xml:300
+#: boot-new.xml:324
 #, no-c-format
 msgid ""
 "<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
@@ -516,10 +547,10 @@ msgstr ""
 "userinput>"
 
 #. Tag: para
-#: boot-new.xml:303
-#, no-c-format
+#: boot-new.xml:327
+#, fuzzy, no-c-format
 msgid ""
-"If the volumes holding noncritical system files could not be mounted "
+"If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
 "still boot and you should be able to mount the volumes manually like in the "
 "previous case. However, you will also need to (re)start any services usually "
@@ -543,13 +574,13 @@ msgstr ""
 "다."
 
 #. Tag: title
-#: boot-new.xml:326
+#: boot-new.xml:350
 #, no-c-format
 msgid "Log In"
 msgstr "로그인"
 
 #. Tag: para
-#: boot-new.xml:328
+#: boot-new.xml:352
 #, no-c-format
 msgid ""
 "Once your system boots, you'll be presented with the login prompt. Log in "
@@ -561,7 +592,7 @@ msgstr ""
 "할 준비가 되었습니다."
 
 #. Tag: para
-#: boot-new.xml:334
+#: boot-new.xml:358
 #, no-c-format
 msgid ""
 "If you are a new user, you may want to explore the documentation which is "
@@ -574,7 +605,7 @@ msgstr ""
 "합하는 작업이 진행 중입니다. 이 문서 역시 몇 개의 시작 지점입니다."
 
 #. Tag: para
-#: boot-new.xml:342
+#: boot-new.xml:366
 #, no-c-format
 msgid ""
 "Documentation accompanying programs you have installed is in <filename>/usr/"
@@ -590,7 +621,7 @@ msgstr ""
 "에 위치해 있습니다."
 
 #. Tag: para
-#: boot-new.xml:351
+#: boot-new.xml:375
 #, no-c-format
 msgid ""
 "In addition, there are some special folders within the <filename>/usr/share/"
@@ -606,7 +637,7 @@ msgstr ""
 "html</filename> 안에 브라우징 할 수 있는 색인된 문서를 볼 수 있을 것입니다."
 
 #. Tag: para
-#: boot-new.xml:361
+#: boot-new.xml:385
 #, no-c-format
 msgid ""
 "One easy way to view these documents is to <userinput>cd /usr/share/doc/</"
@@ -618,7 +649,7 @@ msgstr ""
 "렉토리를 의미합니다.)을 입력하세요."
 
 #. Tag: para
-#: boot-new.xml:368
+#: boot-new.xml:392
 #, no-c-format
 msgid ""
 "You can also type <userinput>info <replaceable>command</replaceable></"
@@ -641,7 +672,7 @@ msgstr ""
 "모든 명령들의 목록을 보기 원한다면 특정 문자를 입력하고 탭을 두번 누릅니다."
 
 #. Tag: para
-#: boot-new.xml:383
+#: boot-new.xml:407
 #, no-c-format
 msgid ""
 "For a more complete introduction to Debian and GNU/Linux, see <filename>/usr/"
@@ -649,3 +680,6 @@ msgid ""
 msgstr ""
 "데비안 GNU/리눅스에 대한 완전한 소개를 원한다면 <filename>/usr/share/doc/"
 "debian-guide/html/noframes/index.html</filename>를 보세요."
+
+#~ msgid "TODO: write something once it works."
+#~ msgstr "TODO: write something once it works."

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-new\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-07-25 21:39+0000\n"
+"POT-Creation-Date: 2006-08-05 12:45+0000\n"
 "PO-Revision-Date: 2006-07-15 23:26+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -366,17 +366,17 @@ msgstr ""
 #. Tag: title
 #: boot-new.xml:203
 #, no-c-format
-msgid "loop-AES"
-msgstr "loop-AES"
+msgid "dm-crypt"
+msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"For partitions encrypted via loop-AES you will be shown the following prompt "
-"during the boot: <informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
+"For partitions encrypted using dm-crypt you will be shown the following "
+"prompt during the boot: <informalexample><screen>\n"
+"Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+"Enter LUKS passphrase:\n"
 "</screen></informalexample> In the first line of the prompt, <replaceable>X</"
 "replaceable> is the number of the loop device. You are now probably "
 "wondering <emphasis>for which volume</emphasis> you are actually entering "
@@ -386,9 +386,9 @@ msgid ""
 "this volume. If you set up more than one encrypted volume during the "
 "installation, the notes you wrote down as the last step in <xref linkend="
 "\"partman-crypto\"/> come in handy. If you did not make a note of the "
-"mapping between <filename>loop<replaceable>X</replaceable></filename> and "
-"the mount points before, you can still find it in <filename>/etc/fstab</"
-"filename> of your new system."
+"mapping between <filename>crypt<replaceable>X</replaceable></filename> and "
+"the mount points before, you can still find it in <filename>/etc/crypttab</"
+"filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
 "Đối với phân vùng được mật mã thông qua <filename>loop-AES</filename>, tiến "
 "trình khởi động sẽ hiển thị dấu nhắc này: <informalexample><screen>\n"
@@ -408,14 +408,33 @@ msgstr ""
 "filename> của hệ thống mới."
 
 #. Tag: para
-#: boot-new.xml:226
+#: boot-new.xml:227
 #, no-c-format
 msgid ""
+"The prompt may look somewhat different when an encrypted root file system is "
+"mounted. This depends on which initramfs generator was used to generate the "
+"initrd used to boot the system. The example below is for an initrd generated "
+"using <classname>initramfs-tools</classname>:"
+msgstr ""
+
+#. Tag: screen
+#: boot-new.xml:234
+#, no-c-format
+msgid ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
+msgstr ""
+
+#. Tag: para
+#: boot-new.xml:236 boot-new.xml:261
+#, fuzzy, no-c-format
+msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
-"Be careful, you have only <emphasis>one try</emphasis>. If you enter wrong "
-"passphrase, an error message will appear and the boot process will skip that "
-"volume and continue to mount the next filesystem. Please see <xref linkend="
-"\"crypto-troubleshooting\"/> for further information."
+"If you enter the wrong passphrase, you have two more tries to correct it. "
+"After the third try the boot process will skip this volume and continue to "
+"mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting"
+"\"/> for further information."
 msgstr ""
 "Không có ký tự nào (ngay cả dấu sao) sẽ được hiển thị trong khi nhập cụm từ "
 "mật khẩu. Hãy cẩn thận: bạn có thể nhập cụm từ mật khẩu này <emphasis>chỉ "
@@ -424,7 +443,7 @@ msgstr ""
 "tới. Xem <xref linkend=\"crypto-troubleshooting\"/> để tìm thông tin thêm."
 
 #. Tag: para
-#: boot-new.xml:235
+#: boot-new.xml:244 boot-new.xml:269
 #, no-c-format
 msgid "After entering all passphrases the boot should continue as usual."
 msgstr ""
@@ -433,25 +452,37 @@ msgstr ""
 
 # Name: don't translate / Tên: đừng dịch
 #. Tag: title
-#: boot-new.xml:243
+#: boot-new.xml:252
 #, no-c-format
-msgid "dm-crypt"
-msgstr "dm-crypt"
+msgid "loop-AES"
+msgstr "loop-AES"
 
 #. Tag: para
-#: boot-new.xml:245
+#: boot-new.xml:254
 #, no-c-format
-msgid "TODO: write something once it works."
-msgstr "TODO: (Cần làm: chưa ghi bằng tiếng Anh)"
+msgid ""
+"For partitions encrypted using loop-AES you will be shown the following "
+"prompt during the boot:"
+msgstr ""
+
+#. Tag: screen
+#: boot-new.xml:259
+#, no-c-format
+msgid ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</"
+"replaceable>)\n"
+"Password:"
+msgstr ""
 
 #. Tag: title
-#: boot-new.xml:253
+#: boot-new.xml:277
 #, no-c-format
 msgid "Troubleshooting"
 msgstr "Giải đáp thắc mắc"
 
 #. Tag: para
-#: boot-new.xml:255
+#: boot-new.xml:279
 #, no-c-format
 msgid ""
 "If some of the encrypted volumes could not be mounted because a wrong "
@@ -463,7 +494,7 @@ msgstr ""
 "khi khởi động. Có vài trường hợp có thể."
 
 #. Tag: para
-#: boot-new.xml:264
+#: boot-new.xml:288
 #, no-c-format
 msgid ""
 "The first case concerns the root partition. When it is not mounted "
@@ -475,7 +506,7 @@ msgstr ""
 "máy tính để thử lại."
 
 #. Tag: para
-#: boot-new.xml:271
+#: boot-new.xml:295
 #, no-c-format
 msgid ""
 "The easiest case is for encrypted volumes holding data like <filename>/home</"
@@ -503,7 +534,7 @@ msgstr ""
 "nhắc nhập cụm từ mật khẩu dành cho khối tin này."
 
 #. Tag: para
-#: boot-new.xml:285
+#: boot-new.xml:309
 #, no-c-format
 msgid ""
 "For dm-crypt this is a bit trickier. First you need to register the volumes "
@@ -530,7 +561,7 @@ msgstr ""
 "được, bạn có khả năng đơn giản gắn kết những khối tin bằng cách bình thường."
 
 #. Tag: screen
-#: boot-new.xml:300
+#: boot-new.xml:324
 #, no-c-format
 msgid ""
 "<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></"
@@ -540,10 +571,10 @@ msgstr ""
 "userinput>"
 
 #. Tag: para
-#: boot-new.xml:303
-#, no-c-format
+#: boot-new.xml:327
+#, fuzzy, no-c-format
 msgid ""
-"If the volumes holding noncritical system files could not be mounted "
+"If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
 "still boot and you should be able to mount the volumes manually like in the "
 "previous case. However, you will also need to (re)start any services usually "
@@ -569,13 +600,13 @@ msgstr ""
 "khẩu chủ được yêu cầu."
 
 #. Tag: title
-#: boot-new.xml:326
+#: boot-new.xml:350
 #, no-c-format
 msgid "Log In"
 msgstr "Đăng nhập"
 
 #. Tag: para
-#: boot-new.xml:328
+#: boot-new.xml:352
 #, no-c-format
 msgid ""
 "Once your system boots, you'll be presented with the login prompt. Log in "
@@ -587,7 +618,7 @@ msgstr ""
 "trình cài đặt. Hệ thống của bạn lúc bây giờ sẵn sàng sử dụng."
 
 #. Tag: para
-#: boot-new.xml:334
+#: boot-new.xml:358
 #, no-c-format
 msgid ""
 "If you are a new user, you may want to explore the documentation which is "
@@ -601,7 +632,7 @@ msgstr ""
 "đầu đọc."
 
 #. Tag: para
-#: boot-new.xml:342
+#: boot-new.xml:366
 #, no-c-format
 msgid ""
 "Documentation accompanying programs you have installed is in <filename>/usr/"
@@ -617,7 +648,7 @@ msgstr ""
 "trong <filename>/usr/share/doc/apt/guide.html/index.html</filename>."
 
 #. Tag: para
-#: boot-new.xml:351
+#: boot-new.xml:375
 #, no-c-format
 msgid ""
 "In addition, there are some special folders within the <filename>/usr/share/"
@@ -634,7 +665,7 @@ msgstr ""
 "doc/HTML/index.html</filename>."
 
 #. Tag: para
-#: boot-new.xml:361
+#: boot-new.xml:385
 #, no-c-format
 msgid ""
 "One easy way to view these documents is to <userinput>cd /usr/share/doc/</"
@@ -647,7 +678,7 @@ msgstr ""
 "dấu chấm theo sau (dấu chấm tiêu biểu thư mục hiện có)."
 
 #. Tag: para
-#: boot-new.xml:368
+#: boot-new.xml:392
 #, no-c-format
 msgid ""
 "You can also type <userinput>info <replaceable>command</replaceable></"
@@ -674,7 +705,7 @@ msgstr ""
 "hai dấu cách kiểu Tab."
 
 #. Tag: para
-#: boot-new.xml:383
+#: boot-new.xml:407
 #, no-c-format
 msgid ""
 "For a more complete introduction to Debian and GNU/Linux, see <filename>/usr/"
@@ -682,6 +713,9 @@ msgid ""
 msgstr ""
 "Để tìm giới thiệu hoàn tất hơn về Debian và GNU/LInux, xem <filename>/usr/"
 "share/doc/debian-guide/html/noframes/index.html</filename>."
+
+#~ msgid "TODO: write something once it works."
+#~ msgstr "TODO: (Cần làm: chưa ghi bằng tiếng Anh)"
 
 #~ msgid "Debian Post-Boot (Base) Configuration"
 #~ msgstr "Cấu hình Hậu Khởi động (Cơ bản) Debian"
