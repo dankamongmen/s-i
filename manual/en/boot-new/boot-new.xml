@@ -204,7 +204,7 @@ slightly between dm-crypt and loop-AES.
 
 <para>
 
-For partitions encrypted via dm-crypt you will be shown the following
+For partitions encrypted using dm-crypt you will be shown the following
 prompt during the boot:
 
 <informalexample><screen>
@@ -215,7 +215,7 @@ Enter LUKS passphrase:
 In the first line of the prompt, <replaceable>X</replaceable> is the
 number of the loop device. You are now probably wondering
 <emphasis>for which volume</emphasis> you are actually entering the
-passphrase. Does is relate to your <filename>/home</filename>? Or to
+passphrase. Does it relate to your <filename>/home</filename>? Or to
 <filename>/var</filename>? Of course, if you have just one encrypted
 volume, this is easy and you can just enter the passphrase you used
 when setting up this volume. If you set up more than one encrypted
@@ -229,9 +229,10 @@ and <filename>/etc/fstab</filename> of your new system.
 
 </para><para>
 
-Small exception is the mounting of the root file system, which has
-slightly different prompt clearly indicating that you are going to
-mount <filesystem>/</filesystem>.
+The prompt may look somewhat different when an encrypted root file system is
+mounted. This depends on which initramfs generator was used to generate the
+initrd used to boot the system. The example below is for an initrd generated
+using <classname>initramfs-tools</classname>:
 
 <informalexample><screen>
 Begin: Mounting <emphasis>root file system</emphasis>... ...
@@ -241,11 +242,11 @@ Enter LUKS passphrase:
 
 </para><para>
 
-No characters (even asterisks) will be shown while entering the
-passphrase. If you enter wrong passphrase, you have two more
-tries. After the third try the boot process will skip this volume and
-continue to mount the next filesystem. Please see
-<xref linkend="crypto-troubleshooting"/> for further information.
+No characters (even asterisks) will be shown while entering the passphrase.
+If you enter the wrong passphrase, you have two more tries to correct it.
+After the third try the boot process will skip this volume and continue to
+mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
+for further information.
 
 </para><para>
 
@@ -259,7 +260,7 @@ After entering all passphrases the boot should continue as usual.
 
 <para>
 
-For partitions encrypted via loop-AES you will be shown the following
+For partitions encrypted using loop-AES you will be shown the following
 prompt during the boot:
 
 <informalexample><screen>
@@ -270,11 +271,11 @@ Password:
 
 </para><para>
 
-No characters (even asterisks) will be shown while entering the
-passphrase. If you enter wrong passphrase, you have two more
-tries. After the third try the boot process will skip this volume and
-continue to mount the next filesystem. Please see
-<xref linkend="crypto-troubleshooting"/> for further information.
+No characters (even asterisks) will be shown while entering the passphrase.
+If you enter the wrong passphrase, you have two more tries to correct it.
+After the third try the boot process will skip this volume and continue to
+mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
+for further information.
 
 </para><para>
 
@@ -343,7 +344,7 @@ way:
 </para></listitem>
 <listitem><para>
 
-If the volumes holding noncritical system files could not be mounted
+If any volume holding noncritical system files could not be mounted
 (<filename>/usr</filename> or <filename>/var</filename>), the system
 should still boot and you should be able to mount the volumes manually
 like in the previous case. However, you will also need to (re)start
