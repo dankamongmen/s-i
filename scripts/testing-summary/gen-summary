@@ -72,8 +72,7 @@ sub archname {
 foreach my $dist (@dists) {
 	foreach my $arch (@arches) {
 		my $pkgfile="$mirror/dists/$dist/main/debian-installer/binary-$arch/Packages.gz";
-		system "gunzip -c $pkgfile >Packages" || die "error unzipping $pkgfile: $?";
-		open(PKG, "Packages") || die "cannot open unzipped Packages file: $!";
+		open(PKG, "zcat $pkgfile |") || die "cannot read $pkgfile: $!";
 		local $/="\n\n";
 		while (<PKG>) {
 			my ($package)=m/Package: (.*)\n/;
@@ -121,7 +120,6 @@ foreach my $dist (@dists) {
 	}
 	close PKG;
 }
-unlink "Packages";
 
 # Process exceptions for source packages with debs
 if (open (EXC, "deb-exceptions")) { 
