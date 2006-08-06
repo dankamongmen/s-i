@@ -376,9 +376,9 @@ for dist in testing unstable ; do
 				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
 				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
 				if [ "$ORIG" != "$NEW" ]; then
-					SIGNS="$SIGNS*" #>> $TARGET_DIR/$lang.txt
+					SIGNS="$SIGNS*"
 				fi
-				#rm -f $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 
+				
 	
 				#done
      				$GETTEXT/msgfmt $WD/material/packages.$dist$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
@@ -408,7 +408,7 @@ for dist in testing unstable ; do
          				OK="  $path/$lang.po $T"t" [$LASTT]\n$OK"
 					echo -n
 				else
-      					echo "  $SIGNS$path/$lang.po: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
+      					echo "  $SIGNS$path/$lang.po: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang$ext.txt
       				fi
 			
 			
@@ -481,9 +481,6 @@ if [ $LEVEL = 1 ]; then
 			MASTER_F=`fuzzy $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			MASTER_U=`untranslated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			MASTER_T=`translated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
-#			echo "Master: "$MASTER_T"t"$MASTER_F"f"$MASTER_U"u" | tee -a $TARGET_DIR/$lang.txt
-#		else
-#			echo "No master file" | tee -a $TARGET_DIR/$lang.txt
 		fi
 	done
 	echo ""
