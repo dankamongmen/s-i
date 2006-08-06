@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39380 -->
+<!-- original version: 39583 -->
 
 <chapter id="boot-new">
  <title>Démarrer votre nouveau système Debian</title>
@@ -13,7 +13,7 @@ première fois.
 </para>
 <para>
 
-Si vous démarrez directement sur Debian, et que le système ne démarre pas, 
+Si vous démarrez directement sur Debian, et que le système ne se lance pas, 
 utilisez le support d'installation d'origine, ou insérez la disquette de 
 secours si vous l'avez créée, puis relancez votre système. Vous devrez sans 
 doute ajouter des paramètres de démarrage comme 
@@ -195,6 +195,61 @@ La procédure diffère légèrement pour les méthodes dm-crypt et loop-AES.
 
 </para>
 
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
+
+<para>
+Pour les partitions chiffrées avec dm-crypt, l'invite pendant l'amorçage
+sera&nbsp;:
+
+<informalexample><screen>
+Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Enter LUKS passphrase:
+</screen></informalexample>
+
+Le <replaceable>X</replaceable> sur la première ligne de l'invite
+est le chiffre du périphérique. Vous vous demandez probablement
+<emphasis>pour quel volume</emphasis> vous saisissez la phrase de passe.
+Est-ce pour <filename>/home</filename>, pour <filename>/var</filename>&nbsp;?
+Bien sûr si vous n'avez chiffré qu'un seul volume, c'est facile et vous n'avez
+qu'à saisir la phrase utilisée. Si vous avez chiffré plusieurs volumes, les notes
+que vous avez prises pendant l'installation (étape <xref linkend="partman-crypto"/>)
+vous serviront bien. Si vous n'avez pas noté la correspondance entre
+<filename>crypt<replaceable>X</replaceable></filename> et les points de montage,
+vous pouvez les trouver dans les fichiers <filename>/etc/crypttab</filename> et
+<filename>/etc/fstab</filename> de votre nouveau système.
+</para>
+
+<para>
+
+L'invite peut être légèrement différente quand un système de fichiers racine chiffré
+est monté. Cela dépend du type d'<quote>initramfs</quote> qui a servi à créer
+l'<quote>initrd</quote> utilisé pour amorcer le système. Voici par exemple l'invite
+pour un initrd créé avec <classname>initramfs-tools</classname>&nbsp;:
+
+<informalexample><screen>
+Begin: Mounting <emphasis>root file system</emphasis>... ...
+Begin: Running /scripts/local-top ...
+Enter LUKS passphrase:
+</screen></informalexample>
+
+</para>
+<para>
+
+Quand vous saisissez la phrase, aucun caractère (même pas l'astérisque) n'est montré.
+Si vous saisissez une mauvaise phrase, vous aurez deux possibilités de correction.
+Aprés la troisième tentative, le processus de démarrage
+sautera ce volume et continuera avec les autres volumes. Veuillez consulter
+<xref linkend="crypto-troubleshooting"/> pour d'autres informations. 
+
+</para>
+
+<para>
+Une fois toutes les phrases saisies, le processus de démarrage se poursuit
+normalement.
+</para>
+</sect2>
+
   <sect2 id="mount-loop-aes">
   <title>loop-AES</title>
 
@@ -204,30 +259,20 @@ Pour les partitions chiffrées avec loop-AES, l'invite pendant l'amorçage
 sera&nbsp;:
 
 <informalexample><screen>
-mount: going to use loop device /dev/loop<replaceable>X</replaceable>
+Checking loop-encrypted file systems.
+Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
 Password:
 </screen></informalexample>
 
-Le <replaceable>X</replaceable> sur la première ligne de l'invite
-est le chiffre du périphérique. Vous vous demandez probablement
-<emphasis>pour quel volume</emphasis> vous saisissez la phrase de passe.
-Est-ce pour <filename>/home</filename>, pour <filename>/var</filename>&nbsp;?
-Bien sûr si vous n'avez chiffré qu'un seul volume, c'est facile et vous n'avez
-qu'à saisir la phrase utilisée. Si vous avez chiffré plusieurs volumes, les notes
-que vous avez prises pendant l'installation (étape  <xref linkend="partman-crypto"/>)
-vous serviront bien. Si vous n'avez pas noté la correspondance entre
-<filename>loop<replaceable>X</replaceable></filename> et les points de montage,
-vous pouvez les trouver dans le fichier <filename>/etc/fstab</filename> de votre
-nouveau système.
 </para>
-
 <para>
 
 Quand vous saisissez la phrase, aucun caractère (même pas l'astérisque) n'est montré.
-Faites attention, vous n'avez qu'<emphasis>un seul essai</emphasis>. Si vous
-saisissez une mauvaise phrase, un message d'erreur apparaîtra et le processus de démarrage
+Si vous saisissez une mauvaise phrase, vous aurez deux possibilités de correction.
+Aprés la troisième tentative, le processus de démarrage
 sautera ce volume et continuera avec les autres volumes. Veuillez consulter
-<xref linkend="crypto-troubleshooting"/> pour d'autres informations. 
+<xref linkend="crypto-troubleshooting"/> pour d'autres informations.
+
 </para>
 
 <para>
@@ -235,15 +280,6 @@ Une fois toutes les phrases saisies, le processus de démarrage se poursuit
 normalement.
 </para>
 </sect2>
-
-  <sect2 id="mount-dm-crypt" condition="FIXME">
-  <title>dm-crypt</title>
-
-<para>
-
-TODO: write something once it works.
-</para>
-  </sect2>
 
   <sect2 id="crypto-troubleshooting">
   <title>En cas de problèmes</title>
