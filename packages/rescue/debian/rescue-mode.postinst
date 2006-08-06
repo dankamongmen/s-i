@@ -86,7 +86,7 @@ choose_root () {
 	log-output -t rescue umount /target || true
 	if ! log-output -t rescue mount "$RESCUE_ROOTDEV" /target; then
 		log "mount '$RESCUE_ROOTDEV' /target failed"
-		db_subst rescue/no-such-device DEVICE "$RESCUE_ROOTDEV"
+		db_subst rescue/mount-failed DEVICE "$RESCUE_ROOTDEV"
 		db_input critical rescue/mount-failed
 		# Since continuing returns to the rescue/root question,
 		# backing up returns to the main menu.
