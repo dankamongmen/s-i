@@ -731,7 +731,7 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>
 	log "Detected PCMCIA, installing pcmcia-cs."
 	apt-install pcmcia-cs || true
 	if expr "$(uname -r)" : 2.6 >/dev/null; then
-		log "Detected PCMCIA and no cardmgr, installing pcmciautils."
+		log "Detected PCMCIA, installing pcmciautils."
 		apt-install pcmciautils || true
 	fi
 
