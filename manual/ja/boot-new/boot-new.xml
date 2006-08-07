@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39380 -->
+<!-- original version: 39583 -->
 
 <chapter id="boot-new">
 <!--
@@ -364,21 +364,21 @@ slightly between dm-crypt and loop-AES.
 
 </para>
 
-  <sect2 id="mount-loop-aes">
-  <title>loop-AES</title>
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
 
 <para>
 
 <!--
-For partitions encrypted via loop-AES you will be shown the following
+For partitions encrypted using dm-crypt you will be shown the following
 prompt during the boot:
 -->
-loop-AES で暗号化したパーティションでは、
+dm-crypt で暗号化したパーティションでは、
 起動中に以下のようなプロンプトが表示されます。
 
 <informalexample><screen>
-mount: going to use loop device /dev/loop<replaceable>X</replaceable>
-Password:
+Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Enter LUKS passphrase:
 </screen></informalexample>
 
 <!--
@@ -392,9 +392,10 @@ when setting up this volume. If you set up more than one encrypted
 volume during the installation, the notes you wrote down as the last
 step in <xref linkend="partman-crypto"/> come in handy. If you did not
 make a note of the mapping between
-<filename>loop<replaceable>X</replaceable></filename> and the mount
+<filename>crypt<replaceable>X</replaceable></filename> and the mount
 points before, you can still find it
-in <filename>/etc/fstab</filename> of your new system.
+in <filename>/etc/crypttab</filename>
+and <filename>/etc/fstab</filename> of your new system.
 -->
 プロンプトの最初の行の <replaceable>X</replaceable> は、
 ループデバイスの番号です。
@@ -407,23 +408,43 @@ in <filename>/etc/fstab</filename> of your new system.
 インストール時に、暗号化ボリュームを少なくとも一つは設定しているなら、
 <xref linkend="partman-crypto"/> 
 の最後のステップに書き留めたメモが役に立つでしょう。
-以前の <filename>loop<replaceable>X</replaceable></filename> 
+以前の <filename>crypt<replaceable>X</replaceable></filename> 
 とマウントポイントの間のマッピングを記録しない場合、
-新しいシステムの <filename>/etc/fstab</filename> にあります。
+新しいシステムの <filename>/etc/crypttab</filename> と 
+<filename>/etc/fstab</filename> にあります。
 
 </para><para>
 
 <!--
-No characters (even asterisks) will be shown while entering the
-passphrase. Be careful, you have only <emphasis>one try</emphasis>. If
-you enter wrong passphrase, an error message will appear and the boot
-process will skip that volume and continue to mount the next
-filesystem. Please see <xref linkend="crypto-troubleshooting"/> for
-further information.
+The prompt may look somewhat different when an encrypted root file system is
+mounted. This depends on which initramfs generator was used to generate the
+initrd used to boot the system. The example below is for an initrd generated
+using <classname>initramfs-tools</classname>:
+-->
+暗号化されたルートファイルシステムがマウントされる時は、
+プロンプトは少し違って見えるかもしれません。
+それは、システムの起動に使用される initrd を生成するために、
+どの initramfs ジェネレータが使われたかによります。
+以下の例は、<classname>initramfs-tools</classname> で生成された initrd の場合です。
+
+<informalexample><screen>
+Begin: Mounting <emphasis>root file system</emphasis>... ...
+Begin: Running /scripts/local-top ...
+Enter LUKS passphrase:
+</screen></informalexample>
+
+</para><para>
+
+<!--
+No characters (even asterisks) will be shown while entering the passphrase.
+If you enter the wrong passphrase, you have two more tries to correct it.
+After the third try the boot process will skip this volume and continue to
+mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
+for further information.
 -->
 パスフレーズの入力時には、入力した文字 (やアスタリスク) は表示されません。
-<emphasis>試行は 1 回</emphasis>だけなことに注意してください。
-パスフレーズを間違えると、そのボリュームをスキップして、
+パスフレーズを間違えた場合、訂正するために 2 回までは試行できます。
+入力を 3 回間違えると、そのボリュームをスキップして、
 次のファイルシステムをマウントしようとします。
 詳細は、<xref linkend="crypto-troubleshooting"/> をご覧ください。
 
@@ -437,15 +458,45 @@ After entering all passphrases the boot should continue as usual.
 </para>
   </sect2>
 
-  <sect2 id="mount-dm-crypt" condition="FIXME">
-  <title>dm-crypt</title>
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
 
 <para>
 
 <!--
-TODO: write something once it works.
+For partitions encrypted using loop-AES you will be shown the following
+prompt during the boot:
 -->
-TODO: どのように動作するか書いてください。
+loop-AES で暗号化したパーティションでは、
+起動中に以下のようなプロンプトが表示されます。
+
+<informalexample><screen>
+Checking loop-encrypted file systems.
+Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
+Password:
+</screen></informalexample>
+
+</para><para>
+
+<!--
+No characters (even asterisks) will be shown while entering the passphrase.
+If you enter the wrong passphrase, you have two more tries to correct it.
+After the third try the boot process will skip this volume and continue to
+mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
+for further information.
+-->
+パスフレーズの入力時には、入力した文字 (やアスタリスク) は表示されません。
+パスフレーズを間違えた場合、訂正するために 2 回までは試行できます。
+入力を 3 回間違えると、そのボリュームをスキップして、
+次のファイルシステムをマウントしようとします。
+詳細は、<xref linkend="crypto-troubleshooting"/> をご覧ください。
+
+</para><para>
+
+<!--
+After entering all passphrases the boot should continue as usual.
+-->
+パスフレーズをすべて入力すると、通常と同様に起動を継続します。
 
 </para>
   </sect2>
@@ -548,7 +599,7 @@ way:
 <listitem><para>
 
 <!--
-If the volumes holding noncritical system files could not be mounted
+If any volume holding noncritical system files could not be mounted
 (<filename>/usr</filename> or <filename>/var</filename>), the system
 should still boot and you should be able to mount the volumes manually
 like in the previous case. However, you will also need to (re)start
