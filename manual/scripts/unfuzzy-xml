@@ -7,7 +7,7 @@
 # English text and then only if they know exactly what they are doing!
 
 # The script takes a revision number as argument, looks for English files
-# modified in that commit and finds the previous revision from the log.
+# modified in that commit and finds the previous revision of the file.
 # It then changes the revision comment for any translation that was
 # up-to-date with the previous revision.
 
@@ -25,8 +25,8 @@ MODIFIED="$(find . -name "*.xml" | xargs grep "^<.*\$Id:.*$REV" | cut -d: -f1)"
 cd ..
 
 for XML in $MODIFIED; do
-	PREVREV="$(svn log en/$XML | egrep "^r[0-9]{5} \| .* \| [0-9]* lines?" | \
-		   head -n 2 | tail -n 1 | sed "s/^r\([0-9]*\).*$/\1/")"
+	PREVREV="$(svn cat -r $(($REV - 1)) en/$XML | grep "^<.*\$Id:" | \
+		   sed "s/^.*\.xml \([0-9]*\) .*/\1/")"
 	echo "$XML: $PREVREV -> $REV"
 	if [ "$PREVREV" ] && [ "$PREVREV" -lt "$REV" ]; then
 		sed -i "s/^\(.*original version: \)$PREVREV\(.*\)$/\1$REV\2/" */$XML
