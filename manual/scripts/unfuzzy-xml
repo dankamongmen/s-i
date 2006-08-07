@@ -28,7 +28,7 @@ for XML in $MODIFIED; do
 	PREVREV="$(svn log en/$XML | egrep "^r[0-9]{5} \| .* \| [0-9]* lines?" | \
 		   head -n 2 | tail -n 1 | sed "s/^r\([0-9]*\).*$/\1/")"
 	echo "$XML: $PREVREV -> $REV"
-	if [ "$PREVREV"] && [ "$PREVREV" -lt "$REV" ]; then
+	if [ "$PREVREV" ] && [ "$PREVREV" -lt "$REV" ]; then
 		sed -i "s/^\(.*original version: \)$PREVREV\(.*\)$/\1$REV\2/" */$XML
 	else
 		echo "*** Invalid previous revision: '$PREVREV'"
