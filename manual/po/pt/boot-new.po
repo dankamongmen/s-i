@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: boot-new\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-05 12:45+0000\n"
-"PO-Revision-Date: 2006-01-14 14:44+0000\n"
+"PO-Revision-Date: 2006-08-08 22:10+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese \n"
 "MIME-Version: 1.0\n"
@@ -362,7 +362,7 @@ msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For partitions encrypted using dm-crypt you will be shown the following "
 "prompt during the boot: <informalexample><screen>\n"
@@ -381,11 +381,10 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/crypttab</"
 "filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
-"Para partições encriptadas via loop-AES, durante o arranque, ser-lhe-á "
+"Para partições encriptadas utilizando o dm-crypt, durante o arranque, ser-lhe-á "
 "mostrada a seguinte pergunta: <informalexample><screen>\n"
-"mount: vai utilizar o dispositivo loop /dev/loop<replaceable>X</"
-"replaceable>\n"
-"Password:\n"
+"A iniciar discos encriptados iniciais... crypt</replaceable>X</replaceable>(a iniciar)\n"
+"Introduza a frase-chave do LUKS:\n"
 "</screen></informalexample> Na primeira linha da pergunta, <replaceable>X</"
 "replaceable> é o número do dispositivo loop. Agora deve estar provavelmente "
 "a pensar <emphasis>para qual volume</emphasis> está a introduzir a frase-"
@@ -394,9 +393,9 @@ msgstr ""
 "isto é fácil e pode apenas introduzir a frase-chave que utilizou quando "
 "configurou este volume. Se durante a instalação configurou mais de um volume "
 "encriptado, as notas que escreveu na última etapa em <xref linkend=\"partman-"
-"crypto\"/> vêm a calhar. Se não tomou nota antes do mapeamento entre o "
-"<filename>loop<replaceable>X</replaceable></filename> e o ponto de montagem, "
-"ainda o pode encontrar em <filename>/etc/fstab</filename> do seu sistema."
+"crypto\"/> vêm a calhar. Se antes não tomou nota antes do mapeamento entre o "
+"<filename>crypt<replaceable>X</replaceable></filename> e os pontos de montagem, "
+"ainda o pode encontrar em <filename>/etc/crypttab</filename> e <filename>/etc/fstab</filename> do seu novo sistema."
 
 #. Tag: para
 #: boot-new.xml:227
@@ -407,6 +406,10 @@ msgid ""
 "initrd used to boot the system. The example below is for an initrd generated "
 "using <classname>initramfs-tools</classname>:"
 msgstr ""
+"A pergunta pode parecer diferente quando um sistema de ficheiros raiz "
+"encriptado está montado. Isto depende de que gerador de initramfs foi "
+"utilizado para carregar o sistema. O exemplo abaixo é para um initramfs "
+"gerado utilizando <classname>initramfs-tools</classname>:"
 
 #. Tag: screen
 #: boot-new.xml:234
@@ -416,10 +419,13 @@ msgid ""
 "Begin: Running /scripts/local-top ...\n"
 "Enter LUKS passphrase:"
 msgstr ""
+"Inicio: A montar <emphasis>sistema de ficheiros raiz</emphasis>... ...\n"
+"Inicio: A correr /scrips/local-top ...\n"
+"Introduza a frase-passe do LUKS:"
 
 #. Tag: para
 #: boot-new.xml:236 boot-new.xml:261
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
 "If you enter the wrong passphrase, you have two more tries to correct it. "
@@ -428,11 +434,10 @@ msgid ""
 "\"/> for further information."
 msgstr ""
 "Não serão mostrados nenhuns caracteres (nem asteriscos) enquanto introduz a "
-"frase-chave. Tenha cuidado, tem apenas <emphasis>uma</emphasis> tentativa.Se "
-"introduzir a frase-chave errada, irá aparecer uma mensagem de erro e o "
-"processo de aranque irá saltar esse volume e continuar a montar o próximo "
-"sistema de ficheiros. Para mais informações por favor veja <xref linkend="
-"\"crypto-troubleshooting\"/>."
+"frase-chave. Se introduzir a frase-chave errada, tem mais duas tentativas "
+"para a corrigir. Após a terceira tentativa o processo de arranque irá saltar "
+"esse volume e continuar a montar o próximo sistema de ficheiros. Para mais "
+"informações por favor veja <xref linkend=\"crypto-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-new.xml:244 boot-new.xml:269
@@ -455,6 +460,8 @@ msgid ""
 "For partitions encrypted using loop-AES you will be shown the following "
 "prompt during the boot:"
 msgstr ""
+"Para partições encriptadas utilizando loop-AES ser-lhe-á mostrada a seguinte "
+"pergunta durante o arranque:"
 
 #. Tag: screen
 #: boot-new.xml:259
@@ -465,6 +472,9 @@ msgid ""
 "replaceable>)\n"
 "Password:"
 msgstr ""
+"A verificar sistemas de ficheiros encriptados via loop.\n"
+"A configurar /dev/loop<replaceable>X</replaceable> (/<replaceable>ponto de montagem</replaceable>)\n"
+"Palavra-passe:"
 
 #. Tag: title
 #: boot-new.xml:277
@@ -562,7 +572,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-new.xml:327
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
@@ -576,13 +586,13 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
-"Se os volumes que contêm ficheiros de sistema não-críticos não puderem ser "
-"montados (<filename>/usr</filename> ou <filename>/var</filename>), o sistema "
+"Se algum volume que contenha ficheiros de sistema não-críticos não puder ser "
+"montado (<filename>/usr</filename> ou <filename>/var</filename>), o sistema "
 "deve mesmo assim arrancar e você deve conseguir montar manualmente os "
 "volumes como no caso anterior. No entanto, também necessitará de (re)iniciar "
-"todos os serviços que correm usualmente no runlevel por omissão porque é "
+"todos os serviços que correm normalmente no runlevel por omissão porque é "
 "muito provável que estes não tenham iniciado. A forma mais fácil de "
-"conseguir isto é mudar para o primeiro runlevel e voltar, escrevendo "
+"conseguir isto é mudar para o primeiro runlevel e voltar escrevendo "
 "<informalexample><screen>\n"
 "<prompt>#</prompt> <userinput>init 1</userinput>\n"
 "</screen></informalexample> na prompt da shell e carregando em <keycombo> "
