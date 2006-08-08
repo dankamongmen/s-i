@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33725 -->
+<!-- original version: 39531 -->
 <!-- revisado jfs, 31 octubre 2004 -->
 
    <sect3 id="partman-lvm">
@@ -38,22 +38,75 @@ Si aún no lo ha leído, debería consultar el
 
 </para><para>
 
-La configuración LVM con el &d-i; es bastante sencilla. Primero, tiene que marcar
+La configuración LVM con el &d-i; es bastante sencilla y está totalmente soportada dentro de <command>partman</command>. Primero, tiene que marcar
 las particiones que va a usar con volúmenes físicos para el LVM. Esto se hace
-con <command>partman</command> en el menú <guimenu>Configuración de la
+en el menú <guimenu>Configuración de la
 partición:</guimenu> donde puede seleccionar <menuchoice> <guimenu>Utilizar
 como:</guimenu> <guimenuitem>volumen físico para LVM</guimenuitem>
-</menuchoice>. A continuación, ejecute el módulo <command>lvmcfg</command> (o bien
-directamente con <command>partman</command> o desde el menú principal del &d-i;)
-y combine los volúmenes físicos en un grupo o grupos de volúmenes debajo del menú
-<guimenuitem>Modificar los grupos de volumen (VG)</guimenuitem>.
-Después de esto, debe
-crear volúmenes lógicos encima de los grupos de volúmenes desde el menú
-<guimenuitem>Modificar los volúmenes lógicos (LV)</guimenuitem>.
+</menuchoice>.
+
+ </para><para>
+
+Cuando vuelva a la pantalla principal de <command>partman</command>
+verá una nueva opción: <guimenuitem>Configurar el Gestor de Volúmenes
+Lógicos (LVM)</guimenuitem>. Si lo selecciona se le pedirá que
+confirme las modificaciones que están pendientes en la tabla de
+particiones (si es que hay alguno) y después de ésto se le mostrará el
+menú de configuración de LVM.  Se le muestra la configuración de LVM
+resumida encima del menú. El menú es sensible al contexto y sólo le
+mostrará las acciones que sean válidas en cada momento. Las acciones
+posibles son:
+
+<itemizedlist>
+  <listitem><para>
+    <guimenuitem>Mostrar los detalles de la configuración</guimenuitem>:
+    muestra la estructura del dispositivo LVM, y los nombres y tamaños
+    de los volúmenes lógicos junto con otra información.
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Crear grupo de volúmenes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Crear volúmenes lógicos</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Borrar el grupo de volúmenes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Borrar volúmenes lógicos</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Extender los grupos de volúmenes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Reducir los grupos de volúmenes</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Terminar</guimenuitem>:
+    vuelve a la pantalla principal de <command>partman</command>.
+  </para></listitem>
+</itemizedlist>
 
 </para><para>
 
-Después de volver de <command>lvmcfg</command> a <command>partman</command>,
+Utilice las opciones en este menú para crear el grupo de volúmenes por
+primera vez y después cree dentro de éste sus volúmenes lógicos.
+
+
+</para>
+<note><para>
+
+Tambien puede utilizar este menú para borrar una configuración de LVM
+que ya exista en su disco duro antes de elegir <quote>Particionado
+guiado con LVM</quote>.  No se puede realizar el particionado guiado
+de LVM si ya existen grupos de volúmenes definidos pero puede
+utilizarlo si los elimina primero.
+
+</para></note>
+<para>
+
+
+Después de volver a la pantalla principal de <command>partman</command>,
 verá los volúmenes lógicos como si fuesen particiones ordinarias (y debe
 tratarlas como tales).
 

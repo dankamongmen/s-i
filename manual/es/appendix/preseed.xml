@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39285  -->
+<!-- original version: 39468 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
 <!--
@@ -1049,14 +1049,26 @@ También puede no seleccionar ninguna tarea y forzar la instalación de un
 conjunto de paquetes de alguna otra forma. Le recomendamos que siempre
 introduzca la tarea <userinput>Sistema estándar</userinput>.
 
+</para><para>
+
+Puede utilizar el parámetro <classname>pkgsel/include</classname> para
+instalar paquetes individuales además de los paquetes que instalan las
+tareas. Este parámetro toma valores que pueden estar separados por
+comas o por espacios, de forma que puede utilizar fácilmente en la
+línea de órdenes del núcleo.
+
 </para>
 
-<informalexample role="example"><screen>
+<informalexample role="example">
+<screen> 
 tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server
+#tasksel tasksel/first multiselect standard, web-server 
 #tasksel tasksel/first multiselect standard, kde-desktop
 
-# Algunas verisones del instalador pueden informar de las versiones
+# Paquetes individuales que también deben instalarse
+#d-i pkgsel/include string openssh-server build-essential
+
+# Algunas versiones del instalador pueden informar de las versiones
 # de programas que tiene instalados y los programas que utiliza.
 # Por omisión, no se envía ningún informe, pero estos informes
 # ayudan al proyecto a determinar qué programas son más populares

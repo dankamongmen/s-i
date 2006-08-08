@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 29687 -->
+<!-- original version: 39614 -->
 <!-- revisado por ender, 31 dic 2005 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
@@ -103,8 +103,20 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
   <title>Instalar el objetivo</title>
 <para>
 
-Arranque con el medio de instalación. Tiene que ejecutar la instalación
-en modo experto, utilizando <userinput>expert</userinput> en el indicador de sistema del arranque.
+Arranque con el medio de instalación. Tiene que ejecutar la
+instalación en modo experto, utilizando <userinput>expert</userinput>
+en el indicador de sistema del arranque.
+También debe indicar los parámetros que necesite para los módulos
+del núcleo en el indicador de sistema del arranque. Por ejemplo,
+deberá introducir lo que se muestra a continuación si necesita
+arrancar el instalador y fijar los valores necesarios a las
+opciones <quote>io</quote> e <quote>irq</quote> en el módulo
+parport_pc:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
 Abajo se dan las respuestas que debería dar durante las distintas fases de la
 instalación.
 
@@ -139,28 +151,13 @@ tarjeta de red el instalador no mostrará esta lista.
  </para></listitem>
  <listitem><para>
 
-¿Solicitar los parámetros de los módulos? Sí
+El instalador le preguntará si quiere seleccionar un módulo de
+controlador de red de la lista dado que antes no se ha seleccionado ni
+detectado una tarjeta de red.  Seleccione el módulo
+<userinput>plip</userinput>.
 
  </para></listitem>
- <listitem><para>
 
-El instalador le preguntará si quiere seleccionar un módulo de controlador de red
-de la lista dado que antes no se ha seleccionado ni detectado una tarjeta de red.
-Seleccione el módulo <userinput>plip</userinput>.
-
- </para></listitem>
- <listitem><para>
-
-Por favor, introduzca los parámetros adicionales para el módulo parport_pc:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-Por favor, introduzca los parámetros adicionales para el módulo plip:
-(Déjelos en blanco)
-
- </para></listitem>
  </itemizedlist>
 
 </listitem>
