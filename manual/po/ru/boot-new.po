@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: boot-new\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-05 12:45+0000\n"
-"PO-Revision-Date: 2006-07-12 22:49+0300\n"
+"PO-Revision-Date: 2006-08-08 20:26+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -83,8 +83,7 @@ msgstr ""
 #. Tag: para
 #: boot-new.xml:36
 #, no-c-format
-msgid ""
-"<userinput>b6000</userinput> followed by &enterkey; to boot a BVME 4000/6000"
+msgid "<userinput>b6000</userinput> followed by &enterkey; to boot a BVME 4000/6000"
 msgstr ""
 "<userinput>b6000</userinput> и нажмите &enterkey;, чтобы загрузить BVME "
 "4000/6000"
@@ -93,16 +92,13 @@ msgstr ""
 #: boot-new.xml:41
 #, no-c-format
 msgid "<userinput>b162</userinput> followed by &enterkey; to boot an MVME162"
-msgstr ""
-"<userinput>b162</userinput> и нажмите &enterkey;, чтобы загрузить MVME162"
+msgstr "<userinput>b162</userinput> и нажмите &enterkey;, чтобы загрузить MVME162"
 
 #. Tag: para
 #: boot-new.xml:46
 #, no-c-format
-msgid ""
-"<userinput>b167</userinput> followed by &enterkey; to boot an MVME166/167"
-msgstr ""
-"<userinput>b167</userinput> и нажмите &enterkey;, чтобы загрузить MVME166/167"
+msgid "<userinput>b167</userinput> followed by &enterkey; to boot an MVME166/167"
+msgstr "<userinput>b167</userinput> и нажмите &enterkey;, чтобы загрузить MVME166/167"
 
 #. Tag: title
 #: boot-new.xml:58
@@ -365,7 +361,7 @@ msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For partitions encrypted using dm-crypt you will be shown the following "
 "prompt during the boot: <informalexample><screen>\n"
@@ -384,19 +380,19 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/crypttab</"
 "filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
-"Для разделов, зашифрованных loop-AES, во время загрузки вы увидите следующее "
+"Для разделов, зашифрованных dm-crypt, во время загрузки вы увидите следующее "
 "сообщение: <informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
+"Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+"Enter LUKS passphrase:\n"
 "</screen></informalexample> В первой строке приглашения, вместо "
 "<replaceable>X</replaceable> будет указан номер loop устройства. Вы, "
-"вероятно, задумаетесь <emphasis>для какого тома</emphasis> нужно ввести "
-"ключевую фразу. Это для <filename>/home</filename>? Или для <filename>/var</"
+"вероятно, задумаетесь <emphasis>для какого тома</emphasis> нужно вводить "
+"ключевую фразу. Для <filename>/home</filename>? Или для <filename>/var</"
 "filename>? Естественно, если у вас только один шифрованный том, это легко и "
 "вы можете просто ввести ключевую фразу, которую задали при настройке тома. "
 "Если же у вас несколько шифрованных томов, то пригодятся заметки, которые вы "
 "сделали на последнем этапе <xref linkend=\"partman-crypto\"/>. Если вы ранее "
-"не записали соответствие между <filename>loop<replaceable>X</replaceable></"
+"не записали соответствие между <filename>crypt<replaceable>X</replaceable></"
 "filename> и точкой монтирования, то можете выяснить это в файле <filename>/"
 "etc/fstab</filename>."
 
@@ -409,6 +405,10 @@ msgid ""
 "initrd used to boot the system. The example below is for an initrd generated "
 "using <classname>initramfs-tools</classname>:"
 msgstr ""
+"При монтировании зашифрованного корневого раздела приглашение может выглядеть "
+"несколько иначе. Это зависит от генератора initramfs, который использовался "
+"при создании initrd для загрузки системы. Пример для initrd, созданного "
+"с помощью <classname>initramfs-tools</classname>:"
 
 #. Tag: screen
 #: boot-new.xml:234
@@ -418,10 +418,13 @@ msgid ""
 "Begin: Running /scripts/local-top ...\n"
 "Enter LUKS passphrase:"
 msgstr ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
 
 #. Tag: para
 #: boot-new.xml:236 boot-new.xml:261
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
 "If you enter the wrong passphrase, you have two more tries to correct it. "
@@ -430,10 +433,10 @@ msgid ""
 "\"/> for further information."
 msgstr ""
 "Во время ввода ключевой фразы символы не отображаются (даже звёздочками). "
-"Осторожно, у вас есть только <emphasis>одна попытка</emphasis>. Если вы "
-"введёте неверную ключевую фразу, появиться сообщение об ошибке и процесс "
-"загрузки пропустит этот том и начнётся монтирование следующей файловой "
-"системы. Подробней смотрите в <xref linkend=\"crypto-troubleshooting\"/>."
+"Если вы введёте неверную ключевую фразу, то у вас ещё есть две попытки. "
+"После третьей попытки процесс загрузки пропустит этот том и начнётся монтирование "
+"следующей файловой системы. Подробней смотрите в "
+"<xref linkend=\"crypto-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-new.xml:244 boot-new.xml:269
@@ -454,6 +457,8 @@ msgid ""
 "For partitions encrypted using loop-AES you will be shown the following "
 "prompt during the boot:"
 msgstr ""
+"Для разделов, зашифрованных loop-AES, во время загрузки вы увидите следующее "
+"приглашение:"
 
 #. Tag: screen
 #: boot-new.xml:259
@@ -464,6 +469,10 @@ msgid ""
 "replaceable>)\n"
 "Password:"
 msgstr ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</"
+"replaceable>)\n"
+"Password:"
 
 #. Tag: title
 #: boot-new.xml:277
@@ -561,7 +570,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-new.xml:327
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
@@ -575,7 +584,7 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
-"Если на несмонтированных томах содержатся некритичные системные файлы "
+"Если на любых несмонтированных томах содержатся некритичные системные файлы "
 "(<filename>/usr</filename> или <filename>/var</filename>), система должна "
 "загрузиться и вы сможете смонтировать тома вручную как в предыдущем случае. "
 "Однако, может потребоваться (пере)запуск каждого сервиса, который обычно "
@@ -700,5 +709,3 @@ msgstr ""
 "Более полное введение в Debian и GNU/Linux, смотрите в <filename>/usr/share/"
 "doc/debian-guide/html/noframes/index.html</filename>."
 
-#~ msgid "TODO: write something once it works."
-#~ msgstr "TODO: написать как это работает."
