@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: boot-new.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-05 12:45+0000\n"
-"PO-Revision-Date: 2006-07-24 23:57+0900\n"
+"PO-Revision-Date: 2006-08-08 23:35+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -358,7 +358,7 @@ msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For partitions encrypted using dm-crypt you will be shown the following "
 "prompt during the boot: <informalexample><screen>\n"
@@ -377,20 +377,10 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/crypttab</"
 "filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
-"loop-AES로 암호화한 파티션의 경우 부팅할 때 다음과 같이 물어봅니다: "
-"<informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
-"</screen></informalexample> 첫 번째 줄에서, <replaceable>X</replaceable>는 루"
-"프 장치의 번호입니다. 여기에서 과연 <emphasis>어떤 볼륨의</emphasis> 열쇠글"
-"을 실제로 입력해야 하는 지 궁금할 것입니다. <filename>/home</filename>일까"
-"요? 아니면 <filename>/var</filename>일까요? 물론, 암호화 볼륨이 1개뿐이라면, "
-"이 볼륨을 설정할 때 사용한 열쇠글을 입력하면 됩니다. 설치할 때 암호화 볼륨을 "
-"여러 개 설정했다면, <xref linkend=\"partman-crypto\"/>의 마지막 단계에서 적"
-"어 놓은 메모를 잘 가지고 있어야 합니다. <filename>loop<replaceable>X</"
-"replaceable></filename>에 해당되는 사항과 거기에 해당하는 마운트 위치를 적어 "
-"놓지 않았다면 새로 설치한 시스템의 <filename>/etc/fstab</filename>에서 찾아 "
-"볼 수도 있습니다."
+"dm-crypt로 암호화한 파티션의 경우 부팅할 때 다음과 같이 물어봅니다: <informalexample><screen>\n"
+"Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+"Enter LUKS passphrase:\n"
+"</screen></informalexample> 첫 번째 줄에서, <replaceable>X</replaceable>는 루프 장치의 번호입니다. 여기에서 과연 <emphasis>어떤 볼륨의</emphasis> 열쇠글을 실제로 입력해야 하는 지 궁금할 것입니다. <filename>/home</filename>일까요? 아니면 <filename>/var</filename>일까요? 물론, 암호화 볼륨이 1개뿐이라면, 이 볼륨을 설정할 때 사용한 열쇠글을 입력하면 됩니다. 설치할 때 암호화 볼륨을 여러 개 설정했다면, <xref linkend=\"partman-crypto\"/>의 마지막 단계에서 적어 놓은 메모를 잘 가지고 있어야 합니다. <filename>crypt<replaceable>X</replaceable></filename>에 해당되는 사항과 거기에 해당하는 마운트 위치를 적어 놓지 않았다면 새로 설치한 시스템의 <filename>/etc/crypttab</filename>과 <filename>/etc/fstab</filename>에서 찾아 볼 수도 있습니다."
 
 #. Tag: para
 #: boot-new.xml:227
@@ -400,7 +390,7 @@ msgid ""
 "mounted. This depends on which initramfs generator was used to generate the "
 "initrd used to boot the system. The example below is for an initrd generated "
 "using <classname>initramfs-tools</classname>:"
-msgstr ""
+msgstr "이 프롬프트는 암호화한 루트 파일시스템을 마운트할 때는 약간 다릅니다. 시스템을 부팅할 때 사용하는 initrd를 만들 때 어떤 initramfs 생성 프로그램을 사용했느냐에 달려 있습니다. 아래의 예제는 <classname>initramfs-tools</classname>로 initrd를 만들 경우에 대한 예제입니다:"
 
 #. Tag: screen
 #: boot-new.xml:234
@@ -410,22 +400,20 @@ msgid ""
 "Begin: Running /scripts/local-top ...\n"
 "Enter LUKS passphrase:"
 msgstr ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
 
 #. Tag: para
 #: boot-new.xml:236 boot-new.xml:261
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
 "If you enter the wrong passphrase, you have two more tries to correct it. "
 "After the third try the boot process will skip this volume and continue to "
 "mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting"
 "\"/> for further information."
-msgstr ""
-"열쇠글을 입력할 때는 아무런 글자도 (별표 조차도) 나타나지 않습니다. 오직 "
-"<emphasis>단 한번</emphasis>만 입력할 수 있으니 주의하십시오. 열쇠글이 틀리"
-"면, 오류 메세지가 나오면서 부팅 과정에서 해당 볼륨을 건너뛰고 다음 파일 시스"
-"템으로 넘어갑니다. 자세한 정보는 <xref linkend=\"crypto-troubleshooting\"/> "
-"부분을 보십시오."
+msgstr "열쇠글을 입력할 때는 아무런 글자도 (별표 조차도) 나타나지 않습니다. 열쇠글을 잘못 입력하면, 두 번 더 시도할 수 있습니다. 세 번째 시도에서 틀리면 부팅 과정에서 해당 볼륨을 건너뛰고 다음 파일 시스템으로 넘어갑니다. 자세한 정보는 <xref linkend=\"crypto-troubleshooting\"/> 부분을 보십시오."
 
 #. Tag: para
 #: boot-new.xml:244 boot-new.xml:269
@@ -445,7 +433,7 @@ msgstr "loop-AES"
 msgid ""
 "For partitions encrypted using loop-AES you will be shown the following "
 "prompt during the boot:"
-msgstr ""
+msgstr "loop-AES를 사용해 암호화한 파티션의 경우 부팅할 때 다음 프롬프트가 나옵니다:"
 
 #. Tag: screen
 #: boot-new.xml:259
@@ -456,6 +444,9 @@ msgid ""
 "replaceable>)\n"
 "Password:"
 msgstr ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)\n"
+"Password:"
 
 #. Tag: title
 #: boot-new.xml:277
@@ -548,7 +539,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-new.xml:327
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
@@ -562,16 +553,9 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
-"꼭 필요하지 않은 시스템 파일이 들어 있는 볼륨을 (<filename>/usr</filename> 혹"
-"은 <filename>/var</filename>) 마운트할 수 없는 경우, 그래도 시스템이 부팅하"
-"고 수동으로 볼륨을 마운트할 수 있습니다. 하지만 현재 런레벨의 각종 서비스를 "
-"(다시) 시작해야 할 수도 있습니다. 서비스가 제대로 시작하지 않았을 가능성이 높"
-"기 때문입니다. 가장 쉬운 방법은 쉘에서 다음과 같은 명령어로 첫 번째 런레벨로 "
-"갔다가 다시 돌아오는 것입니다:<informalexample><screen>\n"
+"꼭 필요하지 않은 시스템 파일이 들어 있는 볼륨중에 하나라도 (<filename>/usr</filename> 혹은 <filename>/var</filename>) 마운트할 수 없는 경우, 그래도 시스템이 부팅하고 수동으로 볼륨을 마운트할 수 있습니다. 하지만 현재 런레벨의 각종 서비스를 (다시) 시작해야 할 수도 있습니다. 서비스가 제대로 시작하지 않았을 가능성이 높기 때문입니다. 가장 쉬운 방법은 쉘에서 다음과 같은 명령어로 첫 번째 런레벨로 갔다가 다시 돌아오는 것입니다:<informalexample><screen>\n"
 "<prompt>#</prompt> <userinput>init 1</userinput>\n"
-"</screen></informalexample> 이렇게 입력하고 루트 열쇠글을 물어보면 "
-"<keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>를 누릅니"
-"다."
+"</screen></informalexample> 이렇게 입력하고 루트 열쇠글을 물어보면 <keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>를 누릅니다."
 
 #. Tag: title
 #: boot-new.xml:350
@@ -677,9 +661,4 @@ msgstr ""
 msgid ""
 "For a more complete introduction to Debian and GNU/Linux, see <filename>/usr/"
 "share/doc/debian-guide/html/noframes/index.html</filename>."
-msgstr ""
-"데비안 GNU/리눅스에 대한 완전한 소개를 원한다면 <filename>/usr/share/doc/"
-"debian-guide/html/noframes/index.html</filename>를 보세요."
-
-#~ msgid "TODO: write something once it works."
-#~ msgstr "TODO: write something once it works."
+msgstr "데비안 GNU/리눅스에 대한 완전한 소개는 <filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename> 페이지를 보십시오."
