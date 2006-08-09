@@ -41,6 +41,7 @@
 #define CHARSET_ISO_8859_8
 #define CHARSET_ISO_8859_9
 
+#define CHARSET_THAI
 
 // Sanity checks
 

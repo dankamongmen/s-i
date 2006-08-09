@@ -1150,6 +1150,10 @@ static sym iso_8859_9_syms[] = { /* latin-5 */
 #include "sami.syms.h"
 #endif
 
+#if defined(CHARSET_THAI)
+#include "thai.syms.h"
+#endif
+
 static sym iso_8859_15_syms[] = {
 	/* latin-1 with 8 changes */
 	{ 0x00a0, "" },
@@ -1651,6 +1655,9 @@ struct cs {
     { "cp-1250",	cp1250_syms, 128 },
     { "koi8-r",		koi8_syms, 128 },
     { "koi8-u",		koi8_syms, 128 },
+#ifdef CHARSET_THAI
+    { "tis-620",	tis_620_syms, 160 },
+#endif
 #ifdef CHARSET_ETHIOPIC
     { "iso-10646-18",	iso_10646_18_syms, 159 },	/* ethiopic */
 #endif
