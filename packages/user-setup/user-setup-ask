@@ -13,6 +13,20 @@ export ROOT
 
 . /usr/lib/user-setup/functions.sh
 
+# For the convenience of heavy testers
+set_special_users() {
+	local realname
+	case "$fullname" in
+	    fjp)	realname="Frans Pop" ;;
+	    tbm)	realname="Martin Michlmayr" ;;
+	    *)		return 1 ;;
+	esac
+	db_set passwd/user-fullname "$realname"
+	userdefault=$fullname
+	db_fset passwd/username seen true
+	return 0
+}
+
 # Main loop starts here. Use a state machine to allow jumping back to
 # previous questions.
 STATE=0
@@ -107,13 +121,10 @@ while :; do
 			db_get passwd/username
 			if [ -z "$RET" ]; then
 				db_get passwd/user-fullname
-				case "$RET" in
-					"Frans Pop")	userdefault="fjp";;
-					"Martin Michlmayr")	userdefault="tbm";;
-					*)
-						userdefault=`echo $RET | sed 's/ .*//' | LC_ALL=C tr A-Z a-z`
-					;;
-				esac
+				fullname=$RET
+				if ! set_special_users; then
+					userdefault=$(echo "$fullname" | sed 's/ .*//' | LC_ALL=C tr A-Z a-z)
+				fi
 				if test -n "$userdefault" && \
 					LC_ALL=C expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
 					db_set passwd/username "$userdefault"
