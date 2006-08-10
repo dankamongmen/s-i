@@ -790,6 +790,12 @@ default_disk_label () {
 	    fi;;	    
 	arm)
 	    case "$sub" in
+		iop32x)
+		    echo msdos;;
+		iop33x)
+		    echo msdos;;
+		ixp4xx)
+		    echo msdos;;
 		riscstation)
 		    echo msdos;;
 		netwinder)
