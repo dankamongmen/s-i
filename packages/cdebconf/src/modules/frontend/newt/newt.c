@@ -988,6 +988,8 @@ newt_handler_error(struct frontend *obj, struct question *q)
     if (strcmp(oldrootBg, oldshadowBg) == 0)
     	palette.shadowBg = "red";
     palette.rootBg = "red";
+    palette.helpLineFg = "white";
+    palette.helpLineBg = "red";
     newtSetColors(palette);
     ret = newt_handler_note(obj, q);
     palette.rootBg = oldrootBg;
