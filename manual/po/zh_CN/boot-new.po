@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-05 12:45+0000\n"
-"PO-Revision-Date: 2006-07-13 14:42+0800\n"
+"PO-Revision-Date: 2006-08-10 10:49+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -332,7 +332,7 @@ msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For partitions encrypted using dm-crypt you will be shown the following "
 "prompt during the boot: <informalexample><screen>\n"
@@ -351,18 +351,10 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/crypttab</"
 "filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
-"通过 loop-AES 加密的分区，启动的时候会有下面的提示信息："
-"<informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
-"</screen></informalexample> 提示的第一行，<replaceable>X</replaceable> 是 "
-"loop 设备的号码。您也许想知道输入密码的具体是 <emphasis>哪一卷</emphasis>。 "
-"它是与 <filename>/home</filename> 相关？或者是 <filename>/var</filename>？当"
-"然，如果您只有一个加密卷，只需输入密码就可以轻松地建立起该卷。假如您在安装过"
-"程中建立了多个加密卷，把上一步 <xref linkend=\"partman-crypto\"/> 里写下的记"
-"录放在手边。要是您之前没有记下 <filename>loop<replaceable>X</replaceable></"
-"filename> 和挂载点之间的映射关系，仍然可以在系统的 <filename>/etc/fstab</"
-"filename> 里面找到它。"
+"通过 dm-crypt 加密的分区，启动的时候会有下面的提示信息：<informalexample><screen>\n"
+"Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+"Enter LUKS passphrase:\n"
+"</screen></informalexample> 提示的第一行，<replaceable>X</replaceable> 是 loop 设备的号码。您也许想知道输入密码的具体 <emphasis>是哪一卷</emphasis>。它是与 <filename>/home</filename> 相关？或者是 <filename>/var</filename>？当然，如果您只有一个加密卷，只需输入密码就可以轻松地建立起该卷。假如您在安装过程中建立了多个加密卷，把上一步 <xref linkend=\"partman-crypto\"/> 里的记录放在手边。要是您之前没有记下 <filename>crypt<replaceable>X</replaceable></filename> 和挂载点之间的映射关系，仍然可以在新系统的 <filename>/etc/crypttab</filename> 和 <filename>/etc/fstab</filename> 里面找到它。"
 
 #. Tag: para
 #: boot-new.xml:227
@@ -372,7 +364,7 @@ msgid ""
 "mounted. This depends on which initramfs generator was used to generate the "
 "initrd used to boot the system. The example below is for an initrd generated "
 "using <classname>initramfs-tools</classname>:"
-msgstr ""
+msgstr "根文件系统加载的时候，提示信息或许会有些不同。这取决于使用了哪个 initamfs 生成器制作用于启动的 initrd。下面的例子是使用 <classname>initramfs-tools</classname> 生成的 initrd："
 
 #. Tag: screen
 #: boot-new.xml:234
@@ -382,20 +374,20 @@ msgid ""
 "Begin: Running /scripts/local-top ...\n"
 "Enter LUKS passphrase:"
 msgstr ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
 
 #. Tag: para
 #: boot-new.xml:236 boot-new.xml:261
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
 "If you enter the wrong passphrase, you have two more tries to correct it. "
 "After the third try the boot process will skip this volume and continue to "
 "mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting"
 "\"/> for further information."
-msgstr ""
-"输入密码时不会有字符(包括星号)回显。注意，您只有 <emphasis>一次机会</"
-"emphasis>。如果密码输错，将显示错误信息，但启动过程将跳过该卷进入到下一个文件"
-"系统。请参阅 <xref linkend=\"crypto-troubleshooting\"/> 了解更多信息。"
+msgstr "输入密码时不会有字符(包括星号)回显。如果密码输错，您还有两次机会修正。第三次输错后，启动过程将跳过该卷进入到下一个文件系统。请参阅 <xref linkend=\"crypto-troubleshooting\"/> 了解更多信息。"
 
 #. Tag: para
 #: boot-new.xml:244 boot-new.xml:269
@@ -415,7 +407,7 @@ msgstr "loop-AES"
 msgid ""
 "For partitions encrypted using loop-AES you will be shown the following "
 "prompt during the boot:"
-msgstr ""
+msgstr "使用 loop-AES 加密的分区，启动的时候将会有下面的提示信息："
 
 #. Tag: screen
 #: boot-new.xml:259
@@ -426,6 +418,9 @@ msgid ""
 "replaceable>)\n"
 "Password:"
 msgstr ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)\n"
+"Password:"
 
 #. Tag: title
 #: boot-new.xml:277
@@ -516,7 +511,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-new.xml:327
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
@@ -530,13 +525,9 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
-"如果这些卷保存着非临界系统文件(<filename>/usr</filename> 或 <filename>/var</"
-"filename>)不能加载，系统仍然可以启动，并且您仍然可以按前一种情况手动加载。但"
-"是，您需要(重新)启动默认 runlevel 下的任何服务，这是因为它们很可能没有启动。"
-"最简单的做法是切换到第一个 runlevel 再返回<informalexample><screen>\n"
+"如果保存着非临界系统文件(<filename>/usr</filename> 或 <filename>/var</filename>)的卷不能加载，系统仍然可以启动，并且您仍然可以按前一种情况手动加载。但是，您需要(重新)启动默认 runlevel 下的任何 service，因为它们很可能没有启动。最简单的做法是切换到第一个 runlevel 再返回<informalexample><screen>\n"
 "<prompt>#</prompt> <userinput>init 1</userinput>\n"
-"</screen></informalexample> 在 shell 提示符下输入该命令，在要求输入 root 口令"
-"时按下 <keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>。"
+"</screen></informalexample> 在 shell 提示符下输入该命令，并在要求输入 root 口令时按下 <keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>。"
 
 #. Tag: title
 #: boot-new.xml:350
@@ -640,6 +631,3 @@ msgid ""
 msgstr ""
 "了解更多的 Debian 和 GNU/Linux，请参阅 <filename>/usr/share/doc/debian-guide/"
 "html/noframes/index.html</filename>。"
-
-#~ msgid "TODO: write something once it works."
-#~ msgstr "TODO: write something once it works."
