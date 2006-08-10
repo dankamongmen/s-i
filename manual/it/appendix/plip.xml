@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29687 -->
+<!-- original version: 39644 -->
 
 
  <sect1 id="plip" arch="x86">
@@ -8,7 +8,7 @@
 <para>
 
 <!--
-This section explains how to install &debian; on a computer without
+This section explains how to install &debian; on a computer without an
 Ethernet card, but with just a remote gateway computer attached via
 a Null-Modem cable (also called Null-Printer cable). The gateway
 computer should be connected to a network that has a Debian mirror
@@ -159,13 +159,30 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 <!--
 Boot the installation media. The installation needs to be run in
 expert mode; enter <userinput>expert</userinput> at the boot prompt.
+If you need to set parameters for kernel modules, you also need to
+do this at the boot prompt. For example, to boot the installer and
+set values for the <quote>io</quote> and <quote>irq</quote> options
+for the parport_pc module, enter the following at the boot prompt:
+-->
+
+Avviare l'installazione in modalità esperto, inserire
+<userinput>expert</userinput> al prompt d'avvio. Anche nel caso che si
+debbano impostare dei parametri per i moduli del kernl è necessario farlo
+dal prompt d'avvio. Per esempio, per avviare l'installatore e impostare i
+valori dei parametri <quote>io</quote> e <quote>irq</quote> per il modulo
+parport_pc si deve inserire al prompt d'avvio:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
+<!--
 Below are the answers that should be given during various stages of
 the installation.
 -->
 
-Avviare l'installazione in modalità esperto, inserire
-<userinput>expert</userinput> al prompt d'avvio. In seguito sono riepilogate
-le risposte che si devono dare nei vari passi dell'installazione.
+In seguito sono riepilogate le risposte che si devono dare nei vari passi
+dell'installazione.
 
 </para>
 
@@ -173,10 +190,10 @@ le risposte che si devono dare nei vari passi dell'installazione.
 <listitem><para>
 
 <!--
-<guimenuitem>Load installer components</guimenuitem>
+<guimenuitem>Load installer components from CD</guimenuitem>
 -->
 
-<guimenuitem>Caricamento dei componenti dell'installatore</guimenuitem>
+<guimenuitem>Caricare i componenti dell'installatore dal CD-ROM</guimenuitem>
 
 </para><para>
 
@@ -219,15 +236,6 @@ il target non ha una scheda di rete l'installatore non mostra questo elenco.
  <listitem><para>
 
 <!--
-Prompt for module parameters: Yes
--->
-
-Prompt per i parametri dei moduli: Sì
-
- </para></listitem>
- <listitem><para>
-
-<!--
 Because no network card was detected/selected earlier, the installer will
 ask you to select a network driver module from a list.
 Select the <userinput>plip</userinput> module.
@@ -236,26 +244,6 @@ Select the <userinput>plip</userinput> module.
 Poiché in precedenza non è stata rilevata/selezionata nessuna scheda di
 rete, l'installatore chiede di scegliere il modulo con il driver di rete
 da un elenco; scegliere il modulo <userinput>plip</userinput>.
-
- </para></listitem>
- <listitem><para>
-
-<!--
-Additional parameters for module parport_pc:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
--->
-
-Ulteriori parametri da passare al modulo parport_pc:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-<!--
-Additional parameters for module plip: leave empty
--->
-
-Ulteriori parametri da passare al modulo parport_pc: lasciare vuoto
 
  </para></listitem>
  </itemizedlist>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33887 -->
+<!-- original version: 39551 -->
 
 
  <sect1 id="linuxdevices">
@@ -8,23 +8,24 @@
 <para>
 
 <!--
-In Linux you have various special files in
-<filename>/dev</filename>. These files are called device files. In
-the Unix world accessing hardware is different.  There you have a
-special file which actually runs a driver which in turn accesses the
-hardware. The device file is an interface to the actual system
-component. Files under <filename>/dev</filename> also behave
-differently than ordinary files. Below are the most important device
-files listed.
+In Linux various special files can be found under the directory
+<filename>/dev</filename>. These files are called device files and
+behave unlike ordinary files. The most common types of device files
+are for block devices and character devices. These files are an
+interface to the actual driver (part of the Linux kernel) which in
+turn accesses the hardware. Another, less common, type of device file
+is the named <firstterm>pipe</firstterm>.
+The most important device files are listed in the tables below.
 -->
 
-In Linux sotto <filename>/dev</filename> sono presenti diversi file
-speciali, chiamati file di device. Nel mondo Unix si accede alle
-periferiche in modo particolare: c'&egrave; un file speciale che in realt&agrave;
-esegue un driver che a sua volta accede all'hardware. Il file di device
-&egrave; un'interfaccia verso il componente reale del sistema. Inoltre i file
-sotto <filename>/dev</filename> si comportano in modo diverso dai file
-ordinari. Segue un elenco dei file di device pi&ugrave; significativi.
+In Linux, all'interno della directory <filename>/dev</filename>, sono
+presenti diversi file speciali, chiamati file di device, che si comportano
+in modo diverso dai file normali. I tipi più comuni di file di device sono
+per i device a blocchi e per i device a caratteri. Questo tipo di file sono
+un'interfaccia per i driver (che fanno parte del kernel Linux) che si
+occupano del reale accesso all'hardware. Un altro tipo di device, meno
+comune, sono i file <firstterm>pipe</firstterm>. I file di device più
+significativi sono elencati nella seguente tabella.
 
 </para><para>
 
@@ -70,7 +71,7 @@ ordinari. Segue un elenco dei file di device pi&ugrave; significativi.
 <row>
   <entry><filename>sda</filename></entry>
   <entry><!-- SCSI Hard disk with lowest SCSI ID (e.g. 0) -->
-  Il disco fisso SCSI con l'ID SCSI pi&ugrave; basso (p.e. 0)</entry>
+  Il disco fisso SCSI con l'ID SCSI più basso (p.e. 0)</entry>
 </row><row>
   <entry><filename>sdb</filename></entry>
   <entry><!-- SCSI Hard disk with next higher SCSI ID (e.g. 1) -->
@@ -94,7 +95,7 @@ ordinari. Segue un elenco dei file di device pi&ugrave; significativi.
 <row>
   <entry><filename>sr0</filename></entry>
   <entry><!-- SCSI CD-ROM with the lowest SCSI ID -->
-  Il lettore CD SCSI con l'ID SCSI pi&ugrave; basso</entry>
+  Il lettore CD SCSI con l'ID SCSI più basso</entry>
 </row><row>
   <entry><filename>sr1</filename></entry>
   <entry><!-- SCSI CD-ROM with the next higher SCSI ID -->
@@ -137,8 +138,8 @@ ordinari. Segue un elenco dei file di device pi&ugrave; significativi.
 <informaltable><tgroup cols="2"><tbody>
 <row>
   <entry><filename>null</filename></entry>
-  <entry><!-- Everything pointed to this device will disappear -->
-  Qualunque cosa trasmessa a questo device scomparir&agrave;</entry>
+  <entry><!-- Anything written to this device will disappear -->
+  Qualunque cosa scritta su questo device scomparirà</entry>
 </row><row>
   <entry><filename>zero</filename></entry>
   <entry><!-- One can endlessly read zeros out of this device -->
@@ -159,8 +160,8 @@ environment. The two uses can be made compatible if the gpm repeater is used
 to allow the signal to flow to the X server as shown:
 -->
 
-Il mouse pu&ograve; essere utilizzato sia in console (con gpm) che in ambiente
-X Window. Le due modalit&agrave; di utilizzo sono compatibili se si utilizza
+Il mouse può essere utilizzato sia in console (con gpm) che in ambiente
+X Window. Le due modalità di utilizzo sono compatibili se si utilizza
 il ripetitore di dati di gpm per permettere al segnale di passare
 al server X, come mostrato di seguito:
 
@@ -190,7 +191,7 @@ unplugged inadvertently.  Simply restarting gpm with
 -->
 
 L'utilizzo di gpm anche in X si dimostra vantaggioso nel caso il mouse
-venga inavvertitamente scollegato. Baster&agrave; semplicemente rilanciare
+venga inavvertitamente scollegato. Basterà semplicemente rilanciare
 gpm con
 
 <informalexample><screen>
@@ -206,17 +207,17 @@ per riconnettere via software il mouse senza dover rilanciare X.
 </para><para>
 
 <!--
-If gpm is disabled or not installed with some reason, make sure to set X to
-read directly from the mouse device such as /dev/psaux. For details, refer
+If gpm is disabled or not installed for some reason, make sure to set X to
+read directly from a mouse device such as /dev/psaux. For details, refer
 to the 3-Button Mouse mini-Howto at
 <filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
 <userinput>man gpm</userinput>,
 <filename>/usr/share/doc/gpm/FAQ.gz</filename>, and
-<ulink url=&url-xorg;current/doc/html/mouse.html>README.mouse</ulink>.
+<ulink url="&url-xorg;current/doc/html/mouse.html">README.mouse</ulink>.
 -->
 
-Se gpm è disattivato, o per qualche ragione non è installato, assicurarsi
-di impostare X affinché legga direttamente il device del mouse, ad esempio
+Se gpm è disattivato, o per qualche ragione non è installato, assicurarsi di
+impostare X affinché legga direttamente da un device del mouse, per esempio
 /dev/psaux. Per dettagli si faccia riferimento al 3-Button Mouse mini-Howto
 (<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>), a
 <userinput>man gpm</userinput>, <filename>/usr/share/doc/gpm/FAQ.gz</filename>
@@ -244,7 +245,7 @@ when your mouse only has one button. Just add the following lines to
 -->
 
 I kernel attuali permettono di emulare un mouse a tre tasti con un mouse
-ad un solo tasto. &Egrave; sufficiente aggiungere le righe seguenti al
+ad un solo tasto. È sufficiente aggiungere le righe seguenti al
 file <filename>/etc/sysctl.conf</filename>.
 
 <!--
@@ -279,6 +280,17 @@ file <filename>/etc/sysctl.conf</filename>.
  <sect1 id="tasksel-size-list">
  <!-- <title>Disk Space Needed for Tasks</title> -->
  <title>Spazio necessario per i task di tasksel</title>
+
+<!-- Note for d-i and manual maintainers
+ Sizes of tasks should be determined by running "tasksel new" on a system
+ that been fully installed without selecting any tasks. By selecting a
+ task together with the "manual selection" option, aptitude will be started
+ and show the sizes for the task. After deselecting the packages to be
+ installed, quit aptitude and repeat for other tasks.
+ Space requirements need to be determined from tasksel as tasksel will not
+ install recommended packages while selecting a task from aptitude will.
+-->
+
 <para>
 
 <!--
@@ -314,7 +326,7 @@ Most of the size listed as <quote>Installed size</quote> will end up in
 is (temporarily) required in <filename>/var</filename>.
 -->
 
-Si noti che &egrave; necessario aggiungere dello spazio rispetto a quanto
+Si noti che è necessario aggiungere dello spazio rispetto a quanto
 indicato nella tabella come spazio minimo nel momento in cui si definisce
 la dimensione delle partizioni. La maggior parte delle dimensioni elencate
 come <quote>Dimensione installazione</quote> va a finire all'interno
@@ -391,7 +403,7 @@ download</quote> devono essere (temporaneamente) disponibili in
 <note><para>
 
 <!--
-The <emphasis>Desktop</emphasis> task will install both the Gnome and KDE
+The <emphasis>Desktop</emphasis> task will install both the GNOME and KDE
 desktop environments.
 -->
 

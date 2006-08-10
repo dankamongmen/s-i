@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39285 -->
+<!-- original version: 39468 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -299,7 +299,7 @@ A question always refers to the template used to ask it. For obvious
 security reasons the values for questions of type <quote>password</quote>
 are stored in a separate, non-readable file in the same directory.
 
-Un altro file (dal formato comprensibile) 
+Un altro file (dal formato comprensibile)
 <filename>/var/cache/debconf/questions.dat</filename> è usato per
 memorizzare i valori delle variabili e delle risposte date alle domande.
 Tutte le domande hanno un riferimento al template usato per presentarle
@@ -566,7 +566,8 @@ dhcp3-server).
 
 <informalexample><screen>
 if substring (option vendor-class-identifier, 0, 3) = "d-i" {
-    filename "http://host/preseed.cfg";}
+    filename "http://host/preseed.cfg";
+}
 </screen></informalexample>
 
 <para>
@@ -738,12 +739,12 @@ del file di preconfigurazione è:
 
 <!--
 <informalexample><screen>
-&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt; 
+&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;
 </screen></informalexample>
 -->
 
 <informalexample><screen>
-&lt;detentore&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt; 
+&lt;detentore&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt;
 </screen></informalexample>
 
 </para><para>
@@ -1658,12 +1659,33 @@ Si può anche scegliere di non installare alcun task e forzare l'installazione
 di un insieme di pacchetti in qualche altro modo. Raccomandiamo di includere
 sempre il task <userinput>standard</userinput>.
 
+</para><para>
+
+<!--
+If you want to install some individual packages in addition to packages
+installed by tasks, you can use the parameter
+<classname>pkgsel/include</classname>. The value of this parameter can be
+either comma-separated or space-separated, so you can also use it easily on
+the kernel command line.
+-->
+
+Se oltre ai task si vuole installare anche qualche altro pacchetto allora
+è possibile usare il parametro <classname>pkgsel/include</classname>; il
+valore di questo parametro può essere separato con virgole o con spazi,
+in questo modo può essere comodamente usato anche sulla riga di comando
+del kernel.
+
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+<!--
+# Individual additional packages to install
+-->
+# Ulteriori pacchetti da installare
+#d-i pkgsel/include string openssh-server build-essential
 <!--
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,

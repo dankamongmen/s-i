@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36758 -->
+<!-- original version: 39614 -->
 
 
  <sect1 id="linux-upgrade">
@@ -69,12 +69,12 @@ e una partizione di swap. Per un ambiente puramente testuale è necessario
 </para><para>
 
 <!--
-To create file systems on your partitions. For example, to create
-an ext3 file system on partition <filename>/dev/hda6</filename> (that's
+Create file systems on your partitions. For example, to create an
+ext3 file system on partition <filename>/dev/hda6</filename> (that's
 our example root partition):
 -->
 
-Si creino dei file system sulle partizioni appena create. In questo esempio
+Creare dei file system sulle partizioni appena realizzate. In questo esempio
 si crea un file system ext3 sulla partizione <filename>/dev/hda6</filename>
 (in seguito questa partizione è usata come root):
 
@@ -83,8 +83,7 @@ si crea un file system ext3 sulla partizione <filename>/dev/hda6</filename>
 </screen></informalexample>
 
 <!--
-To create an ext2 file system instead, omit
-<userinput>-j</userinput>.
+To create an ext2 file system instead, omit <userinput>-j</userinput>.
 -->
 
 Per creare un file system ext2, basta omettere l'opzione
@@ -123,7 +122,8 @@ verrà utilizzato da qui in avanti.
 # mount /dev/hda6 /mnt/debinst
 </screen></informalexample>
 
-</para><note><para>
+</para>
+<note><para>
 
 <!--
 If you want to have parts of the filesystem (e.g. /usr) mounted on
@@ -144,7 +144,7 @@ directory prima di procedere con la prossima fase.
 <para>
 
 <!--
-The tool that the Debian installer uses, which is recognized as the
+The utility used by the Debian installer, and recognized as the
 official way to install a Debian base system, is
 <command>debootstrap</command>. It uses <command>wget</command> and
 <command>ar</command>, but otherwise depends only on
@@ -189,8 +189,7 @@ presenti sul sistema in uso, quindi si scarichi e installi
 
 If you have an rpm-based system, you can use alien to convert the
 .deb into .rpm, or download an rpm-ized version at
-<ulink
-url="http://people.debian.org/~blade/install/debootstrap"></ulink>
+<ulink url="http://people.debian.org/~blade/install/debootstrap"></ulink>
 
 Su un sistema basato su rpm, si può utilizzare alien per convertire il
 pacchetto .deb in .rpm, o si può scaricarne una versione rpm presso
@@ -234,9 +233,9 @@ lo si copi nella cartella di lavoro e si estraggano da esso i file
 binari. Servono i privilegi di root per installarli.
 
 <informalexample><screen>
-# ar -xf debootstrap_0.X.X_arch.deb
+# ar -x debootstrap_0.X.X_arch.deb
 # cd /
-# zcat &#60; /full-path-to-work/work/data.tar.gz | tar xv
+# zcat /full-path-to-work/work/data.tar.gz | tar xv
 </screen></informalexample>
 
 </para><para>
@@ -262,12 +261,14 @@ richiama diverse utilità che richiedono la <classname>glibc</classname>.
   <title>Esecuzione di <command>debootstrap</command></title>
 <para>
 
-<!-- <command>debootstrap</command> can download the needed files directly
+<!--
+<command>debootstrap</command> can download the needed files directly
 from the archive when you run it. You can substitute any Debian
 archive mirror for <userinput>http.us.debian.org/debian</userinput> in
 the command example below, preferably a mirror close to you
 network-wise. Mirrors are listed at
-<ulink url="http://www.debian.org/misc/README.mirrors"></ulink>. -->
+<ulink url="http://www.debian.org/misc/README.mirrors"></ulink>.
+-->
 
 Quando viene lanciato, <command>debootstrap</command> è in grado
 di scaricare i file necessari direttamente dall'archivio. Si può
@@ -318,8 +319,8 @@ Al posto di <replaceable>ARCH</replaceable>, nel comando
 <userinput>sparc</userinput>.
 
 <informalexample><screen>
-# /usr/sbin/debootstrap --arch ARCH sarge \
-      /mnt/debinst http://http.us.debian.org/debian
+# /usr/sbin/debootstrap --arch ARCH &releasename; \
+     /mnt/debinst http://http.us.debian.org/debian
 </screen></informalexample>
 
 </para>
@@ -395,7 +396,7 @@ Per montare tutti i file system specificati nel proprio
 mentre per montarli singolarmente si usi:
 
 <informalexample><screen>
-# mount /path  # ad esempio:  mount /usr
+# mount /path   # ad esempio:  mount /usr
 </screen></informalexample>
 
 <!--
@@ -425,9 +426,9 @@ Adesso il comando <userinput>ls /proc</userinput> dovrebbe mostrare una
 directory con dei file. Se non funziona, si dovrebbe essere in grado di
 montare proc da fuori della chroot:
 
-<informalexample><screen> 
-# mount -t proc proc /mnt/debinst/proc 
-</screen></informalexample> 
+<informalexample><screen>
+# mount -t proc proc /mnt/debinst/proc
+</screen></informalexample>
 
 </para>
    </sect3>
@@ -467,13 +468,17 @@ della chroot, sarà possibile configurarla al riavvio successivo.
 
 <!--
 To configure networking, edit
+<filename>/etc/network/interfaces</filename>,
 <filename>/etc/resolv.conf</filename>,
 <filename>/etc/hostname</filename> and
 <filename>/etc/hosts</filename>.
 -->
 
-Per configurare la rete, si editino <filename>/etc/resolv.conf</filename>,
-<filename>/etc/hostname</filename> e <filename>/etc/hosts</filename>.
+Per configurare la rete, si editino
+<filename>/etc/network/interfaces</filename>,
+<filename>/etc/resolv.conf</filename>,
+<filename>/etc/hostname</filename> e
+<filename>/etc/hosts</filename>.
 
 <informalexample><screen>
 # editor /etc/network/interfaces
@@ -571,28 +576,30 @@ che ci si aspetta (eth0, eth1, etc.).
 
 <!--
 To configure your locale settings to use a language other than
-English, install the locales support package and configure it:
+English, install the <classname>locales</classname> support package
+and configure it:
 -->
 
 Per utilizzare una localizzazione diversa da quella inglese, si installi
-il pacchetto locales e lo si configuri.
+il pacchetto <classname>locales</classname> e lo si configuri.
 
 <informalexample><screen>
-# apt-get install locales
+# aptitude install locales
 # dpkg-reconfigure locales
 </screen></informalexample>
 
 <!--
-NOTE: Apt must be configured beforehand by creating a sources.list and
-running apt-get update.
+NOTE: <classname>apt</classname> must be configured beforehand by creating
+a sources.list and running <command>aptitude update</command>.
 Before using locales with character sets other than ASCII or latin1,
 please consult the appropriate localization HOWTO.
 -->
 
-NOTA: Apt dev'essere già stato configurato in precedenza con la creazione
-di source.list e l'esecuzione di apt-get update.
-Prima di utilizzare locales con un set di caratteri diverso da
-ASCII o latin1, si consulti l'HOWTO di localizzazione appropriato.
+NOTA: <classname>apt</classname> dev'essere già stato configurato
+in precedenza con la creazione di source.list e l'esecuzione di
+<command>aptitude update</command>. Prima di utilizzare locales con
+un set di caratteri diverso da ASCII o latin1, si consulti l'HOWTO
+di localizzazione appropriato.
 
 </para>
    </sect3>
@@ -608,9 +615,8 @@ If you intend to boot this system, you probably want a Linux kernel
 and a boot loader. Identify available pre-packaged kernels with
 -->
 
-In caso si intenda fare il boot nel nuovo sistema, servono un kernel
-Linux e
-un boot loader. I kernel pacchettizzati disponibili si trovano con
+Nel caso si intenda fare il boot nel nuovo sistema, servono un kernel Linux
+e un boot loader. I kernel pacchettizzati disponibili si trovano con
 
 <informalexample><screen>
 # apt-cache search <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image
@@ -623,7 +629,7 @@ Then install your choice using its package name.
 Si può quindi installare quello scelto usando il nome del pacchetto.
 
 <informalexample><screen>
-# apt-get install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
+# aptitude install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
 </para>
@@ -636,15 +642,16 @@ Si può quindi installare quello scelto usando il nome del pacchetto.
 
 <!--
 To make your &debian; system bootable, set up your boot loader to load
-the installed kernel with your new root partition. Note that debootstrap
-does not install a boot loader, though you can use apt-get inside your
-Debian chroot to do so.
+the installed kernel with your new root partition. Note that
+<command>debootstrap</command> does not install a boot loader, though you
+can use <command>aptitude</command> inside your Debian chroot to do so.
 -->
 
 Per rendere avviabile il sistema &debian;, si configuri il boot loader
 affinché carichi il kernel installato con la nuova partizione di root. Si
-noti che debootstrap non installa di suo un boot loader, lo si può fare
-tramite apt-get dall'interno della chroot Debian.
+noti che <command>debootstrap</command> non installa di suo un boot loader,
+lo si può fare tramite <command>aptitude</command> dall'interno della
+chroot Debian.
 
 </para><para arch="x86">
 
@@ -697,8 +704,7 @@ install Debian, just add an entry for the Debian install to your
 existing <filename>yaboot.conf</filename>.  You could also copy it to
 the new system and
 edit it there. After you are done editing, call ybin (remember it will
-use <filename>yaboot.conf</filename> relative to the system you call it
-from).
+use <filename>yaboot.conf</filename> relative to the system you call it from).
 -->
 
 Si provi <userinput>man yaboot.conf</userinput> per ottenere istruzioni
@@ -713,8 +719,7 @@ sistema su cui viene lanciato).
 </para><para arch="powerpc">
 
 <!--
-Here is a basic <filename>/etc/yaboot.conf</filename> as an
-example:
+Here is a basic <filename>/etc/yaboot.conf</filename> as an example:
 -->
 
 Di seguito un <filename>/etc/yaboot.conf</filename> di base come esempio:
