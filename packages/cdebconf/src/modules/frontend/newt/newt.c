@@ -116,8 +116,10 @@ typedef int (newt_handler)(struct frontend *obj, struct question *q);
 #define TEXT_PADDING 1
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
-/*  Padding of title width, allows for leading "[!!] " before title. */
-#define TITLE_PADDING 6
+/*  Padding of title width, allows for leading "[!!] " before title
+ *  and the two vertical bars that limit the border.
+ */
+#define TITLE_PADDING 8
 
 /* gettext would be much nicer :-( */
 static const char *
