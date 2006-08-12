@@ -39,12 +39,11 @@ done
 config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
 
 db_progress STEP 1
-
-# progressbar should start at 1
 progress_start=1
 
 if ! db_get popularity-contest/participate || [ "$RET" != false ]; then
 	progress_end=5
+
 	# Install popularity-contest but remove it if the user decides not to
 	# participate.
 	if in-target sh -c "$config debconf-apt-progress --from $progress_start --to $progress_end --logstderr -- apt-get -q -y -f install popularity-contest"; then
@@ -55,14 +54,14 @@ if ! db_get popularity-contest/participate || [ "$RET" != false ]; then
 	progress_start=$progress_end
 fi
 
-db_get pkgsel/include
-if [ "$RET" ]; then
-	progress_end=90
-else
-	progress_end=95
-fi
-
 if ! db_fget tasksel/first seen || (! db_get tasksel/first || [ -z "$RET" ]); then
+	db_get pkgsel/include
+	if [ "$RET" ]; then
+		progress_end=90
+	else
+		progress_end=95
+	fi
+
 	db_progress INFO pkgsel/progress/tasksel
 	ret=0
 	in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from $progress_start --to $progress_end --logstderr'" || ret=$?
@@ -80,12 +79,12 @@ if ! db_fget tasksel/first seen || (! db_get tasksel/first || [ -z "$RET" ]); th
 		exit $ret
 	fi
 	progress_start=$progress_end
-else
-	progress_end=100
 fi
 
 db_get pkgsel/include
 if [ "$RET" ]; then
+	progress_end=95
+
 	# Allow comma-separation so that this can more easily be preseeded
 	# at the kernel command line.
 	RET="$(printf '%s' "$RET" | sed 's/,/ /g')"
@@ -102,6 +101,11 @@ if [ "$RET" ]; then
 		db_progress STOP
 		exit $ret
 	fi
+	progress_start=$progress_end
+fi
+
+if [ $progress_end -gt $progress_start ]; then
+	db_progress STEP $(($progress_end - $progress_start))
 fi
 
 db_progress INFO pkgsel/progress/cleanup
