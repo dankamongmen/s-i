@@ -50,6 +50,11 @@ for line in $(sed 's/^/:/' $file); do
 	line="${line#:}"
 	if expr "$line" : '.*[^ ].*' >/dev/null && [ "$(expr "$line" : "#")" != 1 ]; then
 		items=$(expr "$items" + 1)
+		# Write blank line between generators
+		if [ $items = 1 ] && [ -f "$saveto" ]; then
+			saveline ""
+		fi
+
 		if [ -z "$NOTEST" ] && valid "$line"; then
 			gooditems=$(expr "$gooditems" + 1)
 			saveline "$line"
@@ -58,7 +63,10 @@ for line in $(sed 's/^/:/' $file); do
 			saveline "#$line"
 		fi
 	else
-		saveline "$line"
+		# Ignore leading empty lines
+		if [ $items != 0 ] || [ "$line" ]; then
+			saveline "$line"
+		fi
 	fi
 done
 

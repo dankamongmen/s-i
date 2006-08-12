@@ -37,7 +37,6 @@ for generator in $gendir/*; do
 	fi
 	
 	tmp=$($chroot $ROOT tempfile)
-	echo > $ROOT$tmp
 
 	code=0
 	$generator $ROOT$tmp || code=$?
@@ -54,7 +53,7 @@ for generator in $gendir/*; do
 	    10)
 		# TODO handle backup better
 		log "$generator backed up"
-		rm -f $ROOT$tmp
+		rm -f $ROOT$tmp $ROOT/etc/apt/sources.list.new
 		db_progress STOP
 		exit 10
 		;;
