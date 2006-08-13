@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-07-30 15:28+0000\n"
-"PO-Revision-Date: 2006-08-12 22:25+0300\n"
+"PO-Revision-Date: 2006-08-13 17:24+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -888,11 +888,11 @@ msgstr "Apt:n asetukset"
 #: preseed.xml:661
 #, no-c-format
 msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
-msgstr ""
+msgstr "Tiedoston <filename>/etc/apt/sources.list</filename> teko ja perusasetukset on täysin automatisoitu asennustavan ja aiempien kysymysten vastausten perusteella. Muiden (paikallisten) varastoalueiden lisääminen on valinnaista."
 
 #. Tag: screen
 #: preseed.xml:669
-#, no-c-format
+#, no-c-format, fuzzy
 msgid ""
       "# You can choose to install non-free and contrib software.\n"
       "#d-i apt-setup/non-free boolean true\n"
@@ -908,24 +908,37 @@ msgid ""
       "# URL to the public key of the local repository\n"
       "#d-i apt-setup/local0/key string http://local.server/key"
 msgstr ""
+"# non-free ja contrib -osaston ohjelmia voidaan valita asennettaviksi\n"
+"#d-i apt-setup/non-free boolean true\n"
+"#d-i apt-setup/contrib boolean true\n"
+"# Poista kommentit jättääksesi tietoturvapäivitysten varastoalueen pois tai\n"
+"# lisää konenimi jos halutaan käyttää jotain muuta kuin security.debian.org.\n"
+"#d-i apt-setup/security_host string\n"
+"\n"
+"# Lisää varastoalueita, local[0-9] käytettävissä\n"
+"#d-i apt-setup/local0/comment string local server\n"
+"#d-i apt-setup/local0/source string \\\n"
+"#       deb http://local.server/debian stable main\n"
+"# varastoalueen julkisen avaimen ULR\n"
+"#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
 #: preseed.xml:674
 #, no-c-format
 msgid "Account setup"
-msgstr ""
+msgstr "Käyttäjätunnusten luonti"
 
 #. Tag: para
 #: preseed.xml:675
 #, no-c-format
 msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
+msgstr "Pääkäyttäjän tunnuksen root salasana ja ensimmäisen tavallisen käyttäjän tunnus ja salasana voidaan antaa valmiissa vastauksissa. Salasanalle voidaan käyttää joko ilmitekstiä tai MD5 <emphasis>tiivistettä</emphasis> (hash)."
 
 #. Tag: para
 #: preseed.xml:682
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
-msgstr ""
+msgstr "On hyvä tietää ettei valmiiden vastausten käyttäminen salasanoille ole täysin tietoturvallista, koska jokainen vastaukset sisältävän tiedoston lukija saa ne tietää. MD5-tiivisteiden käyttö parantaa turvallisuutta hieman, mutta saattaa myös tuudittaa liialliseen turvallisuuden tunteeseen koska MD5-tiivisteen tietämällä voi salasanoja murtaa kokeilemalla kaikki mahdollisuudet."
 
 #. Tag: screen
 #: preseed.xml:692
@@ -952,36 +965,56 @@ msgid ""
       "# or encrypted using an MD5 hash.\n"
       "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
+"# Ohita pääkäyttäjän tunnuksen luominen (tavallinen käyttäjätunnus\n"
+"# voi käyttää sudo:a).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Tai ohita tavallisen käyttäjän tunnuksen luominen.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Pääkäyttäjän salasana, joko ilmitekstinä\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# tai salattuna ja MD5-tiiviste.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# Luodaan tavallisen käyttäjän tunnus.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Tavallisen käyttäjän salasana, joko ilmitekstinä\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# tai salattuna ja MD5-tiiviste.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
 #: preseed.xml:694
 #, no-c-format
 msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is setup to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
-msgstr ""
+msgstr "Muuttujille <classname>passwd/root-password-crypted</classname> ja <classname>passwd/user-password-crypted</classname> voidaan antaa valmis vastaus myös <quote>!</quote> arvona. Tällöin vastaavan käyttäjätunnuksen käyttö on estetty. Tämä voi olla kätevää pääkäyttäjän tunnukselle, tietenkin vain jos on tehty muu tapa tehdä pääkäyttäjä tehtävät tai kirjautua pääkäyttäjänä (esimerkiksi tunnistautua SSH-avaimilla tai komento <command>sudo</command>)."
 
 #. Tag: para
 #: preseed.xml:704
 #, no-c-format
 msgid "An MD5 hash for a password can be generated using the following command."
-msgstr ""
+msgstr "Salasanan MD5-tiiviste saadaan tehtyä seuraavalla komennolla."
 
 #. Tag: screen
 #: preseed.xml:708
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr ""
+msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 
 #. Tag: title
 #: preseed.xml:714
 #, no-c-format
 msgid "Base system installation"
-msgstr ""
+msgstr "Perusjärjestelmän asennus"
 
 #. Tag: para
 #: preseed.xml:715
 #, no-c-format
 msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
-msgstr ""
+msgstr "Tässä asennuksen vaiheessa ei oikeastaan ole kovinkaan paljoa mahdollista käyttää valmiita vastauksia. Ainoat kysymykset koskevat ytimen asentamista."
 
 #. Tag: screen
 #: preseed.xml:722
@@ -990,12 +1023,14 @@ msgid ""
       "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
       "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 msgstr ""
+"# Valitaan  initramfs:n tekevä ohjelma jolla initrd tehdään 2.6-ytimille.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:727
 #, no-c-format
 msgid "Boot loader installation"
-msgstr ""
+msgstr "Käynnistyslataimen asennus"
 
 #. Tag: screen
 #: preseed.xml:729
@@ -1019,96 +1054,113 @@ msgid ""
       "#d-i grub-installer/only_debian boolean false\n"
       "#d-i grub-installer/with_other_os boolean false"
 msgstr ""
+"# Grub on oletus käynnistyslataimeksi (arkkitehtuurille x86). Jos sen\n"
+"# tilalle halutaan lilo, poistetaan tästä kommentit:\n"
+"#d-i grub-installer/skip boolean true\n"
+"\n"
+"# Tämä on melko turvallinen asetus, eli grub asentuu automaattisesti\n"
+"# MBR:ään jos koneesta ei löydy muita käyttöjärjestelmiä.\n"
+"d-i grub-installer/only_debian boolean true\n"
+"\n"
+"# Tämä saa grub-instellerin asentamaan MBR:ään jos se löytää jonkin muunkin\n"
+"# käyttöjärjestelmä. Epävarmaa, koska se ei ehkä osaa käynnistää sitä.\n"
+"d-i grub-installer/with_other_os boolean true\n"
+"\n"
+"# Jos halutaan asentaa muualle kuin mbr:ään, poistetaan kommentti ja muokataan\n"
+"# näitä rivejä:\n"
+"#d-i grub-installer/bootdev  string (hd0,0)\n"
+"#d-i grub-installer/only_debian boolean false\n"
+"#d-i grub-installer/with_other_os boolean false"
 
 #. Tag: title
 #: preseed.xml:734
 #, no-c-format
 msgid "Package selection"
-msgstr ""
+msgstr "Pakettien valinta"
 
 #. Tag: para
 #: preseed.xml:735
 #, no-c-format
 msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
-msgstr ""
+msgstr "Asennettavaksi voidaan valita mitkä tahansa saatavilla olevista tehtävistä. Tätä kirjoitettaessa saatavilla olevia tehtäviä ovat ainakin:"
 
 #. Tag: userinput
 #: preseed.xml:744
 #, no-c-format
 msgid "standard"
-msgstr ""
+msgstr "standard"
 
 #. Tag: userinput
 #: preseed.xml:747
 #, no-c-format
 msgid "desktop"
-msgstr ""
+msgstr "desktop"
 
 #. Tag: userinput
 #: preseed.xml:750
 #, no-c-format
 msgid "gnome-desktop"
-msgstr ""
+msgstr "gnome-desktop"
 
 #. Tag: userinput
 #: preseed.xml:753
 #, no-c-format
 msgid "kde-desktop"
-msgstr ""
+msgstr "kde-desktop"
 
 #. Tag: userinput
 #: preseed.xml:756
 #, no-c-format
 msgid "web-server"
-msgstr ""
+msgstr "web-server"
 
 #. Tag: userinput
 #: preseed.xml:759
 #, no-c-format
 msgid "print-server"
-msgstr ""
+msgstr "print-server"
 
 #. Tag: userinput
 #: preseed.xml:762
 #, no-c-format
 msgid "dns-server"
-msgstr ""
+msgstr "dns-server"
 
 #. Tag: userinput
 #: preseed.xml:765
 #, no-c-format
 msgid "file-server"
-msgstr ""
+msgstr "file-server"
 
 #. Tag: userinput
 #: preseed.xml:768
 #, no-c-format
 msgid "mail-server"
-msgstr ""
+msgstr "mail-server"
 
 #. Tag: userinput
 #: preseed.xml:771
 #, no-c-format
 msgid "sql-database"
-msgstr ""
+msgstr "sql-database"
 
 #. Tag: userinput
 #: preseed.xml:774
 #, no-c-format
 msgid "laptop"
-msgstr ""
+msgstr "laptop"
 
 #. Tag: para
 #: preseed.xml:778
 #, no-c-format
 msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>standard</userinput> task."
-msgstr ""
+msgstr "Voidaan myös jättää kaikki tehtävät valitsematta, ja pakotetaan halutun pakettijoukon asennus muilla tavoin. Suositellaan aina valittavaksi tehtävä <userinput>standard</userinput>."
 
 #. Tag: para
 #: preseed.xml:784
 #, no-c-format
 msgid "If you want to install some individual packages in addition to packages installed by tasks, you can use the parameter <classname>pkgsel/include</classname>. The value of this parameter can be either comma-separated or space-separated, so you can also use it easily on the kernel command line."
-msgstr ""
+msgstr "Jos tehtävien asentamien pakettien lisäksi halutaan asentaa yksittäisiä paketteja, voidaan käyttää parametria <classname>pkgsel/include</classname>. Tämän parametrin arvojen luettelo voi olla eroteltu joko pilkuin tai välilyönnein, joten sitä on helppo käyttää ytimen käynnistysparametrina."
 
 #. Tag: screen
 #: preseed.xml:794
@@ -1127,12 +1179,24 @@ msgid ""
       "# popular and include it on CDs.\n"
       "#popularity-contest popularity-contest/participate boolean false"
 msgstr ""
+"tasksel tasksel/first multiselect standard, desktop\n"
+"#tasksel tasksel/first multiselect standard, web-server\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop\n"
+"\n"
+"# Asennetaan yksittäisiä lisäpaketteja\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Jotkin asentimen versiot voivat kertoa mitä ohjelmia on asennettuna,\n"
+"# ja mitä ohjelmia käytetään. Oletusarvo on ettei raporttia lähetetä,\n"
+"# mutta raporttien lähettäminen auttaa Debian-projektia tietämään\n"
+"# suosituimmat ohjelmat ja kokoamaan ne rompuille.\n"
+"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:799
 #, no-c-format
 msgid "Finishing up the first stage install"
-msgstr ""
+msgstr "Asennuksen ensimmäisen osan lopetus"
 
 #. Tag: screen
 #: preseed.xml:801
@@ -1145,18 +1209,24 @@ msgid ""
       "# which is useful in some situations.\n"
       "#d-i cdrom-detect/eject boolean false"
 msgstr ""
+"# Vältetään viimeinen viesti asennuksen valmistumisesta.\n"
+"d-i finish-install/reboot_in_progress note\n"
+"\n"
+"# Tämä estää asenninta poistamasta romppua asemasta uudelleenkäynnistettäessä,\n"
+"# mikä on hyödyllistä joissakin tilanteissa.\n"
+"#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
 #: preseed.xml:806
 #, no-c-format
 msgid "Mailer configuration"
-msgstr ""
+msgstr "Sähköpostin asetukset"
 
 #. Tag: para
 #: preseed.xml:807
 #, no-c-format
 msgid "During a normal install, exim asks only a few questions. Here's how to avoid even those. More complicated preseeding is possible."
-msgstr ""
+msgstr "Tavallisen asennuksen aikana exim kysyy vain muutamia kysymyksiä. Näin vältetään nekin. Myös mutkikkaammat valmiit vastaukset ovat mahdollisia."
 
 #. Tag: screen
 #: preseed.xml:814
@@ -1168,18 +1238,23 @@ msgid ""
       "exim4-config exim4/no_config boolean true\n"
       "exim4-config exim4/dc_postmaster string"
 msgstr ""
+"exim4-config exim4/dc_eximconfig_configtype \\\n"
+"       select no configuration at this time\n"
+"exim4-config exim4/no_config boolean true\n"
+"exim4-config exim4/no_config boolean true\n"
+"exim4-config exim4/dc_postmaster string"
 
 #. Tag: title
 #: preseed.xml:819
 #, no-c-format
 msgid "X configuration"
-msgstr ""
+msgstr "X:n asetukset"
 
 #. Tag: para
 #: preseed.xml:820
 #, no-c-format
 msgid "Preseeding Debian's X config is possible, but you probably need to know some details about the video hardware of the machine, since Debian's X configurator does not do fully automatic configuration of everything."
-msgstr ""
+msgstr "Debianin X:n asetuksille on mahdollista antaa valmiit vastaukset, mutta luultavasti on tiedettävä muutamia yksityiskohtia tietokoneen näytönohjaimesta, koska Debianin X:n asetukset tekevä ohjelma ei tee kaikkia asetuksia täysin automaattisesti."
 
 #. Tag: screen
 #: preseed.xml:828
@@ -1206,12 +1281,32 @@ msgid ""
       "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
       "       select 1024x768 @ 60 Hz"
 msgstr ""
+"# X osaa löytää oikean ajurin joillekin korteille, mutta valmis vastaus \n"
+"# korvaa X:n valinnan. Mutta vesa toimii useimmiten.\n"
+"#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
+"\n"
+"# Hiiren tunnistuksessa on hankaluus: jos se epäonnistuu, X jää \n"
+"# yrittämään tunnistusta uudelleen ja uudelleen. Niimpä jos valmis\n"
+"# vastaus määrää hiiren tunnistuksen, voidaan jäädä junnaamaan.\n"
+"#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
+"\n"
+"# Monitorin automaattista tunnistamista suositellaan.\n"
+"xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
+"# Poista kommentti jos näyttö on LCD.\n"
+"#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
+"# X:sssä on kolme asetustapaa monitorille Näin annetaan valmis\n"
+"# vastaus aina käytettävissä olevalle medium-tavalle. \"simple\"\n"
+"# ei ehkä ole käytettävissä, ja \"advanced\" kyselee ihan liikaa.\n"
+"xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
+"       select medium\n"
+"xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
+"       select 1024x768 @ 60 Hz"
 
 #. Tag: title
 #: preseed.xml:833
 #, no-c-format
 msgid "Preseeding other packages"
-msgstr ""
+msgstr "Valmiit vastaukset muille paketeille"
 
 #. Tag: screen
 #: preseed.xml:835
@@ -1225,18 +1320,25 @@ msgid ""
       "#   debconf-get-selections --installer > file\n"
       "#   debconf-get-selections >> file"
 msgstr ""
+"# Asennettaviksi valitut ohjelmat tai asennuksen meneminen pieleen \n"
+"# vaikuttavat kysyttäviin kysymyksiin. Muitakin kysymyksiä voi olla, \n"
+"# ja niihinkin voi antaa valmiit vastaukset. Kaikkien mahdollisten\n"
+"# asennuksen aikana kysyttävien kysymysten luettelon saa asennuksen\n"
+"# jälkeen komennoilla:\n"
+"#   debconf-get-selections --installer > file\n"
+"#   debconf-get-selections >> file"
 
 #. Tag: title
 #: preseed.xml:841
 #, no-c-format
 msgid "Advanced options"
-msgstr ""
+msgstr "Lisäasetukset"
 
 #. Tag: title
 #: preseed.xml:844
 #, no-c-format
 msgid "Shell commands"
-msgstr ""
+msgstr "Komentotulkin komennot"
 
 #. Tag: screen
 #: preseed.xml:846
@@ -1259,18 +1361,36 @@ msgid ""
       "# packages and run commands in the target system.\n"
       "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 msgstr ""
+"# valmiiden vastausten käyttö ei ole perusturvallista. Asentimessa \n"
+"# ei ole lainkaan tarkistuksia tahallisten puskurin ylivuotojen \n"
+"# tai muiden sen kaltaisten arvojan varalle. Käytä valmiiden\n"
+"# vastausten tiedostoja vain luotettavista lähteistä! Jotta \n"
+"# tämä varmasti tulisi selväksi, ja koska tämä on usein hyödyllistä,\n"
+"# näin voidaan käynnistää mikä tahansa komentotulkin komento \n"
+"# automaattisesti asentimesta.\n"
+"\n"
+"# Tämä ensimmäinen komento suoritetaan mahdollisimman aikaisin, heti\n"
+"# valmiiden vastausten tiedoston lukemisen jälkeen.\n"
+"#d-i preseed/early_command string anna-install some-udeb\n"
+"\n"
+"# Tämä komento suoritetaan juuri ennen asennuksen päättymistä, mutta\n"
+"# /target hakemiston vielä ollessa kunnossa. /target voidaan käyttää\n"
+"# suoraan juurihakemistona tai käyttämällä komentoja apt-install ja\n"
+"# in-target helposti asentaa paketteja ja suorittaa komentoja \n"
+"# asennetussa järjestelmässä.\n"
+"#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
 #: preseed.xml:851
 #, no-c-format
 msgid "Chainloading preconfiguration files"
-msgstr ""
+msgstr "Valmiiden vastausten tiedostojen lataaminen ketjussa"
 
 #. Tag: para
 #: preseed.xml:852
 #, no-c-format
 msgid "It is possible to include other preconfiguration files from a preconfiguration file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
-msgstr ""
+msgstr "Valmiiden vastausten tiedostossa on mahdollista ottaa käyttöön muita tiedostoja. Noiden tiedostojen asetukset korvaavat aikaisemmin ladatuissa tiedostoissa olleet vastaavat arvot. Tämä mahdollistaa esimerkiksi yleisten paikallisten verkkoasetusten tallentaminen yhteen tiedostoon ja tarkemmat asetukset tiettyihin kokoonpanoihin toisiin tiedostoihin."
 
 #. Tag: screen
 #: preseed.xml:862
@@ -1298,4 +1418,27 @@ msgid ""
       "# directory as the preconfiguration file that runs them.\n"
       "d-i preseed/run string foo.sh"
 msgstr ""
+"# Luettelossa voi olla useita tiedostoja välilyönneillä eroteltuina;\n"
+"# ne kaikki ladataan. Liitetyissä tiedostoissa voi olla myös omia \n"
+"# preseed/include direktiivejä. Huomaa tiedostonimien olevan suhteelisia,\n"
+"# ne etsitään samasta hakemistosta kuin liittävä valmiiden vastausten\n"
+"# tiedosto. \n"
+"#d-i preseed/include string x.cfg\n"
+"\n"
+"# Asennin tarkistaa haluttaessa valmiiden vastausten tiedostojen \n"
+"# tarkistussummat ennen tiedostojen käyttöä. Tällä hetkellä vain \n"
+"# md5sum on tuettu, luettele md5sum-arvot samassa järjestyksessä\n"
+"# kuin liitettävien tiedostojen luettelo.\n"
+"#d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"# Joustavampi tapa, tässä käynnistetään komentotulkin komento ja jos sen\n"
+"# tulosteessa on valmiiden vastausten tiedostojen nimiä, ne liitetään.\n"
+"#d-i preseed/include_command \\\n"
+"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"\n"
+"# Kaikkein joustavin tapa on noutaa ohjelma ja käynnistää se. Ohjelma\n"
+"# voi käyttää komentoja kuten debconf-set muokkaamaan debconfin tietokantaa.\n"
+"#  Huomaa tiedostonimien olevan suhteellisia, ne etsitään samasta \n"
+"# hakemistosta kuin ne käynnistävä liittävä valmiiden vastausten tiedosto\n"
+"d-i preseed/run string foo.sh"
 
