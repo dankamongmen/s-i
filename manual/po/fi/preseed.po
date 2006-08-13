@@ -1,0 +1,1301 @@
+# Debian Installation Guide preseed.
+# Tapio Lehtonen <tale@debian.org>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Installation Guide preseed\n"
+"Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
+"POT-Creation-Date: 2006-07-30 15:28+0000\n"
+"PO-Revision-Date: 2006-08-12 22:25+0300\n"
+"Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
+"Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: preseed.xml:16
+#, no-c-format
+msgid "Automating the installation using preseeding"
+msgstr "Asennuksen automatisointi valmiilla vastauksilla"
+
+#. Tag: para
+#: preseed.xml:18
+#, no-c-format
+msgid "This appendix explains the intricacies of preseeding answers to questions in &d-i; to automate your installation."
+msgstr "Tämä liite selittää visaiset pulmat annettaessa &d-i; asetukset etukäteen asennuksen automatisoimiseksi."
+
+#. Tag: para
+#: preseed.xml:23 preseed.xml:504
+#, no-c-format
+msgid "The configuration fragments used in this appendix are also available as an example preconfiguration file from &urlset-example-preseed;."
+msgstr "Tässä liitteessä käytetyt asetustiedostojen osat ovat saatavilla myös esimerkkiasetustiedostona &urlset-example-preseed;."
+
+#. Tag: title
+#: preseed.xml:31
+#, no-c-format
+msgid "Introduction"
+msgstr "Johdanto"
+
+#. Tag: para
+#: preseed.xml:32
+#, no-c-format
+msgid "Preseeding provides a way to set answers to questions asked during the installation process, without having to manually enter the answers while the installation is running. This makes it possible to fully automate most types of installation and even offers some features not available during normal installations."
+msgstr "Valmiit vastaukset tarkoittaa asennuksen aikana kysyttävien kysymysten vastauksien antamista etukäteen, jolloin asennuksen aikana ei tarvitse istua vastailemassa. Tämä mahdollistaa useimpien asennustapojen täydellisen automatisoinnin ja jopa muutamia lisäominaisuuksia joita ei tavallisessa asennuksessa ole."
+
+#. Tag: title
+#: preseed.xml:43
+#, no-c-format
+msgid "Preseeding methods"
+msgstr "Valmiiden vastausten tallennustapoja"
+
+#. Tag: para
+#: preseed.xml:44
+#, no-c-format
+msgid "There are three methods that can be used for preseeding: <firstterm>initrd</firstterm>, <firstterm>file</firstterm> and <firstterm>network</firstterm>. Initrd preseeding will work with any installation method and supports preseeding of more things, but it requires the most preparation. File and network preseeding each can be used with different installation methods. With file and network preseeding the first few installer questions cannot be preseeded because the preconfiguration file is only loaded after they have been asked."
+msgstr "Valmiille vastauksille on kolme tallennuspaikkaa: <firstterm>initrd</firstterm>, <firstterm>tiedosto</firstterm> ja <firstterm>verkko</firstterm>. initrd toimii kaikilla asennustavoilla ja tukee valmiita vastauksia useampiin kysyttäviin asioihin, mutta vaatii eniten valmisteluja. Tiedostoa ja verkkoa käytetään eri asennustavoissa. Näitä tallennuspaikkoja käytettäessä muutamaan asentimen ensimmäisistä kysymyksistä ei voi antaa valmista vastausta koska vastaukset noudetaan vasta kysymysten jälkeen."
+
+#. Tag: para
+#: preseed.xml:55
+#, no-c-format
+msgid "The following table shows which preseeding methods can be used with which installation methods."
+msgstr "Seuraava taulukko näyttää mitä valmiiden vastausten tallennuspaikkoja voi käyttää minkäkinlaisissa asennustavoissa."
+
+#. Tag: entry
+#: preseed.xml:64
+#, no-c-format
+msgid "Installation method"
+msgstr "Asennustapa"
+
+#. Tag: entry
+#: preseed.xml:64
+#, no-c-format
+msgid "initrd"
+msgstr "initrd"
+
+#. Tag: entry
+#: preseed.xml:65
+#, no-c-format
+msgid "file"
+msgstr "tiedosto"
+
+#. Tag: entry
+#: preseed.xml:65
+#, no-c-format
+msgid "network"
+msgstr "verkko"
+
+#. Tag: entry
+#: preseed.xml:71
+#, no-c-format
+msgid "CD/DVD"
+msgstr "CD/DVD"
+
+#. Tag: entry
+#: preseed.xml:72 preseed.xml:73 preseed.xml:77 preseed.xml:79 preseed.xml:82 preseed.xml:83 preseed.xml:87 preseed.xml:88 preseed.xml:92 preseed.xml:94 preseed.xml:97 preseed.xml:99
+#, no-c-format
+msgid "<entry>yes</entry>"
+msgstr "<entry>kyllä</entry>"
+
+#. Tag: entry
+#: preseed.xml:74 preseed.xml:78 preseed.xml:84 preseed.xml:89 preseed.xml:93 preseed.xml:98
+#, no-c-format
+msgid "<entry>no</entry>"
+msgstr "<entry>ei</entry>"
+
+#. Tag: entry
+#: preseed.xml:76
+#, no-c-format
+msgid "netboot"
+msgstr "netboot"
+
+#. Tag: entry
+#: preseed.xml:81
+#, no-c-format
+msgid "hd-media <phrase condition=\"bootable-usb\">(including usb-stick)</phrase>"
+msgstr "kiintolevy <phrase condition=\"bootable-usb\">(myös USB-muisti)</phrase>"
+
+#. Tag: entry
+#: preseed.xml:86
+#, no-c-format
+msgid "floppy based (cd-drivers)"
+msgstr "levykkeeltä (CD-ajurit)"
+
+#. Tag: entry
+#: preseed.xml:91
+#, no-c-format
+msgid "floppy based (net-drivers)"
+msgstr "levykkeeltä (verkkoajurit)"
+
+#. Tag: entry
+#: preseed.xml:96
+#, no-c-format
+msgid "generic/tape"
+msgstr "muu/nauha"
+
+#. Tag: para
+#: preseed.xml:105
+#, no-c-format
+msgid "An important difference between the preseeding methods is the point at which the preconfiguration file is loaded and processed. For initrd preseeding this is right at the start of the installation, before the first question is even asked. For file preseeding this is after the CD or CD image has been loaded. For network preseeding it is only after the network has been configured."
+msgstr "Tärkeä ero valmiiden vastausten tallennuspaikkojen välillä on vastausten noutamis- ja käsittelyhetki asennuksen aikana. initrd on käytettävissä heti asennuksen alussa, ennen ensimmäistäkään kysymystä. Tiedostosta voidaan lukea kun romppu tai romppuotos on ladattu. Verkosta voidaan noutaa vasta kun verkkoasetukset on tehty."
+
+#. Tag: para
+#: preseed.xml:114
+#, no-c-format
+msgid "In practical terms this means for file and network preseeding that the questions about language, country and keyboard selection will already have been asked. For network preseeding add to that any questions related to network configuration. Some other questions that are only displayed at medium or low priority (like the first hardware detection run) will also already have been processed."
+msgstr "Tämä tarkoittaa käytännössä, että käytettäessä tiedostoa tai verkkoa on kieltä, maata ja näppäinasettelua koskevat kysymykset jo kysytty. Verkkoa käytettäessä on kysytty myös kaikki verkon asetuksia koskevat kysymykset. Jotkin muutkin kysymykset jotka esitetään vain keskitasoa tai matalaa prioriteettia käytettäessä on myös jo käsitelty."
+
+#. Tag: para
+#: preseed.xml:123
+#, no-c-format
+msgid "Obviously, any questions that have been processed before the preconfiguration file is loaded cannot be preseeded. <xref linkend=\"preseed-bootparms\"/> offers a way to avoid these questions being asked."
+msgstr "Ei tietenkään ole mahdollista antaa valmiita vastauksia kysymyksiin jotka esitetään ennen vastausten noutamista. <xref linkend=\"preseed-bootparms\"/> kertoo miten nämä kysymyksen on mahdollista välttää."
+
+#. Tag: title
+#: preseed.xml:134
+#, no-c-format
+msgid "Limitations"
+msgstr "Rajoituksia"
+
+#. Tag: para
+#: preseed.xml:135
+#, no-c-format
+msgid "Although most questions used by &d-i; can be preseeded using this method, there are some notable exceptions. You must (re)partition an entire disk or use available free space on a disk; it is not possible to use existing partitions. You currently cannot use preseeding to set up RAID."
+msgstr "Vaikkakin useimpiin asentimen kysymyksiin voidaan antaa valmiit vastaukset, on muutamia tärkeitä poikkeuksia. Kiintolevy on joko (uudelleen) osioitava kokonaan  tai käytettävä levyllä olevaa vapaata tilaa; ei ole mahdollista käyttää valmiita osioita. Valmiita vastauksia ei voi käyttää otettaessa RAID käyttöön."
+
+#. Tag: title
+#: preseed.xml:207
+#, no-c-format
+msgid "Running custom commands during the installation"
+msgstr "Mielivaltaisten komentojen käynnistämien asennuksen aikana"
+
+#. Tag: para
+#: preseed.xml:208
+#, no-c-format
+msgid "A very powerful and flexible option offered by the preconfiguration tools is the ability to run commands or scripts at certain points in the installation. See <xref linkend=\"preseed-shell\"/> for details."
+msgstr "Valmiiden vastausten vallan mahtava ja joustava ominaisuus on komentojen tai komentotiedostojen suorittaminen tietyissä paikoissa asennuksen aikan. Katso yksityiskohtia <xref linkend=\"preseed-shell\"/>."
+
+#. Tag: para
+#: preseed.xml:217
+#, no-c-format
+msgid "<userinput>preseed/early_command</userinput>: is run as soon as the preconfiguration file has been loaded"
+msgstr "<userinput>preseed/early_command</userinput>: suoritetaan heti kun valmiit vastaukset on noudettu"
+
+#. Tag: para
+#: preseed.xml:221
+#, no-c-format
+msgid "<userinput>preseed/late_command</userinput>: is run just before the reboot at the end of the install, but before the <filename>/target</filename> filesystem has been unmounted"
+msgstr "<userinput>preseed/late_command</userinput>: suoritetaan asennuksen lopussa juuri ennen uudelleenkäynnistystä, mutta ennen kuin <filename>/target</filename> irrotetaan"
+
+#. Tag: title
+#: preseed.xml:231
+#, no-c-format
+msgid "Using preseeding to change default values"
+msgstr "Oletusarvojen muuttaminen valmiilla vastauksilla"
+
+#. Tag: para
+#: preseed.xml:232
+#, no-c-format
+msgid "It is possible to use preseeding to change the default answer for a question, but still have the question asked. To do this the <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after setting the value for a question."
+msgstr "On mahdollista muuttaa oletusarvoa valmiilla vastauksella mutta silti esittää kysymys. Tämä tehdään muuttamalla ilmaisimen <firstterm>seen</firstterm> arvoksi <quote>false</quote> sen jälkeen kun vastaus on asetettu."
+
+#. Tag: screen
+#: preseed.xml:241
+#, no-c-format
+msgid ""
+      "d-i foo/bar string value\n"
+      "d-i foo/bar seen false"
+msgstr ""
+"d-i foo/bar string value\n"
+"d-i foo/bar seen false"
+
+#. Tag: title
+#: preseed.xml:247
+#, no-c-format
+msgid "Using preseeding"
+msgstr "Valmiiden vastausten käyttö"
+
+#. Tag: para
+#: preseed.xml:248
+#, no-c-format
+msgid "Of course you will first need to create a preconfiguration file and place it in the location from where you want to use it. Creating the preconfiguration file is covered later in this appendix. Putting it in the correct location is fairly straightforward for network preseeding or if you want to read the file off a floppy or usb-stick. If you want to include the file on a CD or DVD, you will have to remaster the ISO image. How to get the preconfiguration file included in the initrd is outside the scope of this document; please consult the developers documentation for &d-i;."
+msgstr "Ensin on valmiit vastaukset sisältävä tiedosto tietenkin tehtävä ja tallennettava se siihen paikkaan josta sitä halutaan käyttää. Tiedoston tekemistä käsitellään jäljempänä tässä liitteessä. Tallentaminen oikeaan paikkaan on varsin suoraviivaista käytettäessä verkkoa tai jos tiedosto halutaan lukea levykkeeltä tai USB-muistilta. Jos tiedosto halutaan tallentaa CD- tai DVD-levylle, on ISO-otos luotava uudelleen. Tiedoston saaminen mukaan initrd:hen ei kuulu tämän ohjeen piiriin; katso &d-i; kehittäjän ohjeita."
+
+#. Tag: para
+#: preseed.xml:259
+#, no-c-format
+msgid "An example preconfiguration file that you can use as basis for your own preconfiguration file is available from &urlset-example-preseed;. This file is based on the configuration fragments included in this appendix."
+msgstr "Valmiiden vastausten tiedostosta on esimerkki &urlset-example-preseed; jota voi käyttää oman tiedoston pohjana. Tuo tiedosto käyttää tämän liitteen esimerkkeinä olevia asetuksia."
+
+#. Tag: title
+#: preseed.xml:268
+#, no-c-format
+msgid "Loading the preconfiguration file"
+msgstr "Valmiiden vastausten tiedoston lataaminen"
+
+#. Tag: para
+#: preseed.xml:269
+#, no-c-format
+msgid "If you are using initrd preseeding, you only have to make sure a file named <filename>preseed.cfg</filename> is included in the root directory of the initrd. The installer will automatically check if this file is present and load it."
+msgstr "Jos tallennuspaikkana on initrd, riittää varmistaa tiedoston nimeltä <filename>preseed.cfg</filename> olevan initrd:n juurihakemistossa. Asennin tarkistaa automaattisesti onko tuo tiedosto paikallaan ja lataa sen."
+
+#. Tag: para
+#: preseed.xml:276
+#, no-c-format
+msgid "For the other preseeding methods you need to tell the installer what file to use when you boot it. This is normally done by passing the kernel a boot parameter, either manually at boot time or by editing the bootloader configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end of the append line(s) for the kernel."
+msgstr "Tallennettaessa vastaukset muuanne on asentimelle kerrottava käynnistyksen yhteydessä mitä tiedostoa käytetätään. Tämä tehdään tavallisesti antamalla ytimelle käynnistysparametreja, joko käsin käynnistyksen yhteydessä tai muokkaamalla käynnistyslataimen asetustiedostoa (esim. <filename>syslinux.cfg</filename>) ja lisäämällä parametri ytimen append-rivin lopppuun."
+
+#. Tag: para
+#: preseed.xml:284
+#, no-c-format
+msgid "If you do specify the preconfiguration file in the bootloader configuration, you might change the configuration so you don't need to hit enter to boot the installer. For syslinux this means setting the timeout to <literal>1</literal> in <filename>syslinux.cfg</filename>."
+msgstr "Jos vastaukset sisältävä tiedosto kerrotaan käynnistyslataimen asetuksissa, halutaan asetuksia ehkä muuttaa siten ettei asenninta tarvitse käynnistää painamalla &enterkey;. Jos käytössä on syslinux asetetaan aikakatkaisun arvoksi <literal>1</literal> tiedostossa <filename>syslinux.cfg</filename>."
+
+#. Tag: para
+#: preseed.xml:291
+#, no-c-format
+msgid "To make sure the installer gets the right preconfiguration file, you can optionally specify a checksum for the file. Currently this needs to be a md5sum, and if specified it must match the preconfiguration file or the installer will refuse to use it."
+msgstr "Tiedostolle on mahdollista asettaa tarkistussumma varmistamaan asentimen saavan oikean asetustiedoston. Tällä hetkellä tarkistussummman on oltava md5sum, ja jos se annetaan sen on vastattava valmiit vastaukset sisältävää tiedostoa tai asennin jättää tiedoston käyttämättä."
+
+#. Tag: screen
+#: preseed.xml:300
+#, no-c-format
+msgid ""
+      "Boot parameters to specify:\n"
+      "- if you're netbooting:\n"
+      "  preseed/url=http://host/path/to/preseed.cfg\n"
+      "  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "- if you're booting a remastered CD:\n"
+      "  preseed/file=/cdrom/preseed.cfg\n"
+      "  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "- if you're installing from USB media (put the preconfiguration file in the\n"
+      "  toplevel directory of the USB stick):\n"
+      "  preseed/file=/hd-media/preseed.cfg\n"
+      "  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d"
+msgstr ""
+"Käytettäviä käynnistysparametreja:\n"
+"- jos käynnistetään verkosta:\n"
+"  preseed/url=http://host/path/to/preseed.cfg\n"
+"  preseed/url/checksum=5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"- jos käynnistetään uudelleen luotu romppu:\n"
+"  preseed/file=/cdrom/preseed.cfg\n"
+"  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"- jos asennetaan USB-muistilta (tallenna valmiiden vastausten tiedosto USB-muistin juurihakemistoon):\n"
+"  preseed/file=/hd-media/preseed.cfg\n"
+"  preseed/file/checksum=5da499872becccfeda2c4872f9171c3d"
+
+#. Tag: para
+#: preseed.xml:302
+#, no-c-format
+msgid "Note that <filename>preseed/url</filename> can be shortened to just <filename>url</filename> and <filename>preseed/file</filename> to just <filename>file</filename> when they are passed as boot parameters."
+msgstr "Huomaa, että <filename>preseed/url</filename> voidaan lyhentää <filename>url</filename> ja <filename>preseed/file</filename> lyhentää <filename>file</filename> kun niitä käytetään käynnistysparametreina."
+
+#. Tag: para
+#: preseed.xml:308
+#, no-c-format
+msgid "While you're at it, you may want to add a boot parameter <userinput>priority=critical</userinput>. This will avoid most questions even if the preseeding below misses some."
+msgstr "Kun käynnistysparametreja nyt peukaloidaan, kannattaa lisätä myös <userinput>priority=critical</userinput>. Tällä asetuksella useimmat kysymykset ohitetaan vaikka valmiita vastauksia ei olisikaan kaikkiin."
+
+#. Tag: title
+#: preseed.xml:318
+#, no-c-format
+msgid "Using a DHCP server to specify preconfiguration files"
+msgstr "DHCP-palvelin kertomaan mistä valmiiden vastausten tiedosto löytyy"
+
+#. Tag: para
+#: preseed.xml:319
+#, no-c-format
+msgid "It's also possible to use DHCP to specify a preconfiguration file to download from the network. DHCP allows specifying a filename. Normally this is a file to netboot, but if it appears to be an URL then installation media that support network preseeding will download the file from the URL and use it as a preconfiguration file. Here is an example of how to set it up in the dhcpd.conf for version 3 of the ISC DHCP server (the dhcp3-server Debian package)."
+msgstr "DHCP:täkin voi käyttää kertomaan mistä päin verkkoa valmiit vastaukset sisältävä tiedosto noudetaan. DHCP sallii tiedoston nimen välittämisen. Tämä on tavallisesti verkkokäynnistyksen tiedosto, mutta jos se näyttäisi olevan URL noutaa verkosta haettavia valmiita vastauksia tukeva asennustaltio tiedoston URL:n avulla ja käyttää sitä valmiiden vastausten tiedostona. Seuraava esimerkki näyttää miten tämä tehdään ISC DHCP -palvelimen version 3 <filename>dhcpd.conf</filename>-tiedostossa (Debianin paketti dhcp3-server). "
+
+#. Tag: screen
+#: preseed.xml:330
+#, no-c-format
+msgid ""
+      "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
+      "    filename \"http://host/preseed.cfg\";\n"
+      "}"
+msgstr ""
+"if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
+"    filename \"http://host/preseed.cfg\";\n"
+"}"
+
+#. Tag: para
+#: preseed.xml:332
+#, no-c-format
+msgid "Note that the above example limits this filename to DHCP clients that identify themselves as \"d-i\", so it will not affect regular DHCP clients, but only the installer. You can also put the text in a stanza for only one particular host to avoid preseeding all installs on your network."
+msgstr "Huomaa edeltävän esimerkin tarjoavat tätä tiedostonimeä vain DHCP-asiakkaille jotka ilmoittavat nimekseen \"d-i\", joten tämä ei vaikuta tavallisiin DHCP-asiakkaisiin, vain asentimeen. Toinen tapa on kirjoittaa teksti vain nimetyn koneen tietueeseen jolloin sitä ei taaskaan käytetä kaikkiin verkosta tapahtuviin asennuksiin."
+
+#. Tag: para
+#: preseed.xml:339
+#, no-c-format
+msgid "A good way to use the DHCP preseeding is to only preseed values specific to your network, such as the Debian mirror to use. This way installs on your network will automatically get a good mirror selected, but the rest of the installation can be performed interactively. Using DHCP preseeding to fully automate Debian installs should only be done with care."
+msgstr "DHCP:tä on hyvä käyttää kertomaan valmiit vastaukset vain verkkokohtaisiin kysymyksiin, kuten käytettävä Debian-asennuspalvelin. Näin verkkoa käyttävät asennukset saavat automaattisesti valittua hyvän asennuspalvelimen, mutta muut asennukset voidaan tehdä vuorovaikutteisesti. DHCP:n käyttö automatisoimaan Debianin asennus kokonaan olisi tehtävä vain harkitusti."
+
+#. Tag: title
+#: preseed.xml:351
+#, no-c-format
+msgid "Using boot parameters to supplement preseeding"
+msgstr "Käynnistysparametrit täydentävät valmiita vastauksia"
+
+#. Tag: para
+#: preseed.xml:352
+#, no-c-format
+msgid "Some parts of the installation process cannot be automated using some forms of preseeding because the questions are asked before the preconfiguration file is loaded. For example, if the preconfiguration file is downloaded over the network, the network setup must be done first. One reason to use initrd preseeding is that it allows preseeding of even these early steps of the installation process."
+msgstr "Joitakin asennuksen osia ei voi automatisoida kaikilla valmiiden vastausten tallennustavoilla koska kysymykset esitetään ennen kuin valmiiden vastausten tiedosto ladataan. Jos esimerkiksi tiedosto noudetaan verkosta, on verkon asetukset tehtävä ensin. Yksi initrd:n käytön syy on, että se sallii valmiit vastaukset myös näinin asennuksen alkuvaiheisiin."
+
+#. Tag: para
+#: preseed.xml:361
+#, no-c-format
+msgid "If a preconfiguration file cannot be used to preseed some steps, the install can still be fully automated, since you can pass preseed values to the kernel on the command line. Just pass <userinput>path/to/var=value</userinput> for any of the preseed variables listed in the examples."
+msgstr "Jos valmiiden vastausten tiedostoa ei voi käyttää joidenkin vaiheiden automatisoimiseen, asennus voidaan siitä huolimatta automatisoida täysin, koska valmiit vastaukset voidaan välittää ytimelle komentorivillä. Käytä <userinput>polku/siihen/muuttujaan=arvo</userinput> mille tahansa esimerkissä luetellulle muuttujalle jolle voi käyttää valmiita vastauksia."
+
+#. Tag: para
+#: preseed.xml:368
+#, no-c-format
+msgid "Note that some variables that are frequently set at the boot prompt have a shorter alias. If an alias is available, it is used in the examples in this appendix instead of the full variable."
+msgstr "Huomaa joillakin usein käynnistimen kehotteessa käytetyillä muuttujilla olevan lyhennysmerkintä. Jos lyhennysmerkintä on käytettävissä, sitä käytetään tämän liitteen esimerkissä pitkän nimen tilalla."
+
+#. Tag: para
+#: preseed.xml:374
+#, no-c-format
+msgid "A <quote>--</quote> in the boot options has special meaning. Kernel parameters that appear after it will be copied into the installed bootloader configuration (if supported by the installer for the bootloader). Note that the <quote>--</quote> may already be present in the default boot parameters."
+msgstr "Merkinnällä <quote>--</quote> on erikoismerkitys käynnistysvalitsimissa. Sen jälkeen tulevat ytimen parametrit kopioidaan asennetun käynnistyslataimen asetuksiin (jos asennin tukee tätä käytetylle käynnistyslataimelle). Huomaa, että <quote>--</quote> saattaa olla jo käynnistyksen oletusparametreissa."
+
+#. Tag: para
+#: preseed.xml:383
+#, no-c-format
+msgid "The 2.4 kernel accepts a maximum of 8 command line options and 8 environment options (including any options added by default for the installer). If these numbers are exceeded, 2.4 kernels will drop any excess options and 2.6 kernels will panic. For kernel 2.6.9 and later, you can use 32 command line options and 32 environment options."
+msgstr "2.4 version ydin kelpuuttaa enintään 8 parametriä komentorivillä ja 8 ympäristömuuttujaa (mukaan lukien asentimelle oletusarvona annetut). Jos nämä määrät ylitetään, 2.4 ytimet pudottava ylimääräiset parametrit pois ja 2.6 ytimet kaatuvat. Ytimen versiolle 2.6.9 ja uudempi voi käyttää 32 komentorivin parametria ja 32 ympäristömuuttujaa."
+
+#. Tag: para
+#: preseed.xml:392
+#, no-c-format
+msgid "For most installations some of the default options in your bootloader configuration file, like <literal>vga=normal</literal>, may be safely removed which may allow you to add more options for preseeding."
+msgstr "Useimmissa asennuksissa voidaan jotkin käynnistyslataimen asetustiedoston valitsimet, kuten <literal>vga=normal</literal>, turvallisesti poistaa. Näin enemmän parametreja valmiiden vastausten käyttöön."
+
+#. Tag: para
+#: preseed.xml:399
+#, no-c-format
+msgid "It may not always be possible to specify values with spaces for boot parameters, even if you delimit them with quotes."
+msgstr "Voi olla ettei käynnistyksen parametreille voi aina antaa arvoa jossa on tyhjämerkki, vaikka käytettäisiinkin lainausmerkkejä arvon ympärillä."
+
+#. Tag: title
+#: preseed.xml:409
+#, no-c-format
+msgid "Creating a preconfiguration file"
+msgstr "Valmiiden vastausten tiedoston tekeminen"
+
+#. Tag: para
+#: preseed.xml:410
+#, no-c-format
+msgid "The preconfiguration file is in the format used by the <command>debconf-set-selections</command> command. The general format of a line in a preconfiguration file is:"
+msgstr "Valmiiden vastausten tiedosto on komennon <command>debconf-set-selections</command> käyttämässä muodossa. Tiedoston rivi on muotoa:"
+
+#. Tag: screen
+#: preseed.xml:416
+#, no-c-format
+msgid "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
+msgstr "&lt;omistaja&gt; &lt;kysymyksen nimi&gt; &lt;kysymyksen tyyppi&gt; &lt;arvo&gt;"
+
+#. Tag: para
+#: preseed.xml:418
+#, no-c-format
+msgid "There are a few rules to keep in mind when writing a preconfiguration file."
+msgstr "Valmiiden vastausten tiedostoa kirjoitettaessa olisi pidettävä mielessä muutamia sääntöjä."
+
+#. Tag: para
+#: preseed.xml:425
+#, no-c-format
+msgid "Put only a single space or tab between type and value: any additional whitespace will be interpreted as belonging to the value."
+msgstr "Kirjoita vain yksi välilyönti tai sarkainmerkki tyypin ja arvon väliin: kaikki muut tyhjätilamerkit katsotaan arvoon kuuluviksi."
+
+#. Tag: para
+#: preseed.xml:429
+#, no-c-format
+msgid "A line can be split into multiple lines by appending a backslash (<quote><literal>\\</literal></quote>) as the line continuation character. A good place to split a line is after the question name; a bad place is between type and value."
+msgstr "Rivi voidaan jakaa usealle riville kirjoittamalla kenoviiva (<quote><literal>\\</literal></quote>) jatkorivin merkiksi. Hyvä kohta rivin jakamiseen on kysymyksen nimen jälkeen; huono kohta on tyypin ja arvon välissä."
+
+#. Tag: para
+#: preseed.xml:435
+#, no-c-format
+msgid "Most questions need to be preseeded using the values valid in English and not the translated values. However, there are some questions (for example in <classname>partman</classname> where the translated values need to be used."
+msgstr "Useimpiin kysymyksiin on valmis vastaus annettava englanninkielisenä arvona eikä käännettynä arvona. Joissakin kysymyksissä (esimerkiksi moduulissa <classname>partman</classname>) on kuitenkin käytettävä käännettyjä arvoja."
+
+#. Tag: para
+#: preseed.xml:441
+#, no-c-format
+msgid "Some questions take a code as value instead of the English text that is shown during installation."
+msgstr "Joihinkin kysymyksiin arvo on koodi eikä asennuksen aikana näytettävä teksti."
+
+#. Tag: para
+#: preseed.xml:447
+#, no-c-format
+msgid "The easiest way to create a preconfiguration file is to use the example file linked in <xref linkend=\"preseed-contents\"/> as basis and work from there."
+msgstr "Valmiiden vastausten tiedosto on helpointa tehdä esimerkkitiedostosta <xref linkend=\"preseed-contents\"/> ja muokata sitä sopivaksi."
+
+#. Tag: para
+#: preseed.xml:452
+#, no-c-format
+msgid "An alternative method is to do a manual installation and then, after rebooting, use the <command>debconf-get-selections</command> from the <classname>debconf-utils</classname> package to dump both the debconf database and the installer's cdebconf database to a single file:"
+msgstr "Toinen tapa on tehdä asennus tavalliseen tapaan ja sitten, uudelleenkäynnistyksen jälkeen, paketin <classname>debconf-utils</classname> komennolla <command>debconf-get-selections</command> vedostaa sekä debconf-tietokanta että asentimen debconf-tietokanta yhteen tiedostoon:"
+
+#. Tag: screen
+#: preseed.xml:459
+#, no-c-format
+msgid ""
+      "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
+      "$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>"
+msgstr ""
+"$ debconf-get-selections --installer &gt; <replaceable>tiedosto</replaceable>\n"
+"$ debconf-get-selections &gt;&gt; <replaceable>tiedosto</replaceable>"
+
+#. Tag: para
+#: preseed.xml:461
+#, no-c-format
+msgid "However, a file generated in this manner will have some items that should not be preseeded, and the example file is a better starting place for most users."
+msgstr "Tällä tavalla tehdyssä tiedostossa on kuitenkin muutamia kohtia joihin ei pitäisi antaa valmista vastausta, joten esimerkkitiedoston käyttö pohjana on parempi useimmille käyttäjille."
+
+#. Tag: para
+#: preseed.xml:469
+#, no-c-format
+msgid "This method relies on the fact that, at the end of the installation, the installer's cdebconf database is saved to the installed system in <filename>/var/log/installer/cdebconf</filename>. However, because the database may contain sensitive information, by default the files are only readable by root."
+msgstr "Tämä vedostamistapa toimii, koska asennuksen lopuksi asentimen cdebconf-tietokanta tallennetaan asennettuun järjestelmään tiedostoon <filename>/var/log/installer/cdebconf</filename>. Koska tietokanta saattaa sisältää salassapidettävää tietoa, on tiedoston lukuoikeus oletusarvona vain pääkäyttäjällä."
+
+#. Tag: para
+#: preseed.xml:477
+#, no-c-format
+msgid "The directory <filename>/var/log/installer</filename> and all files in it will be deleted from your system if you purge the package <classname>installation-report</classname>."
+msgstr "Hakemisto <filename>/var/log/installer</filename> ja kaikki sen tiedostot poistetaan järjestelmästä jos paketti <classname>installation-report</classname> poistetaan valitsimella purge."
+
+#. Tag: para
+#: preseed.xml:485
+#, no-c-format
+msgid "To check possible values for questions, you can use <command>nano</command> to examine the files in <filename>/var/lib/cdebconf</filename> while an installation is in progress. View <filename>templates.dat</filename> for the raw templates and <filename>questions.dat</filename> for the current values and for the values assigned to variables."
+msgstr "Valmiiden vastausten mahdollisia arvoja näkee komennolla <command>nano</command> tutkimalla tiedostoa <filename>/var/lib/cdebconf</filename> asennuksen aikana. Tiedostosta <filename>templates.dat</filename> näkee tyhjät mallineet ja tiedostosta <filename>questions.dat</filename> tämänhetkiset arvot ja muuttujille sijoitetut arvot."
+
+#. Tag: para
+#: preseed.xml:493
+#, no-c-format
+msgid "To check if the format of your preconfiguration file is valid before performing an install, you can use the command <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>."
+msgstr "Valmiiden vastausten tiedoston kelvollisuuden voi tarkistaa ennen asennusta komennolla <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>."
+
+#. Tag: title
+#: preseed.xml:503
+#, no-c-format
+msgid "Contents of the preconfiguration file"
+msgstr "Valmiiden vastausten tiedoston sisältö"
+
+#. Tag: para
+#: preseed.xml:509
+#, no-c-format
+msgid "Note that this example is based on an installation for the Intel x86 architecture. If you are installing a different architecture, some of the examples (like keyboard selection and bootloader installation) may not be relevant and will need to be replaced by debconf settings appropriate for your architecture."
+msgstr "Huomaa tämän esimerkin olevan tarkoitettu Intel x86-arkkitehtuurille tapahtuvaan asennukseen. Jos asennetaan jollekin muulle arkkitehtuurille, jotkin esimerkeistä (kuten näppäimistön valinta ja käynnistyslataimen asennus) eivät ehkä ole mielekkäitä ja ne on korvattava arkkitehtuurikohtaisilla debconfin asetuksilla."
+
+#. Tag: title
+#: preseed.xml:520
+#, no-c-format
+msgid "Localization"
+msgstr "Kotoistus"
+
+#. Tag: para
+#: preseed.xml:521
+#, no-c-format
+msgid "Setting localization values will only work if you are using initrd preseeding. With all other methods the preconfiguration file will only be loaded after these questions have been asked."
+msgstr "Valmiit vastaukset kotoistukseen toimivat vain jos vastausten tallennuspaikka on initrd. Muista tallennuspaikoista tiedosto ladataan vasta kun kysymykset on jo esitetty."
+
+#. Tag: para
+#: preseed.xml:527
+#, no-c-format
+msgid "The locale can be used to specify both language and country. To specify the locale as a boot parameter, use <userinput>locale=<replaceable>en_US</replaceable></userinput>."
+msgstr "Lokaalin avulla voidaan määrätä sekä kieli että maa. Lokaali annetaan käynnistysparametrina kirjoittamalla <userinput>locale=<replaceable>fi_FI</replaceable></userinput>."
+
+#. Tag: screen
+#: preseed.xml:533
+#, no-c-format
+msgid ""
+      "# Locale sets language and country.\n"
+      "d-i debian-installer/locale string en_US"
+msgstr ""
+"# Lokaali määrittää kielen ja maan.\n"
+"d-i debian-installer/locale string fi_FI"
+
+#. Tag: para
+#: preseed.xml:535
+#, no-c-format
+msgid "Keyboard configuration consists of selecting a keyboard architecture and a keymap. In most cases the correct keyboard architecture is selected by default, so there's normally no need to preseed it. The keymap must be valid for the selected keyboard architecture."
+msgstr "Näppämistön asetuksissa valitaan näppäimistön arkkitehtuuri ja asettelu. Useimmissa tapauksissa oikea näppäimistön arkkitehtuuri on oletusarvona, joten se ei tavallisesti tarvitse valmista vastausta. Näppäinasettelun on oltava kelvollinen valitulle näppäimistön arkkitehtuurille."
+
+#. Tag: screen
+#: preseed.xml:542
+#, no-c-format
+msgid ""
+      "# Keyboard selection.\n"
+      "#d-i console-tools/archs select at\n"
+      "d-i console-keymaps-at/keymap select us\n"
+      "# Example for a different keyboard architecture\n"
+      "#d-i console-keymaps-usb/keymap select mac-usb-us"
+msgstr ""
+"# Näppäimistön valinta.\n"
+"#d-i console-tools/archs select at\n"
+"d-i console-keymaps-at/keymap select us\n"
+"# Esimerkki muusta näppäimistön arkkitehtuurista\n"
+"#d-i console-keymaps-usb/keymap select mac-usb-us"
+
+#. Tag: para
+#: preseed.xml:544
+#, no-c-format
+msgid "To skip keyboard configuration, preseed <classname>console-tools/archs</classname> with <userinput>skip-config</userinput>. This will result in the kernel keymap remaining active."
+msgstr "Näppäimistön asetukset ohitetaan antamalla kysymykseen <classname>console-tools/archs</classname> valmis vastaus <userinput>skip-config</userinput>. Tällöin ytimen näppäinasettelu jää käyttöön."
+
+#. Tag: para
+#: preseed.xml:553
+#, no-c-format
+msgid "The changes in the input layer for 2.6 kernels have made the keyboard architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote> (<userinput>at</userinput>) keymap should be selected."
+msgstr "2.6-ytimien syötetason muutoksien seurauksena näppäinarkkitehtuuri on melkein poistunut käytöstä. 2.6-ytimille olisi tavallisesti valittava näppäinasetteluksi <quote>PC</quote> (<userinput>at</userinput>)."
+
+#. Tag: title
+#: preseed.xml:563
+#, no-c-format
+msgid "Network configuration"
+msgstr "Verkkoasetukset"
+
+#. Tag: para
+#: preseed.xml:564
+#, no-c-format
+msgid "Of course, preseeding the network configuration won't work if you're loading your preconfiguration file from the network. But it's great when you're booting from CD or USB stick. If you are loading preconfiguration files from the network, you can pass network config parameters by using kernel boot parameters."
+msgstr "Valmiit vastaukset verkkoasetuksiin ei tietystikään toimi jos valmiiden vastausten tiedosto noudetaan verkosta. Mutta rompulta tai USB-muistilta käynnistettäessä lataaminen on tosi näppärää. Noudettaessa valmiiden vastausten tiedostot verkosta, voidaan verkon asetukset antaa ytimen käynnistysparametreina."
+
+#. Tag: para
+#: preseed.xml:572
+#, no-c-format
+msgid "If you need to pick a particular interface when netbooting before loading a preconfiguration file from the network, use a boot parameter such as <userinput>interface=<replaceable>eth1</replaceable></userinput>."
+msgstr "Mikäli verkosta käynnistettäessä on valittava tietty verkkoliitäntä ennen valmiiden vastausten tiedoston noutamista verkosta, käytetään käynnistysparametria kuten <userinput>interface=<replaceable>eth1</replaceable></userinput>."
+
+#. Tag: para
+#: preseed.xml:578
+#, no-c-format
+msgid "Although preseeding the network configuration is normally not possible when using network preseeding (using <quote>preseed/url</quote>), you can use the following hack to work around that, for example if you'd like to set a static address for the network interface. The hack is to force the network configuration to run again after the preconfiguration file has been loaded by creating a <quote>preseed/run</quote> script containing the following lines:"
+msgstr "Vaikkakaan valmiit vastaukset verkon asetuksiin ei tavallisesti ole mahdollista noudettaessa valmiiden vastausten tiedosto verkosta (käytettäessä <quote>preseed/url</quote>), voidaan seuraavalla kikalla kiertää tämä rajoitus vaikkapa haluttaessa antaa kiinteä osoite verkkoliitännälle. Kikkailu tapahtuu pakottamalla verkon asetukset tehtäväksi uudelleen kun valmiiden vastausten tiedosto on ladattu tekemällä <quote>preseed/run</quote> -komentotiedosto jossa on seuraavat rivit:"
+
+#. Tag: screen
+#: preseed.xml:588
+#, no-c-format
+msgid ""
+      "killall.sh dhclient\n"
+      "netcfg"
+msgstr ""
+"killall.sh dhclient\n"
+"netcfg"
+
+#. Tag: screen
+#: preseed.xml:592
+#, no-c-format
+msgid ""
+      "# netcfg will choose an interface that has link if possible. This makes it\n"
+      "# skip displaying a list if there is more than one interface.\n"
+      "d-i netcfg/choose_interface select auto\n"
+      "\n"
+      "# To pick a particular interface instead:\n"
+      "#d-i netcfg/choose_interface select eth1\n"
+      "\n"
+      "# If you have a slow dhcp server and the installer times out waiting for\n"
+      "# it, this might be useful.\n"
+      "#d-i netcfg/dhcp_timeout string 60\n"
+      "\n"
+      "# If you prefer to configure the network manually, uncomment this line and\n"
+      "# the static network configuration below.\n"
+      "#d-i netcfg/disable_dhcp boolean true\n"
+      "\n"
+      "# If you want the preconfiguration file to work on systems both with and\n"
+      "# without a dhcp server, uncomment these lines and the static network\n"
+      "# configuration below.\n"
+      "#d-i netcfg/dhcp_failed note\n"
+      "#d-i netcfg/dhcp_options select Configure network manually\n"
+      "\n"
+      "# Static network configuration.\n"
+      "#d-i netcfg/get_nameservers string 192.168.1.1\n"
+      "#d-i netcfg/get_ipaddress string 192.168.1.42\n"
+      "#d-i netcfg/get_netmask string 255.255.255.0\n"
+      "#d-i netcfg/get_gateway string 192.168.1.1\n"
+      "#d-i netcfg/confirm_static boolean true\n"
+      "\n"
+      "# Any hostname and domain names assigned from dhcp take precedence over\n"
+      "# values set here. However, setting the values still prevents the questions\n"
+      "# from being shown, even if values come from dhcp.\n"
+      "d-i netcfg/get_hostname string unassigned-hostname\n"
+      "d-i netcfg/get_domain string unassigned-domain\n"
+      "\n"
+      "# Disable that annoying WEP key dialog.\n"
+      "d-i netcfg/wireless_wep string\n"
+      "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
+      "#d-i netcfg/dhcp_hostname string radish"
+msgstr ""
+"# netcfg valitsee liitännän jossa linkkivalo palaa, mikäli mahdollista.\n"
+"# Tällöin ohitetaan luettelon näyttäminen jos liitäntöjä on \n"
+"# enemmmän kuin yksi.\n"
+"d-i netcfg/choose_interface select auto\n"
+"\n"
+"# Valitaankin tietty liitäntä:\n"
+"#d-i netcfg/choose_interface select eth1\n"
+"\n"
+"# Jos DHCP-palvelin on hidas ja asennin tekee aikakatkaisun sitä\n"
+"# odotellessaan, tämä voi olla hyödyllistä.\n"
+"#d-i netcfg/dhcp_timeout string 60\n"
+"\n"
+"# Jos mielluummin tekee verkon asetukset itse, poistetaan kommenttimerkit\n"
+"# seur. rivistä ja muutaman rivin päästä olevissa kiinteiden\n"
+"# verkkoasetusten riveistä.\n"
+"#d-i netcfg/disable_dhcp boolean true\n"
+"\n"
+"# Jos valmiiden vastausten tiedoston on toimittava sekä DHCP-palvelimen\n"
+"# kanssa että ilman, poistetaan kommenttimerkki seur. riveistä ja\n"
+"# kiinteiden verkkoasetusten riveistä.\n"
+"#d-i netcfg/dhcp_failed note\n"
+"#d-i netcfg/dhcp_options select Configure network manually\n"
+"\n"
+"# Kiinteät verkkoasetukset.\n"
+"#d-i netcfg/get_nameservers string 192.168.1.1\n"
+"#d-i netcfg/get_ipaddress string 192.168.1.42\n"
+"#d-i netcfg/get_netmask string 255.255.255.0\n"
+"#d-i netcfg/get_gateway string 192.168.1.1\n"
+"#d-i netcfg/confirm_static boolean true\n"
+"\n"
+"# DHCP-palvelimelta saadut konenimi ja verkkoaluenimi ovat etusijalla,\n"
+"# mutta näiden arvojen antaminen estää kysymysten esittämisen,\n"
+"# vaikkakin käytetään DHCP:n antamia arvoja.\n"
+"d-i netcfg/get_hostname string unassigned-hostname\n"
+"d-i netcfg/get_domain string unassigned-domain\n"
+"\n"
+"# Ota inha WEP-avaimen valintaikkuna pois käytöstä.\n"
+"d-i netcfg/wireless_wep string\n"
+"# Pälli dhcp konenimi, joillain palveluntarjoajilla salasanan tapaisena.\n"
+"#d-i netcfg/dhcp_hostname string radish"
+
+#. Tag: title
+#: preseed.xml:597
+#, no-c-format
+msgid "Mirror settings"
+msgstr "Asennuspalvelimen asetukset"
+
+#. Tag: para
+#: preseed.xml:598
+#, no-c-format
+msgid "Depending on the installation method you use, a mirror may be used both to download additional components of the installer, the base system and to set up the <filename>/etc/apt/sources.list</filename> for the installed system."
+msgstr "Käytettävästä asennustavasta riippuen asennuspalvelimelta voidaan sekä noutaa lisää asentimen osia ja peruskokoonpano, että tehdä tiedosto <filename>/etc/apt/sources.list</filename> asennettavaan järjestelmään."
+
+#. Tag: para
+#: preseed.xml:605
+#, no-c-format
+msgid "The parameter <classname>mirror/suite</classname> determines the suite for the installed system."
+msgstr "Parametri <classname>mirror/suite</classname> kertoo mitä julkaisua käytetään asennuksessa."
+
+#. Tag: para
+#: preseed.xml:610
+#, no-c-format
+msgid "The parameter <classname>mirror/udeb/suite</classname> determines the suite for additional components for the installer. It is only useful to set this if components are actually downloaded over the network and should match the suite that was used to build the initrd for the installation method used for the installation. By default the value for <classname>mirror/udeb/suite</classname> is the same as <classname>mirror/suite</classname>."
+msgstr "Parametri <classname>mirror/udeb/suite</classname> kertoo mistä julkaisusta asentimen lisäosat noudetaan. Tästä parametrista on hyötyä vain jos osat tosiaan noudetaan verkosta ja sen on vastattava käytetyn asennustavan initrd:n tekemisessä käytettyä julkaisua. Oletusarvona <classname>mirror/udeb/suite</classname> on sama kuin <classname>mirror/suite</classname>."
+
+#. Tag: screen
+#: preseed.xml:622
+#, no-c-format
+msgid ""
+      "d-i mirror/country string enter information manually\n"
+      "d-i mirror/http/hostname string http.us.debian.org\n"
+      "d-i mirror/http/directory string /debian\n"
+      "d-i mirror/http/proxy string\n"
+      "\n"
+      "# Suite to install.\n"
+      "#d-i mirror/suite string testing\n"
+      "# Suite to use for loading installer components (optional).\n"
+      "#d-i mirror/udeb/suite string testing"
+msgstr ""
+"d-i mirror/country string enter information manually\n"
+"d-i mirror/http/hostname string http.us.debian.org\n"
+"d-i mirror/http/directory string /debian\n"
+"d-i mirror/http/proxy string\n"
+"\n"
+"# Asennettava julkaisu\n"
+"#d-i mirror/suite string testing\n"
+"# Julkaisu josta asentimen lisäosat noudetaan (valinnainen).\n"
+"#d-i mirror/udeb/suite string testing"
+
+#. Tag: title
+#: preseed.xml:627
+#, no-c-format
+msgid "Partitioning"
+msgstr "Osiointi"
+
+#. Tag: para
+#: preseed.xml:628
+#, no-c-format
+msgid "Using preseeding to partition the harddisk is very much limited to what is supported by <classname>partman-auto</classname>. You can choose to either partition existing free space on a disk or a whole disk. The layout of the disk can be determined by using a predefined recipe, a custom recipe from a recipe file or a recipe included in the preconfiguration file. It is currently not possible to partition multiple disks using preseeding nor to set up RAID."
+msgstr "Valmiiden vastausten käyttämistä levyn osioinnissa rajoittaa se mitä <classname>partman-auto</classname> tukee. Osiot on tehtävä joko levyllä jo olevaan vapaaseen tilaan tai osioitava koko levy. Osioiden asettelu levyllä voidaan määrätä käyttämällä valmista mallinetta, muokattua mallinetta mallinetiedostosta tai valmiiden vastausten tiedostoon tallennettua mallinetta. Tällä hetkellä ei ole mahdollista käyttää valmiita vastauksia useiden levyjen osioimiseen tai RAID-asetusten tekoon."
+
+#. Tag: para
+#: preseed.xml:640
+#, no-c-format
+msgid "The identification of disks is dependent on the order in which their drivers are loaded. If there are multiple disks in the system, make very sure the correct one will be selected before using preseeding."
+msgstr "Levylaitteiden ajurien lataamisjärjestys vaikuttaa levyjen nimeämiseen. Jos järjestelmässä on useinta kiintolevyjä, varmistu huolellisesti oikean levyn tulevan valituksi valmiita vastauksia käytettäessä."
+
+#. Tag: screen
+#: preseed.xml:648
+#, no-c-format
+msgid ""
+      "# If the system has free space you can choose to only partition that space.\n"
+      "# Note: this must be preseeded with a localized (translated) value.\n"
+      "#d-i partman-auto/init_automatically_partition \\\n"
+      "#      select Use the largest continuous free space\n"
+      "\n"
+      "# Alternatively, you can specify a disk to partition. The device name can\n"
+      "# be given in either devfs or traditional non-devfs format.\n"
+      "# For example, to use the first disk devfs knows of:\n"
+      "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+      "# Or, if you want to use LVM:\n"
+      "#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc\n"
+      "\n"
+      "# You can choose from any of the predefined partitioning recipes.\n"
+      "# Note: this must be preseeded with a localized (translated) value.\n"
+      "d-i partman-auto/choose_recipe \\\n"
+      "       select All files in one partition (recommended for new users)\n"
+      "#d-i partman-auto/choose_recipe \\\n"
+      "#       select Separate /home partition\n"
+      "#d-i partman-auto/choose_recipe \\\n"
+      "#       select Separate /home, /usr, /var, and /tmp partitions\n"
+      "\n"
+      "# Or provide a recipe of your own...\n"
+      "# The recipe format is documented in the file devel/partman-auto-recipe.txt.\n"
+      "# If you have a way to get a recipe file into the d-i environment, you can\n"
+      "# just point at it.\n"
+      "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
+      "\n"
+      "# If not, you can put an entire recipe the preconfiguration file in one\n"
+      "# (logical) line. This example creates a small /boot partition, suitable\n"
+      "# swap, and uses the rest of the space for the root partition:\n"
+      "#d-i partman-auto/expert_recipe string                         \\\n"
+      "#      boot-root ::                                            \\\n"
+      "#              40 50 100 ext3                                  \\\n"
+      "#                      $primary{ } $bootable{ }                \\\n"
+      "#                      method{ format } format{ }              \\\n"
+      "#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+      "#                      mountpoint{ /boot }                     \\\n"
+      "#              .                                               \\\n"
+      "#              500 10000 1000000000 ext3                       \\\n"
+      "#                      method{ format } format{ }              \\\n"
+      "#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+      "#                      mountpoint{ / }                         \\\n"
+      "#              .                                               \\\n"
+      "#              64 512 300% linux-swap                          \\\n"
+      "#                      method{ swap } format{ }                \\\n"
+      "#              .\n"
+      "\n"
+      "# This makes partman automatically partition without confirmation.\n"
+      "d-i partman/confirm_write_new_label boolean true\n"
+      "d-i partman/choose_partition \\\n"
+      "       select Finish partitioning and write changes to disk\n"
+      "d-i partman/confirm boolean true"
+msgstr ""
+"# Jos järjestelmässä on vapaata tilaa voidaan valita osioitavaksi vain\n"
+"# tuo tila. Huomaa: valmiissa vastauksissa on käytettävä kotoistettua\n"
+"# (eli suomennettua) arvoa.\n"
+"#d-i partman-auto/init_automatically_partition \\\n"
+"#      select Käytä suurinta yhtenäistä vapaata tilaa\n"
+"\n"
+"# Toinen tapa on määrätä mikä levy osioidaan. Laitenimi voidaan antaa \n"
+"# joko devfs- tai perinteisessä ei-devfs-muodossa.\n"
+"# Esimerkiksi jos käytetään ensimmäistä devfs:n tunnistamaa levyä:\n"
+"d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+"# Tai jos halutaan käyttää LVM:ää:\n"
+"#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc\n"
+"\n"
+"# Voidaan valita mikä tahansa tallennetuista osiointimallineista.\n"
+"# Huomaa: valmiissa vastauksissa on käytettävä kotoistettua arvoa.\n"
+"d-i partman-auto/choose_recipe \\\n"
+"       select Vain yksi levyosio (suositellaan uusille käyttäjille)\n"
+"#d-i partman-auto/choose_recipe \\\n"
+"#       select Erillinen /home -osio\n"
+"#d-i partman-auto/choose_recipe \\\n"
+"#       select Erilliset /home, /usr, /var, ja /tmp -levyosiot\n"
+"\n"
+"# Tai annetaan oma malline...\n"
+"# Mallineen muoto on kuvattu tiedostossa devel/partman-auto-recipe.txt.\n"
+"# Jos mallinetiedoston saa asentimen ympäristöön, siihen voidaan \n"
+"# viitata suoraan.\n"
+"#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
+"\n"
+"# Jos ei, koko mallinen voidaan tallentaa valmiiden vastausten tiedostoon\n"
+"# yhtenä (loogisena) rivinä. Tämä esimerkki tekee pienen /boot-osion, \n"
+"# sopivan sivutusosion, ja käyttää lopun tilan juuriosiolle:\n"
+"#d-i partman-auto/expert_recipe string                         \\\n"
+"#      boot-root ::                                            \\\n"
+"#              40 50 100 ext3                                  \\\n"
+"#                      $primary{ } $bootable{ }                \\\n"
+"#                      method{ format } format{ }              \\\n"
+"#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+"#                      mountpoint{ /boot }                     \\\n"
+"#              .                                               \\\n"
+"#              500 10000 1000000000 ext3                       \\\n"
+"#                      method{ format } format{ }              \\\n"
+"#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+"#                      mountpoint{ / }                         \\\n"
+"#              .                                               \\\n"
+"#              64 512 300% linux-swap                          \\\n"
+"#                      method{ swap } format{ }                \\\n"
+"#              .\n"
+"\n"
+"# Tämä saa partman-moduulin tekemään osiot automaattisesti kyselemättä\n"
+"# varmistuksia.\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
+
+#. Tag: title
+#: preseed.xml:653
+#, no-c-format
+msgid "Clock and time zone setup"
+msgstr "Kellon ja aikavyöhykkeen asetukset"
+
+#. Tag: screen
+#: preseed.xml:655
+#, no-c-format
+msgid ""
+      "# Controls whether or not the hardware clock is set to UTC.\n"
+      "d-i clock-setup/utc boolean true\n"
+      "\n"
+      "# You may set this to any valid setting for $TZ; see the contents of\n"
+      "# /usr/share/zoneinfo/ for valid values.\n"
+      "d-i time/zone string US/Eastern"
+msgstr ""
+"# Määrittää onko laitekello maailmanajassa vai paikallisessa ajassa.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Tämä voivaan asettaa mihin tahansa kelvolliseen ympäristömuuttujan\n"
+"# $TZ arvoon; kelvolliset arvot löytyvät hakemistosta /usr/share/zoneinfo/.\n"
+"d-i time/zone string Europe/Helsinki"
+
+#. Tag: title
+#: preseed.xml:660
+#, no-c-format
+msgid "Apt setup"
+msgstr "Apt:n asetukset"
+
+#. Tag: para
+#: preseed.xml:661
+#, no-c-format
+msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:669
+#, no-c-format
+msgid ""
+      "# You can choose to install non-free and contrib software.\n"
+      "#d-i apt-setup/non-free boolean true\n"
+      "#d-i apt-setup/contrib boolean true\n"
+      "# Uncomment this to avoid adding security sources, or\n"
+      "# add a hostname to use a different server than security.debian.org.\n"
+      "#d-i apt-setup/security_host string\n"
+      "\n"
+      "# Additional repositories, local[0-9] available\n"
+      "#d-i apt-setup/local0/comment string local server\n"
+      "#d-i apt-setup/local0/source string \\\n"
+      "#       deb http://local.server/debian stable main\n"
+      "# URL to the public key of the local repository\n"
+      "#d-i apt-setup/local0/key string http://local.server/key"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:674
+#, no-c-format
+msgid "Account setup"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:675
+#, no-c-format
+msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:682
+#, no-c-format
+msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:692
+#, no-c-format
+msgid ""
+      "# Skip creation of a root account (normal user account will be able to\n"
+      "# use sudo).\n"
+      "#d-i passwd/root-login boolean false\n"
+      "# Alternatively, to skip creation of a normal user account.\n"
+      "#d-i passwd/make-user boolean false\n"
+      "\n"
+      "# Root password, either in clear text\n"
+      "#d-i passwd/root-password password r00tme\n"
+      "#d-i passwd/root-password-again password r00tme\n"
+      "# or encrypted using an MD5 hash.\n"
+      "#d-i passwd/root-password-crypted password [MD5 hash]\n"
+      "\n"
+      "# To create a normal user account.\n"
+      "#d-i passwd/user-fullname string Debian User\n"
+      "#d-i passwd/username string debian\n"
+      "# Normal user's password, either in clear text\n"
+      "#d-i passwd/user-password password insecure\n"
+      "#d-i passwd/user-password-again password insecure\n"
+      "# or encrypted using an MD5 hash.\n"
+      "#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:694
+#, no-c-format
+msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is setup to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:704
+#, no-c-format
+msgid "An MD5 hash for a password can be generated using the following command."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:708
+#, no-c-format
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:714
+#, no-c-format
+msgid "Base system installation"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:715
+#, no-c-format
+msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:722
+#, no-c-format
+msgid ""
+      "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
+      "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:727
+#, no-c-format
+msgid "Boot loader installation"
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:729
+#, no-c-format
+msgid ""
+      "# Grub is the default boot loader (for x86). If you want lilo installed\n"
+      "# instead, uncomment this:\n"
+      "#d-i grub-installer/skip boolean true\n"
+      "\n"
+      "# This is fairly safe to set, it makes grub install automatically to the MBR\n"
+      "# if no other operating system is detected on the machine.\n"
+      "d-i grub-installer/only_debian boolean true\n"
+      "\n"
+      "# This one makes grub-installer install to the MBR if if finds some other OS\n"
+      "# too, which is less safe as it might not be able to boot that other OS.\n"
+      "d-i grub-installer/with_other_os boolean true\n"
+      "\n"
+      "# Alternatively, if you want to install to a location other than the mbr,\n"
+      "# uncomment and edit these lines:\n"
+      "#d-i grub-installer/bootdev  string (hd0,0)\n"
+      "#d-i grub-installer/only_debian boolean false\n"
+      "#d-i grub-installer/with_other_os boolean false"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:734
+#, no-c-format
+msgid "Package selection"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:735
+#, no-c-format
+msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:744
+#, no-c-format
+msgid "standard"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:747
+#, no-c-format
+msgid "desktop"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:750
+#, no-c-format
+msgid "gnome-desktop"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:753
+#, no-c-format
+msgid "kde-desktop"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:756
+#, no-c-format
+msgid "web-server"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:759
+#, no-c-format
+msgid "print-server"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:762
+#, no-c-format
+msgid "dns-server"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:765
+#, no-c-format
+msgid "file-server"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:768
+#, no-c-format
+msgid "mail-server"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:771
+#, no-c-format
+msgid "sql-database"
+msgstr ""
+
+#. Tag: userinput
+#: preseed.xml:774
+#, no-c-format
+msgid "laptop"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:778
+#, no-c-format
+msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>standard</userinput> task."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:784
+#, no-c-format
+msgid "If you want to install some individual packages in addition to packages installed by tasks, you can use the parameter <classname>pkgsel/include</classname>. The value of this parameter can be either comma-separated or space-separated, so you can also use it easily on the kernel command line."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:794
+#, no-c-format
+msgid ""
+      "tasksel tasksel/first multiselect standard, desktop\n"
+      "#tasksel tasksel/first multiselect standard, web-server\n"
+      "#tasksel tasksel/first multiselect standard, kde-desktop\n"
+      "\n"
+      "# Individual additional packages to install\n"
+      "#d-i pkgsel/include string openssh-server build-essential\n"
+      "\n"
+      "# Some versions of the installer can report back on what software you have\n"
+      "# installed, and what software you use. The default is not to report back,\n"
+      "# but sending reports helps the project determine what software is most\n"
+      "# popular and include it on CDs.\n"
+      "#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:799
+#, no-c-format
+msgid "Finishing up the first stage install"
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:801
+#, no-c-format
+msgid ""
+      "# Avoid that last message about the install being complete.\n"
+      "d-i finish-install/reboot_in_progress note\n"
+      "\n"
+      "# This will prevent the installer from ejecting the CD during the reboot,\n"
+      "# which is useful in some situations.\n"
+      "#d-i cdrom-detect/eject boolean false"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:806
+#, no-c-format
+msgid "Mailer configuration"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:807
+#, no-c-format
+msgid "During a normal install, exim asks only a few questions. Here's how to avoid even those. More complicated preseeding is possible."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:814
+#, no-c-format
+msgid ""
+      "exim4-config exim4/dc_eximconfig_configtype \\\n"
+      "       select no configuration at this time\n"
+      "exim4-config exim4/no_config boolean true\n"
+      "exim4-config exim4/no_config boolean true\n"
+      "exim4-config exim4/dc_postmaster string"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:819
+#, no-c-format
+msgid "X configuration"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:820
+#, no-c-format
+msgid "Preseeding Debian's X config is possible, but you probably need to know some details about the video hardware of the machine, since Debian's X configurator does not do fully automatic configuration of everything."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:828
+#, no-c-format
+msgid ""
+      "# X can detect the right driver for some cards, but if you're preseeding,\n"
+      "# you override whatever it chooses. Still, vesa will work most places.\n"
+      "#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
+      "\n"
+      "# A caveat with mouse autodetection is that if it fails, X will retry it\n"
+      "# over and over. So if it's preseeded to be done, there is a possibility of\n"
+      "# an infinite loop if the mouse is not autodetected.\n"
+      "#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
+      "\n"
+      "# Monitor autodetection is recommended.\n"
+      "xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
+      "# Uncomment if you have an LCD display.\n"
+      "#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
+      "# X has three configuration paths for the monitor. Here's how to preseed\n"
+      "# the \"medium\" path, which is always available. The \"simple\" path may not\n"
+      "# be available, and the \"advanced\" path asks too many questions.\n"
+      "xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
+      "       select medium\n"
+      "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
+      "       select 1024x768 @ 60 Hz"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:833
+#, no-c-format
+msgid "Preseeding other packages"
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:835
+#, no-c-format
+msgid ""
+      "# Depending on what software you choose to install, or if things go wrong\n"
+      "# during the installation process, it's possible that other questions may\n"
+      "# be asked. You can preseed those too, of course. To get a list of every\n"
+      "# possible question that could be asked during an install, do an\n"
+      "# installation, and then run these commands:\n"
+      "#   debconf-get-selections --installer > file\n"
+      "#   debconf-get-selections >> file"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:841
+#, no-c-format
+msgid "Advanced options"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:844
+#, no-c-format
+msgid "Shell commands"
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:846
+#, no-c-format
+msgid ""
+      "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
+      "# for attempts at buffer overflows or other exploits of the values of a\n"
+      "# preconfiguration file like this one. Only use preconfiguration files from\n"
+      "# trusted locations! To drive that home, and because it's generally useful,\n"
+      "# here's a way to run any shell command you'd like inside the installer,\n"
+      "# automatically.\n"
+      "\n"
+      "# This first command is run as early as possible, just after\n"
+      "# preseeding is read.\n"
+      "#d-i preseed/early_command string anna-install some-udeb\n"
+      "\n"
+      "# This command is run just before the install finishes, but when there is\n"
+      "# still a usable /target directory. You can chroot to /target and use it\n"
+      "# directly, or use the apt-install and in-target commands to easily install\n"
+      "# packages and run commands in the target system.\n"
+      "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:851
+#, no-c-format
+msgid "Chainloading preconfiguration files"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:852
+#, no-c-format
+msgid "It is possible to include other preconfiguration files from a preconfiguration file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:862
+#, no-c-format
+msgid ""
+      "# More that one file can be listed, separated by spaces; all will be\n"
+      "# loaded. The included files can have preseed/include directives of their\n"
+      "# own as well. Note that if the filenames are relative, they are taken from\n"
+      "# the same directory as the preconfiguration file that includes them.\n"
+      "#d-i preseed/include string x.cfg\n"
+      "\n"
+      "# The installer can optionally verify checksums of preconfiguration files\n"
+      "# before using them. Currently only md5sums are supported, list the md5sums\n"
+      "# in the same order as the list of files to include.\n"
+      "#d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d\n"
+      "\n"
+      "# More flexibly, this runs a shell command and if it outputs the names of\n"
+      "# preconfiguration files, includes those files. \n"
+      "#d-i preseed/include_command \\\n"
+      "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+      "\n"
+      "# Most flexibly of all, this downloads a program and runs it. The program\n"
+      "# can use commands such as debconf-set to manipulate the debconf database.\n"
+      "# Note that if the filenames are relative, they are taken from the same\n"
+      "# directory as the preconfiguration file that runs them.\n"
+      "d-i preseed/run string foo.sh"
+msgstr ""
+
