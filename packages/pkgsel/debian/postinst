@@ -54,7 +54,8 @@ if ! db_get popularity-contest/participate || [ "$RET" != false ]; then
 	progress_start=$progress_end
 fi
 
-if ! db_fget tasksel/first seen || (! db_get tasksel/first || [ -z "$RET" ]); then
+
+if (db_fget tasksel/first seen && [ "$RET" = false ]) || (db_get tasksel/first && [ "$RET" ]); then
 	db_get pkgsel/include
 	if [ "$RET" ]; then
 		progress_end=90
