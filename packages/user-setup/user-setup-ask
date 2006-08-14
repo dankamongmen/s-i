@@ -51,12 +51,7 @@ while :; do
 				# No preseed of the root password hash
 				# we will prompt the user
 				db_input critical passwd/root-password || true
-				# Note that this runs at a slightly lower
-				# priority, so it may not always be seen. If
-				# it isn't, don't compare passwords.
-				COMPARE_PW=''
-				db_input critical passwd/root-password-again \
-				&& COMPARE_PW=1 || true
+				db_input critical passwd/root-password-again || true
 			fi
 		fi
 	;;
@@ -82,7 +77,7 @@ while :; do
 					continue
 				fi
 				db_get passwd/root-password-again
-				if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
+				if [ "$ROOT_PW" != "$RET" ]; then
 					db_fset user-setup/password-mismatch seen false
 					db_input critical user-setup/password-mismatch
 					db_fset passwd/root-password seen false
@@ -151,9 +146,7 @@ while :; do
 			db_get passwd/user-password-crypted || true
 			if ! test "$RET" ; then
 				db_input critical passwd/user-password || true
-				COMPARE_PW=''
-				db_input critical passwd/user-password-again \
-				&& COMPARE_PW=1 || true
+				db_input critical passwd/user-password-again || true
 			fi
 		fi
 	;;
@@ -167,7 +160,7 @@ while :; do
 				db_get passwd/user-password
 				USER_PW="$RET"
 				db_get passwd/user-password-again
-				if [ "$COMPARE_PW" ] && [ "$USER_PW" != "$RET" ]; then
+				if [ "$USER_PW" != "$RET" ]; then
 					db_set passwd/user-password ""
 					db_set passwd/user-password-again ""
 					db_fset user-setup/password-mismatch seen false
