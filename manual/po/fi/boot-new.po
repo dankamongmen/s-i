@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Installation Guide boot-new\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-05 12:45+0000\n"
-"PO-Revision-Date: 2006-08-10 13:28+0300\n"
+"PO-Revision-Date: 2006-08-15 14:34+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -357,7 +357,7 @@ msgstr "dm-crypt"
 
 #. Tag: para
 #: boot-new.xml:205
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For partitions encrypted using dm-crypt you will be shown the following "
 "prompt during the boot: <informalexample><screen>\n"
@@ -376,21 +376,10 @@ msgid ""
 "the mount points before, you can still find it in <filename>/etc/crypttab</"
 "filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
-"Osioille joiden salausmenetelmä on loop-AES näytetään käynnistyksen aikana "
-"seuraava kehote:<informalexample><screen>\n"
-"mount: going to use loop device /dev/loop<replaceable>X</replaceable>\n"
-"Password:\n"
-"</screen></informalexample> <replaceable>X</replaceable> kehotteen "
-"ensimmäisellä rivillä on silmukkalaitteen numero. Nyt varmaan mietit "
-"<emphasis>minkä levyniteen</emphasis> tunnuslause pitäisi kirjoittaa. Onko "
-"kyseessä <filename>/home</filename>? Vai <filename>/var</filename>? Jos "
-"salattuja osioita on vain yksi, on tämä tietysti helppoa ja kirjoitetaan "
-"vain levynidettä tehtäessä asetettu tunnuslause. Jos salattuja osioita "
-"tehtiin enemmän kuin yksi, ovat <xref linkend=\"partman-crypto\"/> lopuksi "
-"tietenkin tekemäsi muistiinpanot tarpeen. Jos et kirjoittanut muistiin miten "
-"<filename>loop<replaceable>X</replaceable></filename> kuvautuvat "
-"liitoskohdiksi, voit vieläkin selvittää ne katsomalla asennetun järjestelmän "
-"tiedostosta <filename>/etc/fstab</filename>."
+"Osioille joiden salausmenetelmä on dm-crypt näytetään käynnistyksen aikana seuraava kehote:<informalexample><screen>\n"
+"Starting early crypto disks... crypt <replaceable>X</replaceable>\n"
+"Enter LUKS Passphrase:\n"
+"</screen></informalexample> <replaceable>X</replaceable> kehotteen ensimmäisellä rivillä on silmukkalaitteen numero. Nyt varmaan mietit <emphasis>minkä levyniteen</emphasis> tunnuslause pitäisi kirjoittaa. Onko kyseessä <filename>/home</filename>? Vai <filename>/var</filename>? Jos salattuja osioita on vain yksi, on tämä tietysti helppoa ja kirjoitetaan vain levynidettä tehtäessä asetettu tunnuslause. Jos salattuja osioita tehtiin enemmän kuin yksi, ovat <xref linkend=\"partman-crypto\"/> lopuksi tietenkin tekemäsi muistiinpanot tarpeen. Jos et kirjoittanut muistiin miten <filename>crypt<replaceable>X</replaceable></filename> kuvautuvat liitoskohdiksi, voit vieläkin selvittää ne katsomalla asennetun järjestelmän tiedostosta <filename>/etc/fstab</filename>."
 
 #. Tag: para
 #: boot-new.xml:227
@@ -400,7 +389,7 @@ msgid ""
 "mounted. This depends on which initramfs generator was used to generate the "
 "initrd used to boot the system. The example below is for an initrd generated "
 "using <classname>initramfs-tools</classname>:"
-msgstr ""
+msgstr "Kehotteen ulkonäkö voi olla muuttunut kun liitetään salattua juuritiedostojärjestelmää, riippuen käynnistyksessä käytetyn initrd:n tehneestä initramfs-generaattorista. Alla oleva esimerkki on initrd:stä jonka teki <classname>initramfs-tools</classname>:"
 
 #. Tag: screen
 #: boot-new.xml:234
@@ -410,23 +399,20 @@ msgid ""
 "Begin: Running /scripts/local-top ...\n"
 "Enter LUKS passphrase:"
 msgstr ""
+"Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
+"Begin: Running /scripts/local-top ...\n"
+"Enter LUKS passphrase:"
 
 #. Tag: para
 #: boot-new.xml:236 boot-new.xml:261
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "No characters (even asterisks) will be shown while entering the passphrase. "
 "If you enter the wrong passphrase, you have two more tries to correct it. "
 "After the third try the boot process will skip this volume and continue to "
 "mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting"
 "\"/> for further information."
-msgstr ""
-"Tunnuslausetta kirjoitettaessa ei näytetä mitään merkkejä (ei edes tähteä "
-"eli asteriskia). Kannataa olla varovainen koska yrittää voi vain "
-"<emphasis>yhden kerran</emphasis>. Jos tunnuslause on väärin, näkyy "
-"virheilmoitus ja käynnistys ohittaa tuon levyniteen liittämisen ja jatkaa "
-"liittämään seuraavaa tiedostojärjestelmää. Katso lisätietoja <xref linkend="
-"\"crypto-troubleshooting\"/>."
+msgstr "Tunnuslausetta kirjoitettaessa ei näytetä mitään merkkejä (ei edes tähteä eli asteriskia). Väärän tunnuslauseen voi kirjoittaa kaksi kertaa. Kolmannella kerralla käynnistys ohittaa levyniteen ja aloittaa seuraavan tiedostojärjestelmän liittämisen. Katso lisätietoja <xref linkend=\"crypto-troubleshooting\"/>."
 
 #. Tag: para
 #: boot-new.xml:244 boot-new.xml:269
@@ -448,7 +434,7 @@ msgstr "loop-AES"
 msgid ""
 "For partitions encrypted using loop-AES you will be shown the following "
 "prompt during the boot:"
-msgstr ""
+msgstr "loop-AES:llä salattuille osioille näytetään käynnistyksen aikana seuraava kehote:"
 
 #. Tag: screen
 #: boot-new.xml:259
@@ -459,6 +445,9 @@ msgid ""
 "replaceable>)\n"
 "Password:"
 msgstr ""
+"Checking loop-encrypted file systems.\n"
+"Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)\n"
+"Password:"
 
 #. Tag: title
 #: boot-new.xml:277
@@ -554,7 +543,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-new.xml:327
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If any volume holding noncritical system files could not be mounted "
 "(<filename>/usr</filename> or <filename>/var</filename>), the system should "
@@ -568,17 +557,9 @@ msgid ""
 "<keycap>Control</keycap> <keycap>D</keycap> </keycombo> when asked for the "
 "root password."
 msgstr ""
-"Jos ei-välttämättömien järjestelmätiedostojen levyniteitä ei voitu liittää "
-"(<filename>/usr</filename> tai <filename>/var</filename>), järjestelmän "
-"pitäisi silti käynnistyä ja ja levyniteet voida liittää kuten edellisessä "
-"tapauksessa. On kuitenkin (uudelleen) käynnistettävä kaikki palvelut jotka "
-"ovat käynnissä oletusajotasolla (runlevel), koska hyvin todennäköisesti ne "
-"eivät käynnistyneet. Helpoin tapa on vaihtaan ensimmäiselle ajotasolle ja "
-"takaisin komennolla <informalexample<screen>\n"
+"Jos ei-välttämättömien järjestelmätiedostojen levyniteitä ei voitu liittää (<filename>/usr</filename> tai <filename>/var</filename>), järjestelmän pitäisi silti käynnistyä ja ja levyniteet voida liittää kuten edellisessä tapauksessa. On kuitenkin (uudelleen) käynnistettävä kaikki palvelut jotka ovat käynnissä oletusajotasolla (runlevel), koska hyvin todennäköisesti ne eivät käynnistyneet. Helpoin tapa on vaihtaan ensimmäiselle ajotasolle ja takaisin komennolla <informalexample<screen>\n"
 "    <prompt>#</prompt> <userinput>init 1</userinput>\n"
-"    </screen></informalexample> komentotulkissa ja painamalla <keycombo> "
-"<keycap>Control</keycap> <keycap>D</keycap> </keycombo> kun kysytään "
-"pääkäyttäjän salsanaa."
+"    </screen></informalexample> komentotulkissa ja painamalla <keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo> kun kysytään pääkäyttäjän salsanaa."
 
 #. Tag: title
 #: boot-new.xml:350
