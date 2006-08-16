@@ -14,10 +14,52 @@ This section merely outlines the basics.
    <sect3><title>CPU</title>
 <para>
 
-Nearly all x86-based processors are supported; this includes AMD and
-VIA (former Cyrix) processors as well.  Also the new processors like
-Athlon XP and Intel P4 Xeon are supported.  However, Linux will
-<emphasis>not</emphasis> run on 286 or earlier processors.
+Nearly all x86-based (IA-32) processors still in use in personal computers
+are supported, including all varieties of Intel's "Pentium" series.
+This also includes 32-bits AMD and VIA (former Cyrix) processors, and new
+processors like the Athlon XP and Intel P4 Xeon.
+
+</para>
+<note><para>
+
+If your system has a 64-bits AMD64, Intel EM64t or Intel Core 2 Duo processor,
+you will probably want to use the installer for the amd64 architecture instead
+of the installer for the (32-bits) i386 architecture.
+
+</para></note>
+<para>
+
+However, Debian GNU/Linux &releasename; will <emphasis>not</emphasis> run
+on 386 or earlier processors.  Despite the architecture name "i386", Debian
+Sarge has <emphasis>dropped support</emphasis> for actual 80386 processors
+(and their clones), which were supported by earlier releases<footnote>
+
+<para>
+We have long tried to avoid this, but in the end it was necessary due a
+unfortunate series of issues with the compiler and the kernel, starting
+with an bug in the C++ ABI provided by GCC.  You should still be able to
+run Debian GNU/Linux on actual 80386 processors if you compile your own
+kernel and compile all packages from source, but that is beyond the
+scope of this manual.
+</para>
+
+</footnote>. (No version of Linux has ever supported the 286 or earlier
+chips in the series.)  All i486 and later processors are still
+supported<footnote>
+
+<para>
+
+Many Debian packages will actually run slightly faster on modern computers
+as a positive side effect of dropping support for these old chips.  The
+i486, introduced in 1989, has three opcodes (bswap, cmpxchg, and xadd)
+which the i386, introduced in 1986, did not have. Previously, these could not
+be easily used by most Debian packages; now they can.
+
+</para>
+
+</footnote>.
+
+</para><para>
 
 </para>
    </sect3>
@@ -29,7 +71,8 @@ The system bus is the part of the motherboard which allows the CPU to
 communicate with peripherals such as storage devices.  Your computer
 must use the ISA, EISA, PCI, the Microchannel Architecture (MCA, used
 in IBM's PS/2 line), or VESA Local Bus (VLB, sometimes called the VL
-bus).
+bus).  Essentially all personal computers sold in recent years use one
+of these.
 
 </para>
    </sect3>
