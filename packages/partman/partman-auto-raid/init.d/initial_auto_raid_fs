@@ -1,0 +1,97 @@
+#!/bin/sh
+
+# Set the filesystems for the newly created preseeded RAID config if we have
+# done one.
+
+. /usr/share/debconf/confmodule
+. /lib/partman/definitions.sh
+
+fix_raid_fs() {
+	raidnum=$1
+	fstype=$2
+	mountpoint=$3
+
+	dev="/var/lib/partman/devices/=dev=md=$raidnum"
+	cd $dev
+	id=`ls -d 0-*`
+	if [ -z $id ]; then
+		db_set partman-auto-raid/nodir "false"
+		db_input high partman-auto-raid/nodir
+		db_go
+		db_stop
+		exit 0
+	fi
+
+	cd $id
+
+	if [ "$fstype" = "swap" ]; then
+		rm -f filesystem mountpoint use_filesystem options
+		echo "swap" >method
+	else
+		echo "$fstype" >filesystem
+		echo "$mountpoint" >mountpoint
+		echo "format" >method
+		touch use_filesystem
+		mkdir options
+	fi
+	touch format
+	touch formatable
+
+	update_partition $dev $id
+}
+
+# Only run if we have previously done the initial_auto_raid stuff
+if [ ! -f /var/lib/partman/initial_auto_raid ]; then
+	exit 0
+fi
+# Only run once
+if [ -f /var/lib/partman/initial_auto_raid_fs ]; then
+	exit 0
+fi
+
+[ -d /var/lib/partman ] || mkdir /var/lib/partman
+touch /var/lib/partman/initial_auto_raid_fs
+
+# Check we have the stashed value of the first RAID dev we created
+db_get partman-auto-raid/raidnum
+if [ -z "$RET" ]; then
+	db_set partman-auto-raid/noraidnum "false"
+	db_input high partman-auto-raid/noraidnum
+	db_go
+	db_stop
+	exit 0
+fi
+
+raidnum=$RET
+
+# Check we have recipe(s)
+db_get partman-auto-raid/recipes
+if [ -z "$RET" ]; then
+	db_set partman-auto-raid/norecipes "false"
+	db_input high partman-auto-raid/norecipes
+	db_go
+	db_stop
+	exit 0
+fi
+
+recipes=$RET
+
+# Try to act on each recipe we were given
+while [ -n "$recipes" ]; do
+	tmp=$recipes
+	recipes=`echo $tmp|sed -e 's/^[^.]*\.\(.*\)$/\1/'`;
+	recipe=`echo $tmp|sed -e 's/^\([^.]*\)\..*$/\1/'`;
+
+	if [ "$recipe" = "$recipes" ]; then
+		recipes=''
+	fi
+
+	# Do the recipe!
+	echo $recipe >/tmp/partman-auto-raid-fs-recipe
+	read raidtype devcount sparecount fstype mountpoint devs \
+		</tmp/partman-auto-raid-fs-recipe
+	fix_raid_fs $raidnum $fstype $mountpoint
+
+	raidnum=$(($raidnum + 1))
+
+done

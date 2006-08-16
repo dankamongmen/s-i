@@ -1,0 +1,157 @@
+#!/bin/sh
+
+# parts based on initial_auto from partman_auto
+# parts based on partman-raid's do_option for choose_partition
+
+. /usr/share/debconf/confmodule
+. /lib/partman/definitions.sh
+
+confirm_changes () {
+    local dev x part partitions num id size type fs path name filesystem partitems items
+    # Compute the changes we are going to do
+    partitems=''
+    items=''
+    for dev in $DEVICES/*; do
+	[ -d "$dev" ] || continue
+	cd $dev
+
+	open_dialog IS_CHANGED
+	read_line x
+	close_dialog
+	if [ "$x" = yes ]; then
+	    partitems="${partitems}   $(humandev $(cat device))
+"
+	fi
+
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line num id size type fs path name; [ "$id" ]; }; do
+	    [ "$fs" != free ] || continue
+	    partitions="$partitions $id,$num"
+	done
+	close_dialog
+	
+	for part in $partitions; do
+	    id=${part%,*}
+	    num=${part#*,}
+            [ -f $id/method -a -f $id/format \
+                -a -f $id/visual_filesystem ] || continue
+            [ -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method ] || continue
+            [ ! -f $id/filesystem -o ! -f $id/formatted \
+                -o $id/formatted -ot $id/method \
+                -o $id/formatted -ot $id/filesystem ] || continue
+	    filesystem=$(cat $id/visual_filesystem)
+	    db_subst partman/text/confirm_item TYPE "$filesystem"
+	    db_subst partman/text/confirm_item PARTITION "$num"
+	    db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
+	    db_metaget partman/text/confirm_item description
+	    
+	    items="${items}   ${RET}
+"
+	done
+    done
+
+    if [ "$items" ]; then
+	db_metaget partman/text/confirm_item_header description
+	items="$RET
+$items"
+    fi
+    
+    if [ "$partitems" ]; then
+	db_metaget partman/text/confirm_partitem_header description
+	partitems="$RET
+$partitems"
+    fi
+ 
+    if [ "$partitems$items" ]; then
+	if [ -z "$items" ]; then
+	    x="$partitems"
+	elif [ -z "$partitems" ]; then
+	    x="$items"
+	else
+	    x="$partitems
+$items"
+	fi
+	db_subst partman/text/confirm ITEMS "$x"
+	db_input critical partman/text/confirm
+	db_go || true
+	db_get partman/text/confirm
+	if [ "$RET" = false ]; then
+	    db_reset partman/text/confirm
+	    return 1
+	else
+	    db_reset partman/text/confirm
+	    return 0
+	fi
+    else
+	db_input high partman/text/confirm_nochanges
+	db_go || true
+	db_get partman/text/confirm_nochanges
+	if [ "$RET" = false ]; then
+	    db_reset partman/text/confirm_nochanges
+	    return 1
+	else
+	    db_reset partman/text/confirm_nochanges
+	    return 0
+	fi
+    fi
+}
+
+
+dev_to_partman () {
+	local dev_name="$1"
+	
+	local mapped_dev_name="$(mapdevfs $dev_name)"
+	if [ -n "$mapped_dev_name" ]; then
+		dev_name="$mapped_dev_name"
+	fi
+
+	for dev in $DEVICES/*; do
+		# mapdevfs both to allow for different ways to refer to the
+		# same device using devfs, and to allow user input in
+		# non-devfs form
+		if [ "$(mapdevfs $(cat $dev/device))" = "$dev_name" ]; then
+			echo $dev
+		fi
+	done
+}
+
+# Only run the first time.
+if [ -f /var/lib/partman/initial_auto_raid ]; then
+	exit 0
+fi
+[ -d /var/lib/partman ] || mkdir /var/lib/partman
+touch /var/lib/partman/initial_auto_raid
+
+# See if we are supposed to try to 
+db_get partman-auto-raid/auto
+if [ "$RET" = "true" ]; then
+
+	# Stolen from partman-md
+
+	confirm_changes || exit 0
+
+	# Commit the changes
+	for s in /lib/partman/commit.d/*; do
+	    if [ -x $s ]; then
+		$s || {
+		    db_input high partman/text/commit_failed || true
+		    db_go || true
+		    for s in /lib/partman/init.d/*; do
+			if [ -x $s ]; then
+			    $s || exit 255
+			fi
+		    done
+		    exit 0
+		}
+	    fi
+	done
+
+	stop_parted_server
+
+	auto-raidcfg
+
+	restart_partman
+fi
+
