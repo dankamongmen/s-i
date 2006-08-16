@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+findfs () {
+	mount | grep "on /target${1%/} " | cut -d' ' -f1
+}
+
+rootfs_devfs=$(findfs /)
+bootfs_devfs=$(findfs /boot)
+
+if [ "$bootfs_devfs" = "" ]; then
+	bootfs_devfs=$rootfs_devfs
+	boot="boot/"
+else
+	boot=""
+fi
+
+# The name of the symlinks to be created depends on the machine
+case "`archdetect`" in
+	arm/iop32x)
+		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\t:\s*//')
+		if echo "$machine" | grep -q "^GLAN Tank"; then
+		fi
+			kernel_alias=zImage
+			initrd_alias=initrd
+		;;
+esac
+
+# Look for kernel and initrd
+
+db_get base-installer/kernel/linux/link_in_boot
+link_in_boot="$RET"
+if [ "$link_in_boot" = "true" ]; then
+	boot_link="boot/"
+else
+	boot_link=""
+fi
+
+if [ -e /target/${boot_link}vmlinuz ]; then
+	kernel="vmlinuz"
+elif [ -e /target/${boot_link}vmlinux ]; then
+	kernel="vmlinux"
+else
+	kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%' | tail -n 1`
+fi
+
+if [ -e /target/${boot_link}initrd.img ]; then
+	initrd=initrd.img
+else
+	initrd=`ls /target/boot/initrd.img* | sed -e 's%/target/boot/%%' | tail -n 1`
+fi
+
+# ... and make symlinks
+
+if [ -n "$kernel" -a -n "$kernel_alias" ]; then
+	ln -s $kernel /target/${boot_link}${kernel_alias}
+fi
+if [ -n "$initrd" -a -n "$initrd_alias" ]; then
+	ln -s $initrd /target/${boot_link}${initrd_alias}
+fi
+

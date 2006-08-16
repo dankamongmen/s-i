@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+
+build:
+# Ye olde no-op.
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k -i
+	dh_installdirs -i
+
+binary-arch: build install
+
+binary-indep: build install
+	dh_testdir
+	dh_testroot
+	dh_installdebconf -i
+	dh_installdeb -i
+	dh_gencontrol -i
+	dh_builddeb -i
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
