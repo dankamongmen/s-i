@@ -34,9 +34,8 @@ if [ "$codename" = sid ]; then
 fi
 
 # FIXME what if choose-mirror isn't available, i.e. full CD install?
-db_fget mirror/http/proxy seen || true
-proxy="$RET"
-if [ -n "$proxy" ]; then
+if db_get mirror/http/proxy && [ -n "$RET" ]; then
+	proxy="$RET"
 	if ! grep -iq "Acquire::$protocol::Proxy" $ROOT/etc/apt/apt.conf.new; then
 		echo "Acquire::$protocol::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf.new
 	fi
