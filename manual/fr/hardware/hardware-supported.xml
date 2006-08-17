@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 39886 -->
 
  <sect1 id="hardware-supported">
 <title>Matériel reconnu</title>
@@ -41,34 +41,17 @@ appelées <quote>saveurs</quote>.
 
 <tbody>
 <row>
-  <entry morerows="2">Intel x86-based</entry>
-  <entry morerows="2">i386</entry>
-  <entry morerows="2"></entry>
-  <entry>vanilla</entry>
-</row><row>
-  <entry>speakup</entry>
-</row><row>
-  <entry>linux26</entry>
+  <entry>Intel x86-based</entry>
+  <entry>i386</entry>
+  <entry></entry>
+  <entry></entry>
 </row>
 
 <row>
-  <entry morerows="5">Motorola 680x0</entry>
-  <entry morerows="5">m68k</entry>
-  <entry>Atari</entry>
-  <entry>atari</entry>
-</row><row>
-  <entry>Amiga</entry>
-  <entry>amiga</entry>
-</row><row>
-  <entry>68k Macintosh</entry>
-  <entry>mac</entry>
-</row><row>
-  <entry morerows="2">VME</entry>
-  <entry>bvme6000</entry>
-</row><row>
-  <entry>mvme147</entry>
-</row><row>
-  <entry>mvme16x</entry>
+  <entry>AMD64 &amp; Intel EM64t</entry>
+  <entry>amd64</entry>
+  <entry></entry>
+  <entry></entry>
 </row>
 
 <row>
@@ -76,15 +59,6 @@ appelées <quote>saveurs</quote>.
   <entry>alpha</entry>
   <entry></entry>
   <entry></entry>
-</row>
-
-<row>
-  <entry morerows="1">Sun SPARC</entry>
-  <entry morerows="1">sparc</entry>
-  <entry morerows="1"></entry>
-  <entry>sun4cdm</entry>
-</row><row>
-  <entry>sun4u</entry>
 </row>
 
 <row>
@@ -98,22 +72,6 @@ appelées <quote>saveurs</quote>.
 </row><row>
   <entry>RiscPC</entry>
   <entry>rpc</entry>
-</row>
-
-<row>
-  <entry morerows="3">IBM/Motorola PowerPC</entry>
-  <entry morerows="3">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
-  <entry>PowerMac</entry>
-  <entry>pmac</entry>
-</row><row>
-  <entry>PReP</entry>
-  <entry>prep</entry>
-</row><row>
-  <entry>APUS</entry>
-  <entry>apus</entry>
 </row>
 
 <row>
@@ -168,6 +126,51 @@ appelées <quote>saveurs</quote>.
 </row>
 
 <row>
+  <entry morerows="5">Motorola 680x0</entry>
+  <entry morerows="5">m68k</entry>
+  <entry>Atari</entry>
+  <entry>atari</entry>
+</row><row>
+  <entry>Amiga</entry>
+  <entry>amiga</entry>
+</row><row>
+  <entry>68k Macintosh</entry>
+  <entry>mac</entry>
+</row><row>
+  <entry morerows="2">VME</entry>
+  <entry>bvme6000</entry>
+</row><row>
+  <entry>mvme147</entry>
+</row><row>
+  <entry>mvme16x</entry>
+</row>
+
+<row>
+  <entry morerows="3">IBM/Motorola PowerPC</entry>
+  <entry morerows="3">powerpc</entry>
+  <entry>CHRP</entry>
+  <entry>chrp</entry>
+</row><row>
+  <entry>PowerMac</entry>
+  <entry>pmac</entry>
+</row><row>
+  <entry>PReP</entry>
+  <entry>prep</entry>
+</row><row>
+  <entry>APUS</entry>
+  <entry>apus</entry>
+</row>
+
+<row>
+  <entry morerows="1">Sun SPARC</entry>
+  <entry morerows="1">sparc</entry>
+  <entry morerows="1"></entry>
+  <entry>sun4cdm</entry>
+</row><row>
+  <entry>sun4u</entry>
+</row>
+
+<row>
   <entry morerows="1">IBM S/390</entry>
   <entry morerows="1">s390</entry>
   <entry>IPL avec VM-reader et DASD</entry>
@@ -182,9 +185,9 @@ appelées <quote>saveurs</quote>.
 </para>
 
 <para>
-Ce document décrit l'installation pour l'architecture
-<emphasis>&arch-title;</emphasis>. Des versions pour les autres
-architectures disponibles existent sur les pages <ulink url="http://www.debian.org/ports/">Debian-Ports</ulink>.
+Ce document décrit l'installation pour l'architecture <emphasis>&arch-title;</emphasis>.
+Des versions pour les autres architectures disponibles existent sur les pages
+<ulink url="http://www.debian.org/ports/">Debian-Ports</ulink>.
 </para>
 
 <para condition="new-arch">
@@ -203,6 +206,7 @@ produit sur une plateforme &arch-title;. Et prévenez aussi la
 
 <!-- supported cpu docs -->
 &supported-alpha.xml;
+&supported-amd64.xml;
 &supported-arm.xml;
 &supported-hppa.xml;
 &supported-i386.xml;
@@ -279,11 +283,28 @@ Pour optimiser le noyau pour un seul processeur, vous devrez
 remplacer le noyau Debian standard. Vous trouverez une
 discussion sur la façon de faire dans la <xref linkend="kernel-baking"/>. 
 Aujourd'hui (version &kernelversion; du noyau) la façon de désactiver SMP est 
-de ne pas choisir<quote>symmetric multi-processing</quote> dans la section
-<quote>General</quote> quand on configure le noyau.
+de ne pas choisir <quote>&smp-config-option;</quote> dans la section
+<quote>&smp-config-section;</quote> quand on configure le noyau.
+</para>
+</sect2>
+
+<sect2 condition="smp-alternatives">
+<title>Processeurs multiples</title>
+<para>
+Cette architecture accepte les systèmes à plusieurs processeurs 
+(<quote>symmetric multi-processing</quote> ou SMP). L'image
+standard du noyau Debian &release; a été compilé avec l'option
+<firstterm>SMP-alternatives</firstterm>. Le noyau détectera si votre système possède plusieurs
+processeurs et désactivera automatiquement la gestion SMP sur les systèmes avec un seul
+processeur.
 </para>
 
-  </sect2>
+<para arch="i386">
+Pour l'architecture &arch-title;, la variante 486 de l'image debian du noyau
+n'est pas compilé avec l'option SMP.
+</para>
+</sect2>
+
 <sect2 condition="supports-smp">
  <title>Processeurs multiples</title>
 <para>

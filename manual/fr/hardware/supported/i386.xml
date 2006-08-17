@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 39898 -->
 
-  <sect2 arch="x86">
+  <sect2 arch="i386">
 <title>Microprocesseurs, cartes mère et cartes vidéo</title>
 
 <para>
@@ -12,14 +12,45 @@ Cette section présente seulement les éléments de base.
 </para>
 
    <sect3>
-<title>Microprocesseur</title>
+<title>Microprocesseurs</title>
 
 <para>
-Quasiment tous les processeurs de la famille x86 sont reconnus&nbsp;; cela 
-veut dire également les processeurs AMD et VIA (anciennement Cyrix). Les 
-nouveaux processeurs tels que Athlon XP et Intel P4 Xeon sont également 
-reconnus. Cependant, Linux <emphasis>ne fonctionnera pas</emphasis> sur les 
-processeurs 286 ou antérieurs.
+Quasiment tous les processeurs de la famille x86 (IA-32), toute la série Pentium
+d'Intel, encore en usage sur les PC sont reconnus&nbsp;; cela 
+veut dire également les processeurs 32-bits AMD et VIA (anciennement Cyrix) et les 
+nouveaux processeurs tels que Athlon XP et Intel P4 Xeon.
+</para>
+<note><para>
+Si votre système possède un processeur 64-bits AMD64, Intel EM64t ou Intel Core 2 Duo,
+vous préférerez sans doute utiliser l'installateur pour l'architecture amd64
+au lieu de l'installateur pour l'architecture i386 (32 bits).
+</para></note>
+
+<para>
+Cependant, Debian GNU/Linux &releasename; <emphasis>ne fonctionnera pas</emphasis> sur les 
+processeurs 386 ou antérieurs. Malgré le nom de l'architecture, <quote>i386</quote>,
+la version Sarge de Debian a abandonné la gestion des processeurs 80386 (et de leurs clones)
+<footnote>
+<para>
+Nous avons longtemps essayé d'éviter cet abandon mais il est devenu nécessaire
+à cause de problèmes malheureux avec le compilateur et le noyau, en commençant par
+un bug dans l'ABI C++ fournie par GCC. Il est toujours possible d'installer
+Debian GNU/Linux sur des processeurs 80386 mais il faut compiler le noyau et
+tous les paquets à partir des sources.
+</para>
+</footnote>
+
+(Aucune version de Linux n'a jamais fonctionné avec les processeurs 286 ou
+anterieurs.) Tous les processeurs 486 sont gérés <footnote>
+<para>
+Beaucoup de paquets Debian fonctionneront légèrement plus vite sur
+des ordinateurs modernes, c'est un effet positif de l'abandon de la gestion
+des anciens processeurs. Le processeur i486, lancé en 1989, possède trois
+<quote>opcodes</quote>, bswap, cmpxchg et xadd que ne possède pas l'i386, lancé en
+1986. Les paquets Debian ne pouvaient pas les utiliser facilement.
+</para>
+</footnote>.
+ 
 </para>
    </sect3>
 
@@ -31,7 +62,8 @@ Le bus système est la partie de la carte mère permettant au CPU de
 communiquer avec les périphériques tels que les périphériques de stockage. 
 Votre ordinateur doit utiliser l'un des bus ISA, EISA, PCI, l'architecture 
 Microchannel (MCA, utilisée sur la gamme des PS/2 d'IBM) ou VESA Local Bus
-(VLB, parfois appelé bus VL).
+(VLB, parfois appelé bus VL). Tous les PC vendus ces dernières années utilisent
+l'un d'entre eux.
 </para>
 
    </sect3>
