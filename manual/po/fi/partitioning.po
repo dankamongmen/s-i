@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Debian Installation Guide partitioning\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-07 22:39+0000\n"
-"PO-Revision-Date: 2006-08-16 15:37+0300\n"
+"PO-Revision-Date: 2006-08-17 18:01+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -629,7 +629,7 @@ msgstr "Sovelluksen <command>fdisk</command> sovitus arkkitehtuurille &arch-titl
 #: partitioning.xml:575
 #, no-c-format
 msgid "One of these programs will be run by default when you select <guimenuitem>Partition disks</guimenuitem> (or similar). It may be possible to use a different partitioning tool from the command line on VT2, but this is not recommended."
-msgstr ""
+msgstr "Jokin näistä ohjelmista käynnistetään oletusarvona kun valitaan <guimenuitem>Tee levyosiot</guimenuitem> (tai vastaavaa). Saattaa olla mahdollista käyttää jotain muuta osiointisovellusta käynnistämällä se komentoriviltä virtuaalikonsolilla kaksi, mutta tätä ei suositella."
 
 #. Tag: para
 #: partitioning.xml:582
@@ -647,30 +647,41 @@ msgid ""
       "# chmod 660 hda21\n"
       "</screen></informalexample> <phrase arch=\"x86\">Remember to mark your boot partition as <quote>Bootable</quote>.</phrase>"
 msgstr ""
+"Mikäli IDE-levyllä käytetään ennemmän kuin 20 osiota, on osioille 21:stä eteenpäin luotava laitetiedostot. Osion käyttöönoton seuraava toimenpide epäonnistuu ilman oikeaa laitetiedostoa. Esimerkkinä on tässä komennot joilla voidaan konsolilla <userinput>tty2</userinput> tai valikossa<guimenuitem>Käynnistä komentotulkki</guimenuitem> lisätä laitetiedosto 21. osiolle jotta osio voidaan ottaa käyttöön: <informalexample><screen>\n"
+"# cd /dev\n"
+"# mknod hda21 b 3 21\n"
+"# chgrp disk hda21\n"
+"# chmod 660 hda21\n"
+"</screen></informalexample> Asennetun järjestelmän käynnistäminen ei onnistu jollei oikeita laitetiedostoja ole asennetussa tiedostojärjestelmässä. Ytimen ja moduulien asentamisen jälkeen komennetaan:  <informalexample><screen>\n"
+"# cd /target/dev\n"
+"# mknod hda21 b 3 21\n"
+"# chgrp disk hda21\n"
+"# chmod 660 hda21\n"
+"</screen></informalexample> <phrase arch=\"x86\">Muista merkitä käynnistysosio <quote>Käynnistyskelpoisuuden ilmaisimella</quote>.</phrase>"
 
 #. Tag: para
 #: partitioning.xml:601
 #, no-c-format
 msgid "One key point when partitioning for Mac type disks is that the swap partition is identified by its name; it must be named <quote>swap</quote>. All Mac linux partitions are the same partition type, Apple_UNIX_SRV2. Please read the fine manual. We also suggest reading the <ulink url=\"&url-mac-fdisk-tutorial;\">mac-fdisk Tutorial</ulink>, which includes steps you should take if you are sharing your disk with MacOS."
-msgstr ""
+msgstr "Tärkeä seikka Mac-tyyppisiä levyjä osioitaessa on sivutusosion tunnistaminen nimestä: nimen on oltava <quote>swap</quote>. Kaikkien Macin linuxosioiden tyyppinä on Apple_UNIX_SRV2. Kannattaa lukea hieno käsikirja. Suositeltavaa lukemista on myös <ulink url=\"&url-mac-fdisk-tutorial;\">mac-fdisk Tutorial</ulink>, josta löytyy ohjeet levyn jakamiseen MacOS:n kanssa."
 
 #. Tag: title
 #: partitioning.xml:617 partitioning.xml:677 partitioning.xml:701 partitioning.xml:798 partitioning.xml:912 partitioning.xml:989
 #, no-c-format
 msgid "Partitioning for &arch-title;"
-msgstr ""
+msgstr "&arch-title; ja osiointi"
 
 #. Tag: para
 #: partitioning.xml:618
 #, no-c-format
 msgid "Booting Debian from the SRM console (the only disk boot method supported by &releasename;) requires you to have a BSD disk label, not a DOS partition table, on your boot disk. (Remember, the SRM boot block is incompatible with MS-DOS partition tables &mdash; see <xref linkend=\"alpha-firmware\"/>.) As a result, <command>partman</command> creates BSD disk labels when running on &architecture;, but if your disk has an existing DOS partition table the existing partitions will need to be deleted before <command>partman</command> can convert it to use a disk label."
-msgstr ""
+msgstr "Debianin käynnistäminen SRM-konsolilta (ainoa käynnistämistapa levyltä jota &releasename; tukee) vaatii käynnistyslevyllä BSD-levynimiön, ei DOS-osiotaulua. (Muista SRM-käynnistyslohkon olevan ei-yhteensopiva DOS-osiotaulujen kanssa &mdash; katso <xref linkend=\"alpha-firmware\"/>.) Tästä syystä komento <command>partman</command> luo BSD-levynimiöitä toimiessaan arkkitehtuurilla &architecture;, mutta jos levyllä on jo DOS-osiotaulu on levyllä olevat osiot poistettava ennen kuin <command>partman</command> voi muuntaa levyn käyttämään levynimiötä."
 
 #. Tag: para
 #: partitioning.xml:629
 #, no-c-format
 msgid "If you have chosen to use <command>fdisk</command> to partition your disk, and the disk that you have selected for partitioning does not already contain a BSD disk label, you must use the <quote>b</quote> command to enter disk label mode."
-msgstr ""
+msgstr "Jos on valittu komento <command>fdisk</command> osioimaan levy, ja osioitavaksi valittu levy ei jo käytä BSD-levynimiötä, on komennolla <quote>b</quote> siirryttävä levynimiötilaan."
 
 #. Tag: para
 #: partitioning.xml:636
@@ -682,25 +693,25 @@ msgstr ""
 #: partitioning.xml:647
 #, no-c-format
 msgid "Also, because <command>aboot</command> is written to the first few sectors of the disk (currently it occupies about 70 kilobytes, or 150 sectors), you <emphasis>must</emphasis> leave enough empty space at the beginning of the disk for it. In the past, it was suggested that you make a small partition at the beginning of the disk, to be left unformatted. For the same reason mentioned above, we now suggest that you do not do this on disks that will only be used by GNU/Linux. When using <command>partman</command>, a small partition will still be created for <command>aboot</command> for convenience reasons."
-msgstr ""
+msgstr "Myöskin on huomattava, että koska <command>aboot</command> kirjoitetaan levyn ensimmäisille sektoreille (tällä hetkellä se vie noin 70 kilotavua tai 150 sektoria), <emphasis>on jätettävä</emphasis> riittävästi tyhjää tilaa levyn alkuun. Aikaisemmin ehdotettiin tehtäväksi levyn alkuun pieni osio johon ei luoda tiedostojärjestelmää. Samasta yllä mainitusta syystä nyt ehdotetaan ettei tätä tehtäisi levyille joita vain GNU/Linux käyttää. Kun käytetään komentoa <command>partman</command>, luodaan silti mukavuussyistä pieni osio <command>aboot</command>:ia varten. "
 
 #. Tag: para
 #: partitioning.xml:659
 #, no-c-format
 msgid "For ARC installations, you should make a small FAT partition at the beginning of the disk to contain <command>MILO</command> and <command>linload.exe</command> &mdash; 5 megabytes should be sufficient, see <xref linkend=\"non-debian-partitioning\"/>. Unfortunately, making FAT file systems from the menu is not yet supported, so you'll have to do it manually from the shell using <command>mkdosfs</command> before attempting to install the boot loader."
-msgstr ""
+msgstr "ARC-asennuksissa olisi tehtävä levyn alkuun pieni FAT-osio, johon tallennetaan <command>MILO</command> ja <command>linload.exe</command> &mdash; 5 megatavua pitäisi riittää, katso <xref linkend=\"non-debian-partitioning\"/>. Valitettavasti FAT-tiedostojärjestelmien tekeminen valikosta ei ole vielä tuettu, joten ne on tehtävä komentotulkista komennolla <command>mkdosfs</command> ennen käynnistyslataimen asennusta."
 
 #. Tag: para
 #: partitioning.xml:678
 #, no-c-format
 msgid "PALO, the HPPA boot loader, requires a partition of type <quote>F0</quote> somewhere in the first 2GB. This is where the boot loader and an optional kernel and RAMdisk will be stored, so make it big enough for that &mdash; at least 4Mb (I like 8&ndash;16MB). An additional requirement of the firmware is that the Linux kernel must reside within the first 2GB of the disk. This is typically achieved by making the root ext2 partition fit entirely within the first 2GB of the disk. Alternatively you can create a small ext2 partition near the start of the disk and mount that on <filename>/boot</filename>, since that is the directory where the Linux kernel(s) will be stored. <filename>/boot</filename> needs to be big enough to hold whatever kernels (and backups) you might wish to load; 25&ndash;50MB is generally sufficient."
-msgstr ""
+msgstr "HPPA:n käynnistyslatain PALO vaatii osion tyypiltään <quote>F0</quote> levyn ensimmäisen 2 Gt:n alueella. Osioon tallennetaan käynnistyslatain ja valinnaisesti ydin ja näennäislevyn otos, tee siitä riittävän iso &mdash; ainakin 4 Mt (tämän kirjoittajan mielestä 8&ndash;16 Mt). Lisäksi laiteohjelmisto vaatii Linux-ytimen sijaitsevan levyn ensimmäisen 2 Gt:n alueella. Tavallisesti tämä varmistetaan mahduttamalla ext2 juuriosio kokonaan levyn ensimmäiseen 2 Gtavuun. Toinen tapa on tehdä pieni ext2 osio lähelle levyn alkua ja liittää se kohtaan <filename>/boot</filename>, joka on se hakemisto johon Linux-ytimet tallennetaan. Hakemistoon <filename>/boot</filename> on mahduttava käytettävät ytimet (ja varmuuskopiot); 25&ndash;50 Mt on tavallisesti riittävä."
 
 #. Tag: para
 #: partitioning.xml:702
 #, no-c-format
 msgid "If you have an existing other operating system such as DOS or Windows and you want to preserve that operating system while installing Debian, you may need to resize its partition to free up space for the Debian installation. The installer supports resizing of both FAT and NTFS filesystems; when you get to the installer's partitioning step, select the option <guimenuitem>Manually edit partition table</guimenuitem> and then simply select an existing partition and change its size."
-msgstr ""
+msgstr "Jos tietokoneessa on ennestään muu käyttöjärjestelmä kuten DOS tai Windows ja tuo käyttöjärjestelmä halutaan säilyttää kun Debian asennetaan, on tuon muun käyttöjärjestelmän levyosion kokoa ehkä muutettava jotta saadaan vapaata tilaa Debianin asennukselle. Asennin tukee sekä FAT- että NTFS-tiedostojärjestelmien koon muuttamista; asentimen osiointivaiheessa valitaan <guimenuitem>Muokkaa itse osiotaulua</guimenuitem> ja sitten yksinkertaisesti valitaan olemassa oleva osio ja muutetaan sen kokoa."
 
 #. Tag: para
 #: partitioning.xml:712
