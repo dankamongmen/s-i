@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36758 -->
+<!-- original version: 39614 -->
 
  <sect1 id="linux-upgrade">
 <!--
@@ -71,11 +71,11 @@ X をインストールする予定なら最低 300MB 必要です。
 </para><para>
 
 <!--
-To create file systems on your partitions. For example, to create an
+Create file systems on your partitions. For example, to create an
 ext3 file system on partition <filename>/dev/hda6</filename> (that's
 our example root partition):
 -->
-パーティションへのファイルシステム作成。
+パーティションにファイルシステムを作成してください。
 例えば、<filename>/dev/hda6</filename> パーティションに、
 ext3 ファイルシステムを作成するには、以下のようにします。
 (今回の例ではこのパーティションを root パーティションとします)
@@ -144,15 +144,15 @@ manually before proceding with the next stage.
 <para>
 
 <!--
-The tool that the Debian installer uses, which is recognized as the
+The utility used by the Debian installer, and recognized as the
 official way to install a Debian base system, is
 <command>debootstrap</command>. It uses <command>wget</command> and
 <command>ar</command>, but otherwise depends only on
 <classname>/bin/sh</classname> and basic Unix/Linux tools<footnote>
 -->
-Debian インストーラが使用するツール 
-(Debian 基本システムをインストールする公式の方法と認められている) 
-が <command>debootstrap</command> です。
+Debian インストーラが使用するユーティリティで、 
+Debian 基本システムをインストールする公式の方法と認められているのが 
+<command>debootstrap</command> です。
 <command>wget</command> と <command>ar</command> を使用しますが、
 <classname>/bin/sh</classname> と基本的な Unix/Linux ツール<footnote>
 
@@ -541,24 +541,26 @@ interface name (eth0, eth1, etc.) that you expect.
 
 <!--
 To configure your locale settings to use a language other than
-English, install the locales support package and configure it:
+English, install the <classname>locales</classname> support package
+and configure it:
 -->
 英語以外の言語を使用するようロケールの設定をするために、
-次のようにロケールをサポートするパッケージをインストール・設定します。
+次のようにロケールをサポートするパッケージ 
+(<classname>locales</classname>) をインストール・設定します。
 
 <informalexample><screen>
-# apt-get install locales
+# aptitude install locales
 # dpkg-reconfigure locales
 </screen></informalexample>
 
 <!--
-NOTE: Apt must be configured beforehand by creating a sources.list and
-running apt-get update.
+NOTE: <classname>apt</classname> must be configured beforehand by creating
+a sources.list and running <command>aptitude update</command>.
 Before using locales with character sets other than ASCII or latin1,
 please consult the appropriate localisation HOWTO.
 -->
 注: あらかじめ sources.list の作成と apt-get update を実行して、
-apt を設定しておかなければなりません。
+<classname>apt</classname> を設定しておかなければなりません。
 ASCII や latin1 以外の文字セットを持つロケールを使用する前には、
 適切な localization HOWTO を調べてください。
 
@@ -588,7 +590,7 @@ Then install your choice using its package name.
 次に、選んだパッケージ名を使ってインストールしてください。
 
 <informalexample><screen>
-# apt-get install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
+# aptitude install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
 </para>
@@ -600,16 +602,16 @@ Then install your choice using its package name.
 
 <!--
 To make your &debian; system bootable, set up your boot loader to load
-the installed kernel with your new root partition. Note that debootstrap
-does not install a boot loader, though you can use apt-get inside your
-Debian chroot to do so.
+the installed kernel with your new root partition. Note that
+<command>debootstrap</command> does not install a boot loader, though you
+can use <command>aptitude</command> inside your Debian chroot to do so.
 -->
 &debian; システムを起動できるようにするために、
 インストールしたカーネルを新しい root パーティションから読み込むように、
-ブートローダをセットアップしてください。
-debootstrap は、ブートローダをインストールしないことに注意してください。
-とは言っても、セットアップするために Debian chroot 内部の apt-get を
-使用することができます。
+ブートローダをセットアップしてください。<command>debootstrap</command> は、
+ブートローダをインストールしないことに注意してください。
+とは言っても、セットアップするのに Debian chroot 内部の 
+<command>aptitude</command> を使用できます。
 
 </para><para arch="x86">
 

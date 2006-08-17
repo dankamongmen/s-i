@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39285 -->
+<!-- original version: 39468 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1514,12 +1514,31 @@ set of packages in some other way. We recommend always including the
 他の方法でパッケージのセットが強制的にインストールされることもあります。
 <userinput>standard</userinput> タスクは常に含めるのをお奨めします。
 
+</para><para>
+
+
+<!--
+If you want to install some individual packages in addition to packages
+installed by tasks, you can use the parameter
+<classname>pkgsel/include</classname>. The value of this parameter can be
+either comma-separated or space-separated, so you can also use it easily on
+the kernel command line.
+-->
+タスクでインストールするパッケージに加えて、
+特定のパッケージをインストールする場合、
+<classname>pkgsel/include</classname> パラメータを使用できます。
+このパラメータの値は、カーネルコマンドラインで使いやすいので、
+カンマ区切りか空白区切りにしてください。
+
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+
+# Individual additional packages to install
+#d-i pkgsel/include string openssh-server build-essential
 
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
