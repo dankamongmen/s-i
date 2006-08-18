@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: partitioning.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-08-07 22:39+0000\n"
+"POT-Creation-Date: 2006-08-18 17:32+0000\n"
 "PO-Revision-Date: 2006-08-08 23:12+0900\n"
 "Last-Translator: Seok-moon Jang <drssay97@gmail.com>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
@@ -878,7 +878,10 @@ msgid ""
 "Recommended partitioning tool in Debian. This Swiss army knife can also "
 "resize partitions, create filesystems <phrase arch=\"x86\"> (<quote>format</"
 "quote> in Windows speak)</phrase> and assign them to the mountpoints."
-msgstr "데비안에서 권장하는 파티션용 프로그램. 이 만능 프로그램으로 파티션의 크기를 조정하며, 파일시스템을 생성하고 <phrase arch=\"x86\"> (윈도우에서 말하는 <quote>포맷</quote>)</phrase>, 마운트 위치도 설정할 수 있습니다. "
+msgstr ""
+"데비안에서 권장하는 파티션용 프로그램. 이 만능 프로그램으로 파티션의 크기를 "
+"조정하며, 파일시스템을 생성하고 <phrase arch=\"x86\"> (윈도우에서 말하는 "
+"<quote>포맷</quote>)</phrase>, 마운트 위치도 설정할 수 있습니다. "
 
 #. Tag: command
 #: partitioning.xml:495
@@ -1039,17 +1042,24 @@ msgid ""
 "</screen></informalexample> <phrase arch=\"x86\">Remember to mark your boot "
 "partition as <quote>Bootable</quote>.</phrase>"
 msgstr ""
-"동시에 20개 이상의 IDE 파티션을 사용하실 경우 파티션 21 이상은 따로 디바이스를 생성해야 합니다. 그렇지 않을 경우 파티션을 초기화하는 작업이 실패하게 됩니다. 아래에 <userinput>tty2</userinput> 명령어나 <guimenuitem>쉘을 띄우기</guimenuitem>를 통해 21번째 파티션의 디바이스를 생성시키는 과정을 보여드립니다: <informalexample><screen>\n"
+"동시에 20개 이상의 IDE 파티션을 사용하실 경우 파티션 21 이상은 따로 디바이스"
+"를 생성해야 합니다. 그렇지 않을 경우 파티션을 초기화하는 작업이 실패하게 됩니"
+"다. 아래에 <userinput>tty2</userinput> 명령어나 <guimenuitem>쉘을 띄우기</"
+"guimenuitem>를 통해 21번째 파티션의 디바이스를 생성시키는 과정을 보여드립니"
+"다: <informalexample><screen>\n"
 "# cd /dev\n"
 "# mknod hda21 b 3 21\n"
 "# chgrp disk hda21\n"
 "# chmod 660 hda21\n"
-"</screen></informalexample> 적절한 디바이스가 생성되어 있지 않을 경우 새로 설치한 리눅스는 부팅이 되지 않을 것입니다. 커널과 모듈을 모두 설치하신 후 다음을 실행하십시오: <informalexample><screen>\n"
+"</screen></informalexample> 적절한 디바이스가 생성되어 있지 않을 경우 새로 설"
+"치한 리눅스는 부팅이 되지 않을 것입니다. 커널과 모듈을 모두 설치하신 후 다음"
+"을 실행하십시오: <informalexample><screen>\n"
 "# cd /target/dev\n"
 "# mknod hda21 b 3 21 \n"
 "# chgrp disk hda21\n"
 "# chmod 660 hda21\n"
-"</screen></informalexample> <phrase arch=\"x86\">부트 파티션을 <quote>Bootable</quote>로 설정하는 것을 잊지 마십시오.</phrase>"
+"</screen></informalexample> <phrase arch=\"x86\">부트 파티션을 "
+"<quote>Bootable</quote>로 설정하는 것을 잊지 마십시오.</phrase>"
 
 #. Tag: para
 #: partitioning.xml:601
@@ -1069,8 +1079,8 @@ msgstr ""
 "fdisk Tutorial</ulink>도 읽을 것을 권해드립니다. "
 
 #. Tag: title
-#: partitioning.xml:617 partitioning.xml:677 partitioning.xml:701
-#: partitioning.xml:798 partitioning.xml:912 partitioning.xml:989
+#: partitioning.xml:617 partitioning.xml:678 partitioning.xml:702
+#: partitioning.xml:799 partitioning.xml:913 partitioning.xml:990
 #, no-c-format
 msgid "Partitioning for &arch-title;"
 msgstr "&arch-title;에서 파티션하기"
@@ -1112,16 +1122,16 @@ msgstr ""
 
 #. Tag: para
 #: partitioning.xml:636
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "Unless you wish to use the disk you are partitioning from Tru64 Unix or one "
 "of the free 4.4BSD-Lite derived operating systems (FreeBSD, OpenBSD, or "
-"NetBSD), it is suggested that you do <emphasis>not</emphasis> make the third "
-"partition contain the whole disk. This is not required by <command>aboot</"
-"command>, and in fact, it may lead to confusion since the "
-"<command>swriteboot</command> utility used to install <command>aboot</"
-"command> in the boot sector will complain about a partition overlapping with "
-"the boot block."
+"NetBSD), you should <emphasis>not</emphasis> create the third partition as a "
+"<quote>whole disk</quote> partition (i.e. with start and end sectors to span "
+"the whole disk), as this renders the disk incompatible with the tools used "
+"to make it bootable with aboot. This means that the disk configured by the "
+"installer for use as the Debian boot disk will be inaccessible to the "
+"operating systems mentioned earlier."
 msgstr ""
 "Tru64 Unix나 FreeBSD, OpenBSD, NetBSD등 4.4BSD-Lite에 기반을 둔 운영체제와 디"
 "스크를 공유하고자 할 경우가 아니면 세번째 파티션에 디스크 전체를 넣지 않는 것"
@@ -1131,7 +1141,7 @@ msgstr ""
 "메시지를 출력시키게 합니다. "
 
 #. Tag: para
-#: partitioning.xml:647
+#: partitioning.xml:648
 #, no-c-format
 msgid ""
 "Also, because <command>aboot</command> is written to the first few sectors "
@@ -1151,7 +1161,7 @@ msgstr ""
 "편의를 위하여 <command>partman</command>명령어는 여전히 이 빈공간을 둡니다. "
 
 #. Tag: para
-#: partitioning.xml:659
+#: partitioning.xml:660
 #, no-c-format
 msgid ""
 "For ARC installations, you should make a small FAT partition at the "
@@ -1171,7 +1181,7 @@ msgstr ""
 "야 합니다. "
 
 #. Tag: para
-#: partitioning.xml:678
+#: partitioning.xml:679
 #, no-c-format
 msgid ""
 "PALO, the HPPA boot loader, requires a partition of type <quote>F0</quote> "
@@ -1198,7 +1208,7 @@ msgstr ""
 "MB 정도 할당해두시면 됩니다. "
 
 #. Tag: para
-#: partitioning.xml:702
+#: partitioning.xml:703
 #, no-c-format
 msgid ""
 "If you have an existing other operating system such as DOS or Windows and "
@@ -1216,7 +1226,7 @@ msgstr ""
 "이미 존재하는 파티션의 크기를 조정하시면 됩니다. "
 
 #. Tag: para
-#: partitioning.xml:712
+#: partitioning.xml:713
 #, no-c-format
 msgid ""
 "The PC BIOS generally adds additional constraints for disk partitioning. "
@@ -1237,7 +1247,7 @@ msgstr ""
 "은 배우실 수 있습니다. "
 
 #. Tag: para
-#: partitioning.xml:723
+#: partitioning.xml:724
 #, no-c-format
 msgid ""
 "<quote>Primary</quote> partitions are the original partitioning scheme for "
@@ -1256,7 +1266,7 @@ msgstr ""
 "크에는 <quote>확장파티션</quote>을 하나만 둘 수 있습니다. "
 
 #. Tag: para
-#: partitioning.xml:734
+#: partitioning.xml:735
 #, no-c-format
 msgid ""
 "Linux limits the partitions per drive to 15 partitions for SCSI disks (3 "
@@ -1273,7 +1283,7 @@ msgstr ""
 "추가하셔야 합니다. "
 
 #. Tag: para
-#: partitioning.xml:744
+#: partitioning.xml:745
 #, no-c-format
 msgid ""
 "If you have a large IDE disk, and are using neither LBA addressing, nor "
@@ -1288,7 +1298,7 @@ msgstr ""
 "없이는 맨앞 524 MB에 둬야 합니다. "
 
 #. Tag: para
-#: partitioning.xml:752
+#: partitioning.xml:753
 #, no-c-format
 msgid ""
 "This restriction doesn't apply if you have a BIOS newer than around "
@@ -1313,7 +1323,7 @@ msgstr ""
 "에 BIOS가 사용되지 않으므로 이런 제약이 없어집니다. "
 
 #. Tag: para
-#: partitioning.xml:766
+#: partitioning.xml:767
 #, no-c-format
 msgid ""
 "If you have a large disk, you might have to use cylinder translation "
@@ -1334,7 +1344,7 @@ msgstr ""
 "후</emphasis>의 앞 1024번째 실린더 내에 할당되어야 합니다. "
 
 #. Tag: para
-#: partitioning.xml:778
+#: partitioning.xml:779
 #, no-c-format
 msgid ""
 "The recommended way of accomplishing this is to create a small "
@@ -1355,7 +1365,7 @@ msgstr ""
 "모든 경우에 적용될 수 있습니다. "
 
 #. Tag: para
-#: partitioning.xml:799
+#: partitioning.xml:800
 #, no-c-format
 msgid ""
 "The <command>partman</command> disk partitioner is the default partitioning "
@@ -1371,13 +1381,13 @@ msgstr ""
 "command> 명령어를 사용합니다. "
 
 #. Tag: title
-#: partitioning.xml:811
+#: partitioning.xml:812
 #, no-c-format
 msgid "EFI Recognized Formats"
 msgstr "EFI에서 지원하는 포맷"
 
 #. Tag: para
-#: partitioning.xml:812
+#: partitioning.xml:813
 #, no-c-format
 msgid ""
 "The IA64 EFI firmware supports two partition table (or disk label) formats, "
@@ -1394,7 +1404,7 @@ msgstr ""
 "url=\"parted.txt\"> <command>parted</command></ulink>를 사용하십시오. "
 
 #. Tag: para
-#: partitioning.xml:824
+#: partitioning.xml:825
 #, no-c-format
 msgid ""
 "The automatic partitioning recipes for <command>partman</command> allocate "
@@ -1410,7 +1420,7 @@ msgstr ""
 "다. "
 
 #. Tag: para
-#: partitioning.xml:832
+#: partitioning.xml:833
 #, no-c-format
 msgid ""
 "The <command>partman</command> partitioner will handle most disk layouts. "
@@ -1457,13 +1467,13 @@ msgstr ""
 "배드블럭을 검사하는데 몇분정도 걸릴 수 있습니다. "
 
 #. Tag: title
-#: partitioning.xml:857
+#: partitioning.xml:858
 #, no-c-format
 msgid "Boot Loader Partition Requirements"
 msgstr "부트로더 파티션의 제약"
 
 #. Tag: para
-#: partitioning.xml:858
+#: partitioning.xml:859
 #, no-c-format
 msgid ""
 "ELILO, the ia64 boot loader, requires a partition containing a FAT file "
@@ -1477,7 +1487,7 @@ msgstr ""
 "MB입니다만, 커널을 여러개 두고자 하실 경우엔 128 MB정도는 필요할 것입니다. "
 
 #. Tag: para
-#: partitioning.xml:867
+#: partitioning.xml:868
 #, no-c-format
 msgid ""
 "The EFI Boot Manager and the EFI Shell fully support the GPT table so the "
@@ -1501,7 +1511,7 @@ msgstr ""
 "면 됩니다. "
 
 #. Tag: para
-#: partitioning.xml:882
+#: partitioning.xml:883
 #, no-c-format
 msgid ""
 "It is strongly recommended that you allocate the EFI boot partition on the "
@@ -1511,13 +1521,13 @@ msgstr ""
 "것을 권장합니다. "
 
 #. Tag: title
-#: partitioning.xml:890
+#: partitioning.xml:891
 #, no-c-format
 msgid "EFI Diagnostic Partitions"
 msgstr "EFI 검사용 파티션"
 
 #. Tag: para
-#: partitioning.xml:891
+#: partitioning.xml:892
 #, no-c-format
 msgid ""
 "The EFI firmware is significantly more sophisticated than the usual BIOS "
@@ -1537,7 +1547,7 @@ msgstr ""
 "파티션은 EFI 부트 파티션을 설정할 때 같이 설정하시면 편합니다. "
 
 #. Tag: para
-#: partitioning.xml:913
+#: partitioning.xml:914
 #, no-c-format
 msgid ""
 "SGI machines require an SGI disk label in order to make the system bootable "
@@ -1554,13 +1564,13 @@ msgstr ""
 "는 0번 섹터에 있어야 합니다. "
 
 #. Tag: title
-#: partitioning.xml:930
+#: partitioning.xml:931
 #, no-c-format
 msgid "Partitioning Newer PowerMacs"
 msgstr "현대 PowerMac에서 파티션하기"
 
 #. Tag: para
-#: partitioning.xml:931
+#: partitioning.xml:932
 #, no-c-format
 msgid ""
 "If you are installing onto a NewWorld PowerMac you must create a special "
@@ -1583,7 +1593,7 @@ msgstr ""
 "해서 만드시면 됩니다. "
 
 #. Tag: para
-#: partitioning.xml:944
+#: partitioning.xml:945
 #, no-c-format
 msgid ""
 "The special partition type Apple_Bootstrap is required to prevent MacOS from "
@@ -1595,7 +1605,7 @@ msgstr ""
 "로 부팅하도록 특별히 수정된 파티션이기 때문입니다. "
 
 #. Tag: para
-#: partitioning.xml:951
+#: partitioning.xml:952
 #, no-c-format
 msgid ""
 "Note that the bootstrap partition is only meant to hold 3 very small files: "
@@ -1613,7 +1623,7 @@ msgstr ""
 "<command>mkofboot</command> 프로그램을 통해서 관리하실 수 있습니다. "
 
 #. Tag: para
-#: partitioning.xml:961
+#: partitioning.xml:962
 #, no-c-format
 msgid ""
 "In order for OpenFirmware to automatically boot &debian; the bootstrap "
@@ -1634,7 +1644,7 @@ msgstr ""
 "요한 것이 아니라 논리적인 배열 순서가 중요합니다. "
 
 #. Tag: para
-#: partitioning.xml:973
+#: partitioning.xml:974
 #, no-c-format
 msgid ""
 "Apple disks normally have several small driver partitions. If you intend to "
@@ -1649,7 +1659,7 @@ msgstr ""
 "션과 드라이버 파티션이 없는 디스크를 초기화하고자 하기 때문입니다. "
 
 #. Tag: para
-#: partitioning.xml:990
+#: partitioning.xml:991
 #, no-c-format
 msgid ""
 "Make sure you create a <quote>Sun disk label</quote> on your boot disk. This "
@@ -1664,7 +1674,7 @@ msgstr ""
 "keycap>키를 이용하여 만드실 수 있습니다. "
 
 #. Tag: para
-#: partitioning.xml:998
+#: partitioning.xml:999
 #, no-c-format
 msgid ""
 "Furthermore, on &arch-title; disks, make sure your first partition on your "
@@ -1683,7 +1693,7 @@ msgstr ""
 "션으로 지정하면 이 섹터들을 보존할 수 있을 것입니다. "
 
 #. Tag: para
-#: partitioning.xml:1009
+#: partitioning.xml:1010
 #, no-c-format
 msgid ""
 "It is also advised that the third partition should be of type <quote>Whole "

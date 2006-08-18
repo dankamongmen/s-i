@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-08-16 18:10+0000\n"
+"POT-Creation-Date: 2006-08-18 17:32+0000\n"
 "PO-Revision-Date: 2006-08-18 04:18+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -527,7 +527,9 @@ msgstr "DOS, Windows, OS/2에서 디스크 이미지 쓰기"
 msgid ""
 "If you have access to an i386 or amd64 machine, you can use one of the "
 "following programs to copy images to floppies."
-msgstr "i386 혹은 amd64 기계의 경우는, 다음 명령 중의 하나를 이용해 이미지를 플로피로 복사하십시오."
+msgstr ""
+"i386 혹은 amd64 기계의 경우는, 다음 명령 중의 하나를 이용해 이미지를 플로피"
+"로 복사하십시오."
 
 #. Tag: para
 #: install-methods.xml:399
@@ -1682,9 +1684,9 @@ msgstr "RARP 서버 준비하기"
 
 #. Tag: para
 #: install-methods.xml:1157
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"To setup RARP, you need to know the Ethernet address (a.k.a. the MAC "
+"To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
 "address) of the client computers to be installed. If you don't know this "
 "information, you can <phrase arch=\"sparc\"> pick it off the initial "
 "OpenPROM boot messages, use the OpenBoot <userinput>.enet-addr</userinput> "
@@ -1701,63 +1703,17 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1169
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"On a RARP server system using a Linux 2.2.x kernel, you need to populate the "
-"kernel's RARP table. To do this, run the following commands: "
-"<informalexample><screen>\n"
-"# <userinput>/sbin/rarp -s\n"
-"<replaceable>client-hostname</replaceable>\n"
-"<replaceable>client-enet-addr</replaceable></userinput>\n"
-"\n"
-"# <userinput>/usr/sbin/arp -s\n"
-"<replaceable>client-ip</replaceable>\n"
-"<replaceable>client-enet-addr</replaceable></userinput>\n"
-"</screen></informalexample> If you get <informalexample><screen>\n"
-"SIOCSRARP: Invalid argument\n"
-"</screen></informalexample> you probably need to load the RARP kernel module "
-"or else recompile the kernel to support RARP. Try <userinput>modprobe rarp</"
-"userinput> and then try the <command>rarp</command> command again."
-msgstr ""
-"리눅스 2.2.x 커널을 사용하는 RARP 서버 시스템에서는, 커널의 RARP 테이블을 조"
-"정해야 합니다. 그렇게 하려면 다음 명령을 실행하십시오: "
-"<informalexample><screen>\n"
-"# <userinput>/sbin/rarp -s \n"
-"<replaceable>client-hostname</replaceable>\n"
-"<replaceable>client-enet-addr</replaceable></userinput>\n"
-"\n"
-"# <userinput>/usr/sbin/arp -s \n"
-"<replaceable>client-ip</replaceable>\n"
-"<replaceable>client-enet-addr</replaceable></userinput>\n"
-"</screen></informalexample> 만약 다음과 같은 에러가 발생하면: "
-"<informalexample><screen>\n"
-"SIOCSRARP: Invalid argument\n"
-"</screen></informalexample> 그러면 RARP 커널 모듈을 읽어들이거나 RARP를 지원"
-"하도록 커널을 다시 컴파일해야 할 겁니다. <userinput>modprobe rarp</"
-"userinput> 명령을 실행하고 <command>rarp</command> 명령을 실행해 보십시오."
-
-#. Tag: para
-#: install-methods.xml:1185
-#, no-c-format
-msgid ""
-"On a RARP server system using a Linux 2.4.x kernel, there is no RARP module, "
-"and you should instead use the <command>rarpd</command> program. The "
-"procedure is similar to that used under SunOS in the following paragraph."
-msgstr ""
-"리눅스 2.4.x 커널을 사용하는 RARP 서버 시스템에서는, RARP 모듈이 없는 대신 "
-"<command>rarpd</command> 프로그램을 사용해야 합니다. 그 다음 과정은 SunOS에"
-"서 사용하는 방법과 비슷합니다."
-
-#. Tag: para
-#: install-methods.xml:1193
-#, no-c-format
-msgid ""
-"Under SunOS, you need to ensure that the Ethernet hardware address for the "
-"client is listed in the <quote>ethers</quote> database (either in the "
-"<filename>/etc/ethers</filename> file, or via NIS/NIS+) and in the "
-"<quote>hosts</quote> database. Then you need to start the RARP daemon. In "
-"SunOS 4, issue the command (as root): <userinput>/usr/etc/rarpd -a</"
-"userinput>; in SunOS 5, use <userinput>/usr/sbin/rarpd -a</userinput>."
+"On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
+"you use the <command>rarpd</command> program. You need to ensure that the "
+"Ethernet hardware address for the client is listed in the <quote>ethers</"
+"quote> database (either in the <filename>/etc/ethers</filename> file, or via "
+"NIS/NIS+) and in the <quote>hosts</quote> database. Then you need to start "
+"the RARP daemon. Issue the command (as root): <userinput>/usr/sbin/rarpd -a</"
+"userinput> on most Linux systems and SunOS 5 (Solaris 2), <userinput>/usr/"
+"sbin/in.rarpd -a</userinput> on some other Linux systems, or <userinput>/usr/"
+"etc/rarpd -a</userinput> in SunOS 4 (Solaris 1)."
 msgstr ""
 "SunOS에서는, 클라이언트의 이더넷 하드웨어 주소가 <quote>ethers</quote> 데이터"
 "베이스 (<filename>/etc/ethers</filename> 파일이나 NIS/NIS+를 통해) 및 "
@@ -1767,13 +1723,13 @@ msgstr ""
 "userinput> 명령을 사용하십시오."
 
 #. Tag: title
-#: install-methods.xml:1212
+#: install-methods.xml:1191
 #, no-c-format
 msgid "Setting up BOOTP server"
 msgstr "BOOTP 서버 준비하기"
 
 #. Tag: para
-#: install-methods.xml:1213
+#: install-methods.xml:1192
 #, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
@@ -1788,7 +1744,7 @@ msgstr ""
 "classname>라는 꾸러미로 포함되어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1221
+#: install-methods.xml:1200
 #, no-c-format
 msgid ""
 "To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
@@ -1850,7 +1806,7 @@ msgstr ""
 "면 됩니다. <userinput>eaddr</userinput> 변수의 값이 MAC 주소입니다. </phrase>"
 
 #. Tag: para
-#: install-methods.xml:1254
+#: install-methods.xml:1233
 #, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
@@ -1871,13 +1827,13 @@ msgstr ""
 "<command>dhcpd</command>를 다시 시작하면 됩니다."
 
 #. Tag: title
-#: install-methods.xml:1275
+#: install-methods.xml:1254
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "DHCP 서버 설정하기"
 
 #. Tag: para
-#: install-methods.xml:1276
+#: install-methods.xml:1255
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. In &debian;, "
@@ -1933,7 +1889,7 @@ msgstr ""
 "꾸러미는 <filename>/etc/dhcp3/dhcpd.conf</filename> 파일을 사용합니다."
 
 #. Tag: para
-#: install-methods.xml:1288
+#: install-methods.xml:1267
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -1950,7 +1906,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: install-methods.xml:1298
+#: install-methods.xml:1277
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -1961,13 +1917,13 @@ msgstr ""
 "오."
 
 #. Tag: title
-#: install-methods.xml:1306
+#: install-methods.xml:1285
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "DHCP 설정에서 PXE 부팅하게 만들기"
 
 #. Tag: para
-#: install-methods.xml:1307
+#: install-methods.xml:1286
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -2037,13 +1993,13 @@ msgstr ""
 "linkend=\"tftp-images\"/> 부분 참고)"
 
 #. Tag: title
-#: install-methods.xml:1323
+#: install-methods.xml:1302
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "TFTP Server 사용하기"
 
 #. Tag: para
-#: install-methods.xml:1324
+#: install-methods.xml:1303
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
@@ -2062,7 +2018,7 @@ msgstr ""
 "이런 설정이 들어갑니다."
 
 #. Tag: para
-#: install-methods.xml:1335
+#: install-methods.xml:1314
 #, no-c-format
 msgid ""
 "Look in that file and remember the directory which is used as the argument "
@@ -2087,7 +2043,7 @@ msgstr ""
 "<replaceable>inetd-pid</replaceable></userinput> 명령을 실행합니다."
 
 #. Tag: para
-#: install-methods.xml:1349
+#: install-methods.xml:1328
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2117,13 +2073,13 @@ msgstr ""
 "를 조정합니다."
 
 #. Tag: title
-#: install-methods.xml:1371
+#: install-methods.xml:1350
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "TFTP 이미지를 적당한 위치에 옮기기"
 
 #. Tag: para
-#: install-methods.xml:1372
+#: install-methods.xml:1351
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2141,7 +2097,7 @@ msgstr ""
 "하고, 어떤 표준도 없습니다."
 
 #. Tag: para
-#: install-methods.xml:1382
+#: install-methods.xml:1361
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2158,7 +2114,7 @@ msgstr ""
 "filename>로 이름을 바꾸십시오."
 
 #. Tag: para
-#: install-methods.xml:1391
+#: install-methods.xml:1370
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2174,7 +2130,7 @@ msgstr ""
 "시오."
 
 #. Tag: para
-#: install-methods.xml:1399
+#: install-methods.xml:1378
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2190,13 +2146,13 @@ msgstr ""
 "DHCP 서버에 설정하십시오."
 
 #. Tag: title
-#: install-methods.xml:1411
+#: install-methods.xml:1390
 #, no-c-format
 msgid "DECstation TFTP Images"
 msgstr "DECstation TFTP 이미지"
 
 #. Tag: para
-#: install-methods.xml:1412
+#: install-methods.xml:1391
 #, no-c-format
 msgid ""
 "For DECstations, there are tftpimage files for each subarchitecture, which "
@@ -2213,7 +2169,7 @@ msgstr ""
 "을 <userinput>/tftpboot/tftpboot.img</userinput> 파일로 복사하십시오."
 
 #. Tag: para
-#: install-methods.xml:1422
+#: install-methods.xml:1401
 #, no-c-format
 msgid ""
 "The DECstation firmware boots by TFTP with the command <userinput>boot "
@@ -2231,13 +2187,13 @@ msgstr ""
 "다:"
 
 #. Tag: userinput
-#: install-methods.xml:1434
+#: install-methods.xml:1413
 #, no-c-format
 msgid "boot #/tftp/filename param1=value1 param2=value2 ..."
 msgstr "boot #/tftp/filename 파라미터1=값1 파라미터2=값2 ..."
 
 #. Tag: para
-#: install-methods.xml:1436
+#: install-methods.xml:1415
 #, no-c-format
 msgid ""
 "Several DECstation firmware revisions show a problem with regard to net "
@@ -2274,13 +2230,13 @@ msgstr ""
 "ulink>"
 
 #. Tag: title
-#: install-methods.xml:1474
+#: install-methods.xml:1453
 #, no-c-format
 msgid "Alpha TFTP Booting"
 msgstr "Alpha TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1475
+#: install-methods.xml:1454
 #, no-c-format
 msgid ""
 "On Alpha, you must specify the filename (as a relative path to the boot "
@@ -2302,13 +2258,13 @@ msgstr ""
 "정해야 합니다</emphasis>."
 
 #. Tag: title
-#: install-methods.xml:1490
+#: install-methods.xml:1469
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "SPARC TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1491
+#: install-methods.xml:1470
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2338,7 +2294,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: install-methods.xml:1507
+#: install-methods.xml:1486
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2351,13 +2307,13 @@ msgstr ""
 "userinput>. 파일은 TFTP 서버가 찾는 디렉토리 안에 들어 있어야 합니다."
 
 #. Tag: title
-#: install-methods.xml:1518
+#: install-methods.xml:1497
 #, no-c-format
 msgid "BVM/Motorola TFTP Booting"
 msgstr "BVM/Motorola TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1519
+#: install-methods.xml:1498
 #, no-c-format
 msgid ""
 "For BVM and Motorola VMEbus systems copy the files &bvme6000-tftp-files; to "
@@ -2367,7 +2323,7 @@ msgstr ""
 "tftpboot/</filename> 디렉토리에 복사하십시오."
 
 #. Tag: para
-#: install-methods.xml:1524
+#: install-methods.xml:1503
 #, no-c-format
 msgid ""
 "Next, configure your boot ROMs or BOOTP server to initially load the "
@@ -2382,13 +2338,13 @@ msgstr ""
 "<filename>tftplilo.txt</filename> 파일을 참고하십시오."
 
 #. Tag: title
-#: install-methods.xml:1536
+#: install-methods.xml:1515
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "SGI TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1537
+#: install-methods.xml:1516
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2402,13 +2358,13 @@ msgstr ""
 "<userinput>filename=</userinput> 옵션으로 지정합니다."
 
 #. Tag: title
-#: install-methods.xml:1549
+#: install-methods.xml:1528
 #, no-c-format
 msgid "Broadcom BCM91250A and BCM91480B TFTP Booting"
 msgstr "Broadcom BCM91250A과 BCM91480B TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1550
+#: install-methods.xml:1529
 #, no-c-format
 msgid ""
 "You don't have to configure DHCP in a special way because you'll pass the "
@@ -2418,13 +2374,13 @@ msgstr ""
 "없습니다."
 
 #. Tag: title
-#: install-methods.xml:1655
+#: install-methods.xml:1634
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "자동 설치"
 
 #. Tag: para
-#: install-methods.xml:1656
+#: install-methods.xml:1635
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2440,13 +2396,13 @@ msgstr ""
 "할 수도 있습니다."
 
 #. Tag: title
-#: install-methods.xml:1669
+#: install-methods.xml:1648
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "데비안 설치 프로그램을 이용한 자동 설치"
 
 #. Tag: para
-#: install-methods.xml:1670
+#: install-methods.xml:1649
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2459,7 +2415,7 @@ msgstr ""
 "다. 이 파일 안에는 설치 과정에서 나오는 질문에 대한 대답들이 들어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1677
+#: install-methods.xml:1656
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
@@ -2467,3 +2423,48 @@ msgid ""
 msgstr ""
 "<xref linkend=\"appendix-preseed\"/>에 보면 미리 설정에 대한 문서가 있고, 약"
 "간 고쳐서 사용할 수 있는 잘 동작하는 예제가 있습니다."
+
+#~ msgid ""
+#~ "On a RARP server system using a Linux 2.2.x kernel, you need to populate "
+#~ "the kernel's RARP table. To do this, run the following commands: "
+#~ "<informalexample><screen>\n"
+#~ "# <userinput>/sbin/rarp -s\n"
+#~ "<replaceable>client-hostname</replaceable>\n"
+#~ "<replaceable>client-enet-addr</replaceable></userinput>\n"
+#~ "\n"
+#~ "# <userinput>/usr/sbin/arp -s\n"
+#~ "<replaceable>client-ip</replaceable>\n"
+#~ "<replaceable>client-enet-addr</replaceable></userinput>\n"
+#~ "</screen></informalexample> If you get <informalexample><screen>\n"
+#~ "SIOCSRARP: Invalid argument\n"
+#~ "</screen></informalexample> you probably need to load the RARP kernel "
+#~ "module or else recompile the kernel to support RARP. Try "
+#~ "<userinput>modprobe rarp</userinput> and then try the <command>rarp</"
+#~ "command> command again."
+#~ msgstr ""
+#~ "리눅스 2.2.x 커널을 사용하는 RARP 서버 시스템에서는, 커널의 RARP 테이블을 "
+#~ "조정해야 합니다. 그렇게 하려면 다음 명령을 실행하십시오: "
+#~ "<informalexample><screen>\n"
+#~ "# <userinput>/sbin/rarp -s \n"
+#~ "<replaceable>client-hostname</replaceable>\n"
+#~ "<replaceable>client-enet-addr</replaceable></userinput>\n"
+#~ "\n"
+#~ "# <userinput>/usr/sbin/arp -s \n"
+#~ "<replaceable>client-ip</replaceable>\n"
+#~ "<replaceable>client-enet-addr</replaceable></userinput>\n"
+#~ "</screen></informalexample> 만약 다음과 같은 에러가 발생하면: "
+#~ "<informalexample><screen>\n"
+#~ "SIOCSRARP: Invalid argument\n"
+#~ "</screen></informalexample> 그러면 RARP 커널 모듈을 읽어들이거나 RARP를 지"
+#~ "원하도록 커널을 다시 컴파일해야 할 겁니다. <userinput>modprobe rarp</"
+#~ "userinput> 명령을 실행하고 <command>rarp</command> 명령을 실행해 보십시오."
+
+#~ msgid ""
+#~ "On a RARP server system using a Linux 2.4.x kernel, there is no RARP "
+#~ "module, and you should instead use the <command>rarpd</command> program. "
+#~ "The procedure is similar to that used under SunOS in the following "
+#~ "paragraph."
+#~ msgstr ""
+#~ "리눅스 2.4.x 커널을 사용하는 RARP 서버 시스템에서는, RARP 모듈이 없는 대"
+#~ "신 <command>rarpd</command> 프로그램을 사용해야 합니다. 그 다음 과정은 "
+#~ "SunOS에서 사용하는 방법과 비슷합니다."
