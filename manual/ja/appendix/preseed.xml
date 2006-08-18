@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39468 -->
+<!-- original version: 39932 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1209,6 +1209,8 @@ correct one will be selected before using preseeding.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Or, if you want to use LVM:
 #d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# Or, LVM with more than one disk:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
@@ -1444,9 +1446,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# To install grub to multiple disks:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
