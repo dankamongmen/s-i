@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39468 -->
+<!-- original version: 39932 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -744,6 +744,9 @@ sera choisi avant de préconfigurer son partitionnement.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Ou, pour utiliser LVM :
 # d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# Ou, LVM avec plusieurs disques :
+# d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
 
 # Vous pouvez choisir parmi tous les schémas prédéfinis...
 # Note : la valeur du choix doit être traduit.
@@ -901,7 +904,7 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 <para>
 
 Peu d'éléments peuvent être préconfigurés à cette étape de l'installation.
-Les seules questions posées concernent l'installation du noyau
+Les seules questions posées concernent l'installation du noyau.
 
 </para>
 
@@ -932,9 +935,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Vous pouvez aussi l'installer ailleurs que dans le secteur d'amorçage 
 # principal. Décommentez et modifiez les lignes suivantes :
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Pour installer grub sur plusieurs disques :
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
