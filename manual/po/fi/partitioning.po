@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Debian Installation Guide partitioning\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-07 22:39+0000\n"
-"PO-Revision-Date: 2006-08-17 18:01+0300\n"
+"PO-Revision-Date: 2006-08-18 07:28+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -717,67 +717,67 @@ msgstr "Jos tietokoneessa on ennestään muu käyttöjärjestelmä kuten DOS tai
 #: partitioning.xml:712
 #, no-c-format
 msgid "The PC BIOS generally adds additional constraints for disk partitioning. There is a limit to how many <quote>primary</quote> and <quote>logical</quote> partitions a drive can contain. Additionally, with pre 1994&ndash;98 BIOSes, there are limits to where on the drive the BIOS can boot from. More information can be found in the <ulink url=\"&url-partition-howto;\">Linux Partition HOWTO</ulink> and the <ulink url=\"&url-phoenix-bios-faq-large-disk;\">Phoenix BIOS FAQ</ulink>, but this section will include a brief overview to help you plan most situations."
-msgstr ""
+msgstr "PC BIOS aiheuttaa yleensä lisärajoituksia levyn osioinnissa. Levyn <quote>ensisijaisten</quote> ja <quote>loogisten</quote> lukumäärä on rajoitettu. Lisäksi ennen noin 1994&ndash;98 tehdyissä BIOSeissa on rajoituksia mistä kohtaa levyä BIOS osaa käynnistää. Tarkempaa tietoa löytyy ohjeista <ulink url=\\\"&url-partition-howto;\\\">Linux Partition HOWTO</ulink> ja <ulink url=\\\"&url-phoenix-bios-faq-large-disk;\\\">Phoenix BIOS FAQ</ulink>, mutta tämän luvun pikaohje auttaa useimmissa tapauksissa."
 
 #. Tag: para
 #: partitioning.xml:723
 #, no-c-format
 msgid "<quote>Primary</quote> partitions are the original partitioning scheme for PC disks. However, there can only be four of them. To get past this limitation, <quote>extended</quote> and <quote>logical</quote> partitions were invented. By setting one of your primary partitions as an extended partition, you can subdivide all the space allocated to that partition into logical partitions. You can create up to 60 logical partitions per extended partition; however, you can only have one extended partition per drive."
-msgstr ""
+msgstr "<quote>Ensisijaiset</quote> osiot ovat PC-levyjen alkuperäinen osiointitapa. Niitä voi kuitenkin olla enintään neljä kappaletta. Tämän rajoituksen ohittamiseksi keksittiin <quote>laajennetut</quote> ja <quote>loogiset</quote> osiot. Muuttamalla yksi ensisijaisista osioista laajennetuksi osioksi, voidaan tuon osion tila jakaa useaan loogiseen osioon. Yhteen laajennettuun osioon voi tehdä jopa 60 loogista osiota; laajennettuja osioita voi kuitenkin olla vain yksi levyä kohti."
 
 #. Tag: para
 #: partitioning.xml:734
 #, no-c-format
 msgid "Linux limits the partitions per drive to 15 partitions for SCSI disks (3 usable primary partitions, 12 logical partitions), and 63 partitions on an IDE drive (3 usable primary partitions, 60 logical partitions). However the normal &debian; system provides only 20 devices for partitions, so you may not install on partitions higher than 20 unless you first manually create devices for those partitions."
-msgstr ""
+msgstr "Linux rajoittaa osioiden määrän levyä kohti 15 osioon SCSI-levyille (käytettävissä on 3 ensisijaista osiota ja 12 loogista osiota), ja 63 osioon IDE-levyille (käytettävissä on 3 ensisijaista osiota ja 60 loogista osiota). Kuitenkin tavallinen &debian; järjestelmä tekee vain 20 laitetiedostoa osioille, joten enempiä osioita ei voi levylle tehdä luomalla ensin itse laitetiedostot ylimääräisille osioille."
 
 #. Tag: para
 #: partitioning.xml:744
 #, no-c-format
 msgid "If you have a large IDE disk, and are using neither LBA addressing, nor overlay drivers (sometimes provided by hard disk manufacturers), then the boot partition (the partition containing your kernel image) must be placed within the first 1024 cylinders of your hard drive (usually around 524 megabytes, without BIOS translation)."
-msgstr ""
+msgstr "Jos tietokoneessa on iso IDE-levy eikä käytetä LBA-osoitusta eikä päällysajuria (kiintolevyjen valmistajat saattavat toimittaa niitä), on käynnistysosion (osio jossa ytimen suorituskelpoinen tiedosto sijaitsee) sijaittava levyn 1024 ensimmäisen syliterin alueella (tavallisesti noin 524 Mt, jos BIOS ei muunna osoitteita)."
 
 #. Tag: para
 #: partitioning.xml:752
 #, no-c-format
 msgid "This restriction doesn't apply if you have a BIOS newer than around 1995&ndash;98 (depending on the manufacturer) that supports the <quote>Enhanced Disk Drive Support Specification</quote>. Both Lilo, the Linux loader, and Debian's alternative <command>mbr</command> must use the BIOS to read the kernel from the disk into RAM. If the BIOS int 0x13 large disk access extensions are found to be present, they will be utilized. Otherwise, the legacy disk access interface is used as a fall-back, and it cannot be used to address any location on the disk higher than the 1023rd cylinder. Once Linux is booted, no matter what BIOS your computer has, these restrictions no longer apply, since Linux does not use the BIOS for disk access."
-msgstr ""
+msgstr "Tätä rajoitusta ei ole jos BIOS on uudempi kuin noin 1995&ndash;98 (riippuu valmistajasta) ja ominaisuus <quote>Enhanced Disk Drive Support Specification</quote> on tuettu. Sekä Lilo, Linuxin käynnistyslatain, että Debianin vaihtoehtoinen <command>mbr</command> joutuvat käyttämään BIOSia ytimen lukemiseen levyltä keskusmuistiin. Jos BIOSin keskeytystä 0x13 käyttävä lisäys isojen levyjen käyttöön löytyy, sitä käytetään. Muussa tapauksessa peräydytään käyttämään perinteistä levyrajapintaa, joka ei osaa käyttää levyosoitteita 1023. sylinterin jälkeen. Kun Linux on käynnistynyt, ei BIOSilla enää ole merkitystä, koska Linux ei käytä levyä BIOSin kautta."
 
 #. Tag: para
 #: partitioning.xml:766
 #, no-c-format
 msgid "If you have a large disk, you might have to use cylinder translation techniques, which you can set from your BIOS setup program, such as LBA (Logical Block Addressing) or CHS translation mode (<quote>Large</quote>). More information about issues with large disks can be found in the <ulink url=\"&url-large-disk-howto;\">Large Disk HOWTO</ulink>. If you are using a cylinder translation scheme, and the BIOS does not support the large disk access extensions, then your boot partition has to fit within the <emphasis>translated</emphasis> representation of the 1024th cylinder."
-msgstr ""
+msgstr "Jos levy on iso, on ehkä käytettävä sylinteriosoitteen muunnosta. Nämä voidaan valita BIOSin asetuksista, esimerkiksi LBA (Logical Block Addressing) tai CHS translation mode (<quote>Large</quote>). Lisätietoa isojen levyjen käyttämisestä on ohjeessa <ulink url=\"&url-large-disk-howto;\">Large Disk HOWTO</ulink>. Jos käytetään sylinteriosoitteen muunnosta eikä BIOS tue lisäystä isojen levyjen käyttöön, on käynnistysosion sijaittava <emphasis>muunnettujen</emphasis> 1023 ensimmäisen sylinterin alueella."
 
 #. Tag: para
 #: partitioning.xml:778
 #, no-c-format
 msgid "The recommended way of accomplishing this is to create a small (25&ndash;50MB should suffice) partition at the beginning of the disk to be used as the boot partition, and then create whatever other partitions you wish to have, in the remaining area. This boot partition <emphasis>must</emphasis> be mounted on <filename>/boot</filename>, since that is the directory where the Linux kernel(s) will be stored. This configuration will work on any system, regardless of whether LBA or large disk CHS translation is used, and regardless of whether your BIOS supports the large disk access extensions."
-msgstr ""
+msgstr "Suositeltu tapa tämän tekemiseen on pienen (25&ndash;50 Mt pitäisi riittää) osion luominen levyn alkuun käytettäväksi käynnistysosiona, ja luoda muut tarvittavat osiot jäljelle jäävään osaan levyä. Tämä käynnistysosio <emphasis>on liitettävä</emphasis> kohtaan <filename>/boot</filename>, koska tuohon hakemistoon tallennetaan Linux-ytimet. Tämä järjestely toimii kaikissa järjestelmissä, eikä ole väliä onko käytössä LBA tai CHS translation mode tai tukeeko BIOS lisäystä isojen levyjen käyttöön."
 
 #. Tag: para
 #: partitioning.xml:799
 #, no-c-format
 msgid "The <command>partman</command> disk partitioner is the default partitioning tool for the installer. It manages the set of partitions and their mount points to ensure that the disks and filesystems are properly configured for a successful installation. It actually uses <command>parted</command> to do the on-disk partitioning."
-msgstr ""
+msgstr "Osiointisovellus <command>partman</command> on asentimen oletustyökalu levyjen osiointiin. Se huolehtii osiosta ja niiden liitoskohdista jotta levyt ja tiedostojärjestelmät on tehty oikein menestyksekästä asennusta varten. Se käyttää komentoa <command>parted</command> tekemään varsinaisen levyn osioinnin."
 
 #. Tag: title
 #: partitioning.xml:811
 #, no-c-format
 msgid "EFI Recognized Formats"
-msgstr ""
+msgstr "EFI:n tunnistamat osiotaulut"
 
 #. Tag: para
 #: partitioning.xml:812
 #, no-c-format
 msgid "The IA64 EFI firmware supports two partition table (or disk label) formats, GPT and MS-DOS. MS-DOS, the format typically used on i386 PCs, is no longer recommended for IA64 systems. Although the installer also provides <command>cfdisk</command>, you should only use <ulink url=\"parted.txt\"> <command>parted</command></ulink> because only it can manage both GPT and MS-DOS tables correctly."
-msgstr ""
+msgstr "IA64 EFI laiteohjelmisto tukee kahta osiotaulun (tai levynimiön) lajia, GPT tai MS-DOS. MS-DOS, jota i386 PC:eissä tavataan käyttää, ei ole enää suositeltu käytettäväksi IA64-järjestelmissä. Vaikka asentimessa on myös komento <command>cfdisk</command>, olisi käytettävä vain komentoa <ulink url=\"parted.txt\"> <command>parted</command></ulink> koska vain se osaa käyttää sekä GPT että MS-DOS osiotauluja oikein."
 
 #. Tag: para
 #: partitioning.xml:824
 #, no-c-format
 msgid "The automatic partitioning recipes for <command>partman</command> allocate an EFI partition as the first partition on the disk. You can also set up the partition under the <guimenuitem>Guided partitioning</guimenuitem> from the main menu in a manner similar to setting up a <emphasis>swap</emphasis> partition."
-msgstr ""
+msgstr "Automaattisen osioinnin mallineet joita <command>partman</command> käyttää varaavat tilan EFI-osiolle levyn ensimmäisenä osiona. Osion asetukset voidaan tehdä myös päävalikon kohdasta <guimenuitem>Ohjattu levyosioiden teko</guimenuitem> vastaavaan tapaan kuin <emphasis>sivutus</emphasis>-osio."
 
 #. Tag: para
 #: partitioning.xml:832
@@ -793,100 +793,109 @@ msgid ""
       "      quit\n"
       "</screen></informalexample> This creates a new partition table, and three partitions to be used as an EFI boot partition, swap space, and a root file system. Finally it sets the boot flag on the EFI partition. Partitions are specified in Megabytes, with start and end offsets from the beginning of the disk. So, for example, above we created a 1999MB ext2 file system starting at offset 1001MB from the start of the disk. Note that formatting swap space with <command>parted</command> can take a few minutes to complete, as it scans the partition for bad blocks."
 msgstr ""
+"Osiointisovellus <command>partman</command> osaa käsitellä useimmat osioasettelut. Niissä harvinaisissa tapauksissa joissa on välttämätöntä tehdä osiot itse, voidaan käynnistää komentotulkki kuten edellä on neuvottu ja käynnistää <command>parted</command> suoraan käyttäen sen komentorivin käyttöliittymää. Jos halutaan tyhjentää koko levy ja luoda GPT-osiotaulu sekä joitakin osioita, voidaan käyttää seuraavien komentojen tapaista: <informalexample><screen>\n"
+"      mklabel gpt\n"
+"      mkpartfs primary fat 0 50\n"
+"      mkpartfs primary linux-swap 51 1000\n"
+"      mkpartfs primary ext2 1001 3000\n"
+"      set 1 boot on\n"
+"      print\n"
+"      quit\n"
+"</screen></informalexample> Komennot luovat uuden osiotaulun ja kolme osiota eli EFI-käynnistysosio, sivutus ja juuritiedostojärjestelmä. Lopuksi EFI-osiolle asetetaan käynnistyskelpoisuuden ilmaisin. Osion koko annetaan megatavuina, alun ja lopun kohdat lasketaan levyn alusta. Esimerkiksi yllä luotiin 1999 Mt ext2 tiedostojärjestelmä jonka alkukohta on 1001 Mt levyn alusta. Huomaa että sivutusosion luomiseen <command>parted</command> saattaa käyttää muutaman minuutin, koska osio tarkistetaan toimimattomien lohkojen varalta."
 
 #. Tag: title
 #: partitioning.xml:857
 #, no-c-format
 msgid "Boot Loader Partition Requirements"
-msgstr ""
+msgstr "Käynnistyslataimen osion ominaisuudet"
 
 #. Tag: para
 #: partitioning.xml:858
 #, no-c-format
 msgid "ELILO, the ia64 boot loader, requires a partition containing a FAT file system with the <userinput>boot</userinput> flag set. The partition must be big enough to hold the boot loader and any kernels or RAMdisks you may wish to boot. A minimum size would be about 20MB, but if you expect to run with multiple kernels, then 128MB might be a better size."
-msgstr ""
+msgstr "ELILO, ia64 käynnistyslatain, vaatii osion jonka tiedostojärjestelmä on FAT ja <userinput>käynnistyskelpoisuuden ilmaisin</userinput> päällä. Osion on oltava riittävän suuri jotta siihen mahtuu käynnistyslatain ja käytettävät ytimet tai käynnistyslevyn otokset. Vähimmäiskoko olisi noin 20 Mt, mutta jos aiotaan käyttää useita ytimiä 128 Mt lienee parempi."
 
 #. Tag: para
 #: partitioning.xml:867
 #, no-c-format
 msgid "The EFI Boot Manager and the EFI Shell fully support the GPT table so the boot partition does not necessarily have to be the first partition or even on the same disk. This is convenient if you should forget to allocate the partition and only find out after you have formatted the other partitions on your disk(s). The <command>partman</command> partitioner checks for an EFI partition at the same time it checks for a properly set up <emphasis>root</emphasis> partition. This gives you an opportunity to correct the disk layout before the package install begins. The easiest way to correct this omission is to shrink the last partition of the disk to make enough free space for adding an EFI partition."
-msgstr ""
+msgstr "EFI-käynnistyslatain Boot Manager ja -komentotulkki tukevat täysin GPT-ositaulua joten käynnistysosion ei tarvitse olla levyn ensimmäinen eikä edes samalla levyllä. Tämä on kätevää jos unohtuu varata tila osiolle ja tämä huomataan vasta kun levyn muille osioille on jo tiedostojärjestelmäkin tehty. <command>partman</command> tarkistaa onko EFI-osiota samalla kun se tarkistaa onko <emphasis>root</emphasis>-osio tehty kuten pitää. Tällöin on mahdollista korjata levyn osioasettelu ennen kuin pakettien asennus alkaa. Helpoin tapa korjata unohtunut EFI-osio on tehdä sille tilaa pienentämällä levyn viimeistä osiota."
 
 #. Tag: para
 #: partitioning.xml:882
 #, no-c-format
 msgid "It is strongly recommended that you allocate the EFI boot partition on the same disk as the <emphasis>root</emphasis> filesystem."
-msgstr ""
+msgstr "EFI-käynnistysosion sijoittamista samalle levylle kuin <emphasis>root</emphasis>-tiedostojärjestelmä suositellaan vahvasti."
 
 #. Tag: title
 #: partitioning.xml:890
 #, no-c-format
 msgid "EFI Diagnostic Partitions"
-msgstr ""
+msgstr "EFI:n vianjäljitysosio"
 
 #. Tag: para
 #: partitioning.xml:891
 #, no-c-format
 msgid "The EFI firmware is significantly more sophisticated than the usual BIOS seen on most x86 PCs. Some system vendors take advantage of the ability of the EFI to access files and run programs from a hard disk filesystem to store diagnostics and EFI based system management utilities on the hard disk. This is a separate FAT format filesystem on the system disk. Consult the system documentation and accessories that come with the system for details. The easiest time to set up a diagnostics partition is at the same time you set up the EFI boot partition."
-msgstr ""
+msgstr "EFI-laiteohjelmisto on merkittävästi edistyneempi kuin useimpien x86 PC-koneiden tavallinen BIOS. Jotkut järjestelmätoimittajat hyödyntävät EFI:n mahdollisuutta lukea ja kirjoittaa tiedostoja ja käynnistää ohjelmia kiintolevyn tiedostojärjestelmältä tallentamaan vianjäljitystietoa ja EFI:in perustuvia järjestelmänhallintaohjelmia kiintolevylle. Tämä on erillinen FAT-tiedostojärjestelmä järjestelmälevyllä. Etsi tarkempaa tietoa järjestelmän mukana tulleista ohjeista ja ohjelmista. Helpoiten vianjäljitysosio on tehtävissä samalla kun tehdään EFI-käynnistysosio."
 
 #. Tag: para
 #: partitioning.xml:913
 #, no-c-format
 msgid "SGI machines require an SGI disk label in order to make the system bootable from hard disk. It can be created in the fdisk expert menu. The thereby created volume header (partition number 9) should be at least 3MB large. If the volume header created is too small, you can simply delete partition number 9 and re-add it with a different size. Note that the volume header must start at sector 0."
-msgstr ""
+msgstr "SGI-tietokoneet vaativat SGI-levynimiön jotta järjestelmä voisi käynnistyä kiintolevyltä. Se voidaan tehdä fdiskin expert-valikossa. Näin tehty levyn otsikko (osio numero 9) olisi oltava ainakin 3 Mt. Jos luotu levyn otsikko on liian pieni, voidaan osio numero 9 poistaa ja tehdä se uudestaan eri kokoisena. Huomaa että levyn otsikon alkukohdan on oltava sektori 0."
 
 #. Tag: title
 #: partitioning.xml:930
 #, no-c-format
 msgid "Partitioning Newer PowerMacs"
-msgstr ""
+msgstr "Uusien PowerMac-koneiden osiointi"
 
 #. Tag: para
 #: partitioning.xml:931
 #, no-c-format
 msgid "If you are installing onto a NewWorld PowerMac you must create a special bootstrap partition to hold the boot loader. The size of this partition must be 800KB and its partition type must be <emphasis>Apple_Bootstrap</emphasis>. If the bootstrap partition is not created with the <emphasis>Apple_Bootstrap</emphasis> type your machine cannot be made bootable from the hard disk. This partition can easily be created by creating a new partition in <command>partman</command> and telling it to use it as a <quote>NewWorld boot partition</quote>, or in <command>mac-fdisk</command> using the <userinput>b</userinput> command."
-msgstr ""
+msgstr "Jos asennettava kone on NewWorld PowerMac on käynnistyslataimelle luotava oma osio. Tämän osio koon on oltava 800 Kt ja tyypin <emphasis>Apple_Bootstrap</emphasis>. Jos tämän käynnistysosion tyyppi ei ole <emphasis>Apple_Bootstrap</emphasis> ei konetta voi käynnistää kiintolevyltä. Osio on luotavissa helposti tekemällä ohjelmalla <command>partman</command> uusi osio ja merkitsemällä se käytöksi <quote>NewWorld boot partition</quote>, tai komennolla <command>mac-fdisk</command> jossa käytetään komentoa <userinput>b</userinput>."
 
 #. Tag: para
 #: partitioning.xml:944
 #, no-c-format
 msgid "The special partition type Apple_Bootstrap is required to prevent MacOS from mounting and damaging the bootstrap partition, as there are special modifications made to it in order for OpenFirmware to boot it automatically."
-msgstr ""
+msgstr "Erikoisosion tyyppi Apple_Bootstrap tarvitaan jotta MacOS ei liitä ja riko käynnistysosiota, koska siihen on tehty erikoismuutoksia jotta OpenFirmware käynnistää sen automaattisesti."
 
 #. Tag: para
 #: partitioning.xml:951
 #, no-c-format
 msgid "Note that the bootstrap partition is only meant to hold 3 very small files: the <command>yaboot</command> binary, its configuration <filename>yaboot.conf</filename>, and a first stage OpenFirmware loader <command>ofboot.b</command>. It need not and must not be mounted on your file system nor have kernels or anything else copied to it. The <command>ybin</command> and <command>mkofboot</command> utilities are used to manipulate this partition."
-msgstr ""
+msgstr "Huomaa, että käynnistysosiossa on tarkoitus olla vain kolme hyvin pientä tiedostoa: komennon <command>yaboot</command> suorituskelpoinen tiedosto, sen asetustiedosto <filename>yaboot.conf</filename> ja OpenFirmwaren ensimmäisen vaiheen latain <command>ofboot.b</command>. Sitä ei tarvitse eikä saa liittää tiedostojärjestelmää eikä ytimiä tai muutakaan saa siihen kopioida. Osiota käytetään apuohjelmilla <command>ybin</command> ja <command>mkofboot</command>."
 
 #. Tag: para
 #: partitioning.xml:961
 #, no-c-format
 msgid "In order for OpenFirmware to automatically boot &debian; the bootstrap partition should appear before other boot partitions on the disk, especially MacOS boot partitions. The bootstrap partition should be the first one you create. However, if you add a bootstrap partition later, you can use <command>mac-fdisk</command>'s <userinput>r</userinput> command to reorder the partition map so the bootstrap partition comes right after the map (which is always partition 1). It's the logical map order, not the physical address order, that counts."
-msgstr ""
+msgstr "Jotta OpenFirmware osaisi automaattisesti käynnistää &debian;in pitäisi käynnistysosion sijaita ennen muita levyn käynnistysosioita, erityisesti ennen MacOS-käynnistysosioita. Käynnistysosion olisi oltava ensimmäinen luotava osio. Jos kuitenkin käynnistysosio lisätään myöhemmin, voidaan sovelluksen <command>mac-fdisk</command> komennolla <userinput>r</userinput> muuttaa osioiden järjestystä siten että käynnistysosio on heti osiotaulun jälkeen (joka on aina osio numero 1). Merkitystä on vain osioiden loogisella järjestyksellä, ei osioiden järjestyksellä levyllä. "
 
 #. Tag: para
 #: partitioning.xml:973
 #, no-c-format
 msgid "Apple disks normally have several small driver partitions. If you intend to dual boot your machine with MacOSX, you should retain these partitions and a small HFS partition (800k is the minimum size). That is because MacOSX, on every boot, offers to initialize any disks which do not have active MacOS partitions and driver partitions."
-msgstr ""
+msgstr "Applen levyillä on tavallisesti useita pieniä ajuriosioita. Käytettäessä monikäynnistystä MacOSX:n kanssa, olisi nämä osiot ja pieni HFS-osio (vähimmäiskooltaan 800 kt) säilytettävä. Tämä siitä syystä, että MacOSX tarjoutuu jokaisella käynnistyskerralla alustamaan kaikki levyt joissa ei ole käytössä olevia MacOS osioita ja ajuriosioita."
 
 #. Tag: para
 #: partitioning.xml:990
 #, no-c-format
 msgid "Make sure you create a <quote>Sun disk label</quote> on your boot disk. This is the only kind of partition scheme that the OpenBoot PROM understands, and so it's the only scheme from which you can boot. The <keycap>s</keycap> key is used in <command>fdisk</command> to create Sun disk labels."
-msgstr ""
+msgstr "Varmistu käynnistyslevylle luotavan <quote>Sun-levynimiö</quote>. Tämä on ainoa osiotaulu jota OpenBoot PROm ymmärtää, joten ilman Sun-levynimiötä ei kiintolevyltä pysty käynnistämään. Komennossa <command>fdisk</command> luodaan Sun-levynimiö näppäimellä <keycap>s</keycap>."
 
 #. Tag: para
 #: partitioning.xml:998
 #, no-c-format
 msgid "Furthermore, on &arch-title; disks, make sure your first partition on your boot disk starts at cylinder 0. While this is required, it also means that the first partition will contain the partition table and the boot block, which are the first two sectors of the disk. You must <emphasis>not</emphasis> put swap on the first partition of the boot drive, since swap partitions do not preserve the first few sectors of the partition. You can put Ext2 or UFS partitions there; these will leave the partition table and the boot block alone."
-msgstr ""
+msgstr "Lisäksi &arch-title; levyillä on varmistuttava käynnistyslevyn ensimmäisen osion alkavan sylinteriltä 0. Tästä vaatimuksesta seuraa, että ensimmäisessä osiossa on osiotaulu ja käynnistyslohko, koska ne sijaitsevat levyn kahdella ensimmäisellä sektorilla. Käynnistyslevyn ensimmäinen osio <emphasis>ei</emphasis> saa olla sivutus, koska sivutusosio ei säilytä osion muutamaa ensimmäistä sektoria. Ensimmäinen osio voi olla ext2 tai UFS, nämä jättävät osiotaulun ja käynnistyslohkon rauhaan."
 
 #. Tag: para
 #: partitioning.xml:1009
 #, no-c-format
 msgid "It is also advised that the third partition should be of type <quote>Whole disk</quote> (type 5), and contain the entire disk (from the first cylinder to the last). This is simply a convention of Sun disk labels, and helps the <command>SILO</command> boot loader keep its bearings."
-msgstr ""
+msgstr "Lisäksi suositellaan levyn kolmannen osion tyypiksi <quote>Whole disk</quote> (type 5), ja osion kooksi koko levy (ensimmäisestä sylinteristä viimeiseen). Tämä on tapana Sun-levynimiöissä, ja pitää käynnistyslataimen <command>SILO</command> raiteillaan."
 
