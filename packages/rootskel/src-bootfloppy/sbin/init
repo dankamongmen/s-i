@@ -96,12 +96,7 @@ while [ "$LOADED" = 0 ]; do
 		# be inserted at any time.
 		DEVS=""
 		if [ -z "$INSTALL_MEDIA_DEV" ]; then
-			if [ -d /dev/floppy ]; then
-				DEVS=/dev/floppy/?
-			fi
-			if [ -d /dev/scsi ]; then
-				DEVS="$DEVS `find /dev/scsi`"
-			fi
+			DEVS="`list-devices floppy` `list-devices disk` `list-devices partition`"
 		else
 			DEVS="`find $INSTALL_MEDIA_DEV`"
 		fi
