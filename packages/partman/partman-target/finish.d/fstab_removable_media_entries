@@ -78,36 +78,60 @@ populate_media floppy auto rw,user,noauto $FDDEVICES
 
 # See if a usb storage device is plugged in right now. If so, assume it is
 # removable media unless the disk is already listed in the fstab. 
-USBDEVICES=''
 HD_MEDIA=$(grep /hd-media /proc/mounts | cut -d ' ' -f 1)
 if [ -n "$HD_MEDIA" ]; then
     HD_MEDIA="$(mapdevfs $HD_MEDIA)"
 fi
-for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
-    if [ -d "$dir" ]; then
-        for ent in $dir/*; do
-	    if [ -f "$ent" ]; then
-	        host=$(grep "Host scsi" $ent | sed 's/.*scsi\([0-9]\).*/\1/')
-	        for dev in $(find /dev/scsi/host$host/ -type b); do
-	            if [ -b "$dev" ]; then
-	 	        if grep -q "^$(mapdevfs $dev) " /target/etc/fstab; then
-			    continue 2
-			fi
-	 	    fi
-	        done
-		dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
-		if [ -z "$USBDEVICES" ]; then
-		    USBDEVICES="$dev"
-		else
-		    if [ "$dev" != "$HD_MEDIA" ]; then
-			USBDEVICES="$USBDEVICES $dev"
-		    else
-			# If installing from usb, list that device first.
-			USBDEVICES="$dev $USBDEVICES"
-		    fi
-		fi
+founddevs=
+if [ -d /sys ] && type udevinfo >/dev/null 2>&1; then
+    disk_containing () {
+	dirname "$(udevinfo -q path -n "$dev")"
+    }
+    partitions="$(list-devices partition)"
+    for dev in $partitions; do
+	if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
+	    continue
+	fi
+	disk="$(disk_containing "$dev")"
+	for otherdev in $partitions; do
+	    if [ "$(disk_containing "$otherdev")" = "$disk" ] && \
+	       grep -q "^$otherdev " /target/etc/fstab; then
+		continue 2
 	    fi
-        done
+	done
+	founddevs="${founddevs:+$founddevs }$dev"
+    done
+else
+    for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
+	if [ -d "$dir" ]; then
+	    for ent in $dir/*; do
+		if [ -f "$ent" ]; then
+		    host=$(grep "Host scsi" $ent | sed 's/.*scsi\([0-9]\).*/\1/')
+		    for dev in $(find /dev/scsi/host$host/ -type b); do
+			if [ -b "$dev" ]; then
+			    if grep -q "^$(mapdevfs $dev) " /target/etc/fstab; then
+				continue 2
+			    fi
+			fi
+		    done
+		    dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
+		    founddevs="${founddevs:+$founddevs }$dev"
+		fi
+	    done
+	fi
+    done
+fi
+USBDEVICES=
+for dev in $founddevs; do
+    if [ -z "$USBDEVICES" ]; then
+	USBDEVICES="$dev"
+    else
+	if [ "$dev" != "$HD_MEDIA" ]; then
+	    USBDEVICES="$USBDEVICES $dev"
+	else
+	    # If installing from usb, list that device first.
+	    USBDEVICES="$dev $USBDEVICES"
+	fi
     fi
 done
 
