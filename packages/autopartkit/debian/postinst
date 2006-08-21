@@ -24,12 +24,22 @@ run_parts() {
     done
 }
 
+modprobe_if_missing() {
+    module=$1
+    if ((cut -d" " -f1 /proc/modules | grep -q "^$module\$") ||
+	(cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$module\$")) ; then
+	:
+    else
+	log-output -t autopartkit modprobe $module || true
+    fi
+}
+
 # Try to load LVM support, and make sure the user tools are installed into
 # /target/.  It should be safe to try both alternatives, as only the working
 # one will be activated at boot.
 log-output -t autopartkit depmod -a || true
-log-output -t autopartkit modprobe dm-mod || true
-log-output -t autopartkit modprobe lvm-mod || true
+modprobe_if_missing dm-mod
+modprobe_if_missing lvm-mod
 apt-install lvm2 || true
 apt-install lvm10 || true
 
