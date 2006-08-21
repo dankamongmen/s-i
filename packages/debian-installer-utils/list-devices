@@ -2,17 +2,32 @@
 TYPE="$1"
 
 case $TYPE in
-	cd|disk|floppy|maybe-floppy)	;;
+	cd|disk|partition|floppy|maybe-floppy)	;;
 	*)
-		echo "Usage: $0 cd|disk|floppy|maybe-floppy" >&2
+		echo "Usage: $0 cd|disk|partition|floppy|maybe-floppy" >&2
 		exit 2
 		;;
 esac
 
 if [ -d /sys ] && type udevinfo >/dev/null 2>&1; then
-	for x in /sys/block/*; do
-		[ -d "$x" ] || continue
-		syspath="${x#/sys}"
+	syspaths=
+	case $TYPE in
+		partition)
+			for x in /sys/block/*/*; do
+				[ -d "$x" ] || continue
+				syspaths="${syspaths:+$syspaths }$x"
+			done
+			TYPE=disk
+			;;
+		*)
+			for x in /sys/block/*; do
+				[ -d "$x" ] || continue
+				syspaths="${syspaths:+$syspaths }$x"
+			done
+			;;
+	esac
+	for x in $syspaths; do
+		devpath="${x#/sys}"
 		match=false
 		case $TYPE in
 			maybe-floppy)
@@ -22,7 +37,7 @@ if [ -d /sys ] && type udevinfo >/dev/null 2>&1; then
 		case $TYPE in
 			floppy)
 				# TODO ugly special case for non-IDE floppies
-				case $syspath in
+				case $devpath in
 					/block/fd[0-9]*)
 						match=:
 						;;
@@ -30,13 +45,13 @@ if [ -d /sys ] && type udevinfo >/dev/null 2>&1; then
 				;;
 		esac
 		if ! $match; then
-			if udevinfo -q env -p "$syspath" 2>/dev/null | \
+			if udevinfo -q env -p "$devpath" 2>/dev/null | \
 			   grep -q "^ID_TYPE=$TYPE"; then
 				match=:
 			fi
 		fi
 		if $match; then
-			echo "/dev/$(udevinfo -q name -p "$syspath")"
+			echo "/dev/$(udevinfo -q name -p "$devpath")"
 		fi
 	done
 else
@@ -48,7 +63,16 @@ else
 			;;
 		disk)
 			if [ -d /dev/discs ]; then
-				find /dev/discs -type b
+				# busybox find has no -maxdepth
+				find /dev/discs -type b | \
+					grep -v '/.*/.*/.*/' || true
+			fi
+			;;
+		partition)
+			if [ -d /dev/discs ]; then
+				# busybox find has no -mindepth
+				find /dev/discs -type b | \
+					grep '/.*/.*/.*/' || true
 			fi
 			;;
 		floppy)
