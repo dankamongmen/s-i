@@ -5,7 +5,7 @@ FLOPPYMNT=/floppy
 
 ask_dev() {
 	DEVS=""
-	for dev in `find /dev/floppy /dev/scsi /dev/ide /dev/disc`; do
+	for dev in $(list-devices maybe-floppy); do
 		# TODO if sfdisk or something similar were available, we could
 		# do this:
 		#        SIZE=sfdisk -s $DEV
@@ -41,6 +41,11 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 		log-output -t mountfloppy modprobe vfat || true
 	fi
 	
+	if [ ! -e "$FLOPPYDEV" ]; then
+		# Try non-devfs naming.
+		FLOPPYDEV=/dev/fd0
+	fi
+
 	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
 		# Cannot find a device, or found the wrong device.
 		# Ask for help from the user and try it again.
