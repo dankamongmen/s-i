@@ -192,6 +192,18 @@ create_dvi () {
         $tempdir/install.${language}.profiled.xml
     RET=$?; [ $RET -ne 0 ] && return $RET
 
+    # some languages need additional macro
+    case "$language" in
+        ko)
+            mv $tempdir/install.${language}.tex \
+                $tempdir/install.${language}.orig.tex
+            cat templates/header.${language}.tex \
+                $tempdir/install.${language}.orig.tex \
+                > $tempdir/install.${language}.tex
+            rm $tempdir/install.${language}.orig.tex
+            ;;
+    esac
+
     echo "Info: creating temporary .dvi file..."
 
     # Next we use jadetex to generate a .dvi file
@@ -261,9 +273,9 @@ BUILD_OK=""
 BUILD_FAIL=""
 for format in $formats ; do
     case "$language" in
-        el|ja|ko|vi|zh_CN|zh_TW)
+        el|ja|vi|zh_CN|zh_TW)
             if [ "$format" = "pdf" -o "$format" = "ps" ] ; then
-                echo "Warning: pdf and ps formats are currently not supported for Chinese, Greek, Japanese, Korean and Vietnamese"
+                echo "Warning: pdf and ps formats are currently not supported for Chinese, Greek, Japanese and Vietnamese"
                 BUILD_SKIP="$BUILD_SKIP $format"
                 continue
             fi
