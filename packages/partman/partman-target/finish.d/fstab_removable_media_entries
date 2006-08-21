@@ -88,25 +88,22 @@ for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
         for ent in $dir/*; do
 	    if [ -f "$ent" ]; then
 	        host=$(grep "Host scsi" $ent | sed 's/.*scsi\([0-9]\).*/\1/')
-	        infstab=""
 	        for dev in $(find /dev/scsi/host$host/ -type b); do
 	            if [ -b "$dev" ]; then
 	 	        if grep -q "^$(mapdevfs $dev) " /target/etc/fstab; then
-			    infstab=1
+			    continue 2
 			fi
 	 	    fi
 	        done
-		if [ ! "$infstab" ]; then
-		    dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
-		    if [ -z "$USBDEVICES" ]; then
-		        USBDEVICES="$dev"
+		dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
+		if [ -z "$USBDEVICES" ]; then
+		    USBDEVICES="$dev"
+		else
+		    if [ "$dev" != "$HD_MEDIA" ]; then
+			USBDEVICES="$USBDEVICES $dev"
 		    else
-		        if [ "$dev" != "$HD_MEDIA" ]; then
-		            USBDEVICES="$USBDEVICES $dev"
-                        else
-			    # If installing from usb, list that device first.
-			    USBDEVICES="$dev $USBDEVICES"
-			fi
+			# If installing from usb, list that device first.
+			USBDEVICES="$dev $USBDEVICES"
 		    fi
 		fi
 	    fi
