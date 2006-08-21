@@ -1,9 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 39897 -->
 <!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
 
   <sect2 condition="supports-rarp" id="tftp-rarp">
-   <title>Configurando um servidor RARP</title>
+  <title>Configurando um servidor RARP</title>
 <para>
 
 Para configurar o RARP, você precisa conhecer o endereço Ethernet (a.k.a. o
@@ -19,50 +19,16 @@ recuperação) e use o comando <userinput>/sbin/ifconfig eth0</userinput>.
 
 </para><para>
 
-Em sistemas RARP usando o kernel do Linux 2.2.x, você precisará popular a
-tabela RARP do kernel. Para fazer isto execute os seguintes comandos:
-
-<informalexample><screen>
-# <userinput>/sbin/rarp -s
-<replaceable>nomedemaquina-do-cliente</replaceable>
-<replaceable>endereco-ethernet-cliente</replaceable>
-</userinput>
-
-# <userinput>/usr/sbin/arp -s
-<replaceable>client-ip</replaceable>
-<replaceable>client-enet-addr</replaceable>
-</userinput>
-
-</screen></informalexample>
-
-</para><para>
-
-Você obterá
-
-<informalexample><screen>
-SIOCSRARP: Invalid argument
-</screen></informalexample>
-
-então provavelmente precisará carregar o módulo RARP do kernel ou
-senão recompilar o kernel para suportar RARP. Tente
-<userinput>modprobe rarp</userinput> e
-então tente o comando <command>rarp</command> denovo.
-
-</para><para>
-
-Em sistemas RARP usando um kernel do Linux 2.4.x, não existe módulo RARP e
-você deverá ao invés disso usar o programa <command>rarpd</command>.
-O processo é idêntico ao usado sob o SunOS do seguinte parágrafo.
-
-</para><para>
-
-Sob o SunOS, você precisará ter certeza que o endereço de hardware
-Ethernet do cliente está listado no banco de dados <quote>ethers</quote> (ou
-no arquivo <filename>/etc/ethers</filename> ou via NIS/NIS+) e no
-banco de dados <quote>hosts</quote>. Então você precisará iniciar o daemon
-RARP. No SunOS 4, digite o comando (como root):
-<userinput>/usr/etc/rarpd -a</userinput>; no SunOS 5, use
-<userinput>/usr/sbin/rarpd -a</userinput>.
+Em sistemas RARP usando um kernel Linux 2.4 ou 2.6, ou Solaris/SunOS, você 
+usa o programa <command>rarpd</command>.
+Você precisará ter certeza que o endereço de hardware Ethernet do cliente
+está listado no banco de dados <quote>ethers</quote> (ou
+no arquivo <filename>/etc/ethers</filename> ou via NIS/NIS+) e no banco de
+dados <quote>hosts</quote>. Então você precisará iniciar o daemon RARP. 
+Digite o comando (como root): <userinput>/usr/sbin/rarpd -a</userinput>; 
+na maioria dos sistemas Linux e no SunOS 5 (Solaris 2),
+<userinput>/usr/sbin/in.rarpd -a</userinput> em alguns outros sistemas Linux,
+ou <userinput>/usr/etc/rarpd -a</userinput> no SunOS 4 (Solaris 1).
 
 </para>
   </sect2>

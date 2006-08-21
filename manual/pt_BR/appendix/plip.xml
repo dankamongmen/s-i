@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29687 -->
+<!-- original version: 39644 -->
 <!-- translated by Marco Carvalho (macs) 2005.12.30 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.31 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.08.06 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.08.21 -->
 
  <sect1 id="plip" arch="x86">
  <title>Instalando &debian; por Linha IP Paralela (PLIP)</title>
@@ -102,7 +103,17 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 Inicie a mídia de instalação. A instalação precisa ser executada em
 modo expert; entre <userinput>expert</userinput> no prompt de
-inicialização. Abaixo estão as respostas que devem ser dadas nos
+inicialização. Se você precisar definir parâmetros para os modulos do
+kernel, você também precisará fazer isso no prompt de inicialização.
+Por exemplo, para inicializar o instalador e configurar valores para
+as opções <quote>io</quote> e <quote>irq</quote> do módulo parport_pc,
+digite o seguinte no prompt de inicialização:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
+Abaixo estão as respostas que devem ser dadas nos
 vários estágios da instalação.
 
 </para>
@@ -110,7 +121,7 @@ vários estágios da instalação.
 <orderedlist>
 <listitem><para>
 
-<guimenuitem>Carregar componentes do instalador</guimenuitem>
+<guimenuitem>Carregar componentes do instalador do CD</guimenuitem>
 
 </para><para>
 
@@ -136,25 +147,9 @@ mostrará esta lista.
  </para></listitem>
  <listitem><para>
 
-Prompt for module parameters: Yes
-
- </para></listitem>
- <listitem><para>
-
 Devido à nenhuma placa de rede ser detectada/selecionada antes, o instalador
 irá perguntar se você quer selecionar um módulo de driver de uma lista.
 Selecione o módulo <userinput>plip</userinput>.
-
- </para></listitem>
- <listitem><para>
-
-Additional parameters for module parport_pc:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-Additional parameters for module plip: deixe vazio
 
  </para></listitem>
  </itemizedlist>
