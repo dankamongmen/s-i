@@ -1,0 +1,70 @@
+#! /bin/sh -e
+TYPE="$1"
+
+case $TYPE in
+	cd|disk|floppy|maybe-floppy)	;;
+	*)
+		echo "Usage: $0 cd|disk|floppy|maybe-floppy" >&2
+		exit 2
+		;;
+esac
+
+if [ -d /sys ] && type udevinfo >/dev/null 2>&1; then
+	for x in /sys/block/*; do
+		[ -d "$x" ] || continue
+		syspath="${x#/sys}"
+		match=false
+		case $TYPE in
+			maybe-floppy)
+				TYPE=floppy
+				;;
+		esac
+		case $TYPE in
+			floppy)
+				# TODO ugly special case for non-IDE floppies
+				case $syspath in
+					/block/fd[0-9]*)
+						match=:
+						;;
+				esac
+				;;
+		esac
+		if ! $match; then
+			if udevinfo -q env -p "$syspath" 2>/dev/null | \
+			   grep -q "^ID_TYPE=$TYPE"; then
+				match=:
+			fi
+		fi
+		if $match; then
+			echo "/dev/$(udevinfo -q name -p "$syspath")"
+		fi
+	done
+else
+	case $TYPE in
+		cd)
+			if [ -d /dev/cdroms ]; then
+				find /dev/cdroms -type b
+			fi
+			;;
+		disk)
+			if [ -d /dev/discs ]; then
+				find /dev/discs -type b
+			fi
+			;;
+		floppy)
+			if [ -d /dev/floppy ]; then
+				find /dev/floppy -type b
+			fi
+			;;
+		maybe-floppy)
+			# Without udev, we can't necessarily tell floppies
+			# from other kinds of disks, so we have to offer
+			# everything.
+			for x in /dev/floppy /dev/scsi /dev/ide /dev/discs; do
+				if [ -d "$x" ]; then
+					find "$x" -type b
+				fi
+			done
+			;;
+	esac
+fi
