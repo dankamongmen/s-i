@@ -24,6 +24,34 @@ basename () {
 	echo "${x##*/}"
 }
 
+can_escape () {
+	type debconf-escape >/dev/null 2>&1 || return 1
+	db_capb
+	for cap in $RET; do
+		case $cap in
+			escape)	return 0 ;;
+		esac
+	done
+	return 1
+}
+
+maybe_escape () {
+	local code saveret
+	text="$1"
+	shift
+	if can_escape; then
+		db_capb backup escape
+		code=0
+		"$@" "$(printf '%s' "$text" | debconf-escape -e)" || code=$?
+		saveret="$RET"
+		db_capb backup
+		RET="$saveret"
+		return $code
+	else
+		"$@" "$text"
+	fi
+}
+
 debconf_select () {
 	local IFS priority template choices default_choice default x u newchoices code
 	priority="$1"
@@ -412,7 +440,7 @@ error_handler () {
 	log error_handler: reading options
 	options=$(read_list)
 	db_subst partman/exception_handler TYPE "$type"
-	db_subst partman/exception_handler DESCRIPTION "$message"
+	maybe_escape "$message" db_subst partman/exception_handler DESCRIPTION
 	db_subst partman/exception_handler CHOICES "$options"
 	if
 	    expr "$options" : '.*,.*' >/dev/null \
@@ -426,7 +454,7 @@ error_handler () {
 	    fi
 	else
 	    db_subst partman/exception_handler_note TYPE "$type"
-	    db_subst partman/exception_handler_note DESCRIPTION "$message"
+	    maybe_escape "$message" db_subst partman/exception_handler_note DESCRIPTION
 	    db_input $priority partman/exception_handler_note || true
 	    db_go || true
 	    write_line "unhandled"
@@ -1043,7 +1071,7 @@ $partitems"
 			x="$partitems
 $items"
 		fi
-		db_subst $template/confirm ITEMS "$x"
+		maybe_escape "$x" db_subst $template/confirm ITEMS
 		db_input critical $template/confirm
 		db_go || true
 		db_get $template/confirm
