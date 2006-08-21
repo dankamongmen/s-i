@@ -43,6 +43,7 @@ int distribute_partitions(struct disk_info_t diskinfo[],
 			  struct diskspace_req_s reqs[]);
 struct disk_info_t *get_free_space_list(void);
 void print_list(struct disk_info_t diskinfo[], struct diskspace_req_s reqs[]);
+PedDevice *my_ped_device_get_next_rw(PedDevice *dev);
 
 /* from loadpartitions.c */
 diskspace_req_t * load_partitions(const char *filename);

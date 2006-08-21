@@ -82,14 +82,6 @@
 #include <syslog.h>
 #include <assert.h>
 
-#ifdef __linux__
-#include <fcntl.h>
-#include <sys/ioctl.h>
-
-/* from <linux/cdrom.h> */
-#define CDROM_GET_CAPABILITY	0x5331	/* get capabilities */
-#endif /* __linux__ */
-
 #include "autopartkit.h"
 
 /*
@@ -113,9 +105,9 @@
 /* Ignore devfs devices, used in choose_dev */
 #define IGNORE_DEVFS_DEVICES 1
 
-#if 0
+#if 1
 #define log_line() \
-  autopartkit_log("  Error bounding: %s %d\n",__FILE__,__LINE__)
+  autopartkit_log(2, "  Error bounding: %s %d\n",__FILE__,__LINE__)
 #else
 #define log_line()
 #endif
@@ -313,25 +305,6 @@ static int is_root(const char *mountpoint)
     return (0 == strcmp(mountpoint, "/") );
 }
 
-#ifdef __linux__
-static int is_cdrom(const char *path)
-{
-    int fd;
-    int ret;
-
-    fd = open(path, O_RDONLY | O_NONBLOCK);
-    ret = ioctl(fd, CDROM_GET_CAPABILITY, NULL);
-    close(fd);
-
-    if (ret >= 0)
-	return 1;
-    else
-	return 0;
-}
-#else /* !__linux__ */
-#define is_cdrom(path) 0
-#endif /* __linux__ */
-
 /*
  * Step 1 & 2: Discover and select the device
  *
@@ -357,15 +330,13 @@ static PedDevice* choose_device(void)
     DeviceStats *stats;
 #endif /* fordebian */
 
+    autopartkit_log( 1, "Trying to select device to partition\n");
     disable_kmsg(1);
     ped_device_probe_all();
     disable_kmsg(0);
 
-    dev = ped_device_get_next(NULL);
-    while (dev != NULL && (dev->read_only || is_cdrom(dev->path)))
-    {
-	dev = ped_device_get_next(dev);
-    }
+    autopartkit_log( 1, "Checking each available device\n");
+    dev = my_ped_device_get_next_rw(NULL);
 
     if (dev == NULL)
     {
@@ -383,19 +354,21 @@ static PedDevice* choose_device(void)
 	}
 	return dev;
     }
+    autopartkit_log( 1, "Selected device %s\n", dev->path);
 #if defined(fordebian)
     default_device[0] = '\0';
     device_list[0] = '\0';
     ptr_list = device_list;
     ptr_table = table;
-    for(; dev; dev = ped_device_get_next(dev))
+    for(; dev; dev = my_ped_device_get_next_rw(dev))
     {
 #ifdef IGNORE_DEVFS_DEVICES
-	if (strstr(dev->path, "dev/ide/") || strstr(dev->path, "dev/scsi/"))
+	if (strstr(dev->path, "dev/ide/") || strstr(dev->path, "dev/scsi/")) {
+	    autopartkit_log( 1, "Skipping devfs device %s\n", dev->path);
 	    continue;
+	}
 #endif
-	if (dev->read_only || is_cdrom(dev->path))
-	    continue;
+
 	++num_devices;
 	stats = get_device_stats(dev);
 	/*
@@ -408,6 +381,7 @@ static PedDevice* choose_device(void)
 	*/
 	ptr_table += snprintf(ptr_table, TABLE_SIZE + table - ptr_table,
 		"%s", dev->path);
+	log_line();
 	if (10 > strlen(dev->path))
 	{
 	    memset(ptr_table, ' ', 10 - strlen(dev->path));
@@ -441,12 +415,14 @@ static PedDevice* choose_device(void)
 	free(stats);
     }
 
+    log_line();
     if (num_devices == 1)
     {
 	/* There's only a single usable device detected */
 	return ped_device_get(default_device);
     }
 
+    log_line();
     dev = NULL;
     nb_try = 0;
     while (dev == NULL)
@@ -877,7 +853,7 @@ nuke_all_partitions(void)
     PedDevice *dev;
 
     /* Loop over all devices, and nuke the partition table on each one. */
-    dev = ped_device_get_next(NULL);
+    dev = my_ped_device_get_next_rw(NULL);
     do {
         PedDisk *p;
 	p = ped_disk_new_fresh(dev, ped_disk_type_get(default_disk_label()));
@@ -885,7 +861,7 @@ nuke_all_partitions(void)
 	ped_disk_commit(p);
 #endif
 	ped_disk_destroy(p);
-	dev = ped_device_get_next(dev);
+	dev = my_ped_device_get_next_rw(dev);
     } while (dev != NULL);
 }
 
@@ -1230,7 +1206,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
        device is in an unknown state when we return from this function, or
        rather, it is closed when returning.  This is _bad_. */
     for (dev_tmp = devlist; dev_tmp;
-	 dev_tmp = ped_device_get_next(dev_tmp))
+	 dev_tmp = my_ped_device_get_next_rw(dev_tmp))
     {
         log_line();
 	disk_tmp = ped_disk_new(dev_tmp);
@@ -1440,6 +1416,7 @@ int main (int argc, char *argv[])
 		    default_disk_label());
 
 #if defined(LVM_HACK)
+    autopartkit_log(1, "Initializing LVM framework.\n");
     if (0 != lvm_init())
         autopartkit_log(1, "Unable to initialize LVM support.  "
 			"Continuing anyway.\n");
@@ -1447,6 +1424,7 @@ int main (int argc, char *argv[])
 
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
+    autopartkit_log(1, "Initializing libparted.\n");
     PED_INIT();
     disable_kmsg(0);
 

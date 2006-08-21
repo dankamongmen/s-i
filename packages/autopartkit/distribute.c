@@ -68,6 +68,14 @@
 
 #include "parted-compat.h"
 
+#ifdef __linux__
+#include <fcntl.h>
+#include <sys/ioctl.h>
+
+/* from <linux/cdrom.h> */
+#define CDROM_GET_CAPABILITY	0x5331	/* get capabilities */
+#endif /* __linux__ */
+
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 
 /*
@@ -253,10 +261,9 @@ get_free_space_list(void)
     ped_device_probe_all();
 
     /* Loop over the detected devices */
-    for (dev = ped_device_get_next(NULL); dev; dev = ped_device_get_next(dev))
+    for (dev = my_ped_device_get_next_rw(NULL); dev; dev = my_ped_device_get_next_rw(dev))
     {
         assert(dev);
-
 	autopartkit_log(2, "  checking dev: %s, sector_size=%d\n",
 			dev->path,
 			dev->sector_size /* in bytes */);
@@ -318,4 +325,35 @@ reduce_disk_usage_size(struct disk_info_t *vg,
     }
     newsize = ((vg->capacity) - minimum) * percent;
     vg->freespace = newsize + minimum;
+}
+
+#ifdef __linux__
+static int is_cdrom(const char *path)
+{
+    int fd;
+    int ret;
+
+    fd = open(path, O_RDONLY | O_NONBLOCK);
+    ret = ioctl(fd, CDROM_GET_CAPABILITY, NULL);
+    close(fd);
+
+    if (ret >= 0) {
+        autopartkit_log( 1, "device %s is cdrom\n", path);
+	return 1;
+    }
+    else
+	return 0;
+}
+#else /* !__linux__ */
+#define is_cdrom(path) 0
+#endif /* __linux__ */
+
+PedDevice *my_ped_device_get_next_rw(PedDevice *dev)
+{
+    dev = ped_device_get_next(dev);
+    while (dev && (dev->read_only || is_cdrom(dev->path))) {
+        autopartkit_log( 1, "skipping device %s\n", dev->path);
+        dev = ped_device_get_next(dev);
+    }
+    return dev;
 }
