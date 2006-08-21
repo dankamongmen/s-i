@@ -1148,6 +1148,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                  * sure the device file is available when we need it.
                 */
                 ped_disk_commit(disk_maybe);
+                sleep(2); /* Give the kernel a moment to create the device */
 
                 makefs(mountmap[partcount].devpath, req_tmp->fstype);
 	    }
@@ -1178,6 +1179,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		   make sure the device file is available when we need
 		   it. */
 		ped_disk_commit(disk_maybe);
+		sleep(2); /* Give the kernel a moment to create the device */
 
 		lvm_pv_stack_push(lvm_pv_stack, req_tmp->mountpoint, devpath);
 	    }
@@ -1256,6 +1258,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         free(vgname);
         free(devpath);
     }
+    sleep(2); /* Give the kernel a moment to create the devices */
 
     /* Distribute logical volumes (andread@linpro.no) */
     lvm_vg_stack = lvm_vg_stack_new();
@@ -1353,6 +1356,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		autopartkit_log(1, "  LVM lv created ok, devpath=%s\n",
 				devpath);
 		autopartkit_log(1, "  LVM creating fs: %s\n", fstype);
+		sleep(2); /* Give the kernel a moment to create the device */
 		if (0 == makefs(devpath, fstype))
 		  { /* Replace devpath placeholder with real path */
 		    char buf[1024];
