@@ -24,6 +24,11 @@ static PedExceptionOption my_exception_handler(PedException* ex) {
 	return PED_EXCEPTION_CANCEL;
 }
 
+/* NOTE:
+ * DO NOT base new code in other parts of d-i on this function: it will not
+ * work when using udev without devfs compatibility. New code should use
+ * 'list-devices disk' from the shell instead.
+ */
 static int get_all_disks(PedDevice *discs[], int max_disks) {
 	DIR *devdir;
 	struct dirent *direntry;
