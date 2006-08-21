@@ -68,6 +68,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <parted/parted.h>
+#include <debian-installer/system/devfs.h>
 #if defined(TEST)
 #include "dummydebconfclient.h"
 #else /* not TEST */
@@ -764,6 +765,8 @@ static char *get_device_path(PedDevice *dev, PedPartition *freepart)
 static void
 fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 {
+    static char buf[256];
+    const char *rootpath;
     int i;
 
     /* Mount partitions and write fstab */
@@ -772,8 +775,11 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 
     /* Find and mount the root fs */
 
-    autopartkit_log( 1, "device for /: %s\n",
-		     normalize_devfs(find_partition_by_mountpoint(mountmap,"/")));
+    rootpath = find_partition_by_mountpoint(mountmap,"/");
+    if (di_system_devfs_map_from(rootpath, buf, sizeof(buf)))
+        autopartkit_log(1, "device for /: %s\n", buf);
+    else
+        autopartkit_error(0, "Unable to devfs-map device for /: %s\n", rootpath);
 
     /* FIXME Should use fstype for /, not DEFAULT_FS */
     if (mount(find_partition_by_mountpoint(mountmap,"/"),
@@ -822,8 +828,6 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 			 ( mountmap[i].mountpoint->mountpoint ?
 			   mountmap[i].mountpoint->mountpoint : "[null]" ),
 			 mountmap[i].mountpoint->fstype);
-
-	devpath = normalize_devfs(mountmap[i].devpath);
 
 	asprintf(&tmpmnt, "/target%s", mountmap[i].mountpoint->mountpoint);
 	make_path(tmpmnt, 0755);

@@ -16,7 +16,6 @@ autopartkit_SOURCES = \
 	distribute.c \
 	loadpartitions.c \
 	lvm.c \
-	mapdevfs.c \
 	makepath.c \
 	parted-compat.h \
 	autopartkit.c \
