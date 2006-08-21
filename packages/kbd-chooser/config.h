@@ -33,10 +33,13 @@
 
 // #define CHARSET_ETHIOPIC 1
 // #define CHARSET_SAMI 1
+// #define CHARSET_MAZOVIA
+// #define CHARSET_KOI8
+// #define CHARSET_CP1250
 // #define CHARSET_ISO_8859_3  1
 #define CHARSET_ISO_8859_4  1
 #define CHARSET_ISO_8859_5  1
-// #define CHARSET_ISO_8859_7  1
+#define CHARSET_ISO_8859_7  1
 
 #define CHARSET_ISO_8859_8
 #define CHARSET_ISO_8859_9

@@ -445,6 +445,7 @@ static sym latin2_syms[] = {
 	{ 0x02d9, "abovedot" }
 };
 
+#ifdef CHARSET_MAZOVIA
 static sym mazovia_syms[] = {
 	/* as specified by Wlodek Bzyl <matwb@univ.gda.pl> */
 	{ 0x0080, "" },
@@ -576,6 +577,7 @@ static sym mazovia_syms[] = {
 	{ 0x00fe, "" },
 	{ 0x201e, "quotedblbase" }
 };
+#endif // CHARSET_MAZOVIA
 
 #ifdef CHARSET_ISO_8859_3
 static sym latin3_syms[] = {
@@ -1139,8 +1141,13 @@ static sym iso_8859_9_syms[] = { /* latin-5 */
 };
 #endif
 
+#if defined(CHARSET_KOI8)
 #include "koi8.syms.h"
+#endif
+
+#if defined(CHARSET_CP1250)
 #include "cp1250.syms.h"
+#endif
 
 #if defined(CHARSET_ETHIOPIC)
 #include "ethiopic.syms.h"
@@ -1651,10 +1658,16 @@ struct cs {
     { "iso-8859-10",	latin6_syms, 160 },
 #endif
     { "iso-8859-15",	iso_8859_15_syms, 160 },
+#ifdef CHARSET_MAZOVIA
     { "mazovia",	mazovia_syms, 128 },
+#endif
+#ifdef CHARSET_CP1250
     { "cp-1250",	cp1250_syms, 128 },
+#endif
+#ifdef CHARSET_KOI8
     { "koi8-r",		koi8_syms, 128 },
     { "koi8-u",		koi8_syms, 128 },
+#endif
 #ifdef CHARSET_THAI
     { "tis-620",	tis_620_syms, 160 },
 #endif
