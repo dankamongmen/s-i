@@ -45,7 +45,7 @@ db_capb backup
 
 # Choose a root filesystem.
 choose_root () {
-	PARTITIONS="$(find /dev/discs -follow -name part\* | sort | \
+	PARTITIONS="$(list-devices partition | sort | \
 		tr '\n' , | sed 's/,$//; s/,/, /g')"
 
 	if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
