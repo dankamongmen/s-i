@@ -1,0 +1,12 @@
+protocol_fetch() {
+	FILE="/floppy/${1#floppy://*}"
+
+	mountfloppy || true
+	touch /var/run/preseed-usedfloppy
+        
+	if [ ! -e "$FILE" ] || ! cp "$FILE" $2; then
+		return 1
+	else
+		return 0
+	fi
+}

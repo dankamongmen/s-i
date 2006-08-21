@@ -15,8 +15,30 @@ error () {
 	exit 1
 }
 
-# Note: Needs a preseed_fetch function or command not provided by this
-# file, as well as preseed_relative
+# Function to implement the behaviour documented in README.pressed_fetch
+make_absolute_url() {
+	url="$1"
+	last="$2"
+
+	if [ -n "${url##*://*}" ]; then
+		# url does not contain ://
+		if [ -z "${url##/*}" ]; then
+			# url starts with /
+			if [ -z "${last##*/./*}" ]; then
+				# if last has a /./, start the "root" there
+				url="${last%%/./*}/.$url"
+			else
+				# if not, strip the path component of $last
+				url="$(expr $last : '\([^:]*://[^/]*/\)')$url"
+			fi
+		else
+			# for relative urls, just replace the old filename
+			url="${last%/*}/$url"
+		fi
+	fi
+	echo "$url"
+}
+
 preseed_location () {
 	local location="$1"
 	local checksum="$2"
@@ -79,29 +101,29 @@ preseed_location () {
 			sum="${checksum%% *}"
 			checksum="${checksum#$sum }"
 
-			# Support relative paths, just use path of last file.
-			if preseed_relative "$location"; then
-				# This works for urls too.
-				location="$(dirname $last_location)/$location"
-			fi
+			location=$(make_absolute_url "$location" "$last_location")
+			# BTW -- is this test for empty strings really needed?
 			if [ -n "$location" ]; then
 				preseed_location "$location" "$sum"
 			fi
 		done
 	
+		echo $last_location > /var/run/preseed.last_location
+
 		for location in $torun; do
-			if preseed_relative "$location"; then
-				location="$(dirname $last_location)/$location"
-			fi
+			location=$(make_absolute_url "$location" "$last_location")
+			# BTW -- is this test for empty strings really needed?
 			if [ -n "$location" ]; then
 				if ! preseed_fetch "$location" "$tmp"; then
+					log "error fetching \"$location\""
 					error retrieve_error "$location"
 				fi
 				chmod +x $tmp
-				if ! $tmp; then
+				if ! log-output -t preseed/run $tmp; then
+					log "error running \"$location\""
 					error load_error "$location"
 				fi
-				log "successfully ran file from $location"
+				log "successfully ran \"$location\""
 				rm -f $tmp
 			fi
 		done
