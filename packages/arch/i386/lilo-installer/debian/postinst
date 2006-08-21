@@ -55,12 +55,18 @@ bootfs=$(mapdevfs $bootfs_devfs)
 
 prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
 
-if [ "$prefix" != /dev/md ]; then
-	disc_offered_devfs=$(find $prefix -follow -name disc | head -n 1)
-else
-	disc_offered_devfs="$bootfs_devfs"
-	db_register lilo-installer/bootdev_raid lilo-installer/bootdev
-fi
+case $prefix in
+	/dev/md)
+		disc_offered_devfs="$bootfs_devfs"
+		db_register lilo-installer/bootdev_raid lilo-installer/bootdev
+	;;
+	/dev/[hs]d[a-z])
+		disc_offered_devfs="$prefix"
+	;;
+	*)
+		disc_offered_devfs=$(find $prefix -follow -name disc | head -n 1)
+	;;
+esac
 disc_offered=$(mapdevfs "$disc_offered_devfs")
 
 db_capb backup
@@ -77,7 +83,7 @@ case "$RET" in
   *Master*|*RAID*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
   *Debian*)
     bootdev=$(mapdevfs $bootfs_devfs)
-    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
   ;;
   *Advanced*)
     not_done=1
@@ -93,13 +99,13 @@ case "$RET" in
 	   if [ -b "$RET" ]; then
 	    bootdev="$(mapdevfs $RET)"
 	    not_done=0
-	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
 	   fi
 	  ;;
 	  /dev/[hs]d[a-z]*|/dev/md*)
 	    bootdev=$RET;
 	    not_done=0
-	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/part\1/')
+	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
 	  ;;
 	esac
 
@@ -132,7 +138,7 @@ db_progress info lilo-installer/progress_active
 # Do not try to make MD device active
 if (echo "${bootdev}" | grep -q '[0-9]$') && [ "${raid_boot}" = "no" ]; then
     # Installing to a partition, check if it is already marked active
-    if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+${part} " | grep -q '\*'; then
+    if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\(part\|[hs]d[a-z]\)${part} " | grep -q '\*'; then
         # partition is not marked active, offer to make it so
         db_input high lilo-installer/activate-part || [ $? -eq 30 ]
         if ! db_go; then
