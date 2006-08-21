@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-18 17:32+0000\n"
-"PO-Revision-Date: 2006-08-15 14:49+0300\n"
+"PO-Revision-Date: 2006-08-21 15:27+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1196,7 +1196,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:648
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1267,6 +1267,8 @@ msgstr ""
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
 "# Tai jos halutaan käyttää LVM:ää:\n"
 "#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc\n"
+"# Tai LVM ja useampi kuin yksi levy:\n"
+"#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
 "\n"
 "# Voidaan valita mikä tahansa tallennetuista osiointimallineista.\n"
 "# Huomaa: valmiissa vastauksissa on käytettävä kotoistettua arvoa.\n"
@@ -1536,7 +1538,7 @@ msgstr "Käynnistyslataimen asennus"
 
 #. Tag: screen
 #: preseed.xml:729
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
@@ -1572,12 +1574,13 @@ msgstr ""
 "# käyttöjärjestelmä. Epävarmaa, koska se ei ehkä osaa käynnistää sitä.\n"
 "d-i grub-installer/with_other_os boolean true\n"
 "\n"
-"# Jos halutaan asentaa muualle kuin mbr:ään, poistetaan kommentti ja "
-"muokataan\n"
+"# Jos halutaan asentaa muualle kuin mbr:ään, poistetaan kommentti ja muokataan\n"
 "# näitä rivejä:\n"
-"#d-i grub-installer/bootdev  string (hd0,0)\n"
 "#d-i grub-installer/only_debian boolean false\n"
-"#d-i grub-installer/with_other_os boolean false"
+"#d-i grub-installer/with_other_os boolean false\n"
+"#d-i grub-installer/bootdev  string (hd0,0)\n"
+"# Asennetaan grub usealle levylle\n"
+"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
 #: preseed.xml:734
