@@ -21,15 +21,11 @@ findfs () {
 
 db_progress START 0 3 sibyl-installer/progress
 
-# detect the partitions /target and /target/boot
+# detect the /target partition
 rootfs_devfs=$(findfs /)
-bootfs_devfs=$(findfs /boot)
-[ "$bootfs_devfs" ] || bootfs_devfs="$rootfs_devfs"
 
 rootfs=$(mapdevfs $rootfs_devfs)
-bootfs=$(mapdevfs $bootfs_devfs)
 bootdev=`echo $rootfs | sed 's/[0-9]\+$//'`
-bootfs_no_dev=${bootfs#/dev/}
 
 db_progress INFO sibyl-installer/apt-install
 
