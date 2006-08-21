@@ -48,8 +48,7 @@ else
 fi
 
 CDDEVICES=''
-for dev in /dev/cdroms/*; do
-    [ -b "$dev" ] || continue
+for dev in $(list-devices cd); do
     mapdev=$(mapdevfs $dev)
     if [ -n "$mapdev" ] && [ "$mapdev" != "$MAPCDDEV" ]; then
 	CDDEVICES="$CDDEVICES $mapdev"
@@ -68,8 +67,7 @@ if [ -n "$CDDEVICES" ]; then
 fi
 
 FDDEVICES=''
-for dev in /dev/floppy/?; do
-    [ -b "$dev" ] || continue
+for dev in $(list-devices floppy); do
     mapdev=$(mapdevfs $dev)
     if [ "$mapdev" ]; then
 	FDDEVICES="$FDDEVICES $mapdev"
