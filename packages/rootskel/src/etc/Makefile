@@ -9,7 +9,8 @@ files = \
 	inittab \
 	modules.conf \
 	nsswitch.conf \
-	passwd
+	passwd \
+	profile
 
 install-local:: $(outdir)
 	ln -fs /proc/mounts $(outdir)/mtab
