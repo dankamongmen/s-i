@@ -15,11 +15,14 @@ makedev 600 /dev/console c 5 1
 makedev 666 /dev/null c 1 3
 makedir 755 /dev/rd
 makedev 660 /dev/rd/0 b 1 0
+makedev 660 /dev/ram0 b 1 0
 makedir 755 /dev/vc
 for i in 0 1 2 3 4; do
 	makedev 600 /dev/vc/"$i" c 4 "$i"
+	makedev 600 /dev/tty"$i" c 4 "$i"
 done
 makedir 755 /dev/tts
 for i in 0 1; do
 	makedev 600 /dev/tts/"$i" c 4 "$(($i + 64))"
+	makedev 600 /dev/ttyS"$i" c 4 "$(($i + 64))"
 done
