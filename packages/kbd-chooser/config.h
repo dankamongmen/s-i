@@ -3,7 +3,6 @@
  *  
  */
 
-
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
@@ -22,8 +21,8 @@
 // #undef ENABLE_NLS
 
 // Define this if you want 2.5 kernel support
+// #define KERNEL_2_5
 
-// #define KERNEL_2_5 1
 #define KERNEL_2_4
 
 
@@ -31,19 +30,18 @@
 // For console-data, = 2002.12.04dbs-06, only
 // iso-8859-[1289] are required.
 
-// #define CHARSET_ETHIOPIC 1
-// #define CHARSET_SAMI 1
-// #define CHARSET_MAZOVIA
-// #define CHARSET_KOI8
-// #define CHARSET_CP1250
-// #define CHARSET_ISO_8859_3  1
-#define CHARSET_ISO_8859_4  1
-#define CHARSET_ISO_8859_5  1
-#define CHARSET_ISO_8859_7  1
-
+// #define CHARSET_ISO_8859_3
+#define CHARSET_ISO_8859_4
+#define CHARSET_ISO_8859_5
+#define CHARSET_ISO_8859_7
 #define CHARSET_ISO_8859_8
 #define CHARSET_ISO_8859_9
 
+// #define CHARSET_CP1250
+// #define CHARSET_ETHIOPIC
+// #define CHARSET_KOI8
+// #define CHARSET_MAZOVIA
+// #define CHARSET_SAMI
 #define CHARSET_THAI
 
 // Sanity checks
