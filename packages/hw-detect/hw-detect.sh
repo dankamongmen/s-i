@@ -780,6 +780,18 @@ if [ -d /sys/class/misc/pmu/ ]; then
 	apt-install pbbuttonsd || true
 fi
 
+# Install optimised libc based on CPU type.
+case "$(udpkg --print-architecture)" in
+	i386)
+		case "$(grep '^cpu family' /proc/cpuinfo | cut -d: -f2)" in
+			" 6"|" 15")
+				# intel 686 or Amd k6.
+				apt-install libc6-i686 || true
+	                ;;
+		esac
+	;;
+esac
+
 db_progress SET $MAX_STEPS
 db_progress STOP
 
