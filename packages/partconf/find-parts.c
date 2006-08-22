@@ -5,6 +5,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/mount.h>
 #include <ctype.h>
 #include <libgen.h>
@@ -214,6 +215,18 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
                             2*host + bus + 1, targets[target], part);
                 else
                     p->description = strdup(p->path);
+            } else if (strstr(p->path, "/dev/hd") == p->path) {
+                static char *targets[] = { "master", "slave" };
+                char drive;
+                int part;
+
+                if (sscanf(p->path, "/dev/hd%c%d", &drive, &part) == 2
+                        && drive >= 'a' && drive <= 'z')
+                    asprintf(&p->description, "IDE%d %s\\, part. %d",
+                            (drive - 'a') / 2 + 1, targets[(drive - 'a') % 2],
+                            part);
+                else
+                    p->description = strdup(p->path);
             } else if (strstr(p->path, "/dev/scsi/") == p->path) {
                 int host, bus, target, lun, part;
 
@@ -222,6 +235,45 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
                     asprintf(&p->description, "SCSI%d (%d\\,%d\\,%d) part. %d",
                             host + 1, bus, target, lun, part);
                 else
+                    p->description = strdup(p->path);
+            } else if (strstr(p->path, "/dev/sd") == p->path) {
+                char drive;
+                int host, bus, target, lun, part;
+                int done = 0;
+
+                if (sscanf(p->path, "/dev/sd%c%d", &drive, &part) == 2
+                        && drive >= 'a' && drive <= 'z') {
+                    struct stat st;
+                    char *disk, *disk_pos, *sys_device;
+                    disk = strdup(p->path + 5);
+                    for (disk_pos = disk + strlen(disk) - 1; disk_pos > disk;
+                         --disk_pos) {
+                        if (*disk_pos >= '0' && *disk_pos <= '9')
+                            *disk_pos = 0;
+                        else
+                            break;
+                    }
+                    sys_device = malloc(strlen(disk) + 19);
+                    sprintf(sys_device, "/sys/block/%s/device", disk);
+                    /* TODO: device symlinks are allegedly slated to go
+                     * away, but it's not entirely clear what their
+                     * replacement will be yet ...
+                     */
+                    if (lstat(sys_device, &st) == 0 && S_ISLNK(st.st_mode)) {
+                        char buf[512];
+                        memset(buf, 0, 512);
+                        if (readlink(sys_device, buf, 511) > 0) {
+                            const char *bus_id = basename(buf);
+                            if (sscanf(bus_id, "%d:%d:%d:%d",
+                                        &host, &bus, &target, &lun) == 4) {
+                                asprintf(&p->description, "SCSI%d (%d\\,%d\\,%d) part. %d",
+                                        host + 1, bus, target, lun, part);
+                                done = 1;
+                            }
+                        }
+                    }
+                }
+                if (!done)
                     p->description = strdup(p->path);
             } else
                 p->description = strdup(p->path);
