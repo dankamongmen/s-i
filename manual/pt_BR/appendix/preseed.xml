@@ -1,8 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39285 -->
+<!-- original version: 39932 -->
 <!-- translated by Marco Carvalho (macs) 2005.12.30 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.07.09 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.07.11 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.08.06 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.08.23 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -758,6 +758,8 @@ o correto será selecionado antes de usar a pré-configuração.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Or, if you want to use LVM:
 #d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# Or, LVM with more than one disk:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
@@ -942,9 +944,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# To install grub to multiple disks:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
@@ -1001,12 +1005,23 @@ Você pode também escolher não instalar nenhuma tarefa, e forçar a instalaç�
 de um conjunto de pacotes de algum outro modo. Nós recomendamos sempre incluir
 a tarefa <userinput>standard</userinput>.
 
+</para><para>
+
+Se você quiser instalar alguns pacotes individuais em adição aos pacotes
+instalados pelas tarefas (<quote>tasks</quote>), você pode usar o parâmetro
+<classname>pkgsel/include</classname>. O valor deste parâmetro pode ser
+separado por vírgula ou espaço, então você também pode usá-lo facilmente
+na linha de comando do kernel.
+
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+
+# Individual additional packages to install
+#d-i pkgsel/include string openssh-server build-essential
 
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
