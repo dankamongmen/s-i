@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39380 -->
+<!-- original version: 39583 -->
 
 <chapter id="boot-new">
  <title>Das neue Debian-System starten</title>
@@ -202,17 +202,17 @@ zwischen dm-crypt und loop-AES.
 
 </para>
 
-  <sect2 id="mount-loop-aes">
-  <title>loop-AES</title>
+  <sect2 id="mount-dm-crypt">
+  <title>dm-crypt</title>
 
 <para>
 
-Für Partitionen, die via loop-AES verschlüsselt sind, wird der
+Für Partitionen, die mittels dm-crypt verschlüsselt sind, wird der
 folgende Prompt während des Bootens angezeigt:
 
 <informalexample><screen>
-mount: going to use loop device /dev/loop<replaceable>X</replaceable>
-Password:
+Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Enter LUKS passphrase:
 </screen></informalexample>
 
 Dabei entspricht hier das <replaceable>X</replaceable> in der ersten Zeile
@@ -225,36 +225,70 @@ können einfach die Passphrase eingeben, die Sie bei der Erstellung
 des Dateisystems benutzt haben. Haben Sie aber mehrere erstellt, sind
 die Notizen praktisch, die Sie sich im letzten Schritt von
 <xref linkend="partman-crypto"/> aufgeschrieben haben. Wenn Sie sich
-nicht notiert haben, wie die loop-Geräte
-(<filename>loop<replaceable>X</replaceable></filename>) auf die
-Einhängepunkte abgebildet werden, finden Sie diese Infos auch in 
+nicht notiert haben, wie die verschlüsselten Partitionen
+(<filename>crypt<replaceable>X</replaceable></filename>) auf die
+Einhängepunkte abgebildet sind, finden Sie diese Infos auch in
+<filename>/etc/crypttab</filename> und
 <filename>/etc/fstab</filename> Ihres neuen Systems.
 
 </para><para>
 
-Es werden keinerlei Zeichen (nicht einmal Sternchen) angezeigt, während
-Sie die Passphrase eingeben. Seien Sie vorsichtig, Sie haben
-<emphasis>nur einen Versuch</emphasis>! Geben Sie eine falsche Passphrase
-ein, erscheint eine Fehlermeldung, der Bootprozess überspringt den
-Schritt und fährt mit dem Einbinden des nächsten Dateisystems fort.
-Weitere Informationen hierzu finden Sie im
-<xref linkend="crypto-troubleshooting"/>.
+Der Prompt während des Bootens könnte ein wenig anders aussehen, während ein
+verschlüsseltes root-Dateisystem eingebunden wird. Dies hängt davon ab, welcher
+initramfs-Generator verwendet wurde, um die zum Starten des Systems nötige
+initrd (Initial-Ram-Disk) zu erzeugen. Das folgende Beispiel gilt für eine
+initrd, die mittels <classname>initramfs-tools</classname> generiert wurde:
 
+<informalexample><screen>
+Begin: Mounting <emphasis>root file system</emphasis>... ...
+Begin: Running /scripts/local-top ...
+Enter LUKS passphrase:
+</screen></informalexample>
+
+</para><para>
+
+Es werden keinerlei Zeichen (nicht einmal Sternchen) angezeigt, während
+Sie die Passphrase eingeben. Wenn Sie eine falsche Passphrase
+eingeben, haben Sie noch zwei weitere Versuche, dies zu korrigieren. Nach
+dem dritten Versuch überspringt der Boot-Prozess den Schritt und fährt
+mit dem Einbinden des nächsten Dateisystems fort. Weitere Informationen
+hierzu finden Sie im <xref linkend="crypto-troubleshooting"/>.
 
 </para><para>
 
 Nachdem Sie alle Passphrasen eingegeben haben, sollte der
-Bootprozess wie üblich fortgesetzt werden.
+Boot-Prozess wie üblich fortgesetzt werden.
 
 </para>
   </sect2>
 
-  <sect2 id="mount-dm-crypt" condition="FIXME">
-  <title>dm-crypt</title>
+  <sect2 id="mount-loop-aes">
+  <title>loop-AES</title>
 
 <para>
 
-TODO: write something once it works.
+Für Partitionen, die via loop-AES verschlüsselt sind, wird der
+folgende Prompt während des Bootens angezeigt:
+
+<informalexample><screen>
+Checking loop-encrypted file systems.
+Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
+Password:
+</screen></informalexample>
+
+</para><para>
+
+Es werden keinerlei Zeichen (nicht einmal Sternchen) angezeigt, während
+Sie die Passphrase eingeben. Wenn Sie eine falsche Passphrase
+eingeben, haben Sie noch zwei weitere Versuche, dies zu korrigieren. Nach
+dem dritten Versuch überspringt der Boot-Prozess den Schritt und fährt
+mit dem Einbinden des nächsten Dateisystems fort. Weitere Informationen
+hierzu finden Sie im <xref linkend="crypto-troubleshooting"/>.
+
+</para><para>
+
+Nachdem Sie alle Passphrasen eingegeben haben, sollte der
+Boot-Prozess wie üblich fortgesetzt werden.
 
 </para>
   </sect2>
@@ -274,7 +308,7 @@ manuell einbinden. Es gibt unterschiedliche Situationen:
 <listitem><para>
 
 Die erste betrifft die root-Partition. Wenn diese nicht korrekt eingebunden
-werden konnte, stoppt der Bootprozess und Sie müssen den Rechner neu
+werden konnte, stoppt der Boot-Prozess und Sie müssen den Rechner neu
 starten, um den nächsten Versuch machen zu können.
 
 </para></listitem>
@@ -321,12 +355,12 @@ einbinden:
 </para></listitem>
 <listitem><para>
 
-Wenn Dateisysteme, die unkritische Systemdateien beinhalten, beim
+Falls Dateisysteme, welche unkritische Systemdateien beinhalten, beim
 Start nicht eingebunden werden konnten (wie <filename>/usr</filename>
 oder <filename>/var</filename>), sollte das System trotzdem booten
 und Sie müssten die Dateisysteme wie oben beschrieben manuell einbinden
 können. Allerdings werden Sie wohl alle Dienste (neu) starten müssen,
-die sonst beim Wechsel in den Standard-Runlevel bei Ihnen aktiviert
+die normalerweise beim Wechsel in den Standard-Runlevel bei Ihnen aktiviert
 werden, da sie wahrscheinlich nicht erfolgreich gestartet werden konnten.
 Der einfachste Weg, dies zu bewerkstelligen ist, in den ersten Runlevel
 zu wechseln und wieder zurück, indem Sie 

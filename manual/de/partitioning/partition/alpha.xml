@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 39920 -->
 
 
   <sect2 arch="alpha"><title>Partitionierung auf &arch-title;-Systemen</title>
@@ -8,12 +8,12 @@
 Zum Booten von Debian von der SRM-Konsole (das ist die einzige Möglichkeit,
 von der Festplatte zu starten, die von &releasename-cap; unterstützt wird)
 benötigen Sie ein BSD-Disklabel anstatt einer DOS-Partitionstabelle auf
-Ihrer Boot-Platte. (Zur Erinnerung: Der SRM-Bootblock ist mit
+Ihrer Boot-Festplatte (zur Erinnerung: Der SRM-Bootblock ist mit
 MS-DOS-Partitionstabellen nicht kompatibel &ndash; siehe <xref
 linkend="alpha-firmware"/>.) Folglich erstellt <command>partman</command>
-BSD-Disklabels, wenn es unter &architecture; läuft, aber wenn Ihre
-Festplatte eine DOS-Partition aufweist, muss diese gelöscht werden, bevor
-partman ein Disklabel schreiben kann.
+BSD-Disklabels, wenn es unter &architecture; läuft. Wenn aber Ihre
+Festplatte eine DOS-Partitionstabelle enthält, muss diese gelöscht werden, bevor
+partman ein BSD-Disklabel schreiben kann.
 
 </para><para>
 
@@ -24,16 +24,17 @@ Disklabel-Modus einzuschalten.
 
 </para><para>
 
-Es wird <emphasis>nicht</emphasis> empfohlen, die dritte Partition so
-einzurichten, dass sie die <emphasis>ganze</emphasis> Festplatte umfasst,
-es sei denn, Sie haben vor, die Festplatte, die Sie partitionieren, mit
+Es wird <emphasis>nicht</emphasis> empfohlen, die dritte Partition als
+Komplett-Festplatten-Partition einzurichten (so dass sie die <emphasis>ganze</emphasis>
+Festplatte enthält; Start- und Endsektoren der Festplatte sind auch Start-
+und Endsektoren der Partition).
+Einzige Ausnahme: Sie haben vor, die Festplatte, die Sie partitionieren, mit
 Tru64 Unix oder einem der drei von 4.4BSD-Lite abgeleiteten Betriebssysteme
 (FreeBSD, OpenBSD oder NetBSD) zu benutzen.
-<command>aboot</command> erfordert dies nicht und
-es kann sogar Verwirrung stiften, weil das Programm
-<command>swriteboot</command>, das <command>aboot</command> in den
-Bootsektor schreibt, sich über eine Partition beschweren wird, die sich mit
-dem Bootblock überschneidet.
+Durch diese Art der Partitionierung würde die Festplatte inkompatibel zu den
+Werkzeugen, die die Bootfähigkeit mit aboot herstellen. Dies bedeutet, dass
+die Platte, die vom Installer als Debian-Boot-Festplatte konfiguriert wird,
+von den vorher genannten Betriebssystemen nicht erreichbar wäre.
 
 </para><para>
 

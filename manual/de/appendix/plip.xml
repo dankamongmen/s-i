@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 29687 -->
+<!-- original version: 39644 -->
 
  <sect1 id="plip" arch="x86">
  <title>&debian; über Parallel Line IP (PLIP) installieren</title>
@@ -103,7 +103,17 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
 
 Booten Sie vom Installationsmedium. Sie müssen die Installation im
 Experten-Modus durchführen; geben Sie <userinput>expert</userinput>
-am Boot-Prompt ein. Im Folgenden finden Sie die Antworten, die Sie auf
+am Boot-Prompt ein. Falls Sie Parameter für Kernel-Module angeben
+müssen, muss dies ebenfalls am Boot-Prompt geschehen. Um zum Beispiel
+den Rechner zu starten und dabei die Werte für die Optionen
+<quote>io</quote> und <quote>irq</quote> für das parport_pc-Modul zu
+setzen, geben Sie Folgendes ein:
+
+<informalexample><screen>
+expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
+</screen></informalexample>
+
+Im Folgenden finden Sie die Antworten, die Sie auf
 entsprechende gestellte Fragen während der verschiedenen Stufen der
 Installation geben sollten.
 
@@ -112,7 +122,7 @@ Installation geben sollten.
 <orderedlist>
 <listitem><para>
 
-<guimenuitem>Installer-Komponenten laden</guimenuitem>
+<guimenuitem>Installer-Komponenten von CD laden</guimenuitem>
 
 </para><para>
 
@@ -139,26 +149,9 @@ Liste natürlich überhaupt nicht anzeigen.
  </para></listitem>
  <listitem><para>
 
-Nach Modulparametern fragen: Ja
-
- </para></listitem>
- <listitem><para>
-
 Da keine Netzwerkkarte erkannt bzw. angewählt wurde, fordert der
 Installer Sie auf, ein Netzwerktreiber-Modul aus der Liste auszuwählen.
 Wählen Sie das <userinput>plip</userinput>-Modul.
-
- </para></listitem>
- <listitem><para>
-
-Zusätzliche Parameter für das Modul <quote>parport_pc</quote>:
-<userinput><replaceable>io=0x378 irq=7</replaceable></userinput>
-
- </para></listitem>
- <listitem><para>
-
-Zusätzliche Parameter für das Modul <quote>plip</quote>: lassen Sie
-dies leer.
 
  </para></listitem>
  </itemizedlist>

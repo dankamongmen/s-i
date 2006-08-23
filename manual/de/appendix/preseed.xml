@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39285 -->
+<!-- original version: 39932 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -795,8 +795,10 @@ Voreinstellung nutzen.
 # traditionellen Format angegeben werden. Um z.B. die erste Platte zu
 # nutzen, die devfs kennt:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# Or, if you want to use LVM:
+# Oder wenn Sie LVM benutzen möchten:
 #d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# Oder LVM mit mehr als einer Festplatte:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
 # NOTE: this must be preseeded with a localized (translated) value.
@@ -995,9 +997,11 @@ d-i grub-installer/with_other_os boolean true
 # Wenn Sie alternativ an einen anderen Ort als in den MBR installieren
 # möchten, entfernen Sie hier die Kommentarzeichen und passen Sie
 # die Zeilen an:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Um grub auf mehrere Festplatten zu installieren:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
@@ -1054,12 +1058,23 @@ Installation von bestimmten Paketen auf andere Art erzwingen. Wir empfehlen
 aber, immer zumindest die Programmgruppe <quote>standard</quote>
 auszuwählen.
 
+</para><para>
+
+Wenn Sie zusätzlich zu den Paketen, die durch die Programmgruppen installiert
+werden, weitere benötigen, können Sie den Parameter
+<classname>pkgsel/include</classname> benutzen. Der Wert für diesen Parameter
+kann eine entweder durch Kommas oder durch Leerzeichen getrennte Liste sein,
+so dass Sie ihn auch recht einfach auf der Kernel-Kommandozeile verwenden können.
+
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+
+# Individual additional packages to install
+#d-i pkgsel/include string openssh-server build-essential
 
 # Einige Versionen des Installers können Informationen an das Debian-
 # Projekt zurück senden, welche Pakete Sie installiert haben.
