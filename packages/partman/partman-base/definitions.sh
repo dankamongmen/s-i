@@ -994,7 +994,7 @@ partman_unlock_unit() {
 
 # List the changes that are about to be committed and let the user confirm first
 confirm_changes () {
-	local template dev x part partitions num id size type fs path name filesystem partitems items formatted_previously
+	local template dev x part partitions num id size type fs path name filesystem partdesc partitems items formatted_previously
 	template="$1"
 
 	# Compute the changes we are going to do
@@ -1040,10 +1040,16 @@ confirm_changes () {
 				continue
 			}
 			filesystem=$(cat $id/visual_filesystem)
-			db_subst partman/text/confirm_item TYPE "$filesystem"
-			db_subst partman/text/confirm_item PARTITION "$num"
-			db_subst partman/text/confirm_item DEVICE $(humandev $(cat device))
-			db_metaget partman/text/confirm_item description
+			# Special case d-m devices to use a different description
+			if cat device | grep -q "/dev/mapper" ; then
+				partdesc="partman/text/confirm_unpartitioned_item"
+			else
+				partdesc="partman/text/confirm_item"
+				db_subst $partdesc PARTITION "$num"
+			fi
+			db_subst $partdesc TYPE "$filesystem"
+			db_subst $partdesc DEVICE $(humandev $(cat device))
+			db_metaget $partdesc description
 		    
 			items="${items}   ${RET}
 "
