@@ -50,7 +50,7 @@ et pendant la deuxième partie.
 
 La préconfiguration peut être faite de trois manières différentes&nbsp;:
 <firstterm>initrd</firstterm>, <firstterm>file</firstterm> et
-<firstterm>network</firstterm>. La méthode qui utilise <quote>initrd</quote> est compatible
+<firstterm>network</firstterm>. La méthode <quote>initrd</quote> est compatible
 avec tous les types d'installation et offre toutes les possibilités mais elle
 demande une préparation soignée. Les méthodes <quote>file</quote> et<quote>network</quote>
 sont compatibles avec plusieurs types d'installation mais les toutes premières
@@ -111,8 +111,8 @@ méthodes de préconfiguration.
 
 Le moment où le fichier de préconfiguration est chargé et exécuté est une
 différence fondamentale entre les diverses méthodes de préconfiguration.
-Avec l'initrd, ce fichier est chargé au tout début de l'installation, avant même
-qu'une seule question soit posée. Avec la méthode <quote>file</quote>,
+Avec la méthode <quote>initrd</quote>, ce fichier est chargé au tout début de l'installation,
+avant même qu'une seule question soit posée. Avec la méthode <quote>file</quote>,
 il faut que le cédérom (ou une image) ait été chargé. Avec la méthode <quote>network</quote>,
 le réseau doit avoir été préalablement configuré.
 
@@ -144,7 +144,8 @@ La plupart des dialogues de l'installateur Debian peuvent être
 préconfigurés de cette manière. Il y a cependant des exceptions
 notables. On doit partitionner tout un disque ou partitionner
 une partie de l'espace disponible&nbsp;; on ne peut pas utiliser des
-partitions existantes. On ne peut pas non plus installer RAID en utilisant cette méthode.
+partitions existantes. On ne peut pas non plus installer un système RAID
+en utilisant cette méthode.
 
 </para>
   </sect2>
@@ -268,7 +269,7 @@ consulter la documentation des développeurs de l'installateur.
 <para>
 Un exemple de fichier de préconfiguration basé sur les éléments de cette annexe
 est disponible dans &urlset-example-preseed;.
-Vous pouvez vous servir de ce fichier pour créer le votre.
+Vous pouvez vous servir de ce fichier pour créer le vôtre.
 </para>
 
   <sect2 id="preseed-loading">
@@ -293,7 +294,7 @@ le fichier de configuration du programme d'amorçage (par exemple
 Si vous avez indiqué le fichier de préconfiguration dans le fichier de configuration 
 du programme d'amorçage, il est possible de modifier la configuration pour ne pas avoir à
 appuyer sur la touche <quote>Entrée</quote> pour lancer l'installateur.
-Avec syslinux, il suffit de mettre le délai d'attente à 1 dans
+Avec syslinux, il suffit de mettre le délai d'attente à 1 dans le fichier
 <filename>syslinux.cfg</filename>.
 
 </para><para>
@@ -380,8 +381,8 @@ On ne peut pas automatiser certaines étapes de l'installation avec certains type
 de préconfiguration car les questions sont posées avant que le fichier
 ne soit chargé. Si par exemple le fichier est téléchargé sur le réseau, la
 configuration du réseau doit être faite préalablement. L'une des raisons d'utiliser
-la préconfiguration avec initrd est qu'il est alors possible de préconfigurer
-ces étapes.
+la méthode de préconfiguration <quote>initrd</quote> est qu'il est alors possible de
+préconfigurer ces étapes.
 
 </para><para>
 
@@ -482,8 +483,8 @@ d'utiliser la commande <command>debconf-get-selections</command> du paquet
 la base de données cdebconf de l'installateur dans un fichier&nbsp;:
 
 <informalexample><screen>
-$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
-$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
+$ debconf-get-selections --installer &gt; <replaceable>fichier</replaceable>
+$ debconf-get-selections &gt;&gt; <replaceable>fichier</replaceable>
 </screen></informalexample>
 
 </para>
@@ -535,7 +536,7 @@ est disponible dans &urlset-example-preseed;.
 
 Les exemples donnés ici sont valables pour l'architecture Intel x86.
 Si vous utilisez une autre architecture, certains exemples, comme la préconfiguration 
-du clavier ou du programme d'amorçage, ne seront pas appropriés et vous devrez les
+du clavier ou du programme d'amorçage, ne seront pas corrects et vous devrez les
 modifier avec les valeurs adéquates.
 
 </para>
@@ -612,9 +613,10 @@ avant de charger le fichier de préconfiguration, utilisez un paramètre comme cel
 
 <para>
 
-Quand vous utilisez la préconfiguration de type network (avec <quote>preseed/url</quote>),
-il n'est pas possible normalement de préconfigurer le réseau. Cependant il existe un truc.
-Vous voudriez par exemple définir l'adresse de l'interface réseau&nbsp;: il suffit de
+Quand vous utilisez la préconfiguration de type <quote>network</quote>
+(avec <quote>preseed/url</quote>), il n'est pas possible normalement de préconfigurer le réseau.
+Cependant il existe un truc.
+Pour définir par exemple l'adresse de l'interface réseau, il suffit de
 forcer la configuration du réseau à s'exécuter une nouvelle fois après que le
 fichier de préconfiguration a été chargé. Le script <quote>preseed/run</quote> suivant
 fera l'affaire&nbsp;:
@@ -681,7 +683,7 @@ configurer le fichier <filename>/etc/apt/sources.list</filename>.
 
 </para><para>
 
-Le paramètre <classname>mirror/suite</classname> détermine la distribution pour le
+Le paramètre <classname>mirror/suite</classname> détermine la distribution du
 système à installer.
 
 </para><para>
@@ -717,7 +719,7 @@ Préconfigurer le partitionnement du disque dur est limité aux possibilités offer
 par <classname>partman-auto</classname>. Vous pouvez partitionner un disque entier
 ou seulement un espace libre sur ce disque. La disposition du disque peut être
 indiquée par un schéma prédefini, un schéma inclus dans un fichier de schémas ou un
-schéma mis dans dans le fichier de préconfiguration. Pour l'instant, on ne peut pas
+schéma mis dans le fichier de préconfiguration. Pour l'instant, on ne peut pas
 préconfigurer le partitionnement de plusieurs disques ni la mise en &oelig;uvre de RAID.
 
 </para>
