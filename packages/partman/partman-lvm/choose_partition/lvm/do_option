@@ -108,9 +108,18 @@ do_vg_create() {
 	[ $? -eq 30 ] && return
 	db_get partman-lvm/vgcreate_name
 	vg="$RET"
+
+	# Check VG name
 	if [ -z "$vg" ]; then
 		db_set partman-lvm/vgcreate_nonamegiven "false"
 		db_input critical partman-lvm/vgcreate_nonamegiven
+		db_go
+		return
+	fi
+
+	if ! vg_name_ok "$vg"; then
+		db_set partman-lvm/badnamegiven "false"
+		db_input critical partman-lvm/badnamegiven
 		db_go
 		return
 	fi
@@ -420,13 +429,22 @@ do_lv_create() {
 	db_go
 	[ $? -eq 30 ] && return
 	db_get partman-lvm/lvcreate_name
-	if [ -z "$RET" ]; then
+	lv="$RET"
+
+	# Check LV name
+	if [ -z "$lv" ]; then
 		db_set partman-lvm/lvcreate_nonamegiven "false"
 		db_input critical partman-lvm/lvcreate_nonamegiven
 		db_go
 		return
 	fi
-	lv="$RET"
+
+	if ! lv_name_ok "$lv"; then
+		db_set partman-lvm/badnamegiven "false"
+		db_input critical partman-lvm/badnamegiven
+		db_go
+		return
+	fi
 
 	# Make sure the name isn't already in use
 	if lvs "/dev/$vg/$lv" > /dev/null 2>&1; then

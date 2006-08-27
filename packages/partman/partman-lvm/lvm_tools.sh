@@ -136,6 +136,45 @@ $RET
 	return 0
 }	
 
+# Common checks for VG and LV names
+# Rules:
+# 1) At least one character
+# 2) Only alphanumeric characters (isalnum()) and "._-+"
+# 3) May not be "." or ".."
+# 4) must not start with a hyphen
+# 5) maximum name length 128 characters
+# See lvm2 source and bug #254630 for details
+lvm_name_ok() {
+	local name
+	name="$1"
+
+	# Rule 1
+	if [ -z "$name" ]; then
+		return 1
+	fi
+
+	# Rule 2
+	if [ "$(echo -n "$name" | sed 's/[^-+_\.[:alnum:]]//g')" != "$name" ]; then
+		return 1
+	fi
+
+	# Rule 3
+	if [ "$name" = "." -o "$name" = ".." ]; then
+		return 1
+	fi
+
+	# Rule 4
+	if [ "$(echo -n "$name" | sed 's/^-//')" != "$name" ]; then
+		return 1
+	fi
+
+	# Rule 5
+	if [ $(echo -n "$name" | wc -c) -gt 128 ]; then
+		return 1
+	fi
+
+	return 0
+}
 
 ###############################################################################
 #                                
@@ -289,6 +328,25 @@ lv_delete() {
 	return $?
 }
 
+# Checks that a logical volume name is ok
+# Rules:
+# 1) The common rules (see lvm_name_ok)
+# 2) must not start with "snapshot"
+# See lvm2 source and bug #254630 for details
+lv_name_ok() {
+	local lvname
+	lvname="$1"
+
+	# Rule 1
+	lvm_name_ok "$lvname" || return 1
+
+	# Rule 2
+	if [ "${lvname#snapshot}" != "$lvname" ]; then
+		return 1
+	fi
+
+	return 0
+}
 
 ###############################################################################
 #                                
@@ -396,4 +454,18 @@ vg_reduce() {
 
 	log-output -t partman-lvm vgreduce "$vg" "$pv"
 	return $?
+}
+
+# Checks that a logical volume name is ok
+# Rules:
+# 1) The common rules (see lvm_name_ok)
+# See lvm2 source and bug #254630 for details
+vg_name_ok() {
+	local vgname
+	vgname="$1"
+
+	# Rule 1
+	lvm_name_ok "$vgname" || return 1
+
+	return 0
 }
