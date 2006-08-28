@@ -127,7 +127,9 @@ echo -n "(" > $TEMPDIR/avg
 
 for level in $LEVELS; do
 	cp $RESULTS/level$level/rank$ext.txt $TEMPDIR/tmp.txt
-	grep "%" $TEMPDIR/tmp.txt > $TEMPDIR/$level.txt
+	grep "%" $TEMPDIR/tmp.txt \
+	  | LC_ALL=C sed -e "s:%[[:space:]]*\([_a-zA-Z]*\):% <a href=\"level$level/\1$ext.txt\">\1</a>:" \
+	  > $TEMPDIR/$level.txt
 	doit $TEMPDIR/$level.txt >> $TEMPDIR/$level.txt
 	rm -f $TEMPDIR/tmp.txt
 done
