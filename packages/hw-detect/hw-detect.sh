@@ -790,7 +790,7 @@ case "$(udpkg --print-architecture)" in
 	                ;;
 		esac
 	;;
-	sparc
+	sparc)
 		if grep -q '^type.*: sun4u' /proc/cpuinfo ; then
 			# sparc v9 or v9b
 			if grep -q '^cpu.*: .*UltraSparc III' /proc/cpuinfo; then
