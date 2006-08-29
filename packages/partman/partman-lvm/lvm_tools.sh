@@ -258,6 +258,18 @@ pv_create() {
 	return $?
 }
 
+# Remove the LVM signatures from a PV
+pv_delete() {
+	local pv
+	pv="$1"
+
+	if ! pvs "$pv" > /dev/null 2>&1; then
+		return 0
+	fi
+
+	log-output -t partman-lvm pvremove -ff -y "$pv"
+	return $?
+}
 
 ###############################################################################
 #                                
