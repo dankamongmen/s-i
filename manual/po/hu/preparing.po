@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-08-28 07:52+0100\n"
+"PO-Revision-Date: 2006-08-29 09:09+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: hu\n"
 "MIME-Version: 1.0\n"
@@ -1087,132 +1087,131 @@ msgstr "Ha a Linuxot egy ARC/AlphaBIOS/ARCSBIOS konzolról szeretnéd indítani,
 msgid "Partitioning From DOS or Windows"
 msgstr "Particionálás DOS-ban vagy Windowsból"
 
-# FIXME
 #. Tag: para
 #: preparing.xml:1068
 #, no-c-format
 msgid "If you are manipulating existing FAT or NTFS partitions, it is recommended that you either use the scheme below or native Windows or DOS tools. Otherwise, it is not really necessary to partition from DOS or Windows; the Linux partitioning tools will generally do a better job."
-msgstr "Ha létező FAT vagy NTFS partíciót kezelsz, ajánlott az alábbi mód használata."
+msgstr "Ha létező FAT vagy NTFS partíciót kezelsz, ajánlott az alábbi mód használata esetleg az azokat használó rendszerek beépített eszközeinek alkalmazása. Amúgy nem érdemes az adott rendszereket használni; a Linux particionáló eszközök sokkal jobb munkát végeznek."
 
 #. Tag: para
 #: preparing.xml:1076
 #, no-c-format
 msgid "But if you have a large IDE disk, and are using neither LBA addressing, overlay drivers (sometimes provided by hard disk manufacturers), nor a new (post 1998) BIOS that supports large disk access extensions, then you must locate your Debian boot partition carefully. In this case, you will have to put the boot partition into the first 1024 cylinders of your hard drive (usually around 524 megabytes, without BIOS translation). This may require that you move an existing FAT or NTFS partition."
-msgstr ""
+msgstr "Ha nagy IDE lemezed van, és nem használsz sem LBA címzést, sem átfedő meghajtókat (a merevlemez-gyártók gyakran mellékelik) sem új (1998 utáni) BIOS-t, mely támogatja a nagy lemezekhez való hozzáférési bővítéseket, akkor ennek megfelelően kell megadni a Debian indító partíciót. Ebben az esetben a merevlemez első 1024 cilinderére kell tenni (BIOS áltai módosítás nélkül körülbelül 524 MB). Ez a létező FAT vagy NTFS partíció áthelyezését igényelheti."
 
 #. Tag: title
 #: preparing.xml:1090
 #, no-c-format
 msgid "Lossless Repartitioning When Starting From DOS, Win-32 or OS/2"
-msgstr ""
+msgstr "Veszteségmentes újraparticionálás DOS-ból, Win-32-ből vagy OS/2-ből indítva"
 
 #. Tag: para
 #: preparing.xml:1093
 #, no-c-format
 msgid "One of the most common installations is onto a system that already contains DOS (including Windows 3.1), Win32 (such as Windows 95, 98, Me, NT, 2000, XP), or OS/2, and it is desired to put Debian onto the same disk without destroying the previous system. Note that the installer supports resizing of FAT and NTFS filesystems as used by DOS and Windows. Simply start the installer, select the option to <menuchoice> <guimenuitem>Manually edit partition table</guimenuitem> </menuchoice>, select the partition to resize, and specify its new size. So in most cases you should not need to use the method described below."
-msgstr ""
+msgstr "Az egyik legnépszerűbb telepítés egy olyan gépre telepíteni, melyen már van egy DOS (+ netán Windows 3.1), Win32 (mondjuk 95, 98, Me, NT, 2000, XP) vagy OS/2 és a Debian ugyanarra a lemezre menne a korábbi rendszer megőrzésével. A telepítő támogatja az e rendszerek által használt FAT és NTFS fájlrendszerek átméretezését. Indítsd a telepítőt, válaszd ki a <menuchoice> <guimenuitem>Partíciós tábla kézi szerkesztése</guimenuitem> </menuchoice> lehetőséget, jelöld ki az átméretezendő partíciót és add meg az új méretét. A legtöbb esetben ez tökéletesen működik és egyáltalán nem lesz szükség az alább leírt módra."
 
 #. Tag: para
 #: preparing.xml:1105
 #, no-c-format
 msgid "Before going any further, you should have decided how you will be dividing up the disk. The method in this section will only split a partition into two pieces. One will contain the original OS and the other will be used for Debian. During the installation of Debian, you will be given the opportunity to use the Debian portion of the disk as you see fit, i.e., as swap or as a file system."
-msgstr ""
+msgstr "Mielőtt továbbmennénk, el kell dönteni, hogyan legyen felosztva a lemez. Ebben a részben 2 részre osztjuk a partíciót. Egy az eredeti rendszert tartalmazza majd, a másik a Debian számára készül. A Debian telepítése során lehetőség lesz a Debian rész ízlés szerinti felhasználására, például cserehelyként és fájlrendszerként."
 
 #. Tag: para
 #: preparing.xml:1114
 #, no-c-format
 msgid "The idea is to move all the data on the partition to the beginning, before changing the partition information, so that nothing will be lost. It is important that you do as little as possible between the data movement and repartitioning to minimize the chance of a file being written near the end of the partition as this will decrease the amount of space you can take from the partition."
-msgstr ""
+msgstr "A terv az összes adat mozgatása a partíció elejére a partíció adatok módosítása előtt, így semmi nem vész el. A lehető legkevesebbet végezzük az adatok mozgatása és az újraparticionálás közt, így gyakorlatilag nincs esély, hogy közben egy fájl a partíció végéhez közel íródjon, így lehet a legnagyobb új partíciót létrehozni."
 
 #. Tag: para
 #: preparing.xml:1123
 #, no-c-format
 msgid "The first thing needed is a copy of <command>fips</command> which is available in the <filename>tools/</filename> directory on your nearest Debian mirror. Unzip the archive and copy the files <filename>RESTORRB.EXE</filename>, <filename>FIPS.EXE</filename> and <filename>ERRORS.TXT</filename> to a bootable floppy. A bootable floppy can be created using the command <filename>sys a:</filename> under DOS. <command>fips</command> comes with very good documentation which you may want to read. You will definitely need to read the documentation if you use a disk compression driver or a disk manager. Create the disk and read the documentation <emphasis>before</emphasis> you defragment the disk."
-msgstr ""
+msgstr "Először szükség lesz egy <command>fips</command> programra, mely elérhető a legközelebbi Debian tükör <filename>tools/</filename> könyvtárából. Csomagold ki az archívumot és másold a <filename>RESTORRB.EXE</filename>, <filename>FIPS.EXE</filename> és <filename>ERRORS.TXT</filename> fájlokat egy indítható flopira. Indítható flopi a <filename>sys a:</filename> paranccsal hozható létre DOS-ban. A <command>fips</command> nagyon jó dokumentációval rendelkezik, melyet érdemes elolvasni. El kell, ha lemeztömörítő-meghajtót vagy egy lemezkezelőt használsz. Hozd létra a lemezt és olvasd el a dokumentációt <emphasis>mielőtt</emphasis> töredezettség-mentesíted a lemezt."
 
 #. Tag: para
 #: preparing.xml:1136
 #, no-c-format
 msgid "The next thing needed is to move all the data to the beginning of the partition. <command>defrag</command>, which comes standard with DOS 6.0 and later, can easily do the job. See the <command>fips</command> documentation for a list of other software that may do the trick. Note that if you have Windows 9x, you must run <command>defrag</command> from there, since DOS doesn't understand VFAT, which is used to support for long filenames, used in Windows 95 and higher."
-msgstr ""
+msgstr "Ezután minden adatot a partíció elejére kel mozgatni. A <command>defrag</command> parancs, mely a DOS 6.0+ része könnyen elvégzi ezt. Lásd a <command>fips</command> dokumentációját más hasonló szoftverekért. Windows 9x esetén a <command>defrag</command> parancsot onnan kell futtatni, mert a DOS nem érti a VFAT-ot, mely hosszú fájlneveket támogat Windows 95+ esetén."
 
 #. Tag: para
 #: preparing.xml:1146
 #, no-c-format
 msgid "After running the defragmenter (which can take a while on a large disk), reboot with the <command>fips</command> disk you created in the floppy drive. Simply type <filename>a:\\fips</filename> and follow the directions."
-msgstr ""
+msgstr "A töredezettség-mentesítő után (mely nagy lemezeknél eltarthat egy ideig) indítsd újra a <command>fips</command> lemezről, mely a flopi-meghajtóban van. Gépeld be ezt: <filename>a:\\fips</filename> és kövesd az utasításokat."
 
 #. Tag: para
 #: preparing.xml:1152
 #, no-c-format
 msgid "Note that there are many other partition managers out there, in case <command>fips</command> doesn't do the trick for you."
-msgstr ""
+msgstr "Jó tudni, hogy egyéb partíció-kezelők is vannak, ha a <command>fips</command> nem válna be."
 
 #. Tag: title
 #: preparing.xml:1160
 #, no-c-format
 msgid "Partitioning for DOS"
-msgstr ""
+msgstr "Particionálás DOS számára"
 
 #. Tag: para
 #: preparing.xml:1162
 #, no-c-format
 msgid "If you are partitioning for DOS drives, or changing the size of DOS partitions, using Linux tools, many people experience problems working with the resulting FAT partitions. For instance, some have reported slow performance, consistent problems with <command>scandisk</command>, or other weird errors in DOS or Windows."
-msgstr ""
+msgstr "DOS meghajtók particionálásakor, vagy DOS partíciók átméretezésekor Linux eszközökkel, többen gondokat észleltek a kapott FAT partíciókkal való munkakor. Például egyeseknél lassú működés, állandó <command>scandisk</command> gondok, vagy fura hibák jelentkeztek DOS-ban vagy Windowsban."
 
 #. Tag: para
 #: preparing.xml:1170
 #, no-c-format
 msgid "Apparently, whenever you create or resize a partition for DOS use, it's a good idea to fill the first few sectors with zeros. You should do this prior to running DOS's <command>format</command> command by executing the following command from Linux:"
-msgstr ""
+msgstr "Ha létrehozol vagy átméretezel egy partíciót DOS-hoz, nullázd az első pár szektort. Ezt megteheted a DOS <command>format</command> parancsát megelőzve az alábbi paranccsal Linuxból:"
 
 #. Tag: screen
 #: preparing.xml:1177
 #, no-c-format
 msgid "# dd if=/dev/zero of=/dev/hdXX bs=512 count=4"
-msgstr ""
+msgstr "# dd if=/dev/zero of=/dev/hdXX bs=512 count=4"
 
 #. Tag: title
 #: preparing.xml:1188
 #, no-c-format
 msgid "Partitioning in AmigaOS"
-msgstr ""
+msgstr "Particionálás AmigaOS rendszerben"
 
 #. Tag: para
 #: preparing.xml:1189
 #, no-c-format
 msgid "If you are running AmigaOS, you can use the <command>HDToolBox</command> program to adjust your native partitions prior to installation."
-msgstr ""
+msgstr "Ha AmigaOS rendszert futtatsz, használd a <command>HDToolBox</command> programot az eredeti partíciók állításához a telepítés előtt."
 
 #. Tag: title
 #: preparing.xml:1197
 #, no-c-format
 msgid "Partitioning in Atari TOS"
-msgstr ""
+msgstr "Particionálás Atari TOS rendszerben"
 
 #. Tag: para
 #: preparing.xml:1198
 #, no-c-format
 msgid "Atari partition IDs are three ASCII characters, use <quote>LNX</quote> for data and <quote>SWP</quote> for swap partitions. If using the low memory installation method, a small Minix partition is also needed (about 2 MB), for which the partition ID is <quote>MNX</quote>. Failure to set the appropriate partition IDs not only prevents the Debian installation process from recognizing the partitions, but also results in TOS attempting to use the Linux partitions, which confuses the hard disk driver and renders the whole disk inaccessible."
-msgstr ""
+msgstr "Egy Atari partíció azonosító 3 ASCII karakter, az  <quote>LNX</quote> az adat, az <quote>SWP</quote> a cserepartíció. Alacsony memóriás partíciós módnál egy kis Minix partíció is szükséges (körülbelül 2 MB) <quote>MNX</quote> partíció azonosítóval. A partíció azonosítók hibás megadása nem csupán megakadályozza a Debian telepítő folyamatot a partíciók felismerésében, de azt is eredményezi, hogy a TOS a Linux partíciót akarja használni, mely összezavarja a merevlemez-meghajtót és az egész lemezt elérhetetlenné teheti."
 
 #. Tag: para
 #: preparing.xml:1209
 #, no-c-format
 msgid "There are a multitude of third party partitioning tools available (the Atari <command>harddisk</command> utility doesn't permit changing the partition ID); this manual cannot give detailed descriptions for all of them. The following description covers <command>SCSITool</command> (from Hard+Soft GmBH)."
-msgstr ""
+msgstr "Számos partíciós eszköz elérhető (az Atari <command>harddisk</command> eszköz teszi lehetővé a partíció azonosító módosítását); e kézikönyv nem adhat részletes leírást mindegyikről. Az alábbi leírás a <command>SCSITool</command> programot tárgyalja (a Hard+Soft GmBH terméke)."
 
 #. Tag: para
 #: preparing.xml:1218
 #, no-c-format
 msgid "Start <command>SCSITool</command> and select the disk you want to partition (<guimenu>Disk</guimenu> menu, item <guimenuitem>select</guimenuitem>)."
-msgstr ""
+msgstr "Indítsd el a <command>SCSITool</command> programot és válaszd ki a particionálandó lemezt (<guimenu>Disk</guimenu> menü, <guimenuitem>kijelölés</guimenuitem> elem)."
 
 #. Tag: para
 #: preparing.xml:1224
 #, no-c-format
 msgid "From the <guimenu>Partition</guimenu> menu, select either <guimenuitem>New</guimenuitem> to add new partitions or change the existing partition sizes, or <guimenuitem>Change</guimenuitem> to change one specific partition. Unless you have already created partitions with the right sizes and only want to change the partition ID, <guimenuitem>New</guimenuitem> is probably the best choice."
-msgstr ""
+msgstr "A <guimenu>Partíciók</guimenu> menüből válaszd az <guimenuitem>Új</guimenuitem> menüpontot új partíciók létrehozásához vagy a <guimenuitem>Módosítás</guimenuitem> pontot egy partíció módosításához. Kivéve, ha már megvannak a megfelelő partícióid és csak a partíció azonosítót akarod módosítani, válaszd az <guimenuitem>Új</guimenuitem> menüpontot."
 
 #. Tag: para
 #: preparing.xml:1234
