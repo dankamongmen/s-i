@@ -20,6 +20,8 @@ extern void stringovfl(void);
 extern void open_include(char *s);
 %}
 
+%option nounput
+
 %s RVALUE
 %x STR
 %x INCLSTR
