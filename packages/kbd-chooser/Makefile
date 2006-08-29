@@ -90,9 +90,7 @@ debian/kbd-chooser.templates:  $(TEMPLATES)
 	# debconf-updatepo
 	touch -mr debian/kbd-chooser.templates-in $@
 	
-# loadkeys.o: separate rule since the flex output does not permit -Wall
 loadkeys.o:     loadkeys.c analyze.c
-	$(CC) -c $(CFLAGS) $(DEFS) $<
 
 clean:
 	rm -f *~ *.o kbd-mode kbd-chooser analyze.c loadkeys.c demo demo.templates *#
