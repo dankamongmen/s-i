@@ -6,10 +6,16 @@ mypart=''
 mysize=0
 
 for dev in $DEVICES/*; do
-    [ -d "$dev" ] || continue
-    db_subst partman-auto/text/use_device DEVICE $(device_name $dev)
-    db_metaget partman-auto/text/use_device description
-    printf "$dev\t$RET\n"
+	[ -d "$dev" ] || continue
+
+	# Skip /dev/mapper/X and /dev/mdX devices
+	device=$(cat $dev/device)
+	$(echo "$device" | grep -q "/dev/md[0-9]*$") && continue
+	$(echo "$device" | grep -q "/dev/mapper/") && continue
+
+	db_subst partman-auto/text/use_device DEVICE $(device_name $dev)
+	db_metaget partman-auto/text/use_device description
+	printf "$dev\t$RET\n"
 done
 
 
