@@ -1,8 +1,92 @@
 ## this file contains a bunch of shared code between partman-auto
 ## and partman-auto-lvm.
 
+# Wipes any traces of LVM from a disk
+# Normally you wouldn't want to use this function, 
+# but wipe_disk() which will also call this function.
+lvm_wipe_disk() {
+	local dev realdev vg pvs pv lv tmpdev restart
+	dev="$1"
+	cd $dev
+
+	if [ ! -e /lib/partman/lvm_tools.sh ]; then
+		return 0
+	fi
+
+	. /lib/partman/lvm_tools.sh
+
+	# Check if the device already contains any physical volumes
+	realdev=$(mapdevfs "$(cat $dev/device)")
+	if ! pv_on_device "$realdev"; then
+		return 0
+	fi
+
+	# Ask for permission to erase LVM volumes 
+	db_input critical partman-auto/purge_lvm_from_device
+	db_go || return 1
+	db_get partman-auto/purge_lvm_from_device
+	if [ "$RET" != "true" ]; then
+		return 1
+	fi
+
+	# Check all VG's
+	for vg in $(vg_list); do
+		pvs=$(vg_list_pvs $vg)
+		
+		# Only deal with VG's on the selected disk
+		if ! $(echo "$pvs" | grep -q "$realdev"); then
+			continue
+		fi
+
+		# Make sure the VG don't span any other disks
+		if $(echo -n "$pvs" | grep -q -v "$realdev"); then
+			log-output -t partman-auto-lvs vgs
+			db_input critical partman-auto/cannot_purge_lvm_from_device || true
+			db_go || true
+			return 1
+		fi
+
+		# Remove LV's from the VG
+		for lv in $(vg_list_lvs $vg); do
+			lv_delete $vg $lv
+		done
+
+		# Remove the VG and its PV's 
+		vg_delete $vg
+		for pv in $pvs; do
+			pv_delete $pv
+		done
+	done
+
+	# Make sure that parted has no stale LVM info
+	restart="0"
+	for tmpdev in $DEVICES/*; do
+		realdev=$(cat $tmpdev/device)
+
+		if ! $(echo "$realdev" | grep -q "/dev/mapper/"); then
+			continue
+		fi
+
+		if [ -b "$realdev" ]; then
+			continue
+		fi
+
+		rm -rf $tmpdev
+		restart="1"
+	done
+
+	if [ $restart ]; then
+		stop_parted_server
+		restart_partman || return 1
+	fi
+
+	return 0
+}
+
 wipe_disk() {
 	cd $dev
+
+	lvm_wipe_disk "$dev" || return 1
 
 	open_dialog LABEL_TYPES
 	types=$(read_list)
