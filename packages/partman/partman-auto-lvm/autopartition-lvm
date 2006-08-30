@@ -26,15 +26,9 @@ if type update-dev >/dev/null 2>&1; then
 	log-output -t update-dev update-dev
 fi
 
-# Check if the device already contains any physical volumes
-realdev=$(mapdevfs "$(cat $dev/device)")
-if pv_on_device "$realdev"; then
-	bail_out pv_on_device
-fi
+wipe_disk || exit $?
 
 choose_recipe "$free_size" lvm || exit $?
-
-wipe_disk || exit $?
 
 # Check if partition is usable; use existing partman-auto template as we depend on it
 if [ "$free_type" = unusable ]; then
