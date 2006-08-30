@@ -40,8 +40,13 @@ free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabyte
 
 decode_recipe $recipe lvm
 
-# Check if the recipe contains lvmok tags otherwise fail
-if [ -z "$(echo "$scheme" | grep "lvmok")" ]; then
+# Make sure the recipe contains lvmok tags
+if ! echo "$scheme" | grep -q "lvmok"; then
+	bail_out unusable_recipe
+fi
+
+# Make sure a boot partition isn't marked as lvmok
+if echo "$scheme" | grep "lvmok" | grep -q "[[:space:]]/boot[[:boot:]]"; then
 	bail_out unusable_recipe
 fi
 
