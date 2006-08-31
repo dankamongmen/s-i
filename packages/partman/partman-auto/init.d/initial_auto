@@ -33,28 +33,66 @@ fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto
 
-# See if any disks to autopartition (either classic or LVM) have been set
+# See if any autopartition method has been set
+method=""
+if db_get partman-auto/method && [ -n "$RET" ]; then
+	method="$RET"
+fi
+
+# See if any autopartition disks have been set
+disks=""
 if db_get partman-auto/disk && [ -n "$RET" ]; then
 	disks="$RET"
-	for disk in $disks
-	do
-		id=$(dev_to_partman "$disk") || true
-		if [ -n "$id" ]; then
-			autopartition "$id"
-		fi
-	done
-	exit 0
-elif search-path autopartition-lvm && \
-     db_get partman-auto-lvm/disk && [ -n "$RET" ]; then
-	disk="$RET"
-	id=$(dev_to_partman "$disk") || true
-	if [ -n "$id" ]; then
-		autopartition-lvm "$id"
-		exit 0
-	fi
+fi
+
+# If both are set, let's try to do a completely automatic partitioning
+if [ -n "$method" ] && [ -n "$disks" ]; then
+	# The code for the methods could be merged, but in the future non-regular
+	# methods may support multiple disks
+	case "$method" in
+		regular)
+			for disk in $disks; do
+				id=$(dev_to_partman "$disk") || true
+				if [ -n "$id" ]; then
+					autopartition "$id"
+					exit 0
+				fi
+			done
+			exit 1
+			;;
+		lvm)
+			search-path autopartition-lvm || exit 1
+			for disk in $disks; do
+				id=$(dev_to_partman "$disk") || true
+				if [ -n "$id" ]; then
+					autopartition-lvm "$id"
+					exit 0
+				fi
+			done
+			exit 1
+			;;
+		crypto)
+			search-path autopartition-crypto || exit 1
+			for disk in $disks; do
+				id=$(dev_to_partman "$disk") || true
+				if [ -n "$id" ]; then
+					autopartition-crypto "$id"
+					exit 0
+				fi
+			done
+			exit 1
+			;;
+		*)
+			# Unsupported method
+			exit 1
+			;;
+	esac
 fi
 
 echo "partman-auto/init_automatically_partition" > /lib/partman/automatically_partition/question
-ask_user /lib/partman/automatically_partition 
-code=$?
+code=255 # 255 signals a retry
+while [ $code = 255 ]; do
+	ask_user /lib/partman/automatically_partition 
+	code=$?
+done
 echo "partman-auto/automatically_partition" > /lib/partman/automatically_partition/question

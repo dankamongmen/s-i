@@ -47,10 +47,15 @@ Type: string
 # Only used for preseeding.
 Description: device to partition, in either devfs or non format
 
+Template: partman-auto/method
+Type: string
+# Only used for preseeding.
+Description: method to use for partitioning
+
 Template: partman-auto/automatically_partition
 Type: select
 Choices: ${CHOICES}
-_Description: Disk space to partition:
+_Description: Partitioning method:
 
 Template: partman-auto/choose_recipe
 Type: select
@@ -93,6 +98,16 @@ Type: text
 # as short as possible and keep the variable AT THE END
 # for example "Erase entire disk: IDE0 master - Maxtor 46L489"
 _Description: Erase entire disk: ${DEVICE}
+
+Template: partman-auto/select_disk
+Type: select
+Choices: ${CHOICES}
+_Description: Select disk to partition:
+
+Template: partman-auto/select_disks
+Type: multiselect
+Choices: ${CHOICES}
+_Description: Select disk(s) to partition:
 
 Template: partman-auto/text/custom_partitioning
 Type: text

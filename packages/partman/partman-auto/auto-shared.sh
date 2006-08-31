@@ -265,3 +265,31 @@ foreach_partition '
     setup_partition $id $*
     free_space=$(partition_after $id)'
 }
+
+get_auto_disks() {
+	local dev device
+
+	for dev in $DEVICES/*; do
+		[ -d "$dev" ] || continue
+
+		# Skip /dev/mapper/X and /dev/mdX devices
+		device=$(cat $dev/device)
+		$(echo "$device" | grep -q "/dev/md[0-9]*$") && continue
+		$(echo "$device" | grep -q "/dev/mapper/") && continue
+
+		printf "$dev\t$(device_name $dev)\n"
+	done
+}
+
+select_auto_disk() {
+	local DEVS
+
+	DEVS=$(get_auto_disks)
+	[ -n "$DEVS" ] || return 1
+	debconf_select critical partman-auto/select_disk "$DEVS" "" || return 1
+	echo "$RET"
+	return 0
+}
+
+# TODO: Add a select_auto_disks() function
+# Note: This needs a debconf_multiselect equiv.
