@@ -26,7 +26,7 @@ basename () {
 
 can_escape () {
 	type debconf-escape >/dev/null 2>&1 || return 1
-	db_capb
+	db_capb backup
 	for cap in $RET; do
 		case $cap in
 			escape)	return 0 ;;
