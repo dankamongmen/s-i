@@ -79,27 +79,7 @@ case "$consoletype" in
 	fi
 	;;
     cyr)
-	consolefont=`echo $RET | sed -e 's/^cyr=//'`
-	if apt-install console-cyrillic; then
-		cyrconfig=/target/etc/console-cyrillic
-		# format of the consolefont is:
-		# style,size,encoding,layout(option1 option2)
-		style=`echo $consolefont | sed -e 's/,.*$//'`
-		size=`echo $consolefont | sed -e 's/^[^,]*,\([^,]*\),.*$/\1/'`
-		encoding=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,\([^,]*\),.*$/\1/'`
-		layoutopts=`echo $consolefont | sed -e 's/^[^,]*,[^,]*,[^,]*,\([^)]*)\).*$/\1/'`
-		layout=`echo $layoutopts | sed -e 's/(.*)$//'`
-		options=`echo $layoutopts | sed -e 's/.*(//' -e 's/).*//'`
-		modify_cyrconfig style "$style"
-		modify_cyrconfig size "$size"
-		modify_cyrconfig encoding "$encoding"
-		modify_cyrconfig layout "$layout"
-		modify_cyrconfig options "$options"
-		sed -e 's/^.*Bootsetup: .*$/# Bootsetup: YES/' $cyrconfig > $cyrconfig.tmp && \
-		    mv $cyrconfig.tmp $cyrconfig
-		sed -e 's/^.*Debconf: .*$/# Debconf: NO/' $cyrconfig > $cyrconfig.tmp && \
-		    mv $cyrconfig.tmp $cyrconfig
-	fi
+	apt-install console-cyrillic || true
 	;;
 esac
 
