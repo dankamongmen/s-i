@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 39285 -->
+<!-- original version: 40409 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -731,10 +731,18 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení může být v tradičním formátu nebo ve formátu devfs.
+# Pokud to metoda podporuje, můžete zadat několik disků oddělených
+# mezerami.
 # Například pro použití prvního disku, který devfs najde:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# Nebo pokud si přejete použít LVM:
-#partman-auto-lvm/disk string /dev/discs/disc0/disc
+# Dále musíte zvolit metodu, která se má použít. Momentálně jsou
+# dostupné metody "regular", "lvm" a "crypto".
+d-i partman-auto/method string lvm
+
+# Pokud některý z disků určených k automatickému rozdělení obsahuje
+# pozůstatek z předchozího LVM, zobrazí se varování. Tímto můžete
+# varování potlačit...
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # Můžete vybrat libovolné z přednastavených schémat dělení.
 # Pozn: hodnota musí být lokalizována (přeložena).
@@ -920,9 +928,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Alternativně můžete instalovat jinam než do MBR - odkomentujete
 # a upravte tyto řádky:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Pro instalaci Grubu na více disků:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
@@ -978,12 +988,22 @@ Instalaci úloh můžete vynechat a instalovat balíky nějakou jinou
 cestou. Úlohu <userinput>standard</userinput> však doporučujeme
 instalovat vždy.
 
+</para><para>
+
+Chcete-li kromě balíků v úlohách instalovat také nějaké samostatné
+balíky, můžete použít parametr <classname>pkgsel/include</classname>.
+Hodnotou parametru je čárkami nebo mezerami oddělený seznam, takže jej
+můžete jednoduše použít i na příkazové řádce jádra.
+
 </para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+
+# Samostatné balíky pro instalaci.
+#d-i pkgsel/include string openssh-server build-essential
 
 # Některé verze instalačního systému mohou vývojářům Debianu hlásit
 # seznam balíků, které jste nainstalovali, což pomáhá při

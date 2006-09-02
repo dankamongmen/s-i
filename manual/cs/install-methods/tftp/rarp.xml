@@ -1,8 +1,8 @@
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 39897 -->
 
   <sect2 condition="supports-rarp" id="tftp-rarp">
-   <title>Nastavení RARP serveru</title>
+  <title>Nastavení RARP serveru</title>
 <para>
 
 Pro úspěšné nastavení RARP serveru potřebujete znát ethernetovou
@@ -19,49 +19,17 @@ a použít příkaz <userinput>/sbin/ifconfig eth0</userinput>.
 
 </para><para>
 
-Na RARP serveru používajícím linuxové jádro řady 2.2 potřebujete zanést
-příslušný záznam do RARP tabulky udržované jádrem. Můžete toho
-dosáhnout příkazy:
-
-<informalexample><screen>
-<prompt>#</prompt> <userinput>/sbin/rarp -s
-<replaceable>jméno-klienta</replaceable>
-<replaceable>eternetová-adresa-klienta</replaceable></userinput>
-
-<prompt>#</prompt> <userinput>/usr/sbin/arp -s
-<replaceable>ip-adresa-klienta</replaceable>
-<replaceable>eternetová-adresa-klienta</replaceable></userinput>
-</screen></informalexample>
-
-</para><para>
-
-Pokud uvidíte hlášku
-
-<informalexample><screen>
-SIOCSRARP: Invalid argument
-</screen></informalexample>
-
-pravděpodobně budete muset zavést jaderný modul s rarp, nebo, pokud
-jej nemáte, překompilovat jádro s RARP podporou. Zkuste příkaz
-<userinput>modprobe rarp</userinput> a pak znovu spusťte předchozí
-příkazy.
-
-</para><para>
-
-Na systémech používajících jádro řady 2.4 žádný RARP modul neexistuje
-a místo něj byste měli použít program <command>rarpd</command>. Postup
-je podobný jako u SunOS v následujícím odstavci.
-
-</para><para>
-
-Pokud používáte SunOS, musíte zaručit, že ethernetová adresa klienta
-bude zaznamenána v databázích <quote>ethers</quote> (buďto v souboru
-<filename>/etc/ethers</filename> nebo pomocí NIS/NIS+)
-a <quote>hosts</quote>.
-Nyní můžete spustit RARP démona. V systému SunOS 4 spusťte
-(jako superuživatel root)
-<userinput>/usr/etc/rarpd -a</userinput>; v systému SunOS 5 použijte
-<userinput>/usr/sbin/rarpd -a</userinput>.
+Na systémech používajících linuxové jádro řady 2.4 nebo 2.6, případně
+na systémech SunOS/Solaris máte k dispozici program
+<command>rarpd</command>. Nejprve musíte zaručit, že ethernetová
+adresa klienta bude zaznamenána v databázích <quote>ethers</quote>
+(tj. buď v souboru <filename>/etc/ethers</filename> nebo pomocí
+NIS/NIS+) a <quote>hosts</quote>. Pak můžete spustit RARP démona.  Na
+většině linuxových systémů a na SunOS 5 (Solaris 2) to provedete (jako
+superuživatel root) příkazem <userinput>/usr/sbin/rarpd
+-a</userinput>, na jiných systémech příkazem
+<userinput>/usr/sbin/in.rarpd -a</userinput> a na SunOS 4 (Solaris 1)
+příkazem <userinput>/usr/etc/rarpd -a</userinput>.
 
 </para>
   </sect2>
