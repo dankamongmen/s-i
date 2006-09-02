@@ -8,7 +8,6 @@ noinst_LTLIBRARIES = \
 libsystem_la_SOURCES = \
 	devfs.c \
 	dpkg.c \
-	prebaseconfig.c \
 	utils.c
 
 libsystem_package_la_SOURCES = \
