@@ -64,7 +64,7 @@ di_tree *di_tree_new_full (di_compare_func key_compare_func, di_destroy_notify k
  * Destroys the di_tree. If keys and/or values are dynamically allocated, you
  * should either free them first or create the di_tree using di_tree_new_full.
  * In the latter case the destroy functions you supplied will be called on all
- * keys and values before destroying the di_hash_table.
+ * keys and values before destroying the di_tree.
  *
  * @param tree a di_tree.
  */
