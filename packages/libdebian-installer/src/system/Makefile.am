@@ -1,14 +1,18 @@
 INCLUDES = \
 	-I$(top_srcdir)/include
 
-noinst_LTLIBRARIES = libsystem.la
+noinst_LTLIBRARIES = \
+	libsystem.la \
+	libsystem_package.la
 
 libsystem_la_SOURCES = \
 	devfs.c \
 	dpkg.c \
-	packages.c \
 	prebaseconfig.c \
 	utils.c
+
+libsystem_package_la_SOURCES = \
+	packages.c
 
 EXTRA_libsystem_la_SOURCES = \
 	subarch-generic.c \

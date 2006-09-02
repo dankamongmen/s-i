@@ -420,22 +420,6 @@ void di_package_parser_write_description (
   }
 }
 
-di_parser_fields_function_read di_package_parser_read_name_real_4_0 __attribute__ ((unused));
-
-void di_package_parser_read_name_real_4_0 (data, fip, field_modifier, value, user_data)
-  void **data;
-  const di_parser_fieldinfo *fip __attribute__ ((unused));
-  di_rstring *field_modifier __attribute__ ((unused));
-  di_rstring *value;
-  void *user_data __attribute__ ((unused));
-{
-  di_package *p = *data;
-  p->key.string = di_stradup (value->string, value->size);
-  p->key.size = value->size;
-}
-
-__asm__ (".symver di_package_parser_read_name_real_4_0,di_package_parser_read_name@LIBDI_4.0");
-
 void di_package_parser_read_priority (
   void **data,
   const di_parser_fieldinfo *fip __attribute__ ((unused)),
