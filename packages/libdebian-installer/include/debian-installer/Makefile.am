@@ -3,7 +3,6 @@ SUBDIRS = system
 realincludedir = $(includedir)/debian-installer
 
 realinclude_HEADERS = \
-	config.h \
 	exec.h \
 	hash.h \
 	list.h \

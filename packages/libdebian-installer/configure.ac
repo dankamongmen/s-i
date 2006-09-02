@@ -72,7 +72,7 @@ else
 fi
 AC_SUBST(SUBARCH_SYSTEM)
 
-AC_CONFIG_HEADERS([config.h include/debian-installer/config.h])
+AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_FILES([
 Makefile
