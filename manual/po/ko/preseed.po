@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-18 17:32+0000\n"
-"PO-Revision-Date: 2006-08-05 14:44+0900\n"
+"PO-Revision-Date: 2006-09-02 12:31+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1167,7 +1167,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:648
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1237,6 +1237,8 @@ msgstr ""
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
 "# 혹은 LVM을 사용하려면:\n"
 "#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc\\n\"\n"
+"# 아니면, 디스크가 두 개 이상인 LVM의 경우:\n"
+"#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
 "\n"
 "# 미리 정의한 파티션 방식 중의 하나를 선택할 수 있습니다.\n"
 "# Note: 이 템플릿은 지역화된(번역된) 값으로 미리 설정되어야 합니다.\n"
@@ -1502,7 +1504,7 @@ msgstr "부트 로더 설치"
 
 #. Tag: screen
 #: preseed.xml:729
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
@@ -1540,9 +1542,11 @@ msgstr ""
 "\n"
 "# 다른 방법으로 MBR이 아닌 위치에 설치하려면, 다음 주석을 지우고\n"
 "# 편집하십시오.\n"
-"#d-i grub-installer/bootdev  string (hd0,0)\n"
 "#d-i grub-installer/only_debian boolean false\n"
-"#d-i grub-installer/with_other_os boolean false"
+"#d-i grub-installer/with_other_os boolean false\n"
+"#d-i grub-installer/bootdev  string (hd0,0)\n"
+"# GRUB을 여러 디스크에 설치하려면:\n"
+"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
 #: preseed.xml:734
