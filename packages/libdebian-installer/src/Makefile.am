@@ -14,8 +14,6 @@ libdebian_installer_la_SOURCES = \
 	log.c \
 	mem.c \
 	mem_chunk.c \
-	parser.c \
-	parser_rfc822.c \
 	slist.c \
 	string.c \
 	tree.c \
@@ -29,7 +27,9 @@ libdebian_installer_package_la_SOURCES = \
 	package.c \
 	package_parser.c \
 	packages.c \
-	packages_parser.c
+	packages_parser.c \
+	parser.c \
+	parser_rfc822.c
 
 libdebian_installer_la_LIBADD = \
 	system/libsystem.la
