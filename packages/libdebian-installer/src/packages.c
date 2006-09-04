@@ -207,7 +207,7 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
         di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): mark", package->package);
 #endif
       
-      r->do_real (package, r->do_real_data);
+      r->do_real (r, package, r->do_real_data);
       break;
 
     case di_package_type_virtual_package:
@@ -238,7 +238,7 @@ bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_
           if (d->type == di_package_dependency_type_reverse_provides)
           {
             if (!(package->resolver & (r->resolver << 2)))
-              best_provide = r->check_virtual (package, best_provide, d, r->check_virtual_data);
+              best_provide = r->check_virtual (r, package, best_provide, d, r->check_virtual_data);
           }
         }
 
@@ -272,12 +272,12 @@ error:
   return false;
 }
 
-bool di_packages_resolve_dependencies_check_real (di_packages_resolve_dependencies_check *r, di_package *package, di_package_dependency *d)
+bool di_packages_resolve_dependencies_check_real (di_packages_resolve_dependencies_info *info, di_package *package, di_package_dependency *d)
 {
-  return di_packages_resolve_dependencies_recurse (r, d->ptr, package);
+  return di_packages_resolve_dependencies_recurse (info, d->ptr, package);
 }
 
-di_package_dependency *di_packages_resolve_dependencies_check_virtual (di_package *package __attribute__ ((unused)), di_package_dependency *best, di_package_dependency *d, void  *data __attribute__ ((unused)))
+di_package_dependency *di_packages_resolve_dependencies_check_virtual (di_packages_resolve_dependencies_info *info __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *best, di_package_dependency *d, void  *data __attribute__ ((unused)))
 {
   if (!best || best->ptr->priority < d->ptr->priority ||
       (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked))
@@ -303,13 +303,13 @@ bool di_packages_resolve_dependencies_check_non_existant_permissive (di_packages
   return true;
 }
 
-void di_packages_resolve_dependencies_do_real_list_append (di_package *package, void *_data)
+void di_packages_resolve_dependencies_do_real_list_append (di_packages_resolve_dependencies_info *info, di_package *package, void *_data)
 {
-  struct di_packages_resolve_dependencies_do_real_list_append_data *data = _data;
-  di_slist_append_chunk (&data->list, package, data->allocator->slist_node_mem_chunk);
+  struct di_slist *list = _data;
+  di_slist_append_chunk (list, package, info->allocator->slist_node_mem_chunk);
 }
 
-void di_packages_resolve_dependencies_do_real_mark (di_package *package, void *data __attribute__ ((unused)))
+void di_packages_resolve_dependencies_do_real_mark (di_packages_resolve_dependencies_info *info __attribute__ ((unused)), di_package *package, void *data __attribute__ ((unused)))
 {
   package->status_want = di_package_status_want_install;
 }
@@ -334,28 +334,23 @@ void di_packages_resolve_dependencies_marker (di_packages *packages)
 
 }
 
-di_slist *di_packages_resolve_dependencies_special (di_packages *packages, di_slist *list, di_packages_resolve_dependencies_check *s, di_packages_allocator *allocator)
+di_slist *di_packages_resolve_dependencies_special (di_packages_resolve_dependencies_info *info, di_slist *list)
 {
-  struct di_packages_resolve_dependencies_do_real_list_append_data data =
-  {
-    { NULL, NULL },
-    allocator,
-  };
-
   di_slist *install = di_slist_alloc ();
+  di_slist temp = { NULL, NULL };
   di_slist_node *node;
 
-  s->do_real_data = &data;
+  info->do_real_data = &temp;
 
-  di_packages_resolve_dependencies_marker (packages);
+  di_packages_resolve_dependencies_marker (info->packages);
 
-  s->resolver = packages->resolver;
+  info->resolver = info->packages->resolver;
 
   for (node = list->head; node; node = node->next)
   {
     di_package *p = node->data;
-    if (di_packages_resolve_dependencies_recurse (s, p, NULL))
-      internal_di_slist_append_list (install, &data.list);
+    if (di_packages_resolve_dependencies_recurse (info, p, NULL))
+      internal_di_slist_append_list (install, &temp);
   }
 
   return install;
@@ -363,8 +358,10 @@ di_slist *di_packages_resolve_dependencies_special (di_packages *packages, di_sl
 
 di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *list, di_packages_allocator *allocator)
 {
-  struct di_packages_resolve_dependencies_check s =
+  di_packages_resolve_dependencies_check info =
   {
+    packages,
+    allocator,
     di_packages_resolve_dependencies_check_real,
     di_packages_resolve_dependencies_check_virtual,
     di_packages_resolve_dependencies_check_non_existant,
@@ -374,36 +371,33 @@ di_slist *di_packages_resolve_dependencies (di_packages *packages, di_slist *lis
     NULL,
   };
 
-  return di_packages_resolve_dependencies_special (packages, list, &s, allocator);
+  return di_packages_resolve_dependencies_special (&info, list);
 }
 
-di_slist *di_packages_resolve_dependencies_array_special (di_packages *packages, di_package **array, di_packages_resolve_dependencies_check *s, di_packages_allocator *allocator)
+di_slist *di_packages_resolve_dependencies_array_special (di_packages_resolve_dependencies_info *info, di_package **array)
 {
-  struct di_packages_resolve_dependencies_do_real_list_append_data data =
-  {
-    { NULL, NULL },
-    allocator,
-  };
-
   di_slist *install = di_slist_alloc ();
+  di_slist temp = { NULL, NULL };
 
-  s->do_real_data = &data;
+  info->do_real_data = &temp;
 
-  di_packages_resolve_dependencies_marker (packages);
+  di_packages_resolve_dependencies_marker (info->packages);
 
-  s->resolver = packages->resolver;
+  info->resolver = info->packages->resolver;
 
   while (*array)
-    if (di_packages_resolve_dependencies_recurse (s, *array++, NULL))
-      internal_di_slist_append_list (install, &data.list);
+    if (di_packages_resolve_dependencies_recurse (info, *array++, NULL))
+      internal_di_slist_append_list (install, &temp);
 
   return install;
 }
 
 di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_package **array, di_packages_allocator *allocator)
 {
-  struct di_packages_resolve_dependencies_check s =
+  di_packages_resolve_dependencies_info info =
   {
+    packages,
+    allocator,
     di_packages_resolve_dependencies_check_real,
     di_packages_resolve_dependencies_check_virtual,
     di_packages_resolve_dependencies_check_non_existant,
@@ -413,29 +407,31 @@ di_slist *di_packages_resolve_dependencies_array (di_packages *packages, di_pack
     NULL,
   };
 
-  return di_packages_resolve_dependencies_array_special (packages, array, &s, allocator);
+  return di_packages_resolve_dependencies_array_special (&info, array);
 }
 
-void di_packages_resolve_dependencies_mark_special (di_packages *packages, di_packages_resolve_dependencies_check *s)
+void di_packages_resolve_dependencies_mark_special (di_packages_resolve_dependencies_info *info)
 {
   di_slist_node *node;
 
-  di_packages_resolve_dependencies_marker (packages);
+  di_packages_resolve_dependencies_marker (info->packages);
 
-  s->resolver = packages->resolver;
+  info->resolver = info->packages->resolver;
 
-  for (node = packages->list.head; node; node = node->next)
+  for (node = info->packages->list.head; node; node = node->next)
   {
     di_package *package = node->data;
-    if (!(package->resolver & packages->resolver) && package->status_want == di_package_status_want_install)
-      di_packages_resolve_dependencies_recurse (s, package, NULL);
+    if (!(package->resolver & info->packages->resolver) && package->status_want == di_package_status_want_install)
+      di_packages_resolve_dependencies_recurse (info, package, NULL);
   }
 }
 
 void di_packages_resolve_dependencies_mark (di_packages *packages)
 {
-  struct di_packages_resolve_dependencies_check s =
+  di_packages_resolve_dependencies_info info =
   {
+    packages,
+    NULL,
     di_packages_resolve_dependencies_check_real,
     di_packages_resolve_dependencies_check_virtual,
     di_packages_resolve_dependencies_check_non_existant_quiet,
@@ -445,6 +441,6 @@ void di_packages_resolve_dependencies_mark (di_packages *packages)
     NULL,
   };
 
-  di_packages_resolve_dependencies_mark_special (packages, &s);
+  di_packages_resolve_dependencies_mark_special (&info);
 }
 
