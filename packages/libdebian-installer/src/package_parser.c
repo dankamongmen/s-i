@@ -270,7 +270,7 @@ void di_package_parser_read_dependency (
   char *cur = value->string, *end = value->string + value->size;
   char *namebegin, *fieldend;
   size_t namelen;
-  di_package_dependency *d, *d1;
+  di_package_dependency *d;
 
   /*
    * basic depends line parser. can ignore versioning
