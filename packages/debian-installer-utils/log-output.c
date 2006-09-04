@@ -19,6 +19,7 @@ int pass(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data ATTRIBUTE
 	 * program *not* outputting a trailing newline!
 	 */
 	printf("%s\n", buf);
+	fflush(stdout);
 	return 0;
 }
 
