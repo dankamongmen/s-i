@@ -83,10 +83,10 @@ struct newtColors newtAltColorPalette = {
 	"white", "blue",			/* shadow fg, bg */
 	/*"red", "lightgray",*/			/* title fg, bg */
 	"yellow", "black",			/* title fg, bg */
-	"lightgray", "red",			/* button fg, bg */
-	"red", "lightgray",			/* active button fg, bg */
-	"yellow", "blue",			/* checkbox fg, bg */
-	"blue", "brown",			/* active checkbox fg, bg */
+	"brightred", "gray",			/* button fg, bg */
+	"gray", "brightred",			/* active button fg, bg */
+	"white", "gray",			/* checkbox fg, bg */
+	"yellow", "brown",			/* active checkbox fg, bg */
 	"yellow", "blue",			/* entry box fg, bg */
 	/*"blue", "lightgray",*/			/* label fg, bg */
 	"brightred", "black",			/* label fg, bg */
@@ -104,7 +104,7 @@ struct newtColors newtAltColorPalette = {
 	"blue", "lightgray",			/* disabled entry fg, bg */
 	/*"black", "lightgray",*/			/* compact button fg, bg */
 	"lightgray", "black",			/* compact button fg, bg */
-	"yellow", "red",			/* active & sel listbox */
+	"yellow", "gray",			/* active & sel listbox */
 	"black", "brown"			/* selected listbox */
 };
 
