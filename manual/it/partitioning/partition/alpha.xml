@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39465 -->
+<!-- original version: 39920 -->
 
 
   <sect2 arch="alpha">
@@ -47,22 +47,24 @@ usare il comando <quote>b</quote> per entrare in modalità etichetta disco.
 <!--
 Unless you wish to use the disk you are partitioning from Tru64 Unix
 or one of the free 4.4BSD-Lite derived operating systems (FreeBSD,
-OpenBSD, or NetBSD), it is suggested that you do
-<emphasis>not</emphasis> make the third partition contain the whole
-disk.  This is not required by <command>aboot</command>, and in fact,
-it may lead to confusion since the <command>swriteboot</command>
-utility used to install <command>aboot</command> in the boot sector
-will complain about a partition overlapping with the boot block.
+OpenBSD, or NetBSD), you should <emphasis>not</emphasis> create the
+third partition as a <quote>whole disk</quote> partition (i.e. with
+start and end sectors to span the whole disk), as this renders the
+disk incompatible with the tools used to make it bootable with aboot.
+This means that the disk configured by the installer for use as the
+Debian boot disk will be inaccessible to the operating systems mentioned
+earlier.
 -->
 
-A meno che non si voglia usare il disco che si sta partizionando con
-il sistema operativo Tru64 Unix o con uno dei sistemi operativi derivati da
-4.4BSD-Lite (FreeBSD, OpenBSD, o NetBSD), è consigliabile che la terza
-partizione <emphasis>non</emphasis> contenga l'intero disco. Ciò non è richiesto
-da <command>aboot</command>, e inoltre potrebbe causare confusione, visto che
-l'utilità <command>swriteboot</command> usata per installare
-<command>aboot</command> sul settore di avvio segnalerà una sovrapposizione
-tra la partizione e il blocco di avvio.
+A meno che non si voglia usare il disco che si sta partizionando con il
+sistema operativo Tru64 Unix o con uno dei sistemi operativi derivati da
+4.4BSD-Lite (FreeBSD, OpenBSD o NetBSD), <emphasis>non</emphasis> si deve
+creare la terza partizione <quote>tutto il disco</quote> (cioè con settori
+di inizio e fine in modo da coprire l'intero disco) dato che questo rende
+il disco incompatibile con gli strumenti usati per rendere il disco
+avviabile con aboot. Questo vuol dire che il disco configurato dal sistema
+d'installazione per essere usato come disco di avvio per Debian sarà
+inaccessibile dai sistemi operativi menzionati in precedenza.
 
 </para><para>
 
@@ -79,7 +81,7 @@ created for <command>aboot</command> for convenience reasons.
 -->
 
 Inoltre, poiché <command>aboot</command> viene scritto sui primi settori
-del disco (al momento occupa circa 70 kilobyte, o 150 settori), si
+del disco (al momento occupa circa 70&nbsp;kilobyte, o 150 settori), si
 <emphasis>deve</emphasis> lasciare abbastanza spazio vuoto all'inizio del
 disco. In passato si suggeriva di creare una piccola partizione all'inizio del
 disco, da lasciare non formattata, ma per lo stesso motivo visto prima, non è
