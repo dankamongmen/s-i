@@ -71,6 +71,7 @@ struct newt_data {
                   scale_cancel,
                   perc_label;
     int           scale_textbox_height;
+    char *        scale_info;
 };
 
 struct newtColors newtAltColorPalette = {
@@ -1137,22 +1138,92 @@ newt_can_cancel_progress(struct frontend *obj)
 }
 
 static void
-newt_progress_start(struct frontend *obj, int min, int max, const char *title)
+newt_make_progress_bar(struct frontend *obj, const char *info)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
-    int width = 80, height = 24, win_width, win_height;
+    int width = 80, height = 24, win_width, win_height, text_height;
     int extra = 0;
+    bool can_cancel_progress;
+    bool changed = false;
 #ifdef HAVE_LIBTEXTWRAP
+    textwrap_t tw;
+    char *wrappedtext;
     int flags = 0;
 #else
     int flags = NEWT_FLAG_WRAP;
 #endif
+
+    can_cancel_progress = obj->methods.can_cancel_progress(obj);
+    if (can_cancel_progress)
+        extra += 2;
+    newtGetScreenSize(&width, &height);
+    win_width = width-7;
+    if (!info)
+        info = data->scale_info;
+    else
+        data->scale_info = strdup(info);
+    if (info)
+        text_height = newt_get_text_height(info, win_width);
+    else
+        text_height = 0;
+    /* Minimal height set to 2 to prevent box flashing */
+    if (text_height < 2)
+        text_height = 2;
+    if (data->scale_form) {
+        if (text_height != data->scale_textbox_height)
+            changed = true;
+        else if (can_cancel_progress && !data->scale_cancel)
+            changed = true;
+        else if (!can_cancel_progress && data->scale_cancel)
+            changed = true;
+        if (changed) {
+            newtFormDestroy(data->scale_form);
+            newtPopWindow();
+        }
+    }
+    if (!data->scale_form || changed) {
+        if (text_height + 3 + extra <= height - 5)
+            win_height = text_height + 3 + extra;
+        else
+            win_height = height - 5;
+        newtCenteredWindow(win_width, win_height, obj->progress_title);
+        data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
+        data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, text_height, flags);
+        data->scale_textbox_height = text_height;
+        data->scale_form = create_form(NULL);
+        newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
+        if (obj->methods.can_cancel_progress(obj)) {
+            data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
+            newtFormAddComponent(data->scale_form, data->scale_cancel);
+        } else
+            data->scale_cancel = NULL;
+        newtFormSetTimer(data->scale_form, 1);
+    }
+    newtScaleSet(data->scale_bar, obj->progress_cur - obj->progress_min);
+    if (info) {
+#ifdef HAVE_LIBTEXTWRAP
+        textwrap_init(&tw);
+        textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
+        wrappedtext = textwrap(&tw, info);
+        newtTextboxSetText(data->scale_textbox, wrappedtext);
+        free(wrappedtext);
+#else
+        newtTextboxSetText(data->scale_textbox, info);
+#endif
+    }
+}
+
+static void
+newt_progress_start(struct frontend *obj, int min, int max, const char *title)
+{
+    struct newt_data *data = (struct newt_data *)obj->data;
 
     DELETE(obj->progress_title);
     obj->progress_title = strdup(title);
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
+    data->scale_info = NULL;
     SLang_init_tty(0, 1, 0); /* disable flow control */
     newtInit();
     newtSetColors(newtAltColorPalette);
@@ -1163,25 +1234,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
             newtDrawRootText(0, 0, text);
         free(text);
     }
-    if (obj->methods.can_cancel_progress(obj))
-        extra += 2;
-    newtGetScreenSize(&width, &height);
-    win_width = width-7;
-    strtruncate(obj->progress_title, win_width-4);
-    win_height = 5+extra;
-    newtCenteredWindow(win_width, win_height, obj->progress_title);
-    data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
-    /*  Minimal height set to 2 to prevent box flashing */
-    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, 2, flags);
-    data->scale_textbox_height = 2;
-    data->scale_form = create_form(NULL);
-    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
-    if (obj->methods.can_cancel_progress(obj)) {
-        data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
-        newtFormAddComponent(data->scale_form, data->scale_cancel);
-    } else
-        data->scale_cancel = NULL;
-    newtFormSetTimer(data->scale_form, 1);
+    newt_make_progress_bar(obj, NULL);
     newtDrawForm(data->scale_form);
     newtRefresh();
 }
@@ -1206,7 +1259,7 @@ newt_progress_set(struct frontend *obj, int val)
 	    sprintf(buf, "%3d%%", (int)perc);
 	    newtLabelSetText(data->perc_label, buf);
 	} */
-	newtScaleSet(data->scale_bar, obj->progress_cur - obj->progress_min);
+	newt_make_progress_bar(obj, NULL);
 	newtFormRun(data->scale_form, &es);
 	if (es.reason == NEWT_EXIT_TIMER || data->scale_cancel == NULL)
 	    ret = DC_OK;
@@ -1230,53 +1283,7 @@ newt_progress_info(struct frontend *obj, const char *info)
     int ret;
 
     if (data->scale_form != NULL) {
-	int width, height, win_width, win_height, text_height;
-	int extra = 0;
-#ifdef HAVE_LIBTEXTWRAP
-	textwrap_t tw;
-	char *wrappedtext;
-	int flags = 0;
-#else
-	int flags = NEWT_FLAG_WRAP;
-#endif
-
-	if (obj->methods.can_cancel_progress(obj))
-	    extra += 2;
-	newtGetScreenSize(&width, &height);
-	win_width = width-7;
-	text_height = newt_get_text_height(info, win_width);
-	if (text_height < 2)
-	    text_height = 2;
-	if (text_height != data->scale_textbox_height) {
-	    newtFormDestroy(data->scale_form);
-	    newtPopWindow();
-	    if (text_height + 3 + extra <= height - 5)
-		win_height = text_height + 3 + extra;
-	    else
-		win_height = height - 5;
-	    newtCenteredWindow(win_width, win_height, obj->progress_title);
-	    data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max);
-	    newtScaleSet(data->scale_bar, obj->progress_cur);
-	    data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, text_height, flags);
-	    data->scale_textbox_height = text_height;
-	    data->scale_form = create_form(NULL);
-	    newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
-	    if (obj->methods.can_cancel_progress(obj)) {
-		data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
-		newtFormAddComponent(data->scale_form, data->scale_cancel);
-	    } else
-		data->scale_cancel = NULL;
-	    newtFormSetTimer(data->scale_form, 1);
-	}
-#ifdef HAVE_LIBTEXTWRAP
-	textwrap_init(&tw);
-	textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
-	wrappedtext = textwrap(&tw, info);
-	newtTextboxSetText(data->scale_textbox, wrappedtext);
-	free(wrappedtext);
-#else
-	newtTextboxSetText(data->scale_textbox, info);
-#endif
+	newt_make_progress_bar(obj, info);
 	newtFormRun(data->scale_form, &es);
 	if (es.reason == NEWT_EXIT_TIMER || data->scale_cancel == NULL)
 	    ret = DC_OK;
@@ -1302,6 +1309,8 @@ newt_progress_stop(struct frontend *obj)
         newtPopWindow();
         newtFinished();
         data->scale_form = data->scale_bar = data->perc_label = data->scale_textbox = data->scale_cancel = NULL;
+        free(data->scale_info);
+        data->scale_info = NULL;
     }
 }
 
