@@ -201,7 +201,7 @@ command_go(struct confmodule *mod, char *arg)
 
     q = mod->questions->methods.get(mod->questions, "debconf/frontend");
     if (q)
-	requested_frontend = question_getvalue(q, "");
+	requested_frontend = question_getvalue(q, "C");
     question_deref(q);
 
     running_frontend = getenv("DEBIAN_FRONTEND");
@@ -258,7 +258,7 @@ command_get(struct confmodule *mod, char *arg)
                 CMDSTATUS_BADQUESTION, argv[0]);
     else 
     {
-        const char *value = question_getvalue(q, NULL);
+        const char *value = question_getvalue(q, "C");
         asprintf(&out, "%u %s",
                 CMDSTATUS_SUCCESS, value ? value : "");
     }

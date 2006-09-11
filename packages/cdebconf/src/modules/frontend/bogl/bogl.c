@@ -8,11 +8,6 @@
 #include <bogl/bogl.h>
 #include <bogl/bowl.h>
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-
 /* Any private variables we may need. */
 struct uidata {
 };
@@ -152,11 +147,11 @@ int bogl_handler_multiselect(struct frontend *ui, struct question *q)
 	memset(selected, ' ', count);
 
 	dcount = 1;
-	for(p = question_get_field(q, NULL, "value"); *p; p++)
+	for(p = question_get_field(q, "C", "value"); *p; p++)
 		if(*p == ',')
 		  	dcount++;
 	defaults = malloc(sizeof(char *) * dcount);
-	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, dcount);
+	dcount = strchoicesplit(question_get_field(q, "C", "value"), defaults, dcount);
 	for(j = 0; j < dcount; j++)
 	{
 		for(i = 0; i < count; i++)
@@ -207,7 +202,7 @@ int bogl_handler_string(struct frontend *ui, struct question *q)
 
 	bowl_flush();
 	drawdesctop(ui, q);
-	bowl_new_input(&s, question_get_field(q, NULL, "value"));
+	bowl_new_input(&s, question_get_field(q, "C", "value"));
 	drawnavbuttons(ui, q);
 	drawdescbot(ui, q);
 	bowl_layout();

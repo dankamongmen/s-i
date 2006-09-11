@@ -230,8 +230,14 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
             {
                 p = t->lget((struct template *) t, lang, *field);
                 if (p != NULL && p != t->lget((struct template *) t, NULL, *field))
-                    fprintf(outf, "%c%s-%s.UTF-8: %s\n",
-                        toupper((*field)[0]), (*field)+1, lang, escapestr(p));
+                {
+                    if (strcmp(lang, "C") == 0)
+                        fprintf(outf, "%c%s-C: %s\n",
+                            toupper((*field)[0]), (*field)+1, escapestr(p));
+                    else
+                        fprintf(outf, "%c%s-%s.UTF-8: %s\n",
+                            toupper((*field)[0]), (*field)+1, lang, escapestr(p));
+                }
             }
             lang = t->next_lang((struct template *) t, lang);
         }

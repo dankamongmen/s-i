@@ -143,8 +143,14 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 		{
 			p = t->lget(t, lang, *field);
 			if (p != NULL && p != t->lget(t, NULL, *field))
-				fprintf(outf, "\t%s-%s.UTF-8 \"%s\";\n",
-						*field, lang, escapestr(p));
+			{
+				if (strcmp(lang, "C") == 0)
+					fprintf(outf, "\t%s-C \"%s\";\n",
+							*field, escapestr(p));
+				else
+					fprintf(outf, "\t%s-%s.UTF-8 \"%s\";\n",
+							*field, lang, escapestr(p));
+			}
 		}
 		lang = t->next_lang(t, lang);
 	}

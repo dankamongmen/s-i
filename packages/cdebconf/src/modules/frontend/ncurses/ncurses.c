@@ -11,11 +11,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-
 #define WIN_QUERY	1
 #define WIN_DESC	2
 #define COLOR_FRAME	1
@@ -380,7 +375,7 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 		defval = choices[0];
 
 	strchoicesplit(q_get_choices(q), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, DIM(defaults));
+	dcount = strchoicesplit(question_get_field(q, "C", "value"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question

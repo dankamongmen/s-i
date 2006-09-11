@@ -58,12 +58,6 @@
 #define COLS		(SLtt_Screen_Cols ? SLtt_Screen_Cols : 80)
 #define UIDATA(obj) 	((struct uidata *)(obj)->data)
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), NULL, "choices")
-#define q_get_indices(q)		question_get_field((q), "", "indices")
-
 /* Private variables */
 struct uidata {
 	struct slwindow qrywin, descwin, progwin;
@@ -374,7 +368,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	if (!yes_text)	yes_text = get_text(ui, "debconf/button-yes", "Yes");
 	if (!no_text)  	no_text = get_text(ui, "debconf/button-no", "No");
 
-	value = question_get_field(q, NULL, "value");
+	value = question_get_field(q, "C", "value");
 
 	ans = (strcmp(value, "true") == 0);
 	pos = (ans ? 2 : 3);
@@ -451,7 +445,7 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 		return DC_NOTOK;
 
 	defaults = malloc(sizeof(char *) * count);
-	dcount = strchoicesplit(question_get_field(q, NULL, "value"), defaults, count);
+	dcount = strchoicesplit(question_get_field(q, "C", "value"), defaults, count);
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults", count, dcount);
 	if (dcount <= 0) return DC_NOTOK;
 	if (count == 1 && !multi)
@@ -598,7 +592,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	int xpos = 0, ypos = win->y + win->border + 4;
 	int cursor;
 
-	STRCPY(value, question_get_field(q, NULL, "value"));
+	STRCPY(value, question_get_field(q, "C", "value"));
 	cursor = strlen(value);
 
 	/* TODO: scrolling */

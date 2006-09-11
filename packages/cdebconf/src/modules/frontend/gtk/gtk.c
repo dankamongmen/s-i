@@ -65,12 +65,6 @@
 
 typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)            question_get_field((q), "", "description")
-#define q_get_choices(q)                question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)           question_get_field((q), NULL, "choices")
-#define q_get_indices(q)                question_get_field((q), "", "indices")
-
 static GCond *button_cond = NULL;
 static GMutex *button_mutex = NULL;
 

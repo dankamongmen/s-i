@@ -112,7 +112,7 @@ struct template *template_new(const char *tag)
 	struct template_l10n_fields *f = NEW(struct template_l10n_fields);
 	struct template *t = NEW(struct template);
 	memset(f, 0, sizeof(struct template_l10n_fields));
-	f->language = strdup("C");
+	f->language = strdup("");
 	memset(t, 0, sizeof(struct template));
 	t->ref = 1;
 	t->tag = STRDUP(tag);
@@ -347,8 +347,8 @@ static const char *template_lget(const struct template *t,
         altlang = strchr(orig_field, '-');
         *altlang = 0;
         altlang++;
-        if (strcmp(altlang, "C") == 0)
-            ret = template_lget(t, NULL, orig_field);
+        if (strcasecmp(altlang, "C") == 0)
+            ret = template_lget(t, "C", orig_field);
         else {
             if (!allow_i18n()) {
                 free(orig_field);
@@ -458,8 +458,8 @@ static void template_lset(struct template *t, const char *lang,
         altlang = strchr(orig_field, '-');
         *altlang = 0;
         altlang++;
-        if (strcmp(altlang, "C") == 0)
-            template_lset(t, NULL, orig_field, value);
+        if (strcasecmp(altlang, "C") == 0)
+            template_lset(t, "C", orig_field, value);
         else {
             if (!allow_i18n()) {
                 free(orig_field);
@@ -630,54 +630,69 @@ struct template *template_load(const char *filename)
 			template_lset(t, NULL, "default", p+9);
 		else if (i18n && strstr(p, "Default-") == p && t != 0)
 		{
-			cp = strcasestr(p, ".UTF-8: ");
-			if (cp != NULL && cp != p+8)
-			{
-				lang = strndup(p+8, (int) (cp - p - 8));
-				template_lset(t, lang, "default", cp+8);
-			}
+			if (strcasestr(p, "Default-C: ") == p)
+				template_lset(t, "C", "default", p+11);
 			else
 			{
+				cp = strcasestr(p, ".UTF-8: ");
+				if (cp != NULL && cp != p+8)
+				{
+					lang = strndup(p+8, (int) (cp - p - 8));
+					template_lset(t, lang, "default", cp+8);
+				}
+				else
+				{
 #ifndef NODEBUG
-				fprintf(stderr, "Unknown localized field:\n%s\n", p);
+					fprintf(stderr, "Unknown localized field:\n%s\n", p);
 #endif
-                                continue;
+					continue;
+				}
 			}
 		}
 		else if (strstr(p, "Choices: ") == p && t != 0)
 			template_lset(t, NULL, "choices", p+9);
 		else if (i18n && strstr(p, "Choices-") == p && t != 0)
 		{
-			cp = strcasestr(p, ".UTF-8: ");
-			if (cp != NULL && cp != p+8)
-			{
-				lang = strndup(p+8, (int) (cp - p - 8));
-				template_lset(t, lang, "choices", cp+8);
-			}
+			if (strcasestr(p, "Choices-C: ") == p)
+				template_lset(t, "C", "choices", p+11);
 			else
 			{
+				cp = strcasestr(p, ".UTF-8: ");
+				if (cp != NULL && cp != p+8)
+				{
+					lang = strndup(p+8, (int) (cp - p - 8));
+					template_lset(t, lang, "choices", cp+8);
+				}
+				else
+				{
 #ifndef NODEBUG
-				fprintf(stderr, "Unknown localized field:\n%s\n", p);
+					fprintf(stderr, "Unknown localized field:\n%s\n", p);
 #endif
-                                continue;
+					continue;
+				}
 			}
 		}
 		else if (strstr(p, "Indices: ") == p && t != 0)
 			template_lset(t, NULL, "indices", p+9);
 		else if (i18n && strstr(p, "Indices-") == p && t != 0)
 		{
-			cp = strcasestr(p, ".UTF-8: ");
-			if (cp != NULL && cp != p+8)
-			{
-				lang = strndup(p+8, (int) (cp - p - 8));
-				template_lset(t, lang, "indices", cp+8);
-			}
+			if (strcasestr(p, "Indices-C: ") == p)
+				template_lset(t, "C", "indices", p+11);
 			else
 			{
+				cp = strcasestr(p, ".UTF-8: ");
+				if (cp != NULL && cp != p+8)
+				{
+					lang = strndup(p+8, (int) (cp - p - 8));
+					template_lset(t, lang, "indices", cp+8);
+				}
+				else
+				{
 #ifndef NODEBUG
-				fprintf(stderr, "Unknown localized field:\n%s\n", p);
+					fprintf(stderr, "Unknown localized field:\n%s\n", p);
 #endif
-                                continue;
+					continue;
+				}
 			}
 		}
 		else if (strstr(p, "Description: ") == p && t != 0)
@@ -709,19 +724,27 @@ struct template *template_load(const char *filename)
 		}
 		else if (i18n && strstr(p, "Description-") == p && t != 0)
 		{
-			cp = strcasestr(p, ".UTF-8: ");
-			if (cp != NULL && cp != p+12)
+			if (strcasestr(p, "Description-C: ") == p)
 			{
-				lang = strndup(p+12, (int) (cp - p - 12));
-				template_lset(t, lang, "description", cp+8);
+				lang = strdup("C");
+				template_lset(t, lang, "description", p+15);
 			}
 			else
 			{
+				cp = strcasestr(p, ".UTF-8: ");
+				if (cp != NULL && cp != p+12)
+				{
+					lang = strndup(p+12, (int) (cp - p - 12));
+					template_lset(t, lang, "description", cp+8);
+				}
+				else
+				{
 #ifndef NODEBUG
-				fprintf(stderr, "Unknown localized field:\n%s\n", p);
+					fprintf(stderr, "Unknown localized field:\n%s\n", p);
 #endif
-				/*  Skip extended description  */
-				lang = NULL;
+					/*  Skip extended description  */
+					lang = NULL;
+				}
 			}
 			extdesc[0] = 0;
 			i = fgetc(fp);
