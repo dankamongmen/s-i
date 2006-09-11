@@ -75,6 +75,10 @@ void question_setvalue(struct question *q, const char *value)
 	}
 }
 
+/* Note that Default-* fields contain *untranslated* choices, so it's usual
+ * to call this with lang="" and then compare the answer with untranslated
+ * choices.
+ */
 const char *question_getvalue(const struct question *q, const char *lang)
 {
 	if (q->value)
