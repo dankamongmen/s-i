@@ -49,6 +49,10 @@
 #include <debian-installer/slist.h>
 #include <gdk/gdkkeysyms.h>
 
+#ifdef GDK_WINDOWING_DIRECTFB
+#include <directfb.h>
+#endif
+
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -1542,6 +1546,9 @@ static int gtk_go(struct frontend *obj)
 
     gdk_threads_enter();
 
+    #ifdef GDK_WINDOWING_DIRECTFB
+    dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
+    #endif
     gtk_rc_reparse_all();
 
     questionbox = gtk_vbox_new(FALSE, 0);
