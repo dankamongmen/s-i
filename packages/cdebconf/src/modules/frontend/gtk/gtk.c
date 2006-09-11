@@ -241,10 +241,8 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
     if (obj->info != NULL) {
         char *text = q_get_description(obj->info);
         if (text) {
-            message = malloc(strlen(text) + 8 );
-            /* TODO */
-            /* setting custom font colours would make GTKDFB 2.0.9 crash */
-            /* this issue has already been fixed in recent GTKDFB verions */
+            message = malloc(strlen(text) + 42 );
+            /* setting font colour makes GTKDFB 2.0.9 crash */
             #if GTK_CHECK_VERSION(2,8,0)
             sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text);
             #else
@@ -256,6 +254,7 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
             pango_layout_get_pixel_size(layout, &w, &h);
             /* obj->info is drawn over the debian banner, top-right corner of the screen */
             gdk_draw_layout(wid->window, gdk_gc_new(wid->window),  WINDOW_WIDTH - w - 4, 4, layout);
+            free(message);
         }
         free(text);
     }
