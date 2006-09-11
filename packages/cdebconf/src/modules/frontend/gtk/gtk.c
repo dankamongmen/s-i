@@ -1790,8 +1790,8 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info); */
 
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
-    progress_bar_label_string = malloc(strlen(info) + 13 );
-    sprintf(progress_bar_label_string,"<i> %s...</i>",info);
+    progress_bar_label_string = malloc(strlen(info) + 10 );
+    sprintf(progress_bar_label_string,"<i> %s</i>",info);
     gtk_label_set_markup(GTK_LABEL(progress_bar_label), progress_bar_label_string);
     free(progress_bar_label_string);
     gdk_threads_leave();

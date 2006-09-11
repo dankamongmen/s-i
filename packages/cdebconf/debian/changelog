@@ -5,10 +5,13 @@ cdebconf (0.106) UNRELEASED; urgency=low
     when FRONTEND_BACKGROUND=dark, to improve text readability.
 
   [ Attilio Fiandrotti ]
-  * Fixed buffer overflow spotted by Aike Reyer <aike@users.sourceforge.net>
-    in the GTK frontend. Closes: #386752
-  * GTK frontend forces DirectFB to reload keymap at every frontend_go() run.
-    Closes: #381979
+  * Fix buffer overflow spotted by Aike Reyer <aike@users.sourceforge.net>
+    in the GTK frontend. Closes: #386752.
+  * GTK frontend: force DirectFB to reload keymap at every frontend_go() run.
+    This will ensure that we have the correct keymap after the user selects
+    one in kbd-chooser. This solution is a workaround until we can implement
+    a reload triggered from kbd-chooser, which would be cleaner.
+    Closes: #381979.
 
   [ Colin Watson ]
   * Refactor newt frontend to have a single common function to build the
@@ -20,7 +23,11 @@ cdebconf (0.106) UNRELEASED; urgency=low
     templates without having to ensure that ${CHOICES-TRANS} is translated
     to the same thing in every language.
 
- -- Attilio Fiandrotti <fiandro@tiscali.it>  Mon, 11 Sep 2006 17:04:46 +0200
+  [ Frans Pop ]
+  * GTK frontend: don't print an extra ellipsis in the progress bar. Thanks
+    to Jens Seidel for spotting this.
+
+ -- Frans Pop <fjp@debian.org>  Tue, 12 Sep 2006 00:09:02 +0200
 
 cdebconf (0.105) unstable; urgency=low
 
