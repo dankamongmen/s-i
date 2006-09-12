@@ -1016,9 +1016,6 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
         gtk_list_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
         if (defval && strcmp(choices[tindex[i]], defval) == 0)
         {
-            /* TODO
-             * gtk_tree_view_scroll_to_cell() is broken in GTKDFB 2.0.9
-             */
             path = gtk_tree_model_get_path(model, &iter);
             gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
             gtk_tree_view_set_cursor        (GTK_TREE_VIEW(view), path, NULL, FALSE);
@@ -1540,9 +1537,15 @@ static int gtk_go(struct frontend *obj)
 
     gdk_threads_enter();
 
+    /* TODO
+     * workarund to force dfb to reload keymap at every run, awaiting
+     * for dfb to support automatic keymap change detection and reloading
+     * (See also bug #381979)
+     */
     #ifdef GDK_WINDOWING_DIRECTFB
     dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
     #endif
+    
     gtk_rc_reparse_all();
 
     questionbox = gtk_vbox_new(FALSE, 0);
