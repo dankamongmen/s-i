@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+. /lib/partman/recipes.sh
+. /lib/partman/crypto_tools.sh
+
+# If there are no recipies that support LVM then don't offer auto-crypto
+recipedir=$(get_recipedir)
+if ! grep -q "\$lvmok" $recipedir/*; then
+	exit 0
+fi
+
+# Also don't offer auto-crypto if there is not enough memory
+crypto_check_mem "false" || exit 0
+
+db_metaget partman-auto-crypto/text/choice description
+printf "crypto\t$RET\n"
