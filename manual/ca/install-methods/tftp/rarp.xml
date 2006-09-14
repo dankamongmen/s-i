@@ -1,14 +1,13 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 39897 -->
 
 
   <sect2 condition="supports-rarp" id="tftp-rarp">
-   <title>Configurant un servidor RARP</title>
+  <title>Configuració d'un servidor RARP</title>
 <para>
 
 Per configurar el RARP, necessitareu la adreça Ethernet (és a dir l'adreça
 MAC) dels clients on instal·lar-se.
-
 Si no sabeu aquesta informació, podeu
 
 <phrase arch="sparc">agafar-la dels missatges d'arrancada de l'OpenPROM,
@@ -17,47 +16,19 @@ utilitzar l'ordre   OpenBoot <userinput>.enet-addr</userinput>, o </phrase>
 arrencar amb el mode de <quote>recuperació</quote> (es a dir des del disquet
 de recuperació) i utilitzar l'ordre <userinput>/sbin/ifconfig eth0</userinput>.
 
-</para><para>
-
-Si utilitzeu el nucli de Linux 2.2.x al servidor RARP, necessitareu omplir
-la taula RARP del nucli. Per fer-ho, executeu les ordres següents:
-
-<informalexample><screen>
-# <userinput>/sbin/rarp -s
-<replaceable>client-hostname</replaceable>
-<replaceable>client-enet-addr</replaceable></userinput>
-
-# <userinput>/usr/sbin/arp -s
-<replaceable>client-ip</replaceable>
-<replaceable>client-enet-addr</replaceable></userinput>
-</screen></informalexample>
-
-Si obteniu:
-
-<informalexample><screen>
-SIOCSRARP: Invalid argument
-</screen></informalexample>
-
-Probablement, necessitareu carregar el mòdul del nucli pel RARP o bé
-recompilar el nucli per que suporti RARP. Executeu
-<userinput>modprobe rarp</userinput> i desprès altra vegada l'ordre
-<command>rarp</command>.
 
 </para><para>
 
-Si utilitzeu un nucli de Linux 2.4.x al servidor RARP, no hi ha cap mòdul
-RARP, i hauríeu d'utilitzar el programa <command>rarpd</command>.  El
-procediment és semblant al utilitzat pel SunOS al paràgraf següent.
-
-</para><para>
-
-Al SunOS, necessitareu estar segurs que l'adreça física del client és
+A un servidor RARP que utilize un nucli de Linux 2.4 o 2.6, o Solaris/SunOS,
+podeu utilitzar l'ordre <command>rarpd</command>.
+Assegureu-vos que l'adreça física Ethernet del client és
 a la base de dades <quote>ethers</quote> (o bé al fitxer
 <filename>/etc/ethers</filename>, o via NIS/NIS+) i a la base de dades
 <quote>hosts</quote>. Necessitareu aleshores engegar el dimoni RARP.
-Al SunOS 4, introduïu (com a root) l'ordre:
-<userinput>/usr/etc/rarpd -a</userinput>; al SunOS 5, utilitzeu
-<userinput>/usr/sbin/rarpd -a</userinput>.
+Executeu (com a root) l'ordre: <userinput>/usr/sbin/rarpd -a</userinput>
+a la majoria dels sistemes Linux i SunOS 5 (Solaris 2),
+<userinput>/usr/sbin/in.rarpd -a</userinput> a altres sistemes Linux o
+bé <userinput>/usr/etc/rarpd -a</userinput> al SunOS 4 (Solaris 1).
 
 </para>
   </sect2>

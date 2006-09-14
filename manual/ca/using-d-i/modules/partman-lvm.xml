@@ -36,26 +36,71 @@ d'encara no haver-ho fet.
 
 </para><para>
 
-La configuració de LVM en l'&d-i; és força simple. Primer heu de
-marcar les particions per a ser utilitzades com a volums físics
-per part de LVM (l'opció s'habilita al <command>partman</command>
-al menú <guimenu>Paràmetres de la partició</guimenu> on hauríeu
-de seleccionar <menuchoice> <guimenu>Utilitza com a:</guimenu>
-<guimenuitem>volum físic per a LVM</guimenuitem> </menuchoice>).
-Seguidament inicieu el mòdul <command>lvmcfg</command> (directament
-a través de <command>partman</command> o a través de l'opció
-del menú principal del &d-i;) i combineu volums físics amb grups
-de volums a través del menú <guimenuitem>Modifica els volums de grups (VG)
-</guimenuitem>. A continuació hauríeu de crear volums lògics sobre
-els grups de volums al menú <guimenuitem>Modifica els volums lògics (LV)
-</guimenuitem>.
+La configuració de LVM al &d-i; es prou senzilla i està completament
+suportada dins del <command>partman</command>. Primer, heu de marcar les
+particions que voleu utilitzar com volums físics per LVM. Açò es fa al
+menú <guimenu>Paràmetres de la partició</guimenu> on seleccionaríeu
+<menuchoice> <guimenu>Utilitza-ho com a:
+</guimenu> <guimenuitem>volum físic per LVM</guimenuitem> </menuchoice>.
 
 </para><para>
 
-Un cop finalitzada l'execució de <command>lvmcfg</command> torneu a
-<command>partman</command>, visualitzareu qualsevol volum lògic creat
-de la mateixa manera que les particions ordinàries (i les haureu
-de gestionar de la mateixa manera).
+Quan torneu a la pantalla principal de <command>partman</command>, voreu una
+opció nova <guimenuitem>Configura el gestor de volums lògics</guimenuitem>.
+Quan ho seleccioneu, primer se us demanarà que confirmeu els canvis pendents
+a la taula de particions (si n'hi ha) i després es mostrarà el menú de
+configuració LVM. Dalt del menú es mostra un resum de la configuració LVM.
+El menú en si mateix és sensible al context i tan sols mostra les accions
+vàlides. Les possibles accions són:
+
+<itemizedlist>
+  <listitem><para>
+    <guimenuitem>Mostra els detalls de la configuració</guimenuitem>:
+    mostra l'estructura del dispositiu LVM, noms i mides dels volums lògics i més
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Crea un grup de volums</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Crea volums lògics</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Suprimeix el grup de volums</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Suprimeix el volum lògic</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Estén grup de volums</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Redueix el grup de volums</guimenuitem>
+  </para></listitem>
+  <listitem><para>
+    <guimenuitem>Finalitza</guimenuitem>:
+    torna a la pantalla principal de <command>partman</command>
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Utilitzeu les opcions d'aquest menú per crear primer un grup de volums i
+desprès crear volums lògics dins d'aquest.
+
+</para>
+<note><para>
+
+Podeu també utilitzar aquest menú per esborrar una configuració LVM existent
+al vostre disc dur abans d'escollir <quote>Particionament guiat amb LVM</quote>.
+El particionament guiat amb LVM no és possible si hi ha grups de volums
+definits, però esborrant-los podeu tenir un inici net.
+
+</para></note>
+<para>
+
+Després de tornar a la pantalla principal de <command>partman</command>,
+qualsevol volum lògic es mostrarà de la mateixa forma que les particions
+normals (i les podreu tractar com a tals).
 
 </para>
    </sect3>

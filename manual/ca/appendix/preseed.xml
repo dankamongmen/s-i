@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39468 -->
+<!-- original version: 39932 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -763,6 +763,8 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # O bé si voleu utilitzar LVM:
 #d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# O bé si voleu més d'un disc amb LVM:
+#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
 # Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).
@@ -957,9 +959,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Com a alternativa, si voleu instal·lar-lo a un lloc diferent de l'MBR,
 # tragueu-ne el comentari i editeu aquestes línies:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Per instal·lar grub a més d'un disc:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
