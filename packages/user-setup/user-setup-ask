@@ -143,6 +143,16 @@ while :; do
 				continue
 			fi
 			
+			if grep -v '^#' /usr/lib/user-setup/reserved-usernames | \
+			   grep -q "^$USER\$"; then
+				db_fset passwd/username seen false
+				db_fset passwd/username-reserved seen false
+				db_subst passwd/username-reserved USERNAME "$USER"
+				db_input critical passwd/username-reserved
+				STATE=3
+				continue
+			fi
+
 			db_get passwd/user-password-crypted || true
 			if ! test "$RET" ; then
 				db_input critical passwd/user-password || true
