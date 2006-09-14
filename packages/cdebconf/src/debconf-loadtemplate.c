@@ -56,13 +56,15 @@ void add_questions_debconf(int argc, char **argv)
 {
     int i;
     struct debconfclient *client;
+    const char *owner;
     client = debconfclient_new ();
-        
-    for (i = optind; i <= argc; i++)
+
+    owner = argv[optind];
+    for (i = optind + 1; i <= argc; i++)
     {
         if (argv[i])
             client->command (client, "X_LOADTEMPLATEFILE", 
-                                         argv[i], NULL);
+                                         argv[i], owner, NULL);
     }
 }
 
