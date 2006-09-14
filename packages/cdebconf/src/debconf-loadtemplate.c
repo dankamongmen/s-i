@@ -66,6 +66,7 @@ void add_questions_debconf(int argc, char **argv)
             client->command (client, "X_LOADTEMPLATEFILE", 
                                          argv[i], owner, NULL);
     }
+    debconf_x_save (client);
 }
 
 int main(int argc, char **argv)
