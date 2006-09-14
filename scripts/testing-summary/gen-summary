@@ -14,6 +14,7 @@ my %pooldirs;
 my %poolfiles;
 my %lastbinfromsource;
 my %inconsistent;
+my %bin_nmu;
 my %frozen;
 my %has_debs;
 my @annotations;
@@ -93,10 +94,18 @@ foreach my $dist (@dists) {
 				# Assume that source packages maintained by d-i team don't
 				# have debs and others do; exceptions in deb-exceptions
 				my ($maintainer)=m/Maintainer: (.*)\n/;
-				if (defined $maintainer && $maintainer!~/debian-boot/) {
+				if (defined $maintainer && $maintainer !~ /debian-boot/) {
 					$has_debs{$source}=1;
 				}
 
+				# Check for binNMUs; correct version to source version
+				if ($version =~ /\+b[1-9]$/) {
+					if (! $bin_nmu{$source}) {
+						$bin_nmu{$source}=1;
+						push @annotations, {arch => $arch, package => $source, annotation => "has binary NMU in $dist" };
+					}
+					$version =~ s/\+b[1-9]$//
+				}
 				if ($dist eq 'testing' && 
 				    exists $packageversions{$source}{$dist}{$arch} &&
 				    $packageversions{$source}{$dist}{$arch} ne $version) {
