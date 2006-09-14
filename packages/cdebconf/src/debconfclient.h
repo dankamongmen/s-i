@@ -173,4 +173,10 @@ typedef enum {
 #define debconf_settitle(_client, _title) \
     _client->commandf(_client, "SETTITLE %s", _title)
 
+#define debconf_x_save(_client) \
+    _client->command(_client, "X_SAVE", NULL)
+
+#define debconf_info(_client, _question) \
+    _client->commandf(_client, "INFO %s", _question)
+
 #endif
