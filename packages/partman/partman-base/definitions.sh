@@ -88,6 +88,12 @@ debconf_select () {
         done
         u=${u#, }
 	restore_ifs
+	# TODO: This can be preseeded without having to use translated
+	# values (which are often inappropriate for preseeding across many
+	# machines due to including e.g. disk capacities) but it's nasty;
+	# you have to use runes like
+	# "20some_device__________/var/lib/partman/devices/=dev=sda". We
+	# could do with an abbreviated syntax.
 	if [ -n "$default" ]; then
 	        db_set $template "$default"
 	fi
