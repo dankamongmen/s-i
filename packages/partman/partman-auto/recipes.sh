@@ -300,6 +300,9 @@ choose_recipe () {
 	decode_recipe $recipe $2
 	if [ $(min_size) -le $free_size ]; then
 	    return 0
+	else
+	    logger -t partman-auto \
+		"Expert recipe too large ($(min_size) > $free_size); skipping"
 	fi
     fi
 
