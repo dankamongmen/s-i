@@ -344,6 +344,8 @@ expand_scheme() {
     # Make factors small numbers so we can multiply on them.
     # Also ensure that fact, max and fs are valid
     # (Ofcourse in valid recipes they must be valid.)
+    # TODO: if factsum ever becomes zero, we'll crash. This happens when the
+    # whole recipe is used up and there's still disk space left to allocate.
     factsum=$(($(factor_sum) - $(min_size)))
     scheme=$(
         foreach_partition '
