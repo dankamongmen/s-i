@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39468 untranslated -->
+<!-- original version: 40460 untranslated -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -458,7 +458,7 @@ There are a few rules to keep in mind when writing a preconfiguration file.
 <listitem><para>
   Most questions need to be preseeded using the values valid in English and
   not the translated values. However, there are some questions (for example
-  in <classname>partman</classname> where the translated values need to be
+  in <classname>partman</classname>) where the translated values need to be
   used.
 </para></listitem>
 <listitem><para>
@@ -739,11 +739,18 @@ correct one will be selected before using preseeding.
 #      select Use the largest continuous free space
 
 # Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format.
-# For example, to use the first disk devfs knows of:
+# be given in either devfs or traditional non-devfs format. If the method
+# supports it, you can specify several disks separated by spaces.
+# For example, to use the first disk:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# Or, if you want to use LVM:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
+# In addition, you'll need to specify the method to use.
+# The presently available methods are: "regular", "lvm" and "crypto"
+d-i partman-auto/method string lvm
+
+# If one of the disks that are going to be automatically partitioned
+# contains an old LVM configuration, the user will normally receive a
+# warning. This can be preseeded away...
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
@@ -928,9 +935,11 @@ d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# To install grub to multiple disks:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
