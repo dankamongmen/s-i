@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39932 -->
+<!-- original version: 40460 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -516,8 +516,8 @@ $ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
 </para><para>
 
 Allerdings wird eine Datei, die auf diese Art erzeugt wurde, einige
-Einträge enthalten, die nicht voreingestellt werden sollten und die
-Beispieldatei sollte für die meisten Benutzer ein besserer Ausgangspunkt
+Einträge enthalten, die besser nicht voreingestellt werden sollten; deshalb
+wird die Beispieldatei für die meisten Benutzer ein besserer Ausgangspunkt
 sein.
 
 </para>
@@ -792,13 +792,18 @@ Voreinstellung nutzen.
 
 # Alternativ können Sie eine Festplatte angeben, die partitioniert werden
 # soll. Der Gerätename kann entweder als devfs-Bezeichnung oder im
-# traditionellen Format angegeben werden. Um z.B. die erste Platte zu
-# nutzen, die devfs kennt:
+# traditionellen Format angegeben werden. Wenn von der Partitionsmethode
+# unterstützt, können Sie mehrere Festplatten angeben, getrennt durch
+# Leerzeichen. Um z.B. die erste Platte zu nutzen:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# Oder wenn Sie LVM benutzen möchten:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
-# Oder LVM mit mehr als einer Festplatte:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+# Zusätzlich müssen Sie angeben, welche Partitionsmethode genutzt werden
+# soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
+d-i partman-auto/method string lvm
+
+# Falls eine der Festplatten, die automatisch partitioniert werden sollen, eine
+# alte LVM-Konfiguration enthält, wird dem Benutzer normalerweise eine Warnung
+# angezeigt. Diese kann aber durch Voreinstellung unterdrückt werden...
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
 # NOTE: this must be preseeded with a localized (translated) value.
