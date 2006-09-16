@@ -2,23 +2,28 @@
 
 set -e
 
+. /usr/share/debconf/confmodule
+
 [ "$DEBIAN_FRONTEND" = "gtk" ] || exit 0
 
-language="$1"
 CONFFILE="/etc/gtk-2.0/gtkrc"
-
-[ -n "$language" ] || exit 1
 [ -f "$CONFFILE" ] || exit 1
+
+if db_get debian-installer/language && [ "$RET" ]; then
+	language="$RET"
+else
+	language=en
+fi
 
 DEFAULT_FONT="DejaVu"
 # Default font size; good for 640x480 or 800x600 screens
-FONT_SIZE=11
+FONT_SIZE=9
 
 # Set the primary GTK font according to language
 case "$language" in
     ar|fa)
 	FONT_NAME="Nazli"
-	FONT_SIZE=14
+	FONT_SIZE=$(($FONT_SIZE + 2))
 	;;
     ja)
 	FONT_NAME="Sazanami Gothic"
@@ -34,12 +39,19 @@ case "$language" in
 	;;
 esac
 
+if db_get debian-installer/theme && [ "$RET" = dark ]; then
+	# Theme for visually impaired; increase fontsize
+	FONT_SIZE=$(($FONT_SIZE + 7))
+fi
+
 # Fall back to default if font does not exist; default is assumed to exist
 if ! fc-list | grep -q "$FONT_NAME"; then
 	FONT_NAME=$DEFAULT_FONT
+	logger -t gtk-set-font "Switching to font '$FONT_NAME' for '$language'"
+else
+	logger -t gtk-set-font "Requested font for '$language' not found; using default"
 fi
 
-cp $CONFFILE $CONFFILE.old
 sed -i "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" $CONFFILE
 
 exit 0
