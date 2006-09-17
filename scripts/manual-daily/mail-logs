@@ -2,12 +2,11 @@
 
 # Note: this script should be run from _outside_ the chroot
 
-ROOT=/srv/d-i_daily
-logdir=$ROOT/log
-mainlog=$logdir/main.log
-builddate=`date +"%d %b %Y"`
+[ -f ~/.di-manual-daily ] || exit 1
+. ~/.di-manual-daily
+
+builddate=$(date +"%d %b %Y")
 logpage="http://people.debian.org/~fjp/d-i_manual/log"
-myaddress="elendil@planet.nl"
 
 [ -e "$logdir" ] && cd $logdir || exit 1
 
@@ -26,12 +25,12 @@ if [ -f $ROOT/do_not_build ] ; then
     echo "Build or upload failed; no mails sent!" >>$mainlog
     add-svnlog
 
-    mutt -s "D-I Manual build failed ($builddate)" $myaddress <$mainlog
+    mutt -s "D-I Manual build failed ($builddate)" $MAIL_FROM <$mainlog
     exit 0
 fi
 
 # Only create mails for languages that were built
-for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -f 2`; do
+for lang in $(egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -f 2); do
     grepexp="^$lang[[:space:]]"
     mailaddress=`egrep "$grepexp" $ROOT/bin/langlist | cut -f 9`
 
@@ -45,10 +44,10 @@ for lang in `egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -
     fi
 
     # Create header file
-    echo "From: Frans Pop <elendil@planet.nl>" >/tmp/header.$$
+    echo "From: $NAME_FROM <$MAIL_FROM>" >/tmp/header.$$
     echo "To: $mailaddress" >>/tmp/header.$$
 #   echo "BCC: fjp@fjphome.nl" >>/tmp/header.$$
-    echo "Reply-To: Frans Pop <elendil@planet.nl>" >>/tmp/header.$$
+    echo "Reply-To: $NAME_FROM <$MAIL_FROM>" >>/tmp/header.$$
     if [ "$BUILD_ERRORS" = "0" ] ; then
         echo "Subject: [D-I Manual] Build log for $lang ($builddate)" >>/tmp/header.$$
     else
@@ -88,7 +87,7 @@ echo "" >>$mainlog
 echo "Build successfull; logmails have been sent!" >>$mainlog
 add-svnlog
 
-mutt -s "D-I Manual build success ($builddate)" $myaddress <$mainlog
+mutt -s "D-I Manual build success ($builddate)" $MAIL_FROM <$mainlog
 
 rm /tmp/*.$$ &>/dev/null
 exit 0

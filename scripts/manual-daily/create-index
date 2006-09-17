@@ -1,8 +1,7 @@
 #!/bin/bash
-ROOT=/srv/d-i_daily
-source=$ROOT/manual
-destination=$ROOT/build
-logdir=$ROOT/log
+
+[ -f ~/.di-manual-daily ] || exit 1
+. ~/.di-manual-daily
 
 mainlog=$logdir/main.log
 pagefile=$destination/index.html
@@ -146,7 +145,8 @@ if [ -f $logdir/tr-stats ] ; then
     
 fi
 
-sed "s/%date%/`date -u`/" $ROOT/bin/index.tail >>$pagefile
+sed "s/%date%/`date -u`/" $ROOT/bin/index.tail | \
+    sed "s/%email%/$MAIL_FROM/g" >>$pagefile
 
 cp $ROOT/bin/translators.html $destination
 chmod 664 $destination/translators.html
