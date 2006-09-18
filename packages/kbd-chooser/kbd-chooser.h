@@ -62,7 +62,7 @@ char *locale_get (void);
 #define PREFERRED_KBD "sun"
 #endif
 
-#if defined(__m68k___)
+#if defined(__m68k__)
 #define PREFERRED_KBD "skip-config"
 #endif
 
