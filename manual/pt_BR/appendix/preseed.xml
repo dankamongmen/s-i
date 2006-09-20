@@ -1,8 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39932 -->
+<!-- original version: 40460 -->
 <!-- translated by Marco Carvalho (macs) 2005.12.30 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.08.06 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.08.23 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.09.12 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.09.19 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -469,7 +469,7 @@ pré-configuração.
 <listitem><para>
   A maioria das questões precisa ser pré-configurada usando os valores válidos
   em inglês e não os valores traduzidos. No entanto, há algumas questões (por
-  exemplo em <classname>partman</classname> onde os valores traduzidos precisam
+  exemplo em <classname>partman</classname>) onde os valores traduzidos precisam
   ser usados.
 </para></listitem>
 <listitem><para>
@@ -753,13 +753,18 @@ o correto será selecionado antes de usar a pré-configuração.
 #      select Use the largest continuous free space
 
 # Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format.
-# For example, to use the first disk devfs knows of:
+# be given in either devfs or traditional non-devfs format. If the method
+# supports it, you can specify several disks separated by spaces.
+# For example, to use the first disk:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# Or, if you want to use LVM:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
-# Or, LVM with more than one disk:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+# In addition, you'll need to specify the method to use.
+# The presently available methods are: "regular", "lvm" and "crypto"
+d-i partman-auto/method string lvm
+
+# If one of the disks that are going to be automatically partitioned
+# contains an old LVM configuration, the user will normally receive a
+# warning. This can be preseeded away...
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
