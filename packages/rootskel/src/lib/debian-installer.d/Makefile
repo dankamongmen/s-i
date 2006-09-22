@@ -17,7 +17,13 @@ endif
 files += \
 	S30term \
 	S60frontend \
+	S65theme \
 	S72menu-exit
+
+ifneq ($(DEB_HOST_ARCH_CPU),sparc)
+  files += \
+	S34framebuffer-linux-sparc
+endif
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
   ifneq ($(DEB_HOST_ARCH_CPU),s390)

@@ -1,0 +1,12 @@
+# Framebuffer is disabled by default on sparc; enable for known good cards
+
+if ! grep -q "\(framebuffer\|fb\)=" /proc/cmdline; then
+	if [ -f /proc/fb ]; then
+		# Weird syntax because direct grep on /proc/fb fails
+		_FB=$(echo "$(< /proc/fb)")
+		if [ $(echo "$_FB" | wc -l) -eq 1 ] && \
+		   echo "$_FB" | grep -q "ATY Mach64"; then
+			debconf-set debian-installer/framebuffer true
+		fi
+	fi
+fi
