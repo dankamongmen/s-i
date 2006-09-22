@@ -25,31 +25,34 @@ NONINTERACTIVE="yes"
 FILE=/preseed.cfg
 
 case "`archdetect`" in
-	arm/nslu2 | armeb/nslu2)
-		check_file /proc/mtd
-		sysconf=$(get_mtdblock "SysConf")
-		if [ -z "$sysconf" ]; then
-			log "Can't find SysConf MTD partition"
-			exit
-		fi
-		parse_sysconf "/dev/$sysconf"
-		# The original NSLU2 uses a different name for the network interface
-		if [ "$INTERFACE" = "ixp0" ]; then
-			INTERFACE=eth0
-		fi
-		# Use DHCP if the original IP from the firmware has never been changed
-		if [ "$IPADDRESS" = "192.168.1.77" ]; then
-			unset NET_CONFIG
-		fi
-		if [ "$NET_CONFIG" != "static" ]; then
-			IPADDRESS=192.168.1.77
-			NETMASK=255.255.255.0
-			GATEWAY=192.168.1.1
-			[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
-			dhcp_fallback $FILE
-		fi
-		if [ "$NONINTERACTIVE" = "yes" ]; then
-			add "$FILE" "ethdetect/use_firewire_ethernet" "boolean" "false"
+	arm/ixp4xx | armeb/ixp4xx | arm/nslu2 | armeb/nslu2)
+		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+		if echo "$machine" | grep -q "^Linksys NSLU2"; then
+			check_file /proc/mtd
+			sysconf=$(get_mtdblock "SysConf")
+			if [ -z "$sysconf" ]; then
+				log "Can't find SysConf MTD partition"
+				exit
+			fi
+			parse_sysconf "/dev/$sysconf"
+			# The original NSLU2 uses a different name for the network interface
+			if [ "$INTERFACE" = "ixp0" ]; then
+				INTERFACE=eth0
+			fi
+			# Use DHCP if the original IP from the firmware has never been changed
+			if [ "$IPADDRESS" = "192.168.1.77" ]; then
+				unset NET_CONFIG
+			fi
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.1.77
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.1.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
+				dhcp_fallback $FILE
+			fi
+			if [ "$NONINTERACTIVE" = "yes" ]; then
+				add "$FILE" "ethdetect/use_firewire_ethernet" "boolean" "false"
+			fi
 		fi
 	;;
 	arm/iop3xx | armeb/iop3xx)
