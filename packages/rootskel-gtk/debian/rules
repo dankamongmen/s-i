@@ -1,8 +1,9 @@
 #!/usr/bin/make -f
 
-DESTDIR=$(CURDIR)/debian/rootskel-gtk/
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+#DESTDIR=$(CURDIR)/debian/rootskel-gtk/
 
-build: build-stamp
+build: build-stamp debian/templates
 build-stamp:
 	dh_testdir
 
@@ -10,12 +11,16 @@ build-stamp:
 
 	touch $@
 
+debian/templates: debian/templates-arch
+	debian/templates-build.pl $(DEB_HOST_ARCH) < $< > $@
+
 clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
 
 	$(MAKE) clean
+	rm -f debian/templates
 
 	dh_clean
 

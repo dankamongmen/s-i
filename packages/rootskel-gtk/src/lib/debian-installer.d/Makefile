@@ -14,7 +14,8 @@ ifeq ($(DEB_HOST_ARCH_OS),)
   DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 endif
 
-files = 
+files = \
+	S62hw-acceleration
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
