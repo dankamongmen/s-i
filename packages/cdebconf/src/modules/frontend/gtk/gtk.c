@@ -49,7 +49,11 @@
 #include <debian-installer/slist.h>
 #include <gdk/gdkkeysyms.h>
 
+#if GTK_CHECK_VERSION(2,10,0)
 #ifdef GDK_WINDOWING_DIRECTFB
+#include <directfb.h>
+#endif
+#else
 #include <directfb.h>
 #endif
 
@@ -1543,10 +1547,15 @@ static int gtk_go(struct frontend *obj)
      * for dfb to support automatic keymap change detection and reloading
      * (See also bug #381979)
      */
+
+    #if GTK_CHECK_VERSION(2,10,0)
     #ifdef GDK_WINDOWING_DIRECTFB
     dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
     #endif
-    
+    #else
+    dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
+    #endif
+
     gtk_rc_reparse_all();
 
     questionbox = gtk_vbox_new(FALSE, 0);
