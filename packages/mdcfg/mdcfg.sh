@@ -492,7 +492,8 @@ depmod -a >/dev/null 2>&1
 modprobe md >/dev/null 2>&1 || modprobe md-mod >/dev/null 2>&1
 modprobe raid0 >/dev/null 2>&1
 modprobe raid1 >/dev/null 2>&1
-modprobe raid5 >/dev/null 2>&1
+# kernels >=2.6.18 have raid456
+modprobe raid456 >/dev/null 2>&1 || modprobe raid5 >/dev/null 2>&1
 
 # Try to detect MD devices, and start them
 # mdadm will fail if /dev/md does not already exist
