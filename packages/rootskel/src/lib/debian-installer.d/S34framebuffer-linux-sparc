@@ -2,8 +2,8 @@
 
 if ! grep -q "\(framebuffer\|fb\)=" /proc/cmdline; then
 	if [ -f /proc/fb ]; then
-		# Weird syntax because direct grep on /proc/fb fails
-		_FB=$(echo "$(< /proc/fb)")
+		# Hack because direct grep on /proc/fb fails (#388815)
+		_FB="$(dd if=/proc/fb bs=1 2>/dev/null)"
 		if [ $(echo "$_FB" | wc -l) -eq 1 ] && \
 		   echo "$_FB" | grep -q "ATY Mach64"; then
 			debconf-set debian-installer/framebuffer true

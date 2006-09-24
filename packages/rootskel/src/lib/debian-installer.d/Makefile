@@ -20,7 +20,7 @@ files += \
 	S65theme \
 	S72menu-exit
 
-ifneq ($(DEB_HOST_ARCH_CPU),sparc)
+ifeq ($(DEB_HOST_ARCH_CPU),sparc)
   files += \
 	S34framebuffer-linux-sparc
 endif
