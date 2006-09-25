@@ -153,20 +153,23 @@ di_parser_info *di_system_packages_status_parser_info (void)
 
 di_slist *di_system_packages_resolve_dependencies_array_permissive (di_packages *packages, di_package **array, di_packages_allocator *allocator)
 {
-  struct di_packages_resolve_dependencies_info info =
+  struct di_packages_resolve_dependencies_do_real_list_append_data data =
   {
-    packages,
+    { NULL, NULL },
     allocator,
+  };
+  struct di_packages_resolve_dependencies_check s =
+  {
     di_packages_resolve_dependencies_check_real,
     di_packages_resolve_dependencies_check_virtual,
     di_packages_resolve_dependencies_check_non_existant_permissive,
     di_packages_resolve_dependencies_do_real_list_append,
     0,
     NULL,
-    NULL,
+    &data,
   };
 
-  return di_packages_resolve_dependencies_array_special (&info, array);
+  return di_packages_resolve_dependencies_array_special (packages, array, &s, allocator);
 }
 
 struct check
@@ -188,7 +191,7 @@ static bool check_real_anna (di_packages_resolve_dependencies_check *r, di_packa
   return di_packages_resolve_dependencies_recurse (r, d->ptr, package);
 }
 
-static di_package_dependency *check_virtual_anna (di_packages_resolve_dependencies_info *info __attribute__ ((unused)), di_package *package __attribute__ ((unused)), di_package_dependency *best, di_package_dependency *d, void *data)
+static di_package_dependency *check_virtual_anna (di_package *package __attribute__ ((unused)), di_package_dependency *best, di_package_dependency *d, void *data)
 {
   struct check *sc = data;
   if (((di_system_package *)d->ptr)->kernel_version &&
@@ -230,10 +233,8 @@ void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, c
     subarchitecture,
     kernel,
   };
-  di_packages_resolve_dependencies_info info =
+  struct di_packages_resolve_dependencies_check s =
   {
-    packages,
-    NULL,
     check_real_anna,
     check_virtual_anna,
     di_packages_resolve_dependencies_check_non_existant_permissive,
@@ -243,6 +244,6 @@ void di_system_packages_resolve_dependencies_mark_anna (di_packages *packages, c
     NULL,
   };
 
-  return di_packages_resolve_dependencies_mark_special (&info);
+  return di_packages_resolve_dependencies_mark_special (packages, &s);
 }
 

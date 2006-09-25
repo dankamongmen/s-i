@@ -270,7 +270,7 @@ void di_package_parser_read_dependency (
   char *cur = value->string, *end = value->string + value->size;
   char *namebegin, *fieldend;
   size_t namelen;
-  di_package_dependency *d;
+  di_package_dependency *d, *d1;
 
   /*
    * basic depends line parser. can ignore versioning
@@ -288,9 +288,27 @@ void di_package_parser_read_dependency (
       q = di_packages_get_package_new (parser_data->packages, parser_data->allocator, namebegin, namelen);
       d->ptr = q;
     }
+    else
+      q = NULL;
 
     d->type = fip->integer;
     di_slist_append_chunk (&p->depends, d, parser_data->allocator->slist_node_mem_chunk);
+
+    if (q && (d->type == di_package_dependency_type_provides || d->type == di_package_dependency_type_enhances))
+    {
+      if (q->type == di_package_type_non_existent)
+        q->type = di_package_type_virtual_package;
+      if (q->type == di_package_type_virtual_package && q->priority < p->priority)
+        q->priority = p->priority;
+
+      d1 = di_package_dependency_alloc (parser_data->allocator);
+      d1->ptr = p;
+      if (d->type == di_package_dependency_type_provides)
+        d1->type = di_package_dependency_type_reverse_provides;
+      else if (d->type == di_package_dependency_type_enhances)
+        d1->type = di_package_dependency_type_reverse_enhances;
+      di_slist_append_chunk (&q->depends, d1, parser_data->allocator->slist_node_mem_chunk);
+    }
 
     fieldend = cur + strcspn (cur, "\n,");
     while (isspace(*++fieldend));

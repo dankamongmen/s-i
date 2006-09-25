@@ -27,8 +27,7 @@
 
 #include <debian-installer/list.h>
 
-typedef struct di_packages_resolve_dependencies_info di_packages_resolve_dependencies_check;
-typedef struct di_packages_resolve_dependencies_info di_packages_resolve_dependencies_info;
+typedef struct di_packages_resolve_dependencies_check di_packages_resolve_dependencies_check;
 
 /**
  * @addtogroup di_packages
@@ -37,14 +36,12 @@ typedef struct di_packages_resolve_dependencies_info di_packages_resolve_depende
 
 di_packages_allocator *internal_di_packages_allocator_alloc (void);
 
-typedef bool di_packages_resolve_dependencies_check_package (di_packages_resolve_dependencies_check *info, di_package *package, di_package_dependency *d);
-typedef di_package_dependency *di_packages_resolve_dependencies_check_provide (di_packages_resolve_dependencies_info *info, di_package *package, di_package_dependency *best, di_package_dependency *d, void *data);
-typedef void di_packages_resolve_dependencies_do_package (di_packages_resolve_dependencies_info *info, di_package *package, void *data);
+typedef bool di_packages_resolve_dependencies_check_package (di_packages_resolve_dependencies_check *r, di_package *package, di_package_dependency *d);
+typedef di_package_dependency *di_packages_resolve_dependencies_check_provide (di_package *package, di_package_dependency *best, di_package_dependency *d, void *data);
+typedef void di_packages_resolve_dependencies_do_package (di_package *package, void *data);
 
-struct di_packages_resolve_dependencies_info
+struct di_packages_resolve_dependencies_check
 {
-  di_packages *packages;
-  di_packages_allocator *allocator;
   di_packages_resolve_dependencies_check_package *check_real;
   di_packages_resolve_dependencies_check_provide *check_virtual;
   di_packages_resolve_dependencies_check_package *check_non_existant;
@@ -54,9 +51,9 @@ struct di_packages_resolve_dependencies_info
   void *do_real_data;
 };
 
-di_slist *di_packages_resolve_dependencies_special (di_packages_resolve_dependencies_info *info, di_slist *list);
-di_slist *di_packages_resolve_dependencies_array_special (di_packages_resolve_dependencies_info *info, di_package **array);
-void di_packages_resolve_dependencies_mark_special (di_packages_resolve_dependencies_info *info);
+di_slist *di_packages_resolve_dependencies_special (di_packages *packages, di_slist *list, di_packages_resolve_dependencies_check *s, di_packages_allocator *allocator);
+di_slist *di_packages_resolve_dependencies_array_special (di_packages *packages, di_package **array, di_packages_resolve_dependencies_check *s, di_packages_allocator *allocator);
+void di_packages_resolve_dependencies_mark_special (di_packages *packages, di_packages_resolve_dependencies_check *s);
 
 void di_packages_resolve_dependencies_marker (di_packages *packages);
 bool di_packages_resolve_dependencies_recurse (di_packages_resolve_dependencies_check *r, di_package *package, di_package *dependend_package);
@@ -73,6 +70,12 @@ di_packages_resolve_dependencies_check_provide
 di_packages_resolve_dependencies_do_package
   di_packages_resolve_dependencies_do_real_list_append,
   di_packages_resolve_dependencies_do_real_mark;
+
+struct di_packages_resolve_dependencies_do_real_list_append_data
+{
+  di_slist list;
+  di_packages_allocator *allocator;
+};
 
 /** @} */
 
