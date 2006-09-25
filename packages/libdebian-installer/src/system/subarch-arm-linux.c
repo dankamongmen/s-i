@@ -38,6 +38,8 @@ static struct map map_hardware[] = {
     { "Gateworks Avila Network Platform", "ixp4xx" },
     { "Gemtek GTWX5715 (Linksys WRV54G)", "ixp4xx" },
     { "Iomega NAS 100d", "ixp4xx" },
+    { "ARM-Versatile AB", "versatile" },
+    { "ARM-Versatile PB", "versatile" },
     { NULL, NULL }
 };
 
