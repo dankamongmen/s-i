@@ -13,8 +13,8 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k -i
-	dh_installdirs -i
+	dh_clean -k
+	dh_installdirs
 
 binary-indep: build install
 
@@ -22,9 +22,16 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
+	dh_installdocs
+	dh_install -p glantank-utils glantank-update-kernel usr/sbin
+	dh_installman glantank-update-kernel.8
 	cp debian/glantank-installer.isinstallable debian/glantank-installer/DEBIAN/isinstallable
+	dh_installchangelogs
+	dh_compress
 	dh_installdeb
+	dh_shlibdeps
 	dh_gencontrol
+	dh_md5sums
 	dh_builddeb
 
 binary: binary-indep binary-arch
