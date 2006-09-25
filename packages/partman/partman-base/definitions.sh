@@ -838,6 +838,8 @@ default_disk_label () {
 		    echo msdos;;
 		nslu2)
 		    echo msdos;;
+		versatile)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
