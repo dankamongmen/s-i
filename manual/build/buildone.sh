@@ -72,11 +72,13 @@ create_profiled () {
     fi
 
     # Join all architecture options into one big variable
-    condition="$kernelpackage;$fdisk;$network;$boot;$smp;$other;$goodies;$unofficial_build;$status;$manual_release"
+    condition="$fdisk;$network;$boot;$smp;$other;$goodies;$unofficial_build;$status;$manual_release"
     # Add language options
     condition="$condition;$optional_paras"
     # Add build options for the manual
     condition="$condition;$unofficial_build;$status;$manual_release;$manual_target"
+    # TODO: Obsoleted, but keep until translations have been updated
+    condition="$condition;common-kpkg"
 
     # Write dynamic non-profilable entities into the file
     echo "<!-- arch- and lang-specific non-profilable entities -->" > $dynamic
