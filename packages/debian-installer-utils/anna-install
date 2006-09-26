@@ -3,7 +3,8 @@
 . /usr/share/debconf/confmodule
 
 if db_get anna/retriever && [ "$RET" ]; then
-	# Install the requested modules immediately.
+	# Install the requested modules immediately
+	logger -t anna-install "Installing $@"
 	exec anna install "$@"
 fi
 
@@ -13,6 +14,7 @@ mkdir -p /var/lib/anna-install
 touch $queue
 for pkg in $@ ; do
 	if ! grep -q "^$pkg$" $queue; then
+		logger -t anna-install "Queueing udeb $pkg for later installation"
 	        echo "$pkg" >> $queue
 	fi
 done
