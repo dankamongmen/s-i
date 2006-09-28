@@ -140,12 +140,10 @@ fi
 
 # remove ${ALL_THESE_VARIABLES} if they do not need to be spell checked
 # remove %s, %c, %d (to get better count of unicode points)
-# ${KBD-ARCHS-L10N} is a particular case which has to be treated as a variable
 if [ ${REMOVE_VARS} = "yes" ] ; then
     NEEDS_RM="${NO_VARS} ${NEEDS_RM}"
     grep -e "^-" ${ALL_STRINGS} | \
-    sed -e s/\$\{[a-zA-Z0-9_]*\}//g \
-	-e "s|\${KBD-ARCHS-L10N}||" > ${NO_VARS}
+    sed -e s/\$\{[a-zA-Z0-9_]*\}//g > ${NO_VARS}
 
     FILE_TO_CHECK=${NO_VARS}
 else

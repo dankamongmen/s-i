@@ -25,9 +25,7 @@ sub checkVars (@)
         my $var1 = getVars($msgid);
 
 	# Exceptions:
-	# - in kbd-chooser KBD-ARCHS should be translated with KBD-ARCHS-L10N
 	# - in tasksel ORIGCHOICES should be translated with CHOICES
-	$var1 =~ s/KBD-ARCHS/KBD-ARCHS-L10N/;
 	$var1 =~ s/ORIGCHOICES/CHOICES/;
 
 	for (@_)
