@@ -24,10 +24,6 @@ sub checkVars (@)
         my $msgid = shift;
         my $var1 = getVars($msgid);
 
-	# Exceptions:
-	# - in tasksel ORIGCHOICES should be translated with CHOICES
-	$var1 =~ s/ORIGCHOICES/CHOICES/;
-
 	for (@_)
         {
                 my $var2 = getVars($_);
