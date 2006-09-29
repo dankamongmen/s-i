@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39932 -->
+<!-- original version: 40460 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -758,13 +758,19 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 #      select Utilitza l'espai lliure continu més gran
 
 # També podeu especificar el disc que es particionarà. El nom del dispositiu
-# es pot indicar bé en el format devfs o bé en el format tradicional.
-# Per exemple, per emprar el primer disc que detecta el devfs:
+# es pot indicar bé en el format devfs o bé en el format tradicional no
+# devfs. Si el mètode ho suporta, podeu especificar diversos discs
+# separats per espais.
+# Per exemple, per emprar el primer disc:
 d-i partman-auto/disk string /dev/discs/disc0/disc
-# O bé si voleu utilitzar LVM:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
-# O bé si voleu més d'un disc amb LVM:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+# Addicionalment, haureu d'especificar el mètode a usar.
+# Els mètodes actualment disponibles són: "regular", "lvm" i "crypto"
+d-i partman-auto/method string lvm
+
+# Si un dels discs que s'ha de particionar automàticament conté una
+# configuració antiga LVM, l'usuari rebra un avís. Això ès pot
+# desactivar amb una configuració prèvia...
+d-i partman-auto/purge_lvm_from_device boolean true
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
 # Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).

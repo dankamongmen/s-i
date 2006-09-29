@@ -1,15 +1,15 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40673 untranslated -->
+<!-- original version: 40673 -->
 
  <sect1 id="mount-encrypted-volumes">
- <title>Mounting encrypted volumes</title>
+ <title>Muntar volums xifrats</title>
 
 <para>
 
-If you created encrypted volumes during the installation and assigned
-them mount points, you will be asked to enter the passphrase for each
-of these volumes during the boot. The actual procedure differs
-slightly between dm-crypt and loop-AES.
+Si heu creat volums xifrats a la instal·lació i els heu assignat
+punts de muntatge, se us preguntarà que introduïu la contrasenya per
+cada volum a l'arrencada. El procediment actual canvia lleugerament entre
+dm-crypt i loop-AES.
 
 </para>
 
@@ -18,53 +18,53 @@ slightly between dm-crypt and loop-AES.
 
 <para>
 
-For partitions encrypted using dm-crypt you will be shown the following
-prompt during the boot:
+A les particions xifrades amb dm-crypt se us mostrarà l'indicador
+següent a l'arrencada:
 
 <informalexample><screen>
-Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
-Enter LUKS passphrase:
+Arrancant els primers discs xifrats... crypt<replaceable>X</replaceable>(s'està començant)
+Introduïu la contrasenya LUKS:
 </screen></informalexample>
 
-In the first line of the prompt, <replaceable>X</replaceable> is the
-number of the loop device. You are now probably wondering
-<emphasis>for which volume</emphasis> you are actually entering the
-passphrase. Does it relate to your <filename>/home</filename>? Or to
-<filename>/var</filename>? Of course, if you have just one encrypted
-volume, this is easy and you can just enter the passphrase you used
-when setting up this volume. If you set up more than one encrypted
-volume during the installation, the notes you wrote down as the last
-step in <xref linkend="partman-crypto"/> come in handy. If you did not
-make a note of the mapping between
-<filename>crypt<replaceable>X</replaceable></filename> and the mount
-points before, you can still find it
-in <filename>/etc/crypttab</filename>
-and <filename>/etc/fstab</filename> of your new system.
+A la primera línia de d'indicador, <replaceable>X</replaceable> és el
+número del dispositiu loop. Us preguntareu probablement
+<emphasis>quin és el volum</emphasis> pel qual esteu introduint ara la
+contrasenya. És la que es refereix al vostre <filename>/home</filename>? O to
+<filename>/var</filename>? Per suposat, si xifreu tan sols un volum,
+és fàcil tan sols donant la paraula de pas que heu utilitzat quan heu
+configurat el volum. Si heu configurat més d'un volum xifrat a la
+instal·lació, us seran útils les notes que heu escrit a l'últim pas de
+<xref linkend="partman-crypto"/>. Si no vàreu fer una nota del mapatge
+dels <filename>crypt<replaceable>X</replaceable></filename> i els punt
+de muntatge abans, encara podeu trobar-ho a
+<filename>/etc/crypttab</filename>
+i a <filename>/etc/fstab</filename> del vostre nou sistema.
 
 </para><para>
 
-The prompt may look somewhat different when an encrypted root file system is
-mounted. This depends on which initramfs generator was used to generate the
-initrd used to boot the system. The example below is for an initrd generated
-using <classname>initramfs-tools</classname>:
+L'indicador es pot mostrar diferent quan està muntat el sistema de fitxers
+arrel xifrat. Açò depen de quin generador de initramfs es va utilitzar per
+generar el initrd utilitzat per arrencar el sistema. L'exemple de baix és
+per un initrd generat amb <classname>initramfs-tools</classname>:
 
 <informalexample><screen>
-Begin: Mounting <emphasis>root file system</emphasis>... ...
-Begin: Running /scripts/local-top ...
-Enter LUKS passphrase:
+Begin: Muntant el <emphasis>sistema de fitxers arrel</emphasis>... ...
+Begin: Executant /scripts/local-top ...
+Introduïu la contrasenya LUKS:
 </screen></informalexample>
 
 </para><para>
 
-No characters (even asterisks) will be shown while entering the passphrase.
-If you enter the wrong passphrase, you have two more tries to correct it.
-After the third try the boot process will skip this volume and continue to
-mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
-for further information.
+No es mostrarà cap caràcter (ni asteriscs) mentre introduïu la contrasenya.
+Si introduïu una contrasenya incorrecta, tindreu dos intents més per
+corregir-ho. Després del tercer intent, el procés d'arrencada obviarà
+aquest volum i continuarà per muntar el pròxim sistema de fitxers. Vegeu
+<xref linkend="crypto-troubleshooting"/> per obtenir més informació.
 
 </para><para>
 
-After entering all passphrases the boot should continue as usual.
+Després d'introduir totes les contrasenyes l'arrencada hauria de continuar
+de forma normal.
 
 </para>
   </sect2>
@@ -74,82 +74,82 @@ After entering all passphrases the boot should continue as usual.
 
 <para>
 
-For partitions encrypted using loop-AES you will be shown the following
-prompt during the boot:
+A les particions xifrades amb loop-AES voreu l'indicador següent a
+l'arrencada:
 
 <informalexample><screen>
-Checking loop-encrypted file systems.
-Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
-Password:
+Comprovant els sistemes de fitxes loop-encrypted.
+Configurant /dev/loop<replaceable>X</replaceable> (/<replaceable>puntdemuntatge</replaceable>)
+Contrasenya:
 </screen></informalexample>
 
 </para><para>
 
-No characters (even asterisks) will be shown while entering the passphrase.
-If you enter the wrong passphrase, you have two more tries to correct it.
-After the third try the boot process will skip this volume and continue to
-mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/>
-for further information.
+No es mostrarà cap caràcter (ni asteriscs) mentre introduïu la contrasenya.
+Si introduïu una contrasenya incorrecta, tindreu dos intents més per
+corregir-ho. Després del tercer intent, el procés d'arrencada obviarà
+aquest volum i continuarà per muntar el pròxim sistema de fitxers. Vegeu
+<xref linkend="crypto-troubleshooting"/> per obtenir més informació.
 
 </para><para>
 
-After entering all passphrases the boot should continue as usual.
+Després d'introduir totes les contrasenyes l'arrencada continuarà de forma
+normal.
 
 </para>
   </sect2>
 
   <sect2 id="crypto-troubleshooting">
-  <title>Troubleshooting</title>
+  <title>Resolució de problemes</title>
 
 <para>
 
-If some of the encrypted volumes could not be mounted because a wrong
-passphrase was entered, you will have to mount them manually after the
-boot. There are several cases.
+Si algun volum xifrat no s'ha pogut muntar degut a que s'ha introduït una
+contrasenya incorrecta, haureu de muntar-los manualment després de
+l'arrencada. Hi ha casos diferents.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
 
-The first case concerns the root partition. When it is not mounted
-correctly, the boot process will halt and you will have to reboot the
-computer to try again.
+El primer cas fa referència a la partició arrel. Quan no es munta
+correctament, el procés d'arrencada s'aturarà i haureu de reiniciar
+l'ordinador per provar altra vegada.
 
 </para></listitem>
 <listitem><para>
 
-The easiest case is for encrypted volumes holding data like
-<filename>/home</filename> or <filename>/srv</filename>. You can
-simply mount them manually after the boot. For loop-AES this is
-one-step operation:
+El cas més senzill és per volums xifrats que contenen dades com és
+<filename>/home</filename> o <filename>/srv</filename>. Podeu simplement
+muntar-lo manualment després de l'arrencada. Per loop-AES aquest és una
+operació d'un pas:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
 <prompt>Password:</prompt>
 </screen></informalexample>
 
-where <replaceable>/mount_point</replaceable> should be replaced by
-the particular directory (e.g. <filename>/home</filename>). The only
-difference from an ordinary mount is that you will be asked to enter
-the passphrase for this volume.
+on <replaceable>/mount_point</replaceable> hauria de reemplaçar-se pel
+directori particular(p.e. <filename>/home</filename>). L'única diferència
+de un punt de muntatge normal és que se us demanarà d'introduir la
+contrasenya per aquest volum.
 
 </para><para>
 
-For dm-crypt this is a bit trickier. First you need to register the
-volumes with <application>device mapper</application> by running:
+Per dm-crypt açò és una mica més difícil. Primer necessitareu registrar
+els volums amb <application>device mapper</application> executant:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
 </screen></informalexample>
 
-This will scan all volumes mentioned
-in <filename>/etc/crypttab</filename> and will create appropriate
-devices under the <filename>/dev</filename> directory after entering
-the correct passphrases. (Already registered volumes will be skipped,
-so you can repeat this command several times without worrying.) After
-successful registration you can simply mount the volumes the usual
-way:
+Açò buscarà a tots els volums anomenats a
+<filename>/etc/crypttab</filename> i crearà els dispositius apropiats al
+directori <filename>/dev</filename> després d'introduir les contrasenyes
+correctes. (Als volums ja registrats no ho farà, així que podeu repetir
+aquesta ordre més vegades sense preocupar-se). Després d'un registre
+correcte podeu muntar els volums de la forma habitual:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
@@ -158,23 +158,24 @@ way:
 </para></listitem>
 <listitem><para>
 
-If any volume holding noncritical system files could not be mounted
-(<filename>/usr</filename> or <filename>/var</filename>), the system
-should still boot and you should be able to mount the volumes manually
-like in the previous case. However, you will also need to (re)start
-any services usually running in your default runlevel because it is
-very likely that they were not started. The easiest way to achieve
-this is by switching to the first runlevel and back by entering
+Si qualsevol volum que continga sistemes de fitxers no crítics no és
+muntat (<filename>/usr</filename> o <filename>/var</filename>), el sistema
+encara podria arrencar i hauríeu de ser capaços de muntar els volums
+manualment com al cas anterior. Però, necessitareu tornar a iniciar alguns
+serveis que s'executen al vostre nivell d'execució per defecte ja que és
+molt probable que no s'haja engegat. La forma més senzilla d'aconseguir-ho
+és canviar al primer nivell d'execució i tornar a entrar amb
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>init 1</userinput>
 </screen></informalexample>
 
-at the shell prompt and pressing <keycombo> <keycap>Control</keycap>
-<keycap>D</keycap> </keycombo> when asked for the root password.
+a l'interpret d'ordres i prement  <keycombo> <keycap>Control</keycap>
+<keycap>D</keycap> </keycombo> quan us demane la contrasenya.
 
 </para></listitem>
 </itemizedlist>
 
   </sect2>
  </sect1>
+
