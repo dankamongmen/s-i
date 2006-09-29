@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39887 -->
+<!-- original version: 40980 -->
 
  <sect1 id="kernel-baking"><title>Compiler un nouveau noyau</title>
 <para>
@@ -58,12 +58,10 @@ de nouvelles choses.
 
 </para><para>
 
-Pour compiler un noyau «&nbsp;façon Debian&nbsp;», vous avez besoin des 
+Pour compiler un noyau <emphasis>façon Debian</emphasis>, vous avez besoin des 
 paquets suivants&nbsp;:
 <classname>fakeroot</classname>, <classname>kernel-package</classname>,
-<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
-(la version la plus récente lors de la rédaction de ce document)</phrase> 
-<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+<classname>linux-source-2.6</classname>
 et quelques autres qui sont probablement déjà installés sur votre machine 
 (pour la liste complète, voyez
 <filename>/usr/share/doc/kernel-package/README.gz</filename>).
@@ -79,13 +77,11 @@ et une sauvegarde du fichier de configuration utilisé pour ce paquet.
 </para><para>
 
 Il faut remarquer qu'il n'est pas <emphasis>obligatoire</emphasis> de 
-compiler votre noyau «&nbsp;façon Debian&nbsp;»; mais vous vous rendrez compte 
+compiler votre noyau façon Debian mais vous vous rendrez compte 
 qu'utiliser le système de gestion des paquets pour
 gérer les noyaux rend leur installation plus simple et plus sûre.
 En fait, vous pouvez simplement télécharger les sources de Linus et non pas
-<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,
-</phrase>
-<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+<classname>linux-source-2.6</classname>,
 tout en utilisant la méthode de compilation <classname>kernel-package</classname>.
 
 </para><para>
@@ -107,13 +103,9 @@ le noyau, mais c'est le plus facile car aucun droit spécial n'est demandé.
 Nous supposerons aussi que la version du noyau est &kernelversion;. Allez 
 dans le répertoire où vous voulez désarchiver 
 les sources et désarchivez-les avec
-<phrase condition="classic-kpkg"><userinput>tar xjf /usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
-<phrase condition="common-kpkg"><userinput>tar xjf
-/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>, 
+<userinput>tar xjf /usr/src/linux-source-&kernelversion;.tar.bz2</userinput>, 
 et déplacez-vous dans le répertoire 
-<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
-<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>
-qui vient d'être créé.
+<filename>linux-source-&kernelversion;</filename> qui vient d'être créé.
 
 </para><para>
 
@@ -146,24 +138,18 @@ Maintenant, compilez votre noyau&nbsp;:
 Bien sûr, le numéro de version «&nbsp;1.0&nbsp;» peut être changé&nbsp;; 
 il s'agit juste d'un moyen de suivre vos différentes
 versions du noyau. De la même façon, vous pouvez remplacer le mot 
-«&nbsp;custom\&nbsp;» par ce que vous voulez (par exemple le nom d'une 
-machine). La compilation d'un noyau peut être assez longue, selon la puissance 
+<quote>custom</quote> par ce que vous voulez (par exemple le nom d'une 
+machine). La compilation d'un noyau peut être plus ou moins longue, selon la puissance 
 de votre machine.
 
 </para><para>
 
 Une fois la compilation terminée, vous pouvez installer votre noyau
 personnalisé comme n'importe quel autre paquet. En étant superutilisateur,
-tapez 
-<phrase condition="classic-kpkg">
+saisissez
 <userinput>dpkg -i
- ../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
-</phrase>
-<phrase condition="common-kpkg">
-<userinput>dpkg -i
-../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
-</phrase>
-La partie <replaceable>subarchitecture</replaceable> est une 
+../linux-image-&kernelversion;-<replaceable>sous-architecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
+La partie <replaceable>sous-architecture</replaceable> est une 
 sous-architecture optionnelle,
 <phrase arch="x86"> telle que <quote>686</quote>, </phrase>
 suivant les options de compilation que vous avez définies.
@@ -175,7 +161,7 @@ fichier <filename>/boot/config-&kernelversion;</filename> sera installé, qui
 contiendra votre configuration noyau.
 Le nouveau paquet est assez évolué pour utiliser automatiquement le programme d'amorçage de
 votre plateforme et mettre à jour l'information sur l'image de noyau utilisée.
-Si vous avez créé un paquet pour les modules, <phrase condition="classic-kpkg">par exemple, avec les services PCMCIA</phrase>, vous devrez installer ce paquet également.
+Si vous avez créé un paquet pour les modules, vous devrez installer ce paquet également.
 
 </para><para>
 
