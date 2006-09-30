@@ -1,26 +1,33 @@
 #!/usr/bin/perl -w
-
+#
 # This script converts and updates revision comments in translations.
 # It will automatically replace revision comments for 'original documents'
 # with revision comments for 'translated documents'.
-# When called with "-u" option, it will also update the revision for the
-# translated document to the revision number in the original document.
 # This script only supports SVN style revision marks.
-
-# Note: only use the "-u" option after you have made sure there are no
-#       changes in content for the listed documents.
-
-# SYNOPSIS:
-#             ./rev-update [-u] [-v] [lang]
 #
-#	(uses $lang set below if lang is not given on commandline)
 
 use Getopt::Std;
 use File::Find;
-$opt_u = $opt_v = 0;
-getopts('uvV');
+$opt_h = $opt_u = $opt_v = 0;
+getopts('huv');
 # You may set this to your default language code
 $lang = shift || "pl";
+
+sub usage
+{
+	printf <<HERE, $lang;
+Usage: $0 [options] [<language>]
+
+  -h        print this help message.
+  -u        update the revision for the translated document to the revision
+	    number in the original document (use only after having made sure
+	    there are no changes in content for the listed documents).
+  -v        be verbose.
+
+  Current <language> is '%s'.
+HERE
+	exit 0;
+}
 
 sub convert
 {
@@ -129,6 +136,9 @@ sub process
 	$plfname =~ s,^en/,$lang/,;
 	checkrev($plfname, $enfname);
 }
+
+usage() if $opt_h;
+
 File::Find::find({ wanted => \&process, no_chdir => 1 }, 'en');
 #checkrev("build/install.$lang.xml", "build/install.en.xml");
 #checkdiff("release-notes.$lang.sgml","release-notes.sgml");

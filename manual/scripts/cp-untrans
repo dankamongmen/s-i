@@ -11,12 +11,18 @@
 
 set -e
 
+language=${1:-pl}
+
 if [ "$1" = "--help" ]; then
-    echo "Usage: $0 language"
+    echo <<HELP
+Usage: $0 [<language>]
+
+  --help    print this help message.
+
+Current <language> is '$language'.
+HELP
     exit 0
 fi
-
-language=${1:-pl}
 
 UFILES="$(./scripts/doc-check $language 2>/dev/null | \
             egrep "^en\/.* \(untranslated\)$" | \
