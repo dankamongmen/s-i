@@ -12,7 +12,7 @@ struct map {
 };
 
 static struct map map_hardware[] = {
-    { "Linksys NSLU2", "nslu2" },
+    { "Linksys NSLU2", "ixp4xx" },
     { NULL, NULL }
 };
 

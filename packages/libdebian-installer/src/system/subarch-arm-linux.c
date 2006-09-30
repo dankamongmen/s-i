@@ -20,7 +20,6 @@ static struct map map_hardware[] = {
     { "Compaq-PersonalServer" , "netwinder" },
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
-    { "Linksys NSLU2", "nslu2" },
     { "Intel EP80219", "iop32x" },
     { "Intel IQ31244", "iop32x" },
     { "Intel IQ80321", "iop32x" },
@@ -38,6 +37,7 @@ static struct map map_hardware[] = {
     { "Gateworks Avila Network Platform", "ixp4xx" },
     { "Gemtek GTWX5715 (Linksys WRV54G)", "ixp4xx" },
     { "Iomega NAS 100d", "ixp4xx" },
+    { "Linksys NSLU2", "ixp4xx" },
     { "ARM-Versatile AB", "versatile" },
     { "ARM-Versatile PB", "versatile" },
     { NULL, NULL }
