@@ -23,7 +23,7 @@ endif
 export CFLAGS
 
 configure:
-	AUTOMAKE=automake-1.9 ACLOCAL=aclocal-1.9 \
+	AUTOMAKE=automake-1.8 ACLOCAL=aclocal-1.8 \
 		autoreconf -i -v
 	@exit 1
 
@@ -52,6 +52,7 @@ endif
 
 clean:
 	dh_testdir
+	dh_testroot
 	rm -f build-stamp
 
 	rm -rf build
@@ -72,9 +73,9 @@ install: build
 	dh_installdirs
 
 	$(MAKE) -C build install DESTDIR=$(CURDIR)/debian/tmp
-	install -D $(CURDIR)/debian/tmp/usr/lib/libdebian-installer.so.5 $(CURDIR)/debian/libdebian-installer5-udeb/lib
-	install -D $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-udeb/lib
-	install -D $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-package.so.0 $(CURDIR)/debian/libdebian-installer-package0-udeb/lib
+
+	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer.so.4 $(CURDIR)/debian/libdebian-installer4-udeb/lib
+	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-udeb/lib
 	dh_install --sourcedir=debian/tmp
 
 binary-indep: build install
@@ -88,14 +89,13 @@ binary-arch: build install
 	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_makeshlibs -plibdebian-installer5 -V \
-		--add-udeb=libdebian-installer5-udeb
+	dh_makeshlibs -plibdebian-installer4 -V \
+		--add-udeb=libdebian-installer4-udeb
 	dh_makeshlibs -plibdebian-installer-extra4 -V \
 		--add-udeb=libdebian-installer-extra4-udeb
-	dh_makeshlibs -plibdebian-installer-package0 -V \
-		--add-udeb=libdebian-installer-package0-udeb
 	dh_installdeb
-	dh_shlibdeps
+	dh_shlibdeps -N libdebian-installer-extra4 -N libdebian-installer-extra4-udeb
+	dh_shlibdeps -p libdebian-installer-extra4 -p libdebian-installer-extra4-udeb -- -L$(CURDIR)/debian/libdebian-installer-extra4.shlibs.local
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

@@ -25,6 +25,41 @@ LIBDI_4.0 {
     di_mem_chunk_destroy;
     di_mem_chunk_new;
     di_mem_chunk_size;
+    di_package_destroy;
+    di_package_parser_fieldinfo;
+    di_package_parser_info;
+    di_package_parser_read_dependency;
+    di_package_parser_read_description;
+    di_package_parser_read_name;
+    di_package_parser_read_priority;
+    di_package_parser_read_status;
+    di_package_parser_write_dependency;
+    di_package_parser_write_description;
+    di_package_parser_write_priority;
+    di_package_parser_write_status;
+    di_package_special_read_file;
+    di_package_version_compare;
+    di_package_version_free;
+    di_package_version_parse;
+    di_packages_alloc;
+    di_packages_allocator_alloc;
+    di_packages_allocator_free;
+    di_packages_append_package;
+    di_packages_free;
+    di_packages_get_package;
+    di_packages_get_package_new;
+    di_packages_minimal_parser_fieldinfo;
+    di_packages_minimal_parser_info;
+    di_packages_parser_fieldinfo;
+    di_packages_parser_info;
+    di_packages_parser_read_name;
+    di_packages_resolve_dependencies;
+    di_packages_resolve_dependencies_array;
+    di_packages_resolve_dependencies_mark;
+    di_packages_special_read_file;
+    di_packages_special_write_file;
+    di_packages_status_parser_fieldinfo;
+    di_packages_status_parser_info;
     di_parser_info_add;
     di_parser_info_alloc;
     di_parser_info_free;
@@ -37,6 +72,7 @@ LIBDI_4.0 {
     di_parser_write_boolean;
     di_parser_write_int;
     di_parser_write_string;
+    di_prebaseconfig_append;
     di_progname_get;
     di_realloc;
     di_rstring_equal;
@@ -52,6 +88,14 @@ LIBDI_4.0 {
     di_system_devfs_map_from;
     di_system_dpkg_package_control_file_exec;
     di_system_init;
+    di_system_package_destroy;
+    di_system_package_parser_fieldinfo;
+    di_system_package_parser_info;
+    di_system_packages_alloc;
+    di_system_packages_allocator_alloc;
+    di_system_packages_parser_info;
+    di_system_packages_status_parser_info;
+    di_system_prebaseconfig_append;
     di_vlog;
   local:
     *;
@@ -63,12 +107,32 @@ LIBDI_4.1 {
     di_exec_prepare_chdir;
     di_log;
     di_slist_destroy;
+    di_system_package_check_subarchitecture;
 } LIBDI_4.0;
+
+LIBDI_4.2 {
+  global:
+    di_package_array_text_from;
+    di_package_priority_text;
+    di_package_status_want_text;
+    di_package_status_text;
+} LIBDI_4.1;
+
+LIBDI_4.2_UNSTABLE {
+  global:
+    di_system_packages_resolve_dependencies_array_permissive;
+    di_system_packages_resolve_dependencies_mark_kernel;
+} LIBDI_4.2;
 
 LIBDI_4.3 {
   global:
     di_exec_env_full;
-} LIBDI_4.1;
+} LIBDI_4.2;
+
+LIBDI_4.3_UNSTABLE {
+  global:
+    di_system_packages_resolve_dependencies_mark_anna;
+} LIBDI_4.2_UNSTABLE;
 
 LIBDI_4.4 {
   global:
@@ -90,4 +154,9 @@ LIBDI_4.6 {
     di_tree_new_full;
     di_tree_size;
 } LIBDI_4.5;
+
+#LIBDI_PRIVATE {
+#  global:
+#    internal_*;
+#} LIBDI_4.1;
 
