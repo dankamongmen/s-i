@@ -34,17 +34,17 @@ md_delete_verify() {
 			# Stop the MD device, and zero the superblock
 			# of all the component devices
       DEVICES=`mdadm -Q --detail /dev/md/${NUMBER} | grep "\(active\|spare\)" | sed -e 's/.* //'`
-			mdadm --stop /dev/md/${NUMBER}
-			echo "Removing /dev/md/$NUMBER" > /var/log/mdcfg.log
-			echo "${DEVICES}" >> /var/log/mdcfg.log
+			logger -t mdcfg "Removing /dev/md/$NUMBER ($DEVICES)"
+			log-output -t mdcfg mdadm --stop /dev/md/${NUMBER} || return 1
 			for DEV in "$DEVICES"; do
-				mdadm --zero-superblock --force ${DEV}
-				echo ${DEV} >> /var/log/mdcfg.log
+				log-output -t mdcfg \
+					mdadm --zero-superblock --force ${DEV} || return 1
 			done
 			;;
 		"false")
 			: ;;
 	esac
+	return 0
 }
 
 md_delete() {
@@ -63,7 +63,11 @@ md_delete() {
 
 	case $RET in
 		md*)
-			md_delete_verify $RET ;;
+			if ! md_delete_verify $RET; then
+				db_input critical mdcfg/deletefailed
+				db_go
+			fi
+			;;
 		*)
 			: ;;
 	esac
@@ -80,7 +84,9 @@ md_createmain() {
 		fi
 		RAID_SEL="$RET"
 		
-		get_partitions
+		if ! get_partitions; then
+			return
+		fi
 
 		case "$RAID_SEL" in
 			"RAID5")
@@ -124,8 +130,9 @@ get_partitions() {
 	if [ -z "${PARTITIONS}" ] ; then
 		db_input critical mdcfg/noparts
 		db_go
-		return
+		return 1
 	fi
+	return 0
 }
 
 prune_partitions() {
@@ -253,6 +260,7 @@ md_create_raid1() {
 	done
 
 	# Add "missing" for as many devices as weren't selected
+	MISSING_DEVICES=""
 	while [ "${SELECTED}" -lt "${DEV_COUNT}" ]; do
 		MISSING_DEVICES="${MISSING_DEVICES} missing"
 		let SELECTED++
