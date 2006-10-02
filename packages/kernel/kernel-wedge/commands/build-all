@@ -1,6 +1,7 @@
 #!/bin/sh
-# This is a wrapper script that I use to build all architectures.
+# This is a wrapper script that can be used to build all architectures.
 #
+# The script builds all architectures listed in kernel-versions.
 # It expects to have the unpacked kernel packages for various arches in
 # ../alpha, etc. modules.dep files have to be put in there too if they are
 # not shipped in the .deb (varies)
@@ -9,52 +10,6 @@
 
 set -e
 
-buildpackage () {
-	dpkg-buildpackage -d -us -uc -rfakeroot -tc \
-		-ICVS -I.svn -I'{arch}' -I.arch-ids $@
-}
-
-# Build source package. Binaries are built below.
-buildpackage -S
-
-# Directory for stubs, added to PATH.
-trap 'rm -rf $tmpdir' EXIT 
-tmpdir=$(tempfile)
-rm $tmpdir
-mkdir $tmpdir
-PATH=$PATH:$tmpdir
-export PATH
-
 for arch in $(cut -d ' ' -f 1 kernel-versions | grep -v ^# | uniq); do
-	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
-		# Generate cross-compiler stub, this is needed to get the
-		# debian build system to cross-build the given arch w/o a
-		# real cross compiler.
-		CC=$tmpdir/$arch-linux-gcc
-		echo "#!/bin/sh" > $CC
-		echo "echo $arch-linux" >> $CC
-		chmod +x $CC
-		# Not only must it be in the path, but CC needs to be
-		# exported as well.
-		export CC
-	else
-		# native build
-		unset CC
-	fi
-	
-	if [ -d ../$arch ]; then
-		export SOURCEDIR=`pwd`/../$arch
-	else
-		unset SOURCEDIR
-	fi
-
-	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ]; then
-		if [ -z "$SOURCEDIR" ]; then
-			echo "** Warning: no SOURCEDIR for arch $arch" >&2
-		fi
-		buildpackage -b -a$arch
-	else
-		# native build
-		buildpackage
-	fi	
+	kernel-wedge build-arch "$arch"
 done
