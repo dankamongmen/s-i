@@ -12,7 +12,7 @@
 #  define ATTRIBUTE_UNUSED
 #endif
 
-int pass(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data ATTRIBUTE_UNUSED)
+static int pass(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data ATTRIBUTE_UNUSED)
 {
 	/* di_exec_* always strips any trailing newline, so we have to add
 	 * one back on; we hope that nothing depends on the subsidiary
@@ -23,7 +23,7 @@ int pass(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data ATTRIBUTE
 	return 0;
 }
 
-int logger(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data)
+static int logger(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data)
 {
 	static int log_open = 0;
 
@@ -40,7 +40,7 @@ int logger(const char *buf, size_t len ATTRIBUTE_UNUSED, void *user_data)
 	return 0;
 }
 
-void usage(FILE *output)
+static void usage(FILE *output)
 {
 	fprintf(output, "Usage: log-output -t TAG [--pass-stdout] PROGRAM [ARGUMENTS]\n");
 }
