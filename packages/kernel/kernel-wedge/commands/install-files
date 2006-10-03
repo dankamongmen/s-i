@@ -39,7 +39,21 @@ while (<KVERS>) {
 		$extraname="$suffix";
 	}
 	
-	if (-e "$sourcedir/boot/vmlinux-$installedname") {
+	my $modlistdir;
+	if (-d "modules/$arch-$flavour") {
+		$modlistdir="modules/$arch-$flavour";
+	}
+	elsif (-d "modules/$flavour") {
+		$modlistdir="modules/$flavour";
+	}
+	else {
+		$modlistdir="modules/$arch";
+	}
+
+	if (! -e "$modlistdir/kernel-image") {
+		# copy no kernel
+	}
+	elsif (-e "$sourcedir/boot/vmlinux-$installedname") {
 		doit("install", "-D", "-m", 644,
 			"$sourcedir/boot/vmlinux-$installedname",
 			"debian/kernel-image-$kernelversion-$flavour-di/boot/vmlinux$extraname");
@@ -60,7 +74,8 @@ while (<KVERS>) {
 	doit("install", "-D", "-m", 644,
 		"$sourcedir/boot/System.map-$installedname",
 		"debian/kernel-image-$kernelversion-$flavour-di/boot/System.map$extraname")
-	      if -e "$sourcedir/boot/System.map-$installedname";
+	      if -e "$sourcedir/boot/System.map-$installedname" &&
+	         -e "$modlistdir/kernel-image";
 
 	# Include extra files to help the d-i build process build kernels
 	# for certain subarchitectures. This is powerpc-specific at the
