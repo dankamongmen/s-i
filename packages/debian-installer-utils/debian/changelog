@@ -1,8 +1,10 @@
 debian-installer-utils (1.36) UNRELEASED; urgency=low
 
   [ Colin Watson ]
-  * log-output: Flush stdout after each write in --pass-stdout mode.
   * log-output: Use static functions where appropriate.
+  * log-output: When using --pass-stdout, pass stdout file descriptor
+    through directly, without the need for a stdout handler function.
+    Without this, long lines on stdout get broken into 1024-byte pieces.
 
   [ Frans Pop ]
   * Log actions by anna-install.
