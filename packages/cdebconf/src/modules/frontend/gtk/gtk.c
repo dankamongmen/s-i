@@ -1109,6 +1109,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
     gtk_tree_selection_set_select_function(selection, (GtkTreeSelectionFunc) select_treeview_callback, data, NULL);
+    g_signal_connect (G_OBJECT(view), "row-activated", G_CALLBACK (select_onRowActivated), (struct frontend_data *) obj->data);
     g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_description_data), data);
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
     model = GTK_TREE_MODEL( store );
