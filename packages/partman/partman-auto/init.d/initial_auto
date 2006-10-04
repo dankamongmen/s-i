@@ -82,6 +82,17 @@ if [ -n "$method" ] && [ -n "$disks" ]; then
 			done
 			exit 1
 			;;
+		raid)
+			# Partition all the disks given ready for
+			# partman-auto-raid
+			for disk in $disks; do
+				id=$(dev_to_partman "$disk") || true
+				if [ -n "$id" ]; then
+					autopartition "$id"
+				fi
+			done
+			exit 0
+			;;
 		*)
 			# Unsupported method
 			exit 1
