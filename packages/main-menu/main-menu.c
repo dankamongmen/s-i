@@ -574,6 +574,12 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	/* Tell udpkg to shut up. */
 	setenv("UDPKG_QUIET", "y", 1);
 
+	/* Make cdebconf honour currently set language */
+	const char *template = "debconf/language";
+	if (debconf_get(debconf, template) == CMD_SUCCESS && 
+	    debconf->value && *debconf->value)
+		debconf_set(debconf, template, debconf->value);
+
 	menu_startup();
 
 	allocator = di_system_packages_allocator_alloc ();
