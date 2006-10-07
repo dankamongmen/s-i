@@ -46,7 +46,7 @@ auto_lvm_prepare() {
 	fi
 
 	# Make sure a boot partition isn't marked as lvmok
-	if echo "$scheme" | grep "lvmok" | grep -q "[[:space:]]/boot[[:boot:]]"; then
+	if echo "$scheme" | grep "lvmok" | grep -q "[[:space:]]/boot[[:space:]]"; then
 		bail_out unusable_recipe
 	fi
 
