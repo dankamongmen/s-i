@@ -2,9 +2,6 @@
 
 # Mostly based on mdcfg
 
-. /usr/share/debconf/confmodule
-
-### Functions ###
 create_raid() {
 	RAID_TYPE="$1"
 	DEV_COUNT="$2"
@@ -23,36 +20,35 @@ create_raid() {
 	DEVICES="$6"
 	SPARE_DEVICES="$7"
 
-	NAMED_SPARES=`echo $SPARE_DEVICES|wc -w`
+	NAMED_SPARES=$(echo $SPARE_DEVICES | wc -w)
 
-	RAID_DEVICES=`echo $DEVICES|sed -e "s/#/ /g"`
+	RAID_DEVICES=$(echo $DEVICES | sed -e "s/#/ /g")
 
-	SPARE_DEVICES=`echo $SPARE_DEVICES|sed -e "s/#/ /g"`
+	SPARE_DEVICES=$(echo $SPARE_DEVICES | sed -e "s/#/ /g")
 
-	MISSING_DEVICES=""
-	MISSING_SPARES=""
 	if [ "$RAID_TYPE" != "0" ]; then
 		# Count them
-		SELECTED=`echo $RAID_DEVICES|wc -w`
+		SELECTED=$(echo $RAID_DEVICES | wc -w)
 
+		MISSING_DEVICES=""
 		# Add "missing" for as many devices as weren't selected
-		while [ "${SELECTED}" -lt "${DEV_COUNT}" ]; do
-			MISSING_DEVICES="${MISSING_DEVICES} missing"
+		while [ "$SELECTED" -lt "$DEV_COUNT" ]; do
+			MISSING_DEVICES="$MISSING_DEVICES missing"
 			let SELECTED++
 		done
 
+		COUNT=$NAMED_SPARES
 		MISSING_SPARES=""
-
-		COUNT=${NAMED_SPARES}
-		while [ "${COUNT}" -lt "${SPARE_COUNT}" ]; do
-			MISSING_SPARES="${MISSING_SPARES} missing"
+		while [ "$COUNT" -lt "$SPARE_COUNT" ]; do
+			MISSING_SPARES="$MISSING_SPARES missing"
 			let COUNT++
 		done
 	fi
 
 	# Find the next available md-number
-	MD_NUM=`grep ^md /proc/mdstat|sed -e 's/^md\(.*\) : active .*/\1/'|sort|tail -n 1`
-	if [ -z "${MD_NUM}" ]; then
+	MD_NUM=$(grep ^md /proc/mdstat | sed -e 's/^md\(.*\) : active .*/\1/' | \
+		sort | tail -n 1)
+	if [ -z "$MD_NUM" ]; then
 		MD_NUM=0
 	else
 		let MD_NUM++
@@ -65,18 +61,18 @@ create_raid() {
 		db_set partman-auto-raid/raidnum $MD_NUM
 	fi
 
-	echo "Raid devices count: ${DEV_COUNT}"
+	echo "Raid devices count: $DEV_COUNT"
 	if [ "$RAID_TYPE" != "0" ]; then
-		echo "Selected spare count: ${NAMED_SPARES}"
-		echo "Spare devices count: ${SPARE_COUNT}"
-		MDADM_PARAMS="-x ${SPARE_COUNT} ${RAID_DEVICES} ${MISSING_DEVICES} ${SPARE_DEVICES} ${MISSING_SPARES}"
+		echo "Selected spare count: $NAMED_SPARES"
+		echo "Spare devices count: $SPARE_COUNT"
+		MDADM_PARAMS="-x $SPARE_COUNT $RAID_DEVICES $MISSING_DEVICES $SPARE_DEVICES $MISSING_SPARES"
 	else 
-		MDADM_PARAMS="${RAID_DEVICES}"
+		MDADM_PARAMS="$RAID_DEVICES"
 	fi
 
-	echo "Commandline:"
-
-	`mdadm --create /dev/md/${MD_NUM} --auto=yes --force -R -l raid${RAID_TYPE} -n ${DEV_COUNT} $MDADM_PARAMS`
+	log-output -t partman-auto-raid \
+		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid$RAID_TYPE \
+		      -n $DEV_COUNT $MDADM_PARAMS`
 }
 
 # Try to load the necesarry modules.
@@ -99,7 +95,7 @@ if [ ! -e /proc/mdstat ]; then
 fi
 
 # Force mdadm to be installed on the target system
-apt-install mdadm
+apt-install mdadm || true
 
 # Check we have recipe(s)
 db_get partman-auto-raid/recipes
@@ -115,8 +111,8 @@ fi
 recipes=$RET
 while [ -n "$recipes" ]; do
 	tmp=$recipes
-	recipes=`echo $tmp|sed -e 's/^[^.]*\.\(.*\)$/\1/'`;
-	recipe=`echo $tmp|sed -e 's/^\([^.]*\)\..*$/\1/'`;
+	recipes=$(echo $tmp | sed -e 's/^[^.]*\.\(.*\)$/\1/');
+	recipe=$(echo $tmp | sed -e 's/^\([^.]*\)\..*$/\1/');
 
 	if [ "$recipe" = "$recipes" ]; then
 		recipes=''

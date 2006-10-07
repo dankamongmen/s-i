@@ -3,7 +3,6 @@
 # Set the filesystems for the newly created preseeded RAID config if we have
 # done one.
 
-. /usr/share/debconf/confmodule
 . /lib/partman/definitions.sh
 
 fix_raid_fs() {
@@ -13,7 +12,7 @@ fix_raid_fs() {
 
 	dev="/var/lib/partman/devices/=dev=md=$raidnum"
 	cd $dev
-	id=`ls -d 0-*`
+	id=$(ls -d 0-*)
 	if [ -z $id ]; then
 		db_set partman-auto-raid/nodir "false"
 		db_input high partman-auto-raid/nodir
@@ -24,7 +23,7 @@ fix_raid_fs() {
 
 	cd $id
 
-	if [ "$fstype" = "swap" ]; then
+	if [ "$fstype" = swap ]; then
 		rm -f filesystem mountpoint use_filesystem options
 		echo "swap" >method
 	else
@@ -79,8 +78,8 @@ recipes=$RET
 # Try to act on each recipe we were given
 while [ -n "$recipes" ]; do
 	tmp=$recipes
-	recipes=`echo $tmp|sed -e 's/^[^.]*\.\(.*\)$/\1/'`;
-	recipe=`echo $tmp|sed -e 's/^\([^.]*\)\..*$/\1/'`;
+	recipes=$(echo $tmp | sed -e 's/^[^.]*\.\(.*\)$/\1/');
+	recipe=$(echo $tmp | sed -e 's/^\([^.]*\)\..*$/\1/');
 
 	if [ "$recipe" = "$recipes" ]; then
 		recipes=''
@@ -93,5 +92,4 @@ while [ -n "$recipes" ]; do
 	fix_raid_fs $raidnum $fstype $mountpoint
 
 	raidnum=$(($raidnum + 1))
-
 done
