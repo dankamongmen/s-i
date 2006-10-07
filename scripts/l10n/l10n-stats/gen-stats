@@ -208,8 +208,8 @@ for dist in testing unstable cvs ; do
 done
 
 # Some output
-echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
-date
+#echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
+#date
 
 ## echo "Working directory is $WD"
 ## echo "Skipping in rank.txt:"
@@ -243,8 +243,8 @@ if [ "$FETCH" ]; then
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			cd $TEMPDIR
   			echo -n "$pkg "
-			rm -rf $WD/material/packages.$dist$LEVEL/$pkg*
-	  		apt-get $APT_OPT -t $dist source $pkg > /dev/null || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
+			rm -rf $WD/material/packages.$dist$LEVEL/$pkg
+	  		apt-get $APT_OPT -t $dist source $pkg >/dev/null  || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
 	  		rm -f *.tar.gz *.dsc *.diff.gz
 			
 #			create_dir $WD/material/packages.$dist$LEVEL/$pkg
@@ -265,7 +265,7 @@ if [ "$FETCH" ]; then
 		if [ -f $WD/config/packages.$dist.commands$LEVEL ] ; then
 			cd $WD/material/packages.$dist$LEVEL/
 			sh $WD/config/packages.$dist.commands$LEVEL
-			cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
+			cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-$dist
 		fi
 		echo ""
 	done
@@ -298,8 +298,8 @@ for dist in testing unstable cvs ; do
 		test -f $WD/material/packages.$dist$LEVEL/$path/*.pot || continue
 		U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
 		
-		# Copy files only for unstable
-		if [ "$dist" = "unstable" ] ; then
+		# Copy files only for cvs repos
+		if [ "$dist" = "cvs" ] ; then
 			cp $WD/material/packages.$dist$LEVEL/$path/*.pot $TARGET_DIR/POT/${path//\//_}.pot
 		fi
 		
