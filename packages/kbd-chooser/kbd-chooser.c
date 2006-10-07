@@ -189,9 +189,9 @@ locale_list_compare (char *langs)
 			*colon = '\0';
 		locale_parse (s, &lang2, &territory2, &modifier2, &charset2);
 		if (!strcmp (lang1, lang2))    {
-			score = 3;
+			score = 2;
 			if (territory1  && territory2 && !strcmp (territory1, territory2))  	{
-				score+=2;
+				score+=3;
 			}
 			// Favour 'generic' locales; ie 'fr' matches 'fr' better
 			// than 'fr_BE' does
