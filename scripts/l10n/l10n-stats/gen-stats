@@ -518,7 +518,7 @@ echo "Final steps:"
 echo -n "  Ranking..."
 # Generate ranking
 for dist in testing unstable cvs; do
-	echo -n " $dist..."
+#	echo -n " $dist..."
 	if [ "$dist" = "cvs" ] ; then
 		ext=""
 	else
@@ -530,20 +530,19 @@ for dist in testing unstable cvs; do
 	$WD/sort-ranktxt < $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
 	rm $TARGET_DIR/.rank$ext.txt$LEVEL
 done
-echo "Done."
+echo ""
 
 # Move files to their destination
 cp $WD/config/HEADER.txt $TARGET_DIR/
 
 
-echo -n "  Moving master files to a downloadable location..."
 if [ $LEVEL = 1 ]; then
+	echo -n "  Moving master files..."
 	mkdir $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*po $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*pot $TARGET_DIR/master
-
+	echo ""
 fi
-echo "Done."
 
 # Cleanup
 echo -n "  Cleanup..."
@@ -563,11 +562,11 @@ chmod -R a+r $TARGET_DIR
 
 rm $RUN_DIR/$LEVEL.lock
 
-echo "Done."
+echo ""
 
 fancy_output
 
-echo -n "Script end: "
-date
+#echo -n "Script end: "
+#date
 
 fancy_output
