@@ -86,6 +86,10 @@ auto_lvm_prepare() {
 
 	create_partitions
 
+	if ! confirm_changes "partman-lvm"; then
+		return 30
+	fi
+
 	# Write the partition tables
 	disable_swap
 	cd $dev
