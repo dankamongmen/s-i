@@ -23,7 +23,8 @@
 
 ############################### Functions ##################################
 fancy_output() {
-	echo "==============================================================================="
+#	echo "==============================================================================="
+	echo -n ""
 }
 
 create_dir() {
@@ -55,6 +56,10 @@ fuzzy() {  #how many fuzzy?
 
 untranslated () {  #guess, what does this do?
   $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}' |sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+}
+
+stats () {  #guess, what does this do?
+  $GETTEXT/msgfmt -o /dev/null --statistics $1 2>&1 | awk -F ", " '{print $1}{print $2}{print $3}' |sed -e 's/\.//g'|sed -e 's/ .*$//g'
 }
 
 translator () { #who is last-translator?
@@ -153,7 +158,7 @@ create_dir $COPY_TO_DIR
 create_dir $RUN_DIR
 create_dir $GRAPHS_DIR/data
 
-PROSPECTIVE="$WD/material/packages.unstable1/debian-installer/packages/po/PROSPECTIVE"
+PROSPECTIVE="$WD/material/packages.cvs1/debian-installer/packages/po/PROSPECTIVE"
 if [ ! -f $PROSPECTIVE ] ; then
   echo No PROSPECTIVE file found
   echo Please run $0 at least once for level 1 with \"fetch\"
@@ -182,7 +187,7 @@ fi
 
 # Do not accept working on a locked copy
 if [ "$LEVEL" = "1" ] ; then
-	LOCKFILE=$WD/material/packages.unstable$LEVEL/debian-installer/.l10n.lock
+	LOCKFILE=$WD/material/packages.cvs$LEVEL/debian-installer/.l10n.lock
 	if [ -f $LOCKFILE ] ; then
 		echo $LOCKFILE file detected.
 		echo $DI_COPY seems to be locked by another l10n process
@@ -198,8 +203,9 @@ cd $WD
 touch "${RUN_DIR}/$LEVEL.lock"
 
 # Create the directories for the material
-create_dir $WD/material/packages.unstable$LEVEL
-create_dir $WD/material/packages.testing$LEVEL
+for dist in testing unstable cvs ; do 
+	create_dir $WD/material/packages.$dist$LEVEL
+done
 
 # Some output
 echo -n "$SCRIPTNAME script start by user $USER, logname $LOGNAME: "
@@ -211,7 +217,7 @@ date
 
 rm -rf $TARGET_DIR/*
 if [ "$FETCH" ]; then
-	for dist in testing unstable ; do
+	for dist in testing unstable cvs ; do
 		for I in `find $WD/material/packages.$dist$LEVEL/ -name "*.po"`; do 
 			rm $I
 		done
@@ -222,7 +228,7 @@ fancy_output
 
 #get sources:
 if [ "$FETCH" ]; then
-	echo "Sources fetched via apt:"
+	echo "Getting sources:"
 	
 	rm -rf $TEMPDIR > /dev/null
 
@@ -231,11 +237,9 @@ if [ "$FETCH" ]; then
 	cd $TEMPDIR
 
 	apt-get $APT_OPT update >/dev/null
-	for dist in testing unstable ; do
+	for dist in testing unstable cvs ; do
 		date -u >> $TARGET_DIR/packages-list-$dist
-		echo "  For $dist:"
-		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
-		echo -n "    "
+		echo -n "  $dist: "
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			cd $TEMPDIR
   			echo -n "$pkg "
@@ -258,48 +262,38 @@ if [ "$FETCH" ]; then
 			fi
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
 		done
+		if [ -f $WD/config/packages.$dist.commands$LEVEL ] ; then
+			cd $WD/material/packages.$dist$LEVEL/
+			sh $WD/config/packages.$dist.commands$LEVEL
+			cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
+		fi
 		echo ""
 	done
-
-	#get files from CVS:
-	echo "Sources fetched from maintainers repositories:"
-	echo "  For unstable:"
-	cd $WD/material/packages.unstable$LEVEL/
-#	cat $WD/config/packages.cvs$LEVEL
-
-	sh $WD/config/packages.cvs.commands$LEVEL
-	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
-	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
-
 	cd $WD
 else
 	echo "no download... (use 'fetch' to force)"
 
-	for dist in unstable testing ; do
+	for dist in unstable testing cvs ; do
 		date -u > $TARGET_DIR/packages-list-$dist
 		echo "From $dist:" >> $TARGET_DIR/packages-list-$dist
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			head -n 1 $WD/material/packages.$dist$LEVEL/$pkg/debian/changelog >> $TARGET_DIR/packages-list-$dist
 		done
 	done
-
-	echo -e "\nFrom CVS/SVN:" >> $TARGET_DIR/packages-list-unstable
-	cat $WD/config/packages.cvs$LEVEL >> $TARGET_DIR/packages-list-unstable
-
+	echo ""
 fi
 
-echo ""
 fancy_output
 
-echo "Computing the number of strings:"
+echo "Number of strings:"
 
-for dist in testing unstable ; do
-	echo "  In $dist:"
+for dist in testing unstable cvs ; do
+	echo -n "  In $dist... "
 	#check how many strings at all
 	eval "TOTAL_$dist=0"
 	LANG=C
 	mkdir -p $TARGET_DIR/POT
-	echo -n "    "
+#	echo -n "    "
 	for path in `cat $WD/config/paths.$dist$LEVEL`; do
 		test -f $WD/material/packages.$dist$LEVEL/$path/*.pot || continue
 		U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
@@ -310,8 +304,9 @@ for dist in testing unstable ; do
 		fi
 		
 #	  	echo "      $path/*.pot:  $U"
-	  	echo -n "${U}+"
+#	  	echo -n "${U}+"
 		TOTALTEMP=`eval "expr \\$TOTAL_$dist + $U"`
+
 		eval "TOTAL_$dist=$TOTALTEMP"
 		
 		if [ `eval "echo \\$TOTAL_$dist"` = "0" -o -z `eval "echo \\$TOTAL_$dist"` ]; then
@@ -321,12 +316,12 @@ for dist in testing unstable ; do
 		fi
 
 		#backup everylanguage-file to check against debconf-updatepo later
-		for lang in `cat $WD/config/languages`; do
-			test -f $WD/material/packages.$dist$LEVEL/$path/$lang.po || continue
-			cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
-		done
+#		for lang in `cat $WD/config/languages`; do
+#			test -f $WD/material/packages.$dist$LEVEL/$path/$lang.po || continue
+#			cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig >/dev/null 2>&1
+#		done
 	done		
-	eval "echo '='\$TOTAL_$dist"
+	eval "echo \$TOTAL_$dist"
 done
 
 fancy_output
@@ -338,10 +333,10 @@ rm -f $TARGET_DIR/.rank.txt$LEVEL
 rm -rf $TEMPDIR
 
 
-for dist in testing unstable ; do
-	echo "Computing languages statistics for $dist:"
+for dist in testing unstable cvs ; do
+	echo "Statistics for $dist:"
 	echo -n "  "
-	if [ "$dist" = "unstable" ] ; then
+	if [ "$dist" = "cvs" ] ; then
 		ext=""
 	else
 		ext=".$dist"
@@ -355,7 +350,7 @@ for dist in testing unstable ; do
 	GR_FUZZY=0
 	GR_UNTRANSLATED=0
 	for lang in `cat $WD/config/languages`; do #run for every language
-		echo -n "$lang"
+		echo -n "$lang "
 		NAME=`cat $LANG_NAMES | grep "$lang:" | cut -f2 -d: || echo $lang`
 		echo -e "Statistics of $SCRIPTNAME packages for$NAME in $dist:\nRead http://people.debian.org/~seppy/d-i/translation-status.html\n\nOutdated:" >>  $TARGET_DIR/$lang$ext.txt
 		MISSING=""
@@ -367,26 +362,26 @@ for dist in testing unstable ; do
 		for path in `cat config/paths.$dist$LEVEL`; do #for every package
 			if [ -e $WD/material/packages.$dist$LEVEL/$path/$lang.po ]; then #if the file does exist
 				LASTT=`translator $WD/material/packages.$dist$LEVEL/$path/$lang.po`
-				
 				$GETTEXT/msgmerge -U $WD/material/packages.$dist$LEVEL/$path/$lang.po $WD/material/packages.$dist$LEVEL/$path/*.pot > /dev/null 2>&1
       				SIGNS="  "	
 				#now check if a file has been modified by debconf-updatepo and output a *
 				#for lang in `cat $WD/languages`; do
 				#	test -f packages/$path/$lang.po || continue
-				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
-				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
-				if [ "$ORIG" != "$NEW" ]; then
-					SIGNS="$SIGNS*"
-				fi
+#				ORIG=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig 2>&1`
+#				NEW=`$GETTEXT/msgfmt --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
+#				if [ "$ORIG" != "$NEW" ]; then
+#					SIGNS="$SIGNS*"
+#				fi
 				
 	
 				#done
-     				$GETTEXT/msgfmt $WD/material/packages.$dist$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
+#     				$GETTEXT/msgfmt $WD/material/packages.$dist$LEVEL/$path/$lang.po > /dev/null 2>&1|| (echo "$SIGNS!$path/$lang.po [$LASTT]" >> $TARGET_DIR/$lang.txt; touch /tmp/.$LEVEL.error; return 1) || continue
 
 				#strings of this package:
-      				U=`untranslated $WD/material/packages.$dist$LEVEL/$path/$lang.po`
-      				F=`fuzzy $WD/material/packages.$dist$LEVEL/$path/$lang.po`
-     				T=`translated $WD/material/packages.$dist$LEVEL/$path/$lang.po`
+				STATS=`LC_ALL=C msgfmt -o /dev/null --statistics $WD/material/packages.$dist$LEVEL/$path/$lang.po 2>&1`
+      				U=`echo $STATS | grep " untranslated" | sed 's/ untranslated.*//g' | awk '{print $(NF)};'`
+      				F=`echo $STATS | grep " fuzzy" | sed 's/ fuzzy.*//g' | awk '{print $(NF)};'`
+      				T=`echo $STATS | grep " translated" | sed 's/ translated.*//g' | awk '{print $(NF)};'`
       				test -z "$U" && U=0
       				test -z "$F" && F=0
       				test -z "$T" && T=0
@@ -419,7 +414,7 @@ for dist in testing unstable ; do
 					cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po"
 				fi
 
-				mv $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig $WD/material/packages.$dist$LEVEL/$path/$lang.po >/dev/null 2>&1
+#				mv $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig $WD/material/packages.$dist$LEVEL/$path/$lang.po >/dev/null 2>&1
     			else #=if not existing
 				MISSING_U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
 				test -z $MISSING_U && MISSING_U=0
@@ -462,7 +457,7 @@ for dist in testing unstable ; do
 		# Data needed by graphs
 		test "$P" = "000" || echo `date +%Y-%m-%d` $P >> $GRAPHS_DIR/data/$lang$GRAPH_FILE
 	
-	  	echo -n "($P%) "
+#	  	echo -n "($P%) "
 		
 	done # for lang...
 	echo ""
@@ -473,7 +468,7 @@ fancy_output
 
 # Special info about the master file, for unstable only
 if [ $LEVEL = 1 ]; then
-	echo "Computing information for the master file..."
+	echo "Master file information..."
 	echo -n "  "
 	for lang in `cat $WD/config/languages`; do #run for every language
 		echo -n "$lang "
@@ -487,11 +482,10 @@ if [ $LEVEL = 1 ]; then
 	fancy_output
 fi
 
-echo "Generating spellcheck information for unstable:"
+echo "Generating spellcheck information for:"
 echo -n "  "
 # Add spellcheck info to the unstable files
 for lang in `cat $WD/config/languages`; do #run for every language
-	echo -n "$lang "
 	if [ "$dist" = "unstable" ] ; then
 		ext=""
 	else
@@ -505,9 +499,9 @@ for lang in `cat $WD/config/languages`; do #run for every language
    %3s codepoints
    %3s level-specific wrong msgstrs
 " $SPELLCHECK >> $TARGET_DIR/$lang.txt
+		echo -n "$lang "
 	else
 		echo "No spellcheck available."  >>$TARGET_DIR/$lang.txt
-		echo -n "(N/A) "
 	fi
   	print_text
 done
@@ -521,11 +515,11 @@ fancy_output
 
 echo "Final steps:"
 
-echo -n "  Computing ranking information..."
+echo -n "  Ranking..."
 # Generate ranking
-for dist in testing unstable ; do
+for dist in testing unstable cvs; do
 	echo -n " $dist..."
-	if [ "$dist" = "unstable" ] ; then
+	if [ "$dist" = "cvs" ] ; then
 		ext=""
 	else
 		ext=".$dist"
@@ -545,7 +539,8 @@ cp $WD/config/HEADER.txt $TARGET_DIR/
 echo -n "  Moving master files to a downloadable location..."
 if [ $LEVEL = 1 ]; then
 	mkdir $TARGET_DIR/master
-	cp $WD/material/packages.unstable1/debian-installer/packages/po/* $TARGET_DIR/master
+	cp $WD/material/packages.cvs1/debian-installer/packages/po/*po $TARGET_DIR/master
+	cp $WD/material/packages.cvs1/debian-installer/packages/po/*pot $TARGET_DIR/master
 
 fi
 echo "Done."

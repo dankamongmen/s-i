@@ -32,6 +32,14 @@ rm -rf *
 wget -q -O - http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ | wget -q --force-html --base=http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ -i -
 rm *gif* *html*
 
+for i in dictionaries-common newt ; do
+	echo -n "$i "
+	apt-get -t unstable source $i >/dev/null
+	rm -f *.tar.gz *.dsc *.diff.gz
+	mv $i* $i
+done
+
+
 cd ../..
 
 
