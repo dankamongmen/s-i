@@ -1,5 +1,3 @@
-#!/bin/sh
-
 . /lib/partman/definitions.sh
 
 # Avoid warnings from lvm2 tools about open file descriptors
