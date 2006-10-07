@@ -699,7 +699,7 @@ humandev () {
 	        type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
 	    fi
 
-	    if [ $type = crypt ]; then
+	    if [ "$type" = crypt ]; then
 	        mapping=${1#/dev/mapper/}
 	        db_metaget partman/text/dmcrypt_volume description
 	        printf "$RET" $mapping
