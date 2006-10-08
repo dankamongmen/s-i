@@ -7,22 +7,22 @@ id=$2
 cd $dev
 
 if [ -f $id/detected_filesystem ]; then
-    fs=$(cat $id/detected_filesystem)
-    case "$fs" in
-	linux-swap|ext2|ext3|fat16|fat32)
-	    true
-	    ;;
-	ntfs)
-	    if ! search-path ntfsresize; then
+	fs=$(cat $id/detected_filesystem)
+	case "$fs" in
+	    linux-swap|ext2|ext3|fat16|fat32)
+		true
+		;;
+	    ntfs)
+		if ! search-path ntfsresize; then
+			exit 0
+		fi
+		;;
+	    *)
 		exit 0
-	    fi
-	    ;;
-	*)
-	    exit 0
-	    ;;
-    esac
+		;;
+	esac
 else
-    exit 0
+	exit 0
 fi
 
 open_dialog PARTITION_INFO $id

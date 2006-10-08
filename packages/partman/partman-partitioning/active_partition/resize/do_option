@@ -10,29 +10,27 @@ cd $dev
 
 check_virtual
 
-if \
-    [ "$virtual" = no -a -f $oldid/detected_filesystem ] \
-    && [ "$(cat $oldid/detected_filesystem)" = ntfs ]
-then
-    get_ntfs_resize_range
+if [ "$virtual" = no -a -f $oldid/detected_filesystem ] && \
+   [ "$(cat $oldid/detected_filesystem)" = ntfs ]; then
+	get_ntfs_resize_range
 else
-    get_resize_range
+	get_resize_range
 fi
 
 if [ -z "$maxsize" ]; then
-    db_input critical partman-partitioning/impossible_resize || true
-    db_go || true
-    exit 1
+	db_input critical partman-partitioning/impossible_resize || true
+	db_go || true
+	exit 1
 fi
 
 human_resize_range
 
 if [ "$virtual" = no ]; then
-    db_set partman-partitioning/confirm_resize 'false'
-    db_input critical partman-partitioning/confirm_resize || true
-    db_go || exit 0
-    db_get partman-partitioning/confirm_resize
-    [ "$RET" = 'true' ] || exit 0
+	db_set partman-partitioning/confirm_resize 'false'
+	db_input critical partman-partitioning/confirm_resize || true
+	db_go || exit 0
+	db_get partman-partitioning/confirm_resize
+	[ "$RET" = 'true' ] || exit 0
 fi
 
 ask_for_size

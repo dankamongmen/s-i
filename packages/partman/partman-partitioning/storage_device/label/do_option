@@ -11,8 +11,8 @@ db_input critical partman/confirm_new_label
 db_go || exit 0
 db_get partman/confirm_new_label
 if [ "$RET" = false ]; then
-    db_reset partman/confirm_new_label
-    exit 1
+	db_reset partman/confirm_new_label
+	exit 1
 fi
 db_reset partman/confirm_new_label
 
@@ -46,29 +46,29 @@ db_get partman-partitioning/choose_label
 chosen_type="$RET"
 
 if [ "$chosen_type" = sun ]; then
-    db_input critical partman/confirm_write_new_label
-    db_go || exit 0
-    db_get partman/confirm_write_new_label
-    if [ "$RET" = false ]; then
-        db_reset partman/confirm_write_new_label
-	exit 1
-    fi
-    db_reset partman/confirm_write_new_label
+	db_input critical partman/confirm_write_new_label
+	db_go || exit 0
+	db_get partman/confirm_write_new_label
+	if [ "$RET" = false ]; then
+		db_reset partman/confirm_write_new_label
+		exit 1
+	fi
+	db_reset partman/confirm_write_new_label
 fi
 
 open_dialog NEW_LABEL "$chosen_type"
 close_dialog
 
 if [ "$chosen_type" = sun ]; then
-    # write the partition table to the disk
-    disable_swap
-    open_dialog COMMIT
-    close_dialog
-    sync
-    # reread it from there
-    open_dialog UNDO
-    close_dialog
-    enable_swap
+	# write the partition table to the disk
+	disable_swap
+	open_dialog COMMIT
+	close_dialog
+	sync
+	# reread it from there
+	open_dialog UNDO
+	close_dialog
+	enable_swap
 fi
 
 # Different types partition tables support different visuals.  Some
@@ -80,16 +80,16 @@ rm -f visuals
 partitions=''
 open_dialog PARTITIONS
 while { read_line num id size type fs path name; [ "$id" ]; }; do
-    partitions="$partitions $id"
+	partitions="$partitions $id"
 done
 close_dialog
 
 for id in $partitions; do
-    update_partition $dev $id
+	update_partition $dev $id
 done
 
 if [ "$chosen_type" = sun ]; then
-    backupdir=../../backup/`basename $dev`
-    rm -rf "$backupdir"
-    cp -a . "$backupdir"
+	backupdir=../../backup/`basename $dev`
+	rm -rf "$backupdir"
+	cp -a . "$backupdir"
 fi

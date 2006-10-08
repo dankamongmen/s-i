@@ -10,9 +10,9 @@ cd $dev
 valid_boot=no
 open_dialog VALID_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
-    if [ "$flag" = boot ]; then
-	valid_boot=yes
-    fi
+	if [ "$flag" = boot ]; then
+		valid_boot=yes
+	fi
 done
 close_dialog
 
@@ -21,9 +21,9 @@ close_dialog
 bootable=no
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
-    if [ "$flag" = boot ]; then
-	bootable=yes
-    fi
+	if [ "$flag" = boot ]; then
+		bootable=yes
+	fi
 done
 close_dialog
 
@@ -31,9 +31,9 @@ db_metaget partman-partitioning/text/bootable description
 description=$(stralign -25 "$RET")
 
 if [ $bootable = yes ]; then
-    db_metaget partman-partitioning/text/on description
-    printf "unbootable\t%s%s\n" "$description" "${RET}"
+	db_metaget partman-partitioning/text/on description
+	printf "unbootable\t%s%s\n" "$description" "${RET}"
 else
-    db_metaget partman-partitioning/text/off description
-    printf "bootable\t%s%s\n" "$description" "${RET}"
+	db_metaget partman-partitioning/text/off description
+	printf "bootable\t%s%s\n" "$description" "${RET}"
 fi

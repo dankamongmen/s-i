@@ -26,8 +26,8 @@ log "New flags:" $RET
 open_dialog SET_FLAGS $id
 IFS=','
 for flag in $RET; do
-    restore_ifs
-    write_line $flag
+	restore_ifs
+	write_line $flag
 done
 write_line NO_MORE
 restore_ifs
@@ -36,11 +36,11 @@ close_dialog
 partitions=''
 open_dialog PARTITIONS
 while { read_line num id size type fs path name; [ "$id" ]; }; do
-    [ "$fs" != free ] || continue
-    partitions="$partitions $id"
+	[ "$fs" != free ] || continue
+	partitions="$partitions $id"
 done
 close_dialog
 
 for id in $partitions; do
-    update_partition $dev $id
+	update_partition $dev $id
 done
