@@ -5,6 +5,8 @@ set -e
 [ -r ./po_functions ] || exit 1
 . ./po_functions
 
+manual_release=${manual_release:=etch}
+
 if [ -z "$languages" ]; then
     # Buildlist of languages to be included on the official website
     # Based on list of languages used in official builds

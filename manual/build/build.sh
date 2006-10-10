@@ -5,6 +5,8 @@ set -e
 [ -r ./po_functions ] || exit 1
 . ./po_functions
 
+manual_release=${manual_release:=etch}
+
 if [ -z "$languages" ]; then
     # Buildlist of languages
     # Note: this list is no longer being maintained; see debian/langlist instead
