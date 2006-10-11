@@ -37,15 +37,11 @@ fix_raid_fs() {
 	update_partition $dev $id
 }
 
-# Only run if we have previously done the initial_auto_raid stuff
-# and only run once
-if [ ! -f /var/lib/partman/initial_auto_raid ] || \
-   [ -f /var/lib/partman/initial_auto_raid_fs ]; then
+# Only run if we have succesfully done the initial_auto_raid stuff
+if [ ! -f /var/lib/partman/do_initial_auto_raid_fs ]; then
 	exit 0
 fi
-
-[ -d /var/lib/partman ] || mkdir /var/lib/partman
-touch /var/lib/partman/initial_auto_raid_fs
+rm /var/lib/partman/do_initial_auto_raid_fs
 
 # Check we have the stashed value of the first RAID dev we created
 db_get partman-auto-raid/raidnum
