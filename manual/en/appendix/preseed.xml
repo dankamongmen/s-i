@@ -738,8 +738,8 @@ correct one will be selected before using preseeding.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
-# Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format.
+# Alternatively, you can specify a disk to partition. The device name
+# can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # In addition, you'll need to specify the method to use.
@@ -789,6 +789,84 @@ d-i partman-auto/choose_recipe \
 #              .
 
 # This makes partman automatically partition without confirmation.
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-partman-raid">
+  <title>Partitioning using RAID</title>
+<para>
+
+You can also use preseeding to set up partitions on software RAID arrays.
+Supported are RAID levels 0, 1 and 5, creating degraded arrays and
+specifying spare devices.
+If you are using RAID 1, you can preseed grub to install to all devices
+used in the array; see <xref linkend="preseed-bootloader"/>.
+
+</para>
+
+<warning><para>
+
+This type of automated partitioning is easy to get wrong. It is also a
+very new component that may still have some bugs or missing error
+handling. The responsibility to get the various recipes right (so they
+make sense and don't conflict) lies with the user.
+Check <filename>/var/log/syslog</filename> if you run into problems.
+
+</para><para>
+
+Note that only RAID 0 and RAID 1 have been tested by the developers of the
+component. RAID 5 is untested. Advanced RAID setup with degraded arrays or
+spare devices has only been tested lightly.
+
+</para></warning>
+
+<informalexample><screen>
+# NOTE: this option is of beta release quality and should be used carefully
+
+# The method should be set to "raid".
+#d-i partman-auto/method string raid
+# Specify the disks to be partitioned. They will all get the same layout,
+# so this will only work if the disks are the same size.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# Next you need to specify the physical partitions that will be used. 
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Last you need to specify how the previously defined partitions will be
+# used in the RAID setup. Remember to use the correct partition numbers
+# for logical partitions.
+# Parameters are:
+# <raidtype> <devcount> <sparecount> <fstype> <mountpoint> \
+#          <devices> <sparedevices>
+# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# This makes partman automatically partition without confirmation.
+d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
        select Finish partitioning and write changes to disk
