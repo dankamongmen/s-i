@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /usr/share/debconf/confmodule
+
 # Mostly based on mdcfg
 
 create_raid() {
@@ -9,7 +11,7 @@ create_raid() {
 	if [ "$DEV_COUNT" -lt 3 ] && [ $RAID_TYPE = "5" ] ; then
 		db_input critical partman-auto-raid/notenoughparts
 		db_go partman-auto-raid/notenoughparts
-		return
+		exit 1
 	fi
 
 	SPARE_COUNT="$3"
@@ -72,7 +74,7 @@ create_raid() {
 
 	log-output -t partman-auto-raid \
 		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid$RAID_TYPE \
-		      -n $DEV_COUNT $MDADM_PARAMS`
+		      -n $DEV_COUNT $MDADM_PARAMS
 }
 
 # Try to load the necesarry modules.
@@ -90,19 +92,19 @@ if [ ! -e /proc/mdstat ]; then
 	db_set partman-auto-raid/nomd false
 	db_input critical partman-auto-raid/nomd
 	db_go
-	exit 0
+	exit 1
 fi
 
 # Force mdadm to be installed on the target system
 apt-install mdadm || true
 
 # Check we have recipe(s)
-db_get partman-auto-raid/recipes
+db_get partman-auto-raid/recipe
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipes false
-	db_input high partman-auto-raid/norecipes
+	db_set partman-auto-raid/norecipe false
+	db_input high partman-auto-raid/norecipe
 	db_go
-	exit 0
+	exit 1
 fi
 
 # Try to act on each recipe we were given

@@ -33,7 +33,7 @@ fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto_raid
 
-confirm_changes || exit 0
+confirm_changes "partman-md" || exit 1
 
 # Commit the changes
 for s in /lib/partman/commit.d/*; do
@@ -46,13 +46,13 @@ for s in /lib/partman/commit.d/*; do
 		    $s || exit 255
 		fi
 	    done
-	    exit 0
+	    exit 1
 	}
     fi
 done
 
 stop_parted_server
 
-auto-raidcfg
+auto-raidcfg || exit 1
 
 restart_partman

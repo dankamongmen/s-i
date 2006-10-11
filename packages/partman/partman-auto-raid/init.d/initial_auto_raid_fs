@@ -16,7 +16,7 @@ fix_raid_fs() {
 		db_set partman-auto-raid/nodir false
 		db_input high partman-auto-raid/nodir
 		db_go
-		exit 0
+		exit 1
 	fi
 
 	cd $id
@@ -53,18 +53,18 @@ if [ -z "$RET" ]; then
 	db_set partman-auto-raid/noraidnum false
 	db_input high partman-auto-raid/noraidnum
 	db_go
-	exit 0
+	exit 1
 fi
 
 raidnum=$RET
 
 # Check we have recipe(s)
-db_get partman-auto-raid/recipes
+db_get partman-auto-raid/recipe
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipes false
-	db_input high partman-auto-raid/norecipes
+	db_set partman-auto-raid/norecipe false
+	db_input high partman-auto-raid/norecipe
 	db_go
-	exit 0
+	exit 1
 fi
 
 recipes=$RET
