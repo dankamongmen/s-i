@@ -38,11 +38,9 @@ fix_raid_fs() {
 }
 
 # Only run if we have previously done the initial_auto_raid stuff
-if [ ! -f /var/lib/partman/initial_auto_raid ]; then
-	exit 0
-fi
-# Only run once
-if [ -f /var/lib/partman/initial_auto_raid_fs ]; then
+# and only run once
+if [ ! -f /var/lib/partman/initial_auto_raid ] || \
+   [ -f /var/lib/partman/initial_auto_raid_fs ]; then
 	exit 0
 fi
 

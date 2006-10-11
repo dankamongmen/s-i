@@ -23,37 +23,36 @@ dev_to_partman () {
 	done
 }
 
-# Only run the first time.
-if [ -f /var/lib/partman/initial_auto_raid ]; then
+# See if we are supposed to run and only run once
+db_get partman-auto/method
+if [ "$RET" != raid ] || \
+   [ -f /var/lib/partman/initial_auto_raid ]; then
 	exit 0
 fi
+
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto_raid
 
-# See if we are supposed to try to 
-db_get partman-auto/method
-if [ "$RET" = raid ]; then
-	confirm_changes || exit 0
+confirm_changes || exit 0
 
-	# Commit the changes
-	for s in /lib/partman/commit.d/*; do
-	    if [ -x $s ]; then
-		$s || {
-		    db_input high partman/text/commit_failed || true
-		    db_go || true
-		    for s in /lib/partman/init.d/*; do
-			if [ -x $s ]; then
-			    $s || exit 255
-			fi
-		    done
-		    exit 0
-		}
-	    fi
-	done
+# Commit the changes
+for s in /lib/partman/commit.d/*; do
+    if [ -x $s ]; then
+	$s || {
+	    db_input high partman/text/commit_failed || true
+	    db_go || true
+	    for s in /lib/partman/init.d/*; do
+		if [ -x $s ]; then
+		    $s || exit 255
+		fi
+	    done
+	    exit 0
+	}
+    fi
+done
 
-	stop_parted_server
+stop_parted_server
 
-	auto-raidcfg
+auto-raidcfg
 
-	restart_partman
-fi
+restart_partman
