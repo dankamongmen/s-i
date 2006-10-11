@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Set the filesystems for the newly created preseeded RAID config if we have
-# done one.
+# Set the filesystems for the newly created preseeded RAID config
 
 . /lib/partman/definitions.sh
 
@@ -14,10 +13,9 @@ fix_raid_fs() {
 	cd $dev
 	id=$(ls -d 0-*)
 	if [ -z $id ]; then
-		db_set partman-auto-raid/nodir "false"
+		db_set partman-auto-raid/nodir false
 		db_input high partman-auto-raid/nodir
 		db_go
-		db_stop
 		exit 0
 	fi
 
@@ -54,10 +52,9 @@ touch /var/lib/partman/initial_auto_raid_fs
 # Check we have the stashed value of the first RAID dev we created
 db_get partman-auto-raid/raidnum
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/noraidnum "false"
+	db_set partman-auto-raid/noraidnum false
 	db_input high partman-auto-raid/noraidnum
 	db_go
-	db_stop
 	exit 0
 fi
 
@@ -66,10 +63,9 @@ raidnum=$RET
 # Check we have recipe(s)
 db_get partman-auto-raid/recipes
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipes "false"
+	db_set partman-auto-raid/norecipes false
 	db_input high partman-auto-raid/norecipes
 	db_go
-	db_stop
 	exit 0
 fi
 

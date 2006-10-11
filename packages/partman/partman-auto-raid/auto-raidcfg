@@ -6,7 +6,7 @@ create_raid() {
 	RAID_TYPE="$1"
 	DEV_COUNT="$2"
 
-	if [ "$DEV_COUNT" -lt 3 -a $RAID_TYPE = "5" ] ; then
+	if [ "$DEV_COUNT" -lt 3 ] && [ $RAID_TYPE = "5" ] ; then
 		db_input critical partman-auto-raid/notenoughparts
 		db_go partman-auto-raid/notenoughparts
 		return
@@ -87,10 +87,9 @@ mkdir -p /dev/md
 
 # Make sure that we have md-support
 if [ ! -e /proc/mdstat ]; then
-	db_set partman-auto-raid/nomd "false"
+	db_set partman-auto-raid/nomd false
 	db_input critical partman-auto-raid/nomd
 	db_go
-	db_stop
 	exit 0
 fi
 
@@ -100,10 +99,9 @@ apt-install mdadm || true
 # Check we have recipe(s)
 db_get partman-auto-raid/recipes
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipes "false"
+	db_set partman-auto-raid/norecipes false
 	db_input high partman-auto-raid/norecipes
 	db_go
-	db_stop
 	exit 0
 fi
 
@@ -122,9 +120,8 @@ while [ -n "$recipes" ]; do
 	echo $recipe >/tmp/partman-auto-raid-recipe
 	read raidtype devcount sparecount fstype mountpoint devs sparedevs \
 		</tmp/partman-auto-raid-recipe
-	create_raid $raidtype $devcount $sparecount $fstype $mountpoint $devs \
-		$sparedevs
-
+	create_raid $raidtype $devcount $sparecount $fstype $mountpoint \
+		$devs $sparedevs
 done
 
 exit 0
