@@ -10,13 +10,12 @@ bail_out() {
 }
 
 auto_lvm_prepare() {
-	local dev method free_size normalscheme
+	local dev method size free_size normalscheme target
 	dev=$1
 	method=$2
 
 	[ -f $dev/size ] || return 1
-	free_size=$(cat $dev/size)
-	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
+	size=$(cat $dev/size)
 
 	# Be sure the modules are loaded
 	modprobe dm-mod >/dev/null 2>&1 || true
@@ -26,7 +25,11 @@ auto_lvm_prepare() {
 		log-output -t update-dev update-dev
 	fi
 
-	choose_recipe "$free_size" lvm || return $?
+	target="$(humandev $(cat $dev/device)) - $(cat $dev/model)"
+	target="$target: $(longint2human $size)"
+	free_size=$(expr 0000000"$size" : '0*\(..*\)......$') # convert to megabytes
+
+	choose_recipe lvm "$target" "$free_size" || return $?
 
 	wipe_disk || return $?
 

@@ -5,29 +5,33 @@
 . /lib/partman/auto-shared.sh
 
 dev=$1
+cd $dev
+
+[ -f size ] || exit 1
+size=$(cat size)
+target="$(humandev $(cat device)) - $(cat model)"
 
 if [ -z "$2" ]; then
 	# Only one parameter. Being run for initial autopartitioning.
 
-	[ -f $dev/size ] || exit 1
-	free_size=$(cat $dev/size)
-	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
+	target="$target: $(longint2human $size)"
+	free_size=$(expr 0000000"$size" : '0*\(..*\)......$') # convert to megabytes
 
-	choose_recipe "$free_size" default || exit $?
+	choose_recipe default "$target" "$free_size" || exit $?
 
 	wipe_disk || exit $?
 else
 	# Two parameters, being run on selected free space.
 	free_space=$2
 	
-	cd $dev
 	open_dialog PARTITION_INFO $free_space
 	read_line x1 x2 free_size x3 x4 x5 x6
 	close_dialog
 
+	target="$target: $(longint2human $free_size) ($(longint2human $size))"
 	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
 
-	choose_recipe "$free_size" default || exit $?
+	choose_recipe default "$target" "$free_size" || exit $?
 fi
 
 perform_recipe $dev $free_space $recipe || exit $?
