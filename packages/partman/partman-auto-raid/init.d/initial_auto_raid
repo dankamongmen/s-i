@@ -39,7 +39,7 @@ confirm_changes "partman-md" || exit 1
 for s in /lib/partman/commit.d/*; do
     if [ -x $s ]; then
 	$s || {
-	    db_input high partman/text/commit_failed || true
+	    db_input critical partman/text/commit_failed || true
 	    db_go || true
 	    for s in /lib/partman/init.d/*; do
 		if [ -x $s ]; then
@@ -53,7 +53,14 @@ done
 
 stop_parted_server
 
-auto-raidcfg || exit 1
+RET=""
+auto-raidcfg || RET=$?
+if [ "$RET" ] && [ "$RET" -ne 9 ]; then
+	db_set partman-auto-raid/error false
+	db_input critical partman-auto-raid/error
+	db_go
+	exit 1
+fi
 touch /var/lib/partman/do_initial_auto_raid_fs
 
 restart_partman

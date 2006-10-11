@@ -11,7 +11,7 @@ create_raid() {
 	if [ "$DEV_COUNT" -lt 3 ] && [ $RAID_TYPE = "5" ] ; then
 		db_input critical partman-auto-raid/notenoughparts
 		db_go partman-auto-raid/notenoughparts
-		exit 1
+		exit 9
 	fi
 
 	SPARE_COUNT="$3"
@@ -65,16 +65,20 @@ create_raid() {
 
 	echo "Raid devices count: $DEV_COUNT"
 	if [ "$RAID_TYPE" != "0" ]; then
-		echo "Selected spare count: $NAMED_SPARES"
-		echo "Spare devices count: $SPARE_COUNT"
+		logger -t partman-auto-raid "Selected spare count: $NAMED_SPARES"
+		logger -t partman-auto-raid "Spare devices count: $SPARE_COUNT"
 		MDADM_PARAMS="-x $SPARE_COUNT $RAID_DEVICES $MISSING_DEVICES $SPARE_DEVICES $MISSING_SPARES"
 	else 
 		MDADM_PARAMS="$RAID_DEVICES"
 	fi
 
-	log-output -t partman-auto-raid \
+	if ! log-output -t partman-auto-raid \
 		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid$RAID_TYPE \
 		      -n $DEV_COUNT $MDADM_PARAMS
+	then
+		logger -t partman-auto-raid "Error creating array /dev/md/$MD_NUM"
+		exit 1
+	fi
 }
 
 # Try to load the necesarry modules.
@@ -89,10 +93,10 @@ mkdir -p /dev/md
 
 # Make sure that we have md-support
 if [ ! -e /proc/mdstat ]; then
-	db_set partman-auto-raid/nomd false
-	db_input critical partman-auto-raid/nomd
+	db_set mdcfg/nomd false
+	db_input critical mdcfg/nomd
 	db_go
-	exit 1
+	exit 9
 fi
 
 # Force mdadm to be installed on the target system
@@ -101,9 +105,7 @@ apt-install mdadm || true
 # Check we have recipe(s)
 db_get partman-auto-raid/recipe
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipe false
-	db_input high partman-auto-raid/norecipe
-	db_go
+	logger -t partman-auto-raid "Error: recipe missing in partman-auto-raid/recipe"
 	exit 1
 fi
 

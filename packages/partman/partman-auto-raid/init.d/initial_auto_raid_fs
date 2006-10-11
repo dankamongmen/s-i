@@ -10,15 +10,23 @@ fix_raid_fs() {
 	mountpoint=$3
 
 	dev="/var/lib/partman/devices/=dev=md=$raidnum"
-	cd $dev
-	id=$(ls -d 0-*)
-	if [ -z $id ]; then
-		db_set partman-auto-raid/nodir false
-		db_input high partman-auto-raid/nodir
+	if [ ! -d $dev ]; then
+		logger -t partman-auto-raid "Error: directory for /dev/md/$raidnum not found"
+		db_set partman-auto-raid/error false
+		db_input critical partman-auto-raid/error
 		db_go
 		exit 1
 	fi
+	cd $dev
 
+	id=$(ls -d 0-*)
+	if [ -z $id ]; then
+		logger -t partman-auto-raid "Error: incorrect directory for /dev/md/$raidnum"
+		db_set partman-auto-raid/error false
+		db_input critical partman-auto-raid/error
+		db_go
+		exit 1
+	fi
 	cd $id
 
 	if [ "$fstype" = swap ]; then
@@ -46,23 +54,16 @@ rm /var/lib/partman/do_initial_auto_raid_fs
 # Check we have the stashed value of the first RAID dev we created
 db_get partman-auto-raid/raidnum
 if [ -z "$RET" ]; then
-	db_set partman-auto-raid/noraidnum false
-	db_input high partman-auto-raid/noraidnum
+	logger -t partman-auto-raid "Error: cannot determine device number for RAID device"
+	db_set partman-auto-raid/error false
+	db_input critical partman-auto-raid/error
 	db_go
 	exit 1
 fi
-
 raidnum=$RET
 
-# Check we have recipe(s)
+# We've already checked that there is a recipe
 db_get partman-auto-raid/recipe
-if [ -z "$RET" ]; then
-	db_set partman-auto-raid/norecipe false
-	db_input high partman-auto-raid/norecipe
-	db_go
-	exit 1
-fi
-
 recipes=$RET
 
 # Try to act on each recipe we were given
