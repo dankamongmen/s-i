@@ -19,8 +19,9 @@ check_sparc()
 prom_major_version()
 {
   [ -f /proc/cpuinfo ] || exit 0
-  prom="$(grep '^prom' /proc/cpuinfo | grep -v '^promlib')"
+  prom="$(grep '^prom[[:space:]]*:' /proc/cpuinfo)"
   prom_version="${prom##*: }"
+  prom_version="${prom_version##OBP }"
   prom_major="${prom_version%%.*}"
   echo "prom_major=${prom_major}"
 }
