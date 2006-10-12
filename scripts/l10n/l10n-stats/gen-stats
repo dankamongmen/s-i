@@ -228,7 +228,8 @@ fancy_output
 
 #get sources:
 if [ "$FETCH" ]; then
-	echo "Getting sources:"
+#	echo "Getting sources:"
+	echo -n "Getting sources:"
 	
 	rm -rf $TEMPDIR > /dev/null
 
@@ -239,10 +240,11 @@ if [ "$FETCH" ]; then
 	apt-get $APT_OPT update >/dev/null
 	for dist in testing unstable cvs ; do
 		date -u >> $TARGET_DIR/packages-list-$dist
-		echo -n "  $dist:	"
+#		echo -n "  $dist:	"
+		echo -n " $dist... "
 		for pkg in `cat $WD/config/packages.$dist$LEVEL`; do
 			cd $TEMPDIR
-  			echo -n "$pkg "
+#  			echo -n "$pkg "
 			rm -rf $WD/material/packages.$dist$LEVEL/$pkg
 	  		apt-get $APT_OPT -t $dist source $pkg >/dev/null  || echo "FAILED to fetch $pkg from $dist!" >> $TARGET_DIR/packages-list-$dist
 	  		rm -f *.tar.gz *.dsc *.diff.gz
@@ -333,9 +335,11 @@ rm -f $TARGET_DIR/.rank.txt$LEVEL
 rm -rf $TEMPDIR
 
 
+echo "Statistics:"
 for dist in testing unstable cvs ; do
-	echo "Statistics for $dist:"
-	echo -n "  "
+#	echo "Statistics for $dist:"
+	echo "  $dist..."
+#	echo -n "  "
 	if [ "$dist" = "cvs" ] ; then
 		ext=""
 	else
