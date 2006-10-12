@@ -32,14 +32,15 @@ get_ntfs_resize_range () {
 	if [ -b $bdev ]; then
 	    ntfsinfo="$(ntfsresize -f -i $bdev)"
 	    if [ $? -ne 0 ]; then
-		log "Error running 'ntfsresize --info'"
+		logger -t partman "Error running 'ntfsresize --info'"
 		return 1
 	    fi
-	    if cat "$ntfsinfo" | grep -q "NTFS volume version: 3.1"; then
-		log "Resizing of Vista NTFS partitions (version 3.1) not supported (#379835)"
+	    if echo "$ntfsinfo" | grep -q "NTFS volume version: 3.1"; then
+		logger -t partman  "Resizing of Vista NTFS partitions (NTFS version 3.1) is not supported"
+		logger -t partman  "See http://www.bugs.debian.org/379835 for details"
 		return 1
 	    fi
-	    size=$(cat "$ntfsinfo" \
+	    size=$(echo "$ntfsinfo" \
 		| grep '^You might resize at' \
 		| sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
 		| grep '^[0-9]*$')
