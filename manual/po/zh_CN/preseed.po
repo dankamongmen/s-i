@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-10-11 02:03+0000\n"
+"POT-Creation-Date: 2006-10-12 17:22+0000\n"
 "PO-Revision-Date: 2006-09-29 14:14+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
@@ -1099,16 +1099,15 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:648
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
 "#d-i partman-auto/init_automatically_partition \\\n"
 "#      select Use the largest continuous free space\n"
 "\n"
-"# Alternatively, you can specify a disk to partition. The device name can\n"
-"# be given in either devfs or traditional non-devfs format. If the method\n"
-"# supports it, you can specify several disks separated by spaces.\n"
+"# Alternatively, you can specify a disk to partition. The device name\n"
+"# can be given in either devfs or traditional non-devfs format.\n"
 "# For example, to use the first disk:\n"
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
 "# In addition, you'll need to specify the method to use.\n"
@@ -1119,6 +1118,8 @@ msgid ""
 "# contains an old LVM configuration, the user will normally receive a\n"
 "# warning. This can be preseeded away...\n"
 "d-i partman-auto/purge_lvm_from_device boolean true\n"
+"# And the same goes for the confirmation to write the lvm partitions.\n"
+"d-i partman-lvm/confirm boolean true\n"
 "\n"
 "# You can choose from any of the predefined partitioning recipes.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1225,12 +1226,100 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:653
+#, fuzzy, no-c-format
+msgid "Partitioning using RAID"
+msgstr "分区"
+
+#. Tag: para
+#: preseed.xml:654
+#, no-c-format
+msgid ""
+"You can also use preseeding to set up partitions on software RAID arrays. "
+"Supported are RAID levels 0, 1 and 5, creating degraded arrays and "
+"specifying spare devices. If you are using RAID 1, you can preseed grub to "
+"install to all devices used in the array; see <xref linkend=\"preseed-"
+"bootloader\"/>."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:664
+#, no-c-format
+msgid ""
+"This type of automated partitioning is easy to get wrong. It is also a very "
+"new component that may still have some bugs or missing error handling. The "
+"responsibility to get the various recipes right (so they make sense and "
+"don't conflict) lies with the user. Check <filename>/var/log/syslog</"
+"filename> if you run into problems."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:672
+#, no-c-format
+msgid ""
+"Note that only RAID 0 and RAID 1 have been tested by the developers of the "
+"component. RAID 5 is untested. Advanced RAID setup with degraded arrays or "
+"spare devices has only been tested lightly."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:680
+#, no-c-format
+msgid ""
+"# NOTE: this option is of beta release quality and should be used carefully\n"
+"\n"
+"# The method should be set to \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Specify the disks to be partitioned. They will all get the same layout,\n"
+"# so this will only work if the disks are the same size.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"\n"
+"# Next you need to specify the physical partitions that will be used. \n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Last you need to specify how the previously defined partitions will be\n"
+"# used in the RAID setup. Remember to use the correct partition numbers\n"
+"# for logical partitions.\n"
+"# Parameters are:\n"
+"# <raidtype> <devcount> <sparecount> <fstype> <mountpoint> \\\n"
+"#          <devices> <sparedevices>\n"
+"# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# This makes partman automatically partition without confirmation.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:685
 #, no-c-format
 msgid "Clock and time zone setup"
 msgstr "时钟与时区设置"
 
 #. Tag: screen
-#: preseed.xml:655
+#: preseed.xml:687
 #, no-c-format
 msgid ""
 "# Controls whether or not the hardware clock is set to UTC.\n"
@@ -1248,13 +1337,13 @@ msgstr ""
 "d-i time/zone string US/Eastern"
 
 #. Tag: title
-#: preseed.xml:660
+#: preseed.xml:692
 #, no-c-format
 msgid "Apt setup"
 msgstr "设置 apt"
 
 #. Tag: para
-#: preseed.xml:661
+#: preseed.xml:693
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1267,7 +1356,7 @@ msgstr ""
 "仓库。"
 
 #. Tag: screen
-#: preseed.xml:669
+#: preseed.xml:701
 #, fuzzy, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1301,13 +1390,13 @@ msgstr ""
 "#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
-#: preseed.xml:674
+#: preseed.xml:706
 #, no-c-format
 msgid "Account setup"
 msgstr "帐号设置"
 
 #. Tag: para
-#: preseed.xml:675
+#: preseed.xml:707
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1318,7 +1407,7 @@ msgstr ""
 "或 MD5 <emphasis>hashes</emphasis> 值。"
 
 #. Tag: para
-#: preseed.xml:682
+#: preseed.xml:714
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1331,7 +1420,7 @@ msgstr ""
 "MD5 哈西表相对安全一些，但也会造成安全的假象，MD5 哈西表也可以被暴力破解。"
 
 #. Tag: screen
-#: preseed.xml:692
+#: preseed.xml:724
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1377,7 +1466,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:694
+#: preseed.xml:726
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1394,26 +1483,26 @@ msgstr ""
 "root 登录(例如使用 SSH key 认证或 sudo)。"
 
 #. Tag: para
-#: preseed.xml:704
+#: preseed.xml:736
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
 msgstr "密码的 MD5 hash 可以用下面命令产生。"
 
 #. Tag: screen
-#: preseed.xml:708
+#: preseed.xml:740
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 
 #. Tag: title
-#: preseed.xml:714
+#: preseed.xml:746
 #, no-c-format
 msgid "Base system installation"
 msgstr "基本系统安装"
 
 #. Tag: para
-#: preseed.xml:715
+#: preseed.xml:747
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -1422,7 +1511,7 @@ msgid ""
 msgstr "本阶段的安装并没有多少东西需要预置。仅有一个与内核安装相关的问题。"
 
 #. Tag: screen
-#: preseed.xml:722
+#: preseed.xml:754
 #, no-c-format
 msgid ""
 "# Select the initramfs generator used to generate the initrd for 2.6 "
@@ -1434,13 +1523,13 @@ msgstr ""
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:727
+#: preseed.xml:759
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "安装引导加载器"
 
 #. Tag: screen
-#: preseed.xml:729
+#: preseed.xml:761
 #, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -1488,13 +1577,13 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
-#: preseed.xml:734
+#: preseed.xml:766
 #, no-c-format
 msgid "Package selection"
 msgstr "选择软件包"
 
 #. Tag: para
-#: preseed.xml:735
+#: preseed.xml:767
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -1502,73 +1591,73 @@ msgid ""
 msgstr "您可以选择安装存在的任务的组合。写这篇文章时已有的任务是："
 
 #. Tag: userinput
-#: preseed.xml:744
+#: preseed.xml:776
 #, no-c-format
 msgid "standard"
 msgstr "标准"
 
 #. Tag: userinput
-#: preseed.xml:747
+#: preseed.xml:779
 #, no-c-format
 msgid "desktop"
 msgstr "桌面"
 
 #. Tag: userinput
-#: preseed.xml:750
+#: preseed.xml:782
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "gnome 桌面"
 
 #. Tag: userinput
-#: preseed.xml:753
+#: preseed.xml:785
 #, no-c-format
 msgid "kde-desktop"
 msgstr "kde 桌面"
 
 #. Tag: userinput
-#: preseed.xml:756
+#: preseed.xml:788
 #, no-c-format
 msgid "web-server"
 msgstr "web 服务器"
 
 #. Tag: userinput
-#: preseed.xml:759
+#: preseed.xml:791
 #, no-c-format
 msgid "print-server"
 msgstr "打印服务器"
 
 #. Tag: userinput
-#: preseed.xml:762
+#: preseed.xml:794
 #, no-c-format
 msgid "dns-server"
 msgstr "dns 服务器"
 
 #. Tag: userinput
-#: preseed.xml:765
+#: preseed.xml:797
 #, no-c-format
 msgid "file-server"
 msgstr "文件服务器"
 
 #. Tag: userinput
-#: preseed.xml:768
+#: preseed.xml:800
 #, no-c-format
 msgid "mail-server"
 msgstr "邮件服务器"
 
 #. Tag: userinput
-#: preseed.xml:771
+#: preseed.xml:803
 #, no-c-format
 msgid "sql-database"
 msgstr "SQL 数据库"
 
 #. Tag: userinput
-#: preseed.xml:774
+#: preseed.xml:806
 #, no-c-format
 msgid "laptop"
 msgstr "便携机"
 
 #. Tag: para
-#: preseed.xml:778
+#: preseed.xml:810
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -1579,7 +1668,7 @@ msgstr ""
 "userinput> 任务。"
 
 #. Tag: para
-#: preseed.xml:784
+#: preseed.xml:816
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -1591,7 +1680,7 @@ msgstr ""
 "include</classname>。该参数的值可以用逗号或空格分开，便于在内核命令行上使用。"
 
 #. Tag: screen
-#: preseed.xml:794
+#: preseed.xml:826
 #, no-c-format
 msgid ""
 "tasksel tasksel/first multiselect standard, desktop\n"
@@ -1621,13 +1710,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:799
+#: preseed.xml:831
 #, no-c-format
 msgid "Finishing up the first stage install"
 msgstr "完成第一阶段安装"
 
 #. Tag: screen
-#: preseed.xml:801
+#: preseed.xml:833
 #, no-c-format
 msgid ""
 "# Avoid that last message about the install being complete.\n"
@@ -1645,13 +1734,13 @@ msgstr ""
 "#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
-#: preseed.xml:806
+#: preseed.xml:838
 #, no-c-format
 msgid "Mailer configuration"
 msgstr "邮件设置"
 
 #. Tag: para
-#: preseed.xml:807
+#: preseed.xml:839
 #, no-c-format
 msgid ""
 "During a normal install, exim asks only a few questions. Here's how to avoid "
@@ -1660,7 +1749,7 @@ msgstr ""
 "普通安装方式下，exim 会问一些问题。这里是避免的方法。也可以有更多的预置内容。"
 
 #. Tag: screen
-#: preseed.xml:814
+#: preseed.xml:846
 #, no-c-format
 msgid ""
 "exim4-config exim4/dc_eximconfig_configtype \\\n"
@@ -1676,13 +1765,13 @@ msgstr ""
 "exim4-config exim4/dc_postmaster string"
 
 #. Tag: title
-#: preseed.xml:819
+#: preseed.xml:851
 #, no-c-format
 msgid "X configuration"
 msgstr "设置 X"
 
 #. Tag: para
-#: preseed.xml:820
+#: preseed.xml:852
 #, no-c-format
 msgid ""
 "Preseeding Debian's X config is possible, but you probably need to know some "
@@ -1693,7 +1782,7 @@ msgstr ""
 "的 X 配置工具无法自动设置每一件事。"
 
 #. Tag: screen
-#: preseed.xml:828
+#: preseed.xml:860
 #, no-c-format
 msgid ""
 "# X can detect the right driver for some cards, but if you're preseeding,\n"
@@ -1741,13 +1830,13 @@ msgstr ""
 "       select 1024x768 @ 60 Hz"
 
 #. Tag: title
-#: preseed.xml:833
+#: preseed.xml:865
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "预置其他的软件包"
 
 #. Tag: screen
-#: preseed.xml:835
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -1767,19 +1856,19 @@ msgstr ""
 "#   debconf-get-selections >> file"
 
 #. Tag: title
-#: preseed.xml:841
+#: preseed.xml:873
 #, no-c-format
 msgid "Advanced options"
 msgstr "高级选项"
 
 #. Tag: title
-#: preseed.xml:844
+#: preseed.xml:876
 #, no-c-format
 msgid "Shell commands"
 msgstr "shell 命令"
 
 #. Tag: screen
-#: preseed.xml:846
+#: preseed.xml:878
 #, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
@@ -1817,13 +1906,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:851
+#: preseed.xml:883
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "预置文件链"
 
 #. Tag: para
-#: preseed.xml:852
+#: preseed.xml:884
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -1837,7 +1926,7 @@ msgstr ""
 "另外的文件里面。"
 
 #. Tag: screen
-#: preseed.xml:862
+#: preseed.xml:894
 #, no-c-format
 msgid ""
 "# More that one file can be listed, separated by spaces; all will be\n"

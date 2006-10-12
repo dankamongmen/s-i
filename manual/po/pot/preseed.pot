@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-10-11 02:03+0000\n"
+"POT-Creation-Date: 2006-10-12 17:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -675,9 +675,8 @@ msgid ""
       "#d-i partman-auto/init_automatically_partition \\\n"
       "#      select Use the largest continuous free space\n"
       "\n"
-      "# Alternatively, you can specify a disk to partition. The device name can\n"
-      "# be given in either devfs or traditional non-devfs format. If the method\n"
-      "# supports it, you can specify several disks separated by spaces.\n"
+      "# Alternatively, you can specify a disk to partition. The device name\n"
+      "# can be given in either devfs or traditional non-devfs format.\n"
       "# For example, to use the first disk:\n"
       "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
       "# In addition, you'll need to specify the method to use.\n"
@@ -688,6 +687,8 @@ msgid ""
       "# contains an old LVM configuration, the user will normally receive a\n"
       "# warning. This can be preseeded away...\n"
       "d-i partman-auto/purge_lvm_from_device boolean true\n"
+      "# And the same goes for the confirmation to write the lvm partitions.\n"
+      "d-i partman-lvm/confirm boolean true\n"
       "\n"
       "# You can choose from any of the predefined partitioning recipes.\n"
       "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -734,11 +735,86 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:653
 #, no-c-format
+msgid "Partitioning using RAID"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:654
+#, no-c-format
+msgid "You can also use preseeding to set up partitions on software RAID arrays. Supported are RAID levels 0, 1 and 5, creating degraded arrays and specifying spare devices. If you are using RAID 1, you can preseed grub to install to all devices used in the array; see <xref linkend=\"preseed-bootloader\"/>."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:664
+#, no-c-format
+msgid "This type of automated partitioning is easy to get wrong. It is also a very new component that may still have some bugs or missing error handling. The responsibility to get the various recipes right (so they make sense and don't conflict) lies with the user. Check <filename>/var/log/syslog</filename> if you run into problems."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:672
+#, no-c-format
+msgid "Note that only RAID 0 and RAID 1 have been tested by the developers of the component. RAID 5 is untested. Advanced RAID setup with degraded arrays or spare devices has only been tested lightly."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:680
+#, no-c-format
+msgid ""
+      "# NOTE: this option is of beta release quality and should be used carefully\n"
+      "\n"
+      "# The method should be set to \"raid\".\n"
+      "#d-i partman-auto/method string raid\n"
+      "# Specify the disks to be partitioned. They will all get the same layout,\n"
+      "# so this will only work if the disks are the same size.\n"
+      "#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+      "\n"
+      "# Next you need to specify the physical partitions that will be used. \n"
+      "#d-i partman-auto/expert_recipe string \\\n"
+      "#      multiraid ::                                         \\\n"
+      "#              1000 5000 4000 raid                          \\\n"
+      "#                      $primary{ } method{ raid }           \\\n"
+      "#              .                                            \\\n"
+      "#              64 512 300% raid                             \\\n"
+      "#                      method{ raid }                       \\\n"
+      "#              .                                            \\\n"
+      "#              500 10000 1000000000 raid                    \\\n"
+      "#                      method{ raid }                       \\\n"
+      "#              .\n"
+      "\n"
+      "# Last you need to specify how the previously defined partitions will be\n"
+      "# used in the RAID setup. Remember to use the correct partition numbers\n"
+      "# for logical partitions.\n"
+      "# Parameters are:\n"
+      "# <raidtype> <devcount> <sparecount> <fstype> <mountpoint> \\\n"
+      "#          <devices> <sparedevices>\n"
+      "# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
+      "#d-i partman-auto-raid/recipe string \\\n"
+      "#    1 2 0 ext3 /                                           \\\n"
+      "#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+      "#    .                                                      \\\n"
+      "#    1 2 0 swap -                                           \\\n"
+      "#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+      "#    .                                                      \\\n"
+      "#    0 2 0 ext3 /home                                       \\\n"
+      "#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+      "#    .\n"
+      "\n"
+      "# This makes partman automatically partition without confirmation.\n"
+      "d-i partman-md/confirm boolean true\n"
+      "d-i partman/confirm_write_new_label boolean true\n"
+      "d-i partman/choose_partition \\\n"
+      "       select Finish partitioning and write changes to disk\n"
+      "d-i partman/confirm boolean true"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:685
+#, no-c-format
 msgid "Clock and time zone setup"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:655
+#: preseed.xml:687
 #, no-c-format
 msgid ""
       "# Controls whether or not the hardware clock is set to UTC.\n"
@@ -750,19 +826,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:660
+#: preseed.xml:692
 #, no-c-format
 msgid "Apt setup"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:661
+#: preseed.xml:693
 #, no-c-format
 msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:669
+#: preseed.xml:701
 #, no-c-format
 msgid ""
       "# You can choose to install non-free and contrib software.\n"
@@ -783,25 +859,25 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:674
+#: preseed.xml:706
 #, no-c-format
 msgid "Account setup"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:675
+#: preseed.xml:707
 #, no-c-format
 msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:682
+#: preseed.xml:714
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:692
+#: preseed.xml:724
 #, no-c-format
 msgid ""
       "# Skip creation of a root account (normal user account will be able to\n"
@@ -827,37 +903,37 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:694
+#: preseed.xml:726
 #, no-c-format
 msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is setup to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:704
+#: preseed.xml:736
 #, no-c-format
 msgid "An MD5 hash for a password can be generated using the following command."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:708
+#: preseed.xml:740
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:714
+#: preseed.xml:746
 #, no-c-format
 msgid "Base system installation"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:715
+#: preseed.xml:747
 #, no-c-format
 msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:722
+#: preseed.xml:754
 #, no-c-format
 msgid ""
       "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
@@ -865,13 +941,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:727
+#: preseed.xml:759
 #, no-c-format
 msgid "Boot loader installation"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:729
+#: preseed.xml:761
 #, no-c-format
 msgid ""
       "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -896,97 +972,97 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:734
+#: preseed.xml:766
 #, no-c-format
 msgid "Package selection"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:735
+#: preseed.xml:767
 #, no-c-format
 msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:744
+#: preseed.xml:776
 #, no-c-format
 msgid "standard"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:747
+#: preseed.xml:779
 #, no-c-format
 msgid "desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:750
+#: preseed.xml:782
 #, no-c-format
 msgid "gnome-desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:753
+#: preseed.xml:785
 #, no-c-format
 msgid "kde-desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:756
+#: preseed.xml:788
 #, no-c-format
 msgid "web-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:759
+#: preseed.xml:791
 #, no-c-format
 msgid "print-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:762
+#: preseed.xml:794
 #, no-c-format
 msgid "dns-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:765
+#: preseed.xml:797
 #, no-c-format
 msgid "file-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:768
+#: preseed.xml:800
 #, no-c-format
 msgid "mail-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:771
+#: preseed.xml:803
 #, no-c-format
 msgid "sql-database"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:774
+#: preseed.xml:806
 #, no-c-format
 msgid "laptop"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:778
+#: preseed.xml:810
 #, no-c-format
 msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>standard</userinput> task."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:784
+#: preseed.xml:816
 #, no-c-format
 msgid "If you want to install some individual packages in addition to packages installed by tasks, you can use the parameter <classname>pkgsel/include</classname>. The value of this parameter can be either comma-separated or space-separated, so you can also use it easily on the kernel command line."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:794
+#: preseed.xml:826
 #, no-c-format
 msgid ""
       "tasksel tasksel/first multiselect standard, desktop\n"
@@ -1004,13 +1080,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:799
+#: preseed.xml:831
 #, no-c-format
 msgid "Finishing up the first stage install"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:801
+#: preseed.xml:833
 #, no-c-format
 msgid ""
       "# Avoid that last message about the install being complete.\n"
@@ -1022,19 +1098,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:806
+#: preseed.xml:838
 #, no-c-format
 msgid "Mailer configuration"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:807
+#: preseed.xml:839
 #, no-c-format
 msgid "During a normal install, exim asks only a few questions. Here's how to avoid even those. More complicated preseeding is possible."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:814
+#: preseed.xml:846
 #, no-c-format
 msgid ""
       "exim4-config exim4/dc_eximconfig_configtype \\\n"
@@ -1045,19 +1121,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:819
+#: preseed.xml:851
 #, no-c-format
 msgid "X configuration"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:820
+#: preseed.xml:852
 #, no-c-format
 msgid "Preseeding Debian's X config is possible, but you probably need to know some details about the video hardware of the machine, since Debian's X configurator does not do fully automatic configuration of everything."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:828
+#: preseed.xml:860
 #, no-c-format
 msgid ""
       "# X can detect the right driver for some cards, but if you're preseeding,\n"
@@ -1083,13 +1159,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:833
+#: preseed.xml:865
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:835
+#: preseed.xml:867
 #, no-c-format
 msgid ""
       "# Depending on what software you choose to install, or if things go wrong\n"
@@ -1102,19 +1178,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:841
+#: preseed.xml:873
 #, no-c-format
 msgid "Advanced options"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:844
+#: preseed.xml:876
 #, no-c-format
 msgid "Shell commands"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:846
+#: preseed.xml:878
 #, no-c-format
 msgid ""
       "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
@@ -1136,19 +1212,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:851
+#: preseed.xml:883
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:852
+#: preseed.xml:884
 #, no-c-format
 msgid "It is possible to include other preconfiguration files from a preconfiguration file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:862
+#: preseed.xml:894
 #, no-c-format
 msgid ""
       "# More that one file can be listed, separated by spaces; all will be\n"
