@@ -54,16 +54,21 @@ foreach my $f (sort keys %oldfiles) {
   $removed .= "  * $f : $oldfiles{$f}\n";
 }
 
-# Display data
-print "Changes for $newstat[1] level $newstat[0]\n";
-print "   between $oldstat[2] and $newstat[2]\n";
-print "\n";
+# Create report
+my $report = "";
+$report .= "Removed files:\n$removed\n" if ($removed ne "");
+$report .= "Added files:\n$new\n" if ($new ne "");
+$report .= "Changed files:\n$changed\n" if ($changed ne "");
 
-print "Removed files:\n$removed\n" if ($removed ne "");
-print "Added files:\n$new\n" if ($new ne "");
-print "Changed files:\n$changed\n" if ($changed ne "");
+$report .= "Master translation: $oldmaster -> $newmaster\n\n" if ($oldmaster ne $newmaster);
 
-print "Master translation: $oldmaster -> $newmaster\n\n" if ($oldmaster ne $newmaster);
+$report .= "Old totals: $oldglobal\n" if ($oldglobal ne "");
+$report .= "New totals: $newglobal\n" if ($newglobal ne "");
 
-print "Old totals: $oldglobal\n" if ($oldglobal ne "");
-print "New totals: $newglobal\n" if ($newglobal ne "");
+# Display report if not empty
+if ($report ne "") {
+  print "Changes for $newstat[1] level $newstat[0]\n";
+  print "   between $oldstat[2] and $newstat[2]\n";
+  print "\n";
+  print $report;
+}
