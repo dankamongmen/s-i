@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/lib/klibc/bin/sh.shared
 # This is a special init for the boot floppy image.
 # It loads the main d-i initrd from either a second floppy, or a USB
 # storage device.
@@ -6,17 +6,22 @@
 # INSTALL_MEDIA_DEV can be passed as a boot parameter to force only 
 # one device or set of devices to be scanned.
 
+# add klibc binaries
+PATH=/usr/lib/klibc/bin:"${PATH}"
 export PATH
 
 # The identification of this floppy and the desired root floppy.
-SYSTEM=debian-installer
+SYSTEM="debian-installer"
 LABEL="boot floppy"
 ROOT_LABEL="root floppy"
+ROOT_FS="ext2"
+
+MODULE_DIR="/lib/modules/*"
+
 
 abort () {
 	echo $1 >&2
 	echo "Giving up!" >&2
-	debugshell "Aborted"
 	sleep 5000
 	exit
 }
@@ -32,34 +37,40 @@ if [ "$BOOT_DEBUG" -gt 1 ]; then
 	set -x
 fi
 
-if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv floppy; then
-	NO_FLOPPY=1
-fi
-if [ -n "$INSTALL_MEDIA_DEV" ] && echo "$INSTALL_MEDIA_DEV" | grep -qv scsi; then
-	NO_SCSI=1
-fi
-
 mount -t proc proc proc
-mount -t devfs dev dev || true
+mount -t sysfs sysfs sys
 
-modprobe vfat >/dev/null
-modprobe loop >/dev/null
 
-debugshell "before hardware detection"
-
-if [ ! "$NO_FLOPPY" ]; then
-	modprobe floppy >/dev/null
-fi
-if [ ! "$NO_SCSI" ]; then
-	if [ -x /usr/sbin/usb-discover ]; then
-		/usr/sbin/usb-discover
-	fi
-	# This is currently needed or usb-storage won't load (for ide_fix_driveid).
-	modprobe ide-core >/dev/null
-	modprobe usb-storage >/dev/null
-	modprobe sd_mod >/dev/null
+# TODO: no modprobe in klibc
+if ! insmod $MODULE_DIR/kernel/drivers/block/floppy.ko 2>/dev/null; then
+    abort "Cannot load floppy module"
 fi
 
+makedev () {
+	[ -e "$1" ] || mknod "$1" "$2" "$3" "$4"
+}
+
+makedir () {
+	[ -d "$2" ] || mkdir -m "$1" "$2"
+}
+
+makedir 755 /dev/floppy
+
+for i in 0 1 2 3 4 5 6 7; do
+    if sys_dev=`cat /sys/block/fd$i/dev 2>/dev/null`; then
+	case $sys_dev in
+	    2:0) makedev  /dev/floppy/"$i" b 2 0 ;;	    
+	    2:1) makedev  /dev/floppy/"$i" b 2 1 ;;	    
+	    2:2) makedev  /dev/floppy/"$i" b 2 2 ;;	    
+	    2:3) makedev  /dev/floppy/"$i" b 2 3 ;;	    
+	    2:128) makedev  /dev/floppy/"$i" b 2 128 ;;	    
+	    2:129) makedev  /dev/floppy/"$i" b 2 129 ;;	    
+	    2:130) makedev  /dev/floppy/"$i" b 2 130 ;;	    
+	    2:131) makedev  /dev/floppy/"$i" b 2 131 ;;
+	    *) echo "Unknown devive major:minor for /dev/floppy/$i" ;;
+	esac
+    fi
+done
 debugshell "after hardware detection"
 
 echo
@@ -68,12 +79,25 @@ echo
 echo
 echo
 
+# no grep in klibc, replace by this horrible hack in bash
+test_disk_lbl() {
+    n=$1
+    nb_words=$2
+    str=$3
+    shift 3
+    shift $n
+    if [ "$nb_words" = "1" -a "$str" = "$1" ] || [ "$nb_words" = "2" -a "$str" = "$1 $2" ]  || [ "$nb_words" = "3" -a "$str" = "$1 $2 $3" ] ; then
+	return 0
+    fi
+    return 1   
+}
+
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	MOUNTED=0
 	while [ "$MOUNTED" = 0 ]; do
 		echo
-		echo "Insert the $ROOT_LABEL or plug in a USB storage device."
+		echo "Insert the $ROOT_LABEL."
 		GOTLINE=0
 		while [ "$GOTLINE" = 0 ]; do
 			OLDPRINTK=$(cat /proc/sys/kernel/printk)
@@ -99,11 +123,8 @@ while [ "$LOADED" = 0 ]; do
 			if [ -d /dev/floppy ]; then
 				DEVS=/dev/floppy/?
 			fi
-			if [ -d /dev/scsi ]; then
-				DEVS="$DEVS `find /dev/scsi`"
-			fi
-		else
-			DEVS="`find $INSTALL_MEDIA_DEV`"
+		elif [ -e "$INSTALL_MEDIA_DEV" ]; then
+			DEVS="$INSTALL_MEDIA_DEV"
 		fi
 		
 		ERR=""
@@ -112,11 +133,12 @@ while [ "$LOADED" = 0 ]; do
 				# XXX as a mount point, /floppy is not
 				# quite right, as this may be USB storage,
 				# whatever.
-				if mount $dev -o ro -tvfat floppy 2>/dev/null; then
-					if [ -e floppy/disk.lbl ] && grep -q "^System: " floppy/disk.lbl; then
-						if ! grep -q "^System: $SYSTEM$" floppy/disk.lbl; then
+				if mount -o ro -t $ROOT_FS $dev floppy 2>/dev/null; then
+				    disk_lbl=`cat floppy/disk.lbl`
+					if [ -e floppy/disk.lbl ] && test_disk_lbl 0 1 "System:" $disk_lbl; then
+						if ! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
 							ERR="$ERR; $dev: not a $SYSTEM floppy"
-						elif grep -q "^Label: $LABEL$" floppy/disk.lbl; then
+						elif test_disk_lbl 2 3 "Label: $LABEL" $disk_lbl; then
 							ERR="$ERR; $dev: still the $LABEL"
 						else
 							cat floppy/disk.lbl
@@ -145,35 +167,31 @@ while [ "$LOADED" = 0 ]; do
 		fi
 	done
 
-	if grep -q tmpfs /proc/filesystems; then
-		mount -t tmpfs -o size=100M tmpfs mnt
-	else
-		mount -t shm shm mnt
+	if ! mount -t tmpfs -o size=100M tmpfs mnt 2>/dev/null && \
+	    ! mount -t shm shm mnt 2>/dev/null; then
+	    echo "Cannot mount mnt"
 	fi
-	
+
+
 	echo -n "Loading.."
 	# pipe_progress adds dots to the above line while there is
 	# activity. But we must be sure to catch errors from the zcat.
 	# Hard to do in a pipeline..
-	rm -f /tmp/zcat_failure
-	(zcat floppy/initrd.gz || echo 1 > tmp/zcat_failure ) | pipe_progress > mnt/tmp-initrd || abort "failed to extract initrd (may be out of space on ram disk)"
-	if [ ! -e /tmp/zcat_failure ]; then
+	echo 0 > /tmp/zcat_failure
+	cd mnt
+	(zcat ../floppy/initrd.gz || echo 1 > /tmp/zcat_failure ) | cpio -i -V || abort "failed to extract initrd (may be out of space on ram disk)"
+	cd ..
+
+	if [ "`cat /tmp/zcat_failure`" = 0 ]; then
 		LOADED=1
 	else
-		rm -f /tmp/zcat_failure
 		echo "install media seems to be bad!" >&2
 		debugshell "bad media mounted"
 		umount mnt
 	fi
+	
 	umount floppy
 done
-
-echo "Setting up filesystem..."
-umount /initrd # the original initrd
-mount -o loop mnt/tmp-initrd /initrd
-cp -a /initrd/* mnt || abort "failed copying filesystem (may be out of space on ram disk)"
-rm -f mnt/tmp-initrd
-umount /initrd
 
 debugshell "filesystem loaded and set up"
 
@@ -181,18 +199,4 @@ debugshell "filesystem loaded and set up"
 umount proc
 
 echo "Starting the installer..."
-cd mnt
-pivot_root . initrd
-mount -t proc proc proc
-mount -t devfs devfs dev
-
-# If this is missing, things can get *really* weird.
-if [ ! -x /usr/sbin/chroot ]; then
-	abort "Bad initrd! Cannot chroot."
-fi
-
-# Close all open files on the initrd, and run busybox init.
-rm -f sbin/init # probably not busybox init
-ln -s ../bin/busybox sbin/init
-debugshell "before chroot"
-exec /usr/sbin/chroot . /sbin/init <dev/console >dev/console 2>&1
+exec run-init mnt /init
