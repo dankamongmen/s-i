@@ -28,64 +28,65 @@ Q_default=true
 # this means that disk_N can not be loaded before disk_N-1
 old_disk_type=""
 while true; do
-    db_set $Q $Q_default || true
-    db_input critical $Q || true
-    if ! db_go; then
-	exit 10 # backup
-    fi
-    db_get $Q
-    if [ "$RET" = false ]; then
-	exit 0
-    fi
+	db_set $Q $Q_default || true
+	db_input critical $Q || true
+	if ! db_go; then
+		exit 10 # backup
+	fi
+	db_get $Q
+	if [ "$RET" = false ]; then
+		exit 0
+	fi
 
-    # TODO: hack to avoid that mount fails
-    modprobe -r floppy
-    modprobe floppy
+	# TODO: hack to avoid that mount fails
+	modprobe -r floppy
+	modprobe floppy
 
-    label=""
-    mountfloppy
-    if [ -e $FLOPPYMNT/disk.lbl ]; then
-	label=`cat $FLOPPYMNT/disk.lbl | grep "^Label" | sed "s/Label://"`
-    fi
-    umount $FLOPPYMNT
+	label=""
+	mountfloppy
+	if [ -e $FLOPPYMNT/disk.lbl ]; then
+		label=$(cat $FLOPPYMNT/disk.lbl | grep "^Label" | sed "s/Label://")
+	fi
+	umount $FLOPPYMNT
 
-    # a floppy disk_N (N>=2) must be loaded after disk_N-1
-    disk_name=`echo $label | cut -d':' -f1`
-    disk_type=`echo $label | cut -d':' -f2`
-    disk_nb=`echo $label | cut -d':' -f3`
+	# a floppy disk_N (N>=2) must be loaded after disk_N-1
+	disk_name=$(echo $label | cut -d':' -f1)
+	disk_type=$(echo $label | cut -d':' -f2)
+	disk_nb=$(echo $label | cut -d':' -f3)
 
-    if [ "$label" ] ; then
-	Q_default=true
-	if [ "$disk_nb" ] && [ $disk_nb -eq 2 ] && [ "$disk_type" != "$old_disk_type" ]; then
-	    disk_name_1=`echo $disk_name | sed "s/[0-9]$/1/"`
-	    # BEGIN WITH DISK1
-	    warning "Loading $disk_name instead of $disk_name_1"
-	    db_subst $W DISK_LABEL "$disk_type 1"
-	    db_subst $W DISK_NAME "$disk_name_1"
-	    db_input critical $W || true
-	    db_go
+	if [ "$label" ] ; then
+		Q_default=true
+		if [ "$disk_nb" ] && [ $disk_nb -eq 2 ] && \
+		   [ "$disk_type" != "$old_disk_type" ]; then
+			# BEGIN WITH DISK1
+			disk_name_1=$(echo $disk_name | sed "s/[0-9]$/1/")
+			warning "Loading $disk_name instead of $disk_name_1"
+			db_subst $W DISK_LABEL "$disk_type 1"
+			db_subst $W DISK_NAME "$disk_name_1"
+			db_input critical $W || true
+			db_go
+		else
+			# DISK OK
+			anna floppy-retriever
+			old_disk_type="$disk_type"
+			Q=$A
+			if [ ! "$disk_nb" ] || [ $disk_nb -eq 2 ]; then
+				Q_default=false
+			fi
+		fi
 	else
-	    # DISK OK
-	    anna floppy-retriever
-	    old_disk_type="$disk_type"
-	    Q=$A
-	    if [ ! "$disk_nb" ] || [ $disk_nb -eq 2 ]; then
-		Q_default=false
-	    fi
+		# UNKNOWN FLOPPY
+		warning "Unknown (non-Debian) floppy present"
+		db_set $U false || true
+		db_input critical $U || true
+		db_go
+		db_get $U
+		if [ "$RET" = true ]; then
+			anna floppy-retriever
+			old_disk_type=""
+			Q=$A
+			Q_default=false
+		fi
 	fi
-    else
-        # UNKNOWN FLOPPY
-	warning "Unknown floppy"
-	db_set $U false || true
-	db_input critical $U || true
-	db_go
-	db_get $U
-	if [ "$RET" = true ]; then
-	    anna floppy-retriever
-	    old_disk_type=""
-	    Q=$A
-	    Q_default=false
-	fi
-    fi
-    db_capb
+	db_capb
 done
