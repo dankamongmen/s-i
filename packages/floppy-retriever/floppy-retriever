@@ -63,17 +63,9 @@ case "x$cmd" in
 		umount $FLOPPYMNT || true
 
 		T="retriever/floppy/error"
-		db_set "$T" true
 		db_input critical "$T" || true
-		if ! db_go; then
-			exit 2
-		fi
-		db_get "$T"
-		if [ "$RET" = true ]; then
-			exit 0
-		else
-			exit 2
-		fi
+		db_go
+		exit 2
 	;;
 	
 	xcleanup)
