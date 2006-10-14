@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39529 -->
+<!-- original version: 41634 -->
 
    <sect3 id="partman"><title>Partitionner les disques</title>
 <para>
@@ -14,29 +14,50 @@ Dans un premier temps, vous aurez la possibilité de partitionner un disque
 entier ou une partie de disque, de façon automatique. 
 C'est le partitionnement <quote>assisté</quote>. Si vous n'aimez pas
 ce côté automatique, choisissez l'option 
-<guimenuitem>Modifier la table des partitions</guimenuitem> dans le menu.
+<guimenuitem>Manuel</guimenuitem> dans le menu.
 </para>
 <para>
-Si vous choisissez le partitionnement assisté, vous aurez le choix entre deux solutions&nbsp;:
-créer directement les partitions sur le disque (méthode classique) ou utiliser LVM,
-<quote>Logical Volume management</quote>. Dans ce dernier cas, l'installateur créera
+Si vous choisissez le partitionnement assisté, vous aurez le choix entre trois solutions&nbsp;:
+créer directement les partitions sur le disque (méthode classique), utiliser LVM,
+<quote>Logical Volume management</quote> ou utiliser LVM avec chiffrement. Il se peut toutefois
+que cette dernière option ne soit pas disponible sur toutes les architectures.
+</para>
+<para>
+
+Si vous utilisez LVM ou LVM avec chiffrement, l'installateur créera
 les partitions dans une grande partition. L'avantage de cette méthode est la possibilité
-de redimensionner facilement ces partitions. Il se peut toutefois que LVM ne soit pas disponible
-sur toutes les architectures.
+de redimensionner facilement ces partitions. Si elle est chiffrée, la grande partition
+ne sera pas accessible sans une phrase spéciale qui sécurisera vos données.
 
 </para>
-<warning><para>
+<note><para>
 
-Si vous avez choisi le partitionnement assisté avec LVM, il ne sera pas possible
-d'annuler les modifications apportées à la table des partitions. Les données
-présentes sur le disque dur sélectionné sont effectivement détruites.
+Si vous avez choisi le partitionnement assisté avec LVM ou LVM avec chiffrement,
+la table des partitions du disque choisi doit être modifiée. Ces modifications
+détruisent réellement les données présentes sur le disque. Il ne sera pas possible
+ensuite d'annuler ces modifications. Cependant l'installateur vous demandera de
+confirmer ces modifications avant qu'elles ne soient écrites sur le disque.
 
-</para></warning>
+</para></note>
 
 <para>
 
-Après avoir choisi le partitionnement assisté (soit la méthode classique, soit la méthode LVM),
-vous pourrez choisir un schéma parmi les modèles décrits dans le tableau ci-dessous.
+Après avoir choisi le partitionnement assisté (soit la méthode classique,
+soit les méthodes LVM), vous devrez choisir le disque à partitionner.
+Vérifiez que tous les disques sont listés et choisissez le bon si vous avez plusieurs
+disques. L'ordre de la liste peut différer de celui qui vous est habituel. La taille
+des disques peut vous aider à les identifier.
+</para>
+<para>
+
+Les données présentes sur le disque choisi seront finalement détruites. Mais il vous
+est toujours demandé de confirmer les modifications qui doivent être apportées.
+Si vous avez choisi le méthode classique, vous pourrez annuler tout changement
+jusqu'à la fin du processus. Avec les méthodes LVM, cela n'est pas possible.
+</para>
+
+<para>
+Vous pourrez ensuite choisir un schéma parmi les modèles décrits dans le tableau ci-dessous.
 Tous ces schémas ont leurs avantages et leurs inconvénients, certains sont discutés dans 
 l'<xref linkend="partitioning"/>. Choisissez le premier si vous
 n'avez pas d'avis tranché. N'oubliez pas que le partitionnement assisté

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 41451 -->
+<!-- original version: 41587 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -740,8 +740,7 @@ sera choisi avant de préconfigurer son partitionnement.
 #    select Utiliser le plus grand espace disponible
 
 # Vous pouvez aussi choisir un disque entier. Le nom du disque peut être
-# donné selon le format devfs ou le format traditionnel. Si la méthode le permet,
-# vous pouvez indiquer plusieurs disques séparés par des espaces.
+# donné selon le format devfs ou le format traditionnel.
 # Par exemple, pour utiliser le premier disque :
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Il faudra aussi indiquer la méthode à utiliser.
@@ -752,6 +751,8 @@ d-i partman-auto/method string lvm
 # configuration LVM, l'utilisateur recevra normalement un avertissement.
 # Cet avertissement peut être évité :  
 d-i partman-auto/purge_lvm_from_device boolean true
+# De même pour la confirmation de créer les partitions lvm :
+d-i partman-lvm/confirm boolean true
 
 # Vous pouvez choisir parmi tous les schémas prédéfinis...
 # Note : la valeur du choix doit être traduit.
@@ -793,6 +794,80 @@ d-i partman-auto/choose_recipe \
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
    select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
+<sect2 id="preseed-partman-raid">
+  <title>Partitionnement et RAID logiciel</title>
+<para>
+
+Il est aussi possible de préconfigurer le partitionnement d'un RAID logiciel.
+Les niveaux 0,1 et 5 sont acceptés, de même que la création d'ensemble dégradé et
+de périphériques de rechange.
+Si vous utilisez RAID 1, vous pouvez préconfigurer grub pour qu'il s'installe sur tous
+les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
+</para>
+
+<warning><para>
+
+Il est facile de se tromper avec ce type de partitionnement automatique.
+C'est aussi un nouveau composant de l'installateur, des bogues peuvent exister et
+la gestion de certaines erreurs peut manquer. Donner les bonnes formules est
+la responsabilité de l'utilisateur. Consultez le fichier <filename>/var/log/syslog</filename>
+si vous rencontrez des problèmes.
+</para>
+<para>
+Seuls RAID 0 et RAID 1 ont été testés par les développeurs. RAID 5 n'est pas testé.
+Le RAID avec ensemble dégradé ou périphériques de rechange n'a été testé que très légèrement.
+</para></warning>
+
+<informalexample><screen>
+# NOTE: cette option est en mode bêta et doit être utilisée avec précaution.
+
+# La méthode à indiquer est "raid".
+#d-i partman-auto/method string raid
+# Indiquez les disques à partitionner. Ils auront tous les mêmes caractéristiques,
+# aussi cela ne fonctionnera que s'ils ont tous la même taille.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# Ensuite, indiquez les partitions physiques à utiliser. 
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Enfin vous devez indiquer comment seront utilisées les partitions que
+# vous venez de définir. N'oubliez pas de donner les bons numéros pour
+# les partitions logiques.
+# Paramètres :
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# Les niveaux RAID 0, 1 et 5 sont acceptés. Les périphériques sont séparés par "#".
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# Pour que partman partitionne automatiquement sans demander une confirmation :
+d-i partman-md/confirm boolean true
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
 d-i partman/confirm boolean true
 </screen></informalexample>
 
