@@ -71,7 +71,7 @@ update_from_svn () {
         cat $logdir/svn_up.log >>$mainlog
         exit 1
     fi
-    if svn st | grep -q "^C" ; then
+    if svn st 2>/dev/null | grep -q "^C" ; then
         checkfatal "C" "checking for conflicts after 'svn up'"
     fi
 }
@@ -79,7 +79,7 @@ update_from_svn () {
 commit_to_svn () {
     echo "Committing changes in manual/po to SVN..." >>$mainlog
     : >$logdir/svn_ci.log
-    SVN_NEW_LIST=$(svn st po/ | grep "^\?[[:space:]]" | sed "s/^\?[[:space:]]*//")
+    SVN_NEW_LIST=$(svn st po/ 2>/dev/null | grep "^\?[[:space:]]" | sed "s/^\?[[:space:]]*//")
     if [ -n "$SVN_NEW_LIST" ] ; then
         echo "Adding new files:" >>$logdir/svn_ci.log
         for SVN_NEW in $SVN_NEW_LIST; do
@@ -87,13 +87,13 @@ commit_to_svn () {
             checkfatal "$?" "running 'svn add' on $SVN_NEW"
         done
     fi
-    if svn st po/ | grep -q "^[AM]" ; then
+    if svn st po/ 2>/dev/null | grep -q "^[AM]" ; then
 #       echo "Actual commit disabled, showing svn st:" >>$logdir/svn_ci.log
-#       svn st po/ >>$logdir/svn_ci.log 2>&1
+#       svn st po/ 2>/dev/null >>$logdir/svn_ci.log 2>&1
         echo "Committing changed files:" >>$logdir/svn_ci.log
         svn ci po/ -m "Update of POT and PO files for the manual" >>$logdir/svn_ci.log 2>&1
         checkfatal "$?" "committing POT/PO files to SVN"
-        if svn st po/ | grep -q "^C" ; then
+        if svn st po/ 2>/dev/null | grep -q "^C" ; then
             checkfatal "C" "checking for conflicts in manual/po after 'svn ci'"
         fi
     else
