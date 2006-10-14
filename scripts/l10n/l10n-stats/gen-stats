@@ -488,8 +488,8 @@ if [ $LEVEL = 1 ]; then
 	fancy_output
 fi
 
-echo "Generating spellcheck information for:"
-echo -n "  "
+echo "Generating spellcheck information..."
+# echo -n "  "
 # Add spellcheck info to the unstable files
 for lang in `cat $WD/config/languages`; do #run for every language
 	if [ "$dist" = "unstable" ] ; then
@@ -505,7 +505,7 @@ for lang in `cat $WD/config/languages`; do #run for every language
    %3s codepoints
    %3s level-specific wrong msgstrs
 " $SPELLCHECK >> $TARGET_DIR/$lang.txt
-		echo -n "$lang "
+#		echo -n "$lang "
 	else
 		echo "No spellcheck available."  >>$TARGET_DIR/$lang.txt
 	fi
@@ -536,7 +536,6 @@ for dist in testing unstable cvs; do
 	$WD/sort-ranktxt < $TARGET_DIR/.rank$ext.txt$LEVEL >> $TARGET_DIR/rank$ext.txt
 	rm $TARGET_DIR/.rank$ext.txt$LEVEL
 done
-echo ""
 
 # Move files to their destination
 cp $WD/config/HEADER.txt $TARGET_DIR/
@@ -547,7 +546,6 @@ if [ $LEVEL = 1 ]; then
 	mkdir $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*po $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*pot $TARGET_DIR/master
-	echo ""
 fi
 
 # Cleanup
