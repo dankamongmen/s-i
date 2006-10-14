@@ -1,6 +1,7 @@
 dir = usr/share
 
 subdirs = \
-	graphics
+	graphics \
+	themes
 
 include ../../../Makefile.inc
