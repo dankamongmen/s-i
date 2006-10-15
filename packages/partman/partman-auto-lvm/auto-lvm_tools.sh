@@ -103,6 +103,20 @@ auto_lvm_prepare() {
 }
 
 auto_lvm_perform() {
+	# Use hostname as default vg name (if available)
+	local defvgname
+	db_get partman-auto-lvm/new_vg_name
+	if [ -z "$RET" ]; then
+		if [ -s /etc/hostname ]; then
+			defvgname=$(cat /etc/hostname | head -n 1 | tr -d " ")
+		fi
+		if [ "$defvgname" ]; then
+			db_set partman-auto-lvm/new_vg_name $defvgname
+		else
+			db_set partman-auto-lvm/new_vg_name Debian
+		fi
+	fi
+
 	# Choose name, create VG and attach each partition as a physical volume
 	noninteractive=true
 	while true; do
