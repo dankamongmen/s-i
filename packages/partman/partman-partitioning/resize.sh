@@ -5,6 +5,33 @@ check_virtual () {
     close_dialog
 }
 
+has_vista () {
+	local has_vista tdir
+	has_vista=0
+	tdir=/tmp/ntfs
+	# Check if partition has Windows Vista; assume yes on failures
+	ANNA_QUIET=1 DEBIAN_FRONTEND=none \
+		log-output -t os-prober \
+		anna-install "ntfs-modules" || true
+	depmod -a || true
+
+	mkdir -p $tdir
+	if mount $bdev $tdir -t ntfs -o ro 2>/dev/null; then
+		if [ -e "$tdir/bootmgr" ] && [ -e "$tdir/Boot/BCD" ]; then
+			logger -t partman "Partition $(mapdevfs $bdev) contains Windows Vista"
+		else
+			logger -t partman "Partition $(mapdevfs $bdev) does not contain Windows Vista"
+			has_vista=1
+		fi
+		umount $tdir || true
+	else
+		logger -t partman "Unable to mount $(mapdevfs $bdev); assuming it contains Windows Vista"
+	fi
+
+	rmdir $tdir || true
+	return $has_vista
+}
+
 get_ntfs_resize_range () {
     local backupdev num bdev size
     open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
@@ -30,15 +57,18 @@ get_ntfs_resize_range () {
 		;;
 	esac
 	if [ -b $bdev ]; then
-	    ntfsinfo="$(ntfsresize -f -i $bdev)"
+	    ntfsinfo="$(log-output -t partman --pass-stdout \
+			ntfsresize -f -i $bdev)"
 	    if [ $? -ne 0 ]; then
 		logger -t partman "Error running 'ntfsresize --info'"
 		return 1
 	    fi
 	    if echo "$ntfsinfo" | grep -q "NTFS volume version: 3.1"; then
-		logger -t partman  "Resizing of Vista NTFS partitions (NTFS version 3.1) is not supported"
-		logger -t partman  "See http://www.bugs.debian.org/379835 for details"
-		return 1
+	        if has_vista; then
+		    logger -t partman  "Resizing of Vista NTFS partitions is not supported"
+		    logger -t partman  "See http://www.bugs.debian.org/379835 for details"
+		    return 1
+		fi
 	    fi
 	    size=$(echo "$ntfsinfo" \
 		| grep '^You might resize at' \
