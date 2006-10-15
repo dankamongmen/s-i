@@ -32,6 +32,15 @@ has_vista () {
 	return $has_vista
 }
 
+do_ntfsresize () {
+	local RET
+	ntfsresize="$(ntfsresize $@ 2>&1)"
+	RET=$?
+	echo "$ntfsresize" | grep -v "percent completed" | \
+		logger -t ntfsresize
+	return $RET
+}
+
 get_ntfs_resize_range () {
     local backupdev num bdev size
     open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
@@ -57,20 +66,18 @@ get_ntfs_resize_range () {
 		;;
 	esac
 	if [ -b $bdev ]; then
-	    ntfsinfo="$(log-output -t partman --pass-stdout \
-			ntfsresize -f -i $bdev)"
-	    if [ $? -ne 0 ]; then
+	    if ! do_ntfsresize -f -i $bdev; then
 		logger -t partman "Error running 'ntfsresize --info'"
 		return 1
 	    fi
-	    if echo "$ntfsinfo" | grep -q "NTFS volume version: 3.1"; then
-	        if has_vista; then
-		    logger -t partman  "Resizing of Vista NTFS partitions is not supported"
-		    logger -t partman  "See http://www.bugs.debian.org/379835 for details"
+	    if echo "$ntfsresize" | grep -q "NTFS volume version: 3.1"; then
+		if has_vista; then
+		    logger -t partman "Resizing of Vista NTFS partitions is not supported"
+		    logger -t partman "See http://www.bugs.debian.org/379835 for details"
 		    return 1
 		fi
 	    fi
-	    size=$(echo "$ntfsinfo" \
+	    size=$(echo "$ntfsresize" \
 		| grep '^You might resize at' \
 		| sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
 		| grep '^[0-9]*$')
@@ -178,18 +185,25 @@ perform_resizing () {
 	    open_dialog PARTITION_INFO $newid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
-	    echo y | ntfsresize -f $path
+	    echo y | do_ntfsresize -f $path
+	    if ! echo y | do_ntfsresize -f $path; then
+		logger -t partman "Error resizing the NTFS filesystem to the partition size"
+	    fi
 	else
 	    open_dialog COMMIT
 	    close_dialog
 	    open_dialog PARTITION_INFO $oldid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
-	    if echo y | ntfsresize -f --size "$newsize" $path; then
+	    if echo y | do_ntfsresize -f --size "$newsize" $path; then
 		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 		read_line newid
 		close_dialog
-		echo y | ntfsresize -f $path
+		if ! echo y | do_ntfsresize -f $path; then
+		    logger -t partman "Error resizing the NTFS filesystem to the partition size"
+		fi
+	    else
+		logger -t partman "Error resizing the NTFS filesystem"
 	    fi
 	fi
     else
