@@ -185,7 +185,6 @@ perform_resizing () {
 	    open_dialog PARTITION_INFO $newid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
-	    echo y | do_ntfsresize -f $path
 	    if ! echo y | do_ntfsresize -f $path; then
 		logger -t partman "Error resizing the NTFS filesystem to the partition size"
 	    fi
