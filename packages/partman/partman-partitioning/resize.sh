@@ -186,7 +186,7 @@ perform_resizing () {
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
 	    if ! echo y | do_ntfsresize -f $path; then
-		logger -t partman "Error resizing the NTFS filesystem to the partition size"
+		logger -t partman "Error resizing the NTFS file system to the partition size"
 	    fi
 	else
 	    open_dialog COMMIT
@@ -199,10 +199,10 @@ perform_resizing () {
 		read_line newid
 		close_dialog
 		if ! echo y | do_ntfsresize -f $path; then
-		    logger -t partman "Error resizing the NTFS filesystem to the partition size"
+		    logger -t partman "Error resizing the NTFS file system to the partition size"
 		fi
 	    else
-		logger -t partman "Error resizing the NTFS filesystem"
+		logger -t partman "Error resizing the NTFS file system"
 	    fi
 	fi
     else
