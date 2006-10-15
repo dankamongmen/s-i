@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40460 -->
+<!-- original version: 41587 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -790,11 +790,10 @@ Voreinstellung nutzen.
 #d-i partman-auto/init_automatically_partition \
 #      select Größten, ununterbrochenen freien Speicher benutzen
 
-# Alternativ können Sie eine Festplatte angeben, die partitioniert werden
-# soll. Der Gerätename kann entweder als devfs-Bezeichnung oder im
-# traditionellen Format angegeben werden. Wenn von der Partitionsmethode
-# unterstützt, können Sie mehrere Festplatten angeben, getrennt durch
-# Leerzeichen. Um z.B. die erste Platte zu nutzen:
+# Alternativ können Sie eine Festplatte angeben, die partitioniert
+# werden soll. Der Gerätename kann entweder als devfs-Bezeichnung
+# oder im traditionellen Format angegeben werden. 
+# Um z.B. die erste Platte zu nutzen:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Zusätzlich müssen Sie angeben, welche Partitionsmethode genutzt werden
 # soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
@@ -804,6 +803,8 @@ d-i partman-auto/method string lvm
 # alte LVM-Konfiguration enthält, wird dem Benutzer normalerweise eine Warnung
 # angezeigt. Diese kann aber durch Voreinstellung unterdrückt werden...
 d-i partman-auto/purge_lvm_from_device boolean true
+# Das gleiche gilt für die Bestätigung, die LVM-Partitionen zu schreiben.
+d-i partman-lvm/confirm boolean true
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
 # NOTE: this must be preseeded with a localized (translated) value.
@@ -843,8 +844,89 @@ d-i partman-auto/choose_recipe \
 #                      method{ swap } format{ }                \
 #              .
 
-# Dies veranlasst partman, automatisch ohne zusätzliche Bestätigung
-# zu partitionieren.
+# Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-partman-raid">
+  <title>Partitionierung mit RAID</title>
+<para>
+
+Sie können auch Voreinstellung verwenden, um Partitionen auf einem
+Software-RAID einzurichten. Es werden RAID-Level 0, 1 und 5 unterstützt
+sowie die Einrichtung von degradierten Arrays und die Festlegung von
+Reserve-Geräten. Wenn Sie RAID 1 verwenden, können Sie voreinstellen,
+dass grub auf allen Geräten im Verbund installiert wird; siehe
+<xref linkend="preseed-bootloader"/>.
+
+</para>
+
+<warning><para>
+
+Bei dieser Art von automatisierter Partitionierung kann leicht etwas
+falsch laufen. Auch ist diese Installer-Komponente recht neu und könnte noch
+Fehler enthalten bzw. nicht vorhandene Fehlerbehandlungen. Die Verantwortung,
+die verschiedenen Rezepte richtig hinzubekommen (so dass Sie Sinn machen
+und nicht miteinander kollidieren), liegt beim Benutzer. Schauen Sie in
+<filename>/var/log/syslog</filename>, wenn Probleme auftreten.
+
+</para><para>
+
+Bedenken Sie, dass nur RAID 0 und RAID 1 von den Entwicklern dieser Komponente
+getestet wurden. RAID 5 ist noch ungetestet. Erweiterte RAID-Einstellungen mit
+degradierten Arrays und Reserve-Geräten wurden nur oberflächlich getestet.
+
+</para></warning>
+
+<informalexample><screen>
+# HINWEIS: diese Option hat noch Beta-Charakter und sollte mit großer Vorsicht
+# verwendet werden.
+#
+# Die Partitionierungsmethode sollte auf "raid" gesetzt werden.
+#d-i partman-auto/method string raid
+# Geben Sie die Festplatten an, die partitioniert werden sollen. Sie bekommen
+# alle das gleiche Layout, dies wird also nur funktionieren, wenn alle
+# Festplatten die gleiche Größe haben.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# Als nächstes müssen Sie die zu nutzenden physikalischen Partitionen einrichten.
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Als letztes muss noch angegeben werden, wie die vorher definierten Partitionen
+# im RAID-Setup verwendet werden sollen. Denken Sie daran, die korrekten
+# Partitionsnummern für die logischen Partitionen zu benutzen.
+# Parameter sind:
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# RAID-Level 0, 1 und 5 werden unterstützt; mehrere Geräte werden mit "#" getrennt.
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.
+d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
        select Finish partitioning and write changes to disk
@@ -889,9 +971,11 @@ weitere (lokale) Paket-Repositories hinzufügen.
 #d-i apt-setup/security_host string
 
 # Zusätzliche Paketquellen (Repositories), local[0-9] verfügbar
-#d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/source string \
+#d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# deb-src-Zeilen aktivieren
+#d-i apt-setup/local0/source boolean true
 # URL zum öffentlichen Schlüssel des lokalen Repositories
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>

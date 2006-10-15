@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 41453 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian; von einem anderen Unix/Linux-System aus installieren</title>
@@ -138,22 +138,14 @@ Das <command>debootstrap</command>-Binary finden Sie im Debian-Archiv
 Laden Sie das <command>debootstrap</command>.deb aus dem
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
 Pool</ulink> herunter, kopieren Sie es in das Arbeitsverzeichnis work und
-extrahieren Sie daraus die Binär-Dateien. Sie benötigen root-Rechte, um die
+extrahieren Sie daraus die Dateien. Sie benötigen root-Rechte, um die
 Binär-Dateien zu installieren.
 
 <informalexample><screen>
-# ar -xf debootstrap_0.X.X_arch.deb
+# ar -xf debootstrap_0.X.X_all.deb
 # cd /
 # zcat /full-path-to-work/work/data.tar.gz | tar xv
 </screen></informalexample>
-
-</para><para>
-
-Beachten Sie, dass Sie eine minimale Version von <classname>glibc</classname>
-(derzeit GLIBC_2.3) installiert haben müssen, um <command>debootstrap</command>
-starten zu können. Zwar ist <command>debootstrap</command> selbst ein
-Shell-Script, aber es ruft verschiedene Werkzeuge auf, die 
-<classname>glibc</classname> erfordern.
 
 </para>
   </sect2>
@@ -393,14 +385,13 @@ einen Linux-Kernel und einen Bootloader. Sie finden verfügbare, bereits
 fertig paketierte Kernel mit dem Befehl
 
 <informalexample><screen>
-# apt-cache search <phrase condition="classic-kpkg">kernel</phrase><phrase
-condition="common-kpkg">linux</phrase>-image
+# apt-cache search linux-image
 </screen></informalexample>
 
 Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
 
 <informalexample><screen>
-# aptitude install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
+# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
 </para>

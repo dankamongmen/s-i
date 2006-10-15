@@ -1,11 +1,11 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39887 -->
+<!-- original version: 40980 -->
 
  <sect1 id="kernel-baking"><title>Einen neuen Kernel kompilieren</title>
 <para>
 
 Warum sollte jemand einen neuen, eigenen Kernel kompilieren wollen?
-Es ist oft nicht nötig, da der Standardkernel in Debian die meisten
+Dies ist oft nicht nötig, da der Standardkernel in Debian die meisten
 Konfigurationen bedient. Auch bietet Debian häufig verschiedene 
 alternative Kernel an. Sie sollten also vielleicht erst prüfen, ob ein
 alternatives Kernel-Image verfügbar ist, das besser zu Ihrer Hardware
@@ -62,18 +62,16 @@ zu kompilieren. Es macht Spaß und lohnt sich.
 Um auf die debiansche Art einen Kernel zu kompilieren, benötigen
 Sie ein paar Pakete:
 <classname>fakeroot</classname>, <classname>kernel-package</classname>,
-<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>
-(das war die neueste Version zum Zeitpunkt, als dies geschrieben wurde)</phrase>
-<phrase condition="common-kpkg"><classname>linux-source-2.6</classname></phrase>
+<classname>linux-source-2.6</classname>
 und ein paar weitere, die vielleicht schon installiert sind
-(<filename>/usr/share/doc/kernel-package/README.gz</filename> enthält die
-komplette Liste).
+(<filename>/usr/share/doc/kernel-package/README.gz</filename> enthält
+die komplette Liste).
 
 </para><para>
 
 Diese Methode erstellt ein .deb-Paket aus den Kernelquellen und, falls
 Sie Nicht-Standard-Module verwenden, auch ein synchrones abhängiges .deb für diese
-Module. Es ist ein besserer Weg, um die Kernel-Images zu verwalten
+Module. Dies ist ein besserer Weg, um die Kernel-Images zu verwalten
 (verglichen mit der Nicht-Debian-Methode, einen Kernel zu erzeugen);
 <filename>/boot</filename> enthält den Kernel, die dazugehörige
 System.map und ein Log der aktiven Konfigurationsdatei für den Bau des
@@ -85,9 +83,7 @@ Beachten Sie, dass Sie Ihren Kernel nicht auf <quote>Debian-Art</quote> kompilie
 <emphasis>müssen</emphasis>, aber wir meinen, dass es erheblich sicherer
 und einfacher ist, das Paketsystem zur Verwaltung der Kernel zu verwenden.
 Sie können Ihre Kernelquellen auch direkt von Linus beziehen statt aus
-dem Paket
-<phrase condition="classic-kpkg"><classname>kernel-source-&kernelversion;</classname>,</phrase>
-<phrase condition="common-kpkg"><classname>linux-source-2.6</classname>,</phrase>
+dem Paket <classname>linux-source-2.6</classname>
 und trotzdem die <classname>kernel-package</classname>-Methode zum
 Kompilieren nutzen.
 
@@ -95,12 +91,12 @@ Kompilieren nutzen.
 
 Sie finden eine komplette Dokumentation zur Nutzung von
 <classname>kernel-package</classname> unter
-<filename>/usr/share/doc/kernel-package</filename>. Dieses Kapitel gibt
-nur eine kurze Einführung.
+<filename>/usr/share/doc/kernel-package</filename>. Hier im
+Installationshandbuch geben wir nur eine kurze Einführung.
 
 </para><para>
 
-Wir gehen hier davon aus, dass Sie freien Zugriff auf Ihren Rechner haben
+Wir gehen davon aus, dass Sie freien Zugriff auf Ihren Rechner haben
 und die Kernelquellen irgendwo in Ihr Home-Verzeichnis entpacken werden<footnote>
 
 <para>
@@ -115,13 +111,9 @@ da er keine speziellen Berechtigungen erfordert.
 &kernelversion; ist. Vergewissern Sie sich, dass Sie sich in dem Verzeichnis
 befinden, in das Sie die Kernelquellen entpacken möchten und extrahieren Sie
 sie mittels
-<phrase condition="classic-kpkg"><userinput>tar xjf
-/usr/src/kernel-source-&kernelversion;.tar.bz2</userinput></phrase>
-<phrase condition="common-kpkg"><userinput>tar xjf
-/usr/src/linux-source-&kernelversion;.tar.bz2</userinput></phrase>.
+<userinput>tar xjf /usr/src/linux-source-&kernelversion;.tar.bz2</userinput>.
 Wechseln Sie in das neu erstellte Verzeichnis
-<phrase condition="classic-kpkg"><filename>kernel-source-&kernelversion;</filename></phrase>
-<phrase condition="common-kpkg"><filename>linux-source-&kernelversion;</filename></phrase>.
+<filename>linux-source-&kernelversion;</filename>.
 
 </para><para>
 
@@ -130,7 +122,7 @@ xconfig</userinput> aus, wenn X11 installiert, konfiguriert und gestartet ist;
 andernfalls nehmen Sie <userinput>make menuconfig</userinput> (hierzu muss
 das Paket <classname>libncurses5-dev</classname> installiert sein). Nehmen Sie sich
 die Zeit, die Onlinehilfe zu lesen, und wählen Sie sorgfältig die Optionen aus.
-Wenn Sie Zweifel haben, ist es typischerweise besser, den zweifelhaften
+Wenn Sie Zweifel haben, ist es typischerweise am besten, den zweifelhaften
 Gerätetreiber mit in den Kernel zu integrieren (ein Gerätetreiber ist ein
 Stück Software, das Hardware-Peripherie verwaltet, wie z.B. Ethernetkarten,
 SCSI-Controller und so weiter). Seien Sie vorsichtig: andere Optionen, die nicht
@@ -159,15 +151,9 @@ abhängig von der Leistungsfähigkeit Ihres Rechners.
 </para><para>
 
 Sobald die Kompilierung beendet ist, können Sie Ihren eigenen Kernel wie
-ein Paket installieren. Tippen Sie als root ein: 
-<phrase condition="classic-kpkg">
-<userinput>dpkg -i 
-../kernel-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
-</phrase>
-<phrase condition="common-kpkg">
+jedes andere Paket installieren. Tippen Sie als root ein:
 <userinput>dpkg -i
 ../linux-image-&kernelversion;-<replaceable>subarchitecture</replaceable>_custom.1.0_&architecture;.deb</userinput>.
-</phrase>
 Der Teil <replaceable>subarchitecture</replaceable> im Dateinamen ist eine
 optionale Bezeichnung für die Unterarchitektur, <phrase arch="i386"> wie
 z.B. <quote>686</quote>, </phrase>
@@ -180,8 +166,7 @@ die <filename>System.map</filename> korrekt installiert
 sie enthält Ihre aktuelle Konfiguration. Ihr neues Kernelpaket ist
 ebenfalls clever genug, automatisch Ihren Bootloader zu aktualisieren,
 so dass der neue Kernel benutzt wird. Falls Sie auch ein Modul-Paket
-erstellt haben, <phrase condition="classic-kpkg">z.B. wenn Sie PCMCIA
-haben,</phrase> müssen Sie auch dieses Paket noch installieren.
+erstellt haben, müssen Sie auch dieses Paket noch installieren.
 
 </para><para>
 

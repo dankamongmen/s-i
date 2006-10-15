@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39529 -->
+<!-- original version: 41634 -->
 
    <sect3 id="partman">
    <title>Partitionieren Ihrer Festplatten (partman)</title>
@@ -13,36 +13,63 @@ möchten, lesen Sie <xref linkend="partitioning"/>.
 </para><para>
 
 Zuerst wird Ihnen die Auswahl geboten, automatisch entweder eine gesamte Platte
-zu partitionieren oder nur den freien Speicherplatz auf einer Platte (falls
-vorhanden). Dies wird auch als <quote>Geführte Partitionierung</quote>
+zu partitionieren oder nur den freien Speicherplatz auf einer Platte, falls
+vorhanden. Dies wird auch als <quote>Geführte Partitionierung</quote>
 bezeichnet. Wenn Sie keine automatische Partitionierung wollen, wählen Sie
-<guimenuitem>Partitionstabelle von Hand eingeben</guimenuitem>.
+<guimenuitem>Manuell</guimenuitem>.
 
 </para><para>
 
-Wenn Sie Geführte Partitionierung wählen, haben Sie zwei Möglichkeiten:
-Partitionen direkt auf der Festplatte zu erzeugen (die klassische Methode) oder
-LVM (Logical Volume Management) zu benutzen. Im zweiten Fall wird der Installer
-die meisten Partitionen innerhalb einer großen Partition erstellen; der Vorteil
-dieser Methode ist, dass Partitionen innerhalb dieser großen Partition später
-relativ einfach in ihrer Größe verändert werden können. Beachten Sie: die
-Option LVM zu nutzen ist möglicherweise nicht auf allen Architekturen
-verfügbar.
+Wenn Sie Geführte Partitionierung wählen, haben Sie drei Möglichkeiten:
+Partitionen direkt auf der Festplatte erzeugen (die klassische Methode),
+LVM (Logical Volume Management) benutzen oder verschlüsseltes LVM benutzen.
+Hinweis: die Option zur Nutzung von LVM (Standard oder verschlüsselt) ist
+möglicherweise nicht auf allen Architekturen verfügbar.
+
+</para><para>
+
+Bei der Verwendung von LVM oder verschlüsseltem LVM erzeugt der Installer
+die meisten Partitionen innerhalb einer grossen Partition; der Vorteil dabei
+ist, dass die Partitionen innerhalb der grossen Partition sehr einfach
+im Nachhinein in der Größe verändert werden können. Im Fall von verschlüsseltem
+LVM ist die grosse Partition ohne Kenntnis einer speziellen Passphrase nicht
+lesbar und bietet deshalb zusätzliche Sicherheit Ihrer (persönlichen) Daten.
 
 </para>
-<warning><para>
+<note><para>
 
-Wenn Sie Geführte Partitionierung mittels LVM wählen, wird es nicht möglich
-sein, Änderungen in der Partitionstabelle rückgängig zu machen. Dies
-bedeutet, dass alle Daten, die sich vorher auf der Festplatte befinden,
-gelöscht werden.
+Wenn Sie Geführte Partitionierung mittels LVM oder verschlüsseltem LVM wählen,
+müssen einige Änderungen in der Partitionstabelle auf die ausgewählten
+Festplatten geschrieben werden, während LVM eingerichtet wird. Diese Änderungen
+löschen effektiv alle Daten, die zu dieser Zeit auf den entsprechenden
+Festplatten gespeichert sind und sind nicht rückgängig zu machen. Der
+Installer bittet Sie aber, diese Änderungen zu bestätigen, bevor die sie auf
+die Platten geschrieben werden.
 
-</para></warning>
+</para></note>
 <para>
 
-Nachdem Sie Geführte Partitionierung gewählt haben (egal ob die klassische
-Variante oder die mit LVM), können Sie eines der Schemata aus der unten
-stehenden Tabelle wählen. Alle Schemata haben ihre Vor- und
+Nachdem Sie Geführte Partitionierung (entweder klassisch oder mittels
+(verschlüsseltem) LVM) für eine ganze Festplatte ausgewählt haben, müssen
+Sie die Platte angeben, die Sie nutzen möchten. Überprüfen Sie, ob alle
+Ihre Festplatten aufgelistet sind und, falls Sie mehrere haben, achten Sie
+darauf, dass Sie die richtige wählen. Die Reihenfolge, in der sie aufgelistet
+sind, könnte anders sein als sie es gewohnt sind. Die Größe der Festplatten
+kann Ihnen helfen, sie zu identifizieren.
+
+</para><para>
+
+Alle Daten auf den ausgewählten Festplatten könnten verloren gehen,
+aber Sie werden immer aufgefordert, jegliche Änderungen zu bestätigen, bevor
+Sie auf die Festplatte geschrieben werden. Wenn Sie die klassische
+Partitionierungsmethode gewählt haben, können Sie bis zuletzt alle Änderungen
+rückgängig machen; bei der Verwendung von LVM (Standard oder LVM) ist dies
+nicht möglich.
+
+</para><para>
+
+Als nächstes können Sie aus der Liste ein Partitionsschema auswählen.
+Alle Schemata haben ihre Vor- und
 Nachteile, von denen einige unter <xref linkend="partitioning"/> erörtert
 sind. Wenn Sie sich nicht sicher sind, wählen Sie die erste Möglichkeit.
 Beachten Sie, dass die automatische Partitionierung ein gewisses Minimum
@@ -88,8 +115,9 @@ wird die automatische Partitionierung fehlschlagen.
 
 <para>
 
-Wenn Sie Geführte Partitionierung mit LVM wählen, wird der Installer
-zusätzlich eine separate <filename>/boot</filename>-Partition erzeugen.
+Wenn Sie Geführte Partitionierung mit LVM (Standard oder LVM) wählen,
+wird der Installer zusätzlich eine separate
+<filename>/boot</filename>-Partition erzeugen.
 Alle anderen Partitionen (außer Swap) werden innerhalb der LVM-Partition
 erstellt.
 
