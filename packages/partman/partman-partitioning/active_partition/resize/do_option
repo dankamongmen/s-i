@@ -10,15 +10,19 @@ cd $dev
 
 check_virtual
 
-RET=""
 if [ "$virtual" = no ] && [ -f $oldid/detected_filesystem ] && \
    [ "$(cat $oldid/detected_filesystem)" = ntfs ]; then
-	get_ntfs_resize_range || RET=$?
+	if ! get_ntfs_resize_range; then
+		db_input critical partman-partitioning/impossible_resize || true
+		db_go || true
+		exit 1
+	fi
 else
 	get_resize_range
 fi
 
-if [ -z "$maxsize" ] || [ "$RET" ]; then
+if [ -z "$maxsize" ]; then
+	logger -t partman "Error: unable to determine maximum new size for partition"
 	db_input critical partman-partitioning/impossible_resize || true
 	db_go || true
 	exit 1
