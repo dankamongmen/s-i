@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40460 -->
+<!-- original version: 41587 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -15,7 +15,6 @@ Currently only a single variant of the example file is generated (for i386).
 <appendix id="appendix-preseed">
 <!-- <title>Automating the installation using preseeding</title> -->
 <title>Installazione automatica tramite preconfigurazione</title>
-
 <para>
 
 <!--
@@ -495,17 +494,17 @@ Boot parameters to specify:
 - con avvio da rete:
   preseed/url=http://host/parcorso/di/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
+
 <!--
 - if you're booting a remastered CD:
--->
-- con avvio da un CD masterizzato:
+-->- con avvio da un CD masterizzato:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
+
 <!--
 - if you're installing from USB media (put the preconfiguration file in the
   toplevel directory of the USB stick):
--->
-- con installazione da un supporto USB (mettere il file di preconfigurazione
+-->- con installazione da un supporto USB (mettere il file di preconfigurazione
   nella directory principale della chiavetta USB):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
@@ -1100,61 +1099,61 @@ netcfg
 # Questo evita la visualizzazione di una lista se è presente più di
 # un'interfaccia.
 d-i netcfg/choose_interface select auto
+
 <!--
 # To pick a particular interface instead:
--->
-# Oppure scegliere un'interfaccia ben precisa:
+--># Oppure scegliere un'interfaccia ben precisa:
 #d-i netcfg/choose_interface select eth1
+
 <!--
 # If you have a slow dhcp server and the installer times out waiting for
 # it, this might be useful.
--->
-# Se si ha un server dhcp lento e l'installatore va in timeout in attesa
+--># Se si ha un server dhcp lento e l'installatore va in timeout in attesa
 # di esso, questo potrebbe essere utile.
 #d-i netcfg/dhcp_timeout string 60
+
 <!--
 # If you prefer to configure the network manually, uncomment this line and
 # the static network configuration below.
--->
-# Se si preferisce configurare manualmente la rete, togliere il commento
+--># Se si preferisce configurare manualmente la rete, togliere il commento
 # alla prossima riga e alle righe con la configurazione statica della rete.
 #d-i netcfg/disable_dhcp boolean true
+
 <!--
 # If you want the preconfiguration file to work on systems both with and
 # without a dhcp server, uncomment these lines and the static network
 # configuration below.
--->
-# Se si desidera che il file di preconfigurazione funzioni su qualsiasi
+--># Se si desidera che il file di preconfigurazione funzioni su qualsiasi
 # sistema, a prescindere dalla presenza di un server DHCP in rete, si può
 # togliere il commento alle righe seguenti e alle righe con la configurazione
 # statica della rete.
 #d-i netcfg/dhcp_failed note
 #d-i netcfg/dhcp_options select Configure network manually
+
 <!--
 # Static network configuration.
--->
-# Configurazione statica della rete.
+--># Configurazione statica della rete.
 #d-i netcfg/disable_dhcp boolean true
 #d-i netcfg/get_nameservers string 192.168.1.1
 #d-i netcfg/get_ipaddress string 192.168.1.42
 #d-i netcfg/get_netmask string 255.255.255.0
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
+
 <!--
 # Any hostname and domain names assigned from dhcp take precedence over
 # values set here. However, setting the values still prevents the questions
 # from being shown, even if values come from dhcp.
--->
-# Si noti che gli eventuali nomi di host e dominio assegnati da dhcp hanno
+--># Si noti che gli eventuali nomi di host e dominio assegnati da dhcp hanno
 # la precedenza sui valori qui impostati. Naturalmente, l'impostazione dei
 # valori previene ancora che le domande siano visualizzate anche se i
 # valori arrivano da dhcp.
 d-i netcfg/get_hostname string unassigned-hostname
 d-i netcfg/get_domain string unassigned-domain
+
 <!--
 # Disable that annoying WEP key dialog.
--->
-# Disabilita la noiosa finestra di dialogo della chiave WEP.
+--># Disabilita la noiosa finestra di dialogo della chiave WEP.
 d-i netcfg/wireless_wep string
 <!--
 # The wacky dhcp hostname that some ISPs use as a password of sorts.
@@ -1221,10 +1220,10 @@ d-i mirror/http/hostname string http.us.debian.org
 d-i mirror/http/hostname string http.it.debian.org
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
+
 <!--
 # Suite to install.
--->
-# Versione da installare.
+--># Versione da installare.
 #d-i mirror/suite string testing
 <!--
 # Suite to use for loading installer components (optional).
@@ -1284,16 +1283,14 @@ preconfigurazione.
 # localizzato (cioè tradotto).
 #d-i partman-auto/init_automatically_partition \
 #    select Usare il più ampio spazio contiguo disponibile.
+
 <!--
-# Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format. If the method
-# supports it, you can specify several disks separated by spaces.
+# Alternatively, you can specify a disk to partition. The device name
+# can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
--->
-# In alternativa è possibile specificare un disco da partizionare. Il nome
+--># In alternativa è possibile specificare un disco da partizionare. Il nome
 # del dispositivo può essere dato sia nel formato devfs che nel tradizionale
-# formato non-devfs. Se il metodo lo permette è anche possibile specificare
-# più dischi separandoli con degli spazi.
+# formato non-devfs.
 # Per esempio, per usare il primo disco:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 <!--
@@ -1302,20 +1299,25 @@ d-i partman-auto/disk string /dev/discs/disc0/disc
 --># Inoltre è necessario specificare il metodo da usare. Quelli attualmente
 # disponibili sono "regular", "lvm" e "crypto".
 d-i partman-auto/method string lvm
+
 <!--
 # If one of the disks that are going to be automatically partitioned
 # contains an old LVM configuration, the user will normally receive a
 # warning. This can be preseeded away...
--->
-# L'utente riceve un avviso se uno dei dischi che stanno per essere
+--># L'utente riceve un avviso se uno dei dischi che stanno per essere
 # partizionati automaticamente contiene già una precedente configurazione
 # LVM. Comunque anche questo può essere preconfigurato...
 d-i partman-auto/purge_lvm_from_device boolean true
 <!--
+# And the same goes for the confirmation to write the lvm partitions.
+--># E può essere preconfigurata anche la conferma alla scrittura delle
+# partizioni lvm.
+d-i partman-lvm/confirm boolean true
+
+<!--
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
--->
-# È possibile scegliere una qualsiasi delle ricette di partizionamento
+--># È possibile scegliere una qualsiasi delle ricette di partizionamento
 # predefinite. Nota: da preconfigurare con un valore localizzato (cioè
 # tradotto).
 d-i partman-auto/choose_recipe \
@@ -1330,23 +1332,23 @@ d-i partman-auto/choose_recipe \
 <!--
 #       select Separate /home, /usr, /var, and /tmp partitions
 -->#       select Partizioni /home, /usr, /var e /tmp separate
+
 <!--
 # Or provide a recipe of your own...
 # The recipe format is documented in the file devel/partman-auto-recipe.txt.
 # If you have a way to get a recipe file into the d-i environment, you can
 # just point at it.
--->
-# Oppure creare una ricetta personalizzata...
+--># Oppure creare una ricetta personalizzata...
 # Il formato della ricetta è documentato nel file devel/partman-auto-recipe.txt.
 # Se si ha modo di importare un file ricetta dentro l'ambiente
 # dell'installatore, è possibile semplicemente puntare a questo.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
+
 <!--
 # If not, you can put an entire recipe the preconfiguration file in one
 # (logical) line. This example creates a small /boot partition, suitable
 # swap, and uses the rest of the space for the root partition:
--->
-# Altrimenti, è possibile mettere un'intera ricetta in una riga. Questo
+--># Altrimenti, è possibile mettere un'intera ricetta in una riga. Questo
 # esempio crea una piccola partizione /boot, un'area swap appropriata e usa
 # il resto dello spazio per la partizione root:
 #d-i partman-auto/expert_recipe string                         \
@@ -1365,10 +1367,135 @@ d-i partman-auto/choose_recipe \
 #              64 512 300% linux-swap                          \
 #                      method{ swap } format{ }                \
 #              .
+
 <!--
 # This makes partman automatically partition without confirmation.
+--># Questo fa in modo che partman partizioni automaticamente senza conferma.
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+<!--
+       select Finish partitioning and write changes to disk
+-->       select Terminare il partizionamento e scrivere i cambiamenti sul disco
+d-i partman/confirm boolean true
+</screen></informalexample>
+  </sect2>
+
+  <sect2 id="preseed-partman-raid">
+  <!-- <title>Partitioning using RAID</title> -->
+  <title>Partizionamento con RAID</title>
+<para>
+
+<!--
+You can also use preseeding to set up partitions on software RAID arrays.
+Supported are RAID levels 0, 1 and 5, creating degraded arrays and
+specifying spare devices.
+If you are using RAID 1, you can preseed grub to install to all devices
+used in the array; see <xref linkend="preseed-bootloader"/>.
 -->
-# Questa fa in modo che partman partizioni automaticamente senza conferma.
+
+Si può usare anche la preconfigurazione per impostare le partizioni su array
+in RAID software. È supportato il RAID di livello 0, 1 e 5, la creazione di
+array <emphasis>degraded</emphasis> e la scelta di dischi di scorta. Se si
+usa RAID 1 è possibile preconfigurare grub in modo da installarlo su tutti i
+dispositivi usati dall'array; si veda <xref linkend="preseed-bootloader"/>.
+
+</para>
+<warning><para>
+
+<!--
+This type of automated partitioning is easy to get wrong. It is also a
+very new component that may still have some bugs or missing error
+handling. The responsibility to get the various recipes right (so they
+make sense and don't conflict) lies with the user.
+Check <filename>/var/log/syslog</filename> if you run into problems.
+-->
+
+È probabile che questo tipo di partizionamento automatico fallisca. Infatti
+si tratta di un componente nuovo che potrebbe avere dei bug o delle carenze
+nella gestione degli errori. La responsabilità di recuperare delle ricette
+corrette (cioè che abbiano senso e che non siano in conflitto) è lasciata
+all'utente. In caso di problemi si controlli in
+<filename>/var/log/syslog</filename>.
+
+</para><para>
+
+<!--
+Note that only RAID 0 and RAID 1 have been tested by the developers of the
+component. RAID 5 is untested. Advanced RAID setup with degraded arrays or
+spare devices has only been tested lightly.
+-->
+
+Infine è da notare che gli sviluppatori hanno fatto dei test solo su RAID 0
+e 1. RAID 5 non è stato provato, le configurazioni di RAID più sofisticate,
+con array <emphasis>degraded</emphasis> e dischi di scorta, sono state
+provate in modo non approfondito.
+
+</para></warning>
+
+<informalexample><screen>
+<!--
+# NOTE: this option is of beta release quality and should be used carefully
+--># NOTA: questa funzionalità è ancora in fase beta e deve essere usata con
+# molta cautela
+
+<!--
+# The method should be set to "raid".
+--># Il metodo deve essere impostato come "raid".
+#d-i partman-auto/method string raid
+<!--
+# Specify the disks to be partitioned. They will all get the same layout,
+# so this will only work if the disks are the same size.
+--># Specificare quali sono i dischi da partizionare. Questi dischi avranno
+# tutti la stessa configurazione quindi è necessario che abbiano la stessa
+# dimensione.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+<!--
+# Next you need to specify the physical partitions that will be used. 
+--># Poi si devono specificare le partizioni fisiche da usare.
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+<!--
+# Last you need to specify how the previously defined partitions will be
+# used in the RAID setup. Remember to use the correct partition numbers
+# for logical partitions.
+# Parameters are:
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+--># Infine si deve specificare come devono essere utilizzate le partizioni
+# definite in precedenza all'interno del RAID. Attenzione a usare i numeri
+# di partizione corretti per le partizioni logiche.
+# I parametri sono:
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# Sono supportati i livelli di RAID 0, 1 e 5; i dispositivi devono essere
+# separati usando il carattere "#"
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+<!--
+# This makes partman automatically partition without confirmation.
+--># Questo fa in modo che partman partizioni automaticamente senza conferma.
+d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
 <!--
@@ -1386,11 +1513,11 @@ d-i partman/confirm boolean true
 # Controls whether or not the hardware clock is set to UTC.
 --># Controlla se l'orologio hardware deve essere impostato o meno su UTC.
 d-i clock-setup/utc boolean true
+
 <!--
 # You may set this to any valid setting for $TZ; see the contents of
 # /usr/share/zoneinfo/ for valid values.
--->
-# Questo può essere impostato con qualsiasi valore valido per $TZ; si
+--># Questo può essere impostato con qualsiasi valore valido per $TZ; si
 # consulti /usr/share/zoneinfo/ per i valori validi.
 d-i time/zone string US/Eastern
 </screen></informalexample>
@@ -1427,13 +1554,17 @@ aggiungere altri repository (anche locali).
 # delle sorgenti per la sicurezza oppure per usare un server diverso da
 # security.debian.org.
 #d-i apt-setup/security_host string
+
 <!--
 # Additional repositories, local[0-9] available
--->
-# Altri repository, sono disponibili local[0-9]
-#d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/source string \
+--># Altri repository, sono disponibili local[0-9]
+#d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+<!--
+# Enable deb-src lines
+--># Abilita le righe deb-src
+#d-i apt-setup/local0/source boolean true
 <!--
 # URL to the public key of the localrepository
 --># URL alla chiave pubblica del repository locale
@@ -1487,20 +1618,20 @@ poiché un hash MD5 consente attacchi di tipo brute force.
 --># In alternativa, è possibile saltare la creazione dell'account per
 # l'utente normale.
 #d-i passwd/make-user boolean false
+
 <!--
 # Root password, either in clear text
--->
-# Password di root, in chiaro entrambe le volte
+--># Password di root, in chiaro entrambe le volte
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 <!--
 # or encrypted using an MD5 hash.
 --># oppure criptata in un hash MD5.
 #d-i passwd/root-password-crypted password [MD5 hash]
+
 <!--
 # To create a normal user account.
--->
-# Per creare l'account per l'utente normale.
+--># Per creare l'account per l'utente normale.
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
 <!--
@@ -1582,27 +1713,27 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 --># Grub è il boot loader predefinito (per x86). Invece, se si desidera
 # che sia installato lilo, scommentare questa riga:
 #d-i grub-installer/skip boolean true
+
 <!--
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.
--->
-# Questa è ragionevolmente sicura da impostare, fa in modo che grub sia
+--># Questa è ragionevolmente sicura da impostare, fa in modo che grub sia
 # installato automaticamente nel MBR se nessun altro sistema operativo è
 # rilevato nella macchina.
 d-i grub-installer/only_debian boolean true
+
 <!--
 # This one makes grub-installer install to the MBR if if finds some other OS
 # too, which is less safe as it might not be able to boot that other OS.
--->
-# Questa fa in modo che grub-installer si installi sul MBR se trova anche
+--># Questa fa in modo che grub-installer si installi sul MBR se trova anche
 # qualche altro sistema operativo, che è un po' meno sicuro poiché potrebbe
 # non riuscire ad avviare gli altri sistemi operativi.
 d-i grub-installer/with_other_os boolean true
+
 <!--
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
--->
-# In alternativa, se si vuole installare in una locazione differente dal
+--># In alternativa, se si vuole installare in una locazione differente dal
 # MBR, scommentare ed editare queste linee:
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
@@ -1698,18 +1829,18 @@ del kernel.
 tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
 #tasksel tasksel/first multiselect standard, kde-desktop
+
 <!--
 # Individual additional packages to install
--->
-# Ulteriori pacchetti da installare
+--># Ulteriori pacchetti da installare
 #d-i pkgsel/include string openssh-server build-essential
+
 <!--
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
 # but sending reports helps the project determine what software is most
 # popular and include it on CDs.
--->
-# Alcune versioni dell'installatore possono inviare un resoconto di quali
+--># Alcune versioni dell'installatore possono inviare un resoconto di quali
 # programmi sono stati installati e quali sono usati. Questo resoconto, la
 # cui ricezione aiuta il progetto a determinare quali sono i programmi più
 # popolari per inserirli nei CD, normalmente non viene inviato.
@@ -1725,11 +1856,11 @@ tasksel tasksel/first multiselect standard, desktop
 # Avoid that last message about the install being complete.
 --># Evita l'ultimo messaggio riguardo il completamento dell'installazione.
 d-i finish-install/reboot_in_progress note
+
 <!--
 # This will prevent the installer from ejecting the CD during the reboot,
 # which is useful in some situations.
--->
-# Impedisce che il programma d'installazione espelli il CD prima del riavvio,
+--># Impedisce che il programma d'installazione espelli il CD prima del riavvio,
 # in alcuni casi può essere utile.
 #d-i cdrom-detect/eject boolean false
 </screen></informalexample>
@@ -1786,20 +1917,20 @@ a fare una configurazione automatica di tutto.
 # preconfigurando, si sovrascriverà qualsiasi cosa esso scelga. Nella
 # maggioranza dei casi vesa funzionerà ancora.
 #xserver-xorg xserver-xorg/config/device/driver select vesa
+
 <!--
 # A caveat with mouse autodetection is that if it fails, X will retry it
 # over and over. So if it's preseeded to be done, there is a possibility of
 # an infinite loop if the mouse is not autodetected.
--->
-# Un avvertimento per il rilevamento automatico del mouse è che se questo
+--># Un avvertimento per il rilevamento automatico del mouse è che se questo
 # fallisce, X lo proverà ancora e così via. Pertanto, se si è preconfigurato
 # che debba essere fatto, c'è la possibilità di un ciclo infinito se il
 # mouse non è rilevato automaticamente.
 #xserver-xorg xserver-xorg/autodetect_mouse boolean true
+
 <!--
 # Monitor autodetection is recommended.
--->
-# Il rilevamento automatico del monitor è raccomandato.
+--># Il rilevamento automatico del monitor è raccomandato.
 xserver-xorg xserver-xorg/autodetect_monitor boolean true
 <!--
 # Uncomment if you have an LCD display.
@@ -1864,20 +1995,20 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # fidate! Per comprendere il rischio, e poiché è generalmente utile,
 # ecco un modo per eseguire automaticamente qualsiasi comando della shell
 # all'interno dell'installatore.
+
 <!--
 # This first command is run as early as possible, just after
 # preseeding is read.
--->
-# Questo è primo comando, è eseguito il prima possibile, appena dopo la
+--># Questo è primo comando, è eseguito il prima possibile, appena dopo la
 # lettura della preconfigurazione.
 #d-i preseed/early_command string anna-install some-udeb
+
 <!--
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
 # directly, or use the apt-install and in-target commands to easily install
 # packages and run commands in the target system.
--->
-# Questo è l'ultimo comando, è eseguito appena prima che l'installatore
+--># Questo è l'ultimo comando, è eseguito appena prima che l'installatore
 # termini, ma quando la directory /target è ancora usabile. È possibile
 # fare un chroot su /target e usarlo direttamente oppure usare i comandi
 # apt-install e in-target per installare dei pacchetti ed eseguire comandi
@@ -1919,30 +2050,30 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # sono prelevati dalla stessa directory del file di preconfigurazione che
 # gli include.
 #d-i preseed/include string x.cfg
+
 <!--
 # The installer can optionally verify checksums of preconfiguration files
 # before using them. Currently only md5sums are supported, list the md5sums
 # in the same order as the list of files to include.
--->
-# Facoltativamente il programma d'installazione può verificare le checksum
+--># Facoltativamente il programma d'installazione può verificare le checksum
 # dei file prima di processarli. Attualmente sono supportati solo le checksum
 # md5sum che vanno elencate nello stesso ordine con cui sono inclusi i file.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
+
 <!--
 # More flexibly, this runs a shell command and if it outputs the names of
 # preconfiguration files, includes those files.
--->
-# Ancora più flessibile, questo esegue un comando di shell e se restituisce
+--># Ancora più flessibile, questo esegue un comando di shell e se restituisce
 # i nomi dei file di preconfigurazione allora include questi file.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+
 <!--
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
--->
-# Il massimo della flessibilità, questo scarica ed esegue un programma. Il
+--># Il massimo della flessibilità, questo scarica ed esegue un programma. Il
 # programma può usare debconf-set per manipolare il database di debconf. Si
 # noti che se i nomi dei file sono relativi, sono prelevati dalla stessa
 # directory del file di preconfigurazione che gli esegue.

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40673 -->
+<!-- original version: 41817 -->
 
  <sect1 id="mount-encrypted-volumes">
  <!-- <title>Mounting encrypted volumes</title> -->
@@ -34,13 +34,14 @@ Le partizioni cifrate con dm-crypt sono mostrate durante l'avvio con un
 prompt simile a questo:
 
 <informalexample><screen>
-Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Starting early crypto disks... <replaceable>part</replaceable>_crypt(starting)
 Enter LUKS passphrase:
 </screen></informalexample>
 
 <!--
-In the first line of the prompt, <replaceable>X</replaceable> is the
-number of the loop device. You are now probably wondering
+In the first line of the prompt, <replaceable>part</replaceable> is the
+name of the underlying partition, e.g. sda2 or md0.
+You are now probably wondering
 <emphasis>for which volume</emphasis> you are actually entering the
 passphrase. Does it relate to your <filename>/home</filename>? Or to
 <filename>/var</filename>? Of course, if you have just one encrypted
@@ -49,14 +50,15 @@ when setting up this volume. If you set up more than one encrypted
 volume during the installation, the notes you wrote down as the last
 step in <xref linkend="partman-crypto"/> come in handy. If you did not
 make a note of the mapping between
-<filename>crypt<replaceable>X</replaceable></filename> and the mount
+<filename><replaceable>part</replaceable>_crypt</filename> and the mount
 points before, you can still find it
 in <filename>/etc/crypttab</filename>
 and <filename>/etc/fstab</filename> of your new system.
 -->
 
-Nella prima riga la <replaceable>X</replaceable> è il numero del loop
-device. Probabilmente adesso si vorrebbe conosce <emphasis>per quale
+Nella prima riga la <replaceable>part</replaceable> è il nome della
+partizione sottostante, per esempio sda2 o md0.
+Probabilmente adesso si vorrebbe conosce <emphasis>per quale
 volume</emphasis> si sta inserendo la passphrase. Si tratta di
 <filename>/home</filename>? Oppure di <filename>/var</filename>?
 Certamente se nel sistema esiste un solo volume cifrato la risposta è
@@ -65,7 +67,7 @@ configurazione. Invece, se durante l'installazione sono stati preparati
 più volumi cifrati, gli appunti presi durante l'ultimo passo descritto
 in <xref linkend="partman-crypto"/> risultano molto utili. Se non si
 hanno appunti su come sono mappati i diversi
-<filename>crypt<replaceable>X</replaceable></filename> sui vari punti di
+<filename><replaceable>part</replaceable>_crypt</filename> sui vari punti di
 mount allora si possono trovare nei file <filename>/etc/crypttab</filename>
 e <filename>/etc/fstab</filename> del nuovo sistema.
 

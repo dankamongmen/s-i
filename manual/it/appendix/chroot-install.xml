@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 41453 -->
 
 
  <sect1 id="linux-upgrade">
@@ -19,15 +19,15 @@ the user's current system, while <prompt>#</prompt> refers to a
 command entered in the Debian chroot.
 -->
 
-In questa sezione è spiegato come installare &debian; a partire da un sistema
-Unix o Linux esistente, senza utilizzare l'installatore a menu come illustrato
-nel resto del manuale. Questo HOWTO sul <quote>cross-install</quote> è stato
-richiesto da utenti di altre distribuzioni, Red Hat, Mandrake e SUSE, che
-vogliono passare a &debian;. Viene data per acquisita una minima familiarità
-con i comandi *nix e con la navigazione del file system. In questa sezione,
-<prompt>$</prompt> indica un comando da inserire nel sistema attualmente in
-uso all'utente, mentre <prompt>#</prompt> si riferisce a un comando da
-inserire nell'ambiente chroot di Debian.
+In questa sezione viene spiegato come installare &debian; a partire da un
+sistema Unix o Linux esistente, senza utilizzare l'installatore a menu come
+illustrato nel resto del manuale. Questo HOWTO sul <quote>cross-install</quote>
+è stato richiesto da utenti di altre distribuzioni, come Red Hat, Mandrake e
+SUSE, che vogliono provare a &debian;. Viene data per acquisita da parte
+dell'utente una minima familiarità con i comandi *nix e con la navigazione
+del file system. In questa sezione, <prompt>$</prompt> indica un comando da
+inserire nel sistema attualmente in uso all'utente, mentre <prompt>#</prompt>
+si riferisce a un comando da inserire nell'ambiente chroot di Debian.
 
 </para><para>
 
@@ -41,11 +41,11 @@ media.
 -->
 
 Una volta che il nuovo sistema Debian è stato configurato a proprio
-piacimento, si può procedere alla migrazione dei dati esistenti e
-proseguire normalmente. Si tratta perciò di un'installazione che non
-blocca, nemmeno momentaneamente, l'uso del sistema, inoltre è un modo
-ingegnoso per lavorare con hardware che potrebbe creare problemi con i
-normali dispositivi di avvio o installazione.
+piacimento, si può procedere alla migrazione dei dati esistenti e poi
+all'uso quotidiano. Si tratta quindi di un'installazione che non blocca,
+nemmeno momentaneamente, l'uso del sistema, inoltre è un modo ingegnoso
+per gestire hardware che potrebbe avere problemi con i normali metodi di
+avvio o installazione.
 
 </para>
 
@@ -61,10 +61,10 @@ need at least 150MB of space available for a console only install,
 or at least 300MB if you plan to install X.
 -->
 
-Si ripartizioni secondo le proprie necessità il disco fisso con i tool
-di partizionamento *nix disponibili. Come minimo servono un file system
-e una partizione di swap. Per un ambiente puramente testuale è necessario
-150&nbsp;MB di spazio minimo, 300&nbsp;MB se si intende installare X.
+Usando gli strumenti per il partizionamento disponibili, ripartizionare,
+secondo le proprie necessità, il disco fisso creando almeno un file system
+e una partizione di swap. Per un ambiente puramente testuale sono necessari
+150&nbsp;MB, 300&nbsp;MB se si intende installare X.
 
 </para><para>
 
@@ -96,8 +96,8 @@ Initialize and activate swap (substitute the partition number for
 your intended Debian swap partition):
 -->
 
-Si inizializzi e attivi lo swap (si sostituisca il numero della
-partizione con quello della partizione destinata allo swap per Debian):
+Inizializzare e attivare lo swap (sostituire il numero della partizione
+con quello della partizione destinata allo swap per Debian):
 
 <informalexample><screen>
 # mkswap /dev/hda5
@@ -112,10 +112,10 @@ on your new system). The mount point name is strictly arbitrary, it is
 referenced later below.
 -->
 
-Si monti una partizione come <filename>/mnt/debinst</filename> (il punto
-di installazione, che sarà il file system di root (<filename>/</filename>)
+Montare una partizione come <filename>/mnt/debinst</filename> (il punto
+di installazione, diventerà il file system di root <filename>/</filename>
 del nuovo sistema). Il nome del mount point è arbitrario, quello scelto
-verrà utilizzato da qui in avanti.
+è utilizzato da qui in avanti.
 
 <informalexample><screen>
 # mkdir /mnt/debinst
@@ -151,11 +151,11 @@ official way to install a Debian base system, is
 <classname>/bin/sh</classname> and basic Unix/Linux tools<footnote>
 -->
 
-Lo strumento che l'installatore Debian usa, e che è considerato il
+Lo strumento usato dall'installatore Debian, e che è considerato il
 mezzo ufficiale per installare un sistema Debian di base, è
 <command>debootstrap</command>. Utilizza <command>wget</command> e
-<command>ar</command>, ma a parte questi dipende solo da
-<classname>/bin/sh</classname> e dagli strumenti Unix/Linux di
+<command>ar</command>, ma a parte questi programmi ha bisogno solo
+di <classname>/bin/sh</classname> e degli strumenti Unix/Linux di
 base<footnote>
 
 <para>
@@ -177,10 +177,9 @@ Questi includono le principali utility GNU e comandi come
 then download and install <command>debootstrap</command>.
 -->
 
-</footnote>. Si installi
-<command>wget</command> e <command>ar</command> in caso non siano già
-presenti sul sistema in uso, quindi si scarichi e installi
-<command>debootstrap</command>.
+</footnote>. Si installi <command>wget</command> e <command>ar</command>
+in caso non siano già presenti sul sistema in uso, poi scaricare e
+installare <command>debootstrap</command>.
 
 </para>
 
@@ -206,8 +205,9 @@ Or, you can use the following procedure to install it
 manually. Make a work folder for extracting the .deb into:
 -->
 
-Un'ulteriore possibilità è installarlo manualmente seguendo questa
-procedura. Si crei una cartella di lavoro in cui estrarre il .deb:
+Un'ulteriore possibilità è installare <command>debootstrap</command>
+manualmente seguendo questa procedura. Creare una cartella di lavoro
+in cui estrarre il .deb:
 
 <informalexample><screen>
 # mkdir work
@@ -220,38 +220,22 @@ archive (be sure to select the proper file for your
 architecture). Download the <command>debootstrap</command> .deb from
 the <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
 pool</ulink>, copy the package to the work folder, and extract the
-binary files from it. You will need to have root privileges to install
-the binaries.
+files from it. You will need to have root privileges to install
+the files.
 -->
 
-Il binario di <command>debootstrap</command> si trova nell'archivio
-Debian (si faccia attenzione a scegliere il file adatto alla propria
-architettura). Si scarichi il pacchetto .deb di
-<command>debootstrap</command> da <ulink
+Il binario di <command>debootstrap</command> si trova nell'archivio Debian
+(si faccia attenzione a scegliere il file adatto alla propria architettura).
+Scaricare il pacchetto .deb di <command>debootstrap</command> dal <ulink
 url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">pool</ulink>,
-lo si copi nella cartella di lavoro e si estraggano da esso i file
-binari. Servono i privilegi di root per installarli.
+poi copiarlo nella cartella di lavoro ed estrarre i file. Servono i privilegi
+di root per installarli.
 
 <informalexample><screen>
-# ar -x debootstrap_0.X.X_arch.deb
+# ar -x debootstrap_0.X.X_all.deb
 # cd /
 # zcat /full-path-to-work/work/data.tar.gz | tar xv
 </screen></informalexample>
-
-</para><para>
-
-<!--
-Note that running <command>debootstrap</command> may require you to have
-a minimal version of <classname>glibc</classname> installed (currently
-GLIBC_2.3). <command>debootstrap</command> itself is a shell script, but
-it calls various utilities that require <classname>glibc</classname>.
--->
-
-Notare che l'esecuzione di <command>debootstrap</command> potrebbe
-richiedere l'installazione di una versione minimale della
-<classname>glibc</classname> (al momento GLIBC_2.3).
-<command>debootstrap</command> è semplicemente uno script di shell ma
-richiama diverse utilità che richiedono la <classname>glibc</classname>.
 
 </para>
   </sect2>
@@ -272,10 +256,10 @@ network-wise. Mirrors are listed at
 
 Quando viene lanciato, <command>debootstrap</command> è in grado
 di scaricare i file necessari direttamente dall'archivio. Si può
-sostituire a <userinput>http.us.debian.org/debian</userinput>,
-utilizzato nell'esempio sottostante, un qualsiasi mirror dell'archivio
+sostituire <userinput>http.us.debian.org/debian</userinput>,
+utilizzato nell'esempio sottostante, con un qualsiasi mirror dell'archivio
 Debian, meglio se geograficamente vicino. Un elenco dei mirror è
-reperibile presso: <ulink
+disponibole presso: <ulink
 url="http://www.debian.org/misc/README.mirrors"></ulink>.
 
 </para><para>
@@ -287,8 +271,8 @@ of the http URL: <userinput>file:/cdrom/debian/</userinput>
 -->
 
 In caso si abbia un CD &debian; &releasename; montato su
-<filename>/cdrom</filename>, si può sostituire all'URL http
-l'URL <userinput>file:/cdrom/debian/</userinput>.
+<filename>/cdrom</filename>, si può sostituire l'URL http con l'URL
+<userinput>file:/cdrom/debian/</userinput>.
 
 </para><para>
 
@@ -309,8 +293,8 @@ in the <command>debootstrap</command> command:
 <userinput>sparc</userinput>.
 -->
 
-Al posto di <replaceable>ARCH</replaceable>, nel comando
-<command>debootstrap</command> si sostituisca uno dei seguenti:
+Nel comando <command>debootstrap</command> sostituire
+<replaceable>ARCH</replaceable> con uno dei seguenti:
 <userinput>alpha</userinput>, <userinput>arm</userinput>,
 <userinput>hppa</userinput>, <userinput>i386</userinput>,
 <userinput>ia64</userinput>, <userinput>m68k</userinput>,
@@ -336,7 +320,7 @@ Now you've got a real Debian system, though rather lean, on disk.
 <command>Chroot</command> into it:
 -->
 
-Ora sul disco c'è un vero sistema Debian, seppur minimale. Ci si faccia
+Ora sul disco c'è un vero sistema Debian, seppur minimale. Eseguire
 <command>chroot</command>:
 
 <informalexample><screen>
@@ -354,7 +338,7 @@ Ora sul disco c'è un vero sistema Debian, seppur minimale. Ci si faccia
 You need to create <filename>/etc/fstab</filename>.
 -->
 
-Bisogna creare <filename>/etc/fstab</filename>.
+Adesso è necessario creare <filename>/etc/fstab</filename>.
 
 <informalexample><screen>
 # editor /etc/fstab
@@ -396,7 +380,7 @@ Per montare tutti i file system specificati nel proprio
 mentre per montarli singolarmente si usi:
 
 <informalexample><screen>
-# mount /path   # ad esempio:  mount /usr
+# mount /path   # per esempio:  mount /usr
 </screen></informalexample>
 
 <!--
@@ -406,9 +390,9 @@ locations, though <filename>/proc</filename> is customary. If you didn't use
 -->
 
 È possibile montare il file system proc più volte e in posizioni
-arbitrarie, ma è consuetudine farlo su <filename>/proc</filename>. In caso
-non si esegua <userinput>mount -a</userinput>, ci si assicuri di montare
-proc prima di continuare:
+arbitrarie, ma è consuetudine farlo su <filename>/proc</filename>. Se
+non si esegue <userinput>mount -a</userinput>, prima di continuare
+assicurarsi di montare proc:
 
 <informalexample><screen>
 # mount -t proc proc /proc
@@ -442,7 +426,7 @@ montare proc da fuori della chroot:
 To configure your keyboard:
 -->
 
-Per configurare la propria tastiera:
+Per configurare la tastiera:
 
 <informalexample><screen>
 # dpkg-reconfigure console-data
@@ -474,7 +458,7 @@ To configure networking, edit
 <filename>/etc/hosts</filename>.
 -->
 
-Per configurare la rete, si editino
+Per configurare la rete, si deve modificare
 <filename>/etc/network/interfaces</filename>,
 <filename>/etc/resolv.conf</filename>,
 <filename>/etc/hostname</filename> e
@@ -525,7 +509,7 @@ Enter your nameserver(s) and search directives in
 <filename>/etc/resolv.conf</filename>:
 -->
 
-Gli indirizzi dei name server e le direttive search vanno immesse in
+Gli indirizzi dei name server e le direttive search vanno inseriti in
 <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
@@ -548,7 +532,7 @@ nameserver 192.168.9.100
 Enter your system's host name (2 to 63 characters):
 -->
 
-Si immetta l'hostname del proprio sistema (da 2 a 63 caratteri):
+Inserire l'hostname del proprio sistema (da 2 a 63 caratteri):
 
 <informalexample><screen>
 # echo DebianHostName &gt; /etc/hostname
@@ -580,8 +564,8 @@ English, install the <classname>locales</classname> support package
 and configure it:
 -->
 
-Per utilizzare una localizzazione diversa da quella inglese, si installi
-il pacchetto <classname>locales</classname> e lo si configuri.
+Per utilizzare una localizzazione diversa da quella inglese, installare e
+configurare il pacchetto <classname>locales</classname>.
 
 <informalexample><screen>
 # aptitude install locales
@@ -595,11 +579,10 @@ Before using locales with character sets other than ASCII or latin1,
 please consult the appropriate localization HOWTO.
 -->
 
-NOTA: <classname>apt</classname> dev'essere già stato configurato
-in precedenza con la creazione di source.list e l'esecuzione di
-<command>aptitude update</command>. Prima di utilizzare locales con
-un set di caratteri diverso da ASCII o latin1, si consulti l'HOWTO
-di localizzazione appropriato.
+NOTA: <classname>apt</classname> dev'essere stato configurato in precedenza
+con la creazione di source.list e l'esecuzione di <command>aptitude
+update</command>. Prima di utilizzare locales con un set di caratteri
+diverso da ASCII o latin1, si consulti l'HOWTO di localizzazione appropriato.
 
 </para>
    </sect3>
@@ -619,7 +602,7 @@ Nel caso si intenda fare il boot nel nuovo sistema, servono un kernel Linux
 e un boot loader. I kernel pacchettizzati disponibili si trovano con
 
 <informalexample><screen>
-# apt-cache search <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image
+# apt-cache search linux-image
 </screen></informalexample>
 
 <!--
@@ -629,7 +612,7 @@ Then install your choice using its package name.
 Si può quindi installare quello scelto usando il nome del pacchetto.
 
 <informalexample><screen>
-# aptitude install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arch-etc</replaceable>
+# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
 </para>
@@ -647,11 +630,11 @@ the installed kernel with your new root partition. Note that
 can use <command>aptitude</command> inside your Debian chroot to do so.
 -->
 
-Per rendere avviabile il sistema &debian;, si configuri il boot loader
-affinché carichi il kernel installato con la nuova partizione di root. Si
-noti che <command>debootstrap</command> non installa di suo un boot loader,
-lo si può fare tramite <command>aptitude</command> dall'interno della
-chroot Debian.
+Per rendere avviabile il sistema &debian;, si deve configurare il boot loader
+in modo da caricare il kernel installato con la nuova partizione di root. Si
+noti che <command>debootstrap</command> non installa un boot loader, si può
+installare un boot loader tramite <command>aptitude</command> dall'interno
+della chroot Debian.
 
 </para><para arch="x86">
 

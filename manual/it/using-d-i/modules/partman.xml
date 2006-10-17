@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39529 -->
+<!-- original version: 41634 -->
 
 
    <sect3 id="partman">
@@ -21,56 +21,108 @@ il partizionamento, o si desidera conoscere più particolari, si veda
 
 <!--
 First you will be given the opportunity to automatically partition
-either an entire drive, or free space on a drive. This is also called
-<quote>guided</quote> partitioning. If you do not want to
-autopartition, choose <guimenuitem>Manually edit partition
-table</guimenuitem> from the menu.
+either an entire drive, or available free space on a drive. This is
+also called <quote>guided</quote> partitioning. If you do not want to
+autopartition, choose <guimenuitem>Manual</guimenuitem> from the menu.
 -->
 
 In primo luogo è data l'opportunità di partizionare automaticamente un
-intero disco o solo lo spazio libero. Ciò è chiamato partizionamento
-<quote>guidato</quote>. Se non si desidera usare l'autopartizionamento,
-scegliere <guimenuitem>Modificare la tabella delle partizioni
-manualmente</guimenuitem> dal menu.
+intero disco oppure il solo spazio libero disponibile. Ciò è chiamato
+partizionamento <quote>guidato</quote>. Se non si desidera usare
+l'autopartizionamento si deve scegliere <guimenuitem>Manuale</guimenuitem>
+dal menu.
 
 </para><para>
 
 <!--
-If you choose guided partitioning, you may have two options: to create
-partitions directly on the hard disk (classic method) or to use Logical
-Volume Management (LVM). In the second case, the installer will create most
-partitions inside one big partition; the advantage of this method is that
-partitions inside this big partition can be resized relatively easily later.
-Note: the option to use LVM may not be available on all architectures.
+If you choose guided partitioning, you may have three options: to create
+partitions directly on the hard disk (classic method), or to create them
+using Logical Volume Management (LVM), or to create them using encrypted
+LVM. Note: the option to use (encrypted) LVM may not be available on all
+architectures.
 -->
 
-Con il partizionamento guidato si hanno due possibilità: creare le partizioni
-direttamente sull'hard disk (il metodo classico) oppure usare il Logical
-Volume Management (LVM). Nel secondo caso, l'installatore crea la maggior
-parte delle partizioni dentro una partizione più grande; il vantaggio di
-questo metodo è che in seguito le partizioni interne possono essere
-ridimensionate abbastanza facilmente. Nota: la possibilità di usare LVM
-potrebbe non essere disponibile su tutte le architetture.
+Con il partizionamento guidato si hanno tre possibilità: creare le partizioni
+direttamente sull'hard disk (il metodo classico) oppure tramite il Logical
+Volume Management (LVM) oppure tramite LVM cifrato. Nota: la possibilità di
+usare LVM (cifrato o no) potrebbe non essere disponibile su tutte le
+architetture.
 
-</para>
-<warning><para>
+</para><para>
 
 <!--
-If you choose guided partitioning using LVM, it will not be possible to
-undo changes made in the partition table. This effectively erases all
-data that is currently on the selected hard disk.
+When using LVM or encrypted LVM, the installer will create most
+partitions inside one big partition; the advantage of this method is that
+partitions inside this big partition can be resized relatively easily later.
+In the case of encrypted LVM the big partition will not be readable without
+knowing a special key phrase, thus providing extra security of your
+(personal) data.
 -->
 
-Se si sceglie il partizionamento guidato con LVM, non è possibile annullare
-le modifiche fatte alla tabella delle partizioni. In pratica cancella tutti
-i dati che attualmente presenti sul disco selezionato.
+Quando si usa LVM o LVM cifrato, l'installatore crea gran parte delle
+partizioni all'interno una partizione più grande; il vantaggio di questa
+operazione è che in seguito le partizioni interne possono essere
+ridimensionate abbastanza facilmente. Per LVM cifrato la partizione più
+grande non è leggibile senza conoscere la passphrase, questo fornisce un
+livello di sicurezza maggiore per i propri dati personali.
 
-</para></warning>
+</para>
+<note><para>
+
+<!--
+If you choose guided partitioning using LVM or encrypted LVM, some changes
+in the partition table will need to be written to the selected disk while
+LVM is being set up. These changes effectively erase all data that is
+currently on the selected hard disk and you will not be able to undo them
+later. However, the installer will ask you to confirm these changes before
+they are written to disk.
+-->
+
+Se si sceglie il partizionamento guidato con LVM o LVM cifrato è necessario
+effettuare alcune modifiche alla tabella delle partizioni del disco scelto
+durante la configurazione del LVM. Queste modiche cancellano i dati presenti
+sul disco e non è possibile annullare l'operazione, però viene richiesta la
+conferma di qualsiasi modifica prima di eseguire la scrittura sul disco.
+
+</para></note>
 <para>
 
 <!--
-After you choose guided partitioning (either classic or using LVM), you
-will be able to choose from the schemes listed in the table below.
+If you choose guided partitioning (either classic or using (encrypted)
+LVM) for a whole disk, you will first be asked to select the disk you want
+to use. Check that all your disks are listed and, if you have several disks,
+make sure you select the correct one. The order they are listed in may
+differ from what you are used too. The size of the disks may help to identify
+them.
+-->
+
+Se si sceglie il partizionamento guidato (classico, LVM o LVM cifrato)
+dell'intero disco viene prima chiesto di scegliere il disco che si vuole
+usare, verificare che nell'elenco appaiano tutti i dischi e assicurarsi
+di scegliere quello corretto. L'ordine con cui appaiono i dischi può
+essere diverso da quello a cui si è abituati; la dimensione del disco
+può essere utile per identificare i diversi dischi.
+
+</para><para>
+
+<!--
+Any data on the disk you select will eventually be lost, but you will always
+be asked to confirm any changes before they are written to the disk.
+If you have selected the classic method of partitioning, you will be able to
+undo any changes right until the end; when using (encrypted) LVM this is not
+possible.
+-->
+
+Tutti i dati sul disco scelto possono andare persi, però viene richiesta la
+conferma di qualsiasi modifica prima di eseguire la scrittura sul disco. Con
+il metodo di partizionamento classico è possibile annullare qualsiasi modifica
+fino alla fine; quando si usa i metodi LVM (cifrato o no) questo non è
+possibile.
+
+</para><para>
+
+<!--
+Next, you will be able to choose from the schemes listed in the table below.
 All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
 unsure, choose the first one. Bear in mind that guided partitioning
@@ -79,8 +131,7 @@ give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
 -->
 
-Una volta scelto il partizionamento guidato (classico o con LVM),
-è possibile scegliere uno degli
+Poi è possibile scegliere uno degli
 schemi elencati nella tabella seguente. Tutti gli schemi hanno pro e contro,
 alcuni dei quali sono discussi in <xref linkend="partitioning"/>. Si consiglia
 l'uso del primo schema se si hanno dei dubbi su quale scegliere. Inoltre si
@@ -130,14 +181,15 @@ guidato non funziona.
 <para>
 
 <!--
-If you choose guided partitioning using LVM, the installer will also create
+If you choose guided partitioning using (encrypted) LVM, the installer will also create
 a separate <filename>/boot</filename> partition. The other partitions, except
 for the swap partition, will be created inside the LVM partition.
 -->
 
-Se si sceglie il partizionamento guidato con LVM, l'installatore crea
-una partizione <filename>/boot</filename> separata. Le altre partizioni,
-a eccezione della partizione di swap, sono create dentro la partizione LVM.
+Se si sceglie il partizionamento guidato con LVM (cifrato o no),
+l'installatore crea una partizione <filename>/boot</filename> separata.
+Le altre partizioni, a eccezione della partizione di swap, sono create
+dentro la partizione LVM.
 
 </para><para arch="ia64">
 
@@ -263,7 +315,7 @@ trattati nel seguito di questa sezione.
 </para><para>
 
 <!--
-If you select a pristine disk which doesn't have neither partitions
+If you select a pristine disk which has neither partitions
 nor free space on it, you will be offered to create a new partition
 table (this is needed so you can create new partitions). After this
 a new line entitled <quote>FREE SPACE</quote> should appear under the
@@ -274,8 +326,8 @@ Se si sceglie un disco nuovo, su cui non è presente nessuna partizione o
 su cui non c'è spazio libero, viene richiesta la creazione di una nuova
 tabella delle partizioni (questa operazione è necessaria per poter creare
 delle nuove partizioni). Come conseguenza a questa operazione, sotto il
-disco selezionato, appare una nuova riga intitolata <quote>SPAZIO
-LIBERO</quote>.
+disco selezionato, appare una nuova riga intitolata <quote>FREE
+SPACE</quote> (spazio libero).
 
 </para><para>
 
