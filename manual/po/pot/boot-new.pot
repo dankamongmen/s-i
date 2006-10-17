@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-09-15 18:50+0000\n"
+"POT-Creation-Date: 2006-10-17 08:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,19 +187,19 @@ msgstr ""
 #, no-c-format
 msgid ""
       "For partitions encrypted using dm-crypt you will be shown the following prompt during the boot: <informalexample><screen>\n"
-      "Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)\n"
+      "Starting early crypto disks... <replaceable>part</replaceable>_crypt(starting)\n"
       "Enter LUKS passphrase:\n"
-      "</screen></informalexample> In the first line of the prompt, <replaceable>X</replaceable> is the number of the loop device. You are now probably wondering <emphasis>for which volume</emphasis> you are actually entering the passphrase. Does it relate to your <filename>/home</filename>? Or to <filename>/var</filename>? Of course, if you have just one encrypted volume, this is easy and you can just enter the passphrase you used when setting up this volume. If you set up more than one encrypted volume during the installation, the notes you wrote down as the last step in <xref linkend=\"partman-crypto\"/> come in handy. If you did not make a note of the mapping between <filename>crypt<replaceable>X</replaceable></filename> and the mount points before, you can still find it in <filename>/etc/crypttab</filename> and <filename>/etc/fstab</filename> of your new system."
+      "</screen></informalexample> In the first line of the prompt, <replaceable>part</replaceable> is the name of the underlying partition, e.g. sda2 or md0. You are now probably wondering <emphasis>for which volume</emphasis> you are actually entering the passphrase. Does it relate to your <filename>/home</filename>? Or to <filename>/var</filename>? Of course, if you have just one encrypted volume, this is easy and you can just enter the passphrase you used when setting up this volume. If you set up more than one encrypted volume during the installation, the notes you wrote down as the last step in <xref linkend=\"partman-crypto\"/> come in handy. If you did not make a note of the mapping between <filename><replaceable>part</replaceable>_crypt</filename> and the mount points before, you can still find it in <filename>/etc/crypttab</filename> and <filename>/etc/fstab</filename> of your new system."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:231
+#: boot-new.xml:232
 #, no-c-format
 msgid "The prompt may look somewhat different when an encrypted root file system is mounted. This depends on which initramfs generator was used to generate the initrd used to boot the system. The example below is for an initrd generated using <classname>initramfs-tools</classname>:"
 msgstr ""
 
 #. Tag: screen
-#: boot-new.xml:238
+#: boot-new.xml:239
 #, no-c-format
 msgid ""
       "Begin: Mounting <emphasis>root file system</emphasis>... ...\n"
@@ -208,31 +208,31 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:240 boot-new.xml:265
+#: boot-new.xml:241 boot-new.xml:266
 #, no-c-format
 msgid "No characters (even asterisks) will be shown while entering the passphrase. If you enter the wrong passphrase, you have two more tries to correct it. After the third try the boot process will skip this volume and continue to mount the next filesystem. Please see <xref linkend=\"crypto-troubleshooting\"/> for further information."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:248 boot-new.xml:273
+#: boot-new.xml:249 boot-new.xml:274
 #, no-c-format
 msgid "After entering all passphrases the boot should continue as usual."
 msgstr ""
 
 #. Tag: title
-#: boot-new.xml:256
+#: boot-new.xml:257
 #, no-c-format
 msgid "loop-AES"
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:258
+#: boot-new.xml:259
 #, no-c-format
 msgid "For partitions encrypted using loop-AES you will be shown the following prompt during the boot:"
 msgstr ""
 
 #. Tag: screen
-#: boot-new.xml:263
+#: boot-new.xml:264
 #, no-c-format
 msgid ""
       "Checking loop-encrypted file systems.\n"
@@ -241,25 +241,25 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-new.xml:281
+#: boot-new.xml:282
 #, no-c-format
 msgid "Troubleshooting"
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:283
+#: boot-new.xml:284
 #, no-c-format
 msgid "If some of the encrypted volumes could not be mounted because a wrong passphrase was entered, you will have to mount them manually after the boot. There are several cases."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:292
+#: boot-new.xml:293
 #, no-c-format
 msgid "The first case concerns the root partition. When it is not mounted correctly, the boot process will halt and you will have to reboot the computer to try again."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:299
+#: boot-new.xml:300
 #, no-c-format
 msgid ""
       "The easiest case is for encrypted volumes holding data like <filename>/home</filename> or <filename>/srv</filename>. You can simply mount them manually after the boot. For loop-AES this is one-step operation: <informalexample><screen>\n"
@@ -269,7 +269,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:313
+#: boot-new.xml:314
 #, no-c-format
 msgid ""
       "For dm-crypt this is a bit trickier. First you need to register the volumes with <application>device mapper</application> by running: <informalexample><screen>\n"
@@ -278,13 +278,13 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: boot-new.xml:328
+#: boot-new.xml:329
 #, no-c-format
 msgid "<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>"
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:331
+#: boot-new.xml:332
 #, no-c-format
 msgid ""
       "If any volume holding noncritical system files could not be mounted (<filename>/usr</filename> or <filename>/var</filename>), the system should still boot and you should be able to mount the volumes manually like in the previous case. However, you will also need to (re)start any services usually running in your default runlevel because it is very likely that they were not started. The easiest way to achieve this is by switching to the first runlevel and back by entering <informalexample><screen>\n"
@@ -293,49 +293,49 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-new.xml:354
+#: boot-new.xml:355
 #, no-c-format
 msgid "Log In"
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:356
+#: boot-new.xml:357
 #, no-c-format
 msgid "Once your system boots, you'll be presented with the login prompt. Log in using the personal login and password you selected during the installation process. Your system is now ready to use."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:362
+#: boot-new.xml:363
 #, no-c-format
 msgid "If you are a new user, you may want to explore the documentation which is already installed on your system as you start to use it. There are currently several documentation systems, work is proceeding on integrating the different types of documentation. Here are a few starting points."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:370
+#: boot-new.xml:371
 #, no-c-format
 msgid "Documentation accompanying programs you have installed is in <filename>/usr/share/doc/</filename>, under a subdirectory named after the program. For example, the APT User's Guide for using <command>apt</command> to install other programs on your system, is located in <filename>/usr/share/doc/apt/guide.html/index.html</filename>."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:379
+#: boot-new.xml:380
 #, no-c-format
 msgid "In addition, there are some special folders within the <filename>/usr/share/doc/</filename> hierarchy. Linux HOWTOs are installed in <emphasis>.gz</emphasis> format, in <filename>/usr/share/doc/HOWTO/en-txt/</filename>. After installing <command>dhelp</command> you will find a browse-able index of documentation in <filename>/usr/share/doc/HTML/index.html</filename>."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:389
+#: boot-new.xml:390
 #, no-c-format
 msgid "One easy way to view these documents is to <userinput>cd /usr/share/doc/</userinput>, and type <userinput>lynx</userinput> followed by a space and a dot (the dot stands for the current directory)."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:396
+#: boot-new.xml:397
 #, no-c-format
 msgid "You can also type <userinput>info <replaceable>command</replaceable></userinput> or <userinput>man <replaceable>command</replaceable></userinput> to see documentation on most commands available at the command prompt. Typing <userinput>help</userinput> will display help on shell commands. And typing a command followed by <userinput>--help</userinput> will usually display a short summary of the command's usage. If a command's results scroll past the top of the screen, type <userinput>| more</userinput> after the command to cause the results to pause before scrolling past the top of the screen. To see a list of all commands available which begin with a certain letter, type the letter and then two tabs."
 msgstr ""
 
 #. Tag: para
-#: boot-new.xml:411
+#: boot-new.xml:412
 #, no-c-format
 msgid "For a more complete introduction to Debian and GNU/Linux, see <filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>."
 msgstr ""
