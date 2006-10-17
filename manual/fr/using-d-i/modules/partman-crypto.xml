@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39460 -->
+<!-- original version: 41817 -->
 
    <sect3 id="partman-crypto">
    <title>Configuration des volumes chiffrés</title>
@@ -20,7 +20,7 @@ Le chiffrement est particulièrement important pour deux partitions, la
 partition /home avec les données privées et la partition d'échange où 
 peuvent se trouver stockées temporairement des données sensibles. Bien sûr, 
 vous pouvez chiffrer n'importe quelle partition, par exemple <filename>/var</filename>
-où se trouvent les données des serveurs de base de données, des serveurs de 
+où se trouvent les données des serveurs de bases de données, des serveurs de 
 courrier ou d'impression, <filename>/tmp</filename> avec ses fichiers temporaires, etc. Vous 
 pouvez même chiffrer le système complet. La seule exception est qu'on ne 
 peut pas chiffrer la partition <filename>/boot</filename> car il n'existe actuellement aucun 
@@ -49,7 +49,7 @@ différentes options de chiffrement pour la partition.
 
 L'installateur debian propose plusieurs méthodes de chiffrement. Par défaut, 
 la méthode est <firstterm>dm-crypt</firstterm>, qui fait partie des noyaux 
-linux récents, et qui peut gérer les volumes LVM. Un autre méthode est 
+linux récents, et qui peut gérer les volumes logiques (LVM). Un autre méthode est 
 <firstterm>loop-AES</firstterm>, plus ancienne et maintenue en marge du 
 noyau Linux. Il est recommandé d'utiliser la méthode par défaut.
 
@@ -59,9 +59,9 @@ noyau Linux. Il est recommandé d'utiliser la méthode par défaut.
 </para><para>
 
 Voyons tout d'abord les options disponibles quand on a sélectionné la 
-méthode de chiffrement <userinput>Device-mapper (dm-crypt)</userinput>. Et 
-bien sûr, en cas de doute, il faut utiliser les options par défaut car elles 
-ont été choisies en visant la sécurité.
+méthode de chiffrement <userinput>Device-mapper (dm-crypt)</userinput>. N'oubliez pas
+qu'en cas de doute il faut utiliser les options par défaut car elles 
+ont été choisies en visant la sécurité d'utilisation.
 
 <variablelist>
 
@@ -77,8 +77,8 @@ bloc suivants&nbsp;: <firstterm>aes</firstterm>, <firstterm>blowfish</firstterm>
 <firstterm>serpent</firstterm> et <firstterm>twofish</firstterm>. Nous ne 
 discuterons pas ici de la qualité de ces différents algorithmes. Cependant, 
 il peut être utile de savoir que l'algorithme <emphasis>AES</emphasis> a été 
-choisi en 2000 par l'<quote>American National Institute of Standards and 
-Technology</quote> pour la protection des données sensibles au 21e siècle.
+choisi en 2000 par l'<emphasis>American National Institute of Standards
+and Technology</emphasis> pour la protection des données sensibles au 21e siècle.
 
 </para></listitem>
 </varlistentry>
@@ -316,7 +316,7 @@ configurer de la même façon que des partitions ordinaires. L'exemple suivant
 montre deux volumes différents, l'un chiffré avec dm-cript, l'autre avec 
 loop-AES.
 <informalexample><screen>
-Volume chiffré (<replaceable>crypt0</replaceable>) - 115.1 Go Linux device-mapper
+Volume chiffré (<replaceable>sda2_crypt</replaceable>) - 115.1 Go Linux device-mapper
         #1 115.1 Go  F ext3
 
 Loopback (<replaceable>loop0</replaceable>) - 515.2 Mo AES256 keyfile
@@ -328,7 +328,7 @@ défaut ne vous convient pas.
 </para><para>
 
 Notez bien les identifiants entre parenthèses
-(<replaceable>crypt0</replaceable> et <replaceable>loop0</replaceable> dans
+(<replaceable>sda2_crypt</replaceable> et <replaceable>loop0</replaceable> dans
 ce cas) et le point de montage affecté à chaque volume chiffré. Vous aurez
 besoin de ces informations quand vous amorcerez le nouveau système. Les
 différences entre un processus de démarrage ordinaire et un processus impliquant
