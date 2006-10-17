@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40673 -->
+<!-- original version: 41817 -->
 
  <sect1 id="mount-encrypted-volumes">
 <!--
@@ -35,13 +35,14 @@ dm-crypt で暗号化したパーティションでは、
 起動中に以下のようなプロンプトが表示されます。
 
 <informalexample><screen>
-Starting early crypto disks... crypt<replaceable>X</replaceable>(starting)
+Starting early crypto disks... <replaceable>part</replaceable>_crypt(starting)
 Enter LUKS passphrase:
 </screen></informalexample>
 
 <!--
-In the first line of the prompt, <replaceable>X</replaceable> is the
-number of the loop device. You are now probably wondering
+In the first line of the prompt, <replaceable>part</replaceable> is the
+name of the underlying partition, e.g. sda2 or md0.
+You are now probably wondering
 <emphasis>for which volume</emphasis> you are actually entering the
 passphrase. Does it relate to your <filename>/home</filename>? Or to
 <filename>/var</filename>? Of course, if you have just one encrypted
@@ -50,23 +51,23 @@ when setting up this volume. If you set up more than one encrypted
 volume during the installation, the notes you wrote down as the last
 step in <xref linkend="partman-crypto"/> come in handy. If you did not
 make a note of the mapping between
-<filename>crypt<replaceable>X</replaceable></filename> and the mount
+<filename><replaceable>part</replaceable>_crypt</filename> and the mount
 points before, you can still find it
 in <filename>/etc/crypttab</filename>
 and <filename>/etc/fstab</filename> of your new system.
 -->
-プロンプトの最初の行の <replaceable>X</replaceable> は、
-ループデバイスの番号です。
+プロンプトの最初の行の <replaceable>part</replaceable> は、
+たとえば sda2 や md0 のような、基本的なパーティション名です。
 おそらく、<emphasis>ボリュームごとに</emphasis> パスフレーズを入力することに、
-違和感を感じるのではないでしょうか。
+違和感を覚えるのではないでしょうか。
 これは <filename>/home</filename> や <filename>/var</filename> それぞれで
-パスフレーズを入力させられるのでしょうか？ もちろんそうです。
+パスフレーズを入力させられるのでしょうか? もちろんそうです。
 暗号化したボリュームが一つだけなら、話は簡単で、
 セットアップのときに入力したパスフレーズを入力するだけです。
 インストール時に、暗号化ボリュームを少なくとも一つは設定しているなら、
 <xref linkend="partman-crypto"/> 
 の最後のステップに書き留めたメモが役に立つでしょう。
-以前の <filename>crypt<replaceable>X</replaceable></filename> 
+以前の <filename><replaceable>part</replaceable>_crypt</filename>
 とマウントポイントの間のマッピングを記録しない場合、
 新しいシステムの <filename>/etc/crypttab</filename> と 
 <filename>/etc/fstab</filename> にあります。
