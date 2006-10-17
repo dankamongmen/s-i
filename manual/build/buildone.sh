@@ -42,7 +42,7 @@ dynamic="${tempdir}/dynamic.ent"
 
 create_profiled () {
 
-    [ -x /usr/bin/xsltproc ] || return 9
+    [ -x "`which xsltproc 2>/dev/null`" ] || return 9
 
     echo "Info: creating temporary profiled .xml file..."
 
@@ -97,7 +97,7 @@ create_profiled () {
         sed "s:##SRCPATH##:$source_path:" > $tempdir/install.${language}.xml
 
     # Create the profiled xml file
-    /usr/bin/xsltproc \
+    xsltproc \
         --xinclude \
         --stringparam profile.arch "$archspec" \
         --stringparam profile.condition "$condition" \
@@ -113,7 +113,7 @@ create_html () {
 
     echo "Info: creating .html files..."
 
-    /usr/bin/xsltproc \
+    xsltproc \
         --xinclude \
         --stringparam base.dir $destdir/html/ \
         $stylesheet_html \
@@ -128,11 +128,11 @@ create_html () {
 
 create_text () {
 
-    [ -x /usr/bin/w3m ] || return 9
+    [ -x "`which w3m 2>/dev/null`" ] || return 9
 
     echo "Info: creating temporary .html file..."
 
-    /usr/bin/xsltproc \
+    xsltproc \
         --xinclude \
         --output $tempdir/install.${language}.html \
         $stylesheet_html_single \
@@ -166,7 +166,7 @@ create_text () {
             CHARSET=ISO-8859-1 ;;
     esac
     
-    /usr/bin/w3m -dump $tempdir/install.${language}.corr.html \
+    HOME=$tempdir w3m -dump $tempdir/install.${language}.corr.html \
         -o display_charset=$CHARSET \
         >$destdir/install.${language}.txt
     RET=$?; [ $RET -ne 0 ] && return $RET
@@ -176,8 +176,8 @@ create_text () {
 
 create_dvi () {
     
-    [ -x /usr/bin/openjade ] || return 9
-    [ -x /usr/bin/jadetex ] || return 9
+    [ -x "`which openjade 2>/dev/null`" ] || return 9
+    [ -x "`which jadetex 2>/dev/null`" ] || return 9
 
     # Skip this step if the .dvi file already exists
     [ -f "$tempdir/install.${language}.dvi" ] && return
@@ -186,7 +186,7 @@ create_dvi () {
 
     # And use openjade to generate a .tex file
     export SP_ENCODING="utf-8"
-    /usr/bin/openjade -t tex \
+    openjade -t tex \
         -b utf-8 \
         -o $tempdir/install.${language}.tex \
         -d $stylesheet_dsssl \
@@ -212,7 +212,7 @@ create_dvi () {
     # This needs three passes to properly generate the index (page numbering)
     cd $tempdir
     for PASS in 1 2 3 ; do
-        /usr/bin/jadetex install.${language}.tex >/dev/null
+        jadetex install.${language}.tex >/dev/null
         RET=$?; [ $RET -ne 0 ] && break
     done
     cd ..
@@ -223,14 +223,14 @@ create_dvi () {
 
 create_pdf() {
     
-    [ -x /usr/bin/dvipdf ] || return 9
+    [ -x "`which dvipdf 2>/dev/null`" ] || return 9
 
     create_dvi
     RET=$?; [ $RET -ne 0 ] && return $RET
 
     echo "Info: creating .pdf file..."
 
-    /usr/bin/dvipdf $tempdir/install.${language}.dvi
+    dvipdf $tempdir/install.${language}.dvi
     RET=$?; [ $RET -ne 0 ] && return $RET
     mv install.${language}.pdf $destdir/
 
@@ -239,14 +239,14 @@ create_pdf() {
 
 create_ps() {
     
-    [ -x /usr/bin/dvips ] || return 9
+    [ -x "`which dvips 2>/dev/null`" ] || return 9
 
     create_dvi
     RET=$?; [ $RET -ne 0 ] && return $RET
 
     echo "Info: creating .ps file..."
 
-    /usr/bin/dvips -q $tempdir/install.${language}.dvi
+    dvips -q $tempdir/install.${language}.dvi
     RET=$?; [ $RET -ne 0 ] && return $RET
     mv install.${language}.ps $destdir/
 
