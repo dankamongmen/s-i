@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 33725 -->
+<!-- original version: 39531 -->
 
    <sect3 id="partman-lvm">
    <title>Nastavení manažera logických svazků (LVM)</title>
@@ -38,57 +38,72 @@ url="&url-lvm-howto;">LVM HOWTO</ulink>.
 
 </para><para>
 
-Nastavení LVM v instalačním programu Debianu je poměrně jednoduché.
-Nejprve musíte označit fyzické oblasti, které mají být spravovány přes
-LVM. (To se provádí v <command>partman</command>u v menu
-<guimenu>Nastavení oblasti</guimenu>, kde byste měli nastavit položku
-<guimenu>Použít jako:</guimenu> na hodnotu <guimenuitem>fyzický svazek
-pro LVM</guimenuitem>.) Poté přejděte do komponenty
-<command>lvmcfg</command> (buď přímo z <command>partman</command>u
-nebo z hlavního menu &d-i;u), kde uvidíte dvě hlavní menu:
-<guimenuitem>Upravit skupiny svazků (VG)</guimenuitem>
-a <guimenuitem>Upravit logické svazky (LV)</guimenuitem>. Jak již
-název prvního menu napovídá, spravují se zde skupiny svazků. Prakticky
-to znamená možnost:
+Nastavení LVM v instalačním programu Debianu je poměrně jednoduché a
+plně integrované do <command>partman</command>u.  Nejprve musíte
+označit fyzické oblasti, které mají být spravovány přes LVM. To se
+provádí v menu <guimenu>Nastavení oblasti</guimenu>, kde byste měli
+nastavit položku <guimenu>Použít jako:</guimenu> na hodnotu
+<guimenuitem>fyzický svazek pro LVM</guimenuitem>.
+
+</para><para>
+
+Po návratu na hlavní obrazovku <command>partman</command>u uvidíte
+nové menu <guimenuitem>Nastavit manažer logických svazků
+(LVM)</guimenuitem>. Po jeho výběru budete nejprve dotázáni, abyste
+potvrdili všechny dosud neprovedené změny v tabulce oblastí (pokud
+takové existují) a vzápětí se objeví konfigurační menu LVM, nad kterým
+je zobrazen krátký přehled současného nastavení. Menu samotné je
+kontextově závislé a zobrazuje pouze akce použitelné v daný
+okamžik. Mezi dostupné akce patří:
 
 <itemizedlist>
 <listitem><para>
 
-vytvořit novou skupinu z dosud nevyužitých fyzických svazků,
+<guimenuitem>Zobrazit podrobné nastavení</guimenuitem>, což zobrazí
+strukturu LVM zařízení včetně jmen a velikostí fyzických svazků,
+logických svazků a samozřejmě skupin svazků.
 
 </para></listitem>
 <listitem><para>
 
-smazat skupinu svazků a uvolnit tak fyzické svazky, ze kterých se
-skupina skládá,
+<guimenuitem>Vytvořit skupinu svazků</guimenuitem> z dosud nevyužitých
+fyzických svazků.
 
 </para></listitem>
 <listitem><para>
 
-rozšířit skupinu svazků o nevyužité fyzické svazky
+<guimenuitem>Smazat skupinu svazků</guimenuitem> a uvolnit tak fyzické
+svazky, ze kterých se skupina skládá.
 
 </para></listitem>
 <listitem><para>
 
-a naopak skupinu svazků zmenšit o některé fyzické svazky a tudíž je
-dát k dispozici jiným skupinám, nebo z nich
-v <command>partman</command>u udělat <quote>běžné</quote> oblasti.
-
-</para></listitem>
-</itemizedlist>
-
-Menu <guimenuitem>Upravit logické svazky (LV)</guimenuitem> nabízí
-pouze dvě možnosti:
-
-<itemizedlist>
-<listitem><para>
-
-vytvořit logický svazek z volného místa ve skupině svazků
+<guimenuitem>Rozšířit skupinu svazků</guimenuitem> o nevyužité fyzické
+svazky.
 
 </para></listitem>
 <listitem><para>
 
-smazat logický svazek ze skupiny svazků.
+<guimenuitem>Zmenšit skupinu svazků</guimenuitem> o některé fyzické
+svazky a tudíž je dát k dispozici jiným skupinám, nebo z nich v
+<command>partman</command>u udělat <quote>běžné</quote> oblasti.
+
+</para></listitem>
+<listitem><para>
+
+<guimenuitem>Vytvořit logický svazek</guimenuitem> z volného místa ve
+skupině svazků.
+
+</para></listitem>
+<listitem><para>
+
+<guimenuitem>Smazat logický svazek</guimenuitem> ze skupiny svazků.
+
+</para></listitem>
+<listitem><para>
+
+<guimenuitem>Skončit</guimenuitem>, čímž se vrátíte zpět do hlavního
+rozdělovacího menu.
 
 </para></listitem>
 </itemizedlist>
@@ -101,9 +116,16 @@ protože v běžícím systému se podle těchto názvů vytvoří nová blokov�
 zařízení v adresáři <filename>/dev/</filename>, která se budou
 používat pro přímý přístup k daným logickým svazkům. Tedy tam, kde by
 se běžně použilo např. <filename>/dev/hda3</filename> se nyní použije
-<filename>/dev/mapper/jmskupiny/jmsvazku</filename>. (Pěkně to bude
+<filename>/dev/mapper/jmskupiny-jmsvazku</filename>. (Pěkně to bude
 vidět v souboru <filename>/etc/fstab</filename> nebo na výstupu
 příkazů <command>mount</command> a <command>df</command>.)
+
+</para></note><note><para>
+
+Pomocí tohoto menu můžete také z disku smazat stávající konfiguraci
+LVM, což se může hodit před spuštěním asistovaného dělení pomocí LVM,
+protože to vyžaduje disk bez definovaných skupin svazků. Jejich
+odstraněním získáte čistý stůl.
 
 </para></note><para>
 
