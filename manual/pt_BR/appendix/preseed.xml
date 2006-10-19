@@ -1,8 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40460 -->
-<!-- translated by Marco Carvalho (macs) 2005.12.30 -->
+<!-- original version: 41587 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.09.12 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.09.19 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.10.19 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -752,9 +751,8 @@ o correto será selecionado antes de usar a pré-configuração.
 #d-i partman-auto/init_automatically_partition \
 #      select Use the largest continuous free space
 
-# Alternatively, you can specify a disk to partition. The device name can
-# be given in either devfs or traditional non-devfs format. If the method
-# supports it, you can specify several disks separated by spaces.
+# Alternatively, you can specify a disk to partition. The device name
+# can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # In addition, you'll need to specify the method to use.
@@ -765,6 +763,9 @@ d-i partman-auto/method string lvm
 # contains an old LVM configuration, the user will normally receive a
 # warning. This can be preseeded away...
 d-i partman-auto/purge_lvm_from_device boolean true
+# And the same goes for the confirmation to write the lvm partitions.
+d-i partman-lvm/confirm boolean true
+
 
 # You can choose from any of the predefined partitioning recipes.
 # Note: this must be preseeded with a localized (translated) value.
@@ -810,6 +811,87 @@ d-i partman/confirm boolean true
 
   </sect2>
 
+  <sect2 id="preseed-partman-raid">
+  <title>Particionando usando RAID</title>
+<para>
+
+Você também pode usar pré-configuração para configurar <quote>arrays</quote>
+RAID via software. Há suporte para os níveis de RAID 0, 1 e 5, criação de
+<quote>arrays</quote> degradados e especificação de dispositivos
+<quote>spare</quote>.
+Se você estiver usando RAID1, você pode pré-configurar o grub para ser
+instalado em todos os dispositivos usando no <quote>array</quote>; veja
+<xref linkend="preseed-bootloader"/>.
+
+</para>
+
+<warning><para>
+
+Este tipo de particionamento automático é fácil de errar. E é um componente
+bastante novo que pode ainda ter falhas ou gerenciamento falho de erros. A
+responsabilidade de usar as várias receitas de maneira correta (de forma que
+elas tenham sentido e não conflitem) recai sobre o usuário.
+Verifique <filename>/var/log/syslog</filename> se você tiver problemas.
+
+</para><para>
+
+Note que apenas RAID 0 e RAID 1 foram testados pelos desenvolvedores do
+componente. RAID 5 não está testado. Configurações avançadas de RAID com
+<quote>arrays</quote> degradados e dispositivos <quote>spare</quote> foi
+levemente testado.
+
+</para></warning>
+
+<informalexample><screen>
+# NOTE: this option is of beta release quality and should be used carefully
+
+# The method should be set to "raid".
+#d-i partman-auto/method string raid
+# Specify the disks to be partitioned. They will all get the same layout,
+# so this will only work if the disks are the same size.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# Next you need to specify the physical partitions that will be used. 
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Last you need to specify how the previously defined partitions will be
+# used in the RAID setup. Remember to use the correct partition numbers
+# for logical partitions.
+# Parameters are:
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# This makes partman automatically partition without confirmation.
+d-i partman-md/confirm boolean true
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-time">
   <title>Configurar relógio e fuso horário</title>
 
@@ -844,9 +926,11 @@ repositórios (locais).
 #d-i apt-setup/security_host string
 
 # Additional repositories, local[0-9] available
-#d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/source string \
+#d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Enable deb-src lines
+#d-i apt-setup/local0/source boolean true
 # URL to the public key of the local repository
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
