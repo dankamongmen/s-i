@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-10-12 17:29+0000\n"
-"PO-Revision-Date: 2006-09-07 21:11+0000\n"
+"PO-Revision-Date: 2006-10-19 20:36+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -1221,7 +1221,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:648
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1284,6 +1284,7 @@ msgid ""
 "d-i partman/choose_partition \\\n"
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
+
 msgstr ""
 "# Se o sistema tiver espaço livre pode escolher particionar apenas esse "
 "espaço.\n"
@@ -1293,18 +1294,19 @@ msgstr ""
 "\n"
 "# Em alternativa, pode especificar um disco a particionar. O nome do\n"
 "# dispositivo pode ser dado quer no formato devfs quer no tradicional\n"
-"# não-devfs. Se o método o suportar, pode especificar vários discos\n"
-"# separados por espaços.\n"
+"# não-devfs.\n"
 "# Por exemplo, para utilizar o primeiro disco:\n"
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
 "# Adiconalmente tem de especificar o método a utilizar.\n"
 "# Actualmente os métodos disponíveis são: \"regular\", \"lvm\" e \"crypto\"\n"
 "d-i partman-auto/method string lvm\n"
 "\n"
-"# Se um dos discos irá ser particionado automaticamente contiver uma\n"
+"# Se um dos discos que irá ser particionado automaticamente contiver uma\n"
 "# configuração LVM antiga, o utilizador normalmente recebe um aviso. Isto\n"
 "# pode ser afastado com preseed...\n"
 "d-i partman-auto/purge_lvm_from_device boolean true\n"
+"# E o mesmo para a confirmção para escrever partições lvm\n"
+"d-i partman-lvm/confirm boolean true\n"
 "\n"
 "# Pode escolher uma das receitas de particionamento pré-definidas.\n"
 "# Nota: a este template tem ser feito preseed com um valor localizado\n"
@@ -1352,9 +1354,9 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:653
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Partitioning using RAID"
-msgstr "Particionamento"
+msgstr "Particionamento utilizando RAID"
 
 #. Tag: para
 #: preseed.xml:654
@@ -1366,6 +1368,7 @@ msgid ""
 "install to all devices used in the array; see <xref linkend=\"preseed-"
 "bootloader\"/>."
 msgstr ""
+"Também pode utilizar preseeding para configurar partições em arrays RAID por software. Os níveis RAID suportados são 0, 1 e 5, criar 'degraded arrays' e especificar dispositivos de reserva. Se está a utilizar RAID 1, pode fazer preseed ao grub para instalar em todos os dispositivos utilizados no array; veja <xref=\"preseed-bootloader\"/>."
 
 #. Tag: para
 #: preseed.xml:664
@@ -1377,6 +1380,7 @@ msgid ""
 "don't conflict) lies with the user. Check <filename>/var/log/syslog</"
 "filename> if you run into problems."
 msgstr ""
+"Neste tipo de particionamento automatizado é fácil de errar. É também um componnente muito recente que ainda poderá ter alguns bugs ou falta de manuseamento de error. A responsabilidade de ter as várias receitas correctas (de modo a que façam sentido e não entrem em conflito) é do utilizador. Se tiver problemas veja <filename>/var/log/syslog</filename>."
 
 #. Tag: para
 #: preseed.xml:672
@@ -1386,6 +1390,7 @@ msgid ""
 "component. RAID 5 is untested. Advanced RAID setup with degraded arrays or "
 "spare devices has only been tested lightly."
 msgstr ""
+"Note que apenas RAID 0 e 1 foram testados pelos criadores do componente. RAID 5 não foi testado. Configurações avançadas de RAID com 'degraded arrays' ou dispositivos de reserva foram apenas ligeiramente testados."
 
 #. Tag: screen
 #: preseed.xml:680
@@ -1438,6 +1443,53 @@ msgid ""
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
 msgstr ""
+"# NOTA: esta opção é de qualidade de lançamento beta e deve ser utilizada\n"
+"# com cuidado\n"
+"\n"
+"# O método deve ser definido como \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Especifique os discos a serem particionados. Eles ficarão com a mesma\n"
+"# disposição, por isso só funcionará se os discos forem do mesmo tamanho.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"\n"
+"# De sequida tem de especificar quais as partições físicas que serão usadas.\n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Por fim tem de especificar como as partições definidas anteriormente\n"
+"# serão utilizadas na configuração RAID. Lembre-se de utilizar os números\n"
+"# de partição correctos para as partições lógicas.\n"
+"# Os parâmetros são:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
+"mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# São suportados RAID 0, 1 e 5; os dispositivos são separados com \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# Isto faz com que o partman particione automaticamente sem confirmação.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:685
@@ -1485,7 +1537,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:701
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1512,9 +1564,11 @@ msgstr ""
 "#d-i apt-setup/security_host string\n"
 "\n"
 "# Repositórios adicionais, disponíveis local[0-9]\n"
-"# d-i apt-setup/local0/comment string local server\n"
-"#d-i apt-setup/local0/source string \\\n"
-"#       deb http://local.server/debian stable main\n"
+"# d-i apt-setup/local0/repository string \\\n"
+"#	deb http://local.server/debian stable main\n"
+"#d-i apt-setup/local0/comment string local server\n"
+"# Colocar as linhas deb-src\n"
+"# d-i apt-setup/local0/source boolean true\n"
 "# URL para a chave pública do repositório local\n"
 "#d-i apt-setup/local0/key string http://local.server/key"
 
