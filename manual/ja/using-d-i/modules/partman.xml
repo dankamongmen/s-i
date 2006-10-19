@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39529 -->
+<!-- original version: 41871 -->
 
    <sect3 id="partman">
    <title>ディスクのパーティション分割</title>
@@ -20,55 +20,106 @@ linkend="partitioning"/>.
 
 <!--
 First you will be given the opportunity to automatically partition
-either an entire drive, or free space on a drive. This is also called
-<quote>guided</quote> partitioning. If you do not want to
-autopartition, choose <guimenuitem>Manually edit partition
-table</guimenuitem> from the menu.
+either an entire drive, or available free space on a drive. This is
+also called <quote>guided</quote> partitioning. If you do not want to
+autopartition, choose <guimenuitem>Manual</guimenuitem> from the menu.
 -->
-最初に、ドライブのすべてか、またはドライブの空き領域を、
+最初に、ドライブのすべてか、またはドライブの有効な空き領域を、
 自動的にパーティション分割するか選択する機会が与えられます。
 これを<quote>ガイド</quote>パーティション分割とも呼びます。
-自動分割を望まなければ、
-<guimenuitem>Manually edit partition table</guimenuitem> を選んでください。
+自動分割を望まなければ、<guimenuitem>Manual</guimenuitem> を選んでください。
 
 </para><para>
 
 <!--
-If you choose guided partitioning, you may have two options: to create
-partitions directly on the hard disk (classic method) or to use Logical
-Volume Management (LVM). In the second case, the installer will create most
+If you choose guided partitioning, you may have three options: to create
+partitions directly on the hard disk (classic method), or to create them
+using Logical Volume Management (LVM), or to create them using encrypted
+LVM. Note: the option to use (encrypted) LVM may not be available on all
+architectures.
+-->
+ガイドパーティション分割を選択した場合、選択肢が 3 つあります。
+ハードディスクに直接パーティションを作成する (クラシック) 方法、
+論理ボリューム管理 (LVM) を利用する方法、
+暗号化 LVM を利用する方法です。
+注意: (暗号化を含む) LVM を使用する方法は、
+すべてのアーキテクチャで使用できるわけではありません。
+
+</para><para>
+
+<!--
+When using LVM or encrypted LVM, the installer will create most
 partitions inside one big partition; the advantage of this method is that
 partitions inside this big partition can be resized relatively easily later.
-Note: the option to use LVM may not be available on all architectures.
+In the case of encrypted LVM the big partition will not be readable without
+knowing a special key phrase, thus providing extra security of your
+(personal) data.
 -->
-ガイドパーティション分割を選択した場合、選択肢が 2 つあります。
-ハードディスクに直接パーティションを作成する (クラシック) 方法と、
-論理ボリューム管理 (LVM) を利用する方法です。
-2 番目の方法では、インストーラが作成するほとんどのパーティションを、
+LVM や 暗号化 LVM を使用する場合、
+インストーラが作成するほとんどのパーティションを、
 大きなパーティションの中に作成します。
 この利点は、大きなパーティションの中にあるパーティションを、
 後から簡単に大きさを変更できることです。
-注意: LVM を使用する方法は、
-すべてのアーキテクチャで使用できるわけではありません。
+暗号化 LVM の場合、
+特殊なキーフレーズを知らずに大きなパーティションを読むことができません。
+そのため、あなたの (個人) データにさらなるセキュリティを提供します。
 
 </para>
-<warning><para>
+<note><para>
+
 
 <!--
-If you choose guided partitioning using LVM, it will not be possible to
-undo changes made in the partition table. This effectively erases all
-data that is currently on the selected hard disk.
+If you choose guided partitioning using LVM or encrypted LVM, some changes
+in the partition table will need to be written to the selected disk while
+LVM is being set up. These changes effectively erase all data that is
+currently on the selected hard disk and you will not be able to undo them
+later. However, the installer will ask you to confirm these changes before
+they are written to disk.
 -->
-LVM を使用してガイドパーティション分割を選択した場合、
-パーティションテーブルへの変更を元に戻せなくなります。
-これにより、選択したハードディスクの現在のデータは、すべて消去されます。
+LVM や 暗号化 LVM を使用してガイドパーティション分割を選択した場合、
+パーティションテーブルへの変更は、
+LVM のセットアップで選択したディスクに書き込まれる必要があります。
+この変更によって、選択したハードディスクの現在のデータはすべて消去され、
+後で元に戻すことができなくなります。
+しかし、ディスクに書き込む前に、インストーラは変更してよいか確認してきます。
 
-</para></warning>
+</para></note>
 <para>
 
 <!--
-After you choose guided partitioning (either classic or using LVM), you
-will be able to choose from the schemes listed in the table below.
+If you choose guided partitioning (either classic or using (encrypted)
+LVM) for a whole disk, you will first be asked to select the disk you want
+to use. Check that all your disks are listed and, if you have several disks,
+make sure you select the correct one. The order they are listed in may
+differ from what you are used to. The size of the disks may help to identify
+them.
+-->
+ディスク全体に対してガイドパーティション分割を選択した場合 
+(クラシックでも (暗号化) LVMでも) 、
+まずはじめに、選択したディスクを使用してよいか尋ねられます。
+複数ディスクがある場合、すべてのディスクが一覧され、
+正しいものが選択されていることを確認してください。
+表示順は、普段使っているものと違う可能性があります。
+ディスクサイズを確認の手がかりにしてください。
+
+</para><para>
+
+<!--
+Any data on the disk you select will eventually be lost, but you will always
+be asked to confirm any changes before they are written to the disk.
+If you have selected the classic method of partitioning, you will be able to
+undo any changes right until the end; when using (encrypted) LVM this is not
+possible.
+-->
+ここでついに、ディスクのすべてのデータが失われますが、
+ディスクに書き込む前に変更してよいか、必ず確認してきます。
+パーティション分割にクラシック法を選択した場合は、終了する前に元に戻せますが、
+(暗号化) LVM を使用する場合は元に戻せません。
+
+</para><para>
+
+<!--
+Next, you will be able to choose from the schemes listed in the table below.
 All schemes have their pros and cons,
 some of which are discussed in <xref linkend="partitioning"/>. If you are
 unsure, choose the first one. Bear in mind that guided partitioning
@@ -76,8 +127,7 @@ needs a certain minimal amount of free space to operate with. If you don't
 give it at least about 1GB of space (depends on chosen scheme), guided
 partitioning will fail.
 -->
-ガイドパーティション分割を選択した場合、(クラシックでも LVMでも) 
-以下の表から分割案を選択できます。
+次に、以下の表から分割案を選択できます。
 どの案でも賛否両論あり、<xref linkend="partitioning"/> で議論されています。
 よくわからなければ、最初の項目を選択してください。
 ガイドパーティション分割は、最低限動作する空き領域が必要なことを、
@@ -123,11 +173,11 @@ partitioning will fail.
 <para>
 
 <!--
-If you choose guided partitioning using LVM, the installer will also create
+If you choose guided partitioning using (encrypted) LVM, the installer will also create
 a separate <filename>/boot</filename> partition. The other partitions, except
 for the swap partition, will be created inside the LVM partition.
 -->
-LVM を利用するガイドパーティション分割を行うと決めた場合、
+(暗号化) LVM を利用するガイドパーティション分割を行うと決めた場合、
 インストーラは独立した <filename>/boot</filename> パーティションも作成します。
 スワップパーティションを除くその他のパーティションは、
 LVM パーティションの内部に作成します。
@@ -251,7 +301,7 @@ in the remainder of this section.
 </para><para>
 
 <!--
-If you select a pristine disk which doesn't have neither partitions
+If you select a pristine disk which has neither partitions
 nor free space on it, you will be offered to create a new partition
 table (this is needed so you can create new partitions). After this
 a new line entitled <quote>FREE SPACE</quote> should appear under the
