@@ -6,7 +6,9 @@
 src="$1"
 dst="$2"
 
-url=$(make_absolute_url "$src" "$(cat /var/run/preseed.last_location)")
+last=/var/run/preseed.last_location
+
+url=$(make_absolute_url "$src" "$(test -r $last && cat $last)")
 proto=${url%%://*}
 
 . /lib/preseed/fetch-methods/$proto
