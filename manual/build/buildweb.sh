@@ -56,10 +56,10 @@ for lang in $languages; do
         mkdir -p "$destination/$destsuffix"
         for format in $formats; do
             if [ "$format" = html ]; then
-                mv ./build.out/html/* "$destination/$destsuffix"
+                mv -f ./build.out/html/* "$destination/$destsuffix"
             else
                 # Do not fail because of missing PDF support for some languages
-                mv ./build.out/install.$lang.$format "$destination/$destsuffix/install.$format.$lang" || true
+                mv -f ./build.out/install.$lang.$format "$destination/$destsuffix/install.$format.$lang" || true
             fi
         done
 
