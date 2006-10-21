@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-10-12 17:29+0000\n"
-"PO-Revision-Date: 2006-10-03 12:32+0300\n"
+"PO-Revision-Date: 2006-10-21 17:48+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -700,7 +700,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:435
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Most questions need to be preseeded using the values valid in English and "
 "not the translated values. However, there are some questions (for example in "
@@ -1196,7 +1196,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:648
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1268,13 +1268,18 @@ msgstr ""
 "\n"
 "# Toinen tapa on määrätä mikä levy osioidaan. Laitenimi voidaan antaa \n"
 "# joko devfs- tai perinteisessä ei-devfs-muodossa.\n"
-"# Esimerkiksi jos käytetään ensimmäistä devfs:n tunnistamaa levyä:\n"
+"# Esimerkiksi haluttaessa käyttää ensimmäistä levyä:\n"
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
-"# Tai jos halutaan käyttää LVM:ää:\n"
-"#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc\n"
-"# Tai LVM ja useampi kuin yksi levy:\n"
-"#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc /dev/discs/disc1/"
-"disc\n"
+"# Lisäksi on määritettävä mitä osiointitapaa käytetään.\n"
+"# Tällä hetkellä käytettävissä on tavat: \"regular\", \"lvm\" ja \"crypto\"\n"
+"d-i partman-auto/method string lvm\n"
+"\n"
+"# Jos yhdellä automaattisesti osioitavista levyistä on vanha LVM-asennus,\n"
+"# saa käyttäjä tavallisesti varoituksen. Tämä varoitus voidaan \n"
+"# valmiilla vastauksella poistaa...\n"
+"d-i partman-auto/purge_lvm_from_device boolean true\n"
+"# Sama jutt kysymykselle vahvistuksest LVM-osoiden kirjoittamisesta.\n"
+"d-i partman-lvm/confirm boolean true\n"
 "\n"
 "# Voidaan valita mikä tahansa tallennetuista osiointimallineista.\n"
 "# Huomaa: valmiissa vastauksissa on käytettävä kotoistettua arvoa.\n"
@@ -1320,9 +1325,9 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:653
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Partitioning using RAID"
-msgstr "Osiointi"
+msgstr "Osiointi käyttäen RAIDia"
 
 #. Tag: para
 #: preseed.xml:654
@@ -1333,7 +1338,7 @@ msgid ""
 "specifying spare devices. If you are using RAID 1, you can preseed grub to "
 "install to all devices used in the array; see <xref linkend=\"preseed-"
 "bootloader\"/>."
-msgstr ""
+msgstr "Valmiilla vastauksilla voidaan tehdä osiot myös ohjelmallisesti toteutettuihin RAID-pakkoihin. Tuettuja ovat RAID-tasot 0, 1 ja 5, vajaiden pakkojen luominen ja varalevyjen määrittely. Käytettäessä RAID tasoa 1, voidaan valmiilla vastauksilla saada grub asentumaan kaikille pakassa käytetyille laitteille; katso <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
 #: preseed.xml:664
@@ -1344,7 +1349,7 @@ msgid ""
 "responsibility to get the various recipes right (so they make sense and "
 "don't conflict) lies with the user. Check <filename>/var/log/syslog</"
 "filename> if you run into problems."
-msgstr ""
+msgstr "Tämänkaltaisen automaattisen osioinnin kanssa tekee helposti virheitä. Se on myöskin hyvin uusi osa, jossa saattaa vielä olla vikoja tai puutteita virhetilanteiden käsittelyssä. Vastuu mallineiden oikeellisuudesta (ovat järkeviä eivätkä sisällä ristiriitoja) on käyttäjällä. Tarkista lokitiedosto <filename>/var/log/syslog</filename> jos pulmia ilmenee."
 
 #. Tag: para
 #: preseed.xml:672
@@ -1353,7 +1358,7 @@ msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
 "component. RAID 5 is untested. Advanced RAID setup with degraded arrays or "
 "spare devices has only been tested lightly."
-msgstr ""
+msgstr "Huomaa, että osan tekijät ovat testanneet vain RAID tasot 0 ja 1. RAID 5 on testaamatta. Edistyneemmä asetukset joissa on vajaita pakkoja tai varalaitteita on testattu vain hieman."
 
 #. Tag: screen
 #: preseed.xml:680
@@ -1406,6 +1411,51 @@ msgid ""
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
 msgstr ""
+"# HUOMIO: tämä valinta on laadultaan testiversio ja käytettävä varoen\n"
+"\n"
+"# Mallineeksi olisi valittava \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Määritä osioitavat levyt. Niihin tulee kaikkin sama osiointi,\n"
+"# joten tämä toimii vain jos levyt ovat samankokoisia.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"\n"
+"# Seuraavaksi on määritettävä käytettävä fyysinen osiointi.\n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Lopuksi on määritettävä kuinka yllä määriteltyjä osioita käytetään\n"
+"# RAID-pakassa. Muista käyttää oikeita osioiden numeroita loogisille\n"
+"# osioille.\n"
+"# Parametrit ovat:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# RAID tasot 0, 1 ja 5 on tuettu; laitteiden erottimena on \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# Tämä saa partmanin tekemään osiot automaattisesti kysymättä vahvistusta.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Lopeta osioiden teko ja tallenna muutokset levylle\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:685
@@ -1452,7 +1502,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:701
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1474,14 +1524,15 @@ msgstr ""
 "#d-i apt-setup/non-free boolean true\n"
 "#d-i apt-setup/contrib boolean true\n"
 "# Poista kommentit jättääksesi tietoturvapäivitysten varastoalueen pois tai\n"
-"# lisää konenimi jos halutaan käyttää jotain muuta kuin security.debian."
-"org.\n"
+"# lisää konenimi jos halutaan käyttää jotain muuta kuin security.debian.org.\n"
 "#d-i apt-setup/security_host string\n"
 "\n"
 "# Lisää varastoalueita, local[0-9] käytettävissä\n"
-"#d-i apt-setup/local0/comment string local server\n"
-"#d-i apt-setup/local0/source string \\\n"
+"#d-i apt-setup/local0/repository string \\\\\n"
 "#       deb http://local.server/debian stable main\n"
+"#d-i apt-setup/local0/comment string local server\n"
+"# Ota käyttöön deb-src-rivit\n"
+"#d-i apt-setup/local0/source boolean true\n"
 "# varastoalueen julkisen avaimen ULR\n"
 "#d-i apt-setup/local0/key string http://local.server/key"
 
