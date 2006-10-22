@@ -6,8 +6,8 @@ set -e
 
 # transitional kludge to deal with old path based locations
 db_get preseed/file
-[ -n "${RET#/floppy*}" ] && RET="floppy://${RET#/floppy}"
-[ -n "${RET#/*}" ] && RET="file://$RET"
+[ "${RET#/floppy*}" != "$RET" ] && RET="floppy://${RET#/floppy}"
+[ "${RET#/*}" != "$RET" ] && RET="file://$RET"
 db_set preseed/file $RET
 
 preseed preseed/file
