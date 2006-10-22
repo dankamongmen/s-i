@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-08-18 17:32+0000\n"
-"PO-Revision-Date: 2006-10-22 14:15+0100\n"
+"PO-Revision-Date: 2006-10-22 16:37+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian <debian-l10n-hungarian@lists.debian>\n"
 "MIME-Version: 1.0\n"
@@ -937,7 +937,7 @@ msgstr "Az ISC <command>dhcpd</command> BOOTP beállítása még egyszerűbb, me
 #: install-methods.xml:1254
 #, no-c-format
 msgid "Setting up a DHCP server"
-msgstr ""
+msgstr "Egy DHCP kiszolgáló beállítása"
 
 #. Tag: para
 #: install-methods.xml:1255
@@ -965,24 +965,45 @@ msgid ""
 "}\n"
 "</screen></informalexample> Note: the new (and preferred) <classname>dhcp3</classname> package uses <filename>/etc/dhcp3/dhcpd.conf</filename>."
 msgstr ""
+"Egy szabad DHCP kiszolgáló az ISC <command>dhcpd</command>. A &debian; rendszerben a <classname>dhcp</classname> csomagban van. Itt egy példa beállító fájl (általában <filename>/etc/dhcpd.conf</filename>): <informalexample><screen>\n"
+"option domain-name \"example.com\";\n"
+"option domain-name-servers ns1.example.com;\n"
+"option subnet-mask 255.255.255.0;\n"
+"default-lease-time 600;\n"
+"max-lease-time 7200;\n"
+"server-name \"servername\";\n"
+"\n"
+"subnet 192.168.1.0 netmask 255.255.255.0 {\n"
+"  range 192.168.1.200 192.168.1.253;\n"
+"  option routers 192.168.1.1;\n"
+"}\n"
+"\n"
+"host clientname {\n"
+"  filename \"/tftpboot/tftpboot.img\";\n"
+"  server-name \"servername\";\n"
+"  next-server servername;\n"
+"  hardware ethernet 01:23:45:67:89:AB;\n"
+"  fixed-address 192.168.1.90;\n"
+"}\n"
+"</screen></informalexample> Az új (és javasolt) <classname>dhcp3</classname> csomag a <filename>/etc/dhcp3/dhcpd.conf</filename> fájlt használja."
 
 #. Tag: para
 #: install-methods.xml:1267
 #, no-c-format
 msgid "In this example, there is one server <replaceable>servername</replaceable> which performs all of the work of DHCP server, TFTP server, and network gateway. You will almost certainly need to change the domain-name options, as well as the server name and client hardware address. The <replaceable>filename</replaceable> option should be the name of the file which will be retrieved via TFTP."
-msgstr ""
+msgstr "E példában a <replaceable>servername</replaceable> nevű kiszolgáló végzi a DHCP és TFTP kiszolgáló és hálózati átjáró munkáját. Természetesen be kell állítani a tartomány-név opciókat, a kiszolgáló nevét és az ügyfél hardver címét. A <replaceable>filename</replaceable> opció a TFTP-n át elérendő fájl neve."
 
 #. Tag: para
 #: install-methods.xml:1277
 #, no-c-format
 msgid "After you have edited the <command>dhcpd</command> configuration file, restart it with <userinput>/etc/init.d/dhcpd restart</userinput>."
-msgstr ""
+msgstr "A <command>dhcpd</command> beállító fájl szerkesztése után, indítsd újra a szokásos <userinput>/etc/init.d/dhcpd restart</userinput> paranccsal."
 
 #. Tag: title
 #: install-methods.xml:1285
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
-msgstr ""
+msgstr "PXE indítás bekapcsolása a DHCP beállításban"
 
 #. Tag: para
 #: install-methods.xml:1286
@@ -1018,12 +1039,41 @@ msgid ""
 "}\n"
 "</screen></informalexample> Note that for PXE booting, the client filename <filename>pxelinux.0</filename> is a boot loader, not a kernel image (see <xref linkend=\"tftp-images\"/> below)."
 msgstr ""
+"Itt egy másik, indítás-előtti futtatási környezet (PXE) TFTP módot használó <filename>dhcp.conf</filename> példa. <informalexample><screen>\n"
+"option domain-name \"example.com\";\n"
+"\n"
+"default-lease-time 600;\n"
+"max-lease-time 7200;\n"
+"\n"
+"allow booting;\n"
+"allow bootp;\n"
+"\n"
+"# The next paragraph needs to be modified to fit your case\n"
+"subnet 192.168.1.0 netmask 255.255.255.0 {\n"
+"  range 192.168.1.200 192.168.1.253;\n"
+"  option broadcast-address 192.168.1.255;\n"
+"# the gateway address which can be different\n"
+"# (access to the internet for instance)\n"
+"  option routers 192.168.1.1;\n"
+"# indicate the dns you want to use\n"
+"  option domain-name-servers 192.168.1.3;\n"
+"}\n"
+"\n"
+"group {\n"
+" next-server 192.168.1.3;\n"
+" host tftpclient {\n"
+"# tftp client hardware address\n"
+"  hardware ethernet  00:10:DC:27:6C:15;\n"
+"  filename \"/tftpboot/pxelinux.0\";\n"
+" }\n"
+"}\n"
+"</screen></informalexample> A PXE indítás számára a <filename>pxelinux.0</filename> ügyfél fájl neve egy boot betöltő, nem egy kernel kép (lásd az alábbi <xref linkend=\"tftp-images\"/> részt)."
 
 #. Tag: title
 #: install-methods.xml:1302
 #, no-c-format
 msgid "Enabling the TFTP Server"
-msgstr ""
+msgstr "TFTP kiszolgáló bekapcsolása"
 
 #. Tag: para
 #: install-methods.xml:1303
@@ -1033,12 +1083,15 @@ msgid ""
 "tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
 "</screen></informalexample> Debian packages will in general set this up correctly by default when they are installed."
 msgstr ""
+"A TFTP kiszolgáló indításához először győződj meg a <command>tftpd</command> bekapcsolt voltáról. Ehhez a <filename>/etc/inetd.conf</filename> fájlban általában ilyen sor szerepel: <informalexample><screen>\n"
+"tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
+"</screen></informalexample> A Debian csomagok általában ezt helyesen beállítják telepítésükkor."
 
 #. Tag: para
 #: install-methods.xml:1314
 #, no-c-format
 msgid "Look in that file and remember the directory which is used as the argument of <command>in.tftpd</command>; you'll need that below. The <userinput>-l</userinput> argument enables some versions of <command>in.tftpd</command> to log all requests to the system logs; this is useful for diagnosing boot errors. If you've had to change <filename>/etc/inetd.conf</filename>, you'll have to notify the running <command>inetd</command> process that the file has changed. On a Debian machine, run <userinput>/etc/init.d/inetd reload</userinput>; on other machines, find out the process ID for <command>inetd</command>, and run <userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>."
-msgstr ""
+msgstr "Nézz e fájlba és jegyezd meg az <command>in.tftpd</command> argumentumában adott könyvtárat; ez kell alább. A <userinput>-l</userinput> az <command>in.tftpd</command> egyes verzióiban az összes kérés rendszer-naplóba naplózását kapcsolja be; ez hasznos indítási hibák vizsgálatára.  A <filename>/etc/inetd.conf</filename> módosításakor értesíteni kell a futó <command>inetd</command> folymatot, hogy a fájl változott. Egy Debian gépen ez ilyen egyszerű: <userinput>/etc/init.d/inetd reload</userinput>; más gépeken keresd meg az <command>inetd</command> PID-et, és futtasd ezt: <userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>."
 
 #. Tag: para
 #: install-methods.xml:1328
@@ -1055,13 +1108,13 @@ msgstr ""
 #: install-methods.xml:1350
 #, no-c-format
 msgid "Move TFTP Images Into Place"
-msgstr ""
+msgstr "TFTP képek helyükre tétele"
 
 #. Tag: para
 #: install-methods.xml:1351
 #, no-c-format
 msgid "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-files\"/>, in the <command>tftpd</command> boot image directory. Generally, this directory will be <filename>/tftpboot</filename>. You'll have to make a link from that file to the file which <command>tftpd</command> will use for booting a particular client. Unfortunately, the file name is determined by the TFTP client, and there are no strong standards."
-msgstr ""
+msgstr "Most tedd a TFTP indító képet a <xref linkend=\"where-files\"/> szerint a <command>tftpd</command> indító kép könyvtárba. Általában e könyvtár a <filename>/tftpboot</filename>. Innen egy láncot kell csinálni arra fájlra, melyet a <command>tftpd</command> egy adott ügyfél indítására használ majd. Sajnos, a fájl nevét a TFTP ügyfél határozza meg és erre nincs erős szabvány."
 
 #. Tag: para
 #: install-methods.xml:1361
@@ -1073,13 +1126,13 @@ msgstr ""
 #: install-methods.xml:1370
 #, no-c-format
 msgid "For PXE booting, everything you should need is set up in the <filename>netboot/netboot.tar.gz</filename> tarball. Simply extract this tarball into the <command>tftpd</command> boot image directory. Make sure your dhcp server is configured to pass <filename>/pxelinux.0</filename> to <command>tftpd</command> as the filename to boot."
-msgstr ""
+msgstr "A PXE indításhoz az egyetlen tennivaló a <filename>netboot/netboot.tar.gz</filename> beállítása. Egyszerűen bontsd ki a <command>tftpd</command> indító kép könyvtárba. Ellenőrizd, hogy a dhcp kiszolgáló a <filename>/pxelinux.0</filename>-t adja át <command>tftpd</command> számára, mint az indító fájl neve."
 
 #. Tag: para
 #: install-methods.xml:1378
 #, no-c-format
 msgid "For PXE booting, everything you should need is set up in the <filename>netboot/netboot.tar.gz</filename> tarball. Simply extract this tarball into the <command>tftpd</command> boot image directory. Make sure your dhcp server is configured to pass <filename>/debian-installer/ia64/elilo.efi</filename> to <command>tftpd</command> as the filename to boot."
-msgstr ""
+msgstr "A PXE indításhoz az egyetlen tennivaló a <filename>netboot/netboot.tar.gz</filename> beállítása. Egyszerűen bontsd ki a <command>tftpd</command> indító kép könyvtárba. Ellenőrizd, hogy a dhcp kiszolgáló a <filename>/debian-installer/ia64/elilo.efi</filename>-t adja át <command>tftpd</command> számára, mint az indító fájl neve."
 
 #. Tag: title
 #: install-methods.xml:1390
