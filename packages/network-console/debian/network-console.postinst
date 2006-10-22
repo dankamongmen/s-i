@@ -15,11 +15,11 @@ if [ ! -f $KEY_FILE ]; then
 fi
 
 db_get $TEMPLATE_ROOT/password
-ROOT_PWD="$RET"
+INST_PWD="$RET"
 # FIXME: put all of this architecture-specific code into hooks -- tbm
 case "$ARCHDETECT" in
 	mipsel/cobalt)
-		if [ -z "$ROOT_PWD" ]; then
+		if [ -z "$INST_PWD" ]; then
 			PASSWORD=$(pwgen -1 8)
 			DISPLAY_PWD="passwd: $PASSWORD"
 		fi
@@ -28,25 +28,22 @@ esac
 
 while [ -z "$PASSWORD" ]; do
 	db_input critical $TEMPLATE_ROOT/password || true
-	db_go
 	COMPARE_PW=''
 	db_input high $TEMPLATE_ROOT/password-again && COMPARE_PW=1 || true
 	db_go
 
 	db_get $TEMPLATE_ROOT/password
-	ROOT_PW="$RET"
-	if [ -z "$ROOT_PW" ]; then
+	INST_PW="$RET"
+	if [ -z "$INST_PW" ]; then
 		db_input critical $TEMPLATE_ROOT/password-empty
-		db_go
 		continue
 	fi
 	db_get $TEMPLATE_ROOT/password-again
-	if [ "$COMPARE_PW" ] && [ "$ROOT_PW" != "$RET" ]; then
+	if [ "$COMPARE_PW" ] && [ "$INST_PW" != "$RET" ]; then
 		db_input critical $TEMPLATE_ROOT/password-mismatch
-		db_go
 		continue
 	fi
-	PASSWORD=$ROOT_PW
+	PASSWORD=$INST_PW
 
 	db_set $TEMPLATE_ROOT/password ""
 	db_set $TEMPLATE_ROOT/password-again ""
