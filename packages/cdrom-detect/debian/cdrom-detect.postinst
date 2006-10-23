@@ -9,8 +9,7 @@ log() {
 }
 
 fail () {
-	log "CDROM-detect failed: device=$device"
-	log "Unmounting CD just to be sure."
+	log "CDROM-detect failed; unmounting CD just to be sure"
 	umount /cdrom 2>/dev/null || true
 	exit 1
 }
@@ -36,10 +35,12 @@ do
 	devices="$(list-devices cd)"
 	for device in $devices; do
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
-			log "CDROM-mount succeeded: device=$device"
+			log "CD-ROM mount succeeded: device=$device"
 			mounted=1
 			db_set cdrom-detect/cdrom_device $device
 			break
+		else
+			log "CD-ROM mount failed: device=$device"
 		fi
 	done
 
@@ -53,7 +54,7 @@ do
 		db_go
 		db_get cdrom-detect/retry
 		if [ "$RET" = "true" ]; then
-			log "Unmounting CD just to be sure."
+			log "Unmounting CD just to be sure"
 			umount /cdrom 2>/dev/null || true
 			continue
 		else
@@ -101,10 +102,11 @@ do
 			modprobe $module
 		fi
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
-			log "CDROM-mount succeeded: device=$device"
+			log "CD-ROM mount succeeded: device=$device"
 			mounted=1
 			break
 		else
+			log "CD-ROM mount failed: device=$device"
 			fail
 		fi
 	else
