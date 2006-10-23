@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41587 -->
+<!-- original version: 42036 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -44,9 +44,9 @@ die während einer normalen Installation nicht verfügbar sind.
   <title>Verschiedene Methoden der Voreinstellung</title>
 <para>
 
-Es gibt drei Methoden, die zum Voreinstellen genutzt werden können:
-<firstterm>initrd</firstterm>, <firstterm>file</firstterm> und
-<firstterm>network</firstterm>. Voreinstellung per initrd funktioniert
+Es gibt drei Methoden, die zur Voreinstellung genutzt werden können:
+<firstterm>initrd</firstterm>, <firstterm>file</firstterm> (Datei) und
+<firstterm>network</firstterm> (Netzwerk). Voreinstellung per initrd funktioniert
 mit jeder Art von Installation und unterstützt vergleichsweise viele
 Dinge, benötigt jedoch mehr Vorbereitung. Das Voreinstellen mittels
 file und network kann jeweils mit verschiedenen Installationsmethoden
@@ -120,13 +120,13 @@ In der Praxis bedeutet dies, dass beim Voreinstellen per file und network
 die Fragen über Sprache, Land und Tastaturauswahl bereits gestellt worden
 sind. Beim network-Voreinstellen kommen noch die Fragen zur Konfiguration
 des Netzwerks hinzu. Auf einige andere Fragen, die nur bei mittlerer oder
-niedriger Priorität gestellt werden (wie der erste Hardware-Erkennungslauf)
-werden, trifft dies ebenfalls zu.
+niedriger Priorität gestellt werden (wie der erste Hardware-Erkennungslauf),
+trifft dies ebenfalls zu.
 
 </para><para>
 
 Natürlich können Voreinstellungswerte für solche Fragen nicht greifen.
-<xref linkend="preseed-bootparms"/> zeigt aber einen Weg, zu vermeiden,
+<xref linkend="preseed-bootparms"/> zeigt aber einen Weg, trotzdem zu vermeiden,
 dass diese Fragen gestellt werden.
 
 </para>
@@ -212,7 +212,7 @@ are stored in a separate, non-readable file in the same directory.
 
 Eine sehr kraftvolle und flexible Funktion, die das Voreinstellungswerkzeug
 bietet, ist die Möglichkeit, Kommandos oder Scripte an bestimmten Stellen
-in der Installation auszuführen. Siehe <xref linkend="preseed-shell"/>
+während der Installation auszuführen. Siehe <xref linkend="preseed-shell"/>
 bezüglich weiterer Details.
 
 </para>
@@ -350,11 +350,11 @@ entsprechenden Einträge fehlen sollten.
 Es ist auch möglich, DHCP zu benutzen, um eine Voreinstellungsdatei
 anzugeben, die vom Netzwerk heruntergeladen werden soll. DHCP erlaubt es,
 einen Dateinamen anzugeben. Normalerweise ist dies eine Datei für das Booten
-per Netzwerk, wenn sie jedoch als URL angegeben wird, wird das
+per Netzwerk; wenn sie jedoch als URL angegeben wird, wird das
 Installationsmedium (dies muss Voreinstellung per Netzwerk unterstützen) die
-Datei unter der URL herunterladen und als Voreinstellungsdatei benutzen.
+Datei von der URL herunterladen und als Voreinstellungsdatei benutzen.
 Hier ein Beispiel, wie Sie die dhcpd.conf für ISC DHCP-Server Version 3
-(das Debianpaket dhcp3-server) einstellen müssen.
+(das Debianpaket dhcp3-server) einstellen müssen:
 
 </para>
 
@@ -375,9 +375,9 @@ Installationen im Netzwerk voreingestellt werden.
 
 </para><para>
 
-Eine gute Sache Voreinstellung per DHCP zu nutzen ist, nur Werte vorzugeben,
+Eine gute Sache für die Voreinstellung per DHCP ist es, nur Werte vorzugeben,
 die netzwerkspezifisch sind, wie der zu nutzende Debian-Spiegelserver. Auf diese
-Weise wird bei allen Installationen im Netzwerk automatisch ein guter
+Weise wird bei allen Installationen im Netzwerk automatisch ein passender
 Spiegelserver gewählt, aber der Rest der Installation kann interaktiv
 vonstatten gehen. Eine voll automatisierte Debian-Installation per
 DHCP-Voreinstellung sollte nur mit Vorsicht durchgeführt werden.
@@ -454,7 +454,7 @@ Anführungszeichen einfassen.
  <title>Eine Voreinstellungsdatei erstellen</title>
 <para>
 
-Die Voreinstellungsdatei hat das gleiche Format wie es
+Die Voreinstellungsdatei hat das gleiche Format, wie es
 auch vom Befehl <command>debconf-set-selections</command>
 verwendet wird. Das grundsätzliche Format einer Zeile in einer
 Voreinstellungsdatei ist folgendes:
@@ -506,7 +506,7 @@ Eine andere Methode ist, eine manuelle Installation durchzuführen und
 dann nach dem Neustart den Befehl <command>debconf-get-selections</command>
 aus dem Paket <classname>debconf-utils</classname> zu verwenden, um
 sowohl die debconf-Datenbank wie auch die cdebconf-Datenbank des
-Installers in eine Datei einzulesen.
+Installers in eine Datei einzulesen:
 
 <informalexample><screen>
 $ debconf-get-selections --installer &gt; <replaceable>file</replaceable>
@@ -547,7 +547,7 @@ den Editor <command>nano</command> benutzen, um die Dateien in
 <filename>/var/lib/cdebconf</filename> zu betrachten, während die Installation
 im Gange ist. <filename>templates.dat</filename> enthält die rohen Einträge
 (Templates) und in <filename>questions.dat</filename> finden Sie die aktuellen
-Werte zu den Templates sowie die Werte, die Variablen zugewiesen sind.
+Werte zu den Templates sowie die Werte, die den Variablen zugewiesen sind.
 
 </para><para>
 
@@ -589,11 +589,11 @@ geladen, nachdem diese Fragen gestellt wurden.
 
 Die Locale kann verwenden werden, um sowohl Sprache wie auch Land anzugeben.
 Um die Locale als Boot-Parameter festzulegen, nutzen Sie
-<userinput>locale=<replaceable>en_US</replaceable></userinput>.
+<userinput>locale=<replaceable>de_DE</replaceable></userinput>.
 
 <informalexample role="example"><screen>
 # Die Locale setzt Sprache und Land.
-d-i debian-installer/locale string en_US
+d-i debian-installer/locale string de_DE
 </screen></informalexample>
 
 </para><para>
@@ -607,7 +607,7 @@ ausgewählten Architektur passen.
 <informalexample role="example"><screen>
 # Auswahl der Tastatur.
 #d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select us
+d-i console-keymaps-at/keymap select de
 # Beispiel für eine andere Tastaturarchitektur.
 #d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
@@ -626,7 +626,7 @@ Tastaturbelegung des Kernels weiter verwendet wird.
 Die Änderungen am Input-Layer für 2.6-Kernels haben die
 Tastatur-Architektur virtuell überflüssig gemacht.
 Für 2.6-Kernels sollte normalerweise eine
-<quote>PC</quote>-(<userinput>at</userinput>)Tastaturbelegung gewählt werden.
+<quote>PC</quote>-Tastaturbelegung (<userinput>at</userinput>) gewählt werden.
 
 </para></note>
   </sect2>
@@ -637,7 +637,7 @@ Für 2.6-Kernels sollte normalerweise eine
 
 Die Voreinstellung der Netzwerk-Konfiguration funktioniert natürlich
 nicht, wenn Sie Ihre Voreinstellungsdatei vom Netzwerk laden, aber es
-ist toll, wenn Sie von CD oder USB-Stick booten. Sie können auch
+ist toll, wenn Sie von CD oder USB-Stick booten. Sie können jedoch auch
 Netzwerkkonfigurations-Parameter automatisieren, wenn Sie die
 Voreinstellungsdatei per Netzwerk laden, und zwar per Kernel-Parameter.
 
@@ -699,7 +699,7 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Bedenken Sie, dass jeder Hostname und Domainname, der per DHCP
+# Bedenken Sie, dass jeder Hostname und Domänenname, der per DHCP
 # zugewiesen wird, Vorrang hat vor den hier angegebenen. Allerdings
 # bewirken diese Zeilen, dass keine Fragen angezeigt werden, auch wenn
 # Werte per DHCP empfangen werden.
@@ -721,13 +721,13 @@ d-i netcfg/wireless_wep string
 Abhängig von der Installationsmethode, die Sie verwenden, könnte ein
 Spiegelserver sowohl dazu genutzt werden, zusätzliche Komponenten des
 Installers und das Basissystem herunterzuladen wie auch um die
-<filename>/etc/apt/sources.list</filename> für das installierte System
+<filename>/etc/apt/sources.list</filename> für das zu installierende System
 einzurichten.
 
 </para><para>
 
 Der Parameter <classname>mirror/suite</classname> beeinflusst die
-Paketquellen für das installierte System.
+Paketquellen für das zu installierende System.
 
 </para><para>
 
@@ -760,8 +760,8 @@ d-i mirror/http/proxy string
   <title>Partitionierung</title>
 <para>
 
-Voreinstellung für die Partitionierung der Festplatte wird sehr
-stark dadurch eingeschränkt, was <classname>partman-auto</classname>
+Die Voreinstellung für die Partitionierung der Festplatte wird sehr
+stark eingeschränkt durch das, was <classname>partman-auto</classname>
 unterstützt. Sie können entweder wählen, vorhandenen freien Platz auf der
 Platte zu partitionieren, oder die komplette Platte. Das Layout der Disk kann
 durch ein vordefiniertes Rezept festgelegt werden, durch ein selbst erstelltes
@@ -788,7 +788,7 @@ Voreinstellung nutzen.
 # HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
 # (übersetzt) sein.
 #d-i partman-auto/init_automatically_partition \
-#      select Größten, ununterbrochenen freien Speicher benutzen
+#      select Geführt - den größten freien Speicherbereich benutzen
 
 # Alternativ können Sie eine Festplatte angeben, die partitioniert
 # werden soll. Der Gerätename kann entweder als devfs-Bezeichnung
@@ -823,7 +823,7 @@ d-i partman-auto/choose_recipe \
 # d-i-Umgebung zu bekommen, können Sie einfach darauf verweisen:
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# Wenn nicht, können Sie auch ein ganzes Rezept in eine einzige (logische)
+# Falls nicht, können Sie auch ein ganzes Rezept in eine einzige (logische)
 # Zeile packen. Dieses Beispiel erzeugt eine kleine /boot-Partition, eine
 # Swap-Partition passender Größe und benutzt den Rest des Platzes für
 # die root-Partition:
@@ -870,9 +870,9 @@ dass grub auf allen Geräten im Verbund installiert wird; siehe
 
 Bei dieser Art von automatisierter Partitionierung kann leicht etwas
 falsch laufen. Auch ist diese Installer-Komponente recht neu und könnte noch
-Fehler enthalten bzw. nicht vorhandene Fehlerbehandlungen. Die Verantwortung,
+Fehler enthalten bzw. nicht vorhandene Fehlerbehandlung. Die Verantwortung,
 die verschiedenen Rezepte richtig hinzubekommen (so dass Sie Sinn machen
-und nicht miteinander kollidieren), liegt beim Benutzer. Schauen Sie in
+und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 <filename>/var/log/syslog</filename>, wenn Probleme auftreten.
 
 </para><para>
@@ -939,12 +939,12 @@ d-i partman/confirm boolean true
   <title>Einstellung von Zeit und Zeitzone</title>
 
 <informalexample role="example"><screen>
-# Einstellung, ob die Hardware-(CMOS-)Uhr auf UTC eingestellt ist.
+# Einstellung, ob die Hardware- (CMOS-) Uhr auf UTC eingestellt ist.
 d-i clock-setup/utc boolean true
 
 # Sie können dies auf jeden gültigen Wert für $TZ setzen; siehe
 # /usr/share/zoneinfo/ für passende Werte.
-d-i time/zone string US/Eastern
+d-i time/zone string Europe/Berlin
 </screen></informalexample>
 
   </sect2>
@@ -966,11 +966,11 @@ weitere (lokale) Paket-Repositories hinzufügen.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
 # Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Quellen
-# von Sicherheitsaktualierungen zu vermeiden oder fügen Sie einen Hostnamen
+# für Sicherheitsaktualisierungen zu vermeiden oder fügen Sie einen Hostnamen
 # hinzu, um einen anderen Server als security.debian.org zu verwenden.
 #d-i apt-setup/security_host string
 
-# Zusätzliche Paketquellen (Repositories), local[0-9] verfügbar
+# Zusätzliche Paketquellen (Repositories), "local[0-9]" verfügbar
 #d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
 #d-i apt-setup/local0/comment string local server
@@ -983,10 +983,10 @@ weitere (lokale) Paket-Repositories hinzufügen.
   </sect2>
 
   <sect2 id="preseed-account">
-  <title>Einrichtung von Benutzerkonten</title>
+  <title>Einrichtung von Benutzerzugängen</title>
 <para>
 
-Das Passwort für das Superuser-Konto (root) sowie Name und Passwort des ersten
+Das Passwort für den Superuser-Zugang (root) sowie Name und Passwort des ersten
 regulären Benutzers können voreingestellt werden. Für die Passwörter können
 Sie entweder Klartext-Werte oder MD5-<emphasis>Hashes</emphasis> verwenden.
 
@@ -996,14 +996,14 @@ Sie entweder Klartext-Werte oder MD5-<emphasis>Hashes</emphasis> verwenden.
 Bedenken Sie, dass die Voreinstellung von Passwörtern nicht ganz sicher
 ist, da jeder, der Zugang zur Voreinstellungsdatei hat, Kenntnis von den
 Passwörtern hat. Hier MD5-Hashes zu verwenden, wird von der
-Sicherheit her betrachtet als besser angesehen, allerdings könnte dies auch
-in falscher Sicherheit wiegen: der Zugriff auf einen MD5-Hash birgt
+Sicherheit her betrachtet als besser angesehen, allerdings könnte Sie dies
+auch in falscher Sicherheit wiegen: der Zugriff auf einen MD5-Hash birgt
 die Gefahr von Brute-Force-Attacken.
 
 </para></warning>
 
 <informalexample role="example"><screen>
-# Das Anlegen des Root-Accounts abbrechen (der normale Benutzer
+# Das Anlegen des Root-Zugangs abbrechen (der normale Benutzer
 # bekommt dann die Möglichkeit, sudo zu benutzen)
 #d-i passwd/root-login boolean false
 # Alternativ dazu können Sie auch das Anlegen eines normalen
@@ -1016,7 +1016,7 @@ die Gefahr von Brute-Force-Attacken.
 # ... oder verschlüsselt als MD5-Hash.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
-# Um ein reguläres Benutzerkonto zu erstellen:
+# Um einen regulären Benutzerzugang zu erstellen:
 #d-i passwd/user-fullname string Debian User
 #d-i passwd/username string debian
 # Passwort des regulären Benutzers, entweder als Klartext ...
@@ -1030,8 +1030,8 @@ die Gefahr von Brute-Force-Attacken.
 
 Die Variablen <classname>passwd/root-password-crypted</classname> und
 <classname>passwd/user-password-crypted</classname> können auch mit
-<quote>!</quote> als Wert voreingestellt werden. In diesem Fall wird das
-entsprechende Konto deaktiviert. Dies könnte für das root-Konto sinnvoll
+<quote>!</quote> als Wert voreingestellt werden. In diesem Fall wird der
+entsprechende Zugang deaktiviert. Dies könnte für den root-Zugang sinnvoll
 sein, vorausgesetzt natürlich, dass alternative Möglichkeiten vorhanden sind,
 um administrative Tätigkeiten oder root-Logins zu ermöglichen (z.B. per
 Authentifizierung mit SSH-Schlüssel oder per sudo).
@@ -1272,7 +1272,7 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
   <title>Shell-Befehle</title>
 
 <informalexample role="example"><screen>
-# Den d-i voreinzustellen, ist von Natur aus nicht sicher. Nichts im
+# Den d-i voreinzustellen, ist von Natur aus nicht sicher! Nichts im
 # Installer überprüft auf Versuche eines Pufferüberlaufs oder anderweitiger
 # Ausnutzung der Werte einer Voreinstellungsdatei wie dieser. Benutzen Sie
 # nur Voreinstellungsdateien aus vertrauenswürdigen Quellen! Um diese
