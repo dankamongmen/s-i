@@ -9,7 +9,9 @@ log() {
 }
 
 fail () {
-	log "CDROM-detect failed."
+	log "CDROM-detect failed: device=$device"
+	log "Unmounting CD just to be sure."
+	umount /cdrom 2>/dev/null || true
 	exit 1
 }
 
@@ -38,21 +40,6 @@ do
 			mounted=1
 			db_set cdrom-detect/cdrom_device $device
 			break
-		else
-			log "CDROM-mount failed (error=$?): device=$device"
-			log "Unmounting CD just to be sure."
-			umount /cdrom 2>/dev/null || true
-			log "Trying it again."
-			if mount -t iso9660 -o ro,exec $device /cdrom; then
-				log "CDROM-mount succeeded: device=$device"
-				mounted=1
-				db_set cdrom-detect/cdrom_device $device
-				break
-			else
-				log "CDROM-mount failed again (error=$?): device=$device"
-				log "Unmounting CD just to be sure and giving it up."
-				umount /cdrom 2>/dev/null || true
-			fi
 		fi
 	done
 
@@ -66,6 +53,8 @@ do
 		db_go
 		db_get cdrom-detect/retry
 		if [ "$RET" = "true" ]; then
+			log "Unmounting CD just to be sure."
+			umount /cdrom 2>/dev/null || true
 			continue
 		else
 			fail
@@ -116,9 +105,7 @@ do
 			mounted=1
 			break
 		else
-			log "CDROM-mount failed (error=$?): device=$device"
-			log "Unmounting CD just to be sure and giving it up."
-			umount /cdrom 2>/dev/null || true
+			fail
 		fi
 	else
 		fail
@@ -130,10 +117,9 @@ if [ -e /cdrom/.disk/info ] ; then
 	log "Detected CD '$CDNAME'"
 else
 	log "The available CD is not a Debian CD!"
-	umount /cdrom
 	db_input critical cdrom-detect/wrong-cd || [ $? -eq 30 ]
 	db_go
-	exit 1 
+	fail 
 fi
 
 # Get all the pool directories into the dentry cache, to cut down on seek
@@ -173,7 +159,6 @@ if [ -z "$suite" ] ; then
 	log "Error reading Release file; unable to determine distribution"
 	db_input critical cdrom-detect/no-release || [ $? -eq 30 ]
 	db_go
-	umount /cdrom
 	fail
 fi
 
