@@ -1,7 +1,8 @@
-<!-- original version: 39529 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 41871 -->
 <!-- revised by Marco Carvalho (macs) 2005.12.31 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.06.30 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.09.20 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.10.25 -->
 
    <sect3 id="partman">
    <title>Particionando seus discos</title>
@@ -16,32 +17,60 @@ linkend="partitioning"/>.
 
 Primeiro de tudo você terá a oportunidade de particionar automaticamente
 toda a unidade de discos ou o espaço livre na unidade. Isto também é
-chamado particionamento <quote>guiado</quote>. Se não quiser o particionamento
-automático, selecione <guimenuitem>Editar Manualmente a Tabela de
-Partição</guimenuitem> através do menu.
+chamado particionamento <quote>guiado</quote>. Se você não quiser o
+particionamento automático, selecione <guimenuitem>Manual</guimenuitem>
+através do menu.
 
 </para><para>
 
-Se escolher particionamento guiado, você pode escolher entre duas opções: criar
-partições diretamente no disco rígido (método clássico) ou usar o 
-Gerenciamento Lógico de Volumes (LVM). No segundo caso, o instalador irá
+Se escolher particionamento guiado, você pode escolher entre três opções: criar
+partições diretamente no disco rígido (método clássico), ou criá-las usando o
+Gerenciamento Lógico de Volumes (LVM) ou criá-las usando LVM criptografado.
+Nota: a opção de usar LVM (criptografado) pode não estar disponível em todas as
+arquiteturas.
+
+</para><para>
+
+Quando estiver usando LVM ou LVM criptografado, o instalador irá
 criar a maioria das partições dentro de uma grande partição; a vantagem deste
 método é que as partições dentro desta grande partição podem ser
-redimensionadas de maneira relativamente fácil posteriormente. Nota: a opção
-para usar LVM pode não estar disponível em todas as arquiteturas.
+redimensionadas de maneira relativamente fácil posteriormente. No caso do LVM
+criptografado a partição grande não poderá ser lida sem conhecer uma senha
+chave especial, desta maneira fornecendo segurança extra para seus dados
+(pessoais).
 
 </para>
-<warning><para>
+<note><para>
 
-Se você escolher o particionamento guiado usando LVM, não será possível
-desfazer as mudanças feitas na tabela de partições. Isto efetivamente apagará
-todos os dados que estiverem no disco rígido selecionado.
+Se você escolher o particionamento guiado usando LVM ou LVM criptografado,
+algumas alterações na tabela de partições precisarão ser escritas no disco
+selecionado enquanto LVM está sendo configurado. Estas mudanças efetivamente
+apagam todos os dados que estão atualmente no disco rígido selecionado e você
+não poderá desfazê-las posteriormente. No entanto, o instalador irá pedir que
+você confirme estar mudanças antes que elas sejam escritas no disco.
 
-</para></warning>
+</para></note>
 <para>
 
-Após você escolher o particionamento guiado (seja o clássico ou usando LVM),
-você será capaz de escolher a partir dos esquemas listados na tabela abaixo.
+Se você escolher particionamento guiado (seja o clássico ou usando LVM
+(criptografado)) para o disco todo, você primeiro terá que selecionar o disco
+que quer usar. Verifique se todos os seus discos estão listados e, se você
+tiver vários discos, tenha certeza que selecionou o disco correto. A ordem
+que eles são listados pode ser diferente da que você está acostumado. O
+tamanho dos discos pode ajudá-lo a identificá-los.
+
+</para><para>
+
+Quaisquer dados no disco selecionado serão eventualmente perdidos, mas sempre
+será solicitado que você confirme quaisquer mudanças antes que elas sejam
+escritas no disco.
+Se você selecionou o método clássico de particionamento, você será capaz de
+desfazer quaisquer mudanças antes do final, quando usando LVM (criptografado)
+isto não é possível.
+
+</para><para>
+
+A seguir, você poderá escolher um dos esquemas listados na tabela abaixo.
 Todos os esquemas têm seus prós e contras, alguns dos quais são discutidos em
 <xref linkend="partitioning"/>. Se você estiver inseguro, selecione o
 primeiro. Tenha em mente que o particionamento guiado precisa de uma
@@ -86,9 +115,10 @@ guiado falhará.
 
 <para>
 
-Se você escolher o particionamento guiado usando LVM, o instalador irá também
-criar uma partição <filename>/boot</filename> separada. As outras partições,
-exceto a partição swap, serão criadas dentro da partição LVM.
+Se você escolher o particionamento guiado usando LVM (criptografado), o
+instalador irá também criar uma partição <filename>/boot</filename> separada.
+As outras partições, exceto a partição swap, serão criadas dentro da partição
+LVM.
 
 </para><para arch="ia64">
 Se você selecionar o particionamento guiado para o seu sistema IA64, existirá
@@ -161,7 +191,7 @@ Debian será coberto durante o resto desta seção.
 
 </para><para>
 
-Caso selecionar um disco zerado que não tem ou partições ou
+Caso selecionar um disco zerado que não tem nem partições nem
 espaço em disco, você será perguntado se deseja criar uma
 nova tabela de partição (isto é necessário, assim você poderá
 criar novas partições). Após isto, uma linha com o título
