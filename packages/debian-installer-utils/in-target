@@ -2,7 +2,10 @@
 set -e
 . /lib/chroot-setup.sh
 
-chroot_setup
+if ! chroot_setup; then
+	logger -t in-target "Unexpected error: command '$@' not executed"
+	exit 1
+fi
 
 DEBCONF_READFD=0
 export DEBCONF_READFD

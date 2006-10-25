@@ -6,13 +6,26 @@ mountpoints () {
 }
 
 chroot_setup () {
+	# Bail out if directories we need are not there
+	if [ ! -d /target/sbin ] || [ ! -d /target/usr/sbin ] || \
+	   [ ! -d /target/proc ]; then
+		return 1
+	fi
+	case $(uname -r | cut -d . -f 1,2) in
+	    2.6)
+		if [ ! -d /target/sys ] ; then
+			return 1
+		fi
+		;;
+	esac
+
 	if [ -e /var/run/chroot-setup.lock ]; then
 		cat >&2 <<EOF
 apt-install or in-target is already running, so you cannot run either of
 them again until the other instance finishes. You may be able to use
 'chroot /target ...' instead.
 EOF
-		exit 1
+		return 1
 	fi
 	touch /var/run/chroot-setup.lock
 
@@ -48,11 +61,11 @@ EOF
 	# For installing >=2.6.14 kernels we also need sysfs mounted
 	# Only mount it if not mounted already and we're running 2.6
 	case $(uname -r | cut -d . -f 1,2) in
-	2.6)
+	    2.6)
 		if [ ! -d /target/sys/devices ] ; then
 			mount -t sysfs none /target/sys
 		fi
-	;;
+		;;
 	esac
 
 	# Try to enable proxy when using HTTP.
@@ -83,6 +96,8 @@ EOF
 	# Avoid debconf mailing notes.
 	DEBCONF_ADMIN_EMAIL=""
 	export DEBCONF_ADMIN_EMAIL
+
+	return 0
 }
 
 chroot_cleanup () {
