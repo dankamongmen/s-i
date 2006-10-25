@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # *** l10n-spellcheck.sh ***
-export LOCAL_REPOSITORY="${HOME}/di_manual"
+export LOCAL_REPOSITORY="${HOME}/di_manual/po"
 export REFRESH_CMD="svn up ${LOCAL_REPOSITORY}"
 export OUT_DIR="/var/lib/gforge/chroot/home/groups/d-i/htdocs/spellcheck/manual_d-i/"
 
