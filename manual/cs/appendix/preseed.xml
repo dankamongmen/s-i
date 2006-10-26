@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 41587 -->
+<!-- original version: 42250 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -135,7 +135,7 @@ souboru s přednastavením, můžete využít zaváděcí parametry jádra, viz
 Přestože takto můžete přednastavit většinu otázek &d-i;u, existuje
 několik výjimek. Při dělení disku musíte rozdělit buď celý disk, nebo
 použít stávající volné místo &mdash; není možné použít existující
-oblasti. Také nemůžete přednastavit vytváření RAID polí.
+oblasti.
 
 </para>
   </sect2>
@@ -713,7 +713,7 @@ Dělení disku je víceméně omezeno možnostmi, které nabízí
 stávajícího volného místa, nebo celého disku. Rozvržení oblastí můžete
 nadefinovat pomocí předdefinovaného schematu, vlastního schematu ze
 souboru nebo schematu obsaženém v souboru s přednastavením. Momentálně
-není možné přednastavit rozdělení více disků nebo nastavení RAIDu.
+není možné přednastavit rozdělení více disků.
 
 </para><warning><para>
 
@@ -727,7 +727,7 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 # Pokud má systém volné místo, můžete je vybrat k automatickému rozdělení.
 # Pozn: hodnota musí být lokalizována (přeložena).
 #d-i partman-auto/init_automatically_partition \
-#      select Použít největší spojité volné místo
+#      select Asistované - použít největší spojité volné místo
 
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení může být v tradičním formátu nebo ve formátu devfs.
@@ -749,11 +749,11 @@ d-i partman-lvm/confirm boolean true
 # Můžete vybrat libovolné z přednastavených schémat dělení.
 # Pozn: hodnota musí být lokalizována (přeložena).
 d-i partman-auto/choose_recipe \
-       select All files in one partition (recommended for new users)
+       select Všechny soubory v jedné oblasti (doporučeno pro začátečníky)
 #d-i partman-auto/choose_recipe \
-#       select Separate /home partition
+#       select Samostatná oblast pro /home
 #d-i partman-auto/choose_recipe \
-#       select Separate /home, /usr, /var, and /tmp partitions
+#       select Samostatné oblasti pro /home, /usr, /var a /tmp
 
 # Nebo zadat váš vlastní návod na dělení...
 # Formát návodu je popsán v souboru devel/partman-auto-recipe.txt.
@@ -996,7 +996,7 @@ týkají instalace jádra.
   <title>Instalace zavaděče</title>
 
 <informalexample role="example"><screen>
-# Implicitní zavaděč (pro x86) je Grub. Chcete-li místo něj instalovat
+# Výchozím zavaděčem (pro x86) je Grub. Chcete-li místo něj instalovat
 # LILO, odkomentujte následující:
 #d-i grub-installer/skip boolean true
 
@@ -1151,7 +1151,7 @@ tudíž byste si měli o přítomném hardwaru zjistit nějaké podrobnosti.
 
 # Automatické rozpoznání monitoru je doporučeno.
 xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Odkomentujete pokud máte LCD displej.
+# Odkomentujete, pokud máte LCD displej.
 #xserver-xorg xserver-xorg/config/monitor/lcd boolean true
 # X má tři metody nastavení monitoru. Ukážeme střední cestu
 # ("medium"), která je dostupná vždy. Možnost "simple" nemusí být
