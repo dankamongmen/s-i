@@ -35,7 +35,7 @@ machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 case "$machine" in
 	"GLAN Tank")
 		rm -f /boot/initrd /boot/zImage
-		ln -s $ifile /boot/initrd
+		ln -s $(basename $ifile) /boot/initrd
 		(
 			devio 'wl 0xe3a01c04,4' 'wl 0xe381104c,4'
 			cat $kfile
