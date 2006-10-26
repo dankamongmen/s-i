@@ -74,14 +74,15 @@ case "`archdetect`" in
 					lun="$(echo "$bootfs_disk" | cut -d: -f4)"
 					;;
 			esac
-			part="$(($(echo "$bootfs_devfs" | sed 's/[^0-9]*//') - $partition_offset))"
+			# TODO: the next line still uses the devfs path
+			part="$(($(echo "$bootfs_devfs" | sed -e 's%^.*part%%') - $partition_offset))"
 		else
 			kind=`echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
 			host=`echo $bootfs_devfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
 			bus=`echo $bootfs_devfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%'`
 			target=`echo $bootfs_devfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%'`
 			lun=`echo $bootfs_devfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%'`
-			part="$(($(echo $bootfs_devfs | sed -e 's%^.*part%%') - $partition_offset))"
+			part="$(($(echo "$bootfs_devfs" | sed -e 's%^.*part%%') - $partition_offset))"
 		fi
 
 		# We don't know how to map non ide or scsi disks
