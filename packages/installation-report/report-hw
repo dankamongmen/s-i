@@ -11,15 +11,11 @@ addinfo () {
 uname -a 2>&1 | addinfo "umame -a"
 
 if type lspci >/dev/null 2>&1; then
-	lspci -v -t 2>&1 | addinfo "lspci -v -t"
-	lspci -n 2>&1 | addinfo "lspci -n"
-	lspci -v 2>&1 | addinfo "lspci -v"
-	lspci -x 2>&1 | addinfo "lspci -x"
+	lspci -nn  2>&1 | addinfo "lspci -nn"
+	lspci -vnn 2>&1 | addinfo "lspci -vnn"
 elif /target/usr/bin/lspci >/dev/null; then
-	/target/usr/bin/lspci -v -t 2>&1 | addinfo "lspci -v -t"
-	/target/usr/bin/lspci -n 2>&1 | addinfo "lspci -n"
-	/target/usr/bin/lspci -v 2>&1 | addinfo "lspci -v"
-	/target/usr/bin/lspci -x 2>&1 | addinfo "lspci -x"
+	/target/usr/bin/lspci -nn 2>&1 | addinfo "lspci -nn"
+	/target/usr/bin/lspci -vnn 2>&1 | addinfo "lspci -vnn"
 else
 	cat /proc/pci 2>&1 | addinfo /proc/pci
 	cat /proc/bus/pci/devices 2>&1 | addinfo /proc/bus/pci/devices
