@@ -6,6 +6,190 @@
 <para>
 </para>
 
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>CD-ROM Reliability</title>
+<para>
+
+Sometimes, especially with older CD-ROM drives, the installer may fail
+to boot from a CD-ROM. The installer may also &mdash; even after booting
+successfully from CD-ROM &mdash; fail to recognize the CD-ROM or return
+errors while reading from it during the installation.
+
+</para><para>
+
+There are a many different possible causes for these problems. We can
+only list some common issues and provide general suggestions on how to
+deal with them. The rest is up to you.
+
+</para><para>
+
+If you cannot get the installation working from CD-ROM, try one of the
+other installation methods that are available.
+
+</para>
+
+  <sect3>
+  <title>Common issues</title>
+
+<itemizedlist>
+  <listitem><para>
+
+Some older CD-ROM drives do not support reading from discs that were burned
+at high speeds using a modern CD writer.
+
+  </para></listitem>
+  <listitem><para>
+
+If your system boots correctly from the CD-ROM, it does not necessarily
+mean that Linux also supports the CD-ROM (or, more correctly, the controller
+that your CD-ROM drive is connected to). 
+
+  </para></listitem>
+  <listitem><para>
+
+Some older CD-ROM drives do not work correctly if <quote>direct memory
+access</quote> (DMA) is enabled.
+
+  </para></listitem>
+</itemizedlist>
+
+  </sect3>
+
+  <sect3>
+  <title>How to investigate and maybe solve issues</title>
+<para>
+
+If the CD-ROM fails to boot, try the suggestions listed below.
+
+<itemizedlist>
+  <listitem><para>
+
+Check that your BIOS actually supports booting from CD-ROM (older systems
+possibly don't) and that your CD-ROM drive supports the media you are using.
+
+  </para></listitem>
+  <listitem><para>
+
+If you downloaded an iso image, check that the md5sum of that image matches
+the one listed for the image in the <filename>MD5SUMS</filename> file that
+should be present in the same location as where you downloaded the image
+from.
+
+<informalexample><screen>
+$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+Next, check that the md5sum of the burned CD-ROM matches as well. The
+following command should work. It uses the size of the image to read the
+correct number of bytes from the CD-ROM.
+
+<informalexample><screen>
+$ dd if=/dev/cdrom | \
+> head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \
+> md5sum
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+If, after the installer has been booted successfully, the CD-ROM is not
+detected, sometimes simply trying again may solve the problem. If you have
+more than one CD-ROM drive, try changing the CD-ROM to the other drive.
+If that does not work or if the CD-ROM is recognized but there are errors
+when reading from it, try the suggestions listed below. Some basic knowledge
+of Linux is required for this.
+To execute any of the commands, you should first switch to the second
+virtual console (VT2) and activate the shell there.
+
+<itemizedlist>
+  <listitem><para>
+
+Switch to VT4 or view the contents of <filename>/var/log/syslog</filename>
+(use <command>nano</command> as editor) to check for any specific error
+messages. After that, also check the output of <command>dmesg</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Check in the output of <command>dmesg</command> if your CD-ROM drive was
+recognized. You should see something like (the lines do not necessarily
+have to be consecutive):
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+If you don't see something like that, chances are the controller your CD-ROM
+is connected to was not recognized or may be not supported at all. If you
+know what driver is needed for the drive, you can try loading it manually
+using <command>modprobe</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Check that there is a device node for your CD-ROM drive under
+<filename>/dev/</filename>. In the example above, this would be
+<filename>/dev/hdc</filename>.
+There should also be a <filename>/dev/cdroms/cdrom0</filename>.
+
+  </para></listitem>
+  <listitem><para>
+
+Use the <command>mount</command> command to check if the CD-ROM is already
+mounted; if not, try mounting it manually:
+
+<informalexample><screen>
+$ mount /dev/<replaceable>hdc</replaceable> /cdrom
+</screen></informalexample>
+
+Check if there are any error messages after that command.
+
+  </para></listitem>
+  <listitem><para>
+
+Check if DMA is currently enabled:
+
+<informalexample><screen>
+$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
+$ grep dma settings
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+A <quote>1</quote> means it is enabled. If it is, try disabling it:
+
+<informalexample><screen>
+$ echo -n "using_dma:0" >settings
+</screen></informalexample>
+
+Make sure that you are in the directory for the device that corresponds
+to your CD-ROM drive.
+
+  </para></listitem>
+  <listitem><para>
+
+If there are any problems during the installation, try checking the integrity
+of the CD-ROM using the option near the bottom of the installer's main menu.
+This option can also be used as a general test if the CD-ROM can be read
+reliably.
+
+  </para></listitem>
+</itemizedlist>
+
+</para>
+  </sect3>
+  </sect2>
+
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Floppy Disk Reliability</title>
 
@@ -26,12 +210,17 @@ indicate themselves with a flood of messages about disk I/O errors.
 </para><para>
 
 If you are having the installation stall at a particular floppy, the
-first thing you should do is re-download the floppy disk image and
-write it to a <emphasis>different</emphasis> floppy. Simply
-reformatting the old
+first thing you should write it to a <emphasis>different</emphasis>
+floppy. Simply reformatting the old
 floppy may not be sufficient, even if it appears that the floppy was
 reformatted and written with no errors. It is sometimes useful to try
 writing the floppy on a different system.
+
+</para><para>
+
+Normally you should not have download a floppy image again, but if you
+are experiencing problems it is always useful to verify that the images
+were downloaded correctly by verifying their md5sums.
 
 </para><para>
 
