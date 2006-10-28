@@ -22,10 +22,22 @@ autopartition, choose <guimenuitem>Manual</guimenuitem> from the menu.
 If you choose guided partitioning, you may have three options: to create
 partitions directly on the hard disk (classic method), or to create them
 using Logical Volume Management (LVM), or to create them using encrypted
-LVM. Note: the option to use (encrypted) LVM may not be available on all
-architectures.
+LVM<footnote>.
 
-</para><para>
+<para>
+The installer will encrypt the LVM volume group using a 256 bit AES key and
+makes use of the kernel's <quote>dm-crypt</quote> support.
+</para>
+
+</footnote>.
+
+</para>
+<note><para>
+
+The option to use (encrypted) LVM may not be available on all architectures.
+
+</para></note>
+<para>
 
 When using LVM or encrypted LVM, the installer will create most
 partitions inside one big partition; the advantage of this method is that
@@ -33,6 +45,14 @@ partitions inside this big partition can be resized relatively easily later.
 In the case of encrypted LVM the big partition will not be readable without
 knowing a special key phrase, thus providing extra security of your
 (personal) data.
+
+</para><para>
+
+When using encrypted LVM, the installer will also automatically erase the
+disk by writing random data to it. This further improves security (as it
+makes it impossible to tell which parts of the disk are in use and also
+makes sure that any traces of previous installations are erased), but may
+take some time depending on the size of your disk.
 
 </para>
 <note><para>
