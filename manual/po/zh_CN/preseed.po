@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-10-26 16:19+0000\n"
+"POT-Creation-Date: 2006-10-29 14:48+0000\n"
 "PO-Revision-Date: 2006-10-16 15:44+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
@@ -26,7 +26,7 @@ msgid ""
 msgstr "本附录对 &d-i; 中提问对应的答案进行说明，让安装过程自动化。"
 
 #. Tag: para
-#: preseed.xml:23 preseed.xml:504
+#: preseed.xml:23 preseed.xml:508
 #, no-c-format
 msgid ""
 "The configuration fragments used in this appendix are also available as an "
@@ -542,33 +542,38 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:374
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "A <quote>--</quote> in the boot options has special meaning. Kernel "
-"parameters that appear after it will be copied into the installed bootloader "
-"configuration (if supported by the installer for the bootloader). Note that "
-"the <quote>--</quote> may already be present in the default boot parameters."
+"parameters that appear after the last <quote>--</quote> will be copied into "
+"the installed bootloader configuration (if supported by the installer for "
+"the bootloader). Note that the <quote>--</quote> may already be present in "
+"the default boot parameters, which means that unless you add another "
+"<quote>--</quote> all parameters specified at the boot prompt will be "
+"copied. That being the case, you should specify any preconfiguration options "
+"before any options required by the hardware in order to boot, and separate "
+"them with a <quote>--</quote> to ensure that only the latter are copied onto "
+"the target system."
 msgstr ""
 "<quote>--</quote> 在启动选项中有特殊含义。之后的内核参数将复制到已安装的引导"
 "器配置(假如安装程序支持引导器)。注意 <quote>--</quote> 也可能已经存在于默认的"
 "引导参数中。"
 
 #. Tag: para
-#: preseed.xml:383
-#, no-c-format
+#: preseed.xml:388
+#, fuzzy, no-c-format
 msgid ""
-"The 2.4 kernel accepts a maximum of 8 command line options and 8 environment "
-"options (including any options added by default for the installer). If these "
-"numbers are exceeded, 2.4 kernels will drop any excess options and 2.6 "
-"kernels will panic. For kernel 2.6.9 and later, you can use 32 command line "
-"options and 32 environment options."
+"Current linux kernels (2.6.9 and later) accept a maximum of 32 command line "
+"options and 32 environment options, including any options added by default "
+"for the installer. If these numbers are exceeded, the kernel will panic "
+"(crash). (For earlier kernels, these numbers were lower.)"
 msgstr ""
 "对于 2.4 内核，它最多可以接受 8 个命令行选项和 8 个环境变量选项(包括安装程序"
 "使用的默认选项)。如果超出，2.4 内核将丢弃多余部分，但 2.6 内核会崩溃。2.6.9 "
 "以后的内核，您可以指定 32 个命令行选项和 32 个环境变量选项。"
 
 #. Tag: para
-#: preseed.xml:392
+#: preseed.xml:396
 #, no-c-format
 msgid ""
 "For most installations some of the default options in your bootloader "
@@ -579,7 +584,7 @@ msgstr ""
 "literal>，可以放心地删除，这让您可以添加更多的预置选项。"
 
 #. Tag: para
-#: preseed.xml:399
+#: preseed.xml:403
 #, no-c-format
 msgid ""
 "It may not always be possible to specify values with spaces for boot "
@@ -587,13 +592,13 @@ msgid ""
 msgstr "引导参数中即使使用引号，也可能无法夹杂空格。"
 
 #. Tag: title
-#: preseed.xml:409
+#: preseed.xml:413
 #, no-c-format
 msgid "Creating a preconfiguration file"
 msgstr "创建预置文件"
 
 #. Tag: para
-#: preseed.xml:410
+#: preseed.xml:414
 #, no-c-format
 msgid ""
 "The preconfiguration file is in the format used by the <command>debconf-set-"
@@ -604,21 +609,21 @@ msgstr ""
 "预置文件中每一行的格式为："
 
 #. Tag: screen
-#: preseed.xml:416
+#: preseed.xml:420
 #, no-c-format
 msgid "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
 msgstr ""
 "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
 
 #. Tag: para
-#: preseed.xml:418
+#: preseed.xml:422
 #, no-c-format
 msgid ""
 "There are a few rules to keep in mind when writing a preconfiguration file."
 msgstr "编写预置文件的时候要留意几条规则。"
 
 #. Tag: para
-#: preseed.xml:425
+#: preseed.xml:429
 #, no-c-format
 msgid ""
 "Put only a single space or tab between type and value: any additional "
@@ -627,7 +632,7 @@ msgstr ""
 "在类型和值之间只有一个空格或者 tab：任何额外的空格将被解释为值的一部分。"
 
 #. Tag: para
-#: preseed.xml:429
+#: preseed.xml:433
 #, no-c-format
 msgid ""
 "A line can be split into multiple lines by appending a backslash "
@@ -639,7 +644,7 @@ msgstr ""
 "行。分割一行较好的地方是在问题名后面；而在类型和值之间则是糟糕的地方。"
 
 #. Tag: para
-#: preseed.xml:435
+#: preseed.xml:439
 #, no-c-format
 msgid ""
 "Most questions need to be preseeded using the values valid in English and "
@@ -650,7 +655,7 @@ msgstr ""
 "<classname>partman</classname>)，需要使用翻译过的值。"
 
 #. Tag: para
-#: preseed.xml:441
+#: preseed.xml:445
 #, no-c-format
 msgid ""
 "Some questions take a code as value instead of the English text that is "
@@ -658,7 +663,7 @@ msgid ""
 msgstr "有些问题在安装过程中显示值的代码而不是英文文本。"
 
 #. Tag: para
-#: preseed.xml:447
+#: preseed.xml:451
 #, no-c-format
 msgid ""
 "The easiest way to create a preconfiguration file is to use the example file "
@@ -668,7 +673,7 @@ msgstr ""
 "\"preseed-contents\"/>。"
 
 #. Tag: para
-#: preseed.xml:452
+#: preseed.xml:456
 #, no-c-format
 msgid ""
 "An alternative method is to do a manual installation and then, after "
@@ -681,7 +686,7 @@ msgstr ""
 "程序的 cdebconf 数据库到一个文件："
 
 #. Tag: screen
-#: preseed.xml:459
+#: preseed.xml:463
 #, no-c-format
 msgid ""
 "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
@@ -691,7 +696,7 @@ msgstr ""
 "$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>"
 
 #. Tag: para
-#: preseed.xml:461
+#: preseed.xml:465
 #, no-c-format
 msgid ""
 "However, a file generated in this manner will have some items that should "
@@ -702,7 +707,7 @@ msgstr ""
 "始。"
 
 #. Tag: para
-#: preseed.xml:469
+#: preseed.xml:473
 #, no-c-format
 msgid ""
 "This method relies on the fact that, at the end of the installation, the "
@@ -716,7 +721,7 @@ msgstr ""
 "感的信息，默认只为 root 可读。"
 
 #. Tag: para
-#: preseed.xml:477
+#: preseed.xml:481
 #, no-c-format
 msgid ""
 "The directory <filename>/var/log/installer</filename> and all files in it "
@@ -727,7 +732,7 @@ msgstr ""
 "log/installer</filename> 目录及其中的文件将从您的系统中删除。"
 
 #. Tag: para
-#: preseed.xml:485
+#: preseed.xml:489
 #, no-c-format
 msgid ""
 "To check possible values for questions, you can use <command>nano</command> "
@@ -742,7 +747,7 @@ msgstr ""
 "值。"
 
 #. Tag: para
-#: preseed.xml:493
+#: preseed.xml:497
 #, no-c-format
 msgid ""
 "To check if the format of your preconfiguration file is valid before "
@@ -753,13 +758,13 @@ msgstr ""
 "selections -c <replaceable>preseed.cfg</replaceable></command> 命令。"
 
 #. Tag: title
-#: preseed.xml:503
+#: preseed.xml:507
 #, no-c-format
 msgid "Contents of the preconfiguration file"
 msgstr "预置文件的内容"
 
 #. Tag: para
-#: preseed.xml:509
+#: preseed.xml:513
 #, no-c-format
 msgid ""
 "Note that this example is based on an installation for the Intel x86 "
@@ -773,13 +778,13 @@ msgstr ""
 "设置替换。"
 
 #. Tag: title
-#: preseed.xml:520
+#: preseed.xml:524
 #, no-c-format
 msgid "Localization"
 msgstr "本地化"
 
 #. Tag: para
-#: preseed.xml:521
+#: preseed.xml:525
 #, no-c-format
 msgid ""
 "Setting localization values will only work if you are using initrd "
@@ -789,7 +794,7 @@ msgstr ""
 "设置本地信息只适用于使用 initrd 预置。其他方式下这些问题是在询问之后加载的。"
 
 #. Tag: para
-#: preseed.xml:527
+#: preseed.xml:531
 #, no-c-format
 msgid ""
 "The locale can be used to specify both language and country. To specify the "
@@ -800,7 +805,7 @@ msgstr ""
 "<userinput>locale=<replaceable>en_US</replaceable></userinput>。"
 
 #. Tag: screen
-#: preseed.xml:533
+#: preseed.xml:537
 #, no-c-format
 msgid ""
 "# Locale sets language and country.\n"
@@ -810,7 +815,7 @@ msgstr ""
 "d-i debian-installer/locale string en_US"
 
 #. Tag: para
-#: preseed.xml:535
+#: preseed.xml:539
 #, no-c-format
 msgid ""
 "Keyboard configuration consists of selecting a keyboard architecture and a "
@@ -822,7 +827,7 @@ msgstr ""
 "体系，因此通常不必预置。键映射必须对所选择的键盘体系有效。"
 
 #. Tag: screen
-#: preseed.xml:542
+#: preseed.xml:546
 #, no-c-format
 msgid ""
 "# Keyboard selection.\n"
@@ -838,7 +843,7 @@ msgstr ""
 "#d-i console-keymaps-usb/keymap select mac-usb-us"
 
 #. Tag: para
-#: preseed.xml:544
+#: preseed.xml:548
 #, no-c-format
 msgid ""
 "To skip keyboard configuration, preseed <classname>console-tools/archs</"
@@ -849,7 +854,7 @@ msgstr ""
 "tools/archs</classname>。这将导致内核键映射保持活动。"
 
 #. Tag: para
-#: preseed.xml:553
+#: preseed.xml:557
 #, no-c-format
 msgid ""
 "The changes in the input layer for 2.6 kernels have made the keyboard "
@@ -860,13 +865,13 @@ msgstr ""
 "<quote>PC</quote> (<userinput>at</userinput>) keymap。"
 
 #. Tag: title
-#: preseed.xml:563
+#: preseed.xml:567
 #, no-c-format
 msgid "Network configuration"
 msgstr "网络设置"
 
 #. Tag: para
-#: preseed.xml:564
+#: preseed.xml:568
 #, no-c-format
 msgid ""
 "Of course, preseeding the network configuration won't work if you're loading "
@@ -879,7 +884,7 @@ msgstr ""
 "助。如果您计划从网络加载预置文件，应该使用传递网络设置给内核引导参数的方式。"
 
 #. Tag: para
-#: preseed.xml:572
+#: preseed.xml:576
 #, no-c-format
 msgid ""
 "If you need to pick a particular interface when netbooting before loading a "
@@ -890,7 +895,7 @@ msgstr ""
 "<userinput>interface=<replaceable>eth1</replaceable></userinput>。"
 
 #. Tag: para
-#: preseed.xml:578
+#: preseed.xml:582
 #, no-c-format
 msgid ""
 "Although preseeding the network configuration is normally not possible when "
@@ -906,7 +911,7 @@ msgstr ""
 "再运行一次，这需要下面的内容包含在 <quote>preseed/run</quote> 脚本里面："
 
 #. Tag: screen
-#: preseed.xml:588
+#: preseed.xml:592
 #, no-c-format
 msgid ""
 "killall.sh dhclient\n"
@@ -916,7 +921,7 @@ msgstr ""
 "netcfg"
 
 #. Tag: screen
-#: preseed.xml:592
+#: preseed.xml:596
 #, no-c-format
 msgid ""
 "# netcfg will choose an interface that has link if possible. This makes it\n"
@@ -998,13 +1003,13 @@ msgstr ""
 "#d-i netcfg/dhcp_hostname string radish"
 
 #. Tag: title
-#: preseed.xml:597
+#: preseed.xml:601
 #, no-c-format
 msgid "Mirror settings"
 msgstr "镜像设置"
 
 #. Tag: para
-#: preseed.xml:598
+#: preseed.xml:602
 #, no-c-format
 msgid ""
 "Depending on the installation method you use, a mirror may be used both to "
@@ -1015,7 +1020,7 @@ msgstr ""
 "系统建立 <filename>/etc/apt/sources.list</filename>。"
 
 #. Tag: para
-#: preseed.xml:605
+#: preseed.xml:609
 #, no-c-format
 msgid ""
 "The parameter <classname>mirror/suite</classname> determines the suite for "
@@ -1024,7 +1029,7 @@ msgstr ""
 "参数 <classname>mirror/suite</classname> 决定了安装好的系统使用的套件。"
 
 #. Tag: para
-#: preseed.xml:610
+#: preseed.xml:614
 #, no-c-format
 msgid ""
 "The parameter <classname>mirror/udeb/suite</classname> determines the suite "
@@ -1040,7 +1045,7 @@ msgstr ""
 "suite</classname> 的值相同。"
 
 #. Tag: screen
-#: preseed.xml:622
+#: preseed.xml:626
 #, no-c-format
 msgid ""
 "d-i mirror/country string enter information manually\n"
@@ -1064,13 +1069,13 @@ msgstr ""
 "#d-i mirror/udeb/suite string testing"
 
 #. Tag: title
-#: preseed.xml:627
+#: preseed.xml:631
 #, no-c-format
 msgid "Partitioning"
 msgstr "分区"
 
 #. Tag: para
-#: preseed.xml:628
+#: preseed.xml:632
 #, fuzzy, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1086,7 +1091,7 @@ msgstr ""
 "立 RAID。"
 
 #. Tag: para
-#: preseed.xml:639
+#: preseed.xml:643
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1097,7 +1102,7 @@ msgstr ""
 "确的那一个。"
 
 #. Tag: screen
-#: preseed.xml:647
+#: preseed.xml:651
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1226,13 +1231,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:652
+#: preseed.xml:656
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "使用 RAID 分区"
 
 #. Tag: para
-#: preseed.xml:653
+#: preseed.xml:657
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1246,7 +1251,7 @@ msgstr ""
 "列中的所有设备；参见 <xref linkend=\"preseed-bootloader\"/>。"
 
 #. Tag: para
-#: preseed.xml:663
+#: preseed.xml:667
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1260,7 +1265,7 @@ msgstr ""
 "一下 <filename>/var/log/syslog</filename>。"
 
 #. Tag: para
-#: preseed.xml:671
+#: preseed.xml:675
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1271,7 +1276,7 @@ msgstr ""
 "RAID 设置像降级阵列或额外设备只经过了轻量级的测试。"
 
 #. Tag: screen
-#: preseed.xml:679
+#: preseed.xml:683
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1369,13 +1374,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:684
+#: preseed.xml:688
 #, no-c-format
 msgid "Clock and time zone setup"
 msgstr "时钟与时区设置"
 
 #. Tag: screen
-#: preseed.xml:686
+#: preseed.xml:690
 #, no-c-format
 msgid ""
 "# Controls whether or not the hardware clock is set to UTC.\n"
@@ -1393,13 +1398,13 @@ msgstr ""
 "d-i time/zone string US/Eastern"
 
 #. Tag: title
-#: preseed.xml:691
+#: preseed.xml:695
 #, no-c-format
 msgid "Apt setup"
 msgstr "设置 apt"
 
 #. Tag: para
-#: preseed.xml:692
+#: preseed.xml:696
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1412,7 +1417,7 @@ msgstr ""
 "仓库。"
 
 #. Tag: screen
-#: preseed.xml:700
+#: preseed.xml:704
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1448,13 +1453,13 @@ msgstr ""
 "#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
-#: preseed.xml:705
+#: preseed.xml:709
 #, no-c-format
 msgid "Account setup"
 msgstr "帐号设置"
 
 #. Tag: para
-#: preseed.xml:706
+#: preseed.xml:710
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1465,7 +1470,7 @@ msgstr ""
 "或 MD5 <emphasis>hashes</emphasis> 值。"
 
 #. Tag: para
-#: preseed.xml:713
+#: preseed.xml:717
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1478,7 +1483,7 @@ msgstr ""
 "MD5 哈西表相对安全一些，但也会造成安全的假象，MD5 哈西表也可以被暴力破解。"
 
 #. Tag: screen
-#: preseed.xml:723
+#: preseed.xml:727
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1524,7 +1529,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:725
+#: preseed.xml:729
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1541,26 +1546,26 @@ msgstr ""
 "root 登录(例如使用 SSH key 认证或 sudo)。"
 
 #. Tag: para
-#: preseed.xml:735
+#: preseed.xml:739
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
 msgstr "密码的 MD5 hash 可以用下面命令产生。"
 
 #. Tag: screen
-#: preseed.xml:739
+#: preseed.xml:743
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 
 #. Tag: title
-#: preseed.xml:745
+#: preseed.xml:749
 #, no-c-format
 msgid "Base system installation"
 msgstr "基本系统安装"
 
 #. Tag: para
-#: preseed.xml:746
+#: preseed.xml:750
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -1569,7 +1574,7 @@ msgid ""
 msgstr "本阶段的安装并没有多少东西需要预置。仅有一个与内核安装相关的问题。"
 
 #. Tag: screen
-#: preseed.xml:753
+#: preseed.xml:757
 #, no-c-format
 msgid ""
 "# Select the initramfs generator used to generate the initrd for 2.6 "
@@ -1581,13 +1586,13 @@ msgstr ""
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:758
+#: preseed.xml:762
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "安装引导加载器"
 
 #. Tag: screen
-#: preseed.xml:760
+#: preseed.xml:764
 #, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -1635,13 +1640,13 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
-#: preseed.xml:765
+#: preseed.xml:769
 #, no-c-format
 msgid "Package selection"
 msgstr "选择软件包"
 
 #. Tag: para
-#: preseed.xml:766
+#: preseed.xml:770
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -1649,73 +1654,73 @@ msgid ""
 msgstr "您可以选择安装存在的任务的组合。写这篇文章时已有的任务是："
 
 #. Tag: userinput
-#: preseed.xml:775
+#: preseed.xml:779
 #, no-c-format
 msgid "standard"
 msgstr "标准"
 
 #. Tag: userinput
-#: preseed.xml:778
+#: preseed.xml:782
 #, no-c-format
 msgid "desktop"
 msgstr "桌面"
 
 #. Tag: userinput
-#: preseed.xml:781
+#: preseed.xml:785
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "gnome 桌面"
 
 #. Tag: userinput
-#: preseed.xml:784
+#: preseed.xml:788
 #, no-c-format
 msgid "kde-desktop"
 msgstr "kde 桌面"
 
 #. Tag: userinput
-#: preseed.xml:787
+#: preseed.xml:791
 #, no-c-format
 msgid "web-server"
 msgstr "web 服务器"
 
 #. Tag: userinput
-#: preseed.xml:790
+#: preseed.xml:794
 #, no-c-format
 msgid "print-server"
 msgstr "打印服务器"
 
 #. Tag: userinput
-#: preseed.xml:793
+#: preseed.xml:797
 #, no-c-format
 msgid "dns-server"
 msgstr "dns 服务器"
 
 #. Tag: userinput
-#: preseed.xml:796
+#: preseed.xml:800
 #, no-c-format
 msgid "file-server"
 msgstr "文件服务器"
 
 #. Tag: userinput
-#: preseed.xml:799
+#: preseed.xml:803
 #, no-c-format
 msgid "mail-server"
 msgstr "邮件服务器"
 
 #. Tag: userinput
-#: preseed.xml:802
+#: preseed.xml:806
 #, no-c-format
 msgid "sql-database"
 msgstr "SQL 数据库"
 
 #. Tag: userinput
-#: preseed.xml:805
+#: preseed.xml:809
 #, no-c-format
 msgid "laptop"
 msgstr "便携机"
 
 #. Tag: para
-#: preseed.xml:809
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -1726,7 +1731,7 @@ msgstr ""
 "userinput> 任务。"
 
 #. Tag: para
-#: preseed.xml:815
+#: preseed.xml:819
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -1738,7 +1743,7 @@ msgstr ""
 "include</classname>。该参数的值可以用逗号或空格分开，便于在内核命令行上使用。"
 
 #. Tag: screen
-#: preseed.xml:825
+#: preseed.xml:829
 #, no-c-format
 msgid ""
 "tasksel tasksel/first multiselect standard, desktop\n"
@@ -1768,13 +1773,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:830
+#: preseed.xml:834
 #, no-c-format
 msgid "Finishing up the first stage install"
 msgstr "完成第一阶段安装"
 
 #. Tag: screen
-#: preseed.xml:832
+#: preseed.xml:836
 #, no-c-format
 msgid ""
 "# Avoid that last message about the install being complete.\n"
@@ -1792,13 +1797,13 @@ msgstr ""
 "#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
-#: preseed.xml:837
+#: preseed.xml:841
 #, no-c-format
 msgid "Mailer configuration"
 msgstr "邮件设置"
 
 #. Tag: para
-#: preseed.xml:838
+#: preseed.xml:842
 #, no-c-format
 msgid ""
 "During a normal install, exim asks only a few questions. Here's how to avoid "
@@ -1807,7 +1812,7 @@ msgstr ""
 "普通安装方式下，exim 会问一些问题。这里是避免的方法。也可以有更多的预置内容。"
 
 #. Tag: screen
-#: preseed.xml:845
+#: preseed.xml:849
 #, no-c-format
 msgid ""
 "exim4-config exim4/dc_eximconfig_configtype \\\n"
@@ -1823,13 +1828,13 @@ msgstr ""
 "exim4-config exim4/dc_postmaster string"
 
 #. Tag: title
-#: preseed.xml:850
+#: preseed.xml:854
 #, no-c-format
 msgid "X configuration"
 msgstr "设置 X"
 
 #. Tag: para
-#: preseed.xml:851
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Preseeding Debian's X config is possible, but you probably need to know some "
@@ -1840,7 +1845,7 @@ msgstr ""
 "的 X 配置工具无法自动设置每一件事。"
 
 #. Tag: screen
-#: preseed.xml:859
+#: preseed.xml:863
 #, no-c-format
 msgid ""
 "# X can detect the right driver for some cards, but if you're preseeding,\n"
@@ -1888,13 +1893,13 @@ msgstr ""
 "       select 1024x768 @ 60 Hz"
 
 #. Tag: title
-#: preseed.xml:864
+#: preseed.xml:868
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "预置其他的软件包"
 
 #. Tag: screen
-#: preseed.xml:866
+#: preseed.xml:870
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -1914,19 +1919,19 @@ msgstr ""
 "#   debconf-get-selections >> file"
 
 #. Tag: title
-#: preseed.xml:872
+#: preseed.xml:876
 #, no-c-format
 msgid "Advanced options"
 msgstr "高级选项"
 
 #. Tag: title
-#: preseed.xml:875
+#: preseed.xml:879
 #, no-c-format
 msgid "Shell commands"
 msgstr "shell 命令"
 
 #. Tag: screen
-#: preseed.xml:877
+#: preseed.xml:881
 #, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
@@ -1964,13 +1969,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:882
+#: preseed.xml:886
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "预置文件链"
 
 #. Tag: para
-#: preseed.xml:883
+#: preseed.xml:887
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -1984,7 +1989,7 @@ msgstr ""
 "另外的文件里面。"
 
 #. Tag: screen
-#: preseed.xml:893
+#: preseed.xml:897
 #, no-c-format
 msgid ""
 "# More that one file can be listed, separated by spaces; all will be\n"
