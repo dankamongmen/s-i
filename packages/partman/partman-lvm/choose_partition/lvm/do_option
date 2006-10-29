@@ -562,8 +562,9 @@ menu_finish="$RET"
 
 while [ 1 ]; do
 	# Get some statistics
-	used_pvs=$(pvs --noheadings | wc -l)
 	free_pvs=$(pv_list_free | wc -l)
+	used_pvs=$(pvs --noheadings | wc -l)  # All PVs
+	used_pvs=$(( $used_pvs - $free_pvs )) # Used = All PVs - Free PVs
 	vgs=$(vg_list | wc -l)
 	lvs=$(lv_list | wc -l)
 
