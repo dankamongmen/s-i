@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-10-29 14:49+0000\n"
-"PO-Revision-Date: 2006-10-29 19:47+0300\n"
+"PO-Revision-Date: 2006-10-29 21:09+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: boot-installer.xml:4
 #, no-c-format
 msgid "Booting the Installation System"
-msgstr "Загрузка системы"
+msgstr "Загрузка системы установки"
 
 #. Tag: title
 #: boot-installer.xml:9
@@ -93,7 +93,7 @@ msgid ""
 "prefer to partition your disks from the firmware menus before installing "
 "Linux."
 msgstr ""
-"Для ARC требуется использовать таблицу разделов MS-DOS (которая создается с "
+"Для ARC требуется использовать таблицу разделов MS-DOS (которая создаётся с "
 "помощью <command>cfdisk</command>) для загрузочного диска. Таким образом, "
 "формат разделов MS-DOS для таблицы разделов является <quote>родным</quote>, "
 "когда загрузка происходит из ARC. А ещё, поскольку AlphaBIOS содержит "
@@ -3052,7 +3052,7 @@ msgid ""
 "they have no serial port."
 msgstr ""
 "Через последовательный порт: С помощью нуль-модемного кабеля, вы можете "
-"подключиться кпоследовательному порту Cobalt (на скорости 115200 bps) и "
+"подключиться к последовательному порту Cobalt (на скорости 115200 bps) и "
 "выполнить установку. Этот способ не работает на машинах Qube 2700 (Qube1), "
 "так как они не имеют последовательного порта."
 
@@ -4285,7 +4285,7 @@ msgid ""
 "access</quote> (DMA) is enabled."
 msgstr ""
 "Некоторые старые приводы CD-ROM работают неправильно, если "
-"включен <quote>прямой доступ к памяти</quote> (DMA)."
+"включён <quote>прямой доступ к памяти</quote> (DMA)."
 
 #. Tag: title
 #: boot-installer.xml:3171
@@ -4332,8 +4332,8 @@ msgstr ""
 "a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst."
 "iso</replaceable>\n"
 "</screen></informalexample> Далее проверьте, что md5sum записанного CD-ROM "
-"также совпадает. Следующая команда должна сработать. В ней считается сумма "
-"для прочитанных с CD-ROM байт, составляющих образ."
+"также совпадает. Следующая команда должна сработать. Здесь считается сумма "
+"прочитанных с CD-ROM байт, составляющих образ."
 
 #. Tag: screen
 #: boot-installer.xml:3196
@@ -4369,6 +4369,14 @@ msgid ""
 "Linux is required for this. To execute any of the commands, you should first "
 "switch to the second virtual console (VT2) and activate the shell there."
 msgstr ""
+"Если после успешной загрузки программы установки не определяется "
+"CD-ROM, то иногда помогает просто попробовать ещё раз. Если у вас "
+"более одного привода CD-ROM, попробуйте загрузиться с другого CD-ROM. "
+"Если это не помогает или если CD-ROM определяется, но при чтении возникают "
+"ошибки, попробуйте выполнить предложения, данные ниже. Для этого потребуются "
+"азы работы в Linux. Перед тем как выполнить любую команду, сначала вы должны "
+"переключиться во вторую виртуальную консоль (VT2) и активировать оболочку "
+"командной строки."
 
 #. Tag: para
 #: boot-installer.xml:3213
@@ -4378,6 +4386,9 @@ msgid ""
 "(use <command>nano</command> as editor) to check for any specific error "
 "messages. After that, also check the output of <command>dmesg</command>."
 msgstr ""
+"Переключитесь в VT4 или посмотрите файл <filename>/var/log/syslog</filename> "
+"(в качестве редактора используется <command>nano</command>), чтобы найти сообщения о специфических ошибках. После этого также проверьте вывод "
+"команды <command>dmesg</command>."
 
 #. Tag: para
 #: boot-installer.xml:3220
@@ -4396,6 +4407,19 @@ msgid ""
 "not supported at all. If you know what driver is needed for the drive, you "
 "can try loading it manually using <command>modprobe</command>."
 msgstr ""
+"В выводе <command>dmesg</command> проверьте, что привод CD-ROM "
+"был найден. Вы должны увидеть что-то типа этого (строки могут быть в другой "
+"последовательности): <informalexample><screen>\n"
+"Probing IDE interface ide1...\n"
+"hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive\n"
+"ide1 at 0x170-0x177,0x376 on irq 15\n"
+"hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)\n"
+"Uniform CD-ROM driver Revision: 3.20\n"
+"</screen></informalexample> Если вы не нашли подобных строк, это "
+"случай, когда контроллер, к которому подключён CD-ROM, не распознан или "
+"не поддерживается ядром вообще. Если вы знаете, какой драйвер требуется "
+"для привода, то можете попытаться загрузить его вручную с помощью "
+"команды <command>modprobe</command>."
 
 #. Tag: para
 #: boot-installer.xml:3234
@@ -4405,6 +4429,9 @@ msgid ""
 "</filename>. In the example above, this would be <filename>/dev/hdc</"
 "filename>. There should also be a <filename>/dev/cdroms/cdrom0</filename>."
 msgstr ""
+"Проверьте, что есть соответствующий файл устройства для привода CD-ROM в "
+"каталоге <filename>/dev/</filename>. Для примера выше, должен существовать "
+"файл <filename>/dev/hdc</filename>. Также может быть <filename>/dev/cdroms/cdrom0</filename>."
 
 #. Tag: para
 #: boot-installer.xml:3242
@@ -4416,6 +4443,11 @@ msgid ""
 "</screen></informalexample> Check if there are any error messages after that "
 "command."
 msgstr ""
+"С помощью команды <command>mount</command> проверьте, что CD-ROM "
+"уже смонтировать; если нет, попытайтесь смонтировать вручную: <informalexample><screen>\n"
+"$ mount /dev/<replaceable>hdc</replaceable> /cdrom\n"
+"</screen></informalexample> Проверьте, не появилось ли ошибок после "
+"этой команды."
 
 #. Tag: para
 #: boot-installer.xml:3252
@@ -4431,6 +4463,15 @@ msgid ""
 "</screen></informalexample> Make sure that you are in the directory for the "
 "device that corresponds to your CD-ROM drive."
 msgstr ""
+"Проверьте, включён ли DMA: <informalexample><screen>\n"
+"$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>\n"
+"$ grep dma settings\n"
+"using_dma      1       0       1       rw\n"
+"</screen></informalexample> A <quote>1</quote> означает включён. "
+"Если включён, попробуйте выключить его: <informalexample><screen>\n"
+"$ echo -n \"using_dma:0\" >settings\n"
+"</screen></informalexample> Удостоверьтесь, что находитесь в каталоге "
+"для устройства, соответствующего приводу CD-ROM."
 
 #. Tag: para
 #: boot-installer.xml:3266
@@ -4441,6 +4482,9 @@ msgid ""
 "main menu. This option can also be used as a general test if the CD-ROM can "
 "be read reliably."
 msgstr ""
+"Если возникли проблемы во время установки, попробуйте проверить "
+"целостность CD-ROM с помощью пункта внизу главного меню программы установки. "
+"Этим также можно провести общую проверку надёжности чтения CD-ROM."
 
 #. Tag: title
 #: boot-installer.xml:3281
@@ -4500,6 +4544,9 @@ msgid ""
 "experiencing problems it is always useful to verify that the images were "
 "downloaded correctly by verifying their md5sums."
 msgstr ""
+"Обычно не нужно скачивать образ дискет ещё раз, но если вы "
+"испытываете проблемы, всегда полезно проверить корректность "
+"загруженных образов с помощью md5sums."
 
 #. Tag: para
 #: boot-installer.xml:3312
