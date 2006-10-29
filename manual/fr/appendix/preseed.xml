@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 41587 -->
+<!-- original version: 42305 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -144,8 +144,7 @@ La plupart des dialogues de l'installateur Debian peuvent être
 préconfigurés de cette manière. Il y a cependant des exceptions
 notables. On doit partitionner tout un disque ou partitionner
 une partie de l'espace disponible&nbsp;; on ne peut pas utiliser des
-partitions existantes. On ne peut pas non plus installer un système RAID
-en utilisant cette méthode.
+partitions existantes.
 
 </para>
   </sect2>
@@ -401,20 +400,23 @@ cet annexe l'utilise au lieu de la variable complète.
 
 <para>
 Dans les paramètres d'amorçage, <quote>--</quote> possède une signification
-spéciale. Tous les paramètres du noyau placés après les deux tirets seront copiés
-dans la configuration du programme d'amorçage (si l'installateur le permet).
+spéciale. Tous les paramètres du noyau placés après le dernier ensemble de deux tirets
+seront copiés dans la configuration du programme d'amorçage (si l'installateur le permet).
 Il se peut que ces deux tirets, <quote>--</quote>, soient déjà présents
-dans les paramètres d'amorçage par défaut.
+dans les paramètres d'amorçage par défaut. Cela signifie que
+tous les paramètres indiqués à l'invite d'amorçage seront copiés, sauf si vous ajoutez
+un autre <quote>--</quote>. Dans ce cas, vous devez indiquer toutes les options de
+préconfiguration avant les options nécessaires à l'amorçage du matériel et les séparer
+par un <quote>--</quote> pour s'assurer que seules ces dernières seront copiés sur le système
+cible.
 
 </para>
 <note><para>
 
-Il faut savoir que le noyau accepte un maximum de huit options ligne de
-de commandes et huit variables d'environnement. Et les options ajoutées
+Il faut savoir que le noyau linux (version 2.6.9 et au delà) accepte un maximum de 32 options
+ligne de commandes et 32 variables d'environnement. Et les options ajoutées
 par l'installateur sont comprises dans ces chiffres. S'il y a dépassement,
-les noyaux 2.4 ignorent les options en trop et les noyaux 2.6 paniquent.
-À partir des noyaux 2.6.9, vous pouvez employer 32 options ligne de
-commandes et 32 variables d'environnement.
+le noyau <emphasis>panique</emphasis>. Les précédents noyaux acceptaient moins d'options.
 
 </para></note>
 <para>
@@ -720,7 +722,7 @@ par <classname>partman-auto</classname>. Vous pouvez partitionner un disque enti
 ou seulement un espace libre sur ce disque. La disposition du disque peut être
 indiquée par un schéma prédefini, un schéma inclus dans un fichier de schémas ou un
 schéma mis dans le fichier de préconfiguration. Pour l'instant, on ne peut pas
-préconfigurer le partitionnement de plusieurs disques ni la mise en &oelig;uvre de RAID.
+préconfigurer le partitionnement de plusieurs disques.
 
 </para>
 
@@ -737,7 +739,7 @@ sera choisi avant de préconfigurer son partitionnement.
 # espace.
 # Note : la valeur du choix doit être traduit.
 #d-i partman-auto/init_automatically_partition	\
-#    select Utiliser le plus grand espace disponible
+#    select Assisté - utiliser le plus grand espace disponible
 
 # Vous pouvez aussi choisir un disque entier. Le nom du disque peut être
 # donné selon le format devfs ou le format traditionnel.
@@ -770,9 +772,10 @@ d-i partman-auto/choose_recipe \
 # l'installateur, vous pouvez simplement pointer sur lui.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# Sinon, vous pouvez écrire un schéma en une seule ligne. L'exemple suivant
-# crée une petite partition /boot, une partition swap convenable, et utilise le
-# reste de l'espace libre pour la partition racine :
+# Sinon, vous pouvez mettre un schéma dans le fichier de préconfiguration
+# (une seule ligne logique). L'exemple suivant crée une petite partition
+# /boot, une partition swap convenable, et utilise le reste de l'espace libre
+# pour la partition racine :
 #d-i partman-auto/expert_recipe string                         \
 #      boot-root ::                                            \
 #              40 50 100 ext3                                  \

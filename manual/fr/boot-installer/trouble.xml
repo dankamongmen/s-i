@@ -1,10 +1,164 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 42301 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Dysfonctionnements pendant la procédure d'installation</title>
 <para>
 </para>
+
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>Fiabilité des lecteurs de cédéroms</title>
+<para>
+
+Parfois, particulièrement avec d'anciens lecteurs, l'installateur ne
+peut s'amorcer à partir d'un cédérom. Il arrive aussi que même aprés un amorçage
+réussi, l'installateur ne reconnaisse pas le lecteur ou bien signale des erreurs
+de lecture pendant l'installation.
+</para>
+<para>
+Plusieurs causes sont possibles. Voici une liste de problèmes communs, accompagnés
+de suggestions sur la manière de les traiter.
+</para>
+<para>
+Si vous ne pouvez faire l'installation à partir d'un cédérom, vous pouvez essayer l'une
+des autres méthodes disponibles.
+</para>
+
+  <sect3>
+  <title>Problèmes communs</title>
+
+<itemizedlist>
+
+  <listitem><para>
+Certains lecteurs anciens ne peuvent lire des disques gravés à grande vitesse sur
+les lecteurs modernes.
+</para></listitem>
+<listitem><para>
+Quand le système s'amorce correctement à partir d'un cédérom, cela ne veut pas dire
+que Linux reconnaisse le contrôleur auquel est connecté le lecteur de cédéroms.
+</para></listitem>
+<listitem><para>
+Certains lecteurs anciens ne fonctionnent pas correctement si le DMA (<emphasis>direct memory
+access</emphasis> est activé.
+</para></listitem>
+</itemizedlist>
+</sect3>
+
+<sect3>
+  <title>Comment résoudre ces problèmes ?</title>
+<para>
+Si le cédérom ne peut amorcer l'installateur, voici une liste de suggestions.
+
+<itemizedlist>
+  <listitem><para>
+
+Vérifiez que le BIOS est réellement capable de gérer l'amorçage à partir d'un cédérom,
+certains anciens systèmes ne le permettent pas. Vérifiez aussi que le lecteur
+reconnaît le support que vous utilisez.
+</para></listitem>
+<listitem><para>
+Si vous avez téléchargé une image iso, vérifiez que la somme md5 de cette image
+correspond à celle associée dans le fichier <filename>MD5SUMS</filename> qui se trouve
+normalement là où vous avez téléchargé l'image.
+
+<informalexample><screen>
+$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+Vérifiez ensuite que la somme md5 du cédérom gravé correspond aussi. La commande
+suivante devrait fonctionner. Elle utilise la taille de l'image pour lire le nombre d'octets
+sur le cédérom.
+ 
+<informalexample><screen>
+$ dd if=/dev/cdrom | \
+> head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \
+> md5sum
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+</para></listitem>
+</itemizedlist>
+</para>
+
+<para>
+Quand le lecteur de cédéroms n'est pas reconnu même après un amorçage réussi, il suffit souvent
+de recommencer pour résoudre le problème. Si vous possédez plusieurs lecteurs,
+mettez le cédérom dans l'autre lecteur. Si rien ne marche ou si des erreurs de lecture
+sont signalées, essayez les suggestions listées ci-dessous. Une connaissance élémentaire
+de Linux est nécessaire. Pour exécuter ces commandes, il faut passer sur la deuxième
+console virtuelle (VT2) et lancer un interpréteur de commandes.
+
+<itemizedlist>
+  <listitem><para>
+
+Passez sur VT4 et consultez le fichier <filename>/var/log/syslog</filename> (avec l'éditeur
+<command>nano</command>) pour des messages d'erreur spécifiques. Vérifiez
+ensuite la sortie de <command>dmesg</command>.
+</para></listitem>
+<listitem><para>
+Si votre lecteur a été reconnu, vérifiez la sortie de <command>dmesg</command>.
+Vous devriez voir des lignes de ce type (elles ne se suivent pas nécessairement)&nbsp;:
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+Si vous ne voyez rien de tel, il est probable que le contrôleur du lecteur
+n'a pas été reconnu ou qu'il n'est pas du tout géré. Si vous connaissez le pilote nécessaire
+au lecteur, vous pouvez le charger vous-même avec <command>modprobe</command>.
+</para></listitem>
+<listitem><para>
+Vérifiez que le lecteur de cédérom est bien listé dans le répertoire <filename>/dev/</filename>.
+Pour l'exemple ci-dessus, ce serait <filename>/dev/hdc</filename>.
+Il doit exister aussi un fichier <filename>/dev/cdroms/cdrom0</filename>.
+</para></listitem>
+<listitem><para>
+Vérifiez avec la commande <command>mount</command> que le cédérom est déjà monté.
+Si non, montez-le vous-même&nbsp;:
+
+<informalexample><screen>
+$ mount /dev/<replaceable>hdc</replaceable> /cdrom
+</screen></informalexample>
+
+Vérifiez si cette commande a provoqué des messages d'erreur.
+
+</para></listitem>
+<listitem><para>
+Vérifiez si le DMA est activé&nbsp;:
+
+<informalexample><screen>
+$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
+$ grep dma settings
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+Un <quote>1</quote> signifie qu'il est activé. Dans ce cas, désactivez-le&nbsp;:
+
+<informalexample><screen>
+$ echo -n "using_dma:0" >settings
+</screen></informalexample>
+
+Assurez-vous que vous êtes bien dans le répertoire du périphérique qui
+correspond au lecteur de cédéroms.
+</para></listitem>
+<listitem><para>
+Si vous rencontrez des problèmes pendant l'installation, vérifiez l'intégrité du cédérom
+avec l'option qui se trouve en fin du menu principal de l'installateur.
+Cette option peut aussi servir de test quand le cédérom peut être lu correctement.
+</para></listitem>
+</itemizedlist>
+</para>
+</sect3>
+</sect2>  
+  
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Fiabilité des disquettes</title>
@@ -27,14 +181,20 @@ messages sur des erreurs d'entrée/sortie.
 </para><para>
 
 Si vous êtes bloqué pendant l'installation avec une disquette, la première 
-chose à faire est de télécharger à nouveau l'image de la disquette et de la 
-réécrire sur une <emphasis>nouvelle</emphasis> disquette. Reformater 
+chose à faire est de réécrire l'image sur une <emphasis>nouvelle</emphasis> disquette.
+Reformater 
 simplement l'ancienne disquette peut être insuffisant, même si la disquette est
 reformatée et écrite sans erreur. Il est parfois utile d'écrire les disquettes
 sur un autre système.
 
 </para><para>
 
+Normalement il n'est pas nécessaire de télécharger à nouveau l'image&nbsp;;
+mais, en cas de problèmes, il est toujours utile de vérifier que les images ont été
+correctement téléchargées en vérifiant les sommes md5.
+
+</para>
+<para>
 Un utilisateur a rapporté qu'il avait dû réécrire les
 images sur la disquette <emphasis>trois</emphasis> fois avant qu'elle
 fonctionne&nbsp;; ensuite, tout s'est bien déroulé avec cette
@@ -242,7 +402,7 @@ rapport de bogue pour le paquet <classname>installation-reports</classname>,
 Package: installation-reports
 
 Boot method: &lt;Comment avez-vous amorcé l'installateur ? cédérom, disquette ? réseau ?&gt;
-Image version: &lt;date et provenance de l'image&gt;
+Image version: &lt;URL complète de l'image téléchargée&gt;
 Date: &lt;Date et heure de l'installation&gt;
 
 Machine: &lt;Description de la machine (p. ex. IBM Thinkpad R32)&gt;
@@ -250,25 +410,27 @@ Processor:
 Memory:
 Partitions: &lt;df -Tl ; mais nous préférons la table des partitions&gt;
 
-Résultat de lspci et lspci -n :
+Résultat de lspci -nn et lspci -vnn :
 
 Base System Installation Checklist:
 [O] = OK, [E] = Error (please elaborate below), [ ] = didn't try it
 
-Initial boot worked:    [ ]
-Configure network HW:   [ ]
-Config network:         [ ]
+Initial boot:           [ ]
+Detect network card:    [ ]
+Configure network:      [ ]
 Detect CD:              [ ]
 Load installer modules: [ ]
 Detect hard drives:     [ ]
 Partition hard drives:  [ ]
-Create file systems:    [ ]
-Mount partitions:       [ ]
 Install base system:    [ ]
+Clock/timezone setup:   [ ]
+User/password setup:    [ ]
+Install tasks:          [ ]
 Install boot loader:    [ ]
-Reboot:                 [ ]
+Overall install:        [ ]
 
 Comments/Problems:
+
 &lt;Décrivez l'installation, les pensées, commentaires ou idées de propositions
 que vous avez eus pendant cette installation.&gt;
 </screen></informalexample>
