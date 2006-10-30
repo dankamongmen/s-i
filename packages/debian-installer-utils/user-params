@@ -25,6 +25,12 @@ for item in $(cat $CMDLINE); do
 		continue
 	fi
 	
+	# Skip preseed aliases.
+	if [ -e /etc/preseed_aliases ] && \
+	   grep -q "^$var[[:space:]]" /etc/preseed_aliases; then
+		continue
+	fi
+	
 	if [ "$item" = "--" ]; then
 		inuser=1
 		collect=""
