@@ -69,8 +69,14 @@ installation methods.
   <entry>CD/DVD</entry>
   <entry>yes</entry>
   <entry>yes</entry>
-  <entry>yes<footnote id='apx-ps-net'><para>
-  but only if you have network access, and set preseed/url appropriately</para></footnote></entry>
+  <entry>yes<footnote id='apx-ps-net'>
+
+  <para>
+  but only if you have network access, and set <literal>preseed/url</literal>
+  appropriately
+  </para>
+
+  </footnote></entry>
 </row><row>
   <entry>netboot</entry>
   <entry>yes</entry>
@@ -121,14 +127,12 @@ offers a way to avoid these questions being asked.
 </para><para>
 
 In order to avoid the questions that would normally appear before the
-preseeding occurs, you can start the installer in <quote>auto</quote> mode
-by entering <userinput>auto</userinput> and parameters to indicate the
-source of the preseed file, at the boot prompt. This delays questions that
-would normally be asked too early for preseeding (i.e. language, country
-and keyboard selection) until after the network comes up, thus allowing
-them to be preseeded. It also runs the installation in crtitical priority,
-which avoids many unimportant questions. See <xref linkend="preseed-auto"/>
-for details.
+preseeding occurs, you can start the installer in <quote>auto</quote>
+mode. This delays questions that would normally be asked too early for
+preseeding (i.e. language, country and keyboard selection) until after
+the network comes up, thus allowing them to be preseeded. It also runs
+the installation in crtitical priority, which avoids many unimportant
+questions. See <xref linkend="preseed-auto"/> for details.
 
 </para>
   </sect2>
@@ -205,21 +209,21 @@ are stored in a separate, non-readable file in the same directory.
 </para>
   </sect2>
 -->
-
  </sect1>
+
 
  <sect1 id="preseed-using">
  <title>Using preseeding</title>
 <para>
 
-You will first need to create a preconfiguration file and place it in the
-location from where you want to use it. Creating the preconfiguration file
-is covered later in this appendix. Putting it in the correct location is
-fairly straightforward for network preseeding or if you want to read the
-file off a floppy or usb-stick. If you want to include the file on a CD or
-DVD, you will have to remaster the ISO image. How to get the
-preconfiguration file included in the initrd is outside the scope of this
-document; please consult the developers documentation for &d-i;.
+You will first need to create a preconfiguration file and place it in
+the location from where you want to use it. Creating the preconfiguration file
+is covered later in this appendix. Putting it in the correct location is fairly
+straightforward for network preseeding or if you want to read the file off
+a floppy or usb-stick. If you want to include the file on a CD or DVD, you
+will have to remaster the ISO image. How to get the preconfiguration file
+included in the initrd is outside the scope of this document; please consult
+the developers' documentation for &d-i;.
 
 </para><para>
 
@@ -342,13 +346,13 @@ parameters, even if you delimit them with quotes.
   <title>Auto mode</title>
 <para>
 
-There are several features of Debian-installer that combine to allow
+There are several features of Debian Installer that combine to allow
 fairly simple command lines at the boot prompt to result in
-arbitrarily complex customised automatic installs.  To illustrate
+arbitrarily complex customized automatic installs.  To illustrate
 this, here are some examples that can be used at the boot prompt:
 
 <informalexample><screen>
-  auto url=autoserver
+auto url=autoserver
 </screen></informalexample>
 
 This relies on there being a DHCP server that will get the machine to
@@ -358,13 +362,16 @@ If this was done at a site where the domain is
 <literal>example.com</literal>, and they have a reasonably sane DHCP
 setup, it would result in the preseed file being retrieved from
 <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
-The the path segment of that comes from
+
+</para><para>
+
+The path segment of that comes from
 <literal>auto-install/defaultroot</literal>, which includes the
 directory <literal>etch</literal> by default to allow future versions
 to specify their own codename to let people migrate forwards in a
 controlled manner.  The <literal>/./</literal> bit is used to indicate
 a root relative to which subsequent paths can be anchored (for use in
-preseed/include and presseed/run).  This allows files to be specified
+preseed/include and preseed/run).  This allows files to be specified
 either as full URLs, paths starting with / that are thus anchored, or
 even paths relative to the location where the last preseed file was
 found.  This can be used to construct more portable scripts where an
@@ -386,42 +393,50 @@ in the URL).  Here is an example that requires minimal support from
 the local network infrastructure:
 
 <informalexample><screen>
-  auto url=http://192.168.1.2/path/to/mypreseed.file
+auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
 </screen></informalexample>
 
-The way this works is that if the URL is missing a protocol, http is
-assumed, if the hostname section had no periods, it has the domain
-derived from DHCP appended to it, and if there's no /'s after the
-hostname, then the default path is added.
+The way this works is that:
+<itemizedlist>
+<listitem>
+if the URL is missing a protocol, http is assumed,
+</listitem><listitem>
+if the hostname section had no periods, it has the domain derived from
+DHCP appended to it, and
+</listitem><listitem>
+if there's no <literal>/</literal>'s after the hostname, then the default
+path is added.
+</listitem>
+</itemizedlist>
 
 </para><para>
 
 In addition to specifying the url, you can also specify settings that
-do not directly affect the behavior of debian-installer itself, but
-can be passed through to any scripts that might be specified
-preseed/run settings in the loaded preseed file.  At present, the only
-example of this is <literal>auto-install/classes</literal>, which has
-an alias <literal>classes</literal>.  This can be used thus:
+do not directly affect the behavior of &d-i; itself, but can be passed
+through to any scripts that might be specified <literal>preseed/run</literal>
+settings in the loaded preseed file.  At present, the only example of
+this is <literal>auto-install/classes</literal>, which has an alias
+<literal>classes</literal>.  This can be used thus:
 
 <informalexample><screen>
-  auto url=hands.com classes=xen3
+auto url=<replaceable>hands.com</replaceable> classes=<replaceable>xen3</replaceable>
 </screen></informalexample>
 
-Refer to http://hands.com/d-i/ for more details how this example
-works. If you want to come up with other paradigms, it is reasonable
-to use the auto-install namespace for this, so one might have
-something like <literal>auto-install/style</literal> which is then
-used in your scripts.  If you feel the need to do this, please mention
-it to the debian-boot mailing list so that we can avoid namespace
-conflicts, and perhaps add a preseed_alias for you.
+Refer to <ulink url="http://hands.com/d-i/" /> for more details how
+this example works. If you want to come up with other paradigms, it is
+reasonable to use the auto-install namespace for this, so one might have
+something like <literal>auto-install/style</literal> which is then used
+in your scripts.  If you feel the need to do this, please mention it on
+the <email>debian-boot@lists.debian.org</email> mailing list so that we
+can avoid namespace conflicts, and perhaps add a alias for the parameter
+for you.
 
 </para><para>
 
 The <literal>auto</literal> boot label is not yet defined on all
-architectures. The same effect may be achieved by simply adding the
-two settings <literal>auto=true priority=critical</literal> to the
-kernel command line yourself to achieve the same effect.  The
-<literal>auto</literal> is an alias for
+architectures. The same effect may be achieved by simply adding the two
+parameters <literal>auto=true priority=critical</literal> to the kernel
+command line.  The <literal>auto</literal> parameter is an alias for
 <literal>auto-install/enabled</literal> and controls the delay of the
 locale and keyboard questions until after there has been a chance to
 preseed them, while <literal>priority</literal> is an alias for
@@ -439,7 +454,6 @@ DHCP query.
 
 </para>
   </sect2>
-
   
   <sect2 id="preseed-dhcp">
   <title>Using a DHCP server to specify preconfiguration files</title>
@@ -478,6 +492,7 @@ automate Debian installs should only be done with care.
 </para>
   </sect2>
  </sect1>
+
 
  <sect1 id="preseed-creating">
  <title>Creating a preconfiguration file</title>
@@ -577,6 +592,7 @@ an install, you can use the command <command>debconf-set-selections -c
 
 </para>
  </sect1>
+
 
  <sect1 id="preseed-contents">
  <title>Contents of the preconfiguration file</title>
@@ -1239,6 +1255,7 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
   </sect2>
  </sect1>
 
+
  <sect1 id="preseed-advanced">
  <title>Advanced options</title>
 
@@ -1330,7 +1347,7 @@ d-i preseed/run string foo.sh
 <para>
 
 It is also possible to chainload from the initrd or file preseeding phase,
-into networking preseeding by setting preseed/url in the earlier files.
+into network preseeding by setting preseed/url in the earlier files.
 This will cause network preseeding to be performed when the network comes
 up.  You need to be careful when doing this, since there will be two
 distinct runs at preseeding, meaning for example that you get another
