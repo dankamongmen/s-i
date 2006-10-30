@@ -17,8 +17,8 @@ Currently only a single variant of the example file is generated (for i386).
 
 <para>
 
-This appendix explains the intricacies of preseeding answers to questions in
-&d-i; to automate your installation.
+This appendix explains how to preseed answers to questions in &d-i; to
+automate your installation.
 
 </para><para>
 
@@ -48,9 +48,7 @@ There are three methods that can be used for preseeding:
 <firstterm>network</firstterm>. Initrd preseeding will work with any
 installation method and supports preseeding of more things, but it requires
 the most preparation. File and network preseeding each can be used with
-different installation methods. With file and network preseeding the first
-few installer questions cannot be preseeded because the preconfiguration
-file is only loaded after they have been asked.
+different installation methods.
 
 </para><para>
 
@@ -71,7 +69,8 @@ installation methods.
   <entry>CD/DVD</entry>
   <entry>yes</entry>
   <entry>yes</entry>
-  <entry>no</entry>
+  <entry>yes<footnote id='apx-ps-net'><para>
+  but only if you have network access, and set preseed/url appropriately</para></footnote></entry>
 </row><row>
   <entry>netboot</entry>
   <entry>yes</entry>
@@ -81,12 +80,12 @@ installation methods.
   <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
   <entry>yes</entry>
   <entry>yes</entry>
-  <entry>no</entry>
+  <entry>yes<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>floppy based (cd-drivers)</entry>
   <entry>yes</entry>
   <entry>yes</entry>
-  <entry>no</entry>
+  <entry>yes<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>floppy based (net-drivers)</entry>
   <entry>yes</entry>
@@ -113,19 +112,23 @@ configured.
 
 </para><para>
 
-In practical terms this means for file and network preseeding that the
-questions about language, country and keyboard selection will already have
-been asked. For network preseeding add to that any questions related to
-network configuration. Some other questions that are only displayed
-at medium or low priority (like the first hardware detection run) will
-also already have been processed.
+Obviously, any questions that have been processed before the
+preconfiguration file is loaded cannot be preseeded (this will include
+questions that are only displayed at medium or low priority, like the
+first hardware detection run). <xref linkend="preseed-bootparms"/>
+offers a way to avoid these questions being asked.
 
 </para><para>
 
-Obviously, any questions that have been processed before the
-preconfiguration file is loaded cannot be preseeded.
-<xref linkend="preseed-bootparms"/> offers a way to avoid these
-questions being asked.
+In order to avoid the questions that would normally appear before the
+preseeding occurs, you can start the installer in <quote>auto</quote> mode
+by entering <userinput>auto</userinput> and parameters to indicate the
+source of the preseed file, at the boot prompt. This delays questions that
+would normally be asked too early for preseeding (i.e. language, country
+and keyboard selection) until after the network comes up, thus allowing
+them to be preseeded. It also runs the installation in crtitical priority,
+which avoids many unimportant questions. See <xref linkend="preseed-auto"/>
+for details.
 
 </para>
   </sect2>
@@ -203,61 +206,20 @@ are stored in a separate, non-readable file in the same directory.
   </sect2>
 -->
 
-  <sect2 id="preseed-hooks">
-  <title>Running custom commands during the installation</title>
-<para>
-
-A very powerful and flexible option offered by the preconfiguration tools
-is the ability to run commands or scripts at certain points in the
-installation. See <xref linkend="preseed-shell"/> for details.
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-  <userinput>preseed/early_command</userinput>: is run as soon as the
-  preconfiguration file has been loaded
-</para></listitem>
-<listitem><para>
-  <userinput>preseed/late_command</userinput>: is run just before the reboot
-  at the end of the install, but before the <filename>/target</filename>
-  filesystem has been unmounted
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
-
-  <sect2 id="preseed-seenflag">
-  <title>Using preseeding to change default values</title>
-<para>
-
-It is possible to use preseeding to change the default answer for a
-question, but still have the question asked. To do this the
-<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
-setting the value for a question.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
  </sect1>
 
  <sect1 id="preseed-using">
  <title>Using preseeding</title>
 <para>
 
-Of course you will first need to create a preconfiguration file and place it in
-the location from where you want to use it. Creating the preconfiguration file
-is covered later in this appendix. Putting it in the correct location is fairly
-straightforward for network preseeding or if you want to read the file off
-a floppy or usb-stick. If you want to include the file on a CD or DVD, you
-will have to remaster the ISO image. How to get the preconfiguration file
-included in the initrd is outside the scope of this document; please consult
-the developers documentation for &d-i;.
+You will first need to create a preconfiguration file and place it in the
+location from where you want to use it. Creating the preconfiguration file
+is covered later in this appendix. Putting it in the correct location is
+fairly straightforward for network preseeding or if you want to read the
+file off a floppy or usb-stick. If you want to include the file on a CD or
+DVD, you will have to remaster the ISO image. How to get the
+preconfiguration file included in the initrd is outside the scope of this
+document; please consult the developers documentation for &d-i;.
 
 </para><para>
 
@@ -322,14 +284,162 @@ Note that <filename>preseed/url</filename> can be shortened to just
 <filename>url</filename> and <filename>preseed/file</filename> to just
 <filename>file</filename> when they are passed as boot parameters.
 
+</para>
+  </sect2>
+  
+  <sect2 id="preseed-bootparms">
+  <title>Using boot parameters to supplement preseeding</title>
+<para>
+
+If a preconfiguration file cannot be used to preseed some steps, the
+install can still be fully automated, since you can pass preseed values on
+the command line when booting the installer. Just pass
+<userinput>path/to/var=value</userinput> for any of the preseed variables
+listed in the examples.
+
 </para><para>
 
-While you're at it, you may want to add a boot parameter
-<userinput>priority=critical</userinput>. This will avoid most
-questions even if the preseeding below misses some.
+Note that some variables that are frequently set at the boot prompt
+have a shorter alias. If an alias is available, it is used in the
+examples in this appendix instead of the full variable.  In
+particular, the <literal>preseed/url</literal> variable has been
+aliased as <literal>url</literal> and has some extra magic to allow
+shortened urls to be used.
+
+</para><para>
+
+A <quote>--</quote> in the boot options has special meaning. Kernel
+parameters that appear after the last <quote>--</quote> may be copied
+into the bootloader configuration for the installed system (if supported by
+the installer for the bootloader). The installer will automatically filter
+out any options (like preconfiguration options) that it recognizes.
+
+</para>
+<note><para>
+
+Current linux kernels (2.6.9 and later) accept a maximum of 32 command line
+options and 32 environment options, including any options added by default
+for the installer. If these numbers are exceeded, the kernel will panic
+(crash). (For earlier kernels, these numbers were lower.)
+
+</para></note>
+<para>
+
+For most installations some of the default options in your bootloader
+configuration file, like <literal>vga=normal</literal>, may be safely
+removed which may allow you to add more options for preseeding.
+
+</para>
+<note><para>
+
+It may not always be possible to specify values with spaces for boot
+parameters, even if you delimit them with quotes.
+
+</para></note>
+  </sect2>
+  
+  <sect2 id="preseed-auto">
+  <title>Auto mode</title>
+<para>
+
+There are several features of Debian-installer that combine to allow
+fairly simple command lines at the boot prompt to result in
+arbitrarily complex customised automatic installs.  To illustrate
+this, here are some examples that can be used at the boot prompt:
+
+<informalexample><screen>
+  auto url=autoserver
+</screen></informalexample>
+
+This relies on there being a DHCP server that will get the machine to
+the point where <literal>autoserver</literal> can be resolved by DNS,
+perhaps after adding the local domain if that was provided by DHCP.
+If this was done at a site where the domain is
+<literal>example.com</literal>, and they have a reasonably sane DHCP
+setup, it would result in the preseed file being retrieved from
+<literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+The the path segment of that comes from
+<literal>auto-install/defaultroot</literal>, which includes the
+directory <literal>etch</literal> by default to allow future versions
+to specify their own codename to let people migrate forwards in a
+controlled manner.  The <literal>/./</literal> bit is used to indicate
+a root relative to which subsequent paths can be anchored (for use in
+preseed/include and presseed/run).  This allows files to be specified
+either as full URLs, paths starting with / that are thus anchored, or
+even paths relative to the location where the last preseed file was
+found.  This can be used to construct more portable scripts where an
+entire hierarchy of scripts can be moved to a new location without
+breaking it, for example copying the files onto a USB stick when they
+started out on a web server.  In this example, if the preseed file
+sets <literal>preseed/run</literal> to
+<literal>/scripts/late_command.sh</literal> then the file will be
+fetched from
+<literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
+
+</para><para>
+
+If there is no local DHCP or DNS infrastructure, or if you
+do not want to use the default path to the preseed.cfg, you can still
+use an explicit url, and if you don't use the <literal>/./</literal>
+element it will be anchored to the start of the path (i.e. the third /
+in the URL).  Here is an example that requires minimal support from
+the local network infrastructure:
+
+<informalexample><screen>
+  auto url=http://192.168.1.2/path/to/mypreseed.file
+</screen></informalexample>
+
+The way this works is that if the URL is missing a protocol, http is
+assumed, if the hostname section had no periods, it has the domain
+derived from DHCP appended to it, and if there's no /'s after the
+hostname, then the default path is added.
+
+</para><para>
+
+In addition to specifying the url, you can also specify settings that
+do not directly affect the behavior of debian-installer itself, but
+can be passed through to any scripts that might be specified
+preseed/run settings in the loaded preseed file.  At present, the only
+example of this is <literal>auto-install/classes</literal>, which has
+an alias <literal>classes</literal>.  This can be used thus:
+
+<informalexample><screen>
+  auto url=hands.com classes=xen3
+</screen></informalexample>
+
+Refer to http://hands.com/d-i/ for more details how this example
+works. If you want to come up with other paradigms, it is reasonable
+to use the auto-install namespace for this, so one might have
+something like <literal>auto-install/style</literal> which is then
+used in your scripts.  If you feel the need to do this, please mention
+it to the debian-boot mailing list so that we can avoid namespace
+conflicts, and perhaps add a preseed_alias for you.
+
+</para><para>
+
+The <literal>auto</literal> boot label is not yet defined on all
+architectures. The same effect may be achieved by simply adding the
+two settings <literal>auto=true priority=critical</literal> to the
+kernel command line yourself to achieve the same effect.  The
+<literal>auto</literal> is an alias for
+<literal>auto-install/enabled</literal> and controls the delay of the
+locale and keyboard questions until after there has been a chance to
+preseed them, while <literal>priority</literal> is an alias for
+<literal>preseed/priority</literal> and setting it to
+<literal>critical</literal> stops any questions with a lower priority
+from being asked.
+
+</para><para>
+
+Additional options that may be of interest while attempting to
+automate an install while using DHCP are: <literal>interface=auto
+netcfg/dhcp_timeout=60</literal> which makes the machine choose the
+first viable NIC and be more patient about getting a reply to its
+DHCP query.
 
 </para>
   </sect2>
+
   
   <sect2 id="preseed-dhcp">
   <title>Using a DHCP server to specify preconfiguration files</title>
@@ -366,62 +476,6 @@ installation can be performed interactively. Using DHCP preseeding to fully
 automate Debian installs should only be done with care.
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-bootparms">
-  <title>Using boot parameters to supplement preseeding</title>
-<para>
-
-Some parts of the installation process cannot be automated using some forms
-of preseeding because the questions are asked before the preconfiguration
-file is loaded. For example, if the preconfiguration file is downloaded over
-the network, the network setup must be done first. One reason to use initrd
-preseeding is that it allows preseeding of even these early steps of the
-installation process.
-
-</para><para>
-
-If a preconfiguration file cannot be used to preseed some steps, the install
-can still be fully automated, since you can pass preseed values to the kernel
-on the command line. Just pass <userinput>path/to/var=value</userinput>
-for any of the preseed variables listed in the examples.
-
-</para><para>
-
-Note that some variables that are frequently set at the boot prompt have a
-shorter alias. If an alias is available, it is used in the examples in
-this appendix instead of the full variable.
-
-</para><para>
-
-A <quote>--</quote> in the boot options has special meaning. Kernel
-parameters that appear after the last <quote>--</quote> may be copied
-into the bootloader configuration for the installed system (if supported by
-the installer for the bootloader). The installer will automatically filter
-out any options (like preconfiguration options) that it recognizes.
-
-</para>
-<note><para>
-
-Current linux kernels (2.6.9 and later) accept a maximum of 32 command line
-options and 32 environment options, including any options added by default
-for the installer. If these numbers are exceeded, the kernel will panic
-(crash). (For earlier kernels, these numbers were lower.)
-
-</para></note>
-<para>
-
-For most installations some of the default options in your bootloader
-configuration file, like <literal>vga=normal</literal>, may be safely
-removed which may allow you to add more options for preseeding.
-
-</para>
-<note><para>
-
-It may not always be possible to specify values with spaces for boot
-parameters, even if you delimit them with quotes.
-
-</para></note>
   </sect2>
  </sect1>
 
@@ -1188,8 +1242,15 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <sect1 id="preseed-advanced">
  <title>Advanced options</title>
 
-  <sect2 id="preseed-shell">
-  <title>Shell commands</title>
+  <sect2 id="preseed-hooks">
+  <title>Running custom commands during the installation</title>
+<para>
+
+A very powerful and flexible option offered by the preconfiguration tools
+is the ability to run commands or scripts at certain points in the
+installation.
+
+</para>
 
 <informalexample role="example"><screen>
 # d-i preseeding is inherently not secure. Nothing in the installer checks
@@ -1211,6 +1272,24 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 </screen></informalexample>
 
   </sect2>
+  
+  <sect2 id="preseed-seenflag">
+  <title>Using preseeding to change default values</title>
+<para>
+
+It is possible to use preseeding to change the default answer for a
+question, but still have the question asked. To do this the
+<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
+setting the value for a question.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
 
   <sect2 id="preseed-chainload">
   <title>Chainloading preconfiguration files</title>
@@ -1225,7 +1304,7 @@ settings for certain configurations in other files.
 </para>
 
 <informalexample><screen>
-# More that one file can be listed, separated by spaces; all will be
+# More than one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preconfiguration file that includes them.
@@ -1247,6 +1326,18 @@ settings for certain configurations in other files.
 # directory as the preconfiguration file that runs them.
 d-i preseed/run string foo.sh
 </screen></informalexample>
+
+<para>
+
+It is also possible to chainload from the initrd or file preseeding phase,
+into networking preseeding by setting preseed/url in the earlier files.
+This will cause network preseeding to be performed when the network comes
+up.  You need to be careful when doing this, since there will be two
+distinct runs at preseeding, meaning for example that you get another
+chance to run the preseed/early command, the second one happening after the
+network comes up.
+
+</para>
 
   </sect2>
  </sect1>
