@@ -1661,6 +1661,10 @@ static int gtk_go(struct frontend *obj)
 	
     gdk_threads_enter();
 
+    gtk_widget_set_sensitive (data->button_prev, FALSE);
+    gtk_widget_set_sensitive (data->button_next, FALSE);
+    gtk_widget_set_sensitive (data->button_screenshot, FALSE);
+
     if (data->button_val == DC_OK)
     {
         call_setters(obj);
@@ -1678,9 +1682,6 @@ static int gtk_go(struct frontend *obj)
         gtk_widget_destroy(questionbox);
     else
         gtk_widget_destroy(questionbox_scroll);
-
-    gtk_widget_set_sensitive (data->button_prev, FALSE);
-    gtk_widget_set_sensitive (data->button_next, FALSE);
 
     gdk_threads_leave();
 
