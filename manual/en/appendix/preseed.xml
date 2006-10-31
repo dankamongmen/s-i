@@ -169,7 +169,7 @@ The following types of templates are relevant for preseeding.
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: allows the user to type any value
 </para></listitem>
@@ -397,16 +397,18 @@ auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
 </screen></informalexample>
 
 The way this works is that:
-<itemizedlist>
-<listitem>
+<itemizedlist spacing="compact">
+<listitem><para>
 if the URL is missing a protocol, http is assumed,
-</listitem><listitem>
-if the hostname section had no periods, it has the domain derived from
-DHCP appended to it, and
-</listitem><listitem>
+</para></listitem>
+<listitem><para>
+if the hostname section contains no periods, it has the domain derived
+from DHCP appended to it, and
+</para></listitem>
+<listitem><para>
 if there's no <literal>/</literal>'s after the hostname, then the default
 path is added.
-</listitem>
+</para></listitem>
 </itemizedlist>
 
 </para><para>
@@ -419,12 +421,16 @@ this is <literal>auto-install/classes</literal>, which has an alias
 <literal>classes</literal>.  This can be used thus:
 
 <informalexample><screen>
-auto url=<replaceable>hands.com</replaceable> classes=<replaceable>xen3</replaceable>
+auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>
 </screen></informalexample>
 
-Refer to <ulink url="http://hands.com/d-i/" /> for more details how
-this example works. If you want to come up with other paradigms, it is
-reasonable to use the auto-install namespace for this, so one might have
+The classes could for example denote the type of system to be installed,
+or the localization to be used.
+
+</para><para>
+
+It is of course possible to extend this concept, and if you do, it is
+reasonable to use the auto-install namespace for this. So one might have
 something like <literal>auto-install/style</literal> which is then used
 in your scripts.  If you feel the need to do this, please mention it on
 the <email>debian-boot@lists.debian.org</email> mailing list so that we
@@ -453,6 +459,34 @@ first viable NIC and be more patient about getting a reply to its
 DHCP query.
 
 </para>
+  </sect2>
+
+  <sect2 id="preseed-aliases">
+  <title>Aliases useful with preseeding</title>
+<para>
+
+The following aliases can be useful when using (auto mode) preseeding.
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
   </sect2>
   
   <sect2 id="preseed-dhcp">
