@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39622 -->
+<!-- original version: 42302 -->
 
  <sect1 id="partition-programs">
 <!--
@@ -173,50 +173,12 @@ is not recommended.
 VT2 のコマンドラインから、異なるパーティション分割ツールを使うこともできますが
 お勧めしません。
 
-</para><para>
-
 <!--
-If you will be working with more than 20 partitions on your ide disk,
-you will need to create devices for partitions 21 and beyond. The next
-step of initializing the partition will fail unless a proper device is
-present. As an example, here are commands you can use in
-<userinput>tty2</userinput> or under <guimenuitem>Execute a shell</guimenuitem>
-to add a device so the 21st partition can be initialized:
+</para><para arch="x86">Remember to mark your boot partition as
+<quote>Bootable</quote>.
 -->
-IDE ディスクに 20 以上のパーティションを作ろうとしている場合は、
-21 番目以降のパーティションに対応するデバイスを作成しなければなりません。
-適切なデバイスが存在しないと、パーティションを初期化した後の次のステップで
-失敗します。例として、21 番目のパーティションが初期化できるよう、デバイスを
-追加するためのコマンド群を示します。これらは <userinput>tty2</userinput>
-や <guimenuitem>シェルの実行</guimenuitem> から実行できます。
-
-<informalexample><screen>
-# cd /dev
-# mknod hda21 b 3 21
-# chgrp disk hda21
-# chmod 660 hda21
-</screen></informalexample>
-
-<!--
-Booting into the new system will fail unless proper devices are present
-on the target system. After installing the kernel and modules, execute:
--->
-ターゲットシステムにも正しいデバイスがないと、新しいシステムで起動したときに失敗します。
-カーネルとモジュールをインストールしたら、以降を実行してください。
-
-<informalexample><screen>
-# cd /target/dev
-# mknod hda21 b 3 21
-# chgrp disk hda21
-# chmod 660 hda21
-</screen></informalexample>
-
-<!--
-<phrase arch="x86">Remember to mark your boot partition as
-<quote>Bootable</quote>.</phrase>
--->
-<phrase arch="x86">ブートパーティションを
-<quote>起動可能 (Bootable)</quote>にマークするのをお忘れなく。</phrase>
+</para><para arch="x86">ブートパーティションを
+<quote>起動可能 (Bootable)</quote> にマークするのをお忘れなく。
 
 </para><para condition="mac-fdisk.txt">
 
