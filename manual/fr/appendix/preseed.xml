@@ -36,12 +36,6 @@ processus d'installation sans avoir à les saisir pendant le processus lui-même. 
 possible une automatisation complète de ce processus et cela offre même des fonctionnalités qui
 ne sont pas disponibles autrement.
 
-</para><para>
-
-Avec la préconfiguration, on peut répondre aux questions qui sont posées pendant
-la première partie de l'installation (avant le lancement du nouveau système)
-et pendant la deuxième partie.
-
 </para>
 
   <sect2 id="preseed-methods">
@@ -50,10 +44,10 @@ et pendant la deuxième partie.
 
 La préconfiguration peut être faite de trois manières différentes&nbsp;:
 <firstterm>initrd</firstterm>, <firstterm>file</firstterm> et
-<firstterm>network</firstterm>. La méthode <quote>initrd</quote> est compatible
+<firstterm>network</firstterm>. La méthode <emphasis>initrd</emphasis> est compatible
 avec tous les types d'installation et offre toutes les possibilités mais elle
-demande une préparation soignée. Les méthodes <quote>file</quote> et<quote>network</quote>
-sont compatibles avec plusieurs types d'installation.
+demande une préparation soignée. Les méthodes <emphasis>file</emphasis> et
+<emphasis>network</emphasis> sont compatibles avec plusieurs types d'installation.
 
 </para><para>
 
@@ -88,12 +82,12 @@ Seulement si vous avez accès au réseau et si vous définissez <literal>preseed/ur
   <entry>hd-media <phrase condition="bootable-usb">(clé usb)</phrase></entry>
   <entry>oui</entry>
   <entry>oui</entry>
-  <entry>oui <footnoteref linkend='apx-ps-net'/></entry>
+  <entry>oui <footnoteref linkend="apx-ps-net"></footnoteref></entry>
 </row><row condition="supports-floppy-boot">
   <entry>disquettes (pilotes cd)</entry>
   <entry>oui</entry>
   <entry>oui</entry>
-  <entry>oui <footnoteref linkend='apx-ps-net'/></entry>
+  <entry>oui <footnoteref linkend="apx-ps-net"></footnoteref></entry>
 </row><row condition="supports-floppy-boot">
   <entry>disquettes (pilotes réseau)</entry>
   <entry>oui</entry>
@@ -113,9 +107,10 @@ Seulement si vous avez accès au réseau et si vous définissez <literal>preseed/ur
 
 Le moment où le fichier de préconfiguration est chargé et exécuté est une
 différence fondamentale entre les diverses méthodes de préconfiguration.
-Avec la méthode <quote>initrd</quote>, ce fichier est chargé au tout début de l'installation,
-avant même qu'une seule question soit posée. Avec la méthode <quote>file</quote>,
-il faut que le cédérom (ou une image) ait été chargé. Avec la méthode <quote>network</quote>,
+Avec la méthode <emphasis>initrd</emphasis>, ce fichier est chargé au tout début
+de l'installation, avant même qu'une seule question soit posée. Avec la méthode
+<emphasis>file</emphasis>, il faut que le cédérom (ou une image) ait été chargé.
+Avec la méthode <emphasis>network</emphasis>,
 le réseau doit avoir été préalablement configuré.
 
 </para><para>
@@ -123,7 +118,7 @@ le réseau doit avoir été préalablement configuré.
 Il est donc clair que toutes les questions posées avant que le fichier de
 préconfiguration n'ait été chargé, ainsi que les questions avec une priorité de type medium
 ou basse, ne peuvent pas être préconfigurées. 
-La section <xref linkend="preseed-bootparms"/> montre comment éviter que ces
+La section <xref linkend="preseed-bootparms"></xref> montre comment éviter que ces
 questions soient posées.
 
 </para>
@@ -236,7 +231,7 @@ Vous pouvez vous servir de ce fichier pour créer le vôtre.
   <title>Charger le fichier de préconfiguration</title>
 <para>
 
-Quand on utilise l'initrd, il faut être sûr qu'un fichier appelé
+Quand on utilise la méthode <emphasis>initrd</emphasis>, il faut être sûr qu'un fichier appelé
 <filename>preseed.cfg</filename> se trouve dans le répertoire racine
 de l'initrd. L'installateur recherche ce fichier et le charge s'il est présent.
 
@@ -316,8 +311,8 @@ spéciale. Tous les paramètres du noyau placés après le dernier ensemble de deux 
 seront copiés dans la configuration du programme d'amorçage (si l'installateur le permet).
 Il se peut que ces deux tirets, <quote>--</quote>, soient déjà présents
 dans les paramètres d'amorçage par défaut. 
-L'installateur filtrera automatiquement les options, (comme par exemple
-les options de préconfiguration), qu'il reconnaît.
+L'installateur filtrera automatiquement les options qu'il reconnaît, comme par exemple
+les options de préconfiguration.
 
 </para>
 <note><para>
@@ -368,7 +363,7 @@ trouvé à l'url <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</li
 La partie adresse provient de <literal>auto-install/defaultroot</literal> qui contient
 le répertoire <literal>etch</literal> par défaut. Il sera ainsi possible
 dans de prochaines versions d'indiquer un nom de code particulier, ce qui permettra des
-migrations contrôlées. Le <literal>/./</literal> indique une racine relative
+migrations contrôlées. L'élément <literal>/./</literal> indique une racine relative
 à laquelle rattacher les chemins (à utiliser avec preseed/include et preseed/run).
 On peut ainsi indiquer des fichiers soit avec une url complète, chemin commençant par
 /, soit avec un chemin relatif à l'endroit où a été trouvé le dernier fichier de
@@ -417,9 +412,7 @@ avec l'alias <literal>classes</literal>. Exemple&nbsp;:
 <informalexample><screen>
 auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>
 </screen></informalexample>
-</para>
 
-<para>
 Une classe peut par exemple dénoter le type de système à installer ou la locale à
 utiliser.
 </para>
@@ -515,8 +508,6 @@ peut se faire interactivement. Il faut être très prudent si l'on veut automatise
 toute l'installation avec une préconfiguration de type DHCP.
 </para>
 </sect2>
-
-
    </sect1>
 
  <sect1 id="preseed-creating">
@@ -533,6 +524,8 @@ Le format de ce fichier est celui de la commande
 </para><para>
 
 Voici quelques règles pour écrire un fichier de préconfiguration.
+
+</para>
 
 <itemizedlist>
 <listitem><para>
@@ -555,7 +548,7 @@ Voici quelques règles pour écrire un fichier de préconfiguration.
   est affiché pendant l'installation.
 </para></listitem>
 </itemizedlist>
-</para>
+
 <para>
 
 Pour créer le fichier de préconfiguration, la méthode la plus facile est
@@ -587,13 +580,11 @@ de données cdebconf de l'installateur est sauvegardée dans le fichier
 <filename>/var/log/installer/cdebconf</filename>. Mais cette base peut contenir des
 données sensibles et par défaut elle n'est lisible que par le superutilisateur.
 </para>
-</note>
-
 <para>
 Le répertoire <filename>/var/log/installer</filename> et tous ses fichiers sera détruit
 si vous <quote>purgez</quote> le paquet <classname>installation-report</classname>.
 </para>
-
+</note>
 <para>
 
 Pour examiner les valeurs données aux variables, on peut utiliser <command>nano</command>
@@ -1161,7 +1152,7 @@ Pour l'heure, les tâches disponibles sont les suivantes :
 <para>
 Vous pouvez aussi choisir de n'installer aucune tâche et forcer l'installation de paquets 
 par un autre moyen.
-Il est recommandé de toujours inclure la tâche <quote>standard</quote>.
+Il est recommandé de toujours inclure la tâche <emphasis>standard</emphasis>.
 </para>
 <para>
 
@@ -1169,6 +1160,7 @@ Si vous voulez installer des paquets particuliers en plus des paquets installés 
 les tâches, vous pouvez utiliser le paramètre <classname>pkgsel/include</classname>.
 Séparez les valeurs par des virgules ou des espaces. Vous pouvez ainsi l'utiliser
 facilement sur la ligne de commande du noyau.
+</para>
 
 <informalexample role="example"><screen>
 tasksel tasksel/first multiselect standard, desktop
@@ -1183,7 +1175,7 @@ tasksel tasksel/first multiselect standard, desktop
 # d'installation aide le projet à connaître les logiciels populaires.
 #popularity-contest popularity-contest/participate boolean false
 </screen></informalexample>
-</para>
+
   </sect2>
 
   <sect2 id="preseed-finish">
@@ -1270,7 +1262,7 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <title>Options complexes</title>
 
   <sect2 id="preseed-hooks">
-  <title>Exécuter des commandes pendant l'installation </title>
+  <title>Exécuter des commandes pendant l'installation</title>
 
 <para>
 Une option très puissante offerte par les outils de préconfiguration est
@@ -1363,6 +1355,5 @@ Cela signifie que vous pouvez exécuter à nouveau la commande preseed/early, la s
 après la mise en &oelig;uvre du réseau.
  </para>
 </sect2>
-
 </sect1>
 </appendix>
