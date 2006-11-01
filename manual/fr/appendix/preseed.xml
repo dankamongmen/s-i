@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 42305 -->
+<!-- original version: 42377 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -53,9 +53,7 @@ La préconfiguration peut être faite de trois manières différentes&nbsp;:
 <firstterm>network</firstterm>. La méthode <quote>initrd</quote> est compatible
 avec tous les types d'installation et offre toutes les possibilités mais elle
 demande une préparation soignée. Les méthodes <quote>file</quote> et<quote>network</quote>
-sont compatibles avec plusieurs types d'installation mais les toutes premières
-questions de l'installateur ne peuvent pas être préconfigurées puisque le fichier
-de préconfiguration est chargé <quote>après</quote> que ces questions ont été posées.
+sont compatibles avec plusieurs types d'installation.
 
 </para><para>
 
@@ -76,22 +74,26 @@ méthodes de préconfiguration.
   <entry>CD/DVD</entry>
   <entry>oui</entry>
   <entry>oui</entry>
-  <entry>non</entry>
+  <entry>oui <footnote id="apx-ps-net">
+<para>
+Seulement si vous avez accès au réseau et si vous définissez <literal>preseed/url</literal>.
+</para></footnote></entry>
+
 </row><row>
-  <entry>network</entry>
+  <entry>netboot</entry>
   <entry>oui</entry>
   <entry>non</entry>
   <entry>oui</entry>
 </row><row>
-  <entry>disque dur <phrase condition="bootable-usb">(clé usb)</phrase></entry>
+  <entry>hd-media <phrase condition="bootable-usb">(clé usb)</phrase></entry>
   <entry>oui</entry>
   <entry>oui</entry>
-  <entry>non</entry>
+  <entry>oui <footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>disquettes (pilotes cd)</entry>
   <entry>oui</entry>
   <entry>oui</entry>
-  <entry>non</entry>
+  <entry>oui <footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>disquettes (pilotes réseau)</entry>
   <entry>oui</entry>
@@ -118,22 +120,22 @@ le réseau doit avoir été préalablement configuré.
 
 </para><para>
 
-Cela signifie que dans le cas d'une préconfiguration avec la méthode <quote>file</quote> ou 
-la méthode <quote>network</quote>, les questions sur la langue, le pays et le clavier 
-ont déjà été posées.
-Quand le fichier est sur le réseau, il faut ajouter à cela la configuration du réseau.
-D'autres questions, qui ne sont visibles qu'avec une priorité de type medium ou basse,
-comme par exemple lors de la première phase de détection du matériel, auront déjà été
-posées.
-
-</para><para>
-
 Il est donc clair que toutes les questions posées avant que le fichier de
-préconfiguration n'ait été chargé ne peuvent pas être préconfigurées.
+préconfiguration n'ait été chargé, ainsi que les questions avec une priorité de type medium
+ou basse, ne peuvent pas être préconfigurées. 
 La section <xref linkend="preseed-bootparms"/> montre comment éviter que ces
 questions soient posées.
 
 </para>
+<para>
+Pour éviter que des questions ne soient posées avant la mise en oeuvre de
+la préconfiguration, vous pouvez lancer l'installateur en mode <quote>auto</quote>.
+Ce mode retarde certaines questions, comme les questions sur la langue, le pays et le clavier,
+pour ne les poser qu'après l'installation du réseau&nbsp;: elles peuvent donc être
+préconfigurées. Ce mode définit la priorité à <emphasis>critical</emphasis> ce qui
+écarte les questions sans importance. Voyez <xref linkend="preseed-auto"/> pour des
+précisions.
+</para> 
   </sect2>
 
   <sect2 id="preseed-limitations">
@@ -170,7 +172,7 @@ Les types suivants sont utilisés pour la préconfiguration :
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: l'utilisateur saisit une valeur
 </para></listitem>
@@ -210,47 +212,6 @@ placées dans un fichier distinct non lisible du même répertoire.
 </para>
   </sect2>
 -->
-  <sect2 id="preseed-hooks">
-  <title>Exécuter ses propres commandes pendant l'installation</title>
-<para>
-
-Une option pratique et très puissante offerte par les outils de préconfiguration
-est la possibilité d'exécuter des commandes ou de lancer des scripts à certains
-moments de l'installation. Voyez <xref linkend="preseed-shell"/> pour des précisions.
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-  <userinput>preseed/early_command</userinput> : commande lancée dès que le fichier
-  de préconfiguration a été chargé
-</para></listitem>
-<listitem><para>
-  <userinput>preseed/late_command</userinput> : commande lancée juste avant le redémarrage,
-  à la fin de l'installation, mais avant que le système de fichiers 
-  <filename>/target</filename> ait été démonté
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
-
-  <sect2 id="preseed-seenflag">
-  <title>Modifier les valeurs par défaut avec la préconfiguration</title>
-<para>
-
-Avec la préconfiguration, on peut modifier la valeur par défaut
-d'une réponse à une question, question qui sera, malgré cela, posée.
-Il suffit de positionner le drapeau <firstterm>seen</firstterm> à <quote>false</quote>
-après avoir indiqué cette valeur.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
  </sect1>
 
  <sect1 id="preseed-using">
@@ -329,13 +290,196 @@ passez en paramètres d'amorçage.
 
 </para>
 
+</sect2>
+
+  <sect2 id="preseed-bootparms">
+  <title>Utiliser les paramètres d'amorçage pour compléter la préconfiguration</title>
 <para>
 
-Pendant que vous y êtes, vous pourriez déclarer un 
-<userinput>priority=critical</userinput> pour éviter la plupart des questions, 
-même si la préconfiguration qui suit ne les aborde pas.
+Quand on ne peut pas utiliser un fichier de préconfiguration pour préconfigurer
+certaines étapes, on peut quand même automatiser l'installation car il est possible
+de passer des paramètres au noyau sur la ligne de commande. Il suffit d'indiquer
+une paire de type <userinput>path/to/variable=valeur</userinput>
+pour toutes les variables listées dans les exemples.
+
+</para><para>
+
+Certaines des variables qui sont fréquemment définies à l'invite du démarrage
+possèdent des alias plus courts. Quand un alias est disponible, les exemples de
+cet annexe l'utilise au lieu de la variable complète. En particulier, la variable
+<literal>preseed/url</literal> possède l'alias <literal>url</literal> et elle permet
+de raccourcir les urls à utiliser.
+</para>
+<para>
+Dans les paramètres d'amorçage, <quote>--</quote> possède une signification
+spéciale. Tous les paramètres du noyau placés après le dernier ensemble de deux tirets
+seront copiés dans la configuration du programme d'amorçage (si l'installateur le permet).
+Il se peut que ces deux tirets, <quote>--</quote>, soient déjà présents
+dans les paramètres d'amorçage par défaut. 
+L'installateur filtrera automatiquement les options, (comme par exemple
+les options de préconfiguration), qu'il reconnaît.
 
 </para>
+<note><para>
+
+Il faut savoir que le noyau linux (version 2.6.9 et au delà) accepte un maximum de 32 options
+ligne de commandes et 32 variables d'environnement. Et les options ajoutées
+par l'installateur sont comprises dans ces chiffres. S'il y a dépassement,
+le noyau <emphasis>panique</emphasis>. Les précédents noyaux acceptaient moins d'options.
+
+</para></note>
+<para>
+
+On peut sans risque supprimer certaines options par défaut, comme
+<literal>vga=normal</literal>. Cela permet de rajouter autant d'options
+pour la préconfiguration.
+
+</para>
+<note><para>
+
+Il n'est pas toujours possible d'indiquer des valeurs contenant des espaces
+dans les paramètres d'amorçage, même encadrés par des guillemets.
+
+</para></note>
+  </sect2>
+ 
+ <sect2 id="preseed-auto">
+  <title>Le mode Auto</title>
+
+<para>
+
+En combinant certaines fonctionnalités de l'installateur Debian, il est
+possible d'écrire des lignes de commandes très simples qui automatiseront
+toutes vos installations, aussi complexes soient-elles. Voici quelques exemples
+à utiliser à l'invite d'amorçage&nbsp;:
+
+<informalexample><screen>
+auto url=autoserver
+</screen></informalexample>
+
+On suppose qu'un serveur DHCP permettra que <literal>autoserver</literal> puisse
+être résolu par un serveur DNS, en ajoutant peut-être un domaine local s'il est donné par le
+serveur DHCP.
+Si le site, dont le domaine est <literal>example.com</literal>, possède un serveur
+DHCP correctement configuré, alors le fichier de préconfiguration recherché serait
+trouvé à l'url <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+</para>
+<para>
+La partie adresse provient de <literal>auto-install/defaultroot</literal> qui contient
+le répertoire <literal>etch</literal> par défaut. Il sera ainsi possible
+dans de prochaines versions d'indiquer un nom de code particulier, ce qui permettra des
+migrations contrôlées. Le <literal>/./</literal> indique une racine relative
+à laquelle rattacher les chemins (à utiliser avec preseed/include et preseed/run).
+On peut ainsi indiquer des fichiers soit avec une url complète, chemin commençant par
+/, soit avec un chemin relatif à l'endroit où a été trouvé le dernier fichier de
+préconfiguration. Cela permettra d'écrire des scripts portables où une
+hiérarchie complète de scripts pourra être déplacée à un nouvel endroit sans être
+détruite. Par exemple, on pourra déplacer des fichiers d'un serveur web à une clé USB.
+Si le fichier de préconfiguration définit <literal>preseed/run</literal> comme
+<literal>/scripts/late_command.sh</literal>, le fichier sera cherché à
+<literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
+</para>
+<para>
+S'il n'existe pas de serveurs DHCP ou DNS ou si vous ne voulez pas utiliser
+le chemin par défaut du fichier preseed.cfg, vous pouvez toujours utiliser une url
+explicite. Et si vous n'utilisez pas l'élément <literal>/./</literal>,
+le fichier sera rattaché au troisième / de l'url. Voici un exemple qui demande
+une gestion minimale du réseau&nbsp;:
+
+<informalexample><screen>
+auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
+</screen></informalexample>
+ 
+Cela fonctionne ainsi&nbsp;:
+
+<itemizedlist spacing="compact">
+<listitem><para>
+Si l'URL n'a pas de protocole, http est supposé,
+</para></listitem>
+<listitem><para>
+si le domaine n'a pas de point, le domaine donné par DHCP lui sera ajouté
+et
+</para></listitem>
+<listitem><para>
+s'il n'y a pas de <literal>/</literal> après le domaine, le chemin par défaut
+est ajouté.
+</para></listitem>
+</itemizedlist> 
+</para>
+
+<para>
+En outre, vous pouvez indiquer des paramètres qui n'affectent pas directement
+l'installateur Debian mais qui peuvent être passés à des scripts spécifiés dans
+les éléments <literal>preseed/run</literal> du fichier de préconfiguration
+chargé. Pour l'instant, le seul exemple est <literal>auto-install/classes</literal>,
+avec l'alias <literal>classes</literal>. Exemple&nbsp;:
+
+<informalexample><screen>
+auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>
+</screen></informalexample>
+</para>
+
+<para>
+Une classe peut par exemple dénoter le type de système à installer ou la locale à
+utiliser.
+</para>
+
+<para>
+Il est bien sûr possible d'étendre ce concept. Dans ce cas, il est raisonnable
+d'utiliser l'espace de nom de auto-install. On peut avoir par exemple
+un <literal>auto-install/style</literal> qui sera utilisé dans les scripts.
+Si vous en éprouvez le besoin, veuillez envoyer un courriel à la liste
+<email>debian-boot@lists.debian.org</email> pour que nous puissions éviter des conflits
+d'espace de noms et, qui sait ? que nous ajoutions un alias pour vos paramètres.
+</para>
+
+<para>
+
+Le label <literal>auto</literal> n'est pas encore défini pour
+toutes les architectures. Mais il suffit d'ajouter les deux paramètres
+<literal>auto=true priority=critical</literal> sur la ligne de commande du
+noyau. Le paramètre <literal>auto</literal> est un alias pour
+<literal>auto-install/enabled</literal>. Il contrôle le retard apporté aux
+questions sur la locale et le clavier pour qu'elles puissent être préconfigurées.
+Le paramètre <literal>priority</literal> est un alias pour <literal>preseed/priority</literal>.
+S'il est défini à <literal>critical</literal>, les questions avec une priorité plus basse
+sont évitées.
+</para>
+
+<para>
+Voici d'autres options intéressantes pour automatiser une installation avec DHCP&nbsp;:
+<literal>interface=auto netcfg/dhcp_timeout=60</literal>. Elles permettent de
+choisir la carte réseau et de patienter pour l'obtention d'une réponse du serveur DHCP.
+</para>
+</sect2>
+ 
+
+  <sect2 id="preseed-aliases">
+  <title>Alias utiles avec la préconfiguration</title>
+<para>
+
+Voici des alias utiles avec la préconfiguration (mode auto)&nbsp;:
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
   </sect2>
 
   <sect2 id="preseed-dhcp">
@@ -372,68 +516,8 @@ toute l'installation avec une préconfiguration de type DHCP.
 </para>
 </sect2>
 
-  <sect2 id="preseed-bootparms">
-  <title>Utiliser les paramètres d'amorçage pour compléter la préconfiguration</title>
-<para>
 
-On ne peut pas automatiser certaines étapes de l'installation avec certains types
-de préconfiguration car les questions sont posées avant que le fichier
-ne soit chargé. Si par exemple le fichier est téléchargé sur le réseau, la
-configuration du réseau doit être faite préalablement. L'une des raisons d'utiliser
-la méthode de préconfiguration <quote>initrd</quote> est qu'il est alors possible de
-préconfigurer ces étapes.
-
-</para><para>
-
-Quand on ne peut pas utiliser un fichier de préconfiguration pour préconfigurer
-certaines étapes, on peut quand même automatiser l'installation car il est possible
-de passer des paramètres au noyau sur la ligne de commande. Il suffit d'indiquer
-une paire de type <userinput>path/to/variable=valeur</userinput> 
-pour toutes les variables listées dans les exemples.
-
-</para><para>
-
-Certaines des variables qui sont fréquemment définies à l'invite du démarrage
-possèdent des alias plus courts. Quand un alias est disponible, les exemples de
-cet annexe l'utilise au lieu de la variable complète.
-</para>
-
-<para>
-Dans les paramètres d'amorçage, <quote>--</quote> possède une signification
-spéciale. Tous les paramètres du noyau placés après le dernier ensemble de deux tirets
-seront copiés dans la configuration du programme d'amorçage (si l'installateur le permet).
-Il se peut que ces deux tirets, <quote>--</quote>, soient déjà présents
-dans les paramètres d'amorçage par défaut. Cela signifie que
-tous les paramètres indiqués à l'invite d'amorçage seront copiés, sauf si vous ajoutez
-un autre <quote>--</quote>. Dans ce cas, vous devez indiquer toutes les options de
-préconfiguration avant les options nécessaires à l'amorçage du matériel et les séparer
-par un <quote>--</quote> pour s'assurer que seules ces dernières seront copiés sur le système
-cible.
-
-</para>
-<note><para>
-
-Il faut savoir que le noyau linux (version 2.6.9 et au delà) accepte un maximum de 32 options
-ligne de commandes et 32 variables d'environnement. Et les options ajoutées
-par l'installateur sont comprises dans ces chiffres. S'il y a dépassement,
-le noyau <emphasis>panique</emphasis>. Les précédents noyaux acceptaient moins d'options.
-
-</para></note>
-<para>
-
-On peut sans risque supprimer certaines options par défaut, comme 
-<literal>vga=normal</literal>. Cela permet de rajouter autant d'options
-pour la préconfiguration.
-
-</para>
-<note><para>
-
-Il n'est pas toujours possible d'indiquer des valeurs contenant des espaces 
-dans les paramètres d'amorçage, même encadrés par des guillemets.
-
-</para></note>
-  </sect2>
- </sect1>
+   </sect1>
 
  <sect1 id="preseed-creating">
  <title>Créer un fichier de préconfiguration</title>
@@ -1185,8 +1269,14 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <sect1 id="preseed-advanced">
  <title>Options complexes</title>
 
-  <sect2 id="preseed-shell">
-  <title>Commandes Shell</title>
+  <sect2 id="preseed-hooks">
+  <title>Exécuter des commandes pendant l'installation </title>
+
+<para>
+Une option très puissante offerte par les outils de préconfiguration est
+la possibilité de lancer des commandes ou des scripts à certains moments
+de l'installation.
+</para>
 
 <informalexample role="example"><screen>
 # La préconfiguration de l'installation n'est pas sécurisée. Rien dans 
@@ -1209,6 +1299,22 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 </screen></informalexample>
 
 </sect2>
+
+<sect2 id="preseed-seenflag">
+  <title>Changer les valeurs par défaut avec la préconfiguration</title>
+<para>
+
+Il est possible de changer la réponse par défaut à une question tout en
+maintenant l'interrogation. Pour cela, le drapeau <firstterm>seen</firstterm> doit être
+remis à  <quote>false</quote> après avoir modifié la valeur de la réponse.
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
 
   <sect2 id="preseed-chainload">
   <title>Chaîner les fichiers de préconfiguration</title>
@@ -1246,6 +1352,16 @@ un autre fichier.
 d-i preseed/run string foo.sh
 
 </screen></informalexample>
+
+<para>
+Il est aussi possible de chaîner une préconfiguration de type <emphasis>initrd</emphasis>
+ou <emphasis>file</emphasis> avec une préconfiguration de type <emphasis>network</emphasis>.
+Pour cela il faut déclarer preseed/url dans les fichiers précédents.
+La préconfiguration <emphasis>network</emphasis> sera exécutée quand le réseau
+fonctionnera. Soyez prudent car il y aura deux exécutions distinctes de la préconfiguration.
+Cela signifie que vous pouvez exécuter à nouveau la commande preseed/early, la seconde fois
+après la mise en &oelig;uvre du réseau.
+ </para>
 </sect2>
 
 </sect1>
