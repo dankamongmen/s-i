@@ -36,7 +36,9 @@ parse_unix_tree() {
 		parse_network_interfaces $ETC/network/interfaces "eth0"
 	fi
 	if [ -e $ETC/resolv.conf ]; then
-		var_add NAMESERVERS "$(grep "^nameserver" $ETC/resolv.conf | sed 's/^.* //')"
+		for i in $(grep "^nameserver" $ETC/resolv.conf | sed 's/^.* //'); do
+			var_add NAMESERVERS "$i"
+		done
 	fi
 	if [ -e $ETC/hostname ]; then
 		HOSTNAME=$(cat $ETC/hostname | cut -d . -f 1)
