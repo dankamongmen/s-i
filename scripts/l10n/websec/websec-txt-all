@@ -52,10 +52,16 @@ for i in ${URL_SOURCES}; do
 	mv ${LOCAL_PATH_FILES}/$LOCAL_FILE ${LOCAL_PATH_FILES}/$LOCAL_FILE.old
 	wget --quiet $URL_SOURCE0 -O - | grep -v "Files fetched and report generated" > ${LOCAL_PATH_FILES}/$LOCAL_FILE
 
-	diff -u ${LOCAL_PATH_FILES}/$LOCAL_FILE.old ${LOCAL_PATH_FILES}/$LOCAL_FILE > ${LOCAL_PATH_FILES}/$LOCAL_FILE.diff
-	if test $? -ne 0;
+	DIFFFILE=${LOCAL_PATH_FILES}/$LOCAL_FILE.diff
+	diff -u ${LOCAL_PATH_FILES}/$LOCAL_FILE.old ${LOCAL_PATH_FILES}/$LOCAL_FILE > ${DIFFFILE}
+	DIFFRETURNED=$?
+	if test $DIFFRETURNED -ne 0;
 	then
-		cat ${LOCAL_PATH_FILES}/$LOCAL_FILE.diff | $FILTER | mutt -s "[WebSec-txt-${ACTUAL_LANGUAGE}] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
+		if test -s ${DIFFFILE}; then
+			cat ${DIFFFILE} | $FILTER | mutt -s "[WebSec-txt-${ACTUAL_LANGUAGE}] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
+		else
+			echo "diff for ${URL_SOURCE0} returned ${DIFFRETURNED}, yet ${DIFFFILE} is empty\!"
+		fi
 #	else
 #		echo "$URL_SOURCE0 - no changes"
 	fi
