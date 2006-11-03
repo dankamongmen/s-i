@@ -74,7 +74,7 @@ lvm_get_config() {
 "
 	pvs=$(pv_list_free)
 	if [ -z "$pvs" ]; then
-		db_metaget partman-lvm/text/configuration_none description
+		db_metaget partman-lvm/text/configuration_none_pvs description
 		output="$output  * $RET
 "
 	else
@@ -93,7 +93,7 @@ $RET
 "
 	vgs=$(vg_list)
 	if [ -z "$vgs" ]; then
-		db_metaget partman-lvm/text/configuration_none description
+		db_metaget partman-lvm/text/configuration_none_vgs description
 		RET="$output  * $RET
 "
 		return 0
