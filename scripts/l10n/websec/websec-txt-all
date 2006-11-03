@@ -58,7 +58,11 @@ for i in ${URL_SOURCES}; do
 	if test $DIFFRETURNED -ne 0;
 	then
 		if test -s ${DIFFFILE}; then
-			cat ${DIFFFILE} | $FILTER | mutt -s "[WebSec-txt-${ACTUAL_LANGUAGE}] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
+			RPTFILE=${LOCAL_PATH_FILES}/$LOCAL_FILE.report
+			cat ${DIFFFILE} | $FILTER > ${RPTFILE}
+			if test -s ${RPTFILE}; then
+				cat ${RPTFILE} | mutt -s "[WebSec-txt-${ACTUAL_LANGUAGE}] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
+			fi
 		else
 			echo "diff for ${URL_SOURCE0} returned ${DIFFRETURNED}, yet ${DIFFFILE} is empty\!"
 		fi
