@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-10-29 14:49+0000\n"
+"POT-Creation-Date: 2006-11-04 17:26+0000\n"
 "PO-Revision-Date: 2006-10-31 19:55+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -3742,7 +3742,10 @@ msgid ""
 "exceeded, the kernel will panic. </para> </footnote> which may be useful."
 msgstr ""
 "O sistema de instalação reconhece alguns parâmetros de arranque adicionais "
-"<footnote> <para> Com os actuais kernels (2.6.9 e posteriores) pode utilizar até 32 opções de linha de comandos e 32 opções de ambiente. Se este números forem excedidos ocorrerá um kernel panic (colapso). </para> </footnote> que poderão ser úteis."
+"<footnote> <para> Com os actuais kernels (2.6.9 e posteriores) pode utilizar "
+"até 32 opções de linha de comandos e 32 opções de ambiente. Se este números "
+"forem excedidos ocorrerá um kernel panic (colapso). </para> </footnote> que "
+"poderão ser úteis."
 
 #. Tag: term
 #: boot-installer.xml:2821
@@ -4140,11 +4143,27 @@ msgstr ""
 #. Tag: term
 #: boot-installer.xml:3057
 #, no-c-format
+msgid "auto-install/enabled"
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3058
+#, no-c-format
+msgid ""
+"Delay questions that are normally asked before preseeding is possible until "
+"after the network is configured. Short form: <userinput>auto=true</"
+"userinput> See <xref linkend=\"preseed-auto\"/> for details about using this "
+"to automate installs."
+msgstr ""
+
+#. Tag: term
+#: boot-installer.xml:3069
+#, no-c-format
 msgid "cdrom-detect/eject"
 msgstr "cdrom-detect/eject"
 
 #. Tag: para
-#: boot-installer.xml:3058
+#: boot-installer.xml:3070
 #, no-c-format
 msgid ""
 "By default, before rebooting, &d-i; automatically ejects the optical media "
@@ -4163,7 +4182,7 @@ msgstr ""
 "recarregar automaticamente."
 
 #. Tag: para
-#: boot-installer.xml:3067
+#: boot-installer.xml:3079
 #, no-c-format
 msgid ""
 "Set to <userinput>false</userinput> to disable automatic ejection, and be "
@@ -4175,13 +4194,13 @@ msgstr ""
 "automaticamente a partir da drive optical após a instalação inicial."
 
 #. Tag: term
-#: boot-installer.xml:3078
+#: boot-installer.xml:3090
 #, no-c-format
 msgid "ramdisk_size"
 msgstr "ramdisk_size"
 
 #. Tag: para
-#: boot-installer.xml:3079
+#: boot-installer.xml:3091
 #, no-c-format
 msgid "If you are using a 2.2.x kernel, you may need to set &ramdisksize;."
 msgstr ""
@@ -4189,13 +4208,13 @@ msgstr ""
 "&ramdisksize;."
 
 #. Tag: term
-#: boot-installer.xml:3087
+#: boot-installer.xml:3099
 #, no-c-format
 msgid "directfb/hw-accel"
 msgstr "directfb/hw-accel"
 
 #. Tag: para
-#: boot-installer.xml:3088
+#: boot-installer.xml:3100
 #, no-c-format
 msgid ""
 "For the gtk frontend (graphical installer), hardware acceleration in "
@@ -4207,13 +4226,13 @@ msgstr ""
 "parãmetro para <userinput>true</userinput> quando arrancar o instalador."
 
 #. Tag: term
-#: boot-installer.xml:3098
+#: boot-installer.xml:3110
 #, no-c-format
 msgid "rescue/enable"
 msgstr "rescue/enable"
 
 #. Tag: para
-#: boot-installer.xml:3099
+#: boot-installer.xml:3111
 #, no-c-format
 msgid ""
 "Set to <userinput>true</userinput> to enter rescue mode rather than "
@@ -4223,19 +4242,70 @@ msgstr ""
 "em vez de efectuar uma instalação normal. Veja a <xref linkend=\"rescue\"/>."
 
 #. Tag: title
-#: boot-installer.xml:3117
+#: boot-installer.xml:3122
+#, no-c-format
+msgid "Passing parameters to kernel modules"
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3123
+#, no-c-format
+msgid ""
+"If drivers are compiled into the kernel, you can pass parameters to them as "
+"described in the kernel documentation. However, if drivers are compiled as "
+"modules and because kernel modules are loaded a bit differently during an "
+"installation than when booting an installed system, it is not possible to "
+"pass parameters to modules as you would normally do. Instead, you need to "
+"use a special syntax recognized by the installer which will then make sure "
+"that the parameters are saved in the proper configuration files and will "
+"thus be used when the modules are actually loaded. The parameters will also "
+"be propagated automatically to the configuration for the installed system."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3136
+#, no-c-format
+msgid ""
+"Note that it is now quite rare that parameters need to be passed to modules. "
+"In most cases the kernel will be able to probe the hardware present in a "
+"system and set good defaults that way. However, in some situations it may "
+"still be needed to set parameters manually."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3143
+#, no-c-format
+msgid ""
+"The syntax to use to set parameters for modules is: "
+"<informalexample><screen>\n"
+"<replaceable>module_name</replaceable>.<replaceable>parameter_name</"
+"replaceable>=<replaceable>value</replaceable>\n"
+"</screen></informalexample> If you need to pass multiple parameters to the "
+"same or different modules, just repeat this. For example, to set an old 3Com "
+"network interface card to use the BNC (coax) connector and IRQ 10, you would "
+"pass:"
+msgstr ""
+
+#. Tag: screen
+#: boot-installer.xml:3153
+#, no-c-format
+msgid "3c509.xcvr=3 3c509.irq=10"
+msgstr ""
+
+#. Tag: title
+#: boot-installer.xml:3165
 #, no-c-format
 msgid "Troubleshooting the Installation Process"
 msgstr "Diagnosticar Problemas no Processo de Instalação"
 
 #. Tag: title
-#: boot-installer.xml:3122
+#: boot-installer.xml:3170
 #, no-c-format
 msgid "CD-ROM Reliability"
 msgstr "Fiabilidade do CD-ROM"
 
 #. Tag: para
-#: boot-installer.xml:3123
+#: boot-installer.xml:3171
 #, no-c-format
 msgid ""
 "Sometimes, especially with older CD-ROM drives, the installer may fail to "
@@ -4243,84 +4313,130 @@ msgid ""
 "successfully from CD-ROM &mdash; fail to recognize the CD-ROM or return "
 "errors while reading from it during the installation."
 msgstr ""
-"Por vezes, especialmente em leitores de CD-ROM antigos, o instaldor pode falhar o arranque a partir de um CD-ROM. O instalador pode também &mdash; mesmo após ter arrancado com sucesso a partir de CD-ROM &mdash; falhar o reconhecimento do CD-ROM ou durante a instalação retornar erros ao ler a partir deste."
+"Por vezes, especialmente em leitores de CD-ROM antigos, o instaldor pode "
+"falhar o arranque a partir de um CD-ROM. O instalador pode também &mdash; "
+"mesmo após ter arrancado com sucesso a partir de CD-ROM &mdash; falhar o "
+"reconhecimento do CD-ROM ou durante a instalação retornar erros ao ler a "
+"partir deste."
 
 #. Tag: para
-#: boot-installer.xml:3130
+#: boot-installer.xml:3178
 #, no-c-format
 msgid ""
 "There are a many different possible causes for these problems. We can only "
 "list some common issues and provide general suggestions on how to deal with "
 "them. The rest is up to you."
 msgstr ""
-"Existem muitas possíveis causas diferentes para estes problemas. Podemos apenas listar alguns dos problemas usuais e disponibilizar sugestões gerais acerca de como lidar com eles. O resto é consigo."
+"Existem muitas possíveis causas diferentes para estes problemas. Podemos "
+"apenas listar alguns dos problemas usuais e disponibilizar sugestões gerais "
+"acerca de como lidar com eles. O resto é consigo."
 
 #. Tag: para
-#: boot-installer.xml:3136
+#: boot-installer.xml:3184
+#, no-c-format
+msgid "There are two very simple things that you should try first."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3189
+#, no-c-format
+msgid ""
+"If the CD-ROM does not boot, check that it was inserted correctly and that "
+"it is not dirty."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3195
+#, no-c-format
+msgid ""
+"If the installer fails to recognize a CD-ROM, try just running the option "
+"<menuchoice> <guimenuitem>Detect and mount CD-ROM</guimenuitem> </"
+"menuchoice> a second time. Some DMA related isses with older CD-ROM drives "
+"are known to be resolved in this way."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3205
+#, no-c-format
+msgid ""
+"If this does not work, then try the suggestions in the subsections below. "
+"Most, but not all, suggestions discussed there are valid for both CD-ROM and "
+"DVD, but we'll use the term CD-ROM for simplicity."
+msgstr ""
+
+#. Tag: para
+#: boot-installer.xml:3211
 #, no-c-format
 msgid ""
 "If you cannot get the installation working from CD-ROM, try one of the other "
 "installation methods that are available."
 msgstr ""
-"Se não puder põr a instalação a funcionar a partir de CD-ROM, tente um dos outros métodos de instalação que estão disponíveis."
+"Se não puder põr a instalação a funcionar a partir de CD-ROM, tente um dos "
+"outros métodos de instalação que estão disponíveis."
 
 #. Tag: title
-#: boot-installer.xml:3144
+#: boot-installer.xml:3219
 #, no-c-format
 msgid "Common issues"
 msgstr "Problemas usuais"
 
 #. Tag: para
-#: boot-installer.xml:3147
+#: boot-installer.xml:3222
 #, no-c-format
 msgid ""
 "Some older CD-ROM drives do not support reading from discs that were burned "
 "at high speeds using a modern CD writer."
 msgstr ""
-"Alguns leitores de CD-ROM antigos não suportam a leitura a partir de discos que foram gravados a altas velocidades com um gravador de CDs moderno."
+"Alguns leitores de CD-ROM antigos não suportam a leitura a partir de discos "
+"que foram gravados a altas velocidades com um gravador de CDs moderno."
 
 #. Tag: para
-#: boot-installer.xml:3153
+#: boot-installer.xml:3228
 #, no-c-format
 msgid ""
 "If your system boots correctly from the CD-ROM, it does not necessarily mean "
 "that Linux also supports the CD-ROM (or, more correctly, the controller that "
 "your CD-ROM drive is connected to)."
 msgstr ""
-"Se o seu sistema arranca correctamente a partir de CD-ROM, não significa neccessariamente que Linux também suporte o CD-ROM (ou, mais correctamente, o controlador ao qual o seu leitor de CD-ROMs está ligado)."
+"Se o seu sistema arranca correctamente a partir de CD-ROM, não significa "
+"neccessariamente que Linux também suporte o CD-ROM (ou, mais correctamente, "
+"o controlador ao qual o seu leitor de CD-ROMs está ligado)."
 
 #. Tag: para
-#: boot-installer.xml:3160
+#: boot-installer.xml:3235
 #, no-c-format
 msgid ""
 "Some older CD-ROM drives do not work correctly if <quote>direct memory "
 "access</quote> (DMA) is enabled."
 msgstr ""
-"Alguns leitores de CD-ROM mais antigos não trabalham correctamente se o <quote>acesso directo á memória</quote> (DMA) estiver activado."
+"Alguns leitores de CD-ROM mais antigos não trabalham correctamente se o "
+"<quote>acesso directo á memória</quote> (DMA) estiver activado."
 
 #. Tag: title
-#: boot-installer.xml:3171
+#: boot-installer.xml:3246
 #, no-c-format
 msgid "How to investigate and maybe solve issues"
 msgstr "Como investigar e talvez resolver problemas"
 
 #. Tag: para
-#: boot-installer.xml:3172
+#: boot-installer.xml:3247
 #, no-c-format
 msgid "If the CD-ROM fails to boot, try the suggestions listed below."
 msgstr "Se o CD-ROM falhar o arranqye, tente as sugestões listadas abaixo."
 
 #. Tag: para
-#: boot-installer.xml:3177
+#: boot-installer.xml:3252
 #, no-c-format
 msgid ""
 "Check that your BIOS actually supports booting from CD-ROM (older systems "
 "possibly don't) and that your CD-ROM drive supports the media you are using."
 msgstr ""
-"Verifique se a BIOS na realidade suporta arrancar a partir de CD-ROM (os sistemas mais antigos possivelmente não) e que o seu leitor de CD-ROMs suporta o disco que está a utilizar."
+"Verifique se a BIOS na realidade suporta arrancar a partir de CD-ROM (os "
+"sistemas mais antigos possivelmente não) e que o seu leitor de CD-ROMs "
+"suporta o disco que está a utilizar."
 
 #. Tag: para
-#: boot-installer.xml:3183
+#: boot-installer.xml:3258
 #, no-c-format
 msgid ""
 "If you downloaded an iso image, check that the md5sum of that image matches "
@@ -4334,14 +4450,19 @@ msgid ""
 "matches as well. The following command should work. It uses the size of the "
 "image to read the correct number of bytes from the CD-ROM."
 msgstr ""
-"Se fez o download de uma imagem iso, verifique se o md5sum dessa imagem coincide com o que está listado para a imagem no ficheiro <filename>MD5SUMS</filename> que deve estar presente no mesmo local de onde fez o download da imagem. <informalexample><screen>\n"
+"Se fez o download de uma imagem iso, verifique se o md5sum dessa imagem "
+"coincide com o que está listado para a imagem no ficheiro <filename>MD5SUMS</"
+"filename> que deve estar presente no mesmo local de onde fez o download da "
+"imagem. <informalexample><screen>\n"
 "$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>\n"
 "a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst."
 "iso</replaceable>\n"
-"</screen></informalexample> De seguida, verifique se o md5sum do CD-ROM gravado também coincide. O seguinte comando deve funcionar. Utiliza o tamanho da imagem para ler o número de bytes correcto a partir do CD-ROM."
+"</screen></informalexample> De seguida, verifique se o md5sum do CD-ROM "
+"gravado também coincide. O seguinte comando deve funcionar. Utiliza o "
+"tamanho da imagem para ler o número de bytes correcto a partir do CD-ROM."
 
 #. Tag: screen
-#: boot-installer.xml:3196
+#: boot-installer.xml:3271
 #, no-c-format
 msgid ""
 "$ dd if=/dev/cdrom | \\\n"
@@ -4363,7 +4484,7 @@ msgstr ""
 "134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s"
 
 #. Tag: para
-#: boot-installer.xml:3201
+#: boot-installer.xml:3276
 #, no-c-format
 msgid ""
 "If, after the installer has been booted successfully, the CD-ROM is not "
@@ -4374,20 +4495,29 @@ msgid ""
 "Linux is required for this. To execute any of the commands, you should first "
 "switch to the second virtual console (VT2) and activate the shell there."
 msgstr ""
-"Se, após o instalador ter arrancado com sucesso, o CD-ROM não for detectado, simplesmente tentar novamemente poderá resolver o problema. Se tiver mais do que um leitor de CD-ROMs, tente mudar o CD-ROM para o outro leitor. Se isso nao funcionar ou se o CD-ROM for reconhecido mas existirem erros quando ler a partir dele, tente as sugestões listadas abaixo. Para isto serão necessários alguns conhecimentos básicos de Linux. Para executar qualquer dos comandos, deve primeiro mudar para a segunda consola virtual (VT2) e activar lá a shell."
+"Se, após o instalador ter arrancado com sucesso, o CD-ROM não for detectado, "
+"simplesmente tentar novamemente poderá resolver o problema. Se tiver mais do "
+"que um leitor de CD-ROMs, tente mudar o CD-ROM para o outro leitor. Se isso "
+"nao funcionar ou se o CD-ROM for reconhecido mas existirem erros quando ler "
+"a partir dele, tente as sugestões listadas abaixo. Para isto serão "
+"necessários alguns conhecimentos básicos de Linux. Para executar qualquer "
+"dos comandos, deve primeiro mudar para a segunda consola virtual (VT2) e "
+"activar lá a shell."
 
 #. Tag: para
-#: boot-installer.xml:3213
+#: boot-installer.xml:3288
 #, no-c-format
 msgid ""
 "Switch to VT4 or view the contents of <filename>/var/log/syslog</filename> "
 "(use <command>nano</command> as editor) to check for any specific error "
 "messages. After that, also check the output of <command>dmesg</command>."
 msgstr ""
-"Mude para o VT4 ou veja o conteúdo de <filename>/var/log/syslog</filename> (utilize o <command>nano</command> como editor) para ver alguma mensagem de erro específica. Depois disso, veja a saída de <command>dmesg</dmesg>."
+"Mude para o VT4 ou veja o conteúdo de <filename>/var/log/syslog</filename> "
+"(utilize o <command>nano</command> como editor) para ver alguma mensagem de "
+"erro específica. Depois disso, veja a saída de <command>dmesg</dmesg>."
 
 #. Tag: para
-#: boot-installer.xml:3220
+#: boot-installer.xml:3295
 #, no-c-format
 msgid ""
 "Check in the output of <command>dmesg</command> if your CD-ROM drive was "
@@ -4411,22 +4541,26 @@ msgstr ""
 "ide1 at 0x170-0x177,0x376 on irq 15\n"
 "hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)\n"
 "Uniform CD-ROM driver Revision: 3.20\n"
-"</screen></informalexample> Se não vir algo como isso, existe a possibilidade do controlador a que o seu CD-ROM está ligado não tenha sido reconhecido ou não é suportado. Se sabe que controlador é necessário para este leitor, deve tentar carrega-lo manualmente utilizando o <command>modprobe</command>."
-
+"</screen></informalexample> Se não vir algo como isso, existe a "
+"possibilidade do controlador a que o seu CD-ROM está ligado não tenha sido "
+"reconhecido ou não é suportado. Se sabe que controlador é necessário para "
+"este leitor, deve tentar carrega-lo manualmente utilizando o "
+"<command>modprobe</command>."
 
 #. Tag: para
-#: boot-installer.xml:3234
+#: boot-installer.xml:3309
 #, no-c-format
 msgid ""
 "Check that there is a device node for your CD-ROM drive under <filename>/dev/"
 "</filename>. In the example above, this would be <filename>/dev/hdc</"
 "filename>. There should also be a <filename>/dev/cdroms/cdrom0</filename>."
 msgstr ""
-"Verifique se existe um nó de dispositivo para o seu leitor de CD-ROMs sob <filename>/dev/</filename>. No exemplo acima, isto será <filename>/dev/hdc</"
+"Verifique se existe um nó de dispositivo para o seu leitor de CD-ROMs sob "
+"<filename>/dev/</filename>. No exemplo acima, isto será <filename>/dev/hdc</"
 "filename>. Deve também existir um <filename>/dev/cdroms/cdrom0</filename>."
 
 #. Tag: para
-#: boot-installer.xml:3242
+#: boot-installer.xml:3317
 #, no-c-format
 msgid ""
 "Use the <command>mount</command> command to check if the CD-ROM is already "
@@ -4435,12 +4569,15 @@ msgid ""
 "</screen></informalexample> Check if there are any error messages after that "
 "command."
 msgstr ""
-"Utilize o comando <command>mount</command> para verificar se o CD-ROM já está montado; caso não esteja, tente montá-lo manualmente: <informalexample><screen>\n"
+"Utilize o comando <command>mount</command> para verificar se o CD-ROM já "
+"está montado; caso não esteja, tente montá-lo manualmente: "
+"<informalexample><screen>\n"
 "$ mount /dev/<replaceable>hdc</replaceable> /cdrom\n"
-"</screen></informalexample> Verifique se existe alguma mensagem de erro após este comando."
+"</screen></informalexample> Verifique se existe alguma mensagem de erro após "
+"este comando."
 
 #. Tag: para
-#: boot-installer.xml:3252
+#: boot-installer.xml:3327
 #, no-c-format
 msgid ""
 "Check if DMA is currently enabled: <informalexample><screen>\n"
@@ -4457,12 +4594,14 @@ msgstr ""
 "$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>\n"
 "$ grep dma settings\n"
 "using_dma      1       0       1       rw\n"
-"</screen></informalexample> A <quote>1</quote> significa que está activado. Se estiver, tente desabilita-lo: <informalexample><screen>\n"
+"</screen></informalexample> A <quote>1</quote> significa que está activado. "
+"Se estiver, tente desabilita-lo: <informalexample><screen>\n"
 "$ echo -n \"using_dma:0\" >settings\n"
-"</screen></informalexample> Assegure-se que está no directório para o dispositivo que corresponde ao seu leitor de CD-ROMs."
+"</screen></informalexample> Assegure-se que está no directório para o "
+"dispositivo que corresponde ao seu leitor de CD-ROMs."
 
 #. Tag: para
-#: boot-installer.xml:3266
+#: boot-installer.xml:3341
 #, no-c-format
 msgid ""
 "If there are any problems during the installation, try checking the "
@@ -4470,16 +4609,19 @@ msgid ""
 "main menu. This option can also be used as a general test if the CD-ROM can "
 "be read reliably."
 msgstr ""
-"Se existirem quaisquer problemas durante a instalação, tente verificar a integridade do CD-ROM utilizando a opção perto do fundo no menu principal do instalador. Esta opção também pode ser utilizada como um teste para verificar se o CD-ROM pode ser lido com fiabilidade."
+"Se existirem quaisquer problemas durante a instalação, tente verificar a "
+"integridade do CD-ROM utilizando a opção perto do fundo no menu principal do "
+"instalador. Esta opção também pode ser utilizada como um teste para "
+"verificar se o CD-ROM pode ser lido com fiabilidade."
 
 #. Tag: title
-#: boot-installer.xml:3281
+#: boot-installer.xml:3356
 #, no-c-format
 msgid "Floppy Disk Reliability"
 msgstr "Disquetes de confiança"
 
 #. Tag: para
-#: boot-installer.xml:3283
+#: boot-installer.xml:3358
 #, no-c-format
 msgid ""
 "The biggest problem for people using floppy disks to install Debian seems to "
@@ -4489,7 +4631,7 @@ msgstr ""
 "parece ser a confiança na duração das disquetes."
 
 #. Tag: para
-#: boot-installer.xml:3288
+#: boot-installer.xml:3363
 #, no-c-format
 msgid ""
 "The boot floppy is the floppy with the worst problems, because it is read by "
@@ -4507,7 +4649,7 @@ msgstr ""
 "muitas mensagens de erros I/O."
 
 #. Tag: para
-#: boot-installer.xml:3297
+#: boot-installer.xml:3372
 #, no-c-format
 msgid ""
 "If you are having the installation stall at a particular floppy, the first "
@@ -4516,20 +4658,27 @@ msgid ""
 "the floppy was reformatted and written with no errors. It is sometimes "
 "useful to try writing the floppy on a different system."
 msgstr ""
-"Se está a enfrentar paragens da instalação numa disquete em particular, a primeira coisa que deve fazer é gravá-la para uma disquete <emphasis>diferente</emphasis>. Simplesmente re-formatar disquete antiga poderá não ser suficiente, mesmo que parece que a disquete foi re-formatada e escrita sem erros. Por vezes é útil tentar escrever a disquete num sistema diferente."
+"Se está a enfrentar paragens da instalação numa disquete em particular, a "
+"primeira coisa que deve fazer é gravá-la para uma disquete "
+"<emphasis>diferente</emphasis>. Simplesmente re-formatar disquete antiga "
+"poderá não ser suficiente, mesmo que parece que a disquete foi re-formatada "
+"e escrita sem erros. Por vezes é útil tentar escrever a disquete num sistema "
+"diferente."
 
 #. Tag: para
-#: boot-installer.xml:3306
+#: boot-installer.xml:3381
 #, no-c-format
 msgid ""
 "Normally you should not have download a floppy image again, but if you are "
 "experiencing problems it is always useful to verify that the images were "
 "downloaded correctly by verifying their md5sums."
 msgstr ""
-"Normalmente deve fazer novamente o download da imagem da disquete, mas se está a ter problemas é sempre útil verificar que foi feito correctamente o download das imagens verificando o seu md5sum."
+"Normalmente deve fazer novamente o download da imagem da disquete, mas se "
+"está a ter problemas é sempre útil verificar que foi feito correctamente o "
+"download das imagens verificando o seu md5sum."
 
 #. Tag: para
-#: boot-installer.xml:3312
+#: boot-installer.xml:3387
 #, no-c-format
 msgid ""
 "One user reports he had to write the images to floppy <emphasis>three</"
@@ -4541,7 +4690,7 @@ msgstr ""
 "bem com a terceira disquete."
 
 #. Tag: para
-#: boot-installer.xml:3318
+#: boot-installer.xml:3393
 #, no-c-format
 msgid ""
 "Other users have reported that simply rebooting a few times with the same "
@@ -4554,13 +4703,13 @@ msgstr ""
 "disquetes."
 
 #. Tag: title
-#: boot-installer.xml:3327
+#: boot-installer.xml:3402
 #, no-c-format
 msgid "Boot Configuration"
 msgstr "Configuração de arranque"
 
 #. Tag: para
-#: boot-installer.xml:3329
+#: boot-installer.xml:3404
 #, no-c-format
 msgid ""
 "If you have problems and the kernel hangs during the boot process, doesn't "
@@ -4574,7 +4723,7 @@ msgstr ""
 "como foi visto na <xref linkend=\"boot-parms\"/>."
 
 #. Tag: para
-#: boot-installer.xml:3336
+#: boot-installer.xml:3411
 #, no-c-format
 msgid ""
 "If you are booting with your own kernel instead of the one supplied with the "
@@ -4587,7 +4736,7 @@ msgstr ""
 "userinput>."
 
 #. Tag: para
-#: boot-installer.xml:3343
+#: boot-installer.xml:3418
 #, no-c-format
 msgid ""
 "Often, problems can be solved by removing add-ons and peripherals, and then "
@@ -4599,7 +4748,7 @@ msgstr ""
 "dispositivos Plug-n-Play podem ser especialmente problemáticos.</phrase>"
 
 #. Tag: para
-#: boot-installer.xml:3349
+#: boot-installer.xml:3424
 #, no-c-format
 msgid ""
 "If you have a large amount of memory installed in your machine, more than "
@@ -4613,13 +4762,13 @@ msgstr ""
 "vê, tal como <userinput>mem=512m</userinput>."
 
 #. Tag: title
-#: boot-installer.xml:3360
+#: boot-installer.xml:3435
 #, no-c-format
 msgid "Common &arch-title; Installation Problems"
 msgstr "Problemas comuns de Instalação em &arch-title;"
 
 #. Tag: para
-#: boot-installer.xml:3361
+#: boot-installer.xml:3436
 #, no-c-format
 msgid ""
 "There are some common installation problems that can be solved or avoided by "
@@ -4629,7 +4778,7 @@ msgstr ""
 "evitados passar alguns parâmetros de arranque ao instalador."
 
 #. Tag: para
-#: boot-installer.xml:3366
+#: boot-installer.xml:3441
 #, no-c-format
 msgid ""
 "Some systems have floppies with <quote>inverted DCLs</quote>. If you receive "
@@ -4641,7 +4790,7 @@ msgstr ""
 "tente o parâmetro <userinput>floppy=thinkpad</userinput>."
 
 #. Tag: para
-#: boot-installer.xml:3372
+#: boot-installer.xml:3447
 #, no-c-format
 msgid ""
 "On some systems, such as the IBM PS/1 or ValuePoint (which have ST-506 disk "
@@ -4661,7 +4810,7 @@ msgstr ""
 "replaceable></userinput>."
 
 #. Tag: para
-#: boot-installer.xml:3381
+#: boot-installer.xml:3456
 #, no-c-format
 msgid ""
 "If you have a very old machine, and the kernel hangs after saying "
@@ -4675,7 +4824,7 @@ msgstr ""
 "desactiva este teste."
 
 #. Tag: para
-#: boot-installer.xml:3388
+#: boot-installer.xml:3463
 #, no-c-format
 msgid ""
 "If your screen begins to show a weird picture while the kernel boots, eg. "
@@ -4696,13 +4845,13 @@ msgstr ""
 "Veja a <xref linkend=\"boot-parms\"/> para mais detalhes."
 
 #. Tag: title
-#: boot-installer.xml:3402
+#: boot-installer.xml:3477
 #, no-c-format
 msgid "System Freeze During the PCMCIA Configuration Phase"
 msgstr "Bloqueio do Sistema Durante a Fase de Configuração de PCMCIA"
 
 #. Tag: para
-#: boot-installer.xml:3403
+#: boot-installer.xml:3478
 #, no-c-format
 msgid ""
 "Some laptop models produced by Dell are known to crash when PCMCIA device "
@@ -4723,7 +4872,7 @@ msgstr ""
 "conflito."
 
 #. Tag: para
-#: boot-installer.xml:3413
+#: boot-installer.xml:3488
 #, no-c-format
 msgid ""
 "Alternatively, you can boot the installer in expert mode. You will then be "
@@ -4745,13 +4894,13 @@ msgstr ""
 "introduz estes valors no instalador."
 
 #. Tag: title
-#: boot-installer.xml:3430
+#: boot-installer.xml:3505
 #, no-c-format
 msgid "System Freeze while Loading the USB Modules"
 msgstr "Bloqueio de Sistema durante o carregamento dos módulos USB"
 
 #. Tag: para
-#: boot-installer.xml:3431
+#: boot-installer.xml:3506
 #, no-c-format
 msgid ""
 "The kernel normally tries to install USB modules and the USB keyboard driver "
@@ -4771,13 +4920,13 @@ msgstr ""
 "carregados."
 
 #. Tag: title
-#: boot-installer.xml:3445
+#: boot-installer.xml:3520
 #, no-c-format
 msgid "Interpreting the Kernel Startup Messages"
 msgstr "Interpretar as mensagens de arranque do kernel"
 
 #. Tag: para
-#: boot-installer.xml:3447
+#: boot-installer.xml:3522
 #, no-c-format
 msgid ""
 "During the boot sequence, you may see many messages in the form "
@@ -4814,13 +4963,13 @@ msgstr ""
 "\"kernel-baking\"/>)."
 
 #. Tag: title
-#: boot-installer.xml:3472
+#: boot-installer.xml:3547
 #, no-c-format
 msgid "Bug Reporter"
 msgstr "Relatório de Erros"
 
 #. Tag: para
-#: boot-installer.xml:3473
+#: boot-installer.xml:3548
 #, no-c-format
 msgid ""
 "If you get through the initial boot phase but cannot complete the install, "
@@ -4839,7 +4988,7 @@ msgstr ""
 "esta informação ao relatório de erros."
 
 #. Tag: para
-#: boot-installer.xml:3484
+#: boot-installer.xml:3559
 #, no-c-format
 msgid ""
 "Other pertinent installation messages may be found in <filename>/var/log/</"
@@ -4852,13 +5001,13 @@ msgstr ""
 "instalado."
 
 #. Tag: title
-#: boot-installer.xml:3495
+#: boot-installer.xml:3570
 #, no-c-format
 msgid "Submitting Installation Reports"
 msgstr "Submeter Relatórios de Instalação"
 
 #. Tag: para
-#: boot-installer.xml:3496
+#: boot-installer.xml:3571
 #, no-c-format
 msgid ""
 "If you still have problems, please submit an installation report. We also "
@@ -4872,7 +5021,7 @@ msgstr ""
 "possível no maior número de configurações de hardware."
 
 #. Tag: para
-#: boot-installer.xml:3503
+#: boot-installer.xml:3578
 #, no-c-format
 msgid ""
 "If you have a working Debian system, the easiest way to send an installation "
@@ -4886,7 +5035,7 @@ msgstr ""
 "comando <command>reportbug installation-report</command>."
 
 #. Tag: para
-#: boot-installer.xml:3510
+#: boot-installer.xml:3585
 #, no-c-format
 msgid ""
 "Please use this template when filling out installation reports, and file the "
@@ -4953,19 +5102,19 @@ msgstr ""
 "Base System Installation Checklist:\n"
 "[O] = OK, [E] = Erro (por favor descreva abaixo), [ ] = não foi tentado\n"
 "\n"
-"Initial boot:				[ ]\n"
-"Detectar placa de rede:		[ ]\n"
-"Configurar rede:	        	[ ]\n"
-"Detectar CD:		       		[ ]\n"
-"Caregar módulos do instalador: 	[ ]\n"
-"Detectar discos rígidos:		[ ]\n"
-"Particionar discos rígidos:  		[ ]\n"
-"Instalar o sistema base:		[ ]\n"
-"Configuração do relógio/fuso horário:	[ ]\n"
-"Configuração do utilizador/password:	[ ]\n"
-"Instalar tarefas:			[ ]\n"
-"Instalar gestor de arranque:		[ ]\n"
-"Total da instalação:			[ ]\n"
+"Initial boot:\t\t\t\t[ ]\n"
+"Detectar placa de rede:\t\t[ ]\n"
+"Configurar rede:\t        \t[ ]\n"
+"Detectar CD:\t\t       \t\t[ ]\n"
+"Caregar módulos do instalador: \t[ ]\n"
+"Detectar discos rígidos:\t\t[ ]\n"
+"Particionar discos rígidos:  \t\t[ ]\n"
+"Instalar o sistema base:\t\t[ ]\n"
+"Configuração do relógio/fuso horário:\t[ ]\n"
+"Configuração do utilizador/password:\t[ ]\n"
+"Instalar tarefas:\t\t\t[ ]\n"
+"Instalar gestor de arranque:\t\t[ ]\n"
+"Total da instalação:\t\t\t[ ]\n"
 "\n"
 "Comentários/Problemas:\n"
 "\n"
