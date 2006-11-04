@@ -385,5 +385,45 @@ performing a normal installation. See <xref linkend="rescue"/>.
 
 </variablelist>
   </sect2>
+
+  <sect2 id="module-parms"><title>Passing parameters to kernel modules</title>
+<para>
+
+If drivers are compiled into the kernel, you can pass parameters to them
+as described in the kernel documentation. However, if drivers are compiled
+as modules and because kernel modules are loaded a bit differently during
+an installation than when booting an installed system, it is not possible
+to pass parameters to modules as you would normally do. Instead, you need
+to use a special syntax recognized by the installer which will then make
+sure that the parameters are saved in the proper configuration files and
+will thus be used when the modules are actually loaded. The parameters
+will also be propagated automatically to the configuration for the installed
+system.
+
+</para><para>
+
+Note that it is now quite rare that parameters need to be passed to modules.
+In most cases the kernel will be able to probe the hardware present in a
+system and set good defaults that way. However, in some situations it may
+still be needed to set parameters manually.
+
+</para><para>
+
+The syntax to use to set parameters for modules is:
+
+<informalexample><screen>
+<replaceable>module_name</replaceable>.<replaceable>parameter_name</replaceable>=<replaceable>value</replaceable>
+</screen></informalexample>
+
+If you need to pass multiple parameters to the same or different modules,
+just repeat this. For example, to set an old 3Com network interface card
+to use the BNC (coax) connector and IRQ 10, you would pass:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+  </sect2>
  </sect1>
 
