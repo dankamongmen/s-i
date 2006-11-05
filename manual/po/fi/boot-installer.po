@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Debian Installer boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-11-04 17:26+0000\n"
-"PO-Revision-Date: 2006-11-02 17:27+0200\n"
+"PO-Revision-Date: 2006-11-05 08:19+0200\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -126,16 +126,7 @@ msgid ""
 "to use the &debian; &release; installer. You can still run &debian; "
 "&release; on such systems by using other install media; for instance, you "
 "can install Debian woody with MILO and upgrade."
-msgstr ""
-"GNU/Linux on Alphan ainoa käyttöjärjestelmä joka voidaan käynnistää "
-"molemmista konsolityypeistä, mutta &debian; &release tukee käynnistämistä "
-"vain SRM:ään pohjautuvilla järjestelmillä. Jos käytössä on Alpha johon ei "
-"ole saatavilla mitään SRM:n versiota, jos halutaan kaksoiskäynnistää Windows "
-"NT:n kanssa, tai jos käynnistyslaite vaatii ARC-konsolin tukea BIOS:n "
-"alkuarvojen asettamiseen, ei &debian; &release;:n asenninta voi käyttää. "
-"&debian; &release;:aa voidaan silti ajaa noilla järjestelmillä käyttämällä "
-"muuta asennustaltiota; esimerkiksi voidaan asentaa Debian Woody MILO:lla ja "
-"päivittää."
+msgstr "GNU/Linux on Alphan ainoa käyttöjärjestelmä joka voidaan käynnistää molemmista konsolityypeistä, mutta &debian; &release; tukee käynnistämistä vain SRM:ään pohjautuvilla järjestelmillä. Jos käytössä on Alpha johon ei ole saatavilla mitään SRM:n versiota, jos halutaan kaksoiskäynnistää Windows NT:n kanssa, tai jos käynnistyslaite vaatii ARC-konsolin tukea BIOS:n alkuarvojen asettamiseen, ei &debian; &release;:n asenninta voi käyttää. &debian; &release;:aa voidaan silti ajaa noilla järjestelmillä käyttämällä muuta asennustaltiota; esimerkiksi voidaan asentaa Debian Woody MILO:lla ja päivittää."
 
 #. Tag: para
 #: boot-installer.xml:87
@@ -631,7 +622,7 @@ msgstr ""
 #: boot-installer.xml:341
 #, no-c-format
 msgid "Booting from CD-ROM with the ARC or AlphaBIOS Console"
-msgstr ""
+msgstr "Käynnistäminen rompulta ARC- tai AlphaBIOS-konsolilta"
 
 #. Tag: para
 #: boot-installer.xml:342
@@ -644,13 +635,13 @@ msgid ""
 "replaceable> is the proper subarchitecture name) as the OS Path in the `OS "
 "Selection Setup' menu. Ruffians make an exception: You need to use <filename>"
 "\\milo\\ldmilo.exe</filename> as boot loader."
-msgstr ""
+msgstr "ARC-konsolilta käynnistetään rompulta etsimällä suoritinarkkitehtuurin koodinimi (katso <xref linkend=\"alpha-cpus\"/>), määrittämällä käynnistyslataimeksi <filename>\\milo\\linload.exe</filename> ja OS Path:in arvoksi \"OS Selection Setup\"-valikossa <filename>\\milo\\<replaceable>subarch</replaceable></filename> (missä <replaceable>subarch</replaceable> on asiaankuuluva suoritinarkkitehtuurin nimi). Ruffianit ovat poikkeus: käynnistyslataimena on käytettävä <filename>\\milo\\ldmilo.exe</filename>."
 
 #. Tag: title
 #: boot-installer.xml:358
 #, no-c-format
 msgid "Booting from Floppies with the SRM Console"
-msgstr ""
+msgstr "Käynnistäminen levykkeiltä SRM-konsolilla"
 
 #. Tag: para
 #: boot-installer.xml:359
@@ -669,6 +660,11 @@ msgid ""
 "command>. If everything works OK, you will eventually see the Linux kernel "
 "boot."
 msgstr ""
+"Kirjoita SRM-kehotteeseen (<prompt>&gt;&gt;&gt;</prompt>) seuraava komento:<informalexample><screen>\n"
+"&gt;&gt;&gt; boot dva0 -flags 0\n"
+"</screen></informalexample> mahdollisesti korvaten <filename>dva0</filename> oikealla laitenimellä. Tavallisesti <filename>dva0</filename> on levyke; kirjoittamalla <informalexample><screen>\n"
+"&gt;&gt;&gt; show dev\n"
+"</screen></informalexample> näkee laiteluettelon (esim. jos halutaan käynnistää rompulta). Huomaa, että käynnistettäessä MILO:n avulla, parametri <command>-flags</command> ohitetaan joten voidaan kirjoittaa vain <command>boot dva0</command>. Jos kaikki toimii kuten pitää, käynnistyy Linux-ydin hetken kuluttua."
 
 #. Tag: para
 #: boot-installer.xml:376
@@ -683,6 +679,9 @@ msgid ""
 "boot device name for <filename>fd0</filename>, and the desired kernel "
 "parameters for <filename>arguments</filename>."
 msgstr ""
+"Jos käynnistettäessä halutaan antaa ytimen parametreja <command>aboot</command>:n kautta, käytetään seuraavaa komentoa:<informalexample><screen>\n"
+"&gt;&gt;&gt; boot dva0 -file linux.bin.gz -flags \"root=/dev/fd0 load_ramdisk=1 arguments\"\n"
+"</screen></informalexample> (kaikki kirjoitetaan samalle riville), korvaten, jos tarpeen, <filename>dva0</filename>:n tilalle oikea SRM:n laitenimi, <filename>fd0</filename>:n tilalle Linuxin käynnistyslaite ja <filename>arguments</filename>:in tilalle halutut ytimen parametrit."
 
 #. Tag: para
 #: boot-installer.xml:388
@@ -691,13 +690,13 @@ msgid ""
 "If you want to specify kernel parameters when booting via <command>MILO</"
 "command>, you will have to interrupt bootstrap once you get into MILO. See "
 "<xref linkend=\"booting-from-milo\"/>."
-msgstr ""
+msgstr "Jos <command>MILO</command>:n avulla käynnistettäessä halutaan antaa ytimen parametreja, on käynnistys keskeytettävä kun on päästy MILO:on. Katso <xref linkend=\"booting-from-milo\"/>."
 
 #. Tag: title
 #: boot-installer.xml:398
 #, no-c-format
 msgid "Booting from Floppies with the ARC or AlphaBIOS Console"
-msgstr ""
+msgstr "Käynnistäminen levykkeiltä ARC- tai AlphaBIOS-konsolilta"
 
 #. Tag: para
 #: boot-installer.xml:400
@@ -706,13 +705,13 @@ msgid ""
 "In the OS Selection menu, set <command>linload.exe</command> as the boot "
 "loader, and <command>milo</command> as the OS Path. Bootstrap using the "
 "newly created entry."
-msgstr ""
+msgstr "OS Selection -valikossa, aseta käynnistyslataimeksi <command>linload.exe</command> ja \"OS Path\" arvoon <command>milo</command>. Käynnistä tällä uudella valikon kohdalla."
 
 #. Tag: title
 #: boot-installer.xml:409
 #, no-c-format
 msgid "Booting with MILO"
-msgstr ""
+msgstr "Käynnistäminen MILO:lla"
 
 #. Tag: para
 #: boot-installer.xml:410
@@ -721,7 +720,7 @@ msgid ""
 "MILO contained on the bootstrap media is configured to proceed straight to "
 "Linux automatically. Should you wish to intervene, all you need is to press "
 "space during MILO countdown."
-msgstr ""
+msgstr "Käynnistystaltiolla olevan MILO:n asetukset on tehty jatkamaan suoraan Linuxiin automaattisesti. Jos tätä ei haluta, riittää painaa välilyöntiä MILO:n lähtölaskennan aikana."
 
 #. Tag: para
 #: boot-installer.xml:416
@@ -736,12 +735,15 @@ msgid ""
 "appropriate device name in Linux notation. The <command>help</command> "
 "command would give you a brief MILO command reference."
 msgstr ""
+"Haluttaessa määrittää kaikki yksityiskohdat tarkkaan (esimerkiksi antaa lisäparametreja), voidaan käyttää tämän tapaista komentoa: <informalexample><screen>\n"
+"MILO> boot fd0:linux.bin.gz root=/dev/fd0 load_ramdisk=1 <!-- parametreja -->\n"
+"</screen></informalexample> Jos käynnistetään muulta laitteelta kuin levyke, kirjoita yllä olevassa esimerkissä <filename>fd0</filename>:n tilalle oikean laitteen nimi Linuxin merkintätavalla. Komennolla <command>help</command> näkee lyhyen MILO:n komentojen luettelon."
 
 #. Tag: title
 #: boot-installer.xml:435
 #, no-c-format
 msgid "Booting from TFTP"
-msgstr ""
+msgstr "Käynnistäminen TFTP:llä"
 
 #. Tag: para
 #: boot-installer.xml:441 boot-installer.xml:1003 boot-installer.xml:1506
@@ -750,7 +752,7 @@ msgstr ""
 msgid ""
 "Booting from the network requires that you have a network connection and a "
 "TFTP network boot server (DHCP, RARP, or BOOTP)."
-msgstr ""
+msgstr "Käynnistäminen verkosta edellyttää verkkoyhteyttä ja TFTP-käynnistyspalvelinta (DHCP, RARP, tai BOOTP)."
 
 #. Tag: para
 #: boot-installer.xml:446 boot-installer.xml:1008 boot-installer.xml:1511
@@ -759,7 +761,7 @@ msgstr ""
 msgid ""
 "Older systems such as the 715 might require the use of an RBOOT server "
 "instead of a BOOTP server."
-msgstr ""
+msgstr "Vanhoissa järjestelmissä kuten 715 saatetaan joutua käyttämään RBOOT-palvelinta BOOTP:n tilalla."
 
 #. Tag: para
 #: boot-installer.xml:451 boot-installer.xml:1013 boot-installer.xml:1516
@@ -768,13 +770,13 @@ msgstr ""
 msgid ""
 "The installation method to support network booting is described in <xref "
 "linkend=\"install-tftp\"/>."
-msgstr ""
+msgstr "Verkosta käynnistämistä tukeva asennustapa kuvataan kohdassa <xref linkend=\"install-tftp\"/>."
 
 #. Tag: title
 #: boot-installer.xml:459
 #, no-c-format
 msgid "Booting from TFTP on Netwinder"
-msgstr ""
+msgstr "Käynnistäminen TFTP:llä Netwinderissa"
 
 #. Tag: para
 #: boot-installer.xml:460
@@ -785,7 +787,7 @@ msgid ""
 "Tulip card. There may be problems loading the image via TFTP using the "
 "100Mbps card so it is recommended that you use the 10Mbps interface (the one "
 "labeled with <literal>10 Base-T</literal>)."
-msgstr ""
+msgstr "Netwindereissa on kaksi verkkoliitäntää: 10 Mbit NE2000-yhteensoiva kortti (johon yleensä viitataan nimellä <literal>eth0</literal>) ja 100 Mbit Tulip-kortti. Otoksen noutamisessa 100 Mbit-kortilla saattaa olla pulmia, joten suositellaan käytettävän 10 Mbit-liitäntää (se, jossa lukee <literal>10 Base-T</literal>)."
 
 #. Tag: para
 #: boot-installer.xml:469
@@ -795,7 +797,7 @@ msgid ""
 "2.3.3 is recommended. Unfortunately, firmware files are currently not "
 "available for download because of license issues. If this situation changes, "
 "you may find new images at <ulink url=\"http//www.netwinder.org/\"></ulink>."
-msgstr ""
+msgstr "Asennusjärjestelmän käynnistämiseen tarvitaan NeTTrom 2.2.1 tai uudempi, suositellaan versiota 2.3.3. Harmittavasti laiteohjelmatiedostoja ei tällä hetkellä ole saatavilla käyttöoikeussyistä. Jos tämä tilanne muuttuu, uudet otokset saattavat löytyä osoitteesta <ulink url=\"http//www.netwinder.org/\"></ulink>."
 
 #. Tag: para
 #: boot-installer.xml:477
@@ -840,12 +842,33 @@ msgid ""
 "\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</"
 "ulink> is available."
 msgstr ""
+"Kun Netwinderia käynnistetään on käynnistysprosessi keskeytettävä lähtölaskennan aikana. Tällöin päästään muuttamaan muutamia laiteohjelmisto asetuksia joilla asennin saadaan käynnistettyä. Ensiksi, ladataan oletusasetukset: <informalexample><screen>\n"
+"    NeTTrom command-&gt; load-defaults\n"
+"</screen></informalexample> Lisäksi on tehtävä verkkoasetukset, joko kiinteällä osoitteella: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 flash\n"
+"    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24\n"
+"</screen></informalexample> missä 24 on verkon peiton bittien lukumäärä, tai vaihtuvalla osoitteella: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv netconfig_eth0 dhcp\n"
+"</screen></informalexample> Mahdollisesti on tehtävä myös <userinput>route1</userinput>-asetukset jos TFTP-palvelin ei ole paikallisessa aliverkossa. Katso mallia näistä asetuksista ja anna TFTP-palvelimen osoite ja otoksen sijainti. Asetukset voi sitten tallentaa flash-muistiin. <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1\n"
+"    NeTTrom command-&gt; setenv kerntftpfile boot.img\n"
+"    NeTTrom command-&gt; save-all\n"
+"</screen></informalexample> Nyt on laiteohjelmistolle kerrottava että pitää käynnistää TFTP-otos: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv kernconfig tftp\n"
+"    NeTTrom command-&gt; setenv rootdev /dev/ram\n"
+"</screen></informalexample> Jos Netwinderin asennuksessa käytetään sarjapäätettä, on lisättävä seuraava asetus: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200\n"
+"</screen></informalexample> Toinen tapa on käyttää näppäimistöä ja näyttöä jolloin käytetään asetuksia: <informalexample><screen>\n"
+"    NeTTrom command-&gt; setenv cmdappend root=/dev/ram\n"
+"</screen></informalexample> Komennolla <command>printenv</command> näkee ympäristömuuttujien arvot. Kun on varmistettu asetusten olevan oikein, voidaan otos ladata: <informalexample><screen>\n"
+"    NeTTrom command-&gt; boot\n"
+"</screen></informalexample> Jos tulee pulmia on ohje <ulink url=\"http://www.netwinder.org/howto/Firmware-HOWTO.html\">detailed HOWTO</ulink> saatavilla."
 
 #. Tag: title
 #: boot-installer.xml:529
 #, no-c-format
 msgid "Booting from TFTP on CATS"
-msgstr ""
+msgstr "Käynnistäminen TFTP:llä CATS:illa"
 
 #. Tag: para
 #: boot-installer.xml:530
