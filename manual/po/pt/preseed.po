@@ -572,12 +572,21 @@ msgid ""
 "replaceable>\n"
 "</screen></informalexample> The way this works is that:"
 msgstr ""
+"Se não existir uma infra-estrutura local de DHCP ou de DNS, ou se não desejar "
+"utilizar o caminho por omissão para o preseed.cfg, ainda assim pode utilizar "
+"um url explícito, e se não utilizar o elemento <literal>/./</literal> será "
+"ancorado ao inicio do caminho (i.e. o terceiro / no URL). Está aqui um "
+"exemplo que necessita de suporte mínimo da estrutura de rede local: "
+"<informalexample><screen>\n"
+"auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</"
+"replaceable>\n"
+"</screen></informalexample> A forma como funciona isto é:"
 
 #. Tag: para
 #: preseed.xml:383
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
-msgstr ""
+msgstr "se faltar o protocolo ao URL, é assumido http,"
 
 #. Tag: para
 #: preseed.xml:386
@@ -586,6 +595,7 @@ msgid ""
 "if the hostname section contains no periods, it has the domain derived from "
 "DHCP appended to it, and"
 msgstr ""
+"se a secção do hostname não tiver pontos finais, tem acrescentado o domínio derivado do DHCP, e "
 
 #. Tag: para
 #: preseed.xml:390
@@ -594,6 +604,7 @@ msgid ""
 "if there's no <literal>/</literal>'s after the hostname, then the default "
 "path is added."
 msgstr ""
+"se não existir nenhum <literal>/</literal> depois do hostname, então é acrescentado o caminho por omissão."
 
 #. Tag: para
 #: preseed.xml:396
@@ -611,6 +622,18 @@ msgid ""
 "</screen></informalexample> The classes could for example denote the type of "
 "system to be installed, or the localization to be used."
 msgstr ""
+"Além de especificar o url, também pode especificar configurações que não "
+"afectam directamente o comportamento do próprio &d-i;, mas podem ser passadas "
+"através de quaisquer scripts que possam ter especificadas configurações "
+"<literal>preseed/run</literal> no ficheiro preseed carregado. Actualmente, o "
+"único exemplo disto é "
+"<literal>auto-install/classes</literal>, que tem uma abreviatura "
+"<literal>classes</literal>. Isto pode ser utilizado da seguinte forma: "
+"<informalexample><screen>\n"
+"auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;"
+"class_B</replaceable>\n"
+"</screen></informalexample> As classes podem por exemplo denotar o tipo de "
+"sistema a ser instalado, ou a localização a ser utilizada."
 
 #. Tag: para
 #: preseed.xml:410
@@ -624,6 +647,12 @@ msgid ""
 "avoid namespace conflicts, and perhaps add an alias for the parameter for "
 "you."
 msgstr ""
+"Claro que é possível estender este conceito, e se o fizer, é razoável "
+"utilizar o namespace auto-install para isto. Por isso poderá ter algo do "
+"tipo <literal>auto-install/style</literal> que é então utilizado nos seus "
+"scripts. Se acha que necessita fazer isto, por favor mencione-o na mailing "
+"list <email>debian-boot@lists.debian.org</email> para que nós possamos "
+"evitar conflitos de namespace, e talvez acrescentar um alias ao parâmetro para si."
 
 #. Tag: para
 #: preseed.xml:420
@@ -639,6 +668,15 @@ msgid ""
 "literal> and setting it to <literal>critical</literal> stops any questions "
 "with a lower priority from being asked."
 msgstr ""
+"A label de arranque <literal>auto</literal> ainda não está definida em todas "
+"as arquitecturas. O mesmo efeito pode ser alcançado simplesmente adicionando "
+"dois parâmetros <literal>auto=true priority=critical</literal> à linha de "
+"comandos do kernel. O parâmetro <literal>auto</literal> é uma abreviatura para "
+"<literal>auto-install/enabled</literal> e controla a demora das questões do "
+"locale e do teclado até que exista a possibilidade de fazer preseed a estas, "
+"enquanto <literal>priority</literal> é uma abreviatura para <literal>preseed/priority"
+"</literal> e defini-lo como <literal>critical</literal> faz que seja evitada "
+"a colocação de quaisquer questões com prioridade inferior."
 
 #. Tag: para
 #: preseed.xml:433
@@ -649,151 +687,153 @@ msgid ""
 "dhcp_timeout=60</literal> which makes the machine choose the first viable "
 "NIC and be more patient about getting a reply to its DHCP query."
 msgstr ""
-
+"Opções adicionais que podem ter interesse enquanto tenta automatizar uma "
+"instalação enquanto utilizar DHCP são: <literal>interface=auto netcfg/"
+"dhcp_timeout=60</literal> que faz com que a máquina escolha a primeira placa "
+"de rede viável e seja mais paciente com a espera da resposta ao seu pedido DHCP."
 #. Tag: title
 #: preseed.xml:445
 #, no-c-format
 msgid "Aliases useful with preseeding"
-msgstr ""
+msgstr "Abreviaturas úteis com o preseed"
 
 #. Tag: para
 #: preseed.xml:446
 #, no-c-format
 msgid "The following aliases can be useful when using (auto mode) preseeding."
-msgstr ""
+msgstr "As seguintes abreviaturas podem ser úteis quanto utilizar preseed (modo auto)."
 
 #. Tag: entry
 #: preseed.xml:456
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "auto"
-msgstr "laptop"
+msgstr "auto"
 
 #. Tag: entry
 #: preseed.xml:456
 #, no-c-format
 msgid "auto-install/enabled"
-msgstr ""
+msgstr "auto-install/enabled"
 
 #. Tag: entry
 #: preseed.xml:457
 #, no-c-format
 msgid "classes"
-msgstr ""
+msgstr "classes"
 
 #. Tag: entry
 #: preseed.xml:457
 #, no-c-format
 msgid "auto-install/classes"
-msgstr ""
+msgstr "auto-install/classes"
 
 #. Tag: entry
 #: preseed.xml:458
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "<entry>fb</entry>"
-msgstr "<entry>no</entry>"
+msgstr "<entry>fb</entry>"
 
 #. Tag: entry
 #: preseed.xml:458
 #, no-c-format
 msgid "debian-installer/framebuffer"
-msgstr ""
+msgstr "debian-installer/framebuffer"
 
 #. Tag: entry
 #: preseed.xml:459
 #, no-c-format
 msgid "locale"
-msgstr ""
+msgstr "locale"
 
 #. Tag: entry
 #: preseed.xml:459
 #, no-c-format
 msgid "debian-installer/locale"
-msgstr ""
+msgstr "debian-installer/locale"
 
 #. Tag: entry
 #: preseed.xml:460
 #, no-c-format
 msgid "priority"
-msgstr ""
+msgstr "priority"
 
 #. Tag: entry
 #: preseed.xml:460
 #, no-c-format
 msgid "debconf/priority"
-msgstr ""
+msgstr "debconf/priority"
 
 #. Tag: entry
 #: preseed.xml:461
 #, no-c-format
 msgid "preseed/file"
-msgstr ""
+msgstr "preseed/file"
 
 #. Tag: entry
 #: preseed.xml:462
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "<entry>url</entry>"
-msgstr "<entry>no</entry>"
+msgstr "<entry>url</entry>"
 
 #. Tag: entry
 #: preseed.xml:462
 #, no-c-format
 msgid "preseed/url"
-msgstr ""
+msgstr "preseed/url"
 
 #. Tag: entry
 #: preseed.xml:463
 #, no-c-format
 msgid "hostname&nbsp;&nbsp;&nbsp;"
-msgstr ""
+msgstr "hostname&nbsp;&nbsp;&nbsp;"
 
 #. Tag: entry
 #: preseed.xml:463
 #, no-c-format
 msgid "netcfg/get_hostname"
-msgstr ""
+msgstr "netcfg/get_hostname"
 
 #. Tag: entry
 #: preseed.xml:464
 #, no-c-format
 msgid "domain"
-msgstr ""
+msgstr "domain"
 
 #. Tag: entry
 #: preseed.xml:464
 #, no-c-format
 msgid "netcfg/get_domain"
-msgstr ""
+msgstr "netcfg/get_domain"
 
 #. Tag: entry
 #: preseed.xml:465
 #, no-c-format
 msgid "interface"
-msgstr ""
+msgstr "interface"
 
 #. Tag: entry
 #: preseed.xml:465
 #, no-c-format
 msgid "netcfg/choose_interface"
-msgstr ""
+msgstr "netcfg/choose_interface"
 
 #. Tag: entry
 #: preseed.xml:466
 #, no-c-format
 msgid "suite"
-msgstr ""
+msgstr "suite"
 
 #. Tag: entry
 #: preseed.xml:466
 #, no-c-format
 msgid "mirror/suite"
-msgstr ""
+msgstr "mirror/suite"
 
 #. Tag: title
 #: preseed.xml:473
 #, no-c-format
 msgid "Using a DHCP server to specify preconfiguration files"
-msgstr ""
-"Utilizar um servidor de DHCP para especificar ficheiros de pré-configuração"
+msgstr "Utilizar um servidor de DHCP para especificar ficheiros de pré-configuração"
 
 #. Tag: para
 #: preseed.xml:474
@@ -2284,14 +2324,14 @@ msgstr "Executar comandos personalizados durante a instalação"
 
 #. Tag: para
 #: preseed.xml:977
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
 "the ability to run commands or scripts at certain points in the installation."
 msgstr ""
 "Uma opção muito poderosa e flexível oferecida pelas ferramentas de pré-"
 "configuração é a habilidade de correr comandos ou scripts em certos pontos "
-"da instalação. Para detalhes veja <xref linkend=\"preseed-shell\"/>"
+"da instalação."
 
 #. Tag: screen
 #: preseed.xml:985
@@ -2387,7 +2427,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1016
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -2413,8 +2453,8 @@ msgid ""
 msgstr ""
 "# Podem ser listados mais do que um ficheiro, separados por espaços;\n"
 "# todos serão carregados. Os ficheiros incluídos podem ter também\n"
-"# directivas de preseed/include deles próprios. Note que os nomes dos\n"
-"# ficheiros são relativos, e são tirados do mesmo directório do ficheiro\n"
+"# directivas de preseed/include deles próprios. Note que se os nomes dos\n"
+"# ficheiros forem relativos, serão tirados do mesmo directório do ficheiro\n"
 "# de pré-configuração que os incluí.\n"
 "#d-i preseed/include string x.cfg\n"
 "\n"
@@ -2429,11 +2469,10 @@ msgstr ""
 "#d-i preseed/include_command \\\n"
 "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
 "\n"
-"# De forma mais flexível isto faz o download um programa e corre-o.\n"
-"# O programa pode utilizar comandos como o debconf-set para manipular a "
-"base\n"
-"# de dados do debconf.\n"
-"# Note que os nomes dos ficheiros são relativos, e são retirados do mesmo\n"
+"# Da forma mais flexível, isto faz o download um programa e corre-o.\n"
+"# O programa pode utilizar comandos como o debconf-set para manipular a\n"
+"# base de dados do debconf.\n"
+"# Note que se os nomes dos ficheiros são relativos, serão retirados do mesmo\n"
 "# directório do ficheiro de pré-configuração que os corre.\n"
 "d-i preseed/run string foo.sh"
 
@@ -2448,6 +2487,12 @@ msgid ""
 "preseeding, meaning for example that you get another chance to run the "
 "preseed/early command, the second one happening after the network comes up."
 msgstr ""
+"Também é possível carregar a partir do initrd ou da fase de preseed de "
+"ficheiro, para o preseed de rede definindo preseed/url nos ficheiros "
+"anteriores. Isto irá fazer com que seja feito preseed por rede quando a rede "
+"ficar disponível. Tem de ter cuidado ao fazer isto, já que existem duas "
+"execuções distintas de preseed, significa por exemplo que pode ter outra "
+"oportunidade de correr o comando preseed/early, a segunda acontece após a rede estar disponível."
 
 #~ msgid ""
 #~ "In practical terms this means for file and network preseeding that the "
