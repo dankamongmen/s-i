@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version:  42367 -->
+<!-- original version:  42485 -->
 
  <sect1 id="boot-parms"><title>Paramètres d'amorçage</title>
 <para>
@@ -37,7 +37,7 @@ doit être affiché assez tôt durant le processus.
 <replaceable>Total</replaceable> doit correspondre à la quantité de mémoire 
 vive (exprimée en kilo-octets) que contient votre machine. Si la quantité de
 mémoire vive détectée ne correspond pas à la quantité de mémoire de votre 
-machine, vous devrez utiliser le paramètre
+machine, vous devez utiliser le paramètre
 <userinput>mem=<replaceable>ram</replaceable></userinput>, où 
 <replaceable>ram</replaceable> est la taille mémoire de votre machine, suivie 
 par <quote>k</quote> pour kilo-octets ou <quote>m</quote> pour méga-octets. Par 
@@ -391,4 +391,41 @@ au lieu de faire une installation normale. Voyez <xref linkend="rescue"/>.
 
 </variablelist>
   </sect2>
+
+<sect2 id="module-parms"><title>Passer des paramètres aux modules du noyau</title>
+<para>
+
+Selon la documentation du noyau Linux, il est possible de passer des paramètres
+aux pilotes de phériphériques compilés dans le noyau. Cependant il existe une différence
+entre la façon de charger un module pendant l'installation et la façon de le charger sur
+un système installé. Aussi, quand les pilotes sont compilés en modules, il n'est pas possible
+de leur passer des paramètres de la manière habituelle. Une syntaxe spéciale est nécessaire.
+L'installateur fera en sorte que les paramètres soient dans les bons fichiers de
+configuration quand les modules seront réellement chargés. Les paramètres seront aussi
+propagés automatiquement dans la configuration du système installé.
+</para>
+<para>
+Il est aujourd'hui très rare d'avoir à passer des paramètres aux modules.
+Dans la plupart des cas, le noyau sait tester le matériel présent sur une machine et
+donner de bons paramètres par défaut. Parfois cependant il sera nécessaire de passer
+soi-même des paramètres.
+</para>
+<para>
+Voici la syntaxe à utiliser&nbsp;:
+ 
+<informalexample><screen>
+<replaceable>module</replaceable>.<replaceable>paramètre</replaceable>=<replaceable>valeur</replaceable>
+</screen></informalexample>
+
+Si vous devez passer plusieurs paramètres, pour un module ou pour plusieurs modules,
+il suffit de répéter la formule. Ainsi, pour faire qu'une vieille carte 3com utilise le
+connecteur BNC (coax) et l'IRQ 10&nbsp;:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+  </sect2>
+
  </sect1>
