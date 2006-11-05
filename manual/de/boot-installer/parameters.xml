@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40875 -->
+<!-- original version: 42485 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -77,12 +77,9 @@ Das Installationssystem kennt ein paar zusätzliche Boot-Parameter<footnote>
 
 <para>
 
-Bedenken Sie, dass 2.4-Kernel maximal 8 Kommandozeilen-Optionen und
-8 Umgebungs-Optionen (inklusive der Optionen, die standardmäßig für
-den Installer hinzugefügt werden) akzeptieren. Werden diese Grenzen
-überschritten, wird der 2.4er Kernel überzählige Optionen einfach
-ignorieren. Falls Sie einen 2.6.9-Kernel oder neuer verwenden, können
-Sie 32 Kommandozeilenoptionen und 32 Umgebungsoptionen benutzen.
+Mit aktuellen Kernels (2.6.9 und neuer) können Sie 32
+Kommandozeilenoptionen und 32 Umgebungsoptionen benutzen. Werden diese Grenzen
+überschritten, meldet der Kernel eine Panic (stürzt ab).
 
 </para>
 
@@ -342,6 +339,18 @@ um die Installation zu automatisieren. Siehe auch
 </varlistentry>
 
 <varlistentry>
+<term>auto-install/enabled</term>
+<listitem><para>
+
+Fragen, die eigentlich gestellt werden, bevor Voreinstellung greift, können
+aufgeschoben werden, bis das Netzwerk konfiguriert ist. Kurzform:
+<userinput>auto=true</userinput>. Siehe <xref linkend="preseed-auto"/>, wie
+Sie dies für automatisierte Installationen nutzen können.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -394,8 +403,51 @@ Siehe <xref linkend="rescue"/>.
 </para></listitem>
 </varlistentry>
 
-
 </variablelist>
   </sect2>
+
+  <sect2 id="module-parms"><title>Parameter für Kernelmodule angeben</title>
+<para>
+
+Wenn Treiber in den Kernel einkompiliert sind, können Sie Parameter für
+sie angeben wie in der Kerneldokumentation beschrieben. Wenn allerdings
+die Treiber als Module kompiliert sind und weil Kernelmodule während einer
+Installation ein wenig anders geladen werden wie beim Booten eines
+installierten System, ist es nicht möglich, Parameter für die Module
+auf die gleiche Art anzugeben wie gewöhnlich. Statt dessen müssen Sie eine
+spezielle Syntax einhalten, die vom Installer erkannt wird und sicherstellt,
+dass die Parameter in den passenden Konfigurationsdateien gespeichert werden
+und beim eigentlichen Laden der Module genutzt werden. Außerdem werden
+die Parameter automatisch zur Konfiguration des installierten System
+hinzugefügt.
+
+</para><para>
+
+Beachten Sie, dass es mittlerweile sehr selten ist, Parameter für Module
+angeben zu müssen. In den meisten Fällen kann der Kernel die im System
+vorhandene Hardware erkennen und auf dem Wege gute Voreinstellungen setzen.
+In einigen Situationen könnte es allerdings trotzdem nötig sein, Parameter
+manuell zu setzen.
+
+</para><para>
+
+Die zu verwendende Syntax, um Parameter für Module zu setzen:
+
+<informalexample><screen>
+<replaceable>Modulname</replaceable>.<replaceable>Parametername</replaceable>=<replaceable>Wert</replaceable>
+</screen></informalexample>
+
+Müssen Sie mehrere Parameter für das gleiche oder andere Module angeben,
+wiederholen Sie es einfach. Um zum Beispiel eine alte 3Com-Netzwerkkarte
+so einzustellen, dass der BNC-(Koax-)Anschluss und der Interrupt IRQ 10
+verwendet wird, nutzen Sie dies:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+  </sect2>
  </sect1>
+
 

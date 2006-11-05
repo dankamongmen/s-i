@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41871 -->
+<!-- original version: 42323 -->
 
    <sect3 id="partman">
    <title>Partitionieren Ihrer Festplatten (partman)</title>
@@ -14,7 +14,7 @@ möchten, lesen Sie <xref linkend="partitioning"/>.
 
 Zuerst wird Ihnen die Auswahl geboten, automatisch entweder eine gesamte Platte
 zu partitionieren oder nur den freien Speicherplatz auf einer Platte, falls
-vorhanden. Dies wird auch als <quote>Geführte Partitionierung</quote>
+solcher vorhanden ist. Dies wird auch als <quote>Geführte Partitionierung</quote>
 bezeichnet. Wenn Sie keine automatische Partitionierung wollen, wählen Sie
 <guimenuitem>Manuell</guimenuitem>.
 
@@ -22,18 +22,40 @@ bezeichnet. Wenn Sie keine automatische Partitionierung wollen, wählen Sie
 
 Wenn Sie Geführte Partitionierung wählen, haben Sie drei Möglichkeiten:
 Partitionen direkt auf der Festplatte erzeugen (die klassische Methode),
-LVM (Logical Volume Management) benutzen oder verschlüsseltes LVM benutzen.
-Hinweis: die Option zur Nutzung von LVM (Standard oder verschlüsselt) ist
+LVM (Logical Volume Management) benutzen oder verschlüsseltes LVM
+benutzen<footnote>
+
+<para>
+Der Installer verschlüsselt die LVM-Volumegruppe mittels eines 256 Bit-AES-Schlüssels
+und nutzt dazu die <quote>dm-crypt</quote>-Unterstützung des Kernels.
+</para>
+
+</footnote>.
+
+</para>
+<note><para>
+
+Die Option zur Nutzung von LVM (Standard oder verschlüsselt) ist
 möglicherweise nicht auf allen Architekturen verfügbar.
 
-</para><para>
+</para></note>
+<para>
 
 Bei der Verwendung von LVM oder verschlüsseltem LVM erzeugt der Installer
 die meisten Partitionen innerhalb einer grossen Partition; der Vorteil dabei
 ist, dass die Partitionen innerhalb der grossen Partition sehr einfach
-im Nachhinein in der Größe verändert werden können. Im Fall von verschlüsseltem
+nachträglich in der Größe verändert werden können. Im Fall von verschlüsseltem
 LVM ist die grosse Partition ohne Kenntnis einer speziellen Passphrase nicht
 lesbar und bietet deshalb zusätzliche Sicherheit Ihrer (persönlichen) Daten.
+
+</para><para>
+
+Wenn Sie verschlüsseltes LVM verwenden, wird der Installer auch automatisch
+die Festplatte löschen, indem Zufallsdaten darauf geschrieben werden. Dies
+verbessert zusätzlich die Sicherheit (da es so unmöglich ist, zu erkennen,
+welche Teile der Platte genutzt werden und außerdem alle Spuren von
+früheren Installationen gelöscht werden), könnte aber einiges an Zeit
+benötigen, abhängig von der Größe der Festplatte.
 
 </para>
 <note><para>
@@ -42,8 +64,8 @@ Wenn Sie Geführte Partitionierung mittels LVM oder verschlüsseltem LVM wählen
 müssen einige Änderungen in der Partitionstabelle auf die ausgewählten
 Festplatten geschrieben werden, während LVM eingerichtet wird. Diese Änderungen
 löschen effektiv alle Daten, die zu dieser Zeit auf den entsprechenden
-Festplatten gespeichert sind und sind nicht rückgängig zu machen. Der
-Installer bittet Sie aber, diese Änderungen zu bestätigen, bevor die sie auf
+Festplatten gespeichert sind und sind nicht rückgängig zu machen! Der
+Installer fordert Sie aber auf, diese Änderungen zu bestätigen, bevor sie auf
 die Platten geschrieben werden.
 
 </para></note>
@@ -187,9 +209,9 @@ erläutert.
 
 </para><para>
 
-Ein ähnliches Bild wie oben wird Ihnen angezeigt, wenn Sie <quote>Manuelle
-Partitionierung</quote> wählen, mit dem Unterschied, dass Ihre derzeit existierende
-Partitionstabelle angezeigt wird, und die Einhängepunkte fehlen.
+Ein ähnliches Bild wie oben wird Ihnen angezeigt, wenn Sie <quote>Manuell</quote>
+wählen, mit dem Unterschied, dass Ihre derzeit existierende
+Partitionstabelle angezeigt wird und die Einhängepunkte fehlen.
 Wie Sie die Partitionstabelle manuell einrichten (sowie einiges über die Nutzung
 der Partitionen durch Ihr neues Debian-System) wird im Rest dieses Kapitels
 beschrieben.
@@ -205,7 +227,7 @@ für die ausgewählte Festplatte erscheinen.
 </para><para>
 
 Wenn Sie eine Zeile mit freiem Speicher auswählen, wird angeboten, eine neue
-Partition zu erstellen. Sie müssen eine Reihe von Fragen über ihre Größe, den
+Partition zu erstellen. Sie müssen einige Fragen über ihre Größe, den
 Typ (primär oder logisch) und die Lage auf der Platte (am Anfang oder am Ende
 des freien Speicherbereichs) beantworten. Danach wird eine detaillierte Übersicht
 der neuen Partition angezeigt mit Einträgen für: den Einhängepunkt im zukünftigen

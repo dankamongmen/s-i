@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39622 -->
+<!-- original version: 42302 -->
 
  <sect1 id="partition-programs">
  <title>Debian-Partitionierungsprogramme</title>
@@ -38,7 +38,7 @@ Der Original-Linux-Festplatten-Partitionierer, gut für Gurus.
 Seien Sie vorsichtig, wenn Sie bestehende FreeBSD-Partitionen auf Ihrem
 Rechner haben. Die Installationskernel bieten Unterstützung für diesen
 Partitionstyp, aber die Art und Weise, wie <command>fdisk</command> sie
-darstellt (oder nicht), kann verursachen, dass sich die Gerätebezeichnungen
+darstellt (oder evtl. nicht), kann verursachen, dass sich die Gerätebezeichnungen
 unterscheiden. Lesen Sie dazu das
 <ulink url="&url-linux-freebsd;">Linux+FreeBSD-HowTo</ulink>.
 
@@ -119,37 +119,8 @@ Eines dieser Programme wird standardmäßig gestartet, wenn Sie
 wählen. Es könnte möglich sein, ein anderes Programm auf der zweiten
 virtuellen Konsole VT2 zu benutzen, aber dies wird nicht empfohlen.
 
-</para><para>
-
-Wenn Sie mehr als 20 Partitionen auf Ihrer IDE-Festplatte brauchen, müssen
-Sie für die Partitionen 21 und höher zusätzliche Geräte (<quote>devices</quote>) erzeugen.
-Der Schritt zur Initialisierung der Partition schlägt fehl, solange kein
-ordnungsgemäßes Device verfügbar ist. Als Beispiel hier die Befehle, die
-Sie auf <userinput>tty2</userinput> oder unter
-<guimenuitem>Eine Shell ausführen</guimenuitem> benutzen
-können, um ein Device zu erzeugen, so dass die 21. Partition initialisiert
-werden kann:
-
-<informalexample><screen>
-# cd /dev
-# mknod hda21 b 3 21 
-# chgrp disk hda21
-# chmod 660 hda21
-</screen></informalexample>
-
-Das neue System zu booten schlägt fehl, solange kein ordnungsgemäßes
-Device auf dem Zielsystem vorhanden ist. Nachdem der Kernel und die Module
-installiert sind, führen Sie Folgendes aus:
-
-<informalexample><screen>
-# cd /target/dev
-# mknod hda21 b 3 21 
-# chgrp disk hda21
-# chmod 660 hda21
-</screen></informalexample>
-
-<phrase arch="x86">Denken Sie daran, Ihre Boot-Partition als
-<quote>Bootable</quote> (bootfähig) zu kennzeichnen.</phrase>
+</para><para arch="x86">Denken Sie daran, die Boot-Partition als
+<quote>Bootable</quote> (bootfähig) zu markieren.
 
 </para><para condition="mac-fdisk.txt">
 
