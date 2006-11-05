@@ -61,6 +61,8 @@ for i in ${URL_SOURCES}; do
 			RPTFILE=${LOCAL_PATH_FILES}/$LOCAL_FILE.report
 			cat ${DIFFFILE} | $FILTER > ${RPTFILE}
 			if test -s ${RPTFILE}; then
+				echo "Mailing  ${MAIL_ADDRESS} for ${ACTUAL_LANGUAGE} with:"
+				cat ${RPTFILE}
 				cat ${RPTFILE} | mutt -s "[WebSec-txt-${ACTUAL_LANGUAGE}] $URL_SOURCE0 - $ACTUAL_DATE" ${MAIL_ADDRESS}
 			fi
 		else
