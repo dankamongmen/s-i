@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed.po\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-11-04 17:26+0000\n"
-"PO-Revision-Date: 2006-11-05 10:22+0300\n"
+"PO-Revision-Date: 2006-11-06 15:06+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -520,6 +520,20 @@ msgid ""
 "in the preseed file being retrieved from <literal>http://autoserver.example."
 "com/d-i/etch/./preseed.cfg</literal>."
 msgstr ""
+"Есть несколько возможностей программы установки Debian, объединив "
+"которые с помощью простых команд в приглашении к загрузке, можно "
+"получить автоматическую установку любого уровня настраиваемости. "
+"Вот один из примеров использования настроек в приглашении к "
+"загрузке: <informalexample><screen>\n"
+"auto url=autoserver\n"
+"</screen></informalexample> "
+"В этом случае для установки согласно полученным настройкам с DHCP сервера "
+"будет найдена машина <literal>autoserver</literal> из записей DNS, "
+"возможно к имени будет добавлено имя локального домена, если он "
+"передаётся в DHCP. Если машина имеет доменное имя <literal>example."
+"com</literal>, и этот домен настроен в DHCP, то в результате файл с "
+"ответами будет получен с <literal>http://autoserver.example."
+"com/d-i/etch/./preseed.cfg</literal>."
 
 #. Tag: para
 #: preseed.xml:350
@@ -541,6 +555,22 @@ msgid ""
 "from <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command."
 "sh</literal>."
 msgstr ""
+"Часть пути к файлу настраивается в <literal>auto-install/defaultroot</"
+"literal>, по умолчанию имеет значение <literal>etch</literal>, чтобы "
+"для будущих версий можно было задать своё название, что позволит "
+"людям контроливать процесс перехода на новую версию. Часть "
+"<literal>/./</literal> используется для указания корня, относительно "
+"которого будут задаваться остальные пути (для использования в "
+"preseed/include и preseed/run). Это позволяет указывать файлы или с "
+"полным URL (пути, начинающиеся с /), или даже пути относительно "
+"места, где был найден последний файл ответов. Это может "
+"быть использовано для написание более переносимых сценариев, для того "
+"чтобы полное дерево сценариев можно было переместить в новое место ничего "
+"при этом не сломав, например скопировать файлы на USB-носитель, если ранее "
+"они брались с веб-сервера. Продолжая пример, если в файле ответов "
+"<literal>preseed/run</literal> имеет значение "
+"<literal>/scripts/late_command.sh</literal>, то файл будет получен с "
+"<literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
 
 #. Tag: para
 #: preseed.xml:370
@@ -556,12 +586,21 @@ msgid ""
 "replaceable>\n"
 "</screen></informalexample> The way this works is that:"
 msgstr ""
+"Если в сети нет локальных DHCP или DNS, или если вы не хотите "
+"использовать пути по умолчанию к preseed.cfg, то вы можете явно "
+"задать url, и если вы не используете элемент <literal>/./</literal>, то "
+"это будет началом пути (третий / в URL). Вот пример, "
+"для которого нужна минимальная поддержка служб в локальной сети: "
+"<informalexample><screen>\n"
+"auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</"
+"replaceable>\n"
+"</screen></informalexample> Это работает так:"
 
 #. Tag: para
 #: preseed.xml:383
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
-msgstr "Если в URL не указан протокол, то используется http,"
+msgstr "если в URL не указан протокол, то используется http,"
 
 #. Tag: para
 #: preseed.xml:386
@@ -570,6 +609,8 @@ msgid ""
 "if the hostname section contains no periods, it has the domain derived from "
 "DHCP appended to it, and"
 msgstr ""
+"если в имени машины нет точек, то будет добавлен домен, полученный "
+"по DHCP, и"
 
 #. Tag: para
 #: preseed.xml:390
@@ -578,6 +619,8 @@ msgid ""
 "if there's no <literal>/</literal>'s after the hostname, then the default "
 "path is added."
 msgstr ""
+"если нет <literal>/</literal> после имени машины, то добавляется путь "
+"по умолчанию."
 
 #. Tag: para
 #: preseed.xml:396
@@ -595,6 +638,17 @@ msgid ""
 "</screen></informalexample> The classes could for example denote the type of "
 "system to be installed, or the localization to be used."
 msgstr ""
+"Также помимо указания url, вы можете задать настройки, которые не "
+"влияют напрямую на поведение самого &d-i;, но будут переданы во "
+"все сценарии, которые могут быть заданы с помощью <literal>preseed/run</literal> "
+"в загруженном файле ответов. В настоящий момент, как пример использования, "
+"есть только <literal>auto-install/classes</literal> с псевдонимом "
+"<literal>classes</literal>. Это можно использовать так: "
+"<informalexample><screen>\n"
+"auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;"
+"class_B</replaceable>\n"
+"</screen></informalexample> classes, например, может означать тип "
+"устанавливаемой системы или используемую локализацию."
 
 #. Tag: para
 #: preseed.xml:410
@@ -608,6 +662,13 @@ msgid ""
 "avoid namespace conflicts, and perhaps add an alias for the parameter for "
 "you."
 msgstr ""
+"Естественно, можно расширить эту концепцию, и если вы это делаете,"
+"имеет смысл задействовать пространство имён auto-install. Это может "
+"выглядеть как <literal>auto-install/style</literal>, что затем будет "
+"использовано в ваших сценариях. Если вы думаете, что вам это нужно, напишите "
+"в список рассылки <email>debian-boot@lists.debian.org</email>, для того чтобы мы "
+"смогли избежать конфликта имён, и возможно, добавили псевдонимы для ваших "
+"параметров."
 
 #. Tag: para
 #: preseed.xml:420
@@ -623,6 +684,16 @@ msgid ""
 "literal> and setting it to <literal>critical</literal> stops any questions "
 "with a lower priority from being asked."
 msgstr ""
+"Загрузочная метка <literal>auto</literal> пока работает не на всех "
+"архитектурах. Такой же эффект можно получить просто добавив два "
+"параметра <literal>auto=true priority=critical</literal> в командной строке "
+"параметров ядра. Параметр <literal>auto</literal> &mdash; это псевдоним для "
+"<literal>auto-install/enabled</literal>, который управляет задержкой выдачи "
+"вопросов о локали и клавиатуре, чтобы была возможность настроить их "
+"автоматически, а <literal>priority</literal> является псевдонимом для "
+"<literal>preseed/priority</literal> и установка в значение "
+"<literal>critical</literal> заставляет программу установки не задавать "
+"вопросы с меньшим уровнем важности."
 
 #. Tag: para
 #: preseed.xml:433
@@ -633,18 +704,22 @@ msgid ""
 "dhcp_timeout=60</literal> which makes the machine choose the first viable "
 "NIC and be more patient about getting a reply to its DHCP query."
 msgstr ""
+"Для автоматизации с использованием DHCP могут пригодиться следующие "
+"дополнительные параметры: <literal>interface=auto netcfg/"
+"dhcp_timeout=60</literal>, будет выбрана первая рабочая сетевая карта, "
+"ответ на DHCP запрос будет ожидаться больше чем обычно."
 
 #. Tag: title
 #: preseed.xml:445
 #, no-c-format
 msgid "Aliases useful with preseeding"
-msgstr ""
+msgstr "Полезные в автоматизации псевдонимы"
 
 #. Tag: para
 #: preseed.xml:446
 #, no-c-format
 msgid "The following aliases can be useful when using (auto mode) preseeding."
-msgstr ""
+msgstr "Следующие псевдонимы могут быть полезны при автоматизации (режим auto)."
 
 #. Tag: entry
 #: preseed.xml:456
@@ -2356,7 +2431,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1016
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -2389,22 +2464,20 @@ msgstr ""
 "\n"
 "# Программу установки можно заставить проверять контрольные суммы файлов\n"
 "# ответов перед их использованием. В данный момент поддерживается только\n"
-"# md5sums, в списке md5sums файлы должны указываться в том же порядке,\n"
+"# md5sums; в списке md5sums файлы должны указываться в том же порядке,\n"
 "# что и при включении файлов.\n"
 "#d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d\n"
 "\n"
-"# Для большей гибкости можно запустить команду оболочки и если она выдаёт\n"
+"# Для большей гибкости можно запустить команду оболочки и если она выдаст\n"
 "# имена файлов ответов, включить эти файлы. \n"
 "#d-i preseed/include_command \\\n"
 "#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
 "\n"
-"# Наиболее гибкая из всех -- это команда загрузки и исполнения программы.\n"
-"# Программа может использовать команды, например, debconf-set для "
-"управления\n"
-"# базой данных debconf.\n"
-"# Заметим, что если имена файлов относительные, то они ищутся в том же "
-"каталоге\n"
-"# откуда взят файл ответов, который запускает их.\n"
+"# Наиболее гибкая из всех, команда загрузки и исполнения программы.\n"
+"# Программа может использовать команды, например, debconf-set для\n"
+"# управления базой данных debconf.\n"
+"# Заметим, что если имена файлов относительные, то они ищутся в том же\n"
+"# каталоге откуда взят файл ответов, который запускает их.\n"
 "d-i preseed/run string foo.sh"
 
 #. Tag: para
@@ -2418,4 +2491,11 @@ msgid ""
 "preseeding, meaning for example that you get another chance to run the "
 "preseed/early command, the second one happening after the network comes up."
 msgstr ""
+"Также возможно цепоченное выполнение автоматизации из initrd или файла, "
+"а затем автоматизацию по сети, если задать preseed/url в файлах "
+"исполняемых первыми. Это приведёт выполнению автоматизации по сети, "
+"когда сеть станет доступна. Нужно быть осторожным при настройке, так как "
+"будут выполняться два разных по сути метода автоматизации, что, например, "
+"приведёт к выполнению команды из preseed/early дважды: один раз из "
+"первого метода, второй раз после включения сети."
 
