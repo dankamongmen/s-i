@@ -889,6 +889,8 @@ default_disk_label () {
 		# Broadcom SB1 evaluation boards
 		sb1-bcm91250a | sb1a-bcm91480b)
 		    echo msdos;;
+		qemu-mips32)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
@@ -905,6 +907,8 @@ default_disk_label () {
 		cobalt)
 		    echo msdos;;
 		bcm947xx)
+		    echo msdos;;
+		qemu-mips32)
 		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
