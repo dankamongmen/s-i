@@ -41,6 +41,11 @@ static struct cpu system_bcm_bcm947xx_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_qemu_cpu[] = {
+	{ "MIPS 4Kc", "qemu-mips32" },
+	{ NULL, "unknown" }
+}
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -70,6 +75,8 @@ static struct systype system_type[] = {
 	{"Cobalt ", system_cobalt_cpu },
 	/* Broadcom based APs/NAS */
 	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu },
+	/* match QEMU virtual machine */
+	{"Qemu", system_qemu_cpu },
 	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
