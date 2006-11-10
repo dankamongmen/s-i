@@ -1,10 +1,236 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 42532 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Beseitigen von Problemen während der Installation</title>
 <para>
 </para>
+
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>Zuverlässigkeit von CD-ROMs</title>
+<para>
+
+Manchmal schlägt der Start des Installers von CD-ROM fehl, speziell bei
+älteren CD-ROM-Laufwerken. Auch könnte es möglich sein &ndash; sogar wenn
+erfolgreich von CD-ROM gebootet wurde &ndash; dass der Installer die CD-ROM
+nicht mehr erkennt oder Fehler ausgibt, wenn er während der Installation
+von der CD liest.
+
+</para><para>
+
+Es gibt viele verschiedene Gründe, die dies verursachen könnten. Wir
+können hier nur einige allgemeine Probleme auflisten und generelle
+Empfehlungen geben, wie Sie damit umgehen sollten. Der Rest liegt bei
+Ihnen.
+
+</para><para>
+
+Es gibt zwei einfache Dinge, die Sie zunächst ausprobieren sollten.
+
+<itemizedlist>
+<listitem><para>
+
+Wenn die CD-ROM nicht bootet, überprüfen Sie, ob Sie korrekt eingelegt wurde
+und nicht verschmutzt ist.
+
+</para></listitem>
+<listitem><para>
+
+Erkennt der Installer die CD-ROM nicht mehr, wählen Sie ein zweites
+Mal die Option <menuchoice> <guimenuitem>CD-ROM erkennen und
+einbinden</guimenuitem> </menuchoice> aus dem Menü. Es ist uns bekannt,
+dass einige Probleme bezüglich DMA bei älteren CD-ROM-Laufwerken auf
+diese Weise behoben werden können.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Falls dies nicht funktioniert, probieren Sie die Empfehlungen weiter
+unten aus. Die meisten dieser Empfehlungen gelten sowohl für
+CD-ROM- wie auch für DVD-Laufwerke, aber wir verwenden der Einfachheit
+halber nur den Begriff CD-ROM.
+
+</para><para>
+
+Sollten Sie die Installation überhaupt nicht per CD-ROM zum Laufen
+bekommen, versuchen Sie eine der anderen verfügbaren
+Installationsmethoden.
+
+</para>
+
+  <sect3>
+  <title>Allgemeine Probleme</title>
+
+<itemizedlist>
+  <listitem><para>
+
+Einige ältere CD-ROM-Laufwerke unterstützen nicht das Lesen von Disks, die
+mit modernen CD-Brennern in hoher Geschwindigkeit gebrannt wurden.
+
+  </para></listitem>
+  <listitem><para>
+
+Wenn Ihr System von der CD-ROM bootet, heißt das nicht zwingend, dass
+das Laufwerk auch von Linux unterstützt wird (bzw. vielmehr der Controller,
+an den Ihr CD-ROM-Laufwerk angeschlossen ist).
+
+  </para></listitem>
+  <listitem><para>
+
+Einige ältere CD-ROM-Laufwerke arbeiten nicht korrekt, wenn <quote>Direct Memory
+Access</quote> (DMA) aktiviert ist.
+
+  </para></listitem>
+</itemizedlist>
+
+  </sect3>
+
+  <sect3>
+  <title>Wie Sie Probleme untersuchen und vielleicht auch lösen</title>
+<para>
+
+Falls die CD-ROM nicht bootet, versuchen Sie dies:
+
+<itemizedlist>
+  <listitem><para>
+
+Überprüfen Sie, ob das BIOS Ihres Rechners das Booten von CD-ROM unterstützt
+(ältere System tun dies möglicherweise nicht) und ob Ihr Laufwerk zu dem
+Medium kompatibel ist, das Sie nutzen.
+
+  </para></listitem>
+  <listitem><para>
+
+Falls Sie ein iso-Image heruntergeladen haben, überprüfen Sie, ob die
+md5sum-Prüfsumme des Images mit der übereinstimmt, die in der Datei
+<filename>MD5SUMS</filename> für dieses Image aufgelistet ist. Sie sollten
+diese Datei dort finden, wo Sie auch das Image heruntergeladen haben.
+
+<informalexample><screen>
+$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+Überprüfen Sie auch, ob die md5sum-Prüfsumme der gebrannten CD korrekt ist.
+Dies sollten Sie mit dem folgenden Kommando erledigen können. Es nutzt die
+Größe des Images, um die korrekte Zahl an Bytes von der CD-ROM zu lesen.
+
+<informalexample><screen>
+$ dd if=/dev/cdrom | \
+> head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \
+> md5sum
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Wenn die CD-ROM nicht mehr erkannt wird, nachdem der Installer erfolgreich
+davon gestartet hat, kann es funktionieren, es einfach noch einmal zu
+probieren. Haben Sie mehr als ein CD-ROM-Laufwerk, versuchen Sie, die
+CD-ROM in das andere Laufwerk einzulegen. Funktioniert dies auch nicht
+oder die CD-ROM wird zwar erkannt, aber es gibt trotzdem Fehler beim
+Lesen, versuchen Sie die folgenden Empfehlungen. Dazu sind einige
+grundlegende Linux-Kenntnisse nötig. Um die aufgelisteten Kommandos
+auszuführen, sollten Sie zunächst auf die zweite virtuelle Konsole (VT2)
+wechseln und dort die Shell aktivieren.
+
+<itemizedlist>
+  <listitem><para>
+
+Wechseln Sie auf VT4 oder lesen Sie den Inhalt der Datei
+<filename>/var/log/syslog</filename> (nutzen Sie <command>nano</command>
+als Editor), um zu überprüfen, ob eventuell spezielle Fehlermeldungen
+vorhanden sind. Überprüfen Sie danach auch die Ausgabe von
+<command>dmesg</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Kontrollieren Sie in der Ausgabe von <command>dmesg</command>, ob Ihr
+CD-ROM-Laufwerk erkannt wurde. Es sollte etwas ähnliches angezeigt werden
+wie dies (die Zeilen müssen allerdings nicht zwingend direkt aufeinander
+folgend angezeigt werden):
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+Sollten Sie solche Zeilen nicht finden, besteht die Möglichkeit, dass der
+Controller, an den Ihr Laufwerk angeschlossen ist, nicht erkannt wurde oder
+von Linux nicht unterstützt wird. Falls Sie wissen, welcher Treiber dafür
+benötigt wird, können Sie versuchen, ihn mit <command>modprobe</command>
+zu laden.
+
+  </para></listitem>
+  <listitem><para>
+
+Überprüfen Sie, ob eine Gerätedatei (device node) für Ihr CD-ROM-Laufwerk
+in <filename>/dev/</filename> existiert. In dem obigen Beispiel
+wäre dies <filename>/dev/hdc</filename>. Es sollte auch
+<filename>/dev/cdroms/cdrom0</filename> existieren.
+
+  </para></listitem>
+  <listitem><para>
+
+Kontrollieren Sie mittels <command>mount</command>, ob die CD-ROM
+bereits ins Dateisystem eingehängt ist; falls nicht, erledigen Sie dies
+manuell:
+
+<informalexample><screen>
+$ mount /dev/<replaceable>hdc</replaceable> /cdrom
+</screen></informalexample>
+
+Achten Sie darauf, ob nach diesem Befehl irgendwelche Fehlermeldungen
+angezeigt werden.
+
+  </para></listitem>
+  <listitem><para>
+
+Überprüfen Sie, ob DMA im Moment aktiviert ist:
+
+<informalexample><screen>
+$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
+$ grep dma settings
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+Eine <quote>1</quote> an der ersten Stelle (direkt hinter
+<quote>using_dma</quote>) bedeutet, dass DMA aktiviert ist. Sollte
+dies so sein, versuchen Sie, es zu deaktivieren:
+
+<informalexample><screen>
+$ echo -n "using_dma:0" >settings
+</screen></informalexample>
+
+Stellen Sie sicher, dass Sie sich in dem Verzeichnis befinden, das zu
+Ihrem CD-ROM-Laufwerk gehört.
+
+  </para></listitem>
+  <listitem><para>
+
+Falls während der Installation irgendwelche Probleme auftreten, überprüfen
+Sie die Integrität der CD-ROM mittels der entsprechenden Option im
+Hauptmenü des Installers (ziemlich weit unten). Sie können dies auch nutzen,
+um zu testen, ob die CD-ROM zuverlässig gelesen werden kann.
+
+  </para></listitem>
+</itemizedlist>
+
+</para>
+  </sect3>
+  </sect2>
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>(Un-)Zuverlässigkeit von Floppy-Disks</title>
@@ -27,8 +253,9 @@ zeigt.
 </para><para>
 
 Wenn Sie mit einer bestimmten Floppy einen Abbruch der Installation
-haben, sollten Sie als erstes das Floppy-Disk-Image erneut herunterladen
-und auf eine <emphasis>andere</emphasis> Diskette schreiben. Die alte
+haben, sollten Sie als erstes das Floppy-Disk-Image auf eine
+<emphasis>andere</emphasis> Diskette schreiben und schauen, ob dies
+das Problem löst. Die alte
 Disk einfach nur neu zu formatieren, könnte nicht ausreichend sein,
 selbst wenn das Neuformatieren und Beschreiben scheinbar ohne Fehler
 funktioniert. Manchmal kann es auch sinnvoll sein, die Floppy
@@ -37,8 +264,15 @@ testweise auf einem anderen System zu beschreiben.
 </para><para>
 
 Jemand hat uns berichtet, dass er die Images <emphasis>dreimal</emphasis>
-auf Diskette schreiben musste, bis eine funktionierte, und dann war auch
-mit der dritten Floppy alles in Ordnung.
+auf Diskette schreiben musste, bis eine funktionierte, und
+mit der dritten Floppy war dann alles in Ordnung.
+
+</para><para>
+
+Normalerweise sollte es nicht nötig sein, das Floppy-Image neu herunterzuladen,
+wenn Sie aber Probleme feststellen, ist es immer nützlich, über die
+md5sum-Prüfsummen zu kontrollieren, ob die Images korrekt heruntergeladen
+wurden.
 
 </para><para>
 
@@ -136,7 +370,7 @@ enthält Details zu diesem Thema.
 Einige Laptop-Modelle von Dell sind bekannt dafür, dass Sie sich aufhängen,
 wenn die PCMCIA-Geräteerkennung versucht, bestimmte Hardwareadressen
 abzufragen. Andere Modelle können ähnliche Symptome zeigen. Wenn Ihnen solche
-Probleme unter kommen und Sie kein PCMCIA-Gerät während der Installation
+Probleme unterkommen und Sie kein PCMCIA-Gerät während der Installation
 benötigen, können Sie PCMCIA komplett deaktivieren, indem Sie den
 Boot-Parameter <userinput>hw-detect/start_pcmcia=false</userinput>
 benutzen. Nachdem die Installation abgeschlossen ist, können Sie PCMCIA so
@@ -255,7 +489,7 @@ und schicken Sie ihn als Fehlerbericht gegen das Pseudo-Paket
 Package: installation-reports
 
 Boot method: &lt;How did you boot the installer? CD? floppy? network?&gt;
-Image version: &lt;Fill in date and from where you got the image&gt;
+Image version: &lt;Full URL to image you downloaded is best&gt;
 Date: &lt;Date and time of the install&gt;
 
 Machine: &lt;Description of machine (eg, IBM Thinkpad R32)&gt;
@@ -263,23 +497,24 @@ Processor:
 Memory:
 Partitions: &lt;df -Tl will do; the raw partition table is preferred&gt;
 
-Output of lspci and lspci -n:
+Output of lspci -nn and lspci -vnn:
 
 Base System Installation Checklist:
 [O] = OK, [E] = Error (please elaborate below), [ ] = didn't try it
 
-Initial boot worked:    [ ]
-Configure network HW:   [ ]
-Config network:         [ ]
+Initial boot:           [ ]
+Detect network card:    [ ]
+Configure network:      [ ]
 Detect CD:              [ ]
 Load installer modules: [ ]
 Detect hard drives:     [ ]
 Partition hard drives:  [ ]
-Create file systems:    [ ]
-Mount partitions:       [ ]
 Install base system:    [ ]
+Clock/timezone setup:   [ ]
+User/password setup:    [ ]
+Install tasks:          [ ]
 Install boot loader:    [ ]
-Reboot:                 [ ]
+Overall install:        [ ]
 
 Comments/Problems:
 
