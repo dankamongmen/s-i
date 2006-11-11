@@ -8,10 +8,9 @@ use POSIX q{strftime};
 sub logpng {
 	my $log=shift;
 	my $basename=shift;
-	my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
 	my $desc=$log->{description};
 	$desc=~s/[^a-zA-Z0-9]//g;
-	return "$basebasename.$desc.png";
+	return "$basename.$desc.png";
 }
 
 sub aggregate {
@@ -35,7 +34,8 @@ sub aggregate {
 		if (length $log->{notes}) {
 			print $fh "Notes: ".$log->{notes}."<br>\n";
 		}
-		print $fh "<img src=\"".logpng($log, $basename)."\" alt=\"graph\">\n";
+		my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
+		print $fh "<img src=\"".logpng($log, $basebasename)."\" alt=\"graph\">\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
 		if ($logurl=~m#.*://#) {
 			if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
