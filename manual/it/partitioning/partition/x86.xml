@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39622 -->
+<!-- original version: 42250 -->
 
 
   <sect2 arch="x86">
@@ -14,18 +13,17 @@ you want to preserve that operating system while installing Debian, you may
 need to resize its partition to free up space for the Debian installation.
 The installer supports resizing of both FAT and NTFS filesystems; when you
 get to the installer's partitioning step, select the option
-<guimenuitem>Manually edit partition table</guimenuitem> and then simply
-select an existing partition and change its size.
+<guimenuitem>Manual</guimenuitem> and then simply select an existing
+partition and change its size.
 -->
 
-Se si usa già un altro sistema operativo come DOS o Windows e si intende
+Se si usa giÃ  un altro sistema operativo come DOS o Windows e si intende
 preservarlo mentre si installa Debian, potrebbe essere necessario
 ridimensionare la sua partizione per liberare spazio per l'installazione
 di Debian. L'installatore supporta il ridimensionamento dei file system
 FAT e NTFS: arrivati alla fase di partizionamento, occorre selezionare
-l'opzione <guimenuitem>Modificare la tabella delle partizioni
-manualmente</guimenuitem> e poi scegliere la partizione esistente da
-ridimensionare.
+l'opzione <guimenuitem>Manuale</guimenuitem> e poi scegliere la partizione
+esistente da ridimensionare.
 
 </para><para>
 
@@ -41,10 +39,10 @@ this section will include a brief overview to help you plan most situations.
 -->
 
 Il BIOS dei PC comporta alcuni vincoli riguardanti il partizionamento del disco.
-C'è un limite al numero di partizioni <quote>primarie</quote> e
+C'Ã¨ un limite al numero di partizioni <quote>primarie</quote> e
 <quote>logiche</quote> che possono essere contenute in un disco. Inoltre, i BIOS
 anteriori al periodo 1994&ndash;98 contengono limitazioni sulla posizione del disco
-che può essere avviata dal BIOS. È possibile trovare maggiori informazioni nel
+che puÃ² essere avviata dal BIOS. Ãˆ possibile trovare maggiori informazioni nel
 <ulink url="&url-partition-howto;">Linux Partition HOWTO</ulink> e nella
 <ulink url="&url-phoenix-bios-faq-large-disk;">Phoenix BIOS FAQ</ulink>, ma
 questo capitolo contiene una breve panoramica utile nella maggior parte delle
@@ -67,9 +65,9 @@ Le partizioni <quote>primarie</quote> sono il tipo di partizione tradizionale
 per i dischi dei PC. Tuttavia, possono esisterne al massimo quattro per ogni
 disco; per superare questa limitazione, sono state introdotte le partizioni
 <quote>estese</quote> e <quote>logiche</quote>. Impostando una partizione
-primaria come partizione estesa, è possibile suddividere ulteriormente lo spazio
-allocato a questa partizione in più partizioni logiche. È possibile creare fino
-a 60 partizioni logiche per ogni partizione estesa, ma è possibile avere solo
+primaria come partizione estesa, Ã¨ possibile suddividere ulteriormente lo spazio
+allocato a questa partizione in piÃ¹ partizioni logiche. Ãˆ possibile creare fino
+a 60 partizioni logiche per ogni partizione estesa, ma Ã¨ possibile avere solo
 una partizione estesa per ogni disco.
 
 </para><para>
@@ -88,8 +86,8 @@ Linux limita il numero delle partizioni per disco a 15 partizioni sui dischi
 SCSI (3 partizioni primarie e 12 partizioni logiche), e a 63 partizioni sui
 dischi IDE (3 partizioni primarie, 60 partizioni logiche). Tuttavia, il sistema
 &debian; standard fornisce solo 20 file di device per rappresentare le
-partizioni, quindi se si intende creare più di 20 partizioni occorrerà prima
-creare manualmente di device per le nuove partizioni.
+partizioni, quindi se si intende creare piÃ¹ di 20 partizioni occorrerÃ  prima
+creare manualmente i device per le nuove partizioni.
 
 </para><para>
 
@@ -101,8 +99,8 @@ must be placed within the first 1024 cylinders of your hard drive
 (usually around 524 megabytes, without BIOS translation).
 -->
 
-Se si possiede un disco IDE grande e non si sta usando né l'indirizzamento LBA,
-né i driver talvolta forniti dai produttori di hard disk, allora la partizione
+Se si possiede un disco IDE grande e non si sta usando nÃ© l'indirizzamento LBA,
+nÃ© i driver talvolta forniti dai produttori di hard disk, allora la partizione
 di avvio (quella che contiene l'immagine del kernel) deve trovarsi all'interno
 dei primi 1024 cilindri del disco (di solito circa 524&nbsp;MB, senza
 traduzione da parte del BIOS).
@@ -123,16 +121,16 @@ has, these restrictions no longer apply, since Linux does not use the
 BIOS for disk access.
 -->
 
-Questa restrizione non è rilevante se si possiede un BIOS più recente del
+Questa restrizione non Ã¨ rilevante se si possiede un BIOS piÃ¹ recente del
 periodo 1995&ndash;98 (a seconda del produttore) che supporta la <quote>Enhanced
 Disk Drive Support Specification</quote>.  Sia Lilo, il Linux loader, sia il
 programma alternativo di Debian <command>mbr</command> devono affidarsi al BIOS
 per leggere il kernel dal disco e caricarlo nella RAM. Se il BIOS supporta le
 estensioni int 0x13 per l'accesso ai dischi grandi, queste verranno utilizzate;
-altrimenti occorrerà utilizzare la vecchia interfaccia di accesso al disco, che
-non può accedere porzioni del disco che si trovano oltre il 1023-esimo cilindro.
+altrimenti occorrerÃ  utilizzare la vecchia interfaccia di accesso al disco, che
+non puÃ² accedere porzioni del disco che si trovano oltre il 1023-esimo cilindro.
 Una volta avviato Linux, qualsiasi sia il BIOS del computer, queste restrizioni
-non sono più vincolanti, visto che Linux non usa il BIOS per accedere al disco.
+non sono piÃ¹ vincolanti, visto che Linux non usa il BIOS per accedere al disco.
 
 </para><para>
 
@@ -148,10 +146,10 @@ within the <emphasis>translated</emphasis> representation of the
 1024th cylinder.
 -->
 
-Se si ha un disco grande, è possibile che si debbano usare tecniche di
+Se si ha un disco grande, Ã¨ possibile che si debbano usare tecniche di
 traduzione del numero di cilindri da attivare nel proprio BIOS, come ad esempio
-l'LBA (Logical Block Addressing) o la modalità CHS (<quote>Large</quote>).
-È possibile trovare maggiori informazioni su questo problema nel
+l'LBA (Logical Block Addressing) o la modalitÃ  CHS (<quote>Large</quote>).
+Ãˆ possibile trovare maggiori informazioni su questo problema nel
 <ulink url="&url-large-disk-howto;">Large Disk HOWTO</ulink>.  Se si usa uno
 schema di traduzione del numero di cilindri e il BIOS non supporta le estensioni
 per l'accesso ai dischi grandi, allora la partizione di avvio deve essere
@@ -178,7 +176,7 @@ del disco, da usare come partizione di avvio, e di creare tutte le altre
 partizioni nello spazio rimanente.
 Questa partizione di avvio <emphasis>deve</emphasis> essere montata su
 <filename>/boot</filename>, la directory destinata a contenere i kernel Linux.
-Questo tipo di configurazione funzionerà su tutti i sistemi, sia che venga usato
+Questo tipo di configurazione funzionerÃ  su tutti i sistemi, sia che venga usato
 l'LBA o la traduzione CHS, e a prescindere dal fatto che il proprio BIOS
 supporti le estensioni per l'accesso ai dischi grandi.
 

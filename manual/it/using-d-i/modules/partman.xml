@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41634 -->
+<!-- original version: 42323 -->
 
 
    <sect3 id="partman">
@@ -38,17 +38,39 @@ dal menu.
 If you choose guided partitioning, you may have three options: to create
 partitions directly on the hard disk (classic method), or to create them
 using Logical Volume Management (LVM), or to create them using encrypted
-LVM. Note: the option to use (encrypted) LVM may not be available on all
-architectures.
+LVM<footnote>
 -->
 
 Con il partizionamento guidato si hanno tre possibilità: creare le partizioni
 direttamente sull'hard disk (il metodo classico) oppure tramite il Logical
-Volume Management (LVM) oppure tramite LVM cifrato. Nota: la possibilità di
-usare LVM (cifrato o no) potrebbe non essere disponibile su tutte le
-architetture.
+Volume Management (LVM) oppure tramite LVM cifrato<footnote>
 
-</para><para>
+<para>
+
+<!--
+The installer will encrypt the LVM volume group using a 256 bit AES key and
+makes use of the kernel's <quote>dm-crypt</quote> support.
+-->
+
+Il sistema di installazione cifra il gruppo di volumi LVM con una chiave AES
+a 256 bit tramite il supporto <quote>dm-crypt</quote> del kernel.
+
+</para>
+
+</footnote>.
+
+</para>
+<note><para>
+
+<!--
+The option to use (encrypted) LVM may not be available on all architectures.
+-->
+
+La possibilità di usare LVM (cifrato o no) potrebbe non essere disponibile
+su tutte le architetture.
+
+</para></note>
+<para>
 
 <!--
 When using LVM or encrypted LVM, the installer will create most
@@ -65,6 +87,23 @@ operazione è che in seguito le partizioni interne possono essere
 ridimensionate abbastanza facilmente. Per LVM cifrato la partizione più
 grande non è leggibile senza conoscere la passphrase, questo fornisce un
 livello di sicurezza maggiore per i propri dati personali.
+
+</para><para>
+
+<!--
+When using encrypted LVM, the installer will also automatically erase the
+disk by writing random data to it. This further improves security (as it
+makes it impossible to tell which parts of the disk are in use and also
+makes sure that any traces of previous installations are erased), but may
+take some time depending on the size of your disk.
+-->
+
+Quando si usano volumi LVM cifrati, l'installatore cancella
+automaticamente il contenuto del disco scrivendovi dati casuali. Questo
+incrementa la sicurezza (rendendo impossibile riconoscere le parti del
+disco usate e assicurando la cancellazione di tutte le tracce delle
+precedenti installazioni) ma può richiedere molto tempo, a seconda
+della dimensione del disco.
 
 </para>
 <note><para>
@@ -92,7 +131,7 @@ If you choose guided partitioning (either classic or using (encrypted)
 LVM) for a whole disk, you will first be asked to select the disk you want
 to use. Check that all your disks are listed and, if you have several disks,
 make sure you select the correct one. The order they are listed in may
-differ from what you are used too. The size of the disks may help to identify
+differ from what you are used to. The size of the disks may help to identify
 them.
 -->
 

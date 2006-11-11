@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40875 -->
+<!-- original version: 42485 -->
 
 
  <sect1 id="boot-parms">
@@ -59,13 +59,10 @@ When the kernel boots, a message
 
 All'inizio del processo d'avvio il kernel mostra il messaggio
 
+<informalexample><screen>
 <!--
-<informalexample><screen>
 Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k available
--->
-
-<informalexample><screen>
-Memory:<replaceable>disp</replaceable>k/<replaceable>totale</replaceable>k available
+-->Memory:<replaceable>disp</replaceable>k/<replaceable>totale</replaceable>k available
 </screen></informalexample>
 
 <!--
@@ -143,19 +140,13 @@ Il sistema d'installazione riconosce alcuni parametri aggiuntivi<footnote>
 <para>
 
 <!--
-Note that the 2.4 kernel accepts a maximum of 8 command line options and
-8 environment options (including any options added by default for the
-installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options. With kernel 2.6.9 or newer,
-you can use 32 command line options and 32 environment options.
+With current kernels (2.6.9 or newer) you can use 32 command line options and
+32 environment options. If these numbers are exceeded, the kernel will panic.
 -->
 
-Notare che il kernel 2.4 accetta un massimo di 8 opzioni sulla riga di
-comando e di 8 opzioni d'ambiente (comprese tutte le opzioni aggiunte
-automaticamente dall'installatore). Se il numero di opzioni supera questo
-limite i kernel 2.4 scartano tutte le opzioni in eccesso. Con un kernel
-2.6.9 o successivo si possono usare 32 opzioni sulla riga di comando e 32
-opzioni d'ambiente.
+Con gli attuali kernel (2.6.9 e successivi) si possono usare 32 opzioni
+sulla riga di comando e 32 opzioni d'ambiente. Nel caso si superino questi
+limiti il kernel si blocca.
 
 </para>
 
@@ -571,6 +562,26 @@ Abbreviazione: <userinput>file</userinput>
 </varlistentry>
 
 <varlistentry>
+<term>auto-install/enabled</term>
+<listitem><para>
+
+<!--
+Delay questions that are normally asked before preseeding is possible until
+after the network is configured. Short form: <userinput>auto=true</userinput>
+See <xref linkend="preseed-auto"/> for details about using this to
+automate installs.
+-->
+
+Rimanda le domande che normalmente sono poste prima che sia possibile
+fare la preconfigurazione fino a quando non viene configurata la rete.
+Abbreviazione: <userinput>auto=true</userinput>
+Si vedano in <xref linkend="preseed-auto"/> i dettagli su come usare
+questo parametro per automatizzare l'installazione.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -656,5 +667,82 @@ ripristino anziché effettuare una normale installazione. Si consulti
 </varlistentry>
 
 </variablelist>
+  </sect2>
+
+  <sect2 id="module-parms">
+  <!-- <title>Passing parameters to kernel modules</title> -->
+  <title>Passaggio di parametri ai moduli del kernel</title>
+<para>
+
+<!--
+If drivers are compiled into the kernel, you can pass parameters to them
+as described in the kernel documentation. However, if drivers are compiled
+as modules and because kernel modules are loaded a bit differently during
+an installation than when booting an installed system, it is not possible
+to pass parameters to modules as you would normally do. Instead, you need
+to use a special syntax recognized by the installer which will then make
+sure that the parameters are saved in the proper configuration files and
+will thus be used when the modules are actually loaded. The parameters
+will also be propagated automatically to the configuration for the installed
+system.
+-->
+
+Se i driver sono compilati nel kernel, il passaggio dei parametri
+avviene come descritto nella documentazione del kernel. Invece, se i
+driver sono compilati come moduli, ciò non è possibile in quanto la
+modalità con cui questi vengono caricati durante l'installazione è
+leggermente diversa rispetto a come vengono caricati da un sistema
+installato. Per ovviare a ciò si deve usare una sintassi particolare
+riconosciuta dall'installatore, il quale assicura il salvataggio dei
+parametri nei file di configurazione corretti e quindi il loro uso
+nel momento in cui i moduli vengono caricati. Oltre a ciò, i parametri
+vengono propagati automaticamente anche nella configurazione del sistema
+installato.
+
+</para><para>
+
+<!--
+Note that it is now quite rare that parameters need to be passed to modules.
+In most cases the kernel will be able to probe the hardware present in a
+system and set good defaults that way. However, in some situations it may
+still be needed to set parameters manually.
+-->
+
+Oggigiorno la necessità di passare dei parametri ai moduli è molto rara;
+infatti nella maggioranza dei casi il kernel è in grado di riconoscere
+l'hardware presente e di usare dei valori predefiniti corretti. Purtroppo,
+in alcune situazioni, potrebbe ancora esserci il bisogno di impostare
+manualmente i parametri.
+
+</para><para>
+
+<!--
+The syntax to use to set parameters for modules is:
+-->
+
+La sintassi da usare per impostare i parametri dei moduli è:
+
+<informalexample><screen>
+<!--
+<replaceable>module_name</replaceable>.<replaceable>parameter_name</replaceable>=<replaceable>value</replaceable>
+--><replaceable>nome_modulo</replaceable>.<replaceable>nome_parametro</replaceable>=<replaceable>valore</replaceable>
+</screen></informalexample>
+
+<!--
+If you need to pass multiple parameters to the same or different modules,
+just repeat this. For example, to set an old 3Com network interface card
+to use the BNC (coax) connector and IRQ 10, you would pass:
+-->
+
+Se è necessario passare più parametri a uno stesso modulo o a più moduli
+diversi, è sufficiente ripetere la stessa sintassi. Per esempio, per
+impostare una vecchia scheda di rete 3Com in modo che usi il connettore
+BNC (coassiale) e l'IRQ 10 si deve passare:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
   </sect2>
  </sect1>
