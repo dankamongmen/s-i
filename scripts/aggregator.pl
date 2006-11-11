@@ -5,6 +5,14 @@ use warnings;
 use strict;
 use POSIX q{strftime};
 
+sub logpng {
+	my $log=shift;
+	my $basename=shift;
+	my $desc=$log->{description};
+	$desc=~s/[^a-zA-Z0-9]//g;
+	return "$basename.$desc.png";
+}
+
 sub aggregate {
 	my $fh=shift;
 	my $basename=shift;
@@ -26,6 +34,7 @@ sub aggregate {
 		if (length $log->{notes}) {
 			print $fh "Notes: ".$log->{notes}."<br>\n";
 		}
+		print $fh "<img src=\"".logpng($log, $basename)."\" alt=\"graph\">\n";
 		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
 		if ($logurl=~m#.*://#) {
 			if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
@@ -109,26 +118,23 @@ sub aggregate {
 	close STATS;
 	
 	# plot the stats
-	open (GNUPLOT, "| gnuplot") || die "gnuplot: $!";
-	print GNUPLOT qq{
-set timefmt "%m/%d/%Y %H:%M"
-set xdata time
-set format x "%m/%y"
-set yrange [-2 to 102]
-set ylabel 'percent successful'
-set terminal png giant size 640,640
-set output '$basename.png'
-set key below
-};
 	my $c=2;
-	print GNUPLOT "plot";
 	foreach my $log (@_) {
+		my $png=logpng($log, $basename);
+		open (GNUPLOT, "| gnuplot") || die "gnuplot: $!";
+		print GNUPLOT qq{
+			set timefmt "%m/%d/%Y %H:%M"
+			set xdata time
+			set format x "%m/%y"
+			set yrange [-2 to 102]
+			set terminal png size 640,128
+			set output '$png'
+			set key off
+		};
 		$c++;
-		print GNUPLOT " '$basename.stats' using 1:$c title \"".$log->{description}."\" with lines,";
+		print GNUPLOT "plot '$basename.stats' using 1:$c title \"".$log->{description}."\" with lines";
+		close GNUPLOT;
 	}
-	$c++;
-	print GNUPLOT " '$basename.stats' using 1:$c title 'overall' with lines\n";
-	close GNUPLOT;
 	
 	return ($total, $failed, $success, $old);
 }
