@@ -104,11 +104,6 @@ void free_description_data( GtkObject *obj, struct frontend_question_data* data 
     free(data);
 }
 
-void free_treemodel_data( GtkWidget *widget, struct question_treemodel_data* data )
-{
-    free(data);
-}
-
 gboolean is_first_question (struct question *q)
 {
     struct question *crawl;
@@ -752,7 +747,7 @@ static int gtkhandler_multiselect_single(struct frontend *obj, struct question *
     data->q = q;
     data->treemodel = model;
     g_signal_connect(G_OBJECT(renderer_check), "toggled", G_CALLBACK(multiselect_single_callback), data);
-    g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_treemodel_data), data);
+    g_signal_connect (G_OBJECT(view), "destroy", G_CALLBACK (free_description_data), data);
     g_object_unref (model);
 
     for (i = 0; i < count; i++)
