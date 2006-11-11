@@ -8,9 +8,10 @@ use POSIX q{strftime};
 sub logpng {
 	my $log=shift;
 	my $basename=shift;
+	my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
 	my $desc=$log->{description};
 	$desc=~s/[^a-zA-Z0-9]//g;
-	return "$basename.$desc.png";
+	return "$basebasename.$desc.png";
 }
 
 sub aggregate {
