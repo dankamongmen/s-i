@@ -369,16 +369,6 @@ void button_single_callback(GtkWidget *button, struct frontend_question_data* da
     gtk_main_quit();
 }
 
-void check_toggled_callback (GtkWidget *toggle, gpointer data)
-{
-    struct question *q = (struct question*)data;
-    gboolean value;
-
-    /* INFO(INFO_DEBUG, "GTK_DI - check_toggled_callback() called"); */
-    value = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(toggle));
-    bool_setter (toggle, q);
-}
-
 void boolean_single_callback(GtkWidget *button, struct frontend_question_data* data )
 {
     struct frontend *obj = data->obj;
@@ -607,23 +597,21 @@ GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
         gtk_widget_modify_base(GTK_WIDGET(ext_description_view), GTK_STATE_NORMAL, bg_color);
     }
 
-    /* here is created the question's description, unless question is BOOLEAN */
-    if( strcmp(q->template->type, "boolean") != 0 ) {
-        description_view = gtk_text_view_new ();
-        description_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (description_view));
-        gtk_text_buffer_set_text (description_buffer, q_get_description(q), -1);
-        gtk_text_view_set_editable (GTK_TEXT_VIEW(description_view), FALSE);
-        gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(description_view), FALSE);
-        gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(description_view), GTK_WRAP_WORD);
-        gtk_text_view_set_left_margin (GTK_TEXT_VIEW(description_view), 4);
-        gtk_text_view_set_right_margin (GTK_TEXT_VIEW(description_view), 4);
-        gtk_text_buffer_create_tag (description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
-        g_object_set_data (G_OBJECT (description_view), "tag", "italic");
-        gtk_text_buffer_get_start_iter  (description_buffer, &start);
-        gtk_text_buffer_get_end_iter  (description_buffer, &end);
-        gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
-        gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, bg_color);
-    }
+    /* here is created the question's description */
+    description_view = gtk_text_view_new ();
+    description_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (description_view));
+    gtk_text_buffer_set_text (description_buffer, q_get_description(q), -1);
+    gtk_text_view_set_editable (GTK_TEXT_VIEW(description_view), FALSE);
+    gtk_text_view_set_cursor_visible (GTK_TEXT_VIEW(description_view), FALSE);
+    gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW(description_view), GTK_WRAP_WORD);
+    gtk_text_view_set_left_margin (GTK_TEXT_VIEW(description_view), 4);
+    gtk_text_view_set_right_margin (GTK_TEXT_VIEW(description_view), 4);
+    gtk_text_buffer_create_tag (description_buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
+    g_object_set_data (G_OBJECT (description_view), "tag", "italic");
+    gtk_text_buffer_get_start_iter  (description_buffer, &start);
+    gtk_text_buffer_get_end_iter  (description_buffer, &end);
+    gtk_text_buffer_apply_tag_by_name (description_buffer, "italic", &start, &end);
+    gtk_widget_modify_base(GTK_WIDGET(description_view), GTK_STATE_NORMAL, bg_color);
 
     gtk_container_set_focus_chain(GTK_CONTAINER(description_box), NULL);
 
@@ -637,8 +625,7 @@ GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
     {
         if (strlen (q_get_extended_description(q)) > 0)
             gtk_box_pack_start(GTK_BOX (description_box), ext_description_view, FALSE, FALSE, 2);
-        if( strcmp(q->template->type, "boolean") != 0 )
-            gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
+        gtk_box_pack_start(GTK_BOX (description_box), description_view, FALSE, FALSE, 3);
     }
 
     if ( strcmp(q->template->type,"note") == 0 )
@@ -660,40 +647,48 @@ GtkWidget* display_descriptions(struct question *q, struct frontend *obj)
 
 static int gtkhandler_boolean(struct frontend *obj, struct question *q, GtkWidget *qbox)
 {
-    GtkWidget *description_box, *check, *hpadbox, *vpadbox;
+    GtkWidget *description_box, *radio_false, *radio_true, *hpadbox, *vpadbox;
     struct frontend_question_data *data;
     const char *defval = question_getvalue(q, "");
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean() called"); */
 
-    data = NEW(struct frontend_question_data);
+    data = NEW (struct frontend_question_data);
     data->obj = obj;
     data->q = q;
 
-    check = gtk_check_button_new_with_label(q_get_description(q));
-    if (strcmp(defval, "true") == 0)
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), TRUE);
-    else
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), FALSE);
+    radio_false = gtk_radio_button_new_with_label (NULL, question_get_text (obj, "debconf/no", "No"));
+    radio_true = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON (radio_false), question_get_text (obj, "debconf/yes", "Yes"));
 
-    if (q->next == NULL && q->prev == NULL)
-        g_signal_connect (G_OBJECT(check), "toggled", G_CALLBACK(check_toggled_callback), q);
-    else
-        register_setter(bool_setter, check, q, obj);
+    if (strcmp (defval, "true") == 0) {
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_false), FALSE);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_true), TRUE);
+    }
+    else {
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_false), TRUE);
+        gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (radio_true), FALSE);
+    }
 
-    g_signal_connect (G_OBJECT(check), "destroy", G_CALLBACK (free_description_data), data);
+    register_setter(bool_setter, radio_true, q, obj);
 
-    description_box = display_descriptions(q, obj);
+    g_signal_connect (G_OBJECT (radio_true), "destroy", G_CALLBACK (free_description_data), data);
+
+    description_box = display_descriptions (q, obj);
 
     vpadbox = gtk_vbox_new (FALSE, DEFAULT_PADDING);
     gtk_box_pack_start (GTK_BOX(vpadbox), description_box, FALSE, FALSE, 0);
-    gtk_box_pack_start (GTK_BOX(vpadbox), check, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(vpadbox), radio_false, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(vpadbox), radio_true, FALSE, FALSE, 0);
     hpadbox = gtk_hbox_new (FALSE, DEFAULT_PADDING);
-    gtk_box_pack_start (GTK_BOX(hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
-    gtk_box_pack_start(GTK_BOX(qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
+    gtk_box_pack_start (GTK_BOX (hpadbox), vpadbox, TRUE, TRUE, QUESTIONBOX_HPADDING);
+    gtk_box_pack_start(GTK_BOX (qbox), hpadbox, FALSE, FALSE, QUESTIONBOX_VPADDING);
 
-    if (is_first_question(q))
-        gtk_widget_grab_focus(check);
+    if (is_first_question (q)) {
+        if (strcmp (defval, "true") == 0)
+            gtk_widget_grab_focus (radio_true);
+        else
+            gtk_widget_grab_focus (radio_false);
+    }
 
     return DC_OK;
 }
