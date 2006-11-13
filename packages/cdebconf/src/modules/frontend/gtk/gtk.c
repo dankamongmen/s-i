@@ -1124,8 +1124,10 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
                     path = gtk_tree_model_get_path(model, &iter);
+                    gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model, &iter), TRUE);
+                    gtk_tree_path_free (path);
+                    path = gtk_tree_model_get_path(model, &child);
                     gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-                    gtk_tree_view_expand_row (GTK_TREE_VIEW(view), path, TRUE);
                     gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
                     gtk_tree_path_free (path);
                 }
