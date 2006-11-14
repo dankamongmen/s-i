@@ -86,6 +86,13 @@ struct question_treemodel_data
 	GtkTreeModel *treemodel;
 };
 
+/* used to pass default path and callback function id to single SELECT question callback function */
+struct treeview_expose_callback_data
+{
+    gchar *path;
+    gulong callback_function;
+};
+
 /* Functions registered here will be called after each question run. It is to be used
    to retrieve the data from the widgets and store it in the question database */
 void register_setter(void (*func)(void*, struct question*), 

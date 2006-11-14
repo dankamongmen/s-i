@@ -259,6 +259,19 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
     return FALSE;
 }
 
+/* Scrolling to default row in SELECT questions has to be done after the
+ * treeview has been realized
+ */
+void treeview_exposed_callback (GtkWidget *widget, GdkEventExpose *event, struct treeview_expose_callback_data *data)
+{
+    GtkTreePath *path  = gtk_tree_path_new_from_string (data -> path);
+    gtk_tree_view_set_cursor (GTK_TREE_VIEW (widget), path, NULL, FALSE);
+    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (widget ), path, NULL, TRUE, 0.5, 0);
+    gtk_tree_path_free (path);
+    g_signal_handler_disconnect (G_OBJECT(widget), data->callback_function);
+    free(data);
+}
+
 void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
 {
     GdkWindow *gdk_window;
@@ -972,7 +985,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     GtkWidget           *view, *scroll, *frame;
     GtkCellRenderer     *renderer;
     GtkTreeSelection    *selection;
-    GtkTreePath         *path;
+    struct treeview_expose_callback_data *expose_data = NEW (struct treeview_expose_callback_data);
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_list() called"); */
 
@@ -1003,7 +1016,6 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
 
     model = GTK_TREE_MODEL( store );
     gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
-    g_object_unref (model);
 
     for (i = 0; i < count; i++)
     {
@@ -1011,23 +1023,20 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
         gtk_list_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
         if (defval && strcmp(choices[tindex[i]], defval) == 0)
         {
-            path = gtk_tree_model_get_path(model, &iter);
-            gtk_tree_view_scroll_to_cell    (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-            gtk_tree_view_set_cursor        (GTK_TREE_VIEW(view), path, NULL, FALSE);
-            gtk_tree_path_free (path);
+            expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &iter));
+            expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
             flag_default_set = TRUE;
         }
         free(choices[tindex[i]]);
     }
-	/* by default the first row gets selected if no default option is specified */
-	if( flag_default_set == FALSE )
-	{
-		gtk_tree_model_get_iter_first (model,&iter);
-		path = gtk_tree_model_get_path(model, &iter);
-		gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
-		gtk_tree_path_free (path);
-	}
 
+    if( flag_default_set == FALSE )
+    {
+        gtk_tree_model_get_iter_first (model, &iter);
+        gtk_tree_view_set_cursor (GTK_TREE_VIEW (view), gtk_tree_path_new_from_indices ( 0, -1), NULL, FALSE);
+    }
+
+    g_object_unref (model);
     free(choices);
     free(choices_translated);
     free(tindex);
@@ -1066,6 +1075,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     int *tindex = NULL;
     const gchar *indices = q_get_indices(q);
     GtkWidget *hpadbox, *vpadbox, *description_box;
+    int flag_default_set = FALSE;
 
     GtkTreeModel        *model;
     GtkTreeStore        *store;
@@ -1073,7 +1083,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     GtkWidget           *view, *scroll, *frame;
     GtkCellRenderer     *renderer;
     GtkTreeSelection    *selection;
-    GtkTreePath         *path;
+    struct treeview_expose_callback_data *expose_data = NEW (struct treeview_expose_callback_data);
 	
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_select_treeview_store() called"); */
 
@@ -1104,7 +1114,6 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
     gtk_tree_view_set_enable_search (GTK_TREE_VIEW(view), TRUE);
     model = GTK_TREE_MODEL( store );
     gtk_tree_view_set_model (GTK_TREE_VIEW (view), model);
-    g_object_unref (model);
 
     for (i = 0; i < count; i++)
     {
@@ -1112,60 +1121,60 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
         if(strcmp(q->tag, "countrychooser/country-name") == 0 )
         {
             if( ((choices_translated[i][0]=='-') && (choices_translated[i][1]=='-')) )
-            {    /* father */
+            {    /* father, continent, will never receive focus by default*/
                 gtk_tree_store_append (store, &iter,NULL);
                 gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
             }
             else
-            {    /* child */
+            {    /* child, country */
                 gtk_tree_store_append (store, &child, &iter);
                 gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
 
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
-                    path = gtk_tree_model_get_path(model, &iter);
-                    gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model, &iter), TRUE);
-                    gtk_tree_path_free (path);
-                    path = gtk_tree_model_get_path(model, &child);
-                    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
-                    gtk_tree_path_free (path);
+                    gtk_tree_view_expand_row (GTK_TREE_VIEW (view), gtk_tree_model_get_path (model, &iter), TRUE);
+                    expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &child));
+                    expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
+                    flag_default_set = TRUE;
                 }
             }
         }
         else if(strcmp(q->tag, "partman/choose_partition") == 0 )
         {
             if( strstr(choices_translated[i],"    ")!=NULL )
-            {    /* child */
+            {    /* child, partition */
                 gtk_tree_store_append (store, &child, &iter);
                 gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
-
-                path = gtk_tree_model_get_path(model, &iter);
+                gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model, &iter), TRUE);
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
-                    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
+                    expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &child));
+                    expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
+                    flag_default_set = TRUE;
                 }
-                path = gtk_tree_model_get_path(model, &iter);
-                gtk_tree_view_expand_row (GTK_TREE_VIEW(view), path, TRUE);
-                gtk_tree_path_free (path);
             }
             else
-            {    /* father */
+            {    /* father, disk */
                 gtk_tree_store_append (store, &iter,NULL);
                 gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
                 if (defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
-                    path = gtk_tree_model_get_path(model, &iter);
-                    gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW(view), path, NULL, FALSE, 0.5, 0);
-                    gtk_tree_view_set_cursor (GTK_TREE_VIEW(view), path, NULL, FALSE);
-                    gtk_tree_path_free (path);
+                    expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &iter));
+                    expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
+                    flag_default_set = TRUE;
                 }
             }
         }
         free(choices[tindex[i]]);
     }
 
+    if (flag_default_set == FALSE)
+    {
+        gtk_tree_model_get_iter_first (model, &iter);
+        gtk_tree_view_set_cursor (GTK_TREE_VIEW (view), gtk_tree_path_new_from_indices ( 0, -1), NULL, FALSE);
+    }
+
+    g_object_unref (model);
     free(choices);
     free(choices_translated);
     free(tindex);
