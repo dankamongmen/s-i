@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <string.h>
 
 /* from <linux/cdrom.h> */
 #define CDROM_GET_CAPABILITY	0x5331	/* get capabilities */
@@ -31,6 +32,16 @@ is_cdrom(const char *path)
 #define is_cdrom(path) 0
 #endif /* __linux__ */
 
+#ifdef __linux__
+static int
+is_floppy(const char *path)
+{
+	return (strstr(path, "/dev/floppy") != NULL);
+}
+#else /* !__linux__ */
+#define is_floppy(path) 0
+#endif /* __linux__ */
+
 int
 main(int argc, char *argv[])
 {
@@ -40,7 +51,7 @@ main(int argc, char *argv[])
         for (dev = NULL; NULL != (dev = ped_device_get_next(dev));) {
 		if (dev->read_only)
 			continue;
-		if (is_cdrom(dev->path))
+		if (is_cdrom(dev->path) || is_floppy(dev->path))
 			continue;
                 printf("%s\t%lli\t%s\n",
                        dev->path,
