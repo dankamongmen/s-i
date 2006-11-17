@@ -836,8 +836,6 @@ default_disk_label () {
 		    echo msdos;;
 		ads)
 		    echo msdos;;
-		nslu2)
-		    echo msdos;;
 		versatile)
 		    echo msdos;;
 		*)
@@ -845,7 +843,7 @@ default_disk_label () {
 	    esac;;
 	armeb)
 	    case "$sub" in
-		nslu2)
+		ixp4xx)
 		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
