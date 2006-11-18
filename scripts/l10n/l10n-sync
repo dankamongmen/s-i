@@ -9,6 +9,8 @@
 # See installer/doc/i18n/i18n.txt for details about 
 # the single master file for translations
 
+# 2006/09/23: implement two levels, so two master files
+
 COMMIT_MARKER="[l10n] [SILENT_COMMIT]"
 
 # Defaults
@@ -19,12 +21,15 @@ BIG_COMMITS=N
 DEBUG=N
 KEEP_REVISION=N
 FORCE_RUN=N
+UPDATEPO=Y
+SYNCPKGS=Y
 svn=svn
 debconfupdatepo=debconf-updatepo
+LEVELS=2
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
+echo  "$0 [--online] [--debug] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--levels="number_of_levels"] [--debconf-updatepo="debconf-updatepo command"] <D-I repository path>"
 echo  "    --debug             : Verbose output"
 echo  "    --online            : Work online (will update the local copy on"
 echo  "                          the fly)"
@@ -37,6 +42,8 @@ echo  "                          implies --online"
 echo  "    --force             : Forced run even if 'run=0'"
 echo  "                          appears in packages/po/run-l10n-sync"
 echo  "                          Should only be used in manual runs"
+echo  "    --noupdatepo        : Do not run debconf-updatepo for each package"
+echo  "    --nosyncpkgs        : Do not sync PO files for each package"
 echo  "    --atomic-updates    : Do a \"svn up\" before each step"
 echo  "                          (VERY time consuming)"
 echo  "                          implies --online"
@@ -45,6 +52,7 @@ echo  "                          for a given language"
 echo  "                          meant for use when switching a language"
 echo  "                          NOT RECOMMENDED in other situations"
 echo  "    --svn               : path to the svn binary"
+echo  "    --levels            : number of levels"
 echo  "    --debconf-updatepo  : debconf-updatepo command line"
 echo  "                          (for using hacked debconf-updatepo)"
 echo  "    --merge="other_dir" : merge master files from master files"
@@ -56,8 +64,8 @@ svnerr() {
 echo "Error in a SVN operation, please investigate"
 echo "Trying to cleanup locks..."
 if "$DI_COPY" ;  then
-  cd $DI_COPY
-  $svn cleanup
+	cd $DI_COPY
+	$svn cleanup
 fi
 exit 1
 }
@@ -77,557 +85,653 @@ exit 3
 ##  Command line parsing
 MORETODO=true
 while $MORETODO ; do
-    case "$1" in
-    "--online")
-        ONLINE=Y
-        shift
-        ;;
-    "--keep-revision"*)
-        KEEP_REVISION=`echo $1|cut -f2 -d=`
+	case "$1" in
+	"--online")
+		ONLINE=Y
+		shift
+		;;
+	"--keep-revision"*)
+		KEEP_REVISION=`echo $1|cut -f2 -d=`
 	if [ -z "$KEEP_REVISION" ] ; then
-	    usage
-	    exit 1
+		usage
+		exit 1
 	fi
-        shift
-        ;;
-    "--debug")
-        DEBUG=Y
-        shift
-        ;;
-    "--atomic")
-        ATOMIC_COMMITS=Y
-        shift
-        ;;      
-    "--atomic-updates")
-        ATOMIC_UPDATES=Y
-        shift
-        ;;      
-    "--commit")
-        BIG_COMMITS=Y
-        shift
-        ;;
-    "--force")
-        FORCE_RUN=Y
-        shift
-        ;;
-    "--merge="*)
-        MERGEDIR=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    "--svn="*)
-        svn=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    "--debconf-updatepo="*)
-        debconfupdatepo=`echo $1|cut -f2 -d=`
-        shift
-        ;;
-    "--"*)
-        echo "Illegal option: $1" 1>&2
-        usage
-        exit 1
-        ;;
-    *)
-        DI_COPY=$1
-        MORETODO=false
-        ;;
-    esac
+		shift
+		;;
+	"--debug")
+		DEBUG=Y
+		shift
+		;;
+	"--atomic")
+		ATOMIC_COMMITS=Y
+		shift
+		;;      
+	"--atomic-updates")
+		ATOMIC_UPDATES=Y
+		shift
+		;;      
+	"--commit")
+		BIG_COMMITS=Y
+		shift
+		;;
+	"--force")
+		FORCE_RUN=Y
+		shift
+		;;
+	"--noupdatepo")
+		UPDATEPO=N
+		shift
+		;;
+	"--nosyncpkgs")
+		SYNCPKGS=N
+		shift
+		;;
+	"--merge="*)
+		MERGEDIR=`echo $1|cut -f2 -d=`
+		shift
+		;;
+	"--svn="*)
+		svn=`echo $1|cut -f2 -d=`
+		shift
+		;;
+	"--levels="*)
+		LEVELS=`echo $1|cut -f2 -d=`
+		shift
+		;;
+	"--debconf-updatepo="*)
+		debconfupdatepo=`echo $1|cut -f2 -d=`
+		shift
+		;;
+	"--"*)
+		echo "Illegal option: $1" 1>&2
+		usage
+		exit 1
+		;;
+	*)
+		DI_COPY=$1
+		MORETODO=false
+		;;
+	esac
 done
 
 if [ -z "$DI_COPY" ]
 then
-  usage
-  exit 1
+	usage
+	exit 1
+fi
+
+# If LEVELS=0 we use the old way (no levels)
+if [ "$LEVELS" != "0" ] ; then
+	WITHLEVELS=Y
+	LEVELS=`seq 1 $LEVELS`
+else
+	WITHLEVELS=N
+	LEVELS=1
 fi
 
 # If we asked for commits we are online...:-)
 if [ "$ATOMIC_COMMITS" = "Y" -o "$ATOMIC_UPDATES" = "Y" -o "$BIG_COMMITS" = "Y" ] ; then
-   ONLINE=Y
+	ONLINE=Y
 fi
 
 # If we asked for atomic commits, we don't want big commits
 if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-   BIG_COMMITS=N
+	BIG_COMMITS=N
 fi
 
 
 # A few checks about the D-I copy directory
 if [ ! -d $DI_COPY ] ; then
-  echo $DI_COPY does not exist
-  exit 1
+	echo $DI_COPY does not exist
+	exit 1
 fi
 
 if [ ! -d $DI_COPY/packages/.svn ] ; then
-  echo No $DI_COPY/packages/.svn directory found
-  echo $DI_COPY may not be a copy of Debian Installer SVN repository
-  exit 1
+	echo No $DI_COPY/packages/.svn directory found
+	echo $DI_COPY may not be a copy of Debian Installer SVN repository
+	exit 1
 fi
 
 if ! grep "/d-i/" $DI_COPY/packages/.svn/entries >/dev/null 2>&1 ; then
-  echo $DI_COPY does not seem to be a complete Debian Installer SVN copy
-  echo Please check it before...
-  exit 1
+	echo $DI_COPY does not seem to be a complete Debian Installer SVN copy
+	echo Please check it before...
+	exit 1
 fi
 
 if [ -n "$MERGEDIR" ] ; then
-  if [ -d "$MERGEDIR" ] ; then
-    if [ ! -d "$MERGEDIR/packages/po" ] ; then
-      echo $MERGEDIR/packages/po does not exist. Please check
-      echo whether $MERGEDIR is a complete Debian Installer checkout copy
-      exit 1
-    fi
-  else
-    echo $MERGEDIR is not a directory
-    exit 1
-  fi   
+	if [ -d "$MERGEDIR" ] ; then
+		if [ ! -d "$MERGEDIR/packages/po" ] ; then
+			echo $MERGEDIR/packages/po does not exist. Please check
+			echo whether $MERGEDIR is a complete Debian Installer checkout copy
+			exit 1
+		fi
+	else
+		echo $MERGEDIR is not a directory
+		exit 1
+	fi   
 fi
 
 # Checking a few utilities we need
 for i in msgcat msgmerge msgattrib `echo ${debconfupdatepo} | awk '{print $1};'` ; do
-  if ! which $i >/dev/null 2>&1 ; then
-    echo $i not found in the PATH
-    exit 1
-  fi
+	if ! which $i >/dev/null 2>&1 ; then
+		echo $i not found in the PATH
+		exit 1
+	fi
 done
 
 # Do not accept working on an unclean copy
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
-  echo $DI_COPY seems to contain some SVN conflict files
-  echo Please fix this before lauching the script again...
-  exit 1
+	echo $DI_COPY seems to contain some SVN conflict files
+	echo Please fix this before lauching the script again...
+	exit 1
 fi
 
 # First, update the packages/po directory
 # to get the run-l10n-sync file
 cd $DI_COPY/packages/po
 if [ "$ONLINE" = "Y" ] ; then
-  if [ "$DEBUG" = "Y" ] ; then
-    echo Synchronising $DI_COPY/packages:
-    $svn update || svnerr
-    echo Done.
-  else
-    $svn update >/dev/null 2>&1 || svnerr
-  fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Synchronising $DI_COPY/packages:
+		$svn update || svnerr
+		echo Done.
+	else
+		$svn update >/dev/null 2>&1 || svnerr
+	fi
 fi
 
 # Check the packages/po/run-l10n-sync file
 markerfile=${DI_COPY}/packages/po/run-l10n-sync
 if [ -f ${markerfile} ] ; then
-  . ${markerfile}
-  if [ -n "${run}" ] ; then
-    if [ ${run} = 0 ] ; then
-      if [ "${FORCE_RUN}" = "Y" ] ; then
-        echo Enforce running despite instruction in ${markerfile}...
-      else
-        echo Explicit request to no run the script in ${markerfile}...
-        exit 0
-      fi
-    fi
-  fi
+	. ${markerfile}
+	if [ -n "${run}" ] ; then
+		if [ ${run} = 0 ] ; then
+			if [ "${FORCE_RUN}" = "Y" ] ; then
+			echo Enforce running despite instruction in ${markerfile}...
+			else
+			echo Explicit request to no run the script in ${markerfile}...
+			exit 0
+			fi
+		fi
+	fi
 else
-  echo No ${markerfile} file: aborting...
-  exit 1
+	echo No ${markerfile} file: aborting...
+	exit 1
 fi
 
-# Check the packages/po/packages_list file
-listfile=${DI_COPY}/packages/po/packages_list
-if [ ! -r ${listfile} ] ; then
-  echo No ${listfile} file: aborting...
-  exit 1
+# Check the packages/po/packages_list* files
+if [ "$WITHLEVELS" = "N" ]; then
+	listfile1=${DI_COPY}/packages/po/packages_list
+else
+	for i in $LEVELS ; do
+		eval "listfile$i=${DI_COPY}/packages/po/packages_list_sublevel$i"
+		if [ ! -r `eval "echo \\$listfile$i"` ] ; then
+			echo No ${listfile1} file: aborting...
+			exit 1
+		fi
+	done
 fi
-
 # Do not accept working on a locked copy
 LOCKFILE=$DI_COPY/.l10n.lock
 if [ -f $LOCKFILE ] ; then
-  echo $LOCKFILE file detected.
-  echo $DI_COPY seems to be locked by another l10n process
-  echo Please fix this before lauching the script again...
-  exit 1
+	echo $LOCKFILE file detected.
+	echo $DI_COPY seems to be locked by another l10n process
+	echo Please fix this before lauching the script again...
+	exit 1
 else
-  touch $LOCKFILE
+	touch $LOCKFILE
 fi
 
 # First, update the copy of D-I repository
 cd $DI_COPY/packages
 if [ "$ONLINE" = "Y" ] ; then
-  if [ "$DEBUG" = "Y" ] ; then
-    echo Synchronising $DI_COPY/packages:
-    $svn update || svnerr
-    echo Done.
-  else
-    $svn update >/dev/null 2>&1 || svnerr
-  fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Synchronising $DI_COPY/packages:
+		$svn update || svnerr
+		echo Done.
+	else
+		$svn update >/dev/null 2>&1 || svnerr
+	fi
 fi
 
 # In case a merge has to be done with another directory
 # we update this directory as well
 if [ -n "$MERGEDIR" ] ; then
-  cd $MERGEDIR/packages/po
-  if [ "$ONLINE" = "Y" ] ; then
-    if [ "$DEBUG" = "Y" ] ; then
-      echo Synchronising the merge directory $MERGEDIR/packages/po:
-      $svn update || svnerr
-      echo Done.
-    else
-      $svn update >/dev/null 2>&1 || svnerr
-    fi
-  fi
+	cd $MERGEDIR/packages/po
+	if [ "$ONLINE" = "Y" ] ; then
+		if [ "$DEBUG" = "Y" ] ; then
+			echo Synchronising the merge directory $MERGEDIR/packages/po:
+			$svn update || svnerr
+			echo Done.
+		else
+			$svn update >/dev/null 2>&1 || svnerr
+		fi
+	fi
 fi
 
 # Let's check the thing again....ceinture et bretelles as we say in French
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
-  echo $DI_COPY seems to contain some SVN conflict files
-  echo Please fix this before lauching the script again...
-  exit 1
+	echo $DI_COPY seems to contain some SVN conflict files
+	echo Please fix this before lauching the script again...
+	exit 1
 fi
 
 # Build a list of all D-I packages with i18n material
 # The list of packages is taken from the file
 # "packages_list" maintained in packages/po
-packages=$(grep -v -E "^\#|^[[:space:]]*$" ${listfile})
-if [ "$DEBUG" = "Y" ] ; then
-  echo Done.
-fi
+for i in $LEVELS; do
+	if [ "$WITHLEVELS" = "Y" ] ; then
+		level=" for level $i"
+	else
+		level=""
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo -n "Build the list of packages with i18n material${level}..."
+	fi
+	listfile_tmp=`eval "echo \\$listfile$i"`
+	packages_tmp=$(grep -v -E "^\#|^[[:space:]]*$" ${listfile_tmp})
+	eval "packages$i=\"${packages_tmp}\""
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Done.
+	fi
+done
 
-pots=""
-for package in $packages ; do
-    pots="${pots} ${package}/debian/po/templates.pot"
+for i in $LEVELS; do
+	eval "pots$i=''"
+	for package in `eval "echo \\$packages$i"` ; do
+		eval "pots$i=\"\$pots$i ${package}/debian/po/templates.pot\""
+	done
 done
 
 # Loop over packages
 #  1a) sync the debian/ directory
 #  1b) run debconf-updatepo
 #  1c) commit back the changes
-if [ "$DEBUG" = "Y" ] ; then
-  echo Run debconf-updatepo for all packages:
-fi
+if [ "UPDATEPO" = "Y" ]; then
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Run debconf-updatepo for all packages:
+	fi
 
-for i in  $packages ; do 
- if [ "$DEBUG" = "Y" ] ; then
-  echo "  $i:"
- fi
- cd $DI_COPY/packages/$i/debian
- if [ "$ATOMIC_UPDATES" = "Y" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "    - Update..."
-     $svn update || svnerr
-   else
-     $svn update >/dev/null 2>&1 || svnerr
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-    echo Done.
-   fi
- fi
- if [ "$DEBUG" = "Y" ] ; then
-  echo -n "    - Debconf-updatepo..."
- fi
- cd $DI_COPY/packages/$i/debian
- if [ "$DEBUG" = "Y" ] ; then
-   $debconfupdatepo
- else
-   $debconfupdatepo >/dev/null 2>&1
- fi
- if [ "$DEBUG" = "Y" ] ; then
-   echo Done.
- fi
- if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "    - Commit..."
-   fi
-   cd $DI_COPY/packages/$i/debian/po
-   $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" || svnerr
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
- fi
-done
+	for i in  $packages1 $packages2; do 
+		if [ "$DEBUG" = "Y" ] ; then
+			echo "  $i:"
+		fi
+		cd $DI_COPY/packages/$i/debian
+		if [ "$ATOMIC_UPDATES" = "Y" ] ; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "    - Update..."
+				$svn update || svnerr
+			else
+				$svn update >/dev/null 2>&1 || svnerr
+			fi
+			if [ "$DEBUG" = "Y" ] ; then
+				echo Done.
+			fi
+		fi
+		if [ "$DEBUG" = "Y" ] ; then
+			echo -n "    - Debconf-updatepo..."
+		fi
+		cd $DI_COPY/packages/$i/debian
+		if [ "$DEBUG" = "Y" ] ; then
+			$debconfupdatepo
+		else
+			$debconfupdatepo >/dev/null 2>&1
+		fi
+		if [ "$DEBUG" = "Y" ] ; then
+			echo Done.
+		fi
+		if [ "$ATOMIC_COMMITS" = "Y" ] ; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "    - Commit..."
+			fi
+			cd $DI_COPY/packages/$i/debian/po
+			$svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" || svnerr
+			if [ "$DEBUG" = "Y" ] ; then
+				echo Done.
+			fi
+		fi
+	done
+	if [ "$BIG_COMMITS" = "Y" ] ; then
+		cd $DI_COPY/packages
+		$svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Done.
+	fi
 
-if [ "$BIG_COMMITS" = "Y" ] ; then
-  cd $DI_COPY/packages
-  $svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
-fi
-if [ "$DEBUG" = "Y" ] ; then
-  echo Done.
+else
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Not running debconf-updatepo for packages as requested.
+	fi
 fi
 
 # 2) Merge all templates.pot files together
 cd $DI_COPY/packages
-if [ "$DEBUG" = "Y" ] ; then
-  echo -n "Creating the general template.pot file..."
-fi
-# Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
-if ! msgcat $pots >/dev/null 2>&1 ; then
-  svnerr
-fi
-if [ "$DEBUG" = "Y" ] ; then
-  msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
-else
-  msgcat $pots | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new 2>/dev/null
-fi
-# Determine the most recent POT-Creation-Date for individual components
-# Include master templates.pot too so the timestamp will never be set back
-LASTDATE="$(
-  for i in $pots po/template.pot; do
-    date -ud "$(grep "POT-Creation-Date:" $i | sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%F %R%z"
-  done | sort | tail -n 1)"
-# We don't want all templates.pot files headers as we don't care about them
-# So we merge the generated file with a simple header.pot file
-if [ -f po/header.pot -a -s po/template.pot.new ] ; then
-  msgcat --use-first po/header.pot po/template.pot.new | \
-      sed 's/charset=UTF-8/charset=CHARSET/g' | \
-      sed "s/^.*POT-Creation-Date:.*$/\"POT-Creation-Date: $LASTDATE\\\n\"/" \
-      > po/template.pot
-  rm po/template.pot.new
-else
-  echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
-  exit 1
-fi
-if [ "$DEBUG" = "Y" ] ; then
-  echo Done.
-fi
-if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-  if [ "$DEBUG" = "Y" ] ; then
-    echo -n "Commiting the general template.pot file..."
-  fi
-  cd $DI_COPY/packages/po
-  $svn commit -m"${COMMIT_MARKER} Update general template file from the l10n synchronisation script" template.pot || svnerr
-  if [ "$DEBUG" = "Y" ] ; then
-    echo Done.
-  fi
-fi
 
+# OK, should be a nice loop...:-)
+for i in $LEVELS; do
+	if [ "$WITHLEVELS" = "Y" ] ; then
+		dir=po/sublevel$i
+		level="level $i "
+	else
+		dir=po
+		level=""
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo -n "Creating the general ${level}template.pot file..."
+	fi
+	# Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
+	pots_tmp=`eval "echo \\$pots$i"`
+	if ! msgcat ${pots_tmp} >/dev/null 2>&1 ; then
+		svnerr
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		msgcat ${pots_tmp} | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/$dir/template.pot.new
+	else
+		msgcat ${pots_tmp} | sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/$dir/template.pot.new 2>/dev/null
+	fi
+	# Determine the most recent POT-Creation-Date for individual components
+	# Include master templates.pot too so the timestamp will never be set back
+	LASTDATE="$(
+		for j in ${pots_tmp} $dir/template.pot; do
+			date -ud "$(grep "POT-Creation-Date:" $j | sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%F %R%z"
+		done | sort | tail -n 1)"
+	# We don't want all templates.pot files headers as we don't care about them
+	# So we merge the generated file with a simple header.pot file
+	if [ -f po/header.pot -a -s $dir/template.pot.new ] ; then
+		msgcat --use-first po/header.pot $dir/template.pot.new | \
+			sed 's/charset=UTF-8/charset=CHARSET/g' | \
+			sed "s/^.*POT-Creation-Date:.*$/\"POT-Creation-Date: $LASTDATE\\\n\"/" \
+			> $dir/template.pot
+		rm $dir/template.pot.new
+	else
+		echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
+		exit 1
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Done.
+	fi
+	if [ "$ATOMIC_COMMITS" = "Y" ] ; then
+		if [ "$DEBUG" = "Y" ] ; then
+			echo -n "Commiting the general level $i template.pot file..."
+		fi
+		cd $DI_COPY/packages/po
+		$svn commit -m"${COMMIT_MARKER} Update general level $i template file from the l10n synchronisation script" template.pot || svnerr
+		if [ "$DEBUG" = "Y" ] ; then
+			echo Done.
+		fi
+	fi
+done
 
-# For each PO file in packages/po:
+# For each PO file in packages/po/sublevel* or packages/po:
 # 3a) Synchronize with D-I SVN
 # 3b) Update with template.pot
-# 3c) commit back the changed file
-if [ "$DEBUG" = "Y" ] ; then
-  echo Updating general PO files:
-fi
-cd $DI_COPY/packages/po
-
-# The languages variable will contain the list of *supported* languages
-# Supported languages will have PO files content spread over
-# D-I packages
-# Other languages will only have a PO file in packages/po
-#
-# This is meant for having prospective translations
-# which do not clutter up all packages
-#
-# All languages with no supported locale in Debian
-# should stay in the list of PROSPECTIVE languages
-alllanguages=$(ls -1 *.po | sed 's/\.po//g')
-languages=""
-if [ -f $DI_COPY/packages/po/PROSPECTIVE ] ; then
-  for language in $alllanguages ; do
-    if ! grep -q -e "^${language}$" $DI_COPY/packages/po/PROSPECTIVE ; then
-      languages="$languages $language"
-    fi
-  done
-else
-  languages=$alllanguages
-fi
-
-for po in *.po ; do
- lang=$(basename $po .po)
- if [ "$DEBUG" = "Y" ] ; then
-  echo "   $lang:"
- fi
- if [ "$ONLINE" = "Y" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "     - Update from SVN..."
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     $svn update || svnerr
-   else
-     $svn update >/dev/null 2>&1 || svnerr
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
- fi
- if [ -n "$MERGEDIR" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo "     - Merge with $MERGEDIR/packages/po/$lang.po"
-   fi
-   if [ -f "$MERGEDIR/packages/po/$lang.po" ] ; then
-     if ! msgcat --use-first "$MERGEDIR/packages/po/$lang.po" $po >$po.new ; then
-       gettexterr
-     fi
-     mv $po.new $po
-   fi
- fi
- if [ "$DEBUG" = "Y" ] ; then
-   echo "     - Merge with template.pot:"
- fi
- if [ "$DEBUG" = "Y" ] ; then
-   # In case some msgids are duplicate
-   # Does not work on woody systems..:-(
-   #if ! msguniq $po > $po.uniq ; then
-   #  gettexterr
-   #fi
-   # Now do the real merge
-   # The following does not work on woody (gluck for instance)
-   # msgmerge -U $po template.pot
-   if ! msgmerge $po template.pot >$po.new ; then
-     gettexterr
-   fi
-   mv $po.new $po
- else
-   # In case some msgids are duplicate
-   # Does not work on woody systems..:-(
-   #if ! msguniq $po > $po.uniq ; then
-   #  gettexterr
-   #fi
-   # Now do the real merge
-   # The following does not work on woody (gluck for instance)
-   # msgmerge -U $po template.pot >/dev/null 2>&1
-   #
-   # Will not mark strings in the PO but not in the POT as obsolete
-   # so not appropriate for cases when a merge occurs
-   if ! msgmerge $po template.pot >$po.new 2>/dev/null ; then
-     gettexterr
-   fi
-   mv $po.new $po
- fi
- if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "     - Commit back to SVN..."
-   fi
-   $svn commit -m"${COMMIT_MARKER} Updated packages/po/$po with general template.pot" $po || svnerr
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
- fi
+# 3c) Grab translations from the lower levels file(s)
+# 3d) commit back the changed file
+for i in $LEVELS; do
+	if [ "$WITHLEVELS" = "Y" ] ; then
+		dir=po/sublevel$i
+		level="level $i "
+	else
+		dir=po
+		leve=""
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo "Update ${level}PO files:"
+	fi
+	cd $DI_COPY/packages/$dir
+	# The languages variable will contain the list of *supported* languages
+	# Supported languages will have PO files content spread over
+	# D-I packages
+	# Other languages will only have a PO file in packages/po
+	#
+	# This is meant for having prospective translations
+	# which do not clutter up all packages
+	#
+	# All languages with no supported locale in Debian
+	# should stay in the list of PROSPECTIVE languages
+	alllanguages=$(ls -1 *.po | sed 's/\.po//g')
+	languages=""
+	if [ -f $DI_COPY/packages/po/PROSPECTIVE ] ; then
+		for language in $alllanguages ; do
+			if ! grep -q -e "^${language}$" $DI_COPY/packages/po/PROSPECTIVE ; then
+				languages="$languages $language"
+			fi
+		done
+	else
+		languages=$alllanguages
+	fi
+	
+	for po in *.po ; do
+		lang=$(basename $po .po)
+		if [ "$DEBUG" = "Y" ] ; then
+			echo "   $lang:"
+		fi
+		if [ "$ONLINE" = "Y" ] ; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "     - Update from SVN..."
+			fi
+			if [ "$DEBUG" = "Y" ] ; then
+				$svn update || svnerr
+			else
+				$svn update >/dev/null 2>&1 || svnerr
+			fi
+			if [ "$DEBUG" = "Y" ] ; then
+				echo Done.
+			fi
+		fi
+		if [ -n "$MERGEDIR" ] ; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo "     - Merge with $MERGEDIR/packages/$dir/$lang.po"
+			fi
+			if [ -f "$MERGEDIR/packages/$dir/$lang.po" ] ; then
+				if ! msgcat --use-first "$MERGEDIR/packages/$dir/$lang.po" $po >$po.new ; then
+					gettexterr
+				fi
+				mv $po.new $po
+			fi
+		fi
+		if [ "$i" -gt 1 ]; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "     - Merge with other levels:"
+			fi
+			previous=`expr $i - 1`
+			for j in `seq 1 $previous`; do
+				if [ "$DEBUG" = "Y" ] ; then
+					echo -n " $j"
+				fi
+				msgcat --use-first ../sublevel$j/$po $po >$po.new
+				mv $po.new $po
+			done
+			if [ "$DEBUG" = "Y" ] ; then
+				echo ""
+			fi
+		fi
+		if [ "$DEBUG" = "Y" ] ; then
+			echo "     - Merge with template.pot:"
+		fi
+		if [ "$DEBUG" = "Y" ] ; then
+			# In case some msgids are duplicate
+			# Does not work on woody systems..:-(
+			#if ! msguniq $po > $po.uniq ; then
+			#  gettexterr
+			#fi
+			# Now do the real merge
+			# The following does not work on woody (gluck for instance)
+			# msgmerge -U $po template.pot
+			if ! msgmerge $po template.pot >$po.new ; then
+				gettexterr
+			fi
+			mv $po.new $po
+		else
+			# In case some msgids are duplicate
+			# Does not work on woody systems..:-(
+			#if ! msguniq $po > $po.uniq ; then
+			#  gettexterr
+			#fi
+			# Now do the real merge
+			# The following does not work on woody (gluck for instance)
+			# msgmerge -U $po template.pot >/dev/null 2>&1
+			#
+			# Will not mark strings in the PO but not in the POT as obsolete
+			# so not appropriate for cases when a merge occurs
+			if ! msgmerge $po template.pot >$po.new 2>/dev/null ; then
+				gettexterr
+			fi
+			mv $po.new $po
+		fi
+		if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "     - Commit back to SVN..."
+			fi
+			$svn commit -m"${COMMIT_MARKER} Updated packages/$dir/$po with general template.pot" $po || svnerr
+			if [ "$DEBUG" = "Y" ] ; then
+				echo Done.
+			fi
+		fi
+	done
+	if [ "$BIG_COMMITS" = "Y" ] ; then
+		if [ "$DEBUG" = "Y" ] ; then
+			echo -n "Commit all general PO files to SVN..."
+		fi
+		$svn commit -m"${COMMIT_MARKER} Updated packages/$dir/* with general template.pot" *.po template.pot || svnerr
+		if [ "$DEBUG" = "Y" ] ; then
+			echo Done.
+		fi
+	fi
 done
-if [ "$BIG_COMMITS" = "Y" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "Commit all general PO files to SVN..."
-   fi
-   $svn commit -m"${COMMIT_MARKER} Updated packages/po/* with general template.pot" *.po template.pot || svnerr
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
-fi
 
 # Loop over D-I packages:
 # 4a) synchronize the local copy with the D-I SVN 
 # 4b) update debian/po/*.po files with files in packages/po/
 # 4c) commit back the changes to D-I SVN
-if [ "$DEBUG" = "Y" ] ; then
-  echo Updating D-I packages:
-fi
-for package in $packages ; do
- if [ "$DEBUG" = "Y" ] ; then
-  echo "   $package:"
- fi
- cd $DI_COPY/packages/$package/debian/po
- if [ "$ONLINE" = "Y" ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "      - synchronize with D-I repository..."
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     $svn update || svnerr
-   else
-     $svn update >/dev/null 2>&1 || svnerr
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
- fi
- if [ "$DEBUG" = "Y" ] ; then
-   echo -n "      - rebuild languages files: "
- fi
- # For each language listed in packages/po, update PO files
- for lang in $languages ; do
-      if [ "$DEBUG" = "Y" ] ; then
-        echo -n "$lang "
-      fi
-      cat >$lang.po.new <<EOF
+if [ "$SYNCPKGS" = "Y" ]; then
+	if [ "$WITHLEVELS" = "Y" ] ; then
+		dir=po/sublevel$i
+	else
+		dir=po
+	fi
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Updating D-I packages:
+	fi
+	
+	for i in $LEVELS; do
+		for package in `eval "echo \\$packages$i"` ; do
+			if [ "$DEBUG" = "Y" ] ; then
+				echo "   $package:"
+			fi
+			cd $DI_COPY/packages/$package/debian/po
+			if [ "$ONLINE" = "Y" ] ; then
+				if [ "$DEBUG" = "Y" ] ; then
+					echo -n "      - synchronize with D-I repository..."
+				fi
+				if [ "$DEBUG" = "Y" ] ; then
+					$svn update || svnerr
+				else
+					$svn update >/dev/null 2>&1 || svnerr
+				fi
+				if [ "$DEBUG" = "Y" ] ; then
+					echo Done.
+				fi
+			fi
+			if [ "$DEBUG" = "Y" ] ; then
+				echo -n "      - rebuild languages files: "
+			fi
+			# For each language listed in packages/po, update PO files
+			for lang in $languages ; do
+				if [ "$DEBUG" = "Y" ] ; then
+					echo -n "$lang "
+				fi
+				cat >$lang.po.new <<EOF
 # THIS FILE IS AUTOMATICALLY GENERATED FROM THE MASTER FILE
 # packages/po/$lang.po
 #
 # DO NOT MODIFY IT DIRECTLY : SUCH CHANGES WILL BE LOST
 # 
 EOF
-      if [ "$DEBUG" = "Y" ] ; then
-        msgmerge $DI_COPY/packages/po/$lang.po templates.pot |\
-           msgattrib --width=79 --no-obsolete - >>$lang.po.new
-      else
-        msgmerge $DI_COPY/packages/po/$lang.po templates.pot 2>/dev/null |\
-           msgattrib --width=79 --no-obsolete - >>$lang.po.new 2>/dev/null
-      fi
-      if [ -f $lang.po ] ; then
-        # We change PO-Revision-Date in the new file only if 
-	# the changes are more than just 
-        # changing a header or comment line
-        # For this we "filter" the files against a carefully crafted regexp
-        # Comment lines (^\#.*$) are filtered 
-	# EXCEPT the fuzzy markers (^\#,.*$)
-        oldfiltered=`tempfile`
-        newfiltered=`tempfile`
-	filter="^(\"(PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|X-.*):|#[^,]|#$)"
-        egrep -v "$filter" $lang.po >$oldfiltered
-        egrep -v "$filter" $lang.po.new >$newfiltered
-        if [ -z "$(diff $oldfiltered $newfiltered)" ] ; then
-	  # We don't commit if a filtered line was the only change
-	  rm $lang.po.new
-        else
-	  # At least one non filtered line changed
-          # We put the old Revision-Date back if asked for
-	  if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" ] ; then
-	    # We grab back the PO-Revision-Date from the old file
-	    old_revision=`cat $lang.po| grep -e "^\"PO-Revision-Date:" | sed 's/\\\\n\"//g'`
-	    # And we replace the one from the new file by it
-	    # then put all this as a result
-	    cat $lang.po.new | sed "s/\"PO-Revision-Date:.*/$old_revision\\\\n\"/g" >$lang.po	    
-	    rm $lang.po.new
-            if [ "$DEBUG" = "Y" ] ; then
-	      echo -n "(CHANGED, Revision kept) "
-	    else
-              echo ${package}/debian/po/${lang}.po CHANGED, Revision kept
-	    fi
-	  else
-	    mv $lang.po.new $lang.po
-            if [ "$DEBUG" = "Y" ] ; then
-	      echo -n "(CHANGED) "
-	    else
-              echo ${package}/debian/po/${lang}.po CHANGED
-	    fi
-	  fi
-        fi
-	# Remove temporary files
-	rm $oldfiltered || true
-	rm $newfiltered || true
-      else
-	mv $lang.po.new $lang.po
-	svn add $lang.po
-        if [ "$DEBUG" = "Y" ] ; then
-	  echo -n "(ADDED) "
-        else
-          echo ${package}/debian/po/${lang}.po ADDED
+				if [ "$DEBUG" = "Y" ] ; then
+					msgmerge $DI_COPY/packages/$dir/$lang.po templates.pot |\
+						msgattrib --width=79 --no-obsolete - >>$lang.po.new
+				else
+					msgmerge $DI_COPY/packages/$dir/$lang.po templates.pot 2>/dev/null |\
+						msgattrib --width=79 --no-obsolete - >>$lang.po.new 2>/dev/null
+				fi
+				if [ -f $lang.po ] ; then
+					# We change PO-Revision-Date in the new file only if 
+					# the changes are more than just 
+					# changing a header or comment line
+					# For this we "filter" the files against a carefully crafted regexp
+					# Comment lines (^\#.*$) are filtered 
+					# EXCEPT the fuzzy markers (^\#,.*$)
+					oldfiltered=`tempfile`
+					newfiltered=`tempfile`
+					filter="^(\"(PO-Revision-Date|Project-Id-Version|Report-Msgid-Bugs-To|POT-Creation-Date|Last-Translator|Language-Team|X-.*):|#[^,]|#$)"
+					egrep -v "$filter" $lang.po >$oldfiltered
+					egrep -v "$filter" $lang.po.new >$newfiltered
+					if [ -z "$(diff $oldfiltered $newfiltered)" ] ; then
+						# We don't commit if a filtered line was the only change
+						rm $lang.po.new
+					else
+						# At least one non filtered line changed
+						# We put the old Revision-Date back if asked for
+						if [ "$KEEP_REVISION" != "N" -a "$KEEP_REVISION" = "$lang" ] ; then
+							# We grab back the PO-Revision-Date from the old file
+							old_revision=`cat $lang.po| grep -e "^\"PO-Revision-Date:" | sed 's/\\\\n\"//g'`
+							# And we replace the one from the new file by it
+							# then put all this as a result
+							cat $lang.po.new | sed "s/\"PO-Revision-Date:.*/$old_revision\\\\n\"/g" >$lang.po
+							rm $lang.po.new
+							if [ "$DEBUG" = "Y" ] ; then
+								echo -n "(CHANGED, Revision kept) "
+							else
+								echo ${package}/debian/po/${lang}.po CHANGED, Revision kept
+							fi
+						else
+							mv $lang.po.new $lang.po
+							if [ "$DEBUG" = "Y" ] ; then
+								echo -n "(CHANGED) "
+							else
+								echo ${package}/debian/po/${lang}.po CHANGED
+							fi
+						fi
+					fi
+					# Remove temporary files
+					rm $oldfiltered || true
+					rm $newfiltered || true
+				else
+					mv $lang.po.new $lang.po
+					svn add $lang.po
+					if [ "$DEBUG" = "Y" ] ; then
+						echo -n "(ADDED) "
+					else
+						echo ${package}/debian/po/${lang}.po ADDED
+					fi
+				fi
+			done
+			if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
+				if [ "$DEBUG" = "Y" ] ; then
+					echo -n "      - commiting back updated files..."
+				fi
+				if [ "$DEBUG" = "Y" ] ; then
+					$svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/$dir" *.po || svnerr
+				else
+					$svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/$dir" *.po >/dev/null 2>&1 || svnerr
+				fi
+				if [ "$DEBUG" = "Y" ] ; then
+					echo Done.
+				fi
+			fi
+		done
+	done
+	
+	if [ "$BIG_COMMITS" = "Y" ] ; then
+		cd $DI_COPY/packages
+		svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
 	fi
-      fi
- done
- if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-   if [ "$DEBUG" = "Y" ] ; then
-     echo -n "      - commiting back updated files..."
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po || svnerr
-   else
-     $svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/po" *.po >/dev/null 2>&1 || svnerr
-   fi
-   if [ "$DEBUG" = "Y" ] ; then
-     echo Done.
-   fi
- fi
-done
-
-if [ "$BIG_COMMITS" = "Y" ] ; then
-  cd $DI_COPY/packages
-  svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
+else
+	if [ "$DEBUG" = "Y" ] ; then
+		echo Not syncing D-I packages as requested.
+	fi
 fi
-
+	
 # Remove the lock file
 rm -f $LOCKFILE || true
