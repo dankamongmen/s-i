@@ -83,6 +83,7 @@ WD="."
 FETCH=""
 GETTEXT="/usr/bin"
 LEVEL=1
+SUBLEVELS=2
 ########################### End of Defaults ###################################
 
 
@@ -481,9 +482,7 @@ fancy_output
 # Special info about the master file, for unstable only
 if [ $LEVEL = 1 ]; then
 	echo "Master file information..."
-#	echo -n "  "
 	for lang in `cat $WD/config/languages`; do #run for every language
-#		echo -n "$lang "
 		if [ -f $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po ]; then
 			MASTER_F=`fuzzy $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
 			MASTER_U=`untranslated $WD/material/packages.unstable1/debian-installer/packages/po/$lang.po`
@@ -491,6 +490,20 @@ if [ $LEVEL = 1 ]; then
 		fi
 	done
 	echo ""
+	fancy_output
+	echo "Master file information: ${MASTER_T}t${MASTER_F}f${MASTER_U}u" >>$TARGET_DIR/$lang.txt
+	echo "Master sublevel files information..."
+	echo ""
+        for level in `seq 1 $SUBLEVELS`; do
+		for lang in `cat $WD/config/languages`; do #run for every language
+			if [ -f $WD/material/packages.unstable1/debian-installer/packages/po/sublevel${level}/$lang.po ]; then
+				F=`fuzzy $WD/material/packages.unstable1/debian-installer/packages/po/sublevel${level}/$lang.po`
+				U=`untranslated $WD/material/packages.unstable1/debian-installer/packages/po/sublevel${level}/$lang.po`
+				T=`translated $WD/material/packages.unstable1/debian-installer/packages/po/sublevel${level}/$lang.po`
+				echo "    Sublevel ${level}: ${T}t${F}f${U}u" >>$TARGET_DIR/$lang.txt
+			fi
+		done
+	done
 	fancy_output
 fi
 
@@ -552,6 +565,12 @@ if [ $LEVEL = 1 ]; then
 	mkdir $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*po $TARGET_DIR/master
 	cp $WD/material/packages.cvs1/debian-installer/packages/po/*pot $TARGET_DIR/master
+	echo -n "Moving master sublevel files... "
+        for level in `seq 1 $SUBLEVELS`; do
+		mkdir $TARGET_DIR/master/sublevel${level}
+		cp $WD/material/packages.cvs1/debian-installer/packages/po/sublevel${level}/*po $TARGET_DIR/master/sublevel${level}
+		cp $WD/material/packages.cvs1/debian-installer/packages/po/sublevel${level}/*pot $TARGET_DIR/master/sublevel${level}
+	done
 fi
 
 # Cleanup
