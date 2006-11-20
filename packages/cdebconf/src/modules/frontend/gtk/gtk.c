@@ -347,57 +347,6 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
     free(label_title_string);
 }
 
-void button_single_callback(GtkWidget *button, struct frontend_question_data* data)
-{
-    struct frontend *obj = data->obj;
-    struct question *q = data->q;
-    char **choices, **choices_translated;
-    int i, count;
-    int *tindex = NULL;
-    const gchar *indices = q_get_indices(q);
-
-    count = strgetargc(q_get_choices_vals(q));
-    if (count <= 0)
-        return /* DC_NOTOK */;
-    choices = malloc(sizeof(char *) * count);
-    choices_translated = malloc(sizeof(char *) * count);
-    tindex = malloc(sizeof(int) * count);
-
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
-        return /* DC_NOTOK */;
-
-    for (i = 0; i < count; i++)
-    {
-        if (strcmp(gtk_button_get_label(GTK_BUTTON(button)), choices_translated[i]) == 0)
-            question_setvalue(q, choices[tindex[i]]);
-        free(choices[tindex[i]]);
-        free(choices_translated[i]);
-    }
-    free(choices);
-    free(choices_translated);
-    free(tindex);
-    ((struct frontend_data*)obj->data)->button_val = DC_OK;
-    free(data);
-
-    gtk_main_quit();
-}
-
-void boolean_single_callback(GtkWidget *button, struct frontend_question_data* data )
-{
-    struct frontend *obj = data->obj;
-    struct question *q = data->q;
-    char *ret;
-
-    /* INFO(INFO_DEBUG, "GTK_DI - boolean_single_callback() called"); */
-    ret = (char*) gtk_object_get_user_data(GTK_OBJECT(button));
-    question_setvalue(q, ret);
-    free(ret);
-
-    ((struct frontend_data*)obj->data)->button_val = DC_OK;;
-
-    gtk_main_quit();
-}
-
 void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_string, struct question_treemodel_data* data)
 {
     int i, count;
