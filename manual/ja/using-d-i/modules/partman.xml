@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41871 -->
+<!-- original version: 42323 -->
 
    <sect3 id="partman">
    <title>ディスクのパーティション分割</title>
@@ -35,17 +35,38 @@ autopartition, choose <guimenuitem>Manual</guimenuitem> from the menu.
 If you choose guided partitioning, you may have three options: to create
 partitions directly on the hard disk (classic method), or to create them
 using Logical Volume Management (LVM), or to create them using encrypted
-LVM. Note: the option to use (encrypted) LVM may not be available on all
-architectures.
+LVM<footnote>
 -->
 ガイドパーティション分割を選択した場合、選択肢が 3 つあります。
 ハードディスクに直接パーティションを作成する (クラシック) 方法、
 論理ボリューム管理 (LVM) を利用する方法、
-暗号化 LVM を利用する方法です。
-注意: (暗号化を含む) LVM を使用する方法は、
+暗号化 LVM<footnote>
+
+<para>
+<!--
+The installer will encrypt the LVM volume group using a 256 bit AES key and
+makes use of the kernel's <quote>dm-crypt</quote> support.
+-->
+このインストーラでは、LVM ボリュームグループを 256 bit AES キーで暗号化し、
+カーネルの <quote>dm-crypt</quote> サポートを利用します。
+</para>
+
+<!--
+</footnote>.
+-->
+</footnote> を利用する方法です。
+
+</para>
+<note><para>
+
+<!--
+The option to use (encrypted) LVM may not be available on all architectures.
+-->
+(暗号化を含む) LVM を使用する方法は、
 すべてのアーキテクチャで使用できるわけではありません。
 
-</para><para>
+</para></note>
+<para>
 
 <!--
 When using LVM or encrypted LVM, the installer will create most
@@ -63,6 +84,21 @@ LVM や 暗号化 LVM を使用する場合、
 暗号化 LVM の場合、
 特殊なキーフレーズを知らずに大きなパーティションを読むことができません。
 そのため、あなたの (個人) データにさらなるセキュリティを提供します。
+
+</para><para>
+
+<!--
+When using encrypted LVM, the installer will also automatically erase the
+disk by writing random data to it. This further improves security (as it
+makes it impossible to tell which parts of the disk are in use and also
+makes sure that any traces of previous installations are erased), but may
+take some time depending on the size of your disk.
+-->
+暗号化 LVM を利用する場合、インストーラは、
+自動的にランダムなデータを書き込んでディスクを消去します。
+この機能は、(ディスクの使用中の領域を分からなくし、
+以前インストールしていたものの痕跡を消去して) セキュリティを向上しますが、
+ディスクのサイズにより、時間がかかることがあります。
 
 </para>
 <note><para>

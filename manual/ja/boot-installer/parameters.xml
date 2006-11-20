@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40875 -->
+<!-- original version: 42485 -->
 
  <sect1 id="boot-parms"><title>ブートパラメータ</title>
 <para>
@@ -133,19 +133,12 @@ The installation system recognizes a few additional boot parameters<footnote>
 <para>
 
 <!--
-Note that the 2.4 kernel accepts a maximum of 8 command line options and
-8 environment options (including any options added by default for the
-installer). If these numbers are exceeded, 2.4 kernels will drop any
-excess options. With kernel 2.6.9 or newer,
-you can use 32 command line options and 32 environment options.
+With current kernels (2.6.9 or newer) you can use 32 command line options and
+32 environment options. If these numbers are exceeded, the kernel will panic.
 -->
-カーネル 2.4 は最大でコマンドラインオプションを 8 つと、
-環境オプションを 8 つ受け付けます。
-(インストーラがデフォルトで付加するオプション含む)
-もしこの数を超過すると、
-2.4 カーネルは超過したオプションを無視してしまいます。
-2.6.9 カーネル以降では、
+現在のカーネル (2.6.9 以降) では、
 コマンドラインオプションを 32 個と環境オプションを 32 個使用できます。
+それを越えると、カーネルはパニックしてしまいます。
 
 </para>
 
@@ -525,6 +518,24 @@ automating the install. See <xref linkend="automatic-install"/>.
 </varlistentry>
 
 <varlistentry>
+<term>auto-install/enabled</term>
+<listitem><para>
+
+<!--
+Delay questions that are normally asked before preseeding is possible until
+after the network is configured. Short form: <userinput>auto=true</userinput>
+See <xref linkend="preseed-auto"/> for details about using this to
+automate installs.
+-->
+通常 preseed の前に行われる質問を、ネットワークの設定が終わるまで遅らせます。
+短縮形: <userinput>auto=true</userinput>。
+自動インストールでこのパラメータを使用する際には、
+<xref linkend="preseed-auto"/> をご覧ください。
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -606,6 +617,76 @@ performing a normal installation. See <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
+  </sect2>
+
+<!--
+  <sect2 id="module-parms"><title>Passing parameters to kernel modules</title>
+-->
+  <sect2 id="module-parms"><title>カーネルモジュールへのパラメータ指定</title>
+<para>
+
+<!--
+If drivers are compiled into the kernel, you can pass parameters to them
+as described in the kernel documentation. However, if drivers are compiled
+as modules and because kernel modules are loaded a bit differently during
+an installation than when booting an installed system, it is not possible
+to pass parameters to modules as you would normally do. Instead, you need
+to use a special syntax recognized by the installer which will then make
+sure that the parameters are saved in the proper configuration files and
+will thus be used when the modules are actually loaded. The parameters
+will also be propagated automatically to the configuration for the installed
+system.
+-->
+カーネル内にコンパイルされているドライバの場合、
+カーネルのドキュメントに記載されている方法でパラメータを渡せます。
+しかし、ドライバがモジュールとしてコンパイルされており、
+インストールしたシステムの起動時に、
+インストール時と比べてカーネルモジュールの読み込みが若干異なる場合、
+通常の方法ではモジュールにパラメータを渡せません。
+代わりに、インストーラが認識できる特殊文法を使用して、
+パラメータが適切な設定ファイルに格納し、
+実際にモジュールをロードする際に使用する必要があります。
+パラメータは自動的にインストールしたシステムに伝播します。
+
+</para><para>
+
+<!--
+Note that it is now quite rare that parameters need to be passed to modules.
+In most cases the kernel will be able to probe the hardware present in a
+system and set good defaults that way. However, in some situations it may
+still be needed to set parameters manually.
+-->
+モジュールにパラメータを渡さなければならないというのは、
+本当にまれな状況だということに注意してください。
+ほとんどの場合、カーネルはシステムにあるハードウェアから得られる値を検出し、
+適切な値を設定してくれます。
+しかしある状況下では、未だにパラメータを手で設定しなければなりません。
+
+</para><para>
+
+<!--
+The syntax to use to set parameters for modules is:
+-->
+モジュールにパラメータを設定する文法は以下のようになります。
+
+<informalexample><screen>
+<replaceable>module_name</replaceable>.<replaceable>parameter_name</replaceable>=<replaceable>value</replaceable>
+</screen></informalexample>
+
+<!--
+If you need to pass multiple parameters to the same or different modules,
+just repeat this. For example, to set an old 3Com network interface card
+to use the BNC (coax) connector and IRQ 10, you would pass:
+-->
+1 つないし複数のモジュールに、複数のパラメータを渡す場合は繰り返してください。
+例えば、古い 3Com のネットワークインターフェースカードで BNC (coax) を使用し、
+IRQ 10 を設定する場合は、以下のようにします。
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
   </sect2>
  </sect1>
 

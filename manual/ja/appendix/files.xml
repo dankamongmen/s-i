@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39551 -->
+<!-- original version: 42302 -->
 
 
  <sect1 id="linuxdevices"><title>Linux のデバイス</title>
@@ -242,23 +242,25 @@ when your mouse only has one button. Just add the following lines to
  </sect1>
 
  <sect1 id="tasksel-size-list">
+<!--
+ <title>Disk Space Needed for Tasks</title>
+-->
  <title>タスクに必要なディスクの空き容量</title>
 
 <!-- Note for d-i and manual maintainers
- Sizes of tasks should be determined by running "tasksel new" on a system
- that been fully installed without selecting any tasks. By selecting a
- task together with the "manual selection" option, aptitude will be started
- and show the sizes for the task. After deselecting the packages to be
- installed, quit aptitude and repeat for other tasks.
+ Sizes of tasks should be determined by running tasksel with the "new-install"
+ option on a system that been fully installed without selecting any tasks. By
+ selecting a task together with the "manual selection" option, aptitude will
+ be started and show the sizes for the task. Use "cancel panding actions" to
+ clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
-d-i・マニュアルメンテナ向け注
- いずれのタスクも選択せずにインストールした状態で "tasksel new" を実行して、
- タスクのサイズを決定するべきです。
+ d-i・マニュアルメンテナ向け注
+ いずれのタスクも選択せずにインストールした状態で tasksel を "new-install" 
+ オプションつけて実行し、タスクのサイズを決定してください。
  "manual selection" オプションを用いてタスクを選択しようとすると、
  aptitude がタスク用に起動して、サイズを示します。
- インストールするパッケージの選択を解除して、
- aptitude を終了しほかのタスクについて繰り返します。
+ "cancel panding actions" で選択解除ししてください。
  必要な空き領域は、aptitude からタスクを選択した時のように、
  tasksel が推奨パッケージをインストールしない状態で決定する必要があります。
 -->
@@ -266,11 +268,14 @@ d-i・マニュアルメンテナ向け注
 <para>
 
 <!--
-The base installation for i386 using the default 2.4 kernel,
-including all standard packages, requires 573MB of disk space.
+The base installation for i386 using the default 2.6 kernel,
+including all standard packages, requires 585MB of disk space.
+A minimal base installation, without the standard task selected,
+will take 365MB.
 -->
-デフォルトの 2.4 カーネルを用いた i386 用の基本インストールは、
-全標準パッケージを含めると、573MB のディスク領域が必要です。
+デフォルトの 2.6 カーネルを用いた i386 用の基本インストールは、
+全標準パッケージを含めると、585MB のディスク領域が必要です。
+標準タスクを選択しない、最小のベースインストールには、365MB 必要です。
 
 </para><para>
 
@@ -325,9 +330,19 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>Desktop</entry>
 -->
   <entry>デスクトップ</entry>
-  <entry>1392</entry>
-  <entry>460</entry>
-  <entry>1852</entry>
+  <entry>1258</entry>
+  <entry>418</entry>
+  <entry>1676</entry>
+</row>
+
+<row>
+<!--
+  <entry>Laptop</entry>
+-->
+  <entry>ラップトップ</entry>
+  <entry>46</entry>
+  <entry>16</entry>
+  <entry>62</entry>
 </row>
 
 <row>
@@ -335,9 +350,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>Web server</entry>
 -->
   <entry>ウェブサーバ</entry>
-  <entry>36</entry>
-  <entry>12</entry>
-  <entry>48</entry>
+  <entry>35</entry>
+  <entry>11</entry>
+  <entry>46</entry>
 </row>
 
 <row>
@@ -345,9 +360,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>Print server</entry>
 -->
   <entry>印刷サーバ</entry>
-  <entry>168</entry>
-  <entry>58</entry>
-  <entry>226</entry>
+  <entry>326</entry>
+  <entry>95</entry>
+  <entry>421</entry>
 </row>
 
 <row>
@@ -365,8 +380,8 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>File server</entry>
 -->
   <entry>ファイルサーバ</entry>
-  <entry>47</entry>
-  <entry>24</entry>
+  <entry>50</entry>
+  <entry>21</entry>
   <entry>71</entry>
 </row>
 
@@ -375,9 +390,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>Mail server</entry>
 -->
   <entry>メールサーバ</entry>
-  <entry>10</entry>
-  <entry>3</entry>
   <entry>13</entry>
+  <entry>5</entry>
+  <entry>18</entry>
 </row>
 
 <row>
@@ -385,9 +400,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>SQL database</entry>
 -->
   <entry>SQL データベース</entry>
-  <entry>66</entry>
-  <entry>21</entry>
-  <entry>87</entry>
+  <entry>24</entry>
+  <entry>8</entry>
+  <entry>32</entry>
 </row>
 
 </tbody>
@@ -396,11 +411,11 @@ is (temporarily) required in <filename>/var</filename>.
 <note><para>
 
 <!--
-The <emphasis>Desktop</emphasis> task will install both the GNOME and KDE
-desktop environments.
+The <emphasis>Desktop</emphasis> task will install the GNOME desktop
+environment.
 -->
 <emphasis>デスクトップ</emphasis> タスクは、
-GNOME と KDE の両デスクトップ環境をインストールします。
+GNOME デスクトップ環境をインストールします。
 
 </para></note>
 
