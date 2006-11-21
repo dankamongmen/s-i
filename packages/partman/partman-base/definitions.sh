@@ -1010,6 +1010,7 @@ confirm_changes () {
 	# Compute the changes we are going to do
 	partitems=''
 	items=''
+	formatted_previously=no
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
 		cd $dev
@@ -1030,7 +1031,6 @@ confirm_changes () {
 		done
 		close_dialog
 	
-		formatted_previously=no
 		for part in $partitions; do
 			id=${part%,*}
 			num=${part#*,}
