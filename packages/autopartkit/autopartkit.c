@@ -99,6 +99,8 @@
 
 #define PART_SIZE_BYTE(device, part) ((part)->geom.length * (device)->sector_size)
 
+#define NBSP 160
+
 /* Write /etc/windows_part?
 #define WRITE_WINDOWS_PART
 */
@@ -386,21 +388,21 @@ static PedDevice* choose_device(void)
 	log_line();
 	if (10 > strlen(dev->path))
 	{
-	    memset(ptr_table, ' ', 10 - strlen(dev->path));
+	    memset(ptr_table, NBSP, 10 - strlen(dev->path));
 	    ptr_table += 10 - strlen(dev->path);
 	}
 	ptr_table += snprintf(ptr_table, TABLE_SIZE + table - ptr_table,
 		"%s", dev->model);
 	if (20 > strlen(dev->model))
 	{
-	    memset(ptr_table, ' ', 20 - strlen(dev->model));
+	    memset(ptr_table, NBSP, 20 - strlen(dev->model));
 	    ptr_table += 20 - strlen(dev->model);
 	}
 
 	ptr_table += snprintf(ptr_table, TABLE_SIZE + table - ptr_table,
-		"%05dM %05dM %05dM  %-d\n",
-		stats->size, stats->free_space,
-		stats->free_space_in_fat, stats->nb_part);
+		"%05dM%c%05dM%c%05dM%c%c%-d\n",
+		stats->size, NBSP, stats->free_space, NBSP,
+		stats->free_space_in_fat, NBSP, NBSP, stats->nb_part);
 
 	if (strlen(device_list))
 	{
