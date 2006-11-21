@@ -3,6 +3,11 @@
 
 #include <parted/parted.h>
 
+#if defined(__GNUC__) && defined(__GNUC_MINOR__) && \
+    (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4))
+#define ATTRIBUTE_UNUSED __attribute__((__unused__))
+#endif
+
 struct disk_info_t;
 
 struct diskspace_req_s {

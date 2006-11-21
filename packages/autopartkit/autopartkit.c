@@ -146,7 +146,7 @@ static void autopartkit_handle_timer(PedTimer* timer, void* context);
 /* update the debconf progress bar when given notice by autopartkit */
 /* No longer used after rewrite to use /sbin/mkfs.*. [pere 2005-03-19] */
 static void
-autopartkit_handle_timer(PedTimer* timer, void* context)
+autopartkit_handle_timer(PedTimer* timer, void* context ATTRIBUTE_UNUSED)
 {
     int minutes_left = (timer->predicted_end - timer->now) / 60;
     char hours[16], minutes[16];
@@ -735,6 +735,7 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
 static char *get_device_path(PedDevice *dev, PedPartition *freepart)
 {
 #if defined(HAVE_PED_PARTITION_GET_PATH)
+    (void) dev;
     return ped_partition_get_path(freepart);
 #else /* not HAVE_PED_PARTITION_GET_PATH */
     char *retval;
@@ -817,7 +818,6 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     for (i = 0; i < partcount; i++)
     {
         char *tmpmnt;
-	char *devpath;
 	if ( is_root(mountmap[i].mountpoint->mountpoint)
 #if defined(LVM_HACK)
 	     || (strcmp(mountmap[i].mountpoint->fstype,"lvm") == 0)
@@ -965,7 +965,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     PedFileSystemType *fs_type = NULL;
     PedDevice *dev_tmp = NULL;
     PedDisk *disk_tmp = NULL, *disk_maybe = NULL;
-    PedFileSystem *fs;
     device_mntpoint_map_t mountmap[MAX_PARTITIONS];
     diskspace_req_t requirements[MAX_PARTITIONS], *req_tmp = NULL;
     int partcount = 0;

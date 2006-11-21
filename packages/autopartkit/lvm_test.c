@@ -84,7 +84,7 @@ test_split(void)
 }
 
 int
-main(int argc, char **argv)
+main(int argc ATTRIBUTE_UNUSED, char **argv ATTRIBUTE_UNUSED)
 {
     test_pv_stack();
     test_lv_stack();
