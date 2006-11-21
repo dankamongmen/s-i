@@ -9,10 +9,10 @@
 */
 /*
    autopartkit.c - Module to partition devices for debian-installer.
-   Author - Raphaël Hertzog
+   Author - RaphaÃ«l Hertzog
 
-   Copyright (C) 2001  Logidée (http://www.logidee.com)
-   Copyright (C) 2001  Raphaël Hertzog <hertzog@debian.org>
+   Copyright (C) 2001  LogidÃ©e (http://www.logidee.com)
+   Copyright (C) 2001  RaphaÃ«l Hertzog <hertzog@debian.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
