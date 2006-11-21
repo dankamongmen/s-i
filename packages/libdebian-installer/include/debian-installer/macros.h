@@ -28,4 +28,12 @@
 #define DI_STRINGIFY_ARG(contents) #contents
 #define DI_STRLOC __FILE__ ":" DI_STRINGIFY(__LINE__)
 
+/* GCC version checking borrowed from glibc. */
+#if defined(__GNUC__) && defined(__GNUC_MINOR__)
+#  define DI_GNUC_PREREQ(maj,min) \
+        ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+#else
+#  define DI_GNUC_PREREQ(maj,min) 0
+#endif
+
 #endif
