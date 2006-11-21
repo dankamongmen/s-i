@@ -65,6 +65,7 @@
 #define _GNU_SOURCE /* To enable vasprintf() */
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <parted/parted.h>
@@ -105,9 +106,6 @@
 
 /* Ignore devfs devices, used in choose_dev */
 #define IGNORE_DEVFS_DEVICES 1
-
-/* sleep period to give udev time to create the devices */
-#define UDEV_SLEEP_HACK 3
 
 #if 1
 #define log_line() \
@@ -1155,7 +1153,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
                  * sure the device file is available when we need it.
                 */
                 ped_disk_commit(disk_maybe);
-                sleep(UDEV_SLEEP_HACK); /* Give the kernel a moment to create the device */
+                system("update-dev"); /* persuade the kernel to create the device */
 
                 makefs(mountmap[partcount].devpath, req_tmp->fstype);
 	    }
@@ -1186,7 +1184,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		   make sure the device file is available when we need
 		   it. */
 		ped_disk_commit(disk_maybe);
-		sleep(UDEV_SLEEP_HACK); /* Give the kernel a moment to create the device */
+		system("update-dev"); /* persuade the kernel to create the device */
 
 		lvm_pv_stack_push(lvm_pv_stack, req_tmp->mountpoint, devpath);
 	    }
@@ -1265,7 +1263,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
         free(vgname);
         free(devpath);
     }
-    sleep(UDEV_SLEEP_HACK); /* Give the kernel a moment to create the devices */
+    system("update-dev"); /* persuade the kernel to create the devices */
 
     /* Distribute logical volumes (andread@linpro.no) */
     lvm_vg_stack = lvm_vg_stack_new();
@@ -1363,7 +1361,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 		autopartkit_log(1, "  LVM lv created ok, devpath=%s\n",
 				devpath);
 		autopartkit_log(1, "  LVM creating fs: %s\n", fstype);
-		sleep(UDEV_SLEEP_HACK); /* Give the kernel a moment to create the device */
+		system("update-dev"); /* persuade the kernel to create the device */
 		if (0 == makefs(devpath, fstype))
 		  { /* Replace devpath placeholder with real path */
 		    char buf[1024];
