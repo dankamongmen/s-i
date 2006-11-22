@@ -44,7 +44,7 @@ static struct cpu system_bcm_bcm947xx_cpu[] = {
 static struct cpu system_qemu_cpu[] = {
 	{ "MIPS 4Kc", "qemu-mips32" },
 	{ NULL, "unknown" }
-}
+};
 
 /* add new system types here */
 
