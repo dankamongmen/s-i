@@ -74,8 +74,7 @@ case "`archdetect`" in
 					lun="$(echo "$bootfs_disk" | cut -d: -f4)"
 					;;
 			esac
-			# TODO: the next line still uses the devfs path
-			part="$(($(echo "$bootfs_devfs" | sed -e 's%^.*part%%') - $partition_offset))"
+			part="$(($(echo "$bootfs_devfs" | sed 's/^.*[^0-9]//') - $partition_offset))"
 		else
 			kind=`echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
 			host=`echo $bootfs_devfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
