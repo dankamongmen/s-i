@@ -16,8 +16,7 @@ endif
 
 files = \
 	S62directfb-hw-accel \
-	S62directfb-left-handed \
-	S63fr-latin9-fix
+	S62directfb-left-handed
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
