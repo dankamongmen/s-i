@@ -32,7 +32,6 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
   
   ifeq ($(DEB_HOST_ARCH_CPU),powerpc)
     files += \
-        S05fancontrol-linux-powerpc \
 	S45keyboard-linux-powerpc
   endif
   
