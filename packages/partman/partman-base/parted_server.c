@@ -1497,6 +1497,20 @@ command_set_name()
 }
 
 void
+command_get_max_primary()
+{
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        log("command_get_max_primary()");
+        open_out();
+        oprintf("OK\n");
+        deactivate_exception_handler();
+        oprintf("%d\n", ped_disk_get_max_primary_partition_count(disk));
+        activate_exception_handler();
+}
+
+void
 command_uses_extended()
 {
         scan_device_name();
@@ -2201,6 +2215,8 @@ main_loop()
                         command_set_name();
                 else if (!strcasecmp(str, "USES_NAMES"))
                         command_uses_names();
+                else if (!strcasecmp(str, "GET_MAX_PRIMARY"))
+                        command_get_max_primary();
                 else if (!strcasecmp(str, "USES_EXTENDED"))
                         command_uses_extended();
                 else if (!strcasecmp(str, "FILE_SYSTEM_TYPES"))
