@@ -44,17 +44,15 @@ if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
 				esac
 				;;
 		esac
-		if ! $match; then
-			case $TYPE in
-				cd)
-					udevre="^ID_CDROM="
-					;;
-				*)
-					udevre="^ID_TYPE=$TYPE"
-					;;
-			esac
+		if ! $match && [ "$TYPE" = cd ]; then
 			if udevinfo -q env -p "$devpath" 2>/dev/null | \
-			   grep -q "$udevre"; then
+			   grep -q '^ID_CDROM='; then
+				match=:
+			fi
+		fi
+		if ! $match; then
+			if udevinfo -q env -p "$devpath" 2>/dev/null | \
+			   grep -q "^ID_TYPE=$TYPE"; then
 				match=:
 			fi
 		fi
