@@ -1315,11 +1315,12 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_button_box_set_layout (GTK_BUTTON_BOX(actionbox), GTK_BUTTONBOX_END);
     gtk_box_set_spacing (GTK_BOX(actionbox), DEFAULT_PADDING);
 
-    /* button to take screenshots of the frontend */
+    /* Screenshot button is set insensitive by default */
     button_screenshot = gtk_button_new_with_label (get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
     g_signal_connect (G_OBJECT (button_screenshot), "clicked", G_CALLBACK (screenshot_button_callback), obj );
     gtk_box_pack_start (GTK_BOX(actionbox), button_screenshot, TRUE, TRUE, DEFAULT_PADDING);
     ((struct frontend_data*) obj->data)->button_screenshot = button_screenshot;
+    gtk_widget_set_sensitive (button_screenshot, FALSE);
 
     /* Here are the back and forward buttons */
     button_prev = gtk_button_new_with_label (get_text(obj, "debconf/button-goback", "Go Back"));
@@ -1344,7 +1345,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
     gtk_widget_set_sensitive (button_prev, FALSE);
     gtk_widget_set_sensitive (button_next, FALSE);
 
-    /* Cancel button is not displayed by default */
+    /* Cancel button is set insensitive by default */
     button_cancel = gtk_button_new_with_label (get_text(obj, "debconf/button-cancel", "Cancel"));
     ret_val = NEW(int);
     *ret_val = DC_GOBACK;
@@ -1353,7 +1354,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
                       G_CALLBACK(cancel_button_callback), obj);
     gtk_box_pack_start (GTK_BOX(actionbox), button_cancel, TRUE, TRUE, DEFAULT_PADDING);
     ((struct frontend_data*) obj->data)->button_cancel = button_cancel;
-    gtk_widget_hide(button_cancel);
+    gtk_widget_set_sensitive (button_cancel, FALSE);
 
     /* focus order inside actionbox */
     focus_chain = g_list_append(focus_chain, button_next);
@@ -1679,13 +1680,14 @@ static void set_design_elements_while_progressbar_runs(struct frontend *obj)
         gtk_widget_hide(data->button_prev);
         gtk_widget_hide(data->button_next);
         gtk_widget_show(data->button_cancel);
+        gtk_widget_set_sensitive (data->button_cancel, TRUE);
         GTK_WIDGET_SET_FLAGS (GTK_WIDGET(data->button_cancel), GTK_CAN_DEFAULT);
         gtk_widget_grab_default (GTK_WIDGET(data->button_cancel));    
     }
     else {
-        gtk_widget_set_sensitive (data->button_screenshot, FALSE);
-        gtk_widget_set_sensitive (data->button_prev, FALSE);
-        gtk_widget_set_sensitive (data->button_next, FALSE);
+        gtk_widget_hide(data->button_screenshot);
+        gtk_widget_hide(data->button_prev);
+        gtk_widget_hide(data->button_next);
         gtk_widget_hide(data->button_cancel);
     }
 
