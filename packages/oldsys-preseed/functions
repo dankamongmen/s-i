@@ -234,7 +234,9 @@ generate_preseed_file() {
 		add "$1" "netcfg/use_dhcp" "boolean" "true"
 	fi
 	if [ "$NONINTERACTIVE" = "yes" -o "$HOSTNAME" != "$DEFAULT_HOSTNAME" ]; then
-		add "$1" "netcfg/get_hostname" "string" "$HOSTNAME"
+		if verify_hostname "$HOSTNAME"; then
+			add "$1" "netcfg/get_hostname" "string" "$HOSTNAME"
+		fi
 	fi
 	add "$1" "netcfg/get_domain" "string" "$DOMAIN"
 }
@@ -249,5 +251,25 @@ unset_matching_var() {
 	if [ "$(eval echo $`echo $1`)" = "$2" ]; then
 		unset $1
 	fi
+}
+
+
+# Check the hostname for RFC 1123 compliance.
+verify_hostname() {
+	t=$(echo "$1" | tr -d 'a-zA-Z0-9.-')
+	if [ -n "$t" ]; then
+		return 1
+	fi
+	if echo "$1" | grep -q "^-"; then
+		return 1
+	fi
+	if echo "$1" | grep -q -- "-$"; then
+		return 1
+	fi
+	l=$(($(echo "$1" | wc -c) - 1))
+	if [ $l -lt 2 -o $l -gt 63 ]; then
+		return 1
+	fi
+	return 0
 }
 
