@@ -111,6 +111,8 @@ struct newtColors newtAltColorPalette = {
 
 typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
+static void newt_progress_stop(struct frontend *obj);
+
 #include "config-newt.h"
 
 /*  Horizontal offset between buttons and text box */
@@ -1218,12 +1220,11 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
 
-    if (data->scale_form != NULL) {
-        newtFormDestroy(data->scale_form);
-        newtPopWindow();
-        newtFinished();
-        data->scale_form = data->scale_bar = data->perc_label = data->scale_textbox = data->scale_cancel = NULL;
-    }
+    if (data->scale_form != NULL)
+        /* Nested progress bars are not currently supported. If you try to
+         * use one anyway, tear down the old progress bar first.
+         */
+        newt_progress_stop(obj);
     DELETE(obj->progress_title);
     obj->progress_title = strdup(title);
     obj->progress_min = min;
