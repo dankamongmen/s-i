@@ -238,14 +238,8 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
     if (obj->info != NULL) {
         char *text = q_get_description(obj->info);
         if (text) {
-            /* setting font colour makes GTKDFB 2.0.9 crash */
-            #if GTK_CHECK_VERSION(2,8,0)
             message = malloc(strlen(text) + 42 );
             sprintf(message,"<b><span foreground=\"#ffffff\">%s</span></b>", text);
-            #else
-            message = malloc(strlen(text) + 8 );
-            sprintf(message,"<b>%s</b>", text);
-            #endif
             layout = gtk_widget_create_pango_layout(wid, NULL);
             pango_layout_set_markup(layout, message, strlen(message));
             pango_layout_set_font_description(layout, pango_font_description_from_string("Sans 12"));
