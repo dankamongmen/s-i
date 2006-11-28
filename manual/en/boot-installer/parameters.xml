@@ -126,23 +126,16 @@ installer. The current possible parameter settings are:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
-The default front end is <userinput>DEBIAN_FRONTEND=newt</userinput>.
+The default frontend is <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>DEBIAN_FRONTEND=text</userinput> may be preferable for
 serial console installs. Generally only the
 <userinput>newt</userinput> frontend is available on default install
-media, so this is not very useful right now.
+media. On architectures which support it, the graphical installer uses
+the <userinput>gtk</userinput> frontend.
 
 </para></listitem>
 </varlistentry>
@@ -304,7 +297,7 @@ this misbehavior.
 
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>url</userinput>
+Short form: <userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -315,7 +308,7 @@ Short form: <userinput>url</userinput>
 
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>file</userinput>
+Short form: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -394,9 +387,60 @@ performing a normal installation. See <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
-  </sect2>
 
-  <sect2 id="module-parms"><title>Passing parameters to kernel modules</title>
+   <sect3 id="preseed-args">
+   <title>Using boot parameters to answer questions</title>
+<para>
+
+With some exceptions, a value can be set at the boot prompt for any question
+asked during the installation, though this is only really useful in specific
+cases. General instructions how to do this can be found in
+<xref linkend="preseed-bootparms"/>. Some specific examples are listed below.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+Can be used to set both the language and country for the installation.
+This will only work if the locale is supported in Debian.
+Short form: <userinput>locale</userinput>.
+For example, use <userinput>locale=de_CH</userinput> to select German as
+language and Switserland as country.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Set to <userinput>true</userinput> if you want to disable DHCP and instead
+force static network configuration.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+
+Can be used to select tasks that are not available from the interactive task
+list, such as the <literal>kde-desktop</literal> task.
+See <xref linkend="pkgsel"/> for additional information.
+Short form: <userinput>tasks</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms"><title>Passing parameters to kernel modules</title>
 <para>
 
 If drivers are compiled into the kernel, you can pass parameters to them
@@ -434,6 +478,6 @@ to use the BNC (coax) connector and IRQ 10, you would pass:
 </screen></informalexample>
 
 </para>
+   </sect3>
   </sect2>
  </sect1>
-
