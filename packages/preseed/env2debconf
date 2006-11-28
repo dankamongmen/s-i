@@ -18,6 +18,12 @@ for line in $(set); do
 			var=${var#*[[:space:]]}
 		fi
 		if [ "$var" != "" ]; then
+			owner="${var%:*}"
+			if [ "$owner" = "$var" ]; then
+				owner="d-i"
+			fi
+			var="${var#*:}"
+
 			# remove single quotes from around value
 			val="${val#\'}"
 			val="${val%\'}"
@@ -38,7 +44,7 @@ for line in $(set); do
 			else
 				type=unknown
 			fi
-			echo "#d-i $var $type $val" >> /var/lib/preseed/log
+			echo "$owner $var $type $val" >> /var/lib/preseed/log
 			db_fset "$var" seen true
 			IFS=$NEWLINE
 		fi
