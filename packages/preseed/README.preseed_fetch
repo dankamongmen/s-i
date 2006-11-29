@@ -8,10 +8,10 @@ is used to construct one before proceeding further.
 This is done as follows:
 
   if the source is a relative path, the contents of preseed.last_location
-  is stripped of it's last slash and beyond, and the relative path is
+  is stripped of its last slash and beyond, and the relative path is
   appended to it.
 
-  if the source start's with a /, and preseed.last_location does not
+  if the source starts with a /, and preseed.last_location does not
   contain '/./' anywhere in it, the content of preseed.last_location is
   truncated at the start of the path component, and the source is appended
   to that.
@@ -29,7 +29,7 @@ local/path		http://foo.com/bar/baz		http://foo.com/bar/local/path
 /local/path		http://foo.com/wibble/./bar/baz	http://foo.com/wibble/local/path
 /local/path		file:///bar/baz			file:///local/path
 
-Once the full URL is known, we select a method based on it, source it's
+Once the full URL is known, we select a method based on it, source its
 file, and execute the protocol_fetch function defined therein.
 
 As seen with the floppy method, if special processing is needed to ensure
@@ -38,7 +38,7 @@ that the files are available, this can be done thus:
 floppy://foo/bar which mounts	the flopy, then does a file copy from /floppy/foo/bar
 
 BTW the value of preseed/last_location defaults to file:///, which
-should ensure vaguely normal behaviour if it's is somehow invoked before
+should ensure vaguely normal behaviour if it is somehow invoked before
 one of the preseed postinst scripts.  Once we get into preseeding via
 the preseed.sh script, it will get set to the most recently fetched
 preseed/include.  There are some slight wrinkles to this at present:
