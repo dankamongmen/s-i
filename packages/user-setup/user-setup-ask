@@ -46,10 +46,12 @@ while :; do
 			db_set passwd/root-password-crypted "!"
 		elif ! root_password; then
 			# First check whether the root password was preseeded crypted
+			# to an actual password (not locked)
 			db_get passwd/root-password-crypted || true
-			if ! test "$RET" ; then
+			if ! test "$RET" || [ "x$RET" = "x!" ]; then
 				# No preseed of the root password hash
 				# we will prompt the user
+				db_set passwd/root-password-crypted ""
 				db_input critical passwd/root-password || true
 				db_input critical passwd/root-password-again || true
 			fi
