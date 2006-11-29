@@ -16,21 +16,25 @@ rawconsole=${rawconsole#/dev/}
 console=${console#/dev/}
 
 case "$console" in
-ttyS*)
+    ttyS*|hvc*|hvsi*)
 	log "Configuring /etc/inittab for serial console"
+	consoletype=${console%%[0-9]*}
+	ttyline=${console#$consoletype}
 	ttyspeed=$(chroot /target stty --file /dev/$console speed)
-	ttyline=${console#ttyS}
 	ttyterm="$TERM"
 
 	if [ -z "$ttyterm" ]; then ttyterm=vt100; fi
 	if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
+
 	sed -i -e "s/^\([1-6]\):/#\1:/" \
-	    -e "s/^#T0\(.*ttyS\).*/T$ttyline\1$ttyline $ttyspeed $ttyterm/" \
+	    -e "s/^#T0\(.*\)ttyS.*/T$ttyline\1$console $ttyspeed $ttyterm/" \
 	    /target/etc/inittab
+
+	echo "" >> /target/etc/securetty
 	echo "# serial console added by debian-installer" >> /target/etc/securetty
 	echo "$rawconsole" >> /target/etc/securetty
 	if [ -n "$console" ] && [ "$console" != "$rawconsole" ]; then
 		echo "$console" >> /target/etc/securetty
 	fi
-;;
+	;;
 esac
