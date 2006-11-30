@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 42868 -->
+<!-- original version: 42982 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -288,22 +288,36 @@ passez en paramètres d'amorçage.
 </sect2>
 
   <sect2 id="preseed-bootparms">
-  <title>Utiliser les paramètres d'amorçage pour compléter la préconfiguration</title>
+  <title>Utiliser les paramètres d'amorçage pour préconfigurer des questions</title>
 <para>
 
 Quand on ne peut pas utiliser un fichier de préconfiguration pour préconfigurer
 certaines étapes, on peut quand même automatiser l'installation car il est possible
-de passer des paramètres au noyau sur la ligne de commande. Il suffit d'indiquer
-une paire de type <userinput>path/to/variable=valeur</userinput>
-pour toutes les variables listées dans les exemples.
-
+de passer des paramètres au noyau sur la ligne de commande.
+</para>
+<para>
+Même si l'on ne veut pas se servir de la préconfiguration, on peut utiliser
+les paramètres d'amorçage pour fournir une réponse à une question particulière.
+Des exemples sont donnés ailleurs dans ce manuel.
+</para>
+<para>
+Pour toutes les variables listées dans les exemples,
+il suffit d'indiquer une paire de type 
+<userinput><replaceable>path/to/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
+Quand une valeur est destinée à la configuration de paquets du système cible, il est nécessaire
+d'ajouter le <firstterm>propriétaire</firstterm> de la variable&nbsp;:
+<userinput><replaceable>propriétaire</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
+Si vous n'indiquez pas de propriétaire, la valeur de la variable ne sera pas copiée
+dans la base de données debconf du système cible et ne sera pas utilisée pendant la
+configuration des paquets.
 </para><para>
 
 Certaines des variables qui sont fréquemment définies à l'invite du démarrage
 possèdent des alias plus courts. Quand un alias est disponible, les exemples de
 cet annexe l'utilise au lieu de la variable complète. En particulier, la variable
 <literal>preseed/url</literal> possède l'alias <literal>url</literal> et elle permet
-de raccourcir les urls à utiliser.
+de raccourcir les urls à utiliser. Un autre exemple est l'alias <literal>tasks</literal>,
+qui représente <literal>tasksel:tasksel/first</literal>.
 </para>
 <para>
 Dans les paramètres d'amorçage, <quote>--</quote> possède une signification

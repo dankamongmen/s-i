@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version:  42824 -->
+<!-- original version:  42982 -->
 
  <sect1 id="boot-parms"><title>Paramètres d'amorçage</title>
 <para>
@@ -22,7 +22,7 @@ Toutes les informations nécessaires sur les paramètres
 d'amorçage sont disponibles dans le 
 <ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">HOWTO Linux BootPrompt</ulink>&nbsp;;
 la présente section contient seulement un résumé des paramètres les
-plus utilisés. Certains <quote>trucs</quote> sont donnés dans la
+plus utilisés. Certains <emphasis>trucs</emphasis> sont donnés dans la
 <xref linkend="boot-troubleshooting"/>.
 
 </para><para>
@@ -128,27 +128,18 @@ Voici les valeurs possibles actuellement&nbsp;:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
 L'interface par défaut est <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>DEBIAN_FRONTEND=text</userinput> est peut-être préférable pour les 
-installations avec une console série. Les autres interfaces ne sont pas 
-disponibles sur les supports d'installation, et ne sont pas utiles pour
-l'instant.
+installations avec une console série. Seule l'interface <userinput>newt</userinput> est
+disponible sur les supports d'installation par défaut. Sur certaines architectures,
+l'installateur graphique utilise l'interface <userinput>gtk</userinput>.
 
 </para></listitem>
 </varlistentry>
-
 
 <varlistentry>
 <term>BOOT_DEBUG</term>
@@ -320,6 +311,7 @@ Forme courte&nbsp;: <userinput>url</userinput>.
 
 Indique le chemin d'un fichier de préconfiguration à utiliser pour
 automatiser l'installation. Voyez la <xref linkend="automatic-install"/>.
+Forme courte&nbsp;: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -400,9 +392,58 @@ au lieu de faire une installation normale. Voyez <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
-  </sect2>
 
-<sect2 id="module-parms"><title>Passer des paramètres aux modules du noyau</title>
+  <sect3 id="preseed-args">
+   <title>Répondre à des questions avec les paramètres d'amorçage</title>
+<para>
+
+À quelques exceptions près, toute question posée pendant l'installation peut recevoir
+une réponse définie au moment de l'invite d'amorçage. Ce n'est vraiment utile que
+pour certains cas particuliers. Une présentation générale se trouve dans
+<xref linkend="preseed-bootparms"/>. Voici quelques exemples.
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+Ce paramètre permet de définir la langue et le pays utilisés pour l'installation.
+La locale doit être connue dans Debian.
+Forme courte&nbsp;: <userinput>locale</userinput>.
+Par exemple, <userinput>locale=de_CH</userinput> sélectionne l'allemand comme
+langue et la Suisse comme pays.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Ce paramètre peut être mis à <userinput>true</userinput> pour désactiver DHCP et
+forcer une configuration manuelle du réseau.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+Ce paramètre permet la sélection de tâches qui ne sont pas disponibles
+dans la liste interactive, comme par exemple la tâche <literal>kde-desktop</literal>.
+Voyez <xref linkend="pkgsel"/> pour des précisions.
+Forme courte&nbsp;: <userinput>tasks</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+<sect3 id="module-parms"><title>Passer des paramètres aux modules du noyau</title>
 <para>
 
 Selon la documentation du noyau Linux, il est possible de passer des paramètres
@@ -436,6 +477,6 @@ connecteur BNC (coax) et l'IRQ 10&nbsp;:
 </screen></informalexample>
 
 </para>
-  </sect2>
-
- </sect1>
+  </sect3>
+</sect2>
+</sect1>
