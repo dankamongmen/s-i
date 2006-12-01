@@ -315,9 +315,11 @@ fi
 # This is needed later in the script
 COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
 COUNTRY_LANGUAGECHOOSER=$(code2country $COUNTRY)
-# Set correct default
-db_set $fulllist "${COUNTRY_LANGUAGECHOOSER}"
-log "Set $fulllist = '${COUNTRY_LANGUAGECHOOSER}'"
+if [ "$COUNTRY_LANGUAGECHOOSER" ]; then
+	# Set correct default
+	db_set $fulllist "${COUNTRY_LANGUAGECHOOSER}"
+	log "Set $fulllist = '${COUNTRY_LANGUAGECHOOSER}'"
+fi
 
 # Keep track of values we have after language selection step
 LOCALE_LANGUAGECHOOSER=$LOCALE
