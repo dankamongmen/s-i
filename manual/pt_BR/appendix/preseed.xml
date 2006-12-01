@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42036 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.09.12 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.10.25 -->
+<!-- original version: 42982 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.30 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -19,7 +19,7 @@ Currently only a single variant of the example file is generated (for i386).
 
 <para>
 
-Este apêndice explica os meandros da pré-configuração de respostas para questões
+Este apêndice explica como pré-configurar respostas para questões
 do &d-i; para automatizar sua instalação.
 
 </para><para>
@@ -50,9 +50,7 @@ Existem três métodos que podem ser usados para pré-configuração:
 <firstterm>network</firstterm>. Pré-configuração initrd funciona com qualquer
 método de instalação e suporta pré-configuração de mais coisas, mas isto requer
 maior preparação. Pré-configuração file e network podem ser utilizados com
-diferentes métodos de instalação. Com pré-configuração file e network as
-primeiras questões não podem ser pré-configuradas porque a pré-configuração
-file somente é carregada após a questão ser exibida.
+diferentes métodos de instalação.
 
 </para><para>
 
@@ -73,7 +71,13 @@ com cada método de instalação.
   <entry>CD/DVD</entry>
   <entry>sim</entry>
   <entry>sim</entry>
-  <entry>não</entry>
+  <entry>yes<footnote id='apx-ps-net'>
+
+  <para>
+  mas apenas se você tiver acesso à rede, e definir
+  <literal>preseed/url</literal> apropriadamente
+  </para>
+  </footnote></entry>
 </row><row>
   <entry>netboot</entry>
   <entry>sim</entry>
@@ -83,12 +87,12 @@ com cada método de instalação.
   <entry>hd-media <phrase condition="bootable-usb">(incluindo usb-stick)</phrase></entry>
   <entry>sim</entry>
   <entry>sim</entry>
-  <entry>não</entry>
+  <entry>yes<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>floppy based (cd-drivers)</entry>
   <entry>sim</entry>
   <entry>sim</entry>
-  <entry>não</entry>
+  <entry>yes<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>floppy based (net-drivers)</entry>
   <entry>sim</entry>
@@ -114,19 +118,23 @@ pré-configuração network é somente depois da rede ser configurada.
 
 </para><para>
 
-Em termos práticos isto quer dizer que para pré-configuração file e network as
-questões sobre idioma, país e teclado já foram perguntadas. Para
-pré-configuração network adicione à isto qualquer questão relacionada com as
-configurações de rede. Algumas outras questões que são exibidas apenas em
-prioridade média ou baixa (como a primeira execução da detecção de hardware)
-também já terão sido executadas.
+Obviamente, quaisquer questões que venham a ser processada antes que o
+arquivo de pré-configuração seja carregado, não poderão ser pré-configuradas
+(isso incluirá questões que são exibidas apenas nas prioridades média e
+baixa, como a primeira tentativa de detecção de hardware).
+<xref linkend="preseed-bootparms"/> oferece uma forma de evitar que estas
+questões sejam perguntadas.
 
 </para><para>
 
-Obviamente, qualquer questão que venha a ser processada antes que o arquivo de
-pré-configuração seja carregado, não poderá ser pré-configurada.
-<xref linkend="preseed-bootparms"/> oferece uma forma de evitar que estas
-questões sejam exibidas.
+Para evitar que questões que normalmente aparecem antes que a
+pré-configuração ocorra, você pode iniciar o instalador no modo
+<quote>auto</quote>. Isso retarda perguntas que normalmente seriam
+feitas muito cedo para a pré-configuração (i.e. seleção de idioma,
+país ou teclado) até depois que a rede esteja ativa, e assim permitindo
+que elas sejam pré-configurados. Isso também executa a instalação com
+prioridade crítica, a qual evita muitas questões de pouca importância.
+Veja <xref linkend="preseed-auto"/> para detalhes.
 
 </para>
   </sect2>
@@ -138,8 +146,7 @@ questões sejam exibidas.
 Enquanto a maioria das questões usadas pelo &d-i; podem ser pré-configuradas
 usando este método, aqui há algumas exceções dignas de nota. Você deve
 re(particionar) o disco inteiro ou utilizar algum espaço livre disponível no
-disco; não é possível usar partições existentes. Atualmente você não pode usar
-pré-configuração para configurar RAID.
+disco; não é possível usar partições existentes.
 
 </para>
   </sect2>
@@ -165,7 +172,7 @@ The following types of templates are relevant for preseeding.
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: allows the user to type any value
 </para></listitem>
@@ -205,55 +212,12 @@ are stored in a separate, non-readable file in the same directory.
 </para>
   </sect2>
 -->
-
-  <sect2 id="preseed-hooks">
-  <title>Executando comandos personalizados durante a instalação</title>
-<para>
-
-Uma poderosa e flexível opção oferecida pelas ferramentas de pré-configuração é
-a habilidade de executar comandos ou scripts em certos pontos na instalação.
-Veja <xref linkend="preseed-shell"/> para detalhes.
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-  <userinput>preseed/early_command</userinput>: é executado assim que o arquivo
-  de pré-configuração é carregado
-</para></listitem>
-<listitem><para>
-  <userinput>preseed/late_command</userinput>: é executado antes de reiniciar
-  ao final da instalação, mas antes do sistema de arquivos
-  <filename>/target</filename> ser desmontado
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
-
-  <sect2 id="preseed-seenflag">
-  <title>Usando pré-configuração para mudar valores padrão</title>
-<para>
-
-É possível usar pré-configuração para mudar a resposta padrão para uma pergunta,
-mas mantendo a exibição da pergunta. Para isso o marcador
-<firstterm>seen</firstterm> deve ser redefinido para <quote>false</quote> após
-definir o valor para a pergunta.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
+</sect1>
  <sect1 id="preseed-using">
  <title>Usando pré-configuração</title>
 <para>
 
-É claro que primeiro você precisa criar um arquivo de pré-configuração e colocar
+Você primeiro precisa criar um arquivo de pré-configuração e colocá-lo
 em um local onde você possa usar. A criação do arquivo de pré-configuração é
 coberto mais tarde neste apêndice. Colocar no local correto é essencial para
 pré-configuração por rede ou se você quiser ler o arquivo de um disquete ou de
@@ -304,7 +268,7 @@ pré-configuração ou o instalador se recusará a usá-lo.
 </para>
 
 <informalexample><screen>
-Parâmetros de inicialização à especificar:
+Parâmetros de inicialização a especificar:
 - se estiver iniciando pela rede:
   preseed/url=http://host/path/to/preseed.cfg
   preseed/url/checksum=5da499872becccfeda2c4872f9171c3d
@@ -325,16 +289,232 @@ Note que <filename>preseed/url</filename> pode ser abreviado para apenas
 <filename>url</filename> e <filename>preseed/file</filename> para apenas
 <filename>file</filename> quando são passados como parâmetros de inicialização.
 
+</para>
+  </sect2>
+
+  <sect2 id="preseed-bootparms">
+	  <title>Usando parâmetros de inicialização para pré-configurar questões</title>
+<para>
+
+Se um arquivo de pré-configuração não puder ser usado para pré-configurar
+alguns passos, a instalação ainda pode ser totalmente automatizada, já
+que você pode passar valores pré-configurados pela linha de comando quando
+inicializar o instalador. 
+
 </para><para>
 
-Nesse momento, você pode querer adicionar um parâmetro de inicialização
-<userinput>priority=critical</userinput>. Isto evita a maioria das
-perguntas mesmo que a pré-configuração acima perca alguma.
+Parâmetros de inicialização também podem ser usados se você não quer
+realmente usar a pré-configuração, mas apenas quer fornecer uma resposta para
+uma pergunta específica. Alguns exemplos onde isso pode ser útil estão
+documentados em outro lugar deste manual.
+
+</para><para>
+
+Para definir um valor a ser usando dentro do &d-i;, apenas passe
+<userinput><replaceable>caminho/para/a/variavel</replaceable>=<replaceable>valor</replaceable></userinput>
+para qualquer uma das variáveis de pré-configuração listadas nos exemplos
+neste apêndice. Se um valor é para ser usado para configurar pacotes no
+sistema algo, você precisa prefixar o done da variável como em
+<userinput><replaceable>dono</replaceable>:<replaceable>caminho/para/a/variavel</replaceable>=<replaceable>valor</replaceable></userinput>.
+Se você não especificar um dono, o valor para a variável não será copiado
+para a base de dados do debconf no sistema alvo e portanto permanecerá sem
+uso durante a configuração do pacote relevante.
+
+</para><para>
+
+Note que algumas variáveis que são freqüentemente definidas no prompt de 
+inicialização tem um apelido abreviado. Se um apelido está disponível, ele
+é usado nos exemplos deste apêndice ao invés da variável completa. Em
+particular, a variável <literal>preseed/url</literal> foi apelidada como
+<literal>url</literal> e tem algumas mágicas a mais para permitir o uso de
+urls reduzidas. Outro exemplo é o apelido <literal>tasks</literal>, que
+traduz para <literal>tasksel:tasksel/first</literal>.
+
+</para><para>
+
+Um <quote>--</quote> nas opções de inicialização tem um significado especial.
+Parâmetros do kernel que aparecem após o último <quote>--</quote> podem ser
+copiados dentro da configuração do carregador de inicialização
+(<quote>bootloader</quote>) para o sistema instalado (se suportado pelo
+instalador para o carregador de inicialização). O instalador irá
+automaticamente filtrar quaisquer opções (como opções pré-configuradas) que
+reconhecer.
+
+</para>
+<note><para>
+
+Kernels atuais (2.6.9 e posteriores) aceitam um máximo de 32 opções de linha
+de comando e 32 opções de ambiente, incluindo quaisquer opções adicionadas
+por padrão pelo instalador.  Se esses números forem excedidos, o kernel irá
+entrar em pânico (crash). (Para kernels anteriores, esses números eram
+menores).
+
+</para></note>
+<para>
+
+Para a maioria das instalações algumas das opções padrão do arquivo de
+configuração do seu carregador de inicialização
+(<quote>bootloader</quote>, como <literal>vga=normal</literal>, podem
+ser removidas com segurança, o que permite que você adicione mais opções
+na pré-configuração.
+
+</para>
+<note><para>
+
+Talvez nem sempre seja possível especificar valores com espaços nos
+parâmetros de inicialização, mesmo se você delimitá-los com aspas.
+
+</para></note>
+  </sect2>
+
+  <sect2 id="preseed-auto">
+  <title>Modo auto</title>
+<para>
+
+Existem vários recursos do Instalador Debian que se combinam para permitir
+permitir que simples linhas de comando passadas ao carregador de inicialização
+resultem em instalações automaticamente personalizadas e arbitrariamente
+complexas. Para ilustrar isso, aqui estão alguns exemplos que podem ser
+usados no prompt de inicialização:
+
+<informalexample><screen>
+auto url=autoserver
+</screen></informalexample>
+
+Isso depende da existência de um servidor DHCP que irá levar a máquina ao
+ponto onde <literal>autoserver</literal> possa ser resolvido pelo DNS,
+talvez após adicionar o domínio local se isso for fornecido pelo DHCP. Se
+isso for feito em um local onde o domíno é <literal>example.com</literal>,
+e eles tiverem um DCHP com uma configuração razoavelmente sã, isso resultaria
+em um arquivo de pré-configuração sendo pego de
+<literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+
+</para><para>
+
+O segmento do caminho que vem de <literal>auto-install/defaultroot</literal>,
+o qual inclui o diretório <literal>etch</literal> por padrão permite que
+futuras versões especifiquem seus próprios codinomes, permitindo que as
+pessoas migrem adiante de uma maneira controlada. O <literal>/./</literal> é
+usado para indicar uma raiz relativa, no qual subseqüentes caminhos podem ser
+ancorados (para uso em preseed/include e preseed/run). Isso permite que
+arquivos sejam especificados tanto como URLs completas, caminhos iniciados
+com / que são assim ancorados, ou mesmo caminhos relativos para o local onde
+o último arquivo de pré-configuração foi encontrado. Isso pode ser usado
+para construir scripts mais portáveis onde toda uma hierarquia de scripts
+pode ser movida para um novo local sem ser quebrada, por exemplo, copiando
+os arquivos para um dispositivo USB quando eles foram iniciados em um
+servidor web. Neste exemplo, se o arquivo de pré-configuração define
+<literal>preseed/run</literal> para
+<literal>/scripts/late_command.sh</literal> então o arquivo será pego de
+<literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
+
+</para><para>
+
+Se não existir uma infraestrutura local com DHCP ou DNS, ou se você não
+quiser usar o caminho padrão para o preseed.cfg, você pode ainda usar uma
+url explícita, e se você não usar o elemento <literal>/./</literal> ele
+será ancorado no inicio do caminho (i.e. o terceiro / da URL). Aqui
+está um exemplo que requer suporte mínimo da infraestrutura da rede local:
+
+<informalexample><screen>
+auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
+</screen></informalexample>
+
+A maneira como isso funciona é esta:
+<itemizedlist spacing="compact">
+<listitem><para>
+se a URL não especificar um protocolo, http é assumido,
+</para></listitem>
+<listitem><para>
+se a seção contendo o nome da máquina não tiver pontos, ela terá o dominio
+derivado do DHCP anexado a ela, e
+</para></listitem>
+<listitem><para>
+se não existir <literal>/</literal>'s após o nome da máquina, então o
+o caminho padrão é adicionado.
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Adicionalmente ao especificar a url, você pode também especificar
+configurações que não afetam diretamente o comportamento do &d-i;
+em si, mas podem ser passadas através de qualquer script que possa ser
+especificado como <literal>preseed/run</literal> no arquivo de
+pré-configuração carregado. No momento, o único exemplo disso é
+<literal>auto-install/classes</literal>, o qual tem um apelido
+<literal>classes</literal>. Isso pode ser usado assim:
+
+<informalexample><screen>
+auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>
+</screen></informalexample>
+
+As classes poderiam, por exemplo, denotar o tipo de sistema a ser instalado,
+ou a localização a ser usada.
+
+</para><para>
+
+Claro que é possível estender este conceito, e se você o fizer, é razoável
+usar o <quote>auto-install namespace</quote> para isso. Então, alguém poderá
+ter algo como <literal>auto-install/style</literal> o qual é então usado em
+seus scripts. Se você achar necessário fazer isso, por favor mencione isso
+(em inglês) na lista de email <email>debian-boot@lists.debian.org</email>
+para que nós possamos evitar conflitos de nomes, e talvez adicionar um
+apelido para o parâmetro para você.
+
+</para><para>
+
+O rótulo de inicialização <literal>auto</literal> ainda não está definido
+em todas as arquiteturas. O mesmo efeito pode ser alcançado simplesmente
+adicionando os dois parâmetros <literal>auto=true priority=critical</literal>
+à linha de comando do kernel. O parâmetro <literal>auto</literal> é um
+apelido para <literal>auto-install/enabled</literal> e controla o atraso
+das questões sobre localização e teclado até após ter tido a chance de fazer
+a pré-configuração deles, enquanto <literal>priority</literal> é um apelido
+para <literal>preseed/priority</literal> e definindo isso para
+<literal>critical</literal> evita quaisquer questões com uma baixa
+prioridade de serem perguntadas.
+
+</para><para>
+
+Opções adicionais que possam ser de interesse durante a tentativa de
+automatizar a instalação usando o DHCP são: <literal>interface=auto
+netcfg/dhcp_timeout=60</literal> a qual faz com que a máquina escolha
+a primeira interface de rede viável e seja mais paciente sobre ter uma
+resposta para sua pesquisa DHCP.
 
 </para>
   </sect2>
 
-  <sect2 id="preseed-dhcp">
+  <sect2 id="preseed-aliases">
+  <title>Apelidos úteis para pré-configuração</title>
+<para>
+
+Os apelidos a seguir podem ser úteis ao usar (modo auto) pré-configuração.
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
+ </sect2>
+
+ <sect2 id="preseed-dhcp">
   <title>Usando um servidor DHCP para especificar arquivos de pré-configuração</title>
 <para>
 
@@ -372,66 +552,6 @@ pré-configuração DHCP para automatizar totalmente as instalações de Debian
 deve ser feita somente com cuidado.
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-bootparms">
-  <title>Usando parâmetros de inicialização para complementar a pré-configuração</title>
-<para>
-
-Algumas partes do processo de instalação não podem ser automatizadas usando
-algumas formas de pré-configuração porque as perguntas são feitas antes do
-arquivo de pré-configuração ser carregado. Por exemplo, se o arquivo de
-pré-configuração for baixado pela rede, a configuração da rede deve ser feita
-primeiro. Uma razão para usar pré-configuração initrd é que ele permite a
-pré-configuração destes primeiros passos do processo de instalação.
-
-</para><para>
-
-Se um arquivo de pré-configuração não puder ser usado para pré-configurar alguns
-passos, a instalação ainda pode ser totalmente automatizada, desde que você
-passe os parâmetros de pré-configuração para o kernel na linha de comando.
-Apenas passe <userinput>path/to/var=value</userinput> para qualquer uma das
-variáveis de pré-configuração listada nos exemplos.
-
-</para><para>
-
-Note que algumas variáveis que são freqüentemente definidas no comando de
-inicialização têm um apelido abreviado. Se um apelido estiver disponível, ele
-é usado nos exemplos deste apêndice ao invés da variável completa.
-
-</para><para>
-
-Um <quote>--</quote> na opções de boot tem um significado especial.
-Parâmetros de kernel que aparecem após <quote>--</quote>, serão copiados
-dentro da configuração do carregador de inicialização instalado (se suportado
-pelo instalador para o carregador de inicialização). Note que <quote>--</quote>
-pode já estar presente nos parâmetros de inicialização padrão.
-
-</para>
-<note><para>
-
-O kernel 2.4 aceita no máximo 8 opções de linha de comando e 8 opções de
-ambiente (incluindo qualquer opção adicionada por padrão para o instalador).
-Se esses números forem excedidos, os kernels 2.4 irão descartar quaisquer opções
-excedentes e os kernels 2.6 vão sofrer <quote>kernel panic</quote>. Para o
-kernel 2.6.9 e posteriores, você pode usar 32 opções de linha de comando e 32
-opções de ambiente.
-
-</para></note>
-<para>
-
-Para a maioria das instalações algumas das opções padrão no seu arquivo de
-configuração do bootloader, como <literal>vga=normal</literal>, pode ser
-removida com segurança permitindo que você adicione mais opções na
-pré-configuração.
-
-</para>
-<note><para>
-
-Não é possivel especificar valores com espaços para os parâmetros de
-inicialização, mesmo que você os delimite com aspas.
-
-</para></note>
   </sect2>
  </sect1>
 
@@ -537,6 +657,7 @@ fazer uma instalação, você pode usar o comando
 
 </para>
  </sect1>
+
 
  <sect1 id="preseed-contents">
  <title>Conteúdo do arquivo de pré-configuração</title>
@@ -732,8 +853,7 @@ Usar pré-configuração para particionar o disco rígido é muito limitado pelo
 particionar um espaço existente no disco ou o disco inteiro. O layout do disco
 pode ser determinado por uma receita pré-definida, uma receita modificada de um
 arquivo de receita ou uma receita incluída no arquivo de pré-configuração.
-Atualmente não é possível particionar múltiplos discos usando pré-configuração
-nem configurar RAID.
+Atualmente não é possível particionar múltiplos discos usando pré-configuração.
 
 </para>
 
@@ -931,7 +1051,9 @@ repositórios (locais).
 #d-i apt-setup/local0/comment string local server
 # Enable deb-src lines
 #d-i apt-setup/local0/source boolean true
-# URL to the public key of the local repository
++# URL to the public key of the local repository; you must provide a key or
++# apt will complain about the unauthenticated repository and so the
++# sources.list line will be left commented out
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
@@ -1205,11 +1327,18 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
   </sect2>
  </sect1>
 
+
  <sect1 id="preseed-advanced">
  <title>Opções avançadas</title>
 
-  <sect2 id="preseed-shell">
-  <title>Comandos shell</title>
+  <sect2 id="preseed-hooks">
+  <title>Execuntando comandos personalizados durante a instalação</title>
+<para>
+
+Uma poderosa e flexível opção oferecida pelas ferramentas de pré-configuração
+é a opção de executar comandos ou scripts em certos pontos da instalação.
+
+</para>
 
 <informalexample role="example"><screen>
 # d-i preseeding is inherently not secure. Nothing in the installer checks
@@ -1232,6 +1361,24 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 
   </sect2>
 
+  <sect2 id="preseed-seenflag">
+  <title>Usando a pré-configuração para mudar valores padrão</title>
+<para>
+
+É possível usar a pré-configuração para mudar a resposta padrão para uma
+questão, mas ainda ter a pergunta sendo feita. Para fazer isso a
+<quote>flag</quote> <firstterm>seen</firstterm> deve ser alterada para
+<quote>false</quote> após definir um valor para a questão.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-chainload">
   <title>Carregando arquivos de pré-configuração em cadeia</title>
 <para>
@@ -1245,7 +1392,7 @@ em um arquivo e configurações mais específicas em outro arquivo.
 </para>
 
 <informalexample><screen>
-# More that one file can be listed, separated by spaces; all will be
+# More than one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preconfiguration file that includes them.
@@ -1267,6 +1414,18 @@ em um arquivo e configurações mais específicas em outro arquivo.
 # directory as the preconfiguration file that runs them.
 d-i preseed/run string foo.sh
 </screen></informalexample>
+
+<para>
+
+Também é possível inicializar a partir das fases initrd ou arquivo de
+pré-configuração, na pré-configuração da rede, definindo preseed/url nos
+arquivos anteriores. Isso fará com que a pré-configuração de rede seja
+executada quando a rede subir.  Você precisa ser cuidadoso ao fazer
+isso, já que haverá duas execuções distintas na pré-configuração, o que
+significa por exemplo que você tem outra chance de executar o comando
+preseed/early, a segunda acontecendo após a rede subir.
+
+</para>
 
   </sect2>
  </sect1>
