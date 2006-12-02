@@ -35,18 +35,18 @@ touch /var/lib/partman/initial_auto
 
 # See if any autopartition method has been set
 method=""
-if db_get partman-auto/method && [ -n "$RET" ]; then
+if db_get partman-auto/method && [ "$RET" ]; then
 	method="$RET"
 fi
 
 # See if any autopartition disks have been set
 disks=""
-if db_get partman-auto/disk && [ -n "$RET" ]; then
+if db_get partman-auto/disk && [ "$RET" ]; then
 	disks="$RET"
 fi
 
 # If both are set, let's try to do a completely automatic partitioning
-if [ -n "$method" ] && [ -n "$disks" ]; then
+if [ "$method" ] && [ "$disks" ]; then
 	# The code for the methods could be merged, but in the future non-regular
 	# methods may support multiple disks
 	case "$method" in
@@ -94,7 +94,7 @@ if [ -n "$method" ] && [ -n "$disks" ]; then
 			exit 0
 			;;
 		*)
-			# Unsupported method
+			logger -t partman-auto "Unsupported method '$method'"
 			exit 1
 			;;
 	esac
