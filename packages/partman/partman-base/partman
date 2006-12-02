@@ -59,6 +59,13 @@ while true; do
 	done
 	db_progress STOP
 
+	for s in /lib/partman/auto.d/*; do
+		if [ -x $s ]; then
+			#logger -t "Running auto.d/$s
+			$s || continue 2
+		fi
+	done
+
 	while true; do
 		ask_user /lib/partman/choose_partition
 		exitcode=$?
