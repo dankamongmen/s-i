@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42551 -->
+<!-- original version: 42985 -->
 
    <sect3 id="pkgsel">
    <title>Software auswählen und installieren (pkgsel)</title>
@@ -54,15 +54,33 @@ sogar entscheiden, an dieser Stelle gar keine Programmgruppen zu installieren.
 <note><para>
 
 Die Programmgruppe <quote>Arbeitsplatzrechner</quote> installiert die
-Gnome-Desktop-Umgebung. Die Optionen direkt im Installer erlauben es
+GNOME-Desktop-Umgebung. Die Optionen direkt im Installer erlauben es
 derzeit nicht, eine andere Desktop-Umgebung (wie z.B. KDE) zu installieren.
 
 </para><para>
 
-Es ist jedoch trotzdem möglich, den Installer anzuweisen, KDE zu installieren,
+Es ist trotzdem möglich, den Installer anzuweisen, KDE zu installieren,
 und zwar mittels Voreinstellung (siehe <xref linkend="preseed-pkgsel"/>) oder
 indem Sie beim Start des Installers am Boot-Prompt
-<literal>tasksel/first=kde-desktop</literal> angeben.
+<literal>tasks="standard, kde-desktop"</literal> angeben. Allerdings
+wird dies nur funktionieren, wenn die Pakete, die für KDE benötigt werden,
+auch verfügbar sind. Wenn Sie von einem Komplett-CD-Image installieren,
+müssen diese von einem Spiegelserver heruntergeladen werden, da die
+KDE-Pakete im ersten Komplett-CD-Image nicht enthalten sind; KDE auf diesem Weg
+zu installieren, sollte aber funktionieren, wenn Sie von einem DVD-Image
+oder mit irgendeiner anderen Installationsmethode installieren.
+
+</para><para>
+
+Die verschiedenen Server-Programmgruppen installieren grob gesagt folgende
+Software.
+DNS-Server: <classname>bind9</classname>;
+Datei-Server: <classname>samba</classname>, <classname>nfs</classname>;
+Mail-Server: <classname>exim4</classname>, <classname>spamassassin</classname>,
+<classname>uw-imap</classname>;
+Print-Server: <classname>cups</classname>;
+SQL-Datenbank-Server: <classname>postgresql</classname>;
+Web-Server: <classname>apache</classname>.
 
 </para></note>
 <para>
@@ -90,8 +108,9 @@ Programm für die Installation zusätzliche Informationen von Ihnen
 benötigt, werden Sie während dieses Prozesses danach gefragt.
 
 </para>
- <sect4 id="config-mta">
- <title>Ihren MTA (Mail-Transport-Agent) konfigurieren</title>
+   </sect3>
+   <sect3 id="config-mta">
+   <title>Ihren MTA (Mail-Transport-Agent) konfigurieren</title>
 
 <para>
 
@@ -185,5 +204,4 @@ die Installation beendet ist. Mehr Informationen über
 <filename>/usr/share/doc/exim4</filename>.
 
 </para>
- </sect4>
    </sect3>

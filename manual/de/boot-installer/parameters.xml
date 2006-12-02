@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42824 -->
+<!-- original version: 42982 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -24,8 +24,8 @@ Informationen über viele Boot-Parameter finden Sie im
 <ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html"> Linux
 BootPrompt-HowTo</ulink>, inklusive Tipps für problematische Hardware.
 Dieses Kapitel enthält nur einen Abriss der wichtigsten Parameter.
-Einige häufig vorkommenden Problemfälle sind in <xref linkend="boot-troubleshooting"/>
-beschrieben.
+Einige häufig vorkommenden Problemfälle sind in
+<xref linkend="boot-troubleshooting"/> beschrieben.
 
 </para><para>
 
@@ -39,8 +39,9 @@ Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k avail
 erscheinen.
 <replaceable>Total</replaceable> sollte der Summe des installierten
 Arbeitsspeichers in Kilobyte entsprechen. Wenn dem nicht so ist,
-müssen Sie den Parameter <userinput>mem=<replaceable>ram</replaceable></userinput>
-verwenden, wobei <replaceable>ram</replaceable> durch den Gesamtwert des Arbeitsspeichers
+müssen Sie den Parameter
+<userinput>mem=<replaceable>ram</replaceable></userinput> verwenden,
+wobei <replaceable>ram</replaceable> durch den Gesamtwert des Arbeitsspeichers
 ersetzt werden muss (mit einem nachfolgenden <quote>k</quote> für Kilobyte
 oder <quote>m</quote> für Megabyte). Ein Beispiel: sowohl
 <userinput>mem=65536k</userinput>
@@ -133,15 +134,7 @@ die für den Installer benutzt wird. Mögliche Einstellungen sind:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
@@ -149,12 +142,11 @@ die für den Installer benutzt wird. Mögliche Einstellungen sind:
 <userinput>DEBIAN_FRONTEND=text</userinput> könnte man bevorzugt für
 Installationen per serieller Konsole nutzen. Allgemein ist auf
 Standard-Installationsmedien nur das <userinput>newt</userinput>-Frontend
-vorhanden, deswegen ist dieser Parameter im Moment noch nicht so sehr
-nützlich.
+vorhanden; auf Architekturen, auf denen der grafische Installer unterstützt
+wird, benutzt er das <userinput>gtk</userinput>-Frontend.
 
 </para></listitem>
 </varlistentry>
-
 
 <varlistentry>
 <term>BOOT_DEBUG</term>
@@ -162,8 +154,8 @@ nützlich.
 
 Ist dieser Bootparameter auf 2 gesetzt, wird der Bootprozess des Installers
 ausführlich protokolliert. Auf 3 gesetzt bewirkt er, dass an strategischen
-Punkten des Bootprozesses eine Shell zur Fehlersuche gestartet wird (schliessen
-Sie die Shell, um den Bootprozess fortzusetzen).
+Punkten des Bootprozesses eine Shell zur Fehlersuche gestartet wird
+(schließen Sie die Shell, um den Bootprozess fortzusetzen).
 
 <variablelist>
 <varlistentry>
@@ -195,7 +187,6 @@ Bootvorgang fortzusetzen.
 
 </para></listitem>
 </varlistentry>
-
 
 <varlistentry>
 <term>INSTALL_MEDIA_DEV</term>
@@ -232,7 +223,8 @@ Installationsstart.
 
 Manchmal muss auch <userinput>video=vga16:off</userinput> benutzt werden,
 um die Verwendung des Framebuffers durch den Kernel zu deaktivieren. Solche
-Probleme wurden von einem Dell Inspiron mit Mobile Radeon-Grafikkarte berichtet.
+Probleme wurden von einem Dell Inspiron mit Mobile Radeon-Grafikkarte
+berichtet.
 
 </para><para arch="m68k">
 
@@ -245,11 +237,11 @@ Probleme mit dem Framebuffer wurden u.a. von hppa-Systemen berichtet.
 </para><note arch="sparc"><para>
 
 Aufgrund von Darstellungsproblemen auf manchen Systemen ist die
-Framebuffer-Unterstützung für die &arch-title;-Architektur <emphasis>standardmäßig
-deaktiviert</emphasis>. Dies kann auf Systemen, die den Framebuffer eigentlich
-korrekt unterstützen (wie solche mit ATI-Grafikkarten), zu einer seltsamen
-Anzeige führen. Wenn Sie solche Anzeigeprobleme im Installer feststellen,
-können Sie versuchen, mit dem Parameter
+Framebuffer-Unterstützung für die &arch-title;-Architektur
+<emphasis>standardmäßig deaktiviert</emphasis>. Dies kann auf Systemen, die den
+Framebuffer eigentlich korrekt unterstützen (wie solche mit ATI-Grafikkarten),
+zu einer seltsamen Anzeige führen. Wenn Sie solche Anzeigeprobleme im Installer
+feststellen, können Sie versuchen, mit dem Parameter
 <userinput>debian-installer/framebuffer=true</userinput> oder
 kurz <userinput>fb=true</userinput> zu booten.
 
@@ -286,19 +278,19 @@ die Suche nach USB-Geräten für den Fall, dass diese sonst Probleme verursacht.
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
-Standardmäßig versucht der &d-i;, die Netzwerkkonfiguration per DHCP 
-zu beziehen. Wenn dies erfolgreich ist, haben Sie keine Chance mehr, 
-sich anders zu entscheiden und die Einstellungen manuell zu ändern. 
-Das manuelle Netzwerksetup kann man nur erreichen, wenn die DHCP-Abfrage 
-fehlschlägt. 
+Standardmäßig versucht der &d-i;, die Netzwerkkonfiguration per DHCP
+zu beziehen. Wenn dies erfolgreich ist, haben Sie keine Chance mehr,
+sich anders zu entscheiden und die Einstellungen manuell zu ändern.
+Das manuelle Netzwerksetup kann man nur erreichen, wenn die DHCP-Abfrage
+fehlschlägt.
 
 </para><para>
 
-Wenn Sie einen DHCP-Server in Ihrem lokalen Netzwerk haben, ihn aber 
-umgehen wollen, z.B. weil er falsche Antworten gibt, können Sie 
-den Parameter <userinput>netcfg/disable_dhcp=true</userinput> benutzen, 
-um die Konfiguration per DHCP zu unterdrücken und die Daten manuell 
-einzugeben. 
+Wenn Sie einen DHCP-Server in Ihrem lokalen Netzwerk haben, ihn aber
+umgehen wollen, z.B. weil er falsche Antworten gibt, können Sie
+den Parameter <userinput>netcfg/disable_dhcp=true</userinput> benutzen,
+um die Konfiguration per DHCP zu unterdrücken und die Daten manuell
+einzugeben.
 
 </para></listitem>
 </varlistentry>
@@ -358,15 +350,15 @@ Standardmäßig wirft der &d-i; automatisch das optische Installationsmedium
 aus, bevor er den Rechner neu startet. Dies kann jedoch unnötig sein, falls
 das System eh nicht automatisch von CD bootet. In einigen Fällen könnte es
 sogar unerwünscht sein, wenn z.B. das optische Laufwerk das Medium nicht selbst
-wieder einlegen kann und der Benutzer nicht vor Ort ist, um dies manuell zu erledigen.
-Viele Slot-In-, Slim-Line- und Cartridge-Laufwerke können Medien nicht automatisch
-neu einlegen/einziehen.
+wieder einlegen kann und der Benutzer nicht vor Ort ist, um dies manuell zu
+erledigen. Viele Slot-In-, Slim-Line- und Cartridge-Laufwerke können Medien
+nicht automatisch neu einlegen/einziehen.
 
 </para><para>
 
-Setzen Sie diesen Parameter auf <userinput>false</userinput>, um das automatische
-Auswerfen des Mediums zu deaktivieren und stellen Sie sicher, dass das System nach
-der Basisinstallation nicht mehr vom optischen Laufwerk bootet.
+Setzen Sie diesen Parameter auf <userinput>false</userinput>, um das
+automatische Auswerfen des Mediums zu deaktivieren und stellen Sie sicher, dass
+das System nach der Basisinstallation nicht mehr vom optischen Laufwerk bootet.
 
 </para></listitem>
 </varlistentry>
@@ -398,7 +390,8 @@ auf Linkshänder-Betrieb umschalten, indem dieser Parameter auf
 
 Im Gtk-Frontend (graphischer Installer) ist die Hardwarebeschleunigung in
 directfb (Framebuffer) standardmäßig deaktiviert. Um sie zu aktivieren, setzen
-Sie beim Booten des Installers diesen Parameter auf <userinput>true</userinput>.
+Sie beim Booten des Installers diesen Parameter auf
+<userinput>true</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -415,9 +408,62 @@ Siehe <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
-  </sect2>
 
-  <sect2 id="module-parms"><title>Parameter für Kernelmodule angeben</title>
+   <sect3 id="preseed-args">
+   <title>Boot-Parameter benutzen, um Fragen automatisiert zu beantworten</title>
+<para>
+
+Mit einigen Ausnahmen kann für jede während der Installation gestellte Frage
+am Bootprompt eine Antwort vorgegeben werden, obwohl dies nur in speziellen
+Fällen sinnvoll ist. Generelle Anweisungen, wie Sie dies erledigen, finden
+Sie im <xref linkend="preseed-bootparms"/>. Einige spezielle Beispiele
+sind weiter unten aufgelistet.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+Kann genutzt werden, um sowohl die Sprache wie auch das Land für die
+Installation anzugeben. Dies funktioniert nur, wenn die angegebene
+Locale in Debian unterstützt wird. Kurzform: <userinput>locale</userinput>.
+Um zum Beispiel Deutsch als Sprache zu verwenden und Schweiz als Land,
+nutzen Sie <userinput>locale=de_CH</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Setzen Sie dies auf <userinput>true</userinput>, wenn Sie DHCP deaktivieren
+möchten und stattdessen statische Netzwerkkonfiguration erzwingen möchten.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+
+Dies kann genutzt werden, um Programmgruppen zu installieren, die in der
+interaktiven Liste von tasksel nicht verfügbar sind, wie z.B.
+<literal>kde-desktop</literal>.
+Siehe <xref linkend="pkgsel"/> für zusätzliche Informationen.
+Kurzform: <userinput>tasks</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms"><title>Parameter für Kernelmodule angeben</title>
 <para>
 
 Wenn Treiber in den Kernel einkompiliert sind, können Sie Parameter für
@@ -458,7 +504,6 @@ verwendet wird, nutzen Sie dies:
 </screen></informalexample>
 
 </para>
+   </sect3>
   </sect2>
  </sect1>
-
-

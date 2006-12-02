@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42868 -->
+<!-- original version: 42982 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -45,9 +45,9 @@ die während einer normalen Installation nicht verfügbar sind.
 
 Es gibt drei Methoden, die zur Voreinstellung genutzt werden können:
 <firstterm>initrd</firstterm>, <firstterm>file</firstterm> (Datei) und
-<firstterm>network</firstterm> (Netzwerk). Voreinstellung per initrd funktioniert
-mit jeder Art von Installation und unterstützt vergleichsweise viele
-Dinge, benötigt jedoch mehr Vorbereitung. Das Voreinstellen mittels
+<firstterm>network</firstterm> (Netzwerk). Voreinstellung per initrd
+funktioniert mit jeder Art von Installation und unterstützt vergleichsweise
+viele Dinge, benötigt jedoch mehr Vorbereitung. Das Voreinstellen mittels
 file und network kann jeweils mit verschiedenen Installationsmethoden
 genutzt werden.
 
@@ -73,8 +73,8 @@ verschiedenen Installationsarten nutzen können.
   <entry>ja<footnote id='apx-ps-net'>
 
   <para>
-  jedoch nur, falls Sie Netzwerkzugriff haben und <literal>preseed/url</literal>
-  passend gesetzt haben
+  jedoch nur, falls Sie Netzwerkzugriff haben und
+  <literal>preseed/url</literal> passend gesetzt haben
   </para>
 
   </footnote></entry>
@@ -115,8 +115,8 @@ Zeitpunkt, zu dem die Voreinstellungsdatei geladen und bearbeitet wird. Beim
 Voreinstellen per initrd ist dies direkt bei Start der Installation, noch
 bevor die erste Frage gestellt wird. Beim Voreinstellen mittels file passiert
 dies, nachdem die CD oder das CD-Image geladen wurde. Beim Voreinstellen
-per network kann die Datei erst geladen werden, nachdem das Netzwerk konfiguriert
-wurde.
+per network kann die Datei erst geladen werden, nachdem das Netzwerk
+konfiguriert wurde.
 
 </para><para>
 
@@ -131,11 +131,11 @@ vermeiden, dass diese Fragen gestellt werden.
 
 Um Fragen zu vermeiden, die normalerweise erscheinen, bevor die Voreinstellung
 greift, können Sie den Installer im <quote>auto</quote>-Modus starten.
-Dadurch werden Fragen, die eigentlich für Voreinstellung zu früh gestellt werden
-(wie Land, Sprache und Tastaturbelegung), aufgeschoben bis das Netzwerk
-aktiv ist und dann voreingestellt werden können. Ausserdem wird die Installation
-mit Priorität kritisch durchgeführt, um unwichtige Fragen zu unterdrücken.
-Siehe <xref linkend="preseed-auto"/> für Details.
+Dadurch werden Fragen, die eigentlich für Voreinstellung zu früh gestellt
+werden (wie Land, Sprache und Tastaturbelegung), aufgeschoben bis das Netzwerk
+aktiv ist und dann voreingestellt werden können. Ausserdem wird die
+Installation mit Priorität kritisch durchgeführt, um unwichtige Fragen zu
+unterdrücken. Siehe <xref linkend="preseed-auto"/> für Details.
 
 </para>
   </sect2>
@@ -301,15 +301,33 @@ diese Argumente als Bootparameter an den Kernel übergeben werden.
   </sect2>
 
   <sect2 id="preseed-bootparms">
-  <title>Boot-Parameter nutzen, um das Voreinstellen zu ergänzen</title>
+  <title>Boot-Parameter nutzen, um Fragen automatisiert zu beantworten</title>
 <para>
 
 Falls eine Voreinstellungsdatei für einige Schritte nicht verwendet werden
 kann, kann die Installation trotzdem voll automatisiert werden, da Sie auch
 Voreinstellungswerte per Kommandozeile an den Kernel übergeben können.
-Verwenden Sie einfach die Kommandozeilenoption
-<userinput>path/to/var=value</userinput> für jede Voreinstellungsvariable,
-die in den Beispielen aufgelistet ist.
+
+</para><para>
+
+Boot-Parameter können auch verwendet werden, wenn zwar Voreinstellung generell
+nicht verwendet, aber eine Antwort für eine spezielle Frage vorgegeben werden
+soll. Einige Beispiele, wofür das sinnvoll sein kann, sind an anderer Stelle
+in diesem Handbuch dokumentiert.
+
+</para><para>
+
+Um einen Wert festzulegen, der innerhalb vom &d-i; verwendet werden soll,
+geben Sie einfach
+<userinput><replaceable>Pfad/zur/Variable</replaceable>=<replaceable>Wert</replaceable></userinput>
+für jede Voreinstellungsvariable, die in den Beispielen dieses Abschnitts
+aufgelistet ist, am Bootprompt an. Falls ein Wert verwendet werden soll,
+um Pakete für das Zielsystem zu konfigurieren, müssen Sie den
+<firstterm>Eigentümer</firstterm> der Variable voranstellen wie hier:
+<userinput><replaceable>Eigentümer</replaceable>:<replaceable>Pfad/zur/Variable</replaceable>=<replaceable>value</replaceable></userinput>. Geben Sie den
+Eigentümer nicht an, wird der Wert der Variable nicht in die Debconf-Datenbank
+des Zielsystems kopiert und bleibt deshalb bei der Konfiguration des
+entsprechenden Pakets ungenutzt.
 
 </para><para>
 
@@ -318,7 +336,9 @@ einen kurzen Alias (Abkürzung). Wenn ein Alias vorhanden ist, wird er in
 den Beispielen in diesem Kapitel auch verwendet (statt der langen Fassung).
 Speziell die <literal>preseed/url</literal>-Variable wurde zum Alias
 <literal>url</literal> gekürzt und bietet eine spezielle Magie, um
-abgekürzte URLs nutzen zu können.
+abgekürzte URLs nutzen zu können. Ein anderes Beispiel ist der Alias
+<literal>tasks</literal>, der in <literal>tasksel:tasksel/first</literal>
+übersetzt wird.
 
 </para><para>
 
@@ -359,9 +379,9 @@ Anführungszeichen einfassen.
 <para>
 
 Es gibt etliche Features des Debian Installers, die es erlauben, mit ziemlich
-einfachen Kommandozeilen am Boot-Prompt zu komplexen angepassten automatisierten
-Installationen zu kommen. Um dies zu demonstrieren, hier einige Beispiele,
-die Sie am Boot-Prompt verwenden können:
+einfachen Kommandozeilen am Boot-Prompt zu komplexen angepassten
+automatisierten Installationen zu kommen. Um dies zu demonstrieren, hier einige
+Beispiele, die Sie am Boot-Prompt verwenden können:
 
 <informalexample><screen>
 auto url=autoserver
@@ -457,9 +477,9 @@ vermeiden können und vielleicht einen Alias dafür hinzufügen.
 
 Das <literal>auto</literal>-Bootlabel ist noch nicht auf allen
 Architekturen definiert. Der selbe Effekt wird erreicht, indem die beiden
-Parameter <literal>auto=true priority=critical</literal> zur Kernel-Kommandozeile
-hinzugefügt werden. Der Parameter <literal>auto</literal> ist ein Alias
-für <literal>auto-install/enabled</literal> und kontrolliert den
+Parameter <literal>auto=true priority=critical</literal> zur
+Kernel-Kommandozeile hinzugefügt werden. Der Parameter <literal>auto</literal>
+ist ein Alias für <literal>auto-install/enabled</literal> und kontrolliert den
 Aufschub der Fragen über Locale und Tastatur, bis eine Chance besteht,
 sie per Voreinstellung zu setzen. <literal>priority</literal> ist ein
 Alias für <literal>preseed/priority</literal>, und wenn er auf
@@ -539,8 +559,8 @@ Installationen im Netzwerk voreingestellt werden.
 </para><para>
 
 Eine gute Sache für die Voreinstellung per DHCP ist es, nur Werte vorzugeben,
-die netzwerkspezifisch sind, wie der zu nutzende Debian-Spiegelserver. Auf diese
-Weise wird bei allen Installationen im Netzwerk automatisch ein passender
+die netzwerkspezifisch sind, wie der zu nutzende Debian-Spiegelserver. Auf
+diese Weise wird bei allen Installationen im Netzwerk automatisch ein passender
 Spiegelserver gewählt, aber der Rest der Installation kann interaktiv
 vonstatten gehen. Eine voll automatisierte Debian-Installation per
 DHCP-Voreinstellung sollte nur mit Vorsicht durchgeführt werden.
@@ -1255,8 +1275,8 @@ auszuwählen.
 Wenn Sie zusätzlich zu den Paketen, die durch die Programmgruppen installiert
 werden, weitere benötigen, können Sie den Parameter
 <classname>pkgsel/include</classname> benutzen. Der Wert für diesen Parameter
-kann eine entweder durch Kommas oder durch Leerzeichen getrennte Liste sein,
-so dass Sie ihn auch recht einfach auf der Kernel-Kommandozeile verwenden können.
+kann eine entweder durch Kommas oder durch Leerzeichen getrennte Liste sein, so
+dass Sie ihn auch recht einfach auf der Kernel-Kommandozeile verwenden können.
 
 </para>
 
@@ -1317,9 +1337,9 @@ exim4-config exim4/dc_postmaster string
 <para>
 
 Die Konfiguration von Debian's X-System voreinzustellen ist möglich, aber
-Sie müssen vielleicht einige Details über die Video-Hardware des Rechners kennen,
-da Debian's X-Konfigurationsprogramm nicht in jedem Fall eine vollautomatische
-Konfiguration durchführen kann.
+Sie müssen vielleicht einige Details über die Video-Hardware des Rechners
+kennen, da Debian's X-Konfigurationsprogramm nicht in jedem Fall eine
+vollautomatische Konfiguration durchführen kann.
 
 </para>
 
@@ -1429,8 +1449,8 @@ d-i foo/bar seen false
 <para>
 
 Wenn Sie mögen, können Sie hier weitere Voreinstellungsdateien in diese
-Datei integrieren. Jegliche Einstellungen in den integrierten Dateien werden die
-Werte aus dieser Datei überschreiben. Dies ermöglicht es z.B., allgemeine
+Datei integrieren. Jegliche Einstellungen in den integrierten Dateien werden
+die Werte aus dieser Datei überschreiben. Dies ermöglicht es z.B., allgemeine
 Netzwerkeinstellungen in einer Datei festzulegen und speziellere Einstellungen
 für andere Zwecke/Netze/Orte in anderen Dateien.
 
