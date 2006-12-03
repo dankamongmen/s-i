@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42367 untranslated -->
+<!-- original version: 42982 untranslated -->
 
  <sect1 id="boot-parms"><title>Boot Parameters</title>
 <para>
@@ -126,23 +126,16 @@ installer. The current possible parameter settings are:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
-The default front end is <userinput>DEBIAN_FRONTEND=newt</userinput>.
+The default frontend is <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>DEBIAN_FRONTEND=text</userinput> may be preferable for
 serial console installs. Generally only the
 <userinput>newt</userinput> frontend is available on default install
-media, so this is not very useful right now.
+media. On architectures which support it, the graphical installer uses
+the <userinput>gtk</userinput> frontend.
 
 </para></listitem>
 </varlistentry>
@@ -304,7 +297,7 @@ this misbehavior.
 
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>url</userinput>
+Short form: <userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -315,7 +308,7 @@ Short form: <userinput>url</userinput>
 
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>file</userinput>
+Short form: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -362,7 +355,17 @@ If you are using a 2.2.x kernel, you may need to set &ramdisksize;.
 </para></listitem>
 </varlistentry>
 
-<varlistentry>
+<varlistentry condition="g-i">
+<term>mouse/left</term>
+<listitem><para>
+
+For the gtk frontend (graphical installer), users can switch the mouse to
+left-handed operation by setting this parameter to <userinput>true</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="g-i">
 <term>directfb/hw-accel</term>
 <listitem><para>
 
@@ -384,6 +387,97 @@ performing a normal installation. See <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
+
+   <sect3 id="preseed-args">
+   <title>Using boot parameters to answer questions</title>
+<para>
+
+With some exceptions, a value can be set at the boot prompt for any question
+asked during the installation, though this is only really useful in specific
+cases. General instructions how to do this can be found in
+<xref linkend="preseed-bootparms"/>. Some specific examples are listed below.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+Can be used to set both the language and country for the installation.
+This will only work if the locale is supported in Debian.
+Short form: <userinput>locale</userinput>.
+For example, use <userinput>locale=de_CH</userinput> to select German as
+language and Switserland as country.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Set to <userinput>true</userinput> if you want to disable DHCP and instead
+force static network configuration.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+
+Can be used to select tasks that are not available from the interactive task
+list, such as the <literal>kde-desktop</literal> task.
+See <xref linkend="pkgsel"/> for additional information.
+Short form: <userinput>tasks</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms"><title>Passing parameters to kernel modules</title>
+<para>
+
+If drivers are compiled into the kernel, you can pass parameters to them
+as described in the kernel documentation. However, if drivers are compiled
+as modules and because kernel modules are loaded a bit differently during
+an installation than when booting an installed system, it is not possible
+to pass parameters to modules as you would normally do. Instead, you need
+to use a special syntax recognized by the installer which will then make
+sure that the parameters are saved in the proper configuration files and
+will thus be used when the modules are actually loaded. The parameters
+will also be propagated automatically to the configuration for the installed
+system.
+
+</para><para>
+
+Note that it is now quite rare that parameters need to be passed to modules.
+In most cases the kernel will be able to probe the hardware present in a
+system and set good defaults that way. However, in some situations it may
+still be needed to set parameters manually.
+
+</para><para>
+
+The syntax to use to set parameters for modules is:
+
+<informalexample><screen>
+<replaceable>module_name</replaceable>.<replaceable>parameter_name</replaceable>=<replaceable>value</replaceable>
+</screen></informalexample>
+
+If you need to pass multiple parameters to the same or different modules,
+just repeat this. For example, to set an old 3Com network interface card
+to use the BNC (coax) connector and IRQ 10, you would pass:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+   </sect3>
   </sect2>
  </sect1>
-
