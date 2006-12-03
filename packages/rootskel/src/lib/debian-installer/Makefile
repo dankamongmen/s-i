@@ -14,12 +14,14 @@ ifeq ($(DEB_HOST_ARCH_OS),)
   DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_GNU_SYSTEM)
 endif
 
+files = \
+	init-debug
+
 files_exec = \
 	coldplug \
 	exit \
 	exit-command \
 	init-udev-devices \
-	init-debug \
 	menu
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
