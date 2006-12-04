@@ -303,10 +303,10 @@ Des exemples sont donnés ailleurs dans ce manuel.
 <para>
 Pour toutes les variables listées dans les exemples,
 il suffit d'indiquer une paire de type 
-<userinput><replaceable>path/to/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
+<userinput><replaceable>chemin/vers/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
 Quand une valeur est destinée à la configuration de paquets du système cible, il est nécessaire
 d'ajouter le <firstterm>propriétaire</firstterm> de la variable&nbsp;:
-<userinput><replaceable>propriétaire</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
+<userinput><replaceable>propriétaire</replaceable>:<replaceable>chemin/vers/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
 Si vous n'indiquez pas de propriétaire, la valeur de la variable ne sera pas copiée
 dans la base de données debconf du système cible et ne sera pas utilisée pendant la
 configuration des paquets.
@@ -314,7 +314,7 @@ configuration des paquets.
 
 Certaines des variables qui sont fréquemment définies à l'invite du démarrage
 possèdent des alias plus courts. Quand un alias est disponible, les exemples de
-cet annexe l'utilise au lieu de la variable complète. En particulier, la variable
+cette annexe l'utilise au lieu de la variable complète. En particulier, la variable
 <literal>preseed/url</literal> possède l'alias <literal>url</literal> et elle permet
 de raccourcir les urls à utiliser. Un autre exemple est l'alias <literal>tasks</literal>,
 qui représente <literal>tasksel:tasksel/first</literal>.
@@ -383,13 +383,13 @@ On peut ainsi indiquer des fichiers soit avec une url complète, chemin commençan
 /, soit avec un chemin relatif à l'endroit où a été trouvé le dernier fichier de
 préconfiguration. Cela permettra d'écrire des scripts portables où une
 hiérarchie complète de scripts pourra être déplacée à un nouvel endroit sans être
-détruite. Par exemple, on pourra déplacer des fichiers d'un serveur web à une clé USB.
+détruite. Par exemple, on pourra déplacer des fichiers d'un serveur web sur une clé USB.
 Si le fichier de préconfiguration définit <literal>preseed/run</literal> comme
 <literal>/scripts/late_command.sh</literal>, le fichier sera cherché à
 <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
 </para>
 <para>
-S'il n'existe pas de serveurs DHCP ou DNS ou si vous ne voulez pas utiliser
+S'il n'existe pas de serveur DHCP ou DNS, ou si vous ne voulez pas utiliser
 le chemin par défaut du fichier preseed.cfg, vous pouvez toujours utiliser une url
 explicite. Et si vous n'utilisez pas l'élément <literal>/./</literal>,
 le fichier sera rattaché au troisième / de l'url. Voici un exemple qui demande
@@ -529,7 +529,7 @@ toute l'installation avec une préconfiguration de type DHCP.
 <para>
 
 Le format de ce fichier est celui de la commande 
-<command>debconf-set-selections</command>. Chaque ligne est de la forme suivante&nbsp;:
+<command>debconf-set-selections</command>. Chaque ligne est de cette forme&nbsp;:
 
 <informalexample><screen>
 &lt;propriétaire&gt; &lt;nom de la question&gt; &lt;type de la question&gt; &lt;valeur&gt;
@@ -906,13 +906,13 @@ les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
 
 Il est facile de se tromper avec ce type de partitionnement automatique.
 C'est aussi un nouveau composant de l'installateur, des bogues peuvent exister et
-la gestion de certaines erreurs peut manquer. Donner les bonnes formules est
-la responsabilité de l'utilisateur. Consultez le fichier <filename>/var/log/syslog</filename>
+la gestion de certaines erreurs peut manquer. Donner les bonnes formules est de
+la responsabilité de chacun. Consultez le fichier <filename>/var/log/syslog</filename>
 si vous rencontrez des problèmes.
 </para>
 <para>
 Seuls RAID 0 et RAID 1 ont été testés par les développeurs. RAID 5 n'est pas testé.
-Le RAID avec ensemble dégradé ou périphériques de rechange n'a été testé que très légèrement.
+Le RAID avec ensemble dégradé ou périphériques de rechange n'a été que très peu testé.
 </para></warning>
 
 <informalexample><screen>
@@ -1343,7 +1343,7 @@ un autre fichier.
 
 # L'installateur peut vérifier la somme de contrôle des fichiers de
 # préconfiguration avant de les utiliser. Pour le moment, cette somme doit être
-# de type md5sum. Il faut lister les sommes de contrôles dans le même ordre
+# de type md5sum. Il faut lister les sommes de contrôle dans le même ordre
 # que les fichiers à inclure. 
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
