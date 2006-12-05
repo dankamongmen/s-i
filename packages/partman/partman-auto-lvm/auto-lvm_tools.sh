@@ -65,12 +65,25 @@ auto_lvm_prepare() {
 	normalscheme=$(echo "$scheme" | grep -v "lvmok")
 
 	# Check if the scheme contains a boot partition; if not warn the user
-	if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
-		db_input critical partman-auto-lvm/no_boot || true
-		db_go || return 30
-		db_get partman-auto-lvm/no_boot || true
-		[ "$RET" = true ] || return 30
+	# Except for powerpc/prep as that has the kernel in the prep partition
+	if type archdetect >/dev/null 2>&1; then
+		archdetect=$(archdetect)
+	else
+		archdetect=unknown/generic
 	fi
+
+	case $archdetect in
+	    powerpc/prep)
+		: ;;
+	    *)
+		if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
+			db_input critical partman-auto-lvm/no_boot || true
+			db_go || return 30
+			db_get partman-auto-lvm/no_boot || true
+			[ "$RET" = true ] || return 30
+		fi
+		;;
+	esac
 
 	# Creating envelope
 	scheme="$normalscheme${NL}100 1000 1000000000 ext3 method{ $method }"
