@@ -265,7 +265,7 @@ setup_partition () {
 get_recipedir () {
     local archdetect arch sub recipedir
 
-    if [ -x /bin/archdetect ]; then
+    if type archdetect >/dev/null 2>&1; then
 	archdetect=$(archdetect)
     else
 	archdetect=unknown/generic
