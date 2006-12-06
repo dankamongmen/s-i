@@ -73,7 +73,7 @@ get_ntfs_resize_range () {
 	    if echo "$ntfsresize" | grep -q "NTFS volume version: 3.1"; then
 		if has_vista; then
 		    logger -t partman "Resizing of Vista NTFS partitions is not supported"
-		    logger -t partman "See http://www.bugs.debian.org/379835 for details"
+		    logger -t partman "See http://bugs.debian.org/379835 for details"
 		    return 1
 		fi
 	    fi
