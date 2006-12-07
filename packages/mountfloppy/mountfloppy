@@ -28,6 +28,15 @@ ask_dev() {
 	echo $RET
 }
 
+try_mount() {
+    # TO REMOVE, there is a bug somewhere in the kernel, the first
+    # mount command fail when changing floppy disk
+    # so we have to launch mount twice
+    mount $1 -tauto $2 || true
+    umount $2 || true
+    mount $1 -tauto $2
+}
+
 if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 	# This is a good reasonable default, but will fail for
 	# USB floppys.
@@ -46,10 +55,10 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 		FLOPPYDEV=/dev/fd0
 	fi
 
-	if [ ! -e "$FLOPPYDEV" ] || ! mount $FLOPPYDEV -tauto $FLOPPYMNT; then
+	if [ ! -e "$FLOPPYDEV" ] || ! try_mount $FLOPPYDEV $FLOPPYMNT; then
 		# Cannot find a device, or found the wrong device.
 		# Ask for help from the user and try it again.
 		FLOPPYDEV=$(ask_dev)
-		mount $FLOPPYDEV -tauto $FLOPPYMNT
+		try_mount $FLOPPYDEV $FLOPPYMNT
 	fi
 fi
