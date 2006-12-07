@@ -59,21 +59,39 @@ while true; do
 	done
 	db_progress STOP
 
+	skip_choose_partition=no
 	for s in /lib/partman/auto.d/*; do
 		if [ -x $s ]; then
 			#logger -t "Running auto.d/$s"
-			$s || continue 2
+			$s
+			exitcode=$?
+			if [ $exitcode -eq 255 ]; then
+				abort 10 # back up to main menu
+			elif [ $exitcode -ge 100 ]; then
+				# Partitioning complete; go straight to
+				# confirmation. (To present choose_partition
+				# so that the user can edit the results of
+				# manual partitioning, just exit 0 instead.)
+				skip_choose_partition=yes
+			elif [ $exitcode -ne 0 ]; then
+				continue 2
+			fi
 		fi
 	done
 
 	while true; do
-		ask_user /lib/partman/choose_partition
-		exitcode=$?
+		if [ "$skip_choose_partition" != yes ]; then
+			ask_user /lib/partman/choose_partition
+			exitcode=$?
+		else
+			exitcode=100
+		fi
 		if [ $exitcode -eq 255 ]; then
 			abort 10 # back up to main menu
 		elif [ $exitcode -ge 100 ] && confirm_changes "partman"; then
 			break
 		fi
+		skip_choose_partition=no
 	done
 
 	for s in /lib/partman/commit.d/*; do
