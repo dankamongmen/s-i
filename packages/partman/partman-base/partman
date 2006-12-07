@@ -42,7 +42,7 @@ while true; do
 
 	for s in /lib/partman/init.d/*; do
 		if [ -x $s ]; then
-			#logger -t "Running init.d/$s
+			#logger -t "Running init.d/$s"
 
 			base=$(basename $s | sed 's/[0-9]*//')
 			# Not every init script has, or needs, its own progress
@@ -61,7 +61,7 @@ while true; do
 
 	for s in /lib/partman/auto.d/*; do
 		if [ -x $s ]; then
-			#logger -t "Running auto.d/$s
+			#logger -t "Running auto.d/$s"
 			$s || continue 2
 		fi
 	done
@@ -78,14 +78,14 @@ while true; do
 
 	for s in /lib/partman/commit.d/*; do
 		if [ -x $s ]; then
-			#logger -t "Running commit.d/$s
+			#logger -t "Running commit.d/$s"
 			$s || continue 2
 		fi
 	done
 
 	for s in /lib/partman/finish.d/*; do
 		if [ -x $s ]; then
-			#logger -t "Running finish.d/$s
+			#logger -t "Running finish.d/$s"
 			$s || {
 				status=$?
 				if [ "$status" = 1 ]; then
