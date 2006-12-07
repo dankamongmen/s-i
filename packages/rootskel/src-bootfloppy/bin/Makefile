@@ -9,20 +9,21 @@ files_exec = \
 	umount:/usr/lib/klibc/bin/umount \
 	zcat:/usr/lib/klibc/bin/zcat \
 	run-init:/usr/lib/klibc/bin/run-init \
-	cpio
+	cpio \
+	timeout_read
 
 CC=klcc
 CFLAGS= 
 LDFLAGS=-shared -s
 OBJS=$(subst .c,.o,$(wildcard *.c))
-BIN=cpio
+BIN=cpio timeout_read
 LIBS=
 
 
 build-local:: $(BIN)
 
 $(BIN): $(OBJS)
-	$(CC) $(LDFLAGS) -o $(BIN) $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $@.o $(LIBS)
 
 clean:
 	-rm -f $(BIN) $(OBJS) *~

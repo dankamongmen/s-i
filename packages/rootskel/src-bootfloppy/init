@@ -6,6 +6,8 @@
 # INSTALL_MEDIA_DEV can be passed as a boot parameter to force only 
 # one device or set of devices to be scanned.
 
+set -e
+
 # The identification of this floppy and the desired root floppy.
 SYSTEM="debian-installer"
 LABEL="boot floppy"
@@ -39,33 +41,33 @@ mount -t sysfs sysfs sys
 
 # TODO: no modprobe in klibc
 if ! insmod $MODULE_DIR/kernel/drivers/block/floppy.ko 2>/dev/null; then
-    abort "Cannot load floppy module"
+	abort "Cannot load floppy module"
 fi
 
 makedev () {
-	[ -e "$1" ] || mknod "$1" "$2" "$3" "$4"
+    [ -e "$1" ] || mknod "$1" "$2" "$3" "$4"
 }
 
 makedir () {
-	[ -d "$2" ] || mkdir -m "$1" "$2"
+    [ -d "$2" ] || mkdir -m "$1" "$2"
 }
 
 makedir 755 /dev/floppy
 
 for i in 0 1 2 3 4 5 6 7; do
-    if sys_dev=`cat /sys/block/fd$i/dev 2>/dev/null`; then
-	case $sys_dev in
-	    2:0) makedev  /dev/floppy/"$i" b 2 0 ;;	    
-	    2:1) makedev  /dev/floppy/"$i" b 2 1 ;;	    
-	    2:2) makedev  /dev/floppy/"$i" b 2 2 ;;	    
-	    2:3) makedev  /dev/floppy/"$i" b 2 3 ;;	    
-	    2:128) makedev  /dev/floppy/"$i" b 2 128 ;;	    
-	    2:129) makedev  /dev/floppy/"$i" b 2 129 ;;	    
-	    2:130) makedev  /dev/floppy/"$i" b 2 130 ;;	    
-	    2:131) makedev  /dev/floppy/"$i" b 2 131 ;;
-	    *) echo "Unknown devive major:minor for /dev/floppy/$i" ;;
-	esac
-    fi
+	if sys_dev=`cat /sys/block/fd$i/dev 2>/dev/null`; then
+		case $sys_dev in
+			2:0) makedev  /dev/floppy/"$i" b 2 0 ;;	    
+			2:1) makedev  /dev/floppy/"$i" b 2 1 ;;	    
+			2:2) makedev  /dev/floppy/"$i" b 2 2 ;;	    
+			2:3) makedev  /dev/floppy/"$i" b 2 3 ;;	    
+			2:128) makedev  /dev/floppy/"$i" b 2 128 ;;	    
+			2:129) makedev  /dev/floppy/"$i" b 2 129 ;;	    
+			2:130) makedev  /dev/floppy/"$i" b 2 130 ;;	    
+			2:131) makedev  /dev/floppy/"$i" b 2 131 ;;
+			*) echo "Unknown devive major:minor for /dev/floppy/$i" ;;
+		esac
+	fi
 done
 debugshell "after hardware detection"
 
@@ -75,7 +77,7 @@ echo
 echo
 echo
 
-# no grep in klibc, replace by this horrible hack in bash
+# no grep in klibc, replaced by this horrible hack in sh
 test_disk_lbl() {
     n=$1
     nb_words=$2
@@ -83,38 +85,62 @@ test_disk_lbl() {
     shift 3
     shift $n
     if [ "$nb_words" = "1" -a "$str" = "$1" ] || [ "$nb_words" = "2" -a "$str" = "$1 $2" ]  || [ "$nb_words" = "3" -a "$str" = "$1 $2 $3" ] ; then
-	return 0
+	    return 0
     fi
     return 1   
+}
+
+try_mount() {
+    # TO REMOVE, there is a bug somewhere in the kernel, the first
+    # mount command fail when changing floppy disk
+    # so we have to launch mount twice
+	local dev=$1
+	local fs=$2
+	local dir=$3
+	mount -o ro -t $fs $dev $dir 2> /dev/null || true
+	umount $dir 2> /dev/null || true
+	if mount -o ro -t $fs $dev $dir 2> /dev/null; then
+		return 0
+	fi
+	return 1
 }
 
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	MOUNTED=0
+	nb_timeout=3
 	while [ "$MOUNTED" = 0 ]; do
 		echo
 		echo "Insert the $ROOT_LABEL."
-		GOTLINE=0
-		while [ "$GOTLINE" = 0 ]; do
-			OLDPRINTK=$(cat /proc/sys/kernel/printk)
-			echo 0 > /proc/sys/kernel/printk
-			echo -n "Press Enter when ready, or type a command: "
+		
+		OLDPRINTK=$(cat /proc/sys/kernel/printk)
+		echo 0 > /proc/sys/kernel/printk
+		echo -n "Press Enter when ready"
+		if [ $nb_timeout = 0 ]; then
+			echo -n ":"
 			read line
-			echo $OLDPRINTK > /proc/sys/kernel/printk
-			if [ -n "$line" ]; then
-				# inexpensive and easy and it makes this a lot more flexible!
-				eval "$line" || true
+		else
+			# boot floppy has no USB keyboard driver
+			# so we use a timeout instead
+			READ_TIMEOUT=30 #seconds
+			echo -n ", or wait $READ_TIMEOUT seconds: "
+			if timeout_read $READ_TIMEOUT; then
+				# it is not a usb keyboard so
+				# we no long need a timeout
+				nb_timeout=0
 			else
-				GOTLINE=1
+				nb_timeout=$(($nb_timeout -1))
 			fi
-		done
-
+		fi
+		echo ""
+		echo $OLDPRINTK > /proc/sys/kernel/printk
+		
 		# Look for any storage devices we can find.
 		# Only ones that we have modules loaded for should exist,
 		# so this is not at brute-force as it may seem.
 		# It's done each time through the loop as USB devices may
 		# be inserted at any time.
-		DEVS=""
+	        DEVS=""
 		if [ -z "$INSTALL_MEDIA_DEV" ]; then
 			if [ -d /dev/floppy ]; then
 				DEVS=/dev/floppy/?
@@ -129,8 +155,8 @@ while [ "$LOADED" = 0 ]; do
 				# XXX as a mount point, /floppy is not
 				# quite right, as this may be USB storage,
 				# whatever.
-				if mount -o ro -t $ROOT_FS $dev floppy 2>/dev/null; then
-				    disk_lbl=`cat floppy/disk.lbl`
+				if try_mount $dev $ROOT_FS floppy; then
+					disk_lbl=`cat floppy/disk.lbl`
 					if [ -e floppy/disk.lbl ] && test_disk_lbl 0 1 "System:" $disk_lbl; then
 						if ! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
 							ERR="$ERR; $dev: not a $SYSTEM floppy"
@@ -164,8 +190,9 @@ while [ "$LOADED" = 0 ]; do
 	done
 
 	if ! mount -t tmpfs -o size=100M tmpfs mnt 2>/dev/null && \
-	    ! mount -t shm shm mnt 2>/dev/null; then
-	    echo "Cannot mount mnt"
+		! mount -t shm shm mnt 2>/dev/null; then
+		echo "Cannot mount mnt"
+		continue
 	fi
 
 
