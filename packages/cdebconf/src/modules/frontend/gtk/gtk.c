@@ -259,8 +259,8 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
 void treeview_exposed_callback (GtkWidget *widget, GdkEventExpose *event, struct treeview_expose_callback_data *data)
 {
     GtkTreePath *path  = gtk_tree_path_new_from_string (data -> path);
-    gtk_tree_view_set_cursor (GTK_TREE_VIEW (widget), path, NULL, FALSE);
     gtk_tree_view_scroll_to_cell (GTK_TREE_VIEW (widget ), path, NULL, TRUE, 0.5, 0);
+    gtk_tree_view_set_cursor (GTK_TREE_VIEW (widget), path, NULL, FALSE);
     gtk_tree_path_free (path);
     g_signal_handler_disconnect (G_OBJECT(widget), data->callback_function);
     free(data);
