@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43253 -->
+<!-- original version: 43259 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Dysfonctionnements pendant la procédure d'installation</title>
@@ -136,7 +136,7 @@ Uniform CD-ROM driver Revision: 3.20
 
 Si vous ne voyez rien de tel, il est probable que le contrôleur du lecteur
 n'a pas été reconnu ou qu'il n'est pas du tout géré. Si vous connaissez le pilote nécessaire
-au lecteur, vous pouvez le charger vous-même avec <command>modprobe</command>.
+à ce contrôleur, vous pouvez le charger vous-même avec <command>modprobe</command>.
 </para></listitem>
 <listitem><para>
 Vérifiez que le lecteur de cédérom est bien listé dans le répertoire <filename>/dev/</filename>.
@@ -159,11 +159,12 @@ Vérifiez si le DMA est activé&nbsp;:
 
 <informalexample><screen>
 $ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
-$ grep dma settings
+$ grep using_dma settings
 using_dma      1       0       1       rw
 </screen></informalexample>
 
-Un <quote>1</quote> signifie qu'il est activé. Dans ce cas, désactivez-le&nbsp;:
+Un <quote>1</quote> dans la première colonne après <literal>using_dma</literal>
+signifie qu'il est activé. Dans ce cas, désactivez-le&nbsp;:
 
 <informalexample><screen>
 $ echo -n "using_dma:0" >settings
@@ -175,7 +176,7 @@ correspond au lecteur de cédéroms.
 <listitem><para>
 Si vous rencontrez des problèmes pendant l'installation, vérifiez l'intégrité du cédérom
 avec l'option qui se trouve en fin du menu principal de l'installateur.
-Cette option peut aussi servir de test quand le cédérom peut être lu correctement.
+Cette option peut aussi servir de test quand le cédérom est lu correctement.
 </para></listitem>
 </itemizedlist>
 </para>
@@ -354,7 +355,7 @@ démarrage, ce qui empêchera le chargement de ces modules.
 
 <para>
 
-Durant la séquence de démarrage, vous pourriez voir beaucoup de messages du 
+Durant la séquence de démarrage, vous pouvez voir beaucoup de messages du 
 genre 
 <computeroutput>can't find <replaceable>something</replaceable></computeroutput>, 
 ou <computeroutput><replaceable>something</replaceable> not present</computeroutput>, 
@@ -362,9 +363,8 @@ ou <computeroutput><replaceable>something</replaceable> not present</computerout
 <computeroutput>this driver release depends on <replaceable>something</replaceable> </computeroutput>. La plupart de ces messages sont sans conséquence. 
 Vous les voyez parce que le noyau du système d'installation est conçu pour 
 tourner sur des ordinateurs avec des périphériques très différents. Évidemment,
-aucun ordinateur ne possède tous les
-périphériques possibles, et le système d'exploitation pourrait se plaindre 
-alors qu'il recherche un périphérique que vous ne possédez pas. Vous pourriez 
+aucun ordinateur ne possède tous les périphériques possibles,
+et le système d'exploitation recherche un périphérique que vous ne possédez pas. Vous pourriez 
 également voir le système s'arrêter pendant un moment. Cela arrive quand il 
 attend la réponse d'un périphérique qui n'est pas présent sur votre système. 
 Si vous trouvez le temps de démarrage du système exagérément long, vous 
@@ -375,7 +375,7 @@ pouvez créer un noyau personnalisé (voyez&nbsp;: <xref linkend="kernel-baking"/>
 
 
   <sect2 id="problem-report">
-  <title>Rapporteur de bogues</title>
+  <title>Signaler les problèmes</title>
 <para>
 
 Si vous parvenez à la fin de la phase d'amorçage mais que vous ne parveniez 
