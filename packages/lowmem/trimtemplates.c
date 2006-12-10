@@ -58,7 +58,8 @@ int trimtemplate(char *filename) {
 			   tags_to_remove[i], LANG_TO_KEEP);
 
 		  if( strstr(template_line, tag_to_keep) == NULL &&
-		      strstr(template_line, tags_to_remove[i]) != NULL ) {
+		      strstr(template_line, tags_to_remove[i]) != NULL &&
+		      strstr(template_line, "Choices-C:") == NULL ) {
 			  ignore = 1;
 		  }
 	  }
