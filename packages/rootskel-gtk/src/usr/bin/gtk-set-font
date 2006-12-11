@@ -6,8 +6,8 @@ set -e
 
 [ "$DEBIAN_FRONTEND" = "gtk" ] || exit 0
 
-CONFFILE="/etc/gtk-2.0/gtkrc"
-[ -f "$CONFFILE" ] || exit 1
+GTKRC="/etc/gtk-2.0/gtkrc"
+[ -f "$GTKRC" ] || exit 1
 
 if db_get debian-installer/language && [ "$RET" ]; then
 	language="$RET"
@@ -35,7 +35,7 @@ case "$language" in
     ko)
 	FONT_NAME="UnDotum"
 	;;
-    zh)
+    zh*)
 	FONT_NAME="AR PL ShanHeiSun Uni"
 	;;
     *)
@@ -49,13 +49,13 @@ if db_get debian-installer/theme && [ "$RET" = dark ]; then
 fi
 
 # Fall back to default if font does not exist; default is assumed to exist
-if ! fc-list | grep -q "$FONT_NAME"; then
-	FONT_NAME=$DEFAULT_FONT
+if fc-list | grep -q "$FONT_NAME"; then
 	logger -t gtk-set-font "Switching to font '$FONT_NAME' for '$language'"
 else
+	FONT_NAME=$DEFAULT_FONT
 	logger -t gtk-set-font "Requested font for '$language' not found; using default"
 fi
 
-sed -i "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" $CONFFILE
+sed -i "s/^gtk-font-name.*$/gtk-font-name = \"$FONT_NAME $FONT_SIZE\"/" $GTKRC
 
 exit 0
