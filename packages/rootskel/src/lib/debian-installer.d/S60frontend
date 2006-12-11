@@ -1,6 +1,6 @@
 get_mem () {
-	ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; }) || true # in kilobytes
-	if [ "$ram" = "" ]; then
+	local ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; }) || true # in kilobytes
+	if [ -z "$ram" ]; then
 		echo "Cannot determine system memory" >&2
         	ram=0
 	else
@@ -12,6 +12,10 @@ get_mem () {
 check_gtk () {
 	if [ -z "$TERM_FRAMEBUFFER" ] ; then
 		echo "Framebuffer not available; disabling graphical frontend" >&2
+		return 1
+	fi
+	if [ "$GTK_NOVESA" ]; then
+		echo "No VESA framebuffer available; disabling graphical frontend" >&2
 		return 1
 	fi
 
