@@ -14,8 +14,16 @@ check_gtk () {
 		echo "Framebuffer not available; disabling graphical frontend" >&2
 		return 1
 	fi
+
+	case "$(archdetect)" in
+	    powerpc/*)
+		local MEMLIMIT=122 ;;	# is 128 MiB
+	    *)
+		local MEMLIMIT=88 ;;	# is 92 MiB
+	esac
+
 	# 88MB = 92MiB
-	if [ $(get_mem) -lt 88 ] ; then
+	if [ $(get_mem) -lt $MEMLIMIT ] ; then
 		echo "Insufficient memory for graphical frontend; disabling" >&2
 		return 1
 	fi
