@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43253 -->
+<!-- original version: 43259 -->
 
 
  <sect1 id="boot-troubleshooting">
@@ -265,14 +265,14 @@ Uniform CD-ROM driver Revision: 3.20
 <!--
 If you don't see something like that, chances are the controller your CD-ROM
 is connected to was not recognized or may be not supported at all. If you
-know what driver is needed for the drive, you can try loading it manually
+know what driver is needed for the controller, you can try loading it manually
 using <command>modprobe</command>.
 -->
 
 Se non si vede qualcosa di simile, è probabile che il controller a cui
 è collegato il CD-ROM non sia riconosciuto o supportato. Se si conosce
-qual è il driver necessario si può provare a caricarlo manualmente usando
-<command>modprobe</command>.
+qual è il driver necessario al controlloer si può provare a caricarlo
+manualmente usando <command>modprobe</command>.
 
 </para></listitem>
 <listitem><para>
@@ -320,15 +320,17 @@ Verificare che il DMA sia attivo:
 
 <informalexample><screen>
 $ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
-$ grep dma settings
+$ grep using_dma settings
 using_dma      1       0       1       rw
 </screen></informalexample>
 
 <!--
-A <quote>1</quote> means it is enabled. If it is, try disabling it:
--->
+-A <quote>1</quote> means it is enabled. If it is, try disabling it:
++A <quote>1</quote> in the first column after <literal>using_dma</literal>
++means it is enabled. If it is, try disabling it:-->
 
-Il valore <quote>1</quote> vuol dire che è attivo; in questo caso
+Il valore <quote>1</quote> nella prima colonna dopo
+<literal>using_dma</literal> vuol dire che è attivo; in questo caso
 provare a disabilitarlo con:
 
 <informalexample><screen>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42377 -->
+<!-- original version: 42982 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -473,24 +473,57 @@ si possono abbreviare rispettivamente con <filename>url</filename> e
   </sect2>
 
   <sect2 id="preseed-bootparms">
-  <!-- <title>Using boot parameters to supplement preseeding</title> -->
-  <title>Uso dei parametri di avvio per completare la preconfigurazione</title>
+  <!-- <title>Using boot parameters to preseed questions</title> -->
+  <title>Uso dei parametri di avvio per la preconfigurazione</title>
 <para>
 
 <!--
 If a preconfiguration file cannot be used to preseed some steps, the
 install can still be fully automated, since you can pass preseed values on
-the command line when booting the installer. Just pass
-<userinput>path/to/var=value</userinput> for any of the preseed variables
-listed in the examples.
+the command line when booting the installer.
 -->
 
 Anche se un file di preconfigurazione non può essere usato per preconfigurare
 alcuni passi, l'installazione può avvenire ugualmente in modo completamente
 automatico dato che è possibile passare i valori di preconfigurazione tramite
-la riga di comando all'avvio dell'installatore. È sufficiente passare
-<userinput>precorso/alla/variabile=valore</userinput> per qualsiasi variabile
-mostrata negli esempi.
+la riga di comando all'avvio dell'installatore.
+
+</para><para>
+
+<!--
+Boot parameters can also be used if you do not really want to use preseeding,
+but just want to provide an answer for a specific question. Some examples where
+this can be useful are documented elsewhere in this manual.
+-->
+
+I parametri di avvio possono essere usati anche per impostare le risposte ad
+alcune domande senza usare la preconfigurazione. In questo manuale ci sono
+esempi in cui questa funzionalità è particolarmente utile.
+
+</para><para>
+
+<!--
+To set a value to be used inside &d-i;, just pass
+<userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
+for any of the preseed variables listed in the examples in this appendix.
+If a value is to be used to configure packages for the target system, you
+will need to prepend the <firstterm>owner</firstterm> of the variable as in
+<userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
+If you don't specify the owner, the value for the variable will not be
+copied to the debconf database in the target system and thus remain unused
+during the configuration of the relevant package.
+-->
+
+Per impostare un valore da usare all'interno di &d-i; è sufficiente passare
+<userinput><replaceable>percorso/alla/variabile</replaceable>=<replaceable>valore</replaceable></userinput>
+per qualsiasi variabile di preconfigurazione mostrata negli esempi di questa
+appendice. Se un valore deve essere usato per configurare dei pacchetti sul
+sistema installato è necessario inserire come prefisso il
+<firstterm>proprietario</firstterm> della variabile in questo modo
+<userinput><replaceable>proprietario</replaceable>:<replaceable>percorso/alla/variabile</replaceable>=<replaceable>valore</replaceable></userinput>.
+Se non si specifica il proprietario, il valore della variabile non viene
+copiato nel database di debconf sul sistema installato e quindi può essere
+usato durante la successiva configurazione del relativo pacchetto.
 
 </para><para>
 
@@ -500,7 +533,8 @@ have a shorter alias. If an alias is available, it is used in the
 examples in this appendix instead of the full variable.  In
 particular, the <literal>preseed/url</literal> variable has been
 aliased as <literal>url</literal> and has some extra magic to allow
-shortened urls to be used.
+shortened urls to be used. Another example is the <literal>tasks</literal>
+alias, which translates to <literal>tasksel:tasksel/first</literal>.
 -->
 
 Alcune delle variabili che più frequentemente sono impostate dal prompt
@@ -509,8 +543,9 @@ appendice è usata, quando disponibile, l'abbrevazione al posto della
 variabile completa. In particolare alla variabile
 <literal>preseed/url</literal> è stato assegnato l'alias
 <literal>url</literal> e consente l'uso di alcuni trucchi che permettono
-di accorciare le url da utilizzare.
-
+di accorciare le url da utilizzare. Un altro esempio è l'alias
+<literal>tasks</literal> che viene tradotto in
+<literal>tasksel:tasksel/first</literal>.
 
 </para><para>
 
@@ -1755,8 +1790,13 @@ aggiungere altri repository (anche locali).
 --># Abilita le righe deb-src
 #d-i apt-setup/local0/source boolean true
 <!--
-# URL to the public key of the local repository
---># URL alla chiave pubblica del repository locale
+# URL to the public key of the local repository; you must provide a key or
+# apt will complain about the unauthenticated repository and so the
+# sources.list line will be left commented out
+--># URL alla chiave pubblica del repository locale; è necessario fornire
+# una chiave altrimenti apt si lamenta perché il repository non è
+# autenticato e che quindi non dovrebbe essere usato (commentandolo in
+# sources.list)
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
   </sect2>
