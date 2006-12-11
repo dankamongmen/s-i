@@ -20,6 +20,7 @@ files = \
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
+	S59check-vesa-x86 \
 	S61mouse-support-x86
 endif
 ifneq (,$(filter powerpc,$(DEB_HOST_ARCH_CPU)))
