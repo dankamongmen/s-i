@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-11-29 17:16+0000\n"
+"POT-Creation-Date: 2006-12-12 21:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1074,7 +1074,7 @@ msgid "Press <command>ENTER</command>. This will load and start the kernel. The 
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:1481
+#: boot-installer.xml:1481 boot-installer.xml:1617
 #, no-c-format
 msgid "Proceed to the next chapter to continue the installation where you will set up the language locale, network, and disk partitions."
 msgstr ""
@@ -1082,13 +1082,13 @@ msgstr ""
 #. Tag: para
 #: boot-installer.xml:1492
 #, no-c-format
-msgid "Booting an IA64 system from the network is similar to a CD boot. The only difference is how the installation kernel is loaded. The EFI Boot Manager can load and start programs from a server on the network. Once the installation kernel is loaded and starts, the system install will proceed thru the same steps as the CD install with the exception that the packages of the base install will be loaded from the network rather than the CD drive."
+msgid "Booting an IA-64 system from the network is similar to a CD boot. The only difference is how the installation kernel is loaded. The EFI Boot Manager can load and start programs from a server on the network. Once the installation kernel is loaded and starts, the system install will proceed thru the same steps as the CD install with the exception that the packages of the base install will be loaded from the network rather than the CD drive."
 msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:1526
 #, no-c-format
-msgid "Network booting an ia64 system requires two architecture-specific actions. On the boot server, DHCP and TFTP must be configured to deliver <command>elilo</command>. On the client a new boot option must be defined in the EFI boot manager to enable loading over a network."
+msgid "Network booting an IA-64 system requires two architecture-specific actions. On the boot server, DHCP and TFTP must be configured to deliver <command>elilo</command>. On the client a new boot option must be defined in the EFI boot manager to enable loading over a network."
 msgstr ""
 
 #. Tag: title
@@ -1101,7 +1101,7 @@ msgstr ""
 #: boot-installer.xml:1538
 #, no-c-format
 msgid ""
-      "A suitable TFTP entry for network booting an ia64 system looks something like this: <informalexample><screen>\n"
+      "A suitable TFTP entry for network booting an IA-64 system looks something like this: <informalexample><screen>\n"
       "host mcmuffin {\n"
       "        hardware ethernet 00:30:6e:1e:0e:83;\n"
       "        fixed-address 10.0.0.21;\n"
@@ -1150,12 +1150,6 @@ msgstr ""
 #: boot-installer.xml:1608
 #, no-c-format
 msgid "The boot loader will display its prompt after it has downloaded and processed its configuration file. At this point, the installation proceeds with the same steps as a CD install. Select a boot option as in above and when the kernel has completed installing itself from the network, it will start the Debian Installer."
-msgstr ""
-
-#. Tag: para
-#: boot-installer.xml:1617
-#, no-c-format
-msgid "Proceed to the next chapter to continue the installation where you will set up the language locale, network, and the disk partitions."
 msgstr ""
 
 #. Tag: title
@@ -2365,7 +2359,7 @@ msgid ""
       "ide1 at 0x170-0x177,0x376 on irq 15\n"
       "hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)\n"
       "Uniform CD-ROM driver Revision: 3.20\n"
-      "</screen></informalexample> If you don't see something like that, chances are the controller your CD-ROM is connected to was not recognized or may be not supported at all. If you know what driver is needed for the drive, you can try loading it manually using <command>modprobe</command>."
+      "</screen></informalexample> If you don't see something like that, chances are the controller your CD-ROM is connected to was not recognized or may be not supported at all. If you know what driver is needed for the controller, you can try loading it manually using <command>modprobe</command>."
 msgstr ""
 
 #. Tag: para
@@ -2389,207 +2383,207 @@ msgstr ""
 msgid ""
       "Check if DMA is currently enabled: <informalexample><screen>\n"
       "$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>\n"
-      "$ grep dma settings\n"
+      "$ grep using_dma settings\n"
       "using_dma      1       0       1       rw\n"
-      "</screen></informalexample> A <quote>1</quote> means it is enabled. If it is, try disabling it: <informalexample><screen>\n"
+      "</screen></informalexample> A <quote>1</quote> in the first column after <literal>using_dma</literal> means it is enabled. If it is, try disabling it: <informalexample><screen>\n"
       "$ echo -n \"using_dma:0\" >settings\n"
       "</screen></informalexample> Make sure that you are in the directory for the device that corresponds to your CD-ROM drive."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3397
+#: boot-installer.xml:3398
 #, no-c-format
 msgid "If there are any problems during the installation, try checking the integrity of the CD-ROM using the option near the bottom of the installer's main menu. This option can also be used as a general test if the CD-ROM can be read reliably."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3412
+#: boot-installer.xml:3413
 #, no-c-format
 msgid "Floppy Disk Reliability"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3414
+#: boot-installer.xml:3415
 #, no-c-format
 msgid "The biggest problem for people using floppy disks to install Debian seems to be floppy disk reliability."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3419
+#: boot-installer.xml:3420
 #, no-c-format
 msgid "The boot floppy is the floppy with the worst problems, because it is read by the hardware directly, before Linux boots. Often, the hardware doesn't read as reliably as the Linux floppy disk driver, and may just stop without printing an error message if it reads incorrect data. There can also be failures in the driver floppies, most of which indicate themselves with a flood of messages about disk I/O errors."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3428
+#: boot-installer.xml:3429
 #, no-c-format
 msgid "If you are having the installation stall at a particular floppy, the first thing you should do is write the image to a <emphasis>different</emphasis> floppy and see if that solves the problem. Simply reformatting the old floppy may not be sufficient, even if it appears that the floppy was reformatted and written with no errors. It is sometimes useful to try writing the floppy on a different system."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3437
+#: boot-installer.xml:3438
 #, no-c-format
 msgid "One user reports he had to write the images to floppy <emphasis>three</emphasis> times before one worked, and then everything was fine with the third floppy."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3443
+#: boot-installer.xml:3444
 #, no-c-format
 msgid "Normally you should not have to download a floppy image again, but if you are experiencing problems it is always useful to verify that the images were downloaded correctly by verifying their md5sums."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3449
+#: boot-installer.xml:3450
 #, no-c-format
 msgid "Other users have reported that simply rebooting a few times with the same floppy in the floppy drive can lead to a successful boot. This is all due to buggy hardware or firmware floppy drivers."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3458
+#: boot-installer.xml:3459
 #, no-c-format
 msgid "Boot Configuration"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3460
+#: boot-installer.xml:3461
 #, no-c-format
 msgid "If you have problems and the kernel hangs during the boot process, doesn't recognize peripherals you actually have, or drives are not recognized properly, the first thing to check is the boot parameters, as discussed in <xref linkend=\"boot-parms\"/>."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3467
+#: boot-installer.xml:3468
 #, no-c-format
 msgid "If you are booting with your own kernel instead of the one supplied with the installer, be sure that <userinput>CONFIG_DEVFS</userinput> is set in your kernel. The installer requires <userinput>CONFIG_DEVFS</userinput>."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3474
+#: boot-installer.xml:3475
 #, no-c-format
 msgid "Often, problems can be solved by removing add-ons and peripherals, and then trying booting again. <phrase arch=\"x86\">Internal modems, sound cards, and Plug-n-Play devices can be especially problematic.</phrase>"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3480
+#: boot-installer.xml:3481
 #, no-c-format
 msgid "If you have a large amount of memory installed in your machine, more than 512M, and the installer hangs when booting the kernel, you may need to include a boot argument to limit the amount of memory the kernel sees, such as <userinput>mem=512m</userinput>."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3491
+#: boot-installer.xml:3492
 #, no-c-format
 msgid "Common &arch-title; Installation Problems"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3492
+#: boot-installer.xml:3493
 #, no-c-format
 msgid "There are some common installation problems that can be solved or avoided by passing certain boot parameters to the installer."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3497
+#: boot-installer.xml:3498
 #, no-c-format
 msgid "Some systems have floppies with <quote>inverted DCLs</quote>. If you receive errors reading from the floppy, even when you know the floppy is good, try the parameter <userinput>floppy=thinkpad</userinput>."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3503
+#: boot-installer.xml:3504
 #, no-c-format
 msgid "On some systems, such as the IBM PS/1 or ValuePoint (which have ST-506 disk drivers), the IDE drive may not be properly recognized. Again, try it first without the parameters and see if the IDE drive is recognized properly. If not, determine your drive geometry (cylinders, heads, and sectors), and use the parameter <userinput>hd=<replaceable>cylinders</replaceable>,<replaceable>heads</replaceable>,<replaceable>sectors</replaceable></userinput>."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3512
+#: boot-installer.xml:3513
 #, no-c-format
 msgid "If you have a very old machine, and the kernel hangs after saying <computeroutput>Checking 'hlt' instruction...</computeroutput>, then you should try the <userinput>no-hlt</userinput> boot argument, which disables this test."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3519
+#: boot-installer.xml:3520
 #, no-c-format
 msgid "If your screen begins to show a weird picture while the kernel boots, eg. pure white, pure black or colored pixel garbage, your system may contain a problematic video card which does not switch to the framebuffer mode properly. Then you can use the boot parameter <userinput>fb=false video=vga16:off</userinput> to disable the framebuffer console. Only the English language will be available during the installation due to limited console features. See <xref linkend=\"boot-parms\"/> for details."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3533
+#: boot-installer.xml:3534
 #, no-c-format
 msgid "System Freeze During the PCMCIA Configuration Phase"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3534
+#: boot-installer.xml:3535
 #, no-c-format
 msgid "Some laptop models produced by Dell are known to crash when PCMCIA device detection tries to access some hardware addresses. Other laptops may display similar problems. If you experience such a problem and you don't need PCMCIA support during the installation, you can disable PCMCIA using the <userinput>hw-detect/start_pcmcia=false</userinput> boot parameter. You can then configure PCMCIA after the installation is completed and exclude the resource range causing the problems."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3544
+#: boot-installer.xml:3545
 #, no-c-format
 msgid "Alternatively, you can boot the installer in expert mode. You will then be asked to enter the resource range options your hardware needs. For example, if you have one of the Dell laptops mentioned above, you should enter <userinput>exclude port 0x800-0x8ff</userinput> here. There is also a list of some common resource range options in the <ulink url=\"http://pcmcia-cs.sourceforge.net/ftp/doc/PCMCIA-HOWTO-1.html#ss1.12\">System resource settings section of the PCMCIA HOWTO</ulink>. Note that you have to omit the commas, if any, when you enter this value in the installer."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3561
+#: boot-installer.xml:3562
 #, no-c-format
 msgid "System Freeze while Loading the USB Modules"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3562
+#: boot-installer.xml:3563
 #, no-c-format
 msgid "The kernel normally tries to install USB modules and the USB keyboard driver in order to support some non-standard USB keyboards. However, there are some broken USB systems where the driver hangs on loading. A possible workaround may be disabling the USB controller in your mainboard BIOS setup. Another option is passing the <userinput>debian-installer/probe/usb=false</userinput> parameter at the boot prompt, which will prevent the modules from being loaded."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3576
+#: boot-installer.xml:3577
 #, no-c-format
 msgid "Interpreting the Kernel Startup Messages"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3578
+#: boot-installer.xml:3579
 #, no-c-format
 msgid "During the boot sequence, you may see many messages in the form <computeroutput>can't find <replaceable>something</replaceable> </computeroutput>, or <computeroutput> <replaceable>something</replaceable> not present</computeroutput>, <computeroutput>can't initialize <replaceable>something</replaceable> </computeroutput>, or even <computeroutput>this driver release depends on <replaceable>something</replaceable> </computeroutput>. Most of these messages are harmless. You see them because the kernel for the installation system is built to run on computers with many different peripheral devices. Obviously, no one computer will have every possible peripheral device, so the operating system may emit a few complaints while it looks for peripherals you don't own. You may also see the system pause for a while. This happens when it is waiting for a device to respond, and that device is not present on your system. If you find the time it takes to boot the system unacceptably long, you can create a custom kernel later (see <xref linkend=\"kernel-baking\"/>)."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3603
+#: boot-installer.xml:3604
 #, no-c-format
 msgid "Bug Reporter"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3604
+#: boot-installer.xml:3605
 #, no-c-format
 msgid "If you get through the initial boot phase but cannot complete the install, the bug reporter menu choice may be helpful. It lets you store system error logs and configuration information from the installer to a floppy, or download them in a web browser. This information may provide clues as to what went wrong and how to fix it. If you are submitting a bug report you may want to attach this information to the bug report."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3615
+#: boot-installer.xml:3616
 #, no-c-format
 msgid "Other pertinent installation messages may be found in <filename>/var/log/</filename> during the installation, and <filename>/var/log/installer/</filename> after the computer has been booted into the installed system."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3626
+#: boot-installer.xml:3627
 #, no-c-format
 msgid "Submitting Installation Reports"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3627
+#: boot-installer.xml:3628
 #, no-c-format
 msgid "If you still have problems, please submit an installation report. We also encourage installation reports to be sent even if the installation is successful, so that we can get as much information as possible on the largest number of hardware configurations."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3634
+#: boot-installer.xml:3635
 #, no-c-format
 msgid "If you have a working Debian system, the easiest way to send an installation report is to install the installation-report and reportbug packages (<command>apt-get install installation-report reportbug</command>) and run the command <command>reportbug installation-report</command>."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3641
+#: boot-installer.xml:3642
 #, no-c-format
 msgid ""
       "Please use this template when filling out installation reports, and file the report as a bug report against the <classname>installation-reports</classname> pseudo package, by sending it to <email>submit@bugs.debian.org</email>. <informalexample><screen>\n"

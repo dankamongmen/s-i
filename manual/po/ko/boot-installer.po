@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-11-29 17:16+0000\n"
+"POT-Creation-Date: 2006-12-12 21:17+0000\n"
 "PO-Revision-Date: 2006-10-07 17:00+0900\n"
 "Last-Translator: Seok-moon Jang <drssay97@gmail.com>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
@@ -2039,7 +2039,7 @@ msgstr ""
 "나타납니다."
 
 #. Tag: para
-#: boot-installer.xml:1481
+#: boot-installer.xml:1481 boot-installer.xml:1617
 #, no-c-format
 msgid ""
 "Proceed to the next chapter to continue the installation where you will set "
@@ -2049,9 +2049,9 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:1492
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"Booting an IA64 system from the network is similar to a CD boot. The only "
+"Booting an IA-64 system from the network is similar to a CD boot. The only "
 "difference is how the installation kernel is loaded. The EFI Boot Manager "
 "can load and start programs from a server on the network. Once the "
 "installation kernel is loaded and starts, the system install will proceed "
@@ -2066,9 +2066,9 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:1526
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"Network booting an ia64 system requires two architecture-specific actions. "
+"Network booting an IA-64 system requires two architecture-specific actions. "
 "On the boot server, DHCP and TFTP must be configured to deliver "
 "<command>elilo</command>. On the client a new boot option must be defined in "
 "the EFI boot manager to enable loading over a network."
@@ -2086,9 +2086,9 @@ msgstr "서버 설정하기"
 
 #. Tag: para
 #: boot-installer.xml:1538
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"A suitable TFTP entry for network booting an ia64 system looks something "
+"A suitable TFTP entry for network booting an IA-64 system looks something "
 "like this: <informalexample><screen>\n"
 "host mcmuffin {\n"
 "        hardware ethernet 00:30:6e:1e:0e:83;\n"
@@ -2212,15 +2212,6 @@ msgstr ""
 "다. 여기까지 오면, CD 설치와 마찬가지로 설치를 진행합니다. 위에서와 같이 부"
 "트 옵션을 선택하시고 네트워크에서 커널 설치를 마치면, 데비안 설치 프로그램이 "
 "시작합니다."
-
-#. Tag: para
-#: boot-installer.xml:1617
-#, no-c-format
-msgid ""
-"Proceed to the next chapter to continue the installation where you will set "
-"up the language locale, network, and the disk partitions."
-msgstr ""
-"다음 장으로 가서 언어 로케일, 네트워크, 디스크 파티션 설정을 계속 하십시오."
 
 #. Tag: title
 #: boot-installer.xml:1630
@@ -4368,8 +4359,8 @@ msgid ""
 "Uniform CD-ROM driver Revision: 3.20\n"
 "</screen></informalexample> If you don't see something like that, chances "
 "are the controller your CD-ROM is connected to was not recognized or may be "
-"not supported at all. If you know what driver is needed for the drive, you "
-"can try loading it manually using <command>modprobe</command>."
+"not supported at all. If you know what driver is needed for the controller, "
+"you can try loading it manually using <command>modprobe</command>."
 msgstr ""
 
 #. Tag: para
@@ -4398,17 +4389,18 @@ msgstr ""
 msgid ""
 "Check if DMA is currently enabled: <informalexample><screen>\n"
 "$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>\n"
-"$ grep dma settings\n"
+"$ grep using_dma settings\n"
 "using_dma      1       0       1       rw\n"
-"</screen></informalexample> A <quote>1</quote> means it is enabled. If it "
-"is, try disabling it: <informalexample><screen>\n"
+"</screen></informalexample> A <quote>1</quote> in the first column after "
+"<literal>using_dma</literal> means it is enabled. If it is, try disabling "
+"it: <informalexample><screen>\n"
 "$ echo -n \"using_dma:0\" >settings\n"
 "</screen></informalexample> Make sure that you are in the directory for the "
 "device that corresponds to your CD-ROM drive."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3397
+#: boot-installer.xml:3398
 #, no-c-format
 msgid ""
 "If there are any problems during the installation, try checking the "
@@ -4418,13 +4410,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3412
+#: boot-installer.xml:3413
 #, no-c-format
 msgid "Floppy Disk Reliability"
 msgstr "플로피 디스크 신뢰성"
 
 #. Tag: para
-#: boot-installer.xml:3414
+#: boot-installer.xml:3415
 #, no-c-format
 msgid ""
 "The biggest problem for people using floppy disks to install Debian seems to "
@@ -4434,7 +4426,7 @@ msgstr ""
 "성 문제일 것입니다."
 
 #. Tag: para
-#: boot-installer.xml:3419
+#: boot-installer.xml:3420
 #, fuzzy, no-c-format
 msgid ""
 "The boot floppy is the floppy with the worst problems, because it is read by "
@@ -4451,7 +4443,7 @@ msgstr ""
 "로피에서도 디스크 입출력 오류 메세지만 가득 나오는 문제가 발생하기도 합니다."
 
 #. Tag: para
-#: boot-installer.xml:3428
+#: boot-installer.xml:3429
 #, fuzzy, no-c-format
 msgid ""
 "If you are having the installation stall at a particular floppy, the first "
@@ -4467,7 +4459,7 @@ msgstr ""
 "안 됩니다. 다른 시스템에서 플로피를 만드는 게 도움이 될 수도 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3437
+#: boot-installer.xml:3438
 #, no-c-format
 msgid ""
 "One user reports he had to write the images to floppy <emphasis>three</"
@@ -4478,7 +4470,7 @@ msgstr ""
 "emphasis> 써야 했다고 하고, 세 번째 플로피에서 제대로 동작했다고 합니다."
 
 #. Tag: para
-#: boot-installer.xml:3443
+#: boot-installer.xml:3444
 #, no-c-format
 msgid ""
 "Normally you should not have to download a floppy image again, but if you "
@@ -4487,7 +4479,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3449
+#: boot-installer.xml:3450
 #, no-c-format
 msgid ""
 "Other users have reported that simply rebooting a few times with the same "
@@ -4499,13 +4491,13 @@ msgstr ""
 "이버때문입니다."
 
 #. Tag: title
-#: boot-installer.xml:3458
+#: boot-installer.xml:3459
 #, no-c-format
 msgid "Boot Configuration"
 msgstr "부팅 설정"
 
 #. Tag: para
-#: boot-installer.xml:3460
+#: boot-installer.xml:3461
 #, no-c-format
 msgid ""
 "If you have problems and the kernel hangs during the boot process, doesn't "
@@ -4518,7 +4510,7 @@ msgstr ""
 "linkend=\"boot-parms\"/>에 쓰여 있는 것처럼 제대로 되었는 지 확인하십시오."
 
 #. Tag: para
-#: boot-installer.xml:3467
+#: boot-installer.xml:3468
 #, no-c-format
 msgid ""
 "If you are booting with your own kernel instead of the one supplied with the "
@@ -4530,7 +4522,7 @@ msgstr ""
 "<userinput>CONFIG_DEVFS</userinput>가 필요합니다."
 
 #. Tag: para
-#: boot-installer.xml:3474
+#: boot-installer.xml:3475
 #, no-c-format
 msgid ""
 "Often, problems can be solved by removing add-ons and peripherals, and then "
@@ -4542,7 +4534,7 @@ msgstr ""
 "히 문제가 많습니다.</phrase>"
 
 #. Tag: para
-#: boot-installer.xml:3480
+#: boot-installer.xml:3481
 #, no-c-format
 msgid ""
 "If you have a large amount of memory installed in your machine, more than "
@@ -4555,13 +4547,13 @@ msgstr ""
 "수도 있습니다. 예를 들어 <userinput>mem=512m</userinput>과 같이 씁니다."
 
 #. Tag: title
-#: boot-installer.xml:3491
+#: boot-installer.xml:3492
 #, no-c-format
 msgid "Common &arch-title; Installation Problems"
 msgstr "자주 발생하는 &arch-title; 설치 문제"
 
 #. Tag: para
-#: boot-installer.xml:3492
+#: boot-installer.xml:3493
 #, no-c-format
 msgid ""
 "There are some common installation problems that can be solved or avoided by "
@@ -4571,7 +4563,7 @@ msgstr ""
 "법으로 해결할 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3497
+#: boot-installer.xml:3498
 #, no-c-format
 msgid ""
 "Some systems have floppies with <quote>inverted DCLs</quote>. If you receive "
@@ -4583,7 +4575,7 @@ msgstr ""
 "<userinput>floppy=thinkpad</userinput> 파라미터를 시도해 보십시오."
 
 #. Tag: para
-#: boot-installer.xml:3503
+#: boot-installer.xml:3504
 #, no-c-format
 msgid ""
 "On some systems, such as the IBM PS/1 or ValuePoint (which have ST-506 disk "
@@ -4603,7 +4595,7 @@ msgstr ""
 "십시오."
 
 #. Tag: para
-#: boot-installer.xml:3512
+#: boot-installer.xml:3513
 #, no-c-format
 msgid ""
 "If you have a very old machine, and the kernel hangs after saying "
@@ -4616,7 +4608,7 @@ msgstr ""
 "도록 <userinput>no-hlt</userinput> 파라미터를 시도해 보십시오."
 
 #. Tag: para
-#: boot-installer.xml:3519
+#: boot-installer.xml:3520
 #, no-c-format
 msgid ""
 "If your screen begins to show a weird picture while the kernel boots, eg. "
@@ -4636,13 +4628,13 @@ msgstr ""
 "parms\"/> 부분을 참고하십시오."
 
 #. Tag: title
-#: boot-installer.xml:3533
+#: boot-installer.xml:3534
 #, no-c-format
 msgid "System Freeze During the PCMCIA Configuration Phase"
 msgstr "PCMCIA 설정 단계에서 시스템 멈춤"
 
 #. Tag: para
-#: boot-installer.xml:3534
+#: boot-installer.xml:3535
 #, no-c-format
 msgid ""
 "Some laptop models produced by Dell are known to crash when PCMCIA device "
@@ -4661,7 +4653,7 @@ msgstr ""
 "제외할 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3544
+#: boot-installer.xml:3545
 #, no-c-format
 msgid ""
 "Alternatively, you can boot the installer in expert mode. You will then be "
@@ -4682,13 +4674,13 @@ msgstr ""
 "값을 입력할 때, 쉼표를 쓰지 않는다는 것에 유의하십시오."
 
 #. Tag: title
-#: boot-installer.xml:3561
+#: boot-installer.xml:3562
 #, no-c-format
 msgid "System Freeze while Loading the USB Modules"
 msgstr "USB 모듈을 읽어들이다가 시스템 멈춤"
 
 #. Tag: para
-#: boot-installer.xml:3562
+#: boot-installer.xml:3563
 #, no-c-format
 msgid ""
 "The kernel normally tries to install USB modules and the USB keyboard driver "
@@ -4707,13 +4699,13 @@ msgstr ""
 "는 것입니다."
 
 #. Tag: title
-#: boot-installer.xml:3576
+#: boot-installer.xml:3577
 #, no-c-format
 msgid "Interpreting the Kernel Startup Messages"
 msgstr "커널 시작 메세지 해석하기"
 
 #. Tag: para
-#: boot-installer.xml:3578
+#: boot-installer.xml:3579
 #, no-c-format
 msgid ""
 "During the boot sequence, you may see many messages in the form "
@@ -4748,13 +4740,13 @@ msgstr ""
 "(<xref linkend=\"kernel-baking\"/> 참고.)"
 
 #. Tag: title
-#: boot-installer.xml:3603
+#: boot-installer.xml:3604
 #, no-c-format
 msgid "Bug Reporter"
 msgstr "버그 보고"
 
 #. Tag: para
-#: boot-installer.xml:3604
+#: boot-installer.xml:3605
 #, no-c-format
 msgid ""
 "If you get through the initial boot phase but cannot complete the install, "
@@ -4771,7 +4763,7 @@ msgstr ""
 "이 정보를 버그 보고에 첨부해 주십시오."
 
 #. Tag: para
-#: boot-installer.xml:3615
+#: boot-installer.xml:3616
 #, no-c-format
 msgid ""
 "Other pertinent installation messages may be found in <filename>/var/log/</"
@@ -4783,13 +4775,13 @@ msgstr ""
 "들어 있습니다."
 
 #. Tag: title
-#: boot-installer.xml:3626
+#: boot-installer.xml:3627
 #, no-c-format
 msgid "Submitting Installation Reports"
 msgstr "설치 보고 제출"
 
 #. Tag: para
-#: boot-installer.xml:3627
+#: boot-installer.xml:3628
 #, no-c-format
 msgid ""
 "If you still have problems, please submit an installation report. We also "
@@ -4802,7 +4794,7 @@ msgstr ""
 "사용하는 지에 대한 정보를 많이 얻을 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3634
+#: boot-installer.xml:3635
 #, no-c-format
 msgid ""
 "If you have a working Debian system, the easiest way to send an installation "
@@ -4816,7 +4808,7 @@ msgstr ""
 "installation-report</command> 명령을 실행하는 것입니다."
 
 #. Tag: para
-#: boot-installer.xml:3641
+#: boot-installer.xml:3642
 #, fuzzy, no-c-format
 msgid ""
 "Please use this template when filling out installation reports, and file the "
@@ -4904,3 +4896,10 @@ msgstr ""
 "</screen></informalexample> 버그 보고서에 문제가 무엇인지 설명하시고, 커널이 "
 "멈춘 경우에 마지막으로 볼 수 있는 커널 메세지를 포함하십시오. 문제가 발생할 "
 "때 어떤 과정을 거쳤는 지 설명하십시오."
+
+#~ msgid ""
+#~ "Proceed to the next chapter to continue the installation where you will "
+#~ "set up the language locale, network, and the disk partitions."
+#~ msgstr ""
+#~ "다음 장으로 가서 언어 로케일, 네트워크, 디스크 파티션 설정을 계속 하십시"
+#~ "오."
