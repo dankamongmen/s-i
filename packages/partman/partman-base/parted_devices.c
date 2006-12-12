@@ -36,7 +36,8 @@ is_cdrom(const char *path)
 static int
 is_floppy(const char *path)
 {
-	return (strstr(path, "/dev/floppy") != NULL);
+	return (strstr(path, "/dev/floppy") != NULL &&
+		strstr(path, "/dev/fd") != NULL);
 }
 #else /* !__linux__ */
 #define is_floppy(path) 0
