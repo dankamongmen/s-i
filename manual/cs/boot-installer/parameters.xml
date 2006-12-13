@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 40875 -->
+<!-- original version: 42982 -->
 
  <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
 <para>
@@ -71,10 +71,8 @@ hodnotu <filename>ttya</filename>.
 
 Instalační systém rozpoznává několik užitečných parametrů.<footnote><para>
 
-Jádra řady 2.4 akceptují nejvýše 8 parametrů a 8 proměnných prostředí
-(včetně standardních voleb pro instalační program). Pokud tento limit
-překročíte, jádro přebývající parametry zahodí. Od jádra verze 2.6.9
-lze použít až 32 parametrů a 32 proměnných prostředí.
+S aktuálními jádry (od verze 2.6.9) lze použít až 32 parametrů a 32
+proměnných prostředí. Pokud tato čísla překročíte, jádro zpanikaří.
 
 </para></footnote>
 
@@ -126,23 +124,16 @@ probíhat. Dostupné volby jsou:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
 Standardní rozhraní je <userinput>DEBIAN_FRONTEND=newt</userinput>.
 Pro instalaci přes sériovou konzolu může být vhodnější
 <userinput>DEBIAN_FRONTEND=text</userinput>. Standardní instalační
-média momentálně podporují pouze rozhraní <userinput>newt</userinput>,
-tudíž je tato volba spíše příslibem do budoucna.
+média momentálně podporují rozhraní <userinput>newt</userinput>. Na
+architekturách, kde to je možné, využívá grafický instalátor rozhraní
+<userinput>gtk</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -323,6 +314,18 @@ Kratší varianta: <userinput>file</userinput>
 </varlistentry>
 
 <varlistentry>
+<term>auto-install/enabled</term>
+<listitem><para>
+
+Odsune otázky obvykle zobrazované před začátkem přednastavení až za
+nastavení sítě. Podrobnosti o automatizaci instalací pomocí této
+možnosti naleznete v části <xref linkend="preseed-auto"/>.
+Kratší varianta: <userinput>auto=true</userinput>
+ 
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -352,7 +355,19 @@ Používáte-li ještě jádro řady 2.2.x, budete možná muset zadat
 </para></listitem>
 </varlistentry>
 
-<varlistentry>
+<varlistentry condition="g-i">
+<term>mouse/left</term>
+<listitem><para>
+
+U gtk rozhraní (alias grafického instalátoru) si mohou uživatelé na
+myši prohodit levé a pravé tlačítko (vhodné při ovládání levou
+rukou). Stačí nastavit tento parametr na hodnotu
+<userinput>true</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="g-i">
 <term>directfb/hw-accel</term>
 <listitem><para>
 
@@ -375,6 +390,92 @@ linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
+
+   <sect3 id="preseed-args">
+   <title>Použití zaváděcích parametrů pro zodpovězení otázek</title>
+<para>
+
+Na stejném místě, kam se zadávají parametry pro jádro nebo instalační
+program, můžete zadat odpověď na téměř každou otázku, se kterou se
+můžete při instalaci potkat. Tato možnost se využívá spíše ve
+specifických případech a je zde vypsáno jen několik
+příkladů. Podrobnější informace naleznete v dodatku <xref
+linkend="preseed-bootparms"/>.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+Tento parametr nastaví jazyk a zemi instalace a následně instalovaného
+systému. Podmínkou je, že zvolené locale musí být v Debianu
+podporováno. Například
+<userinput>debian-installer/locale=de_CH</userinput> vybere jako
+výchozí jazyk němčinu a jako zemi Švýcarsko.
+Kratší varianta: <userinput>locale</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+
+Tímto parametrem můžete nainstalovat úlohy, které nejsou při instalaci
+v interaktivním seznamu úloh dostupné. Příkladem budiž úloha
+<literal>kde-desktop</literal>. Více informací naleznete v části <xref
+linkend="pkgsel"/>.
+Kratší varianta: <userinput>tasks</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms">
+   <title>Předávání parametrů jaderným modulům</title>
+<para>
+
+Jestliže jsou ovladače zakompilovány přímo do jádra, můžete jim
+předávat parametry tak, jak je popsáno v dokumentaci k jádru. Pokud
+však jsou ovladače zkompilovány jako moduly, znamená to, že jsou při
+instalaci zaváděny odlišným způsobem než při zavádění nainstalovaného
+systému a nemůžete jim předat parametry klasickým postupem. Musíte
+použít speciální syntaxi, kterou instalátor rozpozná a zařídí, aby se
+tyto parametry uložily do příslušných konfiguračních souborů a posléze
+se v pravý čas použily. Tyto parametry se automaticky přenesou i do
+nainstalovaného systému.
+
+</para><para>
+
+Poznamenejme, že v dnešní době je používání parametrů modulů téměř
+raritou, protože jádro ve většině případů správně rozpozná přítomný
+hardware a nastaví pro něj vhodné hodnoty automaticky. Pokud tomu tak
+není, stále můžete použít ruční nastavení.
+
+</para><para>
+
+Syntaxe pro nastavení parametrů modulu je následující:
+
+<informalexample><screen>
+<replaceable>název_modulu</replaceable>.<replaceable>název_parametru</replaceable>=<replaceable>hodnota</replaceable>
+</screen></informalexample>
+
+Potřebujete-li modulu předat několik parametrů, stačí syntaxi
+několikrát zopakovat. Například pro nastavení staré síťové karty 3Com,
+aby použila konektor BNC (koaxiální) a IRQ 10, zadali-byste:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+   </sect3>
   </sect2>
  </sect1>
 

@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 35518 -->
+<!-- original version: 42985 -->
 
   <sect3 id="pkgsel">
   <title>Výběr a instalace softwaru</title>
@@ -37,24 +37,55 @@ linkend="tasksel-size-list"/>.
 
 </para><para>
 
+Podle odhadnutého typu počítače mohou být některé úlohy
+předvybrány. (Např. pokud si &d-i; myslí, že instalujete notebook,
+předvybere úlohu <quote>Notebook</quote>.) Nesouhlasíte-li s výběrem,
+můžete nechtěné úlohy zase odebrat. Dokonce nemusíte instalovat žádnou
+úlohu.
+
+</para><note><para>
+
+Úloha <quote>Stolní počítač</quote> nainstaluje desktopové prostředí
+GNOME. Současné možnosti nabízené instalačním systémem neumožňují
+výběr jiného desktopového prostředí, například KDE.
+
+</para><para>
+
+Nezoufejte, naštěstí existuje způsob, jak instalační systém donutit k
+instalaci KDE, a tím je přednastavení (viz <xref
+linkend="preseed-pkgsel"/>), nebo přidání parametru
+<literal>tasks="standard, kde-desktop"</literal> při zavádění
+instalačního systému. To samozřejmě bude fungovat pouze v případě, že
+jsou balíky tvořící KDE k dispozici. Naznačujeme tím, že pokud k
+instalaci používáte pouze první CD, musí se tyto balíky stáhnout ze
+síťového zrcadla. U všech ostatních typů instalace (z DVD nebo rovnou
+ze sítě) by se mělo KDE nainstalovat bez problémů.
+
+</para><para>
+
+Různé serverové úlohy nainstalují zhruba následující software.
+
+DNS server: <classname>bind9</classname>;
+Souborový server: <classname>samba</classname>,
+<classname>nfs</classname>;
+Poštovní server: <classname>exim4</classname>,
+<classname>spamassassin</classname>, <classname>uw-imap</classname>;
+Tiskový server: <classname>cups</classname>;
+SQL server: <classname>postgresql</classname>;
+Webový server: <classname>apache</classname>.
+
+</para></note><para>
+
 Až skončíte s výběrem, vyberte tlačítko <guibutton>Ok</guibutton>.
 Tím se na pozadí spustí <command>aptitude</command>, která nainstaluje
 vybrané balíky.
 
-<note><para>
+</para><note><para>
 
 Ve výchozím prostředí instalátoru se úlohy (od)vybírají klávesou
 <keycap>mezera</keycap>.
 
-</para></note><note><para>
-
-Podle odhadnutého typu počítače mohou být některé úlohy
-předvybrány. (Např. pokud si &d-i; myslí, že instalujete notebook,
-předvybere úlohu <quote>notebook</quote>.) Nesouhlasíte-li s výběrem,
-můžete nechtěné úlohy zase odebrat. Dokonce nemusíte instalovat žádnou
-úlohu.
-
-</para></note></para><para>
+</para></note><para>
 
 Programy <command>apt-get</command> a <command>dpkg</command> pak
 zajistí stažení, rozbalení a instalaci všech balíků obsažených ve
@@ -63,9 +94,10 @@ vstup, budete dotázáni stejně jako třeba při vytváření nového
 uživatele.
 
 </para>
+  </sect3>
 
-   <sect4 id="config-mta">
-   <title>Nastavení poštovního serveru</title>
+  <sect3 id="config-mta">
+  <title>Nastavení poštovního serveru</title>
 
 <para>
 
@@ -96,7 +128,7 @@ z nich ten, který nejvíce odpovídá zamýšlenému použití:
 <term>internetový počítač</term>
 <listitem><para>
 
-Váš systém je připojen k počítačové síti a pošta je odesílána/příjmána
+Váš systém je připojen k počítačové síti a pošta je odesílána/přijímána
 přímo protokolem SMTP. Na následujících obrazovkách budete dotázáni
 několik základních údajů, jako je poštovní jméno nebo seznam domén,
 pro které chcete přijímat nebo předávat poštu.
@@ -156,5 +188,4 @@ Další informace o <command>exim4</command> naleznete v adresáři
 <filename>/usr/share/doc/exim4</filename>.
 
 </para>
-   </sect4>
   </sect3>

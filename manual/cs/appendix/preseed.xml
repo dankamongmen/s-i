@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 42250 -->
+<!-- original version: 42982 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -47,8 +47,7 @@ Přednastavení existuje ve třech variantách:
 a <firstterm>síť</firstterm>. Initrd funguje s každým typem instalace,
 podporuje přednastavení více odpovědí, ovšem vyžaduje nejvíce příprav.
 Přednastavení přes lokální soubor nebo přes síť se používají pro různé
-typy instalací a oproti initrd neumí přednastavit několik prvních
-otázek, protože ty jsou zobrazeny dříve, než je přednastavení načteno.
+typy instalací.
 
 </para><para>
 
@@ -71,7 +70,12 @@ s kterými způsoby instalací.
   <entry>CD/DVD</entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ne</entry>
+  <entry>ano<footnote id='apx-ps-net'><para>
+
+     Ovšem pouze pokud máte přístup k síti a správně nastavíte
+     <literal>preseed/url</literal>.
+
+  </para></footnote></entry>
 </row><row>
   <entry>zavedení ze sítě</entry>
   <entry>ano</entry>
@@ -81,12 +85,12 @@ s kterými způsoby instalací.
   <entry>z pevného disku <phrase condition="bootable-usb">(včetně usb klíčenky)</phrase></entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ne</entry>
+  <entry>ano<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>z disket (cd ovladače)</entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ne</entry>
+  <entry>ano<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>z disket (síťové ovladače)</entry>
   <entry>ano</entry>
@@ -125,6 +129,15 @@ Abyste mohli přednastavit i otázky, které se zobrazují před nahráním
 souboru s přednastavením, můžete využít zaváděcí parametry jádra, viz
 část <xref linkend="preseed-bootparms"/>.
 
+</para><para>
+
+Jinou možností, jak se vyhnout otázkám, které se zobrazují před
+nahráním souboru s přednastavením, je spustit instalátor
+v <quote>automatickém</quote> režimu. Tím se odsunou všechny brzké
+otázky až za okamžik nahození sítě a navíc se zobrazí jen otázky s
+kritickou prioritou, což odfiltruje několik zbytečných
+otázek. Podrobnosti naleznete v <xref linkend="preseed-auto"/>.
+
 </para>
   </sect2>
 
@@ -159,7 +172,7 @@ Pro přednastavení jsou relevantní následující typy šablon.
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: umožňuje uživateli zadat libovolnou hodnotu
 </para></listitem>
@@ -201,14 +214,10 @@ adresáři), který ovšem může číst pouze uživatel root.
 </para>
   </sect2>
 -->
-
+<!--
   <sect2 id="preseed-hooks">
   <title>Spouštění vlastních příkazů během instalace</title>
 <para>
-
-Nástroje pro přednastavení nabízí velice mocnou vlastnost, kterou je
-možnost spouštění libovolných příkazů nebo skriptů v určitých bodech
-instalace. Podrobnosti naleznete v <xref linkend="preseed-shell"/>.
 
 </para>
 
@@ -226,26 +235,7 @@ instalace. Podrobnosti naleznete v <xref linkend="preseed-shell"/>.
 
   </sect2>
 
-  <sect2 id="preseed-seenflag">
-  <title>Použití přednastavení pro změnu výchozích hodnot</title>
-<para>
-
-Pomocí přednastavení můžete dosáhnout i toho, že se otázka normálně
-zobrazí, ale změní se její výchozí odpověď. (Například na úvodní
-otázce ohledně jazyka můžete přednastavit místo angličtiny češtinu,
-takže uživateli stačí stisknout &enterkey;, ale stále mu necháváte
-možnost volby jiného jazyka.) Dosáhnete toho tak, že po nastavení
-proměnné změníte příznak <firstterm>seen</firstterm> na hodnotu
-<quote>false</quote>.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string hodnota
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
+-->
  </sect1>
 
  <sect1 id="preseed-using">
@@ -260,7 +250,7 @@ s přednastavením načítat ze sítě, z diskety nebo usb klíčenky, je jeho
 umístění zřejmé. Chcete-li soubor umístit na CD nebo DVD, budete muset
 znovu sestavit celý ISO obraz. Umístění souboru s přednastavením přímo
 do initrd je mimo rozsah tohoto dokumentu a musíme vás odkázat na
-vývojářskou dokumentaci k &d-i;
+vývojářskou dokumentaci k &d-i;u.
 
 </para><para>
 
@@ -328,13 +318,237 @@ nebo <filename>preseed/file</filename> jako zaváděcí parametr, můžete
 použít zkrácenou verzi <filename>url</filename>, resp.
 <filename>file</filename>.
 
+</para>
+  </sect2>
+
+  <sect2 id="preseed-bootparms">
+  <title>Použití zaváděcích parametrů jako formy přednastavení</title>
+<para>
+
+I když nemůžete přednastavit některé kroky připravenými odpověďmi v
+souboru, stále můžete dosáhnout plně automatické instalace, protože
+můžete zadat hodnoty pro přednastavení jako zaváděcí parametry jádra.
+Zaváděcí parametry jádra můžete též využít v případě, kdy nechcete
+použít celé přednastavení, ale jen předodpovědět nějakou konkrétní
+otázku.
+
 </para><para>
 
+Pro nastavení hodnoty libovolné proměnné zmíněné v tomto dodatku stačí
+zadat
+<userinput><replaceable>cesta/k/proměnné</replaceable>=<replaceable>hodnota</replaceable></userinput>. Jestliže
+se má hodnota použít k přednastavení balíku v cílovém systému, musíte
+předřadit ještě <firstterm>vlastníka</firstterm> proměnné
+<userinput><replaceable>vlastník</replaceable>:<replaceable>cesta/k/proměnné</replaceable>=<replaceable>hodnota</replaceable></userinput>.
+Nezadáte-li vlastníka, hodnota proměnné se nezkopíruje do databáze
+debconfu v cílovém systému a tudíž zůstane při konfiguraci daného
+balíku nevyužita.
+
+</para><para>
+
+Některé často používané proměnné mohou mít i kratší variantu, Pokud je
+tato varianta dostupná, upřednostňujeme ji zde před úplnou formou.
+Konkrétně proměnnou <literal>preseed/url</literal> zde zkracujeme na
+<literal>url</literal>, což s sebou nese i nějakou magii ohledně
+zkracování samotných url. Jiným příkladem je alias
+<literal>tasks</literal>, který vlastně znamená
+<literal>tasksel:tasksel/first</literal>.
+
+</para><para>
+
+Dvě pomlčky <quote>--</quote> mají u zaváděcích parametrů jádra
+speciální význam. Všechny parametry nacházející se za posledními
+pomlčkami budou zkopírovány do konfigurace zavaděče v instalovaném
+systému. (Pokud to instalátor pro daný zavaděč umožňuje.) Parametry,
+které instalátor rozpozná (např. volby pro přednastavení), budou
+automaticky odfiltrovány.
+
+</para><note><para>
+
+Aktuální jádra (2.6.9 a novější) akceptují nejvýše 32 parametrů a 32
+proměnných prostředí (včetně standardních voleb pro instalační
+program). Pokud tento limit překročíte, jádro zpanikaří. (Dřívější
+jádra měla tyto limity ještě menší.)
+
+</para></note><para>
+
+Pro většinu instalací můžete celkem bez problémů odstranit implicitní
+volby jako <userinput>vga=normal</userinput>, což vám umožní přidat
+další volby pro přednastavení.
+
+</para><note><para>
+
+V některých případech není možné zadat hodnotu obsahující mezeru, a to
+i v případě, kdy hodnotu obklopíte uvozovkami.
+
+</para></note>
+  </sect2>
+
+  <sect2 id="preseed-auto">
+  <title>Automatický režim</title>
+<para>
+
+Díky několika pokročilým (někteří říkají zmateným) vlastnostem
+instalačního systém Debianu je možné, aby se poměrně jednoduchý
+zaváděcí parametr rozvinul do komplexní a na míru upravené automatické
+instalace. Pro ilustraci uvádíme několik příkladů, které můžete zadat
+na zaváděcí výzvě.
+
+<informalexample><screen>
+auto url=autoserver
+</screen></informalexample>
+
+Toto spoléhá na fakt, že na síti existuje DHCP server, který dostane
+počítač do bodu, kdy bude možné přes DNS přeložit jméno
+<literal>autoserver</literal>. Pokud DHCP server poskytnul i název
+domény, tak se zkusí i varianta, kdy se za název počítače přidá právě
+poskytnutá doména. Například pokud je přes DHCP poskytnuta doména
+<literal>priklad.cz</literal>, vyústí to ve stažení souboru s
+přednastavením z adresy
+<literal>http://autoserver.priklad.cz/d-i/etch/./preseed.cfg</literal>.
+
+</para><para>
+
+První část cesty na serveru pochází z proměnné
+<literal>auto-install/defaultroot</literal>. Proměnná implicitně
+obsahuje adresář <literal>etch</literal>, aby jste s příchodem
+novějších verzí Debianu a nových kódových označení nemigrovali na nové
+verze automaticky, ale kontrolovaněji (po explicitním zadání nového
+kódového jména).
+
+Část <literal>/./</literal> indikuje kořen, vůči kterému můžete
+zadávat relativní cesty (používá se v
+<literal>preseed/include</literal> a <literal>preseed/run</literal>).
+To umožňuje zadávat cesty k souborům jako kompletní URL, cesty
+začínající na <literal>/</literal> jsou připojeny ke kořenu, nebo jako
+cesty relativní k umístění, kde byl nalezen poslední soubor s
+přednastavením. To umožňuje vytvářet přenositelnější skripty, kde
+můžete přesouvat celé hierarchie skriptů na nová umístění, aniž by se
+co pokazilo. Například můžete na USB klíčenku přesunout soubory, které
+se dříve používaly na webovém serveru. Předpokládejme, že je v souboru
+s přednastavením nastavena proměnná <literal>preseed/run</literal> na
+hodnotu <literal>/scripts/late_command.sh</literal>. Pak v naší ukázce
+bude zmíněný soubor stažen z
+<literal>http://autoserver.priklad.cz/d-i/etch/./scripts/late_command.sh</literal>.
+
+</para><para>
+
+Pokud na dané síti není vybudovaná vhodná DHCP a DNS infrastruktura,
+nebo pokud nechcete použít výchozí cestu k souboru
+<filename>preseed.cfg</filename>, můžete zadat explicitní
+URL. Nebude-li URL obsahovat prvek <filename>/./</filename>, bude
+automaticky připojen na začátek cesty, tj. za třetí lomítko URL.
+Příklad vyžadující jen minimální podporu od místní síťové
+infrastruktury:
+
+<informalexample><screen>
+auto url=<replaceable>http://192.168.1.2/cesta/k/preseed.souboru</replaceable>
+</screen></informalexample>
+
+Celé to funguje tak, že
+<itemizedlist spacing="compact">
+<listitem><para>
+
+pokud v URL chybí protokol, předpokládá se http,
+
+</para></listitem>
+<listitem><para>
+
+pokud název počítače neobsahuje tečky, připojí se k němu doména
+odvozená z DHCP a
+
+</para></listitem>
+<listitem><para>
+
+pokud za názvem počítače není žádné lomítko, přidá se výchozí cesta.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Kromě zadávání URL můžete zadat i parametry, které přímo neovlivňují
+chování &d-i;u samotného, ale které mohou být předány do skriptů
+spouštěných z nahraného souboru s přednastavením pomocí
+<literal>preseed/run</literal>. V současnosti to je pouze
+<literal>auto-install/classes</literal>, ve zkrácené verzi
+<literal>classes</literal>. Příklad použití:
+
+<informalexample><screen>
+auto url=<replaceable>autoserver</replaceable> classes=<replaceable>trida_A;trida_B</replaceable>
+</screen></informalexample>
+
+Třídy mohou například označovat typ systému, který se má instalovat,
+nebo jazykové prostředí, které se má nastavit.
+
+</para><para>
+
+Tento koncept je možné dále rozšiřovat. Pokud toho ve svých skriptech
+využijete, je rozumné použít jmenný prostor
+<literal>auto-install</literal>, například
+<literal>auto-install/style</literal>. Jestliže si myslíte, že máte
+pro další parametr vhodné využití, zmiňte se o něm v diskusní skupině
+<email>debian-boot@lists.debian.org</email>, abychom předešli
+konfliktům v jmenném prostoru (a případně vám přidali kratší alias).
+
+</para><para>
+
+Příkaz <literal>auto</literal> zatím není definován na všech
+architekturách. Stejného výsledku však můžete dosáhnout přidáním dvou
+parametrů <literal>auto=true priority=critical</literal> k parametrům
+jádra. Parametr <literal>auto</literal> je vlastně alias pro
+<literal>auto-install/enabled</literal> a potlačuje zobrazení otázek
+ohledně místního prostředí a nastavení klávesnice až do bodu, kdy je
+bude možné přednastavit. Parametr <literal>priority</literal> je alias
+pro <literal>preseed/priority</literal> a nastavením na hodnotu
+<literal>critical</literal> zajistíte, aby se zobrazovaly pouze otázky
+s kritickou prioritou, kterých při instalaci moc není.
+
+</para><para>
+
+Další parametry, které se mohou hodit při automatizaci instalací přes
+DHCP, jsou <literal>interface=auto netcfg/dhcp_timeout=60</literal>,
+které způsobí, že se k instalaci použije první funkční síťové rozhraní
+a že instalátor bude trpělivější při čekání na odpovědi od DHCP
+serveru.
+
+<!--
 Když už upravujete soubor zavaděče, přidejte na stejné místo
 i parametr <userinput>priority=critical</userinput>, který
 odchytí většinu případných otázek, které zde zapomenete nastavit.
+-->
 
 </para>
+  </sect2>
+
+  <sect2 id="preseed-aliases">
+  <title>Užitečné aliasy</title>
+<para>
+
+Při použití (automatického) přednastavení se mohou hodit následující
+aliasy.
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry>
+</row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
   </sect2>
 
   <sect2 id="preseed-dhcp">
@@ -375,59 +589,6 @@ přednastavení přes DHCP byste měli provádět pouze s nejvyšší
 opatrností.
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-bootparms">
-  <title>Použití zaváděcích parametrů jako formu přednastavení</title>
-<para>
-
-Ne všechny části instalačního procesu jdou automatizovat pomocí
-všech typů přednastavení, protože se občas zobrazí otázky ještě před
-nahráním souboru s přednastavením. Například aby se mohl stáhnout
-soubor s přednastavením ze sítě, musí se síť nejprve nastavit. (Tento
-problém řeší mj. přednastavení rovnou v initrd.)
-
-</para><para>
-
-I když nemůžete přednastavit některé kroky, stále můžete dosáhnout
-plně automatické instalace, protože můžete zadat hodnoty pro
-přednastavení jako zaváděcí parametry jádra. Pro libovolnou proměnnou
-stačí zadat <userinput>cesta/k/promenne=hodnota</userinput>.
-
-</para><para>
-
-Některé často používané proměnné mohou mít i kratší variantu, Pokud je
-tato varianta dostupná, upřednostňujeme ji zde před úplnou formou.
-
-</para><para>
-
-Dvě pomlčky <quote>--</quote> mají u zaváděcích parametrů jádra
-speciální význam. Všechny parametry nacházející se za těmito pomlčkami
-budou zkopírovány do konfigurace zavaděče v instalovaném
-systému. (Pokud to instalátor pro daný zavaděč umožňuje.) Dejte pozor,
-zda <quote>--</quote> již není přítomen ve výchozích zaváděcích
-parametrech jádra.
-
-</para><note><para>
-
-Jádro 2.4 akceptuje nejvýše 8 parametrů a 8 proměnných prostředí
-(včetně standardních voleb pro instalační program). Pokud tento limit
-překročíte, jádra řady 2.4 přebývající parametry zahodí, jádra 2.6
-zpanikaří. S jádry 2.6.9 a novějšími můžete použít až 32 parametrů
-a 32 proměnných prostředí.
-
-</para></note><para>
-
-Pro většinu instalací můžete celkem bez problémů odstranit implicitní
-volby jako <userinput>vga=normal</userinput>, což vám umožní přidat
-další volby pro přednastavení.
-
-</para><note><para>
-
-V některých případech není možné zadat hodnotu obsahující mezeru, a to
-i v případě, kdy hodnotu obklopíte uvozovkami.
-
-</para></note>
   </sect2>
  </sect1>
 
@@ -907,7 +1068,9 @@ a dříve zodpovězenými otázkami. Volitelně můžete přidat další
 #d-i apt-setup/local0/comment string local server
 # Povolí řádky deb-src
 #d-i apt-setup/local0/source boolean true
-# URL k veřejnému klíči lokálního archivu
+# URL k veřejnému klíči lokálního archivu; Klíč musíte zadat, protože
+# jinak si apt bude stěžovat na neautentizovaný archiv a příslušný
+# řádek v sources.list zůstane zakomentovaný
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
@@ -1182,8 +1345,15 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <sect1 id="preseed-advanced">
  <title>Pokročilé možnosti</title>
 
-  <sect2 id="preseed-shell">
-  <title>Shellové příkazy</title>
+  <sect2 id="preseed-hooks">
+  <title>Spouštění vlastních příkazů během instalace</title>
+<para>
+
+Nástroje pro přednastavení nabízí velice mocnou vlastnost, kterou je
+možnost spouštění libovolných příkazů nebo skriptů v určitých bodech
+instalace.
+
+</para>
 
 <informalexample role="example"><screen>
 # Přednastavení d-i není už ze své podstaty bezpečné. Nic
@@ -1201,6 +1371,27 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # resp. in-target pro jednoduchou instalaci balíků resp. spouštění
 # příkazů v nově instalovaném systému
 #d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-seenflag">
+  <title>Použití přednastavení pro změnu výchozích hodnot</title>
+<para>
+
+Pomocí přednastavení můžete dosáhnout i toho, že se otázka normálně
+zobrazí, ale změní se její výchozí odpověď. (Například na úvodní
+otázce ohledně jazyka můžete přednastavit místo angličtiny češtinu,
+takže uživateli stačí stisknout &enterkey;, ale stále mu necháváte
+možnost volby jiného jazyka.) Dosáhnete toho tak, že po nastavení
+proměnné změníte příznak <firstterm>seen</firstterm> na hodnotu
+<quote>false</quote>.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string hodnota
+d-i foo/bar seen false
 </screen></informalexample>
 
   </sect2>
@@ -1245,6 +1436,18 @@ dalších souborů se specifickým nastavením pro danou situaci.
 d-i preseed/run string foo.sh
 </screen></informalexample>
 
+<para>
+
+Zřetězené nahrávání souborů s přednastavením funguje i mezi různými
+typy přednastavení. Například pokud používáte přednastavení z initrd
+nebo ze souboru, můžete v nich uvést proměnnou
+<classname>preseed/url</classname> a po naběhnutí sítě tak plynule
+přejít do souboru s přednastavením staženým ze sítě. Musíte však být
+opatrní, protože to také znamená, že se proces přednastavení spustí
+znovu a mimo jiné tím dostanete šanci na druhé spuštění příkazu
+<classname>preseed/early</classname>, tentokráte po naběhnutí sítě.
+
+</para>
   </sect2>
  </sect1>
 </appendix>

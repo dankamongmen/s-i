@@ -1,10 +1,220 @@
 <!-- $Id$ -->
-<!-- original version: 39614 -->
+<!-- original version: 43259 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Problémy s instalačním systémem</title>
 <para>
 </para>
+
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>Spolehlivost CD</title>
+<para>
+
+Občas, obzvláště se staršími CD mechanikami, se nemusí podařit zavést
+instalační systém. Dokonce je možné, že se systém zavede, ale poté již
+CD mechaniku nenalezne, nebo během instalace bude čtení vracet chyby.
+
+</para><para>
+
+Možných příčin je spousta a můžeme zde vypsat jen ty nejběžnější,
+resp. můžeme zmínit obecné postupy. Zbytek je na vás.
+
+</para><para>
+
+Nejprve byste měli vyzkoušet dvě nejjednodušší věci.
+
+<itemizedlist>
+<listitem><para>
+
+Pokud z CD nejde zavést, zkontrolujte, že je disk vložen správně a že
+není špinavý.
+
+</para></listitem>
+<listitem><para>
+
+Pokud systém sice naběhne, ale rozpoznání CD selže, zkuste z menu
+opakovaně vybrat možnost <menuchoice> <guimenuitem>Rozpoznat a
+připojit CD-ROM</guimenuitem> </menuchoice>. Je známo, že se tím
+vyřeší některé problémy s DMA starších CD mechanik.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Jestliže to stále nepomohlo, zkuste některý z návrhů níže. Většina
+návrhů platí jak pro CD mechaniky, tak pro DVD, Blue Ray a podobné
+mechaniky.
+
+</para><para>
+
+Jako poslední záchrana zde stále existuje možnost zvolit instalaci
+z jiného média, např. ze sítě.
+
+</para>
+
+  <sect3>
+  <title>Běžné problémy</title>
+
+<itemizedlist>
+  <listitem><para>
+
+Některé starší CD mechaniky nepodporují čtení disků vypálených
+na novějších vypalovačkách vyššími rychlostmi.
+
+  </para></listitem>
+  <listitem><para>
+
+Jestliže váš systém zvládá zavádění z CD, nemusí to nutně znamenat, že
+že tuto mechaniku (přesněji řečeno řadič, ke kterému je mechanika
+připojena) podporuje i Linux.
+
+  </para></listitem>
+  <listitem><para>
+
+Některé starší CD mechaniky nefungují správně při povoleném DMA
+<quote>direct memory access</quote>.
+
+  </para></listitem>
+</itemizedlist>
+
+  </sect3>
+
+  <sect3>
+  <title>Jak zjistit o problému co nejvíce (a možná jej vyřešit)</title>
+<para>
+
+Pokud se nedaří z CD zavést systém, zkuste následující.
+
+<itemizedlist>
+  <listitem><para>
+
+Zkontrolujte, zda je v BIOSu povoleno zavádění z CD (starší systémy to
+nejspíš nezvládají) a že vaše CD mechanika podporuje média, která
+používáte.
+
+  </para></listitem>
+  <listitem><para>
+
+Pokud jste si stáhli iso obraz, zkontrolujte, že souhlasí kontrolní
+součet s tím, který se nachází v souboru
+<filename>MD5SUMS</filename>. Soubor by měl ležet na stejném místě, ze
+kterého jste stáhli obraz.
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable></userinput>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+Dále zkontrolujte, že kontrolní součet souhlasí i po vypálení obrazu.
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>dd if=/dev/cdrom | \</userinput>
+<prompt>></prompt> <userinput>head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \</userinput>
+<prompt>></prompt> <userinput>md5sum</userinput>
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Pokud se podařilo zavést instalační systém, ale ten už CD nerozpozná,
+postačí někdy z hlavního instalačního menu znovu spustit krok
+rozpoznání CD. Máte-li více mechanik, zkuste použít nějakou
+jinou. Jestliže to nepomáhá, nebo se při čtení objevují chyby, zkuste
+některou z rad níže. Pro následující kroky je třeba základní znalost
+Linuxu. Pro spouštění různých příkazů byste se měli přepnout na druhou
+virtuální konzolu (VT2) a aktivovat tam spící shell.
+
+<itemizedlist>
+  <listitem><para>
+
+Zkontrolujte podezřelé hlášky na čtvrté virtuální konzoli, nebo si
+editorem <command>nano</command> prohlédněte obsah souboru
+<filename>/var/log/syslog</filename>. Poté zkontrolujte výstup příkazu
+<command>dmesg</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Ve výpisu příkazu <command>dmesg</command> se podívejte, zda byla vaše
+CD mechanika nalezena. Měli byste tam vidět něco podobného (ne nutně v
+tomto pořadí):
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+Nevidíte-li nic podobného, je možné, že řadič, ke kterému je vaše CD
+mechanika připojena, nebyl rozpoznán, nebo není podporován. Jestliže
+víte, který ovladač je vyžadován pro váš řadič, můžete jej zkusit
+nahrát ručně příkazem <command>modprobe</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Zkontrolujte, zda se v adresáři <filename>/dev/</filename> vytvořil
+soubor zařízení odpovídající vaší CD mechanice. Podle výše uvedeného
+příkladu by to byl soubor <filename>/dev/hdc</filename>. Také by měl
+existovat <filename>/dev/cdroms/cdrom0</filename>.
+
+  </para></listitem>
+  <listitem><para>
+
+Příkazem <command>mount</command> se přesvědčte, zda je CD připojeno.
+Pokud ne, zkuste je připojit ručně.
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>mount /dev/<replaceable>hdc</replaceable> /cdrom</userinput>
+</screen></informalexample>
+
+Podívejte se, zda tento příkaz nevyvolal nějaká chybová hlášení.
+
+  </para></listitem>
+  <listitem><para>
+
+Zkontrolujte, zda je DMA zapnuté:
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable></userinput>
+<prompt>$</prompt> <userinput>grep using_dma settings</userinput>
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+Číslo <quote>1</quote> v prvním sloupci za textem
+<literal>using_dma</literal> znamená, že je DMA povoleno. Pokud je,
+zkuste je vypnout:
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>echo -n "using_dma:0" >settings</userinput>
+</screen></informalexample>
+
+Před spuštěním příkazu se ujistěte, že jste v adresáři zařízení, které
+odpovídá vaší CD mechanice.
+
+  </para></listitem>
+  <listitem><para>
+
+Pokud se během instalace vyskytnou problémy, zkuste zkontrolovat
+integritu média pomocí volby v hlavním menu instalačního systému. Toto
+menu můžete použít jako rozumný test, zda je možné spolehlivě přečíst
+celé CD.
+
+  </para></listitem>
+</itemizedlist>
+
+</para>
+  </sect3>
+  </sect2>
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Spolehlivost disket</title>
@@ -31,7 +241,8 @@ kterou byste měli udělat, je znovu stáhnout obraz diskety a zapsat
 jej na <emphasis>jinou</emphasis> disketu. Přeformátování původní
 diskety nemusí vést k úspěchu, ani když se po formátování vypíše, že
 operace proběhla bez problémů. Někdy je užitečné zkusit nahrát
-diskety na jiném počítači.
+diskety na jiném počítači. Máte-li podezření na problém při stahování,
+ověřte md5součty obrazů.
 
 </para><para>
 
@@ -240,7 +451,7 @@ Při psaní, prosím, použijte následující
 Package: installation-reports
 
 Boot method: <replaceable>&lt;Jak jste zavedli instalaci? CD? Disketa? Síť?&gt;</replaceable>
-Image version: <replaceable>&lt;Kdy a odkud jste stáhli obraz(y)&gt;</replaceable>
+Image version: <replaceable>&lt;Celé url, odkud jste stáhli obraz(y)&gt;</replaceable>
 Date: <replaceable>&lt;Datum a čas instalace&gt;</replaceable>
 
 Machine: <replaceable>&lt;Popis počítače (např. IBM Thinkpad T41)&gt;</replaceable>
@@ -248,23 +459,24 @@ Processor:
 Memory:
 Partitions: <replaceable>&lt;Výstup příkazu df -Tl;&gt;</replaceable>
 
-Output of lspci and lspci -n:
+Output of lspci -nn and lspci -vnn:
 
 Base System Installation Checklist:
 [O] = OK, [E] = Error (please elaborate below), [ ] = didn't try it
 
-Initial boot worked:    [ ]
-Configure network HW:   [ ]
-Config network:         [ ]
+Initial boot:           [ ]
+Detect network card:    [ ]
+Configure network:      [ ]
 Detect CD:              [ ]
 Load installer modules: [ ]
 Detect hard drives:     [ ]
 Partition hard drives:  [ ]
-Create file systems:    [ ]
-Mount partitions:       [ ]
 Install base system:    [ ]
+Clock/timezone setup:   [ ]
+User/password setup:    [ ]
+Install tasks:          [ ]
 Install boot loader:    [ ]
-Reboot:                 [ ]
+Overall install:        [ ]
 
 Comments/Problems:
 

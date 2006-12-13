@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 41871 -->
+<!-- original version: 43254 -->
 
    <sect3 id="partman">
    <title>Rozdělení disků</title>
@@ -21,15 +21,31 @@ z nabídky <guimenuitem>Ručně</guimenuitem>.
 
 Zvolíte-li automatické rozdělování, měli byste mít na výběr několik
 možností: vytvořit oblasti přímo na disku (klasický způsob), použít
-Logical Volume Management (LVM), nebo použít šifrované LVM. Ve druhém
+Logical Volume Management (LVM), nebo použít šifrované LVM<footnote>
+
+<para>
+
+Instalátor zašifruje skupinu svazků pomocí 256 bitového klíče AES a
+využije pro to <quote>dm-crypt</quote>, který je součástí linuxového
+jádra.
+
+</para></footnote>. Ve druhém
 a třetím případě vytvoří instalátor většinu oblastí uvnitř jedné
 veliké; výhoda je ta, že oblasti uvnitř této veliké oblasti pak můžete
 relativně jednoduše zvětšovat a případně zmenšovat. U šifrovaného LVM
 bude tato veliká oblast šifrovaná a pro přístup k datům na ní uloženým
-budete muset znát přístupovou frázi. Poznámka: (šifrované) LVM nemusí
-být k dispozici na všech architekturách.
+budete muset znát přístupovou frázi. Šifrované LVM má ještě jednu
+výhodu, a to tu, že před použitím se celá oblast přepíše náhodnými
+daty, takže nebude možné rozeznat, které části oblasti se aktivně
+používají, a také tím zrušíte stopy po předchozích instalacích. Musíte
+však počítat s tím, že mazání zabere určitý čas, který může být u
+větších oblastí docela značný.
 
 </para><note><para>
+
+(Šifrované) LVM nemusí být k dispozici na všech architekturách.
+
+</para></note><note><para>
 
 Při automatickém rozdělení pomocí LVM (nebo šifrovaného LVM), se budou
 muset na zvolený disk zapsat některé změny provedené v tabulce
