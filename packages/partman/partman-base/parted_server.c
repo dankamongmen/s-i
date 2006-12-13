@@ -1510,7 +1510,7 @@ command_get_max_primary()
                 oprintf("%d\n",
                         ped_disk_get_max_primary_partition_count(disk));
         else
-                oprintf("0\n");
+                oprintf("\n");
         activate_exception_handler();
 }
 
