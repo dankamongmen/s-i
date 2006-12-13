@@ -1506,7 +1506,11 @@ command_get_max_primary()
         open_out();
         oprintf("OK\n");
         deactivate_exception_handler();
-        oprintf("%d\n", ped_disk_get_max_primary_partition_count(disk));
+        if (disk != NULL && disk->type != NULL)
+                oprintf("%d\n",
+                        ped_disk_get_max_primary_partition_count(disk));
+        else
+                oprintf("0\n");
         activate_exception_handler();
 }
 
