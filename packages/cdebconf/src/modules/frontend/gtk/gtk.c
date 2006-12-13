@@ -964,7 +964,7 @@ static int gtkhandler_select_treeview_list(struct frontend *obj, struct question
     {
         gtk_list_store_append (store, &iter);
         gtk_list_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
-        if (defval && strcmp(choices[tindex[i]], defval) == 0)
+        if (!flag_default_set && defval && strcmp(choices[tindex[i]], defval) == 0)
         {
             expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &iter));
             expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
@@ -1073,7 +1073,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
                 gtk_tree_store_append (store, &child, &iter);
                 gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
 
-                if (defval && strcmp(choices[tindex[i]], defval) == 0)
+                if (!flag_default_set && defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
                     gtk_tree_view_expand_row (GTK_TREE_VIEW (view), gtk_tree_model_get_path (model, &iter), TRUE);
                     expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &child));
@@ -1089,7 +1089,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
                 gtk_tree_store_append (store, &child, &iter);
                 gtk_tree_store_set (store, &child, SELECT_COL_NAME, choices_translated[i], -1);
                 gtk_tree_view_expand_row (GTK_TREE_VIEW(view), gtk_tree_model_get_path(model, &iter), TRUE);
-                if (defval && strcmp(choices[tindex[i]], defval) == 0)
+                if (!flag_default_set && defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
                     expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &child));
                     expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
@@ -1100,7 +1100,7 @@ static int gtkhandler_select_treeview_store(struct frontend *obj, struct questio
             {    /* father, disk */
                 gtk_tree_store_append (store, &iter,NULL);
                 gtk_tree_store_set (store, &iter, SELECT_COL_NAME, choices_translated[i], -1);
-                if (defval && strcmp(choices[tindex[i]], defval) == 0)
+                if (!flag_default_set && defval && strcmp(choices[tindex[i]], defval) == 0)
                 {
                     expose_data -> path = gtk_tree_path_to_string (gtk_tree_model_get_path (model, &iter));
                     expose_data -> callback_function = g_signal_connect_after (G_OBJECT(view), "expose_event", G_CALLBACK (treeview_exposed_callback), (gpointer) expose_data);
