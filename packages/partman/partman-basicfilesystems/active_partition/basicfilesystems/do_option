@@ -80,12 +80,15 @@ do_mountpoint_manual () {
 
 case $1 in
     mountpoint)
+	code=0
 	if [ "$filesystem" = fat16 -o "$filesystem" = fat32 ]; then
-	    do_fatmountpoint
+	    do_fatmountpoint || code=$?
 	else
-	    select_mountpoint $dev $id
+	    select_mountpoint $dev $id || code=$?
 	fi
-	update_partition $dev $id
+	if [ "$code" -eq 0 ]; then
+	    update_partition $dev $id
+	fi
 	;;
     options)
 	if [ "$filesystem" = fat16 -o "$filesystem" = fat32 ]; then
