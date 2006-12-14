@@ -13,8 +13,9 @@ filesystem=$(cat $part/acting_filesystem)
 
 case $1 in
     mountpoint)
-	select_mountpoint $dev $id
-	update_partition $dev $id
+	if select_mountpoint $dev $id; then
+	    update_partition $dev $id
+	fi
 	;;
     options)
 	select_mountoptions $dev $id partman-jfs/options
