@@ -1,0 +1,9 @@
+#!/bin/bash -e
+# Remove debugging symbols from kernel modules. Pass the kernel name.
+kernel=$1
+set -e
+for dir in debian/*-modules-$kernel-di; do
+	for module in `find $dir/lib/modules/ -name '*.o' -name '*.ko'`; do
+		strip -R .comment -R .note -g $$module
+	done
+done
