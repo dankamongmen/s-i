@@ -67,6 +67,12 @@
 #define PROGRESSBAR_HPADDING 60
 #define PROGRESSBAR_VPADDING 60
 
+/* Make sure this is called in a GDK thread-safe way
+ */
+void update_frontend_title (struct frontend *obj, char *title);
+
+char *progressbar_title = NULL;
+
 typedef int (gtk_handler)(struct frontend *obj, struct question *q, GtkWidget *questionbox);
 
 static GCond *button_cond = NULL;
@@ -274,7 +280,7 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
     gint x, y, width, height, depth;
     int i, j;
     char screenshot_name[256], popup_message[256];
-    char *label_title_string;
+    char *tmp;
 	
     gdk_window = gtk_widget_get_parent_window ( button );
     gdk_window_get_geometry( gdk_window, &x, &y, &width, &height, &depth);
@@ -309,9 +315,9 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
 
     title_label = gtk_label_new (get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
     gtk_misc_set_alignment(GTK_MISC(title_label), 0, 0);
-    label_title_string = malloc(strlen(get_text(obj, "debconf/gtk-button-screenshot", "Screenshot")) + 8 );
-    sprintf(label_title_string,"<b>%s</b>", get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
-    gtk_label_set_markup(GTK_LABEL(title_label), label_title_string);
+    tmp = malloc(strlen(get_text(obj, "debconf/gtk-button-screenshot", "Screenshot")) + 8 );
+    sprintf(tmp,"<b>%s</b>", get_text(obj, "debconf/gtk-button-screenshot", "Screenshot"));
+    gtk_label_set_markup(GTK_LABEL(title_label), tmp);
     sprintf(popup_message, get_text(obj, "debconf/gtk-screenshot-saved", "Screenshot saved as %s"), screenshot_name );
     message_label = gtk_label_new (popup_message);
 
@@ -338,7 +344,7 @@ void screenshot_button_callback(GtkWidget *button, struct frontend* obj )
     gtk_container_add (GTK_CONTAINER (window), frame);
     gtk_widget_show_all (window);
 
-    free(label_title_string);
+    free(tmp);
 }
 
 void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_string, struct question_treemodel_data* data)
@@ -1293,6 +1299,7 @@ void set_design_elements(struct frontend *obj, GtkWidget *window)
   
     /* A label is used to display the fontend's title */
     label_title = gtk_label_new(NULL);
+    gtk_misc_set_alignment (GTK_MISC (label_title), 0, 0);
     ((struct frontend_data*) obj->data)->title = label_title;
     h_title_box = gtk_hbox_new (TRUE, 0);
     gtk_box_pack_start(GTK_BOX (h_title_box), label_title, TRUE, TRUE, DEFAULT_PADDING);
@@ -1593,6 +1600,8 @@ static int gtk_go(struct frontend *obj)
     GTK_WIDGET_SET_FLAGS (GTK_WIDGET(data->button_next), GTK_CAN_DEFAULT);
     gtk_widget_grab_default (GTK_WIDGET(data->button_next));
 
+    update_frontend_title (obj, obj->title);
+
     gtk_widget_show_all(data->window);
     gtk_widget_hide(((struct frontend_data*)obj->data)->progress_bar_box) ;
     gtk_widget_hide(((struct frontend_data*)obj->data)->button_cancel) ;
@@ -1640,17 +1649,10 @@ static int gtk_go(struct frontend *obj)
 
 static void gtk_set_title(struct frontend *obj, const char *title)
 {
-    GtkWidget *label_title;
-    char *label_title_string;
-
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called"); */
 
     gdk_threads_enter();
-    label_title = ((struct frontend_data*) obj->data)->title;
-    gtk_misc_set_alignment(GTK_MISC(label_title), 0, 0);
-    label_title_string = malloc(strlen(title) + 10 );
-    sprintf(label_title_string,"<b> %s</b>", title);
-    gtk_label_set_markup(GTK_LABEL(label_title), label_title_string);
+    update_frontend_title (obj, (char *)title);
     gdk_threads_leave();
 }
 
@@ -1708,6 +1710,12 @@ static void gtk_progress_start(struct frontend *obj, int min, int max, const cha
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
+    
+    free (progressbar_title);
+    progressbar_title = malloc (strlen (obj->title)+1);
+    strcpy(progressbar_title, obj->title);
+    update_frontend_title (obj, progressbar_title);
+    
     gdk_threads_leave();
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_start(min=%d, max=%d, title=%s) called", min, max, title); */
@@ -1723,6 +1731,7 @@ static int gtk_progress_set(struct frontend *obj, int val)
     
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_set(val=%d) called", val); */
 
+    update_frontend_title (obj, progressbar_title);
     progress_bar = ((struct frontend_data*)obj->data)->progress_bar;
     gtk_widget_set_sensitive( GTK_WIDGET(progress_bar), TRUE);
 
@@ -1748,8 +1757,10 @@ static int gtk_progress_info(struct frontend *obj, const char *info)
     struct frontend_data *data = (struct frontend_data *) obj->data;
     gdk_threads_enter();
     set_design_elements_while_progressbar_runs(obj);
+
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_progress_info(%s) called", info); */
 
+    update_frontend_title (obj, progressbar_title);
     progress_bar_label = ((struct frontend_data*)obj->data)->progress_bar_label;
     progress_bar_label_string = malloc(strlen(info) + 10 );
     sprintf(progress_bar_label_string,"<i> %s</i>",info);
@@ -1782,7 +1793,7 @@ struct frontend_module debconf_frontend_module =
 {
     initialize: gtk_initialize,
     go: gtk_go,
-    set_title: gtk_set_title,
+/*  set_title: gtk_set_title, */
     can_go_back: gtk_can_go_back,
     can_cancel_progress: gtk_can_cancel_progress,
     progress_start: gtk_progress_start,
@@ -1791,3 +1802,13 @@ struct frontend_module debconf_frontend_module =
     progress_stop: gtk_progress_stop,
     query_capability: gtk_query_capability,
 };
+
+void update_frontend_title (struct frontend *obj, char *title)
+{
+    char *tmp;
+    
+    tmp = malloc (strlen (title) + 12 );
+    sprintf (tmp,"<b> %s</b>", title);
+    gtk_label_set_markup (GTK_LABEL (((struct frontend_data*) obj->data)->title), tmp);
+    free (tmp);
+}
