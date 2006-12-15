@@ -3,7 +3,7 @@
 kernel=$1
 set -e
 for dir in debian/*-modules-$kernel-di; do
-	for module in `find $dir/lib/modules/ -name '*.o' -name '*.ko'`; do
-		strip -R .comment -R .note -g $$module
+	for module in `find $dir/lib/modules/ -name '*.o' -or -name '*.ko'`; do
+		strip -R .comment -R .note -g --strip-unneeded $module
 	done
 done
