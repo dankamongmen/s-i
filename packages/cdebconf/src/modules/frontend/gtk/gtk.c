@@ -1646,7 +1646,7 @@ static int gtk_go(struct frontend *obj)
     else
         return DC_OK;
 }
-
+#if 0
 static void gtk_set_title(struct frontend *obj, const char *title)
 {
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_set_title() called"); */
@@ -1655,7 +1655,7 @@ static void gtk_set_title(struct frontend *obj, const char *title)
     update_frontend_title (obj, (char *)title);
     gdk_threads_leave();
 }
-
+#endif
 static bool gtk_can_go_back(struct frontend *obj, struct question *q)
 {
     return (obj->capability & DCF_CAPB_BACKUP);
