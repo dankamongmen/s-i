@@ -9,6 +9,7 @@ files_exec = \
 	umount:/usr/lib/klibc/bin/umount \
 	zcat:/usr/lib/klibc/bin/zcat \
 	run-init:/usr/lib/klibc/bin/run-init \
+	uname:/usr/lib/klibc/bin/uname \
 	cpio \
 	timeout_read
 

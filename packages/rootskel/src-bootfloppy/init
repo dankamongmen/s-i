@@ -10,8 +10,7 @@ set -e
 
 # The identification of this floppy and the desired root floppy.
 SYSTEM="debian-installer"
-LABEL="boot floppy"
-ROOT_LABEL="root floppy"
+ROOT_LABEL="Root floppy"
 ROOT_FS="ext2"
 
 MODULE_DIR="/lib/modules/*"
@@ -78,7 +77,7 @@ echo
 echo
 
 # no grep in klibc, replaced by this horrible hack in sh
-test_disk_lbl() {
+test_disk_lbl () {
     n=$1
     nb_words=$2
     str=$3
@@ -90,7 +89,7 @@ test_disk_lbl() {
     return 1   
 }
 
-try_mount() {
+try_mount () {
     # TO REMOVE, there is a bug somewhere in the kernel, the first
     # mount command fail when changing floppy disk
     # so we have to launch mount twice
@@ -105,10 +104,21 @@ try_mount() {
 	return 1
 }
 
+klibc_timeout_supported () {
+	local arch=`uname -i`
+	if [ $arch = "i386" ] || [ $arch = "amd64" ] ; then
+		return 0
+	fi
+	return 1
+}
+
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	MOUNTED=0
-	nb_timeout=3
+	nb_timeout=0
+	if klibc_timeout_supported; then
+		nb_timeout=3
+	fi
 	while [ "$MOUNTED" = 0 ]; do
 		echo
 		echo "Insert the $ROOT_LABEL."
@@ -156,12 +166,13 @@ while [ "$LOADED" = 0 ]; do
 				# quite right, as this may be USB storage,
 				# whatever.
 				if try_mount $dev $ROOT_FS floppy; then
-					disk_lbl=`cat floppy/disk.lbl`
-					if [ -e floppy/disk.lbl ] && test_disk_lbl 0 1 "System:" $disk_lbl; then
-						if ! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
+					if [ -e floppy/disk.lbl ] ; then
+						disk_lbl=`cat floppy/disk.lbl`
+						if ! test_disk_lbl 0 1 "System:" $disk_lbl || \
+							! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
 							ERR="$ERR; $dev: not a $SYSTEM floppy"
-						elif test_disk_lbl 2 3 "Label: $LABEL" $disk_lbl; then
-							ERR="$ERR; $dev: still the $LABEL"
+						elif ! test_disk_lbl 2 3 "Label: $ROOT_LABEL" $disk_lbl; then
+							ERR="$ERR; $dev: not the $ROOT_LABEL"
 						else
 							cat floppy/disk.lbl
 							MOUNTED=1
