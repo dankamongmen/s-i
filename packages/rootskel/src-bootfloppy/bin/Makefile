@@ -1,3 +1,5 @@
+ARCH := $(shell dpkg --print-architecture)
+
 dir = bin
 files_exec = \
 	sh:/usr/lib/klibc/bin/sh.shared \
@@ -19,6 +21,13 @@ LDFLAGS=-shared -s
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=cpio timeout_read
 LIBS=
+
+ifeq ($(ARCH),i386)
+CFLAGS += -DKLIBC_SELECT 
+endif
+ifeq ($(ARCH),amd64)
+CFLAGS += -DKLIBC_SELECT 
+endif
 
 
 build-local:: $(BIN)

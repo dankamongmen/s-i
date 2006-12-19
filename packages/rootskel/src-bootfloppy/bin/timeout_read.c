@@ -3,13 +3,18 @@
 #include <sys/types.h>
 #include <time.h>
 
+
 int main(int argc, char *argv[])
 {  
+	int ret = -1;
+	
+	/* For the moment, select fuction does not work for all arches */ 
+#if defined (KLIBC_SELECT)
 	int i;
 	char str[255] = "";
 	fd_set set;
 	struct timeval ts;
-	int ret = -1;
+
 
 	if (argc != 2) {
 	  fprintf(stderr, "Usage: %s nb_seconds\n",
@@ -35,5 +40,7 @@ int main(int argc, char *argv[])
 		  ret = 0;
 		}
 	}
+#endif
+
 	return ret;
 }
