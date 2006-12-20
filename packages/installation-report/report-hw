@@ -8,6 +8,12 @@ addinfo () {
 	sed "s%^%$1: %"
 }
 
+addfile () {
+	if [ -r "$1" ]; then
+		cat "$1" | addinfo "$1"
+	fi
+}
+
 uname -a 2>&1 | addinfo "umame -a"
 
 if type lspci >/dev/null 2>&1; then
@@ -17,8 +23,8 @@ elif /target/usr/bin/lspci >/dev/null; then
 	/target/usr/bin/lspci -nn 2>&1 | addinfo "lspci -nn"
 	/target/usr/bin/lspci -vnn 2>&1 | addinfo "lspci -vnn"
 else
-	cat /proc/pci 2>&1 | addinfo /proc/pci
-	cat /proc/bus/pci/devices 2>&1 | addinfo /proc/bus/pci/devices
+	addfile /proc/pci
+	addfile /proc/bus/pci/devices
 fi
 
 lsmod 2>&1 | addinfo lsmod
@@ -32,14 +38,14 @@ cardctl ident 2>&1 | addinfo "cardctl ident"
 
 for file in cpuinfo ioports iomem interrupts meminfo bus/usb/devices \
 	bus/input/devices; do
-	if [ -e /proc/$file ] ; then
-		cat /proc/$file 2>&1 | addinfo /proc/$file
-	fi
+	addfile /proc/$file
 done
 dmidecode 2>&1 | addinfo dmidecode
 
-if [ "$DEBIAN_FRONTEND" = gtk ] && \
-   [ -x /usr/lib/directfb-0.9.25/bin/dfbinfo ]; then
-	/usr/lib/directfb-0.9.25/bin/dfbinfo 2>&1 | addinfo dfbinfo
-	[ -f /proc/fb ] && cat /proc/fb | addinfo /proc/fb
+if [ "$DEBIAN_FRONTEND" = gtk ]; then
+	addfile /proc/fb
+	addfile /etc/directfbrc
+	if [ -x /usr/lib/directfb-0.9.25/bin/dfbinfo ]; then
+		/usr/lib/directfb-0.9.25/bin/dfbinfo 2>&1 | addinfo dfbinfo
+	fi
 fi
