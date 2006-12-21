@@ -3,6 +3,7 @@ set -e
 
 export DEBIAN_FRONTEND=none
 . /usr/share/debconf/confmodule
+. /lib/preseed/preseed.sh
 
 SEEN=1
 if [ "$1" = --unseen ]; then
@@ -29,6 +30,8 @@ for line in $(grep -v '^#' "$file" | sed "s/$CR//g"); do
 		multiline=""
 	fi
 	
+	echo "$line" >> $logfile
+
 	set -- $line
 	#package="$1"
 	var="$2"

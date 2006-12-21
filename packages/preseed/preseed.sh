@@ -64,12 +64,6 @@ preseed_location () {
 	if ! debconf-set-selections $UNSEEN $tmp; then
 		error load_error "$location"
 	fi
-		
-	if [ -e $logfile ]; then
-		cat $tmp >> $logfile
-	else
-		cp $tmp $logfile
-	fi
 	rm -f $tmp
 
 	log "successfully loaded preseed file from $location"
