@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42824 -->
+<!-- original version: 42982 -->
 
  <sect1 id="boot-parms"><title>ブートパラメータ</title>
 <para>
@@ -216,31 +216,25 @@ installer. The current possible parameter settings are:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
 <!--
-The default front end is <userinput>DEBIAN_FRONTEND=newt</userinput>.
+The default frontend is <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>DEBIAN_FRONTEND=text</userinput> may be preferable for
 serial console installs. Generally only the
 <userinput>newt</userinput> frontend is available on default install
-media, so this is not very useful right now.
+media. On architectures which support it, the graphical installer uses
+the <userinput>gtk</userinput> frontend.
 -->
-デフォルトのフロントエンドは <userinput>DEBCONF_FRONTEND=newt</userinput> です。
-シリアルコンソールでインストールするには、
+デフォルトのフロントエンドは <userinput>DEBCONF_FRONTEND=newt</userinput> 
+です。シリアルコンソールでインストールするには、
 <userinput>DEBIAN_FRONTEND=text</userinput> とすべきでしょう。
 一般的に、デフォルトのインストールメディアでは <userinput>newt</userinput>
- フロントエンドのみが利用可能です。
-そのため、今現在あまり有用ではありません。
+フロントエンドのみが利用可能です。
+サポートしているアーキテクチャでは、グラフィカルインストーラが 
+<userinput>gtk</userinput> フロントエンドを使用します。
 
 
 </para></listitem>
@@ -414,8 +408,8 @@ designed for visually impaired users. Set the theme by booting with parameter
 or <userinput>theme=<replaceable>dark</replaceable></userinput>.
 -->
 テーマ (theme) はインストーラのユーザインターフェースがどのように見えるか 
-(色、アイコンなど) を決定します。現在、newt と gtk のフロントエンドに、
-目の不自由な方向けにデザインされた <quote>dark</quote> テーマのみあります。
+(色、アイコンなど) を決定します。現在、newt と gtk のフロントエンドにのみ、
+目の不自由な方向けにデザインされた <quote>dark</quote> テーマがあります。
 起動時のパラメータに、
 <userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
 や省略形の <userinput>theme=<replaceable>dark</replaceable></userinput> 
@@ -493,12 +487,12 @@ PCMCIA サービスが原因で問題が発生する場合、
 <!--
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>url</userinput>
+Short form: <userinput>url</userinput>.
 -->
 preconfiguration ファイルをダウンロードする URL を指定します。
 これは自動インストールで使用します。
 <xref linkend="automatic-install"/> を参照してください。
-短縮形: <userinput>url</userinput>
+短縮形は <userinput>url</userinput> です。
 
 </para></listitem>
 </varlistentry>
@@ -510,9 +504,11 @@ preconfiguration ファイルをダウンロードする URL を指定します。
 <!--
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
+Short form: <userinput>file</userinput>.
 -->
 自動インストールで読み込む preconfiguration ファイルの PATH を指定します。
 <xref linkend="automatic-install"/> を参照してください。
+短縮形は <userinput>file</userinput> です。
 
 </para></listitem>
 </varlistentry>
@@ -528,7 +524,7 @@ See <xref linkend="preseed-auto"/> for details about using this to
 automate installs.
 -->
 通常 preseed の前に行われる質問を、ネットワークの設定が終わるまで遅らせます。
-短縮形: <userinput>auto=true</userinput>。
+短縮形は <userinput>auto=true</userinput> です。
 自動インストールでこのパラメータを使用する際には、
 <xref linkend="preseed-auto"/> をご覧ください。
 
@@ -632,12 +628,90 @@ performing a normal installation. See <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
-  </sect2>
+
+   <sect3 id="preseed-args">
+<!--
+   <title>Using boot parameters to answer questions</title>
+-->
+   <title>ブートパラメータで質問に答える</title>
+<para>
 
 <!--
-  <sect2 id="module-parms"><title>Passing parameters to kernel modules</title>
+With some exceptions, a value can be set at the boot prompt for any question
+asked during the installation, though this is only really useful in specific
+cases. General instructions how to do this can be found in
+<xref linkend="preseed-bootparms"/>. Some specific examples are listed below.
 -->
-  <sect2 id="module-parms"><title>カーネルモジュールへのパラメータ指定</title>
+例外的に、インストール中の質問にブートパラメータで答を与えることができます。
+これは、特殊な状況でのみ便利です。
+この方法の概要は、<xref linkend="preseed-bootparms"/> にあります。
+特殊な例を以下に示します。
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale</term>
+<listitem><para>
+
+<!--
+Can be used to set both the language and country for the installation.
+This will only work if the locale is supported in Debian.
+Short form: <userinput>locale</userinput>.
+For example, use <userinput>locale=de_CH</userinput> to select German as
+language and Switserland as country.
+-->
+インストールする際の言語や国の情報を設定するのに使用します。
+これは Debian でロケールをサポートしている場合のみ有効です。
+短縮形は <userinput>locale</userinput> です。
+例えば、言語にドイツ語、国にスイスを指定するには、
+<userinput>locale=de_CH</userinput> と指定します。
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+<!--
+Set to <userinput>true</userinput> if you want to disable DHCP and instead
+force static network configuration.
+-->
+DHCP を無効にし、静的ネットワーク設定を強制するには、
+<userinput>true</userinput> と設定します。
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first</term>
+<listitem><para>
+
+<!--
+Can be used to select tasks that are not available from the interactive task
+list, such as the <literal>kde-desktop</literal> task.
+See <xref linkend="pkgsel"/> for additional information.
+Short form: <userinput>tasks</userinput>.
+-->
+<literal>kde-desktop</literal> タスクのような、
+タスク一覧に表示されないタスクを選択するのに使用します。
+さらなる情報は <xref linkend="pkgsel"/> をご覧ください。
+短縮形は <userinput>tasks</userinput> です。
+
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+<!--
+   <sect3 id="module-parms"><title>Passing parameters to kernel modules</title>
+-->
+   <sect3 id="module-parms"><title>カーネルモジュールへパラメータを渡す</title>
 <para>
 
 <!--
@@ -702,6 +776,6 @@ IRQ 10 を設定する場合は、以下のようにします。
 </screen></informalexample>
 
 </para>
+   </sect3>
   </sect2>
  </sect1>
-

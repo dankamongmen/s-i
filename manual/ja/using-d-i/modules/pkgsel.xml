@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42551 -->
+<!-- original version: 42985 -->
 
    <sect3 id="pkgsel">
 <!--
@@ -89,39 +89,69 @@ un-select the tasks. You can even opt to install no tasks at all at this point.
 <note><para>
 
 <!--
-The <quote>Desktop environment</quote> task will install the Gnome desktop
+The <quote>Desktop environment</quote> task will install the GNOME desktop
 environment. The options offered by the installer currently do not allow to
-select a different desktop environment like for example KDE.
+select a different desktop environment such as for example KDE.
 -->
 <quote>デスクトップ環境</quote> タスクは、
-Gnome デスクトップ環境をインストールします。
+GNOME デスクトップ環境をインストールします。
 現在インストーラで提供されているオプションでは、
 KDE のような他のデスクトップ環境を選択できません。
 
 </para><para>
 
 <!--
-It is however possible to get the installer to install KDE by using preseeding
+It is possible to get the installer to install KDE by using preseeding
 (see <xref linkend="preseed-pkgsel"/>) or by adding
-<literal>tasksel/first=kde-desktop</literal> at the boot prompt when starting
-the installer.
+<literal>tasks="standard, kde-desktop"</literal> at the boot prompt
+when starting the installer. However, this will only work if the packages
+needed for KDE are actually available. If you are installing using a full
+CD image, they will need to be downloaded from a mirror as KDE packages are
+not included on the first full CD; installing KDE this way should work fine
+if you are using a DVD image or any other installation method.
 -->
-しかし、preseed (<xref linkend="preseed-pkgsel"/> 参照) を使用したり、
+preseed (<xref linkend="preseed-pkgsel"/> 参照) を使用したり、
 インストーラの起動時にブートプロンプトで 
-<literal>tasksel/first=kde-desktop</literal> と指定して、
+<literal>tasks="standard, kde-desktop"</literal> と指定して、
 インストーラが KDE をインストールするようにできます。
+しかし、KDE に必要なパッケージが有効な場合のみ動作します。
+フル CD イメージでインストールしている場合、
+KDE のパッケージがフル CD の 1 枚目に入っていないので、
+ミラーサイトからダウンロードする必要があります。
+DVD イメージやその他のインストール方法では、
+KDE でのインストールがうまくいくでしょう。
+
+</para><para>
+
+<!--
+The various server tasks will install software roughly as follows.
+DNS server: <classname>bind9</classname>;
+File server: <classname>samba</classname>, <classname>nfs</classname>;
+Mail server: <classname>exim4</classname>, <classname>spamassassin</classname>,
+<classname>uw-imap</classname>;
+Print server: <classname>cups</classname>;
+SQL server: <classname>postgresql</classname>;
+Web server: <classname>apache</classname>.
+-->
+各サーバタスクでは、おおまかに以下のソフトウェアをインストールします。
+DNS サーバ: <classname>bind9</classname>。
+ファイルサーバ: <classname>samba</classname>, <classname>nfs</classname>。
+メールサーバ: <classname>exim4</classname>, 
+<classname>spamassassin</classname>, <classname>uw-imap</classname>。
+印刷サーバ: <classname>cups</classname>。
+SQL サーバ: <classname>postgresql</classname>。
+Web サーバ: <classname>apache</classname>。
 
 </para></note>
 <para>
 
 <!--
-Once you've selected your tasks, select
-<guibutton>Ok</guibutton>. At this point,
-<command>aptitude</command> will install the packages you've
-selected.
+Once you've selected your tasks, select <guibutton>Ok</guibutton>. At this
+point, <command>aptitude</command> will install the packages that are part
+of the tasks you've selected.
 -->
 タスクを選択したら、<guibutton>Ok</guibutton> を選択してください。
-<command>aptitude</command> が選択したパッケージのインストールを開始します。
+<command>aptitude</command> が選択したパッケージの一部をインストールし始めます。
 
 </para>
 <note><para>
@@ -154,11 +184,13 @@ information from the user, it will prompt you during this process.
 この処理中に入力をうながしてきます。
 
 </para>
- <sect4 id="config-mta">
+   </sect3>
+
+   <sect3 id="config-mta">
 <!--
- <title>Configuring Your Mail Transport Agent</title>
+   <title>Configuring Your Mail Transport Agent</title>
 -->
- <title>メール配送エージェント (MTA) の設定</title>
+   <title>メール配送エージェント (MTA) の設定</title>
 
 <para>
 
@@ -313,5 +345,4 @@ under <filename>/usr/share/doc/exim4</filename>.
 <filename>/usr/share/doc/exim4</filename> 以下にあります。
 
 </para>
- </sect4>
    </sect3>
