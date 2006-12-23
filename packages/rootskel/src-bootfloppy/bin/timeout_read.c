@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	  fprintf(stderr, "select error\n");
 	}
 	else if (i) {
-		i = read(0, str,255);
+		i = read(0, str, 255);
 		if ( i > 0 ) {
 		  str[i] = '\0';
 		  ret = 0;
