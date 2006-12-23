@@ -25,10 +25,6 @@ LIBS=
 ifeq ($(ARCH),i386)
 CFLAGS += -DKLIBC_SELECT 
 endif
-ifeq ($(ARCH),amd64)
-CFLAGS += -DKLIBC_SELECT 
-endif
-
 
 build-local:: $(BIN)
 
