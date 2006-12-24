@@ -14,14 +14,11 @@
 
 #include <libsysfs.h>
 
-const char *const file_devices = "/proc/dasd/devices";
-
 #define SYSCONFIG_DIR "/etc/sysconfig/hardware/"
 #define TEMPLATE_PREFIX	"s390-dasd/"
 
 static struct debconfclient *client;
 
-//enum dasd_state { DASD_STATE_OFFLINE, DASD_STATE_ONLINE, DASD_STATE_ONLINE_UNFORMATTED };
 enum channel_type
 {
 	CHANNEL_TYPE_DASD_ECKD,
@@ -100,40 +97,6 @@ static int channel_device (const char *i)
 		return ret;
 	return -1;
 }
-
-#if 0
-static bool update_state (void)
-{
-	char buf[256];
-	FILE *f = fopen(file_devices, "r");
-	unsigned int i;
-
-	if (!f)
-		return false;
-
-	while (fgets (buf, sizeof (buf), f))
-	{
-		for (i = 0; i < dasds_items; i++)
-			if (strncmp (buf, dasds[i].device, strlen (dasds[i].device)) == 0)
-			{
-				if (!strncmp (buf + 48, "active", 6))
-				{
-					if (!strncmp (buf + 55, "n/f", 3))
-						dasds[i].state = UNFORMATTED;
-					else
-						dasds[i].state = FORMATTED;
-				}
-				else if (!strncmp (buf + 48, "ready", 5))
-					dasds[i].state = READY;
-				else
-					dasds[i].state = UNKNOWN;
-				break;
-			}
-	}
-
-	return true;
-}
-#endif
 
 static enum state_wanted setup ()
 {
