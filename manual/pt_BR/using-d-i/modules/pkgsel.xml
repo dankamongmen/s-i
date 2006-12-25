@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 35518 -->
+<!-- original version: 43512 -->
 <!-- translated by Herbert Parentes  Fortes Neto (hpfn) 2006.02.05 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.04.11 -->
+<!-- revised by Herbert Parentes FOrtes Neto (hpfn) 2006.12.11 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.25 -->
 
    <sect3 id="pkgsel">
    <title>Selecionando e Instalando Programas</title>
@@ -28,8 +29,8 @@ diferentes serviços ou itens que você quer fazer com seu computador, como
 
 Você deve ter isso definido no momento que esta lista for apresentada, o
 instalador está meramente invocando o programa <command>tasksel</command>. Ele
-pode ser executado em qualquer momento após a instalação para instalar (ou
-remover) mais pacotes, ou você pode usar uma ferramenta mais aprimorada
+pode ser executado a qualquer momento após a instalação para instalar mais
+pacotes (ou removê-los), ou você pode usar uma ferramenta mais aprimorada
 como o <command>aptitude</command>.
 Se você estiver procurando por um pacote específico, após ter sido
 concluída a instalação, simplesmente execute 
@@ -44,25 +45,58 @@ requerido para as tarefas disponíveis.
 
 </para><para>
 
-Uma vez que você tenha selecionado suas tarefas, selecione
-<guibutton>Ok</guibutton>. Neste momento, o
-<command>aptitude</command> irá instalar os pacotes que você escolheu.
+Algumas tarefas podem estar pré-selecionadas com base nas características do
+computador que está sendo usado. Se você discordar dessas seleções você
+pode desmarcá-las. Você pode até mesmo optar por não instalar nenhuma das
+tarefas neste momento.
 
+</para>
+<note><para>
+
+A tarefa <quote>Ambiente Desktop</quote> irá instalar o ambiente de desktop
+GNOME. As opções oferecidas pelo instalador atualmente não permitem selecionar
+um ambiente de desktop diferente, como por exemplo o KDE.
+
+</para><para>
+
+É possível fazer com que o instalador instale o KDE usando a pré-configuração
+(veja <xref linked="preseed-pkgsel"/>) ou adicionando
+<literal>tasks="standard, kde-desktop"</literal> no prompt da inicialização
+ao iniciar o instalador. Contudo, isso funcionará apenas se os pacotes
+de que o KDE depende estiverem realmente disponíveis. Se você estiver fazendo a
+instalação usando uma imagem de CD completa, eles precisarão ser baixados a
+partir de um espelho, já que os pacotes do KDE não são incluídos no primeiro
+CD completo; fazer a instalação desta maneira deve funcionar bem se você
+estiver usando uma imagem de DVD ou qualquer outro método de instalação.
+
+</para><para>
+
+As várias tarefas de servidor irão instalar programas de forma aproximada ao
+que se segue.
+Servidor DNS: <classname>bind9</classname>;
+Servidor de Arquivo: <classname>samba</classname>, <classname>nfs</classname>;
+Servidor de correio eletrônico: <classname>exim4</classname>, <classname>spamassassin</classname>,
+<classname>uw-imap</classname>;
+Servidor de Impressão: <classname>cups</classname>;
+Servidor SQL: <classname>postgresql</classname>;
+Servidor web: <classname>apache</classname>.
+
+</para></note>
+<para>
+
+Uma vez que você tenha selecionado suas tarefas, selecione
+<guibutton>Ok</guibutton>. Neste ponto, o <command>aptitude</command> irá
+instalar os pacotes que são parte das tarefas que você selecionou.
+
+</para>
 <note><para>
 
 Na interface de usuário padrão do instalador, você pode usar a barra de espaço
-para marcar/selecionar uma tarefa.
+para selecionar uma tarefa.
 
 </para></note>
+<para>
 
-<note><para>
-
-Note que algumas tarefas podem estar pré-selecionadas, baseando-se nas
-características do computador em que está sendo feita a instalação. Se
-você discordar com essas seleções você pode desmarcar as tarefas. Você
-pode até mesmo optar por não instalar nenhuma tarefa neste momento.
-
-</para></note>
 
 </para><para>
 
@@ -72,8 +106,10 @@ desempacotado e então instalado pelos programas <command>apt-get</command> e
 informações do usuário, ele irá perguntar à você durante o processamento.
 
 </para>
- <sect4 id="config-mta">
- <title>Configurando Seu Agente de Transporte de Correio Eletrônico</title>
+   </sect3>
+
+   <sect3 id="config-mta">
+   <title>Configurando Seu Agente de Transporte de Correio Eletrônico</title>
 
 <para>
 
@@ -164,5 +200,4 @@ a instalação. Mais informações sobre o <command>exim4</command> podem ser
 encontradas em <filename>/usr/share/doc/exim4</filename>.
 
 </para>
- </sect4>
    </sect3>
