@@ -91,7 +91,7 @@ commit_to_svn () {
 #       echo "Actual commit disabled, showing svn st:" >>$logdir/svn_ci.log
 #       svn st po/ 2>/dev/null >>$logdir/svn_ci.log 2>&1
         echo "Committing changed files:" >>$logdir/svn_ci.log
-        svn ci po/ -m "Update of POT and PO files for the manual" >>$logdir/svn_ci.log 2>&1
+        svn ci po/ -m "[SILENT_COMMIT] Update of POT and PO files for the manual" >>$logdir/svn_ci.log 2>&1
         checkfatal "$?" "committing POT/PO files to SVN"
         if svn st po/ 2>/dev/null | grep -q "^C" ; then
             checkfatal "C" "checking for conflicts in manual/po after 'svn ci'"
