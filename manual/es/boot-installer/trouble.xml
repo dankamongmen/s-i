@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 43514 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 
@@ -7,6 +7,235 @@
  <title>Resolución de problemas en el proceso de instalación</title>
 <para>
 </para>
+
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>Fiabilidad de la unidad de CD-ROM</title>
+<para>
+
+Algunas veces, especialmente en el caso de las unidades antiguas de
+CD-ROM, el instalador puede fallar y no poder arrancar del CD-ROM. El
+instalador puede que (aún después de haber arrancado con éxito del
+CD-ROM) falle al reconocer el CD-ROM o devuelva errores mientras lee
+de éste durante la instalación.
+
+</para><para>
+
+Hay muchas causas posibles para estos problemas. Aquí sólo se pueden
+listar algunos problemas comunes y dar sugerencias generales de cómo
+tratarlos. Lo demás depende de usted.
+
+</para><para>
+
+Hay dos cosas muy sencillas que debería intentar primero.
+
+<itemizedlist>
+<listitem><para>
+
+Si el CD-ROM no arranca, compruebe que se introdujo correctamente y
+que no está sucio.
+
+</para></listitem>
+<listitem><para>
+
+Si el instalador no consigue reconocer el CD-ROM, intente ejecutarlo
+de nuevo sólo con la opción <menuchoice> <guimenuitem>Detectar y
+montar el CD-ROM</guimenuitem> </menuchoice>. Se sabe que algunos
+problemas relacionados con DMA en unidades de CD-ROM antiguas se
+resuelven de esta forma.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Pruebe las sugerencias que se muestran en las subsecciones a
+continuación si no funciona ninguna de estas opciones. Algunas, pero
+no todas, las opciones que aquí se discuten son válidas tanto para las
+unidades de CD-ROM como las unidades de DVD. Se utilizará sólo el
+término CD-ROM con el objetivo de simplificar el texto.
+
+</para><para>
+
+En cualquier caso, intente cualquiera de los otros métodos de instalación
+disponible si no consigue que la instalación funcione mediante CD-ROM.
+
+</para>
+
+  <sect3>
+  <title>Problemas habituales</title>
+
+<itemizedlist>
+  <listitem><para>
+
+Algunas unidades antiguas de CD-ROM no pueden leer discos que se
+grabaron a altas velocidades con grabadores de CD modernos.
+
+  </para></listitem>
+  <listitem><para>
+
+Si su sistema arranca correctamente desde CD-ROM, no significa
+necesariamente que Linux también tenga soporte para CD-ROM (o, más
+concretamente, la controladora a la que está conectada su unidad de
+CD-ROM).
+
+  </para></listitem>
+  <listitem><para>
+
+Algunas unidades antiguas de CD-ROM no funcionan correctamente si se
+activa la función <quote>direct memory access</quote> (DMA).
+
+  </para></listitem>
+</itemizedlist>
+
+  </sect3>
+
+  <sect3>
+  <title>Cómo investigar y, quizás, solucionar problemas</title>
+<para>
+
+Si el CD-ROM no puede arrancar, intente las sugerencias descritas a
+continuación.
+
+<itemizedlist>
+  <listitem><para>
+
+Check that your BIOS actually supports booting from CD-ROM (older systems
+possibly don't) and that your CD-ROM drive supports the media you are using.
+
+  </para></listitem>
+  <listitem><para>
+
+Compruebe que la suma md5 de la imagen coincide con el valor listado 
+en el fichero <filename>MD5SUMS</filename> si ha descargado la imagen
+iiso. Este fichero debería estar disponibles en la misma ubicación de
+la que descargo la imagen.
+
+<informalexample><screen>
+$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+A continuación, compruebe que la suma md5 del CD-ROM grabado también
+coincide. La orden mostrada a continuación debería ser suficiente para
+poder hacer esto. Utiliza el tamaño de la imagen ppara leer el número
+de bytes correcto del CD-ROM.
+
+<informalexample><screen>
+$ dd if=/dev/cdrom | \
+> head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \
+> md5sum
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Puede volver a intentar la instalación si no se detecta el CD-ROM
+después de que el instalador haya arrancado con éxito, ya que ésto
+algunas veces resuelve el problema. Intente cambiar el CD-ROM a la
+otra unidad si tiene más de una unidad de CD-ROM. Intente algunas de
+las sugerencias mostradas a continuación si no funciona ninguna de
+éstas o si se dan errores cuando se intenta leer de éste. Para
+llevarlas a cabo es necesario tener algunos conocimientos básicos de
+Linux. Debe cambiar primero a la segunda consola virtual (VT2) y
+activar el intérprete de órdenes para ejecutar cualquiera de estas órdenes.
+
+<itemizedlist>
+  <listitem><para>
+
+Cambie al terminal virtual VT4 o consulte los contenidos de
+<filename>/var/log/syslog</filename> (utilice <command>nano</command>
+como editor) para comprobar si hay algún mensaje de error
+específico. Una vez lo haya hecho, compruebe también la salida de
+ejecutar <command>dmesg</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Puede ver si se ha reconocido su unidad de CD-ROM comprobando la
+salida de <command>dmesg</command>. Debería ver algo como ésto (las
+líneas no tienen por qué ser consecutivas):
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+Es posible que su unidad de CD-ROM esté conectada pero no se haya
+reconocido o puede no estar soportada, si no ve ninguna de estas
+líneas. Si sabe qué controlador es necesario para su controladora
+puede intentar cargarla de forma manual ejecutando la orden
+<command>modprobe</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Compruebe que hay un nodo de dispositivo para su unidad de CD-ROM en
+<filename>/dev/</filename>. En el ejemplo anterior, el nodo se
+llamaría <filename>/dev/hdc</filename>.  También debería existir
+<filename>/dev/cdroms/cdrom0</filename>.
+
+  </para></listitem>
+  <listitem><para>
+
+Utilice la orden <command>mount</command> para comprobar si el CD-ROM
+está ya montado. Si no lo está puede intentar montarlo manualmente
+con:
+
+
+<informalexample><screen>
+$ mount /dev/<replaceable>hdc</replaceable> /cdrom
+</screen></informalexample>
+
+Compruebe si se produce algún mensaje de error después de ejecutar
+esta orden.
+
+  </para></listitem>
+  <listitem><para>
+
+Compruebe si está activo la función de DMA:
+
+<informalexample><screen>
+$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
+$ grep using_dma settings
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+Un valor de <quote>1</quote> en la primera columna después de
+<literal>using_dma</literal> significa que está activa. Si lo está,
+intente desactivarla:
+
+<informalexample><screen>
+$ echo -n "using_dma:0" >settings
+</screen></informalexample>
+
+Asegúrese que está en el directorio del dispositivo que corresponde a
+su unidad de CD-ROM.
+
+  </para></listitem>
+  <listitem><para>
+
+Intenge comprobar la integridad del CD-ROM con la opción que
+encontrará al final del menú principal del instalador si se producen
+problemas durante la instalación. Esta opción puede utilizarse como
+una prueba general para determinar si el CD-ROM se puede leer
+con fiabilidad.
+
+
+  </para></listitem>
+</itemizedlist>
+
+</para>
+  </sect3>
+  </sect2>
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Fiabilidad de los disquetes</title>
