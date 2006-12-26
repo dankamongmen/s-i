@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43514 -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Hardware- und Betriebssystem-Setup vor der Installation</title>
@@ -7,12 +7,12 @@
 
 Dieses Kapitel wird Sie durch die Hardware-Einstellungen vor der Installation
 leiten, die Sie eventuell machen müssen, bevor Sie Debian installieren.
-Generell beinhaltet dies das Überprüfen und eventuell Ändern von
-Firmware-Einstellungen für Ihr System. Die <quote>Firmware</quote> ist die von der Hardware
-genutzte interne Software; sie ist meistens höchst kritisch in den Bootprozess
-involviert (nach dem Einschalten). Bekannte Hardware-Probleme, die die
-Betriebssicherheit von &debian; auf Ihrem System beeinträchtigen könnten, werden hier
-ebenfalls behandelt.
+Dies beinhaltet das Überprüfen und eventuell Ändern von Firmware-Einstellungen
+für Ihr System. Die <quote>Firmware</quote> ist die von der Hardware genutzte
+interne Software; sie ist meistens höchst kritisch in den Bootprozess involviert
+(direkt nach dem Einschalten). Bekannte Hardware-Probleme, die die
+Betriebssicherheit von &debian; auf Ihrem System beeinträchtigen könnten,
+werden hier ebenfalls behandelt.
 
 </para>
 
@@ -22,15 +22,15 @@ ebenfalls behandelt.
 &bios-setup-sparc.xml; 
 &bios-setup-s390.xml; 
 
-  <sect2><title>Hardware-Probleme, auf die man achten sollte</title>
+  <sect2><title>Hardware-Probleme, auf die Sie achten sollten</title>
 <para arch="not-s390">
 
-Viele Leute haben versucht, ihre 90 MHz-CPU auf 100 MHz zu betreiben, und so weiter.
-Manchmal funktioniert es, aber das System ist empfindlich bezüglich der
+Viele Leute haben versucht, ihre 90 MHz-CPU auf 100 MHz zu betreiben, und so
+weiter. Manchmal funktioniert es, aber das System ist empfindlich bezüglich der
 Temperatur sowie einiger anderer Faktoren und könnte beschädigt werden.
-Einer der Autoren dieses Dokuments hatte sein eigenes System für ein Jahr
-übertaktet, und dann begannen Probleme, dass das <command>gcc</command>-Programm
-während der Kompilierung von Betriebssystem-Kernels aufgrund eines 
+Einer der Autoren dieses Dokuments hatte sein eigenes System ein Jahr lang
+übertaktet und dann begannen Probleme, dass das <command>gcc</command>-Programm
+während der Kompilierung von Betriebssystem-Kernels aufgrund eines
 unerwarteten Signals abbrach. Das Problem konnte nur durch Reduzieren des
 CPU-Taktes auf den regulären Wert gelöst werden.
 
@@ -42,7 +42,7 @@ Hardware-Problemen, durch die Daten unberechenbar verändert werden) abstürzt,
 weil er gewaltige Datenstrukturen verarbeitet, die dabei wiederholt
 durchlaufen werden. Jeglicher Fehler in diesen Strukturen verursacht
 das Ausführen eines unerlaubten Befehls oder den Zugriff auf eine
-nicht existente Adresse. Durch diese Symptome wird der <command>gcc</command>
+nicht existente Adresse. Durch diese Symptome wird <command>gcc</command>
 aufgrund eines unerwarteten Signals beendet.
 
 </para><para arch="m68k">
@@ -60,21 +60,10 @@ FIXME: more description of this needed.
 
 </para><para arch="x86">
 
-Wirklich gute Mainboards unterstützen RAM mit Parity und informieren
-den Benutzer, falls das System einen Single-Bit-Fehler im RAM hat.
-Allerdings haben sie keine Möglichkeit, das Problem zu beheben; deswegen stürzen
-sie unverzüglich ab, nachdem sie den RAM-Fehler gemeldet haben. Dennoch
-ist es besser, über den defekten Speicher informiert zu werden, als wenn
-unbemerkt Fehler in Ihre Daten eingeschleust werden. Deswegen haben die besten Systeme
-Motherboards, die Parity und True-Parity-Speichermodule unterstützen;
-siehe auch <xref linkend="Parity-RAM"/>.
-
-</para><para arch="x86">
-
 Wenn Sie True-Parity-Speicher haben und Ihr Motherboard damit umgehen
 kann, stellen Sie sicher, dass die entsprechenden BIOS-Einstellungen
-aktiviert sind, so dass das Motherboard abbricht, falls ein Speicher-Parity-Fehler
-auftritt.
+aktiviert sind, so dass das Motherboard abbricht, falls ein
+Speicher-Parity-Fehler auftritt.
 
 </para>
 
@@ -86,7 +75,7 @@ CPU-Takt beeinflusst. Wählen Sie die Einstellung für hohe Geschwindigkeit.
 Wenn ihr BIOS die Möglichkeit bietet, den Turboschalter zu deaktivieren
 (oder die Kontrolle des CPU-Takts per Software), tun Sie es und setzen
 Sie den CPU-Takt fest auf die schnelle Geschwindigkeit. Uns wurde von einem
-speziellen System berichtet, auf dem Linux während der Hardwareerkennung
+speziellen System berichtet, auf dem Linux während der Hardware-Erkennung
 fälschlicherweise die Software-Control-Einstellung für den Turboschalter
 verändern könnte.
 
@@ -96,8 +85,8 @@ verändern könnte.
    <sect3 arch="x86"><title>Cyrix-CPUs und Disketten-Fehler</title>
 <para>
 
-Viele Nutzer von Cyrix-CPUs mussten den Cache/Zwischenspeicher
-während der Installation deaktivieren, da es sonst zu Fehlern des
+Viele Nutzer von Cyrix-CPUs mussten den Cache (Pufferspeicher)
+während der Installation deaktivieren, da es ansonsten zu Fehlern des
 Diskettenlaufwerks kam. Wenn dies auch für Sie zutrifft, denken Sie
 daran, den Cache nach der Installation wieder zu aktivieren, da das
 System sonst <emphasis>erheblich</emphasis> langsamer läuft.
@@ -116,17 +105,18 @@ ist.
    <sect3 arch="x86"><title>Hardware-Einstellungen für Peripheriegeräte</title>
 <para>
 
-Sie müssen eventuell einige Einstellungen oder Jumper auf Erweiterungskarten Ihres
-Computers ändern. Einige Karten haben Setup-Menüs, während andere über Jumper eingestellt
-werden. Dieses Handbuch kann nicht für alle Geräte vollständige Informationen
-anbieten; wir hoffen nur, nützliche Tipps geben zu können.
+Sie müssen eventuell einige Einstellungen oder Jumper auf Erweiterungskarten
+Ihres Computers ändern. Einige Karten haben Setup-Menüs, während andere über
+Jumper eingestellt werden. Dieses Handbuch kann nicht für alle Geräte
+vollständige Informationen anbieten; wir hoffen nur, nützliche Tipps geben
+zu können.
 
 </para><para>
 
-Falls solche Karten erweiterten Speicher (<quote>mapped memory</quote>) anbieten,
-sollte diesem ein Adressbereich zwischen 0xA0000 und 0xFFFFF (von 640K bis
-gerade noch unterhalb von 1 Megabyte) zugewiesen werden, oder aber ein Bereich
-mindestens 1 Megabyte oberhalb des insgesamt verfügbaren Arbeitsspeichers.
+Falls solche Karten erweiterten Speicher (<quote>mapped memory</quote>)
+anbieten, sollte diesem ein Adressbereich zwischen 0xA0000 und 0xFFFFF (von
+640K bis gerade noch unterhalb von 1 Megabyte) zugewiesen werden, oder aber ein
+Bereich mindestens 1 Megabyte oberhalb des insgesamt verfügbaren Arbeitsspeichers.
 
 </para>
    </sect3>
@@ -136,12 +126,13 @@ mindestens 1 Megabyte oberhalb des insgesamt verfügbaren Arbeitsspeichers.
 <para>
 
 Falls Sie keine AT-Tastatur haben, sondern lediglich ein USB-Modell, müssen Sie
-eventuell <quote>Legacy AT keyboard emulation</quote> im BIOS aktivieren. Tun Sie dies
-nur, wenn das Installationssystem Ihre Tastatur im USB-Modus nicht nutzen kann.
-Umgekehrt kann es auf einige Systemen (speziell Laptops) auch nötig sein,
-<quote>Legacy USB Support</quote> zu deaktivieren, wenn die Tastatur nicht funktioniert.
-Konsultieren Sie das Handbuch Ihres Mainboards und schauen Sie im BIOS nach
-Optionen für <quote>Legacy keyboard emulation</quote> oder <quote>USB keyboard support</quote>.
+eventuell <quote>Legacy AT keyboard emulation</quote> im BIOS aktivieren. Tun
+Sie dies nur, wenn das Installationssystem Ihre Tastatur im USB-Modus nicht
+nutzen kann. Umgekehrt kann es auf einige Systemen (speziell Laptops) auch
+nötig sein, <quote>Legacy USB Support</quote> zu deaktivieren, wenn die
+Tastatur nicht funktioniert. Konsultieren Sie das Handbuch Ihres Mainboards und
+schauen Sie im BIOS nach Optionen für <quote>Legacy keyboard emulation</quote>
+oder <quote>USB keyboard support</quote>.
 
 </para>
    </sect3>
@@ -149,8 +140,8 @@ Optionen für <quote>Legacy keyboard emulation</quote> oder <quote>USB keyboard 
    <sect3><title>Mehr als 64 MB RAM</title>
 <para>
 
-Der Linux-Kernel kann nicht immer die korrekte Größe des Arbeitsspeichers
-erkennen, den Sie installiert haben. Falls dies der Fall sein sollte, gehen Sie
+Der Linux-Kernel kann manchmal die korrekte Größe des installierten
+Arbeitsspeichers nicht erkennen. Falls dies der Fall sein sollte, gehen Sie
 zu <xref linkend="boot-parms"/>.
 
 </para>
@@ -162,11 +153,11 @@ zu <xref linkend="boot-parms"/>.
 
 Bei einigen OldWorld-Powermacs (an erster Stelle sind hier die zu nennen, die
 den <quote>control</quote>-Bildschirm-Treiber verwenden, aber möglicherweise
-auch andere) ist unter Linux möglicherweise die sichtbare Farbdarstellung nicht
+auch andere) ist unter Linux möglicherweise die Farbdarstellung nicht
 ganz zuverlässig, wenn das Display auf mehr als 256 Farben konfiguriert ist.
 Falls Sie nach dem Neustart solche Probleme bei Ihrem Display feststellen
 (manchmal können Sie noch eine Anzeige auf dem Monitor erkennen, aber in
-anderen Fällen sehen Sie vielleicht garnichts) oder falls der Monitor nach
+anderen Fällen sehen Sie vielleicht gar nichts) oder falls der Monitor nach
 dem Start des Installers nur ein schwarzes Bild anzeigt statt dem
 Benutzerbildschirm, versuchen Sie, unter MacOS die Bildschirmeinstellungen
 so einzustellen, dass 256 Farben verwenden werden statt
