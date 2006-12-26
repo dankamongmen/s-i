@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 untranslated -->
+<!-- original version: 43525 untranslated -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -311,7 +311,18 @@ To set a value to be used inside &d-i;, just pass
 <userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
 for any of the preseed variables listed in the examples in this appendix.
 If a value is to be used to configure packages for the target system, you
-will need to prepend the <firstterm>owner</firstterm> of the variable as in
+will need to prepend the <firstterm>owner</firstterm><footnote>
+
+<para>
+The owner of a debconf variable (or template) is normally the name of the
+package that contains the corresponding debconf template. For variables
+used in the installer itself the owner is <quote>d-i</quote>.
+Templates and variables can have more than one owner which helps to
+determine whether they can be removed from the debconf database if the
+package is purged.
+</para>
+
+</footnote> of the variable as in
 <userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
 If you don't specify the owner, the value for the variable will not be
 copied to the debconf database in the target system and thus remain unused
@@ -382,12 +393,12 @@ setup, it would result in the preseed file being retrieved from
 
 </para><para>
 
-The path segment of that comes from
-<literal>auto-install/defaultroot</literal>, which includes the
-directory <literal>etch</literal> by default to allow future versions
-to specify their own codename to let people migrate forwards in a
+The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>)
+is taken from <literal>auto-install/defaultroot</literal>. By default
+this includes the directory <literal>etch</literal> to allow future versions
+to specify their own codename and let people migrate forwards in a
 controlled manner.  The <literal>/./</literal> bit is used to indicate
-a root relative to which subsequent paths can be anchored (for use in
+a root, relative to which subsequent paths can be anchored (for use in
 preseed/include and preseed/run).  This allows files to be specified
 either as full URLs, paths starting with / that are thus anchored, or
 even paths relative to the location where the last preseed file was
@@ -402,12 +413,12 @@ fetched from
 
 </para><para>
 
-If there is no local DHCP or DNS infrastructure, or if you
-do not want to use the default path to the preseed.cfg, you can still
+If there is no local DHCP or DNS infrastructure, or if you do not want to
+use the default path to <filename>preseed.cfg</filename>, you can still
 use an explicit url, and if you don't use the <literal>/./</literal>
-element it will be anchored to the start of the path (i.e. the third /
-in the URL).  Here is an example that requires minimal support from
-the local network infrastructure:
+element it will be anchored to the start of the path (i.e. the third
+<literal>/</literal> in the URL).  Here is an example that requires minimal
+support from the local network infrastructure:
 
 <informalexample><screen>
 auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
@@ -432,8 +443,8 @@ path is added.
 
 In addition to specifying the url, you can also specify settings that
 do not directly affect the behavior of &d-i; itself, but can be passed
-through to any scripts that might be specified <literal>preseed/run</literal>
-settings in the loaded preseed file.  At present, the only example of
+through to scripts specified using <literal>preseed/run</literal>
+in the loaded preseed file.  At present, the only example of
 this is <literal>auto-install/classes</literal>, which has an alias
 <literal>classes</literal>.  This can be used thus:
 
@@ -1392,9 +1403,10 @@ settings for certain configurations in other files.
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
+# More than one script can be listed, separated by spaces.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
 <para>

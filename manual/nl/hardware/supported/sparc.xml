@@ -1,82 +1,84 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 untranslated -->
+<!-- original version: 43528 untranslated -->
 
-
-  <sect2 arch="sparc" id="sparc-cpus"><title>CPU, Main Boards, and Video Support</title>
+  <sect2 arch="sparc" id="sparc-cpus">
+  <title>CPU and Main Boards Support</title>
 <para>
 
-Currently the <emphasis>&architecture;</emphasis> port supports
-several types of Sparc systems. The most common identifiers for Sparc
-systems are sun4, sun4c, sun4m, sun4d and sun4u. Currently we do not
-support very old sun4 hardware. However, the other systems are
-supported. Sun4d has been tested the least of these, so expect
-possible problems with regard to the kernel stability. Sun4c and
-Sun4m, the most common of the older Sparc hardware, includes such
-systems as SparcStation 1, 1+, IPC, IPX and the SparcStation LX, 5,
-10, and 20, respectively. The UltraSPARC class systems fall under the
-sun4u identifier, and are supported using the sun4u set of install
-images. Some systems that fall under these supported identifiers are
-known to not be supported. Known unsupported systems are the AP1000
-multicomputer and the Tadpole Sparcbook 1. See the
-<ulink url="&url-sparc-linux-faq;">Linux for SPARCProcessors FAQ</ulink>
-for complete information.
+Sparc-based hardware is divided into a number of different subarchitectures,
+identified by one of the following names: sun4, sun4c, sun4d, sun4m, sun4u
+or sun4v. The following list describes what machines they include and what
+level of support may be expected for each of them.
 
 </para>
 
-   <sect3><title>Memory Configuration</title>
+<variablelist>
+<varlistentry>
+<term>sun4, sun4c, sun4d</term>
+
+<listitem><para>
+
+These subarchitectures include some very old 32-bit machines, which are
+no longer supported. For a complete list please consult the
+<ulink url="http://en.wikipedia.org/wiki/SPARCstation">Wikipedia
+SPARCstation page</ulink>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4m</term>
+
+<listitem><para>
+
+sun4m is the only 32-bit subarchitecture (sparc32) that is currently
+supported. The most popular machines belonging to this class are
+Sparcstation 4, 5, 10 and 20.
+
+</para><para>
+
+Note that symmetric multiprocessing (SMP) &mdash; the ability to run
+processes on multiple processors &mdash; is not supported on this hardware,
+due to stability problems with such configurations. The available
+uniprocessor (UP) sparc32 kernel will boot fine on multiprocessor
+machines, although it will activate and use only the first CPU.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4u</term>
+
+<listitem><para>
+
+This subarchitecture includes all 64-bit machines (sparc64) based on
+the UltraSparc processor and its clones. Most of the machines are well
+supported, even though for some you may experience problems booting from
+CD due to firmware or bootloader bugs (this problem may be worked around
+by using netbooting). Use the sparc64 or sparc64-smp kernel in UP and SMP
+configurations respectively.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4v</term>
+
+<listitem><para>
+
+This is the newest addition to the Sparc family, which includes machines
+based on the Niagara multi-core CPUs. At the moment such CPUs are only
+available in T1000 and T2000 servers by Sun, and are well supported. Use
+the sparc64-smp kernel.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
 <para>
 
-Some older Sun workstations, notably the Sun IPX and Sun IPC have
-memory banks located at fixed locations in physical memory.  Thus if
-the banks are not filled gaps will exist in the physical memory space.
-The Linux installation requires a contiguous memory block into which
-to load the kernel and the initial RAMdisk.  If this is not available a
-<quote>Data Access Exception</quote> will result.
-
-</para><para>
-
-Thus you must configure the memory so that the lowest memory block is
-contiguous for at least 8Mb.  In the IPX and IPC cited above, memory banks
-are mapped in at 16Mb boundaries.  In effect this means that you must have
-a sufficiently large SIMM in bank zero to hold the kernel and RAMdisk.
-In this case 4Mb is <emphasis>not</emphasis> sufficient.
-
-</para><para>
-
-Example:
-In a Sun IPX you have a 16Mb SIMM and a 4Mb SIMM.  There are four
-SIMM banks (0,1,2,3). [Bank zero is that furthest away from the SBUS
-connectors]. You must therefore install the 16Mb SIMM in bank 0; it is
-then recommended to install the 4Mb SIMM in bank 2.
+Note that Fujitsu's SPARC64 CPUs used in PRIMEPOWER family of servers are not
+supported due to lack of support in the Linux kernel.
 
 </para>
-   </sect3>
-
-   <sect3><title>Graphics Configuration</title>
-<para>
-
-Especially in the case of older Sun workstations, it is very common
-for there to be an onboard framebuffer which has been superseded (for
-example the bwtwo on a sun IPC), and an SBUS card containing a later
-probably accelerated buffer is then plugged in to an SBUS slot.
-Under Solaris/SunOS this causes no problems because both cards are
-initialized.
-
-</para><para>
-
-However with Linux this can cause a problem, in that the boot PROM
-monitor may display its output on this additional card; however the
-linux kernel boot messages may then be directed to the original on
-board framebuffer, leaving <emphasis>no</emphasis> error messages on
-the screen, with the machine apparently stuck loading the RAMdisk.
-
-</para><para>
-
-To avoid this problem, connect the monitor (if required) to the video
-card in the lowest numbered SBUS slot (on motherboard card counts
-as below external slots).  Alternatively it is possible to use a serial
-console.
-
-</para>
-   </sect3>
   </sect2>

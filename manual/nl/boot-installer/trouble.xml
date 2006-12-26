@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43253 untranslated -->
+<!-- original version: 43514 untranslated -->
 
  <sect1 id="boot-troubleshooting">
  <title>Troubleshooting the Installation Process</title>
@@ -159,7 +159,7 @@ Uniform CD-ROM driver Revision: 3.20
 
 If you don't see something like that, chances are the controller your CD-ROM
 is connected to was not recognized or may be not supported at all. If you
-know what driver is needed for the drive, you can try loading it manually
+know what driver is needed for the controller, you can try loading it manually
 using <command>modprobe</command>.
 
   </para></listitem>
@@ -189,11 +189,12 @@ Check if DMA is currently enabled:
 
 <informalexample><screen>
 $ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
-$ grep dma settings
+$ grep using_dma settings
 using_dma      1       0       1       rw
 </screen></informalexample>
 
-A <quote>1</quote> means it is enabled. If it is, try disabling it:
+A <quote>1</quote> in the first column after <literal>using_dma</literal>
+means it is enabled. If it is, try disabling it:
 
 <informalexample><screen>
 $ echo -n "using_dma:0" >settings
@@ -409,13 +410,13 @@ custom kernel later (see <xref linkend="kernel-baking"/>).
 
 
   <sect2 id="problem-report">
-  <title>Bug Reporter</title>
+  <title>Reporting Installation Problems</title>
 <para>
 
-If you get through the initial boot phase but cannot complete the
-install, the bug reporter menu choice may be helpful.
+If you get through the initial boot phase but cannot complete the install,
+the menu option <guimenuitem>Save debug logs</guimenuitem> may be helpful.
 It lets you store system error logs and configuration information from the
-installer to a floppy, or download them in a web browser.
+installer to a floppy, or download them using a web browser.
 
 This information may provide clues as to what went wrong and how to
 fix it.  If you are submitting a bug report you may want to attach
@@ -442,6 +443,12 @@ number of hardware configurations.
 
 </para><para>
 
+Note that your installation report will be published in the Debian Bug
+Tracking System (BTS) and forwarded to a public mailing list. Make sure that
+you use an E-Mail address that you do not mind being made public.
+
+</para><para>
+
 If you have a working Debian system, the easiest way to send an installation
 report is to install the installation-report and reportbug packages
 (<command>apt-get install installation-report reportbug</command>) and run
@@ -449,7 +456,7 @@ the command <command>reportbug installation-report</command>.
 
 </para><para>
 
-Please use this template when filling out
+Alternatively you can use this template when filling out
 installation reports, and file the report as a bug report against the
 <classname>installation-reports</classname> pseudo package, by sending it to
 <email>submit@bugs.debian.org</email>.
