@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 42982 -->
+<!-- original version: 43525 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -305,7 +305,15 @@ Pour toutes les variables listées dans les exemples,
 il suffit d'indiquer une paire de type 
 <userinput><replaceable>chemin/vers/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
 Quand une valeur est destinée à la configuration de paquets du système cible, il est nécessaire
-d'ajouter le <firstterm>propriétaire</firstterm> de la variable&nbsp;:
+d'ajouter le <firstterm>propriétaire</firstterm> <footnote> 
+<para>
+Le propriétaire d'une variable debconf (ou d'une question) est le paquet qui contient
+la question correspondante. Les variables utilisées par l'installateur sont la
+propriété de <quote>d-i</quote>. Variables et questions peuvent avoir plusieurs
+propriétaires, ce qui aide à déterminer si elles peuvent être supprimées de la
+base de données lorsqu'un paquet est <emphasis>purgé</emphasis>.
+</para></footnote>
+de la variable&nbsp;:
 <userinput><replaceable>propriétaire</replaceable>:<replaceable>chemin/vers/variable</replaceable>=<replaceable>valeur</replaceable></userinput>.
 Si vous n'indiquez pas de propriétaire, la valeur de la variable ne sera pas copiée
 dans la base de données debconf du système cible et ne sera pas utilisée pendant la
@@ -374,7 +382,8 @@ DHCP correctement configuré, alors le fichier de préconfiguration recherché sera
 trouvé à l'url <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
 </para>
 <para>
-La partie adresse provient de <literal>auto-install/defaultroot</literal> qui contient
+La partie adresse (<literal>d-i/etch/./preseed.cfg</literal>) provient de
+<literal>auto-install/defaultroot</literal> qui contient
 le répertoire <literal>etch</literal> par défaut. Il sera ainsi possible
 dans de prochaines versions d'indiquer un nom de code particulier, ce qui permettra des
 migrations contrôlées. L'élément <literal>/./</literal> indique une racine relative
@@ -390,10 +399,10 @@ Si le fichier de préconfiguration définit <literal>preseed/run</literal> comme
 </para>
 <para>
 S'il n'existe pas de serveur DHCP ou DNS, ou si vous ne voulez pas utiliser
-le chemin par défaut du fichier preseed.cfg, vous pouvez toujours utiliser une url
-explicite. Et si vous n'utilisez pas l'élément <literal>/./</literal>,
-le fichier sera rattaché au troisième / de l'url. Voici un exemple qui demande
-une gestion minimale du réseau&nbsp;:
+le chemin par défaut du fichier <filename>preseed.cfg</filename>,
+vous pouvez toujours utiliser une url explicite. Et si vous n'utilisez pas l'élément
+<literal>/./</literal>, le fichier sera rattaché au troisième <literal>/</literal> de l'url.
+Voici un exemple qui demande une gestion minimale du réseau&nbsp;:
 
 <informalexample><screen>
 auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
@@ -1354,10 +1363,11 @@ un autre fichier.
 
 # Plus encore, cela télécharge un programme et l'exécute. Le programme peut
 # utiliser des commandes comme debconf-set pour manipuler la base de données de debconf.
+# Il est possible de lister plusieurs scripts, séparés par des espaces.
 # Il faut remarquer que si les fichiers sont indiqués de façon relative, ils
 # seront cherchés dans le répertoire qui contient le fichier de préconfiguration qui les
 # a lancés.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 
 </screen></informalexample>
 
