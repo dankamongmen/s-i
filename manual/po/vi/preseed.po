@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-11-29 17:16+0000\n"
+"POT-Creation-Date: 2006-12-26 01:54+0000\n"
 "PO-Revision-Date: 2006-10-21 21:32+0930\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -33,7 +33,7 @@ msgstr ""
 "câu hỏi trong &d-i; để tự động hoá tiến trình cài đặt."
 
 #. Tag: para
-#: preseed.xml:23 preseed.xml:621
+#: preseed.xml:23 preseed.xml:632
 #, no-c-format
 msgid ""
 "The configuration fragments used in this appendix are also available as an "
@@ -112,7 +112,7 @@ msgid "initrd"
 msgstr "initrd"
 
 #. Tag: entry
-#: preseed.xml:63 preseed.xml:478
+#: preseed.xml:63 preseed.xml:489
 #, no-c-format
 msgid "file"
 msgstr "tập tin"
@@ -437,15 +437,21 @@ msgid ""
 "replaceable></userinput> for any of the preseed variables listed in the "
 "examples in this appendix. If a value is to be used to configure packages "
 "for the target system, you will need to prepend the <firstterm>owner</"
-"firstterm> of the variable as in <userinput><replaceable>owner</replaceable>:"
-"<replaceable>path/to/variable</replaceable>=<replaceable>value</"
-"replaceable></userinput>. If you don't specify the owner, the value for the "
-"variable will not be copied to the debconf database in the target system and "
-"thus remain unused during the configuration of the relevant package."
+"firstterm><footnote> <para> The owner of a debconf variable (or template) is "
+"normally the name of the package that contains the corresponding debconf "
+"template. For variables used in the installer itself the owner is <quote>d-"
+"i</quote>. Templates and variables can have more than one owner which helps "
+"to determine whether they can be removed from the debconf database if the "
+"package is purged. </para> </footnote> of the variable as in "
+"<userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</"
+"replaceable>=<replaceable>value</replaceable></userinput>. If you don't "
+"specify the owner, the value for the variable will not be copied to the "
+"debconf database in the target system and thus remain unused during the "
+"configuration of the relevant package."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:306
+#: preseed.xml:317
 #, fuzzy, no-c-format
 msgid ""
 "Note that some variables that are frequently set at the boot prompt have a "
@@ -461,7 +467,7 @@ msgstr ""
 "thí dụ trong phụ lục này, thay cho biến đầy đủ."
 
 #. Tag: para
-#: preseed.xml:316
+#: preseed.xml:327
 #, no-c-format
 msgid ""
 "A <quote>--</quote> in the boot options has special meaning. Kernel "
@@ -472,7 +478,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:325
+#: preseed.xml:336
 #, fuzzy, no-c-format
 msgid ""
 "Current linux kernels (2.6.9 and later) accept a maximum of 32 command line "
@@ -488,7 +494,7 @@ msgstr ""
 "tùy chọn dòng lệnh và 32 tùy chọn môi trường."
 
 #. Tag: para
-#: preseed.xml:333
+#: preseed.xml:344
 #, no-c-format
 msgid ""
 "For most installations some of the default options in your bootloader "
@@ -501,7 +507,7 @@ msgstr ""
 "chọn nữa để chèn sẵn."
 
 #. Tag: para
-#: preseed.xml:340
+#: preseed.xml:351
 #, no-c-format
 msgid ""
 "It may not always be possible to specify values with spaces for boot "
@@ -511,13 +517,13 @@ msgstr ""
 "tham số khởi động, thậm chí nếu bạn định giới chúng bằng dấu trích dẫn."
 
 #. Tag: title
-#: preseed.xml:349
+#: preseed.xml:360
 #, no-c-format
 msgid "Auto mode"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:350
+#: preseed.xml:361
 #, no-c-format
 msgid ""
 "There are several features of Debian Installer that combine to allow fairly "
@@ -535,49 +541,49 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:367
+#: preseed.xml:378
 #, no-c-format
 msgid ""
-"The path segment of that comes from <literal>auto-install/defaultroot</"
-"literal>, which includes the directory <literal>etch</literal> by default to "
-"allow future versions to specify their own codename to let people migrate "
-"forwards in a controlled manner. The <literal>/./</literal> bit is used to "
-"indicate a root relative to which subsequent paths can be anchored (for use "
-"in preseed/include and preseed/run). This allows files to be specified "
-"either as full URLs, paths starting with / that are thus anchored, or even "
-"paths relative to the location where the last preseed file was found. This "
-"can be used to construct more portable scripts where an entire hierarchy of "
-"scripts can be moved to a new location without breaking it, for example "
-"copying the files onto a USB stick when they started out on a web server. In "
-"this example, if the preseed file sets <literal>preseed/run</literal> to "
-"<literal>/scripts/late_command.sh</literal> then the file will be fetched "
-"from <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command."
-"sh</literal>."
+"The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>) is "
+"taken from <literal>auto-install/defaultroot</literal>. By default this "
+"includes the directory <literal>etch</literal> to allow future versions to "
+"specify their own codename and let people migrate forwards in a controlled "
+"manner. The <literal>/./</literal> bit is used to indicate a root, relative "
+"to which subsequent paths can be anchored (for use in preseed/include and "
+"preseed/run). This allows files to be specified either as full URLs, paths "
+"starting with / that are thus anchored, or even paths relative to the "
+"location where the last preseed file was found. This can be used to "
+"construct more portable scripts where an entire hierarchy of scripts can be "
+"moved to a new location without breaking it, for example copying the files "
+"onto a USB stick when they started out on a web server. In this example, if "
+"the preseed file sets <literal>preseed/run</literal> to <literal>/scripts/"
+"late_command.sh</literal> then the file will be fetched from <literal>http://"
+"autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:387
+#: preseed.xml:398
 #, no-c-format
 msgid ""
 "If there is no local DHCP or DNS infrastructure, or if you do not want to "
-"use the default path to the preseed.cfg, you can still use an explicit url, "
-"and if you don't use the <literal>/./</literal> element it will be anchored "
-"to the start of the path (i.e. the third / in the URL). Here is an example "
-"that requires minimal support from the local network infrastructure: "
-"<informalexample><screen>\n"
+"use the default path to <filename>preseed.cfg</filename>, you can still use "
+"an explicit url, and if you don't use the <literal>/./</literal> element it "
+"will be anchored to the start of the path (i.e. the third <literal>/</"
+"literal> in the URL). Here is an example that requires minimal support from "
+"the local network infrastructure: <informalexample><screen>\n"
 "auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</"
 "replaceable>\n"
 "</screen></informalexample> The way this works is that:"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:400
+#: preseed.xml:411
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:403
+#: preseed.xml:414
 #, no-c-format
 msgid ""
 "if the hostname section contains no periods, it has the domain derived from "
@@ -585,7 +591,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:407
+#: preseed.xml:418
 #, no-c-format
 msgid ""
 "if there's no <literal>/</literal>'s after the hostname, then the default "
@@ -593,16 +599,15 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:413
+#: preseed.xml:424
 #, no-c-format
 msgid ""
 "In addition to specifying the url, you can also specify settings that do not "
 "directly affect the behavior of &d-i; itself, but can be passed through to "
-"any scripts that might be specified <literal>preseed/run</literal> settings "
-"in the loaded preseed file. At present, the only example of this is "
-"<literal>auto-install/classes</literal>, which has an alias "
-"<literal>classes</literal>. This can be used thus: "
-"<informalexample><screen>\n"
+"scripts specified using <literal>preseed/run</literal> in the loaded preseed "
+"file. At present, the only example of this is <literal>auto-install/classes</"
+"literal>, which has an alias <literal>classes</literal>. This can be used "
+"thus: <informalexample><screen>\n"
 "auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;"
 "class_B</replaceable>\n"
 "</screen></informalexample> The classes could for example denote the type of "
@@ -610,7 +615,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:427
+#: preseed.xml:438
 #, no-c-format
 msgid ""
 "It is of course possible to extend this concept, and if you do, it is "
@@ -623,7 +628,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:437
+#: preseed.xml:448
 #, no-c-format
 msgid ""
 "The <literal>auto</literal> boot label is not yet defined on all "
@@ -638,7 +643,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:450
+#: preseed.xml:461
 #, no-c-format
 msgid ""
 "Additional options that may be of interest while attempting to automate an "
@@ -648,151 +653,151 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:462
+#: preseed.xml:473
 #, no-c-format
 msgid "Aliases useful with preseeding"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:463
+#: preseed.xml:474
 #, no-c-format
 msgid "The following aliases can be useful when using (auto mode) preseeding."
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:473
+#: preseed.xml:484
 #, fuzzy, no-c-format
 msgid "auto"
 msgstr "máy tính xách tay"
 
 #. Tag: entry
-#: preseed.xml:473
+#: preseed.xml:484
 #, no-c-format
 msgid "auto-install/enabled"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:474
+#: preseed.xml:485
 #, no-c-format
 msgid "classes"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:474
+#: preseed.xml:485
 #, no-c-format
 msgid "auto-install/classes"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:475
+#: preseed.xml:486
 #, fuzzy, no-c-format
 msgid "<entry>fb</entry>"
 msgstr "<entry>không</entry>"
 
 #. Tag: entry
-#: preseed.xml:475
+#: preseed.xml:486
 #, no-c-format
 msgid "debian-installer/framebuffer"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:476
+#: preseed.xml:487
 #, no-c-format
 msgid "locale"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:476
+#: preseed.xml:487
 #, no-c-format
 msgid "debian-installer/locale"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:477
+#: preseed.xml:488
 #, no-c-format
 msgid "priority"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:477
+#: preseed.xml:488
 #, no-c-format
 msgid "debconf/priority"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:478
+#: preseed.xml:489
 #, no-c-format
 msgid "preseed/file"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:479
+#: preseed.xml:490
 #, fuzzy, no-c-format
 msgid "<entry>url</entry>"
 msgstr "<entry>không</entry>"
 
 #. Tag: entry
-#: preseed.xml:479
+#: preseed.xml:490
 #, no-c-format
 msgid "preseed/url"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:480
+#: preseed.xml:491
 #, no-c-format
 msgid "hostname&nbsp;&nbsp;&nbsp;"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:480
+#: preseed.xml:491
 #, no-c-format
 msgid "netcfg/get_hostname"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:481
+#: preseed.xml:492
 #, no-c-format
 msgid "domain"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:481
+#: preseed.xml:492
 #, no-c-format
 msgid "netcfg/get_domain"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:482
+#: preseed.xml:493
 #, no-c-format
 msgid "interface"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:482
+#: preseed.xml:493
 #, no-c-format
 msgid "netcfg/choose_interface"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:483
+#: preseed.xml:494
 #, no-c-format
 msgid "suite"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:483
+#: preseed.xml:494
 #, no-c-format
 msgid "mirror/suite"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:490
+#: preseed.xml:501
 #, no-c-format
 msgid "Using a DHCP server to specify preconfiguration files"
 msgstr "Dùng máy phục vụ DHCP để xác định tập tin định cấu hình sẵn"
 
 #. Tag: para
-#: preseed.xml:491
+#: preseed.xml:502
 #, no-c-format
 msgid ""
 "It's also possible to use DHCP to specify a preconfiguration file to "
@@ -813,7 +818,7 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: preseed.xml:502
+#: preseed.xml:513
 #, no-c-format
 msgid ""
 "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
@@ -825,7 +830,7 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: preseed.xml:504
+#: preseed.xml:515
 #, no-c-format
 msgid ""
 "Note that the above example limits this filename to DHCP clients that "
@@ -839,7 +844,7 @@ msgstr ""
 "dòng cho chỉ một máy riêng, để tránh chèn sẵn mọi việc cài đặt trên mạng đó."
 
 #. Tag: para
-#: preseed.xml:511
+#: preseed.xml:522
 #, no-c-format
 msgid ""
 "A good way to use the DHCP preseeding is to only preseed values specific to "
@@ -856,13 +861,13 @@ msgstr ""
 "cài đặt Debian nào."
 
 #. Tag: title
-#: preseed.xml:525
+#: preseed.xml:536
 #, no-c-format
 msgid "Creating a preconfiguration file"
 msgstr "Tạo tập tin định cấu hình sẵn"
 
 #. Tag: para
-#: preseed.xml:526
+#: preseed.xml:537
 #, no-c-format
 msgid ""
 "The preconfiguration file is in the format used by the <command>debconf-set-"
@@ -874,21 +879,21 @@ msgstr ""
 "hình sẵn là:"
 
 #. Tag: screen
-#: preseed.xml:532
+#: preseed.xml:543
 #, no-c-format
 msgid "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
 msgstr ""
 "&lt;sở hữu&gt; &lt;tên câu hỏi&gt; &lt;kiểu câu hỏi&gt; &lt;giá trị&gt;"
 
 #. Tag: para
-#: preseed.xml:534
+#: preseed.xml:545
 #, no-c-format
 msgid ""
 "There are a few rules to keep in mind when writing a preconfiguration file."
 msgstr "Ghi nhớ vài quy tắc khi tạo tập tin cấu hình sẵn."
 
 #. Tag: para
-#: preseed.xml:541
+#: preseed.xml:552
 #, no-c-format
 msgid ""
 "Put only a single space or tab between type and value: any additional "
@@ -898,7 +903,7 @@ msgstr ""
 "nào sẽ được xử lý là phần của giá trị đó."
 
 #. Tag: para
-#: preseed.xml:545
+#: preseed.xml:556
 #, no-c-format
 msgid ""
 "A line can be split into multiple lines by appending a backslash "
@@ -912,7 +917,7 @@ msgstr ""
 "nơi giữa « kiểu câu hỏi » và « giá trị »."
 
 #. Tag: para
-#: preseed.xml:551
+#: preseed.xml:562
 #, no-c-format
 msgid ""
 "Most questions need to be preseeded using the values valid in English and "
@@ -924,7 +929,7 @@ msgstr ""
 "<classname>partman</classname>) trong đó cần phải dùng giá trị đã dịch."
 
 #. Tag: para
-#: preseed.xml:557
+#: preseed.xml:568
 #, no-c-format
 msgid ""
 "Some questions take a code as value instead of the English text that is "
@@ -934,7 +939,7 @@ msgstr ""
 "hiển thị trong khi cài đặt."
 
 #. Tag: para
-#: preseed.xml:563
+#: preseed.xml:574
 #, no-c-format
 msgid ""
 "The easiest way to create a preconfiguration file is to use the example file "
@@ -945,7 +950,7 @@ msgstr ""
 "từ từ vào nó."
 
 #. Tag: para
-#: preseed.xml:568
+#: preseed.xml:579
 #, no-c-format
 msgid ""
 "An alternative method is to do a manual installation and then, after "
@@ -959,7 +964,7 @@ msgstr ""
 "lẫn cơ sở dữ liệu cdebconf của trình cài đặt đều vào cùng một tập tin:"
 
 #. Tag: screen
-#: preseed.xml:575
+#: preseed.xml:586
 #, no-c-format
 msgid ""
 "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
@@ -970,7 +975,7 @@ msgstr ""
 "$ debconf-get-selections &gt;&gt; <replaceable>tập tin</replaceable>"
 
 #. Tag: para
-#: preseed.xml:577
+#: preseed.xml:588
 #, no-c-format
 msgid ""
 "However, a file generated in this manner will have some items that should "
@@ -982,7 +987,7 @@ msgstr ""
 "hợp của phần lớn người dùng."
 
 #. Tag: para
-#: preseed.xml:585
+#: preseed.xml:596
 #, no-c-format
 msgid ""
 "This method relies on the fact that, at the end of the installation, the "
@@ -998,7 +1003,7 @@ msgstr ""
 "tin đó chỉ cho phép người chủ đọc thôi."
 
 #. Tag: para
-#: preseed.xml:593
+#: preseed.xml:604
 #, no-c-format
 msgid ""
 "The directory <filename>/var/log/installer</filename> and all files in it "
@@ -1010,7 +1015,7 @@ msgstr ""
 "<classname>installation-report</classname>."
 
 #. Tag: para
-#: preseed.xml:601
+#: preseed.xml:612
 #, no-c-format
 msgid ""
 "To check possible values for questions, you can use <command>nano</command> "
@@ -1027,7 +1032,7 @@ msgstr ""
 "trị được gán cho biến."
 
 #. Tag: para
-#: preseed.xml:609
+#: preseed.xml:620
 #, no-c-format
 msgid ""
 "To check if the format of your preconfiguration file is valid before "
@@ -1039,13 +1044,13 @@ msgstr ""
 "<replaceable>preseed.cfg</replaceable></command>."
 
 #. Tag: title
-#: preseed.xml:620
+#: preseed.xml:631
 #, no-c-format
 msgid "Contents of the preconfiguration file"
 msgstr "Nội dung của tập tin định cấu hình sẵn"
 
 #. Tag: para
-#: preseed.xml:626
+#: preseed.xml:637
 #, no-c-format
 msgid ""
 "Note that this example is based on an installation for the Intel x86 "
@@ -1061,13 +1066,13 @@ msgstr ""
 "với kiến trúc đó."
 
 #. Tag: title
-#: preseed.xml:637
+#: preseed.xml:648
 #, no-c-format
 msgid "Localization"
 msgstr "Địa phương hoá"
 
 #. Tag: para
-#: preseed.xml:638
+#: preseed.xml:649
 #, no-c-format
 msgid ""
 "Setting localization values will only work if you are using initrd "
@@ -1079,7 +1084,7 @@ msgstr ""
 "được tải chỉ sau khi hỏi các câu này."
 
 #. Tag: para
-#: preseed.xml:644
+#: preseed.xml:655
 #, no-c-format
 msgid ""
 "The locale can be used to specify both language and country. To specify the "
@@ -1092,7 +1097,7 @@ msgstr ""
 "mã ngôn ngữ/quốc gia khác dạng « nn » hay « nn_QQ »)."
 
 #. Tag: screen
-#: preseed.xml:650
+#: preseed.xml:661
 #, no-c-format
 msgid ""
 "# Locale sets language and country.\n"
@@ -1102,7 +1107,7 @@ msgstr ""
 "d-i debian-installer/locale string vi"
 
 #. Tag: para
-#: preseed.xml:652
+#: preseed.xml:663
 #, no-c-format
 msgid ""
 "Keyboard configuration consists of selecting a keyboard architecture and a "
@@ -1116,7 +1121,7 @@ msgstr ""
 "trước nó. Bố trí bàn phím phải là hợp lệ cho kiến trúc bàn phím đã chọn."
 
 #. Tag: screen
-#: preseed.xml:659
+#: preseed.xml:670
 #, no-c-format
 msgid ""
 "# Keyboard selection.\n"
@@ -1132,7 +1137,7 @@ msgstr ""
 "#d-i console-keymaps-usb/keymap select mac-usb-us"
 
 #. Tag: para
-#: preseed.xml:661
+#: preseed.xml:672
 #, no-c-format
 msgid ""
 "To skip keyboard configuration, preseed <classname>console-tools/archs</"
@@ -1144,7 +1149,7 @@ msgstr ""
 "Kết quả là bố trí bàn phím của hạt nhân còn lại hoạt động."
 
 #. Tag: para
-#: preseed.xml:670
+#: preseed.xml:681
 #, no-c-format
 msgid ""
 "The changes in the input layer for 2.6 kernels have made the keyboard "
@@ -1156,13 +1161,13 @@ msgstr ""
 "bàn phím kiểu <quote>PC</quote> (<userinput>at</userinput>)."
 
 #. Tag: title
-#: preseed.xml:680
+#: preseed.xml:691
 #, no-c-format
 msgid "Network configuration"
 msgstr "Cấu hình mạng"
 
 #. Tag: para
-#: preseed.xml:681
+#: preseed.xml:692
 #, no-c-format
 msgid ""
 "Of course, preseeding the network configuration won't work if you're loading "
@@ -1177,7 +1182,7 @@ msgstr ""
 "năng gởi tham số cấu hình mạng bằng cách sử dụng tham số khởi động hạt nhân."
 
 #. Tag: para
-#: preseed.xml:689
+#: preseed.xml:700
 #, no-c-format
 msgid ""
 "If you need to pick a particular interface when netbooting before loading a "
@@ -1189,7 +1194,7 @@ msgstr ""
 "<userinput>interface=<replaceable>eth1</replaceable></userinput>."
 
 #. Tag: para
-#: preseed.xml:695
+#: preseed.xml:706
 #, no-c-format
 msgid ""
 "Although preseeding the network configuration is normally not possible when "
@@ -1208,7 +1213,7 @@ msgstr ""
 "run</quote> chứa những dòng này:"
 
 #. Tag: screen
-#: preseed.xml:705
+#: preseed.xml:716
 #, no-c-format
 msgid ""
 "killall.sh dhclient\n"
@@ -1218,7 +1223,7 @@ msgstr ""
 "netcfg"
 
 #. Tag: screen
-#: preseed.xml:709
+#: preseed.xml:720
 #, no-c-format
 msgid ""
 "# netcfg will choose an interface that has link if possible. This makes it\n"
@@ -1302,13 +1307,13 @@ msgstr ""
 "#d-i netcfg/dhcp_hostname string radish"
 
 #. Tag: title
-#: preseed.xml:714
+#: preseed.xml:725
 #, no-c-format
 msgid "Mirror settings"
 msgstr "Thiết lập máy nhân bản"
 
 #. Tag: para
-#: preseed.xml:715
+#: preseed.xml:726
 #, no-c-format
 msgid ""
 "Depending on the installation method you use, a mirror may be used both to "
@@ -1321,7 +1326,7 @@ msgstr ""
 "thống đã cài đặt."
 
 #. Tag: para
-#: preseed.xml:722
+#: preseed.xml:733
 #, no-c-format
 msgid ""
 "The parameter <classname>mirror/suite</classname> determines the suite for "
@@ -1331,7 +1336,7 @@ msgstr ""
 "thống đã cài đặt."
 
 #. Tag: para
-#: preseed.xml:727
+#: preseed.xml:738
 #, no-c-format
 msgid ""
 "The parameter <classname>mirror/udeb/suite</classname> determines the suite "
@@ -1349,7 +1354,7 @@ msgstr ""
 "<classname>mirror/suite</classname> là trùng."
 
 #. Tag: screen
-#: preseed.xml:739
+#: preseed.xml:750
 #, no-c-format
 msgid ""
 "d-i mirror/country string enter information manually\n"
@@ -1373,13 +1378,13 @@ msgstr ""
 "#d-i mirror/udeb/suite string testing"
 
 #. Tag: title
-#: preseed.xml:744
+#: preseed.xml:755
 #, no-c-format
 msgid "Partitioning"
 msgstr "Phân vùng"
 
 #. Tag: para
-#: preseed.xml:745
+#: preseed.xml:756
 #, fuzzy, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1398,7 +1403,7 @@ msgstr ""
 "thể thiết lập RAID."
 
 #. Tag: para
-#: preseed.xml:756
+#: preseed.xml:767
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1410,7 +1415,7 @@ msgstr ""
 "khả năng chèn sẵn."
 
 #. Tag: screen
-#: preseed.xml:764
+#: preseed.xml:775
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1544,13 +1549,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:769
+#: preseed.xml:780
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Phân vùng bằng RAID"
 
 #. Tag: para
-#: preseed.xml:770
+#: preseed.xml:781
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1566,7 +1571,7 @@ msgstr ""
 "<xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:780
+#: preseed.xml:791
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1582,7 +1587,7 @@ msgstr ""
 "nếu bạn gặp lỗi."
 
 #. Tag: para
-#: preseed.xml:788
+#: preseed.xml:799
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1594,7 +1599,7 @@ msgstr ""
 "suy biến hoặc thiết bị thêm đã được thử ra chỉ một ít."
 
 #. Tag: screen
-#: preseed.xml:796
+#: preseed.xml:807
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1695,13 +1700,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:801
+#: preseed.xml:812
 #, no-c-format
 msgid "Clock and time zone setup"
 msgstr "Thiết lập đồng hồ và múi giờ"
 
 #. Tag: screen
-#: preseed.xml:803
+#: preseed.xml:814
 #, no-c-format
 msgid ""
 "# Controls whether or not the hardware clock is set to UTC.\n"
@@ -1720,13 +1725,13 @@ msgstr ""
 "d-i time/zone string US/Eastern"
 
 #. Tag: title
-#: preseed.xml:808
+#: preseed.xml:819
 #, no-c-format
 msgid "Apt setup"
 msgstr "Thiết lập apt"
 
 #. Tag: para
-#: preseed.xml:809
+#: preseed.xml:820
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1740,7 +1745,7 @@ msgstr ""
 "năng thêm kho phần mềm (cục bộ) khác."
 
 #. Tag: screen
-#: preseed.xml:817
+#: preseed.xml:828
 #, fuzzy, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1780,13 +1785,13 @@ msgstr ""
 "#d-i apt-setup/local0/key chuỗi http://máy_phục_vụ_cục_bộ/khoá"
 
 #. Tag: title
-#: preseed.xml:822
+#: preseed.xml:833
 #, no-c-format
 msgid "Account setup"
 msgstr "Thiết lập tài khoản"
 
 #. Tag: para
-#: preseed.xml:823
+#: preseed.xml:834
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1798,7 +1803,7 @@ msgstr ""
 "dùng giá trị nhập thô (không mật mã) hay <emphasis>băm</emphasis> kiểu MD5."
 
 #. Tag: para
-#: preseed.xml:830
+#: preseed.xml:841
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1814,7 +1819,7 @@ msgstr ""
 "truy cập băm MD5 cho phép người khác tấn công bằng sức mạnh vũ phu."
 
 #. Tag: screen
-#: preseed.xml:840
+#: preseed.xml:851
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1860,7 +1865,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [băm MD5]"
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:853
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1880,7 +1885,7 @@ msgstr ""
 "<command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:852
+#: preseed.xml:863
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
@@ -1888,19 +1893,19 @@ msgstr "Băm MD5 cho mật khẩu có thể được tạo ra bằng lệnh theo
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: preseed.xml:856
+#: preseed.xml:867
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 
 #. Tag: title
-#: preseed.xml:862
+#: preseed.xml:873
 #, no-c-format
 msgid "Base system installation"
 msgstr "Cài đặt hệ thống cơ bản"
 
 #. Tag: para
-#: preseed.xml:863
+#: preseed.xml:874
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -1911,7 +1916,7 @@ msgstr ""
 "cách cài đặt hạt nhân."
 
 #. Tag: screen
-#: preseed.xml:870
+#: preseed.xml:881
 #, no-c-format
 msgid ""
 "# Select the initramfs generator used to generate the initrd for 2.6 "
@@ -1922,13 +1927,13 @@ msgstr ""
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:875
+#: preseed.xml:886
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Cài đặt bộ tải khởi động"
 
 #. Tag: screen
-#: preseed.xml:877
+#: preseed.xml:888
 #, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -1976,13 +1981,13 @@ msgstr ""
 "#d-i grub-installer/bootdev  chuỗi (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
-#: preseed.xml:882
+#: preseed.xml:893
 #, no-c-format
 msgid "Package selection"
 msgstr "Chọn gói phần mềm"
 
 #. Tag: para
-#: preseed.xml:883
+#: preseed.xml:894
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -1992,73 +1997,73 @@ msgstr ""
 "lúc viết câu này, các công việc sẵn sàng gồm:"
 
 #. Tag: userinput
-#: preseed.xml:892
+#: preseed.xml:903
 #, no-c-format
 msgid "standard"
 msgstr "chuẩn"
 
 #. Tag: userinput
-#: preseed.xml:895
+#: preseed.xml:906
 #, no-c-format
 msgid "desktop"
 msgstr "môi trường làm việc"
 
 #. Tag: userinput
-#: preseed.xml:898
+#: preseed.xml:909
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "môi trường làm việc Gnome"
 
 #. Tag: userinput
-#: preseed.xml:901
+#: preseed.xml:912
 #, no-c-format
 msgid "kde-desktop"
 msgstr "môi trường làm việc KDE"
 
 #. Tag: userinput
-#: preseed.xml:904
+#: preseed.xml:915
 #, no-c-format
 msgid "web-server"
 msgstr "trình phục vụ Mạng"
 
 #. Tag: userinput
-#: preseed.xml:907
+#: preseed.xml:918
 #, no-c-format
 msgid "print-server"
 msgstr "trình phục vụ in"
 
 #. Tag: userinput
-#: preseed.xml:910
+#: preseed.xml:921
 #, no-c-format
 msgid "dns-server"
 msgstr "trình phục vụ DNS"
 
 #. Tag: userinput
-#: preseed.xml:913
+#: preseed.xml:924
 #, no-c-format
 msgid "file-server"
 msgstr "trình phục vụ tập tin"
 
 #. Tag: userinput
-#: preseed.xml:916
+#: preseed.xml:927
 #, no-c-format
 msgid "mail-server"
 msgstr "trình phục vụ thư tín"
 
 #. Tag: userinput
-#: preseed.xml:919
+#: preseed.xml:930
 #, no-c-format
 msgid "sql-database"
 msgstr "co sở dữ liệu SQL"
 
 #. Tag: userinput
-#: preseed.xml:922
+#: preseed.xml:933
 #, no-c-format
 msgid "laptop"
 msgstr "máy tính xách tay"
 
 #. Tag: para
-#: preseed.xml:926
+#: preseed.xml:937
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -2070,7 +2075,7 @@ msgstr ""
 "<userinput>chuẩn</userinput>."
 
 #. Tag: para
-#: preseed.xml:932
+#: preseed.xml:943
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -2084,7 +2089,7 @@ msgstr ""
 "cách, vậy dễ dàng dùng trên dòng lệnh."
 
 #. Tag: screen
-#: preseed.xml:942
+#: preseed.xml:953
 #, no-c-format
 msgid ""
 "tasksel tasksel/first multiselect standard, desktop\n"
@@ -2115,13 +2120,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:947
+#: preseed.xml:958
 #, no-c-format
 msgid "Finishing up the first stage install"
 msgstr "Làm xong giai đoạn cài đặt thứ nhất"
 
 #. Tag: screen
-#: preseed.xml:949
+#: preseed.xml:960
 #, no-c-format
 msgid ""
 "# Avoid that last message about the install being complete.\n"
@@ -2139,13 +2144,13 @@ msgstr ""
 "#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
-#: preseed.xml:954
+#: preseed.xml:965
 #, no-c-format
 msgid "Mailer configuration"
 msgstr "Cấu hình trình thư"
 
 #. Tag: para
-#: preseed.xml:955
+#: preseed.xml:966
 #, no-c-format
 msgid ""
 "During a normal install, exim asks only a few questions. Here's how to avoid "
@@ -2155,7 +2160,7 @@ msgstr ""
 "cách tránh ngay cả vài câu đó. Có khả năng chèn sẵn một cách phức tạp hơn."
 
 #. Tag: screen
-#: preseed.xml:962
+#: preseed.xml:973
 #, no-c-format
 msgid ""
 "exim4-config exim4/dc_eximconfig_configtype \\\n"
@@ -2171,13 +2176,13 @@ msgstr ""
 "exim4-config exim4/dc_postmaster string"
 
 #. Tag: title
-#: preseed.xml:967
+#: preseed.xml:978
 #, no-c-format
 msgid "X configuration"
 msgstr "Cấu hình X"
 
 #. Tag: para
-#: preseed.xml:968
+#: preseed.xml:979
 #, no-c-format
 msgid ""
 "Preseeding Debian's X config is possible, but you probably need to know some "
@@ -2189,7 +2194,7 @@ msgstr ""
 "Debian không cấu hình tự động đầy đủ mọi thứ."
 
 #. Tag: screen
-#: preseed.xml:976
+#: preseed.xml:987
 #, no-c-format
 msgid ""
 "# X can detect the right driver for some cards, but if you're preseeding,\n"
@@ -2239,13 +2244,13 @@ msgstr ""
 "       select 1024x768 @ 60 Hz"
 
 #. Tag: title
-#: preseed.xml:981
+#: preseed.xml:992
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "Chèn trước gói khác"
 
 #. Tag: screen
-#: preseed.xml:983
+#: preseed.xml:994
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -2264,19 +2269,19 @@ msgstr ""
 "#   debconf-get-selections >> file"
 
 #. Tag: title
-#: preseed.xml:990
+#: preseed.xml:1001
 #, no-c-format
 msgid "Advanced options"
 msgstr "Tùy chọn cấp cao"
 
 #. Tag: title
-#: preseed.xml:993
+#: preseed.xml:1004
 #, no-c-format
 msgid "Running custom commands during the installation"
 msgstr "Chạy lệnh riêng trong khi cài đặt"
 
 #. Tag: para
-#: preseed.xml:994
+#: preseed.xml:1005
 #, fuzzy, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
@@ -2287,7 +2292,7 @@ msgstr ""
 "Xem <xref linkend=\"preseed-shell\"/> để tìm chi tiết."
 
 #. Tag: screen
-#: preseed.xml:1002
+#: preseed.xml:1013
 #, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
@@ -2327,13 +2332,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:1007
+#: preseed.xml:1018
 #, no-c-format
 msgid "Using preseeding to change default values"
 msgstr "Dùng khả năng chèn sẵn để thay đổi giá trị mặc định"
 
 #. Tag: para
-#: preseed.xml:1008
+#: preseed.xml:1019
 #, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
@@ -2347,7 +2352,7 @@ msgstr ""
 "trị cho câu hỏi nào."
 
 #. Tag: screen
-#: preseed.xml:1017
+#: preseed.xml:1028
 #, no-c-format
 msgid ""
 "d-i foo/bar string value\n"
@@ -2357,13 +2362,13 @@ msgstr ""
 "d-i phu/ba seen false"
 
 #. Tag: title
-#: preseed.xml:1022
+#: preseed.xml:1033
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "Tải dây chuyền tập tin định cấu hình sẵn"
 
 #. Tag: para
-#: preseed.xml:1023
+#: preseed.xml:1034
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2379,7 +2384,7 @@ msgstr ""
 "để thiết lập chi tiết hơn cho một số cấu hình riêng trong các tập tin khác."
 
 #. Tag: screen
-#: preseed.xml:1033
+#: preseed.xml:1044
 #, fuzzy, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2400,9 +2405,10 @@ msgid ""
 "\n"
 "# Most flexibly of all, this downloads a program and runs it. The program\n"
 "# can use commands such as debconf-set to manipulate the debconf database.\n"
+"# More than one script can be listed, separated by spaces.\n"
 "# Note that if the filenames are relative, they are taken from the same\n"
 "# directory as the preconfiguration file that runs them.\n"
-"d-i preseed/run string foo.sh"
+"#d-i preseed/run string foo.sh"
 msgstr ""
 "# Có thể liệt kê nhiều tập tin, định giới bằng dấu cách: các tập tin đó\n"
 "# sẽ được tải. Những tập tin được gồm, lần lượt, cũng có thể chứa chỉ thị\n"
@@ -2429,7 +2435,7 @@ msgstr ""
 "d-i preseed/run string phu.sh"
 
 #. Tag: para
-#: preseed.xml:1035
+#: preseed.xml:1046
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
