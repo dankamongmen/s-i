@@ -24,13 +24,12 @@
 # 
 #
 
-       SCRIPTNAME="Installation Guide"
-       ROOT="/srv/d-i_daily"
-       WD="$ROOT/bin/po_stats"
-       TEMP_DIR="$WD/temp"
-       TARGET_DIR="$WD/out"
-       PO_DIR="$ROOT/manual/po"
-       ALIOTH_RSYNC="alioth:/var/lib/gforge/chroot/home/users/fjp/d-i_web/manual/po_stats/"
+SCRIPTNAME="Installation Guide"
+ROOT="/srv/d-i_daily"
+WD="$ROOT/bin/po_stats"
+TEMP_DIR="$WD/temp"
+TARGET_DIR="$WD/out"
+PO_DIR="$ROOT/manual/po"
 
 # We want the manual files group writable
 umask 0002
@@ -44,38 +43,32 @@ touch manual.lock
 
 mkdir -p out
 
-if [ `hostname` = "gluck" ]; then
-	GETTEXT="/home/barbier/extra/bin"
-	export PATH=/home/barbier/extra/bin:$PATH
-	APT_OPT="-o Dir::Etc::sourcelist=sources.list -o Dir::Etc=/home/seppy/ -o Dir::State::lists=/home/seppy/apt-dir"
-	LANG_NAMES="/home/seppy/languages.names"
-else
-	WD=`pwd`
-	GETTEXT="/usr/bin"
-	APT_OPT=""
-fi;
+export GETTEXT="/usr/bin"
+APT_OPT=""
+export LANG_NAMES="../langlist"
 TEMPFILE="/tmp/.gen-stats-temp-$RANDOM"
-export GETTEXT
 LANG=C
-
 
 #some functions:
 translated () {  #how many are translated?
-  $GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " translated"|sed -e 's/ .*$//g'
+	$GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, /§/g' | \
+		./rmnl 2 | sed -e 's/\.//g' | grep " translated" | \
+		sed -e 's/ .*$//g'
 }
 
 fuzzy() {  #how many fuzzy?
-  #msgfmt -o /dev/null --statistics  $1 2>&1 | sed -e 's/.*translated messages, //g' |sed -e 's/ fuzzy.*$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " fuzzy"|sed -e 's/ .*$//g'
+	$GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g' | \
+		./rmnl 2 | sed -e 's/\.//g' | grep " fuzzy" | \
+		sed -e 's/ .*$//g'
 }
 
 untranslated () {  #guess, what does this do?
-  #msgfmt -o /dev/null --statistics $1 2>&1|sed -e 's/.*, //g' | sed -e 's/ .*.$//g'
-  $GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g'|./rmnl 2|sed -e 's/\.//g'|grep " untranslated"|sed -e 's/ .*$//g'
+	$GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g' | \
+		./rmnl 2 | sed -e 's/\.//g' | grep " untranslated" | \
+		sed -e 's/ .*$//g'
 }
 
 translator () { #who is last-translator?
-  #awk '/Last-Translator:/ { print $2,$3 } ' $1
   grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
 }
 
@@ -102,9 +95,9 @@ LANG=C
 POT_LIST=`ls -1 $PO_DIR/pot/`
 for file in $POT_LIST; do
 	U=`untranslated $PO_DIR/pot/$file`
-  	echo "$file has $U untranslated. ($TOTALU)"
+	echo "$file has $U untranslated. ($TOTALU)"
 
-  	TOTALU=`expr $TOTALU + $U || echo 0`
+	TOTALU=`expr $TOTALU + $U || echo 0`
 	if [ "$TOTALU" = "0" -o -z "$TOTALU" ]; then
 		echo "Error while counting untranslated strings in templates."
 	fi
@@ -121,40 +114,38 @@ GR_FUZZY=0
 GR_UNTRANSLATED=0
 rm -f $TEMP_DIR/rank.txt
 rm -rf $TEMPFILE
-#for lang in `cat languages`; do #run for every language
 for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for every language
-  	echo "$lang..."
-
-	NAME=`cat languages.names | grep "$lang:" | sed "s/://g" || echo $lang`
+	NAME=$(grep "^$lang[[:space:]]" "$LANG_NAMES" | cut -f 8)
+	echo "$NAME ($lang)..."
 
 	echo -e "Statistics of Installation Guide translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
-  	MISSING=""
+	MISSING=""
 
 	#for total strings of a language
-  	TU=0
-  	TT=0
-  	TF=0
- 	for f in $POT_LIST; do #for every package
+	TU=0
+	TT=0
+	TF=0
+	for f in $POT_LIST; do #for every POT file
 		file=`echo $f | sed "s/t$//g"`;
 		fileprt="$file"
 		file="$PO_DIR/$lang/$file";
 
 		echo  "   $file..."
-    		if [ -e $file ]; then #if the file does exist
-      			LASTT=`translator $file`
+		if [ -e $file ]; then #if the file does exist
+			LASTT=`translator $file`
 
 			#strings of this package:
-      			U=`untranslated $file`
-      			F=`fuzzy $file`
-     			T=`translated $file`
-      			test -z "$U" && U=0
-      			test -z "$F" && F=0
-      			test -z "$T" && T=0
+			U=`untranslated $file`
+			F=`fuzzy $file`
+			T=`translated $file`
+			test -z "$U" && U=0
+			test -z "$F" && F=0
+			test -z "$T" && T=0
 
-      			#get infos:
+			#get infos:
 			TU=`expr $TU + $U`
-      			TT=`expr $TT + $T`
-      			TF=`expr $TF + $F`
+			TT=`expr $TT + $T`
+			TF=`expr $TF + $F`
 
 			#for the graph:
 			GR_TRANSLATED=`expr $GR_TRANSLATED + $TT`
@@ -162,22 +153,22 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
 			GR_FUZZY=`expr $GR_FUZZY + $TF`
       			
 			#dont show completely translated files:
-      			if [ "$U" = "0" -a "$F" = "0" ]; then
-         			OK="  $fileprt: $T"t" [$LASTT]\n$OK"
+			if [ "$U" = "0" -a "$F" = "0" ]; then
+				OK="  $fileprt: $T"t" [$LASTT]\n$OK"
 				echo -n
 			else
-      				echo "  $fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
-      			fi
+				echo "  $fileprt: $T"t"$F"f"$U"u" [$LASTT]" >> $TARGET_DIR/$lang.txt
+			fi
 
-    	else #=if not existing
-		MISSING_U=`untranslated $PO_DIR/pot/$f`
-		test -z $MISSING_U && MISSING_U=0
-      		MISSING="$MISSING  $fileprt: "$MISSING_U"u\n"
-      		#echo "  !!$path/$lang.po"
-    	fi
-	done #for path in `cat paths`; do
+		else #=if not existing
+			MISSING_U=`untranslated $PO_DIR/pot/$f`
+			test -z $MISSING_U && MISSING_U=0
+			MISSING="$MISSING  $fileprt: "$MISSING_U"u\n"
+			#echo "  !!$path/$lang.po"
+		fi
+	done # POT files
  
- 	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.txt
+	echo -e "\nTranslated:" >> $TARGET_DIR/$lang.txt
 	echo -e "$OK" >> $TARGET_DIR/$lang.txt
 	OK=""
 
@@ -186,39 +177,30 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
   	STR=`echo "$TT + $TU + $TF" | bc`
   	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
   	if [ "$STR" -gt "$TOTALU" ]; then
-  		echo "  You have more strings translated/fuzzy/untranslated that in
-  the pot-templates. Please check about that!" >>  $TARGET_DIR/$lang.txt
-  	fi
-  	echo >>  $TARGET_DIR/$lang.txt
+		echo "  You have more strings translated/fuzzy/untranslated than in
+  the pot-templates. Please check!" >>  $TARGET_DIR/$lang.txt
+	fi
+	echo >>  $TARGET_DIR/$lang.txt
 
-  	print_shit
+	print_shit
 
 	LEAD="000";
 	if [ ${#LEAD} -gt ${#P} ]; then
-	  	P="${LEAD:0:${#LEAD}-${#P}}$P"
+		P="${LEAD:0:${#LEAD}-${#P}}$P"
 	else
 		P="$P"
 	fi
- 	echo -e "$P%\t $lang" >> $TEMP_DIR/rank.txt
+	echo -e "$P%\t $lang" >> $TEMP_DIR/rank.txt
 
-  	echo "$lang done. ($P%)"
+	echo "$lang done. ($P%)"
 	echo
-done
-#for lang in `cat languages`; do
-
+done # languages
 
 #generate ranking:
-echo "Rankings for Installation Guide po files." > $TARGET_DIR/rank.txt
-echo >> $TARGET_DIR/rank.txt
-$WD/sort-ranktxt < $TEMP_DIR/rank.txt >> $TARGET_DIR/rank.txt
-echo -e -n "\nFiles fetched and report generated on: " >> $TARGET_DIR/rank.txt
-date -u  >> $TARGET_DIR/rank.txt
+$WD/sort-ranktxt < $TEMP_DIR/rank.txt > ../index.podata
 
 #move files to their destination
 cp HEADER.txt $TARGET_DIR/
-
-#copy files to alioth
-rsync -p $TARGET_DIR/* $ALIOTH_RSYNC
 
 #cleanup
 echo "Cleanup..."

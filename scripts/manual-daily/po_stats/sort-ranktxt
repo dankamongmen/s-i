@@ -13,35 +13,46 @@ for I in $F; do
                 STR[$X]="${STR[$X]}\n$I"
         else
                 O=$N
-                C=`expr $C + 1`
+                C=$(($C + 1))
                 [ $X -gt 0 ] && echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
-                X=`expr $X + 1`
+                X=$(($X + 1))
                 STR[$X]="${STR[$X]}$I"
         fi
 done
-echo -e "${STR[$X]}" |sort >> /tmp/$TEMP
+echo -e "${STR[$X]}" | sort >> /tmp/$TEMP
 
 C=0
 T=0
 O=""
-SAME=""
+SAME=0
+echo "<TABLE>"
+echo "<TR><TH>Rank</TH><TH>Percentage</TH><TH>Language</TH><TH>Count</TH></TR>"
 for I in `cat /tmp/$TEMP`; do
-        N=`echo "$I" | sed "s/%.*//g"`
+        N=`echo "$I" | sed "s/%.*//"`
+        lang=`echo "$I" | sed "s/^.*%[[:space:]]*//"`
+	NAME=$(grep "^$lang[[:space:]]" "$LANG_NAMES" | cut -f 8)
+	LINK="<a href="po_stats/$lang.txt" target="_blank">$NAME</a>"
         if [ "$N" = "$O" ]; then
-                echo -ne "\n   $I"
-		SAME=`expr $SAME + 1`
+		if [ $SAME -ge 1 ]; then
+			echo "<TD>&nbsp;</TD></TR>"
+		fi
+                echo -n "<TR><TD>&nbsp;</TD><TD>$N%</TD><TD>$LINK</TD>"
+		SAME=$(($SAME + 1))
         else
+                C=$(($C + 1))
+		if [ "$SAME" -ge 1 ]; then
+			echo "<TD style=\"text-align: right;\">$SAME</TD></TR>"
+		elif [ "$O" ]; then
+			echo "<TD>&nbsp;</TD></TR>"
+		fi
+                echo -n "<TR><TD class=\"col1r\">$C</TD><TD>$N%</TD><TD>$LINK</TD>"
                 O=$N
-                C=`expr $C + 1`
-                test "${#C}" = 1 && WHITE=" "
-                test "${#C}" = 2 && WHITE=""
-		[ "$SAME" ] && echo -e "\t$SAME"
-                echo -ne "$WHITE$C $I"
 		SAME=1
         fi
-        T=`expr $T + 1`
+        T=$(($T + 1))
 done
-echo -ne "\t$SAME"
+echo "<TD style=\"text-align: right;\">$SAME</TD></TR>"
 
-echo -e "\n\t\t=$T"
+echo "<TR><TD style=\"font-weight: bold; text-align: left;\" colspan=\"3\">Total</TD><TD style=\"text-align: right;\">$T</TD></TR>"
+echo "</TABLE>"
 rm /tmp/$TEMP
