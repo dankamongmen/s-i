@@ -1,14 +1,14 @@
 <!-- retain these comments for translator revision tracking -->
 <!-- $Id$ -->
 
-  <sect2 condition="supports-dhcp" id="dhcpd">
+  <sect2 id="dhcpd">
    <title>Setting up a DHCP server</title>
 <para>
 
 One free software DHCP server is ISC <command>dhcpd</command>.
-In &debian;, this is available in the <classname>dhcp</classname> package.
-Here is a sample configuration file for it (usually
-<filename>/etc/dhcpd.conf</filename>):
+For &debian;, the <classname>dhcp3-server</classname> package is
+recommended.  Here is a sample configuration file for it (see
+<filename>/etc/dhcp3/dhcpd.conf</filename>):
 
 <informalexample><screen>
 option domain-name "example.com";
@@ -32,9 +32,6 @@ host clientname {
 }
 </screen></informalexample>
 
-Note: the new (and preferred) <classname>dhcp3</classname> package uses
-<filename>/etc/dhcp3/dhcpd.conf</filename>.
-
 </para><para>
 
 In this example, there is one server
@@ -48,7 +45,7 @@ file which will be retrieved via TFTP.
 </para><para>
 
 After you have edited the <command>dhcpd</command> configuration file,
-restart it with <userinput>/etc/init.d/dhcpd restart</userinput>.
+restart it with <userinput>/etc/init.d/dhcpd3-server restart</userinput>.
 
 </para>
 
@@ -79,11 +76,11 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 }
 
 group {
- next-server 192.168.1.3;
- host tftpclient {
+  next-server 192.168.1.3;
+  host tftpclient {
 # tftp client hardware address
   hardware ethernet  00:10:DC:27:6C:15;
-  filename "/tftpboot/pxelinux.0";
+  filename "pxelinux.0";
  }
 }
 </screen></informalexample>
