@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Préparer les fichiers pour amorcer depuis le réseau avec TFTP</title>
@@ -14,8 +14,8 @@ amorcer votre propre machine.
 </para><para>
 
 Vous devez configurer un serveur TFTP et, pour beaucoup de machines, 
-un serveur BOOTP<phrase condition="supports-rarp">, un serveur RARP</phrase>
-<phrase condition="supports-dhcp">ou un serveur DHCP</phrase>.
+un serveur DHCP<phrase condition="supports-rarp">, un serveur RARP</phrase>
+<phrase condition="supports-bootp">ou un serveur BOOTP</phrase>.
 
 </para><para>
 
@@ -33,11 +33,11 @@ image d'amorçage.</phrase>
 VMEbus&nbsp;: l'adresse IP peut être configurée manuellement dans la ROM 
 d'amorçage.</phrase>
 
-<phrase condition="supports-dhcp">Le protocole DHCP 
+Le protocole DHCP 
 («&nbsp;Dynamic Host Configuration Protocole&nbsp;», Protocole de 
 configuration dynamique des hôtes) est une extension bien plus flexible 
 de BOOTP (et respectant la compatibilité ascendante). Certains systèmes ne 
-peuvent être configurés que par DHCP.</phrase>
+peuvent être configurés que par DHCP.
 
 </para><para arch="powerpc">
 
@@ -107,14 +107,28 @@ tftp dgram udp wait root /usr/sbin/tcpd in.tftpd /tftpboot
 
 Les paquets Debian, quand ils sont installés, placent correctement cette
 ligne.
-</para><para> 
+</para>
 
-Lisez ce fichier et mémorisez le répertoire passé en argument à 
-<command>in.tftpd</command>&nbsp;; vous en aurez besoin ultérieurement. 
+<note><para>
+Les serveurs TFTP usaient habituellement du répertoire <filename>/tftpboot</filename> pour
+stocker les images. Cependant les paquets &debian; se servent d'autres répertoires
+pour obéir au <ulink url="&url-fhs-home;">standard sur l'organisation des fichiers</ulink>.
+Par exemple, <classname>tftpd-hpa</classname> utilise par défaut
+<filename>/var/lib/tftpboot</filename>. Vous aurez à modifier les exemples de cette section.
+</para></note>
+
+<para> 
+
+Lisez le fichier <filename>/etc/inetd.conf</filename> et mémorisez le répertoire
+passé en argument à <command>in.tftpd</command>
+<footnote>
+<para>
 L'option <userinput>-l</userinput> autorise certaines versions de 
 <command>in.tftpd</command> à enregistrer toutes les requêtes dans le journal 
-du système&nbsp;; c'est extrêmement pratique en cas d'erreur d'amorçage. Si 
-vous avez dû modifier <filename>/etc/inetd.conf</filename>, vous devrez le 
+du système&nbsp;; c'est extrêmement pratique en cas d'erreur d'amorçage.
+</para>
+</footnote>&nbsp;; vous en aurez besoin ultérieurement. 
+Si vous avez dû modifier <filename>/etc/inetd.conf</filename>, vous devrez le 
 signaler au processus <command>inetd</command>. Sur une machine Debian,
 lancez <userinput>/etc/init.d/inetd reload</userinput>&nbsp;; sur les autres 
 machines, retrouvez le numéro de processus de <command>inetd</command> et 
@@ -151,7 +165,7 @@ pour fixer l'intervalle des ports source que le serveur TFTP peut utiliser.
 <para>
 
 Ensuite, placez les images TFTP dont vous avez besoin (décrites dans la 
-<xref linkend="where-files"/>) dans le répertoire des images d'amorce 
+<xref linkend="where-files"/>) dans le répertoire des images d'amorçage 
 de <command>tftpd</command>. Généralement, ce répertoire s'appelle 
 <filename>/tftpboot</filename>. Vous aurez à faire un lien depuis ce fichier 
 vers le fichier que <command>tftpd</command> utilisera pour amorcer le client.
@@ -174,7 +188,7 @@ travers TFTP. Pour amorcer sur le réseau, utilisez
 Pour le démarrage PXE, tout ce dont vous avez besoin est dans l'archive
 <filename>netboot/netboot.tar.gz</filename>. Extrayez les fichiers dans le
 répertoire de l'image <command>tftpd</command>. Assurez-vous que le serveur
-DHCP donnera bien le fichier <filename>/pxelinux.0</filename> comme fichier
+DHCP donnera bien le fichier <filename>pxelinux.0</filename> comme fichier
 d'amorçage à <command>tftpd</command>.
 </para>
 <para arch="ia64">
