@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-10-29 14:49+0000\n"
+"POT-Creation-Date: 2006-12-27 04:04+0000\n"
 "PO-Revision-Date: 2006-10-29 18:57+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -14,7 +14,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.2\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Tag: title
 #: random-bits.xml:4
@@ -457,9 +458,9 @@ msgid ""
 "installation, without the standard task selected, will take 365MB."
 msgstr ""
 "Для базовой установки на i386 с ядром по умолчанию версии 2.6 со всеми "
-"стандартными пакетами требуется 585 МБ дискового пространства. "
-"Минимальная базовая установка без выбранной задачи \"Стандартная система\" "
-"занимает 365 МБ."
+"стандартными пакетами требуется 585 МБ дискового пространства. Минимальная "
+"базовая установка без выбранной задачи \"Стандартная система\" занимает 365 "
+"МБ."
 
 #. Tag: para
 #: random-bits.xml:196
@@ -708,7 +709,9 @@ msgstr "<entry>32</entry>"
 msgid ""
 "The <emphasis>Desktop</emphasis> task will install the GNOME desktop "
 "environment."
-msgstr "В задачу <emphasis>Окружение рабочего стола</emphasis> входит установка среды рабочего стола Gnome."
+msgstr ""
+"В задачу <emphasis>Окружение рабочего стола</emphasis> входит установка "
+"среды рабочего стола Gnome."
 
 #. Tag: para
 #: random-bits.xml:290
@@ -778,12 +781,13 @@ msgstr "Начинаем"
 
 #. Tag: para
 #: random-bits.xml:332
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "With your current *nix partitioning tools, repartition the hard drive as "
-"needed, creating at least one filesystem plus swap. You need at least 150MB "
-"of space available for a console only install, or at least 300MB if you plan "
-"to install X."
+"needed, creating at least one filesystem plus swap. You need around 350MB of "
+"space available for a console only install, or about 1GB if you plan to "
+"install X (more if you intend to install destop environments like GNOME or "
+"KDE)."
 msgstr ""
 "С помощью имеющейся утилиты работы с разделами диска, переразметьте диск как "
 "нужно, создав как минимум одну файловую систему плюс раздел подкачки (swap). "
@@ -791,13 +795,13 @@ msgstr ""
 "300 МБ, если вы планируете установить X."
 
 #. Tag: para
-#: random-bits.xml:339
-#, no-c-format
+#: random-bits.xml:340
+#, fuzzy, no-c-format
 msgid ""
-"Create file systems on your partitions. For example, to create an ext3 file "
-"system on partition <filename>/dev/hda6</filename> (that's our example root "
-"partition): <informalexample><screen>\n"
-"# mke2fs -j /dev/hda6\n"
+"Next, create file systems on the partitions. For example, to create an ext3 "
+"file system on partition <filename>/dev/hda6</filename> (that's our example "
+"root partition): <informalexample><screen>\n"
+"# mke2fs -j /dev/<replaceable>hda6</replaceable>\n"
 "</screen></informalexample> To create an ext2 file system instead, omit "
 "<userinput>-j</userinput>."
 msgstr ""
@@ -809,14 +813,14 @@ msgstr ""
 "указывайте параметр <userinput>-j</userinput>."
 
 #. Tag: para
-#: random-bits.xml:349
-#, no-c-format
+#: random-bits.xml:350
+#, fuzzy, no-c-format
 msgid ""
 "Initialize and activate swap (substitute the partition number for your "
 "intended Debian swap partition): <informalexample><screen>\n"
-"# mkswap /dev/hda5\n"
+"# mkswap /dev/<replaceable>hda5</replaceable>\n"
 "# sync; sync; sync\n"
-"# swapon /dev/hda5\n"
+"# swapon /dev/<replaceable>hda5</replaceable>\n"
 "</screen></informalexample> Mount one partition as <filename>/mnt/debinst</"
 "filename> (the installation point, to be the root (<filename>/</filename>) "
 "filesystem on your new system). The mount point name is strictly arbitrary, "
@@ -833,17 +837,17 @@ msgstr ""
 "абсолютно произвольное."
 
 #. Tag: screen
-#: random-bits.xml:361
-#, no-c-format
+#: random-bits.xml:362
+#, fuzzy, no-c-format
 msgid ""
 "# mkdir /mnt/debinst\n"
-"# mount /dev/hda6 /mnt/debinst"
+"# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 msgstr ""
 "# mkdir /mnt/debinst\n"
 "# mount /dev/hda6 /mnt/debinst"
 
 #. Tag: para
-#: random-bits.xml:364
+#: random-bits.xml:365
 #, no-c-format
 msgid ""
 "If you want to have parts of the filesystem (e.g. /usr) mounted on separate "
@@ -855,13 +859,13 @@ msgstr ""
 "перед тем как перейти к следующему этапу."
 
 #. Tag: title
-#: random-bits.xml:374
+#: random-bits.xml:375
 #, no-c-format
 msgid "Install <command>debootstrap</command>"
 msgstr "Установка <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:375
+#: random-bits.xml:376
 #, no-c-format
 msgid ""
 "The utility used by the Debian installer, and recognized as the official way "
@@ -886,7 +890,7 @@ msgstr ""
 "command>."
 
 #. Tag: para
-#: random-bits.xml:405
+#: random-bits.xml:406
 #, no-c-format
 msgid ""
 "Or, you can use the following procedure to install it manually. Make a work "
@@ -913,7 +917,7 @@ msgstr ""
 "суперпользователя (root)."
 
 #. Tag: screen
-#: random-bits.xml:420
+#: random-bits.xml:421
 #, no-c-format
 msgid ""
 "# ar -x debootstrap_0.X.X_all.deb\n"
@@ -925,13 +929,13 @@ msgstr ""
 "# zcat /full-path-to-work/work/data.tar.gz | tar xv"
 
 #. Tag: title
-#: random-bits.xml:426
+#: random-bits.xml:427
 #, no-c-format
 msgid "Run <command>debootstrap</command>"
 msgstr "Запуск <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:427
+#: random-bits.xml:428
 #, no-c-format
 msgid ""
 "<command>debootstrap</command> can download the needed files directly from "
@@ -947,7 +951,7 @@ msgstr ""
 "\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 
 #. Tag: para
-#: random-bits.xml:436
+#: random-bits.xml:437
 #, no-c-format
 msgid ""
 "If you have a &releasename; &debian; CD mounted at <filename>/cdrom</"
@@ -959,15 +963,15 @@ msgstr ""
 "URL: <userinput>file:/cdrom/debian/</userinput>"
 
 #. Tag: para
-#: random-bits.xml:442
-#, no-c-format
+#: random-bits.xml:443
+#, fuzzy, no-c-format
 msgid ""
 "Substitute one of the following for <replaceable>ARCH</replaceable> in the "
 "<command>debootstrap</command> command: <userinput>alpha</userinput>, "
-"<userinput>arm</userinput>, <userinput>hppa</userinput>, <userinput>i386</"
-"userinput>, <userinput>ia64</userinput>, <userinput>m68k</userinput>, "
-"<userinput>mips</userinput>, <userinput>mipsel</userinput>, "
-"<userinput>powerpc</userinput>, <userinput>s390</userinput>, or "
+"<userinput>amd64</userinput>, <userinput>arm</userinput>, <userinput>hppa</"
+"userinput>, <userinput>i386</userinput>, <userinput>ia64</userinput>, "
+"<userinput>m68k</userinput>, <userinput>mips</userinput>, <userinput>mipsel</"
+"userinput>, <userinput>powerpc</userinput>, <userinput>s390</userinput>, or "
 "<userinput>sparc</userinput>."
 msgstr ""
 "Замените <replaceable>ARCH</replaceable> на один из следующих вариантов в "
@@ -979,46 +983,47 @@ msgstr ""
 "<userinput>sparc</userinput>."
 
 #. Tag: screen
-#: random-bits.xml:459
-#, no-c-format
+#: random-bits.xml:461
+#, fuzzy, no-c-format
 msgid ""
 "# /usr/sbin/debootstrap --arch ARCH &releasename; \\\n"
-"     /mnt/debinst http://http.us.debian.org/debian"
+"     /mnt/debinst http://ftp.us.debian.org/debian"
 msgstr ""
 "# /usr/sbin/debootstrap --arch ARCH &releasename; \\\n"
 "     /mnt/debinst http://http.us.debian.org/debian"
 
 #. Tag: title
-#: random-bits.xml:465
+#: random-bits.xml:467
 #, no-c-format
 msgid "Configure The Base System"
 msgstr "Настройка базовой системы"
 
 #. Tag: para
-#: random-bits.xml:466
+#: random-bits.xml:468
 #, no-c-format
 msgid ""
 "Now you've got a real Debian system, though rather lean, on disk. "
-"<command>Chroot</command> into it:"
+"<command>chroot</command> into it: <informalexample><screen>\n"
+"# LANG=C chroot /mnt/debinst /bin/bash\n"
+"</screen></informalexample> After chrooting you may need to set the terminal "
+"definition to be compatible with the Debian base system, for example:"
 msgstr ""
-"Теперь у вас на диске есть настоящая, пусть и слабенькая, система Debian. "
-"Выполните <command>Chroot</command> в неё:"
 
 #. Tag: screen
-#: random-bits.xml:471
+#: random-bits.xml:478
 #, no-c-format
-msgid "# LANG= chroot /mnt/debinst /bin/bash"
-msgstr "# LANG= chroot /mnt/debinst /bin/bash"
+msgid "# export TERM=<replaceable>xterm-color</replaceable>"
+msgstr ""
 
 #. Tag: title
-#: random-bits.xml:476
+#: random-bits.xml:483
 #, no-c-format
 msgid "Mount Partitions"
 msgstr "Монтирование разделов"
 
 #. Tag: para
-#: random-bits.xml:477
-#, no-c-format
+#: random-bits.xml:484
+#, fuzzy, no-c-format
 msgid ""
 "You need to create <filename>/etc/fstab</filename>. "
 "<informalexample><screen>\n"
@@ -1034,8 +1039,8 @@ msgid ""
 "/dev/XXX         none          swap    sw                       0    0\n"
 "proc             /proc         proc    defaults                 0    0\n"
 "\n"
-"/dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0\n"
-"/dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0\n"
+"/dev/fd0         /media/floppy auto    noauto,rw,sync,user,exec 0    0\n"
+"/dev/cdrom       /media/cdrom  iso9660 noauto,ro,user,exec      0    0\n"
 "\n"
 "/dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2\n"
 "/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2\n"
@@ -1043,8 +1048,17 @@ msgid ""
 "/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2\n"
 "</screen></informalexample> Use <userinput>mount -a</userinput> to mount all "
 "the file systems you have specified in your <filename>/etc/fstab</filename>, "
-"or to mount file systems individually use: <informalexample><screen>\n"
+"or, to mount file systems individually, use: <informalexample><screen>\n"
 "# mount /path   # e.g.: mount /usr\n"
+"</screen></informalexample> Current Debian systems have mountpoints for "
+"removable media under <filename>/media</filename>, but keep compatibility "
+"symlinks in <filename>/</filename>. Create these as as needed, for example: "
+"<informalexample><screen>\n"
+"# cd /media\n"
+"# mkdir cdrom0\n"
+"# ln -s cdrom0 cdrom\n"
+"# cd /\n"
+"# ln -s media/cdrom\n"
 "</screen></informalexample> You can mount the proc file system multiple "
 "times and to arbitrary locations, though <filename>/proc</filename> is "
 "customary. If you didn't use <userinput>mount -a</userinput>, be sure to "
@@ -1082,13 +1096,13 @@ msgstr ""
 "тем как продолжить, убедитесь, что proc смонтирована:"
 
 #. Tag: screen
-#: random-bits.xml:497
+#: random-bits.xml:510
 #, no-c-format
 msgid "# mount -t proc proc /proc"
 msgstr "# mount -t proc proc /proc"
 
 #. Tag: para
-#: random-bits.xml:499
+#: random-bits.xml:512
 #, no-c-format
 msgid ""
 "The command <userinput>ls /proc</userinput> should now show a non-empty "
@@ -1100,48 +1114,44 @@ msgstr ""
 "chroot:"
 
 #. Tag: screen
-#: random-bits.xml:505
+#: random-bits.xml:518
 #, no-c-format
 msgid "# mount -t proc proc /mnt/debinst/proc"
 msgstr "# mount -t proc proc /mnt/debinst/proc"
 
 #. Tag: title
-#: random-bits.xml:511
-#, no-c-format
-msgid "Configure Keyboard"
-msgstr "Настройка клавиатуры"
+#: random-bits.xml:524
+#, fuzzy, no-c-format
+msgid "Setting Timezone"
+msgstr "Настройка источника"
 
 #. Tag: para
-#: random-bits.xml:512
-#, no-c-format
-msgid "To configure your keyboard:"
-msgstr "Для настройки клавиатуры введите:"
-
-#. Tag: screen
-#: random-bits.xml:516
-#, no-c-format
-msgid "# dpkg-reconfigure console-data"
-msgstr "# dpkg-reconfigure console-data"
-
-#. Tag: para
-#: random-bits.xml:518
+#: random-bits.xml:525
 #, no-c-format
 msgid ""
-"Note that the keyboard cannot be set while in the chroot, but will be "
-"configured for the next reboot."
+"An option in the file <filename>/etc/default/rcS</filename> determines "
+"whether the system will interpret the hardware clock as being set to UTC or "
+"local time. The following command allow you to set that and choose your "
+"timezone."
 msgstr ""
-"Заметим, что клавиатура не может быть настроена, пока работа производится в "
-"chroot, но настройка будет произведена после следующей перезагрузки."
+
+#. Tag: screen
+#: random-bits.xml:532
+#, no-c-format
+msgid ""
+"# editor /etc/default/rcS\n"
+"# tzconfig"
+msgstr ""
 
 #. Tag: title
-#: random-bits.xml:527
+#: random-bits.xml:538
 #, no-c-format
 msgid "Configure Networking"
 msgstr "Настройка сети"
 
 #. Tag: para
-#: random-bits.xml:528
-#, no-c-format
+#: random-bits.xml:539
+#, fuzzy, no-c-format
 msgid ""
 "To configure networking, edit <filename>/etc/network/interfaces</filename>, "
 "<filename>/etc/resolv.conf</filename>, <filename>/etc/hostname</filename> "
@@ -1185,6 +1195,17 @@ msgid ""
 "</screen></informalexample> Enter your system's host name (2 to 63 "
 "characters): <informalexample><screen>\n"
 "# echo DebianHostName &gt; /etc/hostname\n"
+"</screen></informalexample> And a basic <filename>/etc/hosts</filename> with "
+"IPv6 support: <informalexample><screen>\n"
+"127.0.0.1 localhost DebianHostName\n"
+"\n"
+"# The following lines are desirable for IPv6 capable hosts\n"
+"::1     ip6-localhost ip6-loopback\n"
+"fe00::0 ip6-localnet\n"
+"ff00::0 ip6-mcastprefix\n"
+"ff02::1 ip6-allnodes\n"
+"ff02::2 ip6-allrouters\n"
+"ff02::3 ip6-allhosts\n"
 "</screen></informalexample> If you have multiple network cards, you should "
 "arrange the names of driver modules in the <filename>/etc/modules</filename> "
 "file into the desired order. Then during boot, each card will be associated "
@@ -1239,25 +1260,44 @@ msgstr ""
 "интерфейса (eth0, eth1 и т.д.) как вы и хотели."
 
 #. Tag: title
-#: random-bits.xml:565
-#, no-c-format
-msgid "Configure Locales"
-msgstr "Настройка локалей"
+#: random-bits.xml:580
+#, fuzzy, no-c-format
+msgid "Configure Apt"
+msgstr "Настройка сети"
 
 #. Tag: para
-#: random-bits.xml:566
+#: random-bits.xml:581
 #, no-c-format
 msgid ""
+"Debootstrap will have created a very basic <filename>/etc/apt/sources.list</"
+"filename> that will allow installing additional packages. However, you may "
+"want to add some additional sources, for example for source packages and "
+"security updates: <informalexample><screen>\n"
+"deb-src http://ftp.us.debian.org/debian etch main\n"
+"\n"
+"deb http://security.debian.org/ etch/updates main\n"
+"deb-src http://security.debian.org/ etch/updates main\n"
+"</screen></informalexample> Make sure to run <userinput>aptitude update</"
+"userinput> after you have made changes to the sources list."
+msgstr ""
+
+#. Tag: title
+#: random-bits.xml:597
+#, fuzzy, no-c-format
+msgid "Configure Locales and Keyboard"
+msgstr "Настройка клавиатуры"
+
+#. Tag: para
+#: random-bits.xml:598
+#, fuzzy, no-c-format
+msgid ""
 "To configure your locale settings to use a language other than English, "
-"install the <classname>locales</classname> support package and configure it: "
+"install the <classname>locales</classname> support package and configure it. "
+"Currently the use of UTF-8 locales is recommended. "
 "<informalexample><screen>\n"
 "# aptitude install locales\n"
 "# dpkg-reconfigure locales\n"
-"</screen></informalexample> NOTE: <classname>apt</classname> must be "
-"configured beforehand by creating a sources.list and running "
-"<command>aptitude update</command>. Before using locales with character sets "
-"other than ASCII or latin1, please consult the appropriate localization "
-"HOWTO."
+"</screen></informalexample> To configure your keyboard (if needed):"
 msgstr ""
 "Чтобы использовать язык, отличный от английского, нужно настроить локаль. "
 "Для этого установите пакет поддержки <classname>locales</classname> и "
@@ -1270,18 +1310,36 @@ msgstr ""
 "набором символов, отличным от ASCII или latin1, пожалуйста "
 "проконсультируйтесь с соответствующим HOWTO по локализации."
 
+#. Tag: screen
+#: random-bits.xml:608
+#, fuzzy, no-c-format
+msgid ""
+"# aptitude install console-data\n"
+"# dpkg-reconfigure console-data"
+msgstr "# dpkg-reconfigure console-data"
+
+#. Tag: para
+#: random-bits.xml:610
+#, no-c-format
+msgid ""
+"Note that the keyboard cannot be set while in the chroot, but will be "
+"configured for the next reboot."
+msgstr ""
+"Заметим, что клавиатура не может быть настроена, пока работа производится в "
+"chroot, но настройка будет произведена после следующей перезагрузки."
+
 #. Tag: title
-#: random-bits.xml:584
+#: random-bits.xml:620
 #, no-c-format
 msgid "Install a Kernel"
 msgstr "Установка ядра"
 
 #. Tag: para
-#: random-bits.xml:585
-#, no-c-format
+#: random-bits.xml:621
+#, fuzzy, no-c-format
 msgid ""
 "If you intend to boot this system, you probably want a Linux kernel and a "
-"boot loader. Identify available pre-packaged kernels with "
+"boot loader. Identify available pre-packaged kernels with: "
 "<informalexample><screen>\n"
 "# apt-cache search linux-image\n"
 "</screen></informalexample> Then install your choice using its package name."
@@ -1293,7 +1351,7 @@ msgstr ""
 "</screen></informalexample> Затем установите нужное, указав имя пакета."
 
 #. Tag: screen
-#: random-bits.xml:594
+#: random-bits.xml:630
 #, no-c-format
 msgid ""
 "# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
@@ -1302,14 +1360,25 @@ msgstr ""
 "# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
 "replaceable>"
 
+#. Tag: para
+#: random-bits.xml:633
+#, no-c-format
+msgid ""
+"The configuration file <filename>/etc/kernel-img.conf</filename> influences "
+"the installation and upgrade of pre-packaged Debian kernels. A default file "
+"will be created when you first install a Debian kernel image. For additional "
+"information about this file, consult its man page which will be available "
+"after installing the <classname>kernel-package</classname> package."
+msgstr ""
+
 #. Tag: title
-#: random-bits.xml:600
+#: random-bits.xml:645
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Установка системного загрузчика"
 
 #. Tag: para
-#: random-bits.xml:601
+#: random-bits.xml:646
 #, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1324,8 +1393,8 @@ msgstr ""
 "чтобы сделать это."
 
 #. Tag: para
-#: random-bits.xml:608
-#, no-c-format
+#: random-bits.xml:653
+#, fuzzy, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
 "userinput> for instructions on setting up the bootloader. If you are keeping "
@@ -1333,8 +1402,8 @@ msgid ""
 "install to your existing grub <filename>menu.lst</filename> or "
 "<filename>lilo.conf</filename>. For <filename>lilo.conf</filename>, you "
 "could also copy it to the new system and edit it there. After you are done "
-"editing, call lilo (remember it will use <filename>lilo.conf</filename> "
-"relative to the system you call it from)."
+"editing, call <command>lilo</command> (remember it will use <filename>lilo."
+"conf</filename> relative to the system you call it from)."
 msgstr ""
 "Просмотрите в <userinput>info grub</userinput> или <userinput>man lilo.conf</"
 "userinput> об установке системного загрузчика. Если вы оставляете систему, "
@@ -1347,17 +1416,32 @@ msgstr ""
 "вызвали)."
 
 #. Tag: para
-#: random-bits.xml:619
+#: random-bits.xml:665
+#, no-c-format
+msgid ""
+"Installing and setting up <classname>grub</classname> is as easy as: "
+"<informalexample><screen>\n"
+"# aptitude install grub\n"
+"# grub-install /dev/<replaceable>hda</replaceable>\n"
+"# update-grub\n"
+"</screen></informalexample> The second command will install <command>grub</"
+"command> (in this case in the MBR of <literal>hda</literal>). The last "
+"command will create a sane and working <filename>/boot/grub/menu.lst</"
+"filename>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:675
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "Вот простой <filename>/etc/lilo.conf</filename> в качестве примера:"
 
 #. Tag: screen
-#: random-bits.xml:623
-#, no-c-format
+#: random-bits.xml:679
+#, fuzzy, no-c-format
 msgid ""
-"boot=/dev/hda6\n"
-"root=/dev/hda6\n"
+"boot=/dev/<replaceable>hda6</replaceable>\n"
+"root=/dev/<replaceable>hda6</replaceable>\n"
 "install=menu\n"
 "delay=20\n"
 "lba32\n"
@@ -1373,7 +1457,7 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:625
+#: random-bits.xml:681
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1393,7 +1477,7 @@ msgstr ""
 "которой его вызвали)."
 
 #. Tag: para
-#: random-bits.xml:635
+#: random-bits.xml:691
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1423,13 +1507,46 @@ msgstr ""
 "использовать <userinput>ide0:</userinput> вместо <userinput>hd:</userinput>."
 
 #. Tag: title
-#: random-bits.xml:653
+#: random-bits.xml:704
+#, no-c-format
+msgid "Finishing touches"
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:705
+#, no-c-format
+msgid ""
+"As mentioned earlier, the installed system will be very basic. If you would "
+"like to make the system a bit more mature, there is an easy method to "
+"packages of <quote>standard</quote> priority: <informalexample><screen>\n"
+"# tasksel install standard\n"
+"</screen></informalexample> Of course, you can also just use "
+"<command>aptitude</command> to install packages individually."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:716
+#, no-c-format
+msgid ""
+"After the installation there will be a lot of downloaded packages in "
+"<filename>/var/cache/apt/archives/</filename>. You can free up some "
+"diskspace by running:"
+msgstr ""
+
+#. Tag: screen
+#: random-bits.xml:722
+#, no-c-format
+msgid "# aptitude clean"
+msgstr ""
+
+#. Tag: title
+#: random-bits.xml:733
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "Установка &debian; через Parallel Line IP (PLIP)"
 
 #. Tag: para
-#: random-bits.xml:655
+#: random-bits.xml:735
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1444,7 +1561,7 @@ msgstr ""
 "Интернет)."
 
 #. Tag: para
-#: random-bits.xml:663
+#: random-bits.xml:743
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1460,7 +1577,7 @@ msgstr ""
 "не должны использоваться в вашем сетевом адресном пространстве)."
 
 #. Tag: para
-#: random-bits.xml:671
+#: random-bits.xml:751
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1471,7 +1588,7 @@ msgstr ""
 "перезагрузки в установленную систему (смотрите <xref linkend=\"boot-new\"/>)."
 
 #. Tag: para
-#: random-bits.xml:676
+#: random-bits.xml:756
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1484,13 +1601,13 @@ msgstr ""
 "<literal>io=0x378</literal>, <literal>irq=7</literal>."
 
 #. Tag: title
-#: random-bits.xml:686
+#: random-bits.xml:766
 #, no-c-format
 msgid "Requirements"
 msgstr "Требования"
 
 #. Tag: para
-#: random-bits.xml:689
+#: random-bits.xml:769
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1500,7 +1617,7 @@ msgstr ""
 "будет установлен Debian."
 
 #. Tag: para
-#: random-bits.xml:695
+#: random-bits.xml:775
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr ""
@@ -1508,7 +1625,7 @@ msgstr ""
 "\"/>."
 
 #. Tag: para
-#: random-bits.xml:700
+#: random-bits.xml:780
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1518,7 +1635,7 @@ msgstr ""
 "emphasis>, будет использоваться в качестве шлюза."
 
 #. Tag: para
-#: random-bits.xml:706
+#: random-bits.xml:786
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1529,13 +1646,13 @@ msgstr ""
 "<ulink url=\"&url-plip-install-howto;\">PLIP-Install-HOWTO</ulink>."
 
 #. Tag: title
-#: random-bits.xml:718
+#: random-bits.xml:798
 #, no-c-format
 msgid "Setting up source"
 msgstr "Настройка источника"
 
 #. Tag: para
-#: random-bits.xml:719
+#: random-bits.xml:799
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1545,7 +1662,7 @@ msgstr ""
 "источника в качестве шлюза в Интернет через ppp0."
 
 #. Tag: screen
-#: random-bits.xml:724
+#: random-bits.xml:804
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1587,13 +1704,13 @@ msgstr ""
 "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 #. Tag: title
-#: random-bits.xml:730
+#: random-bits.xml:810
 #, no-c-format
 msgid "Installing target"
 msgstr "Установка приёмника"
 
 #. Tag: para
-#: random-bits.xml:731
+#: random-bits.xml:811
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1619,13 +1736,13 @@ msgstr ""
 "различных этапах установки."
 
 #. Tag: guimenuitem
-#: random-bits.xml:750
+#: random-bits.xml:830
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr "Загрузка компонентов программы установки с CD"
 
 #. Tag: para
-#: random-bits.xml:752
+#: random-bits.xml:832
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1635,13 +1752,13 @@ msgstr ""
 "доступным PLIP драйвера для программы установки."
 
 #. Tag: guimenuitem
-#: random-bits.xml:760
+#: random-bits.xml:840
 #, no-c-format
 msgid "Detect network hardware"
 msgstr "Определение сетевой карты"
 
 #. Tag: para
-#: random-bits.xml:765
+#: random-bits.xml:845
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1656,7 +1773,7 @@ msgstr ""
 "установки не покажет этого списка."
 
 #. Tag: para
-#: random-bits.xml:774
+#: random-bits.xml:854
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1668,33 +1785,36 @@ msgstr ""
 "<userinput>plip</userinput>."
 
 #. Tag: guimenuitem
-#: random-bits.xml:786
+#: random-bits.xml:866
 #, no-c-format
 msgid "Configure the network"
 msgstr "Настройка сети"
 
 #. Tag: para
-#: random-bits.xml:789
+#: random-bits.xml:869
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr "Настроить сеть автоматически с помощью DHCP: нет"
 
 #. Tag: para
-#: random-bits.xml:794
+#: random-bits.xml:874
 #, no-c-format
-msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr "IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgid ""
+"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgstr ""
+"IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:799
+#: random-bits.xml:879
 #, no-c-format
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
 "userinput>"
-msgstr "Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
+msgstr ""
+"Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:805
+#: random-bits.xml:885
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
@@ -1703,3 +1823,18 @@ msgstr ""
 "Адреса DNS-серверов: можно указать те же адреса что и для источника "
 "(смотрите <filename>/etc/resolv.conf</filename>)"
 
+#~ msgid ""
+#~ "Now you've got a real Debian system, though rather lean, on disk. "
+#~ "<command>Chroot</command> into it:"
+#~ msgstr ""
+#~ "Теперь у вас на диске есть настоящая, пусть и слабенькая, система Debian. "
+#~ "Выполните <command>Chroot</command> в неё:"
+
+#~ msgid "# LANG= chroot /mnt/debinst /bin/bash"
+#~ msgstr "# LANG= chroot /mnt/debinst /bin/bash"
+
+#~ msgid "To configure your keyboard:"
+#~ msgstr "Для настройки клавиатуры введите:"
+
+#~ msgid "Configure Locales"
+#~ msgstr "Настройка локалей"
