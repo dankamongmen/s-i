@@ -11,8 +11,12 @@
 #ifdef WITH_FTP
 #include "mirrors_ftp.h"
 #endif
+
 #if ! defined (WITH_HTTP) && ! defined (WITH_FTP)
 #error Must compile with at least one of FTP or HTTP
+#endif
+#if defined (WITH_FTP) && defined (WITH_FTP_MANUAL)
+#error Only one of WITH_FTP and WITH_FTP_MANUAL can be defined
 #endif
 
 static struct debconfclient *debconf;
@@ -95,7 +99,7 @@ static char **mirrors_in(char *country) {
 	return ret;
 }
 
-/* returns true if there is a mirror in the specificed country */
+/* returns true if there is a mirror in the specified country */
 static inline int has_mirror(char *country) {
 	char **mirrors;
 	if (strcmp(country, MANUAL_ENTRY) == 0)
@@ -217,6 +221,12 @@ static int choose_country(void) {
 		free(country);
 	country = NULL;
 
+#if defined (WITH_FTP_MANUAL)
+	assert(protocol != NULL);
+	if (strcasecmp(protocol,"ftp") == 0)
+		return 0;
+#endif
+
 	debconf_get(debconf, DEBCONF_BASE "country");
 	if (! strlen(debconf->value)) {
 		/* Not set yet. Seed with a default value. */
@@ -250,6 +260,13 @@ static int choose_country(void) {
 
 static int set_country(void) {
 	char *countries;
+
+#if defined (WITH_FTP_MANUAL)
+	assert(protocol != NULL);
+	if (strcasecmp(protocol,"ftp") == 0)
+		return 0;
+#endif
+
 	countries = add_protocol("countries");
 	debconf_get(debconf, countries);
 	country = strdup(debconf->value);
@@ -260,7 +277,7 @@ static int set_country(void) {
 }
 
 static int choose_protocol(void) {
-#if defined (WITH_HTTP) && defined (WITH_FTP)
+#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
 	/* Both are supported, so ask. */
 	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
 	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
@@ -269,7 +286,7 @@ static int choose_protocol(void) {
 }
 
 static int get_protocol(void) {
-#if defined (WITH_HTTP) && defined (WITH_FTP)
+#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
 	debconf_get(debconf, DEBCONF_BASE "protocol");
 	protocol = strdup(debconf->value);
 #else
@@ -300,7 +317,15 @@ static int choose_mirror(void) {
 	char *list;
 
 	debconf_get(debconf, DEBCONF_BASE "country");
+#ifndef WITH_FTP_MANUAL
 	manual_entry = ! strcmp(debconf->value, MANUAL_ENTRY);
+#else
+	if (! strcasecmp(protocol,"ftp") == 0)
+		manual_entry = ! strcmp(debconf->value, MANUAL_ENTRY);
+	else
+		manual_entry = 1;
+#endif
+
 	if (! manual_entry) {
 		char *mir = add_protocol("mirror");
 

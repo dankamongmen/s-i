@@ -1,5 +1,6 @@
 USE_HTTP=1
 #USE_FTP=1
+USE_FTP_MANUAL=1
 
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
@@ -12,7 +13,12 @@ templates:=$(templates) debian/choose-mirror-bin.templates.http-in
 endif
 ifeq (1,${USE_FTP})
 CFLAGS:=$(CFLAGS) -DWITH_FTP
-templates:=$(templates) debian/choose-mirror-bin.templates.ftp-in
+templates:=$(templates) debian/choose-mirror-bin.templates.ftp.base-in
+templates:=$(templates) debian/choose-mirror-bin.templates.ftp.sel-in
+endif
+ifeq (1,${USE_FTP_MANUAL})
+CFLAGS:=$(CFLAGS) -DWITH_FTP_MANUAL
+templates:=$(templates) debian/choose-mirror-bin.templates.ftp.base-in
 endif
 templates:=$(templates) debian/choose-mirror-bin.templates.both-in
 
