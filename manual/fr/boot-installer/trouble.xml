@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43514 -->
+<!-- original version: 43638 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Dysfonctionnements pendant la procédure d'installation</title>
@@ -350,6 +350,53 @@ démarrage, ce qui empêchera le chargement de ces modules.
 </sect3>
 </sect2>
 
+ <sect2 arch="sparc" id="sparc-boot-problems">
+  <title>Problèmes communs sur &arch-title;</title>
+<para>
+
+Certains problèmes communs lors de l'installation méritent une mention.
+</para>
+   <sect3>
+   <title>Sortie video mal dirigée</title>
+<para>
+
+Il est très courant qu'une machine possède deux cartes vidéo, par exemple une carte
+ATI et une carte Sun Creator 3D. Dès lors, après le démarrage du système, il se peut
+que la sortie vidéo soit mal dirigée. Si c'est le cas, l'affichage est&nbsp;:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+Pour contourner ce problème, vous pouvez soit retirer l'une des cartes soit
+désactiver celle qui n'est pas utilisée pendant la phase d'amorçage de l'OpenProm
+avec un paramètre du noyau. Par exemple, pour désactiver une carte ATI, amorcez
+l'installateur avec le paramètre <userinput>video=atyfb:off</userinput>.
+</para><para>
+
+Notez que vous aurez à ajouter ce paramètre au fichier de configuration de silo
+(modifiez <filename>/target/etc/silo.conf</filename> avant le  redémarrage).
+Si vous installez X11, vous devez modifier aussi le pilote vidéo dans
+<filename>/etc/X11/xorg.conf</filename>.
+</para>
+</sect3>
+
+   <sect3>
+   <title>Failure to Boot or Kernel from CD-ROM</title>
+<para>
+
+Il est connu que certains systèmes Sparc s'amorcent difficilement par
+cédérom et, même si l'amorçage réussit, l'installation échoue parfois inexplicablement.
+La plupart des problèmes ont été signalés sur des systèmes SunBlade.
+</para>
+<para>
+Pour de tels systèmes, nous recommandons d'amorcer l'installateur par le réseau.
+</para>
+</sect3>
+</sect2>
+
+
   <sect2 id="kernel-msgs">
   <title>Comprendre les messages du noyau au démarrage</title>
 
@@ -416,9 +463,9 @@ liste de diffusion publique. Votre adresse de courrier sera aussi rendue publiqu
 <para>
 
 Si vous êtes sur un système Debian, vous pouvez installer les paquets
-installation-report et reportbug 
-(<command>apt-get install installation-report reportbug</command>) et exécuter la
-commande <command>reportbug installation-report</command>.
+<classname>installation-report</classname> et <classname>reportbug</classname> 
+(<command>aptitude install installation-report reportbug</command>).
+Puis exécutez la commande <command>reportbug installation-report</command>.
 
 </para>
 <para>

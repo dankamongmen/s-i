@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43573 -->
+<!-- original version: 43637 -->
 
    <sect3 id="partman"><title>Partitionner les disques</title>
 <para>
@@ -8,7 +8,24 @@ Il est temps maintenant de partitionner les disques. Si le partitionnement
 vous inquiète ou si vous voulez des précisions supplémentaires, voyez
 l'<xref linkend="partitioning"/>.
 
-</para><para>
+</para>
+
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
+Quand un disque a déjà été utilisé sous Solaris, le programme de
+partitionnement peut ne pas détecter correctement la taille du disque.
+Le problème n'est pas réglé par la création d'une nouvelle table des partitions.
+Il faut modifier les premiers secteurs du disque de cette façon&nbsp;:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Notez que cela rendra inacessibles les données de ce disque.
+</para></warning>
+
+
+<para>
 
 Dans un premier temps, vous aurez la possibilité de partitionner un disque
 entier ou une partie de disque, de façon automatique. 
