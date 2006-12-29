@@ -196,4 +196,51 @@ a Windows driver.</phrase>
 
 </para>
   </sect2>
+
+  <sect2 arch="sparc" id="nics-sparc-trouble">
+  <title>Known Issues for &arch-title;</title>
+<para>
+
+There are a couple of issues with specific network cards that are worth
+mentioning here.
+
+</para>
+
+   <sect3><title>Conflict between tulip and dfme drivers</title>
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+<para>
+
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+There are various PCI network cards that have the same PCI identification,
+but are supported by related, but different drivers. Some cards work with
+the <literal>tulip</literal> driver, others with the <literal>dfme</literal>
+driver. Because they have the same identification, the kernel cannot
+distinguish between them and it is not certain which driver will be loaded.
+If this happens to be the wrong one, the NIC may not work, or work badly.
+
+</para><para>
+
+This is a common problem on Netra systems with a Davicom (DEC-Tulip
+compatible) NIC. In that case the <literal>tulip</literal> driver is
+probably the correct one.
+
+During the installation the solution is to switch to a shell and unload the
+wrong driver module using
+<userinput>modprobe -r <replaceable>module</replaceable></userinput> (or
+both, if they are both loaded). After that you can load the correct module
+using <userinput>modprobe <replaceable>module</replaceable></userinput>.
+
+</para>
+   </sect3>
+
+   <sect3><title>Sun B100 blade</title>
+<!-- BTS: #384549; should be checked for kernels >2.6.18 -->
+<para>
+
+The <literal>cassini</literal> network driver does not work with Sun B100
+blade systems.
+
+</para>
+   </sect3>
+  </sect2>
  </sect1>

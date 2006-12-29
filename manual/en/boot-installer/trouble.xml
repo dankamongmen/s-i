@@ -368,7 +368,7 @@ installer.
    </sect3>
 
    <sect3>
-   <title>System Freeze while Loading the USB Modules</title>
+   <title>System Freeze while Loading USB Modules</title>
 <para>
 
 The kernel normally tries to install USB modules and the USB keyboard driver
@@ -377,6 +377,58 @@ broken USB systems where the driver hangs on loading. A possible workaround
 may be disabling the USB controller in your mainboard BIOS setup. Another option
 is passing the <userinput>debian-installer/probe/usb=false</userinput> parameter
 at the boot prompt, which will prevent the modules from being loaded.
+
+</para>
+   </sect3>
+  </sect2>
+
+  <sect2 arch="sparc" id="sparc-boot-problems">
+  <title>Common &arch-title; Installation Problems</title>
+<para>
+
+There are some common installation problems that are worth mentioning.
+
+</para>
+   <sect3>
+   <title>Misdirected video output</title>
+<para>
+
+It is fairly common for &arch-title; to have two video cards in one machine,
+for example an ATI card and a Sun Creator 3D. In some cases, this may result
+in the video output getting misdirected soon after the system boots. In
+typical cases, the display will only show:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+To work around this, you can either pull out one of the video cards, or
+disable the one not used during the OpenProm boot phase using a kernel
+parameter. For example, to disable an ATI card, you should boot the
+installer with <userinput>video=atyfb:off</userinput>.
+
+</para><para>
+
+Note that you may also have to manually add this parameter to the silo
+configuration (edit <filename>/target/etc/silo.conf</filename> before
+rebooting) and, if you installed X11, modify the video driver in
+<filename>/etc/X11/xorg.conf</filename>.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Failure to Boot or Kernel from CD-ROM</title>
+<para>
+
+Some Sparc systems are notoriously difficult to boot from CD-ROM and
+even if they do boot, there may be inexplicable failures during the
+installation. Most problems have been reported with SunBlade systems.
+
+</para><para>
+
+We recommend to install such systems by netbooting the installer.
 
 </para>
    </sect3>

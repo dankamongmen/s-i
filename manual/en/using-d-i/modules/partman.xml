@@ -10,7 +10,23 @@ Now it is time to partition your disks. If you are uncomfortable with
 partitioning, or just want to know more details, see <xref
 linkend="partitioning"/>.
 
-</para><para>
+</para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
+
+If a hard disk has previously used under Solaris, the partitioner may not
+detect the size of the drive correctly. Creating a new partition table
+does not fix this issue. What does help, is to <quote>zero</quote> the
+first few sectors of the drive:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Note that this will make any existing data on that disk inaccessible.
+
+</para></warning>
+<para>
 
 First you will be given the opportunity to automatically partition
 either an entire drive, or available free space on a drive. This is
