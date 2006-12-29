@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Dateien vorbereiten für TFTP-Netzwerk-Boot</title>
@@ -15,26 +15,26 @@ konfiguriert werden.
 </para><para>
 
 Sie müssen einen TFTP-Server einrichten und in vielen Fällen auch
-einen BOOTP-Server<phrase
-condition="supports-rarp"> oder einen RARP-Server</phrase><phrase
-condition="supports-dhcp"> oder einen DHCP-Server</phrase>.
+einen DHCP-Server<phrase condition="supports-rarp"> oder einen
+RARP-Server</phrase><phrase condition="supports-bootp"> oder einen
+BOOTP-Server</phrase>.
 
 </para><para>
 
 <phrase condition="supports-rarp">Das Reverse-Address-Resolution-Protocol (RARP)
 ist eine Möglichkeit, dem Client mitzuteilen, welche IP-Adresse er selbst
-verwenden soll. Ein anderer Weg wäre, das BOOTP-Protokoll zu verwenden. </phrase>
+verwenden soll. Ein anderer Weg wäre, das BOOTP-Protokoll zu verwenden.</phrase>
 
 <phrase condition="supports-bootp">BOOTP ist ein IP-Protokoll, das einem
 Computer seine IP-Adresse mitteilt und wo er im Netzwerk ein Boot-Image
-findet. </phrase>
+findet.</phrase>
 
 <phrase arch="m68k">Auf VMEbus-Systemen existiert noch eine andere Möglichkeit:
-die IP-Adresse kann manuell im Boot-ROM eingestellt werden. </phrase>
+die IP-Adresse kann manuell im Boot-ROM eingestellt werden.</phrase>
 
-<phrase condition="supports-dhcp">Das Dynamic-Host-Configuration-Protocol
-(DHCP) ist eine flexiblere, rückwärts-kompatible Erweiterung von BOOTP.
-Einige Systeme können nur per DHCP konfiguriert werden. </phrase>
+Das Dynamic-Host-Configuration-Protocol (DHCP) ist eine flexiblere,
+rückwärts-kompatible Erweiterung von BOOTP. Einige Systeme können nur per
+DHCP konfiguriert werden.
 
 </para><para arch="powerpc">
 
@@ -104,23 +104,43 @@ wie der folgenden in <filename>/etc/inetd.conf</filename> erreichen:
 tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 </screen></informalexample>
 
-Die Debian-Pakete richten dies generell standardmäßig korrekt ein, wenn sie installiert werden.
+Die Debian-Pakete richten dies generell standardmäßig korrekt ein, wenn sie
+installiert werden.
 
-</para><para>
+</para>
+<note><para>
 
-Schauen Sie sich die Datei an und merken Sie sich das Verzeichnis, das
-als Argument hinter <command>in.tftpd</command> eingetragen ist; Sie
-werden es später benötigen. Das Argument <userinput>-l</userinput>
-aktiviert bei einigen Versionen von <command>in.tftpd</command> das
-Logging, so dass alle Anfragen im Systemlog protokolliert werden;
-dies ist nützlich für die Fehlersuche bei Bootproblemen.
-Wenn Sie <filename>/etc/inetd.conf</filename> ändern mussten,
-ist es nötig, dem laufenden <command>inetd</command>-Prozess
-mitzuteilen, dass sich die Konfigurationsdatei geändert hat.
-Auf einem Debian-Rechner erledigen Sie das mit
-<userinput>/etc/init.d/inetd reload</userinput>; auf anderen Maschinen
-müssen Sie die Prozess-ID von <command>inetd</command> herausfinden
-und <userinput>kill -HUP <replaceable>Prozess-ID</replaceable></userinput>
+Früher haben TFTP-Server das Verzeichnis <filename>/tftpboot</filename>
+genutzt, um Images bereitzustellen. Allerdings verwenden Server aus
+&debian;-Paketen unter Umständen andere Verzeichnisse, um den
+<ulink url="&url-fhs-home;">Filesystem Hierarchy Standard</ulink>
+(Festlegungen, an welcher Stelle im Dateisystem bestimmte Daten abgespeichert
+werden sollten) zu erfüllen. Zum Beispiel nutzt <classname>tftpd-hpa</classname>
+standardmäßig <filename>/var/lib/tftpboot</filename>. Sie müssen also
+eventuell die Konfigurationsbeispiele aus diesem Kapitel entsprechend an
+Ihre Situation anpassen.
+
+</para></note>
+<para>
+
+Schauen Sie sich die Datei <filename>/etc/inetd.conf</filename> an und merken
+Sie sich das Verzeichnis, das als Argument hinter <command>in.tftpd</command>
+eingetragen ist<footnote>
+
+<para>
+Das Argument <userinput>-l</userinput> aktiviert bei einigen Versionen von
+<command>in.tftpd</command> die Log-Funktion, so dass Aufzeichnungen über alle
+Anfragen im System-Log protokolliert werden; dies könnte zur Fehlersuche bei
+Bootproblemen nützlich sein.
+</para>
+
+</footnote>; Sie werden es später benötigen.
+Wenn Sie <filename>/etc/inetd.conf</filename> ändern mussten, ist es nötig,
+dem laufenden <command>inetd</command>-Prozess mitzuteilen, dass sich die
+Konfigurationsdatei geändert hat. Auf einem Debian-Rechner erledigen Sie das
+mit <userinput>/etc/init.d/inetd reload</userinput>; auf anderen Maschinen
+müssen Sie die Prozess-ID von <command>inetd</command> herausfinden und
+<userinput>kill -HUP <replaceable>Prozess-ID</replaceable></userinput>
 ausführen.
 
 </para><para arch="mips">
@@ -133,19 +153,19 @@ Server Folgendes ausführen
 # echo 1 &gt; /proc/sys/net/ipv4/ip_no_pmtu_disc
 </screen></informalexample>
 
-um <quote>Path MTU discovery</quote> auszuschalten, andernfalls kann der PROM des SGI
-den Kernel nicht herunterladen. Außerdem müssen Sie sicherstellen, dass
+um <quote>Path MTU discovery</quote> auszuschalten, andernfalls kann der PROM
+des SGI den Kernel nicht herunterladen. Außerdem müssen Sie sicherstellen, dass
 TFTP-Pakete von einem Quellport nicht größer als 32767 verschickt werden,
-sonst wird der Download nach dem ersten Paket stoppen. Es ist wieder
-der Linux-Kernel 2.4.x, der diesen Fehler im PROM auslöst, aber Sie können
-dies vermeiden, indem Sie
+sonst wird der Download nach dem ersten Paket stoppen. Es ist wieder der
+Linux-Kernel 2.4.x, der diesen Fehler im PROM auslöst, aber Sie können dies
+vermeiden, indem Sie
 
 <informalexample><screen>
 # echo "2048 32767" &gt; /proc/sys/net/ipv4/ip_local_port_range
 </screen></informalexample>
 
-ausführen; dies stellt den Bereich der Quellports ein, den der Linux-TFTP-Server
-benutzt.
+ausführen; dies stellt den Bereich der Quellports ein, den der
+Linux-TFTP-Server benutzt.
 
 </para>
   </sect2>
@@ -154,14 +174,13 @@ benutzt.
   <title>Die TFTP-Images an ihren Platz befördern</title>
 <para>
 
-Als nächstes legen Sie die TFTP-Bootimages, die Sie benötigen
-und die Sie wie in <xref linkend="where-files"/> beschrieben
-finden können, im <command>tftpd</command>-Bootimage-Verzeichnis
-ab. Meistens wird dies <filename>/tftpboot</filename> sein.
-Sie müssen einen Link von diesem Image auf die Datei anlegen,
-die <command>tftpd</command> benutzt, um einen speziellen Client
-zu booten. Bedauerlicherweise hängt der Name dieser Datei von dem
-TFTP-Client ab und es gibt dabei keine festen Standards.
+Als nächstes legen Sie die TFTP-Bootimages, die Sie benötigen und die Sie
+wie in <xref linkend="where-files"/> beschrieben finden können, im
+<command>tftpd</command>-Bootimage-Verzeichnis ab. Sie müssen unter Umständen
+einen Link von diesem Image auf die Datei anlegen, die
+<command>tftpd</command> benutzt, um einen speziellen Client zu booten.
+Bedauerlicherweise hängt der Name dieser Datei von dem TFTP-Client ab und es
+gibt dabei keine festen Standards.
 
 </para><para arch="powerpc">
 
@@ -174,11 +193,11 @@ um.
 
 </para><para arch="x86">
 
-Um per PXE zu booten, müssen Sie nur den
-<filename>netboot/netboot.tar.gz</filename>-Tarball einrichten.
+Alles was Sie benötigen, um per PXE zu booten, ist bereits in dem
+<filename>netboot/netboot.tar.gz</filename>-Tarball eingerichtet.
 Entpacken Sie den Tarball einfach in das
 <command>tftpd</command>-Bootimage-Verzeichnis. Stellen Sie sicher, dass
-der DHCP-Server konfiguriert ist, <filename>/pxelinux.0</filename> als
+der DHCP-Server konfiguriert ist, <filename>pxelinux.0</filename> als
 zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
 
 </para><para arch="ia64">

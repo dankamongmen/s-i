@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43573 -->
+<!-- original version: 43637 -->
 
    <sect3 id="partman">
    <title>Partitionieren Ihrer Festplatten (partman)</title>
@@ -10,7 +10,24 @@ Nun ist es Zeit, Ihre Festplatten zu partitionieren. Wenn Sie sich mit
 Partitionierung nicht auskennen oder einfach mehr Details wissen
 möchten, lesen Sie <xref linkend="partitioning"/>.
 
-</para><para>
+</para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
+
+Wenn eine Festplatte früher bereits unter Solaris genutzt wurde, könnte es sein,
+dass der Partitionierer die Größe der Platte nicht korrekt erkennt. Auch das
+Erzeugen einer neuen Partitionstabelle löst dieses Problem nicht. Was aber hilft
+ist, die ersten paar Sektoren der Festplatte mit Nullen zu überschreiben:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Beachten Sie, dass Sie durch diese Aktion auf alle vorhandenen Daten auf der
+Platte nicht mehr zugreifen können!
+
+</para></warning>
+<para>
 
 Zuerst wird Ihnen die Auswahl geboten, automatisch entweder eine gesamte Platte
 zu partitionieren oder nur den freien Speicherplatz auf einer Platte, falls

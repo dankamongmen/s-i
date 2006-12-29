@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41453 -->
+<!-- original version: 43576 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian; von einem anderen Unix/Linux-System aus installieren</title>
@@ -21,11 +21,12 @@ Kommando im Debian-chroot ausgeführt wird.
 </para><para>
 
 Sobald Sie das neue Debian-System nach Ihren Wünschen konfiguriert haben,
-können Sie Ihre evtl. vorhandenen eigenen Dateien hinüber verschieben und loslegen.
-Deswegen wird dies auch die <quote>zero-downtime</quote>-&debian;-Installation (Installation
-ohne eine Zeitspanne, während der das System nicht verfügbar ist) genannt. Es ist
-ebenso ein geschickter Weg, mit Hardwarekomponenten zurechtzukommen, die sich
-sonst nicht gut mit verschiedenen Boot- oder Installationsmedien vertragen.
+können Sie Ihre evtl. vorhandenen eigenen Dateien hinüber verschieben und
+loslegen. Deswegen wird dies auch die
+<quote>zero-downtime</quote>-&debian;-Installation (Installation ohne eine
+Zeitspanne, während der das System nicht verfügbar ist) genannt. Es ist ebenso
+ein geschickter Weg, mit Hardwarekomponenten zurechtzukommen, die sich sonst
+nicht gut mit verschiedenen Boot- oder Installationsmedien vertragen.
 
 </para>
 
@@ -33,21 +34,22 @@ sonst nicht gut mit verschiedenen Boot- oder Installationsmedien vertragen.
   <title>Es geht los!</title>
 <para>
 
-Benutzen Sie die *nix-Partitionierungsprogramme des vorhandenen
-Systems, um Ihre Festplatte nach Bedarf neu zu partitionieren;
-erstellen Sie zumindest ein neues Dateisystem plus Swap. Sie benötigen
-mindestens 150MB Speicher für eine Nur-Konsolen-Installation oder
-ein Minimum von 300MB, wenn Sie vorhaben, X zu installieren.
+Benutzen Sie die *nix-Partitionierungsprogramme des vorhandenen Systems, um
+Ihre Festplatte nach Bedarf neu zu partitionieren; erstellen Sie zumindest
+ein neues Dateisystem plus Swap. Sie benötigen ungefähr 350MB Speicher für
+eine Nur-Konsolen-Installation oder ca. 1GB, wenn Sie vorhaben, X zu
+installieren (und noch mehr, wenn Sie Desktop-Umgebungen wie GNOME oder KDE
+installieren möchten).
 
 </para><para>
 
-Dateisysteme auf Ihren Partitionen erzeugen:
-um ein Dateisystem auf einer Partition zu erstellen, zum Beispiel ein
-ext3-Dateisystem auf <filename>/dev/hda6</filename> (dies soll in diesem
-Beispiel unsere root-Partition sein):
+Dateisysteme auf Ihren Partitionen erzeugen: um ein Dateisystem auf einer
+Partition zu erstellen, zum Beispiel ein ext3-Dateisystem auf
+<filename>/dev/hda6</filename> (dies soll in diesem Beispiel unsere
+root-Partition sein):
 
 <informalexample><screen>
-# mke2fs -j /dev/hda6
+# mke2fs -j /dev/<replaceable>hda6</replaceable>
 </screen></informalexample>
 
 Um stattdessen ein ext2-Dateisystem zu erzeugen, lassen Sie das
@@ -59,9 +61,9 @@ Initialisieren und aktivieren Sie den Swap (passen Sie die Partitionsnummer
 für Ihre geplante Debian-Swap-Partition an):
 
 <informalexample><screen>
-# mkswap /dev/hda5
+# mkswap /dev/<replaceable>hda5</replaceable>
 # sync; sync; sync
-# swapon /dev/hda5
+# swapon /dev/<replaceable>hda5</replaceable>
 </screen></informalexample>
 
 Hängen Sie eine Partition (wahrscheinlich die neue) als <filename>/mnt/debinst</filename> ins
@@ -72,7 +74,7 @@ gewählt; es wird später noch öfter darauf verwiesen.
 
 <informalexample><screen>
 # mkdir /mnt/debinst
-# mount /dev/hda6 /mnt/debinst
+# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst
 </screen></informalexample>
 
 </para>
@@ -173,6 +175,7 @@ Setzen Sie in dem folgenden <command>debootstrap</command>-Befehl für
 ein:
 
 <userinput>alpha</userinput>, 
+<userinput>amd64</userinput>,
 <userinput>arm</userinput>,
 <userinput>hppa</userinput>, 
 <userinput>i386</userinput>, 
@@ -186,7 +189,7 @@ ein:
 
 <informalexample><screen>
 # /usr/sbin/debootstrap --arch ARCH &releasename; \
-    /mnt/debinst http://http.us.debian.org/debian
+    /mnt/debinst http://ftp.us.debian.org/debian
 </screen></informalexample>
 
 </para>
@@ -197,11 +200,19 @@ ein:
 <para>
 
 Sie haben jetzt ein echtes, aber noch etwas mageres Debian-System auf
-der Festplatte. Wechseln Sie mit <command>Chroot</command> hinein:
+der Festplatte. Wechseln Sie mit <command>chroot</command> hinein:
 
 <informalexample><screen>
-# LANG= chroot /mnt/debinst /bin/bash
+# LANG=C chroot /mnt/debinst /bin/bash
 </screen></informalexample>
+
+Danach müssen Sie unter Umständen die Definition der Terminal-Variable
+anpassen, so dass sie mit dem Debian-Basissystem kompatibel ist, zum Beispiel:
+
+<informalexample><screen>
+# export TERM=<replaceable>xterm-color</replaceable>
+</screen></informalexample>
+
 </para>
 
    <sect3>
@@ -226,8 +237,8 @@ Hier ein Beispiel, das Sie sich anpassen können:
 /dev/XXX         none          swap    sw                       0     0
 proc             /proc         proc    defaults                 0     0
 
-/dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0     0
-/dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0     0
+/dev/fd0         /media/floppy auto    noauto,rw,sync,user,exec 0     0
+/dev/cdrom       /media/cdrom  iso9660 noauto,ro,user,exec      0     0
 
 /dev/XXX         /tmp          ext3    rw,nosuid,nodev          0     2
 /dev/XXX         /var          ext3    rw,nosuid,nodev          0     2
@@ -241,6 +252,19 @@ die Dateisysteme einzeln einzubinden, benutzen Sie:
 
 <informalexample><screen>
 # mount /path   # z.B.: mount /usr
+</screen></informalexample>
+
+Aktuelle Debian-Systeme haben Einhängepunkte (Mountpoints) für
+Wechseldatenträger in <filename>/media</filename>, behalten aber aus
+Kompatibilitätsgründen auch symbolische Links in <filename>/</filename>.
+Erstellen Sie diese nach Bedarf, zum Beispiel mit:
+
+<informalexample><screen>
+# cd /media
+# mkdir cdrom0
+# ln -s cdrom0 cdrom
+# cd /
+# ln -s media/cdrom
 </screen></informalexample>
 
 Sie können das proc-Dateisystem mehrfach einbinden und in frei wählbare
@@ -266,13 +290,17 @@ außerhalb der chroot-Umgebung einbinden:
    </sect3>
 
    <sect3>
-   <title>Die Tastatur konfigurieren</title>
+   <title>Die Zeitzone setzen</title>
 <para>
 
-Um Ihre Tastatur zu konfigurieren, verwenden Sie:
+Eine Option in der Datei <filename>/etc/default/rcS</filename> legt fest, ob
+das System die Hardware-CMOS-Uhr als UTC-Zeit oder als lokale Zeit
+interpretiert. Mit dem folgenden Befehl können Sie diese Option setzen sowie
+Ihre Zeitzone festlegen:
 
 <informalexample><screen>
-# dpkg-reconfigure console-data
+# editor /etc/default/rcS
+# tzconfig
 </screen></informalexample>
 
 </para>
@@ -345,6 +373,21 @@ Geben Sie den Hostnamen Ihres Systems ein (zwischen 2 und 63 Stellen lang):
 # echo DebianHostName &gt; /etc/hostname
 </screen></informalexample>
 
+Und hier ein Beispiel für <filename>/etc/hosts</filename> mit
+IPv6-Unterstützung:
+
+<informalexample><screen>
+127.0.0.1 localhost DebianHostName
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+</screen></informalexample>
+
 Wenn Sie mehrere Netzwerkkarten haben, sollten Sie die Namen der
 Treibermodule in <filename>/etc/modules</filename> in die richtige
 Reihenfolge bringen. Während des Bootens wird dann jede Karte die
@@ -354,23 +397,52 @@ Schnittstellenbezeichnung (eth0, eth1, etc.) bekommen, die Sie erwarten.
    </sect3>
 
    <sect3>
+   <title>Configure Apt</title>
+
+<para>
+
+Debootstrap hat eine grundsätzliche <filename>/etc/apt/sources.list</filename>
+erstellt, die es erlaubt, zusätzliche Pakete zu installieren. Allerdings
+möchten Sie vielleicht einige Quellen hinzufügen, z.B. für Quellpakete oder
+für Sicherheits-Updates:
+
+<informalexample><screen>
+deb-src http://ftp.us.debian.org/debian etch main
+
+deb http://security.debian.org/ etch/updates main
+deb-src http://security.debian.org/ etch/updates main
+</screen></informalexample>
+
+Denken Sie daran, <userinput>aptitude update</userinput> auszuführen, nachdem
+Sie Änderungen in der sources.list-Datei gemacht haben.
+
+</para>
+   </sect3>
+
+   <sect3>
    <title>Die lokalen Einstellungen (locales) konfigurieren</title>
 <para>
 
 Um Ihre lokalen Einstellungen anzupassen, wenn Sie nicht Englisch
-verwenden möchten, installieren Sie das Paket
-<classname>locales</classname> und konfigurieren es:
+verwenden möchten, installieren Sie das Paket <classname>locales</classname>
+und konfigurieren es. Es wird die Verwendung von UTF-8-Locales empfohlen.
 
 <informalexample><screen>
 # aptitude install locales
 # dpkg-reconfigure locales
 </screen></informalexample>
 
-BEACHTEN SIE: <classname>apt</classname> muss zuvor eingerichtet werden,
-indem die Datei sources.list erstellt wird und <command>aptitude update</command>
-ausgeführt wird. Bevor Sie locales mit
-anderen Zeichensätzen als ASCII oder latin1 verwenden, lesen Sie das
-dazugehörige <quote>Localization</quote>-HowTo.
+Um Ihre Tastatur zu konfigurieren (falls nötig):
+ 
+<informalexample><screen>
+# aptitude install console-data
+# dpkg-reconfigure console-data
+</screen></informalexample>
+
+</para><para>
+
+Beachten Sie, dass die Tastatureinstellung nicht verändert werden kann, während
+Sie im chroot sind; die Konfiguration wird jedoch beim nächsten Neustart aktiv.
 
 </para>
    </sect3>
@@ -380,7 +452,7 @@ dazugehörige <quote>Localization</quote>-HowTo.
   <title>Einen Kernel installieren</title>
 <para>
 
-Wenn Sie vorhaben, dieses System zu booten, wollen Sie wahrscheinlich
+Wenn Sie vorhaben, dieses System zu booten, möchten Sie wahrscheinlich
 einen Linux-Kernel und einen Bootloader. Sie finden verfügbare, bereits
 fertig paketierte Kernel mit dem Befehl
 
@@ -395,6 +467,16 @@ Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
 </screen></informalexample>
 
 </para>
+<note><para>
+
+Die Konfigurationsdatei <filename>/etc/kernel-img.conf</filename> beeinflußt
+die Installation und Aktualisierung von vor-paketierten Debian-Kernels. Eine
+Standard-Version dieser Datei wird erstellt, wenn Sie zum ersten Mal ein
+Debian-Kernel-Image installieren. Zusätzliche Informationen zu dieser Datei
+finden Sie in der zugehörigen Handbuchseite (Manpage), die nach Installation
+des Paketes <classname>kernel-package</classname> verfügbar ist.
+
+</para></note>
   </sect2>
 
   <sect2>
@@ -411,21 +493,38 @@ dies zu erledigen.
 
 Lesen Sie <userinput>info grub</userinput> oder <userinput>man
 lilo.conf</userinput>, um Informationen über die Einrichtung des Bootloaders
-zu bekommen. Wenn Sie das Betriebssystem, das Sie zur Installation von Debian benutzt
-haben, behalten möchten, müssen Sie lediglich einen Eintrag zur vorhandenen
-grub-<filename>menu.lst</filename> oder zu <filename>lilo.conf</filename>
-hinzufügen. Die Datei <filename>lilo.conf</filename> können Sie auch auf Ihr
-neues Debian-System kopieren und dort bearbeiten. Rufen Sie danach <command>lilo</command> auf
+zu bekommen. Wenn Sie das Betriebssystem, das Sie zur Installation von Debian
+benutzt haben, behalten möchten, müssen Sie lediglich einen Eintrag zur
+vorhandenen grub-<filename>menu.lst</filename> oder zu
+<filename>lilo.conf</filename> hinzufügen. Die Datei
+<filename>lilo.conf</filename> können Sie auch auf Ihr neues Debian-System
+kopieren und dort bearbeiten. Rufen Sie danach <command>lilo</command> auf
 (bedenken Sie: lilo nutzt die <filename>lilo.conf</filename> relativ zum
 System, von dem aus Sie es aufrufen).
+
+</para><para arch="x86">
+
+Die Installation und Einrichtung von <classname>grub</classname> ist so
+einfach wie:
+
+<informalexample><screen>
+# aptitude install grub
+# grub-install /dev/<replaceable>hda</replaceable>
+# update-grub
+</screen></informalexample>
+
+Der zweite Befehl installiert <command>grub</command> (in diesem Fall in den
+Master Boot Record (MBR) von <literal>hda</literal>). Der letzte Befehl erzeugt
+eine schöne funktionierende Konfigurationsdatei
+<filename>/boot/grub/menu.lst</filename>.
 
 </para><para arch="x86">
 
 Hier ein grundsätzliches Beispiel einer <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
-boot=/dev/hda6
-root=/dev/hda6
+boot=/dev/<replaceable>hda6</replaceable>
+root=/dev/<replaceable>hda6</replaceable>
 install=menu
 delay=20
 lba32
@@ -462,6 +561,36 @@ label=Debian
 
 Auf einigen Maschinen müssen Sie unter Umständen <userinput>ide0:</userinput>
 benutzen statt <userinput>hd:</userinput>.
+
+</para>
+  </sect2>
+
+  <sect2>
+<title>Zum Schluß</title>
+<para>
+
+Wie bereits vorher erwähnt, wird das installierte System nur sehr
+minimalistisch ausgestattet sein. Wenn Sie möchten, dass das System ein
+bisschen ausgereifter wird, gibt es eine einfache Methode für Pakete mit
+<quote>Standard</quote>-Priorität:
+
+<informalexample><screen>
+# tasksel install standard
+</screen></informalexample>
+
+Sie können natürlich auch einfach <command>aptitude</command> benutzen,
+um individuell Pakete zu installieren.
+
+</para><para>
+
+Nach der Installation liegen viele heruntergeladene Pakete in dem
+Verzeichnis <filename>/var/cache/apt/archives/</filename>. Sie können
+etliches an Festplattenspeicher wieder frei machen, indem Sie folgendes
+ausführen:
+
+<informalexample><screen>
+# aptitude clean
+</screen></informalexample>
 
 </para>
   </sect2>
