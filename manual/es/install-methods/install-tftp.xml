@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 <!-- revisado por nahoo, 1 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 
@@ -15,16 +15,16 @@ en esa máquina, y debe configurarla para soportar el arranque desde ella.
 
 </para><para>
 
-Necesita configurar un servidor TFTP, y en caso de que tenga varias máquinas, un
-servidor BOOTP
+Necesita configurar un servidor TFTP, y, en caso de que tenga muchas máquinas, un
+servidor DHCP
 <phrase condition="supports-rarp">, o un servidor RARP</phrase>
-<phrase condition="supports-dhcp">, o un servidor DHCP</phrase>.
+<phrase condition="supports-bootp">, o un servidor BOOTP</phrase>.
 
 </para><para>
 
 <phrase condition="supports-rarp">El protocolo de resolución reversa de
 dirección (RARP) es una forma de decirle al cliente que dirección IP
-debe usar. Otra forma es usar el protocolo BOOTP. </phrase>
+debe usar. Otra forma es usar el protocolo BOOTP.</phrase>
 
 <phrase condition="supports-bootp">BOOTP es un protocolo IP que informa al
 ordenador de su dirección IP y desde dónde puede obtener una imagen de arranque
@@ -34,9 +34,10 @@ en la red.</phrase>
 Se puede configurar manualemnte la dirección IP en la ROM de arranque.
 </phrase>
 
-<phrase condition="supports-dhcp">El DHCP (Protocolo de configuración dinámica
-de sistema) es una extensión de BOOTP compatible con éste, pero más flexible.
-Algunos sistemas solamente se pueden configurar a través de DHCP. </phrase>
+DHCP («Dynamic Host Configuration Protocol», o protocolo de
+configuración dinámica de equipos) es una extensión de BOOTP
+compatible con éste, pero más flexible.  Algunos sistemas solamente se
+pueden configurar a través de DHCP.
 
 </para><para arch="powerpc">
 
@@ -110,19 +111,38 @@ tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 Cuando se instalan los paquetes de Debian, por lo general, lo configuran
 correctamente de forma predeterminada.
 
-</para><para>
+</para>
+<note><para>
 
-Busque en ese fichero y recuerde el directorio que usa como
-argumento de <command>in.tftpd</command>; lo necesitará mas
-adelante. El argumento <userinput>-l</userinput> hace que algunas
+Los servidores de TFTP utilizan <filename>/tftpboot</filename> como
+directorio del que servir las imágenes por motivos históricos. Sin
+embargo, algunos paquetes &debian; puede utilizar otros directorios
+para cumplir con el <ulink url="&url-fhs-home;">estándar de jerarquía
+de sistemas de ficheros</ulink>. Por ejemplo,
+<classname>tftpd-hpa</classname> utiliza, por omisión,
+<filename>/var/lib/tftpboot</filename>. Puede tener que ajustar los
+ejemplos de configuración en esta sección si la ubicación varía.
+
+</para></note>
+<para>
+
+Busque en el fichero <filename>/etc/inetd.conf</filename> y recuerde
+el directorio que usa como argumento de
+<command>in.tftpd</command></footnote>
+
+<para>
+El argumento <userinput>-l</userinput> hace que algunas
 versiones de <command>in.tftpd</command> registren todas las peticiones en los
-registros del sistema; es útil para diagnosticar fallos de arranque. Si
-ha tenido que cambiar <filename>/etc/inetd.conf</filename>, deberá
-notificar al proceso <command>inetd</command> en ejecución que el
-fichero ha cambiado. En un sistema Debian, ejecute
-<userinput>/etc/init.d/inetd reload</userinput>; en otros sistemas,
-busque el ID del proceso <command>inetd</command>, y ejecute
-<userinput>kill -HUP <replaceable>id-de-inetd</replaceable></userinput>.
+registros del sistemaes útil para diagnosticar fallos de arranque
+
+</para>
+</footnote>, lo necesitará más adelante. Si ha tenido que cambiar
+<filename>/etc/inetd.conf</filename>, deberá notificar al proceso
+<command>inetd</command> en ejecución que el fichero ha cambiado. En
+un sistema Debian, ejecute <userinput>/etc/init.d/inetd
+reload</userinput>; en otros sistemas, busque el ID del proceso
+<command>inetd</command>, y ejecute <userinput>kill -HUP
+<replaceable>id-de-inetd</replaceable></userinput>.
 
 </para><para arch="mips">
 
@@ -154,8 +174,7 @@ para ajustar el rango de puertos origen que usa el servidor TFTP.
 
 Seguidamente, ubique la imagen TFTP de arranque que necesita, como se
 describe en la <xref linkend="where-files"/>, en el directorio de
-imagen de arranque de <command>tftpd</command>. Generalmente, este
-directorio será <filename>/tftpboot</filename>. Tendrá que hacer un
+imagen de arranque de <command>tftpd</command>. Tendrá que hacer un
 enlace desde este fichero hacia el fichero que usará
 <command>tftpd</command> para arrancar un cliente en específico.
 Desafortunadamente, el nombre del fichero es determinado por el
@@ -177,7 +196,7 @@ Para arranque PXE, todo lo que necesitará es colocar el fichero tar
 <filename>netboot/netboot.tar.gz</filename>. Simplemente
 extraiga este fichero tar en el directorio de imágenes de arranque de
 <command>tftpd</command>. Asegúrese de que su servidor DHCP está configurado
-para pasar <filename>/pxelinux.0</filename> a <command>tftpd</command> como
+para pasar <filename>pxelinux.0</filename> a <command>tftpd</command> como
 el nombre del fichero a arrancar.
 
 </para><para arch="ia64">
