@@ -1,21 +1,57 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 16990 -->
+<!-- original version: 43603 untranslated -->
 
   <sect3 id="lowmem">
-  <title>Auf verfügbaren Arbeitsspeicher überprüfen (lowmem)</title>
+  <title>Verfügbaren Arbeitsspeicher prüfen / Low-Memory-Modus (lowmem)</title>
 
 <para>
 
 Einer der ersten Tests, die der &d-i; durchführt, ist zu überprüfen,
 wie viel Arbeitsspeicher zur Verfügung steht. Ist der verfügbare Speicher
 knapp, führt dieses Modul einige Änderungen am Installationsprozess durch,
-die Ihnen hoffentlich ermöglichen, &debian; auf Ihrem System zu installieren.
+die Ihnen hoffentlich ermöglichen, &debian; trotzdem auf Ihrem System zu
+installieren.
 
 </para><para>
 
-Während einer Installation mit wenig Arbeitsspeicher sind nicht alle Komponenten verfügbar.
-Eine Einschränkung ist zum Beispiel, dass Sie keine Sprache für die
-Installation auswählen können.
+The first measure taken to reduce memory consumption by the installer
+is to disable translations, which means that the installation can
+only be done in English. Of course, you can still localize the installed
+system after the installation has completed.
+
+</para><para>
+
+If that is not sufficient, the installer will further reduce memory
+consumption by loading only those components essential to complete a basic
+installation. This reduces the functionality of the installation system.
+You will be given the opportunity to load additional components manually,
+but you should be aware that each component you select will use
+additional memory and thus may cause the installation to fail.
+
+</para><para>
+
+If the installer runs in low memory mode, it is recommended to create
+a relatively large swap partition (64&ndash;128MB). The swap partition
+will be used as virtual memory and thus increases the amount of memory
+available to the system. The installer will activate the swap partition
+as early as possible in the installation process. Note that heavy use
+of swap will reduce performance of your system and may lead to high
+disk activity.
+
+</para><para>
+
+Despite these measures, it is still possible that your system freezes,
+that unexpected errors occur or that processes are killed by the kernel
+because the system runs out of memory (which will result in <quote>Out
+of memory</quote> messages on VT4 and in the syslog).
+
+</para><para>
+
+For example, it has been reported that creating a big ext3 file system
+fails in low memory mode when there is insufficient swap space. If a
+larger swap doesn't help, try creating the file system as ext2 (which
+is an essential component of the installer) instead. It is possible to
+change an ext2 partition to ext3 after the installation.
 
 </para>
    </sect3>
