@@ -1,93 +1,83 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 43528 -->
 
   <sect2 arch="sparc" id="sparc-cpus">
-<title>Microprocesseurs, cartes mère et cartes vidéo</title>
+<title>Microprocesseurs et cartes mère</title>
 
 <para>
-Pour le moment, le portage <emphasis>&architecture;</emphasis> reconnaît de
-nombreux types de systèmes Sparc. Les étiquettes habituelles
-pour ces systèmes sont sun4, sun4c, sun4m, sun4d and
-sun4u. Actuellement, le très vieux matériel sun4 n'est pas géré. Cependant, 
-les autres systèmes sont reconnus. Sun4d est le dernier à avoir été testé, 
-attendez-vous donc à des problèmes possibles concernant la stabilité du 
-noyau. Sun4c et Sun4m, le matériel déclassé le plus courant de chez Sun,
-comprennent SparcStation1, 1+, IPC, IPX, et SparcStation
-LX,5,10,20 respectivement. La gamme UltraSPARC fait partie de
-sun4u et utilise le jeu d'images d'installation sparc64. Certains
-systèmes qui portent ces étiquettes ne sont pas reconnus. Il
-s'agit, par exemple, du supercomputer AP1000 et du Tadpole
-Sparcbook 1. Voyez la <ulink url="&url-sparc-linux-faq;">FAQ Linux pour les 
-processeurs SPARC</ulink> pour des informations complètes.
+
+Le matériel Sparc comprend nombre de sous-architectures différentes, identifiées
+comme suit&nbsp;: sun4, sun4c, sun4d, sun4m, sun4u ou sun4v. La liste suivante
+indique les machines qui correspondent à ces architectures et dans quelle mesure
+elles sont gérées par Debian.
 </para>
 
-   <sect3>
-<title>Configuration de la mémoire</title>
+<variablelist>
+<varlistentry>
+<term>sun4, sun4c, sun4d</term>
+
+<listitem><para>
+
+Ces sous-architectures comprennent de très vieilles machines 32 bits qui ne
+sont plus du tout gérées. Pour une liste complète, consultez la
+<ulink url="http://en.wikipedia.org/wiki/SPARCstation"> page Wikipedia sur SPARC</ulink>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4m</term>
+
+<listitem><para>
+
+Sun4m est la seule sous-architecture 32 bits (sparc32) encore acceptée. 
+Les machines les plus populaires sont les Sparcstation 4, 5, 10 et 20.
+
+</para><para>
+
+Notez que le <emphasis>SMP, symmetric multiprocessing</emphasis> &mdash;
+la possibilité d'exécuter des processus sur plusieurs processeurs &mdash;
+n'est pas géré sur ce matériel, à cause de problèmes de stabilité avec de telles
+configurations. Le noyau sparc32 pour un seul processeur s'amorce bien sur
+les machines avec plusieurs processeurs mais il n'activera et n'utilisera que
+le premier processeur.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4u</term>
+
+<listitem><para>
+
+Cette architecture comprend toutes les machines 64 bits (sparc64) basées
+sur le processeur UltraSparc et ses clones. La plupart de ces machines sont
+bien gérées même si vous pouvez rencontrer des problèmes lors de l'amorçage
+à partir d'un cédérom à cause de bogues dans le firmware ou dans le programme
+d'amorçage (on peut contourner ce problème en amorçant sur le réseau).
+Utilisez les noyaux sparc64 ou sparc64-smp selon que la machine possède
+un ou plusieurs processeurs.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4v</term>
+
+<listitem><para>
+
+C'est la plus récente architecture de la famille Sparc. Elle comprend des
+machines basées sur les processeurs Niagara à plusieurs coeurs. Pour l'instant
+ces processeurs ne sont disponibles que sur les serveurs T1000 et T2000 de Sun.
+Ils sont correctement gérés. Utilisez le noyau sparc64-smp
+
+</para></listitem>
+</varlistentry>
+</variablelist>
 
 <para>
-Certains postes de travail de Sun, plus anciens, en
-particulier le Sun IPX et le Sun IPC, affectent un emplacement fixe
-dans la mémoire physique aux banques mémoire. Cela signifie que 
-si les banques mémoire ne sont pas remplies, il y aura des 
-«&nbsp;trous&nbsp;» dans l'espace mémoire physique. L'installation 
-de Linux nécessite un bloc de mémoire continu dans lequel puisse se
-charger le noyau et un ramdisk initial. Si ce n'est pas le
-cas une <quote>Data Access Exception</quote> se produira.
+
+Notez que les processeurs SPARC64 de Fujitsu utilisés dans la famille de serveurs
+PRIMEPOWER ne sont pas reconnus car ils ne sont pas gérés par le noyau Linux.
 </para>
-
-<para>
-Vous devez donc configurer la mémoire de telle sorte que le
-bloc de mémoire le plus bas soit continu sur au moins
-8&nbsp;Mo. Sur les IPX et IPC cités plus haut, les
-banques mémoire sont découpées en tranche de
-16&nbsp;Mo. Dans la pratique, cela signifie que vous devez
-avoir installé une SIMM suffisamment grande dans
-la banque 0 afin d'héberger le noyau et le ramdisk. Dans
-le cas qui nous occupe, 4&nbsp;Mo n'est <emphasis>pas</emphasis>
-suffisant.
-</para>
-
-<para>
-Exemple&nbsp;: dans un Sun IPX, vous avez une SIMM de 16&nbsp;Mo
-et une de 4&nbsp;Mo. Il y a quatre banques SIMM
-(0,1,2,3). [La banque 0 est la plus éloignée des
-connecteurs SBUS]. Il vous faudra donc installer la SIMM
-16&nbsp;Mo dans l'emplacement 0&nbsp;; il est recommandé
-d'installer la SIMM de 4&nbsp;Mo dans la banque 2.
-</para>
-
-   </sect3>
-
-   <sect3>
-<title>Configuration graphique</title>
-
-<para>
-Particulièrement dans le cas des anciens postes de
-travail Sun, il est courant de posséder sur la carte mère un
-tampon vidéo désuet (par exemple le bwtwo sur
-Sun IPC), et une carte SBUS qui contient un tampon plus récent, accéléré, a 
-été insérée dans un emplacement SBUS. Sous Solaris/SunOS, ce n'est pas un 
-problème car les deux cartes sont initialisées.
-</para>
-
-<para>
-Cependant, avec Linux, cela peut poser un problème, dans le
-sens où le moniteur bootprom peut afficher sa sortie sur la
-carte additionnelle&nbsp;; cependant, les messages de démarrage du
-noyau linux peuvent alors être redirigés vers le framebuffer
-original, <emphasis>sans</emphasis> afficher de messages d'erreur
-à l'écran, laissant croire que la machine
-est apparemment bloquée par le chargement du ramdisk.
-</para>
-
-<para>
-Pour éviter ce problème, connectez le moniteur (si
-nécessaire) à la carte vidéo se trouvant dans l'emplacement
-SBUS de numéro le plus bas (sur les cartes mères la carte a
-un numéro inférieur aux numéros des connecteurs
-externes). Alternativement, il est possible d'utiliser une
-console série.
-</para>
-
-   </sect3>
-  </sect2>
+</sect2>
