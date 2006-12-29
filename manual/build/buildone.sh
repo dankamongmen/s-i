@@ -72,7 +72,7 @@ create_profiled () {
     fi
 
     # Join all architecture options into one big variable
-    condition="$fdisk;$network;$boot;$smp;$other;$goodies;$unofficial_build;$status;$manual_release"
+    condition="$fdisk;$network;$boot;$smp;$frontend;$other;$goodies;$unofficial_build;$status;$manual_release"
     # Add language options
     condition="$condition;$optional_paras"
     # Add build options for the manual
