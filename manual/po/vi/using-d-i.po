@@ -7,7 +7,7 @@ msgid ""
 msgstr "Project-Id-Version: using-d-i\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2006-12-29 21:25+1030\n"
+"PO-Revision-Date: 2006-12-30 14:38+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1198,9 +1198,12 @@ msgid ""
 "sync\n"
 "</screen></informalexample> Note that this will make any existing data on "
 "that disk inaccessible."
-msgstr ""
+msgstr "Nếu đĩa cứng đã được dùng dưới hệ điều hành Solaris, trình phân vùng có thể không phát hiện đúng kích cỡ của ổ đĩa. Việc tạo một bảng phân vùng mới không quyết định vấn đề này. Việc quyết định là <quote>làm số không</quote> vài rãnh ghi đầu của ổ đĩa: <informalexample><screen>\n"
+"# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; "
+"sync\n"
+"</screen></informalexample> Ghi chú rằng việc này sẽ làm cho dữ liệu nào tồn tại trên cùng đĩa không còn có khả năng truy cấp lại."
 
-#. Tag: para
+#.Tag: para
 #: using-d-i.xml:797
 #, no-c-format
 msgid ""
@@ -1671,7 +1674,6 @@ msgstr "Thiết bị đa đĩa là cơ bản một bộ phân vùng nằm trên 
 "lắp v.v.)."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1085
 #, no-c-format
 msgid ""
@@ -1711,41 +1713,12 @@ msgid ""
 "redundancy. On the other hand, it might be a bit slower on write operations "
 "than RAID0 due to computation of parity information. </para></listitem> </"
 "varlistentry> </variablelist> To sum it up:"
-msgstr "Lợi ích được nhận phụ thuộc vào kiểu thiết bị đa đích bạn đang tạo. HIện "
-"thời có hỗ trợ : <variablelist> <varlistentry> <term>RAID0</"
-"term><listitem><para> được thiết kế chính cho hiệu suất tốt. RAID0 chia tách "
-"các dữ liệu được gởi đến ra <firstterm>lát</firstterm> rồi phát hành chúng "
-"một cách bằng nhau ra mỗi đĩa trong mảng đó. Cấu trúc này có thể tăng tốc độ "
-"của thao tác đọc/ghi, nhưng mà khi đĩa nào thất bại, bạn sẽ mất "
-"<emphasis>tất cả</emphasis> (phần thông tin vẫn còn nằm trên những đĩa hoạt "
-"động được, nhưng phần khác <emphasis>đã</emphasis> nằm trên đĩa đã thất "
-"bại). </para><para> Cách sử dụng điển hình RAID0 là một phân vùng riêng để "
-"soạn thảo ảnh động. </para></listitem> </varlistentry> <varlistentry> "
+msgstr "Lợi ích được nhận phụ thuộc vào kiểu thiết bị đa đích bạn đang tạo. HIện thời có hỗ trợ : <variablelist> <varlistentry> <term>RAID0</term><listitem><para> được thiết kế chính cho hiệu suất tốt. RAID0 chia tách các dữ liệu được gửi đến ra nhiều <firstterm>lát</firstterm> rồi phân phối chúng một cách bằng nhau ra mỗi đĩa nằm trong mảng đó. Cấu trúc này có thể tăng tốc độ của thao tác đọc/ghi, nhưng mà khi đĩa nào hỏng hóc, bạn sẽ mất "
+"<emphasis>tất cả</emphasis> (phần thông tin vẫn còn nằm trên [những] đĩa hoạt động được, nhưng phần khác <emphasis>đã</emphasis> nằm trên đĩa mới hỏng hóc). </para><para> Cách sử dụng điển hình RAID0 là một phân vùng riêng để soạn thảo ảnh động. </para></listitem> </varlistentry> <varlistentry> "
 "<term>RAID1</term><listitem><para> thích hợp với thiết lập gán ưu tiên cao "
-"nhất cho sự đáng tin cậy. Nó gồm có vài (thường là hai) phân vùng cùng kích "
-"cỡ mà mỗi phân vùng chứa chính xác cùng dữ liệu. Trường hợp này có ba kết "
-"quả chính: (1) nếu đĩa nào thất bại, bạn vẫn còn có cùng dữ liệu được nhân "
-"đôi trên các đĩa còn lại; (2) bạn có thể sử dụng chỉ một phân số của sức "
-"chứa sẵn sàng (chính xác hơn, nó là kích cỡ của phân vùng nhỏ nhất trong "
-"RAID đó); (3) các việc đọc tập tin được chia ra một cách bằng nhau giữa các "
-"đĩa khác nhau, mà có thể tăng hiệu suất trên máy phục vụ, như máy phục vụ "
-"tập tin mà thường phải thực hiện nhiều việc đọc đĩa hơn ghi. </para><para> "
-"Tùy chọn bạn có thể gồm một đĩa thêm trong mảng mà sẽ thay thế đĩa mới thất "
-"bại trong trường hợp đó. </para></listitem> </varlistentry> <varlistentry> "
-"<term>RAID5</term><listitem><para> là thoả hiệp hữu ích tốc độ, sự đáng tin "
-"cậy và sự thừa. RAID5 chia tách tất cả các dữ liệu được gởi đến ra lát rồi "
-"phát hành chúng một cách bằng nhau ra cả đĩa trừ một (tương tự với RAID0). "
-"Không như RAID0, RAID5 cũng tính thông tin <firstterm>chẵn lẻ</firstterm>, "
-"mà được ghi vào đĩa còn lại. Đĩa tính chẵn lẻ không phải là tĩnh (như "
-"RAID4), vì nó thay đổi theo định kỷ, vì vậy thông tin tính chẵn lẻ được phát "
-"hành bằng nhau trên mọi đĩa. Khi đĩa nào thất bại, phần thông tin còn thiếu "
-"có thể được tính từ dữ liệu còn lại và chẵn lẻ của nó. RAID5 phải gồm có ít "
-"nhất ba phân vùng hoạt động. Tùy chọn bạn có thể có một phân vùng thêm trong "
-"mảng đó, trong trường hợp thất bại. </para><para> Như bạn đọc biết được, "
-"RAID5 có độ tin cây tương tự với RAID1 còn đạt được ít sự thừa hơn. Mặt "
-"khác, có lẽ nó chạy chậm một ít trong thao tác ghi hơn RAID0 do việc tính "
-"thông tin chẵn lẻ. </para></listitem> </varlistentry> </variablelist> Để tóm "
-"tắt:"
+"nhất cho sự đáng tin cậy. Nó gồm có vài (thường là hai) phân vùng cùng kích cỡ mà mỗi phân vùng chứa chính xác cùng dữ liệu. Trường hợp này có ba kết quả chính:<orderedlist> <listitem><para>nếu đĩa nào hỏng hóc, bạn vẫn còn có cùng dữ liệu được nhân đôi trên các đĩa còn lại;</para></listitem><listitem><para>bạn có thể sử dụng chỉ một phân số của sức chứa sẵn sàng (chính xác hơn, nó là kích cỡ của phân vùng nhỏ nhất trong RAID đó);</para></listitem><listitem><para>các việc đọc tập tin được chia bằng nhau ra các đĩa khác nhau, mà có thể tăng hiệu suất trên máy phục vụ, như máy phục vụ tập tin mà thường phải thực hiện nhiều việc đọc đĩa hơn việc ghi.</para></listitem></orderedlist><para><para> "
+"Tùy chọn mảng có thể gồm một đĩa thêm sẽ thay thế đĩa mới hỏng hóc trong trường hợp đó. </para></listitem> </varlistentry> <varlistentry> <term>RAID5</term><listitem><para> là thoả hiệp hữu ích tốc độ, sự đáng tin cậy và sự thừa dữ liệu. RAID5 chia tách tất cả các dữ liệu được gửi đến ra nhiều lát rồi phân phối bằng nhau ra cả đĩa trừ một (tương tự với RAID0). Không như RAID0, RAID5 cũng tính thông tin <firstterm>chẵn lẻ</firstterm>, mà được ghi vào đĩa còn lại. Đĩa tính chẵn lẻ không phải tĩnh (có phải thì RAID4): nó thay đổi theo định kỷ, vì thế thông tin tính chẵn lẻ được phân phối bằng nhau trên mọi đĩa. Khi đĩa nào hỏng hóc, phần thông tin bị thiếu có thể được tính từ dữ liệu còn lại và tính chẵn lẻ của nó. RAID5 phải gồm có ít nhất ba phân vùng hoạt động. Tùy chọn mảng có một đĩa thêm sẽ thay thế đĩa mới hỏng hóc. </para><para> Như bạn thấy được, RAID5 có độ đáng tin cây tương tự với RAID1 còn đạt được ít sự thừa hơn. Mặt "
+"khác, có lẽ nó chạy ít chậm trong thao tác ghi hơn RAID0 do việc tính thông tin chẵn lẻ. </para></listitem> </varlistentry> </variablelist> Để tóm tắt:"
 
 #.Tag: entry
 #: using-d-i.xml:1163
@@ -1783,14 +1756,16 @@ msgstr "Chỗ sẵn sàng"
 msgid "RAID0"
 msgstr "RAID0"
 
-#. Tag: entry
-#: using-d-i.xml:1174 using-d-i.xml:1182
+#.Tag: entry
+#: using-d-i.xml:1174
+#: using-d-i.xml:1182
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
-#. Tag: entry
-#: using-d-i.xml:1175 using-d-i.xml:1176
+#.Tag: entry
+#: using-d-i.xml:1175
+#: using-d-i.xml:1176
 #, no-c-format
 msgid "<entry>no</entry>"
 msgstr "<entry>không</entry>"
@@ -1807,14 +1782,16 @@ msgstr "Kích cỡ của phân vùng nhỏ nhất được nhân số thiết b�
 msgid "RAID1"
 msgstr "RAID1"
 
-#. Tag: entry
-#: using-d-i.xml:1183 using-d-i.xml:1191
+#.Tag: entry
+#: using-d-i.xml:1183
+#: using-d-i.xml:1191
 #, no-c-format
 msgid "optional"
 msgstr "tùy chọn"
 
-#. Tag: entry
-#: using-d-i.xml:1184 using-d-i.xml:1192
+#.Tag: entry
+#: using-d-i.xml:1184
+#: using-d-i.xml:1192
 #, no-c-format
 msgid "<entry>yes</entry>"
 msgstr "<entry>có</entry>"
@@ -1846,13 +1823,12 @@ msgid ""
 msgstr "Kích cỡ của phân vùng nhỏ nhất được nhận (số thiết bị trong RAID trừ một)"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1201
 #, no-c-format
 msgid ""
 "If you want to know more about Software RAID, have a look at <ulink url="
 "\"&url-software-raid-howto;\">Software RAID HOWTO</ulink>."
-msgstr "Nếu bạn muốn biết thêm về RAID phần mềm, hãy xem tài liệu RAID phần mềm Thế "
+msgstr "Muốn biết thêm về RAID kiểu phần mềm, hãy xem tài liệu RAID phần mềm Thế "
 "Nào <ulink url=\"&url-software-raid-howto;\">Software RAID HOWTO</ulink>."
 
 #.Tag: para
@@ -1948,7 +1924,6 @@ msgstr "RAID5 có thủ tục thiết lập tương tự với RAID1, trừ bạ
 "nhất <emphasis>ba</emphasis> phân vùng hoạt động."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1264
 #, no-c-format
 msgid ""
@@ -1958,12 +1933,7 @@ msgid ""
 "RAID0 (fast 300 GB video editing partition) and use the other three "
 "partitions (2 active and 1 spare) for RAID1 (quite reliable 100 GB partition "
 "for <filename>/home</filename>)."
-msgstr "Rất có thể có vài kiểu thiết bị đa đĩa đồng thời. Lấy thí dụ, nếu bạn có ba "
-"đĩa cứng 300GB cả dành cho thiết bị đa đĩa, mỗi đĩa chứa hai phân vùng "
-"100GB, trong trường hợp này bạn có khả năng kết hợp phân vùng thứ nhất trong "
-"cả ba đĩa cứng để tạo RAID0 (phân vùng soạn thảo ảnh động 300GB nhanh) và sử "
-"dụng ba phân vùng khác (2 hoạt động và 1 phụ tùng) là RAID1 (phân vùng 100GB "
-"hơi tin cậy cho <filename>/home</filename>)."
+msgstr "Rất có thể sử dụng đồng thời vài kiểu thiết bị đa đĩa. Chẳng hạn, nếu bạn có ba đĩa cứng 200 GB cả dành cho thiết bị đa đĩa, mỗi đĩa chứa hai phân vùng 100 GB, trong trường hợp này bạn có khả năng kết hợp phân vùng thứ nhất trong cả ba đĩa cứng để tạo RAID0 (phân vùng soạn thảo ảnh động 300 GB nhanh) và sử dụng ba phân vùng khác (2 hoạt động và 1 phụ tùng) như là RAID1 (phân vùng 100 GB hơi đáng tin cậy cho <filename>/home</filename>)."
 
 #.Tag: para
 #: using-d-i.xml:1273
@@ -2211,7 +2181,6 @@ msgstr "Ghi chú rằng phân vùng được mật mã có hiệu suất ít hơ
 "của khoá."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1420
 #, no-c-format
 msgid ""
@@ -2222,14 +2191,7 @@ msgid ""
 "select <guimenuitem>physical volume for encryption</guimenuitem> at the "
 "<menuchoice> <guimenu>Use as:</guimenu> </menuchoice> option. The menu will "
 "then change to include several cryptographic options for the partition."
-msgstr "Để sử dụng khả năng mật mã, bạn cần phải tạo một phân vùng mới bằng cách "
-"chọn một phần sức chứa còn rảnh trong trình đơn phân vùng chính. Hoặc bạn có "
-"thể chọn một phân vùng tồn tại (v.d. một phân vùng chuẩn, một khối tin hợp "
-"lý LVM hay một khối tin RAID). Trong trình đơn <guimenu>Thiết lập phân vùng</"
-"guimenu>, bạn cần chọn mục <guimenuitem>khối tin vật lý cho sự mật mã</"
-"guimenuitem> tại tùy chọn <menuchoice> <guimenu>Dùng làm:</guimenu> </"
-"menuchoice>. Trình đơn sẽ thay đổi, hiển thị vài tùy chọn mật mã cho phân "
-"vùng đó."
+msgstr "Để sử dụng khả năng mật mã, bạn cần phải tạo một phân vùng mới bằng cách chọn một phần sức chứa còn rảnh trong trình đơn phân vùng chính. Hoặc có thể chọn một phân vùng tồn tại (v.d. một phân vùng chuẩn, một khối tin hợp lý LVM hay một khối tin RAID). Trong trình đơn <guimenu>Thiết lập phân vùng</guimenu>, bạn cần chọn mục <guimenuitem>khối tin vật lý cho sự mật mã</guimenuitem> tại tùy chọn <menuchoice> <guimenu>Dùng làm:</guimenu> </menuchoice>. Trình đơn lúc đó thay đổi để hiển thị vài tùy chọn mật mã cho phân vùng đó."
 
 #.Tag: para
 #: using-d-i.xml:1431
@@ -2374,8 +2336,9 @@ msgstr "Khoá mật mã sẽ được tính<footnote> <para> Dùng cụm từ m�
 "\">LUKS</ulink>. </para></footnote> dựa vào cụm từ mật khẩu bạn có thể nhập "
 "vào lúc sau trong tiến trình."
 
-#. Tag: term
-#: using-d-i.xml:1535 using-d-i.xml:1628
+#.Tag: term
+#: using-d-i.xml:1535
+#: using-d-i.xml:1628
 #, no-c-format
 msgid "Random key"
 msgstr "Khoá ngẫu nhiên"
@@ -2415,8 +2378,9 @@ msgstr "Khoá ngẫu nhiên có ích đối với phân vùng trao đổi, vì b
 "nhân Linux mới hơn cung cấp, vì không thể phục hồi dữ liệu được ngưng đã "
 "được ghi vào phân vùng trao đổi, khi khởi động lại."
 
-#. Tag: term
-#: using-d-i.xml:1564 using-d-i.xml:1641
+#.Tag: term
+#: using-d-i.xml:1564
+#: using-d-i.xml:1641
 #, no-c-format
 msgid "Erase data: <userinput>yes</userinput>"
 msgstr "Xoá bỏ dữ liệu : <userinput>có</userinput>"
@@ -2876,7 +2840,6 @@ msgstr "Mặc dù giai đoạn này là đơn giản nhất, nó chiếm một p
 "kéo dài một lát."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1892
 #, no-c-format
 msgid ""
@@ -2885,23 +2848,16 @@ msgid ""
 "by pressing <keycombo><keycap>Left Alt</keycap><keycap>F4</keycap></"
 "keycombo>; get back to the main installer process with "
 "<keycombo><keycap>Left Alt</keycap><keycap>F1</keycap></keycombo>."
-msgstr "Trong khi cài đặt Cơ Bản, các thông điệp về cách giải nén gói và thiết lập "
-"có được chuyển tiếp tới bàn điều khiển <userinput>tty4</userinput>. Bạn có "
-"thể truy cập nó bằng cách bấm tổ hợp phím <keycombo><keycap>Alt trái</"
-"keycap><keycap>F4</keycap></keycombo>, và lùi lại về tiến trình cài đặt "
-"chính bằng <keycombo><keycap>Alt trái</keycap><keycap>F1</keycap></keycombo>."
+msgstr "Trong khi cài đặt hệ thống cơ bản, các thông điệp về cách giải nén gói và thiết lập được chuyển tiếp tới thiết bị cuối <userinput>tty4</userinput>. Có thể truy cập nó bằng cách bấm tổ hợp phím <keycombo><keycap>Alt trái</keycap><keycap>F4</keycap></keycombo>, và lùi lại về tiến trình cài đặt chính bằng <keycombo><keycap>Alt trái</keycap><keycap>F1</keycap></keycombo>."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1901
 #, no-c-format
 msgid ""
 "The unpack/setup messages generated during this phase are also saved in "
 "<filename>/var/log/syslog</filename>. You can check them there if the "
 "installation is performed over a serial console."
-msgstr "Các thông điệp về cách giải nén gói và thiết lập được tạo bởi việc cài đặt "
-"cơ bản có được lưu vào bản ghi hệ thống <filename>/var/log/syslog</filename> "
-"khi việc cài đặt được thực hiện qua bàn điều khiển nối tiếp."
+msgstr "Các thông điệp kiểu giải nén/thiết lập được tạo ra trong giải đoạn này cũng được lưu vào bản ghi hệ thống <filename>/var/log/syslog</filename>. Bạn vẫn có khả năng kiểm tra những thông điệp ở đó nếu tiến trình cài đặt được chạy qua bàn giao tiếp nối tiếp."
 
 #.Tag: para
 #: using-d-i.xml:1907
@@ -2923,7 +2879,6 @@ msgid "Installing Additional Software"
 msgstr "Cài đặt phần mềm thêm"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1920
 #, no-c-format
 msgid ""
@@ -2932,11 +2887,7 @@ msgid ""
 "to their needs, and the installer allows you do so. This step can take even "
 "longer than installing the base system if you have a slow computer or "
 "network."
-msgstr "Sau khi cài đặt hệ thống cơ bản, bạn có một hệ thống có ích nhưng còn bị hạn "
-"chế. Phần lớn người dùng sẽ muốn thêm phần mềm nữa vào hệ thống, để điều "
-"hưởng tinh nó để tương thích với họ, và trình cài đặt cho bạn khả năng làm "
-"như thế. Bước này có thể mất ngay cả lâu hơn việc cài đặt hệ thống cơ bản "
-"nếu bạn có máy tính hay mạng chạy chậm."
+msgstr "Sau khi cài đặt hệ thống cơ bản, bạn có một hệ thống có ích nhưng còn bị hạn chế. Phần lớn người dùng sẽ muốn cài đặt phần mềm thêm vào hệ thống, để điều hưởng tinh nó để tương thích với những nhu cầu của họ, và trình cài đặt cho khả năng đó. Bước này có thể mất ngay cả lâu hơn việc cài đặt hệ thống cơ bản nếu máy tính hay mạng chạy chậm."
 
 #.Tag: title
 #: using-d-i.xml:1934
@@ -2945,7 +2896,6 @@ msgid "Configuring apt"
 msgstr "Cấu hình apt"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1936
 #, no-c-format
 msgid ""
@@ -2964,17 +2914,7 @@ msgid ""
 "(package searching and status checks) in a nice user interface. In fact, "
 "<command>aptitude</command> is now the recommended utility for package "
 "management."
-msgstr "Người dùng thường cài đặt gói vào hệ thống bằng chương trình <command>apt-"
-"get</command>, của gói <classname>apt</classname>.<footnote> <para> Ghi chú "
-"rằng chương trình thật cài đặt gói có tên <command>dpkg</command>. Tuy "
-"nhiên, chương trình này chỉ là công cụ cấp thấp. Trình <command>apt-get</"
-"command> là công cụ cấp cao hơn, mà gọi trình <command>dpkg</command> khi "
-"thích hợp, biết các gói khác cần cài đặt để hỗ trợ gói đang cài đặt, và cách "
-"lấy gói từ đĩa CD, mạng v.v. </para> </footnote> Tiền tiêu khác để quản lý "
-"gói phần mềm, như <command>aptitude</command> và <command>synaptic</"
-"command>, cũng được dùng và phụ thuộc vào trình <command>apt-get</command>. "
-"Đề nghị bạn sử dụng một tiền tiêu như thế, vì nó hợp nhất một số tính năng "
-"có ích (tìm kiếm gói và kiểm tra trạng thái) trong giao diện người dùng đẹp."
+msgstr "Một của những công cụ dùng để cài đặt gói vào hệ thống &debian; là một chương trình tên <command>apt-get</command>, thuộc về gói <classname>apt</classname><footnote> <para> Ghi chú rằng chương trình thật cài đặt các gói có tên <command>dpkg</command>. Tuy nhiên, chương trình này là công cụ chạy ở cấp thấp hơn. <command>apt-get</command> là công cụ chạy ở cấp cao hơn, và sẽ gọi <command>dpkg</command> trong trường hợp thích hợp. Nó có khả năng lấy các gói từ đĩa CD, mạng hay nơi khác nào. Nó cũng có thể tự động cài đặt các gói khác cần thiết để cho gói đã chọn đầu tiên hoạt động được.</para> </footnote>. Cũng có giao diện quản lý gói như <command>aptitude</command> và <command>synaptic</command>. Khuyên người dùng (nhất là người dùng mới) sử dụng giao diện như thế, vì nó hợp nhất một số tính năng thêm trong giao diện đẹp và dễ dùng. <command>aptitude</command> đặc biệt là tiện ích quản lý gói khuyến khích."
 
 #.Tag: para
 #: using-d-i.xml:1962
@@ -3015,7 +2955,6 @@ msgstr "Trong tiến trình cài đặt, bạn có dịp chọn phần mềm th�
 "tác vụ khác nhau."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:1989
 #, no-c-format
 msgid ""
@@ -3033,31 +2972,18 @@ msgid ""
 "<replaceable>package</replaceable> is the name of the package you are "
 "looking for. </para> </footnote>. <xref linkend=\"tasksel-size-list\"/> "
 "lists the space requirements for the available tasks."
-msgstr "Vậy bạn có khả năng chọn <emphasis>công việc</emphasis> trước, rồi thêm gói "
-"riêng về sau. Mỗi công việc đại diện một việc đặc biệt bạn muốn làm bằng máy "
-"tính, như <quote>môi trường làm việc</quote>, <quote>trình phục vụ Mạng</"
-"quote>, hay <quote>trình phục vụ in</quote><footnote> <para> Để hiển thị "
-"danh sách này, trình cài đặt gọi chương trình <command>tasksel</command>. Có "
-"thể chạy nó vào bất cứ điểm thời nào sau khi cài đặt hệ thống, để cài đặt "
-"hay gỡ bỏ gói thêm, hoặc bạn có thể sử dụng một công cụ xử lý mỗi gói như "
-"<command>aptitude</command>. Nếu bạn tìm một gói riêng, sau khi cài đặt hệ "
-"thống, đơn giản hãy chạy lệnh <userinput>aptitude install <replaceable>gói</"
-"replaceable></userinput>, mà <replaceable>gói</replaceable> là tên của gói "
-"bạn tìm. </para> </footnote>. <xref linkend=\"tasksel-size-list\"/> xác định "
-"sức chứa cần thiết cho các công việc có sẵn."
+msgstr "Vậy bạn có khả năng chọn <emphasis>công việc</emphasis> vào lúc trước, rồi thêm gói "
+"riêng về sau. Mỗi công việc đại diện việc đặc biệt bạn muốn làm bằng máy tính, như <quote>môi trường làm việc</quote>, <quote>trình phục vụ Mạng</quote>, hay <quote>trình phục vụ in</quote><footnote> <para> Để hiển thị danh sách các công việc này, trình cài đặt đơn giản gọi chương trình <command>tasksel</command>. Vẫn có "
+"thể chạy nó vào bất cứ điểm thời nào sau khi cài đặt hệ thống, để cài đặt (hay gỡ bỏ) gói thêm, hoặc bạn có thể sử dụng một công cụ xử lý mỗi gói như <command>aptitude</command>. Nếu bạn tìm một gói riêng, sau khi cài đặt hệ thống, đơn giản hãy chạy lệnh <userinput>aptitude install <replaceable>gói</replaceable></userinput>, mà <replaceable>gói</replaceable> là tên của gói bạn tìm. </para> </footnote>. <xref linkend=\"tasksel-size-list\"/> xác định sức chứa cần thiết cho các công việc có sẵn."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2014
 #, no-c-format
 msgid ""
 "Some tasks may be pre-selected based on the characteristics of the computer "
 "you are installing. If you disagree with these selections you can un-select "
 "the tasks. You can even opt to install no tasks at all at this point."
-msgstr "Ghi chú rằng một số công việc có thể được chọn sẵn, dựa vào các đặc tính của "
-"máy tính nơi bạn cài đặt hệ thống. Nếu bạn không đồng ý với các công việc "
-"chọn sẵn, bạn có thể bỏ chọn điều nào. Tại điểm thời này, bạn có thể chọn "
-"ngay cả không cài đặt gì."
+msgstr "Một số công việc riêng có thể được chọn sẵn, dựa vào các đặc tính của máy tính vào đó bạn cài đặt hệ thống. Không đồng ý với các công việc chọn sẵn thì có khả năng bỏ chọn điều nào. Tại điểm thời này, bạn vẫn còn có thể chọn không cài đặt gì cả."
 
 #.Tag: para
 #: using-d-i.xml:2021
@@ -3066,7 +2992,7 @@ msgid ""
 "The <quote>Desktop environment</quote> task will install the GNOME desktop "
 "environment. The options offered by the installer currently do not allow to "
 "select a different desktop environment such as for example KDE."
-msgstr ""
+msgstr "Công việc <quote>môi trường làm việc</quote> sẽ cài đặt môi trường làm việc GNOME. Những tùy chọn được cung cấp bởi tiến trình cài đặt hiện thời không cho phép người dùng chọn môi trường làm việc khác (v.d. KDE, Xfce)."
 
 #.Tag: para
 #: using-d-i.xml:2027
@@ -3080,7 +3006,8 @@ msgid ""
 "downloaded from a mirror as KDE packages are not included on the first full "
 "CD; installing KDE this way should work fine if you are using a DVD image or "
 "any other installation method."
-msgstr ""
+msgstr "Vẫn còn có thể cài đặt KDE trong tiến trình cài đặt, dùng khả năng chèn sẵn (xem <xref linkend=\"preseed-pkgsel\"/>), hoặc bằng cách thêm <literal>tasks=\"standard, "
+"kde-desktop\"</literal> ở dấu nhắc khởi động khi khởi chạy trình cài đặt. Tuy nhiên, việc này sẽ chỉ hoạt động được nếu những gói cần thiết cho KDE thực sự sẵn sàng. Nếu bạn cài đặt từ ảnh đĩa CD đầy đủ, cần phải tải các gói này xuống một máy nhân bản Debian, vì các gói KDE không nằm trong đĩa CD đầy thứ nhất; sử dụng ảnh DVD hay phương pháp cài đặt khác thì việc cài đặt KDE bằng cách này nên chạy tốt."
 
 #.Tag: para
 #: using-d-i.xml:2038
@@ -3092,19 +3019,18 @@ msgid ""
 "classname>, <classname>spamassassin</classname>, <classname>uw-imap</"
 "classname>; Print server: <classname>cups</classname>; SQL server: "
 "<classname>postgresql</classname>; Web server: <classname>apache</classname>."
-msgstr ""
+msgstr "Những công việc trình phục vụ khác nhau sẽ cài đặt phần mềm khoảng như theo:<itemizedlist> "
+"<listitem><para>Trình phục vụ DNS: <classname>bind9</classname>;</para></listitem><listitem><para>Trình phục vụ tập tin: <classname>samba</"
+"classname>, <classname>nfs</classname>;</para></listitem><listitem><para>Trình phục vụ thư tín: <classname>exim4</classname>, <classname>spamassassin</classname>, <classname>uw-imap</classname>;</para></listitem><listitem><para>Trình phục vụ in ấn: <classname>cups</classname>;</para></listitem><listitem><para>Trình phục vụ SQL: <classname>postgresql</classname>;</para></listitem><listitem><para>Trình phục vụ Mạng: <classname>apache</classname>.</para></listitem></itemizedlist>"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2050
 #, no-c-format
 msgid ""
 "Once you've selected your tasks, select <guibutton>OK</guibutton>. At this "
 "point, <command>aptitude</command> will install the packages that are part "
 "of the tasks you've selected."
-msgstr "Một khi bạn chọn các công việc, hãy bấm cái nút <guibutton>Được</guibutton>. "
-"Tại điểm thời này, chương trình <command>aptitude</command> sẽ cài đặt những "
-"gói đã chọn."
+msgstr "Một khi chọn các công việc, hãy bấm cái nút <guibutton>Được</guibutton>. Tại điểm thời này, chương trình <command>aptitude</command> sẽ cài đặt các gói thuộc về những công việc đã chọn."
 
 #.Tag: para
 #: using-d-i.xml:2057
@@ -3131,7 +3057,6 @@ msgstr "Mỗi gói bạn đã chọn bằng <command>tasksel</command> sẽ đư
 #.Tag: title
 #: using-d-i.xml:2079
 #, no-c-format
-<<<<<<< .mine
 msgid "Configuring Your Mail Transport Agent"
 msgstr "Cấu hình tác nhân truyền thư tín"
 
@@ -3277,7 +3202,6 @@ msgid "Making Your System Bootable"
 msgstr "Cho hệ thống khả năng khởi động"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2081
 #, no-c-format
 msgid ""
@@ -3285,10 +3209,7 @@ msgid ""
 "local disk isn't a meaningful option, and this step will be skipped. <phrase "
 "arch=\"sparc\">You may wish to set OpenBoot to boot from the network by "
 "default; see <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
-msgstr "Nếu bạn cài đặt máy trạm không có đĩa, không có ích để thử khởi động từ đĩa "
-"cục bộ, thì bước này sẽ bị bỏ qua. <phrase arch=\"sparc\">Có lẽ bạn muốn đặt "
-"OpenBoot khởi động qua mạng theo mặc định; xem phần <xref linkend=\"boot-dev-"
-"select-sun\"/>.</phrase>"
+msgstr "Cài đặt máy trạm không có đĩa thì rõ ràng không có ích khi khởi động từ đĩa cục bộ nên bước này sẽ bị bỏ qua. <phrase arch=\"sparc\">Có lẽ bạn muốn đặt OpenBoot khởi động qua mạng theo mặc định; xem <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
 
 #.Tag: title
 #: using-d-i.xml:2096
@@ -3333,7 +3254,6 @@ msgid "Install <command>aboot</command> on a Hard Disk"
 msgstr "Cài đặt <command>aboot</command> vào đĩa cứng"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2125
 #, no-c-format
 msgid ""
@@ -3345,14 +3265,7 @@ msgid ""
 "OpenVMS) from the same disk. If you also have a different operating system "
 "installed on the disk where you have installed Debian, you will have to boot "
 "GNU/Linux from a floppy instead."
-msgstr "Nếu bạn đã khởi động từ SRM, và bật tùy chọn này, trình cài đặt sẽ ghi "
-"<command>aboot</command> vào rãnh ghi thứ nhất của đĩa nơi bạn đã cài đặt "
-"Debian. Hãy <emphasis>rất</emphasis> cẩn thận &mdash; <emphasis>không</"
-"emphasis> thể khởi động nhiều hệ điều hành (v.d. GNU/Linux, Free/Open/"
-"NetBSD, OSF/1 cũng tên Digital Unix cũng tên Tru64 Unix, hay OpenVMS) từ "
-"cùng một đĩa. Nếu bạn có một hệ điều hành khác được cài đặt vào cùng một đĩa "
-"nơi bạn đã cài đặt Debian, bạn sẽ phải khởi động GNU/Linux từ đĩa mềm thay "
-"thế."
+msgstr "Khởi động từ SRM và bật tùy chọn này thì trình cài đặt sẽ ghi <command>aboot</command> vào rãnh ghi thứ nhất của đĩa vào đó bạn đã cài đặt Debian. Hãy <emphasis>rất</emphasis> cẩn thận &mdash; <emphasis>không</emphasis> thể khởi động nhiều hệ điều hành (v.d. GNU/Linux, Free/Open/NetBSD, OSF/1 cũng tên Digital Unix cũng tên Tru64 Unix, hay OpenVMS) từ cùng một đĩa. Có một hệ điều hành khác đã cài đặt vào cùng một đĩa vào đó bạn mới cài đặt Debian thì phải khởi động GNU/Linux từ đĩa mềm thay thế."
 
 #.Tag: title
 #: using-d-i.xml:2145
@@ -3454,13 +3367,12 @@ msgstr "Hiện thời, việc cài đặt LILO sẽ tạo mục trình đơn cho
 "khi cài đặt."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2215
 #, no-c-format
 msgid ""
 "&d-i; offers you three choices on where to install the <command>LILO</"
 "command> boot loader:"
-msgstr "&d-i; cung cấp ba nơi có thể cài đặt bộ tải khởi động <command>LILO</"
+msgstr "&d-i; cung cấp ba sự chọn về nơi vào đó cần cài đặt bộ tải khởi động <command>LILO</"
 "command>:"
 
 #.Tag: term
@@ -3519,7 +3431,6 @@ msgstr "Có ích cho người dùng cấp cao mà muốn cài đặt <command>LI
 "<filename>/dev/sda</filename>."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2250
 #, no-c-format
 msgid ""
@@ -3528,12 +3439,7 @@ msgid ""
 "mbr</userinput> command to reinstall the MS-DOS master boot record &mdash; "
 "however, this means that you'll need to use some other way to get back into "
 "Debian!"
-msgstr "Nếu bạn không còn có thể khởi động lại vào Windows 9x (hay DOS) sau bước "
-"này, bạn sẽ cần phải sử dụng đĩa khởi động Windows 9x (MS-DOS), và dùng lệnh "
-"<userinput>fdisk /mbr</userinput> để cài đặt lại mục ghi khởi động cái MS-"
-"DOS &mdash; tuy nhiên, có nghĩa là bạn sẽ cần phải sử dụng cách khác nào để "
-"trở về Debian. Để tìm thông tin thêm về điều này, hãy xem phần <xref linkend="
-"\"reactivating-win\"/>."
+msgstr "Không còn có thể khởi động lại vào Windows 9x (hay DOS) sau bước này thì bạn sẽ cần phải sử dụng đĩa khởi động Windows 9x (MS-DOS), và chạy lệnh <userinput>fdisk /mbr</userinput> để cài đặt lại mục ghi khởi động cái MS-DOS &mdash; tuy nhiên, có nghĩa là bạn cần phải sử dụng phương pháp khác để trở về Debian."
 
 #.Tag: title
 #: using-d-i.xml:2266
@@ -3542,7 +3448,6 @@ msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr "Cài đặt bộ tải khởi động <command>ELILO</command> vào đĩa cứng"
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2268
 #, no-c-format
 msgid ""
@@ -3557,17 +3462,8 @@ msgid ""
 "copies files into it. The <filename>elilo.efi</filename> program is copied "
 "into the EFI partition and then run by the <quote>EFI Boot Manager</quote> "
 "to do the actual work of loading and starting the Linux kernel."
-msgstr "Bộ tải khởi động cho kiến trúc &architecture; có tên <quote>elilo</quote>. "
-"Nó dựa vào bộ tải khởi động <quote>lilo</quote> của kiến trúc x86, và dùng "
-"tập tin cấu hình tương tự. Tuy nhiên, thay vào ghi mục ghi khởi động cái hay "
-"phân vùng vào đĩa, nó sao chép các tập tin cần thiết vào một phân vùng đĩa "
-"đã định dạng FAT, và sửa đổi trình đơn <guimenuitem>EFI Boot Manager</"
-"guimenuitem> (Bộ quản lý khởi động EFI) trong phần vững để chỉ tới các tập "
-"tin nằm trên phân vùng EFI. Bộ tải khởi động <command>elilo</command> thật "
-"có hai phần. Lệnh <filename>/usr/sbin/elilo</filename> quản lý phân vùng và "
-"sao chép tập tin vào nó. Chương trình <filename>elilo.efi</filename> được "
-"sao chép vào phân vùng EFI, rồi được chạy bởi <quote>EFI Boot Manager</"
-"quote> thật để làm việc tải và khởi chạy hạt nhân Linux."
+msgstr "Bộ tải khởi động cho kiến trúc &architecture; có tên <quote>elilo</quote>. Nó dựa vào bộ tải khởi động <quote>lilo</quote> của kiến trúc x86, và dùng tập tin cấu hình tương tự. Tuy nhiên, thay vào ghi mục ghi khởi động cái hay phân vùng vào đĩa, nó sao chép các tập tin cần thiết vào một phân vùng đĩa riêng đã định dạng FAT, và sửa đổi trình đơn <guimenuitem>EFI Boot Manager</guimenuitem> (Bộ quản lý khởi động EFI) trong phần vững để chỉ tới các tập tin nằm trên phân vùng EFI. Bộ tải khởi động <command>elilo</command> thật có hai phần. Lệnh <filename>/usr/sbin/elilo</filename> quản lý phân vùng và sao chép tập tin vào nó. Chương trình <filename>elilo.efi</filename> được "
+"sao chép vào phân vùng EFI, rồi được chạy bởi <quote>EFI Boot Manager</quote> để làm việc thật tải và khởi chạy hạt nhân Linux."
 
 #.Tag: para
 #: using-d-i.xml:2284
@@ -3593,7 +3489,6 @@ msgid "Choose the correct partition!"
 msgstr "Chọn phân vùng đúng đi."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2298
 #, no-c-format
 msgid ""
@@ -3603,12 +3498,7 @@ msgid ""
 "including EFI partitions of other system disks and EFI diagnostic "
 "partitions. Remember, <command>elilo</command> may format the partition "
 "during the installation, erasing any previous contents!"
-msgstr "Tiêu chuẩn để chọn phân vùng là nó chứa hệ thống tập tin dạng thức FAT với "
-"cờ <emphasis>khả năng khởi động</emphasis> được đặt. &d-i; có thể hiển thị "
-"nhiều sự chọn, phụ thuộc vào kết quả của việc quét mọi đĩa của hệ thống, gồm "
-"các phân vùng EFI của các đĩa của hệ điều hành khác và phân vùng chẩn đoán "
-"EFI. Hãy ghi nhớ rằng <command>elilo</command> có thể định dạng phân vùng đó "
-"trong khi cài đặt, thì xoá bỏ hoàn toàn nội dung đã có !"
+msgstr "Tiêu chuẩn để chọn phân vùng là nó chứa hệ thống tập tin định dạng FAT với cờ <emphasis>khả năng khởi động</emphasis> được đặt. &d-i; có thể hiển thị nhiều sự chọn, phụ thuộc vào kết quả của việc quét mọi đĩa của hệ thống, gồm các phân vùng EFI của những đĩa hệ điều hành khác và những phân vùng chẩn đoán EFI. Ghi nhớ rằng trong khi cài đặt, <command>elilo</command> có thể định dạng phân vùng nên xoá hoàn toàn nội dung đã có !"
 
 #.Tag: title
 #: using-d-i.xml:2313
@@ -3821,8 +3711,9 @@ msgid ""
 msgstr "là SCSI ID (mã nhận diện SCSI) của đĩa cứng nơi <command>arcboot</command> "
 "được cài đặt"
 
-#. Tag: replaceable
-#: using-d-i.xml:2441 using-d-i.xml:2510
+#.Tag: replaceable
+#: using-d-i.xml:2441
+#: using-d-i.xml:2510
 #, no-c-format
 msgid "partnr"
 msgstr "số_phân"
@@ -4216,7 +4107,7 @@ msgid ""
 "footnote> (on a Mac keyboard, <keycombo><keycap>Option</keycap> <keycap>F2</"
 "keycap></keycombo>). Use <keycombo><keycap>Left Alt</keycap> <keycap>F1</"
 "keycap></keycombo> to switch back to installer itself."
-msgstr ""
+msgstr "Có vài phương pháp khác nhau cho bạn sử dụng để tuy cấp trình bao trong khi chạy tiến trình cài đặt. Trên phần lớn hệ thống, nếu bạn không cài đặt qua bàn giao tiếp nối tiếp, phương pháp dễ nhất là chuyển đổi sang <emphasis>bàn giao tiếp ảo</emphasis> thứ hai bằng cách bấm tổ hợp phím <keycombo><keycap>Alt trái</keycap> <keycap>F2</keycap></keycombo><footnote> <para> Tức là: bấm đồng thời phím sửa đổi <keycap>Alt</keycap> bên trái <keycap>phím dài</keycap> và phím chức năng <keycap>F2</keycap>. </para> </footnote> (trên bàn phím Mac, tổ hợp phím <keycombo><keycap>option</keycap> <keycap>F2</keycap></keycombo>: các máy Mac mới hơn cũng có từ « alt » trên phím <keycap>option</keycap>.). Rồi bấm tổ hợp phím <keycombo><keycap>Alt trái</keycap> <keycap>F1</keycap></keycombo> để trở về bộ cài đặt chính nó."
 
 #.Tag: para
 #: using-d-i.xml:2754
@@ -4226,10 +4117,9 @@ msgid ""
 "Shell</guimenuitem> item on the main menu that can be used to start a shell. "
 "To get back to the installer itself, type <userinput>exit</userinput> to "
 "close the shell."
-msgstr ""
+msgstr "Nếu bạn không thể chuyển đổi bàn giao tiếp, trình đơn chính vẫn còn có mục <guimenuitem>Chạy trình bao</guimenuitem> có thể dùng để khởi chạy một trình bao. Để trở về bộ cài đặt chính nó, gõ lệnh <userinput>exit</userinput> (thoát) để đóng trình bao đó."
 
 #.Tag: para
-#, fuzzy
 #: using-d-i.xml:2761
 #, no-c-format
 msgid ""
@@ -4239,12 +4129,9 @@ msgid ""
 "command> and by typing <command>help</command>. The shell is a Bourne shell "
 "clone called <command>ash</command> and has some nice features like "
 "autocompletion and history."
-msgstr "Vào lúc này, bạn được khởi động từ đĩa RAM, và có sẵn một bộ tiện ích UNIX "
-"bị hạn chế để sử dụng. Bạn có thể xem các chương trình sẵn sàng bằng cách "
-"dùng lệnh <command>ls /bin /sbin /usr/bin /usr/sbin</command> (ls = liệt kê) "
-"và bằng cách gõ lệnh <command>help</command> (trợ giúp). Có trình soạn thảo "
-"văn bản được gọi là <command>nano</command>. Hệ vỏ có một số tính năng đẹp "
-"như khả năng gõ xong tự động và lược sử."
+msgstr "Vào lúc này, bạn được khởi động từ đĩa RAM nên có sẵn một bộ tiện ích UNIX "
+"bị hạn chế để sử dụng. Có thể xem các chương trình sẵn sàng bằng cách "
+"chạy lệnh <command>ls /bin /sbin /usr/bin /usr/sbin</command> (ls = liệt kê) hay <command>help</command> (trợ giúp). Trình bao này là bộ nhái trình bao Bourne tên <command>ash</command> có một số tính năng tốt đẹp như khả năng tự động gõ và lược sử."
 
 #.Tag: para
 #: using-d-i.xml:2770
@@ -4253,7 +4140,7 @@ msgid ""
 "To edit and view files, use the text editor <command>nano</command>. Log "
 "files for the installation system can be found in the <filename>/var/log</"
 "filename> directory."
-msgstr ""
+msgstr "Để soạn thảo và xem tập tin, hãy dùng trình soạn thảo văn bản <command>nano</command>. Các tập tin ghi lưu cho hệ thống cài đặt nằm trong thư mục <filename>/var/log</filename>."
 
 #.Tag: para
 #: using-d-i.xml:2777
@@ -4262,7 +4149,7 @@ msgid ""
 "Although you can do basically anything in a shell that the available "
 "commands allow you to do, the option to use a shell is really only there in "
 "case something goes wrong and for debugging."
-msgstr ""
+msgstr "Mặc dù bạn có thể sử dụng bất cứ lệnh có sẵn trong trình bao, tùy chọn dùng trình bao chỉ sẵn sàng để giúp đỡ trong trường hợp bị lỗi hay gỡ lỗi."
 
 #.Tag: para
 #: using-d-i.xml:2783
@@ -4272,7 +4159,7 @@ msgid ""
 "process and result in errors or an incomplete installation. In particular, "
 "you should always use let the installer activate your swap partition and not "
 "do this yourself from a shell."
-msgstr ""
+msgstr "Việc tự chạy lệnh từ trình bao có thể gây trở ngạy cho tiến trình cài đặt nên gây ra lỗi hay việc cài đặt chưa hoàn thành. Đặc biệt bạn phải cho phép trình cài đặt kích hoạt vùng trao đổi, không bao giờ tự làm như thế từ trình bao."
 
 #.Tag: title
 #: using-d-i.xml:2798
