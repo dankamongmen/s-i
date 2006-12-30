@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 43658 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -323,8 +323,19 @@ geben Sie einfach
 für jede Voreinstellungsvariable, die in den Beispielen dieses Abschnitts
 aufgelistet ist, am Bootprompt an. Falls ein Wert verwendet werden soll,
 um Pakete für das Zielsystem zu konfigurieren, müssen Sie den
-<firstterm>Eigentümer</firstterm> der Variable voranstellen wie hier:
-<userinput><replaceable>Eigentümer</replaceable>:<replaceable>Pfad/zur/Variable</replaceable>=<replaceable>value</replaceable></userinput>. Geben Sie den
+<firstterm>Eigentümer</firstterm> (Owner <footnote>
+
+<para>
+Der Owner einer Debconf-Variable (oder Vorlage) ist normalerweise der Name
+des Pakets, das die entsprechende Debconf-Vorlage enthält. Bei Variablen, die
+im Installer selbst verwendet werden, ist der Owner <quote>d-i</quote>.
+Vorlagen und Variablen können auch mehr als einen Owner haben, was dabei
+hilfreich sein kann, herauszufinden, ob sie aus der Debconf-Datenbank entfernt
+werden können, wenn das Paket komplett vom System entfernt wird.
+</para>
+
+</footnote>) der Variable voranstellen wie hier:
+<userinput><replaceable>Eigentümer</replaceable>:<replaceable>Pfad/zur/Variable</replaceable>=<replaceable>Wert</replaceable></userinput>. Geben Sie den
 Eigentümer nicht an, wird der Wert der Variable nicht in die Debconf-Datenbank
 des Zielsystems kopiert und bleibt deshalb bei der Konfiguration des
 entsprechenden Pakets ungenutzt.
@@ -398,18 +409,18 @@ empfangen wird.
 
 </para><para>
 
-Der Pfad datei stammt von <literal>auto-install/defaultroot</literal>,
-wo das Verzeichnis <literal>etch</literal> als Standard enthalten ist,
-damit zukünftige Versionen einen eigenen Codenamen festlegen können,
-um den Leuten eine kontrollierte Migration zu ermöglichen. Der Teil
-<literal>/./</literal> des Pfades wird genutzt, um das root-Verzeichnis
-relativ zu den späteren Pfaden, die verankert werden können,
-zu bezeichnen. Hierdurch können Dateien durch eine komplette
-URL angegeben werden (mit Pfaden, die mit / beginnen und entsprechend
-verankert sind oder sogar mit Pfaden relativ zu dem Verzeichnis, in dem
-die letzte Voreinstellungsdatei gefunden wurde). Dies kann genutzt werden,
-um Skripte zu entwerfen, die in höherem Maße portierbar sind, so dass eine
-komplette Hierachie von Skripten an einen neuen Ort verschoben werden
+Der letzte Teil der URL (<literal>d-i/etch/./preseed.cfg</literal>) stammt
+von <literal>auto-install/defaultroot</literal>. Standardmässig ist dabei
+das Verzeichnis <literal>etch</literal> enthalten, damit zukünftige
+Versionen einen eigenen Codenamen festlegen können, um den Leuten eine
+kontrollierte Migration zu ermöglichen. Der Teil <literal>/./</literal>
+des Pfades wird genutzt, um das root-Verzeichnis relativ zu den späteren
+Pfaden, die verankert werden können, zu bezeichnen. Hierdurch können Dateien
+durch eine komplette URL angegeben werden (mit Pfaden, die mit / beginnen und
+entsprechend verankert sind oder sogar mit Pfaden relativ zu dem Verzeichnis,
+in dem die letzte Voreinstellungsdatei gefunden wurde). Dies kann genutzt
+werden, um Skripte zu entwerfen, die in höherem Maße portierbar sind, so dass
+eine komplette Hierachie von Skripten an einen neuen Ort verschoben werden
 kann, ohne sie total zu zerstören (z.B. Skripte auf einen USB-Stick
 verschieben, während sie auf einem Webserver entwickelt wurden).
 Ein Beispiel: die Voreinstellungsdatei setzt <literal>preseed/run</literal>
@@ -420,12 +431,12 @@ heruntergeladen.
 </para><para>
 
 Falls keine lokale DHCP- oder DNS-Infrastruktur existiert oder falls Sie
-nicht den Standardpfad zu der Datei preseed.cfg nutzen möchten, können Sie
-auch eine explizite URL angeben, und wenn Sie dabei nicht das
-Element <literal>/./</literal> im Pfad benutzen, wird sie passend zum
-Anfang des Pfades verankert (z.B. das dritte / in der URL). Hier ein
-Beispiel, das nur minimale Unterstützung von der lokalen Netzwerkinfrastruktur
-erfordert:
+nicht den Standardpfad zu der Datei <filename>preseed.cfg</filename> nutzen
+möchten, können Sie auch eine explizite URL angeben, und wenn Sie dabei nicht
+das Element <literal>/./</literal> im Pfad benutzen, wird sie passend zum
+Anfang des Pfades verankert (z.B. das dritte <literal>/</literal> in der URL).
+Hier ein Beispiel, das nur minimale Unterstützung von der lokalen
+Netzwerkinfrastruktur erfordert:
 
 <informalexample><screen>
 auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
@@ -450,7 +461,7 @@ Standardpfad hinzugefügt.
 
 Zusätzlich zur Angabe der URL können Sie auch Einstellungen angeben, die
 nicht direkt das Verhalten des &d-i; selbst beeinflussen, sondern an
-Skripte weitergeleitet werden, die in <literal>preseed/run</literal>
+Skripte weitergeleitet werden, die mit <literal>preseed/run</literal>
 in der geladenen Voreinstellungsdatei festgelegt sind. Derzeit ist das
 einzige solche Beispiel <literal>auto-install/classes</literal>, was den
 Alias <literal>classes</literal> hat. Dies kann entsprechend so genutzt
@@ -517,9 +528,10 @@ Die folgenden Aliase könnten nützlich sein, wenn Sie Voreinstellung
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
 <row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
 <row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
 <row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
-<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
 <row><entry>suite</entry><entry>mirror/suite</entry></row>
 </tbody></tgroup>
 </informaltable>
@@ -839,7 +851,7 @@ d-i netcfg/wireless_wep string
   <title>Einstellungen für den Spiegelserver</title>
 <para>
 
-Abhängig von der Installationsmethode, die Sie verwenden, könnte ein
+Abhängig von der Installationsmethode, die Sie verwenden, kann ein
 Spiegelserver sowohl dazu genutzt werden, zusätzliche Komponenten des
 Installers und das Basissystem herunterzuladen wie auch um die
 <filename>/etc/apt/sources.list</filename> für das zu installierende System
@@ -881,10 +893,10 @@ d-i mirror/http/proxy string
   <title>Partitionierung</title>
 <para>
 
-Die Voreinstellung für die Partitionierung der Festplatte wird sehr
-stark eingeschränkt durch das, was <classname>partman-auto</classname>
-unterstützt. Sie können entweder wählen, vorhandenen freien Platz auf der
-Platte zu partitionieren, oder die komplette Platte. Das Layout der Disk kann
+Die Möglichkeiten der Voreinstellung für die Partitionierung der Festplatte
+werden begrenzt durch das, was <classname>partman-auto</classname>
+unterstützt. Sie können wählen, entweder vorhandenen freien Platz auf der
+Platte zu partitionieren oder die komplette Platte. Das Layout der Disk kann
 durch ein vordefiniertes Rezept festgelegt werden, durch ein selbst erstelltes
 aus einer Rezeptdatei oder durch ein Rezept, das in der Vorkonfigurationsdatei
 enthalten ist. Derzeit ist es nicht möglich, mehrere Festplatten per
@@ -1201,9 +1213,9 @@ Kernels.
 # erkannt wird. 
 d-i grub-installer/only_debian boolean true
 
-# Dies bewirkt, dass grub in den MBR installiert wird, wenn andere Betriebs-
-# systeme erkannt werden. Dies ist nicht so sicher, da möglicherweise die
-# anderen Systeme nicht mehr gestartet werden können.
+# Dies bewirkt, dass grub in den MBR installiert wird, wenn auch noch andere
+# Betriebssysteme erkannt wurden. Dies ist nicht so sicher, da möglicherweise
+# die anderen Systeme nicht mehr gestartet werden können.
 d-i grub-installer/with_other_os boolean true
 
 # Wenn Sie alternativ an einen anderen Ort als in den MBR installieren
@@ -1275,8 +1287,9 @@ auszuwählen.
 Wenn Sie zusätzlich zu den Paketen, die durch die Programmgruppen installiert
 werden, weitere benötigen, können Sie den Parameter
 <classname>pkgsel/include</classname> benutzen. Der Wert für diesen Parameter
-kann eine entweder durch Kommas oder durch Leerzeichen getrennte Liste sein, so
-dass Sie ihn auch recht einfach auf der Kernel-Kommandozeile verwenden können.
+kann eine Liste von Paketen sein, getrennt entweder durch Kommas oder durch
+Leerzeichen, so dass Sie ihn auch recht einfach auf der Kernel-Kommandozeile
+verwenden können.
 
 </para>
 
@@ -1476,12 +1489,13 @@ für andere Zwecke/Netze/Orte in anderen Dateien.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
-# Flexibler als alles andere ist dies: ein Programm wird heruntergeladen
-# und gestartet. Das Programm kann Kommandos wie debconf-set nutzen, um
-# die debconf-Datenbank zu manipulieren. Beachten Sie: falls die Datei-
-# namen relativ sind, gehen sie vom gleichen Verzeichnis aus wie die
-# Voreinstellungsdatei, von der sie gestartet werden.
-d-i preseed/run string foo.sh
+# Flexibler als alles andere: ein Programm wird heruntergeladen und
+# gestartet. Das Programm kann Kommandos wie debconf-set nutzen, um die
+# debconf-Datenbank zu manipulieren. Es können auch mehrere Skripte
+# angegeben werden, getrennt durch Leerzeichen. Beachten Sie: falls die
+# Dateinamen relativ sind, gehen sie vom gleichen Verzeichnis aus wie
+# die Voreinstellungsdatei, von der sie gestartet werden.
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
 <para>
