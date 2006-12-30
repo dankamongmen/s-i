@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version:  43642 -->
+<!-- original version:  43675 -->
 
  <sect1 id="boot-parms"><title>Paramètres d'amorçage</title>
 <para>
@@ -76,18 +76,26 @@ Le système d'installation reconnaît des paramètres d'amorçage <footnote>
 En cas de dépassement, le noyau <emphasis>panique</emphasis>.
 </para></footnote>
 
-qui peuvent être utiles. 
+qui peuvent être utiles.
 
 </para>
+<para>
+
+Certains paramètres possèdent une <quote>forme courte</quote> qui permet
+d'éviter les limitations concernant les options du noyau données sur la
+ligne de commande. La saisie en est aussi facilitée. Quand il existe une forme courte,
+elle sera donnée entre parenthèses, après la forme longue. Les exemples de ce
+manuel utilisent la forme courte des paramètres.
+</para>
+
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 Ce paramètre sert à déclarer le niveau de la priorité à partir de laquelle
 les messages seront affichés. 
-Forme courte : <userinput>priority</userinput>.
 
 </para><para>
 
@@ -202,13 +210,12 @@ cette recherche à un seul périphérique.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Certaines architectures utilisent le tampon vidéo du noyau afin d'offrir 
 l'installation en plusieurs langues. Si le tampon vidéo provoque des 
 problèmes sur votre système, vous pouvez utiliser le paramètre 
-<userinput>debian-installer/framebuffer=false</userinput> ou en plus court,
 <userinput>fb=false</userinput>, pour le désactiver. 
 Les symptômes de ce problème sont des messages d'erreur au sujet de bterm ou 
 bogl, un écran noir, ou un blocage quelques minutes après le début de
@@ -244,15 +251,14 @@ pouvez amorcer avec le paramètre
 
 
  <varlistentry arch="not-s390">
-<term>debian-installer/theme</term>
+<term>debian-installer/theme (theme)</term>
 <listitem><para>
 
 L'apparence (couleurs, icônes, etc.) de l'interface de l'installateur est
 déterminée par un thème. Les thèmes diffèrent selon les interfaces. Pour l'instant,
 les interfaces newt et gtk n'ont qu'un seul thème, <quote>dark</quote>, conçu pour
 les déficients visuels. On peut installer le thème avec le paramètre
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
-ou <userinput>theme=<replaceable>dark</replaceable></userinput>.
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -296,35 +302,33 @@ PCMCIA.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Indique l'adresse du fichier de préconfiguration à télécharger pour
 automatiser l'installation. Voyez la <xref linkend="automatic-install"/>.
-Forme courte&nbsp;: <userinput>url</userinput>.
+
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Indique le chemin d'un fichier de préconfiguration à utiliser pour
 automatiser l'installation. Voyez la <xref linkend="automatic-install"/>.
-Forme courte&nbsp;: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 
 <varlistentry>
-<term>auto-install/enabled</term>
+<term>auto-install/enabled (auto)</term>
 <listitem><para>
 
 Retarde certaines questions normalement posées avant l'installation du réseau.
-Ainsi la préconfiguration devient possible. Forme courte&nbsp;:
-<userinput>auto=true</userinput>. Voyez <xref linkend="preseed-auto"/> pour des
-précisions.
+Ainsi la préconfiguration devient possible.
+Voyez <xref linkend="preseed-auto"/> pour des précisions.
 </para></listitem>
 </varlistentry>
 
@@ -406,12 +410,11 @@ pour certains cas particuliers. Une présentation générale se trouve dans
 <variablelist>
 
 <varlistentry>
-<term>debian-installer/locale</term>
+<term>debian-installer/locale (locale)</term>
 <listitem><para>
 
 Ce paramètre permet de définir la langue et le pays utilisés pour l'installation.
 La locale doit être connue dans Debian.
-Forme courte&nbsp;: <userinput>locale</userinput>.
 Par exemple, <userinput>locale=de_CH</userinput> sélectionne l'allemand comme
 langue et la Suisse comme pays.
 
@@ -419,12 +422,11 @@ langue et la Suisse comme pays.
 </varlistentry>
 
 <varlistentry>
-<term>anna/choose_modules</term>
+<term>anna/choose_modules (modules)</term>
 <listitem><para>
 
 Ce paramètre permet de charger automatiquement des composants de l'installateur
 qui ne sont pas chargés par défaut.
-Forme courte&nbsp;: <userinput>modules</userinput>.
 Voici des exemples de composants qui peuvent être utiles&nbsp;:
 <classname>openssh-client-udeb</classname> (pour pouvoir utiliser
 <command>scp</command> pendant l'installation) et
@@ -444,12 +446,25 @@ forcer une configuration manuelle du réseau.
 </varlistentry>
 
 <varlistentry>
-<term>tasksel:tasksel/first</term>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+L'installateur utilise normalement le protocole http pour télécharger les fichiers
+sur les miroirs Debian. Il n'est pas possible de passer à ftp pendant les
+installations faites avec la priorité <emphasis>normale</emphasis>. En mettant
+ce paramètre à <userinput>ftp</userinput>, vous pouvez forcer l'installateur
+à utiliser ce protocole. Notez que vous ne pouvez sélectionner un miroir ftp dans une
+liste, vous devrez saisir son nom.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 Ce paramètre permet la sélection de tâches qui ne sont pas disponibles
 dans la liste interactive, comme par exemple la tâche <literal>kde-desktop</literal>.
 Voyez <xref linkend="pkgsel"/> pour des précisions.
-Forme courte&nbsp;: <userinput>tasks</userinput>.
 
 </para></listitem>
 </varlistentry>
