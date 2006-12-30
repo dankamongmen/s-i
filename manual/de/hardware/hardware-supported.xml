@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 43640 -->
 
  <sect1 id="hardware-supported">
  <title>Unterstützte Hardware</title>
@@ -149,8 +149,8 @@ von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 </row>
 
 <row>
-  <entry morerows="3">IBM/Motorola PowerPC</entry>
-  <entry morerows="3">powerpc</entry>
+  <entry morerows="2">IBM/Motorola PowerPC</entry>
+  <entry morerows="2">powerpc</entry>
   <entry>CHRP</entry>
   <entry>chrp</entry>
 </row><row>
@@ -159,18 +159,18 @@ von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 </row><row>
   <entry>PReP</entry>
   <entry>prep</entry>
-</row><row>
-  <entry>APUS</entry>
-  <entry>apus</entry>
 </row>
 
 <row>
-  <entry morerows="1">Sun SPARC</entry>
-  <entry morerows="1">sparc</entry>
-  <entry morerows="1"></entry>
-  <entry>sun4cdm</entry>
+  <entry morerows="2">Sun SPARC</entry>
+  <entry morerows="2">sparc</entry>
+  <entry>sun4m</entry>
+  <entry>sparc32</entry>
 </row><row>
   <entry>sun4u</entry>
+  <entry morerows="1">sparc64</entry>
+</row><row>
+  <entry>sun4v</entry>
 </row>
 
 <row>
@@ -203,7 +203,7 @@ unsere
 <ulink url="&url-bts;">Fehlerdatenbank (Bug Tracking System, BTS)</ulink>, um
 Probleme zu melden; geben Sie jedoch auf jeden Fall an, dass der
 Fehler auf &arch-title; vorgekommen ist. Es könnte auch notwendig sein, die
-<ulink url="&url-list-subscribe;">Debian &arch-listname;-Mailingliste</ulink>
+<ulink url="&url-list-subscribe;">debian &arch-listname;-Mailingliste</ulink>
 zu kontaktieren.
 
 </para>
@@ -223,7 +223,7 @@ zu kontaktieren.
 &supported-s390.xml;
 &supported-sparc.xml;
 
-  <sect2 id="gfx" arch="not-s390"><title>Grafikkarten</title>
+  <sect2 id="gfx" arch="not-s390"><title>Grafikkarten-Unterstützung</title>
 <para arch="x86">
 
 Sie sollten eine VGA-kompatible Grafikschnittstelle für das
@@ -262,6 +262,34 @@ Gruppe von Grafikkarten.
 Eine <ulink url="&url-bcm91250a-hardware;">Kompatibilitätsliste</ulink>
 für die Evaluation-Boards ist verfügbar.
 
+</para><para arch="sparc">
+
+Die meiste Grafik-Hardware, die man auf Sparc-basierten Maschinen findet, wird
+unterstützt. X.org-Grafiktreiber sind verfügbar für sunbw2, suncg14, suncg3,
+suncg6, sunleo- und suntcx-Framebuffer, Creator3D- und Elite3D-Karten
+(sunffb-Treiber), PGX24/PGX64 ATI-basierte Grafikkarten (ati-Treiber) sowie für
+PermediaII-basierte Karten (glint-Treiber). Um eine Elite3D-Karte mit X.org
+verwenden zu können, müssen Sie zusätzlich das Paket
+<classname>afbinit</classname> installieren; lesen Sie auch die Dokumentation,
+die dort enthalten ist, für Informationen, wie Sie die Karte aktivieren.
+
+</para><para arch="sparc">
+
+Es ist für eine Sparc-Maschine nicht unüblich, in der Standardbestückung zwei
+Grafikkaren installiert zu haben. In einem solchen Fall besteht die Möglichkeit,
+dass der Linux-Kernel seine Ausgabe nicht auf die Karte ausgibt, die eingangs
+von der Firmware genutzt wurde, sondern auf die andere. Weil in einem solchen
+Fall auf der grafischen Konsole nichts angezeigt wird, könnte man
+fälschlicherweise davon ausgehen, der Rechner würde hängen (gewöhnlich ist die
+letzte Meldung, die Sie auf der Konsole sehen <quote>Booting Linux...</quote>).
+Eine mögliche Lösung ist, eine der Karten physikalisch aus dem System zu
+entfernen; eine andere Möglichkeit wäre, eine der Karten mittels eines
+Kernel-Bootparameters zu deaktivieren. Alternativ können Sie die serielle
+Konsole zur Installation verwenden, wenn die grafische Bildschirmanzeige eh
+nicht nötig oder erwünscht ist. Auf einige Systemen kann die Nutzung der
+seriellen Konsole ganz einfach aktiviert werden, indem man den Stecker der
+Tastatur vor dem Systemstart herauszieht.
+
 </para>
   </sect2>
 
@@ -281,7 +309,7 @@ spezieller Laptop gut mit GNU/Linux zurechtkommt, lesen Sie die
 <para>
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
-Multi-Processing</quote> oder SMP genannt &ndash; ist für diese Architektur
+Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
 verfügbar. Das Standard-Kernelimage in &release; wurde mit SMP-Unterstützung
 kompiliert. Das sollte eine Installation jedoch nicht verhindern, da der
 SMP-Kernel auch auf Nicht-SMP-Systemen starten müsste; der Kernel wird
@@ -304,7 +332,7 @@ das Abwählen von <quote>&smp-config-option;</quote> im
 <para>
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
-Multi-Processing</quote> oder SMP genannt &ndash; ist für diese Architektur
+Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
 verfügbar. Das Standard-Kernelimage in &release; wurde mit
 <firstterm>SMP-alternatives</firstterm>-Unterstützung kompiliert.
 Das bedeutet, dass der Kernel die Zahl der Prozessoren (oder
@@ -324,7 +352,7 @@ ist nicht mit SMP-Unterstützung kompiliert.
 <para>
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
-Multi-Processing</quote> oder SMP genannt &ndash; ist für diese Architektur
+Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
 verfügbar. Das Standard-Kernelimage in &release; unterstützt jedoch kein SMP.
 Das sollte eine Installation jedoch nicht verhindern, da der
 Standard-Nicht-SMP-Kernel auch auf SMP-Systemen starten müsste;
@@ -348,7 +376,7 @@ das Auswählen von <quote>&smp-config-option;</quote> im
 <para>
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
-Multi-Processing</quote> oder SMP genannt &ndash; ist für diese Architektur
+Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
 verfügbar und wird auch von einem der vorkompilierten Kernel unterstützt. Es
 hängt jedoch von Ihrem Installationsmedium ab, ob dieser SMP-fähige Kernel
 standardmäßig installiert wird. Dies sollte eine Installation aber nicht
@@ -361,7 +389,9 @@ Um die Vorteile von mehreren Prozessoren zu nutzen, sollten Sie überprüfen,
 ob ein Kernelpaket, das SMP unterstützt, installiert ist und, falls nicht,
 ein passendes Paket wählen und installieren.
 
-Sie können ebenfalls Ihren eigenen benutzerspezifischen Kernel mit
+</para><para>
+
+Sie können auch Ihren eigenen benutzerspezifischen Kernel mit
 SMP-Unterstützung bauen. Zum momentanen Zeitpunkt (Kernel-Version
 &kernelversion;) ist der Weg zum Aktivieren von SMP das Auswählen von
 <quote>&smp-config-option;</quote> im

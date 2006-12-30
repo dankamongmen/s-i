@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40671 -->
+<!-- original version: 43599 -->
 
 <chapter id="boot-new">
  <title>Das neue Debian-System starten</title>
@@ -10,17 +10,46 @@
 Der erste Systemstart aus eigener Kraft ist das, was Elektroingenieure
 den <quote>smoke test</quote> nennen (testen ob's qualmt).
 
+</para><para arch="x86">
+
+Wenn Sie eine Standard-Installation durchgeführt haben, sollten Sie als erstes
+das Menü des Bootloaders <classname>grub</classname> oder eventuell
+<classname>lilo</classname> sehen, wenn Sie booten. Der erste Auswahlpunkt
+in dem Menü ist Ihr neues Debian-System. Falls Sie weitere Betriebssysteme auf
+dem Rechner installiert haben (wie z.B. Windows), die vom Installationssystem
+erkannt wurden, sind diese weiter unten im Menü aufgelistet.
+
 </para><para>
 
-Wenn Sie Debian direkt starten, aber der Start nicht funktioniert,
-legen Sie entweder das Original-Installationsmedium oder Ihre angepasste
-Boot-Floppy ein, wenn Sie eine haben, und machen einen Neustart.
-Bei dieser Methode müssen Sie evtl. einige Boot-Parameter angeben, wie
-<userinput>root=<replaceable>root</replaceable></userinput>,
-wobei <replaceable>root</replaceable> Ihre root-Partition ist, also
-z.B. <filename>/dev/sda1</filename>.
-Alternativ finden Sie im <xref linkend="rescue"/> Anweisungen, wie Sie den
-eingebauten Rettungsmodus des Installers benutzen.
+Falls das System nicht korrekt startet - keine Panik. Wenn die Installation
+erfolgreich verlaufen ist, stehen die Chancen gut, dass nur ein relativ kleiner
+Fehler vorhanden ist, der das System daran hindert, Debian zu booten. In den
+meisten Fällen können solche Probleme behoben werden, ohne die Installation
+komplett wiederholen zu müssen. Eine mögliche Option, das Problem zu lösen,
+ist die Benutzung des eingebauten Rettungs-Modus' des Installers (siehe
+<xref linkend="rescue"/>).
+
+</para><para>
+
+Wenn Sie noch neu sind bei Debian und Linux, benötigen Sie vielleicht Hilfe
+von erfahreneren Benutzern. <phrase arch="x86">Direkte Online-Hilfe bekommen
+Sie vielleicht auf den IRC-Channels #debian oder #debian-boot im OFTC-Netzwerk.
+Alternativ können Sie die <ulink url="&url-list-subscribe;">debian-user
+Mailingliste</ulink> kontaktieren.</phrase>
+<phrase arch="not-x86">Für nicht ganz so gängige Architekturen wie &arch-title;
+ist es die beste Wahl, auf der
+<ulink url="&url-list-subscribe;">debian-&arch-listname;
+Mailingliste </ulink> nachzufragen.</phrase>
+Sie können auch einen Installationsbericht einschicken, wie im
+<xref linkend="submit-bug"/> beschrieben. Bitte achten Sie darauf, Ihr Problem
+klar und verständlich zu beschreiben und etwaige (Fehler-)Meldungen mit
+anzugeben, die anderen helfen könnten, das Problem zu diagnostizieren.
+
+</para><para arch="x86">
+
+Falls Sie ein weiteres Betriebssystem auf Ihrem Computer installiert haben, dieses
+aber nicht oder nicht korrekt erkannt wurde, senden Sie uns bitte ebenfalls einen
+Installationsbericht.
 
 </para>
 
@@ -199,7 +228,7 @@ aktualisieren. Lesen Sie dazu das
 Sobald Ihr System gebootet ist, wird der Anmeldebildschirm angezeigt.
 Melden Sie sich mit Ihrem persönlichen Benutzernamen und Passwort an,
 das Sie während der Installation festgelegt haben. Das System ist jetzt
-fertig zur Benutzung.
+bereit zur Benutzung.
 
 </para><para>
 
@@ -210,30 +239,44 @@ gearbeitet, diese zu vereinheitlichen. Hier ein paar Ausgangspunkte:
 
 </para><para>
 
-Dokumentation, die zu Anwendungsprogrammen gehört, ist unter
+Dokumentation, die zu Anwendungsprogrammen gehört, finden Sie unter
 <filename>/usr/share/doc/</filename> in einem Unterverzeichnis mit dem
-Namen des Programms installiert. Ein Beispiel: Das APT-Benutzerhandbuch
-zur Nutzung von <command>apt</command> (um weitere Programme auf Ihrem
-System zu installieren) liegt in
-<filename>/usr/share/doc/apt/guide.html/index.html</filename>.
+Namen des Programms (oder genauer gesagt mit dem Namen des Debian-Paketes,
+das das Programm enthält). Oft ist allerdings weitergehende Dokumentation auch
+in separaten Dokumentationspaketen enthalten, die meist standardmäßig nicht
+installiert werden. Zum Beispiel finden Sie Dokumentation zu dem
+Paketmanagement-Werkzeug <command>apt</command> in den Paketen
+<classname>apt-doc</classname> oder <classname>apt-howto</classname>.
 
 </para><para>
 
 Zusätzlich gibt es einige spezielle Verzeichnisse unterhalb von
-<filename>/usr/share/doc/</filename>. Linux-HowTos sind im
-<emphasis>.gz</emphasis>-Format in
-<filename>/usr/share/doc/HOWTO/en-txt/</filename> installiert.
-Nachdem <command>dhelp</command> installiert ist, finden Sie
+<filename>/usr/share/doc/</filename>: in
+<filename>/usr/share/doc/HOWTO/en-txt/</filename> sind Linux-HowTos im
+komprimierten <emphasis>.gz</emphasis>-Format installiert. Und nachdem
+das Paket <classname>dhelp</classname> installiert wurde, finden Sie
 in <filename>/usr/share/doc/HTML/index.html</filename> eine Übersicht
-über die Dokumentationen, die Sie mit einem Webbrowser lesen können.
+über Dokumentationen, die Sie mit einem Webbrowser lesen können.
 
 </para><para>
 
-Ein einfacher Weg, diese Dokumente zu betrachten, ist, mit
-<userinput>cd /usr/share/doc/</userinput> in das entsprechende Verzeichnis
-zu wechseln und dann <userinput>lynx</userinput> gefolgt von einem Leerzeichen
-und einem Punkt einzugeben (der Punkt steht für das aktuelle Verzeichnis, in
-dem Sie sich befinden).
+Ein einfacher Weg, diese Dokumente mit einem text-basierten Browser zu
+betrachten, ist, folgende Befehle einzugeben:
+
+<informalexample><screen>
+$ cd /usr/share/doc/
+$ w3c .
+</screen></informalexample>
+
+Der Punkt hinter <command>w3c</command> weist das Programm an, den Inhalt
+des aktuellen Verzeichnisses anzuzeigen.
+
+</para><para>
+
+Wenn Sie eine grafische Desktop-Umgebung wie GNOME oder KDE installiert haben,
+können Sie auch deren Webbrowser verwenden. Starten Sie den Browser aus dem
+Menü und geben Sie <userinput>/usr/share/doc/</userinput> in die Adresszeile
+ein.
 
 </para><para>
 
@@ -245,15 +288,10 @@ eine Hilfe zu Shell-Befehlen, und wenn Sie ein Kommando gefolgt von
 <userinput>--help</userinput> eintippen, wird für gewöhnlich eine kurze
 Zusammenfassung angezeigt, wie das Kommando zu nutzen ist. Wenn die Ausgabe
 eines Befehls länger als die Seite ist, tippen Sie hinter dem Befehl
-<userinput>| more</userinput> ein, so dass die Ausgabe seitenweise angezeigt
-wird. Um eine Liste aller verfügbaren Befehle zu bekommen, die mit einem
+<userinput>|&nbsp;more</userinput> ein; dadurch wird die Ausgabe seitenweise
+angezeigt. Um eine Liste aller verfügbaren Befehle zu bekommen, die mit einem
 bestimmten Buchstaben oder einer bestimmten Buchstabenkombination beginnen,
 tippen Sie den/die Anfangsbuchstaben ein und drücken zweimal TAB.
-
-</para><para>
-
-Eine umfangreichere Einführung in Debian und GNU/Linux liefert
-<filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
 
 </para>
 
