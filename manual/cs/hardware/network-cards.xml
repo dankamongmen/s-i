@@ -1,42 +1,27 @@
 <!-- $Id$ -->
-<!-- original version: 39614 -->
+<!-- original version: 43687 -->
 
  <sect1 id="network-cards">
  <title>Hardware pro připojení k síti</title>
 
-<para arch="x86">
-
-<!-- last updated for kernel-image_2.0.36-2 -->
-
-Instalační systém podporuje naprostou většinu síťových karet pro
-sběrnice PCI a ISA, avšak některé síťové karty nejsou podporovány
-všemi instalačními sadami.  Jedná se o karty a protokoly AX.25,
-NI16510 EtherBlaster, Schneider &amp; Koch G16 a vestavěnou kartu
-Zenith Z-Note.  Rovněž nejsou podporovány síťové karty pro sběrnici
-MCA a karty a protokol FDDI. Nějaké (postarší) informace můžete najít
-v dokumentu <ulink url="&url-linux-mca;">Linux na MCA</ulink>.
-
-<!--
-Pokud instalační systém vaši síťovou kartu nepodporuje, můžete
-si sestavit vlastní jádro s příslušnou podporou a nahradit jím jádro
-instalační (viz <xref linkend="rescue-replace-kernel"/>).
--->
-
-</para><para arch="x86">
-
-Z oblasti ISDN není v sadě zaváděcích médií zahrnuta podpora pro
-protokol D-channel německé sítě 1TR6 a karty Spellcaster BRI.
-
-</para><para arch="m68k">
+<para>
 
 Libovolná síťová karta (NIC) podporovaná linuxovým jádrem by měla být
-podporována i zaváděcími médii. Možná budete muset zavést ovladač jako
-modul. Podrobnosti viz <ulink url="&url-m68k-faq;"></ulink>.
+podporována i instalačním systémem. Ovladače dostupné jak moduly jádra
+by se měly zavádět automaticky.
+
+<phrase arch="x86">To zahrnuje většinu PCI a PCMCIA karet.</phrase>
+
+<phrase arch="i386">Podporováno je i mnoho starších karet pro sběrnici
+ISA.</phrase>
+
+<phrase arch="m68k">Podrobnosti viz <ulink
+url="&url-m68k-faq;"></ulink>.</phrase>
 
 </para><para arch="sparc">
 
-Následující síťové karty (NIC) jsou podporovány přímo v instalačním
-jádře:
+To zahrnuje mnoho obecných PCI karet (na systémech s podporou PCI),
+ale i následující karty od Sunu:
 
 <itemizedlist>
 <listitem><para>
@@ -49,15 +34,6 @@ Sun LANCE
 Sun Happy Meal
 
 </para></listitem>
-</itemizedlist>
-
-</para><para arch="sparc">
-
-Další ovladače síťových karet existují ve formě modulů. Tyto můžete
-použít až po instalaci ovladačů. Ovšem díky magii v OpenPROM je možné
-zavádět z těchto zařízení:
-
-<itemizedlist>
 <listitem><para>
 
 Sun BigMAC
@@ -75,12 +51,6 @@ MyriCOM Gigabit Ethernet
 </para></listitem>
 </itemizedlist>
 
-</para><para arch="alpha;powerpc;hppa;mips;ia64">
-
-Libovolná síťová karta (NIC) podporovaná linuxovým jádrem by měla být
-podporována i zaváděcími médii. Možná budete muset zavést ovladač jako
-modul.
-
 </para><para arch="mipsel">
 
 Kvůli omezení jádra jsou podporována pouze síťová rozhraní integrovaná
@@ -89,10 +59,7 @@ současné době nefungují.
 
 </para><para arch="s390">
 
-Libovolná síťová karta (NIC) podporovaná linuxovým jádrem by měla být
-podporována i zaváděcími disky. Všechny ovladače síťových karet jsou
-sestaveny jako moduly, takže během úvodní fáze síťové instalace budete
-muset jeden z nich nahrát. Podporovaná zařízení jsou:
+Podporovaná síťová zařízení jsou:
 
 <itemizedlist>
 <listitem><para>
@@ -107,73 +74,103 @@ OSA-2 Token Ring/Ethernet a OSA-Express Fast Ethernet (ne QDIO)
 </para></listitem>
 <listitem><para>
 
-Inter-User Communication Vehicle (IUCV) &mdash; dostupné pouze pro hosty
-systému VM
-
-</para></listitem>
-<listitem><para>
-
 OSA-Express v QDIO módu, HiperSockets a Guest-LAN
 
 </para></listitem>
 </itemizedlist>
 
-</para>
-
-
-<para arch="arm">
-
-Na počítačích NetWinder a CATS jsou následující síťová rozhraní
-podporována přímo zaváděcími disky:
-
-<itemizedlist>
-<listitem><para>
-
-PCI-based NE2000
-
-</para></listitem>
-<listitem><para>
-
-DECchip Tulip
-
-</para></listitem>
-</itemizedlist>
-
 </para><para arch="arm">
 
-Zaváděcí disky na počítačích RiscPC podporují tyto síťové karty:
+Na architektuře &architecture; je podporována většina integrovaných
+ethernetových zařízení a dostupné jsou i moduly pro přídavná PCI a USB
+zařízení. Významnou výjimkou je platforma IPX4xx (obsahující zařízení
+jako Linksys NSLU2), která pro fungování zabudovaného ethernetového
+rozhraní potřebuje proprietární mikrokód. Neoficiální obrazy pro
+Linksys NSLU2 s integrovaným proprietárním mikrokódem můžete získat na
+stránce <ulink
+url="http://www.slug-firmware.net/">Slug-Firmware</ulink>.
 
-<itemizedlist>
-<listitem><para>
+</para><para arch="x86">
 
-Ether1
-
-</para></listitem>
-<listitem><para>
-
-Ether3
-
-</para></listitem>
-<listitem><para>
-
-EtherH
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Jestliže je vaše karta zmíněna v předchozím seznamu, můžete provést
-celou instalaci ze sítě bez použití disket nebo CD.
-
-</para><para arch="arm">
-
-Všechny ostatní síťové karty (NIC) podporované linuxovým jádrem by
-měly být podporovány i zaváděcími disky.
-Možná budete muset zavést ovladač síťové karty jako modul &mdash; to
-znamená, že pro instalaci jádra a modulů budete muset použít jiné
-médium.
+Z oblasti ISDN není v sadě zaváděcích disků zahrnuta podpora pro
+protokol D-channel (staré) německé sítě 1TR6 a karty Spellcaster
+BRI. Používání ISDN během instalace není podporováno.
 
 </para>
 
+  <sect2 arch="not-s390" id="nics-firmware">
+  <title>Ovladače vyžadující firmware</title>
+<para>
+
+Instalační systém zatím nepodporuje používání firmware. To znamená, že
+síťové karty používající ovladač, který vyžaduje nahrání firmwaru,
+nejsou podporovány.
+
+</para><para>
+
+Jestliže pro instalaci nemůžete použít jinou síťovou kartu, můžete pro
+instalaci &debian;u použít obraz velkého CD nebo DVD. Při instalaci
+zvolte možnost, že nechcete nastavit síť a že chcete použít pouze
+balíky, které jsou dostupné na CD/DVD. Po instalaci (po restartu do
+nového systému) pak můžete nainstalovat příslušný ovladač a firmware a
+nastavit síť ručně. Může se stát, že firmware bude zabalený v jiném
+balíku než ovladač, nebo že nebude dostupný v <quote>hlavní</quote>
+sekci archivu Debianu.
+
+</para><para>
+
+Pokud je <emphasis>podporovaný</emphasis> samotný ovladač, je zde
+šance, že budete moci síťovou kartu používat i během instalace. Musíte
+však z nějakého média ručně nakopírovat firmware do adresáře
+<filename>/usr/lib/hotplug/firmware</filename>. Firmware byste pak
+měli před dokončením instalace nakopírovat i do nově nainstalovaného
+systému.
+
+</para>
+  </sect2>
+
+  <sect2 arch="sparc" id="nics-sparc-trouble">
+  <title>Známé problémy na &arch-title;</title>
+<para>
+
+U konkrétních síťových karet bylo hlášeno několik problémů, které je
+vhodné zde zmínit.
+
+</para>
+
+   <sect3>
+   <title>Konflikt mezi ovladači tulip a dfme</title>
+<para>
+
+Existuje několik síťových PCI karet, které se identifikují stejně, ale
+jsou jsou podporovány různými ovladači. Některé karty pracují s
+ovladačem <literal>tulip</literal>, jiné s ovladačem
+<literal>dfme</literal>. Protože se karty identifikují stejně, jádro
+mezi nimi nemůže rozlišit a neví, který ovladač má nahrát. Pokud to
+bude zrovna ten špatný, karta může fungovat špatně, nebo dokonce
+nemusí fungovat vůbec.
+
+</para><para>
+
+Jedná se o běžný problém na systémech Netra s kartami Davicom
+(kompatibilní s DEC-Tulip). V tomto případě je nejspíš ten správný
+ovladač <literal>tulip</literal>. Řešením je se během instalace
+přepnout do shellu, odebrat chybný modul (nebo moduly, pokud jich je
+nahráno víc) příkazem
+<userinput>modprobe -r <replaceable>modul</replaceable></userinput>
+a následně zavést správný modul příkazem
+<userinput>modprobe <replaceable>module</replaceable></userinput>.
+ 
+</para>
+   </sect3>
+
+   <sect3><title>Sun B100 blade</title>
+<para>
+
+Síťový ovladač <literal>cassini</literal> nefunguje na systémech Sun
+B100 blade.
+ 
+ </para>
+   </sect3>
+  </sect2>
  </sect1>

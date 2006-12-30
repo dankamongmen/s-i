@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 40671 -->
+<!-- original version: 43599 -->
 
 <chapter id="boot-new">
  <title>Zavedení vašeho nového systému</title>
@@ -10,17 +10,44 @@
 
 Teď přichází chvíle <emphasis>zahoření</emphasis> systému.
 
+</para><para arch="x86">
+
+Jestliže jste provedli víceméně standardní instalaci, měli byste při
+zavádění systému jako první vidět nabídku zavaděče
+<classname>grub</classname>, případně
+<classname>lilo</classname>. První položky nabídky patří novému
+systému Debian. Jestliže máte na svém systému i jiné operační systémy
+(např. Windows), které byly během instalace rozpoznány, budou v
+nabídce uvedeny.
+
 </para><para>
 
-Jestliže Debian z disku nenaběhne, zkuste to znovu z původního
-instalačního média, nebo založte do mechaniky svou vlastní zaváděcí
-disketu (pokud nějakou máte) a restartujte počítač. Při startu budete
-pravděpodobně muset zadat nějaké parametry, například
-<userinput>root=<replaceable>kořen</replaceable></userinput>, kde
-<replaceable>kořen</replaceable> je vaše kořenová oblast
-(např. <filename>/dev/sda1</filename>). Alternativně si můžete
-přečíst část <xref linkend="rescue"/> a použít záchranný režim
-zabudovaný přímo v instalačním systému.
+Pokud Debian z disku nenaběhne, nepanikařte. Byla-li instalace
+úspěšná, je velká šance, že se jedná jen o relativně drobný
+problém. Ve většině případů je možné tyto problémy spravit bez
+opakování celé instalace. Jednou z možností je použít záchranný režim
+zabudovaný přímo do instalačního systému (viz část <xref
+linkend="rescue"/>).
+
+</para><para>
+
+Jestliže se systémem Debian začínáte, může se vám hodit pomoc
+zkušenějších uživatelů. <phrase arch="x86">Pro online pomoc můžete
+zkusit IRC kanály #debian nebo #debian-boot v síti OFTC, nebo můžete
+kontaktovat poštovní konferenci <ulink
+url="&url-list-subscribe;">debian-user</ulink>.</phrase> <phrase
+arch="not-x86">Pro méně rozšířené architektury jako &arch-title; bude
+nejlepší zeptat se v poštovní konferenci <ulink
+url="&url-list-subscribe;">debian-&arch-listname;</ulink>.</phrase>
+Dále nám můžete poslat zprávu o instalaci (viz <xref
+linkend="submit-bug"/>). Svůj problém popište stručně a jasně a opište
+z obrazovky všechny hlášky, které by mohly ostatním pomoci v určení
+problému.
+
+</para><para arch="x86">
+
+Pokud na svém počítači máte operační systémy, které nebyly nalezeny,
+nebo nebyly rozpoznány správně, pošlete nám prosím zprávu o instalaci.
 
 </para>
 
@@ -203,10 +230,12 @@ dokumentačních systémů, ale pracuje se na jejich sjednocení.
 </para><para>
 
 Dokumentace vztahující se k instalovaným programům je v adresáři
-<filename>/usr/share/doc/</filename> v podadresáři se jménem programu.
-Například příručka pro použití programu <command>apt</command> (APT
-User's Guide) je v souboru
-<filename>/usr/share/doc/apt/guide.html/index.html</filename>.
+<filename>/usr/share/doc/</filename> v podadresáři se jménem programu
+(přesněji se jménem balíku). U rozsáhlejší dokumentace bývá tato
+zabalena v samostatném balíku, který je většinou potřeba doinstalovat
+zvlášť. Například příručku pro použití programu <command>apt</command>
+naleznete v balíku <classname>apt-doc</classname> nebo
+<classname>apt-howto</classname>.
 
 </para><para>
 
@@ -214,16 +243,29 @@ User's Guide) je v souboru
 speciálních adresářů. Například linuxové návody <quote>jak na
 to</quote> (HOWTO) jsou v adresáři
 <filename>/usr/share/doc/HOWTO/en-txt/</filename>.
-Nainstalujete-li balík <command>dhelp</command>, získáte soubor
+Nainstalujete-li balík <classname>dhelp</classname>, získáte soubor
 <filename>/usr/share/doc/HTML/index.html</filename>, který obsahuje
 seznam veškeré instalované dokumentace.
 
 </para><para>
 
-Tyto dokumenty můžete jednoduše prohlížet tak, že vstoupíte do
-adresáře s dokumentací (<userinput>cd /usr/share/doc/</userinput>)
-a napíšete <userinput>lynx .</userinput> (tečka znamená aktuální
-adresář).
+Tyto dokumenty můžete jednoduše prohlížet pomocí textového
+prohlížeče. Zadejte:
+
+<informalexample><screen>
+<prompt>$</prompt> <userinput>cd /usr/share/doc/</userinput>
+<prompt>$</prompt> <userinput>w3c .</userinput>
+</screen></informalexample>
+
+Tečka za příkazem <command>w3c</command> říká, že má zobrazit obsah
+aktuálního adresáře.
+
+</para><para>
+
+Máte-li nainstalované desktopové grafické prostředí, můžete použít
+v něm obsažený grafický webový prohlížeč. Spusťte prohlížeč z nabídky
+aplikací a do řádku s adresou zadejte
+<userinput>/usr/share/doc/</userinput>.
 
 </para><para>
 
@@ -233,16 +275,11 @@ Dokumentaci k příkazu můžete získat, když napíšete na příkazovém řá
 návod k použití příkazu obvykle získáte, když za příkaz přidáte
 parametr <userinput>--help</userinput>. Jestliže je výstup delší než
 obrazovka, napište na konec příkazu ještě
-<userinput>| more</userinput> (výstup se pak zastaví po každé plné
+<userinput>| more</userinput> (výstup se pak zastaví po každé plné
 obrazovce). Všechny příkazy začínající určitým řetězcem zobrazíte tak,
 že napíšete řetězec a dvakrát stisknete klávesu <keycap>Tab</keycap>.
 Nápovědu k povelům shellu získáte příkazem
 <userinput>help</userinput>.
-
-</para><para>
-
-Obsáhlejší úvod do Debianu a GNU/Linuxu najdete (anglicky) v
-<filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
 
 </para>
 

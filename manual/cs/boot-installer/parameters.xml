@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 42982 -->
+<!-- original version: 43675 -->
 
  <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
 <para>
@@ -69,22 +69,29 @@ hodnotu <filename>ttya</filename>.
   <sect2 id="installer-args"><title>Parametry instalačního programu</title>
 <para>
 
-Instalační systém rozpoznává několik užitečných parametrů.<footnote><para>
+Instalační systém rozpoznává několik užitečných parametrů<footnote><para>
 
 S aktuálními jádry (od verze 2.6.9) lze použít až 32 parametrů a 32
 proměnných prostředí. Pokud tato čísla překročíte, jádro zpanikaří.
 
-</para></footnote>
+</para></footnote>.
+
+</para><para>
+
+Mnoho parametrů má i svou zkrácenou formu, která usnadňuje zadávání a
+také pomáhá obejít omezení příkazové řádky jádra. Pokud má parametr
+zkrácenou formu, bude uvedena v závorce za dlouhou podobou. Krátkou
+formu preferujeme i v příkladech této příručce.
 
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 Nastavením tohoto parametru můžete změnit nejnižší prioritu
-zobrazených otázek. Kratší varianta: <userinput>priority</userinput>
+zobrazených otázek.
 
 </para><para>
 
@@ -194,16 +201,14 @@ všech dostupných disketových mechanikách. Tímto parametrem jí sdělíte,
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Některé architektury využívají pro instalaci v různých jazycích
 jaderný framebuffer (grafická konzole). Pokud na svém systému
 zaznamenáte symptomy jako chybové hlášky o btermu a boglu, černou
 obrazovku nebo zamrznutí instalace po několika minutách od spuštění,
-můžete framebuffer vypnout parametrem
-<userinput>debian-installer/framebuffer=false</userinput>, nebo
-krátce <userinput>fb=false</userinput>.
+můžete framebuffer vypnout parametrem <userinput>fb=false</userinput>.
 
 </para><para arch="x86">
 
@@ -233,8 +238,8 @@ krátce <userinput>fb=true</userinput>.
 </para></note></listitem>
 </varlistentry>
 
-<varlistentry>
-<term>debian-installer/theme</term>
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
 <listitem><para>
 
 Téma určuje vzhled uživatelského rozhraní instalačního systému (barvy,
@@ -242,8 +247,7 @@ ikony, atd.). Dostupná témata se liší podle použitého
 rozhraní. Rozhraní newt i gtk nyní podporují pouze alternativní téma
 <quote>dark</quote>, které bylo navrženo pro zrakově postižené
 uživatele. Téma můžete nastavit zaváděcím parametrem
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>,
-případně <userinput>theme=<replaceable>dark</replaceable></userinput>.
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -291,36 +295,34 @@ nechvalně známé tím, že při startu PCMCIA služeb zaseknou celý systém.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Zde můžete zadat url k souboru s přednastavením, podle kterého se
 má provést automatická instalace, viz <xref
 linkend="automatic-install"/>.
-Kratší varianta: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Zde můžete zadat soubor s přednastavením, podle kterého se má provést
 automatická instalace, viz <xref linkend="automatic-install"/>.
-Kratší varianta: <userinput>file</userinput>
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enabled</term>
+<term>auto-install/enabled (auto)</term>
 <listitem><para>
 
-Odsune otázky obvykle zobrazované před začátkem přednastavení až za
-nastavení sítě. Podrobnosti o automatizaci instalací pomocí této
-možnosti naleznete v části <xref linkend="preseed-auto"/>.
-Kratší varianta: <userinput>auto=true</userinput>
+Při nastavení na hodnotu <userinput>true</userinput> odsune otázky
+obvykle zobrazované před začátkem přednastavení až za nastavení
+sítě. Podrobnosti o automatizaci instalací pomocí této možnosti
+naleznete v části <xref linkend="preseed-auto"/>.
  
 </para></listitem>
 </varlistentry>
@@ -407,7 +409,7 @@ linkend="preseed-bootparms"/>.
 <variablelist>
 
 <varlistentry>
-<term>debian-installer/locale</term>
+<term>debian-installer/locale (locale)</term>
 <listitem><para>
 
 Tento parametr nastaví jazyk a zemi instalace a následně instalovaného
@@ -415,20 +417,45 @@ systému. Podmínkou je, že zvolené locale musí být v Debianu
 podporováno. Například
 <userinput>debian-installer/locale=de_CH</userinput> vybere jako
 výchozí jazyk němčinu a jako zemi Švýcarsko.
-Kratší varianta: <userinput>locale</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>tasksel:tasksel/first</term>
+<term>anna/choose_modules (modules)</term>
+<listitem><para>
+
+Pomocí tohoto parametru můžete nechat automaticky nahrát komponenty
+instalačního systému, které se implicitně nenahrávají. Příkladem
+užitečných komponent jsou <classname>openssh-client-udeb</classname>
+(během instalace můžete využívat <command>scp</command>) a
+<classname>ppp-udeb</classname> (podporuje nastavení PPPoE).
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+Instalační systém standardně používá pro stažení souborů ze zrcadel
+Debianu protokol http a při standardní prioritě otázek nelze za běhu
+změnit na ftp. nastavením tohoto parametru na hodnotu
+<userinput>ftp</userinput> můžete instalátor donutit, aby použil právě
+tento protokol. Ftp zrcadlo nemůžete vybrat z připraveného seznamu,
+vždy jej musíte zadat ručně.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 
 Tímto parametrem můžete nainstalovat úlohy, které nejsou při instalaci
 v interaktivním seznamu úloh dostupné. Příkladem budiž úloha
 <literal>kde-desktop</literal>. Více informací naleznete v části <xref
 linkend="pkgsel"/>.
-Kratší varianta: <userinput>tasks</userinput>.
 
 </para></listitem>
 </varlistentry>

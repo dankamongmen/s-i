@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 42982 -->
+<!-- original version: 43658 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -338,7 +338,19 @@ Pro nastavení hodnoty libovolné proměnné zmíněné v tomto dodatku stačí
 zadat
 <userinput><replaceable>cesta/k/proměnné</replaceable>=<replaceable>hodnota</replaceable></userinput>. Jestliže
 se má hodnota použít k přednastavení balíku v cílovém systému, musíte
-předřadit ještě <firstterm>vlastníka</firstterm> proměnné
+předřadit ještě <firstterm>vlastníka</firstterm><footnote>
+
+<para>
+
+Vlastníkem debconf proměnné (nebo šablony) je obvykle jméno balíku,
+který obsahuje odpovídající debconf šablonu. U proměnných používaných
+přímo v instalačním systému je vlastníkem <quote>d-i</quote>. Šablony
+a proměnné mohou mít více vlastníků, což pomáhá při rozhodování, zda
+je možné je při odinstalování balíku odstranit z databáze debconfu.
+
+</para>
+
+</footnote> proměnné
 <userinput><replaceable>vlastník</replaceable>:<replaceable>cesta/k/proměnné</replaceable>=<replaceable>hodnota</replaceable></userinput>.
 Nezadáte-li vlastníka, hodnota proměnné se nezkopíruje do databáze
 debconfu v cílovém systému a tudíž zůstane při konfiguraci daného
@@ -409,12 +421,12 @@ přednastavením z adresy
 
 </para><para>
 
-První část cesty na serveru pochází z proměnné
-<literal>auto-install/defaultroot</literal>. Proměnná implicitně
-obsahuje adresář <literal>etch</literal>, aby jste s příchodem
-novějších verzí Debianu a nových kódových označení nemigrovali na nové
-verze automaticky, ale kontrolovaněji (po explicitním zadání nového
-kódového jména).
+Poslední část url (<literal>d-i/etch/./preseed.cfg</literal>) pochází
+z proměnné <literal>auto-install/defaultroot</literal>. Proměnná
+implicitně obsahuje adresář <literal>etch</literal>, aby jste s
+příchodem novějších verzí Debianu a nových kódových označení
+nemigrovali na nové verze automaticky, ale kontrolovaněji (po
+explicitním zadání nového kódového jména).
 
 Část <literal>/./</literal> indikuje kořen, vůči kterému můžete
 zadávat relativní cesty (používá se v
@@ -541,10 +553,11 @@ aliasy.
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
 <row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
 <row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry>
 </row>
 <row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
-<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
 <row><entry>suite</entry><entry>mirror/suite</entry></row>
 </tbody></tgroup>
 </informaltable>
@@ -1433,7 +1446,8 @@ dalších souborů se specifickým nastavením pro danou situaci.
 # používat příkazy pro manipulaci s databází debconfu jako např.
 # debconf-set. Pokud jsou názvy souborů relativní, berou se ze
 # stejného adresáře jako soubor s přednastavením, který je spouští.
-d-i preseed/run string foo.sh
+# Zadat můžete i více skriptů, stačí je oddělit mezerami.
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
 <para>

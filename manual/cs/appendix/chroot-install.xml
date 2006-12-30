@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 41453 -->
+<!-- original version: 43655 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalace Debianu ze stávajícího unixového/linuxového systému</title>
@@ -31,9 +31,9 @@ hardwarem, který jinak není podporován instalačními médii.
 
 Nejprve si rozdělte disk. Budete potřebovat aspoň jeden oddíl
 (kořenový) plus oblast pro virtuální paměť (swap). Pro čistě
-konzolovou instalaci potřebujete oblast velkou minimálně 150 MB,
+konzolovou instalaci potřebujete oblast velkou minimálně 350 MB,
 jestliže budete instalovat i X Window System, počítejte s nejméně
-300 megabajty.
+1 GB.
 
 </para><para>
 
@@ -159,6 +159,7 @@ V ukázkovém příkazu <command>debootstrap</command> nahraďte
 <replaceable>ARCH</replaceable> jedním z následujících:
 
 <userinput>alpha</userinput>,
+<userinput>amd64</userinput>,
 <userinput>arm</userinput>,
 <userinput>hppa</userinput>,
 <userinput>i386</userinput>,
@@ -172,7 +173,7 @@ V ukázkovém příkazu <command>debootstrap</command> nahraďte
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>/usr/sbin/debootstrap --arch <replaceable>ARCH</replaceable> &releasename; \
-     /mnt/debinst http://http.us.debian.org/debian</userinput>
+     /mnt/debinst http://ftp.cz.debian.org/debian</userinput>
 </screen></informalexample>
 
 </para>
@@ -189,6 +190,13 @@ když minimální, systém Debian. Nastal čas se do něj přesunout:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>LANG=C chroot /mnt/debinst /bin/bash</userinput>
+</screen></informalexample>
+
+a případně nastavit definici terminálu tak, aby byla kompatibilní se
+základním systémem Debianu:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>export TERM=<replaceable>xterm-color</replaceable></userinput>
 </screen></informalexample>
 
 </para>
@@ -216,8 +224,8 @@ Jako vzor můžete použít následující šablonu (místo
 /dev/XXX         none          swap    sw                       0    0
 proc             /proc         proc    defaults                 0    0
 
-/dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0
-/dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0
+/dev/fd0         /media/floppy auto    noauto,rw,sync,user,exec 0    0
+/dev/cdrom       /media/cdrom  iso9660 noauto,ro,user,exec      0    0
 
 /dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2
 /dev/XXX         /var          ext3    rw,nosuid,nodev          0    2
@@ -233,6 +241,19 @@ příkazem <userinput>mount -a</userinput>, nebo individuálně příkazem:
 <prompt>#</prompt> <userinput>mount /cesta</userinput> # např.:  mount /usr
 </screen></informalexample>
 
+Přípojné body pro výměnná média se v aktuálních verzích Debianu
+nachází v adresáři <filename>/media</filename>, ale pro zachování
+zpětné kompatibility na ně existují i symbolické odkazy v kořenu
+<filename>/</filename>. Příklad:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>cd /media</userinput>
+<prompt>#</prompt> <userinput>mkdir cdrom0</userinput>
+<prompt>#</prompt> <userinput>ln -s cdrom0 cdrom</userinput>
+<prompt>#</prompt> <userinput>cd /</userinput>
+<prompt>#</prompt> <userinput>ln -s media/cdrom</userinput>
+</screen></informalexample>
+
 Před další prací si ověřte, že máte připojený virtuální souborový
 systém <filename>/proc</filename>. Pokud tomu tak není, připojte jej:
 
@@ -242,7 +263,7 @@ systém <filename>/proc</filename>. Pokud tomu tak není, připojte jej:
 
 </para><para>
 
-Príkaz <userinput>ls /proc</userinput> by nyní měll vypsat neprázdný
+Příkaz <userinput>ls /proc</userinput> by nyní měl vypsat neprázdný
 adresář. Pokud by se tak nestalo, stále byste měli být schopni
 připojit <filename>proc</filename> z vnějšku chrootu:
 
@@ -254,19 +275,19 @@ připojit <filename>proc</filename> z vnějšku chrootu:
    </sect3>
 
    <sect3>
-   <title>Nastavení klávesnice</title>
+   <title>Nastavení časového pásma</title>
 <para>
 
-Klávesnici nastavíte:
+Nastavením proměnné <quote>UTC</quote> v souboru
+<filename>/etc/default/rcS</filename> systému říkáte, zda má
+hardwarové hodiny počítače interpretovat jako místní čas, nebo jako
+čas v UTC. Nástrojem <userinput>tzconfig</userinput> můžete nastavit
+své časové pásmo.
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>dpkg-reconfigure console-data</userinput>
+<prompt>#</prompt> <userinput>editor /etc/default/rcS</userinput>
+<prompt>#</prompt> <userinput>tzconfig</userinput>
 </screen></informalexample>
-
-</para><para>
-
-Klávesnici nemůžete v chrootu nastavit, změna se projeví až po příštím
-restartu.
 
 </para>
    </sect3>
@@ -339,6 +360,20 @@ Zadejte název svého systému (délka aspoň 2 a nejvýše 63 znaky):
 <prompt>#</prompt> <userinput>echo JmenoPocitace &gt; /etc/hostname</userinput>
 </screen></informalexample>
 
+A vytvořte základní <filename>/etc/hosts</filename> s podporou IPv6:
+
+<informalexample><screen>
+127.0.0.1 localhost JmenoPocitace
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+</screen></informalexample>
+
 Jestliže máte více síťových karet, měli byste si pohrát s názvy modulů
 v <filename>/etc/modules</filename>, aby se karty vždy přiřadily ke
 stejnému rozhraní (eth0, eth1, atd.)
@@ -347,22 +382,51 @@ stejnému rozhraní (eth0, eth1, atd.)
    </sect3>
 
    <sect3>
-   <title>Nastavení Locales</title>
+   <title>Nastavení APT</title>
+<para>
+
+Debootstrap sice vytvořil základní soubor
+<filename>/etc/apt/sources.list</filename>, který umožní instalaci
+dalších balíků, ale je možné, že budete chtít přidat další zdroje,
+například pro bezpečnostní aktualizace, nebo pro zdrojové balíky:
+
+<informalexample><screen>
+deb-src http://ftp.cz.debian.org/debian etch main
+
+deb http://security.debian.org/ etch/updates main
+deb-src http://security.debian.org/ etch/updates main
+</screen></informalexample>
+
+Po úpravách seznamu zdrojů nezapomeňte spustit příkaz
+<userinput>aptitude update</userinput>.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Nastavení místního prostředí a klávesnice</title>
 <para>
 
 Aby se s vámi systém bavil v jiném jazyce než je angličtina, musíte
-nainstalovat a nastavit balík pro podporu národních prostředí:
+nainstalovat a nastavit balík pro podporu národních prostředí. V
+současnosti se doporučuje použít prostředí v kódování UTF-8.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>aptitude install locales</userinput>
 <prompt>#</prompt> <userinput>dpkg-reconfigure locales</userinput>
 </screen></informalexample>
 
-POZNÁMKA: Před tímto krokem již musíte mít nastavený systém pro správu
-balíčků &mdash; <classname>apt</classname>. To znamená mít správně
-vytvořený soubor <filename>sources.list</filename> a poté spustit
-příkaz <command>aptitude update</command>. Také nebude od věci
-nastudovat si odpovídající dokumenty HOWTO.
+Pokud je to potřeba, můžete nakonfigurovat klávesnici:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>aptitude install console-data</userinput>
+<prompt>#</prompt> <userinput>dpkg-reconfigure console-data</userinput>
+</screen></informalexample>
+
+</para><para>
+
+Klávesnici nemůžete nastavit v chrootu, změna se projeví až po příštím
+restartu.
 
 </para>
    </sect3>
@@ -386,7 +450,15 @@ Vybrané jádro nainstalujte:
 <prompt>#</prompt> <userinput>aptitude install linux-image-<replaceable>&kernelversion;-arch-atd</replaceable></userinput>
 </screen></informalexample>
 
-</para>
+</para><note><para>
+
+Instalaci a aktualizaci jader dodávaných s Debianem ovlivňuje
+konfigurační soubor <filename>/etc/kernel-img.conf</filename>.
+Tento soubor se vytvoří při první instalaci balíku s jádrem. Více
+informací o tomto souboru se dozvíte v jeho manuálové stránce, která
+je součástí balíku <classname>kernel-package</classname>.
+
+</para></note>
   </sect2>
 
   <sect2>
@@ -412,11 +484,27 @@ kterého jej spouštíte).
 
 </para><para arch="x86">
 
+Instalace a nastavení <classname>grub</classname>u není složitější
+než spuštění:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>aptitude install grub</userinput>
+<prompt>#</prompt> <userinput>grub-install /dev/<replaceable>hda</replaceable></userinput>
+<prompt>#</prompt> <userinput>update-grub</userinput>
+</screen></informalexample>
+
+Druhý příkaz nainstaluje <command>grub</command> (v tomto případě do
+hlavního zaváděcího záznamu (MBR) disku
+<literal>hda</literal>). Poslední příkaz vytvoří rozumný a funkční
+konfigurační soubor <filename>/boot/grub/menu.lst</filename>.
+
+</para><para arch="x86">
+
 Pro inspiraci nabízíme minimální <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
-boot=/dev/hda6
-root=/dev/hda6
+boot=/dev/<replaceable>hda6</replaceable>
+root=/dev/<replaceable>hda6</replaceable>
 install=menu
 delay=20
 lba32
@@ -450,6 +538,34 @@ label=Debian
 
 Na některých počítačích musíte místo <userinput>hd:</userinput> použít
 <userinput>ide0:</userinput>.
+
+</para>
+  </sect2>
+
+  <sect2>
+  <title>Závěrečné kroky</title>
+<para>
+
+Jak již bylo řečeno dříve, nainstalovaný systém bude poměrně
+jednoduchý. Chcete-li z něj udělat systém o něco vyspělejší,
+doinstalujte alespoň balíky s prioritou <quote>standardní</quote>:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>tasksel install standard</userinput>
+</screen></informalexample>
+
+Nic vám samozřejmě nebrání nainstalovat jednotlivé balíky pomocí
+<command>aptitude</command>.
+
+</para><para>
+
+Po instalaci zůstanou stažené .deb soubory v adresáři
+<filename>/var/cache/apt/archives/</filename>. Nějaké místo můžete
+uvolnit jejich smazáním:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>aptitude clean</userinput>
+</screen></informalexample>
 
 </para>
   </sect2>

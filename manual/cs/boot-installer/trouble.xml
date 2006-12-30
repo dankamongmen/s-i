@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43259 -->
+<!-- original version: 43638 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Problémy s instalačním systémem</title>
@@ -378,6 +378,63 @@ nalezen.
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+  <title>Běžné problémy s instalací na &arch-title;</title>
+<para>
+
+Při instalaci existuje několik známých problémů, které je dobré zmínit.
+
+</para>
+
+   <sect3>
+   <title>Chybné přesměrování video výstupu</title>
+<para>
+
+Není neobvyklé, že ve výchozí konfiguraci mají systémy &arch-title; dvě
+grafické karty, například ATI a Sun Creator 3D. V některých případech se
+může stát, že Linux nepřesměruje svůj video výstup na kartu původně zvolenou
+firmwarem, ale na tu druhou. To pak může vypadat, jako by se zavádění
+zaseklo. Poslední viditelná hláška bývá obvykle:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+Možným řešením je fyzické odstranění jedné z grafických karet, nebo
+zakázání nepoužívané karty pomocí parametru jádra. Například pro
+zakázání karty ATI byste zavedli instalační systém s parametrem
+<userinput>video=atyfb:off</userinput>.
+
+</para><para>
+
+Je možné, že tento parametr budete muset před restartem přidat i do
+konfiguračního souboru zavaděče silo
+(<filename>/target/etc/silo.conf</filename>) a pokud jste instalovali
+X11, tak v souboru <filename>/etc/X11/xorg.conf</filename> změnit
+ovladač, aby odpovídal skutečně použité kartě.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Chyba při zavádění z CD-ROM</title>
+<para>
+
+Některé Sparc systémy jsou notoricky známé tím, že mají problémy se
+zaváděním z CD-ROM. A i když se zavedení podaří, mohou se během
+instalace objevovat nevysvětlitelné chyby. Nejvíce problémů bylo
+hlášeno na systémech SunBlade.
+
+</para><para>
+
+Doporučujeme tyto systémy instalovat zavedením ze sítě.
+
+</para>
+   </sect3>
+  </sect2>
+
+
   <sect2 id="kernel-msgs">
   <title>Význam hlášek při zavádění jádra</title>
 
@@ -403,12 +460,12 @@ vlastní jádro (viz <xref linkend="kernel-baking"/>).
 
 
   <sect2 id="problem-report">
-  <title><command>dbootstrap</command> &mdash; hlášení problému</title>
+  <title>Hlášení problémů s instalací</title>
 <para>
 
 Jestliže se dostanete přes úvodní fázi zavedení systému, ale nemůžete
-instalaci dokončit, můžete použít menu <quote>Report a Problem</quote>
-(nahlášení chyby). Tato volba vám umožní uložit na disketu nebo
+instalaci dokončit, můžete použít menu <guimenuitem>Uložit záznamy pro
+pozdější ladění</guimenuitem>. Tato volba vám umožní uložit na disketu nebo
 zpřístupnit přes webové rozhraní chybové hlášky, stav systému a jiné
 užitečné informace, které vám mohou naznačit, v čem je problém a jak
 ho vyřešit. Tyto údaje nám také můžete poslat spolu s hlášením
@@ -434,15 +491,23 @@ hardwarových konfiguracích.
 
 </para><para>
 
-Máte-li funkční systém s Debianem, je nejjednodušší zaslat zprávu
-pomocí balíčku <classname>reportbug</classname>. Nainstalujte si
-potřebné balíčky (<command>apt-get install installation-report
-reportbug</command>) a spusťte příkaz <command>reportbug
-installation-report</command>.
+Zprávy o instalaci budou publikovány v debianím systému sledování chyb
+(BTS, Bug Tracking System) a budou přeposlány do veřejného diskusního
+listu. Proto se ujistěte, že použijete emailovou adresu, u které vám
+nevadí, že bude zveřejněna.
 
 </para><para>
 
-Při psaní, prosím, použijte následující
+Máte-li funkční systém s Debianem, je nejjednodušší zaslat zprávu
+pomocí balíku <classname>reportbug</classname>. Nainstalujte si
+potřebné balíky (<command>aptitude install installation-report
+reportbug</command>), nastavte <classname>reportbug</classname> podle
+kapitoly <xref linkend="mail-outgoing"/> a spusťte příkaz
+<command>reportbug installation-report</command>.
+
+</para><para>
+
+Při psaní zprávy můžete využít následující
 šablonu, kterou pak zašlete jako hlášení o chybě vůči pseudobalíku
 <classname>installation-report</classname> na adresu
 <email>submit@bugs.debian.org</email>.

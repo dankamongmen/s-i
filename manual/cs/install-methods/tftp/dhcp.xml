@@ -1,14 +1,15 @@
 <!-- $Id$ -->
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 
-  <sect2 condition="supports-dhcp" id="dhcpd">
+  <sect2 id="dhcpd">
    <title>Nastavení DHCP serveru</title>
 <para>
 
 Jedním ze svobodných DHCP serverů je ISC
 <command>dhcpd</command>. &debian; jej obsahuje jako balík
-<classname>dhcp</classname>. Následuje ukázka jednoduchého
-konfiguračního souboru (obvykle <filename>/etc/dhcpd.conf</filename>):
+<classname>dhcp3-server</classname>. Následuje ukázka jednoduchého
+konfiguračního souboru (obvykle
+<filename>/etc/dhcp3/dhcpd.conf</filename>):
 
 <informalexample><screen>
 option domain-name "priklad.cz";
@@ -32,10 +33,6 @@ host clientname {
 }
 </screen></informalexample>
 
-Poznámka: novější (a preferovaný) balík <classname>dhcp3</classname>
-používá konfigurační soubor
-<filename>/etc/dhcp3/dhcpd.conf</filename>.
-
 </para><para>
 
 V tomto příkladu máme jeden server jménem
@@ -48,7 +45,7 @@ obsahovat název souboru, který si klient stáhne přes TFTP.
 </para><para>
 
 Po úpravách konfiguračního souboru musíte restartovat
-<command>dhcpd</command> příkazem <userinput>/etc/init.d/dhcpd
+<command>dhcpd</command> příkazem <userinput>/etc/init.d/dhcpd3-server
 restart</userinput>.
 
 </para>
@@ -80,12 +77,12 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 }
 
 group {
- next-server 192.168.1.3;
- host tftpclient {
-# hardwarová adresa tftp klienta
-  hardware ethernet  00:10:DC:27:6C:15;
-  filename "/tftpboot/pxelinux.0";
- }
+  next-server 192.168.1.3;
+  host tftpclient {
+    # hardwarová adresa tftp klienta
+    hardware ethernet  00:10:DC:27:6C:15;
+    filename "pxelinux.0";
+  }
 }
 </screen></informalexample>
 

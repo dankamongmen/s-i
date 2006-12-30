@@ -1,81 +1,83 @@
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 43528 -->
 
   <sect2 arch="sparc" id="sparc-cpus">
-  <title>Procesory, základní desky a grafické karty</title>
+  <title>Procesory a základní desky</title>
 <para>
 
-V současnosti podporuje <emphasis>&architecture;</emphasis> port
-několik typů Sparc systémů. Nejobvyklejší jsou sun4, sun4c, sun4m,
-sun4d a sun4u. S výjimkou velmi starého hardware ze sun4 jsou
-podporovány i další systémy. Nejméně testovaný je Sun4d, takže
-očekávejte možné problémy se stabilitou jádra. Ze staršího hardware
-jsou nejčastější Sun4c a Sun4m, které zahrnují systémy jako
-SparcStation 1, 1+, IPC, IPX a SparcStation LX, 5, 10 a 20.
-Třída systémů UltraSPARC spadá pod označení sun4u a používá tuto sadu
-instalačních disků.
-Přestože některé systémy patří do podporovaných skupin, samy
-podporovány nejsou. Takovým případem je třeba AP1000
-a Tadpole Sparcbook 1, viz
-<ulink url="&url-sparc-linux-faq;">Linux for SPARCProcessors FAQ</ulink>.
+Sparc systémy se dají rozdělit do několika podarchitektur: sun4,
+sun4c, sun4d, sun4m, sun4u a sun4v. Následující seznam popisuje, které
+systémy patří do které kategorie a jakou míru podpory pro ně můžete
+očekávat.
 
 </para>
 
-   <sect3><title>Nastavení paměti</title>
+<variablelist>
+<varlistentry>
+<term>sun4, sun4c, sun4d</term>
+
+<listitem><para>
+
+Tyto podarchitektury zahrnují některé velmi staré 32 bitové stroje,
+které již nejsou podporovány. Kompletní seznam naleznete na <ulink
+url="http://en.wikipedia.org/wiki/SPARCstation">SPARCstation</ulink>
+stránce ve Wikipedii.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4m</term>
+
+<listitem><para>
+
+sun4m je jedinou momentálně podporovanou 32 bitovou podarchitekturou
+(sparc32), která je momentálně podporována. Nejpopulárnější počítače
+patřící do této třídy jsou Sparcstation 4, 5, 10 a 20.
+
+</para><para>
+
+Symetrický multiprocessing (SMP) &mdash; schopnost používat více
+procesorů &mdash; není na tomto hardwaru podporována kvůli problémům
+se stabilitou. Dostupné jednoprocesorové (UP) jádro pro sparc32 se
+zavede bez problémů, ovšem aktivuje a použije pouze první procesor.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4u</term>
+
+<listitem><para>
+
+Tato podarchitektura zahrnuje všechny 64 bitové počítače (sparc64)
+založené na procesoru UltraSparc a jeho klonech. Většina strojů je
+podporována dobře, ale na některých můžete zaznamenat problém se
+zaváděním z CD. Za problémy mohou chyby ve firmwaru nebo zavaděči (a
+můžete je obejít zavedením ze sítě). Pro jedno resp. víceprocesorové
+systémy použijte jádra sparc64 resp. sparc64-smp.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4v</term>
+
+<listitem><para>
+
+Toto je nejnovější přírůstek do rodiny Sparců a zahrnuje počítače
+založené na vícejádrových procesorech Niagara. Tyto procesory jsou
+nyní dostupné pouze v serverech T1000 a T2000 od Sunu a jsou
+podporovány velmi dobře. Použijte jádro sparc64-smp.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
 <para>
 
-Některé starší pracovní stanice, jmenovitě Sun IPX a Sun IPC, mají
-paměťové sloty umístěny na pevných adresách ve fyzické paměti.
-To znamená, že když modul nebude obsazený, vzniknou ve fyzickém
-paměťovém prostoru mezery.
-Instalace Linuxu vyžaduje souvislý paměťový blok do kterého se nahraje
-jádro a počáteční RAMdisk. Pokud to není splněno, skončí instalace
-hláškou <computeroutput>Data Access Exception</computeroutput>.
-
-</para><para>
-
-Takže musíte nastavit paměť tak, aby nejnižší paměťový blok měl
-souvislých alespoň 8Mb. Na IPX a IPC jsou paměťové sloty mapovány v
-16Mb hranicích. To znamená, že ve slotu nula musíte mít dostatečně
-velký paměťový modul. 4Mb v tomto případě
-<emphasis>nestačí</emphasis>.
-
-</para><para>
-
-Příklad:
-V Sun IPX máte 16Mb a 4Mb SIMM. Dále máte čtyři paměťové sloty
-(0,1,2,3). [Slot nula je nejdál od SBUS konektorů]. To znamená, že
-16Mb modul musíte dát do slotu 0. Je doporučeno umístit 4Mb SIMM
-do slotu 2.
+Procesory SPARC64 od Fujitsu používané v řadě serverů PRIMEPOWER
+nejsou podporovány, protože pro ně chybí podpora v linuxovém jádře.
 
 </para>
-   </sect3>
-
-   <sect3><title>Nastavení grafiky</title>
-<para>
-
-Obzvláště u starších pracovních stanic Sun je běžné, že se na základní
-desce nachází starý framebuffer (třeba bwtwo na sun IPC) a do SBUS
-slotu je zapojena karta obsahující framebuffer novější a pravděpodobně
-akcelerovaný.
-Pod Solarisem nebo SunOS to nevadí, protože jsou inicializovány obě
-karty.
-
-</para><para>
-
-Pod Linuxem to ale může způsobit problém, protože bootPROM monitor
-může zobrazovat svůj výstup na přídavnou kartu, ale zprávy linuxového
-jádra se mohou posílat na původní framebuffer. Takže když se počítač
-zastaví třeba při zavádění RAMdisku, neuvidíte
-<emphasis>žádné</emphasis> chybové hlášky.
-
-</para><para>
-
-Abyste se tomuto problému vyhnuli, připojte monitor (pokud bude třeba)
-do videokarty v nejnižším číslovaném SBUS slotu.
-(Karta na základní desce se počítá jako nižší než externí karty).
-Případně také můžete použít sériovou konzoli.
-
-</para>
-   </sect3>
   </sect2>

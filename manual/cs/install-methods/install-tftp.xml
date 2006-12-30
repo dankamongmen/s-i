@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Příprava souborů pro zavedení ze sítě pomocí TFTP</title>
@@ -12,9 +12,9 @@ specifických adresářů a povolit zavádění vaší stanice.
 
 </para><para>
 
-Musíte nastavit TFTP server a často i BOOTP server
+Musíte nastavit TFTP server a často i DHCP server
 <phrase condition="supports-rarp"> nebo RARP </phrase>
-<phrase condition="supports-dhcp"> nebo DHCP </phrase> server.
+<phrase condition="supports-bootp"> nebo BOOTP </phrase> server.
 
 </para><para>
 
@@ -31,10 +31,9 @@ zaváděcí obraz.
 IP adresu můžete ručně nastavit v boot ROM.
 </phrase>
 
-<phrase condition="supports-dhcp"> DHCP (Dynamic Host Configuration
-Protocol) je flexibilnější, zpětně kompatibilní rozšíření protokolu
-BOOTP. Některé systémy mohou být nastaveny pouze pomocí DHCP.
-</phrase>
+DHCP (Dynamic Host Configuration Protocol) je flexibilnější, zpětně
+kompatibilní rozšíření protokolu BOOTP. Některé systémy mohou být
+nastaveny pouze pomocí DHCP.
 
 </para><para arch="powerpc">
 
@@ -100,22 +99,34 @@ tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 Při instalaci z debianích balíků se o nic nemusíte starat, protože
 se tento řádek založí automaticky při instalaci balíku.
 
-</para><para>
+</para><note><para>
+
+TFTP servery historicky používaly pro uložení nabízených obrazů
+adresář <filename>/tftpboot</filename>. Aby byl &debian; v souladu se
+standardem <ulink url="&url-fhs-home;">FHS</ulink>, mohou debianí
+balíky používat jiná umístění. Například
+<classname>tftpd-hpa</classname> implicitně používá adresář
+<filename>/var/lib/tftpboot</filename>. Je proto možné, že budete
+muset cesty uváděné v této kapitole upravit pro konkrétní situaci.
+
+</para></note><para>
 
 Podívejte se do souboru <filename>/etc/inetd.conf</filename> a
 zapamatujte si název adresáře, jehož jméno je za
-<command>in.tftpd</command>; budete jej dále potřebovat. Přepínač
-<userinput>-l</userinput> umožňuje některým verzím
+<command>in.tftpd</command>;<footnote><para>
+
+Přepínač <userinput>-l</userinput> umožňuje některým verzím
 <command>in.tftpd</command> zaznamenávat všechny požadavky, které mu
 byly zaslány, do systémových logů. To je vhodné zejména v situaci, kdy
-zavádění neprobíhá tak, jak má. Pokud musíte změnit obsah souboru
-<filename>/etc/inetd.conf</filename>, musíte proces
-<command>inetd</command> upozornit, aby aktualizoval svá nastavení.
-Na počítači s Debianem stačí spustit <userinput>/etc/init.d/inetd
-reload</userinput>.
-Na jiných systémech musíte zjistit ID běžícího procesu
-<command>inetd</command> a spustit <userinput>kill -HUP
-<replaceable>inetd-pid</replaceable></userinput>.
+zavádění neprobíhá tak, jak má.
+
+</para></footnote> budete jej dále potřebovat. Pokud musíte změnit
+obsah souboru <filename>/etc/inetd.conf</filename>, musíte také
+upozornit proces <command>inetd</command>, aby aktualizoval svá
+nastavení.  Na počítači s Debianem stačí spustit
+<userinput>/etc/init.d/inetd reload</userinput>.  Na jiných systémech
+musíte zjistit ID běžícího procesu <command>inetd</command> a spustit
+<userinput>kill -HUP <replaceable>pid-inetd</replaceable></userinput>.
 
 </para><para arch="mips">
 
@@ -146,8 +157,8 @@ příkazem:
 
 Dále je potřeba umístit příslušný TFTP obraz (viz
 <xref linkend="where-files"/>) do adresáře, kde má
-<command>tftpd</command> uloženy obrazy, obvykle
-<filename>/tftpboot</filename>. Bohužel TFTP klient očekává jméno
+<command>tftpd</command> uloženy obrazy.
+Bohužel TFTP klient očekává jméno
 souboru v určitém tvaru, pro který neexistují žádné závazné
 standardy. Proto ještě musíte na příslušný obraz vytvořit odkaz, který
 <command>tftpd</command> použije pro zavedení konkrétního klienta.
@@ -167,7 +178,7 @@ Pro PXE zavádění by mělo být vše potřebné v souboru
 <filename>netboot/netboot.tar.gz</filename>. Tento archiv stačí
 rozbalit do adresáře, kde <command>tftpd</command> uchovává zaváděcí
 obrazy. Ujistěte se, že je váš dhcp server nastaven tak, aby jako
-jméno souboru pro zavedení zasílal <filename>/pxelinux.0</filename>.
+jméno souboru pro zavedení zasílal <filename>pxelinux.0</filename>.
 
 </para><para arch="ia64">
 

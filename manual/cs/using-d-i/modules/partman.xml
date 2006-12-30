@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43254 -->
+<!-- original version: 43655 -->
 
    <sect3 id="partman">
    <title>Rozdělení disků</title>
@@ -9,7 +9,21 @@ Nyní nastal čas rozdělit pevné disky. Pokud se náhodou něco pokazí,
 nebo pokud chcete o rozdělování disků dozvědět více, podívejte se do
 dodatku <xref linkend="partitioning"/>.
 
-</para><para>
+</para><warning arch="sparc"><para>
+
+Jestliže byl disk původně použit v Solarisu, dělení disků nemusí
+rozpoznat správnou velikost disku. Vytvoření nové tabulky oblastí
+nepomůže. Pomůže však <quote>vynulování</quote> několika prvních
+sektorů disku:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync</userinput>
+</screen></informalexample>
+
+Mějte na paměti, že tímto znepřístupníte všechna data, která se na
+disku dosud nacházela.
+
+</para></warning><para>
 
 Nejprve vám bude nabídnuta možnost automaticky rozdělit buď celý disk,
 nebo dostupné volné místo na disku. Tato volba se někdy nazývá
@@ -179,10 +193,10 @@ Vyberete-li volné místo, <command>partman</command> vám nabídne
 vytvoření nové oblasti. Nejprve musíte odpovědět několik základních
 otázek jako velikost nové oblasti, typ (primární nebo logická)
 a umístění (na začátku nebo na konci volného místa). Poté se zobrazí
-detailní pohled na novou oblast. Naleznete zde volby jako přípojný
+detailní pohled na novou oblast. Naleznete zde položky jako přípojný
 bod, volby připojení, zaváděcí příznak nebo způsob použití. Pokud vám
 nevyhovují přednastavené hodnoty, můžete je upravit dle
-libosti. Například výběrem volby <guimenuitem>Použít
+libosti. Nejdůležitější volbou <guimenuitem>Použít
 jako:</guimenuitem> můžete změnit souborový systém dané oblasti včetně
 možnosti použít oblast jako odkládací prostor, softwarový RAID, LVM
 nebo ji nepoužít vůbec. Další příjemnou vlastností je možnost
