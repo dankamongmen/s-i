@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-12-29 19:35+0000\n"
+"POT-Creation-Date: 2006-12-31 03:15+0000\n"
 "PO-Revision-Date: 2005-07-18 14:20+0800\n"
 "Last-Translator: Jhang, Jia-Wei<dreamcryer@gmail.com>\n"
 "Language-Team: debian-chinese-big5 <debian-chinese-big5@lists.debian.org>\n"
@@ -1285,10 +1285,7 @@ msgstr "核心的安裝"
 #, fuzzy, no-c-format
 msgid ""
 "If you intend to boot this system, you probably want a Linux kernel and a "
-"boot loader. Identify available pre-packaged kernels with: "
-"<informalexample><screen>\n"
-"# apt-cache search linux-image\n"
-"</screen></informalexample> Then install your choice using its package name."
+"boot loader. Identify available pre-packaged kernels with:"
 msgstr ""
 "您若想啟動這個系統，您很可能還需要一個 Linux 核心和一個 boot loader。 可以用"
 "下面指令找到那些目前可用的被打好包的核心 <informalexample><screen>\n"
@@ -1297,33 +1294,80 @@ msgstr ""
 "參數來安裝它。"
 
 #. Tag: screen
-#: random-bits.xml:630
-#, fuzzy, no-c-format
-msgid ""
-"# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
-"replaceable>"
+#: random-bits.xml:626
+#, no-c-format
+msgid "# apt-cache search linux-image"
 msgstr ""
-"# apt-get install kernel-image-<replaceable>2.X.X-arch-etc</replaceable>"
 
 #. Tag: para
-#: random-bits.xml:633
+#: random-bits.xml:628
 #, no-c-format
 msgid ""
-"The configuration file <filename>/etc/kernel-img.conf</filename> influences "
-"the installation and upgrade of pre-packaged Debian kernels. A default file "
-"will be created when you first install a Debian kernel image. For additional "
-"information about this file, consult its man page which will be available "
-"after installing the <classname>kernel-package</classname> package."
+"If you intend to use a pre-packaged kernel, you may want to create the "
+"configuration file <filename>/etc/kernel-img.conf</filename> before you do "
+"so. Here's an example file:"
+msgstr ""
+
+#. Tag: screen
+#: random-bits.xml:634
+#, no-c-format
+msgid ""
+"# Kernel image management overrides\n"
+"# See kernel-img.conf(5) for details\n"
+"do_symlinks = yes\n"
+"relative_links = yes\n"
+"do_bootloader = yes\n"
+"do_bootfloppy = no\n"
+"do_initrd = yes\n"
+"link_in_boot = no"
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:636
+#, no-c-format
+msgid ""
+"For detailed information about this file and the various options, consult "
+"its man page which will be available after installing the <classname>kernel-"
+"package</classname> package. We recommend that you check that the values are "
+"appropirate for your system."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:643
+#, no-c-format
+msgid ""
+"If you intend to use <classname>grub</classname> as your bootloader, you can "
+"set the <literal>do_bootloader</literal> option to <quote>no</quote>. To "
+"automatically update your <filename>/boot/grub/menu.lst</filename> on "
+"installation or removal of Debian kernels, add the following lines: "
+"<informalexample><screen>\n"
+"postinst_hook = update-grub\n"
+"postrm_hook   = update-grub\n"
+"</screen></informalexample> For the <classname>lilo</classname> bootloader, "
+"the value of <literal>do_bootloader</literal> needs to be <quote>yes</quote>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:655
+#, no-c-format
+msgid ""
+"Then install the kernel package of your choice using its package name. "
+"<informalexample><screen>\n"
+"# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
+"replaceable>\n"
+"</screen></informalexample> If you did not create a <filename>/etc/kernel-"
+"img.conf</filename> before installing a pre-packaged kernel, you may be "
+"asked some questions during its installation that refer to it."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:645
+#: random-bits.xml:669
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Boot Loader 的設定"
 
 #. Tag: para
-#: random-bits.xml:646
+#: random-bits.xml:670
 #, fuzzy, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1336,7 +1380,7 @@ msgstr ""
 "Debian 的 chroot 中使用 apt-get 完成。"
 
 #. Tag: para
-#: random-bits.xml:653
+#: random-bits.xml:677
 #, fuzzy, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
@@ -1357,7 +1401,7 @@ msgstr ""
 "lilo，它就會用哪個系統裡的 <filename>lilo.conf</filename> )。"
 
 #. Tag: para
-#: random-bits.xml:665
+#: random-bits.xml:689
 #, no-c-format
 msgid ""
 "Installing and setting up <classname>grub</classname> is as easy as: "
@@ -1372,13 +1416,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:675
+#: random-bits.xml:699
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "下面有一個簡單的 <filename>/etc/lilo.conf</filename> 例子："
 
 #. Tag: screen
-#: random-bits.xml:679
+#: random-bits.xml:703
 #, fuzzy, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1398,7 +1442,7 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:681
+#: random-bits.xml:705
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1416,7 +1460,7 @@ msgstr ""
 "<filename>lilo.conf</filename> )。"
 
 #. Tag: para
-#: random-bits.xml:691
+#: random-bits.xml:715
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1446,13 +1490,13 @@ msgstr ""
 "userinput> 換成 <userinput>hd:</userinput>。"
 
 #. Tag: title
-#: random-bits.xml:704
+#: random-bits.xml:728
 #, no-c-format
 msgid "Finishing touches"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:705
+#: random-bits.xml:729
 #, no-c-format
 msgid ""
 "As mentioned earlier, the installed system will be very basic. If you would "
@@ -1465,7 +1509,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:716
+#: random-bits.xml:740
 #, no-c-format
 msgid ""
 "After the installation there will be a lot of downloaded packages in "
@@ -1474,19 +1518,19 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:722
+#: random-bits.xml:746
 #, no-c-format
 msgid "# aptitude clean"
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:733
+#: random-bits.xml:757
 #, fuzzy, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "透過 Unix/Linux 系統來安裝 &debian;"
 
 #. Tag: para
-#: random-bits.xml:735
+#: random-bits.xml:759
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1496,7 +1540,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:743
+#: random-bits.xml:767
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1507,7 +1551,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:751
+#: random-bits.xml:775
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1516,7 +1560,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:756
+#: random-bits.xml:780
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1526,13 +1570,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:766
+#: random-bits.xml:790
 #, no-c-format
 msgid "Requirements"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:769
+#: random-bits.xml:793
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1540,13 +1584,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:775
+#: random-bits.xml:799
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:780
+#: random-bits.xml:804
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1554,7 +1598,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:786
+#: random-bits.xml:810
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1563,13 +1607,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:798
+#: random-bits.xml:822
 #, fuzzy, no-c-format
 msgid "Setting up source"
 msgstr "設定您的滑鼠"
 
 #. Tag: para
-#: random-bits.xml:799
+#: random-bits.xml:823
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1577,7 +1621,7 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:804
+#: random-bits.xml:828
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1601,13 +1645,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:810
+#: random-bits.xml:834
 #, fuzzy, no-c-format
 msgid "Installing target"
 msgstr "核心的安裝"
 
 #. Tag: para
-#: random-bits.xml:811
+#: random-bits.xml:835
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1623,13 +1667,13 @@ msgid ""
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:830
+#: random-bits.xml:854
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:832
+#: random-bits.xml:856
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1637,13 +1681,13 @@ msgid ""
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:840
+#: random-bits.xml:864
 #, no-c-format
 msgid "Detect network hardware"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:845
+#: random-bits.xml:869
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1653,7 +1697,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:854
+#: random-bits.xml:878
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1662,26 +1706,26 @@ msgid ""
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:866
+#: random-bits.xml:890
 #, fuzzy, no-c-format
 msgid "Configure the network"
 msgstr "網路的設定"
 
 #. Tag: para
-#: random-bits.xml:869
+#: random-bits.xml:893
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:874
+#: random-bits.xml:898
 #, no-c-format
 msgid ""
 "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:879
+#: random-bits.xml:903
 #, no-c-format
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
@@ -1689,12 +1733,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:885
+#: random-bits.xml:909
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
 "<filename>/etc/resolv.conf</filename>)"
 msgstr ""
+
+#, fuzzy
+#~ msgid ""
+#~ "# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
+#~ "replaceable>"
+#~ msgstr ""
+#~ "# apt-get install kernel-image-<replaceable>2.X.X-arch-etc</replaceable>"
 
 #~ msgid ""
 #~ "Now you've got a real Debian system, though rather lean, on disk. "
