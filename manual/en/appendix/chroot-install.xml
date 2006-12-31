@@ -441,22 +441,58 @@ and a boot loader. Identify available pre-packaged kernels with:
 # apt-cache search linux-image
 </screen></informalexample>
 
-Then install your choice using its package name.
+</para><para>
+
+If you intend to use a pre-packaged kernel, you may want to create the
+configuration file <filename>/etc/kernel-img.conf</filename> before you
+do so. Here's an example file:
+
+<informalexample><screen>
+# Kernel image management overrides
+# See kernel-img.conf(5) for details
+do_symlinks = yes
+relative_links = yes
+do_bootloader = yes
+do_bootfloppy = no
+do_initrd = yes
+link_in_boot = no
+</screen></informalexample>
+
+</para><para>
+
+For detailed information about this file and the various options, consult
+its man page which will be available after installing the
+<classname>kernel-package</classname> package. We recommend that you check
+that the values are appropirate for your system.
+
+</para><para arch="x86">
+
+If you intend to use <classname>grub</classname> as your bootloader, you
+can set the <literal>do_bootloader</literal> option to <quote>no</quote>.
+To automatically update your <filename>/boot/grub/menu.lst</filename> on
+installation or removal of Debian kernels, add the following lines:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+For the <classname>lilo</classname> bootloader, the value of
+<literal>do_bootloader</literal> needs to be <quote>yes</quote>.
+
+</para><para>
+
+Then install the kernel package of your choice using its package name.
 
 <informalexample><screen>
 # aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
+If you did not create a <filename>/etc/kernel-img.conf</filename> before
+installing a pre-packaged kernel, you may be asked some questions during
+its installation that refer to it.
+
 </para>
-<note><para>
-
-The configuration file <filename>/etc/kernel-img.conf</filename> influences
-the installation and upgrade of pre-packaged Debian kernels. A default file
-will be created when you first install a Debian kernel image. For additional
-information about this file, consult its man page which will be available
-after installing the <classname>kernel-package</classname> package.
-
-</para></note>
   </sect2>
 
   <sect2>
