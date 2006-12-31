@@ -1,4 +1,4 @@
-<!-- original version: 43514 -->
+<!-- original version: 43696 -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Configuratie van apparatuur en besturingssysteem voor de installatie</title>
@@ -20,29 +20,10 @@ de betrouwbaarheid van &debian; op uw systeem kunnen beïnvloeden.
 &bios-setup-sparc.xml;
 &bios-setup-s390.xml;
 
-  <sect2><title>Aandachtspunten ten aanzien van apparatuur</title>
-<para arch="not-s390">
+  <sect2 arch="m68k;x86;powerpc" id="hardware-issues">
+  <title>Aandachtspunten ten aanzien van apparatuur</title>
 
-Velen hebben geprobeerd om bijvoorbeeld hun 90 MHz CPU op 100 MHz te laten
-werken. Soms werkt dit, maar het is gevoelig voor temperatuur en andere
-factoren en kan uw systeem beschadigen. Eén van de auteurs van dit document
-heeft zijn systeem een jaar lang op verhoogde snelheid laten draaien waarna
-het systeem tijdens de compilatie van het besturingssysteem plotseling begon
-het <command>gcc</command>-programma af te breken met een onverwachte fout.
-Het probleem kon worden opgelost door de CPU weer op zijn normale snelheid te
-laten werken.
-
-</para><para arch="not-s390">
-
-De <command>gcc</command>-compiler vertoont vaak als eerste problemen door
-slechte geheugenmodules (of andere hardwareproblemen die onvoorspelbare
-veranderingen van gegevens veroorzaken) omdat het enorme gegevensstructuren
-opbouwt die herhaaldelijk worden doorlopen. Een fout in deze gegevensstructuren
-resulteert in een ongeldige instructie of het lezen van een onbestaand
-geheugenadres. Het symptoom hiervan is dat <command>gcc</command> afbreekt met
-een onverwachte fout.
-
-</para><para arch="m68k">
+<para arch="m68k">
 
 Atari TT RAM moederborden zijn berucht om hun problemen met RAM onder
 Linux; probeer, als u vreemde problemen tegenkomt, om tenminste de kernel
@@ -57,68 +38,9 @@ FIXME: more description of this needed.
 
 </emphasis></phrase>
 
-</para><para arch="x86">
-
-Als u 'true-parity' RAM heeft en als dit door uw moederbord wordt ondersteund,
-activeer dan eventuele BIOS-instellingen die ervoor zorgen dat het moederbord
-een interrupt genereert bij pariteitsfouten in het geheugen.
-
 </para>
 
-   <sect3 arch="x86"><title>De turboschakelaar</title>
-<para>
-
-Veel systemen hebben een <emphasis>turboschakelaar</emphasis> die de
-snelheid van de CPU reguleert. Selecteer de hoogste snelheid. Als uw
-BIOS de mogelijkheid biedt om softwarematige besturing van de
-turboschakelaar (of CPU-snelheid) uit te schakelen, kunt u dit het beste
-doen en het systeem vastzetten in de hoogste snelheid. Er is één melding
-van een systeem waarbij Linux, tijdens het automatisch zoeken naar aanwezige
-apparatuur, per ongeluk de softwarematige besturing van de turboschakelaar raakte.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Cyrix-CPU's en diskettefouten</title>
-<para>
-
-Bij systemen met een Cyrix-CPU kan het noodzakelijk zijn om tijdens de
-installatie het cache-geheugen uit te schakelen omdat anders
-diskettefouten optreden. Vergeet niet om na de installatie de cache weer
-te activeren omdat het systeem <emphasis>veel</emphasis> trager werkt als
-de cache uitgeschakeld is.
-
-</para><para>
-
-We denken dat dit niet noodzakelijk een fout van de Cyrix-CPU is. Mogelijk
-kan dit probleem binnen Linux worden opgelost; we blijven hieraan werken.
-(Voor technisch geïnteresseerde lezers: we vermoeden dat het probleem is dat
-de cache ongeldig wordt na een omschakeling van instructies van 16-bit
-naar 32-bit.)
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Instellingen van randapparatuur</title>
-<para>
-
-Mogelijk moet u instellingen of jumpers op in uw computer aanwezige kaarten
-van randapparatuur wijzigen. Sommige kaarten beschikken over
-configuratiemenu's terwijl andere gebruik maken van jumpers. Het is helaas
-niet mogelijk om in dit document volledige informatie te verschaffen over elk
-apparaat; wel proberen we nuttige tips te geven.
-
-</para><para>
-
-Als u kaarten heeft die gebruik maken van 'mapped memory', dan dient dit
-geconfigureerd te worden ergens tussen 0xA0000 en 0xFFFFF (van 640K tot net
-onder 1 megabyte) of een adres tenminste 1 megabyte groter dan de totale
-hoeveelheid RAM in uw systeem.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86" id="usb-keyboard-config">
+   <formalpara arch="x86">
    <title>USB BIOS instellingen en toetsenborden</title>
 <para>
 
@@ -132,18 +54,9 @@ naar opties voor <quote>Legacy keyboard emulation</quote> of <quote>USB keyboard
 support</quote>.
 
 </para>
-   </sect3>
+   </formalpara>
 
-   <sect3><title>Meer dan 64 MB RAM</title>
-<para>
-
-De Linux kernel kan niet in alle gevallen bepalen over hoeveel RAM u beschikt.
-Raadpleeg in dat geval <xref linkend="boot-parms"/>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="powerpc">
+   <formalpara arch="powerpc">
    <title>Beeldschermweergave op OldWorld Powermacs</title>
 <para>
 
@@ -159,6 +72,6 @@ beeldscherminstellingen te wijzigen naar 256 kleuren in plaats van
 <quote>duizenden</quote> of <quote>millioenen</quote>.
 
 </para>
-   </sect3>
-</sect2>
+   </formalpara>
+  </sect2>
  </sect1>
