@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43527 untranslated -->
+<!-- original version: 43675 untranslated -->
 
  <sect1 id="boot-parms"><title>Boot Parameters</title>
 <para>
@@ -81,15 +81,22 @@ With current kernels (2.6.9 or newer) you can use 32 command line options and
 
 </footnote> which may be useful.
 
+</para><para>
+
+A number of parameters have a <quote>short form</quote> that helps avoid
+the limitations of the kernel command line options and makes entering the
+parameters easier. If a parameter has a short form, it will be listed in
+brackets behind the (normal) long form. Examples in this manual will
+normally use the short form too.
+
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 This parameter sets the lowest priority of messages to be displayed.
-Short form: <userinput>priority</userinput>
 
 </para><para>
 
@@ -199,14 +206,13 @@ one device.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Some architectures use the kernel framebuffer to offer installation in
 a number of languages. If framebuffer causes a problem on your system
 you can disable the feature by the parameter
-<userinput>debian-installer/framebuffer=false</userinput>, or
-<userinput>fb=false</userinput> for short. Problem symptoms are error messages
+<userinput>fb=false</userinput>. Problem symptoms are error messages
 about bterm or bogl, a blank screen, or a freeze within a few minutes after
 starting the install.
 
@@ -237,16 +243,15 @@ parameter <userinput>debian-installer/framebuffer=true</userinput> or
 </para></note></listitem>
 </varlistentry>
 
-<varlistentry>
-<term>debian-installer/theme</term>
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
 <listitem><para>
 
 A theme determines how the user interface of the installer looks (colors,
 icons, etc.). What themes are available differs per frontend.  Currently
 both the newt and gtk frontends only have a <quote>dark</quote> theme that was
-designed for visually impaired users. Set the theme by booting with parameter
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
-or <userinput>theme=<replaceable>dark</replaceable></userinput>.
+designed for visually impaired users. Set the theme by booting with 
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -292,33 +297,31 @@ this misbehavior.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enabled</term>
+<term>auto-install/enabled (auto)</term>
 <listitem><para>
 
 Delay questions that are normally asked before preseeding is possible until
-after the network is configured. Short form: <userinput>auto=true</userinput>
+after the network is configured.
 See <xref linkend="preseed-auto"/> for details about using this to
 automate installs.
 
@@ -402,12 +405,11 @@ cases. General instructions how to do this can be found in
 <variablelist>
 
 <varlistentry>
-<term>debian-installer/locale</term>
+<term>debian-installer/locale (locale)</term>
 <listitem><para>
 
 Can be used to set both the language and country for the installation.
 This will only work if the locale is supported in Debian.
-Short form: <userinput>locale</userinput>.
 For example, use <userinput>locale=de_CH</userinput> to select German as
 language and Switzerland as country.
 
@@ -415,11 +417,11 @@ language and Switzerland as country.
 </varlistentry>
 
 <varlistentry>
-<term>anna/choose_modules</term>
+<term>anna/choose_modules (modules)</term>
 <listitem><para>
 
 Can be used to automatically load installer components that are not loaded
-by default. Short form: <userinput>modules</userinput>.
+by default.
 Examples of optional components that may be useful are
 <classname>openssh-client-udeb</classname> (so you can use
 <command>scp</command> during the installation) and
@@ -439,13 +441,26 @@ force static network configuration.
 </varlistentry>
 
 <varlistentry>
-<term>tasksel:tasksel/first</term>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+By default the installer will use the http protocol to download files from
+Debian mirrors and changing that to ftp is not possible during installations
+at normal priority. By setting this parameter to <userinput>ftp</userinput>,
+you can force the installer to use that protocol instead. Note that you
+cannot select an ftp mirror from a list, you have to enter the hostname
+manually.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 
 Can be used to select tasks that are not available from the interactive task
 list, such as the <literal>kde-desktop</literal> task.
 See <xref linkend="pkgsel"/> for additional information.
-Short form: <userinput>tasks</userinput>.
 
 </para></listitem>
 </varlistentry>
