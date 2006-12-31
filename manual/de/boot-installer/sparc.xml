@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 43696 -->
 
   <sect2 arch="sparc" id="boot-tftp"><title>Booten per TFTP</title>
 
@@ -14,10 +14,7 @@ Nutzen Sie <userinput>boot net</userinput>, um von einem
 TFTP-RARP-Server zu booten; Sie können auch
 <userinput>boot net:bootp</userinput> oder
 <userinput>boot net:dhcp</userinput> versuchen, um von einem
-TFTP-BOOTP- oder DHCP-Server zu booten. Einige ältere Versionen von
-OpenBoot benötigen auch den Gerätenamen im Boot-Kommando, wie z.B.
-<userinput>boot le()</userinput>; diese unterstützen unter Umständen
-weder BOOTP noch DHCP.
+TFTP-BOOTP- oder DHCP-Server zu booten.
 
 </para>
   </sect2>
@@ -32,11 +29,7 @@ weder BOOTP noch DHCP.
 Die meisten OpenBoot-Versionen unterstützen das
 <userinput>boot cdrom</userinput>-Kommando, das einfach nur ein Alias
 ist für das Booten vom SCSI-Gerät mit der ID 6 (oder vom Master des
-zweiten IDE-Kanals bei IDE-Systemen). Bei älteren OpenBoot-Versionen,
-die dieses spezielle Kommando noch nicht unterstützen,
-müssen Sie manchmal den Gerätenamen direkt verwenden.
-Beachten Sie, dass auf Sun4m-Systemen (z.B. Sparc 10s und Sparc 20s)
-von Problemen berichtet wurde im Zusammenhang mit dem Booten von CD-ROM.
+zweiten IDE-Kanals bei IDE-Systemen).
 
 </para>
   </sect2>
@@ -45,6 +38,16 @@ von Problemen berichtet wurde im Zusammenhang mit dem Booten von CD-ROM.
   <sect2 arch="sparc" condition="supports-floppy-boot">
   <title>Booten von Floppy-Disk</title>
 <para>
+
+Floppy-Images sind derzeit nur für sparc32 verfügbar, allerdings, aus
+technischen Gründen, nicht für offizielle Veröffentlichungen. (Der Grund ist,
+dass Sie nur als root gebaut werden können, was aber von unseren Build-Daemons
+nicht unterstützt wird.) Suchen Sie auf der
+<ulink url="&url-d-i;">Debian Installer-Projekt-Webseite</ulink> unter
+<quote>Täglich gebaute Images</quote> (daily builds) nach Floppy-Images
+für sparc32.
+
+</para><para>
 
 Um ein Sparc-System von einer Floppy-Diskette zu booten, benutzen Sie
 
@@ -55,9 +58,7 @@ Stop-A -> OpenBoot: "boot floppy"
 Seien Sie gewarnt, dass Systeme der neueren Sun4u-(ultra-)Architektur das
 Booten von Floppy nicht unterstützen. Eine typische Fehlermeldung ist:
 <computeroutput>Bad magic number in disk label - Can't open disk
-label package</computeroutput>. Außerdem unterstützt eine Reihe von
-Sun4c-Modellen (wie der IPX) die komprimierten Images auf den Disketten nicht;
-deshalb wird auch hier das Booten per Floppy nicht unterstützt.
+label package</computeroutput>.
 
 </para><para>
 

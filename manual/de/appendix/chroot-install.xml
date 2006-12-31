@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43655 -->
+<!-- original version: 43697 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian; von einem anderen Unix/Linux-System aus installieren</title>
@@ -460,23 +460,59 @@ fertig paketierte Kernel mit dem Befehl
 # apt-cache search linux-image
 </screen></informalexample>
 
+</para><para>
+
+Wenn Sie vorhaben, einen fertig paketierten Kernel zu verwenden, sollten Sie
+vielleicht vorher die Konfigurationsdatei
+<filename>/etc/kernel-img.conf</filename> erstellen. Hier eine Beispieldatei:
+
+<informalexample><screen>
+# Kernel image management overrides
+# See kernel-img.conf(5) for details
+do_symlinks = yes
+relative_links = yes
+do_bootloader = yes
+do_bootfloppy = no
+do_initrd = yes
+link_in_boot = no
+</screen></informalexample>
+
+</para><para>
+
+Detailierte Informationen über diese Datei und die verschiedenen Optionen
+finden Sie in ihrer Handbuchseite (Manpage), die nach der Installation des
+Paketes <classname>kernel-package</classname> verfügbar ist. Wir empfehlen
+zu überprüfen, ob die eingetragenen Werte für Ihr System passend sind.
+
+</para><para arch="x86">
+
+Wenn Sie <classname>grub</classname> als Bootloader verwenden möchten, können
+Sie die Option <literal>do_bootloader</literal> auf <quote>no</quote> setzen.
+Um Ihre <filename>/boot/grub/menu.lst</filename> bei Installation oder
+Löschung von Debian-Kernels automatisch aktualisieren zu lassen, fügen Sie
+der Datei die folgenden Zeilen hinzu:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+Bei Verwendung von <classname>lilo</classname> als Bootloader muss
+<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt sein.
+
+</para><para>
+
 Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
 
 <informalexample><screen>
 # aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
-</para>
-<note><para>
+Wenn Sie die Datei <filename>/etc/kernel-img.conf</filename> vor der
+Installation eines Debian-Kernels nicht erstellt haben, werden Ihnen eventuell
+einige Fragen gestellt, die sich darum drehen.
 
-Die Konfigurationsdatei <filename>/etc/kernel-img.conf</filename> beeinflußt
-die Installation und Aktualisierung von vor-paketierten Debian-Kernels. Eine
-Standard-Version dieser Datei wird erstellt, wenn Sie zum ersten Mal ein
-Debian-Kernel-Image installieren. Zusätzliche Informationen zu dieser Datei
-finden Sie in der zugehörigen Handbuchseite (Manpage), die nach Installation
-des Paketes <classname>kernel-package</classname> verfügbar ist.
-
-</para></note>
+ </para>
   </sect2>
 
   <sect2>

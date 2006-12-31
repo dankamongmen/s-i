@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43655 -->
+<!-- original version: 43696 -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Hardware- und Betriebssystem-Setup vor der Installation</title>
@@ -22,30 +22,10 @@ werden hier ebenfalls behandelt.
 &bios-setup-sparc.xml; 
 &bios-setup-s390.xml; 
 
-  <sect2><title>Hardware-Probleme, auf die Sie achten sollten</title>
-<para arch="not-s390">
+  <sect2 arch="m68k;x86;powerpc" id="hardware-issues">
+  <title>Hardware-Probleme, auf die Sie achten sollten</title>
 
-Viele Leute haben versucht, ihre 90 MHz-CPU auf 100 MHz zu betreiben, und so
-weiter. Manchmal funktioniert es, aber das System ist empfindlich bezüglich der
-Temperatur sowie einiger anderer Faktoren und könnte beschädigt werden.
-Einer der Autoren dieses Dokuments hatte sein eigenes System ein Jahr lang
-übertaktet und dann begannen Probleme, dass das <command>gcc</command>-Programm
-während der Kompilierung von Betriebssystem-Kernels aufgrund eines
-unerwarteten Signals abbrach. Das Problem konnte nur durch Reduzieren des
-CPU-Taktes auf den regulären Wert gelöst werden.
-
-</para><para arch="not-s390">
-
-Der <command>gcc</command>-Compiler ist oft die erste Anwendung, die
-aufgrund von schlechten/defekten Speichermodulen (oder anderen
-Hardware-Problemen, durch die Daten unberechenbar verändert werden) abstürzt,
-weil er gewaltige Datenstrukturen verarbeitet, die dabei wiederholt
-durchlaufen werden. Jeglicher Fehler in diesen Strukturen verursacht
-das Ausführen eines unerlaubten Befehls oder den Zugriff auf eine
-nicht existente Adresse. Durch diese Symptome wird <command>gcc</command>
-aufgrund eines unerwarteten Signals beendet.
-
-</para><para arch="m68k">
+<para arch="m68k">
 
 Atari-TT-RAM-Boards sind berühmt-berüchtigt für RAM-Probleme unter Linux;
 wenn Ihnen seltsame Symptome unterkommen, versuchen Sie, zumindest den Kernel
@@ -58,70 +38,9 @@ FIXME: more description of this needed.
 
 </emphasis></phrase>
 
-</para><para arch="x86">
-
-Wenn Sie True-Parity-Speicher haben und Ihr Motherboard damit umgehen
-kann, stellen Sie sicher, dass die entsprechenden BIOS-Einstellungen
-aktiviert sind, so dass das Motherboard abbricht, falls ein
-Speicher-Parity-Fehler auftritt.
-
 </para>
 
-   <sect3 arch="x86"><title>Der Turbo-Schalter</title>
-<para>
-
-Viele Systeme haben einen <emphasis>Turbo</emphasis>-Schalter, der den
-CPU-Takt beeinflusst. Wählen Sie die Einstellung für hohe Geschwindigkeit.
-Wenn ihr BIOS die Möglichkeit bietet, den Turboschalter zu deaktivieren
-(oder die Kontrolle des CPU-Takts per Software), tun Sie es und setzen
-Sie den CPU-Takt fest auf die schnelle Geschwindigkeit. Uns wurde von einem
-speziellen System berichtet, auf dem Linux während der Hardware-Erkennung
-fälschlicherweise die Software-Control-Einstellung für den Turboschalter
-verändern könnte.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Cyrix-CPUs und Disketten-Fehler</title>
-<para>
-
-Viele Nutzer von Cyrix-CPUs mussten den Cache (Pufferspeicher)
-während der Installation deaktivieren, da es ansonsten zu Fehlern des
-Diskettenlaufwerks kam. Wenn dies auch für Sie zutrifft, denken Sie
-daran, den Cache nach der Installation wieder zu aktivieren, da das
-System sonst <emphasis>erheblich</emphasis> langsamer läuft.
-
-</para><para>
-
-Wir denken, dass dies nicht zwingend ein Fehler der Cyrix-CPU sein muss.
-Es ist möglicherweise ein Problem, das sich mit Linux umgehen ließe. Wir werden
-dies weiter beobachten. Für alle technisch Interessierten: wir vermuten,
-dass der Cache nach einem Umschalten von 16-Bit- auf 32-Bit-Code gestört
-ist.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Hardware-Einstellungen für Peripheriegeräte</title>
-<para>
-
-Sie müssen eventuell einige Einstellungen oder Jumper auf Erweiterungskarten
-Ihres Computers ändern. Einige Karten haben Setup-Menüs, während andere über
-Jumper eingestellt werden. Dieses Handbuch kann nicht für alle Geräte
-vollständige Informationen anbieten; wir hoffen nur, nützliche Tipps geben
-zu können.
-
-</para><para>
-
-Falls solche Karten erweiterten Speicher (<quote>mapped memory</quote>)
-anbieten, sollte diesem ein Adressbereich zwischen 0xA0000 und 0xFFFFF (von
-640K bis gerade noch unterhalb von 1 Megabyte) zugewiesen werden, oder aber ein
-Bereich mindestens 1 Megabyte oberhalb des insgesamt verfügbaren Arbeitsspeichers.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86" id="usb-keyboard-config">
+   <formalpara arch="x86">
    <title>USB-Bios-Support und Tastaturen</title>
 <para>
 
@@ -135,22 +54,12 @@ schauen Sie im BIOS nach Optionen für <quote>Legacy keyboard emulation</quote>
 oder <quote>USB keyboard support</quote>.
 
 </para>
-   </sect3>
+   </formalpara>
 
-   <sect3><title>Mehr als 64 MB RAM</title>
-<para>
-
-Der Linux-Kernel kann manchmal die korrekte Größe des installierten
-Arbeitsspeichers nicht erkennen. Falls dies der Fall sein sollte, gehen Sie
-zu <xref linkend="boot-parms"/>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="powerpc">
+   <formalpara arch="powerpc">
    <title>Bildschirmanzeige auf OldWorld Powermac-Systemen</title>
-<para>
 
+<para>
 Bei einigen OldWorld-Powermacs (an erster Stelle sind hier die zu nennen, die
 den <quote>control</quote>-Bildschirm-Treiber verwenden) wird unter Linux
 möglicherweise keine zuverlässige Farbdarstellung erreicht, wenn das Display
@@ -164,6 +73,6 @@ so einzustellen, dass 256 Farben verwenden werden statt Tausende
 (<quote>Thousands</quote>) oder Millionen (<quote>Millions</quote>).
 
 </para>
-   </sect3>
+   </formalpara>
   </sect2>
  </sect1>

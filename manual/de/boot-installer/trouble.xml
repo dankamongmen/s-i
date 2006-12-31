@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43514 -->
+<!-- original version: 43694 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Beseitigen von Problemen während der Installation</title>
@@ -408,6 +408,63 @@ am Boot-Prompt einzugeben; dies verhindert, dass die Module geladen werden.
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+  <title>Allgemeine &arch-title;-Installationsprobleme</title>
+<para>
+
+Es gibt einige allgemeine Installationsproblem, die hier erwähnt werden sollten:
+
+</para>
+   <sect3>
+   <title>Fehlgeleitete Grafikausgabe</title>
+<para>
+
+Es ist für &arch-title;-Systeme nicht unüblich, zwei Grafikkarten in einem
+Rechner installiert zu haben, zum Beispiel eine ATI-Karte und eine Sun Creator
+3D. In solchen Fällen könnte dies dazu führen, dass die Grafikausgabe recht
+früh nach dem Systemstart auf die falsche Grafikkarte geschaltet wird. In
+typischen Fällen zeigt das Display nur folgendes an:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+Um dies zu umgehen, können Sie entweder eine der Grafikkarten aus dem Rechner
+entfernen oder diejenige Karte, die während der OpenProm-Bootphase nicht
+verwendet wird, mittels eines Kernel-Parameters deaktivieren. Um zum Beispiel
+eine ATI-Karte zu deaktivieren, sollten Sie mit dem Parameter
+<userinput>video=atyfb:off</userinput> booten.
+
+</para><para>
+
+Bedenken Sie, dass Sie diesen Parameter unter Umständen auch manuell zur
+silo-Konfiguration hinzufügen müssen (editieren Sie
+<filename>/target/etc/silo.conf</filename> vor dem Neustart). Außerdem müssen
+Sie eventuell den Grafiktreiber in <filename>/etc/X11/xorg.conf</filename>
+anpassen, wenn Sie X11 installiert haben.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Booten oder Installieren von CD-ROM schlägt fehl</title>
+<para>
+
+Einige Sparc-Systeme sind notorisch problematisch, wenn es darum geht, sie
+von CD-ROM zu booten, und sogar wenn Sie booten, kann es unerklärliche
+Fehler während der Installation geben. Die meisten solcher Probleme wurden
+mit SunBlade-Systemen berichtet.
+
+</para><para>
+
+Wir empfehlen, zur Installation solcher Systeme den Installer per Netzwerk-Boot
+zu starten.
+
+</para>
+   </sect3>
+  </sect2>
+
   <sect2 id="kernel-msgs">
   <title>Die Startmeldungen des Kernels deuten</title>
 
@@ -478,12 +535,14 @@ der Sie nichts dagegen haben, dass sie öffentlich gemacht wird.
 
 </para><para>
 
-Falls Sie bereits ein funktionierendes Debian-System haben, ist der einfachste
-Weg, uns einen Installationsbericht zu schicken, die Pakete
-<quote>installation-report</quote> und <quote>reportbug</quote> zu
-installieren (<command>apt-get install installation-report reportbug</command>)
-und den Befehl <command>reportbug installation-report</command>
-auszuführen.
+Falls Sie bereits ein funktionierendes Debian-System haben, ist dies der
+einfachste Weg, um uns einen Installationsbericht zu schicken: installieren Sie
+die Pakete <classname>installation-report</classname> und
+<classname>reportbug</classname> (mit <command>aptitude install
+installation-report reportbug</command>), konfigurieren Sie
+<classname>reportbug</classname> wie in <xref linkend="mail-outgoing"/>
+beschrieben und führen Sie dann den Befehl
+<command>reportbug installation-report</command> aus.
 
 </para><para>
 
