@@ -1,120 +1,54 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43687 -->
 
  <sect1 id="network-cards">
  <title>Hardware für Netzwerkverbindungen</title>
 
-<para arch="x86">
+<para>
 
-<!-- last updated for kernel-image_2.0.36-2 -->
+Nahezu alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt werden,
+sollten auch vom Installationssystem unterstützt werden; modulare Treiber
+werden normalerweise automatisch geladen.
 
-Die meisten PCI- und viele ältere ISA-Netzwerkkarten werden unterstützt.
-Einige Netzwerkkarten werden von den meisten
-Debian-Installationsmedien nicht unterstützt, wie die AX.25-Karten und
--Protokolle, NT16510 EtherBlaster-Karten, Schneider-&amp; Koch G16-Karten
-und die Zenith Z-Note Build-in-Netzwerkkarten. Microchannel-(MCA)Netzwerkkarten
-werden vom Standard-Installationssystem nicht unterstützt, aber lesen Sie
-<ulink url="&url-linux-mca;">Linux on MCA</ulink>, um einige (jedoch veraltete)
-Instruktionen zu erhalten.
-FDDI-Netzwerke werden ebenfalls nicht vom Installationssystem unterstützt,
-weder die Karten noch die Protokolle.
+<phrase arch="x86">Dies beinhaltet die meisten PCI- und PCMCIA-Karten.</phrase>
+<phrase arch="i386">Viele ältere ISA-Karten werden ebenfalls
+unterstützt.</phrase>
 
-<!-- missing-doc FIXME You can create a custom kernel which supports an
-otherwise unsupported card and then substitute in the installer (see
-<xref linkend="rescue-replace-kernel"/>). -->
-
-</para><para arch="x86">
-
-Bei ISDN wird das D-Channel-Protokoll für das (alte) deutsche 1TR6 nicht
-unterstützt; Spellcaster BRI-ISDN-Boards werden ebenfalls nicht vom &d-i;
-unterstützt.
-
-</para>
-
-<para arch="m68k">
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Es ist unter
-Umständen nötig, den Netzwerktreiber als Modul zu laden. Für vollständige
-Informationen lesen Sie wieder <ulink url="&url-m68k-faq;"></ulink>.
-
-</para>
-
-<para arch="sparc">
-
-Die folgenden Netzwerkkarten (NIC) werden vom Boot-Kernel
-direkt unterstützt:
-
-<itemizedlist>
- <listitem><para>
-
-Sun LANCE
- 
-
-</para></listitem>
- <listitem><para>
-
-Sun Happy Meal
- 
-
-</para></listitem>
-</itemizedlist>
+<phrase arch="m68k">Noch einmal: lesen Sie <ulink url="&url-m68k-faq;"></ulink>
+für ausführliche Details.</phrase>
 
 </para><para arch="sparc">
 
-Die folgenden Netzwerkkarten werden als Kernelmodul unterstützt. Sie können
-erst aktiviert werden, sobald die Treiber während des Setups installiert wurden.
-Allerdings sollten Sie aufgrund der eigenen Magie von
-OpenPROM trotzdem von diesen Geräten booten können:
+Dies beinhaltet viele generische PCI-Karten (für Systeme, die PCI haben)
+und die folgenden Netzwerkkarten (NIC) von Sun:
 
 <itemizedlist>
- <listitem><para>
+<listitem><para>
 
-Sun BigMAC
- 
+Sun LANCE
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
+
+Sun Happy Meal
+
+</para></listitem>
+<listitem><para>
+
+Sun BigMAC
+
+</para></listitem>
+<listitem><para>
 
 Sun QuadEthernet
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 MyriCOM Gigabit Ethernet
 
 </para></listitem>
 </itemizedlist>
-
-</para><para arch="alpha">
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Möglicherweise
-müssen Sie den Treiber der Netzwerkkarte aber noch als Modul in den Kernel laden.
-
-</para><para arch="powerpc"> 
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Möglicherweise
-müssen Sie den Treiber der Netzwerkkarte aber noch als Modul in den Kernel laden.
-
-</para><para arch="hppa">
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Möglicherweise
-müssen Sie den Treiber der Netzwerkkarte aber noch als Modul in den Kernel laden.
-
-</para><para arch="ia64">
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Möglicherweise
-müssen Sie den Treiber der Netzwerkkarte aber noch als Modul in den Kernel laden.
-
-</para><para arch="mips">
-
-Alle Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Möglicherweise
-müssen Sie den Treiber der Netzwerkkarte aber noch als Modul in den Kernel laden.
 
 </para><para arch="mipsel">
 
@@ -124,25 +58,17 @@ im Moment nicht.
 
 </para><para arch="s390">
 
-Jede Netzwerkkarte (NIC), die vom Linux-Kernel unterstützt wird,
-sollte auch von den Boot-Medien unterstützt werden. Alle Netzwerktreiber
-sind als Module kompiliert, deshalb müssen Sie zunächst den passenden während des
-Netzwerk-Setups laden. Eine Liste mit unterstützten Netzwerk-Geräten:
+Die derzeit unterstützten Netzwerkkarten sind:
 
 <itemizedlist>
- <listitem><para>
+<listitem><para>
 
 Channel-to-Channel (CTC) oder ESCON-Verbindung (real oder emuliert)
 
 </para></listitem>
- <listitem><para>
-
-OSA-2 Token Ring/Ethernet und OSA-Express Fast Ethernet (nicht QDIO)
-
-</para></listitem>
 <listitem><para>
 
-Inter-User Communication Vehicle (IUCV) &ndash; nur für VM-guests verfügbar
+OSA-2 Token Ring/Ethernet und OSA-Express Fast Ethernet (nicht QDIO)
 
 </para></listitem>
 <listitem><para>
@@ -156,59 +82,137 @@ OSA-Express im QDIO-Modus, für HiperSockets und Guest-LANs
 
 <para arch="arm">
 
-Die folgenden Netzwerkkarten werden auf Netwinder und
-CATS-Maschinen direkt von den Boot-Medien unterstützt:
+Auf &architecture;-Systemen werden die meisten integrierten (Onboard-)
+Ethernet-Schnittstellen unterstützt und für zusätzliche PCI- und
+USB-Geräte werden Module angeboten. Die große Ausnahme ist die
+IXP4xx-Plattform (der Geräte wie der Linksys NSLU2 angehören). Sie benötigt
+einen proprietären Microcode für den Betrieb der integrierten
+Ethernet-Schnittstelle. Inoffizielle Images für den Linksys NSLU2 mit diesem
+proprietären Microcode können von der <ulink
+url="http://www.slug-firmware.net/">Slug-Firmware-Seite</ulink> bezogen
+werden.
 
-<itemizedlist>
- <listitem><para>
+</para><para arch="x86">
 
-    PCI-basierte NE2000
- 
-
-</para></listitem>
- <listitem><para>
-
-    DECchip Tulip
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Die folgenden Netzwerkkarten werden auf RiscPCs
-direkt von den Boot-Medien unterstützt:
-
-<itemizedlist>
- <listitem><para>
-
-    Ether1
-
-</para></listitem>
- <listitem><para>
-
-    Ether3
-
-</para></listitem>
- <listitem><para>
-
-    EtherH
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Wenn Ihre Karte in der obigen Liste aufgeführt ist, kann die komplette
-Installation über das Netzwerk abgewickelt werden, ohne CD-ROM oder
-Floppy.
-
-</para><para arch="arm">
-
-Alle anderen Netzwerkkarten (NIC), die vom Linux-Kernel unterstützt
-werden, sollten auch von den Boot-Medien unterstützt werden. Unter Umständen
-müssen Sie den Netzwerktreiber als Modul laden; dies bedeutet, dass Sie den
-Betriebssystem-Kernel und die Module von einem anderen Medium installieren müssen.
+Bei ISDN wird das D-Channel-Protokoll für das (alte) deutsche 1TR6 nicht
+unterstützt; Spellcaster BRI-ISDN-Boards werden ebenfalls nicht vom &d-i;
+unterstützt. Die Verwendung von ISDN während der Installation wird
+grundsätzlich nicht unterstützt.
 
 </para>
 
+  <sect2 arch="not-s390" id="nics-firmware">
+  <title>Treiber, die spezielle Firmware erfordern</title>
+<para>
+
+Das Installationssystem unterstützt derzeit nicht das Herunterladen von
+Firmware. Das bedeutet, dass jede Netzwerkkarte, dessen Treiber es erfordert,
+dass Firmware geladen wird, standardmäßig nicht unterstützt wird.
+
+</para><para>
+
+Falls keine andere Netzwerkkarte für die Installation genutzt werden kann,
+ist es immer noch möglich, &debian; von einer Komplett-CD-ROM oder DVD zu
+installieren. Wählen Sie die Option, das Netzwerk unkonfiguriert zu lassen
+und benutzen Sie zur Installation nur die Pakete, die auf der CD/DVD
+verfügbar sind. Sie können den nötigen Treiber und die Firmware installieren,
+wenn die Installation abgeschlossen ist (nach dem Neustart) und das Netzwerk
+manuell konfigurieren. Beachten Sie, dass die Firmware unter Umständen
+getrennt vom Treiber separat paketiert ist und nicht in der
+<quote>main</quote>-Sektion des &debian;-Archivs enthalten sein könnte.
+
+</para><para>
+
+Falls der Treiber selbst unterstützt <emphasis>wird</emphasis>, können Sie
+die Netzwerkkarte vielleicht auch während der Installation verwenden, indem
+Sie die Firmware von einem anderen Medium nach
+<filename>/usr/lib/hotplug/firmware</filename> kopieren. Vergessen Sie nicht,
+die Firmware am Ende der Installation (vor dem Neustart) ebenfalls in das
+entsprechende Verzeichnis des zu installierenden Systems zu kopieren.
+
+</para>
+  </sect2>
+
+  <sect2 condition="supports-wireless" id="nics-wireless">
+  <title>Wireless-LAN Netzwerkkarten</title>
+<para>
+
+Netzwerkkarten für WLAN werden generell ebenfalls unterstützt, allerdings
+unter einem großen Vorbehalt: viele WLAN-Adapter erfordern Treiber, die
+entweder nicht-frei sind oder noch nicht für die Integration in den
+offiziellen Linux-Treiber akzeptiert wurden. Diese Adapter können zwar
+generell unter &debian; zum Laufen gebracht werden, werden aber während
+der Installation nicht unterstützt.
+
+</para><para>
+
+Falls keine andere Netzwerkkarte für die Installation genutzt werden kann,
+ist es immer noch möglich, &debian; von einer Komplett-CD-ROM oder DVD zu
+installieren. Verwenden Sie die gleiche Prozedur wie oben im Abschnitt
+<quote>Treiber, die spezielle Firmware erfordern</quote> beschrieben.
+
+</para><para>
+
+In einigen Fällen könnte der Treiber, den Sie benötigen, nicht als
+Debian-Paket verfügbar sein. Sie müssen dann prüfen, ob Quellcode für solch
+einen Treiber im Internet bereitgestellt wird und den Treiber selbst
+kompilieren. Wie das geht ist allerdings nicht Thema dieses Handbuchs.
+<phrase arch="x86">Falls überhaupt kein Linux-Treiber für Ihr Gerät zur
+Verfügung steht, ist die Nutzung des
+<classname>ndiswrapper</classname>-Paketes Ihre letzte Rettung. Dies erlaubt
+Ihnen, einen Windows-Treiber zu verwenden.</phrase>
+
+</para>
+  </sect2>
+
+  <sect2 arch="sparc" id="nics-sparc-trouble">
+  <title>Bekannte Probleme unter &arch-title;</title>
+<para>
+
+Es gibt einige Probleme mit speziellen Netzwerkkarten, die hier erwähnt
+werden sollten.
+
+</para>
+
+   <sect3><title>Konflikt zwischen tulip- und dfme-Treibern</title>
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+<para>
+
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+Es gibt viele PCI-Netzwerkkarten (NIC), die zwar die gleiche PCI-Identifikation
+haben, aber von unterschiedlichen (wenn auch verwandten) Treibern unterstützt
+werden. Einige Karten funktionieren mit dem <literal>tulip</literal>-Treiber,
+andere mit dem <literal>dfme</literal>-Treiber. Weil die Karten die gleiche
+Identifikation verwenden, kann der Kernel sie nicht unterscheiden und es ist
+nicht sicher, welcher Treiber geladen wird. Falls der falsche geladen wird,
+könnte die Netzwerkkarte nicht oder nur schlecht funktionieren.
+
+</para><para>
+
+Dies ist allgemein ein Problem auf Netra-Systemen mit einem Davicom
+(DEC-Tulip-kompatiblen) NIC. In diesem Fall ist vermutlich der
+<literal>tulip</literal>-Treiber der korrekte.
+
+</para><para>
+
+Während der Installation können Sie dies lösen, indem Sie auf eine Shell
+wechseln und das falsche Treibermodul mit
+<userinput>modprobe -r <replaceable>Modul</replaceable></userinput>
+entladen (falls beide geladen sind, müssen Sie beide entladen). Danach
+können Sie das richtige Modul mit
+<userinput>modprobe <replaceable>Modul</replaceable></userinput> neu laden.
+
+</para>
+   </sect3>
+
+   <sect3><title>Sun B100 Blade</title>
+<!-- BTS: #384549; should be checked for kernels >2.6.18 -->
+<para>
+
+Der <literal>cassini</literal>-Netzwerktreiber funktioniert nicht mit Sun B100
+Blade-Systemen.
+
+</para>
+   </sect3>
+  </sect2>
  </sect1>
