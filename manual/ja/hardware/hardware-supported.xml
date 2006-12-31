@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 43529 -->
 
  <sect1 id="hardware-supported">
 <!--
@@ -190,8 +190,8 @@ Debian &release; は 12 の主要なアーキテクチャと、
 </row>
 
 <row>
-  <entry morerows="3">IBM/Motorola PowerPC</entry>
-  <entry morerows="3">powerpc</entry>
+  <entry morerows="2">IBM/Motorola PowerPC</entry>
+  <entry morerows="2">powerpc</entry>
   <entry>CHRP</entry>
   <entry>chrp</entry>
 </row><row>
@@ -200,9 +200,6 @@ Debian &release; は 12 の主要なアーキテクチャと、
 </row><row>
   <entry>PReP</entry>
   <entry>prep</entry>
-</row><row>
-  <entry>APUS</entry>
-  <entry>apus</entry>
 </row>
 
 <row>
@@ -286,9 +283,9 @@ as well.
 &supported-sparc.xml;
 
 <!--
-  <sect2 id="gfx" arch="not-s390"><title>Graphics Card</title>
+  <sect2 id="gfx" arch="not-s390"><title>Graphics Card Support</title>
 -->
-  <sect2 id="gfx" arch="not-s390"><title>グラフィックカード</title>
+  <sect2 id="gfx" arch="not-s390"><title>グラフィックカードのサポート</title>
 <para arch="x86">
 
 <!--
@@ -353,6 +350,58 @@ VGA エミュレーションや、グラフィックカードの選択した範囲での
 Linux フレームバッファをサポートしています。
 Broadcom 評価ボード用の<ulink url="&url-bcm91250a-hardware;">互換性リスト</ulink>を利用できます。
 
+</para><para arch="sparc">
+
+<!--
+Most graphics options commonly found on Sparc-based machines are supported.
+X.org graphics drivers are available for sunbw2, suncg14, suncg3, suncg6,
+sunleo and suntcx framebuffers, Creator3D and Elite3D cards (sunffb driver),
+PGX24/PGX64 ATI-based video cards (ati driver), and PermediaII-based cards
+(glint driver). To use an Elite3D card with X.org you additionally need to
+install the <classname>afbinit</classname> package, and read the documentation
+included with it on how to activate the card.
+-->
+Sparc ベースマシンで共通して存在する、
+ほとんどのグラフィックオプションをサポートしています。
+X.org グラフィックドライバでは、
+sunbw2, suncg14, suncg3, suncg6, sunleo, suntcx の各フレームバッファや、
+Creator3D や Elite3D のカード (sunffb ドライバ)、
+PGX24/PGX64 ATI ベースビデオカード (ati ドライバ)、
+PermediaII ベースカード (glint ドライバ) が利用できます。
+Elite3D カードを X.org で使用するには、
+<classname>afbinit</classname> パッケージを追加インストールする必要があります。
+また、カードを有効にするために、
+そのパッケージに付属するドキュメントをお読みください。
+
+</para><para arch="sparc">
+
+<!--
+It is not uncommon for a Sparc machine to have two graphics cards in a
+default configuration. In such a case there is a possibility that the
+Linux kernel will not direct its output to the card initially used by the
+firmware. The lack of output on the graphical console may then be mistaken
+for a hang (usually the last message seen on console is 'Booting Linux...').
+One possible solution is to physically remove one of the video cards;
+another option is to disable one of the cards using a kernel boot parameter.
+Also, if graphical output is not required or desired, serial console may be
+used as an alternative. On some systems use of serial console can be
+activated automatically by disconnecting the keyboard before booting the
+system.
+-->
+Sparc マシンのデフォルト構成で、グラフィックカードを 2 つ持っているのは、
+珍しいことではありません。
+そのような場合、ファームウェアではじめに使用したカードに、
+Linux カーネルが出力を向けない可能性があります。
+グラフィックコンソールに出力が足らないと、ハングに間違われるかもしれません
+(通常、コンソールに表示される最後のメッセージは、'Booting Linux...' です)。
+解決法の 1 つにビデオカードを物理的に取り除いてしまう、という物があります。
+また、カーネルのブートパラメータで、
+カードを 1 つ無効にしてしまうという方法もあります。
+グラフィック出力が必須でないか必要ないなら、
+シリアルコンソールを代わりに使用する方法もあります。
+ある種のシステムでは、システムが起動する前にキーボードを接続しないと、
+自動的にシリアルコンソールを使用する物があります。
+
 </para>
   </sect2>
 
@@ -384,7 +433,7 @@ with GNU/Linux, see the
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric multi-processing</quote>
+Multiprocessor support &mdash; also called <quote>symmetric multiprocessing</quote>
 or SMP &mdash; is available for this architecture.  The standard Debian
 &release; kernel image was compiled with SMP support.  This should not
 prevent installation, since the SMP kernel should boot on non-SMP systems;
@@ -428,8 +477,8 @@ Debian の標準カーネルを置き換える必要があります。
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture.
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture.
 The standard Debian &release; kernel image was compiled with
 <firstterm>SMP-alternatives</firstterm> support. This means that the kernel
 will detect the number of processors (or processor cores) and will
@@ -461,8 +510,8 @@ SMP をサポートするようコンパイルされていません。
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture.
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture.
 However, the standard Debian &release; kernel image does not support
 SMP.  This should not prevent installation, since the standard,
 non-SMP kernel should boot on SMP systems; the kernel will simply use
@@ -500,8 +549,8 @@ section of the kernel config.
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture,
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture,
 and is supported by a precompiled Debian kernel image. Depending on your
 install media, this SMP-capable kernel may or may not be installed by
 default. This should not prevent installation, since the standard,
@@ -528,6 +577,8 @@ appropriate kernel package.
 複数のプロセッサを利用するためには、
 SMP をサポートするカーネルパッケージがインストールされることをチェックするか、
 そうでなければ、適切なカーネルパッケージを選ぶ必要があります。
+
+</para><para>
 
 <!--
 You can also build your own customized kernel to support SMP. You can find

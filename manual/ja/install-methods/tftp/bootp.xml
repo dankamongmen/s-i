@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36841 -->
+<!-- original version: 43558 -->
 
 
   <sect2 condition="supports-bootp" id="tftp-bootp">
 <!--
-  <title>Setting up BOOTP server</title>
+  <title>Setting up a BOOTP server</title>
 -->
   <title>BOOTP サーバの設定</title>
 <para>
@@ -14,14 +14,14 @@
 There are two BOOTP servers available for GNU/Linux. The first is CMU
 <command>bootpd</command>. The other is actually a DHCP server: ISC
 <command>dhcpd</command>. In &debian; these are contained in the
-<classname>bootp</classname> and <classname>dhcp</classname> packages
-respectively.
+<classname>bootp</classname> and <classname>dhcp3-server</classname>
+packages respectively.
 -->
 GNU/Linux で使える BOOTP サーバは 2 つあります。
 ひとつは CMU の <command>bootpd</command> です。
 もう 1 つは実際は DHCP サーバですが、ISC の <command>dhcpd</command> です。
 &debian; では、
-<classname>bootp</classname> パッケージと <classname>dhcp</classname> 
+<classname>bootp</classname> パッケージと <classname>dhcp3-server</classname>
 パッケージにそれぞれ入っています。
 
 </para><para>
@@ -103,11 +103,11 @@ By contrast, setting up BOOTP with ISC <command>dhcpd</command> is
 really easy, because it treats BOOTP clients as a moderately special
 case of DHCP clients.  Some architectures require a complex
 configuration for booting clients via BOOTP.  If yours is one of
-those, read the section <xref linkend="dhcpd"/>.  Otherwise, you
+those, read the section <xref linkend="dhcpd"/>.  In that case, you
 will probably be able to get away with simply adding the
 <userinput>allow bootp</userinput> directive to the configuration
 block for the subnet containing the client, and restart
-<command>dhcpd</command> with <userinput>/etc/init.d/dhcpd
+<command>dhcpd</command> with <userinput>/etc/init.d/dhcpd3-server
 restart</userinput>.
 -->
 対照的に、ISC <command>dhcpd</command> を使っての BOOTP の設定は実に簡単です。
@@ -116,10 +116,9 @@ restart</userinput>.
 アーキテクチャによっては、BOOTP によるクライアントの起動には
 複雑な設定が必要になります。
 これに該当してしまったら、<xref linkend="dhcpd"/> の節を読んでください。
-該当しないアーキテクチャでは、
-クライアントの含まれるサブネットの設定ブロックに
+この場合、クライアントの含まれるサブネットの設定ブロックに
 <userinput>allow bootp</userinput> というディレクティブを追加し、
-<userinput>/etc/init.d/dhcpd restart</userinput> で
+<userinput>/etc/init.d/dhcpd3-server restart</userinput> で
 <command>dhcpd</command> を再起動するだけです。
 
 </para>

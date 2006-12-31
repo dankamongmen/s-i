@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42985 -->
+<!-- original version: 43675 -->
 
    <sect3 id="pkgsel">
 <!--
@@ -46,7 +46,7 @@ your computer, such as <quote>Desktop environment</quote>,
 <!--
 You should know that to present this list, the installer is merely
 invoking the <command>tasksel</command> program. It can be run at any
-time after installation to install more packages or remove them), or
+time after installation to install more packages (or remove them), or
 you can use a more fine-grained tool such as <command>aptitude</command>.
 If you are looking for a specific single package, after
 installation is complete, simply run <userinput>aptitude install
@@ -57,7 +57,7 @@ looking for.
 表示されるリストは、
 インストーラが単に <command>tasksel</command> プログラムを起動しているだけ、
 ということを知っておいてください。インストールの後で、
-他のパッケージをインストール・削除するのにいつでも実行できます。
+他のパッケージをインストール (または削除) するのにいつでも実行できます。
 また <command>aptitude</command> のような、よりきめ細かいツールも利用できます。
 インストール完了後、特定の 1 パッケージを探すのなら、単に 
 <userinput>aptitude install <replaceable>パッケージ名</replaceable></userinput>
@@ -130,7 +130,7 @@ File server: <classname>samba</classname>, <classname>nfs</classname>;
 Mail server: <classname>exim4</classname>, <classname>spamassassin</classname>,
 <classname>uw-imap</classname>;
 Print server: <classname>cups</classname>;
-SQL server: <classname>postgresql</classname>;
+SQL database: <classname>postgresql</classname>;
 Web server: <classname>apache</classname>.
 -->
 各サーバタスクでは、おおまかに以下のソフトウェアをインストールします。
@@ -139,18 +139,18 @@ DNS サーバ: <classname>bind9</classname>。
 メールサーバ: <classname>exim4</classname>, 
 <classname>spamassassin</classname>, <classname>uw-imap</classname>。
 印刷サーバ: <classname>cups</classname>。
-SQL サーバ: <classname>postgresql</classname>。
+SQL データベース: <classname>postgresql</classname>。
 Web サーバ: <classname>apache</classname>。
 
 </para></note>
 <para>
 
 <!--
-Once you've selected your tasks, select <guibutton>Ok</guibutton>. At this
+Once you've selected your tasks, select <guibutton>OK</guibutton>. At this
 point, <command>aptitude</command> will install the packages that are part
 of the tasks you've selected.
 -->
-タスクを選択したら、<guibutton>Ok</guibutton> を選択してください。
+タスクを選択したら、<guibutton>OK</guibutton> を選択してください。
 <command>aptitude</command> が選択したパッケージの一部をインストールし始めます。
 
 </para>
@@ -166,7 +166,38 @@ to toggle selection of a task.
 </para></note>
 <para>
 
+<!--
+You should be aware that especially the Desktop task is very large.
+Especially when installing from a normal CD-ROM in combination with a
+mirror for packages not on the CD-ROM, the installer may want to retrieve
+a lot of packages over the network. If you have a relatively slow
+Internet connection, this can take a long time. There is no option to
+cancel the installation of packages once it has started.
+-->
+デスクトップタスクは非常に大きいことを意識していてください。
+特に、通常の CD-ROM と、
+ミラーサイトにあるCD-ROM 外のパッケージを組み合わせる場合、インストーラが、
+ネットワークから大量のパッケージを取得しようとするかもしれません。
+インターネット接続が低速な場合、長い時間かかるでしょう。
+一度、パッケージのインストールを始めたら、
+キャンセルするオプションはありません。
 
+</para><para>
+
+<!--
+Even when packages are included on the CD-ROM, the installer may still
+retrieve them from the mirror if the version available on the mirror is
+more recent than the one included on the CD-ROM. If you are installing
+the stable distribution, this can happen after a point release (an update
+of the original stable release); if you are installing the testing
+distribution this will happen if you are using an older image.
+-->
+パッケージが CD-ROM に含まれている場合でも、
+CD-ROM にあるパッケージよりもミラーサイトにあるパッケージの方が新しければ、
+インストーラはミラーサイトから取得しようとします。
+安定版をインストールしている場合、ポイントリリース 
+(オリジナルの安定版リリースの更新) 後に、テスト版をインストールしている場合は、
+古いイメージを使用していると、こういったことが起こり得ます。
 
 </para><para>
 
@@ -182,167 +213,6 @@ information from the user, it will prompt you during this process.
 インストールします。
 口うるさいプログラムが、ユーザからの情報をもっと必要とする場合は、
 この処理中に入力をうながしてきます。
-
-</para>
-   </sect3>
-
-   <sect3 id="config-mta">
-<!--
-   <title>Configuring Your Mail Transport Agent</title>
--->
-   <title>メール配送エージェント (MTA) の設定</title>
-
-<para>
-
-<!--
-Today, email is a very important part of many people's life, so it's
-no surprise Debian lets you configure your mail system right as a part
-of the installation process. The standard mail transport agent in
-Debian is <command>exim4</command>, which is relatively small,
-flexible, and easy to learn.
--->
-今日、email は多くの人々の生活で非常に重要な位置を占めています。
-ですからインストール処理中で、
-Debian がメールシステムを正しく設定させるのは驚くべきことではありません。
-Debian の標準メール配送エージェントは <command>exim4</command> です。
-これは、比較的小さく、柔軟で学習が容易です。
-
-</para><para>
-
-<!--
-You may ask if this is needed even if your computer is not connected
-to any network. The short answer is: Yes. The longer explanation: Some
-system utilities (like <command>cron</command>,
-<command>quota</command>, <command>aide</command>, &hellip;) may send
-you important notices via email.
--->
-ネットワークに繋がっていないコンピュータでも、必要なのか聞きたそうですね。
-簡単に言えば Yes です。もう少し長く説明すると、
-(<command>cron</command>, <command>quota</command>, <command>aide</command>,
-&hellip; といった) システムユーティリティには、
-重要な通知を email で送信するものがあるのです。
-
-</para><para>
-
-<!--
-So on the first screen you will be presented with several common mail
-scenarios. Choose the one that most closely resembles your needs:
--->
-そのため、最初の画面では、いくつか一般的なメールのシナリオが提示されます。
-ニーズに最も近いものを選択してください。
-
-</para>
-
-<variablelist>
-<varlistentry>
-<!--
-<term>internet site</term>
--->
-<term>インターネットサイト</term>
-<listitem><para>
-
-<!--
-Your system is connected to a network and your mail is sent and
-received directly using SMTP. On the following screens you will be
-asked a few basic questions, like your machine's mail name, or a list of
-domains for which you accept or relay mail.
--->
-システムがネットワークに繋がっており、メールを直接 SMTP で送受信します。
-マシンのメール名やメールを受け付け・リレーするドメインのリストといった
-基本的な質問が続きます。
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<!--
-<term>mail sent by smarthost</term>
--->
-<term>スマートホストでメール送信</term>
-<listitem><para>
-
-<!--
-In this scenario is your outgoing mail forwarded to another machine,
-called a <quote>smarthost</quote>, which does the actual job for
-you. Smarthost also usually stores incoming mail addressed to your
-computer, so you don't need to be permanently online. That also means
-you have to download your mail from the smarthost via programs like
-fetchmail. This option is suitable for dial-up users.
--->
-このシナリオは、
-実際に配送を行う<quote>スマートホスト</quote>と呼ばれる別のマシンに、
-出ていくメールをフォワードしてもらいます。
-またスマートホストは、
-通常あなたのコンピュータ宛に入ってくるメールを格納するため、
-ずっとオンラインである必要はありません。
-またこれは、スマートホストから fetchmail のようなプログラムを用いて、
-メールをダウンロードしなければならない、と言うことでもあります。
-このオプションは、ダイアルアップユーザに最適です。
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<!--
-<term>local delivery only</term>
--->
-<term>ローカル配信のみ</term>
-<listitem><para>
-
-<!--
-Your system is not on a network and mail is sent or received only
-between local users. Even if you don't plan to send any messages, this
-option is highly recommended, because some system utilities may send
-you various alerts from time to time (e.g. beloved <quote>Disk quota
-exceeded</quote>). This option is also convenient for new users,
-because it doesn't ask any further questions.
--->
-システムがネットワーク上になく、メールの送受信をローカルユーザとのみ行います。
-いずれのメッセージを送信する予定がなくとも、このオプションを強くお奨めします。
-システムユーティリティの中には、時々様々な警告 
-(愛しい <quote>Disk quota exceeded</quote> など) を挙げるものがあるからです。
-このオプションは他に質問を発しないので、新しいユーザにとって便利です。
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<!--
-<term>no configuration at this time</term>
--->
-<term>今は設定しない</term>
-<listitem><para>
-
-<!--
-Choose this if you are absolutely convinced you know what you are
-doing. This will leave you with an unconfigured mail system &mdash;
-until you configure it, you won't be able to send or receive any mail
-and you may miss some important messages from your system utilities.
--->
-何をしようとしているか、絶対に確信しているなら、これを選択してください。
-これにより、設定されていないメールシステムが残ります。&mdash;
-設定するまで、どんなメールも送受信できませんし、
-システムユーティリティからの重要なメッセージを見逃してしまうことでしょう。
-
-
-</para></listitem>
-</varlistentry>
-</variablelist>
-
-<para>
-
-<!--
-If none of these scenarios suits your needs, or if you need a finer
-setup, you will need to edit configuration files under the
-<filename>/etc/exim4</filename> directory after the installation is
-complete. More information about <command>exim4</command> may be found
-under <filename>/usr/share/doc/exim4</filename>.
--->
-ニーズに合ったシナリオがなかったり、もっとよいセットアップが必要なら、
-<filename>/etc/exim4</filename> ディレクトリ以下にある設定ファイルを、
-インストール完了後に編集してください。
-<command>exim4</command> についてのさらなる情報は、
-<filename>/usr/share/doc/exim4</filename> 以下にあります。
 
 </para>
    </sect3>

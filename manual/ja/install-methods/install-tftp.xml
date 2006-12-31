@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43696 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>TFTP ネットブート用ファイルの準備</title>
@@ -23,22 +23,22 @@ TFTP を用いると、そのマシンをネットワーク越しに他のマシンから起動できます。
 </para><para>
 
 <!--
-You need to setup a TFTP server, and for many machines, a BOOTP server
-<phrase condition="supports-rarp">, or RARP server</phrase>
-<phrase condition="supports-dhcp">, or DHCP server</phrase>.
+You need to setup a TFTP server, and for many machines a DHCP
+server<phrase condition="supports-rarp">, or RARP
+server</phrase><phrase condition="supports-bootp">, or BOOTP
+server</phrase>.
 -->
-設定が必要なのは TFTP サーバです。
-また多くのマシンでは BOOTP サーバ
-<phrase condition="supports-rarp">、RARP サーバ</phrase>
-<phrase condition="supports-dhcp">、DHCP サーバ</phrase>
-のいずれかの設定が必要です。
+TFTP サーバをセットアップする必要があります。
+また多くのマシンでは DHCP サーバ<phrase condition="supports-rarp">や、
+RARP サーバ</phrase><phrase condition="supports-bootp">、
+BOOTP サーバ</phrase>のセットアップも必要です。
 
 </para><para>
 
 <!--
 <phrase condition="supports-rarp">The Reverse Address Resolution Protocol (RARP) is
 one way to tell your client what IP address to use for itself. Another
-way is to use the BOOTP protocol. </phrase>
+way is to use the BOOTP protocol.</phrase>
 -->
 <phrase condition="supports-rarp">Reverse Address Resolution Protocol (RARP) は、
 どの IP を用いるべきかをクライアントに伝える方法のひとつです。
@@ -47,28 +47,27 @@ way is to use the BOOTP protocol. </phrase>
 <!--
 <phrase condition="supports-bootp">BOOTP is an IP protocol that
 informs a computer of its IP address and where on the network to obtain
-a boot image. </phrase>
+a boot image.</phrase>
 -->
 <phrase condition="supports-bootp">BOOTP は IP プロトコルのひとつです。
 クライアントに対して、使うべき IP アドレスと、
 ブートイメージをネットワークのどこから取得するかを伝えます。</phrase>
 
 <!--
-<phrase arch="m68k"> Yet another alternative exists on VMEbus
-systems: the IP address can be manually configured in boot ROM. </phrase>
+<phrase arch="m68k">Yet another alternative exists on VMEbus
+systems: the IP address can be manually configured in boot ROM.</phrase>
 -->
 <phrase arch="m68k">VMEbus システムではまた違った選択肢も存在します。
 IP アドレスはブート ROM から手動で設定できます。</phrase>
 
 <!--
-<phrase condition="supports-dhcp">The DHCP (Dynamic Host Configuration
-Protocol) is a more flexible, backwards-compatible extension of BOOTP.
-Some systems can only be configured via DHCP. </phrase>
+The DHCP (Dynamic Host Configuration Protocol) is a more flexible,
+backwards-compatible extension of BOOTP.
+Some systems can only be configured via DHCP.
 -->
-<phrase condition="supports-dhcp">
 DHCP (Dynamic Host Configuration Protocol) は、
 BOOTP との後方互換性を保ちつつ、より柔軟に拡張させたものです。
-システムによっては DHCP でしか設定できないこともあります。</phrase>
+システムによっては DHCP でしか設定できないこともあります。
 
 </para><para arch="powerpc">
 
@@ -188,34 +187,64 @@ are installed.
 Debian パッケージは一般的にインストールする際、
 デフォルトで正しくセットアップできます。
 
-</para><para>
+</para>
+<note><para>
 
 <!--
-Look in that file and remember the directory which is used as the
-argument of <command>in.tftpd</command>; you'll need that below.  The
-<userinput>-l</userinput> argument enables some versions of
-<command>in.tftpd</command> to log all requests to the system logs;
-this is useful for diagnosing boot errors.  If you've had to change
-<filename>/etc/inetd.conf</filename>, you'll have to notify the
-running <command>inetd</command> process that the file has changed.
-On a Debian machine, run <userinput>/etc/init.d/inetd
-reload</userinput>; on other machines,
-find out the process ID for <command>inetd</command>, and run
-<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
+Historically TFTP servers used <filename>/tftpboot</filename> as directory
+to serve images from. However, &debian; packages may use other directories
+to comply with the <ulink url="&url-fhs-home;">Filesystem Hierarchy
+Standard</ulink>. For example, <classname>tftpd-hpa</classname> by default
+uses <filename>/var/lib/tftpboot</filename>. You may have to adjust the
+configuration examples in this section accordingly.
+-->
+歴史的に TFTP サーバは、
+イメージを提供するディレクトリに <filename>/tftpboot</filename> を使用します。
+しかし &debian; のパッケージでは、
+<ulink url="&url-fhs-home;">Filesystem Hierarchy Standard</ulink> 
+を満たす別のディレクトリを使用する可能性があります。
+例えば、<classname>tftpd-hpa</classname> では 
+<filename>/var/lib/tftpboot</filename> をデフォルトで使用します。
+必要に応じて、本節の設定例を調整してください。
+
+</para></note>
+<para>
+
+<!--
+Look in <filename>/etc/inetd.conf</filename> and remember the directory which
+is used as the argument of <command>in.tftpd</command><footnote>
 -->
 <filename>/etc/inetd.conf</filename> を見て、<command>in.tftpd</command> 
-の引数に与えられているディレクトリを覚えてください。
-後でこのディレクトリを使います。
+の引数に与えられているディレクトリを覚えておいてください<footnote>
+
+<para>
+<!--
+The <userinput>-l</userinput> argument enables some versions of
+<command>in.tftpd</command> to log all requests to the system logs;
+this is useful for diagnosing boot errors.
+-->
 <command>in.tftpd</command> のバージョンによっては、
 <userinput>-l</userinput> 引数をつけると、
 すべての要求をシステムログに記録できます。
 これは起動エラーの診断に有用です。
+</para>
+
+<!--
+</footnote>; you'll need that below.
+If you've had to change <filename>/etc/inetd.conf</filename>, you'll have to
+notify the running <command>inetd</command> process that the file has changed.
+On a Debian machine, run <userinput>/etc/init.d/inetd reload</userinput>; on
+other machines, find out the process ID for <command>inetd</command>, and run
+<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
+-->
+</footnote>。後でこのディレクトリを使います。
 <filename>/etc/inetd.conf</filename> を変更したら、
 変更したことを <command>inetd</command> に伝えなければなりません。
 Debian マシンでは <userinput>/etc/init.d/inetd reload</userinput>
 を実行します。
 他のマシンでは、<command>inetd</command> のプロセス ID を見つけて、
-<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput> を実行します。
+<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput> 
+を実行します。
 
 </para><para arch="mips">
 
@@ -264,8 +293,7 @@ to adjust the range of source ports the Linux TFTP server uses.
 <!--
 Next, place the TFTP boot image you need, as found in
 <xref linkend="where-files"/>, in the <command>tftpd</command>
-boot image directory.  Generally, this directory will be
-<filename>/tftpboot</filename>.  You'll have to make a link from that
+boot image directory.  You may have to make a link from that
 file to the file which <command>tftpd</command> will use for booting a
 particular client.  Unfortunately, the file name is determined by the
 TFTP client, and there are no strong standards.
@@ -273,9 +301,8 @@ TFTP client, and there are no strong standards.
 次に行うことは、
 <xref linkend="where-files"/> の記述にある、必要な TFTP ブートイメージを、
 <command>tftpd</command> のブートイメージディレクトリに置く作業です。
-このディレクトリは普通 <filename>/tftpboot</filename> です。
 <command>tftpd</command> が特定のクライアントの起動に用いるファイルへのリンクを、
-ここに作らなければなりません。
+ここに作成してください。
 残念ながら、ファイルの名前は TFTP クライアントによって決まり、
 強制力のある標準は存在しません。
 
@@ -303,14 +330,14 @@ TFTP のディレクトリに置いてください。
 For PXE booting, everything you should need is set up in the
 <filename>netboot/netboot.tar.gz</filename> tarball. Simply extract this
 tarball into the <command>tftpd</command> boot image directory. Make sure
-your dhcp server is configured to pass <filename>/pxelinux.0</filename>
+your dhcp server is configured to pass <filename>pxelinux.0</filename>
 to <command>tftpd</command> as the filename to boot.
 -->
 PXE 起動では、必要なことがすべて <filename>netboot/netboot.tar.gz</filename> 
 tarball の中にセットアップされています。
 単にこの tarball を、
 <command>tftpd</command> ブートイメージディレクトリに展開してください。
-<filename>/pxelinux.0</filename> を、
+<filename>pxelinux.0</filename> を、
 起動するファイル名として <command>tftpd</command> へ渡すよう、
 dhcp サーバが設定されていることを確認してください。
 
@@ -509,6 +536,20 @@ uppercase and if necessary append the subarchitecture name.
 -->
 正しいファイル名を取得するには、文字をすべて大文字に変更し、
 (必要なら) サブアーキテクチャ名を追加しなければなりません。
+
+</para><para>
+
+<!--
+If you've done all this correctly, giving the command <userinput>boot
+net</userinput> from the OpenPROM should load the image. If the image
+cannot be found, try checking the logs on your tftp server to see which
+image name is being requested.
+-->
+すべて正しく行うと、
+OpenPROM から <userinput>boot net</userinput> コマンドを与えて、
+イメージをロードできます。
+イメージが見つからない場合、tftp サーバのログをチェックし、
+どのような名前のイメージを要求されているかを確認してください。
 
 </para><para>
 
