@@ -25,7 +25,7 @@ do_extra () {
 }
 
 update_templates () {
-    echo "Generating integrated XML files and POT files"
+    echo "Generating integrated XML files and POT files..."
     ./scripts/merge_xml en
     RET=$?; [ $RET -ne 0 ] && return 1
     ./scripts/update_pot
@@ -341,27 +341,23 @@ if [ $NR_BUILD -gt 0 ] ; then
     $ROOT/bin/translation-stats | sort -k 2,2nr >$logdir/tr-stats
     echo "Calculating translation statistics for po files..." >>$mainlog
     $ROOT/bin/po_stats/gen &>$logdir/po-stats.log
-    echo "Creating index page" >>$mainlog
+    echo "Creating index page..." >>$mainlog
     $ROOT/bin/create-index
 
     echo "" >>$mainlog
     cd $destination
-    echo "Creating archive..." >>$mainlog
-    #tar cjf $ROOT/manual.tar.bz2 --mode=g+rw *
-    tar cjf $ROOT/manual.tar.bz2 *
-    checkfatal "$?" "creating archive"
 
-    cd $ROOT
-    echo "Copying archive to alioth..." >>$mainlog
-    scp manual.tar.bz2 alioth.debian.org: >/dev/null
-    checkfatal "$?" "copying archive to alioth"
-
-    echo "Extracting archive on alioth..." >>$mainlog
-    ssh alioth.debian.org bin/man-extract
-    checkfatal "$?" "extracting archive on alioth"
+    # rsync directories individually so we can also delete obsolete files
+    #echo "rsyncing files to alioth..." >>$mainlog
+    for i in $(find . -type d); do
+    	rsync -zr --perms --delete "$i" alioth\:d-i_web/manual/ >>$mainlog 2>&1
+	checkfatal "$?" "rsync of '$i'"
+    done
 else
     echo "No languages built." >>$mainlog
 fi
+
+rm -f $ROOT/bin/index.podata
 
 echo "" >>$mainlog
 echo "Done -- `date -u`" >>$mainlog
