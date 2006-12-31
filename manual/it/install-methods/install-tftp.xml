@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43696 -->
 
 
  <sect1 condition="supports-tftp" id="install-tftp">
@@ -24,55 +24,56 @@ e che sia configurata per gestire l'avvio della propria macchina.
 </para><para>
 
 <!--
-You need to setup a TFTP server, and for many machines, a BOOTP server
-<phrase condition="supports-rarp">, or RARP server</phrase>
-<phrase condition="supports-dhcp">, or DHCP server</phrase>.
+You need to setup a TFTP server, and for many machines a DHCP 
+server<phrase condition="supports-rarp">, or RARP
+server</phrase><phrase condition="supports-bootp">, or BOOTP
+server</phrase>.
 -->
 
-È necessario attivare un server TFTP e, per più macchine, un server
-BOOTP<phrase condition="supports-rarp"> o un server
-RARP</phrase><phrase condition="supports-dhcp"> o un server DHCP</phrase>.
+È necessario attivare un server TFTP e, per più macchine un server
+DHCP<phrase condition="supports-rarp"> o un server
+RARP</phrase><phrase condition="supports-bootp"> o un server BOOTP</phrase>.
 
 </para><para>
 
 <!--
 <phrase condition="supports-rarp">The Reverse Address Resolution Protocol (RARP) is
 one way to tell your client what IP address to use for itself. Another
-way is to use the BOOTP protocol. </phrase>
+way is to use the BOOTP protocol.</phrase>
 -->
 
 <phrase condition="supports-rarp">Il RARP (Reverse Address Resolution
 Protocol) è un metodo per comunicare ai client quale indirizzo IP usare.
-In alternativa è possibile usare il protocollo BOOTP. </phrase>
+In alternativa è possibile usare il protocollo BOOTP.</phrase>
 
 <!--
 <phrase condition="supports-bootp">BOOTP is an IP protocol that
 informs a computer of its IP address and where on the network to obtain
-a boot image. </phrase>
+a boot image.</phrase>
 -->
 
 <phrase condition="supports-bootp">BOOTP è un protocollo IP che comunica a
 un computer qual è il proprio indirizzo IP e dove può recuperare dalla rete
-un'immagine per l'avvio. </phrase>
+un'immagine per l'avvio.</phrase>
 
 <!--
-<phrase arch="m68k"> Yet another alternative exists on VMEbus
-systems: the IP address can be manually configured in boot ROM. </phrase>
+<phrase arch="m68k">Yet another alternative exists on VMEbus
+systems: the IP address can be manually configured in boot ROM.</phrase>
 -->
 
 <phrase arch="m68k">Sui sistemi VMEbus esiste un'altra alternativa:
-l'indirizzo IP può essere configurato manualmente nella ROM di avvio.
-</phrase>
+l'indirizzo IP può essere configurato manualmente nella ROM di
+avvio.</phrase>
 
 <!--
-<phrase condition="supports-dhcp">The DHCP (Dynamic Host Configuration
-Protocol) is a more flexible, backwards-compatible extension of BOOTP.
-Some systems can only be configured via DHCP. </phrase>
+The DHCP (Dynamic Host Configuration Protocol) is a more flexible,
+backwards-compatible extension of BOOTP.
+Some systems can only be configured via DHCP.
 -->
 
-<phrase condition="supports-dhcp">Il DHCP (Dynamic Host Configuration
+Il DHCP (Dynamic Host Configuration
 Protocol) è una estensione più flessibile ma compatibile all'indietro di
-BOOTP. Alcuni sistemi possono essere configurati solo tramite DHCP. </phrase>
+BOOTP. Alcuni sistemi possono essere configurati solo tramite DHCP.
 
 </para><para arch="powerpc">
 
@@ -202,28 +203,63 @@ are installed.
 Solitamente i pacchetti Debian impostano correttamente il server durante
 l'installazione.
 
-</para><para>
+</para>
+<note><para>
 
 <!--
-Look in that file and remember the directory which is used as the
-argument of <command>in.tftpd</command>; you'll need that below.  The
-<userinput>-l</userinput> argument enables some versions of
+Historically TFTP servers used <filename>/tftpboot</filename> as directory
+to serve images from. However, &debian; packages may use other directories
+to comply with the <ulink url="&url-fhs-home;">Filesystem Hierarchy
+Standard</ulink>. For example, <classname>tftpd-hpa</classname> by default
+uses <filename>/var/lib/tftpboot</filename>. You may have to adjust the
+configuration examples in this section accordingly.
+-->
+
+Storicamente i server TFTP hanno usato <filename>/tftpboot</filename> come
+directory dalla quale servire le immagini. Invece, i pacchetti &debian;
+potrebbero usare una directory diversa in modo da essere conformi al
+<ulink url="&url-fhs-home;">Filesystem Hierarchy Standard</ulink>. Per esempio
+<classname>tftpd-hpa</classname> usa <filename>/var/lib/tftpboot</filename>;
+potrebbe essere necessario modificare gli esempi presenti in questa sezione
+in base alla propria configurazione.
+
+</para></note>
+<para>
+
+<!--
+Look in <filename>/etc/inetd.conf</filename> and remember the directory which
+is used as the argument of <command>in.tftpd</command><footnote>
+-->
+
+Cercare all'interno del file <filename>/etc/inetd.conf</filename> la
+directory usata come argomento di <command>in.tftpd</command> e prenderne
+nota<footnote>
+
+<para>
+
+<!--
+The <userinput>-l</userinput> argument enables some versions of
 <command>in.tftpd</command> to log all requests to the system logs;
-this is useful for diagnosing boot errors.  If you've had to change
-<filename>/etc/inetd.conf</filename>, you'll have to notify the
-running <command>inetd</command> process that the file has changed.
-On a Debian machine, run <userinput>/etc/init.d/inetd
-reload</userinput>; on other machines,
-find out the process ID for <command>inetd</command>, and run
+this is useful for diagnosing boot errors.
+-->
+
+L'opzione <userinput>-l</userinput> attiva su alcune versioni di
+<command>in.tftpd</command> la registrazione di tutte le richieste sul log
+di sistema, è utile per la diagnosi degli errori durante l'avvio.
+
+</para>
+
+<!--
+</footnote>; you'll need that below.
+If you've had to change <filename>/etc/inetd.conf</filename>, you'll have to
+notify the running <command>inetd</command> process that the file has changed.
+On a Debian machine, run <userinput>/etc/init.d/inetd reload</userinput>; on
+other machines, find out the process ID for <command>inetd</command>, and run
 <userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
 -->
 
-Cercare all'interno di questo file la directory usata come argomento di
-<command>in.tftpd</command> e prenderne nota, sarà necessaria in seguito.
-L'opzione <userinput>-l</userinput> attiva su alcune versioni di
-<command>in.tftpd</command> la registrazione di tutte le richieste sul log
-di sistema, è utile per la diagnosi degli errori durante l'avvio. Se è
-stato necessario modificare <filename>/etc/inetd.conf</filename> si deve
+</footnote>, sarà necessaria in seguito.
+Se è stato necessario modificare <filename>/etc/inetd.conf</filename> si deve
 passare la nuova configurazione al processo <command>inetd</command> in
 esecuzione, su una macchina Debian eseguire <userinput>/etc/init.d/inetd
 reload</userinput>; su macchine diverse si deve scoprire qual è l'ID del
@@ -281,8 +317,7 @@ per regolare l'intervallo delle porte sorgente usate sul server TFTP Linux.
 <!--
 Next, place the TFTP boot image you need, as found in
 <xref linkend="where-files"/>, in the <command>tftpd</command>
-boot image directory.  Generally, this directory will be
-<filename>/tftpboot</filename>.  You'll have to make a link from that
+boot image directory.  You may have to make a link from that
 file to the file which <command>tftpd</command> will use for booting a
 particular client.  Unfortunately, the file name is determined by the
 TFTP client, and there are no strong standards.
@@ -290,8 +325,7 @@ TFTP client, and there are no strong standards.
 
 Spostare le immagini TFTP di cui si ha bisogno (come descritto in
 <xref linkend="where-files"/>) nella directory delle immagini di avvio per
-TFTP. Generalmente questa directory è <filename>/tftpboot</filename>. È
-necessario fare un link da questa directory al file che
+TFTP. Potrebbe essere necessario fare un link da questa directory al file che
 <command>tftpd</command> dovrà utilizzare per l'avvio di un particolare
 client. Sfortunatamente il nome del file è stabilito dal client TFTP e non
 esiste uno standard.
@@ -320,14 +354,14 @@ TFTP e poi rinominarlo in <filename>yaboot.conf</filename>.
 For PXE booting, everything you should need is set up in the
 <filename>netboot/netboot.tar.gz</filename> tarball. Simply extract this
 tarball into the <command>tftpd</command> boot image directory. Make sure
-your dhcp server is configured to pass <filename>/pxelinux.0</filename>
+your dhcp server is configured to pass <filename>pxelinux.0</filename>
 to <command>tftpd</command> as the filename to boot.
 -->
 
 Per l'avvio PXE tutte le operazioni necessarie sono già state fatte in
 <filename>netboot/netboot.tar.gz</filename>. Estrarre questo tarball nella
 directory delle immagini di avvio <command>tftpd</command>, assicurarsi che
-il server dhcp sia configurato per passare <filename>/pxelinux.0</filename>
+il server dhcp sia configurato per passare <filename>pxelinux.0</filename>
 come file da avviare a <command>tftpd</command>.
 
 </para><para arch="ia64">
@@ -538,6 +572,20 @@ uppercase and if necessary append the subarchitecture name.
 Per ottenere il corretto nome del file è necessario cambiare tutte le
 lettere in maiuscole e, se necessario, aggiungere il nome della
 sottoarchitettura.
+
+</para><para>
+
+<!--
+If you've done all this correctly, giving the command <userinput>boot
+net</userinput> from the OpenPROM should load the image. If the image
+cannot be found, try checking the logs on your tftp server to see which
+image name is being requested.
+-->
+
+Se tutti i passi sono stati eseguiti correttamente, usando il comando
+<userinput>boot net</userinput> da OpenPROM dovrebbe iniziare il caricamento
+dell'immagine. Se non è possibile trovare l'immagine, controllare nei log
+del server tftp quale nome è stato usato per richiederla.
 
 </para><para>
 

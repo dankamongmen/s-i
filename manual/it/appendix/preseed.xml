@@ -1,5 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 43658 -->
+
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -507,11 +508,7 @@ To set a value to be used inside &d-i;, just pass
 <userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
 for any of the preseed variables listed in the examples in this appendix.
 If a value is to be used to configure packages for the target system, you
-will need to prepend the <firstterm>owner</firstterm> of the variable as in
-<userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
-If you don't specify the owner, the value for the variable will not be
-copied to the debconf database in the target system and thus remain unused
-during the configuration of the relevant package.
+will need to prepend the <firstterm>owner</firstterm><footnote>
 -->
 
 Per impostare un valore da usare all'interno di &d-i; è sufficiente passare
@@ -519,7 +516,37 @@ Per impostare un valore da usare all'interno di &d-i; è sufficiente passare
 per qualsiasi variabile di preconfigurazione mostrata negli esempi di questa
 appendice. Se un valore deve essere usato per configurare dei pacchetti sul
 sistema installato è necessario inserire come prefisso il
-<firstterm>proprietario</firstterm> della variabile in questo modo
+<firstterm>proprietario</firstterm><footnote>
+
+<para>
+
+<!--
+The owner of a debconf variable (or template) is normally the name of the
+package that contains the corresponding debconf template. For variables
+used in the installer itself the owner is <quote>d-i</quote>.
+Templates and variables can have more than one owner which helps to
+determine whether they can be removed from the debconf database if the
+package is purged.
+-->
+
+Il proprietario di una variabile debconf (o modello) è normalmente il nome
+del pacchetto che contiene il corrispondente modello. Le variabili usate
+all'interno dell'installatore hanno come proprietario <quote>d-i</quote>.
+I modelli e le variabili possono avere più di un proprietario, questo aiuta
+a determinare in quali casi possono essere eliminato dal database di debconf
+quando il pacchetto viene rimosso.
+
+</para>
+
+<!--
+</footnote> of the variable as in
+<userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
+If you don't specify the owner, the value for the variable will not be
+copied to the debconf database in the target system and thus remain unused
+during the configuration of the relevant package.
+-->
+
+</footnote> della variabile in questo modo
 <userinput><replaceable>proprietario</replaceable>:<replaceable>percorso/alla/variabile</replaceable>=<replaceable>valore</replaceable></userinput>.
 Se non si specifica il proprietario, il valore della variabile non viene
 copiato nel database di debconf sul sistema installato e quindi può essere
@@ -651,12 +678,12 @@ correttamente allora il file di preconfigurazione viene recuperato da
 </para><para>
 
 <!--
-The path segment of that comes from
-<literal>auto-install/defaultroot</literal>, which includes the
+The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>)
+is taken from <literal>auto-install/defaultroot</literal>. By default
 directory <literal>etch</literal> by default to allow future versions
-to specify their own codename to let people migrate forwards in a
+to specify their own codename and let people migrate forwards in a
 controlled manner.  The <literal>/./</literal> bit is used to indicate
-a root relative to which subsequent paths can be anchored (for use in
+a root, relative to which subsequent paths can be anchored (for use in
 preseed/include and preseed/run).  This allows files to be specified
 either as full URLs, paths starting with / that are thus anchored, or
 even paths relative to the location where the last preseed file was
@@ -670,7 +697,8 @@ fetched from
 <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
 -->
 
-La parte relativa al percorso è impostata in
+L'ultima parte della URL (<literal>d-i/etch/./preseed.cfg</literal>)
+è impostata in 
 <literal>auto-install/defaultroot</literal>, il cui valore predefinito
 contiene la directory <literal>etch</literal> per permettere alle versioni
 successive di specificare il proprio nome in codice e quindi permettere
@@ -692,20 +720,20 @@ web. In questo esempio, se il file di preconfigurazione imposta
 </para><para>
 
 <!--
-If there is no local DHCP or DNS infrastructure, or if you
-do not want to use the default path to the preseed.cfg, you can still
+If there is no local DHCP or DNS infrastructure, or if you do not want to
+use the default path to <filename>preseed.cfg</filename>, you can still
 use an explicit url, and if you don't use the <literal>/./</literal>
-element it will be anchored to the start of the path (i.e. the third /
-in the URL).  Here is an example that requires minimal support from
-the local network infrastructure:
+element it will be anchored to the start of the path (i.e. the third
+<literal>/</literal> in the URL).  Here is an example that requires minimal
+support from the local network infrastructure:
 -->
 
 Se non esite un'infrastruttura DHCP o DNS locale oppure se non si vuole
-usare il percorso predefinito per il file preseed.cfg, è comunque possibile
-usare una URL esplicita oppure, quando non si usa l'elemento
-<literal>/./</literal>, viene ancorata al punto di partenza del percorso
-(cioè al terzo <literal>/</literal> nella URL). Segue un esempio che richiede
-un minimo supporto da parte della rete locale:
+usare il percorso predefinito per il file <filename>preseed.cfg</filename>,
+è comunque possibile usare una URL esplicita oppure, quando non si usa
+l'elemento <literal>/./</literal>, viene ancorata al punto di partenza del
+percorso (cioè al terzo <literal>/</literal> nella URL). Segue un esempio
+che richiede un minimo supporto da parte della rete locale:
 
 <informalexample><screen>
 <!--
@@ -749,15 +777,15 @@ percorso predefinito.
 <!--
 In addition to specifying the url, you can also specify settings that
 do not directly affect the behavior of &d-i; itself, but can be passed
-through to any scripts that might be specified <literal>preseed/run</literal>
-settings in the loaded preseed file.  At present, the only example of
+through to scripts specified using <literal>preseed/run</literal>
+in the loaded preseed file.  At present, the only example of
 this is <literal>auto-install/classes</literal>, which has an alias
 <literal>classes</literal>.  This can be used thus:
 -->
 
 Oltre alla URL è possibile specificare anche altre impostazioni che non
 influenzano direttamente il comportamento del &d-i; ma che possono essere
-passate a un qualsiasi script specificato come <literal>preseed/run</literal>
+passate a un qualsiasi script specificato con <literal>preseed/run</literal>
 all'interno del file di preconfigurazione. Al momento l'unico esempio di
 questa caratteristica è <literal>auto-install/classes</literal>
 (che dispone dell'alias <literal>classes</literal>) e può essere usato
@@ -867,9 +895,10 @@ I seguenti alias possono risultare utili quando si usa la preconfigurazione
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
 <row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
 <row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
 <row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
-<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
 <row><entry>suite</entry><entry>mirror/suite</entry></row>
 </tbody></tgroup>
 </informaltable>
@@ -1394,16 +1423,16 @@ d-i netcfg/wireless_wep string
 <para>
 
 <!--
-Depending on the installation method you use, a mirror may be used both to
-download additional components of the installer, the base system and to
-set up the <filename>/etc/apt/sources.list</filename> for the installed
+Depending on the installation method you use, a mirror may be used to
+download additional components of the installer, to install the base system,
+and to set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
 -->
 
-A seconda del metodo d'installazione usato è possibile che venga usato un
-mirror per scaricare i componenti aggiuntivi dell'installatore e il sistema
-di base e nel file <filename>/etc/apt/sources.list</filename> sul sistema
-installato.
+A seconda del metodo d'installazione usato è possibile che venga usato
+un mirror per scaricare i componenti aggiuntivi dell'installatore, per
+installare il sistema di base e per impostare il file
+<filename>/etc/apt/sources.list</filename> sul sistema installato.
 
 </para><para>
 
@@ -1464,8 +1493,8 @@ d-i mirror/http/proxy string
 
 <!--
 Using preseeding to partition the harddisk is very much limited to what is
-supported by <classname>partman-auto</classname>. You can choose to either
-partition existing free space on a disk or a whole disk. The layout of the
+supported by <classname>partman-auto</classname>. You can choose to partition
+either existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preconfiguration file. It is
 currently not possible to partition multiple disks using preseeding.
@@ -1952,8 +1981,8 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 d-i grub-installer/only_debian boolean true
 
 <!--
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
 --># Questa fa in modo che grub-installer si installi sul MBR se trova anche
 # qualche altro sistema operativo, che è un po' meno sicuro poiché potrebbe
 # non riuscire ad avviare gli altri sistemi operativi.
@@ -2043,15 +2072,15 @@ sempre il task <userinput>standard</userinput>.
 If you want to install some individual packages in addition to packages
 installed by tasks, you can use the parameter
 <classname>pkgsel/include</classname>. The value of this parameter can be
-either comma-separated or space-separated, so you can also use it easily on
-the kernel command line.
+a list of packages separated by either commas or spaces, which allows it
+to be used easily on the kernel command line as well.
 -->
 
 Se oltre ai task si vuole installare anche qualche altro pacchetto allora
 è possibile usare il parametro <classname>pkgsel/include</classname>; il
-valore di questo parametro può essere separato con virgole o con spazi,
-in questo modo può essere comodamente usato anche sulla riga di comando
-del kernel.
+valore di questo parametro può essere un elenco di pacchetti separati con
+virgole o con spazi, in questo modo può essere comodamente usato anche
+sulla riga di comando del kernel.
 
 </para>
 
@@ -2343,13 +2372,15 @@ un file e di mettere alcune configurazioni particolari in altri file.
 <!--
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
+# More than one script can be listed, separated by spaces.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
 --># Il massimo della flessibilità, questo scarica ed esegue un programma. Il
-# programma può usare debconf-set per manipolare il database di debconf. Si
-# noti che se i nomi dei file sono relativi, sono prelevati dalla stessa
+# programma può usare debconf-set per manipolare il database di debconf; è
+# possibile elencare più di uno script separandoli con degli spazi. Si noti
+# che se i nomi dei file sono relativi, sono prelevati dalla stessa
 # directory del file di preconfigurazione che gli esegue.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
 <para>

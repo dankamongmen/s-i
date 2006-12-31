@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 43640 -->
 
 
  <sect1 id="hardware-supported">
@@ -176,8 +176,8 @@ di ogni architettura, che vanno sotto il nome di <quote>flavor</quote>.
 </row>
 
 <row>
-  <entry morerows="3">IBM/Motorola PowerPC</entry>
-  <entry morerows="3">powerpc</entry>
+  <entry morerows="2">IBM/Motorola PowerPC</entry>
+  <entry morerows="2">powerpc</entry>
   <entry>CHRP</entry>
   <entry>chrp</entry>
 </row><row>
@@ -186,18 +186,18 @@ di ogni architettura, che vanno sotto il nome di <quote>flavor</quote>.
 </row><row>
   <entry>PReP</entry>
   <entry>prep</entry>
-</row><row>
-  <entry>APUS</entry>
-  <entry>apus</entry>
 </row>
 
-<row>
-  <entry morerows="1">Sun SPARC</entry>
-  <entry morerows="1">sparc</entry>
-  <entry morerows="1"></entry>
-  <entry>sun4cdm</entry>
+ <row>
+  <entry morerows="2">Sun SPARC</entry>
+  <entry morerows="2">sparc</entry>
+  <entry>sun4m</entry>
+  <entry>sparc32</entry>
 </row><row>
   <entry>sun4u</entry>
+  <entry morerows="1">sparc64</entry>
+</row><row>
+  <entry>sun4v</entry>
 </row>
 
 <row>
@@ -270,8 +270,8 @@ problema, assicurandosi di indicare che il bug affligge la piattaforma
 &supported-sparc.xml;
 
   <sect2 id="gfx" arch="not-s390">
-  <!-- <title>Graphics Card</title> -->
-  <title>Schede video</title>
+  <!-- <title>Graphics Card Support</title> -->
+  <title>Schede video supportate</title>
 <para arch="x86">
 
 <!--
@@ -341,6 +341,55 @@ framebuffer su un ridotto insieme di schede video. È disponibile un
 <ulink url="&url-bcm91250a-hardware;">elenco delle schede compatibili</ulink>
 con le schede di prototipazione della Broadcom.
 
+</para><para arch="sparc">
+
+<!--
+Most graphics options commonly found on Sparc-based machines are supported.
+X.org graphics drivers are available for sunbw2, suncg14, suncg3, suncg6,
+sunleo and suntcx framebuffers, Creator3D and Elite3D cards (sunffb driver),
+PGX24/PGX64 ATI-based video cards (ati driver), and PermediaII-based cards
+(glint driver). To use an Elite3D card with X.org you additionally need to
+install the <classname>afbinit</classname> package, and read the documentation
+included with it on how to activate the card.
+-->
+
+Le configurazioni grafiche più comuni sulle macchine Sparc sono supportate;
+sono disponibili dei driver grafici X.org per i framebuffer sunbw2, suncg14,
+suncg3, suncg6, sunleo e suntcx, per le schede Creator3D e Elite3D (driver
+sunffb), per le schede video con chip ATI PGX24/PGX64 (driver ati) e le
+schede basate sul chip PermediaII (driver glint). Per usare una scheda
+Elite3D con X.org è necessario installare anche il pacchetto
+<classname>afbinit</classname> e leggere la documentazione inclusa con le
+istruzioni per l'attivazione della scheda.
+
+</para><para arch="sparc">
+
+<!--
+It is not uncommon for a Sparc machine to have two graphics cards in a
+default configuration. In such a case there is a possibility that the
+Linux kernel will not direct its output to the card initially used by the
+firmware. The lack of output on the graphical console may then be mistaken
+for a hang (usually the last message seen on console is 'Booting Linux...').
+One possible solution is to physically remove one of the video cards;
+another option is to disable one of the cards using a kernel boot parameter.
+Also, if graphical output is not required or desired, serial console may be
+used as an alternative. On some systems use of serial console can be
+activated automatically by disconnecting the keyboard before booting the
+system.
+-->
+
+Non è raro trovare nella configurazione predefinita delle macchine Sparc due
+schede grafiche. In questi casi è possibile che il kernel Linux non riesca a
+dirigere il proprio output verso la scheda inizialmente usata dal firmware e
+la mancaza dell'output sulla console grafica può essere confusa con un blocco
+del sistema (solitamente l'ultimo messaggio che appare sullo schermo è
+<quote>Booting Linux...</quote>). Una soluzione è rimuovere fisicamente una
+delle schede video; un'altra possibilità è disabilitare una delle schede
+tramite un parametro d'avvio da passare al kernel. Oppure, se non si vuole
+avere o non si ha bisogno di un'output grafico, si può usare una console
+seriale. Su alcuni sistemi l'uso della console seriale si attiva
+automaticamente disconnettendo la tastiera prima di avviare il sistema.
+
 </para>
   </sect2>
 
@@ -370,7 +419,7 @@ Linux Laptop</ulink> .
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric multi-processing</quote>
+Multiprocessor support &mdash; also called <quote>symmetric multiprocessing</quote>
 or SMP &mdash; is available for this architecture.  The standard Debian
 &release; kernel image was compiled with SMP support.  This should not
 prevent installation, since the SMP kernel should boot on non-SMP systems;
@@ -378,7 +427,7 @@ the kernel will simply cause a bit more overhead.
 -->
 
 Il supporto multiprocessore &mdash; detto anche <quote>symmetric
-multi-processing</quote> o SMP &mdash; è disponibile per questa
+multiprocessing</quote> o SMP &mdash; è disponibile per questa
 architettura. Il kernel standard di Debian &release; è stato
 compilato con il supporto per l'SMP. Questo non causa problemi durante
 l'installazione, perché il kernel standard SMP funziona anche sui
@@ -411,8 +460,8 @@ la voce <quote>&smp-config-option;</quote> nella sezione
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture.
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture.
 The standard Debian &release; kernel image was compiled with
 <firstterm>SMP-alternatives</firstterm> support. This means that the kernel
 will detect the number of processors (or processor cores) and will
@@ -420,7 +469,7 @@ automatically deactivate SMP on uniprocessor systems.
 -->
 
 Il supporto multiprocessore &mdash; detto anche <quote>symmetric
-multi-processing</quote> o SMP &mdash; è disponibile per questa
+multiprocessing</quote> o SMP &mdash; è disponibile per questa
 architettura. Il kernel standard di Debian &release; è stato compilato
 con il supporto per <firstterm>SMP-alternatives</firstterm>. Questo
 vuol dire che il kernel rileva il numero di processori (o il numero
@@ -445,8 +494,8 @@ La versione 486 dei pacchetti Debian con l'immagine del kernel per
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture.
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture.
 However, the standard Debian &release; kernel image does not support
 SMP.  This should not prevent installation, since the standard,
 non-SMP kernel should boot on SMP systems; the kernel will simply use
@@ -454,7 +503,7 @@ the first CPU.
 -->
 
 Il supporto multiprocessore &mdash; detto anche <quote>symmetric
-multi-processing</quote> o SMP &mdash; è disponibile per questa
+multiprocessing</quote> o SMP &mdash; è disponibile per questa
 architettura. Tuttavia il kernel standard di Debian &release; non è
 stato compilato con il supporto per l'SMP. Questo non causa problemi
 durante l'installazione, perché il kernel standard non-SMP funziona
@@ -488,8 +537,8 @@ la voce <quote>&smp-config-option;</quote> nella sezione
 <para>
 
 <!--
-Multi-processor support &mdash; also called <quote>symmetric
-multi-processing</quote> or SMP &mdash; is available for this architecture,
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this architecture,
 and is supported by a precompiled Debian kernel image. Depending on your
 install media, this SMP-capable kernel may or may not be installed by
 default. This should not prevent installation, since the standard,
@@ -498,7 +547,7 @@ the first CPU.
 -->
 
 Il supporto multiprocessore &mdash; detto anche <quote>symmetric
-multi-processing</quote> o SMP &mdash; è disponibile per questa
+multiprocessing</quote> o SMP &mdash; è disponibile per questa
 architettura ed è supportato dai kernel precompilati di Debian.
 In base al supporto utilizzato per l'installazione il kernel con il
 supporto SMP può essere installato o meno. Questo non causa
@@ -517,6 +566,8 @@ appropriate kernel package.
 Per sfruttare tutti i vantaggi dei sistemi multiprocessore si deve
 controllare se il kernel installato supporta SMP, in caso contrario
 scegliere un pacchetto con un kernel appropriato.
+
+</para><para>
 
 <!--
 You can also build your own customized kernel to support SMP. You can find
