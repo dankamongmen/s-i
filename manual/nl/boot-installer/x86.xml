@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42929 untranslated -->
+<!-- original version: 43730 untranslated -->
 
   <sect2 arch="x86"><title>Booting from a CD-ROM</title>
 
@@ -117,9 +117,9 @@ and place the needed files as described in <xref linkend="boot-drive-files"/>.
 <para>
 If you intend to use the hard drive only for booting and then
 download everything over the network, you should download the
-<filename>netboot/debian-installer/i386/initrd.gz</filename> file and its
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename> file and its
 corresponding kernel
-<filename>netboot/debian-installer/i386/linux</filename>. This will allow you
+<filename>netboot/debian-installer/&architecture;/linux</filename>. This will allow you
 to repartition the hard disk from which you boot the installer, although you
 should do so with care.
 </para>
@@ -158,8 +158,6 @@ Here is a <filename>/etc/lilo.conf</filename> example:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 For more details, refer to the
@@ -178,7 +176,7 @@ add the following lines:
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -231,7 +229,7 @@ device.  This is done with the <emphasis>root=</emphasis> boot
 argument, giving the device that the ide-floppy driver maps the device
 to. For example, if your LS-120 drive is connected as the first IDE
 device (master) on the second cable, you enter
-<userinput>linux root=/dev/hdc</userinput> at the boot prompt.
+<userinput>install root=/dev/hdc</userinput> at the boot prompt.
 
 </para><para>
 
@@ -334,8 +332,8 @@ Information on available boot methods and on boot parameters which might
 be useful can be found by pressing <keycap>F2</keycap> through
 <keycap>F8</keycap>. If you add any parameters to
 the boot command line, be sure to type the boot method (the default is
-<userinput>linux</userinput>) and a space before the first parameter (e.g.,
-<userinput>linux fb=false</userinput>).
+<userinput>install</userinput>) and a space before the first parameter (e.g.,
+<userinput>install fb=false</userinput>).
 
 <note><para>
 
