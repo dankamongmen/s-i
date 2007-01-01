@@ -193,16 +193,31 @@ when your mouse only has one button. Just add the following lines to
  clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
 -->
 
 <para>
 
-The base installation for i386 using the default 2.6 kernel,
-including all standard packages, requires 585MB of disk space.
-A minimal base installation, without the standard task selected,
-will take 365MB.
+A standard installation for the i386 architecture, including all standard
+packages and using the default 2.6 kernel, takes up 442MB of disk space.
+A minimal base installation, without the <quote>Standard system</quote>
+task selected, will take 230MB.
 
-</para><para>
+</para>
+<important><para>
+
+In both cases this is the actual disk space used <emphasis>after</emphasis>
+the installation is finished and any temporary files deleted. It also does
+not take into account overhead used by the file system, for example for
+journal files. This means that significantly more disk space is needed both
+<emphasis>during</emphasis> the installation and for normal system use.
+
+</para></important>
+<para>
 
 The following table lists sizes reported by aptitude for the tasks listed
 in tasksel. Note that some tasks have overlapping constituents, so the
@@ -212,9 +227,10 @@ obtained by adding up the numbers.
 </para><para>
 
 Note that you will need to add the sizes listed in the table to the size
-of the base installation when determining the size of partitions.
+of the standard installation when determining the size of partitions.
 Most of the size listed as <quote>Installed size</quote> will end up in
-<filename>/usr</filename>; the size listed as <quote>Download size</quote>
+<filename>/usr</filename> and in <filename>/lib</filename>;
+the size listed as <quote>Download size</quote>
 is (temporarily) required in <filename>/var</filename>.
 
 </para><para>
@@ -231,17 +247,25 @@ is (temporarily) required in <filename>/var</filename>.
 
 <tbody>
 <row>
-  <entry>Desktop</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>Desktop environment</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
-  <entry>Laptop</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+  <entry>Laptop<footnote>
+  
+  <para>
+  There is a large overlap of the Laptop task with the Destop environment task.
+  If you install both, the Laptop task will only require a few MB additional
+  disk space.
+  </para>
+
+  </footnote></entry>
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -253,9 +277,9 @@ is (temporarily) required in <filename>/var</filename>.
 
 <row>
   <entry>Print server</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
@@ -267,9 +291,9 @@ is (temporarily) required in <filename>/var</filename>.
 
 <row>
   <entry>File server</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
 <row>

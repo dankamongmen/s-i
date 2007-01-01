@@ -89,6 +89,8 @@ create_profiled () {
     echo "<!ENTITY altkernelversion \"${altkernelversion}\">" >> $dynamic
     echo "<!ENTITY smp-config-section \"${smp_config_section}\">" >> $dynamic
     echo "<!ENTITY smp-config-option \"${smp_config_option}\">" >> $dynamic
+    echo "<!ENTITY minimum-memory \"${minimum_memory}&notation-megabytes;\">" >> $dynamic
+
     sed "s:##SRCPATH##:$source_path:" templates/docstruct.ent >> $dynamic
 
     sed "s:##LANG##:$language:g" templates/install.xml.template | \
