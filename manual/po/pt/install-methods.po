@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: install-methods.po\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-01-01 11:02+0000\n"
-"PO-Revision-Date: 2006-08-21 22:11+0000\n"
+"PO-Revision-Date: 2007-01-01 11:43+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -1076,6 +1076,7 @@ msgid ""
 "The <filename>syslinux.cfg</filename> configuration file should contain the "
 "following two lines:"
 msgstr ""
+"O ficheiro de configuração <filename>syslinux.cfg</filename> deve conter as seguintes duas linhas:"
 
 #. Tag: screen
 #: install-methods.xml:741
@@ -1084,6 +1085,8 @@ msgid ""
 "default vmlinuz\n"
 "append initrd=initrd.gz"
 msgstr ""
+"default vmlinuz\n"
+"append initrd=initrd.gz"
 
 #. Tag: para
 #: install-methods.xml:752
@@ -1628,19 +1631,19 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1076
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "You need to setup a TFTP server, and for many machines a DHCP server<phrase "
 "condition=\"supports-rarp\">, or RARP server</phrase><phrase condition="
 "\"supports-bootp\">, or BOOTP server</phrase>."
 msgstr ""
 "Precisa configurar o servidor TFTP, e para muitas máquinas, um servidor "
-"BOOTP <phrase condition=\"supports-rarp\">, ou servidor RARP</phrase> "
-"<phrase condition=\"supports-dhcp\">, ou um servidor DHCP</phrase>."
+"DHCP<phrase condition=\"supports-rarp\">, ou servidor RARP</phrase> "
+"<phrase condition=\"supports-bootp\">, ou um servidor BOOTP</phrase>."
 
 #. Tag: para
 #: install-methods.xml:1083
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "<phrase condition=\"supports-rarp\">The Reverse Address Resolution Protocol "
 "(RARP) is one way to tell your client what IP address to use for itself. "
@@ -1654,14 +1657,14 @@ msgid ""
 msgstr ""
 "<phrase condition=\"supports-rarp\"> O Reverse Address Resolution Protocol "
 "(RARP) é uma maneira de informar o cliente qual o IP deve usar. Outra "
-"maneira é utilizar o protocolo BOOTP. </phrase> <phrase condition=\"supports-"
+"forma é utilizar o protocolo BOOTP. </phrase> <phrase condition=\"supports-"
 "bootp\">BOOTP é um protocolo IP que informa o computador do seu endereço IP "
 "e em que local da rede pode obter uma imagem de arranque.</phrase> <phrase "
-"arch=\"m68k\"> Ainda assim existe outra alternativa  no sistema VMEbus: o "
+"arch=\"m68k\"> Ainda assim existe outra alternativa em sistemas VMEbus: o "
 "endereço IP pode ser manualmente configurado na ROM de arranque. </phrase> "
-"<phrase condition=\"supports-dhcp\"> O DHCP (Dynamic Host Configuration "
-"Protocol) é mais flexível, compatível com extensões anteriores do BOOTP. "
-"Alguns sistemas apenas podem ser configurados via DHCP. </phrase>"
+"O DHCP (Dynamic Host Configuration Protocol) é mais flexível, compatível "
+"com extensões anteriores do BOOTP. Alguns sistemas apenas podem ser "
+"configurados via DHCP."
 
 #. Tag: para
 #: install-methods.xml:1100
@@ -1792,13 +1795,13 @@ msgstr ""
 
 #. Tag: title
 #: install-methods.xml:1189
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Setting up a BOOTP server"
 msgstr "Configurar o servidor BOOTP"
 
 #. Tag: para
 #: install-methods.xml:1190
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
 "<command>bootpd</command>. The other is actually a DHCP server: ISC "
@@ -1809,7 +1812,7 @@ msgstr ""
 "Estão disponíveis dois servidores BOOTP para GNU/Linux. O primeiro é o CMU "
 "<command>bootpd</command>. O outro é na verdade um servidor DHCP: o ISC "
 "<command>dhcpd</command>. Em &debian; estes estão contidos respectivamente "
-"nos pacotes <classname>bootp</classname> e <classname>dhcp</classname>."
+"nos pacotes <classname>bootp</classname> e <classname>dhcp3-server</classname>."
 
 #. Tag: para
 #: install-methods.xml:1198
@@ -1877,7 +1880,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1231
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
 "easy, because it treats BOOTP clients as a moderately special case of DHCP "
@@ -1892,10 +1895,10 @@ msgstr ""
 "fácil, porque trata os clientes BOOTP como casos moderadamente especiais de "
 "clientes DHCP. Algumas arquitecturas requerem uma configuração complexa para "
 "iniciarem clientes via BOOTP. Se o seu caso é um desses, leia a secção <xref "
-"linkend=\"dhcpd\"/>. Caso contrário, irá provavelmente ser capaz de "
+"linkend=\"dhcpd\"/>. Nesse caso, irá provavelmente ser capaz de "
 "conseguir com um simples adicionar de directiva <userinput>allow bootp</"
 "userinput> para o bloco de configuração para a subnet que contém o cliente, "
-"e reiniciar <command>dhcpd</command> com <userinput>/etc/init.d/dhcpd "
+"e reiniciar <command>dhcpd</command> com <userinput>/etc/init.d/dhcpd3-server "
 "restart</userinput>."
 
 #. Tag: title
@@ -1913,10 +1916,11 @@ msgid ""
 "sample configuration file for it (see <filename>/etc/dhcp3/dhcpd.conf</"
 "filename>):"
 msgstr ""
+"Um servidor DHCP de software livre é o ISC <command>dhcpd</command>. Para &debian; é recomendado o pacote <classname>dhcp3-server</classname>. Aqui está um exemplo de ficheiro de configuração para ele (veja <filename>/etc/dhcp3/dhcpd.conf</filename>):"
 
 #. Tag: screen
 #: install-methods.xml:1260
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
 "option domain-name-servers ns1.example.com;\n"
@@ -1938,10 +1942,6 @@ msgid ""
 "  fixed-address 192.168.1.90;\n"
 "}"
 msgstr ""
-"Um software livre de servidor DHCP é o <command>dhcpd</command> do ISC. Em "
-"&debian;, isto está disponível no pacote <classname>dhcp</classname>. Aqui "
-"está um exemplo de um ficheiro de configuração para ele (normalmente "
-"<filename>/etc/dhcpd.conf</filename>): <informalexample><screen>\n"
 "option domain-name \"example.com\";\n"
 "option domain-name-servers ns1.example.com;\n"
 "option subnet-mask 255.255.255.0;\n"
@@ -1960,10 +1960,7 @@ msgstr ""
 "  next-server servername;\n"
 "  hardware ethernet 01:23:45:67:89:AB;\n"
 "  fixed-address 192.168.1.90;\n"
-"}\n"
-"</screen></informalexample> Nota: O novo (e preferencial) pacote "
-"<classname>dhcp3</classname> utiliza <filename>/etc/dhcp3/dhcpd.conf</"
-"filename>."
+"}"
 
 #. Tag: para
 #: install-methods.xml:1262
@@ -1985,13 +1982,13 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1272
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
 "restart it with <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
 msgstr ""
 "Após ter editado o ficheiro de configuração <command>dhcpd</command>, "
-"reinicie-o com <userinput>/etc/init.d/dhcpd restart</userinput>."
+"reinicie-o com <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
 
 #. Tag: title
 #: install-methods.xml:1280
@@ -2001,7 +1998,7 @@ msgstr "Possibilitar o Arranque PXE na configuração DHCP"
 
 #. Tag: para
 #: install-methods.xml:1281
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
 "boot Execution Environment (PXE) method of TFTP. <informalexample><screen>\n"
@@ -2066,7 +2063,7 @@ msgstr ""
 "  filename \"/tftpboot/pxelinux.0\";\n"
 " }\n"
 "}\n"
-"</screen></informalexample> Note que para um arranque PXE, o ficheiro "
+"</screen></informalexample> Note que para um arranque PXE, o ficheiro do "
 "cliente com o nome de <filename>pxelinux.0</filename>, é o gestor de "
 "arranque, não uma imagem de kernel (veja a <xref linkend=\"tftp-images\"/> "
 "abaixo)."
@@ -2108,10 +2105,11 @@ msgid ""
 "uses <filename>/var/lib/tftpboot</filename>. You may have to adjust the "
 "configuration examples in this section accordingly."
 msgstr ""
+"Historicamente os servidores TFTP utilizavam <filename>/tftpboot</filename> como directório para servir imagens. No entanto, os pacotes &debian; podem utilizar outros directórios para estarem de acordo com o <ulink url=\"&url-fhs-home;\">Filesystem Hierarchy Standard</ulink>. Por exemplo, <classname>tftpd-hpa</classname> por omissão utiliza <filename>/var/lib/tftpboot</filename>. Poderá ter de ajustar de acordo os exemplos de configuração nesta secção."
 
 #. Tag: para
 #: install-methods.xml:1320
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
 "which is used as the argument of <command>in.tftpd</command><footnote> "
@@ -2125,12 +2123,12 @@ msgid ""
 "command>, and run <userinput>kill -HUP <replaceable>inetd-pid</replaceable></"
 "userinput>."
 msgstr ""
-"Procure nesse ficheiro e lembre-se do directório que é utilizada como "
-"argumento do <command>in.tftpd</command>; que irá necessitar abaixo. O "
-"argumento <userinput>-l</userinput> permite que algumas versões registem "
-"todos os pedidos aos logs de sistema; isto é útil para diagnosticar erros de "
-"arranque. Se tiver de alterar o <filename>/etc/inetd.conf</filename>, terá "
-"de notificar o processo <command>inetd</command> que o ficheiro foi "
+"Procure em <filename>/etc/inetd.conf</filename> e lembre-se do directório "
+"que é utilizada como argumento do <command>in.tftpd</command><footnote> "
+"<para> O argumento <userinput>-l</userinput> permite que algumas versões "
+"do <command>in.tftpd</command> registem todos os pedidos aos logs de sistema; "
+"isto é útil para diagnosticar erros de arranque. </para> </footnote>; vai necessitar disso abaixo. Se teve de alterar o <filename>/etc/inetd.conf</filename>, terá "
+"de notificar o processo em execução <command>inetd</command> que o ficheiro foi "
 "alterado. Numa máquina Debian, execute <userinput>/etc/init.d/inetd reload</"
 "userinput>; noutras máquinas, procure o ID do processo de <command>inetd</"
 "command>, e execute <userinput>kill -HUP <replaceable>inetd-pid</"
@@ -2175,7 +2173,7 @@ msgstr "Mover Imagens TFTP Para o Lugar"
 
 #. Tag: para
 #: install-methods.xml:1361
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
 "files\"/>, in the <command>tftpd</command> boot image directory. You may "
@@ -2183,10 +2181,9 @@ msgid ""
 "command> will use for booting a particular client. Unfortunately, the file "
 "name is determined by the TFTP client, and there are no strong standards."
 msgstr ""
-"Em seguida, coloque a imagem de arranque do TFTP, conforme encontrada na "
+"Em seguida, coloque a imagem de arranque do TFTP que necessita, conforme encontrada na "
 "<xref linkend=\"where-files\"/>, no directório de imagem de arranque "
-"<command>tftpd</command>. Por norma este directório será <filename>/"
-"tftpboot</filename>. Terá de fazer um link a partir desse ficheiro para o "
+"<command>tftpd</command>. Terá de fazer um link a partir desse ficheiro para o "
 "ficheiro que o <command>tftpd</command> irá utilizar para iniciar um cliente "
 "em particular. Infelizmente, o nome do ficheiro é determinado pelo cliente "
 "TFTP, e não existem standards sólidos."
@@ -2211,7 +2208,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1379
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
 "<filename>netboot/netboot.tar.gz</filename> tarball. Simply extract this "
@@ -2220,7 +2217,7 @@ msgid ""
 "<command>tftpd</command> as the filename to boot."
 msgstr ""
 "Para um arranque PXE, tudo o que deve precisar configurar está no tarball "
-"<filename>netboot/netboot.tar.gz</filename>. Apenas extraia este tarball "
+"<filename>netboot/netboot.tar.gz</filename>. Simplesmente extraía este tarball "
 "para o directório da imagem de arranque <command>tftpd</command>. Certifique-"
 "se que o servidor dhcp está configurado para passar <filename>/pxelinux.0</"
 "filename> ao <command>tftpd</command> como o nome do ficheiro para arrancar."
@@ -2405,6 +2402,10 @@ msgid ""
 "found, try checking the logs on your tftp server to see which image name is "
 "being requested."
 msgstr ""
+"Se fez tudo isto correctamente, dando o comando <userinput>boot net"
+"</userinput> a partir da OpenPROM deve carregar a imagem. Se a imagem não "
+"puder ser encontrada, tente ver os logs do seu servidor tftp para ver qual o "
+"nome da imagem que está a ser pedida."
 
 #. Tag: para
 #: install-methods.xml:1502
