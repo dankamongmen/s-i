@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2006-12-31 19:17+0000\n"
+"POT-Creation-Date: 2007-01-01 11:02+0000\n"
 "PO-Revision-Date: 2006-10-07 17:00+0900\n"
 "Last-Translator: Seok-moon Jang <drssay97@gmail.com>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
@@ -1181,10 +1181,10 @@ msgstr ""
 msgid ""
 "If you intend to use the hard drive only for booting and then download "
 "everything over the network, you should download the <filename>netboot/"
-"debian-installer/i386/initrd.gz</filename> file and its corresponding kernel "
-"<filename>netboot/debian-installer/i386/linux</filename>. This will allow "
-"you to repartition the hard disk from which you boot the installer, although "
-"you should do so with care."
+"debian-installer/&architecture;/initrd.gz</filename> file and its "
+"corresponding kernel <filename>netboot/debian-installer/&architecture;/"
+"linux</filename>. This will allow you to repartition the hard disk from "
+"which you boot the installer, although you should do so with care."
 msgstr ""
 "하드 드라이브를 부팅용으로만 사용하고 나머지는 모두 네트워크에서 받으려고 한"
 "다면, <filename>netboot/debian-installer/i386/initrd.gz</filename> 파일 및 해"
@@ -1228,13 +1228,11 @@ msgstr ""
 
 #. Tag: screen
 #: boot-installer.xml:896
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "image=/boot/newinstall/vmlinuz\n"
 "       label=newinstall\n"
-"       initrd=/boot/newinstall/initrd.gz\n"
-"       root=/dev/ram0\n"
-"       append=\"ramdisk_size=12000\""
+"       initrd=/boot/newinstall/initrd.gz"
 msgstr ""
 "image=/boot/newinstall/vmlinuz\n"
 "       label=newinstall\n"
@@ -1259,14 +1257,14 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:905
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "The procedure for <command>GRUB</command> is quite similar. Locate your "
 "<filename>menu.lst</filename> in the <filename>/boot/grub/</filename> "
 "directory (sometimes in the <filename>/boot/boot/grub/</filename>), add the "
 "following lines: <informalexample><screen>\n"
 "title  New Install\n"
-"kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000\n"
+"kernel (hd0,0)/boot/newinstall/vmlinuz\n"
 "initrd (hd0,0)/boot/newinstall/initrd.gz\n"
 "</screen></informalexample> and reboot."
 msgstr ""
@@ -1349,7 +1347,7 @@ msgid ""
 "with the <emphasis>root=</emphasis> boot argument, giving the device that "
 "the ide-floppy driver maps the device to. For example, if your LS-120 drive "
 "is connected as the first IDE device (master) on the second cable, you enter "
-"<userinput>linux root=/dev/hdc</userinput> at the boot prompt."
+"<userinput>install root=/dev/hdc</userinput> at the boot prompt."
 msgstr ""
 "플로피를 이용해 LS-120 드라이브에서 (ATAPI 버전) 설치하는 경우, 플로피 장치"
 "의 가상 위치를 지정해야 합니다. <emphasis>root=</emphasis> 부팅 파라미터를 사"
@@ -1506,13 +1504,13 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:1078
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "Information on available boot methods and on boot parameters which might be "
 "useful can be found by pressing <keycap>F2</keycap> through <keycap>F8</"
 "keycap>. If you add any parameters to the boot command line, be sure to type "
-"the boot method (the default is <userinput>linux</userinput>) and a space "
-"before the first parameter (e.g., <userinput>linux fb=false</userinput>)."
+"the boot method (the default is <userinput>install</userinput>) and a space "
+"before the first parameter (e.g., <userinput>install fb=false</userinput>)."
 msgstr ""
 "<keycap>F2</keycap>에서 <keycap>F8</keycap>까지 누르다 보면 유용한 부팅 방법"
 "과 부팅 파라미터에 대한 정보를 볼 수 있습니다. 부팅 명령행에 파라미터를 넣으"
@@ -3876,7 +3874,7 @@ msgstr ""
 "USB 검색을 하지 않습니다."
 
 #. Tag: term
-#: boot-installer.xml:3007 boot-installer.xml:3171
+#: boot-installer.xml:3007 boot-installer.xml:3173
 #, no-c-format
 msgid "netcfg/disable_dhcp"
 msgstr "netcfg/disable_dhcp"
@@ -4016,17 +4014,20 @@ msgstr "ramdisk_size"
 #. Tag: para
 #: boot-installer.xml:3091
 #, no-c-format
-msgid "If you are using a 2.2.x kernel, you may need to set &ramdisksize;."
-msgstr "2.2.x 커널을 사용한다면, &ramdisksize;로 설정해야 합니다."
+msgid ""
+"This parameter should already be set to a correct value where needed; set it "
+"only it you see errors during the boot that indicate the ramdisk could not "
+"be loaded completely. The value is in kB."
+msgstr ""
 
 #. Tag: term
-#: boot-installer.xml:3099
+#: boot-installer.xml:3101
 #, no-c-format
 msgid "mouse/left"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3100
+#: boot-installer.xml:3102
 #, fuzzy, no-c-format
 msgid ""
 "For the gtk frontend (graphical installer), users can switch the mouse to "
@@ -4038,13 +4039,13 @@ msgstr ""
 "이 파라미터를 <userinput>true</userinput>로 설정하면 됩니다."
 
 #. Tag: term
-#: boot-installer.xml:3109
+#: boot-installer.xml:3111
 #, no-c-format
 msgid "directfb/hw-accel"
 msgstr "directfb/hw-accel"
 
 #. Tag: para
-#: boot-installer.xml:3110
+#: boot-installer.xml:3112
 #, no-c-format
 msgid ""
 "For the gtk frontend (graphical installer), hardware acceleration in "
@@ -4056,13 +4057,13 @@ msgstr ""
 "이 파라미터를 <userinput>true</userinput>로 설정하면 됩니다."
 
 #. Tag: term
-#: boot-installer.xml:3120
+#: boot-installer.xml:3122
 #, no-c-format
 msgid "rescue/enable"
 msgstr "rescue/enable"
 
 #. Tag: para
-#: boot-installer.xml:3121
+#: boot-installer.xml:3123
 #, no-c-format
 msgid ""
 "Set to <userinput>true</userinput> to enter rescue mode rather than "
@@ -4072,13 +4073,13 @@ msgstr ""
 "로 설정하십시오(참고: <xref linkend=\"rescue\"/>)."
 
 #. Tag: title
-#: boot-installer.xml:3132
+#: boot-installer.xml:3134
 #, no-c-format
 msgid "Using boot parameters to answer questions"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3133
+#: boot-installer.xml:3135
 #, no-c-format
 msgid ""
 "With some exceptions, a value can be set at the boot prompt for any question "
@@ -4088,13 +4089,13 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: boot-installer.xml:3145
+#: boot-installer.xml:3147
 #, fuzzy, no-c-format
 msgid "debian-installer/locale (locale)"
 msgstr "debian-installer/theme"
 
 #. Tag: para
-#: boot-installer.xml:3146
+#: boot-installer.xml:3148
 #, no-c-format
 msgid ""
 "Can be used to set both the language and country for the installation. This "
@@ -4104,13 +4105,13 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: boot-installer.xml:3157
+#: boot-installer.xml:3159
 #, no-c-format
 msgid "anna/choose_modules (modules)"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3158
+#: boot-installer.xml:3160
 #, no-c-format
 msgid ""
 "Can be used to automatically load installer components that are not loaded "
@@ -4121,7 +4122,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3172
+#: boot-installer.xml:3174
 #, no-c-format
 msgid ""
 "Set to <userinput>true</userinput> if you want to disable DHCP and instead "
@@ -4129,13 +4130,13 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: boot-installer.xml:3181
+#: boot-installer.xml:3183
 #, no-c-format
 msgid "mirror/protocol (protocol)"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3182
+#: boot-installer.xml:3184
 #, no-c-format
 msgid ""
 "By default the installer will use the http protocol to download files from "
@@ -4147,13 +4148,13 @@ msgid ""
 msgstr ""
 
 #. Tag: term
-#: boot-installer.xml:3195
+#: boot-installer.xml:3197
 #, no-c-format
 msgid "tasksel:tasksel/first (tasks)"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3196
+#: boot-installer.xml:3198
 #, no-c-format
 msgid ""
 "Can be used to select tasks that are not available from the interactive task "
@@ -4162,13 +4163,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3209
+#: boot-installer.xml:3211
 #, no-c-format
 msgid "Passing parameters to kernel modules"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3210
+#: boot-installer.xml:3212
 #, no-c-format
 msgid ""
 "If drivers are compiled into the kernel, you can pass parameters to them as "
@@ -4183,7 +4184,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3223
+#: boot-installer.xml:3225
 #, no-c-format
 msgid ""
 "Note that it is now quite rare that parameters need to be passed to modules. "
@@ -4193,7 +4194,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3230
+#: boot-installer.xml:3232
 #, no-c-format
 msgid ""
 "The syntax to use to set parameters for modules is: "
@@ -4207,25 +4208,25 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: boot-installer.xml:3240
+#: boot-installer.xml:3242
 #, no-c-format
 msgid "3c509.xcvr=3 3c509.irq=10"
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3252
+#: boot-installer.xml:3254
 #, no-c-format
 msgid "Troubleshooting the Installation Process"
 msgstr "설치 과정의 문제 해결"
 
 #. Tag: title
-#: boot-installer.xml:3257
+#: boot-installer.xml:3259
 #, fuzzy, no-c-format
 msgid "CD-ROM Reliability"
 msgstr "플로피 디스크 신뢰성"
 
 #. Tag: para
-#: boot-installer.xml:3258
+#: boot-installer.xml:3260
 #, no-c-format
 msgid ""
 "Sometimes, especially with older CD-ROM drives, the installer may fail to "
@@ -4235,7 +4236,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3265
+#: boot-installer.xml:3267
 #, no-c-format
 msgid ""
 "There are a many different possible causes for these problems. We can only "
@@ -4244,13 +4245,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3271
+#: boot-installer.xml:3273
 #, no-c-format
 msgid "There are two very simple things that you should try first."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3276
+#: boot-installer.xml:3278
 #, no-c-format
 msgid ""
 "If the CD-ROM does not boot, check that it was inserted correctly and that "
@@ -4258,7 +4259,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3282
+#: boot-installer.xml:3284
 #, no-c-format
 msgid ""
 "If the installer fails to recognize a CD-ROM, try just running the option "
@@ -4268,7 +4269,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3292
+#: boot-installer.xml:3294
 #, no-c-format
 msgid ""
 "If this does not work, then try the suggestions in the subsections below. "
@@ -4277,7 +4278,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3298
+#: boot-installer.xml:3300
 #, no-c-format
 msgid ""
 "If you cannot get the installation working from CD-ROM, try one of the other "
@@ -4285,13 +4286,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3306
+#: boot-installer.xml:3308
 #, no-c-format
 msgid "Common issues"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3309
+#: boot-installer.xml:3311
 #, no-c-format
 msgid ""
 "Some older CD-ROM drives do not support reading from discs that were burned "
@@ -4299,7 +4300,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3315
+#: boot-installer.xml:3317
 #, no-c-format
 msgid ""
 "If your system boots correctly from the CD-ROM, it does not necessarily mean "
@@ -4308,7 +4309,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3322
+#: boot-installer.xml:3324
 #, no-c-format
 msgid ""
 "Some older CD-ROM drives do not work correctly if <quote>direct memory "
@@ -4316,19 +4317,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3333
+#: boot-installer.xml:3335
 #, no-c-format
 msgid "How to investigate and maybe solve issues"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3334
+#: boot-installer.xml:3336
 #, no-c-format
 msgid "If the CD-ROM fails to boot, try the suggestions listed below."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3339
+#: boot-installer.xml:3341
 #, no-c-format
 msgid ""
 "Check that your BIOS actually supports booting from CD-ROM (older systems "
@@ -4336,7 +4337,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3345
+#: boot-installer.xml:3347
 #, no-c-format
 msgid ""
 "If you downloaded an iso image, check that the md5sum of that image matches "
@@ -4352,7 +4353,7 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: boot-installer.xml:3358
+#: boot-installer.xml:3360
 #, no-c-format
 msgid ""
 "$ dd if=/dev/cdrom | \\\n"
@@ -4366,7 +4367,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3363
+#: boot-installer.xml:3365
 #, no-c-format
 msgid ""
 "If, after the installer has been booted successfully, the CD-ROM is not "
@@ -4379,7 +4380,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3375
+#: boot-installer.xml:3377
 #, no-c-format
 msgid ""
 "Switch to VT4 or view the contents of <filename>/var/log/syslog</filename> "
@@ -4388,7 +4389,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3382
+#: boot-installer.xml:3384
 #, no-c-format
 msgid ""
 "Check in the output of <command>dmesg</command> if your CD-ROM drive was "
@@ -4406,7 +4407,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3396
+#: boot-installer.xml:3398
 #, no-c-format
 msgid ""
 "Check that there is a device node for your CD-ROM drive under <filename>/dev/"
@@ -4415,7 +4416,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3404
+#: boot-installer.xml:3406
 #, no-c-format
 msgid ""
 "Use the <command>mount</command> command to check if the CD-ROM is already "
@@ -4426,7 +4427,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3414
+#: boot-installer.xml:3416
 #, no-c-format
 msgid ""
 "Check if DMA is currently enabled: <informalexample><screen>\n"
@@ -4442,7 +4443,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3429
+#: boot-installer.xml:3431
 #, no-c-format
 msgid ""
 "If there are any problems during the installation, try checking the "
@@ -4452,13 +4453,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3444
+#: boot-installer.xml:3446
 #, no-c-format
 msgid "Floppy Disk Reliability"
 msgstr "플로피 디스크 신뢰성"
 
 #. Tag: para
-#: boot-installer.xml:3446
+#: boot-installer.xml:3448
 #, no-c-format
 msgid ""
 "The biggest problem for people using floppy disks to install Debian seems to "
@@ -4468,7 +4469,7 @@ msgstr ""
 "성 문제일 것입니다."
 
 #. Tag: para
-#: boot-installer.xml:3451
+#: boot-installer.xml:3453
 #, fuzzy, no-c-format
 msgid ""
 "The boot floppy is the floppy with the worst problems, because it is read by "
@@ -4485,7 +4486,7 @@ msgstr ""
 "로피에서도 디스크 입출력 오류 메세지만 가득 나오는 문제가 발생하기도 합니다."
 
 #. Tag: para
-#: boot-installer.xml:3460
+#: boot-installer.xml:3462
 #, fuzzy, no-c-format
 msgid ""
 "If you are having the installation stall at a particular floppy, the first "
@@ -4501,7 +4502,7 @@ msgstr ""
 "안 됩니다. 다른 시스템에서 플로피를 만드는 게 도움이 될 수도 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3469
+#: boot-installer.xml:3471
 #, no-c-format
 msgid ""
 "One user reports he had to write the images to floppy <emphasis>three</"
@@ -4512,7 +4513,7 @@ msgstr ""
 "emphasis> 써야 했다고 하고, 세 번째 플로피에서 제대로 동작했다고 합니다."
 
 #. Tag: para
-#: boot-installer.xml:3475
+#: boot-installer.xml:3477
 #, no-c-format
 msgid ""
 "Normally you should not have to download a floppy image again, but if you "
@@ -4521,7 +4522,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3481
+#: boot-installer.xml:3483
 #, no-c-format
 msgid ""
 "Other users have reported that simply rebooting a few times with the same "
@@ -4533,13 +4534,13 @@ msgstr ""
 "이버때문입니다."
 
 #. Tag: title
-#: boot-installer.xml:3490
+#: boot-installer.xml:3492
 #, no-c-format
 msgid "Boot Configuration"
 msgstr "부팅 설정"
 
 #. Tag: para
-#: boot-installer.xml:3492
+#: boot-installer.xml:3494
 #, no-c-format
 msgid ""
 "If you have problems and the kernel hangs during the boot process, doesn't "
@@ -4552,19 +4553,7 @@ msgstr ""
 "linkend=\"boot-parms\"/>에 쓰여 있는 것처럼 제대로 되었는 지 확인하십시오."
 
 #. Tag: para
-#: boot-installer.xml:3499
-#, no-c-format
-msgid ""
-"If you are booting with your own kernel instead of the one supplied with the "
-"installer, be sure that <userinput>CONFIG_DEVFS</userinput> is set in your "
-"kernel. The installer requires <userinput>CONFIG_DEVFS</userinput>."
-msgstr ""
-"설치 프로그램에 들어 있는 커널 대신에 직접 만든 커널로 부팅하려면, "
-"<userinput>CONFIG_DEVFS</userinput>를 꼭 설정하십시오. 설치 프로그램에서 "
-"<userinput>CONFIG_DEVFS</userinput>가 필요합니다."
-
-#. Tag: para
-#: boot-installer.xml:3506
+#: boot-installer.xml:3501
 #, no-c-format
 msgid ""
 "Often, problems can be solved by removing add-ons and peripherals, and then "
@@ -4576,7 +4565,7 @@ msgstr ""
 "히 문제가 많습니다.</phrase>"
 
 #. Tag: para
-#: boot-installer.xml:3512
+#: boot-installer.xml:3507
 #, no-c-format
 msgid ""
 "If you have a large amount of memory installed in your machine, more than "
@@ -4589,13 +4578,13 @@ msgstr ""
 "수도 있습니다. 예를 들어 <userinput>mem=512m</userinput>과 같이 씁니다."
 
 #. Tag: title
-#: boot-installer.xml:3523 boot-installer.xml:3608
+#: boot-installer.xml:3518 boot-installer.xml:3603
 #, no-c-format
 msgid "Common &arch-title; Installation Problems"
 msgstr "자주 발생하는 &arch-title; 설치 문제"
 
 #. Tag: para
-#: boot-installer.xml:3524
+#: boot-installer.xml:3519
 #, no-c-format
 msgid ""
 "There are some common installation problems that can be solved or avoided by "
@@ -4605,7 +4594,7 @@ msgstr ""
 "법으로 해결할 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3529
+#: boot-installer.xml:3524
 #, no-c-format
 msgid ""
 "Some systems have floppies with <quote>inverted DCLs</quote>. If you receive "
@@ -4617,7 +4606,7 @@ msgstr ""
 "<userinput>floppy=thinkpad</userinput> 파라미터를 시도해 보십시오."
 
 #. Tag: para
-#: boot-installer.xml:3535
+#: boot-installer.xml:3530
 #, no-c-format
 msgid ""
 "On some systems, such as the IBM PS/1 or ValuePoint (which have ST-506 disk "
@@ -4637,7 +4626,7 @@ msgstr ""
 "십시오."
 
 #. Tag: para
-#: boot-installer.xml:3544
+#: boot-installer.xml:3539
 #, no-c-format
 msgid ""
 "If you have a very old machine, and the kernel hangs after saying "
@@ -4650,7 +4639,7 @@ msgstr ""
 "도록 <userinput>no-hlt</userinput> 파라미터를 시도해 보십시오."
 
 #. Tag: para
-#: boot-installer.xml:3551
+#: boot-installer.xml:3546
 #, no-c-format
 msgid ""
 "If your screen begins to show a weird picture while the kernel boots, eg. "
@@ -4670,13 +4659,13 @@ msgstr ""
 "parms\"/> 부분을 참고하십시오."
 
 #. Tag: title
-#: boot-installer.xml:3565
+#: boot-installer.xml:3560
 #, no-c-format
 msgid "System Freeze During the PCMCIA Configuration Phase"
 msgstr "PCMCIA 설정 단계에서 시스템 멈춤"
 
 #. Tag: para
-#: boot-installer.xml:3566
+#: boot-installer.xml:3561
 #, no-c-format
 msgid ""
 "Some laptop models produced by Dell are known to crash when PCMCIA device "
@@ -4695,7 +4684,7 @@ msgstr ""
 "제외할 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3576
+#: boot-installer.xml:3571
 #, no-c-format
 msgid ""
 "Alternatively, you can boot the installer in expert mode. You will then be "
@@ -4716,13 +4705,13 @@ msgstr ""
 "값을 입력할 때, 쉼표를 쓰지 않는다는 것에 유의하십시오."
 
 #. Tag: title
-#: boot-installer.xml:3593
+#: boot-installer.xml:3588
 #, fuzzy, no-c-format
 msgid "System Freeze while Loading USB Modules"
 msgstr "USB 모듈을 읽어들이다가 시스템 멈춤"
 
 #. Tag: para
-#: boot-installer.xml:3594
+#: boot-installer.xml:3589
 #, no-c-format
 msgid ""
 "The kernel normally tries to install USB modules and the USB keyboard driver "
@@ -4741,7 +4730,7 @@ msgstr ""
 "는 것입니다."
 
 #. Tag: para
-#: boot-installer.xml:3609
+#: boot-installer.xml:3604
 #, fuzzy, no-c-format
 msgid "There are some common installation problems that are worth mentioning."
 msgstr ""
@@ -4749,13 +4738,13 @@ msgstr ""
 "법으로 해결할 수 있습니다."
 
 #. Tag: title
-#: boot-installer.xml:3615
+#: boot-installer.xml:3610
 #, no-c-format
 msgid "Misdirected video output"
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3616
+#: boot-installer.xml:3611
 #, no-c-format
 msgid ""
 "It is fairly common for &arch-title; to have two video cards in one machine, "
@@ -4771,7 +4760,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3630
+#: boot-installer.xml:3625
 #, no-c-format
 msgid ""
 "Note that you may also have to manually add this parameter to the silo "
@@ -4781,13 +4770,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3641
+#: boot-installer.xml:3636
 #, fuzzy, no-c-format
 msgid "Failure to Boot or Install from CD-ROM"
 msgstr "CD-ROM에서 부팅하기"
 
 #. Tag: para
-#: boot-installer.xml:3642
+#: boot-installer.xml:3637
 #, no-c-format
 msgid ""
 "Some Sparc systems are notoriously difficult to boot from CD-ROM and even if "
@@ -4796,28 +4785,28 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3648
+#: boot-installer.xml:3643
 #, no-c-format
 msgid "We recommend to install such systems by netbooting the installer."
 msgstr ""
 
 #. Tag: title
-#: boot-installer.xml:3657
+#: boot-installer.xml:3652
 #, no-c-format
 msgid "Interpreting the Kernel Startup Messages"
 msgstr "커널 시작 메세지 해석하기"
 
 #. Tag: para
-#: boot-installer.xml:3659
-#, no-c-format
+#: boot-installer.xml:3654
+#, fuzzy, no-c-format
 msgid ""
 "During the boot sequence, you may see many messages in the form "
-"<computeroutput>can't find <replaceable>something</replaceable> </"
-"computeroutput>, or <computeroutput> <replaceable>something</replaceable> "
-"not present</computeroutput>, <computeroutput>can't initialize "
-"<replaceable>something</replaceable> </computeroutput>, or even "
+"<computeroutput>can't find <replaceable>something</replaceable></"
+"computeroutput>, or <computeroutput><replaceable>something</replaceable> not "
+"present</computeroutput>, <computeroutput>can't initialize "
+"<replaceable>something</replaceable></computeroutput>, or even "
 "<computeroutput>this driver release depends on <replaceable>something</"
-"replaceable> </computeroutput>. Most of these messages are harmless. You see "
+"replaceable></computeroutput>. Most of these messages are harmless. You see "
 "them because the kernel for the installation system is built to run on "
 "computers with many different peripheral devices. Obviously, no one computer "
 "will have every possible peripheral device, so the operating system may emit "
@@ -4843,13 +4832,13 @@ msgstr ""
 "(<xref linkend=\"kernel-baking\"/> 참고.)"
 
 #. Tag: title
-#: boot-installer.xml:3684
+#: boot-installer.xml:3679
 #, fuzzy, no-c-format
 msgid "Reporting Installation Problems"
 msgstr "자주 발생하는 &arch-title; 설치 문제"
 
 #. Tag: para
-#: boot-installer.xml:3685
+#: boot-installer.xml:3680
 #, fuzzy, no-c-format
 msgid ""
 "If you get through the initial boot phase but cannot complete the install, "
@@ -4867,7 +4856,7 @@ msgstr ""
 "이 정보를 버그 보고에 첨부해 주십시오."
 
 #. Tag: para
-#: boot-installer.xml:3696
+#: boot-installer.xml:3691
 #, no-c-format
 msgid ""
 "Other pertinent installation messages may be found in <filename>/var/log/</"
@@ -4879,13 +4868,13 @@ msgstr ""
 "들어 있습니다."
 
 #. Tag: title
-#: boot-installer.xml:3707
+#: boot-installer.xml:3702
 #, no-c-format
 msgid "Submitting Installation Reports"
 msgstr "설치 보고 제출"
 
 #. Tag: para
-#: boot-installer.xml:3708
+#: boot-installer.xml:3703
 #, no-c-format
 msgid ""
 "If you still have problems, please submit an installation report. We also "
@@ -4898,16 +4887,16 @@ msgstr ""
 "사용하는 지에 대한 정보를 많이 얻을 수 있습니다."
 
 #. Tag: para
-#: boot-installer.xml:3715
+#: boot-installer.xml:3710
 #, no-c-format
 msgid ""
 "Note that your installation report will be published in the Debian Bug "
 "Tracking System (BTS) and forwarded to a public mailing list. Make sure that "
-"you use an E-Mail address that you do not mind being made public."
+"you use an e-mail address that you do not mind being made public."
 msgstr ""
 
 #. Tag: para
-#: boot-installer.xml:3721
+#: boot-installer.xml:3716
 #, fuzzy, no-c-format
 msgid ""
 "If you have a working Debian system, the easiest way to send an installation "
@@ -4923,7 +4912,7 @@ msgstr ""
 "installation-report</command> 명령을 실행하는 것입니다."
 
 #. Tag: para
-#: boot-installer.xml:3731
+#: boot-installer.xml:3726
 #, fuzzy, no-c-format
 msgid ""
 "Alternatively you can use this template when filling out installation "
@@ -5011,6 +5000,18 @@ msgstr ""
 "</screen></informalexample> 버그 보고서에 문제가 무엇인지 설명하시고, 커널이 "
 "멈춘 경우에 마지막으로 볼 수 있는 커널 메세지를 포함하십시오. 문제가 발생할 "
 "때 어떤 과정을 거쳤는 지 설명하십시오."
+
+#~ msgid "If you are using a 2.2.x kernel, you may need to set &ramdisksize;."
+#~ msgstr "2.2.x 커널을 사용한다면, &ramdisksize;로 설정해야 합니다."
+
+#~ msgid ""
+#~ "If you are booting with your own kernel instead of the one supplied with "
+#~ "the installer, be sure that <userinput>CONFIG_DEVFS</userinput> is set in "
+#~ "your kernel. The installer requires <userinput>CONFIG_DEVFS</userinput>."
+#~ msgstr ""
+#~ "설치 프로그램에 들어 있는 커널 대신에 직접 만든 커널로 부팅하려면, "
+#~ "<userinput>CONFIG_DEVFS</userinput>를 꼭 설정하십시오. 설치 프로그램에서 "
+#~ "<userinput>CONFIG_DEVFS</userinput>가 필요합니다."
 
 #~ msgid "Bug Reporter"
 #~ msgstr "버그 보고"
