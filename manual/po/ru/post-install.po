@@ -1,12 +1,12 @@
 # translation of post-install.po to Russian
 # Russian L10N Team <debian-l10n-russian@lists.debian.org>, 2004.
-# Yuri Kozlov <kozlov.y@gmail.com>, 2004, 2005, 2006.
+# Yuri Kozlov <kozlov.y@gmail.com>, 2004, 2005, 2006, 2007.
 msgid ""
 msgstr ""
 "Project-Id-Version: post-install\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 10:24+0000\n"
-"PO-Revision-Date: 2006-12-30 18:11+0300\n"
+"PO-Revision-Date: 2007-01-01 14:58+0300\n"
 "Last-Translator: Yuri Kozlov <kozlov.y@gmail.com>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -347,7 +347,7 @@ msgstr ""
 #: post-install.xml:238
 #, no-c-format
 msgid "Setting Up Your System To Use E-Mail"
-msgstr ""
+msgstr "Настройка почты"
 
 #. Tag: para
 #: post-install.xml:239
@@ -358,6 +358,11 @@ msgid ""
 "important for some Debian utilities, we will try to cover the basics in this "
 "section."
 msgstr ""
+"Сегодня электронная почта (email) &mdash; это очень важная часть жизни "
+"многих людей. Так как при настройке почты используется много "
+"параметров, а правильность настройки влияет на многие программы "
+"в Debian, в этом разделе мы попытаемся описать основные моменты "
+"конфигурирования."
 
 #. Tag: para
 #: post-install.xml:246
@@ -371,6 +376,16 @@ msgid ""
 "Agent</firstterm> (MDA) that takes care of delivering incoming mail to the "
 "user's inbox."
 msgstr ""
+"Почтовая система состоит из трёх частей. Первая: "
+"<firstterm>пользовательский почтовый агент [Mail User Agent]</firstterm> "
+"(MUA) &mdash; это программа, с которой "
+"работает пользователь для написания и чтения писем. Вторая: "
+"<firstterm>агент пересылки почты [Mail Transfer Agent]</firstterm> "
+"(MTA) &mdash; отвечает за "
+"пересылку сообщений между компьютерами. Третья: "
+"<firstterm>агент доставки почты [Mail Delivery Agent]</firstterm> "
+"(MDA) &mdash; отвечает за "
+"доставку входящей почты в почтовый ящик пользователя."
 
 #. Tag: para
 #: post-install.xml:256
@@ -380,6 +395,10 @@ msgid ""
 "also be combined in one or two programs. It is also possible to have "
 "different programs handle these functions for different types of mail."
 msgstr ""
+"Данные части могут выполняться разными программами, но "
+"могут быть и объединены в одной или двух программах. Также "
+"можно настроить, чтобы разные виды почты обрабатывались "
+"разными программами."
 
 #. Tag: para
 #: post-install.xml:262
@@ -390,6 +409,11 @@ msgid ""
 "often used in combination with <command>exim</command> or <command>sendmail</"
 "command> as MTA and <command>procmail</command> as MDA."
 msgstr ""
+"Исторически, в системах Linux и Unix очень популярным MUA является "
+"<command>mutt</command>. Как и большинство классических программ Linux "
+"он имеет текстовый интерфейс. Часто он используется в связке с "
+"<command>exim</command> или <command>sendmail</command>, работающих в "
+"качестве MTA и <command>procmail</command> в качестве MDA."
 
 #. Tag: para
 #: post-install.xml:269
@@ -406,12 +430,21 @@ msgid ""
 "often are &mdash; also be used in combination with the traditional Linux "
 "tools."
 msgstr ""
+"В связи с ростом популярности систем с графическим рабочим столом, становятся "
+"более востребованными почтовые программы с графическим интерфейсом "
+"типа GNOME <command>evolution</command>, KDE <command>kmail</command> "
+"или Mozilla <command>thunderbird</command> (в Debian имеет название <command>icedove</command><footnote> <para> Причиной переименования "
+"<command>thunderbird</command> в <command>icedove</"
+"command> стала проблема с лицензией. Подробности выходят за рамки этого "
+"руководства. </para> </footnote>). В этих программах объединены функции "
+"MUA, MTA и MDA, но они могут (так часто и происходит) использоваться "
+"совместно с классическими утилитами Linux."
 
 #. Tag: title
 #: post-install.xml:289
 #, no-c-format
 msgid "Default E-Mail Configuration"
-msgstr ""
+msgstr "Почтовая конфигурация по умолчанию"
 
 #. Tag: para
 #: post-install.xml:290
@@ -425,6 +458,16 @@ msgid ""
 "command>, &hellip; </para> </footnote> can send important notices by e-mail "
 "to inform the system administrator of (potential) problems or changes."
 msgstr ""
+"Даже если вы планируете использовать почтовую программу с графическим "
+"интерфейсом, очень важно, чтобы в системе Linux также были установлены и "
+"правильно настроены классические MTA/MDA. Они нужны для различных "
+"утилит, которые работают в системе <footnote> <para> Примеры: "
+"<command>cron</command>, "
+"<command>quota</command>, <command>logcheck</command>, "
+"<command>aide</"
+"command>, &hellip; </para> </footnote>, чтобы они могли послать важные "
+"уведомления по почте системному администратору "
+"о (потенциальных) проблемах или изменениях."
 
 #. Tag: para
 #: post-install.xml:305
@@ -442,6 +485,21 @@ msgid ""
 "filename>. If no regular user account was created, the mail will of course "
 "be delivered to the root account itself. </para> </footnote>."
 msgstr ""
+"По этой причине по умолчанию устанавливаются пакеты "
+"<classname>exim4</classname> и "
+"<classname>mutt</classname> (если вы не отменили задачу "
+"<quote>стандарт</quote> во время установки). "
+"<classname>exim4</classname> &mdash; это комбинация MTA/MDA, "
+"имеет относительно небольшой размер, но очень гибок в конфигурировании. "
+"По умолчанию, он настраивается на обработку только локальной "
+"почты самой системы, а почта, предназначенная системному "
+"администратору (учётная запись root), будет доставлена на учётную "
+"запись обычного пользователя, созданного во время установки<footnote> "
+"<para> Пересылка почты root на учётную "
+"запись обычного пользователя настраивается в файле "
+"<filename>/etc/aliases</filename>. Если учётная запись обычного пользователя "
+"не была создана, почта, естественно, будет направляться самой учётной "
+"записи root. </para> </footnote>."
 
 #. Tag: para
 #: post-install.xml:324
@@ -451,12 +509,15 @@ msgid ""
 "mail/<replaceable>account_name</replaceable></filename>. The e-mails can be "
 "read using <command>mutt</command>."
 msgstr ""
+"При доставке почты она добавляется в файл <filename>/var/"
+"mail/<replaceable>учётная_запись</replaceable></filename>. Почту "
+"можно читать с помощью <command>mutt</command>."
 
 #. Tag: title
 #: post-install.xml:334
 #, no-c-format
 msgid "Sending E-Mails Outside The System"
-msgstr ""
+msgstr "Отправка почты из системы"
 
 #. Tag: para
 #: post-install.xml:335
@@ -466,6 +527,9 @@ msgid ""
 "mail local to the system, not for sending mail to others nor for receiving "
 "mail from others."
 msgstr ""
+"Как было упомянуто ранее, установленная система Debian настроена для "
+"обработки только локальных сообщений, она не может отправлять "
+"или принимать почту от других систем."
 
 #. Tag: para
 #: post-install.xml:341
@@ -475,6 +539,10 @@ msgid ""
 "please refer to the next subsection for the basic available configuration "
 "options. Make sure to test that mail can be sent and received correctly."
 msgstr ""
+"Если вы хотите, чтобы <classname>exim4</classname> обрабатывал "
+"внешнюю почту, перейдите в следующий подраздел, в котором "
+"описаны основные параметры настройки. Обязательно протестируйте "
+"приём и отправку почтовых сообщений."
 
 #. Tag: para
 #: post-install.xml:347
@@ -486,6 +554,13 @@ msgid ""
 "Just configure your favorite graphical mail program to use the correct "
 "servers to send and receive e-mail (how is outside the scope of this manual)."
 msgstr ""
+"Если вы будете использовать почтовую программу с графическим "
+"интерфейсом с почтовым сервером вашего провайдера интернет (ISP) "
+"или вашей компании, то необязательно настраивать "
+"<classname>exim4</classname> для обработки внешней почты. "
+"Просто укажите в любимой почтовой программе с графическим "
+"интерфейсом нужные серверы для отправки и приёма сообщений "
+"(не описано в данном руководстве)."
 
 #. Tag: para
 #: post-install.xml:356
@@ -497,6 +572,11 @@ msgid ""
 "default it expects to be able to use <classname>exim4</classname> to submit "
 "bug reports."
 msgstr ""
+"Однако, в этом случае вам потребуется правильно настроить отдельные "
+"утилиты, чтобы они могли отправлять почту. Одной из таких утилит "
+"является <command>reportbug</command>, программа для отправки "
+"сообщений об ошибках в пакетах Debian. По умолчанию, "
+"она настроена на использование <classname>exim4</classname>."
 
 #. Tag: para
 #: post-install.xml:364
@@ -507,12 +587,18 @@ msgid ""
 "answer <quote>no</quote> to the question if an MTA is available. You will "
 "then be asked for the SMTP server to be used for submitting bug reports."
 msgstr ""
+"Чтобы правильно настроить <command>reportbug</command> на использование "
+"внешнего почтового сервера, запустите команду "
+"<command>reportbug --configure</command> и "
+"ответьте <quote>нет</quote> на вопрос о доступности MTA. Затем "
+"вас попросят указать сервер SMTP, который нужно использовать для "
+"отправки сообщений об ошибках."
 
 #. Tag: title
 #: post-install.xml:375
 #, no-c-format
 msgid "Configuring the Exim4 Mail Transport Agent"
-msgstr ""
+msgstr "Настройка агента пересылки почты Exim4"
 
 #. Tag: para
 #: post-install.xml:376
@@ -523,6 +609,11 @@ msgid ""
 "can of course also remove <classname>exim4</classname> and replace it with "
 "an alternative MTA/MDA. </para> </footnote>:"
 msgstr ""
+"Если вы хотите, чтобы система также работала с внешней почтой, "
+"то вам нужно перенастроить пакет "
+"<classname>exim4</classname><footnote> <para> Конечно, также "
+"вы можете удалить <classname>exim4</classname> и заменить его "
+"другим MTA/MDA. </para> </footnote>:"
 
 #. Tag: screen
 #: post-install.xml:388
@@ -538,6 +629,9 @@ msgid ""
 "the configuration into small files. If you are unsure, select the default "
 "option."
 msgstr ""
+"После ввода этой команды (имея права суперпользователя), "
+"вас спросят, хотите ли вы разделить конфигурацию на маленькие "
+"файлы. Если не знаете что делать, выберите установку по умолчанию."
 
 #. Tag: para
 #: post-install.xml:396
@@ -546,6 +640,8 @@ msgid ""
 "Next you will be presented with several common mail scenarios. Choose the "
 "one that most closely resembles your needs."
 msgstr ""
+"Затем вам будет предложено несколько общих почтовых сценариев. "
+"Выберите тот, который подходит вам больше всего."
 
 #. Tag: term
 #: post-install.xml:405
@@ -583,6 +679,12 @@ msgid ""
 "need to be permanently online. That also means you have to download your "
 "mail from the smarthost via programs like fetchmail."
 msgstr ""
+"По этому сценарию ваша исходящая почта переправляется на другую машину, "
+"называемую <quote>smarthost</quote>, которая и выполняет всю работу за вас. "
+"Smarthost обычно ещё и хранит входящую почту, адресованную вашему "
+"компьютеру, так что вам не надо постоянно находиться в сети. Это также "
+"означает, что вам нужно загружать почту со smarthost с помощью программ типа "
+"fetchmail."
 
 #. Tag: para
 #: post-install.xml:427
@@ -592,12 +694,16 @@ msgid ""
 "this option very suitable for dial-up users. It can also be a company mail "
 "server, or even another system on your own network."
 msgstr ""
+"В большинстве случаев, в качестве smarthost используется почтовый "
+"сервер вашего ISP, что очень подходит пользователям, которые используют "
+"модемное подключение по телефонной линии. Также это может "
+"быть почтовый сервер компании или другая система в вашей сети."
 
 #. Tag: term
 #: post-install.xml:437
 #, no-c-format
 msgid "mail sent by smarthost; no local mail"
-msgstr ""
+msgstr "отправка почты через smarthost; локальная почта отсутствует"
 
 #. Tag: para
 #: post-install.xml:438
@@ -607,6 +713,10 @@ msgid ""
 "will not be set up to handle mail for a local e-mail domain. Mail on the "
 "system itself (e.g. for the system administrator) will still be handled."
 msgstr ""
+"То же самое, что и предыдущее значение, кроме того, что "
+"система не будет настроена на обработку почты локального домена. "
+"Почта от самой системы (например, для системного администратора) "
+"всё равно будет обработана."
 
 #. Tag: term
 #: post-install.xml:449
@@ -618,7 +728,7 @@ msgstr "доставка только локальной почты"
 #: post-install.xml:450
 #, no-c-format
 msgid "This is the option your system is configured for by default."
-msgstr ""
+msgstr "Настроено в системе по умолчанию."
 
 #. Tag: term
 #: post-install.xml:458
@@ -652,6 +762,13 @@ msgid ""
 "filename> has additional details about configuring <classname>exim4</"
 "classname>."
 msgstr ""
+"Если ни один из этих сценариев не подходит или нужна более тонкая настройка, "
+"то после завершения установки вам нужно отредактировать файлы конфигурации в "
+"каталоге <filename>/etc/exim4</filename>. Дополнительную информацию про "
+"<classname>exim4</classname> можно найти в каталоге  "
+"<filename>/usr/share/doc/exim4</filename>; в файле "
+"<filename>README.Debian.gz</filename> содержатся дополнительные "
+"подробности о настройке <classname>exim4</classname>."
 
 #. Tag: para
 #: post-install.xml:480
@@ -665,6 +782,15 @@ msgid ""
 "<classname>exim4</classname> as your MTA, this is possible by adding an "
 "entry in <filename>/etc/email-addresses</filename>."
 msgstr ""
+"Заметим, что если у вас нет официального доменного имени и вы отправляете "
+"почту в интернет напрямую, это может привести к тому, что ваша почта не будет "
+"приниматься серверами, так как на них установлены средства борьбы со спамом. "
+"Предпочтительней использовать почтовый сервер ISP. "
+"Если вы всё равно хотите отправлять почту напрямую, то вам нужно использовать "
+"другой почтовый адрес, а не сгенерированный по умолчанию. "
+"Если в качестве MTA используется "
+"<classname>exim4</classname>, это это делается добавлением "
+"записи в файл <filename>/etc/email-addresses</filename>."
 
 #. Tag: title
 #: post-install.xml:498
@@ -922,8 +1048,8 @@ msgstr ""
 "userinput> установит ядро вместе с некоторыми полезными файлами поддержки. "
 "Например, будет правильно установлен <filename>System.map</filename> "
 "(полезен при отладке проблем с ядром), а также <filename>/boot/config-"
-"&kernelversion;</filename>, содержащий параметры сборки ядра. Ваш новый "
-"пакет достаточно умён, чтобы автоматически использовать системный загрузчик "
+"&kernelversion;</filename>, содержащий параметры сборки ядра. Также, "
+"пакет способен автоматически использовать системный загрузчик "
 "платформы для обновления загрузки. Если вы создали пакет с модулями, то вам "
 "нужно установить и его."
 
