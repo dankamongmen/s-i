@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42929 -->
+<!-- original version: 43730 -->
 
   <sect2 arch="x86"><title>Von einer CD-ROM starten</title>
 
@@ -123,10 +123,11 @@ die dafür benötigten Dateien herunterladen und speichern, wie unter
 
 Wenn Sie vorhaben, die Festplatte lediglich zum Booten zu benutzen und danach
 alles per Netzwerk herunterzuladen, sollten Sie sich die Datei
-<filename>netboot/debian-installer/i386/initrd.gz</filename> und den
-dazugehörigen Kernel <filename>netboot/debian-installer/i386/linux</filename>
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename>
+und den dazugehörigen Kernel
+<filename>netboot/debian-installer/&architecture;/linux</filename>
 auf die Platte laden. Dies gibt Ihnen später die Möglichkeit, die Festplatte,
-von der Sie den Installer gestartet haben, neu zu partitionieren; trotzdem
+von der Sie den Installer gestartet haben, neu zu partitionieren; allerdings
 sollten Sie dies mit Vorsicht genießen.
 
 </para><para>
@@ -165,8 +166,6 @@ Hier ein Beispiel für <filename>/etc/lilo.conf</filename>:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Mehr Details finden Sie in den Handbuchseiten von
@@ -185,7 +184,7 @@ die Datei <filename>menu.lst</filename> im Verzeichnis
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -239,7 +238,7 @@ Dies wird mit dem <emphasis>root=</emphasis>-Parameter gemacht,
 indem man die Gerätebezeichnung angibt, die der ide-floppy-Treiber
 dem Gerät zuweist. Ein Beispiel: wenn Ihr LS-120-Laufwerk als erstes
 IDE-Gerät (Master) am zweiten IDE-Kabel angeschlossen ist, geben Sie
-<userinput>linux root=/dev/hdc</userinput> am Boot-Prompt ein.
+<userinput>install root=/dev/hdc</userinput> am Boot-Prompt ein.
 
 </para><para>
 
@@ -342,9 +341,9 @@ Informationen zu verfügbaren Bootmethoden und Bootparametern, die für
 Sie nützlich sein könnten, bekommen Sie, indem Sie die Tasten
 <keycap>F2</keycap> bis <keycap>F8</keycap> drücken. Sollten Sie irgendwelche
 Parameter am Boot-Prompt eingeben, denken Sie daran, die Bootmethode
-(Standard hierfür ist <userinput>linux</userinput>) sowie ein nachfolgendes
+(Standard hierfür ist <userinput>install</userinput>) sowie ein nachfolgendes
 Leerzeichen vor den ersten Parameter zu stellen (z.B.
-<userinput>linux fb=false</userinput>).
+<userinput>install fb=false</userinput>).
 
 <note><para>
 
