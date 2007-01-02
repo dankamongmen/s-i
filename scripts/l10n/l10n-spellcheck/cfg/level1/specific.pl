@@ -90,15 +90,26 @@ sub checkSpecials (@)
 		}
 	    }
 
-	if ($_ =~ m/#. Translators, this is a menu choice. MUST BE UNDER 65 COLUMNS/)
-	    {
-		utf8::decode($msgstr);
-		my $lung = length $msgstr;
-		if ($lung > 65)
-		{
-		    print "# >>> Line is too long: keep it under 65 characters <<<\n";		
-		    $unmatched=1;			
-		}
+	    my @gi_only = ("bn", "dz", "ka", "gu",
+			   "hi", "kn", "km", "lo",
+			   "ml", "mr", "ne", "pa",
+			   "sa", "ta", "te", "th");
+	    my $lang=$ARGV[1];
+
+	    # check lenght of the msgstr only if language is supported by newt frontend
+	    if(!grep $_ eq $lang, @gi_only)
+            {
+
+		if ($_ =~ m/#. Translators, this is a menu choice. MUST BE UNDER 65 COLUMNS/ )
+		    {
+			utf8::decode($msgstr);
+			  my $lung = length $msgstr;
+			  if ($lung > 65)
+			  {
+			      print "# >>> Line is too long: keep it under 65 characters <<<\n";		
+			      $unmatched=1;			
+			  }
+		     }
 	    }
     }
 

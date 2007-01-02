@@ -95,7 +95,7 @@ while read LANG_FILE; do
 
 	        # Level-specific check (only for po files)
 		if [ -f ${SPECIFIC_CHECK} ] ; then
-		    ${SPECIFIC_CHECK} ${LANG_FILE} >> ${LANG_SPECIFIC}
+		    ${SPECIFIC_CHECK} ${LANG_FILE} ${LANG} >> ${LANG_SPECIFIC}
 		fi
 	    fi
 	    extract_msg.pl -msgstr ${LANG_FILE} >> ${ALL_STRINGS}
@@ -105,7 +105,7 @@ while read LANG_FILE; do
 
 	        # Level-specific check (only for po files)
 		if [ -f ${SPECIFIC_CHECK} ] ; then
-		    ${SPECIFIC_CHECK} ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${LANG_SPECIFIC}
+		    ${SPECIFIC_CHECK} ${LANG_FILE} ${LANG} | iconv --from ${ENC} --to utf-8 >> ${LANG_SPECIFIC}
 		fi
 	    fi
 	    extract_msg.pl -msgstr ${LANG_FILE} | iconv --from ${ENC} --to utf-8 >> ${ALL_STRINGS}
