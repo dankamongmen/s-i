@@ -30,6 +30,7 @@ struct channel
 	int key;
 	char name[SYSFS_NAME_LEN];
 	char devtype[SYSFS_NAME_LEN];
+	bool configured;
 	bool online;
 	enum channel_type type;
 };
@@ -56,7 +57,7 @@ enum state
 	SETUP,
 	DETECT_CHANNELS,
 	GET_CHANNEL,
-	CONFIRM,
+	FORMAT,
 	WRITE,
 	ERROR,
 	FINISH
@@ -123,7 +124,7 @@ static enum state_wanted detect_channels_driver (struct sysfs_driver *driver, in
 		attr_online = sysfs_get_device_attr (device, "online");
 		if (!attr_devtype || !attr_online)
 			return WANT_NONE;
-		current = di_new (struct channel, 1);
+		current = di_new0 (struct channel, 1);
 		if (!current)
 			return WANT_ERROR;
 		strncpy (current->name, device->name, sizeof (current->name));
@@ -194,13 +195,17 @@ static void get_channel_select_append (void *key __attribute__ ((unused)), void 
 	struct channel *channel = value;
 	char *buf = user_data;
 	if (buf[0])
-		strncat (buf, ", ", 512);
-	strncat (buf, channel->name, 512);
+		strncat (buf, ", ", 1024);
+	strncat (buf, channel->name, 1024);
+	if (channel->configured)
+		strncat (buf, " (configured)", 1024);
+	else if (channel->online)
+		strncat (buf, " (online)", 1024);
 }
 
 static enum state_wanted get_channel_select (void)
 {
-	char buf[512], *ptr;
+	char buf[1024], *ptr;
 	int ret, dev;
 
 	buf[0] = '\0';
@@ -250,8 +255,41 @@ static int format_handler (const char *buf, size_t len, void *user_data __attrib
 	return 0;
 }
 
-static enum state_wanted confirm (void)
+static enum state_wanted format (void)
 {
+	char buf[256], dev[128], *ptr;
+	int fd, ret;
+	struct hd_geometry drive_geo;
+
+	debconf_subst (client, TEMPLATE_PREFIX "format", "device", channel_current->name);
+	debconf_set (client, TEMPLATE_PREFIX "format", "false");
+	ret = my_debconf_input ("medium", TEMPLATE_PREFIX "format", &ptr);
+
+	if (ret == 10)
+		return WANT_BACKUP;
+	if (strcmp (ptr, "true"))
+		return WANT_NEXT;
+
+	snprintf (dev, sizeof (dev), "/dev/disk/by-path/ccw-%s", channel_current->name);
+
+	fd = open (dev, O_RDONLY);
+	if (fd < 0)
+		return WANT_ERROR;
+	if (ioctl (fd, HDIO_GETGEO, &drive_geo) < 0)
+		return WANT_ERROR;
+	close (fd);
+
+	debconf_subst (client, TEMPLATE_PREFIX "formatting", "device", channel_current->name);
+	debconf_progress_start (client, 0, drive_geo.cylinders - 1, TEMPLATE_PREFIX "formatting");
+
+	snprintf (buf, sizeof (buf), "dasdfmt -l LX%04x -b 4096 -m 1 -f %s -y", channel_device (channel_current->name), dev);
+	ret = di_exec_shell_full (buf, format_handler, NULL, NULL, NULL, NULL, NULL, NULL);
+
+	debconf_progress_stop (client);
+
+	if (ret)
+		return WANT_ERROR;
+
 	return WANT_NEXT;
 }
 
@@ -274,12 +312,16 @@ static enum state_wanted write_dasd (void)
 
         sysfs_close_device (device);
 
+	channel_current->online = true;
+
         snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", channel_current->name);
         config = fopen (buf, "w");
         if (!config)
                 return WANT_ERROR;
 
         fclose (config);
+
+	channel_current->configured = true;
 
 	return WANT_NEXT;
 }
@@ -310,8 +352,8 @@ int main ()
 			case GET_CHANNEL:
 				state_want = get_channel ();
 				break;
-			case CONFIRM:
-				state_want = confirm ();
+			case FORMAT:
+				state_want = format ();
 				break;
 			case WRITE:
 				state_want = write_dasd ();
@@ -333,9 +375,9 @@ int main ()
 						state = GET_CHANNEL;
 						break;
 					case GET_CHANNEL:
-						state = CONFIRM;
+						state = FORMAT;
 						break;
-					case CONFIRM:
+					case FORMAT:
 						state = WRITE;
 						break;
 					case WRITE:
