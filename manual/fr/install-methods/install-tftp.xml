@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43558 -->
+<!-- original version: 43696 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Préparer les fichiers pour amorcer depuis le réseau avec TFTP</title>
@@ -8,8 +8,8 @@
 Si votre machine est connectée à un réseau local, vous pouvez l'amorcer 
 directement à partir d'une autre machine de ce réseau en utilisant 
 TFTP. Pour cela, les fichiers d'amorçage doivent être 
-placés à un endroit spécifique de cette machine et elle doit savoir 
-amorcer votre propre machine.
+placés à un endroit spécifique de cette machine et celle-ci doit savoir 
+amorcer votre machine.
 
 </para><para>
 
@@ -285,7 +285,7 @@ Certaines architectures SPARC ajoutent au nom de fichier la sous-architecture, c
 <quote>SUN4M</quote> ou <quote>SUN4C</quote>. Ainsi, si votre sous-architecture système
 est SUN4C et que son adresseIP est 192.168.1.3, le nom de fichier sera
 <filename>C0A80103.SUN4C</filename>. Cependant, pour certaines architectures, le fichier
-recherché est simplement <filename>client-ip-in-hex</filename>.
+recherché est simplement <filename>client-ip-en-hex</filename>.
 Pour déterminer facilement ce nom et en supposant que l'adresse IP est 
 10.0.0.4, lancez un interpréteur de commandes et faites&nbsp;:
 
@@ -296,7 +296,15 @@ $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 Il suffira de mettre les lettres en majuscule et d'ajouter le nom de la sous-architecture
 pour obtenir le nom du fichier.
 
-</para><para>
+</para>
+
+<para>
+
+Si tout a été fait correctement, la commande <userinput>boot net</userinput>
+depuis l'OpenPROM devrait charger l'image. Si l'image n'est pas trouvée,
+vérifiez dans les journaux du serveur tftp sous quel nom elle a été demandée.
+</para>
+<para>
 
 Vous pouvez aussi forcer certains systèmes SPARC à rechercher un nom de 
 fichier spécifique en l'ajoutant à la fin de la commande d'amorçage de 

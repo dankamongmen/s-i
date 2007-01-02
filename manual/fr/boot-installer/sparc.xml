@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 28997 -->
+<!-- original version: 43724 -->
 
   <sect2 arch="sparc" id="boot-tftp"><title>Amorcer avec TFTP</title>
 
@@ -14,9 +14,6 @@ de la machine que vous êtes en train d'installer
 RARP&nbsp;; vous pouvez aussi utiliser les commandes 
 <userinput>boot net:bootp</userinput> ou <userinput>boot net:dhcp</userinput>
 pour amorcer avec un serveur TFTP et BOOTP ou avec un serveur DHCP.
-Certaines anciennes versions d'OpenBoot nécessitent d'utiliser le nom du 
-périphérique, comme <userinput>boot le()</userinput>&nbsp;; il est peu 
-probable que ces périphériques acceptent BOOTP ou DHCP.
 
 </para>
   </sect2>
@@ -31,10 +28,6 @@ probable que ces périphériques acceptent BOOTP ou DHCP.
 La plupart des versions d'OpenBoot acceptent la commande
 <userinput>boot cdrom</userinput>qui est un simple alias pour amorcer sur le
 périphérique SCSI n°6 (ou le second maître pour les systèmes à base d'IDE). 
-Il se peut que vous ayez à passer le véritable nom du périphérique pour les 
-vieilles versions d'OpenBoot qui ne proposent pas cette commande.
-il a été reporté des problèmes sur Sun4m (p.&nbsp;ex. SPARC 10s et SPARC 20s) 
-lors de l'amorçage depuis un cédérom.
 
 </para>
   </sect2>
@@ -42,9 +35,21 @@ lors de l'amorçage depuis un cédérom.
 
   <sect2 arch="sparc" condition="supports-floppy-boot">
   <title>Amorcer depuis des disquettes</title>
+
 <para>
 
-Pour amorcer depuis une disquette sur une SPARC, utilisez
+Des images sur disquettes sont disponibles uniquement pour sparc32. Cependant pour
+des raisons techniques, elles ne sont pas publiées officiellement.
+(Elles doivent être construites par le superutilisateur, ce qui n'est pas possible
+sur nos machines de construction.)
+Voyez <quote>daily built images</quote> sur le site web de
+<ulink url="&url-d-i;">l'installateur Debian</ulink> pour des liens vers des images
+sur disquettes pour sparc32.
+
+
+<para>
+
+Pour amorcer depuis une disquette sur une machine SPARC, utilisez
 
 <informalexample><screen>
 Stop-A -&gt; OpenBoot: "boot floppy"
@@ -53,9 +58,6 @@ Stop-A -&gt; OpenBoot: "boot floppy"
 La nouvelle architecture Sun4u (ultra) ne peut s'amorcer depuis une 
 disquette. Le message typique d'erreur est 
 <computeroutput>Bad magic number in disk label - Can't open disk label package</computeroutput>.
-En outre, certains modèles Sun4c (comme les IPX) ne reconnaissent pas les 
-images compressées trouvées sur les disques. Elles ne peuvent donc pas non 
-plus s'amorcer depuis une disquette.
 
 </para><para>
 
@@ -67,7 +69,7 @@ de OBP peut être téléchargé comme produit ID 106121 à partir de
 </para><para>
 
 Si vous amorcez depuis une disquette et si vous apercevez
-         des messages comme
+des messages comme
 
 <informalexample><screen>
 Fatal error: Cannot read partition

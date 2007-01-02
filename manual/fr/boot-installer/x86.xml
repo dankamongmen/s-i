@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 42929 -->
+<!-- original version: 43730 -->
 
   <sect2 arch="x86"><title>Amorcer depuis un cédérom</title>
 
@@ -122,8 +122,8 @@ les fichiers et les installer comme l'explique la section
 <para>
 Si vous voulez utiliser le disque seulement pour l'amorçage et ensuite 
 utiliser le réseau pour télécharger tous les paquets, vous devez récupérer 
-le fichier <filename>netboot/debian-installer/i386/initrd.gz</filename> et le
-noyau qui lui correspond, <filename>netboot/debian-installer/i386/linux</filename>.
+le fichier <filename>netboot/debian-installer/&architecture;/initrd.gz</filename> et le
+noyau qui lui correspond, <filename>netboot/debian-installer/&architecture;/linux</filename>.
 Vous pourrez ainsi repartitionner le disque sur lequel se trouve l'installateur.
 Toutefois cette opération demande un grand soin.
 </para>
@@ -165,8 +165,6 @@ Voici un exemple de fichier <filename>/etc/lilo.conf</filename>&nbsp;:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Pour plus de précisions, référez-vous aux pages de manuel de
@@ -185,7 +183,7 @@ Cherchez le fichier <filename>menu.lst</filename> dans le répertoire
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -237,7 +235,7 @@ lecteur de disquette. On utilise le paramètre d'amorçage
 <emphasis>root=</emphasis>, en indiquant le périphérique que le 
 pilote ide-floppy aura simulé. Par exemple si votre lecteur est connecté sur 
 la première interface IDE en seconde position sur le câble, entrez
-<userinput>linux root=/dev/hdc</userinput> à l'invite de démarrage.
+<userinput>install root=/dev/hdc</userinput> à l'invite de démarrage.
 
 </para><para>
 
@@ -337,9 +335,8 @@ en pressant les touches <keycap>F3</keycap> à
 <keycap>F8</keycap>.
 Si vous ajoutez des paramètres à la ligne de commande d'amorçage, assurez-vous
 d'indiquer la méthode d'amorçage (la valeur par défaut est
-<userinput>linux</userinput>) et un espace avant le premier paramètre
-(par exemple, <userinput>linux priority=medium</userinput>,
-<userinput>linux fb=false</userinput>). 
+<userinput>install</userinput>) et un espace avant le premier paramètre
+(par exemple, <userinput>install fb=false</userinput>). 
 
 <note><para>
 Si vous installez le système depuis une machine distante qui offre une

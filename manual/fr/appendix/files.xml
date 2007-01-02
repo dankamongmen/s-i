@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 42302 -->
+<!-- original version: 43737 -->
 
  <sect1 id="linuxdevices"><title>Périphériques Linux</title>
 <para>
@@ -196,12 +196,25 @@ fichier <filename>/etc/sysctl.conf</filename>&nbsp;:
  clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
 -->
 <para>
-Une installation de base, avec le noyau 2.6 par défaut et tous les paquets standard, 
-demande 585&nbsp;Mo. Une installation minimale, sans la tâche standard, demande
-365&nbsp;Mo. 
+Une installation standard pour l'architecture i386, avec le noyau 2.6 par défaut
+et tous les paquets standard, demande 442&nbsp;Mo. Une installation minimale,
+sans la tâche <emphasis>Standard system</emphasis>, demande 230&nbsp;Mo. 
 </para>
+<important><para>
+Dans ces deux cas, l'espace disque réellement utilisé est calculé <emphasis>après</emphasis>
+la fin de l'installation et tous les fichiers temporaires éliminés. Il ne prend pas
+en compte l'espace utilisé par le système de fichiers, par exemple par les 
+journaux. Il est donc clair qu'il faut plus d'espace disque à la fois
+<emphasis>pendant</emphasis> l'installation et en utilisation réelle du
+système.
+</para></important>
 <para>
 Le tableau suivant montre les tailles rapportées par aptitude pour les tâches 
 affichées dans tasksel. Certaines tâches ont des éléments
@@ -211,9 +224,9 @@ le total obtenu en additionnant les deux tailles.
 <para>
 Pour déterminer la dimension d'une partition, vous devez ajouter les tailles
 dans le tableau et la taille de l'installation de base. Ce que représente
-<quote>Taille installée</quote> va dans <filename>/usr</filename>&nbsp;; et ce
-que représente <quote>Taille à charger</quote> va (provisoirement) dans 
-<filename>/var</filename>. 
+<quote>Taille installée</quote> va dans <filename>/usr</filename> et dans
+<filename>/lib</filename>&nbsp;; et ce que représente <quote>Taille à charger</quote>
+va (provisoirement) dans <filename>/var</filename>. 
 </para>
 <para>
 
@@ -230,16 +243,22 @@ que représente <quote>Taille à charger</quote> va (provisoirement) dans
 <tbody>
 <row>
   <entry>Desktop</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
   <entry>Laptop</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+
+<para> Les tâches Laptop et Desktop environment se recoupent en grande partie.
+Si vous installez les deux, la tâche Laptop demandera seulemnt quelques Mo
+supplémentaires d'espace disqie.
+</para> 
+
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -251,13 +270,13 @@ que représente <quote>Taille à charger</quote> va (provisoirement) dans
 
 <row>
   <entry>Serveur d'impression</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
-  <entry>serveur DNS</entry>
+  <entry>Serveur DNS</entry>
   <entry>2</entry>
   <entry>1</entry>
   <entry>3</entry>
@@ -265,13 +284,13 @@ que représente <quote>Taille à charger</quote> va (provisoirement) dans
 
 <row>
   <entry>Serveur de fichiers</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
 <row>
-  <entry>serveur de courrier</entry>
+  <entry>Serveur de courrier</entry>
   <entry>13</entry>
   <entry>5</entry>
   <entry>18</entry>
@@ -295,7 +314,7 @@ La tâche <emphasis>Desktop</emphasis> installe l'environnement GNOME.
 Si vous faites une installation dans une langue autre que l'anglais,
 <command>tasksel</command> installera d'abord une <firstterm>locale</firstterm>
 s'il en existe une pour votre langue. Chaque langue demande un espace disque.
-Vous devriez accorder 200 Mo pour l'installation et le téléchargement.
+Vous devriez accorder 350&nbsp;Mo pour l'installation et le téléchargement.
 </para>
  </sect1>
 
