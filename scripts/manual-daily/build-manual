@@ -337,10 +337,6 @@ if [ $NR_BUILD -gt 0 ] ; then
     echo "$NR_BUILD languages have been (partially) built." >>$mainlog
 
     echo "" >>$mainlog
-    echo "Calculating translation statistics..." >>$mainlog
-    $ROOT/bin/translation-stats | sort -k 2,2nr >$logdir/tr-stats
-    echo "Calculating translation statistics for po files..." >>$mainlog
-    $ROOT/bin/po_stats/gen &>$logdir/po-stats.log
     echo "Creating index page..." >>$mainlog
     $ROOT/bin/create-index
 
@@ -357,8 +353,6 @@ if [ $NR_BUILD -gt 0 ] ; then
 else
     echo "No languages built." >>$mainlog
 fi
-
-rm -f $ROOT/bin/index.podata
 
 echo "" >>$mainlog
 echo "Done -- `date -u`" >>$mainlog

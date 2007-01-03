@@ -59,6 +59,11 @@ build_link_table () {
 
 # MAINLINE
 
+echo "- calculating translation statistics for XML-based translations..." >>$mainlog
+$ROOT/bin/translation-stats | sort -k 2,2nr >$logdir/tr-stats
+echo "- calculating translation statistics for PO-based translations..." >>$mainlog
+$ROOT/bin/po_stats/gen &>$logdir/po-stats.log
+
 cat $ROOT/bin/index.head >$pagefile
 cat $ROOT/bin/index.changes >>$pagefile
 
@@ -129,5 +134,7 @@ sed "s/%date%/`date -u`/" $ROOT/bin/index.tail | \
 
 cp $ROOT/bin/translators.html $destination
 chmod 664 $destination/translators.html
+
+rm -f $ROOT/bin/index.podata
 
 exit 0
