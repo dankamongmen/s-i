@@ -262,7 +262,7 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
 }
 
 /* TODO: workaround for bug #404482
-/* This is a workaround for a bug in gtk/dfb which causes wrong GDK crossing
+ * This is a workaround for a bug in gtk/dfb which causes wrong GDK crossing
  * events (not) to be delivered and hence cursor not to be reshaped when
  * entering or leaving a gtktextview or a gtkentry
  */
