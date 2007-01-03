@@ -348,7 +348,7 @@ if [ $NR_BUILD -gt 0 ] ; then
     cd $destination
 
     echo "rsyncing files to alioth..." >>$mainlog
-    rsync -z --perms . alioth\:d-i_web/manual/ >>$mainlog 2>&1
+    rsync -z --perms * alioth\:d-i_web/manual/ >>$mainlog 2>&1
     # rsync subdirectories individually so we can also delete obsolete files
     for i in $(find . -type d | grep -v "^\.$"); do
     	rsync -zr --perms --delete "$i" alioth\:d-i_web/manual/ >>$mainlog 2>&1
