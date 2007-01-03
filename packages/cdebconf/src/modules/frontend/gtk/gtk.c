@@ -378,15 +378,14 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
     gboolean bool_var ;
     struct question *q = data->q;
     model = (GtkTreeModel *) data->treemodel;
-    char str_iter_index[4];
 
     /* GtkTreeView is updated */
     path  = gtk_tree_path_new_from_string(path_string);
     gtk_tree_model_get_iter(model, &iter, path);
-    gtk_tree_path_free(path);
     gtk_tree_model_get(model, &iter, MULTISELECT_COL_BOOL, &bool_var, -1);
     bool_var ^= 1;
     gtk_list_store_set(GTK_LIST_STORE(model), &iter, MULTISELECT_COL_BOOL, bool_var, -1);
+    gtk_tree_path_free (path);
 
     /* frontend's internal question struct is updated */
     count = strgetargc(q_get_choices_vals(q));
@@ -400,18 +399,9 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
         return /* DC_NOTOK */;
 
 
-    for (i = 0; i < count; i++)
-    {
-        sprintf(str_iter_index, "%d", i);
-        path  = gtk_tree_path_new_from_string(str_iter_index);
-
-        /* TODO
-         * The above hack is needed since gtk_tree_path_new_from_indices()
-         * was implemented first in GTK v. 2.2
-         * path  = gtk_tree_path_new_from_indices ( i, -1);
-         */
+    for (i = 0; i < count; i++) {
+        path = gtk_tree_path_new_from_indices ( i, -1);
         gtk_tree_model_get_iter(model, &iter, path);
-        gtk_tree_path_free(path);
         gtk_tree_model_get(model, &iter, MULTISELECT_COL_BOOL, &bool_var, -1);
 
         if((result != NULL) && bool_var==1)
@@ -423,6 +413,8 @@ void multiselect_single_callback(GtkCellRendererToggle *cell, const gchar *path_
         }
         else if((result == NULL) && bool_var==1)
             result = g_strdup(choices[tindex[i]]);
+
+        gtk_tree_path_free (path);
     }
 
     if (result == NULL)
