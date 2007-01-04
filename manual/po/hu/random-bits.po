@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-01-04 06:04+0000\n"
-"PO-Revision-Date: 2007-01-04 11:13+0100\n"
+"PO-Revision-Date: 2007-01-04 13:50+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -694,24 +694,26 @@ msgid ""
 "# mkdir /mnt/debinst\n"
 "# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 msgstr ""
+"# mkdir /mnt/debinst\n"
+"# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 
 #. Tag: para
 #: random-bits.xml:389
 #, no-c-format
 msgid "If you want to have parts of the filesystem (e.g. /usr) mounted on separate partitions, you will need to create and mount these directories manually before proceding with the next stage."
-msgstr ""
+msgstr "Ha a fájlrendszer részeit (például /usr) külön partícióra akarod, létre kell hoznod és csatolnod a könyvtárakat a következők előtt."
 
 #. Tag: title
 #: random-bits.xml:399
 #, no-c-format
 msgid "Install <command>debootstrap</command>"
-msgstr ""
+msgstr "A <command>debootstrap</command> telepítése"
 
 #. Tag: para
 #: random-bits.xml:400
 #, no-c-format
 msgid "The utility used by the Debian installer, and recognized as the official way to install a Debian base system, is <command>debootstrap</command>. It uses <command>wget</command> and <command>ar</command>, but otherwise depends only on <classname>/bin/sh</classname> and basic Unix/Linux tools<footnote> <para> These include the GNU core utilities and commands like <command>sed</command>, <command>grep</command>, <command>tar</command> and <command>gzip</command>. </para> </footnote>. Install <command>wget</command> and <command>ar</command> if they aren't already on your current system, then download and install <command>debootstrap</command>."
-msgstr ""
+msgstr "A Debian telepítő által használt eszköz, mely a Debian alaprendszer telepítésének hivatalos módja a <command>debootstrap</command>. A <command>wget</command> és <command>ar</command> programokat használja, de amúgy csak a <classname>/bin/sh</classname> és alapi Unix/Linux eszközöket használja<footnote> <para> Ezek a  GNU mag-eszközök (coreutils) és <command>sed</command>, <command>grep</command>, <command>tar</command> és <command>gzip</command> parancsok. </para> </footnote>. Telepítsd a <command>wget</command> és <command>ar</command> programokat, majd töltsd le és telepítsd a <command>debootstrap</command> programot."
 
 #. Tag: para
 #: random-bits.xml:430
@@ -722,6 +724,10 @@ msgid ""
 "# cd work\n"
 "</screen></informalexample> The <command>debootstrap</command> binary is located in the Debian archive (be sure to select the proper file for your architecture). Download the <command>debootstrap</command> .deb from the <ulink url=\"http://ftp.debian.org/debian/pool/main/d/debootstrap/\"> pool</ulink>, copy the package to the work folder, and extract the files from it. You will need to have root privileges to install the files."
 msgstr ""
+"Vagy használd az alábbi eljárást kézi telepítésére. Készíts egy munka-könyvtárat a .deb kibontására: <informalexample><screen>\n"
+"# mkdir munka\n"
+"# cd munka\n"
+"</screen></informalexample> A <command>debootstrap</command> bináris a Debian archívumban van (a gépednek megfelelő fájlt válaszd). Töltsd le a <command>debootstrap</command> .deb fájlt innen: <ulink url=\"http://ftp.debian.org/debian/pool/main/d/debootstrap/\"> pool</ulink> a munka könyvtárba és bontsd ki fájljait. Rendszergazda jog kell a fájlok telepítéséhez."
 
 #. Tag: screen
 #: random-bits.xml:445
@@ -731,12 +737,15 @@ msgid ""
 "# cd /\n"
 "# zcat /full-path-to-work/work/data.tar.gz | tar xv"
 msgstr ""
+"# ar -x debootstrap_0.X.X_all.deb\n"
+"# cd /\n"
+"# zcat /a-munka-útvonala/munka/data.tar.gz | tar xv"
 
 #. Tag: title
 #: random-bits.xml:451
 #, no-c-format
 msgid "Run <command>debootstrap</command>"
-msgstr ""
+msgstr "Futtasd a <command>debootstrap</command> programot"
 
 #. Tag: para
 #: random-bits.xml:452
@@ -1145,19 +1154,19 @@ msgstr ""
 #: random-bits.xml:693
 #, no-c-format
 msgid "Set up the Boot Loader"
-msgstr ""
+msgstr "A boot betöltő beállítása"
 
 #. Tag: para
 #: random-bits.xml:694
 #, no-c-format
 msgid "To make your &debian; system bootable, set up your boot loader to load the installed kernel with your new root partition. Note that <command>debootstrap</command> does not install a boot loader, though you can use <command>aptitude</command> inside your Debian chroot to do so."
-msgstr ""
+msgstr "A &debian; rendszer indíthatóvá tételéhez, állítsd be a boot betöltőt a kernel a telepített kernel indítására az új gyökér partícióval. A <command>debootstrap</command> nem telepít boot betöltőt, de az <command>aptitude</command> használható a Debian chroot környezetben erre."
 
 #. Tag: para
 #: random-bits.xml:701
 #, no-c-format
 msgid "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</userinput> for instructions on setting up the bootloader. If you are keeping the system you used to install Debian, just add an entry for the Debian install to your existing grub <filename>menu.lst</filename> or <filename>lilo.conf</filename>. For <filename>lilo.conf</filename>, you could also copy it to the new system and edit it there. After you are done editing, call <command>lilo</command> (remember it will use <filename>lilo.conf</filename> relative to the system you call it from)."
-msgstr ""
+msgstr "Lásd az <userinput>info grub</userinput> vagy <userinput>man lilo.conf</userinput> parancsokat a boot-betöltő beállításához. Ha megtartod a Debian telepítésére használt rendszert, csak adj egy bejegyzést a Debian telepítéshez a létező grub <filename>menu.lst</filename> vagy <filename>lilo.conf</filename> fájlhoz. A <filename>lilo.conf</filename> esetén át kell másolni az új rendszerre és ott szerkeszteni. A szerkesztés végeztével futtasd a <command>lilo</command> parancsot (emlékezz, hogy az őt meghívó rendszer <filename>lilo.conf</filename> fájlját használja)."
 
 #. Tag: para
 #: random-bits.xml:713
@@ -1169,12 +1178,17 @@ msgid ""
 "# update-grub\n"
 "</screen></informalexample> The second command will install <command>grub</command> (in this case in the MBR of <literal>hda</literal>). The last command will create a sane and working <filename>/boot/grub/menu.lst</filename>."
 msgstr ""
+"A <classname>grub</classname> telepítése és beállítása ilyen könnyű: <informalexample><screen>\n"
+"# aptitude install grub\n"
+"# grub-install /dev/<replaceable>hda</replaceable>\n"
+"# update-grub\n"
+"</screen></informalexample> A 2. parancs telepíti a <command>grub</command> programot (ez esetben a <literal>hda</literal> MBR részébe). Az utolsó készít egy működő <filename>/boot/grub/menu.lst</filename> fájlt."
 
 #. Tag: para
 #: random-bits.xml:723
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
-msgstr ""
+msgstr "Itt egy alap <filename>/etc/lilo.conf</filename> példaként:"
 
 #. Tag: screen
 #: random-bits.xml:727
@@ -1188,12 +1202,19 @@ msgid ""
 "image=/vmlinuz\n"
 "label=Debian"
 msgstr ""
+"boot=/dev/<replaceable>hda6</replaceable>\n"
+"root=/dev/<replaceable>hda6</replaceable>\n"
+"install=menu\n"
+"delay=20\n"
+"lba32\n"
+"image=/vmlinuz\n"
+"label=Debian"
 
 #. Tag: para
 #: random-bits.xml:729
 #, no-c-format
 msgid "Check <userinput>man yaboot.conf</userinput> for instructions on setting up the bootloader. If you are keeping the system you used to install Debian, just add an entry for the Debian install to your existing <filename>yaboot.conf</filename>. You could also copy it to the new system and edit it there. After you are done editing, call ybin (remember it will use <filename>yaboot.conf</filename> relative to the system you call it from)."
-msgstr ""
+msgstr "Futtasd a <userinput>man yaboot.conf</userinput> parancsot a boot-betöltő beállításához. Ha megtartod a Debian telepítésére használt rendszert, csak adj egy bejegyzést a Debian telepítéshez a létező <filename>yaboot.conf</filename> fájlhoz. Át kell másolni az új rendszerre és ott szerkeszteni. A szerkesztés végeztével futtasd a <command>ybin</command> parancsot (emlékezz, hogy az őt meghívó rendszer <filename>yaboot.conf</filename> fájlját használja)."
 
 #. Tag: para
 #: random-bits.xml:739
@@ -1210,12 +1231,22 @@ msgid ""
 "label=Debian\n"
 "</screen></informalexample> On some machines, you may need to use <userinput>ide0:</userinput> instead of <userinput>hd:</userinput>."
 msgstr ""
+"Itt egy alap <filename>/etc/yaboot.conf</filename> példaként: <informalexample><screen>\n"
+"boot=/dev/hda2\n"
+"device=hd:\n"
+"partition=6\n"
+"root=/dev/hda6\n"
+"magicboot=/usr/lib/yaboot/ofboot\n"
+"timeout=50\n"
+"image=/vmlinux\n"
+"label=Debian\n"
+"</screen></informalexample> Egyes gépeken az <userinput>ide0:</userinput> használata kell a <userinput>hd:</userinput> helyett."
 
 #. Tag: title
 #: random-bits.xml:752
 #, no-c-format
 msgid "Finishing touches"
-msgstr ""
+msgstr "Végső lépések"
 
 #. Tag: para
 #: random-bits.xml:753
@@ -1225,18 +1256,21 @@ msgid ""
 "# tasksel install standard\n"
 "</screen></informalexample> Of course, you can also just use <command>aptitude</command> to install packages individually."
 msgstr ""
+"Amint már tudjuk, a telepített rendszer nagyon alap lesz. Kicsit komolyabb rendszer telepítésére egy könnyű mód az összes <quote>szabvány</quote> elsőségű csomag telepítésére az alábbi: <informalexample><screen>\n"
+"# tasksel install standard\n"
+"</screen></informalexample> Természetesen az <command>aptitude</command> is használható az egyes csomagok telepítésére."
 
 #. Tag: para
 #: random-bits.xml:764
 #, no-c-format
 msgid "After the installation there will be a lot of downloaded packages in <filename>/var/cache/apt/archives/</filename>. You can free up some diskspace by running:"
-msgstr ""
+msgstr "A telepítés után a letöltött csomagok a <filename>/var/cache/apt/archives/</filename> könyvtárban vannak. Ezek teljes törlésével felszabadítható egy kis hely például így:"
 
 #. Tag: screen
 #: random-bits.xml:770
 #, no-c-format
 msgid "# aptitude clean"
-msgstr ""
+msgstr "# aptitude clean"
 
 #. Tag: title
 #: random-bits.xml:781
@@ -1380,143 +1414,143 @@ msgstr ""
 #: random-bits.xml:914
 #, no-c-format
 msgid "Configure the network"
-msgstr ""
+msgstr "Hálózat beállítása"
 
 #. Tag: para
 #: random-bits.xml:917
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
-msgstr ""
+msgstr "Hálózat automata-beállítása DHCP segítségével: Nem"
 
 #. Tag: para
 #: random-bits.xml:922
 #, no-c-format
 msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr ""
+msgstr "IP cím: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:927
 #, no-c-format
 msgid "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
-msgstr ""
+msgstr "Pont-pont cím: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:933
 #, no-c-format
 msgid "Name server addresses: you can enter the same addresses used on source (see <filename>/etc/resolv.conf</filename>)"
-msgstr ""
+msgstr "Név kiszolgáló címek: a forráson is használt címek használhatók (lásd a <filename>/etc/resolv.conf</filename> fájlt)"
 
 #. Tag: title
 #: random-bits.xml:952
 #, no-c-format
 msgid "The Graphical Installer"
-msgstr ""
+msgstr "A grafikus telepítő"
 
 #. Tag: para
 #: random-bits.xml:953
 #, no-c-format
 msgid "The graphical version of the installer is only available for a limited number of architectures, including &arch-title;. The functionality of the graphical installer is essentially the same as that of the regular installer as it basically uses the same programs, but with a different frontend."
-msgstr ""
+msgstr "A telepítő grafikus változata csak pár típusú, például &arch-title; gépre érhető el. A grafikus telepítő feladata ugyanaz, mint a simáé csak más felületen."
 
 #. Tag: para
 #: random-bits.xml:961
 #, no-c-format
 msgid "Although the functionality is identical, the graphical installer still has a few significant advantages. The main advantage is that it supports more languages, namely those that use a character set that cannot be displayed with the regular <quote>newt</quote> frontend. It also has a few usability advantages such as the option to use a mouse, and in some cases several questions can be displayed on a single screen."
-msgstr ""
+msgstr "Bár feladatuk ugyanaz, a grafikus telepítőnek is van pár előnye. A fő előny, hogy még több nyelvet képes támogatni, főleg azokat, melyek olyan karakter készlettet használnak, melyet a sima <quote>newt</quote> felület nem tud megjeleníteni. A felhasználás szempontjából képes használni az egeret és néha pár kérdés egy képernyőre vonható."
 
 #. Tag: para
 #: random-bits.xml:970
 #, no-c-format
 msgid "The graphical installer is available with all CD images and with the hd-media installation method. As the graphical installer uses a separate (much larger) initrd than the regular installer, it has to be booted using <userinput>installgui</userinput> instead of <userinput>install</userinput>. Analogous, the expert and rescue modes are booted using <userinput>expertgui</userinput> and <userinput>rescuegui</userinput> respectively."
-msgstr ""
+msgstr "A grafikus telepítő elérhető minden CD kép és hd-media telepítő móddal. Mivel a grafikus telepítő önálló (sokkal nagyobb) initrd-t használ, mint a sima, az <userinput>installgui</userinput> és nem a sima <userinput>install</userinput> szóval indul. A grafikus szakértő és mentő módok az  <userinput>expertgui</userinput> és <userinput>rescuegui</userinput> szóval."
 
 #. Tag: para
 #: random-bits.xml:980
 #, no-c-format
 msgid "It is also available as a special <quote>mini</quote> ISO image<footnote id=\"gtk-miniiso\"> <para> The mini ISO image can be downloaded from a Debian mirror as described in <xref linkend=\"downloading-files\"/>. Look for <quote>gtk-miniiso</quote>. </para> </footnote>, which is mainly useful for testing; in this case the image is booted just using <userinput>install</userinput>. There is no graphical installer image that can be netbooted."
-msgstr ""
+msgstr "Speciális <quote>mini</quote> ISO képként is létezik<footnote id=\"gtk-miniiso\"> <para> A mini ISO kép egy Debian tükörről tölthető le a <xref linkend=\"downloading-files\"/> szerint. Keresd ezt: <quote>gtk-miniiso</quote>. </para> </footnote>, mely főleg teszt célú; ekkor a kép az <userinput>install</userinput> szóra indul. Nincs grafikus hálózati-indító kép."
 
 #. Tag: para
 #: random-bits.xml:994
 #, no-c-format
 msgid "For &arch-title;, currently only an experimental <quote>mini</quote> ISO image is available<footnote id=\"gtk-miniiso\"> <para> The mini ISO image can be downloaded from a Debian mirror as described in <xref linkend=\"downloading-files\"/>. Look for <quote>gtk-miniiso</quote>. </para> </footnote>. It should work on almost all PowerPC systems that have an ATI graphical card, but is unlikely to work on other systems."
-msgstr ""
+msgstr "A jelen &arch-title; géphez még csak egy kísérleti <quote>mini</quote> ISO kép elérhető<footnote id=\"gtk-miniiso\"> <para> A mini ISO kép egy Debian tükörről tölthető le a <xref linkend=\"downloading-files\"/> szerint. Keresd ezt: <quote>gtk-miniiso</quote>. </para> </footnote>. Szinte minden ATI kártyás PowerPC rendszeren működik más kártyákkal viszont valószínűleg nem."
 
 #. Tag: para
 #: random-bits.xml:1007
 #, no-c-format
 msgid "The graphical installer requires significantly more memory to run than the regular installer: &minimum-memory-gtk;. If insufficient memory is available, it will automatically fall back to the regular <quote>newt</quote> frontend."
-msgstr ""
+msgstr "A grafikus telepítő jóval nagyobb memória-igényű, mint a sima: &minimum-memory-gtk;. Ha kevés van, a sima <quote>newt</quote> felület pótolja."
 
 #. Tag: para
 #: random-bits.xml:1014
 #, no-c-format
 msgid "You can add boot parameters when starting the graphical installer, just as with the regular installer. One of those parameters allows you to configure the mouse for left-handed use. See <xref linkend=\"boot-parms\"/> for valid parameters."
-msgstr ""
+msgstr "Indító paraméterek ugyanúgy adhatók a grafikus telepítőhöz, mint a simához. E paraméterek egyike az egeret balkezesre állítja. Lásd az <xref linkend=\"boot-parms\"/> részt az érvényes paraméterekért."
 
 #. Tag: title
 #: random-bits.xml:1024
 #, no-c-format
 msgid "Using the graphical installer"
-msgstr ""
+msgstr "A grafikus telepítő használata"
 
 #. Tag: para
 #: random-bits.xml:1025
 #, no-c-format
 msgid "As already mentioned, the graphical installer basically works the same as the regular installer and thus the rest of this manual can be used to guide you through the installation process."
-msgstr ""
+msgstr "A grafikus telepítő a simához hasonlóan működik, melyet e kézikönyv bemutat."
 
 #. Tag: para
 #: random-bits.xml:1031
 #, no-c-format
 msgid "If you prefer using the keyboard over the mouse, there are two things you need to know. To expand a collapsed list (used for example for the selection of countries within continents), you can use the <keycap>+</keycap> and <keycap>-</keycap> keys. For questions where more than one item can be selected (e.g. task selection), you first need to tab to the <guibutton>Continue</guibutton> button after making your selections; hitting enter will toggle a selection, not activate <guibutton>Continue</guibutton>."
-msgstr ""
+msgstr "Ha inkább a billentyűzetet szereted, 2 dolgot kell tudni. A zárt listák kinyitásához (például a földrészenkénti ország választásban használt) a <keycap>+</keycap> és <keycap>-</keycap> használható. A többes választásoknál (például feladat választás) a tab billentyűvel lehet a <guibutton>Tovább</guibutton> gombra lépni a választások után; az enter itt mindig egy adott választást kapcsol, nem a <guibutton>Tovább</guibutton> gombot működteti."
 
 #. Tag: para
 #: random-bits.xml:1041
 #, no-c-format
 msgid "To switch to another console, you will also need to use the <keycap>Ctrl</keycap> key, just as with the X Window System. For example, to switch to VT1 you would use: <keycombo> <keycap>Ctrl</keycap> <keycap>Left Alt</keycap> <keycap>F1</keycap> </keycombo>."
-msgstr ""
+msgstr "Másik konzolra váltáshoz a <keycap>Ctrl</keycap> billentyű is kell, mint az X ablakozó rendszernél. Például a VT1 virtuális terminálra váltás módja: <keycombo> <keycap>Ctrl</keycap> <keycap>Balt Alt</keycap> <keycap>F1</keycap> </keycombo>."
 
 #. Tag: title
 #: random-bits.xml:1052
 #, no-c-format
 msgid "Known issues"
-msgstr ""
+msgstr "Ismert hiba-jelenségek"
 
 #. Tag: para
 #: random-bits.xml:1053
 #, no-c-format
 msgid "Etch is the first release that includes the graphical installer and uses some relatively new technology. There are a few known issues that you may run into during the installation. We expect to be able to fix these issues for the next release of &debian;."
-msgstr ""
+msgstr "Az Etch az 1. olyan kiadás, mely grafikus telepítőt tartalmaz és nagyon friss technológiát használ. Van pár ismert lehetséges hiba, mely előfordulhat telepítéskor, ha arra a grafikus felületet választjuk. A &debian; következő kiadására még ezek is javulnak."
 
 #. Tag: para
 #: random-bits.xml:1063
 #, no-c-format
 msgid "Information on some screens is not nicely formatted into columns as it should be. The most obvious example is the first screen where you select your language. Another example is the main screen of partman."
-msgstr ""
+msgstr "Egyes képernyők adatai talán nem formálnak oly szép oszlopokat, mint kéne. Ez főleg az 1. képernyőnél lehet, ami a nyelv kiválasztása. Egy másik példa a partman fő képernyője."
 
 #. Tag: para
 #: random-bits.xml:1070
 #, no-c-format
 msgid "Typing some characters may not work and in some cases the wrong character may be printed. For example, \"composing\" a character by typing an accent and then the letter over/under which the accent should appear does not work."
-msgstr ""
+msgstr "Egyes karakterek nem működhetnek és elvétve rossz karakterek jelenhetnek meg. Például egy karakter \"összeállítása\" az ékezet majd az alatta/felette lévő karakter gépelése esetén az ékezet esetleg nem jelenik meg."
 
 #. Tag: para
 #: random-bits.xml:1077
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
-msgstr ""
+msgstr "A tapipadok támogatása még nem optimális."
 
 #. Tag: para
 #: random-bits.xml:1082
 #, no-c-format
 msgid "You should not switch to a different console while the installer is busy; this may cause the frontend to crash. The frontend will be restarted automatically, but this may still cause problems with the installation. Switching to another console while the installer is waiting for input should work without causing any problems."
-msgstr ""
+msgstr "Talán nem lehet konzolt váltani, míg a telepítő elfoglalt; ettől összeomolhat a felület. Noha a felület újraindul, még mindig gondok lehetnek a telepítéssel. A konzol-váltás a telepítő várakozásakor bármely pillanatban gond nélkül lehetséges."
 
 #. Tag: para
 #: random-bits.xml:1091
 #, no-c-format
 msgid "Support for creating encrypted partitions is limited as it is not possible to generate a random encryption key. It is possible to set up an encrypted partition using a passphrase as encryption key."
-msgstr ""
+msgstr "A titkosított partíciók létrehozásának támogatása korlátozott, mert nem hozható létre véletlen kulcs. Be lehet állítani titkosított partíciókat jelmondattal."
 
