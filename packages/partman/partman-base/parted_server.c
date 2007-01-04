@@ -517,7 +517,7 @@ set_disk_named(const char *name, PedDisk *disk)
         devices[index].disk = disk;
 }
 
-/* True iff the partition doesn't exist on the storage device */
+/* True if the partition doesn't exist on the storage device */
 bool
 named_partition_is_virtual(const char *name, PedSector start, PedSector end)
 {
