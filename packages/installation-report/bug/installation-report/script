@@ -103,17 +103,19 @@ else
 fi
 getlog status
 
-if [ -e "$logsavedir/messages" ] || [ -e "$logsavedir/syslog" ] || \
-   [ -e "$logsavedir/partman" ]; then
-	gettext "
-Additional installer log files can be included in the report.
-This is generally only necessary for debugging if there was a problem with
-the install."
-	echo
-	yesno "$(gettext "Include additional log files in report? [y/N] ") " nop
-	if [ "$REPLY" = yep ]; then
-		getlog syslog
-		getlog messages
-		getlog partman
-	fi
-fi
+# Commented out as inclusion of these files causes installation reports to
+# not reach the debian-boot list (#403346)
+#if [ -e "$logsavedir/messages" ] || [ -e "$logsavedir/syslog" ] || \
+#   [ -e "$logsavedir/partman" ]; then
+#	gettext "
+#Additional installer log files can be included in the report.
+#This is generally only necessary for debugging if there was a problem with
+#the install."
+#	echo
+#	yesno "$(gettext "Include additional log files in report? [y/N] ") " nop
+#	if [ "$REPLY" = yep ]; then
+#		getlog syslog
+#		getlog messages
+#		getlog partman
+#	fi
+#fi
