@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42929 -->
+<!-- original version: 43730 -->
 
 
   <sect2 arch="x86">
@@ -172,17 +172,17 @@ scaricare e posizionare i file necessari come descritto in
 <!--
 If you intend to use the hard drive only for booting and then
 download everything over the network, you should download the
-<filename>netboot/debian-installer/i386/initrd.gz</filename> file and its
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename> file and its
 corresponding kernel
-<filename>netboot/debian-installer/i386/linux</filename>. This will allow you
+<filename>netboot/debian-installer/&architecture;/linux</filename>. This will allow you
 to repartition the hard disk from which you boot the installer, although you
 should do so with care.
 -->
 
 Se si vuole usare il disco fisso solo per l'avvio e poi scaricare
 tutto il resto dalla rete si dovrebbe scaricare il file
-<filename>netboot/debian-installer/i386/initrd.gz</filename> e il
-relativo kernel <filename>netboot/debian-installer/i386/linux</filename>.
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename> e il
+relativo kernel <filename>netboot/debian-installer/&architecture;/linux</filename>.
 Questo permette di ripartizionare il disco fisso da
 cui è stato avviato l'installatore, anche se questa operazione deve
 essere fatta con molta attenzione.
@@ -250,8 +250,6 @@ Questo è un esempio di <filename>/etc/lilo.conf</filename>:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 <!--
@@ -286,7 +284,7 @@ Trovare il file <filename>menu.lst</filename> nella directory
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -374,7 +372,7 @@ device.  This is done with the <emphasis>root=</emphasis> boot
 argument, giving the device that the ide-floppy driver maps the device
 to. For example, if your LS-120 drive is connected as the first IDE
 device (master) on the second cable, you enter
-<userinput>linux root=/dev/hdc</userinput> at the boot prompt.
+<userinput>install root=/dev/hdc</userinput> at the boot prompt.
 -->
 
 Per installare da una serie di dischetti per il lettore LS-120 (versione
@@ -382,7 +380,7 @@ ATAPI) è necessario specificare qual è il device del lettore. Questo si
 può fare con il parametro d'avvio <emphasis>root=</emphasis> passando il
 nome del device ide che mappa il lettore. Per esempio se il proprio LS-120
 è collegato come dispositivo master sul secondo canale IDE si deve inserire
-al prompt boot <userinput>linux root=/dev/hdc</userinput>.
+al prompt boot <userinput>install root=/dev/hdc</userinput>.
 
 </para><para>
 
@@ -564,8 +562,8 @@ Information on available boot methods and on boot parameters which might
 be useful can be found by pressing <keycap>F2</keycap> through
 <keycap>F8</keycap>. If you add any parameters to
 the boot command line, be sure to type the boot method (the default is
-<userinput>linux</userinput>) and a space before the first parameter (e.g.,
-<userinput>linux fb=false</userinput>).
+<userinput>install</userinput>) and a space before the first parameter (e.g.,
+<userinput>install fb=false</userinput>).
 -->
 
 Le informazioni sui metodi d'avvio disponibili e sui parametri si
@@ -573,8 +571,8 @@ possono ricavare premendo i tasti da <keycap>F2</keycap> a
 <keycap>F8</keycap>. Quando si
 inseriscono dei parametri nella riga di comando assicurarsi di
 lasciare uno spazio fra il metodo di avvio (quello predefinito è
-<userinput>linux</userinput>) e il primo parametro (per esempio
-<userinput>linux fb=false</userinput>).
+<userinput>install</userinput>) e il primo parametro (per esempio
+<userinput>install fb=false</userinput>).
 
 <note><para>
 

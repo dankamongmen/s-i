@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43790 -->
 
 
  <sect1 id="minimum-hardware-reqts">
@@ -32,12 +32,12 @@ parte degli utenti diventa frustrata se ignora questi suggerimenti.
 </para><para arch="x86">
 
 <!--
-A Pentium 100 is the minimum recommended for desktop
-systems, and a Pentium II-300 for a Server.
+A Pentium 4, 1GHz system is the minimum recommended for a desktop
+systems.
 -->
 
-Un Pentium 100 è il minimo raccomandato per un sistemi desktop e un
-Pentium II a 300&nbsp;MHz per un server.
+Un Pentium 4, 1&nbsp;GHz è il sistema minimo raccomandato per un sistema
+desktop.
 
 </para><para arch="m68k">
 
@@ -52,41 +52,38 @@ Potrebbe essere necessario meno spazio su disco di quello indicato.
 </para><para arch="powerpc">
 
 <!--
-Any OldWorld or NewWorld PowerPC can serve well
-as a Desktop System. For servers, a minimum 132-Mhz machine is
-recommended.
+Any OldWorld or NewWorld PowerPC can serve well as a desktop system.
 -->
 
-Qualsiasi sistema PowerPC OldWorld o NewWorld può funzionare come sistema
-desktop. Per i server si raccomanda una macchina da almeno 132&nbsp;MHz.
+Qualsiasi sistema PowerPC OldWorld o NewWorld può essere usato come sistema
+desktop.
 
 </para>
 
 <table>
 <!-- <title>Recommended Minimum System Requirements</title> -->
 <title>Requisiti minimi del sistema raccomandati</title>
-<tgroup cols="3">
+<tgroup cols="4">
 <thead>
 <row>
   <entry><!-- Install Type -->Tipologia d'installazionee</entry>
-  <entry>RAM</entry>
+  <entry><!-- RAM (minimal) -->RAM (minima)</entry>
+  <entry><!-- RAM (recommended) -->RAM (raccomandata></entry>
   <entry><!-- Hard Drive -->Spazio su disco</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
-  <entry>Senza desktop</entry>
-  <entry>24 megabyte</entry>
-  <entry>450 megabyte</entry>
-</row><row>
-  <entry>Con Desktop</entry>
+  <entry><!-- No desktop -->Senza desktop</entry>
   <entry>64 megabyte</entry>
+  <entry>256 megabyte</entry>
   <entry>1 gigabyte</entry>
-</row><row>
-  <entry>Server</entry>
-  <entry>128 megabyte</entry>
-  <entry>4 gigabyte</entry>
+</row><row arch="not-s390">
+  <entry><!-- With Desktop -->Con desktop</entry>
+  <entry>64 megabyte</entry>
+  <entry>512 megabyte</entry>
+  <entry>5 gigabyt</entry>
 </row>
 
 </tbody></tgroup></table>
@@ -94,118 +91,94 @@ desktop. Per i server si raccomanda una macchina da almeno 132&nbsp;MHz.
 <para>
 
 <!--
-Here is a sampling of some common Debian system configurations.
-You can also get an idea of the disk space used by related groups
-of programs by referring to <xref linkend="tasksel-size-list"/>.
+The actual minimum memory requirements are a lot less then the numbers
+listed in this table. Depending on the architecture, it is possible to
+install Debian with as little as 20MB (for s390) to 48MB (for i386 and
+amd64). The same goes for the disk space requirements, especially if you
+pick and choose which applications to install; see
+<xref linkend="tasksel-size-list"/> for additional information on disk
+space requirements.
 -->
 
-Seguono degli esempi di configurazioni tipiche di sistemi Debian. Si
-può avere un'idea dello spazio su disco occupato dai vari gruppi di
-programmi facendo riferimento a <xref linkend="tasksel-size-list"/>.
+I reali requisiti minimi di memoria sono leggermente inferiori rispetto ai
+valori riportati nella tabella. In base all'architettura è possibile
+installare Debian con meno di 20&nbsp;MB (per s390) o di 48&nbsp;MB (per
+i386 e amd64). Lo stesso vale per i riquisiti di spazio su disco, in
+particolare se si sceglie una per una le applicazioni da installare; si
+veda <xref linkend="tasksel-size-list"/> per ulteriori informazioni sui
+requisiti di spazio su disco.
 
-</para>
-<variablelist>
-
-<varlistentry>
- <term>Standard Server</term>
- <listitem><para>
+</para><para arch="not-s390">
 
 <!--
-This is a small server profile, useful for a stripped down server
-which does not have a lot of niceties for shell users.  It includes an
-FTP server, a web server, DNS, NIS, and POP. For these 100MB of disk
-space would suffice, and then you would need to add space
-for any data you serve up.
+It is possible to run a graphical desktop environment on older or
+low-end systems, but in that case it is recommended to install
+a window manager that is less resource-hungry than those of the
+GNOME or KDE desktop environments; alternatives include
+<classname>xfce4</classname>, <classname>icewm</classname> and
+<classname>wmaker</classname>, but there are others to choose from.
 -->
 
-Questo è il profilo per un server di fascia bassa, essenziale, privo di ogni
-raffinatezza per gli utenti con shell. Include un server FTP, un server web
-DNS, NIS e POP. Per tali servizi saranno sufficienti 100&nbsp;MB di spazio
-su disco, cui va aggiunto lo spazio necessario per i dati da gestire.
+Si può usare un ambiente desktop grafico su sistemi più vecchi o meno
+performanti ma in questo caso si raccomanda l'installazione di un
+gestore di finestre meno avido di risorse rispetto a quelli degli ambienti
+desktpo GNOME o KDE; delle alternative sono <classname>xfce4</classname>,
+<classname>icewm</classname> e <classname>wmaker</classname>, ma ne esistono
+anche altre.
 
-</para></listitem>
-</varlistentry>
-
-<varlistentry arch="not-s390">
- <term>Desktop</term>
- <listitem><para>
+</para><para>
 
 <!--
-A standard desktop box, including the X window system, full desktop
-environments, sound, editors, etc.  You'll need about 2GB using the
-standard desktop task, though it can be done in far less.
+It is practically impossible to give general memory or disk space
+requirements for server installations as those very much depend on
+what the server is to be used for.
 -->
 
-Una macchina desktop standard, incluso X Window, ambienti desktop completi,
-suoni, editor ecc. Sono necessari 2&nbsp;GB per il normale task desktop,
-però è possibile lavorare anche con molti pacchetti in meno.
+È praticamente impossibile dare dei requisiti di memoria e spazio su disco
+per le installazioni server dato che questi valori sono molto legati all'uso
+finale del server.
 
-</para></listitem>
-</varlistentry>
-
-<varlistentry arch="not-s390">
- <term>Work Console</term>
- <listitem><para>
-
-<!--
-A more stripped-down user machine, without the X window system or X
-applications.  Possibly suitable for a laptop or mobile computer.  The
-size is around 140MB.
--->
-
-Una macchina per l'utente finale ma più essenziale di quella sopra, senza X
-Window o applicazioni X. È una configurazione adatta forse a un portatile
-o un trasportabile. Le dimensioni sono di circa 140&nbsp;MB.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
- <term>Developer</term>
- <listitem><para>
-
-<!--
-A desktop setup with all the development packages, such as Perl, C,
-C++, etc.  Size is around 475MB.  Assuming you are adding X11 and some
-additional packages for other uses, you should plan around 800MB for
-this type of machine.
--->
-
-Una configurazione desktop con tutti i pacchetti di sviluppo, come Perl, C,
-C++, ecc. per un totale di circa 475&nbsp;MB. Dando per scontato che
-verranno aggiunti X11 e alcuni pacchetti aggiuntivi per altri usi, si
-dovrebbe predisporre circa 800&nbsp;MB per questo tipo di macchina.
-
-</para></listitem>
-</varlistentry>
-
-</variablelist><para>
+</para><para>
 
 <!--
 Remember that these sizes don't include all the other materials which
 are usually to be found, such as user files, mail, and data.  It is
 always best to be generous when considering the space for your own
-files and data.  Notably, the <filename>/var</filename> partition contains
-a lot of state information specific to Debian in addition to its regular
-contents like logfiles.  The
-<command>dpkg</command> files (with information on all installed
-packages) can easily consume 20MB. Also,
-<command>apt-get</command> puts downloaded packages here before they are
-installed. You should
-usually allocate at least 100MB for <filename>/var</filename>.
+files and data.
 -->
 
 Ricordarsi che le dimensioni specificate non includono tutto ciò che si può
 trovare di solito su un sistema, come per esempio i file degli utenti, la
 posta e dati vari. La cosa migliore è tenersi larghi, pensando allo spazio
-necessario per i propri dati. In particolare, la partizione
+necessario per i propri dati.
+
+</para><para>
+
+<!--
+Disk space required for the smooth operation of the &debian; system
+itself is taken into account in these recommended system requirements.
+Notably, the <filename>/var</filename> partition contains
+a lot of state information specific to Debian in addition to its regular
+contents, like logfiles.  The
+<command>dpkg</command> files (with information on all installed
+packages) can easily consume 40MB. Also,
+<command>apt-get</command> puts downloaded packages here before they are
+installed. You should
+usually allocate at least 200MB for <filename>/var</filename>, and a lot
+more if you install a graphical desktop environment.
+-->
+
+Nei seguenti requisiti di sistema è compreso lo spazio su disco
+richiesto dalle normali operazioni del sistema operativo &debian;.
+In particolare, la partizione
 <filename>/var</filename> contiene un sacco di informazioni sullo stato
 specifiche per Debian oltre ai normali file con i log. I file di
 <command>dpkg</command> (che contengono informazioni su tutti i pacchetti
-installati) possono facilmente occupare 20&nbsp;MB. Inoltre
+installati) possono facilmente occupare 40&nbsp;MB. Inoltre
 <command>apt-get</command> mette i pacchetti scaricati in questa directory
-prima di installarli. Di solito si deve assegnare almeno 100&nbsp;MB a
-<filename>/var</filename>.
+prima di installarli. Di solito si deve assegnare almeno 200&nbsp;MB a
+<filename>/var</filename>, un po' di più se si installa anche un ambiente
+desktop grafico.
 
 </para>
  </sect1>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43259 -->
+<!-- original version: 43730 -->
 
 
  <sect1 id="boot-troubleshooting">
@@ -325,9 +325,9 @@ using_dma      1       0       1       rw
 </screen></informalexample>
 
 <!--
--A <quote>1</quote> means it is enabled. If it is, try disabling it:
-+A <quote>1</quote> in the first column after <literal>using_dma</literal>
-+means it is enabled. If it is, try disabling it:-->
+A <quote>1</quote> in the first column after <literal>using_dma</literal>
+means it is enabled. If it is, try disabling it:
+-->
 
 Il valore <quote>1</quote> nella prima colonna dopo
 <literal>using_dma</literal> vuol dire che è attivo; in questo caso
@@ -471,20 +471,6 @@ Se si hanno problemi come blocchi del kernel durante il processo d'avvio,
 la mancata individuazione delle periferiche presenti oppure il non corretto
 riconoscimento dei driver, la prima cosa da controllare sono i parametri di
 avvio, si consulti <xref linkend="boot-parms"/>.
-
-</para><para>
-
-<!--
-If you are booting with your own kernel instead of the one supplied
-with the installer, be sure that <userinput>CONFIG_DEVFS</userinput> is set in
-your kernel.  The installer requires
-<userinput>CONFIG_DEVFS</userinput>.
--->
-
-Se si usa un kernel personalizzato anziché uno di quelli forniti con
-l'installatore assicurarsi che nel proprio kernel sia attiva l'opzione
-<userinput>CONFIG_DEVFS</userinput>; questa impostazione è necessaria
-per l'installatore.
 
 </para><para>
 
@@ -653,8 +639,8 @@ nell'installatore.
    </sect3>
 
    <sect3>
-   <!-- <title>System Freeze while Loading the USB Modules</title> -->
-   <title>Blocchi del sistema durante il caricamento dei moduli USB</title>
+   <!-- <title>System Freeze while Loading USB Modules</title> -->
+   <title>Blocco del sistema durante il caricamento dei moduli USB</title>
 <para>
 
 <!--
@@ -678,6 +664,102 @@ caricamento dei moduli.
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+  <!-- <title>Common &arch-title; Installation Problems</title> -->
+  <title>Problemi comuni di installazione su &arch-title;</title>
+<para>
+
+<!--
+There are some common installation problems that are worth mentioning.
+-->
+
+Si possono verificare dei problemi con l'installazione abbastanza comuni
+che vale la pena ricordare.
+
+</para>
+
+   <sect3>
+   <!-- <title>Misdirected video output</title> -->
+   <title>Output video diretto sulla scheda sbagliata</title>
+<para>
+
+<!--
+It is fairly common for &arch-title; to have two video cards in one machine,
+for example an ATI card and a Sun Creator 3D. In some cases, this may result
+in the video output getting misdirected soon after the system boots. In
+typical cases, the display will only show:
+-->
+
+È abbastanza comune trovare una macchina &arch-title; con due schede video,
+per esempio una scheda ATI e una Sun Creator 3D. In alcuni casi è possibile
+che l'output video sia diretto sulla scheda sbagliata subito dopo l'avvio
+del sistema. Nei casi più comuni sul video appare solo:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+<!--
+To work around this, you can either pull out one of the video cards, or
+disable the one not used during the OpenProm boot phase using a kernel
+parameter. For example, to disable an ATI card, you should boot the
+installer with <userinput>video=atyfb:off</userinput>.
+-->
+
+Una soluzione a questo problema è rimuovere fisicamente una delle schede
+video; un'altra possibilità è disabilitare una delle schede durante la
+fase d'avvio su OpenProm usando un parametro da passare al kernel. Per
+esempio, per disabilitare una scheda ATI si deve avviare l'installatore
+con <userinput>video=atyfb:off</userinput>.
+
+</para><para>
+
+<!--
+Note that you may also have to manually add this parameter to the silo
+configuration (edit <filename>/target/etc/silo.conf</filename> before
+rebooting) and, if you installed X11, modify the video driver in
+<filename>/etc/X11/xorg.conf</filename>.
+-->
+
+Notare che potrebbe essere necessario aggiungere manualmente
+questo parametro alla configurazione di silo (modificare
+<filename>/target/etc/silo.conf</filename> prima del riavvio)
+e, se è installato X11, modificare il driver video in
+<filename>/etc/X11/xorg.conf</filename>.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <!-- <title>Failure to Boot or Install from CD-ROM</title> -->
+   <title>Errori durante l'avvio o l'installazione con CD-ROM</title>
+<para>
+
+<!--
+Some Sparc systems are notoriously difficult to boot from CD-ROM and
+even if they do boot, there may be inexplicable failures during the
+installation. Most problems have been reported with SunBlade systems.
+-->
+
+Alcuni sistemi Sparc sono notoriamente difficoltosi da avviare da CD-ROM e
+anche quando funziona l'avvio si potrebbero poi verificare degli errori
+inspiegabili durante l'installazione. Sono stati segnalati parecchi problemi
+con i sistemi SunBlade.
+
+</para><para>
+
+<!--
+We recommend to install such systems by netbooting the installer.
+-->
+
+Si raccomanda di effettuare l'installazione su questi sistemi avviando
+l'installatore dalla rete.
+
+</para>
+   </sect3>
+  </sect2>
+
   <sect2 id="kernel-msgs">
   <!-- <title>Interpreting the Kernel Startup Messages</title> -->
   <title>Interpretazione dei messaggi di avvio del kernel</title>
@@ -685,12 +767,12 @@ caricamento dei moduli.
 
 <!--
 During the boot sequence, you may see many messages in the form
-<computeroutput>can't find <replaceable>something</replaceable>
-</computeroutput>, or <computeroutput>
-<replaceable>something</replaceable> not present</computeroutput>,
-<computeroutput>can't initialize <replaceable>something</replaceable>
-</computeroutput>, or even <computeroutput>this driver release depends
-on <replaceable>something</replaceable> </computeroutput>.
+<computeroutput>can't find <replaceable>something</replaceable></computeroutput>,
+or <computeroutput><replaceable>something</replaceable>
+not present</computeroutput>, <computeroutput>can't initialize
+<replaceable>something</replaceable></computeroutput>,
+or even <computeroutput>this driver release depends
+on <replaceable>something</replaceable></computeroutput>.
 Most of these messages are harmless. You
 see them because the kernel for the installation system is built to
 run on computers with many different peripheral devices. Obviously, no
@@ -704,12 +786,12 @@ custom kernel later (see <xref linkend="kernel-baking"/>).
 -->
 
 Durante la sequenza d'avvio è possibile vedere molti messaggi simili a
-<computeroutput>can't find <replaceable>XXX</replaceable>
-</computeroutput> o <computeroutput><replaceable>XXX</replaceable>
-not present</computeroutput>, <computeroutput>can't initialize
-<replaceable>XXX</replaceable> </computeroutput> o anche
-<computeroutput>this driver release depends on
-<replaceable>XXX</replaceable> </computeroutput>. La maggior parte di
+<computeroutput>can't find <replaceable>XXX</replaceable></computeroutput>,
+<computeroutput><replaceable>XXX</replaceable> not present</computeroutput>,
+<computeroutput>can't initialize <replaceable>XXX</replaceable></computeroutput>
+o anche
+<computeroutput>this driver release depends on <replaceable>XXX</replaceable></computeroutput>.
+La maggior parte di
 questi messaggi sono innocui, compaiono perché il kernel usato dal sistema
 di installazione è stato compilato per funzionare su macchine con
 periferiche anche molto diverse. Ovviamente nessun computer ha tutte le
@@ -724,23 +806,23 @@ kernel personalizzato (si veda <xref linkend="kernel-baking"/>).
   </sect2>
 
   <sect2 id="problem-report">
-  <!-- <title>Bug Reporter</title> -->
-  <title>Segnalazione di bug</title>
+  <!-- <title>Reporting Installation Problems</title> -->
+  <title>Segnalazione di problemi con l'installazione</title>
 <para>
 
 <!--
-If you get through the initial boot phase but cannot complete the
-install, the bug reporter menu choice may be helpful.
+If you get through the initial boot phase but cannot complete the install,
+the menu option <guimenuitem>Save debug logs</guimenuitem> may be helpful.
 It lets you store system error logs and configuration information from the
-installer to a floppy, or download them in a web browser.
+installer to a floppy, or download them using a web browser.
 This information may provide clues as to what went wrong and how to
 fix it.  If you are submitting a bug report you may want to attach
 this information to the bug report.
 -->
 
 Se si riesce a passare la fase di avvio iniziale ma non si può completare
-l'installazione, la voce "Segnalazione di un problema" del menu potrebbe
-tornare utile.
+l'installazione, la voce <guimenuitem>Salvare i log per il debug</guimenuitem>
+del menu potrebbe tornare utile.
 Essa salverà gli errori dai log di sistema e delle informazioni sulla
 configurazione dall'installatore su un dischetto oppure in un browser web.
 Queste informazioni
@@ -774,7 +856,7 @@ computer è stato avviato con il sistema appena installato.
 If you still have problems, please submit an installation report. We also
 encourage installation reports to be sent even if the installation is
 successful, so that we can get as much information as possible on the largest
-number of hardware configurations.
+number of hardware configurations. 
 -->
 
 Se non si riesce a risolvere qualche problema si invii un rapporto di
@@ -785,28 +867,46 @@ possibili sulle diverse configurazioni hardware.
 </para><para>
 
 <!--
+Note that your installation report will be published in the Debian Bug
+Tracking System (BTS) and forwarded to a public mailing list. Make sure that
+you use an e-mail address that you do not mind being made public.
+-->
+
+Notare che il rapporto di installazione viene pubblicato nel BTS (Bug
+Tracking System) di Debian e inoltrato in una mailing list pubblica; si
+raccomanda di usare un indirizzo email tenendo bene in mente che diventa
+di dominio pubblico.
+
+</para><para>
+
+<!--
 If you have a working Debian system, the easiest way to send an installation
-report is to install the installation-report and reportbug packages
-(<command>apt-get install installation-report reportbug</command>) and run
-the command <command>reportbug installation-report</command>.
+report is to install the <classname>installation-report</classname> and
+<classname>reportbug</classname> packages
+(<command>aptitude install installation-report reportbug</command>),
+configure <classname>reportbug</classname> as explained in
+<xref linkend="mail-outgoing"/>, and run the command <command>reportbug
+installation-report</command>.
 -->
 
 Nel caso si riesca ad avere un sistema Debian funzionante il modo più
 semplice per inviare un rapporto d'installazione è installare i pacchetti
-installation-report e reportbug (<command>apt-get install installation-report
-reportbug</command>) ed eseguire il comando <command>reportbug
+<classname>installation-report</classname> e <classname>reportbug</classname>
+(<command>apt-get install installation-report reportbug</command>),
+configurare <classname>reportbug</classname> come spiegato in
+<xref linkend="mail-outgoing"/> ed eseguire il comando <command>reportbug
 installation-report</command>.
 
 </para><para>
 
 <!--
-Please use this template when filling out
+Alternatively you can use this template when filling out
 installation reports, and file the report as a bug report against the
 <classname>installation-reports</classname> pseudo package, by sending it to
 <email>submit@bugs.debian.org</email>.
 -->
 
-Si prega di usare il seguente
+In alternativa è possibile di usare il seguente
 modello per i rapporti d'installazione e poi di inviarlo come segnalazione di
 bug verso lo pseudopacchetto <classname>installation-reports</classname>
 all'indirizzo <email>submit@bugs.debian.org</email>.

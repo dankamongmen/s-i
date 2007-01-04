@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 43730 -->
 
 
  <sect1 id="boot-parms">
@@ -156,20 +156,35 @@ limiti il kernel si blocca.
 
 </footnote> che possono essere molto utili.
 
+</para><para>
+
+<!--
+A number of parameters have a <quote>short form</quote> that helps avoid
+the limitations of the kernel command line options and makes entering the
+parameters easier. If a parameter has a short form, it will be listed in
+brackets behind the (normal) long form. Examples in this manual will
+normally use the short form too.
+-->
+
+Un parte dei parametri dispone di una <quote>abbreviazione</quote> che
+permette di accorciare un po' la riga di comando contenente le opzioni
+da passare al kernel e di semplificare l'inserimento dei parametri. Per
+i parametri che hanno un'abbreviazione, l'abbreviazione è riportata fra
+parentesi accanto alla forma normale (lunga). Gli esempi in questo
+manuale usano normalmente l'abbreviazione.
+
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 <!--
 This parameter sets the lowest priority of messages to be displayed.
-Short form: <userinput>priority</userinput>
 -->
 
 Questo parametro imposta la priorità oltre la quale sono mostrati i messaggi.
-Abbreviazione: <userinput>priority</userinput>
 
 </para><para>
 
@@ -358,15 +373,14 @@ limitare la scansione a solo un device.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 <!--
 Some architectures use the kernel framebuffer to offer installation in
 a number of languages. If framebuffer causes a problem on your system
 you can disable the feature by the parameter
-<userinput>debian-installer/framebuffer=false</userinput>, or
-<userinput>fb=false</userinput> for short. Problem symptoms are error messages
+<userinput>fb=false</userinput>. Problem symptoms are error messages
 about bterm or bogl, a blank screen, or a freeze within a few minutes after
 starting the install.
 -->
@@ -374,7 +388,6 @@ starting the install.
 Su alcune architetture si usa il framebuffer del kernel per fornire
 l'installazione in più lingue. Se sul proprio sistema il framebuffer
 crea problemi è possibile disabilitarlo usando il parametro
-<userinput>debian-installer/framebuffer=false</userinput>, oppure in breve
 <userinput>fb=false</userinput>. Dei sintomi di questo problema sono dei
 messaggi d'errore riguardo bterm o bogl, lo schermo nero oppure un blocco
 entro pochi minuti dall'inizio dell'installazione.
@@ -431,26 +444,25 @@ abbreviata <userinput>fb=true</userinput>.
 </para></note></listitem>
 </varlistentry>
 
-<varlistentry>
-<term>debian-installer/theme</term>
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
 <listitem><para>
 
 <!--
 A theme determines how the user interface of the installer looks (colors,
 icons, etc.). What themes are available differs per frontend.  Currently
 both the newt and gtk frontends only have a <quote>dark</quote> theme that was
-designed for visually impaired users. Set the theme by booting with parameter
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
-or <userinput>theme=<replaceable>dark</replaceable></userinput>.
+designed for visually impaired users. Set the theme by booting with 
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
 -->
 
 Un tema determina l'aspetto dell'interfaccia utente dell'installatore (colori,
 icone, ecc.); i temi disponibili variano al variare dell'interfaccia.
 Attualmente entrambe le interfacce newt e gtk dispongono solo del tema
 <quote>dark</quote>, adatto agli utenti con problemi visivi. L'impostazione
-del tema si fa tramite il parametro
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
-oppure con <userinput>theme=<replaceable>dark</replaceable></userinput>.
+usando il parametro
+<userinput>theme=<replaceable>dark</replaceable></userinput> all'avvio del
+sistema.
 
 </para></listitem>
 </varlistentry>
@@ -522,53 +534,48 @@ sono famosi per questo malfunzionamento.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 <!--
 Specify the url to a preconfiguration file to download and use in
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>url</userinput>.
 -->
 
 Specifica la url del file di preconfigurazione da scaricare e da usare
 nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
-Abbreviazione: <userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 <!--
 Specify the path to a preconfiguration file to load to
 automating the install. See <xref linkend="automatic-install"/>.
-Short form: <userinput>file</userinput>.
 -->
 
 Specifica il percorso del file di preconfigurazione da caricare e da usare
 nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
-Abbreviazione: <userinput>file</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enabled</term>
+<term>auto-install/enabled (auto)</term>
 <listitem><para>
 
 <!--
 Delay questions that are normally asked before preseeding is possible until
-after the network is configured. Short form: <userinput>auto=true</userinput>
+after the network is configured.
 See <xref linkend="preseed-auto"/> for details about using this to
 automate installs.
 -->
 
 Rimanda le domande che normalmente sono poste prima che sia possibile
 fare la preconfigurazione fino a quando non viene configurata la rete.
-Abbreviazione: <userinput>auto=true</userinput>
 Si vedano in <xref linkend="preseed-auto"/> i dettagli su come usare
 questo parametro per automatizzare l'installazione.
 
@@ -612,16 +619,20 @@ nuovamente l'avvio dal lettore CD dopo l'installazione iniziale.
 </para></listitem>
 </varlistentry>
 
-<varlistentry>
+<varlistentry arch="alpha;m68k;mips;mipsel">
 <term>ramdisk_size</term>
 <listitem><para>
 
 <!--
-If you are using a 2.2.x kernel, you may need to set &ramdisksize;.
+This parameter should already be set to a correct value where needed;
+set it only it you see errors during the boot that indicate the ramdisk
+could not be loaded completely. The value is in kB.
 -->
 
-Se si usa un kernel 2.2.x potrebbe essere necessario impostare
-&ramdisksize;.
+Quando è necessario, questo parametro dovrebbe già essere impostato con
+un valore corretto; impostarlo solo se durante l'avvio si verificano degli
+errori che indicano che il ramdisk non può essere completamente caricato.
+Il valore è in kB.
 
 </para></listitem>
 </varlistentry>
@@ -700,22 +711,44 @@ seguono anche alcuni esempi.
 <variablelist>
 
 <varlistentry>
-<term>debian-installer/locale</term>
+<term>debian-installer/locale (locale)</term>
 <listitem><para>
 
 <!--
 Can be used to set both the language and country for the installation.
 This will only work if the locale is supported in Debian.
-Short form: <userinput>locale</userinput>.
 For example, use <userinput>locale=de_CH</userinput> to select German as
-language and Switserland as country.
+language and Switzerland as country.
 -->
 
 Può essere usato per impostare lingua e paese per l'installazione. Funziona
 solo se il <quote>locale</quote> specificato è supportato da Debian.
-Abbreviazione: <userinput>locale</userinput>.
 Per esempio con <userinput>locale=de_CH</userinput> si imposta il tedesco
 come lingua e la Svizzera come paese.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>anna/choose_modules (modules)</term>
+<listitem><para>
+
+<!--
+Can be used to automatically load installer components that are not loaded
+by default.
+Examples of optional components that may be useful are
+<classname>openssh-client-udeb</classname> (so you can use
+<command>scp</command> during the installation) and
+<classname>ppp-udeb</classname> (which supports PPPoE configuration).
+-->
+
+Può essere usato per caricare automaticamente dei componenti
+dell'installatore che normalmente non sono caricati.
+Per esempio, alcuni dei moduli che possono
+essere utili sono <classname>openssh-client-udeb</classname> (per poter
+usare <command>scp</command> durante l'installazione) e
+<classname>ppp-udeb</classname> (il supporto per la configurazione di
+PPPoE).
 
 </para></listitem>
 </varlistentry>
@@ -736,20 +769,41 @@ forzare la configurazione statica della rete.
 </varlistentry>
 
 <varlistentry>
-<term>tasksel:tasksel/first</term>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+<!--
+By default the installer will use the http protocol to download files from
+Debian mirrors and changing that to ftp is not possible during installations
+at normal priority. By setting this parameter to <userinput>ftp</userinput>,
+you can force the installer to use that protocol instead. Note that you
+cannot select an ftp mirror from a list, you have to enter the hostname
+manually.
+-->
+
+Normalmente l'installatore usa il protocollo http per scaricare i file
+dai mirror Debian e non è possibile cambiare protocollo in ftp quando
+l'installazione avviene con priorità normale. Se si imposta questo parametro
+con il valore <userinput>ftp</userinput>, si forza l'installatore a usare
+questo protocollo. Notare che non si può scegliere un mirror ftp dall'elenco,
+il nomehost deve essere inserito manualmente.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 
 <!--
 Can be used to select tasks that are not available from the interactive task
 list, such as the <literal>kde-desktop</literal> task.
 See <xref linkend="pkgsel"/> for additional information.
-Short form: <userinput>tasks</userinput>.
 -->
 
 Può essere usato per scegliere task che non sono disponibili nel normale
 elenco dei task, per esempio il task <literal>kde-desktop</literal>. Per
 ulteriori informazioni si veda <xref linkend="pkgsel"/>.
-Abbreviazione: <userinput>tasks</userinput>.
 
 </para></listitem>
 </varlistentry>

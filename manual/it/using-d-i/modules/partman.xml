@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 43655 -->
 
 
    <sect3 id="partman">
@@ -17,7 +17,35 @@ Ora è il momento di partizionare i dischi. Se non si ha confidenza con
 il partizionamento, o si desidera conoscere più particolari, si veda
 <xref linkend="partitioning"/>.
 
-</para><para>
+</para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
+
+<!--
+If a hard disk has previously used under Solaris, the partitioner may not
+detect the size of the drive correctly. Creating a new partition table
+does not fix this issue. What does help, is to <quote>zero</quote> the
+first few sectors of the drive:
+-->
+
+Se un disco fisso è stato usato in precedenza sotto Solaris, il sistema di
+partizionamento non è in grado di rilevare correttamente la dimensione del
+disco; inoltre la creazione di una nuova tabella delle partizioni non
+risolve questo problema. Quello che risolve è un azzeramento dei primi
+settori del disco:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+<!--
+Note that this will make any existing data on that disk inaccessible.
+-->
+
+Notare che questo rende inutilizzabili tutti i dati sul disco.
+
+</para></warning>
+<para>
 
 <!--
 First you will be given the opportunity to automatically partition
@@ -354,15 +382,15 @@ trattati nel seguito di questa sezione.
 </para><para>
 
 <!--
-If you select a pristine disk which has neither partitions
-nor free space on it, you will be offered to create a new partition
-table (this is needed so you can create new partitions). After this
-a new line entitled <quote>FREE SPACE</quote> should appear under the
-selected disk.
+If you select a pristine disk which has neither partitions nor free
+space on it, you will be asked if a new partition table should be
+created (this is needed so you can create new partitions). After this,
+a new line entitled <quote>FREE SPACE</quote> should appear in the table
+under the selected disk.
 -->
 
 Se si sceglie un disco nuovo, su cui non è presente nessuna partizione o
-su cui non c'è spazio libero, viene richiesta la creazione di una nuova
+su cui non c'è spazio libero, viene chiesto se si vuole creare una nuova
 tabella delle partizioni (questa operazione è necessaria per poter creare
 delle nuove partizioni). Come conseguenza a questa operazione, sotto il
 disco selezionato, appare una nuova riga intitolata <quote>FREE
@@ -371,56 +399,64 @@ SPACE</quote> (spazio libero).
 </para><para>
 
 <!--
-If you select some free space, you will be offered to create new
-partition. You will have to answer a quick series of questions about
+If you select some free space, you will have the opportunity to create a
+new partition. You will have to answer a quick series of questions about
 its size, type (primary or logical), and location (beginning or end of
-the free space). After this, you will be presented with detailed
-overview of your new partition. There are options like mountpoint,
-mount options, bootable flag, or way of usage. If you don't like the
+the free space). After this, you will be presented with a detailed
+overview of your new partition. The main setting is <guimenuitem>Use
+as:</guimenuitem>, which determines if the partition will have a file
+system on it, or be used for swap, software RAID, LVM, an encrypted
+file system, or not be used at all. Other settings include
+mountpoint, mount options, and bootable flag; which settings are shown
+depends on how the partition is to be used. If you don't like the
 preselected defaults, feel free to change them to your liking. E.g. by
 selecting the option <guimenuitem>Use as:</guimenuitem>, you can
-choose different filesystem for this partition including the
-possibility to use the partition for swap, software RAID, LVM, or not
-use it at all. Other nice feature is the possibility to copy data from
-existing partition onto this one.
+choose a different filesystem for this partition, including options
+to use the partition for swap, software RAID, LVM, or not
+use it at all. Another nice feature is the ability to copy data from
+an existing partition onto this one.
 When you are satisfied with your new partition, select
-<guimenuitem>Done setting up the partition</guimenuitem> and you will be
-thrown back to <command>partman</command>'s main screen.
+<guimenuitem>Done setting up the partition</guimenuitem> and you will
+return to <command>partman</command>'s main screen.
 -->
 
 Quando si seleziona dello spazio libero viene data la possibilità di creare
 una nuova partizione; è necessario rispondere a poche domande sulla sua
 dimensione, il tipo (primaria o logica) e la posizione (all'inizio o alla
 fine dello spazio libero). Poi è visualizzato un dettagliato resoconto della
-nuova partizione. Inoltre è possibile specificare alcune opzioni come il
-mount point, le opzioni di mount, il flag avviabile o il modo d'uso. Se i
-valori predefiniti non sono di proprio gradimento si possono cambiare, per
-esempio selezionando l'opzione <guimenuitem>Usato come:</guimenuitem> si
-può cambiare il file system per la partizione compresa la possibilità di
-usare la partizione come swap, in RAID software, con LVM o non utilizzarla
-affatto. Un'altra comoda funzionalità è la possibilità di copiare i dati
-da una partizione esistente. Quando si è conclusa la configurazione della
-partizione si può selezionare <guimenuitem>Preparazione di questa partizione
-completata</guimenuitem> che permette di ritornare alla schermata principale
-di <command>partman</command>.
+nuova partizione. L'opzione più importante è <guimenuitem>Usato
+come:</guimenuitem>, infatti determina se la partizione deve avere un file
+system oppure se deve essere usata come swap, in RAID software, con LVM,
+con un file system cifrato oppure se non deve essere utilizzata. Inoltre è
+possibile specificare altre opzioni come il punto di mount, le opzioni di
+mount e il flag avviabile; queste opzioni sono visualizzate in base all'uso
+che si intende fare della partizione. Se i valori predefiniti non sono di
+proprio gradimento si possono cambiare, per esempio selezionando l'opzione
+<guimenuitem>Usato come:</guimenuitem> si può cambiare il file system per
+la partizione compresa la possibilità di usare la partizione come swap,
+in RAID software, con LVM o non utilizzarla affatto. Un'altra comoda
+funzionalità è la possibilità di copiare i dati da una partizione
+esistente. Conclusa la configurazione della partizione si può selezionare
+<guimenuitem>Preparazione di questa partizione completata</guimenuitem>
+per ritornare alla schermata principale di <command>partman</command>.
 
 </para><para>
 
 <!--
 If you decide you want to change something about your partition,
 simply select the partition, which will bring you to the partition
-configuration menu. Because this is the same screen like when creating
-a new partition, you can change the same set of options. One thing
+configuration menu. This is the same screen like when creating
+a new partition, so you can change the same settings. One thing
 which might not be very obvious at a first glance is that you can
 resize the partition by selecting the item displaying the size of the
 partition. Filesystems known to work are at least fat16, fat32, ext2,
 ext3 and swap. This menu also allows you to delete a partition.
 -->
 
-Per cambiare qualcosa sulle partizioni si deve selezionare la partizione,
-in questo modo appare il menu di configurazione della partizione. Poiché
-usa la stessa schermata della creazione di una nuova partizione è possibile
-modificare le stesse opzioni. Una delle funzioni possibili ma non ovvia è
+Per cambiare qualcosa sulle partizioni si deve selezionare la partizione, in
+questo modo appare il menu di configurazione della partizione; è la stessa
+schermata della creazione di una nuova partizione dalla quale è possibile
+modificare le stesse impostazioni. Una delle funzioni possibili ma non ovvia è
 la possibilità di ridimensionare la partizione selezionando la voce in cui
 è mostrata la dimensione della partizione. Il ridimensionamento funziona
 almeno sui file system fat16, fat32, ext2, ext3 e swap. Questo menu consente
