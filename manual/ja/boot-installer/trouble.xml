@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43514 -->
+<!-- original version: 43730 -->
 
  <sect1 id="boot-troubleshooting">
  <title>インストールプロセスのトラブルシューティング</title>
@@ -456,19 +456,6 @@ as discussed in <xref linkend="boot-parms"/>.
 </para><para>
 
 <!--
-If you are booting with your own kernel instead of the one supplied
-with the installer, be sure that <userinput>CONFIG_DEVFS</userinput> is set in
-your kernel.  The installer requires
-<userinput>CONFIG_DEVFS</userinput>.
--->
-インストーラから与えられたカーネルではなく、
-自分で作ったカーネルから起動した場合は、
-<userinput>CONFIG_DEVFS</userinput> が設定されていることを確認してください。
-このインストーラには <userinput>CONFIG_DEVFS</userinput> が必要です。
-
-</para><para>
-
-<!--
 Often, problems can be solved by removing add-ons and peripherals, and
 then trying booting again.  <phrase arch="x86">Internal modems, sound
 cards, and Plug-n-Play devices can be especially problematic.</phrase>
@@ -633,7 +620,7 @@ PCMCIA HOWTO のシステムリソースの設定</ulink> にあります。
 
    <sect3>
 <!--
-   <title>System Freeze while Loading the USB Modules</title>
+   <title>System Freeze while Loading USB Modules</title>
 -->
    <title>USB モジュールロード中のシステムフリーズ</title>
 <para>
@@ -662,6 +649,99 @@ USB コントローラを無効にできるかもしれません。
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+<!--
+  <title>Common &arch-title; Installation Problems</title>
+-->
+  <title>一般的な&arch-title; インストール時の問題</title>
+<para>
+
+<!--
+There are some common installation problems that are worth mentioning.
+-->
+以下、言及しておくべき、インストール時の一般的な問題があります。
+
+</para>
+   <sect3>
+<!--
+   <title>Misdirected video output</title>
+-->
+   <title>ビデオ出力先の間違い</title>
+<para>
+
+<!--
+It is fairly common for &arch-title; to have two video cards in one machine,
+for example an ATI card and a Sun Creator 3D. In some cases, this may result
+in the video output getting misdirected soon after the system boots. In
+typical cases, the display will only show:
+-->
+ATI カードと Sun Creator 3D といった、
+1 台のマシンに 2 枚のビデオカードがある構成は、&arch-title; によくあります。
+その場合、システム起動後にビデオ出力先を間違うということがあります。
+典型的なケースは、
+ディスプレイに以下のメッセージしか表示されないといった場合です。
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+<!--
+To work around this, you can either pull out one of the video cards, or
+disable the one not used during the OpenProm boot phase using a kernel
+parameter. For example, to disable an ATI card, you should boot the
+installer with <userinput>video=atyfb:off</userinput>.
+-->
+これに対処するには、ビデオカードを引き抜くか、
+OpenProm ブートフェイズでカーネルパラメータを与え、
+使用しないカードを無効にしてください。
+例えば、ATI カードを無効にするには、
+<userinput>video=atyfb:off</userinput> をインストーラに与えて起動してください。
+
+</para><para>
+
+<!--
+Note that you may also have to manually add this parameter to the silo
+configuration (edit <filename>/target/etc/silo.conf</filename> before
+rebooting) and, if you installed X11, modify the video driver in
+<filename>/etc/X11/xorg.conf</filename>.
+-->
+このパラメータを silo の設定に、手で加えなければならない 
+(再起動の前に <filename>/target/etc/silo.conf</filename> を編集する) 
+ことに注意してください。
+また、X11 をインストールしている場合、
+<filename>/etc/X11/xorg.conf</filename> のビデオドライバを修正してください。
+
+</para>
+   </sect3>
+
+   <sect3>
+<!--
+   <title>Failure to Boot or Install from CD-ROM</title>
+-->
+   <title>起動に失敗ないし CD-ROM からインストール</title>
+<para>
+
+<!--
+Some Sparc systems are notoriously difficult to boot from CD-ROM and
+even if they do boot, there may be inexplicable failures during the
+installation. Most problems have been reported with SunBlade systems.
+-->
+いくつかの Sparc システムは、CD-ROM から起動するのが難しく、
+起動してもインストール時に不可解な失敗をすることが知られています。
+ほとんどの問題は SunBlade システムで報告されています。
+
+</para><para>
+
+<!--
+We recommend to install such systems by netbooting the installer.
+-->
+そのようなシステムでは、インストーラをネットから起動するのをお奨めします。
+
+</para>
+   </sect3>
+  </sect2>
+
   <sect2 id="kernel-msgs">
   <title>カーネルの起動時メッセージの意味</title>
 
@@ -669,12 +749,12 @@ USB コントローラを無効にできるかもしれません。
 
 <!--
 During the boot sequence, you may see many messages in the form
-<computeroutput>can't find <replaceable>something</replaceable>
-</computeroutput>, or <computeroutput>
-<replaceable>something</replaceable> not present</computeroutput>,
-<computeroutput>can't initialize <replaceable>something</replaceable>
-</computeroutput>, or even <computeroutput>this driver release depends
-on <replaceable>something</replaceable> </computeroutput>.
+<computeroutput>can't find <replaceable>something</replaceable></computeroutput>,
+or <computeroutput><replaceable>something</replaceable>
+not present</computeroutput>, <computeroutput>can't initialize
+<replaceable>something</replaceable></computeroutput>,
+or even <computeroutput>this driver release depends
+on <replaceable>something</replaceable></computeroutput>.
 Most of these messages are harmless. You
 see them because the kernel for the installation system is built to
 run on computers with many different peripheral devices. Obviously, no
@@ -687,14 +767,14 @@ takes to boot the system unacceptably long, you can create a
 custom kernel later (see <xref linkend="kernel-baking"/>).
 -->
 ブートシーケンスの途中で、
-<computeroutput>can't find <replaceable>something</replaceable>
-</computeroutput> (〜が見つからない),
- <computeroutput><replaceable>something</replaceable> not present
-</computeroutput> (〜が存在しない),
-<computeroutput>can't initialize <replaceable>something</replaceable>
-</computeroutput> (〜を初期化できない),
-<computeroutput>this driver release depends on <replaceable>something
-</replaceable></computeroutput> (このドライバには〜が必要だ)
+<computeroutput>can't find 
+<replaceable>something</replaceable></computeroutput> (〜が見つからない),
+ <computeroutput><replaceable>something</replaceable> 
+not present</computeroutput> (〜が存在しない),
+<computeroutput>can't initialize 
+<replaceable>something</replaceable></computeroutput> (〜を初期化できない),
+<computeroutput>this driver release depends on 
+<replaceable>something</replaceable></computeroutput> (このドライバには〜が必要だ)
 などのメッセージがたくさん出力されることがあります。
 これらのメッセージのほとんどは無害です。
 これらが出力される理由は、インストールシステムのカーネルが、
@@ -775,24 +855,30 @@ number of hardware configurations.
 <!--
 Note that your installation report will be published in the Debian Bug
 Tracking System (BTS) and forwarded to a public mailing list. Make sure that
-you use an E-Mail address that you do not mind being made public.
+you use an e-mail address that you do not mind being made public.
 -->
 あなたのインストールレポートは、Debian バグ追跡システム (BTS) で公開され、
 公開メーリングリストに転送されることに留意してください。
-必ず、公開されても問題ない E-mail アドレスを使用してください。
+必ず、公開されても問題ない e-mail アドレスを使用してください。
 
 </para><para>
 
 <!--
 If you have a working Debian system, the easiest way to send an installation
-report is to install the installation-report and reportbug packages
-(<command>apt-get install installation-report reportbug</command>) and run
-the command <command>reportbug installation-report</command>.
+report is to install the <classname>installation-report</classname> and
+<classname>reportbug</classname> packages
+(<command>aptitude install installation-report reportbug</command>),
+configure <classname>reportbug</classname> as explained in
+<xref linkend="mail-outgoing"/>, and run the command <command>reportbug
+installation-report</command>.
 -->
 動作する Debian システムがある場合、
 インストールレポートを送る最も簡単な方法は以下のようになります。
-installation-report と reportbug パッケージをインストール
-(<command>apt-get install installation-report reportbug</command>) し、
+<classname>installation-report</classname> と 
+<classname>reportbug</classname> パッケージをインストール
+(<command>aptitude install installation-report reportbug</command>) し、
+<xref linkend="mail-outgoing"/> で説明しているように 
+<classname>reportbug</classname> を設定して、
 <command>reportbug installation-report</command> を実行してください。
 
 </para><para>

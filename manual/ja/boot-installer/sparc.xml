@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 43841 -->
 
   <sect2 arch="sparc" id="boot-tftp"><title>TFTP での起動</title>
 
@@ -15,9 +15,7 @@ machine which is being installed (see
 Use the command <userinput>boot net</userinput> to boot from a TFTP
 and RARP server, or try <userinput>boot net:bootp</userinput> or
 <userinput>boot net:dhcp</userinput> to boot from a TFTP and BOOTP
-or DHCP server. Some older OpenBoot revisions require using
-the device name, such as <userinput>boot le()</userinput>; these
-probably don't support BOOTP nor DHCP.
+or DHCP server.
 -->
 OpenBoot のマシンでは、
 単にインストール対象のマシンでブートモニタに入ってください。
@@ -27,9 +25,6 @@ TFTP と RARP サーバから起動するには、
 TFTP と BOOTP サーバや TFTP と DHCP サーバから起動するには、
 <userinput>boot net:bootp</userinput> や 
 <userinput>boot net:dhcp</userinput> というコマンドを試してください。
-OpenBoot のリビジョンが古いと、<userinput>boot le()</userinput>
-のようにデバイス名を使う必要がある場合もあります。
-これはたぶん BOOTP も DHCP もサポートしないでしょう。
 
 </para>
   </sect2>
@@ -44,28 +39,42 @@ OpenBoot のリビジョンが古いと、<userinput>boot le()</userinput>
 <!--
 Most OpenBoot versions support the <userinput>boot cdrom</userinput>
 command which is simply an alias to boot from the SCSI device on ID 6
-(or the secondary master for IDE based systems). You may have to use
-the actual device name for older OpenBoot versions that don't support
-this special command. Note that some problems have been reported on Sun4m
-(e.g., Sparc 10s and Sparc 20s) systems booting from CD-ROM.
+(or the secondary master for IDE based systems).
 -->
 OpenBoot のほとんどのバージョンは
 <userinput>boot cdrom</userinput> コマンドをサポートしています。
 これは単に ID 6 の SCSI デバイス (あるいは IDE ベースのシステムなら
 セカンダリのマスター) から起動せよ、という命令の別名です。
 この特殊なコマンドをサポートしていないような、
-OpenBoot の古いバージョンでは、
-実際のデバイス名を用いる必要があるかもしれません。
-Sun4m (例: Sparc 10s や Sparc 20s) システムでは、
-CD-ROM からの起動で、いくつか問題が報告されていることに注意してください。
 
 </para>
   </sect2>
 
 
   <sect2 arch="sparc" condition="supports-floppy-boot">
+<!--
+  <title>Booting from Floppies</title>
+-->
   <title>フロッピーからの起動</title>
 <para>
+
+<!--
+Floppy images are currently only available for sparc32, but, for technical
+reasons, not for official releases. (The reason is that they can only be
+built as root, which is not supported by our build daemons.)
+Look under <quote>daily built images</quote> on the
+<ulink url="&url-d-i;">Debian Installer project website</ulink> for links
+to floppy images for sparc32.
+-->
+フロッピーイメージは、現在 sparc32 でしか利用できません。
+また、技術的な問題で公式リリースに含まれていません。
+(これはフロッピーイメージが root でしかビルドできず、
+私たちのビルドデーモンではサポートしていないからです)
+sparc32 用のフロッピーイメージへのリンクは、
+<ulink url="&url-d-i;">Debian Installer project website</ulink> の 
+<quote>daily built images</quote> にあります。
+
+</para><para>
 
 <!--
 To boot from floppy on a Sparc, use
@@ -86,8 +95,6 @@ Stop-A -> OpenBoot: "boot floppy"
 Be warned that the newer Sun4u (ultra) architecture does not support
 floppy booting. A typical error message is <computeroutput>Bad magic
 number in disk label - Can't open disk label package</computeroutput>.
-Furthermore, a number of Sun4c models (such as the IPX) do not support
-the compressed images found on the disks, so also are not supported.
 -->
 注意してほしいのですが、
 新しい Sun4u (ultra) アーキテクチャは
@@ -95,9 +102,6 @@ the compressed images found on the disks, so also are not supported.
 一般的なエラーメッセージは、<computeroutput>Bad magic
 number in disk label - Can't open disk label package</computeroutput>
 となります。
-さらに Sun4c モデルの多く (IPX など) は、
-ディスクの圧縮イメージをサポートしておらず、
-従って起動もサポートしていません。
 
 </para><para>
 

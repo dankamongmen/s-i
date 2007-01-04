@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40811 -->
+<!-- original version: 43782 -->
 
  <sect1 id="install-overview">
 <!--
@@ -207,7 +207,22 @@ Load the newly installed system for the first time.
 </para></listitem>
 </orderedlist>
 
-<para>
+<para condition="gtk">
+
+<!--
+For &arch-title; you have the option of using
+<phrase arch="x86">a</phrase>
+<phrase arch="powerpc">an experimental</phrase>
+graphical version of the installation system. For more information about
+this graphical installer, see <xref linkend="graphical"/>.
+-->
+&arch-title; では、
+グラフィカル<phrase arch="powerpc">実験</phrase>版
+インストールシステムを使用するという選択肢があります。
+グラフィカルインストーラについては、
+<xref linkend="graphical"/> をご覧ください。
+
+</para><para>
 
 <!--
 If you have problems during the installation, it helps to know which
@@ -224,8 +239,10 @@ actors in this installation drama:
 The installer software, <classname>debian-installer</classname>, is
 the primary concern of this manual. It detects hardware and loads
 appropriate drivers, uses <classname>dhcp-client</classname> to set up the
-network connection, and runs <classname>debootstrap</classname> to install
-the base system packages. Many more actors play smaller parts in this process,
+network connection, runs <classname>debootstrap</classname> to install
+the base system packages, and runs <classname>tasksel</classname> to allow
+you to install certain additional software.
+Many more actors play smaller parts in this process,
 but <classname>debian-installer</classname> has completed its task when
 you load the new system for the first time.
 -->
@@ -234,7 +251,9 @@ you load the new system for the first time.
 ハードウェアを検出して適切なドライバをロードし、
 <classname>dhcp-client</classname> を使用してネットワーク接続を設定し、
 基本システムパッケージをインストールするのに 
-<classname>debootstrap</classname> を実行します。
+<classname>debootstrap</classname> を実行し、
+さらに追加ソフトウェアをインストールする 
+<classname>tasksel</classname> を実行します。
 このプロセスで多くの俳優が、より小さな役を演じますが、
 初めて新しいシステムを起動する時に、<classname>debian-installer</classname> 
 はそのタスクを終えることになります。
@@ -253,35 +272,37 @@ Web サーバやデスクトップ環境といった、
 </para><para>
 
 <!--
-When <classname>debian-installer</classname> finishes, before the
-first system load, you have only a very basic command line driven
-system. The graphical interface which displays windows on your monitor
-will not be installed unless you select it with <classname>tasksel</classname>.
-It's optional because many &debian; systems are servers which don't really
-have any need for a graphical user interface to do their job.
+One important option during the installation is whether or not to install
+a graphical desktop environment, consisting of the X11 window system and
+one of the available graphical desktop environments.
+If you choose not to select the <quote>Desktop environment</quote> task,
+you will only have a relatively basic, command line driven system.
+Installing the Desktop environment task is optional because it requires a
+fairly large amount of disk space, and because many &debian; systems are
+servers which don't really have any need for a graphical user interface
+to do their job.
 -->
-初めてシステムを起動する前で、<classname>debian-installer</classname> が
-完了した時には、システムを操作するのに、非常に基本的なコマンドラインしか
-ありません。モニタにウィンドウを表示するようなグラフィカルインターフェースは、
-最終ステップで <classname>tasksel</classname> を使って選択しないと
-インストールされません。
-多くの &debian; システムは、処理を行う上で本当なら
-グラフィカルユーザインターフェースを特に必要としないようなサーバであるため、
-これはオプションとなっています。
+インストール時の重要な選択肢に、X11 window system 
+とグラフィカルデスクトップ環境の 1 つからなる、
+グラフィカルデスクトップ環境をインストールするかどうかがあります。
+<quote>デスクトップ環境</quote> タスクを選択しない場合、
+比較的基本的な、コマンドライン駆動システムになります。
+かなり大きなディスク領域を必要とし、また、多くの &debian; システムは、
+グラフィカルユーザインターフェースを特に必要としないサーバであるため、
+デスクトップ環境タスクはオプションとなっています。
 
 </para><para arch="not-s390">
 
 <!--
-Just be aware that the X system is completely separate from
+Just be aware that the X11 window system is completely separate from
 <classname>debian-installer</classname>, and in fact is much more
 complicated. Installation and trouble shooting of the X window
-installation is not within the scope of this manual.
+system is not within the scope of this manual.
 -->
-X のシステムは、 <classname>debian-installer</classname> とは完全に
+X11 window system は、 <classname>debian-installer</classname> とは完全に
 分かれていて、実際には非常に複雑なことに注意してください。
-X ウィンドウシステムのインストールとトラブルシュートは、
-このマニュアルの想定外です。
+X11 window system のインストールとトラブルシュートは、
+このマニュアルでは扱いません。
 
 </para>
  </sect1>
-
