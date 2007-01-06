@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 43841 -->
 
 <!--
-Be carefull with the format of this file as it is parsed to generate
+Be careful with the format of this file as it is parsed to generate
 the example preconfiguration file.
 このファイルをパースしてサンプル事前設定ファイルを生成するので、
 形式に注意してください。
@@ -495,7 +495,18 @@ To set a value to be used inside &d-i;, just pass
 <userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
 for any of the preseed variables listed in the examples in this appendix.
 If a value is to be used to configure packages for the target system, you
-will need to prepend the <firstterm>owner</firstterm> of the variable as in
+will need to prepend the <firstterm>owner</firstterm><footnote>
+
+<para>
+The owner of a debconf variable (or template) is normally the name of the
+package that contains the corresponding debconf template. For variables
+used in the installer itself the owner is <quote>d-i</quote>.
+Templates and variables can have more than one owner which helps to
+determine whether they can be removed from the debconf database if the
+package is purged.
+</para>
+
+</footnote> of the variable as in
 <userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>.
 If you don't specify the owner, the value for the variable will not be
 copied to the debconf database in the target system and thus remain unused
@@ -505,9 +516,19 @@ during the configuration of the relevant package.
 <userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
 のように本付録の例にある preseed 変数を渡すだけです。
 値がターゲットシステムのパッケージを設定することがある場合、
+<firstterm>owner</firstterm><footnote>
+
+<para>
+debconf 変数 (やテンプレート) の所有者 (owner) は、
+debconf テンプレートに含まれるように、通常パッケージ名です。
+インストーラ自体が使用する値は、<quote>d-i</quote> になっています。
+テンプレートや変数は、複数の owner を持て、パッケージを完全削除する際に 
+debconf データベースから削除できるかどうかを決定するのに利用されます。
+</para>
+
+</footnote> 変数を、あらかじめ用意し、
 <userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>
-で使用するような変数の <firstterm>owner</firstterm> を、
-あらかじめ用意する必要があります。
+で使用する必要があります。
 owner を指定しない場合、
 変数の値はターゲットシステムの debconf データベースにコピーされず、
 関連パッケージの設定中使用されません。
@@ -629,12 +650,12 @@ setup, it would result in the preseed file being retrieved from
 </para><para>
 
 <!--
-The path segment of that comes from
-<literal>auto-install/defaultroot</literal>, which includes the
-directory <literal>etch</literal> by default to allow future versions
-to specify their own codename to let people migrate forwards in a
+The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>)
+is taken from <literal>auto-install/defaultroot</literal>. By default
+this includes the directory <literal>etch</literal> to allow future versions
+to specify their own codename and let people migrate forwards in a
 controlled manner.  The <literal>/./</literal> bit is used to indicate
-a root relative to which subsequent paths can be anchored (for use in
+a root, relative to which subsequent paths can be anchored (for use in
 preseed/include and preseed/run).  This allows files to be specified
 either as full URLs, paths starting with / that are thus anchored, or
 even paths relative to the location where the last preseed file was
@@ -647,9 +668,10 @@ sets <literal>preseed/run</literal> to
 fetched from
 <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
 -->
-このパスセグメントは <literal>auto-install/defaultroot</literal> に由来します。
-ここには、将来のバージョンでコードネームを指定して移行していけるように、
-デフォルトで <literal>etch</literal> ディレクトリが含まれています。
+URL (<literal>d-i/etch/./preseed.cfg</literal>) の最後の部分は、
+<literal>auto-install/defaultroot</literal> から取られています。
+デフォルトでは、将来のバージョンでコードネームを指定して移行していけるように、
+<literal>etch</literal> ディレクトリが含まれています。
 <literal>/./</literal> は、その後に続くパスが確定するように、
 ルートからの相対パスを示します (preseed/include や preseed/run で使用)。
 これにより、完全な URLや / で始まるパス、
@@ -665,17 +687,17 @@ fetched from
 </para><para>
 
 <!--
-If there is no local DHCP or DNS infrastructure, or if you
-do not want to use the default path to the preseed.cfg, you can still
+If there is no local DHCP or DNS infrastructure, or if you do not want to
+use the default path to <filename>preseed.cfg</filename>, you can still
 use an explicit url, and if you don't use the <literal>/./</literal>
-element it will be anchored to the start of the path (i.e. the third /
-in the URL).  Here is an example that requires minimal support from
-the local network infrastructure:
+element it will be anchored to the start of the path (i.e. the third
+<literal>/</literal> in the URL).  Here is an example that requires minimal
+support from the local network infrastructure:
 -->
 手元に DHCP や DNS のインフラがない場合や、
-preseed.cfg のデフォルトパスを使用したくない場合でも、
+<filename>preseed.cfg</filename> のデフォルトパスを使用したくない場合でも、
 きちんとした URL を使用でき、<literal>/./</literal> 要素を使用しない場合は、
-パスの開始点を決定できます (例えば URL の 3 つ目の /)。
+パスの開始点を決定できます (例えば URL の 3 つ目の <literal>/</literal>)。
 以下は、手元のネットワークインフラから最低限必要な物のサンプルです。
 
 <informalexample><screen>
@@ -714,15 +736,15 @@ path is added.
 <!--
 In addition to specifying the url, you can also specify settings that
 do not directly affect the behavior of &d-i; itself, but can be passed
-through to any scripts that might be specified <literal>preseed/run</literal>
-settings in the loaded preseed file.  At present, the only example of
+through to scripts specified using <literal>preseed/run</literal>
+in the loaded preseed file.  At present, the only example of
 this is <literal>auto-install/classes</literal>, which has an alias
 <literal>classes</literal>.  This can be used thus:
 -->
 URL を指定するのに加えて、
 &d-i; 自身の振る舞いには直接影響しない設定も追加できますが、
-読み込んだ preseed ファイルの <literal>preseed/run</literal> 設定で指定した、
-いずれのスクリプトにも渡すことができます。
+読み込んだ preseed ファイルの <literal>preseed/run</literal> で指定した、
+スクリプトに渡すことができます。
 現在のところ、<literal>classes</literal> というエイリアスを持つ、
 <literal>auto-install/classes</literal> のサンプルのみです。
 以下のように使用します。
@@ -825,9 +847,10 @@ The following aliases can be useful when using (auto mode) preseeding.
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
 <row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
 <row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
 <row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
-<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
 <row><entry>suite</entry><entry>mirror/suite</entry></row>
 </tbody></tgroup>
 </informaltable>
@@ -1303,13 +1326,13 @@ d-i netcfg/wireless_wep string
 <para>
 
 <!--
-Depending on the installation method you use, a mirror may be used both to
-download additional components of the installer, the base system and to
-set up the <filename>/etc/apt/sources.list</filename> for the installed
+Depending on the installation method you use, a mirror may be used to
+download additional components of the installer, to install the base system,
+and to set up the <filename>/etc/apt/sources.list</filename> for the installed
 system.
 -->
 使用するインストール方法に依存しますが、
-インストーラの追加コンポーネントのダウンロードや、基本システム、
+インストーラの追加コンポーネントのダウンロードや、基本システムのインストール、
 インストールしたシステムの <filename>/etc/apt/sources.list</filename> の
 セットアップにミラーを使用できます。
 
@@ -1366,8 +1389,8 @@ d-i mirror/http/proxy string
 
 <!--
 Using preseeding to partition the harddisk is very much limited to what is
-supported by <classname>partman-auto</classname>. You can choose to either
-partition existing free space on a disk or a whole disk. The layout of the
+supported by <classname>partman-auto</classname>. You can choose to partition
+either existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preconfiguration file. It is
 currently not possible to partition multiple disks using preseeding.
@@ -1752,8 +1775,8 @@ installation. The only questions asked concern the installation of the kernel.
 # if no other operating system is detected on the machine.
 d-i grub-installer/only_debian boolean true
 
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
 d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
@@ -1837,14 +1860,14 @@ set of packages in some other way. We recommend always including the
 If you want to install some individual packages in addition to packages
 installed by tasks, you can use the parameter
 <classname>pkgsel/include</classname>. The value of this parameter can be
-either comma-separated or space-separated, so you can also use it easily on
-the kernel command line.
+a list of packages separated by either commas or spaces, which allows it
+to be used easily on the kernel command line as well.
 -->
 タスクでインストールするパッケージに加えて、
 特定のパッケージをインストールする場合、
 <classname>pkgsel/include</classname> パラメータを使用できます。
 このパラメータの値は、カーネルコマンドラインにそのまま渡されるので、
-カンマ区切りか空白区切りにしてください。
+カンマか空白で区切ったパッケージのリストを取れます。
 
 </para>
 
@@ -2050,9 +2073,10 @@ settings for certain configurations in other files.
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
+# More than one script can be listed, separated by spaces.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
   </sect2>

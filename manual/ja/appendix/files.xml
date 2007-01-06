@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42302 -->
+<!-- original version: 43841 -->
 
 
  <sect1 id="linuxdevices"><title>Linux のデバイス</title>
@@ -251,33 +251,61 @@ when your mouse only has one button. Just add the following lines to
  Sizes of tasks should be determined by running tasksel with the "new-install"
  option on a system that been fully installed without selecting any tasks. By
  selecting a task together with the "manual selection" option, aptitude will
- be started and show the sizes for the task. Use "cancel panding actions" to
+ be started and show the sizes for the task. Use "cancel pending actions" to
  clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
  d-i・マニュアルメンテナ向け注
  いずれのタスクも選択せずにインストールした状態で tasksel を "new-install" 
  オプションをつけて実行し、タスクのサイズを決定してください。
  "manual selection" オプションを用いてタスクを選択しようとすると、
  aptitude がタスク用に起動して、サイズを示します。
- "cancel panding actions" で選択解除ししてください。
+ "cancel pending actions" で選択解除ししてください。
  必要な空き領域は、aptitude からタスクを選択した時のように、
  tasksel が推奨パッケージをインストールしない状態で決定する必要があります。
+
+ 基本システムのサイズは、'aptitude clean' を実行した後で、
+ 'du -hsx /' で決定するべきです。standard system のサイズは、
+ 同じ方法で "Standard system" タスクのインストール後に決定するべきです。
 -->
 
 <para>
 
 <!--
-The base installation for i386 using the default 2.6 kernel,
-including all standard packages, requires 585MB of disk space.
-A minimal base installation, without the standard task selected,
-will take 365MB.
+A standard installation for the i386 architecture, including all standard
+packages and using the default 2.6 kernel, takes up 442MB of disk space.
+A minimal base installation, without the <quote>Standard system</quote>
+task selected, will take 230MB.
 -->
-デフォルトの 2.6 カーネルを用いた i386 用の基本インストールは、
-全標準パッケージを含めると、585MB のディスク領域が必要です。
-標準タスクを選択しない、最小のベースインストールには、365MB 必要です。
+i386 アーキテクチャの全標準パッケージを含む標準インストールで、
+デフォルトの 2.6 カーネルを用いると、442MB 以上のディスク領域を必要とします。
+<quote>標準システム</quote>タスクを選択しない最小の基本インストールでは、
+230MB 必要でしょう。
 
-</para><para>
+</para>
+<important><para>
+
+<!--
+In both cases this is the actual disk space used <emphasis>after</emphasis>
+the installation is finished and any temporary files deleted. It also does
+not take into account overhead used by the file system, for example for
+journal files. This means that significantly more disk space is needed both
+<emphasis>during</emphasis> the installation and for normal system use.
+-->
+どちらの場合も、
+インストールが完了し一時ファイルを削除した<emphasis>後</emphasis>の、
+実際のディスク領域です。ジャーナルファイルのような、
+ファイルシステムのオーバーヘッドで消費される量は含まれていません。
+これは、インストールの<emphasis>最中</emphasis>や通常のシステム利用では、
+もっと大量にディスク領域が必要だということです。
+
+</para></important>
+<para>
 
 <!--
 The following table lists sizes reported by aptitude for the tasks listed
@@ -295,15 +323,17 @@ aptitude が報告したサイズです。
 
 <!--
 Note that you will need to add the sizes listed in the table to the size
-of the base installation when determining the size of partitions.
+of the standard installation when determining the size of partitions.
 Most of the size listed as <quote>Installed size</quote> will end up in
-<filename>/usr</filename>; the size listed as <quote>Download size</quote>
+<filename>/usr</filename> and in <filename>/lib</filename>;
+the size listed as <quote>Download size</quote>
 is (temporarily) required in <filename>/var</filename>.
 -->
-パーティションのサイズを決定するとき、基本インストールのサイズに加え、
+パーティションのサイズを決定するとき、標準インストールのサイズに加え、
 以下の表に列挙したサイズが必要であるのに注意してください。
-<quote>Installed size</quote> はインストール完了時に <filename>/usr</filename>
-に必要なサイズを、<quote>Download size</quote> は <filename>/var</filename> に
+<quote>Installed size</quote> はインストール完了時に 
+<filename>/usr</filename> と <filename>/lib</filename> に必要なサイズを、
+<quote>Download size</quote> は <filename>/var</filename> に
 (一時的に) 必要なサイズを記述しています。
 
 </para><para>
@@ -327,22 +357,36 @@ is (temporarily) required in <filename>/var</filename>.
 <tbody>
 <row>
 <!--
-  <entry>Desktop</entry>
+  <entry>Desktop environment</entry>
 -->
-  <entry>デスクトップ</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>デスクトップ環境</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
 <!--
-  <entry>Laptop</entry>
+  <entry>Laptop<footnote>
+
+  <para>
+  There is a large overlap of the Laptop task with the Destop environment task.
+  If you install both, the Laptop task will only require a few MB additional
+  disk space.
+  </para>
 -->
-  <entry>ラップトップ</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+  <entry>ラップトップ<footnote>
+
+  <para>
+  ラップトップタスクとデスクトップタスクはかなり重複しています。
+  両方インストールした場合、ラップトップタスクはディスク領域を、
+  数 MB 追加で必要とするだけでしょう
+  </para>
+
+  </footnote></entry>
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -360,9 +404,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>Print server</entry>
 -->
   <entry>印刷サーバ</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
@@ -380,9 +424,9 @@ is (temporarily) required in <filename>/var</filename>.
   <entry>File server</entry>
 -->
   <entry>ファイルサーバ</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
 <row>
@@ -425,12 +469,12 @@ GNOME デスクトップ環境をインストールします。
 If you install in a language other than English, <command>tasksel</command>
 may automatically install a <firstterm>localization task</firstterm>, if one
 is available for your language. Space requirements differ per language;
-you should allow up to 200MB in total for download and installation.
+you should allow up to 350MB in total for download and installation.
 -->
 英語以外の言語でインストールする場合、その言語が有効なら 
 <command>tasksel</command> は <firstterm>地域化タスク</firstterm> を、
 自動的にインストールします。
 必要な容量は言語によって異なりますが、
-ダウンロードとインストールで最大 200MB 必要となります。
+ダウンロードとインストールで最大 350MB 必要となります。
 </para>
  </sect1>
