@@ -1,10 +1,15 @@
 #!/bin/sh
 QUEUE=/var/lib/register-module
+BLACKLIST=0
 ADD_TO_INITRD=0
 TYPE=options
 PARAMS_ONLY=0
 ADD_PARAMS=1
 
+if [ "$1" = "-b" ]; then
+	BLACKLIST=1
+	shift 1
+fi
 if [ "$1" = "-i" ]; then
 	ADD_TO_INITRD=1
 	shift 1
@@ -26,11 +31,26 @@ MODULE=$1
 shift
 PARAMS="$@"
 
+BLACKLISTFILE=$QUEUE/$MODULE.blacklist
 LOADFILE=$QUEUE/$MODULE.load
 INITRDFILE=$QUEUE/$MODULE.initrd
 PARAMFILE=$QUEUE/$MODULE.params
 
+if [ -d /etc/modprobe.d ] && [ ! -e /etc/modprobe.conf ]; then
+	MODPROBE_OPT=/etc/modprobe.d/local
+	MODPROBE_BL=/etc/modprobe.d/blacklist.local
+else
+	MODPROBE_OPT=/etc/modprobe.conf
+	MODPROBE_BL=/etc/modprobe.conf
+fi
+
 mkdir -p $QUEUE
+if [ "$BLACKLIST" = 1 ]; then
+	touch $BLACKLISTFILE
+	echo "blacklist $MODULE" >> $MODPROBE_BL
+	exit 0
+fi
+
 if [ "$PARAMS_ONLY" = 0 ]; then
 	if [ "$ADD_TO_INITRD" = 1 ]; then
 		touch $INITRDFILE
@@ -50,7 +70,7 @@ if [ -n "$PARAMS" ]; then
 	echo "$TYPE:$PARAMS" >> $PARAMFILE
 
 	if [ "$TYPE" = options ]; then
-		for file in /etc/modules.conf /etc/modprobe.conf; do
+		for file in /etc/modules.conf $MODPROBE_OPT; do
 			if [ -e "$file" ]; then
 				grep -v "options $MODULE " $file > $file.new
 				mv $file.new $file

@@ -6,7 +6,7 @@ MODUTILSDIR=/target/etc/modprobe.d/
 
 create () {
 	if [ ! -e $1 ]; then
-		echo "# Local modules settings." > $1
+		echo "# Local module settings" > $1
 		echo "# Created by the Debian installer" >> $1
 		echo "" >> $1
 	fi
@@ -43,6 +43,16 @@ for QUEUEFILE in $QUEUE/*.params; do
 		esac
 	done < $QUEUEFILE
 	IFS=$OLDIFS
+	rm $QUEUEFILE
+done
+
+FILE=$MODUTILSDIR/blacklist.local
+for QUEUEFILE in $QUEUE/*.blacklist; do
+	[ ! -e $QUEUEFILE ] && break
+	MODULE=$(basename $QUEUEFILE ".blacklist")
+
+	create $FILE
+	echo "blacklist $MODULE" >> $FILE
 	rm $QUEUEFILE
 done
 
