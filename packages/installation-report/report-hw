@@ -15,18 +15,19 @@ addfile () {
 }
 
 list_loaded_modules () {
-	cd /sys/bus/pci/devices
-	for address in *; do
+	for address in /sys/bus/pci/devices/*; do
 		if [ -d "$address/driver/module" ]; then
 			module=$(basename "$(readlink $address/driver/module)")
 			if grep -q "^$module " /proc/modules; then
-				address=$(echo $address | sed s/0000://)
-				echo "$(lspci -n -s $address | tail -n 1 | cut -d ' ' -f 3) $module"
+				address=$(basename "$address" | sed s/0000://)
+				echo "$(lspci -n -s "$address" | tail -n 1 | cut -d ' ' -f 3) $module"
 			fi
 		fi
 	done
 }
 
+list_loaded_modules
+exit 0
 uname -a 2>&1 | addinfo "umame -a"
 
 if type lspci >/dev/null 2>&1; then
