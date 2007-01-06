@@ -510,5 +510,33 @@ to use the BNC (coax) connector and IRQ 10, you would pass:
 
 </para>
    </sect3>
+
+   <sect3 id="module-parms"><title>Blacklisting kernel modules</title>
+<para>
+
+Sometimes it may be necessary to blacklist a module to prevent it from
+being loaded automatically by the kernel and udev. One reason could be that
+a particular module causes problems with your hardware. The kernel also
+sometimes lists two different drivers for the same device. This can cause
+the device to not work correctly if the drivers conflict or if the wrong
+driver is loaded first.
+
+</para><para>
+
+You can blacklist a module using the following syntax:
+<userinput><replaceable>module_name</replaceable>.blacklist=yes</userinput>.
+This will cause the module to be blacklisted in
+<filename>/etc/modprobe.d/blacklist.local</filename> both during the
+installation and for the installed system.
+
+</para><para>
+
+Note that a module may still be loaded by the installation system itself.
+You can prevent that from happening by running the installation in expert
+mode and unselecting the module from the list of modules displayed during
+the hardware detection phases.
+
+</para>
+   </sect3>
   </sect2>
  </sect1>
