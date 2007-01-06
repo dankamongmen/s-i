@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42302 -->
+<!-- original version: 43841 -->
 
 
  <sect1 id="linuxdevices"><title>Linux-Geräte</title>
@@ -197,18 +197,35 @@ folgenden Zeilen zur Datei <filename>/etc/sysctl.conf</filename> hinzu.
  Sizes of tasks should be determined by running tasksel with the "new-install"
  option on a system that been fully installed without selecting any tasks. By
  selecting a task together with the "manual selection" option, aptitude will
- be started and show the sizes for the task. Use "cancel panding actions" to
+ be started and show the sizes for the task. Use "cancel pending actions" to
  clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
 -->
 
-Eine Basis-Installation für i386 unter Verwendung des 2.6-Kernels (dies
-ist der Standardkernel) inklusive aller Standard-Pakete benötigt
-585MB Festplattenspeicher. Eine minimale Basisinstallation ohne die
-Programmgruppe Standard benötigt 365MB.
+Eine Standard-Installation für die i386-Architektur inklusive aller
+Standardpakete und mit Verwendung des standardmäßigen 2.6-Kernels benötigt
+442MB Festplattenplatz. Eine minimale Basisinstallation ohne die Programmgruppe
+<quote>Standard-System</quote> belegt 230MB.
+</para>
+<important><para>
 
-</para><para>
+In beiden Fällen ist dies der benötigte Platz auf der Platte,
+<emphasis>nachdem</emphasis> die Installation beendet ist und alle temporären
+Dateien gelöscht wurden. Ebenfalls ist der vom Dateisystem genutzte Overhead
+nicht mit eingerechnet, zum Beispiel für die Journal-Dateien. Dies bedeutet,
+dass noch bedeutend mehr Festplattenplatz benötigt wird, und zwar sowohl
+<emphasis>während</emphasis> der Installation wie auch später bei der normalen
+Nutzung des Systems.
+
+</para></important>
+<para>
+
 
 Die folgende Tabelle listet die Größe der Programmgruppen auf (die Sie in
 tasksel auswählen können), wie Sie von aptitude angegeben wird. Beachten Sie,
@@ -219,11 +236,12 @@ der einzelnen Werte.
 </para><para>
 
 Bedenken Sie, dass Sie zu den Angaben aus der Liste noch die Größe der
-Basis-Installation hinzurechnen müssen, wenn es darum geht, die benötigte
+Standard-Installation hinzurechnen müssen, wenn es darum geht, die benötigte
 Größe der Partitionen abzuschätzen. Von dem, was unter <quote>Größe
 nach der Installation</quote> aufgeführt ist, wird das meiste in
-<filename>/usr</filename> landen; die Werte unter <quote>Herunterzuladende
-Größe</quote> werden (vorübergehend) in <filename>/var</filename> benötigt.
+<filename>/usr</filename> und <filename>/lib</filename> landen; die Werte
+unter <quote>Herunterzuladende Größe</quote> werden (vorübergehend) in
+<filename>/var</filename> benötigt.
  
 </para><para>
 
@@ -241,16 +259,24 @@ Größe</quote> werden (vorübergehend) in <filename>/var</filename> benötigt.
 <tbody>
 <row>
   <entry>Arbeitsplatzrechner</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
-  <entry>Laptop</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+  <entry>Laptop<footnote>
+  
+  <para>
+   Es gibt eine erhebliche Überschneidung der Programmgruppe Laptop mit
+   der für Arbeitsplatzrechner. Wenn Sie beide installieren, benötigt Laptop
+   nur ein paar MB zusätzlich.
+  </para>
+
+  </footnote></entry>
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -262,9 +288,9 @@ Größe</quote> werden (vorübergehend) in <filename>/var</filename> benötigt.
 
 <row>
   <entry>Print-Server</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
@@ -276,9 +302,9 @@ Größe</quote> werden (vorübergehend) in <filename>/var</filename> benötigt.
 
 <row>
   <entry>Datei-Server</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
 <row>
@@ -311,7 +337,7 @@ Falls Sie bei der Sprachauswahl nicht Englisch gewählt haben, installiert
 <command>tasksel</command> möglicherweise automatisch eine Programmgruppe
 für die Lokalisierung, falls diese für Ihre Sprache verfügbar ist.
 Der Speicherbedarf differiert abhängig von der Sprache; Sie sollten insgesamt
-bis zu 200MB für das Herunterladen und die Installation vorsehen.
+bis zu 350MB für das Herunterladen und die Installation vorsehen.
 
 </para>
  </sect1>

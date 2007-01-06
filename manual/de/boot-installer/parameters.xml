@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43730 -->
+<!-- original version: 43912 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -497,7 +497,8 @@ Siehe <xref linkend="pkgsel"/> für zusätzliche Informationen.
 
    </sect3>
 
-   <sect3 id="module-parms"><title>Parameter für Kernelmodule angeben</title>
+   <sect3 id="module-parms">
+   <title>Parameter für Kernelmodule angeben</title>
 <para>
 
 Wenn Treiber in den Kernel einkompiliert sind, können Sie Parameter für
@@ -536,6 +537,37 @@ verwendet wird, nutzen Sie dies:
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
 </screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Kernel-Module als gesperrt markieren</title>
+<para>
+
+Manchmal könnte es nötig sein, ein Modul als gesperrt zu markieren, um zu
+verhindern, dass es automatisch vom Kernel und von udev geladen wird. Ein
+Grund dafür könnte sein, dass ein spezielles Modul Probleme mit Ihrer Hardware
+verursacht. Außerdem listet der Kernel manchmal zwei verschiedene Treiber für
+das gleiche Gerät. Dies könnte zu inkorrekter Funktion des Gerätes führen,
+falls der Treiber zu einem Konflikt führt oder der falsche Treiber zuerst
+geladen wird.
+
+</para><para>
+
+Sie können mit der folgenden Syntax ein Modul als gesperrt markieren:
+<userinput><replaceable>Modul-Name</replaceable>.blacklist=yes</userinput>.
+Das führt dazu, dass das Modul in
+<filename>/etc/modprobe.d/blacklist.local</filename> eingetragen wird; es
+wird sowohl für die Installation wie auch später für das installierte System
+gesperrt.
+
+</para><para>
+
+Beachten Sie, dass das Modul trotzdem noch vom Installationssystem selbst
+geladen werden könnte. Sie können dies verhindern, indem Sie die Installation
+im Expert-Modus durchführen und das Modul in den Listen der zu ladenden Module
+(während der Hardware-Erkennung) deaktivieren.
 
 </para>
    </sect3>
