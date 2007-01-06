@@ -253,7 +253,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 			break;
 		}
 	}
-	
+
 	if (! ret) {
 		/* This could happen because of a debconf protocol problem
 		 * (for example, leading whitespace in menu items can
@@ -261,7 +261,8 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		 * problem. */
 		di_log(DI_LOG_LEVEL_WARNING, "Internal error! Cannot find \"%s\" in menu.", s);
 	}
-	
+
+	free(menu);
 	free(package_array);
 
 	return ret;
