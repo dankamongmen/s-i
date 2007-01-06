@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40542 -->
+<!-- original version: 43789 -->
 
  <sect2 arch="alpha" id="alpha-firmware">
  <title>Alpha Console-Firmware</title>
@@ -15,9 +15,9 @@ sind auch zwei Arten von Konsolen-Firmware verfügbar:
 <itemizedlist>
 <listitem><para>
 
-  <emphasis>SRM Console</emphasis> basiert auf der Alpha Console Subsystem-Spezifikation,
-  die eine Betriebsumgebung für OpenVMS, Tru64 UNIX und Linux-Betriebssysteme
-  zur Verfügung stellt.
+  <emphasis>SRM Console</emphasis> basiert auf der Alpha Console
+  Subsystem-Spezifikation, die eine Betriebsumgebung für OpenVMS, Tru64 UNIX
+  und Linux-Betriebssysteme zur Verfügung stellt.
 
 </para></listitem>
 <listitem><para>
@@ -56,8 +56,8 @@ DOS-Partitionstabelle.
 </para>
 
 </footnote> zu MS-DOS-Partitionstabellen. Da Tru64 Unix das
-BSD-Disklabel-Format benutzt, ist dies das <quote>native</quote> Partitionsformat
-für SRM-Installationen.
+BSD-Disklabel-Format benutzt, ist dies das <quote>native</quote>
+Partitionsformat für SRM-Installationen.
 
 </para><para>
 
@@ -193,13 +193,13 @@ SRM-Konsole gibt es <command>aboot</command>, einen kleinen,
 plattform-unabhängigen Bootloader. Sehen Sie sich auch das (leider veraltete)
 <ulink url="&url-srm-howto;">SRM-Firmware-HowTo</ulink> an.
 
-<!-- </para><para condition="FIXME"> -->
-<!-- commented out outdated paragraphs - H. Wansing
+</para><para condition="FIXME">
 
-Die folgenden Kapitel stammen aus dem Woody-Installationshandbuch und
+<!--obsolet - MILO -->
+Die folgenden 5 Abschnitte stammen aus dem Woody-Installationshandbuch und
 sind hier nur als Referenz eingefügt; vielleicht sind Sie zu einem späteren
-Zeitpunkt mal nützlich, wenn Debian zu einem späteren Zeitpunkt evtl. wieder
-MILO-basierte Installationen unterstützt.
+Zeitpunkt mal nützlich, wenn Debian evtl. wieder MILO-basierte Installationen
+unterstützt. Sie sind aktuell für &releasename-cap; nicht anwendbar.
 
 </para><para condition="FIXME">
 
@@ -243,14 +243,18 @@ Produktion (seit Februar 2000) verfügbar ist und weil es nicht mehr
 nötig ist, eine OpenVMS- oder Tru64 Unix-Lizenz zu kaufen, um
 SRM-Firmware für ältere Alpha-Systeme zu bekommen, wird empfohlen,
 dass Sie SRM und <command>aboot</command> für GNU/Linux-Installationen
-benutzen, außer Sie haben ein Dual-Boot-System mit Windows NT. -->
+benutzen, außer Sie haben ein Dual-Boot-System mit Windows NT.
+
+</para><para condition="FIXME">
+
+Ende der (überholten) Kapitel aus Woody.
 
 </para><para>
 
 Die Mehrzahl von AlphaServer-Systemen und aller aktuellen Server und
 Workstations enthalten sowohl SRM wie auch AlphaBIOS in ihrer Firmware.
-Bei <quote>half-flash</quote>-Maschinen wie den verschiedenen Evaluation-Boards ist
-es möglich, zwischen den beiden Versionen umzuschalten, indem man die
+Bei <quote>half-flash</quote>-Maschinen wie den verschiedenen Evaluation-Boards
+ist es möglich, zwischen den beiden Versionen umzuschalten, indem man die
 Firmware neu flasht. Auch ist es möglich, ARC/AlphaBIOS von einer
 Floppy zu starten, wenn SRM einmal installiert ist (benutzen Sie dazu den
 <command>arc</command>-Befehl). Aus den bereits erwähnten Gründen
@@ -301,8 +305,8 @@ Stellen Sie jetzt sicher, dass der richtige Medientyp eingestellt ist:
 &gt;&gt;&gt; set ewa0_mode <replaceable>mode</replaceable>
 </screen></informalexample>
 
-Mit <userinput>&gt;&gt;&gt;set ewa0_mode</userinput> bekommen Sie eine Liste der
-möglichen Modi.
+Mit <userinput>&gt;&gt;&gt;set ewa0_mode</userinput> bekommen Sie eine Liste
+der möglichen Modi.
 
 </para><para>
 
@@ -320,8 +324,8 @@ enthalten sind.
 Wollen Sie eine serielle Konsole benutzen, <emphasis>müssen</emphasis>
 Sie dem Kernel den Parameter <userinput>console=</userinput> übergeben.
 Dies wird mit dem <userinput>-flags</userinput>-Argument gemacht, das zum
-SRM-<userinput>boot</userinput>-Kommando hinzugefügt wird. Die seriellen Ports sind
-wie die entsprechenden Dateien in <userinput>/dev</userinput> benannt.
+SRM-<userinput>boot</userinput>-Kommando hinzugefügt wird. Die seriellen Ports
+sind wie die entsprechenden Dateien in <userinput>/dev</userinput> benannt.
 Wenn Sie zusätzliche Kernelparameter verwenden, müssen Sie bestimmte
 Standardoptionen ebenfalls mit angeben, die von den &d-i;-Images
 benötigt werden. Ein Beispiel: um von <userinput>ewa0</userinput>
@@ -338,13 +342,26 @@ müssen Sie eintippen:
   <sect2 arch="alpha"><title>Booten von CD-ROM mit der SRM-Konsole</title>
 <para>
 
-Tippen Sie
+Die &debian;-Installations-CDs enthalten verschiedene vorkonfigurierte
+Boot-Optionen für VGA und serielle Konsole. Tippen Sie
 
 <informalexample><screen>
 &gt;&gt;&gt; boot xxxx -flags 0
 </screen></informalexample>
 
-ein, wobei <replaceable>xxxx</replaceable> die SRM-Bezeichnung Ihres CD-ROM-Laufwerk ist.
+ein, um mittels VGA-Konsole zu booten, wobei <replaceable>xxxx</replaceable>
+die SRM-Bezeichnung Ihres CD-ROM-Laufwerk ist. Um die serielle Konsole auf
+dem ersten seriellen Port zu nutzen, tippen Sie folgendes ein:
+
+<informalexample><screen>
+&gt;&gt;&gt; boot xxxx -flags 1
+</screen></informalexample>
+
+Und für die Konsole auf dem zweiten seriellen Port dies:
+
+<informalexample><screen>
+&gt;&gt;&gt; boot xxxx -flags 2
+</screen></informalexample>
 
 </para>
   </sect2>
@@ -357,9 +374,9 @@ Um per ARC-Konsole von CD-ROM zu booten, finden Sie den Codenamen Ihrer
 Unterarchitektur heraus (lesen Sie dazu <xref linkend="alpha-cpus"/>);
 geben Sie dann <filename>\milo\linload.exe</filename> als Bootloader
 und <filename>\milo\<replaceable>subarch</replaceable></filename>
-als Betriebssystem-Pfad (<quote>OS Path</quote>) im <quote>OS Selection Setup</quote>-Menü ein
-(wobei <replaceable>subarch</replaceable> der korrekte Name Ihrer
-Unterarchitektur ist). Ruffian-Maschinen bilden eine Ausnahme:
+als Betriebssystem-Pfad (<quote>OS Path</quote>) im <quote>OS Selection
+Setup</quote>-Menü ein (wobei <replaceable>subarch</replaceable> der korrekte
+Name Ihrer Unterarchitektur ist). Ruffian-Maschinen bilden eine Ausnahme:
 hier müssen Sie <filename>\milo\ldmilo.exe</filename> als Bootloader
 eintragen.
 
@@ -423,14 +440,20 @@ erreichen. Lesen Sie dazu <xref linkend="booting-from-milo"/>.
 
 Im Betriebssystem-Auswahlmenü (<quote>OS Selection menu</quote>) stellen Sie
 <command>linload.exe</command> als Bootloader ein und <command>milo</command>
-als Betriebssystem-Pfad (<quote>OS Path</quote>). Bootstrap benutzt dann den neu
-erstellten Eintrag.
+als Betriebssystem-Pfad (<quote>OS Path</quote>). Bootstrap benutzt dann den
+neu erstellten Eintrag.
 
 </para>
   </sect2>
 
  <sect2 arch="alpha" condition="FIXME" id="booting-from-milo"><title>Booten mit MILO</title>
 <para>
+
+<!-- obsolet - MILO -->
+Dieser Abschnitt ist überholt und stammt aus dem Installationshandbuch
+für Woody. Er ist derzeit für &releasename-cap; nicht anwendbar.
+
+</para><para>
 
 MILO (auf dem Boot-Medium enthalten) ist konfiguriert, direkt nach
 Linux durchzustarten. Wenn Sie hier eingreifen wollen, müssen Sie
