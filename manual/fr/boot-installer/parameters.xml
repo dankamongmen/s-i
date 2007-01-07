@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version:  43730 -->
+<!-- original version:  43912 -->
 
  <sect1 id="boot-parms"><title>Paramètres d'amorçage</title>
 <para>
@@ -279,8 +279,8 @@ On peut empêcher la recherche de périphériques USB avec le paramètre
 
 L'installateur Debian recherche automatiquement la configuration du réseau 
 avec DHCP. Si la recherche réussit, vous n'aurez plus la possibilité de vérifier
-et de modifier les valeurs obtenues. Vous pouvez obtenir la configuration manuelle du réseau
-que si la recherche avec DHCP a échoué.
+et de modifier les valeurs obtenues. Vous ne pouvez configurer vous-même
+le réseau que si la recherche avec DHCP a échoué.
 	  </para>
 <para>
 
@@ -295,8 +295,8 @@ indiquer vous-même les valeurs.
 <term>hw-detect/start_pcmcia</term>
 <listitem><para>
 
-Fixez ce paramètre à <userinput>false</userinput> pour empêcher de démarrer
-les services PCMCIA. Certains portables connaissent des problèmes avec les
+Fixez ce paramètre à <userinput>false</userinput> pour empêcher le démarrage
+des services PCMCIA. Certains portables connaissent des problèmes avec les
 PCMCIA.
 	  </para></listitem>
 </varlistentry>
@@ -305,7 +305,7 @@ PCMCIA.
 <term>preseed/url (url)</term>
 <listitem><para>
 
-Indique l'adresse du fichier de préconfiguration à télécharger pour
+Indique l'url d'un fichier de préconfiguration à télécharger pour
 automatiser l'installation. Voyez la <xref linkend="automatic-install"/>.
 
 </para></listitem>
@@ -475,7 +475,8 @@ Voyez <xref linkend="pkgsel"/> pour des précisions.
 
    </sect3>
 
-<sect3 id="module-parms"><title>Passer des paramètres aux modules du noyau</title>
+<sect3 id="module-parms">
+<title>Passer des paramètres aux modules du noyau</title>
 <para>
 
 Selon la documentation du noyau Linux, il est possible de passer des paramètres
@@ -510,5 +511,33 @@ connecteur BNC (coax) et l'IRQ 10&nbsp;:
 
 </para>
   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Interdire des modules du noyau</title>
+<para>
+
+Il est parfois nécessaire de mettre un module dans une liste noire pour
+empêcher son chargement automatique par le noyau et udev. Il se peut par exemple que
+tel module pose des problèmes à tel matériel. Le noyau peut aussi lister deux
+pilotes différents pour le même périphérique. Si les pilotes s'excluent ou si le
+mauvais pilote est chargé en premier, le périphérique ne fonctionnera pas
+correctement.
+</para>
+<para>
+
+Voici comment créer cette liste noire&nbsp;:
+<userinput><replaceable>module_name</replaceable>.blacklist=yes</userinput>.
+Le module sera listé dans le fichier <filename>/etc/modprobe.d/blacklist.local</filename>
+et sera interdit à la fois pendant l'installation et pour le système installé.
+</para>
+<para>
+
+Il faut noter que le système d'installation peut toujours charger
+le module. Vous pouvez l'empêcher en faisant une installation en mode
+<emphasis>expert</emphasis> et en désélectionnant le module dans la liste des
+modules qui est affiché pendant la phase de détection du matériel.
+</para>
+</sect3>
+
 </sect2>
 </sect1>
