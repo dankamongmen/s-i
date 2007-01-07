@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-04 06:04+0000\n"
+"POT-Creation-Date: 2007-01-07 13:24+0000\n"
 "PO-Revision-Date: 2006-10-31 21:52+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
@@ -1178,9 +1178,9 @@ msgid ""
 "</screen></informalexample> Enter your nameserver(s) and search directives "
 "in <filename>/etc/resolv.conf</filename>: <informalexample><screen>\n"
 "# editor /etc/resolv.conf\n"
-"</screen></informalexample> A simple <filename>/etc/resolv.conf</filename>: "
-"<informalexample><screen>\n"
-"search hqdom.local\\000\n"
+"</screen></informalexample> A simple example <filename>/etc/resolv.conf</"
+"filename>: <informalexample><screen>\n"
+"search hqdom.local\n"
 "nameserver 10.1.1.36\n"
 "nameserver 192.168.9.100\n"
 "</screen></informalexample> Enter your system's host name (2 to 63 "
@@ -1374,21 +1374,6 @@ msgstr ""
 #: random-bits.xml:667
 #, no-c-format
 msgid ""
-"If you intend to use <classname>grub</classname> as your bootloader, you can "
-"set the <literal>do_bootloader</literal> option to <quote>no</quote>. To "
-"automatically update your <filename>/boot/grub/menu.lst</filename> on "
-"installation or removal of Debian kernels, add the following lines: "
-"<informalexample><screen>\n"
-"postinst_hook = update-grub\n"
-"postrm_hook   = update-grub\n"
-"</screen></informalexample> For the <classname>lilo</classname> bootloader, "
-"the value of <literal>do_bootloader</literal> needs to be <quote>yes</quote>."
-msgstr ""
-
-#. Tag: para
-#: random-bits.xml:679
-#, no-c-format
-msgid ""
 "Then install the kernel package of your choice using its package name. "
 "<informalexample><screen>\n"
 "# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
@@ -1399,13 +1384,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:693
+#: random-bits.xml:681
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Boot Loader 的设置"
 
 #. Tag: para
-#: random-bits.xml:694
+#: random-bits.xml:682
 #, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1418,7 +1403,7 @@ msgstr ""
 "loader，因此您要在 Debian 的 chroot 中使用 <command>aptitude</command> 完成。"
 
 #. Tag: para
-#: random-bits.xml:701
+#: random-bits.xml:689
 #, fuzzy, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
@@ -1439,13 +1424,13 @@ msgstr ""
 "它就会用哪个系统里的 <filename>lilo.conf</filename> )。"
 
 #. Tag: para
-#: random-bits.xml:713
+#: random-bits.xml:701
 #, no-c-format
 msgid ""
 "Installing and setting up <classname>grub</classname> is as easy as: "
 "<informalexample><screen>\n"
 "# aptitude install grub\n"
-"# grub-install /dev/<replaceable>hda</replaceable>\n"
+"# grub-install --recheck --no-floppy /dev/<replaceable>hda</replaceable>\n"
 "# update-grub\n"
 "</screen></informalexample> The second command will install <command>grub</"
 "command> (in this case in the MBR of <literal>hda</literal>). The last "
@@ -1454,13 +1439,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:723
+#: random-bits.xml:711
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "下面有一个简单的<filename>/etc/lilo.conf</filename> 作为例子："
 
 #. Tag: screen
-#: random-bits.xml:727
+#: random-bits.xml:715
 #, fuzzy, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1480,7 +1465,31 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:729
+#: random-bits.xml:717
+#, no-c-format
+msgid ""
+"Depending on which bootloader you selected, you can now make some additional "
+"changes in <filename>/etc/kernel-img.conf</filename>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:722
+#, no-c-format
+msgid ""
+"For the <classname>grub</classname> bootloader, you should set the "
+"<literal>do_bootloader</literal> option to <quote>no</quote>. And to "
+"automatically update your <filename>/boot/grub/menu.lst</filename> on "
+"installation or removal of Debian kernels, add the following lines: "
+"<informalexample><screen>\n"
+"postinst_hook = update-grub\n"
+"postrm_hook   = update-grub\n"
+"</screen></informalexample> For the <classname>lilo</classname> bootloader, "
+"the value of <literal>do_bootloader</literal> needs to remain <quote>yes</"
+"quote>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:734
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1498,7 +1507,7 @@ msgstr ""
 "filename> )。"
 
 #. Tag: para
-#: random-bits.xml:739
+#: random-bits.xml:744
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1528,13 +1537,13 @@ msgstr ""
 "userinput> 换成 <userinput>hd:</userinput>。"
 
 #. Tag: title
-#: random-bits.xml:752
+#: random-bits.xml:757
 #, no-c-format
 msgid "Finishing touches"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:753
+#: random-bits.xml:758
 #, no-c-format
 msgid ""
 "As mentioned earlier, the installed system will be very basic. If you would "
@@ -1547,7 +1556,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:764
+#: random-bits.xml:769
 #, no-c-format
 msgid ""
 "After the installation there will be a lot of downloaded packages in "
@@ -1556,19 +1565,19 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:770
+#: random-bits.xml:775
 #, no-c-format
 msgid "# aptitude clean"
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:781
+#: random-bits.xml:786
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "通过 Parallel Line IP (PLIP) 来安装 &debian;"
 
 #. Tag: para
-#: random-bits.xml:783
+#: random-bits.xml:788
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1581,7 +1590,7 @@ msgstr ""
 "具有 Debian 镜像的网络(例如，互联网)。"
 
 #. Tag: para
-#: random-bits.xml:791
+#: random-bits.xml:796
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1595,7 +1604,7 @@ msgstr ""
 "IP 地址(这些地址在您的网络地址空间里面未被占用)。"
 
 #. Tag: para
-#: random-bits.xml:799
+#: random-bits.xml:804
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1606,7 +1615,7 @@ msgstr ""
 "linkend=\"boot-new\"/>)。"
 
 #. Tag: para
-#: random-bits.xml:804
+#: random-bits.xml:809
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1618,13 +1627,13 @@ msgstr ""
 "为 <literal>io=0x378</literal>，<literal>irq=7</literal>。"
 
 #. Tag: title
-#: random-bits.xml:814
+#: random-bits.xml:819
 #, no-c-format
 msgid "Requirements"
 msgstr "需求"
 
 #. Tag: para
-#: random-bits.xml:817
+#: random-bits.xml:822
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1632,13 +1641,13 @@ msgid ""
 msgstr "目标计算机，称为 <emphasis>target</emphasis>，将安装 Debian 在上面。"
 
 #. Tag: para
-#: random-bits.xml:823
+#: random-bits.xml:828
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr "系统安装介质；参阅 <xref linkend=\"installation-media\"/>。"
 
 #. Tag: para
-#: random-bits.xml:828
+#: random-bits.xml:833
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1647,7 +1656,7 @@ msgstr ""
 "另外一台连接到互联网的计算机，称为 <emphasis>source</emphasis>，功能是网关。"
 
 #. Tag: para
-#: random-bits.xml:834
+#: random-bits.xml:839
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1658,13 +1667,13 @@ msgstr ""
 "Install-HOWTO</ulink> 了解这种线的更多信息，以及如何自己制作。"
 
 #. Tag: title
-#: random-bits.xml:846
+#: random-bits.xml:851
 #, no-c-format
 msgid "Setting up source"
 msgstr "建立源"
 
 #. Tag: para
-#: random-bits.xml:847
+#: random-bits.xml:852
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1674,7 +1683,7 @@ msgstr ""
 "算机。"
 
 #. Tag: screen
-#: random-bits.xml:852
+#: random-bits.xml:857
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1716,13 +1725,13 @@ msgstr ""
 "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 #. Tag: title
-#: random-bits.xml:858
+#: random-bits.xml:863
 #, no-c-format
 msgid "Installing target"
 msgstr "安装目标"
 
 #. Tag: para
-#: random-bits.xml:859
+#: random-bits.xml:864
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1746,13 +1755,13 @@ msgstr ""
 "</screen></informalexample> 下面是安装过程中各阶段所要提供的答案。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:878
+#: random-bits.xml:883
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr "从光盘加载安装组件"
 
 #. Tag: para
-#: random-bits.xml:880
+#: random-bits.xml:885
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1762,13 +1771,13 @@ msgstr ""
 "用 PLIP 驱动。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:888
+#: random-bits.xml:893
 #, no-c-format
 msgid "Detect network hardware"
 msgstr "侦测网络硬件"
 
 #. Tag: para
-#: random-bits.xml:893
+#: random-bits.xml:898
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1781,7 +1790,7 @@ msgstr ""
 "系统没有网卡，安装程序不会显示该列表。"
 
 #. Tag: para
-#: random-bits.xml:902
+#: random-bits.xml:907
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1792,29 +1801,29 @@ msgstr ""
 "<userinput>plip</userinput> 模块。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:914
+#: random-bits.xml:919
 #, no-c-format
 msgid "Configure the network"
 msgstr "配置网络"
 
 #. Tag: para
-#: random-bits.xml:917
+#: random-bits.xml:922
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr "Auto-configure network with DHCP: No"
 
 #. Tag: para
-#: random-bits.xml:922
-#, no-c-format
-msgid ""
-"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr ""
-"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-
-#. Tag: para
 #: random-bits.xml:927
 #, no-c-format
 msgid ""
+"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgstr ""
+"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+
+#. Tag: para
+#: random-bits.xml:932
+#, no-c-format
+msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
 "userinput>"
 msgstr ""
@@ -1822,7 +1831,7 @@ msgstr ""
 "userinput>"
 
 #. Tag: para
-#: random-bits.xml:933
+#: random-bits.xml:938
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
@@ -1832,13 +1841,13 @@ msgstr ""
 "resolv.conf</filename>)"
 
 #. Tag: title
-#: random-bits.xml:952
+#: random-bits.xml:957
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:953
+#: random-bits.xml:958
 #, no-c-format
 msgid ""
 "The graphical version of the installer is only available for a limited "
@@ -1848,7 +1857,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:961
+#: random-bits.xml:966
 #, no-c-format
 msgid ""
 "Although the functionality is identical, the graphical installer still has a "
@@ -1860,7 +1869,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:970
+#: random-bits.xml:975
 #, no-c-format
 msgid ""
 "The graphical installer is available with all CD images and with the hd-"
@@ -1873,7 +1882,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:980
+#: random-bits.xml:985
 #, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
@@ -1885,7 +1894,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:994
+#: random-bits.xml:999
 #, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
@@ -1897,7 +1906,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1007
+#: random-bits.xml:1012
 #, no-c-format
 msgid ""
 "The graphical installer requires significantly more memory to run than the "
@@ -1907,7 +1916,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1014
+#: random-bits.xml:1019
 #, no-c-format
 msgid ""
 "You can add boot parameters when starting the graphical installer, just as "
@@ -1917,13 +1926,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:1024
+#: random-bits.xml:1029
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1025
+#: random-bits.xml:1030
 #, no-c-format
 msgid ""
 "As already mentioned, the graphical installer basically works the same as "
@@ -1932,7 +1941,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1031
+#: random-bits.xml:1036
 #, no-c-format
 msgid ""
 "If you prefer using the keyboard over the mouse, there are two things you "
@@ -1945,7 +1954,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1041
+#: random-bits.xml:1046
 #, no-c-format
 msgid ""
 "To switch to another console, you will also need to use the <keycap>Ctrl</"
@@ -1955,13 +1964,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:1052
+#: random-bits.xml:1057
 #, no-c-format
 msgid "Known issues"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1053
+#: random-bits.xml:1058
 #, no-c-format
 msgid ""
 "Etch is the first release that includes the graphical installer and uses "
@@ -1971,7 +1980,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1063
+#: random-bits.xml:1068
 #, no-c-format
 msgid ""
 "Information on some screens is not nicely formatted into columns as it "
@@ -1980,7 +1989,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1070
+#: random-bits.xml:1075
 #, no-c-format
 msgid ""
 "Typing some characters may not work and in some cases the wrong character "
@@ -1989,13 +1998,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1077
+#: random-bits.xml:1082
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1082
+#: random-bits.xml:1087
 #, no-c-format
 msgid ""
 "You should not switch to a different console while the installer is busy; "
@@ -2006,7 +2015,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1091
+#: random-bits.xml:1096
 #, no-c-format
 msgid ""
 "Support for creating encrypted partitions is limited as it is not possible "

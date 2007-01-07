@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-04 06:04+0000\n"
+"POT-Creation-Date: 2007-01-07 13:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -896,8 +896,8 @@ msgid ""
       "#     gateway 192.168.0.1\n"
       "</screen></informalexample> Enter your nameserver(s) and search directives in <filename>/etc/resolv.conf</filename>: <informalexample><screen>\n"
       "# editor /etc/resolv.conf\n"
-      "</screen></informalexample> A simple <filename>/etc/resolv.conf</filename>: <informalexample><screen>\n"
-      "search hqdom.local\\000\n"
+      "</screen></informalexample> A simple example <filename>/etc/resolv.conf</filename>: <informalexample><screen>\n"
+      "search hqdom.local\n"
       "nameserver 10.1.1.36\n"
       "nameserver 192.168.9.100\n"
       "</screen></informalexample> Enter your system's host name (2 to 63 characters): <informalexample><screen>\n"
@@ -1011,58 +1011,48 @@ msgstr ""
 #: random-bits.xml:667
 #, no-c-format
 msgid ""
-      "If you intend to use <classname>grub</classname> as your bootloader, you can set the <literal>do_bootloader</literal> option to <quote>no</quote>. To automatically update your <filename>/boot/grub/menu.lst</filename> on installation or removal of Debian kernels, add the following lines: <informalexample><screen>\n"
-      "postinst_hook = update-grub\n"
-      "postrm_hook   = update-grub\n"
-      "</screen></informalexample> For the <classname>lilo</classname> bootloader, the value of <literal>do_bootloader</literal> needs to be <quote>yes</quote>."
-msgstr ""
-
-#. Tag: para
-#: random-bits.xml:679
-#, no-c-format
-msgid ""
       "Then install the kernel package of your choice using its package name. <informalexample><screen>\n"
       "# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>\n"
       "</screen></informalexample> If you did not create a <filename>/etc/kernel-img.conf</filename> before installing a pre-packaged kernel, you may be asked some questions during its installation that refer to it."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:693
+#: random-bits.xml:681
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:694
+#: random-bits.xml:682
 #, no-c-format
 msgid "To make your &debian; system bootable, set up your boot loader to load the installed kernel with your new root partition. Note that <command>debootstrap</command> does not install a boot loader, though you can use <command>aptitude</command> inside your Debian chroot to do so."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:701
+#: random-bits.xml:689
 #, no-c-format
 msgid "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</userinput> for instructions on setting up the bootloader. If you are keeping the system you used to install Debian, just add an entry for the Debian install to your existing grub <filename>menu.lst</filename> or <filename>lilo.conf</filename>. For <filename>lilo.conf</filename>, you could also copy it to the new system and edit it there. After you are done editing, call <command>lilo</command> (remember it will use <filename>lilo.conf</filename> relative to the system you call it from)."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:713
+#: random-bits.xml:701
 #, no-c-format
 msgid ""
       "Installing and setting up <classname>grub</classname> is as easy as: <informalexample><screen>\n"
       "# aptitude install grub\n"
-      "# grub-install /dev/<replaceable>hda</replaceable>\n"
+      "# grub-install --recheck --no-floppy /dev/<replaceable>hda</replaceable>\n"
       "# update-grub\n"
       "</screen></informalexample> The second command will install <command>grub</command> (in this case in the MBR of <literal>hda</literal>). The last command will create a sane and working <filename>/boot/grub/menu.lst</filename>."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:723
+#: random-bits.xml:711
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:727
+#: random-bits.xml:715
 #, no-c-format
 msgid ""
       "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1075,13 +1065,29 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:729
+#: random-bits.xml:717
+#, no-c-format
+msgid "Depending on which bootloader you selected, you can now make some additional changes in <filename>/etc/kernel-img.conf</filename>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:722
+#, no-c-format
+msgid ""
+      "For the <classname>grub</classname> bootloader, you should set the <literal>do_bootloader</literal> option to <quote>no</quote>. And to automatically update your <filename>/boot/grub/menu.lst</filename> on installation or removal of Debian kernels, add the following lines: <informalexample><screen>\n"
+      "postinst_hook = update-grub\n"
+      "postrm_hook   = update-grub\n"
+      "</screen></informalexample> For the <classname>lilo</classname> bootloader, the value of <literal>do_bootloader</literal> needs to remain <quote>yes</quote>."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:734
 #, no-c-format
 msgid "Check <userinput>man yaboot.conf</userinput> for instructions on setting up the bootloader. If you are keeping the system you used to install Debian, just add an entry for the Debian install to your existing <filename>yaboot.conf</filename>. You could also copy it to the new system and edit it there. After you are done editing, call ybin (remember it will use <filename>yaboot.conf</filename> relative to the system you call it from)."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:739
+#: random-bits.xml:744
 #, no-c-format
 msgid ""
       "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: <informalexample><screen>\n"
@@ -1097,13 +1103,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:752
+#: random-bits.xml:757
 #, no-c-format
 msgid "Finishing touches"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:753
+#: random-bits.xml:758
 #, no-c-format
 msgid ""
       "As mentioned earlier, the installed system will be very basic. If you would like to make the system a bit more mature, there is an easy method to install all packages with <quote>standard</quote> priority: <informalexample><screen>\n"
@@ -1112,91 +1118,91 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:764
+#: random-bits.xml:769
 #, no-c-format
 msgid "After the installation there will be a lot of downloaded packages in <filename>/var/cache/apt/archives/</filename>. You can free up some diskspace by running:"
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:770
+#: random-bits.xml:775
 #, no-c-format
 msgid "# aptitude clean"
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:781
+#: random-bits.xml:786
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:783
+#: random-bits.xml:788
 #, no-c-format
 msgid "This section explains how to install &debian; on a computer without an Ethernet card, but with just a remote gateway computer attached via a Null-Modem cable (also called Null-Printer cable). The gateway computer should be connected to a network that has a Debian mirror on it (e.g. to the Internet)."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:791
+#: random-bits.xml:796
 #, no-c-format
 msgid "In the example in this appendix we will set up a PLIP connection using a gateway connected to the Internet over a dial-up connection (ppp0). We will use IP addresses 192.168.0.1 and 192.168.0.2 for the PLIP interfaces on the target system and the source system respectively (these addresses should be unused within your network address space)."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:799
+#: random-bits.xml:804
 #, no-c-format
 msgid "The PLIP connection set up during the installation will also be available after the reboot into the installed system (see <xref linkend=\"boot-new\"/>)."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:804
+#: random-bits.xml:809
 #, no-c-format
 msgid "Before you start, you will need to check the BIOS configuration (IO base address and IRQ) for the parallel ports of both the source and target systems. The most common values are <literal>io=0x378</literal>, <literal>irq=7</literal>."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:814
+#: random-bits.xml:819
 #, no-c-format
 msgid "Requirements"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:817
+#: random-bits.xml:822
 #, no-c-format
 msgid "A target computer, called <emphasis>target</emphasis>, where Debian will be installed."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:823
+#: random-bits.xml:828
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:828
+#: random-bits.xml:833
 #, no-c-format
 msgid "Another computer connected to the Internet, called <emphasis>source</emphasis>, that will function as the gateway."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:834
+#: random-bits.xml:839
 #, no-c-format
 msgid "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;\">PLIP-Install-HOWTO</ulink> for more information on this cable and instructions how to make your own."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:846
+#: random-bits.xml:851
 #, no-c-format
 msgid "Setting up source"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:847
+#: random-bits.xml:852
 #, no-c-format
 msgid "The following shell script is a simple example of how to configure the source computer as a gateway to the Internet using ppp0."
 msgstr ""
 
 #. Tag: screen
-#: random-bits.xml:852
+#: random-bits.xml:857
 #, no-c-format
 msgid ""
       "#!/bin/sh\n"
@@ -1217,13 +1223,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:858
+#: random-bits.xml:863
 #, no-c-format
 msgid "Installing target"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:859
+#: random-bits.xml:864
 #, no-c-format
 msgid ""
       "Boot the installation media. The installation needs to be run in expert mode; enter <userinput>expert</userinput> at the boot prompt. If you need to set parameters for kernel modules, you also need to do this at the boot prompt. For example, to boot the installer and set values for the <quote>io</quote> and <quote>irq</quote> options for the parport_pc module, enter the following at the boot prompt: <informalexample><screen>\n"
@@ -1232,175 +1238,175 @@ msgid ""
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:878
+#: random-bits.xml:883
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:880
+#: random-bits.xml:885
 #, no-c-format
 msgid "Select the <userinput>plip-modules</userinput> option from the list; this will make the PLIP drivers available to the installation system."
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:888
+#: random-bits.xml:893
 #, no-c-format
 msgid "Detect network hardware"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:893
+#: random-bits.xml:898
 #, no-c-format
 msgid "If target <emphasis>does</emphasis> have a network card, a list of driver modules for detected cards will be shown. If you want to force &d-i; to use plip instead, you have to deselect all listed driver modules. Obviously, if target doesn't have a network card, the installer will not show this list."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:902
+#: random-bits.xml:907
 #, no-c-format
 msgid "Because no network card was detected/selected earlier, the installer will ask you to select a network driver module from a list. Select the <userinput>plip</userinput> module."
 msgstr ""
 
 #. Tag: guimenuitem
-#: random-bits.xml:914
+#: random-bits.xml:919
 #, no-c-format
 msgid "Configure the network"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:917
+#: random-bits.xml:922
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:922
+#: random-bits.xml:927
 #, no-c-format
 msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:927
+#: random-bits.xml:932
 #, no-c-format
 msgid "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:933
+#: random-bits.xml:938
 #, no-c-format
 msgid "Name server addresses: you can enter the same addresses used on source (see <filename>/etc/resolv.conf</filename>)"
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:952
+#: random-bits.xml:957
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:953
+#: random-bits.xml:958
 #, no-c-format
 msgid "The graphical version of the installer is only available for a limited number of architectures, including &arch-title;. The functionality of the graphical installer is essentially the same as that of the regular installer as it basically uses the same programs, but with a different frontend."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:961
+#: random-bits.xml:966
 #, no-c-format
 msgid "Although the functionality is identical, the graphical installer still has a few significant advantages. The main advantage is that it supports more languages, namely those that use a character set that cannot be displayed with the regular <quote>newt</quote> frontend. It also has a few usability advantages such as the option to use a mouse, and in some cases several questions can be displayed on a single screen."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:970
+#: random-bits.xml:975
 #, no-c-format
 msgid "The graphical installer is available with all CD images and with the hd-media installation method. As the graphical installer uses a separate (much larger) initrd than the regular installer, it has to be booted using <userinput>installgui</userinput> instead of <userinput>install</userinput>. Analogous, the expert and rescue modes are booted using <userinput>expertgui</userinput> and <userinput>rescuegui</userinput> respectively."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:980
+#: random-bits.xml:985
 #, no-c-format
 msgid "It is also available as a special <quote>mini</quote> ISO image<footnote id=\"gtk-miniiso\"> <para> The mini ISO image can be downloaded from a Debian mirror as described in <xref linkend=\"downloading-files\"/>. Look for <quote>gtk-miniiso</quote>. </para> </footnote>, which is mainly useful for testing; in this case the image is booted just using <userinput>install</userinput>. There is no graphical installer image that can be netbooted."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:994
+#: random-bits.xml:999
 #, no-c-format
 msgid "For &arch-title;, currently only an experimental <quote>mini</quote> ISO image is available<footnote id=\"gtk-miniiso\"> <para> The mini ISO image can be downloaded from a Debian mirror as described in <xref linkend=\"downloading-files\"/>. Look for <quote>gtk-miniiso</quote>. </para> </footnote>. It should work on almost all PowerPC systems that have an ATI graphical card, but is unlikely to work on other systems."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1007
+#: random-bits.xml:1012
 #, no-c-format
 msgid "The graphical installer requires significantly more memory to run than the regular installer: &minimum-memory-gtk;. If insufficient memory is available, it will automatically fall back to the regular <quote>newt</quote> frontend."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1014
+#: random-bits.xml:1019
 #, no-c-format
 msgid "You can add boot parameters when starting the graphical installer, just as with the regular installer. One of those parameters allows you to configure the mouse for left-handed use. See <xref linkend=\"boot-parms\"/> for valid parameters."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:1024
+#: random-bits.xml:1029
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1025
+#: random-bits.xml:1030
 #, no-c-format
 msgid "As already mentioned, the graphical installer basically works the same as the regular installer and thus the rest of this manual can be used to guide you through the installation process."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1031
+#: random-bits.xml:1036
 #, no-c-format
 msgid "If you prefer using the keyboard over the mouse, there are two things you need to know. To expand a collapsed list (used for example for the selection of countries within continents), you can use the <keycap>+</keycap> and <keycap>-</keycap> keys. For questions where more than one item can be selected (e.g. task selection), you first need to tab to the <guibutton>Continue</guibutton> button after making your selections; hitting enter will toggle a selection, not activate <guibutton>Continue</guibutton>."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1041
+#: random-bits.xml:1046
 #, no-c-format
 msgid "To switch to another console, you will also need to use the <keycap>Ctrl</keycap> key, just as with the X Window System. For example, to switch to VT1 you would use: <keycombo> <keycap>Ctrl</keycap> <keycap>Left Alt</keycap> <keycap>F1</keycap> </keycombo>."
 msgstr ""
 
 #. Tag: title
-#: random-bits.xml:1052
+#: random-bits.xml:1057
 #, no-c-format
 msgid "Known issues"
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1053
+#: random-bits.xml:1058
 #, no-c-format
 msgid "Etch is the first release that includes the graphical installer and uses some relatively new technology. There are a few known issues that you may run into during the installation. We expect to be able to fix these issues for the next release of &debian;."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1063
+#: random-bits.xml:1068
 #, no-c-format
 msgid "Information on some screens is not nicely formatted into columns as it should be. The most obvious example is the first screen where you select your language. Another example is the main screen of partman."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1070
+#: random-bits.xml:1075
 #, no-c-format
 msgid "Typing some characters may not work and in some cases the wrong character may be printed. For example, \"composing\" a character by typing an accent and then the letter over/under which the accent should appear does not work."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1077
+#: random-bits.xml:1082
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1082
+#: random-bits.xml:1087
 #, no-c-format
 msgid "You should not switch to a different console while the installer is busy; this may cause the frontend to crash. The frontend will be restarted automatically, but this may still cause problems with the installation. Switching to another console while the installer is waiting for input should work without causing any problems."
 msgstr ""
 
 #. Tag: para
-#: random-bits.xml:1091
+#: random-bits.xml:1096
 #, no-c-format
 msgid "Support for creating encrypted partitions is limited as it is not possible to generate a random encryption key. It is possible to set up an encrypted partition using a passphrase as encryption key."
 msgstr ""
