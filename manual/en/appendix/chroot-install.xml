@@ -465,21 +465,6 @@ its man page which will be available after installing the
 <classname>kernel-package</classname> package. We recommend that you check
 that the values are appropriate for your system.
 
-</para><para arch="x86">
-
-If you intend to use <classname>grub</classname> as your bootloader, you
-can set the <literal>do_bootloader</literal> option to <quote>no</quote>.
-To automatically update your <filename>/boot/grub/menu.lst</filename> on
-installation or removal of Debian kernels, add the following lines:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-For the <classname>lilo</classname> bootloader, the value of
-<literal>do_bootloader</literal> needs to be <quote>yes</quote>.
-
 </para><para>
 
 Then install the kernel package of your choice using its package name.
@@ -522,7 +507,7 @@ Installing and setting up <classname>grub</classname> is as easy as:
 
 <informalexample><screen>
 # aptitude install grub
-# grub-install /dev/<replaceable>hda</replaceable>
+# grub-install --recheck --no-floppy /dev/<replaceable>hda</replaceable>
 # update-grub
 </screen></informalexample>
 
@@ -543,6 +528,26 @@ lba32
 image=/vmlinuz
 label=Debian
 </screen></informalexample>
+
+</para><para arch="x86">
+
+Depending on which bootloader you selected, you can now make some
+additional changes in <filename>/etc/kernel-img.conf</filename>.
+
+</para><para arch="x86">
+
+For the <classname>grub</classname> bootloader, you should
+set the <literal>do_bootloader</literal> option to <quote>no</quote>.
+And to automatically update your <filename>/boot/grub/menu.lst</filename>
+on installation or removal of Debian kernels, add the following lines:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+For the <classname>lilo</classname> bootloader, the value of
+<literal>do_bootloader</literal> needs to remain <quote>yes</quote>.
 
 </para><para arch="powerpc">
 
