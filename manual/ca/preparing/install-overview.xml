@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40811 -->
+<!-- original version: 43943 -->
 
  <sect1 id="install-overview">
  <title>Resum del procés d'instal·lació</title>
@@ -127,7 +127,14 @@ Carregueu per primera vegada el sistema acabat d'instal·lar.
 </para></listitem>
 </orderedlist>
 
-<para>
+<para condition="gtk">
+
+Per a &arch-title; teniu l'opció d'emprar una versió
+<phrase arch="powerpc">experimental</phrase> gràfica del sistema
+d'instal·lació. Per a més informació referent a aquest instal·lador
+gràfic, vegeu <xref linkend="graphical"/>.
+
+</para><para>
 
 Si teniu problemes durant la instal·lació, és útil saber quins paquets
 s'han instal·lat i en quins passos. En el drama de la instal·lació, els
@@ -135,14 +142,16 @@ actors principals són:
 
 </para><para>
 
-L'instal·lador, el <classname>debian-installer</classname>, que és
-l'objecte principal d'aquest manual. Detecta el maquinari i carrega els
+L'instal·lador, el <classname>debian-installer</classname>, és l'objecte
+principal d'aquest manual. Detecta el maquinari i carrega els
 controladors adients, fa servir el <classname>dhcp-client</classname>
-per establir la connexió de xarxa, i executa el
+per establir la connexió de xarxa, i executa
 <classname>debootstrap</classname> a fi d'instal·lar els paquets del
-sistema base. N'hi ha més, d'actors que fan papers menors en aquest
-procés, però el <classname>debian-installer</classname> ha complert el
-seu quan carregueu el nou sistema per primera vegada.
+sistema base, i executa el <classname>tasksel</classname> amb l'objectiu
+de permetre-vos instal·lar alguns programes addicionals.
+N'hi ha més d'actors que fan papers menors en aquest procés, però el
+<classname>debian-installer</classname> ha complert la seva feina quan
+carregueu el nou sistema per primera vegada.
 
 </para><para>
 
@@ -153,20 +162,23 @@ o entorn d'escriptori.
 
 </para><para>
 
-Quan el <classname>debian-installer</classname> finalitza, abans de la
-primera càrrega del sistema, sols disposeu d'un sistema controlat per línia
-d'ordres molt bàsic. La interfície gràfica que mostra finestres al vostre
-monitor no s'instal·larà si no la seleccioneu durant els passos finals
-amb el <classname>tasksel</classname>. Això és opcional perquè nombrosos
-sistemes &debian; són servidors, els quals no necessiten cap interfície
-gràfica per funcionar.
+Una decisió important a la instal·lació és si instal·lar o no un entorn
+gràfic d'escriptori, que inclou l'«X Window System» i un dels entorns
+gràfics d'escriptori.
+Si escolliu no seleccionar la tasca <quote>Entorn d'escriptori</quote>,
+tan sols disposareu d'un sistema basat en línia d'ordres, relativament bàsic.
+La instal·lació de la tasca d'entorn d'escriptori és opcional ja que
+necessita d'una gran quantitat d'espai en disc, i perque alguns sistemes
+&debian; són servidors que realment no necessiten una interfície
+gràfica d'usuari per fer la seua tasca.
 
 </para><para arch="not-s390">
 
-Per tant, tingueu en compte que el sistema X està completament separat
-del <classname>debian-installer</classname>; de fet, és més complicat que
-aquest. Tant la instal·lació del sistema X de finestres com els problemes
-relacionats amb ella estan fora de l'abast d'aquest manual.
+Per tant, tingueu en compte que l'«X Window System» està completament
+separat del <classname>debian-installer</classname>; de fet, és més
+complicat que aquest. Tant la instal·lació de l'«X Window System» com
+els problemes relacionats amb aquest estan fora de l'abast d'aquest
+manual.
 
 </para>
  </sect1>

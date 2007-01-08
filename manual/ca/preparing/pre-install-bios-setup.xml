@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43696 -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Configuració del maquinari i del sistema operatiu prèvia a la instal·lació</title>
@@ -22,29 +22,10 @@ sistema també s'indiquen.
 &bios-setup-sparc.xml;
 &bios-setup-s390.xml;
 
-  <sect2><title>Aspectes del maquinari que cal tenir en compte</title>
-<para arch="not-s390">
+  <sect2 arch="m68k;x86;powerpc" id="hardware-issues">
+  <title>Aspectes del maquinari que cal tenir en compte</title>
 
-Molta gent ha provat de fer funcionar llurs CPU de 90 MHz a 100 MHz, etc.
-Això funciona de vegades, però n'afecta la temperatura i altres factors, i
-pot espatllar realment el vostre sistema. Un dels autors d'aquest document
-va forçar durant un any la freqüència de treball del seu sistema, i
-després, en iniciar-se aquest, el programa <command>gcc</command>
-s'avortava amb un senyal inesperat mentre es compilava el nucli del
-sistema operatiu. En tornar a baixar la freqüència de la CPU al nivell
-recomanat va desaparèixer el problema.
-
-</para><para arch="not-s390">
-
-El compilador <command>gcc</command> és sovint el primer element que no
-funciona a causa del mal estat dels mòduls de memòria (o d'altres problemes
-de maquinari que modifiquen les dades de manera indeterminable) ja que
-construeix estructures de dades enormes i les recorre de manera repetida. Un
-error en aquestes estructures farà que s'execute una instrucció il·legal o
-que s'accedisca a una adreça inexistent. Símptoma d'això és l'acabament
-del <command>gcc</command> amb un senyal inesperat.
-
-</para><para arch="m68k">
+<para arch="m68k">
 
 Els problemes de les plaques RAM Atari TT amb el Linux són coneguts; si
 hi teniu cap problema estrany, proveu d'executar, si més no, el nucli en
@@ -57,77 +38,9 @@ FIXME: cal més descripció sobre això.
 
 </emphasis></phrase>
 
-</para><para arch="x86">
-
-Les millors plaques base permeten l'ús de RAM de paritat, que us indicaran
-si aquesta té un error fins i tot en un únic bit. Tanmateix, no poden
-arreglar-lo, per tant solen trencar-se tot just després d'informar-hi.
-Amb tot, és millor saber que la memòria està malament que no pas patir
-sense cap avís errors a les vostres dades. Els millors sistemes tenen
-plaques base que permeten l'ús de mòduls de memòria de paritat i de paritat
-real; vegeu
-<xref linkend="Parity-RAM"/>.
-
-</para><para arch="x86">
-
-Si teniu RAM de paritat real i la placa base la pot fer servir, no dubteu a
-habilitar els ajusts de la BIOS que interrompen el funcionament de la placa
-quan es detecten errors de paritat de la memòria.
-
 </para>
 
-   <sect3 arch="x86"><title>El commutador turbo</title>
-<para>
-
-Molts sistemes tenen un commutador <emphasis>turbo</emphasis> que controla
-la freqüència de la CPU. Seleccioneu-ne un valor alt. Si la BIOS ho permet,
-deshabiliteu el control per programari del commutador (o el control per
-programari de la freqüència de la CPU) i fixeu el sistema en mode de
-velocitat alta. Hi ha un informe segons el qual en un determinat sistema,
-mentre Linux està fent comprovacions automàtiques (cercant dispositius de
-maquinari) pot manipular el programari de control del commutador turbo.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Les CPU Cyrix i els errors de disquet</title>
-<para>
-
-Molts usuaris de CPU Cyrix han hagut de deshabilitar la memòria cau de llurs
-sistemes durant la instal·lació, ja que si no ho fan el disquet els dóna
-errors. Si heu de fer això, assegureu-vos de tornar a habilitar la memòria
-cau quan hàgeu acabat la instal·lació, car el sistema funciona
-<emphasis>molt més</emphasis> lentament amb la memòria cau deshabilitada.
-
-</para><para>
-
-Això no és necessàriament problema de la CPU Cyrix. Potser és un problema
-que el Linux pot superar. Continuarem examinant-lo. Per als qui hi tenen
-curiositat, tenim la sospita que la memòria cau no és vàlida després de
-commutar del codi 16 bits al de 32.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Configuració dels perifèrics</title>
-<para>
-
-Potser hàgeu de canviar alguns ajusts o ponts de les targetes dels perifèrics
-del vostre ordinador. Algunes tenen menús de configuració, mentre que d'altres
-es basen en ponts. Aquest document no pot proporcionar informació completa
-sobre cada dispositiu de maquinari; pretén en canvi donar-hi consells útils.
-
-</para><para>
-
-Si alguna targeta té <quote>memòria mapejada</quote>, la memòria ha d'estar
-mapejada en alguna lloc entre 0xA0000 i 0xFFFFF (de 640 KiB a tot just per
-sota d'1 MiB) o a una adreça superior en almenys 1 MiB a la quantitat total
-de RAM del sistema.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86" id="usb-keyboard-config">
+   <formalpara arch="x86">
    <title>Funcionalitats USB de la BIOS i teclats</title>
 <para>
 
@@ -141,24 +54,15 @@ opcions <quote>Legacy keyboard emulation</quote> o
 <quote>USB keyboard support</quote>.
 
 </para>
-   </sect3>
+   </formalpara>
+   <formalpara arch="powerpc">
+   <title>Visibilitat de la pantalla als Powermac OldWord</title>
 
-   <sect3><title>Més de 64 MiB de RAM</title>
-<para>
-
-El nucli del Linux no sempre pot detectar la quantitat de RAM. Si és aquest
-el cas vegeu <xref linkend="boot-parms"/>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="powerpc">
-   <title>Visibilitat de la pantalla als Powermacs Oldword</title>
 <para>
 
 Alguns Powermacs OldWord, especialment aquells amb el controlador de
-pantalla <quote>control</quote> però possiblement altres també, podrien no
-donar un mapa de colors amb resultats fiables a la sortida visible quan la
+pantalla <quote>control</quote>, podrien no
+donar un mapa de colors amb resultats fiables visible quan la
 pantalla amb linux està configurada amb més de 256 colors. Si esteu
 experimentant aquest problema amb la vostra pantalla després de reiniciar
 (de vegades vegeu dades al monitor, però altres no vegeu res) o, si la
@@ -168,6 +72,6 @@ MacOS per utilitzar 256 colors en comptes de <quote>milers</quote> o
 <quote>milions</quote>.
 
 </para>
-   </sect3>
+   </formalpara>
   </sect2>
  </sect1>
