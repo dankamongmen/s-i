@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43841 -->
+<!-- original version: 44016 -->
 
  <sect1 id="linux-upgrade">
  <title>Installer &debian; à partir d'un système Unix/Linux</title>
@@ -346,10 +346,10 @@ Indiquez vos serveurs de noms et les directives search dans le fichier
 # editor /etc/resolv.conf
 </screen></informalexample>
 
-Un simple <filename>/etc/resolv.conf</filename>&nbsp;:
+Un fichier <filename>/etc/resolv.conf</filename> simple&nbsp;:
 
 <informalexample><screen>
-# search hqdom.local\000
+# search hqdom.local
 # nameserver 10.1.1.36
 # nameserver 192.168.9.100
 </screen></informalexample>
@@ -438,7 +438,7 @@ Il sera configuré au prochain démarrage de la machine.
 <para>
 
 Si vous avez l'intention de démarrer ce système, vous aurez vraisemblablement
-besoin d'un noyau Linux ainsi que d'un gestionnaire de démarrage. Identifiez
+besoin d'un noyau Linux ainsi que d'un programme d'amorçage. Identifiez
 les paquets contenant des noyaux avec&nbsp;:
 
 <informalexample><screen>
@@ -469,24 +469,9 @@ link_in_boot = no
 Pour des informations supplémentaires sur ce fichier, consultez sa page
 de manuel qui est disponible dès que le paquet
 <classname>kernel-package</classname> est installé. Il est recommandé de vérifier
-que les valeurs correspondent bian à votre système.
+que les valeurs correspondent bien à votre système.
 </para>
 
-<para arch="x86">
-Si vous comptez utiliser le programme d'amorçage <classname>grub</classname>, vous
-pouvez mettre l'option <literal>do_bootloader</literal> à <quote>no</quote>. Pour
-mettre à jour automatiquement le fichier<filename>/boot/grub/menu.lst</filename>
-lors de la suppression ou l'installation de noyaux Debian, ajoutez ces lignes&nbsp;:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-Pour le programme d'amorçage <classname>lilo</classname>, la valeur de 
-<literal>do_bootloader</literal> doit être <quote>yes</quote>.
-
-</para>
 <para>
 Installez alors le noyau de votre choix en utilisant son nom&nbsp;:
 
@@ -550,7 +535,31 @@ image=/vmlinuz
 label=Debian
 </screen></informalexample>
 
-</para><para arch="powerpc">
+
+</para>
+
+<para arch="x86">
+
+Selon le programme d'amorçage choisi, vous pouvez apporter d'autres
+changements au fichier <filename>/etc/kernel-img.conf</filename>.
+</para>
+<para arch="x86">
+Pour le programme <classname>grub</classname>, vous
+pouvez mettre l'option <literal>do_bootloader</literal> à <quote>no</quote>. Pour
+mettre à jour automatiquement le fichier<filename>/boot/grub/menu.lst</filename>
+lors de la suppression ou l'installation de noyaux Debian, ajoutez ces lignes&nbsp;:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+Pour le programme d'amorçage <classname>lilo</classname>, la valeur de 
+<literal>do_bootloader</literal> doit être <quote>yes</quote>.
+
+</para>
+
+<para arch="powerpc">
 
 Consultez le <userinput>man yaboot.conf</userinput> pour les instructions de 
 configuration du programme d'amorçage. Si vous souhaitez conserver le système 
