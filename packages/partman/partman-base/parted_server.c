@@ -1604,7 +1604,6 @@ command_change_file_system()
         }
         free(id);
         fstype = ped_file_system_type_get(s_fstype);
-        free(s_fstype);
         if (fstype == NULL) {
                 log("Filesystem %s not found, let's see if it is a flag",
                     s_fstype);
@@ -1618,6 +1617,7 @@ command_change_file_system()
         } else {
                 ped_partition_set_system(part, fstype);
         }
+        free(s_fstype);
         oprintf("OK\n");
 }
 
@@ -1672,7 +1672,6 @@ command_create_file_system()
                 critical_error("No such partition: %s", id);
         free(id);
         fstype = ped_file_system_type_get(s_fstype);
-        free(s_fstype);
         if (fstype == NULL)
                 critical_error("Bad file system type: %s", s_fstype);
         ped_partition_set_system(part, fstype);
@@ -1682,6 +1681,7 @@ command_create_file_system()
                 ped_disk_commit_to_dev(disk);
         }
         activate_exception_handler();
+        free(s_fstype);
         oprintf("OK\n");
         if (fs != NULL)
                 oprintf("OK\n");
