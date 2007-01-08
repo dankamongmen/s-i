@@ -1,14 +1,14 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43558 -->
 
-  <sect2 condition="supports-dhcp" id="dhcpd">
+  <sect2 id="dhcpd">
    <title>Configurar un servidor DHCP</title>
 <para>
 
 Un servidor que es programari gratuït de DHCP és el <command>dhcpd</command>
-d'ISC. A &debian;, podeu trobar-lo al paquet <classname>dhcp</classname>.
+d'ISC. A &debian;, es recomana utilitzar el paquet <classname>dhcp3-server</classname>.
 Hi ha un fitxer d'exemple de configuració per utilitzar-lo (normalment
-<filename>/etc/dhcpd.conf</filename>):
+<filename>/etc/dhcpd3/dhcpd.conf</filename>):
 
 <informalexample><screen>
 option domain-name "example.com";
@@ -32,9 +32,6 @@ host clientname {
 }
 </screen></informalexample>
 
-Avís: el paquet nou de <classname>dhcp3</classname> (i preferible), fa
-servir <filename>/etc/dhcp3/dhcpd.conf</filename>.
-
 </para><para>
 
 En aquest exemple, hi ha un servidor <replaceable>servername</replaceable>
@@ -47,7 +44,7 @@ es descarregarà per TFTP.
 </para><para>
 
 Desprès d'editar el fitxer de configuració del <command>dhcpd</command>,
-reengegueu-lo amb <userinput>/etc/init.d/dhcpd restart</userinput>.
+reengegueu-lo amb <userinput>/etc/init.d/dhcpd3-server restart</userinput>.
 
 </para>
 
@@ -78,11 +75,11 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 }
 
 group {
- next-server 192.168.1.3;
- host tftpclient {
+  next-server 192.168.1.3;
+  host tftpclient {
 # adreça màquina del client tftp
   hardware ethernet  00:10:DC:27:6C:15;
-  filename "/tftpboot/pxelinux.0";
+  filename "pxelinux.0";
  }
 }
 </screen></informalexample>

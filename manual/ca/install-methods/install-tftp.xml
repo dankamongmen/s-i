@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43696 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparació dels fitxers per a l'arrencada en xarxa TFTP</title>
@@ -14,9 +14,9 @@ la qual ha de configurar-se a fi de permetre l'arrencada de la vostra.
 </para><para>
 
 Heu d'instal·lar un servidor TFTP, i en nombroses màquines, cal també un
-servidor BOOTP
+servidor DHCP
 <phrase condition="supports-rarp">, o un servidor RARP</phrase>
-<phrase condition="supports-dhcp">, o un servidor DHCP</phrase>.
+<phrase condition="supports-bootp">, o un servidor BOOTP</phrase>.
 
 </para><para>
 
@@ -31,10 +31,10 @@ on obtenir la imatge d'arrencada.</phrase>
 <phrase arch="m68k">Hi ha una altra alternativa en sistemes VMEbus:
 l'adreça IP es pot configurar manualment en una ROM d'arrencada.</phrase>
 
-<phrase condition="supports-dhcp">El DHCP (Protocol de configuració
+El DHCP (Protocol de configuració
 dinàmica d'ordinadors centrals) és una extensió més flexible, i
 compatible, del BOOTP. Alguns sistemes sols es poden configurar fent
-servir el DHCP.</phrase>
+servir el DHCP.
 
 </para><para arch="powerpc">
 
@@ -104,18 +104,35 @@ tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 
 Els paquets Debian solen configurar-ho per defecte correctament.
 
-</para><para>
+</para>
+<note><para>
 
-Examineu el fitxer i recordeu el directori que heu indicat com a argument
-de l'<command>in.tftpd</command>; us caldrà després. En algunes versions
-de l'<command>in.tftpd</command>, l'argument <userinput>-l</userinput>
-fa que s'arxiven tots els fitxers de registre de peticions al sistema;
-això és d'utilitat a l'hora de fer comprovacions d'errors d'arrencada. Si
-heu hagut de canviar el <filename>/etc/inetd.conf</filename>, cal que
-indiqueu al procés actiu <command>inetd</command> que el fitxer ha canviat.
-En màquines Debian s'ha d'executar <userinput>/etc/init.d/inetd
-reload</userinput>; en d'altres, esbrineu la identitat (ID) del procés
-<command>inetd</command> i executeu
+Històricament els servidors TFTP utilitzen el directori
+<filename>/tftpboot</filename> per servir les imatges. Per altra banda,
+els paquets de &debian; poden utilitzar altres directoris per complir
+amb l'<ulink url="&url-fhs-home;">Estàndard de la Jerarquia del Sistema
+de Fitxers</ulink>. Per exemple, el <classname>tftpd-hpa</classname>
+utilitza per defecte <filename>/var/lib/tftpboot</filename>. Es possible
+que hagueu d'ajustar els exemples de configuració d'aquesta secció en
+conseqüència.
+
+</para></note>
+<para>
+
+Vegeu el fitxer <filename>/etc/inetd.conf</filename> i recordeu el directori
+que s'utilitza com a paràmetre del <command>in.tftpd</command><footnote>
+
+<para>
+El paràmetre <userinput>-l</userinput> fa que algunes versions del
+<command>in.tftpd</command> registrin totes les peticions als registres
+del sistema, útil per diagnosticar els errors d'arrencada.
+</para>
+
+</footnote>; ho necessitareu després.
+Si heu canviat <filename>/etc/inetd.conf</filename>, haureu de notificar-ho
+al procés <command>inetd</command> que s'està executant. En màquines Debian,
+executeu <userinput>/etc/init.d/inetd reload</userinput>; en d'altres,
+esbrineu la identitat (ID) del procés <command>inetd</command> i executeu
 <userinput>kill -HUP <replaceable>pid-d'inetd</replaceable></userinput>.
 
 </para><para arch="mips">
@@ -148,8 +165,7 @@ a fi d'ajustar el rang de ports origen que empra el servidor TFTP de Linux.
 
 Després, col·loqueu la imatge d'arrencada TFTP que us calga, i que figura
 a <xref linkend="where-files"/>, al directori d'imatges d'arrencada del
-<command>tftpd</command>. Normalment, el directori té el nom
-<filename>/tftpboot</filename>. Haureu de fer un enllaç des d'aquest
+<command>tftpd</command>. Haureu de fer un enllaç des d'aquest
 fitxer al fitxer que emprarà el <command>tftpd</command> per arrencar un
 client determinat. Malauradament, el nom del fitxer el determina el client
 TFTP, i no hi existeix cap norma ben establerta.
@@ -166,16 +182,16 @@ el RAMdisk a través del TFTP mateix. Per arrencar en xarxa, feu servir
 </para><para arch="x86">
 
 Per a arrencar amb PXE, sols cal el tarball
-<filename>netboot/netboot.tar.gz</filename>. Simplement extragueu-lo
+<filename>netboot/netboot.tar.gz</filename>. Simplement extraieu-lo
 al directori d'imatge d'arrencada del <command>tftpd</command>.
 Assegureu-vos que el servidor dhcp està configurat per passar
-<filename>/pxelinux.0</filename> al <command>tftpd</command> com a
+<filename>pxelinux.0</filename> al <command>tftpd</command> com a
 nom del fitxer d'arrencada.
 
 </para><para arch="ia64">
 
 Per a arrencar amb PXE, sols cal el tarball
-<filename>netboot/netboot.tar.gz</filename>. Simplement extragueu-lo al
+<filename>netboot/netboot.tar.gz</filename>. Simplement extraieu-lo al
 directori d'imatge d'arrencada <command>tftpd</command>. Assegureu-vos
 que el servidor dhcp està configurat per passar
 <filename>/debian-installer/ia64/elilo.efi</filename> al
@@ -284,6 +300,13 @@ $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 
 Per obtenir el nom de fitxer correcte, canvieu totes les lletres a
 majúscules i afegiu-hi si cal el nom de la subarquitectura.
+
+</para><para>
+
+Si ho heu fet tot bé, posant l'ordre <userinput>boot net</userinput> a
+l'OpenPROM hauria de carregar la imatge. Si la imatge no es troba, proveu
+de comprovar els fitxers de registre del vostre servidor tftp per veure
+quin és el nom de la imatge que s'ha demanat.
 
 </para><para>
 
