@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44016 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian; von einem anderen Unix/Linux-System aus installieren</title>
@@ -359,10 +359,10 @@ Suchregeln in <filename>/etc/resolv.conf</filename> ein:
 # editor /etc/resolv.conf
 </screen></informalexample>
 
-Eine einfache <filename>/etc/resolv.conf</filename>:
+Eine einfache beispielhafte <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
-search hqdom.local\000
+search hqdom.local
 nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
@@ -484,22 +484,6 @@ finden Sie in ihrer Handbuchseite (Manpage), die nach der Installation des
 Paketes <classname>kernel-package</classname> verfügbar ist. Wir empfehlen
 zu überprüfen, ob die eingetragenen Werte für Ihr System passend sind.
 
-</para><para arch="x86">
-
-Wenn Sie <classname>grub</classname> als Bootloader verwenden möchten, können
-Sie die Option <literal>do_bootloader</literal> auf <quote>no</quote> setzen.
-Um Ihre <filename>/boot/grub/menu.lst</filename> bei Installation oder
-Löschung von Debian-Kernels automatisch aktualisieren zu lassen, fügen Sie
-der Datei die folgenden Zeilen hinzu:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-Bei Verwendung von <classname>lilo</classname> als Bootloader muss
-<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt sein.
-
 </para><para>
 
 Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
@@ -567,6 +551,28 @@ lba32
 image=/vmlinuz
 label=Debian
 </screen></informalexample>
+
+</para><para arch="x86">
+
+Abhängig davon, welchen Bootloader Sie ausgewählt haben, können Sie jetzt
+einige zusätzliche Änderungen in <filename>/etc/kernel-img.conf</filename>
+machen.
+
+</para><para arch="x86">
+
+Für <classname>grub</classname> als Bootloader sollten Sie die Option
+<literal>do_bootloader</literal> auf <quote>no</quote> setzen. Um Ihre
+<filename>/boot/grub/menu.lst</filename> bei Installation oder Löschung
+von Debian-Kernels automatisch aktualisieren zu lassen, fügen Sie der Datei
+die folgenden Zeilen hinzu:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+Bei Verwendung von <classname>lilo</classname> als Bootloader muss
+<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt sein.
 
 </para><para arch="powerpc">
 
