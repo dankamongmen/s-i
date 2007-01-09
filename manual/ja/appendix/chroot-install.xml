@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44016 -->
 
  <sect1 id="linux-upgrade">
 <!--
@@ -522,12 +522,12 @@ Enter your nameserver(s) and search directives in
 </screen></informalexample>
 
 <!--
-A simple <filename>/etc/resolv.conf</filename>:
+A simple example <filename>/etc/resolv.conf</filename>:
 -->
-シンプルな <filename>/etc/resolv.conf</filename> は以下になります。
+以下は、<filename>/etc/resolv.conf</filename> の簡単な例です。
 
 <informalexample><screen>
-search hqdom.local\000
+search hqdom.local
 nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
@@ -705,34 +705,6 @@ that the values are appropriate for your system.
 man ページで説明しています。
 これで、あなたのシステムに適切な値をチェックするのをお奨めします。
 
-</para><para arch="x86">
-
-<!--
-If you intend to use <classname>grub</classname> as your bootloader, you
-can set the <literal>do_bootloader</literal> option to <quote>no</quote>.
-To automatically update your <filename>/boot/grub/menu.lst</filename> on
-installation or removal of Debian kernels, add the following lines:
--->
-ブートローダに <classname>grub</classname> を使用する場合、
-<literal>do_bootloader</literal>オプションに <quote>no</quote> 
-とセットできます。
-Debian のカーネルをインストール・削除で
-<filename>/boot/grub/menu.lst</filename> を自動的に更新するには、
-以下の行を追加してください。
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<!--
-For the <classname>lilo</classname> bootloader, the value of
-<literal>do_bootloader</literal> needs to be <quote>yes</quote>.
--->
-<classname>lilo</classname> ブートローダでは、
-<literal>do_bootloader</literal> の値は <quote>yes</quote> 
-である必要があります。
-
 </para><para>
 
 <!--
@@ -837,6 +809,43 @@ lba32
 image=/vmlinuz
 label=Debian
 </screen></informalexample>
+
+</para><para arch="x86">
+
+<!--
+Depending on which bootloader you selected, you can now make some
+additional changes in <filename>/etc/kernel-img.conf</filename>.
+-->
+選択したブートローダによって、
+<filename>/etc/kernel-img.conf</filename> にさらに変更を加えても結構です。
+
+</para><para arch="x86">
+
+<!--
+For the <classname>grub</classname> bootloader, you should
+set the <literal>do_bootloader</literal> option to <quote>no</quote>.
+And to automatically update your <filename>/boot/grub/menu.lst</filename>
+on installation or removal of Debian kernels, add the following lines:
+-->
+<classname>grub</classname> ブートローダでは、
+<literal>do_bootloader</literal>オプションに <quote>no</quote> 
+とセットしてください。
+また、Debian のカーネルをインストール・削除で
+<filename>/boot/grub/menu.lst</filename> を自動的に更新するには、
+以下の行を追加してください。
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+<!--
+For the <classname>lilo</classname> bootloader, the value of
+<literal>do_bootloader</literal> needs to remain <quote>yes</quote>.
+-->
+<classname>lilo</classname> ブートローダでは、
+<literal>do_bootloader</literal> の値は <quote>yes</quote> 
+である必要があります。
 
 </para><para arch="powerpc">
 
