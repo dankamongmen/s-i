@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2007-01-08 09:46+0200\n"
+"PO-Revision-Date: 2007-01-10 00:46+0200\n"
 "Last-Translator: quad-nrg.net <galaxico@quad-nrg.net>\n"
 "Language-Team: Greek <en@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -531,6 +531,10 @@ msgid ""
 "in the preseed file being retrieved from <literal>http://autoserver.example."
 "com/d-i/etch/./preseed.cfg</literal>."
 msgstr ""
+"Υπάρχουν αρκετά γνωρίσματα του Εγκαταστάτη του Debian που συνδυάζονται για να επιτρππεψουν σχετικά απλές εντολές γραμμής στο προτρεπτικό εκκίνησης να δώσουν οσοδήποτε σύνθετες αυτόματες εγκαταστάσεις προσαρμοσμένες στις ανάγκες σας. Για να το δείξουμε αυτό παραθέτουμε εδώ μερικά παραδείγματα που μπορούν να χρησιμοποιηθούν στο προτρεπτικό εκκίνησης: <informalexample><screen>\n"
+"auto url=autoserver\n"
+"</screen></informalexample> Αυτό βασίζεται στην ύπαρξη ενός εξυπηρετητή DHCP ο οποίος θα φέρει το μηχάνημά μας στο σημείο που ένας <literal>autoserver</literal> του οποίου το όνομα μπορεί να προσδιοριστεί μέσω DNS, πιθανόν μετά και την προσθήκη του τοπικού τομέα δικτύου αν αυτό δώθηκε από το DHCP. Αν αυτό έγινε σε ένα δίκτυο που το όνομα τομέα του είναι  <literal>example.com</literal>, και το οποίο διαθέτει μια εύλογη ρύθμιση της υπηρεσίας DHCP, τότε το αποτέλεσμα θα ήταν η ανάκτηση του αρχείου προρύθμισης από το <literal>http://autoserver.example."
+"com/d-i/etch/./preseed.cfg</literal>."
 
 #. Tag: para
 #: preseed.xml:378
@@ -552,6 +556,9 @@ msgid ""
 "late_command.sh</literal> then the file will be fetched from <literal>http://"
 "autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
 msgstr ""
+"Το τελευταίο κομμάτι της διεύθυνσης (<literal>d-i/etch/./preseed.cfg</literal>) λαμβάνεται από το <literal>auto-install/defaultroot</literal>. Εξ' ορισμού περιλαμβάνει τον κατάλογο <literal>etch</literal> για να επιτρέπει σε μεταγενέστερες εκδόσεις του Debian να προσδιορίζουν το δικό τους κωδικό όνομα και στους χρήστες να αλλάζουν σ' αυτές με έναν ελεγχόμενο τρόπο. Το κομμάτι <literal>/./</literal> χρησιμοποιείται σαν ένδειξη μιας ρίζας, σε σχέση με την οποία να μπορούν να αγκιστρώνονται άλλες διαδρομές στο σύστημα αρχείων που ακολουθούν (για χρήση με τα preseed/include και preseed/run). Αυτό επιτρέπει τον προσδιορισμό αρχείων σαν πλήρεις διευθύνσεις URL, και διαδρομές που ξεκινούν με / αγκιστρώνονται κατ' αυτόν τον τρόπο, ή ακόμα και σαν διαδρομές σχετικά με την τοποθεσία όπου βρέθηκε το τελευταίο αρχείο προρύθμισης. Αυτό μπορεί να χρησιμοποιηθεί στην κατασκευή πιο \"φορητών\" σεναρίων (script) στα οποία μια ολόκληρη ιεραρχία σεναρίων μπορεί να μετακινηθεί σε μια καινούρια τοποθεσία χωρίς προβλήματα, για παράδειγμα με την αντιγραφή των αρχείων σε ένα stick USB ενώ αυτά προέρχονται από έναν εξυπηρετητή web. Στο παράδειγμα αυτό, αν το αρχείο προρύθμισης θέτει το <literal>preseed/run</literal> σαν <literal>/scripts/"
+"late_command.sh</literal> τότε το αρχείο θα ανακτηθεί από τη διεύθυνση <literal>http://"
+"autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
 
 #. Tag: para
 #: preseed.xml:398
@@ -567,12 +574,16 @@ msgid ""
 "replaceable>\n"
 "</screen></informalexample> The way this works is that:"
 msgstr ""
+"Αν δεν είναι διαθέσιμη μια τοπική υποδομή υπηρεσιών DNS ή DHCP, ή αν δεν θέλετε να χρησιμοποιήσετε την προκαθορισμένη διαδρομή στο <filename>preseed.cfg</filename>, μπορείτε και πάλι να χρησιμοποιήσετε ένα συγκεκριμένο url, που αν δεν χρησιμοποιήσετε το κομμάτι <literal>/./</literal> θα αγκιστρωθεί στην αρχή της διαδρομής (δηλ, το τρίτο <literal>/</literal> στο URL). Εδώ είναι ένα παράδειγμα που απαιτεί ελάχιστη υποστήριξη από την τοπική δικτυακή υποδομή:<informalexample><screen>\n"
+"auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</"
+"replaceable>\n"
+"</screen></informalexample> Ο τρόπος με τον οποίο δουλεύει αυτό είναι:"
 
 #. Tag: para
 #: preseed.xml:411
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
-msgstr ""
+msgstr "αν στην διεύθυνση URL δεν υπάρχει κάποιο πρωτόκολλο, υποτίθεται ότι αυτό είναι το http,"
 
 #. Tag: para
 #: preseed.xml:414
@@ -580,7 +591,7 @@ msgstr ""
 msgid ""
 "if the hostname section contains no periods, it has the domain derived from "
 "DHCP appended to it, and"
-msgstr ""
+msgstr "αν το όνομα του μηχανήματος δεν περιέχει τελείες, τότε προσάπτεται σ' αυτό το όνομα τομέα που προκύπτει από το DHCP, και"
 
 #. Tag: para
 #: preseed.xml:418
@@ -588,7 +599,7 @@ msgstr ""
 msgid ""
 "if there's no <literal>/</literal>'s after the hostname, then the default "
 "path is added."
-msgstr ""
+msgstr "αν δεν υπάρχει <literal>/</literal> μετά το όνομα του μηχανήματος, τότε προστίθεται η προκαθορισμένη διαδρομή."
 
 #. Tag: para
 #: preseed.xml:424
@@ -605,6 +616,10 @@ msgid ""
 "</screen></informalexample> The classes could for example denote the type of "
 "system to be installed, or the localization to be used."
 msgstr ""
+"Επιπρόσθετα από τον προσδιορισμό του url, μπορείτε ακόμα να προσδιορίσετε ρυθμίσεις που δεν επηρεάζουν άμεσα την συμπεριφορά του ίδιου του &d-i; αλλά μπορούν να περάσουν στα σενάρια που προσδιορίζονται με την χρήση του  <literal>preseed/run</literal> στο αρχείο προρύθμισης που έχει ήδη φορτωθεί. Προς το παρόν, το μοναδικό παράδειγμα αυτής της κατάστασης είναι το <literal>auto-install/classes</literal>, με παρωνύμιο <literal>classes</literal>. Αυτό μπορεί να χρησιμοποιηθεί ως εξής:<informalexample><screen>\n"
+"auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;"
+"class_B</replaceable>\n"
+"</screen></informalexample> Οι κλάσεις θα μπορούσαν να δηλώνουν για παράδειγμα τον τύπο του συστήματος που πρόκειται να εγκατασταθεί, ή τις τοπικές ρυθμίσεις που πρόκειται να χρησιμοποιηθούν."
 
 #. Tag: para
 #: preseed.xml:438
@@ -617,7 +632,7 @@ msgid ""
 "<email>debian-boot@lists.debian.org</email> mailing list so that we can "
 "avoid namespace conflicts, and perhaps add an alias for the parameter for "
 "you."
-msgstr ""
+msgstr "Φυσικά είναι δυνατόν να επεκτείνει κανείς αυτή την ιδέα, και αν κάνετε κάτι τέτοιο, είναι εύλογο να χρησιμοποιήσετε τον χώρο ονομασιών (namespace) auto-install για τον σκοπό αυτό. Έτσι μπορεί κανείς να έχει κάτι όπως το <literal>auto-install/style</literal> που στη συνέχεια να χρησιμοποιείται στα σενάριά του. Αν αισθάνεστε την ανάγκη να κάνετε κάτι τέτοιο, παρακαλούμε αναφέρετέ το στη λίστα αλληλογραφίας <email>debian-boot@lists.debian.org</email> ώστε να αποφύγουμε ασυμφωνίες στον χώρο ονομασιών και πιθανόν να προσθέσουμε ένα παρωνύμιο για την παράμετρο για λογαριασμό σας."
 
 #. Tag: para
 #: preseed.xml:448
@@ -632,7 +647,7 @@ msgid ""
 "while <literal>priority</literal> is an alias for <literal>preseed/priority</"
 "literal> and setting it to <literal>critical</literal> stops any questions "
 "with a lower priority from being asked."
-msgstr ""
+msgstr "Η επικεφαλίδα εκκίνησης  <literal>auto</literal> δεν έχει ακόμα οριστεί σε όλες τις αρχιτεκτονικές. Το ίδιο αποτέλεσμα μπορεί να επιτευχθεί όμως προσθέτοντας απλά τις δυο παραμέτρους <literal>auto=true priority=critical</literal> στην γραμμή εντολών του πυρήνα. Η παράμετρος <literal>auto</literal> είναι ένα παρωνύμιο για την <literal>auto-install/enabled</literal> και ελέγχει την καθυστέρηση στην διατύπωση των ερωτήσεων για τις τοπικές ρυθμίσεις και το πληκτρολόγιο μέχρι την στιγμή που θα έχει δοθεί η ευκαιρία να γίνει η προρύθμισή τους, ενώ η παράμετρος <literal>priority</literal> είναι παρωνύμιο για την  <literal>preseed/priority</literal> και ο καθορισμός της σε <literal>critical</literal> αποτρέπει την διατύπωση οποιωνδήποτε ερωτήσεων με χαμηλότερη προτεραιότητα."
 
 #. Tag: para
 #: preseed.xml:461
@@ -643,166 +658,168 @@ msgid ""
 "dhcp_timeout=60</literal> which makes the machine choose the first viable "
 "NIC and be more patient about getting a reply to its DHCP query."
 msgstr ""
+"Επιπλέον επιλογές που μπορεί να έχουν ενδιαφέρον στην προσπάθεια αυτοματοποίησης μιας εγκατάστασης με χρήση της υπηρεσίας DHCP είναι: <literal>interface=auto netcfg/"
+"dhcp_timeout=60</literal> που κάνει το μηχάνημα να διαλέξει την πρώτη διαθέσιμη διεπαφή δικτύου (NIC) και να είναι περισσότερο \"υπομονετικό\" όσον αφορά την λήψη μιας απάντησης στο αίτημά του προς τον εξυπηρετητή DHCP."
 
 #. Tag: title
 #: preseed.xml:473
 #, no-c-format
 msgid "Aliases useful with preseeding"
-msgstr ""
+msgstr "Παρωνύμια χρήσιμα με την προρύθμιση"
 
 #. Tag: para
 #: preseed.xml:474
 #, no-c-format
 msgid "The following aliases can be useful when using (auto mode) preseeding."
-msgstr ""
+msgstr "Τα ακόλουθα παρωνύμια μπορεί να είναι χρήσιμα όταν χρησιμοποιείτε προρύθμιση (σε κατάσταση auto)."
 
 #. Tag: entry
 #: preseed.xml:484
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "auto"
-msgstr "Φορητός υπολογιστής"
+msgstr "auto"
 
 #. Tag: entry
 #: preseed.xml:484
 #, no-c-format
 msgid "auto-install/enabled"
-msgstr ""
+msgstr "auto-install/enabled"
 
 #. Tag: entry
 #: preseed.xml:485
 #, no-c-format
 msgid "classes"
-msgstr ""
+msgstr "classes"
 
 #. Tag: entry
 #: preseed.xml:485
 #, no-c-format
 msgid "auto-install/classes"
-msgstr ""
+msgstr "auto-install/classes"
 
 #. Tag: entry
 #: preseed.xml:486
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "<entry>fb</entry>"
-msgstr "<entry>όχι</entry>"
+msgstr "<entry>fb</entry>"
 
 #. Tag: entry
 #: preseed.xml:486
 #, no-c-format
 msgid "debian-installer/framebuffer"
-msgstr ""
+msgstr "debian-installer/framebuffer"
 
 #. Tag: entry
 #: preseed.xml:487
 #, no-c-format
 msgid "locale"
-msgstr ""
+msgstr "locale"
 
 #. Tag: entry
 #: preseed.xml:487
 #, no-c-format
 msgid "debian-installer/locale"
-msgstr ""
+msgstr "debian-installer/locale"
 
 #. Tag: entry
 #: preseed.xml:488
 #, no-c-format
 msgid "priority"
-msgstr ""
+msgstr "priority"
 
 #. Tag: entry
 #: preseed.xml:488
 #, no-c-format
 msgid "debconf/priority"
-msgstr ""
+msgstr "debconf/priority"
 
 #. Tag: entry
 #: preseed.xml:489
 #, no-c-format
 msgid "preseed/file"
-msgstr ""
+msgstr "preseed/file"
 
 #. Tag: entry
 #: preseed.xml:490
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "<entry>url</entry>"
-msgstr "<entry>όχι</entry>"
+msgstr "<entry>url</entry>"
 
 #. Tag: entry
 #: preseed.xml:490
 #, no-c-format
 msgid "preseed/url"
-msgstr ""
+msgstr "preseed/url"
 
 #. Tag: entry
 #: preseed.xml:491
 #, no-c-format
 msgid "interface"
-msgstr ""
+msgstr "interface"
 
 #. Tag: entry
 #: preseed.xml:491
 #, no-c-format
 msgid "netcfg/choose_interface"
-msgstr ""
+msgstr "netcfg/choose_interface"
 
 #. Tag: entry
 #: preseed.xml:492
 #, no-c-format
 msgid "hostname&nbsp;&nbsp;&nbsp;"
-msgstr ""
+msgstr "hostname&nbsp;&nbsp;&nbsp;"
 
 #. Tag: entry
 #: preseed.xml:492
 #, no-c-format
 msgid "netcfg/get_hostname"
-msgstr ""
+msgstr "netcfg/get_hostname"
 
 #. Tag: entry
 #: preseed.xml:493
 #, no-c-format
 msgid "domain"
-msgstr ""
+msgstr "domain"
 
 #. Tag: entry
 #: preseed.xml:493
 #, no-c-format
 msgid "netcfg/get_domain"
-msgstr ""
+msgstr "netcfg/get_domain"
 
 #. Tag: entry
 #: preseed.xml:494
 #, no-c-format
 msgid "protocol"
-msgstr ""
+msgstr "protocol"
 
 #. Tag: entry
 #: preseed.xml:494
 #, no-c-format
 msgid "mirror/protocol"
-msgstr ""
+msgstr "mirror/protocol"
 
 #. Tag: entry
 #: preseed.xml:495
 #, no-c-format
 msgid "suite"
-msgstr ""
+msgstr "suite"
 
 #. Tag: entry
 #: preseed.xml:495
 #, no-c-format
 msgid "mirror/suite"
-msgstr ""
+msgstr "mirror/suite"
 
 #. Tag: title
 #: preseed.xml:502
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Using a DHCP server to specify preconfiguration files"
-msgstr "Χρήση ενός server DHCP για τον προσδιορισμό αρχείων προρυθμίσεων"
+msgstr "Χρήση ενός εξυπηρετητή DHCP για τον προσδιορισμό αρχείων προρυθμίσεων"
 
 #. Tag: para
 #: preseed.xml:503
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "It's also possible to use DHCP to specify a preconfiguration file to "
 "download from the network. DHCP allows specifying a filename. Normally this "
@@ -815,23 +832,22 @@ msgstr ""
 "Είναι επίσης δυνατόν να χρησιμοποιήσετε το πρωτόκολλο DHCP για τον "
 "προσδιορισμό ενός αρχείου προρυθμίσεων και να το κατεβάσετε από το δίκτυο. "
 "Το DHCP επιτρέπει τον προσδιορισμό ενός ονόματος αρχείου. Συνήθως αυτό είναι "
-"ένα αρχείο για εκκίνηση από το δίκτυο, αν όμως εμφανίζεται να είναι ένας "
-"σύνδεσμος URL τότε τα μέσα εγκατάστασης που υποστηρίζουν προρύθμιση μέσω "
-"δικτύου θα κατεβάσουν το αρχείο από τον σύνδεσμο αυτό και θα το "
+"ένα αρχείο για εκκίνηση από το δίκτυο, αν όμως εμφανίζεται να είναι μια διεύθυνση URL τότε τα μέσα εγκατάστασης που υποστηρίζουν προρύθμιση μέσω "
+"δικτύου θα κατεβάσουν το αρχείο από την διεύθυνση αυτή και θα το "
 "χρησιμοποιήσουν σαν αρχείο προρυθμίσεων. Εδώ είναι ένα παράδειγμα του πώς να "
 "κάνετε την αντίστοιχη ρύθμιση στο αρχείο dhcpd.conf για την έκδοση 3 του "
-"server SC DHCP (του πακέτου για τον server dhcp-3 στο Debian)."
+"εξυπηρετητή DHCP του ISC (το πακέτο dhcp3-server στο Debian)."
 
 #. Tag: screen
 #: preseed.xml:514
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
 "    filename \"http://host/preseed.cfg\";\n"
 "}"
 msgstr ""
 "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
-"        filename \"http://host/preseed.cfg\";\n"
+"    filename \"http://host/preseed.cfg\";\n"
 "}"
 
 #. Tag: para
@@ -871,20 +887,20 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:537
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Creating a preconfiguration file"
 msgstr "Δημιουργία ενός αρχείου προρυθμίσεων"
 
 #. Tag: para
 #: preseed.xml:538
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The preconfiguration file is in the format used by the <command>debconf-set-"
 "selections</command> command. The general format of a line in a "
 "preconfiguration file is:"
 msgstr ""
 "Το αρχείο των προρυθμίσεων είναι στην μορφή που χρησιμοποιείται από την "
-"εντολή<command>debconf-set-selections</command>."
+"εντολή <command>debconf-set-selections</command>. H γενική μορφή μιας γραμμής σε ένα αρχείο προρυθμίσεων είναι:"
 
 #. Tag: screen
 #: preseed.xml:544
@@ -928,14 +944,14 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:563
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Most questions need to be preseeded using the values valid in English and "
 "not the translated values. However, there are some questions (for example in "
 "<classname>partman</classname>) where the translated values need to be used."
 msgstr ""
-"Οι περισσότερες ερωτήσεις θα πρέπει να προρυθμιστούν χρησιμοποιώντας τιμές "
-"έγκυρες στα αγγλικά και όχι τις μεταφράσεις τους. Παρ' όλα αυτά υπάρχουν "
+"Οι περισσότερες ερωτήσεις θα πρέπει να προρυθμιστούν χρησιμοποιώντας τις τιμές "
+"που είναι έγκυρες στα Αγγλικά και όχι μεταφράσεις τους. Παρ' όλα αυτά υπάρχουν "
 "μερικές ερωτήσεις (για παράδειγμα για το πρόγραμμα <classname>partman</"
 "classname>) στις οποίες θα πρέπει να χρησιμοποιηθούν οι μεταφρασμένες τιμές."
 
@@ -1044,22 +1060,22 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:621
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "To check if the format of your preconfiguration file is valid before "
 "performing an install, you can use the command <command>debconf-set-"
 "selections -c <replaceable>preseed.cfg</replaceable></command>."
 msgstr ""
-"Για να ελέγξετε αν το format του αρχείου preseed είναι έγκυρο πριν "
+"Για να ελέγξετε αν η μορφή του αρχείου προρύθμισης είναι έγκυρη πριν "
 "πραγματοποιήσετε μια εγκατάσταση, μπορείτε να χρησιμοποιήσετε την εντολή "
 "<command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></"
 "command>."
 
 #. Tag: title
 #: preseed.xml:632
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Contents of the preconfiguration file"
-msgstr "Φόρτωση του αρχείου preseed"
+msgstr "Περιεχόμενα του αρχείου προρύθμισης"
 
 #. Tag: para
 #: preseed.xml:638
@@ -1086,28 +1102,25 @@ msgstr "Τοπικοποίηση"
 
 #. Tag: para
 #: preseed.xml:650
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Setting localization values will only work if you are using initrd "
 "preseeding. With all other methods the preconfiguration file will only be "
 "loaded after these questions have been asked."
-msgstr ""
-"Η ρύθμιση των τιμών τοπικοποίησης θα δουλέψει μόνο αν χρησιμοποιείται initrd "
-"preseeding. Με όλες τις άλλες μεθόδους το αρχείο preseed θα φορτωθεί μόνο "
-"αφότου γίνουν αυτές οι ερωτήσεις."
+msgstr "Η ρύθμιση των τιμών τοπικοποίησης θα δουλέψει μόνο αν χρησιμοποιείτε προρύθμιση με initrd. Με όλες τις άλλες μεθόδους το αρχείο προρύθμισης θα φορτωθεί μόνο μετά τη διατύπωση αυτών των ερωτήσεων."
 
 #. Tag: para
 #: preseed.xml:656
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The locale can be used to specify both language and country. To specify the "
 "locale as a boot parameter, use <userinput>locale=<replaceable>en_US</"
 "replaceable></userinput>."
 msgstr ""
 "Το σύνολο τοπικών ρυθμίσεων μπορεί να χρησιμοποιηθεί για να προσδιορίσετε "
-"τόσο την γλώσσα όσο και την χώρα. Για να ορίσετε το σύνολοι αυτό σαν "
-"παράμετρο εκκίνησης, χρησιμοποιήστε <userinput>debian-installer/"
-"locale=<replaceable>en_US</replaceable></userinput>."
+"τόσο την γλώσσα όσο και την χώρα. Για να ορίσετε το σύνολο αυτό σαν μια"
+"παράμετρο εκκίνησης, χρησιμοποιήστε <userinput>locale=<replaceable>en_US</"
+"replaceable></userinput>."
 
 #. Tag: screen
 #: preseed.xml:662
@@ -1152,14 +1165,14 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:673
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "To skip keyboard configuration, preseed <classname>console-tools/archs</"
 "classname> with <userinput>skip-config</userinput>. This will result in the "
 "kernel keymap remaining active."
 msgstr ""
 "Για να παρακάμψετε την ρύθμιση του πληκτρολογίου προρυθμίστε το "
-"<classname>console-tools/archs</classname> μαζί με το <userinput>skip-"
+"<classname>console-tools/archs</classname> σαν <userinput>skip-"
 "config</userinput>. Αυτό θα έχει σαν αποτέλεσμα να παραμείνει ενεργό το "
 "keymap του πυρήνα."
 
@@ -1184,7 +1197,7 @@ msgstr "Ρύθμιση δικτύου"
 
 #. Tag: para
 #: preseed.xml:693
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Of course, preseeding the network configuration won't work if you're loading "
 "your preconfiguration file from the network. But it's great when you're "
@@ -1192,24 +1205,23 @@ msgid ""
 "the network, you can pass network config parameters by using kernel boot "
 "parameters."
 msgstr ""
-"Φυσικά, preseeding για την ρύθμιση του δικτύου δεν θα δουλέψει αν φορτώνετε "
-"το αρχείο preseed από το δίκτυο. Είναι όμως σπουδαίο αν εκκινείτε από ένα CD "
-"ή ένα USB stick. Αν φιρτώνετε αρχεία preseed από το δίκτυο, μπορείτε να "
-"περάσετε παραμέτρους ρύθμισης του δικτύου με χρήση παραμέτρων εκκίνησης του "
+"Φυσικά, προρύθμιση της διαμόρφωσης του δικτύου δεν θα δουλέψει αν φορτώνετε "
+"το αρχείο προρύθμισης από το δίκτυο. Είναι όμως σπουδαίο αν εκκινείτε από ένα CD "
+"ή ένα stick USB. Αν φορτώνετε αρχεία προρύθμισης από το δίκτυο, μπορείτε να "
+"περάσετε παραμέτρους ρύθμισης του δικτύου χρησιμοποιώντας παραμέτρους εκκίνησης του "
 "πυρήνα."
 
 #. Tag: para
 #: preseed.xml:701
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If you need to pick a particular interface when netbooting before loading a "
 "preconfiguration file from the network, use a boot parameter such as "
 "<userinput>interface=<replaceable>eth1</replaceable></userinput>."
 msgstr ""
-"Αν χρειάζεται να διαλέξετε μια συγκεκριμένη διεπαφή δικτύου κατά την "
-"εκκίνηση από δίκτυο πριν την φόρτωση ενός αρχείου preseed από το δίκτυο, "
-"χρησιμοποιείστε μια παράμετρο εκκίνησης όπως η<userinput>netcfg/"
-"choose_interface=<replaceable>eth1</replaceable></userinput>."
+"Αν είναι απαραίτητο να διαλέξετε μια συγκεκριμένη διεπαφή δικτύου κατά την "
+"εκκίνηση από δίκτυο και πριν από την φόρτωση ενός αρχείου προρύθμισης από αυτό, "
+"χρησιμοποιείστε μια παράμετρο εκκίνησης όπως η <userinput>interface=<replaceable>eth1</replaceable></userinput>."
 
 #. Tag: para
 #: preseed.xml:707
@@ -1244,7 +1256,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:721
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# netcfg will choose an interface that has link if possible. This makes it\n"
 "# skip displaying a list if there is more than one interface.\n"
@@ -1285,9 +1297,9 @@ msgid ""
 "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
 "#d-i netcfg/dhcp_hostname string radish"
 msgstr ""
-"# Το netcfg θα επιλέξει αν είναι δυνατόν μια διασύνδεση που έχει #ενεργή "
+"# Το netcfg θα επιλέξει αν είναι δυνατόν μια διεπαφή δικτύου που έχει ενεργή "
 "σύνδεση. Αυτό έχει σαν αποτέλεσμα\n"
-"# την αποφυγή εμφάνισης μιας λίστας αν υπάρχουν περισσότερες από # μια "
+"# την αποφυγή εμφάνισης μιας λίστας αν υπάρχουν περισσότερες από μια "
 "διεπαφές δικτύου.\n"
 "d-i netcfg/choose_interface select auto\n"
 "\n"
@@ -1329,7 +1341,7 @@ msgstr "Ρυθμίσεις καθρέφτη της αρχειοθήκης του
 
 #. Tag: para
 #: preseed.xml:727
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Depending on the installation method you use, a mirror may be used to "
 "download additional components of the installer, to install the base system, "
@@ -1337,9 +1349,8 @@ msgid ""
 "installed system."
 msgstr ""
 "Ανάλογα με την μέθοδο εγκατάστασης που χρησιμοποιείτε, ίσως χρησιμοποιηθεί "
-"ένας καθρέφτης της αρχειοθήκης τόσο για το \"κατέβασμα\" περισσότερων "
-"συστατικών του εγκαταστάτη, του βασικού συστήματος όσο και την ρύθμιση του "
-"αρχείου <filename>/etc/apt/sources.list</filename> για το εγκατεστημένο "
+"ένας καθρέφτης της αρχειοθήκης για το κατέβασμα πρόσθετων "
+"συστατικών του εγκαταστάτη, την εγκατάσταση του βασικού συστήματος και την ρύθμιση του αρχείου <filename>/etc/apt/sources.list</filename> για το εγκατεστημένο "
 "σύστημα."
 
 #. Tag: para
@@ -1404,7 +1415,7 @@ msgstr "Διαμέριση"
 
 #. Tag: para
 #: preseed.xml:757
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
 "supported by <classname>partman-auto</classname>. You can choose to "
@@ -1412,15 +1423,7 @@ msgid ""
 "of the disk can be determined by using a predefined recipe, a custom recipe "
 "from a recipe file or a recipe included in the preconfiguration file. It is "
 "currently not possible to partition multiple disks using preseeding."
-msgstr ""
-"Η χρήση preseeding για την διαμέριση του σκληρού δίσκου περιορίζεται "
-"ιδιαίτερα σε ότι υποστηρίζει το πρόγραμμα <classname>partman-auto</"
-"classname>. Μπορείτε να επιλέξετε την διαμέριση είτε του ελεύθερου χώρου που "
-"υπάρχει ήδη σ' έναν δίσκο είτε ολόκληρο τον δίσκο. Το περίγραμμα του δίσκου "
-"μπορεί να οριστεί χρησιμοποιώντας μια προκαθορισμένη \"συνταγή\", μια δική "
-"σας \"συνταγή\" από ένα σχετικό αρχείο ή μια \"συνταγή\" που περιέχεται στο "
-"αρχείο προρυθμίσεων. Προς το παρόν δεν είναι δυνατή η διαμέριση πολλών "
-"δίσκων με χρήση preseeding ούτε η ρύθμιση RAID."
+msgstr "Η χρήση preseeding για την διαμέριση του σκληρού δίσκου είναι ιδιαίτερα περιορισμένο σε ό,τι υποστηρίζει το πρόγραμμα <classname>partman-auto</classname>. Μπορείτε να επιλέξετε την διαμέριση είτε του υπάρχοντος ελεύθερου χώρου σ' έναν δίσκο είτε ενός ολόκληρου δίσκου. Η διάταξη του δίσκου μπορεί να προσδιοριστεί χρησιμοποιώντας μια προκαθορισμένη ή μια δική σας \"συνταγή\" από ένα σχετικό αρχείο ή μια \"συνταγή\" που συμπεριλαμβάνεται στο αρχείο προρυθμίσεων. Προς το παρόν δεν είναι δυνατή η διαμέριση πολλών δίσκων με χρήση προρύθμισης."
 
 #. Tag: para
 #: preseed.xml:768
@@ -1436,7 +1439,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:776
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1503,22 +1506,29 @@ msgid ""
 msgstr ""
 "# Αν το σύστημα έχει ελεύθερο χώρο μπορείτε να επιλέξετε να διαμερίσετε μόνο "
 "αυτόν τον χώρο.\n"
-"#Σημείωση: η προρυθμισμένη τιμή γι' αυτό το πρότυπο θα πρέπει να "
-"τοπικοποιηθεί (μεταφραστεί).\n"
+"#Σημείωση: αυτό θα πρέπει να προρυθμιστεί με μια τοπικοποιημένη (μεταφρασμένη) τιμή.\n"
 "#d-i partman-auto/init_automatically_partition \\\n"
-"#      επιλέξτε Χρήση του μεγαλύτερου συνεχόμενου ελεύθερου χώρου\n"
+"#      επιλέξτε Καθοδηγούμενη - Χρήση του μεγαλύτερου συνεχόμενου ελεύθερου χώρου\n"
 "\n"
 "# Εναλλακτικά, μπορείτε να ορίσετε έναν ολόκληρο δίσκο για διαμέριση. Το "
-"όνομα της συσκευής μπορεί να\n"
-"# δωθεί σε μορφή είτε devfs είτε παραδοσιακή non-devfs.\n"
-"# Για παράδειγμα, για να χρησιμοποιήσετε τον πρώτο δίσκο που γνωρίζει το "
-"devfs:\n"
+"όνομα της συσκευής\n"
+"# μπορεί να δοθεί είτε σε μορφή devfs είτε σε παραδοσιακή non-devfs μορφή.\n"
+"# Για παράδειγμα, για να χρησιμοποιήσετε τον πρώτο δίσκο:\n"
 "d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+"#Επιπρόσθετα θα πρέπει να προσδιορίσετε την μέθοδο που θα χρησιμοποιηθεί.\n"
+"#Οι μέθοδοι που είναι αυτή τη στιγμή διαθέσιμες είναι: \"regular\", \"lvm\" και \"crypto\"\n"
+"d-i partman-auto/method string lvm\n"
+"\n"
+"#Αν ένας από τους δίσκους που πρόκειται να διαμεριστούν αυτόματα\n"
+"# περιέχει μια παλιά διαμόρφωση LVM, ο χρήστης θα λάβει κανονικά μια\n"
+"#προειδοποίηση. Αυτό μπορεί επίσης να αποφευχθεί με προρύθμιση...\n"
+"d-i partman-auto/purge_lvm_from_device boolean true\n"
+"#Και το ίδιο ισχύει για την επιβεβαίωση της εγγραφής των κατατμήσεων lvm.\n"
+"d-i partman-lvm/confirm boolean true\n"
 "\n"
 "# Μπορείτε να διαλέξετε οποιαδήποτε από τις προκαθορισμένες συνταγές "
-"διαμέρισης:\n"
-"#Σημείωση: η προκαθορισμένη τιμή γι' αυτό το πρότυπο πρέπει να τοπικοποιηθεί "
-"(μεταφραστεί).\n"
+"διαμέρισης.\n"
+"#Σημείωση: αυτό θα πρέπει να προρυθμιστεί με μια τοπικοποιημένη (μεταφρασμένη) τιμή.\n"
 "d-i partman-auto/choose_recipe \\\n"
 "       επιλέξτε Όλα τα αρχεία σε μια κατάτμηση (συνίσταται για νέους "
 "χρήστες)\n"
@@ -1535,10 +1545,8 @@ msgstr ""
 "# απλά να το υποδείξετε.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
 "\n"
-"# αν όχι, μπορείτε να βάλετε μια ολόκληρη συνταγή στο αρχείο preseed σε μια "
-"(λογική)\n"
-"# γραμμή. Αυτό το παράδειγμα δημιουργεί μια μικρή κατάτμηση /boot, κατάλληλο "
-"χώρο swap, και\n"
+"# αν όχι, μπορείτε να βάλετε μια ολόκληρη συνταγή στο αρχείο προρυθμίσεων σε μια\n"
+"# (λογική) γραμμή. Αυτό το παράδειγμα δημιουργεί μια μικρή κατάτμηση /boot, κατάλληλο χώρο swap, και\n"
 "# χρησιμοποιεί τον υπόλοιπο χώρο για την ριζική κατάτμηση:\n"
 "#d-i partman-auto/expert_recipe string                         \\\n"
 "#      boot-root ::                                            \\\n"
@@ -1567,9 +1575,9 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:781
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Partitioning using RAID"
-msgstr "Διαμέριση"
+msgstr "Διαμέριση με χρήση RAID"
 
 #. Tag: para
 #: preseed.xml:782
@@ -1581,6 +1589,8 @@ msgid ""
 "install to all devices used in the array; see <xref linkend=\"preseed-"
 "bootloader\"/>."
 msgstr ""
+"Μπορείτε επίσης να χρησιμοποιήσετε την μέθοδο προρύθμισης για να διαμορφώσετε κατατμήσεις σε συστοιχίες RAID λογισμικού (software RAID). Υποστηρίζονται επίπεδα RAID 0, 1 και 5, η δημιουργία degraded συστοιχιών και ο προσδιορισμός εφεδρικών συσκευών. Αν χρησιμοποιείτε RAID 1 μπορείτε να προρυθμίσετε την εγκατάσταση του grub σε όλες τις συσκευές που χρησιμοποιούνται στη συστοιχία. Δείτε το <xref linkend=\"preseed-"
+"bootloader\"/>."
 
 #. Tag: para
 #: preseed.xml:792
@@ -1591,7 +1601,7 @@ msgid ""
 "responsibility to get the various recipes right (so they make sense and "
 "don't conflict) lies with the user. Check <filename>/var/log/syslog</"
 "filename> if you run into problems."
-msgstr ""
+msgstr "Είναι εύκολο να γίνει κάποιο λάθος με αυτόν τον τύπο αυτόματης διαμέρισης. Είναι επίσης ένα πολύ καινούριο στοιχείο που πιθανόν να έχει ακόμα μερικά σφάλματα ή να στερείται διαχείριση λαθών. Η ευθύνη να γίνουν οι διάφορες συνταγές με σωστό τρόπο (ώστε να έχουν νόημα και να μην οδηγούν σε συγκρούσεις) ανήκει στον ίδιο τον χρήστη. Ελέγξτε το <filename>/var/log/syslog</filename> αντιμετωπίσετε προβλήματα."
 
 #. Tag: para
 #: preseed.xml:800
@@ -1600,7 +1610,7 @@ msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
 "component. RAID 5 is untested. Advanced RAID setup with degraded arrays or "
 "spare devices has only been tested lightly."
-msgstr ""
+msgstr "Σημειώστε ότι μόνο επίπεδα RAID 0 και RAID 1 έχουν ελεγχθεί από τους προγραμματιστές αυτής της συνιστώσας. Δεν έχει δοκιμαστεί το RAID 5. Πιο εξεζητημένες διαμορφώσεις με degraded συστοιχίες ή εφεδρικές συσκευές έχουν ελεγχθεί ελάχιστα."
 
 #. Tag: screen
 #: preseed.xml:808
@@ -1653,6 +1663,52 @@ msgid ""
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
 msgstr ""
+"# ΣΗΜΕΙΩΣΗ: αυτή η επιλογή έχει ποιότητα έκδοσης beta και θα πρέπει να χρησιμοποιηθεί προσεκτικά\n"
+"\n"
+"# Η μέθοδος θα πρέπει να οριστεί σαν \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Προσδιορίστε τους δίσκους που θέλετε να διαμερίσετε. Θα αποκτήσουν όλοι το ίδιι περίγραμμα,\n"
+"# συνεπώς η μέθοδος θα δουλέψει μόνο αν οι δίσκοι έχουν το ίδιο μέγεθος.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"\n"
+"# Στη συνέχεια θα πρέπει να προσδιορίσετε τις φυσικές κατατμήσεις που θα χρησιμοποιηθούν.\n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Τέλος πρέπει να προσδιορίσετε το πώς θα χρησιμοποιηθούν οι από πριν καθορισμένες\n"
+"# κατατμήσεις στην διαμόρφωση του RAID. Θυμηθείτε να χρησιμοποιήσετε τους σωστούς αριθμούς των καταμήσεων\n"
+"# για λογικές κατατμήσεις.\n"
+"# Οι παράμετροι είναι:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
+"mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# Υποστηρίζονται επίπεδα RAID 0, 1 και 5; οι συσκευές χωρίζονται με χρήση της \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# Αυτό έχει σαν αποτέλεσμα την πραγματοποίηση της διαμέρισης από το πρόγραμμα partman αυτόματα χωρίς επιβεβαίωση.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       επιλέξτε Ολοκλήρωση διαμέρισης και εγγραφή των αλλαγών στον δίσκο\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:813
@@ -1701,7 +1757,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:829
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
 "#d-i apt-setup/non-free boolean true\n"
@@ -1727,15 +1783,18 @@ msgstr ""
 "#d-i apt-setup/contrib boolean true\n"
 "# Αποσχολιάσετε το επόμενο για να αποφύγετε την προσθήκη πηγών αναβαθμίσεων "
 "ασφαλείας, ή\n"
-"#προσθέστε ένα άλλο όνομα μηχανήματος για να χρησιμοποιήσετε έναν άλλον "
-"server από το security.debian.org.\n"
+"#προσθέστε ένα άλλο όνομα μηχανήματος για να χρησιμοποιήσετε έναν εξυπηρετητή διαφορετικό από τον security.debian.org.\n"
 "#d-i apt-setup/security_host string \n"
 "\n"
-"# Επιπρόσθετες διαθέσιμες τοποθεσίες πακέτων, local[0-9]\n"
-"#d-i apt-setup/local0/comment string local server\n"
+"# Επιπρόσθετες διαθέσιμες αρχειοθήκες πακέτων, local[0-9]\n"
 "#d-i apt-setup/local0/repository string \\\n"
 "#       deb http://local.server/debian stable main\n"
-"# URL για το δημόσιο κλειδί της τοπικής \"αποθήκης\" \n"
+"#d-i apt-setup/local0/comment string local server\n"
+"#Ενεργοποίηση γραμμών για deb-src\n"
+"#d-i apt-setup/local0/source boolean true\n"
+"# URL για το δημόσιο κλειδί της τοπικής αρχειοθήκης. Θα πρέπει να δώσετε ένα κλειδί \n"
+"#διαφορετικά το apt θα διαμαρτυρηθεί για την μη πιστοποιημένη αρχειοθήκη και έτσι\n"
+"#η αντίστοιχη γραμμή στο sources.list θα παραμείνει σχολιασμένη\n"
 "#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
@@ -1759,7 +1818,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:842
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
 "access to the preconfiguration file will have the knowledge of these "
@@ -1767,16 +1826,16 @@ msgid ""
 "security but it might also give a false sense of security as access to a MD5 "
 "hash allows for brute force attacks."
 msgstr ""
-"Έχετε υπόψιν ότι το preseeding κωδικών πρόσβασης δεν είναι απόλυτα ασφαλές "
-"καθώς οποιοσδήποτε με πρόσβαση στο αρχείο preseed θα έχει γνώση αυτών των "
+"Έχετε υπόψιν ότι η προρύθμιση για τους κωδικούς πρόσβασης δεν είναι απόλυτα ασφαλής "
+"καθώς οποιοσδήποτε με πρόσβαση στο αρχείο προρυθμίσεων θα έχει γνώση αυτών των "
 "κωδικών. Η χρήση κωδικών MD5 hash θεωρείται σχετικά καλλίτερη από άποψη "
-"ασφαλείας, αλλά μπορεί επίσης να δώσει μια ψευδή αίσθηση ασφαλείας καθώς η "
-"πρόσβαση σε ένα τέτοιο κωδικό επιτρέπει επιθέσεις \"ωμής\" παραβίασής (brute "
-"force attack) του."
+"ασφάλειας, μπορεί όμως και να δώσει μια ψευδή αίσθηση ασφάλειας καθώς η "
+"πρόσβαση σ' έναν τέτοιο κωδικό επιτρέπει \"απευθείας\" επιθέσεις (brute "
+"force attacks)."
 
 #. Tag: screen
 #: preseed.xml:852
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1799,16 +1858,19 @@ msgid ""
 "# or encrypted using an MD5 hash.\n"
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
+"#Παράκαμψη της δημιουργίας λογαριασμού χρήστη root (ο λογαριασμός απλού χρήστη\n"
+"#θα είναι σε θέση να χρησιμοποιήσει την εντολή sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"#Eναλλακτικά για να παρακάμψετε την δημιουργία ενός λογαριασμού απλού χρήστη.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
 "# Κωδικός χρήστη root, είτε σε απλό κείμενο (clear text)\n"
 "#d-i passwd/root-password password r00tme\n"
 "#d-i passwd/root-password-again password r00tme\n"
 "# είτε κρυπτογραφημένο με χρήση MD5 hash.\n"
 "#d-i passwd/root-password-crypted password [MD5 hash]\n"
 "\n"
-"# Παρακάμψτε την δημιουργία ενός λογαριασμού απλού χρήστη.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Εναλλακτικά, δημιουργήστε έναν λογαριασμό απλού χρήστη.\n"
+"# Για να δημιουργήστε έναν λογαριασμό απλού χρήστη.\n"
 "#d-i passwd/user-fullname string Debian User\n"
 "#d-i passwd/username string debian\n"
 "# Κωδικός πρόσβασης απλού χρήστη, είτε σε απλό κείμενο\n"
@@ -1819,7 +1881,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:854
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
 "<classname>passwd/user-password-crypted</classname> variables can also be "
@@ -1831,11 +1893,11 @@ msgid ""
 msgstr ""
 "Οι μεταβλητές <classname>passwd/root-password-crypted</classname> και "
 "<classname>passwd/user-password-crypted</classname> μπορούν επίσης να "
-"προρυθμιστούν με το <quote>!</quote> σαν τιμή. Στην περίπτωση αυτή, ο "
+"προρυθμιστούν παίρνοντας σαν τιμή το <quote>!</quote>. Στην περίπτωση αυτή, ο "
 "αντίστοιχος λογαριασμός απενεργοποιείται. Αυτό μπορεί να είναι βολικό για "
-"τον λογαριασμό του χρήστη root, εφόσον βέβαια έχετε ορίσει έναν εναλλακτικό "
-"τρόπο για την δυνατότητα διαχειριστικών ενεργειών ή είσοδο του χρήστη root "
-"(για παράδειγμα με χρήση αυθεντικοποίησης με κλειδί SSH ή sudo)."
+"τον λογαριασμό του χρήστη root, εφόσον βέβαια έχει ρυθμιστεί εναλλακτικός "
+"τρόπος που να επιτρέπει τις διάφορες διαχειριστικές ενέργειες ή την είσοδο του χρήστη root "
+"(για παράδειγμα με χρήση αυθεντικοποίησης με κλειδί SSH ή την εντολή <command>sudo</command>)."
 
 #. Tag: para
 #: preseed.xml:864
@@ -1890,7 +1952,7 @@ msgstr "Εγκατάσταση φορτωτή εκκίνησης"
 
 #. Tag: screen
 #: preseed.xml:889
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
@@ -1914,28 +1976,30 @@ msgid ""
 "# To install grub to multiple disks:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 msgstr ""
-"# Το Grub είναι ο προεπιλεγμένος φορτωτής εκκίνησης (για συστήματα x86). Αν "
-"# θέλετε να εγκαταστήσετε αντί γι' αυτό το lilo\n"
-"# αποσχολιάσετε αυτή την γραμμή:\n"
+"# Το Grub είναι ο προεπιλεγμένος φορτωτής εκκίνησης (για συστήματα x86). Αν θέλετε αντί γι' αυτό να εγκαταστήσετε το lilo\n"
+"# αποσχολιάσετε αυτή τη γραμμή:\n"
 "#d-i grub-installer/skip boolean true\n"
 "\n"
-"# Είναι αρκετά ασφαλές να κάνετε αυτή την ρύθμιση, προκαλεί την αυτόματη # "
+"# Ο ορισμός αυτής της ρύθμισης είναι αρκετά ασφαλής και προκαλεί την αυτόματη"
 "εγκατάσταση του grub στο MBR\n"
-"# αν δεν ανιχνυεθεί κάποιο άλλο λειτουργικό σύστημα στο μηχάνημά σας.\n"
+"# αν δεν ανιχνευθεί κάποιο άλλο λειτουργικό σύστημα στο μηχάνημα.\n"
 "d-i grub-installer/only_debian boolean true\n"
 "\n"
-"# Αυτό προκαλεί την εγκατάσταση του grub-installer στο MBR αν εντοπίσει και "
+"# Αυτή η ρύθμιση προκαλεί την εγκατάσταση του grub-installer στο MBR αν εντοπίσει και "
 "# κάποιο άλλο λειτουργικό σύστημα (OS)\n"
-"# και είναι σχετικά λιγότερο ασφαλές, καθώς είναι δυνατόν να μην μπορεί να # "
+"# και είναι σχετικά λιγότερο ασφαλής, καθώς είναι δυνατόν να μην μπορεί να"
 "εκκινήσει αυτό το άλλο λειτουργικό σύστημα.\n"
 "d-i grub-installer/with_other_os boolean true\n"
 "\n"
-"# Ενναλακτικά, αν θέλετε να εγκαταστήσετε το GRUB σε μια τοποθεσία # "
+"# Εναλλακτικά, αν θέλετε να εγκαταστήσετε το GRUB σε μια τοποθεσία"
 "διαφορετική από το mbr,\n"
 "# αποσχολιάστε και διορθώστε τις ακόλουθες γραμμές:\n"
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "#d-i grub-installer/only_debian boolean false\n"
-"#d-i grub-installer/with_other_os boolean false"
+"#d-i grub-installer/with_other_os boolean false\n"
+"#d-i grub-installer/bootdev  string (hd0,0)\n"
+"# Για να εγκαταστήσετε το grub σε πολλαπλούς δίσκους:\n"
+"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
 #: preseed.xml:894
@@ -1956,7 +2020,7 @@ msgstr ""
 
 #. Tag: userinput
 #: preseed.xml:904
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "standard"
 msgstr "Κανονικό σύστημα"
 
@@ -2042,7 +2106,7 @@ msgid ""
 "classname>. The value of this parameter can be a list of packages separated "
 "by either commas or spaces, which allows it to be used easily on the kernel "
 "command line as well."
-msgstr ""
+msgstr "Αν θέλετε να εγκαταστήσετε κάποια μεμονωμένα πακέτα επιπλέον από τα πακέτα που εγκαθίστανται από τις ομάδες πακέτων (tasks), μπορείτε να χρησιμοποιήσετε την παράμετρο <classname>pkgsel/include</classname>. Η τιμή αυτής της παραμέτρου μπορεί να είναι μια λίστα πακέτων που διαχωρίζονται με άνω τελείες ή κενά, κάτι που επιτρέπει επίσης την εύκολη χρήση της στην γραμμή εντολών του πυρήνα."
 
 #. Tag: screen
 #: preseed.xml:954
@@ -2081,7 +2145,7 @@ msgstr "Ολοκλήρωση του πρώτου σταδίου της εγκα�
 
 #. Tag: screen
 #: preseed.xml:961
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Avoid that last message about the install being complete.\n"
 "d-i finish-install/reboot_in_progress note\n"
@@ -2090,11 +2154,11 @@ msgid ""
 "# which is useful in some situations.\n"
 "#d-i cdrom-detect/eject boolean false"
 msgstr ""
-"# Avoid that last message about the install being complete.\n"
-"d-i prebaseconfig/reboot_in_progress note\n"
+"# Αποφύγετε αυτό το τελευταίο μήνυμα σχετικά με την ολοκλήρωση της εγκατάστασης.\n"
+"d-i finish-install/reboot_in_progress note\n"
 "\n"
-"# This will prevent the installer from ejecting the CD during the reboot,\n"
-"# which is useful in some situations.\n"
+"# Αυτό θα αποτρέψει τον εγκαταστάτη από το να εξάγει το CD κατά την επανεκκίνηση,\n"
+"#κάτι που είναι χρήσιμο σε μερικές περιπτώσεις.\n"
 "#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
@@ -2246,19 +2310,18 @@ msgstr "Εκτέλεση προσαρμοσμένων εντολών κατά τ
 
 #. Tag: para
 #: preseed.xml:1006
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
 "the ability to run commands or scripts at certain points in the installation."
 msgstr ""
 "Μια πολύ ισχυρή και ευέλικτη επιλογή που προσφέρεται από τα εργαλεία "
-"προρύθμισης είναι η δυνατότητα εκτέλεσης εντολών ή \"σεναρίων\" (script) σε "
-"συγκεκριμένα σημεία της εγκατάστασης. Δείτε το <xref linkend=\"preseed-shell"
-"\"/> για λεπτομέρειες."
+"προρύθμισης είναι η δυνατότητα εκτέλεσης εντολών ή σεναρίων σε "
+"συγκεκριμένα σημεία της εγκατάστασης."
 
 #. Tag: screen
 #: preseed.xml:1014
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
 "# for attempts at buffer overflows or other exploits of the values of a\n"
@@ -2277,14 +2340,14 @@ msgid ""
 "# packages and run commands in the target system.\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 msgstr ""
-"# Το d-i preseeding είναι από την φύση του μη ασφαλές. Δεν υπάρχει κανένα "
+"# H προρύθμιση με τον d-i είναι από την φύση της μη ασφαλής. Δεν υπάρχει κανένα "
 "#στοιχείο στον εγκαταστάτη που να ελέγχει\n"
 "# για προσπάθειες buffer overflow ή άλλες αδυναμίες στις τιμές ενός\n"
-"# αρχείου preseed όπως αυτό. Χρησιμοποιήστε ένα τέτοιο αρχείο μόνο από "
+"# αρχείου προρυθμίσεων όπως αυτό εδώ. Χρησιμοποιήστε ένα τέτοιο αρχείο μόνο από "
 "#έμπιστες\n"
 "# τοποθεσίες! Για να το πετύχετε αυτό, κι επειδή είναι γενικά χρήσιμο, εδώ "
 "είναι\n"
-"# ένας τρόπος να εκτελέσετε οποιοδήποτε εντολή κελύφους μέσα από τον "
+"# ένας τρόπος να εκτελέσετε οποιαδήποτε εντολή κελύφους μέσα από τον "
 "#εγκαταστάτη,\n"
 "# αυτόματα.\n"
 "\n"
@@ -2294,10 +2357,10 @@ msgstr ""
 "\n"
 "# Η εντολή αυτή εκτελείται μόλις πριν από την ολοκλήρωση της εγκατάστασης, "
 "#αλλά ενώ υπάρχει ακόμα\n"
-"# ένας χρησιμοποιήσιμος κατάλογος /target. Μπορείτε να κάνετε chroot στον # "
+"# ένας χρησιμοποιήσιμος κατάλογος /target. Μπορείτε να κάνετε chroot στον"
 "κατάλογο /target και να τον χρησιμοποιήσετε\n"
 "# άμεσα, ή να χρησιμοποιήσετε τις εντολές apt-install και in-target για να\n"
-" # εγκαταστήσετε εύκολα πακέτα και να εκτελέσετε εντολές στο σύστημα # "
+" # εγκαταστήσετε εύκολα πακέτα και να εκτελέσετε εντολές στο σύστημα"
 "προορισμού\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
