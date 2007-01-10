@@ -1,6 +1,12 @@
 #!/bin/sh
 
 . /lib/partman/definitions.sh
+. /lib/partman/auto-shared.sh
+
+# Skip if no disks detected
+if [ -z "$(get_auto_disks)" ]; then
+	exit 0
+fi
 
 db_metaget partman-auto/text/use_device description
 printf "regular\t$RET\n"
