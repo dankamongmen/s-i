@@ -1,10 +1,12 @@
 #!/bin/sh
 
 . /usr/share/debconf/confmodule
+. /lib/partman/auto-shared.sh
 
-# Do not run on S/390
-if [ "$(udpkg --print-architecture)" = s390 ]; then
-        exit 0
+# Skip if no disks detected and don't run on S/390
+if [ -z "$(get_auto_disks)" ] || \
+   [ "$(udpkg --print-architecture)" = s390 ]; then
+	exit 0
 fi
 
 db_metaget partman-auto/text/automatically_partition description
