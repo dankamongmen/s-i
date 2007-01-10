@@ -1,87 +1,88 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 43528 -->
 
-
-  <sect2 arch="sparc" id="sparc-cpus"><title>CPUs, Mainboards und Grafikunterstützung</title>
+  <sect2 arch="sparc" id="sparc-cpus">
+  <title>Unterstützte CPUs und Mainboards</title>
 <para>
 
-Momentan unterstützt die <emphasis>&architecture;</emphasis>-Portierung
-mehrere Typen von Sparc-Systemen. Die verbreitetsten Namen für
-Sparc-Systeme sind sun4, sun4c, sun4m, sun4d und sun4u. Momentan unterstützen
-wir keine sehr alte sun4-Hardware. Die anderen Systeme werden jedoch
-unterstützt. Sun4d wurde davon am wenigsten getestet, erwarten Sie
-also mögliche Probleme im Bezug auf die Stabilität des Kernels. Sun4c
-und Sun4m, die am stärksten verbreitete ältere Sparc-Hardware,
-beinhaltet solche Systeme wie die SparcStation 1, 1+, IPC, IPX beziehungsweise
-SparcStation LX, 5, 10 und 20. Die UltraSPARC-Systemklasse fällt unter
-die sun4u-Kategorie und wird mit dem sun4u-Satz der Installationsimages
-unterstützt. Einige Systeme, die in diese eigentlich unterstützte Kategorie
-gehören, werden nicht unterstützt. Bekanntermaßen nicht unterstützte Systeme sind der
-AP1000 Multicomputer und das Tadpole Sparcbook 1. Lesen Sie die
-<ulink url="&url-sparc-linux-faq;">Linux for SPARC Processors F.A.Q.</ulink>
-bezüglich detaillierter Informationen.
+Sparc-basierte Hardware ist in eine Reihe von verschiedenen Unterarchitekturen
+aufgeteilt, die durch einen der folgenden Namen identifiziert werden: sun4,
+sun4c, sun4d, sun4m, sun4u oder sun4v. Die folgende Liste beschreibt, welche
+Maschinen enthalten sind und welches Maße an Unterstützung für sie erwartet
+werden kann.
 
 </para>
 
-   <sect3><title>Speicherkonfiguration</title>
+<variablelist>
+<varlistentry>
+<term>sun4, sun4c, sun4d</term>
+
+<listitem><para>
+
+Diese Unterarchitekturen enthalten einige sehr alte 32-Bit-Maschinen, die
+nicht mehr unterstützt werden. Eine komplette Liste finden Sie auf der
+<ulink url="http://en.wikipedia.org/wiki/SPARCstation">Wikipedia
+SPARCstation - Seite</ulink>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4m</term>
+
+<listitem><para>
+
+sun4m ist die einige 32-Bit-Unterarchitektur (sparc32), die derzeit unterstützt
+wird. Die populärsten Maschinen aus dieser Klasse sind Sparcstation 4, 5, 10
+und 20.
+
+</para><para>
+
+Beachten Sie, dass symmetrisches Multiprocessing (SMP) &ndash; die
+Möglichkeit, Prozesse auf mehreren Prozessoren laufen zu lassen &ndash; auf
+dieser Hardware aufgrund von Stabilitätsproblemen mit solchen Konfigurationen
+nicht unterstützt wird. Der verfügbare <quote>Uniprocessor</quote>-
+(UP)-Sparc32-Kernel bootet aber korrekt auf Multiprozessor-Maschinen (obwohl
+er nur die erste CPU aktiviert und nutzt).
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4u</term>
+
+<listitem><para>
+
+Diese Unterarchitektur enthält alle 64-Bit-Rechner (sparc64), die auf dem
+UltraSparc-Prozessor oder dessen Klonen basieren. Die meisten dieser Maschinen
+werden gut unterstützt, obwohl Sie bei manchen aufgrund von Firmware- oder
+Bootloader-Fehlern Probleme haben könnten, von CD zu booten (dieses Problem
+kann eventuell durch das Booten per Netzwerk (netboot) umgangen werden).
+Verwenden Sie den sparc64- oder sparc64-smp-Kernel für UP- beziehungsweise
+SMP-Konfigurationen.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4v</term>
+
+<listitem><para>
+
+Dies ist der letzte Neuzugang in der Sparc-Familie und enthält Maschinen,
+die auf den Niagara Multi-Core-CPUs basieren. Im Moment sind solche CPUs
+nur in T1000- und T2000-Servern von Sun verfügbar und sie werden gut
+unterstützt. Nutzen Sie den sparc64-smp-Kernel.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
 <para>
 
-Bei einigen älteren Sun-Arbeitsplatzrechnern, besonders Sun IPX und Sun IPC,
-befinden sich die Speicherbänke an fixen Stellen im physikalischen Speicherbereich.
-Wenn die Bänke nicht besetzt sind, existieren deshalb Lücken im physikalischen
-Speicher. Die Linux-Installation benötigt jedoch einen zusammenhängenden
-Speicherbereich, in den der Kernel und die Initial-RAM-Disk geladen wird.
-Ist dieser nicht verfügbar, führt das zu einer <quote>Data Access Exception</quote>
-(Datenzugriffs-Fehler).
-
-</para><para>
-
-Daher müssen Sie den Speicher so konfigurieren, dass der kleinste
-zusammenhängende Speicherblock mindestens 8MB hat. In den oben
-zitierten IPX und IPC sind die Speicherbänke in 16MB Bereiche
-eingeteilt. Das bedeutet, dass Sie eine ausreichend große
-SIMM in der Bank 0 (1. Steckplatz) haben müssen, um den Kernel
-und die RAM-Disk fassen zu können. In diesem Fall sind
-4MB <emphasis>nicht</emphasis> ausreichend.
-
-</para><para>
-
-Beispiel:
-In einer Sun IPX haben Sie einen 16MB SIMM und einen 4MB SIMM. Es gibt
-vier SIMM-Steckplätze (0,1,2,3; Platz 0 ist der am weitesten entfernte von den
-SBUS-Anschlüssen). Hier müssen Sie den 16MB SIMM in Steckplatz 0 installieren;
-es wird empfohlen, den 4MB SIMM in Platz 2 zu stecken.
+Beachten Sie, dass Fujitsu's sparc64-CPUs, die in der PRIMEPOWER-Server-Familie
+Verwendung finden, nicht unterstützt werden, da im Linux-Kernel die
+entsprechende Unterstützung fehlt.
 
 </para>
-   </sect3>
-
-   <sect3><title>Grafikkonfiguration</title>
-<para>
-
-Im speziellen Fall von älteren Sun-Workstations ist es relativ
-verbreitet, dass ein Onboard-Framebuffer vorhanden ist
-(der später ersetzt wurde, zum Beispiel der bwtwo in einer Sun IPC)
-und eine SBUS-Karte im SBUS-Slot gesteckt wird, die
-wahrscheinlich beschleunigten Pufferspeicher enthält.
-Unter Solaris/SunOS bereitet das keine Probleme, da beide
-Karten initialisiert werden.
-
-</para><para>
-
-Mit Linux könnte das ein Problem werden, weil der Boot-PROM-Monitor
-seine Meldungen auf dieser zusätzlichen Karte anzeigt,
-die Boot-Meldungen des Linux-Kernels jedoch zum
-Original-Onboard-Framebuffer umgeleitet werden, so dass <emphasis>keine</emphasis>
-Fehlermeldungen auf dem Bildschirm erscheinen, während die
-Maschine beim Laden der RAM-Disk scheinbar hängt.
-
-</para><para>
-
-Um dieses Problem zu vermeiden, schließen Sie den Bildschirm (wenn nötig)
-an die Video-Karte im SBUS-Slot mit der niedrigsten Nummer an (eine
-Onboard-Karte ist niedriger nummeriert als externe Slots).
-Alternativ ist es möglich, eine serielle Konsole zu verwenden.
-
-</para>
-   </sect3>
   </sect2>
