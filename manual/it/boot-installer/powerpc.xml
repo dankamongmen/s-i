@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33886 -->
+<!-- original version: 43923 -->
 
 
   <sect2 arch="powerpc" id="boot-cd">
@@ -12,16 +12,16 @@
 
 <!--
 Currently, the only &arch-title; subarchitectures that support CD-ROM
-booting are PReP and New World PowerMacs. On PowerMacs, hold the
-<keycap>c</keycap> key, or else the combination of
+booting are PReP (though not all systems) and New World PowerMacs.
+On PowerMacs, hold the <keycap>c</keycap> key, or else the combination of
 <keycap>Command</keycap>, <keycap>Option</keycap>,
 <keycap>Shift</keycap>, and <keycap>Delete</keycap>
 keys together while booting to boot from the CD-ROM.
 -->
 
-Attualmente le sole sotto architetture &arch-title; che supportano l'avvio
-da CD-ROM sono PReP e <quote>New World PowerMac</quote>. Sui PowerMac si
-deve premere il tasto <keycap>c</keycap> oppure la combinazione
+Attualmente le sole sotto architetture di &arch-title; che supportano l'avvio
+da CD-ROM sono PReP (non tutti i sistemi) e <quote>New World PowerMac</quote>.
+Sui PowerMac si deve premere il tasto <keycap>c</keycap> oppure la combinazione
 <keycap>Command</keycap>, <keycap>Option</keycap>, <keycap>Shift</keycap> e
 <keycap>Delete</keycap> contemporaneamente durante l'accensione per avviare
 da CD-ROM.
@@ -211,7 +211,7 @@ Make sure you have prepared everything from <xref
 linkend="boot-usb-files"/>. To boot a Macintosh system from a USB stick,
 you will need to use the Open Firmware prompt, since Open Firmware does
 not search USB storage devices by default.
-<!- TODO: although it could be made to; watch this space ->
+<!\-\- TODO: although it could be made to; watch this space \-\->
 To get to the prompt, hold down
 <keycombo><keycap>Command</keycap> <keycap>Option</keycap>
 <keycap>o</keycap> <keycap>f</keycap></keycombo> all together while
@@ -330,6 +330,10 @@ boot monitor (see <xref linkend="invoking-openfirmware"/>) and
 use the command <command>boot enet:0</command>.  PReP and CHRP boxes
 may have different ways of addressing the network.  On a PReP machine,
 you should try
+<userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
+On some PReP systems (e.g. Motorola PowerStack machines) the command
+<userinput>help boot</userinput> may give a description of syntax and
+available options.
 -->
 
 Su macchine con Open Firmware, come i PowerMac NewWorld, si deve
@@ -338,8 +342,10 @@ accedere al <quote>boot monitor</quote> (si veda
 e usare il comando <command>boot enet:0</command>. Le macchine
 PReP e CHRP possono avere metodi diversi di indirizzare la rete.
 Su una macchina PReP si può provare
-
-<userinput>boot <replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
+<userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
+Su alcuni sistemi PReP (come le macchine Motorola PowerStack) il comando
+<userinput>help boot</userinput> potrebbe visualizzare una descrizione
+della sintassi e delle opzioni disponibili.
 
 </para>
   </sect2>
@@ -431,6 +437,7 @@ appears skewed on an older Apple monitor, try appending the boot
 argument <userinput>video=atyfb:vmode:6</userinput> , which will
 select that mode for most Mach64 and Rage video hardware. For Rage 128
 hardware, this changes to
+<userinput>video=aty128fb:vmode:6</userinput> .
 -->
 
 Se l'immagine appare distorta utilizzando un video Apple in modalità

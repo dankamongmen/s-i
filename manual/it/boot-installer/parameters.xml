@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43730 -->
+<!-- original version: 44002 -->
 
 
  <sect1 id="boot-parms">
@@ -251,9 +251,9 @@ dall'installatore. Attualmente i possibili valori sono:
 <!--
 The default frontend is <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>DEBIAN_FRONTEND=text</userinput> may be preferable for
-serial console installs. Generally only the
+serial console installs. Generally, only the
 <userinput>newt</userinput> frontend is available on default install
-media. On architectures which support it, the graphical installer uses
+media. On architectures that support it, the graphical installer uses
 the <userinput>gtk</userinput> frontend.
 -->
 
@@ -262,7 +262,7 @@ Nel caso di installazione con una console seriale può essere preferibile
 usare <userinput>DEBIAN_FRONTEND=text</userinput>. Di solito sui supporti
 d'installazione è disponibile solo l'interfaccia <userinput>newt</userinput>.
 Sulle sole architetture che supportano la versione grafica dell'installatore
-è disponibile l'interfaccia <userinput>gtk</userinput>.
+è disponibile anche l'interfaccia <userinput>gtk</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -538,7 +538,7 @@ sono famosi per questo malfunzionamento.
 <listitem><para>
 
 <!--
-Specify the url to a preconfiguration file to download and use in
+Specify the url to a preconfiguration file to download and use for
 automating the install. See <xref linkend="automatic-install"/>.
 -->
 
@@ -553,7 +553,7 @@ nelle installazioni automatiche. Si veda <xref linkend="automatic-install"/>.
 <listitem><para>
 
 <!--
-Specify the path to a preconfiguration file to load to
+Specify the path to a preconfiguration file to load for
 automating the install. See <xref linkend="automatic-install"/>.
 -->
 
@@ -708,6 +708,7 @@ risposte possono essere trovate in <xref linkend="preseed-bootparms"/>;
 seguono anche alcuni esempi.
 
 </para>
+
 <variablelist>
 
 <varlistentry>
@@ -884,6 +885,60 @@ BNC (coassiale) e l'IRQ 10 si deve passare:
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
 </screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <!-- <title>Blacklisting kernel modules</title> -->
+   <title>Moduli del kernel in blacklist</title>
+<para>
+
+<!--
+Sometimes it may be necessary to blacklist a module to prevent it from
+being loaded automatically by the kernel and udev. One reason could be that
+a particular module causes problems with your hardware. The kernel also
+sometimes lists two different drivers for the same device. This can cause
+the device to not work correctly if the drivers conflict or if the wrong
+driver is loaded first.
+-->
+
+Potrebbe essere necessario mettere in blacklist un modulo per impedire che
+venga caricato automaticamente dal kernel o da udev. Un motivo per questa
+operazione può essere l'incompatibilità fra il modulo e l'hardware. Inoltre,
+alcune volte, il kernel elenca due driver diversi per lo stesso device,
+questo può causare il cattivo funzionamento del device se c'è un conflitto
+fra i driver o se viene caricato prima quello sbagliato.
+
+</para><para>
+
+<!--
+You can blacklist a module using the following syntax:
+<userinput><replaceable>module_name</replaceable>.blacklist=yes</userinput>.
+This will cause the module to be blacklisted in
+<filename>/etc/modprobe.d/blacklist.local</filename> both during the
+installation and for the installed system.
+-->
+
+Si può aggiungere un modulo alla blacklist con questa sintassi:
+<userinput><replaceable>nome_modulo</replaceable>.blacklist=yes</userinput>.
+Questo causa l'inserimento del modulo nella blacklist
+<filename>/etc/modprobe.d/blacklist.local</filename> sia durante
+l'installazione che nel sistema al termine dell'installazione.
+
+</para><para>
+
+<!--
+Note that a module may still be loaded by the installation system itself.
+You can prevent that from happening by running the installation in expert
+mode and unselecting the module from the list of modules displayed during
+the hardware detection phases.
+-->
+
+Si noti che un modulo potrebbe essere caricato comunque dal sistema
+d'installazione. Si può evitare che questo avvenga eseguendo l'installazione
+in modalità esperto e deselezionando il modulo nell'elenco dei moduli che
+viene mostrato durante le fasi di riconoscimento dell'hardware.
 
 </para>
    </sect3>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44016 -->
 
 
  <sect1 id="linux-upgrade">
@@ -398,7 +398,9 @@ Per montare tutti i file system specificati nel proprio
 mentre per montarli singolarmente si usi:
 
 <informalexample><screen>
-# mount /path   # per esempio:  mount /usr
+<!--
+# mount /path   # e.g.: mount /usr
+--># mount /path   # per esempio:  mount /usr
 </screen></informalexample>
 
 <!--
@@ -551,13 +553,13 @@ Gli indirizzi dei name server e le direttive search vanno inseriti in
 </screen></informalexample>
 
 <!--
-A simple <filename>/etc/resolv.conf</filename>:
+A simple example <filename>/etc/resolv.conf</filename>:
 -->
 
-Un semplice <filename>/etc/resolv.conf</filename>:
+Un semplice esempio di <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
-search hqdom.local\000
+search hqdom.local
 nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
@@ -740,33 +742,6 @@ l'installazione del pacchetto <classname>kernel-package</classname>.
 Si raccomanda di verificare che i valori riportati siano adatti al
 proprio sistema.
 
-</para><para arch="x86">
-
-<!--
-If you intend to use <classname>grub</classname> as your bootloader, you
-can set the <literal>do_bootloader</literal> option to <quote>no</quote>.
-To automatically update your <filename>/boot/grub/menu.lst</filename> on
-installation or removal of Debian kernels, add the following lines:
--->
-
-Se si intende usare <classname>grub</classname> come bootloader, si può
-impostare il valore di <literal>do_bootloader</literal> a <quote>no</quote>.
-Per aggiornare automaticamente il file <filename>/boot/grub/menu.lst</filename>
-quando si installa o si rimuove un kernel Debian, aggiungere le seguenti righe:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<!--
-For the <classname>lilo</classname> bootloader, the value of
-<literal>do_bootloader</literal> needs to be <quote>yes</quote>.
--->
-
-Per il bootloader <classname>lilo</classname>, il valore di
-<literal>do_bootloader</literal> deve essere <quote>yes</quote>.
-
 </para><para>
 
 <!--
@@ -880,6 +855,43 @@ image=/vmlinuz
 label=Debian
 </screen></informalexample>
 
+</para><para arch="x86">
+
+<!--
+Depending on which bootloader you selected, you can now make some
+additional changes in <filename>/etc/kernel-img.conf</filename>.
+-->
+
+Adesso, a seconda del bootloader prescelto, si devono fare ulteriori
+modifiche al file <filename>/etc/kernel-img.conf</filename>.
+
+</para><para arch="x86">
+
+<!--
+For the <classname>grub</classname> bootloader, you should
+set the <literal>do_bootloader</literal> option to <quote>no</quote>.
+And to automatically update your <filename>/boot/grub/menu.lst</filename>
+on installation or removal of Debian kernels, add the following lines:
+-->
+
+Per il bootloader <classname>grub</classname> si deve impostare l'opzione
+<literal>do_bootloader</literal> a <quote>no</quote>. Per aggiornare
+automaticamente il file <filename>/boot/grub/menu.lst</filename> quando
+si installa o si rimuove un kernel Debian, aggiungere le seguenti righe:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+<!--
+For the <classname>lilo</classname> bootloader, the value of
+<literal>do_bootloader</literal> needs to remain <quote>yes</quote>.
+-->
+
+Per il bootloader <classname>lilo</classname>, il valore di
+<literal>do_bootloader</literal> deve rimanere <quote>yes</quote>.
+
 </para><para arch="powerpc">
 
 <!--
@@ -932,7 +944,7 @@ Su alcune macchine potrebbe essere necessario usare
   </sect2>
 
   <sect2>
-  <!--<title>Finishing touches</title> -->
+  <!-- <title>Finishing touches</title> -->
   <title>Ritocchi finali</title>
 <para>
 
