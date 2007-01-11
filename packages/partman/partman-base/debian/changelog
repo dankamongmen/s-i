@@ -1,3 +1,16 @@
+partman-base (102) UNRELEASED; urgency=low
+
+  [Fabio M. Di Nitto]  
+  * parted_server.c: make sure to clear sigaction structs to fix a runtime
+    Illegal Instruction as see on Niagara machines.
+    From David S. Miller:
+    "You need to clear out the sig_action structure, otherwise
+     you leave crap in sa->sa_flags, in particular what can happen
+     is that SA_ONSTACK gets set which is what causes the program
+     to crash since the default signal stack value is zero."
+
+ -- Fabio M. Di Nitto <fabbione@fabbione.net>  Thu, 11 Jan 2007 07:01:48 +0100
+
 partman-base (101) unstable; urgency=low
 
   * parted_server.c: move free(s_fstype) after last usage in two functions.
