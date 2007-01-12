@@ -10,7 +10,7 @@ for dev in $DEVICES/*; do
     cd $dev
     open_dialog PARTITIONS
     while { read_line num id size type fs path name; [ "$id" ]; }; do
-	if [ "$fs" = free ] && ! longint_le $size $mysize; then
+	if [ "$fs" = free ] && [ "$type" != unusable ] && ! longint_le $size $mysize; then
 	    mysize=$size
 	    mypart=$dev//$id
 	fi
