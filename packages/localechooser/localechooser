@@ -485,9 +485,18 @@ log "Set $localecode = '$LOCALE'"
 # list we got from languagechooser
 # We shouldn't just add this before the former list in case the country 
 # is changed several times.
-if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" -a -n "$COUNTRYCODE" -a -n "$LANGUAGE" -a "$LOCALE" != "C" -a "$LANGUAGELIST" != "$LANGUAGE" ]; then
+if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
+   [ "$COUNTRYCODE" ] && [ "$LANGUAGE" ] && \
+   [ "$LOCALE" != "C" ] && [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
 	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
-	# Languagelist setting
+	db_set "$languagecode" "$LANGUAGELIST"
+	log "Set $languagecode = '$LANGUAGELIST'"
+fi
+
+# The code below adds "en" at the end of the language list
+# This guarantees that English is always a fallback language (#396116)
+if ! echo "$LANGUAGELIST" | grep -q "en"; then
+	LANGUAGELIST=${LANGUAGELIST}:en
 	db_set "$languagecode" "$LANGUAGELIST"
 	log "Set $languagecode = '$LANGUAGELIST'"
 fi
