@@ -493,14 +493,6 @@ if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
 	log "Set $languagecode = '$LANGUAGELIST'"
 fi
 
-# The code below adds "en" at the end of the language list
-# This guarantees that English is always a fallback language (#396116)
-if ! echo "$LANGUAGELIST" | grep -q "en"; then
-	LANGUAGELIST=${LANGUAGELIST}:en
-	db_set "$languagecode" "$LANGUAGELIST"
-	log "Set $languagecode = '$LANGUAGELIST'"
-fi
-
 
 # SELECT ADDITIONAL LOCALES
 
