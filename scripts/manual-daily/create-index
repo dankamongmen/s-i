@@ -22,7 +22,7 @@ build_link_table () {
     echo "  <tr>" >>$pagefile
     echo "    <th class=\"col1\">Architecture</th>" >>$pagefile
     for lang in $languages ; do
-        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
+        langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7`
         echo "    <th class=\"t1\">$langname</th>" >>$pagefile
     done
 
@@ -35,7 +35,7 @@ build_link_table () {
         echo "    <td class=\"col1\">$archname</td>" >>$pagefile
 
         for lang in $languages ; do
-            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7`
             destsuffix="${lang}.${arch}"
             echo "    <td>" >>$pagefile
             echo "      <a href=\"$destsuffix/index.html\">html</a>" >>$pagefile
@@ -111,7 +111,7 @@ if [ -f $logdir/tr-stats ] ; then
     for lang in `egrep -v "^en" $logdir/tr-stats | cut -f 1` ; do
         # XML-based if language dir has been committed to SVN
         if [ -d "$source/$lang/.svn" ] ; then
-            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 8`
+            langname=`egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7`
             echo "  <tr>" >>$pagefile
             echo "    <td class=\"col1\">$langname</td>" >>$pagefile
 

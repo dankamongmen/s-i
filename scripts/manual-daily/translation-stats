@@ -76,21 +76,10 @@ for lang in $languages; do
     done
     pct_trans=$(($lines_tr * 100 / $lines_tot))
 
-    files_need_update="N/A"
-    if [ "$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7)" = "Y" ] ; then
-        files_need_update=$(./scripts/doc-check $lang 2>/dev/null | \
-            egrep "^en/.*[[:digit:]]* -> [[:digit:]]*" | wc -l)
-    fi
+    files_need_update=$(./scripts/doc-check $lang 2>/dev/null | \
+        egrep "^en/.*[[:digit:]]* -> [[:digit:]]*" | wc -l)
 
-    # Special case for languages that generate XML files from PO files
-    case "$lang" in
-        "pt")
-            echo -e "$lang\tN/A\t$lines_tr\tN/A\t$lines_not_tr\tN/A\t$lines_missing\tN/A\tN/A"
-            ;;
-        *)
-        echo -e "$lang\t$pct_trans\t$lines_tr\t$files_tr\t$lines_not_tr\t$files_not_tr\t$lines_missing\t$files_missing\t$files_need_update"
-        ;;
-    esac
+    echo -e "$lang\t$pct_trans\t$lines_tr\t$files_tr\t$lines_not_tr\t$files_not_tr\t$lines_missing\t$files_missing\t$files_need_update"
 done
 
 rm /tmp/*.$$
