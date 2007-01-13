@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43730 -->
+<!-- original version: 44002 -->
 
  <sect1 id="boot-parms"><title>ブートパラメータ</title>
 <para>
@@ -754,10 +754,11 @@ See <xref linkend="pkgsel"/> for additional information.
 
    </sect3>
 
+   <sect3 id="module-parms">
 <!--
-   <sect3 id="module-parms"><title>Passing parameters to kernel modules</title>
+   <title>Passing parameters to kernel modules</title>
 -->
-   <sect3 id="module-parms"><title>カーネルモジュールへパラメータを渡す</title>
+   <title>カーネルモジュールへパラメータを渡す</title>
 <para>
 
 <!--
@@ -820,6 +821,62 @@ IRQ 10 を設定する場合は、以下のようにします。
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
 </screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+<!--
+   <title>Blacklisting kernel modules</title>
+-->
+   <title>カーネルモジュールのブラックリスト化</title>
+<para>
+
+<!--
+Sometimes it may be necessary to blacklist a module to prevent it from
+being loaded automatically by the kernel and udev. One reason could be that
+a particular module causes problems with your hardware. The kernel also
+sometimes lists two different drivers for the same device. This can cause
+the device to not work correctly if the drivers conflict or if the wrong
+driver is loaded first.
+-->
+時には、カーネルや udev が自動的にモジュールを読み込むのを防ぐために、
+ブラックリストに載せる必要があるかもしれません。
+目的の 1 つには、特定のモジュールが、
+あなたのハードウェアで問題を起こす場合が挙げられます。
+またカーネルに、同じデバイスに対して複数の異なるドライバがある場合もあります。
+ドライバが衝突したり、間違ったドライバを先に読み込んでしまうと、
+デバイスが正しく動作しない原因となります。
+
+</para><para>
+
+<!--
+You can blacklist a module using the following syntax:
+<userinput><replaceable>module_name</replaceable>.blacklist=yes</userinput>.
+This will cause the module to be blacklisted in
+<filename>/etc/modprobe.d/blacklist.local</filename> both during the
+installation and for the installed system.
+-->
+<userinput><replaceable>module_name</replaceable>.blacklist=yes</userinput> 
+といった文法でモジュールをブラックリストに指定できます。
+これでそのモジュールが <filename>/etc/modprobe.d/blacklist.local</filename> 
+にあるブラックリストに指定され、
+インストール中・インストールしたシステムの双方で、
+ブラックリストが有効になります。
+
+</para><para>
+
+<!--
+Note that a module may still be loaded by the installation system itself.
+You can prevent that from happening by running the installation in expert
+mode and unselecting the module from the list of modules displayed during
+the hardware detection phases.
+-->
+インストールシステム自体が、
+モジュールをまだ読み込んでいる可能性があることに注意してください。
+エキスパートモードでインストールを行い、
+ハードウェア検出時にモジュールの一覧からモジュールの選択を外すことで、
+モジュールの読み込みを防げます。
 
 </para>
    </sect3>
