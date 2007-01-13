@@ -8,6 +8,9 @@ TEMPLATE_TMP="./debian/templates.tmp"
 TEMPLATE_NEW="./debian/templates"
 TEMPLATE_NAME="countrychooser/shortlist"
 
+NL="
+"
+
 print_trans () {
     ITEM_TRANS=$(awk -v ITEM="$1-$LANG.UTF-8:" \
         -f template_get_item.awk $TEMPLATE_TMP)
@@ -47,7 +50,7 @@ for LANG in $SHORTLIST_LANGS; do
 	field="Default"
     fi
     LANG_DEFAULT_COUNTRY=$(awk -v ITEM="$field:" -f template_get_item.awk \
-	$TEMPLATE_TMP | head -1)
+	$TEMPLATE_TMP | head -1 | sed "s/-$LANG.UTF-8//")
 	
     echo "$LANG"
 
@@ -63,17 +66,16 @@ for LANG in $SHORTLIST_LANGS; do
     for COUNTRYCODE in $(cat $SHORTLIST_DIR/$LANG.short | cut -f 1) ; do
         SHORTLIST="$SHORTLIST$COUNTRYCODE, "
     done
+    C_CHOICES=$(echo $EN_CHOICES | sed "s/Choices:/Choices-C:/")
     REGEXP="s/\${SHORTLIST}, /$SHORTLIST/"
-    echo "$EN_CHOICES" | sed "$REGEXP" >>$TEMPLATE_NEW
-    TRANS_CHOICES=$(print_trans "Choices" "$EN_CHOICES")
+    echo "$C_CHOICES" | sed "$REGEXP" >>$TEMPLATE_NEW
 
-    # Next we build the translated shortlist containing translated countrynames
+    # Next we build a shortlist containing the countrynames in English
     SHORTLIST=
     OLD_IFS="$IFS"
-    IFS="
-"
+    IFS="$NL"
     COUNTRYLIST=
-    for COUNTRYNAME in $(cut -f 2 $SHORTLIST_DIR/$LANG.short) ; do
+    for COUNTRYNAME in $(cut -f 3 $SHORTLIST_DIR/$LANG.short) ; do
         # Comma's in countrynames must be double-escaped here
         # in order to end up escaped in the final list.
         SL_NAME=$(echo "$COUNTRYNAME" | sed -e 's/,/\\\\,/')
@@ -81,7 +83,25 @@ for LANG in $SHORTLIST_LANGS; do
     done
     IFS="$OLD_IFS"
     REGEXP="s/\${SHORTLIST}, /$SHORTLIST/" >>$TEMPLATE_NEW
-    echo "$TRANS_CHOICES" | sed "$REGEXP"  >>$TEMPLATE_NEW
+    echo "$EN_CHOICES" | sed "$REGEXP"  >>$TEMPLATE_NEW
+
+    # Next we build the translated shortlist containing translated countrynames
+    if [ "$LANG" != en ]; then
+        SHORTLIST=
+        OLD_IFS="$IFS"
+        IFS="$NL"
+        COUNTRYLIST=
+        for COUNTRYNAME in $(cut -f 2 $SHORTLIST_DIR/$LANG.short) ; do
+            # Comma's in countrynames must be double-escaped here
+            # in order to end up escaped in the final list.
+            SL_NAME=$(echo "$COUNTRYNAME" | sed -e 's/,/\\\\,/')
+            SHORTLIST="$SHORTLIST$SL_NAME, "
+        done
+        IFS="$OLD_IFS"
+        TRANS_CHOICES=$(print_trans "Choices" "$EN_CHOICES")
+        REGEXP="s/\${SHORTLIST}, /$SHORTLIST/" >>$TEMPLATE_NEW
+        echo "$TRANS_CHOICES" | sed "$REGEXP"  >>$TEMPLATE_NEW
+    fi
 
     # Finally we add the description and translated description
     echo "$EN_DESCR" >>$TEMPLATE_NEW
