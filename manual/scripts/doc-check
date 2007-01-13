@@ -62,29 +62,39 @@ sub getrev
 {
 	my ($plfname, $enfname) = (@_);
 	my ($plrev, $enrev, $untrans, $notconverted) = (0, 0, 0, 0);
+	my $line = 0;
 
 	warn "checking $plfname:\n" if $opt_v;
 	open FILE, $plfname or warn "$plfname: $!\n" and return;
 	while (<FILE>) {
+		$line++;
+
+		# Also check for revision comments of original documents
+		# These may be used in combination with a translation comment in
+		# which case the translation comment overrules what's found here
+		if (($plrev == 0) && (/<!--\s*\$Id: \S+ (\d+) /)) {
+			$plrev = $1;
+			$notconverted = 1;
+			$untrans = 1;
+		}
 		if (/<!--\s*original version\D*([\d\.]+)\s*-->/) {
 			$plrev = $1;
+			$untrans = 0;
+			$notconverted = 0;
 			last;
 		}
 		if (/<!--\s*original version\D*(\d+)\s*untranslated\s*-->/) {
 			$plrev = $1;
 			$untrans = 1;
-			last;
-		}
-		# Also check for revision comments of original documents
-		if (/<!--\s*\$Id: \S+ (\d+) /) {
-			$plrev = $1;
-			$notconverted = 1;
-			$untrans = 1;
+			$notconverted = 0;
 			last;
 		}
 		# Also support CVS style revision comments (depreciated)
 		if (/<!--\s*original document: en\/\S+, revision ([\d\.]+)\s*-->/) {
 			$plrev = $1;
+			last;
+		}
+		if ($line++ > 10) {
 			last;
 		}
 	}
