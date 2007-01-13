@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43655 -->
+<!-- original version: 44016 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalace Debianu ze stávajícího unixového/linuxového systému</title>
@@ -346,10 +346,10 @@ serverů (DNS):
 
 </para><para>
 
-Jednoduchý <filename>/etc/resolv.conf</filename>:
+Jednoduchá ukázka <filename>/etc/resolv.conf</filename>:
 
 <informalexample><screen>
-search hqdom.local\000
+search hqdom.local
 nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
@@ -444,21 +444,44 @@ dostupná připravená jádra:
 <prompt>#</prompt> <userinput>apt-cache search linux-image</userinput>
 </screen></informalexample>
 
-Vybrané jádro nainstalujte:
+</para><para>
+
+Plánujete-li použít některé z předpřipravených jader, je dobré před
+tím vytvořit konfigurační soubor
+<filename>/etc/kernel-img.conf</filename>. Příklad:
+
+<informalexample><screen>
+# Kernel image management overrides
+# See kernel-img.conf(5) for details
+do_symlinks = yes
+relative_links = yes
+do_bootloader = yes
+do_bootfloppy = no
+do_initrd = yes
+link_in_boot = no
+</screen></informalexample>
+
+</para><para>
+
+Více informací o tomto souboru se dozvíte v jeho manuálové stránce,
+která je součástí balíku
+<classname>kernel-package</classname>. Doporučujeme hodnoty upravit
+na míru vašemu systému.
+
+</para><para>
+
+Poté nainstalujte balík vybraným jádrem.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>aptitude install linux-image-<replaceable>&kernelversion;-arch-atd</replaceable></userinput>
 </screen></informalexample>
 
-</para><note><para>
+Jestliže jste před instalací jádra nevytvořili soubor
+<filename>/etc/kernel-img.conf</filename>, můžete být během instalace
+dotázáni an několik otázek, které se jinak zjistí právě z tohoto
+souboru.
 
-Instalaci a aktualizaci jader dodávaných s Debianem ovlivňuje
-konfigurační soubor <filename>/etc/kernel-img.conf</filename>.
-Tento soubor se vytvoří při první instalaci balíku s jádrem. Více
-informací o tomto souboru se dozvíte v jeho manuálové stránce, která
-je součástí balíku <classname>kernel-package</classname>.
-
-</para></note>
+</para>
   </sect2>
 
   <sect2>
@@ -511,6 +534,27 @@ lba32
 image=/vmlinuz
 label=Debian
 </screen></informalexample>
+
+</para><para arch="x86">
+
+Podle zvoleného zavaděče nyní můžete chtít poupravit soubor
+<filename>/etc/kernel-img.conf</filename>.
+
+</para><para arch="x86">
+
+Pro zavaděč <classname>grub</classname> byste měli nastavit proměnnou
+<literal>do_bootloader</literal> na <quote>no</quote>. Aby se při
+instalaci nebo odstranění debianího jádra automaticky aktualizoval
+soubor <filename>/boot/grub/menu.lst</filename>, přidejte následující
+řádky:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+U zavaděče <classname>lilo</classname> musí být hodnota proměnné
+<literal>do_bootloader</literal> nastavena na <quote>yes</quote>.
 
 </para><para arch="powerpc">
 

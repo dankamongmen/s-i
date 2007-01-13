@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 28997 -->
+<!-- original version: 43841 -->
 
   <sect2 arch="sparc" id="boot-tftp"><title>Zavedení z TFTP</title>
 
@@ -12,9 +12,7 @@ monitoru</quote> (viz <xref linkend="invoking-openboot"/>) a zadejte
 příkaz <userinput>boot net</userinput> pro zavedení z TFTP a RARP
 serveru nebo <userinput>boot net:bootp</userinput>
 (resp. <userinput>boot net:dhcp</userinput>) pro zavedení z TFTP
-a BOOTP (resp. DHCP) serveru. Některé starší revize OpenBootu vyžadují
-konkrétní jméno zařízení, například <userinput>boot le()</userinput>;
-tyto pravděpodobně nepodporují ani BOOTP ani DHCP.
+a BOOTP (resp. DHCP) serveru.
 
 </para>
   </sect2>
@@ -29,10 +27,6 @@ tyto pravděpodobně nepodporují ani BOOTP ani DHCP.
 Většina verzí OpenBootu podporuje příkaz <userinput>boot
 cdrom</userinput>, což je jednoduchý alias k zavedení ze SCSI zařízení
 s ID 6 (nebo ze sekundárního master zařízení na systémech IDE).
-Ve starších verzích OpenBootu, které tento alias nepodporují, musíte
-požít jméno konkrétního zařízení. Poznamenejme, že na systémech Sun4m
-(např. Sparc 10s a Sparc 20s) byly zaznamenány problémy se zaváděním
-z CD-ROM.
 
 </para>
   </sect2>
@@ -41,6 +35,14 @@ z CD-ROM.
   <sect2 arch="sparc" condition="supports-floppy-boot">
   <title>Zavedení z disket</title>
 <para>
+
+Obrazy disket jsou dostupné pouze pro sparc32 a to ještě neoficiálně,
+protože tyto obrazy musí být vytvářeny pod uživatelem root, což naši
+kompilační daemoni nepodporují. Obrazy disket pro sparc32 hledejte na
+stránce projektu <ulink url="&url-d-i;">Debian Installer</ulink>
+v části <quote>daily built images</quote>.
+
+</para><para>
 
 Pro zavedení z diskety použijte
 
@@ -51,9 +53,6 @@ Stop-A -&gt; OpenBoot: "boot floppy"
 Bohužel to vypadá, že architektura Sun4u (ultra) nepodporuje zavádění
 z disket. Typická chybová hláška je <computeroutput>Bad magic number
 in disk label - Can't open disk label package</computeroutput>.
-Aby toho nebylo málo, některé modely Sun4c (jako třeba IPX)
-nepodporují komprimované obrazy, které se nachází na disketách, takže
-jsou také mimo hru.
 
 </para><para>
 

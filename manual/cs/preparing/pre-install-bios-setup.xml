@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43655 -->
+<!-- original version: 43696 -->
 
  <sect1 id="pre-install-bios-setup">
  <title>Než začnete s instalací &hellip;</title>
@@ -21,31 +21,10 @@ hardwarových problémech ovlivňujících spolehlivost systému &debian;
 &bios-setup-sparc.xml;
 &bios-setup-s390.xml;
 
-  <sect2><title>Různé hardwarové problémy</title>
+  <sect2 arch="m68k;x86;powerpc" id="hardware-issues">
+  <title>Různé hardwarové problémy</title>
 
-<para arch="not-s390">
-
-Mnoho uživatelů se pokoušelo přetaktovat chod procesoru na vyšší než
-určenou frekvenci (např. 400MHz na 433MHz). Správná funkce počítače
-pak může být závislá na teplotě a dalších faktorech a někdy hrozí i
-poškození systému. Jednomu z autorů tohoto dokumentu fungoval
-přetaktovaný systém přes rok bezchybně a pak začalo docházet k
-nenadálému ukončení běhu kompilátoru <command>gcc</command> s
-chybou unexpected signal při kompilaci jádra. Nastavení rychlosti CPU
-na nominální hodnotu tyto problémy odstranilo.
-
-</para><para arch="not-s390">
-
-Kompilátor <command>gcc</command> často jako první poukáže na problémy
-s pamětí (nebo na jiné hardwarové problémy způsobující
-nepředvídatelnou modifikaci dat), neboť vytváří velké datové
-struktury, které opakovaně prochází. Chyba v uložení dat způsobí
-vygenerování neplatné instrukce nebo přístup na neexistující
-adresu. Symptomem je pak ukončení překladu chybou
-<computeroutput>unexpected signal</computeroutput> (neočekávaný
-signál).
-
-</para><para arch="m68k">
+<para arch="m68k">
 
 Desky Atari TT RAM jsou proslulé svými problémy pod Linuxem.
 Pokud zaznamenáte nějaké divné chování, zkuste alespoň spouštět
@@ -56,64 +35,9 @@ mem souboru zavaděče.
 FIXME: more description of this needed.
 </emphasis></phrase>
 
-</para><para arch="x86">
-
-Pokud máte skutečně paritní paměťové moduly a základní desku, která je
-podporuje, povolte v systému BIOS všechna nastavení, která při chybě
-parity způsobí přerušení.
-
 </para>
 
-   <sect3 arch="x86"><title>Přepínač TURBO</title>
-<para>
-
-Systémy s volbou rychlosti běhu CPU nastavte na vyšší rychlost, a
-pokud BIOS dokáže vypnout softwarové přepínání rychlosti procesoru,
-učiňte tak. Na jednom systému se totiž stalo, že při automatické
-detekci zařízení došlo ke konfliktu se softwarovým řízením taktu
-procesoru a ten se přepnul do velmi pomalého režimu (instalace pak
-trvala celé hodiny).
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Procesory Cyrix a chyby při čtení disket</title>
-<para>
-
-Mnozí majitelé procesorů Cyrix byli donuceni po dobu instalace Linuxu
-vypnout vyrovnávací paměť z důvodů chyb při čtení disket. Jestliže
-budete muset přistoupit ke stejnému opatření, nezapomeňte po úspěšné
-instalaci používání vyrovnávací paměti povolit, protože jinak by
-systém běžel <emphasis>výrazně</emphasis> pomaleji.
-
-</para><para>
-
-Nejedná se asi o chybu procesoru a patrně bylo by možné v Linuxu
-zjednat nápravu. Pro zvědavé: Máme podezření, že po přechodu z 16 do
-32 bitového režimu patrně přestane být platný obsah cache.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86"><title>Nastavení přídavných zařízení</title>
-<para>
-
-Mimo nastavení v systému BIOS je někdy třeba změnit konfiguraci
-vlastních zařízení. K některým kartám jsou k dispozici programy na
-jejich konfiguraci, u jiných se provádí změny přímo na kartě
-propojkami. Není možné zde uvést úplný popis pro každé zařízení, cílem
-tohoto návodu je dát alespoň pár užitečných tipů.
-
-</para><para>
-
-Pokud některé ze zařízení poskytuje <quote>mapování paměti</quote>,
-mělo by se odehrávat v oblasti od 0xA0000 do 0xFFFFF (tzn. od 640 kB
-do 1 MB) nebo alespoň 1 MB nad celkovou pamětí vašeho systému.
-
-</para>
-   </sect3>
-
-   <sect3 arch="x86" id="usb-keyboard-config">
+   <formalpara arch="x86">
    <title>BIOS a USB klávesnice</title>
 <para>
 
@@ -126,18 +50,9 @@ support</quote>. Toto nastavení změňte pouze v případě, že instalační
 program klávesnici nerozpozná.
 
 </para>
-   </sect3>
+   </formalpara>
 
-   <sect3><title>Více než 64 MB operační paměti</title>
-<para>
-
-Linux nedokáže vždy správně určit dostupnou paměť v systému. Podívejte
-se na <xref linkend="boot-parms"/>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="powerpc">
+   <formalpara arch="powerpc">
    <title>Viditelnost displeje na OldWorld Powermacích</title>
 <para>
 
@@ -151,6 +66,6 @@ uživatelské rozhraní, zkuste v MacOS změnit nastavení zobrazení, aby
 se místo tisíců nebo milionů barev používalo pouze 256.
 
 </para>
-   </sect3>
+   </formalpara>
   </sect2>
  </sect1>

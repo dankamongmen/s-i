@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 39614 -->
+<!-- original version: 43790 -->
 
  <sect1 id="minimum-hardware-reqts">
 <title>Splnění minimálních hardwarových požadavků</title>
@@ -16,8 +16,8 @@ záleží na konkrétních požadavcích a možnostech.
 
 </para><para arch="x86">
 
-Pro pracovní stanice je minimální doporučený procesor Pentium 100
-a pro server Pentium II-300.
+Pro pracovní stanice je minimální doporučený procesor Pentium 4 na
+1GHz.
 
 </para><para arch="m68k">
 
@@ -27,109 +27,79 @@ možná bude stačit trošku méně, než uvádí tabulka.
 </para><para arch="powerpc">
 
 Všechny OldWorld nebo NewWorld PowerPC mohou velmi dobře posloužit
-jako pracovní stanice. Pro servery je doporučený počítač s procesorem
-taktovaným alespoň na 132-MHz.
+jako pracovní stanice.
+
 </para>
 
 <table>
 <title>Doporučené minimální požadavky</title>
-<tgroup cols="3">
+<tgroup cols="4">
 <thead>
 <row>
-  <entry>Typ instalace</entry><entry>RAM</entry><entry>Pevný disk</entry>
+  <entry>Typ instalace</entry>
+  <entry>RAM (minimální)</entry>
+  <entry>RAM (doporučená)</entry>
+  <entry>Pevný disk</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
   <entry>Bez kanc. aplikací</entry>
-  <entry>24 megabajtů</entry>
-  <entry>450 megabajtů</entry>
-</row><row>
+  <entry>64 MB</entry>
+  <entry>256 MB</entry>
+  <entry>1 GB</entry>
+</row><row arch="not-s390">
   <entry>Pracovní stanice</entry>
-  <entry>64 megabajtů</entry>
-  <entry>1 gigabajt</entry>
-</row><row>
-  <entry>Server</entry>
-  <entry>128 megabajtů</entry>
-  <entry>4 gigabajty</entry>
+  <entry>64 MB</entry>
+  <entry>512 MB</entry>
+  <entry>5 GB</entry>
 </row>
 
 </tbody></tgroup></table>
 
 <para>
 
-Pro představu zde uvádíme několik typických využití Debianu.
-Další ideu o zabraném místu můžete získat pohledem
-do tabulky <xref linkend="tasksel-size-list"/>.
+Konkrétní minimální paměťové požadavky jsou o něco nižší, čísla
+uváděná v tabulce. Podle architektury je možné instalovat Debian
+s pouhými 20MB RAM (na s390) až po 48MB (i386 a amd64). Něco podobného
+platí i pro požadavky na diskový prostor a hodně závisí na tom, které
+aplikace si nainstalujete. Více informací naleznete v tabulce
+<xref linkend="tasksel-size-list"/>.
 
-</para>
+</para><para arch="not-s390">
 
-<variablelist>
+I na starších systémech je možné provozovat grafické desktopové
+prostředí, ale v takovém případě je doporučeno nainstalovat méně
+náročné prostředí než KDE nebo GNOME. Mezi populární alternativy patří
+<classname>xfce4</classname>, <classname>icewm</classname> a
+<classname>wmaker</classname>, ale na výběr máte i přehršle dalších.
 
-<varlistentry>
- <term>Standardní server</term>
- <listitem><para>
+</para><para>
 
-Tento malý profil je vhodný pro očesaný server, který neobsahuje
-zbytečné vymoženosti pro obyčejné uživatele. Obsahuje FTP server,
-web server, DNS, NIS, a POP. Zabere okolo 100MB, plus musíte připočíst
-velikost dat, která budete poskytovat.
+Pro serverové nasazení je téměř nemožné určit paměťové nebo diskové
+požadavky, protože ty se liší podle konkrétního nasazení.
 
-</para></listitem>
-</varlistentry>
-
-<varlistentry arch="not-s390">
- <term>Desktop</term>
- <listitem><para>
-
-Standardní desktop obsahující X Window System, celá desktopová
-prostředí, grafické a zvukové aplikace, editory, etc. Balíčky zaberou
-asi 2GB, ale pečlivým výběrem se můžete dostat na mnohem nižší číslo.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry arch="not-s390">
- <term>Pracovní konzole</term>
- <listitem><para>
-
-Více ořezaná pracovní stanice bez X Window System a X aplikací.
-Pravděpodobně bude vhodná pro laptopy a přenosné počítače.
-Velikost je zhruba 140MB.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
- <term>Vývojářská stanice</term>
- <listitem><para>
-
-Desktop se všemi vývojářskými balíčky, jako je Perl, C, C++, atd.
-Velikost je okolo 475MB.  Předpokládejme, že přidáte X11 a nějaké
-další balíčky pro nejrůznější použití. Pak byste měli počítat
-s asi 800MB zabraného místa.
-
-</para></listitem>
-</varlistentry>
-
-</variablelist>
-
-<para>
+</para><para>
 
 Pamatujte, že všechny uvedené velikosti jsou orientační a že
 neobsahují další věci, které obvykle v systému bývají (jako třeba
 pošta, soubory uživatelů, data). Při přidělování místa pro své vlastní
-soubory a data je vždy lepší být velkorysý.  Zejména oblast
-<filename>/var</filename> obsahuje hodně dat závislých na konkrétní
-situaci. Například soubory programu <command>dpkg</command> mohou
-klidně zabrat 20MB, ani nemrknete.  Dále sem zapisuje třeba
-<command>apt-get</command>, který zde odkládá stažené balíky před
-samotnou instalací. Pokud přidáme velikost logovacích souborů
-(většinou v řádech MB) a ostatní proměnlivá data, měli byste pro
-<filename>/var</filename> uvažovat o alokování minimálně 100MB.
+soubory a data je vždy lepší být velkorysý.
+
+</para><para>
+
+Dále je potřeba dávat pozor na oblast <filename>/var</filename>, která
+obsahuje hodně dat závislých na konkrétní situaci. Například soubory
+programu <command>dpkg</command> mohou klidně zabrat 40MB, ani nevíte
+jak.  Dále sem zapisuje třeba <command>apt-get</command>, který zde
+odkládá stažené balíky před samotnou instalací. Pokud přidáme velikost
+logovacích souborů (většinou v řádech MB) a ostatní proměnlivá data,
+měli byste pro <filename>/var</filename> uvažovat o alokování
+minimálně 200MB. Plánujete-li instalaci grafického desktopového
+prostředí, tak i mnohem více. Do <filename>/var</filename> také
+implicitně ukládají své databáze databázové systémy.
 
 </para>
-
  </sect1>
 

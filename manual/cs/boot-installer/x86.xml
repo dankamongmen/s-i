@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 42929 -->
+<!-- original version: 44002 -->
 
   <sect2 arch="x86"><title>Zavedení z CD-ROM</title>
 
@@ -118,9 +118,9 @@ linkend="boot-drive-files"/>.
 
 Plánujete-li z disku jenom nastartovat a poté již všechno stáhnout ze
 sítě, měli byste použít soubor
-<filename>netboot/debian-installer/i386/initrd.gz</filename>
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename>
 a odpovídající jádro
-<filename>netboot/debian-installer/i386/linux</filename>. To vám
+<filename>netboot/debian-installer/&architecture;/linux</filename>. To vám
 umožní přerozdělit disk, ze kterého jste instalaci spustili.
 
 </para><para>
@@ -159,8 +159,6 @@ Následuje příklad <filename>/etc/lilo.conf</filename>:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Pokud vás zajímají pikantní detaily, prozkoumejte manuálové stránky
@@ -179,7 +177,7 @@ Postup pro <command>GRUB</command> je velmi podobný. Do souboru
 
 <informalexample><screen>
 title  Instalace Debianu
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram0 ramdisk_size=12000
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -232,7 +230,7 @@ disketové mechaniky. Docílíte toho zaváděcím parametrem
 <emphasis>root=</emphasis>, kterému zadáte zařízení, na které
 ovladač ide-floppy připojí mechaniku LS-120. Například pokud ji
 máte připojenou jako první IDE zařízení na druhém kabelu, zadáte
-<userinput>linux.bin root=/dev/hdc</userinput>.
+<userinput>install root=/dev/hdc</userinput>.
 
 </para><para>
 
@@ -329,10 +327,10 @@ Pokud chcete zadat některé z parametrů, o kterých jste se dočetli
 v nápovědě pod klávesami <keycap>F3</keycap> až <keycap
 condition="etch">F8</keycap>,
 nezapomeňte na prvním místě zadat název jádra, které chcete zavést
-(implicitní je <userinput>linux</userinput>).  Celý řádek by tedy
-vypadal třeba takto: <userinput>linux fb=false</userinput>.
+(implicitní je <userinput>install</userinput>). Celý řádek by tedy
+vypadal třeba takto: <userinput>install fb=false</userinput>.
 Jestliže stisknete pouze &enterkey;, je to stejné, jako kdyby jste
-zadali <userinput>linux</userinput> bez dalších parametrů.
+zadali <userinput>install</userinput> bez dalších parametrů.
 
 <note><para>
 

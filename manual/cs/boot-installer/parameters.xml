@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43675 -->
+<!-- original version: 44002 -->
 
  <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
 <para>
@@ -500,6 +500,36 @@ aby použila konektor BNC (koaxiální) a IRQ 10, zadali-byste:
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
 </screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Zapsání jaderných modulů na černou listinu</title>
+<para>
+
+Někdy je nutné zanést modul na černou listinu a zabránit tak jádru a
+udevu, aby jej automaticky zavedli. Jedním z důvodů bývá ten, že modul
+způsobuje na vašem hardwaru problémy. Někdy také jádro registruje pro
+jedno zařízení dva ovladače, což může vytvářet problémy v případech,
+kdy jsou tyto ovladače navzájem konfliktní, nebo pokud zařízení
+funguje správně jen s jedním z ovladačů a jádro nejprve zavede ten
+chybný ovladač.
+
+</para><para>
+
+Moduly můžete na černou listinu přidat následovně:
+<userinput><replaceable>jméno_modulu</replaceable>.blacklist=yes</userinput>.
+Prakticky to znamená, že se modul zapíše do souboru
+<filename>/etc/modprobe.d/blacklist.local</filename>, což ho vyřadí
+jak během instalace, tak v nově nainstalovaném systému.
+
+</para><para>
+
+Poznamenejme, že modul stále může být zaveden explicitně přímo
+instalačním systémem. Předejít tomu můžete instalací v expertním
+režimu a odebráním modulu ze seznamu modulů, který se zobrazuje během
+několika fází rozpoznávání hardwaru.
 
 </para>
    </sect3>
