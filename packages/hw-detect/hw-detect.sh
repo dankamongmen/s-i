@@ -299,9 +299,9 @@ get_manual_hw_info() {
 		echo "lasi_82596:LASI Ethernet"
 		register-module lasi_82596
 		echo "lasi700:LASI SCSI"
-		register-module lasi700
+		register-module -i lasi700
 		echo "zalon7xx:Zalon SCSI"
-		register-module zalon7xx
+		register-module -i zalon7xx
 	fi
 }
 
