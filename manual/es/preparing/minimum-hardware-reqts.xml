@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 43790 -->
 <!-- Revisado por Jfs, 22 febrero 2005 -->
 
  <sect1 id="minimum-hardware-reqts">
@@ -19,8 +19,8 @@ si ignoran estas sugerencias.
 
 </para><para arch="x86">
 
-Se recomienda como mínimo un Pentium de 100 Mhz para un sistema
-de escritorio y un Pentium II de 300 Mhz para un servidor.
+Se recomienda como mínimo un Pentium 4, a 1 GHz para un sistema
+de escritorio.
 
 </para><para arch="m68k">
 
@@ -31,117 +31,87 @@ menos del espacio de disco indicado a continuación.
 </para><para arch="powerpc">
 
 Cualquier máquina PowerPC, OldWorld o NewWorld puede servir
-como un sistema de escritorio. Para servidores se recomienda una
-máquina de 132 Mhz.
+como sistema de escritorio.
 
 </para>
 
 <table>
 <title>Requisitos mínimos de sistema recomendados</title>
-<tgroup cols="3">
+<tgroup cols="4">
 <thead>
 <row>
-  <entry>Tipo de instalación</entry><entry>RAM</entry><entry>Disco duro</entry>
+    <entry>Tipo de instalación</entry>
+    <entry>RAM (mínimo)</entry>
+    <entry>RAM (recomendado)</entry>
+    <entry>Disco duro</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
   <entry>Sin escritorio</entry>
-  <entry>24 Megabytes</entry>
-  <entry>450 Megabytes</entry>
-</row><row>
-  <entry>Con escritorio</entry>
   <entry>64 Megabytes</entry>
+  <entry>256 Megabytes</entry>
   <entry>1 Gigabyte</entry>
 </row><row>
-  <entry>Servidor</entry>
-  <entry>128 Megabytes</entry>
-  <entry>4 Gigabytes</entry>
+</row><row arch="not-s390">
+  <entry>Con escritorio</entry>
+  <entry>64 Megabytes</entry>
+  <entry>512 Megabytes</entry>
+  <entry>5 Gigabytes</entry>
 </row>
 
 </tbody></tgroup></table>
 
 <para>
 
-A continuación se indican algunos ejemplos de
-configuraciones comunes de sistemas Debian.
-Puede hacerse una idea del espacio de disco usado para
-grupos de programas que están relacionados entre sí consultando
-<xref linkend="tasksel-size-list"/>.
+Los  requisitos de memoria mínimos necesarios son en realidad inferiores
+a los indicados en esta table. En función de la arquitectura, es posible
+instalar Debian en sistemas con tan sólo 20 MB (en el caso de s390) a 48 MB
+(para i386 y amd64). Lo mismo se puede decir del espacio necesario en disco,
+especialmente si escoge las aplicaciones que va a instalar manualmente,
+consulte <xref linkend="tasksel-size-list"/> para obtener más información de
+los requisitos de disco.
 
-</para>
-<variablelist>
+</para><para arch="not-s390">
 
-<varlistentry>
- <term>Servidor estándar</term>
- <listitem><para>
+Es posible ejecutar un entorno de escritorio gráfico en sistemas antiguos o de
+gama baja. En este caso es recomendable instalar un gestor de ventanas que es
+consuma menos recursos que los utilizados en los entornos de escritorio de
+GNOME o KDE. Algunas alternativas para estos casos son
+<classname>xfce4</classname>, <classname>icewm</classname> y
+<classname>wmaker</classname>, aunque hay más de los que puede elegir.
 
-Este es un perfil de servidor pequeño, útil para un servidor
-mínimo que no ofrece muchas herramientas para los usuarios de línea
-de órdenes.
-El perfil incluye un servidor FTP, un servidor de Web, DNS, NIS y de
-POP. Para esto serán suficientes 100 MB de espacio en disco, siendo
-necesario añadir espacio adicional para los datos que pueda ofrecer.
+</para><para>
 
-</para></listitem>
-</varlistentry>
+Es prácticamente imposible dar requisitos generales de memoria y espacio en
+disco para instalaciones de servidores ya que éstos dependerán en gran medida
+de aquello para lo que se utilice el servidor.
 
-<varlistentry arch="not-s390">
- <term>Escritorio</term>
- <listitem><para>
-
-Un sistema de escritorio estándar, incluyendo el sistema X,
-entornos de escritorio completos, aplicaciones gráficas, sonido, editores,
-etc. Necesitará cerca de 2 GB si utiliza la tarea de «Escritorio»,
-aunque puede llevarse a cabo con bastante menos espacio.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry arch="not-s390">
- <term>Consola de trabajo</term>
- <listitem><para>
-
-Un sistema más reducido para puesto de trabajo de usuario,
-que no incluye ni el sistema de ventanas X ni las aplicaciones para éste.
-Quizás adecuado para un ordenador portátil o un sistema móvil.
-El tamaño de la instalación ronda los 140 MB.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
- <term>Desarrollador</term>
- <listitem><para>
-
-Una instalación de escritorio con todos los paquetes de desarrollo,
-como puedan ser Perl, C, C++. El tamaño ronda los  475 MB.
-Debe planificar cerca de 800 MB para este tipo de sistema
-si va a añadir el entorno de X11 y algunos paquetes adicionales para otros
-usos.
-
-</para></listitem>
-</varlistentry>
-
-</variablelist><para>
+</para><para>
 
 Recuerde que estos tamaños no incluyen todos los otros materiales
 que se encuentran habitualmente, como puedan ser los
 ficheros de usuarios, el correo y otros datos.
 Siempre es mejor ser generoso cuando uno está pensando qué espacio
-destinar a sus propios ficheros y datos. La partición
+destinar a sus propios ficheros y datos. 
+
+</para><para>
+
+Se ha tenido en cuenta el espacio de disco necesario para la operación normal
+del sistema &debian; en sí en estos requisitos de sistema recomendados. En
+particular, la partición
 <filename>/var</filename> de Debian contiene mucha información de
 estado específica a Debian, además de su contenido habitual, como
 puedan ser los ficheros de registro.
 Los ficheros de <command>dpkg</command>
 (que incluyen información sobre los paquetes instalados)
-pueden fácilmente consumir unos 20 MB. Además, hay que tener en cuenta
+pueden fácilmente consumir unos 40 MB. Además, hay que tener en cuenta
 que <command>apt-get</command> ubica los paquetes descargados aquí
 antes de instalarlos. Por regla general deberá asignar por lo menos
-100 MB para <filename>/var</filename>.
+200 MB para <filename>/var</filename>, y mucho más si va a instalar
+un entorno gráfico de escritorio.
 
 </para>
 
  </sect1>
-

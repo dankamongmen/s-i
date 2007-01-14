@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 40811 -->
+<!-- original version: 43943 -->
 <!-- revisado por jfs, 8 octubre 2004 -->
  <sect1 id="install-overview">
  <title>Descripción del proceso de instalación</title>
@@ -128,7 +128,16 @@ Inicie por primera vez el sistema que acaba de instalar.
 </para></listitem>
 </orderedlist>
 
-<para>
+<para condition="gtk">
+
+Tiene la opción de usar 
+<phrase arch="x86">una versión</phrase> 
+<phrase arch="powerpc">una versión experimental</phrase> 
+del sistema de instalación gráfico en &arch-title;. 
+Consulte <xref linkend="graphical"/> si desea más información sobre este
+instalador gráfico.
+
+</para><para>
 
 Si tiene problemas durante la instalación, es muy útil saber qué paquetes
 están involucrados en cada paso. A continuación le presentamos a los «actores
@@ -136,11 +145,12 @@ principales» en el «drama» de la instalación:
 
 </para><para>
 
-El programa de instalación <classname>debian-installer</classname>, sobre el que trata este manual. Detecta el hardware y carga
+Este manual trata sobre el programa de instalación <classname>debian-installer</classname>. Detecta el hardware y carga
 los controladores apropiados, usa <classname>dhcp-client</classname>
-para configurar la conexión de red, y ejecuta
+para configurar la conexión de red, ejecuta
 <classname>debbootstrap</classname> para instalar los paquetes del
-sistema base. Algunos otros actores realizan pequeñas partes de este proceso,
+sistema base y <classname>tasksel</classname> para que pueda seleccionar
+algunos programas adicionales. Muchos otros programas realizan pequeñas partes de este proceso,
 pero <classname>debian-installer</classname> termina su tarea en el momento en que inicia por primera vez su nuevo sistema.
 
 </para><para>
@@ -152,21 +162,22 @@ para disponer de un servidor Web o de un entorno de escritorio.
 
 </para><para>
 
-Cuando termine <classname>debian-installer</classname>, antes de la
-primera ejecución del sistema, dispondrá únicamente de un sistema muy básico
-de interfaz de línea de órdenes.
-No se instalará la interfaz gráfica que muestra ventanas en
-su pantalla a no ser que la elija con
-<classname>tasksel</classname>. Esta interfaz es opcional puesto que muchos
-sistemas &debian; son servidores que realmente no necesitan una interfaz
+Una opción importante durante la instalación es si se realiza o no
+la instalación del entorno de escritorio gráfico, que está formado por el
+sistema X Window y alguno de los entornos de escritorio gráficos disponibles.
+Si elige no instalar la tarea <quote>Entorno de escritorio</quote> dispondrá
+únicamente de un sistema muy básico de interfaz de línea de órdenes.  La
+instalación del entorno de escritorio es opcional porque ocupa una cantidad
+significativa de disco y porque muchos sistemas &debian; son servidores que
+realmente no necesitan una interfaz
 gráfica de usuario para hacer su trabajo.
 
 </para><para arch="not-s390">
 
-Debe saber que el sistema X está completamente separado del
+Debe saber que el sistema X Window está completamente separado del
 <classname>debian-installer</classname> y de hecho es mucho más
 complicado. La instalación y solución de problemas del sistema
-X no se encuentra dentro del alcance de este manual.
+X Window no se encuentra dentro del alcance de este manual.
 
 </para>
  </sect1>
