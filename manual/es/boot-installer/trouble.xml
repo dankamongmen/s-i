@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43514 -->
+<!-- original version: 44026 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 
@@ -295,13 +295,6 @@ verificar son los parámetros de arranque, como se explica en
 
 </para><para>
 
-Si está arrancando con su propio núcleo en lugar del que se provee
-con el instalador, asegúrese de que la opción <userinput>CONFIG_DEVFS</userinput>
-esté definida en éste. <userinput>CONFIG_DEVFS</userinput> es necesario
-para el instalador.
-
-</para><para>
-
 A menudo, se pueden solventar los problemas desconectando
 algunos periféricos y elementos añadidos e intentando de nuevo
 el arranque.
@@ -359,7 +352,8 @@ no es capaz de cambiar al modo <quote>framebuffer</quote> correctamente. Puede
 utilizar el parámetro del arranque
 <userinput>fb=false video=vga16:off</userinput>
 para deshabilitar el framebuffer en
-consola.  Si hace esto, sólo podrá ver la instalación en el idioma inglés
+consola. Si hace esto, sólo podrá ver la instalación en un conjunto reducido
+de idiomas 
 debido a las funcionalidades limitadas de la consola. Si quiere los detalles,
 consulte <xref linkend="boot-parms"/>.
 
@@ -409,6 +403,61 @@ impedir que se cargen los módulos USB.
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+      <title>Problemas de instalación comunes en &arch-title;</title>
+<para>
+
+    Existen algunos problemas comunes de instalación que merece la pena
+    mencionar.
+</para>
+
+ <sect3>
+   <title>Salida de video mal dirigida</title>
+   <para>
+
+    Es relativamente comun tener dos tarjetas de video en un sistema
+    &arch-title;, por ejemplo, una tarjeta AIT y una tarjeta Sun Creator 3D.
+    En algunos casos esto origina que la salida de video se diriga 
+    incorrectamente una vez el sistema haya arrancado. En estos
+    casos habituales la salida sólo mostrará:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+Para evitar esto puede simplemente desconectar una de las tarjetas de video o
+deshabilitar la que no utiliza en la fase de arranque OpenProm utilizando un
+parámetro del núcleo. Por ejemplo, si quiere deshabilitar una tarjeta ATI
+debería arrancar el instalador con <userinput>video=atyfb:off</userinput>.
+
+</para><para>
+
+Tenga en cuenta que es posible que tenga que añadir este parámetro manualmente
+a la configuración de silo (edite el fichero
+<filename>/target/etc/silo.conf</filename> antes de reiniciar) y, si
+ha instalado X11, modifique la controladora de video en 
+<filename>/etc/X11/xorg.conf</filename>.
+
+</para>
+</sect3>
+
+         <sect3>
+             <title>Fallo en el arranque o la instalación de CD-ROM</title>
+<para>
+
+Algunos sistemas Sparc son difíciles de arrancar del CD-ROM y, aún cuando
+arrancan, pueden producirse fallos inexplicables durante la instalación. La
+mayoría de los problemas de este tipo se han reportado en sistemas SunBlade.
+
+</para><para>
+
+Le recomendamos instalar estos sistemas con el arranque de red del instalador.
+
+</para>
+   </sect3>
+     </sect2>
+
   <sect2 id="kernel-msgs">
   <title>Interpretar los mensajes de inicio del núcleo</title>
 
@@ -416,11 +465,10 @@ impedir que se cargen los módulos USB.
 
 Durante la secuencia de arranque podría ver muchos mensajes
 de la forma
-<computeroutput>can't find <replaceable>algo</replaceable>
-</computeroutput>, o <computeroutput>
-<replaceable>algo</replaceable> not present</computeroutput>,
-<computeroutput>can't initialize <replaceable>algo</replaceable>
-</computeroutput>, o incluso <computeroutput>this driver release depends
+<computeroutput>can't find <replaceable>algo</replaceable></computeroutput>, 
+o <computeroutput><replaceable>algo</replaceable> not present</computeroutput>,
+<computeroutput>can't initialize <replaceable>algo</replaceable></computeroutput>,
+o incluso <computeroutput>this driver release depends
 on <replaceable>algo</replaceable> </computeroutput>.
 Muchos de estos mensajes son inocuos. Los ve porque
 el sistema de instalación está programado para ejecutarse en ordenadores
@@ -444,7 +492,7 @@ arrancar el sistema es muy largo.
 
 Podría serle útil la opción de informe de fallos del menú
 si ha pasado la fase inicial de arranque pero no puede completar
-la instalación.  Esta opción le permite copiar  los registros de fallos de
+la instalación.  Esta opción le permite copiar los registros de fallos de
 sistema y la información de configuración a un disquete, o descargarlas con un
 navegador web.
 
@@ -473,10 +521,19 @@ mayor cantidad de configuraciones de hardware.
 
 </para><para>
 
+Tenga en cuenta que el informe de instalación se publicará en el sistema de
+seguimiento de fallos de Debian y que se reenviará a una lista de correo
+pública. Asegúrese que utiliza una dirección de correo electrónico que no le
+importa que se haga público.
+
+</para><para>
+
 La forma más sencilla de enviar un informe de instalación si tiene un sistema
 Debian funcionando es instalar los paquetes <quote>installation-report</quote>
 y <quote>reportbug</quote> (<command>apt-get install installation-report
-reportbug</command>) y ejecutar la orden <command>reportbug
+reportbug</command>), configurar <classname>reportbug</classname> 
+como se describe en <xref linkend="mail-outgoing"/>,
+y ejecutar la orden <command>reportbug
 installation-report</command>.
 
 </para><para>
@@ -496,7 +553,6 @@ Date: &lt;Fecha y hora de la instalación&gt;
 Machine: &lt;Descripción de la máquina (p. ej., IBM Thinkpad R32)&gt;
 Processor: &lt;Tipo de procesador&gt;
 Memory: &lt;Cantidad de memoria RAM&gt;
-Root Device: &lt;¿IDE o SCSI? Tipo del dispositivo raíz&gt;
 Partitions: &lt;Basta con la salida de «df -Tl», es preferible la tabla de particiones sin editar&gt;
 
 Output of lspci and lspci -n: &lt;Salida de la órdenes «lspci» y «lspci -n»&gt;
@@ -506,18 +562,19 @@ Base System Installation Checklist: &lt;Marque según sea su caso: Escriba «O»
      no intentó o no usó esta opción.&gt;
 [O] = OK, [E] = Error (descríbalo a continuación), [ ] = didn't try it
 
-Initial boot worked:    [ ] &lt;¿Funcionó el arranque inicial?&gt;
-Configure network HW:   [ ] &lt;¿Se configuró el hardware de red?&gt;
-Config network:         [ ] &lt;¿Se configuró la red?&gt;
+Initial boot:           [ ] &lt;¿Funcionó el arranque inicial?&gt;
+Detect network card:    [ ] &lt;¿Se configuró el hardware de red?&gt;
+Configure network:      [ ] &lt;¿Se configuró la red?&gt;
 Detect CD:              [ ] &lt;¿Se detectó la unidad de CD?&gt;
 Load installer modules: [ ] &lt;¿Se cargaron los módulos del instalador?&gt;
 Detect hard drives:     [ ] &lt;¿Se detectaron los discos duros?&gt;
 Partition hard drives:  [ ] &lt;¿Se particionó el disco duro?&gt;
-Create file systems:    [ ] &lt;¿Se crearon los sistemas de ficheros?&gt;
-Mount partitions:       [ ] &lt;¿Se montaron las particiones?&gt;
 Install base system:    [ ] &lt;¿Se instaló el sistema base?&gt;
+Clock/timezone setup:   [ ] &lt;¿Se configuró bien la zona horaria?&gt;
+User/password setup:    [ ] &lt;¿Se configuró correctamente el usuario?&gt;
+Install tasks:          [ ] &lt;¿Se instalaron bien las tareas?&gt;
 Install boot loader:    [ ] &lt;¿Se instaló el gestor de arranque?&gt;
-Reboot:                 [ ] &lt;¿Reinició correctamente?&gt;
+Overall install:        [ ] &lt;¿Reinició correctamente?&gt;
 
 Comments/Problems:
 
@@ -534,8 +591,8 @@ opciones especificadas.
 
 En el informe de fallo describa cuál es el problema, incluya los
 últimos mensajes visibles del núcleo en el caso de que éste
-se bloquee. Describa los pasos que llevó a cabo y que le condujeron a
-la situación del fallo.
+se bloquee. Describa los pasos que llevó a cabo y que condujeron al
+sistema a la situación del fallo.
 
 </para>
   </sect2>
