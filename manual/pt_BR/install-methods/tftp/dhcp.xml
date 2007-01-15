@@ -1,15 +1,16 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
+<!-- original version: 43558 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2005.12.30 -->
+<!-- updated by Felipe Augusto van de Wiel (faw) 2007.01.14 -->
 
-  <sect2 condition="supports-dhcp" id="dhcpd">
+  <sect2 id="dhcpd">
    <title>Configurando um servidor DHCP</title>
 <para>
 
-Um servidor DHCP livre é o ISC <command>dhcpd</command>. Na
-&debian;, ele está disponível no pacote <classname>dhcp</classname>.
-Aqui está um modelo de configuração deste pacote (normalmente
-<filename>/etc/dhcpd.conf</filename>):
+Um servidor DHCP livre é o ISC <command>dhcpd</command>. Para o 
+&debian;, o pacote <classname>dhcp3-server</classname> é recomendado.
+Aqui está um exemplo de configuração para este pacote (veja
+<filename>/etc/dhcp3/dhcpd.conf</filename>):
 
 <informalexample><screen>
 option domain-name "exemplo.com";
@@ -33,9 +34,6 @@ host clientname {
 }
 </screen></informalexample>
 
-Nota: O novo (e preferido) pacote <classname>dhcp3</classname> utiliza o
-arquivo de configuração <filename>/etc/dhcp3/dhcpd.conf</filename>.
-
 </para><para>
 Neste exemplo, existe somente um servidor
 <replaceable>servername</replaceable> que faz todo o trabalho
@@ -47,7 +45,7 @@ deve ter o nome do arquivo que será baixado via TFTP.
 </para><para>
 
 Após editar o arquivo de configuração <command>dhcpd</command>,
-reinice-o com <userinput>/etc/init.d/dhcpd restart</userinput>.
+reinice-o com <userinput>/etc/init.d/dhcpd3-server restart</userinput>.
 
 </para>
 
@@ -78,11 +76,11 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 }
 
 group {
- next-server 192.168.1.3;
- host tftpclient {
+  next-server 192.168.1.3;
+  host tftpclient {
 # tftp client hardware address
   hardware ethernet  00:10:DC:27:6C:15;
-  filename "/tftpboot/pxelinux.0";
+  filename "pxelinux.0";
  }
 }
 </screen></informalexample>

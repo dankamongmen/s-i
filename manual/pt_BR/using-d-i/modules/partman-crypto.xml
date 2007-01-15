@@ -1,14 +1,15 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 41817 -->
+<!-- original version: 44026 -->
 <!-- translated by Herbert Parentes Fortes Neto (hpfn) 2006.08.02 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.10.19 -->
+<!-- updated 41817:44026 by Felipe Augusto van de Wiel (faw) 2007.01.14 -->
 
    <sect3 id="partman-crypto">
    <title>Configurando Volumes Cryptografados</title>
 <para>
 
 &d-i; permite que você configure partições criptografadas. Todo arquivo que
-você escreva em uma partição deste tipo é imediatamente salvo no despositivo
+você escreva em uma partição deste tipo é imediatamente salvo no dispositivo
 de forma criptografada. O acesso aos dados criptografados é garantido apenas
 após o fornecimento da <firstterm>senha</firstterm> usada quando a partição
 criptografada foi originalmente criada. Essa característica é útil para
@@ -44,16 +45,16 @@ e o comprimento da chave.
 Para usar criptografia, você tem que criar uma nova partição selecionando
 algum espaço livre no menu principal de particionamento. Outra opção é
 escolher uma partição existente (e.g. uma partição comum, um volume lógico
-LVM ou um volume RAID). No menu <guimenu>Configurar partição</guimenu>,
-você precisa selecionar <guimenuitem>volume físico para
-criptografar</guimenuitem> na opção <menuchoice> <guimenu>Usar
+LVM ou um volume RAID). No menu <guimenu>Configurações da partição</guimenu>,
+você precisa selecionar <guimenuitem>volume físico a ser 
+criptografado</guimenuitem> na opção <menuchoice> <guimenu>Usar
 como:</guimenu> </menuchoice>. O menu irá então mudar para incluir várias
 opções de criptografia para a partição.
 
 </para><para>
 
 &d-i; suporta vários métodos de criptografia. O método padrão é
-<firstterm>dm-crypt</firstterm> (incluido nos kernels Linux mais 
+<firstterm>dm-crypt</firstterm> (incluído nos kernels Linux mais 
 recentes, capaz de hospedar volumes LVM físicos), o outro é o
 <firstterm>loop-AES</firstterm> (mais antigo, mantido separadamente a 
 partir da árvore do kernel do Linux). A menos que você tenha fortes
@@ -114,14 +115,14 @@ O <firstterm>Initialization Vector</firstterm> ou algoritmo
 <firstterm>IV</firstterm> é usado na criptografia para garantir
 que aplicando o algoritmo no mesmo dado em <firstterm>texto plano</firstterm>
 com a mesma chave sempre produz um único
-<firstterm>texto cifrado</firstterm>. A idéia é previnir que o atacante
+<firstterm>texto cifrado</firstterm>. A idéia é prevenir que o atacante
 deduza informações a partir de padrões de repetição nos dados
 criptografados.
 
 </para><para>
 
 A partir das alternativas fornecidas, o padrão
-<userinput>cbc-essiv:sha256</userinput> é, atualmente, o menos vunerável
+<userinput>cbc-essiv:sha256</userinput> é, atualmente, o menos vulnerável
 a ataques conhecidos. Use as outras alternativas apenas quando você
 precisar garantir compatibilidade com algum sistema previamente instalado
 que não seja capaz de usar algoritmos mais recentes.
@@ -272,15 +273,16 @@ Por favor veja a seção sobre apagar dados acima.
 
 </variablelist>
 
-</para><note><para>
+</para>
+<note condition="gtk"><para>
 
 Por favor note que a versão <emphasis>gráfica</emphasis> do instalador
 ainda tem algumas limitações quando comparada à versão texto. Para
 criptografia isso significa que você pode configurar volumes apenas
-usando <emphasis>senha</emphasis> como chave criptográfica.
+usando uma <emphasis>senha</emphasis> como chave criptográfica.
 
-</para></note><para>
-
+</para></note>
+<para>
 
 Após ter selecionado os parâmetros desejados para suas partições
 criptografadas, volte ao menu de particionamento principal. Deve agora
@@ -316,7 +318,7 @@ sistema de arquivos raiz.
 </para></warning><para>
 
 Se você selecionou o uso de outros métodos ao invés de senha para
-criar chaves criptograficas, elas serão geradas agora. Por causa do kernel,
+criar chaves criptográficas, elas serão geradas agora. Por causa do kernel,
 pode não ter sido recolhido uma quantidade suficiente de entropia neste
 estágio inicial da instalação, e o processo pode demorar. Você pode ajudar
 a acelerar o processo gerando entropia: e.g. pressionando teclas aleatórias,
