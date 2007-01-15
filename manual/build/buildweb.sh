@@ -32,6 +32,9 @@ export official_build="1"
 export web_build="1"
 export manual_target="for_wdo"
 
+# Delete any old generated XML files
+clear_xml
+
 # We need to merge the XML files for English and update the POT files
 export PO_USEBUILD="1"
 update_templates
@@ -40,8 +43,7 @@ for lang in $languages; do
     echo "Language: $lang";
 
     # Update PO files and create XML files
-    check_po
-    if [ -n "$USES_PO" ] ; then
+    if [ ! -d ../$lang ] && uses_po; then
         generate_xml
     fi
     
@@ -65,9 +67,6 @@ for lang in $languages; do
 
         ./clear.sh
     done
-
-    # Delete generated XML files
-    [ -n "$USES_PO" ] && rm -r ../$lang || true
 done
 
 PRESEED="../en/appendix/preseed.xml"
@@ -75,4 +74,6 @@ if [ -f $PRESEED ] && [ -f preseed.pl ] ; then
     ./preseed.pl -r $manual_release $PRESEED >$destination/example-preseed.txt
 fi
 
+# Delete temporary PO files and generated XML files
 clear_po
+clear_xml
