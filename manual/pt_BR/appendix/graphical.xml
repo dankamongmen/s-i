@@ -1,0 +1,154 @@
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 44192 untranslated -->
+
+ <sect1 condition="gtk" id="graphical">
+ <title>The Graphical Installer</title>
+<para>
+
+The graphical version of the installer is only available for a limited
+number of architectures, including &arch-title;. The functionality of
+the graphical installer is essentially the same as that of the regular
+installer as it basically uses the same programs, but with a different
+frontend.
+
+</para><para>
+
+Although the functionality is identical, the graphical installer still has
+a few significant advantages. The main advantage is that it supports more
+languages, namely those that use a character set that cannot be displayed
+with the regular <quote>newt</quote> frontend. It also has a few usability
+advantages such as the option to use a mouse, and in some cases several
+questions can be displayed on a single screen.
+
+</para><para arch="x86">
+
+The graphical installer is available with all CD images and with the
+hd-media installation method. As the graphical installer uses a separate
+(much larger) initrd than the regular installer, it has to be booted using
+<userinput>installgui</userinput> instead of <userinput>install</userinput>.
+Analogous, the expert and rescue modes are booted using
+<userinput>expertgui</userinput> and <userinput>rescuegui</userinput>
+respectively.
+
+</para><para arch="x86">
+
+It is also available as a special <quote>mini</quote> ISO
+image<footnote id="gtk-miniiso">
+
+<para>
+The mini ISO image can be downloaded from a Debian mirror as described
+in <xref linkend="downloading-files"/>. Look for <quote>gtk-miniiso</quote>.
+</para>
+
+</footnote>, which is mainly useful for testing; in this case the image is
+booted just using <userinput>install</userinput>. There is no graphical
+installer image that can be netbooted.
+
+</para><para arch="powerpc">
+
+For &arch-title;, currently only an experimental <quote>mini</quote> ISO
+image is available<footnote id="gtk-miniiso">
+
+<para>
+The mini ISO image can be downloaded from a Debian mirror as described
+in <xref linkend="downloading-files"/>. Look for <quote>gtk-miniiso</quote>.
+</para>
+
+</footnote>. It should work on almost all PowerPC systems that have
+an ATI graphical card, but is unlikely to work on other systems.
+
+</para><para>
+
+The graphical installer requires significantly more memory to run than
+the regular installer: &minimum-memory-gtk;. If insufficient memory is
+available, it will automatically fall back to the regular
+<quote>newt</quote> frontend.
+
+</para><para>
+
+You can add boot parameters when starting the graphical installer, just as
+with the regular installer. One of those parameters allows you to configure
+the mouse for left-handed use. See <xref linkend="boot-parms"/> for valid
+parameters.
+
+</para>
+
+  <sect2 id="gtk-using">
+  <title>Using the graphical installer</title>
+<para>
+
+As already mentioned, the graphical installer basically works the same as
+the regular installer and thus the rest of this manual can be used to guide
+you through the installation process.
+
+</para><para>
+
+If you prefer using the keyboard over the mouse, there are two things you
+need to know. To expand a collapsed list (used for example for the selection
+of countries within continents), you can use the <keycap>+</keycap> and
+<keycap>-</keycap> keys. For questions where more than one item can be
+selected (e.g. task selection), you first need to tab to the
+<guibutton>Continue</guibutton> button after making your selections; hitting
+enter will toggle a selection, not activate <guibutton>Continue</guibutton>.
+
+</para><para>
+
+To switch to another console, you will also need to use the
+<keycap>Ctrl</keycap> key, just as with the X Window System. For example,
+to switch to VT1 you would use: <keycombo> <keycap>Ctrl</keycap>
+<keycap>Left Alt</keycap> <keycap>F1</keycap> </keycombo>.
+
+</para>
+  </sect2>
+
+  <sect2 id="gtk-issues">
+  <title>Known issues</title>
+<para>
+
+Etch is the first release that includes the graphical installer and uses
+some relatively new technology. There are a few known issues that you may
+run into during the installation. We expect to be able to fix these issues
+for the next release of &debian;.
+
+</para>
+
+<itemizedlist>
+<listitem><para>
+
+Information on some screens is not nicely formatted into columns as it
+should be. The most obvious example is the first screen where you select
+your language. Another example is the main screen of partman.
+
+</para></listitem>
+<listitem><para>
+
+Typing some characters may not work and in some cases the wrong character
+may be printed. For example, "composing" a character by typing an accent and
+then the letter over/under which the accent should appear does not work.
+
+</para></listitem>
+<listitem><para>
+
+Support for touchpads is not yet optimal.
+
+</para></listitem>
+<listitem><para>
+
+You should not switch to a different console while the installer is busy;
+this may cause the frontend to crash. The frontend will be restarted
+automatically, but this may still cause problems with the installation.
+Switching to another console while the installer is waiting for input
+should work without causing any problems.
+
+</para></listitem>
+<listitem><para>
+
+Support for creating encrypted partitions is limited as it is not possible
+to generate a random encryption key. It is possible to set up an encrypted
+partition using a passphrase as encryption key.
+
+</para></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
