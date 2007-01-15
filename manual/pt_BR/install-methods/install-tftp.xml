@@ -1,13 +1,14 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 44002 -->
 <!-- revised by Herbert P Fortes Neto 2006.05.02 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.07 -->
+<!-- updated 39614:44002 by Felipe Augusto van de Wiel (faw) 2007.01.15 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparando os arquivos para inicialização via rede usando TFTP</title>
 <para>
 
-Caso sua máquina esteja conectada a uma rede de área local, é possivel
+Caso sua máquina esteja conectada a uma rede de área local, é possível
 inicia-la através da rede a partir de outra máquina
 usando o servidor TFTP. Se tem a intenção de iniciar o sistema
 de instalação para outra arquitetura, os arquivos de inicialização
@@ -16,29 +17,29 @@ a máquina configurada para suportar inicialização em sua máquina
 específica.
 
 </para><para>
-Você precisará configurar um servidor TFTP e para muitas máquinas um
-servidor BOOTP
-<phrase condition="supports-rarp">, ou um servidor RARP</phrase>
-<phrase condition="supports-dhcp">, ou um servidor DHCP</phrase>.
+
+Você precisará configurar um servidor TFTP e, para muitas máquinas, um
+servidor DHCP<phrase condition="supports-rarp">, ou um servidor
+RARP</phrase><phrase condition="supports-bootp">, ou um servidor
+BOOTP</phrase>.
 
 </para><para>
 
 <phrase condition="supports-rarp">O Reverse Address Resolution Protocol (RARP) é
 o único método para dizer aos clientes qual endereço IP usar para si mesmo.
-Outro método é usar o protocolo BOOTP. </phrase>
+Outro método é usar o protocolo BOOTP.</phrase>
 
 <phrase condition="supports-bootp">O BOOTP é um protocolo IP que informa
 um computador de seu endereço IP e onde na rede será obtida a imagem de
-inicialização. </phrase>
+inicialização.</phrase>
 
-<phrase arch="m68k"> Outra alternativa ainda existe nos sistemas
+<phrase arch="m68k">Outra alternativa ainda existe nos sistemas
 VMEbus: o endereço IP pode ser manualmente configurado na ROM de
-inicialização. </phrase>
+inicialização.</phrase>
 
-<phrase condition="supports-dhcp">O DHCP (Dynamic Host Configuration
-Protocol) é uma extensão mais flexível, compatível com versões mais
-antigas do BOOTP. Alguns sistemas somente podem ser configurados via
-DHCP. </phrase>
+O DHCP (Dynamic Host Configuration Protocol) é uma extensão mais flexível,
+compatível com versões mais antigas do BOOTP. Alguns sistemas somente podem
+ser configurados via DHCP.
 
 </para><para arch="powerpc">
 
@@ -88,7 +89,6 @@ qualificam; nós recomendamos o pacote <classname>tftpd-hpa</classname>.
 
 </para></note>
 
-
 </para>
 
 &tftp-rarp.xml;
@@ -110,19 +110,34 @@ tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
 Os pacotes da Debian geralmente configurarão isto corretamente por padrão
 quando forem instalados.
 
-</para><para>
+</para>
+<note><para>
 
-Olhe neste arquivo e lembre-se do diretório que é usado como
-argumento para o <command>in.tftpd</command>; você irá precisa dele
-mais abaixo. O argumento <userinput>-l</userinput> permite que
-alguns tipos de versões do <command>in.tftpd</command> registrem
-todas as requisições para os logs do sistema; isto é mais útil para
-diagnosticar erros de inicialização. Se você tiver que mudar o
-<filename>/etc/inetd.conf</filename>, você terá que notificar o
-processo em execução <command>inetd</command> de que o arquivo foi
-modificado.
-Em máquinas Debian, execute <userinput>/etc/init.d/inetd
-reload</userinput>; em outras máquinas,
+Historicamente, servidores TFTP usavam <filename>/tftpboot</filename> como
+diretório para servir imagens. No entanto, pacotes &debian; podem usar outros
+diretórios para serem compatíveis com a <ulink url="&url-fhs-home;">Filesystem
+Hierarchy Standard</ulink> (Padrão de Hierarquia de Diretórios). Por exemplo,
+<classname>tftpd-hpa</classname> por padrão usa
+<filename>/var/lib/tftpboot</filename>. Você pode ter que ajustar os exemplos
+de configuração nesta seção.
+
+</para></note>
+<para>
+
+Olhe em <filename>/etc/inetd.conf</filename> e lembre-se do diretório que foi
+usado como argumento do <command>in.tftpd</command><footnote>
+
+<para>
+O argumento <userinput>-l</userinput> habilita algumas versões do
+<command>in.tftpd</command> a registrar todas as requisições para os
+logs do sistema; isto é útil para diagnosticar erros de inicialização.
+</para>
+
+</footnote>; você precisará disto abaixo.
+Se você tiver que mudar o <filename>/etc/inetd.conf</filename>, você terá
+que notificar o processo em execução <command>inetd</command> de que o
+arquivo foi modificado. Em máquinas Debian, execute
+<userinput>/etc/init.d/inetd reload</userinput>; em outras máquinas,
 encontre o ID do processo do <command>inetd</command> e execute o
 comando <userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
 
@@ -160,11 +175,10 @@ do Linux utilizará.
 Como próximo passo, coloque a imagem de inicialização TFTP
 que precisa, como encontrada no
 <xref linkend="where-files"/> no diretório de imagens de inicialização
-do <command>tftpd</command>. Geralmente este diretório será
-<filename>/tftpboot</filename>. Você tera que fazer um link
+do <command>tftpd</command>. Você pode ter que fazer um link
 deste arquivo para o arquivo que o <command>tftpd</command> usará
 para inicializar em cliente em particular. Infelizmente, o nome do
-arquivo é determinado pelo client e TFTP e não existem padrões
+arquivo é determinado pelo cliente TFTP e não existem padrões
 rígidos.
 
 </para><para arch="powerpc">
@@ -182,7 +196,7 @@ Para a inicialização usando o PXE, tudo que precisa fazer já está feito no
 arquivo tar <filename>netboot/netboot.tar.gz</filename>. Simplesmente
 descompacte este arquivo no diretório de imagem de inicialização do
 <command>tftpd</command>. Tenha certeza que seu servidor DHCP está configurado
-para passar o arquivo <filename>/pxelinux.0</filename> através do
+para passar o arquivo <filename>pxelinux.0</filename> através do
 <command>tftpd</command> para inicializar através dele.
 
 </para><para arch="ia64">
@@ -201,7 +215,7 @@ Tenha certeza que seu servidor dhcp está configurado para passar o arquivo
 <para>
 
 Para as DECstations, existem arquivos tftpimage para cada
-sub-arquitetura. que contém ambos os kernels e o programa de
+sub-arquitetura, que contém ambos os kernels e o programa de
 instalação em um arquivo. A convenção de nomes é
 <filename><replaceable>subarquitetura</replaceable>/netboot-boot.img</filename>.
 Copie o arquivo tftpimage que deseja usar para
@@ -225,7 +239,7 @@ ser opcionalmente adicionados com a seguinte sintaxe:
 </para><para>
 
 Diversas revisões da firmware da DECstation mostram um problema
-se tratanto com a inicialização via rede: a transferência
+relacionado com a inicialização via rede: a transferência
 inicia, mas após algum tempo ela para com o erro
 <computeroutput>a.out err</computeroutput>. Isto pode ter diversas
 razões:
@@ -297,6 +311,13 @@ $ printf '%.2x%.2x%.2x%.2x\n' 10 0 0 4
 
 Para obter o nome do arquivo correto, vocé precisará mudar todas as letras
 para maiúsculo e, se necessário, adicionar o nome da sub-arquitetura.
+
+</para><para>
+
+Se você fez tudo isso corretamente, executando o comando <userinput>boot
+net</userinput> a partir do OpenPROM deveria carregar a imagem. Se a
+imagem não for encontrada, tente verificar os logs do seu servidor tftp
+para ver qual nome de imagem está sendo requisitado.
 
 </para><para>
 
@@ -447,5 +468,5 @@ TFTP de volta para o servidor que respondeu a requisição RARP anterior).
 </para>
 
   </sect2>
-FIM do FIXME -->
+END FIXME -->
  </sect1>

@@ -1,8 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43512 -->
-<!-- translated by Herbert Parentes  Fortes Neto (hpfn) 2006.02.05 -->
-<!-- revised by Herbert Parentes FOrtes Neto (hpfn) 2006.12.11 -->
+<!-- original version: 43734 -->
+<!-- translated by Herbert Parentes Fortes Neto (hpfn) 2006.02.05 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.12.11 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.25 -->
+<!-- updated 43512:43734 by Felipe Augusto van de Wiel (faw) 2007.01.15 -->
 
    <sect3 id="pkgsel">
    <title>Selecionando e Instalando Programas</title>
@@ -17,6 +18,8 @@ de programas pré-definidas para rapidamente configurar seu computador a
 executar várias tarefas.
 
 </para><para>
+
+<!-- TODO: Should explain popcon first -->
 
 Então, você tem a habilidade de escolher <emphasis>tarefas
 (<quote>tasks</quote>)</emphasis> primeiro, e depois adicionar mais pacotes
@@ -53,6 +56,8 @@ tarefas neste momento.
 </para>
 <note><para>
 
+<!-- TODO: Explain the "Standard system" task first -->
+
 A tarefa <quote>Ambiente Desktop</quote> irá instalar o ambiente de desktop
 GNOME. As opções oferecidas pelo instalador atualmente não permitem selecionar
 um ambiente de desktop diferente, como por exemplo o KDE.
@@ -60,7 +65,7 @@ um ambiente de desktop diferente, como por exemplo o KDE.
 </para><para>
 
 É possível fazer com que o instalador instale o KDE usando a pré-configuração
-(veja <xref linked="preseed-pkgsel"/>) ou adicionando
+(veja <xref linkend="preseed-pkgsel"/>) ou adicionando
 <literal>tasks="standard, kde-desktop"</literal> no prompt da inicialização
 ao iniciar o instalador. Contudo, isso funcionará apenas se os pacotes
 de que o KDE depende estiverem realmente disponíveis. Se você estiver fazendo a
@@ -78,14 +83,14 @@ Servidor de Arquivo: <classname>samba</classname>, <classname>nfs</classname>;
 Servidor de correio eletrônico: <classname>exim4</classname>, <classname>spamassassin</classname>,
 <classname>uw-imap</classname>;
 Servidor de Impressão: <classname>cups</classname>;
-Servidor SQL: <classname>postgresql</classname>;
+Banco de Dados SQL: <classname>postgresql</classname>;
 Servidor web: <classname>apache</classname>.
 
 </para></note>
 <para>
 
 Uma vez que você tenha selecionado suas tarefas, selecione
-<guibutton>Ok</guibutton>. Neste ponto, o <command>aptitude</command> irá
+<guibutton>OK</guibutton>. Neste ponto, o <command>aptitude</command> irá
 instalar os pacotes que são parte das tarefas que você selecionou.
 
 </para>
@@ -97,6 +102,23 @@ para selecionar uma tarefa.
 </para></note>
 <para>
 
+Você deveria estar ciente de que especialmente a tarefa Desktop é muito
+grande. Especialmente quando instalando de um CD-ROM normal em combinação
+com um espelho de pacotes que não está no CD-ROM, o instalador pode querer
+obter vários pacotes através da rede. Se você tem uma conexão de Internet
+relativamente lenta, isto pode demorar bastante. Não há opção para cancelar
+a instalação de pacotes uma vez que ela tenha começado.
+
+</para><para>
+
+Mesmo quando pacotes estão inclusos no CD-ROM, o instalador pode obtê-los
+de um espelho se a versão disponível no espelho é mais recente que a
+inclusa no CD-ROM. Se você está instalando a distribuição estável
+(<quote>stable</quote>), isto pode acontecer após um lançamento pontual
+(<quote>point release</quote> -- uma atualização da lançamento original da
+versão estável); se você está instalando a distribuição de testes
+(<quote>testing</quote>) isto irá acontecer se você estiver usando uma
+imagem antiga.
 
 </para><para>
 
@@ -104,100 +126,6 @@ Cada pacote que você selecionar com o <command>tasksel</command> é baixado,
 desempacotado e então instalado pelos programas <command>apt-get</command> e
 <command>dpkg</command>. Caso um programa em particular necessite de mais
 informações do usuário, ele irá perguntar à você durante o processamento.
-
-</para>
-   </sect3>
-
-   <sect3 id="config-mta">
-   <title>Configurando Seu Agente de Transporte de Correio Eletrônico</title>
-
-<para>
-
-Hoje em dia, o email é parte muito importante da vida de várias pessoas, 
-então não é surpresa que o Debian deixe você configurar seu sistema de 
-correio eletrônico como sendo parte do processo de instalação. O agente de 
-transporte de correio eletrônico padrão no Debian é o <command>exim4</command>,
-o qual é relativamente pequeno, flexível, e fácil de aprender.
-
-</para><para>
-
-Você pode perguntar se isso é necessário mesmo que seu computador não 
-esteja conectado à nenhuma rede. Com uma resposta direta: Sim. E uma longa
-explicação: Algumas ferramentas do sistema (como o <command>cron</command>,
-<command>quota</command>, <command>aide</command>, &hellip;) podem enviar
-para você importantes notícias via correio eletrônico.
-
-</para><para>
-
-Assim, na primeira tela você terá uma lista de vários cenários comuns
-de um serviço de correio eletrônico. Escolha o que estiver mais de acordo
-com suas necessidades:
-
-</para>
-
-<variablelist>
-<varlistentry>
-<term>site internet</term>
-<listitem><para>
-
-Seu sistema está conectado a uma rede e seu email pode ser enviado e
-recebido diretamente usando o SMTP. Nas telas seguintes serão feitas perguntas
-básicas como o nome da sua máquina de correio eletrônico, ou uma lista de
-domínios para os quais você aceita ou transmite mensagens de correio eletrônico.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>mensagem de correio eletrônico enviada por <quote>smarthost</quote></term>
-<listitem><para>
-
-Neste cenário as mensagens de correio eletrônico enviadas são repassadas
-para outra máquina, chamada de <quote>smarthost</quote>, a qual faz
-o real trabalho para você. O smarthost geralmente também armazena mensagens de 
-correio eletrônico recebidas endereçadas ao seu computador, e assim você
-não precisa estar permanentemente online. Isso também significa que você tem
-que baixar seu email a partir do smarthost via um programa como o
-fetchmail. Essa opção é aconselhável para usuários de linha discada.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>apenas entrega local</term>
-<listitem><para>
-
-Seu sistema não faz parte de uma rede e as mensagens de correio eletrônico
-são enviadas e recebidas apenas entre usuários locais. Mesmo que você
-não planeje enviar nenhuma mensagem, essa opção é altamente recomendada,
-porque algumas ferramentas do sistema podem enviar para você vários alertas
-de tempos em tempos (e.g. como <quote>Cota de disco excedida</quote>). Essa
-opção também é conveniente para usuários novos, porque não faz mais perguntas.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>não configurar por enquanto</term>
-<listitem><para>
-
-Escolha essa opção se você está totalmente convencido de que sabe o que está
-fazendo. Isso irá deixar você com um sistema de correio eletrônico sem 
-configuração &mdash; até que você faça a configuração, você não 
-poderá enviar ou receber qualquer mensagem de correio eletrônico e assim 
-pode perder algumas mensagens importantes das ferramentas do sistema.
-
-</para></listitem>
-</varlistentry>
-</variablelist>
-
-<para>
-
-Se nenhum desses cenários satisfaz suas necessidades, ou se você precisa
-de uma configuração mais detalhada, será preciso editar os arquivos de
-configuração no diretório <filename>/etc/exim4</filename> após a completar
-a instalação. Mais informações sobre o <command>exim4</command> podem ser
-encontradas em <filename>/usr/share/doc/exim4</filename>.
 
 </para>
    </sect3>

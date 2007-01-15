@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42929 -->
+<!-- original version: 44002 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.05.06 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.01 -->
+<!-- updated 42929:44002 by Felipe Augusto van de Wiel (faw) 2007.01.15 -->
 
   <sect2 arch="x86"><title>Inicializando o sistema através de um CD-ROM</title>
 
@@ -10,7 +11,7 @@
 <!-- Nós comentaremos a seguinte seção até saber o tamanho exato do conjunto -->
 <!--
 
-O CD #1 do conjunto oficial de CD's da Debian para &arch-title;
+O CD #1 do conjunto oficial de CDs do Debian para &arch-title;
 mostrará a linha <prompt>boot:</prompt> na maioria das máquinas.
 Pressione <keycap>F4</keycap> para ver a lista de opções do kernel
 disponíveis que poderá usar na inicialização. Você pode apenas digitar
@@ -20,7 +21,7 @@ aviso de <prompt>boot:</prompt> seguido da tecla &enterkey;.
 <para>
 
 Caso seu hardware não suporte a inicialização através de múltiplas
-imagens, coloque alguns dos outros CDs da Debian na unidade. Parece
+imagens, coloque alguns dos outros CDs do Debian na unidade. Parece
 que a maioria das unidades de CD-ROM SCSI não suportam a inicialização
 através de múltiplas imagens do <command>isolinux</command>, desta forma
 os usuários com seus CD-ROMs scsi deverão tentar o CD2 (vanilla) ou CD3
@@ -28,7 +29,7 @@ os usuários com seus CD-ROMs scsi deverão tentar o CD2 (vanilla) ou CD3
 
 </para><para>
 
-Os CDs do 2 ao 5 inicializarão com um "sabor" diferente dependendo
+Os CDs do 2 ao 5 inicializarão com um <quote>sabor</quote> diferente dependendo
 de qual CD for inserido. Veja <xref linkend="kernel-choice"/>
 sobre uma discussão sobre os diferentes sabores. Aqui estão a
 lista de tipos de imagem que cada CD contém:
@@ -119,13 +120,13 @@ deverá baixar e gravar os arquivos descritos em
 </para>
 
 <para>
-Se tiver a intenção de usar um disco rígido somente para a
-inicialização e então baixar o resto através da rede, você deve
-baixar o arquivo <filename>netboot/debian-installer/i386/initrd.gz</filename> e
+Se tiver a intenção de usar um disco rígido somente para a inicialização e
+então baixar o resto através da rede, você deve baixar o arquivo
+<filename>netboot/debian-installer/&architecture;/initrd.gz</filename> e
 seu kernel correspondente
-<filename>netboot/debian-installer/i386/linux</filename>. Isto lhe permitirá
-reparticionar o disco rígido de onde iniciou a instalação, no entanto, você
-deverá fazer isto com cuidado.
+<filename>netboot/debian-installer/&architecture;/linux</filename>. Isto lhe
+permitirá reparticionar o disco rígido de onde iniciou a instalação, no
+entanto, você deverá fazer isto com cuidado.
 </para>
 
 <para>
@@ -165,8 +166,6 @@ Aqui está um exemplo do <filename>/etc/lilo.conf</filename>:
 image=/boot/newinstall/vmlinuz
        label=newinstall
        initrd=/boot/newinstall/initrd.gz
-       root=/dev/ram0
-       append="ramdisk_size=12000"
 </screen></informalexample>
 
 Para mais detalhes, veja as páginas de manual do
@@ -177,14 +176,15 @@ Para mais detalhes, veja as páginas de manual do
 execute o <userinput>lilo</userinput> e reinicie.
 
 </para><para>
+
 O procedimento para fazer o mesmo com o <command>GRUB</command> é parecido.
-Localize o arquivo <filename>menu.lst</filename> no diretório <filename>/boot/grub/</filename> (algumas vezes em <filename>/boot/boot/grub/</filename>),
-e adicione as seguintes linhas:
+Localize o arquivo <filename>menu.lst</filename> no diretório
+<filename>/boot/grub/</filename> (algumas vezes em
+<filename>/boot/boot/grub/</filename>), e adicione as seguintes linhas:
 
 <informalexample><screen>
 title  Nova Instalação
-kernel (hd0,0)/boot/newinstall/vmlinuz root=/dev/ram devfs=mount,dall ramdisk_size=17000
-
+kernel (hd0,0)/boot/newinstall/vmlinuz
 initrd (hd0,0)/boot/newinstall/initrd.gz
 </screen></informalexample>
 
@@ -202,7 +202,6 @@ ou <command>LILO</command>.
   </sect2>
 
   <sect2 arch="x86" condition="bootable-usb" id="usb-boot">
-
   <title>Inicialização através de uma memory stick USB</title>
 <para>
 
@@ -211,21 +210,19 @@ linkend="boot-dev-select"/> e <xref linkend="boot-usb-files"/>.  Agora
 apenas ligue sua memory stick USB em algum conector USB livre e reinicie
 o computador. O sistema deverá inicializar e você verá o aviso de
 <prompt>boot:</prompt>. Lá você poderá entrar com argumentos
-opcionais de partida ou apenas teclar &enterkey;.
+opcionais de inicialização ou apenas teclar &enterkey;.
 
 </para>
   </sect2>
 
   <sect2 arch="x86" condition="supports-floppy-boot" id="floppy-boot">
-
   <title>Inicialização através de disquetes</title>
-
 <para>
 
 Você terá que copiar as imagens de disquetes que precisa e as criadas
 como é mostrado em <xref linkend="create-floppy"/>.
 <!-- missing-doc FIXME Se precisar, você também pode alterar o disquete
-de partida, veja <xref linkend="rescue-replace-kernel"/>. -->
+de inicialização, veja <xref linkend="rescue-replace-kernel"/>. -->
 
 </para><para>
 
@@ -242,7 +239,7 @@ o argumento de inicialização <emphasis>root=</emphasis>, apontando
 para o dispositivo ide que será mapeado.
 Por exemplo, se sua unidade LS-120 estiver conectada como primeiro dispositivo
 IDE (master) no segundo cabo, você deverá entrar com
-<userinput>linux root=/dev/hdc</userinput> no aviso de inicialização.
+<userinput>install root=/dev/hdc</userinput> no aviso de inicialização.
 
 </para><para>
 
@@ -289,8 +286,9 @@ automaticamente carregado.
 Existem vários métodos de inicializar através de TFTP na plataforma i386
 </para>
 
-<sect3><title>Placas de Rede ou Placas mãe que suportam o PXE</title>
+   <sect3><title>Placas de Rede ou Placas mãe que suportam o PXE</title>
 <para>
+
 É possível que sua placa de rede ou placa mãe tenha o recurso de inicialização
 através do PXE.
 Esta é uma reimplementação da <trademark class="trade">Intel</trademark> da
@@ -298,34 +296,38 @@ inicialização usando o protocolo TFTP. Se tiver, você poderá ser capaz de
 configurar sua BIOS para inicializar através da rede.
 
 </para>
-</sect3>
+   </sect3>
 
-<sect3><title>Placa de Interface de Rede com o boot através da rede</title>
+   <sect3><title>Placa de Interface de Rede com o boot através da rede</title>
 <para>
+
 Pode ser que sua placa de rede tenha a funcionalidade de
 inicializar via TFTP.
+
 </para><para condition="FIXME">
+
 Conte-nos na <email>&email-debian-boot-list;</email> (em inglês) como fez para
-gerencia-lo. Leia este documento para mais informações.
-</para>
-</sect3>
+gerenciá-lo. Leia este documento para mais informações.
 
-<sect3><title>Etherboot</title>
+</para>
+   </sect3>
+
+   <sect3><title>Etherboot</title>
 <para>
-O <ulink url="http://www.etherboot.org">projeto etherboot</ulink>
-oferece disquete de partida e até mesmo ROMS de inicialização que
-fornecem suporte de inicialização usando o protocolo TFTP.
-</para>
-</sect3>
-</sect2>
 
+O <ulink url="http://www.etherboot.org">projeto etherboot</ulink>
+oferece disquete de inicialização e até mesmo ROMs de inicialização que
+fornecem suporte de inicialização usando o protocolo TFTP.
+
+</para>
+   </sect3>
+  </sect2>
 
   <sect2 arch="x86"><title>Parâmetros de inicialização</title>
 <para>
 
-
 Quando o programa de instalação for iniciado, você deverá ver uma amigável tela
-gráfica mostrando o logotipo da Debian e o aviso de comando boot:
+gráfica mostrando o logotipo do Debian e o aviso de comando boot:
 
 <informalexample><screen>
 Pressione F1 para ajuda ou ENTER para inicializar:
@@ -333,7 +335,7 @@ Pressione F1 para ajuda ou ENTER para inicializar:
 
 No aviso de comando você poderá simplesmente pressionar a tecla &enterkey;
 para inicializar com as opções padrões ou entrar com um método específico de
-partida e, opcionalmente, parâmetros de inicialização.
+inicialização e, opcionalmente, parâmetros de inicialização.
 
 </para><para>
 
@@ -341,9 +343,9 @@ Informações sobre os métodos disponíveis de inicialização e sobre parâmet
 de inicilaização qe podem ser úteis, pressionando-se as teclas de
 <keycap>F2</keycap> até <keycap>F8</keycap>. Se adicionar quaisquer
 parâmetros à linha de comando de inicialização, tenha certeza de entrar com o
-método de partida (o padrão é <userinput>linux</userinput>) seguido de um
-espaço antes do primeiro parâmetro (e.g.,
-<userinput>linux fb=false</userinput>).
+método de inicialização (o padrão é <userinput>install</userinput>) seguido de
+um espaço antes do primeiro parâmetro (e.g.,
+<userinput>install fb=false</userinput>).
 
 <note><para>
 
