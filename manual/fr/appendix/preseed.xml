@@ -324,7 +324,7 @@ Certaines des variables qui sont fréquemment définies à l'invite du démarrage
 possèdent des alias plus courts. Quand un alias est disponible, les exemples de
 cette annexe l'utilise au lieu de la variable complète. En particulier, la variable
 <literal>preseed/url</literal> possède l'alias <literal>url</literal> et elle permet
-de raccourcir les urls à utiliser. Un autre exemple est l'alias <literal>tasks</literal>,
+de raccourcir les URL à utiliser. Un autre exemple est l'alias <literal>tasks</literal>,
 qui représente <literal>tasksel:tasksel/first</literal>.
 </para>
 <para>
@@ -339,8 +339,8 @@ les options de préconfiguration.
 </para>
 <note><para>
 
-Il faut savoir que le noyau linux (version 2.6.9 et au delà) accepte un maximum de 32 options
-ligne de commandes et 32 variables d'environnement. Et les options ajoutées
+Il faut savoir que le noyau Linux (version 2.6.9 et au delà) accepte un maximum de 32 options
+ligne de commandes et 32 variables d'environnement. Les options ajoutées
 par l'installateur sont comprises dans ces chiffres. S'il y a dépassement,
 le noyau <emphasis>panique</emphasis>. Les précédents noyaux acceptaient moins d'options.
 
@@ -379,7 +379,7 @@ On suppose qu'un serveur DHCP permettra que <literal>autoserver</literal> puisse
 serveur DHCP.
 Si le site, dont le domaine est <literal>example.com</literal>, possède un serveur
 DHCP correctement configuré, alors le fichier de préconfiguration recherché serait
-trouvé à l'url <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+trouvé à l'URL <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
 </para>
 <para>
 La partie adresse (<literal>d-i/etch/./preseed.cfg</literal>) provient de
@@ -388,7 +388,7 @@ le répertoire <literal>etch</literal> par défaut. Il sera ainsi possible
 dans de prochaines versions d'indiquer un nom de code particulier, ce qui permettra des
 migrations contrôlées. L'élément <literal>/./</literal> indique une racine relative
 à laquelle rattacher les chemins (à utiliser avec preseed/include et preseed/run).
-On peut ainsi indiquer des fichiers soit avec une url complète, chemin commençant par
+On peut ainsi indiquer des fichiers soit avec une URL complète, chemin commençant par
 /, soit avec un chemin relatif à l'endroit où a été trouvé le dernier fichier de
 préconfiguration. Cela permettra d'écrire des scripts portables où une
 hiérarchie complète de scripts pourra être déplacée à un nouvel endroit sans être
@@ -401,7 +401,7 @@ Si le fichier de préconfiguration définit <literal>preseed/run</literal> comme
 S'il n'existe pas de serveur DHCP ou DNS, ou si vous ne voulez pas utiliser
 le chemin par défaut du fichier <filename>preseed.cfg</filename>,
 vous pouvez toujours utiliser une url explicite. Et si vous n'utilisez pas l'élément
-<literal>/./</literal>, le fichier sera rattaché au troisième <literal>/</literal> de l'url.
+<literal>/./</literal>, le fichier sera rattaché au troisième <literal>/</literal> de l'URL.
 Voici un exemple qui demande une gestion minimale du réseau&nbsp;:
 
 <informalexample><screen>
@@ -412,7 +412,7 @@ Cela fonctionne ainsi&nbsp;:
 
 <itemizedlist spacing="compact">
 <listitem><para>
-Si l'URL n'a pas de protocole, http est supposé,
+Si l'URL n'a pas de protocole, HTTP est supposé,
 </para></listitem>
 <listitem><para>
 si le domaine n'a pas de point, le domaine donné par DHCP lui sera ajouté
@@ -436,8 +436,8 @@ avec l'alias <literal>classes</literal>. Exemple&nbsp;:
 auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>
 </screen></informalexample>
 
-Une classe peut par exemple dénoter le type de système à installer ou la locale à
-utiliser.
+Une classe peut par exemple dénoter le type de système à installer ou
+la <emphasis>locale</emphasis> à utiliser.
 </para>
 
 <para>
@@ -505,7 +505,7 @@ Voici des alias utiles avec la préconfiguration (mode auto)&nbsp;:
 
 Il est aussi possible d'utiliser DHCP pour spécifier un fichier à télécharger sur le réseau.
 DHCP permet d'indiquer un nom de fichier. Normalement ce fichier sert à un amorçage sur
-le réseau. S'il se trouve être un URL, le système d'installation qui permet
+le réseau. S'il s'agit d'une URL, le système d'installation qui permet
 une préconfiguration de type network téléchargera le fichier et l'utilisera comme
 fichier de préconfiguration. Voici un exemple montrant comment configurer le
 fichier dhcpd.conf appartenant à la version 3 du serveur ISC DHCP
@@ -758,7 +758,7 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/get_gateway string 192.168.1.1
 #d-i netcfg/confirm_static boolean true
 
-# Remarquez que les valeurs données par dhcp, nom de domaine ou nom de 
+# Remarquez que les valeurs données par DHCP, nom de domaine ou nom de 
 # machine, prennent le pas sur les valeurs déclarées ici. Cependant,
 # cette déclaration empêche que les questions ne soient posées même si les
 # valeurs viennent de dhcp.
@@ -767,7 +767,7 @@ d-i netcfg/get_domain string unassigned-domain
 
 # Supprimer le dialogue irritant sur la clé WEP.
 d-i netcfg/wireless_wep string
-# Et l'étonnant nom de machine dhcp que certains FAI utilisent comme mot de
+# Et l'étonnant nom de machine DHCP que certains FAI utilisent comme mot de
 # passe.
 #d-i netcfg/dhcp_hostname string radish
 </screen></informalexample>
@@ -837,7 +837,7 @@ sera choisi avant de préconfigurer son partitionnement.
 <informalexample role="example"><screen>
 # Si le système possède un espace libre, vous pouvez ne partitionner que cet
 # espace.
-# Note : la valeur du choix doit être traduit.
+# Note : la valeur du choix doit être traduite.
 #d-i partman-auto/init_automatically_partition	\
 #    select Assisté - utiliser le plus grand espace disponible
 
@@ -984,7 +984,7 @@ d-i partman/confirm boolean true
 d-i clock-setup/utc boolean true
 
 # Vous pouvez mettre toute valeur acceptée pour $TZ.
-# Voyez ce que contient /usr/share/zoneinfo/ pour des options.
+# Voyez ce que contient /usr/share/zoneinfo/ pour les valeurs possibles.
 d-i time/zone string US/Eastern
 </screen></informalexample>
 
