@@ -7,7 +7,7 @@
 <para>
 
 Si vous avez créé des volumes chiffrés et leurs points de montage pendant l'installation,
-vous devrez fournir pendant le démarrage la phrase de passe pour chaque volume.
+vous devrez fournir pendant le démarrage la phrase secrète pour chaque volume.
 La procédure diffère légèrement pour les méthodes dm-crypt et loop-AES.
 
 </para>
@@ -26,12 +26,12 @@ Enter LUKS passphrase:
 
 Le mot <replaceable>part</replaceable> sur la première ligne de l'invite
 est le nom de la partition, par exemple, sda2 ou md0. Vous vous demandez probablement
-<emphasis>pour quel volume</emphasis> vous saisissez la phrase de passe.
+<emphasis>pour quel volume</emphasis> vous saisissez la phrase secrète.
 Est-ce pour <filename>/home</filename>, pour <filename>/var</filename>&nbsp;?
-Bien sûr si vous n'avez chiffré qu'un seul volume, c'est facile et vous n'avez
+Bien sûr, si vous n'avez chiffré qu'un seul volume, c'est facile et vous n'avez
 qu'à saisir la phrase utilisée. Si vous avez chiffré plusieurs volumes, les notes
 que vous avez prises pendant l'installation (étape <xref linkend="partman-crypto"/>)
-vous serviront bien. Si vous n'avez pas noté la correspondance entre
+vous seront utiles. Si vous n'avez pas noté la correspondance entre
 <filename><replaceable>part</replaceable>_crypt</filename> et les points de montage,
 vous pouvez les trouver dans les fichiers <filename>/etc/crypttab</filename> et
 <filename>/etc/fstab</filename> de votre nouveau système.
@@ -54,7 +54,7 @@ Enter LUKS passphrase:
 <para>
 
 Quand vous saisissez la phrase, aucun caractère (même pas l'astérisque) n'est montré.
-Si vous saisissez une mauvaise phrase, vous aurez deux possibilités de correction.
+Si vous faites une erreur, vous aurez deux possibilités de correction.
 Après la troisième tentative, le processus de démarrage
 sautera ce volume et continuera avec les autres volumes. Veuillez consulter
 <xref linkend="crypto-troubleshooting"/> pour d'autres informations. 
@@ -104,7 +104,7 @@ normalement.
 <para>
 
 Quand vous n'avez pas pu monter certains volumes à cause d'une mauvaise
-phrase de passe, vous devez les monter après le démarrage. Il y a plusieurs cas.
+phrase secrète, vous devez les monter après le démarrage. Il y a plusieurs cas.
 
 </para>
 
@@ -128,12 +128,12 @@ les monter après le démarrage. Avec loop-AES, une seule opération est nécessaire
 
 où <replaceable>/mount_point</replaceable> doit être remplacé par un répertoire
 (par exemple, <filename>/home</filename>). La différence avec le montage d'une partition
-ordinaire est qu'on vous demandera de saisir la phrase de passe.  
+ordinaire est qu'on vous demandera de saisir la phrase secrète.  
 
 </para><para>
 
 Avec dm-crypt, c'est un peu plus compliqué. Vous devez d'abord enregistrer
-les volumes avec <application>device mapper</application> de cette façon&nbsp;:
+les volumes avec l'application <application>device mapper</application> de cette façon&nbsp;:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
@@ -158,7 +158,7 @@ système doit s'amorcer malgé tout et vous pouvez monter ces volumes
 comme dans le cas précédent. Mais vous aurez besoin de (re)lancer les
 services qui fonctionnent habituellement car il est probable qu'ils n'auront pas été
 lancés. Le plus simple est de passer sur le premier niveau de fonctionnement
-(<quote>runlevel</quote>) en saisissant&nbsp;:
+(<quote>runlevel</quote>) avec la commande&nbsp;:
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>init 1</userinput>
