@@ -6,7 +6,7 @@
 [ -f "$ROOT/bin/langlist" ] || exit 1
 
 # Order of languages is order in list.
-languages=`egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | cut -f 1`
+languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | cut -f 1)
 
 [ -e "$source" ] && cd $source || exit 1
 
@@ -38,9 +38,9 @@ for lang in $languages; do
     [ -d $source/$lang/.svn ] || continue
 
     if [ $lang = "en" ] ; then
-        for file_en in `find en/ -name "*.xml"`; do
+        for file_en in $(find en/ -name "*.xml"); do
             egrep -v "$grepexp" $file_en >/tmp/file_en.$$
-            lines_en=`wc -l /tmp/file_en.$$ | cut -d " " -f 1`
+            lines_en=$(wc -l /tmp/file_en.$$ | cut -d " " -f 1)
             [ $lines_en -eq 0 ] && continue
 
             lines_tot=$((lines_tot + $lines_en))
@@ -50,12 +50,12 @@ for lang in $languages; do
         continue
     fi
 
-    for file_en in `find en/ -name "*.xml"`; do
+    for file_en in $(find en/ -name "*.xml"); do
         egrep -v "$grepexp" $file_en >/tmp/file_en.$$
-        lines_en=`wc -l /tmp/file_en.$$ | cut -d " " -f 1`
+        lines_en=$(wc -l /tmp/file_en.$$ | cut -d " " -f 1)
         [ $lines_en -eq 0 ] && continue
 
-        file_tr=`echo "$file_en" | sed "s/en\//$lang\//"`
+        file_tr=$(echo "$file_en" | sed "s/en\//$lang\//")
         if [ -f $file_tr ] ; then
             egrep -v "$grepexp" $file_tr >/tmp/file_tr.$$
             if diff -w -q /tmp/file_en.$$ /tmp/file_tr.$$ >/dev/null || \
