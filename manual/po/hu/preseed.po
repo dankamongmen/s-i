@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2007-01-14 08:59+0100\n"
+"PO-Revision-Date: 2007-01-18 05:31+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -276,7 +276,7 @@ msgstr "A <filename>preseed/url</filename> röviden <filename>url</filename>, a 
 #: preseed.xml:281
 #, no-c-format
 msgid "Using boot parameters to preseed questions"
-msgstr "indító paraméterek használata kérdések előírt válaszára"
+msgstr "Indító paraméterek használata kérdések előírt válaszára"
 
 #. Tag: para
 #: preseed.xml:282
@@ -555,13 +555,13 @@ msgstr "mirror/suite"
 #: preseed.xml:502
 #, no-c-format
 msgid "Using a DHCP server to specify preconfiguration files"
-msgstr ""
+msgstr "Egy DHCP kiszolgáló használata elő-beállító fájlok megadására"
 
 #. Tag: para
 #: preseed.xml:503
 #, no-c-format
 msgid "It's also possible to use DHCP to specify a preconfiguration file to download from the network. DHCP allows specifying a filename. Normally this is a file to netboot, but if it appears to be an URL then installation media that support network preseeding will download the file from the URL and use it as a preconfiguration file. Here is an example of how to set it up in the dhcpd.conf for version 3 of the ISC DHCP server (the dhcp3-server Debian package)."
-msgstr ""
+msgstr "DHCP használatával megadható egy hálózatról letöltendő elő-beállító fájl is. A DHCP lehetővé teszi egy fájlnév megadását. Simán ez egy netboot fájl, de ha úgy tűnik: URL, akkor a hálózati előírást támogató telepítő média letölti és elő-beállító fájlként használja a fájlt. Itt egy példa, hogyan állíts be ilyet az ISC DHCP kiszolgáló 3. verziójának (a dhcp3-server Debian csomag) dhcpd.conf fájljában."
 
 #. Tag: screen
 #: preseed.xml:514
@@ -571,78 +571,81 @@ msgid ""
 "    filename \"http://host/preseed.cfg\";\n"
 "}"
 msgstr ""
+"if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
+"    filename \"http://host/preseed.cfg\";\n"
+"}"
 
 #. Tag: para
 #: preseed.xml:516
 #, no-c-format
 msgid "Note that the above example limits this filename to DHCP clients that identify themselves as \"d-i\", so it will not affect regular DHCP clients, but only the installer. You can also put the text in a stanza for only one particular host to avoid preseeding all installs on your network."
-msgstr ""
+msgstr "A fenti példa a magukat \"d-i\" néven azonosító DHCP ügyfelekre korlátozza a fájlnevet, így ez nem hat a sima DHCP ügyfelekre csak a telepítőre. Egy idézőjelben megadott szövegben csak egy gép is megadható, a hálózaton lévő össze telepítés előírásának elkerülésére."
 
 #. Tag: para
 #: preseed.xml:523
 #, no-c-format
 msgid "A good way to use the DHCP preseeding is to only preseed values specific to your network, such as the Debian mirror to use. This way installs on your network will automatically get a good mirror selected, but the rest of the installation can be performed interactively. Using DHCP preseeding to fully automate Debian installs should only be done with care."
-msgstr ""
+msgstr "A DHCP előírás egy jó módja csak a hálózatra vonatkozó értékek előírása, mind például a Debian tükör. Így a hálózat automatikusan egy jó tükröt kap, emellett a telepítés interaktívan végezhető. A Debian telepítés teljes automatizálását DHCP előírással figyelmesen kell végezni."
 
 #. Tag: title
 #: preseed.xml:537
 #, no-c-format
 msgid "Creating a preconfiguration file"
-msgstr ""
+msgstr "Elő-beállító fájl létrehozása"
 
 #. Tag: para
 #: preseed.xml:538
 #, no-c-format
 msgid "The preconfiguration file is in the format used by the <command>debconf-set-selections</command> command. The general format of a line in a preconfiguration file is:"
-msgstr ""
+msgstr "Az elő-beállító fájl a <command>debconf-set-selections</command> által használt formájú. Egy sor általános formája:"
 
 #. Tag: screen
 #: preseed.xml:544
 #, no-c-format
 msgid "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
-msgstr ""
+msgstr "&lt;tulajdonos&gt; &lt;a kérdés neve&gt; &lt;a kérdés típusa&gt; &lt;érték&gt;"
 
 #. Tag: para
 #: preseed.xml:546
 #, no-c-format
 msgid "There are a few rules to keep in mind when writing a preconfiguration file."
-msgstr ""
+msgstr "Van pár fontos szabály az elő-beállító fájlok írásakor."
 
 #. Tag: para
 #: preseed.xml:553
 #, no-c-format
 msgid "Put only a single space or tab between type and value: any additional whitespace will be interpreted as belonging to the value."
-msgstr ""
+msgstr "Csak 1 szóközt vagy tab karaktert rakj a típus és érték közé: továbbiak az érték részeként kerülnek értelmezésre."
 
 #. Tag: para
 #: preseed.xml:557
 #, no-c-format
 msgid "A line can be split into multiple lines by appending a backslash (<quote><literal>\\</literal></quote>) as the line continuation character. A good place to split a line is after the question name; a bad place is between type and value."
-msgstr ""
+msgstr "Egy sor többre vágható egy rep (<quote><literal>\\</literal></quote>) hozzáfűzésével, mint sor folytató karakter. Jó például sorokat törni a kérdés neve után; rossz a típus és érték között."
 
 #. Tag: para
 #: preseed.xml:563
 #, no-c-format
 msgid "Most questions need to be preseeded using the values valid in English and not the translated values. However, there are some questions (for example in <classname>partman</classname>) where the translated values need to be used."
-msgstr ""
+msgstr "A legtöbb elő-válaszolandó kérdés az angolul megadott értékeket várja, nem a lefordított értékeket. De van pár kérdés (például a <classname>partman</classname> részben), ahol a lefordított értékeket kell használni."
 
 #. Tag: para
 #: preseed.xml:569
 #, no-c-format
 msgid "Some questions take a code as value instead of the English text that is shown during installation."
-msgstr ""
+msgstr "Pár kérdés egy kódot vár értékként a telepítés alatt megjelenített angol szöveg helyett."
 
 #. Tag: para
 #: preseed.xml:575
 #, no-c-format
 msgid "The easiest way to create a preconfiguration file is to use the example file linked in <xref linkend=\"preseed-contents\"/> as basis and work from there."
-msgstr ""
+msgstr "Elő-beállító fájl létrehozásának legkönnyebb módja a <xref linkend=\"preseed-contents\"/> részben hivatkozott példa fájl használata alapként és az innen való munka."
 
 #. Tag: para
 #: preseed.xml:580
 #, no-c-format
 msgid "An alternative method is to do a manual installation and then, after rebooting, use the <command>debconf-get-selections</command> from the <classname>debconf-utils</classname> package to dump both the debconf database and the installer's cdebconf database to a single file:"
-msgstr ""
+msgstr "Egy másik mód a kézi telepítés és az újraindítás után a <command>debconf-get-selections</command> használata a <classname>debconf-utils</classname> csomagból, ez a debconf és a telepítő cdebconf adatbázist egy fájlba teszi:"
 
 #. Tag: screen
 #: preseed.xml:587
@@ -651,36 +654,38 @@ msgid ""
 "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
 "$ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>"
 msgstr ""
+"$ debconf-get-selections --installer &gt; <replaceable>fájl</replaceable>\n"
+"$ debconf-get-selections &gt;&gt; <replaceable>fájl</replaceable>"
 
 #. Tag: para
 #: preseed.xml:589
 #, no-c-format
 msgid "However, a file generated in this manner will have some items that should not be preseeded, and the example file is a better starting place for most users."
-msgstr ""
+msgstr "Jó tudni, hogy az így előállított fájl pár előírhatatlan elemet is tartalmaz, a példa fájl jobb kezdés a legtöbb felhasználónak."
 
 #. Tag: para
 #: preseed.xml:597
 #, no-c-format
 msgid "This method relies on the fact that, at the end of the installation, the installer's cdebconf database is saved to the installed system in <filename>/var/log/installer/cdebconf</filename>. However, because the database may contain sensitive information, by default the files are only readable by root."
-msgstr ""
+msgstr "E mód azon alapul, hogy a telepítés végén a cdebconf adatbázis a telepített rendszer <filename>/var/log/installer/cdebconf</filename> könyvtárába kerül. E fájlok érzékeny adatai miatt, alapban őket csak a root olvashatja."
 
 #. Tag: para
 #: preseed.xml:605
 #, no-c-format
 msgid "The directory <filename>/var/log/installer</filename> and all files in it will be deleted from your system if you purge the package <classname>installation-report</classname>."
-msgstr ""
+msgstr "A <filename>/var/log/installer</filename> fájlok megsemmisülnek az <classname>installation-report</classname> csomag törlésekor."
 
 #. Tag: para
 #: preseed.xml:613
 #, no-c-format
 msgid "To check possible values for questions, you can use <command>nano</command> to examine the files in <filename>/var/lib/cdebconf</filename> while an installation is in progress. View <filename>templates.dat</filename> for the raw templates and <filename>questions.dat</filename> for the current values and for the values assigned to variables."
-msgstr ""
+msgstr "A kérdések lehetséges válaszai ellenőrzéséhez, használhatod a <command>nano</command> parancsot a <filename>/var/lib/cdebconf</filename> fájlok vizsgálatához a telepítés alatt. A <filename>templates.dat</filename> a nyers sablonokat, a <filename>questions.dat</filename> a mostani értékeket és a változókhoz rendelt értékeket adja."
 
 #. Tag: para
 #: preseed.xml:621
 #, no-c-format
 msgid "To check if the format of your preconfiguration file is valid before performing an install, you can use the command <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>."
-msgstr ""
+msgstr "Az elő-beállító fájl formája érvényességének ellenőrzéséhez egy telepítés előtt, használd a <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command> parancsot."
 
 #. Tag: title
 #: preseed.xml:632
