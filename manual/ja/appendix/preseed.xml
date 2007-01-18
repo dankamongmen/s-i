@@ -26,7 +26,6 @@ Currently only a single variant of the example file is generated (for i386).
 <title>Automating the installation using preseeding</title>
 -->
 <title>preseed を利用したインストールの自動化</title>
-
 <para>
 
 <!--
@@ -42,8 +41,8 @@ automate your installation.
 The configuration fragments used in this appendix are also available as an
 example preconfiguration file from &urlset-example-preseed;.
 -->
-本付録で使用した設定の断片は、
-&urlset-example-preseed; にある事前設定ファイルのサンプルで利用できます。
+本付録で使用する設定の断片は、
+&urlset-example-preseed; のサンプル事前設定ファイルでも利用できます。
 
 </para>
 
@@ -138,7 +137,7 @@ installation methods.
 <!--
   <entry>hd-media <phrase condition="bootable-usb">(including usb-stick)</phrase></entry>
 -->
-  <entry>hd-media <phrase condition="bootable-usb">(USB スティックを含む)</phrase></entry>
+  <entry>hd-media <phrase condition="bootable-usb">(USB メモリを含む)</phrase></entry>
   <entry>yes</entry>
   <entry>yes</entry>
   <entry>yes<footnoteref linkend='apx-ps-net'/></entry>
@@ -159,9 +158,6 @@ installation methods.
   <entry>no</entry>
   <entry>yes</entry>
 </row><row arch="s390">
-<!--
-  <entry>generic/tape</entry>
--->
   <entry>generic/tape</entry>
   <entry>yes</entry>
   <entry>no</entry>
@@ -235,7 +231,7 @@ preseed が起動する前に、通常現れる質問を回避するのに、
 Although most questions used by &d-i; can be preseeded using this method,
 there are some notable exceptions. You must (re)partition an entire disk
 or use available free space on a disk; it is not possible to use existing
-partitions. 
+partitions.
 -->
 &d-i; で行われる質問のほとんどはこの方法で preseed できますが、
 いくつか注目すべき例外があります。
@@ -331,7 +327,7 @@ the developers' documentation for &d-i;.
 事前設定ファイルを最初に作成し、使用する場所に配置する必要があります。
 事前設定ファイルの作成は本付録で後ほど扱います。
 ネットワーク preseed の場合や、
-ファイルをフロッピーや USB スティックから読み込む場合、
+ファイルをフロッピーや USB メモリから読み込む場合、
 簡単に正しい位置に事前設定ファイルを配置できます。
 CD や DVD にファイルを含めたければ、
 ISO イメージを再度マスタリングする必要があります。
@@ -440,7 +436,7 @@ Boot parameters to specify:
   preseed/file=/cdrom/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
 
-- USB メディアで起動する場合 (事前設定ファイルを USB スティックの
+- USB メディアで起動する場合 (事前設定ファイルを USB メモリの
   トップレベルディレクトリに置くこと):
   preseed/file=/hd-media/preseed.cfg
   preseed/file/checksum=5da499872becccfeda2c4872f9171c3d
@@ -460,7 +456,7 @@ Note that <filename>preseed/url</filename> can be shortened to just
 
 </para>
   </sect2>
-
+  
   <sect2 id="preseed-bootparms">
 <!--
   <title>Using boot parameters to preseed questions</title>
@@ -471,7 +467,7 @@ Note that <filename>preseed/url</filename> can be shortened to just
 <!--
 If a preconfiguration file cannot be used to preseed some steps, the
 install can still be fully automated, since you can pass preseed values on
-the command line when booting the installer. 
+the command line when booting the installer.
 -->
 事前設定ファイルを preseed の各段階で使用できない場合でも、
 preseed の値をインストーラ起動時のコマンドラインに与えることで、
@@ -608,6 +604,7 @@ parameters, even if you delimit them with quotes.
 
 </para></note>
   </sect2>
+  
   <sect2 id="preseed-auto">
 <!--
   <title>Auto mode</title>
@@ -677,7 +674,7 @@ URL (<literal>d-i/etch/./preseed.cfg</literal>) の最後の部分は、
 これにより、完全な URLや / で始まるパス、
 前回 preseed が見つかった場所からの相対パスでファイルを指定できます。
 スクリプトの階層構造を壊さずに新しい場所に移動できる 
-(例えば ウェブサーバで開始し、USB スティックにコピーする)、
+(例えば ウェブサーバで開始し、USB メモリにコピーする)、
 よりポータブルなスクリプトを構成するのに便利です。
 このサンプルでは、preseed ファイルの <literal>preseed/run</literal> に 
 <literal>/scripts/late_command.sh</literal> が設定されている場合、
@@ -804,7 +801,6 @@ from being asked.
 のエイリアスで、<literal>critical</literal> に設定すると、
 優先度の低い質問を抑制するようになります。
 
-
 </para><para>
 
 <!--
@@ -856,7 +852,6 @@ The following aliases can be useful when using (auto mode) preseeding.
 </informaltable>
 
   </sect2>
-
   
   <sect2 id="preseed-dhcp">
 <!--
@@ -864,7 +859,7 @@ The following aliases can be useful when using (auto mode) preseeding.
 -->
   <title>事前設定ファイルを指定するための DHCP の利用方法</title>
 <para>
- 
+
 <!--
 It's also possible to use DHCP to specify a preconfiguration file to download
 from the network. DHCP allows specifying a filename. Normally this is a file
@@ -918,11 +913,12 @@ Debian ミラーサイトのような preseed の値のみ指定することです。
 選択したよいミラーサイトから自動で取得しますが、
 インストールの残りのプロセスはインタラクティブに行われます。
 DHCP preseed を用いた Debian の完全自動インストールは、
-十分注意しなければ行うべきではありません。
+充分注意しなければ行うべきではありません。
 
 </para>
   </sect2>
  </sect1>
+
 
  <sect1 id="preseed-creating">
 <!--
@@ -941,12 +937,12 @@ a line in a preconfiguration file is:
 事前設定ファイルの行の一般的なフォーマットは以下のようになります。
 
 <!--
- <informalexample><screen>
+<informalexample><screen>
 &lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;
- </screen></informalexample>
+</screen></informalexample>
 -->
 <informalexample><screen>
-&lt;所有者&gt; &lt;質問名&gt; &lt;テンプレート型&gt; &lt;値&gt;
+&lt;所有者&gt; &lt;質問名&gt; &lt;質問タイプ&gt; &lt;値&gt;
 </screen></informalexample>
 
 </para><para>
@@ -1100,6 +1096,7 @@ an install, you can use the command <command>debconf-set-selections -c
 </para>
  </sect1>
 
+
  <sect1 id="preseed-contents">
 <!--
  <title>Contents of the preconfiguration file</title>
@@ -1233,7 +1230,7 @@ kernel boot parameters.
 -->
 もちろん、ネットワークから事前設定ファイルを読み込む場合、
 preseed のネットワーク設定は動作しません。
-しかし、CD や USB スティックから起動するときには重要です。
+しかし、CD や USB メモリから起動するときには重要です。
 ネットワークから事前設定ファイルを読み込む場合、
 ネットワーク設定パラメータは、カーネルブートパラメータで渡すことになります。
 
@@ -1322,7 +1319,7 @@ d-i netcfg/wireless_wep string
 <!--
   <title>Mirror settings</title>
 -->
-  <title>ミラー設定</title>
+  <title>ミラーサイト設定</title>
 <para>
 
 <!--
@@ -1334,7 +1331,7 @@ system.
 使用するインストール方法に依存しますが、
 インストーラの追加コンポーネントのダウンロードや、基本システムのインストール、
 インストールしたシステムの <filename>/etc/apt/sources.list</filename> の
-セットアップにミラーを使用できます。
+セットアップにミラーサイトを使用できます。
 
 </para><para>
 
@@ -1546,7 +1543,7 @@ RAID 5 はテストされていません。
 # so this will only work if the disks are the same size.
 #d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
 
-# Next you need to specify the physical partitions that will be used.
+# Next you need to specify the physical partitions that will be used. 
 #d-i partman-auto/expert_recipe string \
 #      multiraid ::                                         \
 #              1000 5000 4000 raid                          \
@@ -1608,7 +1605,7 @@ d-i time/zone string US/Eastern
 <!--
   <title>Apt setup</title>
 -->
-  <title>Apt 設定</title>
+  <title>apt 設定</title>
 <para>
 
 <!--
@@ -1674,10 +1671,10 @@ MD5 hash allows for brute force attacks.
 -->
 preseed のパスワードは、
 パスワードを知っている事前設定ファイルが誰でもアクセスできるために、
-完全に安全でないことを知っておいてください。
+完全に安全というわけではないことを知っておいてください。
 MD5 ハッシュを使えば、セキュリティ的には多少ましと言えますが、
 MD5 ハッシュは総当たり攻撃にかけられることを考えると、
-誤った感覚を与えるかもしれません。
+セキュリティ的に誤解を与えるかもしれません。
 
 </para></warning>
 
@@ -1855,7 +1852,6 @@ set of packages in some other way. We recommend always including the
 
 </para><para>
 
-
 <!--
 If you want to install some individual packages in addition to packages
 installed by tasks, you can use the parameter
@@ -1917,7 +1913,7 @@ During a normal install, exim asks only a few questions. Here's how to
 avoid even those. More complicated preseeding is possible.
 -->
 通常のインストールでは、exim は少々質問しますが、
-さらにこれを避ける方法もあります。
+さらにこれを抑制する方法もあります。
 もっと複雑な preseed も可能です。
 
 </para>
@@ -1936,7 +1932,7 @@ exim4-config exim4/dc_postmaster string
 <!--
   <title>X configuration</title>
 -->
-  <title>X 設定</title>
+  <title>X の設定</title>
 <para>
 
 <!--
@@ -1995,17 +1991,30 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
   </sect2>
  </sect1>
 
+
  <sect1 id="preseed-advanced">
 <!--
  <title>Advanced options</title>
 -->
  <title>高度なオプション</title>
 
-  <sect2 id="preseed-shell">
+  <sect2 id="preseed-hooks">
 <!--
-  <title>Shell commands</title>
+  <title>Running custom commands during the installation</title>
 -->
-  <title>シェルコマンド</title>
+  <title>インストール中のカスタムコマンド実行</title>
+<para>
+
+<!--
+A very powerful and flexible option offered by the preconfiguration tools
+is the ability to run commands or scripts at certain points in the
+installation.
+-->
+事前設定ツールには、
+インストール中の一定の箇所でコマンドやスクリプトを実行するといった、
+とても強力で柔軟なオプションが存在します。
+
+</para>
 
 <informalexample role="example"><screen>
 # d-i preseeding is inherently not secure. Nothing in the installer checks
@@ -2027,19 +2036,43 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 </screen></informalexample>
 
   </sect2>
+  
+  <sect2 id="preseed-seenflag">
+<!--
+  <title>Using preseeding to change default values</title>
+-->
+  <title>preseed を用いたデフォルト値変更</title>
+<para>
+
+<!--
+It is possible to use preseeding to change the default answer for a
+question, but still have the question asked. To do this the
+<firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after
+setting the value for a question.
+-->
+preseed を用いて、質問へのデフォルトの回答を変更できます。
+この場合でも質問は行われます。
+これには、質問への回答を設定した後で、
+<firstterm>seen</firstterm> フラグを <quote>false</quote> 
+にリセットしなければなりません。
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
 
   <sect2 id="preseed-chainload">
 <!--
   <title>Chainloading preconfiguration files</title>
 -->
-  <title>事前設定ファイルの連鎖読み込み</title>
+  <title>事前設定ファイルの多重読み込み</title>
 <para>
 
 <!--
-It is possible to include other preseed files from a preseed file. Any
-settings in those files will override pre-existing settings from files
-loaded earlier. This makes it possible to put, for example, general
-
 It is possible to include other preconfiguration files from a preconfiguration
 file. Any settings in those files will override pre-existing settings from
 files loaded earlier. This makes it possible to put, for example, general
@@ -2055,7 +2088,7 @@ settings for certain configurations in other files.
 </para>
 
 <informalexample><screen>
-# More that one file can be listed, separated by spaces; all will be
+# More than one file can be listed, separated by spaces; all will be
 # loaded. The included files can have preseed/include directives of their
 # own as well. Note that if the filenames are relative, they are taken from
 # the same directory as the preconfiguration file that includes them.
@@ -2078,6 +2111,27 @@ settings for certain configurations in other files.
 # directory as the preconfiguration file that runs them.
 #d-i preseed/run string foo.sh
 </screen></informalexample>
+
+<para>
+
+<!--
+It is also possible to chainload from the initrd or file preseeding phase,
+into network preseeding by setting preseed/url in the earlier files.
+This will cause network preseeding to be performed when the network comes
+up.  You need to be careful when doing this, since there will be two
+distinct runs at preseeding, meaning for example that you get another
+chance to run the preseed/early command, the second one happening after the
+network comes up.
+-->
+また、
+あらかじめ用意したファイルの preseed/url で設定したネットワーク preseed  へ、
+initrd やファイル preseed の段階で、多重読み込みを行うことができます。
+これにより、ネットワークに接続した時点でネットワーク preseed を行えます。
+この場合、2 種類の異なる preseed が実行されることに注意してください。
+例えば、preseed/early コマンドを実行する機会が 2 度あり、
+2 回目はネットワークに接続した時に発生するということです。
+
+</para>
 
   </sect2>
  </sect1>

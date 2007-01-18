@@ -3,7 +3,7 @@
 <!-- original version: 39622 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>USB メモリスティックでの起動用ファイルの準備</title>
+ <title>USB メモリでの起動用ファイルの準備</title>
 
 <para>
 
@@ -16,13 +16,13 @@ stick has been mapped to (in this example
 <filename>/dev/sda</filename> is used). To write to your stick, you
 may have to turn off its write protection switch.
 -->
-USB スティックの準備をするには、
+USB メモリの準備をするには、
 GNU/Linux が既に動いていて、USB をサポートしているシステムが必要になります。
 usb-storage カーネルモジュールをきちんとロードして 
 (<userinput>modprobe usb-storage</userinput>)、
-USB スティックをマッピングしているのがどの SCSI デバイスかを検出してみるべきです。
+USB メモリをマッピングしているのがどの SCSI デバイスかを検出してみるべきです。
 (この例では <filename>/dev/sda</filename> を使用します) 
-USB スティックに書き込むために、
+USB メモリに書き込むために、
 ライトプロテクトスイッチを切る必要があります。
 
 </para><para>
@@ -31,7 +31,7 @@ USB スティックに書き込むために、
 Note, that the USB stick should be at least 128 MB in size (smaller
 setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
 -->
-USB スティックは少なくとも 128 MB のサイズがなければなりません
+USB メモリは少なくとも 128 MB のサイズがなければなりません
 (<xref linkend="usb-copy-flexible"/> のようにすれば、
 より小さなセットアップが可能です)。
 
@@ -51,7 +51,7 @@ have to extract it directly to to your USB stick:
 (カーネルを含む) インストーラの全ファイルが入った
 <filename>hd-media/boot.img.gz</filename> という
 オールインワンファイルがあります。
-以下のように USB スティックに直接展開してください。
+以下のように USB メモリに直接展開してください。
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
@@ -72,8 +72,8 @@ extract the image directly to that:
 <filename>hd-media/boot.img.gz</filename> という
 オールインワンファイルがあります。
 <command>mac-fdisk</command> の <userinput>C</userinput> コマンドで
-USB スティックに "Apple_Bootstrap" タイプのパーティションを作成し、
-以下のように USB スティックに直接展開してください。
+USB メモリに "Apple_Bootstrap" タイプのパーティションを作成し、
+以下のように USB メモリに直接展開してください。
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
@@ -87,7 +87,7 @@ Using this method will destroy anything already on the device. Make sure
 that you use the correct device name for your USB stick.
 -->
 この方法を使うとデバイス上の既存の物は破壊されてしまいます。
-USB スティックの正しいデバイス名を確認して使用してください。
+USB メモリの正しいデバイス名を確認して使用してください。
 
 </para></warning>
 <para>
@@ -103,7 +103,7 @@ on it, and copy a Debian netinst or businesscard ISO image to it.
 Please note that the file name must end in <filename>.iso</filename>.
 Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 -->
-その後、USB メモリスティック 
+その後、USB メモリ 
 (<phrase arch="x86">FAT ファイルシステム</phrase>
 <phrase arch="powerpc">HFS ファイルシステム</phrase>になっている) をマウントし 
 (<userinput>mount <replaceable arch="x86">/dev/sda</replaceable>
@@ -112,7 +112,7 @@ Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 そこに Debian netinst か、名刺型 ISO イメージをコピーしてください。
 ファイル名は <filename>.iso</filename> で終わっていなければならないことに
 注意してください。
-終わったら、USB スティックをアンマウントしてください 
+終わったら、USB メモリをアンマウントしてください 
 (<userinput>umount /mnt</userinput>)。
 
 </para>
@@ -127,7 +127,7 @@ If you like more flexibility or just want to know what's going on, you
 should use the following method to put the files on your stick.
 -->
 もっと柔軟なものがよかったり、何が起きているか知りたいのなら、
-以下に説明する USB スティックにファイルを置く方法を使用すべきです。
+以下に説明する USB メモリにファイルを置く方法を使用すべきです。
 
 </para>
 
@@ -149,11 +149,11 @@ copy a Debian ISO image (businesscard, netinst or even a full CD image)
 onto your stick (be sure to select one that fits). The file name of the
 image must end in <filename>.iso</filename>.
 -->
-インストーラは、USB スティック上の Debian ISO イメージを探し、
+インストーラは、USB メモリ上の Debian ISO イメージを探し、
 インストールに必要な追加データの取得元とします。
 ですから次のステップは、
 Debian ISO イメージ (名刺、netinst、完全版のいずれか) を、
-USB スティックに (入るものを選んで) 入れることです。
+USB メモリに (入るものを選んで) 入れることです。
 ISO イメージのファイル名は <filename>.iso</filename> 
 で終わっていなければなりません。
 
@@ -181,7 +181,7 @@ ISO イメージを使わずネットワーク越しにインストールしたければ、
 When you are done, unmount the USB memory stick (<userinput>umount
 /mnt</userinput>) and activate its write protection switch.
 -->
-終わったら、USB メモリスティックをアンマウントし 
+終わったら、USB メモリをアンマウントし 
 (<userinput>umount /mnt</userinput>)、
 ライトプロテクトスイッチを有効にしてください。
 
@@ -193,7 +193,7 @@ When you are done, unmount the USB memory stick (<userinput>umount
 <!--
   <title>Booting the USB stick</title>
 -->
-  <title>USB スティックからの起動</title>
+  <title>USB メモリからの起動</title>
 <warning><para>
 
 <!--
@@ -202,8 +202,8 @@ contain an invalid master boot record (MBR). To fix this, use the
 <command>install-mbr</command> command from the package
 <classname>mbr</classname>:
 -->
-システムがメモリスティックから起動できなければ、
-このスティックには無効なマスターブートレコード (MBR) があります。
+システムが USB メモリから起動できなければ、
+この USB メモリには無効なマスターブートレコード (MBR) があります。
 これを修正するために、<classname>mbr</classname> パッケージの 
 <command>install-mbr</command> コマンドを次のように使用してください。
 
