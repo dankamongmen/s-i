@@ -1,8 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42302 -->
+<!-- original version: 43841 -->
 <!-- updated from 28672 to 33887 by André Luís Lopes (andrelop) 2006.04.20 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.06 -->
+<!-- updated 42302:43841 by Felipe Augusto van de Wiel (faw) 2007.01.18 -->
+
 
  <sect1 id="linuxdevices"><title>Dispositivos do Linux</title>
 <para>
@@ -124,7 +126,7 @@ Os arquivos de dispositivo mais importantes estão listados nas tabelas abaixo.
 <para>
 
 O mouse pode ser usado em ambos o console do Linux (com o gpm) e no
-ambiente X window. Os dois podem se tornar compatíveis caso o repetidor
+ambiente X Window. Os dois podem se tornar compatíveis caso o repetidor
 gpm é usado para permitir que o sinal vá para o servidor X como
 mostrado:
 
@@ -166,7 +168,7 @@ documento 3-Button Mouse mini-Howto em
 
 Para PowerPC, altere o dispotivo de mouse no arquivo
 <filename>/etc/X11/XF86Config</filename> ou
-<filename>/etc/X11/XF86Config-4</filename> para 
+<filename>/etc/X11/XF86Config-4</filename> para
 <userinput>"/dev/input/mice"</userinput>.
 
 </para><para arch="powerpc">
@@ -193,26 +195,41 @@ seguinte linhas no seu arquivo
  <sect1 id="tasksel-size-list">
  <title>Espaço em Disco Necessário para as Tarefas (tasks)</title>
 
-<!-- Nota para os mantenedores do d-i e manual
-Tamanhos de tarefas devem ser determinados executando-se tasksel com a
-opção "new-install" em um sistema que foi completamente instalado sem
-a seleção de qualquer tarefa. Selecionando uma tarefa junto com a opção
-"seleção manual", o aptitude será iniciado e mostrará o tamanho que 
-será usado por aquela tarefa. Use "cancelar ações pendentes" para limpar
-a lista, saia do aptitude e repita para outras tarefas.
-Os requerimentos de espaço precisam ser determinados a partir do tasksel, pois
-o tasksel não instala pacotes recomendados enquanto a seleção de uma tarefa
-pelo aptitude sim.
+
+<!-- Note for d-i and manual maintainers
+ Sizes of tasks should be determined by running tasksel with the "new-install"
+ option on a system that been fully installed without selecting any tasks. By
+ selecting a task together with the "manual selection" option, aptitude will
+ be started and show the sizes for the task. Use "cancel pending actions" to
+ clear the slate, quit aptitude and repeat for other tasks.
+ Space requirements need to be determined from tasksel as tasksel will not
+ install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
 -->
 
 <para>
 
-A instalação do sistema base para i386, usando o kernel padrão 2.6,
-incluindo todos os pacotes padrão, requer 585MB de espaço em disco.
-Uma instalação base mínima, sem a seleção da tarefa padrão, irá
-consumir 365MB.
+Uma instalação padrão para a arquitetura i386, incluindo todos os pacotes
+padrão (<quote>standard</quote>) e usando o kernel padrão 2.6, ocupa 442MB
+de espaço em disco. Uma instalação mínima, sem a tarefa
+<quote>Sistema padrão</quote> selecionada, ocupará 230MB.
 
-</para><para>
+</para>
+<important><para>
+
+Em ambos os casos, este é o espaço em disco usado <emphasis>após</emphasis>
+a instalação ter terminado e quaisquer arquivos temporários terem sido
+apagados. Isto também não leva em conta a sobrecarga usada pelo sistema de
+arquivos, por exemplo, para arquivos de <quote>journal</quote>. Isto quer
+dizer que significativamente mais espaço em disco é necessário tanto
+<emphasis>durante</emphasis> a instalação quanto para o uso normal do sistema.
+
+</para></important>
+<para>
 
 A seguinte tabela lista tamanhos relatados pelo aptitude para as tarefas
 listadas no tasksel. Note que algumas tarefas tem pacotes que também são
@@ -222,14 +239,14 @@ ser menos que o total obtido pela adição dos números.
 </para><para>
 
 Note que você precisará adicionar os tamanhos listados na tabela ao
-tamanho da instalação do sistema básico, quando determinar o tamanho
+tamanho da instalação do sistema padrão, quando determinar o tamanho
 de partições. A maioria dos tamanhos listados como <quote>Tamanho
-instalado</quote> é o requerimento em <filename>/usr</filename>;
-o tamanho listado em <quote>Tamanho do Download</quote> é o espaço (temporário)
-requerido em <filename>/var</filename>.
+instalado</quote> é o requerimento em <filename>/usr</filename> e em
+<filename>/lib</filename>; o tamanho listado em
+<quote>Tamanho do Download</quote> é o espaço (temporário) requerido
+em <filename>/var</filename>.
 
 </para><para>
-
 
 <informaltable><tgroup cols="4">
 <thead>
@@ -243,17 +260,25 @@ requerido em <filename>/var</filename>.
 
 <tbody>
 <row>
-  <entry>Desktop</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>Ambiente desktop</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
-  <entry>Laptop</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+  <entry>Laptop<footnote>
+
+  <para>
+  Há uma grande sobreposição da tarefa Laptop com a tarefa Ambiente Desktop.
+  Se você instalar ambas, a tarefa Laptop irá requerer apenas alguns MB
+  adicionais de espaço em disco.
+  </para>
+
+  </footnote></entry>
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -265,9 +290,9 @@ requerido em <filename>/var</filename>.
 
 <row>
   <entry>Servidor de Impressão</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
@@ -279,9 +304,9 @@ requerido em <filename>/var</filename>.
 
 <row>
   <entry>Servidor de Arquivos</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
  <row>
@@ -302,8 +327,7 @@ requerido em <filename>/var</filename>.
 </tgroup></informaltable>
 <note><para>
 
-A tarefa <emphasis>Desktop</emphasis> instalará o ambiente desktop
-GNOME.
+A tarefa <emphasis>Desktop</emphasis> instalará o ambiente desktop GNOME.
 
 </para></note>
 
@@ -312,7 +336,7 @@ GNOME.
 Se instalar em um idioma que não seja o inglês, o <command>tasksel</command>
 pode instalar automaticamente uma <firstterm>tarefa de localização</firstterm>,
 se alguma estiver disponível para seu idioma. Os requerimentos de espaço se
-diferem por idioma, você deverá permitir até 200Mb de espaço total para
+diferem por idioma, você deverá permitir até 350MB de espaço total para
 download e instalação.
 
 </para>

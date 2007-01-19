@@ -1,10 +1,11 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 43841 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.30 -->
+<!-- updated 42982:43841 by Felipe Augusto van de Wiel (faw) 2007.01.19 -->
 
 <!--
-Be carefull with the format of this file as it is parsed to generate
+Be careful with the format of this file as it is parsed to generate
 the example preconfiguration file.
 In that file all text between <informalexample> tags that have the
 attribute 'role="example"' set is included, except if a 'condition'
@@ -314,7 +315,18 @@ Para definir um valor a ser usando dentro do &d-i;, apenas passe
 <userinput><replaceable>caminho/para/a/variavel</replaceable>=<replaceable>valor</replaceable></userinput>
 para qualquer uma das variáveis de pré-configuração listadas nos exemplos
 neste apêndice. Se um valor é para ser usado para configurar pacotes no
-sistema algo, você precisa prefixar o done da variável como em
+sistema algo, você precisa prefixar o <firstterm>dono</firstterm><footnote>
+
+<para>
+O dono de uma variável debconf (ou modelo) é normalmente o nome do pacote
+que contém o modelo debconf correspondente. Para variáveis usadas no próprio
+instalador o dono é <quote>d-i</quote>.
+Modelos e variáveis podem ter mais de um dono, isto ajuda a determinar se
+eles podem ser removidos da base de dados debconf se o pacote for expurgado
+(<quote>purged</quote>).
+</para>
+
+</footnote> da variável como em
 <userinput><replaceable>dono</replaceable>:<replaceable>caminho/para/a/variavel</replaceable>=<replaceable>valor</replaceable></userinput>.
 Se você não especificar um dono, o valor para a variável não será copiado
 para a base de dados do debconf no sistema alvo e portanto permanecerá sem
@@ -391,9 +403,15 @@ em um arquivo de pré-configuração sendo pego de
 
 </para><para>
 
-O segmento do caminho que vem de <literal>auto-install/defaultroot</literal>,
-o qual inclui o diretório <literal>etch</literal> por padrão permite que
-futuras versões especifiquem seus próprios codinomes, permitindo que as
++The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>)
++is taken from <literal>auto-install/defaultroot</literal>. By default
++this includes the directory <literal>etch</literal> to allow future versions
++to specify their own codename and let people migrate forwards in a
+
+A última parte daquela url (<literal>d-i/etch/./preseed.cfg</literal>)
+é tirada de <literal>auto-install/defaultroot</literal>. Por padrão
+isto inclui o diretório <literal>etch</literal> para permitir que
+futuras versões especifiquem o seu próprio codinome e deixar que as
 pessoas migrem adiante de uma maneira controlada. O <literal>/./</literal> é
 usado para indicar uma raiz relativa, no qual subseqüentes caminhos podem ser
 ancorados (para uso em preseed/include e preseed/run). Isso permite que
@@ -410,11 +428,12 @@ servidor web. Neste exemplo, se o arquivo de pré-configuração define
 
 </para><para>
 
-Se não existir uma infraestrutura local com DHCP ou DNS, ou se você não
-quiser usar o caminho padrão para o preseed.cfg, você pode ainda usar uma
-url explícita, e se você não usar o elemento <literal>/./</literal> ele
-será ancorado no início do caminho (i.e. o terceiro / da URL). Aqui
-está um exemplo que requer suporte mínimo da infraestrutura da rede local:
+Se não existir uma infraestrutura local com DHCP ou DNS, ou se você não quiser
+usar o caminho padrão para o <filename>preseed.cfg</filename>, você pode ainda
+usar uma url explícita, e se você não usar o elemento <literal>/./</literal>
+ele será ancorado no início do caminho (i.e. o terceiro <literal>/</literal>
+da URL). Aqui está um exemplo que requer suporte mínimo da infraestrutura da
+rede local:
 
 <informalexample><screen>
 auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>
@@ -439,9 +458,9 @@ o caminho padrão é adicionado.
 
 Adicionalmente ao especificar a url, você pode também especificar
 configurações que não afetam diretamente o comportamento do &d-i;
-em si, mas podem ser passadas através de qualquer script que possa ser
-especificado como <literal>preseed/run</literal> no arquivo de
-pré-configuração carregado. No momento, o único exemplo disso é
+em si, mas podem ser passadas através de scripts especificados
+usando <literal>preseed/run</literal> no arquivo de pré-configuração
+carregado. No momento, o único exemplo disso é
 <literal>auto-install/classes</literal>, o qual tem um apelido
 <literal>classes</literal>. Isso pode ser usado assim:
 
@@ -505,9 +524,10 @@ Os apelidos a seguir podem ser úteis ao usar (modo auto) pré-configuração.
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
 <row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
 <row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
 <row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
-<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
 <row><entry>suite</entry><entry>mirror/suite</entry></row>
 </tbody></tgroup>
 </informaltable>
@@ -626,7 +646,7 @@ melhor para a maioria dos usuários.
 <note><para>
 
 Este método baseia-se no fato que, ao final da instalação, o banco de dados
-cdebconf do instalador é salbo no sistema instalado em
+cdebconf do instalador é salvo no sistema instalado em
 <filename>/var/log/installer/cdebconf</filename>. No entanto, como o banco de
 dados pode conter informações sensíveis, por padrão, os arquivos só poderão ser
 lidos pelo root.
@@ -810,8 +830,8 @@ d-i netcfg/wireless_wep string
 <para>
 
 Dependendo do método de instalação que você usar, um espelho pode ser usado
-para baixar componentes adicionais para o instalador, sistema base e para
-configurar o <filename>/etc/apt/sources.list</filename> para o sistema
+para baixar componentes adicionais para o instalador, instalar o sistema base
+e para configurar o <filename>/etc/apt/sources.list</filename> para o sistema
 instalado.
 
 </para><para>
@@ -1149,8 +1169,8 @@ As únicas questões feitas são com relação à instalação do kernel.
 # if no other operating system is detected on the machine.
 d-i grub-installer/only_debian boolean true
 
-# This one makes grub-installer install to the MBR if if finds some other OS
-# too, which is less safe as it might not be able to boot that other OS.
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
 d-i grub-installer/with_other_os boolean true
 
 # Alternatively, if you want to install to a location other than the mbr,
@@ -1169,7 +1189,7 @@ d-i grub-installer/with_other_os boolean true
 <para>
 
 Você pode escolher qualquer combinação de tarefas disponíveis.
-Tarefas disponíveis enqüanto isto é escrito incluem:
+Tarefas disponíveis enquanto isto é escrito incluem:
 
 </para>
 
@@ -1221,8 +1241,8 @@ a tarefa <userinput>standard</userinput>.
 Se você quiser instalar alguns pacotes individuais em adição aos pacotes
 instalados pelas tarefas (<quote>tasks</quote>), você pode usar o parâmetro
 <classname>pkgsel/include</classname>. O valor deste parâmetro pode ser
-separado por vírgula ou espaço, então você também pode usá-lo facilmente
-na linha de comando do kernel.
+uma lista de pacotes separada por vírgulas ou espaços, permitindo que também
+seja facilmente usado na linha de comando do kernel.
 
 </para>
 
@@ -1410,9 +1430,10 @@ em um arquivo e configurações mais específicas em outro arquivo.
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
+# More than one script can be listed, separated by spaces.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
 
 <para>
