@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2007-01-20 17:29+0100\n"
+"PO-Revision-Date: 2007-01-21 00:29+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:16
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Automating the installation using preseeding"
 msgstr "Automata telepítés előírással"
 
@@ -312,7 +312,7 @@ msgstr "A <quote>--</quote> az indító lehetőségeknél különleges értelmű
 #: preseed.xml:336
 #, no-c-format
 msgid "Current linux kernels (2.6.9 and later) accept a maximum of 32 command line options and 32 environment options, including any options added by default for the installer. If these numbers are exceeded, the kernel will panic (crash). (For earlier kernels, these numbers were lower.)"
-msgstr "A jelenlegi linux kernelek (2.6.9 sé később) legfeljebb 32 parancsori és 32 környezeti opciót fogadnak a telepítő által alapban hozzáadott lehetőségekkel együtt. Ezt átlépve kernel pánik (összeomlás) következik. (Korábban e számok kisebbek voltak.)"
+msgstr "A jelenlegi linux kernelek (2.6.9 és később) legfeljebb 32 parancssori és 32 környezeti opciót fogadnak a telepítő által alapban hozzáadott lehetőségekkel együtt. Ezt átlépve kernel pánik (összeomlás) következik. (Korábban e számok kisebbek voltak.)"
 
 #. Tag: para
 #: preseed.xml:344
@@ -758,25 +758,25 @@ msgstr ""
 #: preseed.xml:692
 #, no-c-format
 msgid "Network configuration"
-msgstr ""
+msgstr "Hálózat beállítás"
 
 #. Tag: para
 #: preseed.xml:693
 #, no-c-format
 msgid "Of course, preseeding the network configuration won't work if you're loading your preconfiguration file from the network. But it's great when you're booting from CD or USB stick. If you are loading preconfiguration files from the network, you can pass network config parameters by using kernel boot parameters."
-msgstr ""
+msgstr "Természetesen a hálózati beállítás előírása nem megy, ha az előíró fájlt hálózatról töltöd. De kiváló CD vagy USB indításkor. Előíró fájlok letöltésekor hálózatról, a hálózati beállító paraméterek átadhatók kernel indító paraméterekkel."
 
 #. Tag: para
 #: preseed.xml:701
 #, no-c-format
 msgid "If you need to pick a particular interface when netbooting before loading a preconfiguration file from the network, use a boot parameter such as <userinput>interface=<replaceable>eth1</replaceable></userinput>."
-msgstr ""
+msgstr "Ha szükség van egy adott csatoló választására, használj ilyen indító paramétert: <userinput>interface=<replaceable>eth1</replaceable></userinput>."
 
 #. Tag: para
 #: preseed.xml:707
 #, no-c-format
 msgid "Although preseeding the network configuration is normally not possible when using network preseeding (using <quote>preseed/url</quote>), you can use the following hack to work around that, for example if you'd like to set a static address for the network interface. The hack is to force the network configuration to run again after the preconfiguration file has been loaded by creating a <quote>preseed/run</quote> script containing the following lines:"
-msgstr ""
+msgstr "Bár a hálózati beállítás előírása nem megy hálózati előíráskor (<quote>preseed/url</quote> használata), az alábbi bütyök megkerüli ezt, például egy statikus cím beállításához a hálózati csatolóhoz. E bütykölés a hálózati beállítás ismétlését adja az előíró fájl betöltése után egy <quote>preseed/run</quote> szkript létrehozásával, mely az alábbi sorokat tartalmazza:"
 
 #. Tag: screen
 #: preseed.xml:717
@@ -785,6 +785,8 @@ msgid ""
 "killall.sh dhclient\n"
 "netcfg"
 msgstr ""
+"killall.sh dhclient\n"
+"netcfg"
 
 #. Tag: screen
 #: preseed.xml:721
@@ -829,30 +831,68 @@ msgid ""
 "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
 "#d-i netcfg/dhcp_hostname string radish"
 msgstr ""
+"# A netcfg választ egy kapcsolattal rendelkező csatolót, ha lehet. Ez\n"
+"# átugorja a lista kiírását, ha több, mint 1 ilyen elérhető.\n"
+"d-i netcfg/choose_interface select auto\n"
+"\n"
+"# Adott csatoló választása:\n"
+"#d-i netcfg/choose_interface select eth1\n"
+"\n"
+"# Ha lassú dhcp kiszolgáló miatt a telepítő lemarad\n"
+"# ez hasznos lehet.\n"
+"#d-i netcfg/dhcp_timeout string 60\n"
+"\n"
+"# Kézi beállításhoz vedd ki e sort a megjegyzésből és a további\n"
+"# statikus hálózati beállításokat.\n"
+"#d-i netcfg/disable_dhcp boolean true\n"
+"\n"
+"# Hogy az előíró fájl dhcp kiszolgálóval rendelkező és nem rendelkező\n"
+"# gépen is menjen, vedd ki a megjegyzésből e sorokat és a további statikus\n"
+"# hálózati beállításokat.\n"
+"#d-i netcfg/dhcp_failed note\n"
+"#d-i netcfg/dhcp_options select Configure network manually\n"
+"\n"
+"# Statikus hálózati beállítás.\n"
+"#d-i netcfg/get_nameservers string 192.168.1.1\n"
+"#d-i netcfg/get_ipaddress string 192.168.1.42\n"
+"#d-i netcfg/get_netmask string 255.255.255.0\n"
+"#d-i netcfg/get_gateway string 192.168.1.1\n"
+"#d-i netcfg/confirm_static boolean true\n"
+"\n"
+"# Any hostname and domain names assigned from dhcp take precedence over\n"
+"# values set here. However, setting the values still prevents the questions\n"
+"# from being shown, even if values come from dhcp.\n"
+"d-i netcfg/get_hostname string unassigned-hostname\n"
+"d-i netcfg/get_domain string unassigned-domain\n"
+"\n"
+"# Disable that annoying WEP key dialog.\n"
+"d-i netcfg/wireless_wep string\n"
+"# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
+"#d-i netcfg/dhcp_hostname string radish"
 
 #. Tag: title
 #: preseed.xml:726
 #, no-c-format
 msgid "Mirror settings"
-msgstr ""
+msgstr "Tükör beállítások"
 
 #. Tag: para
 #: preseed.xml:727
 #, no-c-format
 msgid "Depending on the installation method you use, a mirror may be used to download additional components of the installer, to install the base system, and to set up the <filename>/etc/apt/sources.list</filename> for the installed system."
-msgstr ""
+msgstr "A választott telepítő módtól függően egy tükör használható a telepítő további összetevői letöltésére, az alaprendszer telepítésére, és a <filename>/etc/apt/sources.list</filename> beállítására a telepített rendszerhez."
 
 #. Tag: para
 #: preseed.xml:734
 #, no-c-format
 msgid "The parameter <classname>mirror/suite</classname> determines the suite for the installed system."
-msgstr ""
+msgstr "A <classname>mirror/suite</classname> paraméter megadja a telepített rendszerhez használt készletet."
 
 #. Tag: para
 #: preseed.xml:739
 #, no-c-format
 msgid "The parameter <classname>mirror/udeb/suite</classname> determines the suite for additional components for the installer. It is only useful to set this if components are actually downloaded over the network and should match the suite that was used to build the initrd for the installation method used for the installation. By default the value for <classname>mirror/udeb/suite</classname> is the same as <classname>mirror/suite</classname>."
-msgstr ""
+msgstr "A <classname>mirror/udeb/suite</classname> paraméter megadja a további összetevők készletét a telepítőnek. Csak akkor hasznos, ha az összetevők letöltése hálóról történt és mennie kell a telepítésre használt telepítő mód initrd készítésére használt készlettel. Alapban a <classname>mirror/udeb/suite</classname> érték ugyanaz, mint a <classname>mirror/suite</classname>."
 
 #. Tag: screen
 #: preseed.xml:751
@@ -868,24 +908,33 @@ msgid ""
 "# Suite to use for loading installer components (optional).\n"
 "#d-i mirror/udeb/suite string testing"
 msgstr ""
+"d-i mirror/country string enter information manually\n"
+"d-i mirror/http/hostname string http.us.debian.org\n"
+"d-i mirror/http/directory string /debian\n"
+"d-i mirror/http/proxy string\n"
+"\n"
+"# Telepítendő készlet.\n"
+"#d-i mirror/suite string testing\n"
+"# Telepítő összetevőket betöltő készlet (opcionális).\n"
+"#d-i mirror/udeb/suite string testing"
 
 #. Tag: title
 #: preseed.xml:756
 #, no-c-format
 msgid "Partitioning"
-msgstr ""
+msgstr "Particionálás"
 
 #. Tag: para
 #: preseed.xml:757
 #, no-c-format
 msgid "Using preseeding to partition the harddisk is very much limited to what is supported by <classname>partman-auto</classname>. You can choose to partition either existing free space on a disk or a whole disk. The layout of the disk can be determined by using a predefined recipe, a custom recipe from a recipe file or a recipe included in the preconfiguration file. It is currently not possible to partition multiple disks using preseeding."
-msgstr ""
+msgstr "Az előírás használata merevlemez particionálására nagyon függ a <classname>partman-auto</classname> támogatásától. Létező szabad hely vagy egész lemez is választható. A lemez felosztása megadható egy előre-megadott recepttel, egyéni recepttel egy fájlból vagy egy előíró fájlban lévő recepttel. Jelenleg nem lehet több lemezt particionálni előírással."
 
 #. Tag: para
 #: preseed.xml:768
 #, no-c-format
 msgid "The identification of disks is dependent on the order in which their drivers are loaded. If there are multiple disks in the system, make very sure the correct one will be selected before using preseeding."
-msgstr ""
+msgstr "A lemezek azonosítása függ betöltött meghajtójuk sorrendjétől. Több lemez esetén ügyelj nagyon, hogy a helyeset válaszd az előírás előtt."
 
 #. Tag: screen
 #: preseed.xml:776
@@ -952,30 +1001,90 @@ msgid ""
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
 msgstr ""
+"# Ha a rendszeren van szabad hely, választható particionálás csak ide.\n"
+"# Megjegyzés: ezt honosított (lefordított) értékkel kell előírni.\n"
+"#d-i partman-auto/init_automatically_partition \\\n"
+"#      select Irányított - legnagyobb egybefüggő szabad hely használata\n"
+"\n"
+"# Megadható egy particionálandó lemez is. Az eszköz neve\n"
+"# devfs vagy hagyományos nem-devfs formában is megadható.\n"
+"# Például az 1. lemez használata:\n"
+"d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+"# Továbbá meg kell adni a használandó módot.\n"
+"# A jelenlegiek: \"regular\", \"lvm\" és \"crypto\"\n"
+"d-i partman-auto/method string lvm\n"
+"\n"
+"# Ha egy önműködően particionálandó lemez\n"
+"# egy régi LVM beállítást tartalmaz, a felhasználó ilyen üzenetet kap:\n"
+"# warning. This can be preseeded away...\n"
+"d-i partman-auto/purge_lvm_from_device boolean true\n"
+"# Hasonló jön az lvm partíciók lemezre írása megerősítésére.\n"
+"d-i partman-lvm/confirm boolean true\n"
+"\n"
+"# Bármely előre megadott particionáló recept közül lehet választani.\n"
+"# Megjegyzés: ezt honosított (lefordított) értékkel kell előírni.\n"
+"d-i partman-auto/choose_recipe \\\n"
+"       select Minden fájl egy partíción (új felhasználóknak ajánlott)\n"
+"#d-i partman-auto/choose_recipe \\\n"
+"#       select Külön /home partíció\n"
+"#d-i partman-auto/choose_recipe \\\n"
+"#       select Külön /home, /usr, /var, és /tmp partíció\n"
+"\n"
+"# Vagy saját recept...\n"
+"# A recept formája leírva a devel/partman-auto-recipe.txt fájlban.\n"
+"# Egy recept fájl eléréséhez a d-i környezetben egyszerűen rá is lehet\n"
+"# mutatni.\n"
+"#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
+"\n"
+"# Ha nem, egy egész recept betehető az előíró fájlba 1\n"
+"# (logikai) sorba. E példa létrehoz ezeket: egy kis /boot partíció, elég\n"
+"# csere, a többi helyet gyökér partíciónak használja:\n"
+"#d-i partman-auto/expert_recipe string                         \\\n"
+"#      boot-root ::                                            \\\n"
+"#              40 50 100 ext3                                  \\\n"
+"#                      $primary{ } $bootable{ }                \\\n"
+"#                      method{ format } format{ }              \\\n"
+"#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+"#                      mountpoint{ /boot }                     \\\n"
+"#              .                                               \\\n"
+"#              500 10000 1000000000 ext3                       \\\n"
+"#                      method{ format } format{ }              \\\n"
+"#                      use_filesystem{ } filesystem{ ext3 }    \\\n"
+"#                      mountpoint{ / }                         \\\n"
+"#              .                                               \\\n"
+"#              64 512 300% linux-swap                          \\\n"
+"#                      method{ swap } format{ }                \\\n"
+"#              .\n"
+"\n"
+"# Így a partman önműködően particionál megerősítés nélkül.\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:781
 #, no-c-format
 msgid "Partitioning using RAID"
-msgstr ""
+msgstr "Particionálás RAID használatával"
 
 #. Tag: para
 #: preseed.xml:782
 #, no-c-format
 msgid "You can also use preseeding to set up partitions on software RAID arrays. Supported are RAID levels 0, 1 and 5, creating degraded arrays and specifying spare devices. If you are using RAID 1, you can preseed grub to install to all devices used in the array; see <xref linkend=\"preseed-bootloader\"/>."
-msgstr ""
+msgstr "Az előírás szoftver RAID partíciók beállítására is használható. A támogatott RAID szintek: 0,1 és 5, csökkentett tömbök és és tartalék eszközök. RAID 1 esetén előírható a grub telepítése minden a tömbben használt eszközre; lásd a <xref linkend=\"preseed-bootloader\"/> részt."
 
 #. Tag: para
 #: preseed.xml:792
 #, no-c-format
 msgid "This type of automated partitioning is easy to get wrong. It is also a very new component that may still have some bugs or missing error handling. The responsibility to get the various recipes right (so they make sense and don't conflict) lies with the user. Check <filename>/var/log/syslog</filename> if you run into problems."
-msgstr ""
+msgstr "Az önműködő particionálás e típusát könnyű elvéteni. Ez egy nagyon új komponens, melyben még lehetnek hibák vagy hiányzó hiba-kezelés. A különböző receptek elérésének megbízhatósága (az ütközés mentes működés) a felhasználótól függ. Hibák esetén lásd a <filename>/var/log/syslog</filename> fájlt."
 
 #. Tag: para
 #: preseed.xml:800
 #, no-c-format
 msgid "Note that only RAID 0 and RAID 1 have been tested by the developers of the component. RAID 5 is untested. Advanced RAID setup with degraded arrays or spare devices has only been tested lightly."
-msgstr ""
+msgstr "Csak a RAID 0 és RAID 1 tesztelt. A RAID 5 teszteletlen. A haladó RAID beállítás csökkentett tömbökkel és tartalék eszközökkel csak kevéssé tesztelt."
 
 #. Tag: screen
 #: preseed.xml:808
@@ -1027,6 +1136,51 @@ msgid ""
 "       select Finish partitioning and write changes to disk\n"
 "d-i partman/confirm boolean true"
 msgstr ""
+"# Megjegyzés: e mód béta állapotú és óvatosan használandó\n"
+"\n"
+"# A mód legyen \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Particionálandó lemezek megadása. Egyforma elrendezést kapnak,\n"
+"# így csak egyenlő méretű lemezeknél megy.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"\n"
+"# Meg kell adni a használandó fizikai partíciókat. \n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Végül meg kell adni, hogy kerüljenek a korábban megadott partíciók\n"
+"# felhasználásra a RAID beállításban. Figyelj a helyes partíció számokra\n"
+"# a logikai partíciókhoz.\n"
+"# Paraméterek:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# Támogatott RAID szintek: 0, 1 és 5; eszközök elválasztása: \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# Így a partman önműködően particionál megerősítés nélkül.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:813
@@ -1162,7 +1316,7 @@ msgstr ""
 "# Normál felhasználói fiók létrehozása.\n"
 "#d-i passwd/user-fullname string Debian Felhasználó\n"
 "#d-i passwd/username string debian\n"
-"# Normal felhasználói jelszó sima szövegben\n"
+"# Sima felhasználói jelszó sima szövegben\n"
 "#d-i passwd/user-password password insecure\n"
 "#d-i passwd/user-password-again password insecure\n"
 "# vagy MD5 hash titkosítással.\n"
@@ -1482,7 +1636,7 @@ msgstr ""
 "#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
 "# A monitor beállításához X alá 3 mód van. Itt a\n"
 "# \"medium\" előírása, mely mindig elérhető. A \"simple\" módszer néha nem\n"
-"# elérhető, az \"advanced\" től sokat kérdez.\n"
+"# elérhető, az \"advanced\" túl sokat kérdez.\n"
 "xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
 "       select medium\n"
 "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
