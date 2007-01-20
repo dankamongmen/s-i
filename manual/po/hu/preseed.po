@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2007-01-18 05:31+0100\n"
+"PO-Revision-Date: 2007-01-20 17:29+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -1032,7 +1032,7 @@ msgstr ""
 #: preseed.xml:813
 #, no-c-format
 msgid "Clock and time zone setup"
-msgstr ""
+msgstr "Óra és időzóna beállítás"
 
 #. Tag: screen
 #: preseed.xml:815
@@ -1045,18 +1045,24 @@ msgid ""
 "# /usr/share/zoneinfo/ for valid values.\n"
 "d-i time/zone string US/Eastern"
 msgstr ""
+"# Meghatározza, a hardver óra az UTC szerint jár-e.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Bármilyen érvényes $TZ értékre állítható; lásd a\n"
+"# /usr/share/zoneinfo/ tartalmát az érvényes értékekről.\n"
+"d-i time/zone string US/Eastern"
 
 #. Tag: title
 #: preseed.xml:820
 #, no-c-format
 msgid "Apt setup"
-msgstr ""
+msgstr "Az APT beállítása"
 
 #. Tag: para
 #: preseed.xml:821
 #, no-c-format
 msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
-msgstr ""
+msgstr "A <filename>/etc/apt/sources.list</filename> beállítása és az alap beállítási opciók teljesen önműködőek a telepítő módtól és korábbi válaszok függően. További (úgynevezett local) tárak is megadhatók."
 
 #. Tag: screen
 #: preseed.xml:829
@@ -1080,24 +1086,41 @@ msgid ""
 "# sources.list line will be left commented out\n"
 "#d-i apt-setup/local0/key string http://local.server/key"
 msgstr ""
+"# Veszélyes (non-free és contrib) szoftverek telepítése.\n"
+"#d-i apt-setup/non-free boolean true\n"
+"#d-i apt-setup/contrib boolean true\n"
+"# Vedd ki a megjegyzésből ezt más biztonsági tár megadásához,\n"
+"# mint a security.debian.org.\n"
+"#d-i apt-setup/security_host string\n"
+"\n"
+"# További tárak, local[0-9] elérhető\n"
+"#d-i apt-setup/local0/repository string \\\n"
+"#       deb http://local.server/debian stable main\n"
+"#d-i apt-setup/local0/comment string local server\n"
+"# deb-src sorok engedélyezése\n"
+"#d-i apt-setup/local0/source boolean true\n"
+"# A tár nyilvános kulcsát adó URL; meg kell adni egyet, különben\n"
+"# az apt elveti a hitelesítetlen tárat és a\n"
+"# sources.list sor megjegyzésben marad\n"
+"#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
 #: preseed.xml:834
 #, no-c-format
 msgid "Account setup"
-msgstr ""
+msgstr "Fiók beállítások"
 
 #. Tag: para
 #: preseed.xml:835
 #, no-c-format
 msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
+msgstr "A root fiók jelszava és az 1. sima fiók neve és jelszava szintén előírható. A jelszavaknál használhatók sima szöveg értékek vagy MD5 <emphasis>hash</emphasis> kódok."
 
 #. Tag: para
 #: preseed.xml:842
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
-msgstr ""
+msgstr "Jelszavak előírása ne feledjük, hogy az előíró fájlhoz férők megtudják ezeket. Az MD5 hash kódok használata kicsit jobb, de önmagában még hamis biztonság érzetet kelt, mert a hozzáférés lehetővé teszi az ellenük elkövetett nyers erejű támadást."
 
 #. Tag: screen
 #: preseed.xml:852
@@ -1124,36 +1147,56 @@ msgid ""
 "# or encrypted using an MD5 hash.\n"
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 msgstr ""
+"# root fiók létrehozásának kihagyása (normál fiók\n"
+"# sudo parancsot használ majd).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Normál fiók létrehozásának átugrása.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root jelszó sima szövegben\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# vagy MD5 hash titkosítással.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# Normál felhasználói fiók létrehozása.\n"
+"#d-i passwd/user-fullname string Debian Felhasználó\n"
+"#d-i passwd/username string debian\n"
+"# Normal felhasználói jelszó sima szövegben\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# vagy MD5 hash titkosítással.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
 #: preseed.xml:854
 #, no-c-format
 msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is setup to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
-msgstr ""
+msgstr "A <classname>passwd/root-password-crypted</classname> és <classname>passwd/user-password-crypted</classname> változók <quote>!</quote> értéke is előírható. Az adott fiók ekkor kikapcsolt. Ez jó lehet root fióknál, ha természetesen egy más, adminisztratív tevékenységet vagy root bejelentkezést biztosító mód adott (például SSH kulcs hitelesítés vagy <command>sudo</command>)."
 
 #. Tag: para
 #: preseed.xml:864
 #, no-c-format
 msgid "An MD5 hash for a password can be generated using the following command."
-msgstr ""
+msgstr "Egy MD5 hash egy jelszóhoz az alábbi paranccsal készíthető."
 
 #. Tag: screen
 #: preseed.xml:868
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr ""
+msgstr "$ echo \"r00tmagam\" | mkpasswd -s -H MD5"
 
 #. Tag: title
 #: preseed.xml:874
 #, no-c-format
 msgid "Base system installation"
-msgstr ""
+msgstr "Az Alaprendszer telepítése"
 
 #. Tag: para
 #: preseed.xml:875
 #, no-c-format
 msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
-msgstr ""
+msgstr "Jelenleg nincs sok előírható a telepítő e részéhez. Csak a kernel telepítéséhez vannak kérdések."
 
 #. Tag: screen
 #: preseed.xml:882
@@ -1162,12 +1205,14 @@ msgid ""
 "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 msgstr ""
+"# A 2.6 kernel számára használt initramfs előállító választása.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:887
 #, no-c-format
 msgid "Boot loader installation"
-msgstr ""
+msgstr "Boot betöltő telepítés"
 
 #. Tag: screen
 #: preseed.xml:889
@@ -1193,96 +1238,115 @@ msgid ""
 "# To install grub to multiple disks:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 msgstr ""
+"# A Grub az alap boot betöltő (x86-ra). Ha lilo-t akarsz,\n"
+"# vedd ki a megjegyzésből ezt:\n"
+"#d-i grub-installer/skip boolean true\n"
+"\n"
+"# Ez egy biztonságos beállítás, a grub betöltőt az MBR részre telepíti,\n"
+"# ha nem lelt más rendszert a gépen.\n"
+"d-i grub-installer/only_debian boolean true\n"
+"\n"
+"# Ez a a grub-installer programot, az MBR részbe telepítésre utasítja akkor is,\n"
+"# ha talált más rendszert.\n"
+"d-i grub-installer/with_other_os boolean true\n"
+"\n"
+"# Más helyre telepítéshez\n"
+"# vedd ki a megjegyzésből és szerkeszd e sorokat:\n"
+"#d-i grub-installer/only_debian boolean false\n"
+"#d-i grub-installer/with_other_os boolean false\n"
+"#d-i grub-installer/bootdev  string (hd0,0)\n"
+"# Grub telepítés több lemezre:\n"
+"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: title
 #: preseed.xml:894
 #, no-c-format
 msgid "Package selection"
-msgstr ""
+msgstr "Csomag választás"
 
 #. Tag: para
 #: preseed.xml:895
 #, no-c-format
 msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
-msgstr ""
+msgstr "Az elérhető feladatok bármely kombinációja használható. Például:"
 
 #. Tag: userinput
 #: preseed.xml:904
 #, no-c-format
 msgid "standard"
-msgstr ""
+msgstr "szabvány"
 
 #. Tag: userinput
 #: preseed.xml:907
 #, no-c-format
 msgid "desktop"
-msgstr ""
+msgstr "asztal"
 
 #. Tag: userinput
 #: preseed.xml:910
 #, no-c-format
 msgid "gnome-desktop"
-msgstr ""
+msgstr "gnome-desktop"
 
 #. Tag: userinput
 #: preseed.xml:913
 #, no-c-format
 msgid "kde-desktop"
-msgstr ""
+msgstr "kde-desktop"
 
 #. Tag: userinput
 #: preseed.xml:916
 #, no-c-format
 msgid "web-server"
-msgstr ""
+msgstr "web-kiszolgáló"
 
 #. Tag: userinput
 #: preseed.xml:919
 #, no-c-format
 msgid "print-server"
-msgstr ""
+msgstr "nyomtató-kiszolgáló"
 
 #. Tag: userinput
 #: preseed.xml:922
 #, no-c-format
 msgid "dns-server"
-msgstr ""
+msgstr "dns-kiszolgáló"
 
 #. Tag: userinput
 #: preseed.xml:925
 #, no-c-format
 msgid "file-server"
-msgstr ""
+msgstr "fájl-kiszolgáló"
 
 #. Tag: userinput
 #: preseed.xml:928
 #, no-c-format
 msgid "mail-server"
-msgstr ""
+msgstr "levél-kiszolgáló"
 
 #. Tag: userinput
 #: preseed.xml:931
 #, no-c-format
 msgid "sql-database"
-msgstr ""
+msgstr "sql-adatbázis"
 
 #. Tag: userinput
 #: preseed.xml:934
 #, no-c-format
 msgid "laptop"
-msgstr ""
+msgstr "laptop"
 
 #. Tag: para
 #: preseed.xml:938
 #, no-c-format
 msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>standard</userinput> task."
-msgstr ""
+msgstr "Feladatok nélküli telepítés is választható és más módon is utasítható a telepítés egy csomag-készletre. Ajánljuk, ez mindig tartalmazza a <userinput>szabvány</userinput> feladatot."
 
 #. Tag: para
 #: preseed.xml:944
 #, no-c-format
 msgid "If you want to install some individual packages in addition to packages installed by tasks, you can use the parameter <classname>pkgsel/include</classname>. The value of this parameter can be a list of packages separated by either commas or spaces, which allows it to be used easily on the kernel command line as well."
-msgstr ""
+msgstr "Ha egyéni csomagokat is telepítenél a feladatok által telepített csomagokon kívül, használd a <classname>pkgsel/include</classname> paramétert. E paraméter értéke csomagok egy vesszőkkel vagy szóközökkel elválasztott listája, mely lehetővé teszi, hogy a kernelnek is könnyen átadható legyen."
 
 #. Tag: screen
 #: preseed.xml:954
@@ -1301,12 +1365,24 @@ msgid ""
 "# popular and include it on CDs.\n"
 "#popularity-contest popularity-contest/participate boolean false"
 msgstr ""
+"tasksel tasksel/first multiselect standard, desktop\n"
+"#tasksel tasksel/first multiselect standard, web-server\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop\n"
+"\n"
+"# Egyéni további telepítendő csomagok\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# A telepítő egyes verziója vissza tudják küldeni a telepített és\n"
+"# használt szoftvereket. Alapban nincs jelentés-küldés, de\n"
+"# ilyenek küldése segít a projektnek meghatározni, hogy mely szoftverek\n"
+"# népszerűek és kerüljenek a CD lemezekre.\n"
+"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:959
 #, no-c-format
 msgid "Finishing up the first stage install"
-msgstr ""
+msgstr "A telepítés első szakaszának vége"
 
 #. Tag: screen
 #: preseed.xml:961
@@ -1319,18 +1395,24 @@ msgid ""
 "# which is useful in some situations.\n"
 "#d-i cdrom-detect/eject boolean false"
 msgstr ""
+"# A telepítés vége üzenet elkerülése.\n"
+"d-i finish-install/reboot_in_progress note\n"
+"\n"
+"# CD kiadásának meggátolása,\n"
+"# ami néha hasznos.\n"
+"#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
 #: preseed.xml:966
 #, no-c-format
 msgid "Mailer configuration"
-msgstr ""
+msgstr "Levelező beállítás"
 
 #. Tag: para
 #: preseed.xml:967
 #, no-c-format
 msgid "During a normal install, exim asks only a few questions. Here's how to avoid even those. More complicated preseeding is possible."
-msgstr ""
+msgstr "Normál telepítés alatt az exim csak párat kérdez. Még ezek is elkerülhetők az alábbival. Sokkal összetettebb előírás is lehetséges."
 
 #. Tag: screen
 #: preseed.xml:974
@@ -1342,18 +1424,23 @@ msgid ""
 "exim4-config exim4/no_config boolean true\n"
 "exim4-config exim4/dc_postmaster string"
 msgstr ""
+"exim4-config exim4/dc_eximconfig_configtype \\\n"
+"       select no configuration at this time\n"
+"exim4-config exim4/no_config boolean true\n"
+"exim4-config exim4/no_config boolean true\n"
+"exim4-config exim4/dc_postmaster szöveg"
 
 #. Tag: title
 #: preseed.xml:979
 #, no-c-format
 msgid "X configuration"
-msgstr ""
+msgstr "X beállítás"
 
 #. Tag: para
 #: preseed.xml:980
 #, no-c-format
 msgid "Preseeding Debian's X config is possible, but you probably need to know some details about the video hardware of the machine, since Debian's X configurator does not do fully automatic configuration of everything."
-msgstr ""
+msgstr "Természetesen a Debian X beállítás előírása is lehetséges, de tudni kell hozzá pár adatot a videó hardverről, mert a Debian X beállító nem végez mindenre teljesen automata beállítást."
 
 #. Tag: screen
 #: preseed.xml:988
@@ -1380,12 +1467,32 @@ msgid ""
 "xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
 "       select 1024x768 @ 60 Hz"
 msgstr ""
+"# Az X képes megtalálni a megfelelő meghajtót egyes kártyákhoz, de előírással\n"
+"# ez felülbírálható. A vesa szinte mindig megy.\n"
+"#xserver-xorg xserver-xorg/config/device/driver select vesa\n"
+"\n"
+"# Az egér ön-felismerésről tudni kell, hogy ha nem megy, az X újra és újra\n"
+"# megpróbálja. Tehát ha ez elő van írva,\n"
+"# végtelen ciklus keletkezhet, ha nem sikerül.\n"
+"#xserver-xorg xserver-xorg/autodetect_mouse boolean true\n"
+"\n"
+"# A monitor felismerése ajánlott.\n"
+"xserver-xorg xserver-xorg/autodetect_monitor boolean true\n"
+"# Vedd ki a megjegyzésből LCD kijelző esetén.\n"
+"#xserver-xorg xserver-xorg/config/monitor/lcd boolean true\n"
+"# A monitor beállításához X alá 3 mód van. Itt a\n"
+"# \"medium\" előírása, mely mindig elérhető. A \"simple\" módszer néha nem\n"
+"# elérhető, az \"advanced\" től sokat kérdez.\n"
+"xserver-xorg xserver-xorg/config/monitor/selection-method \\\n"
+"       select medium\n"
+"xserver-xorg xserver-xorg/config/monitor/mode-list \\\n"
+"       select 1024x768 @ 60 Hz"
 
 #. Tag: title
 #: preseed.xml:993
 #, no-c-format
 msgid "Preseeding other packages"
-msgstr ""
+msgstr "Más csomagok előírása"
 
 #. Tag: screen
 #: preseed.xml:995
@@ -1399,6 +1506,13 @@ msgid ""
 "#   debconf-get-selections --installer > file\n"
 "#   debconf-get-selections >> file"
 msgstr ""
+"# A választott szoftverektől függően, vagy a telepítő folyamat során\n"
+"# előjövő hibák esetén, más kérdések is előjöhetnek.\n"
+"# Természetesen ezek válaszai is előírhatók. Az összes lehetséges\n"
+"# kérdés listájához végezz egy telepítést majd\n"
+"# futtasd e parancsokat:\n"
+"#   debconf-get-selections --installer > fájl\n"
+"#   debconf-get-selections >> fájl"
 
 #. Tag: title
 #: preseed.xml:1002
