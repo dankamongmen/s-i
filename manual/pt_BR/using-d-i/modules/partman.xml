@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 44026 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.15 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.25 -->
+<!-- updated 43254:44026 by Felipe Augusto van de Wiel (faw) 2007.01.20 -->
 
    <sect3 id="partman">
    <title>Particionando seus discos</title>
@@ -12,7 +13,23 @@ Agora é hora de particionar seus discos. Se não estiver confortável
 com o particionamento ou apenas quer saber mais detalhes, veja <xref
 linkend="partitioning"/>.
 
-</para><para>
+</para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
+
+Se um disco rígido foi anteriormente usado sob Solaris, o particionador pode
+não detectar o tamanho do unidade corretamente. Criando uma nova tabela de
+partições não resolve este problema. O que pode ajudar, é <quote>zerar</quote>
+os primeiros setores da unidade:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Note que isto tornará quaisquer dados existentes no disco inacessíveis.
+
+</para></warning>
+<para>
 
 Primeiro de tudo você terá a oportunidade de particionar automaticamente
 toda a unidade de discos ou o espaço livre na unidade. Isto também é
@@ -212,40 +229,45 @@ Debian será coberto durante o resto desta seção.
 
 </para><para>
 
-Caso selecionar um disco zerado que não tem nem partições nem
-espaço em disco, você será perguntado se deseja criar uma
-nova tabela de partição (isto é necessário, assim você poderá
-criar novas partições). Após isto, uma linha com o título
-<quote>ESPAÇO LIVRE</quote> deverá aparecer sob o disco selecionado.
+Caso selecione um disco zerado que não tem nem partições nem espaço em
+disco, você será perguntado se uma nova tabela de partições deve ser
+criada (isto é necessário, assim você poderá criar novas partições).
+Após isto, uma linha com o título <quote>ESPAÇO LIVRE</quote> deverá
+aparecer na tabela sob o disco selecionado.
 
 </para><para>
 
-Caso selecionar algum espaço livre, você terá a chance de criar uma
-nova partição. Você terá que responder uma série de perguntas rápidas
-sobre seu tamanho, tipo (primária ou lógica) localização (início ou
-fim do espaço livre). Após isto, lhe será mostrado uma visão detalhada de
-sua nova partição. Existem opções como ponto de montagem,
-opções de montagem, opção de inicialização ou método de uso. Se não quiser
-usar os padrões, sinta-se livre para alterá-la para o que quiser. Selecionando
-o item de menu <guimenuitem>Usar como:</guimenuitem>, você poderá
-selecionar um sistema de arquivos diferente para esta partição,
-incluindo a possibilidade de usar a partição como swap,
-RAID via software, LVM ou não usá-la. Outras belas características é
-a possibilidade de copiar dados de uma partição existente para esta.
+Se você selecionar algum espaço livre, você terá a oportunidade de criar uma
+nova partição. Você terá que responder a uma rápida série de perguntas
+sobre tamanho, tipo (primária ou lógica) localização (início ou
+fim do espaço livre). Após isto, será mostrado uma visão detalhada de
+sua nova partição. A configuração principal é <guimenuitem>Usar
+como:</guimenuitem>, que determina se a partição terá um sistema de
+arquivos, ou será usada para área de troca (<quote>swap</quote>), RAID via
+software, LVM, um sistema de arquivos criptografado, ou se não será usada.
+Outras configurações incluem ponto de montagem, opções de montagem,
+<quote>flag</quote> de inicialização (<quote>bootable flag</quote>); quais
+configurações são exibidas dependerá em como a partição será usada. Se você
+não gostar dos padrões pré-selecionados, sinta-se livre para alterá-los para
+o que quiser. Por exemplo, selecionando o item de menu <guimenuitem>Usar
+como:</guimenuitem>, você poderá selecionar um sistema de arquivos diferente
+para esta partição, incluindo opções como usar a partição para área de troca
+(<quote>swap</quote>), RAID via software, LVM ou não usá-la. Outro recurso
+legal é a habilidade de copiar dados de uma partição existente para esta.
 Quando estiver satisfeito com sua nova partição, selecione
-<guimenuitem>Finalizar a configuração da Partição</guimenuitem> e você voltará
+<guimenuitem>Finalizar a configuração da partição</guimenuitem> e você voltará
 para a tela principal do <command>partman</command>.
 
 </para><para>
 
-Se decidir alterar algo sobre sua partição, simplesmente selecione-a
-que o menu de configuração da partição será aberto. Porque esta é a
-mesma tela de criação de uma nova partição, você terá a oportunidade
-de alterar as mesmas opções. Uma coisa que pode não parecer muito óbvia
-em um primeiro momento é que você pode alterar o tamanho da partição
-selecionando o item mostrando o tamanho da partição. Sistemas de arquivos
-que trabalham corretamente com esta opção incluem fat16, fat32, ext2,
-ext3 e swap. Este menu também lhe permite apagar uma partição.
+Se você decidir que quer mudar algo sobre sua partição, simplesmente
+selecione a partição, isto o levará para o menu de configurações da
+partição. Esta é a mesma tela que foi usada para a criação de uma nova
+partição, então você pode mudar as mesmas configurações. Uma coisa que
+pode não ser muito óbvia num primeiro momento é que você pode
+redimensionar a partição. Sistemas de arquivos que trabalham corretamente
+com esta opção incluem fat16, fat32, ext2, ext3 e swap. Este menu também
+permite que você apague uma partição.
 
 </para><para>
 

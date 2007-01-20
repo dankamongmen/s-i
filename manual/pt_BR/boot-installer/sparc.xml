@@ -1,78 +1,84 @@
-<!-- original version: 28997 -->
+<!-- retain these comments for translator revision tracking -->
+<!-- original version: 43841 -->
 <!-- revised by Marco Carvalho (macs) 2006.01.01 -->
+<!-- updated 28997:43841 by Felipe Augusto van de Wiel (faw) 2007.01.20 -->
 
-  <sect2 arch="sparc" id="boot-tftp"><title>Inicializando a partir do TFTP</title>
+  <sect2 arch="sparc" id="boot-tftp"><title>Inicializando com TFTP</title>
 
 &boot-installer-intro-net.xml;
 
 <para>
 
-Em mÃ¡quinas com o OpenBoot, simplesmente entre no monitor de
-inicializaÃ§Ã£o da mÃ¡quina que esta sendo instalada (veja
+Em máquinas com o OpenBoot, simplesmente entre no monitor de
+inicialização da máquina que está sendo instalada (veja
 <xref linkend="invoking-openboot"/>).
-Use o comando <userinput>boot net</userinput> para inicializar atravÃ©s de
-um servidor TFTP
-e RArP ou tente <userinput>boot net:bootp</userinput> ou
-<userinput>boot net:dhcp</userinput> para inicializar atravÃ©s de um servidor
-TFTP, BOOTP ou DHCP. Alguma revisÃµes antigas do OpenBoot requerem o uso do
-nome de dispositivo, tal como <userinput>boot le()</userinput>;
-estes provavelmente nÃ£o suportam BOOTP e nem DHCP.
+
+Use o comando <userinput>boot net</userinput> para inicializar através de
+um servidor TFTP e RARP ou tente <userinput>boot net:bootp</userinput> ou
+<userinput>boot net:dhcp</userinput> para inicializar através de um servidor
+TFTP, BOOTP ou DHCP.
 
 </para>
   </sect2>
 
 
-  <sect2 arch="sparc"><title>Inicializando atravÃ©s de um CD-ROM</title>
+  <sect2 arch="sparc"><title>Inicializando através de um CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
 <para>
 
-A maioria das versÃµes do OpenBoot suportam o comando
-<userinput>boot cdrom</userinput>
-que Ã© simplesmente um alias para inicializaÃ§Ã£o atravÃ©s de um dispositivo
-SCSI na ID 6(ou principal secundÃ¡rio para sistemas baseados em IDE). VocÃª
-poderÃ¡ ter que usar o nome de dispositivo atual para versÃµes antigas
-do OpenBoot que nÃ£o suportam este comando especial. Note que o mesmo
-problema foi reportado na Sun4m (e.g., Sparc 10s e Sparc 20s)
-durante a inicializaÃ§Ã£o via CD-ROM.
+A maioria das versões do OpenBoot suportam o comando
+<userinput>boot cdrom</userinput> que é simplesmente
+um apelido para a inicialização através de um dispositivo
+SCSI no ID 6 (ou mestre secundário para sistemas baseados em IDE).
 
 </para>
   </sect2>
 
+
   <sect2 arch="sparc" condition="supports-floppy-boot">
-  <title>Inicializando atravÃ©s de Disquetes</title>
+  <title>Inicializando através de Disquetes</title>
 <para>
 
-Para inicializar atravÃ©s de disquetes na Sparc ,use
+Imagens de disquetes atualmente estão disponíveis somente para sparc32, mas,
+por razões técnicas, não por lançamentos oficiais. (A razão é que eles só
+podem ser construídos como root, o que não é suportado por nosso sistema de
+construção -- build daemons).
+Veja em <quote>imagens construídas diariamente</quote> (<quote>daily build
+images</quote>) na <ulink url="&url-d-i;">página web do projeto Debian
+Installer</ulink> para links para imagens de disquete para sparc32.
+
+</para><para>
+
+Para inicializar através de disquetes na Sparc, use
 <informalexample><screen>
 Stop-A -> OpenBoot: "boot floppy"
 </screen></informalexample>
 
-Esteja alerta que novas arquiteturas Sun4u (ultra) nÃ£o suportam a
-inicializaÃ§Ã£o via disquetes. Uma mensagem de erro tÃ­pica Ã©
+Esteja alerta que novas arquiteturas Sun4u (ultra) não suportam a
+inicialização via disquetes. Uma mensagem de erro típica é
 <computeroutput>Bad magic number in disk label - Can't open disk label
 package</computeroutput>.
-Ainda mais, um grande nÃºmero de modelos (tal como o IPX) nÃ£o suporta
-as imagens compactadas encontradas no discos, assim tambÃ©m nÃ£o sÃ£o
-suportadas.
 
 </para><para>
 
 Diversas Sparcs (e.g. Ultra 10) tem um bug OBP que impede
-que elas iniciem (ao invÃ©s de nÃ£o suportar totalmente a inicializaÃ§Ã£o).
-A atualizaÃ§Ã£o apropriada do OBP pode ser baixada como produto com ID 106121
-atravÃ©s do link <ulink url="http://sunsolve.sun.com"></ulink>.
+que elas iniciem (ao invés de não suportar totalmente a inicialização).
+A atualização apropriada do OBP pode ser baixada como produto com ID 106121
+através do link <ulink url="http://sunsolve.sun.com"></ulink>.
 
 </para><para>
 
-Se estiver inicializando atravÃ©s de disquetes e ver mensagens como
+Se estiver inicializando através de disquetes e ver mensagens como
+
 <informalexample><screen>
 Fatal error: Cannot read partition
 Illegal or malformed device name
 </screen></informalexample>
-Ã© possÃ­vel que a inicializaÃ§Ã£o via disquetes nÃ£o seja suportada
-em sua mÃ¡quina.
+
+é possível que a inicialização via disquetes não seja suportada
+em sua máquina.
 
 </para>
   </sect2>
@@ -80,9 +86,9 @@ em sua mÃ¡quina.
   <sect2 arch="sparc"><title>Mensagens do IDPROM</title>
 <para>
 
-Caso nÃ£o puder inicializar porque vocÃª estÃ¡ recebendo mensagens
-sobre um problema com a <quote>IDPROM</quote>, entÃ£o Ã© possÃ­vel que sua bateria
-NVRAM, que armazena a informaÃ§Ã£o de configuraÃ§Ã£o de seu firmware,
+Caso não puder inicializar porque você está recebendo mensagens
+sobre um problema com a <quote>IDPROM</quote>, então é possível que sua bateria
+NVRAM, que armazena a informação de configuração de seu firmware,
 esteja esgotada. Veja <ulink url="&url-sun-nvram-faq;">Sun NVRAM FAQ</ulink>
 para mais detalhes.
 
