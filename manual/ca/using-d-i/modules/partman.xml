@@ -1,8 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39529 -->
+<!-- original version: 44026 -->
 
    <sect3 id="partman">
-   <title>Particionant els discs</title>
+   <title>Particionar els discs</title>
 
 <para>
 
@@ -10,43 +10,108 @@ Ha arribat el moment de particionar els discs. Si no esteu convençuts
 de com particionar o simplement voleu obtenir més informació, vegeu
 <xref linkend="partitioning"/>.
 
-</para><para>
-
-Primer podreu particionar automàticament la unitat sencera
-o l'espai lliure corresponent. Aquesta opció s'anomena
-partició <quote>guiada</quote>. Si no voleu la partició
-automàtica escolliu l'opció del menú
-<guimenuitem>Editar manualment la taula de particions</guimenuitem>.
-
-</para><para>
-
-Si escolliu la partició guiada podreu escollir entre dos opcions: crear
-les particions al disc directament (mètode clàssic) o utilitzar
-L'Administrador de Volums Lògics (LVM).  En el segon cas, l'instal·lador
-crearà la major part de les particions dins una gran partició; l'advantatge
-d'aquest mètode és que les particions que estan dins d'aquesta gran
-partició es poden canviar la seva mida de forma relativament fàcil després.
-Avís: la opció d'utilitzar LVM pot no estar disponible a totes les
-arquitectures.
-
 </para>
-<warning><para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
 
-Si escolliu el particionament guiat utilitzant LVM, no podreu desfer els
-canvis fets a la taula de particions. Açò esborra totes les dades
-que són actualment al disc dur seleccionat.
+Si s'ha emprat prèviament un disc sota Solaris, és possible que el
+particionador no detecti correctament la mida de la unitat. Crear una
+nova taula de partició no solucionarà aquest problema. El que sí que
+pot ajudar, però, és posar a <quote>zero</quote> els primers sectors
+del disc:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Fixeu-vos que això deixarà inaccessible tota la informació existent
+que tingueu al disc.
 
 </para></warning>
 <para>
 
-Després d'escollir el particionament guiat (tant el clàssic com LVM),
-podreu triar entre els esquemes llistats a la taula que hi ha a continuació.
-Tots els esquemes tenen els seus pros i contres, alguns dels quals s'han
-discutit a <xref linkend="partitioning"/>. Si no n'esteu segurs escolliu
-la primera opció. Heu de tenir present que la partició guiada precisa
-d'un mínim d'espai lliure amb el qual treballar. Si no li assigneu
-un mínim de 1GB d'espai (en funció de l'esquema escollit), es
-produirà un error en la partició guiada.
+Primer podreu particionar automàticament la unitat sencera
+o l'espai lliure corresponent. Aquesta opció s'anomena
+partició <quote>guiada</quote>. Si no voleu la partició
+automàtica escolliu l'opció <guimenuitem>Manual</guimenuitem> del menú.
+
+</para><para>
+
+Si escolliu la partició guiada podreu triar entre tres opcions: crear les
+particions al disc directament (mètode clàssic), crear-les mitjançant
+L'Administrador de Volums Lògics (LVM), o crear-les utilitzant LVM
+xifrat.<footnote>
+
+<para>
+L'instal·lador xifrarà el grup de volums LVM utilitzant una clau AES de
+256 bits, i aprofitant el suport per a <quote>dm-crypt</quote> del nucli.
+</para>
+
+</footnote>.
+
+</para>
+<note><para>
+
+L'opció d'utilitzar LVM (xifrat) pot no estar disponible a totes les
+arquitectures.
+
+</para></note>
+<para>
+
+Quan s'utilitza LVM o LVM xifrat, l'instal·lador crearà la major
+part de les particions dins una gran partició; l'avantatge d'aquest
+mètode és que més endavant podreu canviar la mida de les particions
+que estan dins d'aquesta gran partició de forma relativament senzilla.
+En el cas d'LVM xifrat, no es podrà llegir la partició gran sense
+conèixer una frase clau especial, proporcionant així certa seguretat
+extra per a les vostres dades personals.
+
+</para><para>
+
+Quan s'utilitza LVM xifrat, l'instal·lador també esborra automàticament
+el disc escrivint-hi dades aleatòries. Això millora encara més
+la seguretat (ja que d'aquesta manera és impossible dir quines
+parts del disc s'estan utilitzant, i a més també s'esborren restes
+d'instal·lacions anteriors), però pot trigar temps segons la mida del
+disc dur.
+
+</para>
+<note><para>
+
+Si trieu el particionat guiat amb LVM o LVM xifrat, s'hauran d'escriure
+alguns canvis a la taula de particions del disc seleccionat mentre es
+configura LVM. Aquests canvis esborraran efectivament tota informació
+que hi hagi al disc dur seleccionat, i no serà possible desfer-ho més
+endavant. Tanmateix, l'instal·lador us demanarà una confirmació dels
+canvis abans de fer-los efectius definitivament.
+
+</para></note>
+<para>
+
+Si trieu el particionat guiat (ja sigui en format clàssic o amb LVM,
+xifrat o no), per a un disc sencer, primer haureu de seleccionar el disc
+que voleu utilitzar. Comproveu que apareixen tots els discs i, si en
+teniu més d'un, assegureu-vos de seleccionar el correcte. L'ordre en
+que es llisten pot variar respecte el que esteu acostumats a veure. La
+mida dels discs pot ajudar a identificar-los.
+
+</para><para>
+
+Les dades que tingueu al disc seleccionat es perdran, però l'instal·lador
+sempre demanarà confirmació dels canvis proposats abans d'escriure
+res al disc. Si heu seleccionat el mètode de particionat clàssic,
+podreu desfer els canvis fins al final; si utilitzeu LVM (xifrat),
+això no serà possible.
+
+</para><para>
+
+A continuació, podreu triar entre els esquemes llistats a la taula que hi
+ha a continuació. Tots els esquemes tenen els seus pros i contres, alguns
+dels quals podeu veure en detall a <xref linkend="partitioning"/>. Si
+no n'esteu segurs, escolliu la primera opció. Heu de tenir present que
+el particionat guiat precisa d'un mínim d'espai lliure amb el qual
+treballar. Si no li assigneu un mínim d'1GiB d'espai (en funció de
+l'esquema escollit), es produirà un error.
 
 </para>
 
@@ -85,22 +150,22 @@ produirà un error en la partició guiada.
 
 <para>
 
-Si escolliu el particionament guiat utilitzant LVM, l'instal·lador també
-crearà una partició <filename>/boot</filename> separada. Les altres
+Si escolliu el particionat guiat utilitzant LVM (xifrat), l'instal·lador
+també crearà una partició <filename>/boot</filename> separada. Les altres
 particions, excepte la d'intercanvi (swap), es crearan dins de la
 partició LVM.
 
 </para><para arch="ia64">
 
-Si escolliu el particionament guiat pel vostre sistema IA64 hi haurà
-una partició addicional, formatejada amb un sistema de fitxers
+Si escolliu el particionat guiat en un sistema IA-64 hi haurà
+una partició addicional, formatada amb un sistema de fitxers
 arrencable FAT16, pel carregador d'arrencada EFI.
 També hi ha un opció addicional del menú de formatat per
 configurar manualment una partició com a partició d'arrencada EFI.
 
 </para><para arch="alpha">
 
-Si escolliu el particionament guiat pel vostre sistema Alpha, s'assignarà
+Si escolliu el particionat guiat pel vostre sistema Alpha, s'assignarà
 una partició no formatada addicional a l'inici del disc per reservar
 espai pel carregador d'arrencada aboot.
 
@@ -136,8 +201,8 @@ L'exemple mostra dos discs dur IDE dividits en múltiples particions;
 el primer disc disposa d'espai lliure. Cada línia de partició disposa
 del número de partició, el tipus, mida, senyaladors opcionals, sistema
 de fitxers i punt de muntatge (si n'hi ha). Avís: aquesta configuració
-particular no es pot crear amb el particionament guiat però mostra les
-possibles variacions que es poden aconseguir utilitzant el particionament
+particular no es pot crear amb el particionat guiat però mostra les
+possibles variacions que es poden aconseguir utilitzant el particionat
 manual.
 
 </para><para>
@@ -148,10 +213,10 @@ de menú
 <guimenuitem>Finalitza la partició i escriu els canvis al disc</guimenuitem>
 per desar la nova taula de particions (tal i com es descriu
 al final d'aquesta secció). Si no satisfà les vostres necessitats podeu
-escollir l'opció <guimenuitem>Desfés els canvis de les
-particions</guimenuitem> i executar el particionament guiat altra vegada, o
-modificar els canvis proposats tal i com es descriu baix pel particionament
-guiat.
+escollir l'opció <guimenuitem>Desfés els canvis a les
+particions</guimenuitem> i executar el particionat guiat altra vegada, o
+modificar els canvis proposats tal i com es descriu a continuació pel
+particionat manual.
 
 </para><para>
 
@@ -172,22 +237,26 @@ amb el títol <quote>ESPAI LLIURE</quote>.
 
 </para><para>
 
-Si seleccioneu l'espai lliure se us oferirà la possibilitat de crear
-una nova partició. Haureu de contestar a una sèrie de qüestions
-ràpides referents a la mida, tipus (primària o lògica) i la ubicació
-(al principi o al final de l'espai lliure). Posteriorment se us
-presentarà la informació referent a la nova partició. Hi ha opcions
-com el punt de muntatges, opcions de muntatge, senyaladors d'arrencada
-o el mètode d'utilització. Podeu modificar lliurements els valors
-predeterminats en funció de les vostres necessitats. Ex.
-seleccionant l'opció <guimenuitem>Utilitza com:</guimenuitem>,
-podeu seleccionar si utilitzar la partició per a swap, RAID per
-software, LVM o cap utilitat específica. Una altra característica
-interessant és la possibilitat de copiar les dades des de
-particions existents a la nova.
-Un cop la nova partició satisfaci les vostres necessitats seleccioneu
-l'opció <guimenuitem>S'ha finalitzat de preparar la partició</guimenuitem> i
-retorneu a la pantalla principal del <command>partman</command>.
+Si seleccioneu l'espai lliure tindreu l'oportunitat de crear una nova
+partició. Haureu de contestar a una sèrie de qüestions ràpides
+referents a la mida, tipus (primària o lògica) i la ubicació (al
+principi o al final de l'espai lliure). Posteriorment se us presentarà
+la informació referent a la nova partició. El paràmetre principal
+és <guimenuitem>Utilitza-ho com a:</guimenuitem>, que determina si la
+partició tindrà un sistema de fitxers o si s'utilitzarà per a memòria
+d'intercanvi, RAID per software, LVM, un sistema de fitxers xifrat,
+o fins i tot deixar-la sense utilitzar. Altres opcions inclouen el punt
+de muntatge, opcions del muntatge, senyaladors d'arrencada o el mètode
+d'utilització. Podeu modificar lliurement els valors predeterminats
+en funció de les vostres necessitats. P.ex. seleccionant l'opció
+<guimenuitem>Utilitza-ho com a:</guimenuitem>, podeu seleccionar
+si utilitzar la partició per a swap, RAID per software, LVM o cap
+utilitat específica. Una altra característica interessant és la
+possibilitat de copiar les dades des de particions existents a la
+nova. Un cop la nova partició satisfaci les vostres necessitats
+seleccioneu l'opció <guimenuitem>S'ha finalitzat la configuració
+de la partició</guimenuitem> i retorneu a la pantalla principal del
+<command>partman</command>.
 
 </para><para>
 
