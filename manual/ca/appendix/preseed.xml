@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 40460 -->
+<!-- original version: 43841 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -17,7 +17,7 @@ Currently only a single variant of the example file is generated (for i386).
 
 <para>
 
-Aquest apèndix explica els detalls de les respostes de la configuració prèvia
+Aquest apèndix explica com preparar les respostes de la configuració prèvia
 a les preguntes del &d-i; per automatitzar la instal·lació.
 
 </para><para>
@@ -47,9 +47,7 @@ N'hi ha tres: <firstterm>initrd</firstterm>, <firstterm>fitxer</firstterm> i
 <firstterm>xarxa</firstterm>. El d'initrd funciona amb qualsevol mètode
 d'instal·lació i permet la configuració prèvia de més coses, però requereix
 la preparació més acurada. Els de fitxer i xarxa es poden fer servir amb
-diferents mètodes d'instal·lació. En aquests les primeres preguntes de
-l'instal·lador no es poden configurar perquè el fitxer de configuració
-prèvia només es carrega després que aquelles s'hagen respost.
+diferents mètodes d'instal·lació.
 
 </para><para>
 
@@ -70,7 +68,14 @@ servir amb els diferents mètodes d'instal·lació.
   <entry>CD/DVD</entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnote id='apx-ps-net'>
+
+  <para>
+  però tan sols si teniu accés a la xarxa, i li doneu el valor apropiat a
+  <literal>preseed/url</literal>
+  </para>
+
+  </footnote></entry>
 </row><row>
   <entry>arrencada en xarxa</entry>
   <entry>sí</entry>
@@ -80,12 +85,12 @@ servir amb els diferents mètodes d'instal·lació.
   <entry>hd-media <phrase condition="bootable-usb">(incloent-hi memòries USB)</phrase></entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>basat en disquet (controladors al CD)</entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>basat en disquet (controladors a la xarxa)</entry>
   <entry>sí</entry>
@@ -112,19 +117,20 @@ que aquesta s'haja configurat.
 
 </para><para>
 
-En concret això vol dir que en el cas del fitxer i la xarxa les preguntes
-sobre la llengua, el país i el teclat ja hauran estat fetes. En el cas de
-la xarxa, cal afegir-hi qualsevol pregunta relacionada amb la configuració
-d'aquesta. Algunes preguntes que sols es fan en mode de prioritat mitjana o
-baixa (com la primera execució de la detecció de maquinari) també hauran
-estat processades.
+Òbviament, qualsevol pregunta que haja estat processada abans de carregar
+la configuració prèvia no es pot incloure en aquesta (açò inclourà les
+preguntes que tan sols es mostren amb prioritat baixa o mitjana, com la
+detecció inicial del maquinari). <xref linkend="preseed-bootparms"/> ofereix
+una manera d'evitar que es facin aquestes preguntes.
 
 </para><para>
 
-Òbviament, qualsevol pregunta que haja estat processada abans de carregar
-la configuració prèvia no es pot incloure en aquesta.
-<xref linkend="preseed-bootparms"/> ofereix una manera d'evitar aquestes
-preguntes.
+Per evitar les preguntes que normalment apareixen abans de fer la
+configurarció prèvia, podeu arrencar l'instal·lador en mode
+<quote>auto</quote>. Açò endarrereix les preguntes que es farien massa
+d'hora per ser configurades prèviament. També executa la instal·lació
+amb prioritat crítica, que evita moltes preguntes sense importància.
+Trobareu més detalls a <xref linkend="preseed-auto"/>.
 
 </para>
   </sect2>
@@ -136,8 +142,7 @@ preguntes.
 Tot i que la majoria de preguntes emprades pel &d-i; poden configurar-se
 prèviament fent servir aquest mètode, hi algunes excepcions remarcables. Cal
 (tornar a) particionar un disc sencer o emprar-ne l'espai lliure disponible;
-no es poden emprar particions ja existents. Actualment tampoc es pot fer
-servir la configuració prèvia per configurar un RAID.
+no es poden emprar particions ja existents.
 
 </para>
   </sect2>
@@ -162,7 +167,7 @@ The following types of templates are relevant for preseeding.
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: allows the user to type any value
 </para></listitem>
@@ -202,55 +207,14 @@ are stored in a separate, non-readable file in the same directory.
 </para>
   </sect2>
 -->
-
-  <sect2 id="preseed-hooks">
-  <title>Execució d'ordres discrecionals durant la instal·lació</title>
-<para>
-
-Una opció molt potent i flexible que ofereixen les eines de configuració
-prèvia és l'execució d'ordres o guions en determinants moments de la
-instal·lació. Consulteu-ne els detalls a <xref linkend="preseed-shell"/>.
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-  <userinput>preseed/early_command</userinput>: s'executa tan bon punt el
-  fitxer de configuració prèvia s'haja carregat
-</para></listitem>
-<listitem><para>
-  <userinput>preseed/late_command</userinput>: s'executa just abans de
-  l'arrencada posterior al final de la instal·lació, però abans que
-  el sistema de fitxers <filename>/target</filename> s'haja desmuntat
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
-
-  <sect2 id="preseed-seenflag">
-  <title>Utilització de la configuració prèvia per canviar els valors predeterminats</title>
-<para>
-
-És pot emprar la configuració prèvia per canviar les respostes
-predeterminades a les preguntes, però tot i així haver-les de respondre.
-Per fer-ho, la marca <firstterm>seen</firstterm> ha de posar-se a
-<quote>false</quote> desprès de definir el valor a una pregunta.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
  </sect1>
+
 
  <sect1 id="preseed-using">
  <title>Utilització de la configuració prèvia</title>
 <para>
 
-Sens dubte, primer de tot heu de crear un fitxer de configuració prèvia i
+Primer de tot heu de crear un fitxer de configuració prèvia i
 posar-lo al lloc des d'on voleu fer-lo servir. La creació de fitxers de
 configuració prèvia es tractarà després. Col·locar-los correctament és
 fàcil en el cas de la configuració per xarxa o si voleu llegir el fitxer
@@ -323,24 +287,252 @@ Adoneu-vos que <filename>preseed/url</filename> pot escurçar-se a tan sols
 <filename>url</filename> i <filename>preseed/file</filename> a
 <filename>file</filename> quan són passats com a paràmetres d'arrencada.
 
+</para>
+  </sect2>
+
+  <sect2 id="preseed-bootparms">
+  <title>Utilització dels paràmetres d'arrencada per complementar la configuració prèvia</title>
+<para>
+
+Si no es pot utilitzar un fitxer de preconfiguració per fer la configuració
+prèvia per alguns passos, la instal·lació encara es pot automatitzar
+completament, ja que podeu passar valors de la configuració prèvia a línia
+d'ordres quan està arrencant l'instal·lador.
+
 </para><para>
 
-Podeu afegir a l'indicador d'arrencada el paràmetre
-<userinput>priority=critical</userinput>, que evitarà la majoria de
-preguntes fins i tot si la configuració prèvia no en contesta algunes.
+També podeu utilitzar els paràmetres d'arrencada si no voleu utilitzar la
+configuració prèvia, però voleu donar una resposta a una pregunta específica.
+Hi ha alguns exemples on açò pot ser útil, documentats per tot arreu en
+aquest manual.
+
+</para><para>
+
+Per donar un valor que s'utilitze dins el &d-i;, passeu
+<userinput><replaceable>ruta/a/la/variable</replaceable>=<replaceable>valor</replaceable></userinput>
+per qualsevol de les variables que es poden configurar prèviament que
+són als exemples en aquest apèndix. Si un valor s'utilitza per configurar
+paquets al sistema destí, necessitareu afegir abans el
+<firstterm>propietari</firstterm><footnote>
+
+<para>
+Normalment, el propietari d'una variable debconf (o una plantilla) és
+el nom del paquet que conté la plantilla debconf que es correspon a la
+plantilla debconf corresponent. Les variables utilitzades en l'instal·lador
+en si mateix tenen com propietari <quote>d-i</quote>. Les plantilles i
+variables poden tenir més d'un propietari que ajuden a determinar si es
+poden esborrar de la base de dades debconf quan el paquet s'esborre
+completament.
+</para>
+
+</footnote> de la variable com
+<userinput><replaceable>propietari</replaceable>:<replaceable>ruta/a/la/variable</replaceable>=<replaceable>valor</replaceable></userinput>.
+Si no especifiqueu el propietari, el valor de la variable no es copiarà
+a la base de dades debconf en el sistema destí i no s'utilitzarà a la
+configuració del paquet rellevant.
+
+</para><para>
+
+Adoneu-vos que algunes variables a les que es dona valors freqüentment
+a l'indicador de l'arrencada tenen una forma curta. Si hi ha una forma
+curta, s'utilitzarà en els exemples d'aquest apèndix en comptes de la
+variable completa. En particular, la variable <literal>preseed/url</literal>
+te com a forma curta <literal>url</literal> i te alguna màgia extra
+per permetre utilitzar adreces abreviades. Un altre exemple és la
+forma curta <literal>tasks</literal>, que es tradueix a
+<literal>tasksel:tasksel/first</literal> .
+
+</para><para>
+
+Un <quote>--</quote> a les opcions d'arrencada té un significat especial.
+Els paràmetres del nucli que apareixen desprès de l'últim <quote>--</quote>
+es poden copiar al carregador d'arrencada del sistema instal·lat (si ho
+suporta l'instal·lador del carregador d'arrencada). L'instal·lador
+automàticament filtrarà qualsevol opció (com les opcions preconfigurades)
+que reconegui.
+
+</para>
+<note><para>
+
+Els nuclis actuals (2.6.9 i posteriors) accepten un màxim de 32 opcions
+a la la línia d'ordres i 32 opcions d'entorn, que inclou qualsevol opció
+afegida per defecte per l'instal·lador. Si es superen aquestes quantitats,
+el nucli farà un «panic» (petarà). (Als nuclis anteriors, aquestes
+quantitats eren inferiors).
+
+</para></note>
+<para>
+
+A quasi totes les instal·lacions es poden esborrar amb seguretat algunes
+de les opcions per defecte en el fitxer de configuració del carregador
+d'arrencada, com <literal>vga=normal</literal>, que us permetrà que
+afegiu més opcions per la configuració prèvia.
+
+</para>
+<note><para>
+
+No sempre és possible passar valors amb espais als paràmetres d'arrencada,
+encara que els delimiteu amb cometes.
+
+</para></note>
+  </sect2>
+
+  <sect2 id="preseed-auto">
+  <title>Mode auto</title>
+<para>
+
+Hi ha algunes característiques de l'instal·lador de Debian que combinen
+la simplicitat de la línia d'ordres de l'indicador d'arrencada per
+aconseguir unes instal·lacions automàtiques personalitzades arbitràriament
+complexes. Per il lustrar-ho, ací teniu alguns exemples que es poden
+utilitzar a l'indicador de l'arrencada:
+
+<informalexample><screen>
+auto url=autoserver
+</screen></informalexample>
+
+Aquesta part dona per suposat que hi ha un servidor DHCP que posarà la
+màquina en un punt on el <literal>autoserver</literal> es pot resoldre
+per DNS, pot ser desprès d'afegir el domini local si s'ha proporcionat
+per DHCP. Si es fa a un lloc on el domini és <literal>exemple.com</literal>,
+i té una configuració ben pensada, podria donar com a resultat que el
+fitxer de configuració prèvia es trobe a
+<literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+
+</para><para>
+
+L'última part de l'adreça (<literal>d-i/etch/./preseed.cfg</literal>)
+s'agafa d'<literal>auto-install/defaultroot</literal>. Per defecte açò
+inclou el directori <literal>etch</literal> per que permeti que les
+futures versions donen el seu nom codi propi i permeti que la gent migre
+d'una forma controlada. El <literal>/./</literal> s'utilitza per indicar
+un origen al qual les rutes subsegüents es referiran (per utilitzar en
+preseed/include i preseed/run). Açò es pot utilitzar per construir uns
+guions més portables de forma que una estructura completa de guions es
+pugui moure a una nova localització sense trencar-la, per exemple
+copiant els fitxers a un llapis USB quan s'inicia des d'un servidor web.
+En aquest exemple, si el fitxer de configuració prèvia dona el valor
+<literal>/scripts/late_command.sh</literal> a
+<literal>preseed/run</literal> aleshores el fitxer es descarregarà des de
+<literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>.
+
+</para><para>
+Si no hi ha cap servidor DHCP o infraestructura DNS, o si no voleu
+utilitzar la ruta per defecte a <filename>preseed.cfg</filename>, encara
+podeu utilitzar una adreça explícita, i si no utilitzeu l'element
+<literal>/./</literal> es referirà a l'inici de la ruta (es a dir, el
+tercer <literal>/</literal> a la URL). Ací hi ha un exemple que necessita
+d'un suport mínim de la infraestructura local de la xarxa:
+
+<informalexample><screen>
+auto url=<replaceable>http://192.168.1.2/ruta/al/fitxer.configuració.previa</replaceable>
+</screen></informalexample>
+
+La forma en que açò funciona és:
+<itemizedlist spacing="compact">
+<listitem><para>
+Si la URL no conté un protocol, es suposa http,
+</para></listitem>
+<listitem><para>
+si la secció hostname no té períodes, té el domini derivat del DHCP afegit, i
+</para></listitem>
+<listitem><para>
+si no hi ha cap <literal>/</literal> desprès del hostname, aleshores
+s'afegeix la ruta per defecte.
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Addicionalment a especificar la url, podeu també donar els paràmetres que
+no afecten directament el comportament del &d-i;, però que es poden
+passar a traves dels guions donats utilitzant <literal>preseed/run</literal>
+al fitxer de configuració prèvia carregat.
+
+En aquest moment, l'únic exemple d'aquest és
+<literal>auto-install/classes</literal>, que, té d'àlies
+<literal>classes</literal>. Açò es pot utilitzar així:
+
+<informalexample><screen>
+auto url=<replaceable>example.com</replaceable> classes=<replaceable>classe_A;classe_B</replaceable>
+</screen></informalexample>
+
+Les classes podrien per exemple indicar el tipus de sistema al instal·lar,
+o la localització a utilitzar.
+
+</para><para>
+
+Per suposat, es pot estendre aquest concepte, i si ho feu, és raonable
+que s'utilitze l'espai de noms auto-install per fer-ho. Així que hauríeu
+de tenir quelcom de l'estil <literal>auto-install/style</literal> que
+s'utilitza aleshores als vostres guions. Si creieu que necessiteu fer-ho,
+d eu-ho a la llista de correu <email>debian-boot@lists.debian.org</email>
+de forma que ens sigui possible evitar conflictes a l'espai de noms, i
+pot ser afegir un àlies del paràmetre per vosaltres.
+
+</para><para>
+
+L'etiqueta d'arrencada <literal>auto</literal> no està definida a totes
+les arquitectures. El mateix efecte es pot aconseguir afegint dos
+paràmetres <literal>auto=true priority=critical</literal> a la línia
+d'ordres del nucli. El paràmetre <literal>auto</literal> és un àlies
+d'<literal>auto-install/enabled</literal> i controla el retard de les
+preguntes del locale i del teclat fins que es tingui oportunitat de
+fer la configuració prèvia d'aquestes, mentre <literal>priority</literal>
+és un àlies per <literal>preseed/priority</literal> i donant-li el valor
+<literal>critical</literal> evita que es faci qualsevol pregunta amb una
+prioritat més baixa.
+
+</para><para>
+
+Les opcions addicionals que poden interessar mentre s'intenta
+automatitzar una instal·lació que faci ús de DHCP són:
+<literal>interface=auto netcfg/dhcp_timeout=60</literal> que fa que la
+màquina agafe el primer NIC i espere a aconseguir una resposta a la seva
+petició DHCP.
 
 </para>
   </sect2>
 
+  <sect2 id="preseed-aliases">
+  <title>Àlies útils per la configuració prèvia</title>
+<para>
+
+Els àlies que hi ha a continuació poden ser útils quan s'utilitza la
+configuració prèvia (mode auto).
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
+  </sect2>
+
   <sect2 id="preseed-dhcp">
   <title>Utilitzar un servidor DHCP per especificar els fitxers de
-  configuració prèvia</title>
+         configuració prèvia</title>
 <para>
 
 També és possible fer servir DHCP per especificar un fitxer de
 configuració prèvia i descarregar-lo des de la xarxa. Normalment
 s'indiquen fitxers per a arrencar la màquina per xarxa, però si
-es tracata d'una URL, aleshores els mitjans d'instal·lació que
+es tracta d'una URL, aleshores els mitjans d'instal·lació que
 suporten configuracions prèvies per xarxa es descarregaran el fitxer i
 l'utilitzaran per a la configuració. A continuació teniu un exemple
 de com s'ha de configurar el fitxer dhcpd.conf per a la versió 3 del
@@ -373,67 +565,6 @@ amb configuracions prèvies i DHCP haureu d'anar amb més cura.
 
 </para>
   </sect2>
-
-  <sect2 id="preseed-bootparms">
-  <title>Utilització dels paràmetres d'arrencada per complementar la configuració prèvia</title>
-<para>
-
-Hi ha parts del procés d'instal·lació no es poden automatitzar fent servir
-algunes formes de configuració prèvia perquè les preguntes es fan abans que
-es carregue el fitxer de configuració prèvia. Per exemple, si el fitxer es
-carrega a través d'una xarxa, la configuració d'aquesta s'ha de fer primer.
-Una raó per emprar la configuració prèvia de l'initrd és que permet
-configurar prèviament fins i tot aquests primers passos del procés
-d'instal·lació.
-
-</para><para>
-
-En cas que un fitxer de configuració prèvia no es puga fer servir per a
-alguns passos, la instal·lació encara es podrà automatitzar del tot si li
-indiqueu al nucli, mitjançant la línia d'ordres, els valors de configuració
-prèvia. Simplement indiqueu el <userinput>camí/a/var=valor</userinput> per
-a qualsevol de les variables de configuració prèvia llistades als exemples.
-
-</para><para>
-
-Adoneu-vos que algunes variables que s'estableixen amb freqüència a l'indicador
-de l'arrencada, tenen un àlies més curt. Si hi ha un de disponible, s'utilitza
-als exemples en aquest apèndix en comptes de la variable completa.
-
-</para><para>
-
-Un <quote>--</quote> a les opcions d'arranc té un significat especial.
-Els paràmetres del nucli que apareixen despres es copiaran a la
-configuració del carregador de l'arrencada instal·lat (si està suportat
-per l'instal·lador del carregador de l'arrencada). Adoneu-vos que el
-<quote>--</quote> podria estar present als paràmetres d'arrencada per
-defecte.
-
-</para>
-<note><para>
-
-El nucli 2.4 kernel accepta un màxim de 8 opcions de línia d'ordres i de 8
-opcions d'entorn (incloent-hi qualsevol opció afegida per defecte per a
-l'instal·lador). Si s'excedeixen aquestes xifres, els nuclis 2.4 kernels les
-ignoren, mentre que els 2.6 s'esquallen. A partir del 2.6.9 podeu emprar 32
-opcions de línia d'ordres i 32 opcions d'entorn.
-
-</para></note>
-<para>
-
-A la majoria d'instal·lacions, algunes de les opcions per defecte del fitxer
-de configuració del carregador, com <literal>vga=normal</literal>, es poden
-eliminar sense cap problema, la qual cosa us permet afegir més opcions de
-configuració prèvia.
-
-</para>
-<note><para>
-
-No sempre és possible especificar valors amb espais per als paràmetres
-d'arrencada, fins i tot si els delimiteu amb cometes.
-
-</para></note>
-  </sect2>
  </sect1>
 
  <sect1 id="preseed-creating">
@@ -456,20 +587,20 @@ configuració prèvia.
 
 <itemizedlist>
 <listitem><para>
-  Poseu tan sos un espai o un tab entre tipus i valor: qualsevol espai
-  adicional s'interpretarà que pertany al valor.
+  Poseu tan sols un espai o un tabulador entre tipus i valor: qualsevol espai
+  addicional s'interpretarà que pertany al valor.
 </para></listitem>
 <listitem><para>
   Una línia es pot dividir en vàries afegint una barra invertida
   (<quote><literal>\</literal></quote>) com a caràcter per continuar.
-  Un bon lloc per dividir una línia és despres del nom de la pregunta;
+  Un bon lloc per dividir una línia és desprès del nom de la pregunta;
   un lloc dolent és entre un tipus i un valor.
 </para></listitem>
 <listitem><para>
   La major part de les preguntes s'han d'omplir utilitzant els valors
-  vàlids i no amb valors traduits. Però, hi ha algunes preguntes (per
+  vàlids i no amb valors traduïts. Però, hi ha algunes preguntes (per
   exemple al <classname>partman</classname>) on s'han d'utilitzar valors
-  traduits.
+  traduïts.
 </para></listitem>
 <listitem><para>
   Algunes preguntes agafen un codi com a valor en comptes del text anglès
@@ -479,15 +610,15 @@ configuració prèvia.
 
 <para>
 
-La manera més fàcil de crear un fitxer de configurció prèvia és utilitzar el
-fitxer d'exemple enllaçat a <xref linkend="preseed-contents"/> com a base i
-continuar la feina des d'allí.
+La manera més fàcil de crear un fitxer de configuració prèvia és utilitzar
+el fitxer d'exemple enllaçat a <xref linkend="preseed-contents"/> com a
+base i continuar la feina des d'allí.
 
 </para><para>
 
-Un mètode alternatiu és fer la instal·lació manual, i despres, quan
+Un mètode alternatiu és fer la instal·lació manual, i desprès, quan
 es reinicie, utilitzar l'ordre <command>debconf-get-selections</command>
-del paquet <classname>debconf-utils</classname> per volcar les dos
+del paquet <classname>debconf-utils</classname> per bolcar les dos
 bases de dades de debconf i la base de dades cdebconf de l'instal·lador
 a un únic fitxer:
 
@@ -499,7 +630,7 @@ $ debconf-get-selections &gt;&gt; <replaceable>file</replaceable>
 </para><para>
 
 Per altra banda, un fitxer generat d'aquesta manera tindrà alguns elements
-que no pode ser configurats prèviament, i el fitxer d'example és el millor
+que no es poden configurar prèviament, i el fitxer d'exemple és el millor
 lloc per on començar per la majoria d'usuaris.
 
 </para>
@@ -509,13 +640,13 @@ lloc per on començar per la majoria d'usuaris.
 Aquest mètode utilitza el fet de que, al acabar la instal·lació, la
 base de dades cdebconf de l'instal·lador es guarda al sistema instal·lat
 a <filename>/var/log/installer/cdebconf</filename>. Però, com que la
-base de dades pot contenir informació sensible, aquests fitxers tan sols
-els pot llegir el root.
+base de dades pot contenir informació sensible, aquests fitxers tan
+sols els pot llegir el superusuari.
 
 </para><para>
 
-El directori <filename>/var/log/installer</filename> i tots els seus fitxers
-s'esborraran del vostre sistema si purgueu el paquet
+El directori <filename>/var/log/installer</filename> i tots els seus
+fitxers s'esborraran del vostre sistema si purgueu el paquet
 <classname>installation-report</classname>.
 
 </para></note>
@@ -526,7 +657,7 @@ Per comprovar els possibles valors per les preguntes, podeu utilitzar
 l'ordre <command>nano</command> per examinar els fitxers
 <filename>/var/lib/cdebconf</filename> mentre la instal·lació s'està
 realitzant. Vegeu <filename>templates.dat</filename> per les plantilles i
-<filename>questions.dat</filename> pels volors assignats a les variables.
+<filename>questions.dat</filename> pels valors assignats a les variables.
 
 </para><para>
 
@@ -632,7 +763,7 @@ quan s'està utilitzant una configuració prèvia (utilitzant
 el procediment per evitar-ho, per exemple si voleu configurar una adreça
 estàtica per la interfície de xarxa. Aquest procediment és per forçar que
 la configuració de xarxa s'execute altra vegada després de haver carregat
-el fitxer de preconfiguració creant un guió  <quote>preseed/run</quote> amb
+el fitxer de preconfiguració creant un guió <quote>preseed/run</quote> amb
 les línies següents:
 
 <informalexample><screen>
@@ -654,13 +785,13 @@ d-i netcfg/choose_interface select auto
 # us pot ser d'utilitat.
 #d-i netcfg/dhcp_timeout string 60
 
-# Si preferiu configurar la xarxa a mà, descomenteu aquesta línia i la
-# configuració de la xarxa estàtica que hi ha a continuació.
+# Si preferiu configurar la xarxa a mà, tragueu-li el comentari a aquesta
+# línia i la configuració de la xarxa estàtica que hi ha a continuació.
 #d-i netcfg/disable_dhcp boolean true
 
 # Si voleu que el fitxer de configuració prèvia funcioni en sistemes amb i
-# sense servidor dhcp, descomenteu aquestes línies i la configuració de la
-# xarxa estàtica que hi ha a continuació.
+# sense servidor dhcp, tragueu-li el comentari a aquestes línies i la
+# configuració de la xarxa estàtica que hi ha a continuació.
 #d-i netcfg/dhcp_failed note
 #d-i netcfg/dhcp_options select Configure network manually
 
@@ -690,10 +821,10 @@ d-i netcfg/wireless_wep string
   <title>Configuració del servidor rèplica</title>
 <para>
 
-Segons el mètode d'instal·lació, un servidor rèplica es pot emprar tant per
-a descarregar components addicionals de l'instal·lador i el sistema base
-com per a configurar el fitxer <filename>/etc/apt/sources.list</filename>
-del sistema.
+Segons el mètode d'instal·lació, un servidor rèplica es pot emprar per
+a descarregar components addicionals de l'instal·lador, per instal·lar
+el sistema base, i com configurar el fitxer
+<filename>/etc/apt/sources.list</filename> del sistema instal·lat.
 
 </para><para>
 
@@ -720,7 +851,7 @@ d-i mirror/http/proxy string
 
 # Conjunt de programes que s'instal·larà.
 #d-i mirror/suite string testing
-# Conjunt de programes que s'empraà per a carregar components de
+# Conjunt de programes que s'emprarà per a carregar components de
 # l'instal·lador (opcional).
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
@@ -732,13 +863,12 @@ d-i mirror/http/proxy string
 <para>
 
 La configuració prèvia del particionat de discs durs està molt limitada per
-les possibilitats oferides pel <classname>partman-auto</classname>. Podeu o
+les possibilitats ofertes pel <classname>partman-auto</classname>. Podeu o
 bé particionar l'espai lliure existent al disc o bé el disc sencer. La
 distribució del disc es pot determinar fent servir una recepta definida
 prèviament, una de personalitzada procedent d'un fitxer recepta, o una
 inclosa dins els fitxers de configuració prèvia. Actualment no es poden
-particionar discs múltiples emprant la configuració prèvia, ni tampoc
-configurar un RAID.
+particionar discs múltiples emprant la configuració prèvia.
 
 </para>
 
@@ -753,14 +883,13 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 <informalexample role="example"><screen>
 # Si el sistema disposa d'espai lliure podeu triar de particionar només
 # aquest.
-# Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).
+# Nota: Aquesta s'ha de omplir amb valors localitzats (traduïts).
 #d-i partman-auto/init_automatically_partition \
-#      select Utilitza l'espai lliure continu més gran
+#      Selecció guiada - Utilitza l'espai lliure continu més gran
 
 # També podeu especificar el disc que es particionarà. El nom del dispositiu
 # es pot indicar bé en el format devfs o bé en el format tradicional no
-# devfs. Si el mètode ho suporta, podeu especificar diversos discs
-# separats per espais.
+# devfs.
 # Per exemple, per emprar el primer disc:
 d-i partman-auto/disk string /dev/discs/disc0/disc
 # Addicionalment, haureu d'especificar el mètode a usar.
@@ -768,13 +897,14 @@ d-i partman-auto/disk string /dev/discs/disc0/disc
 d-i partman-auto/method string lvm
 
 # Si un dels discs que s'ha de particionar automàticament conté una
-# configuració antiga LVM, l'usuari rebra un avís. Això ès pot
+# configuració antiga LVM, l'usuari rebrà un avís. Això es pot
 # desactivar amb una configuració prèvia...
 d-i partman-auto/purge_lvm_from_device boolean true
+# I el mateix per la confirmació d'escriptura a particions lvm.
+d-i partman-lvm/confirm boolean true
 
 # Podeu triar qualsevol de les receptes de particionat predefinides.
-# Nota: Aquesta s'ha de omplir amb valors localitzats (traduits).
-# localitzar (traduir).
+# Nota: Aquesta s'ha d'omplir amb valors localitzats (traduïts).
 d-i partman-auto/choose_recipe \
        select Tots els fitxers en una partició (recomanat per a nous usuaris)
 #d-i partman-auto/choose_recipe \
@@ -817,6 +947,90 @@ d-i partman/confirm boolean true
 
   </sect2>
 
+  <sect2 id="preseed-partman-raid">
+  <title>Particionament amb RAID</title>
+<para>
+
+També podeu utilitzar la configuració prèvia per configurar les
+particions a una matriu RAID per programari. Els nivells de RAID
+suportats són 0, 1 i 5, creant matrius degradades i especificant els
+dispositius de reemplaç. Si esteu fent ús de RAID 1, podeu fer la
+configuració prèvia de grub per instal·lar tots els dispositius que
+s'utilitzen a la matriu; vegeu <xref linkend="preseed-bootloader"/>.
+
+</para>
+
+<warning><para>
+
+És molt fàcil equivocar-se en aquest tipus de particionament
+automatitzat. És, addicionalment, un component molt nou que encara
+pot contenir alguns errors o algun tractament d'errors oblidat. La
+responsabilitat de aconseguir les receptes correctes (de forma que
+tinguin sentit i no entren en conflicte) recau en l'usuari. Comproveu
+el fitxer <filename>/var/log/syslog</filename> si teniu algun problema.
+
+</para><para>
+
+Fixeu-vos que tan sols el RAID 0 i el RAID 1 han estat comprovats pels
+desenvolupadors del component. El RAID 5 està per comprovar. Les
+configuracions RAID amb matrius degradades amb dispositius de reemplaç
+s'ha comprovat poc.
+
+</para></warning>
+
+<informalexample><screen>
+# AVÍS: aquesta opció està en fase beta i s'hauria d'utilitzar amb cura
+
+# A «method» se li hauria de donar el valor "raid".
+#d-i partman-auto/method string raid
+# Especifica quins discs s'han de particionar. Tots acabaran amb la
+# mateixa disposició, per tant tan sols funcionarà si els discs tenen
+# la mateixa mida.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# A continuació necessiteu especificar quines particions físiques
+# s'utilitzaran.
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Per acabar necessiteu especificar com s'utilitzaran les particions
+# prèviament definides a al configuració del RAID. Recordeu d'utilitzar
+# els nombres de partició correctes per particions lògiques.
+# Els paràmetres són:
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# Els nivells de RAID 0, 1 i 5 estan suportats; els dispositius es separen
+# amb "#"
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# Açò fa que el partman particione automàticament sense demanar confirmació.
+d-i partman-md/confirm boolean true
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-time">
   <title>Configuració del rellotge i de la zona horària</title>
 
@@ -848,15 +1062,20 @@ a les primeres preguntes. Opcionalment podeu afegir altres repositoris
 # Podeu instal·lar programari no lliure (non-free) i de contribució (contrib).
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
-# Descomenteu això per evitar afegir fonts de seguretat, o indiqueu un
-# nom de màquina per utilitzar un servidor diferent a security.debian.org.
+# Tragueu-li el comentari a això per evitar afegir fonts de seguretat, o
+# indiqueu un nom de màquina per utilitzar un servidor diferent a
+# security.debian.org.
 #d-i apt-setup/security_host string
 
 # Repositoris addicionals, local[0-9] disponibles
-#d-i apt-setup/local0/comment string local server
 #d-i apt-setup/local0/repository string \
 #       deb http://servidor.local/debian stable main
-# URL de la clau pública del repositori local
+#d-i apt-setup/local0/comment string local server
+# Afegeix les línies deb-src
+#d-i apt-setup/local0/source boolean true
+# La URL de la clau pública del repositori local; heu de donar una clau o
+# l'apt es queixarà de que el repositori no autenticat i per tant es deixarà
+# la línia comentada al sources.list
 #d-i apt-setup/local0/key string http://servidor.local/clau
 </screen></informalexample>
 
@@ -883,7 +1102,7 @@ de força bruta.
 </para></warning>
 
 <informalexample role="example"><screen>
-# No crar el compte de root (l'usuari normal haurà de ser capaç 
+# No crear el compte de superusuari (l'usuari normal haurà de ser capaç
 # d'utilitzar sudo).
 #d-i passwd/root-login boolean false
 # De forma alternativa, per no crear el compte d'usuari normal.
@@ -949,8 +1168,8 @@ del nucli.
   <title>Instal·lació del carregador</title>
 
 <informalexample role="example"><screen>
-# El Grub és el carregador predeterminat (per a l'x86). Si voleu instal·lar
-# el lilo, tragueu-hi el comentari:
+# El grub és el carregador predeterminat (per a l'x86). Si voleu instal·lar
+# el lilo, tragueu-li el comentari:
 #d-i grub-installer/skip boolean true
 
 # Això, que és segur de fer, fa que el grub s'instal·le automàticament al
@@ -1030,8 +1249,8 @@ la tasca <userinput>estàndard</userinput>.
 Si voleu instal·lar alguns paquets de forma individual a més a més dels
 instal·lats per tasques, podeu utilitzar el paràmetre
 <classname>pkgsel/include</classname>. El valor d'aquest paràmetre
-pot anar separat o bé per comes o bé per espais, així que el podeu
-utilitzar de forma senzilla a la línia d'ordres del nucli.
+pot ser una llista de paquets separats o bé per per comes o bé per espais,
+que el podeu utilitzar de forma senzilla a la línia d'ordres del nucli.
 
 </para>
 
@@ -1040,7 +1259,7 @@ tasksel tasksel/first multiselect estàndard, escriptori
 #tasksel tasksel/first multiselect estàndard, servidor-web
 #tasksel tasksel/first multiselect estàndard, escriptori-kde
 
-# Paquets addicionas per instal·lar individualment
+# Paquets addicionals per instal·lar individualment
 #d-i pkgsel/include string openssh-server build-essential
 
 # Algunes versions de l'instal·lador poden enviar informes del programari
@@ -1103,7 +1322,7 @@ no ho configura tot automàticament.
 # Amb tot, el controlador vesa funcionarà la majoria de vegades.
 #xserver-xorg xserver-xorg/config/device/driver select vesa
 
-# Un problema amb l'detecció automàtica del ratolí és que si falla, l'X la
+# Un problema amb detecció automàtica del ratolí és que si falla, l'X la
 # tornarà intentar indefinidament. Per tant, si l'heu inclosa en la
 # configuració prèvia, hi ha la possibilitat de caure en un bucle infinit,
 # si falla la detecció.
@@ -1130,9 +1349,9 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 <informalexample role="example"><screen>
 # Segons el programari instal·lat, o si les coses van malament durant el
 # procés d'instal·lació, és possible rebre preguntes sobre altres qüestions.
-# També podeu fer-ne una configuració prèvia. Per obtenir una llista de totes
-# les preguntes que es poden fer durant la instal·lació, feu una instal·lació,
-# i després executeu aquestes ordres:
+# També podeu fer-ne una configuració prèvia. Per obtenir una llista de
+# totes les preguntes que es poden fer durant la instal·lació, feu una
+# instal·lació, i després executeu aquestes ordres:
 #   debconf-get-selections --installer > file
 #   debconf-get-selections >> file
 </screen></informalexample>
@@ -1143,8 +1362,14 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <sect1 id="preseed-advanced">
  <title>Opcions avançades</title>
 
-  <sect2 id="preseed-shell">
-  <title>Ordres de l'intèrpret</title>
+  <sect2 id="preseed-hooks">
+  <title>Executant ordres personalitzades a la instal·lació</title>
+<para>
+
+Una opció molt potent i flexible oferta per les eines de preconfiguració és
+la possibilitat d'executar ordres o guions en alguns punts de la instal·lació.
+
+</para>
 
 <informalexample role="example"><screen>
 # Necessàriament, la configuració prèvia de l'instal·lador del Debian no pot
@@ -1153,7 +1378,7 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # configuració prèvia com el present. Feu servir només aquests fitxers si
 # provenen de llocs de confiança! Per raons de control, i perquè és útil
 # en general, aquí teniu una manera d'executar de forma automàtica
-# qualsevol ordre de l'intèrpret que vulgueu dins l'instal·lador.
+# qualsevol ordre de l'interpret que vulgueu dins l'instal·lador.
 
 # Aquesta primera ordre s'executa tan prompte com es pot, tot just després
 # de llegir el fitxer de configuració prèvia.
@@ -1168,6 +1393,25 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 </screen></informalexample>
 
   </sect2>
+
+  <sect2 id="preseed-seenflag">
+  <title>Ús de la configuració prèvia per canviar els valors predeterminats</title>
+<para>
+
+És pot utilitzar la configuració prèvia per canviar la resposta
+predeterminada a una pregunta, però que encara es faci la pregunta. Per
+fer açò l'indicador <firstterm>seen</firstterm> s'ha de posar a
+<quote>false</quote> desprès de donar-li el valor a una pregunta.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
+</screen></informalexample>
+
+  </sect2>
+
 
   <sect2 id="preseed-chainload">
   <title>Càrrega en cadena de fitxers de configuració prèvia</title>
@@ -1194,17 +1438,31 @@ general de la xarxa a un fitxer i els ajusts més específics a altres.
 # d'incloure.
 #d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d
 
-# Més flexible que això és el següent, que executa una ordre a l'intèpret i,
+# Més flexible que això és el següent, que executa una ordre a l'intepret i,
 # si s'obté cap nom d'un fitxer de configuració prèvia, s'hi inclou.
 #d-i preseed/include_command \
 #      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # El més flexible de tots, açò descarrega un programa i l'executa.
 # El programa pot utilitzar ordres com debconf-set per manipular la base
-# de dades debconf. Adoneu-vos que els noms d'arxiu són relatius, s'agafen
+# de dades debconf. Es pot llistar més d'un guió, separat per espais.
+# Adoneu-vos que els noms de fitxers són relatius, s'agafen
 # del mateix directori que el fitxer de preconfiguració que els executa.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
+
+<para>
+
+És possible l'encadenament des de l'initrd o de la fase de configuració
+prèvia amb fitxer, a una configuració prèvia en xarxa donant el valor a
+preseed/url en els fitxers anteriors. Açò farà que la configuració prèvia
+de la xarxa es realitze quan la xarxa s'aixeque. Necessiteu anar en compte
+quan ho feu, ja que hi ha dos formes diferents de fer la configuració
+prèvia, que vol dir per exemple que tindreu l'oportunitat d'executar
+l'ordre preseed/early, la segona que es du a terme desprès d'aixecar
+la xarxa.
+
+</para>
 
   </sect2>
  </sect1>
