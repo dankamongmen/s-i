@@ -187,6 +187,9 @@ perform_resizing () {
 	    close_dialog
 	    if ! echo y | do_ntfsresize -f $path; then
 		logger -t partman "Error resizing the NTFS file system to the partition size"
+		db_input high partman-partitioning/new_size_commit_failed || true
+		db_go || true
+		exit 100
 	    fi
 	else
 	    open_dialog COMMIT
@@ -200,9 +203,15 @@ perform_resizing () {
 		close_dialog
 		if ! echo y | do_ntfsresize -f $path; then
 		    logger -t partman "Error resizing the NTFS file system to the partition size"
+		    db_input high partman-partitioning/new_size_commit_failed || true
+		    db_go || true
+		    exit 100
 		fi
 	    else
 		logger -t partman "Error resizing the NTFS file system"
+		db_input high partman-partitioning/new_size_commit_failed || true
+		db_go || true
+		exit 100
 	    fi
 	fi
     else
