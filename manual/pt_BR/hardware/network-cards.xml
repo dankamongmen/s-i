@@ -1,124 +1,54 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 43693 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.04.17 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.15 -->
+<!-- updated 39614:43693 by Felipe Augusto van de Wiel (faw) 2007.01.21 -->
 
  <sect1 id="network-cards">
  <title>Placas de rede</title>
+<para>
 
-<para arch="x86">
+Quase qualquer placa de rede (NIC) suportada pelo kernel Linux também
+deveria ser suportada pelo sistema de instalação, drivers modulares
+deveriam normalmente serem automaticamente carregados.
 
-<!-- last updated for kernel-image_2.0.36-2 -->
+<phrase arch="x86">Isto inclui a maioria das placas PCI e PCMCIA.</phrase>
+<phrase arch="i386">Muitas placas ISA antigas também são suportadas.</phrase>
 
-A maioria das placas PCI e ISA antigas são suportadas. Algumas placas de
-interface der rede não são suportados pela maioria dos discos de instalação da
-Debian, tais como placas AX.25 e protocolos;
-placas NI16510 EtherBlaster; Schneider &amp; placas Koch G16;
-e Zenith Z-Note com placa de rede embutida. Placas de rede Microchannel (MCA)
-não são suportadas pelos discos de instalação padrão, mas veja
-<ulink url="&url-linux-mca;">Linux no MCA</ulink> que contém algumas (antigas)
-instruções. As redes FDDI também não são suportadas pelos discos de
-instalação, ambas placas e protocolos.
+<phrase arch="m68k">Novamente, veja <ulink url="&url-m68k-faq;"></ulink>
+para detalhes completos.</phrase>
 
-<!-- missing-doc FIXME Você poderá criar um kernel personalizado com o suporte a uma
-uma placa não suportada e então substituir
-no sistema de instalação (veja
-<xref linkend="rescue-replace-kernel"/>). -->
-
-</para><para arch="x86">
-
-Como no ISDN, o protocolo D-channel para a (antiga) Alemã 1TR6
-não é suportada; as placas Spellcaster BRI ISDN também não é
-suportada pelo
-&d-i;.
-
-</para>
-
-<para arch="m68k">
-
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-deverá ser também suportada pelos discos de instalação.
-Você poderá precisar carregar seu controlador de rede como
-módulo. Novamente, veja
-<ulink url="&url-m68k-faq;"></ulink> para detalhes completos.
-
-</para>
-
-<para arch="sparc">
-
-As seguintes placas de rede (NICs) são suportadas para inicialização
-direta pelo kernel:
+</para><para arch="sparc">
+Isto inclui várias placas PCI genéricas (para sistemas que têm PCI) e as
+seguintes placas da Sun:
 
 <itemizedlist>
- <listitem><para>
+<listitem><para>
 
 Sun LANCE
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 Sun Happy Meal
 
 </para></listitem>
-</itemizedlist>
-
-</para><para arch="sparc">
-
-As seguintes placas de rede (NICs) são suportadas como módulos.
-Elas podem ser ativadas assim que os controladores estiverem
-instalados. No entanto, devido a mágica do OpenPROM, você ainda
-poderá ser capaz de iniciar a partir destes dispositivos:
-
-<itemizedlist>
- <listitem><para>
+<listitem><para>
 
 Sun BigMAC
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 Sun QuadEthernet
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 MyriCOM Gigabit Ethernet
 
 </para></listitem>
 </itemizedlist>
-
-</para><para arch="alpha">
-
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-deverá também ser suportada pelos discos de instalação. Você
-pode precisar ter que carregar seu controlador de rede
-como um módulo.
-
-</para><para arch="powerpc">
-
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-deverá também ser suportada pelos discos de inicialização.
-Você poderá precisar carregar seu controladora de rede como
-um módulo.
-
-</para><para arch="hppa">
-
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-deverá também ser suportada pelo discos de instalação. Você
-precisará carregar seu controlador de rede como um módulo.
-
-</para><para arch="ia64">
-
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-deverá também ser suportada pelo discos de instalação. Você
-precisará carregar seu controlador de rede como um módulo.
-
-</para><para arch="mips">
-
-Qualquer placa de  rede (NIC) suportada pelo kernel do Linux
-dever também ser suportada pelos discos de inicialização.
-Você pode precisar carregar seu controlador de rede como um
-módulo.
 
 </para><para arch="mipsel">
 
@@ -128,11 +58,7 @@ TurboChannel atualmente não são suportadas.
 
 </para><para arch="s390">
 
-Qualquer placa de rede (NIC) suportada pelo kernel do Linux
-são também suportadas pelos discos de instalação. Todos os
-controladores de rede são compilados como módulos, assim você
-precisará carregar um no momento da configuração inicial da
-rede. A lista de dispositivos de rede suportados é:
+A lista de dispositivos de rede suportados é:
 
 <itemizedlist>
  <listitem><para>
@@ -148,11 +74,6 @@ OSA-2 Token Ring/Ethernet e OSA-Express Fast Ethernet
 </para></listitem>
 <listitem><para>
 
-Inter-User Communication Vehicle (IUCV) &mdash; disponível somente para guests VM
-
-</para></listitem>
-<listitem><para>
-
 OSA-Express em modo QDIO / HiperSockets
 
 </para></listitem>
@@ -162,58 +83,128 @@ OSA-Express em modo QDIO / HiperSockets
 
 <para arch="arm">
 
-As seguintes placas de rede são suportadas diretamente pelos
-disquetes de inicialização em máquinas Netwinder e CATS:
+Em &arch-title;, a maioria dos dispositivos Ethernet <quote>built-in</quote>
+são suportadas e módulos para dispositivos PCI e USB adicionais são fornecidos.
+A maior exceção é a plataforma XP4xx (presente em dispositivos como o Linksys
+NSLU2) que precisa de um microcódigo proprietário para a operação de seu
+dispositivo Ethernet <quote>built-in</quote>. Imagens não-oficiais para o
+Linksys NSLU2 com o microcódigo proprietário podem ser obtidas a partir do
+<ulink url="&url-slug-firmware;">site Slug-Firmware</ulink>.
 
-<itemizedlist>
- <listitem><para>
+</para><para arch="x86">
 
-    PCI-based NE2000
-
-</para></listitem>
- <listitem><para>
-
-    DECchip Tulip
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-As seguintes placas de redes são suportadas diretamente pelos
-discos de instalação em RiscPCs:
-
-<itemizedlist>
- <listitem><para>
-
-    Ether1
-
-</para></listitem>
- <listitem><para>
-
-    Ether3
-
-</para></listitem>
- <listitem><para>
-
-    EtherH
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Caso sua placa foi mencionada na lista acima, a instalação completa
-será guiada via rede sem a necessidade de CD-ROMs ou disquetes.
-
-</para><para arch="arm">
-
-Qualquer outra placa de rede (NIC) suportada pelo kernel do Linux
-também deverá ser suportada pelos discos de instalação. Pode
-ser necessário que você carregue o controlador de rede como módulo;
-isto significa que terá que instalar o kernel do sistema operacional
-e módulos usando alguma outra mídia.
+Para ISDN, o protocolo D-channel para (o antigo) German 1TR6 não é
+suportado; placas Spellcaster BRI ISDN também não são suportadas pelo
+&d-i;. Usar ISDN durante a instalação não é suportado.
 
 </para>
 
+  <sect2 arch="not-s390" id="nics-firmware">
+  <title>Drivers que requerem Firmware</title>
+<para>
+
+O sistema de instalação atualmente não suporta a obtenção de firmware.
+Isto significa que quaisquer placas de rede que usem um driver que requer
+que o firmware seja carregado, não são suportados por padrão.
+
+</para><para>
+
+Se não há outras placas de rede que você possa usar durante a instalação,
+ainda é possível instalar o &debian; usando uma imagem de CD-ROM ou DVD
+completa. Selecione a opção de não configurar a rede e instalar usando
+apenas os pacotes disponíveis a partir do CD/DVD. Você pode então instalar
+o driver e firmware que você precisa após a instalação estar completa (após
+a reinicialização) e configurar sua rede manualmente. Note que o firmware
+pode esta empacotado separadamente do driver e pode não estar disponível
+na seção <quote>main</quote> do repositório &debian;.
+
+</para><para>
+
+Se o driver <emphasis>é</emphasis> suportado, você pode também habilitar o
+uso da placa de rede durante a instalação copiando o firmware de alguma
+mídia para <filename>/usr/lib/hotplug/firmware</filename>. Não esqueça de
+também copiar o firmware para este local no sistema instalado antes de
+reinicializar ao final da instalação.
+
+</para>
+  </sect2>
+
+  <sect2 condition="supports-wireless" id="nics-wireless">
+  <title>Placas de Rede Sem Fio (Wireless</title>
+<para>
+
+Placas de rede sem fio são em geral bem suportadas, com uma grande condição.
+Vários adaptadores de rede sem fio requerem drivers que não são livres ou que
+não foram aceitos no kernel Linux oficial. Estas placas de rede podem,
+geralmente, ser configuradas para funcionar no &debian; mas não são
+suportadas durante a instalação.
+
+</para><para>
+
+Se não há outras placas de rede que você possa usar durante a instalação,
+ainda é possível instalar o &debian; usando uma imagem de CD-ROM ou DVD
+completa. Use o mesmo procedimento descrito acima para placas de rede que
+requerem firmware.
+
+</para><para>
+
+Em alguns casos o driver que você precisa pode não estar disponível como um
+pacote Debian. Você então terá que olhar se há código fonte disponível na
+internet e compilar o driver você mesmo. Como fazer isto está fora do escopo
+deste manual.
+
+<phrase arch="x86">Se nenhum driver Linux está disponível, seu último recurso
+é usar o pacote <classname>ndiswrapper</classname>, que permite que você use
+um driver Windows.</phrase>
+
+</para>
+  </sect2>
+
+  <sect2 arch="sparc" id="nics-sparc-trouble">
+  <title>Problemas Conhecidos para &arch-title;</title>
+<para>
+
+Existem alguns problemas conhecidos para algumas placas de rede específicas
+que merecem ser mencionados aqui.
+
+</para>
+
+   <sect3><title>Conflito entre os drivers tulip e dfme</title>
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+<para>
+
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+Há várias placas de rede PCI que possuem a mesma identificação PCI, mas são
+suportadas por drivers relacionados, mas diferentes. Algumas placas funcionam
+com o driver <literal>tulip</literal>, outras com o <literal>dfme</literal>.
+Por elas terem a mesma identificação, o kernel não consegue fazer distinção
+entre elas e não é certeza qual driver será carregado. Se acontecer do driver
+errado ser carregado, a placa de rede pode não funcionar, ou funcional mal.
+
+</para><para>
+
+Este é um problema comum em sistema Netra com uma Davicom (DEC-Tulip
+compatível). Neste caso o driver <literal>tulip</literal> é provavelmente
+o correto.
+
+Durante a instalação a solução é trocar para um interpretador de comandos
+e descarregar o módulo do driver errado usando
+<userinput>modprobe -r <replaceable>módulo</replaceable></userinput> (ou
+ambos, se ambos foram carregados). Depois disso você pode carregar o
+módulo correto usando
+<userinput>modprobe <replaceable>módulo</replaceable></userinput>.
+
+</para>
+   </sect3>
+
+   <sect3><title>Sun B100 blade</title>
+<!-- BTS: #384549; should be checked for kernels >2.6.18 -->
+<para>
+
+O driver de rede <literal>cassini</literal> não funciona com sistemas
+Sun B100 blade.
+
+</para>
+   </sect3>
+  </sect2>
  </sect1>

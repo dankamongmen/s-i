@@ -1,8 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43254 -->
+<!-- original version: 43943 -->
 <!-- updated from 28997 to 35813 by André Luís Lopes (andrelop) 2006.04.20 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.09.14 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.25 -->
+<!-- updated 43254:43943 by Felipe Augusto van de Wiel (faw) 2007.01.21 -->
 
  <sect1 id="hardware-supported">
  <title>Hardwares Suportados</title>
@@ -28,7 +29,7 @@ poderão ser encontradas.
   <sect2><title>Arquiteturas Suportadas</title>
 <para>
 
-A Debian &release; suporta as 11 maiores variações de arquiteturas
+O Debian &release; suporta as 11 maiores variações de arquiteturas
 e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>.
 
 </para><para>
@@ -153,8 +154,8 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
 </row>
 
 <row>
-  <entry morerows="3">IBM/Motorola PowerPC</entry>
-  <entry morerows="3">powerpc</entry>
+  <entry morerows="2">IBM/Motorola PowerPC</entry>
+  <entry morerows="2">powerpc</entry>
   <entry>CHRP</entry>
   <entry>chrp</entry>
 </row><row>
@@ -163,18 +164,18 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
 </row><row>
   <entry>PReP</entry>
   <entry>prep</entry>
-</row><row>
-  <entry>APUS</entry>
-  <entry>apus</entry>
 </row>
 
 <row>
-  <entry morerows="1">Sun SPARC</entry>
-  <entry morerows="1">sparc</entry>
-  <entry morerows="1"></entry>
-  <entry>sun4cdm</entry>
+  <entry morerows="2">Sun SPARC</entry>
+  <entry morerows="2">sparc</entry>
+  <entry>sun4m</entry>
+  <entry>sparc32</entry>
 </row><row>
   <entry>sun4u</entry>
+  <entry morerows="1">sparc64</entry>
+</row><row>
+  <entry>sun4v</entry>
 </row>
 
 <row>
@@ -227,7 +228,7 @@ debian-&arch-listname;</ulink> também.
 &supported-s390.xml;
 &supported-sparc.xml;
 
-  <sect2 id="gfx" arch="not-s390"><title>Placas de vídeo</title>
+  <sect2 id="gfx" arch="not-s390"><title>Suporte a placas de vídeo</title>
 <para arch="x86">
 
 Você deverá estar usando uma interface compatível com VGA para o
@@ -244,14 +245,14 @@ pelo suporte encontrado no sistema X11 Xorg. A maioria das
 placas de vídeo AGP, PCI e PCIe funcionam sob o XFree86. Os
 detalhes de que barramentos de vídeo suportados, monitores, placas e
 dispositivos de apontamento podem ser encontrados em
-<ulink url="&url-xorg;"></ulink>.  A Debian &release; vem
+<ulink url="&url-xorg;"></ulink>.  O Debian &release; vem
 com o Xorg versão &x11ver;.
 
 </para><para arch="mips">
 
 <!-- FIXME: mencionar explicitamente os chips gráficos e não os
 nomes dos sistemas -->
-O sistema de janelas X11 Xorg é o único suportado na Indy SGI. A
+O X.Org X Window System é o único suportado na Indy SGI. A
 placa de avaliação Broadcom BCM91250A tem slots que seguem o padrão PCI
 de 3.3v e suportam a emulação VGA ou framebuffer do Linux em uma diversidade
 de placas de vídeo.
@@ -260,12 +261,37 @@ relacionada com a BCM91250A.
 
 </para><para arch="mipsel">
 
-O sistema de janelas X11 Xorg é suportado em alguns modelos de DECstation.
+O X.Org X Window System é suportado em alguns modelos de DECstation.
 As placas de avaliação Broadcom BCM91250A e BCM91480B tem slots que seguem
 o padrão PCI de 3.3v e suporta a emulação VGA ou framebuffer em uma
 diversidade de placas de vídeo. Veja a <ulink
 url="&url-bcm91250a-hardware;">lista de compatibilidade</ulink>
 relacionada com placas de avaliação Broadcom.
+
+</para><para arch="sparc">
+
+A maioria das opções de gráficos comumente encontradas em máquinas baseadas
+em Sparc são suportadas. Drivers gráficos X.org estão disponíveis para os
+<quote>framebuffers</quote> sunbw2, suncg14, suncg3, suncg6, sunleo e suntcx.
+As placas Creator3D e Elite3D (driver sunffb), placas de vídeo baseadas em
+ATI PGX24/PGX64, e placas baseadas em PermediaII (glint driver). Para usar
+uma Elite3D com X.org você adicionalmente precisa instalar o pacote
+<classname>afbinit</classname>, e ler a documentação incluída com ele sobre
+como ativar a placa.
+
+</para><para arch="sparc">
+
+Não é incomum para uma máquina Sparc ter duas placas gráficas em sua
+configuração padrão. Neste caso há a possibilidade do kernel Linux não
+direcionar sua saída para a placa inicialmente usada pelo firmware. A
+falta de saída no console gráfico pode então ser um erroneamente entendido
+como um congelamento (usualmente a última mensagem vista no terminal é
+'Booting Linux...'). Uma possível solução é fisicamente remover uma das
+placas de vídeo; outra opção é desabilitar uma das placas usando um parâmetro
+de inicialização do kernel. Além disso, se saída gráfica não é requerida ou
+desejada, o console serial pode ser usado como alternativa. Em alguns sistemas
+o uso do console serial pode ser ativado automaticamente desconectando o
+teclado antes de inicializar o sistema.
 
 </para>
   </sect2>
@@ -281,13 +307,12 @@ notebook funciona bem com o GNU/Linux, veja
 </para>
    </sect2>
 
-
   <sect2 condition="defaults-smp">
   <title>Múltiplos Processadores</title>
 <para>
 
-O suporte a Multi Processamento &mdash; também chamado de
-<quote>symmetric multi-processing</quote> ou SMP &mdash; está disponível para
+O suporte a Multiprocessamento &mdash; também chamado de
+<quote>symmetric multiprocessing</quote> ou SMP &mdash; está disponível para
 esta arquitetura. O kernel padrão do Debian &release; foi compilado com suporte
 a SMP. Isto não deve impedir a instalação, pois os kernels SMP devem
 inicializar em sistemas não-SMP; o kernel simplesmente causará um pouco mais de
@@ -311,7 +336,7 @@ desmarcar <quote>&smp-config-option;</quote> na seção
 <para>
 
 O suporte a múltiplos processadores &mdash; também chamado <quote>symmetric
-multi-processing</quote> ou SMP &mdash; está disponível para esta arquitetura.
+multiprocessing</quote> ou SMP &mdash; está disponível para esta arquitetura.
 O kernel padrão Debian &release; foi compilado com suporte para
 <firstterm>SMP-alternatives</firstterm>. Isso significa que o kernel
 irá detectar o número de processadores (ou núcleos de processadores) e irá
@@ -330,7 +355,7 @@ não são compilados com suporte para SMP.
 <para>
 
 O suporte a múltiplos processadores &mdash; também chamado <quote>symmetric
-multi-processing</quote> ou SMP &mdash; está disponível para esta arquitetura.
+multiprocessing</quote> ou SMP &mdash; está disponível para esta arquitetura.
 No entanto, o kernel padrão do Debian &release; não suporta SMP.
 Isto não deve impedir a instalação, pois o kernel padrão não-SMP
 deve inicializar me sistemas SMP; o kernel simplesmente utilizará a
@@ -351,9 +376,10 @@ SMP é selecionar <quote>&smp-config-option;</quote> na seção
   <sect2 condition="supports-smp-sometimes">
   <title>Múltiplos Processadores</title>
 <para>
-O suporte a multi-processamento &mdash; também chamado de <quote>symmetric
-multi-processing</quote> ou SMP &mdash; está disponível para esta arquitetura e
-é suportado por uma imagem de kernel precompilada para o Debian. Dependendo
+
+O suporte a multiprocessamento &mdash; também chamado de <quote>symmetric
+multiprocessing</quote> ou SMP &mdash; está disponível para esta arquitetura e
+é suportado por uma imagem de kernel pré-compilada para o Debian. Dependendo
 de sua mídia de instalação, esta kernel com capacidades para SMP pode ou não
 ser instalado por padrão. Isto não atrapalhará a instalação, pois o kernel
 padrão sem suporte a SMP deverá inicializar em sistemas SMP também;
@@ -364,6 +390,8 @@ o kernel usará a primeira CPU.
 Para tirar vantagem do uso de múltiplos processadores, você deverá verificar
 e ver se um pacote do kernel que suporta SMP foi instalado, se não foi,
 selecione um pacote de kernel apropriado.
+
+</para><para>
 
 Você também pode construir seu próprio kernel personalizado para suportar SMP.
 Você pode encontrar uma discussão de como fazer isto em

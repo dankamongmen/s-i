@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42982 -->
+<!-- original version: 44002 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.19 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.01 -->
+<!-- updated 42982:44002 by Felipe Augusto van de Wiel (faw) 2007.01.21 -->
 
  <sect1 id="boot-parms"><title>Parâmetros de Inicialização</title>
 <para>
@@ -89,16 +90,23 @@ o kernel irá entrar em pânico (panic).
 </footnote>
 que podem ser úteis.
 
+</para><para>
+
+Um número de parâmetros tem um <quote>formato abreviado</quote> que ajuda a
+evitar as limitações das opções de linha de comando do kernel e torna
+mais fácil informar os parâmetros. Se um parâmetro tem um formato abreviado,
+ele será listado entre parênteses atrás da forma longa (normal). Exemplos
+neste manual normalmente usarão o formato abreviado.
+
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 Este parâmetro definirá qual o a prioridade mais baixa de mensagens que
 serão mostradas.
-Forma abreviada: <userinput>priority</userinput>
 
 </para><para>
 
@@ -145,7 +153,7 @@ usada para o programa de instalação. Os parâmetros possíveis são:
 
 A interface padrão é <userinput>DEBIAN_FRONTEND=newt</userinput>.
 <userinput>debconf/frontend=text</userinput> pode ser preferível para
-a instalação através de console serial. Geralmente somente a interface
+a instalação através de console serial. Geralmente, somente a interface
 com o usuário <userinput>newt</userinput> está disponível na mídia padrão
 de instalação. Em arquiteturas que suportam, o instalador gráfico usa a
 interface <userinput>gtk</userinput>.
@@ -212,13 +220,12 @@ por este parâmetro para procurar somente em um único dispositivo.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Algumas arquiteturas utilizam o framebuffer do kernel para fornecer a
 instalação em um grande número de idiomas. Caso o framebuffer cause um
 problema em seu sistema, você pode desabilitar este recurso com o parâmetro
-<userinput>debian-installer/framebuffer</userinput> ou, de forma abreviada,
 <userinput>fb=false</userinput>. Sintomas do problema são mensagens de erro
 sobre o bterm ou bogl, uma tela preta ou congelamento (<quote>freeze</quote>)
 alguns minutos após iniciar a instalação.
@@ -250,18 +257,16 @@ de forma abreviada, <userinput>fb=true</userinput>.
 
 </varlistentry>
 
-<varlistentry>
-<term>debian-installer/theme</term>
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
 <listitem><para>
 
 Um tema determina a aparência do instalador na interface do usuário (cores,
 ícones, etc.). Quais temas estão disponíveis difere por interface.  Atualmente
 tanto a interface newt quanto a gtk têm apenas o tema <quote>dark</quote>, que
-foi desenhado para usuários com deficiência visual. Configure o tema passando
-o parâmetro
-<userinput>debian-installer/theme=<replaceable>dark</replaceable></userinput>
-ou <userinput>theme=<replaceable>dark</replaceable></userinput> na
-inicialização.
+foi desenhado para usuários com deficiência visual. Configure o tema
+inicializando com
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -308,36 +313,34 @@ notebooks apresentam este mal comportamento.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Especifique uma url para o arquivo de configuração que será baixado e usado
 para fazer a instalação automática. Veja <xref linkend="automatic-install"/>.
-Forma abreviada: <userinput>url</userinput>.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Especifique o caminho o arquivo de configuração que será
 carregado para realizar a configuração automática. Veja
 <xref linkend="automatic-install"/>.
-Forma abreviada: <userinput>file</userinput>
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enabled</term>
+<term>auto-install/enabled (auto)</term>
 <listitem><para>
 
 Atrasar perguntas que normalmente são feitas antes da pré-configuração é
-possível até depois da rede ser configurada. Forma abreviada:
-<userinput>auto=true</userinput>. Veja <xref linkend="preseed-auto"/> para
-detalhes sobre como usar isso para automatizar instalações.
+possível até depois da rede ser configurada.
+Veja <xref linkend="preseed-auto"/> para detalhes sobre como usar isso
+para automatizar instalações.
 
 </para></listitem>
 </varlistentry>
@@ -352,7 +355,7 @@ não esteja inicializando diretamente através da unidade de
 CD. Em alguns casos, podem até mesmo ser desnecessário, por exemplo
 se a unidade ótica não puder sozinha carregar uma nova mídia e o
 usuário não está lá para fazer isto manualmente. Muitos slots de
-mídias, slim-line e unidades estili caddy não podem inserir
+mídias, slim-line e unidades estilo caddy não podem inserir
 automaticamente mídia.
 </para><para>
 
@@ -363,13 +366,14 @@ automaticamente através da unidade óptica após a instalação inicial.
 </para></listitem>
 </varlistentry>
 
-
-<varlistentry>
+<varlistentry arch="alpha;m68k;mips;mipsel">
 <term>ramdisk_size</term>
 <listitem><para>
 
-Se estiver usando um kernel da série 2.2.x, você pode precisa ajustar
-&ramdisksize;.
+Este parâmetro deveria já estar definido para um valor correto onde for
+necessário; defina-o apenas se você estiver vendo erros durante a
+inicialização que indicam que o ramdisk não pode ser completamente
+carregado. O valor é em kB.
 
 </para></listitem>
 </varlistentry>
@@ -423,14 +427,27 @@ específicos estão listados abaixo.
 <variablelist>
 
 <varlistentry>
-<term>debian-installer/locale</term>
+<term>debian-installer/locale (locale)</term>
 <listitem><para>
 
 Pode ser usado para definir tanto a língua como o país para a instalação.
 Isto só funcionará se o locale for suportado no Debian.
-Forma abreviada: <userinput>locale</userinput>.
 Por exemplo, use <userinput>locale=de_CH</userinput> para selecionar alemão
 como língua e Suíça como país.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>anna/choose_modules (modules)</term>
+<listitem><para>
+
+Pode ser usado para automaticamente carregar componentes do instalador que
+não são carregados por padrão.
+Exemplos de componentes opcionais que podem ser úteis são
+<classname>openssh-client-udeb</classname> (para que você possa usar
+<command>scp</command> durante a instalação) e
+<classname>ppp-udeb</classname> (que suporta configuração PPPoE).
 
 </para></listitem>
 </varlistentry>
@@ -446,13 +463,26 @@ forçar uma configuração de rede estática.
 </varlistentry>
 
 <varlistentry>
-<term>tasksel:tasksel/first</term>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+Por padrão o instalador usará o protocolo http para baixar os arquivos dos
+espelhos Debian e trocar isto para ftp durante as instalações em prioridade
+normal não é possível. Definindo este parâmetro para
+<userinput>ftp</userinput>, você pode forçar o instalador a usar este
+protocolo. Note que você não pode selecionar um espelho ftp a partir de uma
+lista, você terá que informar o nome da máquina manualmente.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 
 Pode ser usado para selecionar tarefas que não estarão disponíveis a partir
 da lista interativa de tarefas, como a tarefas <literal>kde-desktop</literal>.
 Veja <xref linkend="pkgsel"/> para informações adicionais.
-Forma abreviada: <userinput>tasks</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -461,7 +491,8 @@ Forma abreviada: <userinput>tasks</userinput>.
 
    </sect3>
 
-   <sect3 id="module-parms"><title>Passando parâmetros para os modulos do kernel</title>
+   <sect3 id="module-parms">
+   <title>Passando parâmetros para os módulos do kernel</title>
 <para>
 
 Se os drivers são compilados fazendo parte do kernel, você pode passar
@@ -499,6 +530,35 @@ passar:
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
 </screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Barrando (blacklisting) módulos do kernel</title>
+<para>
+
+Algumas vezes pode ser necessário barrar um módulo para prevenir que ele
+seja automaticamente carregado pelo kernel e udev. Uma razão pode ser que
+um módulo em particular cause problemas com seu hardware. O kernel algumas
+vezes também lista dois drivers diferentes para o mesmo dispositivo. Isto
+pode fazer com que o dispositivo não funcione corretamente se os drivers
+conflitarem ou se o driver errado for carregado primeiro.
+
+</para><para>
+
+Você pode barrar um módulo usando a seguinte sintaxe:
+<userinput><replaceable>nome_do_módulo</replaceable>.blacklist=yes</userinput>.
+Isto fará com que o módulo seja barrado em
+<filename>/etc/modprobe.d/blacklist.local</filename> tanto durante a
+instalação quanto para o sistema instalado.
+
+</para><para>
+
+Note que um módulo pode ainda ser carregado pelo sistema de instalação.
+Você pode evitar que isto aconteça executando a instalação no modo
+expert e desmarcando o módulo da lista de módulos exibida durante as
+fases de detecção de hardware.
 
 </para>
    </sect3>
