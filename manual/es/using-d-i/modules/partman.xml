@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39529 -->
+<!-- original version: 44026 -->
 <!-- Revisado por Steve Langasek -->
 <!-- Revisado por Rudy Godoy, 22 feb. 2005 -->
 
@@ -10,38 +10,106 @@
 Es hora de particionar sus discos. Si no se siente a gusto particionando, o
 simplemente quiere conocer más detalles, lea el <xref linkend="partitioning"/>.
 
-</para><para>
-
-Primero se le dará la oportunidad de particionar automáticamente todo el
-disco. A esto también se le llama particionado <quote>guiado</quote>. Si no
-quiere autoparticionar, elija <guimenuitem>Editar manualmente la tabla de
-particiones</guimenuitem> en el menú.
-
-</para><para>
-
-Si elije el particionado guiado, puede tener dos opciones: crear las
-particiones directamente en el disco duro (el método clásico) o utilizar el
-Gestor de Volúmenes Lógicos («Logical Volumen Manager», LVM).
-El instalador creará la mayoría de las particiones dentro de una partición
-si escoge la segunda opción, la ventaja de este método es que las 
-particiones dentro de una partición más grande pueden cambiarse de tamaño
-más adelante relativamente fácil. Nota: la opción de la utilización
-de LVM no está disponible para todas las arquitecturas.
-
 </para>
-<warning><para>
+<warning arch="sparc"><para>
+<!-- BTS: #384653 -->
 
-No podrá deshacer los cambios que haga a la tabla de particiones si elige
-el particionado guiado con LVM. Esta opción borra de forma permanente
-todos los datos que existan en el disco que haya seleccionado.
+El instalador puede no ser capaz de detectar el tamaño de la unidad
+correctamente si el disco ya se ha utilizado previamente con
+Solaris. No se arregla este problema creando una nueva tabla de
+particiones. Lo que sí ayuda es poner a <quote>cero</quote> los
+primeros sectores de la unidad:
+
+<informalexample><screen>
+# dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
+</screen></informalexample>
+
+Tenga en cuenta que hacer esto hará que los datos que existan en el
+disco no vuelvan a ser accesibles.
 
 </para></warning>
 <para>
 
+Primero se le dará la oportunidad de particionar automáticamente todo
+el disco o el espacio libre disponible en el disco. A esto también se
+le llama particionado <quote>guiado</quote>. Si no quiere
+autoparticionar, elija <guimenuitem>Manual</guimenuitem> en el menú.
+
+</para><para>
+
+Si elije el particionado guiado, puede tener tres opciones: crear las
+particiones directamente en el disco duro (el método clásico), utilizar el
+Gestor de Volúmenes Lógicos («Logical Volumen Manager», LVM), o
+crearlas utilizando un LVM cifrado<footnote>
+
+<para>
+El instalador cifrará el grupo de volúmenes LVM con una clave AES de
+256 bit y hace uso del soporte de <quote>dm-crypt</quote> en el núcleo.
+</para>
+
+</footnote>.
+
+</para>
+<note><para>
+
+La opción de usar LVM (cifrado) puede no estar disponible en todas las
+arquitecturas.
+
+</para></note>
+<para>
+Cuando utilice LVM o LVM cifrado el instalador creará la mayoría de
+las particiones dentro de una partición si escoge la segunda opción,
+la ventaja de este método es que las particiones dentro de una
+partición más grande pueden cambiarse de tamaño más adelante
+relativamente fácil. 
+En el caso de LVM cifrado la partición más grande no será legible sin 
+el conocimiento de una contraseña especial, lo que da un seguridad
+adicional en su datos (personales).
+ 
+</para><para>
+
+El instalador borra automáticamente el disco escribiendo datos
+aleatorios en él antes de utilizar LVM cifrado. Esto mejora la
+seguridad (ya que hace imposible determinar qué partes del disco se
+están utilizando y también se asegura de que cualquier traza de
+instalación previa se borra). Sin embargo, esto puede llevar un tiempo
+dependiendo del tamaño de su disco.
+
+</para>
+<warning><para>
+
+Algunos de los cambios en la tabla de particiones tengan que escribir
+en el disco seleccionado antes de configurar LVM si elige el
+particionado guiado con LVM o LVM cifrado. Estos cambios borran de forma permanente
+todos los datos que existan en el disco que haya seleccionado y no
+podrán deshacerse más adelante. El instalador, sin embargo, le
+pedirá que confirme estos cambios antes de escribirlos en disco.
+
+</para></note>
+<para>
+
 
 Una vez haya elegido el particionado guiado, tanto en el caso del 
-método clásico como en el caso de LVM, podrá elegir entre los distintos esquemas
-que se muestran en la tabla siguiente. Todos los esquemas tienen sus pros y sus
+método clásico como en el caso de LVM, se le pedirá primero que
+seleccione el disco que quiere utilizar. Compruebe que sus discos
+están en la lista y, si tiene más de un disco, asegúrese de escoger el
+disco correcto. Tenga en cuenta que el orden en el que están listados
+los discos puede ser distinto del que está acostumbrado. El tamaño de
+los discos puede ayudarle a identificarlos.
+
+</para><para>
+
+Se borrará cualquier dato en el disco que haya seleccionado, pero
+siempre se le pedirá que confirme los cambios antes de escribirlos en
+el disco. Si ha seleccionado el método clásico de particionado podrá
+deshacer los cambios hasta el final. Esto no es posible cuando utiliza
+LVM (cifrado).
+
+</para><para>
+
+A continuación podrá escoger de algunos de los esquemas listados en la
+tabla mostrada a continuación.
+Todos los esquemas tienen sus pros y sus
 contras, algunos de éstos se discuten en <xref linkend="partitioning"/>. Si
 no está seguro, escoja el primero. Tenga en mente, que el particionado guiado
 necesita un cierto espacio libre mínimo para operar. Si no le asigna al menos
@@ -85,12 +153,12 @@ fallará.
 
 <para>
 El instalador creará una partición separada para <filename>/boot</filename> si escoge 
-el guiado particionado. Todas las demás particiones, salvo por la 
+el guiado particionado con LVM (cifrado). Todas las demás particiones, salvo por la 
 partición de intercambio, se crearán dentro de la partición LVM.
 
 </para><para arch="ia64">
 
-Si escoge el particionado automático para su sistema IA64, habrá una
+Si escoge el particionado automático para su sistema IA-64, habrá una
 partición adicional, con un sistema de ficheros FAT16 arrancable, para el
 gestor de arranque EFI. Además hay una opción adicional en el menú que le
 permite dar formato a los discos para establecer manualmente una partición
@@ -165,16 +233,22 @@ bajo el disco seleccionado.
 
 </para><para>
 
-Si elije el espacio libre, se le ofrecerá crear nuevas particiones. Tendrá
-que responder rápidamente un conjunto de preguntas sobre su tamaño,
+Si elije el espacio libre, tendrá la oportunidad crear nuevas particiones. Tendrá
+que responder un conjunto de preguntas rápidas sobre su tamaño,
 tipo (primaria o lógica) y ubicación (al inicio o final del espacio libre).
 Después de esto, se le presentará una perspectiva detallada sobre su
-nueva partición. Existen opciones como punto de montaje, opciones de
-montaje, bandera arrancable o tipo de uso. Si no le gustan las opciones
+nueva partición. El valor principal es <guimenuitem>Utilizar
+como:</guimenuitem>, que determina si la partición tendrá un sistema
+de ficheros o se utilizará como intercambio, RAID por software, LVM, un
+sistema de ficheros cifrado, o no se utilizará. Otras opciones
+incluyen el punto de montaje, opciones de
+montaje, bandera arrancable o tipo de uso. Las opciones que se
+muestren dependen de cómo se va a utilizar la partición.
+Si no le gustan las opciones
 predeterminadas, no dude en cambiarlas a su gusto. Por ejemplo,
 si selecciona
 la opción <guimenuitem>Usar como:</guimenuitem>, puede elegir un sistema
-de ficheros distinto para esta partición, incluyendo la posibilidad de
+de ficheros distinto para esta partición, incluyendo opciones para
 usar la partición como intercambio, RAID por software, LVM, o simplemente
 no usarla. Otra característica interesante es la posibilidad de copiar
 datos desde una partición existente a ésta.
@@ -186,8 +260,8 @@ pantalla principal de <command>partman</command>.
 
 Si decide que desea cambiar algo en su partición, simplemente elija
 la partición, lo cual le conducirá al menú de configuración de la
-partición. Debido a que es la misma pantalla que cuando crea la
-partición, puede cambiar el mismo conjunto de opciones. Algo
+partición. Esta es la misma pantalla que cuando crea la
+partición, así que puede cambiar el mismo conjunto de opciones. Algo
 que podría no ser muy obvio a primera impresión, es que puede
 redimensionar el tamaño de la partición seleccionando el elemento
 que muestra el tamaño de ésta. Los sistemas de ficheros que
