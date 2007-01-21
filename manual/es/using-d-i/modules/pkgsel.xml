@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43612 -->
+<!-- original version: 43734 -->
 <!-- traducido jfs, 21 abril 2006 -->
 
    <sect3 id="pkgsel">
@@ -15,6 +15,8 @@ programas de paquetes individuales de entre los &num-of-distrib-pkgs; paquetes
 disponibles. 
 
 </para><para>
+
+<!-- TODO: Should explain popcon first -->
 
 Así pues, podrá elegir en primer lugar <emphasis>tareas</emphasis>
 y podrá añadir programas individuales más adelante. Estas tareas
@@ -50,6 +52,9 @@ ninguna tarea en este punto.
 
 </para>
 <note><para>
+
+<!-- TODO: Explain the "Standard system" task first -->
+
 La tarea <quote>Entorno de escritorio</quote> instalará un entorno de escritorio
 de GNOME. Las opciones que ofrece el instalador no permiten actualmente seleccionar
 otro entorno de escritorio distinto, como por ejemplo KDE.
@@ -90,109 +95,33 @@ espaciador para marcar o desmarcar una tarea.
 </para></note>
 <para>
 
+Debería tener en cuenta que la tarea de Escritorio es muy grande.  El
+instalador puede intentar descargar muchos paquetes de la red
+especialmente si instala de un CD-ROM normal combinándolo con un
+servidor espejo para aquellos paquetes que no están en el CD-ROM. Si
+tiene una conexión a Internet relativamente lenta esto puede tomar un
+tiempo. No hay ninguna opción para cancelar la instalación de paquetes
+una vez haya comenzado.
+ 
+</para><para>
+
+El instalador puede que descargue paquetes de un servidor espejo aún
+cuando los paquetes estén en el CD-ROM si hay una versión disponible
+en la réplica que es más reciente que la que se incluye en el
+CD-ROM. Si está instalando la distribución estable esto puede suceder
+tras la publicación de una nueva revisión de la distribución (una
+actualización de la versión original estable); si está instalando la
+distribución en pruebas esto puede suceder si está utilizando una
+imagen antigua en el CD-ROM.
+
+</para><para>
+
+
 Se descargará, desempaquetará e instalará cada paquete que haya seleccionado
 con <command>tasksel</command> utilizando los programas
 <command>apt-get</command> y <command>dpkg</command>. Pueden realizarse
 preguntas durante este proceso si alguno de los programas necesita información
 del usuario.
-
-</para>
-   </sect3>
-
- <sect3 id="config-mta">
- <title>Configurar su agente de transporte de correo</title>
-
-<para>
-
-Hoy en día el correo electrónico es una parte muy importante de la vida de
-muchas personas así que no es de extrañar que Debian le permita configurar un
-sistema de correo de la forma más apropiada dentro del proceso de instalación.
-El agente de transporte de correo estándar utilizado en Debian es 
-<command>exim4</command>. Se trata de un programa pequeño, flexible
-y fácil de aprender.
-
-</para><para>
-
-Podrá preguntarse si es ésto necesario aún cuando su equipo no
-esté conectado a ninguna red. La respuesta es que sí es necesario.
-La respuesta más larga es que algunas herramientas del sistema 
-(como <command>cron</command>,
-<command>quota</command>, <command>aide</command>, &hellip;) pueden
-tener que enviarle información importante a través de correo electrónico.
-
-</para><para>
-
-Así, en la primera pantalla se le presentarán distintos escenarios habituales.
-Elija aquél que se parezca más a sus necesidades:
-
-</para>
-
-<!-- jfs: En exim4 se pone 'Internet site' cambiar aquí o en po-debconf? -->
-<variablelist>
-<varlistentry>
-<term>equipo en Internet</term>
-<listitem><para>
-
-Su equipo está conectado a una red y envía y recibe correo directamente
-a través de SMTP. En las pantalas mostradas posteriormente se le harán algunas
-preguntas básicas incluyendo el nombre de correo de su equipo, o la lista de
-dominios para los que acepta o reenvía correo.
-
-</para></listitem>
-</varlistentry>
-
-<!-- jfs: En exim4 se pone 'smarthost' cambiar aquí o en po-debconf? -->
-<varlistentry>
-<term>se envía el correo a través de una pasarela</term>
-<listitem><para>
-
-En este escenario su correo saliente se reenvía a través de otro
-equipo llamado <quote>pasarela</quote> (<quote>smarthost</quote>, N. del T.)
-que es el que se encarga de gestionar su correo. Las pasarelas generalmente
-también almacenarán el correo entrante dirigido a su equipo de forma que no es
-necesario que esté permanentemente conectado. Esto también significa que tendrá
-que descargar su correo de la pasarela con un programa como
-<command>fetchmail</command>. Esta opción es la apropiada para los usuarios que
-utilicen acceso remoto a redes.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
-<term>solamente entrega local</term>
-<listitem><para>
-
-Su sistema no está conectado a ninguna red y se envía o recibe el correo sólo entre los usuarios locales. Se le recomienda seleccionar esta opción
-aunque no tenga pensado enviar ningún mensaje de correo, ya que algunas
-herramientas del sistema pueden enviar alertas de cuando en cuando
-(como por ejemplo, los mensajes de <quote>Disk quota exceeded</quote>). 
-Esta opción también es la más conveniente para los nuevos usuarios ya
-que no se les harán más preguntas.
-
-</para></listitem>
-</varlistentry>
-
-<!-- jfs: Esto es lo que pone en exim4 pero 'no configurar en este momento' parece mejor -->
-<varlistentry>
-<term>sin configuración de momento</term>
-<listitem><para>
-
-Elija esta opción si está absolutamente seguro de lo que está haciendo.  Esto
-dejará su sistema de correo sin configurar hasta que vd. lo haga.  Lo que
-significa que el sistema no podrá enviar o recibir correo y puede que no reciba
-avisos enviados por correo de las herramientas del sistema.
-
-</para></listitem>
-</varlistentry>
-</variablelist>
-
-<para>
-
-Tendrá que editar los archivos de configuración en el directorio
-<filename>/etc/exim4</filename> una vez haya terminado la instalación si
-ninguno de los escenarios arriba indicados se ajusta a sus necesidades.  Podrá
-encontrar más información sobre <command>exim4</command> bajo
-<filename>/usr/share/doc/exim4</filename>.
 
 </para>
    </sect3>
