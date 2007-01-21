@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2006-12-29 19:35+0000\n"
-"PO-Revision-Date: 2007-01-21 00:29+0100\n"
+"PO-Revision-Date: 2007-01-21 09:19+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -691,31 +691,31 @@ msgstr "Az elő-beállító fájl formája érvényességének ellenőrzéséhez
 #: preseed.xml:632
 #, no-c-format
 msgid "Contents of the preconfiguration file"
-msgstr ""
+msgstr "Az elő-beállító fájl tartalma"
 
 #. Tag: para
 #: preseed.xml:638
 #, no-c-format
 msgid "Note that this example is based on an installation for the Intel x86 architecture. If you are installing a different architecture, some of the examples (like keyboard selection and bootloader installation) may not be relevant and will need to be replaced by debconf settings appropriate for your architecture."
-msgstr ""
+msgstr "Fontos, hogy e példák egy Intel x86 telepítésre épülnek. Más architektúránál pár példa (például billentyűzet és boot-betöltő választás) érdektelen lehet és az architektúrának megfelelő debconf beállításokra kell cserélni."
 
 #. Tag: title
 #: preseed.xml:649
 #, no-c-format
 msgid "Localization"
-msgstr ""
+msgstr "Honosítás"
 
 #. Tag: para
 #: preseed.xml:650
 #, no-c-format
 msgid "Setting localization values will only work if you are using initrd preseeding. With all other methods the preconfiguration file will only be loaded after these questions have been asked."
-msgstr ""
+msgstr "A honosítási beállítások csak initrd előírás esetén működnek. Más módoknál az előíró fájl csak e kérdések után töltődik be."
 
 #. Tag: para
 #: preseed.xml:656
 #, no-c-format
 msgid "The locale can be used to specify both language and country. To specify the locale as a boot parameter, use <userinput>locale=<replaceable>en_US</replaceable></userinput>."
-msgstr ""
+msgstr "A helyi beállítás a nyelvet és országot is megadja. Indító paraméterként való megadása így lehetséges: <userinput>locale=<replaceable>hu_HU</replaceable></userinput>."
 
 #. Tag: screen
 #: preseed.xml:662
@@ -724,12 +724,14 @@ msgid ""
 "# Locale sets language and country.\n"
 "d-i debian-installer/locale string en_US"
 msgstr ""
+"# Nyelv ér ország beállítása.\n"
+"d-i debian-installer/locale string hu_HU"
 
 #. Tag: para
 #: preseed.xml:664
 #, no-c-format
 msgid "Keyboard configuration consists of selecting a keyboard architecture and a keymap. In most cases the correct keyboard architecture is selected by default, so there's normally no need to preseed it. The keymap must be valid for the selected keyboard architecture."
-msgstr ""
+msgstr "A billentyűzet beállítás egy billentyűzet architektúra és billentyű-kiosztás választásából áll. Általában alapból a helyes billentyűzet architektúra került kiválasztásra, így nem kell előírni. A kiosztás érvényes kell legyen a választott billentyűzet architektúrára."
 
 #. Tag: screen
 #: preseed.xml:671
@@ -741,18 +743,23 @@ msgid ""
 "# Example for a different keyboard architecture\n"
 "#d-i console-keymaps-usb/keymap select mac-usb-us"
 msgstr ""
+"# Billentyűzet választás.\n"
+"#d-i console-tools/archs select at\n"
+"d-i console-keymaps-at/keymap select hu\n"
+"# Példa egy más billentyűzet architektúrára\n"
+"#d-i console-keymaps-usb/keymap select mac-usb-hu"
 
 #. Tag: para
 #: preseed.xml:673
 #, no-c-format
 msgid "To skip keyboard configuration, preseed <classname>console-tools/archs</classname> with <userinput>skip-config</userinput>. This will result in the kernel keymap remaining active."
-msgstr ""
+msgstr "A billentyűzet beállítás átugrására írd elő ezt: <classname>console-tools/archs</classname> így: <userinput>skip-config</userinput>. Így a kernel billentyű-kiosztás marad aktív."
 
 #. Tag: para
 #: preseed.xml:682
 #, no-c-format
 msgid "The changes in the input layer for 2.6 kernels have made the keyboard architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote> (<userinput>at</userinput>) keymap should be selected."
-msgstr ""
+msgstr "A 2.6 kernel beviteli rétege módosításai a billentyűzet architektúrát virtuálisan elavulttá teszik. 2.6 kernelekhez alapban egy <quote>PC</quote> (<userinput>at</userinput>) billentyű-kiosztás választandó."
 
 #. Tag: title
 #: preseed.xml:692
@@ -1672,19 +1679,19 @@ msgstr ""
 #: preseed.xml:1002
 #, no-c-format
 msgid "Advanced options"
-msgstr ""
+msgstr "Haladó lehetőségek"
 
 #. Tag: title
 #: preseed.xml:1005
 #, no-c-format
 msgid "Running custom commands during the installation"
-msgstr ""
+msgstr "Egyéni parancs futtatása telepítéskor"
 
 #. Tag: para
 #: preseed.xml:1006
 #, no-c-format
 msgid "A very powerful and flexible option offered by the preconfiguration tools is the ability to run commands or scripts at certain points in the installation."
-msgstr ""
+msgstr "Az előíró eszközök egy nagyon erős és rugalmas lehetősége parancsok vagy szkriptek futtatása a telepítés egyes pontjain."
 
 #. Tag: screen
 #: preseed.xml:1014
@@ -1707,18 +1714,34 @@ msgid ""
 "# packages and run commands in the target system.\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 msgstr ""
+"# d-i az előírás nem feltétlenül biztonságos. A telepítő nem ellenőriz\n"
+"# puffer túlcsordulást vagy egy előíró fájl értékei általi más\n"
+"# támadást. Csak megbízható helyekről származó előíró\n"
+"# fájlokat használj! Mivel sokszor hasznos,\n"
+"# itt egy mód tetszőleges héj parancs futtatására a telepítőben,\n"
+"# automatikusan.\n"
+"\n"
+"# Az 1. parancs e lehető legkorábban fut, rögtön az előírás\n"
+"# olvasása után.\n"
+"#d-i preseed/early_command string anna-install some-udeb\n"
+"\n"
+"# E parancs a telepítés vége előtt fut, de még egy használható\n"
+"# /target könyvtárnál. Így chroot végezhető a /target könyvtárba és az használható\n"
+"# közvetlenül, és használható az apt-install és más parancsok csomagok könnyű\n"
+"# telepítésére és parancsok futtatására a cél rendszeren.\n"
+"#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
 #: preseed.xml:1019
 #, no-c-format
 msgid "Using preseeding to change default values"
-msgstr ""
+msgstr "Előírás használata alap értékek módosítására"
 
 #. Tag: para
 #: preseed.xml:1020
 #, no-c-format
 msgid "It is possible to use preseeding to change the default answer for a question, but still have the question asked. To do this the <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after setting the value for a question."
-msgstr ""
+msgstr "Az előírás használható alapértelmezett válaszok módosítására a kérdések feltevésével. Ekkor a <firstterm>seen</firstterm> kapcsolót vissza kell állítani <quote>false</quote> értékre egy érték beállítása után egy kérdéshez."
 
 #. Tag: screen
 #: preseed.xml:1029
@@ -1727,18 +1750,20 @@ msgid ""
 "d-i foo/bar string value\n"
 "d-i foo/bar seen false"
 msgstr ""
+"d-i foo/bar string érték\n"
+"d-i foo/bar seen false"
 
 #. Tag: title
 #: preseed.xml:1034
 #, no-c-format
 msgid "Chainloading preconfiguration files"
-msgstr ""
+msgstr "Előíró fájlok lánc-betöltése"
 
 #. Tag: para
 #: preseed.xml:1035
 #, no-c-format
 msgid "It is possible to include other preconfiguration files from a preconfiguration file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
-msgstr ""
+msgstr "Más előíró fájlok is csatolhatók egy előíró fájlból. E fájlok beállításai felülírják a korábban betöltött fájlok beállításait. Ez lehetővé teszi például a helynek megfelelő általános hálózati beállítások elhelyezését egy fájlba és pontosabb beállításokat egyes konfigurációkhoz más fájlokba."
 
 #. Tag: screen
 #: preseed.xml:1045
@@ -1767,10 +1792,32 @@ msgid ""
 "# directory as the preconfiguration file that runs them.\n"
 "#d-i preseed/run string foo.sh"
 msgstr ""
+"# Több fájl felsorolható, szóközökkel elválasztva; mind\n"
+"# betöltődik. A csatolt fájloknak is lehetnek preseed/include\n"
+"# direktívái. Ha a fájlnevek relatívak, az őket tartalmazó\n"
+"# előíró fájl könyvtárából jönnek.\n"
+"#d-i preseed/include string x.cfg\n"
+"\n"
+"# A telepítő ellenőrizheti az előíró fájlok ellenőrző-összegeit\n"
+"# használat előtt. Jelenleg az md5 összegek támogatottak, sorold őket\n"
+"# a csatolt fájlok rendjében.\n"
+"#d-i preseed/include/checksum string 5da499872becccfeda2c4872f9171c3d\n"
+"\n"
+"# Sokkal rugalmasabban, ez egy héj parancsot futtat, mely ha kiadja az\n"
+"# előíró fájlok nevét, csatolja őket.\n"
+"#d-i preseed/include_command \\\n"
+"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"\n"
+"# Még rugalmasabban, ez letölt egy programot és futtatja. A program\n"
+"# olyan parancsokat futtathat, mint a debconf-set a debconf adatbázis kezelésére.\n"
+"# Több szkript felsorolható, szóközökkel elválasztva.\n"
+"# Ha a fájlnevek relatívak, az őket futtató előíró fájlok\n"
+"# könyvtárából jönnek.\n"
+"#d-i preseed/run string foo.sh"
 
 #. Tag: para
 #: preseed.xml:1047
 #, no-c-format
 msgid "It is also possible to chainload from the initrd or file preseeding phase, into network preseeding by setting preseed/url in the earlier files. This will cause network preseeding to be performed when the network comes up. You need to be careful when doing this, since there will be two distinct runs at preseeding, meaning for example that you get another chance to run the preseed/early command, the second one happening after the network comes up."
-msgstr ""
+msgstr "Lehetséges lánc-töltés initrd vagy fájl előíró szakaszból, hálózati előírásba a preseed/url beállításával a korábbi fájlokban. Ez egy hálózati előírás végrehajtását adja a hálózat feléledésekor. Ezt óvatosan kell tenni, mert 2 önálló előírás fut, így például kétszer lefuthat a preseed/early parancs, másodszor a hálózat feléledése után."
 
