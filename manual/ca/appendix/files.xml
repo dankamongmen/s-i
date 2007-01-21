@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 42302 -->
+<!-- original version: 43841 -->
 
 
  <sect1 id="linuxdevices"><title>Dispositius del Linux</title>
@@ -194,20 +194,35 @@ aquells que només en tenen un. Només cal afegir aquestes línies al fitxer
  Sizes of tasks should be determined by running tasksel with the "new-install"
  option on a system that been fully installed without selecting any tasks. By
  selecting a task together with the "manual selection" option, aptitude will
- be started and show the sizes for the task. Use "cancel panding actions" to
+ be started and show the sizes for the task. Use "cancel pending actions" to
  clear the slate, quit aptitude and repeat for other tasks.
  Space requirements need to be determined from tasksel as tasksel will not
  install recommended packages while selecting a task from aptitude will.
+
+ The size for the minimal base system should be determined after running
+ 'aptitude clean' using 'du -hsx /'. After that the "Standard system" task
+ should be installed after which the size of the standard system should be
+ determined using the same method.
 -->
 
 <para>
 
-La instal·lació bàsica per a l'i386 amb el nucli 2.6, incloent-hi
-tots els paquets estàndard, requereix 585 MiB d'espai de disc.
-Una instal·lació bàsica mínima, amb la tasca estàndard no seleccionada,
-ocuparà 365 MiB.
+Una instal·lació estàndard per l'arquitectura i386 amb el nucli 2.6,
+incloent-hi tots els paquets estàndard, requereix 442 MiB d'espai de disc.
+Una instal·lació bàsica mínima, amb la tasca <quote>estàndard</quote> no
+seleccionada, ocuparà 230 MiB.
 
-</para><para>
+</para>
+<important><para>
+
+En els dos casos és l'espai en disc utilitzat <emphasis>després</emphasis>
+d'acabar la instal·lació i esborrar tots els fitxers temporals. Açò també
+te en compte les necessitats del sistema de fitxers, per exemple els fitxers
+de «journal». Açò vol dir que farà falta prou més espai al disc
+<emphasis>durant</emphasis> la instal·lació i per l'ús normal del sistema.
+
+</para></important>
+<para>
 
 La següent taula enumera les mides indicades per l'aptitude que calen per a
 les tasques llistades en el tasksel. Tingueu en compte que algunes d'aquestes
@@ -217,10 +232,11 @@ de dues d'elles pot resultar inferior al total de la suma indicat.
 </para><para>
 
 Tingueu en compte que cal afegir les mides de la taula a la de la
-instal·lació bàsica a l'hora de determinar la mida de les particions. La major
-part de la mida identificada com a <quote>Mida de la instal·lació</quote>
-l'ocuparà <filename>/usr</filename>; la mida identificada com a <quote>Mida
-de la descàrrega</quote> cal tenir-la a l'abast (temporalment) a
+instal·lació estàndard a l'hora de determinar la mida de les particions.
+La  major part de la mida identificada com a <quote>Mida de la
+instal·lació</quote> l'ocuparà <filename>/usr</filename> i a
+<filename>/lib</filename>; la mida identificada com a <quote>Mida de la
+descàrrega</quote> cal tenir-la a l'abast (temporalment) a
 <filename>/var</filename>.
 
 </para><para>
@@ -237,17 +253,25 @@ de la descàrrega</quote> cal tenir-la a l'abast (temporalment) a
 
 <tbody>
 <row>
-  <entry>Escriptori</entry>
-  <entry>1258</entry>
-  <entry>418</entry>
-  <entry>1676</entry>
+  <entry>Entorn d'escriptori</entry>
+  <entry>1267</entry>
+  <entry>420</entry>
+  <entry>1667</entry>
 </row>
 
 <row>
-  <entry>Portàtil</entry>
-  <entry>46</entry>
-  <entry>16</entry>
-  <entry>62</entry>
+  <entry>Portàtil<footnote>
+
+  <para>
+  Hi ha molts paquets comuns a la tasca Portàtil amb la tasca Entorn
+  d'escriptori. Si les instal·leu les dos, la tasca Laptop tan sols
+  necessitarà uns MiB addicionals d'espai en disc.
+  </para>
+
+  </footnote></entry>
+  <entry>50</entry>
+  <entry>17</entry>
+  <entry>67</entry>
 </row>
 
 <row>
@@ -259,9 +283,9 @@ de la descàrrega</quote> cal tenir-la a l'abast (temporalment) a
 
 <row>
   <entry>Servidor d'impressió</entry>
-  <entry>326</entry>
-  <entry>95</entry>
-  <entry>421</entry>
+  <entry>277</entry>
+  <entry>79</entry>
+  <entry>356</entry>
 </row>
 
 <row>
@@ -273,9 +297,9 @@ de la descàrrega</quote> cal tenir-la a l'abast (temporalment) a
 
 <row>
   <entry>Servidor de fitxers</entry>
-  <entry>50</entry>
+  <entry>49</entry>
   <entry>21</entry>
-  <entry>71</entry>
+  <entry>70</entry>
 </row>
 
 <row>
@@ -308,7 +332,7 @@ Si la llengua emprada no és l'anglès, el <command>tasksel</command>
 potser instal·larà automàticament una <firstterm>tasca de
 localització</firstterm> si n'hi ha cap a l'abast per a la vostra
 llengua. Les necessitats d'espai canvien segons la llengua; heu de
-reservar uns 200 MiB en total per a la descàrrega i la instal·lació.
+reservar uns 350 MiB en total per a la descàrrega i la instal·lació.
 
 </para>
  </sect1>
