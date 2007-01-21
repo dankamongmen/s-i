@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 44002 -->
 <!-- revisado jfs, 23 feb. 2005 -->
 
  <sect1 id="boot-parms"><title>Parámetros de arranque</title>
@@ -78,30 +78,33 @@ También puede definir en <quote>OpenPROM</quote> las variables
 El sistema de instalación reconoce algunos parámetros adicionales que <footnote>
 
 <para>
-Tenga en cuenta que el núcleo 2.4 acepta un máximo de ocho opciones de
-línea de órdenes y ocho del entorno, incluyendo cualquier
-opción que el instalador añada por omisión. Si excede este número, los
-núcleos de versión 2.4 descartarán las opciones que lo sobrepasen.
-Con el núcleo kernel 2.6.9, o versiones más recientes,
+Con los núcleos actuales (kernel 2.6.9 o versiones más recientes)
 puede utilizar treinta y dos opciones de línea de órdenes y treinta y dos
-opciones de entorno.
+opciones de entorno. Si excede estos números el núcleo abortará.
 
 </para>
 
 </footnote> pueden serle útiles.
 
+</para><para>
+
+Algunos parámetros tienen una <quote>forma abreviada</quote> que
+permiteevitar las limitaciones de las opciones de línea de órdenes en
+el núcleo y hace más fácil la introducción de parámetros. Las formas
+abreviadas de los parámetros se mostrarán entre paréntesis tras la
+forma (normal) extendida. Los ejemplos en este manual generalmente
+utilizan la forma simplificada.
 
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 El valor de este parámetro define la prioridad de los mensajes que se
 mostrarán durante la instalación. No se mostrará ningún mensaje de
 menor prioridad a la aquí definida.
-Forma abreviada: <userinput>priority</userinput>
 
 </para><para>
 
@@ -143,15 +146,6 @@ valores que puede tomar este parámetro:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
@@ -161,7 +155,9 @@ instalación a través de una consola serie puede que sea mejor utilizar
 <userinput>DEBIAN_FRONTEND=text</userinput>.  Esta opción ahora
 mismo no es muy útil ya que, por regla general, sólo dispondrá de la
 interfaz <userinput>newt</userinput> en el medio de instalación
-predeterminado.
+predeterminado. El instalador gráfico utiliza la interfaz
+<userinput>gtk</userinput> en las arquitecturas en las que está
+soportado.
 
 </para></listitem>
 </varlistentry>
@@ -226,16 +222,14 @@ través de este parámetro para que busque sólo en un dispositivo concreto.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 En algunas arquitecturas se utiliza el framebuffer del núcleo para
 ofrecer la opción a realizar la instalación en un número diverso de idiomas.
 Si el uso de este dispositivo origina problemas en su
 sistema puede deshabilitar esta característica con
-el parámetro
-<userinput>debian-installer/framebuffer=false</userinput> o
-la forma abreviada <userinput>fb=false</userinput>.
+el parámetro <userinput>fb=false</userinput>.
 Algunos síntomas de este problema son mensajes que traten sobre <quote>bterm</quote> o <quote>bogl</quote>,
 la aparición de una pantalla en blanco o que el sistema se quede congelado
 algunos minutos después de iniciarse la instalación.
@@ -267,6 +261,21 @@ visuales con el instalador puede intentar arrancar con el parámetro
 la versión reducida <userinput>fb=true</userinput>.
 
 </para></note></listitem>
+</varlistentry>
+
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
+<listitem><para>
+
+Un tema determina cómo se muestra el interfaz de usuario del
+instalador (colores, iconos, etc.). Los temas disponibles dependen de
+la interfaz. Actualmente las interfaces newt y gtk sólo tienen un tema
+denominado <quote>dark</quote> (oscuro, n. del t.) que se ha diseñado
+para aquellas personas con problemas visuales. Puede fijar este tema
+arrancando el instalador con 
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
+
+</para></listitem>
 </varlistentry>
 
 <varlistentry>
@@ -315,13 +324,12 @@ ser recomendable deshabilitarlo.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Este valor especifica la ruta de un fichero de preconfiguración que
 se descargará y utilizará para automatizar la instalación.
 Vea <xref linkend="automatic-install"/>.
-Forma abreviada: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
@@ -349,26 +357,86 @@ la instalación inicial y el sistema se reinicie.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Este valor especifica la url de un fichero de preconfiguración que
 se cargará en la instalación automática.
 Consulte <xref linkend="automatic-install"/>.
-Forma abreviada: <userinput>file</userinput>
+
+</para></listitem>
+</varlistentry>
+
+<term>auto-install/enabled (auto)</term>
+<listitem><para>
+
+Demora las preguntas que se realizan normalmente antes de la
+preconfiguración hasta después de configurar la red.
+Consulte <xref linkend="preseed-auto"/> para más información de cómo
+utilizar ésto para realizar instalaciones automatizadas.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>ramdisk_size</term>
+<varlistentry>
+<term>cdrom-detect/eject</term>
 <listitem><para>
 
-Puede necesitar definir &ramdisksize; si está usando un núcleo en la
-versión 2.2.x.
+Antes de reiniciar el sistema, &d-i; expulsa automáticamente el medio
+óptico utilizado durante la instalación por omisión. Esto puede no ser
+necesario si el sistema no arranca de forma automática del CD. En
+algunos casos puede incluso no ser deseable, por ejemplo, si la unidad
+óptica no puede volver a insertar el medio y el usuario no está allí
+para hacerlo manualmente. Muchas unidades de distinto tipo («slot
+loading», «slim-line» y «caddty style») no pueden recargar el medio
+automáticamente.
+
+</para><para>
+
+Fije este valor a <userinput>false</userinput> para deshabilitar el
+expulsado automático, pero tenga en cuenta que debe asegurarse que el
+sistema no arranca de forma automática de la unidad óptica tras la
+instalación inicial.
 
 </para></listitem>
 </varlistentry>
+
+<varlistentry arch="alpha;m68k;mips;mipsel">
+<term>ramdisk_size</term>
+<listitem><para>
+
+Este parámetro debería siempre estar fijado al valor correcto
+cuando es necesario. Debe fijarlo sólo si ve errores durante el
+arranque que indiquen que el disco de ram no se cargó por completo. El
+valor se debe dar en kB.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/left</term>
+<listitem><para>
+
+Los usuarios pueden cambiar el ratón para que opere para zurdos
+fijando este parámetro a <userinput>true</userinput> en la interfaz
+gtk (instalador gráfico).
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>directfb/hw-accel</term>
+<listitem><para>
+
+La aceleración hardware en directfb está deshabilitada por omisión en
+el interfaz gtk (instalador gráfico. Debe configurar este parámetro a
+<userinput>true</userinput> si desea activarla cuando arranca el
+instalador.
+
+</para></listitem>
+</varlistentry>
+
 
 <varlistentry>
 <term>rescue/enable</term>
@@ -382,6 +450,167 @@ en lugar de hacer una instalación normal. Si desea más información consulte
 </varlistentry>
 
 </variablelist>
+
+
+   <sect3 id="preseed-args">
+   <title>Utilizar parámetros de arranque para responder a preguntas</title>
+<para>
+
+Se puede fijar un valor durante el indicador de arranque para
+cualquier pregunta que se realiza durante la instalación, con algunas
+excepciones. Realmente ésto es sólo útil para algunos casos
+concretos. Puede encontrar instrucciones generales que describen como
+hacer esto en <xref linkend="preseed-bootparms"/>. A continuación se
+listan algunos ejemplos.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale (locale)</term>
+<listitem><para>
+
+Puede utilizarse para fijar tanto el idioma como el país para la
+instalación. Sólo funcionará si la localización está soportada en
+Debian. Por ejemplo, puede utilizar
+<userinput>locale=de_CH</userinput> para seleccionar alemán como 
+idioma y Suiza como país.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>anna/choose_modules (modules)</term>
+<listitem><para>
+
+Puede utilizarse para cargar automáticamente componentes del
+instalador que no se cargan por omisión.
+Algunos ejemplos de componentes opcionales que pueden ser útilse son
+<classname>openssh-client-udeb</classname> (para poder utilizar el
+programa <command>scp</command> durante la instalación) y
+<classname>ppp-udeb</classname> (que permite la configuración PPPoE).
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Puede fijar este valor a <userinput>true</userinput> si quiere
+deshabilitar DHCP y forzar la configuración estática de la red.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+El instalador utilizará el protocolo http para descargar ficheros de
+las réplicas de Debian y no es posible cambiar a ftp en instalaciones
+que se realizan con prioridad normal. Puede forzar al instalador a
+utilizar el protocolo ftp si fija este parámetro a
+<userinput>ftp</userinput>. Tenga en cuenta que no podrá seleccionar
+una réplica ftp de una lista, tendrá que introducir el nombre del
+sistema donde está la réplica manualmente.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
+<listitem><para>
+
+Puede utilizarse para seleccionar tareas que no están disponibles en
+la lista interactiva de tareas, como pueda ser la tarea
+<literal>kde-desktop</literal>.
+Para más información consulte <xref linkend="pkgsel"/>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms">
+   <title>Pasar parámetros a módulos del núcleo</title>
+<para>
+
+Puede pasar parámetros a los módulos del núcleo como se describe en la
+documentación del núcleo si los controladores están compilados dentro
+de éste. Sin embargo, no es posible pasar parámetros a los módulos
+como haría normalmente en el caso de controladores compilados como
+módulos, debido a que los módulos del núcleo se carga de una forma un
+poco distinta en la instalación a como se hace en un sistema ya
+instalado. Tiene que utilizar una sintaxis especial que reconoce el
+instalador. Si la utiliza, el instalador se asegurará que los
+parámetros se guarden en el fichero de configuración apropiado y se
+utilicen cuando se carguen los módulos. Los parámetros que utilice
+también se propagan de forma automática a la configuración utilizada
+en el sistema instalado.
+
+</para><para>
+
+Tenga en cuenta que ahora es raro pasar parámetros a los módulos. En
+la mayor parte de las situaciones el núcleo podrá analizar el hardware
+disponible en un sistema y fijar valores por omisión correctos de esta
+forma. Existen algunas situaciones, sin embargo, en las que será
+necesario pasar parámetros manualmente.
+
+</para><para>
+
+Debe utilizar la siguiente sintaxis para fijar parámetros para los módulos:
+
+<informalexample><screen>
+<replaceable>nombre_módulo</replaceable>.<replaceable>nombre_parámetro</replaceable>=<replaceable>valor</replaceable>
+</screen></informalexample>
+
+Si necesita pasar múltiples parámetros al mismo módulo o a distintos
+módulos sólo tiene que repetir este formato. Por ejemplo, para indicar a
+una tarjeta de red 3Com antigua que utilice el conector BNC (coaxial)
+y la interrupción (IRQ) 10 debería utiliza:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Poner módulos del núcleo en una lista negra</title>
+<para>
+
+Algunas veces es necesario poner un módulo en una lista negra para que
+ni el núcleo ni «udev» lo carguen automáticamente. Una razón para hacer
+ésto es cuando un módulo concreto causa problemas en su hardware. El
+núcleo también puede algunas veces listar dos controladores distintos
+para el mismo dispositivo. Esto puede hacer que el dispositivo no
+funcione correctamente si los controladores entran en conflicto o si
+se carga el controlador erróneo primero.
+
+</para><para>
+
+Puede poner un módulo en la lista negra con la siguiente sintaxis:
+
+<userinput><replaceable>nombre_módulo</replaceable>.blacklist=yes</userinput>.
+Esto hará que el módulo se ponga en la lista negra en
+<filename>/etc/modprobe.d/blacklist.local</filename> tanto durante la
+instalación como en el sistema instalado.
+
+</para><para>
+
+Tenga en cuenta que el sistema de instalación puede llegar a cargar el
+módulo por sí sólo. Puede evitar esto ejecutando la instalación en
+modo experto y deseleccionando el módulo de la lista de módulos que se
+muestra durante las fases de detección de hardware.
+
+</para>
+   </sect3>
+
   </sect2>
  </sect1>
 
