@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 44002 -->
 
  <sect1 id="boot-parms"><title>Paràmetres d'arrencada</title>
 <para>
@@ -22,7 +22,7 @@ al vostre maquinari.
 
 </para><para>
 
-Podeu trobar informació referent a molts paràmetre de l'arrencada a
+Podeu trobar informació referent a molts paràmetres de l'arrencada a
 <ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">Linux
 BootPrompt HOWTO</ulink>, inclosos alguns trucs per a maquinari
 obscur. Aquesta secció conté únicament una representació dels paràmetres
@@ -75,26 +75,31 @@ d'arrencada<footnote>
 
 <para>
 
-Tingueu en compte que el nucli 2.4 accepta un màxim de 8 paràmetres de línia
-d'ordres i 8 paràmetres d'entorn (incloent qualsevol paràmetre afegit de
-forma predeterminada per l'instal·lador). Si s'excedeixen aquests números,
-els nuclis 2.4 ignoraran qualsevol paràmetre restant. Amb nuclis 2.6.9 o
-més nous, podeu utilitzar fins 32 ordres a la línia de comandes i 32 opcions
-d'entorn.
+Amb nuclis actuals (2.6.9 o més nous) podeu utilitzar fins a 32
+paràmetres de línia d'ordres i 32 paràmetres d'entorn. Si s'excedeixen
+aquestes xifres, el nucli fallarà.
 
 </para>
 
 </footnote> addicionals que us podrien ser d'utilitat.
 
+</para><para>
+
+Hi ha una sèrie de paràmetres que tenen una <quote>forma
+abreujada</quote> que ajuda a evitar les limitacions dels paràmetres
+de línia d'ordres del nucli i facilita la seva introducció. Si un
+paràmetre té una forma abreujada, aquesta es mostrarà entre parèntesi
+després de la forma normal (més llarga). Els exemples d'aquest manual
+normalment utilitzaran la forma abreujada.
+
 </para>
 
 <variablelist>
 <varlistentry>
-<term>debconf/priority</term>
+<term>debconf/priority (priority)</term>
 <listitem><para>
 
 Aquest paràmetre definirà la prioritat més alta dels missatges a mostrar.
-Forma curta: <userinput>priority</userinput>
 
 </para><para>
 
@@ -137,15 +142,7 @@ actuals són:
 </listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=newt</userinput></para>
 </listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=slang</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=ncurses</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=bogl</userinput></para>
-</listitem><listitem>
 <para><userinput>DEBIAN_FRONTEND=gtk</userinput></para>
-</listitem><listitem>
-<para><userinput>DEBIAN_FRONTEND=corba</userinput></para>
 </listitem>
 </itemizedlist>
 
@@ -219,16 +216,16 @@ per forçar que únicament busqui en aquest dispositiu.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer</term>
+<term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Algunes arquitectures utilitzen el framebuffer del nucli per oferir
 la instal·lació en diferents idiomes. Si el framebuffer us provoca
 errors al sistema, podeu deshabilitar la característica utilitzant
-el paràmetre <userinput>debian-installer/framebuffer=false</userinput>, o
-<userinput>fb=false</userinput> per abreujar. Els símptomes del problema són missatges d'error referents al
-bogl, una pantalla en blanc o que es quedi congelat durant uns quants
-minuts després d'iniciar la instal·lació.
+el paràmetre <userinput>fb=false</userinput>. Els símptomes del
+problema són missatges d'error referents al bogl, una pantalla en blanc
+o que es quedi congelat durant uns quants minuts després d'iniciar
+la instal·lació.
 
 </para><para arch="x86">
 
@@ -257,6 +254,20 @@ en l'instal·lador, podeu provar d'arrencar amb el paràmetre
 o amb la forma curta <userinput>fb=true</userinput>.
 
 </para></note></listitem>
+</varlistentry>
+
+<varlistentry arch="not-s390">
+<term>debian-installer/theme (theme)</term>
+<listitem><para>
+
+El tema determina l'aparença de la interfície d'usuari
+(colors, icones, etc.). Els temes disponibles varien segons la
+interfície. Actualment ambdues interfícies, newt i gtk, només
+tenen disponible el tema <quote>dark</quote>, dissenyat per a usuaris
+amb discapacitats visuals. Podeu establir el tema arrencant amb
+<userinput>theme=<replaceable>dark</replaceable></userinput>.
+
+</para></listitem>
 </varlistentry>
 
 <varlistentry>
@@ -301,25 +312,35 @@ s'ha detectat en alguns ordinadors portàtils.
 </varlistentry>
 
 <varlistentry>
-<term>preseed/url</term>
+<term>preseed/url (url)</term>
 <listitem><para>
 
 Especifica l'URL que enllaça a un fitxer de preconfiguració
 a baixar i utilitzar per automatitzar la instal·lació.
 Per a més informació vegeu <xref linkend="automatic-install"/>.
-Forma curta: <userinput>url</userinput>
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>preseed/file</term>
+<term>preseed/file (file)</term>
 <listitem><para>
 
 Especifica el camí que enllaça a un fitxer de preconfiguració
 a carregar per automatitzar la instal·lació. Per a més
 informació vegeu <xref linkend="automatic-install"/>.
-Forma curta: <userinput>file</userinput>
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>auto-install/enabled (auto)</term>
+<listitem><para>
+
+És possible retardar les qüestions que normalment es pregunten abans
+de la preconfiguració fins després de la configuració de la xarxa.
+Per a més informació quant a l'automatització d'instal·lacions,
+vegeu <xref linkend="preseed-auto"/>.
 
 </para></listitem>
 </varlistentry>
@@ -347,12 +368,37 @@ unitat òptica després de la instal·lació inicial.
 </para></listitem>
 </varlistentry>
 
-<varlistentry>
+<varlistentry arch="alpha;m68k;mips;mipsel">
 <term>ramdisk_size</term>
 <listitem><para>
 
-Si utilitzeu un nucli 2.2.x, probablement haureu d'especificar
-la &ramdisksize;.
+Aquest paràmetre ja hauria d'estar definit correctament allà on sigui
+necessari; torneu-lo a definir només si trobeu errors durant el procés
+d'arrencada que indiquin que no ha estat possible carregar el ramdisk
+completament. El valor està en KiB.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/left</term>
+<listitem><para>
+
+En la interfície gtk (l'instal·lador gràfic), és possible canviar el
+funcionament del ratolí per tal d'adaptar-lo a esquerrans si s'estableix
+aquest paràmetre a <userinput>true</userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>directfb/hw-accel</term>
+<listitem><para>
+
+En la interfície gtk (l'instal·lador gràfic), l'acceleració per
+maquinari amb directfb està desactivada per omissió. Per a activar-la,
+establiu aquest paràmetre a <userinput>true</userinput> quan arrenqueu
+l'instal·lador.
 
 </para></listitem>
 </varlistentry>
@@ -369,6 +415,164 @@ Vegeu <xref linkend="rescue"/>.
 </varlistentry>
 
 </variablelist>
+
+   <sect3 id="preseed-args">
+   <title>Utilitzar els paràmetres de l'arrencada per respondre
+          preguntes</title>
+<para>
+
+És possible establir un valor en l'indicador de l'arrencada per a
+pràcticament qualsevol de les qüestions que es pregunten durant el
+procés d'instal·lació, encara que això només és útil en casos
+determinats. Les instruccions generals per fer-ho les podeu trobar a
+<xref linkend="preseed-bootparms"/>. A continuació podeu veure alguns
+exemples concrets.
+
+</para>
+
+<variablelist>
+
+<varlistentry>
+<term>debian-installer/locale (locale)</term>
+<listitem><para>
+
+Aquest paràmetre es pot utilitzar per determinar ambdós,
+l'idioma i el país de la instal·lació. Això només funcionarà
+si el locale està suportat a Debian. Per exemple, podeu utilitzar
+<userinput>locale=de_CH</userinput> per seleccionar l'alemany com a
+idioma i Suïssa com a país.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>anna/choose_modules (modules)</term>
+<listitem><para>
+
+Es pot utilitzar per carregar automàticament components
+de l'instal·lador que no es carreguen per omissió. Alguns
+exemples de components opcionals que us poden ser útils són
+<classname>openssh-client-udeb</classname> (que us permetrà
+emprar l'ordre <command>scp</command> durant la instal·lació) i
+<classname>ppp-udeb</classname> (que incorpora suport per a configurar
+PPPoE).
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>netcfg/disable_dhcp</term>
+<listitem><para>
+
+Establiu-lo a <userinput>true</userinput> si voleu desactivar DHCP i
+forçar la configuració de la xarxa utilitzant adreçament estàtic.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>mirror/protocol (protocol)</term>
+<listitem><para>
+
+Per omissió, l'instal·lador utilitzarà el protocol HTTP per descarregar
+fitxers de les rèpliques de Debian, i no és possible canviar-ho a
+FTP durant les instal·lacions en prioritat normal. Si establiu aquest
+paràmetre a <userinput>ftp</userinput>, forçareu que l'instal·lador
+utilitzi aquest protocol. Tingueu en compte que no podreu seleccionar
+una rèplica FTP de la llista, haureu d'introduir el nom del servidor
+manualment.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>tasksel:tasksel/first (tasks)</term>
+<listitem><para>
+
+Es pot utilitzar per seleccionar tasques que no estan disponibles
+des de la llista de tasques interactiva, com per exemple
+<literal>kde-desktop</literal>. Per a informació addicional, vegeu
+<xref linkend="pkgsel"/>.
+
+</para></listitem>
+</varlistentry>
+
+</variablelist>
+
+   </sect3>
+
+   <sect3 id="module-parms">
+   <title>Pas de paràmetres a mòduls del nucli</title>
+<para>
+
+Si els controladors estan compilats al nucli, és possible passar
+paràmetres tal i com es descriu a la pròpia documentació del
+nucli. Tanmateix, si els controladors estan compilats com a mòduls, no
+és possible passar paràmetres de la forma habitual, ja que durant el
+procés d'instal·lació aquests no es carreguen igual que en un sistema
+ja instal·lat. Haureu d'utilitzar una sintaxi especial, reconeguda
+per l'instal·lador, que assegurarà que els paràmetres es desen als
+fitxers de configuració corresponents i per tant que els mòduls tindran
+disponible aquesta informació quan es carreguin. Els paràmetres també
+es propagaran automàticament a la configuració del sistema instal·lat.
+
+</para><para>
+
+Fixeu-vos que ara es força estrany haver de passar paràmetres
+als mòduls. En la majoria de casos el nucli podrà detectar
+el maquinari present al sistema i establir uns bons paràmetres
+predeterminats. Tanmateix, en algunes situacions encara pot ser necessari
+establir els paràmetres manualment.
+
+</para><para>
+
+La sintaxi utilitzada per establir els paràmetres dels mòduls és
+la següent:
+
+<informalexample><screen>
+<replaceable>nom_del_mòdul</replaceable>.<replaceable>nom_del_paràmetre</replaceable>=<replaceable>valor</replaceable>
+</screen></informalexample>
+
+Si necessiteu passar diversos paràmetres al mateix o a diferents mòduls,
+simplement repetiu això. Per exemple, per fer que una antiga targeta
+de xarxa 3com utilitzi el connector BNC (coaxial) i l'IRQ 10, hauríeu
+de passar:
+
+<informalexample><screen>
+3c509.xcvr=3 3c509.irq=10
+</screen></informalexample>
+
+</para>
+   </sect3>
+
+   <sect3 id="module-blacklist">
+   <title>Afegir mòduls del nucli a la llista negra</title>
+<para>
+
+De vegades pot ser necessari afegir un mòdul en una llista negra per
+evitar que el nucli i udev el carreguin automàticament. Per exemple,
+un motiu per voler fer això seria un mòdul en particular que causi
+problemes amb els components del vostre equip. El nucli de vegades
+també llista dos controladors diferents pel mateix dispositiu. Això pot
+provocar que el dispositiu no funcioni correctament si hi ha conflictes
+entre els controladors, o si es carrega primer el controlador que no toca.
+
+</para><para>
+
+Podeu afegir un mòdul a la llista negra emprant la sintaxi següent:
+<userinput><replaceable>nom_del_mòdul</replaceable>.blacklist=yes</userinput>.
+D'aquesta manera s'afegira el mòdul a
+<filename>/etc/modprobe.d/blacklist.local</filename>, tant durant la
+instal·lació com en el sistema instal·lat.
+
+</para><para>
+
+Tot i així, fixeu-vos que és possible que el sistema d'instal·lació
+carregui un d'aquests mòduls igualment. Podeu evitar-ho si executeu la
+instal·lació en mode expert i desseleccioneu el mòdul de la llista
+que es mostra durant les etapes de detecció de maquinari.
+
+</para>
+   </sect3>
   </sect2>
  </sect1>
-
