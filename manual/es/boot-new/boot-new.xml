@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39380 -->
+<!-- original version: 43599 -->
 <!-- revisado por jfs, 28 octubre 2004 -->
 <!-- revisado Rudy Godoy, 24 feb. 2005 -->
 
@@ -12,18 +12,47 @@
 El primer arranque autónomo de su sistema es lo que los ingenieros
 eléctricos llaman <quote>la prueba de humo</quote>.
 
+</para><para arch="x86">
+
+Si ha hecho la instalación por omisio lo primero que debería ver
+cuando arranque el sistema es el menú del cargador de arranque
+<classname>grub</classname> o <classname>lilo</classname>.  Las
+primeras opciones en el menú serán las de su nuevo sistema Debian. Se
+listarán más abajo otros sistemas operativos en su sistema (como
+Windows) si los tenía y los detectó el sistema de instalación.
+
 </para><para>
 
-Si está arrancando directamente en Debian y el sistema no inicia,
-debe usar o bien el medio original de instalación o insertar el disquete
-de arranque a medida, si tiene uno, y reiniciar su sistema. Es posible
-que, en su caso, tenga que introducir algunos argumentos adicionales al
-arranque como <userinput>root=<replaceable>root</replaceable></userinput>,
-donde <replaceable>root</replaceable> es su partición raíz, como por
-ejemplo <filename>/dev/sda1</filename>.
-Además, puede consultar <xref linkend="rescue"/> para leer las instrucciones
-de cómo usar el modo de rescate incorporado en el instalador.
+Si el sistema no se llega a arrancar no tema. Si la instalación se
+completó con éxito es posible que sólo haya un problema menor que
+impida que su sistema arranque Debian. En muchos casos estos problemas
+pueden arreglarse sin tener que repetir la instalación. Una opción
+disponible para arreglar problemas de arranque es utilizar el modo
+rescate que está disponible en el propio instalador (consulte <xref
+linkend="rescue"/>).
+ 
+</para><para>
+Es posible que necesite ayuda de usuarios más experimentados si es
+nuevo a Debian y a Linux.
+<phrase arch="x86">Puede intentar ayuda directamente en línea en
+los canáles de IRC #debian o #debian-boot en la red OFTC.
+También puede contactar la <ulink url="&url-list-subscribe;">lista de
+usuarios debian-user</ulink> (en inglés) o <ulink url="&url-list-subscribe;">lista de
+usuarios debian-user-spanish</ulink> (en español).</phrase>
+<phrase arch="not-x86">Para arquitecturas menos habituales como es el
+caso de &arch-title;, su mejor opción es preguntar en la 
+<ulink url="&url-list-subscribe;">lista de correo debian-&arch-listname; 
+</ulink>.</phrase>
+También puede enviar un informe de instalación tal y como se describe
+en <xref linkend="submit-bug"/>. Por favor, asegúrese de que describe
+claramente su problema y de que incluye cualquier mensaje que se
+muestra de forma que otros puedan diagnosticar el problema.
 
+</para><para arch="x86">
+
+Si tenía algún sistema operativo en su ordenador que no se detectó o
+no se detectó correctamente, por favor, envíe un informe de
+instalación.
 
 </para>
 
@@ -199,152 +228,7 @@ Para más información, por favor lea el
    </sect2>
  </sect1>
 
- <sect1 id="mount-encrypted-volumes">
- <title>Montaje de volúmenes cifrados</title>
-
-<para>
-
-Se le solicitará la contraseña para cada uno de los volúmenes cifrados durante
-el arranque si ha creado volúmenes cifrados durante la instalación y los ha asociado a puntos de montaje. El procedimiento difiere ligeramente en función de si se utiliza «dm-crypt» o «loop-AES».
-
-</para>
-
-  <sect2 id="mount-loop-aes">
-  <title>loop-AES</title>
-<para>
-
-Se le mostrará el siguiente indicador durante el arranque en el caso
-de que tenga particiones cifradas con «loop-AES»:
-
-<informalexample><screen>
-mount: going to use loop device /dev/loop<replaceable>X</replaceable>
-Password:
-</screen></informalexample>
-
-
-<replaceable>X</replaceable> es el número del dispositivo «loop» en
-la primera línea del indicador. Seguramente se esté preguntando
-<emphasis>para qué volúmen</emphasis> está vd. introduciendo la clave.
-¿Se trata de <filename>/home</filename> o de <filename>/var</filename>? La
-respuesta es muy sencilla si sólo tiene un volúmen cifrado, sólo tiene
-que introducir la contraseña que utilizó cuando configuró dicho volúmen. Las
-notas que escribió como parte del último paso de <xref
-linkend="partman-crypto"/> serán útiles si ha configurado más de un volúmen
-cifrado durante la instalación.  Puede obtener esta información
-del <filename>/etc/fstab</filename> en su nuevo sitema sino guardó
-las notas de la asociación entre
-<filename>loop<replaceable>X</replaceable></filename> y los puntos de montaje.
-</para><para>
-
-No se mostrará ningún caracter (ni siquiera asteriscos) mientras vd.  introduce
-la clave. Tenga cuidado ya que sólo tiene <emphasis>un intento</emphasis>. Si
-introduce mal la clave se mostrará un mensaje de error y el arranque saltará
-ese volumen y continuará intentando montar el siguiente sistemas de ficheros.
-Para más información consulte <xref linkend="crypto-troubleshooting"/>.
-
-</para><para>
-
-El proceso de arranque debería continuar normalmente una vez haya introducido
-todas las claves.
-
-</para>
-  </sect2>
-
-  <sect2 id="mount-dm-crypt" condition="FIXME">
-  <title>dm-crypt</title>
-
-<para>
-
-HACER: escribir algo cuando funcione.
-
-</para>
-  </sect2>
-
-  <sect2 id="crypto-troubleshooting">
-  <title>Solucionar problemas</title>
-
-<para>
-
-Tendrá que montar manualmente los volúmenes cifrados si no se pudieron montar
-porque no introdujo bien la clave. Aquí se dan ciertos casos distintos:
-
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-
-El primer caso está asociado a la partición raíz. El proceso de arranque no
-podrá continuar y se parará si no se monta ésta correctamente, con lo que
-tendrá que reiniciar el equipo e intentarlo de nuevo.
-
-</para></listitem>
-<listitem><para>
-
-El caso más sencillo se da en los volúmenes cifrados que guardan datos
-como pueda ser el caso de 
-<filename>/home</filename> or <filename>/srv</filename>. Simplemente
-puede intentar montarlso de nuevo tras el arranque. En el caso de
-«loop-AES» se hace con una sola operación:
-
-<informalexample><screen>
-<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
-<prompt>Password:</prompt>
-</screen></informalexample>
-
-donde debería reemplazar <replaceable>/mount_point</replaceable> por el
-directorio correspondiente (p.ej. <filename>/home</filename>).  La única
-diferencia con el montaje normal de sistemas de ficheros es que se le
-preguntará la contraseña para este volumen.
-
-</para><para>
-
-Es un poco más complicado para el caso de «dm-crypt». Primero tendrá 
-que registrar los volúmenes con el <application>device mapper</application>
-ejecutando:
-
-<informalexample><screen>
-<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
-</screen></informalexample>
-
-Esto hará que se sondeen todos los volúmenes descritos
-en <filename>/etc/crypttab</filename> y se crearán todos los dispositivos
-necesarios en el directorio <filename>/dev</filename> tras introducir
-la contraseña correctamente. Se omitirán los volúmenes que ya estén
-registrados por lo que puede repetir esta orden tantas veces como
-necesite. Una vez que haya registrado con éxito el dispositivo sólo
-tiene que montarlos de la forma habitual:
-
-<informalexample><screen>
-<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
-</screen></informalexample>
-
-</para></listitem>
-<listitem><para>
-
-El sistema debería arrancar aún cuando no se puedan montar los
-sistemas de ficheros que no contengan ficheros del sistema críticos
-(<filename>/usr</filename> o <filename>/var</filename>). Por lo que debería
-poder montar los volúmenes manualmente como se ha descrito anteriormente. Sin
-embargo, tendrá que arrancar o reiniciar los servicios que se ejecutan en su
-nivel de ejecución normal porque es muy probable que no se hayan podido
-arrancar. La forma más fácil de conseguir ésto es cambiando al primer nivel de
-ejecución y volver al nivel actual introduciendo lo siguiente:
-
-<informalexample><screen>
-<prompt>#</prompt> <userinput>init 1</userinput>
-</screen></informalexample>
-
-y en el indicador del intéprete de ordenes pulseo 
-<keycombo> <keycap>Control</keycap> <keycap>D</keycap> </keycombo>
-cuando se le pregunte la contraseña de root.
-
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
- </sect1>
-
+&mount-encrypted.xml;
 
  <sect1 id="login">
  <title>Acceso</title>
@@ -368,51 +252,62 @@ encontrará algunas guías que le indicarán dónde empezar a buscar.
 
 La documentación que acompaña a los programas que ha instalado se
 encuentra en el directorio <filename>/usr/share/doc/</filename>, bajo
-un subdirectorio cuyo nombre coincide con el del programa. Por
-ejemplo, la «Guía de usuario de APT» que le indica cómo utilizar
-<command>apt</command> para instalar otros programas en su sistema, se
-encuentra en
-<filename>/usr/share/doc/apt/guide.html/index.html</filename>.
+un subdirectorio cuyo nombre coincide con el del programa (o, más
+exactamente, el nombre del paquete Debian que contiene el
+programa). Sin embargo podrá encontrar documentación más extensa en
+paquetes independientes de documentación que generalmente no se
+instalan por omisión. Por ejemplo, puede encontrar documentación de la
+herramienta de gestión de paquetes <command>apt</command> en los
+paquetes <classname>apt-doc</classname> o
+<classname>apt-howto</classname>.
 
 </para><para>
 
 
 Además, existen algunos directorios especiales dentro de la jerarquía
 de <filename>/usr/share/doc/</filename>. Puede encontrar los CÓMOs de
-Linux en formato <emphasis>.gz</emphasis>, en
+Linux en formato <emphasis>.gz</emphasis> (comprimido), en
 <filename>/usr/share/doc/HOWTO/en-txt/</filename>. Encontrará un
 índice navegable de la documentación instalada en
 <filename>/usr/share/doc/HTML/index.html</filename> una vez
-instale <command>dhelp</command>.
+instale <classname>dhelp</classname>.
 
 </para><para>
 
-Una forma fácil de consultar estos documentos es ejecutar
-<userinput>«cd /usr/share/doc/»</userinput>, y escribir
-<userinput>«lynx»</userinput> seguido de un espacio y un punto (el
-punto indica el directorio actual).
+Una forma fácil de consultar estos documentos utilizando un navegador
+con interfaz de texto es ejecutar las siguientes órdenes:
+
+<informalexample><screen>
+$ cd /usr/share/doc/
+$ w3c .
+</screen></informalexample>
+
+El punto después de la orden <command>w3c</command> le indica que debe
+mostrar los contenidos del directorio actual.
+
+ </para><para>
+ 
+Puede utilizar el navegador web del entorno gráfico de escritorio si
+tiene instalado uno. Arranque el navegador web del menú de aplicación
+y escriba <userinput>/usr/share/doc/</userinput> en la barra de
+direcciones.
 
 </para><para>
 
-También puede escribir <userinput>«info
-<replaceable>programa</replaceable>»</userinput> o <userinput>«man
-<replaceable>programa</replaceable>»</userinput> para consultar la
+También puede escribir <userinput>info
+<replaceable>programa</replaceable></userinput> o <userinput>man
+<replaceable>programa</replaceable></userinput> para consultar la
 documentación de la mayoría de los programas disponibles en la línea
 de órdenes. Si escribe <userinput>«help»</userinput> se le mostrará una
 ayuda sobre las órdenes del guión de línea de órdenes. Habitualmente,
 si escribe el nombre de un programa seguido de
 <userinput>--help</userinput> se le mostrará un breve resumen del uso
 de este programa. Si la salida es mayor que el tamaño de su pantalla,
-escriba <userinput>| more</userinput> después de la llamada anterior
+escriba <userinput>|&nbsp;more</userinput> después de la llamada anterior
 para hacer que los resultados se pausen antes de que sobrepasen el
 tamaño de la pantalla. Puede también ver la lista de todos los
 programas disponibles que empiezan con una cierta letra. Simplemente,
 escriba la letra en cuestión y luego presione dos veces el tabulador.
-
-</para><para>
-
-Puede leer una introducción más completa a Debian y GNU/Linux en
-<filename>/usr/share/doc/debian-guide/html/noframes/index.html</filename>.
 
 </para>
 
