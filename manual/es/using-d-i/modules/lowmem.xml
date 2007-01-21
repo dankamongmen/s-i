@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-15"?>
-<!-- original version: 16990 -->
+<!-- original version: 43603 -->
 <!-- revisado jfs, 31 octubre 2004 -->
 
   <sect3 id="lowmem">
-  <title>Comprobación de la memoria disponible</title>
+  <title>Comprobación de la memoria disponible / modo de baja memoria</title>
 
 <para>
 
@@ -16,8 +16,48 @@ sistema de instalación que, con un poco de suerte, le permitirán instalar
 
 No todos los componentes estarán disponibles a lo largo de
 una instalación con poca memoria.
-Una de las limitaciones que se encontrará es que no podrá seleccionar el lenguaje
-en el que se hará la instalación (el lenguaje predeterminado será el inglés).
+La primera medida que se toma para reducir el consumo de memoria en el
+instalador es deshabilitar las traducciones, lo que significa que
+la instalación sólo la podrá hacer en inglés. Por supuesto, puede localizar
+el sistema que haya instalado una vez haya terminado la instalación.
+ 
+</para><para>
+
+El instalador intentará reducir el consumo de memoria cargando
+solamente los componentes esenciales para completar una instalación
+básica si lo anterior no es suficiente. Esto reduce la funcionalidad
+del sistema de instalación. Se le dará la oportunidad de cargar
+componentes adicionales de forma manual pero debe tener en cuenta que
+cada componente que cargue consumirá más memoria y podría hacer que
+toda la instalación fallara.
+
+</para><para>
+
+Si el instalador se ejecuta en modo de baja memoria es recomendable
+crear una partición de intercambio relativamente grande (64 a 128 MB).
+La partición de swap se utilizará como memoria virtual y por tanto
+incrementa la cantidad de memoria disponible al sistema. El instalador
+activará la partición de intercambio lo antes posible en el proceso de
+instalación. Tenga en cuenta que si se usa demasiado la zona de
+intercambio se degradará el rendimiento de su sistema y puede tener
+como consecuencia una alta actividad en el disco.
+
+</para><para>
+
+A pesar de estas medidas, es posible que su sistema se congele, que se
+produzcan errores inesperados o que el núcleo mate procesos porque el
+sistema se quede sin memoria (si esto sucede aparecerán mensajes
+diciendo <quote>Out of memory</quote>, es decir, «Sin memoria» en
+VT4 y en el syslog).
+
+</para><para>
+
+Por ejemplo, se ha reportado que la creación de un sistema de ficheros
+ext3 grande falla en el modo de baja memoria cuando no hay suficiente
+espacio de intercambio. Si el tener una partición de intercambio no
+ayuda, intente crear el sistema de ficheros como si fuera ext2 (que es
+un componente esencial del instalador). Puede cambiar una partición
+ext2 a ext3 después de la instalación.
 
 </para>
    </sect3>
