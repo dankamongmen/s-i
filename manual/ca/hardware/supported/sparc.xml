@@ -1,82 +1,88 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 28997 -->
+<!-- original version: 43528 -->
 
-
-  <sect2 arch="sparc" id="sparc-cpus"><title>Suport de CPU, plaques base i
-    vídeo</title>
+  <sect2 arch="sparc" id="sparc-cpus">
+    <title>Suport de CPU i plaques base</title>
 <para>
 
-Els ports de <emphasis>&architecture;</emphasis> suporten diferents
-tipus de sistemes Sparc. Els identificadors més comuns pels sistemes
-Sparc són sun4c, sun4m, sun4d i sun4u. En aquest moment no es suporta bé
-el maquinari antic sun4. Però els altres sí que es suporten. El sun4d és
-el que menys s'ha provat d'aquests, així que espereu problemes respecte a
-l'estabilitat del nucli. Els sun4c i sun4m, els més comuns del maquinaris
-vells de Sparc, inclouen sistemes com SparcStation 1, 1+, IPC, IPX i el
-SparcStation LX, 5, 10 i 20 respectivament. Els sistemes de tipus
-UltraSPARC tenen l'identificador sun4u, i es suporten utilitzant el
-conjunt d'imatges sun4u. Alguns que tenen aquest identificador, es sabut
-que no estan suportats. Es sap que no estan suportats els multi-computadors
-AP1000 i el Tadpole Sparcbook 1. Vegeu
-<ulink url="&url-sparc-linux-faq;">Linux for SPARCProcessors FAQ</ulink>
-per una informació completa.
+Existeixen nombroses subarquitectures diferents pel maquinari basat
+en Sparc, identificades pels següents noms: sun4, sun4c, sun4d, sun4m,
+sun4u o sun4v. A continuació es mostra una llista que descriu quines
+màquines inclouen i quin nivell de suport s'espera per cada una d'elles.
 
 </para>
 
-   <sect3><title>Configuració de la memòria</title>
+<variablelist>
+<varlistentry>
+<term>sun4, sun4c, sun4d</term>
+
+<listitem><para>
+
+Aquestes subarquitectures inclouen algunes de les màquines antigues de
+32 bits, les quals ja no estan suportades. Per a una llista completa,
+consulteu si us plau la
+<ulink url="http://en.wikipedia.org/wiki/SPARCstation">pàgina de
+la Viquipèdia SPARCstation</ulink>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4m</term>
+
+<listitem><para>
+
+Actualment, sun4m és la única subarquitectura de 32 bits (sparc32) que
+se suporta. Les màquines més populars d'aquesta classe són l'Sparcstation
+4, 5, 10 i 20.
+
+</para><para>
+
+Noteu que el multiprocés simètric (SMP) &mdash; la capacitat d'executar
+processos en múltiples processadors &mdash; no està suportat en aquest
+maquinari, degut a problemes d'estabilitat amb aquestes configuracions.
+El nucli uniprocessador (UP) per a l'sparc32 que hi ha disponible
+funcionarà correctament en màquines multiprocessador, si bé només
+activarà i utilitzarà la primera CPU.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4u</term>
+
+<listitem><para>
+
+Aquesta subarquitectura inclou totes les màquines de 64 bits (sparc64)
+basades en el processador UltraSparc i els seus clons. La majoria de
+les màquines estan ben suportades, si bé per algunes podeu tenir algun
+problema quan arrenqueu des del CD degut a errors al microprogramari o
+al gestor d'arrencada (problema que es pot evitar utilitzant l'arrencada
+via xarxa). Utilitzeu el nucli sparc64 o sparc64-smp en les configuracions
+UP i SMP respectivament.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>sun4v</term>
+
+<listitem><para>
+
+Aquesta és la darrera inclusió a la família Sparc, la qual inclou màquines
+basades en les CPU Niagara multinucli. De moment, aquestes CPU només estan
+disponibles als servidors T1000 i T2000 de Sun, i estan ben suportades.
+Utilitzeu el nucli sparc64-smp.
+
+</para></listitem>
+</varlistentry>
+</variablelist>
+
 <para>
 
-Algunes estacions de treball antigues de Sun, especialment les Sun IPX i
-Sun IPC tenen uns bancs de memòria a direccions fixes a la memòria física.
-Així si els bancs no s'han omplit, hi haurà forats a l'espai de memòria
-física. La instal·lació de Linux necessita un bloc de memòria contigu on
-carregar el nucli i el disc RAM inicial. Si no està disponible s'obtindrà
-un <quote>Data Access Exception</quote>.
-
-</para><para>
-Així que heu de configurar la memòria de manera que el bloc de memòria
-més baix sigui continu i de al menys 8 MiB. Als abans esmentats IPX i IPC,
-els bancs de memòria esta mapada a blocs de 16 MiB. Açò significa en la
-pràctica que es disposa d'un SIMM al banc zero suficientment gran per
-contenir el nucli i el RAMdisk. En aquest cas 4 MiB <emphasis>no</emphasis>
-són suficients.
-
-</para><para>
-
-Exemple:
-A un Sun IPX disposeu de un SIMM de 16 MiB i un de 4 MiB. Hi ha
-quatre bancs SIMM (0,1,2,3). [El banc zero és més enllà dels connectors
-SBUS]. Per tant hauríeu d'instal·lar el SIMM de 16 MiB al bank 0; i
-aleshores es recomana que instal·leu el SIMM de 4 MiB al banc 2.
+Noteu que les CPU SPARC64 de Fujitsu utilitzades per la família de
+servidors PRIMEPOWER no estan suportades degut a la manca de suport per
+part del nucli Linux.
 
 </para>
-   </sect3>
-
-   <sect3><title>Configuració dels gràfics</title>
-<para>
-
-Sobretot en el cas de les estacions de treball velles de Sun, és molt
-normal que tingueu una framebuffer en placa que s'ha reemplaçat (per
-exemple per la bwtwo al Sun IPC), i que tingueu una targeta SBUS
-d'acceleració del buffer a una ranura SBUS. A Solaris/SunOS no suposa
-cap problema ja que s'inicialitzen les dos targetes.
-
-</para><para>
-
-Però a Linux açò pot portar problemes, pot passar que el monitor PROM
-d'arrencada pot mostrar la seva sortida a aquesta targeta addicional; i
-per altra banda els missatges d'arrencada del nucli de Linux dirigir-se
-a la targeta original a la placa, <emphasis>no</emphasis> deixant els
-missatges d'error a la pantalla, amb la màquina aparentment encallada
-carregant el RAMdisk.
-
-</para><para>
-
-Per evitar aquest problema, connecteu el monitor (si fa falta) a la
-targeta de vídeo amb la ranura amb nombre SBUS més baix (la targeta a
-la placa base conta com la ranura externa més baixa). També podeu
-alternativament utilitzar una consola serie.
-
-</para>
-   </sect3>
   </sect2>
