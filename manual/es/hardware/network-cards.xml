@@ -1,128 +1,55 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 43693 -->
 <!-- revisado por Steve Langasek -->
 
  <sect1 id="network-cards">
  <title>Hardware de conectividad de red</title>
 
-<para arch="x86">
+<para>
 
-<!-- last updated for kernel-image_2.0.36-2 -->
+Casi cualquier tarjeta de interfaz de red (también llamadas «network
+interface card» o NIC, n. del t.)  que el núcleo de Linux soporte
+estará también soportada en el sistema de instalación. Los
+controladores modulares se cargarán automáticamente por regla general.
 
-La mayoría de tarjetas las de red (NIC, «network interface card»
-n. del t.) PCI y muchas ISA están soportadas.
-Algunas interfaces de red no están soportadas por los discos de instalación
-de Debian, este es el caso de las tarjetas y protocolos AX.25;
-tarjetas NI16510 EtherBlaster; tarjetas Schneider &amp; Koch G16;
-y la tarjeta de red integrada Zenith Z-Note. Las tarjetas de red
-Microchannel (MCA) no están soportadas por el sistema de instalación
-estándar, pero vea <ulink url="&url-linux-mca;">Linux en MCA</ulink> para
-algunas instrucciones (aunque antiguas).
+<phrase arch="x86">Esto incluye la mayoría de las tarjetas PCI y PCMCIA.</phrase>
+<phrase arch="i386">También se soporta muchas tarjetas ISA antiguas.</phrase>
 
-Los discos de instalación no soportan redes FDDI, tanto para las
-tarjetas como los protocolos.
-
-<!-- Sin embargo, puede crear un núcleo que
-soporte cualquier otra tarjeta y luego sustituirlo en el
-instalador (vea <xref linkend="rescue-replace-kernel"/>). -->
-
-</para><para arch="x86">
-
-Con respecto a RDSI (ISDN), el protocolo de canal D para el (antiguo)
-1TR6 alemán no está soportado; las tarjetas RDSI Spellcaster BRI
-tampoco están soportadas por el &d-i;.
-
-</para>
-
-<para arch="m68k">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo Linux debería también
-estar soportada por los discos de instalación. Puede que necesite
-cagar su controlador de red como un módulo. De nuevo, vea
-<ulink url="&url-m68k-faq;"></ulink> para más detalles.
-
-</para>
-
-<para arch="sparc">
-
-El núcleo de arranque soporta directamente las siguientes tarjetas de red
-(NICs):
-
-<itemizedlist>
- <listitem><para>
-
-Sun LANCE
-
-
-</para></listitem>
- <listitem><para>
-
-Sun Happy Meal
-
-
-</para></listitem>
-</itemizedlist>
+<phrase arch="m68k">De nuevo, consulte <ulink url="&url-m68k-faq;"></ulink>
+para más detalles.</phrase>
 
 </para><para arch="sparc">
 
-Las siguientes tarjetas de red están soportas como
-módulos. Se podrán activar una vez que se haya instalado los
-controladores en la instalación. No obstante, debería ser capaz de arrancar
-desde estos dispositivos gracias a la magia de la OpenPROM:
+Esta lista incluye muchas de las tarjetas PCI genéricas (en aquellos
+sistemas que tienen PCI) y las siguientes NICs de Sun:
 
 <itemizedlist>
- <listitem><para>
+<listitem><para>
+
+Sun LANCE
+
+</para></listitem>
+<listitem><para>
+
+Sun Happy Meal
+
+</para></listitem>
+<listitem><para>
 
 Sun BigMAC
 
-
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 Sun QuadEthernet
 
 </para></listitem>
- <listitem><para>
+<listitem><para>
 
 MyriCOM Gigabit Ethernet
 
 </para></listitem>
 </itemizedlist>
-
-</para><para arch="alpha">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo,
-puede que deba cargar su controlador de red como módulo.
-
-En el
-núcleo se ha compilado el soporte para la tarjeta Ethernet DECChip
-(Tulip) incluida en muchos modelos Alpha.
-Deberá cargar el controlador de red como módulo para otras tarjetas.
-
-</para><para arch="powerpc">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo, puede
-que deba cargar su controlador de red como módulo.
-
-</para><para arch="hppa">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo, puede
-que deba cargar su controlador de red como módulo.
-
-</para><para arch="ia64">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo, puede
-que deba cargar su controlador de red como módulo.
-
-</para><para arch="mips">
-
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo, puede
-que deba cargar su controlador de red como módulo.
 
 </para><para arch="mipsel">
 
@@ -132,10 +59,6 @@ opcionales de red TurboChannel.
 
 </para><para arch="s390">
 
-Cualquier tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Todos los
-controladores de red están compilados como módulos de modo que puede
-necesitar cargar uno primero durante la configuración de red inicial.
 La lista de dispositivos de red soportados es:
 
 <itemizedlist>
@@ -151,77 +74,136 @@ OSA-2 Token Ring/Ethernet y OSA-Express Fast Ethernet (non-QDIO)
 </para></listitem>
 <listitem><para>
 
-Inter-User Communication Vehicle (IUCV) &mdash; disponible solamente
-para huéspedes VM
-
-</para></listitem>
-<listitem><para>
-
-qeth: OSA-Express en modo QDIO / HiperSockets
+OSA-Express en modo QDIO, HiperSockets y Guest-LANs
 
 </para></listitem>
 </itemizedlist>
+
+</para><para arch="x86">
+
+Con respecto a RDSI (ISDN), el protocolo de canal D para el (antiguo)
+1TR6 alemán no está soportado; las tarjetas RDSI Spellcaster BRI
+tampoco están soportadas por el &d-i;. No está soportada la
+utilización de RDSI durante la instalación.
 
 </para>
 
-<para arch="arm">
+  <sect2 arch="not-s390" id="nics-firmware">
+  <title>Controladores que necesitan firmware</title>
+<para>
 
-Los siguientes dispositivos de red están soportados directamente
-por los discos de arranque en máquinas Netwinder y CATS:
+El sistema de instalación no provee de facilidades actualmente para
+descargar firmware. Esto significa que cualquier tarjeta de red que
+utilice una controladora que necesite el firmware para poderse cargar
+no está soportada por omisión.
 
-<itemizedlist>
- <listitem><para>
+</para><para>
 
-    NE2000 basada en PCI
+Aún puede instalar &debian; utilizando una imagen completa de CD-ROM o
+DVD si no puede utilizar ninguna otra tarjeta de red. Elija la opción
+que no configure la red e instale el sistema sólo con los paquetes
+disponibles en el CD/DVD. Una vez haya hecho esto podrá instalar el
+controlador y el firmware que necesita después de terminar la
+instalación (después del reinicio del sistema) y configurar la red
+manualmente. Tenga en cuenta que el firmware puede estar empaquetado
+al margen de la controladora y no estar disponible en la sección
+<quote>main</quote> del archivo de &debian;.
+
+</para><para>
+
+Si la controladora en sí <emphasis>está</emphasis> soportada puede
+utilizar la tarjeta durante la instalación sin más que copiar el
+firmware desde algún medio a
+<filename>/usr/lib/hotplug/firmware</filename>. No se olvide copiar el
+firmware a esta misma ubicación en el sistema instalado antes de
+reiniciar al final de la instalación.
 
 
-</para></listitem>
- <listitem><para>
-
-    DECchip Tulip
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Los siguientes dispositivos de red están soportados directamente por
-los discos de arranque en RiscPCs:
-
-<itemizedlist>
- <listitem><para>
-
-    Ether1
-
-</para></listitem>
- <listitem><para>
-
-    Ether3
-
-</para></listitem>
- <listitem><para>
-
-    EtherH
-
-</para></listitem>
-</itemizedlist>
-
-</para><para arch="arm">
-
-Si su tarjeta está mencionada en las listas anteriores puede realizar la
-instalación completamente desde la red, sin necesidad de CD-ROMs o disquetes,
-
-</para><para arch="arm">
-
-Cualquier otra tarjeta de red (NIC) soportada por el núcleo de
-Linux debería estar soportada por los discos de arranque. Sin embargo, puede
-que deba cargar su controlador de red como módulo; esto significa
-que tendrá que instalar el núcleo del sistema operativo y los módulos
-usando algún otro dispositivo.
-
-</para><para arch="ia64">
-
-Aún no hay información del hardware de este tipo soportado en &architecture;.
 </para>
+  </sect2>
+
+  <sect2 condition="supports-wireless" id="nics-wireless">
+  <title>Tarjetas de red inalámbricas</title>
+<para>
+
+Existe un buen soporte de la mayoría de las tarjetas inalámbricas,
+pero con un factor que se debe tener en cuenta. Una gran cantidad de
+adaptadores inalámbricos han de utilizarse con controladores que o
+bien no son libres o bien no se han aceptado en el núcleo oficial
+Linux. Estas tarjetas generalmente pueden configurarse para que
+funcionen en &debian;, pero no están soportadas durante la instalación.
+
+</para><para>
+
+Aún puede instalar &debian; utilizando una imagen completa de CD-ROM o
+DVD si no puede utilizar ninguna otra tarjeta de red. Siga el mismo
+procedimiento que se describe más arriba para tarjetas que necesitan
+de un firmware.
+
+</para><para>
+
+En algunos casos el controlador que necesita puede no estar disponible
+como paquete Debian. Deberá comprobar si existe código fuente
+disponible en Internet y compilar el controlador vd. mismo. Cómo hacer
+ésto está fuera del ámbito de este manual.
+<phrase arch="x86">Si no hay ningún controlador de Linux disponible
+puede utilizar como último recurso el paquete
+<classname>ndiswrapper</classname> que le permite utilizar un
+controlador de Windows.</phrase>
+
+</para>
+  </sect2>
+
+  <sect2 arch="sparc" id="nics-sparc-trouble">
+  <title>Problemas conocidos para &arch-title;</title>
+<para>
+
+Existen algunos problemas conocidos con tarjetas de red específicas
+que merece la pena tratar aquí.
+
+</para>
+
+   <sect3><title>Conflicto entre los controladores tulip y dfme</title>
+<!-- BTS: #334104; may also affect other arches, but most common on sparc -->
+<para>
+
+<!-- BTS: #334104; may also affect other arches, but most common on
+sparc --> Existen algunas tarjetas PCI que tienen la misma
+identificación PCI pero están soportados por controladores
+relacionados, pero distintos. Algunas tarjetas funcionan con el
+controlador <literal>tulip</literal> y otras con el controlador
+<literal>dfme</literal>. El núcleo no puede distinguir entre ellas ya
+que tienen la misma identificación, con lo que no está seguro de qué
+controlador se debe cargar. Si se instala el controlador incorrecto
+puede que no funcione la tarjeta de red o que funcione mal.
+
+</para><para>
+
+Este es un problema habitual en sistemas Netra con tarjetas Davicom
+(compatible DEC-Tulip). En estos equipos el controlador
+<literal>tulip</literal> es seguramente el que deba utilizar.
+
+</para><para>
+
+La solución durante la instalación es cambiar a un intérprete de
+órdenes, quitar el módulo del controlador incorrecto utilizando
+<userinput>modprobe -r <replaceable>modulo</replaceable></userinput>
+(o quitar ambos, si están los dos). Y después cargar el módulo
+correcto con <userinput>modprobe
+<replaceable>modulo</replaceable></userinput>.
+
+</para>
+   </sect3>
+
+   <sect3><title>Sun B100 blade</title>
+<!-- BTS: #384549; should be checked for kernels >2.6.18 -->
+<para>
+
+El controlador de red <literal>cassini</literal> no funciona en
+sistemas blade Sun B100.
+
+</para>
+   </sect3>
+  </sect2>
 
  </sect1>
