@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-07 13:24+0000\n"
+"POT-Creation-Date: 2007-01-22 23:21+0000\n"
 "PO-Revision-Date: 2007-01-07 17:48+0300\n"
 "Last-Translator: D-R L10N Team <debian-l10n-russian@lists.debian.org>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -333,84 +333,45 @@ msgid "Setting Up Your Mouse"
 msgstr "Установка мыши"
 
 #. Tag: para
-#: random-bits.xml:127
+#: random-bits.xml:126
 #, no-c-format
 msgid ""
 "The mouse can be used in both the Linux console (with gpm) and the X window "
-"environment. The two uses can be made compatible if the gpm repeater is used "
-"to allow the signal to flow to the X server as shown: "
-"<informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (repeater)        (symlink)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> Set the repeater protocol to be raw (in "
-"<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
-"protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/X11/"
-"XF86Config-4</filename>."
+"environment. Normally, this is a simple matter of installing <filename>gpm</"
+"filename> and the X server itself. Both should be configured to use "
+"<filename>/dev/input/mice</filename> as the mouse device. The correct mouse "
+"protocol is named <userinput>exps2</userinput> in gpm, and "
+"<userinput>ExplorerPS/2</userinput> in X. The respective configuration files "
+"are <filename>/etc/gpm.conf</filename> and <filename>/etc/X11/xorg.conf</"
+"filename>."
 msgstr ""
-"Мышь можно использовать одновременно и в консоли Linux (с помощью gpm) и в "
-"среде X window. Это возможно, если использовать повторитель gpm, который "
-"который передаёт сигналы ещё и X серверу: <informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (repeater)        (symlink)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> Установите протокол повторителя в raw (в файле "
-"<filename>/etc/gpm.conf</filename>), а в настройках X фактический протокол "
-"обмена данными с мышью (в файле <filename>/etc/X11/XF86Config</filename> или "
-"<filename>/etc/X11/XF86Config-4</filename>)."
 
 #. Tag: para
-#: random-bits.xml:139
+#: random-bits.xml:137
 #, no-c-format
 msgid ""
-"This approach to use gpm even in X has advantages when the mouse is "
-"unplugged inadvertently. Simply restarting gpm with "
-"<informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> will re-connect the mouse in software without "
-"restarting X."
+"Certain kernel modules must be loaded in order for your mouse to work. In "
+"most cases the correct modules are autodetected, but not always for old-"
+"style serial and bus mice<footnote> <para> Serial mice usually have a 9-hole "
+"D-shaped connector; bus mice have an 8-pin round connector, not to be "
+"confused with the 6-pin round connector of a PS/2 mouse or the 4-pin round "
+"connector of an ADB mouse. </para> </footnote>, which are quite rare except "
+"on very old computers. Summary of Linux kernel modules needed for different "
+"mouse types: <informaltable><tgroup cols=\"2\"><thead> <row> <entry>Module</"
+"entry> <entry>Description</entry> </row> </thead><tbody> <row> "
+"<entry>psmouse</entry> <entry>PS/2 mice (should be autodetected)</entry> </"
+"row> <row> <entry>usbhid</entry> <entry>USB mice (should be autodetected)</"
+"entry> </row> <row> <entry>sermouse</entry> <entry>Most serial mice</entry> "
+"</row> <row> <entry>logibm</entry> <entry>Bus mouse connected to Logitech "
+"adapter card</entry> </row> <row> <entry>inport</entry> <entry>Bus mouse "
+"connected to ATI or Microsoft InPort card</entry> </row> </tbody></tgroup></"
+"informaltable> To load a mouse driver module, you can use the "
+"<command>modconf</command> command (from the package with the same name) and "
+"look in the category <userinput>kernel/drivers/input/mouse</userinput>."
 msgstr ""
-"Такой подход с использованием gpm даже в X имеет преимущество, если мышь "
-"отключат по неосторожности. Простой перезапуск gpm командой "
-"<informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> подключит мышь в программе заново без "
-"перезапуска X."
 
 #. Tag: para
-#: random-bits.xml:148
-#, no-c-format
-msgid ""
-"If gpm is disabled or not installed for some reason, make sure to set X to "
-"read directly from a mouse device such as /dev/psaux. For details, refer to "
-"the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/en-txt/"
-"mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
-"<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-xorg;"
-"current/doc/html/mouse.html\">README.mouse</ulink>."
-msgstr ""
-"Если gpm выключен или не установлен по какой-то причине, убедитесь что X "
-"сервер настроен на чтение непосредственно с устройства мыши, например, из /"
-"dev/psaux. Подробней смотрите 3-Button Mouse mini-Howto в <filename>/usr/"
-"share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, <userinput>man "
-"gpm</userinput>, <filename>/usr/share/doc/gpm/FAQ.gz</filename> и <ulink url="
-"\"&url-xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
-
-#. Tag: para
-#: random-bits.xml:158
-#, no-c-format
-msgid ""
-"For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
-"X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/dev/input/"
-"mice\"</userinput>."
-msgstr ""
-"Для PowerPC в <filename>/etc/X11/XF86Config</filename> или <filename>/etc/"
-"X11/XF86Config-4</filename> установите устройство мышь в <userinput>\"/dev/"
-"input/mice\"</userinput>."
-
-#. Tag: para
-#: random-bits.xml:164
+#: random-bits.xml:184
 #, no-c-format
 msgid ""
 "Modern kernels give you the capability to emulate a three-button mouse when "
@@ -422,7 +383,7 @@ msgstr ""
 "<filename>/etc/sysctl.conf</filename>."
 
 #. Tag: screen
-#: random-bits.xml:170
+#: random-bits.xml:191
 #, no-c-format
 msgid ""
 "# 3-button mouse emulation\n"
@@ -444,13 +405,13 @@ msgstr ""
 "# Для кодов других клавиш, используйте программу showkey."
 
 #. Tag: title
-#: random-bits.xml:177
+#: random-bits.xml:198
 #, no-c-format
 msgid "Disk Space Needed for Tasks"
 msgstr "Дисковое пространство, необходимое для задач"
 
 #. Tag: para
-#: random-bits.xml:194
+#: random-bits.xml:215
 #, no-c-format
 msgid ""
 "A standard installation for the i386 architecture, including all standard "
@@ -464,7 +425,7 @@ msgstr ""
 "занимает 230 МБ."
 
 #. Tag: para
-#: random-bits.xml:202
+#: random-bits.xml:223
 #, no-c-format
 msgid ""
 "In both cases this is the actual disk space used <emphasis>after</emphasis> "
@@ -481,7 +442,7 @@ msgstr ""
 "значительно больше места на диске."
 
 #. Tag: para
-#: random-bits.xml:211
+#: random-bits.xml:232
 #, no-c-format
 msgid ""
 "The following table lists sizes reported by aptitude for the tasks listed in "
@@ -496,7 +457,7 @@ msgstr ""
 "полученный сложением размеров."
 
 #. Tag: para
-#: random-bits.xml:218
+#: random-bits.xml:239
 #, no-c-format
 msgid ""
 "Note that you will need to add the sizes listed in the table to the size of "
@@ -513,61 +474,61 @@ msgstr ""
 "загрузки</quote> занимает место (временно) в <filename>/var</filename>."
 
 #. Tag: entry
-#: random-bits.xml:232
+#: random-bits.xml:253
 #, no-c-format
 msgid "Task"
 msgstr "Задача"
 
 #. Tag: entry
-#: random-bits.xml:233
+#: random-bits.xml:254
 #, no-c-format
 msgid "Installed size (MB)"
 msgstr "Размер после установки (МБ)"
 
 #. Tag: entry
-#: random-bits.xml:234
+#: random-bits.xml:255
 #, no-c-format
 msgid "Download size (MB)"
 msgstr "Размер загрузки (МБ)"
 
 #. Tag: entry
-#: random-bits.xml:235
+#: random-bits.xml:256
 #, no-c-format
 msgid "Space needed to install (MB)"
 msgstr "Требуемое место для установки (МБ)"
 
 #. Tag: entry
-#: random-bits.xml:241
+#: random-bits.xml:262
 #, no-c-format
 msgid "Desktop environment"
 msgstr "Окружение рабочего стола"
 
 #. Tag: entry
-#: random-bits.xml:242
+#: random-bits.xml:263
 #, no-c-format
 msgid "1267"
 msgstr "1267"
 
 #. Tag: entry
-#: random-bits.xml:243
+#: random-bits.xml:264
 #, no-c-format
 msgid "<entry>420</entry>"
 msgstr "<entry>420</entry>"
 
 #. Tag: entry
-#: random-bits.xml:244
+#: random-bits.xml:265
 #, no-c-format
 msgid "1667"
 msgstr "1667"
 
 #. Tag: entry
-#: random-bits.xml:248
+#: random-bits.xml:269
 #, no-c-format
 msgid "Laptop"
 msgstr "Для ноутбука"
 
 #. Tag: para
-#: random-bits.xml:250
+#: random-bits.xml:271
 #, no-c-format
 msgid ""
 "There is a large overlap of the Laptop task with the Destop environment "
@@ -579,169 +540,169 @@ msgstr ""
 "дополнительно всего лишь несколько мегабайт."
 
 #. Tag: entry
-#: random-bits.xml:257
+#: random-bits.xml:278
 #, no-c-format
 msgid "<entry>50</entry>"
 msgstr "<entry>50</entry>"
 
 #. Tag: entry
-#: random-bits.xml:258
+#: random-bits.xml:279
 #, no-c-format
 msgid "<entry>17</entry>"
 msgstr "<entry>17</entry>"
 
 #. Tag: entry
-#: random-bits.xml:259
+#: random-bits.xml:280
 #, no-c-format
 msgid "<entry>67</entry>"
 msgstr "<entry>67</entry>"
 
 #. Tag: entry
-#: random-bits.xml:263
+#: random-bits.xml:284
 #, no-c-format
 msgid "Web server"
 msgstr "веб сервер"
 
 #. Tag: entry
-#: random-bits.xml:264
+#: random-bits.xml:285
 #, no-c-format
 msgid "<entry>35</entry>"
 msgstr "<entry>35</entry>"
 
 #. Tag: entry
-#: random-bits.xml:265
+#: random-bits.xml:286
 #, no-c-format
 msgid "<entry>11</entry>"
 msgstr "<entry>11</entry>"
 
 #. Tag: entry
-#: random-bits.xml:266
+#: random-bits.xml:287
 #, no-c-format
 msgid "<entry>46</entry>"
 msgstr "<entry>46</entry>"
 
 #. Tag: entry
-#: random-bits.xml:270
+#: random-bits.xml:291
 #, no-c-format
 msgid "Print server"
 msgstr "сервер печати"
 
 #. Tag: entry
-#: random-bits.xml:271
+#: random-bits.xml:292
 #, no-c-format
 msgid "<entry>277</entry>"
 msgstr "<entry>277</entry>"
 
 #. Tag: entry
-#: random-bits.xml:272
+#: random-bits.xml:293
 #, no-c-format
 msgid "<entry>79</entry>"
 msgstr "<entry>79</entry>"
 
 #. Tag: entry
-#: random-bits.xml:273
+#: random-bits.xml:294
 #, no-c-format
 msgid "<entry>356</entry>"
 msgstr "<entry>356</entry>"
 
 #. Tag: entry
-#: random-bits.xml:277
+#: random-bits.xml:298
 #, no-c-format
 msgid "DNS server"
 msgstr "DNS-сервер"
 
 #. Tag: entry
-#: random-bits.xml:278
+#: random-bits.xml:299
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: random-bits.xml:279
+#: random-bits.xml:300
 #, no-c-format
 msgid "<entry>1</entry>"
 msgstr "<entry>1</entry>"
 
 #. Tag: entry
-#: random-bits.xml:280
+#: random-bits.xml:301
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: random-bits.xml:284
+#: random-bits.xml:305
 #, no-c-format
 msgid "File server"
 msgstr "файловый сервер"
 
 #. Tag: entry
-#: random-bits.xml:285
+#: random-bits.xml:306
 #, no-c-format
 msgid "<entry>49</entry>"
 msgstr "<entry>49</entry>"
 
 #. Tag: entry
-#: random-bits.xml:286
+#: random-bits.xml:307
 #, no-c-format
 msgid "<entry>21</entry>"
 msgstr "<entry>21</entry>"
 
 #. Tag: entry
-#: random-bits.xml:287
+#: random-bits.xml:308
 #, no-c-format
 msgid "<entry>70</entry>"
 msgstr "<entry>70</entry>"
 
 #. Tag: entry
-#: random-bits.xml:291
+#: random-bits.xml:312
 #, no-c-format
 msgid "Mail server"
 msgstr "почтовый сервер"
 
 #. Tag: entry
-#: random-bits.xml:292
+#: random-bits.xml:313
 #, no-c-format
 msgid "<entry>13</entry>"
 msgstr "<entry>13</entry>"
 
 #. Tag: entry
-#: random-bits.xml:293
+#: random-bits.xml:314
 #, no-c-format
 msgid "<entry>5</entry>"
 msgstr "<entry>5</entry>"
 
 #. Tag: entry
-#: random-bits.xml:294
+#: random-bits.xml:315
 #, no-c-format
 msgid "<entry>18</entry>"
 msgstr "<entry>18</entry>"
 
 #. Tag: entry
-#: random-bits.xml:298
+#: random-bits.xml:319
 #, no-c-format
 msgid "SQL database"
 msgstr "база данных SQL"
 
 #. Tag: entry
-#: random-bits.xml:299
+#: random-bits.xml:320
 #, no-c-format
 msgid "<entry>24</entry>"
 msgstr "<entry>24</entry>"
 
 #. Tag: entry
-#: random-bits.xml:300
+#: random-bits.xml:321
 #, no-c-format
 msgid "<entry>8</entry>"
 msgstr "<entry>8</entry>"
 
 #. Tag: entry
-#: random-bits.xml:301
+#: random-bits.xml:322
 #, no-c-format
 msgid "<entry>32</entry>"
 msgstr "<entry>32</entry>"
 
 #. Tag: para
-#: random-bits.xml:307
+#: random-bits.xml:328
 #, no-c-format
 msgid ""
 "The <emphasis>Desktop</emphasis> task will install the GNOME desktop "
@@ -751,7 +712,7 @@ msgstr ""
 "среды рабочего стола Gnome."
 
 #. Tag: para
-#: random-bits.xml:314
+#: random-bits.xml:335
 #, no-c-format
 msgid ""
 "If you install in a language other than English, <command>tasksel</command> "
@@ -765,13 +726,13 @@ msgstr ""
 "зависит от языка; добавьте около 350 МБ на загрузку и установку."
 
 #. Tag: title
-#: random-bits.xml:329
+#: random-bits.xml:350
 #, no-c-format
 msgid "Installing &debian; from a Unix/Linux System"
 msgstr "Установка &debian; из системы Unix/Linux"
 
 #. Tag: para
-#: random-bits.xml:331
+#: random-bits.xml:352
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; from an existing Unix or Linux "
@@ -794,7 +755,7 @@ msgstr ""
 "относится к команде, вводимой в Debian chroot."
 
 #. Tag: para
-#: random-bits.xml:343
+#: random-bits.xml:364
 #, no-c-format
 msgid ""
 "Once you've got the new Debian system configured to your preference, you can "
@@ -811,13 +772,13 @@ msgstr ""
 "загрузочными или установочными носителями."
 
 #. Tag: title
-#: random-bits.xml:355
+#: random-bits.xml:376
 #, no-c-format
 msgid "Getting Started"
 msgstr "Начинаем"
 
 #. Tag: para
-#: random-bits.xml:356
+#: random-bits.xml:377
 #, no-c-format
 msgid ""
 "With your current *nix partitioning tools, repartition the hard drive as "
@@ -833,7 +794,7 @@ msgstr ""
 "если вы будете устанавливать окружение рабочего стола типа GNOME или KDE)."
 
 #. Tag: para
-#: random-bits.xml:364
+#: random-bits.xml:385
 #, no-c-format
 msgid ""
 "Next, create file systems on the partitions. For example, to create an ext3 "
@@ -851,7 +812,7 @@ msgstr ""
 "указывайте параметр <userinput>-j</userinput>."
 
 #. Tag: para
-#: random-bits.xml:374
+#: random-bits.xml:395
 #, no-c-format
 msgid ""
 "Initialize and activate swap (substitute the partition number for your "
@@ -875,7 +836,7 @@ msgstr ""
 "абсолютно произвольное."
 
 #. Tag: screen
-#: random-bits.xml:386
+#: random-bits.xml:407
 #, no-c-format
 msgid ""
 "# mkdir /mnt/debinst\n"
@@ -885,7 +846,7 @@ msgstr ""
 "# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 
 #. Tag: para
-#: random-bits.xml:389
+#: random-bits.xml:410
 #, no-c-format
 msgid ""
 "If you want to have parts of the filesystem (e.g. /usr) mounted on separate "
@@ -897,13 +858,13 @@ msgstr ""
 "перед тем как перейти к следующему этапу."
 
 #. Tag: title
-#: random-bits.xml:399
+#: random-bits.xml:420
 #, no-c-format
 msgid "Install <command>debootstrap</command>"
 msgstr "Установка <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:400
+#: random-bits.xml:421
 #, no-c-format
 msgid ""
 "The utility used by the Debian installer, and recognized as the official way "
@@ -928,7 +889,7 @@ msgstr ""
 "command>."
 
 #. Tag: para
-#: random-bits.xml:430
+#: random-bits.xml:451
 #, no-c-format
 msgid ""
 "Or, you can use the following procedure to install it manually. Make a work "
@@ -955,7 +916,7 @@ msgstr ""
 "суперпользователя (root)."
 
 #. Tag: screen
-#: random-bits.xml:445
+#: random-bits.xml:466
 #, no-c-format
 msgid ""
 "# ar -x debootstrap_0.X.X_all.deb\n"
@@ -967,18 +928,18 @@ msgstr ""
 "# zcat /full-path-to-work/work/data.tar.gz | tar xv"
 
 #. Tag: title
-#: random-bits.xml:451
+#: random-bits.xml:472
 #, no-c-format
 msgid "Run <command>debootstrap</command>"
 msgstr "Запуск <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:452
-#, no-c-format
+#: random-bits.xml:473
+#, fuzzy, no-c-format
 msgid ""
 "<command>debootstrap</command> can download the needed files directly from "
 "the archive when you run it. You can substitute any Debian archive mirror "
-"for <userinput>http.us.debian.org/debian</userinput> in the command example "
+"for <userinput>&archive-mirror;/debian</userinput> in the command example "
 "below, preferably a mirror close to you network-wise. Mirrors are listed at "
 "<ulink url=\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 msgstr ""
@@ -989,7 +950,7 @@ msgstr ""
 "\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 
 #. Tag: para
-#: random-bits.xml:461
+#: random-bits.xml:482
 #, no-c-format
 msgid ""
 "If you have a &releasename; &debian; CD mounted at <filename>/cdrom</"
@@ -1001,7 +962,7 @@ msgstr ""
 "URL: <userinput>file:/cdrom/debian/</userinput>"
 
 #. Tag: para
-#: random-bits.xml:467
+#: random-bits.xml:488
 #, no-c-format
 msgid ""
 "Substitute one of the following for <replaceable>ARCH</replaceable> in the "
@@ -1021,7 +982,7 @@ msgstr ""
 "<userinput>s390</userinput> или <userinput>sparc</userinput>."
 
 #. Tag: screen
-#: random-bits.xml:485
+#: random-bits.xml:506
 #, no-c-format
 msgid ""
 "# /usr/sbin/debootstrap --arch ARCH &releasename; \\\n"
@@ -1031,13 +992,13 @@ msgstr ""
 "     /mnt/debinst http://ftp.us.debian.org/debian"
 
 #. Tag: title
-#: random-bits.xml:491
+#: random-bits.xml:512
 #, no-c-format
 msgid "Configure The Base System"
 msgstr "Настройка базовой системы"
 
 #. Tag: para
-#: random-bits.xml:492
+#: random-bits.xml:513
 #, no-c-format
 msgid ""
 "Now you've got a real Debian system, though rather lean, on disk. "
@@ -1055,19 +1016,19 @@ msgstr ""
 "например:"
 
 #. Tag: screen
-#: random-bits.xml:502
+#: random-bits.xml:523
 #, no-c-format
 msgid "# export TERM=<replaceable>xterm-color</replaceable>"
 msgstr "# export TERM=<replaceable>xterm-color</replaceable>"
 
 #. Tag: title
-#: random-bits.xml:507
+#: random-bits.xml:528
 #, no-c-format
 msgid "Mount Partitions"
 msgstr "Монтирование разделов"
 
 #. Tag: para
-#: random-bits.xml:508
+#: random-bits.xml:529
 #, no-c-format
 msgid ""
 "You need to create <filename>/etc/fstab</filename>. "
@@ -1150,13 +1111,13 @@ msgstr ""
 "тем как продолжить, убедитесь, что proc смонтирована:"
 
 #. Tag: screen
-#: random-bits.xml:534
+#: random-bits.xml:555
 #, no-c-format
 msgid "# mount -t proc proc /proc"
 msgstr "# mount -t proc proc /proc"
 
 #. Tag: para
-#: random-bits.xml:536
+#: random-bits.xml:557
 #, no-c-format
 msgid ""
 "The command <userinput>ls /proc</userinput> should now show a non-empty "
@@ -1168,19 +1129,19 @@ msgstr ""
 "chroot:"
 
 #. Tag: screen
-#: random-bits.xml:542
+#: random-bits.xml:563
 #, no-c-format
 msgid "# mount -t proc proc /mnt/debinst/proc"
 msgstr "# mount -t proc proc /mnt/debinst/proc"
 
 #. Tag: title
-#: random-bits.xml:548
+#: random-bits.xml:569
 #, no-c-format
 msgid "Setting Timezone"
 msgstr "Настройка часового пояса"
 
 #. Tag: para
-#: random-bits.xml:549
+#: random-bits.xml:570
 #, no-c-format
 msgid ""
 "An option in the file <filename>/etc/default/rcS</filename> determines "
@@ -1194,7 +1155,7 @@ msgstr ""
 "это и выбрать часовой пояс."
 
 #. Tag: screen
-#: random-bits.xml:556
+#: random-bits.xml:577
 #, no-c-format
 msgid ""
 "# editor /etc/default/rcS\n"
@@ -1204,13 +1165,13 @@ msgstr ""
 "# tzconfig"
 
 #. Tag: title
-#: random-bits.xml:562
+#: random-bits.xml:583
 #, no-c-format
 msgid "Configure Networking"
 msgstr "Настройка сети"
 
 #. Tag: para
-#: random-bits.xml:563
+#: random-bits.xml:584
 #, no-c-format
 msgid ""
 "To configure networking, edit <filename>/etc/network/interfaces</filename>, "
@@ -1331,13 +1292,13 @@ msgstr ""
 "интерфейса (eth0, eth1 и т.д.) как вы и хотели."
 
 #. Tag: title
-#: random-bits.xml:604
+#: random-bits.xml:625
 #, no-c-format
 msgid "Configure Apt"
 msgstr "Настройка Apt"
 
 #. Tag: para
-#: random-bits.xml:605
+#: random-bits.xml:626
 #, no-c-format
 msgid ""
 "Debootstrap will have created a very basic <filename>/etc/apt/sources.list</"
@@ -1363,13 +1324,13 @@ msgstr ""
 "update</userinput> после изменения списка источников."
 
 #. Tag: title
-#: random-bits.xml:621
+#: random-bits.xml:642
 #, no-c-format
 msgid "Configure Locales and Keyboard"
 msgstr "Настройка раскладки клавиатуры и локалей"
 
 #. Tag: para
-#: random-bits.xml:622
+#: random-bits.xml:643
 #, no-c-format
 msgid ""
 "To configure your locale settings to use a language other than English, "
@@ -1389,7 +1350,7 @@ msgstr ""
 "</screen></informalexample> Для настройки раскладки клавиатуры (если нужно):"
 
 #. Tag: screen
-#: random-bits.xml:632
+#: random-bits.xml:653
 #, no-c-format
 msgid ""
 "# aptitude install console-data\n"
@@ -1399,7 +1360,7 @@ msgstr ""
 "# dpkg-reconfigure console-data"
 
 #. Tag: para
-#: random-bits.xml:634
+#: random-bits.xml:655
 #, no-c-format
 msgid ""
 "Note that the keyboard cannot be set while in the chroot, but will be "
@@ -1409,13 +1370,13 @@ msgstr ""
 "chroot, но настройка будет произведена после следующей перезагрузки."
 
 #. Tag: title
-#: random-bits.xml:644
+#: random-bits.xml:665
 #, no-c-format
 msgid "Install a Kernel"
 msgstr "Установка ядра"
 
 #. Tag: para
-#: random-bits.xml:645
+#: random-bits.xml:666
 #, no-c-format
 msgid ""
 "If you intend to boot this system, you probably want a Linux kernel and a "
@@ -1425,13 +1386,13 @@ msgstr ""
 "Linux и системный загрузчик. Определите доступные пакеты с ядрами с помощью:"
 
 #. Tag: screen
-#: random-bits.xml:650
+#: random-bits.xml:671
 #, no-c-format
 msgid "# apt-cache search linux-image"
 msgstr "# apt-cache search linux-image"
 
 #. Tag: para
-#: random-bits.xml:652
+#: random-bits.xml:673
 #, no-c-format
 msgid ""
 "If you intend to use a pre-packaged kernel, you may want to create the "
@@ -1443,7 +1404,7 @@ msgstr ""
 "файла:"
 
 #. Tag: screen
-#: random-bits.xml:658
+#: random-bits.xml:679
 #, no-c-format
 msgid ""
 "# Kernel image management overrides\n"
@@ -1465,7 +1426,7 @@ msgstr ""
 "link_in_boot = no"
 
 #. Tag: para
-#: random-bits.xml:660
+#: random-bits.xml:681
 #, no-c-format
 msgid ""
 "For detailed information about this file and the various options, consult "
@@ -1479,7 +1440,7 @@ msgstr ""
 "вашей системе."
 
 #. Tag: para
-#: random-bits.xml:667
+#: random-bits.xml:688
 #, no-c-format
 msgid ""
 "Then install the kernel package of your choice using its package name. "
@@ -1499,13 +1460,13 @@ msgstr ""
 "несколько вопросов во время установки для настройки этого файла."
 
 #. Tag: title
-#: random-bits.xml:681
+#: random-bits.xml:702
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Установка системного загрузчика"
 
 #. Tag: para
-#: random-bits.xml:682
+#: random-bits.xml:703
 #, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1520,7 +1481,7 @@ msgstr ""
 "чтобы сделать это."
 
 #. Tag: para
-#: random-bits.xml:689
+#: random-bits.xml:710
 #, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
@@ -1543,7 +1504,7 @@ msgstr ""
 "системе, из которой его вызвали)."
 
 #. Tag: para
-#: random-bits.xml:701
+#: random-bits.xml:722
 #, no-c-format
 msgid ""
 "Installing and setting up <classname>grub</classname> is as easy as: "
@@ -1567,13 +1528,13 @@ msgstr ""
 "filename>."
 
 #. Tag: para
-#: random-bits.xml:711
+#: random-bits.xml:732
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "Вот простой <filename>/etc/lilo.conf</filename> в качестве примера:"
 
 #. Tag: screen
-#: random-bits.xml:715
+#: random-bits.xml:736
 #, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1593,7 +1554,7 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:717
+#: random-bits.xml:738
 #, no-c-format
 msgid ""
 "Depending on which bootloader you selected, you can now make some additional "
@@ -1604,7 +1565,7 @@ msgstr ""
 "conf</filename>."
 
 #. Tag: para
-#: random-bits.xml:722
+#: random-bits.xml:743
 #, no-c-format
 msgid ""
 "For the <classname>grub</classname> bootloader, you should set the "
@@ -1629,7 +1590,7 @@ msgstr ""
 "quote>."
 
 #. Tag: para
-#: random-bits.xml:734
+#: random-bits.xml:755
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1649,7 +1610,7 @@ msgstr ""
 "которой его вызвали)."
 
 #. Tag: para
-#: random-bits.xml:744
+#: random-bits.xml:765
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1679,13 +1640,13 @@ msgstr ""
 "использовать <userinput>ide0:</userinput> вместо <userinput>hd:</userinput>."
 
 #. Tag: title
-#: random-bits.xml:757
+#: random-bits.xml:778
 #, no-c-format
 msgid "Finishing touches"
 msgstr "Заключительные шаги"
 
 #. Tag: para
-#: random-bits.xml:758
+#: random-bits.xml:779
 #, no-c-format
 msgid ""
 "As mentioned earlier, the installed system will be very basic. If you would "
@@ -1704,7 +1665,7 @@ msgstr ""
 "<command>aptitude</command> для установки отдельных пакетов."
 
 #. Tag: para
-#: random-bits.xml:769
+#: random-bits.xml:790
 #, no-c-format
 msgid ""
 "After the installation there will be a lot of downloaded packages in "
@@ -1716,19 +1677,19 @@ msgstr ""
 "запустив:"
 
 #. Tag: screen
-#: random-bits.xml:775
+#: random-bits.xml:796
 #, no-c-format
 msgid "# aptitude clean"
 msgstr "# aptitude clean"
 
 #. Tag: title
-#: random-bits.xml:786
+#: random-bits.xml:807
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "Установка &debian; через Parallel Line IP (PLIP)"
 
 #. Tag: para
-#: random-bits.xml:788
+#: random-bits.xml:809
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1743,7 +1704,7 @@ msgstr ""
 "Интернет)."
 
 #. Tag: para
-#: random-bits.xml:796
+#: random-bits.xml:817
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1759,7 +1720,7 @@ msgstr ""
 "не должны использоваться в вашем сетевом адресном пространстве)."
 
 #. Tag: para
-#: random-bits.xml:804
+#: random-bits.xml:825
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1770,7 +1731,7 @@ msgstr ""
 "перезагрузки в установленную систему (смотрите <xref linkend=\"boot-new\"/>)."
 
 #. Tag: para
-#: random-bits.xml:809
+#: random-bits.xml:830
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1783,13 +1744,13 @@ msgstr ""
 "<literal>io=0x378</literal>, <literal>irq=7</literal>."
 
 #. Tag: title
-#: random-bits.xml:819
+#: random-bits.xml:840
 #, no-c-format
 msgid "Requirements"
 msgstr "Требования"
 
 #. Tag: para
-#: random-bits.xml:822
+#: random-bits.xml:843
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1799,7 +1760,7 @@ msgstr ""
 "будет установлен Debian."
 
 #. Tag: para
-#: random-bits.xml:828
+#: random-bits.xml:849
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr ""
@@ -1807,7 +1768,7 @@ msgstr ""
 "\"/>."
 
 #. Tag: para
-#: random-bits.xml:833
+#: random-bits.xml:854
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1817,7 +1778,7 @@ msgstr ""
 "emphasis>, будет использоваться в качестве шлюза."
 
 #. Tag: para
-#: random-bits.xml:839
+#: random-bits.xml:860
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1828,13 +1789,13 @@ msgstr ""
 "<ulink url=\"&url-plip-install-howto;\">PLIP-Install-HOWTO</ulink>."
 
 #. Tag: title
-#: random-bits.xml:851
+#: random-bits.xml:872
 #, no-c-format
 msgid "Setting up source"
 msgstr "Настройка источника"
 
 #. Tag: para
-#: random-bits.xml:852
+#: random-bits.xml:873
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1844,7 +1805,7 @@ msgstr ""
 "источника в качестве шлюза в Интернет через ppp0."
 
 #. Tag: screen
-#: random-bits.xml:857
+#: random-bits.xml:878
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1886,13 +1847,13 @@ msgstr ""
 "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 #. Tag: title
-#: random-bits.xml:863
+#: random-bits.xml:884
 #, no-c-format
 msgid "Installing target"
 msgstr "Установка приёмника"
 
 #. Tag: para
-#: random-bits.xml:864
+#: random-bits.xml:885
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1918,13 +1879,13 @@ msgstr ""
 "различных этапах установки."
 
 #. Tag: guimenuitem
-#: random-bits.xml:883
+#: random-bits.xml:904
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr "Загрузка компонент программы установки с CD"
 
 #. Tag: para
-#: random-bits.xml:885
+#: random-bits.xml:906
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1934,13 +1895,13 @@ msgstr ""
 "доступным PLIP драйвера для программы установки."
 
 #. Tag: guimenuitem
-#: random-bits.xml:893
+#: random-bits.xml:914
 #, no-c-format
 msgid "Detect network hardware"
 msgstr "Определение сетевой карты"
 
 #. Tag: para
-#: random-bits.xml:898
+#: random-bits.xml:919
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1955,7 +1916,7 @@ msgstr ""
 "установки не покажет этого списка."
 
 #. Tag: para
-#: random-bits.xml:907
+#: random-bits.xml:928
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1967,19 +1928,19 @@ msgstr ""
 "<userinput>plip</userinput>."
 
 #. Tag: guimenuitem
-#: random-bits.xml:919
+#: random-bits.xml:940
 #, no-c-format
 msgid "Configure the network"
 msgstr "Настройка сети"
 
 #. Tag: para
-#: random-bits.xml:922
+#: random-bits.xml:943
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr "Настроить сеть автоматически с помощью DHCP: нет"
 
 #. Tag: para
-#: random-bits.xml:927
+#: random-bits.xml:948
 #, no-c-format
 msgid ""
 "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
@@ -1987,7 +1948,7 @@ msgstr ""
 "IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:932
+#: random-bits.xml:953
 #, no-c-format
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
@@ -1996,7 +1957,7 @@ msgstr ""
 "Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:938
+#: random-bits.xml:959
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
@@ -2006,13 +1967,13 @@ msgstr ""
 "(смотрите <filename>/etc/resolv.conf</filename>)"
 
 #. Tag: title
-#: random-bits.xml:957
+#: random-bits.xml:978
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr "Программа установки с графическим интерфейсом"
 
 #. Tag: para
-#: random-bits.xml:958
+#: random-bits.xml:979
 #, no-c-format
 msgid ""
 "The graphical version of the installer is only available for a limited "
@@ -2027,7 +1988,7 @@ msgstr ""
 "интерфейсе."
 
 #. Tag: para
-#: random-bits.xml:966
+#: random-bits.xml:987
 #, no-c-format
 msgid ""
 "Although the functionality is identical, the graphical installer still has a "
@@ -2045,7 +2006,7 @@ msgstr ""
 "целиком влезают на один экран."
 
 #. Tag: para
-#: random-bits.xml:975
+#: random-bits.xml:996
 #, no-c-format
 msgid ""
 "The graphical installer is available with all CD images and with the hd-"
@@ -2065,7 +2026,7 @@ msgstr ""
 "<userinput>rescuegui</userinput>, соответственно."
 
 #. Tag: para
-#: random-bits.xml:985
+#: random-bits.xml:1006
 #, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
@@ -2084,7 +2045,7 @@ msgstr ""
 "недоступна."
 
 #. Tag: para
-#: random-bits.xml:999
+#: random-bits.xml:1020
 #, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
@@ -2102,7 +2063,7 @@ msgstr ""
 "картой ATI, но не факт, что будет работать на других системах."
 
 #. Tag: para
-#: random-bits.xml:1012
+#: random-bits.xml:1033
 #, no-c-format
 msgid ""
 "The graphical installer requires significantly more memory to run than the "
@@ -2116,7 +2077,7 @@ msgstr ""
 "<quote>newt</quote>."
 
 #. Tag: para
-#: random-bits.xml:1019
+#: random-bits.xml:1040
 #, no-c-format
 msgid ""
 "You can add boot parameters when starting the graphical installer, just as "
@@ -2130,13 +2091,13 @@ msgstr ""
 "\"boot-parms\"/>."
 
 #. Tag: title
-#: random-bits.xml:1029
+#: random-bits.xml:1050
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr "Использование программы установки с графическим интерфейсом"
 
 #. Tag: para
-#: random-bits.xml:1030
+#: random-bits.xml:1051
 #, no-c-format
 msgid ""
 "As already mentioned, the graphical installer basically works the same as "
@@ -2148,7 +2109,7 @@ msgstr ""
 "использовать для выполнения процесса установки."
 
 #. Tag: para
-#: random-bits.xml:1036
+#: random-bits.xml:1057
 #, no-c-format
 msgid ""
 "If you prefer using the keyboard over the mouse, there are two things you "
@@ -2168,7 +2129,7 @@ msgstr ""
 "переключения выбора, не активировать <guibutton>Продолжить</guibutton>."
 
 #. Tag: para
-#: random-bits.xml:1046
+#: random-bits.xml:1067
 #, no-c-format
 msgid ""
 "To switch to another console, you will also need to use the <keycap>Ctrl</"
@@ -2182,13 +2143,13 @@ msgstr ""
 "keycap> <keycap>F1</keycap> </keycombo>."
 
 #. Tag: title
-#: random-bits.xml:1057
+#: random-bits.xml:1078
 #, no-c-format
 msgid "Known issues"
 msgstr "Известные проблемы"
 
 #. Tag: para
-#: random-bits.xml:1058
+#: random-bits.xml:1079
 #, no-c-format
 msgid ""
 "Etch is the first release that includes the graphical installer and uses "
@@ -2202,7 +2163,7 @@ msgstr ""
 "их в следующем выпуске &debian;."
 
 #. Tag: para
-#: random-bits.xml:1068
+#: random-bits.xml:1089
 #, no-c-format
 msgid ""
 "Information on some screens is not nicely formatted into columns as it "
@@ -2214,7 +2175,7 @@ msgstr ""
 "Другим примером является главный экран программы разметки дисков."
 
 #. Tag: para
-#: random-bits.xml:1075
+#: random-bits.xml:1096
 #, no-c-format
 msgid ""
 "Typing some characters may not work and in some cases the wrong character "
@@ -2227,13 +2188,13 @@ msgstr ""
 "работает."
 
 #. Tag: para
-#: random-bits.xml:1082
+#: random-bits.xml:1103
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr "Поддержка сенсорных панелей (touchpad) пока не оптимальна."
 
 #. Tag: para
-#: random-bits.xml:1087
+#: random-bits.xml:1108
 #, no-c-format
 msgid ""
 "You should not switch to a different console while the installer is busy; "
@@ -2249,7 +2210,7 @@ msgstr ""
 "ввода, работает без проблем."
 
 #. Tag: para
-#: random-bits.xml:1096
+#: random-bits.xml:1117
 #, no-c-format
 msgid ""
 "Support for creating encrypted partitions is limited as it is not possible "
@@ -2259,3 +2220,70 @@ msgstr ""
 "Поддержка создания шифрованных разделов ограничена, так как невозможно "
 "сгенерировать произвольный ключ шифрования. Возможно настроить шифрованный "
 "раздел используя ключевую фразу в качестве ключа шифрования."
+
+#~ msgid ""
+#~ "The mouse can be used in both the Linux console (with gpm) and the X "
+#~ "window environment. The two uses can be made compatible if the gpm "
+#~ "repeater is used to allow the signal to flow to the X server as shown: "
+#~ "<informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> Set the repeater protocol to be raw (in "
+#~ "<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
+#~ "protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
+#~ "X11/XF86Config-4</filename>."
+#~ msgstr ""
+#~ "Мышь можно использовать одновременно и в консоли Linux (с помощью gpm) и "
+#~ "в среде X window. Это возможно, если использовать повторитель gpm, "
+#~ "который который передаёт сигналы ещё и X серверу: "
+#~ "<informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> Установите протокол повторителя в raw (в "
+#~ "файле <filename>/etc/gpm.conf</filename>), а в настройках X фактический "
+#~ "протокол обмена данными с мышью (в файле <filename>/etc/X11/XF86Config</"
+#~ "filename> или <filename>/etc/X11/XF86Config-4</filename>)."
+
+#~ msgid ""
+#~ "This approach to use gpm even in X has advantages when the mouse is "
+#~ "unplugged inadvertently. Simply restarting gpm with "
+#~ "<informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> will re-connect the mouse in software without "
+#~ "restarting X."
+#~ msgstr ""
+#~ "Такой подход с использованием gpm даже в X имеет преимущество, если мышь "
+#~ "отключат по неосторожности. Простой перезапуск gpm командой "
+#~ "<informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> подключит мышь в программе заново без "
+#~ "перезапуска X."
+
+#~ msgid ""
+#~ "If gpm is disabled or not installed for some reason, make sure to set X "
+#~ "to read directly from a mouse device such as /dev/psaux. For details, "
+#~ "refer to the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/"
+#~ "en-txt/mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
+#~ "<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-"
+#~ "xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
+#~ msgstr ""
+#~ "Если gpm выключен или не установлен по какой-то причине, убедитесь что X "
+#~ "сервер настроен на чтение непосредственно с устройства мыши, например, "
+#~ "из /dev/psaux. Подробней смотрите 3-Button Mouse mini-Howto в <filename>/"
+#~ "usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, "
+#~ "<userinput>man gpm</userinput>, <filename>/usr/share/doc/gpm/FAQ.gz</"
+#~ "filename> и <ulink url=\"&url-xorg;current/doc/html/mouse.html\">README."
+#~ "mouse</ulink>."
+
+#~ msgid ""
+#~ "For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/"
+#~ "etc/X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/"
+#~ "dev/input/mice\"</userinput>."
+#~ msgstr ""
+#~ "Для PowerPC в <filename>/etc/X11/XF86Config</filename> или <filename>/etc/"
+#~ "X11/XF86Config-4</filename> установите устройство мышь в <userinput>\"/"
+#~ "dev/input/mice\"</userinput>."

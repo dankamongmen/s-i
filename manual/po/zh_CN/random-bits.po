@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-07 13:24+0000\n"
+"POT-Creation-Date: 2007-01-22 23:21+0000\n"
 "PO-Revision-Date: 2007-01-12 11:00+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
@@ -323,82 +323,45 @@ msgid "Setting Up Your Mouse"
 msgstr "设定您的鼠标"
 
 #. Tag: para
-#: random-bits.xml:127
+#: random-bits.xml:126
 #, no-c-format
 msgid ""
 "The mouse can be used in both the Linux console (with gpm) and the X window "
-"environment. The two uses can be made compatible if the gpm repeater is used "
-"to allow the signal to flow to the X server as shown: "
-"<informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (repeater)        (symlink)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> Set the repeater protocol to be raw (in "
-"<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
-"protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/X11/"
-"XF86Config-4</filename>."
+"environment. Normally, this is a simple matter of installing <filename>gpm</"
+"filename> and the X server itself. Both should be configured to use "
+"<filename>/dev/input/mice</filename> as the mouse device. The correct mouse "
+"protocol is named <userinput>exps2</userinput> in gpm, and "
+"<userinput>ExplorerPS/2</userinput> in X. The respective configuration files "
+"are <filename>/etc/gpm.conf</filename> and <filename>/etc/X11/xorg.conf</"
+"filename>."
 msgstr ""
-"无论在 Linux 的控制台(console)里(通过 gpm)，还是在 X 窗口环境之中，您都可以使"
-"用鼠标。这两种用法是可以兼容的，只要设置 gpm 转发器，令其让信号流往 X 服务"
-"器： <informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (repeater)        (symlink)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> 把转发器的协议设为直接(raw)模式(在 <filename>/"
-"etc/gpm.conf</filename> 里)，同时在 <filename>/etc/X11/XF86Config</filename> "
-"或者 <filename>/etc/X11/XF86Config-4</filename> 里设置一下，让 X 使用原始的鼠"
-"标协议。"
 
 #. Tag: para
-#: random-bits.xml:139
+#: random-bits.xml:137
 #, no-c-format
 msgid ""
-"This approach to use gpm even in X has advantages when the mouse is "
-"unplugged inadvertently. Simply restarting gpm with "
-"<informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> will re-connect the mouse in software without "
-"restarting X."
+"Certain kernel modules must be loaded in order for your mouse to work. In "
+"most cases the correct modules are autodetected, but not always for old-"
+"style serial and bus mice<footnote> <para> Serial mice usually have a 9-hole "
+"D-shaped connector; bus mice have an 8-pin round connector, not to be "
+"confused with the 6-pin round connector of a PS/2 mouse or the 4-pin round "
+"connector of an ADB mouse. </para> </footnote>, which are quite rare except "
+"on very old computers. Summary of Linux kernel modules needed for different "
+"mouse types: <informaltable><tgroup cols=\"2\"><thead> <row> <entry>Module</"
+"entry> <entry>Description</entry> </row> </thead><tbody> <row> "
+"<entry>psmouse</entry> <entry>PS/2 mice (should be autodetected)</entry> </"
+"row> <row> <entry>usbhid</entry> <entry>USB mice (should be autodetected)</"
+"entry> </row> <row> <entry>sermouse</entry> <entry>Most serial mice</entry> "
+"</row> <row> <entry>logibm</entry> <entry>Bus mouse connected to Logitech "
+"adapter card</entry> </row> <row> <entry>inport</entry> <entry>Bus mouse "
+"connected to ATI or Microsoft InPort card</entry> </row> </tbody></tgroup></"
+"informaltable> To load a mouse driver module, you can use the "
+"<command>modconf</command> command (from the package with the same name) and "
+"look in the category <userinput>kernel/drivers/input/mouse</userinput>."
 msgstr ""
-"用这种方法使用 gpm 的话，就算在 X 里也有其优势。如果不小心把鼠标拔下来后，只"
-"要像这样重新启动 gpm 就可以了： <informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> 如此就可以在软件层面上重新连接鼠标，而不用重启 X "
-"了。"
 
 #. Tag: para
-#: random-bits.xml:148
-#, no-c-format
-msgid ""
-"If gpm is disabled or not installed for some reason, make sure to set X to "
-"read directly from a mouse device such as /dev/psaux. For details, refer to "
-"the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/en-txt/"
-"mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
-"<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-xorg;"
-"current/doc/html/mouse.html\">README.mouse</ulink>."
-msgstr ""
-"如果禁用了 gpm，或者因为某些原因没有安装，请确保设置 X 从鼠标设备，比如 /dev/"
-"psaux 上直接读取数据。详情情况，请参阅三键鼠标的 mini-Howto <filename>/usr/"
-"share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>、<userinput>man "
-"gpm</userinput>、<filename>/usr/share/doc/gpm/FAQ.gz</filename> 以及 <ulink "
-"url=\"&url-xorg;current/doc/html/mouse.html\">README.mouse</ulink>。"
-
-#. Tag: para
-#: random-bits.xml:158
-#, no-c-format
-msgid ""
-"For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
-"X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/dev/input/"
-"mice\"</userinput>."
-msgstr ""
-"对 PowerPC 来说，需要在<filename>/etc/X11/XF86Config</filename>或者 "
-"<filename>/etc/X11/XF86Config-4</filename> 设置鼠标设备里或者 <userinput>\"/"
-"dev/input/mice\"</userinput>。"
-
-#. Tag: para
-#: random-bits.xml:164
+#: random-bits.xml:184
 #, no-c-format
 msgid ""
 "Modern kernels give you the capability to emulate a three-button mouse when "
@@ -409,7 +372,7 @@ msgstr ""
 "加入 <filename>/etc/sysctl.conf</filename> 文件。"
 
 #. Tag: screen
-#: random-bits.xml:170
+#: random-bits.xml:191
 #, no-c-format
 msgid ""
 "# 3-button mouse emulation\n"
@@ -431,23 +394,26 @@ msgstr ""
 "# For different keys, use showkey to tell you what the code is."
 
 #. Tag: title
-#: random-bits.xml:177
+#: random-bits.xml:198
 #, no-c-format
 msgid "Disk Space Needed for Tasks"
 msgstr "各软件集所需的磁盘空间"
 
 #. Tag: para
-#: random-bits.xml:194
+#: random-bits.xml:215
 #, no-c-format
 msgid ""
 "A standard installation for the i386 architecture, including all standard "
 "packages and using the default 2.6 kernel, takes up 442MB of disk space. A "
 "minimal base installation, without the <quote>Standard system</quote> task "
 "selected, will take 230MB."
-msgstr "对于 i386 架构，基本安装默认使用 2.6 内核，包含了所有的标准软件包，需要 442MB 磁盘空间。最小化的基本安装，没有选择 <quote>Standard system</quote> 任务，需要 230MB。"
+msgstr ""
+"对于 i386 架构，基本安装默认使用 2.6 内核，包含了所有的标准软件包，需要 "
+"442MB 磁盘空间。最小化的基本安装，没有选择 <quote>Standard system</quote> 任"
+"务，需要 230MB。"
 
 #. Tag: para
-#: random-bits.xml:202
+#: random-bits.xml:223
 #, no-c-format
 msgid ""
 "In both cases this is the actual disk space used <emphasis>after</emphasis> "
@@ -455,10 +421,13 @@ msgid ""
 "not take into account overhead used by the file system, for example for "
 "journal files. This means that significantly more disk space is needed both "
 "<emphasis>during</emphasis> the installation and for normal system use."
-msgstr "在各种情况下，这都是安装完成并且删除临时文件<emphasis>之后</emphasis>，实际使用的磁盘空间。这还不包括文件系统的额外消耗，比如 journal 文件。也就是说，在安装和使用<emphasis>过程中</emphasis>，都会需要更多的磁盘空间。"
+msgstr ""
+"在各种情况下，这都是安装完成并且删除临时文件<emphasis>之后</emphasis>，实际使"
+"用的磁盘空间。这还不包括文件系统的额外消耗，比如 journal 文件。也就是说，在安"
+"装和使用<emphasis>过程中</emphasis>，都会需要更多的磁盘空间。"
 
 #. Tag: para
-#: random-bits.xml:211
+#: random-bits.xml:232
 #, no-c-format
 msgid ""
 "The following table lists sizes reported by aptitude for the tasks listed in "
@@ -471,7 +440,7 @@ msgstr ""
 "装后所占的空间，可能会小于这两个软件集分别安装所占的空间。"
 
 #. Tag: para
-#: random-bits.xml:218
+#: random-bits.xml:239
 #, no-c-format
 msgid ""
 "Note that you will need to add the sizes listed in the table to the size of "
@@ -480,235 +449,241 @@ msgid ""
 "usr</filename> and in <filename>/lib</filename>; the size listed as "
 "<quote>Download size</quote> is (temporarily) required in <filename>/var</"
 "filename>."
-msgstr "注意，您需要将表格中列出的尺寸加上基本安装尺寸以决定分区的大小。多数所列的尺寸，如 <quote>Installed size</quote> 用在 <filename>/usr</filename> 和 <filename>/lib</filename> 里面；列在 <quote>Download size</quote> 的是(临时地)用在 <filename>/var</filename> 里面。"
+msgstr ""
+"注意，您需要将表格中列出的尺寸加上基本安装尺寸以决定分区的大小。多数所列的尺"
+"寸，如 <quote>Installed size</quote> 用在 <filename>/usr</filename> 和 "
+"<filename>/lib</filename> 里面；列在 <quote>Download size</quote> 的是(临时"
+"地)用在 <filename>/var</filename> 里面。"
 
 #. Tag: entry
-#: random-bits.xml:232
+#: random-bits.xml:253
 #, no-c-format
 msgid "Task"
 msgstr "任务"
 
 #. Tag: entry
-#: random-bits.xml:233
+#: random-bits.xml:254
 #, no-c-format
 msgid "Installed size (MB)"
 msgstr "安装尺寸 (MB)"
 
 #. Tag: entry
-#: random-bits.xml:234
+#: random-bits.xml:255
 #, no-c-format
 msgid "Download size (MB)"
 msgstr "下载尺寸 (MB)"
 
 #. Tag: entry
-#: random-bits.xml:235
+#: random-bits.xml:256
 #, no-c-format
 msgid "Space needed to install (MB)"
 msgstr "用于安装所需空间 (MB)"
 
 #. Tag: entry
-#: random-bits.xml:241
+#: random-bits.xml:262
 #, no-c-format
 msgid "Desktop environment"
 msgstr "桌面环境"
 
 #. Tag: entry
-#: random-bits.xml:242
+#: random-bits.xml:263
 #, no-c-format
 msgid "1267"
 msgstr "1267"
 
 #. Tag: entry
-#: random-bits.xml:243
+#: random-bits.xml:264
 #, no-c-format
 msgid "<entry>420</entry>"
 msgstr "<entry>420</entry>"
 
 #. Tag: entry
-#: random-bits.xml:244
+#: random-bits.xml:265
 #, no-c-format
 msgid "1667"
 msgstr "1667"
 
 #. Tag: entry
-#: random-bits.xml:248
+#: random-bits.xml:269
 #, no-c-format
 msgid "Laptop"
 msgstr "便携机"
 
 #. Tag: para
-#: random-bits.xml:250
+#: random-bits.xml:271
 #, no-c-format
 msgid ""
 "There is a large overlap of the Laptop task with the Destop environment "
 "task. If you install both, the Laptop task will only require a few MB "
 "additional disk space."
-msgstr "便携机(Laptop)任务与桌面环境任务有大量重复的内容，如果两个都安装，便携机任务只需要很小的额外空间。"
+msgstr ""
+"便携机(Laptop)任务与桌面环境任务有大量重复的内容，如果两个都安装，便携机任务"
+"只需要很小的额外空间。"
 
 #. Tag: entry
-#: random-bits.xml:257
+#: random-bits.xml:278
 #, no-c-format
 msgid "<entry>50</entry>"
 msgstr "<entry>50</entry>"
 
 #. Tag: entry
-#: random-bits.xml:258
+#: random-bits.xml:279
 #, no-c-format
 msgid "<entry>17</entry>"
 msgstr "<entry>17</entry>"
 
 #. Tag: entry
-#: random-bits.xml:259
+#: random-bits.xml:280
 #, no-c-format
 msgid "<entry>67</entry>"
 msgstr "<entry>67</entry>"
 
 #. Tag: entry
-#: random-bits.xml:263
+#: random-bits.xml:284
 #, no-c-format
 msgid "Web server"
 msgstr "Web 服务器"
 
 #. Tag: entry
-#: random-bits.xml:264
+#: random-bits.xml:285
 #, no-c-format
 msgid "<entry>35</entry>"
 msgstr "<entry>35</entry>"
 
 #. Tag: entry
-#: random-bits.xml:265
+#: random-bits.xml:286
 #, no-c-format
 msgid "<entry>11</entry>"
 msgstr "<entry>11</entry>"
 
 #. Tag: entry
-#: random-bits.xml:266
+#: random-bits.xml:287
 #, no-c-format
 msgid "<entry>46</entry>"
 msgstr "<entry>46</entry>"
 
 #. Tag: entry
-#: random-bits.xml:270
+#: random-bits.xml:291
 #, no-c-format
 msgid "Print server"
 msgstr "打印服务器"
 
 #. Tag: entry
-#: random-bits.xml:271
+#: random-bits.xml:292
 #, no-c-format
 msgid "<entry>277</entry>"
 msgstr "<entry>277</entry>"
 
 #. Tag: entry
-#: random-bits.xml:272
+#: random-bits.xml:293
 #, no-c-format
 msgid "<entry>79</entry>"
 msgstr "<entry>79</entry>"
 
 #. Tag: entry
-#: random-bits.xml:273
+#: random-bits.xml:294
 #, no-c-format
 msgid "<entry>356</entry>"
 msgstr "<entry>356</entry>"
 
 #. Tag: entry
-#: random-bits.xml:277
+#: random-bits.xml:298
 #, no-c-format
 msgid "DNS server"
 msgstr "DNS 服务器"
 
 #. Tag: entry
-#: random-bits.xml:278
+#: random-bits.xml:299
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: random-bits.xml:279
+#: random-bits.xml:300
 #, no-c-format
 msgid "<entry>1</entry>"
 msgstr "<entry>1</entry>"
 
 #. Tag: entry
-#: random-bits.xml:280
+#: random-bits.xml:301
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: random-bits.xml:284
+#: random-bits.xml:305
 #, no-c-format
 msgid "File server"
 msgstr "文件服务器"
 
 #. Tag: entry
-#: random-bits.xml:285
+#: random-bits.xml:306
 #, no-c-format
 msgid "<entry>49</entry>"
 msgstr "<entry>49</entry>"
 
 #. Tag: entry
-#: random-bits.xml:286
+#: random-bits.xml:307
 #, no-c-format
 msgid "<entry>21</entry>"
 msgstr "<entry>21</entry>"
 
 #. Tag: entry
-#: random-bits.xml:287
+#: random-bits.xml:308
 #, no-c-format
 msgid "<entry>70</entry>"
 msgstr "<entry>70</entry>"
 
 #. Tag: entry
-#: random-bits.xml:291
+#: random-bits.xml:312
 #, no-c-format
 msgid "Mail server"
 msgstr "邮件服务器"
 
 #. Tag: entry
-#: random-bits.xml:292
+#: random-bits.xml:313
 #, no-c-format
 msgid "<entry>13</entry>"
 msgstr "<entry>13</entry>"
 
 #. Tag: entry
-#: random-bits.xml:293
+#: random-bits.xml:314
 #, no-c-format
 msgid "<entry>5</entry>"
 msgstr "<entry>5</entry>"
 
 #. Tag: entry
-#: random-bits.xml:294
+#: random-bits.xml:315
 #, no-c-format
 msgid "<entry>18</entry>"
 msgstr "<entry>18</entry>"
 
 #. Tag: entry
-#: random-bits.xml:298
+#: random-bits.xml:319
 #, no-c-format
 msgid "SQL database"
 msgstr "SQL 数据库"
 
 #. Tag: entry
-#: random-bits.xml:299
+#: random-bits.xml:320
 #, no-c-format
 msgid "<entry>24</entry>"
 msgstr "<entry>24</entry>"
 
 #. Tag: entry
-#: random-bits.xml:300
+#: random-bits.xml:321
 #, no-c-format
 msgid "<entry>8</entry>"
 msgstr "<entry>8</entry>"
 
 #. Tag: entry
-#: random-bits.xml:301
+#: random-bits.xml:322
 #, no-c-format
 msgid "<entry>32</entry>"
 msgstr "<entry>32</entry>"
 
 #. Tag: para
-#: random-bits.xml:307
+#: random-bits.xml:328
 #, no-c-format
 msgid ""
 "The <emphasis>Desktop</emphasis> task will install the GNOME desktop "
@@ -716,23 +691,26 @@ msgid ""
 msgstr "<emphasis>桌面</emphasis> 任务将同时安装 GNOME 桌面环境。"
 
 #. Tag: para
-#: random-bits.xml:314
+#: random-bits.xml:335
 #, no-c-format
 msgid ""
 "If you install in a language other than English, <command>tasksel</command> "
 "may automatically install a <firstterm>localization task</firstterm>, if one "
 "is available for your language. Space requirements differ per language; you "
 "should allow up to 350MB in total for download and installation."
-msgstr "如果安装英文之外的其他语言，如果与您选择的语言相符，<command>tasksel</command> 可以自动安装 <firstterm>localization task</firstterm>。每种语言需要的空间不同；您应该留有 350MB 以上的空间用来下载和安装。"
+msgstr ""
+"如果安装英文之外的其他语言，如果与您选择的语言相符，<command>tasksel</"
+"command> 可以自动安装 <firstterm>localization task</firstterm>。每种语言需要"
+"的空间不同；您应该留有 350MB 以上的空间用来下载和安装。"
 
 #. Tag: title
-#: random-bits.xml:329
+#: random-bits.xml:350
 #, no-c-format
 msgid "Installing &debian; from a Unix/Linux System"
 msgstr "通过 Unix/Linux 系统来安装 &debian;"
 
 #. Tag: para
-#: random-bits.xml:331
+#: random-bits.xml:352
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; from an existing Unix or Linux "
@@ -753,7 +731,7 @@ msgstr ""
 "中输入的。"
 
 #. Tag: para
-#: random-bits.xml:343
+#: random-bits.xml:364
 #, no-c-format
 msgid ""
 "Once you've got the new Debian system configured to your preference, you can "
@@ -768,13 +746,13 @@ msgstr ""
 "过任何引导或者安装介质完成安装的权宜之计。"
 
 #. Tag: title
-#: random-bits.xml:355
+#: random-bits.xml:376
 #, no-c-format
 msgid "Getting Started"
 msgstr "准备开始"
 
 #. Tag: para
-#: random-bits.xml:356
+#: random-bits.xml:377
 #, no-c-format
 msgid ""
 "With your current *nix partitioning tools, repartition the hard drive as "
@@ -782,10 +760,13 @@ msgid ""
 "space available for a console only install, or about 1GB if you plan to "
 "install X (more if you intend to install desktop environments like GNOME or "
 "KDE)."
-msgstr "如果需重新分区，用您当前的 *nix 的分区工具，至少要划分出一个文件系统，以及交换分区。如果只用控制台，至少要准备 350MB 空间，倘若想装 X，就需要至少 1GB 的空间了(安装 GNOME 或 KDE 这样的桌面环境，还要更多)。"
+msgstr ""
+"如果需重新分区，用您当前的 *nix 的分区工具，至少要划分出一个文件系统，以及交"
+"换分区。如果只用控制台，至少要准备 350MB 空间，倘若想装 X，就需要至少 1GB 的"
+"空间了(安装 GNOME 或 KDE 这样的桌面环境，还要更多)。"
 
 #. Tag: para
-#: random-bits.xml:364
+#: random-bits.xml:385
 #, no-c-format
 msgid ""
 "Next, create file systems on the partitions. For example, to create an ext3 "
@@ -795,12 +776,15 @@ msgid ""
 "</screen></informalexample> To create an ext2 file system instead, omit "
 "<userinput>-j</userinput>."
 msgstr ""
-"下一步，在分区上创建文件系统。例如，在 <filename>/dev/hda6</filename> 分区(以后的例子中，将把它作为 root 分区)建立一个 ext3 格式的文件系统： <informalexample><screen>\n"
+"下一步，在分区上创建文件系统。例如，在 <filename>/dev/hda6</filename> 分区(以"
+"后的例子中，将把它作为 root 分区)建立一个 ext3 格式的文件系统： "
+"<informalexample><screen>\n"
 "# mke2fs -j /dev/<replaceable>hda6</replaceable>\n"
-"</screen></informalexample> 建立 ext2 格式的文件系统，要去掉 <userinput>-j</userinput>。"
+"</screen></informalexample> 建立 ext2 格式的文件系统，要去掉 <userinput>-j</"
+"userinput>。"
 
 #. Tag: para
-#: random-bits.xml:374
+#: random-bits.xml:395
 #, no-c-format
 msgid ""
 "Initialize and activate swap (substitute the partition number for your "
@@ -813,14 +797,17 @@ msgid ""
 "filesystem on your new system). The mount point name is strictly arbitrary, "
 "it is referenced later below."
 msgstr ""
-"初始化并激活交换分区(请把分区编号替换成您希望用作 Debian 交换分区的分区编号): <informalexample><screen>\n"
+"初始化并激活交换分区(请把分区编号替换成您希望用作 Debian 交换分区的分区编"
+"号): <informalexample><screen>\n"
 "# mkswap /dev/<replaceable>hda5</replaceable>\n"
 "# sync; sync; sync\n"
 "# swapon /dev/<replaceable>hda5</replaceable>\n"
-"</screen></informalexample> 把一个分区挂载到 <filename>/mnt/debinst</filename>(这是安装的位置，将来作为您新系统的根(<filename>/</filename>)文件系统)。挂载点的名称是任意的，后面的步骤将会用到它。"
+"</screen></informalexample> 把一个分区挂载到 <filename>/mnt/debinst</"
+"filename>(这是安装的位置，将来作为您新系统的根(<filename>/</filename>)文件系"
+"统)。挂载点的名称是任意的，后面的步骤将会用到它。"
 
 #. Tag: screen
-#: random-bits.xml:386
+#: random-bits.xml:407
 #, no-c-format
 msgid ""
 "# mkdir /mnt/debinst\n"
@@ -830,7 +817,7 @@ msgstr ""
 "# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 
 #. Tag: para
-#: random-bits.xml:389
+#: random-bits.xml:410
 #, no-c-format
 msgid ""
 "If you want to have parts of the filesystem (e.g. /usr) mounted on separate "
@@ -841,13 +828,13 @@ msgstr ""
 "手动创建和加载这些目录。"
 
 #. Tag: title
-#: random-bits.xml:399
+#: random-bits.xml:420
 #, no-c-format
 msgid "Install <command>debootstrap</command>"
 msgstr "安装 <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:400
+#: random-bits.xml:421
 #, no-c-format
 msgid ""
 "The utility used by the Debian installer, and recognized as the official way "
@@ -870,7 +857,7 @@ msgstr ""
 "<command>debootstrap</command>。"
 
 #. Tag: para
-#: random-bits.xml:430
+#: random-bits.xml:451
 #, no-c-format
 msgid ""
 "Or, you can use the following procedure to install it manually. Make a work "
@@ -895,7 +882,7 @@ msgstr ""
 "并解压获得该文件。把二进制文件安装到系统中，您必须要拥有 root 的权限。"
 
 #. Tag: screen
-#: random-bits.xml:445
+#: random-bits.xml:466
 #, no-c-format
 msgid ""
 "# ar -x debootstrap_0.X.X_all.deb\n"
@@ -907,18 +894,18 @@ msgstr ""
 "# zcat /full-path-to-work/work/data.tar.gz | tar xv"
 
 #. Tag: title
-#: random-bits.xml:451
+#: random-bits.xml:472
 #, no-c-format
 msgid "Run <command>debootstrap</command>"
 msgstr "运行 <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:452
-#, no-c-format
+#: random-bits.xml:473
+#, fuzzy, no-c-format
 msgid ""
 "<command>debootstrap</command> can download the needed files directly from "
 "the archive when you run it. You can substitute any Debian archive mirror "
-"for <userinput>http.us.debian.org/debian</userinput> in the command example "
+"for <userinput>&archive-mirror;/debian</userinput> in the command example "
 "below, preferably a mirror close to you network-wise. Mirrors are listed at "
 "<ulink url=\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 msgstr ""
@@ -929,7 +916,7 @@ msgstr ""
 "README.mirrors\"></ulink>。"
 
 #. Tag: para
-#: random-bits.xml:461
+#: random-bits.xml:482
 #, no-c-format
 msgid ""
 "If you have a &releasename; &debian; CD mounted at <filename>/cdrom</"
@@ -941,7 +928,7 @@ msgstr ""
 "debian/</userinput>"
 
 #. Tag: para
-#: random-bits.xml:467
+#: random-bits.xml:488
 #, no-c-format
 msgid ""
 "Substitute one of the following for <replaceable>ARCH</replaceable> in the "
@@ -951,10 +938,17 @@ msgid ""
 "<userinput>m68k</userinput>, <userinput>mips</userinput>, <userinput>mipsel</"
 "userinput>, <userinput>powerpc</userinput>, <userinput>s390</userinput>, or "
 "<userinput>sparc</userinput>."
-msgstr "请将下列架构中的一个替换 <command>debootstrap</command> 命令中的 <replaceable>ARCH</replaceable>：<userinput>alpha</userinput>、<userinput>amd64</userinput>、<userinput>arm</userinput>、<userinput>hppa</userinput>、<userinput>i386</userinput>、<userinput>ia64</userinput>、<userinput>m68k</userinput>、<userinput>mips</userinput>、<userinput>mipsel</userinput>、<userinput>powerpc</userinput>、<userinput>s390</userinput> 或 <userinput>sparc</userinput>。"
+msgstr ""
+"请将下列架构中的一个替换 <command>debootstrap</command> 命令中的 "
+"<replaceable>ARCH</replaceable>：<userinput>alpha</userinput>、"
+"<userinput>amd64</userinput>、<userinput>arm</userinput>、<userinput>hppa</"
+"userinput>、<userinput>i386</userinput>、<userinput>ia64</userinput>、"
+"<userinput>m68k</userinput>、<userinput>mips</userinput>、<userinput>mipsel</"
+"userinput>、<userinput>powerpc</userinput>、<userinput>s390</userinput> 或 "
+"<userinput>sparc</userinput>。"
 
 #. Tag: screen
-#: random-bits.xml:485
+#: random-bits.xml:506
 #, no-c-format
 msgid ""
 "# /usr/sbin/debootstrap --arch ARCH &releasename; \\\n"
@@ -964,13 +958,13 @@ msgstr ""
 "     /mnt/debinst http://ftp.us.debian.org/debian"
 
 #. Tag: title
-#: random-bits.xml:491
+#: random-bits.xml:512
 #, no-c-format
 msgid "Configure The Base System"
 msgstr "基系统的配置"
 
 #. Tag: para
-#: random-bits.xml:492
+#: random-bits.xml:513
 #, no-c-format
 msgid ""
 "Now you've got a real Debian system, though rather lean, on disk. "
@@ -979,24 +973,26 @@ msgid ""
 "</screen></informalexample> After chrooting you may need to set the terminal "
 "definition to be compatible with the Debian base system, for example:"
 msgstr ""
-"虽然功能很弱，现在您的磁盘上有了一个真正的 Debian 系统。用 <command>chroot</command> 命令进入：<informalexample><screen>\n"
+"虽然功能很弱，现在您的磁盘上有了一个真正的 Debian 系统。用 <command>chroot</"
+"command> 命令进入：<informalexample><screen>\n"
 "# LANG=C chroot /mnt/debinst /bin/bash\n"
-"</screen></informalexample> 之后您需要设置与 Debian 基本系统兼容的终端定义，例如："
+"</screen></informalexample> 之后您需要设置与 Debian 基本系统兼容的终端定义，"
+"例如："
 
 #. Tag: screen
-#: random-bits.xml:502
+#: random-bits.xml:523
 #, no-c-format
 msgid "# export TERM=<replaceable>xterm-color</replaceable>"
 msgstr "# export TERM=<replaceable>xterm-color</replaceable>"
 
 #. Tag: title
-#: random-bits.xml:507
+#: random-bits.xml:528
 #, no-c-format
 msgid "Mount Partitions"
 msgstr "分区的挂载"
 
 #. Tag: para
-#: random-bits.xml:508
+#: random-bits.xml:529
 #, no-c-format
 msgid ""
 "You need to create <filename>/etc/fstab</filename>. "
@@ -1040,7 +1036,8 @@ msgid ""
 msgstr ""
 "您需要新建 <filename>/etc/fstab</filename>。<informalexample><screen>\n"
 "# editor /etc/fstab\n"
-"</screen></informalexample> 这里有个样板，您不妨根据自己的情况来修改它：<informalexample><screen>\n"
+"</screen></informalexample> 这里有个样板，您不妨根据自己的情况来修改它："
+"<informalexample><screen>\n"
 "# /etc/fstab: static file system information.\n"
 "#\n"
 "# file system    mount point   type    options                  dump pass\n"
@@ -1057,24 +1054,31 @@ msgstr ""
 "/dev/XXX         /var          ext3    rw,nosuid,nodev          0    2\n"
 "/dev/XXX         /usr          ext3    rw,nodev                 0    2\n"
 "/dev/XXX         /home         ext3    rw,nosuid,nodev          0    2\n"
-"</screen></informalexample> 您可以通过 <userinput>mount -a</userinput> 来挂载 <filename>/etc/fstab</filename> 中所标明的所有文件系统，您也可以一个一个分别地挂载这些文件系统，像：<informalexample><screen>\n"
+"</screen></informalexample> 您可以通过 <userinput>mount -a</userinput> 来挂"
+"载 <filename>/etc/fstab</filename> 中所标明的所有文件系统，您也可以一个一个分"
+"别地挂载这些文件系统，像：<informalexample><screen>\n"
 "# mount /path   # e.g.: mount /usr\n"
-"</screen></informalexample> Current Debian systems have mountpoints for removable media under <filename>/media</filename>, but keep compatibility symlinks in <filename>/</filename>. Create these as as needed, for example: <informalexample><screen>\n"
+"</screen></informalexample> Current Debian systems have mountpoints for "
+"removable media under <filename>/media</filename>, but keep compatibility "
+"symlinks in <filename>/</filename>. Create these as as needed, for example: "
+"<informalexample><screen>\n"
 "# cd /media\n"
 "# mkdir cdrom0\n"
 "# ln -s cdrom0 cdrom\n"
 "# cd /\n"
 "# ln -s media/cdrom\n"
-"</screen></informalexample> 您可以多次挂载 proc 文件系统，通常是在 <filename>/proc</filename> 位置，但也可以选择任意的地方。如果没有使用 <userinput>mount -a</userinput>，请在下步前先将 proc 挂载："
+"</screen></informalexample> 您可以多次挂载 proc 文件系统，通常是在 "
+"<filename>/proc</filename> 位置，但也可以选择任意的地方。如果没有使用 "
+"<userinput>mount -a</userinput>，请在下步前先将 proc 挂载："
 
 #. Tag: screen
-#: random-bits.xml:534
+#: random-bits.xml:555
 #, no-c-format
 msgid "# mount -t proc proc /proc"
 msgstr "# mount -t proc proc /proc"
 
 #. Tag: para
-#: random-bits.xml:536
+#: random-bits.xml:557
 #, no-c-format
 msgid ""
 "The command <userinput>ls /proc</userinput> should now show a non-empty "
@@ -1085,29 +1089,33 @@ msgstr ""
 "chroot: 以为加载 proc。"
 
 #. Tag: screen
-#: random-bits.xml:542
+#: random-bits.xml:563
 #, no-c-format
 msgid "# mount -t proc proc /mnt/debinst/proc"
 msgstr "# mount -t proc proc /mnt/debinst/proc"
 
 #. Tag: title
-#: random-bits.xml:548
+#: random-bits.xml:569
 #, no-c-format
 msgid "Setting Timezone"
 msgstr "设置时区"
 
 #. Tag: para
-#: random-bits.xml:549
+#: random-bits.xml:570
 #, no-c-format
 msgid ""
 "An option in the file <filename>/etc/default/rcS</filename> determines "
 "whether the system will interpret the hardware clock as being set to UTC or "
 "local time. The following command allow you to set that and choose your "
 "timezone."
-msgstr "An option in the file <filename>/etc/default/rcS</filename> determines whether the system will interpret the hardware clock as being set to UTC or local time. The following command allow you to set that and choose your timezone."
+msgstr ""
+"An option in the file <filename>/etc/default/rcS</filename> determines "
+"whether the system will interpret the hardware clock as being set to UTC or "
+"local time. The following command allow you to set that and choose your "
+"timezone."
 
 #. Tag: screen
-#: random-bits.xml:556
+#: random-bits.xml:577
 #, no-c-format
 msgid ""
 "# editor /etc/default/rcS\n"
@@ -1117,13 +1125,13 @@ msgstr ""
 "# tzconfig"
 
 #. Tag: title
-#: random-bits.xml:562
+#: random-bits.xml:583
 #, no-c-format
 msgid "Configure Networking"
 msgstr "网络的配置"
 
 #. Tag: para
-#: random-bits.xml:563
+#: random-bits.xml:584
 #, no-c-format
 msgid ""
 "To configure networking, edit <filename>/etc/network/interfaces</filename>, "
@@ -1184,9 +1192,12 @@ msgid ""
 "file into the desired order. Then during boot, each card will be associated "
 "with the interface name (eth0, eth1, etc.) that you expect."
 msgstr ""
-"要配置网络，请修改 <filename>/etc/network/interfaces</filename>、<filename>/etc/resolv.conf</filename>、<filename>/etc/hostname</filename> 和 <filename>/etc/hosts</filename>。<informalexample><screen>\n"
+"要配置网络，请修改 <filename>/etc/network/interfaces</filename>、<filename>/"
+"etc/resolv.conf</filename>、<filename>/etc/hostname</filename> 和 <filename>/"
+"etc/hosts</filename>。<informalexample><screen>\n"
 "# editor /etc/network/interfaces\n"
-"</screen></informalexample> 这里有一些来自 <filename>/usr/share/doc/ifupdown/examples</filename> 的简单例子: <informalexample><screen>\n"
+"</screen></informalexample> 这里有一些来自 <filename>/usr/share/doc/ifupdown/"
+"examples</filename> 的简单例子: <informalexample><screen>\n"
 "######################################################################\n"
 "# /etc/network/interfaces -- configuration file for ifup(8), ifdown(8)\n"
 "# See the interfaces(5) manpage for information on what options are\n"
@@ -1212,15 +1223,19 @@ msgstr ""
 "#     netmask 255.255.255.0\n"
 "#     broadcast 192.168.0.255\n"
 "#     gateway 192.168.0.1\n"
-"</screen></informalexample> 填入您的域名服务器和搜索指令到 <filename>/etc/resolv.conf</filename>：<informalexample><screen>\n"
+"</screen></informalexample> 填入您的域名服务器和搜索指令到 <filename>/etc/"
+"resolv.conf</filename>：<informalexample><screen>\n"
 "# editor /etc/resolv.conf\n"
-"</screen></informalexample> 这里有个简单例子 <filename>/etc/resolv.conf</filename>：<informalexample><screen>\n"
+"</screen></informalexample> 这里有个简单例子 <filename>/etc/resolv.conf</"
+"filename>：<informalexample><screen>\n"
 "search hqdom.local\n"
 "nameserver 10.1.1.36\n"
 "nameserver 192.168.9.100\n"
-"</screen></informalexample> 输入您系统的主机名(2 到 63 个字符)：<informalexample><screen>\n"
+"</screen></informalexample> 输入您系统的主机名(2 到 63 个字符)："
+"<informalexample><screen>\n"
 "# echo DebianHostName &gt; /etc/hostname\n"
-"</screen></informalexample> And a basic <filename>/etc/hosts</filename> with IPv6 support: <informalexample><screen>\n"
+"</screen></informalexample> And a basic <filename>/etc/hosts</filename> with "
+"IPv6 support: <informalexample><screen>\n"
 "127.0.0.1 localhost DebianHostName\n"
 "\n"
 "# The following lines are desirable for IPv6 capable hosts\n"
@@ -1230,16 +1245,18 @@ msgstr ""
 "ff02::1 ip6-allnodes\n"
 "ff02::2 ip6-allrouters\n"
 "ff02::3 ip6-allhosts\n"
-"</screen></informalexample> 如果您有多块网卡，在修改 <filename>/etc/modules</filename> 文件时，一定要按照期望的顺序排列驱动模块的名字。这样，系统启动时，每块网卡就能获得所预期的 interface 名称了(eth0、eth1 等等)。"
+"</screen></informalexample> 如果您有多块网卡，在修改 <filename>/etc/modules</"
+"filename> 文件时，一定要按照期望的顺序排列驱动模块的名字。这样，系统启动时，"
+"每块网卡就能获得所预期的 interface 名称了(eth0、eth1 等等)。"
 
 #. Tag: title
-#: random-bits.xml:604
+#: random-bits.xml:625
 #, no-c-format
 msgid "Configure Apt"
 msgstr "配置 Apt"
 
 #. Tag: para
-#: random-bits.xml:605
+#: random-bits.xml:626
 #, no-c-format
 msgid ""
 "Debootstrap will have created a very basic <filename>/etc/apt/sources.list</"
@@ -1253,21 +1270,24 @@ msgid ""
 "</screen></informalexample> Make sure to run <userinput>aptitude update</"
 "userinput> after you have made changes to the sources list."
 msgstr ""
-"Debootstrap 会创建一个基本的 <filename>/etc/apt/sources.list</filename> 文件来安装额外的软件包。但您可以增加一些其他的源，比如源码和安全更新的源：<informalexample><screen>\n"
+"Debootstrap 会创建一个基本的 <filename>/etc/apt/sources.list</filename> 文件"
+"来安装额外的软件包。但您可以增加一些其他的源，比如源码和安全更新的源："
+"<informalexample><screen>\n"
 "deb-src http://ftp.us.debian.org/debian etch main\n"
 "\n"
 "deb http://security.debian.org/ etch/updates main\n"
 "deb-src http://security.debian.org/ etch/updates main\n"
-"</screen></informalexample> 修改源列表之后一定要执行 <userinput>aptitude update</userinput>。"
+"</screen></informalexample> 修改源列表之后一定要执行 <userinput>aptitude "
+"update</userinput>。"
 
 #. Tag: title
-#: random-bits.xml:621
+#: random-bits.xml:642
 #, no-c-format
 msgid "Configure Locales and Keyboard"
 msgstr "本地化和键盘的配置"
 
 #. Tag: para
-#: random-bits.xml:622
+#: random-bits.xml:643
 #, no-c-format
 msgid ""
 "To configure your locale settings to use a language other than English, "
@@ -1278,13 +1298,14 @@ msgid ""
 "# dpkg-reconfigure locales\n"
 "</screen></informalexample> To configure your keyboard (if needed):"
 msgstr ""
-"要配置您的 locale 设定，以便使用英语以外的语言，需要安装 <classname>locales</classname> 支持软件包，然后进行配置： <informalexample><screen>\n"
+"要配置您的 locale 设定，以便使用英语以外的语言，需要安装 <classname>locales</"
+"classname> 支持软件包，然后进行配置： <informalexample><screen>\n"
 "# aptitude install locales\n"
 "# dpkg-reconfigure locales\n"
 "</screen></informalexample> 要配置您的键盘(如果需要)："
 
 #. Tag: screen
-#: random-bits.xml:632
+#: random-bits.xml:653
 #, no-c-format
 msgid ""
 "# aptitude install console-data\n"
@@ -1294,7 +1315,7 @@ msgstr ""
 "# dpkg-reconfigure console-data"
 
 #. Tag: para
-#: random-bits.xml:634
+#: random-bits.xml:655
 #, no-c-format
 msgid ""
 "Note that the keyboard cannot be set while in the chroot, but will be "
@@ -1302,36 +1323,40 @@ msgid ""
 msgstr "注意，在 chroot 里面不能设置键盘，但重新启动以后可以。"
 
 #. Tag: title
-#: random-bits.xml:644
+#: random-bits.xml:665
 #, no-c-format
 msgid "Install a Kernel"
 msgstr "内核的安装"
 
 #. Tag: para
-#: random-bits.xml:645
+#: random-bits.xml:666
 #, no-c-format
 msgid ""
 "If you intend to boot this system, you probably want a Linux kernel and a "
 "boot loader. Identify available pre-packaged kernels with:"
-msgstr "要想这个系统启动，您很可能还需要一个 Linux 内核和一个 boot loader。可以用下面指令找到那些预先打包的内核："
+msgstr ""
+"要想这个系统启动，您很可能还需要一个 Linux 内核和一个 boot loader。可以用下面"
+"指令找到那些预先打包的内核："
 
 #. Tag: screen
-#: random-bits.xml:650
+#: random-bits.xml:671
 #, no-c-format
 msgid "# apt-cache search linux-image"
 msgstr "# apt-cache search linux-image"
 
 #. Tag: para
-#: random-bits.xml:652
+#: random-bits.xml:673
 #, no-c-format
 msgid ""
 "If you intend to use a pre-packaged kernel, you may want to create the "
 "configuration file <filename>/etc/kernel-img.conf</filename> before you do "
 "so. Here's an example file:"
-msgstr "如果您打算使用预编译的内核包，可以在使用前创建 <filename>/etc/kernel-img.conf</filename> 配置文件。这里是一个示例文件："
+msgstr ""
+"如果您打算使用预编译的内核包，可以在使用前创建 <filename>/etc/kernel-img."
+"conf</filename> 配置文件。这里是一个示例文件："
 
 #. Tag: screen
-#: random-bits.xml:658
+#: random-bits.xml:679
 #, no-c-format
 msgid ""
 "# Kernel image management overrides\n"
@@ -1353,17 +1378,19 @@ msgstr ""
 "link_in_boot = no"
 
 #. Tag: para
-#: random-bits.xml:660
+#: random-bits.xml:681
 #, no-c-format
 msgid ""
 "For detailed information about this file and the various options, consult "
 "its man page which will be available after installing the <classname>kernel-"
 "package</classname> package. We recommend that you check that the values are "
 "appropriate for your system."
-msgstr "要了解该文件及其选项的信息，请在安装 <classname>kernel-package</classname> 软件包后参考其手册(man)。我们建议您使用适合您系统的值。"
+msgstr ""
+"要了解该文件及其选项的信息，请在安装 <classname>kernel-package</classname> 软"
+"件包后参考其手册(man)。我们建议您使用适合您系统的值。"
 
 #. Tag: para
-#: random-bits.xml:667
+#: random-bits.xml:688
 #, no-c-format
 msgid ""
 "Then install the kernel package of your choice using its package name. "
@@ -1375,17 +1402,19 @@ msgid ""
 "asked some questions during its installation that refer to it."
 msgstr ""
 "然后使用您选择的内核软件包名来安装。<informalexample><screen>\n"
-"# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>\n"
-"</screen></informalexample> 假如您在安装预编译内核包之前没有创建 <filename>/etc/kernel-img.conf</filename> 文件，安装时会被问到相关的问题。"
+"# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</"
+"replaceable>\n"
+"</screen></informalexample> 假如您在安装预编译内核包之前没有创建 <filename>/"
+"etc/kernel-img.conf</filename> 文件，安装时会被问到相关的问题。"
 
 #. Tag: title
-#: random-bits.xml:681
+#: random-bits.xml:702
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Boot Loader 的设置"
 
 #. Tag: para
-#: random-bits.xml:682
+#: random-bits.xml:703
 #, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1398,7 +1427,7 @@ msgstr ""
 "loader，因此您要在 Debian 的 chroot 中使用 <command>aptitude</command> 完成。"
 
 #. Tag: para
-#: random-bits.xml:689
+#: random-bits.xml:710
 #, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
@@ -1409,10 +1438,17 @@ msgid ""
 "could also copy it to the new system and edit it there. After you are done "
 "editing, call <command>lilo</command> (remember it will use <filename>lilo."
 "conf</filename> relative to the system you call it from)."
-msgstr "通过 <userinput>info grub</userinput> 或 <userinput>man lilo.conf</userinput> 可以看到有关设置 bootloader 的指导。如果希望保留用来安装 Debian 的那个系统，在现有的 grub <filename>menu.lst</filename> 或 <filename>lilo.conf</filename> 里为 Debian 系统的安装添加一条配置就可以了。对于 <filename>lilo.conf</filename>，您也可以把这个文件拷贝到新的系统里，然后在新的系统里编辑它。修改好配置，运行 lilo(请记住，在哪个系统里运行 lilo，它就会用哪个系统里的 <filename>lilo.conf</filename>)。"
+msgstr ""
+"通过 <userinput>info grub</userinput> 或 <userinput>man lilo.conf</"
+"userinput> 可以看到有关设置 bootloader 的指导。如果希望保留用来安装 Debian 的"
+"那个系统，在现有的 grub <filename>menu.lst</filename> 或 <filename>lilo."
+"conf</filename> 里为 Debian 系统的安装添加一条配置就可以了。对于 "
+"<filename>lilo.conf</filename>，您也可以把这个文件拷贝到新的系统里，然后在新"
+"的系统里编辑它。修改好配置，运行 lilo(请记住，在哪个系统里运行 lilo，它就会用"
+"哪个系统里的 <filename>lilo.conf</filename>)。"
 
 #. Tag: para
-#: random-bits.xml:701
+#: random-bits.xml:722
 #, no-c-format
 msgid ""
 "Installing and setting up <classname>grub</classname> is as easy as: "
@@ -1429,16 +1465,18 @@ msgstr ""
 "# aptitude install grub\n"
 "# grub-install /dev/<replaceable>hda</replaceable>\n"
 "# update-grub\n"
-"</screen></informalexample> 第二个命令将安装 <command>grub</command> (本例中是 <literal>hda</literal> 的 MBR)。最后的命令是创建一个胜任的 <filename>/boot/grub/menu.lst</filename>。"
+"</screen></informalexample> 第二个命令将安装 <command>grub</command> (本例中"
+"是 <literal>hda</literal> 的 MBR)。最后的命令是创建一个胜任的 <filename>/"
+"boot/grub/menu.lst</filename>。"
 
 #. Tag: para
-#: random-bits.xml:711
+#: random-bits.xml:732
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "下面有一个简单的<filename>/etc/lilo.conf</filename> 作为例子："
 
 #. Tag: screen
-#: random-bits.xml:715
+#: random-bits.xml:736
 #, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1458,15 +1496,17 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:717
+#: random-bits.xml:738
 #, no-c-format
 msgid ""
 "Depending on which bootloader you selected, you can now make some additional "
 "changes in <filename>/etc/kernel-img.conf</filename>."
-msgstr "根据您选择的 bootloader，可以在 <filename>/etc/kernel-img.conf</filename> 里做一些修改。"
+msgstr ""
+"根据您选择的 bootloader，可以在 <filename>/etc/kernel-img.conf</filename> 里"
+"做一些修改。"
 
 #. Tag: para
-#: random-bits.xml:722
+#: random-bits.xml:743
 #, no-c-format
 msgid ""
 "For the <classname>grub</classname> bootloader, you should set the "
@@ -1480,13 +1520,17 @@ msgid ""
 "the value of <literal>do_bootloader</literal> needs to remain <quote>yes</"
 "quote>."
 msgstr ""
-"对于 <classname>grub</classname> bootloader，您应该设置 <literal>do_bootloader</literal> 选项为 <quote>no</quote>。为了能在安装或删除 Debian 内核时自动更新 <filename>/boot/grub/menu.lst</filename>，应添加下面几行：<informalexample><screen>\n"
+"对于 <classname>grub</classname> bootloader，您应该设置 "
+"<literal>do_bootloader</literal> 选项为 <quote>no</quote>。为了能在安装或删"
+"除 Debian 内核时自动更新 <filename>/boot/grub/menu.lst</filename>，应添加下面"
+"几行：<informalexample><screen>\n"
 "postinst_hook = update-grub\n"
 "postrm_hook   = update-grub\n"
-"</screen></informalexample> 对于 <classname>lilo</classname> bootloader，<literal>do_bootloader</literal> 的值应保留为 <quote>yes</quote>。"
+"</screen></informalexample> 对于 <classname>lilo</classname> bootloader，"
+"<literal>do_bootloader</literal> 的值应保留为 <quote>yes</quote>。"
 
 #. Tag: para
-#: random-bits.xml:734
+#: random-bits.xml:755
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1504,7 +1548,7 @@ msgstr ""
 "filename> )。"
 
 #. Tag: para
-#: random-bits.xml:744
+#: random-bits.xml:765
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1534,13 +1578,13 @@ msgstr ""
 "userinput> 换成 <userinput>hd:</userinput>。"
 
 #. Tag: title
-#: random-bits.xml:757
+#: random-bits.xml:778
 #, no-c-format
 msgid "Finishing touches"
 msgstr "最后一笔"
 
 #. Tag: para
-#: random-bits.xml:758
+#: random-bits.xml:779
 #, no-c-format
 msgid ""
 "As mentioned earlier, the installed system will be very basic. If you would "
@@ -1551,33 +1595,38 @@ msgid ""
 "</screen></informalexample> Of course, you can also just use "
 "<command>aptitude</command> to install packages individually."
 msgstr ""
-"如前所述，安装的是很基本的系统。如果您想让它更成熟一些，有一个简单的方法，使用 <quote>standard</quote> 优先级来安装所有的软件包：<informalexample><screen>\n"
+"如前所述，安装的是很基本的系统。如果您想让它更成熟一些，有一个简单的方法，使"
+"用 <quote>standard</quote> 优先级来安装所有的软件包："
+"<informalexample><screen>\n"
 "# tasksel install standard\n"
-"</screen></informalexample> 当然，您也可以用 <command>aptitude</command> 来安装单独的软件包。"
+"</screen></informalexample> 当然，您也可以用 <command>aptitude</command> 来安"
+"装单独的软件包。"
 
 #. Tag: para
-#: random-bits.xml:769
+#: random-bits.xml:790
 #, no-c-format
 msgid ""
 "After the installation there will be a lot of downloaded packages in "
 "<filename>/var/cache/apt/archives/</filename>. You can free up some "
 "diskspace by running:"
-msgstr "安装之后，<filename>/var/cache/apt/archives/</filename> 里面会有大量下载的软件包。您可以运行下面命令释放空间："
+msgstr ""
+"安装之后，<filename>/var/cache/apt/archives/</filename> 里面会有大量下载的软"
+"件包。您可以运行下面命令释放空间："
 
 #. Tag: screen
-#: random-bits.xml:775
+#: random-bits.xml:796
 #, no-c-format
 msgid "# aptitude clean"
 msgstr "# aptitude clean"
 
 #. Tag: title
-#: random-bits.xml:786
+#: random-bits.xml:807
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "通过 Parallel Line IP (PLIP) 来安装 &debian;"
 
 #. Tag: para
-#: random-bits.xml:788
+#: random-bits.xml:809
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1590,7 +1639,7 @@ msgstr ""
 "具有 Debian 镜像的网络(例如，互联网)。"
 
 #. Tag: para
-#: random-bits.xml:796
+#: random-bits.xml:817
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1604,7 +1653,7 @@ msgstr ""
 "IP 地址(这些地址在您的网络地址空间里面未被占用)。"
 
 #. Tag: para
-#: random-bits.xml:804
+#: random-bits.xml:825
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1615,7 +1664,7 @@ msgstr ""
 "linkend=\"boot-new\"/>)。"
 
 #. Tag: para
-#: random-bits.xml:809
+#: random-bits.xml:830
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1627,13 +1676,13 @@ msgstr ""
 "为 <literal>io=0x378</literal>，<literal>irq=7</literal>。"
 
 #. Tag: title
-#: random-bits.xml:819
+#: random-bits.xml:840
 #, no-c-format
 msgid "Requirements"
 msgstr "需求"
 
 #. Tag: para
-#: random-bits.xml:822
+#: random-bits.xml:843
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1641,13 +1690,13 @@ msgid ""
 msgstr "目标计算机，称为 <emphasis>target</emphasis>，将安装 Debian 在上面。"
 
 #. Tag: para
-#: random-bits.xml:828
+#: random-bits.xml:849
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr "系统安装介质；参阅 <xref linkend=\"installation-media\"/>。"
 
 #. Tag: para
-#: random-bits.xml:833
+#: random-bits.xml:854
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1656,7 +1705,7 @@ msgstr ""
 "另外一台连接到互联网的计算机，称为 <emphasis>source</emphasis>，功能是网关。"
 
 #. Tag: para
-#: random-bits.xml:839
+#: random-bits.xml:860
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1667,13 +1716,13 @@ msgstr ""
 "Install-HOWTO</ulink> 了解这种线的更多信息，以及如何自己制作。"
 
 #. Tag: title
-#: random-bits.xml:851
+#: random-bits.xml:872
 #, no-c-format
 msgid "Setting up source"
 msgstr "建立源"
 
 #. Tag: para
-#: random-bits.xml:852
+#: random-bits.xml:873
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1683,7 +1732,7 @@ msgstr ""
 "算机。"
 
 #. Tag: screen
-#: random-bits.xml:857
+#: random-bits.xml:878
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1725,13 +1774,13 @@ msgstr ""
 "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 #. Tag: title
-#: random-bits.xml:863
+#: random-bits.xml:884
 #, no-c-format
 msgid "Installing target"
 msgstr "安装目标"
 
 #. Tag: para
-#: random-bits.xml:864
+#: random-bits.xml:885
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1755,13 +1804,13 @@ msgstr ""
 "</screen></informalexample> 下面是安装过程中各阶段所要提供的答案。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:883
+#: random-bits.xml:904
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr "从光盘加载安装组件"
 
 #. Tag: para
-#: random-bits.xml:885
+#: random-bits.xml:906
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1771,13 +1820,13 @@ msgstr ""
 "用 PLIP 驱动。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:893
+#: random-bits.xml:914
 #, no-c-format
 msgid "Detect network hardware"
 msgstr "侦测网络硬件"
 
 #. Tag: para
-#: random-bits.xml:898
+#: random-bits.xml:919
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1790,7 +1839,7 @@ msgstr ""
 "系统没有网卡，安装程序不会显示该列表。"
 
 #. Tag: para
-#: random-bits.xml:907
+#: random-bits.xml:928
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1801,19 +1850,19 @@ msgstr ""
 "<userinput>plip</userinput> 模块。"
 
 #. Tag: guimenuitem
-#: random-bits.xml:919
+#: random-bits.xml:940
 #, no-c-format
 msgid "Configure the network"
 msgstr "配置网络"
 
 #. Tag: para
-#: random-bits.xml:922
+#: random-bits.xml:943
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr "Auto-configure network with DHCP: No"
 
 #. Tag: para
-#: random-bits.xml:927
+#: random-bits.xml:948
 #, no-c-format
 msgid ""
 "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
@@ -1821,7 +1870,7 @@ msgstr ""
 "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:932
+#: random-bits.xml:953
 #, no-c-format
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
@@ -1831,7 +1880,7 @@ msgstr ""
 "userinput>"
 
 #. Tag: para
-#: random-bits.xml:938
+#: random-bits.xml:959
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
@@ -1841,23 +1890,26 @@ msgstr ""
 "resolv.conf</filename>)"
 
 #. Tag: title
-#: random-bits.xml:957
+#: random-bits.xml:978
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr "图形安装程序"
 
 #. Tag: para
-#: random-bits.xml:958
+#: random-bits.xml:979
 #, no-c-format
 msgid ""
 "The graphical version of the installer is only available for a limited "
 "number of architectures, including &arch-title;. The functionality of the "
 "graphical installer is essentially the same as that of the regular installer "
 "as it basically uses the same programs, but with a different frontend."
-msgstr "安装程序的图形版本只在有限的几个体系下存在，这包括 &arch-title;。图形界面安装程序的功能基本与普通安装程序相同，它们都是基于同样的程序，仅仅是使用了不同的前端。"
+msgstr ""
+"安装程序的图形版本只在有限的几个体系下存在，这包括 &arch-title;。图形界面安装"
+"程序的功能基本与普通安装程序相同，它们都是基于同样的程序，仅仅是使用了不同的"
+"前端。"
 
 #. Tag: para
-#: random-bits.xml:966
+#: random-bits.xml:987
 #, no-c-format
 msgid ""
 "Although the functionality is identical, the graphical installer still has a "
@@ -1866,10 +1918,13 @@ msgid ""
 "with the regular <quote>newt</quote> frontend. It also has a few usability "
 "advantages such as the option to use a mouse, and in some cases several "
 "questions can be displayed on a single screen."
-msgstr "虽然功能相同，但图形安装程序还有一些优越之处。主要的优点是可以支持更多的语言，特别是那些在普通的 <quote>newt</quote> 前端下无法显示显示字符的语言。它还有一些优点，比如可以使用鼠标，以及在一个屏幕下显示多个问题。"
+msgstr ""
+"虽然功能相同，但图形安装程序还有一些优越之处。主要的优点是可以支持更多的语"
+"言，特别是那些在普通的 <quote>newt</quote> 前端下无法显示显示字符的语言。它还"
+"有一些优点，比如可以使用鼠标，以及在一个屏幕下显示多个问题。"
 
 #. Tag: para
-#: random-bits.xml:975
+#: random-bits.xml:996
 #, no-c-format
 msgid ""
 "The graphical installer is available with all CD images and with the hd-"
@@ -1879,10 +1934,14 @@ msgid ""
 "Analogous, the expert and rescue modes are booted using "
 "<userinput>expertgui</userinput> and <userinput>rescuegui</userinput> "
 "respectively."
-msgstr "图形安装程序在所有的 CD 映像和硬盘安装方法映像上都有。因为图形安装程序使用单独的(较大的) initrd，它使用 <userinput>installgui</userinput> 代替 <userinput>install</userinput> 来引导。同理，expert 和 rescue 模式分别使用 <userinput>expertgui</userinput> 和 <userinput>rescuegui</userinput> 来引导。"
+msgstr ""
+"图形安装程序在所有的 CD 映像和硬盘安装方法映像上都有。因为图形安装程序使用单"
+"独的(较大的) initrd，它使用 <userinput>installgui</userinput> 代替 "
+"<userinput>install</userinput> 来引导。同理，expert 和 rescue 模式分别使用 "
+"<userinput>expertgui</userinput> 和 <userinput>rescuegui</userinput> 来引导。"
 
 #. Tag: para
-#: random-bits.xml:985
+#: random-bits.xml:1006
 #, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
@@ -1891,10 +1950,15 @@ msgid ""
 "<quote>gtk-miniiso</quote>. </para> </footnote>, which is mainly useful for "
 "testing; in this case the image is booted just using <userinput>install</"
 "userinput>. There is no graphical installer image that can be netbooted."
-msgstr "还有一个特殊的 <quote>mini</quote> ISO 映像<footnote id=\"gtk-miniiso\"> <para> mini ISO 映像可从 <xref linkend=\"downloading-files\"/> 里面的 Debian 镜像下载，名为 <quote>gtk-miniiso</quote>。</para> </footnote>，主要用于测试；这时它只能使用 <userinput>install</userinput> 来引导。对于网络引导，没有对应的图形安装程序。"
+msgstr ""
+"还有一个特殊的 <quote>mini</quote> ISO 映像<footnote id=\"gtk-miniiso\"> "
+"<para> mini ISO 映像可从 <xref linkend=\"downloading-files\"/> 里面的 Debian "
+"镜像下载，名为 <quote>gtk-miniiso</quote>。</para> </footnote>，主要用于测"
+"试；这时它只能使用 <userinput>install</userinput> 来引导。对于网络引导，没有"
+"对应的图形安装程序。"
 
 #. Tag: para
-#: random-bits.xml:999
+#: random-bits.xml:1020
 #, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
@@ -1903,45 +1967,56 @@ msgid ""
 "\"downloading-files\"/>. Look for <quote>gtk-miniiso</quote>. </para> </"
 "footnote>. It should work on almost all PowerPC systems that have an ATI "
 "graphical card, but is unlikely to work on other systems."
-msgstr "对于 &arch-title;，当前只有一个实验性的 <quote>mini</quote> ISO 映像<footnote id=\"gtk-miniiso\"> <para> mini ISO image 可以从 <xref linkend=\"downloading-files\"/> 里面的 Debian 镜像下载，名为 <quote>gtk-miniiso</quote>。</para> </footnote>。它可以工作在所有使用 ATI 图形卡的 PowerPC 系统上，但其它的则不行。"
+msgstr ""
+"对于 &arch-title;，当前只有一个实验性的 <quote>mini</quote> ISO 映像"
+"<footnote id=\"gtk-miniiso\"> <para> mini ISO image 可以从 <xref linkend="
+"\"downloading-files\"/> 里面的 Debian 镜像下载，名为 <quote>gtk-miniiso</"
+"quote>。</para> </footnote>。它可以工作在所有使用 ATI 图形卡的 PowerPC 系统"
+"上，但其它的则不行。"
 
 #. Tag: para
-#: random-bits.xml:1012
+#: random-bits.xml:1033
 #, no-c-format
 msgid ""
 "The graphical installer requires significantly more memory to run than the "
 "regular installer: &minimum-memory-gtk;. If insufficient memory is "
 "available, it will automatically fall back to the regular <quote>newt</"
 "quote> frontend."
-msgstr "图形安装程序比普通安装程序需要更多的内存：&minimum-memory-gtk;。如果无法满足内存条件，它将自动回到普通的 <quote>newt</quote> 前端。"
+msgstr ""
+"图形安装程序比普通安装程序需要更多的内存：&minimum-memory-gtk;。如果无法满足"
+"内存条件，它将自动回到普通的 <quote>newt</quote> 前端。"
 
 #. Tag: para
-#: random-bits.xml:1019
+#: random-bits.xml:1040
 #, no-c-format
 msgid ""
 "You can add boot parameters when starting the graphical installer, just as "
 "with the regular installer. One of those parameters allows you to configure "
 "the mouse for left-handed use. See <xref linkend=\"boot-parms\"/> for valid "
 "parameters."
-msgstr "您可以在启动图形安装程序时加上引导参数，就像普通安装程序一样。其中一个参数允许您设置鼠标为左手习惯。参阅 <xref linkend=\"boot-parms\"/> 了解可用的参数。"
+msgstr ""
+"您可以在启动图形安装程序时加上引导参数，就像普通安装程序一样。其中一个参数允"
+"许您设置鼠标为左手习惯。参阅 <xref linkend=\"boot-parms\"/> 了解可用的参数。"
 
 #. Tag: title
-#: random-bits.xml:1029
+#: random-bits.xml:1050
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr "使用图形安装程序"
 
 #. Tag: para
-#: random-bits.xml:1030
+#: random-bits.xml:1051
 #, no-c-format
 msgid ""
 "As already mentioned, the graphical installer basically works the same as "
 "the regular installer and thus the rest of this manual can be used to guide "
 "you through the installation process."
-msgstr "前面提到，图形安装程序与普通安装程序基本上工作一致，因此本手册的其他部分可以用来给您的安装过程进行指导。"
+msgstr ""
+"前面提到，图形安装程序与普通安装程序基本上工作一致，因此本手册的其他部分可以"
+"用来给您的安装过程进行指导。"
 
 #. Tag: para
-#: random-bits.xml:1036
+#: random-bits.xml:1057
 #, no-c-format
 msgid ""
 "If you prefer using the keyboard over the mouse, there are two things you "
@@ -1951,60 +2026,74 @@ msgid ""
 "selected (e.g. task selection), you first need to tab to the "
 "<guibutton>Continue</guibutton> button after making your selections; hitting "
 "enter will toggle a selection, not activate <guibutton>Continue</guibutton>."
-msgstr "如果您喜欢用键盘替代鼠标，有两件事需要知道。要展开一个层级列表(比如用从大洲里面选择国家)，可以使用 <keycap>+</keycap> 和 <keycap>-</keycap> 键。对于多项选择(例如，选择任务)，您首先需要在选中后用 tab 跳到 <guibutton>Continue</guibutton> 按钮，按回车键切换选择，而不是激活 <guibutton>Continue</guibutton>。"
+msgstr ""
+"如果您喜欢用键盘替代鼠标，有两件事需要知道。要展开一个层级列表(比如用从大洲里"
+"面选择国家)，可以使用 <keycap>+</keycap> 和 <keycap>-</keycap> 键。对于多项选"
+"择(例如，选择任务)，您首先需要在选中后用 tab 跳到 <guibutton>Continue</"
+"guibutton> 按钮，按回车键切换选择，而不是激活 <guibutton>Continue</"
+"guibutton>。"
 
 #. Tag: para
-#: random-bits.xml:1046
+#: random-bits.xml:1067
 #, no-c-format
 msgid ""
 "To switch to another console, you will also need to use the <keycap>Ctrl</"
 "keycap> key, just as with the X Window System. For example, to switch to VT1 "
 "you would use: <keycombo> <keycap>Ctrl</keycap> <keycap>Left Alt</keycap> "
 "<keycap>F1</keycap> </keycombo>."
-msgstr "要切换到另外一个控制台，您也需要使用 <keycap>Ctrl</keycap> 键，就像在 X Window 系统一样。例如，要切换到 VT1，需要使用：<keycombo> <keycap>Ctrl</keycap> <keycap>Left Alt</keycap> <keycap>F1</keycap> </keycombo>。"
+msgstr ""
+"要切换到另外一个控制台，您也需要使用 <keycap>Ctrl</keycap> 键，就像在 X "
+"Window 系统一样。例如，要切换到 VT1，需要使用：<keycombo> <keycap>Ctrl</"
+"keycap> <keycap>Left Alt</keycap> <keycap>F1</keycap> </keycombo>。"
 
 #. Tag: title
-#: random-bits.xml:1057
+#: random-bits.xml:1078
 #, no-c-format
 msgid "Known issues"
 msgstr "已知事项"
 
 #. Tag: para
-#: random-bits.xml:1058
+#: random-bits.xml:1079
 #, no-c-format
 msgid ""
 "Etch is the first release that includes the graphical installer and uses "
 "some relatively new technology. There are a few known issues that you may "
 "run into during the installation. We expect to be able to fix these issues "
 "for the next release of &debian;."
-msgstr "Etch 是首个使用图形安装界面的发布版，使用了一些相对新的技术。有一些已知的问题会出现在您的安装过程中。我们希望在下一个 &debian; 发布版中解决这些问题。"
+msgstr ""
+"Etch 是首个使用图形安装界面的发布版，使用了一些相对新的技术。有一些已知的问题"
+"会出现在您的安装过程中。我们希望在下一个 &debian; 发布版中解决这些问题。"
 
 #. Tag: para
-#: random-bits.xml:1068
+#: random-bits.xml:1089
 #, no-c-format
 msgid ""
 "Information on some screens is not nicely formatted into columns as it "
 "should be. The most obvious example is the first screen where you select "
 "your language. Another example is the main screen of partman."
-msgstr "有些画面中的信息没有很好地格式化进它该在的列中。最明显的例子是第一个画面中的语言选择。另外一个例子是 partman 的主画面。"
+msgstr ""
+"有些画面中的信息没有很好地格式化进它该在的列中。最明显的例子是第一个画面中的"
+"语言选择。另外一个例子是 partman 的主画面。"
 
 #. Tag: para
-#: random-bits.xml:1075
+#: random-bits.xml:1096
 #, no-c-format
 msgid ""
 "Typing some characters may not work and in some cases the wrong character "
 "may be printed. For example, \"composing\" a character by typing an accent "
 "and then the letter over/under which the accent should appear does not work."
-msgstr "有些条件下输入一些字符可能会出现错误的字符。例如，用重音符号\"排字\"，重音符号之上/下的字母应该显示，但却没有。"
+msgstr ""
+"有些条件下输入一些字符可能会出现错误的字符。例如，用重音符号\"排字\"，重音符"
+"号之上/下的字母应该显示，但却没有。"
 
 #. Tag: para
-#: random-bits.xml:1082
+#: random-bits.xml:1103
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr "还不支持触摸板"
 
 #. Tag: para
-#: random-bits.xml:1087
+#: random-bits.xml:1108
 #, no-c-format
 msgid ""
 "You should not switch to a different console while the installer is busy; "
@@ -2012,13 +2101,82 @@ msgid ""
 "automatically, but this may still cause problems with the installation. "
 "Switching to another console while the installer is waiting for input should "
 "work without causing any problems."
-msgstr "当安装程序忙碌的时候，您不应切换到另外一个控制台，这可能会让前端崩溃。虽然前端会自动重启，但这会给安装造成一些问题。当安装程序等待输入时，再切换到其他控制台就不会造成任何问题。"
+msgstr ""
+"当安装程序忙碌的时候，您不应切换到另外一个控制台，这可能会让前端崩溃。虽然前"
+"端会自动重启，但这会给安装造成一些问题。当安装程序等待输入时，再切换到其他控"
+"制台就不会造成任何问题。"
 
 #. Tag: para
-#: random-bits.xml:1096
+#: random-bits.xml:1117
 #, no-c-format
 msgid ""
 "Support for creating encrypted partitions is limited as it is not possible "
 "to generate a random encryption key. It is possible to set up an encrypted "
 "partition using a passphrase as encryption key."
-msgstr "由于无法生成随机的密钥，对于创建加密分区的支持仍然有限。但可以使用密码作为密钥来建立加密分区。"
+msgstr ""
+"由于无法生成随机的密钥，对于创建加密分区的支持仍然有限。但可以使用密码作为密"
+"钥来建立加密分区。"
+
+#~ msgid ""
+#~ "The mouse can be used in both the Linux console (with gpm) and the X "
+#~ "window environment. The two uses can be made compatible if the gpm "
+#~ "repeater is used to allow the signal to flow to the X server as shown: "
+#~ "<informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> Set the repeater protocol to be raw (in "
+#~ "<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
+#~ "protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
+#~ "X11/XF86Config-4</filename>."
+#~ msgstr ""
+#~ "无论在 Linux 的控制台(console)里(通过 gpm)，还是在 X 窗口环境之中，您都可"
+#~ "以使用鼠标。这两种用法是可以兼容的，只要设置 gpm 转发器，令其让信号流往 X "
+#~ "服务器： <informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> 把转发器的协议设为直接(raw)模式(在 <filename>/"
+#~ "etc/gpm.conf</filename> 里)，同时在 <filename>/etc/X11/XF86Config</"
+#~ "filename> 或者 <filename>/etc/X11/XF86Config-4</filename> 里设置一下，让 "
+#~ "X 使用原始的鼠标协议。"
+
+#~ msgid ""
+#~ "This approach to use gpm even in X has advantages when the mouse is "
+#~ "unplugged inadvertently. Simply restarting gpm with "
+#~ "<informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> will re-connect the mouse in software without "
+#~ "restarting X."
+#~ msgstr ""
+#~ "用这种方法使用 gpm 的话，就算在 X 里也有其优势。如果不小心把鼠标拔下来后，"
+#~ "只要像这样重新启动 gpm 就可以了： <informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> 如此就可以在软件层面上重新连接鼠标，而不用重"
+#~ "启 X 了。"
+
+#~ msgid ""
+#~ "If gpm is disabled or not installed for some reason, make sure to set X "
+#~ "to read directly from a mouse device such as /dev/psaux. For details, "
+#~ "refer to the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/"
+#~ "en-txt/mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
+#~ "<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-"
+#~ "xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
+#~ msgstr ""
+#~ "如果禁用了 gpm，或者因为某些原因没有安装，请确保设置 X 从鼠标设备，比如 /"
+#~ "dev/psaux 上直接读取数据。详情情况，请参阅三键鼠标的 mini-Howto "
+#~ "<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>、"
+#~ "<userinput>man gpm</userinput>、<filename>/usr/share/doc/gpm/FAQ.gz</"
+#~ "filename> 以及 <ulink url=\"&url-xorg;current/doc/html/mouse.html"
+#~ "\">README.mouse</ulink>。"
+
+#~ msgid ""
+#~ "For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/"
+#~ "etc/X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/"
+#~ "dev/input/mice\"</userinput>."
+#~ msgstr ""
+#~ "对 PowerPC 来说，需要在<filename>/etc/X11/XF86Config</filename>或者 "
+#~ "<filename>/etc/X11/XF86Config-4</filename> 设置鼠标设备里或者 <userinput>"
+#~ "\"/dev/input/mice\"</userinput>。"

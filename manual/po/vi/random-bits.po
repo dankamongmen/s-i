@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-07 13:24+0000\n"
+"POT-Creation-Date: 2007-01-22 23:21+0000\n"
 "PO-Revision-Date: 2007-01-15 18:06+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -332,86 +332,45 @@ msgid "Setting Up Your Mouse"
 msgstr "Thiết lập con chuột"
 
 #. Tag: para
-#: random-bits.xml:127
+#: random-bits.xml:126
 #, no-c-format
 msgid ""
 "The mouse can be used in both the Linux console (with gpm) and the X window "
-"environment. The two uses can be made compatible if the gpm repeater is used "
-"to allow the signal to flow to the X server as shown: "
-"<informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (repeater)        (symlink)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> Set the repeater protocol to be raw (in "
-"<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
-"protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/X11/"
-"XF86Config-4</filename>."
+"environment. Normally, this is a simple matter of installing <filename>gpm</"
+"filename> and the X server itself. Both should be configured to use "
+"<filename>/dev/input/mice</filename> as the mouse device. The correct mouse "
+"protocol is named <userinput>exps2</userinput> in gpm, and "
+"<userinput>ExplorerPS/2</userinput> in X. The respective configuration files "
+"are <filename>/etc/gpm.conf</filename> and <filename>/etc/X11/xorg.conf</"
+"filename>."
 msgstr ""
-"Con chuột được dùng trong cả bàn giao tiếp Linux (bằng GPM) lẫn môi trường "
-"cửa sổ X. Hai cách sử dụng này có thể được làm tương thích với nhau nếu bộ "
-"lặp lại GPM được dùng để cho phép tín hiệu luồng đến trình phục vụ X như "
-"được hiển thị: <informalexample><screen>\n"
-"mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; "
-"X\n"
-"         /dev/ttyS0             (bộ lặp lại)        (liên kết tượng trưng)\n"
-"         /dev/ttyS1\n"
-"</screen></informalexample> Hãy đặt giao thức lặp lại là thô [<quote>raw</"
-"quote>] (trong tập tin cấu hình <filename>/etc/gpm.conf</filename>), còn đặt "
-"X với giao thức con chuột gốc trong tập tin cấu hình X <filename>/etc/X11/"
-"XF86Config</filename> hay <filename>/etc/X11/XF86Config-4</filename>."
 
 #. Tag: para
-#: random-bits.xml:139
+#: random-bits.xml:137
 #, no-c-format
 msgid ""
-"This approach to use gpm even in X has advantages when the mouse is "
-"unplugged inadvertently. Simply restarting gpm with "
-"<informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> will re-connect the mouse in software without "
-"restarting X."
+"Certain kernel modules must be loaded in order for your mouse to work. In "
+"most cases the correct modules are autodetected, but not always for old-"
+"style serial and bus mice<footnote> <para> Serial mice usually have a 9-hole "
+"D-shaped connector; bus mice have an 8-pin round connector, not to be "
+"confused with the 6-pin round connector of a PS/2 mouse or the 4-pin round "
+"connector of an ADB mouse. </para> </footnote>, which are quite rare except "
+"on very old computers. Summary of Linux kernel modules needed for different "
+"mouse types: <informaltable><tgroup cols=\"2\"><thead> <row> <entry>Module</"
+"entry> <entry>Description</entry> </row> </thead><tbody> <row> "
+"<entry>psmouse</entry> <entry>PS/2 mice (should be autodetected)</entry> </"
+"row> <row> <entry>usbhid</entry> <entry>USB mice (should be autodetected)</"
+"entry> </row> <row> <entry>sermouse</entry> <entry>Most serial mice</entry> "
+"</row> <row> <entry>logibm</entry> <entry>Bus mouse connected to Logitech "
+"adapter card</entry> </row> <row> <entry>inport</entry> <entry>Bus mouse "
+"connected to ATI or Microsoft InPort card</entry> </row> </tbody></tgroup></"
+"informaltable> To load a mouse driver module, you can use the "
+"<command>modconf</command> command (from the package with the same name) and "
+"look in the category <userinput>kernel/drivers/input/mouse</userinput>."
 msgstr ""
-"Phương pháp này, để dùng GPM ngay cả trong X, có ích khi con chuột bị tháo "
-"nút ra không chú ý. Việc đơn giản khởi chạy lại GPM bằng "
-"lệnh<informalexample><screen>\n"
-"# /etc/init.d/gpm restart\n"
-"</screen></informalexample> sẽ kết nối lại con chuột trong phần mềm, không "
-"cần khởi chạy lại X."
 
 #. Tag: para
-#: random-bits.xml:148
-#, no-c-format
-msgid ""
-"If gpm is disabled or not installed for some reason, make sure to set X to "
-"read directly from a mouse device such as /dev/psaux. For details, refer to "
-"the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/en-txt/"
-"mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
-"<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-xorg;"
-"current/doc/html/mouse.html\">README.mouse</ulink>."
-msgstr ""
-"Nếu vì lý do nào GPM bị tắt hay chưa được cài đặt, hãy đảm bảo đặt X sẽ đọc "
-"trực tiếp từ thiết bị con chuột, v.d. <filename>/dev/psaux</filename>. Để "
-"tìm chi tiết, xem tài liệu nhỏ con chuột có ba cái nút Thế Nào tại "
-"<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, "
-"trang hướng dẫn <userinput>man gpm</userinput>, Hỏi Đáp <filename>/usr/share/"
-"doc/gpm/FAQ.gz</filename>, và tài liệu Đọc Đi <ulink url=\"&url-xorg;current/"
-"doc/html/mouse.html\">README.mouse</ulink>."
-
-#. Tag: para
-#: random-bits.xml:158
-#, no-c-format
-msgid ""
-"For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
-"X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/dev/input/"
-"mice\"</userinput>."
-msgstr ""
-"Đối với máy kiểu PowerPC, trong tập tin cấu hình X <filename>/etc/X11/"
-"XF86Config</filename> hay <filename>/etc/X11/XF86Config-4</filename>, bạn "
-"đặt thiết bị con chuột thành <userinput>\"/dev/input/mice\"</userinput>."
-
-#. Tag: para
-#: random-bits.xml:164
+#: random-bits.xml:184
 #, no-c-format
 msgid ""
 "Modern kernels give you the capability to emulate a three-button mouse when "
@@ -423,7 +382,7 @@ msgstr ""
 "vào tập tin cấu hình <filename>/etc/sysctl.conf</filename>."
 
 #. Tag: screen
-#: random-bits.xml:170
+#: random-bits.xml:191
 #, no-c-format
 msgid ""
 "# 3-button mouse emulation\n"
@@ -445,13 +404,13 @@ msgstr ""
 "# Đối với phím khác, dùng công cụ showkey để báo bạn biết mã thích hợp."
 
 #. Tag: title
-#: random-bits.xml:177
+#: random-bits.xml:198
 #, no-c-format
 msgid "Disk Space Needed for Tasks"
 msgstr "Sức chứa trên đĩa cần thiết cho công việc"
 
 #. Tag: para
-#: random-bits.xml:194
+#: random-bits.xml:215
 #, no-c-format
 msgid ""
 "A standard installation for the i386 architecture, including all standard "
@@ -465,7 +424,7 @@ msgstr ""
 "chiếm 230 MB."
 
 #. Tag: para
-#: random-bits.xml:202
+#: random-bits.xml:223
 #, no-c-format
 msgid ""
 "In both cases this is the actual disk space used <emphasis>after</emphasis> "
@@ -481,7 +440,7 @@ msgstr ""
 "cả <emphasis>trong khi</emphasis> cài đặt lẫn khi sử dụng hệ thống hàng ngày."
 
 #. Tag: para
-#: random-bits.xml:211
+#: random-bits.xml:232
 #, no-c-format
 msgid ""
 "The following table lists sizes reported by aptitude for the tasks listed in "
@@ -495,7 +454,7 @@ msgstr ""
 "hai công việc với nhau có thể là nhỏ hơn tổng hai số đó."
 
 #. Tag: para
-#: random-bits.xml:218
+#: random-bits.xml:239
 #, no-c-format
 msgid ""
 "Note that you will need to add the sizes listed in the table to the size of "
@@ -513,61 +472,61 @@ msgstr ""
 "<filename>/var</filename>."
 
 #. Tag: entry
-#: random-bits.xml:232
+#: random-bits.xml:253
 #, no-c-format
 msgid "Task"
 msgstr "Công việc"
 
 #. Tag: entry
-#: random-bits.xml:233
+#: random-bits.xml:254
 #, no-c-format
 msgid "Installed size (MB)"
 msgstr "Kích cỡ đã cài đặt (MB)"
 
 #. Tag: entry
-#: random-bits.xml:234
+#: random-bits.xml:255
 #, no-c-format
 msgid "Download size (MB)"
 msgstr "Kích cỡ tải về (MB)"
 
 #. Tag: entry
-#: random-bits.xml:235
+#: random-bits.xml:256
 #, no-c-format
 msgid "Space needed to install (MB)"
 msgstr "Sức chứa cần thiết để cài đặt (MB)"
 
 #. Tag: entry
-#: random-bits.xml:241
+#: random-bits.xml:262
 #, no-c-format
 msgid "Desktop environment"
 msgstr "Môi trường làm việc"
 
 #. Tag: entry
-#: random-bits.xml:242
+#: random-bits.xml:263
 #, no-c-format
 msgid "1267"
 msgstr "1267"
 
 #. Tag: entry
-#: random-bits.xml:243
+#: random-bits.xml:264
 #, no-c-format
 msgid "<entry>420</entry>"
 msgstr "<entry>420</entry>"
 
 #. Tag: entry
-#: random-bits.xml:244
+#: random-bits.xml:265
 #, no-c-format
 msgid "1667"
 msgstr "1667"
 
 #. Tag: entry
-#: random-bits.xml:248
+#: random-bits.xml:269
 #, no-c-format
 msgid "Laptop"
 msgstr "Máy tính xách tay"
 
 #. Tag: para
-#: random-bits.xml:250
+#: random-bits.xml:271
 #, no-c-format
 msgid ""
 "There is a large overlap of the Laptop task with the Destop environment "
@@ -579,169 +538,169 @@ msgstr ""
 "thêm sức chứa trên đĩa."
 
 #. Tag: entry
-#: random-bits.xml:257
+#: random-bits.xml:278
 #, no-c-format
 msgid "<entry>50</entry>"
 msgstr "<entry>50</entry>"
 
 #. Tag: entry
-#: random-bits.xml:258
+#: random-bits.xml:279
 #, no-c-format
 msgid "<entry>17</entry>"
 msgstr "<entry>17</entry>"
 
 #. Tag: entry
-#: random-bits.xml:259
+#: random-bits.xml:280
 #, no-c-format
 msgid "<entry>67</entry>"
 msgstr "<entry>67</entry>"
 
 #. Tag: entry
-#: random-bits.xml:263
+#: random-bits.xml:284
 #, no-c-format
 msgid "Web server"
 msgstr "Trình phục vụ Mạng"
 
 #. Tag: entry
-#: random-bits.xml:264
+#: random-bits.xml:285
 #, no-c-format
 msgid "<entry>35</entry>"
 msgstr "<entry>35</entry>"
 
 #. Tag: entry
-#: random-bits.xml:265
+#: random-bits.xml:286
 #, no-c-format
 msgid "<entry>11</entry>"
 msgstr "<entry>11</entry>"
 
 #. Tag: entry
-#: random-bits.xml:266
+#: random-bits.xml:287
 #, no-c-format
 msgid "<entry>46</entry>"
 msgstr "<entry>46</entry>"
 
 #. Tag: entry
-#: random-bits.xml:270
+#: random-bits.xml:291
 #, no-c-format
 msgid "Print server"
 msgstr "Trình phục vụ in"
 
 #. Tag: entry
-#: random-bits.xml:271
+#: random-bits.xml:292
 #, no-c-format
 msgid "<entry>277</entry>"
 msgstr "<entry>277</entry>"
 
 #. Tag: entry
-#: random-bits.xml:272
+#: random-bits.xml:293
 #, no-c-format
 msgid "<entry>79</entry>"
 msgstr "<entry>79</entry>"
 
 #. Tag: entry
-#: random-bits.xml:273
+#: random-bits.xml:294
 #, no-c-format
 msgid "<entry>356</entry>"
 msgstr "<entry>356</entry>"
 
 #. Tag: entry
-#: random-bits.xml:277
+#: random-bits.xml:298
 #, no-c-format
 msgid "DNS server"
 msgstr "Trình phục vụ DNS"
 
 #. Tag: entry
-#: random-bits.xml:278
+#: random-bits.xml:299
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: random-bits.xml:279
+#: random-bits.xml:300
 #, no-c-format
 msgid "<entry>1</entry>"
 msgstr "<entry>1</entry>"
 
 #. Tag: entry
-#: random-bits.xml:280
+#: random-bits.xml:301
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: random-bits.xml:284
+#: random-bits.xml:305
 #, no-c-format
 msgid "File server"
 msgstr "Trình phục vụ tập tin"
 
 #. Tag: entry
-#: random-bits.xml:285
+#: random-bits.xml:306
 #, no-c-format
 msgid "<entry>49</entry>"
 msgstr "<entry>49</entry>"
 
 #. Tag: entry
-#: random-bits.xml:286
+#: random-bits.xml:307
 #, no-c-format
 msgid "<entry>21</entry>"
 msgstr "<entry>21</entry>"
 
 #. Tag: entry
-#: random-bits.xml:287
+#: random-bits.xml:308
 #, no-c-format
 msgid "<entry>70</entry>"
 msgstr "<entry>70</entry>"
 
 #. Tag: entry
-#: random-bits.xml:291
+#: random-bits.xml:312
 #, no-c-format
 msgid "Mail server"
 msgstr "Trình phục vụ thư"
 
 #. Tag: entry
-#: random-bits.xml:292
+#: random-bits.xml:313
 #, no-c-format
 msgid "<entry>13</entry>"
 msgstr "<entry>13</entry>"
 
 #. Tag: entry
-#: random-bits.xml:293
+#: random-bits.xml:314
 #, no-c-format
 msgid "<entry>5</entry>"
 msgstr "<entry>5</entry>"
 
 #. Tag: entry
-#: random-bits.xml:294
+#: random-bits.xml:315
 #, no-c-format
 msgid "<entry>18</entry>"
 msgstr "<entry>18</entry>"
 
 #. Tag: entry
-#: random-bits.xml:298
+#: random-bits.xml:319
 #, no-c-format
 msgid "SQL database"
 msgstr "Cơ sở dữ liệu SQL"
 
 #. Tag: entry
-#: random-bits.xml:299
+#: random-bits.xml:320
 #, no-c-format
 msgid "<entry>24</entry>"
 msgstr "<entry>24</entry>"
 
 #. Tag: entry
-#: random-bits.xml:300
+#: random-bits.xml:321
 #, no-c-format
 msgid "<entry>8</entry>"
 msgstr "<entry>8</entry>"
 
 #. Tag: entry
-#: random-bits.xml:301
+#: random-bits.xml:322
 #, no-c-format
 msgid "<entry>32</entry>"
 msgstr "<entry>32</entry>"
 
 #. Tag: para
-#: random-bits.xml:307
+#: random-bits.xml:328
 #, no-c-format
 msgid ""
 "The <emphasis>Desktop</emphasis> task will install the GNOME desktop "
@@ -751,7 +710,7 @@ msgstr ""
 "việc GNOME."
 
 #. Tag: para
-#: random-bits.xml:314
+#: random-bits.xml:335
 #, no-c-format
 msgid ""
 "If you install in a language other than English, <command>tasksel</command> "
@@ -766,13 +725,13 @@ msgstr ""
 "350 MB để tải về và cài đặt công việc này."
 
 #. Tag: title
-#: random-bits.xml:329
+#: random-bits.xml:350
 #, no-c-format
 msgid "Installing &debian; from a Unix/Linux System"
 msgstr "Cài đặt &debian; từ hệ thống UNIX/Linux"
 
 #. Tag: para
-#: random-bits.xml:331
+#: random-bits.xml:352
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; from an existing Unix or Linux "
@@ -794,7 +753,7 @@ msgstr ""
 "dấu băm <prompt>#</prompt> đại diện lệnh được nhập vào chroot của Debian."
 
 #. Tag: para
-#: random-bits.xml:343
+#: random-bits.xml:364
 #, no-c-format
 msgid ""
 "Once you've got the new Debian system configured to your preference, you can "
@@ -810,13 +769,13 @@ msgstr ""
 "cứng thường không hợp tác với vật chứa khác nhau kiểu khởi động hay cài đặt."
 
 #. Tag: title
-#: random-bits.xml:355
+#: random-bits.xml:376
 #, no-c-format
 msgid "Getting Started"
 msgstr "Bắt đầu"
 
 #. Tag: para
-#: random-bits.xml:356
+#: random-bits.xml:377
 #, no-c-format
 msgid ""
 "With your current *nix partitioning tools, repartition the hard drive as "
@@ -832,7 +791,7 @@ msgstr ""
 "hơn nếu bạn định cài đặt môi trường làm việc như GNOME hay KDE)."
 
 #. Tag: para
-#: random-bits.xml:364
+#: random-bits.xml:385
 #, no-c-format
 msgid ""
 "Next, create file systems on the partitions. For example, to create an ext3 "
@@ -850,7 +809,7 @@ msgstr ""
 "bỏ đoạn <userinput>-j</userinput> đi."
 
 #. Tag: para
-#: random-bits.xml:374
+#: random-bits.xml:395
 #, no-c-format
 msgid ""
 "Initialize and activate swap (substitute the partition number for your "
@@ -875,7 +834,7 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:386
+#: random-bits.xml:407
 #, no-c-format
 msgid ""
 "# mkdir /mnt/debinst\n"
@@ -885,7 +844,7 @@ msgstr ""
 "# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst"
 
 #. Tag: para
-#: random-bits.xml:389
+#: random-bits.xml:410
 #, no-c-format
 msgid ""
 "If you want to have parts of the filesystem (e.g. /usr) mounted on separate "
@@ -897,13 +856,13 @@ msgstr ""
 "những thư mục này trước khi tiếp tục tới giao đoạn kế tiếp."
 
 #. Tag: title
-#: random-bits.xml:399
+#: random-bits.xml:420
 #, no-c-format
 msgid "Install <command>debootstrap</command>"
 msgstr "Cài đặt <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:400
+#: random-bits.xml:421
 #, no-c-format
 msgid ""
 "The utility used by the Debian installer, and recognized as the official way "
@@ -928,7 +887,7 @@ msgstr ""
 "về và cài đặt <command>debootstrap</command>."
 
 #. Tag: para
-#: random-bits.xml:430
+#: random-bits.xml:451
 #, no-c-format
 msgid ""
 "Or, you can use the following procedure to install it manually. Make a work "
@@ -957,7 +916,7 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:445
+#: random-bits.xml:466
 #, no-c-format
 msgid ""
 "# ar -x debootstrap_0.X.X_all.deb\n"
@@ -969,18 +928,18 @@ msgstr ""
 "# zcat /đường_dẫn_đầy_đủ_đến_work/work/data.tar.gz | tar xv"
 
 #. Tag: title
-#: random-bits.xml:451
+#: random-bits.xml:472
 #, no-c-format
 msgid "Run <command>debootstrap</command>"
 msgstr "Chạy <command>debootstrap</command>"
 
 #. Tag: para
-#: random-bits.xml:452
-#, no-c-format
+#: random-bits.xml:473
+#, fuzzy, no-c-format
 msgid ""
 "<command>debootstrap</command> can download the needed files directly from "
 "the archive when you run it. You can substitute any Debian archive mirror "
-"for <userinput>http.us.debian.org/debian</userinput> in the command example "
+"for <userinput>&archive-mirror;/debian</userinput> in the command example "
 "below, preferably a mirror close to you network-wise. Mirrors are listed at "
 "<ulink url=\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 msgstr ""
@@ -993,7 +952,7 @@ msgstr ""
 "README.mirrors\"></ulink>."
 
 #. Tag: para
-#: random-bits.xml:461
+#: random-bits.xml:482
 #, no-c-format
 msgid ""
 "If you have a &releasename; &debian; CD mounted at <filename>/cdrom</"
@@ -1005,7 +964,7 @@ msgstr ""
 "tập tin: <userinput>file:/cdrom/debian/</userinput>"
 
 #. Tag: para
-#: random-bits.xml:467
+#: random-bits.xml:488
 #, no-c-format
 msgid ""
 "Substitute one of the following for <replaceable>ARCH</replaceable> in the "
@@ -1026,7 +985,7 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:485
+#: random-bits.xml:506
 #, no-c-format
 msgid ""
 "# /usr/sbin/debootstrap --arch ARCH &releasename; \\\n"
@@ -1036,13 +995,13 @@ msgstr ""
 "     /mnt/debinst http://ftp.us.debian.org/debian"
 
 #. Tag: title
-#: random-bits.xml:491
+#: random-bits.xml:512
 #, no-c-format
 msgid "Configure The Base System"
 msgstr "Cấu hình hệ thống cơ bản"
 
 #. Tag: para
-#: random-bits.xml:492
+#: random-bits.xml:513
 #, no-c-format
 msgid ""
 "Now you've got a real Debian system, though rather lean, on disk. "
@@ -1058,19 +1017,19 @@ msgstr ""
 "nghĩa thiết bị cuối tương thích với hệ thống cơ bản Debian, chẳng hạn:"
 
 #. Tag: screen
-#: random-bits.xml:502
+#: random-bits.xml:523
 #, no-c-format
 msgid "# export TERM=<replaceable>xterm-color</replaceable>"
 msgstr "# export TERM=<replaceable>xterm-color</replaceable>"
 
 #. Tag: title
-#: random-bits.xml:507
+#: random-bits.xml:528
 #, no-c-format
 msgid "Mount Partitions"
 msgstr "Gắn kết phân vùng"
 
 #. Tag: para
-#: random-bits.xml:508
+#: random-bits.xml:529
 #, no-c-format
 msgid ""
 "You need to create <filename>/etc/fstab</filename>. "
@@ -1154,13 +1113,13 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:534
+#: random-bits.xml:555
 #, no-c-format
 msgid "# mount -t proc proc /proc"
 msgstr "# mount -t proc proc /proc"
 
 #. Tag: para
-#: random-bits.xml:536
+#: random-bits.xml:557
 #, no-c-format
 msgid ""
 "The command <userinput>ls /proc</userinput> should now show a non-empty "
@@ -1173,19 +1132,19 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:542
+#: random-bits.xml:563
 #, no-c-format
 msgid "# mount -t proc proc /mnt/debinst/proc"
 msgstr "# mount -t proc proc /mnt/debinst/proc"
 
 #. Tag: title
-#: random-bits.xml:548
+#: random-bits.xml:569
 #, no-c-format
 msgid "Setting Timezone"
 msgstr "Đặt múi giờ"
 
 #. Tag: para
-#: random-bits.xml:549
+#: random-bits.xml:570
 #, no-c-format
 msgid ""
 "An option in the file <filename>/etc/default/rcS</filename> determines "
@@ -1198,7 +1157,7 @@ msgstr ""
 "địa phương. Lệnh sau cho bạn có khả năng đặt nó và chọn múi giờ riêng."
 
 #. Tag: screen
-#: random-bits.xml:556
+#: random-bits.xml:577
 #, no-c-format
 msgid ""
 "# editor /etc/default/rcS\n"
@@ -1208,13 +1167,13 @@ msgstr ""
 "# tzconfig"
 
 #. Tag: title
-#: random-bits.xml:562
+#: random-bits.xml:583
 #, no-c-format
 msgid "Configure Networking"
 msgstr "Cấu hình khả năng chạy mạng"
 
 #. Tag: para
-#: random-bits.xml:563
+#: random-bits.xml:584
 #, no-c-format
 msgid ""
 "To configure networking, edit <filename>/etc/network/interfaces</filename>, "
@@ -1338,13 +1297,13 @@ msgstr ""
 "giao diện (eth0, eth1, v.v.) mong đợi."
 
 #. Tag: title
-#: random-bits.xml:604
+#: random-bits.xml:625
 #, no-c-format
 msgid "Configure Apt"
 msgstr "Cấu hình Apt"
 
 #. Tag: para
-#: random-bits.xml:605
+#: random-bits.xml:626
 #, no-c-format
 msgid ""
 "Debootstrap will have created a very basic <filename>/etc/apt/sources.list</"
@@ -1370,13 +1329,13 @@ msgstr ""
 "userinput> sau khi thay đổi danh sách các nguồn."
 
 #. Tag: title
-#: random-bits.xml:621
+#: random-bits.xml:642
 #, no-c-format
 msgid "Configure Locales and Keyboard"
 msgstr "Cấu hình miền địa phương và bàn phím"
 
 #. Tag: para
-#: random-bits.xml:622
+#: random-bits.xml:643
 #, no-c-format
 msgid ""
 "To configure your locale settings to use a language other than English, "
@@ -1396,7 +1355,7 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:632
+#: random-bits.xml:653
 #, no-c-format
 msgid ""
 "# aptitude install console-data\n"
@@ -1406,7 +1365,7 @@ msgstr ""
 "# dpkg-reconfigure console-data"
 
 #. Tag: para
-#: random-bits.xml:634
+#: random-bits.xml:655
 #, no-c-format
 msgid ""
 "Note that the keyboard cannot be set while in the chroot, but will be "
@@ -1416,13 +1375,13 @@ msgstr ""
 "sẽ được cấu hình cho lần khởi động lại kế tiếp."
 
 #. Tag: title
-#: random-bits.xml:644
+#: random-bits.xml:665
 #, no-c-format
 msgid "Install a Kernel"
 msgstr "Cài đặt hạt nhân"
 
 #. Tag: para
-#: random-bits.xml:645
+#: random-bits.xml:666
 #, no-c-format
 msgid ""
 "If you intend to boot this system, you probably want a Linux kernel and a "
@@ -1433,13 +1392,13 @@ msgstr ""
 "hạt nhân đóng gói sẵn bằng lệnh:"
 
 #. Tag: screen
-#: random-bits.xml:650
+#: random-bits.xml:671
 #, no-c-format
 msgid "# apt-cache search linux-image"
 msgstr "# apt-cache search linux-image"
 
 #. Tag: para
-#: random-bits.xml:652
+#: random-bits.xml:673
 #, no-c-format
 msgid ""
 "If you intend to use a pre-packaged kernel, you may want to create the "
@@ -1451,7 +1410,7 @@ msgstr ""
 "thí dụ :"
 
 #. Tag: screen
-#: random-bits.xml:658
+#: random-bits.xml:679
 #, no-c-format
 msgid ""
 "# Kernel image management overrides\n"
@@ -1478,7 +1437,7 @@ msgstr ""
 "# link in boot\tliên kết vào khởi động]"
 
 #. Tag: para
-#: random-bits.xml:660
+#: random-bits.xml:681
 #, no-c-format
 msgid ""
 "For detailed information about this file and the various options, consult "
@@ -1492,7 +1451,7 @@ msgstr ""
 "thích hợp với hệ thống của bạn."
 
 #. Tag: para
-#: random-bits.xml:667
+#: random-bits.xml:688
 #, no-c-format
 msgid ""
 "Then install the kernel package of your choice using its package name. "
@@ -1515,13 +1474,13 @@ msgstr ""
 "về nó trong tiến trình cài đặt."
 
 #. Tag: title
-#: random-bits.xml:681
+#: random-bits.xml:702
 #, no-c-format
 msgid "Set up the Boot Loader"
 msgstr "Thiết lập bộ tải khởi động"
 
 #. Tag: para
-#: random-bits.xml:682
+#: random-bits.xml:703
 #, no-c-format
 msgid ""
 "To make your &debian; system bootable, set up your boot loader to load the "
@@ -1536,7 +1495,7 @@ msgstr ""
 "Debian để làm như thế."
 
 #. Tag: para
-#: random-bits.xml:689
+#: random-bits.xml:710
 #, no-c-format
 msgid ""
 "Check <userinput>info grub</userinput> or <userinput>man lilo.conf</"
@@ -1560,7 +1519,7 @@ msgstr ""
 "hệ thống từ đó bạn gọi nó)."
 
 #. Tag: para
-#: random-bits.xml:701
+#: random-bits.xml:722
 #, no-c-format
 msgid ""
 "Installing and setting up <classname>grub</classname> is as easy as: "
@@ -1584,14 +1543,14 @@ msgstr ""
 "động được."
 
 #. Tag: para
-#: random-bits.xml:711
+#: random-bits.xml:732
 #, no-c-format
 msgid "Here is a basic <filename>/etc/lilo.conf</filename> as an example:"
 msgstr "Ở đây có mẫu <filename>/etc/lilo.conf</filename> cơ bản:"
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: random-bits.xml:715
+#: random-bits.xml:736
 #, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
@@ -1611,7 +1570,7 @@ msgstr ""
 "label=Debian"
 
 #. Tag: para
-#: random-bits.xml:717
+#: random-bits.xml:738
 #, no-c-format
 msgid ""
 "Depending on which bootloader you selected, you can now make some additional "
@@ -1622,7 +1581,7 @@ msgstr ""
 "filename>."
 
 #. Tag: para
-#: random-bits.xml:722
+#: random-bits.xml:743
 #, no-c-format
 msgid ""
 "For the <classname>grub</classname> bootloader, you should set the "
@@ -1651,7 +1610,7 @@ msgstr ""
 "<literal>do_bootloader</literal> nên là <quote>yes</quote> (có)."
 
 #. Tag: para
-#: random-bits.xml:734
+#: random-bits.xml:755
 #, no-c-format
 msgid ""
 "Check <userinput>man yaboot.conf</userinput> for instructions on setting up "
@@ -1671,7 +1630,7 @@ msgstr ""
 "gọi nó)."
 
 #. Tag: para
-#: random-bits.xml:744
+#: random-bits.xml:765
 #, no-c-format
 msgid ""
 "Here is a basic <filename>/etc/yaboot.conf</filename> as an example: "
@@ -1705,13 +1664,13 @@ msgstr ""
 "userinput> thay cho <userinput>hd:</userinput>."
 
 #. Tag: title
-#: random-bits.xml:757
+#: random-bits.xml:778
 #, no-c-format
 msgid "Finishing touches"
 msgstr "Đòn kết liễu"
 
 #. Tag: para
-#: random-bits.xml:758
+#: random-bits.xml:779
 #, no-c-format
 msgid ""
 "As mentioned earlier, the installed system will be very basic. If you would "
@@ -1730,7 +1689,7 @@ msgstr ""
 "<command>aptitude</command> để cài đặt mỗi gói riêng."
 
 #. Tag: para
-#: random-bits.xml:769
+#: random-bits.xml:790
 #, no-c-format
 msgid ""
 "After the installation there will be a lot of downloaded packages in "
@@ -1742,19 +1701,19 @@ msgstr ""
 "thêm chỗ trống trên đĩa bằng cách chạy lệnh « làm sạch »: "
 
 #. Tag: screen
-#: random-bits.xml:775
+#: random-bits.xml:796
 #, no-c-format
 msgid "# aptitude clean"
 msgstr "# aptitude clean"
 
 #. Tag: title
-#: random-bits.xml:786
+#: random-bits.xml:807
 #, no-c-format
 msgid "Installing &debian; over Parallel Line IP (PLIP)"
 msgstr "Cài đặt &debian; qua IP đường song song (PLIP)"
 
 #. Tag: para
-#: random-bits.xml:788
+#: random-bits.xml:809
 #, no-c-format
 msgid ""
 "This section explains how to install &debian; on a computer without an "
@@ -1769,7 +1728,7 @@ msgstr ""
 "nối đến Mạng)."
 
 #. Tag: para
-#: random-bits.xml:796
+#: random-bits.xml:817
 #, no-c-format
 msgid ""
 "In the example in this appendix we will set up a PLIP connection using a "
@@ -1786,7 +1745,7 @@ msgstr ""
 "mạng của bạn)."
 
 #. Tag: para
-#: random-bits.xml:804
+#: random-bits.xml:825
 #, no-c-format
 msgid ""
 "The PLIP connection set up during the installation will also be available "
@@ -1797,7 +1756,7 @@ msgstr ""
 "khởi động lại vào hệ thống đã cài đặt (xem <xref linkend=\"boot-new\"/>)."
 
 #. Tag: para
-#: random-bits.xml:809
+#: random-bits.xml:830
 #, no-c-format
 msgid ""
 "Before you start, you will need to check the BIOS configuration (IO base "
@@ -1810,13 +1769,13 @@ msgstr ""
 "<literal>io=0x378</literal>, <literal>irq=7</literal>."
 
 #. Tag: title
-#: random-bits.xml:819
+#: random-bits.xml:840
 #, no-c-format
 msgid "Requirements"
 msgstr "Nhu cầu"
 
 #. Tag: para
-#: random-bits.xml:822
+#: random-bits.xml:843
 #, no-c-format
 msgid ""
 "A target computer, called <emphasis>target</emphasis>, where Debian will be "
@@ -1826,7 +1785,7 @@ msgstr ""
 "Debian sẽ được cài đặt."
 
 #. Tag: para
-#: random-bits.xml:828
+#: random-bits.xml:849
 #, no-c-format
 msgid "System installation media; see <xref linkend=\"installation-media\"/>."
 msgstr ""
@@ -1834,7 +1793,7 @@ msgstr ""
 ">."
 
 #. Tag: para
-#: random-bits.xml:833
+#: random-bits.xml:854
 #, no-c-format
 msgid ""
 "Another computer connected to the Internet, called <emphasis>source</"
@@ -1844,7 +1803,7 @@ msgstr ""
 "emphasis> (nguồn), mà sẽ hoạt động là cổng ra."
 
 #. Tag: para
-#: random-bits.xml:839
+#: random-bits.xml:860
 #, no-c-format
 msgid ""
 "A DB-25 Null-Modem cable. See the <ulink url=\"&url-plip-install-howto;"
@@ -1856,13 +1815,13 @@ msgstr ""
 "thêm về cáp kiểu này, gồm hướng dẫn về cách tạo điều riêng."
 
 #. Tag: title
-#: random-bits.xml:851
+#: random-bits.xml:872
 #, no-c-format
 msgid "Setting up source"
 msgstr "Thiết lập nguồn"
 
 #. Tag: para
-#: random-bits.xml:852
+#: random-bits.xml:873
 #, no-c-format
 msgid ""
 "The following shell script is a simple example of how to configure the "
@@ -1872,7 +1831,7 @@ msgstr ""
 "máy tính nguồn như là cổng ra Mạng dùng ppp0."
 
 #. Tag: screen
-#: random-bits.xml:857
+#: random-bits.xml:878
 #, no-c-format
 msgid ""
 "#!/bin/sh\n"
@@ -1914,13 +1873,13 @@ msgstr ""
 "echo 1 > /proc/sys/net/ipv4/ip_forward"
 
 #. Tag: title
-#: random-bits.xml:863
+#: random-bits.xml:884
 #, no-c-format
 msgid "Installing target"
 msgstr "Cài đặt đích"
 
 #. Tag: para
-#: random-bits.xml:864
+#: random-bits.xml:885
 #, no-c-format
 msgid ""
 "Boot the installation media. The installation needs to be run in expert "
@@ -1947,13 +1906,13 @@ msgstr ""
 "giai đoạn khác nhau của tiến trình cài đặt."
 
 #. Tag: guimenuitem
-#: random-bits.xml:883
+#: random-bits.xml:904
 #, no-c-format
 msgid "Load installer components from CD"
 msgstr "Tải các thành phần cài đặt từ đĩa CD"
 
 #. Tag: para
-#: random-bits.xml:885
+#: random-bits.xml:906
 #, no-c-format
 msgid ""
 "Select the <userinput>plip-modules</userinput> option from the list; this "
@@ -1963,13 +1922,13 @@ msgstr ""
 "các trình điều khiển PLIP sẵn sàng cho hệ thống cài đặt."
 
 #. Tag: guimenuitem
-#: random-bits.xml:893
+#: random-bits.xml:914
 #, no-c-format
 msgid "Detect network hardware"
 msgstr "Phát hiện phần cứng mạng"
 
 #. Tag: para
-#: random-bits.xml:898
+#: random-bits.xml:919
 #, no-c-format
 msgid ""
 "If target <emphasis>does</emphasis> have a network card, a list of driver "
@@ -1984,7 +1943,7 @@ msgstr ""
 "trình cài đặt sẽ không hiển thị danh sách này."
 
 #. Tag: para
-#: random-bits.xml:907
+#: random-bits.xml:928
 #, no-c-format
 msgid ""
 "Because no network card was detected/selected earlier, the installer will "
@@ -1995,19 +1954,19 @@ msgstr ""
 "mạng trong danh sách. Hãy chọn mô-đun <userinput>plip</userinput>."
 
 #. Tag: guimenuitem
-#: random-bits.xml:919
+#: random-bits.xml:940
 #, no-c-format
 msgid "Configure the network"
 msgstr "Cấu hình mạng"
 
 #. Tag: para
-#: random-bits.xml:922
+#: random-bits.xml:943
 #, no-c-format
 msgid "Auto-configure network with DHCP: No"
 msgstr "Tự động cấu hình mạng bằng DHCP không? : Không"
 
 #. Tag: para
-#: random-bits.xml:927
+#: random-bits.xml:948
 #, no-c-format
 msgid ""
 "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
@@ -2015,7 +1974,7 @@ msgstr ""
 "Địa chỉ IP: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
-#: random-bits.xml:932
+#: random-bits.xml:953
 #, no-c-format
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
@@ -2025,7 +1984,7 @@ msgstr ""
 "userinput>"
 
 #. Tag: para
-#: random-bits.xml:938
+#: random-bits.xml:959
 #, no-c-format
 msgid ""
 "Name server addresses: you can enter the same addresses used on source (see "
@@ -2036,13 +1995,13 @@ msgstr ""
 "conf</filename>)"
 
 #. Tag: title
-#: random-bits.xml:957
+#: random-bits.xml:978
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr "Bộ cài đặt đồ họa"
 
 #. Tag: para
-#: random-bits.xml:958
+#: random-bits.xml:979
 #, no-c-format
 msgid ""
 "The graphical version of the installer is only available for a limited "
@@ -2055,7 +2014,7 @@ msgstr ""
 "đặt chuẩn, vì nó sử dụng cùng những chương trình thông qua giao diện khác."
 
 #. Tag: para
-#: random-bits.xml:966
+#: random-bits.xml:987
 #, no-c-format
 msgid ""
 "Although the functionality is identical, the graphical installer still has a "
@@ -2073,7 +2032,7 @@ msgstr ""
 "được hiển thị trên cùng một màn hình."
 
 #. Tag: para
-#: random-bits.xml:975
+#: random-bits.xml:996
 #, no-c-format
 msgid ""
 "The graphical installer is available with all CD images and with the hd-"
@@ -2093,7 +2052,7 @@ msgstr ""
 "từng cái."
 
 #. Tag: para
-#: random-bits.xml:985
+#: random-bits.xml:1006
 #, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
@@ -2112,7 +2071,7 @@ msgstr ""
 "có thể được khởi động qua mạng."
 
 #. Tag: para
-#: random-bits.xml:999
+#: random-bits.xml:1020
 #, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
@@ -2130,7 +2089,7 @@ msgstr ""
 "đồ họa kiểu ATI, nhưng rất có thể sẽ không hoạt động được trên hệ thống khác."
 
 #. Tag: para
-#: random-bits.xml:1012
+#: random-bits.xml:1033
 #, no-c-format
 msgid ""
 "The graphical installer requires significantly more memory to run than the "
@@ -2143,7 +2102,7 @@ msgstr ""
 "<quote>newt</quote>."
 
 #. Tag: para
-#: random-bits.xml:1019
+#: random-bits.xml:1040
 #, no-c-format
 msgid ""
 "You can add boot parameters when starting the graphical installer, just as "
@@ -2157,13 +2116,13 @@ msgstr ""
 "\"boot-parms\"/> để tìm các tham số hợp lệ."
 
 #. Tag: title
-#: random-bits.xml:1029
+#: random-bits.xml:1050
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr "Cách sử dụng bộ cài đặt đồ họa"
 
 #. Tag: para
-#: random-bits.xml:1030
+#: random-bits.xml:1051
 #, no-c-format
 msgid ""
 "As already mentioned, the graphical installer basically works the same as "
@@ -2175,7 +2134,7 @@ msgstr ""
 "đặt."
 
 #. Tag: para
-#: random-bits.xml:1036
+#: random-bits.xml:1057
 #, no-c-format
 msgid ""
 "If you prefer using the keyboard over the mouse, there are two things you "
@@ -2196,7 +2155,7 @@ msgstr ""
 "<guibutton>Tiếp tục</guibutton>."
 
 #. Tag: para
-#: random-bits.xml:1046
+#: random-bits.xml:1067
 #, no-c-format
 msgid ""
 "To switch to another console, you will also need to use the <keycap>Ctrl</"
@@ -2210,13 +2169,13 @@ msgstr ""
 "keycap> <keycap>Alt trái</keycap> <keycap>F1</keycap> </keycombo>."
 
 #. Tag: title
-#: random-bits.xml:1057
+#: random-bits.xml:1078
 #, no-c-format
 msgid "Known issues"
 msgstr "Vấn đề đã biết"
 
 #. Tag: para
-#: random-bits.xml:1058
+#: random-bits.xml:1079
 #, no-c-format
 msgid ""
 "Etch is the first release that includes the graphical installer and uses "
@@ -2230,7 +2189,7 @@ msgstr ""
 "phát hành &debian; kế tiếp."
 
 #. Tag: para
-#: random-bits.xml:1068
+#: random-bits.xml:1089
 #, no-c-format
 msgid ""
 "Information on some screens is not nicely formatted into columns as it "
@@ -2242,7 +2201,7 @@ msgstr ""
 "màn hình chính của chương trình <filename>partman</filename>."
 
 #. Tag: para
-#: random-bits.xml:1075
+#: random-bits.xml:1096
 #, no-c-format
 msgid ""
 "Typing some characters may not work and in some cases the wrong character "
@@ -2256,13 +2215,13 @@ msgstr ""
 "họa.)"
 
 #. Tag: para
-#: random-bits.xml:1082
+#: random-bits.xml:1103
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr "Khả năng hỗ trợ vùng sờ chưa tối ưu."
 
 #. Tag: para
-#: random-bits.xml:1087
+#: random-bits.xml:1108
 #, no-c-format
 msgid ""
 "You should not switch to a different console while the installer is busy; "
@@ -2278,7 +2237,7 @@ msgstr ""
 "nhập nên hoạt động được, không gây ra lỗi nào."
 
 #. Tag: para
-#: random-bits.xml:1096
+#: random-bits.xml:1117
 #, no-c-format
 msgid ""
 "Support for creating encrypted partitions is limited as it is not possible "
@@ -2288,6 +2247,74 @@ msgstr ""
 "Khả năng tạo phân vùng đã mật mã bị hạn chế vì không thể tạo ra một khoá mật "
 "mã ngẫu nhiên. Vẫn có thể thiết lập một phân vùng đã mật mã, dùng cụm từ mật "
 "khẩu như là khoá mật mã."
+
+#~ msgid ""
+#~ "The mouse can be used in both the Linux console (with gpm) and the X "
+#~ "window environment. The two uses can be made compatible if the gpm "
+#~ "repeater is used to allow the signal to flow to the X server as shown: "
+#~ "<informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> Set the repeater protocol to be raw (in "
+#~ "<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
+#~ "protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
+#~ "X11/XF86Config-4</filename>."
+#~ msgstr ""
+#~ "Con chuột được dùng trong cả bàn giao tiếp Linux (bằng GPM) lẫn môi "
+#~ "trường cửa sổ X. Hai cách sử dụng này có thể được làm tương thích với "
+#~ "nhau nếu bộ lặp lại GPM được dùng để cho phép tín hiệu luồng đến trình "
+#~ "phục vụ X như được hiển thị: <informalexample><screen>\n"
+#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
+#~ "=&gt; X\n"
+#~ "         /dev/ttyS0             (bộ lặp lại)        (liên kết tượng "
+#~ "trưng)\n"
+#~ "         /dev/ttyS1\n"
+#~ "</screen></informalexample> Hãy đặt giao thức lặp lại là thô [<quote>raw</"
+#~ "quote>] (trong tập tin cấu hình <filename>/etc/gpm.conf</filename>), còn "
+#~ "đặt X với giao thức con chuột gốc trong tập tin cấu hình X <filename>/etc/"
+#~ "X11/XF86Config</filename> hay <filename>/etc/X11/XF86Config-4</filename>."
+
+#~ msgid ""
+#~ "This approach to use gpm even in X has advantages when the mouse is "
+#~ "unplugged inadvertently. Simply restarting gpm with "
+#~ "<informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> will re-connect the mouse in software without "
+#~ "restarting X."
+#~ msgstr ""
+#~ "Phương pháp này, để dùng GPM ngay cả trong X, có ích khi con chuột bị "
+#~ "tháo nút ra không chú ý. Việc đơn giản khởi chạy lại GPM bằng "
+#~ "lệnh<informalexample><screen>\n"
+#~ "# /etc/init.d/gpm restart\n"
+#~ "</screen></informalexample> sẽ kết nối lại con chuột trong phần mềm, "
+#~ "không cần khởi chạy lại X."
+
+#~ msgid ""
+#~ "If gpm is disabled or not installed for some reason, make sure to set X "
+#~ "to read directly from a mouse device such as /dev/psaux. For details, "
+#~ "refer to the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/"
+#~ "en-txt/mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
+#~ "<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-"
+#~ "xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
+#~ msgstr ""
+#~ "Nếu vì lý do nào GPM bị tắt hay chưa được cài đặt, hãy đảm bảo đặt X sẽ "
+#~ "đọc trực tiếp từ thiết bị con chuột, v.d. <filename>/dev/psaux</"
+#~ "filename>. Để tìm chi tiết, xem tài liệu nhỏ con chuột có ba cái nút Thế "
+#~ "Nào tại <filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</"
+#~ "filename>, trang hướng dẫn <userinput>man gpm</userinput>, Hỏi Đáp "
+#~ "<filename>/usr/share/doc/gpm/FAQ.gz</filename>, và tài liệu Đọc Đi <ulink "
+#~ "url=\"&url-xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
+
+#~ msgid ""
+#~ "For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/"
+#~ "etc/X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/"
+#~ "dev/input/mice\"</userinput>."
+#~ msgstr ""
+#~ "Đối với máy kiểu PowerPC, trong tập tin cấu hình X <filename>/etc/X11/"
+#~ "XF86Config</filename> hay <filename>/etc/X11/XF86Config-4</filename>, bạn "
+#~ "đặt thiết bị con chuột thành <userinput>\"/dev/input/mice\"</userinput>."
 
 #~ msgid "Desktop"
 #~ msgstr "Môi trường làm việc"
