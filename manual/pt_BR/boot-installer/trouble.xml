@@ -1,13 +1,231 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 44026 -->
 <!-- revised by Marco Carvalho (macs) 2006.01.01 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.06 -->
 <!-- updated 33725:38231 by Felipe Augusto van de Wiel (faw) 2006.06.26 -->
+<!-- updated 39614:44026 by Felipe Augusto van de Wiel (faw) 2007.01.21 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Problemas e Processo de Instalação</title>
 <para>
 </para>
+
+  <sect2 arch="not-s390" id="unreliable-cd">
+  <title>Confiança no CD-ROM</title>
+<para>
+
+Algumas vezes, especialmente com unidades de CD-ROM antigas, o instalador
+pode falhar para inicializar a partir do CD-ROM. O instalador pode também
+&mdash; mesmo após ter inicializado com sucesso a partir do CD-ROM &mdash;
+falhar para reconhecer o CD-ROM ou retornar erros enquanto lê o CD durante
+a instalação.
+
+</para><para>
+
+Há várias causas possíveis para estes problemas. Nós só podemos listas
+alguns problemas comuns e fornecer sugestões genéricas sobre sobre
+lidar com eles. O resto depende de você.
+
+</para><para>
+
+Há duas coisas bem simples que você deveria tentar primeiro.
+
+<itemizedlist>
+<listitem><para>
+
+Se o CD-ROM não inicializa, verifique se foi inserido corretamente e se não
+está sujo.
+
+</para></listitem>
+<listitem><para>
+
+Se o instalador falhar para reconhecer o CD-ROM, tente executar a opção
+<menuchoice> <guimenuitem>Detectar e montar CD-ROM</guimenuitem> </menuchoice>
+uma segunda vez. Sabe-se que alguns problemas relacionados a DMA com unidades
+de CD-ROM antigas são resolvidas desta forma.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Se isto não funcionar, então tente as sugestões na subseções abaixo.
+A maioria das, se não todas as, sugestões discutidas aqui são válidas
+tanto para CD-ROM quanto para DVD, mas nós utilizaremos o termo CD-ROM
+para simplificar.
+
+</para><para>
+
+Se você não puder fazer a instalação funcionar a partir do CD, tente um
+dos outros métodos de instalação que estão disponíveis.
+
+</para>
+
+  <sect3>
+  <title>Problemas comuns</title>
+
+<itemizedlist>
+  <listitem><para>
+
+Algumas unidades de CD-ROM antigas não suportam a leitura de discos que
+foram gravados em alta velocidade usando um gravador de CD moderno.
+
+  </para></listitem>
+  <listitem><para>
+
+Se o seus sistema inicializa corretamente a partir de um CD-ROM, isto
+necessariamente não significa que o Linux também suporta o CD-ROM (ou,
+mais corretamente, a controladora à qual sua unidade de CD-ROM está
+conectada).
+
+  </para></listitem>
+  <listitem><para>
+
+Algumas unidades de CD-ROM antigas não funcionam corretamente se o
+<quote>acesso direto à memória &mdash; direct memory access</quote> (DMA)
+está habilitado.
+
+  </para></listitem>
+</itemizedlist>
+
+  </sect3>
+
+  <sect3>
+  <title>Como investigar e talvez resolver problemas</title>
+<para>
+
+Se o CD-ROM falha para inicializar, tente as sugestões listadas abaixo.
+
+<itemizedlist>
+  <listitem><para>
+
+Verifique se sua BIOS atualmente suporta inicializar a partir do CD-ROM
+(sistema antigos possivelmente não suportam) e se a sua unidade de CD-ROM
+suporta a mídia que você está usando.
+
+  </para></listitem>
+  <listitem><para>
+
+Se você baixou uma imagem iso, verifique se o md5sum da imagem combina com
+o listado para a imagem no arquivo <filename>MD5SUMS</filename> que deveria
+estar presente no mesmo local de onde você baixou a imagem.
+
+<informalexample><screen>
+$ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
+a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
+</screen></informalexample>
+
+Próximo, verifique se o md5sum do CD-ROM gravado também combina. O seguinte
+comando deveria funcionar. Ele usa o tamanho da imagem para ler o número
+correto de bytes do CD-ROM.
+
+<informalexample><screen>
+$ dd if=/dev/cdrom | \
+> head -c `stat --format=%s <replaceable>debian-testing-i386-netinst.iso</replaceable>` | \
+> md5sum
+a20391b12f7ff22ef705cee4059c6b92  -
+262668+0 records in
+262668+0 records out
+134486016 bytes (134 MB) copied, 97.474 seconds, 1.4 MB/s
+</screen></informalexample>
+
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Se, após o instalador ter inicializado com sucesso, o CD-ROM não for
+detectado, algumas vezes simplesmente tentar novamente pode resolver
+o problema. Se você tem mais de uma unidade de CD-ROM, tente mudar o
+CD-ROM para a outra unidade. Se isto não funcionar ou se o CD-ROM for
+reconhecido mas há erros quando ele é lido, tente as sugestões listadas
+abaixo. Algum conhecimento básico de Linux é requerido para isto.
+Para executar quaisquer dos comandos, você deveria primeiro mudar para
+o segundo console virtual (VT2) e ativar o interpretador de comando lá.
+
+<itemizedlist>
+  <listitem><para>
+
+Mude para o VT4 ou veja o conteúdo de <filename>/var/log/syslog</filename>
+(use <command>nano</command> como editor) para verificar quaisquer mensagens
+de erro específicas. Depois disso, também verifique a saída do
+<command>dmesg</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Verifique na saída do <command>dmesg</command> se a sua unidade de CD-ROM
+foi reconhecida. Você deveria ver algo como (as linhas não necessariamente
+serão consecutivas):
+
+<informalexample><screen>
+Probing IDE interface ide1...
+hdc: TOSHIBA DVD-ROM SD-R6112, ATAPI CD/DVD-ROM drive
+ide1 at 0x170-0x177,0x376 on irq 15
+hdc: ATAPI 24X DVD-ROM DVD-R CD-R/RW drive, 2048kB Cache, UDMA(33)
+Uniform CD-ROM driver Revision: 3.20
+</screen></informalexample>
+
+Se você não vê algo como isto, há chances de que a controladora à qual o seu
+CD-ROM está conectador não foi reconhecida ou não é suportada. Se você sabe
+qual driver é necessário para a controladora, você pode tentar carregá-lo
+manualmente usando <command>modprobe</command>.
+
+  </para></listitem>
+  <listitem><para>
+
+Verifique se há um nó de dispositivo (<quote>device node</quote> para o seu
+CD-ROM sob <filename>/dev/</filename>. No exemplo acima, isto seria
+<filename>/dev/hdc</filename>.
+Também deveria existir um <filename>/dev/cdroms/cdrom0</filename>.
+
+  </para></listitem>
+  <listitem><para>
+
+Use o comando <command>mount</command> para verificar se o CD-ROM já está
+montado; se não estiver, tente montá-lo manualmente:
+
+<informalexample><screen>
+$ mount /dev/<replaceable>hdc</replaceable> /cdrom
+</screen></informalexample>
+
+Verifique se há quaisquer mensagens de erro após a execução do comando.
+
+  </para></listitem>
+  <listitem><para>
+
+Verifique se DMA está atualmente habilitada:
+
+<informalexample><screen>
+$ cd /proc/<replaceable>ide</replaceable>/<replaceable>hdc</replaceable>
+$ grep using_dma settings
+using_dma      1       0       1       rw
+</screen></informalexample>
+
+O <quote>1</quote> na primeira coluna depois de <literal>using_dma</literal>
+significa que está habilitado. Se estiver, tente desabilitá-la.
+
+<informalexample><screen>
+$ echo -n "using_dma:0" >settings
+</screen></informalexample>
+
+Tenha certeza que você está no diretório para o dispositivo que corresponde
+à sua unidade de CD-ROM.
+
+  </para></listitem>
+  <listitem><para>
+
+Se existirem quaisquer problemas durante a instalação, tente verificar a
+integridade do CD-ROM usando a opção próxima do fim do menu principal do
+instalador. Esta opção também pode ser usada como um teste genérico se o
+CD-ROM pode ser lido de forma confiável.
+
+  </para></listitem>
+</itemizedlist>
+
+</para>
+  </sect3>
+  </sect2>
 
   <sect2 condition="supports-floppy-boot" id="unreliable-floppies">
   <title>Confiança em Disquetes</title>
@@ -29,19 +247,25 @@ falhas nas unidades de disquetes quando mostram mensagens
 de erros de I/O na tela.
 </para><para>
 
-Se estiver tendo problemas com a instalação com um disquete
-em particular, a primeira coisa que deve tentar é copiar novamente
-a imagem de disquetes e grava-la para um disquete
-<emphasis>diferente</emphasis>. A simples reformatação do
-antigo disquete pode não ser suficiente, até mesmo se ele
-mostrar que foi gravado sem nenhum erro. Em último caso, é
-útil gravar o disquete em outro sistema.
+Se estiver tendo problemas com a instalação com um disquete em
+particular, a primeira coisa que deve fazer é gravar a imagem em
+um disquete <emphasis>diferente</emphasis> e ver se isto resolve
+o problema. A simples reformatação do antigo disquete pode não ser
+suficiente, até mesmo se ele mostrar que foi gravado sem nenhum
+erro. Em último caso, é útil gravar o disquete em outro sistema.
 
 </para><para>
 
 Um usuário relatou que teve que gravar as imagens para o
 disquete <emphasis>três</emphasis> vezes até funcionar e então
 tudo correu bem com o terceiro disquete.
+
+</para><para>
+
+Normalmente você não deveria ter que baixar uma imagem de disquete
+novamente, mas se você está tendo problemas sempre é útil verificar
+se as imagens foram corretamente baixadas através da verificação dos
+md5sums.
 
 </para><para>
 
@@ -65,14 +289,6 @@ discutidos em <xref linkend="boot-parms"/>.
 
 </para><para>
 
-Se estiver inicializando com seu próprio kernel ao invés de um
-fornecido com o programa de instalação, tenha certeza que
-<userinput>CONFIG_DEVFS</userinput> está ativado em seu
-kernel. O programa de instalação requer
-<userinput>CONFIG_DEVFS</userinput>.
-
-</para><para>
-
 Alguns problemas podem ser resolvidos com freqüência removendo
 coisas adicionais e periféricos e então tentando novamente
 iniciar. <phrase arch="x86">Modems internos, placas de som
@@ -82,7 +298,7 @@ e dispositivos Plug-n-Play podem ser especialmente problemáticos.</phrase>
 
 Se tiver uma larga quantidade de memória instalada em sua máquina,
 mais que 512M, e o programa de instalação trava quando o kernel
-inicia, você poderá precisar adicionar o argumento d e inicialização
+inicia, você poderá precisar adicionar o argumento de inicialização
 para limitar a quantidade de memória que o kernel reconhece, tal
 como  <userinput>mem=512m</userinput>.
 
@@ -127,8 +343,8 @@ alguma bagunça colorida, você provavelmente tem uma placa
 de vídeo problemática que não muda para o modo frame buffer de
 forma adequada. Então você poderá usar o argumento de inicialização
 <userinput>fb=false video=vga16:off</userinput> para desativar o console
-frame buffer. Somente o idioma inglês estará disponível devido a
-características limitadas do console. Veja <xref linkend="boot-parms"/>
+frame buffer. Somente um conjunto reduzido de idiomas estará disponível devido
+a características limitadas do console. Veja <xref linkend="boot-parms"/>
 para detalhes.
 
 </para>
@@ -177,6 +393,59 @@ impedirá que os módulos sejam carregados.
    </sect3>
   </sect2>
 
+  <sect2 arch="sparc" id="sparc-boot-problems">
+  <title>Problemas de Instalação Comuns em &arch-title;</title>
+<para>
+
+Há alguns problemas de instalação comuns que merecem ser mencionados.
+
+</para>
+   <sect3>
+   <title>Saída de vídeo mal direcionada</title>
+<para>
+
+É bastante comum para &arch-title; ter duas placas de vídeo em uma máquina,
+por exemplo uma placa ATI e uma Sun Creator 3D. Em alguns casos, isto pode
+resultar na saída de vídeo sendo mal direcionada logo após o sistema
+inicializar. Em casos típicos, a tela exibirá somente o seguinte:
+
+<informalexample><screen>
+Remapping the kernel... done
+Booting Linux...
+</screen></informalexample>
+
+Para contornar esta situação, você pode remover uma das placas de vídeo, ou
+desabilitar a que não é usada durante a fase de inicialização do OpenProm
+usando um parâmetro de kernel. Por exemplo, para desabilitar uma placa ATI,
+você deveria inicializar o instalador com
+<userinput>video=atyfb:off</userinput>.
+
+</para><para>
+
+Note que você você também pode ter que manualmente adicionar este parâmetro
+à configuração do silo (edit <filename>/target/etc/silo.conf</filename> antes
+de reinicializar) e, se você instalou o X11, modifique o driver de vídeo em
+<filename>/etc/X11/xorg.conf</filename>.
+
+</para>
+   </sect3>
+
+   <sect3>
+   <title>Falha na Inicialização ou Instalação a partir do CD-ROM</title>
+<para>
+
+Alguns sistema Sparc são notoriamente difíceis de inicializar a partir do
+CD-ROM e mesmo que inicializem, podem existir falhas inexplicáveis durante
+a instalação. A maioria dos problemas foi reportada com sistemas SunBlade.
+
+</para><para>
+
+Nós recomendamos instalar tais sistemas inicializando o instalador através da
+rede.
+
+</para>
+   </sect3>
+  </sect2>
 
   <sect2 id="kernel-msgs">
   <title>Interpretando as Mensagens de Inicialização do Kernel</title>
@@ -185,10 +454,12 @@ impedirá que os módulos sejam carregados.
 
 Durante a seqüência de inicialização, você poderá ver algumas
 mensagens na forma
-<computeroutput>can't find <replaceable>something</replaceable></computeroutput>, ou
-<computeroutput><replaceable>something</replaceable> not present</computeroutput>,
-<computeroutput>can't initialize <replaceable>something</replaceable></computeroutput>,
-ou até mesmo <computeroutput>this driver release depends on <replaceable>something</replaceable></computeroutput>.
+<computeroutput>can't find <replaceable>alguma coisa</replaceable></computeroutput>,
+ou <computeroutput><replaceable>alguma coisa</replaceable>
+not present</computeroutput>, <computeroutput>can't initialize
+<replaceable>alguma coisa</replaceable></computeroutput>,
+ou até mesmo <computeroutput>this driver release depends
+on <replaceable>alguma coisa</replaceable></computeroutput>.
 Muitas destas mensagens são ignoráveis. Você as vê porque o kernel
 construído para a instalação é feito para rodar na quantidade mais
 variada de dispositivos e periféricos. Obviamente, nenhum computador
@@ -205,13 +476,14 @@ longo, você poderá criar um kernel personalizado depois (veja
   </sect2>
 
   <sect2 id="problem-report">
-  <title>Relatório de Falhas</title>
+  <title>Relatando Problemas na Instalação</title>
 <para>
 
-Caso tenha passado da fase inicial de inicialização mas não pode
-completar a instalação, a opção de relatar falhas do menu será útil.
-Isto permitirá você armazenar os logs de erros de sistema e informações de
-configuração do instalador em um disquete, ou baixá-los em um navegador web.
+Caso tenha passado da fase inicial de inicialização mas não pode completar a
+instalação, a opção do menu <guimenuitem>Gravas logs de depuração</guimenuitem>
+pode ser útil. Isto permitirá você armazenar os logs de erros de sistema e
+informações de configuração do instalador em um disquete, ou baixá-los usando
+um navegador web.
 
 Esta informação poderá oferecer dicas sobre o que ocorreu de
 errado e como corrigi-la. Se estiver enviando um relatório de
@@ -239,46 +511,58 @@ de informações disponíveis e uma larga quantidade de configurações de hardw
 
 </para><para>
 
-Se você tiver um sistema Debian funcionando, a forma mais fácil para enviar um
-relatório de instalação é instalar os pacotes installation-report e reportbug
-(<command>apt-get install installation-report reportbug</command>) e executar o
-comando <command>reportbug installation-report</command>.
+Note que seu relatório de instalação será publicado no Sistema de
+Acompanhamento de Bugs do Debian (BTS &mdash; Debian Bug Tracking System) e
+encaminhado para uma lista de discussão pública. Tenha certeza de que está
+usando um endereço de e-mail que você não se importa de torná-lo público.
 
 </para><para>
 
-Utilize este modelo quando preencher o relatório de instalação e envie um
-relatório de erro como falha no pseudo pacote
-<classname>installation-reports</classname> para o destinatário
+Se você tiver um sistema Debian funcionando, a forma mais fácil para enviar um
+relatório de instalação é instalar os pacotes
+<classname>installation-report</classname> e <classname>reportbug</classname>
+(<command>aptitude install installation-report reportbug</command>), configurar
+o <classname>reportbug</classname> como explicado em
+<xref linkend="mail-outgoing"/> e executar o comando <command>reportbug
+installation-report</command>.
+
+</para><para>
+
+Alternativamente, você pode usar este modelo quando preencher o relatório de
+instalação e enviar um relatório de erro como um relatório de bug  no pseudo
+pacote <classname>installation-reports</classname> para o destinatário
 <email>submit@bugs.debian.org</email>.
 
 <informalexample><screen>
 Package: installation-reports
 
 Boot method: &lt;Como você iniciou o instalador? CD? floppy? network?&gt;
-Image version: &lt;Coloque a data e de onde você prgou a imagem&gt;
+Image version: &lt;Caminho completo para a imagem que você baixou é o melhor&gt;
 Date: &lt;Data e Hora da instalação&gt;
 
 Machine: &lt;Descrição da máquina (eg, IBM Thinkpad R32)&gt;
 Processor:
 Memory:
 Partitions: &lt;df -Tl will do; tabela de partição raw é preferida&gt;
-Saída do comando lspci e lspci -n:
+Saída do comando lspci -nn e lspci -vnn:
 
 Lista de checagens da instalação do sistema básico:
 [O] = OK, [E] = Error (por favor, descreva abaixo), [ ] = não utilizei/tentei
 
-Initial boot worked:    [ ] (inicialização do sistema funcionou)
-Configure network HW:   [ ] (Configuração do Hardware de rede)
-Config network:         [ ] (Configuração de rede)
+Initial boot:           [ ] (Inicialização do sistema)
+Detect network card:    [ ] (Detecção da placa de rede)
+Configure network:      [ ] (Configuração de rede)
 Detect CD:              [ ] (Detecção do CD)
 Load installer modules: [ ] (Carregar módulos do programa de instalação)
 Detect hard drives:     [ ] (Detecção de discos rígidos)
 Partition hard drives:  [ ] (Particionamento de discos rígidos)
-Create file systems:    [ ] (Criação de sistemas de arquivos)
-Mount partitions:       [ ] (Montagem de partições)
 Install base system:    [ ] (Instalação do sistema básico)
+Clock/timezone setup:   [ ] (Configuração do relógio/fuso horário)
+User/password setup:    [ ] (Configuração do usuário/senha)
+Install tasks:          [ ] (Instalação das tarefas)
 Install boot loader:    [ ] (Instalação do gerenciador de partida)
-Reboot:                 [ ] (Reinicialização)
+Overall install:        [ ] (Instalação geral)
+
 
 Comentários/Problemas:
 
