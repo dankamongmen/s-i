@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<!-- original version: 44016 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 <!-- actualizado jfs, 23 marzo 2006 -->
+<!-- actualizado jfs, enero 2007 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalar &debian; desde un sistema Unix/Linux</title>
@@ -39,17 +40,18 @@ Reparticione el disco duro como lo necesita
 con las herramientas de particionado de *nix que disponga,
 debe crear por lo menos un sistema de
 ficheros más una partición de intercambio. Necesita
-por lo menos 150 MB de espacio disponible para una instalación de
-consola o por lo menos 300 MB si va a instalar el entorno X.
+por lo menos 350 MB de espacio disponible para una instalación de
+consola o por lo menos 1 GB si va a instalar el entorno X (más si
+quiere instalar entornos de escritorio como GNOME o KDE).
 
 </para><para>
 
-Deberá crear sistemas de ficheros en sus particiones. Por ejemplo,
+A continuación, deberá crear sistemas de ficheros en sus particiones. Por ejemplo,
 para crear un sistema de ficheros ext3 en la partición
 <filename>/dev/hda6</filename> (es nuestra partición raíz de ejemplo):
 
 <informalexample><screen>
-# mke2fs -j /dev/hda6
+# mke2fs -j /dev/<replaceable>hda6</replaceable>
 </screen></informalexample>
 
 En cambio para crear un sistema de ficheros ext2, omita <userinput>-j</userinput>.
@@ -60,9 +62,9 @@ Inicialice y active la partición de intercambio (sustituya el número de
 partición por la partición de intercambio de Debian que vaya a utilizar):
 
 <informalexample><screen>
-# mkswap /dev/hda5
+# mkswap /dev/<replaceable>hda5</replaceable>
 # sync; sync; sync
-# swapon /dev/hda5
+# swapon /dev/<replaceable>hda5</replaceable>
 </screen></informalexample>
 
 Monte una partición como <filename>/mnt/debinst</filename> (el punto
@@ -73,7 +75,7 @@ nombre más adelante.
 
 <informalexample><screen>
 # mkdir /mnt/debinst
-# mount /dev/hda6 /mnt/debinst
+# mount /dev/<replaceable>hda6</replaceable> /mnt/debinst
 </screen></informalexample>
 
 </para>
@@ -139,23 +141,14 @@ Descargue el .deb de <command>debootstrap</command> desde el almacén
 de paquetes en
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/"></ulink>,
 copie el paquete al directorio <quote>trabajo</quote> y extraiga los
-ficheros binarios de éste. Necesitará privilegios de superusuario para
-instalar los binarios.
+ficheros de éste. Necesitará privilegios de superusuario para
+instalar los ficheros.
 
 <informalexample><screen>
-# ar -x debootstrap_0.X.X_arch.deb
+# ar -x debootstrap_0.X.X_all.deb
 # cd /
 # zcat /ruta-completa-hasta-trabajo/trabajo/data.tar.gz | tar xv
 </screen></informalexample>
-
-</para><para>
-
-Tenga en cuenta que puede necesitar tener al menos una versión de
-<classname>glibc</classname>igual o superior a la versión mínima soportada
-(actualmente GLIBC_2.3) para poder ejecutar <command>debootstrap</command>.
-Aunque <command>debootstrap</command> es un guión de línea de órdenes, tiene
-que llamar a distintas utilidades que necesitan que se disponga de
-<classname>glibc</classname>.
 
 </para>
   </sect2>
@@ -186,6 +179,7 @@ mostrados a continuación en la orden <command>debootstrap</command> en
 función de su arquitectura:
 
 <userinput>alpha</userinput>,
+<userinput>amd64</userinput>,
 <userinput>arm</userinput>,
 <userinput>hppa</userinput>,
 <userinput>i386</userinput>,
@@ -199,7 +193,7 @@ función de su arquitectura:
 
 <informalexample><screen>
 # /usr/sbin/debootstrap --arch ARQ &releasename; \
-     /mnt/debinst http://http.us.debian.org/debian
+     /mnt/debinst http://ftp.us.debian.org/debian
 </screen></informalexample>
 
 </para>
@@ -213,8 +207,17 @@ Ahora tiene instalado un sistema Debian, aunque algo limitado, en
 su disco. Ejecute la orden <command>chroot</command> en él:
 
 <informalexample><screen>
-# LANG= chroot /mnt/debinst /bin/bash
+# LANG=C chroot /mnt/debinst /bin/bash
 </screen></informalexample>
+
+Después de haaber hecho esto puede que necesite establecer una
+definición de terminal compatible con el sistema base de Debian. Por
+ejemplo:
+
+<informalexample><screen>
+# export TERM=<replaceable>xterm-color</replaceable>
+</screen></informalexample>
+
 </para>
 
    <sect3>
@@ -239,8 +242,8 @@ Este es un ejemplo que puede modificar a sus necesidades:
 /dev/XXX         none          swap    sw                       0    0
 proc             /proc         proc    defaults                 0    0
 
-/dev/fd0         /mnt/floppy   auto    noauto,rw,sync,user,exec 0    0
-/dev/cdrom       /mnt/cdrom    iso9660 noauto,ro,user,exec      0    0
+/dev/fd0         /media/floppy auto    noauto,rw,sync,user,exec 0    0
+/dev/cdrom       /media/cdrom  iso9660 noauto,ro,user,exec      0    0
 
 /dev/XXX         /tmp          ext3    rw,nosuid,nodev          0    2
 /dev/XXX         /var          ext3    rw,nosuid,nodev          0    2
@@ -254,6 +257,19 @@ móntelos individualmente usando:
 
 <informalexample><screen>
 # mount /ruta  # por ej.:  mount /usr
+</screen></informalexample>
+
+Los sistemas Debian actuales tienen puntos de montaje para medios
+removibles bajo <filename>/media</filename>, pero mantienen enlaces
+simbólicos por compatibilidad en 
+<filename>/</filename>. Cree esto si los necesita, como por ejemplo:
+
+<informalexample><screen>
+# cd /media
+# mkdir cdrom0
+# ln -s cdrom0 cdrom
+# cd /
+# ln -s media/cdrom
 </screen></informalexample>
 
 Puede montar el sistema de ficheros <quote>proc</quote> tantas veces como quiera y
@@ -280,19 +296,18 @@ del entorno chroot:
    </sect3>
 
    <sect3>
-   <title>Configurar el teclado</title>
-<para>
-
-Para configurar el teclado ejecute:
-
-<informalexample><screen>
-# dpkg-reconfigure console-data
-</screen></informalexample>
-
-</para><para>
-
-Tenga en cuenta que no puede configurar el teclado mientras esté dentro del
-chroot, pero se configurará en el siguiente rearranque.
+   <title>Configurar la zona horaria</title>
+ <para>
+ 
+Una opción en el archivo <filename>/etc/default/rcS</filename>
+determina si el sistema interpreta el reloj de hardware como UTC o
+como hora local. La siguiente orden le permite configurar esto y
+elegir su zona horaria.
+ 
+ <informalexample><screen>
+# editor /etc/default/rcS
+# tzconfig
+ </screen></informalexample>
 
 </para>
    </sect3>
@@ -351,10 +366,10 @@ directivas de búsqueda en
 # editor /etc/resolv.conf
 </screen></informalexample>
 
-Un <filename>/etc/resolv.conf</filename> sencillo sería:
+Un <filename>/etc/resolv.conf</filename> sencillo de ejemplo sería:
 
 <informalexample><screen>
-search hqdom.local\000
+search hqdom.local
 nameserver 10.1.1.36
 nameserver 192.168.9.100
 </screen></informalexample>
@@ -365,6 +380,21 @@ Escriba el nombre de máquina de su sistema (de 2 a 63 caracteres):
 # echo MaquinaDebian &gt; /etc/hostname
 </screen></informalexample>
 
+Y una <filename>/etc/hosts</filename> básico con soporte IPv6 sería:
+
+<informalexample><screen>
+127.0.0.1 localhost MaquinaDebian
+
+# Las siguientes líneas son recomendables en equipos que pueden
+# utilizar IPv6
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+</screen></informalexample>
+
 Si tiene múltiples tarjetas de red, debe añadir los nombres de los
 módulos de controlador en el fichero <filename>/etc/modules</filename>
 en el orden que desee. Luego durante el arranque, cada tarjeta será
@@ -373,25 +403,54 @@ asociada con el nombre de la interfaz (eth0, eth1, etc.) que haya indicado.
 </para>
    </sect3>
 
+   <title>Configurar Apt</title>
+ <para>
+ 
+Debootstrap habrá creado un 
+<filename>/etc/apt/sources.list</filename> muy básico que le permite
+instalar paquetes adicioanles. Seguramente querrá, sin embargo, tener
+algunas fuentes adicionales para poder acceder a paquetes fuente y a
+actualizaciones de seguridad:
+
+<informalexample><screen>
+deb-src http://ftp.us.debian.org/debian etch main
+
+deb http://security.debian.org/ etch/updates main
+deb-src http://security.debian.org/ etch/updates main
+</screen></informalexample>
+
+Asegúrese de ejecutar <userinput>aptitude update</userinput> después
+de hacer cambios a la lista de fuentes.
+
+</para>
+   </sect3>
+
    <sect3>
-   <title>Configurar locales</title>
+   <title>Configure Locales and Keyboard</title>
 <para>
 
-Instale el paquete de soporte de localización <classname>locales</classname> y configúrelo para poder
-definir los valores de localización para usar un idioma diferente
-al inglés:
 
+Instale el paquete de soporte de localización
+<classname>locales</classname> y configúrelo para poder definir los
+valores de localización para usar un idioma diferente al
+inglés. Actualmente se recomienda utilizar locales UTF-8.
 
 <informalexample><screen>
 # aptitude install locales
 # dpkg-reconfigure locales
 </screen></informalexample>
 
-NOTA: Debe haber configurado antes <classname>Apt</classname> creando el archivo sources.list
-y ejecutando <command>aptitude update</command>.
-Consulte el CÓMO de localización apropiado antes de utilizar valores
-de localización con juegos de caracteres distintos a ASCII o
-latin1.
+Para configurar su teclado (si lo necesita):
+ 
+<informalexample><screen>
+# aptitude install console-data
+# dpkg-reconfigure console-data
+</screen></informalexample>
+
+</para><para>
+
+Tenga en cuenta que no puede configurar el teclado mientras esté dentro del
+chroot, pero se configurará en el siguiente rearranque.
 
 </para>
    </sect3>
@@ -403,17 +462,53 @@ latin1.
 
 Si intenta arrancar este sistema, probablemente querrá un núcleo Linux
 y un gestor de arranque. Identifique los núcleos previamente empaquetados
-disponibles con
+disponibles con:
 
 <informalexample><screen>
-# apt-cache search <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image
+# apt-cache search linux-image
 </screen></informalexample>
 
 Luego instale su elección usando el nombre del paquete.
 
+</para><para>
+
+Si va a utilizar un núcleo pre-empaquetado puede querer crear su
+propio fichero de configuración
+<filename>/etc/kernel-img.conf</filename> antes de hacerlo. Aquí hay
+un fichero de ejemplo:
+
 <informalexample><screen>
-# aptitude install <phrase condition="classic-kpkg">kernel</phrase><phrase condition="common-kpkg">linux</phrase>-image-<replaceable>&kernelversion;-arquitectura-etc</replaceable>
+# Kernel image management overrides
+# See kernel-img.conf(5) for details
+do_symlinks = yes
+relative_links = yes
+do_bootloader = yes
+do_bootfloppy = no
+do_initrd = yes
+link_in_boot = no
 </screen></informalexample>
+
+</para><para>
+
+Consulte su página de manual si quiere información detallada de este
+fichero y de las distintas opciones. La página de manual estará
+disponible una vez instale el paquete
+<classname>kernel-package</classname>. Le recomendamos que revise si
+los valores son correctos para su sistema.
+
+</para><para>
+
+Después instale el paquete del núcleo que elija utilizando el nombre
+del paquete.
+
+<informalexample><screen>
+# aptitude install linux-image-<replaceable>&kernelversion;-arch-etc</replaceable>
+</screen></informalexample>
+
+Se le harán algunas preguntas referidas a
+<filename>/etc/kernel-img.conf</filename> durante la instalación si no
+creó ese fichero antes de instalar un núcleo pre-empaquetado.
+
 
 </para>
   </sect2>
@@ -422,10 +517,11 @@ Luego instale su elección usando el nombre del paquete.
 <title>Configurar el gestor de arranque</title>
 <para>
 
-Para poder arrancar su sistema &debian; deberá configurar su gestor de arranque
-para cargar el núcleo instalado en su nueva partición raíz. Tenga en cuenta
-que <command>debootstrap</command> no instala un gestor de arranque, pero puede usar <command>aptitude</command>
-dentro de su jaula Debian para hacer esto.
+Para poder arrancar su sistema &debian; deberá configurar su gestor de
+arranque para cargar el núcleo instalado en su nueva partición
+raíz. Tenga en cuenta que <command>debootstrap</command> no instala un
+gestor de arranque, pero puede usar <command>aptitude</command> dentro
+de su jaula Debian para hacer esto.
 
 </para><para arch="x86">
 
@@ -435,23 +531,61 @@ configurar el gestor de arranque. Si desea mantener el sistema que
 utilizó para instalar Debian, simplemente añada una entrada para la
 instalación de Debian en el fichero <filename>menu.lst</filename> o
 <filename>lilo.conf</filename> actual. También podría copiarlo al
-nuevo sistema y editarlo allí. Ejecute lilo una vez termine de editar
+nuevo sistema y editarlo allí. Ejecute <command>lilo</command> una vez termine de editar
 el fichero (recuerde que éste usará el <filename>lilo.conf</filename>
 relativo al sistema desde el cual lo ejecute).
+
+</para><para arch="x86">
+
+La instalación y configuración de <classname>grub</classname> es tan
+sencilla como hacer:
+
+<informalexample><screen>
+# aptitude install grub
+# grub-install /dev/<replaceable>hda</replaceable>
+# update-grub
+</screen></informalexample>
+
+La segunda orden instalará <command>grub</command> (en este caso en el
+MBR de <literal>hda</literal>). La última orden creará un
+<filename>/boot/grub/menu.lst</filename> funcional.
 
 </para><para arch="x86">
 
 Aquí tiene un ejemplo básico de /etc/lilo.conf:
 
 <informalexample><screen>
-boot=/dev/hda6
-root=/dev/hda6
+boot=/dev/<replaceable>hda6</replaceable>
+root=/dev/<replaceable>hda6</replaceable>
 install=menu
 delay=20
 lba32
 image=/vmlinuz
 label=Debian
 </screen></informalexample>
+
+</para><para arch="x86">
+
+Puede hacer algunos cambios a
+<filename>/etc/kernel-img.conf</filename> dependiendo del cargador de
+arranque que haya instalado.
+
+</para><para arch="x86">
+
+Debería fijar la opción <literal>do_bootloader</literal> a
+<quote>no</quote> en el caso de que tenga el cargador de arranque
+<classname>grub</classname>. Para actualizar automáticamente su
+<filename>/boot/grub/menu.lst</filename> cuando se instalen o eliminen
+núcleos de Debian debe añadir las siguientes líneas:
+
+<informalexample><screen>
+postinst_hook = update-grub
+postrm_hook   = update-grub
+</screen></informalexample>
+
+El valor de la opción <literal>do_bootloader</literal> debe estar
+fijado a <quote>yes</quote> en el caso del cargador de arranque
+<classname>lilo</classname>.
 
 </para><para arch="powerpc">
 
@@ -485,4 +619,33 @@ en lugar de <userinput>hd:</userinput>.
 
 </para>
   </sect2>
+
+  <sect2>
+<title>Toques finales</title>
+<para>
+
+El sistema instalado, como se ha mencionado previamente, será muy
+básico. Si quiere que su sistema sea un poco más maduro puede hacerlo fácilmente
+instalando todos los paquetes de prioridad <quote>standard</quote>:
+
+<informalexample><screen>
+# tasksel install standard
+</screen></informalexample>
+
+Por supuesto, también puede utilizar <command>aptitude</command> para
+instalar individualmente todos los paquetes.
+
+</para><para>
+
+Despue de la instalación habrá muchos paquetes descargados en
+<filename>/var/cache/apt/archives/</filename>. Puede liberar algo de
+espacio de disco ejecutando:
+
+<informalexample><screen>
+# aptitude clean
+</screen></informalexample>
+
+</para>
+  </sect2>
+
  </sect1>
