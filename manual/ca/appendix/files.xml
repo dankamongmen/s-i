@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44406 -->
 
 
  <sect1 id="linuxdevices"><title>Dispositius del Linux</title>
@@ -116,57 +116,69 @@ fitxers de dispositiu més important a la taula de baix.
 
 </para>
 
-  <sect2>
-<title>Configuració del ratolí</title>
-
+  <sect2 arch="not-s390" id="device-mouse">
+  <title>Configuració del ratolí</title>
 <para>
 
-EL ratolí pot emprar-se tant a l'intèpret d'ordres del Linux (amb el gpm)
-com a l'entorn X de finestres. Tots dos usos es poden fer compatibles si el
-repetidor gpm s'empra de manera que permeta al senyal arribar al servidor X,
-així:
-
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repeater)        (symlink)
-         /dev/ttyS1
-</screen></informalexample>
-
-D'una banda, ajusteu el protocol del repetidor a «raw» (a
-<filename>/etc/gpm.conf</filename>), i de l'altra, ajusteu l'X al
-protocol original del ratolí, a <filename>/etc/X11/XF86Config</filename> o
-<filename>/etc/X11/XF86Config-4</filename>.
+EL ratolí pot emprar-se tant a la consola del Linux (amb el gpm) com a
+l'entorn de finestres X. Normalment, això és qüestió d'instal·lar el
+<filename>gpm</filename> i el servidor X. Ambdós s'han de configurar
+per a fer server <filename>/dev/input/mice</filename> com al dispositiu
+de ratolí. El nom correcte del protocol del ratolí a gpm és
+<userinput>exps2</userinput>, i a X <userinput>ExplorerPS/2</userinput>.
+Els fitxers de configuració són <filename>/etc/gpm.conf</filename> i
+<filename>/etc/X11/xorg.conf</filename>, respectivament.
 
 </para><para>
 
-Aquesta solució per emprar el gpm fins i tot en X té avantatges quan
-desendolleu el ratolí sense adonar-vos.  Només cal tornar a engegar el
-gpm amb
+Alguns mòduls del nucli s'han de carregar per tal que el vostre ratolí
+funcioni. En la majoria dels casos els mòduls adients s'autodetectaran,
+però no sempre per a ratolins antics serie i de bus<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+Els ratolins serie tenen normalment un connector de 9 forats en forma
+de D; els ratolins de bus tenen un connector rodó de 8 pins, no confondre
+amb el connector rodó de 6 pins dels ratolins PS/2 o el connector rodó
+de 4 pins d'un ratolí ADB.
+</para>
 
-per tornar a habilitar el ratolí sense haver de tornar a iniciar l'X.
+</footnote>, els quals són força estranys excepte en ordinadors molt
+antics. Sumari dels mòduls del nucli Linux per diferents tipus de ratolí:
 
-</para><para>
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Modul</entry>
+  <entry>Descripció</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>Ratolí PS/2 (s'hauria d'autodetectar)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>Ratolí USB (s'hauria d'autodetectar)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>La major part de ratolins serie</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Ratolí de bus connectat a una targeta adaptadora Logitech</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>Ratolí de bus connectat a una targeta ATI o Microsoft InPort</entry>
+</row>
+</tbody></tgroup></informaltable>
 
-Si el gpm es troba deshabilitat o no s'ha instal·lat, assegureu-vos de
-configurar l'X perquè llegisca directament del dispositiu del ratolí, p.ex.
-/dev/psaux. Per a més detalls, consulteu el miniCOM ES FA del ratolí de 3
-botons, a
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, el
-<userinput>man gpm</userinput>, el
-<filename>/usr/share/doc/gpm/FAQ.gz</filename>, i el
-<ulink url="&url-xorg;current/doc/html/mouse.html">README.mouse</ulink>.
+Per carregar un modul d'un controlador de ratolí, podeu emprar l'ordre
+<command>modconf</command> (del paquet amb el mateix nom) i mirar a la
+categoria <userinput>kernel/drivers/input/mouse</userinput>.
 
 </para><para arch="powerpc">
-
-En els PowerPC, a <filename>/etc/X11/XF86Config</filename> o
-<filename>/etc/X11/XF86Config-4</filename>, ajusteu el dispositiu del ratolí
-a <userinput>"/dev/input/mice"</userinput>.
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: Unsure if this is still valid -->
 
 Els nuclis moderns permeten l'emulació d'un ratolí de tres botons per a
 aquells que només en tenen un. Només cal afegir aquestes línies al fitxer
