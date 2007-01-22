@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39468 -->
+<!-- original version: 43841 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
 <!--
@@ -20,8 +20,8 @@ Actualmente sólo se genera una variante del fichero de ejemplo (para i386).
 
 <para>
 
-Este apéndice explica los detalles de preconfigurar respuesas a preguntas
-en &d-i;  para poder así automatizar una instalación.
+Este apéndice explica cómo preconfigurar respuestas a preguntas
+en &d-i; para poder así automatizar una instalación.
 
 </para><para>
 
@@ -53,9 +53,7 @@ y <firstterm>network</firstterm> (red, n. del t.). La preconfiguración a través
 de initrd funciona en cualquier método de instalación y permite preconfigurar
 más cosas, pero es la que más preparación requiere. Los metodos de
 preconfiguración con fichero o vía red pueden utilizarse en distintos métodos
-de instalación. No se pueden preconfigurar las primeras preguntas de la
-instalación tanto en el caso de la precofinguración a través fichero o vía red
-dado que sólo se cargan una vez se han preguntado.
+de instalación.
 
 </para><para>
 
@@ -76,7 +74,14 @@ con los distintos métodos de instalación.
   <entry>CD/DVD</entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnote id='apx-ps-net'>
+
+  <para>
+  pero sólo si tiene acceso a la red y configura <literal>preseed/url</literal>
+  correctamente.
+  </para>
+
+  </footnote></entry>
 </row><row>
   <entry>netboot</entry>
   <entry>sí</entry>
@@ -86,12 +91,12 @@ con los distintos métodos de instalación.
   <entry>hd-media <phrase condition="bootable-usb">(incluyendo memorias usb)</phrase></entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>basado en disquete (controladores de cd)</entry>
   <entry>sí</entry>
   <entry>sí</entry>
-  <entry>no</entry>
+  <entry>sí<footnoteref linkend='apx-ps-net'/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>basado en disquete (controladores de red)</entry>
   <entry>sí</entry>
@@ -119,21 +124,25 @@ de que se haya configurado la red.
 
 </para><para>
 
-En términos prácticos esto significa que en la preconfiguración por fichero y
-vía red ya se habrá tenido que responder a las preguntas sobre idioma, país y
-seleccio de teclado. Además, para la preconfiguración vía red, se habrán
-respondido  todas las preguntas relacionadas con la configuración de red.
-Algunas preguntas que sólo se muestra en prioridad media o baja (como el primer
-intento de detección automática de hardware) también se habrán respondido en
-este caso.
-
-</para><para>
-
 Obviamente, cualquier pregunta que se haya procesado antes de cargar el
-fichero de preconfiguración no puede preconfigurarse.
+fichero de preconfiguración no puede preconfigurarse (esto
+incluye las preguntas que sólo se muestran a prioridad media o baja,
+como el primer intento de detección automática del hardware).
 Puede encontrar una forma para evitar que se omitan estas preguntas con
 <xref linkend="preseed-bootparms"/>.
 
+ </para><para>
+ 
+Puede arrancar el instalador en modo <quote>auto</quote> para evitar
+las preguntas que generalmente aparecen antes de que se realice la
+preconfiguración. Esto hace que las preguntas que se harían antes de
+poderse preconfigurar (p.ej. idioma, país y selección del teclado) se
+harán después de la configuración de la red, lo que permite que se
+preconfiguren. Esto también hace que la instalación se ejecute en
+prioridad crítica, lo que hace que se omitan muchas preguntas poco
+importantes. Para más información consulte <xref
+linkend="preseed-auto"/>.
+ 
 </para>
   </sect2>
 
@@ -144,8 +153,7 @@ Puede encontrar una forma para evitar que se omitan estas preguntas con
 Aunque la mayoría de las preguntas que utiliza &d-i; pueden preconfigurarse
 con este mecanismo hay algunas excepciones importantes. Tiene que (re)particionar
 el disco completo o utilizar el espacio en disco libre disponible, no puede usar
-particiones existentes. Tampoco puede aún utilizar la preconfiguración para 
-configurar RAID.
+particiones existentes.
 
 </para>
   </sect2>
@@ -170,7 +178,7 @@ The following types of templates are relevant for preseeding.
 
 </para>
 
-<itemizedlist>
+<itemizedlist spacing="compact">
 <listitem><para>
   string: allows the user to type any value
 </para></listitem>
@@ -211,54 +219,11 @@ are stored in a separate, non-readable file in the same directory.
   </sect2>
 -->
 
-  <sect2 id="preseed-hooks">
-  <title>Ejecución de órdenes a medida durante la instalación</title>
-<para>
-
-Una opcio muy poderosa y flexible que ofrecen las herramientas de preconfiguración
-es la capacidad de ejecutar órdenes o guiones en puntos específicos de la instalación.
-Tiene más detalles en <xref linkend="preseed-shell"/>.
-
-</para>
-
-<itemizedlist>
-<listitem><para>
-  <userinput>preseed/early_command</userinput>: se procesa tan pronto como se haya
-  cargado el fichero de preconfiguración.
-</para></listitem>
-<listitem><para>
-  <userinput>preseed/late_command</userinput>: se procesa justo antes del reinicio
-  del equipo al final de la instalación pero antes de que
-  se desmonte el sistema de ficheros <filename>/target</filename>.
-</para></listitem>
-</itemizedlist>
-
-  </sect2>
-
-  <sect2 id="preseed-seenflag">
-  <title>Utilizar la preconfiguración para cambiar los valore por omisión</title>
-<para>
-
-Es posible utilizar la preconfiguración para cambiar las respuestas por omisión
-a una pregunta, pero haciendo que esta pregunta se realice. Para hacer ésto
-debe definirse la marca <firstterm>seen</firstterm> (visto, n. del t.) a
-<quote>false</quote> una vez se ha fijado un valor para la pregunta.
-
-</para>
-
-<informalexample><screen>
-d-i foo/bar string value
-d-i foo/bar seen false
-</screen></informalexample>
-
-  </sect2>
- </sect1>
-
  <sect1 id="preseed-using">
  <title>Utilizar la preconfiguración</title>
 <para>
 
-Por supuesto, en primer lugar ha de crear primero el fichero de preconfiguración
+En primer lugar ha de crear primero el fichero de preconfiguración
 y ponerlo en la localización donde pretende utilizarlo. La creación del fichero
 de preconfiguración se describe más adelante en este apéndice. Colocar el
 fichero en la ubicación correcta es algo relativamente sencillo para la
@@ -334,17 +299,254 @@ Tenga en cuenta que puede abreviar <filename>preseed/url</filename> a
 <filename>url</filename> y <filename>preseed/file</filename> a
 <filename>file</filename> cuando se pasan como parámetros al núcleo.
 
+</para>
+  </sect2>
+  
+  <sect2 id="preseed-bootparms">
+  <title>Usar parámetros de arranque para preconfigurar preguntas</title>
+<para>
+
+Puede automatizar la instalación aún cuando no pueda utilizar el
+archivo de preconfiguración para preconfigurar algunos pasos. Esto es
+gracias a que se pueden preconfigurar valores en la línea de órdenes
+cuando se arranca el instalador.
+
 </para><para>
 
-Cuando haga esto puede quere añadir el parámetro
-<userinput>priority=critical</userinput> en el arranque. Esto impedirá
-que se haga ninguna pregunta aunque la preconfiguración mostrada más abajo no
-responda a alguna.
+Los parámetros de arranque también pueden utilizarse cuando no quiere
+realmente preconfigurar sino que sólo quiere dar una respuesta a una
+pregunta concreta. Algunos de los ejemplos donde esto puede ser útil
+están documentados en otras partes de este manual.
+
+</para><para>
+
+Para fijar un valor que vaya a utilizar &d-i;, sólo tiene que pasar
+<userinput><replaceable>ruta/a/variable</replaceable>=<replaceable>valor</replaceable></userinput>
+para cualquiera de las variables que se listan como ejemplos en este
+apéndice. Si se va a utilizar el valor para preconfigurar paquetes en
+el sistema objetivo, deberán estar precedidos por
+<firstterm>propietario</firstterm><footnote>
+
+
+<para>
+El propietario de una variable debconf (o plantilla) normalmente es el
+nombre del paquete que contiene la plantilla debconf en cuestión.  El
+propietario es <quote>d-i</quote> para el caso de las variables que se
+utilizan en el instalador en sí. Las plantillas y las variables pueden
+tener más de un propietario, lo que ayuda a determinar si pueden
+eliminarse de la base de datos de debconf si se purga el paquete.
+</para>
+
+</footnote> de la variable como sigue:
+<userinput><replaceable>propietario</replaceable>:<replaceable>ruta/a/variable</replaceable>=<replaceable>valor</replaceable></userinput>.
+No se copiará el valor de la variable a la base de datos de debconf
+del sistema objetivo si no especifica el propietario. Por lo que no se
+utilizará durante la configuración del paquete apropiado.
+
+</para><para>
+
+Tenga en cuenta que hay una abreviatura para las variables que se
+utilizan con más frecuencia en el indicador de arranque. Los ejemplos
+de este apéndice utilizan la abreviatura si hay una disponible en
+lugar de la variable completa.  En particular, se ha abreviado la
+variable <literal>preseed/url</literal> a <literal>url</literal> y
+tiene algunas cosas extra para permitir el uso de urls reducidas. Otro
+ejemplo es la abreviatura <literal>tasks</literal> que se traduce a
+<literal>tasksel:tasksel/first</literal>.
+
+</para><para>
+
+Un <quote>--</quote> en las opciones de arranque tiene un 
+significado especial. Los parámetros que aparezcan tras éste pueden copiarse
+a la configuración del cargador de arranque que se instale (si el instalador
+proporciona soporte para esa opción con el cargador de arranque
+seleccionado). El instalador filtrará de forma automática cualquier
+opción (como las opciones de preconfiguración) que reconozca.
+
+</para>
+<note><para>
+
+Los núcleos actuales (2.6.9 y posteriores) aceptan hasta treinta y dos
+opciones de línea de órdenes y treinta y dos opciones de entornos. Si
+se exceden estos números el núcleo abortará (con un
+<quote>panic</quote>). Los números eran menores en núcleos anteriores.
+
+</para></note>
+<para>
+
+Para la mayoría de las instalaciones se pueden eliminar con seguridad
+algunas de las opciones del fichero de configuración del cargado de
+arranque, como por ejemplo <literal>vga=normal</literal> lo que
+permite añadir más opciones para la preconfiguración.
+
+</para>
+<note><para>
+
+No siempre es posible especificar valores con espacios para los parámetros
+de arranque aunque se delimiten con comillas dobles.
+
+</para></note>
+   </sect2>
+
+  <sect2 id="preseed-auto">
+  <title>Modo «auto»</title>
+<para>
+
+Hay algunas funciones del Instalador de Debian que se combinan para
+permitir que algunas entradas de línea de órdenes en el indicador del
+arranque tengan como consecuencia una instalación automática adaptada
+y de arbitrariedad compleja. Para mostrar estro aquí hay algunos
+ejemplos que pueden utilizarse en el indicador del arranque:
+
+<informalexample><screen>
+auto url=autoservidor
+</screen></informalexample>
+
+Este valor depende de la existencia de un servidor de DHCP que hará
+que la máquina llegue al punto donde <literal>autoservidor</literal>
+puede resolverse por DNS quizás después de añadir un dominio local
+entregado por el servidor de DHCP. Si esto se utilizara en un sitio
+donde el dominio fuera <literal>ejemplo.com</literal>, y tuviera una
+configuración de DHCP razonablemente correcta, esto haría que se
+llegara a descargar el fichero de preconfiguración de
+<literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
+
+</para><para>
+
+La última parte de esa url (<literal>d-i/etch/./preseed.cfg</literal>)
+se toma de <literal>auto-install/defaultroot</literal>. Por omisión
+incluye el directorio <literal>etch</literal> para que versiones
+futuras puedan especificar su propio nombre en clave y permita hacer
+migraciones de forma controlada. El trozo <literal>/./</literal> se
+utiliza para indicar la raíz, relativa a la cual se anclarán las rutas
+siguientes (que se utilizará en preseed/include and preseed/run). Esto
+permite que los ficheros se especifiquen o bien como una URL completa,
+bien como rutas que empiezan con «/» y que están ancladas como se
+mencionaba, o bien como rutas relativas a la ubicación donde se
+encontró el último fichero de preconfiguración. Esto puede utilizarse
+para construirse guiones más portable de forma que una jerarquía
+completa de guiones puede moverse a una nueva ubicación sin
+romperla. Por ejempo, copiando los ficheros a un stick USB cuando
+antes estaban en un servidor web. En este ejemplo si el fichero de
+preconfiguración fija <literal>preseed/run</literal> a
+<literal>/scripts/orden_tardia.sh</literal> entonces este se intenta
+obtener de
+<literal>http://autoserver.example.com/d-i/etch/./scripts/orden_tardia.sh</literal>.
+
+</para><para>
+
+Aún puede utilizar una URL específica si no tiene una infraestructura
+de DHCP o DNS o si no quiere utilizar la ruta por omisión
+<filename>preseed.cfg</filename>. Si no utiliza el elemento
+<literal>/./</literal>, entonces se anclará al principio de la ruta
+(esto es, al tercer <literal>/</literal> en la URL). A continuación se
+muestra un ejemplo que requiere poco soporte de la infraestructura de
+red local:
+
+<informalexample><screen>
+auto url=<replaceable>http://192.168.1.2/ruta/a/mipreconfiguracion.archivo</replaceable>
+</screen></informalexample>
+
+Esto funciona de la siguiente forma:
+<itemizedlist spacing="compact">
+<listitem><para>
+si la URL no indica un protocolo se presupone que es http,
+</para></listitem>
+<listitem><para>
+si la sección del nombre de equipo no tiene puntos se le añade el
+dominio derivado del DHCP, y 
+</para></listitem>
+<listitem><para>
+si no hay ningún <literal>/</literal> tras el nombre de host se añade
+la ruta por omisión.
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Además de indicar urls, también puede especificar los valores que no
+afectan directamente al comportamiento de &d-i; pero pueden pasarse a
+los programas indicados en <literal>preseed/run</literal> en el
+fichero de preconfiguración cargado. De momento el único ejemplo de
+esto es  <literal>auto-install/classes</literal>, que tiene la
+abreviatura <literal>classes</literal>.  Puede usarse de la siguiente
+forma:
+
+
+<informalexample><screen>
+auto url=<replaceable>ejemplo.com</replaceable> classes=<replaceable>clase_A;clase_B</replaceable>
+</screen></informalexample>
+
+Las clases podrían indicar, por ejemplo, el tipo de sistema a utilizar
+o la localización a usar.
+
+</para><para>
+
+Por supuesto, se puede extender este concepto y, si lo hace, puede
+utilizar el espacio de nombres «auto-install» para ello. Así, uno
+podría tener algo como <literal>auto-install/style</literal> que
+después se utilizara en sus programas. Si piensa que necesita hacerlo,
+por favor, comuníquelo a la lista de correo
+<email>debian-boot@lists.debian.org</email> para intentar evitar
+conflictos en el espacio de nombres y para quizás añadir una
+abreviatura al parámetro para vd.
+
+</para><para>
+
+La etiqueta de arranque <literal>auto</literal> aún no está definida
+en todas las arquitecturas. Puede obtener el mismo efecto simplemente
+añadiendo dos parámetros a la línea de órdenes del núcleo:
+<literal>auto=true priority=critical</literal>. El parámetro
+<literal>auto</literal> es una abreviatura para
+<literal>auto-install/enabled</literal> y controla el tiempo de espera
+de las preguntas de localización y teclado para que estas se realicen
+más adelante y puedan preconfigurarse. El parámetro
+<literal>priority</literal> es la abreviatura de 
+<literal>preseed/priority</literal>, si se fija a 
+<literal>critical</literal> no se hará ninguna pregunta con una
+prioridad inferior a ésta.
+
+</para><para>
+
+Algunas opciones de interés cuando intenta automatizar una instalación
+utilizando DHCP son: <literal>interface=auto
+netcfg/dhcp_timeout=60</literal> que hace que el sistema coja la
+primera tarjeta de red disponible y sea un poco más paciente mientras
+espera una respuesta a su consulta DHCP.
 
 </para>
   </sect2>
 
+  <sect2 id="preseed-aliases">
+  <title>Aliases useful with preseeding</title>
+<para>
 
+Las siguientes abreviaturas pueden ser útiles cuando se utiliza
+preconfiguración (en modo auto)
+
+</para>
+
+<!-- Setting column width does not seem to work; use non-breaking spaces
+     to separate columns a bit -->
+<informaltable frame="none">
+<tgroup cols="2"><tbody>
+<row><entry>auto</entry><entry>auto-install/enabled</entry></row>
+<row><entry>classes</entry><entry>auto-install/classes</entry></row>
+<row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>locale</entry><entry>debian-installer/locale</entry></row>
+<row><entry>priority</entry><entry>debconf/priority</entry></row>
+<row><entry>file</entry><entry>preseed/file</entry></row>
+<row><entry>url</entry><entry>preseed/url</entry></row>
+<row><entry>interface</entry><entry>netcfg/choose_interface</entry></row>
+<row><entry>hostname&nbsp;&nbsp;&nbsp;</entry><entry>netcfg/get_hostname</entry></row>
+<row><entry>domain</entry><entry>netcfg/get_domain</entry></row>
+<row><entry>protocol</entry><entry>mirror/protocol</entry></row>
+<row><entry>suite</entry><entry>mirror/suite</entry></row>
+</tbody></tgroup>
+</informaltable>
+
+  </sect2>
+  
  <sect2 id="preseed-dhcp">
  <title>Utilizar un servidor DHCP para especificar los ficheros de preconfiguración</title>
 <para>
@@ -386,72 +588,7 @@ la instalación completa de Debian.
 </para>
   </sect2>
 
-
-  <sect2 id="preseed-bootparms">
-  <title>Utilizar parámetros de arranque para complementar la preconfiguración</title>
-<para>
-
-Hay algunas partes del proceso de instalación que no pueden automatizarse con
-algunos métodos de preconfiguración porque las preguntas se responden antes de
-que se cargue el fichero de preconfiguración. Por ejemplo, será necesario
-configurar primero la red si el fichero de preconfiguración se descarga de
-ésta.  Una razón para utilizar la preconfiguración de initrd es que permite la
-preconfiguración incluso en estas etapas iniciales del proceso de instalación.
-
-</para><para>
-
-La instalación puede automatizarse por completo aún cuando  el fichero de
-preconfiguración no puede utilizarse para preconfigurara ya que se pueden dar
-valores de preconfiguración al núcleo en la línea de órdenes. Sólo es necesario
-dar parámetros del tipo <userinput>ruta/a/variable=valor</userinput> para
-cualquiera de las variables de preconfiguración que se detallan en los
-ejemplos.
- 	 
-</para><para>
-
-Tenga en cuenta que hay una abreviatura para las variables que se utilizan con
-más frecuencia en el indicador de arranque. Los ejemplos de este apéndice
-utilizan la abreviatura si hay una disponible en lugar de la variable completa.
-
-</para><para>
-
-Un <quote>--</quote> en las opciones de arranque tiene un 
-significado especial. Los parámetros que aparezcan tras éste se copiarán
-a la configuración del cargador de arranque que se instale (si el instalador
-proporciona soporte para esa opción con el cargador de arranque
-seleccionado). Tenga en cuenta que es posible que el caracter
-<quote>--</quote> ya exista en los parámetros de arranque
-por omisión.
-
-</para>
-<note><para>
-
-El núcleo 2.4 acepta un máximo de ocho opciones en línea de órdenes y
-ocho opciones de entorno (incluyendo las opciones que añade por omisio el
-propio instalador). Si se excede esta cantidad los núcleos 2.4 descartarán las
-opciones que lo sobrepasen y los núcleos 2.6 abortarán (con un
-<quote>panic</quote>). Se pueden utilizar hasta treinta y dos opciones de línea
-de órdenes y treinta y dos opciones de entorno en el caso de las versiones del
-núcleo 2.6.9 y posteriores.
-
-</para></note>
-<para>
-
-Para la mayoría de las instalaciones se pueden eliminar algunas de las opciones
-del fichero de configuracio del cargado de arranque, como por ejemplo
-<literal>vga=normal</literal> lo que permite añadir más opciones para la
-preconfiguración.
-
-</para>
-<note><para>
-
-No siempre es posible especificar valores con espacios para los parámetros
-de arranque aunque se delimiten con comillas dobles.
-
-</para></note>
-  </sect2>
- </sect1>
-
+</sect1>
  <sect1 id="preseed-creating">
  <title>Crear un fichero de preconfiguración</title>
 <para>
@@ -714,9 +851,8 @@ d-i netcfg/wireless_wep string
 
 Dependiendo del método de instalación que uitlice se utilizará una
 réplica tanto para descargar componentes adicionales del instalador
-como para descargar el sistema base y para configurar
+como para instalar el sistema base y para configurar
 <filename>/etc/apt/sources.list</filename> en el sistema instalado.
-
 
 </para><para>
 
@@ -761,8 +897,7 @@ permitir. Puede elegir o bien particionar el espacio libre en el disco
 o todo el disco. La distribución del disco puede basarse en una receta
 existente o utilizar una receta de un fichero o una receta incluída en
 el fichero de preconfiguración. Actualmente no es posible utilizar la
-preconfiguración para particionar más de un disco o para configurar
-el RAID.
+preconfiguración para particionar más de un disco.
 
 </para>
 
@@ -780,13 +915,26 @@ de configurarlo si el sistema tiene más de un disco.
 # Nota: esta pregunta tiene que ser preconfigurada con el valor localizado
 # (traducido)
 #d-i partman-auto/init_automatically_partition \
-#    select Use the largest continuous free space
+#      select Guiado - utilizar el espacio libre contiguo más grande
 #
 # También puede especificar un disco a particionar. El nombre del
 # dispositivo se puede introducir tanto en formato tradicional o en
 # formato devfs.
-#  Por ejemplo, puede utilizar este valor para usar el primer disco devfs:
+#  Por ejemplo, para utilizar el primer disco:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+# Además, debe especificar el método a utilizar.
+# Los métodos disponibles actualmente son: "regular", "lvm" y "crypto"
+d-i partman-auto/method string lvm
+
+# Si alguno de los discos que va a ser automaticamente particionado
+# contiene una configuración antigua de LVM se le presentaría un
+# aviso al usuario. Esto puede preconfigurarse para que no aparezca: 
+d-i partman-auto/purge_lvm_from_device boolean true
+# Y lo mismo pasa con la confirmación para escribir las particiones
+# lvm.
+d-i partman-lvm/confirm boolean true
+
+
 # O, si quiere utilizar LVM:
 #d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
 
@@ -807,10 +955,11 @@ d-i partman-auto/choose_recipe \
 # del d-i, simplemente puede direccionarlo a éste.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
-# Si no, puede colocar la receta completa en una única línea
-#(lógica). Este ejemplo crea una pequeña partición /boot, una
-#partición de intercambio apropiada y usa el resto del espacio para
-#la partición raíz:
+# Si no, puede colocar la receta completa en el fichero de
+# preconfiguración en una única línea (lógica). 
+# Este ejemplo crea una pequeña partición /boot, una
+# partición de intercambio apropiada y usa el resto del espacio para
+# la partición raíz:
 #d-i partman-auto/expert_recipe string                         \
 #      boot-root ::                                            \
 #              40 50 100 ext3                                  \
@@ -830,6 +979,95 @@ d-i partman-auto/choose_recipe \
 
 # La siguiente receta hace que «partman» particione automáticamente el
 # espacio sin confirmación.
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition \
+       select Finish partitioning and write changes to disk
+d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-partman-raid">
+  <title>Particionar con RAID</title>
+<para>
+
+También puede utilizar la preconfiguración para configurar las
+particiones en arrays RAID por software. Se puede utilizar para
+niveles RAID 0, 1 y 5, creando arrays degradados y especificando
+dispositivos libres.
+Puede configurar grub para que se instale en todos los dispositivos
+utilizados en el array si está utilizando RAID 1, consulte <xref
+linkend="preseed-bootloader"/>.
+
+</para>
+
+<warning><para>
+
+Es fácil equivocarse en este tipo de particionado automático. También
+se trata de un componente muy nuevo que puede tener aún algunos
+errores o puede no tratar todos los errores. El usuario es responsable
+de conseguir todas las distintas recetas bien (de forma que tengan
+sentido y no entren en conflicto). Si tiene problemas compruebe
+<filename>/var/log/syslog</filename>.
+
+
+</para><para>
+
+Tenga en cuenta que los desarrolladores de este componente han probado
+sólo RAID 0 y RAID 1. No se ha probado aún RAID 5. Sólo se ha probado
+ligeramente la configuración de RAID avanzados con arrays degradados o
+dispositivos libres.
+
+</para></warning>
+
+<informalexample><screen>
+# AVISO: esta opción es de calidad beta y debería utilizarse con
+# cuidado.
+
+# Debería fijarse el método a "raid".
+#d-i partman-auto/method string raid
+# Specificar los discos a particionar. Deberían tener la misma
+# distribución por lo que esto sólo funcionará si los discos son del
+# mismo tamaño.
+#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+
+# A continuación, tiene que especificar las particiones físicas que se
+# utilizarán.
+#d-i partman-auto/expert_recipe string \
+#      multiraid ::                                         \
+#              1000 5000 4000 raid                          \
+#                      $primary{ } method{ raid }           \
+#              .                                            \
+#              64 512 300% raid                             \
+#                      method{ raid }                       \
+#              .                                            \
+#              500 10000 1000000000 raid                    \
+#                      method{ raid }                       \
+#              .
+
+# Por último, tiene que especificar cómo van a utilizarse las
+# particiones antes definidas en la configuración RAID. Recuerde que
+# tiene que utilizar los números de partición correctos para las
+# particiones lógicas.
+# Los parámetros son
+# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
+#          &lt;devices&gt; &lt;sparedevices&gt;
+# Se soportan los niveles RAID 0, 1 y 5; los dispositivos se separan
+# con "#"
+#d-i partman-auto-raid/recipe string \
+#    1 2 0 ext3 /                                           \
+#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
+#    .                                                      \
+#    1 2 0 swap -                                           \
+#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
+#    .                                                      \
+#    0 2 0 ext3 /home                                       \
+#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    .
+
+# Esto hace que partman particione de forma automática sin
+# confirmación.
+d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
        select Finish partitioning and write changes to disk
@@ -874,10 +1112,15 @@ a continuación son relevantes para la preconfiguración. Desea ayudar
 #d-i apt-setup/security_host string
 
 # Repositorios adicionales, se dispone de local[0-9]
-#d-i apt-setup/local0/comment string local server
-#d-i apt-setup/local0/source string \
+#d-i apt-setup/local0/repository string \
 #       deb http://local.server/debian stable main
-# URL de la clave pública en el repositorio local.
+#d-i apt-setup/local0/comment string local server
+# Activar líneas deb-src
+#d-i apt-setup/local0/source boolean true
+# URL de la clave pública en el repositorio local. Debe indicar
+# una clave o apt se quejará indicando que el repositorio no 
+# está autenticado con lo que la línea en sources.list quedará
+# comentada.
 #d-i apt-setup/local0/key string http://local.server/key
 </screen></informalexample>
 
@@ -990,9 +1233,12 @@ d-i grub-installer/with_other_os boolean true
 
 # Alternativamente, descomente y edite estas líneas
 # si desea instalar en una ubicación distinta al MBR:
-#d-i grub-installer/bootdev  string (hd0,0)
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Para instalar grub en múltiples discos:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
 </screen></informalexample>
 
   </sect2>
@@ -1172,8 +1418,16 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
  <sect1 id="preseed-advanced">
  <title>Opciones avanzadas</title>
 
-  <sect2 id="preseed-shell">
-  <title>Órdenes de shell</title>
+  <sect2 id="preseed-hooks">
+  <title>Ejecutar órdenes a medida durante la instalación</title>
+<para>
+
+Una opción muy potente y flexible que se ofrece con las herramientas
+de preconfiguración es la capacidad de ejecutar órdenes o programas en
+distintos puntos de la instalación.
+
+</para>
+
 
 <informalexample role="example"><screen>
 # La preconfiguración de d-i es inherentemente insegura. Ninguna parte del
@@ -1194,6 +1448,26 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 # órdenes apt-install e «in-target» para instalar fácilmente paquetes
 # y ejecutar órdenes en el sistema objetivo
 #d-i preseed/late_command string apt-get install zsh; in-target chsh -s /bin/zsh
+</screen></informalexample>
+
+  </sect2>
+
+  
+  <sect2 id="preseed-seenflag">
+  <title>Utilizar la preconfiguración para cambiar valores por omisión</title>
+<para>
+
+Es posible utilizar la preconfiguración para cambiar la respuesta por
+omisión para una pregunta, pero manteniendo la pregunta de forma que
+ésta se haría en cualquier caso. Para hacer esto tiene que resetar el
+campo <firstterm>seen</firstterm> (n. del t., «visto») a
+<quote>false</quote> después de fijar el valor para la pregunta.
+
+</para>
+
+<informalexample><screen>
+d-i foo/bar string value
+d-i foo/bar seen false
 </screen></informalexample>
 
   </sect2>
@@ -1235,11 +1509,26 @@ ficheros.
 
 # Lo más flexible es descargar un programa y ejecutarlo. El programa
 # puede utilizar órdenes como debconf-set para manipular la base de datos
-# de debconf. Tenga en cuenta que los nombres de los archivos son relativos,
+# de debconf. 
+# Puede listar más de un programa, separándolos entre sí con espacios.
+# Tenga en cuenta que los nombres de los archivos son relativos,
 # se obtienen del mismo directorio donde está el archivo de preconfiguración
 # que los ejecuta.
-d-i preseed/run string foo.sh
+#d-i preseed/run string foo.sh
 </screen></informalexample>
+
+<para>
+
+También es posible cargar en cadena desde el initrd o la fase de
+preconfiguración de fichero en la preconfiguración con red
+configurando preseed/url en los ficheros antriores. Esto hará que la
+preconfiguración de la red se realice antes de configurar la red. Ha
+de tener cuidado cuando hace esto ya que habrá dos ejecuciones
+independientes de la pregconfiguación. Lo que significa que tiene dos
+oportunidades para ejecutar la orden preseed/early command, la segunda
+tendrá lugar justo después de que se habilite el acceso a la red.
+
+</para>
 
   </sect2>
  </sect1>
