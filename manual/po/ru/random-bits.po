@@ -7,15 +7,14 @@ msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-01-22 23:21+0000\n"
-"PO-Revision-Date: 2007-01-07 17:48+0300\n"
+"PO-Revision-Date: 2007-01-23 21:22+0300\n"
 "Last-Translator: D-R L10N Team <debian-l10n-russian@lists.debian.org>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Tag: title
 #: random-bits.xml:4
@@ -345,6 +344,14 @@ msgid ""
 "are <filename>/etc/gpm.conf</filename> and <filename>/etc/X11/xorg.conf</"
 "filename>."
 msgstr ""
+"Мышь можно использовать одновременно в консоли Linux (с помощью gpm) и "
+"в среде X window. Обычно, для этого достаточно установить "
+"<filename>gpm</filename> и X-сервер. Они должны быть настроены "
+"на использование <filename>/dev/input/mice</filename> в качестве "
+"устройства мыши. В gpm нужно установить протокол работы с мышью <userinput>exps2</userinput>, а в X &mdash; "
+"<userinput>ExplorerPS/2</userinput>. Это производится в соответствующих "
+"файлах настройки <filename>/etc/gpm.conf</filename> и "
+"<filename>/etc/X11/xorg.conf</filename>."
 
 #. Tag: para
 #: random-bits.xml:137
@@ -369,6 +376,28 @@ msgid ""
 "<command>modconf</command> command (from the package with the same name) and "
 "look in the category <userinput>kernel/drivers/input/mouse</userinput>."
 msgstr ""
+"Чтобы мышь заработала, должны быть загружены определённые драйверы "
+"ядра. В большинстве случаев нужные модули определяются автоматически, "
+"но это происходит не всегда, если используются старые мыши, подключаемые "
+"к последовательному порту и по шине<footnote> <para> Мышь, подключаемая к "
+"последовательному порту, имеет трапециевидный разъём с 9 отверстиями; "
+"мышь с подключением по шине имеет 8-штырьковый круглый разъём, не "
+"перепутайте с 6-штырьковым круглым разъёмом мыши PS/2 или "
+"4-штырьковым круглым разъёмом мыши ADB. </para> </footnote>, что есть "
+"большая редкость и встречается только на очень старых компьютерах. "
+"Краткая справка по модулям ядра Linux, которые нужны для различных "
+"типо мышей: <informaltable><tgroup cols=\"2\"><thead> <row> "
+"<entry>Модуль</entry> <entry>Описание</entry> </row> </thead><tbody> "
+"<row> <entry>psmouse</entry> <entry>мышь PS/2 (должна определяться "
+"автоматически)</entry> </row> <row> <entry>usbhid</entry> <entry>мышь "
+"USB (должна определяться автоматически)</entry> </row> <row> <entry>sermouse</entry> <entry>Большинство мышей, подключаемых к "
+"последовательному порту</entry> "
+"</row> <row> <entry>logibm</entry> <entry>Мышь, подключаемая по шине "
+"к карте Logitech</entry> </row> <row> <entry>inport</entry> <entry>Мышь, "
+"подключаемая по шине к карте ATI или Microsoft InPort</entry> </row> "
+"</tbody></tgroup></informaltable> Для загрузки драйвера мыши, вы можете "
+"воспользоваться командой <command>modconf</command> (из пакета "
+"с тем же названием) и посмотреть в категории <userinput>kernel/drivers/input/mouse</userinput>."
 
 #. Tag: para
 #: random-bits.xml:184
@@ -415,14 +444,14 @@ msgstr "Дисковое пространство, необходимое для
 #, no-c-format
 msgid ""
 "A standard installation for the i386 architecture, including all standard "
-"packages and using the default 2.6 kernel, takes up &std-system-size;MB of disk space. A "
+"packages and using the default 2.6 kernel, takes up 442MB of disk space. A "
 "minimal base installation, without the <quote>Standard system</quote> task "
-"selected, will take &base-system-size;MB."
+"selected, will take 230MB."
 msgstr ""
 "Для стандартной установки на i386 с ядром по умолчанию версии 2.6, со всеми "
-"стандартными пакетами требуется &std-system-size; МБ дискового пространства. Минимальная "
+"стандартными пакетами требуется 442 МБ дискового пространства. Минимальная "
 "базовая установка без выбранной задачи <quote>Стандартная система</quote> "
-"занимает &base-system-size; МБ."
+"занимает 230 МБ."
 
 #. Tag: para
 #: random-bits.xml:223
@@ -935,7 +964,7 @@ msgstr "Запуск <command>debootstrap</command>"
 
 #. Tag: para
 #: random-bits.xml:473
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "<command>debootstrap</command> can download the needed files directly from "
 "the archive when you run it. You can substitute any Debian archive mirror "
@@ -943,11 +972,12 @@ msgid ""
 "below, preferably a mirror close to you network-wise. Mirrors are listed at "
 "<ulink url=\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 msgstr ""
-"При запуске <command>debootstrap</command> загружает необходимые файлы прямо "
-"из архива. В примере ниже вы можете заменить <userinput>http.us.debian.org/"
-"debian</userinput> на любой сервер-зеркало архивов Debian, лучше всего "
-"использовать из наиболее близкой к вам сети. Список серверов <ulink url="
-"\"http://www.debian.org/misc/README.mirrors\"></ulink>."
+"Команда <command>debootstrap</command> может загружать "
+"необходимые файлы прямо из архива. В примере ниже вы можете заменить "
+"<userinput>&archive-mirror;/debian</userinput> на любой сервер-зеркало "
+"архива Debian, лучше всего "
+"использовать из наиболее близкой к вам сети. Список серверов "
+"<ulink url=\"http://www.debian.org/misc/README.mirrors\"></ulink>."
 
 #. Tag: para
 #: random-bits.xml:482
@@ -1942,10 +1972,8 @@ msgstr "Настроить сеть автоматически с помощью
 #. Tag: para
 #: random-bits.xml:948
 #, no-c-format
-msgid ""
-"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr ""
-"IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgstr "IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:953
@@ -1953,8 +1981,7 @@ msgstr ""
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
 "userinput>"
-msgstr ""
-"Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
+msgstr "Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:959
@@ -2203,7 +2230,7 @@ msgid ""
 "Switching to another console while the installer is waiting for input should "
 "work without causing any problems."
 msgstr ""
-"Вы не должны переключаться на другую консоль, в то время какпрограмма "
+"Вы не должны переключаться на другую консоль, в то время как программа "
 "установки занята; это может привести к падению интерфейса. Интерфейс будет "
 "перезапущен автоматически, но это может привести к проблемам с установкой. "
 "Переключение на другую консоль, в то время как программа установки ожидает "
@@ -2221,213 +2248,3 @@ msgstr ""
 "сгенерировать произвольный ключ шифрования. Возможно настроить шифрованный "
 "раздел используя ключевую фразу в качестве ключа шифрования."
 
-#~ msgid ""
-#~ "The mouse can be used in both the Linux console (with gpm) and the X "
-#~ "window environment. The two uses can be made compatible if the gpm "
-#~ "repeater is used to allow the signal to flow to the X server as shown: "
-#~ "<informalexample><screen>\n"
-#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
-#~ "=&gt; X\n"
-#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
-#~ "         /dev/ttyS1\n"
-#~ "</screen></informalexample> Set the repeater protocol to be raw (in "
-#~ "<filename>/etc/gpm.conf</filename>) while setting X to the original mouse "
-#~ "protocol in <filename>/etc/X11/XF86Config</filename> or <filename>/etc/"
-#~ "X11/XF86Config-4</filename>."
-#~ msgstr ""
-#~ "Мышь можно использовать одновременно и в консоли Linux (с помощью gpm) и "
-#~ "в среде X window. Это возможно, если использовать повторитель gpm, "
-#~ "который который передаёт сигналы ещё и X серверу: "
-#~ "<informalexample><screen>\n"
-#~ "mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse "
-#~ "=&gt; X\n"
-#~ "         /dev/ttyS0             (repeater)        (symlink)\n"
-#~ "         /dev/ttyS1\n"
-#~ "</screen></informalexample> Установите протокол повторителя в raw (в "
-#~ "файле <filename>/etc/gpm.conf</filename>), а в настройках X фактический "
-#~ "протокол обмена данными с мышью (в файле <filename>/etc/X11/XF86Config</"
-#~ "filename> или <filename>/etc/X11/XF86Config-4</filename>)."
-
-#~ msgid ""
-#~ "This approach to use gpm even in X has advantages when the mouse is "
-#~ "unplugged inadvertently. Simply restarting gpm with "
-#~ "<informalexample><screen>\n"
-#~ "# /etc/init.d/gpm restart\n"
-#~ "</screen></informalexample> will re-connect the mouse in software without "
-#~ "restarting X."
-#~ msgstr ""
-#~ "Такой подход с использованием gpm даже в X имеет преимущество, если мышь "
-#~ "отключат по неосторожности. Простой перезапуск gpm командой "
-#~ "<informalexample><screen>\n"
-#~ "# /etc/init.d/gpm restart\n"
-#~ "</screen></informalexample> подключит мышь в программе заново без "
-#~ "перезапуска X."
-
-#~ msgid ""
-#~ "If gpm is disabled or not installed for some reason, make sure to set X "
-#~ "to read directly from a mouse device such as /dev/psaux. For details, "
-#~ "refer to the 3-Button Mouse mini-Howto at <filename>/usr/share/doc/HOWTO/"
-#~ "en-txt/mini/3-Button-Mouse.gz</filename>, <userinput>man gpm</userinput>, "
-#~ "<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and <ulink url=\"&url-"
-#~ "xorg;current/doc/html/mouse.html\">README.mouse</ulink>."
-#~ msgstr ""
-#~ "Если gpm выключен или не установлен по какой-то причине, убедитесь что X "
-#~ "сервер настроен на чтение непосредственно с устройства мыши, например, "
-#~ "из /dev/psaux. Подробней смотрите 3-Button Mouse mini-Howto в <filename>/"
-#~ "usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, "
-#~ "<userinput>man gpm</userinput>, <filename>/usr/share/doc/gpm/FAQ.gz</"
-#~ "filename> и <ulink url=\"&url-xorg;current/doc/html/mouse.html\">README."
-#~ "mouse</ulink>."
-
-#~ msgid ""
-#~ "For PowerPC, in <filename>/etc/X11/XF86Config</filename> or <filename>/"
-#~ "etc/X11/XF86Config-4</filename>, set the mouse device to <userinput>\"/"
-#~ "dev/input/mice\"</userinput>."
-#~ msgstr ""
-#~ "Для PowerPC в <filename>/etc/X11/XF86Config</filename> или <filename>/etc/"
-#~ "X11/XF86Config-4</filename> установите устройство мышь в <userinput>\"/"
-#~ "dev/input/mice\"</userinput>."
-
-#. Tag: entry
-#: random-bits.xml:247
-#, no-c-format
-msgid "&task-desktop-inst;"
-msgstr "&task-desktop-inst;"
-
-#. Tag: entry
-#: random-bits.xml:248
-#, no-c-format
-msgid "&task-desktop-dl;"
-msgstr "&task-desktop-dl;"
-
-#. Tag: entry
-#: random-bits.xml:249
-#, no-c-format
-msgid "&task-desktop-tot;"
-msgstr "&task-desktop-tot;"
-
-#. Tag: entry
-#: random-bits.xml:262
-#, no-c-format
-msgid "&task-laptop-inst;"
-msgstr "&task-laptop-inst;"
-
-#. Tag: entry
-#: random-bits.xml:263
-#, no-c-format
-msgid "&task-laptop-dl;"
-msgstr "&task-laptop-dl;"
-
-#. Tag: entry
-#: random-bits.xml:264
-#, no-c-format
-msgid "&task-laptop-tot;"
-msgstr "&task-laptop-tot;"
-
-#. Tag: entry
-#: random-bits.xml:269
-#, no-c-format
-msgid "&task-web-inst;"
-msgstr "&task-web-inst;"
-
-#. Tag: entry
-#: random-bits.xml:270
-#, no-c-format
-msgid "&task-web-dl;"
-msgstr "&task-web-dl;"
-
-#. Tag: entry
-#: random-bits.xml:271
-#, no-c-format
-msgid "&task-web-tot;"
-msgstr "&task-web-tot;"
-
-#. Tag: entry
-#: random-bits.xml:276
-#, no-c-format
-msgid "&task-print-inst;"
-msgstr "&task-print-inst;"
-
-#. Tag: entry
-#: random-bits.xml:277
-#, no-c-format
-msgid "&task-print-dl;"
-msgstr "&task-print-dl;"
-
-#. Tag: entry
-#: random-bits.xml:278
-#, no-c-format
-msgid "&task-print-tot;"
-msgstr "&task-print-tot;"
-
-#. Tag: entry
-#: random-bits.xml:283
-#, no-c-format
-msgid "&task-dns-inst;"
-msgstr "&task-dns-inst;"
-
-#. Tag: entry
-#: random-bits.xml:284
-#, no-c-format
-msgid "&task-dns-dl;"
-msgstr "&task-dns-dl;"
-
-#. Tag: entry
-#: random-bits.xml:285
-#, no-c-format
-msgid "&task-dns-tot;"
-msgstr "&task-dns-tot;"
-
-#. Tag: entry
-#: random-bits.xml:290
-#, no-c-format
-msgid "&task-file-inst;"
-msgstr "&task-file-inst;"
-
-#. Tag: entry
-#: random-bits.xml:291
-#, no-c-format
-msgid "&task-file-dl;"
-msgstr "&task-file-dl;"
-
-#. Tag: entry
-#: random-bits.xml:292
-#, no-c-format
-msgid "&task-file-tot;"
-msgstr "&task-file-tot;"
-
-#. Tag: entry
-#: random-bits.xml:297
-#, no-c-format
-msgid "&task-mail-inst;"
-msgstr "&task-mail-inst;"
-
-#. Tag: entry
-#: random-bits.xml:298
-#, no-c-format
-msgid "&task-mail-dl;"
-msgstr "&task-mail-dl;"
-
-#. Tag: entry
-#: random-bits.xml:299
-#, no-c-format
-msgid "&task-mail-tot;"
-msgstr "&task-mail-tot;"
-
-#. Tag: entry
-#: random-bits.xml:304
-#, no-c-format
-msgid "&task-sql-inst;"
-msgstr "&task-sql-inst;"
-
-#. Tag: entry
-#: random-bits.xml:305
-#, no-c-format
-msgid "&task-sql-dl;"
-msgstr "&task-sql-dl;"
-
-#. Tag: entry
-#: random-bits.xml:306
-#, no-c-format
-msgid "&task-sql-tot;"
-msgstr "&task-sql-tot;"
