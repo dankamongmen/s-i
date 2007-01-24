@@ -36,7 +36,7 @@ while db_get "apt-setup/local$i/repository" && [ "$RET" ]; do
 		protocol=${repository%%:*}
 		if db_get mirror/$protocol/proxy && [ "$RET" ]; then
 			proxy="$RET"
-			eval "export ${protocol}_xxx=$proxy"
+			eval "export ${protocol}_proxy=$proxy"
 		fi
 		# fetch the key
 		wget "$key" -O "$ROOT/tmp/key$i.pub"
