@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 
 
  <sect1 id="linuxdevices"><title>Linux のデバイス</title>
@@ -130,92 +130,123 @@ Linux では、<filename>/dev</filename> に特別なファイルがいろいろとあります。
 
 </para>
 
-  <sect2>
-<title>マウスのセットアップ</title>
-
+  <sect2 arch="not-s390" id="device-mouse">
+<!--
+  <title>Setting Up Your Mouse</title>
+-->
+  <title>マウスのセットアップ</title>
 <para>
 
 <!--
-The mouse can be used in both the Linux console (with gpm) and the X window
-environment. The two uses can be made compatible if the gpm repeater is used
-to allow the signal to flow to the X server as shown:
+The mouse can be used in both the Linux console (with gpm) and the X
+window environment. Normally, this is a simple matter of installing
+<filename>gpm</filename> and the X server itself. Both should be
+configured to use <filename>/dev/input/mice</filename> as the mouse
+device. The correct mouse protocol is named <userinput>exps2</userinput>
+in gpm, and <userinput>ExplorerPS/2</userinput> in X. The respective
+configuration files are <filename>/etc/gpm.conf</filename> and
+<filename>/etc/X11/xorg.conf</filename>.
 -->
 (gpm が動いている) Linux コンソールと X ウィンドウ環境の両方で、
 マウスを使用できます。
-以下で示すような、gpm リピータの信号を X サーバに流れるようにすれば、
-双方で使用するような互換性を持つことができます。
-
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repeater)        (symlink)
-         /dev/ttyS1
-</screen></informalexample>
-
-<!--
-Set the repeater protocol to be raw (in <filename>/etc/gpm.conf</filename>) while
-setting X to the original mouse protocol in <filename>/etc/X11/XF86Config</filename>
-or <filename>/etc/X11/XF86Config-4</filename>.
--->
-<filename>/etc/X11/XF86Config</filename> や 
-<filename>/etc/X11/XF86Config-4</filename> で元のマウスプロトコルを 
-X に設定するなら、リピータプロトコルを (<filename>/etc/gpm.conf</filename> で) 
-raw に設定してください。
+通常、<filename>gpm</filename> や X サーバ自体をインストールするだけです。
+どちらも、マウスデバイスとして <filename>/dev/input/mice</filename> 
+を使用するように設定されています。
+正しいマウスプロトコルは、gpm では <userinput>exps2</userinput>、
+X では <userinput>ExplorerPS/2</userinput> とされています。
+それぞれの設定ファイルは <filename>/etc/gpm.conf</filename> と
+<filename>/etc/X11/xorg.conf</filename> です。
 
 </para><para>
 
 <!--
-This approach to use gpm even in X has advantages when the mouse is
-unplugged inadvertently.  Simply restarting gpm with
+Certain kernel modules must be loaded in order for your mouse to work.
+In most cases the correct modules are autodetected, but not always for
+old-style serial and bus mice<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+Serial mice usually have a 9-hole D-shaped connector; bus mice have an
+8-pin round connector, not to be confused with the 6-pin round connector
+of a PS/2 mouse or the 4-pin round connector of an ADB mouse.
+</para>
 
-will re-connect the mouse in software without restarting X.
+</footnote>, which are quite rare except on very old computers. Summary
+of Linux kernel modules needed for different mouse types:
 -->
-X の中で gpm を使用するこのアプローチは、
-マウスが不注意に抜かれた場合にも利点があります。
-単純に
+あなたのマウスが動作するには、
+特定のカーネルモジュールを読み込まなければなりません。
+ほとんどの場合、正しいモジュールを自動検出しますが、
+旧式のシリアルマウスや、バスマウスでは<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+シリアルマウスには、通常 9 穴の D 型コネクタが、
+バスマウスには、8 ピン円形コネクタが付いており、
+PS/2 マウスの 6 ピン円形コネクタや、
+ADB マウスの 4 ピン円形コネクタと混同することはないでしょう。
+</para>
 
-として gpm を再起動すると、X を再起動しなくても、
-ソフトウェア的にマウスを再接続することができます。
+</footnote>いつもそうとは限りません。
+とはいえ、非常に古いコンピュータでなければ、かなり「まれ」です。
+以下に、マウスのタイプごとの、Linux カーネルモジュールをまとめます。
 
-</para><para>
+<informaltable><tgroup cols="2"><thead>
+<row>
+<!--
+  <entry>Module</entry>
+  <entry>Description</entry>
+-->
+  <entry>モジュール</entry>
+  <entry>説明</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+<!--
+  <entry>PS/2 mice (should be autodetected)</entry>
+-->
+  <entry>PS/2 マウス (自動検出可)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+<!--
+  <entry>USB mice (should be autodetected)</entry>
+-->
+  <entry>USB マウス (自動検出可)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+<!--
+  <entry>Most serial mice</entry>
+-->
+  <entry>ほとんどのシリアルマウス</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+<!--
+  <entry>Bus mouse connected to Logitech adapter card</entry>
+-->
+  <entry>Logitech アダプタカードに接続するバスマウス</entry>
+</row>
+<row>
+  <entry>inport</entry>
+<!--
+  <entry>Bus mouse connected to ATI or Microsoft InPort card</entry>
+-->
+  <entry>ATI や Microsoft の InPort カードに接続するバスマウス</entry>
+</row>
+</tbody></tgroup></informaltable>
 
 <!--
-If gpm is disabled or not installed for some reason, make sure to set X to
-read directly from a mouse device such as /dev/psaux. For details, refer
-to the 3-Button Mouse mini-Howto at
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
-<userinput>man gpm</userinput>,
-<filename>/usr/share/doc/gpm/FAQ.gz</filename>, and
-<ulink url="&url-xorg;current/doc/html/mouse.html">README.mouse</ulink>.
+To load a mouse driver module, you can use the <command>modconf</command>
+command (from the package with the same name) and look in the category
+<userinput>kernel/drivers/input/mouse</userinput>.
 -->
-いろいろな理由で gpm が無効だったりインストールされていない場合、
-/dev/psaux といったマウスデバイスから直接読み込むよう X を設定するといいです。
-詳細は、
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename> の
-3-Button Mouse mini-Howto や、<userinput>man gpm</userinput>、
-<filename>/usr/share/doc/gpm/FAQ.gz</filename>、
-<ulink url="&url-xfree86;current/mouse.html">README.mouse</ulink>
-をご覧ください。
+マウスドライバモジュールを読み込むのに、
+<command>modconf</command> コマンド (同名のパッケージに収録) を使用でき、
+<userinput>kernel/drivers/input/mouse</userinput> カテゴリから探せます。
 
 </para><para arch="powerpc">
-
-<!--
-For PowerPC, in <filename>/etc/X11/XF86Config</filename> or
-<filename>/etc/X11/XF86Config-4</filename>, set the mouse device to
-<userinput>"/dev/input/mice"</userinput>.
--->
-PowerPC では、<filename>/etc/X11/XF86Config</filename> や
-<filename>/etc/X11/XF86Config-4</filename>で、
-マウスデバイスを <userinput>"/dev/input/mice"</userinput> に設定してください。
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: Unsure if this is still valid -->
 
 <!--
 Modern kernels give you the capability to emulate a three-button mouse
