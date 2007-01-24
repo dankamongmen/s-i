@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 
 
  <sect1 id="linuxdevices"><title>Linux-Geräte</title>
@@ -115,59 +115,71 @@ Die wichtigsten Gerätedateien sind in der untenstehenden Tabelle aufgelistet.
 
 </para>
 
-  <sect2>
-<title>Einrichten der Maus</title>
+  <sect2 arch="not-s390" id="device-mouse">
+  <title>Einrichten der Maus</title>
 
 <para>
 
 Die Maus kann sowohl auf der Linux-Konsole (mit GPM) wie auch in der
-X-Window-Umgebung verwendet werden. Die beiden Verwendungsarten können
-gleichzeitig genutzt werden, indem der GPM-Repeater wie gezeigt benutzt wird,
-um dem Signal zu ermöglichen, zum X-Server zu gelangen:
-
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repeater)        (symlink)
-         /dev/ttyS1
-</screen></informalexample>
-
-Setzen Sie das Protokoll des Repeaters auf <quote>raw</quote> (in
-<filename>/etc/gpm.conf</filename>), während X in
-<filename>/etc/X11/XF86Config</filename> oder
-<filename>/etc/X11/XF86Config-4</filename> auf das Original-Mausprotokoll
-eingestellt ist.
+X-Window-Umgebung verwendet werden. Normalerweise ist es dazu lediglich
+erforderlich, <filename>gpm</filename> sowie den X-Server selbst zu
+installieren. Beide sollten so konfiguriert werden,
+dass sie <filename>/dev/input/mice</filename> als Maus-Gerät verwenden.
+Das korrekte Mausprotokoll in gpm heißt <userinput>exps2</userinput>, in X
+<userinput>ExplorerPS/2</userinput>. Die entsprechenden Konfigurationsdateien
+sind <filename>/etc/gpm.conf</filename> beziehungsweise
+<filename>/etc/X11/xorg.conf</filename>.
 
 </para><para>
 
-Dieser Ansatz, GPM auch unter X (der grafischen Oberfläche) zu nutzen, hat
-Vorteile, wenn die Maus unbeabsichtigterweise abgezogen wird. Sie müssen GPM
-lediglich mit
+Bestimmte Kernel-Module müssen geladen werden, damit Ihre Maus funktioniert.
+In den meisten Fällen werden die richtigen Module automatisch erkannt, aber für
+ältere serielle oder Bus-Mäuse funktioniert dies nicht immer<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+Serielle Mäuse haben gewöhnlich einen 9-poligen Sub-D-Anschluss, Bus-Mäuse haben
+einen runden 8-poligen Stecker (nicht zu verwechseln mit dem runden 6-poligen
+Stecker einer PS/2-Maus oder dem runden 4-poligen Stecker einer ADB-Maus).
+</para>
 
-neu starten, um die Maus wieder zu aktivieren, ohne dabei den X-Server neu
-starten zu müssen.
+</footnote>; diese sind jedoch sehr selten, außer vielleicht bei sehr alten
+Rechnern. Eine Zusammenfassung der Linux-Kernel-Module, die für verschiedene
+Maustypen erforderlich sind:
 
-</para><para>
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Modul</entry>
+  <entry>Beschreibung</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>PS/2-Maus (sollte automatisch erkannt werden)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>USB-Maus (sollte automatisch erkannt werden)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>Die meisten seriellen Mäuse</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Bus-Maus, die an eine Logitech-Adapterkarte angeschlossen ist</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>Bus-Maus, die an eine ATI oder Microsoft InPort-Karte angeschlossen ist</entry>
+</row>
+</tbody></tgroup></informaltable>
 
-Wenn GPM aus irgendeinem Grund deaktiviert oder nicht installiert ist, stellen
-Sie sicher, dass X direkt von der Mausschnittstelle liest, z.B. von /dev/psaux.
-Details finden Sie im 3-Tasten-Maus-HowTo unter
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>, in der
-Handbuchseite von gpm (<userinput>man gpm</userinput>) sowie unter
-<filename>/usr/share/doc/gpm/FAQ.gz</filename> und
-<ulink url="&url-xorg;current/doc/html/mouse.html">Mouse Support
-in X.Org)</ulink>.
+Um ein Maustreiber-Modul zu laden, können Sie den Befehl
+<command>modconf</command> (aus dem gleichnamigen Paket) verwenden; sehen
+Sie in der Kategorie <userinput>kernel/drivers/input/mouse</userinput> nach.
 
 </para><para arch="powerpc">
-
-Auf PowerPCs setzen Sie in <filename>/etc/X11/XF86Config</filename> oder
-<filename>/etc/X11/XF86Config-4</filename> die Mausschnittstelle auf
-<userinput>"/dev/input/mice"</userinput>.
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: Unsure if this is still valid -->
 
 Moderne Kernel geben Ihnen die Möglichkeit, eine Drei-Tasten-Maus zu
 emulieren, wenn Sie nur eine Ein-Tasten-Maus haben. Fügen Sie dazu die
