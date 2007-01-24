@@ -522,6 +522,22 @@ humandev () {
 		printf "$RET" ${idenum} ${linux}
 	    fi
 	    ;;
+	# Some drivers advertise the disk as "part", workaround for #404950
+	/dev/ide/host*/bus[01]/target[01]/lun0/part)
+	    host=`echo $1 | sed 's,/dev/ide/host\(.*\)/bus.*/target[01]/lun0/part,\1,'`
+	    bus=`echo $1 | sed 's,/dev/ide/host.*/bus\(.*\)/target[01]/lun0/part,\1,'`
+	    target=`echo $1 | sed 's,/dev/ide/host.*/bus.*/target\([01]\)/lun0/part,\1,'`
+	    idenum=$((2 * $host + $bus + 1))
+	    linux=$(mapdevfs $1)
+	    linux=${linux#/dev/}
+	    if [ "$target" = 0 ]; then
+		db_metaget partman/text/ide_master_disk description
+		printf "$RET" ${idenum} ${linux}
+	    else
+		db_metaget partman/text/ide_slave_disk description
+		printf "$RET" ${idenum} ${linux}
+	    fi
+	    ;;
 	/dev/ide/host*/bus[01]/target[01]/lun0/part*)
 	    host=`echo $1 | sed 's,/dev/ide/host\(.*\)/bus.*/target[01]/lun0/part.*,\1,'`
 	    bus=`echo $1 | sed 's,/dev/ide/host.*/bus\(.*\)/target[01]/lun0/part.*,\1,'`
