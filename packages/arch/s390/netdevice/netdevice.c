@@ -57,6 +57,7 @@ struct device
 		struct
 		{
 			struct channel *channels[3];
+			bool layer2;
 			int port;
 			char portname[32];
 		} qeth;
@@ -104,6 +105,7 @@ enum state
 	GET_CTC_CHANNELS,
 	GET_CTC_PROTOCOL,
 	GET_QETH_DEVICE,
+	GET_QETH_LAYER2,
 	GET_QETH_PORT,
 	GET_QETH_PORTNAME,
 	GET_IUCV_DEVICE,
@@ -447,6 +449,21 @@ static enum state_wanted get_qeth_device (void)
 	return WANT_NEXT;
 }
 
+static enum state_wanted get_qeth_layer2 (void)
+{
+	char *ptr;
+	int ret = my_debconf_input ("critical", TEMPLATE_PREFIX "qeth/layer2", &ptr);
+
+	if (ret == 30)
+		return WANT_BACKUP;
+	if (ret)
+		return WANT_ERROR;
+
+	device_current->qeth.layer2 = strstr (ptr, "true");
+
+	return WANT_NEXT;
+}
+
 static enum state_wanted get_qeth_port (void)
 {
 	char *ptr;
@@ -561,7 +578,7 @@ static enum state_wanted confirm_iucv (void)
 	return WANT_ERROR;
 }
 
-static enum state_wanted write_ccwgroup (const char *driver_name, const char *device_name, const char *group)
+static enum state_wanted write_ccwgroup (const char *driver_name, const char *device_name, const char *group, bool layer2)
 {
 	struct sysfs_device *device;
 	struct sysfs_driver *driver;
@@ -582,6 +599,15 @@ static enum state_wanted write_ccwgroup (const char *driver_name, const char *de
 	device = sysfs_open_device ("ccwgroup", device_name);
 	if (!device)
 		return WANT_ERROR;
+
+	if (layer2)
+	{
+		attr = sysfs_get_device_attr (device, "layer2");
+		if (!attr)
+			return WANT_ERROR;
+		if (sysfs_write_attribute (attr, "1", 1) < 0)
+			return WANT_ERROR;
+	}
 
 	attr = sysfs_get_device_attr (device, "online");
 	if (!attr)
@@ -605,7 +631,7 @@ static enum state_wanted write_ctc (void)
 
 	snprintf (buf, sizeof (buf), "%s,%s\n", device_current->ctc.channels[0]->name, device_current->ctc.channels[1]->name);
 
-	ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf);
+	ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf, false);
 	if (ret)
 		return ret;
 
@@ -632,7 +658,7 @@ static enum state_wanted write_qeth (void)
 
 	snprintf (buf, sizeof (buf), "%s,%s,%s\n", device_current->qeth.channels[0]->name, device_current->qeth.channels[1]->name, device_current->qeth.channels[2]->name);
 
-	ret = write_ccwgroup ("qeth", device_current->qeth.channels[0]->name, buf);
+	ret = write_ccwgroup ("qeth", device_current->qeth.channels[0]->name, buf, device_current->qeth.layer2);
 	if (ret)
 		return ret;
 
@@ -643,6 +669,9 @@ static enum state_wanted write_qeth (void)
 
 	snprintf (buf, sizeof (buf), "CCWGROUP_CHANS=(%s %s %s)\n", device_current->qeth.channels[0]->name, device_current->qeth.channels[1]->name, device_current->qeth.channels[2]->name);
 	fwrite (buf, strlen (buf), 1, config);
+
+	if (device_current->qeth.layer2)
+		fprintf (config, "QETH_OPTIONS=(layer2)\n");
 
 	fclose (config);
 
@@ -695,6 +724,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 				break;
 			case GET_QETH_DEVICE:
 				state_want = get_qeth_device ();
+				break;
+			case GET_QETH_LAYER2:
+				state_want = get_qeth_layer2 ();
 				break;
 			case GET_QETH_PORT:
 				state_want = get_qeth_port ();
@@ -767,6 +799,9 @@ int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused
 						state = CONFIRM_CTC;
 						break;
 					case GET_QETH_DEVICE:
+						state = GET_QETH_LAYER2;
+						break;
+					case GET_QETH_LAYER2:
 						/* state = GET_QETH_PORT; */
 						state = CONFIRM_QETH;
 						break;
