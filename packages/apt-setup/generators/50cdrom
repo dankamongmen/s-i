@@ -5,15 +5,19 @@ set -e
 
 file="$1"
 
-if [ -n "$ROOT" ]; then
+logoutput=""
+if [ "$CATCHLOG" ]; then
+	logoutput=log-output
+fi
+
+chroot=
+if [ "$ROOT" ]; then
 	chroot=chroot
-else
-	chroot=
 fi
 
 tmp=$($chroot $ROOT tempfile)
 # apt-cdrom can be interactive, avoid that
-$chroot $ROOT apt-cdrom add \
+$logoutput $chroot $ROOT apt-cdrom add \
 	-o Dir::Etc::SourceList=$tmp \
 	</dev/null
 cat $ROOT$tmp >> $file

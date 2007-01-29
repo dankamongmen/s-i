@@ -11,10 +11,14 @@ fi
 file="$1"
 saveto="$2"
 
-if [ -n "$ROOT" ]; then
+logoutput=""
+if [ "$CATCHLOG" ]; then
+	logoutput=log-output
+fi
+
+chroot=
+if [ "$ROOT" ]; then
 	chroot=chroot
-else
-	chroot=
 fi
 
 saveline () {
@@ -29,7 +33,7 @@ valid () {
 	tmp=$($chroot $ROOT tempfile)
 	echo "$line" > $ROOT$tmp
 	
-	if $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
+	if $logoutput $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
 		-o Dir::Etc::sourcelist=$tmp update
 	then
 		rm -f $ROOT$tmp
