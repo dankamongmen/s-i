@@ -11,6 +11,7 @@ if [ -z "$host" ]; then
 	exit
 fi
 
+# FIXME what if choose-mirror isn't available, i.e. full CD install?
 db_get mirror/protocol
 protocol="$RET"
 
@@ -33,8 +34,7 @@ if [ "$codename" = sid ]; then
 	exit
 fi
 
-# FIXME what if choose-mirror isn't available, i.e. full CD install?
-if db_get mirror/http/proxy && [ -n "$RET" ]; then
+if db_get mirror/$protocol/proxy && [ -n "$RET" ]; then
 	proxy="$RET"
 	if ! grep -iq "Acquire::$protocol::Proxy" $ROOT/etc/apt/apt.conf.new; then
 		echo "Acquire::$protocol::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf.new
@@ -42,7 +42,7 @@ if db_get mirror/http/proxy && [ -n "$RET" ]; then
 fi
 
 CODE=0
-echo "deb http://$host/ $codename/updates $dists" >> $file
+echo "deb $protocol://$host/ $codename/updates $dists" >> $file
 if ! apt-setup-verify $file; then
 	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
 	db_input critical apt-setup/security-updates-failed || true
@@ -52,6 +52,6 @@ if ! apt-setup-verify $file; then
 	CODE=9
 fi
 
-echo "deb-src http://$host/ $codename/updates $dists" >> $file
+echo "deb-src $protocol://$host/ $codename/updates $dists" >> $file
 
 exit $CODE
