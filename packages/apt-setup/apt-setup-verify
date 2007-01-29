@@ -2,6 +2,9 @@
 # verify and optionally save out the file
 set -e
 
+NL="
+"
+
 NOTEST=""
 if [ "$1" = "--invalid" ]; then
 	NOTEST=1
@@ -46,11 +49,12 @@ valid () {
 items=0
 gooditems=0
 
-IFS="
-"
+OLDIFS="$IFS"
+IFS="$NL"
 # Can't just iterate over $(cat $file) because that kills newlines, so
 # introduce a dummy colon.
 for line in $(sed 's/^/:/' $file); do
+	IFS="$OLDIFS"
 	line="${line#:}"
 	if expr "$line" : '.*[^ ].*' >/dev/null && [ "$(expr "$line" : "#")" != 1 ]; then
 		items=$(expr "$items" + 1)
