@@ -34,7 +34,7 @@ valid () {
 	echo "$line" > $ROOT$tmp
 	
 	if $logoutput $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
-		-o Dir::Etc::sourcelist=$tmp update
+		-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update
 	then
 		rm -f $ROOT$tmp
 	else

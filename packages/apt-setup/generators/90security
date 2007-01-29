@@ -43,6 +43,7 @@ fi
 
 CODE=0
 echo "deb $protocol://$host/ $codename/updates $dists" >> $file
+export ASV_TIMEOUT="-o Acquire::http::timeout=30"
 if ! apt-setup-verify $file; then
 	db_subst apt-setup/security-updates-failed SECURITY_HOST "$host"
 	db_input critical apt-setup/security-updates-failed || true
