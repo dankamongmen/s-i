@@ -13,9 +13,11 @@ if grep -q "/dev/md" $dev/device; then
 	lvm=yes
 elif grep -q "/dev/mapper/" $dev/device; then
 	# LVM on device-mapper crypto
-	device=$(cat $dev/device)
-	if [ "$(dmsetup status $device | cut -d' ' -f3)" = "crypt" ]; then
-		lvm=yes
+	if type dmsetup > /dev/null 2>&1 ; then
+		device=$(cat $dev/device)
+		if [ "$(dmsetup status $device | cut -d' ' -f3)" = "crypt" ]; then
+			lvm=yes
+		fi
 	fi
 fi
 
