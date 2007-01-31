@@ -6,14 +6,14 @@ log() {
 
 MANUFACTURER="$(dmidecode -s system-manufacturer)"
 case $MANUFACTURER in
-	Apple*)
-		# LILO stands a better chance of working under Boot Camp,
-		# where /sys/firmware/efi doesn't exist.
-		if [ -d /sys/firmware/efi ]; then
-			log "LILO not usable on Intel-based Macs; use elilo"
-			exit 1
-		fi
-		;;
+    Apple*)
+	# LILO stands a better chance of working under Boot Camp,
+	# where /sys/firmware/efi doesn't exist.
+	if [ -d /sys/firmware/efi ]; then
+		log "LILO not usable on Intel-based Macs; use elilo"
+		exit 1
+	fi
+	;;
 esac
 
 exit 0
