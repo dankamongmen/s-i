@@ -323,7 +323,7 @@ NR_BUILDS=0
 
 # Build the manual for English
 EN_UPDATED=""
-if lang_updated en; then
+if is_updated en; then
     EN_UPDATED=1
     langlog=$logdir/en.log
     : >$langlog
@@ -337,7 +337,7 @@ fi
 
 # Do we need to merge the XML and update the POT files?
 cd $source
-if lang_updated en || [ ! -d "$source/integrated/en" ]; then
+if is_updated en || [ ! -d "$source/integrated/en" ]; then
     update_templates >>$mainlog 2>&1
     checkfatal "$?" "updating templates"
     echo >>$mainlog
@@ -356,7 +356,7 @@ for lang in $translations; do
     # For translations, we may need to update PO and generate XML files
     # PO files are updated for all translations if there was an update for English
     if [ -d "./po/$lang" ]; then
-        if lang_updated "$lang" || [ "$EN_UPDATED" ]; then
+        if is_updated "$lang" || [ "$EN_UPDATED" ]; then
             echo "Info: updating PO files for $lang" >>$mainlog
             update_po $lang >>$langlog 2>&1
             checkfatal "$?" "updating po for $lang"
