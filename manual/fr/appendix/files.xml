@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 
  <sect1 id="linuxdevices"><title>Périphériques Linux</title>
 <para>
@@ -114,58 +114,63 @@ Ci-dessous sont repris les fichiers de périphérique les plus importants.
 
 </para>
 
-  <sect2>
+  <sect2 arch="not-s390" id="device-mouse">
 <title>Régler la souris</title>
 
 <para>
 
 La souris peut être utilisée aussi bien dans une console Linux (avec gpm) 
-qu'en environnement X Window. Les deux modes sont compatibles entre eux si le 
-répétiteur gpm est utilisé afin de permettre au signal de suivre le parcours 
-suivant&nbsp;:
+qu'en environnement X window. Il suffit normalement d'installer le fichier
+<filename>gpm</filename> et le serveur X. Les deux doivent utiliser 
+<filename>/dev/input/mice</filename> comme périphérique.
+Le protocole correct pour la souris est <userinput>exps2</userinput> pour gpm et
+<userinput>ExplorerPS/2</userinput> pour le serveur X. Les fichiers de configuration sont
+respectivement <filename>/etc/gpm.conf</filename> et <filename>/etc/X11/xorg.conf</filename>.
 
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repeater)        (symlink)
-         /dev/ttyS1
-</screen></informalexample>
+</para>
 
-Ajustez le protocole de répétition sur «&nbsp;raw&nbsp;» (dans
-<filename>/etc/gpm.conf</filename>) tandis que vous réglerez X pour
-     utiliser le protocole original de la souris dans
-<filename>/etc/X11/XF86Config</filename> ou
-<filename>/etc/X11/XF86Config-4</filename>.
+<para>
+Pour faire fonctionner la souris, il faut charger certains modules du noyau.
+Dans la plupart des cas, les modules corrects sont détectés mais certaines
+souris anciennes <footnote>
+<para>
+Les souris de type série ont un connecteur à 9 trous en forme de D&nbsp;; les souris
+bus ont un connecteur rond à 8 tiges, qu'il ne faut pas confondre avec le
+connecteur à 6 tiges d'une souris PS/2 ou avec le connecteur à 4 tiges d'une souris ADB.
+</para>
+</footnote> sur de vieux ordinateurs posent des problèmes. Voici les modules du noyau
+nécessaires aux différents types de souris&nbsp;:
 
-</para><para>
-
-Cette approche qui préconise l'utilisation de gpm même sous X a des avantages.
-Si, par exemple, vous déconnectez la souris par erreur, il suffit de redémarrer 
-gpm par
-
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
-
-et la souris recommencera à fonctionner sous X sans qu'il y ait besoin de 
-redémarrer le serveur.
-
-</para><para>
-
-Si gpm est désactivé ou n'est pas installé, assurez-vous que X est réglé de 
-façon à lire directement la souris à travers par exemple /dev/psaux. Pour 
-plus de détails, reportez-vous au mini-Howto 
-«&nbsp;Souris Série 3 Boutons&nbsp;» dans 
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
-<userinput>man gpm</userinput>, <filename>/usr/share/doc/gpm/FAQ.gz</filename>,
-et <ulink url="&url-xorg;current/doc/html/mouse.html">README.mouse</ulink>.
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Module</entry>
+  <entry>Description</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>Souris PS/2 (devrait être détectée)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>Souris USB (devrait être détectée)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>Most serial mice</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Souris Bus connectée à l'adaptateur Logitech</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>Souris Bus connectée à des cartes ATI ou Microsoft</entry>
+</row>
+</tbody></tgroup></informaltable>
 
 </para><para arch="powerpc">
-
-Pour les PowerPC, dans <filename>/etc/X11/XF86Config</filename> ou
-<filename>/etc/X11/XF86Config-4</filename>, réglez le périphérique de
-      souris sur <userinput>"/dev/input/mice"</userinput>.
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: Unsure if this is still valid -->
 
 Les noyaux modernes offrent la possibilité d'émuler une souris 3 boutons 
 quand votre souris n'en a qu'un. Ajoutez simplement les lignes suivantes au 
