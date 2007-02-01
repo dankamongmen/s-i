@@ -4,7 +4,8 @@
 . ~/.di-manual-daily
 
 RET=0
-$ROOT/bin/build-manual || RET=$?
+# Pass all parameters to actual build script
+$ROOT/bin/build-manual $@ || RET=$?
 
 if [ $RET = 0 ] || [ $RET = 999 ]; then
 	$ROOT/bin/mail-logs
