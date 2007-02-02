@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-29 00:43+0000\n"
+"POT-Creation-Date: 2007-02-02 17:44+0000\n"
 "PO-Revision-Date: 2007-01-23 23:41+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
@@ -703,8 +703,8 @@ msgstr ""
 "<literal>auto</literal> 부팅 레이블은 아직 정의되지 않은 아키텍쳐가 있습니"
 "다. 커널 명령행에 파라미터 두 개, <literal>auto=true priority=critical</"
 "literal>이라고 추가하기만 하면 같은 효과를 거둘 수 있습니다. <literal>auto</"
-"literal> 파라미터는 <literal>auto-install/enable</literal>의 줄임말이고 미"
-"리 설정할 수 있도록 로케일 및 키보드 질문을 뒤로 늦춥니다. 또 "
+"literal> 파라미터는 <literal>auto-install/enable</literal>의 줄임말이고 미리 "
+"설정할 수 있도록 로케일 및 키보드 질문을 뒤로 늦춥니다. 또 "
 "<literal>priority</literal>는 <literal>preseed/priority</literal>의 줄임말이"
 "고 <literal>critical</literal>로 설정하면 필수 우선순위보다 낮은 우선순위의 "
 "질문들을 하지 않게 됩니다."
@@ -2377,35 +2377,40 @@ msgstr "미리 설정을 이용해 기본값 바꾸기"
 
 #. Tag: para
 #: preseed.xml:1020
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
 "question, but still have the question asked. To do this the <firstterm>seen</"
 "firstterm> flag must be reset to <quote>false</quote> after setting the "
-"value for a question."
+"value for a question. <informalexample><screen>\n"
+"d-i foo/bar string value\n"
+"d-i foo/bar seen false\n"
+"</screen></informalexample> This will of course only have effect for "
+"parameters that correspond to questions that are actually displayed during "
+"an installation and not for <quote>internal</quote> parameters."
 msgstr ""
 "미리 설정으로 질문에 대한 기본값을 바꾸면서, 그래도 그 질문을 받도록 만들 수 "
 "있습니다. 이렇게 하려면 해당 템플리트에 대한 값을 설정한 다음에 "
 "<firstterm>seen</firstterm> 플래그를 <quote>false</quote>로 놓으면 됩니다."
 
-#. Tag: screen
-#: preseed.xml:1029
+#. Tag: para
+#: preseed.xml:1033
 #, no-c-format
 msgid ""
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false"
+"The same effect can be achieved for <emphasis>all</emphasis> questions by "
+"setting the parameter <classname>preseed/interactive=true</classname> at the "
+"boot prompt. This can also be useful for testing or debugging your "
+"preconfiguration file."
 msgstr ""
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false"
 
 #. Tag: title
-#: preseed.xml:1034
+#: preseed.xml:1044
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "미리설정 파일을 분리해서 사용하기"
 
 #. Tag: para
-#: preseed.xml:1035
+#: preseed.xml:1045
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2420,7 +2425,7 @@ msgstr ""
 "설정을 다른 파일에 집어 넣는 식으로 활용이 가능합니다."
 
 #. Tag: screen
-#: preseed.xml:1045
+#: preseed.xml:1055
 #, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2470,7 +2475,7 @@ msgstr ""
 "#d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1047
+#: preseed.xml:1057
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
@@ -2486,3 +2491,10 @@ msgstr ""
 "야 합니다. 미리 설정을 실행하는 두 개의 별도의 단계가 있기 때문입니다. 예를 "
 "들어서 preseed/early 명령을 한 번 더 실행할 수 있고, 두 번째가 네트워크가 연"
 "결된 다음에 실행될 수 있습니다."
+
+#~ msgid ""
+#~ "d-i foo/bar string value\n"
+#~ "d-i foo/bar seen false"
+#~ msgstr ""
+#~ "d-i foo/bar string value\n"
+#~ "d-i foo/bar seen false"

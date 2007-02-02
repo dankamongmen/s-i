@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-29 00:43+0000\n"
+"POT-Creation-Date: 2007-02-02 17:44+0000\n"
 "PO-Revision-Date: 2007-01-29 21:24+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -745,9 +745,9 @@ msgstr ""
 "as arquitecturas. O mesmo efeito pode ser alcançado simplesmente adicionando "
 "dois parâmetros <literal>auto=true priority=critical</literal> à linha de "
 "comandos do kernel. O parâmetro <literal>auto</literal> é uma abreviatura "
-"para <literal>auto-install/enable</literal> e controla a demora das "
-"questões do locale e do teclado até que exista a possibilidade de fazer "
-"preseed a estas, enquanto <literal>priority</literal> é uma abreviatura para "
+"para <literal>auto-install/enable</literal> e controla a demora das questões "
+"do locale e do teclado até que exista a possibilidade de fazer preseed a "
+"estas, enquanto <literal>priority</literal> é uma abreviatura para "
 "<literal>preseed/priority</literal> e defini-lo como <literal>critical</"
 "literal> faz que seja evitada a colocação de quaisquer questões com "
 "prioridade inferior."
@@ -2475,36 +2475,41 @@ msgstr "Utilizar o preseed para alterar valores por omissão"
 
 #. Tag: para
 #: preseed.xml:1020
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
 "question, but still have the question asked. To do this the <firstterm>seen</"
 "firstterm> flag must be reset to <quote>false</quote> after setting the "
-"value for a question."
+"value for a question. <informalexample><screen>\n"
+"d-i foo/bar string value\n"
+"d-i foo/bar seen false\n"
+"</screen></informalexample> This will of course only have effect for "
+"parameters that correspond to questions that are actually displayed during "
+"an installation and not for <quote>internal</quote> parameters."
 msgstr ""
 "É possível utilizar a pré-configuração para alterar a resposta por omissão a "
 "uma questão, mas a questão será colocada na mesma. Para fazer isto à flag "
 "<firstterm>seen</firstterm> tem de ser feito o reset para <quote>false</"
 "quote> após definir o valor para a questão."
 
-#. Tag: screen
-#: preseed.xml:1029
+#. Tag: para
+#: preseed.xml:1033
 #, no-c-format
 msgid ""
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false"
+"The same effect can be achieved for <emphasis>all</emphasis> questions by "
+"setting the parameter <classname>preseed/interactive=true</classname> at the "
+"boot prompt. This can also be useful for testing or debugging your "
+"preconfiguration file."
 msgstr ""
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false"
 
 #. Tag: title
-#: preseed.xml:1034
+#: preseed.xml:1044
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "Carregamento em série dos ficheiros de pré-configuração"
 
 #. Tag: para
-#: preseed.xml:1035
+#: preseed.xml:1045
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2521,7 +2526,7 @@ msgstr ""
 "ficheiros."
 
 #. Tag: screen
-#: preseed.xml:1045
+#: preseed.xml:1055
 #, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2575,7 +2580,7 @@ msgstr ""
 "d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1047
+#: preseed.xml:1057
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
@@ -2592,6 +2597,13 @@ msgstr ""
 "execuções distintas de preseed, significa por exemplo que pode ter outra "
 "oportunidade de correr o comando preseed/early, a segunda acontece após a "
 "rede estar disponível."
+
+#~ msgid ""
+#~ "d-i foo/bar string value\n"
+#~ "d-i foo/bar seen false"
+#~ msgstr ""
+#~ "d-i foo/bar string value\n"
+#~ "d-i foo/bar seen false"
 
 #~ msgid ""
 #~ "In practical terms this means for file and network preseeding that the "
