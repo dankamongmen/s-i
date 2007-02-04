@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 
  <sect1 id="linuxdevices"><title>Zařízení v Linuxu</title>
 <para>
@@ -128,45 +128,68 @@ nejdůležitějších souborů.
 
 </para>
 
-  <sect2>
-<title>Nastavení myši</title>
+  <sect2 arch="not-s390" id="device-mouse">
+  <title>Nastavení myši</title>
 
 <para>
 
-Myš můžete používat jak na konzoli, tak v prostředí X Window.
-Je toho dosaženo použitím gpm opakovače, který přeposílá signál z myši
-k X serveru.
-
-<informalexample><screen>
-myš =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-       /dev/ttyS0             (opakovač)      (symbolický odkaz)
-       /dev/ttyS1
-</screen></informalexample>
-
-V souboru <filename>/etc/gpm.conf</filename> nastavte opakovací
-protokol na hodnotu <userinput>raw</userinput> a v X ponechte původní
-myší protokol (soubory <filename>/etc/X11/XF86Config</filename> nebo
-<filename>/etc/X11/XF86Config-4</filename>).
+Myš můžete používat jak na konzoli, tak v prostředí X Window.  Obvykle
+stačí nainstalovat balík <filename>gpm</filename> a příslušný X
+server. Oboje by mělo používat jako zařízení myši soubor
+<filename>/dev/input/mice</filename>. Správný komunikační protokol
+bývá v gpm <userinput>exps2</userinput>, v systému X Window
+<userinput>ExplorerPS/2</userinput>. Příslušné konfigurační soubory
+jsou <filename>/etc/gpm.conf</filename> a
+<filename>/etc/X11/xorg.conf</filename>.
 
 </para><para>
 
-Důvod použití gpm i pro X Window System je ten, že když se myš
-neočekávaně odpojí, stačí restartovat pouze gpm a ne celé X Window.
+Aby myš fungovala, musí být zavedeny některé moduly jádra. Ve většině
+případů jsou správné moduly rozpoznány a zavedeny
+automaticky. Výjimkou mohou být staré sériové a sběrnicové myši<footnote>
 
-<informalexample><screen>
-<prompt>#</prompt> <userinput>/etc/init.d/gpm restart</userinput>
-</screen></informalexample>
+<para>
 
-</para><para>
+Sériové myši mají obvykle konektor tvaru D s devíti otvory. Sběrnicové
+myši mají kulatý 8 pinový konektor. Pozor, neplést s 6 pinovým kulatým
+konektorem myší PS/2 a 4 pinovým kulatým konektorem ADB.
 
-Pokud z nějakého důvodu nemáte gpm nainstalované nebo ho nepoužíváte,
-nastavte Xy, aby četly přímo z myšího zařízení (např. /dev/psaux nebo
-/dev/input/mice).
-Mnohem více informací najdete v
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
-<userinput>man gpm</userinput>,
-<filename>/usr/share/doc/gpm/FAQ.gz</filename> a
-<ulink url="&url-xorg;/current/mouse.html">README.mouse</ulink>.
+</para>
+
+</footnote>, které jsou dnes spíše raritou ve velmi starých
+počítačích. Typické moduly, které jsou potřeba pro různé typy myší:
+ 
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Modul</entry>
+  <entry>Popis</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>PS/2 myši (měl by být rozpoznán automaticky)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>USB myši (měl by být rozpoznán automaticky)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>Většina sériových myší</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Sběrnicová myš připojená k adaptérové kartě Logitech</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>Sběrnicová myš připojená ke kartě ATI nebo Microsoft InPort</entry>
+</row>
+</tbody></tgroup></informaltable>
+
+Pro zavedení modulu s ovladačem můžete použít příkaz
+<command>modconf</command> z balíku stejného jména a hledat v
+kategorii <userinput>kernel/drivers/input/mouse</userinput>.
 
 </para><para arch="powerpc">
 
@@ -242,7 +265,7 @@ uloží v adresáři <filename>/var</filename>.
 
 <tbody>
 <row>
-  <entry>Stolní počítač</entry>
+  <entry>Desktopové prostředí</entry>
   <entry>&task-desktop-inst;</entry>
   <entry>&task-desktop-dl;</entry>
   <entry>&task-desktop-tot;</entry>
@@ -251,7 +274,7 @@ uloží v adresáři <filename>/var</filename>.
 <row>
   <entry>Notebook<footnote><para>
 
-Tato úloha se dosti překrývá s |ulohou Stolní počítač, takže pokud
+Tato úloha se dosti překrývá s úlohou Desktoppové prostředí, tzn. pokud
 nainstalujete obě, zabere tato úloha jen několik dalších MB.
 
   </para></footnote></entry>
@@ -308,17 +331,16 @@ nainstalujete obě, zabere tato úloha jen několik dalších MB.
 
 <note><para>
 
-Úloha <emphasis>Desktopový počítač</emphasis> nainstaluje desktopové
+Úloha <emphasis>Desktopové prostředí</emphasis> nainstaluje desktopové
 prostředí GNOME.
 
 </para></note></para><para>
 
 Instalujete-li v jiném jazyce než angličtině, je možné, že
 <command>tasksel</command> automaticky nainstaluje
-<firstterm>localizační úlohu</firstterm> pro daný jazyk. Velikost
+<firstterm>lokalizační úlohu</firstterm> pro daný jazyk. Velikost
 lokalizační úlohy závisí na tom, co do ní její tvůrci umístili za
-balíky; maximálně byste měli počítat s 350MB včetně velikosti při
-stahování.
+balíky.
 
 </para>
  </sect1>
