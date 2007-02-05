@@ -3,6 +3,7 @@
 set -e
 export DEBIAN_FRONTEND=none
 . /usr/share/debconf/confmodule
+SEEN=1
 NEWLINE='
 '
 OLDIFS=$IFS
@@ -23,7 +24,7 @@ for line in $(set); do
 				owner="d-i"
 			fi
 			var="${var#*:}"
-
+			
 			# remove single quotes from around value
 			val="${val#\'}"
 			val="${val%\'}"
@@ -31,7 +32,7 @@ for line in $(set); do
 			# with spaces)
 			val="${val#\"}"
 			val="${val%\"}"
-	
+			
 			IFS=$OLDIFS
 			if ! db_set "$var" "$val"; then
 				db_register debian-installer/dummy "$var"
@@ -45,7 +46,18 @@ for line in $(set); do
 				type=unknown
 			fi
 			echo "$owner $var $type $val" >> /var/lib/preseed/log
-			db_fset "$var" seen true
+
+			if [ "$var" = preseed/interactive ]; then
+				if [ "$val" = true ]; then
+					SEEN=0
+				else
+					SEEN=1
+				fi
+			fi
+
+			if [ "$SEEN" ]; then
+				db_fset "$var" seen true
+			fi
 			IFS=$NEWLINE
 		fi
 	fi
