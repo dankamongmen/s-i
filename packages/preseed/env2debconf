@@ -3,7 +3,6 @@
 set -e
 export DEBIAN_FRONTEND=none
 . /usr/share/debconf/confmodule
-SEEN=1
 NEWLINE='
 '
 OLDIFS=$IFS
@@ -11,6 +10,13 @@ IFS=$NEWLINE
 for line in $(set); do
 	var="${line%=*}"
 	val="${line#[!=]*=}"
+	# support preseeding without forcing seen flag
+	if [ "${var%\?}" != "$var" ]; then
+		var="${var%\?}"
+		seen=
+	else
+		seen=1
+	fi
 	# grep out the normal variables with no slashes
 	varnoslash="${var##*/*}"
 	if [ "$val" != "" ]; then
@@ -47,15 +53,7 @@ for line in $(set); do
 			fi
 			echo "$owner $var $type $val" >> /var/lib/preseed/log
 
-			if [ "$var" = preseed/interactive ]; then
-				if [ "$val" = true ]; then
-					SEEN=""
-				else
-					SEEN=1
-				fi
-			fi
-
-			if [ "$SEEN" ]; then
+			if [ "$seen" ]; then
 				db_fset "$var" seen true
 			fi
 			IFS=$NEWLINE
