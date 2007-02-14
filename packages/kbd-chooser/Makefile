@@ -60,6 +60,14 @@ ifeq ($(ARCH),arm)
 CFLAGS +=  -DAT_KBD -DUSB_KBD 
 KEYBOARDS := at usb
 endif
+ifeq ($(ARCH),armel)
+CFLAGS +=  -DAT_KBD -DUSB_KBD 
+KEYBOARDS := at usb
+endif
+ifeq ($(ARCH),armeb)
+CFLAGS +=  -DAT_KBD -DUSB_KBD 
+KEYBOARDS := at usb
+endif
 ifeq ($(ARCH),m68k)
 CFLAGS += -DAMIGA_KBD -DATARI_KBD -DMAC_KBD -DAT_KBD -DSPARC_KBD -D__m68k__
 KEYBOARDS := amiga atari mac at sparc
