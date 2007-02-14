@@ -838,7 +838,7 @@ default_disk_label () {
 	    else
 		echo msdos
 	    fi;;	    
-	arm)
+	arm|armel)
 	    case "$sub" in
 		iop32x)
 		    echo msdos;;
