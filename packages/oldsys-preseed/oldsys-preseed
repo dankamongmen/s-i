@@ -25,7 +25,7 @@ NONINTERACTIVE="yes"
 FILE=/preseed.cfg
 
 case "`archdetect`" in
-	arm/ixp4xx | armeb/ixp4xx | arm/nslu2 | armeb/nslu2)
+	arm*/ixp4xx | arm*/nslu2 )
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 		if echo "$machine" | grep -q "^Linksys NSLU2"; then
 			check_file /proc/mtd
@@ -55,7 +55,7 @@ case "`archdetect`" in
 			fi
 		fi
 	;;
-	arm/iop32x | armeb/iop32x)
+	arm*/iop32x)
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 		if echo "$machine" | grep -q "^Thecus"; then
 			check_file /proc/mtd
