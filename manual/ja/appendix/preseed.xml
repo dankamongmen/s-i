@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 45087 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -206,7 +206,7 @@ preseeding occurs, you can start the installer in <quote>auto</quote>
 mode. This delays questions that would normally be asked too early for
 preseeding (i.e. language, country and keyboard selection) until after
 the network comes up, thus allowing them to be preseeded. It also runs
-the installation in critical priority, which avoids many unimportant
+the installation at critical priority, which avoids many unimportant
 questions. See <xref linkend="preseed-auto"/> for details.
 -->
 preseed が起動する前に、通常現れる質問を回避するのに、
@@ -2056,13 +2056,43 @@ preseed を用いて、質問へのデフォルトの回答を変更できます。
 <firstterm>seen</firstterm> フラグを <quote>false</quote> 
 にリセットしなければなりません。
 
-</para>
-
 <informalexample><screen>
 d-i foo/bar string value
 d-i foo/bar seen false
 </screen></informalexample>
 
+<!--
+The same effect can be achieved for <emphasis>all</emphasis> questions by
+setting the parameter <classname>preseed/interactive=true</classname> at
+the boot prompt. This can also be useful for testing or debugging your
+preconfiguration file.
+-->
+ブートプロンプトで <classname>preseed/interactive=true</classname> 
+パラメータを設定し、<emphasis>すべて</emphasis> 
+の質問に対して同じ効果を及ぼすこともできます。
+これは事前設定ファイルのテストやデバッグにも便利です。
+
+<!--
+If you are preseeding using boot parameters, you can make the installer ask
+the corresponding question by using the <quote>?=</quote> operator, i.e.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+-->
+ブートパラメータを利用して preseed を行う場合、
+質問に対して <quote>?=</quote> 演算子を使用して回答できます。
+例: <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>
+
+<!--
+This will of course only have effect for parameters that correspond to
+questions that are actually displayed during an installation and not for
+<quote>internal</quote> parameters.
+-->
+これはもちろん、
+インストール中に実際に表示される質問に対応するパラメータにのみ効果を及ぼし、
+<quote>内部</quote>パラメータには効果を及ぼしません。
+
+</para><para>
+
+</para>
   </sect2>
 
   <sect2 id="preseed-chainload">
