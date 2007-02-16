@@ -105,7 +105,7 @@ case "x$cmd" in
 		Release="/tmp/net-retriever-$$-Release"
 		fetch "dists/$codename/Release" "$Release" || exit $?
 		# If gpgv and a keyring are installed, authentication is
-		# mandatory.
+		# mandatory by default.
 		if type gpgv >/dev/null && [ -f "$keyring" ]; then
 			if ! fetch "dists/$codename/Release.gpg" "$Release.gpg"; then
 				error "dists/$codename/Release is unsigned."
@@ -114,8 +114,14 @@ case "x$cmd" in
 			     gpgv --status-fd 1 --keyring "$keyring" \
 			     --ignore-time-conflict \
 			     "$Release.gpg" "$Release" | read_gpg_status; then
-				error "Bad signature on $Release."
+			     	if db_get debian-installer/allow_unauthenticated && [ "$RET" = true ]; then
+					log "Ignoring bad signature on $Release."
+				else
+					error "Bad signature on $Release."
+				fi
 			fi
+		else
+			log "Not verifying Release signature: gpgv not available"
 		fi
 
 		ARCH=`udpkg --print-architecture`
