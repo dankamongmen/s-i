@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-01-29 21:20+0000\n"
+"POT-Creation-Date: 2007-02-18 19:51+0000\n"
 "PO-Revision-Date: 2007-02-08 09:26+0200\n"
 "Last-Translator: \n"
 "Language-Team:  <en@li.org>\n"
@@ -454,9 +454,9 @@ msgid ""
 msgstr ""
 "Η βασική εγκατάσταση για την αρχιτεκτονική i386, περιλαμβάνοντας όλα τα "
 "συνηθισμένα πακέτα και χρησιμοποιώντας τον προεπιλεγμένο πυρήνα 2.6 "
-"καταλαμβάνει μέχρι &std-system-size;MB χώρου στο δίσκο. Μια ελάχιστη βασική εγκατάσταση, "
-"χωρίς την επιλογή της ομάδας πακέτων <quote>Συνηθισμένο σύστημα</quote>, θα "
-"καταλάβει &base-system-size;MB.."
+"καταλαμβάνει μέχρι &std-system-size;MB χώρου στο δίσκο. Μια ελάχιστη βασική "
+"εγκατάσταση, χωρίς την επιλογή της ομάδας πακέτων <quote>Συνηθισμένο "
+"σύστημα</quote>, θα καταλάβει &base-system-size;MB.."
 
 #. Tag: para
 #: random-bits.xml:207
@@ -2011,8 +2011,10 @@ msgstr "Αυτόματη ρύθμιση του δικτύου με DHCP: Όχι"
 #. Tag: para
 #: random-bits.xml:932
 #, no-c-format
-msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr "Διεύθυνση IP: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgid ""
+"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgstr ""
+"Διεύθυνση IP: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:937
@@ -2037,12 +2039,137 @@ msgstr ""
 
 #. Tag: title
 #: random-bits.xml:962
+#, fuzzy, no-c-format
+msgid "Installing &debian; using PPP over Ethernet (PPPoE)"
+msgstr "Εγκαθιστώντας το &debian; πάνω από Parallel Line IP (PLIP)"
+
+#. Tag: para
+#: random-bits.xml:964
+#, no-c-format
+msgid ""
+"In some countries PPP over Ethernet (PPPoE) is a common protocol for "
+"broadband (ADSL or cable) connections to an Internet Service Provider. "
+"Setting up a network connection using PPPoE is not supported by default in "
+"the installer, but can be made to work very simply. This section explains "
+"how."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:972
+#, fuzzy, no-c-format
+msgid ""
+"The PPPoE connection set up during the installation will also be available "
+"after the reboot into the installed system (see <xref linkend=\"boot-new\"/"
+">)."
+msgstr ""
+"Η ρύθμιση της σύνδεσης PLIP κατά την εγκατάσταση θα είναι επίσης διαθέσιμη "
+"μετά την επανεκκίνηση στο εγκατεστημένο σύστημα (δείτε το <xref linkend="
+"\"boot-new\"/>)."
+
+#. Tag: para
+#: random-bits.xml:977
+#, no-c-format
+msgid ""
+"To have the option of setting up and using PPPoE during the installation, "
+"you will need to install using one of the CD-ROM/DVD images that are "
+"available. It is not supported for other installation methods (e.g. "
+"netboot<phrase condition=\"supports-floppy-boot\"> or floppy</phrase>)."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:984
+#, no-c-format
+msgid ""
+"Installing over PPPoE is mostly the same as any other installation. The "
+"following steps explain the differences."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:992
+#, no-c-format
+msgid ""
+"Boot the installer with <userinput>modules=ppp-udeb</userinput> as boot "
+"parameter. This means that at the boot prompt you should enter: "
+"<informalexample><screen>\n"
+"install modules=ppp-udeb\n"
+"</screen></informalexample> or, if you prefer using the graphical installer: "
+"<informalexample><screen>\n"
+"installgui modules=ppp-udeb\n"
+"</screen></informalexample> This will ensure the component responsible for "
+"the setup of PPPoE (<classname>ppp-udeb</classname>) will be loaded and run "
+"automatically."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1007
+#, no-c-format
+msgid ""
+"Follow the regular initial steps of the installation (language, country and "
+"keyboard selection; the loading of additional installer components<footnote> "
+"<para> The <classname>ppp-udeb</classname> component is loaded as one of the "
+"additional components in this step. If you want to install at medium or low "
+"priority (expert mode), you can also manually select the <classname>ppp-"
+"udeb</classname> instead of entering the <quote>modules</quote> parameter at "
+"the boot prompt. </para> </footnote>)."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1026
+#, no-c-format
+msgid ""
+"The next step is the detection of network hardware, in order to identify any "
+"Ethernet cards present in the system."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1032
+#, no-c-format
+msgid ""
+"After this the actual setup of PPPoE is started. The installer will probe "
+"all the detected Ethernet interfaces in an attempt to find a PPPoE "
+"concentrator (a type of server which handles PPPoE connections)."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1038
+#, no-c-format
+msgid ""
+"It is possible that the concentrator will not to be found at the first "
+"attempt. This can happen occasionally on slow or loaded networks or with "
+"faulty servers. In most cases a second attempt to detect the concentrator "
+"will be successful; to retry, select <guimenuitem>Configure and start a "
+"PPPoE connection</guimenuitem> from the main menu of the installer)."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1047
+#, no-c-format
+msgid ""
+"After a concentrator is found, the user will be prompted to type the login "
+"information (the PPPoE username and password)."
+msgstr ""
+
+#. Tag: para
+#: random-bits.xml:1053
+#, no-c-format
+msgid ""
+"At this point the installer will use the provided information to establish "
+"the PPPoE connection. If the correct information was provided, the PPPoE "
+"connection should be configured and the installer should be able to use it "
+"to connect to the Internet and retrieve packages over it (if needed). If the "
+"login information is not correct or some error appears, the installer will "
+"stop, but the configuration can be attempted again by selecting the menu "
+"entry <guimenuitem>Configure and start PPPoE networking</guimenuitem>."
+msgstr ""
+
+#. Tag: title
+#: random-bits.xml:1073
 #, no-c-format
 msgid "The Graphical Installer"
 msgstr "Ο γραφικός εγκαταστάτης"
 
 #. Tag: para
-#: random-bits.xml:963
+#: random-bits.xml:1074
 #, no-c-format
 msgid ""
 "The graphical version of the installer is only available for a limited "
@@ -2057,7 +2184,7 @@ msgstr ""
 "αλλά με ένα διαφορετικό frontend."
 
 #. Tag: para
-#: random-bits.xml:971
+#: random-bits.xml:1082
 #, no-c-format
 msgid ""
 "Although the functionality is identical, the graphical installer still has a "
@@ -2076,7 +2203,7 @@ msgstr ""
 "μπορούν να εμφανιστούν σε μια και μόνο οθόνη."
 
 #. Tag: para
-#: random-bits.xml:980
+#: random-bits.xml:1091
 #, no-c-format
 msgid ""
 "The graphical installer is available with all CD images and with the hd-"
@@ -2097,7 +2224,7 @@ msgstr ""
 "<userinput>rescuegui</userinput> αντίστοιχα."
 
 #. Tag: para
-#: random-bits.xml:990
+#: random-bits.xml:1101
 #, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
@@ -2117,7 +2244,7 @@ msgstr ""
 "εκκινείται δικτυακά."
 
 #. Tag: para
-#: random-bits.xml:1004
+#: random-bits.xml:1115
 #, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
@@ -2136,7 +2263,7 @@ msgstr ""
 "κάρτα γραφικών ATI, αλλά είναι μάλλον απίθανο να δουλεύει σε άλλα συστήματα."
 
 #. Tag: para
-#: random-bits.xml:1017
+#: random-bits.xml:1128
 #, no-c-format
 msgid ""
 "The graphical installer requires significantly more memory to run than the "
@@ -2150,7 +2277,7 @@ msgstr ""
 "quote>."
 
 #. Tag: para
-#: random-bits.xml:1024
+#: random-bits.xml:1135
 #, no-c-format
 msgid ""
 "You can add boot parameters when starting the graphical installer, just as "
@@ -2165,13 +2292,13 @@ msgstr ""
 "παραμέτρους."
 
 #. Tag: title
-#: random-bits.xml:1034
+#: random-bits.xml:1145
 #, no-c-format
 msgid "Using the graphical installer"
 msgstr "Χρησιμοποιώντας τον γραφικό εγκαταστάτη"
 
 #. Tag: para
-#: random-bits.xml:1035
+#: random-bits.xml:1146
 #, no-c-format
 msgid ""
 "As already mentioned, the graphical installer basically works the same as "
@@ -2184,7 +2311,7 @@ msgstr ""
 "<keycap>+</keycap> and <keycap>-</keycap>"
 
 #. Tag: para
-#: random-bits.xml:1041
+#: random-bits.xml:1152
 #, no-c-format
 msgid ""
 "If you prefer using the keyboard over the mouse, there are two things you "
@@ -2206,7 +2333,7 @@ msgstr ""
 "δεν θα ενεργοποιήσει την <guibutton>Συνέχεια</guibutton>."
 
 #. Tag: para
-#: random-bits.xml:1051
+#: random-bits.xml:1162
 #, no-c-format
 msgid ""
 "To switch to another console, you will also need to use the <keycap>Ctrl</"
@@ -2221,13 +2348,13 @@ msgstr ""
 "keycap> </keycombo>."
 
 #. Tag: title
-#: random-bits.xml:1062
+#: random-bits.xml:1173
 #, no-c-format
 msgid "Known issues"
 msgstr "Γνωστά προβλήματα"
 
 #. Tag: para
-#: random-bits.xml:1063
+#: random-bits.xml:1174
 #, no-c-format
 msgid ""
 "Etch is the first release that includes the graphical installer and uses "
@@ -2242,7 +2369,7 @@ msgstr ""
 "επόμενη έκδοση του &debian;."
 
 #. Tag: para
-#: random-bits.xml:1073
+#: random-bits.xml:1184
 #, no-c-format
 msgid ""
 "Information on some screens is not nicely formatted into columns as it "
@@ -2254,7 +2381,7 @@ msgstr ""
 "την γλώσσα. Ένα άλλο παράδειγμα είναι η κύρια οθόνη του partman."
 
 #. Tag: para
-#: random-bits.xml:1080
+#: random-bits.xml:1191
 #, no-c-format
 msgid ""
 "Typing some characters may not work and in some cases the wrong character "
@@ -2268,13 +2395,13 @@ msgstr ""
 "τόνος δεν δουλεύει."
 
 #. Tag: para
-#: random-bits.xml:1087
+#: random-bits.xml:1198
 #, no-c-format
 msgid "Support for touchpads is not yet optimal."
 msgstr "Υποστήριξη για touchpad δεν είναι ακόμα η καλλίτερη."
 
 #. Tag: para
-#: random-bits.xml:1092
+#: random-bits.xml:1203
 #, no-c-format
 msgid ""
 "You should not switch to a different console while the installer is busy; "
@@ -2291,7 +2418,7 @@ msgstr ""
 "προκαλεί οποιαδήποτε προβλήματα."
 
 #. Tag: para
-#: random-bits.xml:1101
+#: random-bits.xml:1212
 #, no-c-format
 msgid ""
 "Support for creating encrypted partitions is limited as it is not possible "
@@ -2304,7 +2431,7 @@ msgstr ""
 "χρησιμοποιώντας μια συνθηματική φράση σαν κλειδί κρυπτογράφησης."
 
 #. Tag: para
-#: random-bits.xml:1108
+#: random-bits.xml:1219
 #, no-c-format
 msgid ""
 "Starting a shell from the graphical frontend is currently not supported. "
@@ -2313,21 +2440,31 @@ msgid ""
 "installation system and in the menu for the rescue mode. You will instead "
 "have to switch (as described above) to the shells that are available on "
 "virtual consoles VT2 and VT3."
-msgstr "Η έναρξη ενός κελύφους από το γραφικό frontend δεν υποστηρίζεται αυτή τη στιγμή. Αυτό σημαίνει ότι οι σχετικές επιλογές για να το κάνετε αυτό (και οι οποίες είναι διαθέσιμες όταν χρησιμοποιείτε το frontend κειμένου) δεν θα εμφανίζονται στο κύριο μενού του συστήματος εγκατάστασης και στο μενού της κατάστασης διάσωσης. Αντί γι' αυτό, θα πρέπει να αλλάξετε (όπως περιγράφηκε παραπάνω) στα κελύφη που είναι διαθέσιμα στις εικονικές κονσόλες VT2 και VT3."
+msgstr ""
+"Η έναρξη ενός κελύφους από το γραφικό frontend δεν υποστηρίζεται αυτή τη "
+"στιγμή. Αυτό σημαίνει ότι οι σχετικές επιλογές για να το κάνετε αυτό (και οι "
+"οποίες είναι διαθέσιμες όταν χρησιμοποιείτε το frontend κειμένου) δεν θα "
+"εμφανίζονται στο κύριο μενού του συστήματος εγκατάστασης και στο μενού της "
+"κατάστασης διάσωσης. Αντί γι' αυτό, θα πρέπει να αλλάξετε (όπως περιγράφηκε "
+"παραπάνω) στα κελύφη που είναι διαθέσιμα στις εικονικές κονσόλες VT2 και VT3."
 
 #. Tag: para
-#: random-bits.xml:1117
+#: random-bits.xml:1228
 #, no-c-format
 msgid ""
 "After booting the installer in rescue mode, it may be useful to start a "
 "shell in the root partition of an already installed system. This is possible "
 "(after you have selected the partition to be mounted as the root partition) "
 "by switching to VT2 or VT3 and entering the following command:"
-msgstr "Μετά την εκκίνηση του εγκαταστάτη σε κατάσταση διάσωσης, μπορεί να είναι χρήσιμο να ξεκινήσετε ένα κέλυφος στην ριζική κατάτμηση ενός ήδη εγκατεστημένου συτήματος. Αυτό είναι εφικτο (αφού έχετε επιλέξει την προσάρτηση της κατάτμησης σαν ριζικής) αλλάζοντας στις κονσόλες VT2 ή VT3 και εισάγοντας την ακόλουθη εντολή:"
+msgstr ""
+"Μετά την εκκίνηση του εγκαταστάτη σε κατάσταση διάσωσης, μπορεί να είναι "
+"χρήσιμο να ξεκινήσετε ένα κέλυφος στην ριζική κατάτμηση ενός ήδη "
+"εγκατεστημένου συτήματος. Αυτό είναι εφικτο (αφού έχετε επιλέξει την "
+"προσάρτηση της κατάτμησης σαν ριζικής) αλλάζοντας στις κονσόλες VT2 ή VT3 "
+"και εισάγοντας την ακόλουθη εντολή:"
 
 #. Tag: screen
-#: random-bits.xml:1124
+#: random-bits.xml:1235
 #, no-c-format
 msgid "# chroot /target"
 msgstr "# chroot /target"
-
