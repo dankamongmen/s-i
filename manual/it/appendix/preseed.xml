@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44376 -->
+<!-- original version: 45190 -->
 
 
 <!--
@@ -193,7 +193,7 @@ preseeding occurs, you can start the installer in <quote>auto</quote>
 mode. This delays questions that would normally be asked too early for
 preseeding (i.e. language, country and keyboard selection) until after
 the network comes up, thus allowing them to be preseeded. It also runs
-the installation in critical priority, which avoids many unimportant
+the installation at critical priority, which avoids many unimportant
 questions. See <xref linkend="preseed-auto"/> for details.
 -->
 
@@ -1469,9 +1469,8 @@ initrd per il metodo d'installazione scelto. Il valore predefinito per
 <informalexample role="example"><screen>
 <!--
 d-i mirror/country string enter information manually
-d-i mirror/http/hostname string http.us.debian.org
 -->d-i mirror/country string inserire manualmente le informazioni
-d-i mirror/http/hostname string http.it.debian.org
+d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
 
@@ -1827,6 +1826,15 @@ aggiungere altri repository (anche locali).
 # autenticato e che quindi non dovrebbe essere usato (commentandolo in
 # sources.list)
 #d-i apt-setup/local0/key string http://local.server/key
+
+<!--
+# By default the installer requires that repositories be authenticated
+# using a known gpg key. This setting can be used to disable that
+# authentication. Warning: Insecure, not recommended.
+--># Normalmente l'installatore richiede che i repository siano autenticati
+# con una chiave gpg conosciuta. Per disabilitare questa autenticazione si
+# può usare questa impostazione. Attenzione: insicuro, non raccomandato.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
   </sect2>
 
@@ -2308,14 +2316,47 @@ a una domanda ma fare in modo che la domanda venga comunque posta. Per farlo
 si deve impostare il flag <firstterm>seen</firstterm> a <quote>false</quote>
 dopo aver impostato il valore della domanda.
 
-</para>
-
 <informalexample><screen>
 <!--
 d-i foo/bar string value
 -->d-i foo/bar string valore
 d-i foo/bar seen false
 </screen></informalexample>
+
+<!--
+The same effect can be achieved for <emphasis>all</emphasis> questions by
+setting the parameter <classname>preseed/interactive=true</classname> at
+the boot prompt. This can also be useful for testing or debugging your
+preconfiguration file.
+-->
+
+Si può estendere questo effetto a <emphasis>tutte</emphasis> le domande
+inserendo il parametro <classname>preseed/interactive=true</classname>
+al prompt boot. Questo può essere utile per effettuare delle prove o il
+debug del proprio file di preconfigurazione.
+
+<!--
+If you are preseeding using boot parameters, you can make the installer ask
+the corresponding question by using the <quote>?=</quote> operator, i.e.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+-->
+
+Quando si usa la preconfigurazione tramite i parametri d'avvio si può
+richiedere all'installatore di chiedere comunque le domande preconfigurate
+usando l'operatore <quote>?=</quote> in questo modo
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valore</replaceable></userinput>.
+
+<!--
+This will of course only have effect for parameters that correspond to
+questions that are actually displayed during an installation and not for
+<quote>internal</quote> parameters.
+-->
+
+Ovviamente questo ha effetto solo sui parametri che corrispondono alle
+domande che sono effettivamente visualizzate durante l'installazione e
+non sui parametri <quote>interni</quote>.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-chainload">
