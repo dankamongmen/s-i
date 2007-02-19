@@ -148,11 +148,9 @@ do_preseed() {
 				SL=$LANGUAGE
 			fi
 			if [ "$SL" ] ; then
-				db_unregister $shortlist || true
-				db_register $shortlist-$SL $shortlist
-				db_set $shortlist "$COUNTRY"
-				log "Set $shortlist = '$COUNTRY'"
-				db_fset $shortlist seen $seenflag || true
+				db_set $shortlist-$SL "$COUNTRY"
+				log "Set $shortlist-$SL = '$COUNTRY'"
+				db_fset $shortlist-$SL seen $seenflag || true
 			fi
 			db_fset $fulllist seen $seenflag || true
 			if grep -q "^$LOCALE$" $SUPPORTEDLOCALES ; then
@@ -335,6 +333,8 @@ EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 FIRST_LANG="${LANGUAGELIST%%:*}"
 
 # We use /etc/shortlists to check if we should present a shortlist
+# As we may unregister the question for shortlists, the value for the
+# shortlist template is also saved with the language specific question
 use_lang=""
 if [ "$LOCALE" != "C" ] ; then
 	if grep -q "^$FIRST_LANG" $SHORTLISTS; then
@@ -370,6 +370,12 @@ while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 				shortlist_template="$shortlist-$use_lang"
 				db_unregister $shortlist || true
 				db_register $shortlist_template $shortlist
+				if db_get $shortlist_template && [ "$RET" ]; then
+					db_set $shortlist $RET
+				fi
+				if db_fget $shortlist_template seen; then
+					db_fset $shortlist seen $RET || true
+				fi
 				db_input $shortprio $shortlist || [ $? -eq 30 ]
 				askedshort=1
 			else
@@ -382,6 +388,7 @@ while [ "$STATE" != 0 -a "$STATE" -le "$LASTSTATE" ]; do
 			db_get $shortlist
 			if [ -n "$RET" ] && [ "$RET" != "other" ]; then
 				COUNTRYCODE="$RET"
+				db_set $shortlist_template $COUNTRYCODE
 				break
 			fi
 		fi
