@@ -1,53 +1,89 @@
 #!/bin/sh
 CMDLINE=/proc/cmdline
-for item in $(cat $CMDLINE); do
-	var="${item%=*}"
-	
-	# BOOT_IMAGE is added by syslinux.
-	if [ "$var" = "BOOT_IMAGE" ]; then
-		continue
-	fi
-	
-	# init is not generally useful to pass on.
-	if [ "$var" = init ]; then
-		continue
-	fi
 
-	# brltty settings shouldn't be passed since
-	# they are already recorded in /etc/brltty.conf
-	if [ "$var" = brltty ]; then
-		continue
-	fi
+SEP=""
 
-	# Skip debconf variables.
-	varnoslash="${var##*/*}"
-	if [ "$varnoslash" = "" ]; then
-		continue
-	fi
-	
-	# Skip module-specific variables.
-	varnodot="${var##*.*}"
-	if [ "$varnodot" = "" ]; then
-		continue
-	fi
-	
-	# Skip preseed aliases.
-	if [ -e /etc/preseed_aliases ] && \
-	   grep -q "^$var[[:space:]]" /etc/preseed_aliases; then
-		continue
-	fi
-	
-	if [ "$item" = "--" ]; then
+saveit() {
+	if [ "$skipping" ]; then
+		return
+	elif [ "$var" = "--" ]; then
 		inuser=1
 		collect=""
 	elif [ "$inuser" ]; then
+		# BOOT_IMAGE is added by syslinux.
+		if [ "$var" = "BOOT_IMAGE" ]; then
+			return
+		fi
+	
+		# init is not generally useful to pass on.
+		if [ "$var" = init ]; then
+			return
+		fi
+
+		# brltty settings shouldn't be passed since
+		# they are already recorded in /etc/brltty.conf
+		if [ "$var" = brltty ]; then
+			return
+		fi
+	
+		# Skip debconf variables.
+		varnoslash="${var##*/*}"
+		if [ "$varnoslash" = "" ]; then
+			return
+		fi
+		
+		# Skip module-specific variables.
+		varnodot="${var##*.*}"
+		if [ "$varnodot" = "" ]; then
+			return
+		fi
+		
+		# Skip preseed aliases.
+		if [ -e /etc/preseed_aliases ] && \
+		   grep -q "^$var[[:space:]]" /etc/preseed_aliases; then
+			return
+		fi
+
 		if [ -z "$collect" ]; then
-			collect="$item"
+			collect="$var=$value"
 		else
-			collect="$collect $item"
+			collect="$collect$SEP$var=$value"
 		fi
 	fi
+}
+
+OLDIFS="$IFS"
+IFS='"'\'' ' # split on quotes and words
+for item in $(cat $CMDLINE); do
+	IFS="$OLDIFS"
+	newvar="${item%=*}"
+
+	itemnoequals="${item##*=*}"
+	if [ -n "$itemnoequals" ] && [ "$item" != "--" ]; then
+		if [ -z "$value" ]; then
+			value="$item"
+		else
+			# skip multi-word values, assumed to always be
+			# debconf params
+			skipping=1
+		fi
+		continue
+	fi
+
+	if [ -n "$var" ]; then
+		saveit
+	fi
+
+	skipping=
+	var="$newvar"
+	value="${item#*=}"
+
+	IFS='"'\'' '
 done
+
+if [ -n "$var" ]; then
+	saveit
+fi
 
 # Include default parameters.
 RET=`debconf-get debian-installer/add-kernel-opts || true`
@@ -55,6 +91,7 @@ if [ "$RET" ]; then
         collect="$collect $RET"
 fi
 
-for word in $collect; do
-	echo "$word"
+IFS="$SEP"
+for var in $collect; do
+	echo "$var"
 done
