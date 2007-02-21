@@ -13,6 +13,11 @@ clean:
 	-$(MAKE) clean
 	dh_clean
 
+test:
+	$(MAKE) -C testsuite test
+
+install: build test
+
 binary-indep: build
 	dh_testdir
 	dh_testroot
@@ -30,7 +35,7 @@ binary-indep: build
 	dh_gencontrol -i
 	dh_builddeb -i
 
-binary-arch: build
+binary-arch: install
 	dh_testdir
 	dh_testroot
 	dh_clean -k
@@ -52,4 +57,4 @@ binary-arch: build
 	dh_builddeb -a
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
+.PHONY: build clean binary-indep binary-arch binary install

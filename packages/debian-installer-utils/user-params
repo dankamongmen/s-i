@@ -1,5 +1,13 @@
 #!/bin/sh
-CMDLINE=/proc/cmdline
+
+if [ -z "$TESTSUITE" ]; then
+	CMDLINE=/proc/cmdline
+	ALIASES=/etc/preseed_aliases
+else
+	CMDLINE=user-params.in
+	ALIASES=user-params.aliases
+fi
+
 
 SEP=""
 
@@ -39,8 +47,8 @@ saveit() {
 		fi
 		
 		# Skip preseed aliases.
-		if [ -e /etc/preseed_aliases ] && \
-		   grep -q "^$var[[:space:]]" /etc/preseed_aliases; then
+		if [ -e "$ALIASES" ] && \
+		   grep -q "^$var[[:space:]]" $ALIASES; then
 			return
 		fi
 
@@ -85,10 +93,12 @@ if [ -n "$var" ]; then
 	saveit
 fi
 
-# Include default parameters.
-RET=`debconf-get debian-installer/add-kernel-opts || true`
-if [ "$RET" ]; then
-        collect="$collect $RET"
+if [ -z "$TESTSUITE" ]; then
+	# Include default parameters.
+	RET=`debconf-get debian-installer/add-kernel-opts || true`
+	if [ "$RET" ]; then
+	        collect="$collect $RET"
+	fi
 fi
 
 IFS="$SEP"
