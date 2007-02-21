@@ -1,5 +1,4 @@
 #!/bin/sh
-
 if [ -z "$TESTSUITE" ]; then
 	CMDLINE=/proc/cmdline
 	ALIASES=/etc/preseed_aliases
@@ -8,90 +7,56 @@ else
 	ALIASES=user-params.aliases
 fi
 
-
-SEP=""
-
-saveit() {
-	if [ "$skipping" ]; then
-		return
-	elif [ "$var" = "--" ]; then
+# sed out multi-word quoted value settings
+for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
+                  -e "s/[^ =]*='[^']*[ ][^']*'//g" $CMDLINE); do
+	var="${item%=*}"
+	
+	if [ "$item" = "--" ]; then
 		inuser=1
 		collect=""
 	elif [ "$inuser" ]; then
 		# BOOT_IMAGE is added by syslinux.
 		if [ "$var" = "BOOT_IMAGE" ]; then
-			return
+			continue
 		fi
-	
+		
 		# init is not generally useful to pass on.
 		if [ "$var" = init ]; then
-			return
+			continue
 		fi
-
+	
 		# brltty settings shouldn't be passed since
 		# they are already recorded in /etc/brltty.conf
 		if [ "$var" = brltty ]; then
-			return
+			continue
 		fi
 	
 		# Skip debconf variables.
 		varnoslash="${var##*/*}"
 		if [ "$varnoslash" = "" ]; then
-			return
+			continue
 		fi
 		
 		# Skip module-specific variables.
 		varnodot="${var##*.*}"
 		if [ "$varnodot" = "" ]; then
-			return
+			continue
 		fi
 		
 		# Skip preseed aliases.
-		if [ -e "$ALIASES" ] && \
-		   grep -q "^$var[[:space:]]" $ALIASES; then
-			return
+			if [ -e "$ALIASES" ] && \
+		   grep -q "^$var[[:space:]]" "$ALIASES"; then
+			continue
 		fi
-
+	
 		if [ -z "$collect" ]; then
-			collect="$var=$value"
+			collect="$item"
 		else
-			collect="$collect$SEP$var=$value"
+			collect="$collect $item"
 		fi
 	fi
-}
-
-OLDIFS="$IFS"
-IFS='"'\'' ' # split on quotes and words
-for item in $(cat $CMDLINE); do
-	IFS="$OLDIFS"
-	newvar="${item%=*}"
-
-	itemnoequals="${item##*=*}"
-	if [ -n "$itemnoequals" ] && [ "$item" != "--" ]; then
-		if [ -z "$value" ]; then
-			value="$item"
-		else
-			# skip multi-word values, assumed to always be
-			# debconf params
-			skipping=1
-		fi
-		continue
-	fi
-
-	if [ -n "$var" ]; then
-		saveit
-	fi
-
-	skipping=
-	var="$newvar"
-	value="${item#*=}"
-
-	IFS='"'\'' '
 done
-
-if [ -n "$var" ]; then
-	saveit
-fi
 
 if [ -z "$TESTSUITE" ]; then
 	# Include default parameters.
@@ -101,7 +66,6 @@ if [ -z "$TESTSUITE" ]; then
 	fi
 fi
 
-IFS="$SEP"
-for var in $collect; do
-	echo "$var"
+for word in $collect; do
+	echo "$word"
 done
