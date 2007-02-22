@@ -3,6 +3,7 @@ set -e
 
 export TESTSUITE=1
 TESTFILE=user-params.in
+trap 'rm -f "$TESTFILE"' 0 HUP INT QUIT TERM
 
 [ "$TEST_VERBOSE" ] || TEST_VERBOSE=0
 
@@ -27,11 +28,9 @@ while read line; do
 		TESTING=1
 		INPUT="$line"
 		echo "$INPUT" >$TESTFILE
-		RESULT="$(../../user-params --test | tr "\n" " " | sed "s/ $//")"
+		RESULT="$(../../user-params | tr "\n" " " | sed "s/ $//")"
 	fi
 done <user-params.tests
-
-rm -f $TESTFILE
 
 if [ $TEST_VERBOSE -ge 2 ]; then
 	echo "Result: $SUCCESSES out of $TESTS test cases were successful"
