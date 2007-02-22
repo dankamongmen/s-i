@@ -343,7 +343,7 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
             pango_layout_set_font_description(layout, pango_font_description_from_string("Sans 12"));
             pango_layout_get_pixel_size(layout, &w, &h);
             /* obj->info is drawn over the debian banner, top-right corner of the screen */
-            gdk_draw_layout(wid->window, gdk_gc_new(wid->window),  WINDOW_WIDTH - w - 4, 4, layout);
+            gdk_draw_layout(wid->window, gdk_gc_new(wid->window),  WINDOW_WIDTH - w - 4 - DEFAULT_PADDING*2, 4, layout);
             free(message);
         }
         free(text);
