@@ -16,12 +16,12 @@ for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
 		inuser=1
 		collect=""
 	elif [ "$inuser" ]; then
-		# BOOT_IMAGE is added by syslinux.
+		# BOOT_IMAGE is added by syslinux
 		if [ "$var" = "BOOT_IMAGE" ]; then
 			continue
 		fi
 		
-		# init is not generally useful to pass on.
+		# init is not generally useful to pass on
 		if [ "$var" = init ]; then
 			continue
 		fi
@@ -32,19 +32,19 @@ for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
 			continue
 		fi
 	
-		# Skip debconf variables.
+		# Skip debconf variables
 		varnoslash="${var##*/*}"
 		if [ "$varnoslash" = "" ]; then
 			continue
 		fi
 		
-		# Skip module-specific variables.
+		# Skip module-specific variables
 		varnodot="${var##*.*}"
 		if [ "$varnodot" = "" ]; then
 			continue
 		fi
 		
-		# Skip preseed aliases.
+		# Skip preseed aliases
 			if [ -e "$ALIASES" ] && \
 		   grep -q "^$var[[:space:]]" "$ALIASES"; then
 			continue
@@ -59,7 +59,7 @@ for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
 done
 
 if [ -z "$TESTSUITE" ]; then
-	# Include default parameters.
+	# Include default parameters
 	RET=`debconf-get debian-installer/add-kernel-opts || true`
 	if [ "$RET" ]; then
 	        collect="$collect $RET"
