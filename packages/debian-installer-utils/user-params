@@ -11,7 +11,7 @@ fi
 for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
                   -e "s/[^ =]*='[^']*[ ][^']*'//g" $CMDLINE); do
 	var="${item%=*}"
-	
+
 	if [ "$item" = "--" ]; then
 		inuser=1
 		collect=""
@@ -20,36 +20,42 @@ for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
 		if [ "$var" = "BOOT_IMAGE" ]; then
 			continue
 		fi
-		
+
 		# init is not generally useful to pass on
 		if [ "$var" = init ]; then
 			continue
 		fi
-	
+
+		# suppress installer-specific parameters
+		if [ "$var" = BOOT_DEBUG ] || [ "$var" = DEBIAN_FRONTEND ] || \
+		   [ "$var" = INSTALL_MEDIA_DEV ]; then
+			continue
+		fi
+
 		# brltty settings shouldn't be passed since
 		# they are already recorded in /etc/brltty.conf
 		if [ "$var" = brltty ]; then
 			continue
 		fi
-	
+
 		# Skip debconf variables
 		varnoslash="${var##*/*}"
 		if [ "$varnoslash" = "" ]; then
 			continue
 		fi
-		
+
 		# Skip module-specific variables
 		varnodot="${var##*.*}"
 		if [ "$varnodot" = "" ]; then
 			continue
 		fi
-		
+
 		# Skip preseed aliases
 		if [ -e "$ALIASES" ] && \
 		   grep -q "^$var[[:space:]]" "$ALIASES"; then
 			continue
 		fi
-	
+
 		if [ -z "$collect" ]; then
 			collect="$item"
 		else
