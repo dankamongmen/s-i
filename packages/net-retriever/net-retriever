@@ -107,16 +107,16 @@ case "x$cmd" in
 		# If gpgv and a keyring are installed, authentication is
 		# mandatory by default.
 		if type gpgv >/dev/null && [ -f "$keyring" ]; then
-			if ! fetch "dists/$codename/Release.gpg" "$Release.gpg"; then
-				error "dists/$codename/Release is unsigned."
-			fi
-			if ! log-output -t net-retriever --pass-stdout \
-			     gpgv --status-fd 1 --keyring "$keyring" \
-			     --ignore-time-conflict \
-			     "$Release.gpg" "$Release" | read_gpg_status; then
-			     	if db_get debian-installer/allow_unauthenticated && [ "$RET" = true ]; then
-					log "Ignoring bad signature on $Release."
-				else
+			if db_get debian-installer/allow_unauthenticated && [ "$RET" = true ]; then
+				log "Not verifying Release signature: unauthenticated mode enabled"
+			else
+				if ! fetch "dists/$codename/Release.gpg" "$Release.gpg"; then
+					error "dists/$codename/Release is unsigned."
+				fi
+				if ! log-output -t net-retriever --pass-stdout \
+				     gpgv --status-fd 1 --keyring "$keyring" \
+				     --ignore-time-conflict \
+				     "$Release.gpg" "$Release" | read_gpg_status; then
 					error "Bad signature on $Release."
 				fi
 			fi
