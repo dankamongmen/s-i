@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 44899 -->
+<!-- original version: 45239 -->
 
  <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
 <para>
@@ -321,7 +321,9 @@ automatická instalace, viz <xref linkend="automatic-install"/>.
 
 Nastavením na hodnotu <userinput>true</userinput> se zobrazí i otázky,
 které byly přednastaveny. To může být užitečné pro testování nebo
-ladění souboru s přednastavením, viz <xref linkend="preseed-seenflag"/>.
+ladění souboru s přednastavením. Nastavení se neprojeví u otázek,
+které byly zadány jako parametry při zavádění systému. Pro ty však
+existuje speciální syntaxe, viz <xref linkend="preseed-seenflag"/>.
 
 </para></listitem>
 </varlistentry>
@@ -358,12 +360,26 @@ Pro zakázání automatického vysunutí nastavte parametr na hodnotu
 </para></listitem>
 </varlistentry>
 
-<varlistentry arch="m68k">
+<varlistentry>
+<term>debian-installer/allow_unauthenticated</term>
+<listitem><para>
+
+Instalační systém vyžaduje, aby byly všechny repositáře autentizovány
+známým gpg klíčem. Nastavením na hodnotu <userinput>true</userinput>
+můžete autentizaci potlačit. <emphasis role="bold">Varování:
+Nebezpečné, není doporučeno.</emphasis>
+
+</para></listitem>
+</varlistentry>
+
+
+<varlistentry arch="alpha;m68k;mips;mipsel">
 <term>ramdisk_size</term>
 <listitem><para>
 
-Používáte-li ještě jádro řady 2.2.x, budete možná muset zadat
-&ramdisksize;.
+Tento parametr by již měl být nastaven na správnou hodnotu. Použijte
+jej pouze v případě, že během zavádění systému uvidíte chyby
+naznačující, že ramdisk nebyl nahrán celý. Hodnota je v kB.
 
 </para></listitem>
 </varlistentry>
@@ -439,8 +455,9 @@ výchozí jazyk němčinu a jako zemi Švýcarsko.
 Pomocí tohoto parametru můžete nechat automaticky nahrát komponenty
 instalačního systému, které se implicitně nenahrávají. Příkladem
 užitečných komponent jsou <classname>openssh-client-udeb</classname>
-(během instalace můžete využívat <command>scp</command>) a
-<classname>ppp-udeb</classname> (podporuje nastavení PPPoE).
+(během instalace můžete využívat <command>scp</command>)<phrase
+arch="not-s390"> a <classname>ppp-udeb</classname> (podporuje
+nastavení PPPoE, viz <xref linkend="pppoe"/>)</phrase>.
 
 </para></listitem>
 </varlistentry>

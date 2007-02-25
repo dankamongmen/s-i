@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 44897 -->
+<!-- original version: 45355 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -524,13 +524,14 @@ které způsobí, že se k instalaci použije první funkční síťové rozhran
 a že instalátor bude trpělivější při čekání na odpovědi od DHCP
 serveru.
 
-<!--
-Když už upravujete soubor zavaděče, přidejte na stejné místo
-i parametr <userinput>priority=critical</userinput>, který
-odchytí většinu případných otázek, které zde zapomenete nastavit.
--->
+</para><tip><para>
 
-</para>
+Rozsáhlý příklad použití této infrastruktury naleznete na <ulink
+url="http://hands.com/d-i/">webových stránkách</ulink> autora. Kromě
+ukázkových skriptů a tříd tam také naleznete zajímavé výsledky
+kreativního použití přednastavení.
+
+</para></tip>
   </sect2>
 
   <sect2 id="preseed-aliases">
@@ -1085,6 +1086,11 @@ a dříve zodpovězenými otázkami. Volitelně můžete přidat další
 # jinak si apt bude stěžovat na neautentizovaný archiv a příslušný
 # řádek v sources.list zůstane zakomentovaný
 #d-i apt-setup/local0/key string http://local.server/key
+
+# Instalace vyžaduje, aby byly všechny repositáře autentizovány
+# známým gpg klíčem. Tímto nastavením můžete autentizaci potlačit.
+# Varování: Nebezpečné, není doporučeno.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1286,6 +1292,8 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
+<!--
+
   <sect2 id="preseed-mailer">
   <title>Nastavení pošty</title>
 <para>
@@ -1304,6 +1312,8 @@ exim4-config exim4/dc_postmaster string
 </screen></informalexample>
 
   </sect2>
+
+-->
 
   <sect2 id="preseed-X">
   <title>Nastavení X Window</title>
@@ -1405,15 +1415,22 @@ d-i foo/bar string hodnota
 d-i foo/bar seen false
 </screen></informalexample>
 
-To samozřejmě funguje jen u parametrů, kterým odpovídá nějaká otázka,
-tj. nefunguje to pro <quote>interní</quote> parametry.
-
-</para><para>
-
 Chcete-li stejného výsledku dosáhnout pro <emphasis>všechny</emphasis>
 otázky, můžete použít zaváděcí parametr
 <classname>preseed/interactive=true</classname>, což se může hodit pro
 testování a ladění konfiguračního souboru s přednastavením.
+
+</para><para>
+
+Přednastavujete-li pomocí zaváděcích parametrů, můžete použít
+speciální operátor <quote>?=</quote>, kterým instalátor donutíte, aby
+danou otázku zobrazil. Například <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>hodnota</replaceable></userinput>.
+
+</para><para>
+
+To samozřejmě funguje jen u parametrů, kterým odpovídá nějaká otázka
+zobrazená během instalace, tj. nefunguje to pro <quote>interní</quote>
+parametry.
 
 </para>
   </sect2>
