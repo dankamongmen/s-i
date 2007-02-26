@@ -37,7 +37,15 @@ case "`archdetect`" in
 			parse_sysconf "/dev/$sysconf"
 			# The original NSLU2 uses a different name for the network interface
 			if [ "$INTERFACE" = "ixp0" ]; then
-				INTERFACE=eth0
+				# IXP4xx NPE ethernet interface seems to come
+				# up as eth0 (#407460) therefore only use eth0
+				# for the installer if the NPE microcode is
+				# present
+				if [ -e /lib/firmware/NPE-B ]; then
+					INTERFACE=eth0
+				else
+					INTERFACE=eth1
+				fi
 			fi
 			# Use DHCP if the original IP from the firmware has never been changed
 			if [ "$IPADDRESS" = "192.168.1.77" ]; then
