@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-02-18 19:51+0000\n"
-"PO-Revision-Date: 2007-02-08 09:42+0800\n"
+"PO-Revision-Date: 2007-02-26 11:57+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1911,9 +1911,9 @@ msgstr ""
 
 #. Tag: title
 #: random-bits.xml:962
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Installing &debian; using PPP over Ethernet (PPPoE)"
-msgstr "通过 Parallel Line IP (PLIP) 来安装 &debian;"
+msgstr "通过 PPP over Ethernet (PPPPoE) 来安装 &debian;"
 
 #. Tag: para
 #: random-bits.xml:964
@@ -1924,18 +1924,16 @@ msgid ""
 "Setting up a network connection using PPPoE is not supported by default in "
 "the installer, but can be made to work very simply. This section explains "
 "how."
-msgstr ""
+msgstr "在一些国家，PPP over Ethernet (PPPoE) 是互联网供应商提供的通用宽带协议(ADSL 或 cable)。安装程序默认并不支持使用 PPPoE 建立网络连接，但很容易实现。本节将说明操作方法。"
 
 #. Tag: para
 #: random-bits.xml:972
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "The PPPoE connection set up during the installation will also be available "
 "after the reboot into the installed system (see <xref linkend=\"boot-new\"/"
 ">)."
-msgstr ""
-"在安装时建立的 PLIP 连接，重新启动后在新安装的系统里面仍然可用(参阅 <xref "
-"linkend=\"boot-new\"/>)。"
+msgstr "安装时建立的 PPPoE 连接，重新启动后在新安装的系统里面仍然可用(参阅 <xref linkend=\"boot-new\"/>)。"
 
 #. Tag: para
 #: random-bits.xml:977
@@ -1945,7 +1943,7 @@ msgid ""
 "you will need to install using one of the CD-ROM/DVD images that are "
 "available. It is not supported for other installation methods (e.g. "
 "netboot<phrase condition=\"supports-floppy-boot\"> or floppy</phrase>)."
-msgstr ""
+msgstr "要在安装过程中具有建立和使用 PPPoE 选项，您需要使用 CD-ROM/DVD 映像。其他的安装方式并不支持 (例如 netboot<phrase condition=\"supports-floppy-boot\"> 或软盘</phrase>)。"
 
 #. Tag: para
 #: random-bits.xml:984
@@ -1953,7 +1951,7 @@ msgstr ""
 msgid ""
 "Installing over PPPoE is mostly the same as any other installation. The "
 "following steps explain the differences."
-msgstr ""
+msgstr "通过 PPPoE 安装，绝大部分与其他方式相同。下面步骤说明不同之处。"
 
 #. Tag: para
 #: random-bits.xml:992
@@ -1970,6 +1968,11 @@ msgid ""
 "the setup of PPPoE (<classname>ppp-udeb</classname>) will be loaded and run "
 "automatically."
 msgstr ""
+"使用 <userinput>modules=ppp-udeb</userinput> 作为引导参数引导安装程序。也就是在引导提示符后面加上：<informalexample><screen>\n"
+"install modules=ppp-udeb\n"
+"</screen></informalexample> 或者，对于图形安装程序：<informalexample><screen>\n"
+"installgui modules=ppp-udeb\n"
+"</screen></informalexample> 这确保设置 PPPoE 的组件 (<classname>ppp-udeb</classname>) 被加载并自动运行。"
 
 #. Tag: para
 #: random-bits.xml:1007
@@ -1982,7 +1985,7 @@ msgid ""
 "priority (expert mode), you can also manually select the <classname>ppp-"
 "udeb</classname> instead of entering the <quote>modules</quote> parameter at "
 "the boot prompt. </para> </footnote>)."
-msgstr ""
+msgstr "按照正常的步骤进行安装(语言、国家和键盘选择；加载额外的安装组件<footnote> <para> 本步骤中，<classname>ppp-udeb</classname> 组件作为其中的一个组件被加载。如果使用中或低优先级(expert 模式)，您可以手动选择 <classname>ppp-udeb</classname>，而不是在引导提示符后面输入<quote>模块</quote>参数。</para> </footnote>)。"
 
 #. Tag: para
 #: random-bits.xml:1026
@@ -1990,7 +1993,7 @@ msgstr ""
 msgid ""
 "The next step is the detection of network hardware, in order to identify any "
 "Ethernet cards present in the system."
-msgstr ""
+msgstr "下一步是侦测网络硬件，目的是识别当前系统中的网卡。"
 
 #. Tag: para
 #: random-bits.xml:1032
@@ -1999,7 +2002,7 @@ msgid ""
 "After this the actual setup of PPPoE is started. The installer will probe "
 "all the detected Ethernet interfaces in an attempt to find a PPPoE "
 "concentrator (a type of server which handles PPPoE connections)."
-msgstr ""
+msgstr "在真正的设置 PPPoE 启动以后，安装程序会探测所有识别的网卡，寻找 PPPoE 连接(一个处理 PPPoE 连接的服务器)。"
 
 #. Tag: para
 #: random-bits.xml:1038
@@ -2010,7 +2013,7 @@ msgid ""
 "faulty servers. In most cases a second attempt to detect the concentrator "
 "will be successful; to retry, select <guimenuitem>Configure and start a "
 "PPPoE connection</guimenuitem> from the main menu of the installer)."
-msgstr ""
+msgstr "第一次尝试可能无法找到连接。这经常会出现在低速或过载的网络，或者有缺陷的服务器上。多数情况下，第二次就能成功发现连接；要重试，从安装程序的主菜单中选择 <guimenuitem>Configure and start a PPPoE connection</guimenuitem>。"
 
 #. Tag: para
 #: random-bits.xml:1047
@@ -2018,7 +2021,7 @@ msgstr ""
 msgid ""
 "After a concentrator is found, the user will be prompted to type the login "
 "information (the PPPoE username and password)."
-msgstr ""
+msgstr "连接找到之后，用户需要提供登录信息(PPPoE 用户名和密码)。"
 
 #. Tag: para
 #: random-bits.xml:1053
@@ -2031,7 +2034,7 @@ msgid ""
 "login information is not correct or some error appears, the installer will "
 "stop, but the configuration can be attempted again by selecting the menu "
 "entry <guimenuitem>Configure and start PPPoE networking</guimenuitem>."
-msgstr ""
+msgstr "此时，安装程序就会用所提供的信息建立 PPPoE 连接。如果所提供的信息正确，PPPoE 将会正确配置，并且安装程序可以使用它连上互联网获取软件包(在需要时)。假如登录信息不正确或有错误出现，安装程序将停止，但可以选择 <guimenuitem>Configure and start PPPoE networking</guimenuitem> 菜单项重新配置。"
 
 #. Tag: title
 #: random-bits.xml:1073
