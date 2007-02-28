@@ -2084,7 +2084,7 @@ void
 make_fifo(char* name)
 {
     int status;
-    status = mkfifo(name, 0x644);
+    status = mkfifo(name, 0644);
     if ((status != 0))
             if (errno != EEXIST) {
                     perror("Cannot create FIFO");
