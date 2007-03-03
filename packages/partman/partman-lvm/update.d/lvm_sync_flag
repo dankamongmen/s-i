@@ -51,13 +51,28 @@ $flag"
 done
 close_dialog
 
+# Some flags make no sense in combination with lvm
+cleanflags=''
+for $flag in $flags; do
+	if [ "$flag" = raid ]; then
+		continue
+	elif [ "$flag" = swap ]; then
+		continue
+	elif [ -n "$cleanflags" ]; then
+		cleanflags="$cleanflags
+$flag"
+	else
+		cleanflags="$flag"
+	fi
+done
+
 if [ "$method" = '' ] && [ "$has_lvm" = yes ]; then
 	echo lvm >$dev/$id/method
 	rm -f $dev/$id/use_filesystem
 	rm -f $dev/$id/format
 elif [ "$method" = lvm ] && [ "$has_lvm" = no ]; then
 	open_dialog SET_FLAGS $id
-	write_line "$flags"
+	write_line "$cleanflags"
 	write_line lvm
 	write_line NO_MORE
 	close_dialog

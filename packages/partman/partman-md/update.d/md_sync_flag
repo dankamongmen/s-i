@@ -41,13 +41,28 @@ $flag"
 done
 close_dialog
 
-if [ "$method" = '' -a "$has_raid" = yes ]; then
+# Some flags make no sense in combination with raid
+cleanflags=''
+for $flag in $flags; do
+	if [ "$flag" = lvm ]; then
+		continue
+	elif [ "$flag" = swap ]; then
+		continue
+	elif [ -n "$cleanflags" ]; then
+		cleanflags="$cleanflags
+$flag"
+	else
+		cleanflags="$flag"
+	fi
+done
+
+if [ "$method" = '' ] && [ "$has_raid" = yes ]; then
     echo raid >$dev/$id/method
     rm -f $dev/$id/use_filesystem
     rm -f $dev/$id/format
 elif [ "$method" = raid -a "$has_raid" = no ]; then
     open_dialog SET_FLAGS $id
-    write_line "$flags"
+    write_line "$cleanflags"
     write_line raid
     write_line NO_MORE
     close_dialog
@@ -57,4 +72,3 @@ elif [ "$method" != raid -a "$has_raid" = yes ]; then
     write_line NO_MORE
     close_dialog
 fi
-
