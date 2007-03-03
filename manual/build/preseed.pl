@@ -131,6 +131,10 @@ sub text_rtn {
 			$text =~ s/^[[:space:]]*//;
 		}
 
+		# Replace entities in examples
+		# FIXME: should maybe be extracted from entity definition
+		$text =~ s/&archive-mirror;/http.us.debian.org/;
+
 		print "$text";
 
 		$example{'first'} = 0;
