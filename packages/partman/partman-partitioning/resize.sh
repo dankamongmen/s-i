@@ -5,33 +5,6 @@ check_virtual () {
     close_dialog
 }
 
-has_vista () {
-	local has_vista tdir
-	has_vista=0
-	tdir=/tmp/ntfs
-	# Check if partition has Windows Vista; assume yes on failures
-	ANNA_QUIET=1 DEBIAN_FRONTEND=none \
-		log-output -t os-prober \
-		anna-install "ntfs-modules" || true
-	depmod -a || true
-
-	mkdir -p $tdir
-	if mount $bdev $tdir -t ntfs -o ro 2>/dev/null; then
-		if [ -e "$tdir/bootmgr" ] && [ -e "$tdir/Boot/BCD" ]; then
-			logger -t partman "Partition $(mapdevfs $bdev) contains Windows Vista"
-		else
-			logger -t partman "Partition $(mapdevfs $bdev) does not contain Windows Vista"
-			has_vista=1
-		fi
-		umount $tdir || true
-	else
-		logger -t partman "Unable to mount $(mapdevfs $bdev); assuming it contains Windows Vista"
-	fi
-
-	rmdir $tdir || true
-	return $has_vista
-}
-
 do_ntfsresize () {
 	local RET
 	ntfsresize="$(ntfsresize $@ 2>&1)"
@@ -69,13 +42,6 @@ get_ntfs_resize_range () {
 	    if ! do_ntfsresize -f -i $bdev; then
 		logger -t partman "Error running 'ntfsresize --info'"
 		return 1
-	    fi
-	    if echo "$ntfsresize" | grep -q "NTFS volume version: 3.1"; then
-		if has_vista; then
-		    logger -t partman "Resizing of Vista NTFS partitions is not supported"
-		    logger -t partman "See http://bugs.debian.org/379835 for details"
-		    return 1
-		fi
 	    fi
 	    size=$(echo "$ntfsresize" \
 		| grep '^You might resize at' \
@@ -185,6 +151,8 @@ perform_resizing () {
 	    open_dialog PARTITION_INFO $newid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
+	    # Allow the system to settle as otherwise the next command may fail
+	    sleep 1
 	    if ! echo y | do_ntfsresize -f $path; then
 		logger -t partman "Error resizing the NTFS file system to the partition size"
 		db_input high partman-partitioning/new_size_commit_failed || true
@@ -201,6 +169,8 @@ perform_resizing () {
 		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 		read_line newid
 		close_dialog
+		# Allow the system to settle as otherwise the next command may fail
+		sleep 1
 		if ! echo y | do_ntfsresize -f $path; then
 		    logger -t partman "Error resizing the NTFS file system to the partition size"
 		    db_input high partman-partitioning/new_size_commit_failed || true
