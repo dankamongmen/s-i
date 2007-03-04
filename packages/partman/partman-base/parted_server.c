@@ -714,8 +714,58 @@ resize_partition(PedDisk *disk, PedPartition *part,
                 }
                 if (NULL == fs && NULL != ped_file_system_probe(&(part->geom)))
                         return false;
+                if (NULL != fs)
+                        constraint = ped_file_system_get_resize_constraint(fs);
+                else
+                        constraint = ped_constraint_any(disk->dev);
         } else {
+                PedFileSystemType *fs_type;
+                PedGeometry *fs_geom;
+                PedAlignment start_align;
+                PedGeometry full_dev;
                 fs = NULL;
+                fs_type = ped_file_system_probe(&(part->geom));
+                log("probed file system: %s", NULL != fs_type ? "yes" : "no");
+                if (NULL != fs_type)
+                        fs_geom = ped_file_system_probe_specific(fs_type,
+                                                                 &part->geom);
+                else
+                        fs_geom = NULL;
+                if (NULL != fs_geom && (fs_geom->start < (part->geom).start
+                                        || fs_geom->end > (part->geom).end)) {
+                        log("broken filesystem detected");
+                        ped_geometry_destroy(fs_geom);
+                        fs_geom = NULL;
+                }
+                if (NULL == fs_geom && NULL != fs_type)
+                        return false;
+                if (NULL != fs_geom) {
+                        /* We cannot resize or move the fs but we can
+                         * move the end of the partition so long as it
+                         * contains the whole fs.
+                         */
+                        if (ped_alignment_init(&start_align, fs_geom->start, 0)
+                            && ped_geometry_init(&full_dev, disk->dev,
+                                                 0, disk->dev->length - 1)) {
+                                constraint = ped_constraint_new(
+                                        &start_align,
+                                        ped_alignment_any,
+                                        &full_dev, &full_dev,
+                                        fs_geom->length,
+                                        disk->dev->length);
+                        } else {
+                                constraint = NULL;
+                        }
+                        ped_geometry_destroy(fs_geom);
+                } else {
+                        constraint = ped_constraint_any(disk->dev);
+                }
+        }
+        if (NULL == constraint) {
+                log("failed to get resize constraint");
+                if (NULL != fs)
+                        ped_file_system_close(fs);
+                return false;
         }
         log("try to check the file system for errors");
         if (NULL != fs && !timered_file_system_check(fs)) {
@@ -727,10 +777,6 @@ resize_partition(PedDisk *disk, PedPartition *part,
         log("successfully checked");
         if (part->type & PED_PARTITION_LOGICAL)
                 maximize_extended_partition(disk);
-        if (NULL != fs)
-                constraint = ped_file_system_get_resize_constraint(fs);
-        else
-                constraint = ped_constraint_any(disk->dev);
         if (!ped_disk_set_partition_geom(disk, part, constraint, start, end))
                 result = false;
         else if (NULL == fs)
