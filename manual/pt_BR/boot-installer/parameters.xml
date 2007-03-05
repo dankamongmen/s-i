@@ -1,8 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44002 -->
+<!-- original version: 45239 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.19 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.12.01 -->
 <!-- updated 42982:44002 by Felipe Augusto van de Wiel (faw) 2007.01.21 -->
+<!-- updated 44002:45239 by Herbert Parentes Fortes Neto (hpfn) 2007.02.22 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2007.03.04 -->
 
  <sect1 id="boot-parms"><title>Parâmetros de Inicialização</title>
 <para>
@@ -334,7 +336,21 @@ carregado para realizar a configuração automática. Veja
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enable (auto)</term>
+<term>preseed/interactive</term>
+<listitem><para>
+
+Definir para <userinput>true</userinput> para exibir perguntas mesmo se elas
+tiverem sido pré-configuradas. Pode ser útil para testar ou depurar um
+arquivo de pré-configuração. Note que isso não terá efeito nos parâmetros
+que são passados como parâmetros de inicialização, mas para aqueles em que
+uma sintaxe especial possa ser usada. Veja <xref linkend="preseed-seenflag"/>
+para detalhes.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>auto-install/enable (auto)</term> 
 <listitem><para>
 
 Atrasar perguntas que normalmente são feitas antes da pré-configuração é
@@ -362,6 +378,18 @@ automaticamente mídia.
 Defina esta opção para <userinput>false</userinput> para impedir que a mídia seja
 ejetada automaticamente, e tenha cuidado para que seu sistema não inicialize
 automaticamente através da unidade óptica após a instalação inicial.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>debian-installer/allow_unauthenticated</term>
+<listitem><para>
+
+Por padrão o instalador requer que os repositórios sejam autenticados
+usando uma chave gpg conhecida. Defina para <userinput>true</userinput> para
+desabilitar essa autenticação.
+<emphasis role="bold">Aviso: inseguro, não recomendado.</emphasis>
 
 </para></listitem>
 </varlistentry>
@@ -446,8 +474,8 @@ Pode ser usado para automaticamente carregar componentes do instalador que
 não são carregados por padrão.
 Exemplos de componentes opcionais que podem ser úteis são
 <classname>openssh-client-udeb</classname> (para que você possa usar
-<command>scp</command> durante a instalação) e
-<classname>ppp-udeb</classname> (que suporta configuração PPPoE).
+<command>scp</command> durante a instalação)<phrase arch="not-s390"> e
+<classname>ppp-udeb</classname> (veja <xref linkend="pppoe"/>)</phrase>.
 
 </para></listitem>
 </varlistentry>
