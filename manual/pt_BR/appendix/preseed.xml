@@ -1,8 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44376 -->
+<!-- original version: 45190 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.30 -->
 <!-- updated 42982:43841 by Felipe Augusto van de Wiel (faw) 2007.01.19 -->
+<!-- updated 44376:45190 by Herbert Parentes Fortes Neto (hpfn) 2007.02.23 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2007.03.06 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -396,7 +398,7 @@ auto url=autoserver
 Isso depende da existência de um servidor DHCP que irá levar a máquina ao
 ponto onde <literal>autoserver</literal> possa ser resolvido pelo DNS,
 talvez após adicionar o domínio local se isso for fornecido pelo DHCP. Se
-isso for feito em um local onde o domíno é <literal>example.com</literal>,
+isso for feito em um local onde o domínio é <literal>example.com</literal>,
 e eles tiverem um DCHP com uma configuração razoavelmente sã, isso resultaria
 em um arquivo de pré-configuração sendo pego de
 <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
@@ -477,7 +479,7 @@ Claro que é possível estender este conceito, e se você o fizer, é razoável
 usar o <quote>auto-install namespace</quote> para isso. Então, alguém poderá
 ter algo como <literal>auto-install/style</literal> o qual é então usado em
 seus scripts. Se você achar necessário fazer isso, por favor mencione isso
-(em inglês) na lista de email <email>debian-boot@lists.debian.org</email>
+(em inglês) na lista de e-mail <email>debian-boot@lists.debian.org</email>
 para que nós possamos evitar conflitos de nomes, e talvez adicionar um
 apelido para o parâmetro para você.
 
@@ -503,6 +505,15 @@ a primeira interface de rede viável e seja mais paciente sobre ter uma
 resposta para sua pesquisa DHCP.
 
 </para>
+<tip><para>
+
+Um exemplo extenso de como usar este <quote>framework</quote>, incluindo
+exemplos de scripts e classes, pode ser encontrado no
+<ulink url="http://hands.com/d-i/">site web do desenvolvedor</ulink>. Os
+exemplos disponíveis lá também mostram muitos outros efeitos legais que
+podem ser alcançados através do uso criativo da pré-configuração.
+
+</para></tip>
   </sect2>
 
   <sect2 id="preseed-aliases">
@@ -851,8 +862,10 @@ Por padrão o valor para <classname>mirror/udeb/suite</classname> é o mesmo que
 </para>
 
 <informalexample role="example"><screen>
+# If you select ftp, the mirror/country string does not need to be set.
+#d-i mirror/protocol string ftp
 d-i mirror/country string enter information manually
-d-i mirror/http/hostname string http.us.debian.org
+d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
 
@@ -1061,6 +1074,8 @@ repositórios (locais).
 # You can choose to install non-free and contrib software.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Uncomment this if you don't want to use a network mirror.
+#d-i apt-setup/use_mirror boolean false
 # Uncomment this to avoid adding security sources, or
 # add a hostname to use a different server than security.debian.org.
 #d-i apt-setup/security_host string
@@ -1071,10 +1086,15 @@ repositórios (locais).
 #d-i apt-setup/local0/comment string local server
 # Enable deb-src lines
 #d-i apt-setup/local0/source boolean true
-+# URL to the public key of the local repository; you must provide a key or
-+# apt will complain about the unauthenticated repository and so the
-+# sources.list line will be left commented out
+# URL to the public key of the local repository; you must provide a key or
+# apt will complain about the unauthenticated repository and so the
+# sources.list line will be left commented out
 #d-i apt-setup/local0/key string http://local.server/key
+
+# By default the installer requires that repositories be authenticated
+# using a known gpg key. This setting can be used to disable that
+# authentication. Warning: Insecure, not recommended.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1277,25 +1297,6 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
-  <sect2 id="preseed-mailer">
-  <title>Configuração de correio eletrônico</title>
-<para>
-
-Durante uma instalação normal, o exim faz algumas perguntas. Aqui está como
-evitá-las. Pré-configurações mais complicadas são possíveis.
-
-</para>
-
-<informalexample role="example"><screen>
-exim4-config exim4/dc_eximconfig_configtype \
-       select no configuration at this time
-exim4-config exim4/no_config boolean true
-exim4-config exim4/no_config boolean true
-exim4-config exim4/dc_postmaster string
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-X">
   <title>Configuração do X</title>
 <para>
@@ -1390,20 +1391,35 @@ questão, mas ainda ter a pergunta sendo feita. Para fazer isso a
 <quote>flag</quote> <firstterm>seen</firstterm> deve ser alterada para
 <quote>false</quote> após definir um valor para a questão.
 
-</para>
-
 <informalexample><screen>
 d-i foo/bar string value
 d-i foo/bar seen false
 </screen></informalexample>
 
+O mesmo efeito pode ser alcançado para <emphasis>todas</emphasis> as
+perguntas definindo o parâmetro
+<classname>preseed/interactive=true</classname> pela linha de comando
+na inicialização. Isso também pode ser útil para testar ou depurar seu
+arquivo de pré-configuração.
+
+Se você está fazendo a pré-configuração pelos parâmetros na inicialização,
+você pode fazer com que o instalador faça a pergunta correspondente usando o
+operador <quote>?=</quote>, i.e. <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+
+Isso, claro, irá apenas ter efeito para parâmetros que correspondem às
+perguntas que são realmente exibidas durante uma instalação e não para
+parâmetros <quote>internos</quote>.
+
+</para><para>
+
+</para>
   </sect2>
 
   <sect2 id="preseed-chainload">
   <title>Carregando arquivos de pré-configuração em cadeia</title>
 <para>
 
-É possível incluir outros arquivos de pré-configuração a partir de um arquivo
+ É possível incluir outros arquivos de pré-configuração a partir de um arquivo
 de pré-configuração. Quaisquer configurações nesses arquivos irão sobrescrever
 configurações pré-existentes nos arquivos lidos anteriormente. Isto torna
 possível colocar, por exemplo, configurações gerais de rede para o seu local
