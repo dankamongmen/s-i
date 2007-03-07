@@ -9,16 +9,14 @@ log() {
 }
 
 partsdir="/usr/lib/finish-install.d"
-oldpartsdir="/usr/lib/prebaseconfig.d"
-scriptcount=`ls "$partsdir"/* "$oldpartsdir"/* | wc -l`
+scriptcount=`ls "$partsdir"/* | wc -l`
 
 db_progress START 0 $scriptcount finish-install/progress/title
 
-for script in $(ls "$partsdir"/* "$oldpartsdir"/* | sort -n -k5 -t/)
+for script in $(ls "$partsdir"/* | sort -n -k5 -t/)
 do
 	base=$(basename $script | sed 's/[0-9]*//')
-	if ! db_progress INFO finish-install/progress/$base &&
-	   ! db_progress INFO prebaseconfig/progress/$base; then
+	if ! db_progress INFO finish-install/progress/$base; then
 		db_subst finish-install/progress/fallback SCRIPT "$base"
 		db_progress INFO finish-install/progress/fallback
 	fi
