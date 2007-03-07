@@ -9,12 +9,11 @@ log() {
 }
 
 partsdir="/usr/lib/finish-install.d"
-scriptcount=`ls "$partsdir"/* | wc -l`
+scriptcount=$(ls "$partsdir"/* | wc -l)
 
 db_progress START 0 $scriptcount finish-install/progress/title
 
-for script in $(ls "$partsdir"/* | sort -n -k5 -t/)
-do
+for script in "$partsdir"/*; do
 	base=$(basename $script | sed 's/[0-9]*//')
 	if ! db_progress INFO finish-install/progress/$base; then
 		db_subst finish-install/progress/fallback SCRIPT "$base"
