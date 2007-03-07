@@ -151,8 +151,8 @@ perform_resizing () {
 	    open_dialog PARTITION_INFO $newid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
-	    # Allow the system to settle as otherwise the next command may fail
-	    sleep 1
+	    # Wait for the device file to be created again
+	    update-dev
 	    if ! echo y | do_ntfsresize -f $path; then
 		logger -t partman "Error resizing the NTFS file system to the partition size"
 		db_input high partman-partitioning/new_size_commit_failed || true
@@ -169,8 +169,8 @@ perform_resizing () {
 		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 		read_line newid
 		close_dialog
-		# Allow the system to settle as otherwise the next command may fail
-		sleep 1
+		# Wait for the device file to be created created
+		update-dev
 		if ! echo y | do_ntfsresize -f $path; then
 		    logger -t partman "Error resizing the NTFS file system to the partition size"
 		    db_input high partman-partitioning/new_size_commit_failed || true
