@@ -9,6 +9,8 @@ pagefile=$destination/index.html
 [ -f "$ROOT/bin/langlist" ] || exit 1
 [ -f "$ROOT/bin/archlist" ] || exit 1
 
+URL_ETTIN="http://ettin.org/pub/debian/dimstats"
+
 build_link_table () {
     # Count languages
     num_lang=0
@@ -71,12 +73,12 @@ cat $ROOT/bin/index.changes >>$pagefile
 
 # First, we build the table for the languages that have all architectures built
 
-# Order of languages is alphabetic on name, but keep English first.
+# Order of languages is alphabetic by name, but keep English first.
 languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | \
 	    sed "s/English/0English/" | sort -k 7,7 | \
 	    cut -f 1,2 | egrep "Y$" | cut -f 1)
 
-# Order of architectures is alphabetic on name.
+# Order of architectures is alphabetic by name.
 architectures=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/archlist | \
 		sort -k 2,2 | cut -f 1)
 
@@ -86,11 +88,11 @@ cat $ROOT/bin/index.single >>$pagefile
 
 # Next, we build the table for the languages that have only i386 built
 
-# Order of languages is alphabetic on name.
+# Order of languages is alphabetic by name.
 languages=$(egrep -v "^[[:space:]]*(|#.*)$" $ROOT/bin/langlist | sort -k 7,7 |
 	    cut -f 1,2 | egrep "S$" | cut -f 1)
 
-# Order of architectures is alphabetic on name.
+# Order of architectures is alphabetic by name.
 architectures="i386"
 
 build_link_table
@@ -115,7 +117,7 @@ if [ -f $logdir/tr-stats ] ; then
         if [ -d "$source/$lang/.svn" ] ; then
             langname=$(egrep "^$lang[[:space:]]" $ROOT/bin/langlist | cut -f 7)
             echo "  <tr>" >>$pagefile
-            echo "    <td class=\"col1\">$langname</td>" >>$pagefile
+            echo "    <td class=\"col1\"><a href="$URL_ETTIN/index.$lang.html" target="_blank">$langname</a></td>" >>$pagefile
 
             for col in 2 4 6 9 8 ; do
                 value=$(egrep "^$lang[[:space:]]" $logdir/tr-stats | cut -f $col)
