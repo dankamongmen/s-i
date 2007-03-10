@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 45405 -->
 <!-- traducido por ikks, mar 2007 -->
+<!-- revisado por jfs, mar 2007 -->
 
  <sect1 id="pppoe" arch="not-s390">
  <title>Instalación de &debian; a través de PPP sobre Ethernet (PPPoE)</title>
@@ -9,27 +10,28 @@
 
 El protocolo PPP sobre Ethernet (PPPoE) para banda ancha (ADSL o cable)
 es muy común en algunos países cuando se establecen conexiones con un
-Proveedor de Servicio de Internet. La configuración de la red a través
-de PPPoE en el instalador no está habilitada por omisión, pero puede 
-hacerse funcionar de manera muy sencilla.  Esta sección explica cómo.
+proveedor de servicio de internet. Si bien la configuración de la red a través
+de PPPoE no se puede hacer en el instalador, puede 
+hacerse funcionar de manera muy sencilla. Esta sección explica cómo.
 
 </para><para>
 
-La configuración de la conexión PPPoE que se hace durante la instalación
-estará disponible al reiniciar en el sistema instalado (ver 
+La configuración de la conexión PPPoE que se realice durante la instalación
+también estará disponible al reiniciar en el sistema instalado (consulte
 <ref linkend="boot-new"/>).
 
 </para><para>
 
-Para poder contar con la opción de configurar y usar PPPoE durante la
-instalación, necesitará instalar con una imagen de CD-ROM/DVD.  No
-está habilitada en otros métodos de instalación (p.e. en arranque por
+Necesitará instalar con una imagen de CD-ROM/DVD para poder contar con la
+opción de configurar y usar PPPoE durante la instalación. No
+está habilitada en otros métodos de instalación (p.ej. en el arranque por
 red<phrase condition="supports-floppy-boot"> o diskettes</phrase>).
 
 </para><para>
 
-Instalar a través de PPPoE es casi lo mismo que en cualquier otra 
-instalación. Los pasos a continuación explican las diferencias.
+La instalación a través de PPPoE es casi idéntica que cualquier otra 
+instalación. Las diferencias se explican en los pasos descritos a
+continuación.
 
 </para>
 
@@ -37,34 +39,35 @@ instalación. Los pasos a continuación explican las diferencias.
 <listitem><para>
 
 Arranque el instalador con <userinput>modules=ppp-udeb</userinput> como
-parámetro de arranque.  Esto significa que en el indicador de sistema 
+parámetro de arranque. Esto significa que en el indicador del sistema 
 del arranque usted debería teclear:
 
 <informalexample><screen>
 install modules=ppp-udeb
 </screen></informalexample>
 
-o, si prefiere, con el instalador gráfico:
+o, si prefiere utilizar el instalador gráfico:
 
 <informalexample><screen>
 installgui modules=ppp-udeb
 </screen></informalexample>
 
-Que garantizará que el componente responsable de la configuración de PPPoE
-(<classname>ppp-udeb</classname>) se cargará y se ejecutará automáticamente.
+Esta opción hará que se cargue y se ejecute automáticamente
+componente responsable de la configuración de PPPoE
+(<classname>ppp-udeb</classname>).
 
 </para></listitem>
 <listitem><para>
 
-Siga los pasos iniciales usuales de instalación (selección de 
-idioma, país y mapa de teclado; la carga de componentes adicionales
+Siga los pasos iniciales usuales de instalación: selección de 
+idioma, país y mapa de teclado, carga de componentes adicionales
 del instalador<footnote>
 
 <para>
 
-El componente <classname>ppp-udeb</classname> se carga como uno de los
-componentes adicionales en este paso. Si quiere instalar con prioridad
-media o baja (modo experto), también puede seleccionar manualmente a
+En este paso se carga el componente <classname>ppp-udeb</classname> como 
+uno de los componentes adicionales. Si quiere instalar utilizando la prioridad
+media o baja (modo experto), puede seleccionar manualmente el componente
 <classname>ppp-udeb</classname> en lugar de indicar explícitamente
 el parámetro <quote>modules</quote> en el indicador de sistema del
 arranque.
@@ -76,7 +79,7 @@ arranque.
 </para></listitem>
 <listitem><para>
 
-El siguiente paso es la detección de hardware de red, para identificar
+El siguiente paso es la detección de hardware de red, que permite identificar
 cualquier tarjeta Ethernet presente en su sistema.
 
 </para></listitem>
@@ -89,11 +92,12 @@ conexiones PPPoE).
 
 </para><para>
 
+<!-- jfs: Esta opción No aparece en el PO del instalador ? -->
 Es probable que el concentrador no se encuentre en el primer intento.
 Puede suceder usualmente en redes lentas o sobrecargadas o con servidores
-poco fiables.  La mayoría de veces un segundo intento de detección de
-un concentrador será exitoso; para volver a intentar, en el menú
-principal del instalador seleccione <guimenuitem>Configurar e iniciar 
+poco fiables. La mayoría de veces tendrá éxito un segundo intento de detección de
+un concentrador. Para volver a intentar, seleccione en el menú
+principal del instalador <guimenuitem>Configurar e iniciar 
 una conexión PPPoE</guimenuitem>.
 
 </para></listitem>
@@ -105,14 +109,14 @@ teclear su información de autenticación (el usuario y la clave de PPPoE).
 </para></listitem>
 <listitem><para>
 
-En este punto el instalador usará la información proveída para establecer
-una conexión PPPoE.  Si se diligenció información correcta, la conexión
-PPPoE debería configurarse y el instalador debería ser capaz de usarla
-para conectarse a Internet y descargar paquetes a través de esta (en caso
-de ser necesario).  Si la información de autenticación no es correcta o 
-aparece algún error, el instalado se detendrá, pero se podrá intentar de
-nuevo la configuración al seleccionar la opción <guimenuitem>Configurar e 
-iniciar una conexión PPPoE</guimenuitem> del menú.
+En este punto el instalador usará la información proporcionada para establecer
+una conexión PPPoE. Si se proporcionó la información correcta, debería
+configurarse la conexión PPPoE y el instalador debería ser capaz de usarla
+para conectarse a Internet y descargar los paquetes a través de esta (en caso
+de que fuera necesario). El instalador se detendrá si la información de
+autenticación no es correcta o si se produce cualquier error,
+pero se podrá intentar de nuevo la configuración seleccionando la opción
+<guimenuitem>Configurar e iniciar una conexión PPPoE</guimenuitem> del menú.
 
 </para></listitem>
 </itemizedlist>
