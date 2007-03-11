@@ -1,0 +1,12 @@
+#!/bin/sh
+# Runs qemu, booting from CD.
+set -e
+
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec qemu -cdrom "$ISO" \
+	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
+	-nographic \
+	-boot d -no-reboot \
+	$QEMU_EXTRA_PARAMS \
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 
