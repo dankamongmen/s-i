@@ -2,11 +2,11 @@
 # Runs qemu, booting from disk.
 set -e
 
-# Store the pid so stopqemu can stop it later.
-echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
-exec qemu -daemonize -cdrom "$ISO" \
+rm -f $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+qemu -daemonize -pidfile $STATE_DIR/qemu-$MACHINE-$SCHEME.pid \
+	--cdrom "$ISO" \
 	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
 	-nographic \
 	-boot c -no-reboot \
 	$QEMU_EXTRA_PARAMS \
-	-serial tcp:localhost:$QEMU_SERIAL_PORT,server
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server &
