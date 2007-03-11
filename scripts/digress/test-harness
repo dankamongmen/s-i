@@ -114,6 +114,11 @@ export PATH
 
 . $DI_TESTDIR/config
 
+if [ -z "$STATE_DIR" ]; then
+	error CONF "STATE_DIR not set"
+fi
+mkdir -p "$STATE_DIR"
+
 if [ -z "$SCHEME" ]; then
 	if [ -z "$MACHINE" ]; then
 		echo "Machines:"
@@ -147,11 +152,6 @@ use common
 use $SCHEME
 
 trap sigout INT QUIT
-
-if [ -z "$STATE_DIR" ]; then
-	error CONF "STATE_DIR not set"
-fi
-mkdir -p "$STATE_DIR"
 
 lockfile="$STATE_DIR/$MACHINE-test"
 lock
