@@ -84,6 +84,9 @@ use () {
 }
 
 lock () {
+	if [ ! -e "$(which lockfile-create)" ]; then
+		error lockfile-create not found
+	fi
 	while ! lockfile-create --retry 1 "$lockfile"; do
 		echo "$MACHINE is in use:"
 		ls -l $lockfile.lock || true
@@ -121,8 +124,15 @@ mkdir -p "$STATE_DIR"
 
 if [ -z "$SCHEME" ]; then
 	if [ -z "$MACHINE" ]; then
-		echo "Machines:"
-		ls $DI_TESTDIR/schemes/$MACHINE
+		printf "Machines:"
+		for machine in $(ls $DI_TESTDIR/schemes/$MACHINE); do
+			SERVER=""
+			use $machine/common
+			if [ -z "$SERVER" ] || 
+			   ( [ -n "$SERVER" ] && [ "$SERVER" = "$(hostname -f)"] ); then
+				printf "$machine "
+			fi
+		done
 	else
 		echo "Available schemes for $MACHINE:"
 		for s in $DI_TESTDIR/schemes/$MACHINE/*; do
