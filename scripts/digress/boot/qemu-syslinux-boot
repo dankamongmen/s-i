@@ -15,6 +15,8 @@ my %keys = (
 $keys{$_}=$_ foreach ('a'..'z', 0..9);
 $keys{$_}="shift-".lc($_) foreach ('A'..'Z');
 
+print "boot: $ENV{BOOTCOMMAND}\n";
+
 # Run in the background, because qemu won't begin accepting console input
 # until the connection is made to its serial port, by console-qemu.
 open STDIN, '/dev/null';
@@ -29,7 +31,6 @@ my $exp = new Expect;
 $exp->raw_pty(1);
 $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
-print STDERR "boot: $ENV{BOOTCOMMAND}\n";
 $exp->expect(60, "(qemu)");
 foreach my $letter (split('', $ENV{BOOTCOMMAND}), "\n") {
 	select(undef, undef, undef, 0.25);
@@ -39,6 +40,5 @@ foreach my $letter (split('', $ENV{BOOTCOMMAND}), "\n") {
 	$exp->send("sendkey $keys{$letter}\n");
 	$exp->expect(60, "(qemu)");
 }
-print STDERR "boot command sent\n";
 
 $exp->expect(undef, "EOF");
