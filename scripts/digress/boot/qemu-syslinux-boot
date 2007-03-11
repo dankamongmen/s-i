@@ -32,8 +32,9 @@ $exp->raw_pty(1);
 $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
 $exp->expect(60, "(qemu)");
+sleep 1;
 foreach my $letter (split('', $ENV{BOOTCOMMAND}), "\n") {
-	select(undef, undef, undef, 0.25);
+	select(undef, undef, undef, 0.33);
 	if (! exists $keys{$letter}) {
 		die "Don't know how to send letter \"$letter\" from BOOTCOMMAND to qemu console";
 	}

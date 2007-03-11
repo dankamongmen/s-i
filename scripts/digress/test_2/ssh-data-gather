@@ -6,7 +6,16 @@ use Expect;
 
 my $timeout=600;
 
-my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $ENV{USER}\@$ENV{MACHINE}");
+my $machine=$ENV{MACHINE};
+if (exists $CONFIG{SSHHOST}) {
+	$machine=$ENV{SSHHOME};
+}
+my $port=22;
+if (exists $CONFIG{SSHPORT}) {
+	$port=$CONFIG{SSHPORT};
+}
+
+my $exp = Expect->spawn("ssh -t -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p $port $ENV{USER}\@$machine");
 #$exp->debug(2);
 #$exp->exp_internal(1);
 $exp->expect($timeout, "assword:");
