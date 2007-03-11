@@ -40,7 +40,7 @@ console_question("Hostname:", $ENV{MACHINE});
 console_question("Domain name:");
 console_question("Remote installation password:", $ENV{ROOT_PASSWORD}); # root will do
 console_question("Re-enter password to verify:", $ENV{ROOT_PASSWORD});
-$exp->expect($ENV{STAGE_1_MAX_TIME}, "To continue the installation, please use an SSH client to log in");
+$exp->expect($ENV{STAGE_1_MAX_TIME}, "To continue the installation, please use an SSH client");
 
 # Now use ssh to log in to d-i and finish the installation.
 my $ssh_exp = Expect->spawn("ssh -t -v -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
