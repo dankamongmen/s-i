@@ -172,7 +172,7 @@ static enum state_wanted get_channel_input (void)
 
 	while (1)
 	{
-		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose", &ptr);
+		ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose", &ptr);
 		if (ret == 30)
 			return WANT_BACKUP;
 
@@ -184,7 +184,7 @@ static enum state_wanted get_channel_input (void)
 				return WANT_NEXT;
 		}
 
-		ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_invalid", &ptr);
+		ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_invalid", &ptr);
 		if (ret == 30)
 			return WANT_BACKUP;
 	}
@@ -213,7 +213,7 @@ static enum state_wanted get_channel_select (void)
 	di_tree_foreach (channels, get_channel_select_append, buf);
 
 	debconf_subst (client, TEMPLATE_PREFIX "choose_select", "choices", buf);
-	ret = my_debconf_input ("high", TEMPLATE_PREFIX "choose_select", &ptr);
+	ret = my_debconf_input ("critical", TEMPLATE_PREFIX "choose_select", &ptr);
 
 	if (ret == 30)
 		return WANT_BACKUP;
@@ -286,7 +286,7 @@ static enum state_wanted format (void)
 
 	debconf_subst (client, TEMPLATE_PREFIX "format", "device", channel_current->name);
 	debconf_set (client, TEMPLATE_PREFIX "format", "false");
-	ret = my_debconf_input ("high", TEMPLATE_PREFIX "format", &ptr);
+	ret = my_debconf_input ("critical", TEMPLATE_PREFIX "format", &ptr);
 
 	if (ret == 10)
 		return WANT_BACKUP;
