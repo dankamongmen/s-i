@@ -3,6 +3,7 @@
 use Expect;
 
 my $down="OB";
+my $up="OA";
 my $left="OD";
 
 # Allow running from cron.
@@ -32,7 +33,6 @@ console_question("Network device type:", 1);
 console_question("CTC read device:", 1);
 console_question("CTC write device:", 2);
 console_question("Protocol for this connection:", 1);
-#console_question("Primary network interface:", 2); # ctc0
 console_question("IP address:", $ENV{S390_IP});
 console_question("Point-to-point address:", $ENV{S390_PTP_IP});
 console_question("Name server addresses:", $ENV{S390_NAMESERVER_IP});
@@ -65,32 +65,37 @@ sub ssh_question {
 ssh_question("password:", $ENV{ROOT_PASSWORD});
 ssh_question("Network console option:");
 
-# Format first (only) dasd.
-ssh_question("Available disks:");
-ssh_question("(configured)", $down);
+# Complete the install.
+my $partition_setup=0;
+$ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
+	[ "-re", "step.*failed" => sub { exit 1 } ],
+	[ "English" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
 
-# Partition first dasd.
-ssh_question("Disk to partition:");
-# In fdasd..
-ssh_question("Command (m for help):", "n");
-ssh_question("First track", 2);
-ssh_question("Last track", "+500M");
-ssh_question("Command (m for help):", "w");
-# And stop.
-ssh_question("Disk to partition:", $down);
+	# driving s390-dasd, not preseedable :-(
+	[ "Format the disk" => sub { sleep 2; $ssh_exp->send($left."\r"); exp_continue; } ],
+	[ "(configured)" => sub { sleep 2; $ssh_exp->send($down."\r"); exp_continue; } ],
 
-# Partition configuration.
-ssh_question("Select a partition");
-ssh_question("Action on"); # make default filesystem type
-ssh_question("Mount point for");
-ssh_question("Select a partition", $down);
-ssh_question("Ready to create file systems and mount partitions?", $left);
+	# partman-auto doesn't support dasds, drive partman by hand :-(
+	[ "Help on partitioning" => sub {
+		sleep 2; 
+		if (! $partition_setup) {
+			$partition_setup=1;
+			$ssh_exp->send($up.$up.$up."\r");
+		}
+		else {
+			$ssh_exp->send($down.$down.$down."\r");
+		}
+		exp_continue; } ],
+	[ "Partition settings" => sub { sleep 2; $ssh_exp->send($down.$down.$down.$down.$down.$down."\r"); exp_continue; } ],
 
-# Wait for the base system install.
-ssh_question("Installation is complete");
-ssh_question("To finish the installation");
-
-$ssh_exp->expect($ENV{STAGE_1_MAX_TIME}. 'eof');
+	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
+	[ "-re", "Choose the next step" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
+	[ "-re", "rebooting.*the.*system." => sub { } ],
+	[ "-re", "down.*NOW" => sub { } ],
+	[ "-re", "Sending.*SIGTERM" => sub { } ],
+	[ 'eof' => sub {} ],
+) || die "failed";
 
 # Wait for it to finish.
 $exp->expect($ENV{STAGE_1_MAX_TIME}, "System halted.") or die "timeout waiting for halt";
