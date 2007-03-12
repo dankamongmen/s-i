@@ -10,6 +10,11 @@ my %keys = (
 	"=" => "equal",
 	"-" => "minus",
 	" " => "spc",
+	"/" => "kp_divide",
+	"." => "kp_decimal",
+	"-" => "kp_subtract",
+	"+" => "kp_add",
+	"*" => "kp_multiply",
 	"\n" => "ret",
 );
 $keys{$_}=$_ foreach ('a'..'z', 0..9);
@@ -34,6 +39,8 @@ $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
 $exp->expect(60, "(qemu)");
 sleep 1;
+$exp->send("sendkey num_lock\n"); # needed for the kp_ keys
+$exp->expect(60, "(qemu)");
 foreach my $letter (split('', $ENV{BOOTCOMMAND}), "\n") {
 	select(undef, undef, undef, 0.33);
 	if (! exists $keys{$letter}) {
