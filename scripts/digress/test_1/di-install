@@ -1,36 +1,26 @@
-#!/usr/bin/expect
+#!/usr/bin/perl
 # Expect script to run for partially interactive first stage installs using the
 # dialog frontend. At least partitioning must be preseeded.
 
-spawn -noecho $env(CONSOLECOMMAND)
+use Expect;
 
-set timeout $env(STAGE_1_MAX_TIME)
-
-expect {
-	-re "step.*failed" {
-		exit 1
-	} "English" {
-		sleep 2
-		send "\r"
-		exp_continue -continue_timer
-	} -re "<Go.*Back>" {
-		sleep 2
-		send "\r"
-		exp_continue -continue_timer
-	} -re "<Continue>" {
-		sleep 2
-		send "\r"
-		exp_continue -continue_timer
-	} -re "rebooting.*the.*system." {
-		exit
-	} -re "down.*NOW" {
-		exit
-	} -re "Sending.*SIGTERM" {
-		exit
-	} timeout {
-		puts "timeout!"
-		exit 1
-	}
+# Allow running from cron.
+if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
+        $ENV{TERM}="vt100";
 }
 
-exit
+my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
+
+#$exp->debug(2);
+#$exp->exp_internal(1);
+$exp->expect($ENV{STAGE_1_MAX_TIME},
+	[ "-re", "step.*failed" => sub { exit 1 } ],
+	[ "English" => sub { sleep 2; $exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r"); exp_continue_timeout } ],
+	[ "<Continue>" => sub { sleep 2; $exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "rebooting.*the.*system." => sub { } ],
+	[ "-re", "down.*NOW" => sub { } ],
+	[ "-re", "Sending.*SIGTERM" => sub {} ],
+) || die "dailed";
+
+exit;

@@ -85,12 +85,13 @@ $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 		else {
 			$ssh_exp->send($down.$down.$down."\r");
 		}
-		exp_continue; } ],
-	[ "Partition settings" => sub { sleep 2; $ssh_exp->send($down.$down.$down.$down.$down.$down."\r"); exp_continue; } ],
+		exp_continue_timeout; } ],
+	[ "Partition settings" => sub { sleep 2;
+		$ssh_exp->send($down.$down.$down.$down.$down.$down."\r"); exp_continue_timeout } ],
 
-	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
-	[ "-re", "Choose the next step" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
-	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
+	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "Choose the next step" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
+	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
 	[ "-re", "rebooting.*the.*system." => sub { } ],
 	[ "-re", "down.*NOW" => sub { } ],
 	[ "-re", "Sending.*SIGTERM" => sub { } ],
