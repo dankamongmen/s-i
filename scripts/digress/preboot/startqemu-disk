@@ -2,8 +2,12 @@
 # Runs qemu, booting from disk.
 set -e
 
+if [ -n "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
 rm -f $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
-qemu -daemonize -pidfile $STATE_DIR/qemu-$MACHINE-$SCHEME.pid \
+$QEMU_COMMAND -daemonize -pidfile $STATE_DIR/qemu-$MACHINE-$SCHEME.pid \
 	--cdrom "$ISO" \
 	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
 	-nographic \

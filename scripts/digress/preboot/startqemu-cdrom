@@ -2,9 +2,13 @@
 # Runs qemu, booting from CD.
 set -e
 
+if [ -n "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
 # Store the pid so stopqemu can stop it later.
 echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
-exec qemu -cdrom "$ISO" \
+exec $QEMU_COMMAND -cdrom "$ISO" \
 	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
 	-nographic \
 	-net nic -net user,hostname=qemu \
