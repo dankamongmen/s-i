@@ -1,10 +1,11 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 <!-- updated from 28672 to 33887 by André Luís Lopes (andrelop) 2006.04.20 -->
 <!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.06 -->
 <!-- updated 42302:43841 by Felipe Augusto van de Wiel (faw) 2007.01.18 -->
-
+<!-- updated 43841:44436 by Herbert Parentes Fortes Neto (hpfn) 2007.02.22 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2007.03.12 -->
 
  <sect1 id="linuxdevices"><title>Dispositivos do Linux</title>
 <para>
@@ -120,65 +121,76 @@ Os arquivos de dispositivo mais importantes estão listados nas tabelas abaixo.
 
 </para>
 
-
-  <sect2>
-<title>Configurando seu Mouse</title>
+  <sect2  arch="not-s390" id="device-mouse">
+  <title>Configurando seu Mouse</title>
 <para>
 
 O mouse pode ser usado em ambos o console do Linux (com o gpm) e no
-ambiente X Window. Os dois podem se tornar compatíveis caso o repetidor
-gpm é usado para permitir que o sinal vá para o servidor X como
-mostrado:
-
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repetidor)        (link simbólico)
-         /dev/ttyS1
-</screen></informalexample>
-
-Ajuste o protocolo de repetição para ser raw (no arquivo <filename>/etc/gpm.conf</filename>)
-enquanto ajustando o protocolo original do mouse do X no arquivo
-<filename>/etc/X11/XF86Config</filename> ou
-<filename>/etc/X11/XF86Config-4</filename>.
+ambiente de janelas X. Normalmente, isso é resolvido simplesmente instalando
+o <filename>gpm</filename> e o próprio servidor X. Ambos devem ser
+configurados para usar <filename>/dev/input/mice</filename> como dispositivo
+de mouse. O protocolo do mouse correto é nomeado como
+<userinput>exps2</userinput> no gpm, e <userinput>ExplorerPS/2</userinput>
+no X. Os respectivos arquivos de configuração são
+<filename>/etc/gpm.conf</filename> e <filename>/etc/X11/xorg.conf</filename>.
 
 </para><para>
 
-Esta forma de usar o gpm até no X tem vantagens que se o mouse
-for desconectado inadvertidamente, você poderá simplesmente reiniciar o
-gpm com
+Certos módulos do kernel devem ser carregados para que seu mouse funcione.
+Na maioria dos casos os módulos corretos são autodetectados, mas nem
+sempre para antigos mouses serial e bus<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+O mouse serial usualmente tem um conector com 9 buracos em formato D; o
+mouse bus tem um conector de 8 pinos redondo, não confunda com o conector
+de 6 pinos do mouse PS/2 ou o conector de 4 pinos de um mouse ADB.
+</para>
 
-para reativar o mouse sem reiniciar o X.
+</footnote>, os quais são raros, a não ser em computadores antigos. Um
+sumário dos módulos do kernel Linux necessários para os diferentes tipos
+de mouse:
 
-</para><para>
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Módulo</entry>
+  <entry>Descrição</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>mouse PS/2 (deve ser autodetectado)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>mouse USB (deve ser autodetectado)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>A maioria dos mouses serial</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Mouse Bus conectado a uma placa adaptadora Logitech</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>mouse Bus conectado a uma placa Inport ATI ou Microsoft</entry>
+</row>
+</tbody></tgroup></informaltable>
 
-Caso o gpm esteja desativado ou não esteja instalado por alguma
-razão, tenha certeza de ajustar o X para ler um dispositivo
-de mouse, como o /dev/psaux, diretamente. Para detalhes, veja o
-documento 3-Button Mouse mini-Howto em
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
-<userinput>man gpm</userinput>,
-<filename>/usr/share/doc/gpm/FAQ.gz</filename>, e
-<ulink url="&url-xorg;current/mouse.html">README.mouse</ulink>.
+Para carregar um módulo para o mouse, você pode usar o comando
+<command>modconf</command> (do pacote com mesmo nome) e olhar na categoria
+<userinput>kernel/drivers/input/mouse</userinput>.
 
 </para><para arch="powerpc">
-
-Para PowerPC, altere o dispotivo de mouse no arquivo
-<filename>/etc/X11/XF86Config</filename> ou
-<filename>/etc/X11/XF86Config-4</filename> para
-<userinput>"/dev/input/mice"</userinput>.
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: Unsure if this is still valid -->
 
 Os kernels mais modernos lhe oferecem a capacidade de emular um mouse
 de três botões caso seu mouse somente tenha um botão. Apenas adicione as
 seguinte linhas no seu arquivo
 <filename>/etc/sysctl.conf</filename>:
 
-<informalexample><screen>
+<informalexample><screen> 
 # Emulação de mouse 3-button
 # ativa a emulação
 /dev/mac_hid/mouse_button_emulation = 1
@@ -197,8 +209,8 @@ seguinte linhas no seu arquivo
 <para>
 
 Uma instalação padrão para a arquitetura i386, incluindo todos os pacotes
-padrão (<quote>standard</quote>) e usando o kernel padrão 2.6, ocupa &std-system-size;MB
-de espaço em disco. Uma instalação mínima, sem a tarefa
+padrão (<quote>standard</quote>) e usando o kernel padrão 2.6, ocupa
+&std-system-size;MB de espaço em disco. Uma instalação mínima, sem a tarefa
 <quote>Sistema padrão</quote> selecionada, ocupará &base-system-size;MB.
 
 </para>
