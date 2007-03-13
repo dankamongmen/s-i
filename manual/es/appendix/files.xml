@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43841 -->
+<!-- original version: 44436 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 
 
@@ -118,57 +118,72 @@ de dispositivo más importantes.
 
 </para>
 
-  <sect2>
-<title>Configurar su ratón</title>
+  <sect2 arch="not-s390" id="device-mouse">
+    <title>Configurar su ratón</title>
 
 <para>
 
 Puede usar su ratón tanto en consola de Linux (con gpm) como en el
-entorno de ventanas X. Los dos usos se pueden complementar si usa el
-repetidor gpm para permitir que la señal fluya hacia el servidor X como
-se muestra:
-
-<informalexample><screen>
-mouse =&gt; /dev/psaux  =&gt; gpm =&gt; /dev/gpmdata -&gt; /dev/mouse =&gt; X
-         /dev/ttyS0             (repetidor)        (enlace simbólico)
-         /dev/ttyS1
-</screen></informalexample>
-
-Configure el protocolo del repetidor como raw (en
-<filename>/etc/gpm.conf</filename>) mientras configura X al protocolo de
-ratón original en <filename>/etc/X11/XF86Config</filename> o
-<filename>/etc/X11/XF86Config-4</filename>.
+entorno de ventanas X. Generalmente para lograr ésto sólo tiene
+que instalar <filename>gpm</filename> y el servidor de X. Ambos
+deberían configurarse para utilizar como dispositivo de ratón
+<filename>/dev/input/mice</filename>. El protocolo de ratón a
+utilizar se llama <userinput>exps2</userinput> en gpm, y
+<userinput>ExplorerPS/2</userinput> en X. Los archivos de configuración son
+<filename>/etc/gpm.conf</filename> y <filename>/etc/X11/xorg.conf</filename>
+respectivamente.
 
 </para><para>
 
-Este enfoque de usar gpm incluso en X tiene ventajas cuando el ratón
-se desconecta inadvertidamente. Simplemente reiniciando gpm con
+Para que su ratón funcione debe cargar algunos módulos del núcleo. 
+El ratón se detecta de forma automática en la mayoría de los casos, pero
+esto no siempre sucede en el caso de ratones serie antiguos o ratones de bus 
+<footnote>
 
-<informalexample><screen>
-# /etc/init.d/gpm restart
-</screen></informalexample>
+<para>
+Los ratones serie tienen generalmente un conector de 9 pines con forma de letra D.
+Los ratones de bus tienen un conector de 8 pines redondos, que no debe confundirse
+con el conector de 6 pines redondo de los ratones PS/2 o el conector redondo de
+cuatro pines de los ratones ADB.
+</para>
+</footnote>, que son muy raros salvo en el caso de utilizar ordenadores antiguros.
+A continuación se resumen los módulos del núcleo necesarios para los distintos tipos
+de ratón:
 
-volverá a conectar el ratón a través de software sin reiniciar X.
+<informaltable><tgroup cols="2"><thead>
+<row>
+  <entry>Modulo</entry>
+  <entry>Descripción</entry>
+</row>
+</thead><tbody>
+<row>
+  <entry>psmouse</entry>
+  <entry>ratón PS/2 mice (debería detectarse automáticamente)</entry>
+</row>
+<row>
+  <entry>usbhid</entry>
+  <entry>ratón USB (debería detectarse automáticamente)</entry>
+</row>
+<row>
+  <entry>sermouse</entry>
+  <entry>Para la mayoría de los ratones serie</entry>
+</row>
+<row>
+  <entry>logibm</entry>
+  <entry>Ratón de bus conectado a una tarjeta adaptadora de Logitech</entry>
+</row>
+<row>
+  <entry>inport</entry>
+  <entry>Ratón de bus conectado a una tarjeta de ATI or InPort de Microsoft</entry>
+</row>
+</tbody></tgroup></informaltable>
 
-</para><para>
-
-Asegúrese de configurar X para leer directamente desde un dispositivo
-de ratón, como pudiera ser /dev/psaux, si desactiva gpm o no lo
-instala por alguna razón, Para más información, consulte el mini-Como
-3 botones en el ratón en
-<filename>/usr/share/doc/HOWTO/en-txt/mini/3-Button-Mouse.gz</filename>,
-<userinput>man gpm</userinput>,
-<filename>/usr/share/doc/gpm/FAQ.gz</filename> y <ulink
-url="&url-xorg;current/doc/html/mouse.html">README.mouse</ulink>.
+Debe usar la orden <command>modconf</command> (en el paquete del mismo
+nombre) para cargar un módulo para la controladora del ratón y mirar
+en la categoría <userinput>kernel/drivers/input/mouse</userinput>.
 
 </para><para arch="powerpc">
-
-Para PowerPC, configure el dispositivo de
-ratón a <userinput>"/dev/input/mice"</userinput>
-en <filename>/etc/X11/XF86Config</filename> o
-<filename>/etc/X11/XF86Config-4</filename>.
-
-</para><para arch="powerpc">
+<!-- FJP 20070122: No estoy seguro si esto es válido -->
 
 Los núcleos modernos le ofrecen la capacidad de emular un ratón de
 tres botones aunque su ratón solo tenga uno. Simplemente añada las
