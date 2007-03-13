@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44410 -->
+<!-- original version: 45612 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
 <!--
@@ -517,6 +517,14 @@ primera tarjeta de red disponible y sea un poco más paciente mientras
 espera una respuesta a su consulta DHCP.
 
 </para>
+<tip><para>
+Puede encontrar en el <ulink url="http://hands.com/d-i/">sitio web del
+desarrollador</ulink> un ejemplo muy largo que muestra cómo usar esta
+plataforma, el sitio incluye programas y clases de ejemplo. Los ejemplos
+disponibles en esa ubicación también muestran algunos de los efectos positivos
+que pueden conseguirse gracias al uso creativo de la preconfiguración.
+</para></tip>
+
   </sect2>
 
   <sect2 id="preseed-aliases">
@@ -875,6 +883,8 @@ instalación utilizado. Por omisión, el valor de
 </para>
 
 <informalexample role="example"><screen>
+# No tiene que definir la cadena mirror/country si selecciona ftp
+#d-i mirror/protocol string ftp
 d-i mirror/country string enter information manually
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
@@ -1109,8 +1119,10 @@ a continuación son relevantes para la preconfiguración. Desea ayudar
 # Puede elegir instalar software de las fuentes «non-free» y «contrib».
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Descomente esta línea si no quiere utilizar una réplica de red
+#d-i apt-setup/use_mirror boolean false
 # Descomente esta línea para impedir que los recursos de seguridad
-# trabajen o me añadan un servidor distinto de security.debianorg.
+# trabajen o me añadan un servidor distinto de security.debian.org.
 #d-i apt-setup/security_host string
 
 # Repositorios adicionales, se dispone de local[0-9]
@@ -1124,6 +1136,12 @@ a continuación son relevantes para la preconfiguración. Desea ayudar
 # está autenticado con lo que la línea en sources.list quedará
 # comentada.
 #d-i apt-setup/local0/key string http://local.server/key
+
+# El instalador exige que los repositorios estén autenticados con una
+# clave gpg conocida por omisión. Puede utilizar esta opción para 
+# deshabilitar la autenticación. Aviso: esta opción no es segura y no se 
+# recomienda
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1340,28 +1358,6 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
-
-
-  <sect2 id="preseed-mailer">
-  <title>Configuración del servicio de correo</title>
-<para>
-
-Exim sólo pregunta unas pocas preguntas durante la instalación
-normal. Aquí se muestra cómo evitar incluso esas preguntas, aunque es
-posible hacer preconfiguraciones más complejtas.
-
-</para>
-
-<informalexample role="example"><screen>
-exim4-config exim4/dc_eximconfig_configtype \
-       select no configuration at this time
-exim4-config exim4/no_config boolean true
-exim4-config exim4/no_config boolean true
-exim4-config exim4/dc_postmaster string
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-X">
   <title>Configuración de X</title>
 <para>
@@ -1465,12 +1461,28 @@ omisión para una pregunta, pero manteniendo la pregunta de forma que
 campo <firstterm>seen</firstterm> (n. del t., «visto») a
 <quote>false</quote> después de fijar el valor para la pregunta.
 
-</para>
-
 <informalexample><screen>
 d-i foo/bar string value
 d-i foo/bar seen false
 </screen></informalexample>
+
+Puede conseguir el mismo efecto en  <emphasis>todas</emphasis> las preguntas
+sin más que configurar el parámetro <classname>preseed/interactive=true</classname>
+en el indicador de arranque. Esta opción puede ser útil para probar o depurar
+su fichero de preconfiguración.
+
+Puede hacer que el instalador le pregunte una pregunta específica utilizando
+el operador <quote>?=</quote> si está preconfigurando con parámetros del arranque.
+Por ejemplo,
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+
+Esta opción sólo tendrá utilidad en el caso de parámetros que correspondan a
+preguntas que se muestran durante la instalación y no para el caso de parámetros
+<quote>internos</quote>.
+
+</para><para>
+
+</para>
 
   </sect2>
 
