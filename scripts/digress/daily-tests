@@ -74,6 +74,7 @@ for SCHEME in $@; do
 	FAILURE_STATUS_FILE=$(tempfile)
 	export FAILURE_STATUS_FILE
 	
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
 		overview success
 	else
@@ -87,7 +88,6 @@ for SCHEME in $@; do
 			overview "failed $(cat $FAILURE_STATUS_FILE)"
 		fi
 	fi) 2>&1 | log $MACHINE $SCHEME
-	ln -f $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 
 	rm -f $FAILURE_STATUS_FILE
 done
