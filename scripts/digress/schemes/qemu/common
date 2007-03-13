@@ -11,8 +11,8 @@ config STAGE_2_MAX_TIME 600
 config USER root
 config USER_PASSWORD foo
 config QEMU_DISK_SIZE 4G
-config QEMU_EXTRA_PARAMS -redir tcp:7001::22
-config SSHPORT 7001
+config SSHPORT $(free-port 7001 7010)
 config SSHHOST localhost
-config QEMU_SERIAL_PORT 7000
+config QEMU_SERIAL_PORT $(free-port 7011 7020)
+config QEMU_EXTRA_PARAMS -redir tcp:$SSHPORT::22
 config ISO ~/sid_d-i_etch-i386-netinst.iso
