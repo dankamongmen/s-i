@@ -25,7 +25,7 @@ print "boot: $ENV{BOOTCOMMAND}\n";
 # Run in the background, because qemu won't begin accepting console input
 # until the connection is made to its serial port, by console-qemu.
 open STDIN, '/dev/null';
-defined(my $pid = fork) or die "Can’t fork: $!";
+defined(my $pid = fork) or die "Can'fork: $!";
 if ($pid) {
 	sleep 2;
 	exit;
@@ -35,6 +35,7 @@ setsid;
 my $exp = new Expect;
 #$exp->debug(2);
 $exp->raw_pty(1);
+$SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
 $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
 $exp->expect(60, "(qemu)");
@@ -50,4 +51,4 @@ foreach my $letter (split('', $ENV{BOOTCOMMAND}), "\n") {
 	$exp->expect(60, "(qemu)");
 }
 
-$exp->expect(undef, "EOF");
+$exp->expect(undef, "eof");

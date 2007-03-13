@@ -6,12 +6,13 @@ if [ -z "$QEMU_COMMAND" ]; then
 	QEMU_COMMAND=qemu
 fi
 
-rm -f $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
-$QEMU_COMMAND -daemonize -pidfile $STATE_DIR/qemu-$MACHINE-$SCHEME.pid \
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec $QEMU_COMMAND \
 	--cdrom "$ISO" \
 	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
 	-nographic \
 	-net nic -net user,hostname=qemu \
 	-boot c -no-reboot \
 	$QEMU_EXTRA_PARAMS \
-	-serial tcp:localhost:$QEMU_SERIAL_PORT,server &
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server

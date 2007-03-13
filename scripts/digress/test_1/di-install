@@ -1,7 +1,6 @@
 #!/usr/bin/perl
-# Expect script to run for partially interactive first stage installs using the
-# dialog frontend. At least partitioning must be preseeded.
-
+# Expect script to run for partially interactive first stage installs using
+# the dialog frontend. At least partitioning must be preseeded.
 use Expect;
 
 # Allow running from cron.
@@ -21,8 +20,10 @@ $exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "rebooting.*the.*system." => sub { } ],
 	[ "-re", "down.*NOW" => sub { } ],
 	[ "-re", "Sending.*SIGTERM" => sub {} ],
-) || die "dailed";
+) || die "install failed (timeout)";
 
-$exp->interact;
+print STDERR "waiting for shutdown\n";
+
+$exp->expect($ENV{STAGE_1_MAX_TIME}, 'eof');
 
 exit;
