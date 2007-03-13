@@ -99,7 +99,8 @@ if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
 		continue 2
 	    fi
 	done
-	founddevs="${founddevs:+$founddevs }$dev"
+	mapdev="$(mapdevfs $dev)"
+	founddevs="${founddevs:+$founddevs }$mapdev"
     done
 else
     for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
