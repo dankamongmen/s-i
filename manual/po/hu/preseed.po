@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-02-28 20:57+0000\n"
-"PO-Revision-Date: 2007-03-04 09:29+0100\n"
+"PO-Revision-Date: 2007-03-13 08:27+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -340,12 +340,15 @@ msgid ""
 "auto url=autoserver\n"
 "</screen></informalexample> This relies on there being a DHCP server that will get the machine to the point where <literal>autoserver</literal> can be resolved by DNS, perhaps after adding the local domain if that was provided by DHCP. If this was done at a site where the domain is <literal>example.com</literal>, and they have a reasonably sane DHCP setup, it would result in the preseed file being retrieved from <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>."
 msgstr ""
+"A Debian Telepítő néhány képessége egyszerű parancsokkal tetszőlegese összetett egyéni automata telepítést végez. Íme az indító jelnél használható pár példa: <informalexample><screen>\n"
+"auto url=autoserver\n"
+"</screen></informalexample> Egy DHCP kiszolgáló megadja egy DNS által feloldható <literal>auto-szerver</literal> helyét, akár egy a DHCP által adott helyi tartomány hozzáadása után. Ha az <literal>example.com</literal> volt a tartomány, és jó a DHCP beállítás, az előíró fájl helye: <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>."
 
 #. Tag: para
 #: preseed.xml:378
 #, no-c-format
 msgid "The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>) is taken from <literal>auto-install/defaultroot</literal>. By default this includes the directory <literal>etch</literal> to allow future versions to specify their own codename and let people migrate forwards in a controlled manner. The <literal>/./</literal> bit is used to indicate a root, relative to which subsequent paths can be anchored (for use in preseed/include and preseed/run). This allows files to be specified either as full URLs, paths starting with / that are thus anchored, or even paths relative to the location where the last preseed file was found. This can be used to construct more portable scripts where an entire hierarchy of scripts can be moved to a new location without breaking it, for example copying the files onto a USB stick when they started out on a web server. In this example, if the preseed file sets <literal>preseed/run</literal> to <literal>/scripts/late_command.sh</literal> then the file will be fetched from <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
-msgstr ""
+msgstr "Az url utolsó része (<literal>d-i/etch/./preseed.cfg</literal>) innen jön: <literal>auto-install/defaultroot</literal>. Alapban tartalmazza az <literal>etch</literal> könyvtárat, e felépítés később lehetővé teszi más kódnevek megadását. A <literal>/./</literal> egy gyökeret jelöl, melyhez az al-útvonalak köthetők (a preseed/include és preseed/run esetében használatos). Így a fájlok teljes URL leírásokkal, / jellel kezdődő útvonalakkal, vagy a legutóbbi előíró fájlhoz viszonyított relatív útvonalakkal is megadhatók. Így sokkal hordozhatóbb szkriptek írhatók, melyek hierarchiája törés nélkül áthelyezhető, például egy web-szerverről fájlokat másolva egy USB tárra. E példában, ha az előíró fájl a <literal>preseed/run</literal> értékéül ezt adja: <literal>/scripts/late_command.sh</literal>, a fájl innen kerül letöltésre: <literal>http://autoserver.example.com/d-i/etch/./scripts/late_command.sh</literal>."
 
 #. Tag: para
 #: preseed.xml:398
@@ -355,24 +358,27 @@ msgid ""
 "auto url=<replaceable>http://192.168.1.2/path/to/mypreseed.file</replaceable>\n"
 "</screen></informalexample> The way this works is that:"
 msgstr ""
+"Ha nincs helyi DHCP vagy DNS, vagy nem akarod az alap útvonalat használni a <filename>preseed.cfg</filename> fájlra, lehetőség van egy url megadására, mely <literal>/./</literal> elem nélkül az útvonal elejére kerül (ami a 3. <literal>/</literal> az URL szerkezetében). Itt egy helyi hálózat minimális támogatását igénylő példa: <informalexample><screen>\n"
+"auto url=<replaceable>http://192.168.1.2/útvonal/az/előíró.fájlomhoz</replaceable>\n"
+"</screen></informalexample> Így működik:"
 
 #. Tag: para
 #: preseed.xml:411
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
-msgstr ""
+msgstr "ha az URL nem tartalmaz protokollt, http kerül kiválasztásra,"
 
 #. Tag: para
 #: preseed.xml:414
 #, no-c-format
 msgid "if the hostname section contains no periods, it has the domain derived from DHCP appended to it, and"
-msgstr ""
+msgstr "ha a gépnév szakaszban nincs pont, a DHCP által adott tartomány kerül hozzáadásra, és"
 
 #. Tag: para
 #: preseed.xml:418
 #, no-c-format
 msgid "if there's no <literal>/</literal>'s after the hostname, then the default path is added."
-msgstr ""
+msgstr "Ha egyetlen <literal>/</literal> jel sem szerepel a gépnév után, akkor az alap útvonal kerül hozzáadásra."
 
 #. Tag: para
 #: preseed.xml:424
@@ -382,18 +388,21 @@ msgid ""
 "auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>\n"
 "</screen></informalexample> The classes could for example denote the type of system to be installed, or the localization to be used."
 msgstr ""
+"Az utl megadásán túl, megadhatsz beállításokat, melyek nem hatnak közvetlenül a &d-i; viselkedésére, de átadhatók szkripteknek a <literal>preseed/run</literal> használatával a betöltött előíró fájlban. Jelenleg, ennek egyetlen példája az <literal>auto-install/classes</literal>, melyre egy álnév a <literal>classes</literal>. Példa:<informalexample><screen>\n"
+"auto url=<replaceable>example.com</replaceable> classes=<replaceable>class_A;class_B</replaceable>\n"
+"</screen></informalexample> Az osztályok például leírhatják a telepítendő rendszer típusát vagy a helyi beállítást."
 
 #. Tag: para
 #: preseed.xml:438
 #, no-c-format
 msgid "It is of course possible to extend this concept, and if you do, it is reasonable to use the auto-install namespace for this. So one might have something like <literal>auto-install/style</literal> which is then used in your scripts. If you feel the need to do this, please mention it on the <email>debian-boot@lists.debian.org</email> mailing list so that we can avoid namespace conflicts, and perhaps add an alias for the parameter for you."
-msgstr ""
+msgstr "Természetesen ez az elképzelés kiterjeszthető, és erre igen jó az auto-install név-hely. Például így: <literal>auto-install/style</literal>, melyet később szkriptjeidben használsz. Ha ezt szükségesnek érzed, írj a <email>debian-boot@lists.debian.org</email> listára, így elkerülhetjük a név-hely ütközéseket és talán adhatunk egy álnevet a szükséges paraméternek."
 
 #. Tag: para
 #: preseed.xml:448
 #, no-c-format
 msgid "The <literal>auto</literal> boot label is not yet defined on all architectures. The same effect may be achieved by simply adding the two parameters <literal>auto=true priority=critical</literal> to the kernel command line. The <literal>auto</literal> parameter is an alias for <literal>auto-install/enable</literal> and controls the delay of the locale and keyboard questions until after there has been a chance to preseed them, while <literal>priority</literal> is an alias for <literal>debconf/priority</literal> and setting it to <literal>critical</literal> stops any questions with a lower priority from being asked."
-msgstr ""
+msgstr "Az <literal>auto</literal> indító címke nincs megadva minden architektúrán. Hasonló hatás érhető így: <literal>auto=true priority=critical</literal>. Az <literal>auto</literal> az <literal>auto-install/enable</literal> egy álneve és felelős a helyi beállítások és billentyűzet kérdések elhalasztásáért az előírás lehetőségig, a <literal>priority</literal> a <literal>debconf/priority</literal> egy álneve és <literal>kritikus</literal> értékre állítása meggátolja az alacsonyabb elsőbbségű kérdések feltevését."
 
 #. Tag: para
 #: preseed.xml:461
@@ -405,7 +414,7 @@ msgstr "További hasznos lehetőségek lehetnek a telepítés önműködővé t�
 #: preseed.xml:470
 #, no-c-format
 msgid "An extensive example of how to use this framework, including example scripts and classes, can be found on the <ulink url=\"http://hands.com/d-i/\">website of its developer</ulink>. The examples available there also show many other nice effects that can be achieved by creative use of preconfiguration."
-msgstr ""
+msgstr "E keretrendszer használatáról átfogó példa található szkriptekkel és osztályokkal a <ulink url=\"http://hands.com/d-i/\">fejlesztő weblapján</ulink>. Az elérhető példák sok más az elő-beállítás használatával elérhető szép hatást is mutatnak."
 
 #. Tag: title
 #: preseed.xml:481
@@ -730,7 +739,7 @@ msgid ""
 "# Locale sets language and country.\n"
 "d-i debian-installer/locale string en_US"
 msgstr ""
-"# Nyelv ér ország beállítása.\n"
+"# Nyelv és ország beállítása.\n"
 "d-i debian-installer/locale string hu_HU"
 
 #. Tag: para
@@ -872,9 +881,9 @@ msgstr ""
 "#d-i netcfg/get_gateway string 192.168.1.1\n"
 "#d-i netcfg/confirm_static boolean true\n"
 "\n"
-"# Any hostname and domain names assigned from dhcp take precedence over\n"
-"# values set here. However, setting the values still prevents the questions\n"
-"# from being shown, even if values come from dhcp.\n"
+"# A dhcp által adott gépnév és tartomány nevek megelőzik az\n"
+"# itteni értékeket. Az itt megadott értékek mégis meggátolják\n"
+"# a kérdések feltevését, akkor is, ha a dhcp adott értékeket.\n"
 "d-i netcfg/get_hostname string unassigned-hostname\n"
 "d-i netcfg/get_domain string unassigned-domain\n"
 "\n"
@@ -1045,13 +1054,13 @@ msgstr ""
 "#d-i partman-auto/choose_recipe \\\n"
 "#       select Külön /home partíció\n"
 "#d-i partman-auto/choose_recipe \\\n"
-"#       select Külön /home, /usr, /var, és /tmp partíció\n"
+"#       select Külön /home, /usr, /var és /tmp partíció\n"
 "\n"
 "# Vagy saját recept...\n"
 "# A recept formája leírva a devel/partman-auto-recipe.txt fájlban.\n"
 "# Egy recept fájl eléréséhez a d-i környezetben egyszerűen rá is lehet\n"
 "# mutatni.\n"
-"#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
+"#d-i partman-auto/expert_recipe_file string /hd-media/recept\n"
 "\n"
 "# Ha nem, egy egész recept betehető az előíró fájlba 1\n"
 "# (logikai) sorba. E példa létrehoz ezeket: egy kis /boot partíció, elég\n"
@@ -1089,7 +1098,7 @@ msgstr "Particionálás RAID használatával"
 #: preseed.xml:790
 #, no-c-format
 msgid "You can also use preseeding to set up partitions on software RAID arrays. Supported are RAID levels 0, 1 and 5, creating degraded arrays and specifying spare devices. If you are using RAID 1, you can preseed grub to install to all devices used in the array; see <xref linkend=\"preseed-bootloader\"/>."
-msgstr "Az előírás szoftver RAID partíciók beállítására is használható. A támogatott RAID szintek: 0,1 és 5, csökkentett tömbök és és tartalék eszközök. RAID 1 esetén előírható a grub telepítése minden a tömbben használt eszközre; lásd a <xref linkend=\"preseed-bootloader\"/> részt."
+msgstr "Az előírás szoftver RAID partíciók beállítására is használható. A támogatott RAID szintek: 0, 1 és 5, csökkentett tömbök és tartalék eszközök. RAID 1 esetén előírható a grub telepítése minden a tömbben használt eszközre; lásd itt: <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
 #: preseed.xml:800
@@ -1233,7 +1242,7 @@ msgstr "Az APT beállítása"
 #: preseed.xml:829
 #, no-c-format
 msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
-msgstr "A <filename>/etc/apt/sources.list</filename> beállítása és az alap beállítási opciók teljesen önműködőek a telepítő módtól és korábbi válaszok függően. További (úgynevezett local) tárak is megadhatók."
+msgstr "A <filename>/etc/apt/sources.list</filename> beállítása és az alap beállítási opciók teljesen önműködőek a telepítő módtól és korábbi válaszoktól függően. További (úgynevezett helyi) tárak is megadhatók."
 
 #. Tag: screen
 #: preseed.xml:837
@@ -1269,8 +1278,8 @@ msgstr ""
 "#d-i apt-setup/contrib boolean true\n"
 "# Vedd ki a megjegyzésből, ha nem akarsz hálózati tükröt.\n"
 "#d-i apt-setup/use_mirror boolean false\n"
-"# Vedd ki a megjegyzésből, ha nem akarsz biztonsági forrásokat\n"
-", vagy más biztonsági tár megadásához, mint a security.debian.org.\n"
+"# Vedd ki a megjegyzésből, ha nem akarsz biztonsági forrásokat,\n"
+"vagy más biztonsági tár megadásához, mint a security.debian.org.\n"
 "#d-i apt-setup/security_host string\n"
 "\n"
 "# További tárak, local[0-9] elérhető\n"
@@ -1305,7 +1314,7 @@ msgstr "A root fiók jelszava és az 1. sima fiók neve és jelszava szintén el
 #: preseed.xml:850
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
-msgstr "Jelszavak előírása ne feledjük, hogy az előíró fájlhoz férők megtudják ezeket. Az MD5 hash kódok használata kicsit jobb, de önmagában még hamis biztonság érzetet kelt, mert a hozzáférés lehetővé teszi az ellenük elkövetett nyers erejű támadást."
+msgstr "Jelszavak előírásakor ne feledjük, hogy az előíró fájlhoz férők megtudják ezeket. Az MD5 hash kódok használata kicsit jobb, de önmagában még hamis biztonság érzetet kelt, mert a hozzáférés lehetővé teszi az ellenük elkövetett nyers erejű támadást."
 
 #. Tag: screen
 #: preseed.xml:860
