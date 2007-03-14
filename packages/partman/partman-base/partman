@@ -88,8 +88,19 @@ while true; do
 		fi
 		if [ $exitcode -eq 255 ]; then
 			abort 10 # back up to main menu
-		elif [ $exitcode -ge 100 ] && confirm_changes "partman"; then
-			break
+		elif [ $exitcode -ge 100 ]; then
+			for s in /lib/partman/check.d/*; do
+				if [ -x $s ]; then
+					#logger -t partman "Running check.d/$s"
+					if ! $s; then
+						skip_choose_partition=no
+						continue 2
+					fi
+				fi
+			done
+			if confirm_changes "partman"; then
+				break
+			fi
 		fi
 		skip_choose_partition=no
 	done
