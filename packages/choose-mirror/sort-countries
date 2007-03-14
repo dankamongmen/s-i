@@ -27,6 +27,7 @@ for protocol in http ftp; do
 		}
 		$_="";'
 	for file in list.*; do
+		[ -e "$file" ] || continue
 		lang=${file#list.}
 		unilang=$(grep "^$lang.* UTF-8" /usr/share/i18n/SUPPORTED | sed -e 's/[@. ].*//;q' )
 		if [ -z "$unilang" ]; then
