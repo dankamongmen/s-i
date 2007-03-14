@@ -69,7 +69,6 @@ ssh_question("Network console option:");
 my $partition_setup=0;
 $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "step.*failed" => sub { exit 1 } ],
-	[ "English" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
 
 	# driving s390-dasd, not preseedable :-(
 	[ "Format the disk" => sub { sleep 2; $ssh_exp->send($left."\r"); exp_continue; } ],
@@ -79,16 +78,21 @@ $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "Help on partitioning" => sub {
 		sleep 2; 
 		if (! $partition_setup) {
-			$partition_setup=1;
-			$ssh_exp->send($up.$up.$up."\r");
+			$ssh_exp->send($up."\r");
 		}
 		else {
 			$ssh_exp->send($down.$down.$down."\r");
 		}
-		exp_continue_timeout; } ],
-	[ "Partition settings" => sub { sleep 2;
-		$ssh_exp->send($down.$down.$down.$down.$down.$down."\r"); exp_continue_timeout } ],
+		exp_continue_timeout
+	} ],
+	[ "Partition settings" => sub {
+		sleep 2;
+		$ssh_exp->send($down.$down.$down.$down.$down.$down."\r");
+		$partition_setup=1;
+		exp_continue_timeout
+	} ],
 
+	[ "English" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue; } ],
 	[ "-re", "Start.*menu" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
 	[ "-re", "Choose the next step" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
 	[ "-re", "<Go.*Back>" => sub { sleep 2; $ssh_exp->send("\r"); exp_continue_timeout } ],
