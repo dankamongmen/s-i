@@ -2308,8 +2308,16 @@ main_loop()
 int
 main(int argc, char *argv[])
 {
-        // Set up signal handling
         struct sigaction act, oldact;
+        int i;
+
+        /* Close all extraneous file descriptors, including our pipe to
+         * debconf.
+         */
+        for (i = 3; i < 256; ++i)
+                close(i);
+
+        // Set up signal handling
         memset(&act,0,sizeof(struct sigaction));
         memset(&oldact,0,sizeof(struct sigaction));
         act.sa_handler = prnt_sig_hdlr;
