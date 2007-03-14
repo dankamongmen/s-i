@@ -19,7 +19,8 @@ EXTRA_libsystem_la_SOURCES = \
 	subarch-mips-linux.c \
 	subarch-mipsel-linux.c \
 	subarch-powerpc-linux.c \
-	subarch-sparc-linux.c
+	subarch-sparc-linux.c \
+	subarch-x86-linux.c
 
 libsystem_la_LIBADD = \
 	@SUBARCH_SYSTEM@

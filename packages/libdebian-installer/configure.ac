@@ -71,6 +71,8 @@ AC_MSG_RESULT([$DEB_HOST_ARCH_OS])
 
 if test -f "$srcdir/src/system/subarch-$DEB_HOST_ARCH_CPU-$DEB_HOST_ARCH_OS.c"; then
 	SUBARCH_SYSTEM="subarch-$DEB_HOST_ARCH_CPU-$DEB_HOST_ARCH_OS.lo"
+elif (test "$DEB_HOST_ARCH_CPU" = i386 || test "$DEB_HOST_ARCH_CPU" = amd64) && test -f "$srcdir/src/system/subarch-x86-$DEB_HOST_ARCH_OS.c"; then
+	SUBARCH_SYSTEM="subarch-x86-$DEB_HOST_ARCH_OS.lo"
 else
 	SUBARCH_SYSTEM="subarch-generic.lo"
 fi
