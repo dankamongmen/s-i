@@ -47,6 +47,14 @@ for f in $fstab; do
 	# needed to unmount the partition; currently this is unused
 	unmount_cmd=$($m "$f")
 	if [ "$?" = 0 ]; then
+	    case $2 in
+		/)
+		    # create these before /var is mounted, so that they can
+		    # be mounted as tmpfses
+		    installdir /target/var/lock
+		    installdir /target/var/run
+		;;
+	    esac
 	    continue 2
 	fi
     done
