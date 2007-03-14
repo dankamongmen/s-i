@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 45612 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -492,6 +492,14 @@ màquina agafe el primer NIC i espere a aconseguir una resposta a la seva
 petició DHCP.
 
 </para>
+<tip><para>
+
+Podeu trobar un exemple detallat de com utilitzar aquest entorn, incloent
+scripts i classes d'exemple, a <ulink url="http://hands.com/d-i/">la
+pàgina del seu desenvolupador</ulink>. Els exemples disponibles també
+mostren altres usos del sistema de preconfiguració.
+
+</para></tip>
   </sect2>
 
   <sect2 id="preseed-aliases">
@@ -844,6 +852,8 @@ de <classname>mirror/suite</classname>.
 </para>
 
 <informalexample role="example"><screen>
+# Si seleccioneu ftp, no cal definir la cadena mirror/country.
+#d-i mirror/protocol string ftp
 d-i mirror/country string enter information manually
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
@@ -1062,6 +1072,8 @@ a les primeres preguntes. Opcionalment podeu afegir altres repositoris
 # Podeu instal·lar programari no lliure (non-free) i de contribució (contrib).
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
+# Descomenteu aquesta línia si no voleu utilitzar una rèplica.
+#d-i apt-setup/use_mirror boolean false
 # Tragueu-li el comentari a això per evitar afegir fonts de seguretat, o
 # indiqueu un nom de màquina per utilitzar un servidor diferent a
 # security.debian.org.
@@ -1077,6 +1089,12 @@ a les primeres preguntes. Opcionalment podeu afegir altres repositoris
 # l'apt es queixarà de que el repositori no autenticat i per tant es deixarà
 # la línia comentada al sources.list
 #d-i apt-setup/local0/key string http://servidor.local/clau
+
+# Per omissió, l'instal·lador requereix repositoris autenticats amb
+# una clau gpg coneguda. Es pot utilitzar aquesta opció per desactivar
+# la comprovació. Avís: aquesta opció és insegura i no es recomana
+# utilitzar-la.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1286,26 +1304,6 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
-  <sect2 id="preseed-mailer">
-  <title>Configuració de l'administrador de correu</title>
-<para>
-
-Durant una instal·lació normal, l'exim sols fa unes poques preguntes. Aquí
-teniu la manera d'evitar fins i tot aquestes. Però encara es pot configurar
-de manera més complexa.
-
-</para>
-
-<informalexample role="example"><screen>
-exim4-config exim4/dc_eximconfig_configtype \
-       select no configuration at this time
-exim4-config exim4/no_config boolean true
-exim4-config exim4/no_config boolean true
-exim4-config exim4/dc_postmaster string
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-X">
   <title>Configuració de l'X</title>
 <para>
@@ -1403,13 +1401,29 @@ predeterminada a una pregunta, però que encara es faci la pregunta. Per
 fer açò l'indicador <firstterm>seen</firstterm> s'ha de posar a
 <quote>false</quote> després de donar-li el valor a una pregunta.
 
-</para>
-
 <informalexample><screen>
 d-i foo/bar string value
 d-i foo/bar seen false
 </screen></informalexample>
 
+Podeu assolir el mateix efecte per a <emphasis>totes</emphasis>
+les preguntes si establiu el paràmetre
+<classname>preseed/interactive=true</classname> a l'indicador
+d'arrencada. També pot ser útil per provar o depurar el vostre fitxer
+de preconfiguració.
+
+Si esteu preconfigurant mitjançant els paràmetres d'arrencada,
+podeu fer que l'instal·lador pregunti una qüestió en
+concret utilitzant l'operador <quote>?=</quote>, p.ex.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valor</replaceable></userinput>.
+
+Tingueu en compte que això només afectarà els paràmetres
+corresponents a les preguntes que realment es mostren durant el procés
+d'instal·lació, i no als paràmetres <quote>interns</quote>.
+
+</para><para>
+
+</para>
   </sect2>
 
 
