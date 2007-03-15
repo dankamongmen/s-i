@@ -50,8 +50,8 @@ if (exists $ENV{HERCULES_MASQ_COMMAND}) {
 
 # Now use ssh to log in to d-i and finish the installation.
 my $ssh_exp = Expect->spawn("ssh -t -v -t -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no installer\@$ENV{S390_IP}") or die "failed to start ssh: $!";
-#$ssh_exp->debug(2);
-#$ssh_exp->exp_internal(1);
+$ssh_exp->debug(2);
+$ssh_exp->exp_internal(1);
 
 sub ssh_question {
 	my $question=shift;
@@ -66,29 +66,42 @@ ssh_question("password:", $ENV{ROOT_PASSWORD});
 ssh_question("Network console option:");
 
 # Complete the install.
+my $formatted=0;
 my $partition_setup=0;
 $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "step.*failed" => sub { exit 1 } ],
 
 	# driving s390-dasd, not preseedable :-(
-	[ "Format the disk" => sub { sleep 2; $ssh_exp->send($left."\r"); exp_continue; } ],
-	[ "(configured)" => sub { sleep 2; $ssh_exp->send($down."\r"); exp_continue; } ],
+	[ "Format the disk" => sub { sleep 2; $ssh_exp->send($left); exp_continue_timeout } ],
+	[ "-re", "\\(configured\\)" => sub { 
+		sleep 2;
+		if (! $formatted) {
+			$ssh_exp->send($down);
+			$formatted=1;
+		}
+		exp_continue_timeout
+	} ],
 
 	# partman-auto doesn't support dasds, drive partman by hand :-(
-	[ "Help on partitioning" => sub {
-		sleep 2; 
+	[ "Finish partitioning" => sub {
+		sleep 2;
 		if (! $partition_setup) {
-			$ssh_exp->send($up."\r");
+			$ssh_exp->send($up);
 		}
 		else {
-			$ssh_exp->send($down.$down.$down."\r");
+			$ssh_exp->send($down.$down.$down);
 		}
 		exp_continue_timeout
 	} ],
 	[ "Partition settings" => sub {
 		sleep 2;
-		$ssh_exp->send($down.$down.$down.$down.$down.$down."\r");
-		$partition_setup=1;
+		if (! $partition_setup) {
+			$ssh_exp->send($down.$down.$down.$down.$down.$down);
+			$partition_setup=1;
+		}
+		else {
+			die "loop detected";
+		}
 		exp_continue_timeout
 	} ],
 
