@@ -68,6 +68,7 @@ ssh_question("Network console option:");
 # Complete the install.
 my $formatted=0;
 my $partition_setup=0;
+my $partman_done=0;
 $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 	[ "-re", "step.*failed" => sub { exit 1 } ],
 
@@ -88,8 +89,9 @@ $ssh_exp->expect($ENV{STAGE_1_MAX_TIME},
 		if (! $partition_setup) {
 			$ssh_exp->send($up);
 		}
-		else {
+		elsif (! $partman_done) {
 			$ssh_exp->send($down.$down.$down);
+			$partman_done=1;
 		}
 		exp_continue_timeout
 	} ],
