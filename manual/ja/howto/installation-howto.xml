@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44580 -->
+<!-- original version: 45291 -->
 
 <!--
 <appendix id="installation-howto">
@@ -323,7 +323,7 @@ various methods to netboot depend on your architecture and netboot setup.
 The files in <filename>netboot/</filename> can be used to netboot &d-i;.
 -->
 &d-i; をネットから完全に起動することもできます。
-netboot のための様々な方法は、アーキテクチャや netboot セットアップに依存します。
+netboot のための様々な方法は、アーキテクチャや netboot の設定に依存します。
 <filename>netboot/</filename> 以下のファイルは、&d-i; を netboot するために使用できます。
 
 </para><para arch="x86">
@@ -337,11 +337,11 @@ filename <filename>/pxelinux.0</filename> to clients, and with luck
 everything will just work.
 For detailed instructions, see <xref linkend="install-tftp" />.
 -->
-セットアップするのに最も容易なのは、おそらく PXE netbooting です。
+設定するのに最も容易なのは、おそらく PXE netbooting です。
 <filename>netboot/pxeboot.tar.gz</filename> ファイルを
 <filename>/var/lib/tftpboot</filename> の中か、
 あるいは tftp サーバの適切な場所ならどこにでも解凍してください。
-DHCP サーバをセットアップして、クライアントへファイル名 <filename>/pxelinux.0</filename>
+DHCP サーバを設定して、クライアントへファイル名 <filename>/pxelinux.0</filename>
 を渡してください。運がよければすべてがうまく動作するでしょう。
 詳細な説明に関しては、<xref linkend="install-tftp" />をご覧ください。
 
@@ -436,7 +436,7 @@ networking by DHCP. If you are not on a network or do not have DHCP, you
 will be given the opportunity to configure the network manually.
 -->
 次にインストーラは、ネットワークハードウェアを検知し、DHCP によって
-ネットワークのセットアップをしようとします。ネットワーク上にないか、
+ネットワークの設定をしようとします。ネットワーク上にないか、
 DHCP が無い場合は、ネットワークを手動で設定する機会が与えられます。
 
 </para><para>
@@ -499,6 +499,47 @@ which can take a while. That is followed by installing a kernel.
 </para><para>
 
 <!--
+The next steps are setting up your time zone and clock. The installer will
+try to select the correct settings automatically and will only ask if it
+cannot. This is followed by setting up user accounts. By default you will
+need to provide a password for the <quote>root</quote> (administrator)
+account and information necessary to create one regular user account.
+-->
+次のステップは、タイムゾーンと時計の設定です。
+インストーラは正しい設定を自動で選択し、不可能な場合のみ問い合わせてきます。
+続いて、ユーザアカウントの設定を行います。
+デフォルトでは、<quote>root</quote> (管理者) アカウントのパスワードを設定し、
+通常ユーザのアカウントを 1 つ作成することになります。
+
+</para><para>
+
+<!--
+The base system that was installed earlier is a working, but very minimal
+installation. To make the system more functional the next step allows you
+to install additional packages by selecting tasks. Before packages can be
+installed <classname>apt</classname> needs to be configured as that defines
+from where the packages will be retrieved.
+The <quote>Standard system</quote> task will be selected by default and
+should normally be installed. Select the <quote>Desktop environment</quote>
+task if you would like to have a graphical desktop after the installation.
+See <xref linkend="pkgsel"/> for additional information about this step.
+-->
+最初にインストールしたベースシステムは動作しますが、
+最低限のものしかインストールされていません。
+もっと機能的にするには、次のステップでタスクを選択し、
+追加パッケージをインストールしてください。
+パッケージをインストールする前に、
+パッケージをどこから取得してインストールするかの定義を、
+<classname>apt</classname> に設定する必要があります。
+<quote>標準システム</quote> タスクはデフォルトで選択され、
+通常は既にインストールされているはずです。
+インストール後にグラフィカルデスクトップが必要であれば、
+<quote>デスクトップ環境</quote> を選択してください。
+このステップについてのさらなる情報は、<xref linkend="pkgsel"/> をご覧ください。
+
+</para><para>
+
+<!--
 The last step is to install a boot loader. If the installer detects
 other operating systems on your computer, it will add them to the boot menu
 and let you know.
@@ -520,14 +561,15 @@ given the opportunity to override that choice and install it elsewhere.
 
 <!--
 &d-i; will now tell you that the installation has
-finished. Remove the cdrom or other boot media and hit &enterkey;
-to reboot your machine. It should boot up into the next stage of the install
-process, which is explained in <xref linkend="boot-new" />.
+finished. Remove the cdrom or other boot media and hit &enterkey; to reboot
+your machine. It should boot up into the newly installed system and
+allow you to log in. This is explained in <xref linkend="boot-new"/>.
 -->
 次に &d-i; は、インストールが終了したことを伝えます。
-CD-ROM や他の起動メディアを取り出して、マシンを再起動するために &enterkey;
-を叩いてください。<xref linkend="boot-new" />で説明しているように、
-インストール手順の次の段階に向けて起動するべきです。
+CD-ROM やその他の起動メディアを取り出して、マシンを再起動するために &enterkey;
+を叩いてください。
+新しくインストールしたシステムが起動し、ログインできるはずです。
+これは <xref linkend="boot-new"/> で説明しています。
 
 </para><para>
 
