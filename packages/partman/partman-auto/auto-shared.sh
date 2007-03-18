@@ -84,9 +84,12 @@ lvm_wipe_disk() {
 }
 
 wipe_disk() {
-	cd $dev
+	local dev
+	dev="$1"
 
 	lvm_wipe_disk "$dev" || return 1
+
+	cd $dev
 
 	open_dialog LABEL_TYPES
 	types=$(read_list)
