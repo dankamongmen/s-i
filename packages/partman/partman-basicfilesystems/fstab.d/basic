@@ -2,7 +2,7 @@
 
 . /lib/partman/definitions.sh
 
-utf8=false
+utf8=
 if db_get debian-installer/locale; then
     # This check breaks for certain locales (e.g. se_NO, vi_VN) that use the
     # UTF-8 encoding but whose names don't include ".UTF-8". This is
@@ -10,7 +10,7 @@ if db_get debian-installer/locale; then
     # localechooser.
     case $RET in
 	*.UTF-8)
-	    utf8=:
+	    utf8=1
 	    ;;
     esac
 fi
@@ -49,7 +49,7 @@ for dev in $DEVICES/*; do
 		    [ -f "$id/mountpoint" ] || continue
 		    mountpoint=$(cat $id/mountpoint)
 		    options=$(get_mountoptions $dev $id)
-		    if $utf8; then
+		    if [ "$utf8" ]; then
 			options="$options,utf8"
 		    fi
 		    echo "$path" "$mountpoint" vfat $options 0 0
