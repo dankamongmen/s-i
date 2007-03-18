@@ -4,12 +4,13 @@
 
 utf8=
 if db_get debian-installer/locale; then
-    # This check breaks for certain locales (e.g. se_NO, vi_VN) that use the
-    # UTF-8 encoding but whose names don't include ".UTF-8". This is
-    # difficult to fix without adding more encoding intelligence to
+    # TODO: This check breaks for locales that use the UTF-8 encoding but
+    # whose names don't include ".UTF-8". This is difficult to fix without
+    # adding more encoding intelligence to localechooser. In the meantime,
+    # we hardcode certain such non-obvious UTF-8 locales known to be used in
     # localechooser.
     case $RET in
-	*.UTF-8)
+	*.UTF-8|bn_BD|dz_BT|gu_IN|hi_IN|km_KH|ml_IN|ne_NP|pa_IN|se_NO|ta_IN|vi_VN|wo_SN)
 	    utf8=1
 	    ;;
     esac
