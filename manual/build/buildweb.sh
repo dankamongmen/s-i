@@ -5,7 +5,7 @@ set -e
 [ -r ./po_functions ] || exit 1
 . ./po_functions
 
-manual_release=${manual_release:=etch}
+manual_release=${manual_release:=lenny}
 
 if [ -z "$languages" ]; then
     # Buildlist of languages to be included on the official website
