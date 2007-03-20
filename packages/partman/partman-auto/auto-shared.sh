@@ -61,6 +61,8 @@ lvm_wipe_disk() {
 	# Make sure that parted has no stale LVM info
 	restart="0"
 	for tmpdev in $DEVICES/*; do
+		[ -d "$tmpdev" ] || continue
+
 		realdev=$(cat $tmpdev/device)
 
 		if ! $(echo "$realdev" | grep -q "/dev/mapper/"); then
