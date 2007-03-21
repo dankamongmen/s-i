@@ -25,10 +25,14 @@ use () {
 	. $DI_TESTDIR/schemes/$MACHINE/$1
 }
 
+overview_add () {
+	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log
+}
+
 overview () {
 	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new || true
-	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log.new
 	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
+	overview_add "$@"
 }
 
 log () {
@@ -69,7 +73,7 @@ for SCHEME in $@; do
 	mkdir -p $LOGDIR/$DATESTAMP
 	touch $LOGDIR/overview.log
 
-	overview incomplete
+	overview_add incomplete
 
 	FAILURE_STATUS_FILE=$(tempfile)
 	export FAILURE_STATUS_FILE
