@@ -1,3 +1,7 @@
 #!/bin/sh
 set -e
-rm -f $STATE_DIR/qemu-$MACHINE-$SCHEME.*
+if [ -z "$STATE_DIR" ] || [ -z "$MACHINE" ] || [ -z "$SCHEME" ]; then
+	echo "cleanupqemu: error!" >&2
+	exit 1
+fi
+rm -rf "$STATE_DIR/qemu-$MACHINE-$SCHEME".*

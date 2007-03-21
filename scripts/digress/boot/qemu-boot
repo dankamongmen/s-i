@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+# Boots qemu, assuming that it doesn't need any serial console commands to
+# start.
+use warnings;
+use strict;
+use POSIX 'setsid';
+
+# Run in the background.
+open STDIN, '/dev/null';
+defined(my $pid = fork) or die "Can'fork: $!";
+if ($pid) {
+	sleep 2;
+	exit;
+}
+setsid;
+
+exec $ENV{START_COMMAND} or die "running \"$ENV{START_COMMAND}\": $!";

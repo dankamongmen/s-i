@@ -1,0 +1,25 @@
+#!/bin/sh
+# Runs qemu, booting from netboot files on mips(el).
+set -e
+
+if [ -z "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
+
+# Qemu needs a dummy bios file for mips.
+mkdir -p $STATE_DIR/qemu-$MACHINE-$SCHEME.files
+dd if=/dev/zero of=$STATE_DIR/qemu-$MACHINE-$SCHEME.files/mips_bios.bin count=1 bs=1M
+
+# Store the pid so stopqemu can stop it later.
+echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+exec $QEMU_COMMAND \
+	-kernel $NETBOOT_KERNEL \
+	-initrd $NETBOOT_IMAGE \
+	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
+	-append "root=/dev/ram $BOOTPARAMS" \
+	-nographic \
+	-L $STATE_DIR/qemu-$MACHINE-$SCHEME.files \
+	-net nic -net user,hostname=qemu \
+	-no-reboot \
+	$QEMU_EXTRA_PARAMS \
+	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 
