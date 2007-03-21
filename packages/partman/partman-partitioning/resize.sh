@@ -5,20 +5,8 @@ check_virtual () {
     close_dialog
 }
 
-do_ntfsresize () {
-	local RET
-	ntfsresize="$(ntfsresize $@ 2>&1)"
-	RET=$?
-	echo "$ntfsresize" | grep -v "percent completed" | \
-		logger -t ntfsresize
-	return $RET
-}
-
-get_ntfs_resize_range () {
-    local backupdev num bdev size
-    open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
-    read_line minsize cursize maxsize
-    close_dialog
+get_real_device () {
+    local backupdev num
     # A weird way to get the real device path.  The partition numbers
     # in parted_server may be changed and the partition table is still
     # not commited to the disk
@@ -34,24 +22,67 @@ get_ntfs_resize_range () {
 		bdev=$bdev$num
 		;;
 	    *)
-		log "get_ntfs_resize_range: strange device name $bdev"
+		log "get_real_device: strange device name $bdev"
 		return
 		;;
 	esac
-	if [ -b $bdev ]; then
-	    if ! do_ntfsresize -f -i $bdev; then
-		logger -t partman "Error running 'ntfsresize --info'"
-		return 1
-	    fi
-	    size=$(echo "$ntfsresize" \
-		| grep '^You might resize at' \
-		| sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
-		| grep '^[0-9]*$')
-	    if [ "$size" ]; then
-		minsize=$size
-	    fi
+	if [ ! -b $bdev ]; then
+	    bdev=
 	fi
     fi
+}
+
+do_ntfsresize () {
+	local RET
+	ntfsresize="$(ntfsresize $@ 2>&1)"
+	RET=$?
+	echo "$ntfsresize" | grep -v "percent completed" | \
+		logger -t ntfsresize
+	return $RET
+}
+
+get_ntfs_resize_range () {
+    local bdev size
+    open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
+    get_real_device
+    if [ "$bdev" ]; then
+	if ! do_ntfsresize -f -i $bdev; then
+	    logger -t partman "Error running 'ntfsresize --info'"
+	    return 1
+	fi
+	size=$(echo "$ntfsresize" \
+	    | grep '^You might resize at' \
+	    | sed 's/^You might resize at \([0-9]*\) bytes.*/\1/' \
+	    | grep '^[0-9]*$')
+	if [ "$size" ]; then
+	    minsize=$size
+	fi
+    fi
+}
+
+get_ext2_resize_range () {
+    local bdev tune2fs block_size block_count free_blocks
+    open_dialog GET_VIRTUAL_RESIZE_RANGE $oldid
+    read_line minsize cursize maxsize
+    close_dialog
+    get_real_device
+    if [ "$bdev" ]; then
+	if ! tune2fs="$(tune2fs -l $bdev)"; then
+	    logger -t partman "Error running 'tune2fs -l $bdev'"
+	    return 1
+	fi
+	block_size="$(echo "$tune2fs" | grep '^Block size:' | head -n1 | sed 's/.*:[[:space:]]*//')"
+	block_count="$(echo "$tune2fs" | grep '^Block count:' | head -n1 | sed 's/.*:[[:space:]]*//')"
+	free_blocks="$(echo "$tune2fs" | grep '^Free blocks:' | head -n1 | sed 's/.*:[[:space:]]*//')"
+	if expr "$block_size" : '[0-9][0-9]*$' >/dev/null && \
+	   expr "$block_count" : '[0-9][0-9]*$' >/dev/null && \
+	   expr "$free_blocks" : '[0-9][0-9]*$' >/dev/null; then
+	    minsize="$(( ($block_count - $free_blocks) * $block_size ))"
+	fi
+    fi
+    return 0
 }
 
 get_resize_range () {
@@ -186,6 +217,64 @@ perform_resizing () {
 		exit 100
 	    fi
 	fi
+    elif \
+	[ "$virtual" = no ] \
+	&& [ -f $oldid/detected_filesystem ] \
+	&& ([ "$(cat $oldid/detected_filesystem)" = ext2 ] \
+	    || [ "$(cat $oldid/detected_filesystem)" = ext3 ])
+    then
+	# resize ext2/ext3; parted can handle simple cases but can't deal
+	# with certain common features such as resize_inode
+	db_progress START 0 1000 partman/text/please_wait
+	db_progress INFO partman-partitioning/progress_resizing
+	if longint_le "$cursize" "$newsize"; then
+	    open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
+	    read_line newid
+	    close_dialog
+	    open_dialog COMMIT
+	    close_dialog
+	    open_dialog PARTITION_INFO $newid
+	    read_line x1 x2 x3 x4 x5 path x7
+	    close_dialog
+	    # Wait for the device file to be created
+	    update-dev
+	    if ! resize2fs $path; then
+		logger -t partman "Error resizing the ext2/ext3 file system to the partition size"
+		db_input high partman-partitioning/new_size_commit_failed || true
+		db_go || true
+		db_progress STOP
+		exit 100
+	    fi
+	else
+	    open_dialog COMMIT
+	    close_dialog
+	    open_dialog PARTITION_INFO $oldid
+	    read_line x1 x2 x3 x4 x5 path x7
+	    close_dialog
+	    # Wait for the device file to be created
+	    update-dev
+	    if resize2fs $path "$(($newsize / 1024))K"; then
+		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
+		read_line newid
+		close_dialog
+		# Wait for the device file to be created
+		update-dev
+		if ! resize2fs $path; then
+		    logger -t partman "Error resizing the ext2/ext3 file system to the partition size"
+		    db_input high partman-partitioning/new_size_commit_failed || true
+		    db_go || true
+		    db_progress STOP
+		    exit 100
+		fi
+	    else
+		logger -t partman "Error resizing the ext2/ext3 file system"
+		db_input high partman-partitioning/new_size_commit_failed || true
+		db_go || true
+		db_progress STOP
+		exit 100
+	    fi
+	fi
+	db_progress STOP
     else
 	# resize virtual partitions, ext2, ext3, swap, fat16, fat32
 	# and probably reiserfs 
