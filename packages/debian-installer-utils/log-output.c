@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include <getopt.h>
 #include <syslog.h>
 #include <debian-installer.h>
@@ -11,6 +12,11 @@
 #else
 #  define ATTRIBUTE_UNUSED
 #endif
+
+/* See below for why this empty handler exists. */
+static void sigchld_handler(int signum ATTRIBUTE_UNUSED)
+{
+}
 
 static int close_orig_stdout(pid_t pid ATTRIBUTE_UNUSED, void *user_data)
 {
@@ -89,6 +95,20 @@ int main(int argc, char **argv)
 		return 0;
 
 	if (pass_stdout) {
+		/* di_exec is a bit odd, and won't always notice that the
+		 * subsidiary process has gone away if a stdout_handler
+		 * isn't installed. We install a no-op SIGCHLD handler to
+		 * make sure that its poll() gets EINTR and gives up.
+		 *
+		 * Technically, this is exploiting a bug in di_exec, and a
+		 * better solution would be nice ...
+		 */
+		struct sigaction sa;
+		sa.sa_handler = &sigchld_handler;
+		sigemptyset(&sa.sa_mask);
+		sa.sa_flags = SA_NOCLDSTOP;
+		sigaction(SIGCHLD, &sa, NULL);
+
 		orig_stdout = dup(1);
 		parent_prepare_handler = &close_orig_stdout;
 		child_prepare_handler = &restore_orig_stdout;
