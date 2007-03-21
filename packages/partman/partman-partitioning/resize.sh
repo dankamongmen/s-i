@@ -173,6 +173,8 @@ perform_resizing () {
 	&& [ "$(cat $oldid/detected_filesystem)" = ntfs ]
     then
 	# resize NTFS
+	db_progress START 0 1000 partman/text/please_wait
+	db_progress INFO partman-partitioning/progress_resizing
 	if longint_le "$cursize" "$newsize"; then
 	    open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 	    read_line newid
@@ -188,6 +190,7 @@ perform_resizing () {
 		logger -t partman "Error resizing the NTFS file system to the partition size"
 		db_input high partman-partitioning/new_size_commit_failed || true
 		db_go || true
+		db_progress STOP
 		exit 100
 	    fi
 	else
@@ -208,15 +211,18 @@ perform_resizing () {
 		    logger -t partman "Error resizing the NTFS file system to the partition size"
 		    db_input high partman-partitioning/new_size_commit_failed || true
 		    db_go || true
+		    db_progress STOP
 		    exit 100
 		fi
 	    else
 		logger -t partman "Error resizing the NTFS file system"
 		db_input high partman-partitioning/new_size_commit_failed || true
 		db_go || true
+		db_progress STOP
 		exit 100
 	    fi
 	fi
+	db_progress STOP
     elif \
 	[ "$virtual" = no ] \
 	&& [ -f $oldid/detected_filesystem ] \
