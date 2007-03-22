@@ -49,6 +49,15 @@ if db_get partman-auto/disk && [ "$RET" ]; then
 	disks="$RET"
 fi
 
+# If there's only one disk, then preseeding partman-auto/disk is
+# unnecessary, and sometimes inconvenient in heterogeneous environments
+if [ "$method" ] && [ -z "$disks" ]; then
+	DEVS="$(get_auto_disks)"
+	if [ "$(echo "$DEVS" | wc -l)" -eq 1 ]; then
+		disks="$(cat "${DEVS%$TAB*}"/device)"
+	fi
+fi
+
 # If both are set, let's try to do a completely automatic partitioning
 if [ "$method" ] && [ "$disks" ]; then
 	# The code for the methods could be merged, but in the future non-regular
