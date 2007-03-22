@@ -2127,6 +2127,29 @@ command_get_disk_type()
 }
 
 void
+command_is_busy()
+{
+        char *id;
+        PedPartition *part;
+        log("command_is_busy()");
+        scan_device_name();
+        if (dev == NULL)
+                critical_error("The device %s is not opened.", device_name);
+        open_out();
+        if (1 != iscanf("%as", &id))
+                critical_error("Expected partition id");
+        log("command_is_busy: busy check for id %s", id);
+        part = partition_with_id(disk, id);
+        oprintf("OK\n");
+        if (ped_partition_is_busy(part)) {
+                oprintf("yes\n");
+        } else {
+                oprintf("no\n");
+        }
+        free(id);
+}
+
+void
 make_fifo(char* name)
 {
     int status;
@@ -2298,6 +2321,8 @@ main_loop()
                         command_copy_partition();
                 else if (!strcasecmp(str, "GET_DISK_TYPE"))
                         command_get_disk_type();
+                else if (!strcasecmp(str, "IS_BUSY"))
+                        command_is_busy();
                 else
                         critical_error("Unknown command %s", str);
                 free(str);
