@@ -40,12 +40,16 @@ rm -f /tmp/efi_boot.list
 	    ;;
     esac
 done
+bootpart_priority=medium
+default_bootpart=
 if [ -s /tmp/efi_boot.list ]; then
     for d in `cat /tmp/efi_boot.list`; do
 	d=`mapdevfs $d`
 	if [ -n "$BOOTPARTS" ]; then
 	    BOOTPARTS="$BOOTPARTS, $d"
+	    bootpart_priority=critical
 	else
+	    default_bootpart=$d
 	    BOOTPARTS=$d
 	fi
     done
@@ -56,8 +60,12 @@ else
 fi
 rm -f /tmp/efi_boot.list
 db_subst elilo-installer/bootpart BOOTPARTS $BOOTPARTS
+db_fget elilo-installer/bootpart seen
+if [ "$RET" = false ]; then
+    db_set elilo-installer/bootpart "$default_bootpart"
+fi
 
-db_input critical elilo-installer/bootpart || true
+db_input "$bootpart_priority" elilo-installer/bootpart || true
 db_go || true
 
 db_get elilo-installer/bootpart
