@@ -110,5 +110,8 @@ while [ $code = 99 ]; do
 	ask_user /lib/partman/automatically_partition 
 	code=$?
 done
+if [ $code -lt 100 ]; then
+	rm -f /var/lib/partman/initial_auto # try again
+fi
 echo "partman-auto/automatically_partition" > /lib/partman/automatically_partition/question
 exit $code
