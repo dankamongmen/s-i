@@ -4,8 +4,39 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+log () {
+	logger -t nobootloader "$@"
+}
+
+error () {
+	log "error: $@"
+}
+
 findfs () {
 	mount | grep "on /target${1%/} " | cut -d' ' -f1
+}
+
+die () {
+	template="$1"
+	shift
+
+	error "$@"
+	db_input critical "$template" || [ $? -eq 30 ]
+	db_go || true
+	exit 1
+}
+
+mountvirtfs () {
+	fstype="$1"
+	path="$2"
+	if grep -q "[[:space:]]$fstype\$" /proc/filesystems && \
+	   ! grep -q "^[^ ]\+ \+$path " /proc/mounts; then
+		mkdir -p "$path" || \
+			die nobootloader/mounterr "Error creating $path"
+		mount -t "$fstype" "$fstype" "$path" || \
+			die nobootloader/mounterr "Error mounting $path"
+		trap "umount $path" HUP INT QUIT KILL PIPE TERM EXIT
+	fi
 }
 
 rootfs_devfs=$(findfs /)
@@ -29,6 +60,19 @@ bootfs=$(mapdevfs $bootfs_devfs)
 case "`archdetect`" in
 	powerpc/chrp_pegasos)
 		kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
+
+		if [ -z "$kernel" ]; then
+			kernelpath=`ls /target/boot/vmlinux-2.* | sed -e 's%/target%%'`
+			version="${kernelpath#*vmlinux-}"
+			if [ "$version" ]; then
+				if apt-install mkvmlinuz; then
+					# mkvmlinuz needs proc in /target
+					mountvirtfs proc /target/proc
+					chroot /target /usr/sbin/mkvmlinuz "$version" "$kernelpath"
+				fi
+			fi
+			kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
+		fi
 
 		partition_offset=1
 		if [ -e /proc/device-tree/openprom/firmware-version ]; then
