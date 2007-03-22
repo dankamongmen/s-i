@@ -63,7 +63,7 @@ EOF
 	case $(uname -r | cut -d . -f 1,2) in
 	    2.6)
 		if [ ! -d /target/sys/devices ] ; then
-			mount -t sysfs none /target/sys
+			mount -t sysfs sysfs /target/sys
 		fi
 		;;
 	esac
