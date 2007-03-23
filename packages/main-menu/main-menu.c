@@ -508,6 +508,14 @@ static void adjust_default_priority (void) {
 	}
 }
 
+static void restore_default_priority (void) {
+	const char *template = "debconf/priority";
+
+	di_log(DI_LOG_LEVEL_INFO, "Restoring default debconf priority '%s'",
+		debconf_priorities[default_priority] ? debconf_priorities[default_priority] : "(null)");
+	debconf_set(debconf, template, debconf_priorities[default_priority]);
+}
+
 void notify_user_of_failure (di_system_package *p) {
 	char buf[256];
 	
@@ -577,6 +585,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	di_packages *packages;
 	di_packages_allocator *allocator;
 	int ret;
+	int last_item_backup = 0;
 
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
@@ -600,6 +609,10 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	while ((p=show_main_menu(packages, allocator))) {
 		di_slist_node *node;
 
+		if (last_item_backup) {
+			restore_default_priority();
+			last_item_backup = 0;
+		}
 		ret = do_menu_item(p);
 		adjust_default_priority();
 		switch (ret) {
@@ -617,6 +630,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 			case EXIT_BACKUP:
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
 				modify_debconf_priority(LOWER);
+				last_item_backup = 1;
 				break;
 			default:
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
