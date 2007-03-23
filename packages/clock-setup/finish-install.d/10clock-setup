@@ -4,13 +4,13 @@ set -e
 . /usr/share/debconf/confmodule
 
 rcsfile=/target/etc/default/rcS
-tmp=/tmp/rcS
+adjtimefile=/target/etc/adjtime
 
 db_get clock-setup/utc
 if [ "$RET" = true ]; then
-	sed -e 's:^UTC="no":UTC="yes":' -e 's:^UTC=no:UTC=yes:' $rcsfile > $tmp
-	
+	sed -i -e 's:^UTC="no":UTC="yes":' -e 's:^UTC=no:UTC=yes:' $rcsfile
+	sed -i -e 's:^LOCAL:UTC:' $adjtimefile
 else
-	sed -e 's:^UTC="yes":UTC="no":' -e 's:^UTC=yes:UTC=no:' $rcsfile > $tmp
+	sed -i -e 's:^UTC="yes":UTC="no":' -e 's:^UTC=yes:UTC=no:' $rcsfile
+	sed -i -e 's:^UTC:LOCAL:' $adjtimefile
 fi
-mv $tmp $rcsfile
