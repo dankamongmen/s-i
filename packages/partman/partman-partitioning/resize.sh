@@ -231,8 +231,17 @@ perform_resizing () {
     then
 	# resize ext2/ext3; parted can handle simple cases but can't deal
 	# with certain common features such as resize_inode
+	fs="$(cat $oldid/detected_filesystem)"
 	db_progress START 0 1000 partman/text/please_wait
-	db_progress INFO partman-partitioning/progress_resizing
+	open_dialog PARTITION_INFO $oldid
+	read_line num x2 x3 x4 x5 x6 x7
+	close_dialog
+	db_metaget "partman/filesystem_short/$fs" description || RET=
+	[ "$RET" ] || RET="$fs"
+	db_subst partman-basicfilesystems/progress_checking TYPE "$RET"
+	db_subst partman-basicfilesystems/progress_checking PARTITION "$num"
+	db_subst partman-basicfilesystems/progress_checking DEVICE "$(humandev $(cat device))"
+	db_progress INFO partman-basicfilesystems/progress_checking
 	if longint_le "$cursize" "$newsize"; then
 	    open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 	    read_line newid
@@ -242,8 +251,32 @@ perform_resizing () {
 	    open_dialog PARTITION_INFO $newid
 	    read_line x1 x2 x3 x4 x5 path x7
 	    close_dialog
-	    # Wait for the device file to be created
-	    update-dev
+	else
+	    open_dialog COMMIT
+	    close_dialog
+	    open_dialog PARTITION_INFO $oldid
+	    read_line x1 x2 x3 x4 x5 path x7
+	    close_dialog
+	fi
+	# Wait for the device file to be created
+	update-dev
+	e2fsck_code=0
+	e2fsck -f -p $path || e2fsck_code=$?
+	if [ $e2fsck_code -gt 1 ]; then
+	    db_subst partman-basicfilesystems/check_failed TYPE "$fs"
+	    db_subst partman-basicfilesystems/check_failed PARTITION "$num"
+	    db_subst partman-basicfilesystems/check_failed DEVICE "$(humandev $(cat device))"
+	    db_set partman-basicfilesystems/check_failed 'true'
+	    db_input critical partman-basicfilesystems/check_failed || true
+	    db_go || true
+	    db_get partman-basicfilesystems/check_failed
+	    if [ "$RET" = 'true' ]; then
+		exit 100
+	    fi
+	fi
+	db_progress INFO partman-partitioning/progress_resizing
+	db_progress SET 500
+	if longint_le "$cursize" "$newsize"; then
 	    if ! resize2fs $path; then
 		logger -t partman "Error resizing the ext2/ext3 file system to the partition size"
 		db_input high partman-partitioning/new_size_commit_failed || true
@@ -252,13 +285,6 @@ perform_resizing () {
 		exit 100
 	    fi
 	else
-	    open_dialog COMMIT
-	    close_dialog
-	    open_dialog PARTITION_INFO $oldid
-	    read_line x1 x2 x3 x4 x5 path x7
-	    close_dialog
-	    # Wait for the device file to be created
-	    update-dev
 	    if resize2fs $path "$(($newsize / 1024))K"; then
 		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 		read_line newid
@@ -280,6 +306,7 @@ perform_resizing () {
 		exit 100
 	    fi
 	fi
+	db_progress SET 1000
 	db_progress STOP
     else
 	# resize virtual partitions, ext2, ext3, swap, fat16, fat32
