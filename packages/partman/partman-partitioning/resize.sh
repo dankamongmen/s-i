@@ -222,6 +222,7 @@ perform_resizing () {
 		exit 100
 	    fi
 	fi
+	db_progress SET 1000
 	db_progress STOP
     elif \
 	[ "$virtual" = no ] \
