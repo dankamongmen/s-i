@@ -26,10 +26,16 @@ get_size () {
 for i in $(grep ^md /proc/mdstat | grep -v inactive | \
 	   sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
 	NUMBER=$(echo ${i}|sed -e "s/^md//")
-	DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
+	if [ -e "/dev/md/${NUMBER}" ]; then
+		DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
+		DEVNODE="/dev/md/${NUMBER}"
+	else
+		DEVICE="/var/lib/partman/devices/=dev=md${NUMBER}"
+		DEVNODE="/dev/md${NUMBER}"
+	fi
 	mkdir -p ${DEVICE}
 	cd ${DEVICE}
-	echo "/dev/md/${NUMBER}" > ${DEVICE}/device
+	echo "$DEVNODE" > ${DEVICE}/device
 
 	db_metaget partman-md/text/device description
 	echo "${RET}" > ${DEVICE}/model
@@ -42,11 +48,11 @@ for i in $(grep ^md /proc/mdstat | grep -v inactive | \
 	size=$(($size * $sector_size))
 	echo "$size" > ${DEVICE}/size
 
-	open_dialog OPENED "/dev/md/${NUMBER}"
+	open_dialog OPENED "$DEVNODE"
 	read_line response
 	close_dialog
 	if [ "$response" = "no" ]; then
-		open_dialog OPEN "/dev/md/${NUMBER}"
+		open_dialog OPEN "$DEVNODE"
 		read_line response
 		close_dialog
 		if [ "$response" = "failed" ]; then
