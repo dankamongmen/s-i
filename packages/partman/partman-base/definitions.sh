@@ -702,7 +702,7 @@ humandev () {
 		printf "$RET" ".CCISS" "-" "$controller" "$lun" "$part" "$linux"
 	    fi
 	    ;;
-	/dev/md/*)
+	/dev/md*|/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
 	    type=`grep "^md${device}[ :]" /proc/mdstat | sed -e "s/^.* : active raid\([[:alnum:]]\).*/\1/"`
 	    db_metaget partman/text/raid_device description
