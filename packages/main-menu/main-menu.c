@@ -609,7 +609,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	while ((p=show_main_menu(packages, allocator))) {
 		di_slist_node *node;
 
-		if (last_item_backup) {
+		if (p->installer_menu_item < NEVERDEFAULT && last_item_backup) {
 			restore_default_priority();
 			last_item_backup = 0;
 		}
