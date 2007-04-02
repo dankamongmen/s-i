@@ -459,11 +459,13 @@ for dist in testing unstable cvs ; do
 		# generate ranking information
 		LEAD="000";
 	 	P="${LEAD:0:${#LEAD}-${#P}}$P"
-		if [ ! `grep "^${lang}$" $PROSPECTIVE` ]; then
-	 	   echo -en "$P%\t $lang" >> $TARGET_DIR/.rank$ext.txt$LEVEL
-  		   test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank$ext.txt$LEVEL
-	  	   echo >> $TARGET_DIR/.rank$ext.txt$LEVEL
+		echo -en "$P%\t $lang" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+		if [ `grep "^${lang}$" $PROSPECTIVE` ]; then
+	 		echo -en " (PROSPECTIVE)" >> $TARGET_DIR/.rank$ext.txt$LEVEL
 		fi
+  		test -e /tmp/.$LEVEL.error && echo -n " SOME FILE(S) ARE CORRUPTED" >> $TARGET_DIR/.rank$ext.txt$LEVEL
+	  	echo >> $TARGET_DIR/.rank$ext.txt$LEVEL
+
 	  	rm -f /tmp/.$LEVEL.error 
 
 
