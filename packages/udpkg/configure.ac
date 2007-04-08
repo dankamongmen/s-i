@@ -36,9 +36,9 @@ if test "$with_loadtemplate" != "no"; then
 fi
 
 dnl Support localized status files?
-AC_ARG_WITH(l18n,[  --without-l18n          do not support localized status files])
-if test "$with_l18n" != "no"; then
-  AC_DEFINE([SUPPORTL18N], [], [Support l18n?])
+AC_ARG_WITH(l10n,[  --without-l10n          do not support localized status files])
+if test "$with_l10n" != "no"; then
+  AC_DEFINE([SUPPORTL10N], [], [Support l10n?])
 fi
 
 dnl Do we need --remove support?

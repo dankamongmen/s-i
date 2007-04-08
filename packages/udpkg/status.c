@@ -146,7 +146,7 @@ void control_read(FILE *f, struct package_t *p)
 			p->long_description = strdup("");
 			read_block(f, &p->long_description);
 		}
-#ifdef DOL18N
+#ifdef SUPPORTL10N
 		else if (strstr(buf, "description-") == buf)
 		{
 			/* Localized description */
@@ -359,7 +359,7 @@ int status_merge(void *status, struct package_t *pkgs)
 			fprintf(fout, "Conffiles:\n %s\n", pkg->conffiles);
 		if (pkg->description)
 			fprintf(fout, "Description: %s\n%s", pkg->description, pkg->long_description);
-#ifdef DOL18N
+#ifdef SUPPORTL10N
 		if (pkg->localized_descriptions) {
 			struct language_description_t *ld;
 			ld = pkg->localized_descriptions;
