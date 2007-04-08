@@ -4,13 +4,11 @@ dnl The ONLY thing this is used for is to configure for different
 dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
-AC_INIT(configure.in)
+AC_INIT([udpkg], m4_esyscmd(dpkg-parsechangelog | perl -ne 'print $1 if m/^Version: (.*)$/;'))
 AC_CONFIG_SRCDIR([udpkg.c])
 CFLAGS="-Wall $CFLAGS"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(config.h:config.h.in)
-
-AC_DEFINE_UNQUOTED(PACKAGE,"udpkg")
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -21,32 +19,32 @@ dnl Checks for libraries.
 dnl Enable debugging?
 AC_ARG_WITH(debug,[  --without-debug         turn off debugging?])
 if test "$with_debug" != "no"; then
-  AC_DEFINE(DODEBUG)
+  AC_DEFINE([DODEBUG], [], [Should we do debugging?])
   CFLAGS="$CFLAGS -g"
 fi
 
 dnl Do dependency checking?
 AC_ARG_WITH(depends,[  --without-depends       do not do dependency checking])
 if test "$with_depends" != "no"; then
-  AC_DEFINE(DODEPENDS)
+  AC_DEFINE([DODEPENDS], [], [Should we do full dependency checking?])
 fi
 
 dnl Load templates?
 AC_ARG_WITH(loadtemplate,[  --without-loadtemplate  do not call debconf-loadtemplate])
 if test "$with_loadtemplate" != "no"; then
-  AC_DEFINE(DOLOADTEMPLATE)
+  AC_DEFINE([DOLOADTEMPLATE], [], [Should we call debconf-loadtemplate?])
 fi
 
 dnl Support localized status files?
 AC_ARG_WITH(l18n,[  --without-l18n          do not support localized status files])
 if test "$with_l18n" != "no"; then
-  AC_DEFINE(SUPPORTL18N)
+  AC_DEFINE([SUPPORTL18N], [], [Support l18n?])
 fi
 
 dnl Do we need --remove support?
 AC_ARG_WITH(remove,[  --without-remove        do not support the --remove flag])
 if test "$with_remove" != "no"; then
-  AC_DEFINE(DOREMOVE)
+  AC_DEFINE([DOREMOVE], [], [Should we support the --remove flag?])
 fi
 
 dnl dpkg library directory
