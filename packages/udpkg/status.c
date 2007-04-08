@@ -96,17 +96,17 @@ static const char *status_print(unsigned long flags)
 int read_block(FILE *f, char **ml)
 {
 	char ch;
-        char *multiple_lines = *ml;
+	char *multiple_lines = *ml;
 	char buf[BUFSIZE];
 
 	while (((ch = fgetc(f)) == ' ') && !feof(f)) {
 		fgets(buf, BUFSIZE, f);
 		multiple_lines = (char *) di_realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
-                memset(multiple_lines + strlen(multiple_lines), '\0', strlen(buf) + 2);
+		memset(multiple_lines + strlen(multiple_lines), '\0', strlen(buf) + 2);
 		strcat(multiple_lines, " ");
 		strcat(multiple_lines, buf);
 	}
-        *ml = multiple_lines;
+	*ml = multiple_lines;
 	ungetc(ch, f);
 	return EXIT_SUCCESS;
 }
@@ -152,7 +152,7 @@ void control_read(FILE *f, struct package_t *p)
 			/* Localized description */
 			struct language_description_t *l;
 			l = di_malloc(sizeof(struct language_description_t));
-                        memset(l,'\0',sizeof (struct language_description_t));
+			memset(l,'\0',sizeof (struct language_description_t));
 			l->next = p->localized_descriptions;
 			p->localized_descriptions = l;
 			buf[14] = '\0';
@@ -160,7 +160,6 @@ void control_read(FILE *f, struct package_t *p)
 			l->description = strdup(buf+16);
 			l->long_description = strdup("");
 			read_block(f, &l->long_description);
-                        
 		}
 #endif
 		/* This is specific to the Debian Installer. Ifdef? */
@@ -198,7 +197,7 @@ void control_read(FILE *f, struct package_t *p)
 		}
 		else if (strcasestr(buf, "Conffiles: ") == buf)
 		{
-                        p->conffiles = strdup("");
+			p->conffiles = strdup("");
 			read_block(f, &p->conffiles);
 		}
 
@@ -365,13 +364,13 @@ int status_merge(void *status, struct package_t *pkgs)
 			struct language_description_t *ld;
 			ld = pkg->localized_descriptions;
 			while (ld) {
-                                if (ld->language && ld->description && 
-                                    ld->long_description) {
-                                        fprintf(fout, "description-%s: %s\n%s", 
-                                                ld->language,
-                                                ld->description, 
-                                                ld->long_description);
-                                }
+				if (ld->language && ld->description && 
+				    ld->long_description) {
+					fprintf(fout, "description-%s: %s\n%s", 
+						ld->language,
+						ld->description, 
+						ld->long_description);
+				}
 				ld = ld->next;
 			}
 		}
