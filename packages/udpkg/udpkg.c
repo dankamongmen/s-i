@@ -29,7 +29,7 @@ static int is_file(const char *fn)
 	return S_ISREG(statbuf.st_mode);
 }
 
-int dpkg_print_architecture()
+static int dpkg_print_architecture()
 {
 	puts(ARCH_TEXT);
 	return 0;

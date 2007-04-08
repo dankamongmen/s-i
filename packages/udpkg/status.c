@@ -93,7 +93,7 @@ static const char *status_print(unsigned long flags)
 	return buf;
 }
 
-int read_block(FILE *f, char **ml)
+static int read_block(FILE *f, char **ml)
 {
 	char ch;
 	char *multiple_lines = *ml;

@@ -6,7 +6,7 @@ dnl code more portable
 
 AC_INIT([udpkg], m4_esyscmd(dpkg-parsechangelog | perl -ne 'print $1 if m/^Version: (.*)$/;'))
 AC_CONFIG_SRCDIR([udpkg.c])
-CFLAGS="-Wall $CFLAGS"
+CFLAGS="$CFLAGS -Wall -Wmissing-prototypes"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(config.h:config.h.in)
 
