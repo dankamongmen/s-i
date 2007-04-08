@@ -121,10 +121,12 @@ static int dpkg_dounpack(struct package_t *pkg)
 	char *cwd;
 	char buf[1024], buf2[1024];
 	unsigned int i;
-	char *adminscripts[] = { "prerm", "postrm", "preinst", "postinst",
-	                         "conffiles", "md5sums", "shlibs", 
-				 "templates", "menutest", "isinstallable",
-				 "config" };
+	const char *adminscripts[] = {
+		"prerm", "postrm", "preinst", "postinst",
+	        "conffiles", "md5sums", "shlibs",
+		"templates", "menutest", "isinstallable",
+		"config"
+	};
 #ifdef DOREMOVE
 	char *p;
 	FILE *infp = NULL, *outfp = NULL;
