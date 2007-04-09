@@ -137,7 +137,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 	cwd = getcwd(0, 0);
 	chdir("/");
 	snprintf(buf, sizeof(buf), "ar -p %s data.tar.gz|tar -xzf -", pkg->file);
-	if (di_exec_shell_log(buf) == 0)
+	if ((r = di_exec_shell_log(buf)) == 0)
 	{
 		/* Installs the package scripts into the info directory */
 		for (i = 0; i < sizeof(adminscripts) / sizeof(adminscripts[0]);
@@ -176,8 +176,11 @@ static int dpkg_dounpack(struct package_t *pkg)
 					snprintf(buf, sizeof(buf),
 						 "debconf-loadtemplate %s %s",
 						 pkg->package, buf2);
-					if (di_exec_shell_log(buf) != 0)
-						r = 1;
+					if ((r = di_exec_shell_log(buf)) != 0)
+						FPRINTF(stderr,
+							"debconf-loadtemplate "
+							"exited with status "
+							"%d\n", r);
 					/* Delete templates after loading. */
 					unlink(buf2);
 				}
@@ -240,7 +243,7 @@ static int dpkg_dounpack(struct package_t *pkg)
 			pkg->status |= STATUS_STATUSHALFINSTALLED;
 	}
 	else
-		r = 1;
+		FPRINTF(stderr, "%s exited with status %d\n", buf, r);
 	chdir(cwd);
 	return r;
 }
@@ -253,7 +256,7 @@ static int dpkg_doinstall(struct package_t *pkg)
 
 static int dpkg_unpackcontrol(struct package_t *pkg)
 {
-	int r = 1;
+	int r;
 	char *cwd = 0;
 	char *p;
 	char buf[1024], buf2[1024];
@@ -269,33 +272,45 @@ static int dpkg_unpackcontrol(struct package_t *pkg)
 	cwd = getcwd(0, 0);
 	snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, pkg->package);
 	DPRINTF("dir = %s\n", buf);
-	if (mkdir(buf, S_IRWXU) == 0 && chdir(buf) == 0)
+	if (mkdir(buf, S_IRWXU) != 0)
 	{
-		snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzf -",
-			pkg->file);
-		if (di_exec_shell_log(buf) == 0)
+		FPRINTF(stderr, "mkdir %s: %s\n", buf, strerror(errno));
+		return 1;
+	}
+	if (chdir(buf) != 0)
+	{
+		FPRINTF(stderr, "chdir %s: %s\n", buf, strerror(errno));
+		return 1;
+	}
+	snprintf(buf, sizeof(buf), "ar -p %s control.tar.gz|tar -xzf -",
+		pkg->file);
+	if ((r = di_exec_shell_log(buf)) != 0)
+	{
+		FPRINTF(stderr, "%s exited with status %d\n", buf, r);
+		return r;
+	}
+	if ((f = fopen("control", "r")) == NULL) 
+	{
+		FPRINTF(stderr, "fopen control: %s\n", strerror(errno));
+		return 1;
+	}
+	control_read(f, pkg);
+	if (strcmp(pkg->package, p) != 0) 
+	{
+		snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, p);
+		snprintf(buf2, sizeof(buf2), "%s%s", DPKGCIDIR, pkg->package);
+		if (rename(buf, buf2) != 0)
 		{
-			if ((f = fopen("control", "r")) != NULL) 
-			{
-				control_read(f, pkg);
-				if (strcmp(pkg->package, p) != 0) 
-				{
-					snprintf(buf, sizeof(buf), "%s%s", DPKGCIDIR, p);
-					snprintf(buf2, sizeof(buf2), "%s%s", DPKGCIDIR, pkg->package);
-					r = rename(buf, buf2);
-				}
-				else 
-				{
-					r = 0;
-				}
-				free(p);
-			}
+			FPRINTF(stderr, "rename %s %s: %s\n",
+				buf, buf2, strerror(errno));
+			return 1;
 		}
 	}
+	free(p);
 
 	chdir(cwd);
 	free(cwd);
-	return r;
+	return 0;
 }
 
 static int dpkg_unpack(struct package_t *pkgs)
@@ -363,7 +378,6 @@ static int dpkg_install(struct package_t *pkgs)
 	for (p = pkgs; p != 0; p = p->next)
 		if (dpkg_unpackcontrol(p) != 0)
 		{
-			perror(p->file);
 			/* force loop break, and prevents further ops */
 			pkgs = 0;
 		}
@@ -387,10 +401,10 @@ static int dpkg_install(struct package_t *pkgs)
 		p->status &= STATUS_FLAGMASK;
 		p->status |= STATUS_FLAGOK;
 
-		if (dpkg_doinstall(p) != 0)
-		{
-			perror(p->file);
-		}
+		/* don't worry about errors here; error messages are printed
+		 * internally
+		 */
+		dpkg_doinstall(p);
 	}
 	
 	if (ordered != 0)
