@@ -4,14 +4,14 @@ log() {
 	logger -t lilo-installer "$@"
 }
 
-MANUFACTURER="$(dmidecode -s system-manufacturer)"
-case $MANUFACTURER in
-    Apple*)
-	# LILO stands a better chance of working under Boot Camp,
+ARCH="$(archdetect)"
+case $ARCH in
+    i386/mac|amd64/mac)
+	# LILO stands a better chance of working in BIOS compatibility mode,
 	# where /sys/firmware/efi doesn't exist.
 	# Note: depends on partman-efi to load the efivars module!
 	if [ -d /sys/firmware/efi ]; then
-		log "LILO not usable on Intel-based Macs; use elilo"
+		log "LILO not usable on Intel-based Macs without BIOS compatibility; use elilo"
 		exit 1
 	fi
 	;;
