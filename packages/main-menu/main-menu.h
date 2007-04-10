@@ -16,7 +16,7 @@
 
 #include <debian-installer.h>
 
-#define NEVERDEFAULT 900
+#define NEVERDEFAULT 90000
 
 enum
 {
