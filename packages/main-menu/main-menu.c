@@ -58,6 +58,9 @@ int package_array_compare (const void *v1, const void *v2) {
 	p2 = *(di_system_package **)v2;
 
 	int r = p1->installer_menu_item - p2->installer_menu_item;
+	//di_log(DI_LOG_LEVEL_DEBUG, "menu compare: %s (%i) vs %s (%i): %i", 
+	//		p1->p.package, p1->installer_menu_item,
+	//		p2->p.package, p2->installer_menu_item, r);
 	if (r) return r;
 	return strcmp(p1->p.package, p2->p.package);
 }
