@@ -21,9 +21,6 @@ if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
 
-# Is hotplug available?  Updated by hotplug_type()
-HOTPLUG_TYPE=fake
-
 log () {
 	logger -t hw-detect "$@"
 }
@@ -101,26 +98,6 @@ load_module() {
 	echo $old > /proc/sys/kernel/printk
 }
 
-hotplug_type () {
-	if [ -f /proc/sys/kernel/hotplug ]; then
-		HOTPLUG_HANDLER="$(cat /proc/sys/kernel/hotplug)"
-		case $HOTPLUG_HANDLER in
-			''|/sbin/udevsend)
-				HOTPLUG_TYPE=udev
-				;;
-			*)
-				if [ -d /etc/hotplug ]; then
-					HOTPLUG_TYPE=real
-				else
-					HOTPLUG_TYPE=fake
-				fi
-				;;
-		esac
-	else
-		HOTPLUG_TYPE=
-	fi
-}
-
 # Some pci chipsets are needed or there can be DMA or other problems.
 get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
@@ -194,9 +171,6 @@ get_manual_hw_info() {
 	fi
 }
 
-# Detect hotplug type
-hotplug_type
-
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
@@ -225,14 +199,7 @@ fi
 
 # If using real hotplug, re-run the rc scripts to pick up new modules.
 # TODO: this just loads modules itself, rather than handing back a list
-case $HOTPLUG_TYPE in
-	real)
-		/lib/debian-installer/coldplug
-		;;
-	udev)
-		update-dev
-		;;
-esac
+update-dev
 
 ALL_HW_INFO=$(get_early_manual_hw_info; get_detected_hw_info; get_manual_hw_info)
 db_progress STEP $OTHER_STEPSIZE
@@ -419,22 +386,9 @@ if [ "$PCMCIA_INIT" ]; then
 			rm -f /var/run/cardmgr.pid
 		fi
 
-		# If hotplugging is available in the kernel, we can use it to
-		# tell which network interfaces belong to PCMCIA devices.
-		if [ "$HOTPLUG_TYPE" = fake ]; then
-			# Simple handling of hotplug events during PCMCIA
-			# detection
-			saved_hotplug=`cat /proc/sys/kernel/hotplug`
-			echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
-		fi
-	    
 		CARDMGR_OPTS="-f" $PCMCIA_INIT start </dev/null 3<&0 2>&1 \
 			| logger -t hw-detect
 	    
-		if [ "$HOTPLUG_TYPE" = fake ]; then
-			echo $saved_hotplug >/proc/sys/kernel/hotplug
-		fi
-
 		db_progress STEP $OTHER_STEPSIZE
 	fi
 	db_fset hw-detect/start_pcmcia seen true || true
@@ -528,7 +482,7 @@ if [ -d /sys/class/misc/pmu/ ]; then
 	apt-install pbbuttonsd || true
 fi
 
-# Install optimised libc based on CPU type.
+# Install optimised libc based on CPU type
 case "$(udpkg --print-architecture)" in
 	i386)
 		case "$(grep '^cpu family' /proc/cpuinfo | cut -d: -f2)" in
