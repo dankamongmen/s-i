@@ -4,16 +4,24 @@ kernel-wedge (2.32) UNRELEASED; urgency=low
     pcmcia-modules. These were only listed in i386's files for some
     reason before.
   * 2.6.20 support:
-    - add dgrs, netxen_nic, broadcom, qla3xxx to nic-extra-modules
+    - add dgrs, netxen_nic, qla3xxx to nic-extra-modules
+      NB: netxen_nic may need external firmware; dgrs seems to contain a
+      binary blob in the kernel.
     - didn't add new tokenring modules for 3c359 and smctr, guessing noone
       will need them?
     - add aic94xx and qla4xxx, and stex to scsi-modules.
     - add mcs7830 to nic-usb-modules.
-    - didn't add aircable to usb-serial-modules, as I'm guessing noone will 
+    - didn't add aircable to usb-serial-modules, as I'm guessing noone will
       use it in d-i (ditto for mos7720 and mos7840)
-    - TODO: ata changes
+    - Add pata_* to ide-modules. This is quite likely wrong, since all the
+      old ide modules are also in there, and most of them register the same
+      pci ida as the pata modules. Which one wins I don't know. I'm just
+      following the kernel team here so that d-i behaves the same as a system
+      running the 2.6.20 kernel package. Expect that this will be worked out
+      in the future and only one version of each module include.
+    - pata_pcmcia to pcmcia-modules
 
- -- Joey Hess <joeyh@debian.org>  Thu, 12 Apr 2007 00:44:49 -0400
+ -- Joey Hess <joeyh@debian.org>  Thu, 12 Apr 2007 01:39:44 -0400
 
 kernel-wedge (2.31) unstable; urgency=low
 
