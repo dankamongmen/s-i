@@ -83,45 +83,25 @@ if [ -n "$HD_MEDIA" ]; then
     HD_MEDIA="$(mapdevfs $HD_MEDIA)"
 fi
 founddevs=
-if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
-    disk_containing () {
+disk_containing () {
 	dirname "$(udevinfo -q path -n "$dev")"
-    }
-    partitions="$(list-devices partition)"
-    for dev in $partitions; do
-	if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
-	    continue
-	fi
-	disk="$(disk_containing "$dev")"
-	for otherdev in $partitions; do
-	    if [ "$(disk_containing "$otherdev")" = "$disk" ] && \
-	       grep -q "^$otherdev " /target/etc/fstab; then
-		continue 2
-	    fi
-	done
-	mapdev="$(mapdevfs $dev)"
-	founddevs="${founddevs:+$founddevs }$mapdev"
-    done
-else
-    for dir in /proc/scsi/usb-storage-* /proc/scsi/usb-storage; do
-	if [ -d "$dir" ]; then
-	    for ent in $dir/*; do
-		if [ -f "$ent" ]; then
-		    host=$(grep "Host scsi" $ent | sed 's/.*scsi\([0-9]\).*/\1/')
-		    for dev in $(find /dev/scsi/host$host/ -type b); do
-			if [ -b "$dev" ]; then
-			    if grep -q "^$(mapdevfs $dev) " /target/etc/fstab; then
-				continue 2
-			    fi
-			fi
-		    done
-		    dev=$(mapdevfs $(find /dev/scsi/host$host/ -type b | grep /disc))
-		    founddevs="${founddevs:+$founddevs }$dev"
-		fi
-	    done
+}
+partitions="$(list-devices partition)"
+for dev in $partitions; do
+    if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
+	continue
+    fi
+    disk="$(disk_containing "$dev")"
+    for otherdev in $partitions; do
+	if [ "$(disk_containing "$otherdev")" = "$disk" ] && \
+	   grep -q "^$otherdev " /target/etc/fstab; then
+	    continue 2
 	fi
     done
-fi
+    mapdev="$(mapdevfs $dev)"
+    founddevs="${founddevs:+$founddevs }$mapdev"
+done
+
 USBDEVICES=
 for dev in $founddevs; do
     if [ -z "$USBDEVICES" ]; then
