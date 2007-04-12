@@ -21,9 +21,6 @@ if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
 
-# Which discover version to use.  Updated by discover_version()
-DISCOVER_VERSION=1
-
 # Is hotplug available?  Updated by hotplug_type()
 HOTPLUG_TYPE=fake
 
@@ -104,68 +101,6 @@ load_module() {
 	echo $old > /proc/sys/kernel/printk
 }
 
-blacklist_de4x5 () {
-	cat << EOF >> $finish_install
-if [ -e /target/etc/discover.conf ]; then
-	touch /target/etc/discover-autoskip.conf
-	(echo "# blacklisted since tulip is used instead"; echo skip de4x5 ) >> /target/etc/discover-autoskip.conf
-fi
-EOF
-}
-
-discover_version () {
-	if type discover >/dev/null 2>&1; then
-		# Ugh, Discover 1.x didn't exit with nonzero status if given an
-		# unrecognized option!
-		DISCOVER_TEST=$(discover --version 2> /dev/null) || true
-		if expr "$DISCOVER_TEST" : 'discover 2.*' > /dev/null 2>&1; then
-			log "Testing experimental discover version 2."
-			DISCOVER_VERSION=2
-		else
-			log "Using discover version 1."
-			DISCOVER_VERSION=1
-		fi
-	else
-		DISCOVER_VERSION=
-	fi
-}
-
-# join hack for discover 2
-dumb_join_discover (){
-	IFS_SAVE="$IFS"
-	IFS="$NEWLINE"
-	for i in $MODEL_INFOS; do
-		echo $1:$i;
-		shift
-	done
-	IFS="$IFS_SAVE"
-}
-
-# wrapper for discover command that can distinguish Discover 1.x and 2.x
-discover_hw () {
-	case "$DISCOVER_VERSION" in
-	2)
-		dpath=linux/module/name
-		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.6)
-		dflags="-d all -e ata -e pci -e pcmcia -e \
-			scsi bridge broadband fixeddisk humaninput modem \
-			network optical removabledisk"
-
-		MODEL_INFOS=$(discover -t $dflags)
-		MODULES=$(discover --data-path=$dpath --data-version=$dver $dflags)
-		dumb_join_discover $MODULES
-		;;
-	1)
-		case "$SUBARCH" in
-		  sparc/*) sbus=",sbus" ;;
-		esac
-		discover --format="%m:%V %M\n" --disable-all \
-		          --enable=pci,ide,scsi${sbus},pcmcia ide scsi cdrom ethernet bridge |
-			sed 's/ $//'
-		;;
-	esac
-}
-
 hotplug_type () {
 	if [ -f /proc/sys/kernel/hotplug ]; then
 		HOTPLUG_HANDLER="$(cat /proc/sys/kernel/hotplug)"
@@ -191,11 +126,7 @@ get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
 		if [ -e $ide_module ]; then
 			baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
-			# hpt366 is in the discover database, and causes
-			# problems with some other hardware (bug #269823)
-			if [ "$baseidemod" != hpt366 ]; then
-				echo "$baseidemod:IDE chipset support"
-			fi
+			echo "$baseidemod:IDE chipset support"
 		fi
 	done
 }
@@ -211,7 +142,6 @@ get_detected_hw_info() {
 	if [ "${SUBARCH%%/*}" = sparc ]; then
 		discover-sbus
 	fi
-	discover_hw
 	if [ -d /proc/bus/usb ]; then
 		echo "usb-storage:USB storage"
 	fi
@@ -253,7 +183,7 @@ get_manual_hw_info() {
 	echo "isofs:Linux ISO 9660 filesystem"
 
 	# on some hppa systems, nic and scsi won't be found because they're
-	# not on a bus that discover understands ... 
+	# not on a bus that udev understands ... 
 	if [ "`udpkg --print-architecture`" = hppa ]; then
 		echo "lasi_82596:LASI Ethernet"
 		register-module lasi_82596
@@ -263,9 +193,6 @@ get_manual_hw_info() {
 		register-module -i zalon7xx
 	fi
 }
-
-# Detect discover version
-discover_version
 
 # Detect hotplug type
 hotplug_type
@@ -280,10 +207,11 @@ db_progress START 0 $MAX_STEPS $PROGRESSBAR
 
 db_progress INFO hw-detect/detect_progress_step
 
+# TODO: Can possibly be removed if udev will load yenta_socket automatically
 # Load yenta_socket, if hardware is available, so that
 # discover will see Cardbus cards.
-if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
-	/sys/bus/pci/devices/*/class && \
+if [ -d /sys/bus/pci/devices ] && \
+	grep -q 0x060700 /sys/bus/pci/devices/*/class && \
 	! grep -q ^yenta_socket /proc/modules; then
 	db_subst hw-detect/load_progress_step CARDNAME "Cardbus bridge"
 	db_subst hw-detect/load_progress_step MODULE "yenta_socket"
@@ -326,13 +254,6 @@ for device in $ALL_HW_INFO; do
 	then
 		if [ -z "$cardname" ]; then
 			cardname="[Unknown]"
-		fi
-		
-		if [ "$module" = de4x5 ] && ! in_list "$module" "$AVAIL_MODULES"; then
-			log "Using tulip rather than unavailable de4x5"
-			blacklist_de4x5
-			module=tulip
-			tulip_de4x5_hack=1
 		fi
 		
 		if in_list "$module" "$AVAIL_MODULES"; then
@@ -391,11 +312,6 @@ for device in $(list_to_lines); do
 			load_module "$module"
 		else
 			load_module "$module" "$cardname"
-		fi
-
-		if [ "$module" = tulip ] && [ "$tulip_de4x5_hack" = 1 ]; then
-			log "Forcing use of tulip in installed system (de4x hack)"
-			register-module tulip
 		fi
 	fi
 
@@ -593,22 +509,8 @@ if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmciautils /var/lib/apt-install/queue 
 	fi
 fi
 
-# Install appropriate hardware detection tool into target.
-if type udevd >/dev/null 2>&1; then
-	apt-install udev || true
-else
-	case "$DISCOVER_VERSION" in
-		2)
-			apt-install discover || true
-			;;
-		1|'')
-			apt-install discover1 || true
-			;;
-	esac
-	if [ -f /proc/sys/kernel/hotplug ]; then
-		apt-install hotplug || true
-	fi
-fi
+# Install udev into target
+apt-install udev || true
 
 # TODO: should this really be conditional on hotplug support?
 if [ -f /proc/sys/kernel/hotplug ]; then
