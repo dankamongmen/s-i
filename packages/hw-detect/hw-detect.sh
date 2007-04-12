@@ -104,24 +104,6 @@ load_module() {
 	echo $old > /proc/sys/kernel/printk
 }
 
-load_sr_mod () {
-	case "$(uname -r)" in
-	2.4*)
-		if is_not_loaded "sr_mod"; then
-			if is_available "sr_mod"; then
-				db_subst hw-detect/load_progress_step CARDNAME "SCSI CDROM support"
-				db_subst hw-detect/load_progress_step MODULE "sr_mod"
-				db_progress INFO hw-detect/load_progress_step
-				load_module sr_mod
-				register-module sr_mod
-			else
-				missing_module sr_mod "SCSI CDROM"
-			fi
-		fi
-		;;
-	esac
-}
-
 blacklist_de4x5 () {
 	cat << EOF >> $finish_install
 if [ -e /target/etc/discover.conf ]; then
@@ -164,7 +146,7 @@ discover_hw () {
 	case "$DISCOVER_VERSION" in
 	2)
 		dpath=linux/module/name
-		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
+		dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.6)
 		dflags="-d all -e ata -e pci -e pcmcia -e \
 			scsi bridge broadband fixeddisk humaninput modem \
 			network optical removabledisk"
@@ -251,24 +233,6 @@ get_ide_floppy_info() {
 	esac
 }
 
-get_input_info() {
-	case "$(uname -r)" in
-	2.4*)
-		case "$(udpkg --print-architecture)" in
-			i386|ia64|amd64)
-				register-module psmouse
-			;;
-		esac
-	
-		case $SUBARCH in
-			powerpc/chrp*|powerpc/prep)
-				register-module psmouse
-			;;
-		esac
-		;;
-	esac
-}
-
 # Modules that should load before autodetection.
 get_early_manual_hw_info() {
 	# Load explicitly rather than implicitly to allow the user to
@@ -281,17 +245,12 @@ get_early_manual_hw_info() {
 # The order of these modules are important.
 get_manual_hw_info() {
 	get_floppy_info
-	# ide-mod and ide-probe-mod are needed for older (2.4.20) kernels
-	echo "ide-mod:Linux IDE driver"
-	echo "ide-probe-mod:Linux IDE probe driver"
 	get_ide_chipset_info
-	echo "ide-detect:Linux IDE detection" # 2.4.x > 20
-	echo "ide-generic:Linux IDE support" # 2.6
+	echo "ide-generic:Linux IDE support"
 	get_ide_floppy_info
 	echo "ide-disk:Linux ATA DISK"
 	echo "ide-cd:Linux ATAPI CD-ROM"
 	echo "isofs:Linux ISO 9660 filesystem"
-	get_input_info
 
 	# on some hppa systems, nic and scsi won't be found because they're
 	# not on a bus that discover understands ... 
@@ -314,31 +273,14 @@ hotplug_type
 # Should be greater than the number of kernel modules we can reasonably
 # expect it will ever need to load.
 MAX_STEPS=1000
-OTHER_STEPS=7
+OTHER_STEPS=4
 # Use 1/10th of the progress bar for the non-module-load steps.
 OTHER_STEPSIZE=$(expr $MAX_STEPS / 10 / $OTHER_STEPS)
 db_progress START 0 $MAX_STEPS $PROGRESSBAR
 
-# Load queued Cardbus modules, if any, and catch hotplug events.
-# We need to do this before the regular PCI detection so that we can
-# determine which network cards are Cardbus.
-if [ -f /etc/pcmcia/cb_mod_queue ]; then
-	if [ "$HOTPLUG_TYPE" = fake ]; then
-		saved_hotplug=`cat /proc/sys/kernel/hotplug`
-		echo /bin/hotplug-pcmcia >/proc/sys/kernel/hotplug
-	fi
-	for module in $(cat /etc/pcmcia/cb_mod_queue); do
-		log "Loading queued Cardbus module $module"
-		modprobe -v $module | logger -t hw-detect
-	done
-	if [ "$HOTPLUG_TYPE" = fake ]; then
-		echo $saved_hotplug >/proc/sys/kernel/hotplug
-	fi
-fi
-
 db_progress INFO hw-detect/detect_progress_step
 
-# Load yenta_socket on 2.6 kernels, if hardware is available, so that
+# Load yenta_socket, if hardware is available, so that
 # discover will see Cardbus cards.
 if [ -d /sys/bus/pci/devices ] && grep -q 0x060700 \
 	/sys/bus/pci/devices/*/class && \
@@ -466,47 +408,6 @@ if [ -z "$LIST" ]; then
 	db_progress STEP $MODULE_STEPS
 fi
 
-# If there is an ide bus, then register the ide CD modules so they'll be
-# available on the target system for base-config. Disk too, in case root is
-# not ide but ide is still used. udev should handle this for 2.6.
-if [ -e /proc/ide/ -a "`find /proc/ide/* -type d 2>/dev/null`" != "" ]; then
-	case "$(uname -r)" in
-	2.4*)
-		register-module ide-detect
-		register-module ide-cd
-		register-module ide-disk
-	;;
-	esac
-fi
-
-case "$(uname -r)" in
-2.4*)
-	# always load sd_mod and sr_mod if a scsi controller module was loaded.
-	# sd_mod to find the disks, and sr_mod to find the CD-ROMs
-	if [ -e /proc/scsi/scsi ] && ! grep -q "Attached devices: none" /proc/scsi/scsi; then
-		if grep -q 'Type:[ ]\+Direct-Access' /proc/scsi/scsi && \
-		   is_not_loaded "sd_mod" && \
-		   ! grep -q '^[^[:alpha:]]\+sd$' /proc/devices; then
-		   	if is_available "sd_mod"; then
-				db_subst hw-detect/load_progress_step CARDNAME "SCSI disk support"
-				db_subst hw-detect/load_progress_step MODULE "sd_mod"
-				db_progress INFO hw-detect/load_progress_step
-				load_module sd_mod
-				register-module sd_mod
-			else
-				missing_module sd_mod "SCSI disk"
-			fi
-		fi
-		db_progress STEP $OTHER_STEPSIZE
-		if grep -q 'Type:[ ]\+CD-ROM' /proc/scsi/scsi && \
-		   ! grep -q '^[^[:alpha:]]\+sr$' /proc/devices; then
-			load_sr_mod
-		fi
-		db_progress STEP $OTHER_STEPSIZE
-	fi
-	;;
-esac
-	
 if ! is_not_loaded ohci1394; then
 	# if firewire was found, try to enable firewire cd support
 	if is_not_loaded sbp2 && is_available scsi_mod; then
@@ -521,36 +422,20 @@ if ! is_not_loaded ohci1394; then
 	fi
 	register-module sbp2
 	db_progress STEP $OTHER_STEPSIZE
-	load_sr_mod
-	db_progress STEP $OTHER_STEPSIZE
-	case "$(uname -r)" in
-	2.4*)
-		# rescan bus for firewire CD after loading sr_mod
-		# (Sometimes this echo fails.)
-		echo "scsi add-single-device 0 0 0 0" > /proc/scsi/scsi || true
-	;;
-	esac
 
 	# also try to enable firewire ethernet (The right way to do this is
 	# really to catch the hotplug events from the kernel.)
 	if is_not_loaded eth1394; then
-		case "$(uname -r)" in
-		2.4*)
-			:
-		;;
-		*)
-			if is_available eth1394; then
-				db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
-				db_subst hw-detect/load_progress_step MODULE "eth1394"
-				db_progress INFO hw-detect/load_progress_step
-				load_module eth1394 "FireWire ethernet"
-				# do not call register-module; udev/hotplug will load it
-				# on the installed system
-			else
-				missing_module eth1394 "FireWire ethernet"
-			fi
-		;;
-		esac
+		if is_available eth1394; then
+			db_subst hw-detect/load_progress_step CARDNAME "FireWire ethernet support"
+			db_subst hw-detect/load_progress_step MODULE "eth1394"
+			db_progress INFO hw-detect/load_progress_step
+			load_module eth1394 "FireWire ethernet"
+			# do not call register-module; udev/hotplug will load it
+			# on the installed system
+		else
+			missing_module eth1394 "FireWire ethernet"
+		fi
 	fi
 fi
 
@@ -596,8 +481,6 @@ apply_pcmcia_resource_opts() {
 PCMCIA_INIT=
 if [ -x /etc/init.d/pcmciautils ]; then
 	PCMCIA_INIT=/etc/init.d/pcmciautils
-elif [ -x /etc/init.d/pcmcia ]; then
-	PCMCIA_INIT=/etc/init.d/pcmcia
 fi
 if [ "$PCMCIA_INIT" ]; then
 	if ! [ -e /var/run/cardmgr.pid ]; then
@@ -621,31 +504,8 @@ if [ "$PCMCIA_INIT" ]; then
 		fi
 
 		# If hotplugging is available in the kernel, we can use it to
-		# load modules for Cardbus cards and tell which network
-		# interfaces belong to PCMCIA devices. The former is only
-		# necessary on 2.4 kernels, though.
+		# tell which network interfaces belong to PCMCIA devices.
 		if [ "$HOTPLUG_TYPE" = fake ]; then
-			# Snapshot discover information so we can detect
-			# modules for Cardbus cards by later comparison in
-			# the hotplug handler. (Only on 2.4 kernels.)
-			if expr `uname -r` : "2.4.*" >/dev/null 2>&1; then
-				case "$DISCOVER_VERSION" in
-				2)
-					dpath=linux/module/name
-					dver=`uname -r|cut -d. -f1,2` # Kernel version (e.g. 2.4)
-					dflags="-d all -e pci scsi fixeddisk modem network removabledisk bridge"
-			
-					echo `discover --data-path=$dpath --data-version=$dver $dflags` \
-						| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-					;;
-				1)
-					discover --format="%m " --disable-all --enable=pci \
-						scsi ide ethernet bridge \
-						| sed 's/ $//' >/tmp/pcmcia-discover-snapshot
-					;;
-				esac
-			fi
-		
 			# Simple handling of hotplug events during PCMCIA
 			# detection
 			saved_hotplug=`cat /proc/sys/kernel/hotplug`
@@ -657,7 +517,6 @@ if [ "$PCMCIA_INIT" ]; then
 	    
 		if [ "$HOTPLUG_TYPE" = fake ]; then
 			echo $saved_hotplug >/proc/sys/kernel/hotplug
-			rm -f /tmp/pcmcia-discover-snapshot
 		fi
 
 		db_progress STEP $OTHER_STEPSIZE
@@ -691,20 +550,11 @@ gen_pcmcia_devnames() {
 }
 
 have_pcmcia=0
-case "$(uname -r)" in
-	2.4*)
-		if [ -e "/proc/bus/pccard/drivers" ]; then
-			have_pcmcia=1
-		fi
-	;;
-	2.6*)
-		if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
-			have_pcmcia=1
-		fi
-	;;
-esac
+if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
+	have_pcmcia=1
+fi
 
-# find Cardbus network cards on 2.6 kernels
+# find Cardbus network cards
 cardbus_check_netdev()
 {
 	local socket="$1"
@@ -727,13 +577,9 @@ if db_get hw-detect/start_pcmcia && [ "$RET" = false ]; then
 fi
 
 # Try to do this only once..
-if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmcia-cs /var/lib/apt-install/queue 2>/dev/null; then
-	log "Detected PCMCIA, installing pcmcia-cs."
-	apt-install pcmcia-cs || true
-	if expr "$(uname -r)" : 2.6 >/dev/null; then
-		log "Detected PCMCIA, installing pcmciautils."
-		apt-install pcmciautils || true
-	fi
+if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmciautils /var/lib/apt-install/queue 2>/dev/null; then
+	log "Detected PCMCIA, installing pcmciautils."
+	apt-install pcmciautils || true
 
 	echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
 		>>$finish_install
@@ -769,7 +615,7 @@ if [ -f /proc/sys/kernel/hotplug ]; then
 	apt-install usbutils || true
 fi
 
-# Install acpi (works only for 2.6 kernels)
+# Install acpi
 if [ -d /proc/acpi ]; then
 	apt-install acpi || true
 	apt-install acpid || true

@@ -46,31 +46,17 @@ for dir in $(find "/proc/device-tree/" -type d); do
 		register-module mesh
 	# sound/ppc, sound/oss/dmasound
 	elif [ "$name" = awacs ]; then
-		case "$(uname -r)" in
-		2.4*)
-			register-module dmasound_pmac
-			;;
-		2.6*)
-			# probably best to go for ALSA
-			register-module snd-powermac
-			;;
-		esac
+		# probably best to go for ALSA
+		register-module snd-powermac
 	elif [ "$name" = davbus ] || [ "$name" = i2s-a ]; then
 		for child in "$dir"/*; do
 			if [ -f "$child/name" ]; then
 				childname="$(cat "$child/name" 2>/dev/null || true)"
 				if [ "$childname" = sound ]; then
-					case "$(uname -r)" in
-					2.4*)
-						register-module dmasound_pmac
-						;;
-					2.6*)
-						# Loading snd-powermac locks up G5 systems
-						if  [ "$name" != i2s-a ]; then
-							register-module snd-powermac
-						fi
-						;;
-					esac
+					# Loading snd-powermac locks up G5 systems
+					if  [ "$name" != i2s-a ]; then
+						register-module snd-powermac
+					fi
 				fi
 			fi
 		done
