@@ -13,12 +13,16 @@ kernel-wedge (2.32) UNRELEASED; urgency=low
     - add mcs7830 to nic-usb-modules.
     - didn't add aircable to usb-serial-modules, as I'm guessing noone will
       use it in d-i (ditto for mos7720 and mos7840)
-    - Add pata_* to ide-modules. This is quite likely wrong, since all the
-      old ide modules are also in there, and most of them register the same
-      pci ida as the pata modules. Which one wins I don't know. I'm just
-      following the kernel team here so that d-i behaves the same as a system
-      running the 2.6.20 kernel package. Expect that this will be worked out
-      in the future and only one version of each module include.
+    - Add pata_* to pata-modules. This is quite likely wrong, since all the
+      old ide modules are also still being built, and most of them register
+      the same pci ida as the pata modules. Which one wins I don't know. I'm
+      just following the kernel team here so that d-i behaves the same as a
+      system running the 2.6.20 kernel package. Expect that this will be
+      worked out in the future and only one version of each module included.
+    - Factor out libata to a new ata-modules, since both sata-modules and
+      pata-modules need it.
+    - scsi-modules also needs to depend on ata-modules now, since ipr has a
+      new dependency on libata.
     - pata_pcmcia to pcmcia-storage-modules
 
  -- Joey Hess <joeyh@debian.org>  Thu, 12 Apr 2007 01:39:44 -0400
