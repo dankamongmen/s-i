@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_INIT([autopartkit],[0.76],[debian-boot@lists.debian.org])
 AM_INIT_AUTOMAKE([foreign no-define])
-
+AM_MAINTAINER_MODE
 AM_CONFIG_HEADER(config.h)
 
 # Checks for programs.
