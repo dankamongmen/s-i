@@ -24,9 +24,6 @@ files = \
 	S35term
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
-  files += \
-	S33usb-linux
-
   ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S05acpi-linux-x86 \
