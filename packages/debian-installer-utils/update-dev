@@ -2,7 +2,9 @@
 set +e	# ignore errors
 
 # Make sure /dev is up to date after loading modules.
-udevtrigger
-udevsettle
+if type udevtrigger >/dev/null 2>&1 && type udevsettle >/dev/null 2>&1; then
+	udevtrigger
+	udevsettle
+fi
 
 exit 0
