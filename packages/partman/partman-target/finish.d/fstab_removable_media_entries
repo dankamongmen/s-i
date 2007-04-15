@@ -83,25 +83,26 @@ if [ -n "$HD_MEDIA" ]; then
     HD_MEDIA="$(mapdevfs $HD_MEDIA)"
 fi
 founddevs=
-disk_containing () {
+if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
+    disk_containing () {
 	dirname "$(udevinfo -q path -n "$dev")"
-}
-partitions="$(list-devices partition)"
-for dev in $partitions; do
-    if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
-	continue
-    fi
-    disk="$(disk_containing "$dev")"
-    for otherdev in $partitions; do
-	if [ "$(disk_containing "$otherdev")" = "$disk" ] && \
-	   grep -q "^$otherdev " /target/etc/fstab; then
-	    continue 2
+    }
+    partitions="$(list-devices partition)"
+    for dev in $partitions; do
+	if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
+	    continue
 	fi
+	disk="$(disk_containing "$dev")"
+	for otherdev in $partitions; do
+	    if [ "$(disk_containing "$otherdev")" = "$disk" ] && \
+	       grep -q "^$otherdev " /target/etc/fstab; then
+		continue 2
+	    fi
+	done
+	mapdev="$(mapdevfs $dev)"
+	founddevs="${founddevs:+$founddevs }$mapdev"
     done
-    mapdev="$(mapdevfs $dev)"
-    founddevs="${founddevs:+$founddevs }$mapdev"
-done
-
+fi
 USBDEVICES=
 for dev in $founddevs; do
     if [ -z "$USBDEVICES" ]; then
