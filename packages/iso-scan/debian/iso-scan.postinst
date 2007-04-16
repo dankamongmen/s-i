@@ -23,15 +23,17 @@ is_debian_iso () {
 }
 
 register_cd () {
-	# Set the suite and codename used by base-installer and base-config
-	# to the suite/codename that is on the CD. This assumes that there
-	# will be no more than one distribution on the CD, and that one of
-	# the testing, stable, or unstable links will point to it. Since the
-	# CDs currently have many links, parse the Release file to get the
-	# actual suite name to use.
+	# Make sure that the iso is usable for the architecture. If so,
+	# set the suite and codename to the suite/codename that is on the CD.
+	# This assumes that there will be no more than one distribution on
+	# the CD, and that one of the testing, stable, or unstable links will
+	# point to it. Since the CDs currently have many links, parse the
+	# Release file to get the actual suite name to use.
 	for distlink in stable testing unstable ; do
 		relfile=/cdrom/dists/$distlink/Release
-		if [ -e $relfile ] ; then
+		if [ -e $relfile ] &&
+		   egrep -q 'Architectures:.* '$(udpkg --print-architecture)'[ |$]' $relfile
+	   	then
 			suite=$(sed -n 's/^Suite: *//p' $relfile)
 			codename=$(sed -n 's/^Codename: *//p' $relfile)
 			log "Detected ISO with '$suite' ($codename) distribution"
@@ -42,9 +44,11 @@ register_cd () {
 			description=`sed -n 's/^Description: *//p' $relfile`
 			db_subst iso-scan/success DESCRIPTION $description
 			
-			break
+			return 0
 		fi
 	done
+
+	return 1
 }
 
 # Try to mount a file as an iso, and see if it's a Debian cd.
@@ -54,25 +58,29 @@ try_iso () {
 	if mount -t iso9660 -o loop,ro,exec $iso_to_try /cdrom 2>/dev/null; then
 		ISO_MOUNT_COUNT=$(expr $ISO_MOUNT_COUNT + 1)
 		if is_debian_iso; then
-			# This could be more sophisticated, and try to deal
-			# with multiple Debian ISO's. For now, once we've got
-			# a Debian ISO, any Debian ISO, we're done.
-			register_cd $iso_to_try $iso_device
-			db_progress STOP
-			db_subst iso-scan/success FILENAME $iso_to_try
-			db_set iso-scan/filename $iso_to_try
-			db_subst iso-scan/success DEVICE $iso_device
-			db_input medium iso-scan/success || true
-			db_go || true
-
-			anna-install apt-mirror-setup || true
-			if [ ! -e /cdrom/.disk/base_installable ]; then
-				log "Base system not installable from CD image, requesting choose-mirror"
-				anna-install choose-mirror || true
+			if register_cd $iso_to_try $iso_device; then
+				# This could be more sophisticated, and try
+				# to deal with multiple Debian ISO's. For
+				# now, once we've got a Debian ISO, any 
+				# Debian ISO, we're done.
+				db_progress STOP
+				db_subst iso-scan/success FILENAME $iso_to_try
+				db_set iso-scan/filename $iso_to_try
+				db_subst iso-scan/success DEVICE $iso_device
+				db_input medium iso-scan/success || true
+				db_go || true
+	
+				anna-install apt-mirror-setup || true
+				if [ ! -e /cdrom/.disk/base_installable ]; then
+					log "Base system not installable from CD image, requesting choose-mirror"
+					anna-install choose-mirror || true
+				else
+					anna-install apt-cdrom-setup || true
+				fi
+				exit 0
 			else
-				anna-install apt-cdrom-setup || true
+				log "Debian ISO not usable, skipping"
 			fi
-			exit 0
 		else
 			log "Not a Debian ISO"
 			umount /cdrom
