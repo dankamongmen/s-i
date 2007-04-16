@@ -120,9 +120,9 @@ static void newt_progress_stop(struct frontend *obj);
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
 /*  Padding of title width, allows for leading "[!!] " before title
- *  and the two vertical bars that limit the border.
+ *  and the two vertical bars and spaces that limit the title.
  */
-#define TITLE_PADDING 8
+#define TITLE_PADDING 9
 
 /* gettext would be much nicer :-( */
 static const char *
