@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/lib/klibc/bin/sh.shared
 # This is a special init for the boot floppy image.
 # It loads the main d-i initrd from either a second floppy, or a USB
 # storage device.
@@ -7,6 +7,9 @@
 # one device or set of devices to be scanned.
 
 set -e
+
+# Add klibc path
+PATH=/usr/lib/klibc/bin:$PATH
 
 # The identification of this floppy and the desired root floppy.
 SYSTEM="debian-installer"
@@ -104,21 +107,10 @@ try_mount () {
 	return 1
 }
 
-klibc_timeout_supported () {
-	local arch=`uname -i`
-	if [ $arch = "i386" ] ; then
-		return 0
-	fi
-	return 1
-}
-
 LOADED=0
 while [ "$LOADED" = 0 ]; do
 	MOUNTED=0
-	nb_timeout=0
-	if klibc_timeout_supported; then
-		nb_timeout=3
-	fi
+	nb_timeout=3
 	while [ "$MOUNTED" = 0 ]; do
 		echo
 		echo "Insert the $ROOT_LABEL."
@@ -134,9 +126,9 @@ while [ "$LOADED" = 0 ]; do
 			# so we use a timeout instead
 			READ_TIMEOUT=30 #seconds
 			echo -n ", or wait $READ_TIMEOUT seconds: "
-			if timeout_read $READ_TIMEOUT; then
+			if read -t $READ_TIMEOUT line; then
 				# it is not a usb keyboard so
-				# we no long need a timeout
+				# we no longer need a timeout
 				nb_timeout=0
 			else
 				nb_timeout=$(($nb_timeout -1))
