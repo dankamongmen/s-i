@@ -984,12 +984,14 @@ newt_handler_text(struct frontend *obj, struct question *q)
 static int
 newt_handler_error(struct frontend *obj, struct question *q)
 {
-    char *oldrootBg, *oldshadowBg;
+    char *oldrootBg, *oldshadowBg, *oldhelpLineFg, *oldhelpLineBg;
     int ret;
     struct newtColors palette = newtAltColorPalette;
 
     oldrootBg = palette.rootBg;
     oldshadowBg = palette.shadowBg;
+    oldhelpLineFg = palette.helpLineFg;
+    oldhelpLineBg = palette.helpLineBg;
     if (strcmp(oldrootBg, oldshadowBg) == 0)
     	palette.shadowBg = "red";
     palette.rootBg = "red";
@@ -999,6 +1001,8 @@ newt_handler_error(struct frontend *obj, struct question *q)
     ret = newt_handler_note(obj, q);
     palette.rootBg = oldrootBg;
     palette.shadowBg = oldshadowBg;
+    palette.helpLineFg = oldhelpLineFg;
+    palette.helpLineBg = oldhelpLineBg;
     newtSetColors(palette);
     return ret;
 }
