@@ -26,7 +26,6 @@ else
     stylesheet_html="$stylesheet_dir/style-html-web.xsl"
 fi
 stylesheet_html_single="$stylesheet_dir/style-html-single.xsl"
-stylesheet_fo="$stylesheet_dir/style-fo.xsl"
 stylesheet_dsssl="$stylesheet_dir/style-print.dsl"
 stylesheet_css="$stylesheet_dir/install.css"
 
