@@ -493,6 +493,18 @@ do_lv_delete() {
 	fi
 }
 
+lvm_menu_add () {
+	local choice=$1
+	db_metaget partman-lvm/menu/$choice description
+	if [ "$choices"]; then
+		choices="$choices, $choice"
+		choices_l10n="$choices_l10n, $RET"
+	else
+		choices="$choice"
+		choices_l10n="$RET"
+	fi
+}
+
 #####################################
 #
 # Main stuff
@@ -500,24 +512,6 @@ do_lv_delete() {
 #####################################
 
 do_initial_setup
-
-# Prepare menu choice translations
-db_metaget partman-lvm/menu/display description
-menu_display="$RET"
-db_metaget partman-lvm/menu/createvg description
-menu_createvg="$RET"
-db_metaget partman-lvm/menu/deletevg description
-menu_deletevg="$RET"
-db_metaget partman-lvm/menu/extendvg description
-menu_extendvg="$RET"
-db_metaget partman-lvm/menu/reducevg description
-menu_reducevg="$RET"
-db_metaget partman-lvm/menu/createlv description
-menu_createlv="$RET"
-db_metaget partman-lvm/menu/deletelv description
-menu_deletelv="$RET"
-db_metaget partman-lvm/menu/finish description
-menu_finish="$RET"
 
 while [ 1 ]; do
 	# Get some statistics
@@ -528,10 +522,11 @@ while [ 1 ]; do
 	lvs=$(lv_list | wc -l)
 
 	# Build menu options
-	choices="$menu_display"
-	# Create VG
+	choices=""
+	choices_l10n=""
+	lvm_menu_add display
 	if [ $free_pvs -gt 0 ]; then
-		choices="${choices}, $menu_createvg"
+		lvm_menu_add createvg
 	fi
 	# Other options only if there is at least one VG
 	if [ $vgs -gt 0 ]; then
@@ -553,32 +548,28 @@ while [ 1 ]; do
 			fi
 		done
 
-		# Create LV
-		if [ -n "$do_createlv" ]; then
-			choices="${choices}, $menu_createlv"
+		if [ "$do_createlv" ]; then
+			lvm_menu_add createlv
 		fi
-		# Delete VG
-		if [ -n "$do_deletevg" ]; then
-			choices="${choices}, $menu_deletevg"
+		if [ "$do_deletevg" ]; then
+			lvm_menu_add deletevg
 		fi
-		# Delete LV
 		if [ $lvs -gt 0 ]; then
-			choices="${choices}, $menu_deletelv"
+			lvm_menu_add deletelv
 		fi
-		# Extend VG
 		if [ $free_pvs -gt 0 ]; then
-			choices="${choices}, $menu_extendvg"
+			lvm_menu_add extendvg
 		fi
-		# Reduce VG
-		if [ -n "$do_reducevg" ]; then
-			choices="${choices}, $menu_reducevg"
+		if [ "$do_reducevg" ]; then
+			lvm_menu_add reducevg
 		fi
 	fi
 	# Add Finish option
-	choices="${choices}, $menu_finish"
+	lvm_menu_add finish
 
 	# Setup main menu template
 	db_subst partman-lvm/mainmenu CHOICES "$choices"
+	db_subst partman-lvm/mainmenu CHOICES_L10N "$choices_l10n"
 	db_subst partman-lvm/mainmenu FREE_PVS "$free_pvs"
 	db_subst partman-lvm/mainmenu USED_PVS "$used_pvs"
 	db_subst partman-lvm/mainmenu VGS "$vgs"
@@ -589,26 +580,19 @@ while [ 1 ]; do
 
 	db_get partman-lvm/mainmenu
 	option="$RET"
-	if [ "$option" = "$menu_display" ]; then
-		do_display
-	elif [ "$option" = "$menu_createvg" ]; then
-		do_vg_create
-	elif [ "$option" = "$menu_deletevg" ]; then
-		do_vg_delete
-	elif [ "$option" = "$menu_extendvg" ]; then
-		do_vg_extend
-	elif [ "$option" = "$menu_reducevg" ]; then
-		do_vg_reduce
-	elif [ "$option" = "$menu_createlv" ]; then
-		do_lv_create
-	elif [ "$option" = "$menu_deletelv" ]; then
-		do_lv_delete
-	elif [ "$option" = "$menu_finish" ]; then
-		break
-	else
+	case "$option" in
+	    display)	do_display ;;
+	    createvg)	do_vg_create ;;
+	    deletevg)	do_vg_delete ;;
+	    extendvg)	do_vg_extend ;;
+	    reducevg)	do_vg_reduce ;;
+	    createlv)	do_lv_create ;;
+	    deletelv)	do_lv_delete ;;
+	    finish)	break ;;
+	    *)
 		logger -t partman-lvm "Unknown selection '$option'"
-		break
-	fi
+		break ;;
+	esac
 done
 
 # install lvm tools in /target if needed
