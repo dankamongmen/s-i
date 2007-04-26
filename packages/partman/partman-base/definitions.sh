@@ -865,13 +865,23 @@ default_disk_label () {
 		    echo UNKNOWN;;
 	    esac;;
 	amd64)
-	    echo msdos;;
+	    case "$sub" in
+		mac)
+		    echo gpt;;
+		*)
+		    echo msdos;;
+	    esac;;
 	hppa)
 	    echo msdos;;
 	ia64)
 	    echo gpt;;
 	i386)
-	    echo msdos;;
+	    case "$sub" in
+		mac)
+		    echo gpt;;
+		*)
+		    echo msdos;;
+	    esac;;
 	m68k)
 	    case "$sub" in
 		amiga)
