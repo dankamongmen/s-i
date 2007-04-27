@@ -79,7 +79,7 @@ get_ext2_resize_range () {
 	if expr "$block_size" : '[0-9][0-9]*$' >/dev/null && \
 	   expr "$block_count" : '[0-9][0-9]*$' >/dev/null && \
 	   expr "$free_blocks" : '[0-9][0-9]*$' >/dev/null; then
-	    minsize="$(( ($block_count - $free_blocks) * $block_size ))"
+	    minsize="$(expr \( "$block_count" - "$free_blocks" \) \* "$block_size")"
 	fi
     fi
     return 0
@@ -95,7 +95,7 @@ human_resize_range () {
     hminsize=$(longint2human $minsize)
     hcursize=$(longint2human $cursize)
     hmaxsize=$(longint2human $maxsize)
-    minpercent=$((100 * $minsize / $maxsize))
+    minpercent="$(expr 100 \* "$minsize" / "$maxsize")"
 }
 
 ask_for_size () {
@@ -286,7 +286,7 @@ perform_resizing () {
 		exit 100
 	    fi
 	else
-	    if resize2fs $path "$(($newsize / 1024))K"; then
+	    if resize2fs $path "$(expr "$newsize" / 1024)K"; then
 		open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 		read_line newid
 		close_dialog
