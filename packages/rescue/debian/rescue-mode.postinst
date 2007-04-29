@@ -44,6 +44,19 @@ log-output -t rescue vgscan || true
 
 db_capb backup
 
+MOUNTED=
+
+# Try to unmount everything we previously mounted.
+umount_all () {
+	for old_mount in $MOUNTED; do
+		log-output -t rescue umount "$old_mount" || true
+	done
+	MOUNTED=
+	log-output -t rescue umount /target || true
+}
+
+trap umount_all EXIT HUP INT QUIT TERM
+
 # Choose a root filesystem.
 choose_root () {
 	PARTITIONS="$(list-devices partition | sort | \
@@ -84,7 +97,7 @@ choose_root () {
 	fi
 
 	mkdir -p /target
-	log-output -t rescue umount /target || true
+	umount_all
 	if ! log-output -t rescue mount "$RESCUE_ROOTDEV" /target; then
 		log "mount '$RESCUE_ROOTDEV' /target failed"
 		db_subst rescue/mount-failed DEVICE "$RESCUE_ROOTDEV"
@@ -93,6 +106,29 @@ choose_root () {
 		# backing up returns to the main menu.
 		db_go || exit 10
 		continue
+	fi
+
+	if [ -d /target/dev ]; then
+		# We want this kernel's idea of device numbering, not
+		# whatever might happen to be statically configured on this
+		# filesystem.
+		if log-output -t rescue mount -o bind /dev /target/dev; then
+			MOUNTED="${MOUNTED:+$MOUNTED }/target/dev"
+		fi
+	fi
+
+	if [ -d /target/proc ]; then
+		# Virtual filesystem.
+		if log-output -t rescue mount -o bind /proc /target/proc; then
+			MOUNTED="${MOUNTED:+$MOUNTED }/target/proc"
+		fi
+	fi
+
+	if [ -d /target/sys ]; then
+		# Virtual filesystem.
+		if log-output -t rescue mount -o bind /sys /target/sys; then
+			MOUNTED="${MOUNTED:+$MOUNTED }/target/sys"
+		fi
 	fi
 }
 
