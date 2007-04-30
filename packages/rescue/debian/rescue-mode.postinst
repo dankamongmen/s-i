@@ -72,6 +72,17 @@ choose_root () {
 		PARTITIONS="${PARTITIONS:+$PARTITIONS, }$LVMPARTS"
 	fi
 
+	for i in $(grep ^md /proc/mdstat | grep -v inactive | \
+		   sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
+		NUMBER="${i#md}"
+		if [ -e "/dev/md/$NUMBER" ]; then
+			MDPART="/dev/md/$NUMBER"
+		else
+			MDPART="/dev/md$NUMBER"
+		fi
+		PARTITIONS="${PARTITIONS:+$PARTITIONS, }$MDPART"
+	done
+
 	if [ -z "$PARTITIONS" ]; then
 		# TODO: need a sensible error here, or perhaps drop through
 		# to a fallback shell?
