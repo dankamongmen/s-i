@@ -19,10 +19,20 @@ if [ "$bootfs" = '' ]; then
 fi
 
 # kernels go in /boot, so palo must go on that device
-rootdev=`echo $rootfs | sed 's/part[0-9]\+$/disc/'` 
-bootdev=`echo $bootfs | sed 's/part[0-9]\+$/disc/'` 
+case $rootfs in
+  */host*)
+    rootdev=`echo $rootfs | sed 's/part[0-9]\+$/disc/'` 
+    bootdev=`echo $bootfs | sed 's/part[0-9]\+$/disc/'` 
 
-bootpart=`echo $bootfs | sed 's/^.*part\([0-9]\+\)$/\1/'`
+    bootpart=`echo $bootfs | sed 's/^.*part\([0-9]\+\)$/\1/'`
+    ;;
+  *)
+    rootdev=`echo $rootfs | sed 's/[0-9]\+$//'` 
+    bootdev=`echo $bootfs | sed 's/[0-9]\+$//'` 
+
+    bootpart=`echo $bootfs | sed 's/^.*[^0-9]\([0-9]\+\)$/\1/'`
+    ;;
+esac
 
 if [ "$rootfs" = "$bootfs" ]; then
 	kernel=$bootpart/boot/vmlinux
