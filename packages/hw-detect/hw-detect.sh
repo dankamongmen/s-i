@@ -482,6 +482,11 @@ if [ -d /sys/class/misc/pmu/ ]; then
 	apt-install pbbuttonsd || true
 fi
 
+# Install eject?
+if [ -n "$(list-devices cd; list-devices maybe-usb-floppy)" ]; then
+	apt-install eject || true
+fi
+
 # Install optimised libc based on CPU type
 case "$(udpkg --print-architecture)" in
 	i386)
