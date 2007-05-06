@@ -27,10 +27,8 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		exit 1
 	fi
 
+	# Default suite to codename; choose-mirror will determine actual suite
 	if db_get cdrom/codename && [ "$RET" ]; then
-		db_set mirror/codename $RET
-	fi
-	if db_get cdrom/suite && [ "$RET" ]; then
 		db_set mirror/suite $RET
 	fi
 	choose-mirror -n # no progress bar
