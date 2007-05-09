@@ -182,7 +182,9 @@ static bool check_real_anna (di_packages_resolve_dependencies_check *r, di_packa
 {
   if (d->ptr->status >= di_package_status_unpacked)
   {
+#ifdef ENABLE_EXTENSIVE_DEBUG
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): accept %s, already installed", package->package, d->ptr->package);
+#endif
     return true;
   }
 #ifdef ENABLE_EXTENSIVE_DEBUG
