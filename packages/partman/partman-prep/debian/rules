@@ -8,11 +8,6 @@ export DH_COMPAT=4
 
 export PACKAGE=partman-prep
 
-VERSION=$(shell dpkg-parsechangelog | grep ^Version: | cut -d ' ' -f 2)
-ARCH=powerpc
-FILENAME=$(PACKAGE)_$(VERSION)_$(ARCH).udeb
-PRIORITY=$(shell grep ^Priority: debian/control | cut -d ' ' -f 2)
-
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -43,9 +38,8 @@ binary-arch: build install
 	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
-	dh_gencontrol -- -fdebian/files~
-	dpkg-distaddfile $(FILENAME) debian-installer $(PRIORITY)
-	dh_builddeb --filename=$(FILENAME)
+	dh_gencontrol
+	dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install
