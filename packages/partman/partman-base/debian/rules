@@ -31,6 +31,7 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
+	# Install hooks into partman-base udeb
 	debian/install-rc choose_partition
 	debian/install-rc storage_device
 	debian/install-rc active_partition
@@ -41,16 +42,11 @@ install: build
 	debian/install-rc finish.d
 	debian/install-rc update.d
 	debian/install-rc valid_visuals.d
-	dh_install visual.d lib/partman
-	dh_install definitions.sh lib/partman
-	dh_install partman bin
-	dh_install stralign bin
-	dh_install parted_devices bin
-	dh_install parted_server bin
 
 binary-arch: build install
 	dh_testdir
 	dh_testroot
+	dh_install
 	dh_installdebconf
 	cp debian/isinstallable debian/${PACKAGE}/DEBIAN/
 	dh_strip
