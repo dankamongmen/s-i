@@ -459,7 +459,9 @@ for dist in testing unstable cvs ; do
 		
 		# generate ranking information
 		LEAD="000";
-	 	P="${LEAD:0:${#LEAD}-${#P}}$P"
+		if [ `expr ${#LEAD} - ${#P}` -ne 0 ]; then
+		 	P="${LEAD:0:${#LEAD}-${#P}}$P"
+		fi
 		echo -en "$P%\t $lang" >> $TARGET_DIR/.rank$ext.txt$LEVEL
 		if [ `grep "^${lang}$" $PROSPECTIVE` ]; then
 	 		echo -en " (PROSPECTIVE)" >> $TARGET_DIR/.rank$ext.txt$LEVEL
