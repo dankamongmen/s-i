@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-05-05 22:00+0000\n"
+"POT-Creation-Date: 2007-05-19 14:20+0000\n"
 "PO-Revision-Date: 2007-03-09 21:40+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
@@ -1797,11 +1797,150 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:828
 #, no-c-format
+msgid "Account setup"
+msgstr "계정 설정"
+
+#. Tag: para
+#: preseed.xml:829
+#, no-c-format
+msgid ""
+"The password for the root account and name and password for a first regular "
+"user's account can be preseeded. For the passwords you can use either clear "
+"text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+"루트 계정의 열쇠글과 맨 처음 만들게 될 일반 사용자의 이름과 열쇠글도 미리 설"
+"정할 수 있습니다. 열쇠글의 경우 원본 텍스트를 그대로 쓸 수도 있고 MD5 "
+"<emphasis>해시값</emphasis>을 쓸 수도 있습니다."
+
+#. Tag: para
+#: preseed.xml:836
+#, no-c-format
+msgid ""
+"Be aware that preseeding passwords is not completely secure as everyone with "
+"access to the preconfiguration file will have the knowledge of these "
+"passwords. Using MD5 hashes is considered slightly better in terms of "
+"security but it might also give a false sense of security as access to a MD5 "
+"hash allows for brute force attacks."
+msgstr ""
+"미리 설정한 열쇠글은 안전하지 않습니다. 미리 설정 파일을 읽을 수 있는 사람은 "
+"열쇠글을 알 수 있기 때문입니다. MD5 해시를 사용하면 보안 측면에서 약간 낫지"
+"만, MD5 해시 역시 열쇠글을 계속해서 입력해 보는 방식의 공격에 약하므로 제대"
+"로 된 보안이라고 할 수 없습니다."
+
+#. Tag: screen
+#: preseed.xml:846
+#, no-c-format
+msgid ""
+"# Skip creation of a root account (normal user account will be able to\n"
+"# use sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Alternatively, to skip creation of a normal user account.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root password, either in clear text\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# To create a normal user account.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Normal user's password, either in clear text\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+"# 루트 계정을 만들지 않고 넘어갑니다.  (일반 유저는 sudo를 사용할 \n"
+"# 수 있습니다.).\n"
+"#d-i passwd/root-login boolean false\n"
+"# 아니면 일반 사용자를 생성하지 않고 넘어갈 수 있습니다.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# 루트 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# 아니면 일반 사용자 계정을 하나 만듭니다.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# 일반 사용자 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+
+#. Tag: para
+#: preseed.xml:848
+#, no-c-format
+msgid ""
+"The <classname>passwd/root-password-crypted</classname> and "
+"<classname>passwd/user-password-crypted</classname> variables can also be "
+"preseeded with <quote>!</quote> as their value. In that case, the "
+"corresponding account is disabled. This may be convenient for the root "
+"account, provided of course that an alternative method is setup to allow "
+"administrative activities or root login (for instance by using SSH key "
+"authentication or <command>sudo</command>)."
+msgstr ""
+"<classname>passwd/root-password-crypted</classname> 및 <classname>passwd/"
+"user-password-crypted</classname> 변수도 그 값으로 <quote>!</quote>을 써서 미"
+"리 설정할 수 있습니다. 이 경우 연관된 게정은 사용할 수 없습니다. 루트 계정의 "
+"경우 이렇게 하는 게 편리할 수도 있습니다. 물론 이 경우 또 다른 방법으로 시스"
+"템 관리를 할 수 있거나 루트 로그인을 할 수 있는 다른 방법이 있어야 합니다. "
+"(예를 들어 SSH 키 인증을 쓰거나 sudo를 사용하는 방법)"
+
+#. Tag: para
+#: preseed.xml:858
+#, no-c-format
+msgid ""
+"An MD5 hash for a password can be generated using the following command."
+msgstr "열쇠글의 MD5 해시는 다음 명령으로 만들 수 있습니다."
+
+#. Tag: screen
+#: preseed.xml:862
+#, no-c-format
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+
+#. Tag: title
+#: preseed.xml:868
+#, no-c-format
+msgid "Base system installation"
+msgstr "기본 시스템  설치"
+
+#. Tag: para
+#: preseed.xml:869
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"이 상태에서는 미리 설정할 수 있는 부분이 별로 많지 않습니다. 유일하게 신경 "
+"쓸 부분은 커널 설치에 관한 질문입니다."
+
+#. Tag: screen
+#: preseed.xml:876
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+"# 2.6 커널의 initrd를 만드는 initramfs를 선택합니다\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+
+#. Tag: title
+#: preseed.xml:881
+#, no-c-format
 msgid "Apt setup"
 msgstr "APT 설정"
 
 #. Tag: para
-#: preseed.xml:829
+#: preseed.xml:882
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1814,7 +1953,7 @@ msgstr ""
 "레파지토리를 지정할 수 있습니다."
 
 #. Tag: screen
-#: preseed.xml:837
+#: preseed.xml:890
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1863,157 +2002,162 @@ msgstr ""
 "#d-i apt-setup/local0/key string http://local.server/key"
 
 #. Tag: title
-#: preseed.xml:842
-#, no-c-format
-msgid "Account setup"
-msgstr "계정 설정"
-
-#. Tag: para
-#: preseed.xml:843
-#, no-c-format
-msgid ""
-"The password for the root account and name and password for a first regular "
-"user's account can be preseeded. For the passwords you can use either clear "
-"text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
-"루트 계정의 열쇠글과 맨 처음 만들게 될 일반 사용자의 이름과 열쇠글도 미리 설"
-"정할 수 있습니다. 열쇠글의 경우 원본 텍스트를 그대로 쓸 수도 있고 MD5 "
-"<emphasis>해시값</emphasis>을 쓸 수도 있습니다."
-
-#. Tag: para
-#: preseed.xml:850
-#, no-c-format
-msgid ""
-"Be aware that preseeding passwords is not completely secure as everyone with "
-"access to the preconfiguration file will have the knowledge of these "
-"passwords. Using MD5 hashes is considered slightly better in terms of "
-"security but it might also give a false sense of security as access to a MD5 "
-"hash allows for brute force attacks."
-msgstr ""
-"미리 설정한 열쇠글은 안전하지 않습니다. 미리 설정 파일을 읽을 수 있는 사람은 "
-"열쇠글을 알 수 있기 때문입니다. MD5 해시를 사용하면 보안 측면에서 약간 낫지"
-"만, MD5 해시 역시 열쇠글을 계속해서 입력해 보는 방식의 공격에 약하므로 제대"
-"로 된 보안이라고 할 수 없습니다."
-
-#. Tag: screen
-#: preseed.xml:860
-#, no-c-format
-msgid ""
-"# Skip creation of a root account (normal user account will be able to\n"
-"# use sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Alternatively, to skip creation of a normal user account.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Root password, either in clear text\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# To create a normal user account.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Normal user's password, either in clear text\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-msgstr ""
-"# 루트 계정을 만들지 않고 넘어갑니다.  (일반 유저는 sudo를 사용할 \n"
-"# 수 있습니다.).\n"
-"#d-i passwd/root-login boolean false\n"
-"# 아니면 일반 사용자를 생성하지 않고 넘어갈 수 있습니다.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# 루트 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# 아니면 일반 사용자 계정을 하나 만듭니다.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# 일반 사용자 열쇠글, 열쇠글 원문 텍스트를 직접 쓸 수도 있고\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# 아니면 MD5 해시로 암호화된 열쇠글을 쓸 수도 있습니다.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-
-#. Tag: para
-#: preseed.xml:862
-#, no-c-format
-msgid ""
-"The <classname>passwd/root-password-crypted</classname> and "
-"<classname>passwd/user-password-crypted</classname> variables can also be "
-"preseeded with <quote>!</quote> as their value. In that case, the "
-"corresponding account is disabled. This may be convenient for the root "
-"account, provided of course that an alternative method is setup to allow "
-"administrative activities or root login (for instance by using SSH key "
-"authentication or <command>sudo</command>)."
-msgstr ""
-"<classname>passwd/root-password-crypted</classname> 및 <classname>passwd/"
-"user-password-crypted</classname> 변수도 그 값으로 <quote>!</quote>을 써서 미"
-"리 설정할 수 있습니다. 이 경우 연관된 게정은 사용할 수 없습니다. 루트 계정의 "
-"경우 이렇게 하는 게 편리할 수도 있습니다. 물론 이 경우 또 다른 방법으로 시스"
-"템 관리를 할 수 있거나 루트 로그인을 할 수 있는 다른 방법이 있어야 합니다. "
-"(예를 들어 SSH 키 인증을 쓰거나 sudo를 사용하는 방법)"
-
-#. Tag: para
-#: preseed.xml:872
-#, no-c-format
-msgid ""
-"An MD5 hash for a password can be generated using the following command."
-msgstr "열쇠글의 MD5 해시는 다음 명령으로 만들 수 있습니다."
-
-#. Tag: screen
-#: preseed.xml:876
-#, no-c-format
-msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:882
-#, no-c-format
-msgid "Base system installation"
-msgstr "기본 시스템  설치"
-
-#. Tag: para
-#: preseed.xml:883
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"이 상태에서는 미리 설정할 수 있는 부분이 별로 많지 않습니다. 유일하게 신경 "
-"쓸 부분은 커널 설치에 관한 질문입니다."
-
-#. Tag: screen
-#: preseed.xml:890
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-msgstr ""
-"# 2.6 커널의 initrd를 만드는 initramfs를 선택합니다\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-
-#. Tag: title
 #: preseed.xml:895
+#, no-c-format
+msgid "Package selection"
+msgstr "꾸러미 선택"
+
+#. Tag: para
+#: preseed.xml:896
+#, no-c-format
+msgid ""
+"You can choose to install any combination of tasks that are available. "
+"Available tasks as of this writing include:"
+msgstr ""
+"사용할 수 있는 태스크는 원하는 대로 설치할 수 있습니다. 현재 이 문서를 쓰는 "
+"시점에 사용할 수 있는 태스크는 다음과 같습니다:"
+
+#. Tag: userinput
+#: preseed.xml:905
+#, no-c-format
+msgid "standard"
+msgstr "표준 시스템"
+
+#. Tag: userinput
+#: preseed.xml:908
+#, no-c-format
+msgid "desktop"
+msgstr "데스크탑"
+
+#. Tag: userinput
+#: preseed.xml:911
+#, no-c-format
+msgid "gnome-desktop"
+msgstr "gnome-desktop"
+
+#. Tag: userinput
+#: preseed.xml:914
+#, no-c-format
+msgid "kde-desktop"
+msgstr "kde-desktop"
+
+#. Tag: userinput
+#: preseed.xml:917
+#, no-c-format
+msgid "web-server"
+msgstr "웹 서버"
+
+#. Tag: userinput
+#: preseed.xml:920
+#, no-c-format
+msgid "print-server"
+msgstr "인쇄 서버"
+
+#. Tag: userinput
+#: preseed.xml:923
+#, no-c-format
+msgid "dns-server"
+msgstr "dns 서버"
+
+#. Tag: userinput
+#: preseed.xml:926
+#, no-c-format
+msgid "file-server"
+msgstr "파일 서버"
+
+#. Tag: userinput
+#: preseed.xml:929
+#, no-c-format
+msgid "mail-server"
+msgstr "메일 서버"
+
+#. Tag: userinput
+#: preseed.xml:932
+#, no-c-format
+msgid "sql-database"
+msgstr "SQL 데이터베이스"
+
+#. Tag: userinput
+#: preseed.xml:935
+#, no-c-format
+msgid "laptop"
+msgstr "노트북 컴퓨터"
+
+#. Tag: para
+#: preseed.xml:939
+#, no-c-format
+msgid ""
+"You can also choose to install no tasks, and force the installation of a set "
+"of packages in some other way. We recommend always including the "
+"<userinput>standard</userinput> task."
+msgstr ""
+"태스크를 설치하지 않을 수도 있고, 다른 방법으로 꾸러미들을 설치할 수 있습니"
+"다. <userinput>표준 시스템</userinput> 태스크는 항상 포함하시길 권장합니다."
+
+#. Tag: para
+#: preseed.xml:945
+#, no-c-format
+msgid ""
+"If you want to install some individual packages in addition to packages "
+"installed by tasks, you can use the parameter <classname>pkgsel/include</"
+"classname>. The value of this parameter can be a list of packages separated "
+"by either commas or spaces, which allows it to be used easily on the kernel "
+"command line as well."
+msgstr ""
+"태스크로 설치한 꾸러미 외에 꾸러미를 더 설치하려면, <classname>pkgsel/"
+"include</classname> 파라미터를 사용하면 됩니다. 이 파라미터의 값은 쉼표나 공"
+"백으로 구분할 수 있으므로, 커널 명령행에서도 쉽게 사용할 수 있습니다."
+
+#. Tag: screen
+#: preseed.xml:955
+#, fuzzy, no-c-format
+msgid ""
+"#tasksel tasksel/first multiselect standard, web-server<phrase condition="
+"\"lenny\">\n"
+"# If the desktop task is selected, install the kde and xfce desktops\n"
+"# instead of the default gnome desktop.\n"
+"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</"
+"phrase><phrase condition=\"etch\">\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop</phrase>\n"
+"\n"
+"# Individual additional packages to install\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Some versions of the installer can report back on what software you have\n"
+"# installed, and what software you use. The default is not to report back,\n"
+"# but sending reports helps the project determine what software is most\n"
+"# popular and include it on CDs.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+"tasksel tasksel/first multiselect standard, desktop\n"
+"#tasksel tasksel/first multiselect standard, web-server\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop\n"
+"\n"
+"\"# 추가로 설치할 꾸러미들\n"
+"\"#d-i pkgsel/include string openssh-server build-essential\\n\"\n"
+"\"\\n\"\n"
+"# 설치 프로그램은 버전에 따라 무엇을 설치했는지 보고서를 보낼 수 있습니다.\n"
+"# 기본값은 보고하지 않는 것이지만, 보고서를 보내면 데비안 프로젝트에서\n"
+"# 어떤 소프트웨어가 유명하고 CD에 포함하는 게 좋을 지 결정하는 데 도움이\n"
+"# 됩니다.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+
+#. Tag: title
+#: preseed.xml:960
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "부트 로더 설치"
 
 #. Tag: screen
-#: preseed.xml:897
-#, no-c-format
+#: preseed.xml:962
+#, fuzzy, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
-"#d-i grub-installer/skip boolean true\n"
+"#d-i grub-installer/skip boolean true<phrase condition=\"lenny\">\n"
+"# To also skip installing lilo, and install no bootloader, uncomment this\n"
+"# too:\n"
+"#d-i lilo-installer/skip boolean true</phrase>\n"
 "\n"
 "# This is fairly safe to set, it makes grub install automatically to the "
 "MBR\n"
@@ -2052,149 +2196,6 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "# GRUB을 여러 디스크에 설치하려면:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
-
-#. Tag: title
-#: preseed.xml:902
-#, no-c-format
-msgid "Package selection"
-msgstr "꾸러미 선택"
-
-#. Tag: para
-#: preseed.xml:903
-#, no-c-format
-msgid ""
-"You can choose to install any combination of tasks that are available. "
-"Available tasks as of this writing include:"
-msgstr ""
-"사용할 수 있는 태스크는 원하는 대로 설치할 수 있습니다. 현재 이 문서를 쓰는 "
-"시점에 사용할 수 있는 태스크는 다음과 같습니다:"
-
-#. Tag: userinput
-#: preseed.xml:912
-#, no-c-format
-msgid "standard"
-msgstr "표준 시스템"
-
-#. Tag: userinput
-#: preseed.xml:915
-#, no-c-format
-msgid "desktop"
-msgstr "데스크탑"
-
-#. Tag: userinput
-#: preseed.xml:918
-#, no-c-format
-msgid "gnome-desktop"
-msgstr "gnome-desktop"
-
-#. Tag: userinput
-#: preseed.xml:921
-#, no-c-format
-msgid "kde-desktop"
-msgstr "kde-desktop"
-
-#. Tag: userinput
-#: preseed.xml:924
-#, no-c-format
-msgid "web-server"
-msgstr "웹 서버"
-
-#. Tag: userinput
-#: preseed.xml:927
-#, no-c-format
-msgid "print-server"
-msgstr "인쇄 서버"
-
-#. Tag: userinput
-#: preseed.xml:930
-#, no-c-format
-msgid "dns-server"
-msgstr "dns 서버"
-
-#. Tag: userinput
-#: preseed.xml:933
-#, no-c-format
-msgid "file-server"
-msgstr "파일 서버"
-
-#. Tag: userinput
-#: preseed.xml:936
-#, no-c-format
-msgid "mail-server"
-msgstr "메일 서버"
-
-#. Tag: userinput
-#: preseed.xml:939
-#, no-c-format
-msgid "sql-database"
-msgstr "SQL 데이터베이스"
-
-#. Tag: userinput
-#: preseed.xml:942
-#, no-c-format
-msgid "laptop"
-msgstr "노트북 컴퓨터"
-
-#. Tag: para
-#: preseed.xml:946
-#, no-c-format
-msgid ""
-"You can also choose to install no tasks, and force the installation of a set "
-"of packages in some other way. We recommend always including the "
-"<userinput>standard</userinput> task."
-msgstr ""
-"태스크를 설치하지 않을 수도 있고, 다른 방법으로 꾸러미들을 설치할 수 있습니"
-"다. <userinput>표준 시스템</userinput> 태스크는 항상 포함하시길 권장합니다."
-
-#. Tag: para
-#: preseed.xml:952
-#, no-c-format
-msgid ""
-"If you want to install some individual packages in addition to packages "
-"installed by tasks, you can use the parameter <classname>pkgsel/include</"
-"classname>. The value of this parameter can be a list of packages separated "
-"by either commas or spaces, which allows it to be used easily on the kernel "
-"command line as well."
-msgstr ""
-"태스크로 설치한 꾸러미 외에 꾸러미를 더 설치하려면, <classname>pkgsel/"
-"include</classname> 파라미터를 사용하면 됩니다. 이 파라미터의 값은 쉼표나 공"
-"백으로 구분할 수 있으므로, 커널 명령행에서도 쉽게 사용할 수 있습니다."
-
-#. Tag: screen
-#: preseed.xml:962
-#, fuzzy, no-c-format
-msgid ""
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"<phrase condition=\"lenny\">\n"
-"# If the desktop task is selected, install the kde and xfce desktops\n"
-"# instead of the default gnome desktop.\n"
-"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop\n"
-"</phrase>\n"
-"<phrase condition=\"etch\">\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"</phrase>\n"
-"\n"
-"# Individual additional packages to install\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# Some versions of the installer can report back on what software you have\n"
-"# installed, and what software you use. The default is not to report back,\n"
-"# but sending reports helps the project determine what software is most\n"
-"# popular and include it on CDs.\n"
-"#popularity-contest popularity-contest/participate boolean false"
-msgstr ""
-"tasksel tasksel/first multiselect standard, desktop\n"
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"\n"
-"\"# 추가로 설치할 꾸러미들\n"
-"\"#d-i pkgsel/include string openssh-server build-essential\\n\"\n"
-"\"\\n\"\n"
-"# 설치 프로그램은 버전에 따라 무엇을 설치했는지 보고서를 보낼 수 있습니다.\n"
-"# 기본값은 보고하지 않는 것이지만, 보고서를 보내면 데비안 프로젝트에서\n"
-"# 어떤 소프트웨어가 유명하고 CD에 포함하는 게 좋을 지 결정하는 데 도움이\n"
-"# 됩니다.\n"
-"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:967

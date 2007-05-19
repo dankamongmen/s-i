@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-05-05 22:00+0000\n"
+"POT-Creation-Date: 2007-05-19 14:20+0000\n"
 "PO-Revision-Date: 2007-03-20 12:04+0200\n"
 "Last-Translator: \n"
 "Language-Team:  <en@li.org>\n"
@@ -1940,11 +1940,162 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:828
 #, no-c-format
+msgid "Account setup"
+msgstr "Ρύθμιση Λογαριασμού"
+
+#. Tag: para
+#: preseed.xml:829
+#, no-c-format
+msgid ""
+"The password for the root account and name and password for a first regular "
+"user's account can be preseeded. For the passwords you can use either clear "
+"text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+"Ο κωδικός πρόσβασης για τον χρήστη root και το όνομα και ο κωδικός πρόσβασης "
+"για τον πρώτο λογαριασμό ενός απλού χρήστη μπορούν να προρυθμιστούν. Για "
+"τους κωδικούς πρόσβασης μπορείτε να χρησιμοποιήσετε είτε έναν απλό μη-"
+"κρυπτογραφημένο (clear text) είτε MD5 <emphasis>hashes</emphasis>."
+
+#. Tag: para
+#: preseed.xml:836
+#, no-c-format
+msgid ""
+"Be aware that preseeding passwords is not completely secure as everyone with "
+"access to the preconfiguration file will have the knowledge of these "
+"passwords. Using MD5 hashes is considered slightly better in terms of "
+"security but it might also give a false sense of security as access to a MD5 "
+"hash allows for brute force attacks."
+msgstr ""
+"Έχετε υπόψιν ότι η προρύθμιση για τους κωδικούς πρόσβασης δεν είναι απόλυτα "
+"ασφαλής καθώς οποιοσδήποτε με πρόσβαση στο αρχείο προρυθμίσεων θα έχει γνώση "
+"αυτών των κωδικών. Η χρήση κωδικών MD5 hash θεωρείται σχετικά καλλίτερη από "
+"άποψη ασφάλειας, μπορεί όμως και να δώσει μια ψευδή αίσθηση ασφάλειας καθώς "
+"η πρόσβαση σ' έναν τέτοιο κωδικό επιτρέπει \"απευθείας\" επιθέσεις (brute "
+"force attacks)."
+
+#. Tag: screen
+#: preseed.xml:846
+#, no-c-format
+msgid ""
+"# Skip creation of a root account (normal user account will be able to\n"
+"# use sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Alternatively, to skip creation of a normal user account.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root password, either in clear text\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# To create a normal user account.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Normal user's password, either in clear text\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+"#Παράκαμψη της δημιουργίας λογαριασμού χρήστη root (ο λογαριασμός απλού "
+"χρήστη\n"
+"#θα είναι σε θέση να χρησιμοποιήσει την εντολή sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"#Eναλλακτικά για να παρακάμψετε την δημιουργία ενός λογαριασμού απλού "
+"χρήστη.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Κωδικός χρήστη root, είτε σε απλό κείμενο (clear text)\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# είτε κρυπτογραφημένο με χρήση MD5 hash.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# Για να δημιουργήστε έναν λογαριασμό απλού χρήστη.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Κωδικός πρόσβασης απλού χρήστη, είτε σε απλό κείμενο\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# είτε κρυπτογραφημένο με χρήση MD5 hash.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+
+#. Tag: para
+#: preseed.xml:848
+#, no-c-format
+msgid ""
+"The <classname>passwd/root-password-crypted</classname> and "
+"<classname>passwd/user-password-crypted</classname> variables can also be "
+"preseeded with <quote>!</quote> as their value. In that case, the "
+"corresponding account is disabled. This may be convenient for the root "
+"account, provided of course that an alternative method is setup to allow "
+"administrative activities or root login (for instance by using SSH key "
+"authentication or <command>sudo</command>)."
+msgstr ""
+"Οι μεταβλητές <classname>passwd/root-password-crypted</classname> και "
+"<classname>passwd/user-password-crypted</classname> μπορούν επίσης να "
+"προρυθμιστούν παίρνοντας σαν τιμή το <quote>!</quote>. Στην περίπτωση αυτή, "
+"ο αντίστοιχος λογαριασμός απενεργοποιείται. Αυτό μπορεί να είναι βολικό για "
+"τον λογαριασμό του χρήστη root, εφόσον βέβαια έχει ρυθμιστεί εναλλακτικός "
+"τρόπος που να επιτρέπει τις διάφορες διαχειριστικές ενέργειες ή την είσοδο "
+"του χρήστη root (για παράδειγμα με χρήση αυθεντικοποίησης με κλειδί SSH ή "
+"την εντολή <command>sudo</command>)."
+
+#. Tag: para
+#: preseed.xml:858
+#, no-c-format
+msgid ""
+"An MD5 hash for a password can be generated using the following command."
+msgstr ""
+"Ένα MD5 hash για έναν κωδικό πρόσβασης μπορεί να δημιουργηθεί "
+"χρησιμοποιώντας την ακόλουθη εντολή."
+
+#. Tag: screen
+#: preseed.xml:862
+#, no-c-format
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+
+#. Tag: title
+#: preseed.xml:868
+#, no-c-format
+msgid "Base system installation"
+msgstr "Εγκατάσταση του βασικού συστήματος"
+
+#. Tag: para
+#: preseed.xml:869
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Στην πραγματικότητα, δεν υπάρχουν πολλά πράγματα για τα οποία μπορείτε να "
+"χρησιμοποιήσετε preseeding σ' αυτό το στάδιο της εγκατάστασης. Οι μόνες "
+"ερωτήσεις που γίνονται αφορούν την εγκατάσταση του πυρήνα."
+
+#. Tag: screen
+#: preseed.xml:876
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+"# Επιλέξτε το πρόγραμμα δημιουργίας του συστήματος αρχείων initramfs, που # "
+"χρησιμοποιήθηκε για την δημιουργία του δίσκου μνήμης initrd για πυρήνες "
+"2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+
+#. Tag: title
+#: preseed.xml:881
+#, no-c-format
 msgid "Apt setup"
 msgstr "Ρύθμιση setup"
 
 #. Tag: para
-#: preseed.xml:829
+#: preseed.xml:882
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1958,7 +2109,7 @@ msgstr ""
 "προαιρετικά να προσθέσετε και άλλες (τοπικές) \"αποθήκες\" πακέτων."
 
 #. Tag: screen
-#: preseed.xml:837
+#: preseed.xml:890
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -2019,169 +2170,167 @@ msgstr ""
 "#d-i debian-installer/allow_unauthenticated string true"
 
 #. Tag: title
-#: preseed.xml:842
-#, no-c-format
-msgid "Account setup"
-msgstr "Ρύθμιση Λογαριασμού"
-
-#. Tag: para
-#: preseed.xml:843
-#, no-c-format
-msgid ""
-"The password for the root account and name and password for a first regular "
-"user's account can be preseeded. For the passwords you can use either clear "
-"text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
-"Ο κωδικός πρόσβασης για τον χρήστη root και το όνομα και ο κωδικός πρόσβασης "
-"για τον πρώτο λογαριασμό ενός απλού χρήστη μπορούν να προρυθμιστούν. Για "
-"τους κωδικούς πρόσβασης μπορείτε να χρησιμοποιήσετε είτε έναν απλό μη-"
-"κρυπτογραφημένο (clear text) είτε MD5 <emphasis>hashes</emphasis>."
-
-#. Tag: para
-#: preseed.xml:850
-#, no-c-format
-msgid ""
-"Be aware that preseeding passwords is not completely secure as everyone with "
-"access to the preconfiguration file will have the knowledge of these "
-"passwords. Using MD5 hashes is considered slightly better in terms of "
-"security but it might also give a false sense of security as access to a MD5 "
-"hash allows for brute force attacks."
-msgstr ""
-"Έχετε υπόψιν ότι η προρύθμιση για τους κωδικούς πρόσβασης δεν είναι απόλυτα "
-"ασφαλής καθώς οποιοσδήποτε με πρόσβαση στο αρχείο προρυθμίσεων θα έχει γνώση "
-"αυτών των κωδικών. Η χρήση κωδικών MD5 hash θεωρείται σχετικά καλλίτερη από "
-"άποψη ασφάλειας, μπορεί όμως και να δώσει μια ψευδή αίσθηση ασφάλειας καθώς "
-"η πρόσβαση σ' έναν τέτοιο κωδικό επιτρέπει \"απευθείας\" επιθέσεις (brute "
-"force attacks)."
-
-#. Tag: screen
-#: preseed.xml:860
-#, no-c-format
-msgid ""
-"# Skip creation of a root account (normal user account will be able to\n"
-"# use sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Alternatively, to skip creation of a normal user account.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Root password, either in clear text\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# To create a normal user account.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Normal user's password, either in clear text\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-msgstr ""
-"#Παράκαμψη της δημιουργίας λογαριασμού χρήστη root (ο λογαριασμός απλού "
-"χρήστη\n"
-"#θα είναι σε θέση να χρησιμοποιήσει την εντολή sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"#Eναλλακτικά για να παρακάμψετε την δημιουργία ενός λογαριασμού απλού "
-"χρήστη.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Κωδικός χρήστη root, είτε σε απλό κείμενο (clear text)\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# είτε κρυπτογραφημένο με χρήση MD5 hash.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# Για να δημιουργήστε έναν λογαριασμό απλού χρήστη.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Κωδικός πρόσβασης απλού χρήστη, είτε σε απλό κείμενο\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# είτε κρυπτογραφημένο με χρήση MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-
-#. Tag: para
-#: preseed.xml:862
-#, no-c-format
-msgid ""
-"The <classname>passwd/root-password-crypted</classname> and "
-"<classname>passwd/user-password-crypted</classname> variables can also be "
-"preseeded with <quote>!</quote> as their value. In that case, the "
-"corresponding account is disabled. This may be convenient for the root "
-"account, provided of course that an alternative method is setup to allow "
-"administrative activities or root login (for instance by using SSH key "
-"authentication or <command>sudo</command>)."
-msgstr ""
-"Οι μεταβλητές <classname>passwd/root-password-crypted</classname> και "
-"<classname>passwd/user-password-crypted</classname> μπορούν επίσης να "
-"προρυθμιστούν παίρνοντας σαν τιμή το <quote>!</quote>. Στην περίπτωση αυτή, "
-"ο αντίστοιχος λογαριασμός απενεργοποιείται. Αυτό μπορεί να είναι βολικό για "
-"τον λογαριασμό του χρήστη root, εφόσον βέβαια έχει ρυθμιστεί εναλλακτικός "
-"τρόπος που να επιτρέπει τις διάφορες διαχειριστικές ενέργειες ή την είσοδο "
-"του χρήστη root (για παράδειγμα με χρήση αυθεντικοποίησης με κλειδί SSH ή "
-"την εντολή <command>sudo</command>)."
-
-#. Tag: para
-#: preseed.xml:872
-#, no-c-format
-msgid ""
-"An MD5 hash for a password can be generated using the following command."
-msgstr ""
-"Ένα MD5 hash για έναν κωδικό πρόσβασης μπορεί να δημιουργηθεί "
-"χρησιμοποιώντας την ακόλουθη εντολή."
-
-#. Tag: screen
-#: preseed.xml:876
-#, no-c-format
-msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:882
-#, no-c-format
-msgid "Base system installation"
-msgstr "Εγκατάσταση του βασικού συστήματος"
-
-#. Tag: para
-#: preseed.xml:883
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Στην πραγματικότητα, δεν υπάρχουν πολλά πράγματα για τα οποία μπορείτε να "
-"χρησιμοποιήσετε preseeding σ' αυτό το στάδιο της εγκατάστασης. Οι μόνες "
-"ερωτήσεις που γίνονται αφορούν την εγκατάσταση του πυρήνα."
-
-#. Tag: screen
-#: preseed.xml:890
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-msgstr ""
-"# Επιλέξτε το πρόγραμμα δημιουργίας του συστήματος αρχείων initramfs, που # "
-"χρησιμοποιήθηκε για την δημιουργία του δίσκου μνήμης initrd για πυρήνες "
-"2.6.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-
-#. Tag: title
 #: preseed.xml:895
+#, no-c-format
+msgid "Package selection"
+msgstr "Επιλογή πακέτων"
+
+#. Tag: para
+#: preseed.xml:896
+#, no-c-format
+msgid ""
+"You can choose to install any combination of tasks that are available. "
+"Available tasks as of this writing include:"
+msgstr ""
+"Μπορείτε να επιλέξετε να εγκαταστήσετε οποιονδήποτε συνδυασμό καθηκόντων "
+"είναι διαθέσιμα. Διαθέσιμα καθήκοντα περιλαμβάνουν την σιγμή που γράφεται "
+"αυτό το κείμενο:"
+
+#. Tag: userinput
+#: preseed.xml:905
+#, no-c-format
+msgid "standard"
+msgstr "Κανονικό σύστημα"
+
+#. Tag: userinput
+#: preseed.xml:908
+#, no-c-format
+msgid "desktop"
+msgstr "επιφάνεια εργασίας"
+
+#. Tag: userinput
+#: preseed.xml:911
+#, no-c-format
+msgid "gnome-desktop"
+msgstr "επιφάνεια εργασίας gnome"
+
+#. Tag: userinput
+#: preseed.xml:914
+#, no-c-format
+msgid "kde-desktop"
+msgstr "επιφάνεια εργασίας kde"
+
+#. Tag: userinput
+#: preseed.xml:917
+#, no-c-format
+msgid "web-server"
+msgstr "Server ιστοσελίδων"
+
+#. Tag: userinput
+#: preseed.xml:920
+#, no-c-format
+msgid "print-server"
+msgstr "Server εκτυπώσεων"
+
+#. Tag: userinput
+#: preseed.xml:923
+#, no-c-format
+msgid "dns-server"
+msgstr "server oνοματοδοσίας (dns-server)"
+
+#. Tag: userinput
+#: preseed.xml:926
+#, no-c-format
+msgid "file-server"
+msgstr "Server αρχείων"
+
+#. Tag: userinput
+#: preseed.xml:929
+#, no-c-format
+msgid "mail-server"
+msgstr "Server αλληλογραφίας"
+
+#. Tag: userinput
+#: preseed.xml:932
+#, no-c-format
+msgid "sql-database"
+msgstr "Βάση δεδομένων SQL"
+
+#. Tag: userinput
+#: preseed.xml:935
+#, no-c-format
+msgid "laptop"
+msgstr "Φορητός υπολογιστής"
+
+#. Tag: para
+#: preseed.xml:939
+#, no-c-format
+msgid ""
+"You can also choose to install no tasks, and force the installation of a set "
+"of packages in some other way. We recommend always including the "
+"<userinput>standard</userinput> task."
+msgstr ""
+"Μπορείτε επίσης να επιλέξετε να μην εγκαταστήσετε οποιοδήποτε task, "
+"επιβάλλοντας την εγκατάσταση ενός συνόλου πακέτων με κάποιον άλλον τρόπο. "
+"Συνιστούμε πάντως να συμπεριλαμβάνετε πάντα το \"καθήκον\" "
+"<userinput>Κανονικό σύστημα</userinput>."
+
+#. Tag: para
+#: preseed.xml:945
+#, no-c-format
+msgid ""
+"If you want to install some individual packages in addition to packages "
+"installed by tasks, you can use the parameter <classname>pkgsel/include</"
+"classname>. The value of this parameter can be a list of packages separated "
+"by either commas or spaces, which allows it to be used easily on the kernel "
+"command line as well."
+msgstr ""
+"Αν θέλετε να εγκαταστήσετε κάποια μεμονωμένα πακέτα επιπλέον από τα πακέτα "
+"που εγκαθίστανται από τις ομάδες πακέτων (tasks), μπορείτε να "
+"χρησιμοποιήσετε την παράμετρο <classname>pkgsel/include</classname>. Η τιμή "
+"αυτής της παραμέτρου μπορεί να είναι μια λίστα πακέτων που διαχωρίζονται με "
+"άνω τελείες ή κενά, κάτι που επιτρέπει επίσης την εύκολη χρήση της στην "
+"γραμμή εντολών του πυρήνα."
+
+#. Tag: screen
+#: preseed.xml:955
+#, fuzzy, no-c-format
+msgid ""
+"#tasksel tasksel/first multiselect standard, web-server<phrase condition="
+"\"lenny\">\n"
+"# If the desktop task is selected, install the kde and xfce desktops\n"
+"# instead of the default gnome desktop.\n"
+"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</"
+"phrase><phrase condition=\"etch\">\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop</phrase>\n"
+"\n"
+"# Individual additional packages to install\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Some versions of the installer can report back on what software you have\n"
+"# installed, and what software you use. The default is not to report back,\n"
+"# but sending reports helps the project determine what software is most\n"
+"# popular and include it on CDs.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+"tasksel tasksel/first multiselect standard, Desktop environment\n"
+"#tasksel tasksel/first multiselect Standard system, Web server\n"
+"\n"
+"# Μερικές εκδόσεις του εγκαταστάτη μπορούν να κάνουν αναφορά σχετικά με το # "
+"λογισμικό που έχετε\n"
+"# και το λογισμικό που χρησιμοποιείτε. Η προεπιλογή είναι να μηνγίνεται μια "
+"# τέτοια αναφορά\n"
+" # αλλά η αποστολή αναφορών βοηθα το Debian project στον καθορισμό του # "
+"λογισμικού που είναι \n"
+" # δημοφιλέστερο ώστε να συμπεριλαμβάνεται στα CD.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+
+#. Tag: title
+#: preseed.xml:960
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Εγκατάσταση φορτωτή εκκίνησης"
 
 #. Tag: screen
-#: preseed.xml:897
-#, no-c-format
+#: preseed.xml:962
+#, fuzzy, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
-"#d-i grub-installer/skip boolean true\n"
+"#d-i grub-installer/skip boolean true<phrase condition=\"lenny\">\n"
+"# To also skip installing lilo, and install no bootloader, uncomment this\n"
+"# too:\n"
+"#d-i lilo-installer/skip boolean true</phrase>\n"
 "\n"
 "# This is fairly safe to set, it makes grub install automatically to the "
 "MBR\n"
@@ -2226,154 +2375,6 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "# Για να εγκαταστήσετε το grub σε πολλαπλούς δίσκους:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
-
-#. Tag: title
-#: preseed.xml:902
-#, no-c-format
-msgid "Package selection"
-msgstr "Επιλογή πακέτων"
-
-#. Tag: para
-#: preseed.xml:903
-#, no-c-format
-msgid ""
-"You can choose to install any combination of tasks that are available. "
-"Available tasks as of this writing include:"
-msgstr ""
-"Μπορείτε να επιλέξετε να εγκαταστήσετε οποιονδήποτε συνδυασμό καθηκόντων "
-"είναι διαθέσιμα. Διαθέσιμα καθήκοντα περιλαμβάνουν την σιγμή που γράφεται "
-"αυτό το κείμενο:"
-
-#. Tag: userinput
-#: preseed.xml:912
-#, no-c-format
-msgid "standard"
-msgstr "Κανονικό σύστημα"
-
-#. Tag: userinput
-#: preseed.xml:915
-#, no-c-format
-msgid "desktop"
-msgstr "επιφάνεια εργασίας"
-
-#. Tag: userinput
-#: preseed.xml:918
-#, no-c-format
-msgid "gnome-desktop"
-msgstr "επιφάνεια εργασίας gnome"
-
-#. Tag: userinput
-#: preseed.xml:921
-#, no-c-format
-msgid "kde-desktop"
-msgstr "επιφάνεια εργασίας kde"
-
-#. Tag: userinput
-#: preseed.xml:924
-#, no-c-format
-msgid "web-server"
-msgstr "Server ιστοσελίδων"
-
-#. Tag: userinput
-#: preseed.xml:927
-#, no-c-format
-msgid "print-server"
-msgstr "Server εκτυπώσεων"
-
-#. Tag: userinput
-#: preseed.xml:930
-#, no-c-format
-msgid "dns-server"
-msgstr "server oνοματοδοσίας (dns-server)"
-
-#. Tag: userinput
-#: preseed.xml:933
-#, no-c-format
-msgid "file-server"
-msgstr "Server αρχείων"
-
-#. Tag: userinput
-#: preseed.xml:936
-#, no-c-format
-msgid "mail-server"
-msgstr "Server αλληλογραφίας"
-
-#. Tag: userinput
-#: preseed.xml:939
-#, no-c-format
-msgid "sql-database"
-msgstr "Βάση δεδομένων SQL"
-
-#. Tag: userinput
-#: preseed.xml:942
-#, no-c-format
-msgid "laptop"
-msgstr "Φορητός υπολογιστής"
-
-#. Tag: para
-#: preseed.xml:946
-#, no-c-format
-msgid ""
-"You can also choose to install no tasks, and force the installation of a set "
-"of packages in some other way. We recommend always including the "
-"<userinput>standard</userinput> task."
-msgstr ""
-"Μπορείτε επίσης να επιλέξετε να μην εγκαταστήσετε οποιοδήποτε task, "
-"επιβάλλοντας την εγκατάσταση ενός συνόλου πακέτων με κάποιον άλλον τρόπο. "
-"Συνιστούμε πάντως να συμπεριλαμβάνετε πάντα το \"καθήκον\" "
-"<userinput>Κανονικό σύστημα</userinput>."
-
-#. Tag: para
-#: preseed.xml:952
-#, no-c-format
-msgid ""
-"If you want to install some individual packages in addition to packages "
-"installed by tasks, you can use the parameter <classname>pkgsel/include</"
-"classname>. The value of this parameter can be a list of packages separated "
-"by either commas or spaces, which allows it to be used easily on the kernel "
-"command line as well."
-msgstr ""
-"Αν θέλετε να εγκαταστήσετε κάποια μεμονωμένα πακέτα επιπλέον από τα πακέτα "
-"που εγκαθίστανται από τις ομάδες πακέτων (tasks), μπορείτε να "
-"χρησιμοποιήσετε την παράμετρο <classname>pkgsel/include</classname>. Η τιμή "
-"αυτής της παραμέτρου μπορεί να είναι μια λίστα πακέτων που διαχωρίζονται με "
-"άνω τελείες ή κενά, κάτι που επιτρέπει επίσης την εύκολη χρήση της στην "
-"γραμμή εντολών του πυρήνα."
-
-#. Tag: screen
-#: preseed.xml:962
-#, fuzzy, no-c-format
-msgid ""
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"<phrase condition=\"lenny\">\n"
-"# If the desktop task is selected, install the kde and xfce desktops\n"
-"# instead of the default gnome desktop.\n"
-"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop\n"
-"</phrase>\n"
-"<phrase condition=\"etch\">\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"</phrase>\n"
-"\n"
-"# Individual additional packages to install\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# Some versions of the installer can report back on what software you have\n"
-"# installed, and what software you use. The default is not to report back,\n"
-"# but sending reports helps the project determine what software is most\n"
-"# popular and include it on CDs.\n"
-"#popularity-contest popularity-contest/participate boolean false"
-msgstr ""
-"tasksel tasksel/first multiselect standard, Desktop environment\n"
-"#tasksel tasksel/first multiselect Standard system, Web server\n"
-"\n"
-"# Μερικές εκδόσεις του εγκαταστάτη μπορούν να κάνουν αναφορά σχετικά με το # "
-"λογισμικό που έχετε\n"
-"# και το λογισμικό που χρησιμοποιείτε. Η προεπιλογή είναι να μηνγίνεται μια "
-"# τέτοια αναφορά\n"
-" # αλλά η αποστολή αναφορών βοηθα το Debian project στον καθορισμό του # "
-"λογισμικού που είναι \n"
-" # δημοφιλέστερο ώστε να συμπεριλαμβάνεται στα CD.\n"
-"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:967

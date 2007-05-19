@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-05-05 22:00+0000\n"
+"POT-Creation-Date: 2007-05-19 14:20+0000\n"
 "PO-Revision-Date: 2006-12-29 15:47+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -1860,11 +1860,153 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:828
 #, no-c-format
+msgid "Account setup"
+msgstr "Thiết lập tài khoản"
+
+#. Tag: para
+#: preseed.xml:829
+#, no-c-format
+msgid ""
+"The password for the root account and name and password for a first regular "
+"user's account can be preseeded. For the passwords you can use either clear "
+"text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+"Có khả năng chèn sẵn mật khẩu cho tài khoản người chủ, cũng tên và mật khẩu "
+"cho tài khoản của người dùng chuẩn thứ nhất. Đối với mật khẩu, bạn có thể "
+"dùng giá trị nhập thô (không mật mã) hay <emphasis>băm</emphasis> kiểu MD5."
+
+#. Tag: para
+#: preseed.xml:836
+#, no-c-format
+msgid ""
+"Be aware that preseeding passwords is not completely secure as everyone with "
+"access to the preconfiguration file will have the knowledge of these "
+"passwords. Using MD5 hashes is considered slightly better in terms of "
+"security but it might also give a false sense of security as access to a MD5 "
+"hash allows for brute force attacks."
+msgstr ""
+"Ghi chú rằng tiến trình chèn sẵn mật khẩu không phải là bảo mật hoàn toàn, "
+"vì mọi người có quyền truy cập tập tin cấu hình sẵn thì biết các mật khẩu "
+"nằm trong nó. Việc dùng băm MD5 được xem là tốt hơn một ít theo các điều "
+"khoản của bảo mật, nhưng nó cũng có thể cung cấp ý thức bảo mật giả, vì cách "
+"truy cập băm MD5 cho phép người khác tấn công bằng sức mạnh vũ phu."
+
+#. Tag: screen
+#: preseed.xml:846
+#, no-c-format
+msgid ""
+"# Skip creation of a root account (normal user account will be able to\n"
+"# use sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Alternatively, to skip creation of a normal user account.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root password, either in clear text\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# To create a normal user account.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Normal user's password, either in clear text\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+"# Bỏ qua bước tạo tài khoản người chủ (tài khoản kiểu người dùng chuẩn\n"
+"# sẽ có khả năng dùng sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Hoặc để bỏ qua bước tạo tài khoản kiểu người dùng chuẩn:\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Mật khẩu người chủ, hoặc bằng nhập thô :\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# hoặc được mật mã bằng băm MD5:\n"
+"#d-i passwd/root-password-crypted password [băm MD5]\n"
+"\n"
+"# Để tạo tài khoản kiểu người dùng chuẩn.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Mật khẩu của người dùng chuẩn, hoặc bằng nhập thô :\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# hoặc được mật mã bằng băm MD5:\n"
+"#d-i passwd/user-password-crypted password [băm MD5]"
+
+#. Tag: para
+#: preseed.xml:848
+#, no-c-format
+msgid ""
+"The <classname>passwd/root-password-crypted</classname> and "
+"<classname>passwd/user-password-crypted</classname> variables can also be "
+"preseeded with <quote>!</quote> as their value. In that case, the "
+"corresponding account is disabled. This may be convenient for the root "
+"account, provided of course that an alternative method is setup to allow "
+"administrative activities or root login (for instance by using SSH key "
+"authentication or <command>sudo</command>)."
+msgstr ""
+"Biến <classname>passwd/root-password-crypted</classname> và "
+"<classname>passwd/user-password-crypted</classname> cũng có thể được chèn "
+"trước bằng <quote>!</quote> là giá trị. Trong trường hợp đó, tài khoản tương "
+"ứng bị tắt. Trường hợp này có thể là tiện với tài khoản người chủ, miễn là "
+"phương pháp xen kẽ được thiết lập để cho phép hoạt động quản lý hay đăng "
+"nhập người chủ (thí dụ bằng cách dùng khả năng xác thức khoá SSH hay "
+"<command>sudo</command>)."
+
+#. Tag: para
+#: preseed.xml:858
+#, no-c-format
+msgid ""
+"An MD5 hash for a password can be generated using the following command."
+msgstr "Băm MD5 cho mật khẩu có thể được tạo ra bằng lệnh theo đây."
+
+# Literal: don't translate / Nghĩa chữ: đừng dịch
+#. Tag: screen
+#: preseed.xml:862
+#, no-c-format
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+
+#. Tag: title
+#: preseed.xml:868
+#, no-c-format
+msgid "Base system installation"
+msgstr "Cài đặt hệ thống cơ bản"
+
+#. Tag: para
+#: preseed.xml:869
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Thật sự không thể chèn sẵn nhiều vào giai đoạn cài đặt này. Chỉ hỏi câu về "
+"cách cài đặt hạt nhân."
+
+#. Tag: screen
+#: preseed.xml:876
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+"# Chọn bộ tạo ra « initramfs » được dùng để tạo ra initrd cho hạt nhân 2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+
+#. Tag: title
+#: preseed.xml:881
+#, no-c-format
 msgid "Apt setup"
 msgstr "Thiết lập apt"
 
 #. Tag: para
-#: preseed.xml:829
+#: preseed.xml:882
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1878,7 +2020,7 @@ msgstr ""
 "năng thêm kho phần mềm (cục bộ) khác."
 
 #. Tag: screen
-#: preseed.xml:837
+#: preseed.xml:890
 #, fuzzy, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1927,160 +2069,165 @@ msgstr ""
 "#d-i apt-setup/local0/key chuỗi http://máy_phục_vụ_cục_bộ/khoá"
 
 #. Tag: title
-#: preseed.xml:842
-#, no-c-format
-msgid "Account setup"
-msgstr "Thiết lập tài khoản"
-
-#. Tag: para
-#: preseed.xml:843
-#, no-c-format
-msgid ""
-"The password for the root account and name and password for a first regular "
-"user's account can be preseeded. For the passwords you can use either clear "
-"text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
-"Có khả năng chèn sẵn mật khẩu cho tài khoản người chủ, cũng tên và mật khẩu "
-"cho tài khoản của người dùng chuẩn thứ nhất. Đối với mật khẩu, bạn có thể "
-"dùng giá trị nhập thô (không mật mã) hay <emphasis>băm</emphasis> kiểu MD5."
-
-#. Tag: para
-#: preseed.xml:850
-#, no-c-format
-msgid ""
-"Be aware that preseeding passwords is not completely secure as everyone with "
-"access to the preconfiguration file will have the knowledge of these "
-"passwords. Using MD5 hashes is considered slightly better in terms of "
-"security but it might also give a false sense of security as access to a MD5 "
-"hash allows for brute force attacks."
-msgstr ""
-"Ghi chú rằng tiến trình chèn sẵn mật khẩu không phải là bảo mật hoàn toàn, "
-"vì mọi người có quyền truy cập tập tin cấu hình sẵn thì biết các mật khẩu "
-"nằm trong nó. Việc dùng băm MD5 được xem là tốt hơn một ít theo các điều "
-"khoản của bảo mật, nhưng nó cũng có thể cung cấp ý thức bảo mật giả, vì cách "
-"truy cập băm MD5 cho phép người khác tấn công bằng sức mạnh vũ phu."
-
-#. Tag: screen
-#: preseed.xml:860
-#, no-c-format
-msgid ""
-"# Skip creation of a root account (normal user account will be able to\n"
-"# use sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Alternatively, to skip creation of a normal user account.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Root password, either in clear text\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# To create a normal user account.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Normal user's password, either in clear text\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-msgstr ""
-"# Bỏ qua bước tạo tài khoản người chủ (tài khoản kiểu người dùng chuẩn\n"
-"# sẽ có khả năng dùng sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Hoặc để bỏ qua bước tạo tài khoản kiểu người dùng chuẩn:\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Mật khẩu người chủ, hoặc bằng nhập thô :\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# hoặc được mật mã bằng băm MD5:\n"
-"#d-i passwd/root-password-crypted password [băm MD5]\n"
-"\n"
-"# Để tạo tài khoản kiểu người dùng chuẩn.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Mật khẩu của người dùng chuẩn, hoặc bằng nhập thô :\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# hoặc được mật mã bằng băm MD5:\n"
-"#d-i passwd/user-password-crypted password [băm MD5]"
-
-#. Tag: para
-#: preseed.xml:862
-#, no-c-format
-msgid ""
-"The <classname>passwd/root-password-crypted</classname> and "
-"<classname>passwd/user-password-crypted</classname> variables can also be "
-"preseeded with <quote>!</quote> as their value. In that case, the "
-"corresponding account is disabled. This may be convenient for the root "
-"account, provided of course that an alternative method is setup to allow "
-"administrative activities or root login (for instance by using SSH key "
-"authentication or <command>sudo</command>)."
-msgstr ""
-"Biến <classname>passwd/root-password-crypted</classname> và "
-"<classname>passwd/user-password-crypted</classname> cũng có thể được chèn "
-"trước bằng <quote>!</quote> là giá trị. Trong trường hợp đó, tài khoản tương "
-"ứng bị tắt. Trường hợp này có thể là tiện với tài khoản người chủ, miễn là "
-"phương pháp xen kẽ được thiết lập để cho phép hoạt động quản lý hay đăng "
-"nhập người chủ (thí dụ bằng cách dùng khả năng xác thức khoá SSH hay "
-"<command>sudo</command>)."
-
-#. Tag: para
-#: preseed.xml:872
-#, no-c-format
-msgid ""
-"An MD5 hash for a password can be generated using the following command."
-msgstr "Băm MD5 cho mật khẩu có thể được tạo ra bằng lệnh theo đây."
-
-# Literal: don't translate / Nghĩa chữ: đừng dịch
-#. Tag: screen
-#: preseed.xml:876
-#, no-c-format
-msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:882
-#, no-c-format
-msgid "Base system installation"
-msgstr "Cài đặt hệ thống cơ bản"
-
-#. Tag: para
-#: preseed.xml:883
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Thật sự không thể chèn sẵn nhiều vào giai đoạn cài đặt này. Chỉ hỏi câu về "
-"cách cài đặt hạt nhân."
-
-#. Tag: screen
-#: preseed.xml:890
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-msgstr ""
-"# Chọn bộ tạo ra « initramfs » được dùng để tạo ra initrd cho hạt nhân 2.6.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-
-#. Tag: title
 #: preseed.xml:895
+#, no-c-format
+msgid "Package selection"
+msgstr "Chọn gói phần mềm"
+
+#. Tag: para
+#: preseed.xml:896
+#, no-c-format
+msgid ""
+"You can choose to install any combination of tasks that are available. "
+"Available tasks as of this writing include:"
+msgstr ""
+"Bạn có khả năng chọn cài đặt bất cứ sự phối hợp công việc nào sẵn sàng. Vào "
+"lúc viết câu này, các công việc sẵn sàng gồm:"
+
+#. Tag: userinput
+#: preseed.xml:905
+#, no-c-format
+msgid "standard"
+msgstr "chuẩn"
+
+#. Tag: userinput
+#: preseed.xml:908
+#, no-c-format
+msgid "desktop"
+msgstr "môi trường làm việc"
+
+#. Tag: userinput
+#: preseed.xml:911
+#, no-c-format
+msgid "gnome-desktop"
+msgstr "môi trường làm việc Gnome"
+
+#. Tag: userinput
+#: preseed.xml:914
+#, no-c-format
+msgid "kde-desktop"
+msgstr "môi trường làm việc KDE"
+
+#. Tag: userinput
+#: preseed.xml:917
+#, no-c-format
+msgid "web-server"
+msgstr "trình phục vụ Mạng"
+
+#. Tag: userinput
+#: preseed.xml:920
+#, no-c-format
+msgid "print-server"
+msgstr "trình phục vụ in"
+
+#. Tag: userinput
+#: preseed.xml:923
+#, no-c-format
+msgid "dns-server"
+msgstr "trình phục vụ DNS"
+
+#. Tag: userinput
+#: preseed.xml:926
+#, no-c-format
+msgid "file-server"
+msgstr "trình phục vụ tập tin"
+
+#. Tag: userinput
+#: preseed.xml:929
+#, no-c-format
+msgid "mail-server"
+msgstr "trình phục vụ thư tín"
+
+#. Tag: userinput
+#: preseed.xml:932
+#, no-c-format
+msgid "sql-database"
+msgstr "cơ sở dữ liệu SQL"
+
+#. Tag: userinput
+#: preseed.xml:935
+#, no-c-format
+msgid "laptop"
+msgstr "máy tính xách tay"
+
+#. Tag: para
+#: preseed.xml:939
+#, no-c-format
+msgid ""
+"You can also choose to install no tasks, and force the installation of a set "
+"of packages in some other way. We recommend always including the "
+"<userinput>standard</userinput> task."
+msgstr ""
+"Bạn cũng có khả năng chọn không cài đặt công việc nào, ép buộc cài đặt một "
+"bộ gói bằng cách khác. Khuyên bạn luôn luôn gồm ít nhất công việc "
+"<userinput>chuẩn</userinput>."
+
+#. Tag: para
+#: preseed.xml:945
+#, no-c-format
+msgid ""
+"If you want to install some individual packages in addition to packages "
+"installed by tasks, you can use the parameter <classname>pkgsel/include</"
+"classname>. The value of this parameter can be a list of packages separated "
+"by either commas or spaces, which allows it to be used easily on the kernel "
+"command line as well."
+msgstr ""
+"Nếu bạn muốn cài đặt một số gói riêng, thêm vào những gói được cài đặt trong "
+"các công việc, bạn có khả năng sử dụng tham số <classname>pkgsel/include</"
+"classname>. Giá trị của tham số này có thể là danh sách các gói được định "
+"giới bằng hoặc dấu phẩy hoặc dấu cách, cũng dễ dàng dùng trên dòng lệnh."
+
+#. Tag: screen
+#: preseed.xml:955
+#, fuzzy, no-c-format
+msgid ""
+"#tasksel tasksel/first multiselect standard, web-server<phrase condition="
+"\"lenny\">\n"
+"# If the desktop task is selected, install the kde and xfce desktops\n"
+"# instead of the default gnome desktop.\n"
+"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</"
+"phrase><phrase condition=\"etch\">\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop</phrase>\n"
+"\n"
+"# Individual additional packages to install\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Some versions of the installer can report back on what software you have\n"
+"# installed, and what software you use. The default is not to report back,\n"
+"# but sending reports helps the project determine what software is most\n"
+"# popular and include it on CDs.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+"tasksel tasksel/first multiselect chuẩn, môi trường làm việc\n"
+"#tasksel tasksel/first multiselect chuẩn, trình phục vụ Mạng\n"
+"#tasksel tasksel/first multiselect chuẩn, môi trường làm việc KDE\n"
+"\n"
+"# Các gói thêm riêng cần cài đặt\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Một số phiên bản riêng của trình cài đặt có khả năng thông báo lại\n"
+"# phần mềm nào bạn đã cài đặt, và phần mềm nào bạn dùng.\n"
+"# Giá trị mặc định là không thông báo lại, nhưng việc thông báo\n"
+"# giúp đỡ dự án Debian quyết định phần mềm nào thường được dùng\n"
+"# thì gồm nó trên đĩa CD.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+
+#. Tag: title
+#: preseed.xml:960
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Cài đặt bộ tải khởi động"
 
 #. Tag: screen
-#: preseed.xml:897
-#, no-c-format
+#: preseed.xml:962
+#, fuzzy, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
-"#d-i grub-installer/skip boolean true\n"
+"#d-i grub-installer/skip boolean true<phrase condition=\"lenny\">\n"
+"# To also skip installing lilo, and install no bootloader, uncomment this\n"
+"# too:\n"
+"#d-i lilo-installer/skip boolean true</phrase>\n"
 "\n"
 "# This is fairly safe to set, it makes grub install automatically to the "
 "MBR\n"
@@ -2121,152 +2268,6 @@ msgstr ""
 "#d-i grub-installer/bootdev  chuỗi (hd0,0)\n"
 "# Để cài đặt grub vào nhiều đĩa:\n"
 "#d-i grub-installer/bootdev  chuỗi (hd0,0) (hd1,0) (hd2,0)"
-
-#. Tag: title
-#: preseed.xml:902
-#, no-c-format
-msgid "Package selection"
-msgstr "Chọn gói phần mềm"
-
-#. Tag: para
-#: preseed.xml:903
-#, no-c-format
-msgid ""
-"You can choose to install any combination of tasks that are available. "
-"Available tasks as of this writing include:"
-msgstr ""
-"Bạn có khả năng chọn cài đặt bất cứ sự phối hợp công việc nào sẵn sàng. Vào "
-"lúc viết câu này, các công việc sẵn sàng gồm:"
-
-#. Tag: userinput
-#: preseed.xml:912
-#, no-c-format
-msgid "standard"
-msgstr "chuẩn"
-
-#. Tag: userinput
-#: preseed.xml:915
-#, no-c-format
-msgid "desktop"
-msgstr "môi trường làm việc"
-
-#. Tag: userinput
-#: preseed.xml:918
-#, no-c-format
-msgid "gnome-desktop"
-msgstr "môi trường làm việc Gnome"
-
-#. Tag: userinput
-#: preseed.xml:921
-#, no-c-format
-msgid "kde-desktop"
-msgstr "môi trường làm việc KDE"
-
-#. Tag: userinput
-#: preseed.xml:924
-#, no-c-format
-msgid "web-server"
-msgstr "trình phục vụ Mạng"
-
-#. Tag: userinput
-#: preseed.xml:927
-#, no-c-format
-msgid "print-server"
-msgstr "trình phục vụ in"
-
-#. Tag: userinput
-#: preseed.xml:930
-#, no-c-format
-msgid "dns-server"
-msgstr "trình phục vụ DNS"
-
-#. Tag: userinput
-#: preseed.xml:933
-#, no-c-format
-msgid "file-server"
-msgstr "trình phục vụ tập tin"
-
-#. Tag: userinput
-#: preseed.xml:936
-#, no-c-format
-msgid "mail-server"
-msgstr "trình phục vụ thư tín"
-
-#. Tag: userinput
-#: preseed.xml:939
-#, no-c-format
-msgid "sql-database"
-msgstr "cơ sở dữ liệu SQL"
-
-#. Tag: userinput
-#: preseed.xml:942
-#, no-c-format
-msgid "laptop"
-msgstr "máy tính xách tay"
-
-#. Tag: para
-#: preseed.xml:946
-#, no-c-format
-msgid ""
-"You can also choose to install no tasks, and force the installation of a set "
-"of packages in some other way. We recommend always including the "
-"<userinput>standard</userinput> task."
-msgstr ""
-"Bạn cũng có khả năng chọn không cài đặt công việc nào, ép buộc cài đặt một "
-"bộ gói bằng cách khác. Khuyên bạn luôn luôn gồm ít nhất công việc "
-"<userinput>chuẩn</userinput>."
-
-#. Tag: para
-#: preseed.xml:952
-#, no-c-format
-msgid ""
-"If you want to install some individual packages in addition to packages "
-"installed by tasks, you can use the parameter <classname>pkgsel/include</"
-"classname>. The value of this parameter can be a list of packages separated "
-"by either commas or spaces, which allows it to be used easily on the kernel "
-"command line as well."
-msgstr ""
-"Nếu bạn muốn cài đặt một số gói riêng, thêm vào những gói được cài đặt trong "
-"các công việc, bạn có khả năng sử dụng tham số <classname>pkgsel/include</"
-"classname>. Giá trị của tham số này có thể là danh sách các gói được định "
-"giới bằng hoặc dấu phẩy hoặc dấu cách, cũng dễ dàng dùng trên dòng lệnh."
-
-#. Tag: screen
-#: preseed.xml:962
-#, fuzzy, no-c-format
-msgid ""
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"<phrase condition=\"lenny\">\n"
-"# If the desktop task is selected, install the kde and xfce desktops\n"
-"# instead of the default gnome desktop.\n"
-"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop\n"
-"</phrase>\n"
-"<phrase condition=\"etch\">\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"</phrase>\n"
-"\n"
-"# Individual additional packages to install\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# Some versions of the installer can report back on what software you have\n"
-"# installed, and what software you use. The default is not to report back,\n"
-"# but sending reports helps the project determine what software is most\n"
-"# popular and include it on CDs.\n"
-"#popularity-contest popularity-contest/participate boolean false"
-msgstr ""
-"tasksel tasksel/first multiselect chuẩn, môi trường làm việc\n"
-"#tasksel tasksel/first multiselect chuẩn, trình phục vụ Mạng\n"
-"#tasksel tasksel/first multiselect chuẩn, môi trường làm việc KDE\n"
-"\n"
-"# Các gói thêm riêng cần cài đặt\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# Một số phiên bản riêng của trình cài đặt có khả năng thông báo lại\n"
-"# phần mềm nào bạn đã cài đặt, và phần mềm nào bạn dùng.\n"
-"# Giá trị mặc định là không thông báo lại, nhưng việc thông báo\n"
-"# giúp đỡ dự án Debian quyết định phần mềm nào thường được dùng\n"
-"# thì gồm nó trên đĩa CD.\n"
-"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:967

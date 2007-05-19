@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-05-05 22:00+0000\n"
+"POT-Creation-Date: 2007-05-19 14:20+0000\n"
 "PO-Revision-Date: 2007-03-18 19:17+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
@@ -1795,11 +1795,150 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:828
 #, no-c-format
+msgid "Account setup"
+msgstr "Fiók beállítások"
+
+#. Tag: para
+#: preseed.xml:829
+#, no-c-format
+msgid ""
+"The password for the root account and name and password for a first regular "
+"user's account can be preseeded. For the passwords you can use either clear "
+"text values or MD5 <emphasis>hashes</emphasis>."
+msgstr ""
+"A root fiók jelszava és az 1. sima fiók neve és jelszava szintén előírható. "
+"A jelszavaknál használhatók sima szöveg értékek vagy MD5 <emphasis>hash</"
+"emphasis> kódok."
+
+#. Tag: para
+#: preseed.xml:836
+#, no-c-format
+msgid ""
+"Be aware that preseeding passwords is not completely secure as everyone with "
+"access to the preconfiguration file will have the knowledge of these "
+"passwords. Using MD5 hashes is considered slightly better in terms of "
+"security but it might also give a false sense of security as access to a MD5 "
+"hash allows for brute force attacks."
+msgstr ""
+"Jelszavak előírásakor ne feledjük, hogy az előíró fájlhoz férők megtudják "
+"ezeket. Az MD5 hash kódok használata kicsit jobb, de önmagában még hamis "
+"biztonság érzetet kelt, mert a hozzáférés lehetővé teszi az ellenük "
+"elkövetett nyers erejű támadást."
+
+#. Tag: screen
+#: preseed.xml:846
+#, no-c-format
+msgid ""
+"# Skip creation of a root account (normal user account will be able to\n"
+"# use sudo).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Alternatively, to skip creation of a normal user account.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root password, either in clear text\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# To create a normal user account.\n"
+"#d-i passwd/user-fullname string Debian User\n"
+"#d-i passwd/username string debian\n"
+"# Normal user's password, either in clear text\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# or encrypted using an MD5 hash.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+msgstr ""
+"# root fiók létrehozásának kihagyása (normál fiók\n"
+"# sudo parancsot használ majd).\n"
+"#d-i passwd/root-login boolean false\n"
+"# Normál fiók létrehozásának átugrása.\n"
+"#d-i passwd/make-user boolean false\n"
+"\n"
+"# Root jelszó sima szövegben\n"
+"#d-i passwd/root-password password r00tme\n"
+"#d-i passwd/root-password-again password r00tme\n"
+"# vagy MD5 hash titkosítással.\n"
+"#d-i passwd/root-password-crypted password [MD5 hash]\n"
+"\n"
+"# Normál felhasználói fiók létrehozása.\n"
+"#d-i passwd/user-fullname string Debian Felhasználó\n"
+"#d-i passwd/username string debian\n"
+"# Sima felhasználói jelszó sima szövegben\n"
+"#d-i passwd/user-password password insecure\n"
+"#d-i passwd/user-password-again password insecure\n"
+"# vagy MD5 hash titkosítással.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]"
+
+#. Tag: para
+#: preseed.xml:848
+#, no-c-format
+msgid ""
+"The <classname>passwd/root-password-crypted</classname> and "
+"<classname>passwd/user-password-crypted</classname> variables can also be "
+"preseeded with <quote>!</quote> as their value. In that case, the "
+"corresponding account is disabled. This may be convenient for the root "
+"account, provided of course that an alternative method is setup to allow "
+"administrative activities or root login (for instance by using SSH key "
+"authentication or <command>sudo</command>)."
+msgstr ""
+"A <classname>passwd/root-password-crypted</classname> és <classname>passwd/"
+"user-password-crypted</classname> változók <quote>!</quote> értéke is "
+"előírható. Az adott fiók ekkor kikapcsolt. Ez jó lehet root fióknál, ha "
+"természetesen egy más, adminisztratív tevékenységet vagy root bejelentkezést "
+"biztosító mód adott (például SSH kulcs hitelesítés vagy <command>sudo</"
+"command>)."
+
+#. Tag: para
+#: preseed.xml:858
+#, no-c-format
+msgid ""
+"An MD5 hash for a password can be generated using the following command."
+msgstr "Egy MD5 hash egy jelszóhoz az alábbi paranccsal készíthető."
+
+#. Tag: screen
+#: preseed.xml:862
+#, no-c-format
+msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
+msgstr "$ echo \"r00tmagam\" | mkpasswd -s -H MD5"
+
+#. Tag: title
+#: preseed.xml:868
+#, no-c-format
+msgid "Base system installation"
+msgstr "Az Alaprendszer telepítése"
+
+#. Tag: para
+#: preseed.xml:869
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Jelenleg nincs sok előírható a telepítő e részéhez. Csak a kernel "
+"telepítéséhez vannak kérdések."
+
+#. Tag: screen
+#: preseed.xml:876
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+msgstr ""
+"# A 2.6 kernel számára használt initramfs előállító választása.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
+
+#. Tag: title
+#: preseed.xml:881
+#, no-c-format
 msgid "Apt setup"
 msgstr "Az APT beállítása"
 
 #. Tag: para
-#: preseed.xml:829
+#: preseed.xml:882
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -1812,7 +1951,7 @@ msgstr ""
 "válaszoktól függően. További (úgynevezett helyi) tárak is megadhatók."
 
 #. Tag: screen
-#: preseed.xml:837
+#: preseed.xml:890
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -1866,157 +2005,162 @@ msgstr ""
 "#d-i debian-installer/allow_unauthenticated string true"
 
 #. Tag: title
-#: preseed.xml:842
-#, no-c-format
-msgid "Account setup"
-msgstr "Fiók beállítások"
-
-#. Tag: para
-#: preseed.xml:843
-#, no-c-format
-msgid ""
-"The password for the root account and name and password for a first regular "
-"user's account can be preseeded. For the passwords you can use either clear "
-"text values or MD5 <emphasis>hashes</emphasis>."
-msgstr ""
-"A root fiók jelszava és az 1. sima fiók neve és jelszava szintén előírható. "
-"A jelszavaknál használhatók sima szöveg értékek vagy MD5 <emphasis>hash</"
-"emphasis> kódok."
-
-#. Tag: para
-#: preseed.xml:850
-#, no-c-format
-msgid ""
-"Be aware that preseeding passwords is not completely secure as everyone with "
-"access to the preconfiguration file will have the knowledge of these "
-"passwords. Using MD5 hashes is considered slightly better in terms of "
-"security but it might also give a false sense of security as access to a MD5 "
-"hash allows for brute force attacks."
-msgstr ""
-"Jelszavak előírásakor ne feledjük, hogy az előíró fájlhoz férők megtudják "
-"ezeket. Az MD5 hash kódok használata kicsit jobb, de önmagában még hamis "
-"biztonság érzetet kelt, mert a hozzáférés lehetővé teszi az ellenük "
-"elkövetett nyers erejű támadást."
-
-#. Tag: screen
-#: preseed.xml:860
-#, no-c-format
-msgid ""
-"# Skip creation of a root account (normal user account will be able to\n"
-"# use sudo).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Alternatively, to skip creation of a normal user account.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Root password, either in clear text\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# To create a normal user account.\n"
-"#d-i passwd/user-fullname string Debian User\n"
-"#d-i passwd/username string debian\n"
-"# Normal user's password, either in clear text\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# or encrypted using an MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-msgstr ""
-"# root fiók létrehozásának kihagyása (normál fiók\n"
-"# sudo parancsot használ majd).\n"
-"#d-i passwd/root-login boolean false\n"
-"# Normál fiók létrehozásának átugrása.\n"
-"#d-i passwd/make-user boolean false\n"
-"\n"
-"# Root jelszó sima szövegben\n"
-"#d-i passwd/root-password password r00tme\n"
-"#d-i passwd/root-password-again password r00tme\n"
-"# vagy MD5 hash titkosítással.\n"
-"#d-i passwd/root-password-crypted password [MD5 hash]\n"
-"\n"
-"# Normál felhasználói fiók létrehozása.\n"
-"#d-i passwd/user-fullname string Debian Felhasználó\n"
-"#d-i passwd/username string debian\n"
-"# Sima felhasználói jelszó sima szövegben\n"
-"#d-i passwd/user-password password insecure\n"
-"#d-i passwd/user-password-again password insecure\n"
-"# vagy MD5 hash titkosítással.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
-
-#. Tag: para
-#: preseed.xml:862
-#, no-c-format
-msgid ""
-"The <classname>passwd/root-password-crypted</classname> and "
-"<classname>passwd/user-password-crypted</classname> variables can also be "
-"preseeded with <quote>!</quote> as their value. In that case, the "
-"corresponding account is disabled. This may be convenient for the root "
-"account, provided of course that an alternative method is setup to allow "
-"administrative activities or root login (for instance by using SSH key "
-"authentication or <command>sudo</command>)."
-msgstr ""
-"A <classname>passwd/root-password-crypted</classname> és <classname>passwd/"
-"user-password-crypted</classname> változók <quote>!</quote> értéke is "
-"előírható. Az adott fiók ekkor kikapcsolt. Ez jó lehet root fióknál, ha "
-"természetesen egy más, adminisztratív tevékenységet vagy root bejelentkezést "
-"biztosító mód adott (például SSH kulcs hitelesítés vagy <command>sudo</"
-"command>)."
-
-#. Tag: para
-#: preseed.xml:872
-#, no-c-format
-msgid ""
-"An MD5 hash for a password can be generated using the following command."
-msgstr "Egy MD5 hash egy jelszóhoz az alábbi paranccsal készíthető."
-
-#. Tag: screen
-#: preseed.xml:876
-#, no-c-format
-msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr "$ echo \"r00tmagam\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:882
-#, no-c-format
-msgid "Base system installation"
-msgstr "Az Alaprendszer telepítése"
-
-#. Tag: para
-#: preseed.xml:883
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Jelenleg nincs sok előírható a telepítő e részéhez. Csak a kernel "
-"telepítéséhez vannak kérdések."
-
-#. Tag: screen
-#: preseed.xml:890
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-msgstr ""
-"# A 2.6 kernel számára használt initramfs előállító választása.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-
-#. Tag: title
 #: preseed.xml:895
+#, no-c-format
+msgid "Package selection"
+msgstr "Csomag választás"
+
+#. Tag: para
+#: preseed.xml:896
+#, no-c-format
+msgid ""
+"You can choose to install any combination of tasks that are available. "
+"Available tasks as of this writing include:"
+msgstr "Az elérhető feladatok bármely kombinációja használható. Például:"
+
+#. Tag: userinput
+#: preseed.xml:905
+#, no-c-format
+msgid "standard"
+msgstr "szabvány"
+
+#. Tag: userinput
+#: preseed.xml:908
+#, no-c-format
+msgid "desktop"
+msgstr "asztal"
+
+#. Tag: userinput
+#: preseed.xml:911
+#, no-c-format
+msgid "gnome-desktop"
+msgstr "gnome-desktop"
+
+#. Tag: userinput
+#: preseed.xml:914
+#, no-c-format
+msgid "kde-desktop"
+msgstr "kde-desktop"
+
+#. Tag: userinput
+#: preseed.xml:917
+#, no-c-format
+msgid "web-server"
+msgstr "web-kiszolgáló"
+
+#. Tag: userinput
+#: preseed.xml:920
+#, no-c-format
+msgid "print-server"
+msgstr "nyomtató-kiszolgáló"
+
+#. Tag: userinput
+#: preseed.xml:923
+#, no-c-format
+msgid "dns-server"
+msgstr "dns-kiszolgáló"
+
+#. Tag: userinput
+#: preseed.xml:926
+#, no-c-format
+msgid "file-server"
+msgstr "fájl-kiszolgáló"
+
+#. Tag: userinput
+#: preseed.xml:929
+#, no-c-format
+msgid "mail-server"
+msgstr "levél-kiszolgáló"
+
+#. Tag: userinput
+#: preseed.xml:932
+#, no-c-format
+msgid "sql-database"
+msgstr "sql-adatbázis"
+
+#. Tag: userinput
+#: preseed.xml:935
+#, no-c-format
+msgid "laptop"
+msgstr "laptop"
+
+#. Tag: para
+#: preseed.xml:939
+#, no-c-format
+msgid ""
+"You can also choose to install no tasks, and force the installation of a set "
+"of packages in some other way. We recommend always including the "
+"<userinput>standard</userinput> task."
+msgstr ""
+"Feladatok nélküli telepítés is választható és más módon is utasítható a "
+"telepítés egy csomag-készletre. Ajánljuk, ez mindig tartalmazza a "
+"<userinput>szabvány</userinput> feladatot."
+
+#. Tag: para
+#: preseed.xml:945
+#, no-c-format
+msgid ""
+"If you want to install some individual packages in addition to packages "
+"installed by tasks, you can use the parameter <classname>pkgsel/include</"
+"classname>. The value of this parameter can be a list of packages separated "
+"by either commas or spaces, which allows it to be used easily on the kernel "
+"command line as well."
+msgstr ""
+"Ha egyéni csomagokat is telepítenél a feladatok által telepített csomagokon "
+"kívül, használd a <classname>pkgsel/include</classname> paramétert. E "
+"paraméter értéke csomagok egy vesszőkkel vagy szóközökkel elválasztott "
+"listája, mely lehetővé teszi, hogy a kernelnek is könnyen átadható legyen."
+
+#. Tag: screen
+#: preseed.xml:955
+#, fuzzy, no-c-format
+msgid ""
+"#tasksel tasksel/first multiselect standard, web-server<phrase condition="
+"\"lenny\">\n"
+"# If the desktop task is selected, install the kde and xfce desktops\n"
+"# instead of the default gnome desktop.\n"
+"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</"
+"phrase><phrase condition=\"etch\">\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop</phrase>\n"
+"\n"
+"# Individual additional packages to install\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# Some versions of the installer can report back on what software you have\n"
+"# installed, and what software you use. The default is not to report back,\n"
+"# but sending reports helps the project determine what software is most\n"
+"# popular and include it on CDs.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+msgstr ""
+"tasksel tasksel/first multiselect standard, desktop\n"
+"#tasksel tasksel/first multiselect standard, web-server\n"
+"#tasksel tasksel/first multiselect standard, kde-desktop\n"
+"\n"
+"# Egyéni további telepítendő csomagok\n"
+"#d-i pkgsel/include string openssh-server build-essential\n"
+"\n"
+"# A telepítő egyes verziója vissza tudják küldeni a telepített és\n"
+"# használt szoftvereket. Alapban nincs jelentés-küldés, de\n"
+"# ilyenek küldése segít a projektnek meghatározni, hogy mely szoftverek\n"
+"# népszerűek és kerüljenek a CD lemezekre.\n"
+"#popularity-contest popularity-contest/participate boolean false"
+
+#. Tag: title
+#: preseed.xml:960
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Boot betöltő telepítés"
 
 #. Tag: screen
-#: preseed.xml:897
-#, no-c-format
+#: preseed.xml:962
+#, fuzzy, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 "# instead, uncomment this:\n"
-"#d-i grub-installer/skip boolean true\n"
+"#d-i grub-installer/skip boolean true<phrase condition=\"lenny\">\n"
+"# To also skip installing lilo, and install no bootloader, uncomment this\n"
+"# too:\n"
+"#d-i lilo-installer/skip boolean true</phrase>\n"
 "\n"
 "# This is fairly safe to set, it makes grub install automatically to the "
 "MBR\n"
@@ -2056,149 +2200,6 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "# Grub telepítés több lemezre:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
-
-#. Tag: title
-#: preseed.xml:902
-#, no-c-format
-msgid "Package selection"
-msgstr "Csomag választás"
-
-#. Tag: para
-#: preseed.xml:903
-#, no-c-format
-msgid ""
-"You can choose to install any combination of tasks that are available. "
-"Available tasks as of this writing include:"
-msgstr "Az elérhető feladatok bármely kombinációja használható. Például:"
-
-#. Tag: userinput
-#: preseed.xml:912
-#, no-c-format
-msgid "standard"
-msgstr "szabvány"
-
-#. Tag: userinput
-#: preseed.xml:915
-#, no-c-format
-msgid "desktop"
-msgstr "asztal"
-
-#. Tag: userinput
-#: preseed.xml:918
-#, no-c-format
-msgid "gnome-desktop"
-msgstr "gnome-desktop"
-
-#. Tag: userinput
-#: preseed.xml:921
-#, no-c-format
-msgid "kde-desktop"
-msgstr "kde-desktop"
-
-#. Tag: userinput
-#: preseed.xml:924
-#, no-c-format
-msgid "web-server"
-msgstr "web-kiszolgáló"
-
-#. Tag: userinput
-#: preseed.xml:927
-#, no-c-format
-msgid "print-server"
-msgstr "nyomtató-kiszolgáló"
-
-#. Tag: userinput
-#: preseed.xml:930
-#, no-c-format
-msgid "dns-server"
-msgstr "dns-kiszolgáló"
-
-#. Tag: userinput
-#: preseed.xml:933
-#, no-c-format
-msgid "file-server"
-msgstr "fájl-kiszolgáló"
-
-#. Tag: userinput
-#: preseed.xml:936
-#, no-c-format
-msgid "mail-server"
-msgstr "levél-kiszolgáló"
-
-#. Tag: userinput
-#: preseed.xml:939
-#, no-c-format
-msgid "sql-database"
-msgstr "sql-adatbázis"
-
-#. Tag: userinput
-#: preseed.xml:942
-#, no-c-format
-msgid "laptop"
-msgstr "laptop"
-
-#. Tag: para
-#: preseed.xml:946
-#, no-c-format
-msgid ""
-"You can also choose to install no tasks, and force the installation of a set "
-"of packages in some other way. We recommend always including the "
-"<userinput>standard</userinput> task."
-msgstr ""
-"Feladatok nélküli telepítés is választható és más módon is utasítható a "
-"telepítés egy csomag-készletre. Ajánljuk, ez mindig tartalmazza a "
-"<userinput>szabvány</userinput> feladatot."
-
-#. Tag: para
-#: preseed.xml:952
-#, no-c-format
-msgid ""
-"If you want to install some individual packages in addition to packages "
-"installed by tasks, you can use the parameter <classname>pkgsel/include</"
-"classname>. The value of this parameter can be a list of packages separated "
-"by either commas or spaces, which allows it to be used easily on the kernel "
-"command line as well."
-msgstr ""
-"Ha egyéni csomagokat is telepítenél a feladatok által telepített csomagokon "
-"kívül, használd a <classname>pkgsel/include</classname> paramétert. E "
-"paraméter értéke csomagok egy vesszőkkel vagy szóközökkel elválasztott "
-"listája, mely lehetővé teszi, hogy a kernelnek is könnyen átadható legyen."
-
-#. Tag: screen
-#: preseed.xml:962
-#, fuzzy, no-c-format
-msgid ""
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"<phrase condition=\"lenny\">\n"
-"# If the desktop task is selected, install the kde and xfce desktops\n"
-"# instead of the default gnome desktop.\n"
-"#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop\n"
-"</phrase>\n"
-"<phrase condition=\"etch\">\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"</phrase>\n"
-"\n"
-"# Individual additional packages to install\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# Some versions of the installer can report back on what software you have\n"
-"# installed, and what software you use. The default is not to report back,\n"
-"# but sending reports helps the project determine what software is most\n"
-"# popular and include it on CDs.\n"
-"#popularity-contest popularity-contest/participate boolean false"
-msgstr ""
-"tasksel tasksel/first multiselect standard, desktop\n"
-"#tasksel tasksel/first multiselect standard, web-server\n"
-"#tasksel tasksel/first multiselect standard, kde-desktop\n"
-"\n"
-"# Egyéni további telepítendő csomagok\n"
-"#d-i pkgsel/include string openssh-server build-essential\n"
-"\n"
-"# A telepítő egyes verziója vissza tudják küldeni a telepített és\n"
-"# használt szoftvereket. Alapban nincs jelentés-küldés, de\n"
-"# ilyenek küldése segít a projektnek meghatározni, hogy mely szoftverek\n"
-"# népszerűek és kerüljenek a CD lemezekre.\n"
-"#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
 #: preseed.xml:967
