@@ -188,10 +188,14 @@ done
 IFS="$OLDIFS"
 
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
-if echo "${defconsole}" | grep -q console=ttyS; then
-    PORT=$(echo "${defconsole}" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
-    SPEED=$(echo "${defconsole}" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
-    SERIAL="${PORT},${SPEED}"
+if echo "$defconsole" | grep -q console=ttyS; then
+    PORT=$(echo "$defconsole" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
+    if echo "$defconsole" | grep -q ','; then
+	    SPEED=$(echo "$defconsole" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
+	    SERIAL="$PORT,$SPEED"
+    else
+	    SERIAL="$PORT"
+    fi
 
     db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
     db_subst lilo-installer/serial-console SPEED "${SPEED}"
