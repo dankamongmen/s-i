@@ -6,6 +6,9 @@ if [ ! -e $PIDFILE ]; then
 	exit 1
 fi
 pid=$(cat $PIDFILE)
+if [ -z "$QEMU_COMMAND" ]; then
+	QEMU_COMMAND=qemu
+fi
 if ! pidof $QEMU_COMMAND | grep -q $pid; then
 	echo "stale pid" >&2
 else
