@@ -11,7 +11,7 @@ echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
 exec $QEMU_COMMAND -cdrom "$ISO" \
 	-hda $STATE_DIR/qemu-$MACHINE-$SCHEME.img \
 	-nographic \
-	-net nic -net user,hostname=qemu \
+	-net nic -net user,hostname=$MACHINE-$SCHEME \
 	-boot d -no-reboot \
 	$QEMU_EXTRA_PARAMS \
 	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 
