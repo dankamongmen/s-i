@@ -80,51 +80,50 @@ db_go || exit 10 # back up
 db_get lilo-installer/bootdev
 
 case "$RET" in
-  *Master*|*RAID*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
-  *Debian*)
-    bootdev=$(mapdevfs $bootfs_devfs)
-    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
-  ;;
-  *Advanced*)
-    not_done=1
-    db_set lilo-installer/manual_bootdev "$disc_offered_devfs" || true
+	*Master*|*RAID*) bootdev=$(mapdevfs $disc_offered_devfs)  ;;
+	*Debian*)
+		bootdev=$(mapdevfs $bootfs_devfs)
+		part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
+	;;
+	*Advanced*)
+		not_done=1
+		db_set lilo-installer/manual_bootdev "$disc_offered_devfs" || true
 
-    while [ $not_done -eq 1 ]; do
-      db_input critical lilo-installer/manual_bootdev || true
-      db_go || exit 10
-      db_get lilo-installer/manual_bootdev
+		while [ $not_done -eq 1 ]; do
+			db_input critical lilo-installer/manual_bootdev || true
+			db_go || exit 10
+			db_get lilo-installer/manual_bootdev
+	
+			case "$RET" in
+				/dev/ide*|/dev/discs/*|/dev/scsi/*|/dev/md/*)
+					if [ -b "$RET" ]; then
+						bootdev="$(mapdevfs $RET)"
+						not_done=0
+						part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
+					fi
+				;;
+				/dev/[hs]d[a-z]*|/dev/md*)
+					bootdev=$RET;
+					not_done=0
+					part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
+				;;
+			esac
 
-        case "$RET" in
-          /dev/ide*|/dev/discs/*|/dev/scsi/*|/dev/md/*)
-	   if [ -b "$RET" ]; then
-	    bootdev="$(mapdevfs $RET)"
-	    not_done=0
-	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
-	   fi
+			if [ $not_done -eq 1 ]; then
+				db_subst lilo-installer/manual_bootdev_error path "$RET"
+				db_input critical lilo-installer/manual_bootdev_error || true
+				db_go || exit 10
+			fi
+		done
 	  ;;
-	  /dev/[hs]d[a-z]*|/dev/md*)
-	    bootdev=$RET;
-	    not_done=0
-	    part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
-	  ;;
-	esac
-
-      if [ $not_done -eq 1 ]; then
-        db_subst lilo-installer/manual_bootdev_error path "$RET"
-	db_input critical lilo-installer/manual_bootdev_error || true
-	db_go || exit 10
-      fi
-    done
-	  
-  ;;
 esac
 
 if echo "${bootdev}" | grep -q '^/dev/md'; then
-    raid_boot="yes"
-    raid_extra_boot="raid-extra-boot=mbr-only"
+	raid_boot="yes"
+	raid_extra_boot="raid-extra-boot=mbr-only"
 else
-    raid_boot="no"
-    raid_extra_boot="# raid-extra-boot=mbr-only"
+	raid_boot="no"
+	raid_extra_boot="# raid-extra-boot=mbr-only"
 fi
 
 db_subst lilo-installer/progress_active bootdev "$bootdev"
@@ -137,39 +136,40 @@ db_progress info lilo-installer/progress_active
 # If installing to a partition (not MBR), offer to make it active
 # Do not try to make MD device active
 if (echo "${bootdev}" | grep -q '[0-9]$') && [ "${raid_boot}" = "no" ]; then
-    # Installing to a partition, check if it is already marked active
-    if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\(part\|[hs]d[a-z]\)${part} " | grep -q '\*'; then
-        # partition is not marked active, offer to make it so
-        db_input high lilo-installer/activate-part || [ $? -eq 30 ]
-        if ! db_go; then
-	  db_progress stop
-	  exit 10 # back up
+	# Installing to a partition, check if it is already marked active
+	if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\(part\|[hs]d[a-z]\)${part} " | grep -q '\*'; then
+		# partition is not marked active, offer to make it so
+		db_input high lilo-installer/activate-part || [ $? -eq 30 ]
+		if ! db_go; then
+			db_progress stop
+			exit 10 # back up
+		fi
+		db_get lilo-installer/activate-part
+		if [ "${RET}" = "true" ]; then
+			pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
+			echo -n "I: Setting partition to active..." >&2
+			sfdisk -A${pnum} ${disc_offered_devfs}
+			echo "done." >&2
+		fi
 	fi
-        db_get lilo-installer/activate-part
-        if [ "${RET}" = "true" ]; then
-            pnum=$(echo ${bootdev} | sed 's/^.*\([0-9]\+\)$/\1/')
-            echo -n "I: Setting partition to active..." >&2
-            sfdisk -A${pnum} ${disc_offered_devfs}
-            echo "done." >&2
-        fi
-    fi
 fi
 
 # Make sure that there's *some* active partition; some BIOSes reportedly
 # don't like it otherwise.
 if [ "${raid_boot}" = no ] && (! fdisk -l "$disc_offered_devfs" | grep '^/dev/' | grep -q '\*'); then
-    # Check whether they already chose not to make their boot partition
-    # active. If so, that's their problem ...
-    db_get lilo-installer/activate-part
-    if [ "$RET" = true ]; then
-        # bootdev must be set to a disk rather than a partition, or we'd
-        # already have an active partition due to the previous check. Let's
-        # just pick the partition containing /boot.
-        pnum="$(echo "$bootfs" | sed 's/^.*\([0-9]\+\)$/\1/')"
-        echo -n "I: Setting partition $bootfs to active..." >&2
-        sfdisk -A"$pnum" "$disc_offered_devfs"
-        echo "done." >&2
-    fi
+	# Check whether they already chose not to make their boot partition
+	# active. If so, that's their problem ...
+	db_get lilo-installer/activate-part
+	if [ "$RET" = true ]; then
+		# bootdev must be set to a disk rather than a partition,
+		# or we'd already have an active partition due to the 
+		# previous check. Let's just pick the partition containing
+		# /boot.
+		pnum="$(echo "$bootfs" | sed 's/^.*\([0-9]\+\)$/\1/')"
+		echo -n "I: Setting partition $bootfs to active..." >&2
+		sfdisk -A"$pnum" "$disc_offered_devfs"
+		echo "done." >&2
+	fi
 fi
 
 db_progress step 1
@@ -179,38 +179,38 @@ db_progress step 1
 OLDIFS="$IFS"
 IFS=" "
 for arg in $(cat /proc/cmdline); do
-  case "$arg" in
-    console=*)
-      defconsole=$arg
-    ;;
-  esac
+	case "$arg" in
+		console=*)
+			defconsole=$arg
+		;;
+	esac
 done
 IFS="$OLDIFS"
 
 defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
 if echo "$defconsole" | grep -q console=ttyS; then
-    PORT=$(echo "$defconsole" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
-    if echo "$defconsole" | grep -q ','; then
-	    SPEED=$(echo "$defconsole" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
-	    SERIAL="$PORT,$SPEED"
-    else
-	    SERIAL="$PORT"
-    fi
+	PORT=$(echo "$defconsole" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
+	if echo "$defconsole" | grep -q ','; then
+		SPEED=$(echo "$defconsole" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
+		SERIAL="$PORT,$SPEED"
+	else
+		SERIAL="$PORT"
+	fi
 
-    db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
-    db_subst lilo-installer/serial-console SPEED "${SPEED}"
-    db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
-    if ! db_go; then
-      db_progress stop
-      exit 10 # back up
-    fi
+	db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
+	db_subst lilo-installer/serial-console SPEED "${SPEED}"
+	db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
+	if ! db_go; then
+		db_progress stop
+		exit 10 # back up
+	fi
 fi
 
 db_progress info lilo-installer/progress_lilo_conf
 
 user_params=$(echo $(user-params | grep -v 'vga=')) || true
 if [ -n "$user_params" ]; then
-  APPEND="    append=\"$user_params\""
+	APPEND="    append=\"$user_params\""
 fi
 
 VGA=$(user-params | grep 'vga=') || true
@@ -221,22 +221,22 @@ fi
 #write out lilo.conf
 
 if [ "${SERIAL}" ]; then
-  SERIAL_CONSOLE="serial=${SERIAL}"
+	SERIAL_CONSOLE="serial=${SERIAL}"
 else
-  SERIAL_CONSOLE="# serial="
+	SERIAL_CONSOLE="# serial="
 fi
 
 if [ "${SERIAL}" ]; then
-  if [ -n "$user_params" ]; then
-    APPEND="	append=\"$user_params console=ttyS${SERIAL}\""
-  else
-    APPEND="	append=\"console=ttyS${SERIAL}\""
-  fi
+	if [ -n "$user_params" ]; then
+		APPEND="	append=\"$user_params console=ttyS${SERIAL}\""
+	else
+		APPEND="	append=\"console=ttyS${SERIAL}\""
+	fi
 fi
 
 if [ -e "/target/initrd.img" ]; then
-  INITRD="	initrd=/initrd.img"
-  OLD_INITRD="${INITRD}.old"
+	INITRD="	initrd=/initrd.img"
+	OLD_INITRD="${INITRD}.old"
 fi
 
 cat > /target/etc/lilo.conf <<EOF
@@ -382,28 +382,28 @@ OLDIFS="$IFS"
 IFS="$newline"
 
 if [ -n "$probed" ]; then
-  for os in $probed; do
-    IFS="$OLDIFS"
-    partition=$(echo "$os" | cut -d: -f1)
-    mappedpartition=$(mapdevfs $partition)
-    label=$(echo "$os" | cut -d: -f3)
-    type=$(echo "$os" | cut -d: -f4)
-    case "$type" in
-        chain)
-            cat >> /target/etc/lilo.conf <<EOF
+	for os in $probed; do
+		IFS="$OLDIFS"
+		partition=$(echo "$os" | cut -d: -f1)
+		mappedpartition=$(mapdevfs $partition)
+		label=$(echo "$os" | cut -d: -f3)
+		type=$(echo "$os" | cut -d: -f4)
+		case "$type" in
+			chain)
+				cat >> /target/etc/lilo.conf <<EOF
 other=$mappedpartition
 	label=$label
 #	restricted
 #	alias=$count
 EOF
-        ;;
-	*)
-	    info "unhandled: $os"
-	;;
-    esac
-    IFS="$newline"
-  done
-  IFS="$OLDIFS"
+			;;
+			*)
+				info "unhandled: $os"
+			;;
+		esac
+		IFS="$newline"
+	done
+	IFS="$OLDIFS"
 fi
 
 db_progress step 1
@@ -434,11 +434,11 @@ db_progress info lilo-installer/progress_running
 ERRCODE=0
 log-output -t lilo-installer chroot /target /sbin/lilo || ERRCODE=$?
 if [ "$ERRCODE" != 0 ]; then
-    db_subst lilo-installer/failed ERRCODE "$ERRCODE"
-    db_input critical lilo-installer/failed || [ $? -eq 30 ]
-    db_progress stop
-    db_go || exit 10 # back up
-    exit 1
+	db_subst lilo-installer/failed ERRCODE "$ERRCODE"
+	db_input critical lilo-installer/failed || [ $? -eq 30 ]
+	db_progress stop
+	db_go || exit 10 # back up
+	exit 1
 fi
 
 umount /target/proc || true
