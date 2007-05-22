@@ -71,6 +71,18 @@ for SCHEME in $@; do
 	export LOGDIR
 	use common
 	use $SCHEME
+
+	# ensure that the logs don't use too much disk
+	if [ "$MAXLOGS" ]; then
+		(
+			cd "$LOGDIR"
+			for dir in $(find -type d -name '[0-9]*' | sort -n); do
+				if [ "$(find -type d -name '[0-9]*' | wc -l)" -gt "$MAXLOGS" ]; do
+					rm -rf "$dir"
+				fi
+			done
+		)
+	fi
 	
 	mkdir -p $LOGDIR/$DATESTAMP
 	touch $LOGDIR/overview.log
