@@ -20,6 +20,7 @@
 #include <parted/parted.h>
 #include <stdio.h>
 
+int
 main (int argc, char **argv)
 {
   PedDevice *device;
@@ -40,4 +41,6 @@ main (int argc, char **argv)
     exit (1);
 
   printf ("%s\n", disk->type->name);
+
+  return 0;
 }

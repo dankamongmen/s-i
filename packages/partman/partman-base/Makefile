@@ -16,6 +16,6 @@ stralign: stralign.c
 	$(CC) $(CFLAGS) stralign.c -o stralign
 
 clean:
-	rm -f parted_server parted_devices stralign
+	rm -f parted_server parted_devices stralign partmap
 
 .PHONY: clean
