@@ -18,17 +18,21 @@ while (1) {
 	$exp->expect($ENV{STAGE_1_MAX_INACTIVITY},
 		[ timeout => sub { die "install failed (timeout on inactivity)" } ],
 		[ "-re", "step.*failed" => sub { exit 1 } ],
-		[ "English" => sub { $time_idle=0; sleep 2; $exp->send("\r") } ],
-		[ "-re", "<Go.*Back>" => sub { $time_idle=0; sleep 2; $exp->send("\r") } ],
-		[ "<Continue>" => sub { $time_idle=-0; sleep 2; $exp->send("\r") } ],
+		[ "English" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
+		[ "-re", "<Go.*Back>" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
+		[ "<Continue>" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
 		[ "-re", "rebooting.*the.*system." => sub { exit } ],
 		[ "-re", "down.*NOW" => sub { exit } ],
 		[ "-re", "Sending.*SIGTERM" => sub { exit } ],
 	);
 	
-	$time_idle+=time - $last_time;
+	if (defined $time_idle) {
+		$time_idle+=time - $last_time;
+	}
+	else {
+		$time_idle=0;
+	}
 	$last_time=time;
-	print ">>idle for $time_idle\n";
 	if ($time_idle > $ENV{STAGE_1_MAX_TIME}) {
 		die "install failed (timeout)";
 	}
