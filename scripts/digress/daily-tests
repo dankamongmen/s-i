@@ -59,9 +59,9 @@ log () {
 		-e "s/\x0e//g" \
 		-e "s/\r//g" \
 		-e "s/[\x1b]\()0\|(B\|[\x5b][;0-9]*[CHJrlhm]\)//g" |
-	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x//g" |
-	sed -e "/qqu$/N;s/\n//" |
-	tr -s "\n" < $logfile > $logfile.asc
+	sed -e "s/^[[:space:]\x08]*$//g;s/^[[:space:]]*x$//g" |
+	tr -s "\n" |
+	sed -e "/qqu$/N;s/\n//" < $logfile > $logfile.asc
 }
 
 why_failed () {
