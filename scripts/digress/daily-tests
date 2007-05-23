@@ -36,6 +36,14 @@ overview () {
 	overview_add "$@"
 }
 
+failure_overview () {
+	if [ "$(cat $FAILURE_STATUS_FILE)" != "SIGNAL" ]; then
+		overview "failed $(cat $FAILURE_STATUS_FILE) $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
+	else
+		overview "failed SIGNAL"
+	fi
+}
+
 log () {
 	local machine=$1
 	local scheme=$2
@@ -115,10 +123,10 @@ for SCHEME in $@; do
 			if $DIGRESSDIR/test-harness $MACHINE $SCHEME 2>&1; then
 				overview "success second try"
 			else
-				overview "failed $(cat $FAILURE_STATUS_FILE) $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
+				failure_overview
 			fi
 		else
-			overview "failed $(cat $FAILURE_STATUS_FILE) $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
+			failure_overview
 		fi
 	fi) 2>&1 | log $MACHINE $SCHEME
 
