@@ -29,6 +29,9 @@ $SIG{USR1}=sub {
 	print STDERR "saving qemu state on SIGUSR1\n";
 	$exp->send("savevm 1\n");
 	$exp->expect(60, "(qemu)");
+	$exp->send("exit\n");
+	$exp->expect(undef, "eof");
+	exit;
 };
 
 $exp->expect(undef, "eof");
