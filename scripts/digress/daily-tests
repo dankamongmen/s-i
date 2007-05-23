@@ -60,6 +60,7 @@ log () {
 		-e "s/\r//g" \
 		-e "s/[\x1b]\()0\|(B\|[\x5b][;0-9]*[CHJrlhm]\)//g" |
 	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x//g" |
+	sed -e "/qqu$/N;s/\n//" |
 	tr -s "\n" < $logfile > $logfile.asc
 }
 
