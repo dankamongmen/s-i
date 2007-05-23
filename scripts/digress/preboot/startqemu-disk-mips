@@ -14,6 +14,11 @@ if [ -z "$QEMU_DISK" ]; then
 	QEMU_DISK=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
 fi
 
+if [ ! -e "$NETBOOT_KERNEL" ]; then
+	echo "$NETBOOT_KERNEL does not exist" >&2
+	exit 1
+fi
+
 # Store the pid so stopqemu can stop it later.
 echo "$$" > $STATE_DIR/qemu-$MACHINE-$SCHEME.pid
 exec $QEMU_COMMAND \
