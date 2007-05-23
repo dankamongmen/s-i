@@ -10,12 +10,23 @@ if ($ENV{TERM} eq "" || $ENV{TERM} eq "dumb") {
 
 my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
 
+my $timeout;
+my $timeout_reason;
+if ($ENV{STAGE_1_MAX_INACTIVITY}) {
+	$timeout=$ENV{STAGE_1_MAX_INACTIVITY};
+	$timeout_reason="timeout on inactivity";
+}
+else {
+	$timeout=$ENV{STAGE_1_MAX_TIME};
+	$timeout_reason="timeout";
+}
+
 #$exp->debug(2);
 #$exp->exp_internal(1);
 my $start_time=time;
 while (1) {
-	$exp->expect($ENV{STAGE_1_MAX_INACTIVITY},
-		[ timeout => sub { die "install failed (timeout on inactivity)" } ],
+	$exp->expect($timeout,
+		[ timeout => sub { die "install failed ($timeout_reason)" } ],
 		[ "-re", "step.*failed" => sub { exit 1 } ],
 		[ "English" => sub { sleep 2; $exp->send("\r") } ],
 		[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r") } ],
