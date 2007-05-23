@@ -183,6 +183,10 @@ static size_t menu_entry(struct debconfclient *debconf, di_system_package *packa
 	return strlen (buf);
 }
 
+static void set_main_menu_title(void) {
+	debconf_settitle(debconf, "debian-installer/main-menu-title");
+}
+
 /* Displays the main menu via debconf and returns the selected menu item. */
 di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *allocator) {
 	di_system_package **package_array, *p;
@@ -240,7 +244,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	di_slist_free(list);
 
 	/* Make debconf show the menu and get the user's choice. */
-	debconf_settitle(debconf, "debian-installer/main-menu-title");
+	set_main_menu_title();
 	debconf_capb(debconf);
 	debconf_subst(debconf, MAIN_MENU, "MENU", menu);
 	if (menudefault) {
@@ -523,6 +527,7 @@ void notify_user_of_failure (di_system_package *p) {
 	char buf[256];
 	
 	debconf_capb(debconf);
+	set_main_menu_title();
 	menu_entry(debconf, p, buf, sizeof (buf));
 	debconf_subst(debconf, ITEM_FAILURE, "ITEM", buf);
 	debconf_input(debconf, "critical", ITEM_FAILURE);
