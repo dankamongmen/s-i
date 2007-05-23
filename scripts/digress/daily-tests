@@ -52,7 +52,14 @@ why_failed () {
 	# Try to find a failure message in the log.
 	# This is dependant on both d-i output formats and on the log being
 	# in a parseable format.
-	strings "$1" | grep '[!!]' |tail -n 1 | sed 's/.*\[!!\] *//'
+	di_err=$(strings "$1" | grep '[!!]' |tail -n 1 | sed 's/.*\[!!\] *//')
+	if [ -n "$di_err" ]; then
+		echo "$di_err"
+	else
+		if grep -q timeout "$1"; then
+			echo "timeout"
+		fi
+	fi
 }
 
 DIGRESSDIR=$(dirname $0)
