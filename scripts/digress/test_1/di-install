@@ -12,28 +12,20 @@ my $exp = Expect->spawn($ENV{CONSOLECOMMAND}) or die "failed to start: $!";
 
 #$exp->debug(2);
 #$exp->exp_internal(1);
-my $time_idle=0;
-my $last_time=time;
+my $start_time=time;
 while (1) {
 	$exp->expect($ENV{STAGE_1_MAX_INACTIVITY},
 		[ timeout => sub { die "install failed (timeout on inactivity)" } ],
 		[ "-re", "step.*failed" => sub { exit 1 } ],
-		[ "English" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
-		[ "-re", "<Go.*Back>" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
-		[ "<Continue>" => sub { $time_idle=undef; sleep 2; $exp->send("\r") } ],
+		[ "English" => sub { sleep 2; $exp->send("\r") } ],
+		[ "-re", "<Go.*Back>" => sub { sleep 2; $exp->send("\r") } ],
+		[ "<Continue>" => sub { sleep 2; $exp->send("\r") } ],
 		[ "-re", "rebooting.*the.*system." => sub { exit } ],
 		[ "-re", "down.*NOW" => sub { exit } ],
 		[ "-re", "Sending.*SIGTERM" => sub { exit } ],
 	);
 	
-	if (defined $time_idle) {
-		$time_idle+=time - $last_time;
-	}
-	else {
-		$time_idle=0;
-	}
-	$last_time=time;
-	if ($time_idle > $ENV{STAGE_1_MAX_TIME}) {
+	if (time - $start_time > $ENV{STAGE_1_MAX_TIME}) {
 		die "install failed (timeout)";
 	}
 }
