@@ -3,9 +3,11 @@
 # start.
 use warnings;
 use strict;
+use Expect;
 use POSIX 'setsid';
 
-# Run in the background.
+# Run in the background, because qemu won't begin accepting console input
+# until the connection is made to its serial port, by console-qemu.
 open STDIN, '/dev/null';
 defined(my $pid = fork) or die "Can'fork: $!";
 if ($pid) {
@@ -14,4 +16,19 @@ if ($pid) {
 }
 setsid;
 
-exec $ENV{START_COMMAND} or die "running \"$ENV{START_COMMAND}\": $!";
+my $exp = new Expect;
+#$exp->debug(2);
+$exp->raw_pty(1);
+$SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
+$exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
+
+open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
+print OUT "$$\n";
+close OUT;
+$SIG{USR1}=sub {
+	print STDERR "saving qemu state on SIGUSR1\n";
+	$exp->send("savevm 1\n");
+	$exp->expect(60, "(qemu)");
+};
+
+$exp->expect(undef, "eof");

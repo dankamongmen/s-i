@@ -1,5 +1,14 @@
 #!/bin/sh
 PIDFILE=$STATE_DIR/qemu-$MACHINE-$SCHEME.pid
+
+# Signal qemu control process to save state.
+if [ -e $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid ]; then
+	kill -USR1 $(cat $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid) || true
+	# wait for it to finish saving
+	# TODO racey
+	sleep 60
+fi
+
 # Stop qemu.
 if [ ! -e $PIDFILE ]; then
 	echo "No pid file $PIDFILE" >&2

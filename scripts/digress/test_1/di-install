@@ -34,7 +34,7 @@ while (1) {
 		[ "-re", "rebooting.*the.*system." => sub { exit } ],
 		[ "-re", "down.*NOW" => sub { exit } ],
 		[ "-re", "Sending.*SIGTERM" => sub { exit } ],
-	);
+	) || die "install failed";
 	
 	if (time - $start_time > $ENV{STAGE_1_MAX_TIME}) {
 		die "install failed (timeout)";

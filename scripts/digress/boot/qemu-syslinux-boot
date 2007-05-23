@@ -38,6 +38,15 @@ $exp->raw_pty(1);
 $SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
 $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
+open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
+print OUT "$$\n";
+close OUT;
+$SIG{USR1}=sub {
+	print STDERR "saving qemu state on SIGUSR1\n";
+	$exp->send("savevm 1\n");
+	$exp->expect(60, "(qemu)");
+};
+
 $exp->expect(60, "(qemu)");
 sleep 1;
 $exp->send("sendkey num_lock\n"); # needed for the kp_ keys
