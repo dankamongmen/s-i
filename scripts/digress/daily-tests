@@ -45,7 +45,7 @@ failure_overview () {
 	fi
 }
 
-log () {
+rawlog () {
 	local machine=$1
 	local scheme=$2
 	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
@@ -60,15 +60,25 @@ log () {
 	fi
 }
 
-asclog () {
+htmllog () {
 	local machine=$1
 	local scheme=$2
-	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
 
-	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log.asc \
-		$LOGDIR/$MACHINE-$SCHEME.log.asc
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html \
+		$LOGDIR/$MACHINE-$SCHEME.html
 
-	cat $logfile |
+	cat > $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+<html>
+<head>
+<title>$MACHINE $SCHEME test log for $DATESTAMP</title>
+</head>
+<body>
+This is a slightly sanitised version of the 
+<a href="$MACHINE-$SCHEME.log">raw log file</a>.
+<hr>
+EOF
+
+	cat $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log |
 	sed -e "s/\x0f/\n/g" \
 	    -e "s/\x0e//g" \
 	    -e "s/\r//g" \
@@ -76,7 +86,16 @@ asclog () {
 	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x\?$//g" |
 	tr -s "\n" |
 	sed -e "/qqu$/{N;s/\n//}" \
-	    -e "s/^lqq/\n\nlqq/" > $logfile.asc
+	    -e "s/^lqq/\n\nlqq/" \
+	sed -e 's/&/&amp;/g' \
+		-e 's/</\&lt;/g' \
+		-e 's/>/\&gt;/g' \
+		>> $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html
+	
+	cat >> $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+</body>
+</html>
+EOF
 }
 
 why_failed () {
@@ -112,7 +131,7 @@ fi
 . $DI_TESTDIR/config
 
 SCHEME=daily-tests overview_add incomplete
-echo | log $MACHINE daily-tests
+echo | rawlog $MACHINE daily-tests
 
 for SCHEME in $@; do
 	RETRY=""
@@ -153,12 +172,11 @@ for SCHEME in $@; do
 		else
 			failure_overview
 		fi
-	fi) 2>&1 | log $MACHINE $SCHEME
+	fi) 2>&1 | rawlog $MACHINE $SCHEME
 
-	asclog $MACHINE $SCHEME
+	htmllog $MACHINE $SCHEME
 
 	rm -f $FAILURE_STATUS_FILE
 done
 
 SCHEME=daily-tests overview_add finished
-
