@@ -24,6 +24,8 @@ else {
 #$exp->debug(2);
 #$exp->exp_internal(1);
 my $start_time=time;
+my $old_time=time;
+my $max_interval=0;
 while (1) {
 	$exp->expect($timeout,
 		[ timeout => sub { die "install failed ($timeout_reason)" } ],
@@ -39,4 +41,16 @@ while (1) {
 	if (time - $start_time > $ENV{STAGE_1_MAX_TIME}) {
 		die "install failed (timeout)";
 	}
+
+	if (time - $old_time > $max_interval) {
+		$max_interval = time - $old_time;
+	}
+	$old_time=time;
+}
+
+sub done {
+	print "installation finished\n";
+	print "longest inactive interval: $max_interval\n";
+	print "total time: ".(time - $start_time)."\n";
+	exit;
 }
