@@ -68,6 +68,7 @@ asclog () {
 	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log.asc \
 		$LOGDIR/$MACHINE-$SCHEME.log.asc
 
+	cat $logfile |
 	sed -e "s/\x0f/\n/g" \
 	    -e "s/\x0e//g" \
 	    -e "s/\r//g" \
@@ -75,7 +76,7 @@ asclog () {
 	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x\?$//g" |
 	tr -s "\n" |
 	sed -e "/qqu$/{N;s/\n//}" \
-	    -e "s/^lqq/\n\nlqq/"  < $logfile > $logfile.asc
+	    -e "s/^lqq/\n\nlqq/" > $logfile.asc
 }
 
 why_failed () {
