@@ -26,7 +26,7 @@ forcekill() {
 # Signal qemu control process to save state.
 if [ -e $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid ]; then
 	controlpid=$(cat $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid)
-	rm cat $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid
+	rm $STATE_DIR/qemu-$MACHINE-$SCHEME.control.pid
 	if ps -ax | grep -q $controlpid'[ ]'; then
 		kill -USR1 $controlpid || true
 		echo "sent control process (pid $controlpid) save and cleanup signal"
