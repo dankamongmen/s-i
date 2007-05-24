@@ -50,11 +50,23 @@ log () {
 	local scheme=$2
 	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
 
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log \
+		$LOGDIR/$MACHINE-$SCHEME.log
+
 	if [ "$VERBOSE" = 1 ]; then
 		tee $logfile
 	else
 		cat > $logfile
 	fi
+}
+
+asclog () {
+	local machine=$1
+	local scheme=$2
+	local logfile=$LOGDIR/$DATESTAMP/$machine-$scheme.log
+
+	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log.asc \
+		$LOGDIR/$MACHINE-$SCHEME.log.asc
 
 	sed -e "s/\x0f/\n/g" \
 	    -e "s/\x0e//g" \
@@ -125,7 +137,6 @@ for SCHEME in $@; do
 	FAILURE_STATUS_FILE=$(tempfile)
 	export FAILURE_STATUS_FILE
 	
-	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log $LOGDIR/$MACHINE-$SCHEME.log
 	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
 		overview success
 	else
@@ -139,6 +150,8 @@ for SCHEME in $@; do
 			failure_overview
 		fi
 	fi) 2>&1 | log $MACHINE $SCHEME
+
+	asclog $MACHINE $SCHEME
 
 	rm -f $FAILURE_STATUS_FILE
 done
