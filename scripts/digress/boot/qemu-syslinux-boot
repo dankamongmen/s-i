@@ -42,9 +42,11 @@ open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
 print OUT "$$\n";
 close OUT;
 $SIG{USR1}=sub {
-	print STDERR "saving qemu state on SIGUSR1\n";
-	$exp->send("savevm 1\n");
-	$exp->expect(60, "(qemu)");
+	if (! exists $ENV{QEMU_SAVE_STATE} || $ENV{QEMU_SAVE_STATE} ne 0) {
+		print STDERR "saving qemu state on SIGUSR1\n";
+		$exp->send("savevm 1\n");
+		$exp->expect(60, "(qemu)");
+	}
 	$exp->send("quit\n");
 	$exp->expect(undef, "eof");
 	exit;
