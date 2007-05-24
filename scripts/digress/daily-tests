@@ -27,6 +27,8 @@ use () {
 }
 
 overview_add () {
+	mkdir -p $LOGDIR/$DATESTAMP
+	touch $LOGDIR/overview.log
 	LANG=C echo "$ARCH ($(date)) $(whoami)@$(hostname | cut -d . -f 1) $MACHINE-$SCHEME $1" >> $LOGDIR/overview.log
 }
 
@@ -60,12 +62,29 @@ rawlog () {
 	fi
 }
 
-htmllog () {
+htmllog_start () {
 	local machine=$1
 	local scheme=$2
 
 	ln -sf $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html \
 		$LOGDIR/$MACHINE-$SCHEME.html
+
+	cat > $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
+<html>
+<head>
+<title>$MACHINE $SCHEME test log for $DATESTAMP</title>
+</head>
+<body>
+This test is still in progress. See the
+<a href="$MACHINE-$SCHEME.log">raw log file</a>.
+</body>
+</html>
+EOF
+}
+
+htmllog_finish () {
+	local machine=$1
+	local scheme=$2
 
 	cat > $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.html <<EOF
 <html>
@@ -86,7 +105,7 @@ EOF
 	sed -e "s/^[[:space:]\x08]*$//g;s/[[:space:]]*x\?$//g" |
 	tr -s "\n" |
 	sed -e "/qqu$/{N;s/\n//}" \
-	    -e "s/^lqq/\n\nlqq/" \
+	    -e "s/^lqq/\n\nlqq/" |
 	sed -e 's/&/&amp;/g' \
 		-e 's/</\&lt;/g' \
 		-e 's/>/\&gt;/g' \
@@ -130,8 +149,10 @@ fi
 
 . $DI_TESTDIR/config
 
-SCHEME=daily-tests overview_add incomplete
-echo | rawlog $MACHINE daily-tests
+use common
+SCHEME=daily-tests overview incomplete
+echo "Running daily tests.." | rawlog $MACHINE daily-tests
+htmllog_start $MACHINE daily-tests
 
 for SCHEME in $@; do
 	RETRY=""
@@ -152,14 +173,12 @@ for SCHEME in $@; do
 		)
 	fi
 	
-	mkdir -p $LOGDIR/$DATESTAMP
-	touch $LOGDIR/overview.log
-
 	overview_add incomplete
 
 	FAILURE_STATUS_FILE=$(tempfile)
 	export FAILURE_STATUS_FILE
 	
+	htmllog_start $MACHINE $SCHEME
 	(if $DIGRESSDIR/test-harness $MACHINE $SCHEME; then
 		overview success
 	else
@@ -174,9 +193,10 @@ for SCHEME in $@; do
 		fi
 	fi) 2>&1 | rawlog $MACHINE $SCHEME
 
-	htmllog $MACHINE $SCHEME
+	htmllog_finish $MACHINE $SCHEME
 
 	rm -f $FAILURE_STATUS_FILE
 done
 
-SCHEME=daily-tests overview_add finished
+SCHEME=daily-tests overview finished
+htmllog_finish $MACHINE daily-tests
