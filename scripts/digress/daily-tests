@@ -37,10 +37,11 @@ overview () {
 }
 
 failure_overview () {
-	if [ "$(cat $FAILURE_STATUS_FILE)" != "SIGNAL" ]; then
-		overview "failed $(cat $FAILURE_STATUS_FILE) $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
+	status=$(cat $FAILURE_STATUS_FILE)
+	if [ "$status" != "SIGNAL" ] && [ "$status" != "STAGE_2" ]; then
+		overview "failed $status $(why_failed $LOGDIR/$DATESTAMP/$MACHINE-$SCHEME.log)"
 	else
-		overview "failed SIGNAL"
+		overview "failed $status"
 	fi
 }
 
