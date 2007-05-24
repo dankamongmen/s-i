@@ -293,7 +293,7 @@ lv_get_info() {
 
 		SIZE=$(echo "$line" | cut -d':' -f2 | cut -d'.' -f1)
 		MOUNT=$(grep "^/dev/mapper/$vg-$lv" /proc/mounts | cut -d' ' -f2 | sed -e 's/\/target//')
-		# FIXME: Get FS
+		# FIXME: Get FS - but we should not use parted for that!
 		#FS=$(parted "$tmplv" print | grep '^1' | \
 		#	sed -e 's/ \+/ /g' | cut -d " " -f 4)
 		break
