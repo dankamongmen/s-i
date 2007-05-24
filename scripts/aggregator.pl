@@ -35,7 +35,7 @@ sub aggregate {
 		}
 		my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
 		print $fh "<img src=\"".logpng($log, $basebasename)."\" alt=\"graph\">\n";
-		my $logurl=$log->{logurl}."overview".$log->{logext}."\n";
+		my $logurl=$log->{logurl}."overview".(exists $log->{overviewext} ? $log->{overviewext} : $log->{logext})."\n";
 		if ($logurl=~m#.*://#) {
 			if (! open (LOG, "wget --tries=3 --timeout=5 --quiet -O - $logurl |")) {
 				print $fh "<b>wget error</b>\n";
