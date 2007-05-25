@@ -32,7 +32,7 @@ register_cd () {
 	for distlink in stable testing unstable ; do
 		relfile=/cdrom/dists/$distlink/Release
 		if [ -e $relfile ] &&
-		   egrep -q 'Architectures:.* '$(udpkg --print-architecture)'[ |$]' $relfile
+		   egrep -q 'Architectures:.* '$(udpkg --print-architecture)'( |$)' $relfile
 	   	then
 			suite=$(sed -n 's/^Suite: *//p' $relfile)
 			codename=$(sed -n 's/^Codename: *//p' $relfile)
