@@ -10,6 +10,14 @@ fi
 mkdir -p $STATE_DIR/qemu-$MACHINE-$SCHEME.files
 dd if=/dev/zero of=$STATE_DIR/qemu-$MACHINE-$SCHEME.files/${ARCH}_bios.bin bs=1024 count=128
 
+# Support either of these names, both make some sense..
+if [ -z "$NETBOOT_KERNEL" ]; then
+	NETBOOT_KERNEL="$QEMU_KERNEL"
+fi
+if [ -z "$NETBOOT_IMAGE" ]; then
+	NETBOOT_IMAGE="$QEMU_INITRD"
+fi
+
 if [ -z "$QEMU_DISK" ]; then
 	QEMU_DISK=$STATE_DIR/qemu-$MACHINE-$SCHEME.img
 fi
