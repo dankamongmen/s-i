@@ -37,6 +37,7 @@ exec $QEMU_COMMAND -cdrom "$ISO" \
 	-initrd $QEMU_INITRD \
 	-nographic \
 	-net nic -net user,hostname=$MACHINE \
-	-boot c -no-reboot \
+	-no-reboot \
 	$QEMU_EXTRA_PARAMS \
+	-append "root=/dev/ram $CONSOLEPARAMS $BOOTPARAMS" \
 	-serial tcp:localhost:$QEMU_SERIAL_PORT,server 
