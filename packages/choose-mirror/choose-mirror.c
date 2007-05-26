@@ -211,8 +211,6 @@ static int check_base_on_cd(void) {
 		base_on_cd = 1;
 		fclose(fp);
 	}
-	else
-		base_on_cd = 0;
 	return 0;
 }
 
