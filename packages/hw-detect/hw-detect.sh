@@ -182,8 +182,7 @@ db_progress START 0 $MAX_STEPS $PROGRESSBAR
 db_progress INFO hw-detect/detect_progress_step
 
 # TODO: Can possibly be removed if udev will load yenta_socket automatically
-# Load yenta_socket, if hardware is available, so that
-# discover will see Cardbus cards.
+# Load yenta_socket, if hardware is available, for Cardbus cards.
 if [ -d /sys/bus/pci/devices ] && \
 	grep -q 0x060700 /sys/bus/pci/devices/*/class && \
 	! grep -q ^yenta_socket /proc/modules; then
@@ -192,7 +191,7 @@ if [ -d /sys/bus/pci/devices ] && \
 	db_progress INFO hw-detect/load_progress_step
 	
 	log "Detected Cardbus bridge, loading yenta_socket"
-	modprobe -v yenta_socket | logger -t hw-detect
+	load_module yenta_socket
 	# Ugly hack, but what's the alternative?
 	sleep 3 || true
 fi
@@ -366,62 +365,27 @@ if [ -x /etc/init.d/pcmciautils ]; then
 	PCMCIA_INIT=/etc/init.d/pcmciautils
 fi
 if [ "$PCMCIA_INIT" ]; then
-	if ! [ -e /var/run/cardmgr.pid ]; then
+	if is_not_loaded pcmcia_core; then
 		db_input medium hw-detect/start_pcmcia || true
+		db_input medium hw-detect/pcmcia_resources || true
+		db_go || true
+		db_get hw-detect/pcmcia_resources || true
+		apply_pcmcia_resource_opts $RET
 	fi
 	if db_go && db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
-		if ! [ -e /var/run/cardmgr.pid ]; then
-			db_input medium hw-detect/pcmcia_resources || true
-			db_go || true
-			db_get hw-detect/pcmcia_resources || true
-			apply_pcmcia_resource_opts $RET
-		fi
-		
 		db_progress INFO hw-detect/pcmcia_step
-		
-		if [ -e /var/run/cardmgr.pid ]; then
-			# Not using $PCMCIA_INIT stop as it
-			# uses sleep which is not available and is racey.
-			kill -9 $(cat /var/run/cardmgr.pid) 2>/dev/null || true
-			rm -f /var/run/cardmgr.pid
-		fi
-
-		CARDMGR_OPTS="-f" $PCMCIA_INIT start </dev/null 3<&0 2>&1 \
-			| logger -t hw-detect
-	    
+		$PCMCIA_INIT start 2>&1 | log
 		db_progress STEP $OTHER_STEPSIZE
 	fi
-	db_fset hw-detect/start_pcmcia seen true || true
 fi
-
-gen_pcmcia_devnames() {
-	while read line; do
-		log "Reading line: $line"
-		line="$(echo $line | tr '\t' ' ')"
-
-		case "$line" in
-			Socket*)
-			devname="$(echo $line | cut -d' ' -f3-)"
-		;;
-		[0-9]*)
-			class="$(echo $line | cut -d' ' -f2)"
-			dev="$(echo $line | cut -d' ' -f5)"
-
-			if [ "$class" != "network" ]; then
-				devname=""
-				return
-			else
-				echo "$dev:$devname" >> /etc/network/devnames
-				echo "$dev" >> /etc/network/devhotplug
-			fi
-		;;
-		esac
-	done
-}
 
 have_pcmcia=0
 if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
-	have_pcmcia=1
+	if db_get hw-detect/start_pcmcia && [ "$RET" = false ]; then
+		have_pcmcia=0
+	else
+		have_pcmcia=1
+	fi
 fi
 
 # find Cardbus network cards
@@ -442,24 +406,16 @@ if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
 	done
 fi
 
-if db_get hw-detect/start_pcmcia && [ "$RET" = false ]; then
-	have_pcmcia=0
-fi
-
 # Try to do this only once..
 if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmciautils /var/lib/apt-install/queue 2>/dev/null; then
 	log "Detected PCMCIA, installing pcmciautils."
 	apt-install pcmciautils || true
 
-	echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
-		>>$finish_install
-	echo "cp /etc/pcmcia/config.opts /target/etc/pcmcia/config.opts" \
-		>>$finish_install
-
-	# Determine devnames.
-	if [ -f /var/run/stab ]; then
-		mkdir -p /etc/network
-		gen_pcmcia_devnames < /var/run/stab
+	if db_get hw-detect/pcmcia_resources && [ -n "$RET" ]; then
+		echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
+			>>$finish_install
+		echo "cp /etc/pcmcia/config.opts /target/etc/pcmcia/config.opts" \
+			>>$finish_install
 	fi
 fi
 

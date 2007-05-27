@@ -1,3 +1,18 @@
+hw-detect (1.54) UNRELEASED; urgency=low
+
+  * Remove cruft left over from the days of pcmcia-cs.
+    - pcmciautils doesn't create a cardmgr.pid, so stop looking for it to
+      determine if pcmcia is started. Look for the pcmcia_core module being
+      loaded  instead.
+    - No need for funky redirections when running the init script as it no
+      longer starts a daemon.
+    - /var/run/stab was only produced by pcmcia-cs, so the whole
+      gen_pcmcia_devnames section can no longer run; remove.
+    - Only modify config.opts in /target if pcmcia_resources is preseeded.
+  * Remove workaround for long fixed cdebconf bug.
+
+ -- Joey Hess <joeyh@debian.org>  Sun, 27 May 2007 01:53:09 -0400
+
 hw-detect (1.53) unstable; urgency=low
 
   [ Joey Hess ]
