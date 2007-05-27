@@ -98,7 +98,11 @@ case "x$cmd" in
 
 		# Setting codename to a suite is not very nice, but can do no harm
 		if ! db_get mirror/udeb/suite || [ -z "$RET" ]; then
-			db_get mirror/codename
+			if [ -f /etc/udebs-source ]; then
+				RET=$(cat /etc/udebs-source)
+			else
+				db_get mirror/codename
+			fi
 		fi
 		codename="$RET"
 
