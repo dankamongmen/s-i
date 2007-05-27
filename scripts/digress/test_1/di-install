@@ -36,7 +36,7 @@ while (1) {
 		[ "-re", "rebooting.*the.*system." => \&done ],
 		[ "-re", "down.*NOW" => \&done ],
 		[ "-re", "Sending.*SIGTERM" => \&done ],
-		[ "-re", ".+" => sub { } ],
+		[ "-re", "\e\\[" => sub { } ], # screen draw indicates general activity
 	) || die "install failed";
 	
 	if (time - $start_time > $ENV{STAGE_1_MAX_TIME}) {
