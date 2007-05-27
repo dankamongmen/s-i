@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 45612 -->
+<!-- original version: 46820 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1000,46 +1000,6 @@ d-i time/zone string US/Eastern
 
   </sect2>
 
-  <sect2 id="preseed-apt">
-  <title>Configuration d'Apt</title>
-<para>
-
-La création du fichier <filename>/etc/apt/sources.list</filename> 
-et les principales options de configuration se font automatiquement à partir
-de la méthode d'installation choisie et des réponses aux précédentes questions.
-Vous pouvez aussi ajouter d'autres sources (locales par exemple).
-</para>
-
-<informalexample role="example"><screen>
-# Vous pouvez installer des logiciels des distributions non-free et contrib.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-#Décommentez cette ligne si vous n'utilisez pas de miroir sur le réseau.
-#d-i apt-setup/use_mirror boolean false
-#Décommentez cette ligne pour éviter d'ajouter des sources sécurisées 
-#ou pour utiliser un autre serveur que security.debian.org.
-#d-i apt-setup/security_host string
-
-# Autres sources disponibles, local[0-9]
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# Activer des lignes deb-src
-#d-i apt-setup/local0/source boolean true
-# URL de la clé publique de la source locale. Vous devez indiquer une clé&nbsp;; sinon
-# apt se plaindra que la source n'est pas authentifiée et laissera la ligne du
-# fichier sources.list en commentaire.
-#d-i apt-setup/local0/key string http://local.server/key
-
-# Par défaut, l'installateur demande que les dépôts soient authentifiés par
-# une clé gpg connue. On peut se servir de cette commande pour désactiver
-# cette authentification. Attention : commande non sécurisé et non recommandée.
-#d-i debian-installer/allow_unauthenticated string true
-
-</screen></informalexample>
-
-</sect2>
-
   <sect2 id="preseed-account">
   <title>Configuration des comptes</title>
 <para>
@@ -1120,35 +1080,45 @@ Les seules questions posées concernent l'installation du noyau.
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
-  <title>Installation du programme d'amorçage</title>
+  <sect2 id="preseed-apt">
+  <title>Configuration d'Apt</title>
+<para>
+
+La création du fichier <filename>/etc/apt/sources.list</filename> 
+et les principales options de configuration se font automatiquement à partir
+de la méthode d'installation choisie et des réponses aux précédentes questions.
+Vous pouvez aussi ajouter d'autres sources (locales par exemple).
+</para>
 
 <informalexample role="example"><screen>
-# Grub est le programme d'amorçage par défaut (pour x86). Si vous préférez
-# LILO, décommentez la ligne suivante :
-#d-i grub-installer/skip boolean true
+# Vous pouvez installer des logiciels des distributions non-free et contrib.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+#Décommentez cette ligne si vous n'utilisez pas de miroir sur le réseau.
+#d-i apt-setup/use_mirror boolean false
+#Décommentez cette ligne pour éviter d'ajouter des sources sécurisées 
+#ou pour utiliser un autre serveur que security.debian.org.
+#d-i apt-setup/security_host string
 
-# Il n'y a aucun danger à donner ce paramètre : il installe grub sur le
-# secteur d'amorçage principal s'il n'existe aucun autre système d'exploitation
-# sur la machine.
-d-i grub-installer/only_debian boolean true
+# Autres sources disponibles, local[0-9]
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Activer des lignes deb-src
+#d-i apt-setup/local0/source boolean true
+# URL de la clé publique de la source locale. Vous devez indiquer une clé&nbsp;; sinon
+# apt se plaindra que la source n'est pas authentifiée et laissera la ligne du
+# fichier sources.list en commentaire.
+#d-i apt-setup/local0/key string http://local.server/key
 
-# Ce paramètre installe grub sur le secteur d'amorçage principal même s'il
-# existe un autre système d'exploitation, ce qui est moins sûr car il pourrait
-# ne pas savoir amorcer cet autre système.
-d-i grub-installer/with_other_os boolean true
+# Par défaut, l'installateur demande que les dépôts soient authentifiés par
+# une clé gpg connue. On peut se servir de cette commande pour désactiver
+# cette authentification. Attention : commande non sécurisé et non recommandée.
+#d-i debian-installer/allow_unauthenticated string true
 
-# Vous pouvez aussi l'installer ailleurs que dans le secteur d'amorçage 
-# principal. Décommentez et modifiez les lignes suivantes :
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# Pour installer grub sur plusieurs disques :
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
-  </sect2>
-
+</sect2>
 
   <sect2 id="preseed-pkgsel">
   <title>Choix des paquets</title>
@@ -1208,9 +1178,11 @@ facilement sur la ligne de commande du noyau.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server
-#tasksel tasksel/first multiselect standard, kde-desktop
+#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+# Si vous sélectionnez la tâche desktop, vous pouvez installer les environnements kde ou xfce
+# au lieu de l'environnement gnome.
+#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</phrase><phrase condition="etch">
+#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 # Paquets supplémentaires
 #d-i pkgsel/include string openssh-server build-essential
@@ -1219,6 +1191,35 @@ tasksel tasksel/first multiselect standard, desktop
 # et ceux que vous utilisez. Par défaut, rien n'est signalé. Mais l'envoi de rapport 
 # d'installation aide le projet à connaître les logiciels populaires.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+  <title>Installation du programme d'amorçage</title>
+
+<informalexample role="example"><screen>
+# Grub est le programme d'amorçage par défaut (pour x86). Si vous préférez
+# LILO, décommentez la ligne suivante :
+#d-i grub-installer/skip boolean true
+
+# Il n'y a aucun danger à mettre ce paramètre : il installe grub sur le
+# secteur d'amorçage principal s'il n'existe aucun autre système d'exploitation
+# sur la machine.
+d-i grub-installer/only_debian boolean true
+
+# Ce paramètre installe grub sur le secteur d'amorçage principal même s'il
+# existe un autre système d'exploitation, ce qui est moins sûr car il pourrait
+# ne pas savoir amorcer cet autre système.
+d-i grub-installer/with_other_os boolean true
+
+# Vous pouvez aussi l'installer ailleurs que dans le secteur d'amorçage 
+# principal. Décommentez et modifiez les lignes suivantes :
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Pour installer grub sur plusieurs disques :
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
