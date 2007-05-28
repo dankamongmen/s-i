@@ -138,6 +138,7 @@ int find_suite (void) {
 	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
 	int i;
 	int ret = 0;
+	char buf[SUITE_LENGTH];
 
 	if (show_progress) {
 		debconf_progress_start(debconf, 0, 1,
@@ -166,8 +167,26 @@ int find_suite (void) {
 				suite = strdup(debconf->value);
 			}
 			else {
-				continue;
+				/* Read this file to find the default suite
+				 * to use. */
+				f = fopen("/etc/default-release", "r");
+				if (f != NULL) {
+					if (fgets(buf, SUITE_LENGTH - 1, f)) {
+						if (buf[strlen(buf) - 1] == '\n')
+							buf[strlen(buf) - 1] = '\0';
+						suite = strdup(buf);
+						fclose(f);
+					}
+					else {
+						fclose(f);
+						continue;
+					}
+				}
+				else {
+					continue;
+				}
 			}
+			
 		}
 		else {
 			suite = strdup(suites[i - 1]);
@@ -180,7 +199,6 @@ int find_suite (void) {
 		free(command);
 
 		if (f != NULL) {
-			char buf[SUITE_LENGTH];
 			if (fgets(buf, SUITE_LENGTH - 1, f)) {
 				if (buf[strlen(buf) - 1] == '\n')
 					buf[strlen(buf) - 1] = '\0';
