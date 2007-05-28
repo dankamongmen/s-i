@@ -1,10 +1,11 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45612 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.11.05 -->
+<!-- original version: 46820 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.30 -->
 <!-- updated 42982:43841 by Felipe Augusto van de Wiel (faw) 2007.01.19 -->
 <!-- updated 44376:45190 by Herbert Parentes Fortes Neto (hpfn) 2007.02.23 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2007.03.12 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2007.05.20 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2007.05.27 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1059,46 +1060,6 @@ d-i time/zone string US/Eastern
 
   </sect2>
 
-  <sect2 id="preseed-apt">
-  <title>Configurar o apt</title>
-<para>
-
-Configurar o <filename>/etc/apt/sources.list</filename> e as opções básicas de
-configuração é totalmente automatizada baseado no seu método de instalação e
-nas respostas das últimas questões. Você pode, opcionalmente, adicionar outros
-repositórios (locais).
-
-</para>
-
-<informalexample role="example"><screen>
-# You can choose to install non-free and contrib software.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-# Uncomment this if you don't want to use a network mirror.
-#d-i apt-setup/use_mirror boolean false
-# Uncomment this to avoid adding security sources, or
-# add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string
-
-# Additional repositories, local[0-9] available
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# Enable deb-src lines
-#d-i apt-setup/local0/source boolean true
-# URL to the public key of the local repository; you must provide a key or
-# apt will complain about the unauthenticated repository and so the
-# sources.list line will be left commented out
-#d-i apt-setup/local0/key string http://local.server/key
-
-# By default the installer requires that repositories be authenticated
-# using a known gpg key. This setting can be used to disable that
-# authentication. Warning: Insecure, not recommended.
-#d-i debian-installer/allow_unauthenticated string true
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-account">
   <title>Configurar contas</title>
 <para>
@@ -1177,29 +1138,42 @@ As únicas questões feitas são com relação à instalação do kernel.
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
-  <title>Instalação do carregador de inicialização</title>
+  <sect2 id="preseed-apt">
+  <title>Configurar o apt</title>
+<para>
+
+Configurar o <filename>/etc/apt/sources.list</filename> e as opções básicas de
+configuração é totalmente automatizada baseado no seu método de instalação e
+nas respostas das últimas questões. Você pode, opcionalmente, adicionar outros
+repositórios (locais).
+
+</para>
 
 <informalexample role="example"><screen>
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
-#d-i grub-installer/skip boolean true
+# You can choose to install non-free and contrib software.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+# Uncomment this if you don't want to use a network mirror.
+#d-i apt-setup/use_mirror boolean false
+# Uncomment this to avoid adding security sources, or
+# add a hostname to use a different server than security.debian.org.
+#d-i apt-setup/security_host string
 
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
-d-i grub-installer/only_debian boolean true
+# Additional repositories, local[0-9] available
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Enable deb-src lines
+#d-i apt-setup/local0/source boolean true
+# URL to the public key of the local repository; you must provide a key or
+# apt will complain about the unauthenticated repository and so the
+# sources.list line will be left commented out
+#d-i apt-setup/local0/key string http://local.server/key
 
-# This one makes grub-installer install to the MBR if it also finds some other
-# OS, which is less safe as it might not be able to boot that other OS.
-d-i grub-installer/with_other_os boolean true
-
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# To install grub to multiple disks:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# By default the installer requires that repositories be authenticated
+# using a known gpg key. This setting can be used to disable that
+# authentication. Warning: Insecure, not recommended.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1267,9 +1241,11 @@ seja facilmente usado na linha de comando do kernel.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server
-#tasksel tasksel/first multiselect standard, kde-desktop
+#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+# If the desktop task is selected, install the kde and xfce desktops
+# instead of the default gnome desktop.
+#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</phrase><phrase condition="etch">
+#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
@@ -1279,6 +1255,36 @@ tasksel tasksel/first multiselect standard, desktop
 # but sending reports helps the project determine what software is most
 # popular and include it on CDs.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+  <title>Instalação do carregador de inicialização</title>
+
+<informalexample role="example"><screen>
+# Grub is the default boot loader (for x86). If you want lilo installed
+# instead, uncomment this:
+#d-i grub-installer/skip boolean true<phrase condition="lenny">
+# To also skip installing lilo, and install no bootloader, uncomment this
+# too:
+#d-i lilo-installer/skip boolean true</phrase>
+
+# This is fairly safe to set, it makes grub install automatically to the MBR
+# if no other operating system is detected on the machine.
+d-i grub-installer/only_debian boolean true
+
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
+d-i grub-installer/with_other_os boolean true
+
+# Alternatively, if you want to install to a location other than the mbr,
+# uncomment and edit these lines:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# To install grub to multiple disks:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
