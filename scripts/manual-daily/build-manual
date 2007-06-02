@@ -231,8 +231,9 @@ build_lang() {
         rm $langlog.arch
         [ $BUILDRESULT = 0 ] && echo >>$mainlog
 
-        # Upload logfile to people.debian.org
-        scp $logdir/$lang.log people.debian.org:public_html/d-i_manual/log/
+        # Upload logfile to alioth
+        R_LOGDIR=/srv/alioth.debian.org/chroot/home/groups/d-i/htdocs/manual/logs/
+        scp $logdir/$lang.log alioth.debian.org:$R_LOGDIR
         if [ $? = 0 ]; then
             echo "  Upload of $lang.log success" >>$mainlog
         else
