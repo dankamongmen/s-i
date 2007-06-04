@@ -3,7 +3,20 @@ kernel-wedge (2.37) UNRELEASED; urgency=low
   [ Martin Michlmayr ]
   * Make nic-modules depend on core-modules. Closes: #421352
 
- -- Martin Michlmayr <tbm@cyrius.com>  Wed, 23 May 2007 09:46:27 +0200
+  [ Joey Hess ]
+  * Split wireless modules out of nic-extra-modules into nic-wireless-modules.
+    This new package will contain wireless modules that arn't USB or pcmcia;
+    those stay in their respective packages.
+  * nic-pcmcia-modules now depends on nic-wireless-modules instead of
+    nic-extra-modules.
+  * Add zd1211rw to nic-usb-modules, and ipw2100 and ipw2200 to
+    nic-wireless-modules. These had been left off due to needing nonfree
+    firmware, but maybe we'll work out a way to provide that, and users can
+    always provide it on their own, so I think including these in d-i is
+    worthwhile.
+  * nic-usb-modules now depends on nic-wireless-modules for 80211 modules.
+
+ -- Joey Hess <joeyh@debian.org>  Mon, 04 Jun 2007 14:34:08 -0400
 
 kernel-wedge (2.36) unstable; urgency=low
 
