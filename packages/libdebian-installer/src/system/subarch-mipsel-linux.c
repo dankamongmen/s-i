@@ -32,10 +32,6 @@ static struct cpu system_cobalt_cpu[] = {
 };
 
 static struct cpu system_bcm_bcm947xx_cpu[] = {
-	/* 2.4 */
-	{ "BCM3302", "bcm947xx" },
-	{ "BCM4710", "bcm947xx" },
-	/* 2.6 */
 	{ "Broadcom BCM3302", "bcm947xx" },
 	{ "Broadcom BCM4710", "bcm947xx" },
 	{ NULL, "unknown" }
@@ -61,23 +57,11 @@ static struct systype system_type[] = {
 	 *	"Digital Personal DECstation"
 	 */
 	{"Digital ", system_dec_decs_cpu },
-	/* match Broadcom SB1 development boards */
-	{"SiByte BCM9", system_sibyte_sb1_cpu },
-	/* match MIPS based Cobalt machines (with old kernels) */
-	{"MIPS Cobalt", system_cobalt_cpu },
-	/* match MIPS based Cobalt machines (with new kernels),
-	 * that is, match any of
-	 *	"Cobalt RaQ"
-	 *	"Cobalt Qube"
-	 *	"Cobalt RaQ2"
-	 *	"Cobalt Qube2"
-	 */
-	{"Cobalt ", system_cobalt_cpu },
-	/* Broadcom based APs/NAS */
-	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu },
-	/* match QEMU virtual machine */
+	{"SiByte BCM9", system_sibyte_sb1_cpu }, /* match Broadcom SB1 boards */
+	{"MIPS Cobalt", system_cobalt_cpu }, /* old kernels */
+	{"Cobalt ", system_cobalt_cpu }, /* match any Cobalt machine; new kernels */
+	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu }, /* Broadcom based APs/NAS */
 	{"Qemu", system_qemu_cpu },
-	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
 

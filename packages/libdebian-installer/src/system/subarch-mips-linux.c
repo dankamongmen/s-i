@@ -15,8 +15,7 @@ struct systype {
 };
 
 static struct cpu system_sgi_ind_cpu[] = {
-	/* match various R4000 variants */
-	{ "R4", "r4k-ip22" },
+	{ "R4", "r4k-ip22" }, /* match various R4000 variants */
 	{ "R5000", "r5k-ip22" },
 	{ "R8000", "r8k-ip26" },
 	{ "R10000", "r10k-ip28" },
@@ -30,7 +29,7 @@ static struct cpu system_sgi_origin_cpu[] = {
 };
 
 static struct cpu system_sgi_o2_cpu[] = {
-	/* match R5000 and R5500 */
+	{ "R5", "r5k-ip32" }, /* match R5000 and R5500 */
 	{ "R5", "r5k-ip32" },
 	{ "RM7000", "r5k-ip32" },
 	{ "R10000", "r10k-ip32" },
@@ -56,18 +55,12 @@ static struct cpu system_unknown_cpu[] = {
 };
 
 static struct systype system_type[] = {
-	/* match "SGI Indy" and "SGI Indigo2" (ip22) */
-	{"SGI Ind", system_sgi_ind_cpu },
-	/* SGI Origin (ip27) */
+	{"SGI Ind", system_sgi_ind_cpu }, /* match "SGI Indy" and "SGI Indigo2" */
 	{"SGI Origin", system_sgi_origin_cpu },
-	/* SGI O2 (ip32) */
 	{"SGI IP32", system_sgi_o2_cpu },
 	{"SGI O2", system_sgi_o2_cpu },
-	/* match Broadcom SB1 development boards */
-	{"SiByte BCM9", system_sibyte_sb1_cpu },
-	/* match QEMU virtual machine */
+	{"SiByte BCM9", system_sibyte_sb1_cpu }, /* match Broadcom SB1 boards */
 	{"Qemu", system_qemu_cpu },
-	/* add new system types here */
 	{ NULL, system_unknown_cpu }
 };
 
