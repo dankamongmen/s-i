@@ -30,7 +30,7 @@ static struct cpu system_sgi_origin_cpu[] = {
 
 static struct cpu system_sgi_o2_cpu[] = {
 	{ "R5", "r5k-ip32" }, /* match R5000 and R5500 */
-	{ "R5", "r5k-ip32" },
+	{ "Nevada", "r5k-ip32" },
 	{ "RM7000", "r5k-ip32" },
 	{ "R10000", "r10k-ip32" },
 	{ "R12000", "r12k-ip32" },
