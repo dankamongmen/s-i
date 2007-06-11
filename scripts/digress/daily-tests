@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+set -x
+
 if [ "$1" = "-v" ]; then
 	VERBOSE=1
 	shift 1
@@ -33,6 +35,7 @@ overview_add () {
 }
 
 overview () {
+	mkdir -p "$LOGDIR"
 	grep -v "$MACHINE-$SCHEME " $LOGDIR/overview.log > $LOGDIR/overview.log.new || true
 	mv $LOGDIR/overview.log.new $LOGDIR/overview.log
 	overview_add "$@"
