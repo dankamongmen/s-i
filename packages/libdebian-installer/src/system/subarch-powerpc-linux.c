@@ -29,6 +29,11 @@ static struct map map_machine[] = {
 	{ NULL, NULL }
 };
 
+static struct map map_platform[] = {
+	{ "PS3", "ps3" },
+	{ NULL, NULL }
+};
+
 static char *check_map(struct map map[], const char *entry)
 {
 	for (; map->entry; map++)
@@ -42,7 +47,7 @@ const char *di_system_subarch_analyze(void)
 {
 	FILE *cpuinfo;
 	char line[1024];
-	char cpuinfo_machine[256], cpuinfo_generation[256];
+	char cpuinfo_platform[256], cpuinfo_machine[256], cpuinfo_generation[256];
 	char *ret, *pos;
 
 	cpuinfo = fopen("/proc/cpuinfo", "r");
@@ -55,6 +60,9 @@ const char *di_system_subarch_analyze(void)
 			continue;
 		while (*++pos && (*pos == '\t' || *pos == ' '));
 
+		if (strstr(line, "platform") == line)
+			strncpy(cpuinfo_platform, pos, sizeof(cpuinfo_platform));
+
 		if (strstr(line, "machine") == line)
 			strncpy(cpuinfo_machine, pos, sizeof(cpuinfo_machine));
 
@@ -64,6 +72,9 @@ const char *di_system_subarch_analyze(void)
 
 	fclose(cpuinfo);
 
+	ret = check_map(map_platform, cpuinfo_platform);
+	if (ret)
+		return ret;
 	ret = check_map(map_machine, cpuinfo_machine);
 	if (ret)
 		return ret;
