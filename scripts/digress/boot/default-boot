@@ -1,8 +1,14 @@
-#!/usr/bin/expect
+#!/usr/bin/perl
 # Just boot whatever is default in the boot loader.
-spawn -noecho $env(CONSOLECOMMAND)
+use strict;
+use Expect;
 
-expect "boot: "
+my $exp = new Expect;
+#$exp->exp_internal(1);
+$exp->raw_pty(1);
 
-send "\r"
+$exp->spawn($ENV{CONSOLECOMMAND}) or die "cannot connect: $!\n";
+
+$exp->expect(600, "boot: ");
+$exp->send("\r");
 
