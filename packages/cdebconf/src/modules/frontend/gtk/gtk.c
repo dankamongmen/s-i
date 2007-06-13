@@ -49,13 +49,7 @@
 #include <debian-installer/slist.h>
 #include <gdk/gdkkeysyms.h>
 
-#if GTK_CHECK_VERSION(2,10,0)
-#ifdef GDK_WINDOWING_DIRECTFB
 #include <directfb.h>
-#endif
-#else
-#include <directfb.h>
-#endif
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -1489,18 +1483,12 @@ static int gtk_go(struct frontend *obj)
     gdk_threads_enter();
 
     /* TODO
-     * workarund to force dfb to reload keymap at every run, awaiting
+     * workaround to force dfb to reload keymap at every run, awaiting
      * for dfb to support automatic keymap change detection and reloading
      * (See also bug #381979)
      */
 
-    #if GTK_CHECK_VERSION(2,10,0)
-    #ifdef GDK_WINDOWING_DIRECTFB
     dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
-    #endif
-    #else
-    dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
-    #endif
 
     gtk_rc_reparse_all();
 
