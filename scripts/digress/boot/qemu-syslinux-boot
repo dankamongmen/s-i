@@ -19,6 +19,13 @@ my %keys = (
 $keys{$_}=$_ foreach ('a'..'z', 0..9);
 $keys{$_}="shift-".lc($_) foreach ('A'..'Z');
 
+# This check is here because startqemu-cdrom runs after this program has
+# daemonised, and so test-harness won't see its nonzero exit if the iso is
+# missing.
+if (exists $ENV{ISO} && ! -e $ENV{ISO}) {
+	die "ISO $ENV{ISO} not found\n";
+}
+
 print "boot: $ENV{BOOTCOMMAND}\n";
 
 # Run in the background, because qemu won't begin accepting console input
@@ -35,6 +42,7 @@ my $exp = new Expect;
 #$exp->debug(2);
 $exp->raw_pty(1);
 $SIG{PIPE}=sub { die "SIGPIPE; exiting\n" };
+$SIG{CHLD}=sub { die "SIGCHLD; exiting\n" };
 $exp->spawn($ENV{START_COMMAND}) or die "running \"$ENV{START_COMMAND}\": $!";
 
 open(OUT, ">$ENV{STATE_DIR}/qemu-$ENV{MACHINE}-$ENV{SCHEME}.control.pid");
