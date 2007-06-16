@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 46527 -->
+<!-- original version: 46820 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -706,8 +706,7 @@ Voreinstellungsdatei gültig ist, können Sie den Befehl
 <para>
 
 Die Konfigurationsfragmente, die in diesem Abschnitt benutzt werden, sind
-auch als Beispiel-Voreinstellungsdatei unter &urlset-example-preseed;
-verfügbar.
+auch als Beispieldatei unter &urlset-example-preseed; verfügbar.
 
 </para><para>
 
@@ -1092,50 +1091,6 @@ d-i time/zone string Europe/Berlin
 
   </sect2>
 
-  <sect2 id="preseed-apt">
-  <title>Konfiguration von Apt</title>
-<para>
-
-Die Konfiguration von <filename>/etc/apt/sources.list</filename> und
-grundlegenden Einstellungsoptionen ist voll automatisiert, basierend auf der
-Installationsmethode und Antworten auf frühere Fragen. Sie können optional
-weitere (lokale) Paket-Repositories hinzufügen.
-
-</para>
-
-<informalexample role="example"><screen>
-# Sie können wählen, ob Sie Software aus dem "non-free"- und
-# "contrib"-Zweig installieren möchten.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-# Entfernen Sie das folgende Kommentarzeichen, wenn Sie keinen Netzwerk-
-# Spiegel verwenden möchten.
-#d-i apt-setup/use_mirror boolean false
-# Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Quellen
-# für Sicherheitsaktualisierungen zu vermeiden oder fügen Sie einen Hostnamen
-# hinzu, um einen anderen Server als security.debian.org zu verwenden.
-#d-i apt-setup/security_host string
-
-# Zusätzliche Paketquellen (Repositories), "local[0-9]" verfügbar
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# deb-src-Zeilen aktivieren
-#d-i apt-setup/local0/source boolean true
-# URL zum öffentlichen Schlüssel des lokalen Repositories; Sie müssen einen
-# Schlüssel bereitstellen, oder apt wird sich über ein nicht-authorisiertes
-# Repository beschweren und die Zeile in der sources.list wird auskommentiert
-# bleiben und nicht genutzt.
-#d-i apt-setup/local0/key string http://local.server/key
-
-# Standardmäßig verlangt der Installer, dass Paket-Repositories mittels
-# bekannter GPG-Schlüssel authentifiziert werden. Folgendes kann verwendet
-# werden, um dies zu deaktivieren. WARNUNG: unsicher, nicht empfohlen.
-#d-i debian-installer/allow_unauthenticated string true
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-account">
   <title>Einrichtung von Benutzerzugängen</title>
 <para>
@@ -1219,32 +1174,46 @@ Kernels.
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
-  <title>Installation des Bootloaders</title>
+  <sect2 id="preseed-apt">
+  <title>Konfiguration von Apt</title>
+<para>
+
+Die Konfiguration von <filename>/etc/apt/sources.list</filename> und
+grundlegenden Einstellungsoptionen ist voll automatisiert, basierend auf der
+Installationsmethode und Antworten auf frühere Fragen. Sie können optional
+weitere (lokale) Paketquellen (Repositories) hinzufügen.
+
+</para>
 
 <informalexample role="example"><screen>
-# Grub ist (für x86) der Standard-Bootloader. Wenn Sie stattdessen lilo
-# installieren möchten, entfernen Sie hier das Kommentarzeichen:
-#d-i grub-installer/skip boolean true
+# Sie können wählen, ob Sie Software aus dem "non-free"- oder
+# "contrib"-Zweig installieren möchten.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+# Entfernen Sie das folgende Kommentarzeichen, wenn Sie keinen Netzwerk-
+# Spiegel verwenden möchten.
+#d-i apt-setup/use_mirror boolean false
+# Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Paketquellen
+# für Sicherheitsaktualisierungen zu vermeiden oder fügen Sie einen Host-Namen
+# hinzu, um einen anderen Server anstatt von security.debian.org zu verwenden.
+#d-i apt-setup/security_host string
 
-# Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
-# automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
-# erkannt wird. 
-d-i grub-installer/only_debian boolean true
+# Zusätzliche Paketquellen, "local[0-9]" verfügbar
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# deb-src-Zeilen aktivieren
+#d-i apt-setup/local0/source boolean true
+# URL zum öffentlichen Schlüssel der lokalen Quelle; Sie müssen einen
+# Schlüssel bereitstellen, oder apt wird sich über die nicht-autorisierte
+# Quelle beschweren und die Zeile in der sources.list wird auskommentiert
+# bleiben und nicht genutzt.
+#d-i apt-setup/local0/key string http://local.server/key
 
-# Dies bewirkt, dass grub in den MBR installiert wird, wenn auch noch andere
-# Betriebssysteme erkannt wurden. Dies ist nicht so sicher, da möglicherweise
-# die anderen Systeme nicht mehr gestartet werden können.
-d-i grub-installer/with_other_os boolean true
-
-# Wenn Sie alternativ an einen anderen Ort als in den MBR installieren
-# möchten, entfernen Sie hier die Kommentarzeichen und passen Sie
-# die Zeilen an:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# Um grub auf mehrere Festplatten zu installieren:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# Standardmäßig verlangt der Installer, dass Paketquellen mittels
+# bekannter GPG-Schlüssel autorisiert werden. Folgendes kann verwendet
+# werden, um das zu deaktivieren. WARNUNG: unsicher, nicht empfohlen.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1313,15 +1282,11 @@ verwenden können.
 </para>
 
 <informalexample role="example"><screen>
-#tasksel tasksel/first multiselect standard, web-server
-<phrase condition="lenny">
+#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
 # Wenn die Programmgruppe "desktop" (Arbeitsplatz-System) ausgewählt ist,
 # den KDE- und XFCE-Desktop statt dem Standard-Gnome-Desktop installieren.
-#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop
-</phrase>
-<phrase condition="etch">
-#tasksel tasksel/first multiselect standard, kde-desktop
-</phrase>
+#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</phrase><phrase condition="etch">
+#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
@@ -1332,6 +1297,39 @@ verwenden können.
 # hilft dem Projekt zu entscheiden, welche Software wie beliebt ist und ob
 # bzw. wo sie auf die CDs gepackt werden sollte.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+  <title>Installation des Bootloaders</title>
+
+<informalexample role="example"><screen>
+# Grub ist (für x86) der Standard-Bootloader. Wenn Sie stattdessen lilo
+# installieren möchten, entfernen Sie hier das Kommentarzeichen:
+#d-i grub-installer/skip boolean true<phrase condition="lenny">
+# Um auch die Installation von lilo zu unterdrücken und überhaupt keinen
+# Bootloader zu installieren, entfernen Sie auch hier das Kommentarzeichen:
+#d-i lilo-installer/skip boolean true</phrase>
+
+# Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
+# automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
+# erkannt wird. 
+d-i grub-installer/only_debian boolean true
+
+# Dies bewirkt, dass grub in den MBR installiert wird, auch wenn noch andere
+# Betriebssysteme erkannt wurden. Dies ist nicht so sicher, da möglicherweise
+# die anderen Systeme nicht mehr gestartet werden können.
+d-i grub-installer/with_other_os boolean true
+
+# Wenn Sie alternativ an einen anderen Ort als in den MBR installieren
+# möchten, entfernen Sie hier die Kommentarzeichen und passen Sie
+# die Zeilen an:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Um grub auf mehrere Festplatten zu installieren:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
