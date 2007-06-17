@@ -53,14 +53,15 @@ fi
 
 bootfs=$(mapdevfs $bootfs_devfs)
 
-prefix=$(echo "$bootfs_devfs" | sed 's/\(\/dev\/[a-z]\+\).*/\1/')
+prefix=$(echo "$bootfs_devfs" | \
+  sed 's/\(\/dev\/\(cciss\|ida\)\/c[0-9]d[0-9]\|\/dev\/[a-z]\+\).*/\1/')
 
 case $prefix in
 	/dev/md)
 		disc_offered_devfs="$bootfs_devfs"
 		db_register lilo-installer/bootdev_raid lilo-installer/bootdev
 	;;
-	/dev/[hs]d[a-z])
+	/dev/[hs]d[a-z]|/dev/cciss/c[0-9]d[0-9]|/dev/ida/c[0-9]d[0-9])
 		disc_offered_devfs="$prefix"
 	;;
 	*)
@@ -135,7 +136,8 @@ db_progress info lilo-installer/progress_active
 
 # If installing to a partition (not MBR), offer to make it active
 # Do not try to make MD device active
-if (echo "${bootdev}" | grep -q '[0-9]$') && [ "${raid_boot}" = "no" ]; then
+if (echo "${bootdev}" | grep -v '/c[0-9]d[0-9]$' | grep -q '[0-9]$') \
+  && [ "${raid_boot}" = "no" ]; then
 	# Installing to a partition, check if it is already marked active
 	if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\(part\|[hs]d[a-z]\)${part} " | grep -q '\*'; then
 		# partition is not marked active, offer to make it so
