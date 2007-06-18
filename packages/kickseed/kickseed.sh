@@ -74,6 +74,7 @@ kickseed () {
 	# Parse and execute %pre sections first.
 	SECTION=main
 	while read line; do
+		line="${line%%}"
 		keyword="${line%%[ 	]*}"
 		case $keyword in
 			%pre)
@@ -102,6 +103,7 @@ kickseed () {
 	# Parse all other sections.
 	SECTION=main
 	(while read line; do
+		line="${line%%}"
 		keyword="${line%%[ 	]*}"
 		# Deal with %include directives.
 		if [ "$keyword" = '%include' ]; then
