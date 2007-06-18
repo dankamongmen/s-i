@@ -10,6 +10,8 @@ clearpart_handler () {
 				;;
 			--all)
 				ks_log "can't clear multiple drives; assuming just the first one"
+				# needed as of partman-auto 55
+				ks_preseed d-i partman-auto/method string regular
 				# TODO: I bet this isn't safe for installs
 				# from USB ...
 				ks_preseed d-i partman-auto/disk string /dev/discs/disc0/disc
@@ -46,6 +48,8 @@ EOF
 						warn "clearing multiple drives not supported"
 						;;
 					*)
+						# needed as of partman-auto 55
+						ks_preseed d-i partman-auto/method string regular
 						ks_preseed d-i partman-auto/disk string "/dev/$2"
 						;;
 				esac
