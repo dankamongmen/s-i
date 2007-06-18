@@ -22,7 +22,7 @@ bootloader_handler_common () {
 						ks_preseed d-i grub-installer/skip boolean true
 						;;
 					*)
-						warn_bad_arg bootloader location "$OPTARG"
+						warn_bad_arg bootloader location "$2"
 						;;
 				esac
 				shift 2

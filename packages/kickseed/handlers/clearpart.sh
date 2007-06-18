@@ -22,7 +22,7 @@ clearpart_handler () {
 						warn "clearing multiple drives not supported"
 						;;
 					*)
-						ks_preseed d-i partman-auto/disk string "/dev/$OPTARG"
+						ks_preseed d-i partman-auto/disk string "/dev/$2"
 						;;
 				esac
 				shift 2
