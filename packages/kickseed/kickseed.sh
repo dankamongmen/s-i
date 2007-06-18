@@ -10,6 +10,9 @@ fi
 if [ -z "$POSTSPOOL" ]; then
 	POSTSPOOL="$SPOOL/parse/post"
 fi
+if [ -z "$SUPPORTEDLOCALES" ]; then
+	SUPPORTEDLOCALES=/etc/SUPPORTED-short
+fi
 
 warn () {
 	ks_log "$@"
