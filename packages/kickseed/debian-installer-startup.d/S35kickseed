@@ -39,27 +39,8 @@ preseed_relative () {
 	fi
 }
 
-KSCFG=
-
-for item in $(cat /proc/cmdline); do
-	var="${item%%=*}"
-
-	if [ "$var" != ks ]; then
-		continue
-	fi
-
-	value="${item#*=}"
-	# TODO: only works for files in the initrd so far
-	case $value in
-		file:*)
-			KSCFG="${value#file:}"
-			;;
-		*)
-			logger -t kickseed "Kickstart location $value not supported"
-			;;
-	esac
-	break
-done
+KS="$(kickseed_cmdline /proc/cmdline)"
+KSCFG="$(kickseed_file "$KS")"
 
 if [ "$KSCFG" ]; then
 	logger -t kickseed "Reading kickstart file from $KSCFG"

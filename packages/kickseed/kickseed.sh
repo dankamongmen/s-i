@@ -203,3 +203,30 @@ kickseed_post () {
 		ks_run_script post /bin/sh "$CHROOTED" "$script"
 	done
 }
+
+# Find ks parameters in /proc/cmdline (or the test file of your choice).
+kickseed_cmdline () {
+	for item in $(cat "$1"); do
+		var="${item%%=*}"
+
+		if [ "$var" = ks ]; then
+			echo "${item#*=}"
+			break
+		fi
+	done
+}
+
+# Work out the filename corresponding to a ks parameter.
+kickseed_file () {
+	if [ -z "$1" ]; then
+		return
+	fi
+	case $1 in
+		file:*)
+			echo "${1#file:}"
+			;;
+		*)
+			logger -t kickseed "Kickstart location $1 not supported"
+			;;
+	esac
+}
