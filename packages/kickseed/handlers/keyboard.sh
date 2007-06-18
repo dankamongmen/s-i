@@ -5,5 +5,7 @@ keyboard_handler () {
 	ks_preseed d-i kbd-chooser/method 'select' \
 		'Select from full keyboard list'
 
-	ks_preseed d-i console-keymaps-at/keymap 'select' "$1"
+	for kbarch in acorn amiga at atari dec mac sun usb; do
+		ks_preseed d-i "console-keymaps-$kbarch/keymap" 'select' "$1"
+	done
 }
