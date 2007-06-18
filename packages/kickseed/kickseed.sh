@@ -183,6 +183,11 @@ kickseed () {
 		ks_preseed base-config base-config/package-selection string \
 			"$pattern"
 	fi
+
+	# Kickstart installations always run at critical priority.
+	ks_preseed d-i debconf/priority 'select' critical
+	# TODO: not in Debian
+	ks_preseed base-config base-config/priority 'select' critical
 }
 
 kickseed_post () {
