@@ -1,0 +1,19 @@
+#! /bin/sh -e
+
+HANDLERS=/lib/kickseed/handlers
+SPOOL=/var/spool/kickseed
+
+(. /lib/kickseed/kickseed.sh
+
+preseed () {
+	echo "$@" >> "$SPOOL/preseed.cfg"
+}
+
+# TODO: need to parse ks= to work out where to get configuration file
+kickseed < /ks.cfg)
+
+(. /lib/preseed/preseed.sh
+
+if [ -s "$SPOOL/preseed.cfg" ]; then
+	preseed_location "$SPOOL/preseed.cfg"
+fi)
