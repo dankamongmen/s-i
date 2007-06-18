@@ -41,7 +41,7 @@ db_progress STEP 1
 
 # Install popularity-contest but remove it if the user decides not to
 # participate.
-if in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -q -y -f install popularity-contest"; then
+if in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -o APT::Install-Recommends=false -q -y -f install popularity-contest"; then
 	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
 		in-target dpkg --purge popularity-contest
 	fi
