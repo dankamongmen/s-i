@@ -22,11 +22,13 @@ else
 fi
 
 set_question () {
-	db_register debian-installer/dummy "$1"
-	if [ "$2" ]; then
-		db_set "$1" "$2"
+	if ! db_fget "$1" seen || [ "$RET" = false ]; then
+		db_register debian-installer/dummy "$1"
+		if [ "$2" ]; then
+			db_set "$1" "$2"
+		fi
+		db_fset "$1" seen true
 	fi
-	db_fset "$1" seen true
 }
 
 if [ -x /var/lib/dpkg/info/netcfg.postinst ]; then
