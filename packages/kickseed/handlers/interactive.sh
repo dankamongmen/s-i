@@ -1,6 +1,6 @@
 #! /bin/sh
 
 interactive_handler () {
-	# requires debian-installer-utils 1.09, preseed 1.03
+	# requires di-utils 1.08ubuntu3, preseed-common 1.02ubuntu2
 	preseed d-i preseed/interactive boolean true
 }
