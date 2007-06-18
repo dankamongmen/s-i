@@ -37,6 +37,9 @@ if [ -x /var/lib/dpkg/info/netcfg.postinst ]; then
 	KSDEVICE="$(kickseed_cmdline /proc/cmdline ksdevice)"
 	if [ -z "$KSDEVICE" ] || [ "$KSDEVICE" = link ]; then
 		KSDEVICE=auto
+	elif [ "$KSDEVICE" = bootif ]; then
+		logger -t kickseed "ksdevice=bootif not supported yet; defaulting to first available interface"
+		KSDEVICE=auto
 	fi
 	set_question netcfg/choose_interface "$KSDEVICE"
 	set_question netcfg/get_hostname ubuntu
