@@ -73,7 +73,7 @@ kickseed () {
 
 	# Parse and execute %pre sections first.
 	SECTION=main
-	(cat "$1"; echo %final) | while read line; do
+	while read line; do
 		keyword="${line%% *}"
 		case $keyword in
 			%pre)
@@ -82,14 +82,7 @@ kickseed () {
 				> "$SPOOL/parse/pre.section"
 				continue
 				;;
-			%packages|%post|%final)
-				if [ -e "$SPOOL/parse/pre.section" ]; then
-					chmod +x "$SPOOL/parse/pre.section"
-					if ! ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"; then
-						warn "%pre script exited with error code $?"
-					fi
-					rm -f "$SPOOL/parse/pre.section"
-				fi
+			%packages|%post)
 				SECTION="${keyword#%}"
 				continue
 				;;
@@ -97,7 +90,14 @@ kickseed () {
 		if [ "$SECTION" = pre ]; then
 			echo "$line" >> "$SPOOL/parse/pre.section"
 		fi
-	done
+	done < "$1"
+	if [ -e "$SPOOL/parse/pre.section" ]; then
+		chmod +x "$SPOOL/parse/pre.section"
+		if ! ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"; then
+			warn "%pre script exited with error code $?"
+		fi
+		rm -f "$SPOOL/parse/pre.section"
+	fi
 
 	# Parse all other sections.
 	SECTION=main
