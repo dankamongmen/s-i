@@ -222,8 +222,17 @@ kickseed_file () {
 		return
 	fi
 	case $1 in
-		file:*)
+		cdrom:/*)
+			echo "/cdrom${1#cdrom:}"
+			;;
+		file:/*)
 			echo "${1#file:}"
+			;;
+		floppy)
+			echo /floppy/ks.cfg
+			;;
+		floppy:/*)
+			echo "/floppy${1#floppy:}"
 			;;
 		*)
 			logger -t kickseed "Kickstart location $1 not supported"

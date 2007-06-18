@@ -42,12 +42,17 @@ preseed_relative () {
 KS="$(kickseed_cmdline /proc/cmdline)"
 KSCFG="$(kickseed_file "$KS")"
 
-if [ "$KSCFG" ]; then
-	logger -t kickseed "Reading kickstart file from $KSCFG"
+case $KSCFG in
+	''|/cdrom/*|/floppy/*)
+		# not handled in initrd (yet?)
+		: ;;
+	*)
+		logger -t kickseed "Reading kickstart file from $KSCFG"
 
-	kickseed "$KSCFG"
+		kickseed "$KSCFG"
 
-	if [ -s "$SPOOL/preseed.cfg" ]; then
-		preseed_location "$SPOOL/preseed.cfg"
-	fi
-fi
+		if [ -s "$SPOOL/preseed.cfg" ]; then
+			preseed_location "$SPOOL/preseed.cfg"
+		fi
+		;;
+esac
