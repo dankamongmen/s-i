@@ -24,8 +24,6 @@ ks_run_script () {
 	"$INTERPRETER" "$SCRIPT"
 }
 
-usedfloppy=
-
 # Used by preseed function.
 preseed_fetch () {
 	ln -sf "$1" "$2"
@@ -39,26 +37,36 @@ preseed_relative () {
 	fi
 }
 
-KS="$(kickseed_cmdline /proc/cmdline)"
-KSCFG="$(kickseed_file "$KS")"
-
-case $KSCFG in
-	/floppy/*)
-		mountfloppy || true
-		trap 'umount /floppy || true' EXIT HUP INT QUIT TERM
-		;;
-esac
-
-case $KSCFG in
-	/floppy/*|/cdrom/*)
-		logger -t kickseed "Reading kickstart file from $KSCFG"
-
-		kickseed "$KSCFG"
-
-		if [ -s "$SPOOL/preseed.cfg" ]; then
-			preseed_location "$SPOOL/preseed.cfg"
+fetch_url () {
+	local url="$1"
+	local file="$2"
+	iters=0
+	while [ $iters -lt 3 ]; do
+		# TODO proxy support? Would it be useful?
+		# TODO add progress bar
+		if wget -q "$url" -O "$file"; then
+			return 0
 		fi
-		;;
+		iters=$(($iters + 1))
+	done
+	return 1
+}
+
+KS="$(kickseed_cmdline /proc/cmdline)"
+
+case $KS in
+	http://*/*)
+		logger -t kickseed "Downloading kickstart file from $KS"
+		KSCFG="$(kickseed_file "$KS")"
+		if fetch_url "$KS" "$KSCFG"; then
+			logger -t kickseed "Reading kickstart file from $KSCFG"
+			kickseed "$KSCFG"
+			if [ -s "$SPOOL/preseed.cfg" ]; then
+				preseed_location "$SPOOL/preseed.cfg"
+			fi
+		else
+			logger -t kickseed "... failed"
+		fi
 	*)
 		# other cases handled elsewhere
 		: ;;

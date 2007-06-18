@@ -241,6 +241,11 @@ kickseed_file () {
 		floppy:/*)
 			echo "/floppy${1#floppy:}"
 			;;
+		http://*/*)
+			spoolpath="$SPOOL/http/${1#http://}"
+			mkdir -p "${spoolpath%/*}"
+			echo "$spoolpath"
+			;;
 		*)
 			logger -t kickseed "Kickstart location $1 not supported"
 			;;
