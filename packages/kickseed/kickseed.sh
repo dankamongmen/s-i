@@ -74,11 +74,11 @@ kickseed () {
 	# Parse and execute %pre sections first.
 	SECTION=main
 	while read line; do
-		keyword="${line%% *}"
+		keyword="${line%%[ 	]*}"
 		case $keyword in
 			%pre)
 				SECTION=pre
-				pre_handler_section "${line#* }"
+				pre_handler_section "${line#*[ 	]}"
 				> "$SPOOL/parse/pre.section"
 				continue
 				;;
@@ -102,11 +102,11 @@ kickseed () {
 	# Parse all other sections.
 	SECTION=main
 	(while read line; do
-		keyword="${line%% *}"
+		keyword="${line%%[ 	]*}"
 		# Deal with %include directives.
 		if [ "$keyword" = '%include' ]; then
-			rest="${line#* }"
-			arg="${rest%% *}"
+			rest="${line#*[ 	]}"
+			arg="${rest%%[ 	]*}"
 			cat "$arg"
 		elif [ "$keyword" = '%final' ]; then
 			die "%final reserved for internal use"
@@ -115,7 +115,7 @@ kickseed () {
 		fi
 	done < "$1"; echo %final) | while read line; do
 		# Work out the section.
-		keyword="${line%% *}"
+		keyword="${line%%[ 	]*}"
 		if [ "$keyword" = '%packages' ]; then
 			save_post_script
 			SECTION=packages
@@ -126,7 +126,7 @@ kickseed () {
 			continue
 		elif [ "$keyword" = '%post' ]; then
 			save_post_script
-			post_handler_section "${line#* }"
+			post_handler_section "${line#*[ 	]}"
 			SECTION=post
 			> "$SPOOL/parse/post.section"
 			continue
@@ -166,7 +166,7 @@ kickseed () {
 			fi
 
 			if [ "$keyword" = '@' ]; then
-				group="${line#* }"
+				group="${line#*[ 	]}"
 				# TODO: temporary hack to make at least the
 				# standard desktop work
 				case $group in
