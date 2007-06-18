@@ -3,6 +3,7 @@ langsupport --default=en_GB de_DE
 keyboard uk
 auth --enablemd5 --enableshadow
 bootloader --location=mbr
+firewall --disabled
 interactive
 lilo
 %include tests/included.ks
