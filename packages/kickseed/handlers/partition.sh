@@ -66,7 +66,7 @@ partition_handler () {
 	mountpoint="$1"
 
 	if [ "$mountpoint" = swap ]; then
-		filesystem=swap
+		filesystem=linux-swap
 		mountpoint=
 	elif [ "$fstype" ]; then
 		filesystem="$fstype"
@@ -74,7 +74,7 @@ partition_handler () {
 		filesystem=ext3
 	fi
 
-	if [ "$filesystem" = swap ] && [ "$recommended" ]; then
+	if [ "$filesystem" = linux-swap ] && [ "$recommended" ]; then
 		size=96
 		priority=512
 		maxsize=300%
@@ -101,7 +101,7 @@ partition_handler () {
 		partition_recipe="$partition_recipe \$primary{ }"
 	fi
 
-	if [ "$filesystem" = swap ]; then
+	if [ "$filesystem" = linux-swap ]; then
 		partition_recipe="$partition_recipe method{ swap }"
 	elif [ "$format" ]; then
 		partition_recipe="$partition_recipe method{ format }"
@@ -113,7 +113,7 @@ partition_handler () {
 		partition_recipe="$partition_recipe format{ }"
 	fi
 
-	if [ "$filesystem" != swap ]; then
+	if [ "$filesystem" != linux-swap ]; then
 		partition_recipe="$partition_recipe use_filesystem{ }"
 		partition_recipe="$partition_recipe filesystem{ $filesystem }"
 	fi
