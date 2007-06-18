@@ -1,6 +1,7 @@
 #! /bin/sh
 
 skipx_handler () {
-	# TODO: how do we do this? just don't start gdm?
-	die "skipx not supported yet"
+	# Ubuntu generally avoids showing an X configuration interface
+	# already, so just don't start the display manager.
+	ks_preseed base-config base-config/start-display-manager boolean false
 }
