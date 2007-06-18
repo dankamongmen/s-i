@@ -7,6 +7,9 @@ fi
 if [ -z "$SPOOL" ]; then
 	SPOOL=/var/spool/kickseed
 fi
+if [ -z "$POSTSPOOL" ]; then
+	POSTSPOOL="$SPOOL/parse/post"
+fi
 
 warn () {
 	echo "$@" >&2
@@ -40,16 +43,16 @@ register_final () {
 # Save %post script for later execution.
 save_post_script () {
 	if [ -e "$SPOOL/parse/post.section" ]; then
-		mkdir -p "$SPOOL/parse/post"
+		mkdir -p "$POSTSPOOL"
 		i=0
-		while [ -e "$SPOOL/parse/post/$i.script" ]; do
+		while [ -e "$POSTSPOOL/$i.script" ]; do
 			i="$(($i + 1))"
 		done
-		mv "$SPOOL/parse/post.section" "$SPOOL/parse/post/$i.script"
+		mv "$SPOOL/parse/post.section" "$POSTSPOOL/$i.script"
 		if [ "$post_chroot" = 1 ]; then
-			touch "$SPOOL/parse/post/$i.chroot"
+			touch "$POSTSPOOL/$i.chroot"
 		else
-			rm -f "$SPOOL/parse/post/$i.chroot"
+			rm -f "$POSTSPOOL/$i.chroot"
 		fi
 	fi
 }
@@ -210,7 +213,7 @@ kickseed () {
 
 kickseed_post () {
 	# TODO: sort numerically
-	for script in "$SPOOL/parse/post"/*.script; do
+	for script in "$POSTSPOOL"/*.script; do
 		if [ ! -f "$script" ]; then
 			continue
 		fi
