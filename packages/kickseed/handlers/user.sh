@@ -2,6 +2,8 @@
 
 user_handler () {
 	makeuser=1
+	crypted=
+	password=
 
 	eval set -- "$(getopt -o '' -l disabled,fullname:,iscrypted,password: -- "$@")" || { warn_getopt user; return; }
 	while :; do
@@ -15,13 +17,11 @@ user_handler () {
 				shift 2
 				;;
 			--iscrypted)
-				# requires passwd 1:4.0.3-30.7ubuntu7
-				ks_preseed passwd passwd/user-password-crypted boolean true
+				crypted=1
 				shift
 				;;
 			--password)
-				ks_preseed passwd passwd/user-password password "$2"
-				ks_preseed passwd passwd/user-password-again password "$2"
+				password="$2"
 				shift 2
 				;;
 			--)	shift; break ;;
@@ -37,6 +37,16 @@ user_handler () {
 
 		ks_preseed passwd passwd/make-user boolean true
 		ks_preseed passwd passwd/username string "$1"
+
+		if [ "$password" ]; then
+			if [ "$crypted" ]; then
+				# requires passwd >= 1:4.0.13-5
+				ks_preseed passwd passwd/user-password-crypted password "$password"
+			else
+				ks_preseed passwd passwd/user-password password "$password"
+				ks_preseed passwd passwd/user-password-again password "$password"
+			fi
+		fi
 	else
 		ks_preseed passwd passwd/make-user boolean false
 	fi
