@@ -6,16 +6,16 @@
 . /usr/share/debconf/confmodule
 
 PACKAGES='ext2-modules vfat-modules'
-if [ ! -x /var/lib/dpkg/info/hw-detect-full.postinst ]; then
-	PACKAGES="$PACKAGES hw-detect-full"
+if [ ! -x /var/lib/dpkg/info/disk-detect.postinst ]; then
+	PACKAGES="$PACKAGES disk-detect"
 fi
 
 /lib/kickseed/kickseed-anna $PACKAGES
 
-if [ -x /var/lib/dpkg/info/hw-detect-full.postinst ]; then
-	/lib/kickseed/kickseed-udpkg hw-detect-full
+if [ -x /var/lib/dpkg/info/disk-detect.postinst ]; then
+	/lib/kickseed/kickseed-udpkg disk-detect
 else
-	logger -t kickseed "hw-detect-full cannot be installed"
+	logger -t kickseed "disk-detect cannot be installed"
 	exit 1
 fi
 
