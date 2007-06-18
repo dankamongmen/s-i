@@ -171,16 +171,16 @@ kickseed () {
 				# standard desktop work
 				case $group in
 					Ubuntu\ Standard)
-						echo "~tubuntu-standard" >> "$SPOOL/parse/$SECTION.section"
+						echo '~t^ubuntu-standard$' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Kubuntu\ Standard)
-						echo "~tkubuntu-standard" >> "$SPOOL/parse/$SECTION.section"
+						echo '~t^kubuntu-standard$' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Ubuntu\ Desktop)
-						echo "~tubuntu-desktop" >> "$SPOOL/parse/$SECTION.section"
+						echo '~t^ubuntu-desktop$' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Kubuntu\ Desktop)
-						echo "~tkubuntu-desktop" >> "$SPOOL/parse/$SECTION.section"
+						echo '~t^kubuntu-desktop$' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					*\ *)
 						warn "Package group '$group' not implemented"
@@ -190,11 +190,11 @@ kickseed () {
 						# is assumed to be the name
 						# of a task; useful for
 						# customisers.
-						echo "~t$group" >> "$SPOOL/parse/$SECTION.section"
+						echo "~t^$group\$" >> "$SPOOL/parse/$SECTION.section"
 						;;
 				esac
 			else
-				echo "$line" >> "$SPOOL/parse/$SECTION.section"
+				echo "^$line\$" >> "$SPOOL/parse/$SECTION.section"
 			fi
 		elif [ "$SECTION" = pre ]; then
 			# already handled
