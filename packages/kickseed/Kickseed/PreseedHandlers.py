@@ -109,3 +109,9 @@ class PreseedHandlers:
 
     def lang(self, args):
         self.preseed('d-i', 'preseed/locale', 'string', args[0])
+
+    def langsupport(self, args):
+        # TODO REQUIRED <languages> [--default=]
+        # preseed/localechooser changes needed to allow different
+        # installation and installed languages
+        raise UnimplementedCommand, 'langsupport not supported yet'
