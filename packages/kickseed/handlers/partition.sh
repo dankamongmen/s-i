@@ -8,6 +8,7 @@ partition_handler () {
 		partition_recipe='Kickstart-supplied partitioning scheme :'
 	fi
 
+	recommended=
 	size=
 	grow=
 	maxsize=
@@ -15,9 +16,16 @@ partition_handler () {
 	asprimary=
 	fstype=
 
-	eval set -- "$(getopt -o '' -l size:,grow,maxsize:,noformat,onpart:,usepart:,ondisk:,ondrive:,asprimary,fstype:,start:,end: -- "$@")" || { warn_getopt partition; return; }
+	eval set -- "$(getopt -o '' -l recommended,size:,grow,maxsize:,noformat,onpart:,usepart:,ondisk:,ondrive:,asprimary,fstype:,start:,end: -- "$@")" || { warn_getopt partition; return; }
 	while :; do
 		case $1 in
+			--recommended)
+				# Apparently only used for swap, but
+				# Anaconda doesn't error if you try to use
+				# it for something else, so we won't either.
+				recommended=1
+				shift
+				;;
 			--size)
 				size="$2"
 				shift 2
@@ -57,11 +65,6 @@ partition_handler () {
 	fi
 	mountpoint="$1"
 
-	if [ -z "$size" ]; then
-		warn "partition command requires a size"
-		return
-	fi
-
 	if [ "$mountpoint" = swap ]; then
 		filesystem=swap
 		mountpoint=
@@ -71,15 +74,26 @@ partition_handler () {
 		filesystem=ext3
 	fi
 
-	if [ "$grow" ]; then
+	if [ "$filesystem" = swap ] && [ "$recommended" ]; then
+		size=96
+		priority=512
+		maxsize=300%
 		partition_leave_free_space=
-		if [ -z "$maxsize" ]; then
-			maxsize=$((1024 * 1024 * 1024))
-		fi
-		priority="$maxsize"
 	else
-		maxsize="$size"
-		priority="$size"
+		if [ -z "$size" ]; then
+			warn "partition command requires a size"
+			return
+		fi
+		if [ "$grow" ]; then
+			partition_leave_free_space=
+			if [ -z "$maxsize" ]; then
+				maxsize=$((1024 * 1024 * 1024))
+			fi
+			priority="$maxsize"
+		else
+			maxsize="$size"
+			priority="$size"
+		fi
 	fi
 	partition_recipe="$partition_recipe $size $priority $maxsize $filesystem"
 
