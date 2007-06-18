@@ -109,16 +109,21 @@ class PreseedHandlers:
 
     def interactive(self, args):
         # requires debian-installer-utils 1.09, preseed 1.03
+        # TODO initrd-preseed
         self._preseed('d-i', 'preseed/interactive', 'boolean', 'true')
 
     def keyboard(self, args):
+        # TODO non-AT
+        # TODO initrd-preseed
         self._preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
 
     def lang(self, args):
+        # TODO initrd-preseed
         self._preseed('d-i', 'preseed/locale', 'string', args[0])
 
     def langsupport(self, args):
         # TODO REQUIRED <languages> [--default=]
+        # TODO initrd-preseed
         # preseed/localechooser changes needed to allow different
         # installation and installed languages
         raise UnimplementedCommand, 'langsupport not supported yet'
@@ -306,3 +311,13 @@ class PreseedHandlers:
     def skipx(self, args):
         # TODO how do we do this? just don't start gdm?
         raise UnimplementedCommand, 'skipx not supported yet'
+
+    def text(self, args):
+        # TODO need to set DEBIAN_FRONTEND=text; how?
+        raise UnimplementedCommand, 'text not supported yet'
+
+    def timezone(self, args):
+        # TODO REQUIRED [--utc] <timezone>
+        # possible to implement as it stands, but very painful; much easier
+        # to fix tzsetup to look at a question in zone.tab format.
+        raise UnimplementedCommand, 'timezone not supported yet'
