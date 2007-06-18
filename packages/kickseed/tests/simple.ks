@@ -25,3 +25,8 @@ echo "It does nothing very interesting."
 
 echo "This is a %post script."
 echo "It does nothing very interesting, in a chroot."
+%post --nochroot
+#! /bin/sh
+
+echo "This is a %post script."
+echo "It does nothing very interesting, outside a chroot."

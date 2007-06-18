@@ -26,17 +26,20 @@ register_final () {
 	final_handlers="$final_handlers $1"
 }
 
-# Save a script for later execution.
-save_script () {
-	TYPE="$1"
-
-	if [ -e "$SPOOL/$TYPE.section" ]; then
-		mkdir -p "$SPOOL/$TYPE"
+# Save %post script for later execution.
+save_post_script () {
+	if [ -e "$SPOOL/post.section" ]; then
+		mkdir -p "$SPOOL/post"
 		i=0
-		while [ -e "$SPOOL/$TYPE/$i.script" ]; do
+		while [ -e "$SPOOL/post/$i.script" ]; do
 			i="$(($i + 1))"
 		done
-		mv "$SPOOL/$TYPE.section" "$SPOOL/$TYPE/$i.script"
+		mv "$SPOOL/post.section" "$SPOOL/post/$i.script"
+		if [ "$post_chroot" = 1 ]; then
+			touch "$SPOOL/post/$i.chroot"
+		else
+			rm -f "$SPOOL/post/$i.chroot"
+		fi
 	fi
 }
 
@@ -60,7 +63,7 @@ kickseed () {
 				;;
 			%packages|%post|%final)
 				if [ -e "$SPOOL/pre.section" ]; then
-					ks_run_script pre /bin/sh "$SPOOL/pre.section"
+					ks_run_script pre /bin/sh 0 "$SPOOL/pre.section"
 					rm -f "$SPOOL/pre.section"
 				fi
 				SECTION="${keyword#%}"
@@ -90,20 +93,21 @@ kickseed () {
 		# Work out the section.
 		keyword="${line%% *}"
 		if [ "$keyword" = '%packages' ]; then
-			save_script post
+			save_post_script
 			SECTION=packages
 			continue
 		elif [ "$keyword" = '%pre' ]; then
-			save_script post
+			save_post_script
 			SECTION=pre
 			continue
 		elif [ "$keyword" = '%post' ]; then
-			save_script post
+			save_post_script
+			post_handler_section "${line#* }"
 			SECTION=post
 			> "$SPOOL/post.section"
 			continue
 		elif [ "$keyword" = '%final' ]; then
-			save_script post
+			save_post_script
 			for handler in $final_handlers; do
 				$handler
 			done

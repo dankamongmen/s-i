@@ -12,8 +12,13 @@ ks_preseed () {
 }
 
 ks_run_script () {
-	echo "Would run $1 script $3 using interpreter $2:"
-	cat "$3"
+	TYPE="$1"
+	INTERPRETER="$2"
+	CHROOTED="$3"
+	SCRIPT="$4"
+
+	echo "Would run $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
+	cat "$SCRIPT"
 	echo
 }
 
@@ -25,7 +30,11 @@ sort "$SPOOL/test-output"
 echo
 # TODO: sort numerically
 for script in "$SPOOL/post"/*.script; do
-	ks_run_script post /bin/sh "$script"
+	CHROOTED=0
+	if [ -e "${script%.script}.chroot" ]; then
+		CHROOTED=1
+	fi
+	ks_run_script post /bin/sh "$CHROOTED" "$script"
 done
 
 exit $RET
