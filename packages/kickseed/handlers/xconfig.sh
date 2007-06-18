@@ -47,10 +47,21 @@ xconfig_handler () {
 				shift
 				;;
 			--resolution)
-				# TODO: ideally we'd just pass the
-				# resolution and let X work out the best
-				# refresh rate
-				ks_preseed xserver-xorg xserver-xorg/config/monitor/mode-list 'select' "$2 @ 60Hz"
+				case $2 in
+					640x480)
+						modes='640x480'
+						;;
+					800x600)
+						modes='800x600, 640x480'
+						;;
+					1024x768)
+						modes='1024x768, 800x600, 640x480'
+						;;
+					*)
+						modes="$2, 1024x768, 800x600, 640x480"
+						;;
+				esac
+				ks_preseed xserver-xorg xserver-xorg/config/display/modes multiselect "$modes"
 				shift 2
 				;;
 			--depth)

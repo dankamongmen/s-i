@@ -16,6 +16,7 @@ rootpw rootme
 timezone --utc America/New_York
 url --url http://archive.ubuntu.com/ubuntu
 user cjwatson --fullname="Colin Watson" --password="foobar"
+xconfig --resolution 1280x1024
 
 %packages
 openssh-server
