@@ -10,9 +10,14 @@ ks_run_script () {
 
 	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
 	if [ "$CHROOTED" = 1 ]; then
-		chroot /target "$INTERPRETER" "$SCRIPT"
+		cp "$SCRIPT" /target/tmp/ks-script
+		chmod 700 /target/tmp/ks-script
+		chroot /target "$INTERPRETER" /tmp/ks-script \
+			>/var/log/messages 2>&1
 	else
-		"$INTERPRETER" "$SCRIPT"
+		cp "$SCRIPT" /tmp/ks-script
+		chmod 700 /tmp/ks-script
+		"$INTERPRETER" /tmp/ks-script >/var/log/messages 2>&1
 	fi
 }
 
