@@ -149,7 +149,7 @@ kickseed () {
 		# Handle %packages.
 		# TODO: doesn't allow removal of packages from ubuntu-base
 
-		packages="$(< "$SPOOL/packages.section")"
+		packages="$(cat "$SPOOL/packages.section")"
 
 		positives=.
 		negatives=.
