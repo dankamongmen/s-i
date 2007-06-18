@@ -1,10 +1,15 @@
 #! /bin/sh
 
 clearpart_handler () {
-	# TODO: --linux, --all
-	eval set -- "$(getopt -o '' -l drives:,initlabel -- "$@")" || die_getopt clearpart
+	eval set -- "$(getopt -o '' -l linux,all,drives:,initlabel -- "$@")" || die_getopt clearpart
 	while :; do
 		case $1 in
+			--linux)
+				die "clearing all Linux partitions not supported yet"
+				;;
+			--all)
+				die "clearing all partitions not supported yet"
+				;;
 			--drives)
 				case $2 in
 					*,*)
