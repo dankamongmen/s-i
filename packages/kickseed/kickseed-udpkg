@@ -1,0 +1,16 @@
+#! /bin/sh
+# Configure a single package earlier than usual.
+# Cloned-and-hacked from /lib/debian-installer.d/S70menu-linux.
+
+export KICKSEED_UDPKG_PACKAGE="$1"
+
+bterm=/usr/bin/bterm
+font=/unifont.bgf
+
+if [ -x "$bterm" ] && [ -e "$font" ] && \
+   [ "$TERM_UTF8" ] && [ "$TERM_FRAMEBUFFER" ]; then
+	TERM=bterm MENU=/lib/kickseed/kickseed-udpkg-helper \
+		$bterm -f $font -l $LANG /lib/debian-installer/menu
+else
+	MENU=/lib/kickseed/kickseed-udpkg-helper /lib/debian-installer/menu
+fi
