@@ -8,7 +8,7 @@ class PreseedHandlers:
     def __init__(self):
         self.preseeds = []
 
-    def preseed(self, qpackage, qname, qtype, qanswer):
+    def _preseed(self, qpackage, qname, qtype, qanswer):
         self.preseeds.append((qpackage, qname, qtype, qanswer))
 
     def auth(self, args):
@@ -22,10 +22,10 @@ class PreseedHandlers:
                            'enablecache'])[0]
         for opt, value in opts:
             if opt == '--enablemd5':
-                self.preseed('passwd', 'passwd/md5', 'boolean', 'true')
+                self._preseed('passwd', 'passwd/md5', 'boolean', 'true')
             elif opt == '--useshadow' or opt == '--enableshadow':
                 # TODO: this is true by default already
-                self.preseed('passwd', 'passwd/shadow', 'boolean', 'true')
+                self._preseed('passwd', 'passwd/shadow', 'boolean', 'true')
             elif opt == '--enablecache':
                 raise UnimplementedArgument, 'nscd not supported'
             else:
@@ -41,13 +41,16 @@ class PreseedHandlers:
             if opt == '--location':
                 if value == 'mbr':
                     # TODO: not always hd0; lilo
-                    self.preseed('d-i', 'grub-installer/bootdev', 'string', '(hd0)')
+                    self._preseed('d-i', 'grub-installer/bootdev', 'string',
+                                  '(hd0)')
                 elif value == 'partition':
                     # TODO: lilo
-                    self.preseed('d-i', 'grub-installer/bootdev', 'string', '(hd0,1)')
+                    self._preseed('d-i', 'grub-installer/bootdev', 'string',
+                                  '(hd0,1)')
                 elif value == 'none':
                     # TODO need lilo-installer/skip too
-                    self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
+                    self._preseed('d-i', 'grub-installer/skip', 'boolean',
+                                  'true')
                 else:
                     raise UnimplementedArgument, value
             elif opt == 'useLilo':
@@ -58,7 +61,7 @@ class PreseedHandlers:
                 raise UnimplementedArgument, opt
 
         if useLilo:
-            self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
+            self._preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
 
     def clearpart(self, args):
         # TODO --linux, --all
@@ -69,9 +72,9 @@ class PreseedHandlers:
                 if len(drives) > 1:
                     raise UnimplementedArgument, 'clearing multiple drives not supported'
                 else:
-                    self.preseed('d-i', 'partman-auto/disk', 'string', '/dev/%s' % drives[0])
+                    self._preseed('d-i', 'partman-auto/disk', 'string', '/dev/%s' % drives[0])
             elif opt == '--initlabel':
-                self.preseed('d-i', 'partman-auto/confirm_write_new_label', 'boolean', 'true')
+                self._preseed('d-i', 'partman-auto/confirm_write_new_label', 'boolean', 'true')
             else:
                 raise UnimplementedArgument, opt
 
@@ -105,13 +108,13 @@ class PreseedHandlers:
 
     def interactive(self, args):
         # requires debian-installer-utils 1.09, preseed 1.03
-        self.preseed('d-i', 'preseed/interactive', 'boolean', 'true')
+        self._preseed('d-i', 'preseed/interactive', 'boolean', 'true')
 
     def keyboard(self, args):
-        self.preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
+        self._preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
 
     def lang(self, args):
-        self.preseed('d-i', 'preseed/locale', 'string', args[0])
+        self._preseed('d-i', 'preseed/locale', 'string', args[0])
 
     def langsupport(self, args):
         # TODO REQUIRED <languages> [--default=]
@@ -139,13 +142,13 @@ class PreseedHandlers:
                                        ['--device=', '--emulthree'])[0]
         for opt, value in opts:
             if opt == '--device':
-                self.preseed('xserver-xorg',
-                             'xserver-xorg/config/inputdevice/mouse/port',
-                             'select', '/dev/%s' % value)
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/inputdevice/mouse/port',
+                              'select', '/dev/%s' % value)
             elif opt == '--emulthree':
-                self.preseed('xserver-xorg',
-                             'xserver-xorg/config/inputdevice/mouse/emulate3buttons',
-                             'boolean', 'true')
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/inputdevice/mouse/emulate3buttons',
+                              'boolean', 'true')
             else:
                 raise UnimplementedArgument, opt
 
