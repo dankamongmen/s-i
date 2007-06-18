@@ -83,7 +83,9 @@ kickseed () {
 				;;
 			%packages|%post|%final)
 				if [ -e "$SPOOL/parse/pre.section" ]; then
-					ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"
+					if ! ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"; then
+						warn "%pre script exited with error code $?"
+					fi
 					rm -f "$SPOOL/parse/pre.section"
 				fi
 				SECTION="${keyword#%}"
@@ -261,6 +263,8 @@ kickseed_post () {
 		if [ -e "${script%.script}.chroot" ]; then
 			CHROOTED=1
 		fi
-		ks_run_script post /bin/sh "$CHROOTED" "$script"
+		if ! ks_run_script post /bin/sh "$CHROOTED" "$script"; then
+			warn "%post script exited with error code $?"
+		fi
 	done
 }
