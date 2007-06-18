@@ -25,5 +25,5 @@ timezone_handler () {
 	else
 		ks_preseed base-config tzconfig/gmt boolean false
 	fi
-	ks_preseed base-config tzconfig/preseed_zone "$1"
+	ks_preseed base-config tzconfig/preseed_zone string "$1"
 }
