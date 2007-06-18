@@ -10,18 +10,15 @@ ks_preseed () {
 	echo "$@" >> "$SPOOL/preseed.cfg"
 }
 
+# No support for chrooting here, as /target isn't available yet and %pre
+# scripts don't need it.
 ks_run_script () {
 	TYPE="$1"
 	INTERPRETER="$2"
-	CHROOTED="$3"
 	SCRIPT="$4"
 
-	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
-	if [ "$CHROOTED" = 1 ]; then
-		chroot /target "$INTERPRETER" "$SCRIPT"
-	else
-		"$INTERPRETER" "$SCRIPT"
-	fi
+	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER:"
+	"$INTERPRETER" "$SCRIPT"
 }
 
 # TODO: need to parse ks= to work out where to get configuration file
