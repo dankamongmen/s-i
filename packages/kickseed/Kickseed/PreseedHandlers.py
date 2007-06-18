@@ -289,3 +289,20 @@ class PreseedHandlers:
         recipe += ' .'
 
         self._preseed('d-i', 'partman-auto/expert_recipe', 'string', recipe)
+
+    def raid(self, args):
+        # possible but complex
+        raise UnimplementedCommand, 'raid not supported yet'
+
+    def reboot(self, args):
+        self._preseed('d-i', 'prebaseconfig/reboot_in_progress', 'note', '')
+
+    def rootpw(self, args):
+        # TODO REQUIRED [--iscrypted] <password>
+        # requires password preseeding support in shadow (security
+        # considerations), or password question in first stage
+        raise UnimplementedCommand, 'rootpw not supported yet'
+
+    def skipx(self, args):
+        # TODO how do we do this? just don't start gdm?
+        raise UnimplementedCommand, 'skipx not supported yet'
