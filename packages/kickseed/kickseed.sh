@@ -35,17 +35,17 @@ register_final () {
 
 # Save %post script for later execution.
 save_post_script () {
-	if [ -e "$SPOOL/post.section" ]; then
-		mkdir -p "$SPOOL/post"
+	if [ -e "$SPOOL/parse/post.section" ]; then
+		mkdir -p "$SPOOL/parse/post"
 		i=0
-		while [ -e "$SPOOL/post/$i.script" ]; do
+		while [ -e "$SPOOL/parse/post/$i.script" ]; do
 			i="$(($i + 1))"
 		done
-		mv "$SPOOL/post.section" "$SPOOL/post/$i.script"
+		mv "$SPOOL/parse/post.section" "$SPOOL/parse/post/$i.script"
 		if [ "$post_chroot" = 1 ]; then
-			touch "$SPOOL/post/$i.chroot"
+			touch "$SPOOL/parse/post/$i.chroot"
 		else
-			rm -f "$SPOOL/post/$i.chroot"
+			rm -f "$SPOOL/parse/post/$i.chroot"
 		fi
 	fi
 }
@@ -57,7 +57,8 @@ done
 
 # Expects kickstart file as $1.
 kickseed () {
-	rm -rf "$SPOOL"/*
+	rm -rf "$SPOOL/parse"
+	mkdir -p "$SPOOL/parse"
 
 	# Parse and execute %pre sections first.
 	SECTION=main
@@ -67,20 +68,20 @@ kickseed () {
 			%pre)
 				SECTION=pre
 				pre_handler_section "${line#* }"
-				> "$SPOOL/pre.section"
+				> "$SPOOL/parse/pre.section"
 				continue
 				;;
 			%packages|%post|%final)
-				if [ -e "$SPOOL/pre.section" ]; then
-					ks_run_script pre /bin/sh 0 "$SPOOL/pre.section"
-					rm -f "$SPOOL/pre.section"
+				if [ -e "$SPOOL/parse/pre.section" ]; then
+					ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"
+					rm -f "$SPOOL/parse/pre.section"
 				fi
 				SECTION="${keyword#%}"
 				continue
 				;;
 		esac
 		if [ "$SECTION" = pre ]; then
-			echo "$line" >> "$SPOOL/pre.section"
+			echo "$line" >> "$SPOOL/parse/pre.section"
 		fi
 	done
 
@@ -113,7 +114,7 @@ kickseed () {
 			save_post_script
 			post_handler_section "${line#* }"
 			SECTION=post
-			> "$SPOOL/post.section"
+			> "$SPOOL/parse/post.section"
 			continue
 		elif [ "$keyword" = '%final' ]; then
 			save_post_script
@@ -145,20 +146,20 @@ kickseed () {
 				die "Package groups not implemented"
 			fi
 
-			echo "$line" >> "$SPOOL/$SECTION.section"
+			echo "$line" >> "$SPOOL/parse/$SECTION.section"
 		elif [ "$SECTION" = pre ]; then
 			# already handled
 			continue
 		else
-			echo "$line" >> "$SPOOL/$SECTION.section"
+			echo "$line" >> "$SPOOL/parse/$SECTION.section"
 		fi
 	done || exit $?
 
-	if [ -s "$SPOOL/packages.section" ]; then
+	if [ -s "$SPOOL/parse/packages.section" ]; then
 		# Handle %packages.
 		# TODO: doesn't allow removal of packages from ubuntu-base
 
-		packages="$(cat "$SPOOL/packages.section")"
+		packages="$(cat "$SPOOL/parse/packages.section")"
 
 		positives=.
 		negatives=.
@@ -199,7 +200,7 @@ kickseed () {
 
 kickseed_post () {
 	# TODO: sort numerically
-	for script in "$SPOOL/post"/*.script; do
+	for script in "$SPOOL/parse/post"/*.script; do
 		if [ ! -f "$script" ]; then
 			continue
 		fi
@@ -242,7 +243,7 @@ kickseed_file () {
 			echo "/floppy${1#floppy:}"
 			;;
 		http://*/*)
-			spoolpath="$SPOOL/http/${1#http://}"
+			spoolpath="$SPOOL/fetch/http/${1#http://}"
 			mkdir -p "${spoolpath%/*}"
 			echo "$spoolpath"
 			;;
