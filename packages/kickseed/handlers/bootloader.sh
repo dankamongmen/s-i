@@ -3,8 +3,8 @@
 bootloader_handler_common () {
 	useLilo="$1"
 	shift
-	# TODO --password=, --md5pass=, --linear, --nolinear, --lba32
-	eval set -- "$(getopt -o '' -l location:,useLilo,upgrade -- "$@")" || { warn_getopt bootloader; return; }
+	# TODO --linear, --nolinear, --lba32
+	eval set -- "$(getopt -o '' -l location:,password:,md5pass:,useLilo,upgrade -- "$@")" || { warn_getopt bootloader; return; }
 	while :; do
 		case $1 in
 			--location)
@@ -25,6 +25,17 @@ bootloader_handler_common () {
 						warn_bad_arg bootloader location "$2"
 						;;
 				esac
+				shift 2
+				;;
+			--password)
+				# requires grub-installer 1.09
+				ks_preseed d-i grub-installer/password password "$2"
+				shift 2
+				;;
+			--md5pass)
+				# requires grub-installer 1.09
+				ks_preseed d-i grub-installer/password password "$2"
+				ks_preseed d-i grub-installer/password-crypted boolean true
 				shift 2
 				;;
 			--useLilo)
