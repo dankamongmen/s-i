@@ -41,7 +41,7 @@ rootpw_handler () {
 		fi
 	else
 		# requires user-setup 1.1
-		ks_preseed d-i passwd/root-login false
+		ks_preseed d-i passwd/root-login boolean false
 		set -- ''
 	fi
 }
