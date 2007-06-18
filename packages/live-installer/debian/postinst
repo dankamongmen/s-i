@@ -1,0 +1,82 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+log() {
+	logger -t live-installer "$@"
+}
+
+error() {
+	log "error: $*"
+}
+
+warning() {
+	log "warning: $*"
+}
+
+info() {
+	log "info: $*"
+}
+
+# Look at
+PLACES=""
+
+# Load filesystem support
+for script in $(ls /lib/live-installer/*); do
+	. $script
+done
+
+for place in $PLACES; do
+	if [ ! -e $place ]; then
+		info "$place doesn't exists"
+		continue
+	fi
+
+	SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
+
+	info "Using $SUPPORT support for $place"
+
+	eval ${SUPPORT}_prepare
+	STEPS=$(eval ${SUPPORT}_count)
+
+	db_progress INFO live-installer/progress/installing
+	db_progress START 0 $STEPS live-installer/progress/installing
+
+	for item in $(find .); do
+		if [ -d $item ]; then
+			mkdir -p /target/$item
+		else
+			mkdir -p /target/$(dirname $item)
+			cp -a $item /target/$item
+		fi
+
+		db_progress STEP 1
+	done
+
+	db_progress STOP
+done
+
+# run the scripts found in hook directory after copying the system
+partsdir="/usr/lib/live-installer.d"
+if [ -d "$partsdir" ]; then
+	for script in $(ls "$partsdir"/*); do
+		base=$(basename $script | sed 's/[0-9]*//')
+		if ! db_progress INFO live-installer/progress/$base; then
+			db_subst live-installer/progress/fallback SCRIPT "$base"
+			db_progress INFO live-installer/progress/fallback
+		fi
+		
+		if [ -x "$script" ] ; then
+			# be careful to preserve exit code
+			if log-output -t live-installer "$script"; then
+				:
+			else
+				warning "$script returned error code $?"
+			fi
+		else
+			error "Unable to execute $script"
+		fi
+	done
+fi
+
+exit 0

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+PLACES="$PLACES /cdrom/live/filesystem.squashfs"
+PLACES="$PLACES /cdrom/casper/filesystem.squashfs" # Etch support
+
+squashfs_prepare() {
+	modprobe squashfs || true
+
+	mkdir -p /mnt
+	if ! mount -t squashfs -o loop $place /mnt; then
+		error "$place has failed to be mounted as squashfs."
+		exit 1
+	fi
+
+	cd /mnt
+}
+
+squashfs_count() {
+	echo `print-inodes /mnt`
+}
