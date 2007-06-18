@@ -5,7 +5,9 @@ rootpw_handler () {
 	while :; do
 		case $1 in
 			--iscrypted)
-				die "pre-crypted passwords not yet supported"
+				# requires passwd 1:4.0.3-30.7ubuntu7
+				ks_preseed passwd passwd/root-password-crypted boolean true
+				shift
 				;;
 			--)	shift; break ;;
 			*)	die_getopt rootpw ;;
