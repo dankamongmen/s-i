@@ -25,6 +25,14 @@ ks_run_script () {
 	log-output -t kickseed --pass-stdout "$INTERPRETER" "$SCRIPT"
 }
 
+ks_write_script () {
+	if [ "${1%/*}" != "$1" ]; then
+		mkdir -p "${1%/*}"
+	fi
+	cat > "$1"
+	chmod +x "$1"
+}
+
 preseed_fetch () {
 	ln -sf "$1" "$2"
 }
