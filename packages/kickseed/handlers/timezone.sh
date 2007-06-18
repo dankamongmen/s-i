@@ -1,6 +1,5 @@
 #! /bin/sh
 
-# requires base-config 2.61ubuntu18
 timezone_handler () {
 	utc=
 
@@ -30,6 +29,7 @@ timezone_handler () {
 		# requires clock-setup
 		ks_preseed d-i clock-setup/utc boolean false
 	fi
+	# requires base-config 2.65
 	ks_preseed base-config tzconfig/preseed_zone string "$1"
 	# requires tzsetup
 	ks_preseed d-i time/zone string "$1"

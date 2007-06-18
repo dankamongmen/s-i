@@ -43,7 +43,7 @@ langsupport_handler () {
 		fi
 	fi
 
-	# requires localechooser 0.04.0ubuntu4
+	# requires localechooser 0.06
 	ks_preseed d-i localechooser/supported-locales multiselect "$languages"
 }
 
