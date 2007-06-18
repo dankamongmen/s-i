@@ -321,3 +321,6 @@ class PreseedHandlers:
         # possible to implement as it stands, but very painful; much easier
         # to fix tzsetup to look at a question in zone.tab format.
         raise UnimplementedCommand, 'timezone not supported yet'
+
+    def upgrade(self, args):
+        raise UnimplementedCommand, 'upgrades using installer not supported'
