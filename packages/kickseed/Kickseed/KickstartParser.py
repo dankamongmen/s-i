@@ -1,20 +1,24 @@
+class KickstartError(Exception): pass
 class KickstartNotImplemented(Exception): pass
 
 class KickstartParser:
     def __init__(self):
+        self._sections = {}
         # TODO: data should be a class itself
         self.data = {}
 
-    def read(self, fd):
-        sections = {}
-        for section in 'main', 'packages', 'pre', 'post':
-            sections[section] = []
-
-        section = 'main'
+    def read(self, fd, startsection = 'main'):
+        section = startsection
         for line in fd:
             line = line.strip()
 
             if line == '':
+                continue
+            elif line.startswith('%include'):
+                args = line.split()
+                if len(args) < 2:
+                    raise KickstartError, 'Invalid %include line'
+                section = self.read(open(args[1], 'r'), startsection = section)
                 continue
             elif line.startswith('%packages'):
                 section = 'packages'
@@ -23,9 +27,19 @@ class KickstartParser:
             elif line.startswith('%post'):
                 section = 'post'
 
-            sections[section].append(line)
+            self._sections[section].append(line)
 
-        for line in sections['main']:
+        return section
+
+    def parse(self, fd):
+        self._sections = {}
+        for section in 'main', 'packages', 'pre', 'post':
+            self._sections[section] = []
+
+        self.read(fd, startsection = 'main')
+
+        self.data = {}
+        for line in self._sections['main']:
             if line == '':
                 continue
             elif line.startswith('#'):
@@ -37,26 +51,26 @@ class KickstartParser:
                 else:
                     self.data[tokens[0]] = ''
 
-        if sections['packages']:
+        if self._sections['packages']:
             # TODO: options to %packages
             # TODO: groups
 
             self.data['individualPackageList'] = []
 
-            for pkg in sections['packages'][1:]:
+            for pkg in self._sections['packages'][1:]:
                 if pkg.startswith('@'):
                     # TODO: groups
                     raise KickstartNotImplemented, "Package groups not implemented"
                 else:
                     self.data['individualPackageList'].append(pkg)
 
-        if sections['pre']:
-            tokens = sections['pre'][0].split()
+        if self._sections['pre']:
+            tokens = self._sections['pre'][0].split()
             self.data['preLine'] = tokens[1:]
             self.data['preList'] = sections['pre'][1:]
 
-        if sections['post']:
-            tokens = sections['post'][0].split()
+        if self._sections['post']:
+            tokens = self._sections['post'][0].split()
             self.data['postLine'] = tokens[1:]
             self.data['postList'] = sections['post'][1:]
 

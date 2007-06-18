@@ -5,7 +5,7 @@ import Kickseed
 
 def main():
     parser = Kickseed.KickstartParser()
-    output = Kickseed.Preseed(parser.read(open(sys.argv[1], 'r')))
+    output = Kickseed.Preseed(parser.parse(open(sys.argv[1], 'r')))
     output.write(sys.stdout)
 
 if __name__ == '__main__':
