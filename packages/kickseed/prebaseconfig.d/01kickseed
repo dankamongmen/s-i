@@ -8,18 +8,19 @@ ks_run_script () {
 	CHROOTED="$3"
 	SCRIPT="$4"
 
-	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
 	if [ "$CHROOTED" = 1 ]; then
-		cp "$SCRIPT" /target/tmp/ks-script
-		chmod 700 /target/tmp/ks-script
-		log-output -t kickseed --pass-stdout \
-			chroot /target "$INTERPRETER" /tmp/ks-script
+		chroot=chroot
+		root=/target
 	else
-		cp "$SCRIPT" /tmp/ks-script
-		chmod 700 /tmp/ks-script
-		log-output -t kickseed --pass-stdout \
-			"$INTERPRETER" /tmp/ks-script
+		chroot=
+		root=
 	fi
+
+	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
+	cp "$SCRIPT" "$root/tmp/ks-script"
+	chmod 700 "$root/tmp/ks-script"
+	log-output -t kickseed --pass-stdout \
+		$chroot $root "$INTERPRETER" /tmp/ks-script
 }
 
 kickseed_post
