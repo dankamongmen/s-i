@@ -1,9 +1,15 @@
 #! /bin/sh
 
 user_handler () {
-	eval set -- "$(getopt -o '' -l fullname:,iscrypted,password: -- "$@")" || die_getopt user
+	makeuser=1
+
+	eval set -- "$(getopt -o '' -l disabled,fullname:,iscrypted,password: -- "$@")" || die_getopt user
 	while :; do
 		case $1 in
+			--disabled)
+				makeuser=
+				shift
+				;;
 			--fullname)
 				ks_preseed passwd passwd/user-fullname string "$2"
 				shift 2
@@ -23,9 +29,14 @@ user_handler () {
 		esac
 	done
 
-	if [ $# -ne 1 ]; then
-		die "user command requires a username"
-	fi
+	if [ "$makeuser" ]; then
+		if [ $# -ne 1 ]; then
+			die "user command requires a username"
+		fi
 
-	ks_preseed passwd passwd/username string "$1"
+		ks_preseed passwd passwd/make-user boolean true
+		ks_preseed passwd passwd/username string "$1"
+	else
+		ks_preseed passwd passwd/make-user boolean false
+	fi
 }
