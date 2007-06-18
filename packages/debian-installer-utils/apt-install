@@ -30,7 +30,9 @@ DEBIAN_FRONTEND=noninteractive
 export DEBIAN_FRONTEND
 
 ERRCODE=0
-log-output -t apt-install chroot /target apt-get -y --no-remove install $@ < /dev/null || ERRCODE=$?
+log-output -t apt-install chroot /target \
+	apt-get -o APT::Install-Recommends=false -y --no-remove install $@ \
+		< /dev/null || ERRCODE=$?
 chroot_cleanup
 
 if [ "$ERRCODE" != 0 ]; then
