@@ -293,7 +293,7 @@ kickseed_post () {
 		[ -d "$dir" ] || continue
 		name="${dir##*/}"
 		if type "${name%.handler}_post" >/dev/null 2>&1; then
-			eval "${name%.handler}_post"
+			ks_run_handler "${name%.handler}_post"
 		else
 			warn "Missing post-installation handler: $name"
 		fi

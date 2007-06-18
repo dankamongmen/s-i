@@ -16,6 +16,10 @@ ks_preseed () {
 	echo "$@" >> "$SPOOL/parse/test-output"
 }
 
+ks_run_handler () {
+	echo "Would run $1 handler"
+}
+
 ks_run_script () {
 	TYPE="$1"
 	INTERPRETER="$2"
@@ -37,5 +41,7 @@ RET=0
 (kickseed "$1") || RET=$?
 
 sort "$SPOOL/parse/test-output"
+
+kickseed_post
 
 exit $RET

@@ -2,7 +2,7 @@ lang en_GB
 langsupport --default=en_US de_DE xh_ZA
 keyboard uk
 autostep
-auth --enablemd5 --enableshadow
+auth --enablemd5 --enableshadow --enablenis
 bootloader --location=mbr
 device eth module1 --opts="aic152x=0x340 io=11"
 device scsi module2 --opts="testopts=testvalue"
