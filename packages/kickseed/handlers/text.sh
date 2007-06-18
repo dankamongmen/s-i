@@ -1,6 +1,6 @@
 #! /bin/sh
 
 text_handler () {
-	# TODO: need to set DEBIAN_FRONTEND=text; how?
-	die "text not supported yet"
+	# No graphical installer yet, so this is the default.
+	return
 }
