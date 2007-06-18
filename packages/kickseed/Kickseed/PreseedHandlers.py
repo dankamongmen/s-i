@@ -121,3 +121,32 @@ class PreseedHandlers:
 
     def lilo(self, args):
         return self.bootloader(args, useLilo = True)
+
+    def lilocheck(self, args):
+        raise UnimplementedCommand, 'lilocheck not supported'
+
+    def logvol(self, args):
+        # possible but complex
+        # TODO <mountpoint> --vgname=name --size=size --name=name
+        raise UnimplementedCommand, 'logvol not supported yet'
+
+    def mouse(self, args):
+        if not args:
+            # autodetection is the default
+            return
+
+        (opts, mousetype) = gnu_getopt(args, '',
+                                       ['--device=', '--emulthree'])[0]
+        for opt, value in opts:
+            if opt == '--device':
+                self.preseed('xserver-xorg',
+                             'xserver-xorg/config/inputdevice/mouse/port',
+                             'select', '/dev/%s' % value)
+            elif opt == '--emulthree':
+                self.preseed('xserver-xorg',
+                             'xserver-xorg/config/inputdevice/mouse/emulate3buttons',
+                             'boolean', 'true')
+            else:
+                raise UnimplementedArgument, opt
+
+            # TODO: translate protocol into xserver-xorg's naming scheme
