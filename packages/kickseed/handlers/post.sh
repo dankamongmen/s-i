@@ -1,9 +1,10 @@
 #! /bin/sh
 
-post_chroot=1
-post_interpreter=
-
 post_handler_section () {
+	# Global variables read by kickseed.
+	post_chroot=1
+	post_interpreter=
+
 	eval set -- "$(getopt -o '' -l nochroot,interpreter: -- "$@")" || { warn_getopt %post; return; }
 	while :; do
 		case $1 in
