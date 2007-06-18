@@ -55,6 +55,10 @@ save_post_script () {
 		chmod +x "$POSTSPOOL/$i.script"
 		if [ "$post_chroot" = 1 ]; then
 			touch "$POSTSPOOL/$i.chroot"
+			if [ "$post_interpreter" ]; then
+				echo "$post_interpreter" \
+					> "$POSTSPOOL/$i.interpreter"
+			fi
 		else
 			rm -f "$POSTSPOOL/$i.chroot"
 		fi
@@ -298,7 +302,11 @@ kickseed_post () {
 		if [ -e "${script%.script}.chroot" ]; then
 			CHROOTED=1
 		fi
-		if ! ks_run_script post /bin/sh "$CHROOTED" "$script"; then
+		INTERPRETER=/bin/sh
+		if [ -e "${script%.script}.interpreter" ]; then
+			INTERPRETER="$(cat "${script%.script}.interpreter")"
+		fi
+		if ! ks_run_script post "$INTERPRETER" "$CHROOTED" "$script"; then
 			warn "%post script exited with error code $?"
 		fi
 	done
