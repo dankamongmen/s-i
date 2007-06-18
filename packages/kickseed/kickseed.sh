@@ -1,6 +1,13 @@
 #! /bin/sh
 # Caller should set -e.
 
+if [ -z "$HANDLERS" ]; then
+	HANDLERS=/lib/kickseed/handlers
+fi
+if [ -z "$SPOOL" ]; then
+	SPOOL=/var/spool/kickseed
+fi
+
 die () {
 	echo "$@" >&2
 	exit 1
