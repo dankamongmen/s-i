@@ -1,4 +1,5 @@
 lang en_GB
+langsupport --default=en_GB de_DE
 keyboard uk
 auth --enablemd5 --enableshadow
 bootloader --location=mbr
