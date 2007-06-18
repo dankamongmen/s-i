@@ -21,6 +21,7 @@ user cjwatson --fullname="Colin Watson" --password="foobar"
 xconfig --resolution 1280x1024
 preseed test/question1 string hello
 preseed --owner base-config test/question2 boolean true
+preseed apt-setup/security_host string ""
 
 %packages
 @ Ubuntu Desktop
