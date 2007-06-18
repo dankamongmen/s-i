@@ -324,3 +324,63 @@ class PreseedHandlers:
 
     def upgrade(self, args):
         raise UnimplementedCommand, 'upgrades using installer not supported'
+
+    def xconfig(self, args):
+        opts = gnu_getopt(args, '',
+                          ['noprobe', 'card=', 'videoram=', 'monitor=',
+                           'hsync=', 'vsync=', 'defaultdesktop=',
+                           'startxonboot', 'resolution=', 'depth='])[0]
+        for opt, value in opts:
+            if opt == '--noprobe':
+                # TODO xresprobe code doesn't honour this
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/autodetect_monitor',
+                              'boolean', 'false')
+            elif opt == '--card':
+                # TODO translate card name
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/device/driver',
+                              'select', value)
+            elif opt == '--videoram':
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/device/video_ram',
+                              'string', value)
+            elif opt == '--monitor':
+                # TODO: no monitor database; we could preseed the identifier
+                # but there's little point
+                raise UnimplementedArgument, opt
+            elif opt == '--hsync':
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/monitor/horiz-sync',
+                              'string', value)
+            elif opt == '--vsync':
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/monitor/vert-refresh',
+                              'string', value)
+            elif opt == '--defaultdesktop':
+                if value == 'GNOME':
+                    # Ubuntu default
+                    pass
+                else:
+                    raise UnimplementedArgument, opt + '=' + value
+            elif opt == '--startxonboot':
+                # TODO: this is true by default already
+                self._preseed('base-config',
+                              'base-config/start-display-manager',
+                              'boolean', 'true')
+            elif opt == '--resolution':
+                # TODO: ideally we'd just pass the resolution and let X work
+                # out the best refresh rate
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/monitor/mode-list',
+                              'select', value + ' @ 60Hz')
+            elif opt == '--depth':
+                if value == 32:
+                    depth = 24
+                else:
+                    depth = value
+                self._preseed('xserver-xorg',
+                              'xserver-xorg/config/display/default_depth',
+                              'select', depth)
+            else:
+                raise UnimplementedArgument, opt
