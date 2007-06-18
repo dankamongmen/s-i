@@ -182,3 +182,17 @@ kickseed () {
 			"$pattern"
 	fi
 }
+
+kickseed_post () {
+	# TODO: sort numerically
+	for script in "$SPOOL/post"/*.script; do
+		if [ ! -f "$script" ]; then
+			continue
+		fi
+		CHROOTED=0
+		if [ -e "${script%.script}.chroot" ]; then
+			CHROOTED=1
+		fi
+		ks_run_script post /bin/sh "$CHROOTED" "$script"
+	done
+}

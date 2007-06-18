@@ -1,0 +1,21 @@
+#! /bin/sh -e
+
+SPOOL=/var/spool/kickseed
+
+. /lib/kickseed/kickseed.sh
+
+ks_run_script () {
+	TYPE="$1"
+	INTERPRETER="$2"
+	CHROOTED="$3"
+	SCRIPT="$4"
+
+	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER (chrooted: $CHROOTED):"
+	if [ "$CHROOTED" = 1 ]; then
+		chroot /target "$INTERPRETER" "$SCRIPT"
+	else
+		"$INTERPRETER" "$SCRIPT"
+	fi
+}
+
+kickseed_post

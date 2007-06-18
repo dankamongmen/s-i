@@ -27,14 +27,6 @@ RET=0
 
 sort "$SPOOL/test-output"
 
-echo
-# TODO: sort numerically
-for script in "$SPOOL/post"/*.script; do
-	CHROOTED=0
-	if [ -e "${script%.script}.chroot" ]; then
-		CHROOTED=1
-	fi
-	ks_run_script post /bin/sh "$CHROOTED" "$script"
-done
+kickseed_post
 
 exit $RET
