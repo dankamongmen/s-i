@@ -31,10 +31,34 @@ for handler in "$HANDLERS"/*; do
 	. "$handler"
 done
 
-# Expects kickstart file on stdin.
+# Expects kickstart file as $1.
 kickseed () {
+	# Parse and execute %pre sections first.
 	SECTION=main
+	(cat "$1"; echo %final) | while read line; do
+		keyword="${line%% *}"
+		case $keyword in
+			%pre)
+				SECTION=pre
+				pre_handler_section "${line#* }"
+				> "$SPOOL/pre.section"
+				continue
+				;;
+			%packages|%post|%final)
+				if [ "$SECTION" = pre ]; then
+					ks_run_script pre /bin/sh "$SPOOL/pre.section"
+				fi
+				SECTION="${keyword#%}"
+				continue
+				;;
+		esac
+		if [ "$SECTION" = pre ]; then
+			echo "$line" >> "$SPOOL/pre.section"
+		fi
+	done
 
+	# Parse all other sections.
+	SECTION=main
 	(while read line; do
 		keyword="${line%% *}"
 		# Deal with %include directives.
@@ -47,7 +71,7 @@ kickseed () {
 		else
 			echo "$line"
 		fi
-	done; echo %final) | while read line; do
+	done < "$1"; echo %final) | while read line; do
 		# Work out the section.
 		keyword="${line%% *}"
 		if [ -z "$keyword" ] || [ "${keyword#\#}" != "$keyword" ]; then
@@ -79,6 +103,9 @@ kickseed () {
 			fi
 		elif [ "$SECTION" = packages ] && [ "$keyword" = '@' ]; then
 			die "Package groups not implemented"
+		elif [ "$SECTION" = pre ]; then
+			# already handled
+			continue
 		else
 			echo "$line" >> "$SPOOL/$SECTION.section"
 		fi

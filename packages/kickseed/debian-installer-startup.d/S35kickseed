@@ -9,8 +9,13 @@ preseed () {
 	echo "$@" >> "$SPOOL/preseed.cfg"
 }
 
+ks_run_script () {
+	logger -t kickseed "Running $1 script $3 using interpreter $2:"
+	"$2" "$3"
+}
+
 # TODO: need to parse ks= to work out where to get configuration file
-kickseed < /ks.cfg)
+kickseed /ks.cfg)
 
 (. /lib/preseed/preseed.sh
 

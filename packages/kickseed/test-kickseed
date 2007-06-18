@@ -11,8 +11,14 @@ preseed () {
 	echo "$@" >> "$SPOOL/test-output"
 }
 
+ks_run_script () {
+	echo "Would run $1 script $3 using interpreter $2:"
+	cat "$3"
+	echo
+}
+
 RET=0
-(kickseed < "$1") || RET=$?
+(kickseed "$1") || RET=$?
 
 sort "$SPOOL/test-output"
 

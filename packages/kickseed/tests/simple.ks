@@ -14,3 +14,9 @@ rootpw rootme
 %packages
 openssh-server
 -man-db
+
+%pre
+#! /bin/sh
+
+echo "This is a %pre script."
+echo "It does nothing very interesting."
