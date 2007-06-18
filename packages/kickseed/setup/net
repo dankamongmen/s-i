@@ -35,7 +35,7 @@ if [ -x /var/lib/dpkg/info/netcfg.postinst ]; then
 	# Make sure we don't get asked unnecessary networking questions.
 	# Do tell the user about errors, though.
 	KSDEVICE="$(kickseed_cmdline /proc/cmdline ksdevice)"
-	if [ -z "$KSDEVICE" ]; then
+	if [ -z "$KSDEVICE" ] || [ "$KSDEVICE" = link ]; then
 		KSDEVICE=auto
 	fi
 	set_question netcfg/choose_interface "$KSDEVICE"
