@@ -16,7 +16,7 @@ rootpw_handler () {
 		die "rootpw command requires a password"
 	fi
 
-	# requires passwd 1:4.0.3-30.7ubuntu4
+	# requires passwd 1:4.0.3-30.7ubuntu6
 	ks_preseed passwd passwd/root-password password "$1"
 	ks_preseed passwd passwd/root-password-again password "$1"
 	if [ -z "$1" ]; then
