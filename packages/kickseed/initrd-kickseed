@@ -36,8 +36,33 @@ preseed_relative () {
 	fi
 }
 
+fetch_url () {
+	local url="$1"
+	local file="$2"
+	iters=0
+	while [ $iters -lt 3 ]; do
+		# TODO proxy support? Would it be useful?
+		# TODO add progress bar
+		if wget -q "$url" -O "$file" 2>&1 | logger -t kickseed; then
+			return 0
+		fi
+		iters=$(($iters + 1))
+	done
+	return 1
+}
+
 KS="$(kickseed_cmdline /proc/cmdline)"
 KSCFG="$(kickseed_file "$KS")"
+
+case $KS in
+	http://*/*)
+		logger -t kickseed "Downloading kickstart file from $KS"
+		if ! fetch_url "$KS" "$KSCFG"; then
+			logger -t kickseed "... failed"
+			exit 1
+		fi
+		;;
+esac
 
 case $KSCFG in
 	/floppy/*)
@@ -47,7 +72,7 @@ case $KSCFG in
 esac
 
 case $KSCFG in
-	''|$SPOOL/fetch/http/*)
+	'')
 		# not handled in initrd (yet?)
 		: ;;
 	*)
