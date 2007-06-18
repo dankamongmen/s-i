@@ -1,3 +1,4 @@
+import sys
 from Kickseed.KickstartData import KickstartData
 
 class KickstartError(Exception): pass
@@ -15,6 +16,9 @@ class KickstartParser:
             if line == '':
                 continue
             elif line.startswith('%include'):
+                print >>sys.stderr, \
+                      "Note: %include directives that depend on %pre " \
+                      "sections are not supported."
                 args = line.split()
                 if len(args) < 2:
                     raise KickstartError, 'Invalid %include line'
