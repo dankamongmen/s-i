@@ -50,9 +50,6 @@ done
 
 # Expects kickstart file as $1.
 kickseed () {
-	rm -rf "$SPOOL"
-	mkdir -p "$SPOOL"
-
 	# Parse and execute %pre sections first.
 	SECTION=main
 	(cat "$1"; echo %final) | while read line; do
