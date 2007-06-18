@@ -1,7 +1,7 @@
 #! /bin/sh
 
 pre_handler_section () {
-	eval set -- "$(getopt -o '' -l interpreter -- "$@")" || die_getopt %pre
+	eval set -- "$(getopt -o '' -l interpreter: -- "$@")" || die_getopt %pre
 	while :; do
 		case $1 in
 			--interpreter)
