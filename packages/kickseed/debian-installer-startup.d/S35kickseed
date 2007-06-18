@@ -21,9 +21,32 @@ ks_run_script () {
 	"$INTERPRETER" "$SCRIPT"
 }
 
-# TODO: need to parse ks= to work out where to get configuration file
-kickseed /ks.cfg
+KSCFG=
 
-if [ -s "$SPOOL/preseed.cfg" ]; then
-	preseed_location "$SPOOL/preseed.cfg"
+for item in $(< /proc/cmdline); do
+	var="${item%%=*}"
+
+	if [ "$var" != ks ]; then
+		continue
+	fi
+
+	value="${item#*=}"
+	# TODO: only works for files in the initrd so far
+	case $value in
+		file:*)
+			KSCFG="${file#file:}"
+			;;
+		*)
+			logger -t kickseed "Kickstart location $value not supported"
+			;;
+	esac
+	break
+done
+
+if [ "$KSCFG" ]; then
+	kickseed "$KSCFG"
+
+	if [ -s "$SPOOL/preseed.cfg" ]; then
+		preseed_location "$SPOOL/preseed.cfg"
+	fi
 fi
