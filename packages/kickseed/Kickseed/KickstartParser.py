@@ -31,8 +31,11 @@ class KickstartParser:
             elif line.startswith('#'):
                 continue
             else:
-                (command, args) = line.split(None, 1)
-                self.data[command] = args
+                tokens = line.split(None, 1)
+                if len(tokens) > 1:
+                    self.data[tokens[0]] = tokens[1]
+                else:
+                    self.data[tokens[0]] = ''
 
         if sections['packages']:
             # TODO: options to %packages
