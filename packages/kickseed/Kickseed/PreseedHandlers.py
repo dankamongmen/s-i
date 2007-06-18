@@ -6,10 +6,10 @@ class UnimplementedArgument(PreseedHandlerException): pass
 
 class PreseedHandlers:
     def __init__(self):
-        self.preseeds = []
+        self.preseeds = {}
 
     def _preseed(self, qpackage, qname, qtype, qanswer):
-        self.preseeds.append((qpackage, qname, qtype, qanswer))
+        self.preseeds[qname] = (qpackage, qtype, qanswer)
 
     def auth(self, args):
         # TODO --enablenis, --nisdomain=, --nisserver=, --enableldap,

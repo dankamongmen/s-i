@@ -48,5 +48,8 @@ class Preseed:
 # preseeding.
 """
 
-        for qpackage, qname, qtype, qanswer in self.handlers.preseeds:
+        qnames = self.handlers.preseeds.keys()
+        qnames.sort()
+        for qname in qnames:
+            (qpackage, qtype, qanswer) = self.handlers.preseeds[qname]
             print >>fd, "%s %s %s %s" % (qpackage, qname, qtype, qanswer)
