@@ -3,9 +3,10 @@
 HANDLERS=/lib/kickseed/handlers
 SPOOL=/var/spool/kickseed
 
-(. /lib/kickseed/kickseed.sh
+. /lib/kickseed/kickseed.sh
+. /lib/preseed/preseed.sh
 
-preseed () {
+ks_preseed () {
 	echo "$@" >> "$SPOOL/preseed.cfg"
 }
 
@@ -15,10 +16,8 @@ ks_run_script () {
 }
 
 # TODO: need to parse ks= to work out where to get configuration file
-kickseed /ks.cfg)
-
-(. /lib/preseed/preseed.sh
+kickseed /ks.cfg
 
 if [ -s "$SPOOL/preseed.cfg" ]; then
 	preseed_location "$SPOOL/preseed.cfg"
-fi)
+fi

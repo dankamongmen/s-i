@@ -11,15 +11,15 @@ bootloader_handler_common () {
 				case $2 in
 					mbr)
 						# TODO: not always hd0; lilo
-						preseed d-i grub-installer/bootdev string '(hd0)'
+						ks_preseed d-i grub-installer/bootdev string '(hd0)'
 						;;
 					partition)
 						# TODO: lilo
-						preseed d-i grub-installer/bootdev string '(hd0,1)'
+						ks_preseed d-i grub-installer/bootdev string '(hd0,1)'
 						;;
 					none)
 						# TODO: need lilo-installer/skip too
-						preseed d-i grub-installer/skip boolean true
+						ks_preseed d-i grub-installer/skip boolean true
 						;;
 					*)
 						die_bad_arg bootloader location "$OPTARG"
@@ -40,7 +40,7 @@ bootloader_handler_common () {
 	done
 
 	if [ "$useLilo" = 1 ]; then
-		preseed d-i grub-installer/skip boolean true
+		ks_preseed d-i grub-installer/skip boolean true
 	fi
 }
 

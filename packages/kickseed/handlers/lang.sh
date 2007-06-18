@@ -1,5 +1,5 @@
 #! /bin/sh
 
 lang_handler () {
-	preseed d-i preseed/locale string "$1"
+	ks_preseed d-i preseed/locale string "$1"
 }

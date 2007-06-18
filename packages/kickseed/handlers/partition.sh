@@ -109,7 +109,7 @@ part_handler () {
 
 partition_handler_final () {
 	if [ "$partition_recipe" ]; then
-		preseed d-i partman-auto/expert_recipe string \
+		ks_preseed d-i partman-auto/expert_recipe string \
 			"$partition_recipe"
 	fi
 }

@@ -17,9 +17,9 @@ rootpw_handler () {
 	fi
 
 	# requires passwd 1:4.0.3-30.7ubuntu4
-	preseed passwd passwd/root-password password "$1"
-	preseed passwd passwd/root-password-again password "$1"
+	ks_preseed passwd passwd/root-password password "$1"
+	ks_preseed passwd passwd/root-password-again password "$1"
 	if [ -z "$1" ]; then
-		preseed passwd passwd/root-password-empty note ''
+		ks_preseed passwd passwd/root-password-empty note ''
 	fi
 }

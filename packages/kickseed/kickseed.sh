@@ -143,7 +143,7 @@ kickseed () {
 		done
 		# introduced in base-config 2.61ubuntu2; Debian would need
 		# tasksel preseeding instead
-		preseed base-config base-config/package-selection string \
+		ks_preseed base-config base-config/package-selection string \
 			"$pattern"
 	fi
 }

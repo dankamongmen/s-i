@@ -10,12 +10,12 @@ auth_handler () {
 	while :; do
 		case $1 in
 			--enablemd5)
-				preseed passwd passwd/md5 boolean true
+				ks_preseed passwd passwd/md5 boolean true
 				shift
 				;;
 			--useshadow|--enableshadow)
 				# TODO: this is true by default already
-				preseed passwd passwd/shadow boolean true
+				ks_preseed passwd passwd/shadow boolean true
 				shift
 				;;
 			--enablecache)

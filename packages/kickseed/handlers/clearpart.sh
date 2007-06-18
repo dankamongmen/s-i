@@ -11,13 +11,13 @@ clearpart_handler () {
 						die "clearing multiple drives not supported"
 						;;
 					*)
-						preseed d-i partman-auto/disk string "/dev/$OPTARG"
+						ks_preseed d-i partman-auto/disk string "/dev/$OPTARG"
 						;;
 				esac
 				shift 2
 				;;
 			--initlabel)
-				preseed d-i partman-auto/confirm_write_new_label boolean true
+				ks_preseed d-i partman-auto/confirm_write_new_label boolean true
 				shift
 				;;
 			--)	shift; break ;;
