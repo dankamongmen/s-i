@@ -1,6 +1,7 @@
 #! /bin/sh
 
 zerombr_handler () {
-	# TODO: as far as I can see, partman doesn't support this
-	die "zerombr not supported"
+	# partman already initialises partition tables when it needs to do
+	# so.
+	return
 }
