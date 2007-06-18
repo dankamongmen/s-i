@@ -138,8 +138,7 @@ class PreseedHandlers:
             # autodetection is the default
             return
 
-        (opts, mousetype) = gnu_getopt(args, '',
-                                       ['--device=', '--emulthree'])[0]
+        (opts, mousetype) = gnu_getopt(args, '', ['device=', 'emulthree'])
         for opt, value in opts:
             if opt == '--device':
                 self._preseed('xserver-xorg',
