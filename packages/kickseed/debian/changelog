@@ -1,3 +1,20 @@
+kickseed (0.20) breezy; urgency=low
+
+  * Send warnings during installation to syslog, not stderr.
+  * Fix handler arguments in the case where no arguments were passed to a
+    command.
+  * Fix langsupport to conform to Kickstart documentation and Anaconda.
+    - If no non-option arguments were passed to langsupport, support all
+      locales, per the Kickstart documentation. Yes, this will be slow. In
+      that case, default to en_US.UTF-8 if there's no default set either,
+      per Anaconda.
+    - Otherwise, default to the first locale selected if there's no default
+      set, per Anaconda.
+  * Tolerate %pre and %post scripts exiting non-zero (log a warning rather
+    than exiting).
+
+ -- Colin Watson <cjwatson@ubuntu.com>  Thu, 14 Apr 2005 12:46:55 +0100
+
 kickseed (0.19) hoary; urgency=low
 
   * Very basic package group support, mapping package groups to tasks. Any
