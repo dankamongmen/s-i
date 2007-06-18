@@ -74,17 +74,35 @@ class PreseedHandlers:
 
     def device(self, args):
         # type argument (args[0]) ignored
-        # TODO modulename = args[1]
+        modulename = args[1]
         opts = gnu_getopt(args[2:], '', ['opts='])[0]
         for opt, value in opts:
             if opt == '--opts':
                 # TODO: can't preseed this because hw-detect/module_params
                 # is just one question; maybe use db_register?
+                raise UnimplementedArgument, "%s %s" % (modulename, opt)
+            else:
                 raise UnimplementedArgument, opt
 
     def deviceprobe(self, args):
         # Already the default thanks to hotplug.
         return
+
+    def driverdisk(self, args):
+        # TODO <partition> --type=
+        raise UnimplementedCommand, 'driver disks not supported'
+
+    def firewall(self, args):
+        # TODO <securitylevel> [--trust=] <incoming> [--port=]
+        raise UnimplementedCommand, 'firewall preseeding not supported yet'
+
+    def install(self, args):
+        # d-i doesn't support upgrades, so this is the default.
+        return
+
+    def interactive(self, args):
+        # requires debian-installer-utils 1.09, preseed 1.03
+        self.preseed('d-i', 'preseed/interactive', 'boolean', 'true')
 
     def keyboard(self, args):
         self.preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
