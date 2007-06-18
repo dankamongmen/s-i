@@ -14,6 +14,7 @@ partition swap --size=512 --maxsize=1024
 rootpw rootme
 timezone --utc America/New_York
 url --url http://archive.ubuntu.com/ubuntu
+user cjwatson --fullname="Colin Watson" --password="foobar"
 
 %packages
 openssh-server
