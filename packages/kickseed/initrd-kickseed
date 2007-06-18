@@ -69,6 +69,16 @@ case $KSCFG in
 		mountfloppy || true
 		trap 'umount /floppy || true' EXIT HUP INT QUIT TERM
 		;;
+	/media/*)
+		device="${KSCFG#/media/}"
+		device="${device%%/*}"
+		# TODO: relies on having non-devfs compatibility paths
+		if mount "/dev/$device" "/media/$device" \
+				>>/var/log/messages 2>&1; then
+			trap "umount '/media/$device' || true" \
+				EXIT HUP INT QUIT TERM
+		fi
+		;;
 esac
 
 case $KSCFG in

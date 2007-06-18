@@ -242,6 +242,12 @@ kickseed_file () {
 		floppy:/*)
 			echo "/floppy${1#floppy:}"
 			;;
+		hd:*:/*)
+			file="${1#hd:}"
+			device="${file%%:*}"
+			file="${file#*:}"
+			echo "/media/$device$file"
+			;;
 		http://*/*)
 			spoolpath="$SPOOL/fetch/http/${1#http://}"
 			mkdir -p "${spoolpath%/*}"

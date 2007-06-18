@@ -1,0 +1,25 @@
+#! /bin/sh -e
+# Bring up everything that's needed to fetch a Kickstart file from a hard
+# disk.
+
+# without this, debconf clients will talk debconf protocol to syslog
+. /usr/share/debconf/confmodule
+
+PACKAGES='ext2-modules vfat-modules'
+if [ ! -x /var/lib/dpkg/info/hw-detect-full.postinst ]; then
+	PACKAGES="$PACKAGES hw-detect-full"
+fi
+
+/lib/kickseed/kickseed-anna $PACKAGES
+
+if [ -x /var/lib/dpkg/info/hw-detect-full.postinst ]; then
+	/lib/kickseed/kickseed-udpkg hw-detect-full
+else
+	logger -t kickseed "hw-detect-full cannot be installed"
+	exit 1
+fi
+
+modprobe -q ext2 >>/var/log/messages 2>&1 || true
+modprobe -q vfat >>/var/log/messages 2>&1 || true
+
+exit 0
