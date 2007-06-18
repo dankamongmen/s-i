@@ -1,0 +1,27 @@
+#! /bin/sh -e
+
+. /lib/kickseed/kickseed.sh
+
+# Run a debconf-using program, possibly inside bterm.
+# Cloned-and-hacked from /lib/debian-installer.d/S70menu-linux.
+bterm_run () {
+	bterm=/usr/bin/bterm
+	font=/unifont.bgf
+
+	if [ -x "$bterm" ] && [ -e "$font" ] && \
+	   [ "$TERM_UTF8" ] && [ "$TERM_FRAMEBUFFER" ]; then
+		TERM=bterm MENU="$1" \
+			$bterm -f $font -l $LANG /lib/debian-installer/menu
+	else
+		MENU="$1" /lib/debian-installer/menu
+	fi
+}
+
+KS="$(kickseed_cmdline /proc/cmdline)"
+KSCFG="$(kickseed_file "$KS")"
+
+case $KSCFG in
+	/cdrom/*)
+		bterm_run /lib/kickseed/setup/cdrom || true
+		;;
+esac
