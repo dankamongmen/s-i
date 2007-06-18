@@ -1,6 +1,7 @@
 #! /bin/sh
 
 partition_recipe=
+partition_leave_free_space=1
 
 partition_handler () {
 	if [ -z "$partition_recipe" ]; then
@@ -9,7 +10,7 @@ partition_handler () {
 
 	size=
 	grow=
-	maxsize=$((1024 * 1024 * 1024))
+	maxsize=
 	format=1
 	asprimary=
 	fstype=
@@ -69,9 +70,14 @@ partition_handler () {
 	fi
 
 	if [ "$grow" ]; then
-		priority="$size"
-	else
+		partition_leave_free_space=
+		if [ -z "$maxsize" ]; then
+			maxsize=$((1024 * 1024 * 1024))
+		fi
 		priority="$maxsize"
+	else
+		maxsize="$size"
+		priority="$size"
 	fi
 	partition_recipe="$partition_recipe $size $priority $maxsize $filesystem"
 
@@ -109,6 +115,13 @@ part_handler () {
 
 partition_final () {
 	if [ "$partition_recipe" ]; then
+		if [ "$partition_leave_free_space" ]; then
+			# This doesn't quite work; it leaves a dummy
+			# partition at the end of the disk. Bug filed on
+			# partman-auto.
+			bignum=$((1024 * 1024 * 1024))
+			partition_recipe="$partition_recipe 0 $bignum $bignum free ."
+		fi
 		ks_preseed d-i partman-auto/expert_recipe string \
 			"$partition_recipe"
 		ks_preseed d-i partman/choose_partition string \
