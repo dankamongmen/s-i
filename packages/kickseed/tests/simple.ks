@@ -1,6 +1,7 @@
 lang en_GB
-langsupport --default=en_GB de_DE
+langsupport --default=en_US de_DE
 keyboard uk
+autostep
 auth --enablemd5 --enableshadow
 bootloader --location=mbr
 firewall --disabled

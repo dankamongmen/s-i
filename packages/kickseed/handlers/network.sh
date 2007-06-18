@@ -5,7 +5,7 @@ network_handler () {
 	got_gateway=
 	got_nameservers=
 	got_netmask=
-	eval set -- "$(getopt -o '' -l bootproto:,device:,ip:,gateway:,nameserver:,nodns,netmask:,hostname: -- "$@")" || die_getopt network
+	eval set -- "$(getopt -o '' -l bootproto:,device:,ip:,gateway:,nameserver:,nodns,netmask:,hostname: -- "$@")" || { warn_getopt network; return; }
 	while :; do
 		case $1 in
 			--bootproto)
@@ -16,7 +16,7 @@ network_handler () {
 						ks_preseed d-i netcfg/disable_dhcp boolean true
 						;;
 					*)
-						die_bad_arg network bootproto "$2"
+						warn_bad_arg network bootproto "$2"
 						;;
 				esac
 				shift 2
@@ -55,7 +55,7 @@ network_handler () {
 				shift 2
 				;;
 			--)	shift; break ;;
-			*)	die_getopt network ;;
+			*)	warn_getopt network; return ;;
 		esac
 	done
 

@@ -2,5 +2,5 @@
 
 driverdisk_handler () {
 	# TODO: <partition> --type=
-	die "driver disks not supported"
+	warn "driver disks not supported"
 }

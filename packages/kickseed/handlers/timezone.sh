@@ -4,7 +4,7 @@
 timezone_handler () {
 	utc=
 
-	eval set -- "$(getopt -o '' -l utc -- "$@")" || die_getopt timezone
+	eval set -- "$(getopt -o '' -l utc -- "$@")" || { warn_getopt timezone; return; }
 	while :; do
 		case $1 in
 			--utc)
@@ -12,12 +12,13 @@ timezone_handler () {
 				shift
 				;;
 			--)	shift; break ;;
-			*)	die_getopt timezone ;;
+			*)	warn_getopt timezone; return ;;
 		esac
 	done
 
 	if [ $# -ne 1 ]; then
-		die "timezone command requires a timezone"
+		warn "timezone command requires a timezone"
+		return
 	fi
 
 	if [ "$utc" ]; then

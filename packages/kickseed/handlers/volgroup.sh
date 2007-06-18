@@ -2,5 +2,5 @@
 
 volgroup_handler () {
 	# possible but complex
-	die "volgroup not supported yet"
+	warn "volgroup not supported yet"
 }

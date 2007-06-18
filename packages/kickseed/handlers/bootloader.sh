@@ -4,7 +4,7 @@ bootloader_handler_common () {
 	useLilo="$1"
 	shift
 	# TODO --password=, --md5pass=, --linear, --nolinear, --lba32
-	eval set -- "$(getopt -o '' -l location:,useLilo,upgrade -- "$@")" || die_getopt bootloader
+	eval set -- "$(getopt -o '' -l location:,useLilo,upgrade -- "$@")" || { warn_getopt bootloader; return; }
 	while :; do
 		case $1 in
 			--location)
@@ -22,7 +22,7 @@ bootloader_handler_common () {
 						ks_preseed d-i grub-installer/skip boolean true
 						;;
 					*)
-						die_bad_arg bootloader location "$OPTARG"
+						warn_bad_arg bootloader location "$OPTARG"
 						;;
 				esac
 				shift 2
@@ -32,10 +32,10 @@ bootloader_handler_common () {
 				shift
 				;;
 			--upgrade)
-				die "upgrades using installer not supported"
+				warn "upgrades using installer not supported"
 				;;
 			--)	shift; break ;;
-			*)	die_getopt bootloader ;;
+			*)	warn_getopt bootloader; return ;;
 		esac
 	done
 

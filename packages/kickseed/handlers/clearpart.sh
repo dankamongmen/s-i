@@ -1,11 +1,12 @@
 #! /bin/sh
 
 clearpart_handler () {
-	eval set -- "$(getopt -o '' -l linux,all,drives:,initlabel -- "$@")" || die_getopt clearpart
+	eval set -- "$(getopt -o '' -l linux,all,drives:,initlabel -- "$@")" || { warn_getopt clearpart; return; }
 	while :; do
 		case $1 in
 			--linux)
-				die "clearing all Linux partitions not supported yet"
+				warn "clearing all Linux partitions not supported yet"
+				shift
 				;;
 			--all)
 				ks_log "can't clear multiple drives; assuming just the first one"
@@ -18,7 +19,7 @@ clearpart_handler () {
 			--drives)
 				case $2 in
 					*,*)
-						die "clearing multiple drives not supported"
+						warn "clearing multiple drives not supported"
 						;;
 					*)
 						ks_preseed d-i partman-auto/disk string "/dev/$OPTARG"
@@ -31,7 +32,7 @@ clearpart_handler () {
 				shift
 				;;
 			--)	shift; break ;;
-			*)	die_getopt clearpart ;;
+			*)	warn_getopt clearpart; return ;;
 		esac
 	done
 }

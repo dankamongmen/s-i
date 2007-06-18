@@ -1,7 +1,7 @@
 #! /bin/sh
 
 url_handler () {
-	eval set -- "$(getopt -o '' -l url: -- "$@")" || die_getopt url
+	eval set -- "$(getopt -o '' -l url: -- "$@")" || { warn_getopt url; return; }
 	while :; do
 		case $1 in
 			--url)
@@ -14,7 +14,8 @@ url_handler () {
 						protocol=ftp
 						;;
 					*)
-						die "URL type $2 not supported"
+						warn "URL type $2 not supported"
+						continue
 						;;
 				esac
 				ks_preseed d-i mirror/protocol 'select' "$protocol"
@@ -33,7 +34,7 @@ url_handler () {
 				shift 2
 				;;
 			--)	shift; break ;;
-			*)	die_getopt url ;;
+			*)	warn_getopt url; return ;;
 		esac
 	done
 }

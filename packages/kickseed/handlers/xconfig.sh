@@ -1,7 +1,7 @@
 #! /bin/sh
 
 xconfig_handler () {
-	eval set -- "$(getopt -o '' -l noprobe,card:,videoram:,monitor:,hsync:,vsync:,defaultdesktop:,startxonboot,resolution:,depth: -- "$@")" || die_getopt xconfig
+	eval set -- "$(getopt -o '' -l noprobe,card:,videoram:,monitor:,hsync:,vsync:,defaultdesktop:,startxonboot,resolution:,depth: -- "$@")" || { warn_getopt xconfig; return; }
 	while :; do
 		case $1 in
 			--noprobe)
@@ -22,7 +22,8 @@ xconfig_handler () {
 				# TODO: no monitor database; we could
 				# preseed the identifier but there's little
 				# point
-				die_bad_opt xconfig monitor
+				warn_bad_opt xconfig monitor
+				shift 2
 				;;
 			--hsync)
 				ks_preseed xserver-xorg xserver-xorg/config/monitor/horiz-sync string "$2"
@@ -36,7 +37,7 @@ xconfig_handler () {
 				if [ "$2" = GNOME ]; then
 					: # Ubuntu default
 				else
-					die_bad_arg xconfig defaultdesktop "$2"
+					warn_bad_arg xconfig defaultdesktop "$2"
 				fi
 				shift 2
 				;;
@@ -62,7 +63,7 @@ xconfig_handler () {
 				shift 2
 				;;
 			--)	shift; break ;;
-			*)	die_getopt xconfig ;;
+			*)	warn_getopt xconfig; return ;;
 		esac
 	done
 }

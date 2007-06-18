@@ -8,21 +8,25 @@ if [ -z "$SPOOL" ]; then
 	SPOOL=/var/spool/kickseed
 fi
 
-die () {
+warn () {
 	echo "$@" >&2
+}
+
+die () {
+	warn "$@"
 	exit 1
 }
 
-die_getopt () {
-	die "Failed to parse $1 options"
+warn_getopt () {
+	warn "Failed to parse $1 options"
 }
 
-die_bad_opt () {
-	die "Unimplemented $1 option $2"
+warn_bad_opt () {
+	warn "Unimplemented $1 option $2"
 }
 
-die_bad_arg () {
-	die "Unimplemented $1 $2 argument $3"
+warn_bad_arg () {
+	warn "Unimplemented $1 $2 argument $3"
 }
 
 # Allow handler files to register functions to be called at the end of
@@ -139,7 +143,7 @@ kickseed () {
 				args="$(printf %s "$args" | sed 's/\$/\\$/g')"
 				eval "${keyword}_handler" "$args"
 			else
-				die "Unrecognised kickstart command: $keyword"
+				warn "Unrecognised kickstart command: $keyword"
 			fi
 		elif [ "$SECTION" = packages ]; then
 			if [ -z "$keyword" ] || [ "${keyword#\#}" != "$keyword" ]; then
@@ -148,7 +152,8 @@ kickseed () {
 			fi
 
 			if [ "$keyword" = '@' ]; then
-				die "Package groups not implemented"
+				warn "Package groups not implemented"
+				continue
 			fi
 
 			echo "$line" >> "$SPOOL/parse/$SECTION.section"

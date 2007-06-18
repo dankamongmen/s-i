@@ -6,7 +6,7 @@ mouse_handler () {
 		return
 	fi
 
-	eval set -- "$(getopt -o '' -l device:,emulthree -- "$@")" || die_getopt mouse
+	eval set -- "$(getopt -o '' -l device:,emulthree -- "$@")" || { warn_getopt mouse; return; }
 	while :; do
 		case $1 in
 			--device)
@@ -18,7 +18,7 @@ mouse_handler () {
 				shift
 				;;
 			--)	shift; break ;;
-			*)	die_getopt mouse ;;
+			*)	warn_getopt mouse; return ;;
 		esac
 	done
 

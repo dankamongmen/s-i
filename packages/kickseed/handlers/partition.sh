@@ -15,7 +15,7 @@ partition_handler () {
 	asprimary=
 	fstype=
 
-	eval set -- "$(getopt -o '' -l size:,grow,maxsize:,noformat,onpart:,usepart:,ondisk:,ondrive:,asprimary,fstype:,start:,end: -- "$@")" || die_getopt partition
+	eval set -- "$(getopt -o '' -l size:,grow,maxsize:,noformat,onpart:,usepart:,ondisk:,ondrive:,asprimary,fstype:,start:,end: -- "$@")" || { warn_getopt partition; return; }
 	while :; do
 		case $1 in
 			--size)
@@ -43,21 +43,23 @@ partition_handler () {
 				shift 2
 				;;
 			--onpart|--usepart|--ondisk|--ondrive|--start|--end)
-				die "unsupported restriction '$1'"
+				warn "unsupported restriction '$1'"
 				shift 2
 				;;
 			--)	shift; break ;;
-			*)	die_getopt partition ;;
+			*)	warn_getopt partition; return ;;
 		esac
 	done
 
 	if [ $# -ne 1 ]; then
-		die "partition command requires a mountpoint"
+		warn "partition command requires a mountpoint"
+		return
 	fi
 	mountpoint="$1"
 
 	if [ -z "$size" ]; then
-		die "partition command requires a size"
+		warn "partition command requires a size"
+		return
 	fi
 
 	if [ "$mountpoint" = swap ]; then

@@ -3,7 +3,7 @@
 rootpw_handler () {
 	setpassword=1
 
-	eval set -- "$(getopt -o '' -l disabled,iscrypted -- "$@")" || die_getopt rootpw
+	eval set -- "$(getopt -o '' -l disabled,iscrypted -- "$@")" || { warn_getopt rootpw; return; }
 	while :; do
 		case $1 in
 			--disabled)
@@ -16,13 +16,14 @@ rootpw_handler () {
 				shift
 				;;
 			--)	shift; break ;;
-			*)	die_getopt rootpw ;;
+			*)	warn_getopt rootpw; return ;;
 		esac
 	done
 
 	if [ "$setpassword" ]; then
 		if [ $# -ne 1 ]; then
-			die "rootpw command requires a password"
+			warn "rootpw command requires a password"
+			return
 		fi
 	else
 		set -- ''

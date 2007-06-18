@@ -1,5 +1,5 @@
 #! /bin/sh
 
 upgrade_handler () {
-	die "upgrades using installer not supported"
+	warn "upgrades using installer not supported"
 }

@@ -6,7 +6,7 @@ auth_handler () {
 	# --enableldaptls, --enablekrb5, --krb5realm=, --krb5kdc=,
 	# --krb5adminserver=, --enablehesiod, --hesiodlhs,
 	# --hesiodrhs, --enablesmbauth, --smbservers=, --smbworkgroup=
-	eval set -- "$(getopt -o '' -l enablemd5,useshadow,enableshadow,enablecache -- "$@")" || die_getopt auth
+	eval set -- "$(getopt -o '' -l enablemd5,useshadow,enableshadow,enablecache -- "$@")" || { warn_getopt auth; return; }
 	while :; do
 		case $1 in
 			--enablemd5)
@@ -19,11 +19,11 @@ auth_handler () {
 				shift
 				;;
 			--enablecache)
-				die "nscd not supported"
+				warn "nscd not supported"
 				shift
 				;;
 			--)	shift; break ;;
-			*)	die_getopt auth ;;
+			*)	warn_getopt auth; return ;;
 		esac
 	done
 }

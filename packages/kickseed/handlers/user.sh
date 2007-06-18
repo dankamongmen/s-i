@@ -3,7 +3,7 @@
 user_handler () {
 	makeuser=1
 
-	eval set -- "$(getopt -o '' -l disabled,fullname:,iscrypted,password: -- "$@")" || die_getopt user
+	eval set -- "$(getopt -o '' -l disabled,fullname:,iscrypted,password: -- "$@")" || { warn_getopt user; return; }
 	while :; do
 		case $1 in
 			--disabled)
@@ -25,13 +25,14 @@ user_handler () {
 				shift 2
 				;;
 			--)	shift; break ;;
-			*)	die_getopt user ;;
+			*)	warn_getopt user; return ;;
 		esac
 	done
 
 	if [ "$makeuser" ]; then
 		if [ $# -ne 1 ]; then
-			die "user command requires a username"
+			warn "user command requires a username"
+			return
 		fi
 
 		ks_preseed passwd passwd/make-user boolean true
