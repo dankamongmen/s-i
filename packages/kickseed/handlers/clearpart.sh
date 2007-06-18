@@ -22,7 +22,7 @@ clearpart_handler () {
 				shift 2
 				;;
 			--initlabel)
-				ks_preseed d-i partman-auto/confirm_write_new_label boolean true
+				ks_preseed d-i partman/confirm_write_new_label boolean true
 				shift
 				;;
 			--)	shift; break ;;
