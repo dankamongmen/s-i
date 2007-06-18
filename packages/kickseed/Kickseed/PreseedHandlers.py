@@ -3,6 +3,7 @@ from getopt import gnu_getopt
 class PreseedHandlerException(Exception): pass
 class UnimplementedCommand(PreseedHandlerException): pass
 class UnimplementedArgument(PreseedHandlerException): pass
+class CommandSyntaxError(PreseedHandlerException): pass
 
 class PreseedHandlers:
     def __init__(self):
@@ -194,3 +195,97 @@ class PreseedHandlers:
         if ('ipaddress' in statics and 'netmask' in statics and
             'gateway' in statics and 'nameservers' in statics):
             self._preseed('d-i', 'netcfg/confirm_static', 'boolean', 'true')
+
+    def part(self, args):
+        return self.partition(args)
+
+    def partition(self, args):
+        if 'partman-auto/expert_recipe' in self.preseeds:
+            qpackage, qtype, recipe = \
+                self.preseeds['partman-auto/expert_recipe']
+        else:
+            recipe = 'Kickstart-supplied partitioning scheme :'
+
+        size = None
+        grow = 0
+        # partman-auto doesn't support unlimited-size partitions, so use an
+        # arbitrary maximum of one petabyte
+        maxsize = 1024 * 1024 * 1024
+        format = 1
+        asprimary = 0
+        fstype = None
+
+        (opts, rest) = gnu_getopt(args, '',
+                                  ['size=', 'grow', 'maxsize=',
+                                   'noformat', 'onpart=', 'usepart=',
+                                   'ondisk=', 'ondrive=', 'asprimary',
+                                   'fstype=', 'start=', 'end='])
+
+        for opt, value in opts:
+            if opt == '--size':
+                size = int(value)
+            elif opt == '--grow':
+                grow = 1
+            elif opt == '--maxsize':
+                maxsize = int(value)
+            elif opt == '--noformat':
+                format = 0
+            elif opt == '--onpart' or opt == '--usepart':
+                raise UnimplementedArgument, "unsupported restriction 'onpart'"
+            elif opt == '--ondisk' or opt == '--ondrive':
+                raise UnimplementedArgument, "unsupported restriction 'ondisk'"
+            elif opt == '--asprimary':
+                asprimary = 1
+            elif opt == '--fstype':
+                fstype = value
+            elif opt == '--start':
+                raise UnimplementedArgument, "unsupported restriction 'start'"
+            elif opt == '--end':
+                raise UnimplementedArgument, "unsupported restriction 'end'"
+            else:
+                raise UnimplementedArgument, opt
+
+        if len(rest) != 1:
+            raise CommandSyntaxError, "partition command requires a mountpoint"
+        mountpoint = rest[0]
+
+        if size is None:
+            raise CommandSyntaxError, "partition command requires a size"
+
+        if mountpoint == 'swap':
+            filesystem = 'swap'
+            mountpoint = None
+        elif fstype:
+            filesystem = fstype
+        else:
+            filesystem = 'ext3'
+
+        if grow:
+            priority = size
+        else:
+            priority = maxsize
+        recipe += ' %u %u %u %s' % (size, priority, maxsize, filesystem)
+
+        if asprimary:
+            recipe += ' $primary{ }'
+
+        if filesystem == 'swap':
+            recipe += ' method{ swap }'
+        elif format:
+            recipe += ' method{ format }'
+        else:
+            recipe += ' method{ keep }'
+
+        if format:
+            recipe += ' format { }'
+
+        if filesystem != 'swap':
+            recipe += ' use_filesystem{ }'
+            recipe += ' filesystem{ %s }' % filesystem
+
+        if mountpoint:
+            recipe += ' mountpoint{ %s }' % mountpoint
+
+        recipe += ' .'
+
+        self._preseed('d-i', 'partman-auto/expert_recipe', 'string', recipe)
