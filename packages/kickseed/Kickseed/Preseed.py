@@ -1,3 +1,5 @@
+import shlex
+
 from Kickseed.PreseedHandlers import PreseedHandlers
 
 class Preseed:
@@ -6,9 +8,8 @@ class Preseed:
         self.handlers = PreseedHandlers()
 
     def write(self, fd):
-        preseeds = []
-        for keyword, args in self.data.items():
-            getattr(self.handlers, keyword)(args)
+        for keyword, argstr in self.data.items():
+            getattr(self.handlers, keyword)(shlex.split(argstr))
 
         print >>fd, """#### Modifying syslinux.cfg.
 

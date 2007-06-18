@@ -1,8 +1,8 @@
+from getopt import gnu_getopt
+
 class PreseedHandlerException(Exception): pass
 class UnimplementedCommand(PreseedHandlerException): pass
 class UnimplementedArgument(PreseedHandlerException): pass
-
-# Global TODO: args with values don't always have =
 
 class PreseedHandlers:
     def __init__(self):
@@ -12,61 +12,65 @@ class PreseedHandlers:
         self.preseeds.append((qpackage, qname, qtype, qanswer))
 
     def auth(self, args):
-        for arg in args:
-            if arg == '--enablemd5':
+        # TODO --enablenis, --nisdomain=, --nisserver=, --enableldap,
+        # --enableldapauth, --ldapserver=, --ldapbasedn=,
+        # --enableldaptls, --enablekrb5, --krb5realm=, --krb5kdc=,
+        # --krb5adminserver=, --enablehesiod, --hesiodlhs,
+        # --hesiodrhs, --enablesmbauth, --smbservers=, --smbworkgroup=
+        opts = gnu_getopt(args, '',
+                          ['enablemd5', 'useshadow', 'enableshadow',
+                           'enablecache'])[0]
+        for opt, value in opts:
+            if opt == '--enablemd5':
                 self.preseed('passwd', 'passwd/md5', 'boolean', 'true')
-            elif arg == '--useshadow' or arg == '--enableshadow':
+            elif opt == '--useshadow' or opt == '--enableshadow':
                 # TODO: this is true by default already
                 self.preseed('passwd', 'passwd/shadow', 'boolean', 'true')
-            elif arg == '--enablecache':
+            elif opt == '--enablecache':
                 raise UnimplementedArgument, 'nscd not supported'
             else:
-                # TODO --enablenis, --nisdomain=, --nisserver=, --enableldap,
-                # --enableldapauth, --ldapserver=, --ldapbasedn=,
-                # --enableldaptls, --enablekrb5, --krb5realm=, --krb5kdc=,
-                # --krb5adminserver=, --enablehesiod, --hesiodlhs,
-                # --hesiodrhs, --enablesmbauth, --smbservers=, --smbworkgroup=
-                raise UnimplementedArgument, arg
+                raise UnimplementedArgument, opt
 
     def autostep(self, args):
         raise UnimplementedCommand, "autostep makes no sense in d-i"
 
     def bootloader(self, args):
-        for arg in args:
-            if arg.startswith('--location='):
-                location = arg[11:]
-                if location == 'mbr':
+        # TODO --password=, --md5pass=, --linear, --nolinear, --lba32
+        opts = gnu_getopt(args, '', ['location=', 'useLilo', 'upgrade'])[0]
+        for opt, value in opts:
+            if opt == '--location':
+                if value == 'mbr':
                     # TODO: not always hd0; lilo
                     self.preseed('d-i', 'grub-installer/bootdev', 'string', '(hd0)')
-                elif location == 'partition':
+                elif value == 'partition':
                     # TODO: lilo
                     self.preseed('d-i', 'grub-installer/bootdev', 'string', '(hd0,1)')
-                elif location == 'none':
+                elif value == 'none':
                     # TODO need lilo-installer/skip too
                     self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
                 else:
-                    raise UnimplementedArgument, arg
-            elif arg.startswith('--useLilo'):
+                    raise UnimplementedArgument, value
+            elif opt == 'useLilo':
                 self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
-            elif arg.startswith('--upgrade'):
+            elif opt == '--upgrade':
                 raise UnimplementedArgument, 'upgrades using installer not supported'
             else:
-                # TODO --password=, --md5pass=, --linear, --nolinear, --lba32
-                raise UnimplementedArgument, arg
+                raise UnimplementedArgument, opt
 
     def clearpart(self, args):
-        for arg in args:
-            if arg.startswith('--drives='):
-                drives = arg[9:].split(',')
+        # TODO --linux, --all
+        opts = gnu_getopt(args, '', ['drives=', 'initlabel'])[0]
+        for opt, value in opts:
+            if opt == '--drives':
+                drives = value.split(',')
                 if len(drives) > 1:
                     raise UnimplementedArgument, 'clearing multiple drives not supported'
                 else:
                     self.preseed('d-i', 'partman-auto/disk', 'string', '/dev/%s' % drives[0])
-            elif arg == '--initlabel':
+            elif opt == '--initlabel':
                 self.preseed('d-i', 'partman-auto/confirm_write_new_label', 'boolean', 'true')
             else:
-                # TODO --linux, --all
-                raise UnimplementedArgument, arg
+                raise UnimplementedArgument, opt
 
     def keyboard(self, args):
         self.preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
