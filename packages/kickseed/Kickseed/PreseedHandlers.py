@@ -2,6 +2,8 @@ class PreseedHandlerException(Exception): pass
 class UnimplementedCommand(PreseedHandlerException): pass
 class UnimplementedArgument(PreseedHandlerException): pass
 
+# Global TODO: args with values don't always have =
+
 class PreseedHandlers:
     def __init__(self):
         self.preseeds = []
@@ -50,6 +52,20 @@ class PreseedHandlers:
                 raise UnimplementedArgument, 'upgrades using installer not supported'
             else:
                 # TODO --password=, --md5pass=, --linear, --nolinear, --lba32
+                raise UnimplementedArgument, arg
+
+    def clearpart(self, args):
+        for arg in args:
+            if arg.startswith('--drives='):
+                drives = ','.split(arg[9:])
+                if len(drives) > 1:
+                    raise UnimplementedArgument, 'clearing multiple drives not supported'
+                else:
+                    self.preseed('d-i', 'partman-auto/disk', 'string', '/dev/%s' % drives[0])
+            elif arg == '--initlabel':
+                self.preseed('d-i', 'partman-auto/confirm_write_new_label', 'boolean', 'true')
+            else:
+                # TODO --linux, --all
                 raise UnimplementedArgument, arg
 
     def keyboard(self, args):
