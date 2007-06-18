@@ -140,6 +140,10 @@ kickseed () {
 			# Delegate to directive handlers.
 			if type "${keyword}_handler" >/dev/null 2>&1; then
 				args="${line#*[ 	]}"
+				if [ "$args" = "$line" ]; then
+					# No arguments.
+					args=
+				fi
 				# This gets ...='\$foo' wrong, but it's
 				# better than the alternative (broken
 				# crypted passwords) for now.
