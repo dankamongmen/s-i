@@ -212,12 +212,12 @@ kickseed_post () {
 	done
 }
 
-# Find ks parameters in /proc/cmdline (or the test file of your choice).
+# Find the parameter named by $2 in /proc/cmdline (or the test file of your choice).
 kickseed_cmdline () {
 	for item in $(cat "$1"); do
 		var="${item%%=*}"
 
-		if [ "$var" = ks ]; then
+		if [ "$var" = "$2" ]; then
 			echo "${item#*=}"
 			break
 		fi

@@ -28,7 +28,11 @@ set_question () {
 if [ -x /var/lib/dpkg/info/netcfg.postinst ]; then
 	# Make sure we don't get asked unnecessary networking questions.
 	# Do tell the user about errors, though.
-	set_question netcfg/choose_interface auto
+	KSDEVICE="$(kickseed_cmdline /proc/cmdline ksdevice)"
+	if [ -z "$KSDEVICE" ]; then
+		KSDEVICE=auto
+	fi
+	set_question netcfg/choose_interface "$KSDEVICE"
 	set_question netcfg/get_hostname ubuntu
 	set_question netcfg/wireless_essid
 	set_question netcfg/wireless_wep
