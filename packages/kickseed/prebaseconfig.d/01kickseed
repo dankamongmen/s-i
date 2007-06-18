@@ -13,11 +13,11 @@ ks_run_script () {
 		cp "$SCRIPT" /target/tmp/ks-script
 		chmod 700 /target/tmp/ks-script
 		chroot /target "$INTERPRETER" /tmp/ks-script \
-			>/var/log/messages 2>&1
+			2>>/var/log/messages
 	else
 		cp "$SCRIPT" /tmp/ks-script
 		chmod 700 /tmp/ks-script
-		"$INTERPRETER" /tmp/ks-script >/var/log/messages 2>&1
+		"$INTERPRETER" /tmp/ks-script 2>>/var/log/messages
 	fi
 }
 
