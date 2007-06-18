@@ -8,7 +8,7 @@ class Preseed:
         self.handlers = PreseedHandlers()
 
     def write(self, fd):
-        for keyword, argstr in self.data.items():
+        for keyword, argstr in self.data.main.items():
             getattr(self.handlers, keyword)(shlex.split(argstr))
 
         print >>fd, """#### Modifying syslinux.cfg.
