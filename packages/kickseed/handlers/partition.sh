@@ -107,11 +107,11 @@ part_handler () {
 	partition_handler "$@"
 }
 
-partition_handler_final () {
+partition_final () {
 	if [ "$partition_recipe" ]; then
 		ks_preseed d-i partman-auto/expert_recipe string \
 			"$partition_recipe"
 	fi
 }
 
-register_final partition_handler_final
+register_final partition_final

@@ -28,7 +28,7 @@ langsupport_handler () {
 	ks_preseed d-i localechooser/supported-locales multiselect "$languages"
 }
 
-langsupport_handler_final () {
+langsupport_final () {
 	# TODO: no support for different installation and installed languages
 	if [ "$lang_value" ] && [ "$langsupport_default" ] && \
 			[ "$lang_value" != "$langsupport_default" ]; then
@@ -36,4 +36,4 @@ langsupport_handler_final () {
 	fi
 }
 
-register_final langsupport_handler_final
+register_final langsupport_final
