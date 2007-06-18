@@ -277,7 +277,7 @@ kickseed () {
 		ks_preseed tasksel tasksel/first multiselect "$tasklist"
 		ks_preseed d-i pkgsel/include string "$packagelist"
 		if $hasnegatives; then
-			warn "exclusions in %packages not supported as of Ubuntu 6.10; remove them manually in %post instead"
+			warn "exclusions in %packages not supported; remove them manually in %post instead"
 		fi
 	fi
 
