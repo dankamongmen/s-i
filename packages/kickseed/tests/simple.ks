@@ -1,5 +1,5 @@
 lang en_GB
-langsupport --default=en_US de_DE
+langsupport --default=en_US de_DE xh_ZA
 keyboard uk
 autostep
 auth --enablemd5 --enableshadow

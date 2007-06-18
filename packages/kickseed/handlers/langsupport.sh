@@ -20,9 +20,9 @@ langsupport_handler () {
 		return
 	fi
 
-	languages="$*"
+	languages="$(echo "$*" | sed 's/ /, /g')"
 	if [ "$langsupport_default" ]; then
-		languages="$langsupport_default $languages"
+		languages="$langsupport_default, $languages"
 	fi
 
 	# requires localechooser 0.04.0ubuntu4
