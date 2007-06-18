@@ -3,3 +3,4 @@ keyboard uk
 auth --enablemd5 --enableshadow
 bootloader --location=mbr
 interactive
+lilo

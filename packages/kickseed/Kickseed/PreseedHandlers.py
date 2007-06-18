@@ -34,7 +34,7 @@ class PreseedHandlers:
     def autostep(self, args):
         raise UnimplementedCommand, "autostep makes no sense in d-i"
 
-    def bootloader(self, args):
+    def bootloader(self, args, useLilo = False):
         # TODO --password=, --md5pass=, --linear, --nolinear, --lba32
         opts = gnu_getopt(args, '', ['location=', 'useLilo', 'upgrade'])[0]
         for opt, value in opts:
@@ -51,11 +51,14 @@ class PreseedHandlers:
                 else:
                     raise UnimplementedArgument, value
             elif opt == 'useLilo':
-                self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
+                useLilo = True
             elif opt == '--upgrade':
                 raise UnimplementedArgument, 'upgrades using installer not supported'
             else:
                 raise UnimplementedArgument, opt
+
+        if useLilo:
+            self.preseed('d-i', 'grub-installer/skip', 'boolean', 'true')
 
     def clearpart(self, args):
         # TODO --linux, --all
@@ -115,3 +118,6 @@ class PreseedHandlers:
         # preseed/localechooser changes needed to allow different
         # installation and installed languages
         raise UnimplementedCommand, 'langsupport not supported yet'
+
+    def lilo(self, args):
+        return self.bootloader(args, useLilo = True)
