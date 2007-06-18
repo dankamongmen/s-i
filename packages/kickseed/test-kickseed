@@ -1,0 +1,19 @@
+#! /bin/sh -e
+
+HANDLERS=handlers
+SPOOL="$(mktemp -d)"
+
+trap 'rm -rf "$SPOOL"' EXIT HUP INT QUIT TERM
+
+. kickseed.sh
+
+preseed () {
+	echo "$@" >> "$SPOOL/test-output"
+}
+
+RET=0
+(kickseed < "$1") || RET=$?
+
+sort "$SPOOL/test-output"
+
+exit $RET
