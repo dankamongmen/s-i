@@ -1,5 +1,3 @@
-import string
-
 class KickstartNotImplemented(Exception): pass
 
 class KickstartParser:
@@ -14,7 +12,7 @@ class KickstartParser:
 
         section = 'main'
         for line in fd:
-            line = string.strip(line)
+            line = line.strip()
 
             if line == '':
                 continue
@@ -33,7 +31,7 @@ class KickstartParser:
             elif line.startswith('#'):
                 continue
             else:
-                tokens = string.split(line)
+                tokens = line.split()
                 self.data[tokens[0]] = tokens[1:]
 
         if sections['packages']:
@@ -50,12 +48,12 @@ class KickstartParser:
                     self.data['individualPackageList'].append(pkg)
 
         if sections['pre']:
-            tokens = string.split(sections['pre'][0])
+            tokens = sections['pre'][0].split()
             self.data['preLine'] = tokens[1:]
             self.data['preList'] = sections['pre'][1:]
 
         if sections['post']:
-            tokens = string.split(sections['post'][0])
+            tokens = sections['post'][0].split()
             self.data['postLine'] = tokens[1:]
             self.data['postList'] = sections['post'][1:]
 
