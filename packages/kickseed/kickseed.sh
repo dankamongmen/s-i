@@ -96,7 +96,6 @@ kickseed () {
 		if [ "$SECTION" = main ]; then
 			# Delegate to directive handlers.
 			if type "${keyword}_handler" >/dev/null 2>&1; then
-				OPTIND=1
 				eval "${keyword}_handler" "${line#* }"
 			else
 				die "Unrecognised kickstart command: $keyword"
