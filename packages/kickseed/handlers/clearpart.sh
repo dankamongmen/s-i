@@ -8,7 +8,12 @@ clearpart_handler () {
 				die "clearing all Linux partitions not supported yet"
 				;;
 			--all)
-				die "clearing all partitions not supported yet"
+				ks_log "can't clear multiple drives; assuming just the first one"
+				# TODO: this will break when we move to udev
+				# device names, and I bet it isn't safe for
+				# installs from USB ...
+				ks_preseed d-i partman-auto/disk string /dev/discs/disc0/disc
+				shift
 				;;
 			--drives)
 				case $2 in
