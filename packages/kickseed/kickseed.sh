@@ -52,6 +52,7 @@ save_post_script () {
 			i="$(($i + 1))"
 		done
 		mv "$SPOOL/parse/post.section" "$POSTSPOOL/$i.script"
+		chmod +x "$POSTSPOOL/$i.script"
 		if [ "$post_chroot" = 1 ]; then
 			touch "$POSTSPOOL/$i.chroot"
 		else
@@ -83,6 +84,7 @@ kickseed () {
 				;;
 			%packages|%post|%final)
 				if [ -e "$SPOOL/parse/pre.section" ]; then
+					chmod +x "$SPOOL/parse/pre.section"
 					if ! ks_run_script pre /bin/sh 0 "$SPOOL/parse/pre.section"; then
 						warn "%pre script exited with error code $?"
 					fi
