@@ -111,6 +111,9 @@ partition_final () {
 	if [ "$partition_recipe" ]; then
 		ks_preseed d-i partman-auto/expert_recipe string \
 			"$partition_recipe"
+		ks_preseed d-i partman/choose_partition string \
+			'Finish partitioning and write changes to disk'
+		ks_preseed d-i partman/confirm boolean true
 	fi
 }
 
