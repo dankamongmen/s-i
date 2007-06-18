@@ -20,3 +20,8 @@ openssh-server
 
 echo "This is a %pre script."
 echo "It does nothing very interesting."
+%post
+#! /bin/sh
+
+echo "This is a %post script."
+echo "It does nothing very interesting, in a chroot."

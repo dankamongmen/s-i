@@ -26,6 +26,20 @@ register_final () {
 	final_handlers="$final_handlers $1"
 }
 
+# Save a script for later execution.
+save_script () {
+	TYPE="$1"
+
+	if [ -e "$SPOOL/$TYPE.section" ]; then
+		mkdir -p "$SPOOL/$TYPE"
+		i=0
+		while [ -e "$SPOOL/$TYPE/$i.script" ]; do
+			i="$(($i + 1))"
+		done
+		mv "$SPOOL/$TYPE.section" "$SPOOL/$TYPE/$i.script"
+	fi
+}
+
 # Load all handlers.
 for handler in "$HANDLERS"/*; do
 	. "$handler"
@@ -45,8 +59,9 @@ kickseed () {
 				continue
 				;;
 			%packages|%post|%final)
-				if [ "$SECTION" = pre ]; then
+				if [ -e "$SPOOL/pre.section" ]; then
 					ks_run_script pre /bin/sh "$SPOOL/pre.section"
+					rm -f "$SPOOL/pre.section"
 				fi
 				SECTION="${keyword#%}"
 				continue
@@ -74,19 +89,21 @@ kickseed () {
 	done < "$1"; echo %final) | while read line; do
 		# Work out the section.
 		keyword="${line%% *}"
-		if [ -z "$keyword" ] || [ "${keyword#\#}" != "$keyword" ]; then
-			# Ignore empty lines and comments.
-			continue
-		elif [ "$keyword" = '%packages' ]; then
+		if [ "$keyword" = '%packages' ]; then
+			save_script post
 			SECTION=packages
 			continue
 		elif [ "$keyword" = '%pre' ]; then
+			save_script post
 			SECTION=pre
 			continue
 		elif [ "$keyword" = '%post' ]; then
+			save_script post
 			SECTION=post
+			> "$SPOOL/post.section"
 			continue
 		elif [ "$keyword" = '%final' ]; then
+			save_script post
 			for handler in $final_handlers; do
 				$handler
 			done
@@ -94,14 +111,28 @@ kickseed () {
 		fi
 
 		if [ "$SECTION" = main ]; then
+			if [ -z "$keyword" ] || [ "${keyword#\#}" != "$keyword" ]; then
+				# Ignore empty lines and comments.
+				continue
+			fi
+
 			# Delegate to directive handlers.
 			if type "${keyword}_handler" >/dev/null 2>&1; then
 				eval "${keyword}_handler" "${line#* }"
 			else
 				die "Unrecognised kickstart command: $keyword"
 			fi
-		elif [ "$SECTION" = packages ] && [ "$keyword" = '@' ]; then
-			die "Package groups not implemented"
+		elif [ "$SECTION" = packages ]; then
+			if [ -z "$keyword" ] || [ "${keyword#\#}" != "$keyword" ]; then
+				# Ignore empty lines and comments.
+				continue
+			fi
+
+			if [ "$keyword" = '@' ]; then
+				die "Package groups not implemented"
+			fi
+
+			echo "$line" >> "$SPOOL/$SECTION.section"
 		elif [ "$SECTION" = pre ]; then
 			# already handled
 			continue
