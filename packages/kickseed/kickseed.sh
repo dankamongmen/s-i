@@ -163,20 +163,20 @@ kickseed () {
 			fi
 		done
 
-		# pattern gets: (pos|pos|pos)!neg!neg!neg
+		# pattern gets: (~nPOS|~nPOS|~nPOS)!~nNEG!~nNEG!~nNEG
 		joinpositives=
 		for pkg in $positives; do
 			if [ "$pkg" = . ]; then
 				continue
 			fi
-			joinpositives="${joinpositives:+$joinpositives|}$pkg"
+			joinpositives="${joinpositives:+$joinpositives|}~n$pkg"
 		done
 		pattern="($joinpositives)"
 		for pkg in $negatives; do
 			if [ "$pkg" = . ]; then
 				continue
 			fi
-			pattern="$pattern!$pkg"
+			pattern="$pattern!~n$pkg"
 		done
 		# introduced in base-config 2.61ubuntu2; Debian would need
 		# tasksel preseeding instead
