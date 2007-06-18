@@ -132,7 +132,12 @@ kickseed () {
 			continue
 		elif [ "$keyword" = '%post' ]; then
 			save_post_script
-			post_handler_section "${line#*[ 	]}"
+			args="${line#*[ 	]}"
+			if [ "$args" = "$line" ]; then
+				# No arguments.
+				args=
+			fi
+			eval post_handler_section "$args"
 			SECTION=post
 			> "$SPOOL/parse/post.section"
 			continue
