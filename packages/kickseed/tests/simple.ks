@@ -4,6 +4,8 @@ keyboard uk
 autostep
 auth --enablemd5 --enableshadow
 bootloader --location=mbr
+device eth module1 --opts="aic152x=0x340 io=11"
+device scsi module2 --opts="testopts=testvalue"
 firewall --disabled
 interactive
 lilo
