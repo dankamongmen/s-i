@@ -132,7 +132,12 @@ kickseed () {
 
 			# Delegate to directive handlers.
 			if type "${keyword}_handler" >/dev/null 2>&1; then
-				eval "${keyword}_handler" "${line#* }"
+				args="${line#*[ 	]}"
+				# This gets ...='\$foo' wrong, but it's
+				# better than the alternative (broken
+				# crypted passwords) for now.
+				args="$(printf %s "$args" | sed 's/\$/\\$/g')"
+				eval "${keyword}_handler" "$args"
 			else
 				die "Unrecognised kickstart command: $keyword"
 			fi
