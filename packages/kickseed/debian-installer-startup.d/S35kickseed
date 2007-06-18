@@ -21,6 +21,18 @@ ks_run_script () {
 	"$INTERPRETER" "$SCRIPT"
 }
 
+preseed_fetch () {
+	ln -s "$1" "$2"
+}
+
+preseed_relative () {
+	if [ -z "${1##/*}" ]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
 KSCFG=
 
 for item in $(< /proc/cmdline); do
