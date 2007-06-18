@@ -63,6 +63,18 @@ case $KS in
 			exit 1
 		fi
 		;;
+	nfs:*:/*)
+		logger -t kickseed "Retrieving kickstart file from $KS"
+		file="${KS#nfs:}"
+		server="${file%%:*}"
+		file="${file#*:}"
+		if ! mount -t nfs -o ro "$server:${file%/*}" "${KSCFG%/*}"; then
+			logger -t kickseed "... failed"
+			exit 1
+		fi
+		trap "umount '${KSCFG%/*}' || true" \
+			EXIT HUP INT QUIT TERM
+		;;
 esac
 
 case $KSCFG in

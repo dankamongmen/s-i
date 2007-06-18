@@ -1,0 +1,9 @@
+#! /bin/sh -e
+# Bring up everything that's needed to fetch a Kickstart file from NFS.
+
+/lib/kickseed/setup/net nfs-modules
+
+depmod -a >/dev/null 2>&1 || true
+modprobe -q nfs >>/var/log/messages 2>&1 || true
+
+exit 0

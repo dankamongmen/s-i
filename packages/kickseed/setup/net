@@ -7,9 +7,11 @@
 
 . /lib/kickseed/cmdline.sh
 
+EXTRA_UDEBS="$@"
+
 if [ ! -x /var/lib/dpkg/info/ethdetect.postinst ] || \
    [ ! -x /var/lib/dpkg/info/netcfg.postinst ]; then
-	/lib/kickseed/kickseed-anna ethdetect netcfg
+	/lib/kickseed/kickseed-anna ethdetect netcfg $EXTRA_UDEBS
 fi
 
 if [ -x /var/lib/dpkg/info/ethdetect.postinst ]; then

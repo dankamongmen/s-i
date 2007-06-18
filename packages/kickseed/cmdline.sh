@@ -50,6 +50,14 @@ kickseed_file () {
 			mkdir -p "${spoolpath%/*}"
 			echo "$spoolpath"
 			;;
+		nfs:*:/*)
+			file="${1#nfs:}"
+			server="${file%%:*}"
+			file="${file#*:}"
+			spoolpath="$SPOOL/fetch/nfs/$server/$file"
+			mkdir -p "${spoolpath%/*}"
+			echo "$spoolpath"
+			;;
 		*)
 			logger -t kickseed "Kickstart location $1 not supported"
 			;;
