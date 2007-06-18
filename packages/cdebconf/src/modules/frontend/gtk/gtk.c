@@ -86,8 +86,6 @@ typedef int (custom_func_t)(struct frontend*, struct question*, GtkWidget*);
 
 static const char * get_text(struct frontend *obj, const char *template, const char *fallback );
 
-static int reset_cursor_cnt = 0;
-
 void register_setter(void (*func)(void*, struct question*),
              void *data, struct question *q, struct frontend *obj)
 {
@@ -346,21 +344,6 @@ gboolean expose_event_callback(GtkWidget *wid, GdkEventExpose *event, struct fro
     return FALSE;
 }
 
-/* TODO: workaround for bug #404482
- * This is a workaround for a bug in gtk/dfb which causes wrong GDK crossing
- * events (not) to be delivered and hence cursor not to be reshaped when
- * entering or leaving a gtktextview or a gtkentry
- */
-static gboolean reset_cursor_callback (GtkWidget *widget, GdkEventExpose *event, void *data)
-{
-    if (event->type == GDK_LEAVE_NOTIFY || event->type == GDK_ENTER_NOTIFY) {
-        if ( (reset_cursor_cnt % 2) == 0)
-            gdk_window_set_cursor (widget->window, NULL);
-        reset_cursor_cnt++;
-    }
-
-    return FALSE;
-}
 
 /* Scrolling to default row in SELECT questions has to be done after the
  * treeview has been realized
@@ -1436,7 +1419,6 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
     gtk_init (&args, &name);
 
     window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    g_signal_connect_after (G_OBJECT (window), "event", G_CALLBACK (reset_cursor_callback), NULL);
     gtk_widget_set_size_request (window, WINDOW_WIDTH, WINDOW_HEIGHT);
     gtk_window_set_resizable (GTK_WINDOW (window), TRUE);
     gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
