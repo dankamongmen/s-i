@@ -18,13 +18,12 @@ bterm_run () {
 }
 
 KS="$(kickseed_cmdline /proc/cmdline ks)"
-KSCFG="$(kickseed_file "$KS")"
 
-case $KSCFG in
-	/cdrom/*)
+case $KS in
+	cdrom:/*)
 		bterm_run /lib/kickseed/setup/cdrom || true
 		;;
-	$SPOOL/fetch/http/*)
+	http://*/*)
 		bterm_run /lib/kickseed/setup/net || true
 		;;
 esac
