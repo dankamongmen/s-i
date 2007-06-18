@@ -12,12 +12,13 @@ ks_run_script () {
 	if [ "$CHROOTED" = 1 ]; then
 		cp "$SCRIPT" /target/tmp/ks-script
 		chmod 700 /target/tmp/ks-script
-		chroot /target "$INTERPRETER" /tmp/ks-script \
-			2>>/var/log/messages
+		log-output -t kickseed --pass-stdout \
+			chroot /target "$INTERPRETER" /tmp/ks-script
 	else
 		cp "$SCRIPT" /tmp/ks-script
 		chmod 700 /tmp/ks-script
-		"$INTERPRETER" /tmp/ks-script 2>>/var/log/messages
+		log-output -t kickseed --pass-stdout \
+			"$INTERPRETER" /tmp/ks-script
 	fi
 }
 

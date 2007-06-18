@@ -22,7 +22,7 @@ ks_run_script () {
 	SCRIPT="$4"
 
 	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER:"
-	"$INTERPRETER" "$SCRIPT" 2>>/var/log/messages
+	log-output -t kickseed --pass-stdout "$INTERPRETER" "$SCRIPT"
 }
 
 preseed_fetch () {
@@ -100,8 +100,8 @@ case $KSCFG in
 		device="${KSCFG#/media/}"
 		device="${device%%/*}"
 		# TODO: relies on having non-devfs compatibility paths
-		if mount "/dev/$device" "/media/$device" \
-				>>/var/log/messages 2>&1; then
+		if log-output -t kickseed \
+				mount "/dev/$device" "/media/$device"; then
 			trap "umount '/media/$device' || true" \
 				EXIT HUP INT QUIT TERM
 		fi
