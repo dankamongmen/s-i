@@ -225,17 +225,30 @@ kickseed () {
 		for pkg in $positives; do
 			case $pkg in
 				.)	continue ;;
-				~t*)	element="$pkg" ;;
-				*)	element="~n$pkg" ;;
+				~t*)
+					element="$pkg"
+					tasklist="${tasklist:+$tasklist, }${pkg#~t}"
+					;;
+				*)
+					element="~n$pkg"
+					packagelist="${packagelist:+$packagelist }$pkg"
+					;;
 			esac
 			joinpositives="${joinpositives:+$joinpositives|}$element"
 		done
 		pattern="($joinpositives)"
+		hasnegatives=false
 		for pkg in $negatives; do
 			case $pkg in
 				.)	continue ;;
-				~t*)	element="$pkg" ;;
-				*)	element="~n$pkg" ;;
+				~t*)
+					element="$pkg"
+					hasnegatives=:
+					;;
+				*)
+					element="~n$pkg"
+					hasnegatives=:
+					;;
 			esac
 			pattern="$pattern!$element"
 		done
@@ -243,8 +256,15 @@ kickseed () {
 		# tasksel preseeding instead
 		ks_preseed base-config base-config/package-selection string \
 			"$pattern"
-		# requires pkgsel 0.04ubuntu1
+		# requires pkgsel 0.04ubuntu1; obsolete as of pkgsel
+		# 0.07ubuntu1
 		ks_preseed d-i pkgsel/install-pattern string "$pattern"
+		# requires pkgsel 0.07ubuntu1/0.08
+		ks_preseed tasksel tasksel/first multiselect "$tasklist"
+		ks_preseed d-i pkgsel/include string "$packagelist"
+		if $hasnegatives; then
+			warn "exclusions in %packages not supported as of Ubuntu 6.10; remove them manually in %post instead"
+		fi
 	fi
 
 	# Kickstart installations always run at critical priority.
