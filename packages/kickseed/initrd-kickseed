@@ -68,7 +68,8 @@ case $KS in
 		file="${KS#nfs:}"
 		server="${file%%:*}"
 		file="${file#*:}"
-		if ! mount -t nfs -o ro "$server:${file%/*}" "${KSCFG%/*}"; then
+		if ! mount -t nfs -o ro,intr \
+				"$server:${file%/*}" "${KSCFG%/*}"; then
 			logger -t kickseed "... failed"
 			exit 1
 		fi
