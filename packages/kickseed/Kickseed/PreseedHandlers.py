@@ -325,6 +325,10 @@ class PreseedHandlers:
     def upgrade(self, args):
         raise UnimplementedCommand, 'upgrades using installer not supported'
 
+    def volgroup(self, args):
+        # possible but complex
+        raise UnimplementedCommand, 'volgroup not supported yet'
+
     def xconfig(self, args):
         opts = gnu_getopt(args, '',
                           ['noprobe', 'card=', 'videoram=', 'monitor=',
@@ -384,3 +388,7 @@ class PreseedHandlers:
                               'select', depth)
             else:
                 raise UnimplementedArgument, opt
+
+    def zerombr(self, args):
+        # TODO: as far as I can see, partman doesn't support this
+        raise UnimplementedCommand, 'zerombr not supported'
