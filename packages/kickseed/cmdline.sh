@@ -34,6 +34,11 @@ kickseed_file () {
 		floppy:/*)
 			echo "/floppy${1#floppy:}"
 			;;
+		ftp://*/*)
+			spoolpath="$SPOOL/fetch/ftp/${1#ftp://}"
+			mkdir -p "${spoolpath%/*}"
+			echo "$spoolpath"
+			;;
 		hd:*:/*)
 			file="${1#hd:}"
 			device="${file%%:*}"
