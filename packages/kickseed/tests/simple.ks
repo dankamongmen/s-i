@@ -17,6 +17,8 @@ timezone --utc America/New_York
 url --url http://archive.ubuntu.com/ubuntu
 user cjwatson --fullname="Colin Watson" --password="foobar"
 xconfig --resolution 1280x1024
+preseed test/question1 string hello
+preseed --owner base-config test/question2 boolean true
 
 %packages
 @ Ubuntu Desktop
