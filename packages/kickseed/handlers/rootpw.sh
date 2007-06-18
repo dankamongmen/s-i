@@ -26,6 +26,8 @@ rootpw_handler () {
 			return
 		fi
 
+		# requires user-setup 1.1
+		ks_preseed d-i passwd/root-login true
 		if [ "$crypted" ] && [ "$1" ]; then
 			# requires passwd 1:4.0.13-5
 			ks_preseed passwd passwd/root-password-crypted password "$1"
@@ -38,6 +40,8 @@ rootpw_handler () {
 			fi
 		fi
 	else
+		# requires user-setup 1.1
+		ks_preseed d-i passwd/root-login false
 		set -- ''
 	fi
 }
