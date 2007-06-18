@@ -171,16 +171,16 @@ kickseed () {
 				# standard desktop work
 				case $group in
 					Ubuntu\ Standard)
-						echo '~t^ubuntu-standard$' >> "$SPOOL/parse/$SECTION.section"
+						echo 'task:ubuntu-standard' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Kubuntu\ Standard)
-						echo '~t^kubuntu-standard$' >> "$SPOOL/parse/$SECTION.section"
+						echo 'task:kubuntu-standard' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Ubuntu\ Desktop)
-						echo '~t^ubuntu-desktop$' >> "$SPOOL/parse/$SECTION.section"
+						echo 'task:ubuntu-desktop' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Kubuntu\ Desktop)
-						echo '~t^kubuntu-desktop$' >> "$SPOOL/parse/$SECTION.section"
+						echo 'task:kubuntu-desktop' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					*\ *)
 						warn "Package group '$group' not implemented"
@@ -190,11 +190,11 @@ kickseed () {
 						# is assumed to be the name
 						# of a task; useful for
 						# customisers.
-						echo "~t^$group\$" >> "$SPOOL/parse/$SECTION.section"
+						echo "task:$group" >> "$SPOOL/parse/$SECTION.section"
 						;;
 				esac
 			else
-				echo "^$line\$" >> "$SPOOL/parse/$SECTION.section"
+				echo "pkg:$line" >> "$SPOOL/parse/$SECTION.section"
 			fi
 		elif [ "$SECTION" = pre ]; then
 			# already handled
@@ -213,11 +213,14 @@ kickseed () {
 		positives=.
 		negatives=.
 		for pkg in $packages; do
-			if [ "${pkg#-}" != "$pkg" ]; then
-				negatives="$negatives ${pkg#-}"
-			else
-				positives="$positives $pkg"
-			fi
+			case $pkg in
+				task:-*|pkg:-*)
+					negatives="$negatives $pkg"
+					;;
+				*)
+					positives="$positives $pkg"
+					;;
+			esac
 		done
 
 		# pattern gets: (~nPOS|~nPOS|~nPOS)!~nNEG!~nNEG!~nNEG
@@ -225,13 +228,13 @@ kickseed () {
 		for pkg in $positives; do
 			case $pkg in
 				.)	continue ;;
-				~t*)
-					element="$pkg"
-					tasklist="${tasklist:+$tasklist, }${pkg#~t}"
+				task:*)
+					element="~t^${pkg#task:}\$"
+					tasklist="${tasklist:+$tasklist, }${pkg#task:}"
 					;;
-				*)
-					element="~n$pkg"
-					packagelist="${packagelist:+$packagelist }$pkg"
+				pkg:*)
+					element="~n^${pkg#pkg:}\$"
+					packagelist="${packagelist:+$packagelist }${pkg#pkg:}"
 					;;
 			esac
 			joinpositives="${joinpositives:+$joinpositives|}$element"
@@ -241,12 +244,12 @@ kickseed () {
 		for pkg in $negatives; do
 			case $pkg in
 				.)	continue ;;
-				~t*)
-					element="$pkg"
+				task:-*)
+					element="~t^${pkg#task:-}\$"
 					hasnegatives=:
 					;;
-				*)
-					element="~n$pkg"
+				pkg:-*)
+					element="~n^${pkg#pkg:-}\$"
 					hasnegatives=:
 					;;
 			esac
