@@ -72,6 +72,20 @@ class PreseedHandlers:
             else:
                 raise UnimplementedArgument, opt
 
+    def device(self, args):
+        # type argument (args[0]) ignored
+        # TODO modulename = args[1]
+        opts = gnu_getopt(args[2:], '', ['opts='])[0]
+        for opt, value in opts:
+            if opt == '--opts':
+                # TODO: can't preseed this because hw-detect/module_params
+                # is just one question; maybe use db_register?
+                raise UnimplementedArgument, opt
+
+    def deviceprobe(self, args):
+        # Already the default thanks to hotplug.
+        return
+
     def keyboard(self, args):
         self.preseed('d-i', 'console-keymaps-at/keymap', 'select', args[0])
 
