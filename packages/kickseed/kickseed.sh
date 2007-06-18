@@ -212,11 +212,21 @@ kickseed () {
 }
 
 kickseed_post () {
+	# Post-installation parts of handlers.
+	for dir in "$POSTSPOOL"/*.handler; do
+		[ -d "$dir" ] || continue
+		name="${dir##*/}"
+		if type "${name%.handler}_post" >/dev/null 2>&1; then
+			eval "${name%.handler}_post"
+		else
+			warn "Missing post-installation handler: $name"
+		fi
+	done
+
+	# User-supplied post-installation scripts.
 	# TODO: sort numerically
 	for script in "$POSTSPOOL"/*.script; do
-		if [ ! -f "$script" ]; then
-			continue
-		fi
+		[ -f "$script" ] || continue
 		CHROOTED=0
 		if [ -e "${script%.script}.chroot" ]; then
 			CHROOTED=1
