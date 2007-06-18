@@ -37,6 +37,7 @@ preseed_relative () {
 	fi
 }
 
+FETCH_ERROR=
 fetch_url () {
 	local url="$1"
 	local file="$2"
@@ -44,9 +45,10 @@ fetch_url () {
 	while [ $iters -lt 3 ]; do
 		# TODO proxy support? Would it be useful?
 		# TODO add progress bar
-		if wget -q "$url" -O "$file" 2>&1 | logger -t kickseed; then
+		if FETCH_ERROR="$(wget -q "$url" -O "$file" 2>&1)"; then
 			return 0
 		fi
+		echo "$FETCH_ERROR" | logger -t kickseed
 		iters=$(($iters + 1))
 	done
 	return 1
@@ -60,6 +62,11 @@ case $KS in
 		logger -t kickseed "Downloading kickstart file from $KS"
 		if ! fetch_url "$KS" "$KSCFG"; then
 			logger -t kickseed "... failed"
+			db_subst initrd-kickseed/wget-failed URL "$KS"
+			db_subst initrd-kickseed/wget-failed \
+				ERROR "$FETCH_ERROR"
+			db_input high initrd-kickseed/wget-failed || true
+			db_go
 			exit 1
 		fi
 		;;
@@ -71,6 +78,12 @@ case $KS in
 		if ! mount -t nfs -o ro,intr,nolock \
 				"$server:${file%/*}" "${KSCFG%/*}"; then
 			logger -t kickseed "... failed"
+			db_subst initrd-kickseed/nfs-mount-failed \
+				DIR "${file%/*}"
+			db_subst initrd-kickseed/nfs-mount-failed \
+				SERVER "$server"
+			db_input initrd-kickseed/nfs-mount-failed || true
+			db_go
 			exit 1
 		fi
 		trap "umount '${KSCFG%/*}' || true" \
