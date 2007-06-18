@@ -1,5 +1,3 @@
-import string
-
 class PreseedHandlerException(Exception): pass
 class UnimplementedCommand(PreseedHandlerException): pass
 class UnimplementedArgument(PreseedHandlerException): pass
