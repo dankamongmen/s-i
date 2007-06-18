@@ -19,6 +19,7 @@ user cjwatson --fullname="Colin Watson" --password="foobar"
 xconfig --resolution 1280x1024
 
 %packages
+@ Ubuntu Desktop
 openssh-server
 -man-db
 

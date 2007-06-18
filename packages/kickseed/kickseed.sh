@@ -155,11 +155,30 @@ kickseed () {
 			fi
 
 			if [ "$keyword" = '@' ]; then
-				warn "Package groups not implemented"
-				continue
+				group="${line#* }"
+				# TODO: temporary hack to make at least the
+				# standard desktop work
+				case $group in
+					Ubuntu\ Desktop)
+						echo "~tubuntu-desktop" >> "$SPOOL/parse/$SECTION.section"
+						;;
+					Kubuntu\ Desktop)
+						echo "~tkubuntu-desktop" >> "$SPOOL/parse/$SECTION.section"
+						;;
+					*\ *)
+						warn "Package group '$group' not implemented"
+						;;
+					*)
+						# Anything without a space
+						# is assumed to be the name
+						# of a task; useful for
+						# customisers.
+						echo "~t$group" >> "$SPOOL/parse/$SECTION.section"
+						;;
+				esac
+			else
+				echo "$line" >> "$SPOOL/parse/$SECTION.section"
 			fi
-
-			echo "$line" >> "$SPOOL/parse/$SECTION.section"
 		elif [ "$SECTION" = pre ]; then
 			# already handled
 			continue
@@ -187,17 +206,21 @@ kickseed () {
 		# pattern gets: (~nPOS|~nPOS|~nPOS)!~nNEG!~nNEG!~nNEG
 		joinpositives=
 		for pkg in $positives; do
-			if [ "$pkg" = . ]; then
-				continue
-			fi
-			joinpositives="${joinpositives:+$joinpositives|}~n$pkg"
+			case $pkg in
+				.)	continue ;;
+				~t*)	element="$pkg" ;;
+				*)	element="~n$pkg" ;;
+			esac
+			joinpositives="${joinpositives:+$joinpositives|}$element"
 		done
 		pattern="($joinpositives)"
 		for pkg in $negatives; do
-			if [ "$pkg" = . ]; then
-				continue
-			fi
-			pattern="$pattern!~n$pkg"
+			case $pkg in
+				.)	continue ;;
+				~t*)	element="$pkg" ;;
+				*)	element="~n$pkg" ;;
+			esac
+			pattern="$pattern!$element"
 		done
 		# introduced in base-config 2.61ubuntu2; Debian would need
 		# tasksel preseeding instead
