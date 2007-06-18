@@ -152,3 +152,45 @@ class PreseedHandlers:
                 raise UnimplementedArgument, opt
 
             # TODO: translate protocol into xserver-xorg's naming scheme
+
+    def network(self, args):
+        statics = {}
+
+        opts = gnu_getopt(args, '',
+                          ['bootproto=', 'device=', 'ip=', 'gateway=',
+                           'nameserver=', 'nodns', 'netmask=', 'hostname='])[0]
+        for opt, value in opts:
+            if opt == '--bootproto':
+                if value == 'dhcp' or value == 'bootp':
+                    pass
+                elif value == 'static':
+                    self._preseed('d-i', 'netcfg/disable_dhcp', 'boolean',
+                                  'true')
+                else:
+                    raise UnimplementedArgument, value
+            elif opt == '--device':
+                self._preseed('d-i', 'netcfg/choose_interface', 'select',
+                              value)
+            elif opt == '--ip':
+                self._preseed('d-i', 'netcfg/get_ipaddress', 'string', value)
+                statics['ipaddress'] = 1
+            elif opt == '--gateway':
+                self._preseed('d-i', 'netcfg/get_gateway', 'string', value)
+                statics['gateway'] = 1
+            elif opt == '--nameserver':
+                self._preseed('d-i', 'netcfg/get_nameservers', 'string', value)
+                statics['nameservers'] = 1
+            elif opt == '--nodns':
+                self._preseed('d-i', 'netcfg/get_nameservers', 'string', '')
+                statics['nameservers'] = 1
+            elif opt == '--netmask':
+                self._preseed('d-i', 'netcfg/get_netmask', 'string', value)
+                statics['netmask'] = 1
+            elif opt == '--hostname':
+                self._preseed('d-i', 'netcfg/get_hostname', 'string', value)
+
+        # If all the information displayed on the netcfg/confirm_static
+        # screen was preseeded, skip it.
+        if ('ipaddress' in statics and 'netmask' in statics and
+            'gateway' in statics and 'nameservers' in statics):
+            self._preseed('d-i', 'netcfg/confirm_static', 'boolean', 'true')
