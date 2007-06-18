@@ -1,9 +1,15 @@
 #! /bin/sh
 
 rootpw_handler () {
-	eval set -- "$(getopt -o '' -l iscrypted -- "$@")" || die_getopt rootpw
+	setpassword=1
+
+	eval set -- "$(getopt -o '' -l disabled,iscrypted -- "$@")" || die_getopt rootpw
 	while :; do
 		case $1 in
+			--disabled)
+				setpassword=
+				shift
+				;;
 			--iscrypted)
 				# requires passwd 1:4.0.3-30.7ubuntu7
 				ks_preseed passwd passwd/root-password-crypted boolean true
@@ -14,8 +20,12 @@ rootpw_handler () {
 		esac
 	done
 
-	if [ $# -ne 1 ]; then
-		die "rootpw command requires a password"
+	if [ "$setpassword" ]; then
+		if [ $# -ne 1 ]; then
+			die "rootpw command requires a password"
+		fi
+	else
+		set -- ''
 	fi
 
 	# requires passwd 1:4.0.3-30.7ubuntu6
