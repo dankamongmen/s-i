@@ -56,7 +56,7 @@ class PreseedHandlers:
                     raise UnimplementedArgument, value
             elif opt == 'useLilo':
                 useLilo = True
-            elif opt == '--upgrade':
+            elif opt == 'upgrade':
                 raise UnimplementedArgument, 'upgrades using installer not supported'
             else:
                 raise UnimplementedArgument, opt
@@ -157,7 +157,7 @@ class PreseedHandlers:
             else:
                 raise UnimplementedArgument, opt
 
-            # TODO: translate protocol into xserver-xorg's naming scheme
+        # TODO: translate protocol into xserver-xorg's naming scheme
 
     def network(self, args):
         statics = {}
@@ -282,7 +282,7 @@ class PreseedHandlers:
             recipe += ' method{ keep }'
 
         if format:
-            recipe += ' format { }'
+            recipe += ' format{ }'
 
         if filesystem != 'swap':
             recipe += ' use_filesystem{ }'
