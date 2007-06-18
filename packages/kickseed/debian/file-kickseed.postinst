@@ -1,0 +1,65 @@
+#! /bin/sh -e
+
+. /usr/share/debconf/confmodule
+
+. /lib/kickseed/kickseed.sh
+. /lib/preseed/preseed.sh
+
+ks_log () {
+	logger -t kickseed "$@"
+}
+
+ks_preseed () {
+	echo "$@" >> "$SPOOL/preseed.cfg"
+}
+
+# No support for chrooting here, as /target isn't available yet and %pre
+# scripts don't need it.
+ks_run_script () {
+	TYPE="$1"
+	INTERPRETER="$2"
+	SCRIPT="$4"
+
+	logger -t kickseed "Running $TYPE script $SCRIPT using interpreter $INTERPRETER:"
+	"$INTERPRETER" "$SCRIPT"
+}
+
+usedfloppy=
+
+# Used by preseed function.
+preseed_fetch () {
+	ln -sf "$1" "$2"
+}
+
+preseed_relative () {
+	if [ -z "${1##/*}" ]; then
+		return 1
+	else	
+		return 0
+	fi
+}
+
+KS="$(kickseed_cmdline /proc/cmdline)"
+KSCFG="$(kickseed_file "$KS")"
+
+case $KSCFG in
+	/floppy/*)
+		mountfloppy || true
+		trap 'umount /floppy || true' EXIT HUP INT QUIT TERM
+		;;
+esac
+
+case $KSCFG in
+	/floppy/*|/cdrom/*)
+		logger -t kickseed "Reading kickstart file from $KSCFG"
+
+		kickseed "$KSCFG"
+
+		if [ -s "$SPOOL/preseed.cfg" ]; then
+			preseed_location "$SPOOL/preseed.cfg"
+		fi
+		;;
+	*)
+		# other cases handled in initrd
+		: ;;
+esac

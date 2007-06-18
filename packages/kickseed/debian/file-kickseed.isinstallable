@@ -1,0 +1,16 @@
+#! /bin/sh -e
+
+. /lib/kickseed/kickseed.sh
+
+KS="$(kickseed_cmdline /proc/cmdline)"
+KSCFG="$(kickseed_file "$KS")"
+
+case $KSCFG in
+	/floppy/*|/cdrom/*)
+		exit 0
+		;;
+	*)
+		# other cases handled in initrd
+		exit 1
+		;;
+esac
