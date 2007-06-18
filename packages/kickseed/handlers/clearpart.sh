@@ -50,7 +50,15 @@ EOF
 					*)
 						# needed as of partman-auto 55
 						ks_preseed d-i partman-auto/method string regular
-						ks_preseed d-i partman-auto/disk string "/dev/$2"
+						disk="$2"
+						case $disk in
+							/dev/*)
+								;;
+							*)
+								disk="/dev/$disk"
+								;;
+						esac
+						ks_preseed d-i partman-auto/disk string "$disk"
 						;;
 				esac
 				shift 2
