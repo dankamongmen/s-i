@@ -57,7 +57,7 @@ class PreseedHandlers:
     def clearpart(self, args):
         for arg in args:
             if arg.startswith('--drives='):
-                drives = ','.split(arg[9:])
+                drives = arg[9:].split(',')
                 if len(drives) > 1:
                     raise UnimplementedArgument, 'clearing multiple drives not supported'
                 else:
