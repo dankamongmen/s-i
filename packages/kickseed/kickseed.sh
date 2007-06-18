@@ -170,6 +170,12 @@ kickseed () {
 				# TODO: temporary hack to make at least the
 				# standard desktop work
 				case $group in
+					Ubuntu\ Standard)
+						echo "~tubuntu-standard" >> "$SPOOL/parse/$SECTION.section"
+						;;
+					Kubuntu\ Standard)
+						echo "~tkubuntu-standard" >> "$SPOOL/parse/$SECTION.section"
+						;;
 					Ubuntu\ Desktop)
 						echo "~tubuntu-desktop" >> "$SPOOL/parse/$SECTION.section"
 						;;
