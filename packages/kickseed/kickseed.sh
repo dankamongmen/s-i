@@ -243,6 +243,8 @@ kickseed () {
 		# tasksel preseeding instead
 		ks_preseed base-config base-config/package-selection string \
 			"$pattern"
+		# requires pkgsel 0.04ubuntu1
+		ks_preseed d-i pkgsel/install-pattern string "$pattern"
 	fi
 
 	# Kickstart installations always run at critical priority.
