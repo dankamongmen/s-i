@@ -12,7 +12,7 @@ if [ -z "$POSTSPOOL" ]; then
 fi
 
 warn () {
-	echo "$@" >&2
+	ks_log "$@"
 }
 
 die () {
