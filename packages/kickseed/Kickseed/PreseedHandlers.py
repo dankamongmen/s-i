@@ -392,3 +392,23 @@ class PreseedHandlers:
     def zerombr(self, args):
         # TODO: as far as I can see, partman doesn't support this
         raise UnimplementedCommand, 'zerombr not supported'
+
+    # %packages
+
+    def packages(self, pkglist):
+        # doesn't allow removal of packages from ubuntu-base
+        positives = []
+        negatives = []
+        for pkg in pkglist:
+            if pkg.startswith('-'):
+                # unclear how useful this is without groups?
+                negatives.append(pkg[1:])
+            else:
+                positives.append(pkg)
+        pattern = '(%s)' % '|'.join(positives)
+        for pkg in negatives:
+            pattern += '!' + pkg
+        # introduced in base-config 2.61ubuntu2; Debian would need tasksel
+        # preseeding instead
+        self._preseed('base-config', 'base-config/package-selection',
+                      'string', pattern)

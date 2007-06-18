@@ -11,6 +11,8 @@ class Preseed:
         for keyword, argstr in self.data.main.items():
             getattr(self.handlers, keyword)(shlex.split(argstr))
 
+        self.handlers.packages(self.data.packages)
+
         print >>fd, """#### Modifying syslinux.cfg.
 
 # Edit the syslinux.cfg (or similar) file, and add parameters to the end
