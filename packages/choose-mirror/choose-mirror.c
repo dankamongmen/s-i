@@ -389,7 +389,14 @@ static int set_proxy(void) {
 
 	debconf_get(debconf, px);
 	if (debconf->value != NULL && strlen(debconf->value)) {
-		setenv(proxy_var, debconf->value, 1);
+		if (strchr(debconf->value, ':'))
+			setenv(proxy_var, debconf->value, 1);
+		else {
+			char *proxy_value;
+			asprintf(&proxy_value, "http://%s", debconf->value);
+			setenv(proxy_var, proxy_value, 1);
+			free(proxy_value);
+		}
 	}
 	else {
 		unsetenv(proxy_var);
