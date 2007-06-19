@@ -6,7 +6,6 @@ url_handler () {
 		case $1 in
 			--url)
 				ks_preseed d-i mirror/country string 'enter information manually'
-				ks_preseed base-config apt-setup/country string 'enter information manually'
 				case $2 in
 					http://*/*)
 						protocol=http
@@ -20,7 +19,6 @@ url_handler () {
 						;;
 				esac
 				ks_preseed d-i mirror/protocol 'select' "$protocol"
-				ks_preseed base-config apt-setup/uri_type 'select' "$protocol"
 				# Disassemble URL into host and path.
 				host="${2#$protocol://}"
 				path="/${host#*/}"
@@ -30,12 +28,9 @@ url_handler () {
 					path="$path/"
 				fi
 				ks_preseed d-i "mirror/$protocol/hostname" string "$host"
-				ks_preseed base-config apt-setup/hostname string "$host"
 				ks_preseed d-i "mirror/$protocol/directory" string "$path"
-				ks_preseed base-config apt-setup/directory string "$path"
 				# TODO: no support for specifying proxy?
 				ks_preseed d-i "mirror/$protocol/proxy" string ''
-				ks_preseed base-config apt-setup/another boolean false
 				shift 2
 				;;
 			--)	shift; break ;;

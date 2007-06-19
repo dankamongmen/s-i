@@ -43,7 +43,6 @@ xconfig_handler () {
 				;;
 			--startxonboot)
 				# TODO: this is true by default already
-				ks_preseed base-config base-config/start-display-manager boolean true
 				shift
 				;;
 			--resolution)

@@ -21,16 +21,12 @@ timezone_handler () {
 	fi
 
 	if [ "$utc" ]; then
-		ks_preseed base-config tzconfig/gmt boolean true
 		# requires clock-setup
 		ks_preseed d-i clock-setup/utc boolean true
 	else
-		ks_preseed base-config tzconfig/gmt boolean false
 		# requires clock-setup
 		ks_preseed d-i clock-setup/utc boolean false
 	fi
-	# requires base-config 2.65
-	ks_preseed base-config tzconfig/preseed_zone string "$1"
 	# requires tzsetup
 	ks_preseed d-i time/zone string "$1"
 }

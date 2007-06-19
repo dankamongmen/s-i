@@ -266,10 +266,6 @@ kickseed () {
 			esac
 			pattern="$pattern!$element"
 		done
-		# introduced in base-config 2.61ubuntu2; Debian would need
-		# tasksel preseeding instead
-		ks_preseed base-config base-config/package-selection string \
-			"$pattern"
 		# requires pkgsel 0.04ubuntu1; obsolete as of pkgsel
 		# 0.07ubuntu1
 		ks_preseed d-i pkgsel/install-pattern string "$pattern"
@@ -283,8 +279,6 @@ kickseed () {
 
 	# Kickstart installations always run at critical priority.
 	ks_preseed d-i debconf/priority 'select' critical
-	# TODO: not in Debian
-	ks_preseed base-config base-config/priority 'select' critical
 }
 
 kickseed_post () {
