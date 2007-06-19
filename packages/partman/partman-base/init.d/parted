@@ -4,6 +4,18 @@ set -e
 
 . /lib/partman/definitions.sh
 
+ORIG_IFS="$IFS"
+
+part_of_fakeraid () {
+	local raiddev
+	for raiddev in $(dmraid -r -c); do
+		if [ "$(readlink -f $raiddev)" = $1 ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 if [ ! -f /var/run/parted_server.pid ]; then
     [ -d /var/run ] || mkdir /var/run
     parted_server
@@ -27,8 +39,18 @@ if [ ! -f /var/run/parted_server.pid ]; then
 	    sed 's,^/dev/\(ide\|scsi\|[hs]d\),!/dev/\1,' | 
 	    sort | 
 	    sed 's,^!,,' ); do
+
 	IFS="$TAB"
 	set -- $partdev
+	IFS="$ORIG_IFS"
+
+	# Skip devices that are part of a dmraid device
+	if type dmraid >/dev/null 2>&1; then
+		if part_of_fakeraid $partdev; then
+			continue
+		fi
+	fi
+
 	dirname=$(echo $1 | sed 's:/:=:g')
 	dev=$DEVICES/$dirname
 	if [ -d /var/lib/partman/old_devices/$dirname ]; then

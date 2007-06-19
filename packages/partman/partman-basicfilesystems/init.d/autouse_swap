@@ -8,6 +8,9 @@ partitions=
 for dev in /var/lib/partman/devices/*; do
     [ -d "$dev" ] || continue
 
+    # Skip dmraid partitions
+    [ ! -e "$dev/fakeraid" ] || continue
+
     # Only run the first time each device is encountered.
     devbase="$(basename "$dev")"
     [ ! -f "/var/lib/partman/autoused_swap/$devbase" ] || continue

@@ -114,7 +114,7 @@ while ! disk_found; do
 
 		db_get disk-detect/module_select
 		if [ "$RET" = "continue with no disk drive" ]; then
-			break
+			exit 0
 		elif [ "$RET" != "none of the above" ]; then
 			module="$RET"
 			if [ -n "$module" ] && is_not_loaded "$module" ; then
@@ -147,3 +147,21 @@ while ! disk_found; do
 	fi
 	db_capb
 done
+
+# Activate fake (ata) raid devices
+db_get disk-detect/dmraid/enable
+if [ $RET = true ]; then
+	if anna-install dmraid-udeb; then
+		# Device mapper support is required to run dmraid
+		if is_not_loaded dm-mod; then
+			module_probe dm-mod
+		fi
+
+		if [ "$(dmraid -c -s)" != "No RAID disks" ]; then
+			anna-install partman-dmraid
+
+			# Activate devices
+			log-output -t disk-detect dmraid -ay
+		fi
+	fi
+fi

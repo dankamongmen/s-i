@@ -1,0 +1,88 @@
+#!/bin/sh
+
+. /lib/partman/definitions.sh
+
+# TODO: Add error checking and error messages !!!!!!!!!!!!
+
+create_ext2 () {
+	frpart=${1##*/}
+	db_subst partman-dmraid/progress/createfs/info DEVICE $frpart
+	db_progress INFO partman-dmraid/progress/createfs/info
+	# TODO: check that ext2 is actually available
+	log-output -t partman-dmraid mkfs.ext2 -q $1
+}
+
+# Save status (including size) of current dmraid partitions
+DM_STATUS="$(dmsetup status --target linear)"
+
+# If a fake raid partition is in use as swap, it cannot be removed
+disable_swap
+
+# Remove existing fake raid partition devices
+# TODO: should probably umount partitions if device is in use
+for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
+	for frpart in $(ls /dev/mapper/$frdisk* 2>/dev/null); do
+		[ $frpart != /dev/mapper/$frdisk ] || continue
+
+		# Remove pending actions on the partitions
+		devdir=$DEVICES/$(echo $frpart | sed 's:/:=:g')
+		if [ -d $devdir ]; then
+			rm -f $devdir/*/method
+			rm -f $devdir/*/format
+		fi
+
+		# Remove the device mapper node
+		dmsetup remove $frpart || exit 1
+	done
+done
+
+# Commit the changes
+confirm_changes "partman-dmraid" || exit 0
+for s in /lib/partman/commit.d/*; do
+	if [ -x $s ]; then
+		$s || {
+			db_input critical partman-dmraid/commit_failed || true
+			db_go || true
+			for s in /lib/partman/init.d/*; do
+				if [ -x $s ]; then
+					$s || exit 255
+				fi
+			done
+			exit 0
+		}
+	fi
+done
+
+# Refresh dmraid partition info
+log-output -t partman-dmraid dmraid -ay
+
+# Use number of linear devices as approximation of steps
+PB_MAX=$(dmsetup status --target linear | wc -l)
+db_progress START 0 $PB_MAX partman-dmraid/progress/createfs/title
+
+# Create an initial filesystem so new partitions are detected properly
+# HACKALERT: we assume that the size of the device is a sufficient indicator
+# that a partition was changed
+for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
+	for frpart in $(ls /dev/mapper/$frdisk* 2>/dev/null); do
+		[ $frpart != /dev/mapper/$frdisk ] || continue
+		if oldstatus=$(echo $DM_STATUS | grep "^$frpart:"); then
+			oldsize=$(echo $oldstatus | cut -d" " -f 3)
+			newsize=$(dmsetup status $frpart | cut -d" " -f 3)
+			if [ $newsize -ne $oldsize ]; then
+				create_ext2 $frpart
+			fi
+		else
+			create_ext2 $frpart
+		fi
+		db_progress STEP 1
+	done
+done
+db_progress SET $PB_MAX
+db_progress STOP
+
+stop_parted_server
+
+restart_partman
+
+exit 0

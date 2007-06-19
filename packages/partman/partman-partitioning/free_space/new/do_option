@@ -143,7 +143,10 @@ create_new_partition () {
 	db_progress START 0 $numparts partman/text/please_wait
 	db_progress INFO partman-partitioning/new_state
 
-	if [ -n "$id" -a -f ../../ext3 ]; then
+	# Fake raid partitions cannot be used directly under the parent device
+	if [ -f fakeraid ]; then
+		:
+	elif [ -n "$id" -a -f ../../ext3 ]; then
 	    # make better defaults for the new partition
 	    [ -d $id ] || mkdir $id
 	    echo format >$id/method

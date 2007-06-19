@@ -709,13 +709,37 @@ humandev () {
 	    printf "$RET" ${type} ${device}
 	    ;;
 	/dev/mapper/*)
-	    # First of all, check if this is a dm-crypt device
 	    type=""
 	    if [ -x /sbin/dmsetup ]; then
 	        type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
 	    fi
 
-	    if [ "$type" = crypt ]; then
+	    # First check for fake (ata) RAID devices
+	    if type dmraid >/dev/null 2>&1; then
+		for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
+			device=${1#/dev/mapper/}
+			case "$1" in
+			    /dev/mapper/$frdisk)
+				type=fakeraid
+				superset=${device%_*}
+				desc=$(dmraid -s -c -c "$superset")
+				rtype=$(echo "$desc" | cut -d: -f4)
+				db_metaget partman/text/dmraid_volume description
+				printf "$RET" $device $rtype
+				;;
+			    /dev/mapper/$frdisk*)
+				type=fakeraid
+				part=${device#$frdisk}
+				db_metaget partman/text/dmraid_part description
+				printf "$RET" $device $part
+				;;
+			esac
+		done
+	    fi
+
+	    if [ "$type" = fakeraid ]; then
+		:
+	    elif [ "$type" = crypt ]; then
 	        mapping=${1#/dev/mapper/}
 	        db_metaget partman/text/dmcrypt_volume description
 	        printf "$RET" $mapping
@@ -1130,6 +1154,10 @@ $items"
 		if [ "$formatted_previously" = no ]; then
 			db_input critical $template/confirm_nochanges
 			db_go || true
+			if [ $template = partman-dmraid ]; then
+				# for dmraid, only a note is displayed
+				return 1
+			fi
 			db_get $template/confirm_nochanges
 			if [ "$RET" = false ]; then
 				db_reset $template/confirm_nochanges
