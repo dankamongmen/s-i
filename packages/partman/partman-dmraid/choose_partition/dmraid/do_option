@@ -19,7 +19,7 @@ DM_STATUS="$(dmsetup status --target linear)"
 disable_swap
 
 # Make sure dmraid devices get re-enabled on errors
-trap 'log-output -t partman-dmraid dmraid -ay' HUP INT QUIT KILL PIPE TERM EXIT
+trap 'log-output -t partman-dmraid dmraid -ay' HUP INT QUIT PIPE TERM EXIT
 
 # Remove existing fake raid partition devices
 # TODO: should probably umount partitions if device is in use
@@ -57,7 +57,7 @@ for s in /lib/partman/commit.d/*; do
 done
 
 # Reset signal handling to defaults
-trap - HUP INT QUIT KILL PIPE TERM EXIT
+trap - HUP INT QUIT PIPE TERM EXIT
 
 # Refresh dmraid partition info
 log-output -t partman-dmraid dmraid -ay
