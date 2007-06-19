@@ -14,9 +14,8 @@ struct mirror_t {
  * once /etc/default_release is fully deployed. */
 #define PREFERRED_DISTRIBUTION "lenny"
 
-/* The two strings defined below must match the strings used in the
- * templates (http and ftp) for these options. */
-#define NO_MIRROR    "don't use a network mirror"
+/* The string defined below must match the string used in the templates
+ * (http and ftp) for this option. */
 #define MANUAL_ENTRY "enter information manually"
 
 #define SUITE_LENGTH 32
