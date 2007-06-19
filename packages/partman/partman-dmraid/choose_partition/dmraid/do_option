@@ -18,6 +18,9 @@ DM_STATUS="$(dmsetup status --target linear)"
 # If a fake raid partition is in use as swap, it cannot be removed
 disable_swap
 
+# Make sure dmraid devices get re-enabled on errors
+trap 'log-output -t partman-dmraid dmraid -ay' HUP INT QUIT KILL PIPE TERM EXIT
+
 # Remove existing fake raid partition devices
 # TODO: should probably umount partitions if device is in use
 for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
@@ -52,6 +55,9 @@ for s in /lib/partman/commit.d/*; do
 		}
 	fi
 done
+
+# Reset signal handling to defaults
+trap - HUP INT QUIT KILL PIPE TERM EXIT
 
 # Refresh dmraid partition info
 log-output -t partman-dmraid dmraid -ay
