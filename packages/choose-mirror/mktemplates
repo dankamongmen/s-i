@@ -40,8 +40,8 @@ printf "Insert the lists of choices into the templates file..."
 		echo
 	done
 ) | debian/templates-build.pl "$DEB_HOST_ARCH" | \
-    perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /enter information manually$/ && length "'"$HTTPCHOICES"'") { s/$/, '"$HTTPCHOICES"'/; $http = 0; }' | \
-    perl -pe 'if (m,ftp/countries$,)  { $ftp  = 1; } elsif ($ftp  and /enter information manually$/ && length "'"$FTPCHOICES"'") { s/$/, '"$FTPCHOICES"'/;  $ftp  = 0; }' | \
+    perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /(?:enter information manually|manual)$/ && length "'"$HTTPCHOICES"'") { s/$/, '"$HTTPCHOICES"'/; $http = 0; }' | \
+    perl -pe 'if (m,ftp/countries$,)  { $ftp  = 1; } elsif ($ftp  and /(?:enter information manually|manual)$/ && length "'"$FTPCHOICES"'") { s/$/, '"$FTPCHOICES"'/;  $ftp  = 0; }' | \
     sed "/^_Choices: enter/s/_Choices:/__Choices:/g" \
     >debian/templates.tmp
 printf " Done.\n"
@@ -107,8 +107,13 @@ if [ ! -f debian/po/en.po ]; then
     printf "Done.\n"
 fi
 
-# and now we generate the templates file from all this
-PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp >debian/choose-mirror-bin.templates
+# and now we generate the templates file from all this; confusingly, we
+# have to set the untranslated Choices to say "manual" here rather than
+# elsewhere in order to avoid breaking translations
+PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp |
+    perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /^Choices:/) { s/^Choices: enter information manually/Choices: manual/; $http = 0; }' | \
+    perl -pe 'if (m,ftp/countries$,)  { $ftp = 1; }  elsif ($ftp  and /^Choices:/) { s/^Choices: enter information manually/Choices: manual/; $ftp = 0;  }' \
+    >debian/choose-mirror-bin.templates
 
 # give the new templates file the same mtime as the input file, so that
 # po2debconf doesn't decide that it needs to run debconf-updatepo
