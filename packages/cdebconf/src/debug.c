@@ -7,7 +7,7 @@
 #include <syslog.h>
 #endif
 
-void debug_printf(int level, char *fmt, ...)
+void debug_printf(int level, char const *fmt, ...)
 {
 	static int loglevel = -1;
 	static FILE *fp = NULL;
