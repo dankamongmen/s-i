@@ -64,6 +64,11 @@
 #define PROGRESSBAR_HPADDING 60
 #define PROGRESSBAR_VPADDING 60
 
+/* paths to images */
+#define NOTE_IMAGE_PATH "/usr/share/graphics/note_icon.png"
+#define WARNING_IMAGE_PATH "/usr/share/graphics/warning_icon.png"
+#define LOGO_IMAGE_PATH "/usr/share/graphics/logo_debian.png"
+
 /* Make sure this is called in a GDK thread-safe way
  */
 void update_frontend_title(struct frontend * obj, char * title);
@@ -715,13 +720,11 @@ static GtkWidget * display_descriptions(struct question * q,
     }
 
     if (0 == strcmp(q->template->type, "note")) {
-        icon_button = gtk_image_new_from_file(
-            "/usr/share/graphics/note_icon.png");
+        icon_button = gtk_image_new_from_file(NOTE_IMAGE_PATH);
         gtk_box_pack_start(GTK_BOX(icon_box), icon_button, FALSE, FALSE, 3);
         gtk_box_pack_start(GTK_BOX(returned_box), icon_box, FALSE, FALSE, 3);
     } else if (0 == strcmp(q->template->type, "error")) {
-        icon_button = gtk_image_new_from_file(
-            "/usr/share/graphics/warning_icon.png");
+        icon_button = gtk_image_new_from_file(WARNING_IMAGE_PATH);
         gtk_box_pack_start(GTK_BOX(icon_box), icon_button, FALSE, FALSE, 3);
         gtk_box_pack_start(GTK_BOX(returned_box), icon_box, FALSE, FALSE, 3);
     }
@@ -1602,8 +1605,7 @@ static void set_design_elements(struct frontend * obj, GtkWidget * window)
 
     /* A logo is displayed in the upper area of the screen */
     /* XXX: constant */
-    logo_button = gtk_image_new_from_file(
-        "/usr/share/graphics/logo_debian.png");
+    logo_button = gtk_image_new_from_file(LOGO_IMAGE_PATH);
     g_signal_connect_after(G_OBJECT(logo_button), "expose_event",
                            G_CALLBACK(expose_event_callback), obj);
   
