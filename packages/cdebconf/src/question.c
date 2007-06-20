@@ -83,7 +83,7 @@ const char *question_getvalue(const struct question *q, const char *lang)
 {
 	if (q->value)
 		return q->value;
-	return q->template->lget(q->template, lang, "default");
+	return template_lget(q->template, lang, "default");
 }
 
 const char *question_get_variable(const struct question *q, const char *var)
@@ -246,7 +246,7 @@ char *question_get_field(const struct question *q, const char *lang,
     if (strcmp(field, "value") == 0)
         ret = question_expand_vars(q, question_getvalue(q, lang));
     else
-        ret = question_expand_vars(q, q->template->lget(q->template, lang, field));
+        ret = question_expand_vars(q, template_lget(q->template, lang, field));
 
     /* question_get_field must always return a valid string. */
     if (ret == NULL)

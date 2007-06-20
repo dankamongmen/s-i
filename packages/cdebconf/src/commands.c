@@ -812,11 +812,11 @@ command_data(struct confmodule *mod, char *arg)
             q->template = t;
             template_ref(t);
         }
-        t->lset(t, NULL, item, value);
+        template_lset(t, NULL, item, value);
         mod->questions->methods.set(mod->questions, q);
     }
     else
-        t->lset(t, NULL, item, value);
+        template_lset(t, NULL, item, value);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;

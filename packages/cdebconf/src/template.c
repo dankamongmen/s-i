@@ -6,13 +6,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static const char *template_lget(const struct template *t,
-                const char *lang, const char *field);
 static const char *template_get_internal(const struct template *t,
                 const char *lang, const char *field);
-static void template_lset(struct template *t, const char *lang,
-                const char *field, const char *value);
-static const char *template_next_lang(const struct template *t, const char *l);
 static struct template_l10n_fields *template_cur_l10n_fields(const struct template *t,
                 const char *lang);
 static char *getlanguage(void);
@@ -116,9 +111,6 @@ struct template *template_new(const char *tag)
 	memset(t, 0, sizeof(struct template));
 	t->ref = 1;
 	t->tag = STRDUP(tag);
-	t->lget = template_lget;
-	t->lset = template_lset;
-	t->next_lang = template_next_lang;
 	t->fields = f;
 	return t;
 }
@@ -326,7 +318,7 @@ static void template_field_set(struct template_l10n_fields *p,
  * Assumptions: 
  */
 
-static const char *template_lget(const struct template *t,
+const char *template_lget(const struct template *t,
                 const char *lang, const char *field)
 {
     const char *ret = NULL;
@@ -431,7 +423,7 @@ static const char *template_get_internal(const struct template *t,
     return NULL;
 }
 
-static void template_lset(struct template *t, const char *lang,
+void template_lset(struct template *t, const char *lang,
                 const char *field, const char *value)
 {
     struct template_l10n_fields *p, *last;
@@ -535,7 +527,7 @@ static struct template_l10n_fields *template_cur_l10n_fields(const struct templa
     return NULL;
 }
 
-static const char *template_next_lang(const struct template *t, const char *lang)
+const char *template_next_lang(const struct template *t, const char *lang)
 {
     const struct template_l10n_fields *p = template_cur_l10n_fields(t, lang);
     if (p != NULL && p->next != NULL)

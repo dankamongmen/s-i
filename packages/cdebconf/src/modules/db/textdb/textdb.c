@@ -121,8 +121,8 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 	const char *p, *lang;
 	const char **field;
 
-	if (t->lget(t, NULL, "tag") == NULL) return DC_NOTOK;
-	filename = template_filename(db, t->lget(t, NULL, "tag"));
+	if (template_lget(t, NULL, "tag") == NULL) return DC_NOTOK;
+	filename = template_filename(db, template_lget(t, NULL, "tag"));
 	
 	if ((outf = fopen(filename, "w")) == NULL)
 		return DC_NOTOK;
@@ -131,18 +131,18 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 
 	for (field = template_fields_list; *field != NULL; field++)
 	{
-		p = t->lget(t, NULL, *field);
+		p = template_lget(t, NULL, *field);
 		if (p != NULL)
 			fprintf(outf, "\t%s \"%s\";\n", *field, escapestr(p));
 	}
 
-	lang = t->next_lang(t, NULL);
+	lang = template_next_lang(t, NULL);
 	while (lang) 
 	{
 		for (field = template_fields_list; *field != NULL; field++)
 		{
-			p = t->lget(t, lang, *field);
-			if (p != NULL && p != t->lget(t, NULL, *field))
+			p = template_lget(t, lang, *field);
+			if (p != NULL && p != template_lget(t, NULL, *field))
 			{
 				if (strcmp(lang, "C") == 0)
 					fprintf(outf, "\t%s-C \"%s\";\n",
@@ -152,7 +152,7 @@ static int textdb_template_set(struct template_db *db, struct template *t)
 							*field, lang, escapestr(p));
 			}
 		}
-		lang = t->next_lang(t, lang);
+		lang = template_next_lang(t, lang);
 	}
 
 	fprintf(outf, "};\n");
@@ -190,8 +190,8 @@ static struct template *textdb_template_get_real(struct template_db *db,
 	node = node->child;
 	while (node)
 	{
-		t->lset(t, NULL, node->tag,
-			STRDUP(unescapestr(node->value)));
+		template_lset(t, NULL, node->tag,
+			      STRDUP(unescapestr(node->value)));
 		node = node->next;
 	}
 

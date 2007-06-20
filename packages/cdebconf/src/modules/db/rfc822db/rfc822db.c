@@ -183,7 +183,7 @@ static int rfc822db_template_load(struct template_db *db)
         tmp = template_new(name);
         for (h = header; h != NULL; h = h->next)
             if (strcmp(h->header, "Name") != 0)
-                tmp->lset(tmp, NULL, h->header, h->value);
+                template_lset(tmp, NULL, h->header, h->value);
 
         tmp->next = NULL;
         tsearch(tmp, &dbdata->root, nodetemplatecomp);
@@ -207,12 +207,12 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
         break;
     case postorder: 
     case leaf:
-        p = t->lget((struct template *) t, NULL, "tag");
+        p = template_lget((struct template *) t, NULL, "tag");
         INFO(INFO_VERBOSE, "dumping template %s", p);
 
         for (field = template_fields_list; *field != NULL; field++)
         {
-            p = t->lget((struct template *) t, NULL, *field);
+            p = template_lget((struct template *) t, NULL, *field);
             if (p != NULL)
             {
                 if (strcmp(*field, "tag") == 0)
@@ -223,13 +223,13 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
             }
         }
     
-        lang = t->next_lang((struct template *) t, NULL);
+        lang = template_next_lang((struct template *) t, NULL);
         while (lang) 
         {
             for (field = template_fields_list; *field != NULL; field++)
             {
-                p = t->lget((struct template *) t, lang, *field);
-                if (p != NULL && p != t->lget((struct template *) t, NULL, *field))
+                p = template_lget((struct template *) t, lang, *field);
+                if (p != NULL && p != template_lget((struct template *) t, NULL, *field))
                 {
                     if (strcmp(lang, "C") == 0)
                         fprintf(outf, "%c%s-C: %s\n",
@@ -239,7 +239,7 @@ void rfc822db_template_dump(const void *node, const VISIT which, const int depth
                             toupper((*field)[0]), (*field)+1, lang, escapestr(p));
                 }
             }
-            lang = t->next_lang((struct template *) t, lang);
+            lang = template_next_lang((struct template *) t, lang);
         }
         fprintf(outf, "\n");
     }
