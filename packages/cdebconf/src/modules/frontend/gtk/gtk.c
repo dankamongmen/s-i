@@ -442,7 +442,7 @@ static void screenshot_button_callback(GtkWidget * button,
     gint height;
     gint depth;
     int i;
-    int j;
+    size_t j;
     char screenshot_name[256];
     char popup_message[256];
     char * tmp;
@@ -636,7 +636,7 @@ static GtkWidget * display_descriptions(struct question * q,
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
     GtkWidget * description_view;
-    GtkWidget * ext_description_view;
+    GtkWidget * ext_description_view = NULL;
     GtkWidget * returned_box;
     GtkWidget * description_box;
     GtkWidget * icon_box;
@@ -686,7 +686,8 @@ static GtkWidget * display_descriptions(struct question * q,
     gtk_text_view_set_right_margin(GTK_TEXT_VIEW(description_view), 4);
     gtk_text_buffer_create_tag(description_buffer, "italic", "style",
                                PANGO_STYLE_ITALIC, NULL);
-    g_object_set_data(G_OBJECT(description_view), "tag", "italic");
+    /* XXX: is that needed? */
+    g_object_set_data(G_OBJECT(description_view), "tag", (void *) "italic");
     gtk_text_buffer_get_start_iter(description_buffer, &start);
     gtk_text_buffer_get_end_iter(description_buffer, &end);
     gtk_text_buffer_apply_tag_by_name(description_buffer, "italic",
@@ -1829,9 +1830,9 @@ static int gtk_go(struct frontend * obj)
     struct frontend_data * data = (struct frontend_data *) obj->data;
     struct question * q = obj->questions;
     GtkWidget * questionbox;
-    GtkWidget * questionbox_scroll;
+    GtkWidget * questionbox_scroll = NULL;
     di_slist * plugins;
-    int i;
+    size_t i;
     int j;
     int ret;
     gtk_handler * handler;
@@ -1989,7 +1990,8 @@ static int gtk_go(struct frontend * obj)
 
     if (NULL == obj->questions->next && NULL == obj->questions->prev) {
         gtk_widget_destroy(questionbox);
-    } else {
+    }
+    if (NULL != questionbox_scroll) {
         gtk_widget_destroy(questionbox_scroll);
     }
 
