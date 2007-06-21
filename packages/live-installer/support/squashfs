@@ -7,6 +7,7 @@ squashfs_prepare() {
 	modprobe squashfs || true
 
 	mkdir -p /mnt
+	umount /mnt || true
 	if ! mount -t squashfs -o loop $place /mnt; then
 		error "$place has failed to be mounted as squashfs."
 		exit 1
