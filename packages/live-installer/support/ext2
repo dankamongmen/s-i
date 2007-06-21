@@ -7,7 +7,7 @@ ext2_prepare() {
 	modprobe ext2 || true
 
 	mkdir -p /mnt
-	umount /mnt || true
+	umount /mnt > /dev/null 2>&1
 	if ! mount -t ext2 -o loop $place /mnt; then
 		error "$place has failed to be mounted as ext2."
 		exit 1
