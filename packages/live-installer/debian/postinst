@@ -38,13 +38,9 @@ install_live_system () {
 	done
 
 	for place in $PLACES; do
-		if [ ! -e $place ]; then
-			info "$place doesn't exists"
-			continue
-		fi
+		[ ! -e $place ] && continue
 
 		SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
-
 		info "Using $SUPPORT support for $place"
 
 		eval ${SUPPORT}_prepare
@@ -67,10 +63,10 @@ install_live_system () {
 			COUNT=$(($COUNT + 1))
 			CURRENT=$(($COUNT * 100 / $STEPS))
 
-			if [ x$CURRENT != x$LAST_UPDATE ]; then
-				LAST_UPDATE=$CURRENT
-				db_progress STEP 1
-			fi
+			[ x$CURRENT = x$LAST_UPDATE ] && continue
+
+			LAST_UPDATE=$CURRENT
+			db_progress STEP 1
 		done
 	done
 
