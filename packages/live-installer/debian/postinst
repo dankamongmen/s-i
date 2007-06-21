@@ -54,7 +54,9 @@ install_live_system () {
 
 		COUNT=0
 		for item in $(find .); do
-			if [ -d $item ]; then
+			# We need to be ensure it's not a symbolic link otherwise
+			# it breaks links for directories.
+			if [ -d $item ] && [ ! -h $item ]; then
 				mkdir -p /target/$item
 			else
 				mkdir -p /target/$(dirname $item)
