@@ -12,7 +12,7 @@
  * @param char *fmt - format of message to write (a la printf)
  * @param ... - other args for format string
  */
-void debug_printf(int level, char const *fmt, ...)
+void debug_printf(int level, const char *fmt, ...)
 #ifdef __GNUC__
 	__attribute__((format(printf, 2, 3)))
 #endif
