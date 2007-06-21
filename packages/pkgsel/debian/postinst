@@ -38,58 +38,44 @@ done
 config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
 
 db_progress STEP 1
-progress_start=1
-progress_end=95
 
-if ! db_get popularity-contest/participate || [ "$RET" != false ]; then
-	progress_end=5
-
-	# Install popularity-contest but remove it if the user decides not to
-	# participate.
-	if in-target sh -c "$config debconf-apt-progress --from $progress_start --to $progress_end --logstderr -- apt-get -o APT::Install-Recommends=false -q -y -f install popularity-contest"; then
-		if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
-			in-target dpkg --purge popularity-contest
-		fi
+# Install popularity-contest but remove it if the user decides not to
+# participate.
+if in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -o APT::Install-Recommends=false -q -y -f install popularity-contest"; then
+	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
+		in-target dpkg --purge popularity-contest
 	fi
-	progress_start=$progress_end
-fi
-
-
-if (db_fget tasksel/first seen && [ "$RET" = false ]) || (db_get tasksel/first && [ "$RET" ]); then
-	db_get pkgsel/include
-	if [ "$RET" ]; then
-		progress_end=90
-	else
-		progress_end=95
-	fi
-
-	db_progress INFO pkgsel/progress/tasksel
-	ret=0
-	in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from $progress_start --to $progress_end --logstderr'" || ret=$?
-
-	if [ "$ret" != 0 ]; then
-		# In case packages failed to install, try to clean up.
-		in-target dpkg --configure -a || true
-		
-		# TODO useful error message here (for ret != 30)
-		db_progress INFO pkgsel/progress/cleanup
-		if ! cleanup; then
-			log "cleanup failed"
-		fi
-		db_progress STOP
-		exit $ret
-	fi
-	progress_start=$progress_end
 fi
 
 db_get pkgsel/include
 if [ "$RET" ]; then
-	progress_end=95
+	tasksel_end=90
+else
+	tasksel_end=95
+fi
 
+db_progress INFO pkgsel/progress/tasksel
+ret=0
+in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 5 --to $tasksel_end --logstderr'" || ret=$?
+if [ "$ret" != 0 ]; then
+	# In case packages failed to install, try to clean up.
+	in-target dpkg --configure -a || true
+	
+	# TODO useful error message here (for ret != 30)
+	db_progress INFO pkgsel/progress/cleanup
+	if ! cleanup; then
+		log "cleanup failed"
+	fi
+	db_progress STOP
+	exit $ret
+fi
+
+db_get pkgsel/include
+if [ "$RET" ]; then
 	# Allow comma-separation so that this can more easily be preseeded
 	# at the kernel command line.
 	RET="$(printf '%s' "$RET" | sed 's/,/ /g')"
-	in-target sh -c "$config debconf-apt-progress --from $progress_start --to $progress_end --logstderr -- aptitude -q --without-recommends -y install $RET" || ret=$?
+	in-target sh -c "$config debconf-apt-progress --from 90 --to 95 --logstderr -- aptitude -q --without-recommends -y install $RET" || ret=$?
 	if [ "$ret" != 0 ]; then
 		# In case packages failed to install, try to clean up.
 		in-target dpkg --configure -a || true
@@ -102,11 +88,6 @@ if [ "$RET" ]; then
 		db_progress STOP
 		exit $ret
 	fi
-	progress_start=$progress_end
-fi
-
-if [ $progress_end -gt $progress_start ]; then
-	db_progress STEP $(($progress_end - $progress_start))
 fi
 
 db_progress INFO pkgsel/progress/cleanup
