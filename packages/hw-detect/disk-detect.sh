@@ -158,10 +158,13 @@ if [ $RET = true ]; then
 		fi
 
 		if [ "$(dmraid -c -s)" != "No RAID disks" ]; then
+			logger -t disk-detect "Fake (ata) RAID disk(s) detected; dmraid support enabled"
 			anna-install partman-dmraid
 
 			# Activate devices
 			log-output -t disk-detect dmraid -ay
+		else
+			logger -t disk-detect "No fake (ata) RAID disks detected"
 		fi
 	fi
 fi
