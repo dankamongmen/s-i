@@ -125,7 +125,8 @@ if [ "$RET" = true ] && ! is_system_user; then
 	fi
 
 	if [ -n "$USER" ]; then
-		for group in audio cdrom dialout floppy video plugdev netdev powerdev; do
+        db_get passwd/user-default-groups
+		for group in $RET; do
 			$log $chroot $ROOT adduser "$USER" $group >/dev/null 2>&1 || true
 		done
 	fi
