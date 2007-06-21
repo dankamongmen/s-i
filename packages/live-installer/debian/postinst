@@ -1,82 +1,116 @@
-#!/bin/sh -e
+#! /bin/sh
+set -e
 
 . /usr/share/debconf/confmodule
+db_capb backup
 
-log() {
-	logger -t live-installer "$@"
-}
+. /usr/lib/base-installer/library.sh
 
-error() {
-	log "error: $*"
-}
+ETCDIR=/target/etc
+ARCH=`udpkg --print-architecture`
+PROTOCOL=
+MIRROR=
+DIRECTORY=
+COMPONENTS=
+DISTRIBUTION=
+INCLUDES=
+EXCLUDES=
+KERNEL=
+KERNEL_LIST=/tmp/available_kernels.txt
+KERNEL_MAJOR="$(uname -r | cut -d . -f 1,2)"
+KERNEL_VERSION="$(uname -r | cut -d - -f 1)"
+KERNEL_ABI="$(uname -r | cut -d - -f 1,2)"
+MACHINE="$(uname -m)"
+NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true
+CPUINFO=/proc/cpuinfo
+SPEAKUP=/proc/speakup
 
-warning() {
-	log "warning: $*"
-}
+SUBARCH="$(archdetect)"
+SUBARCH="${SUBARCH#*/}"
 
-info() {
-	log "info: $*"
-}
+install_live_system () {
+	# Look at
+	PLACES=""
 
-# Look at
-PLACES=""
-
-# Load filesystem support
-for script in $(ls /lib/live-installer/*); do
-	. $script
-done
-
-for place in $PLACES; do
-	if [ ! -e $place ]; then
-		info "$place doesn't exists"
-		continue
-	fi
-
-	SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
-
-	info "Using $SUPPORT support for $place"
-
-	eval ${SUPPORT}_prepare
-	STEPS=$(eval ${SUPPORT}_count)
-
-	db_progress INFO live-installer/progress/installing
-	db_progress START 0 $STEPS live-installer/progress/installing
-
-	for item in $(find .); do
-		if [ -d $item ]; then
-			mkdir -p /target/$item
-		else
-			mkdir -p /target/$(dirname $item)
-			cp -a $item /target/$item
-		fi
-
-		db_progress STEP 1
+	# Load filesystem support
+	for script in $(ls /lib/live-installer/*); do
+		. $script
 	done
 
-	db_progress STOP
-done
-
-# run the scripts found in hook directory after copying the system
-partsdir="/usr/lib/live-installer.d"
-if [ -d "$partsdir" ]; then
-	for script in $(ls "$partsdir"/*); do
-		base=$(basename $script | sed 's/[0-9]*//')
-		if ! db_progress INFO live-installer/progress/$base; then
-			db_subst live-installer/progress/fallback SCRIPT "$base"
-			db_progress INFO live-installer/progress/fallback
+	for place in $PLACES; do
+		if [ ! -e $place ]; then
+			info "$place doesn't exists"
+			continue
 		fi
-		
-		if [ -x "$script" ] ; then
-			# be careful to preserve exit code
-			if log-output -t live-installer "$script"; then
-				:
+
+		SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
+
+		info "Using $SUPPORT support for $place"
+
+		eval ${SUPPORT}_prepare
+		STEPS=$(eval ${SUPPORT}_count)
+
+		db_progress INFO live-installer/progress/installing
+		db_progress START 0 $STEPS live-installer/progress/installing
+
+		COUNT=0
+		for item in $(find .); do
+			if [ -d $item ]; then
+				mkdir -p /target/$item
 			else
-				warning "$script returned error code $?"
+				mkdir -p /target/$(dirname $item)
+				cp -a $item /target/$item
 			fi
-		else
-			error "Unable to execute $script"
-		fi
-	done
-fi
+			
+			COUNT=$(($COUNT + 1))
+			CURRENT=$(($COUNT * 100 / $STEPS))
 
+			if [ x$CURRENT != x$LAST_UPDATE ]; then
+				LAST_UPDATE=$CURRENT
+				db_progress STEP 1
+			fi
+		done
+
+		db_progress STOP
+	done
+
+	# run the scripts found in hook directory after copying the system
+	partsdir="/usr/lib/live-installer.d"
+	if [ -d "$partsdir" ]; then
+		for script in $(ls "$partsdir"/*); do
+			base=$(basename $script | sed 's/[0-9]*//')
+			if ! db_progress INFO live-installer/progress/$base; then
+				db_subst live-installer/progress/fallback SCRIPT "$base"
+				db_progress INFO live-installer/progress/fallback
+			fi
+
+			if [ -x "$script" ] ; then
+				# be careful to preserve exit code
+				if log-output -t live-installer "$script"; then
+					:
+				else
+					warning "$script returned error code $?"
+				fi
+			else
+				error "Unable to execute $script"
+			fi
+		done
+	fi
+}
+
+waypoint 1	check_target
+waypoint 1	get_mirror_info
+waypoint 1	pre_install_hooks
+waypoint 100	install_live_system
+waypoint 1	configure_apt_preferences
+waypoint 1	configure_apt
+waypoint 3	apt_update
+#waypoint 2	create_devices
+waypoint 5	post_install_hooks
+#waypoint 1	pick_kernel
+#waypoint 20	install_linux
+#waypoint 10	install_extra
+waypoint 0	cleanup
+
+run_waypoints
 exit 0
