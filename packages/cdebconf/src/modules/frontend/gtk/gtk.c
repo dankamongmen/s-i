@@ -75,8 +75,8 @@ void update_frontend_title(struct frontend * obj, char * title);
 
 char * progressbar_title = NULL;
 
-typedef int (gtk_handler)(struct frontend * obj, struct question * q,
-                          GtkWidget * questionbox);
+typedef int (fe_gtk_handler)(struct frontend * obj, struct question * q,
+                             GtkWidget * questionbox);
 
 static GCond * button_cond = NULL;
 static GMutex * button_mutex = NULL;
@@ -1691,7 +1691,7 @@ static int gtkhandler_string(struct frontend * obj, struct question * q,
 
 static struct question_handlers {
     char const * type;
-    gtk_handler *handler;
+    fe_gtk_handler *handler;
 } question_handlers[] = {
     { "boolean",        gtkhandler_boolean },
     { "multiselect",    gtkhandler_multiselect },
@@ -1889,7 +1889,7 @@ static void * eventhandler_thread()
     return 0;
 }
 
-static int gtk_initialize(struct frontend * obj, struct configuration * conf)
+static int fe_gtk_initialize(struct frontend * obj, struct configuration * conf)
 {
     struct frontend_data * fe_data;
     GtkWidget * window;
@@ -1969,12 +1969,12 @@ static int gtk_initialize(struct frontend * obj, struct configuration * conf)
     return DC_OK;
 }
 
-static void gtk_plugin_destroy_notify(void * data)
+static void fe_gtk_plugin_destroy_notify(void * data)
 {
     plugin_delete((struct plugin *) data);
 }
 
-static int gtk_go(struct frontend * obj)
+static int fe_gtk_go(struct frontend * obj)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
     struct question * q = obj->questions;
@@ -1984,7 +1984,7 @@ static int gtk_go(struct frontend * obj)
     size_t i;
     int j;
     int ret;
-    gtk_handler * handler;
+    fe_gtk_handler * handler;
     struct plugin * plugin;
 
     if (NULL == q) {
@@ -2052,7 +2052,7 @@ static int gtk_go(struct frontend * obj)
                 if (plugin) {
                     INFO(INFO_DEBUG, 
                          "GTK_DI - Found plugin for %s", q->template->type);
-                    handler = (gtk_handler *) plugin->handler;
+                    handler = (fe_gtk_handler *) plugin->handler;
                     di_slist_append(plugins, plugin);
                 } else {
                     INFO(INFO_DEBUG,
@@ -2065,7 +2065,7 @@ static int gtk_go(struct frontend * obj)
                                       question_handlers[i].type)) {
                 ret = handler(obj, q, questionbox);
                 if (ret != DC_OK) {
-                    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
+                    di_slist_destroy(plugins, &fe_gtk_plugin_destroy_notify);
                     INFO(INFO_DEBUG,
                          "GTK_DI - question %d: \"%s\" failed to display!",
                          j, q->tag);
@@ -2141,7 +2141,7 @@ static int gtk_go(struct frontend * obj)
         }
     }
 
-    di_slist_destroy(plugins, &gtk_plugin_destroy_notify);
+    di_slist_destroy(plugins, &fe_gtk_plugin_destroy_notify);
 
     if (NULL == obj->questions->next && NULL == obj->questions->prev) {
         gtk_widget_destroy(questionbox);
@@ -2172,12 +2172,12 @@ static void gtk_set_title(struct frontend *obj, const char *title)
 }
 #endif
 
-static bool gtk_can_go_back(struct frontend * obj, struct question * q)
+static bool fe_gtk_can_go_back(struct frontend * obj, struct question * q)
 {
     return DCF_CAPB_BACKUP == (obj->capability & DCF_CAPB_BACKUP);
 }
 
-static bool gtk_can_cancel_progress(struct frontend * obj)
+static bool fe_gtk_can_cancel_progress(struct frontend * obj)
 {
     return DCF_CAPB_PROGRESSCANCEL ==
                (obj->capability & DCF_CAPB_PROGRESSCANCEL);
@@ -2206,7 +2206,7 @@ static void set_design_elements_while_progressbar_runs(struct frontend * obj)
     gtk_widget_show(data->progress_bar_box);
 }
 
-static void gtk_progress_start(struct frontend * obj, int min, int max,
+static void fe_gtk_progress_start(struct frontend * obj, int min, int max,
                                char const * title)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
@@ -2247,7 +2247,7 @@ static void gtk_progress_start(struct frontend * obj, int min, int max,
      * called", min, max, title); */
 }
 
-static int gtk_progress_set(struct frontend * obj, int val)
+static int fe_gtk_progress_set(struct frontend * obj, int val)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
     gdouble progress;
@@ -2279,7 +2279,7 @@ static int gtk_progress_set(struct frontend * obj, int val)
     }
 }
 
-static int gtk_progress_info(struct frontend * obj, const char * info)
+static int fe_gtk_progress_info(struct frontend * obj, const char * info)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
     GtkWidget * progress_bar_label;
@@ -2308,7 +2308,7 @@ static int gtk_progress_info(struct frontend * obj, const char * info)
     }
 }
 
-static void gtk_progress_stop(struct frontend *obj)
+static void fe_gtk_progress_stop(struct frontend *obj)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
 
@@ -2319,23 +2319,23 @@ static void gtk_progress_stop(struct frontend *obj)
     gdk_threads_leave();
 }
 
-static unsigned long gtk_query_capability(struct frontend * f)
+static unsigned long fe_gtk_query_capability(struct frontend * f)
 {
     /* INFO(INFO_DEBUG, "GTK_DI - gtk_query_capability() called"); */
     return DCF_CAPB_BACKUP;
 }
 
 struct frontend_module debconf_frontend_module = {
-    initialize: gtk_initialize,
-    go: gtk_go,
+    initialize: fe_gtk_initialize,
+    go: fe_gtk_go,
 /*  set_title: gtk_set_title, */
-    can_go_back: gtk_can_go_back,
-    can_cancel_progress: gtk_can_cancel_progress,
-    progress_start: gtk_progress_start,
-    progress_info: gtk_progress_info,
-    progress_set: gtk_progress_set,
-    progress_stop: gtk_progress_stop,
-    query_capability: gtk_query_capability,
+    can_go_back: fe_gtk_can_go_back,
+    can_cancel_progress: fe_gtk_can_cancel_progress,
+    progress_start: fe_gtk_progress_start,
+    progress_info: fe_gtk_progress_info,
+    progress_set: fe_gtk_progress_set,
+    progress_stop: fe_gtk_progress_stop,
+    query_capability: fe_gtk_query_capability,
 };
 
 void update_frontend_title(struct frontend * obj, char * title)
