@@ -92,8 +92,8 @@ struct setter_struct {
 
 typedef int (custom_func_t)(struct frontend *, struct question *, GtkWidget *);
 
-static char const * get_text(struct frontend * obj, char const * template,
-                             char const * fallback);
+static const char * get_text(struct frontend * obj, const char * template,
+                             const char * fallback);
 
 void register_setter(void (*func)(void *, struct question *),
                      void * data, struct question * q,
@@ -151,7 +151,7 @@ static void combo_setter(void * entry, struct question * q)
     int i;
     int count;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     
     indices = q_get_indices(q);
 
@@ -192,7 +192,7 @@ static void select_setter (void * treeview, struct question * q)
     int *tindex = NULL;
     char ** choices;
     char ** choices_translated;
-    gchar const * indices;
+    const gchar * indices;
     gchar * name;
     
     indices = q_get_indices(q);
@@ -300,7 +300,7 @@ static void multiselect_multiple_setter(void * check_container,
     int count;
     char ** choices, ** choices_translated;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     
     indices = q_get_indices(q);
 
@@ -559,7 +559,7 @@ static void screenshot_button_callback(GtkWidget * button,
 }
 
 static void multiselect_single_callback(GtkCellRendererToggle * cell,
-                                        gchar const * path_string,
+                                        const gchar * path_string,
                                         struct question_treemodel_data * data)
 {
     GtkTreeModel * model;
@@ -631,8 +631,8 @@ static void select_onRowActivated(GtkTreeView * treeview,
 /* XXX: proofread every call to get_text -> they should free the result string
  */
 static const char * get_text(struct frontend * obj,
-                             char const * template,
-                             char const * fallback )
+                             const char * template,
+                             const char * fallback)
 {
     struct question * q = obj->qdb->methods.get(obj->qdb, template);
 
@@ -641,7 +641,7 @@ static const char * get_text(struct frontend * obj,
 
 static GtkTextDirection get_text_direction(struct frontend * obj)
 {
-    char const * dirstr;
+    const char * dirstr;
     
     dirstr = get_text(
         obj, "debconf/text-direction", "LTR - default text direction");
@@ -780,7 +780,7 @@ static int gtkhandler_boolean(struct frontend * obj, struct question * q,
     GtkWidget * hpadbox;
     GtkWidget * vpadbox;
     struct frontend_question_data * data;
-    char const * defval = question_getvalue(q, "");
+    const char * defval = question_getvalue(q, "");
 
     /* INFO(INFO_DEBUG, "GTK_DI - gtkhandler_boolean() called"); */
 
@@ -854,7 +854,7 @@ static int gtkhandler_multiselect_single(struct frontend * obj,
     int flag_default_found;
     struct question_treemodel_data * data;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     GtkTreeModel * model;
     GtkListStore * store;
     GtkTreeIter iter;
@@ -1006,7 +1006,7 @@ static int gtkhandler_multiselect_multiple(struct frontend * obj,
     int defcount;
     struct frontend_question_data * data;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     
     indices = q_get_indices(q);
     data = NEW(struct frontend_question_data);
@@ -1199,9 +1199,9 @@ static int gtkhandler_select_single_list(struct frontend * obj,
     int i;
     int count;
     struct frontend_question_data * data;
-    char const * defval;
+    const char * defval;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     GtkWidget * hpadbox;
     GtkWidget * vpadbox;
     GtkWidget * description_box;
@@ -1338,9 +1338,9 @@ static int gtkhandler_select_single_tree(struct frontend * obj,
     int i;
     int count;
     struct frontend_question_data * data;
-    char const * defval;
+    const char * defval;
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
     GtkWidget * hpadbox;
     GtkWidget * vpadbox;
     GtkWidget * description_box;
@@ -1538,9 +1538,9 @@ static int gtkhandler_select_multiple(struct frontend * obj,
     struct frontend_question_data * data;
     int i;
     int count;
-    char const * defval; 
+    const char * defval; 
     int * tindex = NULL;
-    gchar const * indices;
+    const gchar * indices;
 
     defval = question_getvalue(q, "");
     indices = q_get_indices(q);
@@ -1642,7 +1642,7 @@ static int gtkhandler_string(struct frontend * obj, struct question * q,
     GtkWidget * hpadbox;
     GtkWidget * vpadbox;
     struct frontend_question_data * data;
-    char const * defval;
+    const char * defval;
     
     defval = question_getvalue(q, "");
 
@@ -1690,7 +1690,7 @@ static int gtkhandler_string(struct frontend * obj, struct question * q,
 }
 
 static struct question_handlers {
-    char const * type;
+    const char * type;
     fe_gtk_handler *handler;
 } question_handlers[] = {
     { "boolean",        gtkhandler_boolean },
@@ -2207,7 +2207,7 @@ static void set_design_elements_while_progressbar_runs(struct frontend * obj)
 }
 
 static void fe_gtk_progress_start(struct frontend * obj, int min, int max,
-                               char const * title)
+                                  const char * title)
 {
     struct frontend_data * data = (struct frontend_data *) obj->data;
     GtkWidget *progress_bar;
