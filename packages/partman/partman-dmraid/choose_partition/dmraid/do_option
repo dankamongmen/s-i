@@ -4,6 +4,8 @@
 
 # TODO: Add error checking and error messages !!!!!!!!!!!!
 
+OLDIFS="$IFS"
+
 create_ext2 () {
 	frpart=${1##*/}
 	db_subst partman-dmraid/progress/createfs/info DEVICE $frpart
@@ -66,15 +68,21 @@ log-output -t partman-dmraid dmraid -ay
 PB_MAX=$(dmsetup status --target linear | wc -l)
 db_progress START 0 $PB_MAX partman-dmraid/progress/createfs/title
 
+# Restore IFS as it gets clobbered somewhere
+IFS="$OLDIFS"
+
 # Create an initial filesystem so new partitions are detected properly
 # HACKALERT: we assume that the size of the device is a sufficient indicator
 # that a partition was changed
+# FIXME: this does not work if the partition number changes!
+
 for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
 	for frpart in $(ls /dev/mapper/$frdisk* 2>/dev/null); do
 		[ $frpart != /dev/mapper/$frdisk ] || continue
-		if oldstatus=$(echo $DM_STATUS | grep "^$frpart:"); then
+		if oldstatus=$(echo "$DM_STATUS" | grep "^${frpart#/dev/mapper/}:"); then
 			oldsize=$(echo $oldstatus | cut -d" " -f 3)
-			newsize=$(dmsetup status $frpart | cut -d" " -f 3)
+			# If the device is passed, it is not included in the output!
+			newsize=$(dmsetup status $frpart | cut -d" " -f 2)
 			if [ $newsize -ne $oldsize ]; then
 				create_ext2 $frpart
 			fi
@@ -84,6 +92,7 @@ for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
 		db_progress STEP 1
 	done
 done
+
 db_progress SET $PB_MAX
 db_progress STOP
 
