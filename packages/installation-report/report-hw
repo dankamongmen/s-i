@@ -50,6 +50,14 @@ pccardctl ident 2>&1 | addinfo "cardctl ident"
 cardctl status 2>&1 | addinfo "cardctl status"
 cardctl ident 2>&1 | addinfo "cardctl ident"
 
+if type dmraid >/dev/null 2>&1; then
+	addinfo "dmraid -s"
+	addinfo "dmraid -r"
+	if type dmsetup >/dev/null 2>&1; then
+		addinfo "dmsetup table"
+	fi
+fi
+
 for file in cpuinfo ioports iomem interrupts meminfo bus/usb/devices \
 	bus/input/devices; do
 	addfile /proc/$file
