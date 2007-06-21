@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -e
 
 PLACES="$PLACES /cdrom/live/filesystem.squashfs"
 PLACES="$PLACES /cdrom/casper/filesystem.squashfs" # Etch support
@@ -7,7 +7,7 @@ squashfs_prepare() {
 	modprobe squashfs || true
 
 	mkdir -p /mnt
-	umount /mnt > /dev/null 2>&1
+	umount /mnt > /dev/null 2>&1 || true
 	if ! mount -t squashfs -o loop $place /mnt; then
 		error "$place has failed to be mounted as squashfs."
 		exit 1
