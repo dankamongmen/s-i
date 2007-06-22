@@ -84,7 +84,7 @@ static int confmodule_communicate(struct confmodule *mod)
                 return DC_OK;
             }
 
-            ret = read(mod->infd, buf, sizeof(buf));
+            ret = read(mod->infd, buf, sizeof(buf) - 1);
             if (ret < 0) {
                 if (errno == EINTR)
                     continue;
