@@ -52,14 +52,14 @@ install_live_system () {
 		for item in $(find .); do
 			# We need to be ensure it's not a symbolic link otherwise
 			# it breaks links for directories.
-			if [ -d $item ] && [ ! -h $item ]; then
-				mkdir -p /target/$item
+			if [ -d "$item" ] && [ ! -h "$item" ]; then
+				mkdir -p /target/"$item"
 			else
-				mkdir -p /target/$(dirname $item)
-				rm -f /target/$item
-				cp -a $item /target/$item
+				mkdir -p /target/"$(dirname $item)"
+				rm -f /target/"$item"
+				cp -a "$item" /target/"$item"
 			fi
-			
+
 			COUNT=$(($COUNT + 1))
 			CURRENT=$(($COUNT * 100 / $STEPS))
 
