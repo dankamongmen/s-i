@@ -56,18 +56,18 @@ struct question_db_module {
  * @brief Template database object
  */
 struct template_db {
-	/** db module name */
-	const char *modname;
-	/** db module handle */
-	void *handle;
-	/** configuration data */
-	struct configuration *config;
+    /** db module name */
+    const char *modname;
+    /** db module handle */
+    void *handle;
+    /** configuration data */
+    struct configuration *config;
     /** config path - base of instance configuration */
     char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
-	/** private data */
-	void *data; 
+    /** private data */
+    void *data; 
 
-	/** methods */
+    /** methods */
     struct template_db_module methods;
 };
 
@@ -76,19 +76,19 @@ struct template_db {
  */
 struct question_db {
     /** db module name */
-	const char *modname;
-	/** db module handle */
-	void *handle;
-	/** configuration data */
-	struct configuration *config;
+    const char *modname;
+    /** db module handle */
+    void *handle;
+    /** configuration data */
+    struct configuration *config;
     /** config path - base of instance configuration */
     char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
-	/** private data */
-	void *data; 
+    /** private data */
+    void *data; 
     /** template database */
     struct template_db *tdb;
 
-	/** methods */
+    /** methods */
     struct question_db_module methods;
 };
 
