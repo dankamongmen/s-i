@@ -16,6 +16,7 @@
 #include <debian-installer.h>
 
 static int force_configure = 0;
+static int loadtemplate = 1;
 
 /* 
  * Main udpkg implementation routines
@@ -165,7 +166,8 @@ static int dpkg_dounpack(struct package_t *pkg)
 				/* Is this the templates file?  If
 				 * so, call debconf-loadtemplate on it
 				 */
-				if (strcmp(adminscripts[i],"templates") == 0) {
+				if (loadtemplate &&
+				    strcmp(adminscripts[i], "templates") == 0) {
 					/* Possibly reduce templates prior
 					 * to loading. Done on lowmem
 					 * installs. */
@@ -507,6 +509,7 @@ int main(int argc, char **argv)
 		{ "configure", 0, 0, 'c' },
 		{ "print-architecture", 0, 0, 'p' } ,
 		{ "force-configure", 0, &force_configure, 1 },
+		{ "no-loadtemplate", 0, &loadtemplate, 0 },
 		{ 0, 0, 0, 0 },
 	};
 
