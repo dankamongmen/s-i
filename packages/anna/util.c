@@ -120,6 +120,47 @@ int configure_package (const char *package) {
 	return ret;
 }
 
+int load_templates (di_packages *packages) {
+	di_slist_node *node;
+	size_t command_size = 1024, command_len;
+	char *command = di_malloc(command_size);
+	bool found_templates = false;
+	int ret;
+
+	if (!command)
+		return 0;
+
+	strcpy(command, "debconf-loadtemplate d-i");
+	command_len = strlen(command);
+
+	for (node = packages->list.head; node; node = node->next) {
+		di_package *package = node->data;
+		char *arg = NULL;
+		if (asprintf(&arg, " %s/%s.templates",
+			     INFO_DIR, package->package) == -1) {
+			di_free(command);
+			return 0;
+		}
+		while (command_len + strlen(arg) >= command_size) {
+			command_size *= 2;
+			command = di_realloc(command, command_size);
+			if (!command) {
+				free(arg);
+				return 0;
+			}
+		}
+		strcpy(command + command_len, arg);
+		command_len += strlen(arg);
+		free(arg);
+		found_templates = true;
+	}
+	if (!found_templates)
+		return 0;
+	ret = !di_exec_shell_log(command);
+	di_free(command);
+	return ret;
+}
+
 /* Check whether the md5sum of file matches sum. If not, return 0. */
 int md5sum(const char *sum, const char *file) {
 	FILE *fp;

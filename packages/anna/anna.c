@@ -218,8 +218,8 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	return 0;
 }
 
-void resume_progress_bar (int progress_step, int pkg_count, di_package *package) {
-	debconf_progress_start(debconf, 0, 2*pkg_count,  "anna/progress_title");
+void resume_progress_bar (int progress_step, int step_count, di_package *package) {
+	debconf_progress_start(debconf, 0, step_count, "anna/progress_title");
 	debconf_progress_set(debconf, progress_step);
 	debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
 	debconf_progress_info(debconf, "anna/progress_step_retr");
@@ -230,26 +230,40 @@ install_modules(di_packages *status, di_packages *packages) {
 	di_slist_node *node;
 	di_package *package;
 	char *f, *fp, *dest_file;
-	int ret = 0, pkg_count = 0;
+	int step_count = 0;
 	int progress_step=0;
 
 	di_system_packages_resolve_dependencies_mark_anna(packages, subarchitecture, running_kernel);
 
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
-		if (package->status_want == di_package_status_want_install && !is_installed(package, status))
-			pkg_count++;
-		else
+		if (package->status_want == di_package_status_want_install && !is_installed(package, status)) {
+			if (package->type == di_package_type_real_package)
+				step_count++;
+		} else
 			package->status_want = di_package_status_want_unknown;
 	}
 
 	/* Short-circuit if there's no packages to install. */
-	if (pkg_count <= 0)
+	if (step_count <= 0)
 		return 0;
 
-	if (!quiet)
-		debconf_progress_start(debconf, 0, pkg_count, "anna/progress_title");
+	/* One step for loading templates. */
+	step_count++;
 
+	for (node = packages->list.head; node; node = node->next) {
+		package = node->data;
+		/* One extra step for each package to be configured
+		 * immediately.
+		 */
+		if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install && !((di_system_package *)package)->installer_menu_item)
+			step_count++;
+	}
+
+	if (!quiet)
+		debconf_progress_start(debconf, 0, step_count, "anna/progress_title");
+
+	/* Retrieval and unpack pass. */
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
 		if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install) {
@@ -277,13 +291,12 @@ install_modules(di_packages *status, di_packages *packages) {
 					if (retriever_error("retrieve") != 1) {
 						/* Failed to handle error. */
 						free(dest_file);
-						ret = 6;
-						goto OUT;
+						return 6;
 					}
 					else {
 						/* Handled error, retry. */
 						if (!quiet)
-							resume_progress_bar(progress_step, pkg_count, package);
+							resume_progress_bar(progress_step, step_count, package);
 						continue;
 					}
 				}
@@ -297,13 +310,12 @@ install_modules(di_packages *status, di_packages *packages) {
 						/* Failed to handle error. */
 						unlink(dest_file);
 						free(dest_file);
-						ret = 7;
-						goto OUT;
+						return 7;
 					}
 					else {
 						/* Handled error, retry. */
 						if (!quiet)
-							resume_progress_bar(progress_step, pkg_count, package);
+							resume_progress_bar(progress_step, step_count, package);
 						continue;
 					}
 				}
@@ -319,21 +331,7 @@ install_modules(di_packages *status, di_packages *packages) {
 				debconf_go(debconf);
 				unlink(dest_file);
 				free(dest_file);
-				ret = 8;
-				break;
-			}
-			if (!((di_system_package *)package)->installer_menu_item &&
-			    !configure_package(package->package)) {
-				if (!quiet)
-					debconf_progress_stop(debconf);
-				debconf_subst(debconf, "anna/install_failed", "PACKAGE",
-				              package->package);
-				debconf_input(debconf, "critical", "anna/install_failed");
-				debconf_go(debconf);
-				unlink(dest_file);
-				free(dest_file);
-				ret = 8;
-				break;
+				return 8;
 			}
 
 			unlink(dest_file);
@@ -345,11 +343,53 @@ install_modules(di_packages *status, di_packages *packages) {
 		}
 	}
 
+	/* Load debconf templates. We do this just once to avoid having to
+	 * rewrite the templates database over and over again.
+	 */
+	debconf_progress_info(debconf, "anna/progress_step_loadtemplates");
+	load_templates(packages);
+	if (!quiet) {
+		debconf_progress_step(debconf, 1);
+		progress_step++;
+	}
+
+	/* Configuration pass. */
+	for (node = packages->list.head; node; node = node->next) {
+		package = node->data;
+		if (package->type == di_package_type_real_package && package->status_want == di_package_status_want_install) {
+			if (!package->filename) {
+				di_log(DI_LOG_LEVEL_ERROR, "no Filename field for %s, ignoring", package->package);
+				continue;
+			}
+			if (((di_system_package *)package)->installer_menu_item)
+				continue;
+
+			if (!quiet) {
+				debconf_subst(debconf, "anna/progress_step_conf", "PACKAGE", package->package);
+				debconf_progress_info(debconf, "anna/progress_step_conf");
+			}
+
+			if (!configure_package(package->package)) {
+				if (!quiet)
+					debconf_progress_stop(debconf);
+				debconf_subst(debconf, "anna/install_failed", "PACKAGE",
+				              package->package);
+				debconf_input(debconf, "critical", "anna/install_failed");
+				debconf_go(debconf);
+				return 8;
+			}
+
+			if (!quiet) {
+				debconf_progress_step(debconf, 1);
+				progress_step++;
+			}
+		}
+	}
+
 	if (!quiet)
 		debconf_progress_stop(debconf);
 
-OUT:
-	return ret;
+	return 0;
 }
 
 int main(int argc, char **argv) {

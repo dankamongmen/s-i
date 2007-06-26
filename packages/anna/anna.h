@@ -9,7 +9,8 @@
 #define DOWNLOAD_PACKAGES_DEFAULT	DOWNLOAD_DIR "/Packages.default"
 #define INCLUDE_FILE		DOWNLOAD_DIR "/include"
 #define EXCLUDE_FILE		DOWNLOAD_DIR "/exclude"
-#define DPKG_UNPACK_COMMAND	"udpkg --unpack"
+#define INFO_DIR		"/var/lib/dpkg/info"
+#define DPKG_UNPACK_COMMAND	"udpkg --no-loadtemplate --unpack"
 #define DPKG_CONFIGURE_COMMAND	"udpkg --configure"
 
 extern struct debconfclient *debconf;
