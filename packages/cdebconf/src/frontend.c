@@ -83,6 +83,7 @@ static void frontend_info(struct frontend *f, struct question *info)
 {
 	question_deref(f->info);
 	f->info = info;
+	question_ref(info);
 }
 
 static bool frontend_can_go_back(struct frontend *ui, struct question *q)
@@ -232,10 +233,10 @@ void frontend_delete(struct frontend *obj)
 	obj->methods.shutdown(obj);
 	if (obj->handle != NULL)
 		dlclose(obj->handle);
-	DELETE(obj->questions);
+	frontend_clear(obj);
 	DELETE(obj->capb);
 	DELETE(obj->title);
-	DELETE(obj->info);
+	question_deref(obj->info);
     DELETE(obj->progress_title);
     DELETE(obj->plugin_path);
 	DELETE(obj);

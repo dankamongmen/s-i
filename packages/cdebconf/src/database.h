@@ -57,7 +57,7 @@ struct question_db_module {
  */
 struct template_db {
     /** db module name */
-    const char *modname;
+    char *modname;
     /** db module handle */
     void *handle;
     /** configuration data */
@@ -76,7 +76,7 @@ struct template_db {
  */
 struct question_db {
     /** db module name */
-    const char *modname;
+    char *modname;
     /** db module handle */
     void *handle;
     /** configuration data */

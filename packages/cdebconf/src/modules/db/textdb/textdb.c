@@ -114,6 +114,22 @@ static int textdb_template_initialize(struct template_db *db, struct configurati
 	return DC_OK;
 }
 
+static int textdb_template_shutdown(struct template_db *db)
+{
+	struct template_db_cache *dbdata = db->data;
+	struct template *t;
+
+	while (dbdata->templates != NULL)
+	{
+		t = dbdata->templates;
+		dbdata->templates = dbdata->templates->next;
+		t->next = NULL;
+		template_deref(t);
+	}
+
+	return DC_OK;
+}
+
 static int textdb_template_set(struct template_db *db, struct template *t)
 {
 	FILE *outf;
@@ -271,6 +287,22 @@ static int textdb_question_initialize(struct question_db *db, struct configurati
 
 	dbdata->questions = NULL;
 	db->data = dbdata;
+
+	return DC_OK;
+}
+
+static int textdb_question_shutdown(struct question_db *db)
+{
+	struct question_db_cache *dbdata = db->data;
+	struct question *q;
+
+	while (dbdata->questions != NULL)
+	{
+		q = dbdata->questions;
+		dbdata->questions = dbdata->questions->next;
+		q->next = q->prev = NULL;
+		question_deref(q);
+	}
 
 	return DC_OK;
 }
@@ -446,6 +478,7 @@ static struct question *textdb_question_iterate(struct question_db *db,
 
 struct template_db_module debconf_template_db_module = {
     initialize: textdb_template_initialize,
+    shutdown: textdb_template_shutdown,
     set: textdb_template_set,
     get: textdb_template_get,
     remove: textdb_template_remove,
@@ -454,6 +487,7 @@ struct template_db_module debconf_template_db_module = {
 
 struct question_db_module debconf_question_db_module = {
     initialize: textdb_question_initialize,
+    shutdown: textdb_question_shutdown,
     set: textdb_question_set,
     get: textdb_question_get,
     disown: textdb_question_disown,

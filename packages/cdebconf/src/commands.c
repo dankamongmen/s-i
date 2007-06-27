@@ -395,8 +395,9 @@ command_register(struct confmodule *mod, char *arg)
     }
     question_owner_add(q, mod->owner);
     q->template = t;
-    template_ref(t);
+        /* steal reference from mod->templates->methods.get above */
     mod->questions->methods.set(mod->questions, q);
+    question_deref(q);
     asprintf(&out, "%u", CMDSTATUS_SUCCESS);
     return out;
 }
@@ -418,6 +419,7 @@ command_unregister(struct confmodule *mod, char *arg)
         return out;
     }
     question_owner_delete(q, mod->owner);
+    question_deref(q);
     asprintf(&out, "%u", CMDSTATUS_SUCCESS);
 
     return out;
@@ -457,6 +459,8 @@ command_metaget(struct confmodule *mod, char *arg)
     else
         asprintf(&out, "%u %s", CMDSTATUS_SUCCESS, value);
     free(value);
+
+    question_deref(q);
 
     return out;
 }
@@ -596,6 +600,7 @@ command_x_loadtemplatefile(struct confmodule *mod, char *arg)
         if (*argv[1])
             question_owner_add(q, argv[1]);
         mod->questions->methods.set(mod->questions, q);
+        question_deref(q);
         t = t->next;
     }
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
@@ -638,6 +643,7 @@ command_progress(struct confmodule *mod, char *arg)
             return out;
         }
         value = question_get_field(q, "", "description");
+        question_deref(q);
         if (value == NULL)
         {
             asprintf(&out, "%u %s description field does not exist",
@@ -681,6 +687,7 @@ command_progress(struct confmodule *mod, char *arg)
             return out;
         }
         value = question_get_field(q, "", "description");
+        question_deref(q);
         if (value == NULL)
         {
             asprintf(&out, "%u %s description field does not exist",
@@ -723,6 +730,7 @@ command_settitle(struct confmodule *mod, char *arg)
 	return out;
     }
     value = question_get_field(q, "", "description");
+    question_deref(q);
     if (value == NULL)
     {
 	asprintf(&out, "%u %s description field does not exist",
@@ -774,6 +782,7 @@ command_info(struct confmodule *mod, char *arg)
         return out;
     }
     mod->frontend->methods.info(mod->frontend, q);
+    question_deref(q);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
@@ -814,9 +823,11 @@ command_data(struct confmodule *mod, char *arg)
         }
         template_lset(t, NULL, item, value);
         mod->questions->methods.set(mod->questions, q);
+        question_deref(q);
     }
     else
         template_lset(t, NULL, item, value);
+    template_deref(t);
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;

@@ -22,8 +22,18 @@ struct question *question_new(const char *tag)
 
 void question_delete(struct question *question)
 {
+    struct questionowner **ownerp;
+
+    DELETE(question->tag);
     if (question->template)
         template_deref(question->template);
+    for (ownerp = &question->owners; *ownerp != NULL;)
+    {
+        struct questionowner *currentp = *ownerp;
+        *ownerp = currentp->next;
+        DELETE(currentp->owner);
+        DELETE(currentp);
+    }
     if (question->priority != NULL)
         free(question->priority);
     DELETE(question);

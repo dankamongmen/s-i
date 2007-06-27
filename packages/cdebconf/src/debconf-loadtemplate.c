@@ -122,6 +122,8 @@ int main(int argc, char **argv)
                 if (tdb->methods.set(tdb, t) != DC_OK)
                     INFO(INFO_ERROR, "Cannot add template %s", t->tag);
             }
+            if (oldt)
+                template_deref(oldt);
 
             q = qdb->methods.get(qdb, t->tag);
             if (q == NULL)
@@ -140,7 +142,9 @@ int main(int argc, char **argv)
             if (qdb->methods.set(qdb, q) != DC_OK)
                 INFO(INFO_ERROR, "Cannot add config %s", t->tag);
             question_deref(q);
+            oldt = t;
             t = t->next;
+            template_deref(oldt);
         }
     }
 

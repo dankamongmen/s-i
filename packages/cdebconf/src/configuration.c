@@ -181,6 +181,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 	unsigned int stackpos = 0;
 	int curline = 0, i;
 	int incomment = 0, inquote = 0;
+	int ret = DC_OK;
 
 	linebuf[0] = 0;
 	parenttag[0] = 0;
@@ -309,7 +310,8 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (termchar == '{' && linebuf[0] == 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: block starts with no name", filename, curline);
-					return DC_NOTOK;
+					ret = DC_NOTOK;
+					goto out;
 				}
 
 				if (linebuf[0] == 0)
@@ -331,7 +333,8 @@ static int config_read(struct configuration *cfg, const char *filename)
 				    && strparsequoteword(&q, tag, sizeof(tag)) == 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: Malformed tag", filename, curline);
-					return DC_NOTOK;
+					ret = DC_NOTOK;
+					goto out;
 				}
 
 				/* parse off the value */
@@ -350,15 +353,18 @@ static int config_read(struct configuration *cfg, const char *filename)
 				if (strlen(q) != 0)
 				{
 					INFO(INFO_ERROR, "Syntax error %s:%u: Extra junk after tag", filename, curline);
-					return DC_NOTOK;
+					ret = DC_NOTOK;
+					goto out;
 				}
 
 				if (termchar == '{')
 				{
                                         /* 99, not 100.  100 gives possible
                                            off-by-one error */
-					if (stackpos <= 99)
+					if (stackpos <= 99) {
+						DELETE(stack[stackpos]);
 						stack[stackpos++] = strdup(parenttag);
+					}
 					if (value[0] != 0)
 					{
 						strvacat(tag, sizeof(tag),
@@ -423,8 +429,11 @@ static int config_read(struct configuration *cfg, const char *filename)
 			strvacat(linebuf, sizeof(linebuf), " ", (char *) 0);
 		strcat(linebuf, buf);
 	}
+out:
 	fclose(infp);
-	return DC_OK;
+	for (i = 0; i < DIM(stack); i++)
+		DELETE(stack[i]);
+	return ret;
 }
 
 static void config_dump(struct configuration *cfg)
@@ -489,6 +498,8 @@ void config_delete(struct configuration *config)
 		while (top != 0 && top->next == 0)
 		{
 			next = top->parent;
+			DELETE(top->tag);
+			DELETE(top->value);
 			DELETE(top);
 			top = next;
 		}
@@ -496,8 +507,12 @@ void config_delete(struct configuration *config)
 		if (top != 0)
 		{
 			next = top->next;
+			DELETE(top->tag);
+			DELETE(top->value);
 			DELETE(top);
 			top = next;
 		}
 	}
+
+	DELETE(config);
 }

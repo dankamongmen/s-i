@@ -130,9 +130,9 @@ struct template_db *template_db_new(struct configuration *cfg,
     struct template_db_module *mod;
     char tmp[256];
     const char *modpath, *modname, *driver;
-    
+
     if (instance != NULL) {
-        modname = strdup(instance);
+        modname = instance;
     } else {
         modname = cfg->get(cfg, "global::default::template", getenv("DEBCONF_TEMPLATE"));
     }
@@ -160,7 +160,7 @@ struct template_db *template_db_new(struct configuration *cfg,
     db = NEW(struct template_db);
     memset(db, 0, sizeof(struct template_db));
     db->handle = dlh;
-    db->modname = modname;
+    db->modname = STRDUP(modname);
     db->data = NULL;
     db->config = cfg;
     snprintf(db->configpath, sizeof(db->configpath), 
@@ -196,7 +196,8 @@ struct template_db *template_db_new(struct configuration *cfg,
 void template_db_delete(struct template_db *db)
 {
     db->methods.shutdown(db);
-    dlclose(db->handle);
+    free(db->modname);
+    /* dlclose(db->handle); */
 
     DELETE(db);
 }
@@ -376,8 +377,8 @@ struct question_db *question_db_new(struct configuration *cfg,
     const char *modpath, *driver, *modname = NULL;
 
     if (instance != NULL)
-        modname = strdup(instance);
-    
+        modname = instance;
+
     if (modname == NULL)
         modname = getenv("DEBCONF_CONFIG");
 
@@ -407,7 +408,7 @@ struct question_db *question_db_new(struct configuration *cfg,
     db = NEW(struct question_db);
     memset(db, 0, sizeof(struct question_db));
     db->handle = dlh;
-    db->modname = modname;
+    db->modname = STRDUP(modname);
     db->data = NULL;
     db->config = cfg;
     db->tdb = tdb;
@@ -447,7 +448,8 @@ struct question_db *question_db_new(struct configuration *cfg,
 void question_db_delete(struct question_db *db)
 {
     db->methods.shutdown(db);
-    dlclose(db->handle);
+    free(db->modname);
+    /* dlclose(db->handle); */
 
     DELETE(db);
 }

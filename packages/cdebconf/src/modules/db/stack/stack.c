@@ -85,10 +85,8 @@ static int stack_template_db_shutdown(struct template_db *db)
     struct template_stack *tstack = (struct template_stack *)db->data;
     while (tstack) {
          struct template_stack *next = tstack->next;          
-         if (tstack->db->methods.shutdown(tstack->db) != DC_OK)
-              return DC_NOTOK;
-          dlclose(tstack->db->handle);
-          DELETE(tstack->db);
+          template_db_delete(tstack->db);
+          DELETE(tstack);
         tstack = next;
     }
     return DC_OK;
@@ -250,10 +248,8 @@ static int stack_question_db_shutdown(struct question_db *db)
     struct question_stack *qstack = (struct question_stack *)db->data;
     while (qstack) {
          struct question_stack *next = qstack->next;          
-         if (qstack->db->methods.shutdown(qstack->db) != DC_OK)
-              return DC_NOTOK;
-          dlclose(qstack->db->handle);
-          DELETE(qstack->db);
+          question_db_delete(qstack->db);
+          DELETE(qstack);
           qstack = next;
     }
     return DC_OK;

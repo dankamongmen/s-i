@@ -22,6 +22,9 @@
 
 FILE *outf = NULL;
 
+static struct template *rfc822db_template_get(struct template_db *db,
+    const char *ltag);
+
 int nodetemplatecomp(const void *pa, const void *pb) {
   return strcmp(((struct template *)pa)->tag, 
                 ((struct template *)pb)->tag);
@@ -125,6 +128,11 @@ static int parse_flags(char *string)
     return ret;
 }
 
+void rfc822db_template_destroyitem(void *data)
+{
+    template_deref((struct template *) data);
+}
+
 /* templates */
 static int rfc822db_template_initialize(struct template_db *db, struct configuration *cfg)
 {
@@ -139,6 +147,20 @@ static int rfc822db_template_initialize(struct template_db *db, struct configura
     dbdata->dirty = false;
     db->data = dbdata;
 
+    return DC_OK;
+}
+
+static int rfc822db_template_shutdown(struct template_db *db)
+{
+    struct template_db_cache *dbdata = db->data;
+    if (dbdata == NULL)
+        return DC_OK;
+    if (dbdata->root)
+        tdestroy(dbdata->root, rfc822db_template_destroyitem);
+    if (dbdata->iterator)
+        di_slist_destroy(dbdata->iterator, rfc822db_template_destroyitem);
+    free(dbdata);
+    db->data = NULL;
     return DC_OK;
 }
 
@@ -356,11 +378,6 @@ void rfc822db_template_makeiterator(const void *nodep, const VISIT which,
                         template_dup(*(struct template **) nodep));
 }
 
-void rfc822db_template_destroyiterator(void *data)
-{
-    template_deref((struct template *) data);
-}
-
 static struct template *rfc822db_template_iterate(struct template_db *db,
     void **iter)
 {
@@ -373,8 +390,7 @@ static struct template *rfc822db_template_iterate(struct template_db *db,
     node = *(di_slist_node **) iter;
     if (node == NULL) {
         if (dbdata->iterator)
-            di_slist_destroy(dbdata->iterator,
-                             rfc822db_template_destroyiterator);
+            di_slist_destroy(dbdata->iterator, rfc822db_template_destroyitem);
         dbdata->iterator = di_slist_alloc();
         template_iterator = dbdata->iterator; /* non-thread-safe */
         twalk(dbdata->root, rfc822db_template_makeiterator);
@@ -384,7 +400,7 @@ static struct template *rfc822db_template_iterate(struct template_db *db,
         *iter = node = node->next;
 
     if (node == NULL) {
-        di_slist_destroy(dbdata->iterator, rfc822db_template_destroyiterator);
+        di_slist_destroy(dbdata->iterator, rfc822db_template_destroyitem);
         dbdata->iterator = NULL;
         return NULL;
     }
@@ -392,6 +408,11 @@ static struct template *rfc822db_template_iterate(struct template_db *db,
     t = (struct template *) node->data;
     template_ref(t);
     return t;
+}
+
+void rfc822db_question_destroyitem(void *data)
+{
+    question_deref((struct question *) data);
 }
 
 /* config database */
@@ -409,6 +430,20 @@ static int rfc822db_question_initialize(struct question_db *db, struct configura
     dbdata->dirty = false;
     db->data = dbdata;
 
+    return DC_OK;
+}
+
+static int rfc822db_question_shutdown(struct question_db *db)
+{
+    struct question_db_cache *dbdata = db->data;
+    if (dbdata == NULL)
+        return DC_OK;
+    if (dbdata->root)
+        tdestroy(dbdata->root, rfc822db_question_destroyitem);
+    if (dbdata->iterator)
+        di_slist_destroy(dbdata->iterator, rfc822db_question_destroyitem);
+    free(dbdata);
+    db->data = NULL;
     return DC_OK;
 }
 
@@ -668,11 +703,6 @@ void rfc822db_question_makeiterator(const void *nodep, const VISIT which,
                         question_dup(*(struct question **) nodep));
 }
 
-void rfc822db_question_destroyiterator(void *data)
-{
-    question_deref((struct question *) data);
-}
-
 static struct question *rfc822db_question_iterate(struct question_db *db,
     void **iter)
 {
@@ -685,8 +715,7 @@ static struct question *rfc822db_question_iterate(struct question_db *db,
     node = *(di_slist_node **) iter;
     if (node == NULL) {
         if (dbdata->iterator)
-            di_slist_destroy(dbdata->iterator,
-                             rfc822db_question_destroyiterator);
+            di_slist_destroy(dbdata->iterator, rfc822db_question_destroyitem);
         dbdata->iterator = di_slist_alloc();
         question_iterator = dbdata->iterator; /* non-thread-safe */
         twalk(dbdata->root, rfc822db_question_makeiterator);
@@ -696,7 +725,7 @@ static struct question *rfc822db_question_iterate(struct question_db *db,
         *iter = node = node->next;
 
     if (node == NULL) {
-        di_slist_destroy(dbdata->iterator, rfc822db_question_destroyiterator);
+        di_slist_destroy(dbdata->iterator, rfc822db_question_destroyitem);
         dbdata->iterator = NULL;
         return NULL;
     }
@@ -708,6 +737,7 @@ static struct question *rfc822db_question_iterate(struct question_db *db,
 
 struct template_db_module debconf_template_db_module = {
     initialize: rfc822db_template_initialize,
+    shutdown: rfc822db_template_shutdown,
     load: rfc822db_template_load,
     save: rfc822db_template_save,
     set: rfc822db_template_set,
@@ -718,6 +748,7 @@ struct template_db_module debconf_template_db_module = {
 
 struct question_db_module debconf_question_db_module = {
     initialize: rfc822db_question_initialize,
+    shutdown: rfc822db_question_shutdown,
     load: rfc822db_question_load,
     save: rfc822db_question_save,
     set: rfc822db_question_set,
