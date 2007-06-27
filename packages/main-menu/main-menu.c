@@ -309,8 +309,10 @@ static int satisfy_virtual(di_system_package *p) {
 			if (dep->p.status != di_package_status_installed) {
 				switch (di_config_package(dep, satisfy_virtual)) {
 					case -1:
+						di_free(menu);
 						return -1;
 					case EXIT_BACKUP:
+						di_free(menu);
 						return EXIT_BACKUP;
 				}
 			}
@@ -375,8 +377,10 @@ static int satisfy_virtual(di_system_package *p) {
 			debconf_capb(debconf, "backup");
 			debconf_subst(debconf, MISSING_PROVIDE, "CHOICES", menu);
 			debconf_input(debconf, priority, MISSING_PROVIDE);
-			if (debconf_go(debconf) != 0)
+			if (debconf_go(debconf) != 0) {
+				di_free(menu);
 				return 0;
+			}
 			debconf_capb(debconf);
 			debconf_get(debconf, MISSING_PROVIDE);
 			s = strdup(debconf->value);
@@ -392,8 +396,12 @@ static int satisfy_virtual(di_system_package *p) {
 				 * the providing packages */
 				switch (di_config_package(dep, satisfy_virtual)) {
 					case -1:
+						di_free(menu);
+						free(s);
 						return -1;
 					case EXIT_BACKUP:
+						di_free(menu);
+						free(s);
 						return EXIT_BACKUP;
 				}
 				if (is_menu_item)
@@ -401,7 +409,7 @@ static int satisfy_virtual(di_system_package *p) {
 			}
 		}
 	}
-	free(menu);
+	di_free(menu);
 	free(s);
 	/* It doesn't make sense to configure virtual packages,
 	 * since they are, well, virtual. */
