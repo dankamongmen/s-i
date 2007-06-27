@@ -96,7 +96,7 @@ static int stack_template_db_load(struct template_db *db) {
      int ret = DC_NOTOK;
      struct template_stack *tstack = (struct template_stack *)db->data;
      while (tstack) {
-          /* ignore erors */
+          /* ignore errors */
           if ((tstack->db->methods.load(tstack->db)) == DC_OK)
                ret = DC_OK;
           tstack = tstack->next;
@@ -108,8 +108,7 @@ static int stack_template_db_save(struct template_db *db) {
     struct template_stack *tstack = (struct template_stack *)db->data;
     int ret = DC_NOTOK;
     while (tstack) {
-         /* ignore erors */
-         
+         /* ignore errors */
          if (tstack->db->methods.save(tstack->db) == DC_OK)
               ret = DC_OK;
          tstack = tstack->next;
