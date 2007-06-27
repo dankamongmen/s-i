@@ -513,11 +513,7 @@ if [ "$LOCALE" != "C" ] ; then
 	if [ $(echo $POSSIBLELOCALES | wc -w) -gt 1 ] ; then
 		CHOICES=""
 		for i in $POSSIBLELOCALES ; do
-			if [ -z "$CHOICES" ] ; then
-				CHOICES=$i
-			else
-				CHOICES="$CHOICES, $i"
-			fi
+			CHOICES="${CHOICES:+$CHOICES, }$i"
 		done
 		db_subst $localecode LOCALELIST "$CHOICES"
 		db_input medium $localecode || [ $? -eq 30 ]
@@ -532,11 +528,7 @@ if [ "$LOCALE" != "C" ] ; then
 	CHOICES=
 	# *.UTF-8@euro locales are deprecated; don't use them.
 	for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES | grep -v "^$LOCALE$"); do
-		if [ -z "$CHOICES" ]; then
-			CHOICES="$i"
-		else
-			CHOICES="$CHOICES, $i"
-		fi
+		CHOICES="${CHOICES:+$CHOICES, }$i"
 	done
 	db_subst $supportedlocales LOCALELIST "$CHOICES"
 	db_fget $supportedlocales seen
