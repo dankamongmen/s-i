@@ -281,6 +281,27 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
 static int confmodule_save(struct confmodule *mod)
 {
     int ret = DC_OK;
+
+    if (!load_all_translations())
+    {
+        /* This isn't entirely accurate; really it should be done in
+         * rfc822db's implementation of mod->templates->methods.save().
+         * However, that doesn't have convenient access to the questions
+         * database, so we do it here instead for the time being.
+         */
+        struct question *q = mod->questions->methods.get(
+            mod->questions, "debconf/translations-dropped");
+        if (q != NULL)
+        {
+            if (strcmp(question_getvalue(q, ""), "true") != 0)
+            {
+                question_setvalue(q, "true");
+                mod->questions->methods.set(mod->questions, q);
+            }
+            question_deref(q);
+        }
+    }
+
     ret |= mod->update_seen_questions(mod, STACK_SEEN_SAVE);
     if (mod->questions)
         ret |= mod->questions->methods.save(mod->questions);
