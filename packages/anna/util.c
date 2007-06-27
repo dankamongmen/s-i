@@ -1,4 +1,7 @@
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "anna.h"
 
 int get_lowmem_level (void) {
@@ -136,12 +139,21 @@ int load_templates (di_packages *packages) {
 	for (node = packages->list.head; node; node = node->next) {
 		di_package *package = node->data;
 		char *arg = NULL;
-		if (asprintf(&arg, " %s/%s.templates",
+		struct stat st;
+
+		if (package->type != di_package_type_real_package ||
+		    package->status_want != di_package_status_want_install)
+			continue;
+		if (asprintf(&arg, "%s/%s.templates",
 			     INFO_DIR, package->package) == -1) {
 			di_free(command);
 			return 0;
 		}
-		while (command_len + strlen(arg) >= command_size) {
+		if (stat(arg, &st) == -1) {
+			free(arg);
+			continue;
+		}
+		while (command_len + 1 + strlen(arg) >= command_size) {
 			command_size *= 2;
 			command = di_realloc(command, command_size);
 			if (!command) {
@@ -149,8 +161,9 @@ int load_templates (di_packages *packages) {
 				return 0;
 			}
 		}
-		strcpy(command + command_len, arg);
-		command_len += strlen(arg);
+		command[command_len] = ' ';
+		strcpy(command + command_len + 1, arg);
+		command_len += 1 + strlen(arg);
 		free(arg);
 		found_templates = true;
 	}
