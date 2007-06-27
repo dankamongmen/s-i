@@ -197,7 +197,7 @@ void template_db_delete(struct template_db *db)
 {
     db->methods.shutdown(db);
     free(db->modname);
-    /* dlclose(db->handle); */
+    dlclose(db->handle);
 
     DELETE(db);
 }
@@ -449,7 +449,7 @@ void question_db_delete(struct question_db *db)
 {
     db->methods.shutdown(db);
     free(db->modname);
-    /* dlclose(db->handle); */
+    dlclose(db->handle);
 
     DELETE(db);
 }
