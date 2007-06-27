@@ -102,3 +102,17 @@ char *rfc822_header_lookup(struct rfc822_header *list, const char* key)
 /*    fprintf(stderr,"rfc822_header_lookup returning: '%s'\n", list->value);*/
     return list->value;
 }
+
+
+void rfc822_header_destroy(struct rfc822_header *list)
+{
+    struct rfc822_header *cur = list, *next;
+
+    while (cur) {
+        free(cur->header);
+        free(cur->value);
+        next = cur->next;
+        DELETE(cur);
+        cur = next;
+    }
+}

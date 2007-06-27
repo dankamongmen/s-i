@@ -359,7 +359,7 @@ static struct question *http_question_get(struct question_db *db,
         if (name == NULL || *name == 0)
         {
             INFO(INFO_ERROR, "Read a stanza without a name");
-            DELETE(header);
+            rfc822_header_destroy(header);
             continue;
         }
 
@@ -374,7 +374,7 @@ static struct question *http_question_get(struct question_db *db,
                 tmp->template = template_new(name);
                 db->tdb->methods.set(db->tdb, tmp->template);
         }
-        DELETE(header);
+        rfc822_header_destroy(header);
     }
 
     fclose(inf);

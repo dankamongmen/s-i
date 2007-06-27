@@ -198,7 +198,7 @@ static int rfc822db_template_load(struct template_db *db)
         if (name == NULL)
         {
             INFO(INFO_ERROR, "Read a stanza without a name");
-            DELETE(header);
+            rfc822_header_destroy(header);
             continue;
         }
 
@@ -209,6 +209,7 @@ static int rfc822db_template_load(struct template_db *db)
 
         tmp->next = NULL;
         tsearch(tmp, &dbdata->root, nodetemplatecomp);
+        rfc822_header_destroy(header);
     }
 
     fclose(inf);
@@ -485,7 +486,7 @@ static int rfc822db_question_load(struct question_db *db)
         if (name == NULL || *name == 0)
         {
             INFO(INFO_ERROR, "Read a stanza without a name");
-            DELETE(header);
+            rfc822_header_destroy(header);
             continue;
         }
 
@@ -501,7 +502,7 @@ static int rfc822db_question_load(struct question_db *db)
                 db->tdb->methods.set(db->tdb, tmp->template);
         }
         tsearch(tmp, &dbdata->root, nodequestioncomp);
-        DELETE(header);
+        rfc822_header_destroy(header);
     }
 
     fclose(inf);
