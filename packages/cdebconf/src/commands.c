@@ -284,6 +284,7 @@ command_set(struct confmodule *mod, char *arg)
                 CMDSTATUS_BADQUESTION, argv[0]);
     else
     {
+        char *prev = STRDUP(question_getvalue(q, ""));
         question_setvalue(q, argv[1]);
 
         if (mod->questions->methods.set(mod->questions, q) != 0)
@@ -293,6 +294,13 @@ command_set(struct confmodule *mod, char *arg)
             { /* Pass the value on to getlanguage() in templates.c */
                 debug_printf(0, "Setting debconf/language to %s", argv[1]);
                 setenv("LANGUAGE", argv[1], 1);
+                /* Reloading takes a little while, so only do it when it's
+                 * really necessary.
+                 */
+                if (!load_all_translations() &&
+                    strcmp(argv[1], "C") != 0 && strcmp(argv[1], "en") != 0 &&
+                    (prev == NULL || strcmp(argv[1], prev) != 0))
+                    mod->templates->methods.reload(mod->templates);
             }
             else if (strcmp(argv[0], "debconf/priority") == 0)
             {
@@ -302,6 +310,8 @@ command_set(struct confmodule *mod, char *arg)
         }
         else
             asprintf(&out, "%u cannot set value", CMDSTATUS_INTERNALERROR);
+
+        free(prev);
     }
     question_deref(q);
 

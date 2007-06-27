@@ -17,6 +17,13 @@ cdebconf (0.117) UNRELEASED; urgency=low
     closes: #430108).
   * Document proposed PROGRESS REGION command.
   * Fix a bunch of reference-counting bugs and other memory leaks.
+  * If DEBCONF_DROP_TRANSLATIONS is set to 1, then don't read translations
+    we aren't going to use, and reload the templates database if the
+    language is changed since we might not have the correct translations in
+    memory any more. This saves around 20MB of memory at d-i run-time
+    (closes: #329743). Note that this means that after the templates
+    database is first saved (in practice, after anna has run), it will no
+    longer be possible to change the language and get translated messages.
 
  -- Attilio Fiandrotti <attilio.fiandrotti@gmail.com>  Mon, 18 Jun 2007 15:35:11 +0200
 

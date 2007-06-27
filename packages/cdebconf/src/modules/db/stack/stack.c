@@ -104,6 +104,18 @@ static int stack_template_db_load(struct template_db *db) {
      return ret;
 }
 
+static int stack_template_db_reload(struct template_db *db) {
+     int ret = DC_NOTOK;
+     struct template_stack *tstack = (struct template_stack *)db->data;
+     while (tstack) {
+          /* ignore errors */
+          if ((tstack->db->methods.reload(tstack->db)) == DC_OK)
+               ret = DC_OK;
+          tstack = tstack->next;
+     }
+     return ret;
+}
+
 static int stack_template_db_save(struct template_db *db) {
     struct template_stack *tstack = (struct template_stack *)db->data;
     int ret = DC_NOTOK;
@@ -407,6 +419,7 @@ struct template_db_module debconf_template_db_module = {
     initialize: stack_template_db_initialize,
     shutdown: stack_template_db_shutdown,
     load: stack_template_db_load,
+    reload: stack_template_db_reload,
     save: stack_template_db_save,
     set: stack_template_db_set,
     get: stack_template_db_get,

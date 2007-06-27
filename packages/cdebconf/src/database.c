@@ -62,6 +62,11 @@ static int template_db_load(struct template_db *db)
     return DC_OK;
 }
 
+static int template_db_reload(struct template_db *db)
+{
+    return DC_OK;
+}
+
 static int template_db_save(struct template_db *db)
 {
     return DC_OK;
@@ -173,6 +178,7 @@ struct template_db *template_db_new(struct configuration *cfg,
     SETMETHOD(initialize);
     SETMETHOD(shutdown);
     SETMETHOD(load);
+    SETMETHOD(reload);
     SETMETHOD(save);
     SETMETHOD(set);
     SETMETHOD(get);

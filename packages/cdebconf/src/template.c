@@ -91,6 +91,19 @@ static bool allow_i18n(void)
 		return true;
 }
 
+bool load_all_translations(void)
+{
+	static int translations = -1;
+	if (translations == -1) {
+		const char *translations_env = getenv("DEBCONF_DROP_TRANSLATIONS");
+		if (translations_env && !strcmp(translations_env, "1"))
+			translations = 0;
+		else
+			translations = 1;
+	}
+	return (translations == 1);
+}
+
 /*
  * Function: template_new
  * Input: a tag, describing which template this is.  Can be null.
@@ -259,6 +272,28 @@ struct template *template_l10nmerge(struct template *ret, const struct template 
                         to->extended_description = STRDUP(from->extended_description);
         }
         return ret;
+}
+
+void template_l10nclear(struct template *t)
+{
+    struct template_l10n_fields *p = t->fields, *q;
+
+    while (p != NULL)
+    {
+        q = p->next;
+        DELETE(p->language);
+        DELETE(p->defaultval);
+        DELETE(p->choices);
+        DELETE(p->indices);
+        DELETE(p->description);
+        DELETE(p->extended_description);
+        DELETE(p);
+        p = q;
+    }
+
+    t->fields = NEW(struct template_l10n_fields);
+    memset(t->fields, 0, sizeof(struct template_l10n_fields));
+    t->fields->language = strdup("");
 }
 
 static const char *template_field_get(const struct template_l10n_fields *p,
@@ -491,8 +526,29 @@ void template_lset(struct template *t, const char *lang,
 
     if (*lang == 0)
         curlang = getlanguage();
-    else
+    else if (load_all_translations() ||
+             strcmp(lang, "C") == 0 || strncmp(lang, "en", 2) == 0)
         curlang = lang;
+    else {
+        const char *wantlang_full = getlanguage();
+        char *wantlang;
+        char *p;
+
+        if (!wantlang_full)
+            wantlang_full = "C";
+        wantlang = strdup(wantlang_full);
+        p = strpbrk(wantlang, "_.@");
+        if (p)
+            *p = '\0';
+        if (strncmp(lang, wantlang, strlen(wantlang)) == 0)
+            curlang = lang;
+        else {
+            INFO(INFO_VERBOSE, "Dropping %s/%s for %s (wantlang=%s)", t->tag, field, lang, wantlang);
+            free(wantlang);
+            return;
+        }
+        free(wantlang);
+    }
 
     p = t->fields;
     last = p;

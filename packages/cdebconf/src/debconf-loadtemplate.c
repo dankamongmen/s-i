@@ -85,6 +85,9 @@ int main(int argc, char **argv)
     config = config_new();
     parsecmdline(config, argc, argv);
 
+    /* always load all translations if running standalone */
+    unsetenv("DEBCONF_DROP_TRANSLATIONS");
+
     /* If debconf is already running, use debconfclient to load
      * the templates;
      * This is a hack until we introduce a standard debconf

@@ -22,6 +22,7 @@ struct template_db_module {
     int (*initialize)(struct template_db *db, struct configuration *cfg);
     int (*shutdown)(struct template_db *db);
     int (*load)(struct template_db *db);
+    int (*reload)(struct template_db *db);
     int (*save)(struct template_db *db);
     int (*set)(struct template_db *db, struct template *t);
     struct template *(*get)(struct template_db *db, const char *name);

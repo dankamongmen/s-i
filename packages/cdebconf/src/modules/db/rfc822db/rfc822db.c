@@ -178,6 +178,8 @@ static int rfc822db_template_load(struct template_db *db)
     const char *path;
     FILE *inf;
     struct rfc822_header *header = NULL;
+
+    INFO(INFO_VERBOSE, "rfc822db_template_load(db)");
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL ||
@@ -209,6 +211,76 @@ static int rfc822db_template_load(struct template_db *db)
 
         tmp->next = NULL;
         tsearch(tmp, &dbdata->root, nodetemplatecomp);
+        rfc822_header_destroy(header);
+    }
+
+    fclose(inf);
+
+    return DC_OK;
+}
+
+/*
+ * Function: rfc822db_template_reload
+ * Input: template database
+ * Output: DC_OK/DC_NOTOK
+ * Description: reparse a template db file and update the cache; used when
+ *              the language is changed
+ * Assumptions: the file is in valid rfc822 format
+ */
+static int rfc822db_template_reload(struct template_db *db)
+{
+    struct template_db_cache *dbdata = db->data;
+    char tmp[1024];
+    const char *path;
+    FILE *inf;
+    struct rfc822_header *header = NULL;
+
+    INFO(INFO_VERBOSE, "rfc822db_template_reload(db)");
+    snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
+    path = db->config->get(db->config, tmp, 0);
+    if (path == NULL ||
+        (inf = fopen(path, "r")) == NULL)
+    {
+        INFO(INFO_VERBOSE, "Cannot open template file %s",
+            path ? path : "<empty>");
+        return DC_NOTOK;
+    }
+
+    while ((header = rfc822_parse_stanza(inf)) != NULL)
+    {
+        struct template *tmp;
+        bool is_new = false;
+        const char *name;
+        struct rfc822_header *h;
+
+        name = rfc822_header_lookup(header, "name");
+        if (name == NULL)
+        {
+            INFO(INFO_ERROR, "Read a stanza without a name");
+            rfc822_header_destroy(header);
+            continue;
+        }
+
+        INFO(INFO_VERBOSE, "Template %s:", name);
+        tmp = rfc822db_template_get(db, name);
+        if (tmp)
+            template_l10nclear(tmp);
+        else
+        {
+            tmp = template_new(name);
+            is_new = true;
+        }
+        for (h = header; h != NULL; h = h->next)
+            if (strcmp(h->header, "Name") != 0) {
+                INFO(INFO_VERBOSE, "  %s=%s", h->header, h->value);
+                template_lset(tmp, NULL, h->header, h->value);
+            }
+
+        tmp->next = NULL;
+        if (is_new)
+            tsearch(tmp, &dbdata->root, nodetemplatecomp);
+        else
+            template_deref(tmp);
         rfc822_header_destroy(header);
     }
 
@@ -463,6 +535,7 @@ static int rfc822db_question_load(struct question_db *db)
     FILE *inf;
     struct rfc822_header *header = NULL;
 
+    INFO(INFO_VERBOSE, "rfc822db_question_load(db)");
     snprintf(tmp, sizeof(tmp), "%s::path", db->configpath);
     path = db->config->get(db->config, tmp, 0);
     if (path == NULL ||
@@ -740,6 +813,7 @@ struct template_db_module debconf_template_db_module = {
     initialize: rfc822db_template_initialize,
     shutdown: rfc822db_template_shutdown,
     load: rfc822db_template_load,
+    reload: rfc822db_template_reload,
     save: rfc822db_template_save,
     set: rfc822db_template_set,
     get: rfc822db_template_get,
