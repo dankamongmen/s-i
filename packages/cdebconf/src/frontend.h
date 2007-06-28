@@ -7,6 +7,8 @@
 
 #include <stdbool.h>
 
+#include "constants.h"
+
 #undef _
 #define _(x) (x)
 
