@@ -171,6 +171,22 @@ int load_templates (di_packages *packages) {
 		return 0;
 	ret = !di_exec_shell_log(command);
 	di_free(command);
+
+	/* Delete templates after loading. */
+	for (node = packages->list.head; node; node = node->next) {
+		di_package *package = node->data;
+		char *arg = NULL;
+
+		if (package->type != di_package_type_real_package ||
+		    package->status_want != di_package_status_want_install)
+			continue;
+		if (asprintf(&arg, "%s/%s.templates",
+			     INFO_DIR, package->package) == -1)
+			return 0;
+		unlink(arg);
+		free(arg);
+	}
+
 	return ret;
 }
 
