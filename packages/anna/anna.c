@@ -248,8 +248,10 @@ install_modules(di_packages *status, di_packages *packages) {
 	if (step_count <= 0)
 		return 0;
 
+#ifdef LOADTEMPLATES
 	/* One step for loading templates. */
 	step_count++;
+#endif /* LOADTEMPLATES */
 
 	for (node = packages->list.head; node; node = node->next) {
 		package = node->data;
@@ -343,6 +345,7 @@ install_modules(di_packages *status, di_packages *packages) {
 		}
 	}
 
+#ifdef LOADTEMPLATES
 	/* Load debconf templates. We do this just once to avoid having to
 	 * rewrite the templates database over and over again.
 	 */
@@ -352,6 +355,7 @@ install_modules(di_packages *status, di_packages *packages) {
 		debconf_progress_step(debconf, 1);
 		progress_step++;
 	}
+#endif /* LOADTEMPLATES */
 
 	/* Configuration pass. */
 	for (node = packages->list.head; node; node = node->next) {

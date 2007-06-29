@@ -123,6 +123,7 @@ int configure_package (const char *package) {
 	return ret;
 }
 
+#ifdef LOADTEMPLATES
 int load_templates (di_packages *packages) {
 	di_slist_node *node;
 	size_t command_size = 1024, command_len;
@@ -189,6 +190,7 @@ int load_templates (di_packages *packages) {
 
 	return ret;
 }
+#endif /* LOADTEMPLATES */
 
 /* Check whether the md5sum of file matches sum. If not, return 0. */
 int md5sum(const char *sum, const char *file) {

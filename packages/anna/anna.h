@@ -10,7 +10,11 @@
 #define INCLUDE_FILE		DOWNLOAD_DIR "/include"
 #define EXCLUDE_FILE		DOWNLOAD_DIR "/exclude"
 #define INFO_DIR		"/var/lib/dpkg/info"
+#ifdef LOADTEMPLATES
 #define DPKG_UNPACK_COMMAND	"udpkg --no-loadtemplate --unpack"
+#else
+#define DPKG_UNPACK_COMMAND	"udpkg --unpack"
+#endif /* LOADTEMPLATES */
 #define DPKG_CONFIGURE_COMMAND	"udpkg --configure"
 
 extern struct debconfclient *debconf;

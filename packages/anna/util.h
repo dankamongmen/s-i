@@ -14,4 +14,6 @@ void take_includes(di_packages *packages);
 void drop_excludes(di_packages *packages);
 int unpack_package (const char *pkgfile);
 int configure_package (const char *package);
+#ifdef LOADTEMPLATES
 int load_templates (di_packages *packages);
+#endif /* LOADTEMPLATES */

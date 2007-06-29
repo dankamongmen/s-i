@@ -4,6 +4,11 @@ anna (1.28) UNRELEASED; urgency=low
     Letting udpkg call debconf-loadtemplate once per package is much slower
     as it has to write the templates database over and over again. Requires
     udpkg (>= 1.06) for the --no-loadtemplate option.
+  * On second thoughts, compile this out by default as it raises the
+    high-water mark for d-i memory use substantially, since individual
+    .templates files aren't removed until all of them have been loaded. I've
+    left the code in place as we may want to add this back in as an option
+    for speed in the future.
 
  -- Colin Watson <cjwatson@debian.org>  Tue, 26 Jun 2007 16:57:43 +0100
 
