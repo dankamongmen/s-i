@@ -11,7 +11,7 @@ cdebconf: globalmakeflags
 man:
 	$(MAKE) -C man
 
-configure: configure.in
+configure: configure.ac
 	autoconf
 
 install:
@@ -24,6 +24,7 @@ clean:
 
 distclean: clean
 	-rm -f config.status config.log config.cache globalmakeflags
+	-rm -rf autom4te.cache
 	-rm -f src/cdebconf.conf-dist src/Makefile src/config.h man/Makefile
 
 .PHONY: cdebconf clean distclean

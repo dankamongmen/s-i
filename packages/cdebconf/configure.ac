@@ -3,7 +3,7 @@ dnl The ONLY thing this is used for is to configure for different
 dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
-AC_INIT(configure.in)
+AC_INIT(configure.ac)
 CFLAGS="-Wall $CFLAGS -D_GNU_SOURCE"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(src/config.h:src/config.h.in)
