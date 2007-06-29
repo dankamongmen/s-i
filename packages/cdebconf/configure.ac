@@ -53,7 +53,7 @@ if test "$with_debug" != "no"; then
 fi
 
 dnl Use rpath? (for testing mostly)
-AC_ARG_WITH(depends,[  --with-rpath            use rpath? (for testing)])
+AC_ARG_WITH(rpath,[  --with-rpath            use rpath? (for testing)])
 if test "$with_rpath" != "no"; then
   RPATH="-Wl,-rpath,\$(shell pwd)"
   AC_SUBST(RPATH)
