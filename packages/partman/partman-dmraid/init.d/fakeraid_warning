@@ -1,0 +1,25 @@
+#! /bin/sh
+
+# Display a warning that fake (ata) RAID support is experimental.
+# This script should be removed if that is no longer the case!
+
+. /usr/share/debconf/confmodule
+
+# Only display the warning the first time partman is initialized
+if [ -f /var/lib/partman/fakeraid-warning ]; then
+	exit 0
+fi
+
+if type dmraid >/dev/null 2>&1; then
+	if [ "$(dmraid -s -c | grep -v "No RAID disks")" ]; then
+		db_input critical partman-dmraid/experimental
+		db_go || exit 10
+		db_get partman-dmraid/experimental
+		if [ "$RET" = false ]; then
+			exit 10
+		fi
+	fi
+fi
+
+[ -d /var/lib/partman ] || mkdir -p /var/lib/partman
+> /var/lib/partman/fakeraid-warning
