@@ -1258,8 +1258,8 @@ Optional Packages:
   --with-rpath            use rpath? (for testing)
   --with-db               db modules to build
   --with-frontend         frontend modules to build
-  --with-conffile=PATH    cdebconf config file /etc/debconf.conf
-  --with-default-frontend default frontend to usetext
+  --with-conffile=PATH    cdebconf config file [/etc/debconf.conf]
+  --with-default-frontend default frontend to use [text]
   --with-textwrap         use libtextwrap for line-folding
   --with-syslog-logging   enable logging to syslog
 
@@ -1731,11 +1731,11 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 ac_config_headers="$ac_config_headers src/config.h:src/config.h.in"
 
 
-cat >>confdefs.h <<_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define DEBCONF_VERSION 2.0
 _ACEOF
 
-cat >>confdefs.h <<_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define PACKAGE "cdebconf"
 _ACEOF
 
@@ -2812,7 +2812,14 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-test "$HAVESED" = "yes" || exit 1
+if test "$HAVESED" = yes; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: sed is missing; cannot continue!" >&5
+echo "$as_me: error: sed is missing; cannot continue!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
 
 # Extract the first word of "pod2man", so it can be a program name with args.
 set dummy pod2man; ac_word=$2
@@ -2854,11 +2861,18 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-test -n "$POD2MAN" || exit 1
+if test -n "$POD2MAN"; then
+  :
+else
+  { { echo "$as_me:$LINENO: error: pod2man is missing; cannot continue!" >&5
+echo "$as_me: error: pod2man is missing; cannot continue!" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
 
 
 TOPDIR=$(dirname $0)
-if [ "$TOPDIR" = "${TOPDIR#/}" ]; then
+if test "$TOPDIR" = "${TOPDIR#/}"; then
 	# not absolute, resolve it
 	TOPDIR=$(readlink -f $(dirname $(pwd)/$0))
 fi
@@ -2866,13 +2880,13 @@ fi
 BUILDDIR=$(pwd)
 
 
-if [ "$TOPDIR" != "$BUILDDIR" ]; then
+if test "$TOPDIR" != "$BUILDDIR"; then
 	echo "Setting up build directory"
-    for d in `(cd $TOPDIR; find . -type d -a -not -name CVS -a -not -name debian)`; do
-      mkdir -p $BUILDDIR/$d
-      test -f $TOPDIR/$d/Makefile && cp $TOPDIR/$d/Makefile $BUILDDIR/$d/
-      test -f $TOPDIR/$d/modules.mak && cp $TOPDIR/$d/modules.mak $BUILDDIR/$d/
-    done
+	for d in `(cd $TOPDIR; find . -type d -a -not -name CVS -a -not -name debian)`; do
+		mkdir -p $BUILDDIR/$d
+		test -f $TOPDIR/$d/Makefile && cp $TOPDIR/$d/Makefile $BUILDDIR/$d/
+		test -f $TOPDIR/$d/modules.mak && cp $TOPDIR/$d/modules.mak $BUILDDIR/$d/
+	done
 fi
 
 
@@ -3184,7 +3198,8 @@ echo "${ECHO_T}$ac_cv_lib_mysqlclient_mysql_init" >&6; }
 if test $ac_cv_lib_mysqlclient_mysql_init = yes; then
   DB_MODULES="$DB_MODULES mysql"
 else
-  echo "*** Cannot build mysql database ***"
+  { echo "$as_me:$LINENO: WARNING: cannot build mysql database" >&5
+echo "$as_me: WARNING: cannot build mysql database" >&2;}
 fi
 
 fi
@@ -3257,7 +3272,8 @@ echo "${ECHO_T}$ac_cv_lib_ncurses_initscr" >&6; }
 if test $ac_cv_lib_ncurses_initscr = yes; then
   FRONTEND_MODULES="$FRONTEND_MODULES ncurses"
 else
-  echo "*** Cannot build ncurses frontend ***"
+  { echo "$as_me:$LINENO: WARNING: cannot build ncurses frontend" >&5
+echo "$as_me: WARNING: cannot build ncurses frontend" >&2;}
 fi
 
     { echo "$as_me:$LINENO: checking for bowl_flush in -lbogl" >&5
@@ -3324,7 +3340,8 @@ echo "${ECHO_T}$ac_cv_lib_bogl_bowl_flush" >&6; }
 if test $ac_cv_lib_bogl_bowl_flush = yes; then
   FRONTEND_MODULES="$FRONTEND_MODULES bogl"
 else
-  echo "*** Cannot build BOGL frontend ***"
+  { echo "$as_me:$LINENO: WARNING: cannot build BOGL frontend" >&5
+echo "$as_me: WARNING: cannot build BOGL frontend" >&2;}
 fi
 
     { echo "$as_me:$LINENO: checking for SLang_init_all in -lslang" >&5
@@ -3391,7 +3408,8 @@ echo "${ECHO_T}$ac_cv_lib_slang_SLang_init_all" >&6; }
 if test $ac_cv_lib_slang_SLang_init_all = yes; then
   FRONTEND_MODULES="$FRONTEND_MODULES slang"
 else
-  echo "*** Cannot build SLang frontend ***"
+  { echo "$as_me:$LINENO: WARNING: cannot build SLang frontend" >&5
+echo "$as_me: WARNING: cannot build SLang frontend" >&2;}
 fi
 
     { echo "$as_me:$LINENO: checking for newtInit in -lnewt" >&5
@@ -3458,10 +3476,9 @@ echo "${ECHO_T}$ac_cv_lib_newt_newtInit" >&6; }
 if test $ac_cv_lib_newt_newtInit = yes; then
   FRONTEND_MODULES="$FRONTEND_MODULES newt"
 else
-  echo "*** Cannot build Newt frontend ***"
+  { echo "$as_me:$LINENO: WARNING: cannot build Newt frontend" >&5
+echo "$as_me: WARNING: cannot build Newt frontend" >&2;}
 fi
-
-
 
 fi
 
