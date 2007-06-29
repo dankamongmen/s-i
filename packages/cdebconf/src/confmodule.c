@@ -3,6 +3,7 @@
 #include "frontend.h"
 #include "database.h"
 #include "question.h"
+#include "template.h"
 #include "strutl.h"
 #include "debconfclient.h"
 
