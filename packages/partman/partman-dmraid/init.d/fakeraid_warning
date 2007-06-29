@@ -11,7 +11,7 @@ if [ -f /var/lib/partman/fakeraid-warning ]; then
 fi
 
 if type dmraid >/dev/null 2>&1; then
-	if [ "$(dmraid -s -c | grep -v "No RAID disks")" ]; then
+	if [ "$(dmraid -c -s)" != "No RAID disks" ]; then
 		db_input critical partman-dmraid/experimental
 		db_go || exit 10
 		db_get partman-dmraid/experimental
