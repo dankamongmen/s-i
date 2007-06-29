@@ -150,7 +150,7 @@ done
 
 # Activate fake (ata) raid devices
 db_get disk-detect/dmraid/enable
-if [ $RET = true ]; then
+if [ "$RET" = true ]; then
 	if anna-install dmraid-udeb; then
 		# Device mapper support is required to run dmraid
 		if is_not_loaded dm-mod; then
