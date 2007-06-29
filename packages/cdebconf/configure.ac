@@ -3,7 +3,8 @@ dnl The ONLY thing this is used for is to configure for different
 dnl linux architectures and configurations, it is not used to make the
 dnl code more portable
 
-AC_INIT(configure.ac)
+AC_INIT
+AC_CONFIG_SRCDIR([configure.ac])
 CFLAGS="-Wall $CFLAGS -D_GNU_SOURCE"
 AC_CONFIG_AUX_DIR(.)
 AC_CONFIG_HEADER(src/config.h:src/config.h.in)
@@ -150,4 +151,5 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(socket strdup strstr strtol)
 
-AC_OUTPUT(globalmakeflags src/cdebconf.conf-dist src/Makefile man/Makefile)
+AC_CONFIG_FILES([globalmakeflags src/cdebconf.conf-dist src/Makefile man/Makefile])
+AC_OUTPUT
