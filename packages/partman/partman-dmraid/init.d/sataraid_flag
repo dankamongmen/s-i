@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script sets the fakeraid flag for devices that are recognized by dmraid
+# This script sets the sataraid flag for devices that are recognized by dmraid
 
 for dev in /var/lib/partman/devices/*; do
 	[ -d "$dev" ] || continue
@@ -10,7 +10,7 @@ for dev in /var/lib/partman/devices/*; do
 	for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
 		case $(cat device) in
 		    /dev/mapper/$frdisk)
-			>fakeraid
+			>sataraid
 			break
 			;;
 		esac

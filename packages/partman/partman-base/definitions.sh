@@ -714,13 +714,13 @@ humandev () {
 	        type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
 	    fi
 
-	    # First check for fake (ata) RAID devices
+	    # First check for Serial ATA RAID devices
 	    if type dmraid >/dev/null 2>&1; then
 		for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
 			device=${1#/dev/mapper/}
 			case "$1" in
 			    /dev/mapper/$frdisk)
-				type=fakeraid
+				type=sataraid
 				superset=${device%_*}
 				desc=$(dmraid -s -c -c "$superset")
 				rtype=$(echo "$desc" | cut -d: -f4)
@@ -728,7 +728,7 @@ humandev () {
 				printf "$RET" $device $rtype
 				;;
 			    /dev/mapper/$frdisk*)
-				type=fakeraid
+				type=sataraid
 				part=${device#$frdisk}
 				db_metaget partman/text/dmraid_part description
 				printf "$RET" $device $part
@@ -737,7 +737,7 @@ humandev () {
 		done
 	    fi
 
-	    if [ "$type" = fakeraid ]; then
+	    if [ "$type" = sataraid ]; then
 		:
 	    elif [ "$type" = crypt ]; then
 	        mapping=${1#/dev/mapper/}

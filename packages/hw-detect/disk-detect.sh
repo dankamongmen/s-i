@@ -148,7 +148,7 @@ while ! disk_found; do
 	db_capb
 done
 
-# Activate fake (ata) raid devices
+# Activate support for Serial ATA RAID
 db_get disk-detect/dmraid/enable
 if [ "$RET" = true ]; then
 	if anna-install dmraid-udeb; then
@@ -158,7 +158,7 @@ if [ "$RET" = true ]; then
 		fi
 
 		if [ "$(dmraid -c -s)" != "No RAID disks" ]; then
-			logger -t disk-detect "Fake (ata) RAID disk(s) detected; enabling dmraid support"
+			logger -t disk-detect "Serial ATA RAID disk(s) detected; enabling dmraid support"
 			if anna-install partman-dmraid; then
 				# Activate devices
 				log-output -t disk-detect dmraid -ay
@@ -167,7 +167,7 @@ if [ "$RET" = true ]; then
 				logger -t disk-detect "Error loading partman-dmraid; dmraid devices not activated"
 			fi
 		else
-			logger -t disk-detect "No fake (ata) RAID disks detected"
+			logger -t disk-detect "No Serial ATA RAID disks detected"
 		fi
 	fi
 fi

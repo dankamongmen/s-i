@@ -6,7 +6,7 @@ set -e
 
 ORIG_IFS="$IFS"
 
-part_of_fakeraid () {
+part_of_sataraid () {
 	local raiddev
 	for raiddev in $(dmraid -r -c); do
 		if [ "$(readlink -f $raiddev)" = $1 ]; then
@@ -46,7 +46,7 @@ if [ ! -f /var/run/parted_server.pid ]; then
 
 	# Skip devices that are part of a dmraid device
 	if type dmraid >/dev/null 2>&1; then
-		if part_of_fakeraid $partdev; then
+		if part_of_sataraid $partdev; then
 			continue
 		fi
 	fi

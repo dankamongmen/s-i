@@ -143,8 +143,8 @@ create_new_partition () {
 	db_progress START 0 $numparts partman/text/please_wait
 	db_progress INFO partman-partitioning/new_state
 
-	# Fake raid partitions cannot be used directly under the parent device
-	if [ -f fakeraid ]; then
+	# Cannot set "Use as" for SATA RAID partitions under the parent device
+	if [ -f sataraid ]; then
 		:
 	elif [ -n "$id" -a -f ../../ext3 ]; then
 	    # make better defaults for the new partition
