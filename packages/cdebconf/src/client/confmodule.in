@@ -36,16 +36,14 @@ export DEBCONF_OLD_FD_BASE
 # Commands.
 
 _db_cmd () {
-	printf '%s\n' "$*" >&3
+	IFS=' ' printf '%s\n' "$*" >&3
 	# Set to newline to get whole line.
-	local IFS='
-'
-	local _LINE
-	read -r _LINE
+	IFS='
+' read -r _db_internal_line
 	# Disgusting, but it's the only good way to split the line,
 	# preserving all other whitespace.
-	RET="${_LINE#[! 	][ 	]}"
-	return ${_LINE%%[ 	]*}
+	RET="${_db_internal_line#[! 	][ 	]}"
+	return ${_db_internal_line%%[ 	]*}
 }
 
 REPEAT: db_@command@ ()	{ _db_cmd "@COMMAND@ $@"; }
