@@ -24,7 +24,11 @@ trap sigout INT QUIT
 lockfile-create $LOCK
 lockfile-touch --oneshot $LOCK
 
-if ! br -r 4 -c "$X10_HOUSE" "$switch" "$X10_DEVICE"; then
+if [ -n "$X10_PORT" ]; then
+	PORT="-x$X10_PORT"
+fi
+
+if ! br "$PORT" -r 4 -c "$X10_HOUSE" "$switch" "$X10_DEVICE"; then
 	lockfile-remove $LOCK
 	echo "br failed!" >&2
 	exit 1
