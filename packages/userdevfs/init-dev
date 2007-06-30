@@ -16,6 +16,7 @@ if [ ! -d $ROOT/dev/vc ]; then
 	mkdir -p $ROOT/dev/vc
 	for i in 0 1 2 3 4 5; do
 		mknod $ROOT/dev/vc/$i c 4 $i
+		mknod $ROOT/dev/tty$i c 4 $i
 	done
 fi
 
@@ -24,6 +25,7 @@ if [ ! -d $ROOT/dev/loop ]; then
 	mkdir -p $ROOT/dev/loop
 	for i in 0 1 2 3; do
 		mknod $ROOT/dev/loop/$i b 7 $i 
+		mknod $ROOT/dev/loop$i b 7 $i 
 	done
 fi
 	
@@ -31,6 +33,7 @@ if [ ! -d $ROOT/dev/floppy ]; then
 	echo '  Creating floppy device(s) ...'
 	mkdir -p $ROOT/dev/floppy
 	mknod $ROOT/dev/floppy/0 b 2 0
+	mknod $ROOT/dev/fd0 b 2 0
 fi
 
 if [ ! -d $ROOT/dev/cdroms ]; then

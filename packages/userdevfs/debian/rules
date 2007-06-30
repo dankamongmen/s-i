@@ -24,6 +24,7 @@ install: install-dirs
 	dh_installdirs dev dev/rd dev/vc dev/fb dev/pts
 	# needed in initrd for freeramdisk to work
 	mknod debian/$(PACKAGE)/dev/rd/0 b 1 0
+	mknod debian/$(PACKAGE)/dev/ram0 b 1 0
 	# needed in initrd for console to work right
 	mknod debian/$(PACKAGE)/dev/tty c 5 0
 	mknod debian/$(PACKAGE)/dev/ttyS0 c 4 64
@@ -33,8 +34,14 @@ install: install-dirs
 	mknod debian/$(PACKAGE)/dev/vc/2 c 4 2
 	mknod debian/$(PACKAGE)/dev/vc/3 c 4 3
 	mknod debian/$(PACKAGE)/dev/vc/4 c 4 4
+	mknod debian/$(PACKAGE)/dev/tty0 c 4 0
+	mknod debian/$(PACKAGE)/dev/tty1 c 4 1
+	mknod debian/$(PACKAGE)/dev/tty2 c 4 2
+	mknod debian/$(PACKAGE)/dev/tty3 c 4 3
+	mknod debian/$(PACKAGE)/dev/tty4 c 4 4
 	# for bterm to use the framebuffer
 	mknod debian/$(PACKAGE)/dev/fb/0 c 29 0
+	mknod debian/$(PACKAGE)/dev/fb0 c 29 0
 	mknod debian/$(PACKAGE)/dev/pts/0 c 136 0 
 	mknod debian/$(PACKAGE)/dev/pts/1 c 136 1 
 	mknod debian/$(PACKAGE)/dev/pts/2 c 136 2 
