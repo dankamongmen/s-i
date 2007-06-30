@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Debian-installer 1st-stage master file HR\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-29 22:47+0000\n"
+"POT-Creation-Date: 2007-06-30 12:28+0000\n"
 "PO-Revision-Date: 2006-09-25 23:55+0200\n"
 "Last-Translator: Josip Rodin <joy+ditrans@linux.hr>\n"
 "Language-Team: Croatian <lokalizacija@linux.hr>\n"
@@ -1478,7 +1478,8 @@ msgstr "DHCP klijent nije pronađen. Ovaj paket zahtijeva pump ili dhcp-client."
 #. Type: error
 #. Description
 #: ../netcfg-dhcp.templates:23
-msgid "The DHCP configuration process will be aborted."
+#, fuzzy
+msgid "The DHCP configuration process has been aborted."
 msgstr "Postupak DHCP podešavanja će biti prekinut."
 
 #. Type: select
@@ -2319,7 +2320,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partman-base.templates:64
+#: ../partman-base.templates:64 ../partman-dmraid.templates:42
 msgid "Continue with partitioning?"
 msgstr "Nastaviti s particioniranjem?"
 
@@ -2719,6 +2720,22 @@ msgstr "RAID%s uređaj br. %s"
 #, no-c-format
 msgid "Encrypted volume (%s)"
 msgstr "Enkriptirani prostor (%s)"
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
+#: ../partman-base.templates:291
+#, no-c-format
+msgid "Serial ATA RAID %s (%s)"
+msgstr ""
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume01 (partition #1)
+#: ../partman-base.templates:296
+#, fuzzy, no-c-format
+msgid "Serial ATA RAID %s (partition #%s)"
+msgstr "DASD %s (%s), particija br. %s"
 
 #. Type: text
 #. Description
@@ -3198,7 +3215,8 @@ msgstr "Preslikavanje nije uspjelo"
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:31
-msgid "The copy operation is aborted."
+#, fuzzy
+msgid "The copy operation has been aborted."
 msgstr "Preslikavanje prekinuto."
 
 #. Type: error
@@ -3220,6 +3238,7 @@ msgstr "Iz neznanog razloga nije moguće promijeniti veličinu ovoj paritciji."
 #: ../yaboot-installer.templates:88 ../vmelilo-installer.templates:46
 #: ../lvmcfg-utils.templates:247 ../partman-lvm.templates:381
 #: ../partman-auto-lvm.templates:40 ../partman-auto-raid.templates:3
+#: ../partman-dmraid.templates:20
 msgid "Check /var/log/syslog or see virtual console 4 for the details."
 msgstr "Za pojedinosti provjerite /var/log/syslog ili četvrtu konzolu."
 
@@ -3288,7 +3307,8 @@ msgstr "Pojavila se pogreška pri zapisivanju promjena na uređaje za pohranu."
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:78
-msgid "The resize operation is aborted."
+#, fuzzy
+msgid "The resize operation has been aborted."
 msgstr "Mijenjanje veličine prekinuto."
 
 #. Type: string
@@ -6878,13 +6898,55 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:29
+#, fuzzy
+msgid "Install the GRUB boot loader to the SATA RAID disk?"
+msgstr "Instaliraj GRUB boot učitavač na tvrdi disk"
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "Installation of GRUB on Serial ATA RAID is experimental."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid ""
+"GRUB is always installed to the master boot record (MBR) of the SATA RAID "
+"disk. It is also assumed that that disk is listed as the first hard disk in "
+"the boot order defined in the system's BIOS setup."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "The GRUB root device is: ${GRUBROOT}."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "An error occurred while setting up GRUB for your SATA RAID disk."
+msgstr "Pojavila se pogreška pri podešavanju enkriptiranih prostora."
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "The GRUB installation has been aborted."
+msgstr "Podešavanje je prekinuto."
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:48
 msgid "Install the GRUB boot loader to XFS file system?"
 msgstr "Instaliraj GRUB boot učitavač na XFS datotečni sustav?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:48
 msgid ""
 "The GRUB boot loader installation often fails or hangs when /boot is on a "
 "XFS file system. Using LILO in this situation is recommended."
@@ -6901,14 +6963,14 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#: ../grub-installer.templates:53 ../yaboot-installer.templates:45
+#: ../grub-installer.templates:54 ../yaboot-installer.templates:45
 #: ../aboot-installer.templates:12
 msgid "Device for boot loader installation:"
 msgstr "Uređaj za instalaciju boot učitavača:"
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "You need to make the newly installed system bootable, by installing the GRUB "
 "boot loader on a bootable device. The usual way to do this is to install "
@@ -6924,7 +6986,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "The device can be specified using GRUB's \"(hdn,m)\" notation, or as a "
 "device in /dev. Below are some examples:\n"
@@ -6948,13 +7010,13 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "GRUB password:"
 msgstr "GRUB lozinka:"
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid ""
 "The GRUB boot loader offers many powerful interactive features, which could "
 "be used to compromise your system if unauthorized users have access to the "
@@ -6973,19 +7035,19 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "If you do not wish to set a GRUB password, leave this field blank."
 msgstr "Ako ne želite postaviti GRUB lozinku, ostavite prazno."
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid "GRUB installation failed.  Continue anyway?"
 msgstr "Instalacija GRUB-a nije uspjela. Da ipak nastavim?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid ""
 "The grub package failed to install into /target/.  Installing GRUB as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -6997,87 +7059,87 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Unable to install GRUB in ${BOOTDEV}"
 msgstr "Ne mogu instalirati GRUB na ${BOOTDEV}"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Executing 'grub-install ${BOOTDEV}' failed."
 msgstr "Izvršenje 'grub-install ${BOOTDEV}' nije uspjelo."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Unable to configure GRUB"
 msgstr "Ne mogu podesiti GRUB"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Executing 'update-grub' failed."
 msgstr "Izvršenje 'update-grub' nije uspjelo."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "This is a fatal error."
 msgstr "Ovo je kobna pogreška."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:123
+#: ../grub-installer.templates:124
 msgid "Installing GRUB boot loader"
 msgstr "Instaliram GRUB boot učitavač"
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:127
+#: ../grub-installer.templates:128
 msgid "Looking for other operating systems..."
 msgstr "Tražim druge operacijske sustave..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:131
+#: ../grub-installer.templates:132
 msgid "Installing the 'grub' package..."
 msgstr "Instaliram GRUB paket..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:135
+#: ../grub-installer.templates:136
 msgid "Determining GRUB boot device..."
 msgstr "Određujem GRUB-ov boot uređaj..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:139
+#: ../grub-installer.templates:140
 msgid "Running \"grub-install ${BOOTDEV}\"..."
 msgstr "Pokrećem \"grub-install ${BOOTDEV}\"..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:143
+#: ../grub-installer.templates:144
 msgid "Running \"update-grub\"..."
 msgstr "Pokrećem \"update-grub\"..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:147
+#: ../grub-installer.templates:148
 msgid "Updating /etc/kernel-img.conf..."
 msgstr "Osvježavam /etc/kernel-img.conf..."
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../grub-installer.templates:152
+#: ../grub-installer.templates:153
 msgid "Install the GRUB boot loader on a hard disk"
 msgstr "Instaliraj GRUB boot učitavač na tvrdi disk"
 
 #. Type: text
 #. Description
 #. Rescue menu item
-#: ../grub-installer.templates:157
+#: ../grub-installer.templates:158
 msgid "Reinstall GRUB boot loader"
 msgstr "Ponovo instalirati GRUB boot učitavač"
 
@@ -10524,7 +10586,8 @@ msgstr "Podešavanje RAID-a nije uspjelo"
 #. Type: error
 #. Description
 #: ../partman-md.templates:36
-msgid "The configuration of RAID is aborted."
+#, fuzzy
+msgid "The configuration of RAID has been aborted."
 msgstr "Podešavanje RAID-a prekinuto je."
 
 #. Type: text
@@ -10719,8 +10782,9 @@ msgstr "Pojavila se pogreška pri zapisivanju promjena na diskove."
 #. Type: error
 #. Description
 #: ../partman-lvm.templates:116
-msgid "The configuration of the Logical Volume Manager is aborted."
-msgstr "Podešavanje Upravljača logičkim prostorom prekinuto je."
+#, fuzzy
+msgid "The Logical Volume Manager configuration has been aborted."
+msgstr "Ovo je izbornik podešavanja Upravljača logičkim prostorom."
 
 #. Type: text
 #. Description
@@ -11657,6 +11721,105 @@ msgstr ""
 msgid "Guided - use entire disk and set up encrypted LVM"
 msgstr "Poluautomatsko - cijeli disk, uz enkriptirani ULP"
 
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid "Write changes in SATA RAID partitioning to disk?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid ""
+"Any changes you have made in the partitioning of your Serial ATA RAID disks "
+"need to be written to disk before the partitions can be used. Any other "
+"pending changes will be written to disk as well. These changes cannot be "
+"undone."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "No pending changes"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "There are no changes to commit."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+msgid "Failed to write SATA RAID partitioning changes"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+#, fuzzy
+msgid "An unexpected error occurred while writing the changes to the disks."
+msgstr "Pojavila se pogreška pri zapisivanju promjena na diskove."
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:27
+#, fuzzy
+msgid "Creating initial file system"
+msgstr "Načini %s datotečni sustav"
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:31
+#, fuzzy
+msgid "Creating initial ext2 file system on ${DEVICE}..."
+msgstr ""
+"Provjeravam ext3 datotečni sustav na particiji #${PARTITION} uređaja "
+"${DEVICE}..."
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"The support for SATA RAID disks (using dmraid) in the installer is "
+"experimental. You should make sure that you have a backup of any data on "
+"your system that you do not want to lose!"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"There is currently no real support for SATA RAID disks in either the "
+"partitioner or the boot loaders. The installer works around this, but it "
+"means that the installation is not completely straightforward and that there "
+"are some important limitations."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"More detailed information about SATA RAID support and how to use it, "
+"especially during partitioning and boot loader installation, can be found "
+"at: http://wiki.debian.org/DebianInstaller/SataRaid."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid "Please read that page carefully before proceeding."
+msgstr ""
+
+#. Type: text
+#. Description
+#. Main menu item
+#. Use infinitive form
+#: ../partman-dmraid.templates:62
+msgid "Write changes in SATA RAID partitioning to disk"
+msgstr ""
+
 #. Type: error
 #. Description
 #: ../partconf.templates:3
@@ -11826,29 +11989,35 @@ msgstr "Odmontiranje particija nije uspjelo"
 #. Type: error
 #. Description
 #: ../partconf.templates:82
-msgid ""
-"An error occurred while unmounting the partitions. The partition "
-"configuration process is aborted."
+#, fuzzy
+msgid "An unexpected error occurred while unmounting the partitions."
 msgstr ""
-"Pojavila se pogreška u odmontiranju particija. Postupak podešavanja "
-"particija je prekinut."
+"Pojavila se neočekivana pogreška pri podešavanju unaprijed postavljenog RAID-"
+"a."
+
+#. Type: error
+#. Description
+#: ../partconf.templates:82
+#, fuzzy
+msgid "The partition configuration process has been aborted."
+msgstr "Podešavanje je prekinuto."
 
 #. Type: text
 #. Description
-#: ../partconf.templates:88
+#: ../partconf.templates:89
 #, no-c-format
 msgid "Create %s file system"
 msgstr "Načini %s datotečni sustav"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid "No root partition (/)"
 msgstr "Nema korijenske particije (/)"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
@@ -11858,25 +12027,25 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Partition assigned to ${MOUNT}"
 msgstr "Particiju montirati na ${MOUNT}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr "Nema smisla montirati particiju na ${MOUNT}. Molim, promijenite to."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid "Several partitions assigned to ${MOUNT}"
 msgstr "Nekoliko particija treba montirati na ${MOUNT}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
@@ -11886,19 +12055,19 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "Ready to create file systems and mount partitions?"
 msgstr "Spremni za stvaranje datotečnih sustava i montiranje particija?"
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "File systems will be created and partitions mounted."
 msgstr "Bit će stvoreni datotečni sustavi, a particije montirane."
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
@@ -11908,37 +12077,37 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "Failed to create swap space on ${PARTITION}"
 msgstr "Stvaranje swap prostora na ${PARTITION} nije uspjelo"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "An error occurred when the swap space was created on ${PARTITION}."
 msgstr "Pojavila se pogreška pri stvaranju swap prostora na ${PARTITION}."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "Failed to activate the swap space on ${PARTITION}"
 msgstr "Aktiviranje swap prostora na ${PARTITION} nije uspjelo"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
 msgstr "Pojavila se pogreška pri aktiviranju swap prostora na ${PARTITION}."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid "Failed to create ${FS} file system on ${PARTITION}"
 msgstr "Stvaranje ${FS} datotečnog sustava na ${PARTITION} nije uspjelo"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
@@ -11946,19 +12115,19 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
 msgstr "Montiranje ${PARTITION} na ${MOUNT} nije uspjelo"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr "Pojavila se pogreška pri montiranju ${PARTITION} na ${MOUNT}."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
@@ -11969,7 +12138,7 @@ msgstr ""
 #. Type: text
 #. Description
 #. Main menu item
-#: ../partconf.templates:151
+#: ../partconf.templates:152
 msgid "Configure and mount partitions"
 msgstr "Podesi i montiraj particije"
 
@@ -12641,6 +12810,16 @@ msgstr "Zapisujem kernel u flash memoriju"
 #: ../flash-kernel-installer.templates:25
 msgid "Configure flash memory to boot the system"
 msgstr "Podesiti flash memoriju za podizanje sustava"
+
+#~ msgid "The configuration of the Logical Volume Manager is aborted."
+#~ msgstr "Podešavanje Upravljača logičkim prostorom prekinuto je."
+
+#~ msgid ""
+#~ "An error occurred while unmounting the partitions. The partition "
+#~ "configuration process is aborted."
+#~ msgstr ""
+#~ "Pojavila se pogreška u odmontiranju particija. Postupak podešavanja "
+#~ "particija je prekinut."
 
 #~ msgid "Installing the PCMCIA modules"
 #~ msgstr "Instaliram PCMCIA module"

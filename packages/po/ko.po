@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-29 22:47+0000\n"
+"POT-Creation-Date: 2007-06-30 12:28+0000\n"
 "PO-Revision-Date: 2007-04-03 20:54-0400\n"
 "Last-Translator: Sunjae Park <darehanl@gmail.com>\n"
 "Language-Team:  Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -1470,7 +1470,8 @@ msgstr ""
 #. Type: error
 #. Description
 #: ../netcfg-dhcp.templates:23
-msgid "The DHCP configuration process will be aborted."
+#, fuzzy
+msgid "The DHCP configuration process has been aborted."
 msgstr "DHCP 설정 단계가 중지되었습니다."
 
 #. Type: select
@@ -2300,7 +2301,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partman-base.templates:64
+#: ../partman-base.templates:64 ../partman-dmraid.templates:42
 msgid "Continue with partitioning?"
 msgstr "파티션 프로그램을 계속하시겠습니까?"
 
@@ -2694,6 +2695,22 @@ msgstr "RAID%s 장치 #%s"
 #, no-c-format
 msgid "Encrypted volume (%s)"
 msgstr "암호화된 볼륨(%s)"
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
+#: ../partman-base.templates:291
+#, no-c-format
+msgid "Serial ATA RAID %s (%s)"
+msgstr ""
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume01 (partition #1)
+#: ../partman-base.templates:296
+#, fuzzy, no-c-format
+msgid "Serial ATA RAID %s (partition #%s)"
+msgstr "DASD %s (%s), 파티션 #%s"
 
 #. Type: text
 #. Description
@@ -3164,7 +3181,8 @@ msgstr "복사 작업이 실패했습니다"
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:31
-msgid "The copy operation is aborted."
+#, fuzzy
+msgid "The copy operation has been aborted."
 msgstr "복사 작업이 중지되었습니다."
 
 #. Type: error
@@ -3186,6 +3204,7 @@ msgstr "알 수 없는 이유로 이 파티션의 크기를 바꾸는 게 불가
 #: ../yaboot-installer.templates:88 ../vmelilo-installer.templates:46
 #: ../lvmcfg-utils.templates:247 ../partman-lvm.templates:381
 #: ../partman-auto-lvm.templates:40 ../partman-auto-raid.templates:3
+#: ../partman-dmraid.templates:20
 msgid "Check /var/log/syslog or see virtual console 4 for the details."
 msgstr ""
 "자세한 정보를 확인하시려면 /var/log/messages를 보시거나 가상 콘솔 4을보십시"
@@ -3254,7 +3273,8 @@ msgstr "바뀐 점을 저장 장치에 쓰는 중에 오류가 발생했습니�
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:78
-msgid "The resize operation is aborted."
+#, fuzzy
+msgid "The resize operation has been aborted."
 msgstr "크기 바꾸기 작업이 중지되었습니다."
 
 #. Type: string
@@ -6810,13 +6830,55 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:29
+#, fuzzy
+msgid "Install the GRUB boot loader to the SATA RAID disk?"
+msgstr "GRUB 부트로더를 하드 디스크에 설치"
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "Installation of GRUB on Serial ATA RAID is experimental."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid ""
+"GRUB is always installed to the master boot record (MBR) of the SATA RAID "
+"disk. It is also assumed that that disk is listed as the first hard disk in "
+"the boot order defined in the system's BIOS setup."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "The GRUB root device is: ${GRUBROOT}."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "An error occurred while setting up GRUB for your SATA RAID disk."
+msgstr "암호화된 볼륨을 설정하는 도중 오류가 발생했습니다."
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "The GRUB installation has been aborted."
+msgstr "암호화 설정이 중단되었습니다."
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:48
 msgid "Install the GRUB boot loader to XFS file system?"
 msgstr "GRUB 부트로더를 XFS 파일시스템에 설치하시겠습니까?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:48
 msgid ""
 "The GRUB boot loader installation often fails or hangs when /boot is on a "
 "XFS file system. Using LILO in this situation is recommended."
@@ -6833,14 +6895,14 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#: ../grub-installer.templates:53 ../yaboot-installer.templates:45
+#: ../grub-installer.templates:54 ../yaboot-installer.templates:45
 #: ../aboot-installer.templates:12
 msgid "Device for boot loader installation:"
 msgstr "부트 로더를 설치할 장치:"
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "You need to make the newly installed system bootable, by installing the GRUB "
 "boot loader on a bootable device. The usual way to do this is to install "
@@ -6855,7 +6917,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "The device can be specified using GRUB's \"(hdn,m)\" notation, or as a "
 "device in /dev. Below are some examples:\n"
@@ -6881,13 +6943,13 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "GRUB password:"
 msgstr "GRUB 열쇠글:"
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid ""
 "The GRUB boot loader offers many powerful interactive features, which could "
 "be used to compromise your system if unauthorized users have access to the "
@@ -6904,19 +6966,19 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "If you do not wish to set a GRUB password, leave this field blank."
 msgstr "GRUB 열쇠글을 설정하지 않으려면, 이 필드를 비워 두십시오."
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid "GRUB installation failed.  Continue anyway?"
 msgstr "GRUB 설치가 실패했습니다.  그래도 계속 하시겠습니까?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid ""
 "The grub package failed to install into /target/.  Installing GRUB as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -6928,87 +6990,87 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Unable to install GRUB in ${BOOTDEV}"
 msgstr "GRUB을 ${BOOTDEV}에 설치할 수 없습니다"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Executing 'grub-install ${BOOTDEV}' failed."
 msgstr "'grub-install ${BOOTDEV}' 실행이 실패했습니다."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Unable to configure GRUB"
 msgstr "GRUB을 설정할 수 없습니다"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Executing 'update-grub' failed."
 msgstr "'update-grub' 실행이 실패했습니다."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "This is a fatal error."
 msgstr "치명적인 오류입니다."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:123
+#: ../grub-installer.templates:124
 msgid "Installing GRUB boot loader"
 msgstr "GRUB 부트 로더 설치"
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:127
+#: ../grub-installer.templates:128
 msgid "Looking for other operating systems..."
 msgstr "다른 운영 체제가 있는지 검사하는 중입니다..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:131
+#: ../grub-installer.templates:132
 msgid "Installing the 'grub' package..."
 msgstr "'grub' 꾸러미를 설치하는 중입니다..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:135
+#: ../grub-installer.templates:136
 msgid "Determining GRUB boot device..."
 msgstr "GRUB 부트 장치를 결정하는 중입니다..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:139
+#: ../grub-installer.templates:140
 msgid "Running \"grub-install ${BOOTDEV}\"..."
 msgstr "\"grub-install ${BOOTDEV}\" 실행 중입니다..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:143
+#: ../grub-installer.templates:144
 msgid "Running \"update-grub\"..."
 msgstr "\"update-grub\" 실행 중입니다..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:147
+#: ../grub-installer.templates:148
 msgid "Updating /etc/kernel-img.conf..."
 msgstr "/etc/kernel-img.conf 업데이트 중입니다..."
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../grub-installer.templates:152
+#: ../grub-installer.templates:153
 msgid "Install the GRUB boot loader on a hard disk"
 msgstr "GRUB 부트로더를 하드 디스크에 설치"
 
 #. Type: text
 #. Description
 #. Rescue menu item
-#: ../grub-installer.templates:157
+#: ../grub-installer.templates:158
 msgid "Reinstall GRUB boot loader"
 msgstr "GRUB 부트 로더 재설치"
 
@@ -10421,7 +10483,8 @@ msgstr "RAID 설정 실패"
 #. Type: error
 #. Description
 #: ../partman-md.templates:36
-msgid "The configuration of RAID is aborted."
+#, fuzzy
+msgid "The configuration of RAID has been aborted."
 msgstr "RAID 설정을 그만 둡니다."
 
 #. Type: text
@@ -10614,8 +10677,9 @@ msgstr "바뀐 점을 디스크에 쓰는 중에 오류가 발생했습니다."
 #. Type: error
 #. Description
 #: ../partman-lvm.templates:116
-msgid "The configuration of the Logical Volume Manager is aborted."
-msgstr "논리 볼륨 관리자 (LVM) 설정이 중지되었습니다."
+#, fuzzy
+msgid "The Logical Volume Manager configuration has been aborted."
+msgstr "논리 볼륨 관리자 설정 메뉴입니다."
 
 #. Type: text
 #. Description
@@ -11530,6 +11594,105 @@ msgstr ""
 msgid "Guided - use entire disk and set up encrypted LVM"
 msgstr "안내 - 디스크 전체 사용하고 암호화된 LVM 설정"
 
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid "Write changes in SATA RAID partitioning to disk?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid ""
+"Any changes you have made in the partitioning of your Serial ATA RAID disks "
+"need to be written to disk before the partitions can be used. Any other "
+"pending changes will be written to disk as well. These changes cannot be "
+"undone."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "No pending changes"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "There are no changes to commit."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+msgid "Failed to write SATA RAID partitioning changes"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+#, fuzzy
+msgid "An unexpected error occurred while writing the changes to the disks."
+msgstr "바뀐 점을 디스크에 쓰는 중에 오류가 발생했습니다."
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:27
+#, fuzzy
+msgid "Creating initial file system"
+msgstr "%s 파일 시스테을 만듭니다"
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:31
+#, fuzzy
+msgid "Creating initial ext2 file system on ${DEVICE}..."
+msgstr ""
+"${DEVICE} 장치의 #${PARTITION} 파티션의 ext3 파일 시스템을 검사하는 중입니"
+"다..."
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"The support for SATA RAID disks (using dmraid) in the installer is "
+"experimental. You should make sure that you have a backup of any data on "
+"your system that you do not want to lose!"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"There is currently no real support for SATA RAID disks in either the "
+"partitioner or the boot loaders. The installer works around this, but it "
+"means that the installation is not completely straightforward and that there "
+"are some important limitations."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"More detailed information about SATA RAID support and how to use it, "
+"especially during partitioning and boot loader installation, can be found "
+"at: http://wiki.debian.org/DebianInstaller/SataRaid."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid "Please read that page carefully before proceeding."
+msgstr ""
+
+#. Type: text
+#. Description
+#. Main menu item
+#. Use infinitive form
+#: ../partman-dmraid.templates:62
+msgid "Write changes in SATA RAID partitioning to disk"
+msgstr ""
+
 #. Type: error
 #. Description
 #: ../partconf.templates:3
@@ -11699,29 +11862,34 @@ msgstr "파티션을 마운트 해제하는 데 실패했습니다"
 #. Type: error
 #. Description
 #: ../partconf.templates:82
-msgid ""
-"An error occurred while unmounting the partitions. The partition "
-"configuration process is aborted."
+#, fuzzy
+msgid "An unexpected error occurred while unmounting the partitions."
 msgstr ""
-"파티션을 마운트 해제하는 데 오류가 발생했습니다. 파티션 설정 작업이 중지되었"
-"습니다."
+"기본 설정이 된 RAID 설정을 설정하는 도중 알 수 없는 오류가 발생했습니다."
+
+#. Type: error
+#. Description
+#: ../partconf.templates:82
+#, fuzzy
+msgid "The partition configuration process has been aborted."
+msgstr "암호화 설정이 중단되었습니다."
 
 #. Type: text
 #. Description
-#: ../partconf.templates:88
+#: ../partconf.templates:89
 #, no-c-format
 msgid "Create %s file system"
 msgstr "%s 파일 시스테을 만듭니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid "No root partition (/)"
 msgstr "루트 파일 시스템 (/) 없음"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
@@ -11731,25 +11899,25 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Partition assigned to ${MOUNT}"
 msgstr "${MOUNT}에 마운트할 파티션"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr "파티션을 ${MOUNT}에 마운트하는 건 맞지 않습니다. 바로잡으십시오."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid "Several partitions assigned to ${MOUNT}"
 msgstr "여러 개의 파티션이 ${MOUNT}에 마운트됩니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
@@ -11759,19 +11927,19 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "Ready to create file systems and mount partitions?"
 msgstr "파일 시스템을 만들고 파티션을 마운트할 준비가 되었습니까?"
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "File systems will be created and partitions mounted."
 msgstr "파일 시스템을 만들고 파티션을 마운트합니다."
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
@@ -11780,37 +11948,37 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "Failed to create swap space on ${PARTITION}"
 msgstr "${PARTITION} 파티션에 스왑 공간을 만드는 데 실패했습니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "An error occurred when the swap space was created on ${PARTITION}."
 msgstr "${PARTITION} 파티션에 스왑 공간을 만드는 데 오류가 발생했습니다."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "Failed to activate the swap space on ${PARTITION}"
 msgstr "${PARTITION} 파티션에 스왑 공간을 활성화하는 데 실패했습니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
 msgstr "${PARTITION} 파티션의 스왑 공간을 활성화하는 데 오류가 발생했습니다."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid "Failed to create ${FS} file system on ${PARTITION}"
 msgstr "${PARTITION} 파티션에 ${FS} 파일 시스템을 만드는 데 실패했습니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
@@ -11818,19 +11986,19 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
 msgstr "${MOUNT}에 ${PARTITION} 파티션을 마운트하는 데 실패했습니다"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr "${MOUNT}에 ${PARTITION} 파티션을 마운트하는 데 오류가 발생했습니다."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
@@ -11841,7 +12009,7 @@ msgstr ""
 #. Type: text
 #. Description
 #. Main menu item
-#: ../partconf.templates:151
+#: ../partconf.templates:152
 msgid "Configure and mount partitions"
 msgstr "파티션 설정 및 마운트"
 
@@ -12508,6 +12676,16 @@ msgstr "커널을 플래시 메모리에 쓰는 중"
 #: ../flash-kernel-installer.templates:25
 msgid "Configure flash memory to boot the system"
 msgstr "플래시 메모리를 설정하여 시스템을 부팅할 수 있도록 함"
+
+#~ msgid "The configuration of the Logical Volume Manager is aborted."
+#~ msgstr "논리 볼륨 관리자 (LVM) 설정이 중지되었습니다."
+
+#~ msgid ""
+#~ "An error occurred while unmounting the partitions. The partition "
+#~ "configuration process is aborted."
+#~ msgstr ""
+#~ "파티션을 마운트 해제하는 데 오류가 발생했습니다. 파티션 설정 작업이 중지되"
+#~ "었습니다."
 
 #~ msgid "Installing the PCMCIA modules"
 #~ msgstr "PCMCIA 모듈을 설치하는 중입니다"

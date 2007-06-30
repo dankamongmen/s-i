@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-29 22:47+0000\n"
+"POT-Creation-Date: 2007-06-30 12:28+0000\n"
 "PO-Revision-Date: 2007-04-30 12:09+0200\n"
 "Last-Translator:  Miroslav Kure <kurem@debian.cz>\n"
 "Language-Team:  Czech <provoz@debian.cz>\n"
@@ -1479,7 +1479,8 @@ msgstr "Nebyl nalezen DHCP klient. Tento balík vyžaduje pump nebo dhcp-client.
 #. Type: error
 #. Description
 #: ../netcfg-dhcp.templates:23
-msgid "The DHCP configuration process will be aborted."
+#, fuzzy
+msgid "The DHCP configuration process has been aborted."
 msgstr "Proces nastavení DHCP se přeruší."
 
 #. Type: select
@@ -2314,7 +2315,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partman-base.templates:64
+#: ../partman-base.templates:64 ../partman-dmraid.templates:42
 msgid "Continue with partitioning?"
 msgstr "Pokračovat v rozdělování?"
 
@@ -2714,6 +2715,22 @@ msgstr "RAID%s zařízení č.%s"
 #, no-c-format
 msgid "Encrypted volume (%s)"
 msgstr "Šifrovaný svazek (%s)"
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
+#: ../partman-base.templates:291
+#, no-c-format
+msgid "Serial ATA RAID %s (%s)"
+msgstr ""
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume01 (partition #1)
+#: ../partman-base.templates:296
+#, fuzzy, no-c-format
+msgid "Serial ATA RAID %s (partition #%s)"
+msgstr "DASD %s (%s), oblast č.%s"
 
 #. Type: text
 #. Description
@@ -3188,7 +3205,8 @@ msgstr "Chyba při kopírování"
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:31
-msgid "The copy operation is aborted."
+#, fuzzy
+msgid "The copy operation has been aborted."
 msgstr "Kopírování bylo přerušeno."
 
 #. Type: error
@@ -3210,6 +3228,7 @@ msgstr "Z neznámého důvodu není možné změnit velikost této oblasti."
 #: ../yaboot-installer.templates:88 ../vmelilo-installer.templates:46
 #: ../lvmcfg-utils.templates:247 ../partman-lvm.templates:381
 #: ../partman-auto-lvm.templates:40 ../partman-auto-raid.templates:3
+#: ../partman-dmraid.templates:20
 msgid "Check /var/log/syslog or see virtual console 4 for the details."
 msgstr "Podrobnosti naleznete ve /var/log/syslog nebo na 4. virtuální konzoli."
 
@@ -3278,7 +3297,8 @@ msgstr "Během zápisu změn na úložná zařízení nastala chyba."
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:78
-msgid "The resize operation is aborted."
+#, fuzzy
+msgid "The resize operation has been aborted."
 msgstr "Operace změny velikosti je přerušena."
 
 #. Type: string
@@ -6842,13 +6862,55 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:29
+#, fuzzy
+msgid "Install the GRUB boot loader to the SATA RAID disk?"
+msgstr "Instalovat zavaděč GRUB na pevný disk"
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "Installation of GRUB on Serial ATA RAID is experimental."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid ""
+"GRUB is always installed to the master boot record (MBR) of the SATA RAID "
+"disk. It is also assumed that that disk is listed as the first hard disk in "
+"the boot order defined in the system's BIOS setup."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "The GRUB root device is: ${GRUBROOT}."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "An error occurred while setting up GRUB for your SATA RAID disk."
+msgstr "Během nastavování šifrovaných svazků nastala chyba."
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "The GRUB installation has been aborted."
+msgstr "Nastavování bylo přerušeno."
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:48
 msgid "Install the GRUB boot loader to XFS file system?"
 msgstr "Instalovat zavaděč GRUB na souborový systém XFS?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:48
 msgid ""
 "The GRUB boot loader installation often fails or hangs when /boot is on a "
 "XFS file system. Using LILO in this situation is recommended."
@@ -6865,14 +6927,14 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#: ../grub-installer.templates:53 ../yaboot-installer.templates:45
+#: ../grub-installer.templates:54 ../yaboot-installer.templates:45
 #: ../aboot-installer.templates:12
 msgid "Device for boot loader installation:"
 msgstr "Zařízení pro instalaci zavaděče:"
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "You need to make the newly installed system bootable, by installing the GRUB "
 "boot loader on a bootable device. The usual way to do this is to install "
@@ -6888,7 +6950,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "The device can be specified using GRUB's \"(hdn,m)\" notation, or as a "
 "device in /dev. Below are some examples:\n"
@@ -6911,13 +6973,13 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "GRUB password:"
 msgstr "Heslo pro GRUB:"
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid ""
 "The GRUB boot loader offers many powerful interactive features, which could "
 "be used to compromise your system if unauthorized users have access to the "
@@ -6936,19 +6998,19 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "If you do not wish to set a GRUB password, leave this field blank."
 msgstr "Pokud nechcete nastavit heslo do GRUBu, nechte pole prázdné."
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid "GRUB installation failed.  Continue anyway?"
 msgstr "Instalace GRUBu selhala. Přesto pokračovat?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid ""
 "The grub package failed to install into /target/.  Installing GRUB as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -6960,87 +7022,87 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Unable to install GRUB in ${BOOTDEV}"
 msgstr "Nelze nainstalovat GRUB na ${BOOTDEV}"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Executing 'grub-install ${BOOTDEV}' failed."
 msgstr "Příkaz 'grub-install ${BOOTDEV}' selhal."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Unable to configure GRUB"
 msgstr "GRUB nelze nastavit"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Executing 'update-grub' failed."
 msgstr "Příkaz 'update-grub' selhal."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "This is a fatal error."
 msgstr "Toto je kritická chyba."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:123
+#: ../grub-installer.templates:124
 msgid "Installing GRUB boot loader"
 msgstr "Instaluje se zavaděč GRUB"
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:127
+#: ../grub-installer.templates:128
 msgid "Looking for other operating systems..."
 msgstr "Hledají se jiné operační systémy..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:131
+#: ../grub-installer.templates:132
 msgid "Installing the 'grub' package..."
 msgstr "Instaluje se balík 'grub'..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:135
+#: ../grub-installer.templates:136
 msgid "Determining GRUB boot device..."
 msgstr "Určuje se zaváděcí zařízení pro GRUB..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:139
+#: ../grub-installer.templates:140
 msgid "Running \"grub-install ${BOOTDEV}\"..."
 msgstr "Spouští se \"grub-install ${BOOTDEV}\"..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:143
+#: ../grub-installer.templates:144
 msgid "Running \"update-grub\"..."
 msgstr "Spouští se \"update-grub\"..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:147
+#: ../grub-installer.templates:148
 msgid "Updating /etc/kernel-img.conf..."
 msgstr "Aktualizuje se /etc/kernel-img.conf..."
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../grub-installer.templates:152
+#: ../grub-installer.templates:153
 msgid "Install the GRUB boot loader on a hard disk"
 msgstr "Instalovat zavaděč GRUB na pevný disk"
 
 #. Type: text
 #. Description
 #. Rescue menu item
-#: ../grub-installer.templates:157
+#: ../grub-installer.templates:158
 msgid "Reinstall GRUB boot loader"
 msgstr "Reinstalovat zavaděč GRUB"
 
@@ -10480,7 +10542,8 @@ msgstr "Chyba nastavení RAID"
 #. Type: error
 #. Description
 #: ../partman-md.templates:36
-msgid "The configuration of RAID is aborted."
+#, fuzzy
+msgid "The configuration of RAID has been aborted."
 msgstr "Nastavení RAIDu je přerušeno."
 
 #. Type: text
@@ -10673,8 +10736,9 @@ msgstr "Během zápisu změn na disky nastala chyba."
 #. Type: error
 #. Description
 #: ../partman-lvm.templates:116
-msgid "The configuration of the Logical Volume Manager is aborted."
-msgstr "Nastavení manažeru logických svazků je přerušeno."
+#, fuzzy
+msgid "The Logical Volume Manager configuration has been aborted."
+msgstr "Toto je konfigurační menu manažera logických svazků (LVM)"
 
 #. Type: text
 #. Description
@@ -11604,6 +11668,104 @@ msgstr ""
 msgid "Guided - use entire disk and set up encrypted LVM"
 msgstr "Asistované - použít celý disk a nastavit šifrované LVM"
 
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid "Write changes in SATA RAID partitioning to disk?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid ""
+"Any changes you have made in the partitioning of your Serial ATA RAID disks "
+"need to be written to disk before the partitions can be used. Any other "
+"pending changes will be written to disk as well. These changes cannot be "
+"undone."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "No pending changes"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "There are no changes to commit."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+msgid "Failed to write SATA RAID partitioning changes"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+#, fuzzy
+msgid "An unexpected error occurred while writing the changes to the disks."
+msgstr "Během zápisu změn na disky nastala chyba."
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:27
+#, fuzzy
+msgid "Creating initial file system"
+msgstr "Vytvořit souborový systém %s"
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:31
+#, fuzzy
+msgid "Creating initial ext2 file system on ${DEVICE}..."
+msgstr ""
+"Kontroluje se souborový systém ext3 v oblasti č.${PARTITION} na ${DEVICE}..."
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"The support for SATA RAID disks (using dmraid) in the installer is "
+"experimental. You should make sure that you have a backup of any data on "
+"your system that you do not want to lose!"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"There is currently no real support for SATA RAID disks in either the "
+"partitioner or the boot loaders. The installer works around this, but it "
+"means that the installation is not completely straightforward and that there "
+"are some important limitations."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"More detailed information about SATA RAID support and how to use it, "
+"especially during partitioning and boot loader installation, can be found "
+"at: http://wiki.debian.org/DebianInstaller/SataRaid."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid "Please read that page carefully before proceeding."
+msgstr ""
+
+#. Type: text
+#. Description
+#. Main menu item
+#. Use infinitive form
+#: ../partman-dmraid.templates:62
+msgid "Write changes in SATA RAID partitioning to disk"
+msgstr ""
+
 #. Type: error
 #. Description
 #: ../partconf.templates:3
@@ -11773,29 +11935,35 @@ msgstr "Selhalo odpojování oblastí"
 #. Type: error
 #. Description
 #: ../partconf.templates:82
-msgid ""
-"An error occurred while unmounting the partitions. The partition "
-"configuration process is aborted."
+#, fuzzy
+msgid "An unexpected error occurred while unmounting the partitions."
 msgstr ""
-"Při odpojování oblastí se vyskytla chyba. Proces nastavení oblastí je "
-"přerušen."
+"Během vytváření RAIDu podle zadného přednastavení se vyskytla neočekávaná "
+"chyba."
+
+#. Type: error
+#. Description
+#: ../partconf.templates:82
+#, fuzzy
+msgid "The partition configuration process has been aborted."
+msgstr "Nastavování bylo přerušeno."
 
 #. Type: text
 #. Description
-#: ../partconf.templates:88
+#: ../partconf.templates:89
 #, no-c-format
 msgid "Create %s file system"
 msgstr "Vytvořit souborový systém %s"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid "No root partition (/)"
 msgstr "Nemáte kořenovou oblast (/)"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
@@ -11805,25 +11973,25 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Partition assigned to ${MOUNT}"
 msgstr "Oblast přiřazená k ${MOUNT}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr "Připojení oblasti k ${MOUNT} nedává žádný smysl. Změňte to, prosím."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid "Several partitions assigned to ${MOUNT}"
 msgstr "K ${MOUNT} je přiřazeno několik oblastí"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
@@ -11833,19 +12001,19 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "Ready to create file systems and mount partitions?"
 msgstr "Připraveni na vytvoření souborových systémů a připojení oblastí?"
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "File systems will be created and partitions mounted."
 msgstr "Souborové systémy budou vytvořeny a oblasti připojeny."
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
@@ -11855,37 +12023,37 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "Failed to create swap space on ${PARTITION}"
 msgstr "Selhalo vytvoření odkládacího prostoru na ${PARTITION}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "An error occurred when the swap space was created on ${PARTITION}."
 msgstr "Při vytváření odkládacího prostoru na ${PARTITION} se vyskytla chyba."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "Failed to activate the swap space on ${PARTITION}"
 msgstr "Chyba při aktivování odkládacího místa na ${PARTITION}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
 msgstr "Při aktivování odkládacího místa na ${PARTITION} se vyskytla chyba."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid "Failed to create ${FS} file system on ${PARTITION}"
 msgstr "Selhalo vytvoření souborového systému ${FS} na ${PARTITION}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
@@ -11893,19 +12061,19 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
 msgstr "Selhalo připojení ${PARTITION} na ${MOUNT}"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr "Při připojování ${PARTITION} na ${MOUNT} se vyskytla chyba."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
@@ -11914,7 +12082,7 @@ msgstr "Více informací naleznete na třetí konzoli nebo ve /var/log/messages.
 #. Type: text
 #. Description
 #. Main menu item
-#: ../partconf.templates:151
+#: ../partconf.templates:152
 msgid "Configure and mount partitions"
 msgstr "Nakonfigurovat a připojit oblasti"
 
@@ -12581,6 +12749,16 @@ msgstr "Zapisuje se jádro do flash paměti"
 #: ../flash-kernel-installer.templates:25
 msgid "Configure flash memory to boot the system"
 msgstr "Nastavit flash paměť pro zavedení systému"
+
+#~ msgid "The configuration of the Logical Volume Manager is aborted."
+#~ msgstr "Nastavení manažeru logických svazků je přerušeno."
+
+#~ msgid ""
+#~ "An error occurred while unmounting the partitions. The partition "
+#~ "configuration process is aborted."
+#~ msgstr ""
+#~ "Při odpojování oblastí se vyskytla chyba. Proces nastavení oblastí je "
+#~ "přerušen."
 
 #~ msgid "Installing the PCMCIA modules"
 #~ msgstr "Instalují se PCMCIA moduly"

@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-29 22:47+0000\n"
+"POT-Creation-Date: 2007-06-30 12:28+0000\n"
 "PO-Revision-Date: 2007-05-12 15:16+0200\n"
 "Last-Translator: Jens Seidel <jensseidel@users.sf.net>\n"
 "Language-Team: Debian German <debian-l10n-german@lists.debian.org>\n"
@@ -1524,7 +1524,8 @@ msgstr ""
 #. Type: error
 #. Description
 #: ../netcfg-dhcp.templates:23
-msgid "The DHCP configuration process will be aborted."
+#, fuzzy
+msgid "The DHCP configuration process has been aborted."
 msgstr "Der DHCP-Konfigurationsprozess wird abgebrochen."
 
 #. Type: select
@@ -2385,7 +2386,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partman-base.templates:64
+#: ../partman-base.templates:64 ../partman-dmraid.templates:42
 msgid "Continue with partitioning?"
 msgstr "Mit der Partitionierung fortfahren?"
 
@@ -2790,6 +2791,22 @@ msgstr "RAID%s Gerät #%s"
 #, no-c-format
 msgid "Encrypted volume (%s)"
 msgstr "Verschlüsseltes Volume (%s)"
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
+#: ../partman-base.templates:291
+#, no-c-format
+msgid "Serial ATA RAID %s (%s)"
+msgstr ""
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume01 (partition #1)
+#: ../partman-base.templates:296
+#, fuzzy, no-c-format
+msgid "Serial ATA RAID %s (partition #%s)"
+msgstr "DASD %s (%s), Partition #%s"
 
 #. Type: text
 #. Description
@@ -3277,7 +3294,8 @@ msgstr "Kopiervorgang fehlgeschlagen"
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:31
-msgid "The copy operation is aborted."
+#, fuzzy
+msgid "The copy operation has been aborted."
 msgstr "Der Kopiervorgang wurde abgebrochen."
 
 #. Type: error
@@ -3301,6 +3319,7 @@ msgstr ""
 #: ../yaboot-installer.templates:88 ../vmelilo-installer.templates:46
 #: ../lvmcfg-utils.templates:247 ../partman-lvm.templates:381
 #: ../partman-auto-lvm.templates:40 ../partman-auto-raid.templates:3
+#: ../partman-dmraid.templates:20
 msgid "Check /var/log/syslog or see virtual console 4 for the details."
 msgstr ""
 "Prüfen Sie /var/log/syslog oder die virtuelle Konsole 4 für genauere "
@@ -3375,7 +3394,8 @@ msgstr ""
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:78
-msgid "The resize operation is aborted."
+#, fuzzy
+msgid "The resize operation has been aborted."
 msgstr "Der Vorgang für die Änderung der Größe wurde abgebrochen."
 
 #. Type: string
@@ -7006,13 +7026,57 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:29
+#, fuzzy
+msgid "Install the GRUB boot loader to the SATA RAID disk?"
+msgstr "GRUB-Bootloader auf einer Festplatte installieren"
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "Installation of GRUB on Serial ATA RAID is experimental."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid ""
+"GRUB is always installed to the master boot record (MBR) of the SATA RAID "
+"disk. It is also assumed that that disk is listed as the first hard disk in "
+"the boot order defined in the system's BIOS setup."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "The GRUB root device is: ${GRUBROOT}."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "An error occurred while setting up GRUB for your SATA RAID disk."
+msgstr ""
+"Es trat ein Fehler auf, als die verschlüsselten Datenträger eingerichtet "
+"wurden."
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "The GRUB installation has been aborted."
+msgstr "Die Konfiguration wurde abgebrochen."
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:48
 msgid "Install the GRUB boot loader to XFS file system?"
 msgstr "GRUB-Bootloader in ein XFS-Dateisystem installieren?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:48
 msgid ""
 "The GRUB boot loader installation often fails or hangs when /boot is on a "
 "XFS file system. Using LILO in this situation is recommended."
@@ -7029,14 +7093,14 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#: ../grub-installer.templates:53 ../yaboot-installer.templates:45
+#: ../grub-installer.templates:54 ../yaboot-installer.templates:45
 #: ../aboot-installer.templates:12
 msgid "Device for boot loader installation:"
 msgstr "Gerät für die Bootloader-Installation:"
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "You need to make the newly installed system bootable, by installing the GRUB "
 "boot loader on a bootable device. The usual way to do this is to install "
@@ -7052,7 +7116,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "The device can be specified using GRUB's \"(hdn,m)\" notation, or as a "
 "device in /dev. Below are some examples:\n"
@@ -7077,13 +7141,13 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "GRUB password:"
 msgstr "GRUB-Passwort:"
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid ""
 "The GRUB boot loader offers many powerful interactive features, which could "
 "be used to compromise your system if unauthorized users have access to the "
@@ -7101,20 +7165,20 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "If you do not wish to set a GRUB password, leave this field blank."
 msgstr ""
 "Wenn Sie kein GRUB-Passwort einrichten möchten, lassen Sie dieses Feld leer."
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid "GRUB installation failed.  Continue anyway?"
 msgstr "GRUB konnte nicht installiert werden. Trotzdem fortfahren?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid ""
 "The grub package failed to install into /target/.  Installing GRUB as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -7127,87 +7191,87 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Unable to install GRUB in ${BOOTDEV}"
 msgstr "GRUB konnte nicht nach ${BOOTDEV} installiert werden."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Executing 'grub-install ${BOOTDEV}' failed."
 msgstr "Die Ausführung von »grub install ${BOOTDEV}« ist fehlgeschlagen."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Unable to configure GRUB"
 msgstr "GRUB konnte nicht konfiguriert werden."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Executing 'update-grub' failed."
 msgstr "Ausführung von »update-grub« fehlgeschlagen."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "This is a fatal error."
 msgstr "Dies ist ein schwerwiegender Fehler."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:123
+#: ../grub-installer.templates:124
 msgid "Installing GRUB boot loader"
 msgstr "Installiere GRUB-Bootloader"
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:127
+#: ../grub-installer.templates:128
 msgid "Looking for other operating systems..."
 msgstr "Suche nach weiteren Betriebssystemen ..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:131
+#: ../grub-installer.templates:132
 msgid "Installing the 'grub' package..."
 msgstr "Installiere das Paket »grub« ..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:135
+#: ../grub-installer.templates:136
 msgid "Determining GRUB boot device..."
 msgstr "Stelle das GRUB-Bootgerät fest ..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:139
+#: ../grub-installer.templates:140
 msgid "Running \"grub-install ${BOOTDEV}\"..."
 msgstr "Führe »grub-install ${BOOTDEV}« aus ..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:143
+#: ../grub-installer.templates:144
 msgid "Running \"update-grub\"..."
 msgstr "Führe »update-grub« aus ..."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:147
+#: ../grub-installer.templates:148
 msgid "Updating /etc/kernel-img.conf..."
 msgstr "Aktualisiere /etc/kernel-img.conf ..."
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../grub-installer.templates:152
+#: ../grub-installer.templates:153
 msgid "Install the GRUB boot loader on a hard disk"
 msgstr "GRUB-Bootloader auf einer Festplatte installieren"
 
 #. Type: text
 #. Description
 #. Rescue menu item
-#: ../grub-installer.templates:157
+#: ../grub-installer.templates:158
 msgid "Reinstall GRUB boot loader"
 msgstr "Installiere den GRUB-Bootloader neu"
 
@@ -10745,7 +10809,8 @@ msgstr "RAID-Konfiguration fehlgeschlagen"
 #. Type: error
 #. Description
 #: ../partman-md.templates:36
-msgid "The configuration of RAID is aborted."
+#, fuzzy
+msgid "The configuration of RAID has been aborted."
 msgstr "Die RAID-Konfiguration wurde abgebrochen."
 
 # FIXME: Kleinschreibung im Handbuch
@@ -10945,8 +11010,9 @@ msgstr ""
 #. Type: error
 #. Description
 #: ../partman-lvm.templates:116
-msgid "The configuration of the Logical Volume Manager is aborted."
-msgstr "Die Konfiguration des Logical Volume Managers wurde abgebrochen."
+#, fuzzy
+msgid "The Logical Volume Manager configuration has been aborted."
+msgstr "Dies ist das Konfigurationsmenü des Logical Volume Managers."
 
 #. Type: text
 #. Description
@@ -11913,6 +11979,105 @@ msgstr ""
 msgid "Guided - use entire disk and set up encrypted LVM"
 msgstr "Geführt - gesamte Platte mit verschlüsseltem LVM"
 
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid "Write changes in SATA RAID partitioning to disk?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid ""
+"Any changes you have made in the partitioning of your Serial ATA RAID disks "
+"need to be written to disk before the partitions can be used. Any other "
+"pending changes will be written to disk as well. These changes cannot be "
+"undone."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "No pending changes"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "There are no changes to commit."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+msgid "Failed to write SATA RAID partitioning changes"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+#, fuzzy
+msgid "An unexpected error occurred while writing the changes to the disks."
+msgstr ""
+"Es trat ein Fehler auf, als die Änderungen auf die Festplatten geschrieben "
+"wurden."
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:27
+#, fuzzy
+msgid "Creating initial file system"
+msgstr "Erstelle %s-Dateisystem"
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:31
+#, fuzzy
+msgid "Creating initial ext2 file system on ${DEVICE}..."
+msgstr "Prüfe ext3-Dateisystem der Partition ${PARTITION} auf ${DEVICE} ..."
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"The support for SATA RAID disks (using dmraid) in the installer is "
+"experimental. You should make sure that you have a backup of any data on "
+"your system that you do not want to lose!"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"There is currently no real support for SATA RAID disks in either the "
+"partitioner or the boot loaders. The installer works around this, but it "
+"means that the installation is not completely straightforward and that there "
+"are some important limitations."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"More detailed information about SATA RAID support and how to use it, "
+"especially during partitioning and boot loader installation, can be found "
+"at: http://wiki.debian.org/DebianInstaller/SataRaid."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid "Please read that page carefully before proceeding."
+msgstr ""
+
+#. Type: text
+#. Description
+#. Main menu item
+#. Use infinitive form
+#: ../partman-dmraid.templates:62
+msgid "Write changes in SATA RAID partitioning to disk"
+msgstr ""
+
 #. Type: error
 #. Description
 #: ../partconf.templates:3
@@ -12088,29 +12253,35 @@ msgstr "Partitionen konnten nicht ausgehängt werden"
 #. Type: error
 #. Description
 #: ../partconf.templates:82
-msgid ""
-"An error occurred while unmounting the partitions. The partition "
-"configuration process is aborted."
+#, fuzzy
+msgid "An unexpected error occurred while unmounting the partitions."
 msgstr ""
-"Es trat ein Fehler beim Aushängen der Partitionen auf. Die "
-"Partitionskonfiguration wurde abgebrochen."
+"Es trat ein unerwarteter Fehler auf, als die vorkonfigurierte RAID-"
+"Konfiguration eingerichtet wurde."
+
+#. Type: error
+#. Description
+#: ../partconf.templates:82
+#, fuzzy
+msgid "The partition configuration process has been aborted."
+msgstr "Die Konfiguration wurde abgebrochen."
 
 #. Type: text
 #. Description
-#: ../partconf.templates:88
+#: ../partconf.templates:89
 #, no-c-format
 msgid "Create %s file system"
 msgstr "Erstelle %s-Dateisystem"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid "No root partition (/)"
 msgstr "Keine Root-Partition (/)"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
@@ -12120,13 +12291,13 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Partition assigned to ${MOUNT}"
 msgstr "Partition nach ${MOUNT} zugewiesen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr ""
 "Es macht keinen Sinn, eine Partition nach ${MOUNT} einzubinden. Bitte ändern "
@@ -12134,13 +12305,13 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid "Several partitions assigned to ${MOUNT}"
 msgstr "${MOUNT} wurden mehrere Partitionen zugewiesen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
@@ -12150,19 +12321,19 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "Ready to create file systems and mount partitions?"
 msgstr "Bereit, Dateisysteme zu erstellen und Partitionen einzubinden?"
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "File systems will be created and partitions mounted."
 msgstr "Dateisysteme werden erstellt und die Partitionen eingebunden."
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
@@ -12172,26 +12343,26 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "Failed to create swap space on ${PARTITION}"
 msgstr "Erstellen des Swap-Speichers auf ${PARTITION} fehlgeschlagen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "An error occurred when the swap space was created on ${PARTITION}."
 msgstr ""
 "Es trat ein Fehler auf, als der Swap-Speicher auf ${PARTITION} erzeugt wurde."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "Failed to activate the swap space on ${PARTITION}"
 msgstr "Aktivieren des Swap-Speichers auf ${PARTITION} fehlgeschlagen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
 msgstr ""
 "Es trat ein Fehler auf, als versucht wurde, den Swap-Speicher auf "
@@ -12199,13 +12370,13 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid "Failed to create ${FS} file system on ${PARTITION}"
 msgstr "Erzeugen des ${FS}-Dateisystems auf ${PARTITION} fehlgeschlagen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
@@ -12214,20 +12385,20 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
 msgstr "Einbinden von ${PARTITION} nach ${MOUNT} fehlgeschlagen"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr ""
 "Es trat ein Fehler auf, als ${PARTITION} nach ${MOUNT} eingebunden wurde."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
@@ -12238,7 +12409,7 @@ msgstr ""
 #. Type: text
 #. Description
 #. Main menu item
-#: ../partconf.templates:151
+#: ../partconf.templates:152
 msgid "Configure and mount partitions"
 msgstr "Partitionen konfigurieren und einbinden"
 
@@ -12926,6 +13097,16 @@ msgstr "Schreibe den Kernel in den Flash-Speicher"
 #: ../flash-kernel-installer.templates:25
 msgid "Configure flash memory to boot the system"
 msgstr "Konfiguriere den Flash-Speicher, um das System zu booten"
+
+#~ msgid "The configuration of the Logical Volume Manager is aborted."
+#~ msgstr "Die Konfiguration des Logical Volume Managers wurde abgebrochen."
+
+#~ msgid ""
+#~ "An error occurred while unmounting the partitions. The partition "
+#~ "configuration process is aborted."
+#~ msgstr ""
+#~ "Es trat ein Fehler beim Aushängen der Partitionen auf. Die "
+#~ "Partitionskonfiguration wurde abgebrochen."
 
 #~ msgid "Installing the PCMCIA modules"
 #~ msgstr "Installieren der PCMCIA-Module"

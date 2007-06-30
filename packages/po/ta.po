@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ta\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-06-29 22:47+0000\n"
+"POT-Creation-Date: 2007-06-30 12:28+0000\n"
 "PO-Revision-Date: 2007-05-10 15:07+0530\n"
 "Last-Translator: Dr.T.Vasudevan <agnihot3@gmail.com>\n"
 "Language-Team: TAMIL <ubuntu-l10n-tam@lists.ubuntu.com>\n"
@@ -1479,7 +1479,8 @@ msgstr ""
 #. Type: error
 #. Description
 #: ../netcfg-dhcp.templates:23
-msgid "The DHCP configuration process will be aborted."
+#, fuzzy
+msgid "The DHCP configuration process has been aborted."
 msgstr "(டிஹெச்சிபி) DHCP வடிவமைப்பு செயல் நிறுத்தப்படும்."
 
 #. Type: select
@@ -2310,7 +2311,7 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partman-base.templates:64
+#: ../partman-base.templates:64 ../partman-dmraid.templates:42
 msgid "Continue with partitioning?"
 msgstr "பகிர்தலை தொடரவா?"
 
@@ -2707,6 +2708,22 @@ msgstr "ரெய்டு%s சாதனம் #%s"
 #, no-c-format
 msgid "Encrypted volume (%s)"
 msgstr "குறிமுறையாக்கப்பட்ட தொகுதி (%s)"
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
+#: ../partman-base.templates:291
+#, no-c-format
+msgid "Serial ATA RAID %s (%s)"
+msgstr ""
+
+#. Type: text
+#. Description
+#. For example: Serial ATA RAID isw_dhiiedgihc_Volume01 (partition #1)
+#: ../partman-base.templates:296
+#, fuzzy, no-c-format
+msgid "Serial ATA RAID %s (partition #%s)"
+msgstr "DASD %s (%s), பகிர்வு #%s"
 
 #. Type: text
 #. Description
@@ -3182,7 +3199,8 @@ msgstr "பிரதியெடுக்க இயலவில்லை"
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:31
-msgid "The copy operation is aborted."
+#, fuzzy
+msgid "The copy operation has been aborted."
 msgstr "பிரதியெடுத்தல் கைவிடப்பட்டது."
 
 #. Type: error
@@ -3204,6 +3222,7 @@ msgstr "பகிர்வின் அளவை மாற்றவே இயல
 #: ../yaboot-installer.templates:88 ../vmelilo-installer.templates:46
 #: ../lvmcfg-utils.templates:247 ../partman-lvm.templates:381
 #: ../partman-auto-lvm.templates:40 ../partman-auto-raid.templates:3
+#: ../partman-dmraid.templates:20
 msgid "Check /var/log/syslog or see virtual console 4 for the details."
 msgstr ""
 "/var/log/syslog அல்லது மெய்நிகர் முனையம் 4 (virtual console 4) ஐ விளக்கங்களுக்கு "
@@ -3273,7 +3292,8 @@ msgstr "மாற்றங்களை சேமிப்பு சாதனங�
 #. Type: error
 #. Description
 #: ../partman-partitioning.templates:78
-msgid "The resize operation is aborted."
+#, fuzzy
+msgid "The resize operation has been aborted."
 msgstr "பகிர்வின் அளவை மாற்றும் பணி கைவிடப்பட்டது."
 
 #. Type: string
@@ -6823,13 +6843,55 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:29
+#, fuzzy
+msgid "Install the GRUB boot loader to the SATA RAID disk?"
+msgstr "க்ரப் துவக்கியை ஒரு வன் தட்டில் நிறுவு"
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "Installation of GRUB on Serial ATA RAID is experimental."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid ""
+"GRUB is always installed to the master boot record (MBR) of the SATA RAID "
+"disk. It is also assumed that that disk is listed as the first hard disk in "
+"the boot order defined in the system's BIOS setup."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:29
+msgid "The GRUB root device is: ${GRUBROOT}."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "An error occurred while setting up GRUB for your SATA RAID disk."
+msgstr "மறைகுறியாக்கப்பட்ட தொகுதிகளை அமைக்கும் போது தவறு நேர்ந்தது."
+
+#. Type: error
+#. Description
+#: ../grub-installer.templates:40
+#, fuzzy
+msgid "The GRUB installation has been aborted."
+msgstr "வடிவமைப்பு கைவிடப்பட்டது."
+
+#. Type: boolean
+#. Description
+#: ../grub-installer.templates:48
 msgid "Install the GRUB boot loader to XFS file system?"
 msgstr "க்ரப் துவக்கியை எக்ஸ்எப்எஸ் கோப்பு அமைப்புக்கு நிறுவலாமா?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:47
+#: ../grub-installer.templates:48
 msgid ""
 "The GRUB boot loader installation often fails or hangs when /boot is on a "
 "XFS file system. Using LILO in this situation is recommended."
@@ -6847,14 +6909,14 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: select
 #. Description
-#: ../grub-installer.templates:53 ../yaboot-installer.templates:45
+#: ../grub-installer.templates:54 ../yaboot-installer.templates:45
 #: ../aboot-installer.templates:12
 msgid "Device for boot loader installation:"
 msgstr "துவக்கி நிறுவ சாதனம்:"
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "You need to make the newly installed system bootable, by installing the GRUB "
 "boot loader on a bootable device. The usual way to do this is to install "
@@ -6869,7 +6931,7 @@ msgstr ""
 
 #. Type: string
 #. Description
-#: ../grub-installer.templates:53
+#: ../grub-installer.templates:54
 msgid ""
 "The device can be specified using GRUB's \"(hdn,m)\" notation, or as a "
 "device in /dev. Below are some examples:\n"
@@ -6893,13 +6955,13 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "GRUB password:"
 msgstr "க்ரப் கடவுச்சொல்"
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid ""
 "The GRUB boot loader offers many powerful interactive features, which could "
 "be used to compromise your system if unauthorized users have access to the "
@@ -6916,19 +6978,19 @@ msgstr ""
 
 #. Type: password
 #. Description
-#: ../grub-installer.templates:72
+#: ../grub-installer.templates:73
 msgid "If you do not wish to set a GRUB password, leave this field blank."
 msgstr "க்ரப் கடவுச் சொல் அமைக்க வேண்டாம் எனில் இதை வெற்றாக விடவும்."
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid "GRUB installation failed.  Continue anyway?"
 msgstr "க்ரப் நிறுவல் தோல்வியடைந்தது. எப்படியும் தொடரவா?"
 
 #. Type: boolean
 #. Description
-#: ../grub-installer.templates:91
+#: ../grub-installer.templates:92
 msgid ""
 "The grub package failed to install into /target/.  Installing GRUB as a boot "
 "loader is a required step.  The install problem might however be unrelated "
@@ -6939,87 +7001,87 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Unable to install GRUB in ${BOOTDEV}"
 msgstr "${BOOTDEV}-இல் GRUB-ஐ நிறுவ இயலவில்லை"
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:98
+#: ../grub-installer.templates:99
 msgid "Executing 'grub-install ${BOOTDEV}' failed."
 msgstr "'grub-install ${BOOTDEV}' கட்டளை தோல்வியுற்றது."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Unable to configure GRUB"
 msgstr "க்ரப்பை உருவமைக்க இயலவில்லை."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "Executing 'update-grub' failed."
 msgstr "'update-grub' (க்ரப்பை இற்றைப்படுத்து) கட்டளை தோல்வியுற்றது."
 
 #. Type: error
 #. Description
-#: ../grub-installer.templates:105
+#: ../grub-installer.templates:106
 msgid "This is a fatal error."
 msgstr "உயிர் கொல்லி தவறு."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:123
+#: ../grub-installer.templates:124
 msgid "Installing GRUB boot loader"
 msgstr "க்ரப் துவக்கி நிறுவப் படுகிறது."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:127
+#: ../grub-installer.templates:128
 msgid "Looking for other operating systems..."
 msgstr "மற்ற இயங்கு தளங்களை தேடுகிறது...."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:131
+#: ../grub-installer.templates:132
 msgid "Installing the 'grub' package..."
 msgstr "க்ரப் தொகுப்பு நிறுவப் படுகிறது...."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:135
+#: ../grub-installer.templates:136
 msgid "Determining GRUB boot device..."
 msgstr "க்ரப் துவக்க சாதனம் நிர்ணயிக்கப் படுகிறது."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:139
+#: ../grub-installer.templates:140
 msgid "Running \"grub-install ${BOOTDEV}\"..."
 msgstr " \"grub-install ${BOOTDEV}\" செயற்படுகிறது....."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:143
+#: ../grub-installer.templates:144
 msgid "Running \"update-grub\"..."
 msgstr "\"update-grub\" செயற்படுகிறது...."
 
 #. Type: text
 #. Description
-#: ../grub-installer.templates:147
+#: ../grub-installer.templates:148
 msgid "Updating /etc/kernel-img.conf..."
 msgstr "/etc/kernel-img.conf. ஐ இற்றைப் படுத்துகிறது."
 
 #. Type: text
 #. Description
 #. Main menu item
-#: ../grub-installer.templates:152
+#: ../grub-installer.templates:153
 msgid "Install the GRUB boot loader on a hard disk"
 msgstr "க்ரப் துவக்கியை ஒரு வன் தட்டில் நிறுவு"
 
 #. Type: text
 #. Description
 #. Rescue menu item
-#: ../grub-installer.templates:157
+#: ../grub-installer.templates:158
 msgid "Reinstall GRUB boot loader"
 msgstr "க்ரப் துவக்கியை மீண்டும் நிறுவு"
 
@@ -10452,7 +10514,8 @@ msgstr "ரெய்ட் வடிவமைப்பு தோல்விய�
 #. Type: error
 #. Description
 #: ../partman-md.templates:36
-msgid "The configuration of RAID is aborted."
+#, fuzzy
+msgid "The configuration of RAID has been aborted."
 msgstr "ரெய்ட் வடிவமைப்பு கைவிடப்பட்டது."
 
 #. Type: text
@@ -10649,8 +10712,9 @@ msgstr "மாறுதல்களை வட்டுக்கு எழுத�
 #. Type: error
 #. Description
 #: ../partman-lvm.templates:116
-msgid "The configuration of the Logical Volume Manager is aborted."
-msgstr "எல்விஎம் (LVM) இன் வடிவமைப்பு கைவிடப் பட்டது."
+#, fuzzy
+msgid "The Logical Volume Manager configuration has been aborted."
+msgstr "இது தர்க்க ரீதியான தொகுதி மேலாளர் வடிவமைப்பு பட்டி."
 
 #. Type: text
 #. Description
@@ -11570,6 +11634,104 @@ msgstr ""
 msgid "Guided - use entire disk and set up encrypted LVM"
 msgstr "வழிநடத்தப்பட்ட - முழு வட்டையும் உப்யோகித்து மறைகுறியீடாக்கப்பட்ட LVM-ஐ அமை"
 
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid "Write changes in SATA RAID partitioning to disk?"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:5
+msgid ""
+"Any changes you have made in the partitioning of your Serial ATA RAID disks "
+"need to be written to disk before the partitions can be used. Any other "
+"pending changes will be written to disk as well. These changes cannot be "
+"undone."
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "No pending changes"
+msgstr ""
+
+#. Type: note
+#. Description
+#: ../partman-dmraid.templates:15
+msgid "There are no changes to commit."
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+msgid "Failed to write SATA RAID partitioning changes"
+msgstr ""
+
+#. Type: error
+#. Description
+#: ../partman-dmraid.templates:20
+#, fuzzy
+msgid "An unexpected error occurred while writing the changes to the disks."
+msgstr "மாறுதல்களை வட்டுக்கு எழுதும் போது தவறு நேர்ந்தது."
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:27
+#, fuzzy
+msgid "Creating initial file system"
+msgstr "%s கோப்பு அமைப்பை உருவாக்குக"
+
+#. Type: text
+#. Description
+#: ../partman-dmraid.templates:31
+#, fuzzy
+msgid "Creating initial ext2 file system on ${DEVICE}..."
+msgstr ""
+"${DEVICE}-ன் பகிர்வு #${PARTITION}-ல் உள்ள ext3 கோப்பு அமைப்பு சோதிக்கப்படுகிறது..."
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"The support for SATA RAID disks (using dmraid) in the installer is "
+"experimental. You should make sure that you have a backup of any data on "
+"your system that you do not want to lose!"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"There is currently no real support for SATA RAID disks in either the "
+"partitioner or the boot loaders. The installer works around this, but it "
+"means that the installation is not completely straightforward and that there "
+"are some important limitations."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid ""
+"More detailed information about SATA RAID support and how to use it, "
+"especially during partitioning and boot loader installation, can be found "
+"at: http://wiki.debian.org/DebianInstaller/SataRaid."
+msgstr ""
+
+#. Type: boolean
+#. Description
+#: ../partman-dmraid.templates:42
+msgid "Please read that page carefully before proceeding."
+msgstr ""
+
+#. Type: text
+#. Description
+#. Main menu item
+#. Use infinitive form
+#: ../partman-dmraid.templates:62
+msgid "Write changes in SATA RAID partitioning to disk"
+msgstr ""
+
 #. Type: error
 #. Description
 #: ../partconf.templates:3
@@ -11739,27 +11901,34 @@ msgstr "பகிர்வுகளை இறக்குவது தோல்�
 #. Type: error
 #. Description
 #: ../partconf.templates:82
-msgid ""
-"An error occurred while unmounting the partitions. The partition "
-"configuration process is aborted."
-msgstr "பகிர்வுகளை இறக்கும் போது தவறு ஏற்பட்டது. பகிர்வு வடிவமைப்பு கைவிடப்பட்டது."
+#, fuzzy
+msgid "An unexpected error occurred while unmounting the partitions."
+msgstr ""
+"முன்னமே நிர்ணயிக்கப்பட்ட ரெய்டு வடிவமைப்பை அமைக்கும்போது எதிரபாடாத பிழை ஏற்பட்டது."
+
+#. Type: error
+#. Description
+#: ../partconf.templates:82
+#, fuzzy
+msgid "The partition configuration process has been aborted."
+msgstr "வடிவமைப்பு கைவிடப்பட்டது."
 
 #. Type: text
 #. Description
-#: ../partconf.templates:88
+#: ../partconf.templates:89
 #, no-c-format
 msgid "Create %s file system"
 msgstr "%s கோப்பு அமைப்பை உருவாக்குக"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid "No root partition (/)"
 msgstr "மூலப் பகிர்வு ((/)) ஏதும் இல்லை"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:92
+#: ../partconf.templates:93
 msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
@@ -11769,25 +11938,25 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Partition assigned to ${MOUNT}"
 msgstr "${MOUNT} க்கு அளித்த பகிர்வு"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:98
+#: ../partconf.templates:99
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr "${MOUNT} இல் பகிர்வு ஏற்றுவதில் பொருள் இல்லை. இதை தயவு செய்து மாற்றவும்."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid "Several partitions assigned to ${MOUNT}"
 msgstr "பல பகிர்வுகள் ${MOUNT} க்கு கொடுக்கப் பட்டு உள்ளன."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:103
+#: ../partconf.templates:104
 msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
@@ -11797,19 +11966,19 @@ msgstr ""
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "Ready to create file systems and mount partitions?"
 msgstr "கோப்பு அமைப்புகளை உருவாக்கவும் பகிர்வுகளை ஏற்றவும் தயார்தானே?"
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid "File systems will be created and partitions mounted."
 msgstr "கோப்பு அமைப்புகள் உருவாக்கப் பட்டு பகிர்வுகள் ஏற்றப் படும்."
 
 #. Type: boolean
 #. Description
-#: ../partconf.templates:110
+#: ../partconf.templates:111
 msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
@@ -11819,37 +11988,37 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "Failed to create swap space on ${PARTITION}"
 msgstr "${PARTITION} இல் இட மாற்று வெளி உருவாக்குதல் தோல்வியுற்றது."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:118
+#: ../partconf.templates:119
 msgid "An error occurred when the swap space was created on ${PARTITION}."
 msgstr "${PARTITION} இல் இட மாற்று வெளி உருவாக்கும் போது ஒரு தவறு ஏற்பட்டது."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "Failed to activate the swap space on ${PARTITION}"
 msgstr "${PARTITION} இல் இட மாற்று வெளி செயல் படுத்துதல் தோல்வியுற்றது."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:126
+#: ../partconf.templates:127
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
 msgstr "${PARTITION} இல் இட மாற்று வெளி செயல் படுத்தும் போது ஒரு தவறு ஏற்பட்டது."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid "Failed to create ${FS} file system on ${PARTITION}"
 msgstr "${PARTITION} பகிர்வில் ${FS} கோப்பு அமைப்பை உருவாக்குதல் தோல்வியுற்றது"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:134
+#: ../partconf.templates:135
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
@@ -11857,19 +12026,19 @@ msgstr ""
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
 msgstr "${PARTITION} ஐ ${MOUNT} இல் ஏற்றுதல் தோல்வியுற்றது"
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr "${PARTITION} ஐ ${MOUNT} இல் ஏற்றும் போது ஒரு தவறு ஏற்பட்டது."
 
 #. Type: error
 #. Description
-#: ../partconf.templates:142
+#: ../partconf.templates:143
 msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
@@ -11880,7 +12049,7 @@ msgstr ""
 #. Type: text
 #. Description
 #. Main menu item
-#: ../partconf.templates:151
+#: ../partconf.templates:152
 msgid "Configure and mount partitions"
 msgstr "பகிர்வுகளை வடிவமைத்து ஏற்றவும்"
 
@@ -12549,6 +12718,14 @@ msgstr "கரு பிளாஷ் நினைவகத்திற்கு 
 #: ../flash-kernel-installer.templates:25
 msgid "Configure flash memory to boot the system"
 msgstr "கணிணியை துவக்க பிளாஷ் நினைவகத்தை வடிவமை"
+
+#~ msgid "The configuration of the Logical Volume Manager is aborted."
+#~ msgstr "எல்விஎம் (LVM) இன் வடிவமைப்பு கைவிடப் பட்டது."
+
+#~ msgid ""
+#~ "An error occurred while unmounting the partitions. The partition "
+#~ "configuration process is aborted."
+#~ msgstr "பகிர்வுகளை இறக்கும் போது தவறு ஏற்பட்டது. பகிர்வு வடிவமைப்பு கைவிடப்பட்டது."
 
 #~ msgid "Installing the PCMCIA modules"
 #~ msgstr "பிசிஎம்சிஐஏ (PCMCIA) பகுதிகள் நிறுவப் படுகின்றன"
