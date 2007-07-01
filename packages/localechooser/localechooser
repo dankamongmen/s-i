@@ -41,19 +41,18 @@ code2country() {
 		# Return a "safe default" in case the iso-3166 file
 		# isn't available
 		if [ -f "$ISO3166TAB" ]; then
-			line=`grep "$1" "$ISO3166TAB"`
+			line=$(grep "$1" "$ISO3166TAB")
 
-			if [ -n "$line" ]; then
-				# Remember that country names may have
-				# spaces so the code is different than in
-				# country2code.
-				echo $line | cut -b 4-
-			else
+			if [ -z "$line" ]; then
 				line="US	United States"
 			fi
 		else
 			line="US	United States"
 		fi
+		# Remember that country names may have
+		# spaces so the code is different than in
+		# country2code.
+		echo $line | cut -b 4-
 	else
 		error "Missing argument"
 	fi
