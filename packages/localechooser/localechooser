@@ -136,9 +136,9 @@ do_preseed() {
 	LANGUAGE=$(locale2langcode "$LOCALE")
 	LANGNAME=$(locale2langname "$LOCALE")
 	if [ -n "$LANGNAME" ] ; then
-		db_set ${langname_all} $LANGNAME
-		log "Set ${langname_all} = '$LANGNAME'"
-		db_fset ${langname_all} seen $seenflag || true
+		db_set $langname_all $LANGNAME
+		log "Set $langname_all = '$LANGNAME'"
+		db_fset $langname_all seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ] ; then
 			local SL=""
@@ -209,8 +209,8 @@ fi
 # Framebuffer and non graphical interface-->level 2 and 3 (no combining langs)
 # Framebuffer and graphical interface    -->level 4 (all langs)
 # Depending on these values, we use different templates with a different
-# list of languages. These lists are built at the package build-time
-# from the contents of the second field of languagelist entries
+# list of languages. These lists are created at package build-time
+# from the contents of the second field of languagelist entries.
 #
 # We do this only when the language was not preseeded
 # If the language was preseeded, we assume the user was 
@@ -224,39 +224,39 @@ if [ -z "$LANGNAME" ] ; then
 		# but it will most often be used in situation where the display
 		# is "poor", so let's assume that only ASCII languages may be 
 		# displayed, then
-		template=${langname_ascii}
+		template=$langname_ascii
 		;;
 	    gtk)
 		# We assume that the GTK interface handles all languages
-		template=${langname_all}
+		template=$langname_all
 		;;
 	    *)
 		# Only keep Latin1 languages if we don't have the framebuffer
 		db_get debian-installer/framebuffer || true
 		if [ "$RET" = "false" -o -z "$RET" ] ; then
-			template=${langname_latin}
+			template=$langname_latin
 		else
-			template=${langname_fb}
+			template=$langname_fb
 		fi
 		# Try to detect serial consoles
 		[ -f /lib/debian-installer/detect-console ] && . /lib/debian-installer/detect-console
-		if [ "${TERM_TYPE}" = "serial" ] ; then
-			template=${langname_ascii}	    
+		if [ "$TERM_TYPE" = "serial" ] ; then
+			template=$langname_ascii	    
 		fi
 		# For cases we have a dumb terminal, we're stuck with ASCII
-		if [ "${TERM}" = "dumb" ] ; then
-			template=${langname_ascii}	    
+		if [ "$TERM" = "dumb" ] ; then
+			template=$langname_ascii	    
 		fi
 		;;
 	esac
 else
-	template=${langname_all}
+	template=$langname_all
 fi
 #log "Language input template is $template"
 
 # Set preseeded value as default for selected template if run again
-if [ $template != ${langname_all} ]; then
-	if db_get ${langname_all} && [ "$RET" ]; then
+if [ $template != $langname_all ]; then
+	if db_get $langname_all && [ "$RET" ]; then
 		db_set $template $RET
 	fi
 fi
@@ -267,7 +267,7 @@ if db_go; then
 	db_get $template
 	if [ "$RET" ]; then
 		LANGNAME="$RET"
-		db_set ${langname_all} "$LANGNAME"
+		db_set $langname_all "$LANGNAME"
 		. languagemap
 		if [ -z "$LANGUAGELIST" ]; then
 			db_set "$languagecode" "$LANGUAGE"
@@ -334,8 +334,8 @@ COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
 COUNTRY_LANGUAGECHOOSER=$(code2country $COUNTRY)
 if [ "$COUNTRY_LANGUAGECHOOSER" ]; then
 	# Set correct default
-	db_set $fulllist "${COUNTRY_LANGUAGECHOOSER}"
-	log "Set $fulllist = '${COUNTRY_LANGUAGECHOOSER}'"
+	db_set $fulllist "$COUNTRY_LANGUAGECHOOSER"
+	log "Set $fulllist = '$COUNTRY_LANGUAGECHOOSER'"
 fi
 
 # Keep track of values we have after language selection step
@@ -453,7 +453,7 @@ if [ "$LOCALE" != "C" ] ; then
 		             ${LANGUAGE}_${COUNTRYCODE}; do
 			# Is the locale we inherited really a complete locale?
 			LOCALE_LANGUAGECHOOSER_COMPLETE=$(echo $OLDLOCALE | grep "_" || true)
-			if grep -q "^${entry}$" $SUPPORTEDLOCALES; then
+			if grep -q "^$entry$" $SUPPORTEDLOCALES; then
 				# Special handling of cases where the locale
 				# in languagechooser is NOT the combination of
 				# language_COUNTRY. Used for Norwegian
@@ -461,13 +461,13 @@ if [ "$LOCALE" != "C" ] ; then
 				# locale. May be used in the future for other
 				# special cases, so we'd better keep this.
 				if \
-				    [ "$LANGUAGE" = "${LANGUAGECODE_LANGUAGECHOOSER}" \
+				    [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" \
 				      -a \
-				      "$COUNTRYCODE" = "${COUNTRYCODE_LANGUAGECHOOSER}" \
+				      "$COUNTRYCODE" = "$COUNTRYCODE_LANGUAGECHOOSER" \
 				      -a \
 				      "${LANGUAGE}_${COUNTRYCODE}" != "$OLDLOCALE" \
 				      -a \
-				      -n "${LOCALE_LANGUAGECHOOSER_COMPLETE}" \
+				      -n "$LOCALE_LANGUAGECHOOSER_COMPLETE" \
 				    ] ;  then
 					# Explanation: we revert back to the
 					# locale inherited from the language
@@ -477,7 +477,7 @@ if [ "$LOCALE" != "C" ] ; then
 					# from the one we had in first step.
 					LOCALE=$OLDLOCALE
 				else
-					LOCALE="${entry}"
+					LOCALE="$entry"
 				fi
 				break
 			fi
@@ -488,8 +488,8 @@ if [ "$LOCALE" != "C" ] ; then
 	fi
 	
 	# Fall back to a supported locale.
-	if [ -z "${LOCALE}" ]; then
-		if grep -q "^${FALLBACKLOCALE}$" $SUPPORTEDLOCALES; then
+	if [ -z "$LOCALE" ]; then
+		if grep -q "^$FALLBACKLOCALE$" $SUPPORTEDLOCALES; then
 			LOCALE="$FALLBACKLOCALE"
 		else
 			LOCALE=`echo $FALLBACKLOCALE | sed -e 's/[.@].*$//'`
@@ -509,7 +509,7 @@ log "Set $localecode = '$LOCALE'"
 if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
    [ "$COUNTRYCODE" ] && [ "$LANGUAGE" ] && \
    [ "$LOCALE" != "C" ] && [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
-	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:${LANGUAGELIST}
+	LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:$LANGUAGELIST
 	db_set "$languagecode" "$LANGUAGELIST"
 	log "Set $languagecode = '$LANGUAGELIST'"
 fi
