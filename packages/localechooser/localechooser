@@ -353,14 +353,12 @@ while [ "$STATE" != 0 ] && [ "$STATE" -le "$LASTSTATE" ]; do
 	case "$STATE" in
 	    1)
 		askedshort=0
-		# If the fallback locale does not include a 
-		# country code (and thus an underscore character)
-		# we must prompt for a country, thus show the full list only
-		# Use case: Esperanto
-		# The next "if"" test will be false and "askedshort"
-		# remains to 0-->no short country list question
-		# and the long list is shown at critical priority
-		# because we need a country
+		# If the fallback locale does not include a country code
+		# (and thus no underscore character), we must prompt for a
+		# country, thus show the full list only. Example: Esperanto.
+		# The next "if" test will be false and "askedshort" remains
+		# 0, so no short country list question and the long list is
+		# shown at critical priority because we need a country.
 		if echo $FALLBACKLOCALE | grep "_" >/dev/null 2>&1; then
 			# Otherwise, we prompt with the short list
 			# for languages that are listed in /etc/shortlists
