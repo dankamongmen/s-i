@@ -136,9 +136,9 @@ do_preseed() {
 	LANGUAGE=$(locale2langcode "$LOCALE")
 	LANGNAME=$(locale2langname "$LOCALE")
 	if [ -n "$LANGNAME" ]; then
-		db_set $langname_all $LANGNAME
-		log "Set $langname_all = '$LANGNAME'"
-		db_fset $langname_all seen $seenflag || true
+		db_set $langname_template $LANGNAME
+		log "Set $langname_template = '$LANGNAME'"
+		db_fset $langname_template seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ]; then
 			local SL=""
@@ -189,6 +189,52 @@ else
 	db_set debconf/language C
 fi
 
+# Find the display level
+# This needs to be done before checking preseeding, so we can preseed the
+# correct template.
+#
+# No framebuffer and text interface      -->level 0 (only ASCII)
+# No framebuffer and other interface     -->level 1 (only Latin1)
+# Framebuffer and non graphical interface-->level 2 and 3 (no combining langs)
+# Framebuffer and graphical interface    -->level 4 (all langs)
+# Depending on these values, we use different templates with a different
+# list of languages. These lists are created at package build-time from
+# the contents of the second field of languagelist entries.
+#
+#log "Frontend in use: $DEBIAN_FRONTEND"
+case $DEBIAN_FRONTEND in
+    text)
+	# Stricto-sensu, the text interface could use all languages
+	# but it will most often be used in situation where the display
+	# is "poor", so let's assume that only ASCII languages may be 
+	# displayed, then
+	langname_template=$langname_ascii
+	;;
+    gtk)
+	# We assume that the GTK interface handles all languages
+	langname_template=$langname_all
+	;;
+    *)
+	# Only keep Latin1 languages if we don't have the framebuffer
+	db_get debian-installer/framebuffer || true
+	if [ "$RET" = "false" ] || [ -z "$RET" ]; then
+		langname_template=$langname_latin
+	else
+		langname_template=$langname_fb
+	fi
+	# Try to detect serial consoles
+	[ -f /lib/debian-installer/detect-console ] && . /lib/debian-installer/detect-console
+	if [ "$TERM_TYPE" = "serial" ]; then
+		langname_template=$langname_ascii	    
+	fi
+	# For cases we have a dumb terminal, we're stuck with ASCII
+	if [ "$TERM" = "dumb" ]; then
+		langname_template=$langname_ascii	    
+	fi
+	;;
+esac
+#log "Language input template is $langname_template"
+
 # Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding if this is the first time localechooser is run.
 db_get localechooser/alreadyrun
@@ -201,70 +247,10 @@ if [ "$RET" != true ]; then
 	db_set localechooser/alreadyrun "true" || true
 fi
 
-
-# Find the display level
-#
-# No framebuffer and text interface      -->level 0 (only ASCII)
-# No framebuffer and other interface     -->level 1 (only Latin1)
-# Framebuffer and non graphical interface-->level 2 and 3 (no combining langs)
-# Framebuffer and graphical interface    -->level 4 (all langs)
-# Depending on these values, we use different templates with a different
-# list of languages. These lists are created at package build-time from
-# the contents of the second field of languagelist entries.
-#
-# We do this only when the language was not preseeded
-# If the language was preseeded, we assume the user was 
-# smart enough to preseed it to a supported value
-# so the template uses all possible values
-if [ -z "$LANGNAME" ]; then
-	#log "Frontend in use: $DEBIAN_FRONTEND"
-	case $DEBIAN_FRONTEND in
-	    text)
-		# Stricto-sensu, the text interface could use all languages
-		# but it will most often be used in situation where the display
-		# is "poor", so let's assume that only ASCII languages may be 
-		# displayed, then
-		template=$langname_ascii
-		;;
-	    gtk)
-		# We assume that the GTK interface handles all languages
-		template=$langname_all
-		;;
-	    *)
-		# Only keep Latin1 languages if we don't have the framebuffer
-		db_get debian-installer/framebuffer || true
-		if [ "$RET" = "false" ] || [ -z "$RET" ]; then
-			template=$langname_latin
-		else
-			template=$langname_fb
-		fi
-		# Try to detect serial consoles
-		[ -f /lib/debian-installer/detect-console ] && . /lib/debian-installer/detect-console
-		if [ "$TERM_TYPE" = "serial" ]; then
-			template=$langname_ascii	    
-		fi
-		# For cases we have a dumb terminal, we're stuck with ASCII
-		if [ "$TERM" = "dumb" ]; then
-			template=$langname_ascii	    
-		fi
-		;;
-	esac
-else
-	template=$langname_all
-fi
-#log "Language input template is $template"
-
-# Set preseeded value as default for selected template if run again
-if [ $template != $langname_all ]; then
-	if db_get $langname_all && [ "$RET" ]; then
-		db_set $template $RET
-	fi
-fi
-
-db_input critical $template || [ $? -eq 30 ]
+db_input critical $langname_template || [ $? -eq 30 ]
 
 if db_go; then
-	db_get $template
+	db_get $langname_template
 	if [ "$RET" ]; then
 		LANGNAME="$RET"
 		db_set $langname_all "$LANGNAME"
