@@ -380,7 +380,7 @@ while [ "$STATE" != 0 ] && [ "$STATE" -le "$LASTSTATE" ]; do
 				country_default="$RET"
 				db_metaget $shortlist Choices-C
 				if [ -z "$country_default" ] || \
-				   echo "$RET" | grep -q "\(^\| \)$country_default\(,\|$\)"; then
+				   echo "$RET" | grep -q "$country_default"; then
 					db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
 				else
