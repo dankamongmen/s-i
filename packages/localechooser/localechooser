@@ -373,8 +373,19 @@ while [ "$STATE" != 0 ] && [ "$STATE" -le "$LASTSTATE" ]; do
 				if db_fget $shortlist_template seen; then
 					db_fset $shortlist seen $RET || true
 				fi
-				db_input $shortprio $shortlist || [ $? -eq 30 ]
-				askedshort=1
+
+				# If the current (preseeded) value is not in the
+				# shortlist, show the full list instead.
+				db_get $shortlist
+				country_default="$RET"
+				db_metaget $shortlist Choices-C
+				if [ -z "$country_default" ] || \
+				   echo "$RET" | grep -q "\(^\| \)$country_default\(,\|$\)"; then
+					db_input $shortprio $shortlist || [ $? -eq 30 ]
+					askedshort=1
+				else
+					db_set $fulllist $(code2country $country_default)
+				fi
 			else
 				fullprio=medium
 			fi
