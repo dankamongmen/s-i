@@ -49,7 +49,9 @@
 #include <debian-installer/slist.h>
 #include <gdk/gdkkeysyms.h>
 
+#ifdef DI_UDEB
 #include <directfb.h>
+#endif
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -1472,7 +1474,9 @@ static int gtk_go(struct frontend *obj)
      * (See also bug #381979)
      */
 
+    #ifdef DI_UDEB
     dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
+    #endif
 
     gtk_rc_reparse_all();
 
