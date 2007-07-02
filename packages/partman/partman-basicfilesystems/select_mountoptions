@@ -13,11 +13,7 @@ cd $dev
 full_options=''
 for op in $(cat /lib/partman/mountoptions/$filesystem); do
     if [ -f $part/options/$op ]; then
-	if [ "$full_options" ]; then
-	    full_options="$full_options,$(cat $part/options/$op)"
-	else
-	    full_options="$(cat $part/options/$op)"
-	fi
+	full_options="${full_options:+$full_options,}$(cat $part/options/$op)"
     fi
 done
 db_set $tpl "$full_options"

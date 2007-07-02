@@ -12,11 +12,7 @@ cd $dev
 options=''
 for op in $(cat /lib/partman/mountoptions/$filesystem); do
     if [ -f $part/options/$op ]; then
-	if [ "$options" ]; then
-	    options="$options,$op"
-	else
-	    options="$op"
-	fi
+	options="${options:+$options,}$op"
     fi
 done
 if [ -z "$options" ]; then
