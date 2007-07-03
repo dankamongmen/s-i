@@ -316,12 +316,7 @@ fi
 
 # This is needed later in the script
 COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
-COUNTRY_LANGUAGECHOOSER=$(code2country $COUNTRY)
-if [ "$COUNTRY_LANGUAGECHOOSER" ]; then
-	# Set correct default
-	db_set $fulllist "$COUNTRY_LANGUAGECHOOSER"
-	log "Set $fulllist = '$COUNTRY_LANGUAGECHOOSER'"
-fi
+DEFAULT_COUNTRY=$(code2country $COUNTRY)
 
 # Keep track of values we have after language selection step
 LOCALE_LANGUAGECHOOSER=$LOCALE
@@ -384,7 +379,8 @@ while [ "$STATE" != 0 ] && [ "$STATE" -le "$LASTSTATE" ]; do
 					db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
 				else
-					db_set $fulllist $(code2country $country_default)
+					db_set $shortlist_template other
+					DEFAULT_COUNTRY=$(code2country $country_default)
 				fi
 			else
 				fullprio=medium
@@ -398,6 +394,12 @@ while [ "$STATE" != 0 ] && [ "$STATE" -le "$LASTSTATE" ]; do
 				COUNTRYCODE="$RET"
 				db_set $shortlist_template $COUNTRYCODE
 				break
+			fi
+		else
+			if [ "$DEFAULT_COUNTRY" ]; then
+				# Set correct default
+				db_set $fulllist "$DEFAULT_COUNTRY"
+				log "Set $fulllist = '$DEFAULT_COUNTRY'"
 			fi
 		fi
 
