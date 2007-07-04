@@ -23,7 +23,26 @@ fstab=$(
     done |
     sort |
     while read mp fs type options dump pass; do
-	echo $fs $mp $type $options $dump $pass
+	newoptions=
+	while [ "$options" ]; do
+	    case $options in
+		(ro,*)
+		    options="${options#ro,}"
+		    ;;
+		(ro)
+		    options=
+		    ;;
+		(*,*)
+		    newoptions="${newoptions:+$newoptions,}${options%%,*}"
+		    options="${options#*,}"
+		    ;;
+		(*)
+		    newoptions="${newoptions:+$newoptions,}$options"
+		    options=
+		    ;;
+	    esac
+	done
+	echo $fs $mp $type $newoptions $dump $pass
     done
 )
 
