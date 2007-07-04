@@ -49,10 +49,6 @@
 #include <debian-installer/slist.h>
 #include <gdk/gdkkeysyms.h>
 
-#ifdef DI_UDEB
-#include <directfb.h>
-#endif
-
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
@@ -62,6 +58,12 @@
 /* used to define horizontal and vertical padding of progressbar */
 #define PROGRESSBAR_HPADDING 60
 #define PROGRESSBAR_VPADDING 60
+
+#ifdef DI_UDEB
+#include <directfb.h>
+char last_keymap [STRING_MAX_LENGTH] = "\0", current_keymap [STRING_MAX_LENGTH] = "\0";
+char *keymap = NULL;
+#endif
 
 /* Make sure this is called in a GDK thread-safe way
  */
@@ -1468,14 +1470,20 @@ static int gtk_go(struct frontend *obj)
 
     gdk_threads_enter();
 
-    /* TODO
-     * workaround to force dfb to reload keymap at every run, awaiting
-     * for dfb to support automatic keymap change detection and reloading
-     * (See also bug #381979)
+    /* Checking whether the console keymap has changed or not
      */
-
     #ifdef DI_UDEB
-    dfb_input_device_reload_keymap( dfb_input_device_at( DIDID_KEYBOARD ) );
+    struct question *q_keymap = obj->qdb->methods.get(obj->qdb, "debian-installer/keymap");
+    if (q_keymap != NULL) {
+	if ( (keymap = question_getvalue (q_keymap, "")) != NULL) {
+            strncpy (current_keymap, keymap, STRING_MAX_LENGTH-1);
+            if (strcmp (current_keymap, last_keymap) != 0) {
+                strcpy (last_keymap, current_keymap);
+                dfb_input_device_reload_keymap (dfb_input_device_at (DIDID_KEYBOARD));
+            }
+            question_deref(q_keymap);
+        }
+    }
     #endif
 
     gtk_rc_reparse_all();
