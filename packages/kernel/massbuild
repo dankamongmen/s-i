@@ -1,0 +1,325 @@
+#! /bin/sh
+set -e
+
+MIRROR="http://ftp.nl.debian.org/debian"
+INCOMING="http://incoming.debian.org"
+OPERATION=""
+KVERS=""
+KUDEBS=""
+USE_INCOMING=""
+DO_CLEAN=""
+DO_DCH=""
+CHANGELOG=""
+
+usage() {
+	if [ "$@" ]; then
+		echo "Error: $@"
+		echo
+	fi
+	echo "Usage: $(basename $0) kbuild|mbuild [--dch | -m <changelog entry>] [--incoming] [<kernel/module udeb> ...]"
+	echo "       $(basename $0) krelease|mrelease [<kernel/module udeb> ...]"
+	echo "       $(basename $0) kclean|mclean [<kernel/module udeb> ...]"
+	exit 1
+}
+
+# Parse arguments
+OPERATION="$1"
+shift
+case "$OPERATION" in
+    kbuild|krelease|kclean)
+	BASE=linux-kernel-di-
+	;;
+    mbuild|mrelease|mclean)
+	BASE=linux-modules-di-
+	;;
+    "")
+	usage "operation not specified" ;;
+    *)
+	usage "unrecognized operation" ;;
+esac
+while true; do
+	case "$1" in
+	    "")
+		break ;;
+	    --dch)
+		DO_DCH=1
+		;;
+	    -m)
+		DO_DCH=1
+		shift
+		CHANGELOG="$1"
+		;;
+	    --incoming)
+		USE_INCOMING=1
+		POOL=$INCOMING
+		;;
+	    -*)
+		usage "unrecognized argument '$1'" ;;
+	    *)
+		# Strip trailing slash
+		KUDEBS="$KUDEBS $(echo "$1" | sed "s:/$::")"
+		;;
+	esac
+	shift
+done
+
+# Default to all kernel/module udebs packages in the directory
+if [ -z "$KUDEBS" ]; then
+	KUDEBS="$(find . -maxdepth 1 -type d -name "$BASE*" | sort)"
+fi
+for KUDEB in $KUDEBS; do
+	if ! [ -f $KUDEB/kernel-versions ]; then
+		usage "invalid kernel udeb package '$KUDEB'"
+	fi
+	if [ "${KUDEB%$BASE*}" ]; then
+		usage "$KUDEB does not match selected operation; skipping"
+	fi
+done
+
+log() {
+	echo "$@"
+	echo "$@" >>$LOGFILE
+}
+
+# Warning: this cleaning is very rough!
+clean_arch() {
+	rm -f *-$1-*.changes *-$1-*.dsc *-$1-*.tar.gz *_$1.udeb
+}
+
+do_dch() {
+	local CL
+	if [ "$1" ]; then
+		CL="$1"
+	else
+		CL="Update to kernel image version $KVERS."
+	fi
+	if head -n 1 debian/changelog | grep -q UNRELEASED; then
+		dch -r "$CL"
+		dch --release-heuristic=log "$CL"
+	else
+	        dch --release-heuristic=log -i "$CL"
+	fi
+}
+
+select_source() {
+	local PACKAGE=$1
+	case $PACKAGE in
+	    linux-image-2.6*)
+		BDEP_SOURCE=linux-2.6
+		BDEP_BIN=linux-image-2.6
+		;;
+	    squashfs-modules-2.6*)
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BIN=squashfs-modules-2.6
+		;;
+	    loop-aes-modules-2.6*)
+		BDEP_SOURCE=loop-aes
+		BDEP_BIN=loop-aes-modules-2.6
+		;;
+	    *)
+		echo "Unsupported build-dependency '$1'"
+		exit 1
+		;;
+	esac
+
+	KVERS=$(grep "^$BDEP_SOURCE[[:space:]]" ../massbuild.versions | awk '{print $2}')
+	if [ "$KVERS" ]; then
+		log "  Using version $KVERS for $PACKAGE"
+	else
+		echo "Could not determine desired version for $PACKAGE"
+		exit 1
+	fi
+}
+
+fetch_deblist () {
+	KIMAGES="$(wget -q $1 -O - | \
+		   sed "s:</tr><:</tr>\n<:g" | \
+		   grep "$BDEP_BIN.*\.deb" | \
+		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/")"
+	if [ -z "$KIMAGES" ]; then
+		echo "Failed to retrieve available build dependencies"
+		exit 1
+	fi
+}
+
+get_depends_source() {
+	local WGET_FROM=$1
+
+	case $WGET_FROM in
+	    pool)
+		PSOURCE="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		;;
+	    incoming)
+		PSOURCE="$INCOMING"
+		;;
+	esac
+
+	fetch_deblist $PSOURCE
+
+	kimages="$(echo "$KIMAGES" | grep "${build_dep}_.*$kv_arch\.")"
+	if [ -z "$kimages" ]; then
+		log "* No packages available matching $build_dep in $WGET_FROM"
+		return 1
+	fi
+	kimage="$(echo "$kimages" | grep "_${KVERS}_")"
+	if [ -z "$kimage" ]; then
+		log "* Version $KVERS of $BDEP_SOURCE seems unavailable for $kv_arch in $WGET_FROM"
+		return 1
+	fi
+	log "  - $kimage"
+	if ! wget -q $PSOURCE/$kimage -O $ARCHDIR/$kimage; then
+		log "* Failed to retrieve $kimage for $KUDEB from $WGET_FROM"
+		return 1
+	fi
+}
+
+get_depends() {
+	cat kernel-versions | egrep "^$1[[:space:]]" | \
+	    while read kv_arch version flavour installedname suffix build_deps; do
+		build_deps="$(echo $build_deps | sed "s/ ([^)]*)//" | \
+			      sed "s/,[[:space:]]*/ /g")"
+		for build_dep in $build_deps; do
+			select_source $build_dep
+
+			# exit on errors as we're in a subshell!
+			if ! get_depends_source pool; then
+				[ "$USE_INCOMING" ] || exit 1
+				log "  Trying from incoming"
+				get_depends_source incoming || exit 1
+			fi
+			dpkg -x $ARCHDIR/$kimage $ARCHDIR/
+		done
+		if [ -d $ARCHDIR/lib/modules/$installedname ]; then
+			/sbin/depmod -b $ARCHDIR/ $installedname
+		fi
+	done
+	return $?
+}
+
+has_recent_upload() {
+	local chlog="$KUDEB/debian/changelog"
+	if ! head -n 1 $chlog | grep -q UNRELEASED; then
+		sig="$(grep "^ --" $chlog | head -n 1)"
+		sigdate="${sig#*  }"
+		sigsec="$(date -d "$sigdate" +%s 2>/dev/null)" || true
+		if [ "$sigsec" ]; then
+			if [ $((($(date +%s) - $sigsec) / 86400)) -lt 5 ]; then
+				return 0
+			fi
+		else
+			echo "* Error getting date from '$sig'"
+		fi
+	fi
+	return 1
+}
+
+
+LOGFILE="$(pwd -P)/massbuild.$OPERATION.log"
+: >$LOGFILE
+
+case $OPERATION in
+    krelease|mrelease)
+	for KUDEB in $KUDEBS; do
+		cd $KUDEB
+		arch="$(echo $KUDEB | cut -d"-" -f4)"
+		log "Committing changes for $arch..."
+		SVN_ST="$(svn st)"
+		if [ "$(echo "$SVN_ST" | egrep -q "^(\?|C)")" ]; then
+			log "* Working copy is not clean; skipping"
+			cd ..; log ""; continue
+		fi
+		if [ -z "$(echo "$SVN_ST" | egrep "^M.*debian/changelog")" ]; then
+			log "* No changes to commit; skipping"
+			cd ..; log ""; continue
+		fi
+		svn diff
+		read -n 1 -s -p "Are you sure you want to commit these changes [yN]? " REPLY
+		echo
+		if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
+			log "* Aborted by user"
+			cd ..; log ""; continue
+		fi
+		debcommit --release 2>&1 | tee -a $LOGFILE
+		cd ..; log ""
+	done
+	;;
+    kclean|mclean)
+	for KUDEB in $KUDEBS; do
+		arch="$(echo $KUDEB | cut -d"-" -f4)"
+		log "Cleaning files for $arch..."
+		clean_arch $arch
+	done
+	;;
+esac
+
+## Rest of processing is for builds
+if [ $OPERATION != kbuild ] && [ $OPERATION != mbuild ]; then
+	exit 0
+fi
+
+if ! dpkg -l dpkg-cross | grep -q "^ii"; then
+	echo "Error: dpkg-cross is not installed; unable to proceed"
+	exit 1
+fi
+
+echo "This script will build kernel udebs from source packages of a specific"
+echo "version either for all architectures or a specific architecture."
+echo "Make sure you have updated 'massbuild.versions' before continuing."
+echo "NOTE: This script is intended to be used only by a D-I release manager if the"
+echo "      intention is to upload kernel udebs for all architectures."
+read -n 1 -s -p "Do you wish to continue [yN]? " REPLY
+echo
+if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
+	exit 0
+fi
+
+for KUDEB in $KUDEBS; do
+	for arch in $(cut -d ' ' -f 1 $KUDEB/kernel-versions | grep -v ^# | uniq); do
+		log "Processing $arch..."
+		if [ "$arch" = ppc64 ] || [ "$arch" = armel ]; then
+			echo "! Skipping architecture $arch (unofficial arch)"
+			continue
+		fi
+
+		if has_recent_upload; then
+			echo "There already has been a recent upload for this architecture."
+			read -n 1 -s -p "Skip this architecture [Yn]? " REPLY
+			echo
+			if [ "$REPLY" != n ] && [ "$REPLY" != N ]; then
+				continue
+			fi
+		fi
+
+		clean_arch $arch
+		rm -f massbuild.$arch.log
+
+		cd $KUDEB
+		ARCHDIR="../$arch"
+		rm -rf $ARCHDIR
+		mkdir $ARCHDIR
+
+		log "  Retrieving and extracting dependencies..."
+		if get_depends "$arch"; then
+			if [ "$DO_DCH" ]; then
+				do_dch "$CHANGELOG"
+			fi
+			log "  Building udebs, please wait..."
+			if ! kernel-wedge build-arch "$arch" &>../massbuild.$arch.log; then
+				log "* There were errors building udebs for $arch"
+				clean_arch $arch
+			fi
+		else
+			log "* Skipping architecture $arch"
+		fi
+
+		rm -rf $ARCHDIR
+		cd ..
+	done
+done
+
+echo
+if grep -q "^\*" $LOGFILE; then
+	echo "There were errors processing some architectures!"
+	echo "See the logfiles for details"
+	echo
+fi
