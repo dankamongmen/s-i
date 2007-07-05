@@ -83,7 +83,8 @@ done
 
 # Default to all kernel/module udebs packages in the directory
 if [ -z "$KUDEBS" ]; then
-	KUDEBS="$(find . -maxdepth 1 -type d -name "$BASE*" | sort)"
+	KUDEBS="$(find . -maxdepth 1 -type d -name "$BASE*" | \
+		  sed "s:^./::" | sort)"
 fi
 for KUDEB in $KUDEBS; do
 	if ! [ -f $KUDEB/kernel-versions ]; then
