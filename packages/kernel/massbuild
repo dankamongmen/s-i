@@ -169,7 +169,15 @@ get_depends_source() {
 		log "* No packages available matching $build_dep in $WGET_FROM"
 		return 1
 	fi
-	kimage="$(echo "$kimages" | grep "_${KVERS}_")"
+
+	# HACK ALERT
+	# The binary packages for linux-modules-extra have a different
+	# version than their source package.
+	# The version of the module's source package is inserted between the
+	# "upstream" part of the version and the "Debian" revision.
+	KVERS_BASE=${KVERS%-*}
+	KVERS_REV=${KVERS##*-}
+	kimage="$(echo "$kimages" | egrep "_${KVERS_BASE}([^_]*)?-${KVERS_REV}_")"
 	if [ -z "$kimage" ]; then
 		log "* Version $KVERS of $BDEP_SOURCE seems unavailable for $kv_arch in $WGET_FROM"
 		return 1
