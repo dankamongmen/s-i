@@ -61,8 +61,8 @@
 
 #ifdef DI_UDEB
 #include <directfb.h>
-char last_keymap [STRING_MAX_LENGTH] = "\0", current_keymap [STRING_MAX_LENGTH] = "\0";
-char *keymap = NULL;
+char last_keymap [STRING_MAX_LENGTH] = "\0";
+char *current_keymap = NULL;
 #endif
 
 /* Make sure this is called in a GDK thread-safe way
@@ -1475,14 +1475,13 @@ static int gtk_go(struct frontend *obj)
     #ifdef DI_UDEB
     struct question *q_keymap = obj->qdb->methods.get(obj->qdb, "debian-installer/keymap");
     if (q_keymap != NULL) {
-	if ( (keymap = question_getvalue (q_keymap, "")) != NULL) {
-            strncpy (current_keymap, keymap, STRING_MAX_LENGTH-1);
+        if ( (current_keymap = question_getvalue (q_keymap, "")) != NULL) {
             if (strcmp (current_keymap, last_keymap) != 0) {
-                strcpy (last_keymap, current_keymap);
+                strncpy (last_keymap, current_keymap, STRING_MAX_LENGTH-1);
                 dfb_input_device_reload_keymap (dfb_input_device_at (DIDID_KEYBOARD));
             }
-            question_deref(q_keymap);
         }
+        question_deref(q_keymap);
     }
     #endif
 
