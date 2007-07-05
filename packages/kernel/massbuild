@@ -24,6 +24,9 @@ CHANGELOG_EXTRA=""
 NL="
 "
 
+CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
+trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
+
 usage() {
 	if [ "$@" ]; then
 		echo "Error: $@"
@@ -101,9 +104,23 @@ clean_arch() {
 	rm -f *-$1-*.changes *-$1-*.dsc *-$1-*.tar.gz *_$1.udeb
 }
 
+init_changelog() {
+	>"$CL_TEMP"
+	if [ "$CHANGELOG_EXTRA" ]; then
+		echo "$CHANGELOG_EXTRA" >"$CL_TEMP"
+	fi
+}
+
+add_changelog() {
+	# Avoid duplicate entries
+	if ! grep -q "$1" "$CL_TEMP"; then
+		echo "$1" >>"$CL_TEMP"
+	fi
+}
+
 do_dch() {
 	local first_entry=1
-	cat ../massbuild.changelog | while read CL; do
+	cat "$CL_TEMP" | while read CL; do
 		if [ "$first_entry" ]; then
 			if head -n 1 debian/changelog | grep -q UNRELEASED; then
 				dch -r "$CL"
@@ -196,14 +213,6 @@ get_depends_source() {
 	if ! wget -q $PSOURCE/$kimage -O $ARCHDIR/$kimage; then
 		log "* Failed to retrieve $kimage for $KUDEB from $WGET_FROM"
 		return 1
-	fi
-}
-
-add_changelog() {
-	local CL="$1"
-	# Avoid duplicate entries
-	if ! grep -q "$CL" ../massbuild.changelog; then
-		echo "$CL" >>../massbuild.changelog
 	fi
 }
 
@@ -310,10 +319,7 @@ if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
 fi
 
 for KUDEB in $KUDEBS; do
-	>massbuild.changelog
-	if [ "$CHANGELOG_EXTRA" ]; then
-		echo "$CHANGELOG_EXTRA" >massbuild.changelog
-	fi
+	init_changelog
 
 	for arch in $(cut -d ' ' -f 1 $KUDEB/kernel-versions | grep -v ^# | uniq); do
 		log "Processing $arch..."
