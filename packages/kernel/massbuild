@@ -164,9 +164,7 @@ select_source() {
 	esac
 
 	KVERS=$(grep "^$BDEP_SOURCE[[:space:]]" ../massbuild.versions | awk '{print $2}')
-	if [ "$KVERS" ]; then
-		log "  Using version $KVERS for $PACKAGE"
-	else
+	if [ -z "$KVERS" ]; then
 		echo "Could not determine desired version for $PACKAGE"
 		exit 1
 	fi
@@ -200,7 +198,7 @@ get_depends_source() {
 
 	kimages="$(echo "$KIMAGES" | grep "${build_dep}_.*$kv_arch\.")"
 	if [ -z "$kimages" ]; then
-		log "* No packages available matching $build_dep in $WGET_FROM"
+		log "  * no packages available matching $build_dep in $WGET_FROM"
 		return 1
 	fi
 
@@ -213,12 +211,13 @@ get_depends_source() {
 	KVERS_REV=${KVERS##*-}
 	kimage="$(echo "$kimages" | egrep "_${KVERS_BASE}([^_]*)?-${KVERS_REV}_")"
 	if [ -z "$kimage" ]; then
-		log "* Version $KVERS of $BDEP_SOURCE seems unavailable for $kv_arch in $WGET_FROM"
+		log "  * version $KVERS of $BDEP_SOURCE for $kv_arch seems unavailable in $WGET_FROM"
 		return 1
 	fi
-	log "  - $kimage"
+
+	log "  - retrieving $kimage from $WGET_FROM..."
 	if ! wget -q $PSOURCE/$kimage -O $ARCHDIR/$kimage; then
-		log "* Failed to retrieve $kimage for $KUDEB from $WGET_FROM"
+		log "    * failed to retrieve $kimage for $KUDEB from $WGET_FROM"
 		return 1
 	fi
 }
@@ -234,7 +233,7 @@ get_depends() {
 			# exit on errors as we're in a subshell!
 			if ! get_depends_source pool; then
 				[ "$USE_INCOMING" ] || exit 1
-				log "  Trying from incoming"
+				log "  ! trying to fetch package from incoming"
 				get_depends_source incoming || exit 1
 			fi
 
@@ -259,7 +258,7 @@ has_recent_upload() {
 				return 0
 			fi
 		else
-			echo "* Error getting date from '$sig'"
+			echo "* Error parsing date from '$sig'"
 		fi
 	fi
 	return 1
