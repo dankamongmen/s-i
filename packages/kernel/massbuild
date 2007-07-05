@@ -106,6 +106,8 @@ clean_arch() {
 }
 
 init_changelog() {
+	[ "$DO_DCH" ] || return 0
+
 	>"$CL_TEMP"
 	if [ "$CHANGELOG_EXTRA" ]; then
 		echo "$CHANGELOG_EXTRA" >"$CL_TEMP"
@@ -113,6 +115,8 @@ init_changelog() {
 }
 
 add_changelog() {
+	[ "$DO_DCH" ] || return 0
+
 	# Avoid duplicate entries
 	if ! grep -q "$1" "$CL_TEMP"; then
 		echo "$1" >>"$CL_TEMP"
@@ -120,6 +124,8 @@ add_changelog() {
 }
 
 do_dch() {
+	[ "$DO_DCH" ] || return 0
+
 	local first_entry=1
 	cat "$CL_TEMP" | while read CL; do
 		if [ "$first_entry" ]; then
@@ -348,9 +354,7 @@ for KUDEB in $KUDEBS; do
 
 		log "  Retrieving and extracting dependencies..."
 		if get_depends "$arch"; then
-			if [ "$DO_DCH" ]; then
-				do_dch
-			fi
+			do_dch
 			log "  Building udebs, please wait..."
 			if ! kernel-wedge build-arch "$arch" &>../massbuild.$arch.log; then
 				log "* There were errors building udebs for $arch"
