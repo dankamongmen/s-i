@@ -9,14 +9,17 @@ KUDEBS=""
 USE_INCOMING=""
 DO_CLEAN=""
 DO_DCH=""
-CHANGELOG=""
+CHANGELOG_EXTRA=""
+
+NL="
+"
 
 usage() {
 	if [ "$@" ]; then
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild [--dch | -m <changelog entry>] [--incoming] [<kernel/module udeb> ...]"
+	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [--incoming] [<kernel/module udeb> ...]"
 	echo "       $(basename $0) krelease|mrelease [<kernel/module udeb> ...]"
 	echo "       $(basename $0) kclean|mclean [<kernel/module udeb> ...]"
 	exit 1
@@ -27,16 +30,18 @@ OPERATION="$1"
 shift
 case "$OPERATION" in
     kbuild|krelease|kclean)
-	BASE=linux-kernel-di-
+	TYPE=kernel
 	;;
     mbuild|mrelease|mclean)
-	BASE=linux-modules-di-
+	TYPE=modules
 	;;
     "")
 	usage "operation not specified" ;;
     *)
 	usage "unrecognized operation" ;;
 esac
+BASE=linux-$TYPE-di-
+
 while true; do
 	case "$1" in
 	    "")
@@ -47,7 +52,7 @@ while true; do
 	    -m)
 		DO_DCH=1
 		shift
-		CHANGELOG="$1"
+		CHANGELOG_EXTRA="$1"
 		;;
 	    --incoming)
 		USE_INCOMING=1
@@ -87,18 +92,20 @@ clean_arch() {
 }
 
 do_dch() {
-	local CL
-	if [ "$1" ]; then
-		CL="$1"
-	else
-		CL="Update to kernel image version $KVERS."
-	fi
-	if head -n 1 debian/changelog | grep -q UNRELEASED; then
-		dch -r "$CL"
-		dch --release-heuristic=log "$CL"
-	else
-	        dch --release-heuristic=log -i "$CL"
-	fi
+	local first_entry=1
+	cat ../massbuild.changelog | while read CL; do
+		if [ "$first_entry" ]; then
+			if head -n 1 debian/changelog | grep -q UNRELEASED; then
+				dch -r "$CL"
+				dch --release-heuristic=log "$CL"
+			else
+	        		dch --release-heuristic=log -i "$CL"
+			fi
+			first_entry=""
+		else
+			dch --release-heuristic=log "$CL"
+		fi
+	done
 }
 
 select_source() {
@@ -135,7 +142,8 @@ fetch_deblist () {
 	KIMAGES="$(wget -q $1 -O - | \
 		   sed "s:</tr><:</tr>\n<:g" | \
 		   grep "$BDEP_BIN.*\.deb" | \
-		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/")"
+		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" |
+		   sed "s/%2B/+/")"
 	if [ -z "$KIMAGES" ]; then
 		echo "Failed to retrieve available build dependencies"
 		exit 1
@@ -173,6 +181,14 @@ get_depends_source() {
 	fi
 }
 
+add_changelog() {
+	local CL="$1"
+	# Avoid duplicate entries
+	if ! grep -q "$CL" ../massbuild.changelog; then
+		echo "$CL" >>../massbuild.changelog
+	fi
+}
+
 get_depends() {
 	cat kernel-versions | egrep "^$1[[:space:]]" | \
 	    while read kv_arch version flavour installedname suffix build_deps; do
@@ -187,6 +203,8 @@ get_depends() {
 				log "  Trying from incoming"
 				get_depends_source incoming || exit 1
 			fi
+
+			add_changelog "Built against version $KVERS of $BDEP_SOURCE."
 			dpkg -x $ARCHDIR/$kimage $ARCHDIR/
 		done
 		if [ -d $ARCHDIR/lib/modules/$installedname ]; then
@@ -274,6 +292,11 @@ if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
 fi
 
 for KUDEB in $KUDEBS; do
+	>massbuild.changelog
+	if [ "$CHANGELOG_EXTRA" ]; then
+		echo "$CHANGELOG_EXTRA" >massbuild.changelog
+	fi
+
 	for arch in $(cut -d ' ' -f 1 $KUDEB/kernel-versions | grep -v ^# | uniq); do
 		log "Processing $arch..."
 		if [ "$arch" = ppc64 ] || [ "$arch" = armel ]; then
@@ -301,7 +324,7 @@ for KUDEB in $KUDEBS; do
 		log "  Retrieving and extracting dependencies..."
 		if get_depends "$arch"; then
 			if [ "$DO_DCH" ]; then
-				do_dch "$CHANGELOG"
+				do_dch
 			fi
 			log "  Building udebs, please wait..."
 			if ! kernel-wedge build-arch "$arch" &>../massbuild.$arch.log; then
