@@ -7,17 +7,13 @@ set -e
 # Software Foundation; either version 2 of the License, or (at your option)
 # any later version.
 
-# HACK WARNING
-# This script needs some cleaning up. In particular, a lot of variables names
-# are in need of rationalizing.
-
 ### INITIALIZATION
 
 NL="
 "
 
 OPERATION=""
-KVERS=""
+BDEP_SVERSION=""
 ARCHES=""
 USE_INCOMING=""
 DO_CLEAN=""
@@ -27,9 +23,10 @@ LMIRROR=""
 MIRROR=""
 INCOMING=""
 
+# Source user configuration file
+# Can contain values for LMIRROR, MIRROR and INCOMING
+# A local mirror is only used if defined in this file
 if [ ~/.d-i_massbuildrc ]; then
-	# Can contain values for LMIRROR, MIRROR and INCOMING
-	# A local mirror is only used if defined in this user config file
 	. ~/.d-i_massbuildrc
 fi
 
@@ -58,7 +55,7 @@ list_arches() {
 	done
 }
 
-# Parse arguments
+## Parse command line arguments
 OPERATION="$1"
 shift
 case "$OPERATION" in
@@ -101,6 +98,7 @@ while true; do
 	shift
 done
 
+
 # Default to all possible architectures
 REQUESTED=$ARCHES
 if [ -z "$ARCHES" ]; then
@@ -129,7 +127,7 @@ CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
 trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
 
 
-### FUNCTION DEFINITIONS
+### FUNCTION DEFINITIONS FOR MAINLINE
 
 log() {
 	echo "$@"
@@ -181,118 +179,6 @@ do_dch() {
 	done
 }
 
-select_source() {
-	local PACKAGE=$1
-	case $PACKAGE in
-	    linux-image-2.6*)
-		BDEP_SOURCE=linux-2.6
-		BDEP_BIN=linux-image-2.6
-		;;
-	    squashfs-modules-2.6*)
-		BDEP_SOURCE=linux-modules-extra-2.6
-		BDEP_BIN=squashfs-modules-2.6
-		;;
-	    loop-aes-modules-2.6*)
-		BDEP_SOURCE=loop-aes
-		BDEP_BIN=loop-aes-modules-2.6
-		;;
-	    *)
-		echo "Unsupported build-dependency '$1'"
-		exit 1
-		;;
-	esac
-
-	KVERS=$(grep "^$BDEP_SOURCE[[:space:]]" ../massbuild.versions | awk '{print $2}')
-	if [ -z "$KVERS" ]; then
-		echo "Could not determine desired version for $PACKAGE"
-		exit 1
-	fi
-}
-
-fetch_deblist () {
-	KIMAGES="$(wget -q $1 -O - | \
-		   sed "s:</tr><:</tr>\n<:g" | \
-		   grep "$BDEP_BIN.*\.deb" | \
-		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" |
-		   sed "s/%2B/+/")"
-	if [ -z "$KIMAGES" ]; then
-		echo "Failed to retrieve available build dependencies"
-		exit 1
-	fi
-}
-
-get_depends_source() {
-	local WGET_FROM=$1
-
-	case $WGET_FROM in
-	    local)
-		PSOURCE="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
-		;;
-	    pool)
-		PSOURCE="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
-		;;
-	    incoming)
-		PSOURCE="$INCOMING"
-		;;
-	esac
-
-	fetch_deblist $PSOURCE
-
-	kimages="$(echo "$KIMAGES" | grep "${build_dep}_.*$kv_arch\.")"
-	if [ -z "$kimages" ]; then
-		log "  * no packages available matching $build_dep from $WGET_FROM"
-		return 1
-	fi
-
-	# HACK ALERT
-	# The binary packages for linux-modules-extra have a different
-	# version than their source package.
-	# The version of the module's source package is inserted between the
-	# "upstream" part of the version and the "Debian" revision.
-	KVERS_BASE=${KVERS%-*}
-	KVERS_REV=${KVERS##*-}
-	kimage="$(echo "$kimages" | egrep "_${KVERS_BASE}([^_]*)?-${KVERS_REV}_")"
-	if [ -z "$kimage" ]; then
-		log "  * version $KVERS of $BDEP_SOURCE for $kv_arch seems unavailable in $WGET_FROM"
-		return 1
-	fi
-
-	log "  Retrieving $kimage from $WGET_FROM..."
-	if ! wget -q $PSOURCE/$kimage -O $ARCH_TDIR/$kimage; then
-		log "  * failed to retrieve $kimage for $USOURCE from $WGET_FROM"
-		return 1
-	fi
-}
-
-get_depends() {
-	cat kernel-versions | egrep "^$1[[:space:]]" | \
-	    while read kv_arch version flavour installedname suffix build_deps; do
-		build_deps="$(echo $build_deps | sed "s/ ([^)]*)//" | \
-			      sed "s/,[[:space:]]*/ /g")"
-		for build_dep in $build_deps; do
-			select_source $build_dep
-
-			# exit on errors as we're in a subshell!
-			if [ "$LMIRROR" ] && get_depends_source local; then
-				:
-			elif get_depends_source pool; then
-				:
-			elif [ "$USE_INCOMING" ] && get_depends_source incoming; then
-				:
-			else
-				exit 1
-			fi
-
-			add_changelog "Built against version $KVERS of $BDEP_SOURCE."
-			dpkg -x $ARCH_TDIR/$kimage $ARCH_TDIR/
-		done
-		if [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
-			/sbin/depmod -b $ARCH_TDIR/ $installedname
-		fi
-	done
-	return $?
-}
-
 has_recent_upload() {
 	local chlog="$USOURCE/debian/changelog"
 	if ! head -n 1 $chlog | grep -q UNRELEASED; then
@@ -308,6 +194,116 @@ has_recent_upload() {
 		fi
 	fi
 	return 1
+}
+
+select_source() {
+	local bdep=$1
+	case $bdep in
+	    linux-image-2.6*)
+		BDEP_SOURCE=linux-2.6
+		BDEP_BINARY_BASE=linux-image-2.6
+		;;
+	    squashfs-modules-2.6*)
+		BDEP_SOURCE=linux-modules-extra-2.6
+		BDEP_BINARY_BASE=squashfs-modules-2.6
+		;;
+	    loop-aes-modules-2.6*)
+		BDEP_SOURCE=loop-aes
+		BDEP_BINARY_BASE=loop-aes-modules-2.6
+		;;
+	    *)
+		echo "Unsupported build-dependency '$1'"
+		exit 1
+		;;
+	esac
+
+	BDEP_SVERSION=$(grep "^$BDEP_SOURCE[[:space:]]" ../massbuild.versions | awk '{print $2}')
+	if [ -z "$BDEP_SVERSION" ]; then
+		echo "Could not determine desired version for $bdep"
+		exit 1
+	fi
+}
+
+retrieve_package() {
+	local mirror_type=$1
+	local package_list
+	local url
+
+	case $mirror_type in
+	    local)
+		url="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		;;
+	    pool)
+		url="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		;;
+	    incoming)
+		url="$INCOMING"
+		;;
+	esac
+
+	package_list="$(wget -q $url -O - | \
+		   sed "s:</tr><:</tr>\n<:g" | \
+		   grep "$BDEP_BINARY_BASE.*\.deb" | \
+		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" |
+		   sed "s/%2B/+/")"
+	if [ -z "$package_list" ]; then
+		echo "Failed to retrieve available build dependencies"
+		exit 1
+	fi
+
+	package_list="$(echo "$package_list" | grep "${build_dep}_.*$kv_arch\.")"
+	if [ -z "$package_list" ]; then
+		log "  * no packages available matching $build_dep from $mirror_type"
+		return 1
+	fi
+
+	# HACK ALERT
+	# The binary packages for linux-modules-extra have a different
+	# version than their source package.
+	# The version of the module's source package is inserted between the
+	# "upstream" part of the version and the "Debian" revision.
+	sv_base=${BDEP_SVERSION%-*}
+	sv_rev=${BDEP_SVERSION##*-}
+	PACKAGE="$(echo "$package_list" | egrep "_${sv_base}([^_]*)?-${sv_rev}_")"
+	if [ -z "$PACKAGE" ]; then
+		log "  * version $BDEP_SVERSION of $BDEP_SOURCE for $kv_arch seems unavailable in $mirror_type"
+		return 1
+	fi
+
+	log "  Retrieving $PACKAGE from $mirror_type..."
+	if ! wget -q $url/$PACKAGE -O $ARCH_TDIR/$PACKAGE; then
+		log "  * failed to retrieve $PACKAGE for $USOURCE from $mirror_type"
+		return 1
+	fi
+}
+
+get_depends() {
+	cat kernel-versions | egrep "^$1[[:space:]]" | \
+	    while read kv_arch version flavour installedname suffix build_deps; do
+		build_deps="$(echo $build_deps | sed "s/ ([^)]*)//" | \
+			      sed "s/,[[:space:]]*/ /g")"
+		for build_dep in $build_deps; do
+			select_source $build_dep
+
+			# exit on errors as we're in a subshell!
+			if [ "$LMIRROR" ] && retrieve_package local; then
+				:
+			elif retrieve_package pool; then
+				:
+			elif [ "$USE_INCOMING" ] && retrieve_package incoming; then
+				:
+			else
+				exit 1
+			fi
+
+			add_changelog "Built against version $BDEP_SVERSION of $BDEP_SOURCE."
+			dpkg -x $ARCH_TDIR/$PACKAGE $ARCH_TDIR/
+		done
+		if [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
+			/sbin/depmod -b $ARCH_TDIR/ $installedname
+		fi
+	done
+	return $?
 }
 
 
@@ -331,9 +327,9 @@ case $OPERATION in
 			cd ..; log ""; continue
 		fi
 		svn diff
-		read -n 1 -s -p "Are you sure you want to commit these changes [yN]? " REPLY
+		read -n 1 -s -p "Are you sure you want to commit these changes [yN]? " reply
 		echo
-		if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
+		if [ "$reply" != y ] && [ "$reply" != Y ]; then
 			log "* Aborted by user"
 			cd ..; log ""; continue
 		fi
@@ -386,9 +382,9 @@ else
 	echo "      udebs for multiple architectures after checking with the D-I"
 	echo "      release manager."
 fi
-read -n 1 -s -p "Do you wish to continue [yN]? " REPLY
+read -n 1 -s -p "Do you wish to continue [yN]? " reply
 echo
-if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
+if [ "$reply" != y ] && [ "$reply" != Y ]; then
 	exit 0
 fi
 
@@ -413,9 +409,9 @@ for uarch in $UARCHES; do
 
 		if has_recent_upload; then
 			echo "There already has been a recent upload for this architecture."
-			read -n 1 -s -p "Skip this architecture [Yn]? " REPLY
+			read -n 1 -s -p "Skip this architecture [Yn]? " reply
 			echo
-			if [ "$REPLY" != n ] && [ "$REPLY" != N ]; then
+			if [ "$reply" != n ] && [ "$reply" != N ]; then
 				continue
 			fi
 		fi
