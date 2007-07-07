@@ -11,12 +11,14 @@ set -e
 # This script needs some cleaning up. In particular, a lot of variables names
 # are in need of rationalizing.
 
+### INITIALIZATION
+
 NL="
 "
 
 OPERATION=""
 KVERS=""
-KUDEBS=""
+ARCHES=""
 USE_INCOMING=""
 DO_CLEAN=""
 DO_DCH=""
@@ -34,18 +36,26 @@ fi
 MIRROR=${MIRROR:-"http://ftp.nl.debian.org/debian"}
 INCOMING=${INCOMING:-"http://incoming.debian.org"}
 
-CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
-trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
+UNOFFICIAL="armel ppc64"
 
 usage() {
 	if [ "$@" ]; then
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [--incoming] [<kernel/module udeb> ...]"
-	echo "       $(basename $0) krelease|mrelease [<kernel/module udeb> ...]"
-	echo "       $(basename $0) kclean|mclean [<kernel/module udeb> ...]"
+	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [--incoming] [<architecture> ...]"
+	echo "       $(basename $0) krelease|mrelease [<architecture> ...]"
+	echo "       $(basename $0) kclean|mclean [<architecture> ...]"
 	exit 1
+}
+
+list_arches() {
+	local arch
+	for arch in $1; do
+		local udir=$UDIR_BASE-$arch-2.6
+		echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
+			awk '{print $1}' | sort | uniq)
+	done
 }
 
 # Parse arguments
@@ -63,7 +73,7 @@ case "$OPERATION" in
     *)
 	usage "unrecognized operation" ;;
 esac
-BASE=linux-$TYPE-di-
+UDIR_BASE=linux-$TYPE-di
 
 while true; do
 	case "$1" in
@@ -84,25 +94,41 @@ while true; do
 		usage "unrecognized argument '$1'" ;;
 	    *)
 		# Strip trailing slash
-		KUDEBS="$KUDEBS $(echo "$1" | sed "s:/$::")"
+		ARCHES="${ARCHES:+$ARCHES }$1"
 		;;
 	esac
 	shift
 done
 
-# Default to all kernel/module udebs packages in the directory
-if [ -z "$KUDEBS" ]; then
-	KUDEBS="$(find . -maxdepth 1 -type d -name "$BASE*" | \
-		  sed "s:^./::" | sort)"
+# Default to all possible architectures
+REQUESTED=$ARCHES
+if [ -z "$ARCHES" ]; then
+	for uarch in $(ls -d $UDIR_BASE-*-2.6 | cut -d- -f4); do
+		ARCHES=${ARCHES:+$ARCHES }$(list_arches $uarch)
+	done
 fi
-for KUDEB in $KUDEBS; do
-	if ! [ -f $KUDEB/kernel-versions ]; then
-		usage "invalid kernel udeb package '$KUDEB'"
+
+# Some architectures are combined in the same source 
+UARCHES=""
+for arch in $ARCHES; do
+	case $arch in
+	    ppc64)	uarch=powerpc ;;
+	    *)		uarch=$arch ;;
+	esac
+
+	if ! [ -f $UDIR_BASE-$uarch-2.6/kernel-versions ]; then
+		usage "unsupported architecture '$arch'"
 	fi
-	if [ "${KUDEB%$BASE*}" ]; then
-		usage "$KUDEB does not match selected operation; skipping"
+	if ! echo "$UARCHES" | grep -q $uarch; then
+		UARCHES="${UARCHES:+$UARCHES }$uarch"
 	fi
 done
+
+CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
+trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
+
+
+### FUNCTION DEFINITIONS
 
 log() {
 	echo "$@"
@@ -197,15 +223,12 @@ get_depends_source() {
 	case $WGET_FROM in
 	    local)
 		PSOURCE="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
-		log "  ! trying to fetch package from local mirror"
 		;;
 	    pool)
 		PSOURCE="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
-		log "  ! trying to fetch package from official mirror"
 		;;
 	    incoming)
 		PSOURCE="$INCOMING"
-		log "  ! trying to fetch package from incoming"
 		;;
 	esac
 
@@ -213,7 +236,7 @@ get_depends_source() {
 
 	kimages="$(echo "$KIMAGES" | grep "${build_dep}_.*$kv_arch\.")"
 	if [ -z "$kimages" ]; then
-		log "  * no packages available matching $build_dep in $WGET_FROM"
+		log "  * no packages available matching $build_dep from $WGET_FROM"
 		return 1
 	fi
 
@@ -230,9 +253,9 @@ get_depends_source() {
 		return 1
 	fi
 
-	log "  - retrieving $kimage from $WGET_FROM..."
+	log "  Retrieving $kimage from $WGET_FROM..."
 	if ! wget -q $PSOURCE/$kimage -O $ARCHDIR/$kimage; then
-		log "    * failed to retrieve $kimage for $KUDEB from $WGET_FROM"
+		log "  * failed to retrieve $kimage for $USOURCE from $WGET_FROM"
 		return 1
 	fi
 }
@@ -267,7 +290,7 @@ get_depends() {
 }
 
 has_recent_upload() {
-	local chlog="$KUDEB/debian/changelog"
+	local chlog="$USOURCE/debian/changelog"
 	if ! head -n 1 $chlog | grep -q UNRELEASED; then
 		sig="$(grep "^ --" $chlog | head -n 1)"
 		sigdate="${sig#*  }"
@@ -284,15 +307,16 @@ has_recent_upload() {
 }
 
 
+### MAINLINE
+
 LOGFILE="$(pwd -P)/massbuild.$OPERATION.log"
 : >$LOGFILE
 
 case $OPERATION in
     krelease|mrelease)
-	for KUDEB in $KUDEBS; do
-		cd $KUDEB
-		arch="$(echo $KUDEB | cut -d"-" -f4)"
-		log "Committing changes for $arch..."
+	for uarch in $UARCHES; do
+		cd $UDIR_BASE-$uarch-2.6
+		log "Committing changes for $uarch..."
 		SVN_ST="$(svn st)"
 		if [ "$(echo "$SVN_ST" | egrep -q "^(\?|C)")" ]; then
 			log "* Working copy is not clean; skipping"
@@ -314,13 +338,13 @@ case $OPERATION in
 	done
 	;;
     kclean|mclean)
-	for KUDEB in $KUDEBS; do
-		arch="$(echo $KUDEB | cut -d"-" -f4)"
+	for arch in $ARCHES; do
 		log "Cleaning files for $arch..."
 		clean_arch $arch
 	done
 	;;
 esac
+
 
 ## Rest of processing is for builds
 if [ $OPERATION != kbuild ] && [ $OPERATION != mbuild ]; then
@@ -331,10 +355,9 @@ fi
 # and that architecture matches the host we're running on.
 no_cross=""
 hostarch_cpu=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
-set $KUDEBS
+set $UARCHES
 if [ ${#@} -eq 1 ]; then
-	arches=$(egrep -v "^(#|[[:space:]]*$)" $KUDEBS/kernel-versions | \
-		 awk '{print $1}' | uniq)
+	arches=$(list_arches "$UARCHES")
 	set $arches
 	if [ ${#@} -eq 1 ] && [ "$arches" = $hostarch_cpu ]; then
 		no_cross=1
@@ -344,6 +367,7 @@ if [ -z "$no_cross" ] && ! dpkg -l dpkg-cross | grep -q "^ii"; then
 	echo "Error: dpkg-cross is not installed; unable to proceed"
 	exit 1
 fi
+
 
 echo "This script will build kernel udebs from source packages of a specific"
 echo "version either for all architectures or a specific architecture."
@@ -363,15 +387,24 @@ if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
 	exit 0
 fi
 
-for KUDEB in $KUDEBS; do
+
+for uarch in $UARCHES; do
+	echo
 	init_changelog
 
-	for arch in $(cut -d ' ' -f 1 $KUDEB/kernel-versions | grep -v ^# | uniq); do
-		log "Processing $arch..."
-		if [ "$arch" = ppc64 ] || [ "$arch" = armel ]; then
-			echo "! Skipping architecture $arch (unofficial arch)"
+	USOURCE=$UDIR_BASE-$uarch-2.6
+	for arch in $(list_arches $uarch); do
+		if ! echo "$ARCHES" | egrep -q "(^| )$arch( |$)"; then
 			continue
 		fi
+
+		# Skip unofficial arches unless specifically requested
+		if echo "$UNOFFICIAL" | egrep -q "(^| )$arch( |$)" && \
+		   ! echo "$REQUESTED" | egrep -q "(^| )$arch( |$)"; then
+			echo "! Skipping architecture $arch (unofficial)"
+			continue
+		fi
+		log "Processing $arch..."
 
 		if has_recent_upload; then
 			echo "There already has been a recent upload for this architecture."
@@ -385,7 +418,7 @@ for KUDEB in $KUDEBS; do
 		clean_arch $arch
 		rm -f massbuild.$arch.log
 
-		cd $KUDEB
+		cd $USOURCE
 		ARCHDIR="../$arch"
 		rm -rf $ARCHDIR
 		mkdir $ARCHDIR
