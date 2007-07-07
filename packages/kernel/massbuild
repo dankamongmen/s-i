@@ -328,7 +328,20 @@ if [ $OPERATION != kbuild ] && [ $OPERATION != mbuild ]; then
 	exit 0
 fi
 
-if ! dpkg -l dpkg-cross | grep -q "^ii"; then
+# Require dpkg-cross unless we are building only for a single architecture
+# and that architecture matches the host we're running on.
+no_cross=""
+hostarch_cpu=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
+set $KUDEBS
+if [ ${#@} -eq 1 ]; then
+	arches=$(egrep -v "^(#|[[:space:]]*$)" $KUDEBS/kernel-versions | \
+		 awk '{print $1}' | uniq)
+	set $arches
+	if [ ${#@} -eq 1 ] && [ "$arches" = $hostarch_cpu ]; then
+		no_cross=1
+	fi
+fi
+if [ -z "$no_cross" ] && ! dpkg -l dpkg-cross | grep -q "^ii"; then
 	echo "Error: dpkg-cross is not installed; unable to proceed"
 	exit 1
 fi
@@ -336,8 +349,15 @@ fi
 echo "This script will build kernel udebs from source packages of a specific"
 echo "version either for all architectures or a specific architecture."
 echo "Make sure you have updated 'massbuild.versions' before continuing."
-echo "NOTE: This script is intended to be used only by a D-I release manager if the"
-echo "      intention is to upload kernel udebs for all architectures."
+if [ "$no_cross" ]; then
+	echo "NOTE: Uploads of kernel/module udebs should only be done by a porter"
+	echo "      for that architecture, or after checking with the D-I release"
+	echo "      manager."
+else
+	echo "NOTE: This script should only be used to build and upload kernel/module
+	echo "      udebs for multiple architectures after checking with the D-I"
+	echo "      release manager."
+fi
 read -n 1 -s -p "Do you wish to continue [yN]? " REPLY
 echo
 if [ "$REPLY" != y ] && [ "$REPLY" != Y ]; then
