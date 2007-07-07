@@ -74,6 +74,7 @@ case "$OPERATION" in
 	usage "unrecognized operation" ;;
 esac
 UDIR_BASE=linux-$TYPE-di
+OUTDIR=massbuild.out.$TYPE
 
 while true; do
 	case "$1" in
@@ -135,9 +136,12 @@ log() {
 	echo "$@" >>$LOGFILE
 }
 
-# Warning: this cleaning is very rough!
 clean_arch() {
-	rm -f *-$1-*.changes *-$1-*.dsc *-$1-*.tar.gz *_$1.udeb
+	# Remove from both dirs to also clean manual or failed builds
+	rm -f ./linux-$TYPE-di-$arch-2.6_*.*
+	rm -f ./*_$1.udeb
+	rm -f ./$OUTDIR/linux-$TYPE-di-$arch-2.6_*.*
+	rm -f ./$OUTDIR/*_$1.udeb
 }
 
 init_changelog() {
@@ -342,6 +346,7 @@ case $OPERATION in
 		log "Cleaning files for $arch..."
 		clean_arch $arch
 	done
+	rmdir $OUTDIR 2>/dev/null || true
 	;;
 esac
 
@@ -430,6 +435,10 @@ for uarch in $UARCHES; do
 			if ! kernel-wedge build-arch "$arch" >../massbuild.$TYPE.$arch.log 2>&1; then
 				log "* There were errors building udebs for $arch"
 				clean_arch $arch
+			else
+				mkdir -p ../$OUTDIR
+				mv ../linux-$TYPE-di-$arch-2.6_*.* ../$OUTDIR
+				mv ../*_$arch.udeb ../$OUTDIR
 			fi
 		else
 			log "* Skipping architecture $arch"
