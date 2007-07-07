@@ -52,7 +52,7 @@ usage() {
 list_arches() {
 	local arch
 	for arch in $1; do
-		local udir=$UDIR_BASE-$arch-2.6
+		local udir=$UBASE-$arch-2.6
 		echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
 			awk '{print $1}' | sort | uniq)
 	done
@@ -73,7 +73,7 @@ case "$OPERATION" in
     *)
 	usage "unrecognized operation" ;;
 esac
-UDIR_BASE=linux-$TYPE-di
+UBASE=linux-$TYPE-di
 OUTDIR=massbuild.out.$TYPE
 
 while true; do
@@ -104,7 +104,7 @@ done
 # Default to all possible architectures
 REQUESTED=$ARCHES
 if [ -z "$ARCHES" ]; then
-	for uarch in $(ls -d $UDIR_BASE-*-2.6 | cut -d- -f4); do
+	for uarch in $(ls -d $UBASE-*-2.6 | cut -d- -f4); do
 		ARCHES=${ARCHES:+$ARCHES }$(list_arches $uarch)
 	done
 fi
@@ -117,7 +117,7 @@ for arch in $ARCHES; do
 	    *)		uarch=$arch ;;
 	esac
 
-	if ! [ -f $UDIR_BASE-$uarch-2.6/kernel-versions ]; then
+	if ! [ -f $UBASE-$uarch-2.6/kernel-versions ]; then
 		usage "unsupported architecture '$arch'"
 	fi
 	if ! echo "$UARCHES" | grep -q $uarch; then
@@ -138,9 +138,9 @@ log() {
 
 clean_arch() {
 	# Remove from both dirs to also clean manual or failed builds
-	rm -f ./linux-$TYPE-di-$arch-2.6_*.*
+	rm -f ./$UBASE-$arch-2.6_*.*
 	rm -f ./*_$1.udeb
-	rm -f ./$OUTDIR/linux-$TYPE-di-$arch-2.6_*.*
+	rm -f ./$OUTDIR/$UBASE-$arch-2.6_*.*
 	rm -f ./$OUTDIR/*_$1.udeb
 }
 
@@ -258,7 +258,7 @@ get_depends_source() {
 	fi
 
 	log "  Retrieving $kimage from $WGET_FROM..."
-	if ! wget -q $PSOURCE/$kimage -O $ARCHDIR/$kimage; then
+	if ! wget -q $PSOURCE/$kimage -O $ARCH_TDIR/$kimage; then
 		log "  * failed to retrieve $kimage for $USOURCE from $WGET_FROM"
 		return 1
 	fi
@@ -284,10 +284,10 @@ get_depends() {
 			fi
 
 			add_changelog "Built against version $KVERS of $BDEP_SOURCE."
-			dpkg -x $ARCHDIR/$kimage $ARCHDIR/
+			dpkg -x $ARCH_TDIR/$kimage $ARCH_TDIR/
 		done
-		if [ -d $ARCHDIR/lib/modules/$installedname ]; then
-			/sbin/depmod -b $ARCHDIR/ $installedname
+		if [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
+			/sbin/depmod -b $ARCH_TDIR/ $installedname
 		fi
 	done
 	return $?
@@ -319,7 +319,7 @@ LOGFILE="$(pwd -P)/massbuild.$OPERATION.log"
 case $OPERATION in
     krelease|mrelease)
 	for uarch in $UARCHES; do
-		cd $UDIR_BASE-$uarch-2.6
+		cd $UBASE-$uarch-2.6
 		log "Committing changes for $uarch..."
 		SVN_ST="$(svn st)"
 		if [ "$(echo "$SVN_ST" | egrep -q "^(\?|C)")" ]; then
@@ -346,7 +346,7 @@ case $OPERATION in
 		log "Cleaning files for $arch..."
 		clean_arch $arch
 	done
-	rmdir $OUTDIR 2>/dev/null || true
+	rmdir ./$OUTDIR 2>/dev/null || true
 	;;
 esac
 
@@ -362,9 +362,9 @@ no_cross=""
 hostarch_cpu=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
 set $UARCHES
 if [ ${#@} -eq 1 ]; then
-	arches=$(list_arches "$UARCHES")
-	set $arches
-	if [ ${#@} -eq 1 ] && [ "$arches" = $hostarch_cpu ]; then
+	arch=$(list_arches "$UARCHES")
+	set $arch
+	if [ ${#@} -eq 1 ] && [ "$arch" = $hostarch_cpu ]; then
 		no_cross=1
 	fi
 fi
@@ -397,7 +397,7 @@ for uarch in $UARCHES; do
 	echo
 	init_changelog
 
-	USOURCE=$UDIR_BASE-$uarch-2.6
+	USOURCE=$UBASE-$uarch-2.6
 	for arch in $(list_arches $uarch); do
 		if ! echo "$ARCHES" | egrep -q "(^| )$arch( |$)"; then
 			continue
@@ -424,12 +424,12 @@ for uarch in $UARCHES; do
 		rm -f massbuild.$arch.log
 
 		cd $USOURCE
-		ARCHDIR="../$arch"
-		rm -rf $ARCHDIR
-		mkdir $ARCHDIR
+		ARCH_TDIR=../$arch
+		rm -rf $ARCH_TDIR
+		mkdir $ARCH_TDIR
 
 		log "  Retrieving and extracting dependencies..."
-		if get_depends "$arch"; then
+		if get_depends $arch; then
 			do_dch
 			log "  Building udebs, please wait..."
 			if ! kernel-wedge build-arch "$arch" >../massbuild.$TYPE.$arch.log 2>&1; then
@@ -437,14 +437,14 @@ for uarch in $UARCHES; do
 				clean_arch $arch
 			else
 				mkdir -p ../$OUTDIR
-				mv ../linux-$TYPE-di-$arch-2.6_*.* ../$OUTDIR
+				mv ../$UBASE-$arch-2.6_*.* ../$OUTDIR
 				mv ../*_$arch.udeb ../$OUTDIR
 			fi
 		else
 			log "* Skipping architecture $arch"
 		fi
 
-		rm -rf $ARCHDIR
+		rm -rf $ARCH_TDIR
 		cd ..
 	done
 done
