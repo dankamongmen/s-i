@@ -11,8 +11,9 @@ set -e
 # This script needs some cleaning up. In particular, a lot of variables names
 # are in need of rationalizing.
 
-MIRROR="http://ftp.nl.debian.org/debian"
-INCOMING="http://incoming.debian.org"
+NL="
+"
+
 OPERATION=""
 KVERS=""
 KUDEBS=""
@@ -20,9 +21,18 @@ USE_INCOMING=""
 DO_CLEAN=""
 DO_DCH=""
 CHANGELOG_EXTRA=""
+LMIRROR=""
+MIRROR=""
+INCOMING=""
 
-NL="
-"
+if [ ~/.d-i_massbuildrc ]; then
+	# Can contain values for LMIRROR, MIRROR and INCOMING
+	# A local mirror is only used if defined in this user config file
+	. ~/.d-i_massbuildrc
+fi
+
+MIRROR=${MIRROR:-"http://ftp.nl.debian.org/debian"}
+INCOMING=${INCOMING:-"http://incoming.debian.org"}
 
 CL_TEMP="$(mktemp -t massbuild.changelog.XXXXXX)"
 trap 'rm -f "$CL_TEMP"' EXIT HUP INT QUIT TERM
@@ -185,11 +195,17 @@ get_depends_source() {
 	local WGET_FROM=$1
 
 	case $WGET_FROM in
+	    local)
+		PSOURCE="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		log "  ! trying to fetch package from local mirror"
+		;;
 	    pool)
 		PSOURCE="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		log "  ! trying to fetch package from official mirror"
 		;;
 	    incoming)
 		PSOURCE="$INCOMING"
+		log "  ! trying to fetch package from incoming"
 		;;
 	esac
 
@@ -230,10 +246,15 @@ get_depends() {
 			select_source $build_dep
 
 			# exit on errors as we're in a subshell!
-			if ! get_depends_source pool; then
-				[ "$USE_INCOMING" ] || exit 1
-				log "  ! trying to fetch package from incoming"
-				get_depends_source incoming || exit 1
+			if [ "$LMIRROR" ] && get_depends_source local; then
+				# Only use local mirror if defined in user config
+				:
+			elif get_depends_source pool; then
+				:
+			elif [ "$USE_INCOMING" ] && get_depends_source incoming; then
+				:
+			else
+				exit 1
 			fi
 
 			add_changelog "Built against version $KVERS of $BDEP_SOURCE."
