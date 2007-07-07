@@ -19,6 +19,7 @@ USE_INCOMING=""
 DO_CLEAN=""
 DO_DCH=""
 CHANGELOG_EXTRA=""
+DISTRIBUTION=""
 LMIRROR=""
 MIRROR=""
 INCOMING=""
@@ -40,7 +41,7 @@ usage() {
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [--incoming] [<architecture> ...]"
+	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [-d <distribution>][--incoming] [<architecture> ...]"
 	echo "       $(basename $0) krelease|mrelease [<architecture> ...]"
 	echo "       $(basename $0) kclean|mclean [<architecture> ...]"
 	exit 1
@@ -84,6 +85,10 @@ while true; do
 		DO_DCH=1
 		shift
 		CHANGELOG_EXTRA="$1"
+		;;
+	    -d)
+		shift
+		DISTRIBUTION="$1"
 		;;
 	    --incoming)
 		USE_INCOMING=1
@@ -154,29 +159,38 @@ init_changelog() {
 add_changelog() {
 	[ "$DO_DCH" ] || return 0
 
-	# Avoid duplicate entries
-	if ! grep -q "$1" "$CL_TEMP"; then
-		echo "$1" >>"$CL_TEMP"
-	fi
+	echo "$1" >>"$CL_TEMP"
 }
+
 
 do_dch() {
 	[ "$DO_DCH" ] || return 0
 
-	local first_entry=1
-	cat "$CL_TEMP" | while read CL; do
-		if [ "$first_entry" ]; then
-			if head -n 1 debian/changelog | grep -q UNRELEASED; then
-				dch -r "$CL"
-				dch --release-heuristic=log "$CL"
-			else
-	        		dch --release-heuristic=log -i "$CL"
-			fi
-			first_entry=""
-		else
-			dch --release-heuristic=log "$CL"
+	local new_entry=""
+
+	# Use dch's default logic to determine if we need a new changelog
+	# entry or not.
+	cat $CL_TEMP | while read CL; do
+		# Avoid duplicate entries in the changelog, but limit scope
+		if ! head -n 25 debian/changelog | grep -q "\* $CL"; then
+			dch --release-heuristic=changelog "$CL"
+			new_entry=1
 		fi
 	done
+	# Sanity check
+	if ! head -n 1 debian/changelog | grep -q UNRELEASED && [ -z "$new_entry" ]; then
+		echo
+		echo "Error: no new changelog entries were added, which cannot be correct"
+		echo "as the previous version is already marked as released."
+		echo "Did you want to do a rebuild without the --dch option?"
+		exit 1
+	fi
+
+	local dist=""
+	if [ "$DISTRIBUTION" ]; then
+		dist="--distribution $DISTRIBUTION"
+	fi
+	EDITOR=true dch $dist -r
 }
 
 has_recent_upload() {
