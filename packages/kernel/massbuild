@@ -180,9 +180,13 @@ do_dch() {
 	# Sanity check
 	if ! head -n 1 debian/changelog | grep -q UNRELEASED && [ -z "$new_entry" ]; then
 		echo
-		echo "Error: no new changelog entries were added, which cannot be correct"
-		echo "as the previous version is already marked as released."
-		echo "Did you want to do a rebuild without the --dch option?"
+		echo "Error: no new changelog entries were added, which most likely means"
+		echo "that there has been an earlier build against the same version of"
+		echo "the packages this component depends on. Not having a new changelog"
+		echo "entry cannot be correct as the previous version is already marked"
+		echo "as released."
+		echo "Did you want to do a rebuild without the --dch option or did you"
+		echo "forget to provide a reason for the rebuild using the -m option?"
 		exit 1
 	fi
 
