@@ -15,6 +15,8 @@ console=$(mapdevfs "$rawconsole")
 rawconsole=${rawconsole#/dev/}
 console=${console#/dev/}
 
+# Testing for hvc and hvsi here may be useless as they would normally be
+# redirected to /dev/console, which is covered by the code section below.
 case "$console" in
     tty[A-Z]*|hvc*|hvsi*)
 	log "Configuring init for serial console"
@@ -45,3 +47,42 @@ case "$console" in
 	fi
 	;;
 esac
+
+# Set up virtualized console via onboard service processor (hvsi/hvc)
+DT_ROOT=/proc/device-tree
+if [ -e $DT_ROOT/options/chosen/linux,stdout-path ]; then
+	chosen_dev=$(cat $DT_ROOT/chosen/linux,stdout-path)
+	case $chosen_dev in
+	    /vdevice/vty@30000000)
+		case $(cat ${DT_ROOT}${chosen_dev}/compatible) in
+		    hvterm-protocol)
+			console=hvsi0 ;;
+		    hvterm|hvterm1)
+			console=hvc0 ;;
+		    *)
+			log "Unable to determine type of virtualized console"
+			exit 1
+			;;
+		esac
+		;;
+	    /vdevice/vty@30000001)
+		console=hvsi1 ;;
+	    *)
+       		 exit 0 ;;
+	esac
+
+	log "Setting up virtualized serial console on /dev/$console"
+	if [ -f /target/etc/inittab ]; then
+		# Disable regular VTs
+		sed -i -e "s/^\([1-6]\):/#\1:/" /target/etc/inittab
+	
+		console_line="co:2345:respawn:/sbin/getty $console 9600 vt100"
+		if grep -q "^#\?co:" /target/etc/inittab; then
+			sed -i -e "s|^#\?co:.*$|$console_line|" \
+				/target/etc/inittab
+		else
+			sedexp="/^#1:/i\\$console_line\\"
+			sed -i -e "$sedexp" /target/etc/inittab
+		fi
+	fi
+fi
