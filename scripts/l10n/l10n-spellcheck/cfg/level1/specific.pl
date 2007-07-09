@@ -76,15 +76,15 @@ sub checkSpecials (@)
 	    $unmatched=1;
 	}
 
-	if ($msgid =~ /^--/ && $msgstr !~ /^--/)
+	if ($msgid =~ /^-- / && $msgstr !~ /^-- /)
 	{
-	    print "# >>> String should start with -- <<<\n";		
+	    print "# >>> String should start with \"-- \" <<<\n";		
 	    $unmatched=1;
 	}
 
-	if ($msgid =~ /--$/ && $msgstr !~ /--$/)
+	if ($msgid =~ / --$/ && $msgstr !~ / --$/)
 	{
-	    print "# >>> String should end with -- <<<\n";		
+	    print "# >>> String should end with \" --\" <<<\n";		
 	    $unmatched=1;
 	}
 
