@@ -76,6 +76,18 @@ sub checkSpecials (@)
 	    $unmatched=1;
 	}
 
+	if ($msgid =~ /^--/ && $msgstr !~ /^--/)
+	{
+	    print "# >>> String should start with -- <<<\n";		
+	    $unmatched=1;
+	}
+
+	if ($msgid =~ /--$/ && $msgstr !~ /--$/)
+	{
+	    print "# >>> String should end with -- <<<\n";		
+	    $unmatched=1;
+	}
+
 	if ($_ =~ /#.\s+Type:\s+select/ && $_ =~ /#.\s+Choices/ )
 	    {
 		while ($msgid =~ /,/g) { $count_id++ };
