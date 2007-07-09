@@ -38,7 +38,7 @@ changelog=$1/debian/changelog
 package=$(basename $(echo $1 | sed "s:/*$::"))
 rmadison_out=""
 
-if [ -a $package ] || [ ! -f $changelog ]; then
+if [ -z "$package" ] || [ ! -f $changelog ]; then
 	echo "You must privide a path to the source directory of a package"
 	exit 1
 elif ! type rmadison >/dev/null 2>&1; then
