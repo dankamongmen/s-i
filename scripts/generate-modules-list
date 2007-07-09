@@ -4,15 +4,17 @@
 # and all the packages. This is to be used in discover-data reduction.
 (
 	for dir in $1/*; do
-		for file in $(find $dir/modules -type f | grep -v .svn | grep -v .lnk); do
-			cat $file | \
-			grep -v \# | \
-			sed 's/^-//' | \
-			sed 's/ ?$//' | \
-			sed 's/ -$//' | \
-			grep -v '^$' | \
-			sed 's!.*/!!' | \
-			sed 's/\..*//'
-		done
+		if [ -d "$dir" ]; then
+			for file in $(find $dir/modules -type f | grep -v .svn | grep -v .lnk); do
+				cat $file | \
+				grep -v \# | \
+				sed 's/^-//' | \
+				sed 's/ ?$//' | \
+				sed 's/ -$//' | \
+				grep -v '^$' | \
+				sed 's!.*/!!' | \
+				sed 's/\..*//'
+			done
+		fi
 	done
 ) | sort | uniq
