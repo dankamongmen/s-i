@@ -62,7 +62,7 @@ for i in $( seq 0 $((${#names[@]}-1)) ) ; do
     exec 6>&1
     exec > ${LOGFILE}
 
-    for png in $(find ${png_dir} -name '*.png') ; do	
+    for png in $(find ${png_dir} -name '*.png' | sort) ; do	
 	png=$(basename $png)	
         lang=$(echo $png | sed -e 's|diff_||' -e 's|.png||')
 	echo    "${lang}"
@@ -91,7 +91,7 @@ echo "   <th class=\"t1\">deb [${cmp}]</th>"
 echo "   <th class=\"t1\">udeb [${cmp}]</th>"
 echo " </tr>"
 
-for lang in $(find ${old}/deb/ -name '*.png') ; do
+for lang in $(find ${old}/deb/ -name '*.png' | sort) ; do
 
     lang=$(basename $lang)
 
@@ -104,8 +104,19 @@ for lang in $(find ${old}/deb/ -name '*.png') ; do
     echo "   <td><a href="${new}/deb/${lang}">${lang}</a></td>"
     echo "   <td><a href="${new}/udeb/${lang}">${lang}</a></td>"
 
+
+if [ -f ${cmp}/deb/diff_${lang} ] ; then
     echo "   <td><a href="${cmp}/deb/diff_${lang}">${lang}</a></td>"
+else
+    echo "   <td>-</a></td>"
+fi
+
+if [ -f ${cmp}/udeb/diff_${lang} ] ; then
     echo "   <td><a href="${cmp}/udeb/diff_${lang}">${lang}</a></td>"
+else
+    echo "   <td>-</a></td>"
+fi
+
     echo "  </tr>"
 done
 
