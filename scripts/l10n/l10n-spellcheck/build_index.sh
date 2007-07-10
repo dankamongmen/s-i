@@ -223,6 +223,7 @@ sed -e "/<!-- HTML TABLE STARTS HERE -->/r ${TABLE_HTML}" \
     -e "s|<!-- TODAY DATE -->|$(date --utc)|" \
     -e "s|<!-- COMMON WL -->|latest/nozip/di_common_wl.txt|" \
     -e "s|<!-- CODEPOINTS_TARBALL -->|latest/zip/codepoints.tar.gz|" \
+    -e "s|<!-- ALL_STRINGS_TARBALL -->|latest/zip/all_strings.tar.gz|" \
     -e "s|<!-- CODEPOINTS -->|latest/all_codes.txt|" \
     ${TEMPLATE} > ${INDEX_HTML}
 

@@ -87,6 +87,11 @@ gzip - < codepoints.tar > ${DEST_DIR}/zip/codepoints.tar.gz
 rm codepoints.tar
 cd ${HERE}
 
+HERE=$(pwd)
+cd ${DEST_DIR}/nozip
+tar czf ${DEST_DIR}/zip/all_strings.tar.gz *_all.txt
+cd ${HERE}
+ 
 if [ ! -d ${DEST_DIR} ] ; then
     echo does not exist: for some reasons nothing could be checked
     exit 1
