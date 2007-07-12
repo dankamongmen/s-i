@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh -x
 set -e
 
 # Copyright: Frans Pop <elendil@planet.nl>, 2007
@@ -257,6 +257,10 @@ retrieve_package() {
 	    incoming)
 		url="$INCOMING"
 		;;
+	    *)
+		echo "Internal error: undefined mirror type"
+		exit 1
+		;;
 	esac
 
 	package_list="$(wget -q $url -O - | \
@@ -264,7 +268,7 @@ retrieve_package() {
 		   grep "$BDEP_BINARY_BASE.*\.deb" | \
 		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" |
 		   sed "s/%2B/+/")"
-	if [ -z "$package_list" ]; then
+	if [ "$mirror_type" != incoming ] && [ -z "$package_list" ]; then
 		echo "Failed to retrieve available build dependencies"
 		exit 1
 	fi
