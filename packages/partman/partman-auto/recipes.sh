@@ -348,9 +348,10 @@ expand_scheme() {
     # Make factors small numbers so we can multiply on them.
     # Also ensure that fact, max and fs are valid
     # (Ofcourse in valid recipes they must be valid.)
-    # TODO: if factsum ever becomes zero, we'll crash. This happens when the
-    # whole recipe is used up and there's still disk space left to allocate.
     factsum=$(($(factor_sum) - $(min_size)))
+    if [ $factsum -eq 0 ]; then
+        factsum=100
+    fi
     scheme=$(
         foreach_partition '
             local min fact max fs
@@ -385,11 +386,20 @@ expand_scheme() {
                 fact=$2
                 max=$3
                 shift; shift; shift
-                newmin=$(($min + $unallocated * $fact / $factsum))
-                if [ $newmin -le $max ]; then
-                    echo $newmin $fact $max $*
+                if [ $factsum -eq 0 ]; then
+                    newmin=$min
+                    if [ $fact -lt 0 ]; then
+                        fact=0
+                    fi
                 else
+                    newmin=$(($min + $unallocated * $fact / $factsum))
+                fi
+                if [ $newmin -gt $max ]; then
                     echo $max 0 $max $*
+                elif [ $newmin -lt $min ]; then
+                    echo $min 0 $min $*
+                else
+                    echo $newmin $fact $max $*
                 fi'
         )
     done
