@@ -17,7 +17,8 @@ case $type in
 	;;
     swap)
         # Probably it's already swapped on.
-	if [ -f /proc/swaps ] && grep -q "^$fs " /proc/swaps; then
+	if [ -f /proc/swaps ] && \
+	   grep -q "^$(readlink -f "$fs") " /proc/swaps; then
 		echo "swapoff $fs"
 		exit 0
 	fi
