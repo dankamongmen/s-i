@@ -829,7 +829,7 @@ enable_swap () {
 	close_dialog
     done
     for path in $swaps; do
-	if ! grep -q "$path" /proc/swaps; then
+	if ! grep -q "^$(readlink -f "$path") " /proc/swaps; then
 	    swapon $path 2>/dev/null || true
 	fi
     done
