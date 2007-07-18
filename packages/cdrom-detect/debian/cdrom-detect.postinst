@@ -16,7 +16,7 @@ fail () {
 
 # Is a cdrom already mounted?  If so, assume it's the right one..
 mount | grep -q 'on /cdrom' && exit 0
-if [ -e /cdrom/.disk/info ] ; then
+if [ -e /cdrom/.disk/info ]; then
 	CDNAME=`cat /cdrom/.disk/info`
 	log "Detected CD '$CDNAME'"
 	exit 0
@@ -114,7 +114,7 @@ do
 	fi
 done
 
-if [ -e /cdrom/.disk/info ] ; then
+if [ -e /cdrom/.disk/info ]; then
 	CDNAME=`cat /cdrom/.disk/info`
 	log "Detected CD '$CDNAME'"
 else
@@ -141,9 +141,9 @@ db_progress STOP
 # Set the suite and codename used by base-installer and base-config
 # to the suite/codename that is on the CD. In case there are multiple
 # suites, prefer the one in default-release.
-for dir in /cdrom/dists/$(cat /etc/default-release) $(ls -1 /cdrom/dists/) ; do
+for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
 	relfile=/cdrom/dists/$dir/Release
-	if [ -e $relfile ] ; then
+	if [ -e $relfile ]; then
 		suite=$(sed -n 's/^Suite: *//p' $relfile)
 		codename=$(sed -n 's/^Codename: *//p' $relfile)
 		log "Detected CD with '$suite' ($codename) distribution"
@@ -154,7 +154,7 @@ for dir in /cdrom/dists/$(cat /etc/default-release) $(ls -1 /cdrom/dists/) ; do
 	fi
 done
 
-if [ -z "$suite" ] ; then
+if [ -z "$suite" ]; then
 	log "Error reading Release file; unable to determine distribution"
 	db_input critical cdrom-detect/no-release || [ $? -eq 30 ]
 	db_go
