@@ -142,13 +142,13 @@ db_progress STOP
 # to the suite/codename that is on the CD. In case there are multiple
 # suites, prefer the one in default-release.
 for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
-	relfile=/cdrom/dists/$dir/Release
+	relfile="/cdrom/dists/$dir/Release"
 	if [ -e $relfile ]; then
-		suite=$(sed -n 's/^Suite: *//p' $relfile)
-		codename=$(sed -n 's/^Codename: *//p' $relfile)
+		suite=$(sed -n 's/^Suite: *//p' "$relfile")
+		codename=$(sed -n 's/^Codename: *//p' "$relfile")
 		log "Detected CD with '$suite' ($codename) distribution"
-		db_set cdrom/suite $suite
-		db_set cdrom/codename $codename
+		db_set cdrom/suite "$suite"
+		db_set cdrom/codename "$codename"
 
 		break
 	fi
