@@ -140,12 +140,9 @@ db_progress STOP
 
 # Set the suite and codename used by base-installer and base-config
 # to the suite/codename that is on the CD. This assumes that there
-# will be no more than one distribution on the CD, and that one of
-# the testing, stable, or unstable links will point to it. Since the
-# CDs currently have many links, parse the Release file to get the
-# actual suite name to use.
-for distlink in stable testing unstable ; do
-	relfile=/cdrom/dists/$distlink/Release
+# will be no more than one distribution on the CD.
+for dir in $(ls -1 /cdrom/dists/) ; do
+	relfile=/cdrom/dists/$dir/Release
 	if [ -e $relfile ] ; then
 		suite=$(sed -n 's/^Suite: *//p' $relfile)
 		codename=$(sed -n 's/^Codename: *//p' $relfile)
