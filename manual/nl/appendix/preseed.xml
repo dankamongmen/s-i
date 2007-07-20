@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 47624 untranslated -->
+<!-- original version: 48487 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -330,12 +330,18 @@ during the configuration of the relevant package.
 
 </para><para>
 
+Normally, preseeding a question in this way will mean that the question will
+not be asked. To set a specific default value for a question, but still have
+the question asked, use <quote>?=</quote> instead of <quote>=</quote> as
+operator. See also <xref linkend="preseed-seenflag"/>.
+
+</para><para>
+
 Note that some variables that are frequently set at the boot prompt
 have a shorter alias. If an alias is available, it is used in the
-examples in this appendix instead of the full variable.  In
-particular, the <literal>preseed/url</literal> variable has been
-aliased as <literal>url</literal> and has some extra magic to allow
-shortened urls to be used. Another example is the <literal>tasks</literal>
+examples in this appendix instead of the full variable. The
+<literal>preseed/url</literal> variable for example has been aliased as
+<literal>url</literal>. Another example is the <literal>tasks</literal>
 alias, which translates to <literal>tasksel:tasksel/first</literal>.
 
 </para><para>
@@ -1071,6 +1077,12 @@ MD5 hash allows for brute force attacks.
 #d-i passwd/user-password-again password insecure
 # or encrypted using an MD5 hash.
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Create the first user with the specified UID instead of the default.
+#d-i passwd/user-uid string 1010<phrase condition="lenny">
+
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
 </screen></informalexample>
 
 <para>
@@ -1105,7 +1117,11 @@ installation. The only questions asked concern the installation of the kernel.
 
 <informalexample role="example"><screen>
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1378,10 +1394,11 @@ setting the parameter <classname>preseed/interactive=true</classname> at
 the boot prompt. This can also be useful for testing or debugging your
 preconfiguration file.
 
+</para><para>
+
 If you are preseeding using boot parameters, you can make the installer ask
 the corresponding question by using the <quote>?=</quote> operator, i.e.
 <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
-
 This will of course only have effect for parameters that correspond to
 questions that are actually displayed during an installation and not for
 <quote>internal</quote> parameters.
@@ -1418,7 +1435,7 @@ settings for certain configurations in other files.
 # More flexibly, this runs a shell command and if it outputs the names of
 # preconfiguration files, includes those files. 
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
