@@ -5,7 +5,7 @@
 
 mainlog=$logdir/main.log
 
-ALIOTH_MAN_PATH=/srv/alioth.debian.org/chroot/home/groups/d-i/htdocs/manual/
+ALIOTH_MAN_PATH=/srv/alioth.debian.org/chroot/home/groups/d-i/htdocs/manual
 
 usage() {
     if [ "$@" ]; then
@@ -408,10 +408,10 @@ if [ $NR_BUILDS -gt 0 ]; then
     cd $destination
 
     echo "rsyncing files to alioth..." >>$mainlog
-    rsync -qz --perms * alioth.debian.org\:$ALIOTH_MAN_PATH >>$mainlog 2>&1
+    rsync -qz --perms * alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
     # rsync subdirectories individually so we can also delete obsolete files
     for i in $(find . -type d | grep -v "^\.$"); do
-        rsync -qzr --perms --delete "$i" alioth.debian.org\:$ALIOTH_MAN_PATH >>$mainlog 2>&1
+        rsync -qzr --perms --delete "$i" alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
         checkfatal "$?" "rsync of '$i'"
     done
 else
