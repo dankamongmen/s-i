@@ -31,7 +31,8 @@ if [ -f $ROOT/do_not_build ] ; then
 fi
 
 # Only create mails for languages that were built
-for lang in $(egrep "Language .* - (full|partial) build:" $mainlog | cut -d " " -f 2); do
+for lang in $(egrep "Language .* - (full|partial) build:" $mainlog | \
+	      cut -d " " -f 2 | sort -u); do
     grepexp="^$lang[[:space:]]"
     mailaddress=$(egrep "$grepexp" $ROOT/bin/langlist | cut -f 8)
 
