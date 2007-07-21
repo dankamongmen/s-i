@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed.po\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-07-20 17:30+0000\n"
-"PO-Revision-Date: 2007-07-10 21:34+0400\n"
+"PO-Revision-Date: 2007-07-20 22:13+0400\n"
 "Last-Translator: D-R L10N Team <debian-l10n-russian@lists.debian.org>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -483,10 +483,14 @@ msgid ""
 "the question asked, use <quote>?=</quote> instead of <quote>=</quote> as "
 "operator. See also <xref linkend=\"preseed-seenflag\"/>."
 msgstr ""
+"Обычно, автоматизация ответов приводит к тому, что вопрос задан не будет. "
+"Чтобы установить для вопроса ответ по умолчанию и оставить вопрос "
+"задаваемым, используйте в качестве оператора <quote>?=</quote> вместо "
+"<quote>=</quote>. Смотрите также <xref linkend=\"preseed-seenflag\"/>."
 
 #. Tag: para
 #: preseed.xml:324
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Note that some variables that are frequently set at the boot prompt have a "
 "shorter alias. If an alias is available, it is used in the examples in this "
@@ -498,9 +502,8 @@ msgstr ""
 "Заметим, что для некоторых переменных, которые часто задаются в приглашении "
 "загрузчика, имеются короткие названия. Если имеется короткое название, то "
 "оно используется в примерах в этом приложении вместо полного имени "
-"переменной. В частности, переменная <literal>preseed/url</literal> "
-"сокращается до <literal>url</literal>, а также позволяет сократить другие "
-"указываемые url. Ещё пример: псевдоним <literal>tasks</literal>, который "
+"переменной. Например, переменная <literal>preseed/url</literal> сокращается "
+"до <literal>url</literal>. Ещё пример: псевдоним <literal>tasks</literal> "
 "раскрывается в <literal>tasksel:tasksel/first</literal>."
 
 #. Tag: para
@@ -1900,7 +1903,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:852
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1935,7 +1938,7 @@ msgstr ""
 "# Или же пропустить создание обычной учётной записи пользователя.\n"
 "#d-i passwd/make-user boolean false\n"
 "\n"
-"# Пароль суперпользователя, или открытым текстом\n"
+"# Пароль суперпользователя, любой открытым текстом\n"
 "#d-i passwd/root-password password r00tme\n"
 "#d-i passwd/root-password-again password r00tme\n"
 "# или в виде MD5 хеша.\n"
@@ -1948,8 +1951,10 @@ msgstr ""
 "#d-i passwd/user-password password insecure\n"
 "#d-i passwd/user-password-again password insecure\n"
 "# или в виде MD5 хеша.\n"
-"#d-i passwd/user-password-crypted password [MD5 хеш]<phrase condition=\"lenny"
-"\">\n"
+"#d-i passwd/user-password-crypted password [MD5 хеш]\n"
+"# Создать первую учётную запись с заданным UID вместо значения по\n"
+"# умолчанию.\n"
+"#d-i passwd/user-uid string 1010<phrase condition=\"lenny\">\n"
 "\n"
 "# Учётная запись будет добавлена в несколько стандартных начальных групп.\n"
 "# Чтобы это изменить -- отредактируйте и раскомментируйте строчку ниже.\n"
@@ -2500,7 +2505,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:1021
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
 "question, but still have the question asked. To do this the <firstterm>seen</"
@@ -2520,19 +2525,13 @@ msgstr ""
 "d-i foo/bar string value\n"
 "d-i foo/bar seen false\n"
 "</screen></informalexample> Того же эффекта можно достигнуть для "
-"<emphasis>всех</emphasis> вопросов, установив параметр <classname>preseed/"
+"<emphasis>всех</emphasis> вопросов, указав параметр <classname>preseed/"
 "interactive=true</classname> в приглашении к загрузке. Также это может "
-"помочь при отладке или тестировании вашего файла ответов. Если вы выполняете "
-"автоматизацию через параметры загрузки, то вы можете заставить программу "
-"установки задавать соответствующий вопрос с помощью оператора <quote>?=</"
-"quote>, а именно <userinput><replaceable>foo</replaceable>/<replaceable>bar</"
-"replaceable>?=<replaceable>value</replaceable></userinput>. Естественно, это "
-"действует только на параметры, которые относятся к отображаемым во время "
-"установки вопросам, но никак не на <quote>внутренние</quote> параметры."
+"помочь при отладке или тестировании вашего файла ответов."
 
 #. Tag: para
 #: preseed.xml:1035
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
 "the corresponding question by using the <quote>?=</quote> operator, i.e. "
@@ -2542,22 +2541,13 @@ msgid ""
 "displayed during an installation and not for <quote>internal</quote> "
 "parameters."
 msgstr ""
-"С помощью автоматической установки можно изменить ответы по умолчанию, но "
-"вопросы всё равно будут задаваться. Для этого после задания ответа на вопрос "
-"нужно установить флаг <firstterm>seen</firstterm> в <quote>false</quote> "
-"после указания ответа на вопрос. <informalexample><screen>\n"
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false\n"
-"</screen></informalexample> Того же эффекта можно достигнуть для "
-"<emphasis>всех</emphasis> вопросов, установив параметр <classname>preseed/"
-"interactive=true</classname> в приглашении к загрузке. Также это может "
-"помочь при отладке или тестировании вашего файла ответов. Если вы выполняете "
-"автоматизацию через параметры загрузки, то вы можете заставить программу "
-"установки задавать соответствующий вопрос с помощью оператора <quote>?=</"
-"quote>, а именно <userinput><replaceable>foo</replaceable>/<replaceable>bar</"
-"replaceable>?=<replaceable>value</replaceable></userinput>. Естественно, это "
-"действует только на параметры, которые относятся к отображаемым во время "
-"установки вопросам, но никак не на <quote>внутренние</quote> параметры."
+"Если вы выполняете автоматизацию через параметры загрузки, то можете "
+"заставить программу установки задавать соответствующий вопрос с помощью "
+"оператора <quote>?=</quote>, а именно <userinput><replaceable>foo</"
+"replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</"
+"replaceable></userinput>. Естественно, это действует только на параметры, "
+"которые относятся к отображаемым во время установки вопросам, но никак не на "
+"<quote>внутренние</quote> параметры."
 
 #. Tag: title
 #: preseed.xml:1050
@@ -2583,7 +2573,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1061
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -2624,7 +2614,7 @@ msgstr ""
 "# Для большей гибкости можно запустить команду оболочки и если она выдаст\n"
 "# имена файлов ответов, включить эти файлы. \n"
 "#d-i preseed/include_command \\\n"
-"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"#      string if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
 "\n"
 "# Наиболее гибкий из всех способ -- загрузить и выполнить программу.\n"
 "# Программа может использовать команды, например, debconf-set для\n"
