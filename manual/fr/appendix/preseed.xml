@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 47624 -->
+<!-- original version: 48487 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -318,11 +318,17 @@ de la variable&nbsp;:
 Si vous n'indiquez pas de propriétaire, la valeur de la variable ne sera pas copiée
 dans la base de données debconf du système cible et ne sera pas utilisée pendant la
 configuration des paquets.
-</para><para>
-
+</para>
+<para>
+Préconfigurer une question de cette manière signifie que la question ne
+sera pas posée. Si l'on veut à la fois donner une valeur par défaut et poser la
+question, il faut utiliser l'opérateur <quote>?=</quote> au lieu de <quote>=</quote>.
+Voyez <xref linkend="preseed-seenflag"/>.
+</para>
+<para>
 Certaines des variables qui sont fréquemment définies à l'invite du démarrage
 possèdent des alias plus courts. Quand un alias est disponible, les exemples de
-cette annexe l'utilise au lieu de la variable complète. En particulier, la variable
+cette annexe l'utilise au lieu de la variable complète. Ainsi la variable
 <literal>preseed/url</literal> possède l'alias <literal>url</literal> et elle permet
 de raccourcir les URL à utiliser. Un autre exemple est l'alias <literal>tasks</literal>,
 qui représente <literal>tasksel:tasksel/first</literal>.
@@ -1042,6 +1048,12 @@ car un accès au hachage MD5 permet les attaques en force.
 #d-i passwd/user-password-again password insecure
 # ... ou chiffré avec un hachage MD5
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Préciser l'UID du premier utilisateur.
+#d-i passwd/user-uid string 1010<phrase condition="lenny">
+
+# Le compte sera ajouté à certains groupes. Pour contrôler ces groupes,
+# utilisez cette ligne par exemple :
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
 </screen></informalexample>
 
 <para>
@@ -1076,7 +1088,11 @@ Les seules questions posées concernent l'installation du noyau.
 
 <informalexample role="example"><screen>
 # Choix du générateur initramfs pour créer l'initrd des noyaux 2.6.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+
+# Version du noyau à installer (nom du paquet). Utilisez <emphasis>none</emphasis> si vous ne voulez pas
+# installer de noyau.
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1339,12 +1355,12 @@ Il suffit de déclarer le paramètre <classname>preseed/interactive=true</classnam
 au moment de l'amorçage pour obtenir le même effet pour  
 <emphasis>toutes</emphasis> les questions. Cela peut servir à tester le fichier de
 préconfiguration.
-
+</para>
+<para>
 Si vous utilisez les paramètres d'amorçage pour la préconfiguration,
 l'opérateur <quote>?=</quote> demande à l'installateur de poser la question
 correspondante, c'est-à-dire,
 <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valeur</replaceable></userinput>.
-
 Cela n'aura un effet que sur les paramètres qui correspondent à des questions qui
 sont réellement affichées pendant l'installation et non pas sur les
 paramètres <quote>internes</quote>.
@@ -1378,7 +1394,7 @@ un autre fichier.
 # D'une manière plus souple, cela exécute des commandes du shell et si le 
 # résultat donne les noms de ces fichiers, ils sont inclus. 
 #d-i preseed/include_command string \
-#   string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Plus encore, cela télécharge un programme et l'exécute. Le programme peut
 # utiliser des commandes comme debconf-set pour manipuler la base de données de debconf.
