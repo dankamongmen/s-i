@@ -166,6 +166,10 @@ log() {
 	echo "$@" >>$LOGFILE
 }
 
+clean_arch_tmp() {
+	[ "$NO_CLEAN" ] || rm -rf $ARCH_TDIR
+}
+
 clean_arch() {
 	# Remove from both dirs to also clean manual or failed builds
 	rm -f ./$UBASE-$arch-2.6_*.*
@@ -215,6 +219,7 @@ as the previous version is already marked as released.
 Did you want to do a rebuild without the --dch option or did you forget to
 provide a reason for the rebuild using the -m option?
 EOF
+		clean_arch_tmp
 		exit 1
 	fi
 
@@ -259,6 +264,7 @@ select_source() {
 		;;
 	    *)
 		echo "Unsupported build-dependency '$1'"
+		clean_arch_tmp
 		exit 1
 		;;
 	esac
@@ -266,6 +272,7 @@ select_source() {
 	BDEP_SVERSION=$(grep "^$BDEP_SOURCE[[:space:]]" ../massbuild.versions | awk '{print $2}')
 	if [ -z "$BDEP_SVERSION" ]; then
 		echo "Could not determine desired version for $bdep"
+		clean_arch_tmp
 		exit 1
 	fi
 }
@@ -306,6 +313,7 @@ retrieve_package() {
 		;;
 	    *)
 		echo "Internal error: undefined mirror type"
+		clean_arch_tmp
 		exit 1
 		;;
 	esac
@@ -317,6 +325,7 @@ retrieve_package() {
 		   sed "s/%2B/+/")"
 	if [ "$mirror_type" != incoming ] && [ -z "$package_list" ]; then
 		echo "Failed to retrieve available build dependencies"
+		clean_arch_tmp
 		exit 1
 	fi
 
@@ -512,7 +521,7 @@ for uarch in $UARCHES; do
 			log "* Skipping architecture $arch"
 		fi
 
-		[ "$NO_CLEAN" ] || rm -rf $ARCH_TDIR
+		clean_arch_tmp
 		cd ..
 	done
 done
