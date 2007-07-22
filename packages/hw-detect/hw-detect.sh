@@ -369,8 +369,9 @@ if [ "$PCMCIA_INIT" ]; then
 		db_input medium hw-detect/start_pcmcia || true
 		db_input low hw-detect/pcmcia_resources || true
 		db_go || true
-		db_get hw-detect/pcmcia_resources || true
-		apply_pcmcia_resource_opts $RET
+		if db_get hw-detect/pcmcia_resources && [ "$RET" ]; then
+			apply_pcmcia_resource_opts $RET
+		fi
 	fi
 	if db_go && db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
 		db_progress INFO hw-detect/pcmcia_step
