@@ -41,9 +41,30 @@ usage() {
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild -k --dch [-m <extra changelog entry>] [-d <distribution>][--incoming] [<architecture> ...]"
+	echo "Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]"
 	echo "       $(basename $0) krelease|mrelease [<architecture> ...]"
 	echo "       $(basename $0) kclean|mclean [<architecture> ...]"
+	echo
+	echo "Operations starting with 'k' act on linux-kernel-* source packages;"
+	echo "those starting with 'm' on linux-module-* packages:"
+	echo " - build:   retrieve dependencies and build the udebs"
+	echo " - release: show changes; after confirmation call 'debcommit --release'"
+	echo " - clean:   remove built and temporary files"
+	echo
+	echo "If no architecture is specified, an operation will be performed for all"
+	echo "official architectures."
+	echo
+	echo "Options for 'kbuild' and 'mbuild' operations:"
+	echo " -k            keep the temporary files (incl. downloaded dependencies) used"
+	echo "               during the build; useful for repeated builds when making"
+	echo "               changes to udeb contents or solving build errors"
+	echo " --dch         update changelog; automatically adds new entry (if needed)"
+	echo "               and a line describing updates in dependencies used"
+	echo " -m <extra changelog entry>"
+	echo "               add additional lines in changelog; implies --dch"
+	echo " -d <distribution>"
+	echo "               set named target distribution in changelog"
+	echo " --incoming    also check 'incoming' for dependencies"
 	exit 1
 }
 
@@ -56,6 +77,8 @@ list_arches() {
 	done
 }
 
+[ "$1" ] || usage "operation not specified"
+
 ## Parse command line arguments
 OPERATION="$1"
 shift
@@ -66,11 +89,10 @@ case "$OPERATION" in
     mbuild|mrelease|mclean)
 	TYPE=modules
 	;;
-    "")
-	usage "operation not specified" ;;
     *)
 	usage "unrecognized operation" ;;
 esac
+
 UBASE=linux-$TYPE-di
 OUTDIR=massbuild.out.$TYPE
 
