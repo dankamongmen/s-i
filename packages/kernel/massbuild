@@ -41,30 +41,32 @@ usage() {
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]"
-	echo "       $(basename $0) krelease|mrelease [<architecture> ...]"
-	echo "       $(basename $0) kclean|mclean [<architecture> ...]"
-	echo
-	echo "Operations starting with 'k' act on linux-kernel-* source packages;"
-	echo "those starting with 'm' on linux-module-* packages:"
-	echo " - build:   retrieve dependencies and build the udebs"
-	echo " - release: show changes; after confirmation call 'debcommit --release'"
-	echo " - clean:   remove built and temporary files"
-	echo
-	echo "If no architecture is specified, an operation will be performed for all"
-	echo "official architectures."
-	echo
-	echo "Options for 'kbuild' and 'mbuild' operations:"
-	echo " -k            keep the temporary files (incl. downloaded dependencies) used"
-	echo "               during the build; useful for repeated builds when making"
-	echo "               changes to udeb contents or solving build errors"
-	echo " --dch         update changelog; automatically adds new entry (if needed)"
-	echo "               and a line describing updates in dependencies used"
-	echo " -m <extra changelog entry>"
-	echo "               add additional lines in changelog; implies --dch"
-	echo " -d <distribution>"
-	echo "               set named target distribution in changelog"
-	echo " --incoming    also check 'incoming' for dependencies"
+	cat <<EOF
+Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]"
+       $(basename $0) krelease|mrelease [<architecture> ...]"
+       $(basename $0) kclean|mclean [<architecture> ...]"
+
+Operations starting with 'k' act on linux-kernel-* source packages;"
+those starting with 'm' on linux-module-* packages:"
+ - build:   retrieve dependencies and build the udebs"
+ - release: show changes; after confirmation call 'debcommit --release'"
+ - clean:   remove built and temporary files"
+
+If no architecture is specified, an operation will be performed for all"
+official architectures."
+
+Options for 'kbuild' and 'mbuild' operations:"
+ -k            keep the temporary files (incl. downloaded dependencies) used"
+               during the build; useful for repeated builds when making"
+               changes to udeb contents or solving build errors"
+ --dch         update changelog; automatically adds new entry (if needed)"
+               and a line describing updates in dependencies used"
+ -m <extra changelog entry>"
+               add additional lines in changelog; implies --dch"
+ -d <distribution>"
+               set named target distribution in changelog"
+ --incoming    also check 'incoming' for dependencies"
+EOF
 	exit 1
 }
 
@@ -204,14 +206,15 @@ do_dch() {
 	done
 	# Sanity check
 	if ! head -n 1 debian/changelog | grep -q UNRELEASED && [ -z "$new_entry" ]; then
-		echo
-		echo "Error: no new changelog entries were added, which most likely means"
-		echo "that there has been an earlier build against the same version of"
-		echo "the packages this component depends on. Not having a new changelog"
-		echo "entry cannot be correct as the previous version is already marked"
-		echo "as released."
-		echo "Did you want to do a rebuild without the --dch option or did you"
-		echo "forget to provide a reason for the rebuild using the -m option?"
+		cat <<EOF
+
+Error: no new changelog entries were added, which most likely means there
+has been an earlier build against the same version of the packages this
+component depends on. Not having a new changelog entry cannot be correct
+as the previous version is already marked as released.
+Did you want to do a rebuild without the --dch option or did you forget to
+provide a reason for the rebuild using the -m option?
+EOF
 		exit 1
 	fi
 
@@ -434,17 +437,23 @@ if [ -z "$no_cross" ] && ! dpkg -l dpkg-cross | grep -q "^ii"; then
 fi
 
 
-echo "This script will build kernel udebs from source packages of a specific"
-echo "version either for all architectures or a specific architecture."
-echo "Make sure you have updated 'massbuild.versions' before continuing."
+cat <<EOF
+This script will build kernel udebs from source packages of a specific
+version either for all architectures or a specific architecture.
+Make sure you have updated 'massbuild.versions' before continuing.
+EOF
 if [ "$no_cross" ]; then
-	echo "NOTE: Uploads of kernel/module udebs should only be done by a porter"
-	echo "      for that architecture, or after checking with the D-I release"
-	echo "      manager."
+	cat <<EOF
+NOTE: Uploads of kernel/module udebs should only be done by a porter
+      for that architecture, or after checking with the D-I release
+      manager.
+EOF
 else
-	echo "NOTE: This script should only be used to build and upload kernel/module"
-	echo "      udebs for multiple architectures after checking with the D-I"
-	echo "      release manager."
+	cat <<EOF
+NOTE: This script should only be used to build and upload kernel/module
+      udebs for multiple architectures after checking with the D-I
+      release manager.
+EOF
 fi
 read -n 1 -s -p "Do you wish to continue [yN]? " reply
 echo
