@@ -16,7 +16,7 @@ OPERATION=""
 BDEP_SVERSION=""
 ARCHES=""
 USE_INCOMING=""
-DO_CLEAN=""
+NO_CLEAN=""
 DO_DCH=""
 CHANGELOG_EXTRA=""
 DISTRIBUTION=""
@@ -41,7 +41,7 @@ usage() {
 		echo "Error: $@"
 		echo
 	fi
-	echo "Usage: $(basename $0) kbuild|mbuild --dch [-m <extra changelog entry>] [-d <distribution>][--incoming] [<architecture> ...]"
+	echo "Usage: $(basename $0) kbuild|mbuild -k --dch [-m <extra changelog entry>] [-d <distribution>][--incoming] [<architecture> ...]"
 	echo "       $(basename $0) krelease|mrelease [<architecture> ...]"
 	echo "       $(basename $0) kclean|mclean [<architecture> ...]"
 	exit 1
@@ -78,6 +78,9 @@ while true; do
 	case "$1" in
 	    "")
 		break ;;
+	    -k)
+		NO_CLEAN=1
+		;;
 	    --dch)
 		DO_DCH=1
 		;;
@@ -247,7 +250,26 @@ retrieve_package() {
 	local package_list
 	local url
 
+	# HACK ALERT
+	# The binary packages for linux-modules-extra have a different
+	# version than their source package.
+	# The version of the module's source package is inserted between the
+	# "upstream" part of the version and the "Debian" revision.
+	local sv_base=${BDEP_SVERSION%-*}
+	local sv_rev=${BDEP_SVERSION##*-}
+	local sv_regexp="_${sv_base}([^_]*)?-${sv_rev}_"
+
 	case $mirror_type in
+	    disk)
+		PACKAGE="$(ls -1 $ARCH_TDIR/ | \
+			   egrep "${build_dep}${sv_regexp}${kv_arch}\.deb")"
+		if [ "$PACKAGE" ]; then
+			log "  Using already available $PACKAGE"
+			return 0
+		else
+			return 1
+		fi
+		;;
 	    local)
 		url="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
 		;;
@@ -279,14 +301,7 @@ retrieve_package() {
 		return 1
 	fi
 
-	# HACK ALERT
-	# The binary packages for linux-modules-extra have a different
-	# version than their source package.
-	# The version of the module's source package is inserted between the
-	# "upstream" part of the version and the "Debian" revision.
-	sv_base=${BDEP_SVERSION%-*}
-	sv_rev=${BDEP_SVERSION##*-}
-	PACKAGE="$(echo "$package_list" | egrep "_${sv_base}([^_]*)?-${sv_rev}_")"
+	PACKAGE="$(echo "$package_list" | egrep "$sv_regexp")"
 	if [ -z "$PACKAGE" ]; then
 		log "  * version $BDEP_SVERSION of $BDEP_SOURCE for $kv_arch seems unavailable in $mirror_type"
 		return 1
@@ -300,6 +315,8 @@ retrieve_package() {
 }
 
 get_depends() {
+	rm -rf $ARCH_TDIR/lib $ARCH_TDIR/usr
+
 	cat kernel-versions | egrep "^$1[[:space:]]" | \
 	    while read kv_arch version flavour installedname suffix build_deps; do
 		build_deps="$(echo $build_deps | sed "s/ ([^)]*)//" | \
@@ -308,7 +325,9 @@ get_depends() {
 			select_source $build_dep
 
 			# exit on errors as we're in a subshell!
-			if [ "$LMIRROR" ] && retrieve_package local; then
+			if retrieve_package disk; then
+				:
+			elif [ "$LMIRROR" ] && retrieve_package local; then
 				:
 			elif retrieve_package pool; then
 				:
@@ -362,6 +381,7 @@ case $OPERATION in
     kclean|mclean)
 	for arch in $ARCHES; do
 		log "Cleaning files for $arch..."
+		rm -rf ./$arch
 		clean_arch $arch
 	done
 	rmdir ./$OUTDIR 2>/dev/null || true
@@ -443,8 +463,7 @@ for uarch in $UARCHES; do
 
 		cd $USOURCE
 		ARCH_TDIR=../$arch
-		rm -rf $ARCH_TDIR
-		mkdir $ARCH_TDIR
+		mkdir -p $ARCH_TDIR
 
 		log "  Retrieving and extracting dependencies..."
 		if get_depends $arch; then
@@ -462,7 +481,7 @@ for uarch in $UARCHES; do
 			log "* Skipping architecture $arch"
 		fi
 
-		rm -rf $ARCH_TDIR
+		[ "$NO_CLEAN" ] || rm -rf $ARCH_TDIR
 		cd ..
 	done
 done
