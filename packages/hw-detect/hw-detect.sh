@@ -367,7 +367,7 @@ fi
 if [ "$PCMCIA_INIT" ]; then
 	if is_not_loaded pcmcia_core; then
 		db_input medium hw-detect/start_pcmcia || true
-		db_input medium hw-detect/pcmcia_resources || true
+		db_input low hw-detect/pcmcia_resources || true
 		db_go || true
 		db_get hw-detect/pcmcia_resources || true
 		apply_pcmcia_resource_opts $RET
