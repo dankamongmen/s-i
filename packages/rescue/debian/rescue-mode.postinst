@@ -37,27 +37,28 @@ do_cryptsetup () {
 	dev="$1"
 	pass_ok=0
 	cryptdev="${dev##*/}_crypt"
-	while [ $pass_ok -eq 0 ]; do
-		pass="$(get_passphrase)" || return 1
-		if [ -z "$pass" ]; then
-			return 1
-		fi
-		echo -n "$pass" | log-output -t rescue \
-			cryptsetup -d - luksOpen "$dev" "$cryptdev" && pass_ok=1
-	done
+	if ! cryptsetup status "$cryptdev" > /dev/null; then
+		while [ $pass_ok -eq 0 ]; do
+			pass="$(get_passphrase)" || return 1
+			if [ -z "$pass" ]; then
+				return 1
+			fi
+			echo -n "$pass" | log-output -t rescue \
+				cryptsetup -d - luksOpen "$dev" "$cryptdev" &&
+				pass_ok=1
+		done
+	fi
+	CRYPTPARTS="${CRYPTPARTS:+$CRYPTPARTS,}/dev/mapper/$cryptdev"
 }
 
 activate_encrypted_partitions () {
-	local found pass_ok
-
-	found=0
 	for dev in $(list-devices partition); do
 		if cryptsetup isLuks "$dev" 2> /dev/null; then
-			do_cryptsetup "$dev" && found=1
+			do_cryptsetup "$dev"
 		fi
 	done
 	
-	if [ $found -eq 0 ]; then
+	if [ -z "$CRYPTPARTS" ]; then
 		return 1
 	fi
 	try_load_module aes
@@ -91,6 +92,7 @@ try_load_module lvm-mod
 scan_lvm
 
 # Crypto support
+CRYPTPARTS=
 if activate_encrypted_partitions; then
 	# Scan for LVM partitions again as we just added encrypted volumes
 	scan_lvm
@@ -115,6 +117,10 @@ trap umount_all EXIT HUP INT QUIT TERM
 choose_root () {
 	PARTITIONS="$(list-devices partition | sort | \
 		tr '\n' , | sed 's/,$//; s/,/, /g')"
+
+	if [ "$CRYPTPARTS" ]; then
+		PARTITIONS="${PARTITIONS:+$PARTITIONS, }$CRYPTPARTS"
+	fi
 
 	if lvdisplay -c | cut -d: -f4 | grep 0 >/dev/null; then
 		# Some unavailable logical volumes; activate them
