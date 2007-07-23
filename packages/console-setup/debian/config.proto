@@ -924,19 +924,21 @@ case "$locale" in
 	;;
 esac
 
-if which locale >/dev/null; then
+if \
+    [ -d /lib/debian-installer ] \
+    && db_get debian-installer/charmap \
+    && [ "$RET" ]
+then
+    default_charmap="$RET"
+elif [ "$locale" = C ]; then
+    default_charmap=UTF-8
+    charmap_priority=high
+elif which locale >/dev/null; then
     default_charmap=`locale charmap`
-# TODO: Let localechooser provides information about the charmap
-#       Untill then we will ask.
-# elif [ -d /lib/debian-installer ]; then
-#     default_charmap=UTF-8
 else
     default_charmap=unknown
 fi
-if [ "$locale" = C ]; then
-    default_charmap=UTF-8
-    charmap_priority=high
-elif echo "$charmaps" | grep "$default_charmap" >/dev/null; then
+if echo "$charmaps" | grep "$default_charmap" >/dev/null; then
     charmap_priority=low
 else
     default_charmap=UTF-8
