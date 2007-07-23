@@ -1,7 +1,12 @@
 #!/bin/sh
 
-. /usr/share/debconf/confmodule
 . /lib/partman/definitions.sh
+
+# Only run the first time
+if [ -f /var/lib/partman/initial_auto ]; then
+	exit 0
+fi
+
 . /lib/partman/auto-shared.sh
 
 dev_to_partman () {
@@ -30,10 +35,6 @@ if [ -z "$(get_auto_disks)" ] || \
 	exit 0
 fi
 
-# Only run the first time
-if [ -f /var/lib/partman/initial_auto ]; then
-	exit 0
-fi
 [ -d /var/lib/partman ] || mkdir /var/lib/partman
 touch /var/lib/partman/initial_auto
 
