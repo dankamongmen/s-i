@@ -120,11 +120,11 @@ while [ $code = 99 ]; do
 	ask_user /lib/partman/automatically_partition 
 	code=$?
 done
-if [ $code -gt 0 -a $code -lt 100 ]; then
-	rm -f /var/lib/partman/initial_auto # try again
-fi
 if [ $code -eq 255 ]; then
 	code=99 # do not back up to main menu, restart partman instead
+fi
+if [ $code -gt 0 -a $code -lt 100 ]; then
+	rm -f /var/lib/partman/initial_auto # try again
 fi
 echo "partman-auto/automatically_partition" > /lib/partman/automatically_partition/question
 exit $code
