@@ -24,22 +24,11 @@ basename () {
 	echo "${x##*/}"
 }
 
-can_escape () {
-	type debconf-escape >/dev/null 2>&1 || return 1
-	db_capb backup
-	for cap in $RET; do
-		case $cap in
-			escape)	return 0 ;;
-		esac
-	done
-	return 1
-}
-
 maybe_escape () {
 	local code saveret
 	text="$1"
 	shift
-	if can_escape; then
+	if [ "$can_escape" ]; then
 		db_capb backup escape
 		code=0
 		"$@" "$(printf '%s' "$text" | debconf-escape -e)" || code=$?
