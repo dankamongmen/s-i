@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45612 -->
+<!-- original version: 48636 -->
 
 
 <!--
@@ -126,7 +126,7 @@ usati con i vari metodi d'installazione.
   <entry>no</entry>
   <entry><!-- yes -->sì</entry>
 </row><row>
-  <entry>hd-media <phrase condition="bootable-usb"><!-- (including usb-stick) -->(comprese penne usb)</phrase></entry>
+  <entry>hd-media <phrase condition="bootable-usb"><!-- (including usb-stick) -->(comprese le chiavette USB)</phrase></entry>
   <entry><!-- yes -->sì</entry>
   <entry><!-- yes -->sì</entry>
   <entry><!-- yes -->sì<footnoteref linkend='apx-ps-net'/></entry>
@@ -555,22 +555,33 @@ usato durante la successiva configurazione del relativo pacchetto.
 </para><para>
 
 <!--
+Normally, preseeding a question in this way will mean that the question will
+not be asked. To set a specific default value for a question, but still have
+the question asked, use <quote>?=</quote> instead of <quote>=</quote> as
+operator. See also <xref linkend="preseed-seenflag"/>.
+-->
+
+Normalmente una domanda preconfigurata non viene posta. Per impostare la
+risposta predefinita a una domanda e far in modo che la domanda sia comunque
+posta, usare l'operatore <quote>?=</quote> al posto di <quote>=</quote>. Si
+veda <xref linkend="preseed-seenflag"/>.
+
+</para><para>
+
+<!--
 Note that some variables that are frequently set at the boot prompt
 have a shorter alias. If an alias is available, it is used in the
-examples in this appendix instead of the full variable.  In
-particular, the <literal>preseed/url</literal> variable has been
-aliased as <literal>url</literal> and has some extra magic to allow
-shortened urls to be used. Another example is the <literal>tasks</literal>
+examples in this appendix instead of the full variable. The
+<literal>preseed/url</literal> variable for example has been aliased as
+<literal>url</literal>. Another example is the <literal>tasks</literal>
 alias, which translates to <literal>tasksel:tasksel/first</literal>.
 -->
 
 Alcune delle variabili che più frequentemente sono impostate dal prompt
 boot dispongono di un'abbreviazione. Negli esempi contenuti in questa
-appendice è usata, quando disponibile, l'abbrevazione al posto della
-variabile completa. In particolare alla variabile
-<literal>preseed/url</literal> è stato assegnato l'alias
-<literal>url</literal> e consente l'uso di alcuni trucchi che permettono
-di accorciare le url da utilizzare. Un altro esempio è l'alias
+appendice è usata, quando disponibile, l'abbreviazione al posto della
+variabile completa. Per esempio alla variabile <literal>preseed/url</literal>
+è stato assegnato l'alias <literal>url</literal>. Un altro esempio è l'alias
 <literal>tasks</literal> che viene tradotto in
 <literal>tasksel:tasksel/first</literal>.
 
@@ -586,7 +597,7 @@ out any options (like preconfiguration options) that it recognizes.
 
 L'uso di <quote>--</quote> nelle opzioni d'avvio ha un significato speciale,
 i parametri del kernel che seguono l'ultimo <quote>--</quote> potrebbero
-essere copiati nella configuarazione del bootloader nel sistema installato
+essere copiati nella configurazione del bootloader nel sistema installato
 (solo se il boot loader è supportato dall'installatore). L'installatore
 filtra qualsiasi opzione (come le opzioni di preconfigurazione) che riesce
 a riconoscere.
@@ -728,7 +739,7 @@ element it will be anchored to the start of the path (i.e. the third
 support from the local network infrastructure:
 -->
 
-Se non esite un'infrastruttura DHCP o DNS locale oppure se non si vuole
+Se non esiste un'infrastruttura DHCP o DNS locale oppure se non si vuole
 usare il percorso predefinito per il file <filename>preseed.cfg</filename>,
 è comunque possibile usare una URL esplicita oppure, quando non si usa
 l'elemento <literal>/./</literal>, viene ancorata al punto di partenza del
@@ -1004,7 +1015,7 @@ a line in a preconfiguration file is:
 -->
 
 Il file di preconfigurazione ha lo stesso formato utilizzato dal comando
-<command>debconf-set-selections</command>. Il fomato generico di una riga
+<command>debconf-set-selections</command>. Il formato generico di una riga
 del file di preconfigurazione è:
 
 <!--
@@ -1269,7 +1280,7 @@ essere una valida per l'architettura della tastiera scelta.
 d-i console-keymaps-at/keymap select us
 <!--
 # Example for a different keyboard architecture
---># Esempio con una diversa architettura della tastriera
+--># Esempio con una diversa architettura della tastiera
 #d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
 
@@ -1487,10 +1498,11 @@ initrd per il metodo d'installazione scelto. Il valore predefinito per
 <!--
 # If you select ftp, the mirror/country string does not need to be set.
 --># Quando si seleziona ftp non è necessario impostare mirror/country.
-#d-i mirror/protocol string ftp
+#d-i mirror/protocol string ftp<phrase condition="etch">
 <!--
 d-i mirror/country string enter information manually
--->d-i mirror/country string inserire manualmente le informazioni
+-->d-i mirror/country string inserire manualmente le informazioni</phrase><phrase condition="lenny">
+d-i mirror/country string manual</phrase>
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -1558,14 +1570,23 @@ preconfigurazione.
 #      select Guidato - usare il più ampio spazio contiguo disponibile.
 
 <!--
-# Alternatively, you can specify a disk to partition. The device name
+<phrase condition="etch"># Alternatively, you can specify a disk to partition. The device name
 # can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
---># In alternativa è possibile specificare un disco da partizionare. Il nome
-# del dispositivo può essere dato sia nel formato devfs che nel tradizionale
-# formato non-devfs.
+--><phrase condition="etch"># In alternativa è possibile specificare un disco da partizionare. Il nome
+# del dispositivo può essere dato sia nel formato devfs che nel
+# tradizionale formato non-devfs.
 # Per esempio, per usare il primo disco:
-d-i partman-auto/disk string /dev/discs/disc0/disc
+d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
+<!--
+# Alternatively, you can specify a disk to partition. The device name must
+# be given in traditional non-devfs format.
+# For example, to use the first SCSI/SATA hard disk:
+--># In alternativa è possibile specificare un disco da partizionare.
+# Il nome del dispositivo deve essere dato nel tradizionale formato
+# non-devfs.
+# Per esempio, per usare il primo disco SCSI/SATA:
+d-i partman-auto/disk string /dev/sda</phrase>
 <!--
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
@@ -1792,75 +1813,16 @@ d-i clock-setup/utc boolean true
 # /usr/share/zoneinfo/ for valid values.
 --># Questo può essere impostato con qualsiasi valore valido per $TZ; si
 # consulti /usr/share/zoneinfo/ per i valori validi.
-d-i time/zone string US/Eastern
-</screen></informalexample>
-  </sect2>
-
-  <sect2 id="preseed-apt">
-  <!-- <title>Apt setup</title> -->
-  <title>Impostazione di APT</title>
-<para>
+d-i time/zone string US/Eastern<phrase condition="lenny">
 
 <!--
-Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
-options is fully automated based on your installation method and answers to
-earlier questions. You can optionally add other (local) repositories.
--->
-
-L'impostazione di <filename>/etc/apt/sources.list</filename> e la
-configurazione delle opzioni di base è completamente automatizzata in base
-al metodo d'installazione e alle risposte date in precedenza. È possibile
-aggiungere altri repository (anche locali).
-
-</para>
-
-<informalexample role="example"><screen>
+# Controls whether to use NTP to set the clock during the install
+--># Determina se usare NTP per impostare l'orologio durante l'installazione
+d-i clock-setup/ntp boolean true
 <!--
-# You can choose to install non-free and contrib software.
---># È possibile scegliere di installare software non-free e contrib.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-<!--
-# Uncomment this if you don't want to use a network mirror.
---># Togliere il commento alla prossima riga se non si vuole usare
-# un mirror.
-#d-i apt-setup/use_mirror boolean false
-<!--
-# Uncomment this to avoid adding security sources, or
-# add a hostname to use a different server than security.debian.org.
---># Togliere il commento alla prossima riga per evitare l'inserimento
-# delle sorgenti per la sicurezza oppure per usare un server diverso da
-# security.debian.org.
-#d-i apt-setup/security_host string
-
-<!--
-# Additional repositories, local[0-9] available
---># Altri repository, sono disponibili local[0-9]
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-<!--
-# Enable deb-src lines
---># Abilita le righe deb-src
-#d-i apt-setup/local0/source boolean true
-<!--
-# URL to the public key of the local repository; you must provide a key or
-# apt will complain about the unauthenticated repository and so the
-# sources.list line will be left commented out
---># URL alla chiave pubblica del repository locale; è necessario fornire
-# una chiave altrimenti apt si lamenta perché il repository non è
-# autenticato e che quindi non dovrebbe essere usato (commentandolo in
-# sources.list)
-#d-i apt-setup/local0/key string http://local.server/key
-
-<!--
-# By default the installer requires that repositories be authenticated
-# using a known gpg key. This setting can be used to disable that
-# authentication. Warning: Insecure, not recommended.
---># Normalmente l'installatore richiede che i repository siano autenticati
-# con una chiave gpg conosciuta. Per disabilitare questa autenticazione si
-# può usare questa impostazione. Attenzione: insicuro, non raccomandato.
-#d-i debian-installer/allow_unauthenticated string true
+# NTP server to use. The default is almost always fine here.
+--># Server NTP da usare. Quasi sempre è possibile usare quello predefito.
+#d-i clock-setup/ntp-server ntp.example.com</phrase>
 </screen></informalexample>
   </sect2>
 
@@ -1935,6 +1897,18 @@ poiché un hash MD5 consente attacchi di tipo brute force.
 # or encrypted using an MD5 hash.
 --># oppure criptata in un hash MD5.
 #d-i passwd/user-password-crypted password [MD5 hash]
+<!--
+# Create the first user with the specified UID instead of the default.
+--># Per creare il primo utente con un UID specifico al posto di quello
+# predefinito.
+#d-i passwd/user-uid string 1010<phrase condition="lenny">
+
+<!--
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+--># L'account utente viene automaticamente inserito in alcuni gruppi.
+# Per modificare questo comportamento usare la seguente preconfigurazione.
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
 </screen></informalexample>
 
 <para>
@@ -1991,49 +1965,82 @@ dell'installazione. Le uniche domande riguardano l'installazione del kernel.
 <!--
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
 --># Selezionare il programma per la creazione dell'initrd per i kernel 2.6.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+
+<!--
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+--># Il (meta)pacchetto con l'immagine del kernel da installare; per non
+# installare un kernel inserire "none".
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
   </sect2>
 
-  <sect2 id="preseed-bootloader">
-  <!-- <title>Boot loader installation</title> -->
-  <title>Installazione del boot loader</title>
+  <sect2 id="preseed-apt">
+  <!-- <title>Apt setup</title> -->
+  <title>Impostazione di APT</title>
+<para>
+
+<!--
+Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
+options is fully automated based on your installation method and answers to
+earlier questions. You can optionally add other (local) repositories.
+-->
+
+L'impostazione di <filename>/etc/apt/sources.list</filename> e la
+configurazione delle opzioni di base è completamente automatizzata in base
+al metodo d'installazione e alle risposte date in precedenza. È possibile
+aggiungere altri repository (anche locali).
+
+</para>
+
 <informalexample role="example"><screen>
 <!--
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
---># Grub è il boot loader predefinito (per x86). Invece, se si desidera
-# che sia installato lilo, scommentare questa riga:
-#d-i grub-installer/skip boolean true
+# You can choose to install non-free and contrib software.
+--># È possibile scegliere di installare software non-free e contrib.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+<!--
+# Uncomment this if you don't want to use a network mirror.
+--># Togliere il commento alla prossima riga se non si vuole usare
+# un mirror.
+#d-i apt-setup/use_mirror boolean false
+<!--
+# Uncomment this to avoid adding security sources, or
+# add a hostname to use a different server than security.debian.org.
+--># Togliere il commento alla prossima riga per evitare l'inserimento
+# delle sorgenti per la sicurezza oppure per usare un server diverso da
+# security.debian.org.
+#d-i apt-setup/security_host string
 
 <!--
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
---># Questa è ragionevolmente sicura da impostare, fa in modo che grub sia
-# installato automaticamente nel MBR se nessun altro sistema operativo è
-# rilevato nella macchina.
-d-i grub-installer/only_debian boolean true
+# Additional repositories, local[0-9] available
+--># Altri repository, sono disponibili local[0-9]
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+<!--
+# Enable deb-src lines
+--># Abilita le righe deb-src
+#d-i apt-setup/local0/source boolean true
+<!--
+# URL to the public key of the local repository; you must provide a key or
+# apt will complain about the unauthenticated repository and so the
+# sources.list line will be left commented out
+--># URL alla chiave pubblica del repository locale; è necessario fornire
+# una chiave altrimenti apt si lamenta perché il repository non è
+# autenticato e che quindi non dovrebbe essere usato (commentandolo in
+# sources.list)
+#d-i apt-setup/local0/key string http://local.server/key
 
 <!--
-# This one makes grub-installer install to the MBR if it also finds some other
-# OS, which is less safe as it might not be able to boot that other OS.
---># Questa fa in modo che grub-installer si installi sul MBR se trova anche
-# qualche altro sistema operativo, che è un po' meno sicuro poiché potrebbe
-# non riuscire ad avviare gli altri sistemi operativi.
-d-i grub-installer/with_other_os boolean true
-
-<!--
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
---># In alternativa, se si vuole installare in una locazione differente dal
-# MBR, scommentare ed editare queste linee:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-<!--
-# To install grub to multiple disks:
---># Per installare grub su più dischi:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# By default the installer requires that repositories be authenticated
+# using a known gpg key. This setting can be used to disable that
+# authentication. Warning: Insecure, not recommended.
+--># Normalmente l'installatore richiede che i repository siano autenticati
+# con una chiave gpg conosciuta. Per disabilitare questa autenticazione si
+# può usare questa impostazione. Attenzione: insicuro, non raccomandato.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
   </sect2>
 
@@ -2119,9 +2126,14 @@ sulla riga di comando del kernel.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server
-#tasksel tasksel/first multiselect standard, kde-desktop
+#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+<!--
+# If the desktop task is selected, install the kde and xfce desktops
+# instead of the default gnome desktop.
+--># Quando è selezionato il task desktop, si può installare kde e xfce
+# al posto del desktop predefinito gnome.
+#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</phrase><phrase condition="etch">
+#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 <!--
 # Individual additional packages to install
@@ -2138,6 +2150,54 @@ tasksel tasksel/first multiselect standard, desktop
 # cui ricezione aiuta il progetto a determinare quali sono i programmi più
 # popolari per inserirli nei CD, normalmente non viene inviato.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+  <!-- <title>Boot loader installation</title> -->
+  <title>Installazione del boot loader</title>
+<informalexample role="example"><screen>
+<!--
+# Grub is the default boot loader (for x86). If you want lilo installed
+# instead, uncomment this:
+--># Grub è il boot loader predefinito (per x86). Invece, se si desidera
+# che sia installato lilo, scommentare questa riga:
+#d-i grub-installer/skip boolean true
+
+<!--
+# This is fairly safe to set, it makes grub install automatically to the MBR
+# if no other operating system is detected on the machine.
+--># Questa è ragionevolmente sicura da impostare, fa in modo che grub sia
+# installato automaticamente nel MBR se nessun altro sistema operativo è
+# rilevato nella macchina.
+d-i grub-installer/only_debian boolean true
+
+<!--
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
+--># Questa fa in modo che grub-installer si installi sul MBR se trova anche
+# qualche altro sistema operativo, che è un po' meno sicuro poiché potrebbe
+# non riuscire ad avviare gli altri sistemi operativi.
+d-i grub-installer/with_other_os boolean true<phrase condition="lenny">
+<!--
+# To also skip installing lilo, and install no bootloader, uncomment this
+# too:
+--># Inoltre per evitare anche l'installazione di lilo, e quindi non installare
+# nesun bootloader, scommentare questa riga:
+#d-i lilo-installer/skip boolean true</phrase>
+
+<!--
+# Alternatively, if you want to install to a location other than the mbr,
+# uncomment and edit these lines:
+--># In alternativa, se si vuole installare in una locazione differente dal
+# MBR, scommentare ed editare queste linee:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+<!--
+# To install grub to multiple disks:
+--># Per installare grub su più dischi:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
   </sect2>
 
@@ -2336,23 +2396,21 @@ inserendo il parametro <classname>preseed/interactive=true</classname>
 al prompt boot. Questo può essere utile per effettuare delle prove o il
 debug del proprio file di preconfigurazione.
 
+</para><para>
+
 <!--
 If you are preseeding using boot parameters, you can make the installer ask
 the corresponding question by using the <quote>?=</quote> operator, i.e.
 <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+This will of course only have effect for parameters that correspond to
+questions that are actually displayed during an installation and not for
+<quote>internal</quote> parameters.
 -->
 
 Quando si usa la preconfigurazione tramite i parametri d'avvio si può
 richiedere all'installatore di chiedere comunque le domande preconfigurate
 usando l'operatore <quote>?=</quote> in questo modo
 <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valore</replaceable></userinput>.
-
-<!--
-This will of course only have effect for parameters that correspond to
-questions that are actually displayed during an installation and not for
-<quote>internal</quote> parameters.
--->
-
 Ovviamente questo ha effetto solo sui parametri che corrispondono alle
 domande che sono effettivamente visualizzate durante l'installazione e
 non sui parametri <quote>interni</quote>.
@@ -2409,7 +2467,7 @@ un file e di mettere alcune configurazioni particolari in altri file.
 --># Ancora più flessibile, questo esegue un comando di shell e se restituisce
 # i nomi dei file di preconfigurazione allora include questi file.
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 <!--
 # Most flexibly of all, this downloads a program and runs it. The program

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45239 -->
+<!-- original version: 48421 -->
 
 
  <sect1 id="boot-parms">
@@ -364,10 +364,27 @@ root floppy, can be overridden by this parameter to only look at the
 one device.
 -->
 
-Il dischetto d'avvio che normalmente fa la scansione di tutti i dischetti
-può trovare il dischetto di root,
-questo comportamento può essere modificato da questo parametro in modo da
-limitare la scansione a solo un device.
+Il dischetto d'avvio normalmente effettua la scansione di tutti i dischetti
+alla ricerca del dischetto root, con questo parametro si può cambiare questo
+comportamento in modo da limitare la scansione a solo un device.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="lenny">
+<term>lowmem</term>
+<listitem><para>
+
+<!--
+Can be used to force the installer to a lowmem level higher than the one
+the installer sets by default based on available memory. Possible values
+are 1 and 2. See also <xref linkend="lowmem"/>.
+-->
+
+Può essere usato per forzare l'installatore a un livello di soglia per
+il modulo <quote>low memory</quote> più alto di quello predefinito in
+base alla memoria disponibile. I valori possibili sono 1 e 2. Consultare
+<xref linkend="lowmem"/>.
 
 </para></listitem>
 </varlistentry>
@@ -468,22 +485,6 @@ sistema.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/probe/usb</term>
-<listitem><para>
-
-<!--
-Set to <userinput>false</userinput> to prevent probing for USB on
-boot, if that causes problems.
--->
-
-Da impostare a <userinput>false</userinput> per evitare il riconoscimento
-delle periferiche USB all'avvio, nel caso che questa operazione crei dei
-problemi.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
@@ -529,6 +530,26 @@ this misbehavior.
 Da impostare a <userinput>false</userinput> per evitare l'avvio dei servizi
 PCMCIA che, in qualche caso, possono causare dei problemi. Alcuni portatili
 sono famosi per questo malfunzionamento.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="lenny">
+<term>disk-detect/dmraid/enable (dmraid)</term>
+<listitem><para>
+
+<!--
+Set to <userinput>true</userinput> to enable support for Serial ATA RAID
+(also called ATA RAID, BIOS RAID or fake RAID) disks in the installer.
+Note that this support is currently experimental. Additional information
+can be found on the <ulink url="&url-d-i-wiki;">Debian Installer Wiki</ulink>.
+-->
+
+Da impostare a <userinput>true</userinput> per attivare il supporto per i
+dischi Serial ATA RAID (conosciuti anche come ATA RAID, BIOS RAID o falsi
+RAID) nell'installatore. Notare che attualmente questo supporto è
+sperimentale, ulteriori informazioni possono essere trovate nel
+<ulink url="&url-d-i-wiki;">Debian Installer Wiki</ulink>.
 
 </para></listitem>
 </varlistentry>
@@ -620,7 +641,7 @@ slim-line, and caddy style drives cannot reload media automatically.
 Normalmente, prima di riavviare, &d-i; espelle automaticamente il supporto
 ottico usato durante l'installazione. Questa operazione può essere superflua
 nel caso in cui il sistema non faccia l'avvio automatico da CD e in alcuni
-casi può essere attirittura inopportuna, per esempio il lettore non è in
+casi può essere addirittura inopportuna, per esempio quando il lettore non è in
 grado di richiudere il carrello da solo e l'utente non può farlo manualmente
 perché non è fisicamente presente. Molti dei lettori sottili con caricatore
 a slot non possono ricaricare automaticamente il supporto.
@@ -700,14 +721,13 @@ parametro a <userinput>true</userinput>.
 
 <!--
 For the gtk frontend (graphical installer), hardware acceleration in directfb
-is disabled by default. To enable it, set this parameter to
-<userinput>true</userinput> when booting the installer.
+is disabled by default. Set this parameter to <userinput>true</userinput> to
+enable it.
 -->
 
 Con l'interfaccia gtk (ovvero la versione grafica dell'installatore)
-l'accellerazione hardware di directfb è disabilitata; per attivarla
-si deve, all'avvio dell'installatore, impostare questo parametro a
-<userinput>true</userinput>.
+l'accellerazione hardware di directfb è disabilitata; impostare questo
+parametro a <userinput>true</userinput> per attivarla.
 
 </para></listitem>
 </varlistentry>
