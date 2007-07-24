@@ -22,18 +22,54 @@ Template: apt-setup/progress/security
 Type: text
 _Description: Scanning the security updates repository...
 
+Template: apt-setup/progress/volatile
+Type: text
+_Description: Scanning the volatile updates repository...
+
 Template: apt-setup/security_host
 Type: string
 Default: security.debian.org
 Description: for internal use; can be preseeded
  Host to use for security updates
 
+Template: apt-setup/volatile_host
+Type: string
+Default: volatile.debian.org
+Description: for internal use; can be preseeded
+ Host to use for volatile updates
+
 Template: apt-setup/security-updates-failed
 Type: error
 _Description: Cannot access security updates
- The security updates on ${SECURITY_HOST} couldn't be accessed, so those
+ The security updates on ${HOST} couldn't be accessed, so those
  updates will not be made available to you at this time. You should
  investigate this later.
  .
- Commented out entries for ${SECURITY_HOST} have been added to the
+ Commented out entries for ${HOST} have been added to the
  /etc/apt/sources.list file.
+
+Template: apt-setup/volatile-updates-failed
+Type: error
+_Description: Cannot access volatile updates
+ The volatile updates on ${HOST} couldn't be accessed, so those
+ updates will not be made available to you at this time. You should
+ investigate this later.
+ .
+ Commented out entries for ${HOST} have been added to the
+ /etc/apt/sources.list file.
+
+Template: apt-setup/updates-select
+Type: select
+Default: security
+Choices-C: security, volatile, both, none
+__Choices: Only use updates from security.debian.org, Only use updates from volatile.debian.org, Use updates from both services, Don't use any update services
+_Description: Update services to use:
+ Debian has two services that provide updates to releases.
+ .
+ security.debian.org provides security updates. Enabling this service is
+ strongly recommended as it will help protect your system against attacks.
+ .
+ volatile.debian.org provides updates for software that changes relatively
+ frequently and where not having the lastest version could reduce the
+ usability of the software. An example is the virus signatures for a virus
+ scanner. This service is only available for stable and oldstable releases.

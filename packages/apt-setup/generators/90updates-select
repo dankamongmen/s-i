@@ -1,0 +1,60 @@
+#!/bin/sh
+set -e
+
+. /usr/share/debconf/confmodule
+
+if ! db_get mirror/suite || [ -z "$RET" ]; then
+	db_get cdrom/suite
+fi
+suite="$RET"
+
+security=n
+volatile=n
+if db_get apt-setup/security_host && [ "$RET" ] && \
+   [ "$suite" != unstable ]; then
+	security=y
+fi
+if db_get apt-setup/volatile_host && [ "$RET" ] && \
+   ([ "$suite" = stable ] || [ "$suite" = oldstable ]); then
+	volatile=y
+fi
+
+case $security$volatile in
+    yy)	updates=both ;;
+    yn) updates=security ;;
+    ny) updates=volatile ;;
+    nn) updates=none ;;
+esac
+db_set apt-setup/updates-select $updates
+
+# Nothing available so skip the question
+if [ $updates = none ]; then
+	exit
+fi
+
+db_input medium apt-setup/updates-select
+if ! db_go; then
+	exit 10 # back up
+fi
+
+# Selecting volatile for testing is invalid
+if [ $volatile = n ]; then
+	updates=""
+	db_get apt-setup/updates-select
+	case $RET in
+	    both)	updates=security ;;
+	    volatile)	updates=none ;;
+	esac
+	if [ "$updates" ]; then
+		logger -t apt-setup "Info: invalid selection of volatile for testing disabled"
+		db_set apt-setup/updates-select $updates
+	fi
+fi
+
+# Proxy configuration is common to both security and volatile
+if db_get mirror/http/proxy && [ -n "$RET" ]; then
+	proxy="$RET"
+	if ! grep -iq "Acquire::http::Proxy" $ROOT/etc/apt/apt.conf.new; then
+		echo "Acquire::http::Proxy \"$proxy\";" >> $ROOT/etc/apt/apt.conf.new
+	fi
+fi
