@@ -55,12 +55,6 @@ debconf_select () {
 		local key option
 		restore_ifs
 		key=$(echo ${x%$TAB*})
-		# work around bug #243373
-		if [ "$TERM" = xterm -o "$TERM" = bterm ]; then
-			debconf_select_lead="$NBSP"
-		else
-			debconf_select_lead="> "
-		fi
 		option=$(echo "${x#*$TAB}" | sed "s/ *\$//g; s/^ /$debconf_select_lead/g")
 		newchoices="${newchoices:+${newchoices}${NL}}${key}${TAB}${option}"
 		if [ "$key" = "$default_choice" ]; then
