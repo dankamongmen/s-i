@@ -12,15 +12,42 @@ warning() {
 	log "warning: $@"
 }
 
-# Ask if a mirror should be used if the base system can be installed from CD.
+# Ask if a mirror should be used if the base system can be installed from CD
+# Default to false for full CD/DVD images; ask only at medium prio for
+# netinst images and DVDs
 if [ -e /cdrom/.disk/base_installable ]; then
-	if search-path choose-mirror; then
-		db_input high apt-setup/use_mirror || [ $? -eq 30 ]
-		db_go || exit 10
-	else
+	if ! search-path choose-mirror; then
 		warning "choose-mirror is not available; cannot offer network mirror"
 		exit 1
 	fi
+
+	cd_type=unknown
+	if [ -e /cdrom/.disk/cd_type ]; then
+		cd_type=$(cat /cdrom/.disk/cd_type)
+	fi
+
+	case "$cd_type" in
+	    not_complete)
+		use_mirror=true
+		use_prio=medium ;;
+	    full_cd)
+		use_mirror=false
+		use_prio=high ;;
+	    dvd)
+		use_mirror=false
+		use_prio=medium ;;
+	    *)
+		use_mirror=true
+		use_prio=high ;;
+	esac
+
+	# Only set default if not preseeded or already asked
+	# Hack alert: for this to work no default is set in template
+	db_get apt-setup/use_mirror
+	[ "$RET" ] || db_set apt-setup/use_mirror $use_mirror
+
+	db_input $use_prio apt-setup/use_mirror || [ $? -eq 30 ]
+	db_go || exit 10
 
 	db_get apt-setup/use_mirror
 	if [ "$RET" = false ]; then
