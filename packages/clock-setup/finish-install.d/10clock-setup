@@ -3,6 +3,54 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+log() {
+	logger -t clock-setup "$@"
+}
+warning() {
+	log "warning: $*"
+}
+
+os_needs_local_clock () {
+	while read line; do
+		shortname=$(echo "$line" | cut -d : -f 3)
+		case $shortname in
+		MS-DOS*|Windows*|FreeDOS*) # keep in sync with os-prober
+			return 0
+		;;
+		esac
+	done
+	return 1
+}
+
+pri=high
+
+if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
+	# keep preseeded value
+	:
+else
+	# os-prober is may not yet be installed..
+	anna-install os-prober || true
+
+	probed=$(os-prober)
+
+	if echo "$probed" | os_needs_local_clock; then
+		# default to localtime for some OSes
+		db_set clock-setup/utc false
+		pri=low
+	fi
+
+	if [ -z "$probed" ]; then
+		# installing the only OS, so use UTC
+		db_set clock-setup/utc true
+		pri=low
+	fi
+fi
+
+db_input $pri clock-setup/utc || true
+if ! db_go; then
+	exit 10 # back to main menu
+fi
+
 rcsfile=/target/etc/default/rcS
 adjtimefile=/target/etc/adjtime
 
@@ -14,3 +62,73 @@ else
 	sed -i -e 's:^UTC="yes":UTC="no":' -e 's:^UTC=yes:UTC=no:' $rcsfile
 	sed -i -e 's:^UTC:LOCAL:' $adjtimefile
 fi
+
+anna-install rtc-modules || true
+machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+case "$machine" in
+	"Linksys NSLU2")
+		# The nslu2 needs a special driver for the hardware
+		# clock.
+		log-output -t hw-detect modprobe -v rtc-dev || log "rtc-dev failed to load"
+		update-dev
+		# This driver creates a rtc0 device, so symlink.
+		if [ -e /dev/rtc0 ]; then
+			ln -sf rtc0 /dev/rtc
+		fi
+	;;
+	*)
+		# This may not be necessary; hwclock can do direct IO if
+		# the rtc module is not loaded.
+		log-output -t hw-detect modprobe -v rtc || log "rtc failed to load"
+		update-dev
+	;;
+esac
+
+# bind mount /dev into /target/dev so that rtc devices are available for hwclock
+if mount -o bind /dev /target/dev; then
+	target_dev_mounted=1
+else
+	warning "failed to bind mount /target/dev"
+fi
+
+cleanup () {
+	if [ "$target_dev_mounted" ] && ! umount /target/dev; then
+		warning "failed to unmount /target/dev bind mount"
+	fi
+}
+
+db_progress INFO clock-setup/progress/hwclock
+log-output -t clock-setup chroot /target hwclock --systohc --debug &
+pid="$!"
+count=0
+
+stop_hwclock () {
+	kill $pid || return
+	sleep 1
+	if [ -e /proc/$pid ]; then
+		kill -9 $pid || return
+	fi
+}
+
+while sleep 1; do
+	if [ ! -e /proc/$pid ]; then
+		break
+	fi
+	count=$(expr $count + 1)
+	if [ "$count" = 30 ]; then
+		count=0
+		db_input critical clock-setup/hwclock-wait || true
+		if ! db_go; then
+			stop_hwclock
+			cleanup
+			exit 10 # back to main menu
+		fi
+		db_get clock-setup/hwclock-wait
+		if [ "$RET" = false ]; then
+			stop_hwclock
+			break
+		fi
+	fi
+done
+
+cleanup

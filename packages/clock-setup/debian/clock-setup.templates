@@ -12,16 +12,47 @@ _Description: Is the system clock set to UTC?
  local time. This is recommended unless you also use another operating
  system that expects the clock to be set to local time.
 
+Template: finish-install/progress/clock-setup
+Type: text
+# progress bar item
+_Description: Configuring clock settings...
+
 Template: clock-setup/progress/title
 Type: text
 _Description: Setting up the clock
 
-Template: clock-setup/progress/working
+Template: clock-setup/ntp
+Type: boolean
+Default: true
+_Description: Set the clock using NTP?
+ The Network Time Protocol (NTP) can be used to set the system's clock.
+ The installation process works best with a correctly set clock.
+
+Template: clock-setup/ntp-server
+Type: string
+Default: 0.debian.pool.ntp.org
+_Description: NTP server to use?
+ The default NTP server, pool.ntp.org, is almost always a good choice, but if
+ you prefer to use another NTP server, you can enter it here.
+
+Template: clock-setup/progress/ntp
 Type: text
 # progress bar item
-_Description: Please wait...
+_Description: Getting the time from a network time server...
 
-Template: finish-install/progress/clock-setup
+Template: clock-setup/progress/hwclock
 Type: text
-# finish-install progress bar item
-_Description: Saving UTC setting...
+# progress bar item
+_Description: Setting the hardware clock...
+
+Template: clock-setup/hwclock-wait
+Type: boolean
+Default: false
+_Description: Wait another 30 seconds for hwclock to set the clock?
+ Setting the hardware clock is taking longer than expected. The 'hwclock'
+ program used to set the clock may have problems talking to the hardware clock.
+ .
+ Check /var/log/syslog or see virtual console 4 for the details.
+ .
+ If you choose to not wait for hwclock to finish setting the clock, this
+ system's clock may not be set correctly.

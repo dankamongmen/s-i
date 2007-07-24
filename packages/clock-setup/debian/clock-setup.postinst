@@ -3,48 +3,31 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-db_progress START 0 1 clock-setup/progress/title
-db_progress INFO clock-setup/progress/working
-
-os_needs_local_clock () {
-	while read line; do
-		shortname=$(echo "$line" | cut -d : -f 3)
-		case $shortname in
-		MS-DOS*|Windows*|FreeDOS*) # keep in sync with os-prober
-			return 0
-		;;
-		esac
-	done
-	return 1
+log() {
+	logger -t clock-setup "$@"
 }
 
-pri=high
-
-if db_fget clock-setup/utc seen && [ "$RET" = true ]; then
-	# keep preseeded value
-	:
-else
-	probed=$(os-prober)
-
-	if echo "$probed" | os_needs_local_clock; then
-		# default to localtime for some OSes
-		db_set clock-setup/utc false
-		pri=low
-	fi
-
-	if [ -z "$probed" ]; then
-		# installing the only OS, so use UTC
-		db_set clock-setup/utc true
-		pri=low
-	fi
-fi
-
-db_progress STEP 1
-
-db_input $pri clock-setup/utc || true
+db_input medium clock-setup/ntp || true
 if ! db_go; then
-	db_progress stop
 	exit 10 # back to main menu
 fi
+db_get clock-setup/ntp
+if [ "$RET" = true ]; then
+	db_input low clock-setup/ntp-server || true
+	if ! db_go; then
+		exit 10
+	fi
+	db_get clock-setup/ntp-server
+	server="$RET"
 
-db_progress stop
+	db_progress START 0 1 clock-setup/progress/title
+	db_progress INFO clock-setup/progress/ntp
+	if ! RDATE_OUT=`log-output -t clock-setup --pass-stdout rdate -o 123 -nv "$server"`; then
+		log "rdate failed ($?)"
+	fi
+	log "$RDATE_OUT"
+	db_progress step 1
+	db_progress stop
+fi
+
+tzsetup
