@@ -19,6 +19,10 @@ if db_get apt-setup/volatile_host && [ "$RET" ] && \
 	volatile=y
 fi
 
+# Disable volatile for now as we first need its GPG key in the keyring
+# To activate: remove next line and update log messages below
+volatile=n
+
 case $security$volatile in
     yy)	updates=both ;;
     yn) updates=security ;;
@@ -46,7 +50,8 @@ if [ $volatile = n ]; then
 	    volatile)	updates=none ;;
 	esac
 	if [ "$updates" ]; then
-		logger -t apt-setup "Info: invalid selection of volatile for testing disabled"
+		#logger -t apt-setup "Info: invalid selection of volatile for testing disabled"
+		logger -t apt-setup "Info: GPG key for volatile is not yet available; selection disabled"
 		db_set apt-setup/updates-select $updates
 	fi
 fi
