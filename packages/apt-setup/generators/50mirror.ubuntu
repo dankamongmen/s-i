@@ -23,9 +23,9 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	db_get apt-setup/use_mirror
 	[ "$RET" ] || db_set apt-setup/use_mirror true 
 
-	# Text is optional for Debian
-	db_metaget apt-mirror/netinst/general description
-	db_subst apt-setup/use_mirror NETINST_BLURB "$RET"
+	# Text is variable for Debian
+	db_metaget apt-mirror/use/netinst_old description
+	db_subst apt-setup/use_mirror EXPLANATION1 "$RET"
 
 	db_input medium apt-setup/use_mirror || [ $? -eq 30 ]
 	db_go # or exit 10
