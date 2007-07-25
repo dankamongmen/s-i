@@ -5,6 +5,9 @@ set -e
 
 file="$1"
 
+NL="
+"
+
 log() {
 	logger -t apt-setup "$@"
 }
@@ -29,19 +32,20 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	case "$cd_type" in
 	    not_complete)
 		db_metaget apt-mirror/use/netinst description
-		db_subst apt-setup/use_mirror EXPLANATION1 "$RET"
+		db_subst apt-setup/use_mirror EXPLANATION "$RET"
 		use_mirror=true
 		use_prio=medium ;;
 	    full_cd)
 		db_metaget apt-mirror/use/full_cd1 description
-		db_subst apt-setup/use_mirror EXPLANATION1 "$RET"
+		explanation="$RET"
 		db_metaget apt-mirror/use/full_cd2 description
-		db_subst apt-setup/use_mirror EXPLANATION2 "$RET"
+		explanation="$explanation$NL$NL$RET"
+		db_subst apt-setup/use_mirror EXPLANATION "$explanation"
 		use_mirror=true
 		use_prio=high ;;
 	    dvd)
 		db_metaget apt-mirror/use/dvd description
-		db_subst apt-setup/use_mirror EXPLANATION1 "$RET"
+		db_subst apt-setup/use_mirror EXPLANATION "$RET"
 		use_mirror=false
 		use_prio=high ;;
 	    *)
