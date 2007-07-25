@@ -8,31 +8,25 @@ if ! db_get mirror/suite || [ -z "$RET" ]; then
 fi
 suite="$RET"
 
-security=n
-volatile=n
+updates=""
 if db_get apt-setup/security_host && [ "$RET" ] && \
    [ "$suite" != unstable ]; then
-	security=y
-fi
-if db_get apt-setup/volatile_host && [ "$RET" ] && \
-   ([ "$suite" = stable ] || [ "$suite" = oldstable ]); then
-	volatile=y
+	updates=${updates:+$updates, }security
 fi
 
-# Disable volatile for now as we first need its GPG key in the keyring
-# To activate: remove next line and update log messages below
 volatile=n
+# Disable volatile for now as we first need its GPG key in the keyring
+# To activate: uncomment next lines and update log messages below
+#if db_get apt-setup/volatile_host && [ "$RET" ] && \
+#   ([ "$suite" = stable ] || [ "$suite" = oldstable ]); then
+#	updates=${updates:+$updates, }volatile
+#	volatile=y
+#fi
 
-case $security$volatile in
-    yy)	updates=both ;;
-    yn) updates=security ;;
-    ny) updates=volatile ;;
-    nn) updates=none ;;
-esac
 db_set apt-setup/updates-select $updates
 
 # Nothing available so skip the question
-if [ $updates = none ]; then
+if [ -z "$updates" ]; then
 	exit
 fi
 
@@ -42,18 +36,18 @@ if ! db_go; then
 fi
 
 # Selecting volatile for testing is invalid
-if [ $volatile = n ]; then
-	updates=""
-	db_get apt-setup/updates-select
-	case $RET in
-	    both)	updates=security ;;
-	    volatile)	updates=none ;;
-	esac
-	if [ "$updates" ]; then
-		#logger -t apt-setup "Info: invalid selection of volatile for testing disabled"
-		logger -t apt-setup "Info: GPG key for volatile is not yet available; selection disabled"
-		db_set apt-setup/updates-select $updates
-	fi
+db_get apt-setup/updates-select
+updates="$RET"
+if [ "$volatile" = n ] && echo "$updates" | grep -q volatile; then
+	new_updates=""
+	for u in $(echo $updates | sed "s/,/ /"); do
+		if [ "$u" != volatile ]; then
+			new_updates=${new_updates:+$new_updates, }$u
+		fi
+	done
+	#logger -t apt-setup "Info: invalid selection of volatile for testing disabled"
+	logger -t apt-setup "Info: GPG key for volatile is not yet available; selection disabled"
+	db_set apt-setup/updates-select $new_updates
 fi
 
 # Proxy configuration is common to both security and volatile

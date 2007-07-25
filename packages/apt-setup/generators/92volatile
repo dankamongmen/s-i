@@ -4,7 +4,7 @@ set -e
 . /usr/share/debconf/confmodule
 
 db_get apt-setup/updates-select
-if [ "$RET" != both ] && [ "$RET" != volatile ]; then
+if ! echo "$RET" | grep -q volatile; then
 	exit
 fi
 
