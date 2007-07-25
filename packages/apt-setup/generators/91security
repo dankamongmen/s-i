@@ -31,8 +31,8 @@ CODE=0
 echo "deb http://$host/ $codename/updates $dists" >> $file
 export ASV_TIMEOUT="-o Acquire::http::Timeout=30"
 if ! apt-setup-verify $file; then
-	db_subst apt-setup/security-updates-failed HOST "$host"
-	db_input critical apt-setup/security-updates-failed || true
+	db_subst apt-setup/updates-failed HOST "$host"
+	db_input critical apt-setup/updates-failed || true
 	if ! db_go; then
 		exit 10 # back up
 	fi
