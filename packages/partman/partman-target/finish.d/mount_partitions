@@ -2,17 +2,6 @@
 
 . /lib/partman/definitions.sh
 
-installdir () {
-    dir="${1%/}"
-    while [ "$dir" ]; do
-	dirs="$dir $dirs"
-	dir="${dir%/*}"
-    done
-    for dir in $dirs; do
-	[ -d "$dir" ] || mkdir $dir
-    done
-}
-
 fstab=$(
     for i in /lib/partman/fstab.d/*; do
 	[ -x "$i" ] || continue
@@ -55,11 +44,11 @@ for f in $fstab; do
     set -- $f
     case "$2" in
 	/media/*)
-	    installdir "/target$2"
+	    mkdir -p "/target$2"
 	    continue
 	;;
 	/*)
-	    installdir "/target$2"
+	    mkdir -p "/target$2"
 	;;
     esac
     for m in /lib/partman/mount.d/*; do
@@ -73,8 +62,8 @@ for f in $fstab; do
 		/)
 		    # create these before /var is mounted, so that they can
 		    # be mounted as tmpfses
-		    installdir /target/var/lock
-		    installdir /target/var/run
+		    mkdir -p /target/var/lock
+		    mkdir -p /target/var/run
 		;;
 	    esac
 	    continue 2
