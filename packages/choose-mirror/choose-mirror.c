@@ -103,7 +103,7 @@ static char **mirrors_in(char *country) {
 static inline int has_mirror(char *country) {
 	char **mirrors;
 	if (strcmp(country, MANUAL_ENTRY) == 0 ||
-	    strcmp(country, MANUAL_ENTRY_OLD))
+	    strcmp(country, MANUAL_ENTRY_OLD) == 0)
 		return 1;
 	mirrors = mirrors_in(country);
 	return (mirrors[0] == NULL) ? 0 : 1;
