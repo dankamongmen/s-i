@@ -65,6 +65,10 @@ if [ "$volatile" = n ] && disable_service volatile; then
 	logger -t apt-setup "info: GPG key for volatile is not yet available; selection disabled"
 fi
 
+# No need to set up proxy here if no services were selected
+db_get apt-setup/services-select
+[ "$RET" ] || exit
+
 # Proxy configuration is common to both security and volatile
 if db_get mirror/http/proxy && [ -n "$RET" ]; then
 	proxy="$RET"
