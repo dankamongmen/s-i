@@ -3,15 +3,16 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+file="$1"
+
 db_get apt-setup/updates-select
 if ! echo "$RET" | grep -q volatile; then
 	exit
 fi
 
-file="$1"
-
 db_get apt-setup/volatile_host
 host="$RET"
+[ "$host" ] || exit
 
 if db_get mirror/codename && [ "$RET" ]; then
 	codename="$RET"

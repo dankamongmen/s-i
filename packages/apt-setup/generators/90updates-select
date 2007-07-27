@@ -1,53 +1,69 @@
 #!/bin/sh
 set -e
 
+# The default in the template is to have all services enabled. Here, we
+# disable services that are not available before the question is asked.
+# This way, it is also possible select which services should be enabled
+# using preseeding.
+
 . /usr/share/debconf/confmodule
+
+# Returns 0 if the service was actually removed
+disable_service() {
+	local to_disable="$1"
+
+	db_get apt-setup/services-select
+	local services="$RET"
+
+	local new_services s
+	if echo "$services" | grep -q $to_disable; then
+		new_services=""
+		for s in $(echo "$services" | sed "s/,/ /"); do
+			if [ "$s" != $to_disable ]; then
+				new_services=${new_services:+$new_services, }$s
+			fi
+		done
+		db_set apt-setup/services-select "$new_services"
+		return 0
+	fi
+	return 1
+}
 
 if ! db_get mirror/suite || [ -z "$RET" ]; then
 	db_get cdrom/suite
 fi
 suite="$RET"
 
-updates=""
-if db_get apt-setup/security_host && [ "$RET" ] && \
-   [ "$suite" != unstable ]; then
-	updates=${updates:+$updates, }security
-fi
-
-volatile=n
-# Disable volatile for now as we first need its GPG key in the keyring
-# To activate: uncomment next lines and update log messages below
-#if db_get apt-setup/volatile_host && [ "$RET" ] && \
-#   ([ "$suite" = stable ] || [ "$suite" = oldstable ]); then
-#	updates=${updates:+$updates, }volatile
-#	volatile=y
-#fi
-
-db_set apt-setup/updates-select $updates
-
-# Nothing available so skip the question
-if [ -z "$updates" ]; then
+# No update services available for unstable
+if [ "$suite" = unstable ]; then
+	db_set apt-setup/services-select ""
 	exit
 fi
 
-db_input medium apt-setup/updates-select
+
+# Disable volatile for now as we first need its GPG key in the keyring
+# To activate: uncomment next lines and update log messages below
+volatile=n
+#volatile=y
+#if [ "$suite" != stable ] && [ "$suite" != oldstable ]; then
+#	disable_service volatile || true
+#	volatile=n
+#fi
+
+db_get apt-setup/security_host
+db_subst apt-setup/services-select SEC_HOST "$RET"
+db_get apt-setup/volatile_host
+db_subst apt-setup/services-select VOL_HOST "$RET"
+
+db_input medium apt-setup/services-select
 if ! db_go; then
 	exit 10 # back up
 fi
 
 # Selecting volatile for testing is invalid
-db_get apt-setup/updates-select
-updates="$RET"
-if [ "$volatile" = n ] && echo "$updates" | grep -q volatile; then
-	new_updates=""
-	for u in $(echo $updates | sed "s/,/ /"); do
-		if [ "$u" != volatile ]; then
-			new_updates=${new_updates:+$new_updates, }$u
-		fi
-	done
+if [ "$volatile" = n ] && disable_service volatile; then
 	#logger -t apt-setup "info: invalid selection of volatile for testing disabled"
 	logger -t apt-setup "info: GPG key for volatile is not yet available; selection disabled"
-	db_set apt-setup/updates-select $new_updates
 fi
 
 # Proxy configuration is common to both security and volatile
