@@ -216,7 +216,7 @@ setup_partition () {
 		;;
 	    *{)
 		file=${1%?}
-		[ -d $id ] || mkdir $id
+		mkdir -p $id
 		case $file in
 		    */*)
 			mkdir -p $id/${file%/*}
