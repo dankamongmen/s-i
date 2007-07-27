@@ -1442,11 +1442,6 @@ static int gtk_initialize(struct frontend *obj, struct configuration *conf)
         return DC_NOTOK;
 	}   
 	
-    /* Workaround for bug #407035 */
-    /* TODO: replace by more structural fix (or remove if fixed upstream) */
-    GtkSettings* settings = gtk_settings_get_default ();
-    gtk_settings_set_long_property (settings, "gtk-dnd-drag-threshold", 1000, "g-i");
-
     return DC_OK;
 }
 
