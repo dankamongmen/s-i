@@ -359,11 +359,7 @@ read_list () {
 	list=''
 	while { read_line item; [ "$item" ]; }; do
 		log "option: $item"
-		if [ "$list" ]; then
-			list="$list, $item"
-		else
-			list="$item"
-		fi
+		list="${list:+$list, }$item"
 	done
 	echo "$list"
 }
