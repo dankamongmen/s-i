@@ -636,12 +636,8 @@ humandev () {
 	    else
 	       line=`echo "$line" | sed 's,disc\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
 	       lun=`echo  "$line" | cut -d" " -f1`
-	       if [ "$lun" > 15 ] ; then
-	          controller=$(($lun / 16))
-		  lun=$(($lun % 16))
-	       else
-		  controller=0
-	       fi
+	       controller=$(($lun / 16))
+	       lun=$(($lun % 16))
 	       disc=`echo "$line" | cut -d" " -f2`
 	       part=`echo "$line" | cut -d" " -f3`
 	    fi
