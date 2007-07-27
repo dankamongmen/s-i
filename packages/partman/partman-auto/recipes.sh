@@ -29,10 +29,7 @@ unnamed=0
 
 decode_recipe () {
     local ignore ram line word min factor max fs -
-    ignore=''
-    if [ "$2" ]; then
-	ignore="${2}ignore"
-    fi
+    ignore="${2:+${2}ignore}"
     unnamed=$(($unnamed + 1))
     ram=$(grep ^Mem: /proc/meminfo | { read x y z; echo $y; }) # in bytes
     if [ -z "$ram" ]; then
@@ -50,11 +47,7 @@ decode_recipe () {
 		;;
 	    ::)
 		db_metaget $line description
-		if [ "$RET" ]; then
-		    name=$RET
-		else
-		    name="Unnamed.${unnamed}"
-		fi
+		name="${RET:-Unnamed.$unnamed}"
 		line=''
 		;;
 	    .)
@@ -102,20 +95,13 @@ decode_recipe () {
 		if [ "$ignore" ] && [ "$(echo $line | grep "$ignore")" ]; then
 		    :
 		else
-		    if [ "$scheme" ]; then
-			scheme="${scheme}${NL}${line}"
-		    else
-			scheme="$line"
-		    fi
+		    scheme="${scheme:+$scheme$NL}$line"
 		fi
 		line=''
 		;;
 	    *)
-		if [ "$line" ]; then
-		    line="$line $word"
-		else
-		    line="$word"
-		fi
+		line="${line:+$line }$word"
+		;;
 	esac
     done
 }
@@ -201,11 +187,7 @@ pull_primary () {
         then
             primary="$*"
         else
-    	    if [ -z "$logical" ]; then
-    	        logical="$*"
-    	    else
-                logical="${logical}${NL}$*"
-    	    fi
+            logical="${logical:+$logical$NL}$*"
         fi'
 }
 
@@ -247,11 +229,7 @@ setup_partition () {
 		    if [ "$1" = ';' ]; then
 			echo "$line" >>$id/$file
 		    else
-			if [ "$line" ]; then
-			    line="$line $1"
-			else
-			    line="$1"
-			fi
+			line="${line:+$line }$1"
 		    fi
 		    shift
 		done

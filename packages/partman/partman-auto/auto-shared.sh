@@ -105,19 +105,11 @@ dm_wipe_lvm() {
 	vgtext="$vg"
 	pvtext=""
 	for pv in $pvs; do
-		if [ -z "$pvtext" ]; then
-			pvtext="$pv"
-		else
-			pvtext="$pvtext, $pv"
-		fi
+		pvtext="${pvtext:+$pvtext, }$pv"
 	done
 	lvtext=""
 	for lv in $lvs; do
-		if [ -z "$lvtext" ]; then
-			lvtext="$lv"
-		else
-			lvtext="$lvtext, $lv"
-		fi
+		lvtext="${lvtext:+$lvtext, }$lv"
 	done
 
 	db_subst partman-auto/purge_lvm_from_device VGTARGETS "$vgtext"
