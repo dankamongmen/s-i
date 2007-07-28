@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 48487 -->
+<!-- original version: 48636 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -752,7 +752,7 @@ d-i netcfg/choose_interface select auto
 #d-i netcfg/choose_interface select eth1
 
 #Quand le serveur dhcp est lent et que l'installateur s'arrête pour l'attendre,
-#ceci peut être utile.
+#ceci peut être utile :
 #d-i netcfg/dhcp_timeout string 60
 
 # Si vous préférez configurer vous-même le réseau, décommentez cette ligne et
@@ -858,10 +858,14 @@ sera choisi avant de préconfigurer son partitionnement.
 #d-i partman-auto/init_automatically_partition	\
 #    select Assisté - utiliser le plus grand espace disponible
 
-# Vous pouvez aussi choisir un disque entier. Le nom du disque peut être
+<phrase condition="etch"># Vous pouvez aussi choisir un disque entier. Le nom du disque peut être
 # donné selon le format devfs ou le format traditionnel.
 # Par exemple, pour utiliser le premier disque :
-d-i partman-auto/disk string /dev/discs/disc0/disc
+d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
+# Vous pouvez aussi choisir un disque entier. Le nom du disque doit être
+# donné selon le format traditionnel. Par exemple, pour utiliser le premier disque
+# SCSI/SATA :
+d-i partman-auto/disk string /dev/sda</phrase> 
 # Il faudra aussi indiquer la méthode à utiliser.
 # Actuellement les méthodes disponibles sont : "regular", "lvm" et "crypto".
 d-i partman-auto/method string lvm
@@ -1002,7 +1006,13 @@ d-i clock-setup/utc boolean true
 
 # Vous pouvez mettre toute valeur acceptée pour $TZ.
 # Voyez ce que contient /usr/share/zoneinfo/ pour les valeurs possibles.
-d-i time/zone string US/Eastern
+d-i time/zone string US/Eastern<phrase condition="lenny">
+
+# La ligne suivante autorise l'utilisation de NTP pour régler l'horloge pendant l'installation :
+d-i clock-setup/ntp boolean true
+# Le serveur NTP à utiliser. Le serveur par défaut est presque toujours correct.
+#d-i clock-setup/ntp-server ntp.example.com
+</phrase>
 </screen></informalexample>
 
   </sect2>
