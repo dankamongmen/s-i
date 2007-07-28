@@ -1,11 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 46820 -->
+<!-- original version: 48636 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2006.11.30 -->
 <!-- updated 42982:43841 by Felipe Augusto van de Wiel (faw) 2007.01.19 -->
-<!-- updated 44376:45190 by Herbert Parentes Fortes Neto (hpfn) 2007.02.23 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2007.03.12 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2007.05.20 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2007.05.27 -->
+<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2007.07.13 -->
+<!-- revised by Felipe Augusto van de Wiel (faw) 2007.07.28 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -337,13 +335,20 @@ uso durante a configuração do pacote relevante.
 
 </para><para>
 
+Normalmente, pré-configurar uma questão desta forma significará que essa
+questão não será perguntada. Para definir um valor padrão específico para
+uma questão, mas ainda assim ser questionado, use <quote>?=</quote> ao
+invés de <quote>=</quote> como operador. Veja também
+<xref linkend="preseed-seenflag"/>.
+
+</para><para>
+
 Note que algumas variáveis que são freqüentemente definidas no prompt de 
 inicialização tem um apelido abreviado. Se um apelido está disponível, ele
-é usado nos exemplos deste apêndice ao invés da variável completa. Em
-particular, a variável <literal>preseed/url</literal> foi apelidada como
-<literal>url</literal> e tem algumas mágicas a mais para permitir o uso de
-urls reduzidas. Outro exemplo é o apelido <literal>tasks</literal>, que
-traduz para <literal>tasksel:tasksel/first</literal>.
+é usado nos exemplos deste apêndice ao invés da variável completa. A
+variável <literal>preseed/url</literal>, por exemplo, foi apelidada como
+<literal>url</literal>. Outro exemplo é o apelido <literal>tasks</literal>,
+que traduz para <literal>tasksel:tasksel/first</literal>.
 
 </para><para>
 
@@ -405,11 +410,6 @@ em um arquivo de pré-configuração sendo pego de
 <literal>http://autoserver.example.com/d-i/etch/./preseed.cfg</literal>.
 
 </para><para>
-
-+The last part of that url (<literal>d-i/etch/./preseed.cfg</literal>)
-+is taken from <literal>auto-install/defaultroot</literal>. By default
-+this includes the directory <literal>etch</literal> to allow future versions
-+to specify their own codename and let people migrate forwards in a
 
 A última parte daquela url (<literal>d-i/etch/./preseed.cfg</literal>)
 é tirada de <literal>auto-install/defaultroot</literal>. Por padrão
@@ -864,8 +864,9 @@ Por padrão o valor para <classname>mirror/udeb/suite</classname> é o mesmo que
 
 <informalexample role="example"><screen>
 # If you select ftp, the mirror/country string does not need to be set.
-#d-i mirror/protocol string ftp
-d-i mirror/country string enter information manually
+#d-i mirror/protocol string ftp<phrase condition="etch">
+d-i mirror/country string enter information manually</phrase><phrase condition="lenny">
+d-i mirror/country string manual</phrase>
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -905,10 +906,14 @@ o correto será selecionado antes de usar a pré-configuração.
 #d-i partman-auto/init_automatically_partition \
 #      select Guided - use the largest continuous free space
 
-# Alternatively, you can specify a disk to partition. The device name
+<phrase condition="etch"># Alternatively, you can specify a disk to partition. The device name
 # can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
-d-i partman-auto/disk string /dev/discs/disc0/disc
+d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
+# Alternatively, you can specify a disk to partition. The device name must
+# be given in traditional non-devfs format.
+# For example, to use the first SCSI/SATA hard disk:
+d-i partman-auto/disk string /dev/sda</phrase>
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
 d-i partman-auto/method string lvm
@@ -1055,7 +1060,13 @@ d-i clock-setup/utc boolean true
 
 # You may set this to any valid setting for $TZ; see the contents of
 # /usr/share/zoneinfo/ for valid values.
-d-i time/zone string US/Eastern
+d-i time/zone string US/Eastern<phrase condition="lenny">
+
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+# NTP server to use. The default is almost always fine here.
+#d-i clock-setup/ntp-server ntp.example.com
+</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1100,6 +1111,15 @@ permite ataques de força bruta.
 #d-i passwd/user-password-again password insecure
 # or encrypted using an MD5 hash.
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Create the first user with the specified UID instead of the default.
+#d-i passwd/user-uid string 1010<phrase condition="lenny">
+
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
 </screen></informalexample>
 
 <para>
@@ -1133,7 +1153,11 @@ As únicas questões feitas são com relação à instalação do kernel.
 
 <informalexample role="example"><screen>
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+  
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1408,10 +1432,11 @@ perguntas definindo o parâmetro
 na inicialização. Isso também pode ser útil para testar ou depurar seu
 arquivo de pré-configuração.
 
+</para><para>
+
 Se você está fazendo a pré-configuração pelos parâmetros na inicialização,
 você pode fazer com que o instalador faça a pergunta correspondente usando o
 operador <quote>?=</quote>, i.e. <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
-
 Isso, claro, irá apenas ter efeito para parâmetros que correspondem às
 perguntas que são realmente exibidas durante uma instalação e não para
 parâmetros <quote>internos</quote>.
@@ -1448,7 +1473,7 @@ em um arquivo e configurações mais específicas em outro arquivo.
 # More flexibly, this runs a shell command and if it outputs the names of
 # preconfiguration files, includes those files. 
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
