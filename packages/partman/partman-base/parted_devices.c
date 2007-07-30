@@ -43,22 +43,38 @@ is_floppy(const char *path)
 #define is_floppy(path) 0
 #endif /* __linux__ */
 
+void
+process_device(PedDevice *dev)
+{
+	if (dev->read_only)
+		return;
+	if (is_cdrom(dev->path) || is_floppy(dev->path))
+		return;
+	printf("%s\t%lli\t%s\n",
+	       dev->path,
+	       dev->length * PED_SECTOR_SIZE_DEFAULT,
+	       dev->model);
+}
+
 int
 main(int argc, char *argv[])
 {
         PedDevice *dev;
         ped_exception_fetch_all();
         ped_device_probe_all();
-        for (dev = NULL; NULL != (dev = ped_device_get_next(dev));) {
-		if (dev->read_only)
-			continue;
-		if (is_cdrom(dev->path) || is_floppy(dev->path))
-			continue;
-                printf("%s\t%lli\t%s\n",
-                       dev->path,
-		       dev->length * PED_SECTOR_SIZE_DEFAULT,
-                       dev->model);
-        }
+	if (argc > 1) {
+		int i;
+		for (i = 1; i < argc; ++i) {
+			dev = ped_device_get(argv[i]);
+			if (dev) {
+				process_device(dev);
+				ped_device_destroy(dev);
+			}
+		}
+	} else {
+		for (dev = NULL; NULL != (dev = ped_device_get_next(dev));)
+			process_device(dev);
+	}
         return 0;
 }
 
