@@ -59,9 +59,9 @@ process_device(PedDevice *dev)
 int
 main(int argc, char *argv[])
 {
-        PedDevice *dev;
-        ped_exception_fetch_all();
-        ped_device_probe_all();
+	PedDevice *dev;
+	ped_exception_fetch_all();
+	ped_device_probe_all();
 	if (argc > 1) {
 		int i;
 		for (i = 1; i < argc; ++i) {
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
 		for (dev = NULL; NULL != (dev = ped_device_get_next(dev));)
 			process_device(dev);
 	}
-        return 0;
+	return 0;
 }
 
 /*
