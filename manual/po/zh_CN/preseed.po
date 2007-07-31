@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-07-26 04:00+0000\n"
-"PO-Revision-Date: 2007-06-27 09:55+0800\n"
+"PO-Revision-Date: 2007-07-31 14:04+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -435,11 +435,11 @@ msgid ""
 "not be asked. To set a specific default value for a question, but still have "
 "the question asked, use <quote>?=</quote> instead of <quote>=</quote> as "
 "operator. See also <xref linkend=\"preseed-seenflag\"/>."
-msgstr ""
+msgstr "通常，采用这种方式预置是为了问题不再被询问。为了设置一个问题的默认答案，并仍然显示问题，请使用 <quote>?=</quote> 替换 <quote>=</quote> 作为操作符。参阅 <xref linkend=\"preseed-seenflag\"/>。"
 
 #. Tag: para
 #: preseed.xml:324
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Note that some variables that are frequently set at the boot prompt have a "
 "shorter alias. If an alias is available, it is used in the examples in this "
@@ -447,11 +447,7 @@ msgid ""
 "variable for example has been aliased as <literal>url</literal>. Another "
 "example is the <literal>tasks</literal> alias, which translates to "
 "<literal>tasksel:tasksel/first</literal>."
-msgstr ""
-"注意，一些常用的引导参数变量有简写别名。如果可以使用简写，本附录里面将用来替"
-"代全称。特别需要提到，<literal>preseed/url</literal> 变量简写为 "
-"<literal>url</literal>，并且 url 有另外一些缩写的方式。另一个例子是 "
-"<literal>tasks</literal>，它转换成 <literal>tasksel:tasksel/first</literal>。"
+msgstr "注意，一些常用的引导参数变量有简写别名。如果有简写形式，它们将会被用在附录的例子里面替代全称。例如，<literal>preseed/url</literal> 变量简写为 <literal>url</literal>。另一个例子是 <literal>tasks</literal>，它转换成 <literal>tasksel:tasksel/first</literal>。"
 
 #. Tag: para
 #: preseed.xml:333
@@ -1428,7 +1424,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:790
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# Note: this must be preseeded with a localized (translated) value.\n"
@@ -1504,10 +1500,14 @@ msgstr ""
 "#d-i partman-auto/init_automatically_partition \\\n"
 "#      select Guided - use the largest continuous free space\n"
 "\n"
-"# Alternatively, you can specify a disk to partition. The device name\n"
+"<phrase condition=\"etch\"># Alternatively, you can specify a disk to partition. The device name\n"
 "# can be given in either devfs or traditional non-devfs format.\n"
 "# For example, to use the first disk:\n"
-"d-i partman-auto/disk string /dev/discs/disc0/disc\n"
+"d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition=\"lenny\">\n"
+"# Alternatively, you can specify a disk to partition. The device name must\n"
+"# be given in traditional non-devfs format.\n"
+"# For example, to use the first SCSI/SATA hard disk:\n"
+"d-i partman-auto/disk string /dev/sda</phrase>\n"
 "# In addition, you'll need to specify the method to use.\n"
 "# The presently available methods are: \"regular\", \"lvm\" and \"crypto\"\n"
 "d-i partman-auto/method string lvm\n"
@@ -1529,14 +1529,12 @@ msgstr ""
 "#       select Separate /home, /usr, /var, and /tmp partitions\n"
 "\n"
 "# Or provide a recipe of your own...\n"
-"# The recipe format is documented in the file devel/partman-auto-recipe."
-"txt.\n"
+"# The recipe format is documented in the file devel/partman-auto-recipe.txt.\n"
 "# If you have a way to get a recipe file into the d-i environment, you can\n"
 "# just point at it.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
 "\n"
-"# If not, you can put an entire recipe into the preconfiguration file in "
-"one\n"
+"# If not, you can put an entire recipe into the preconfiguration file in one\n"
 "# (logical) line. This example creates a small /boot partition, suitable\n"
 "# swap, and uses the rest of the space for the root partition:\n"
 "#d-i partman-auto/expert_recipe string                         \\\n"
@@ -1713,7 +1711,7 @@ msgstr "时钟与时区设置"
 
 #. Tag: screen
 #: preseed.xml:829
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Controls whether or not the hardware clock is set to UTC.\n"
 "d-i clock-setup/utc boolean true\n"
@@ -1733,7 +1731,13 @@ msgstr ""
 "\n"
 "# You may set this to any valid setting for $TZ; see the contents of\n"
 "# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern"
+"d-i time/zone string US/Eastern<phrase condition=\"lenny\">\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com\n"
+"</phrase>"
 
 #. Tag: title
 #: preseed.xml:834
@@ -1767,7 +1771,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:852
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1815,7 +1819,13 @@ msgstr ""
 "#d-i passwd/user-password password insecure\n"
 "#d-i passwd/user-password-again password insecure\n"
 "# or encrypted using an MD5 hash.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]"
+"#d-i passwd/user-password-crypted password [MD5 hash]\n"
+"# Create the first user with the specified UID instead of the default.\n"
+"#d-i passwd/user-uid string 1010<phrase condition=\"lenny\">\n"
+"\n"
+"# The user account will be added to some standard initial groups. To\n"
+"# override that, use this.\n"
+"#d-i passwd/user-default-groups string audio cdrom video</phrase>"
 
 #. Tag: para
 #: preseed.xml:854
@@ -1876,6 +1886,12 @@ msgid ""
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image linux-image-2.6-486</phrase>"
 msgstr ""
+"# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition=\"lenny\">\n"
+"\n"
+"# The kernel image (meta) package to be installed; \"none\" can be used if no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486</phrase>"
 
 #. Tag: title
 #: preseed.xml:887
@@ -2336,7 +2352,7 @@ msgstr "使用预置修改默认值"
 
 #. Tag: para
 #: preseed.xml:1021
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
 "question, but still have the question asked. To do this the <firstterm>seen</"
@@ -2349,22 +2365,14 @@ msgid ""
 "<classname>preseed/interactive=true</classname> at the boot prompt. This can "
 "also be useful for testing or debugging your preconfiguration file."
 msgstr ""
-"也可以使用预置在修改问题的默认答案同时仍会有问题提出。要这样做，需要在给问题"
-"设定值以后，<firstterm>seen</firstterm> 旗标必须重置为 <quote>false</quote>。"
-"<informalexample><screen>\n"
+"也可以使用预置修改问题的默认答案，但同时显示问题。这需要在问题设定值之后，必须将 <firstterm>seen</firstterm> 旗标重置为 <quote>false</quote>。<informalexample><screen>\n"
 "d-i foo/bar string value\n"
 "d-i foo/bar seen false\n"
-"</screen></informalexample> 要对<emphasis>所有</emphasis>问题达到同样效果，可"
-"以通过在启动引导符后面设置 <classname>preseed/interactive=true</classname>。"
-"这对于测试和调试您的预置文件很有帮助。如果使用引导参数预置，您可以通过 "
-"<quote>?=</quote> 操作符让安装程序询问相关的问题，例如，"
-"<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?"
-"=<replaceable>value</replaceable></userinput>。当然，这只会影响问题对应的参"
-"数，它们是安装时显示出来的，而不是<quote>内部的</quote>参数。"
+"</screen></informalexample> 要对<emphasis>所有</emphasis>问题达到同样效果，可以通过在启动引导符后面设置 <classname>preseed/interactive=true</classname>。这对于测试和调试您的预置文件很有帮助。"
 
 #. Tag: para
 #: preseed.xml:1035
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
 "the corresponding question by using the <quote>?=</quote> operator, i.e. "
@@ -2373,19 +2381,7 @@ msgid ""
 "effect for parameters that correspond to questions that are actually "
 "displayed during an installation and not for <quote>internal</quote> "
 "parameters."
-msgstr ""
-"也可以使用预置在修改问题的默认答案同时仍会有问题提出。要这样做，需要在给问题"
-"设定值以后，<firstterm>seen</firstterm> 旗标必须重置为 <quote>false</quote>。"
-"<informalexample><screen>\n"
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false\n"
-"</screen></informalexample> 要对<emphasis>所有</emphasis>问题达到同样效果，可"
-"以通过在启动引导符后面设置 <classname>preseed/interactive=true</classname>。"
-"这对于测试和调试您的预置文件很有帮助。如果使用引导参数预置，您可以通过 "
-"<quote>?=</quote> 操作符让安装程序询问相关的问题，例如，"
-"<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?"
-"=<replaceable>value</replaceable></userinput>。当然，这只会影响问题对应的参"
-"数，它们是安装时显示出来的，而不是<quote>内部的</quote>参数。"
+msgstr "如果使用引导参数预置，您可以通过 <quote>?=</quote> 操作符让安装程序询问相关的问题，例如，<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>。当然，这只会影响在安装时显示出来的问题对应的参数，而不是<quote>内部的</quote>参数。"
 
 #. Tag: title
 #: preseed.xml:1050
@@ -2409,7 +2405,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1061
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -2448,7 +2444,7 @@ msgstr ""
 "# More flexibly, this runs a shell command and if it outputs the names of\n"
 "# preconfiguration files, includes those files. \n"
 "#d-i preseed/include_command \\\n"
-"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"#      string if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
 "\n"
 "# Most flexibly of all, this downloads a program and runs it. The program\n"
 "# can use commands such as debconf-set to manipulate the debconf database.\n"
@@ -2471,12 +2467,3 @@ msgstr ""
 "也可以通过在前面设置 preseed/url 从 initrd 或者文件预置链载进入网络预置。这将"
 "使网络预置在网络连通时执行。您应该小心使用，因为这是两种预置，意味着您有机会"
 "执行 preseed/early 命令，第二个可以在网络连通后使用。"
-
-#~ msgid ""
-#~ "# Select the initramfs generator used to generate the initrd for 2.6 "
-#~ "kernels.\n"
-#~ "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
-#~ msgstr ""
-#~ "# Select the initramfs generator used to generate the initrd for 2.6 "
-#~ "kernels.\n"
-#~ "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
