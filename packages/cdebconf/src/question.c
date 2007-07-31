@@ -279,6 +279,9 @@ question_get_text(struct frontend *obj, const char *template,
                   const char *fallback)
 {
 	struct question *q = obj->qdb->methods.get(obj->qdb, template);
-	return q ? q_get_description(q) : fallback;
+	const char *text;
+	text = (q ? q_get_description(q) : fallback);
+	question_deref(q);
+	return text;
 }
 
