@@ -40,14 +40,11 @@ if [ "$suite" = unstable ]; then
 	exit
 fi
 
-
-# Disable volatile for now as we first need its GPG key in the keyring
-# To activate: uncomment condition in next lines and update log messages below
 volatile=y
-#if [ "$suite" != stable ] && [ "$suite" != oldstable ]; then
+if [ "$suite" != stable ] && [ "$suite" != oldstable ]; then
 	disable_service volatile || true
 	volatile=n
-#fi
+fi
 
 db_get apt-setup/security_host
 db_subst apt-setup/services-select SEC_HOST "$RET"
@@ -61,8 +58,7 @@ fi
 
 # Selecting volatile for testing is invalid
 if [ "$volatile" = n ] && disable_service volatile; then
-	#logger -t apt-setup "info: invalid selection of volatile for testing disabled"
-	logger -t apt-setup "info: GPG key for volatile is not yet available; selection disabled"
+	logger -t apt-setup "info: invalid selection of volatile for testing disabled"
 fi
 
 # No need to set up proxy here if no services were selected
