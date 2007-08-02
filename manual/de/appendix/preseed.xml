@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 48439 -->
+<!-- original version: 48636 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -940,12 +940,17 @@ Voreinstellung nutzen.
 #d-i partman-auto/init_automatically_partition \
 #      select Geführt - den größten freien Speicherbereich benutzen
 
-# Alternativ können Sie eine Festplatte angeben, die partitioniert
+<phrase condition="etch"># Alternativ können Sie eine Festplatte angeben, die partitioniert
 # werden soll. Der Gerätename kann entweder als devfs-Bezeichnung
 # oder im traditionellen Format angegeben werden. 
 # Um z.B. die erste Platte zu nutzen:
-d-i partman-auto/disk string /dev/discs/disc0/disc
-# Zusätzlich müssen Sie angeben, welche Partitionsmethode genutzt werden
+d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
+# Alternativ können Sie eine Festplatte angeben, die partitioniert
+# werden soll. Der Gerätename muss im traditionellen Format (nicht devfs)
+# angegeben werden.
+# Um z.B. die erste SCSI/SATA-Festplatte zu nutzen:
+d-i partman-auto/disk string /dev/sda</phrase>
+# Zusätzlich müssen Sie angeben, welche Partitionierungsmethode genutzt werden
 # soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
 d-i partman-auto/method string lvm
 
@@ -1094,7 +1099,15 @@ d-i clock-setup/utc boolean true
 
 # Sie können dies auf jeden gültigen Wert für $TZ setzen; siehe
 # /usr/share/zoneinfo/ für passende Werte.
-d-i time/zone string Europe/Berlin
+d-i time/zone string Europe/Berlin<phrase condition="lenny">
+
+# Legt fest, ob NTP genutzt werden soll, um während der Installation die Uhr
+# zu stellen.
+d-i clock-setup/ntp boolean true
+# NTP-Server, der genutz werden soll. Der Standard sollte in den allermeisten
+# Fällen funktionieren.
+#d-i clock-setup/ntp-server ntp.example.com
+</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1184,8 +1197,12 @@ Kernels.
 
 <informalexample role="example"><screen>
 # Den initramfs-Generator wählen, der zur Erstellung der initrd für
-# 2.6-Kernels genutzt wird.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+# 2.6-Kernels genutzt werden soll.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+
+# Das Kernel-Image- (Meta-) Paket, das installiert werden soll; "none" kann
+# verwendet werden, wenn kein Kernel installiert werden soll.
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
 
   </sect2>
