@@ -1,28 +1,15 @@
-#myecho() {
-#if [ "$DEBUG" ] ; then
-#	echo $*
-#else
-#	echo $* >>$LOG_FILE
-#fi
-#}
-
-
-
 #d-i
 # the checkout directory *must* exist before, with at least a RO copy of D-I
 # We could of course check it out now but, most often, this copy will
 # be shared with the RW one used by l10n-sync
-#myecho -n "    debian-installer	..."
-#echo -n "    debian-installer	..."
 mkdir -p debian-installer
 cd debian-installer/packages
-for I in `find ./ -name "*.pot"`; do
-	rm -f $I 
-done
+#for I in `find ./ -name "*.pot"`; do
+#	rm -f $I 
+#done
+rm po/header.pot
 svn cleanup
 svn -q update 
-#myecho "Done."
-#echo "Done."
 
 cd ../..
 
