@@ -1,33 +1,32 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 45616 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
+ <title>PrÃ©paration des fichiers pour un amorÃ§age avec une clÃ© USB</title>
 
 <para>
 
-Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
-qui gère les périphériques USB. Vérifiez que le module du noyau
-usb-storage est chargé (<userinput>modprobe usb-storage</userinput>) et trouvez
-à quel périphérique SCSI la clé USB est affectée (dans l'exemple qui suit, ce sera
-<filename>/dev/sda</filename>). Pour pouvoir écrire sur la clé, il vous faudra
-enlever la protection contre l'écriture.
+Pour prÃ©parer une clÃ© USB, vous avez besoin d'un systÃ¨me GNU/Linux fonctionnel
+qui gÃ¨re les pÃ©riphÃ©riques USB. VÃ©rifiez que le module du noyau
+usb-storage est chargÃ© (<userinput>modprobe usb-storage</userinput>) et trouvez
+Ã  quel pÃ©riphÃ©rique SCSI la clÃ© USB est affectÃ©e (dans l'exemple qui suit, ce sera
+<filename>/dev/sda</filename>). Pour pouvoir Ã©crire sur la clÃ©, il vous faudra
+enlever la protection contre l'Ã©criture.
 </para>
 <para>
 
-Notez que la taille de la clé doit être au moins égale à 256&nbsp;Mo. Pour des
-tailles inférieures, voyez <xref linkend="usb-copy-flexible"/>.
+Notez que la taille de la clÃ© doit Ãªtre au moins Ã©gale Ã  256&nbsp;Mo. Pour des
+tailles infÃ©rieures, voyez <xref linkend="usb-copy-flexible"/>.
 
 </para>
 
   <sect2 id="usb-copy-easy">
-  <title>Copie des fichiers &mdash; méthode simple</title>
+  <title>Copie des fichiers &mdash; mÃ©thode simple</title>
 <para arch="x86">
 
 Le fichier <filename>hd-media/boot.img.gz</filename> contient tous les
 fichiers de l'installateur, le noyau et le programme 
 <command>SYSLINUX</command> avec son fichier de configuration. Il vous suffit
-d'extraire ces fichiers dans votre clé USB&nbsp;:
+d'extraire ces fichiers dans votre clÃ© USB&nbsp;:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
@@ -38,8 +37,8 @@ d'extraire ces fichiers dans votre clé USB&nbsp;:
 
 Le fichier <filename>hd-media/boot.img.gz</filename> contient tous les
 fichiers de l'installateur, le noyau et le programme
-<command>yaboot</command> avec son fichier de configuration. Créez une 
-partition <quote>Apple_Bootstrap</quote> sur la clé avec la commande 
+<command>yaboot</command> avec son fichier de configuration. CrÃ©ez une 
+partition <quote>Apple_Bootstrap</quote> sur la clÃ© avec la commande 
 <userinput>C</userinput> de <command>mac-fdisk</command> et mettez l'image
 avec&nbsp;:
 
@@ -48,32 +47,32 @@ avec&nbsp;:
 </screen></informalexample>
 </para>
 <warning><para>
-Bien sûr, toutes les données présentes sur la clé seront détruites. Assurez-vous
-d'utiliser le périphérique correspondant à votre clé&nbsp;!
+Bien sÃ»r, toutes les donnÃ©es prÃ©sentes sur la clÃ© seront dÃ©truites. Assurez-vous
+d'utiliser le pÃ©riphÃ©rique correspondant Ã  votre clÃ©&nbsp;!
 </para>
 </warning>
 <para>
 
-Montez ensuite la clé (<userinput>mount 
+Montez ensuite la clÃ© (<userinput>mount 
 <replaceable arch="x86">/dev/sda</replaceable>
 <replaceable arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>),
-qui aura maintenant un système de fichiers 
+qui aura maintenant un systÃ¨me de fichiers 
 <phrase arch="x86">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>, et copiez une image ISO de type
 <quote>netinst</quote> ou <quote>businesscard</quote>.
 Consultez <xref linkend="usb-add-iso"/>. Le nom de ce fichier doit se terminer par
-<filename>.iso</filename>. Démontez la clé (<userinput>umount /mnt</userinput>)
-et voilà, c'est fait&nbsp;!
+<filename>.iso</filename>. DÃ©montez la clÃ© (<userinput>umount /mnt</userinput>)
+et voilÃ , c'est fait&nbsp;!
 </para>
 </sect2>
 
   <sect2 id="usb-copy-flexible">
-  <title>Copie des fichiers &mdash; méthode détaillée</title>
+  <title>Copie des fichiers &mdash; mÃ©thode dÃ©taillÃ©e</title>
 <para>
 
 Si vous aimez la souplesse d'utilisation ou si vous voulez simplement savoir ce qui se
-passe, vous pouvez utiliser la méthode suivante pour mettre les fichiers
-sur la clé. 
+passe, vous pouvez utiliser la mÃ©thode suivante pour mettre les fichiers
+sur la clÃ©. 
 </para>
 
 &usb-setup-x86.xml;
@@ -85,37 +84,37 @@ sur la clé.
 <title>Ajouter une image ISO</title>
 <para>
 
-L'installateur recherchera une image ISO Debian sur la clé où prendre les données
-nécessaires à l'installation. Il vous faut donc copier une image ISO
-(<quote>businesscard</quote>, <quote>netinst</quote> ou même l'image complète) sur la clé.
+L'installateur recherchera une image ISO Debian sur la clÃ© oÃ¹ prendre les donnÃ©es
+nÃ©cessaires Ã  l'installation. Il vous faut donc copier une image ISO
+(<quote>businesscard</quote>, <quote>netinst</quote> ou mÃªme l'image complÃ¨te) sur la clÃ©.
 Le nom de cette image doit se terminer par <filename>.iso</filename>.
 
 </para>
 <para>
 
-Si vous voulez faire une installation sur le réseau, sans utiliser d'image
-ISO, vous sauterez bien sûr l'étape précédente. De plus vous devrez utiliser
-le disque virtuel initial qui se trouve dans le répertoire
-<filename>netboot</filename> au lieu de celui dans le répertoire
+Si vous voulez faire une installation sur le rÃ©seau, sans utiliser d'image
+ISO, vous sauterez bien sÃ»r l'Ã©tape prÃ©cÃ©dente. De plus vous devrez utiliser
+le disque virtuel initial qui se trouve dans le rÃ©pertoire
+<filename>netboot</filename> au lieu de celui dans le rÃ©pertoire
 <filename>hd-media</filename>, car le fichier 
-<filename>hd-media/initrd.gz</filename> ne sait pas utiliser le réseau.
+<filename>hd-media/initrd.gz</filename> ne sait pas utiliser le rÃ©seau.
 
 </para>
 <para>
 
-Quand tout est fait, démontez la clé USB (<userinput>umount /mnt</userinput>) 
-et activez la protection contre l'écriture.
+Quand tout est fait, dÃ©montez la clÃ© USB (<userinput>umount /mnt</userinput>) 
+et activez la protection contre l'Ã©criture.
 
 </para>
 </sect2>
 
 <!-- TODO: doesn't this section belong later? -->
 <sect2 arch="x86">
-   <title>Amorcer la clé USB</title>
+   <title>Amorcer la clÃ© USB</title>
 <warning><para>
 
-Si le système refuse de s'amorcer à partir de la clé, il se peut que le
-secteur principal d'amorçage de la clé soit défectueux. Corrigez-le avec le
+Si le systÃ¨me refuse de s'amorcer Ã  partir de la clÃ©, il se peut que le
+secteur principal d'amorÃ§age de la clÃ© soit dÃ©fectueux. Corrigez-le avec le
 programme <command>install-mbr</command> qui se trouve dans le paquet
 <classname>mbr</classname>&nbsp;:
 

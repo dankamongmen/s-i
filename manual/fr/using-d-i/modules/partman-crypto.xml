@@ -1,67 +1,66 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 44026 -->
 
    <sect3 id="partman-crypto">
-   <title>Configuration des volumes chiffrés</title>
+   <title>Configuration des volumes chiffrÃ©s</title>
 <para>
 
 L'installateur Debian permet le chiffrement des partitions. Tout fichier 
-destiné à une partition chiffrée est sauvegardé sur le périphérique sous 
-une forme chiffrée. L'accès aux données chiffrées n'est autorisé qu'après 
-avoir fourni la <firstterm>phrase secrète</firstterm> qui avait été donnée 
-lors de la création de la partition chiffrée. Ce mécanisme est utile pour 
-protéger des données sensibles en cas de vol du portable ou du disque 
-dur. Le voleur a bien un accès physique au disque dur mais, sans la phrase
-secrète, les données ne sont qu'une suite inintelligible de caractères.
+destinÃ© Ã  une partition chiffrÃ©e est sauvegardÃ© sur le pÃ©riphÃ©rique sous 
+une forme chiffrÃ©e. L'accÃ¨s aux donnÃ©es chiffrÃ©es n'est autorisÃ© qu'aprÃ¨s 
+avoir fourni la <firstterm>phrase secrÃ¨te</firstterm> qui avait Ã©tÃ© donnÃ©e 
+lors de la crÃ©ation de la partition chiffrÃ©e. Ce mÃ©canisme est utile pour 
+protÃ©ger des donnÃ©es sensibles en cas de vol du portable ou du disque 
+dur. Le voleur a bien un accÃ¨s physique au disque dur mais, sans la phrase
+secrÃ¨te, les donnÃ©es ne sont qu'une suite inintelligible de caractÃ¨res.
 
 </para><para>
 
-Le chiffrement est particulièrement important pour deux partitions, la 
-partition /home avec les données privées et la partition d'échange où 
-peuvent se trouver stockées temporairement des données sensibles. Bien sûr, 
+Le chiffrement est particuliÃ¨rement important pour deux partitions, la 
+partition /home avec les donnÃ©es privÃ©es et la partition d'Ã©change oÃ¹ 
+peuvent se trouver stockÃ©es temporairement des donnÃ©es sensibles. Bien sÃ»r, 
 vous pouvez chiffrer n'importe quelle partition, par exemple <filename>/var</filename>
-où se trouvent les données des serveurs de bases de données, des serveurs de 
+oÃ¹ se trouvent les donnÃ©es des serveurs de bases de donnÃ©es, des serveurs de 
 courrier ou d'impression, <filename>/tmp</filename> avec ses fichiers temporaires, etc. Vous 
-pouvez même chiffrer le système complet. La seule exception est qu'on ne 
+pouvez mÃªme chiffrer le systÃ¨me complet. La seule exception est qu'on ne 
 peut pas chiffrer la partition <filename>/boot</filename> car il n'existe actuellement aucun 
-moyen de charger le noyau à partir d'une partition chiffrée.
+moyen de charger le noyau Ã  partir d'une partition chiffrÃ©e.
 
 </para><note><para>
 
-Il faut noter que la performance d'une machine avec partitions chiffrées 
-sera inférieure à celle d'un machine sans. En effet les données doivent être 
-chiffrées ou déchiffrées à chaque lecture ou écriture. L'impact sur la 
-performance dépend de la vitesse du processeur, de l'algorithme choisi et de 
-la longueur de la clé.
+Il faut noter que la performance d'une machine avec partitions chiffrÃ©es 
+sera infÃ©rieure Ã  celle d'un machine sans. En effet les donnÃ©es doivent Ãªtre 
+chiffrÃ©es ou dÃ©chiffrÃ©es Ã  chaque lecture ou Ã©criture. L'impact sur la 
+performance dÃ©pend de la vitesse du processeur, de l'algorithme choisi et de 
+la longueur de la clÃ©.
 
 </para></note><para>
 
-Pour chiffrer une partition, vous devez d'abord la créer, dans le menu de 
-partitionnement. Une autre possibilité est d'utiliser une partition 
+Pour chiffrer une partition, vous devez d'abord la crÃ©er, dans le menu de 
+partitionnement. Une autre possibilitÃ© est d'utiliser une partition 
 existante, par exemple, une partition ordinaire, un volume logique (LVM) ou 
-un volume RAID. Dans le menu <guimenu>Caractéristiques de la partition</guimenu>,
-vous devez modifier la première option pour qu'elle 
-affiche <menuchoice> <guimenu>Utiliser comme :</guimenu> <guimenuitem>volume 
-physique à chiffrer</guimenuitem></menuchoice>. Le menu affichera alors 
-différentes options de chiffrement pour la partition.
+un volume RAID. Dans le menu <guimenu>CaractÃ©ristiques de la partition</guimenu>,
+vous devez modifier la premiÃ¨re option pour qu'elle 
+affiche <menuchoice> <guimenu>Utiliser commeÂ :</guimenu> <guimenuitem>volume 
+physique Ã  chiffrer</guimenuitem></menuchoice>. Le menu affichera alors 
+diffÃ©rentes options de chiffrement pour la partition.
 
 </para><para>
 
-L'installateur Debian propose plusieurs méthodes de chiffrement. Par défaut, 
-la méthode est <firstterm>dm-crypt</firstterm>, qui est gérée par les noyaux 
-Linux récents, et qui peut gérer les volumes logiques (LVM). Un autre méthode est 
+L'installateur Debian propose plusieurs mÃ©thodes de chiffrement. Par dÃ©faut, 
+la mÃ©thode est <firstterm>dm-crypt</firstterm>, qui est gÃ©rÃ©e par les noyaux 
+Linux rÃ©cents, et qui peut gÃ©rer les volumes logiques (LVM). Un autre mÃ©thode est 
 <firstterm>loop-AES</firstterm>, plus ancienne et maintenue en marge du 
-noyau Linux. Il est recommandé d'utiliser la méthode par défaut.
+noyau Linux. Il est recommandÃ© d'utiliser la mÃ©thode par dÃ©faut.
 
 <!-- TODO: link to the "Debian block device encryption guide"
      once Max writes it :-) -->
 
 </para><para>
 
-Voyons tout d'abord les options disponibles quand on a sélectionné la 
-méthode de chiffrement <userinput>Device-mapper (dm-crypt)</userinput>. N'oubliez pas
-qu'en cas de doute il faut utiliser les options par défaut car elles 
-ont été choisies en visant la sécurité d'utilisation.
+Voyons tout d'abord les options disponibles quand on a sÃ©lectionnÃ© la 
+mÃ©thode de chiffrement <userinput>Device-mapper (dm-crypt)</userinput>. N'oubliez pas
+qu'en cas de doute il faut utiliser les options par dÃ©faut car elles 
+ont Ã©tÃ© choisies en visant la sÃ©curitÃ© d'utilisation.
 
 <variablelist>
 
@@ -71,27 +70,27 @@ ont été choisies en visant la sécurité d'utilisation.
 <listitem><para>
 
 Cette option permet de choisir l'algorithme de chiffrement 
-(<firstterm>cipher</firstterm>) qui servira à chiffrer les données de la 
+(<firstterm>cipher</firstterm>) qui servira Ã  chiffrer les donnÃ©es de la 
 partition. Actuellement l'installateur Debian accepte les algorithmes de type 
 bloc suivants&nbsp;: <firstterm>aes</firstterm>, <firstterm>blowfish</firstterm>, 
 <firstterm>serpent</firstterm> et <firstterm>twofish</firstterm>. Nous ne 
-discuterons pas ici de la qualité de ces différents algorithmes. Cependant, 
-il peut être utile de savoir que l'algorithme <emphasis>AES</emphasis> a été 
+discuterons pas ici de la qualitÃ© de ces diffÃ©rents algorithmes. Cependant, 
+il peut Ãªtre utile de savoir que l'algorithme <emphasis>AES</emphasis> a Ã©tÃ© 
 choisi en 2000 par l'<emphasis>American National Institute of Standards
-and Technology</emphasis> pour la protection des données sensibles au 21e siècle.
+and Technology</emphasis> pour la protection des donnÃ©es sensibles au 21e siÃ¨cle.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Taille de clé&nbsp;: <userinput>256</userinput></term>
+<term>Taille de clÃ©&nbsp;: <userinput>256</userinput></term>
 
 <listitem><para>
 
-Vous pouvez choisir ici la taille de la clé de chiffrement. Plus la taille 
-de la clé est grande, plus la force du chiffrement est augmentée. Cependant 
-la taille de la clé a un impact négatif sur la performance. Les différentes 
-tailles de clé dépendent de l'algorithme de chiffrement.
+Vous pouvez choisir ici la taille de la clÃ© de chiffrement. Plus la taille 
+de la clÃ© est grande, plus la force du chiffrement est augmentÃ©e. Cependant 
+la taille de la clÃ© a un impact nÃ©gatif sur la performance. Les diffÃ©rentes 
+tailles de clÃ© dÃ©pendent de l'algorithme de chiffrement.
 
 </para></listitem>
 </varlistentry>
@@ -103,66 +102,66 @@ tailles de clé dépendent de l'algorithme de chiffrement.
 
 L'algorithme de type <firstterm>Initialization Vector</firstterm> ou 
 <firstterm>IV</firstterm> assure que si l'on applique l'algorithme sur le 
-même <firstterm>texte en clair</firstterm> avec la même clé, on obtiendra 
-toujours un <firstterm>texte chiffré</firstterm> différent. L'idée est d'empêcher 
-la déduction d'information à partir de motifs répétés dans les données 
-chiffrées.
+mÃªme <firstterm>texte en clair</firstterm> avec la mÃªme clÃ©, on obtiendra 
+toujours un <firstterm>texte chiffrÃ©</firstterm> diffÃ©rent. L'idÃ©e est d'empÃªcher 
+la dÃ©duction d'information Ã  partir de motifs rÃ©pÃ©tÃ©s dans les donnÃ©es 
+chiffrÃ©es.
 
 </para><para>
 
-De toutes ces possibilités, l'option par défaut 
-<userinput>cbc-essiv:sha256</userinput> est actuellement la moins vulnérable 
+De toutes ces possibilitÃ©s, l'option par dÃ©faut 
+<userinput>cbc-essiv:sha256</userinput> est actuellement la moins vulnÃ©rable 
 aux attaques connues. Ne choisissez les autres options que pour assurer la 
-compatibilité avec des systèmes déjà installées qui ne reconnaissent pas les 
+compatibilitÃ© avec des systÃ¨mes dÃ©jÃ  installÃ©es qui ne reconnaissent pas les 
 nouveaux algorithmes.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Clé de chiffrement&nbsp;: <userinput>phrase secrète</userinput></term>
+<term>ClÃ© de chiffrement&nbsp;: <userinput>phrase secrÃ¨te</userinput></term>
 
 <listitem><para>
 
-Vous pouvez choisir ici le type de la clé de chiffrement pour cette partition.
+Vous pouvez choisir ici le type de la clÃ© de chiffrement pour cette partition.
 
  <variablelist>
  <varlistentry>
- <term>phrase secrète</term>
+ <term>phrase secrÃ¨te</term>
  <listitem><para>
 
-La clé de chiffrement sera calculée <footnote>
+La clÃ© de chiffrement sera calculÃ©e <footnote>
 <para>
 
-L'utilisation d'une phrase comme clé signifie que la partition sera créée 
+L'utilisation d'une phrase comme clÃ© signifie que la partition sera crÃ©Ã©e 
 avec <ulink url="&url-luks;">LUKS</ulink>.
 
-</para></footnote> à partir d'une phrase que vous pourrez saisir plus tard dans le 
+</para></footnote> Ã  partir d'une phrase que vous pourrez saisir plus tard dans le 
 processus.
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Clé aléatoire</term>
+ <term>ClÃ© alÃ©atoire</term>
  <listitem><para>
 
-Une nouvelle clé est calculée avec des données aléatoires chaque fois que la 
-partition chiffrée est montée. En d'autres termes, à chaque arrêt de la 
-machine le contenu de la partition est perdu car la clé est supprimée de la 
-mémoire. On pourrait essayer de deviner la clé au moyen d'une attaque de 
-type force brute, mais, à moins d'une faiblesse non connue de l'algorithme, 
-une vie entière n'y suffirait pas.
+Une nouvelle clÃ© est calculÃ©e avec des donnÃ©es alÃ©atoires chaque fois que la 
+partition chiffrÃ©e est montÃ©e. En d'autres termes, Ã  chaque arrÃªt de la 
+machine le contenu de la partition est perdu car la clÃ© est supprimÃ©e de la 
+mÃ©moire. On pourrait essayer de deviner la clÃ© au moyen d'une attaque de 
+type force brute, mais, Ã  moins d'une faiblesse non connue de l'algorithme, 
+une vie entiÃ¨re n'y suffirait pas.
 
  </para><para>
 
-Les clés aléatoires sont adaptées aux partitions d'échange car vous n'avez 
-pas besoin de mémoriser une phrase secrète ou d'effacer des 
-données sensibles de la partition d'échange avant d'éteindre la 
+Les clÃ©s alÃ©atoires sont adaptÃ©es aux partitions d'Ã©change car vous n'avez 
+pas besoin de mÃ©moriser une phrase secrÃ¨te ou d'effacer des 
+donnÃ©es sensibles de la partition d'Ã©change avant d'Ã©teindre la 
 machine. Cependant cela signifie que vous ne pourrez pas utiliser la 
-fonctionnalité <quote>suspend-to-disk</quote> qu'offrent les noyaux Linux 
-récents. Il est en effet impossible (pendant le redémarrage) de récupérer 
-les données écrites sur la partition d'échange.
+fonctionnalitÃ© <quote>suspend-to-disk</quote> qu'offrent les noyaux Linux 
+rÃ©cents. Il est en effet impossible (pendant le redÃ©marrage) de rÃ©cupÃ©rer 
+les donnÃ©es Ã©crites sur la partition d'Ã©change.
 
  </para></listitem>
  </varlistentry>
@@ -172,20 +171,20 @@ les données écrites sur la partition d'échange.
 </varlistentry>
 
 <varlistentry>
-<term>Effacer les données&nbsp;: <userinput>oui</userinput></term>
+<term>Effacer les donnÃ©es&nbsp;: <userinput>oui</userinput></term>
 
 <listitem><para>
 
-Cette option détermine si la partition doit être remplie de 
-données aléatoires avant le début du chiffrement. Cette opération est 
-recommandée car un attaquant pourrait sinon discerner quelles parties de la 
+Cette option dÃ©termine si la partition doit Ãªtre remplie de 
+donnÃ©es alÃ©atoires avant le dÃ©but du chiffrement. Cette opÃ©ration est 
+recommandÃ©e car un attaquant pourrait sinon discerner quelles parties de la 
 partition sont actives et lesquelles ne le sont pas. De plus cela rendra plus 
-difficile de récupérer des données laissées par des installations 
-précédentes <footnote><para>
+difficile de rÃ©cupÃ©rer des donnÃ©es laissÃ©es par des installations 
+prÃ©cÃ©dentes <footnote><para>
 
 Il est cependant probable que certains organismes gouvernementaux 
-ont les moyens de récupérer des données même après plusieurs écritures d'un 
-support magnétooptique.
+ont les moyens de rÃ©cupÃ©rer des donnÃ©es mÃªme aprÃ¨s plusieurs Ã©critures d'un 
+support magnÃ©tooptique.
 
 </para></footnote>.
 
@@ -196,7 +195,7 @@ support magnétooptique.
 
 </para><para>
 
-Si vous choisissez <menuchoice> <guimenu>Méthode de chiffrement :</guimenu> 
+Si vous choisissez <menuchoice> <guimenu>MÃ©thode de chiffrement :</guimenu> 
 <guimenuitem>Loopback (loop-AES)</guimenuitem> </menuchoice>, le menu offre 
 alors les options suivantes&nbsp;:
 
@@ -207,39 +206,39 @@ alors les options suivantes&nbsp;:
 
 <listitem><para>
 
-Pour loop-AES, contrairement à dm-crypt, les options algorithme et clé sont 
-combinées et vous pouvez les choisir en même temps. Veuillez consulter les 
-sections suivantes sur les algorithmes et les clés pour d'autres 
+Pour loop-AES, contrairement Ã  dm-crypt, les options algorithme et clÃ© sont 
+combinÃ©es et vous pouvez les choisir en mÃªme temps. Veuillez consulter les 
+sections suivantes sur les algorithmes et les clÃ©s pour d'autres 
 informations.
 
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
-<term>Clé de chiffrement : <userinput>Keyfile (GnuPG)</userinput></term>
+<term>ClÃ© de chiffrement : <userinput>Keyfile (GnuPG)</userinput></term>
 
 <listitem><para>
 
-Vous pouvez choisir ici le type de la clé pour cette partition.
+Vous pouvez choisir ici le type de la clÃ© pour cette partition.
 
  <variablelist>
  <varlistentry>
  <term>Keyfile (GnuPG)</term>
  <listitem><para>
 
-La clé de chiffrement sera créée avec des données aléatoires pendant 
-l'installation. Cette clé sera chiffrée avec 
+La clÃ© de chiffrement sera crÃ©Ã©e avec des donnÃ©es alÃ©atoires pendant 
+l'installation. Cette clÃ© sera chiffrÃ©e avec 
 <application>GnuPG</application>, et pour l'utiliser, vous devrez saisir 
-votre phrase secrète (elle vous sera demandée plus tard dans le processus).
+votre phrase secrÃ¨te (elle vous sera demandÃ©e plus tard dans le processus).
 
  </para></listitem>
  </varlistentry>
 
  <varlistentry>
- <term>Clé aléatoire</term>
+ <term>ClÃ© alÃ©atoire</term>
  <listitem><para>
 
-Veuillez consulter la section sur les clés aléatoires ci-dessus.
+Veuillez consulter la section sur les clÃ©s alÃ©atoires ci-dessus.
 
  </para></listitem>
  </varlistentry>
@@ -249,11 +248,11 @@ Veuillez consulter la section sur les clés aléatoires ci-dessus.
 </varlistentry>
 
 <varlistentry>
-<term>Effacer les données&nbsp;: <userinput>oui</userinput></term>
+<term>Effacer les donnÃ©es&nbsp;: <userinput>oui</userinput></term>
 
 <listitem><para>
 
-Veuillez consulter la section sur la suppression des données ci-dessous.
+Veuillez consulter la section sur la suppression des donnÃ©es ci-dessous.
 
 </para></listitem>
 </varlistentry>
@@ -263,80 +262,80 @@ Veuillez consulter la section sur la suppression des données ci-dessous.
 </para>
 <note condition="gtk"><para>
 
-L'installateur en version <emphasis>graphique</emphasis> est plus limité que 
+L'installateur en version <emphasis>graphique</emphasis> est plus limitÃ© que 
 l'installateur standard en mode texte. En ce qui concerne la cryptographie, vous ne pouvez 
-configurer de volumes qu'en utilisant une <emphasis>phrase secrète</emphasis>
-comme clé de chiffrement.
+configurer de volumes qu'en utilisant une <emphasis>phrase secrÃ¨te</emphasis>
+comme clÃ© de chiffrement.
 
 </para></note>
 <para>
 
-Après avoir choisi les paramètres des partitions chiffrées, vous pouvez 
-revenir dans le menu de partitionnement. Une entrée <guimenu>Configuration 
-des volumes chiffrés</guimenu> devrait être présente. Quand vous la 
-sélectionnez, on vous demande de confirmer la suppression des données sur 
-les partitions à supprimer ainsi que d'autres actions comme l'écriture d'une 
+AprÃ¨s avoir choisi les paramÃ¨tres des partitions chiffrÃ©es, vous pouvez 
+revenir dans le menu de partitionnement. Une entrÃ©e <guimenu>Configuration 
+des volumes chiffrÃ©s</guimenu> devrait Ãªtre prÃ©sente. Quand vous la 
+sÃ©lectionnez, on vous demande de confirmer la suppression des donnÃ©es sur 
+les partitions Ã  supprimer ainsi que d'autres actions comme l'Ã©criture d'une 
 nouvelle table des partitions. Pour les grandes partitions, cela peut 
 prendre du temps.
 
 </para><para>
 
 On vous demandera ensuite de saisir une phrase pour les partitions qui en 
-utilisent. Une bonne phrase doit contenir plus de huit caractères, mélanger 
-les lettres, les chiffres et les autres caractères, ne pas comporter des mots 
+utilisent. Une bonne phrase doit contenir plus de huit caractÃ¨res, mÃ©langer 
+les lettres, les chiffres et les autres caractÃ¨res, ne pas comporter des mots 
 du dictionnaire ou des informations personnelles comme dates de naissance, 
 loisirs, petits noms, noms des membres de la famille ou des amis, etc.
 
 </para><warning><para>
 
-Avant de saisir une phrase, vous devez être sûr que le clavier est 
-correctement configuré et affiche bien les caractères attendus. Si ce n'est 
-pas le cas, vous pouvez passer sur la deuxième console et saisir quelques 
-caractères. Cela vous évitera de saisir une phrase avec un clavier configuré 
-en <quote>qwerty</quote> alors qu'à l'installation vous l'aviez configuré en 
+Avant de saisir une phrase, vous devez Ãªtre sÃ»r que le clavier est 
+correctement configurÃ© et affiche bien les caractÃ¨res attendus. Si ce n'est 
+pas le cas, vous pouvez passer sur la deuxiÃ¨me console et saisir quelques 
+caractÃ¨res. Cela vous Ã©vitera de saisir une phrase avec un clavier configurÃ© 
+en <quote>qwerty</quote> alors qu'Ã  l'installation vous l'aviez configurÃ© en 
 <quote>azerty</quote>. Cette situation peut avoir plusieurs causes. Vous 
-avez changé de carte clavier pendant l'installation ou bien la carte clavier 
-n'est pas encore configurée au moment où vous saisissez la phrase secrète 
-pour le système de fichiers racine.
+avez changÃ© de carte clavier pendant l'installation ou bien la carte clavier 
+n'est pas encore configurÃ©e au moment oÃ¹ vous saisissez la phrase secrÃ¨te 
+pour le systÃ¨me de fichiers racine.
 
 </para></warning><para>
 
-Si vous avez choisi une méthode sans phrase secrète pour créer une clé de 
-chiffrement, la clé sera créée maintenant. Comme le noyau, à ce stade de 
+Si vous avez choisi une mÃ©thode sans phrase secrÃ¨te pour crÃ©er une clÃ© de 
+chiffrement, la clÃ© sera crÃ©Ã©e maintenant. Comme le noyau, Ã  ce stade de 
 l'installation, peut manquer d'entropie, cela peut prendre du temps. Vous 
-pouvez accélérer le processus en pressant des touches au hasard ou en 
-passant sur la deuxième console et en créant du trafic réseau ou disque 
-(télécharger des fichiers, envoyer des fichiers sur /dev/null, etc.).
-L'opération est répétée pour chaque partition à chiffrer.
+pouvez accÃ©lÃ©rer le processus en pressant des touches au hasard ou en 
+passant sur la deuxiÃ¨me console et en crÃ©ant du trafic rÃ©seau ou disque 
+(tÃ©lÃ©charger des fichiers, envoyer des fichiers sur /dev/null, etc.).
+L'opÃ©ration est rÃ©pÃ©tÃ©e pour chaque partition Ã  chiffrer.
 
 </para><para>
 
 De retour dans le menu principal de partitionnement, vous pourrez voir tous 
-les volumes chiffrés listés comme partitions supplémentaires que vous pouvez 
-configurer de la même façon que des partitions ordinaires. L'exemple suivant 
-montre deux volumes différents, l'un chiffré avec dm-crypt, l'autre avec loop-AES.
+les volumes chiffrÃ©s listÃ©s comme partitions supplÃ©mentaires que vous pouvez 
+configurer de la mÃªme faÃ§on que des partitions ordinaires. L'exemple suivant 
+montre deux volumes diffÃ©rents, l'un chiffrÃ© avec dm-crypt, l'autre avec loop-AES.
 <informalexample><screen>
-Volume chiffré (<replaceable>sda2_crypt</replaceable>) - 115.1 Go Linux device-mapper
+Volume chiffrÃ© (<replaceable>sda2_crypt</replaceable>) - 115.1 Go Linux device-mapper
         #1 115.1 Go  F ext3
 
 Loopback (<replaceable>loop0</replaceable>) - 515.2 Mo AES256 keyfile
         #1 515.2 Mo  F ext3
 </screen></informalexample> C'est le moment d'affecter des points de montages aux 
-volumes et de modifier le type des systèmes de fichiers si le type par 
-défaut ne vous convient pas.
+volumes et de modifier le type des systÃ¨mes de fichiers si le type par 
+dÃ©faut ne vous convient pas.
 
 </para><para>
 
-Notez bien les identifiants entre parenthèses
+Notez bien les identifiants entre parenthÃ¨ses
 (<replaceable>sda2_crypt</replaceable> et <replaceable>loop0</replaceable> dans
-ce cas) et le point de montage affecté à chaque volume chiffré. Vous aurez
-besoin de ces informations quand vous amorcerez le nouveau système. Les
-différences entre un processus de démarrage ordinaire et un processus impliquant
-des questions de chiffrement seront abordées dans <xref linkend="mount-encrypted-volumes"/>.
+ce cas) et le point de montage affectÃ© Ã  chaque volume chiffrÃ©. Vous aurez
+besoin de ces informations quand vous amorcerez le nouveau systÃ¨me. Les
+diffÃ©rences entre un processus de dÃ©marrage ordinaire et un processus impliquant
+des questions de chiffrement seront abordÃ©es dans <xref linkend="mount-encrypted-volumes"/>.
 
 </para><para>
 
-Une fois le schéma de partitionnement terminé, vous pouvez poursuivre l'installation.
+Une fois le schÃ©ma de partitionnement terminÃ©, vous pouvez poursuivre l'installation.
 
 </para>
    </sect3>

@@ -1,59 +1,58 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 36639 -->
 
-  <sect2 arch="arm" id="boot-tftp"><title>Amorcer à partir de TFTP</title>
+  <sect2 arch="arm" id="boot-tftp"><title>Amorcer Ã  partir de TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Amorcer à partir de TFTP sur une Netwinder</title>
+  <sect3 arch="arm"><title>Amorcer Ã  partir de TFTP sur une Netwinder</title>
 
 <para>
 
-Les Netwinders possèdent deux interfaces réseau&nbsp;: une carte 10&nbsp;Mbps 
-compatible NE2000 (généralement définie comme <filename>eth0</filename>) et la 
+Les Netwinders possÃ¨dent deux interfaces rÃ©seau&nbsp;: une carte 10&nbsp;Mbps 
+compatible NE2000 (gÃ©nÃ©ralement dÃ©finie comme <filename>eth0</filename>) et la 
 carte Tulip en 100&nbsp;Mbps. Charger l'image par TFTP avec la carte en 100&nbsp;Mbps
-peut poser des problèmes. Il est recommandé d'utiliser la carte à 10&nbsp;Mbps
-(celle marquée <literal>10 Base-T</literal>).
+peut poser des problÃ¨mes. Il est recommandÃ© d'utiliser la carte Ã  10&nbsp;Mbps
+(celle marquÃ©e <literal>10 Base-T</literal>).
 
 </para>
 <note><para>
 
-Vous aurez besoin de NeTTrom version&nbsp;2.2.1 ou supérieure pour amorcer le 
-système d'installation. Il est recommandé d'utiliser NeTTrom&nbsp;2.3.3.
-Malheureusement des problèmes de licence empêchent le chargement des fichiers du
-firmware. Si la situation venait à changer, les nouvelles images seraient
+Vous aurez besoin de NeTTrom version&nbsp;2.2.1 ou supÃ©rieure pour amorcer le 
+systÃ¨me d'installation. Il est recommandÃ© d'utiliser NeTTrom&nbsp;2.3.3.
+Malheureusement des problÃ¨mes de licence empÃªchent le chargement des fichiers du
+firmware. Si la situation venait Ã  changer, les nouvelles images seraient
 <ulink url="http//www.netwinder.org/">ici</ulink>.
 
 </para></note>
 
 <para>
 
-Quand vous amorcez votre Netwinder, vous devez interrompre le processus d'amorçage
-pendant la phase de compte à rebours. Cela permet de configurer certains éléments
-nécessaires. Tout d'abord, chargez les paramètres par défaut&nbsp;:
+Quand vous amorcez votre Netwinder, vous devez interrompre le processus d'amorÃ§age
+pendant la phase de compte Ã  rebours. Cela permet de configurer certains Ã©lÃ©ments
+nÃ©cessaires. Tout d'abord, chargez les paramÃ¨tres par dÃ©faut&nbsp;:
 
 <informalexample><screen>
     NeTTrom command-&gt; load-defaults
 </screen></informalexample>
 
-Ensuite vous devez configurer le réseau, même avec une adresse fixe :
+Ensuite vous devez configurer le rÃ©seau, mÃªme avec une adresse fixe :
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv netconfig_eth0 flash
     NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
 </screen></informalexample>
 
-où 24 est le nombre de bits du masque réseau, ou bien sans adresse&nbsp;:
+oÃ¹ 24 est le nombre de bits du masque rÃ©seau, ou bien sans adresse&nbsp;:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv netconfig_eth0 dhcp
 </screen></informalexample>
 
-Il se peut que vous ayez aussi à configurer les réglages de
-<userinput>route1</userinput> si le serveur TFTP n'est pas sur le sous-réseau local.
+Il se peut que vous ayez aussi Ã  configurer les rÃ©glages de
+<userinput>route1</userinput> si le serveur TFTP n'est pas sur le sous-rÃ©seau local.
 
-Ensuite vous devez indiquer le serveur TFTP et l'endroit où se trouve l'image.
-Vous pouvez alors enregistrer ces paramètres en flash.
+Ensuite vous devez indiquer le serveur TFTP et l'endroit oÃ¹ se trouve l'image.
+Vous pouvez alors enregistrer ces paramÃ¨tres en flash.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
@@ -61,46 +60,46 @@ Vous pouvez alors enregistrer ces paramètres en flash.
     NeTTrom command-&gt; save-all
 </screen></informalexample>
 
-Puis vous devez indiquer au firmware que l'image TFTP doit être amorcée&nbsp;:
+Puis vous devez indiquer au firmware que l'image TFTP doit Ãªtre amorcÃ©e&nbsp;:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv kernconfig tftp
     NeTTrom command-&gt; setenv rootdev /dev/ram
 </screen></informalexample>
 
-Si vous voulez installer NetWinder avec la console série, vous devez utiliser
+Si vous voulez installer NetWinder avec la console sÃ©rie, vous devez utiliser
 la commande qui suit.
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
 </screen></informalexample>
 
-Pour les installations avec clavier et moniteur, vous devez exécutez&nbsp;:
+Pour les installations avec clavier et moniteur, vous devez exÃ©cutez&nbsp;:
 
 <informalexample><screen>
     NeTTrom command-&gt; setenv cmdappend root=/dev/ram
 </screen></informalexample>
 
-Utilisez la commande <command>printenv</command> pour réafficher vos 
-réglages. 
-Une fois les vérifications faites, vous pouvez charger l'image&nbsp;:
+Utilisez la commande <command>printenv</command> pour rÃ©afficher vos 
+rÃ©glages. 
+Une fois les vÃ©rifications faites, vous pouvez charger l'image&nbsp;:
 
 <informalexample><screen>
     NeTTrom command-&gt; boot
 </screen></informalexample>
 
-En cas de problèmes, il existe un 
-<ulink url="http://www.netwinder.org/howto/Firmware-HOWTO.html">HOWTO précis</ulink>.
+En cas de problÃ¨mes, il existe un 
+<ulink url="http://www.netwinder.org/howto/Firmware-HOWTO.html">HOWTO prÃ©cis</ulink>.
 
 </para>
   </sect3>
 
-  <sect3 arch="arm"><title>Amorcer à partir de TFTP sur CATS</title>
+  <sect3 arch="arm"><title>Amorcer Ã  partir de TFTP sur CATS</title>
 
 <para>
 
 Sur les machines CATS, utilisez <command>boot de0:</command>
-        ou quelque chose de similaire à l'invite de Cyclone.
+        ou quelque chose de similaire Ã  l'invite de Cyclone.
 
 </para>
    </sect3>
@@ -108,12 +107,12 @@ Sur les machines CATS, utilisez <command>boot de0:</command>
 
 
 
-  <sect2 arch="arm"><title>Amorcer depuis un cédérom</title>
+  <sect2 arch="arm"><title>Amorcer depuis un cÃ©dÃ©rom</title>
 
 &boot-installer-intro-cd.xml;
 
 <para>
-Pour amorcer à partir d'un cédérom depuis l'invite sur une console
+Pour amorcer Ã  partir d'un cÃ©dÃ©rom depuis l'invite sur une console
 Cyclone, utilisez la commande
 <command>boot cd0:cats.bin</command>
 </para>
@@ -125,33 +124,33 @@ Cyclone, utilisez la commande
    <sect3 arch="arm" id="boot-firmware-nslu2"><title>Amorcer un NSLU2</title>
 <para>
 
-Il y a trois façons de mettre le firmware en flash.
+Il y a trois faÃ§ons de mettre le firmware en flash.
 
 </para>
 
     <sect4 arch="arm"><title>Utiliser l'interface web du NSLU2</title>
 <para>
 
-Allez dans la section administration et choisissez l'élément <literal>Upgrade</literal>.
-Vous pouvez chercher l'image que vous venez de télécharger. Pressez le bouton
+Allez dans la section administration et choisissez l'Ã©lÃ©ment <literal>Upgrade</literal>.
+Vous pouvez chercher l'image que vous venez de tÃ©lÃ©charger. Pressez le bouton
 <literal>Start Upgrade</literal>, confirmez, attendez quelques minutes puis
-confirmez à nouveau. Le système s'amorcera directement sur l'installateur.
+confirmez Ã  nouveau. Le systÃ¨me s'amorcera directement sur l'installateur.
 
 </para>
     </sect4>
 
-    <sect4 arch="arm"><title>Par le réseau avec Linux/Unix</title>
+    <sect4 arch="arm"><title>Par le rÃ©seau avec Linux/Unix</title>
 <para>
 
 Vous pouvez utiliser <command>upslug2</command> sur une machine Linux ou Unix
-pour mettre à jour la machine par le réseau. Ce logiciel est un paquet Debian.
+pour mettre Ã  jour la machine par le rÃ©seau. Ce logiciel est un paquet Debian.
 
 D'abord mettez votre NSLU2 en mode upgrade :
 
 <orderedlist>
 <listitem><para>
 
-Déconnectez les disques des ports USB.
+DÃ©connectez les disques des ports USB.
 
 </para></listitem>
 <listitem><para>
@@ -161,7 +160,7 @@ Eteignez le NSLU2
 </para></listitem>
 <listitem><para>
 
-Gardez enfoncé le bouton reset (accessible par un petit trou à l'arrière,
+Gardez enfoncÃ© le bouton reset (accessible par un petit trou Ã  l'arriÃ¨re,
 juste au dessus du bouton power).
 
 </para></listitem>
@@ -173,43 +172,43 @@ Pressez et relachez le bouton power pour lancer le NSLU2.
 <listitem><para>
 
 
-Attendez dix secondes en scrutant la LED « ready/status ». Après dix secondes
-elle passera au rouge. Relachez immédiatement le bouton reset.
+Attendez dix secondes en scrutant la LED Â« ready/status Â». AprÃ¨s dix secondes
+elle passera au rouge. Relachez immÃ©diatement le bouton reset.
 
 </para></listitem>
 <listitem><para>
 
-La LED « ready/status » passera alternativement du vert au rouge
-(il y a une seconde de délai avant le premier vert). Le NSLU2 est maintenant
-en mode mise à jour.
+La LED Â« ready/status Â» passera alternativement du vert au rouge
+(il y a une seconde de dÃ©lai avant le premier vert). Le NSLU2 est maintenant
+en mode mise Ã  jour.
 
 </para></listitem>
 </orderedlist>
 
 Voyez les <ulink
 url="http://www.nslu2-linux.org/wiki/OpenSlug/UsingTheBinary">pages sur NSLU2-Linux
-</ulink> si vous avez des problèmes.
+</ulink> si vous avez des problÃ¨mes.
 
-Une fois en mode mise à jour, vous pouvez mettre en mémoire la nouvelle image.
+Une fois en mode mise Ã  jour, vous pouvez mettre en mÃ©moire la nouvelle image.
 
 <informalexample><screen>
 sudo upslug2 -i di-nslu2.bin
 </screen></informalexample>
 
-Remarquez que ce logiciel montre aussi l'adresse MAC du NSLU2, ce qui peut être
-pratique pour configurer le serveur DHCP. Après que l'image a été chargée et vérifiée,
-le système redémarre automatiquement. N'oubliez pas de rebrancher votre disque USB,
+Remarquez que ce logiciel montre aussi l'adresse MAC du NSLU2, ce qui peut Ãªtre
+pratique pour configurer le serveur DHCP. AprÃ¨s que l'image a Ã©tÃ© chargÃ©e et vÃ©rifiÃ©e,
+le systÃ¨me redÃ©marre automatiquement. N'oubliez pas de rebrancher votre disque USB,
 sinon l'installateur ne pourra pas le trouver
 
 </para>
     </sect4>
 
-    <sect4 arch="arm"><title>Par le réseau avec Windows</title>
+    <sect4 arch="arm"><title>Par le rÃ©seau avec Windows</title>
 <para>
 
 Il existe un <ulink
 url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zip">outil
-</ulink> pour Windows qui met à jour le firmware par le réseau.
+</ulink> pour Windows qui met Ã  jour le firmware par le rÃ©seau.
 
 </para>
     </sect4>

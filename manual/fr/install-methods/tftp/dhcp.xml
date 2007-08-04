@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version 43558 -->
 
 
@@ -7,7 +6,7 @@
 <para>
 
 Il existe un serveur DHCP libre, <command>dhcpd</command> ISC. Pour
-&debian;, le paquet <classname>dhcp3-server</classname> est recommandé. 
+&debian;, le paquet <classname>dhcp3-server</classname> est recommandÃ©. 
 Voici un exemple de fichier de configuration (habituellement
 <filename>/etc/dhcp3/dhcpd.conf</filename>)&nbsp;:
 
@@ -36,26 +35,26 @@ host clientname {
 </para><para>
 
 Dans cet exemple, le serveur <replaceable>servername</replaceable> 
-joue le rôle de serveur DHCP, serveur TFTP et passerelle réseau. Vous 
+joue le rÃ´le de serveur DHCP, serveur TFTP et passerelle rÃ©seau. Vous 
 devrez certainement changer les options concernant le nom de domaine
-ainsi que le nom du serveur et l'adresse matérielle du client. L'option
-<replaceable>filename</replaceable> devrait être le nom du fichier extrait
+ainsi que le nom du serveur et l'adresse matÃ©rielle du client. L'option
+<replaceable>filename</replaceable> devrait Ãªtre le nom du fichier extrait
 par TFTP.
 
 </para><para>
 
-Après avoir modifié le fichier de configuration de <command>dhcpd</command>,
+AprÃ¨s avoir modifiÃ© le fichier de configuration de <command>dhcpd</command>,
 relancez <command>dhcpd</command> par 
 <userinput>/etc/init.d/dhcpd3-server restart</userinput>.
 
 </para>
 
    <sect3 arch="x86">
-   <title>Amorçage PXE et configuration de DHCP</title>
+   <title>AmorÃ§age PXE et configuration de DHCP</title>
 <para>
 Voici un autre exemple de fichier <filename>dhcp.conf</filename> utilisant
-la méthode de chargement du système d'exploitation par le réseau gérée par le 
-matériel («&nbsp;Pre-boot Execution Environment&nbsp;» ou PXE) de TFTP.
+la mÃ©thode de chargement du systÃ¨me d'exploitation par le rÃ©seau gÃ©rÃ©e par le 
+matÃ©riel (Â«&nbsp;Pre-boot Execution Environment&nbsp;Â» ou PXE) de TFTP.
 
 <informalexample><screen>
 option domain-name "example.com";
@@ -66,12 +65,12 @@ max-lease-time 7200;
 allow booting;
 allow bootp;
 
-# Le paragraphe suivant doit être modifié pour correspondre à votre système
+# Le paragraphe suivant doit Ãªtre modifiÃ© pour correspondre Ã  votre systÃ¨me
 subnet 192.168.1.0 netmask 255.255.255.0 {
   range 192.168.1.200 192.168.1.253;
   option broadcast-address 192.168.1.255;
-# L'adresse de la passerelle peut être différente
-# (accès à internet par exemple)
+# L'adresse de la passerelle peut Ãªtre diffÃ©rente
+# (accÃ¨s Ã  internet par exemple)
   option routers 192.168.1.1;
 # Indiquez le DNS que vous voulez utiliser
   option domain-name-servers 192.168.1.3;
@@ -80,15 +79,15 @@ subnet 192.168.1.0 netmask 255.255.255.0 {
 group {
   next-server 192.168.1.3;
   host tftpclient {
-# Adresse matérielle du client TFTP
+# Adresse matÃ©rielle du client TFTP
   hardware ethernet  00:10:DC:27:6C:15;
   filename "pxelinux.0";
  }
 }
 </screen></informalexample>
 
-Pour un démarrage PXE, le fichier du client 
-<filename>pxelinux.0</filename> est un programme d'amorçage et non une image 
+Pour un dÃ©marrage PXE, le fichier du client 
+<filename>pxelinux.0</filename> est un programme d'amorÃ§age et non une image 
 du noyau (voir <xref linkend="tftp-images"/> ci-dessous).
 
 </para>

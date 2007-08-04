@@ -1,100 +1,99 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 45238 -->
 
    <sect3 id="partman"><title>Partitionner les disques</title>
 <para>
 
 Il est temps maintenant de partitionner les disques. Si le partitionnement 
-vous inquiète ou si vous voulez des précisions supplémentaires, voyez
+vous inquiÃ¨te ou si vous voulez des prÃ©cisions supplÃ©mentaires, voyez
 l'<xref linkend="partitioning"/>.
 
 </para>
 
 <warning arch="sparc"><para>
 <!-- BTS: #384653 -->
-Quand un disque a déjà été utilisé sous Solaris, le programme de
-partitionnement peut ne pas détecter correctement la taille du disque.
-Le problème n'est pas réglé par la création d'une nouvelle table des partitions.
-Il faut modifier les premiers secteurs du disque de cette façon&nbsp;:
+Quand un disque a dÃ©jÃ  Ã©tÃ© utilisÃ© sous Solaris, le programme de
+partitionnement peut ne pas dÃ©tecter correctement la taille du disque.
+Le problÃ¨me n'est pas rÃ©glÃ© par la crÃ©ation d'une nouvelle table des partitions.
+Il faut modifier les premiers secteurs du disque de cette faÃ§on&nbsp;:
 
 <informalexample><screen>
 # dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
 </screen></informalexample>
 
-Notez que cela rendra inaccessibles les données de ce disque.
+Notez que cela rendra inaccessibles les donnÃ©es de ce disque.
 </para></warning>
 
 
 <para>
 
-Dans un premier temps, vous aurez la possibilité de partitionner un disque
-entier ou une partie de disque, de façon automatique. 
-C'est le partitionnement <quote>assisté</quote>. Si vous n'aimez pas
-ce côté automatique, choisissez l'option 
+Dans un premier temps, vous aurez la possibilitÃ© de partitionner un disque
+entier ou une partie de disque, de faÃ§on automatique. 
+C'est le partitionnement <quote>assistÃ©</quote>. Si vous n'aimez pas
+ce cÃ´tÃ© automatique, choisissez l'option 
 <guimenuitem>Manuel</guimenuitem> dans le menu.
 </para>
 <para>
-Si vous choisissez le partitionnement assisté, vous aurez le choix entre trois solutions&nbsp;:
-créer directement les partitions sur le disque (méthode classique), utiliser
+Si vous choisissez le partitionnement assistÃ©, vous aurez le choix entre trois solutions&nbsp;:
+crÃ©er directement les partitions sur le disque (mÃ©thode classique), utiliser
 le gestionnaire de volumes logiques, (LVM, <quote>Logical Volume management</quote>)
 ou utiliser LVM avec chiffrement <footnote>
 <para>
-L'installateur chiffrera le groupe de volumes avec une clé AES 256 bits et utilisera
+L'installateur chiffrera le groupe de volumes avec une clÃ© AES 256 bits et utilisera
 la fonction <quote>dm-crypt</quote> du noyau.</para></footnote>.
 </para>
 <note><para>
-Il se peut toutefois que cette dernière option ne soit pas disponible
+Il se peut toutefois que cette derniÃ¨re option ne soit pas disponible
 sur toutes les architectures.
 </para></note>
 <para>
 
-Si vous utilisez LVM ou LVM avec chiffrement, l'installateur créera
-les partitions dans une seule grande partition. L'avantage de cette méthode est la possibilité
-de redimensionner facilement ces partitions. Si elle est chiffrée, la grande partition
-ne sera pas accessible sans une phrase spéciale qui sécurisera vos données.
+Si vous utilisez LVM ou LVM avec chiffrement, l'installateur crÃ©era
+les partitions dans une seule grande partition. L'avantage de cette mÃ©thode est la possibilitÃ©
+de redimensionner facilement ces partitions. Si elle est chiffrÃ©e, la grande partition
+ne sera pas accessible sans une phrase spÃ©ciale qui sÃ©curisera vos donnÃ©es.
 
 </para>
 <para>
 
 Avec LVM avec chiffrement, l'installateur effacera automatiquement le disque en y
-écrivant des données aléatoires. Cela améliore la sécurité car cela rend impossible  
-de dire quelles parties du disque sont utilisées et cela efface toutes les traces d'une
-installation précédente. Cependant cela prend du temps.
+Ã©crivant des donnÃ©es alÃ©atoires. Cela amÃ©liore la sÃ©curitÃ© car cela rend impossible  
+de dire quelles parties du disque sont utilisÃ©es et cela efface toutes les traces d'une
+installation prÃ©cÃ©dente. Cependant cela prend du temps.
 </para>
 
 <note><para>
 
-Si vous avez choisi le partitionnement assisté avec LVM ou LVM avec chiffrement,
-la table des partitions du disque choisi doit être modifiée. Ces modifications
-détruisent réellement les données présentes sur le disque. Il ne sera pas possible
+Si vous avez choisi le partitionnement assistÃ© avec LVM ou LVM avec chiffrement,
+la table des partitions du disque choisi doit Ãªtre modifiÃ©e. Ces modifications
+dÃ©truisent rÃ©ellement les donnÃ©es prÃ©sentes sur le disque. Il ne sera pas possible
 ensuite d'annuler ces modifications. Cependant l'installateur vous demandera de
-confirmer ces modifications avant qu'elles ne soient écrites sur le disque.
+confirmer ces modifications avant qu'elles ne soient Ã©crites sur le disque.
 
 </para></note>
 
 <para>
 
-Après avoir choisi le partitionnement assisté (soit la méthode classique,
-soit les méthodes LVM), vous devrez choisir le disque à partitionner.
-Vérifiez que tous les disques sont listés et choisissez le bon si vous avez plusieurs
-disques. L'ordre de la liste peut différer de celui qui vous est habituel. La taille
-des disques peut vous aider à les identifier.
+AprÃ¨s avoir choisi le partitionnement assistÃ© (soit la mÃ©thode classique,
+soit les mÃ©thodes LVM), vous devrez choisir le disque Ã  partitionner.
+VÃ©rifiez que tous les disques sont listÃ©s et choisissez le bon si vous avez plusieurs
+disques. L'ordre de la liste peut diffÃ©rer de celui qui vous est habituel. La taille
+des disques peut vous aider Ã  les identifier.
 </para>
 <para>
 
-Les données présentes sur le disque choisi seront finalement détruites. Mais il vous
-est toujours demandé de confirmer les modifications qui doivent être apportées.
-Si vous avez choisi la méthode classique, vous pourrez annuler tout changement
-jusqu'à la fin du processus. Avec les méthodes LVM, cela n'est pas possible.
+Les donnÃ©es prÃ©sentes sur le disque choisi seront finalement dÃ©truites. Mais il vous
+est toujours demandÃ© de confirmer les modifications qui doivent Ãªtre apportÃ©es.
+Si vous avez choisi la mÃ©thode classique, vous pourrez annuler tout changement
+jusqu'Ã  la fin du processus. Avec les mÃ©thodes LVM, cela n'est pas possible.
 </para>
 
 <para>
-Vous pourrez ensuite choisir un schéma parmi les modèles décrits dans le tableau ci-dessous.
-Tous ces schémas ont leurs avantages et leurs inconvénients, certains sont discutés dans 
+Vous pourrez ensuite choisir un schÃ©ma parmi les modÃ¨les dÃ©crits dans le tableau ci-dessous.
+Tous ces schÃ©mas ont leurs avantages et leurs inconvÃ©nients, certains sont discutÃ©s dans 
 l'<xref linkend="partitioning"/>. Choisissez le premier si vous
-n'avez pas d'avis tranché. N'oubliez pas que le partitionnement assisté
+n'avez pas d'avis tranchÃ©. N'oubliez pas que le partitionnement assistÃ©
 a besoin de suffisamment d'espace libre pour pouvoir fonctionner. Si vous ne lui donnez
-pas au moins 1&nbsp;GO, il échouera.
+pas au moins 1&nbsp;GO, il Ã©chouera.
 
 </para>
 
@@ -102,9 +101,9 @@ pas au moins 1&nbsp;GO, il échouera.
 <tgroup cols="3">
 <thead>
 <row>
-<entry>Schéma de partitionnement</entry>
+<entry>SchÃ©ma de partitionnement</entry>
 <entry>Espace minimum</entry>
-  <entry>Partitions créées</entry>
+  <entry>Partitions crÃ©Ã©es</entry>
 </row>
 </thead>
 
@@ -133,33 +132,33 @@ pas au moins 1&nbsp;GO, il échouera.
 
 <para>
 
-Si vous avez choisi le partitionnement assisté avec LVM, l'installateur
-créera aussi une partition <filename>/boot</filename> distincte.
-Les autres partitions (et aussi la partition d'échange) seront créées dans la partition LVM.
+Si vous avez choisi le partitionnement assistÃ© avec LVM, l'installateur
+crÃ©era aussi une partition <filename>/boot</filename> distincte.
+Les autres partitions (et aussi la partition d'Ã©change) seront crÃ©Ã©es dans la partition LVM.
 
 </para>
 
 <para arch="ia64">
-Si vous choisissez le partitionnement assisté avec le système IA-64, une
-partition supplémentaire, avec un système de fichiers FAT16 amorçable, 
-sera créée pour le programme d'amorçage EFI. Il y a aussi un élément de menu
-supplémentaire qui permet de formater soi-même une partition comme partition
-EFI amorçable.
+Si vous choisissez le partitionnement assistÃ© avec le systÃ¨me IA-64, une
+partition supplÃ©mentaire, avec un systÃ¨me de fichiers FAT16 amorÃ§able, 
+sera crÃ©Ã©e pour le programme d'amorÃ§age EFI. Il y a aussi un Ã©lÃ©ment de menu
+supplÃ©mentaire qui permet de formater soi-mÃªme une partition comme partition
+EFI amorÃ§able.
 </para>
 <para arch="alpha">
 
-Si vous avez choisi le partitionnement automatique pour le système Alpha,
-une partition non formatée sera installée au début du disque pour réserver
+Si vous avez choisi le partitionnement automatique pour le systÃ¨me Alpha,
+une partition non formatÃ©e sera installÃ©e au dÃ©but du disque pour rÃ©server
 de l'espace pour le programme aboot.
 </para>
 
 <para>
 
-Sur l'écran suivant, vous verrez votre table des partitions, avec le type de 
+Sur l'Ã©cran suivant, vous verrez votre table des partitions, avec le type de 
 formatage des partitions et leur point de montage. 
 </para>
 <para>
-La liste des partitions pourrait ressembler à ceci&nbsp;:
+La liste des partitions pourrait ressembler Ã  ceci&nbsp;:
 
 <informalexample><screen>
   IDE1 master (hda) - 6.4 Go WDC AC36400L
@@ -180,87 +179,87 @@ La liste des partitions pourrait ressembler à ceci&nbsp;:
 </screen></informalexample>
 
 Cet exemple affiche les partitions de deux disques durs IDE. Le premier
-possède un espace libre. Chaque ligne donne le numéro de la partition,
-son type, sa taille, des drapeaux facultatifs, le système de fichiers et le
-point de montage s'il existe. Note&nbsp;: cet exemple ne peut pas être créé avec
-le partitionnement assisté, mais il peut l'être avec le partitionnement manuel.
+possÃ¨de un espace libre. Chaque ligne donne le numÃ©ro de la partition,
+son type, sa taille, des drapeaux facultatifs, le systÃ¨me de fichiers et le
+point de montage s'il existe. Note&nbsp;: cet exemple ne peut pas Ãªtre crÃ©Ã© avec
+le partitionnement assistÃ©, mais il peut l'Ãªtre avec le partitionnement manuel.
 
 </para>
 <para>
 
-Ainsi se termine le partitionnement assisté. Si vous êtes satisfait de la
-table des partitions créée, vous pouvez sélectionner
-<guimenuitem>Terminer le partitionnement et écrire les modifications sur  
-le disque</guimenuitem> dans le menu pour la créer réellement (voyez la fin de
-cette section). Si vous n'êtes pas satisfait, vous pouvez choisir
+Ainsi se termine le partitionnement assistÃ©. Si vous Ãªtes satisfait de la
+table des partitions crÃ©Ã©e, vous pouvez sÃ©lectionner
+<guimenuitem>Terminer le partitionnement et Ã©crire les modifications sur  
+le disque</guimenuitem> dans le menu pour la crÃ©er rÃ©ellement (voyez la fin de
+cette section). Si vous n'Ãªtes pas satisfait, vous pouvez choisir
 <guimenuitem>Ne pas modifier les partitions</guimenuitem>
-pour relancer le partitionnement assisté ou bien pour modifier les changements proposés,
+pour relancer le partitionnement assistÃ© ou bien pour modifier les changements proposÃ©s,
 voyez le partitionnement manuel ci-dessous.
 
 </para>
 <para>
 
-Un écran similaire au précédent sera affiché si vous avez choisi le
+Un Ã©cran similaire au prÃ©cÃ©dent sera affichÃ© si vous avez choisi le
 partitionnement manuel&nbsp;; mais c'est votre table des partitions qui est
-montrée, sans les points de montage. La suite de cette section expliquera
-comment créer une table des partitions et indiquera l'usage de ces partitions.
+montrÃ©e, sans les points de montage. La suite de cette section expliquera
+comment crÃ©er une table des partitions et indiquera l'usage de ces partitions.
 </para> 
 
 <para>
-Si vous avez sélectionné un disque tout neuf, sans partition ni espace libre,
-on vous proposera de créer une table des partitions&nbsp;; c'est nécessaire
-pour créer des partitions. Une nouvelle ligne, intitulée
-<quote>ESPACE LIBRE</quote> devrait apparaître sous le disque sélectionné.
+Si vous avez sÃ©lectionnÃ© un disque tout neuf, sans partition ni espace libre,
+on vous proposera de crÃ©er une table des partitions&nbsp;; c'est nÃ©cessaire
+pour crÃ©er des partitions. Une nouvelle ligne, intitulÃ©e
+<quote>ESPACE LIBRE</quote> devrait apparaÃ®tre sous le disque sÃ©lectionnÃ©.
 </para>
 <para>
-Si vous avez sélectionné un espace libre, on vous proposera de créer 
+Si vous avez sÃ©lectionnÃ© un espace libre, on vous proposera de crÃ©er 
 de nouvelles partitions. On vous posera des questions sur la taille de la
-partition, son type (primaire ou logique), son début et sa fin dans
-l'espace libre. Puis la nouvelle partition sera présentée en détail.
-L'élément principal est <guimenuitem>Utiliser comme :</guimenuitem> qui indique si
-la partition possède un système de fichiers ou si elle est utilisée comme 
-partition d'échange, comme système RAID, LVM, si elle est chiffrée
-ou si elle n'est pas utilisée du tout. Il y a d'autres options
-comme le point de montage, les options de montage, le drapeau d'amorçage, tout dépend de
-la manière dont elle est utilisée.
-Si vous n'aimez pas les valeurs présélectionnées,
-n'hésitez pas à les changer. Par exemple, en choisissant l'option
-<guimenuitem>Utiliser comme :</guimenuitem>, vous pouvez demander un autre système de 
+partition, son type (primaire ou logique), son dÃ©but et sa fin dans
+l'espace libre. Puis la nouvelle partition sera prÃ©sentÃ©e en dÃ©tail.
+L'Ã©lÃ©ment principal est <guimenuitem>Utiliser comme :</guimenuitem> qui indique si
+la partition possÃ¨de un systÃ¨me de fichiers ou si elle est utilisÃ©e comme 
+partition d'Ã©change, comme systÃ¨me RAID, LVM, si elle est chiffrÃ©e
+ou si elle n'est pas utilisÃ©e du tout. Il y a d'autres options
+comme le point de montage, les options de montage, le drapeau d'amorÃ§age, tout dÃ©pend de
+la maniÃ¨re dont elle est utilisÃ©e.
+Si vous n'aimez pas les valeurs prÃ©sÃ©lectionnÃ©es,
+n'hÃ©sitez pas Ã  les changer. Par exemple, en choisissant l'option
+<guimenuitem>Utiliser comme :</guimenuitem>, vous pouvez demander un autre systÃ¨me de 
 fichiers ou demander d'utiliser cette partition comme partition 
-d'échange, comme partition RAID logiciel ou partition LVM, et même demander
-de ne pas l'utiliser du tout. Une autre possibilité agréable est de pouvoir
-copier les données d'une partition existante sur cette partition.
-Quand vous êtes satisfait de votre nouvelle partition, choisissez
-<guimenuitem>Terminer le paramètrage de la partition</guimenuitem> et vous serez ramené à
-l'écran principal de <command>partman</command>.
+d'Ã©change, comme partition RAID logiciel ou partition LVM, et mÃªme demander
+de ne pas l'utiliser du tout. Une autre possibilitÃ© agrÃ©able est de pouvoir
+copier les donnÃ©es d'une partition existante sur cette partition.
+Quand vous Ãªtes satisfait de votre nouvelle partition, choisissez
+<guimenuitem>Terminer le paramÃ¨trage de la partition</guimenuitem> et vous serez ramenÃ© Ã 
+l'Ã©cran principal de <command>partman</command>.
 </para>
 <para>
-Si vous voulez modifier votre partition, sélectionnez-la et vous reviendrez
-au menu de configuration des partitions. C'est le même écran que pour une 
-création et vous pourrez aussi changer les mêmes options. Ce n'est pas 
-évident au premier regard, mais on peut modifier la taille de la partition en 
-sélectionnant l'élément affichant la taille.
-Les systèmes de fichiers fat16, fat32, ext2, ext3 et swap sont réputés bien
+Si vous voulez modifier votre partition, sÃ©lectionnez-la et vous reviendrez
+au menu de configuration des partitions. C'est le mÃªme Ã©cran que pour une 
+crÃ©ation et vous pourrez aussi changer les mÃªmes options. Ce n'est pas 
+Ã©vident au premier regard, mais on peut modifier la taille de la partition en 
+sÃ©lectionnant l'Ã©lÃ©ment affichant la taille.
+Les systÃ¨mes de fichiers fat16, fat32, ext2, ext3 et swap sont rÃ©putÃ©s bien
 fonctionner. Ce menu permet aussi de supprimer une partition.
 </para>
 
 <para>
-N'oubliez pas de créer au moins deux partitions, une partition d'échange,
-<emphasis>swap</emphasis> et une partition pour le système de fichiers de la
-racine (<emphasis>root</emphasis>) qui sera monté en <filename>/</filename>.
-Si vous ne montez pas le système de fichiers de la racine, 
+N'oubliez pas de crÃ©er au moins deux partitions, une partition d'Ã©change,
+<emphasis>swap</emphasis> et une partition pour le systÃ¨me de fichiers de la
+racine (<emphasis>root</emphasis>) qui sera montÃ© en <filename>/</filename>.
+Si vous ne montez pas le systÃ¨me de fichiers de la racine, 
 <command>partman</command> ne pourra continuer que si vous corrigez le 
-problème. 
+problÃ¨me. 
 </para>
 <para arch="ia64">
-Si vous oubliez de créer une partition amorçable EFI, 
-<command>partman</command> le détectera et vous demandera d'en créer une.
+Si vous oubliez de crÃ©er une partition amorÃ§able EFI, 
+<command>partman</command> le dÃ©tectera et vous demandera d'en crÃ©er une.
 </para>
 <para>
 
-On peut ajouter des fonctionnalités à <command>partman</command> avec des
+On peut ajouter des fonctionnalitÃ©s Ã  <command>partman</command> avec des
 modules de l'installateur. Aussi, quand vous ne trouvez pas les options promises,
-vérifiez que vous avez chargé tous les modules requis, par exemple,
+vÃ©rifiez que vous avez chargÃ© tous les modules requis, par exemple,
 <filename>partman-ext3</filename>,
 <filename>partman-xfs</filename>, ou
 <filename>partman-lvm</filename>.
@@ -268,9 +267,9 @@ vérifiez que vous avez chargé tous les modules requis, par exemple,
 </para><para>
 
 Quand les choix de partitionnement vous conviennent, choisissez l'option 
-<guimenuitem>Terminer le partitionnement</guimenuitem> du menu. Un résumé des
-modifications apportées aux disques sera affiché et on vous demandera une 
-confirmation avant de créer les systèmes de fichiers.
+<guimenuitem>Terminer le partitionnement</guimenuitem> du menu. Un rÃ©sumÃ© des
+modifications apportÃ©es aux disques sera affichÃ© et on vous demandera une 
+confirmation avant de crÃ©er les systÃ¨mes de fichiers.
 
 </para>
    </sect3>

@@ -1,102 +1,101 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 42250 -->
 
   <sect2 arch="x86"><title>Partitionnement pour &arch-title;</title>
 <para>
 
-Si vous voulez préserver un système d'exploitation existant comme 
+Si vous voulez prÃ©server un systÃ¨me d'exploitation existant comme 
 DOS ou Windows, il vous faudra redimensionner sa partition pour faire de la
-place pour installer Debian. L'installateur sait redimensionner les systèmes
-de fichiers FAT et NTFS&nbsp;; quand vous arrivez à l'étape 
+place pour installer Debian. L'installateur sait redimensionner les systÃ¨mes
+de fichiers FAT et NTFS&nbsp;; quand vous arrivez Ã  l'Ã©tape 
 <quote>Partitionnement</quote> de l'installateur, choisissez
 <guimenuitem>Manuel</guimenuitem> et indiquez simplement la nouvelle taille de la partition.
 </para>
 
 <para>
 
-Les BIOS des PC ont généralement leurs propres contraintes pour le
+Les BIOS des PC ont gÃ©nÃ©ralement leurs propres contraintes pour le
 partitionnement des disques. Il y a une limite sur le nombre de
-partitions «&nbsp;primaires&nbsp;» et «&nbsp;logiques&nbsp;» qu'un disque 
+partitions Â«&nbsp;primaires&nbsp;Â» et Â«&nbsp;logiques&nbsp;Â» qu'un disque 
 peut contenir.
-De plus, avec les BIOS antérieurs à 1994&ndash;98 (selon les constructeurs),
-il y a des limites sur l'emplacement des partitions à
-partir desquelles on peut démarrer le système. Vous trouverez plus
+De plus, avec les BIOS antÃ©rieurs Ã  1994&ndash;98 (selon les constructeurs),
+il y a des limites sur l'emplacement des partitions Ã 
+partir desquelles on peut dÃ©marrer le systÃ¨me. Vous trouverez plus
 d'information dans le 
 <ulink url="&url-partition-howto;">HOWTO Linux Partition</ulink> et la 
 <ulink url="&url-phoenix-bios-faq-large-disk;">FAQ Phoenix BIOS</ulink>, mais 
-cette section contient un bref survol pour vous aider à aplanir les difficultés
+cette section contient un bref survol pour vous aider Ã  aplanir les difficultÃ©s
 les plus courantes.
 
 </para><para>
 
-À l'origine, le système de partitionnement des disques de PC est basé
-sur les partitions «&nbsp;primaires&nbsp;», mais il ne peut y en avoir que 
+Ã€ l'origine, le systÃ¨me de partitionnement des disques de PC est basÃ©
+sur les partitions Â«&nbsp;primaires&nbsp;Â», mais il ne peut y en avoir que 
 quatre.
-Pour passer outre cette limitation, les partitions «&nbsp;étendues&nbsp;»
-et «&nbsp;logiques&nbsp;» ont été inventées. En configurant une partition 
+Pour passer outre cette limitation, les partitions Â«&nbsp;Ã©tendues&nbsp;Â»
+et Â«&nbsp;logiques&nbsp;Â» ont Ã©tÃ© inventÃ©es. En configurant une partition 
 primaire
-en partition étendue, vous pouvez subdiviser l'espace attribué à cette
-partition en partitions «&nbsp;logiques&nbsp;». La partition étendue peut
-contenir jusqu'à 60 partitions logiques&nbsp;; en revanche,
-il ne peut y avoir qu'une seule partition étendue par disque.
+en partition Ã©tendue, vous pouvez subdiviser l'espace attribuÃ© Ã  cette
+partition en partitions Â«&nbsp;logiques&nbsp;Â». La partition Ã©tendue peut
+contenir jusqu'Ã  60 partitions logiques&nbsp;; en revanche,
+il ne peut y avoir qu'une seule partition Ã©tendue par disque.
 
 </para><para>
 
-Linux limite le nombre de partitions à 15 par disque SCSI (3
+Linux limite le nombre de partitions Ã  15 par disque SCSI (3
 partitions primaires utilisables et 12 partitions logiques dans la
-partition étendue) et à 63
+partition Ã©tendue) et Ã  63
 par disque IDE (3 partitions primaires et 60 partitions logiques).
-Cependant, le système &debian; classique fournit seulement 20 périphériques
-pour les partitions, c'est pourquoi vous ne pourrez pas procéder à
-l'installation sur des partitions supérieures à 20, à moins d'avoir
-créé manuellement des périphériques pour ces partitions.
+Cependant, le systÃ¨me &debian; classique fournit seulement 20 pÃ©riphÃ©riques
+pour les partitions, c'est pourquoi vous ne pourrez pas procÃ©der Ã 
+l'installation sur des partitions supÃ©rieures Ã  20, Ã  moins d'avoir
+crÃ©Ã© manuellement des pÃ©riphÃ©riques pour ces partitions.
 
 </para><para>
 
 Si vous avez un gros disque IDE, et que vous n'utilisez ni l'adressage
 LBA ni les pilotes en couche (quelquefois fournis par les
-constructeurs de disques), la partition de démarrage (celle qui
-contient l'image noyau) doit être placée dans les 1024 premiers
+constructeurs de disques), la partition de dÃ©marrage (celle qui
+contient l'image noyau) doit Ãªtre placÃ©e dans les 1024 premiers
 cylindres de votre disque dur (habituellement, autour de 524&nbsp;Mo, sans
 la translation du BIOS).
 
 </para><para>
 
-Cette restriction ne s'applique pas si vous avez un BIOS postérieur à
+Cette restriction ne s'applique pas si vous avez un BIOS postÃ©rieur Ã 
 1995&ndash;98 (selon les constructeurs) qui prend en charge la norme
 <quote>Enhanced Disk Drive Support Specification</quote>.
 Lilo, le chargeur Linux et la commande Debian <command>mbr</command> ont
 besoin du BIOS pour charger en RAM le noyau lu sur le disque.
-Si les extensions du BIOS int 0x13 pour l'accès aux gros disques sont
-présentes, elles seront utilisées. Sinon, l'interface standard d'accès
-au disque sera utilisée par défaut, et elle ne permettra pas de
-démarrer sur des emplacements situés après le 1023e cylindre du
-disque. Une fois que Linux est démarré, peu importe le BIOS de votre
+Si les extensions du BIOS int 0x13 pour l'accÃ¨s aux gros disques sont
+prÃ©sentes, elles seront utilisÃ©es. Sinon, l'interface standard d'accÃ¨s
+au disque sera utilisÃ©e par dÃ©faut, et elle ne permettra pas de
+dÃ©marrer sur des emplacements situÃ©s aprÃ¨s le 1023e cylindre du
+disque. Une fois que Linux est dÃ©marrÃ©, peu importe le BIOS de votre
 ordinateur, ces restrictions ne s'appliquent plus, puisque Linux
-n'utilise pas le BIOS pour les accès disque.
+n'utilise pas le BIOS pour les accÃ¨s disque.
 
 </para><para>
 
-Si vous avez un gros disque, vous devrez peut-être utiliser des
+Si vous avez un gros disque, vous devrez peut-Ãªtre utiliser des
 techniques de translation de cylindres que vous pouvez configurer
 dans le BIOS, comme le mode d'adressage LBA (Linear Block Addressing),
 ou le mode de translation CHS.
 Vous trouverez plus d'informations sur la gestion des gros disques dans le
 <ulink url="&url-large-disk-howto;">HOWTO Large Disk</ulink>.
-Si vous utilisez une méthode de translation de cylindres, et que le
-BIOS n'accepte pas les extensions pour l'accès aux gros disques, votre
-partition de démarrage devra être contenue dans la partie correspondant
-aux 1024 premiers cylindres <emphasis>translatés</emphasis>.
+Si vous utilisez une mÃ©thode de translation de cylindres, et que le
+BIOS n'accepte pas les extensions pour l'accÃ¨s aux gros disques, votre
+partition de dÃ©marrage devra Ãªtre contenue dans la partie correspondant
+aux 1024 premiers cylindres <emphasis>translatÃ©s</emphasis>.
 
 </para><para>
 
-La meilleure façon de régler ce problème est de créer une petite
-partition (25 à 50&nbsp;Mo doivent suffire) en début de disque, qui sera la
-partition de démarrage, puis de créer toutes les autres partitions que
-vous voulez dans l'espace restant. Cette partition de démarrage
-<emphasis>devra</emphasis> être montée sur <filename>/boot</filename>, 
-le répertoire où seront stockés les noyaux Linux. Cette configuration marchera sur tous
-les systèmes, quel que soit votre mode d'adressage (LBA) ou de
+La meilleure faÃ§on de rÃ©gler ce problÃ¨me est de crÃ©er une petite
+partition (25 Ã  50&nbsp;Mo doivent suffire) en dÃ©but de disque, qui sera la
+partition de dÃ©marrage, puis de crÃ©er toutes les autres partitions que
+vous voulez dans l'espace restant. Cette partition de dÃ©marrage
+<emphasis>devra</emphasis> Ãªtre montÃ©e sur <filename>/boot</filename>, 
+le rÃ©pertoire oÃ¹ seront stockÃ©s les noyaux Linux. Cette configuration marchera sur tous
+les systÃ¨mes, quel que soit votre mode d'adressage (LBA) ou de
 translation (CHS), et quel que soit votre BIOS, avec ou sans extensions.
 
 </para>

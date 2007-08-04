@@ -1,40 +1,39 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 33725 -->
 
    <sect3 arch="powerpc">
-   <title>Partitionner un périphérique USB sur &arch-title;</title>
+   <title>Partitionner un pÃ©riphÃ©rique USB sur &arch-title;</title>
 <para>
 
-La plupart des périphériques USB ne sont pas prêts à être amorcés par le
+La plupart des pÃ©riphÃ©riques USB ne sont pas prÃªts Ã  Ãªtre amorcÃ©s par le
 microprogramme Open Firmware, et vous devez les repartitionner.
-Sur les systèmes Mac, faites <userinput>mac-fdisk /dev/sda</userinput>,
+Sur les systÃ¨mes Mac, faites <userinput>mac-fdisk /dev/sda</userinput>,
 initialisez une nouvelle table des partitions avec la commande
-<userinput>i</userinput> et créez une nouvelle partition Apple_Bootstrap
+<userinput>i</userinput> et crÃ©ez une nouvelle partition Apple_Bootstrap
 avec la commande <userinput>C</userinput>.
-Remarquez que la première partition sera toujours la table des partitions 
-elle-même. Saisissez&nbsp;:
+Remarquez que la premiÃ¨re partition sera toujours la table des partitions 
+elle-mÃªme. Saisissez&nbsp;:
 
 <informalexample><screen>
 $ hformat /dev/<replaceable>sda2</replaceable>
 </screen></informalexample>
 
-Faites attention à utiliser le périphérique correct pour la clé. Le programme
+Faites attention Ã  utiliser le pÃ©riphÃ©rique correct pour la clÃ©. Le programme
 <command>hformat</command>  se trouve dans le paquet Debian
 <classname>hfsutils</classname>.
 
 </para><para>
 
-Pour pouvoir lancer le noyau après l'amorçage sur la clé, nous y mettons
-un programme d'amorçage. Le programme <command>yaboot</command> peut être
-installer sur un système de fichiers HFS et configuré en modifiant un
+Pour pouvoir lancer le noyau aprÃ¨s l'amorÃ§age sur la clÃ©, nous y mettons
+un programme d'amorÃ§age. Le programme <command>yaboot</command> peut Ãªtre
+installer sur un systÃ¨me de fichiers HFS et configurÃ© en modifiant un
 simple fichier texte. On peut modifier la configuration du
-programme d'amorçage avec tous les systèmes d'exploitation qui acceptent
-le système de fichiers HFS.
+programme d'amorÃ§age avec tous les systÃ¨mes d'exploitation qui acceptent
+le systÃ¨me de fichiers HFS.
 
 </para><para>
 
 L'utilitaire <command>ybin</command> de <command>yaboot</command> ne
-comprend pas pour l'instant les périphériques USB, et vous devrez
+comprend pas pour l'instant les pÃ©riphÃ©riques USB, et vous devrez
 installer <command>yaboot</command> manuellement avec les outils
 <classname>hfsutils</classname>. Saisissez&nbsp;:
 
@@ -46,15 +45,15 @@ $ hattrib -b :
 $ humount
 </screen></informalexample>
 
-Encore une fois, faites bien attention à utiliser le nom correct pour la clé.
-La partition ne doit pas être montée pendant la procédure. Cette procédure
-met le programme d'amorçage sur la partition et utilise les outils HFS pour
-préparer ce programme à être lancé par le microprogramme Open Firmware.
-Ensuite, la clé USB peut être préparée avec les outils standards d'Unix.
+Encore une fois, faites bien attention Ã  utiliser le nom correct pour la clÃ©.
+La partition ne doit pas Ãªtre montÃ©e pendant la procÃ©dure. Cette procÃ©dure
+met le programme d'amorÃ§age sur la partition et utilise les outils HFS pour
+prÃ©parer ce programme Ã  Ãªtre lancÃ© par le microprogramme Open Firmware.
+Ensuite, la clÃ© USB peut Ãªtre prÃ©parÃ©e avec les outils standards d'Unix.
 
 </para><para>
 Montez la partition (<userinput>mount /dev/sda2 /mnt</userinput>) et
-copiez les fichiers suivants sur la clé&nbsp;:
+copiez les fichiers suivants sur la clÃ©&nbsp;:
 
 <itemizedlist>
 <listitem><para>
@@ -102,8 +101,8 @@ image=/vmlinux
         read-only
 </screen></informalexample>
 
-Remarquez que la valeur du paramètre <userinput>ramdisk_size</userinput>
-doit être augmentée avec la taille de l'image qui est amorcée.
+Remarquez que la valeur du paramÃ¨tre <userinput>ramdisk_size</userinput>
+doit Ãªtre augmentÃ©e avec la taille de l'image qui est amorcÃ©e.
 
 </para>
    </sect3>

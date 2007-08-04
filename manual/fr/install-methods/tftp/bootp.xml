@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 43558 -->
 
 
@@ -14,23 +13,23 @@ On peut trouver ces serveurs dans les paquets <classname>bootp</classname> et
 </para><para>
 
 Pour utiliser <command>bootpd</command> CMU, vous devez commencer par 
-décommenter (ou ajouter) la ligne adéquate dans 
+dÃ©commenter (ou ajouter) la ligne adÃ©quate dans 
 <filename>/etc/inetd.conf</filename>. Dans &debian;, vous pouvez tout
 simplement lancer <userinput>update-inetd --enable bootps</userinput> suivi
-de <userinput>/etc/init.d/inetd reload</userinput> pour le faire. Au cas où le serveur
-BOOTP ne fonctionnerait pas sous Debian, la ligne en question devrait ressembler à&nbsp;:
+de <userinput>/etc/init.d/inetd reload</userinput> pour le faire. Au cas oÃ¹ le serveur
+BOOTP ne fonctionnerait pas sous Debian, la ligne en question devrait ressembler Ã &nbsp;:
 
 <informalexample><screen>
 bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120
 </screen></informalexample>
 
-Maintenant, vous devez créer le fichier <filename>/etc/bootptab</filename> qui 
-utilise le même genre de format familier et cryptique que les bons vieux 
+Maintenant, vous devez crÃ©er le fichier <filename>/etc/bootptab</filename> qui 
+utilise le mÃªme genre de format familier et cryptique que les bons vieux 
 fichiers BSD <filename>printcap</filename>, <filename>termcap</filename> et
 <filename>disktab</filename>. Voyez la page de manuel de 
 <filename>bootptab</filename> pour d'autres informations. 
-Pour <command>bootpd</command> CMU, il sera nécessaire d'obtenir l'adresse 
-matérielle (MAC) du client. Voici un exemple du fichier 
+Pour <command>bootpd</command> CMU, il sera nÃ©cessaire d'obtenir l'adresse 
+matÃ©rielle (MAC) du client. Voici un exemple du fichier 
 <filename>/etc/bootptab</filename>&nbsp;:
 
 <informalexample><screen>
@@ -43,26 +42,26 @@ client:\
   ha=0123456789AB:
 </screen></informalexample>
 
-Vous devrez changer au moins l'option <quote>ha</quote> qui spécifie l'adresse 
-matérielle du client. L'option <quote>bf</quote> spécifie le fichier que le 
-client devra récupérer par TFTP&nbsp;; cf. <xref linkend="tftp-images"/> pour 
-plus de précisions.
+Vous devrez changer au moins l'option <quote>ha</quote> qui spÃ©cifie l'adresse 
+matÃ©rielle du client. L'option <quote>bf</quote> spÃ©cifie le fichier que le 
+client devra rÃ©cupÃ©rer par TFTP&nbsp;; cf. <xref linkend="tftp-images"/> pour 
+plus de prÃ©cisions.
 
 <phrase arch="mips"> 
-Pour les machines SGI, il suffit d'entrer la commande de contrôle 
+Pour les machines SGI, il suffit d'entrer la commande de contrÃ´le 
 <userinput>printenv</userinput>. La valeur de la variable 
 <userinput>eaddr</userinput> est celle de l'adresse MAC de la machine.
 </phrase>
 
 </para><para>
 
-En comparaison, configurer BOOTP avec <command>dhcpd</command> ISC est très 
-facile parce qu'il traite les clients BOOTP comme des clients DHCP légèrement 
-spéciaux. Certaines architectures requièrent une configuration complexe pour 
-amorcer les clients par BOOTP. Si la vôtre en fait partie, lisez la 
+En comparaison, configurer BOOTP avec <command>dhcpd</command> ISC est trÃ¨s 
+facile parce qu'il traite les clients BOOTP comme des clients DHCP lÃ©gÃ¨rement 
+spÃ©ciaux. Certaines architectures requiÃ¨rent une configuration complexe pour 
+amorcer les clients par BOOTP. Si la vÃ´tre en fait partie, lisez la 
 <xref linkend="dhcpd"/>. Dans ce cas vous pouvez simplement ajouter la directive 
 <userinput>allow bootp</userinput> au bloc de configuration pour le 
-sous-réseau contenant le client, puis redémarrer <command>dhcpd</command> 
+sous-rÃ©seau contenant le client, puis redÃ©marrer <command>dhcpd</command> 
 avec <userinput>/etc/init.d/dhcpd3-server restart</userinput>.
 
 </para>

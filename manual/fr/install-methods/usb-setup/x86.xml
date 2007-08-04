@@ -1,57 +1,56 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 43730 -->
 
    <sect3 arch="x86">
-   <title>Partitionner un périphérique USB sur &arch-title;</title>
+   <title>Partitionner un pÃ©riphÃ©rique USB sur &arch-title;</title>
 <para>
 
-Nous montrerons comment n'utiliser que la première partition,
-au lieu de tout le périphérique.
+Nous montrerons comment n'utiliser que la premiÃ¨re partition,
+au lieu de tout le pÃ©riphÃ©rique.
 
 </para><note><para>
 
-La plupart des clés USB sont préconfigurées avec une seule partition FAT16.
-Vous n'aurez sans doute pas à partitionner ou à formater la clé. Si vous
+La plupart des clÃ©s USB sont prÃ©configurÃ©es avec une seule partition FAT16.
+Vous n'aurez sans doute pas Ã  partitionner ou Ã  formater la clÃ©. Si vous
 devez le faire, utilisez le programme <command>cfdisk</command> ou un autre
-programme de partitionnement pour créer cette partition et saisissez&nbsp;:
+programme de partitionnement pour crÃ©er cette partition et saisissez&nbsp;:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Faites attention à utiliser le périphérique correct pour la clé. Le programme
+Faites attention Ã  utiliser le pÃ©riphÃ©rique correct pour la clÃ©. Le programme
 <command>mkdosfs</command> se trouve dans le paquet Debian <classname>dosfstools</classname>.
 
 </para></note><para>
 
-Pour pouvoir lancer le noyau après l'amorçage sur la clé, nous y installons
-un programme d'amorçage. Tous les programmes d'amorçage fonctionnent
+Pour pouvoir lancer le noyau aprÃ¨s l'amorÃ§age sur la clÃ©, nous y installons
+un programme d'amorÃ§age. Tous les programmes d'amorÃ§age fonctionnent
 (p.&nbsp;ex. <command>LILO</command>), mais <command>SYSLINUX</command> est
-préférable car il utilise une partition FAT16 et peut être reconfiguré en
+prÃ©fÃ©rable car il utilise une partition FAT16 et peut Ãªtre reconfigurÃ© en
 modifiant un simple fichier texte. On peut modifier la configuration du
-programme d'amorçage avec tous les systèmes d'exploitation qui acceptent
-le système de fichiers FAT.
+programme d'amorÃ§age avec tous les systÃ¨mes d'exploitation qui acceptent
+le systÃ¨me de fichiers FAT.
 
 </para><para>
 
-Pour mettre <command>SYSLINUX</command> sur la partition FAT16 de la clé,
+Pour mettre <command>SYSLINUX</command> sur la partition FAT16 de la clÃ©,
 installez les paquets <classname>syslinux</classname> et
-<classname>mtools</classname> sur votre système et faites&nbsp;:
+<classname>mtools</classname> sur votre systÃ¨me et faites&nbsp;:
 
 <informalexample><screen>
 # syslinux /dev/<replaceable>sda1</replaceable>
 </screen></informalexample>
 
-Encore une fois, faites bien attention à utiliser le nom correct pour la clé.
-La partition ne doit pas être montée au lancement de
-<command>SYSLINUX</command>. Cette procédure écrit un secteur d'amorçage sur
-la partition et crée le fichier <filename>ldlinux.sys</filename> qui contient
-le code du programme d'amorçage.
+Encore une fois, faites bien attention Ã  utiliser le nom correct pour la clÃ©.
+La partition ne doit pas Ãªtre montÃ©e au lancement de
+<command>SYSLINUX</command>. Cette procÃ©dure Ã©crit un secteur d'amorÃ§age sur
+la partition et crÃ©e le fichier <filename>ldlinux.sys</filename> qui contient
+le code du programme d'amorÃ§age.
 
 </para><para>
 
 Montez la partition (<userinput>mount /dev/sda1 /mnt</userinput>) et
-copiez les fichiers suivants sur la clé&nbsp;:
+copiez les fichiers suivants sur la clÃ©&nbsp;:
 
 <itemizedlist>
 <listitem><para>

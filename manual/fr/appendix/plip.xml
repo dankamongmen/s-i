@@ -1,44 +1,43 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- original version: 39644 -->
 
  <sect1 id="plip" arch="x86">
- <title>Installer &debian; grâce au protocole PLIP (IP sur port parallèle)</title>
+ <title>Installer &debian; grÃ¢ce au protocole PLIP (IP sur port parallÃ¨le)</title>
 
 <para>
 
 Cette section explique comment installer &debian; sur un ordinateur sans carte
-Ethernet mais qui est relié à une passerelle distante par un câble appelé Null-Modem
-ou Null-Printer. La passerelle doit être connectée à un réseau qui possède un
+Ethernet mais qui est reliÃ© Ã  une passerelle distante par un cÃ¢ble appelÃ© Null-Modem
+ou Null-Printer. La passerelle doit Ãªtre connectÃ©e Ã  un rÃ©seau qui possÃ¨de un
 miroir Debian (p. ex. internet).
 
 </para><para>
 
-Dans cet exemple, nous allons configurer une connexion PLIP à une passerelle
-qui est connectée à internet avec une connexion par téléphone (ppp0).
+Dans cet exemple, nous allons configurer une connexion PLIP Ã  une passerelle
+qui est connectÃ©e Ã  internet avec une connexion par tÃ©lÃ©phone (ppp0).
 Nous utiliserons les adresses 192.168.0.1 et 192.168.0.2 pour les interfaces PLIP
-du système cible et du système source. Ces adresses ne doivent pas être utilisées par
+du systÃ¨me cible et du systÃ¨me source. Ces adresses ne doivent pas Ãªtre utilisÃ©es par
 ailleurs.
 
 </para><para>
 
-La connexion PLIP configurée pendant l'installation sera disponible après le
-réamorçage du système installé, voyez <xref linkend="boot-new"/>.
+La connexion PLIP configurÃ©e pendant l'installation sera disponible aprÃ¨s le
+rÃ©amorÃ§age du systÃ¨me installÃ©, voyez <xref linkend="boot-new"/>.
 
 </para><para>
 
-Avant de commencer, vous devez vérifier la configuration du BIOS pour les ports parallèle 
-(adresses IO et IRQ) des deux systèmes (cible et source). Les valeurs habituelles sont
+Avant de commencer, vous devez vÃ©rifier la configuration du BIOS pour les ports parallÃ¨le 
+(adresses IO et IRQ) des deux systÃ¨mes (cible et source). Les valeurs habituelles sont
 <literal>io=0x378</literal>, <literal>irq=7</literal>.
 
 </para>
 
   <sect2>
-  <title>Pré-requis</title>
+  <title>PrÃ©-requis</title>
 
 <itemizedlist>
 <listitem><para>
 
-Une machine cible, appelée <emphasis>target</emphasis>, où Debian sera installé&nbsp;;
+Une machine cible, appelÃ©e <emphasis>target</emphasis>, oÃ¹ Debian sera installÃ©&nbsp;;
 
 </para></listitem>
 <listitem><para>
@@ -48,15 +47,15 @@ un support d'installation, voyez <xref linkend="installation-media"/>&nbsp;;
 </para></listitem>
 <listitem><para>
 
-une autre machine connectée à internet, appelée <emphasis>source</emphasis>,
+une autre machine connectÃ©e Ã  internet, appelÃ©e <emphasis>source</emphasis>,
 qui fonctionnera comme passerelle&nbsp;;
 
 </para></listitem>
 <listitem><para>
 
-un câble Null-Modem DB-25, voyez le
+un cÃ¢ble Null-Modem DB-25, voyez le
 <ulink url="&url-plip-install-howto;">PLIP-Install-HOWTO</ulink> pour des
-informations sur ce câble et sur la manière d'en fabriquer un.
+informations sur ce cÃ¢ble et sur la maniÃ¨re d'en fabriquer un.
 
 </para></listitem>
 </itemizedlist>
@@ -64,7 +63,7 @@ informations sur ce câble et sur la manière d'en fabriquer un.
   </sect2>
 
   <sect2>
-  <title>Configuration du système source</title>
+  <title>Configuration du systÃ¨me source</title>
 <para>
 
 Le script suivant montre comment configurer simplement la machine source en tant que
@@ -73,7 +72,7 @@ passerelle vers internet avec ppp0.
 <informalexample><screen>
 #!/bin/sh
 
-# Suppression des modules du noyau pour éviter des conflits
+# Suppression des modules du noyau pour Ã©viter des conflits
 # et reconfiguration.
 modprobe -r lp parport_pc
 modprobe parport_pc io=<replaceable>0x378</replaceable> irq=<replaceable>7</replaceable>
@@ -92,13 +91,13 @@ echo 1 > /proc/sys/net/ipv4/ip_forward
   </sect2>
 
   <sect2>
-  <title>Installation du système cible</title>
+  <title>Installation du systÃ¨me cible</title>
 <para>
 
 Amorcez le support d'installation. L'installation doit se faire en mode expert. Pour cela,
-saisissez <userinput>expert</userinput> à l'invite d'amorçage.
-Si vous avez besoin de donner des paramètres pour le noyau, vous devez le faire aussi
-à ce moment. Par exemple, si vous voulez démarrer l'installateur avec des valeurs
+saisissez <userinput>expert</userinput> Ã  l'invite d'amorÃ§age.
+Si vous avez besoin de donner des paramÃ¨tres pour le noyau, vous devez le faire aussi
+Ã  ce moment. Par exemple, si vous voulez dÃ©marrer l'installateur avec des valeurs
 pour les options <quote>io</quote> et <quote>irq</quote> du module parport_pc,
 saisissez&nbsp;:
 
@@ -106,40 +105,40 @@ saisissez&nbsp;:
 expert parport_pc.io=<replaceable>0x378</replaceable> parport_pc.irq=<replaceable>7</replaceable>
 </screen></informalexample>
 
-Voici maintenant les réponses que vous devrez donner à différents moments de l'installation.
+Voici maintenant les rÃ©ponses que vous devrez donner Ã  diffÃ©rents moments de l'installation.
 
 </para>
 
 <orderedlist>
 <listitem><para>
 
-<guimenuitem>Chargement des composants de l'installateur à partir d'un cédérom</guimenuitem>
+<guimenuitem>Chargement des composants de l'installateur Ã  partir d'un cÃ©dÃ©rom</guimenuitem>
 
 </para><para>
 
-Sélectionnez l'option <userinput>plip-modules</userinput> dans la liste. Le pilote PLIP sera
-ainsi disponible pour le système d'installation.
+SÃ©lectionnez l'option <userinput>plip-modules</userinput> dans la liste. Le pilote PLIP sera
+ainsi disponible pour le systÃ¨me d'installation.
 
 </para></listitem>
 <listitem><para>
 
-<guimenuitem>Détection du matériel réseau</guimenuitem>
+<guimenuitem>DÃ©tection du matÃ©riel rÃ©seau</guimenuitem>
 
 </para>
 
  <itemizedlist>
  <listitem><para>
 
-Si la machine cible possède une carte réseau, une liste des modules pour la carte détectée sera
-affichée. Si vous voulez que l'installateur utilise plip, vous devez désélectionner tous les
-modules affichés. Il est évident que si la machine ne possède pas de carte réseau, cette liste 
-ne sera pas affichée.
+Si la machine cible possÃ¨de une carte rÃ©seau, une liste des modules pour la carte dÃ©tectÃ©e sera
+affichÃ©e. Si vous voulez que l'installateur utilise plip, vous devez dÃ©sÃ©lectionner tous les
+modules affichÃ©s. Il est Ã©vident que si la machine ne possÃ¨de pas de carte rÃ©seau, cette liste 
+ne sera pas affichÃ©e.
 
  </para></listitem>
  <listitem><para>
 
-Puisqu'aucune carte réseau n'a été détectée ou sélectionnée, l'installateur vous demande de
-choisir un pilote réseau dans une liste. Choisissez le module <userinput>plip</userinput>.
+Puisqu'aucune carte rÃ©seau n'a Ã©tÃ© dÃ©tectÃ©e ou sÃ©lectionnÃ©e, l'installateur vous demande de
+choisir un pilote rÃ©seau dans une liste. Choisissez le module <userinput>plip</userinput>.
 
  </para></listitem>
  </itemizedlist>
@@ -147,12 +146,12 @@ choisir un pilote réseau dans une liste. Choisissez le module <userinput>plip</u
 </listitem>
 <listitem><para>
 
-<guimenuitem>Configuration du réseau</guimenuitem>
+<guimenuitem>Configuration du rÃ©seau</guimenuitem>
  
  <itemizedlist>
  <listitem><para>
 
-Configuration automatique du réseau avec DHCP : No
+Configuration automatique du rÃ©seau avec DHCP : No
 
  </para></listitem>
  <listitem><para>
@@ -168,7 +167,7 @@ Adresse Point-to-Point&nbsp;:
  </para></listitem>
  <listitem><para>
 
-Adresses des serveurs de noms&nbsp;: vous pouvez mettre les adresses utilisées par le système
+Adresses des serveurs de noms&nbsp;: vous pouvez mettre les adresses utilisÃ©es par le systÃ¨me
 source, voyez <filename>/etc/resolv.conf</filename>.
 
  </para></listitem>
