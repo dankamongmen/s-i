@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-07-26 04:00+0000\n"
-"PO-Revision-Date: 2007-07-09 23:24+0100\n"
+"PO-Revision-Date: 2007-08-08 15:06+0100\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -488,10 +488,15 @@ msgid ""
 "the question asked, use <quote>?=</quote> instead of <quote>=</quote> as "
 "operator. See also <xref linkend=\"preseed-seenflag\"/>."
 msgstr ""
+"Normalmente, fazer preseed, desta forma, a uma questão significa que a "
+"questão não será colocada. Para definir um valor por omissão específico para "
+"uma questão, mas mesmo assim a questão ser colocada, utilize <quote>?="
+"</quote> como operados em vez de <quote>=</quote>. Veja também <xref "
+"linkend=\"preseed-seenflag\"/>."
 
 #. Tag: para
 #: preseed.xml:324
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "Note that some variables that are frequently set at the boot prompt have a "
 "shorter alias. If an alias is available, it is used in the examples in this "
@@ -501,12 +506,11 @@ msgid ""
 "<literal>tasksel:tasksel/first</literal>."
 msgstr ""
 "Note que algumas variáveis que são frequentemente definidas na prompt de "
-"arranque têm uma abreviatura. Se estiver disponível uma abreviatura, é "
+"arranque têm uma abreviatura. Se estiver disponível uma abreviatura, será "
 "utilizada nos exemplos deste apêndice em vez da variável completa. Em "
-"particular, a variável <literal>preseed/url</literal> tem a abreviatura "
-"<literal>url</literal> e tem alguma magia extra para permitir que sejam "
-"utilizados urls mais curtos. Outro exemplo é a abreviatura <literal>tasks</"
-"literal>, que se traduz como <literal>tasksel:tasksel/first</literal>."
+"particular. Por exemplo, a variável <literal>preseed/url</literal> tem a "
+"abreviatura <literal>url</literal>. Outro exemplo é a abreviatura <literal>"
+"tasks</literal>, que se traduz como <literal>tasksel:tasksel/first</literal>."
 
 #. Tag: para
 #: preseed.xml:333
@@ -1880,7 +1884,7 @@ msgstr "Configuração do relógio e fuso horário"
 
 #. Tag: screen
 #: preseed.xml:829
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Controls whether or not the hardware clock is set to UTC.\n"
 "d-i clock-setup/utc boolean true\n"
@@ -1900,7 +1904,13 @@ msgstr ""
 "\n"
 "# Pode definir este valor como qualquer definição válida para $TZ;\n"
 "# para valores válidos veja o conteúdo de /usr/share/zoneinfo/.\n"
-"d-i time/zone string US/Eastern"
+"d-i time/zone string US/Eastern<phrase condition=\"lenny\">\n"
+"\n"
+"# Controla se vai ser utilizado NTP para acertar o relógio durante a instalação\n"
+"d-i clock-setup/ntp boolean true\n"
+"# Servidor NTP a utilizar. O valor por omissão está quase sempre bem.\n"
+"#d-i clock-setup/ntp-server ntp.example.com\n"
+"</phrase>"
 
 #. Tag: title
 #: preseed.xml:834
@@ -1938,7 +1948,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:852
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
 "# use sudo).\n"
@@ -1982,16 +1992,17 @@ msgstr ""
 "# Para criar uma conta de utilizador normal.\n"
 "#d-i passwd/user-fullname string Debian User\n"
 "#d-i passwd/username string debian\n"
-"# Password de utilizador normal, quer em texto simples\n"
+"# Password de utilizador normal, em texto simples\n"
 "#d-i passwd/user-password password insecure\n"
 "#d-i passwd/user-password-again password insecure\n"
-"# ou encriptada utilizando um hash MD5.\n"
-"#d-i passwd/user-password-crypted password [MD5 hash]<phrase condition="
-"\"lenny\">\n"
+"# ou encriptada utilizando uma hash MD5.\n"
+"#d-i passwd/user-password-crypted password [MD5 hash]\n"
+"# Criar o primeiro utilizador com o UID especificado em vez do valor por\n"
+"# omissão.\n"
+"#d-i passwd/user-uid string 1010<phrase condition=\"lenny\">\n"
 "\n"
-"# A conta de utilizador será acrescentada a alguns grupos standard "
-"iniciais.\n"
-"# Para saltar isto, utilize isto.\n"
+"# A conta de utilizador será acrescentada a alguns grupos standard\n"
+"# iniciais. Para saltar isso, utilize isto.\n"
 "#d-i passwd/user-default-groups string audio cdrom video</phrase>"
 
 #. Tag: para
@@ -2059,6 +2070,13 @@ msgid ""
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image linux-image-2.6-486</phrase>"
 msgstr ""
+"# Escolha o gerador de initramfs a utilizar para gerar o initrd para kernels 2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase "
+"condition=\"lenny\">\n"
+"\n"
+"# O (meta) pacote de imagem do kernel a ser instalado; para não ser "
+"instalado nenhum kernel pode ser utilizado \"none\".\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486</phrase>"
 
 #. Tag: title
 #: preseed.xml:887
@@ -2531,7 +2549,7 @@ msgstr "Utilizar o preseed para alterar valores por omissão"
 
 #. Tag: para
 #: preseed.xml:1021
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
 "question, but still have the question asked. To do this the <firstterm>seen</"
@@ -2545,25 +2563,19 @@ msgid ""
 "also be useful for testing or debugging your preconfiguration file."
 msgstr ""
 "É possível utilizar o preseeding para alterar a resposta por omissão a uma "
-"questão, mas a questão será colocada na mesma. Para fazer tem de ser feito o "
-"reset para <quote>false</quote> á flag <firstterm>seen</firstterm> após "
+"questão, mas mesmo assim a questão será colocada. Para fazer tem de ser feito "
+"o 'reset' para <quote>false</quote> á flag <firstterm>seen</firstterm> após "
 "definir o valor para a questão. <informalexample><screen>\n"
 "d-i foo/bar string value\n"
 "d-i foo/bar seen false\n"
 "</screen></informalexample> Pode ser alcançado o mesmo efeito para "
 "<emphasis>todas</emphasis> as questões definindo na prompt de arranque o "
 "parâmetro <classname>preseed/interactive=true</classname>. Isto também pode "
-"ser útil para testar ou depurar o seu ficheiro de pré-configuração. Se está "
-"a fazer preseed utilizando parâmetros de arranque, pode fazer o instalador "
-"colocar a questão correspondente utilizando o operador <quote>?=</quote>, i."
-"e. <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?"
-"=<replaceable>valor</replaceable></userinput>. Claro que isto só terá efeito "
-"para parâmetros que correspondam ás questões mostradas durante a instalação "
-"e não para parâmetros <quote>internos</quote>."
+"ser útil para testar ou depurar o seu ficheiro de pré-configuração."
 
 #. Tag: para
 #: preseed.xml:1035
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
 "the corresponding question by using the <quote>?=</quote> operator, i.e. "
@@ -2573,22 +2585,12 @@ msgid ""
 "displayed during an installation and not for <quote>internal</quote> "
 "parameters."
 msgstr ""
-"É possível utilizar o preseeding para alterar a resposta por omissão a uma "
-"questão, mas a questão será colocada na mesma. Para fazer tem de ser feito o "
-"reset para <quote>false</quote> á flag <firstterm>seen</firstterm> após "
-"definir o valor para a questão. <informalexample><screen>\n"
-"d-i foo/bar string value\n"
-"d-i foo/bar seen false\n"
-"</screen></informalexample> Pode ser alcançado o mesmo efeito para "
-"<emphasis>todas</emphasis> as questões definindo na prompt de arranque o "
-"parâmetro <classname>preseed/interactive=true</classname>. Isto também pode "
-"ser útil para testar ou depurar o seu ficheiro de pré-configuração. Se está "
-"a fazer preseed utilizando parâmetros de arranque, pode fazer o instalador "
-"colocar a questão correspondente utilizando o operador <quote>?=</quote>, i."
-"e. <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?"
-"=<replaceable>valor</replaceable></userinput>. Claro que isto só terá efeito "
-"para parâmetros que correspondam ás questões mostradas durante a instalação "
-"e não para parâmetros <quote>internos</quote>."
+"Se está a fazer preseed utilizando parâmetros de arranque, pode fazer o "
+"instalador colocar a questão correspondente utilizando o operador <quote>?="
+"</quote>, i.e. <userinput><replaceable>foo</replaceable>/<replaceable>bar"
+"</replaceable>?=<replaceable>valor</replaceable></userinput>. Claro que isto "
+"só terá efeito para parâmetros que correspondam ás questões que são mostradas "
+"durante a instalação e não para parâmetros <quote>internos</quote>."
 
 #. Tag: title
 #: preseed.xml:1050
@@ -2615,7 +2617,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1061
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
 "# loaded. The included files can have preseed/include directives of their\n"
@@ -2641,13 +2643,13 @@ msgid ""
 "#d-i preseed/run string foo.sh"
 msgstr ""
 "# Podem ser listados mais do que um ficheiro, separados por espaços;\n"
-"# todos serão carregados. Os ficheiros incluídos podem ter também\n"
-"# directivas de preseed/include deles próprios. Note que se os nomes dos\n"
+"# todos serão carregados. Os ficheiros incluídos podem ter também eles\n"
+"# próprio directivas de preseed/include. Note que se os nomes dos\n"
 "# ficheiros forem relativos, serão tirados do mesmo directório do ficheiro\n"
 "# de pré-configuração que os incluí.\n"
 "#d-i preseed/include string x.cfg\n"
 "\n"
-"# O instalador pode opcionalmente verificar os checksums dos ficheiros de\n"
+"# O instalador pode opcionalmente verificar os 'checksums' dos ficheiros de\n"
 "# pré-configuração antes de os utilizar. Actualmente apenas são\n"
 "# suportados md5sums, liste os md5sums na mesma ordem que a lista de\n"
 "# ficheiros a incluir.\n"
@@ -2656,15 +2658,14 @@ msgstr ""
 "# De forma mais fléxivel, isto corre um comando da shell e se mostrar os\n"
 "# nome dos ficheiros de pré-configuração, inclui esses ficheiros. \n"
 "#d-i preseed/include_command \\\n"
-"#      string echo if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
+"#      string if [ \"`hostname`\" = bob ]; then echo bob.cfg; fi\n"
 "\n"
 "# Da forma mais flexível, isto faz o download um programa e corre-o.\n"
 "# O programa pode utilizar comandos como o debconf-set para manipular a\n"
 "# base de dados do debconf.\n"
 "# Pode ser listado mais do que um script, separado por espaços.\n"
-"# Note que se os nomes dos ficheiros são relativos, serão retirados do "
-"mesmo\n"
-"# directório do ficheiro de pré-configuração que os corre.\n"
+"# Note que se os nomes dos ficheiros são relativos, serão retirados do\n"
+"# mesmo directório do ficheiro de pré-configuração que os corre.\n"
 "d-i preseed/run string foo.sh"
 
 #. Tag: para
