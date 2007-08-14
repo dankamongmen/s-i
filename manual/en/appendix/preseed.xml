@@ -1151,10 +1151,15 @@ earlier questions. You can optionally add other (local) repositories.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
 # Uncomment this if you don't want to use a network mirror.
-#d-i apt-setup/use_mirror boolean false
+#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
 # Uncomment this to avoid adding security sources, or
 # add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string
+#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+# Select which update services to use; define the mirrors to be used.
+# Values shown below are the normal defaults.
+#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
 
 # Additional repositories, local[0-9] available
 #d-i apt-setup/local0/repository string \
