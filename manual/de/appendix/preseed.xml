@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 48636 -->
+<!-- original version: 48960 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -949,7 +949,10 @@ d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="le
 # werden soll. Der Gerätename muss im traditionellen Format (nicht devfs)
 # angegeben werden.
 # Um z.B. die erste SCSI/SATA-Festplatte zu nutzen:
-d-i partman-auto/disk string /dev/sda</phrase>
+d-i partman-auto/disk string /dev/sda
+# Hinweis: Wenn Sie einfach die einzige Festplatte nutzen möchten, die verfügbar
+# ist, unabhängig von ihrem Gerätenamen, kommentieren Sie obige Zeile aus. Das
+# funktioniert aber nur, wenn das System lediglich eine Festplatte enthält.</phrase>
 # Zusätzlich müssen Sie angeben, welche Partitionierungsmethode genutzt werden
 # soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
 d-i partman-auto/method string lvm
@@ -1225,11 +1228,17 @@ weitere (lokale) Paketquellen (Repositories) hinzufügen.
 #d-i apt-setup/contrib boolean true
 # Entfernen Sie das folgende Kommentarzeichen, wenn Sie keinen Netzwerk-
 # Spiegel verwenden möchten.
-#d-i apt-setup/use_mirror boolean false
+#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
 # Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Paketquellen
 # für Sicherheitsaktualisierungen zu vermeiden oder fügen Sie einen Host-Namen
 # hinzu, um einen anderen Server anstatt von security.debian.org zu verwenden.
-#d-i apt-setup/security_host string
+#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+# Wählen Sie, welche Update-Dienste genutzt werden sollen; legen Sie die
+# zu verwendenden Spiegelserver fest. Die hier angegebenen Werte sind die
+# normalen Standardwerte.
+#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
 
 # Zusätzliche Paketquellen, "local[0-9]" verfügbar
 #d-i apt-setup/local0/repository string \
