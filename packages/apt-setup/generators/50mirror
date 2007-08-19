@@ -53,6 +53,13 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		use_prio=high ;;
 	esac
 
+	# Default to false if no network selected in netcfg
+	if db_get netcfg/dhcp_options && \
+	   [ "$RET" = "Do not configure the network at this time" ]; then
+		use_mirror=false
+		use_prio=medium
+	fi
+
 	# Only set default if not preseeded or already asked
 	# Hack alert: for this to work no default is set in template
 	db_get apt-setup/use_mirror
