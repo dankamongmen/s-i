@@ -1,4 +1,5 @@
 #include "config.h"
+#include <features.h>
 #include <linux/kd.h>
 #include <stdio.h>
 #include <string.h>
