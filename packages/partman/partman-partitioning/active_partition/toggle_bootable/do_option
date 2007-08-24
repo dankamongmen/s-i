@@ -8,6 +8,18 @@ id=$3
 
 cd $dev
 
+if [ "$task" = bootable ]; then
+	open_dialog PARTITION_INFO $id
+	read_line x1 x2 x3 type x5 x6 x7
+	close_dialog
+	if [ "$type" = logical ]; then
+		db_input high partman-partitioning/bootable_logical || true
+		db_go || exit 0
+		db_get partman-partitioning/bootable_logical
+		[ "$RET" = true ] || exit 0
+	fi
+fi
+
 new_flags=''
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
