@@ -290,19 +290,25 @@ if [ -z "$LIST" ]; then
 	db_progress STEP $MODULE_STEPS
 fi
 
-if ! is_not_loaded ohci1394; then
+if ! is_not_loaded ohci1394 || ! is_not_loaded firewire-ohci; then
 	# if firewire was found, try to enable firewire cd support
-	if is_not_loaded sbp2 && is_available scsi_mod; then
-		if is_available sbp2; then
+	if is_not_loaded sbp2 && is_not_loaded firewire-sbp2 && \
+	    is_available scsi_mod; then
+	    	sbp2module=
+		if is_available firewire-sbp2; then
+			sbp2module=firewire-sbp2
+		elif is_available sbp2; then
+			sbp2module=sbp2
+		if [ -n "$sbp2module" ]; then
 			db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
-			db_subst hw-detect/load_progress_step MODULE "sbp2"
+			db_subst hw-detect/load_progress_step MODULE "$sbp2module"
 			db_progress INFO hw-detect/load_progress_step
-			load_module sbp2
+			load_module "$sbp2module"
+			register-module "$sbp2module"
 		else
-			missing_module sbp2 "FireWire CDROM"
+			missing_module firewire-sbp2 "FireWire CDROM"
 		fi
 	fi
-	register-module sbp2
 	db_progress STEP $OTHER_STEPSIZE
 
 	# also try to enable firewire ethernet (The right way to do this is

@@ -21,7 +21,8 @@ for dev in $(grep : /proc/net/dev | sort | cut -d: -f1); do
 		if [ "$vendorname" ] || [ "$devicename" ]; then
 			echo "$dev:$vendorname $devicename" >> /etc/network/devnames
 		fi
-	elif [ "$(readlink -f /sys/class/net/$dev/device/bus)" = /sys/bus/ieee1394 ]; then
+	elif [ "$(readlink -f /sys/class/net/$dev/device/bus)" = /sys/bus/ieee1394 ] || \
+	     [ "$(readlink -f /sys/class/net/$dev/device/bus)" = /sys/bus/firewire ]; then
 		echo "$dev:FireWire (IEEE 1394) Ethernet device" >> /etc/network/devnames
 	fi
 done
