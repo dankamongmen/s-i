@@ -5,6 +5,16 @@ log() {
 	logger -t finish-install "$@"
 }
 
+write_console() {
+	if ! grep -q "$1" "$2"; then
+		if ! grep -q "# serial console added by debian-installer" "$2"; then
+			echo "" >> "$2"
+			echo "# serial console added by debian-installer" >> "$2"
+		fi
+		echo "$1" >> "$2"
+	fi
+}		
+
 # Since this script is running with debconf, 'tty' does
 # not give reliable answers about what sort of terminal
 # we have.  The stdin of /sbin/debian-installer seems
@@ -39,11 +49,9 @@ case "$console" in
 		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
 	fi
 
-	echo "" >> /target/etc/securetty
-	echo "# serial console added by debian-installer" >> /target/etc/securetty
-	echo "$rawconsole" >> /target/etc/securetty
+	write_console "$rawconsole" /target/etc/securetty
 	if [ -n "$console" ] && [ "$console" != "$rawconsole" ]; then
-		echo "$console" >> /target/etc/securetty
+		write_console "$console" /target/etc/securetty
 	fi
 	;;
 esac
