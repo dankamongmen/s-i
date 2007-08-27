@@ -2110,9 +2110,9 @@ command_copy_partition()
 }
 
 void
-command_get_disk_type()
+command_get_label_type()
 {
-        log("command_get_disk_type()");
+        log("command_get_label_type()");
         scan_device_name();
         open_out();
         oprintf("OK\n");
@@ -2319,8 +2319,8 @@ main_loop()
                         command_get_virtual_resize_range();
                 else if (!strcasecmp(str, "COPY_PARTITION"))
                         command_copy_partition();
-                else if (!strcasecmp(str, "GET_DISK_TYPE"))
-                        command_get_disk_type();
+                else if (!strcasecmp(str, "GET_LABEL_TYPE"))
+                        command_get_label_type();
                 else if (!strcasecmp(str, "IS_BUSY"))
                         command_is_busy();
                 else
