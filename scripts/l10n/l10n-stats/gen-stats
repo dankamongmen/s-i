@@ -308,6 +308,8 @@ for dist in testing unstable cvs ; do
 	for path in `cat $WD/config/paths.$dist$LEVEL`; do
 		test -f $WD/material/packages.$dist$LEVEL/$path/*.pot || continue
 		U=`untranslated $WD/material/packages.$dist$LEVEL/$path/*.pot`
+		# If the POT file is invalid, return 0
+		if [ -z "$U" ] ; then U=0 ; fi
 		
 		# Copy files only for cvs repos
 		if [ "$dist" = "cvs" ] ; then
