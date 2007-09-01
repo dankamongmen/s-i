@@ -1,0 +1,26 @@
+
+Steps to add a new language
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- l10n/po/: Write your .po file as usual.
+
+- l10n/Makefile: Add your language to LINGUAS variable.
+
+Enabling it in the installer
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+** PLEASE ** only do this when you have tested it works!  (wine-based test
+is ok).  If you can't test it, just skip this part untill somebody who can
+confirm it adds the missing bits.
+
+In main.nsi, add the following lines (each in appropiate place):
+
+  !include l10n/templates/$LANG.nsh
+
+  [...]
+
+  ; LANG_MYLANGUAGE must be a valid string recognised by Nsis.  If your
+  ; language is not yet supported by Nsis, please translate the missing
+  ; Nsis part first.
+  Push ${LANG_MYLANGUAGE}
+  Push Mylanguage
