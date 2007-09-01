@@ -42,5 +42,17 @@ export TEXTDOMAINDIR=${PWD}/locale
 # converted to this charset should be used.
 charset=`gettext windows-1252`
 
+# translate:
+# Charset used by NTLDR in your localised version of Windows XP.  If you
+# don't know, maybe http://en.wikipedia.org/wiki/Code_page helps.
+ntldr_charset=`gettext cp437`
+
 export LANGUAGE
-./win32-loader | iconv -f utf-8 -t ${charset}
+./win32-loader | iconv -f utf-8 -t "${charset}"
+if [ "${ntldr_charset}" = "unknown" ] ; then
+  ntldr_charset="${charset}"
+fi
+# one for ntldr in its own charset
+./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}" | sed -e "s/^\(LangString d-i\) /\1_ntldr /g"
+# one for bootmgr in the native charset
+./win32-loader ntldr | iconv -f utf-8 -t "${charset}"

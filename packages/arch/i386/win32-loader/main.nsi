@@ -595,7 +595,7 @@ boot"
     ; Windows (bad) or straight to Debian-Installer (also bad)!  Force it to 30
     ; just in case.
     WriteIniStr "$boot_ini" "boot loader" "timeout" "30"
-    WriteIniStr "$boot_ini" "operating systems" "$c\g2ldr.mbr" '"$(d-i)"'
+    WriteIniStr "$boot_ini" "operating systems" "$c\g2ldr.mbr" '"$(d-i_ntldr)"'
   ${Endif}
 
   ${If} $windows_boot_method == direct

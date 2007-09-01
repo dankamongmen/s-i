@@ -22,7 +22,7 @@
 #include <stdio.h>
 
 int
-main ()
+main (int argc, char **argv)
 {
   char *nsis_lang;
 
@@ -37,14 +37,6 @@ main ()
   missing Nsis part first.
  */
   nsis_lang = _("LANG_ENGLISH");
-
-/*
-  translate:
-  The nlf file for your language should be found in
-  /usr/share/nsis/Contrib/Language files/
- */
-  printf ("LoadLanguageFile \"${NSISDIR}\\Contrib\\Language files\\%s\"\n", _("English.nlf"));
-  printf ("LicenseLangString license ${%s} license\n", nsis_lang);
 
   auto void langstring (char *code, char *p);
   void langstring (char *code, char *p)
@@ -68,8 +60,27 @@ main ()
     printf ("\"\n");
   }
 
+  if ((argc == 2) && !strcmp (argv[1], "ntldr"))
+    {
+/*
+  translate:
+  IMPORTANT: only the subset of UTF-8 that can be converted to NTLDR charset
+  (e.g. cp437) should be used in this string.  If you don't know which charset
+  applies, limit yourself to ascii.
+ */
+  langstring ("d-i", _("Debian Installer"));
+      return 0;
+    }
+
+/*
+  translate:
+  The nlf file for your language should be found in
+  /usr/share/nsis/Contrib/Language files/
+ */
+  printf ("LoadLanguageFile \"${NSISDIR}\\Contrib\\Language files\\%s\"\n", _("English.nlf"));
+  printf ("LicenseLangString license ${%s} license\n", nsis_lang);
+
   langstring ("program_name",			_("Debian-Installer Loader"));
-  langstring ("d-i",				_("Debian Installer"));
   langstring ("error_missing_ini",		_("Cannot find win32-loader.ini."));
   langstring ("error_incomplete_ini",		_("win32-loader.ini is incomplete.  Contact the provider of this medium."));
   langstring ("detected_keyboard_is",		_("This program has detected that your keyboard type is \"$0\".  Is this correct?"));

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: win32-loader 0.5.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-07-28 11:01+0000\n"
+"POT-Creation-Date: 2007-09-01 23:58+0200\n"
 "PO-Revision-Date: 2007-07-31 22:41+0900\n"
 "Last-Translator: Hideki Yamane (Debian-JP) <henrich@debian.or.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
@@ -28,6 +28,13 @@ msgid "windows-1252"
 msgstr "shift-jis"
 
 #. translate:
+#. Charset used by NTLDR in your localised version of Windows XP.  If you
+#. don't know, maybe http://en.wikipedia.org/wiki/Code_page helps.
+#: win32-loader.sh:48
+msgid "cp437"
+msgstr "unknown"
+
+#. translate:
 #. This must be a valid string recognised by Nsis.  If your
 #. language is not yet supported by Nsis, please translate the
 #. missing Nsis part first.
@@ -37,37 +44,44 @@ msgid "LANG_ENGLISH"
 msgstr "LANG_JAPANESE"
 
 #. translate:
-#. The nlf file for your language should be found in
-#. /usr/share/nsis/Contrib/Language files/
+#. IMPORTANT: only the subset of UTF-8 that can be converted to NTLDR charset
+#. (e.g. cp437) should be used in this string.  If you don't know which charset
+#. applies, limit yourself to ascii.
 #.
-#: win32-loader.c:46
-msgid "English.nlf"
-msgstr "Japanese.nlf"
-
 #: win32-loader.c:71
-msgid "Debian-Installer Loader"
-msgstr "Debian インストーラ起動ツール"
-
-#: win32-loader.c:72
 msgid "Debian Installer"
 msgstr "Debian インストーラ"
 
-#: win32-loader.c:73
+#. translate:
+#. The nlf file for your language should be found in
+#. /usr/share/nsis/Contrib/Language files/
+#.
+#: win32-loader.c:80
+msgid "English.nlf"
+msgstr "Japanese.nlf"
+
+#: win32-loader.c:83
+msgid "Debian-Installer Loader"
+msgstr "Debian インストーラ起動ツール"
+
+#: win32-loader.c:84
 msgid "Cannot find win32-loader.ini."
 msgstr "win32-loader.ini が見つかりません。"
 
-#: win32-loader.c:74
+#: win32-loader.c:85
 msgid "win32-loader.ini is incomplete.  Contact the provider of this medium."
-msgstr "win32-loader.ini が破損しています。このメディアの提供者に問い合わせてください。"
+msgstr ""
+"win32-loader.ini が破損しています。このメディアの提供者に問い合わせてくださ"
+"い。"
 
-#: win32-loader.c:75
+#: win32-loader.c:86
 msgid ""
 "This program has detected that your keyboard type is \"$0\".  Is this "
 "correct?"
 msgstr ""
 "このプログラムは、キーボードの種類を \"$0\" と判断しました。正しいですか?"
 
-#: win32-loader.c:76
+#: win32-loader.c:87
 msgid ""
 "Please send a bug report with the following information:\n"
 "\n"
@@ -87,31 +101,31 @@ msgstr ""
 "\n"
 "よろしくお願いします。"
 
-#: win32-loader.c:77
+#: win32-loader.c:88
 msgid ""
 "Debian-Installer Loader will be setup with the following parameters.  Do NOT "
 "change any of these unless you know what you're doing."
 msgstr ""
-"Debian インストーラ起動ツールは以下のパラメータを元に設定されます。何をしている"
-"のかを理解せずに以下を変更「しない」でください。"
+"Debian インストーラ起動ツールは以下のパラメータを元に設定されます。何をしてい"
+"るのかを理解せずに以下を変更「しない」でください。"
 
-#: win32-loader.c:78
+#: win32-loader.c:89
 msgid "Proxy settings (host:port):"
 msgstr "プロキシの設定 (ホスト名:ポート番号):"
 
-#: win32-loader.c:79
+#: win32-loader.c:90
 msgid "Location of boot.ini:"
 msgstr "boot.ini ファイルの位置"
 
-#: win32-loader.c:80
+#: win32-loader.c:91
 msgid "Debconf preseed line:"
 msgstr "debconf preseed 行:"
 
-#: win32-loader.c:81
+#: win32-loader.c:92
 msgid "Base URL for netboot images (linux and initrd.gz):"
 msgstr "netboot イメージ (Linux と initrd.gz) のベース URL:"
 
-#: win32-loader.c:82
+#: win32-loader.c:93
 msgid ""
 "There doesn't seem to be enough free disk space in drive $c.  For a complete "
 "desktop install, it is recommended to have at least 3 GB of free disk.  If "
@@ -124,15 +138,15 @@ msgstr ""
 "ディスク領域を分割していたりしていた場合、あるいは完全に Windows を上書きする"
 "つもりであれば、この警告を無視して構いません。"
 
-#: win32-loader.c:83
+#: win32-loader.c:94
 msgid "Error: not enough free disk space.  Aborting install."
 msgstr "エラー: ディスクの空き領域が足りません。インストールを終了します。"
 
-#: win32-loader.c:84
+#: win32-loader.c:95
 msgid "This program doesn't support Windows $windows_version yet."
 msgstr "このプログラムはまだ Windows $windows_version をサポートしていません。"
 
-#: win32-loader.c:85
+#: win32-loader.c:96
 msgid ""
 "The version of Debian you're trying to install is designed to run on modern, "
 "64-bit computers.  However, your computer is uncapable of running 64-bit "
@@ -143,16 +157,16 @@ msgid ""
 "\n"
 "This installer will abort now."
 msgstr ""
-"あなたがインストールしようとしているバージョンの Debian は、最新の 64 ビット環境"
-"で動作するように作られたものです。しかしながら、あなたのマシンは 64 ビット用のプロ"
-"グラムが動作するようにはなっていません。\n"
+"あなたがインストールしようとしているバージョンの Debian は、最新の 64 ビット"
+"環境で動作するように作られたものです。しかしながら、あなたのマシンは 64 ビッ"
+"ト用のプログラムが動作するようにはなっていません。\n"
 "\n"
-"32 ビット版、つまり「i386」版の Debian を使うか、どちらにもインストール可能な "
-"Multi-arch 版を使ってください。\n"
+"32 ビット版、つまり「i386」版の Debian を使うか、どちらにもインストール可能"
+"な Multi-arch 版を使ってください。\n"
 "\n"
 "ここでインストーラを終了します。"
 
-#: win32-loader.c:86
+#: win32-loader.c:97
 msgid ""
 "Your computer is capable of running modern, 64-bit operating systems.  "
 "However, the version of Debian you're trying to install is designed to run "
@@ -160,88 +174,89 @@ msgid ""
 "\n"
 "You may still proceed with this install, but in order to take the most "
 "advantage of your computer, we recommend that you use the 64-bit (\"amd64\") "
-"version of Debian instead, or the Multi-arch version which is able to install "
-"either of them.\n"
+"version of Debian instead, or the Multi-arch version which is able to "
+"install either of them.\n"
 "\n"
 "Would you like to abort now?"
 msgstr ""
 "あなたのコンピュータは最新の 64 ビット版 OS が動作するように作られています。"
-"しかし、あなたがインストールしようとしているバージョンの Debian は、以前の 32 ビット"
-"環境で動作するように作られたものです。\n"
+"しかし、あなたがインストールしようとしているバージョンの Debian は、以前の "
+"32 ビット環境で動作するように作られたものです。\n"
 "\n"
-"このままインストールを続けることもできますが、コンピュータの機能をすべて発揮するには、"
-"64 ビット版、つまり「amd64」版の Debian を代わりに使うか、どちらにもインストール"
-"可能な Multi-arch 版を使ってください。\n"
+"このままインストールを続けることもできますが、コンピュータの機能をすべて発揮"
+"するには、64 ビット版、つまり「amd64」版の Debian を代わりに使うか、どちらに"
+"もインストール可能な Multi-arch 版を使ってください。\n"
 "\n"
 "ここで終了しますか?"
 
-#: win32-loader.c:87 win32-loader.c:94
+#: win32-loader.c:98 win32-loader.c:105
 msgid "Select install mode:"
 msgstr "インストールモードを選んでください:"
 
-#: win32-loader.c:88
+#: win32-loader.c:99
 msgid "Normal mode.  Recommended for most users."
 msgstr "通常モード。一般ユーザにお勧めします。"
 
-#: win32-loader.c:89
+#: win32-loader.c:100
 msgid ""
 "Expert mode.  Recommended for expert users who want full control of the "
 "install process."
 msgstr ""
-"上級モード。インストール作業を全て確認したいという熟練のユーザにお勧めします。"
+"上級モード。インストール作業を全て確認したいという熟練のユーザにお勧めしま"
+"す。"
 
-#: win32-loader.c:90
+#: win32-loader.c:101
 msgid "Select which version of Debian-Installer to use:"
 msgstr "どのバージョンの Debian インストーラを使うか選んでください:"
 
-#: win32-loader.c:91
+#: win32-loader.c:102
 msgid "Stable release.  This will install Debian \"stable\"."
 msgstr "安定版リリース。Debian「安定版 (stable)」 をインストールします。"
 
-#: win32-loader.c:92
+#: win32-loader.c:103
 msgid ""
 "Daily build.  This is the development version of Debian-Installer.  It will "
 "install Debian \"testing\" by default, and may be capable of installing "
 "\"stable\" or \"unstable\" as well."
 msgstr ""
-"デイリービルド。開発版の Debian インストーラ です。標準では Debian"
-"「テスト版 (testing)」をインストールします。「安定版 (stable)」 や「不安定版 "
+"デイリービルド。開発版の Debian インストーラ です。標準では Debian「テスト版 "
+"(testing)」をインストールします。「安定版 (stable)」 や「不安定版 "
 "(unstable)」のインストールも可能です。"
 
-#: win32-loader.c:93
+#: win32-loader.c:104
 msgid ""
 "It is recommended that you check for known issues before using a daily "
 "build.  Would you like to do that now?"
 msgstr ""
-"デイリービルドを使う前に既知の問題をチェックすることをお勧めします。今ここでチェック"
-"をしますか?"
+"デイリービルドを使う前に既知の問題をチェックすることをお勧めします。今ここで"
+"チェックをしますか?"
 
-#: win32-loader.c:95
+#: win32-loader.c:106
 msgid "Graphical install"
 msgstr "グラフィカルインストーラ"
 
-#: win32-loader.c:96
+#: win32-loader.c:107
 msgid "Text install"
 msgstr "テキストインストーラ"
 
-#: win32-loader.c:97
+#: win32-loader.c:108
 #, c-format
 msgid "Downloading %s"
 msgstr "%s をダウンロード中"
 
-#: win32-loader.c:98
+#: win32-loader.c:109
 msgid "Connecting ..."
 msgstr "接続しています..."
 
-#: win32-loader.c:99
+#: win32-loader.c:110
 msgid "second"
 msgstr "秒"
 
-#: win32-loader.c:100
+#: win32-loader.c:111
 msgid "minute"
 msgstr "分"
 
-#: win32-loader.c:101
+#: win32-loader.c:112
 msgid "hour"
 msgstr "時間"
 
@@ -251,42 +266,43 @@ msgstr "時間"
 #. has been proposed [1] but in the meantime we'll have to cope with this.
 #. [1] http://sourceforge.net/tracker/index.php?func=detail&aid=1656076&group_id=22049&atid=373087
 #.
-#: win32-loader.c:109
+#: win32-loader.c:120
 msgid "s"
 msgstr "秒"
 
-#: win32-loader.c:110
+#: win32-loader.c:121
 #, c-format
 msgid "%dkB (%d%%) of %dkB at %d.%01dkB/s"
 msgstr "%1dkB 中 %3dkB (%2d%%) at %4d.%01dkB/秒"
 
-#: win32-loader.c:111
+#: win32-loader.c:122
 #, c-format
 msgid " (%d %s%s remaining)"
 msgstr " (残り時間 %d %s%s)"
 
-#: win32-loader.c:112
+#: win32-loader.c:123
 msgid "Error"
 msgstr "エラー"
 
-#: win32-loader.c:113
+#: win32-loader.c:124
 msgid "Error: failed to copy $0 to $1."
 msgstr "エラー: $0 を $1 にコピーするのに失敗しました。"
 
-#: win32-loader.c:114
+#: win32-loader.c:125
 msgid "Error: unable to run $0."
 msgstr "エラー: $0 を実行できません。"
 
-#: win32-loader.c:115
+#: win32-loader.c:126
 msgid "Error: failed to parse bcdedit.exe output."
 msgstr "エラー: bcdedit.exe による出力の解析に失敗しました。"
 
-#: win32-loader.c:116
+#: win32-loader.c:127
 msgid "Error: $boot_ini not found.  Is this really Windows $windows_version?"
 msgstr ""
-"エラー: $boot_ini が見つかりません。これは本当に Windows $windows_version ですか?"
+"エラー: $boot_ini が見つかりません。これは本当に Windows $windows_version で"
+"すか?"
 
-#: win32-loader.c:117
+#: win32-loader.c:128
 msgid "VERY IMPORTANT NOTICE:\\n\\n"
 msgstr "大変重要なお知らせ:\\n\\n"
 
@@ -296,7 +312,7 @@ msgstr "大変重要なお知らせ:\\n\\n"
 #. Take into account that either option has to make sense in our
 #. current context (i.e. be careful when using pronouns, etc).
 #.
-#: win32-loader.c:125
+#: win32-loader.c:136
 msgid ""
 "The second stage of this install process will now be started.  After your "
 "confirmation, this program will restart Windows in DOS mode, and "
@@ -305,7 +321,7 @@ msgstr ""
 "インストール作業を次の段階に進めます。確認後、このプログラムは Windows を "
 "DOS モードで再起動して自動的に Debian インストーラを起動します。\\n\\n"
 
-#: win32-loader.c:126
+#: win32-loader.c:137
 msgid ""
 "You need to reboot in order to proceed with your Debian install.  During "
 "your next boot, you will be asked whether you want to start Windows or "
@@ -313,10 +329,11 @@ msgid ""
 "process.\\n\\n"
 msgstr ""
 "Debian のインストールを続けるには再起動する必要があります。次回の起動時に、"
-"Windows を起動するか、それとも Debian インストーラを起動するかを尋ねられます。"
-"インストール作業を続けるためには Debian インストーラを選択してください。\\n\\n"
+"Windows を起動するか、それとも Debian インストーラを起動するかを尋ねられま"
+"す。インストール作業を続けるためには Debian インストーラを選択してください。"
+"\\n\\n"
 
-#: win32-loader.c:127
+#: win32-loader.c:138
 msgid ""
 "During the install process, you will be offered the possibility of either "
 "reducing your Windows partition to install Debian or completely replacing "
@@ -328,14 +345,14 @@ msgid ""
 "Windows Add/Remove Programs dialog in Control Panel."
 msgstr ""
 "インストール作業中、Debian をインストールするために Windows 領域を縮小するの"
-"か、あるいは完全に上書きするのかを尋ねられたりします。どちらを選ぶにせよ、"
-"事前にデータのバックアップを行っておくことを「強くお勧め」します。データの損"
+"か、あるいは完全に上書きするのかを尋ねられたりします。どちらを選ぶにせよ、事"
+"前にデータのバックアップを行っておくことを「強くお勧め」します。データの損"
 "傷・消失が起こった場合、この起動ツールの作者、もしくは Debian プロジェクトは"
 "「何の責任も負いません」。\\n\\n一旦、Debian のインストールが完了した (そし"
 "て Windows をディスクに残しておくと決めた) 場合、Debian インストーラ起動ツー"
 "ルはコントロールパネルの「プログラムの追加と削除」画面からアンインストールで"
 "きます。"
 
-#: win32-loader.c:128
+#: win32-loader.c:139
 msgid "Do you want to reboot now?"
 msgstr "今すぐ再起動しますか?"
