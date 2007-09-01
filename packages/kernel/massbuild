@@ -275,6 +275,9 @@ select_source() {
 		clean_arch_tmp
 		exit 1
 	fi
+
+        _TMP=${BDEP_SOURCE#?} # everything but the first character
+	BDEP_SOURCE_PREFIX=${BDEP_SOURCE%$_TMP}
 }
 
 retrieve_package() {
@@ -303,10 +306,10 @@ retrieve_package() {
 		fi
 		;;
 	    local)
-		url="$LMIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		url="$LMIRROR/pool/main/${BDEP_SOURCE_PREFIX}/$BDEP_SOURCE"
 		;;
 	    pool)
-		url="$MIRROR/pool/main/${BDEP_SOURCE:0:1}/$BDEP_SOURCE"
+		url="$MIRROR/pool/main/${BDEP_SOURCE_PREFIX}/$BDEP_SOURCE"
 		;;
 	    incoming)
 		url="$INCOMING"
@@ -464,7 +467,7 @@ NOTE: This script should only be used to build and upload kernel/module
       release manager.
 EOF
 fi
-read -n 1 -s -p "Do you wish to continue [yN]? " reply
+read -p "Do you wish to continue [yN]? " reply
 echo
 if [ "$reply" != y ] && [ "$reply" != Y ]; then
 	exit 0
