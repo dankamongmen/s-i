@@ -30,17 +30,22 @@ fi
 
 # Set global locale and language, and make sure the glibc locale is
 # generated.
-# TODO cjwatson 2006-02-19: remove any old LANG/LANGUAGE settings
-# writing to /etc/environment re-disabled after #389466 was fixed in gdm
 DESTFILE="/target/etc/default/locale"
-#DESTFILE2="/target/etc/environment"
-echo "LANG=\"$LOCALE\"" >> $DESTFILE
-#echo "LANG=\"$LOCALE\"" >> $DESTFILE2
-# We set LANGUAGE only if the languagelist is a list of
-# languages with alternatives. Otherwise, setting it is useless
-if echo "$LANGLIST" | grep -q ":"; then
-	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
-#	echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE2
+if [ -e $DESTFILE ]; then
+	sed -i 's/^# LANG=$/LANG=\"'"$LOCALE"'\"/' $DESTFILE
+	# We set LANGUAGE only if the languagelist is a list of
+	# languages with alternatives. Otherwise, setting it is useless
+	if echo "$LANGLIST" | grep -q ":"; then
+		sed -i 's/^# LANGUAGE=$/LANGUAGE=\"'"$LANGLIST"'\"/' $DESTFILE
+	fi
+fi
+# Fallback in case the file wasn't provided by locales, or the format
+# changed.
+if [ ! -e "$DESTFILE" ] || ! grep -q '^LANG=' $DESTFILE; then
+	echo "LANG=\"$LOCALE\"" >> $DESTFILE
+	if echo "$LANGLIST" | grep -q ":"; then
+		echo "LANGUAGE=\"$LANGLIST\"" >> $DESTFILE
+	fi
 fi
 
 # For languages that have no chance to be displayed at the Linux console
