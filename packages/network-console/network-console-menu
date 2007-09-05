@@ -15,7 +15,10 @@ db_input critical $TEMPLATE_ROOT/login
 db_go
 db_get $TEMPLATE_ROOT/login
 
-if [ "$RET" = 'Start menu' ]; then
+if [ "$RET" = 'Start installer' ]; then
+	exec main-menu
+elif [ "$RET" = 'Start installer (expert mode)' ]; then
+	db_set debconf/priority low
 	exec main-menu
 elif [ "$RET" = 'Start shell' ]; then
 	# WORKAROUND
