@@ -58,10 +58,6 @@ int getfd() {
     if (fd >= 0)
       return fd;
 
-    fd = open_a_console("/dev/vc/0");
-    if (fd >= 0)
-      return fd;
-
     fd = open_a_console("/dev/console");
     if (fd >= 0)
       return fd;
