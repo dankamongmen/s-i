@@ -40,7 +40,7 @@ try_mount() {
 if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 	# This is a good reasonable default, but will fail for
 	# USB floppys.
-	FLOPPYDEV=/dev/floppy/0
+	FLOPPYDEV=/dev/fd0
 	
 	if [ ! -e $FLOPPYDEV ]; then
 		log-output -t mountfloppy modprobe floppy || true
@@ -50,11 +50,6 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 		log-output -t mountfloppy modprobe vfat || true
 	fi
 	
-	if [ ! -e "$FLOPPYDEV" ]; then
-		# Try non-devfs naming.
-		FLOPPYDEV=/dev/fd0
-	fi
-
 	if [ ! -e "$FLOPPYDEV" ] || ! try_mount $FLOPPYDEV $FLOPPYMNT; then
 		# Cannot find a device, or found the wrong device.
 		# Ask for help from the user and try it again.
