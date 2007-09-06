@@ -67,8 +67,6 @@
 #include "autopartkit.h"
 #include <assert.h>
 
-#include "parted-compat.h"
-
 #ifdef __linux__
 #include <fcntl.h>
 #include <sys/ioctl.h>

@@ -69,7 +69,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <parted/parted.h>
-#include <debian-installer/system/devfs.h>
 #if defined(TEST)
 #include "dummydebconfclient.h"
 #else /* not TEST */
@@ -106,17 +105,12 @@
 */
 
 
-/* Ignore devfs devices, used in choose_dev */
-#define IGNORE_DEVFS_DEVICES 1
-
 #if 1
 #define log_line() \
   autopartkit_log(2, "  Error bounding: %s %d\n",__FILE__,__LINE__)
 #else
 #define log_line()
 #endif
-
-#include "parted-compat.h"
 
 static struct debconfclient *client;
 
@@ -138,11 +132,8 @@ static void fix_mounting(device_mntpoint_map_t mountmap[], int partcount);
 #if defined(fordebian)
 static DeviceStats* get_device_stats(PedDevice*);
 #endif /* fordebian */
-#if defined(HAVE_PED_DISK_COMMIT)
 static void autopartkit_handle_timer(PedTimer* timer, void* context);
-#endif
 
-#if defined(HAVE_PED_DISK_COMMIT)
 /* update the debconf progress bar when given notice by autopartkit */
 /* No longer used after rewrite to use /sbin/mkfs.*. [pere 2005-03-19] */
 static void
@@ -169,7 +160,6 @@ autopartkit_handle_timer(PedTimer* timer, void* context ATTRIBUTE_UNUSED)
     debconf_progress_info(client, template);
     debconf_progress_set(client, (int)(timer->frac * 1000.0f));
 }
-#endif
 
 void
 autopartkit_error (int isfatal, const char * format, ...)
@@ -366,12 +356,6 @@ static PedDevice* choose_device(void)
     ptr_table = table;
     for(; dev; dev = my_ped_device_get_next_rw(dev))
     {
-#ifdef IGNORE_DEVFS_DEVICES
-	if (strstr(dev->path, "dev/ide/") || strstr(dev->path, "dev/scsi/")) {
-	    autopartkit_log( 1, "Skipping devfs device %s\n", dev->path);
-	    continue;
-	}
-#endif
 
 	++num_devices;
 	stats = get_device_stats(dev);
@@ -532,7 +516,7 @@ static DeviceStats* get_device_stats(PedDevice* dev)
 	    stats->free_space += space;
 	    continue;
 	}
-	if (part->type == PED_PARTITION_PRIMARY ||
+	if (part->type == PED_PARTITION_NORMAL ||
 	    part->type == PED_PARTITION_LOGICAL)
 	{
 	    stats->nb_part++;
@@ -720,48 +704,6 @@ normalize_requirements(diskspace_req_t *dest, const diskspace_req_t *source,
     qsort(&dest[1], count - 1, sizeof(dest[0]),  dr_minsize_compare);
 }
 
-
-/*
- * This hurts my heart, but libparted seems to have some design
- * issues, and it is _impossible_ to get the path of a partition
- * without guessing like this.  That sucks. :(
- *
- * Example paths:
- *  /dev/rd/disc0/disc
- *  /dev/ide/host0/bus0/target0/lun0/disc
- *
- * In parted v1.6.1 we can use ped_partition_get_path(freepart);
- */
-static char *get_device_path(PedDevice *dev, PedPartition *freepart)
-{
-#if defined(HAVE_PED_PARTITION_GET_PATH)
-    (void) dev;
-    return ped_partition_get_path(freepart);
-#else /* not HAVE_PED_PARTITION_GET_PATH */
-    char *retval;
-    char *tmp;
-    size_t slen;
-
-    asprintf(&retval, "%s%d", dev->path, freepart->num);
-
-    slen = strlen(dev->path);
-    tmp = retval + slen - 5; /* 5 is the length of "/disc" */
-
-    printf("tmp=%s\n", tmp);
-
-    /* Replace '/disc' at the end with 'part'.  It sucks having to do
-       it this way. */
-    if (0 == strncmp("/disc", tmp, 5))
-    {
-        tmp[1] = 'p';
-        tmp[2] = 'a';
-        tmp[3] = 'r';
-        tmp[4] = 't';
-    }
-    return retval;
-#endif /* not HAVE_PED_PARTITION_GET_PATH */
-}
-
 /*
  * Make mounting points, and mount the newly created filesystems.
  * Create fstab in /target/fstab.
@@ -769,7 +711,6 @@ static char *get_device_path(PedDevice *dev, PedPartition *freepart)
 static void
 fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
 {
-    static char buf[256];
     const char *rootpath;
     int i;
 
@@ -780,10 +721,7 @@ fix_mounting(device_mntpoint_map_t mountmap[], int partcount)
     /* Find and mount the root fs */
 
     rootpath = find_partition_by_mountpoint(mountmap,"/");
-    if (di_system_devfs_map_from(rootpath, buf, sizeof(buf)))
-        autopartkit_log(1, "device for /: %s\n", buf);
-    else
-        autopartkit_error(0, "Unable to devfs-map device for /: %s\n", rootpath);
+    autopartkit_log(1, "device for /: %s\n", rootpath);
 
     /* FIXME Should use fstype for /, not DEFAULT_FS */
     if (mount(find_partition_by_mountpoint(mountmap,"/"),
@@ -864,9 +802,7 @@ nuke_all_partitions(void)
     do {
         PedDisk *p;
 	p = ped_disk_new_fresh(dev, ped_disk_type_get(default_disk_label()));
-#if defined(HAVE_PED_DISK_COMMIT) /* libparted 1.6 */
 	ped_disk_commit(p);
-#endif
 	ped_disk_destroy(p);
 	dev = my_ped_device_get_next_rw(dev);
     } while (dev != NULL);
@@ -970,9 +906,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     int partcount = 0;
     struct disk_info_t *spaceinfo = NULL;
 
-#if defined(HAVE_PED_DISK_COMMIT)
     PedTimer *timer = NULL;
-#endif /* HAVE_PED_DISK_COMMIT */
 
 #if defined(LVM_HACK)
     void *lvm_pv_stack;
@@ -1078,7 +1012,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	    autopartkit_log(1, "  Creating partition on disk having "
 			    "sectors %lld\n", disk_maybe->dev->length);
-	    any = PED_CONSTRAINT_ANY(disk_maybe, disk_maybe->dev);
+	    any = ped_constraint_any(disk_maybe->dev);
 	    autopartkit_log(1, "  Trying to create part on %lld-%lld\n",
 			    req_tmp->curdisk->geom.start,
 			    req_tmp->curdisk->geom.end);
@@ -1125,7 +1059,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 			    req_tmp->curdisk->geom.start, endsector);
 
 	    newpart = ped_partition_new( disk_maybe,
-					 ( isroot ? PED_PARTITION_PRIMARY
+					 ( isroot ? PED_PARTITION_NORMAL
 					   : PED_PARTITION_LOGICAL ),
 					 fs_type,
 					 req_tmp->curdisk->geom.start,
@@ -1137,8 +1071,7 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
 
 	    ret = ped_disk_add_partition(disk_maybe, newpart, any);
 
-	    mountmap[partcount].devpath =
-	      get_device_path(disk_maybe->dev, newpart);
+	    mountmap[partcount].devpath = ped_partition_get_path(newpart);
 
 	    autopartkit_log(1, "  ped_disk_add_partition: %d\n", ret);
 	    if (0 != ret)
@@ -1231,7 +1164,6 @@ make_partitions(const diskspace_req_t *space_reqs, PedDevice *devlist)
     /* Close libparted, needs to do it here just to let the kernel
      * know of the new partition table so that mounts call actually work
      */
-    PED_DONE();
     disable_kmsg(0);
 
     free(spaceinfo);
@@ -1435,7 +1367,6 @@ int main (int argc, char *argv[])
     disable_kmsg(1);
     ped_exception_set_handler(exception_handler);
     autopartkit_log(1, "Initializing libparted.\n");
-    PED_INIT();
     disable_kmsg(0);
 
     if (argc > 1)
@@ -1479,8 +1410,6 @@ int main (int argc, char *argv[])
     retval = 0;
 
 end:
-    PED_DONE();
-
     debconfclient_delete(client);
     return retval;
 }

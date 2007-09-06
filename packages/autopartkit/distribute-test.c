@@ -32,8 +32,6 @@
 #include <parted/parted.h>
 #include <assert.h>
 
-#include "parted-compat.h"
-
 #define EMPTYGEOMETRY {NULL, 0, 0, 0}
 
 struct disk_info_t diskinfo[] = {
@@ -52,8 +50,6 @@ main(int argc, char *argv[])
     char *infile;
     struct disk_info_t *spaceinfo = NULL;
 
-    PED_INIT();
-
     if (2 == argc)
         infile = argv[1];
     else
@@ -63,7 +59,6 @@ main(int argc, char *argv[])
 
     if (NULL == reqs)
     {
-        PED_DONE();
         return 1;
     }
 
@@ -93,8 +88,6 @@ main(int argc, char *argv[])
 
     if (diskinfo != spaceinfo)
         free(spaceinfo);
-
-    PED_DONE();
 
     return 0;
 }
