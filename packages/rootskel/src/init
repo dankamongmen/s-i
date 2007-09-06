@@ -8,8 +8,9 @@ mount /proc
 if [ -x /sbin/udevd ]; then
 	/lib/debian-installer/init-udev-devices
 else
-	mount /dev
-	mount /dev/pts
+	echo "udev is missing. Giving up!" >&2
+	sleep 5000
+	exit
 fi
 init='busybox init'
 for i in $(cat /proc/cmdline); do

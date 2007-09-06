@@ -2,9 +2,6 @@
 if [ ! -d /proc/self ] ; then
 	mount -t proc proc /proc
 fi
-if [ ! -e /dev/.devfsd ] && [ ! -x /sbin/udevd ]; then
-	mount -t devfs devfs /dev
-fi
 if grep -q '[[:space:]]sysfs' /proc/filesystems; then
 	mount -t sysfs sysfs /sys
 fi
@@ -13,6 +10,4 @@ fi
 # on /initrd (if we're not using initramfs)
 umount /initrd/dev 2>/dev/null
 umount /initrd 2>/dev/null
-if [ "`uname -r | grep '^2.2.'`" = "" ]; then
-	freeramdisk /dev/rd/0 2>/dev/null
-fi
+freeramdisk /dev/ram0 2>/dev/null

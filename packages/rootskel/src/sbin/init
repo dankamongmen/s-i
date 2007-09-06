@@ -5,43 +5,30 @@ export PATH
 debugshell "just booted"
 
 echo "Setting up filesystem, please wait ..."
-if [ "`uname -r | grep '^2.2.'`" = "" ]; then
-	mount /proc
-	umount initrd 2>/dev/null || true
-	if mount -t tmpfs -o size=100M tmpfs /mnt ; then
-		:
-	elif mount -t shm shm mnt; then
-		:
-	else
-		mount -t ramfs ramfs /mnt
-	fi
-	umount /proc
-	cp -a $(ls -1 / |grep -v '\(lost+found\|mnt\|proc\)') /mnt
-	cd /mnt
-	pivot_root . initrd
-	mkdir proc
-	if [ -x /sbin/udevd ]; then
-		/lib/debian-installer/init-udev-devices
-	else
-		mount /dev || true
-		mount /dev/pts || true
-	fi
-	mount /proc
 
-	# Close all open files on the initrd, and run busybox init.
-	debugshell "before init"
-	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
+mount /proc
+umount initrd 2>/dev/null || true
+if mount -t tmpfs -o size=100M tmpfs /mnt ; then
+	:
+elif mount -t shm shm mnt; then
+	:
 else
-	rm /sbin/init
-	mount /proc
-	if grep VME /proc/hardware; then
-		. /lib/debian-installer/detect-console
-        	if [ $TERM_TYPE = "serial" ]; then
-	                for i in 2 3 4 5; do
-	                        rm -f /dev/vc/$i /dev/tty$i
-	                done
-	        fi
-	fi
-	debugshell "before init"
-	exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
+	mount -t ramfs ramfs /mnt
 fi
+umount /proc
+cp -a $(ls -1 / | grep -v '\(lost+found\|mnt\|proc\)') /mnt
+cd /mnt
+pivot_root . initrd
+mkdir proc
+if [ -x /sbin/udevd ]; then
+	/lib/debian-installer/init-udev-devices
+else
+	echo "udev is missing. Giving up!" >&2
+	sleep 5000
+	exit
+fi
+mount /proc
+
+# Close all open files on the initrd, and run busybox init.
+debugshell "before init"
+exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1

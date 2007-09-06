@@ -50,24 +50,20 @@ makedev () {
     [ -e "$1" ] || mknod "$1" "$2" "$3" "$4"
 }
 
-makedir () {
-    [ -d "$2" ] || mkdir -m "$1" "$2"
-}
-
-makedir 755 /dev/floppy
+mkdir -p 755 /dev
 
 for i in 0 1 2 3 4 5 6 7; do
 	if sys_dev=`cat /sys/block/fd$i/dev 2>/dev/null`; then
 		case $sys_dev in
-			2:0) makedev  /dev/floppy/"$i" b 2 0 ;;	    
-			2:1) makedev  /dev/floppy/"$i" b 2 1 ;;	    
-			2:2) makedev  /dev/floppy/"$i" b 2 2 ;;	    
-			2:3) makedev  /dev/floppy/"$i" b 2 3 ;;	    
-			2:128) makedev  /dev/floppy/"$i" b 2 128 ;;	    
-			2:129) makedev  /dev/floppy/"$i" b 2 129 ;;	    
-			2:130) makedev  /dev/floppy/"$i" b 2 130 ;;	    
-			2:131) makedev  /dev/floppy/"$i" b 2 131 ;;
-			*) echo "Unknown devive major:minor for /dev/floppy/$i" ;;
+			2:0) makedev  /dev/fd"$i" b 2 0 ;;	    
+			2:1) makedev  /dev/fd"$i" b 2 1 ;;	    
+			2:2) makedev  /dev/fd"$i" b 2 2 ;;	    
+			2:3) makedev  /dev/fd"$i" b 2 3 ;;	    
+			2:128) makedev  /dev/fd"$i" b 2 128 ;;	    
+			2:129) makedev  /dev/fd"$i" b 2 129 ;;	    
+			2:130) makedev  /dev/fd"$i" b 2 130 ;;	    
+			2:131) makedev  /dev/fd"$i" b 2 131 ;;
+			*) echo "Unknown device major:minor for /dev/fd$i" ;;
 		esac
 	fi
 done
@@ -144,9 +140,7 @@ while [ "$LOADED" = 0 ]; do
 		# be inserted at any time.
 	        DEVS=""
 		if [ -z "$INSTALL_MEDIA_DEV" ]; then
-			if [ -d /dev/floppy ]; then
-				DEVS=/dev/floppy/?
-			fi
+			DEVS=/dev/fd?
 		elif [ -e "$INSTALL_MEDIA_DEV" ]; then
 			DEVS="$INSTALL_MEDIA_DEV"
 		fi
