@@ -16,22 +16,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# make sure gettext output is in UTF-8
-unset LC_CTYPE
-while read a b ; do
-  if [ "$b" = "UTF-8" ] ; then
-    export LC_CTYPE=$a
-    break
-  fi
-done < /etc/locale.gen
-if ! [ "$LC_CTYPE" ] ; then
-  echo "Run \"sudo dpkg-reconfigure locales\" and add at least one UTF-8 locale there."
-  exit 1
-fi
+# We need this for gettext to work.  Why not matching $LANGUAGE as passed
+# by our parent?  Because then we'd have to guess country, and en_US.UTF-8
+# just works.
+export LANG=en_US.UTF-8
+
+# LC_ALL is usually undefined in user shells.  Hence it's easy to experience
+# the illusion that this line is unnecessary.  pbuilder thinks otherwise (as
+# it exports LC_ALL=C breaking it).
+export LC_ALL=$LANG
 
 . /usr/bin/gettext.sh
 export TEXTDOMAIN=win32-loader
 export TEXTDOMAINDIR=${PWD}/locale
+
+nsis_lang=`gettext LANG_ENGLISH`
+
+langstring ()
+{
+  local string
+  read string
+  echo "LangString $1 \${$nsis_lang} \"$string\""
+}
 
 # translate:
 # This must be the string used by Windows to represent your
@@ -52,14 +58,23 @@ export LANGUAGE
 ./win32-loader | iconv -f utf-8 -t "${charset}"
 
 # Now comes a string that may be used by NTLDR (or not).  So we need both
-# samples:
-#  - One for bootmgr in the native charset.
-./win32-loader ntldr | iconv -f utf-8 -t "${charset}"
+# samples.
 
-#  - One for ntldr in its own charset.  If the charset cannot be converted to
-#    ${ntldr_charset}, fallback to English untill it's fixed.
-(if ./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}" > /dev/null ; then
-  ./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}"
+#  - First we get the string.
+
+# translate:
+# IMPORTANT: only the subset of UTF-8 that can be converted to NTLDR charset
+# (e.g. cp437) should be used in this string.  If you don't know which charset
+# applies, limit yourself to ascii.
+d_i=`gettext "Debian Installer"`
+
+#  - Then we get a sample for bootmgr in the native charset.
+echo "${d_i}" | iconv -f utf-8 -t "${charset}" | langstring d-i
+
+#  - And another for ntldr in its own charset.  If the charset cannot be
+#    converted to ${ntldr_charset}, fallback to English untill it's fixed.
+(if echo "${d_i}" | iconv -f utf-8 -t "${ntldr_charset}" > /dev/null 2>&1 ; then
+  echo "${d_i}" | iconv -f utf-8 -t "${ntldr_charset}"
 else
-  LANGUAGE=C ./win32-loader ntldr
-fi) | sed -e "s/^\(LangString d-i\) /\1_ntldr /g"
+  echo "Debian Installer"
+fi) | langstring d-i_ntldr

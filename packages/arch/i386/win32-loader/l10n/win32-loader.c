@@ -60,18 +60,6 @@ main (int argc, char **argv)
     printf ("\"\n");
   }
 
-  if ((argc == 2) && !strcmp (argv[1], "ntldr"))
-    {
-/*
-  translate:
-  IMPORTANT: only the subset of UTF-8 that can be converted to NTLDR charset
-  (e.g. cp437) should be used in this string.  If you don't know which charset
-  applies, limit yourself to ascii.
- */
-  langstring ("d-i", _("Debian Installer"));
-      return 0;
-    }
-
 /*
   translate:
   The nlf file for your language should be found in
