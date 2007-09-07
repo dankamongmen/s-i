@@ -48,11 +48,18 @@ charset=`gettext windows-1252`
 ntldr_charset=`gettext cp437`
 
 export LANGUAGE
+# The bulk of the strings
 ./win32-loader | iconv -f utf-8 -t "${charset}"
-if [ "${ntldr_charset}" = "unknown" ] ; then
-  ntldr_charset="${charset}"
-fi
-# one for ntldr in its own charset
-./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}" | sed -e "s/^\(LangString d-i\) /\1_ntldr /g"
-# one for bootmgr in the native charset
+
+# Now comes a string that may be used by NTLDR (or not).  So we need both
+# samples:
+#  - One for bootmgr in the native charset.
 ./win32-loader ntldr | iconv -f utf-8 -t "${charset}"
+
+#  - One for ntldr in its own charset.  If the charset cannot be converted to
+#    ${ntldr_charset}, fallback to English untill it's fixed.
+(if ./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}" > /dev/null ; then
+  ./win32-loader ntldr | iconv -f utf-8 -t "${ntldr_charset}"
+else
+  LANGUAGE=C ./win32-loader ntldr
+fi) | sed -e "s/^\(LangString d-i\) /\1_ntldr /g"
