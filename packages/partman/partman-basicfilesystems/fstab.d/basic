@@ -39,7 +39,11 @@ for dev in $DEVICES/*; do
 		    fi
 		    options=$(get_mountoptions $dev $id)
 		    if [ "$mountpoint" = / ]; then
-			options="${options},errors=remount-ro"
+			if [ "$options" = defaults ]; then
+			    options="errors=remount-ro"
+			else
+			    options="${options},errors=remount-ro"
+			fi
 			pass=1
 		    else
 			pass=2
@@ -51,7 +55,11 @@ for dev in $DEVICES/*; do
 		    mountpoint=$(cat $id/mountpoint)
 		    options=$(get_mountoptions $dev $id)
 		    if [ "$utf8" ]; then
-			options="$options,utf8"
+			if [ "$options" = defaults ]; then
+			    options="utf8"
+			else
+			    options="$options,utf8"
+			fi
 		    fi
 		    echo "$path" "$mountpoint" vfat $options 0 0
 		    ;;
