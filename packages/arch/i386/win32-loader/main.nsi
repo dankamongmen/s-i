@@ -17,25 +17,7 @@
 ; SetCompressor must _always_ be the first command
 SetCompressor /SOLID lzma
 
-; First is default
-!include l10n/templates/en.nsh
-!include l10n/templates/bg.nsh
-!include l10n/templates/ca.nsh
-!include l10n/templates/cs.nsh
-!include l10n/templates/de.nsh
-!include l10n/templates/es.nsh
-!include l10n/templates/fi.nsh
-!include l10n/templates/fr.nsh
-!include l10n/templates/he.nsh
-!include l10n/templates/hu.nsh
-!include l10n/templates/it.nsh
-!include l10n/templates/ja.nsh
-!include l10n/templates/nl.nsh
-!include l10n/templates/pt.nsh
-!include l10n/templates/ru.nsh
-!include l10n/templates/sk.nsh
-!include l10n/templates/sv.nsh
-!include l10n/templates/tr.nsh
+!include l10n/templates/all.nsh
 
 Name $(program_name)
 Icon "swirl.ico"
@@ -93,42 +75,7 @@ Function .onInit
 
   ; Language selection dialog
   Push ""
-  Push ${LANG_BULGARIAN}
-  Push Bulgarian
-  Push ${LANG_CATALAN}
-  Push Catalan
-  Push ${LANG_CZECH}
-  Push Czech
-  Push ${LANG_DUTCH}
-  Push Dutch
-  Push ${LANG_ENGLISH}
-  Push English
-  Push ${LANG_FINNISH}
-  Push Finnish
-  Push ${LANG_FRENCH}
-  Push French
-  Push ${LANG_HUNGARIAN}
-  Push Hungarian
-  Push ${LANG_ITALIAN}
-  Push Italian
-  Push ${LANG_JAPANESE}
-  Push Japanese
-  Push ${LANG_GERMAN}
-  Push German
-  Push ${LANG_HEBREW}
-  Push Hebrew
-  Push ${LANG_PORTUGUESE}
-  Push Portuguese
-  Push ${LANG_RUSSIAN}
-  Push Russian
-  Push ${LANG_SPANISH}
-  Push Spanish
-  Push ${LANG_SLOVAK}
-  Push Slovak
-  Push ${LANG_SWEDISH}
-  Push Swedish
-  Push ${LANG_TURKISH}
-  Push Turkish
+!include l10n/templates/dialog.nsh
   Push unsupported
   Push "-- Not in this list --"
 

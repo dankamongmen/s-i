@@ -1,6 +1,15 @@
 LINGUAS=bg ca cs de en es fi fr he hu it ja nl pt ru sk sv tr
 
-all: $(foreach lang, $(LINGUAS), templates/$(lang).nsh) po/messages.pot
+all: templates/all.nsh templates/dialog.nsh po/messages.pot
+
+templates/dialog.nsh: templates/all.nsh
+	for i in $(LINGUAS) ; do \
+		echo "Push \$${`LANGUAGE=$$i ./win32-loader.sh LANG_ENGLISH`}" ; \
+		echo "Push `LANGUAGE=$$i ./win32-loader.sh English`" ; \
+	done > $@
+
+templates/all.nsh: $(foreach lang, $(LINGUAS), templates/$(lang).nsh)
+	cat $^ > $@
 
 win32-loader: win32-loader.c
 	gcc -DTEXTDOMAINDIR=\"$(CURDIR)/locale\" $^ -o $@

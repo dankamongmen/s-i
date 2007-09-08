@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Got this from our parent
+export LANGUAGE
+
 # We need this for gettext to work.  Why not matching $LANGUAGE as passed
 # by our parent?  Because then we'd have to guess country, and en_US.UTF-8
 # just works.
@@ -53,7 +56,16 @@ charset=`gettext windows-1252`
 # don't know, maybe http://en.wikipedia.org/wiki/Code_page helps.
 ntldr_charset=`gettext cp437`
 
-export LANGUAGE
+# Were we asked to translate a single string?
+if [ "$1" != "" ] ; then
+  exec gettext -s "$1"
+fi
+
+# May be requested by our parent makefile (see above)
+# translate:
+# The name of your language _in English_ (must be restricted to ascii)
+gettext English > /dev/null
+
 # The bulk of the strings
 ./win32-loader | iconv -f utf-8 -t "${charset}"
 
