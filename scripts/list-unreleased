@@ -25,7 +25,12 @@ get_list() {
 
 if [ "$1" = -c ]; then
 	for component in $(get_list); do
-		sed -n "1,/^ --/p" ./$component/debian/changelog
+		echo "$component:"
+		changelog="./$component/debian/changelog"
+		if [ $(grep -c UNRELEASED $changelog) -gt 1 ]; then
+			echo "WARNING: changelog has more than one UNRELEASED entry"
+		fi
+		sed -n "1,/^ --/p" $changelog
 		echo; echo
 	done
 else
