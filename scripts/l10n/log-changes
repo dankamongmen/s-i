@@ -87,8 +87,10 @@ do
 	    # translations need not.
 
 	    encoding=`grep "charset=" $i | sed 's/\"//g' | sed 's/^.*charset=//g' | sed 's/n//g'`
-	    trans=`echo $translator | iconv -f $encoding -t utf-8`
-	    
+	    if [ -n "$encoding" ]; then
+		    trans=`echo $translator | iconv -f $encoding -t utf-8`
+	    fi	    
+
 	    # And output the changelog line
 	    
 	    echo "$CSN.po:$trans" >> $PACKAGE/debian/.credits_log
