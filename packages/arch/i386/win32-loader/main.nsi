@@ -27,6 +27,7 @@ OutFile "win32-loader.exe"
 
 !include LogicLib.nsh
 !include FileFunc.nsh
+!include WinMessages.nsh
 !insertmacro GetRoot
 !insertmacro un.GetRoot
 
@@ -127,6 +128,21 @@ Function ShowExpert
   IfFileExists $d\win32-loader.ini +3 0
     MessageBox MB_OK|MB_ICONSTOP "$(error_missing_ini)"
     Quit
+
+; ********************************************** Display README.html if found
+  ReadINIStr $0 $PLUGINSDIR\maps.ini "languages" "$LANGUAGE"
+  IfFileExists $d\README.$0.html 0 +3
+    StrCpy $0 README.$0.html
+    Goto readme_file_found
+  IfFileExists $d\README.html 0 readme_file_not_found
+    StrCpy $0 README.html
+    Goto readme_file_found
+
+readme_file_found:
+  ShowWindow $HWNDPARENT ${SW_MINIMIZE}
+  ExecShell "open" "file://$d/$0"
+
+readme_file_not_found:
 !endif
 
 ; ********************************************** Initialise $arch
