@@ -525,10 +525,19 @@ Section "Debian-Installer Loader"
   Call Download
 !endif
 
+; We're about to write down our preseed line.  This would be a nice place
+; to add post-install parameters.
+  StrCpy $preseed "$preseed --"
+
+; ********************************************** preseed quietness
+  ${If} $expert == false
+    StrCpy $preseed "$preseed quiet"
+  ${Endif}
+
   FileOpen $0 $c\grub.cfg w
   FileWrite $0 "\
 search	--set /debian/initrd.gz$\n\
-linux	/debian/linux $preseed --$\n\
+linux	/debian/linux $preseed$\n\
 initrd	/debian/initrd.gz$\n\
 boot"
   FileClose $0
