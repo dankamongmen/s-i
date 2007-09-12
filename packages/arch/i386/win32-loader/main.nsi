@@ -47,6 +47,7 @@ LicenseForceSelection checkbox
 
 Page license
 Page custom ShowExpert
+Page custom ShowRescue
 Page custom ShowGraphics
 !ifdef NETWORK_BASE_URL
 Page custom ShowBranch
@@ -205,6 +206,19 @@ windows_version_ok:
     StrCpy $expert true
   ${Else}
     StrCpy $expert false
+  ${Endif}
+FunctionEnd
+
+Function ShowRescue
+  File /oname=$PLUGINSDIR\rescue.ini	templates/binary_choice.ini
+  WriteINIStr $PLUGINSDIR\rescue.ini "Field 1" "Text" $(rescue1)
+  WriteINIStr $PLUGINSDIR\rescue.ini "Field 2" "Text" $(rescue2)
+  WriteINIStr $PLUGINSDIR\rescue.ini "Field 3" "Text" $(rescue3)
+  InstallOptions::dialog $PLUGINSDIR\rescue.ini
+
+  ReadINIStr $0 $PLUGINSDIR\rescue.ini "Field 3" "State"
+  ${If} $0 == "1"
+    StrCpy $preseed "$preseed rescue/enable=true"
   ${Endif}
 FunctionEnd
 

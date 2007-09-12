@@ -86,6 +86,9 @@ main (int argc, char **argv)
   langstring ("expert1",			_("Select install mode:"));
   langstring ("expert2",			_("Normal mode.  Recommended for most users."));
   langstring ("expert3",			_("Expert mode.  Recommended for expert users who want full control of the install process."));
+  langstring ("rescue1",			_("Select action:"));
+  langstring ("rescue2",			_("Install Debian GNU/Linux on this computer."));
+  langstring ("rescue3",			_("Repair an existing Debian system (rescue mode)."));
   langstring ("di_branch1",			_("Select which version of Debian-Installer to use:"));
   langstring ("di_branch2",			_("Stable release.  This will install Debian \"stable\"."));
   langstring ("di_branch3",			_("Daily build.  This is the development version of Debian-Installer.  It will install Debian \"testing\" by default, and may be capable of installing \"stable\" or \"unstable\" as well."));
