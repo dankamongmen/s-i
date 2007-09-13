@@ -39,7 +39,6 @@ OutFile "win32-loader.exe"
 ;--------------------------------
 
 LicenseData $(license)
-LicenseForceSelection checkbox
 
 ;--------------------------------
 
