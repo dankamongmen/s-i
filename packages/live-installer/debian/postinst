@@ -24,6 +24,8 @@ MACHINE="$(uname -m)"
 NUMCPUS=$(cat /var/numcpus 2>/dev/null) || true
 CPUINFO=/proc/cpuinfo
 SPEAKUP=/proc/speakup
+NEWLINE="
+"
 
 SUBARCH="$(archdetect)"
 SUBARCH="${SUBARCH#*/}"
@@ -50,8 +52,8 @@ install_live_system () {
 
 		COUNT=0
 		OLD_IFS=$IFS
-		IFS=`echo -e "\n"`
-		for item in "`find .`"; do
+		IFS=$NEWLINE
+		for item in `find .`; do
 			# We need to be ensure it's not a symbolic link otherwise
 			# it breaks links for directories.
 			if [ -d "$item" ] && [ ! -h "$item" ]; then
