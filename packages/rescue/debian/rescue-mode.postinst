@@ -266,6 +266,8 @@ while :; do
 				log "Could not find menu item for '$RET'!"
 				continue
 			fi
+			db_subst "rescue/${item#[0-9][0-9]}/intro" \
+				DEVICE "${RESCUE_ROOTDEV}"
 			db_input high "rescue/${item#[0-9][0-9]}/intro" || true
 			if ! db_go; then
 				continue
