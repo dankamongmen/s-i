@@ -472,6 +472,13 @@ keyboard_end:
     StrCpy $preseed "$preseed priority=low"
   ${Endif}
 
+; ********************************************** preseed user-fullname
+  systeminfo::username
+  Pop $0
+  ${If} $0 != ""
+    StrCpy $preseed "$preseed passwd/user-fullname?=$\"$0$\""
+  ${Endif}
+
 !ifdef NETWORK_BASE_URL
 ; ********************************************** if ${NETWORK_BASE_URL} provides a preseed.cfg, use it
   Push true

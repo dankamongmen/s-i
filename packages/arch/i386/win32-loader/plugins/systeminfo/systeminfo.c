@@ -47,6 +47,16 @@ void __declspec(dllexport) domain (HWND hwndParent, int string_size, char *varia
 	computername(ComputerNameDnsDomain,hwndParent,string_size,variables,stacktop,extra);
 }
 
+void __declspec(dllexport)
+username (HWND hwndParent, int string_size, char *variables, stack_t **stacktop, extra_parameters *extra)
+{
+  EXDLL_INIT();
+  DWORD sz = sizeof(buf);
+  if (!GetUserNameA (buf, &sz))
+    buf[0] = '\0';
+  pushstring (buf);
+}
+
 void __declspec(dllexport) keyboard_layout (HWND hwndParent, int string_size, char *variables, stack_t **stacktop, extra_parameters *extra)
 {
 	EXDLL_INIT();

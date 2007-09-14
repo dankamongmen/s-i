@@ -6,6 +6,8 @@ VERSION	:= $(shell head -n 1 debian/changelog | sed -e "s/^$(PACKAGE) (\(.*\)).*
 
 CC		:= i586-mingw32msvc-gcc -Os
 STRIP		:= i586-mingw32msvc-strip
+CFLAGS		:= -Wl,--file-alignment,512 -Werror
+
 MAKENSIS	:= makensis
 ifdef NETWORK_BASE_URL
 MAKENSIS	+= -DNETWORK_BASE_URL=$(NETWORK_BASE_URL)
@@ -41,15 +43,15 @@ license: license.in
 	sed -e "s/@VERSION@/$(VERSION)/g" < $^ > $@
 
 plugins/cpuid/test64.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c
-	$(CC) -Wl,--file-alignment,512 $^ -shared -o $@
+	$(CC) $(CFLAGS) $^ -shared -o $@
 	$(STRIP) $@
 
 plugins/systeminfo/systeminfo.dll: plugins/systeminfo/systeminfo.c
-	$(CC) -Wl,--file-alignment,512 $^ -shared -o $@
+	$(CC) $(CFLAGS) $^ -shared -o $@
 	$(STRIP) $@
 
 plugins/string.dll: plugins/string.c
-	$(CC) -Wl,--file-alignment,512 $^ -shared -o $@
+	$(CC) $(CFLAGS) $^ -shared -o $@
 	$(STRIP) $@
 
 iso: win32-loader.iso
