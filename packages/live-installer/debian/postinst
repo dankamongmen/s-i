@@ -97,6 +97,11 @@ install_live_system () {
 	fi
 }
 
+# mount the udev /dev on target otherwise grub-installer will fail
+if grep -q udev /proc/mounts; then
+	mount -o bind /dev /target/dev
+fi
+
 waypoint 1	check_target
 waypoint 1	get_mirror_info
 waypoint 1	pre_install_hooks
