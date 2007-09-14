@@ -49,7 +49,9 @@ install_live_system () {
 		db_progress INFO live-installer/progress/copying
 
 		COUNT=0
-		for item in "$(find . -print)"; do
+		OLD_IFS=$IFS
+		IFS=`echo -e "\n"`
+		for item in "`find .`"; do
 			# We need to be ensure it's not a symbolic link otherwise
 			# it breaks links for directories.
 			if [ -d "$item" ] && [ ! -h "$item" ]; then
@@ -68,6 +70,7 @@ install_live_system () {
 			LAST_UPDATE=$CURRENT
 			db_progress STEP 1
 		done
+		IFS=$OLD_IFS
 	done
 
 	# run the scripts found in hook directory after copying the system
