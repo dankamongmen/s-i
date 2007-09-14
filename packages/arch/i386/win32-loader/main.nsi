@@ -51,6 +51,7 @@ Page custom ShowGraphics
 !ifdef NETWORK_BASE_URL
 Page custom ShowBranch
 !endif
+Page custom ShowDesktop
 Page custom ShowCustom
 Page instfiles
 
@@ -206,6 +207,9 @@ windows_version_ok:
   ${Else}
     StrCpy $expert false
   ${Endif}
+
+  Var /GLOBAL di_branch
+  StrCpy $di_branch stable
 FunctionEnd
 
 Function ShowRescue
@@ -298,8 +302,6 @@ Function Download
 FunctionEnd
 
 Function ShowBranch
-  Var /GLOBAL di_branch
-  StrCpy $di_branch stable
   File /oname=$PLUGINSDIR\di_branch.ini	templates/binary_choice.ini
   ${If} $expert == true
     WriteINIStr $PLUGINSDIR\di_branch.ini "Field 1" "Text" $(di_branch1)
@@ -330,6 +332,39 @@ Function ShowBranch
   ${Endif}
 FunctionEnd
 !endif
+
+Function ShowDesktop
+  Var /GLOBAL _desktop
+  ; It appears that "desktop" is a reserved keyword, hence the _ prefix
+  StrCpy $_desktop "gnome"
+  ${If} $expert == false
+    Return
+  ${Endif}
+  File /oname=$PLUGINSDIR\desktop.ini	templates/4_choices.ini
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 1" "Text" $(desktop1)
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 2" "Text" $(desktop2)
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 3" "Text" $(desktop3)
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 4" "Text" $(desktop4)
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 5" "Text" $(desktop5)
+  InstallOptions::dialog $PLUGINSDIR\desktop.ini
+  ReadINIStr $0 $PLUGINSDIR\desktop.ini "Field 3" "State"
+  ${If} $0 == "1"
+    StrCpy $_desktop "kde"
+  ${Endif}
+  ReadINIStr $0 $PLUGINSDIR\desktop.ini "Field 4" "State"
+  ${If} $0 == "1"
+    StrCpy $_desktop "xfce"
+  ${Endif}
+  ${If} $_desktop == "gnome"
+    Return ; GNOME is already default, do nothing
+  ${Endif}
+  ${If} $di_branch == "daily"
+    StrCpy $preseed "$preseed desktop=$_desktop-desktop"
+  ${Else}
+    ; etch compatibility
+    StrCpy $preseed "$preseed tasks=$\"$_desktop-desktop, standard$\""
+  ${Endif}
+FunctionEnd
 
 Function ShowCustom
 ; Gather all the missing information before ShowCustom is displayed

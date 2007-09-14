@@ -30,7 +30,7 @@ g2ldr.mbr: /usr/lib/grubutil/g2ldr.mbr
 	cp $^ $@
 
 win32-loader.exe: main.nsi maps.ini \
-		templates/binary_choice.ini templates/graphics.ini templates/custom.ini \
+		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
 		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
 		swirl.ico license
 	$(MAKE) -C l10n
