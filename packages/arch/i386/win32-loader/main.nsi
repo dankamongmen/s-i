@@ -208,8 +208,8 @@ windows_version_ok:
     StrCpy $expert false
   ${Endif}
 
-  Var /GLOBAL di_branch
-  StrCpy $di_branch stable
+  Var /GLOBAL debian_release
+  StrCpy $debian_release lenny
 FunctionEnd
 
 Function ShowRescue
@@ -302,6 +302,9 @@ Function Download
 FunctionEnd
 
 Function ShowBranch
+  Var /GLOBAL di_branch
+  StrCpy $di_branch stable
+  StrCpy $debian_release etch
   File /oname=$PLUGINSDIR\di_branch.ini	templates/binary_choice.ini
   ${If} $expert == true
     WriteINIStr $PLUGINSDIR\di_branch.ini "Field 1" "Text" $(di_branch1)
@@ -311,6 +314,7 @@ Function ShowBranch
     ReadINIStr $0 $PLUGINSDIR\di_branch.ini "Field 3" "State"
     ${If} $0 == "1"
       StrCpy $di_branch daily
+      StrCpy $debian_release lenny
     ${Endif}
   ${Endif}
 
@@ -358,12 +362,14 @@ Function ShowDesktop
   ${If} $_desktop == "gnome"
     Return ; GNOME is already default, do nothing
   ${Endif}
-  ${If} $di_branch == "daily"
-    StrCpy $preseed "$preseed desktop=$_desktop-desktop"
-  ${Else}
-    ; etch compatibility
+!ifdef NETWORK_BASE_URL
+  ${If} $debian_release == "etch"
     StrCpy $preseed "$preseed tasks=$\"$_desktop-desktop, standard$\""
+  ${Else}
+    StrCpy $preseed "$preseed desktop=$_desktop-desktop"
   ${Endif}
+!else
+!endif
 FunctionEnd
 
 Function ShowCustom
