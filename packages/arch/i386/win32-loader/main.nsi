@@ -524,6 +524,11 @@ Section "Debian-Installer Loader"
   Call Download
 !endif
 
+; ********************************************** on novice mode, skip grub confirmation
+  ${If} $expert == false
+    StrCpy $preseed "$preseed grub-installer/only_debian=true grub-installer/with_other_os=true"
+  ${Endif}
+
 ; We're about to write down our preseed line.  This would be a nice place
 ; to add post-install parameters.
   StrCpy $preseed "$preseed --"
