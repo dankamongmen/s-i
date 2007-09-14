@@ -61,8 +61,6 @@ win32-loader.iso: win32-loader.exe win32-loader.ini autorun.inf \
 	todos < autorun.inf > netboot/autorun.inf
 	todos < win32-loader.ini > netboot/win32-loader.ini
 	cp win32-loader.exe netboot/
-	# this mimics the location of html docs in official CDs
-	echo "<html>hello, borg world!</html>" > netboot/README.html
 	genisoimage -r -J -o $@ netboot
 
 netboot/install.386/vmlinuz:
