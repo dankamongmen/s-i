@@ -115,7 +115,7 @@ Function ShowExpert
 ; accepted unless absolutely necessary.
 
 ; ********************************************** Initialise $preseed
-  StrCpy $preseed "interface=auto"
+  StrCpy $preseed ""
 ; ********************************************** Initialise $c
   ; FIXME: this line is duplicated in the uninstaller.  keep in sync!
   ${GetRoot} $WINDIR $c
@@ -428,7 +428,7 @@ proxyless:
     ${If} $0 == ""
       StrCpy $0 "localdomain"
     ${Endif}
-    StrCpy $preseed "$preseed domain=$0"
+    StrCpy $preseed "$preseed domain?=$0"
   ${EndIf}
 
 ; ********************************************** preseed timezone
@@ -438,7 +438,7 @@ proxyless:
   ${Endif}
   ReadINIStr $0 $PLUGINSDIR\maps.ini "timezones" "$0"
   ${If} $0 != ""
-    StrCpy $preseed "$preseed time/zone=$0"
+    StrCpy $preseed "$preseed time/zone?=$0"
   ${Endif}
 
 ; ********************************************** preseed keymap
@@ -571,11 +571,6 @@ Section "Debian-Installer Loader"
   Push "$base_url"
   Call Download
 !endif
-
-; ********************************************** on novice mode, skip grub confirmation
-  ${If} $expert == false
-    StrCpy $preseed "$preseed grub-installer/only_debian=true grub-installer/with_other_os=true"
-  ${Endif}
 
 ; We're about to write down our preseed line.  This would be a nice place
 ; to add post-install parameters.
