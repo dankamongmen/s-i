@@ -106,11 +106,8 @@ main (int argc, char **argv)
   langstring ("di_branch2",			_("Stable release.  This will install Debian \"stable\"."));
   langstring ("di_branch3",			_("Daily build.  This is the development version of Debian-Installer.  It will install Debian \"testing\" by default, and may be capable of installing \"stable\" or \"unstable\" as well."));
   langstring ("di_branch4",			_("It is recommended that you check for known issues before using a daily build.  Would you like to do that now?"));
-  langstring ("desktop1",			_("Select your preferred desktop environment:"));
-  langstring ("desktop2",			_("GNOME.  Emphasizes ease of use."));
-  langstring ("desktop3",			_("KDE.  Emphasizes customizability."));
-  langstring ("desktop4",			_("XFCE.  Emphasizes speed and low use of resources."));
-  langstring ("desktop5",			_("None."));
+  langstring ("desktop1",			_("Desktop environment:"));
+  langstring ("desktop2",			_("None"));
   langstring ("custom1",			_("Debian-Installer Loader will be setup with the following parameters.  Do NOT change any of these unless you know what you're doing."));
   langstring ("custom2",			_("Proxy settings (host:port):"));
   langstring ("custom3",			_("Location of boot.ini:"));

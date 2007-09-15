@@ -346,10 +346,10 @@ Function ShowDesktop
   ${Endif}
   File /oname=$PLUGINSDIR\desktop.ini	templates/4_choices.ini
   WriteINIStr $PLUGINSDIR\desktop.ini	"Field 1" "Text" $(desktop1)
-  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 2" "Text" $(desktop2)
-  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 3" "Text" $(desktop3)
-  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 4" "Text" $(desktop4)
-  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 5" "Text" $(desktop5)
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 2" "Text" "GNOME"
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 3" "Text" "KDE"
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 4" "Text" "XFCE"
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 5" "Text" $(desktop2)
   InstallOptions::dialog $PLUGINSDIR\desktop.ini
   ReadINIStr $0 $PLUGINSDIR\desktop.ini "Field 3" "State"
   ${If} $0 == "1"
