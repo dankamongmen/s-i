@@ -115,7 +115,7 @@ Function ShowExpert
 ; accepted unless absolutely necessary.
 
 ; ********************************************** Initialise $preseed
-  StrCpy $preseed ""
+  StrCpy $preseed " "
 ; ********************************************** Initialise $c
   ; FIXME: this line is duplicated in the uninstaller.  keep in sync!
   ${GetRoot} $WINDIR $c
@@ -364,7 +364,7 @@ Function ShowDesktop
   ${Endif}
 !ifdef NETWORK_BASE_URL
   ${If} $debian_release == "etch"
-    StrCpy $preseed "$preseed tasks=$\"$_desktop-desktop, standard$\""
+    StrCpy $preseed "$preseed tasks=\$\"$_desktop-desktop, standard\$\""
   ${Else}
     StrCpy $preseed "$preseed desktop=$_desktop-desktop"
   ${Endif}
@@ -482,7 +482,7 @@ keyboard_end:
   systeminfo::username
   Pop $0
   ${If} $0 != ""
-    StrCpy $preseed "$preseed passwd/user-fullname?=$\"$0$\""
+    StrCpy $preseed "$preseed passwd/user-fullname?=\$\"$0\$\""
   ${Endif}
 
 !ifdef NETWORK_BASE_URL
