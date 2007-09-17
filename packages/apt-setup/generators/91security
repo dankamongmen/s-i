@@ -30,8 +30,10 @@ done
 
 # Don't test mirror if no network selected in netcfg
 echo "deb http://$host/ $codename/updates $dists" >> $file
-if db_get netcfg/dhcp_options && \
-   [ "$RET" = "Do not configure the network at this time" ]; then
+if ( db_fget netcfg/dhcp_options seen &&
+   [ "$RET" = false ] ) ||
+   ( db_get netcfg/dhcp_options && \
+   [ "$RET" = "Do not configure the network at this time" ] ); then
 	CODE=9
 else
 	CODE=0

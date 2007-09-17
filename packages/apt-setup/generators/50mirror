@@ -54,8 +54,10 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	esac
 
 	# Default to false if no network selected in netcfg
-	if db_get netcfg/dhcp_options && \
-	   [ "$RET" = "Do not configure the network at this time" ]; then
+	if ( db_fget netcfg/dhcp_options seen &&
+	   [ "$RET" = false ] ) ||
+	   ( db_get netcfg/dhcp_options && \
+	   [ "$RET" = "Do not configure the network at this time" ] ); then
 		use_mirror=false
 		use_prio=medium
 	fi
