@@ -73,7 +73,7 @@ main (int argc, char **argv)
   langstring ("error_incomplete_ini",		_("win32-loader.ini is incomplete.  Contact the provider of this medium."));
   langstring ("detected_keyboard_is",		_("This program has detected that your keyboard type is \"$0\".  Is this correct?"));
   langstring ("keyboard_bug_report",		_("Please send a bug report with the following information:\n\n - Version of Windows.\n - Country settings.\n - Real keyboard type.\n - Detected keyboard type.\n\nThank you."));
-  langstring ("not_enough_space_for_debian",	_("There doesn't seem to be enough free disk space in drive $c.  For a complete desktop install, it is recommended to have at least 3 GB of free disk.  If there is already a separate disk or partition to install Debian, or if you plan to replace Windows completely, you can safely ignore this warning."));
+  langstring ("not_enough_space_for_debian",	_("There doesn't seem to be enough free disk space in drive $c.  For a complete desktop install, it is recommended to have at least 3 GB.  If there is already a separate disk or partition to install Debian, or if you plan to replace Windows completely, you can safely ignore this warning."));
   langstring ("not_enough_space_for_loader",	_("Error: not enough free disk space.  Aborting install."));
   langstring ("unsupported_version_of_windows",	_("This program doesn't support Windows $windows_version yet."));
   langstring ("amd64_on_i386",			_("The version of Debian you're trying to install is designed to run on modern, 64-bit computers.  However, your computer is uncapable of running 64-bit programs.\n\nUse the 32-bit (\"i386\") version of Debian, or the Multi-arch version which is able to install either of them.\n\nThis installer will abort now."));
@@ -121,7 +121,7 @@ main (int argc, char **argv)
   langstring ("warning1",			_("VERY IMPORTANT NOTICE:\\n\\n"));
 /*
   translate:
-  The following two strings are mutualy exclussive.  win32-loader
+  The following two strings are mutualy exclusive.  win32-loader
   will display one or the other depending on version of Windows.
   Take into account that either option has to make sense in our
   current context (i.e. be careful when using pronouns, etc).
