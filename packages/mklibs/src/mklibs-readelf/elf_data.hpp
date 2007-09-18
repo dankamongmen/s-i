@@ -36,14 +36,10 @@ namespace Elf
     class file_data : public file
     {
       public:
-        file_data (const char *) throw (std::bad_alloc, std::runtime_error);
-        file_data (const char *, void *, size_t len) throw (std::bad_alloc, std::runtime_error);
+        file_data (void *, size_t len) throw (std::bad_alloc, std::runtime_error);
 
         const uint8_t get_class () const throw () { return _class::id; }
         const uint8_t get_data () const throw () { return _data::id; }
-
-      private:
-        void construct () throw (std::bad_alloc, std::runtime_error);
     };
 
   template <typename _class, typename _data>

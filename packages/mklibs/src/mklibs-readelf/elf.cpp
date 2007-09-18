@@ -60,8 +60,8 @@ namespace
     };
 }
 
-file::file (const char *filename, void *mem, size_t len) throw (std::bad_alloc)
-: filename (std::string (filename)), mem (mem), len (len)
+file::file (void *mem, size_t len) throw (std::bad_alloc)
+: mem (mem), len (len)
 { }
 
 file::~file () throw ()
@@ -92,9 +92,9 @@ file *file::open (const char *filename) throw (std::bad_alloc, std::runtime_erro
     switch (buf[EI_CLASS])
     {
       case ELFCLASS32:
-        return open_class<file_class_32> (filename, buf, mem, len);
+        return open_class<file_class_32> (mem, len);
       case ELFCLASS64:
-        return open_class<file_class_64> (filename, buf, mem, len);
+        return open_class<file_class_64> (mem, len);
       default:
         throw std::runtime_error ("Invalid file class");
     }
@@ -107,35 +107,24 @@ file *file::open (const char *filename) throw (std::bad_alloc, std::runtime_erro
 }
 
 template<typename _class>
-file *file::open_class (const char *filename, const uint8_t *buf, void * mem, size_t len) throw (std::bad_alloc, std::runtime_error)
+file *file::open_class (void * mem, size_t len) throw (std::bad_alloc, std::runtime_error)
 {
+  const uint8_t *buf = static_cast <uint8_t *> (mem);
+
   switch (buf[EI_DATA])
   {
     case ELFDATA2LSB:
-      return new file_data<_class, file_data_2LSB> (filename, mem, len);
+      return new file_data<_class, file_data_2LSB> (mem, len);
     case ELFDATA2MSB:
-      return new file_data<_class, file_data_2MSB> (filename, mem, len);
+      return new file_data<_class, file_data_2MSB> (mem, len);
     default:
       throw std::runtime_error ("Invalid file data");
   }
 }
 
 template <typename _class, typename _data>
-file_data<_class, _data>::file_data (const char *filename) throw (std::bad_alloc, std::runtime_error)
-: file (filename)
-{ 
-  construct ();
-}
-
-template <typename _class, typename _data>
-file_data<_class, _data>::file_data (const char *filename, void *mem, size_t len) throw (std::bad_alloc, std::runtime_error)
-: file (filename, mem, len)
-{
-  construct ();
-}
-
-template <typename _class, typename _data>
-void file_data<_class, _data>::construct () throw (std::bad_alloc, std::runtime_error)
+file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_alloc, std::runtime_error)
+: file (mem, len)
 {
   uint8_t *buf = static_cast <uint8_t *> (this->mem);
   if (buf[EI_CLASS] != _class::id)

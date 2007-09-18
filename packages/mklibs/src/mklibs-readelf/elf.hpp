@@ -55,10 +55,10 @@ namespace Elf
       static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
 
     protected:
-      file (const char *, void *, size_t len) throw (std::bad_alloc);
+      file (void *, size_t len) throw (std::bad_alloc);
 
       template<typename _class>
-        static file *open_class (const char *, const uint8_t *, void *, size_t) throw (std::bad_alloc, std::runtime_error);
+        static file *open_class (void *, size_t) throw (std::bad_alloc, std::runtime_error);
 
       uint16_t type;
       uint16_t machine;
@@ -74,7 +74,6 @@ namespace Elf
       std::vector <section *> sections;
       std::vector <segment *> segments;
 
-      const std::string filename;
       void *mem;
       size_t len;
   };
