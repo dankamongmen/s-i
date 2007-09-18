@@ -1,0 +1,3 @@
+class Executable(object):
+    pass
+
