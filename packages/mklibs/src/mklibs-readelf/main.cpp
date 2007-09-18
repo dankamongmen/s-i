@@ -52,8 +52,9 @@ static void process_elf_header (Elf::file *file)
     << file->get_flags () << '\n';
 }
 
-static void process_dynamics (Elf::section_type<Elf::section_type_DYNAMIC> *section, int64_t tag)
+static void process_dynamics (Elf::file *file, int64_t tag)
 {
+  const Elf::section_type<Elf::section_type_DYNAMIC> *section = file->get_section_DYNAMIC ();
   for (std::vector<Elf::dynamic *>::const_iterator it = section->get_dynamics ().begin (); it != section->get_dynamics ().end (); ++it)
   {
     Elf::dynamic *dynamic = *it;
@@ -62,7 +63,7 @@ static void process_dynamics (Elf::section_type<Elf::section_type_DYNAMIC> *sect
   }
 }
 
-static void process_symbols_provided (Elf::section_type<Elf::section_type_DYNSYM> *section)
+static void process_symbols_provided (const Elf::section_type<Elf::section_type_DYNSYM> *section)
 {
   for (std::vector<Elf::symbol *>::const_iterator it = section->get_symbols ().begin (); it != section->get_symbols ().end (); ++it)
   {
@@ -77,14 +78,13 @@ static void process_symbols_provided (Elf::section_type<Elf::section_type_DYNSYM
   }
 }
 
-static void process_symbols_undefined (Elf::section_type<Elf::section_type_DYNSYM> *section)
+static void process_symbols_undefined (const Elf::section_type<Elf::section_type_DYNSYM> *section)
 {
   for (std::vector<Elf::symbol *>::const_iterator it = section->get_symbols ().begin (); it != section->get_symbols ().end (); ++it)
   {
     const Elf::symbol *symbol = *it;
     uint8_t bind = symbol->get_bind ();
     uint16_t shndx = symbol->get_shndx ();
-    uint8_t type = symbol->get_type ();
     if (shndx != SHN_UNDEF)
       continue;
     if (bind == STB_GLOBAL || bind == STB_WEAK)
@@ -95,27 +95,6 @@ static void process_symbols_undefined (Elf::section_type<Elf::section_type_DYNSY
 static void process (command cmd, const char *filename)
 {
   Elf::file *file = Elf::file::open (filename);
-  const std::vector <Elf::section *> &sections = file->get_sections ();
-  const std::vector <Elf::segment *> &segments = file->get_segments ();
-  Elf::section_type<Elf::section_type_DYNAMIC> *section_dynamic = 0;
-  Elf::section_type<Elf::section_type_DYNSYM> *section_dynsym = 0;
-  Elf::segment_type<Elf::segment_type_INTERP> *segment_interp = 0;
-
-  for (std::vector <Elf::section *>::const_iterator it = sections.begin (); it != sections.end (); ++it)
-  {
-    uint32_t type = (*it)->get_type ();
-    if (type == Elf::section_type_DYNAMIC::id)
-      section_dynamic = dynamic_cast <Elf::section_type<Elf::section_type_DYNAMIC> *> (*it);
-    else if (type == Elf::section_type_DYNSYM::id)
-      section_dynsym = dynamic_cast <Elf::section_type<Elf::section_type_DYNSYM> *> (*it);
-  }
-
-  for (std::vector <Elf::segment *>::const_iterator it = segments.begin (); it != segments.end (); ++it)
-  {
-    uint32_t type = (*it)->get_type ();
-    if (type == Elf::segment_type_INTERP::id)
-      segment_interp = dynamic_cast <Elf::segment_type<Elf::segment_type_INTERP> *> (*it);
-  }
 
   switch (cmd)
   {
@@ -123,23 +102,23 @@ static void process (command cmd, const char *filename)
       process_elf_header (file);
       break;
     case COMMAND_PRINT_INTERP:
-      if (segment_interp)
-        std::cout << segment_interp->get_interp () << '\n';
+      if (file->get_segment_INTERP ())
+        std::cout << file->get_segment_INTERP ()->get_interp () << '\n';
       break;
     case COMMAND_PRINT_NEEDED:
-      process_dynamics (section_dynamic, DT_NEEDED);
+      process_dynamics (file, DT_NEEDED);
       break;
     case COMMAND_PRINT_RPATH:
-      process_dynamics (section_dynamic, DT_RPATH);
+      process_dynamics (file, DT_RPATH);
       break;
     case COMMAND_PRINT_SONAME:
-      process_dynamics (section_dynamic, DT_SONAME);
+      process_dynamics (file, DT_SONAME);
       break;
     case COMMAND_PRINT_SYMBOLS_PROVIDED:
-      process_symbols_provided (section_dynsym);
+      process_symbols_provided (file->get_section_DYNSYM ());
       break;
     case COMMAND_PRINT_SYMBOLS_UNDEFINED:
-      process_symbols_undefined (section_dynsym);
+      process_symbols_undefined (file->get_section_DYNSYM ());
       break;
   }
 }

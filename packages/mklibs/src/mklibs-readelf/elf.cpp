@@ -123,10 +123,10 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
         temp = new section_real<_class, _data, section_type_STRTAB> (&shdrs[i], this->mem);
         break;
       case section_type_DYNAMIC::id:
-        temp = new section_real<_class, _data, section_type_DYNAMIC> (&shdrs[i], this->mem);
+        temp = section_DYNAMIC = new section_real<_class, _data, section_type_DYNAMIC> (&shdrs[i], this->mem);
         break;
       case section_type_DYNSYM::id:
-        temp = new section_real<_class, _data, section_type_DYNSYM> (&shdrs[i], this->mem);
+        temp = section_DYNSYM = new section_real<_class, _data, section_type_DYNSYM> (&shdrs[i], this->mem);
         break;
       case section_type_GNU_VERDEF::id:
         temp = section_GNU_VERDEF = new section_real<_class, _data, section_type_GNU_VERDEF> (&shdrs[i], this->mem);
@@ -155,7 +155,7 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
     switch (convert<_data, typeof (phdrs[i].p_type)> () (phdrs[i].p_type))
     {
       case segment_type_INTERP::id:
-        temp = new segment_real<_class, _data, segment_type_INTERP> (&phdrs[i], this->mem);
+        temp = segment_INTERP = new segment_real<_class, _data, segment_type_INTERP> (&phdrs[i], this->mem);
         break;
       default:
         temp = new segment_real<_class, _data, segment_type_UNDEFINED> (&phdrs[i], this->mem);

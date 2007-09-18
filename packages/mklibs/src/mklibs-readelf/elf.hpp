@@ -34,6 +34,7 @@ namespace Elf
   class section;
   template <typename _type> class section_type;
   class segment;
+  template <typename _type> class segment_type;
 
   class file
   {
@@ -49,11 +50,14 @@ namespace Elf
 
       const std::vector <section *> get_sections () const throw () { return sections; };
       const section *get_section (unsigned int i) const throw (std::out_of_range) { return sections.at(i); };
+      const section_type<section_type_DYNAMIC> *get_section_DYNAMIC () const throw () { return section_DYNAMIC; };
+      const section_type<section_type_DYNSYM> *get_section_DYNSYM () const throw () { return section_DYNSYM; };
       const section_type<section_type_GNU_VERDEF> *get_section_GNU_VERDEF () const throw () { return section_GNU_VERDEF; };
       const section_type<section_type_GNU_VERNEED> *get_section_GNU_VERNEED () const throw () { return section_GNU_VERNEED; };
       const section_type<section_type_GNU_VERSYM> *get_section_GNU_VERSYM () const throw () { return section_GNU_VERSYM; };
 
       const std::vector <segment *> get_segments () const throw () { return segments; };
+      const segment_type<segment_type_INTERP> *get_segment_INTERP () const throw () { return segment_INTERP; };
 
       static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
 
@@ -75,11 +79,14 @@ namespace Elf
       uint16_t shstrndx;
 
       std::vector <section *> sections;
+      section_type<section_type_DYNAMIC> *section_DYNAMIC;
+      section_type<section_type_DYNSYM> *section_DYNSYM;
       section_type<section_type_GNU_VERDEF> *section_GNU_VERDEF;
       section_type<section_type_GNU_VERNEED> *section_GNU_VERNEED;
       section_type<section_type_GNU_VERSYM> *section_GNU_VERSYM;
 
       std::vector <segment *> segments;
+      segment_type<segment_type_INTERP> *segment_INTERP;
 
       void *mem;
       size_t len;
@@ -134,7 +141,7 @@ namespace Elf
       public:
         ~section_type () throw ();
 
-        const std::vector<dynamic *> &get_dynamics () throw () { return dynamics; }
+        const std::vector<dynamic *> &get_dynamics () const throw () { return dynamics; }
 
         void update (const file *) throw (std::bad_alloc);
 
@@ -148,7 +155,7 @@ namespace Elf
       public:
         ~section_type () throw ();
 
-        const std::vector<symbol *> &get_symbols () throw () { return symbols; }
+        const std::vector<symbol *> &get_symbols () const throw () { return symbols; }
 
         void update (const file *) throw (std::bad_alloc);
 
