@@ -197,7 +197,7 @@ namespace Elf
       public:
         ~section_type () throw () { }
 
-        const std::vector<uint16_t> &get_versyms () throw () { return versyms; }
+        const std::vector<uint16_t> &get_versyms () const throw () { return versyms; }
 
       protected:
         std::vector<uint16_t> versyms;
@@ -271,8 +271,10 @@ namespace Elf
       uint8_t get_bind () const throw () { return bind; }
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
+      const std::string &get_version () const throw () { return version; }
 
       virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_version (const file *, uint16_t) throw (std::bad_alloc) = 0;
 
     protected:
       uint32_t name;
@@ -284,6 +286,7 @@ namespace Elf
       uint8_t type;
 
       std::string name_string;
+      std::string version;
   };
 
   class version_definition

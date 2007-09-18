@@ -171,6 +171,7 @@ namespace Elf
         symbol_data (void *) throw ();
 
         void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        virtual void update_version (const file *, uint16_t) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>

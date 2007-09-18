@@ -163,6 +163,9 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
     }
     this->segments[i] = temp;
   }
+
+  for (unsigned int i = 0; i < this->shnum; i++)
+    this->sections[i]->update (this);
 }
 
 void section::update (const file *file) throw (std::bad_alloc)
@@ -232,7 +235,10 @@ void section_type<section_type_DYNSYM>::update (const file *file) throw (std::ba
     dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
 
   for (unsigned int i = 0; i < symbols.size (); i++)
-    this->symbols[i]->update_string (section);
+  {
+    symbols[i]->update_string (section);
+    symbols[i]->update_version (file, i);
+  }
 }
 
 template <typename _class, typename _data>
@@ -401,6 +407,14 @@ template <typename _class, typename _data>
 void symbol_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   this->name_string = section->get_string (this->name);
+}
+
+template <typename _class, typename _data>
+void symbol_data<_class, _data>::update_version (const file *file, uint16_t index) throw (std::bad_alloc)
+{
+  uint16_t versym = file->get_section_GNU_VERSYM ()->get_versyms ().at (index);
+  if (versym == 0 || versym == 1)
+    return;
 }
 
 template <typename _class, typename _data>
