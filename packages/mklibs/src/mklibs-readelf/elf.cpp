@@ -257,6 +257,14 @@ section_real<_class, _data, section_type_DYNSYM>::section_real (void *header, vo
     this->symbols.push_back (new symbol_data<_class, _data> (&syms[i]));
 }
 
+const version_definition *section_type<section_type_GNU_VERDEF>::get_version_definition(uint16_t index) const throw ()
+{
+  for (std::vector<version_definition *>::const_iterator it = verdefs.begin(); it != verdefs.end(); ++it)
+    if ((*it)->get_ndx() == index)
+      return *it;
+  return NULL;
+}
+
 void section_type<section_type_GNU_VERDEF>::update (const file *file) throw (std::bad_alloc)
 {
   section::update (file);
@@ -288,6 +296,15 @@ section_real<_class, _data, section_type_GNU_VERDEF>::section_real (void *header
     act += next;
   }
   while (next);
+}
+
+const version_requirement_entry *section_type<section_type_GNU_VERNEED>::get_version_requirement_entry(uint16_t index) const throw ()
+{
+  for (std::vector<version_requirement *>::const_iterator it = verneeds.begin(); it != verneeds.end(); ++it)
+    for (std::vector<version_requirement_entry *>::const_iterator it1 = (*it)->get_entries().begin(); it1 != (*it)->get_entries().end(); ++it1)
+      if ((*it1)->get_other() == index)
+        return *it1;
+  return NULL;
 }
 
 void section_type<section_type_GNU_VERNEED>::update (const file *file) throw (std::bad_alloc)
@@ -389,6 +406,22 @@ void dynamic_data<_class, _data>::update_string (const section_type<section_type
     this->val_string = section->get_string (this->val);
 }
 
+std::string symbol::get_version () const throw (std::bad_alloc)
+{
+  if (shndx == SHN_UNDEF)
+  {
+    if (verneed)
+      return verneed->get_name();
+  }
+  else
+  {
+    if (verdef)
+      return verdef->get_names()[0];
+  }
+
+  return version;
+}
+
 template <typename _class, typename _data>
 symbol_data<_class, _data>::symbol_data (void *mem) throw ()
 {
@@ -410,11 +443,24 @@ void symbol_data<_class, _data>::update_string (const section_type<section_type_
 }
 
 template <typename _class, typename _data>
-void symbol_data<_class, _data>::update_version (const file *file, uint16_t index) throw (std::bad_alloc)
+void symbol_data<_class, _data>::update_version(const file *file, uint16_t index) throw (std::bad_alloc)
 {
-  uint16_t versym = file->get_section_GNU_VERSYM ()->get_versyms ().at (index);
-  if (versym == 0 || versym == 1)
-    return;
+  uint16_t versym = file->get_section_GNU_VERSYM()->get_versyms().at(index);
+
+  if (versym == 0)
+    version = "*local*";
+  else if (versym == 1)
+    version = "*global*";
+  else if (shndx == SHN_UNDEF)
+  {
+    if (file->get_section_GNU_VERNEED())
+      verneed = file->get_section_GNU_VERNEED()->get_version_requirement_entry(versym);
+  }
+  else
+  {
+    if (file->get_section_GNU_VERDEF())
+      verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym);
+  }
 }
 
 template <typename _class, typename _data>

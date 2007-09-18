@@ -124,6 +124,7 @@ namespace Elf
   class symbol;
   class version_definition;
   class version_requirement;
+  class version_requirement_entry;
 
   template <>
     class section_type<section_type_STRTAB> : public virtual section
@@ -169,6 +170,7 @@ namespace Elf
       public:
         ~section_type () throw () { }
 
+        const version_definition *get_version_definition(uint16_t index) const throw ();
         const std::vector<version_definition *> &get_version_definitions () throw () { return verdefs; }
 
         void update (const file *) throw (std::bad_alloc);
@@ -183,6 +185,7 @@ namespace Elf
       public:
         ~section_type () throw () { }
 
+        const version_requirement_entry *get_version_requirement_entry(uint16_t index) const throw ();
         const std::vector<version_requirement *> &get_version_requirements () throw () { return verneeds; }
 
         void update (const file *) throw (std::bad_alloc);
@@ -262,7 +265,8 @@ namespace Elf
   class symbol
   {
     public:
-      virtual ~symbol () throw () {}
+      symbol() throw () : verdef(NULL), verneed(NULL) {}
+      virtual ~symbol() throw () {}
 
       uint8_t get_info () const throw () { return info; }
       uint16_t get_shndx () const throw () { return shndx; }
@@ -271,7 +275,7 @@ namespace Elf
       uint8_t get_bind () const throw () { return bind; }
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
-      const std::string &get_version () const throw () { return version; }
+      std::string get_version() const throw (std::bad_alloc);
 
       virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
       virtual void update_version (const file *, uint16_t) throw (std::bad_alloc) = 0;
@@ -287,17 +291,19 @@ namespace Elf
 
       std::string name_string;
       std::string version;
+      const version_definition *verdef;
+      const version_requirement_entry *verneed;
   };
 
   class version_definition
   {
     public:
-      virtual ~version_definition () throw () { }
+      virtual ~version_definition() throw () { }
 
-      uint16_t get_ndx () const throw () { return ndx; }
-      const std::vector<std::string> &get_names_string () const throw () { return names_string; }
+      uint16_t get_ndx() const throw () { return ndx; }
+      const std::vector<std::string> &get_names() const throw () { return names_string; }
 
-      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       uint16_t ndx;
@@ -326,6 +332,9 @@ namespace Elf
   {
     public:
       virtual ~version_requirement_entry () throw () { }
+
+      uint16_t get_other () const throw () { return other; }
+      const std::string &get_name() const throw () { return name_string; }
 
       virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
