@@ -248,7 +248,7 @@ namespace Elf
       uint64_t get_ptr () const throw () { return ptr; }
       const std::string &get_val_string () const throw () { return val_string; }
 
-      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       int64_t tag;
@@ -272,7 +272,7 @@ namespace Elf
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
 
-      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       uint32_t name;
@@ -294,7 +294,7 @@ namespace Elf
       uint16_t get_ndx () const throw () { return ndx; }
       const std::vector<std::string> &get_names_string () const throw () { return names_string; }
 
-      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       uint16_t ndx;
@@ -313,7 +313,7 @@ namespace Elf
 
       const std::vector<version_requirement_entry *> &get_entries () const throw () { return entries; }
 
-      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       std::vector<version_requirement_entry *> entries;
@@ -324,7 +324,7 @@ namespace Elf
     public:
       virtual ~version_requirement_entry () throw () { }
 
-      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       uint16_t flags;

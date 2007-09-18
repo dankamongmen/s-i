@@ -216,8 +216,9 @@ void section_type<section_type_DYNAMIC>::update (const file *file) throw (std::b
 
   const section_type<section_type_STRTAB> *section =
     dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
+
   for (unsigned int i = 0; i < dynamics.size (); i++)
-    this->dynamics[i]->update (section);
+    this->dynamics[i]->update_string (section);
 }
 
 section_type<section_type_DYNSYM>::~section_type () throw ()
@@ -234,7 +235,7 @@ void section_type<section_type_DYNSYM>::update (const file *file) throw (std::ba
     dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
 
   for (unsigned int i = 0; i < symbols.size (); i++)
-    this->symbols[i]->update (section);
+    this->symbols[i]->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -261,7 +262,7 @@ void section_type<section_type_GNU_VERDEF>::update (const file *file) throw (std
     dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
 
   for (std::vector<version_definition *>::iterator it = verdefs.begin (); it != verdefs.end (); ++it)
-    (*it)->update(section);
+    (*it)->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -294,7 +295,7 @@ void section_type<section_type_GNU_VERNEED>::update (const file *file) throw (st
     dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
 
   for (std::vector<version_requirement *>::iterator it = verneeds.begin (); it != verneeds.end (); ++it)
-    (*it)->update(section);
+    (*it)->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -379,7 +380,7 @@ dynamic_data<_class, _data>::dynamic_data (void *mem) throw ()
 }
 
 template <typename _class, typename _data>
-void dynamic_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+void dynamic_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   if (this->is_string)
     this->val_string = section->get_string (this->val);
@@ -400,7 +401,7 @@ symbol_data<_class, _data>::symbol_data (void *mem) throw ()
 }
 
 template <typename _class, typename _data>
-void symbol_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+void symbol_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   this->name_string = section->get_string (this->name);
 }
@@ -425,7 +426,7 @@ version_definition_data<_class, _data>::version_definition_data (Verdef *verdef)
 }
 
 template <typename _class, typename _data>
-void version_definition_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+void version_definition_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   for (std::vector<uint32_t>::iterator it = names.begin (); it != names.end (); ++it)
     names_string.push_back (section->get_string (*it));
@@ -449,10 +450,10 @@ version_requirement_data<_class, _data>::version_requirement_data (Verneed *vern
 }
 
 template <typename _class, typename _data>
-void version_requirement_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+void version_requirement_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   for (std::vector<version_requirement_entry *>::iterator it = entries.begin (); it != entries.end (); ++it)
-    (*it)->update (section);
+    (*it)->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -464,7 +465,7 @@ version_requirement_entry_data<_class, _data>::version_requirement_entry_data (V
 }
 
 template <typename _class, typename _data>
-void version_requirement_entry_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+void version_requirement_entry_data<_class, _data>::update_string (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
   name_string = section->get_string (name);
 }

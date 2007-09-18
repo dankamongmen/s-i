@@ -161,7 +161,7 @@ namespace Elf
       public:
         dynamic_data (void *) throw ();
 
-        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -170,7 +170,7 @@ namespace Elf
       public:
         symbol_data (void *) throw ();
 
-        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -182,7 +182,7 @@ namespace Elf
 
         version_definition_data (Verdef *) throw ();
 
-        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -194,7 +194,7 @@ namespace Elf
 
         version_requirement_data (Verneed *) throw ();
 
-        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -205,7 +205,7 @@ namespace Elf
 
         version_requirement_entry_data (Vernaux *) throw ();
 
-        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+        void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 }
 
