@@ -57,13 +57,6 @@ namespace Elf
     class section_real : public section_data<_class, _data>, public section_type<_type>
     {
       public:
-        section_real (void *, void *) throw ();
-    };
-
-  template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_UNDEFINED> : public section_data<_class, _data>, public section_type<section_type_UNDEFINED>
-    {
-      public:
         section_real (void *a, void *b) throw () : section_data<_class, _data> (a, b) { }
     };
 
@@ -90,14 +83,6 @@ namespace Elf
 
   template <typename _class, typename _data, typename _type>
     class segment_real : public segment_data<_class, _data>, public segment_type<_type>
-    {
-      public:
-        segment_real (void *, void *) throw ();
-    };
-
-  template <typename _class, typename _data>
-    class segment_real<_class, _data, segment_type_UNDEFINED>
-    : public segment_data<_class, _data>, public segment_type<segment_type_UNDEFINED>
     {
       public:
         segment_real (void *a, void *b) throw () : segment_data<_class, _data> (a, b) { }
