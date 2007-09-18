@@ -30,8 +30,9 @@ namespace Elf
   class file_data_2LSB { public: static const uint8_t id = 1; };
   class file_data_2MSB { public: static const uint8_t id = 2; };
   class section_type_UNDEFINED { };
-  class section_type_DYNAMIC { public: static const uint8_t id = 6; };
-  class section_type_DYNSYM { public: static const uint8_t id = 11; };
+  class section_type_STRTAB { public: static const uint32_t id = 3; };
+  class section_type_DYNAMIC { public: static const uint32_t id = 6; };
+  class section_type_DYNSYM { public: static const uint32_t id = 11; };
   class segment_type_UNDEFINED { };
   class segment_type_INTERP { public: static const uint8_t id = 3; };
 }

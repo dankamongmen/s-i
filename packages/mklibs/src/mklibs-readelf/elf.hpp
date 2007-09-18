@@ -112,6 +112,15 @@ namespace Elf
   class symbol;
 
   template <>
+    class section_type<section_type_STRTAB> : public virtual section
+    {
+      public:
+        std::string get_name (uint32_t offset) throw (std::bad_alloc);
+
+        void update_string_table (file *) throw (std::bad_alloc) {}
+    };
+
+  template <>
     class section_type<section_type_DYNAMIC> : public virtual section
     {
       public:

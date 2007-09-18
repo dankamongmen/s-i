@@ -151,6 +151,9 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
     section *temp;
     switch (convert<_data, typeof (shdrs[i].sh_type)> () (shdrs[i].sh_type))
     {
+      case section_type_STRTAB::id:
+        temp = new section_real<_class, _data, section_type_STRTAB> (&shdrs[i], this->mem);
+        break;
       case section_type_DYNAMIC::id:
         temp = new section_real<_class, _data, section_type_DYNAMIC> (&shdrs[i], this->mem);
         break;
