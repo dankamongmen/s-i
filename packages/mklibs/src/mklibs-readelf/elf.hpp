@@ -22,7 +22,6 @@
 #define ELF_HPP
 
 #include "elf_defs.hpp"
-#include "elf_endian.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -80,20 +79,6 @@ namespace Elf
       size_t len;
   };
 
-  template <typename _class, typename _data>
-    class file_data : public file
-    {
-      public:
-        file_data (const char *) throw (std::bad_alloc, std::runtime_error);
-        file_data (const char *, void *, size_t len) throw (std::bad_alloc, std::runtime_error);
-
-        const uint8_t get_class () const throw () { return _class::id; }
-        const uint8_t get_data () const throw () { return _data::id; }
-
-      private:
-        void construct () throw (std::bad_alloc, std::runtime_error);
-    };
-
   class section
   {
     public:
@@ -118,13 +103,6 @@ namespace Elf
 
       void *mem;
   };
-
-  template <typename _class, typename _data>
-    class section_data : public virtual section
-    {
-      public:
-        section_data (void *, void *) throw ();
-    };
 
   template <typename _type>
     class section_type : public virtual section
@@ -162,34 +140,6 @@ namespace Elf
         std::vector<symbol *> symbols;
     };
 
-  template <typename _class, typename _data, typename _type>
-    class section_real : public section_data<_class, _data>, public section_type<_type>
-    {
-      public:
-        section_real (void *, void *) throw ();
-    };
-
-  template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_UNDEFINED> : public section_data<_class, _data>, public section_type<section_type_UNDEFINED>
-    {
-      public:
-        section_real (void *a, void *b) throw () : section_data<_class, _data> (a, b) { }
-    };
-
-  template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_DYNAMIC> : public section_data<_class, _data>, public section_type<section_type_DYNAMIC>
-    {
-      public:
-        section_real (void *, void *) throw (std::bad_alloc);
-    };
-
-  template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_DYNSYM> : public section_data<_class, _data>, public section_type<section_type_DYNSYM>
-    {
-      public:
-        section_real (void *, void *) throw (std::bad_alloc);
-    };
-
   class segment
   {
     public:
@@ -210,13 +160,6 @@ namespace Elf
       void *mem;
   };
 
-  template <typename _class, typename _data>
-    class segment_data : public virtual segment
-    {
-      public:
-        segment_data (void *, void *) throw ();
-    };
-
   template <typename _type>
     class segment_type : public virtual segment
     {
@@ -232,29 +175,6 @@ namespace Elf
 
       protected:
         std::string interp;
-    };
-
-  template <typename _class, typename _data, typename _type>
-    class segment_real : public segment_data<_class, _data>, public segment_type<_type>
-    {
-      public:
-        segment_real (void *, void *) throw ();
-    };
-
-  template <typename _class, typename _data>
-    class segment_real<_class, _data, segment_type_UNDEFINED>
-    : public segment_data<_class, _data>, public segment_type<segment_type_UNDEFINED>
-    {
-      public:
-        segment_real (void *a, void *b) throw () : segment_data<_class, _data> (a, b) { }
-    };
-
-  template <typename _class, typename _data>
-    class segment_real<_class, _data, segment_type_INTERP>
-    : public segment_data<_class, _data>, public segment_type<segment_type_INTERP>
-    {
-      public:
-        segment_real (void *, void *) throw (std::bad_alloc);
     };
 
   class dynamic
@@ -277,15 +197,6 @@ namespace Elf
 
       std::string val_string;
   };
-
-  template <typename _class, typename _data>
-    class dynamic_data : public dynamic
-    {
-      public:
-        dynamic_data (void *) throw ();
-
-        void update_string_table (file *, uint16_t) throw (std::bad_alloc);
-    };
 
   class symbol
   {
@@ -313,15 +224,6 @@ namespace Elf
 
       std::string name_string;
   };
-
-  template <typename _class, typename _data>
-    class symbol_data : public symbol
-    {
-      public:
-        symbol_data (void *) throw ();
-
-        void update_string_table (file *, uint16_t) throw (std::bad_alloc);
-    };
 }
 
 #endif
