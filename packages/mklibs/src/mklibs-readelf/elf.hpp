@@ -112,6 +112,7 @@ namespace Elf
   class dynamic;
   class symbol;
   class version_definition;
+  class version_requirement;
 
   template <>
     class section_type<section_type_STRTAB> : public virtual section
@@ -161,6 +162,18 @@ namespace Elf
 
       protected:
         std::vector<version_definition *> verdefs;
+    };
+
+  template <>
+    class section_type<section_type_GNU_VERNEED> : public virtual section
+    {
+      public:
+        ~section_type () throw () { }
+
+        const std::vector<version_requirement *> &get_version_requirements () throw () { return verneeds; }
+
+      protected:
+        std::vector<version_requirement *> verneeds;
     };
 
   template <>
@@ -274,6 +287,36 @@ namespace Elf
       std::vector<uint32_t> names;
 
       std::vector<std::string> names_string;
+  };
+
+  class version_requirement_entry;
+
+  class version_requirement
+  {
+    public:
+      virtual ~version_requirement () throw () { }
+
+      const std::vector<version_requirement_entry *> &get_entries () const throw () { return entries; }
+
+      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+
+    protected:
+      std::vector<version_requirement_entry *> entries;
+  };
+
+  class version_requirement_entry
+  {
+    public:
+      virtual ~version_requirement_entry () throw () { }
+
+      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+
+    protected:
+      uint16_t flags;
+      uint16_t other;
+      uint32_t name;
+
+      std::string name_string;
   };
 }
 

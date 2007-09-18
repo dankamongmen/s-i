@@ -34,6 +34,7 @@ namespace Elf
   class section_type_DYNAMIC { public: static const uint32_t id = 6; };
   class section_type_DYNSYM { public: static const uint32_t id = 11; };
   class section_type_GNU_VERDEF { public: static const uint32_t id = 0x6ffffffd; };
+  class section_type_GNU_VERNEED { public: static const uint32_t id = 0x6ffffffe; };
   class section_type_GNU_VERSYM { public: static const uint32_t id = 0x6fffffff; };
   class segment_type_UNDEFINED { };
   class segment_type_INTERP { public: static const uint8_t id = 3; };

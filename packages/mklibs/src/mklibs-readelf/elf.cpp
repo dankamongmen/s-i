@@ -131,6 +131,9 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
       case section_type_GNU_VERDEF::id:
         temp = new section_real<_class, _data, section_type_GNU_VERDEF> (&shdrs[i], this->mem);
         break;
+      case section_type_GNU_VERNEED::id:
+        temp = new section_real<_class, _data, section_type_GNU_VERNEED> (&shdrs[i], this->mem);
+        break;
       case section_type_GNU_VERSYM::id:
         temp = new section_real<_class, _data, section_type_GNU_VERSYM> (&shdrs[i], this->mem);
         break;
@@ -273,6 +276,28 @@ section_real<_class, _data, section_type_GNU_VERDEF>::section_real (void *header
 }
 
 template <typename _class, typename _data>
+section_real<_class, _data, section_type_GNU_VERNEED>::section_real (void *header, void *mem) throw (std::bad_alloc)
+: section_data<_class, _data> (header, mem)
+{
+  if (this->type != SHT_GNU_verneed)
+    throw std::logic_error ("Wrong section type");
+
+  typedef typename _elfdef<_class>::Verneed Verneed;
+  char *act = static_cast<char *> (this->mem);
+  uint32_t next = 0;
+
+  // TODO: Use DT_VERNEEDNUM!
+  do
+  {
+    Verneed *verneed = reinterpret_cast<Verneed *> (act);
+    verneeds.push_back(new version_requirement_data<_class, _data> (verneed));
+    next = convert<_data, typeof (verneed->vn_next)> () (verneed->vn_next);
+    act += next;
+  }
+  while (next);
+}
+
+template <typename _class, typename _data>
 section_real<_class, _data, section_type_GNU_VERSYM>::section_real (void *header, void *mem) throw (std::bad_alloc)
 : section_data<_class, _data> (header, mem)
 {
@@ -379,6 +404,41 @@ version_definition_data<_class, _data>::version_definition_data (Verdef *verdef)
 
 template <typename _class, typename _data>
 void version_definition_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+{
+}
+
+template <typename _class, typename _data>
+version_requirement_data<_class, _data>::version_requirement_data (Verneed *verneed) throw ()
+{
+  uint16_t cnt = convert<_data, typeof (verneed->vn_cnt)> () (verneed->vn_cnt);
+  uint32_t aux = convert<_data, typeof (verneed->vn_aux)> () (verneed->vn_aux);
+
+  char *act = reinterpret_cast<char *> (verneed) + aux;
+
+  for (int i = 0; i < cnt; i++)
+  {
+    Vernaux *vernaux = reinterpret_cast<Vernaux *> (act);
+    entries.push_back(new version_requirement_entry_data<_class, _data> (vernaux));
+    uint32_t next = convert<_data, typeof (vernaux->vna_next)> () (vernaux->vna_next);
+    act += next;
+  }
+}
+
+template <typename _class, typename _data>
+void version_requirement_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+{
+}
+
+template <typename _class, typename _data>
+version_requirement_entry_data<_class, _data>::version_requirement_entry_data (Vernaux *vna) throw ()
+{
+  flags = convert<_data, typeof (vna->vna_flags)> () (vna->vna_flags);
+  other = convert<_data, typeof (vna->vna_other)> () (vna->vna_other);
+  name  = convert<_data, typeof (vna->vna_name)> ()  (vna->vna_name);
+}
+
+template <typename _class, typename _data>
+void version_requirement_entry_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
 }
 

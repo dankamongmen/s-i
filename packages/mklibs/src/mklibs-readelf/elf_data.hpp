@@ -49,6 +49,8 @@ namespace Elf
         typedef Elf32_Sym Sym;
         typedef Elf32_Verdaux Verdaux;
         typedef Elf32_Verdef Verdef;
+        typedef Elf32_Vernaux Vernaux;
+        typedef Elf32_Verneed Verneed;
         typedef Elf32_Versym Versym;
         static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF32_ST_BIND (st_info); }
         static inline uint8_t st_type (uint8_t st_info) throw () { return ELF32_ST_TYPE (st_info); }
@@ -64,6 +66,8 @@ namespace Elf
         typedef Elf64_Sym Sym;
         typedef Elf64_Verdaux Verdaux;
         typedef Elf64_Verdef Verdef;
+        typedef Elf64_Vernaux Vernaux;
+        typedef Elf64_Verneed Verneed;
         typedef Elf64_Versym Versym;
         static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF64_ST_BIND (st_info); }
         static inline uint8_t st_type (uint8_t st_info) throw () { return ELF64_ST_TYPE (st_info); }
@@ -110,6 +114,13 @@ namespace Elf
 
   template <typename _class, typename _data>
     class section_real<_class, _data, section_type_GNU_VERDEF> : public section_data<_class, _data>, public section_type<section_type_GNU_VERDEF>
+    {
+      public:
+        section_real (void *, void *) throw (std::bad_alloc);
+    };
+
+  template <typename _class, typename _data>
+    class section_real<_class, _data, section_type_GNU_VERNEED> : public section_data<_class, _data>, public section_type<section_type_GNU_VERNEED>
     {
       public:
         section_real (void *, void *) throw (std::bad_alloc);
@@ -170,6 +181,29 @@ namespace Elf
         typedef typename _elfdef<_class>::Verdef Verdef;
 
         version_definition_data (Verdef *) throw ();
+
+        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+    };
+
+  template <typename _class, typename _data>
+    class version_requirement_data : public version_requirement
+    {
+      public:
+        typedef typename _elfdef<_class>::Vernaux Vernaux;
+        typedef typename _elfdef<_class>::Verneed Verneed;
+
+        version_requirement_data (Verneed *) throw ();
+
+        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
+    };
+
+  template <typename _class, typename _data>
+    class version_requirement_entry_data : public version_requirement_entry
+    {
+      public:
+        typedef typename _elfdef<_class>::Vernaux Vernaux;
+
+        version_requirement_entry_data (Vernaux *) throw ();
 
         void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
