@@ -72,6 +72,7 @@ namespace Elf
 
       std::vector <section *> sections;
       section_type<section_type_DYNSYM> *section_DYNSYM;
+      section_type<section_type_GNU_VERDEF> *section_GNU_VERDEF;
       section_type<section_type_GNU_VERSYM> *section_GNU_VERSYM;
 
       std::vector <segment *> segments;
@@ -110,6 +111,7 @@ namespace Elf
 
   class dynamic;
   class symbol;
+  class version_definition;
 
   template <>
     class section_type<section_type_STRTAB> : public virtual section
@@ -147,6 +149,18 @@ namespace Elf
 
       protected:
         std::vector<symbol *> symbols;
+    };
+
+  template <>
+    class section_type<section_type_GNU_VERDEF> : public virtual section
+    {
+      public:
+        ~section_type () throw () { }
+
+        const std::vector<version_definition *> &get_version_definitions () throw () { return verdefs; }
+
+      protected:
+        std::vector<version_definition *> verdefs;
     };
 
   template <>
@@ -242,6 +256,24 @@ namespace Elf
       uint8_t type;
 
       std::string name_string;
+  };
+
+  class version_definition
+  {
+    public:
+      virtual ~version_definition () throw () { }
+
+      uint16_t get_ndx () const throw () { return ndx; }
+      const std::vector<std::string> &get_names_string () const throw () { return names_string; }
+
+      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+
+    protected:
+      uint16_t ndx;
+
+      std::vector<uint32_t> names;
+
+      std::vector<std::string> names_string;
   };
 }
 

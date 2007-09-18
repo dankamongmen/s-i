@@ -23,44 +23,10 @@
 #include <stdexcept>
 
 #include <fcntl.h>
-#include <elf.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 
 using namespace Elf;
-
-namespace
-{
-  template <typename _class>
-    struct _elfdef
-    { };
-
-  template <>
-    struct _elfdef<file_class_32>
-    {
-      typedef Elf32_Dyn Dyn;
-      typedef Elf32_Ehdr Ehdr;
-      typedef Elf32_Phdr Phdr;
-      typedef Elf32_Shdr Shdr;
-      typedef Elf32_Sym Sym;
-      typedef Elf32_Versym Versym;
-      static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF32_ST_BIND (st_info); }
-      static inline uint8_t st_type (uint8_t st_info) throw () { return ELF32_ST_TYPE (st_info); }
-    };
-
-  template <>
-    struct _elfdef<file_class_64>
-    {
-      typedef Elf64_Dyn Dyn;
-      typedef Elf64_Ehdr Ehdr;
-      typedef Elf64_Phdr Phdr;
-      typedef Elf64_Shdr Shdr;
-      typedef Elf64_Sym Sym;
-      typedef Elf64_Versym Versym;
-      static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF64_ST_BIND (st_info); }
-      static inline uint8_t st_type (uint8_t st_info) throw () { return ELF64_ST_TYPE (st_info); }
-    };
-}
 
 file::~file () throw ()
 {
@@ -161,6 +127,9 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
         break;
       case section_type_DYNSYM::id:
         temp = new section_real<_class, _data, section_type_DYNSYM> (&shdrs[i], this->mem);
+        break;
+      case section_type_GNU_VERDEF::id:
+        temp = new section_real<_class, _data, section_type_GNU_VERDEF> (&shdrs[i], this->mem);
         break;
       case section_type_GNU_VERSYM::id:
         temp = new section_real<_class, _data, section_type_GNU_VERSYM> (&shdrs[i], this->mem);
@@ -282,6 +251,28 @@ section_real<_class, _data, section_type_DYNSYM>::section_real (void *header, vo
 }
 
 template <typename _class, typename _data>
+section_real<_class, _data, section_type_GNU_VERDEF>::section_real (void *header, void *mem) throw (std::bad_alloc)
+: section_data<_class, _data> (header, mem)
+{
+  if (this->type != SHT_GNU_verdef)
+    throw std::logic_error ("Wrong section type");
+
+  typedef typename _elfdef<_class>::Verdef Verdef;
+  char *act = static_cast<char *> (this->mem);
+  uint32_t next = 0;
+
+  // TODO: Use DT_VERDEFNUM!
+  do
+  {
+    Verdef *verdef = reinterpret_cast<Verdef *> (act);
+    verdefs.push_back(new version_definition_data<_class, _data> (verdef));
+    next = convert<_data, typeof (verdef->vd_next)> () (verdef->vd_next);
+    act += next;
+  }
+  while (next);
+}
+
+template <typename _class, typename _data>
 section_real<_class, _data, section_type_GNU_VERSYM>::section_real (void *header, void *mem) throw (std::bad_alloc)
 : section_data<_class, _data> (header, mem)
 {
@@ -366,4 +357,29 @@ void symbol_data<_class, _data>::update (const section_type<section_type_STRTAB>
 {
   this->name_string = section->get_string (this->name);
 }
+
+template <typename _class, typename _data>
+version_definition_data<_class, _data>::version_definition_data (Verdef *verdef) throw ()
+{
+  this->ndx    = convert<_data, typeof (verdef->vd_ndx)> () (verdef->vd_ndx);
+  uint16_t cnt = convert<_data, typeof (verdef->vd_cnt)> () (verdef->vd_cnt);
+  uint32_t aux = convert<_data, typeof (verdef->vd_aux)> () (verdef->vd_aux);
+
+  char *act = reinterpret_cast<char *> (verdef) + aux;
+
+  for (int i = 0; i < cnt; i++)
+  {
+    Verdaux *verdaux = reinterpret_cast<Verdaux *> (act);
+    uint32_t name = convert<_data, typeof (verdaux->vda_name)> () (verdaux->vda_name);
+    uint32_t next = convert<_data, typeof (verdaux->vda_next)> () (verdaux->vda_next);
+    names.push_back(name);
+    act += next;
+  }
+}
+
+template <typename _class, typename _data>
+void version_definition_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
+{
+}
+
 
