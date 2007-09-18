@@ -21,7 +21,8 @@
 #ifndef ELF_HPP
 #define ELF_HPP
 
-#include "endian.hpp"
+#include "elf_defs.hpp"
+#include "elf_endian.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -31,16 +32,6 @@
 
 namespace Elf
 {
-  class file_class_32 { public: static const uint8_t id = 1; };
-  class file_class_64 { public: static const uint8_t id = 2; };
-  class file_data_2LSB { public: static const uint8_t id = 1; };
-  class file_data_2MSB { public: static const uint8_t id = 2; };
-  class section_type_UNDEFINED { };
-  class section_type_DYNAMIC { public: static const uint8_t id = 6; };
-  class section_type_DYNSYM { public: static const uint8_t id = 11; };
-  class segment_type_UNDEFINED { };
-  class segment_type_INTERP { public: static const uint8_t id = 3; };
-
   class section;
   class segment;
 
@@ -331,18 +322,6 @@ namespace Elf
 
         void update_string_table (file *, uint16_t) throw (std::bad_alloc);
     };
-
-  template <typename from, typename type>
-    struct convert
-    { };
-
-  template <typename type>
-    struct convert<file_data_2LSB, type> : public endian::convert<endian::little_endian, type>
-    { };
-
-  template <typename type>
-    struct convert<file_data_2MSB, type> : public endian::convert<endian::big_endian, type>
-    { };
 }
 
 #endif
