@@ -129,13 +129,13 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
         temp = new section_real<_class, _data, section_type_DYNSYM> (&shdrs[i], this->mem);
         break;
       case section_type_GNU_VERDEF::id:
-        temp = new section_real<_class, _data, section_type_GNU_VERDEF> (&shdrs[i], this->mem);
+        temp = section_GNU_VERDEF = new section_real<_class, _data, section_type_GNU_VERDEF> (&shdrs[i], this->mem);
         break;
       case section_type_GNU_VERNEED::id:
-        temp = new section_real<_class, _data, section_type_GNU_VERNEED> (&shdrs[i], this->mem);
+        temp = section_GNU_VERNEED = new section_real<_class, _data, section_type_GNU_VERNEED> (&shdrs[i], this->mem);
         break;
       case section_type_GNU_VERSYM::id:
-        temp = new section_real<_class, _data, section_type_GNU_VERSYM> (&shdrs[i], this->mem);
+        temp = section_GNU_VERSYM = new section_real<_class, _data, section_type_GNU_VERSYM> (&shdrs[i], this->mem);
         break;
       default:
         temp = new section_real<_class, _data, section_type_UNDEFINED> (&shdrs[i], this->mem);

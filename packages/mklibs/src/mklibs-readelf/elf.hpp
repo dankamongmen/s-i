@@ -49,6 +49,10 @@ namespace Elf
 
       const std::vector <section *> get_sections () const throw () { return sections; };
       const section *get_section (unsigned int i) const throw (std::out_of_range) { return sections.at(i); };
+      const section_type<section_type_GNU_VERDEF> *get_section_GNU_VERDEF () const throw () { return section_GNU_VERDEF; };
+      const section_type<section_type_GNU_VERNEED> *get_section_GNU_VERNEED () const throw () { return section_GNU_VERNEED; };
+      const section_type<section_type_GNU_VERSYM> *get_section_GNU_VERSYM () const throw () { return section_GNU_VERSYM; };
+
       const std::vector <segment *> get_segments () const throw () { return segments; };
 
       static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
@@ -71,8 +75,8 @@ namespace Elf
       uint16_t shstrndx;
 
       std::vector <section *> sections;
-      section_type<section_type_DYNSYM> *section_DYNSYM;
       section_type<section_type_GNU_VERDEF> *section_GNU_VERDEF;
+      section_type<section_type_GNU_VERNEED> *section_GNU_VERNEED;
       section_type<section_type_GNU_VERSYM> *section_GNU_VERSYM;
 
       std::vector <segment *> segments;
