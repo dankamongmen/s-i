@@ -43,6 +43,7 @@ namespace
       typedef Elf32_Phdr Phdr;
       typedef Elf32_Shdr Shdr;
       typedef Elf32_Sym Sym;
+      typedef Elf32_Versym Versym;
       static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF32_ST_BIND (st_info); }
       static inline uint8_t st_type (uint8_t st_info) throw () { return ELF32_ST_TYPE (st_info); }
     };
@@ -55,6 +56,7 @@ namespace
       typedef Elf64_Phdr Phdr;
       typedef Elf64_Shdr Shdr;
       typedef Elf64_Sym Sym;
+      typedef Elf64_Versym Versym;
       static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF64_ST_BIND (st_info); }
       static inline uint8_t st_type (uint8_t st_info) throw () { return ELF64_ST_TYPE (st_info); }
     };
@@ -159,6 +161,9 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
         break;
       case section_type_DYNSYM::id:
         temp = new section_real<_class, _data, section_type_DYNSYM> (&shdrs[i], this->mem);
+        break;
+      case section_type_GNU_VERSYM::id:
+        temp = new section_real<_class, _data, section_type_GNU_VERSYM> (&shdrs[i], this->mem);
         break;
       default:
         temp = new section_real<_class, _data, section_type_UNDEFINED> (&shdrs[i], this->mem);
@@ -274,6 +279,22 @@ section_real<_class, _data, section_type_DYNSYM>::section_real (void *header, vo
 
   for (unsigned int i = 0; i < max; i++)
     this->symbols.push_back (new symbol_data<_class, _data> (&syms[i]));
+}
+
+template <typename _class, typename _data>
+section_real<_class, _data, section_type_GNU_VERSYM>::section_real (void *header, void *mem) throw (std::bad_alloc)
+: section_data<_class, _data> (header, mem)
+{
+  if (this->type != SHT_GNU_versym)
+    throw std::logic_error ("Wrong section type");
+  typedef typename _elfdef<_class>::Versym Versym;
+  Versym *versyms = static_cast <Versym *> (this->mem);
+  unsigned int max = this->size / sizeof (Versym);
+
+  this->versyms.reserve (max);
+
+  for (unsigned int i = 0; i < max; i++)
+    this->versyms.push_back (versyms[i]);
 }
 
 template <typename _class, typename _data>

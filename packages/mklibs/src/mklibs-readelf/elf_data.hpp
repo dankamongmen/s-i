@@ -71,6 +71,13 @@ namespace Elf
     };
 
   template <typename _class, typename _data>
+    class section_real<_class, _data, section_type_GNU_VERSYM> : public section_data<_class, _data>, public section_type<section_type_GNU_VERSYM>
+    {
+      public:
+        section_real (void *, void *) throw (std::bad_alloc);
+    };
+
+  template <typename _class, typename _data>
     class segment_data : public virtual segment
     {
       public:

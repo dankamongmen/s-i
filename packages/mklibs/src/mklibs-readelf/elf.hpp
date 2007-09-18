@@ -32,6 +32,7 @@
 namespace Elf
 {
   class section;
+  template <typename _type> class section_type;
   class segment;
 
   class file
@@ -70,6 +71,9 @@ namespace Elf
       uint16_t shstrndx;
 
       std::vector <section *> sections;
+      section_type<section_type_DYNSYM> *section_DYNSYM;
+      section_type<section_type_GNU_VERSYM> *section_GNU_VERSYM;
+
       std::vector <segment *> segments;
 
       void *mem;
@@ -143,6 +147,18 @@ namespace Elf
 
       protected:
         std::vector<symbol *> symbols;
+    };
+
+  template <>
+    class section_type<section_type_GNU_VERSYM> : public virtual section
+    {
+      public:
+        ~section_type () throw () { }
+
+        const std::vector<uint16_t> &get_versyms () throw () { return versyms; }
+
+      protected:
+        std::vector<uint16_t> versyms;
     };
 
   class segment
