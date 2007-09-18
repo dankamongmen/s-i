@@ -188,13 +188,14 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
   }
 
   for (unsigned int i = 0; i < this->shnum; i++)
-    this->sections[i]->update_string_table (this);
+    this->sections[i]->update (this);
 }
 
-void section::update_string_table (file *file) throw (std::bad_alloc)
+void section::update (const file *file) throw (std::bad_alloc)
 {
-  const section *section = file->get_section (file->get_shstrndx ());
-  this->name_string = std::string (static_cast <const char *> (section->_mem ()) + this->name);
+  const section_type<section_type_STRTAB> *section =
+    dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (file->get_shstrndx ()));
+  this->name_string = section->get_string (this->name);
 }
 
 template <typename _class, typename _data>
@@ -232,11 +233,14 @@ section_real<_class, _data, section_type_DYNAMIC>::section_real (void *header, v
     this->dynamics.push_back (new dynamic_data<_class, _data> (&dyns[i]));
 }
 
-void section_type<section_type_DYNAMIC>::update_string_table (file *file) throw (std::bad_alloc)
+void section_type<section_type_DYNAMIC>::update (const file *file) throw (std::bad_alloc)
 {
-  section::update_string_table (file);
+  section::update (file);
+
+  const section_type<section_type_STRTAB> *section =
+    dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
   for (unsigned int i = 0; i < dynamics.size (); i++)
-    this->dynamics[i]->update_string_table (file, link);
+    this->dynamics[i]->update (section);
 }
 
 section_type<section_type_DYNSYM>::~section_type () throw ()
@@ -245,11 +249,15 @@ section_type<section_type_DYNSYM>::~section_type () throw ()
     delete *it;
 }
 
-void section_type<section_type_DYNSYM>::update_string_table (file *file) throw (std::bad_alloc)
+void section_type<section_type_DYNSYM>::update (const file *file) throw (std::bad_alloc)
 {
-  section::update_string_table (file);
+  section::update (file);
+
+  const section_type<section_type_STRTAB> *section =
+    dynamic_cast <const section_type<section_type_STRTAB> *> (file->get_section (link));
+
   for (unsigned int i = 0; i < symbols.size (); i++)
-    this->symbols[i]->update_string_table (file, link);
+    this->symbols[i]->update (section);
 }
 
 template <typename _class, typename _data>
@@ -312,11 +320,10 @@ dynamic_data<_class, _data>::dynamic_data (void *mem) throw ()
 }
 
 template <typename _class, typename _data>
-void dynamic_data<_class, _data>::update_string_table (file *file, uint16_t s) throw (std::bad_alloc)
+void dynamic_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
-  const section *section = file->get_section (s);
   if (this->is_string)
-    this->val_string = std::string (static_cast <const char *> (section->_mem ()) + this->val);
+    this->val_string = section->get_string (this->val);
 }
 
 template <typename _class, typename _data>
@@ -334,9 +341,8 @@ symbol_data<_class, _data>::symbol_data (void *mem) throw ()
 }
 
 template <typename _class, typename _data>
-void symbol_data<_class, _data>::update_string_table (file *file, uint16_t s) throw (std::bad_alloc)
+void symbol_data<_class, _data>::update (const section_type<section_type_STRTAB> *section) throw (std::bad_alloc)
 {
-  const section *section = file->get_section (s);
-  this->name_string = std::string (static_cast <const char *> (section->_mem ()) + this->name);
+  this->name_string = section->get_string (this->name);
 }
 

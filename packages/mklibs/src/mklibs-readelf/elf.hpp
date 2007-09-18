@@ -50,8 +50,6 @@ namespace Elf
       const section *get_section (unsigned int i) const throw (std::out_of_range) { return sections.at(i); };
       const std::vector <segment *> get_segments () const throw () { return segments; };
 
-      const void *const _mem () const throw () { return mem; }
-
       static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
 
     protected:
@@ -87,9 +85,7 @@ namespace Elf
       uint64_t get_size () const throw () { return size; }
       const std::string &get_name_string () const throw () { return name_string; }
 
-      const void *const _mem () const throw () { return mem; }
-
-      virtual void update_string_table (file *) throw (std::bad_alloc);
+      virtual void update (const file *) throw (std::bad_alloc);
 
     protected:
       uint32_t name;
@@ -115,9 +111,10 @@ namespace Elf
     class section_type<section_type_STRTAB> : public virtual section
     {
       public:
-        std::string get_name (uint32_t offset) throw (std::bad_alloc);
-
-        void update_string_table (file *) throw (std::bad_alloc) {}
+        std::string get_string (uint32_t offset) const throw (std::bad_alloc)
+        {
+          return std::string (static_cast<const char *> (mem) + offset);
+        }
     };
 
   template <>
@@ -128,7 +125,7 @@ namespace Elf
 
         const std::vector<dynamic *> &get_dynamics () throw () { return dynamics; }
 
-        void update_string_table (file *) throw (std::bad_alloc);
+        void update (const file *) throw (std::bad_alloc);
 
       protected:
         std::vector<dynamic *> dynamics;
@@ -142,7 +139,7 @@ namespace Elf
 
         const std::vector<symbol *> &get_symbols () throw () { return symbols; }
 
-        void update_string_table (file *) throw (std::bad_alloc);
+        void update (const file *) throw (std::bad_alloc);
 
       protected:
         std::vector<symbol *> symbols;
@@ -156,8 +153,6 @@ namespace Elf
       uint32_t get_type () const throw () { return type; }
       uint32_t get_flags () const throw () { return flags; }
       uint64_t get_filesz () const throw () { return filesz; }
-
-      const void *const _mem () const throw () { return mem; }
 
     protected:
       uint32_t type;
@@ -195,7 +190,7 @@ namespace Elf
       uint64_t get_ptr () const throw () { return ptr; }
       const std::string &get_val_string () const throw () { return val_string; }
 
-      virtual void update_string_table (file *, uint16_t) throw (std::bad_alloc) = 0;
+      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       int64_t tag;
@@ -219,7 +214,7 @@ namespace Elf
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
 
-      virtual void update_string_table (file *, uint16_t) throw (std::bad_alloc) = 0;
+      virtual void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
 
     protected:
       uint32_t name;

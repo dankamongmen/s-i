@@ -98,7 +98,7 @@ namespace Elf
       public:
         dynamic_data (void *) throw ();
 
-        void update_string_table (file *, uint16_t) throw (std::bad_alloc);
+        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -107,7 +107,7 @@ namespace Elf
       public:
         symbol_data (void *) throw ();
 
-        void update_string_table (file *, uint16_t) throw (std::bad_alloc);
+        void update (const section_type<section_type_STRTAB> *) throw (std::bad_alloc);
     };
 }
 
