@@ -60,10 +60,6 @@ namespace
     };
 }
 
-file::file (void *mem, size_t len) throw (std::bad_alloc)
-: mem (mem), len (len)
-{ }
-
 file::~file () throw ()
 {
   ::munmap (mem, len);

@@ -55,7 +55,7 @@ namespace Elf
       static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
 
     protected:
-      file (void *, size_t len) throw (std::bad_alloc);
+      file (void *mem, size_t len) throw (std::bad_alloc) : mem (mem), len (len) { }
 
       template<typename _class>
         static file *open_class (void *, size_t) throw (std::bad_alloc, std::runtime_error);
