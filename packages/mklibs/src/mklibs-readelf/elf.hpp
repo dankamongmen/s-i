@@ -160,6 +160,8 @@ namespace Elf
 
         const std::vector<version_definition *> &get_version_definitions () throw () { return verdefs; }
 
+        void update (const file *) throw (std::bad_alloc);
+
       protected:
         std::vector<version_definition *> verdefs;
     };
@@ -171,6 +173,8 @@ namespace Elf
         ~section_type () throw () { }
 
         const std::vector<version_requirement *> &get_version_requirements () throw () { return verneeds; }
+
+        void update (const file *) throw (std::bad_alloc);
 
       protected:
         std::vector<version_requirement *> verneeds;
