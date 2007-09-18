@@ -163,9 +163,6 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
     }
     this->segments[i] = temp;
   }
-
-  for (unsigned int i = 0; i < this->shnum; i++)
-    this->sections[i]->update (this);
 }
 
 void section::update (const file *file) throw (std::bad_alloc)
