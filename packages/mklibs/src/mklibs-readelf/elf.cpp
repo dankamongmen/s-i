@@ -422,6 +422,24 @@ std::string symbol::get_version () const throw (std::bad_alloc)
   return version;
 }
 
+std::string symbol::get_name_version () const throw (std::bad_alloc)
+{
+  std::string ver;
+
+  if (shndx == SHN_UNDEF)
+  {
+    if (verneed)
+      ver = '@' + verneed->get_name();
+  }
+  else
+  {
+    if (verdef)
+      ver = '@' + verdef->get_names()[0];
+  }
+
+  return name_string + ver;
+}
+
 template <typename _class, typename _data>
 symbol_data<_class, _data>::symbol_data (void *mem) throw ()
 {

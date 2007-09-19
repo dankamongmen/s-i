@@ -276,6 +276,7 @@ namespace Elf
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
       std::string get_version() const throw (std::bad_alloc);
+      std::string get_name_version() const throw (std::bad_alloc);
 
       virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
       virtual void update_version (const file *, uint16_t) throw (std::bad_alloc) = 0;
