@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45239 -->
+<!-- original version: 48421 -->
 
  <sect1 id="boot-parms"><title>ブートパラメータ</title>
 <para>
@@ -339,6 +339,22 @@ one device.
 </para></listitem>
 </varlistentry>
 
+<varlistentry condition="lenny">
+<term>lowmem</term>
+<listitem><para>
+
+<!--
+Can be used to force the installer to a lowmem level higher than the one
+the installer sets by default based on available memory. Possible values
+are 1 and 2. See also <xref linkend="lowmem"/>.
+-->
+インストーラが、利用可能なメモリを元に算出するデフォルト値よりも、
+より高レベルな低メモリ (lowmem) レベルに強制するのに使用できます。
+有効な値は、1 か 2 です。<xref linkend="lowmem"/> もご覧ください。
+
+</para></listitem>
+</varlistentry>
+
 <varlistentry>
 <term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
@@ -427,20 +443,6 @@ designed for visually impaired users. Set the theme by booting with
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/probe/usb</term>
-<listitem><para>
-
-<!--
-Set to <userinput>false</userinput> to prevent probing for USB on
-boot, if that causes problems.
--->
-起動時の USB の検出で問題が起きる場合は、
-これに <userinput>false</userinput> を設定してください。
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
@@ -484,6 +486,24 @@ PCMCIA サービスが原因で問題が発生する場合、
 起動しないようにすることができます。
 いくつかのラップトップコンピュータには、
 そういう行儀悪さがあることが知られています。
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="lenny">
+<term>disk-detect/dmraid/enable (dmraid)</term>
+<listitem><para>
+
+<!--
+Set to <userinput>true</userinput> to enable support for Serial ATA RAID
+(also called ATA RAID, BIOS RAID or fake RAID) disks in the installer.
+Note that this support is currently experimental. Additional information
+can be found on the <ulink url="&url-d-i-wiki;">Debian Installer Wiki</ulink>.
+-->
+インストーラで、Serial ATA RAID (ATA RAID, BIOS RAID, fake RAID とも呼ばれる) 
+をサポートを有効にする場合 <userinput>true</userinput> にセットします。
+このサポートは現在実験中であることに注意してください。
+追加情報は <ulink url="&url-d-i-wiki;">Debian Installer Wiki</ulink> にあります。
 
 </para></listitem>
 </varlistentry>
@@ -645,13 +665,12 @@ gtk フロントエンド (グラフィカルインストーラ) 用に、
 
 <!--
 For the gtk frontend (graphical installer), hardware acceleration in directfb
-is disabled by default. To enable it, set this parameter to
-<userinput>true</userinput> when booting the installer.
+is disabled by default. Set this parameter to <userinput>true</userinput> to
+enable it.
 -->
 gtk フロントエンド (グラフィカルインストーラ) 用に、
 directfb のハードウェアアクセラレーションは、デフォルトで無効となっています。
-有効にするには、インストーラの起動の際、
-このパラメータに <userinput>true</userinput> を設定してください。
+有効にするには、このパラメータに <userinput>true</userinput> と設定してください。
 
 </para></listitem>
 </varlistentry>

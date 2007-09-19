@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43693 -->
+<!-- original version: 48981 -->
 
  <sect1 id="network-cards">
 <!--
@@ -308,22 +308,33 @@ If this happens to be the wrong one, the NIC may not work, or work badly.
 This is a common problem on Netra systems with a Davicom (DEC-Tulip
 compatible) NIC. In that case the <literal>tulip</literal> driver is
 probably the correct one.
-
-During the installation the solution is to switch to a shell and unload the
-wrong driver module using
-<userinput>modprobe -r <replaceable>module</replaceable></userinput> (or
-both, if they are both loaded). After that you can load the correct module
-using <userinput>modprobe <replaceable>module</replaceable></userinput>.
+You can prevent this issue by blacklisting the wrong driver module as
+described in <xref linkend="module-blacklist"/>.
 -->
 これは、Davicom (DEC-Tulip 互換) NIC を使用した Netra システム共通の問題です。
 この場合、おそらく <literal>tulip</literal> ドライバが正しい物です。
+この問題は、<xref linkend="module-blacklist"/> で説明している、
+誤ったモジュールをブラックリストに入れることで防げます。
 
-インストール中の解決策としては、
+</para><para>
+
+<!--
+An alternative solution during the installation is to switch to a shell
+and unload the wrong driver module using
+<userinput>modprobe -r <replaceable>module</replaceable></userinput> (or
+both, if they are both loaded). After that you can load the correct module
+using <userinput>modprobe <replaceable>module</replaceable></userinput>.
+Note that the wrong module may then still be loaded when the system is
+rebooted.
+-->
+その他、インストール中の解決策としては、
 <userinput>modprobe -r <replaceable>module</replaceable></userinput> として、
 間違ったドライバモジュール (両方読み込まれている場合は両方) 
 を取り外してください。
 その後、<userinput>modprobe <replaceable>module</replaceable></userinput> で、
 正しい物を読み込んでください。
+システムをリブートするまで、
+誤ったモジュールが読み込まれたままになる可能性があることに注意してください。
 
 </para>
    </sect3>

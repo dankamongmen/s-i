@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45612 -->
+<!-- original version: 49321 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -532,19 +532,31 @@ owner を指定しない場合、
 </para><para>
 
 <!--
+Normally, preseeding a question in this way will mean that the question will
+not be asked. To set a specific default value for a question, but still have
+the question asked, use <quote>?=</quote> instead of <quote>=</quote> as
+operator. See also <xref linkend="preseed-seenflag"/>.
+-->
+通常、この方法で答をあらかじめ設定しておくと、質問してきません。
+質問のデフォルト値を指定しているのに、まだ質問してくる場合には、
+<quote>=</quote> 演算子の代わりに、<quote>?=</quote> を使用してください。
+<xref linkend="preseed-seenflag"/> もご覧ください。
+
+</para><para>
+
+<!--
 Note that some variables that are frequently set at the boot prompt
 have a shorter alias. If an alias is available, it is used in the
-examples in this appendix instead of the full variable.  In
-particular, the <literal>preseed/url</literal> variable has been
-aliased as <literal>url</literal> and has some extra magic to allow
-shortened urls to be used. Another example is the <literal>tasks</literal>
+examples in this appendix instead of the full variable. The
+<literal>preseed/url</literal> variable for example has been aliased as
+<literal>url</literal>. Another example is the <literal>tasks</literal>
 alias, which translates to <literal>tasksel:tasksel/first</literal>.
 -->
 ブートプロンプトによく使用される変数には、
 短いエイリアスがあることに注意してください。
 有効なエイリアスは、本サンプル内で完全な変数名の代わりに使用しています。
-特に、<literal>preseed/url</literal> 変数には <literal>url</literal> 
-というエイリアスがあり、短い URL が使えることによる技がいくつかあります。
+例えば <literal>preseed/url</literal> 変数には <literal>url</literal> 
+というエイリアスがあります。
 もう一つ、<literal>tasks</literal> というエイリアスがあり、
 これは <literal>tasksel:tasksel/first</literal> に変換されます。
 
@@ -1380,8 +1392,9 @@ same as <classname>mirror/suite</classname>.
 
 <informalexample role="example"><screen>
 # If you select ftp, the mirror/country string does not need to be set.
-#d-i mirror/protocol string ftp
-d-i mirror/country string enter information manually
+#d-i mirror/protocol string ftp<phrase condition="etch">
+d-i mirror/country string enter information manually</phrase><phrase condition="lenny">
+d-i mirror/country string manual</phrase>
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -1439,10 +1452,18 @@ correct one will be selected before using preseeding.
 #d-i partman-auto/init_automatically_partition \
 #      select Guided - use the largest continuous free space
 
-# Alternatively, you can specify a disk to partition. The device name
+<phrase condition="etch"># Alternatively, you can specify a disk to partition. The device name
 # can be given in either devfs or traditional non-devfs format.
 # For example, to use the first disk:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
+# Alternatively, you can specify a disk to partition. The device name must
+# be given in traditional non-devfs format.
+# For example, to use the first SCSI/SATA hard disk:
+d-i partman-auto/disk string /dev/sda
+# Note: If you want to use whatever disk is available, no matter
+# what its device name, comment the line above out. This will only work if
+# the system only has one disk.</phrase>
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
 d-i partman-auto/method string lvm
@@ -1613,55 +1634,13 @@ d-i clock-setup/utc boolean true
 
 # You may set this to any valid setting for $TZ; see the contents of
 # /usr/share/zoneinfo/ for valid values.
-d-i time/zone string US/Eastern
-</screen></informalexample>
+d-i time/zone string US/Eastern<phrase condition="lenny">
 
-  </sect2>
-
-  <sect2 id="preseed-apt">
-<!--
-  <title>Apt setup</title>
--->
-  <title>apt 設定</title>
-<para>
-
-<!--
-Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
-options is fully automated based on your installation method and answers to
-earlier questions. You can optionally add other (local) repositories.
--->
-<filename>/etc/apt/sources.list</filename>
-のセットアップと基本設定オプションは、
-インストール方法と初期の質問への回答から、完全に自動的に行われます。
-さらに、他の (ローカルな) リポジトリを追加できます。
-
-</para>
-
-<informalexample role="example"><screen>
-# You can choose to install non-free and contrib software.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-# Uncomment this if you don't want to use a network mirror.
-#d-i apt-setup/use_mirror boolean false
-# Uncomment this to avoid adding security sources, or
-# add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string
-
-# Additional repositories, local[0-9] available
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# Enable deb-src lines
-#d-i apt-setup/local0/source boolean true
-# URL to the public key of the local repository; you must provide a key or
-# apt will complain about the unauthenticated repository and so the
-# sources.list line will be left commented out
-#d-i apt-setup/local0/key string http://local.server/key
-
-# By default the installer requires that repositories be authenticated
-# using a known gpg key. This setting can be used to disable that
-# authentication. Warning: Insecure, not recommended.
-#d-i debian-installer/allow_unauthenticated string true
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+# NTP server to use. The default is almost always fine here.
+#d-i clock-setup/ntp-server ntp.example.com
+</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1723,6 +1702,12 @@ MD5 ハッシュは総当たり攻撃にかけられることを考えると、
 #d-i passwd/user-password-again password insecure
 # or encrypted using an MD5 hash.
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Create the first user with the specified UID instead of the default.
+#d-i passwd/user-uid string 1010<phrase condition="lenny">
+
+# The user account will be added to some standard initial groups. To
+# override that, use this.
+#d-i passwd/user-default-groups string audio cdrom video</phrase>
 </screen></informalexample>
 
 <para>
@@ -1776,37 +1761,64 @@ installation. The only questions asked concern the installation of the kernel.
 
 <informalexample role="example"><screen>
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
+#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
 </screen></informalexample>
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
+  <sect2 id="preseed-apt">
 <!--
-  <title>Boot loader installation</title>
+  <title>Apt setup</title>
 -->
-  <title>ブートローダのインストール</title>
+  <title>apt 設定</title>
+<para>
+
+<!--
+Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration
+options is fully automated based on your installation method and answers to
+earlier questions. You can optionally add other (local) repositories.
+-->
+<filename>/etc/apt/sources.list</filename>
+のセットアップと基本設定オプションは、
+インストール方法と初期の質問への回答から、完全に自動的に行われます。
+さらに、他の (ローカルな) リポジトリを追加できます。
+
+</para>
 
 <informalexample role="example"><screen>
-# Grub is the default boot loader (for x86). If you want lilo installed
-# instead, uncomment this:
-#d-i grub-installer/skip boolean true
+# You can choose to install non-free and contrib software.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+# Uncomment this if you don't want to use a network mirror.
+#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
+# Uncomment this to avoid adding security sources, or
+# add a hostname to use a different server than security.debian.org.
+#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+# Select which update services to use; define the mirrors to be used.
+# Values shown below are the normal defaults.
+#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
 
-# This is fairly safe to set, it makes grub install automatically to the MBR
-# if no other operating system is detected on the machine.
-d-i grub-installer/only_debian boolean true
+# Additional repositories, local[0-9] available
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Enable deb-src lines
+#d-i apt-setup/local0/source boolean true
+# URL to the public key of the local repository; you must provide a key or
+# apt will complain about the unauthenticated repository and so the
+# sources.list line will be left commented out
+#d-i apt-setup/local0/key string http://local.server/key
 
-# This one makes grub-installer install to the MBR if it also finds some other
-# OS, which is less safe as it might not be able to boot that other OS.
-d-i grub-installer/with_other_os boolean true
-
-# Alternatively, if you want to install to a location other than the mbr,
-# uncomment and edit these lines:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# To install grub to multiple disks:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# By default the installer requires that repositories be authenticated
+# using a known gpg key. This setting can be used to disable that
+# authentication. Warning: Insecure, not recommended.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1892,9 +1904,11 @@ to be used easily on the kernel command line as well.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server
-#tasksel tasksel/first multiselect standard, kde-desktop
+#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+# If the desktop task is selected, install the kde and xfce desktops
+# instead of the default gnome desktop.
+#tasksel tasksel/desktop multiselect kde, xfce</phrase><phrase condition="etch">
+#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
@@ -1904,6 +1918,39 @@ tasksel tasksel/first multiselect standard, desktop
 # but sending reports helps the project determine what software is most
 # popular and include it on CDs.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+<!--
+  <title>Boot loader installation</title>
+-->
+  <title>ブートローダのインストール</title>
+
+<informalexample role="example"><screen>
+# Grub is the default boot loader (for x86). If you want lilo installed
+# instead, uncomment this:
+#d-i grub-installer/skip boolean true<phrase condition="lenny">
+# To also skip installing lilo, and install no bootloader, uncomment this
+# too:
+#d-i lilo-installer/skip boolean true</phrase>
+
+# This is fairly safe to set, it makes grub install automatically to the MBR
+# if no other operating system is detected on the machine.
+d-i grub-installer/only_debian boolean true
+
+# This one makes grub-installer install to the MBR if it also finds some other
+# OS, which is less safe as it might not be able to boot that other OS.
+d-i grub-installer/with_other_os boolean true
+
+# Alternatively, if you want to install to a location other than the mbr,
+# uncomment and edit these lines:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# To install grub to multiple disks:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
@@ -2069,20 +2116,19 @@ preconfiguration file.
 の質問に対して同じ効果を及ぼすこともできます。
 これは事前設定ファイルのテストやデバッグにも便利です。
 
+</para><para>
+
 <!--
 If you are preseeding using boot parameters, you can make the installer ask
 the corresponding question by using the <quote>?=</quote> operator, i.e.
 <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
--->
-ブートパラメータを利用して preseed を行う場合、
-質問に対して <quote>?=</quote> 演算子を使用して回答できます。
-例: <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>
-
-<!--
 This will of course only have effect for parameters that correspond to
 questions that are actually displayed during an installation and not for
 <quote>internal</quote> parameters.
 -->
+ブートパラメータを利用して preseed を行う場合、
+質問に対して <quote>?=</quote> 演算子を使用して回答できます。
+例: <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>
 これはもちろん、
 インストール中に実際に表示される質問に対応するパラメータにのみ効果を及ぼし、
 <quote>内部</quote>パラメータには効果を及ぼしません。
@@ -2129,7 +2175,7 @@ settings for certain configurations in other files.
 # More flexibly, this runs a shell command and if it outputs the names of
 # preconfiguration files, includes those files. 
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Most flexibly of all, this downloads a program and runs it. The program
 # can use commands such as debconf-set to manipulate the debconf database.
