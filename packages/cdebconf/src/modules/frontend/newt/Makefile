@@ -2,7 +2,7 @@ MODULE=newt
 SOBJ=newt.so
 OBJS=newt.opic
 
-MODLDFLAGS=-lnewt
+MODLDFLAGS=-lnewt -lslang
 
 include ../modules.mak
 
