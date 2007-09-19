@@ -455,11 +455,15 @@ void symbol_data<_class, _data>::update_version(const file *file, uint16_t index
   {
     if (file->get_section_GNU_VERNEED())
       verneed = file->get_section_GNU_VERNEED()->get_version_requirement_entry(versym);
+    if (!verneed)
+      throw std::runtime_error("Invalid version");
   }
   else
   {
     if (file->get_section_GNU_VERDEF())
-      verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym);
+      verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym & 0x7fff);
+    if (!verdef)
+      throw std::runtime_error("Invalid version");
   }
 }
 
