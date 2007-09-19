@@ -408,16 +408,10 @@ void dynamic_data<_class, _data>::update_string (const section_type<section_type
 
 std::string symbol::get_version () const throw (std::bad_alloc)
 {
-  if (shndx == SHN_UNDEF)
-  {
-    if (verneed)
-      return verneed->get_name();
-  }
-  else
-  {
-    if (verdef)
-      return verdef->get_names()[0];
-  }
+  if (verneed)
+    return verneed->get_name();
+  else if (verdef)
+    return verdef->get_names()[0];
 
   return version;
 }
@@ -426,16 +420,10 @@ std::string symbol::get_name_version () const throw (std::bad_alloc)
 {
   std::string ver;
 
-  if (shndx == SHN_UNDEF)
-  {
-    if (verneed)
-      ver = '@' + verneed->get_name();
-  }
-  else
-  {
-    if (verdef)
-      ver = '@' + verdef->get_names()[0];
-  }
+  if (verneed)
+    ver = '@' + verneed->get_name();
+  else if (verdef)
+    ver = '@' + verdef->get_names()[0];
 
   return name_string + ver;
 }
@@ -466,22 +454,21 @@ void symbol_data<_class, _data>::update_version(const file *file, uint16_t index
   uint16_t versym = file->get_section_GNU_VERSYM()->get_versyms().at(index);
 
   if (versym == 0)
-    version = "*local*";
+    version = "*Base*";
   else if (versym == 1)
     version = "*global*";
-  else if (shndx == SHN_UNDEF)
+  else
   {
     if (file->get_section_GNU_VERNEED())
       verneed = file->get_section_GNU_VERNEED()->get_version_requirement_entry(versym);
+
     if (!verneed)
-      throw std::runtime_error("Invalid version");
-  }
-  else
-  {
-    if (file->get_section_GNU_VERDEF())
-      verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym & 0x7fff);
-    if (!verdef)
-      throw std::runtime_error("Invalid version");
+    {
+      if (file->get_section_GNU_VERDEF())
+        verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym & 0x7fff);
+      if (!verdef)
+        throw std::runtime_error("Invalid version");
+    }
   }
 }
 
