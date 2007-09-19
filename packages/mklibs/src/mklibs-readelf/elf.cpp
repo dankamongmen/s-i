@@ -451,6 +451,9 @@ void symbol_data<_class, _data>::update_string (const section_type<section_type_
 template <typename _class, typename _data>
 void symbol_data<_class, _data>::update_version(const file *file, uint16_t index) throw (std::bad_alloc)
 {
+  if (!file->get_section_GNU_VERSYM())
+    return;
+
   uint16_t versym = file->get_section_GNU_VERSYM()->get_versyms().at(index);
 
   if (versym == 0)
