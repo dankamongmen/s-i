@@ -164,15 +164,12 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
     this->segments[i] = temp;
   }
 
-  for (unsigned int i = 0; i < this->shnum; i++)
-    this->sections[i]->update (this);
-}
-
-void section::update (const file *file) throw (std::bad_alloc)
-{
-  const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file->get_section(file->get_shstrndx()));
-  name_string = section.get_string(this->name);
+  for (std::vector<section *>::iterator it = sections.begin(); it != sections.end(); ++it)
+  {
+    section_data<_class, _data> &section =
+      dynamic_cast <section_data<_class, _data> &> (**it);
+    section.update(*this);
+  }
 }
 
 template <typename _class, typename _data>
@@ -186,6 +183,14 @@ section_data<_class, _data>::section_data (void *header, void *mem) throw ()
   this->size   = convert<_data, typeof (shdr->sh_size  )> () (shdr->sh_size  );
   this->link   = convert<_data, typeof (shdr->sh_link  )> () (shdr->sh_link  );
   this->mem = static_cast <void *> (static_cast <char *> (mem) + this->offset);
+}
+
+template <typename _class, typename _data>
+void section_data<_class, _data>::update(const file &file) throw (std::bad_alloc)
+{
+  const section_type<section_type_STRTAB> &section =
+    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(file.get_shstrndx()));
+  name_string = section.get_string(name);
 }
 
 section_type<section_type_DYNAMIC>::~section_type () throw ()
@@ -210,35 +215,26 @@ section_real<_class, _data, section_type_DYNAMIC>::section_real (void *header, v
     this->dynamics.push_back (new dynamic_data<_class, _data> (&dyns[i]));
 }
 
-void section_type<section_type_DYNAMIC>::update (const file *file) throw (std::bad_alloc)
+template <typename _class, typename _data>
+void section_real<_class, _data, section_type_DYNAMIC>::update(const file &file) throw (std::bad_alloc)
 {
-  section::update (file);
+  section_data<_class, _data>::update(file);
 
   const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file->get_section(link));
+    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(link));
 
-  for (unsigned int i = 0; i < dynamics.size (); i++)
-    this->dynamics[i]->update_string (section);
+  for (std::vector<dynamic *>::iterator it = dynamics.begin(); it != dynamics.end(); ++it)
+  {
+    dynamic_data<_class, _data> &dynamic =
+      dynamic_cast <dynamic_data<_class, _data> &> (**it);
+    dynamic.update_string(section);
+  }
 }
 
 section_type<section_type_DYNSYM>::~section_type () throw ()
 {
   for (std::vector<symbol *>::iterator it = symbols.begin (); it != symbols.end (); ++it)
     delete *it;
-}
-
-void section_type<section_type_DYNSYM>::update (const file *file) throw (std::bad_alloc)
-{
-  section::update (file);
-
-  const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file->get_section (link));
-
-  for (unsigned int i = 0; i < symbols.size (); i++)
-  {
-    symbols[i]->update_string (section);
-    symbols[i]->update_version (file, i);
-  }
 }
 
 template <typename _class, typename _data>
@@ -257,23 +253,29 @@ section_real<_class, _data, section_type_DYNSYM>::section_real (void *header, vo
     this->symbols.push_back (new symbol_data<_class, _data> (&syms[i]));
 }
 
+template <typename _class, typename _data>
+void section_real<_class, _data, section_type_DYNSYM>::update(const file &file) throw (std::bad_alloc)
+{
+  section_data<_class, _data>::update (file);
+
+  const section_type<section_type_STRTAB> &section =
+    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(link));
+
+  for (unsigned int i = 0; i < symbols.size(); i++)
+  {
+    symbol_data<_class, _data> &symbol =
+      dynamic_cast <symbol_data<_class, _data> &> (*symbols[i]);
+    symbol.update_string(section);
+    symbol.update_version(&file, i);
+  }
+}
+
 const version_definition *section_type<section_type_GNU_VERDEF>::get_version_definition(uint16_t index) const throw ()
 {
   for (std::vector<version_definition *>::const_iterator it = verdefs.begin(); it != verdefs.end(); ++it)
     if ((*it)->get_ndx() == index)
       return *it;
   return NULL;
-}
-
-void section_type<section_type_GNU_VERDEF>::update (const file *file) throw (std::bad_alloc)
-{
-  section::update (file);
-
-  const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file->get_section (link));
-
-  for (std::vector<version_definition *>::iterator it = verdefs.begin (); it != verdefs.end (); ++it)
-    (*it)->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -298,6 +300,22 @@ section_real<_class, _data, section_type_GNU_VERDEF>::section_real (void *header
   while (next);
 }
 
+template <typename _class, typename _data>
+void section_real<_class, _data, section_type_GNU_VERDEF>::update(const file &file) throw (std::bad_alloc)
+{
+  section_data<_class, _data>::update(file);
+
+  const section_type<section_type_STRTAB> &section =
+    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section (link));
+
+  for (std::vector<version_definition *>::iterator it = verdefs.begin(); it != verdefs.end(); ++it)
+  {
+    version_definition_data<_class, _data> &verdef =
+      dynamic_cast<version_definition_data<_class, _data> &> (**it);
+    verdef.update_string(section);
+  }
+}
+
 const version_requirement_entry *section_type<section_type_GNU_VERNEED>::get_version_requirement_entry(uint16_t index) const throw ()
 {
   for (std::vector<version_requirement *>::const_iterator it = verneeds.begin(); it != verneeds.end(); ++it)
@@ -305,17 +323,6 @@ const version_requirement_entry *section_type<section_type_GNU_VERNEED>::get_ver
       if ((*it1)->get_other() == index)
         return *it1;
   return NULL;
-}
-
-void section_type<section_type_GNU_VERNEED>::update (const file *file) throw (std::bad_alloc)
-{
-  section::update (file);
-
-  const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file->get_section (link));
-
-  for (std::vector<version_requirement *>::iterator it = verneeds.begin (); it != verneeds.end (); ++it)
-    (*it)->update_string (section);
 }
 
 template <typename _class, typename _data>
@@ -338,6 +345,22 @@ section_real<_class, _data, section_type_GNU_VERNEED>::section_real (void *heade
     act += next;
   }
   while (next);
+}
+
+template <typename _class, typename _data>
+void section_real<_class, _data, section_type_GNU_VERNEED>::update(const file &file) throw (std::bad_alloc)
+{
+  section_data<_class, _data>::update(file);
+
+  const section_type<section_type_STRTAB> &section =
+    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(link));
+
+  for (std::vector<version_requirement *>::iterator it = verneeds.begin (); it != verneeds.end (); ++it)
+  {
+    version_requirement_data<_class, _data> &verneed =
+      dynamic_cast<version_requirement_data<_class, _data> &> (**it);
+    verneed.update_string(section);
+  }
 }
 
 template <typename _class, typename _data>
@@ -497,8 +520,8 @@ version_definition_data<_class, _data>::version_definition_data (Verdef *verdef)
 template <typename _class, typename _data>
 void version_definition_data<_class, _data>::update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
 {
-  for (std::vector<uint32_t>::iterator it = names.begin (); it != names.end (); ++it)
-    names_string.push_back(section.get_string (*it));
+  for (std::vector<uint32_t>::iterator it = names.begin(); it != names.end(); ++it)
+    names_string.push_back(section.get_string(*it));
 }
 
 template <typename _class, typename _data>
@@ -521,8 +544,12 @@ version_requirement_data<_class, _data>::version_requirement_data (Verneed *vern
 template <typename _class, typename _data>
 void version_requirement_data<_class, _data>::update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
 {
-  for (std::vector<version_requirement_entry *>::iterator it = entries.begin (); it != entries.end (); ++it)
-    (*it)->update_string (section);
+  for (std::vector<version_requirement_entry *>::iterator it = entries.begin(); it != entries.end(); ++it)
+  {
+    version_requirement_entry_data<_class, _data> &vernaux =
+      dynamic_cast<version_requirement_entry_data<_class, _data> &> (**it);
+    vernaux.update_string(section);
+  }
 }
 
 template <typename _class, typename _data>

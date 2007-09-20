@@ -89,6 +89,8 @@ namespace Elf
     {
       public:
         section_data (void *, void *) throw ();
+
+        virtual void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data, typename _type>
@@ -103,6 +105,8 @@ namespace Elf
     {
       public:
         section_real (void *, void *) throw (std::bad_alloc);
+
+        void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -110,6 +114,8 @@ namespace Elf
     {
       public:
         section_real (void *, void *) throw (std::bad_alloc);
+
+        void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -117,6 +123,8 @@ namespace Elf
     {
       public:
         section_real (void *, void *) throw (std::bad_alloc);
+
+        void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
@@ -124,6 +132,8 @@ namespace Elf
     {
       public:
         section_real (void *, void *) throw (std::bad_alloc);
+
+        void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
