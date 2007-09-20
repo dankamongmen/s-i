@@ -49,7 +49,7 @@ namespace Elf
       const uint16_t get_shstrndx () const throw () { return shstrndx; }
 
       const std::vector <section *> get_sections () const throw () { return sections; };
-      const section *get_section (unsigned int i) const throw (std::out_of_range) { return sections.at(i); };
+      const section &get_section (unsigned int i) const throw (std::out_of_range) { return *sections.at(i); };
       const section_type<section_type_DYNAMIC> *get_section_DYNAMIC () const throw () { return section_DYNAMIC; };
       const section_type<section_type_DYNSYM> *get_section_DYNSYM () const throw () { return section_DYNSYM; };
       const section_type<section_type_GNU_VERDEF> *get_section_GNU_VERDEF () const throw () { return section_GNU_VERDEF; };
@@ -251,7 +251,7 @@ namespace Elf
       uint64_t get_ptr () const throw () { return ptr; }
       const std::string &get_val_string () const throw () { return val_string; }
 
-      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc) = 0;
 
     protected:
       int64_t tag;
@@ -278,7 +278,7 @@ namespace Elf
       std::string get_version() const throw (std::bad_alloc);
       std::string get_name_version() const throw (std::bad_alloc);
 
-      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc) = 0;
       virtual void update_version (const file *, uint16_t) throw (std::bad_alloc) = 0;
 
     protected:
@@ -304,7 +304,7 @@ namespace Elf
       uint16_t get_ndx() const throw () { return ndx; }
       const std::vector<std::string> &get_names() const throw () { return names_string; }
 
-      virtual void update_string(const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc) = 0;
 
     protected:
       uint16_t ndx;
@@ -323,7 +323,7 @@ namespace Elf
 
       const std::vector<version_requirement_entry *> &get_entries () const throw () { return entries; }
 
-      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc) = 0;
 
     protected:
       std::vector<version_requirement_entry *> entries;
@@ -337,7 +337,7 @@ namespace Elf
       uint16_t get_other () const throw () { return other; }
       const std::string &get_name() const throw () { return name_string; }
 
-      virtual void update_string (const section_type<section_type_STRTAB> *) throw (std::bad_alloc) = 0;
+      virtual void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc) = 0;
 
     protected:
       uint16_t flags;
