@@ -75,10 +75,10 @@ static void process_symbols_provided (const Elf::section_type<Elf::section_type_
       continue;
     if (type == STT_NOTYPE || type == STT_OBJECT || type == STT_FUNC || type == STT_COMMON || type == STT_TLS)
       std::cout <<
-//        symbol->get_name_string () << ' ' <<
-//        symbol->get_version() << ' ' <<
-        symbol->get_name_version() << ' ' <<
-        (bind == STB_WEAK ? "True" : "False") << '\n';
+        symbol->get_name_string () << ' ' <<
+        (bind == STB_WEAK ? "True" : "False") << ' ' <<
+        symbol->get_version() << ' ' <<
+        (symbol->get_version_data() & 0x8000 ? "False" : "True") << '\n';
   }
 }
 
@@ -93,10 +93,9 @@ static void process_symbols_undefined (const Elf::section_type<Elf::section_type
       continue;
     if (bind == STB_GLOBAL || bind == STB_WEAK)
       std::cout <<
-//        symbol->get_name_string () << ' ' <<
-//        symbol->get_version() << ' ' <<
-        symbol->get_name_version() << ' ' <<
-        (bind == STB_WEAK ? "True" : "False") << '\n';
+        symbol->get_name_string () << ' ' <<
+        (bind == STB_WEAK ? "True" : "False") << ' ' <<
+        symbol->get_version() << '\n';
   }
 }
 
