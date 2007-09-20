@@ -266,7 +266,7 @@ void section_real<_class, _data, section_type_DYNSYM>::update(const file &file) 
     symbol_data<_class, _data> &symbol =
       dynamic_cast <symbol_data<_class, _data> &> (*symbols[i]);
     symbol.update_string(section);
-    symbol.update_version(&file, i);
+    symbol.update_version(file, i);
   }
 }
 
@@ -436,7 +436,7 @@ std::string symbol::get_version () const throw (std::bad_alloc)
   else if (verdef)
     return verdef->get_names()[0];
 
-  return version;
+  return "Base";
 }
 
 std::string symbol::get_name_version () const throw (std::bad_alloc)
@@ -472,30 +472,31 @@ void symbol_data<_class, _data>::update_string(const section_type<section_type_S
 }
 
 template <typename _class, typename _data>
-void symbol_data<_class, _data>::update_version(const file *file, uint16_t index) throw (std::bad_alloc)
+void symbol_data<_class, _data>::update_version(const file &file, uint16_t index) throw (std::bad_alloc)
 {
-  if (!file->get_section_GNU_VERSYM())
+  if (!file.get_section_GNU_VERSYM())
     return;
 
-  uint16_t versym = file->get_section_GNU_VERSYM()->get_versyms().at(index);
+  versym = file.get_section_GNU_VERSYM()->get_versyms().at(index);
 
-  if (versym == 0)
-    version = "*Base*";
-  else if (versym == 1)
-    version = "*global*";
-  else
+  if (versym == 0 || versym == 1)
+    return;
+
+  if (file.get_section_GNU_VERNEED())
   {
-    if (file->get_section_GNU_VERNEED())
-      verneed = file->get_section_GNU_VERNEED()->get_version_requirement_entry(versym);
-
-    if (!verneed)
-    {
-      if (file->get_section_GNU_VERDEF())
-        verdef = file->get_section_GNU_VERDEF()->get_version_definition(versym & 0x7fff);
-      if (!verdef)
-        throw std::runtime_error("Invalid version");
-    }
+    verneed = file.get_section_GNU_VERNEED()->get_version_requirement_entry(versym);
+    if (verneed)
+      return;
   }
+
+  if (file.get_section_GNU_VERDEF())
+  {
+    verdef = file.get_section_GNU_VERDEF()->get_version_definition(versym & 0x7fff);
+    if (verdef)
+      return;
+  }
+
+  throw std::runtime_error("Invalid version");
 }
 
 template <typename _class, typename _data>

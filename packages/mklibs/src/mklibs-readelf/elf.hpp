@@ -264,6 +264,7 @@ namespace Elf
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
       std::string get_version() const throw (std::bad_alloc);
+      uint16_t get_version_data() const throw () { return versym; }
       std::string get_name_version() const throw (std::bad_alloc);
 
     protected:
@@ -276,9 +277,10 @@ namespace Elf
       uint8_t type;
 
       std::string name_string;
-      std::string version;
+
       const version_definition *verdef;
       const version_requirement_entry *verneed;
+      uint16_t versym;
   };
 
   class version_definition
