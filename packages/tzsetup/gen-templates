@@ -11,7 +11,7 @@ use strict;
 print "# This file was generated automatically, edit its source file instead\n";
 
 sub honking_big_comment {
-	my $cc=$1;
+	my ($cc)=(@_);
 	return <<"EOF"
 # Timezones for $cc.
 # 
@@ -27,8 +27,7 @@ my %seencc;
 		if (m!Template: tzsetup/country/([A-Z]+)!) {
 			my $cc=$1;
 			$seencc{$cc}=1;
-			if (m/_Choices: (.*)$/m) {
-				my $enchoices=$1;
+			if (m/_Choices: .*$/m) {
 				s/(Choices-C:)/honking_big_comment($cc).$1/me;
 			}
 		}
