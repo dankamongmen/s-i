@@ -253,6 +253,7 @@ int runconfmodule(int argc, char **argv)
 	confmodule = confmodule_new(g_config, g_templates, g_questions, g_frontend);
 	confmodule->run(confmodule, argc, argv);
 	confmodule->communicate(confmodule);
+	confmodule->shutdown(confmodule);
 	ret = confmodule->exitcode;
 	confmodule_delete(confmodule);
 
