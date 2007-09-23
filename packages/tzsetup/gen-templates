@@ -14,7 +14,7 @@ open (ISO, $iso_3166) || die "$iso_3166: $!";
 while (<ISO>) {
 	chomp;
 	next unless length;
-	my ($cc, $country)=split(/\t/, $_, 2);
+	my ($cc, $country)=split(" ", $_, 2);
 	$country{$cc}=$country;
 }
 
@@ -24,7 +24,7 @@ sub honking_big_comment {
 	my ($cc)=@_;
 	my $country=exists($country{$cc}) ? $country{$cc} : $cc;
 	return <<"EOF"
-# Timezone for $country
+# Time zone for $country
 EOF
 }
 
