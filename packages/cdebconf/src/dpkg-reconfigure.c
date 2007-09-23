@@ -37,7 +37,7 @@ struct option g_dpc_args[] = {
 	{ "default-priority", 1, NULL, 'd' },
 	{ "all", 0, NULL, 'a' },
 	{ "unseen-only", 0, NULL, 'u' },
-    { "force", 0, NULL, 'F' },
+	{ "force", 0, NULL, 'F' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -58,16 +58,16 @@ static void cleanup(void)
 {
 	if (g_frontend != NULL)
 		frontend_delete(g_frontend);
-    if (g_templates != NULL)
-    {
-        g_templates->methods.save(g_templates);
-        template_db_delete(g_templates);
-    }
-    if (g_questions != NULL)
-    {
-        g_questions->methods.save(g_questions);
-        question_db_delete(g_questions);
-    }
+	if (g_templates != NULL)
+	{
+		g_templates->methods.save(g_templates);
+		template_db_delete(g_templates);
+	}
+	if (g_questions != NULL)
+	{
+		g_questions->methods.save(g_questions);
+		question_db_delete(g_questions);
+	}
 	if (g_config != NULL)
 		config_delete(g_config);
 }
@@ -139,7 +139,7 @@ void loadtemplate(const char *filename, const char *owner)
 		{
 			q = question_new(t->tag);
 			q->template = t;
-                        template_ref(t);
+			template_ref(t);
 		}
 		else if (q->template != t)
 		{
@@ -283,14 +283,14 @@ int reconfigure(char **pkgs, int i, int max)
 		{
 			INFO(INFO_WARN, "%s is not installed, or does not use debconf", pkg);
 
-                        /* Don't die, though this doesn't have a
-                        config script.. we might be doing stuff with
-                        debian-installer, which doesn't use .config
-                        scripts.  Don't uncomment this without talking
-                        to -boot first
-                        -- tfheen, 2002-09-17 */
+			/* Don't die, though this doesn't have a
+			   config script.. we might be doing stuff with
+			   debian-installer, which doesn't use .config
+			   scripts.  Don't uncomment this without talking
+			   to -boot first
+			   -- tfheen, 2002-09-17 */
 
-                        /* continue; */
+			/* continue; */
 		}
 		/* startup the confmodule; run the config script and talk to it */
 		g_frontend->methods.set_title(g_frontend, pkg);
@@ -310,45 +310,45 @@ int reconfigure(char **pkgs, int i, int max)
 			if ((ret = runconfmodule(4, argv)) != DC_OK)
 				return ret;
 		}
-        else
-        {
-            snprintf(filename, sizeof(filename), INFODIR "/%s.postinst", pkg);
-            if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
-            {
-                if (is_confmodule(filename))
-                {
-                    argv[1] = filename;
-                    argv[2] = "configure";
-                    argv[3] = getfield(pkg, VERSIONFIELD);
-                    if ((ret = runconfmodule(4, argv)) != 0)
-                        return ret;
-                }
-                else
-                {
-                    /* according to debconf:
-                     * Since postinst might run other programs that
-                     * use debconf, checkpoint the db state and
-                     * reinitialize when the script finishes 
-                     */
-                    g_templates->methods.save(g_templates);
-                    g_questions->methods.save(g_questions);
+		else
+		{
+			snprintf(filename, sizeof(filename), INFODIR "/%s.postinst", pkg);
+			if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
+			{
+				if (is_confmodule(filename))
+				{
+					argv[1] = filename;
+					argv[2] = "configure";
+					argv[3] = getfield(pkg, VERSIONFIELD);
+					if ((ret = runconfmodule(4, argv)) != 0)
+						return ret;
+				}
+				else
+				{
+					/* according to debconf:
+					 * Since postinst might run other programs that
+					 * use debconf, checkpoint the db state and
+					 * reinitialize when the script finishes 
+					 */
+					g_templates->methods.save(g_templates);
+					g_questions->methods.save(g_questions);
+	
+					unsetenv("DEBIAN_HAS_FRONTEND");
+					setenv("DEBCONF_SHOWOLD", "1", 1);
 
-                    unsetenv("DEBIAN_HAS_FRONTEND");
-                    setenv("DEBCONF_SHOWOLD", "1", 1);
-
-                    strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
-
-                    ret = system(filename);
-                    if (ret != 0) return DC_NOTOK;
-
-                    setenv("DEBIAN_HAS_FRONTEND", "1", 1);
-                    unsetenv("DEBCONF_SHOWOLD");
-
-                    g_templates->methods.load(g_templates);
-                    g_questions->methods.load(g_questions);
-                }
-            }
-        }
+					strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
+	
+					ret = system(filename);
+					if (ret != 0) return DC_NOTOK;
+	
+					setenv("DEBIAN_HAS_FRONTEND", "1", 1);
+					unsetenv("DEBCONF_SHOWOLD");
+	
+					g_templates->methods.load(g_templates);
+					g_questions->methods.load(g_questions);
+				}
+			}
+		}
 
 		i++;
 	}
@@ -369,8 +369,8 @@ int main(int argc, char **argv)
 	signal(SIGINT, sighandler);
 	setlocale (LC_ALL, "");
 
-    if (getuid() != 0)
-        DIE("%s must be run as root", argv[0]);
+	if (getuid() != 0)
+		E("%s must be run as root", argv[0]);
 
 	g_config = config_new();
 
@@ -380,11 +380,11 @@ int main(int argc, char **argv)
 		{
 		case 'h': usage(); break;
 		case 'f': setenv("DEBIAN_FRONTEND", optarg, 1); break;
-        case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
+		case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
 		case 'd': break;
 		case 'u': break;
 		case 'a': opt_all = 1; break;
-        case 'F': opt_force = 1; break;
+		case 'F': opt_force = 1; break;
 		}
 	}
 	g_config = config_new();
@@ -396,7 +396,7 @@ int main(int argc, char **argv)
 	/* initialize database and frontend modules */
 	if ((g_templates = template_db_new(g_config, NULL)) == 0)
 		DIE("Cannot initialize DebConf templates database");
-    if ((g_questions = question_db_new(g_config, g_templates, NULL)) == 0)
+	if ((g_questions = question_db_new(g_config, g_templates, NULL)) == 0)
 		DIE("Cannot initialize DebConf config database");
 	if ((g_frontend = frontend_new(g_config, g_templates, g_questions)) == 0)
 		DIE("Cannot initialize DebConf frontend");
