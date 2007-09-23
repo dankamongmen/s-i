@@ -13,10 +13,7 @@ print "# This file was generated automatically, edit its source file instead\n";
 sub honking_big_comment {
 	my ($cc)=@_;
 	return <<"EOF"
-# Timezones for $cc.
-# 
-# TRANSLATORS PLEASE NOTE: These are time zones. Many place names will not
-# need translation from the English text, but some parts may be translatable.
+# Timezone for $cc.
 EOF
 }
 
@@ -27,7 +24,7 @@ my %seencc;
 		if (m!Template: tzsetup/country/([A-Z]+)!) {
 			my $cc=$1;
 			$seencc{$cc}=1;
-			s/(_Choices:)/honking_big_comment($cc).$1/me;
+			s/(__Choices:)/honking_big_comment($cc).$1/me;
 		}
 		print;
 	}
@@ -74,7 +71,7 @@ foreach my $cc (sort keys %cc2zone) {
 		print "Type: select\n";
 		print "Choices-C: $list\n";
 		print honking_big_comment($cc);
-		print "_Choices: $englist\n";
+		print "__Choices: $englist\n";
 		print "_Description: Select your time zone:\n";
 	}
 	else {
