@@ -8,20 +8,20 @@
 use warnings;
 use strict;
 
-my $iso_3166 = '/usr/share/iso-codes/iso_3166.tab';
+my $iso_3166="/usr/share/iso-codes/iso_3166.tab";
 my %country;
 open (ISO, $iso_3166) || die "$iso_3166: $!";
 while (<ISO>) {
 	chomp;
-	my ($cc, $country) = split /\t/;
-	$country{ $cc } = $country;
+	my ($cc, $country)=split(/\t/, $_, 2);
+	$country{$cc}=$country;
 }
 
 print "# This file was generated automatically, edit its source file instead\n";
 
 sub honking_big_comment {
 	my ($cc)=@_;
-	my $country = exists $country{ $cc } ? $country{ $cc } : $cc;
+	my $country = exists($country{$cc}) ? $country{$cc} : $cc;
 	return <<"EOF"
 # Timezone for $country
 EOF
