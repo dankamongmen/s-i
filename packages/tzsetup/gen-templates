@@ -13,6 +13,7 @@ my %country;
 open (ISO, $iso_3166) || die "$iso_3166: $!";
 while (<ISO>) {
 	chomp;
+	next unless length;
 	my ($cc, $country)=split(/\t/, $_, 2);
 	$country{$cc}=$country;
 }
@@ -46,7 +47,7 @@ my %zonedesc;
 open (IN, $zonetab) || die "$zonetab: $!";
 while (<IN>) {
 	chomp;
-	next if /#/;
+	next if /^#/;
 	next unless length;
 	my ($cc, $coord, $zone, $comments)=split(' ', $_, 4);
 	push @{$cc2zone{$cc}}, $zone unless $seencc{$cc};
