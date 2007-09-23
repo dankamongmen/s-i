@@ -370,7 +370,7 @@ int main(int argc, char **argv)
 	setlocale (LC_ALL, "");
 
 	if (getuid() != 0)
-		E("%s must be run as root", argv[0]);
+		DIE("%s must be run as root", argv[0]);
 
 	g_config = config_new();
 
