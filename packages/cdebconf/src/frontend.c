@@ -103,27 +103,27 @@ static bool frontend_can_cancel_progress(struct frontend *ui)
 
 static void frontend_progress_start(struct frontend *ui, int min, int max, const char *title)
 {
-    DELETE(ui->progress_title);
-	ui->progress_title = STRDUP(title);
-    ui->progress_min = min;
-    ui->progress_max = max;
-    ui->progress_cur = min;
+	DELETE(ui->progress_title);
+		ui->progress_title = STRDUP(title);
+	ui->progress_min = min;
+	ui->progress_max = max;
+	ui->progress_cur = min;
 }
 
 static int frontend_progress_set(struct frontend *ui, int val)
 {
-    ui->progress_cur = val;
-    return DC_OK;
+	ui->progress_cur = val;
+	return DC_OK;
 }
 
 static int frontend_progress_step(struct frontend *ui, int step)
 {
-    return ui->methods.progress_set(ui, ui->progress_cur + step);
+	return ui->methods.progress_set(ui, ui->progress_cur + step);
 }
 
 static int frontend_progress_info(struct frontend *ui, const char *info)
 {
-    return DC_OK;
+	return DC_OK;
 }
 
 static void frontend_progress_stop(struct frontend *ui)
@@ -139,60 +139,60 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	const char *modpath, *modname;
 	struct question *q;
 
-    modname = getenv("DEBIAN_FRONTEND");
-    if (modname == NULL)
-        modname = cfg->get(cfg, "_cmdline::frontend", 0);
-    if (modname == NULL)
-    {
-            modname = cfg->get(cfg, "global::default::frontend", 0);
-            if (modname == NULL)
-                    DIE("No frontend instance defined");
-            
-            snprintf(tmp, sizeof(tmp), "frontend::instance::%s::driver",
-                     modname);
-            modname = cfg->get(cfg, tmp, 0);
-    }
-    if (modname == NULL)
-        DIE("Frontend instance driver not defined (%s)", tmp);
+	modname = getenv("DEBIAN_FRONTEND");
+	if (modname == NULL)
+		modname = cfg->get(cfg, "_cmdline::frontend", 0);
+	if (modname == NULL)
+	{
+		modname = cfg->get(cfg, "global::default::frontend", 0);
+		if (modname == NULL)
+			DIE("No frontend instance defined");
 
-    setenv("DEBIAN_FRONTEND", modname, 1);
-    obj = NEW(struct frontend);
-    memset(obj, 0, sizeof(struct frontend));
+		snprintf(tmp, sizeof(tmp), "frontend::instance::%s::driver",
+			modname);
+		modname = cfg->get(cfg, tmp, 0);
+	}
+	if (modname == NULL)
+		DIE("Frontend instance driver not defined (%s)", tmp);
 
-    modpath = cfg->get(cfg, "global::module_path::frontend", 0);
-    if (modpath == NULL)
-	DIE("Frontend module path not defined (global::module_path::frontend)");
+	setenv("DEBIAN_FRONTEND", modname, 1);
+	obj = NEW(struct frontend);
+	memset(obj, 0, sizeof(struct frontend));
 
-    if (strcmp(modname, "none") != 0 && strcmp(modname, "noninteractive") != 0)
-    {
-        q = qdb->methods.get(qdb, "debconf/frontend");
-        if (q)
-	    question_setvalue(q, modname);
-        question_deref(q);
-        snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
-        //Frontend switching works when dlopening with RTLD_LAZY
-        //The real reason why it segfaultes with RTLD_NOW has yet to be found
-	if ((dlh = dlopen(tmp, RTLD_LAZY)) == NULL)
-		DIE("Cannot load frontend module %s: %s", tmp, dlerror());
+	modpath = cfg->get(cfg, "global::module_path::frontend", 0);
+	if (modpath == NULL)
+		DIE("Frontend module path not defined (global::module_path::frontend)");
 
-	if ((mod = (struct frontend_module *)dlsym(dlh, "debconf_frontend_module")) == NULL)
-		DIE("Malformed frontend module %s", modname);
+	if (strcmp(modname, "none") != 0 && strcmp(modname, "noninteractive") != 0)
+	{
+		q = qdb->methods.get(qdb, "debconf/frontend");
+		if (q)
+			question_setvalue(q, modname);
+		question_deref(q);
+		snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
+		//Frontend switching works when dlopening with RTLD_LAZY
+		//The real reason why it segfaultes with RTLD_NOW has yet to be found
+		if ((dlh = dlopen(tmp, RTLD_LAZY)) == NULL)
+			DIE("Cannot load frontend module %s: %s", tmp, dlerror());
+
+		if ((mod = (struct frontend_module *)dlsym(dlh, "debconf_frontend_module")) == NULL)
+			DIE("Malformed frontend module %s", modname);
 	
-	memcpy(&obj->methods, mod, sizeof(struct frontend_module));
-    }
-    obj->name = strdup(modname);
+		memcpy(&obj->methods, mod, sizeof(struct frontend_module));
+	}
+	obj->name = strdup(modname);
 	obj->handle = dlh;
 	obj->config = cfg;
 	obj->tdb = tdb;
 	obj->qdb = qdb;
-    frontend_set_title(obj, "");
-    snprintf(obj->configpath, sizeof(obj->configpath),
-        "frontend::instance::%s", modname);
+	frontend_set_title(obj, "");
+	snprintf(obj->configpath, sizeof(obj->configpath),
+ 		"frontend::instance::%s", modname);
 
-    if (asprintf(&obj->plugin_path, "%s/%s", modpath, modname) == -1) {
-        frontend_delete(obj);
-        return NULL;
-    }
+	if (asprintf(&obj->plugin_path, "%s/%s", modpath, modname) == -1) {
+		frontend_delete(obj);
+		 return NULL;
+	}
 
 
 #define SETMETHOD(method) if (obj->methods.method == NULL) obj->methods.method = frontend_##method
@@ -208,11 +208,11 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(can_go_back);
 	SETMETHOD(can_go_forward);
 	SETMETHOD(can_cancel_progress);
-    SETMETHOD(progress_start);
-    SETMETHOD(progress_set);
-    SETMETHOD(progress_step);
-    SETMETHOD(progress_info);
-    SETMETHOD(progress_stop);
+	SETMETHOD(progress_start);
+	SETMETHOD(progress_set);
+	SETMETHOD(progress_step);
+	SETMETHOD(progress_info);
+	SETMETHOD(progress_stop);
 
 #undef SETMETHOD
 
@@ -237,8 +237,8 @@ void frontend_delete(struct frontend *obj)
 	DELETE(obj->capb);
 	DELETE(obj->title);
 	question_deref(obj->info);
-    DELETE(obj->progress_title);
-    DELETE(obj->plugin_path);
+	DELETE(obj->progress_title);
+	DELETE(obj->plugin_path);
 	DELETE(obj);
 }
 
