@@ -637,6 +637,10 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 					//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
 				}
 				else {
+					/* Do not raise the priority after it has been set by cdebconf-priority. */
+					if (0 == strcmp("cdebconf-priority", p->p.package)) {
+						last_item_backup = 0;
+					}
 					// di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
 				}
 				break;
