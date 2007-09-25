@@ -53,6 +53,13 @@ if [ -e /cdrom/.disk/base_installable ]; then
 		use_prio=high ;;
 	esac
 
+	# Default to false if no network selected in netcfg
+	if db_get netcfg/dhcp_options && \
+	   [ "$RET" = "Do not configure the network at this time" ]; then
+		use_mirror=false
+		use_prio=medium
+	fi
+
 	# Only set default if not preseeded or already asked
 	# Hack alert: for this to work no default is set in template
 	db_get apt-setup/use_mirror
@@ -70,7 +77,22 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	if db_get cdrom/codename && [ "$RET" ]; then
 		db_set mirror/suite $RET
 	fi
-	choose-mirror -n # no progress bar
+
+	while true; do
+		RET=0
+		choose-mirror -n || RET=$?	# no progress bar
+		if [ $RET -eq 0 ]; then
+			break
+		else
+			db_input critical apt-setup/no_mirror
+			db_go || exit 10
+
+			db_get apt-setup/no_mirror
+			if [ "$RET" = true ]; then
+				exit 1
+			fi
+		fi
+	done
 fi
 
 # Abort if no mirror is configured.
