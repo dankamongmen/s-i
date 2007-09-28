@@ -72,6 +72,8 @@ case "$machine" in
 		log-output -t hw-detect modprobe -v rtc-dev || log "rtc-dev failed to load (or is built in)"
 		update-dev
 		# This driver creates a rtc0 device, so symlink.
+		# XXX This won't be needed once a new udev that handles the
+		# symlink gets into Debian.
 		if [ -e /dev/rtc0 ]; then
 			ln -sf rtc0 /dev/rtc
 		fi
