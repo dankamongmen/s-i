@@ -64,12 +64,18 @@ else
 fi
 
 anna-install rtc-modules || true
+
+# This may not be necessary; hwclock can do direct IO if
+# the rtc module is not loaded.
+log-output -t hw-detect modprobe -v rtc || log "rtc module not loaded"
+log-output -t hw-detect modprobe -v rtc-dev || log "rtc-dev module not loaded"
+update-dev
+
 machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 case "$machine" in
 	"Linksys NSLU2")
 		# The nslu2 needs a special driver for the hardware
 		# clock.
-		log-output -t hw-detect modprobe -v rtc-dev || log "rtc-dev failed to load (or is built in)"
 		update-dev
 		# This driver creates a rtc0 device, so symlink.
 		# XXX This won't be needed once a new udev that handles the
@@ -77,12 +83,6 @@ case "$machine" in
 		if [ -e /dev/rtc0 ]; then
 			ln -sf rtc0 /dev/rtc
 		fi
-	;;
-	*)
-		# This may not be necessary; hwclock can do direct IO if
-		# the rtc module is not loaded.
-		log-output -t hw-detect modprobe -v rtc || log "rtc failed to load"
-		update-dev
 	;;
 esac
 
