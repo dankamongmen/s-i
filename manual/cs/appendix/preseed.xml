@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 45612 -->
+<!-- original version: 49321 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -358,11 +358,18 @@ balíku nevyužita.
 
 </para><para>
 
+Předzodpovězení otázky popsaným způsobem způsobí, že se tato otázka
+nezobrazí. Chcete-li otázce přednastavit konkrétní odpověď, ale přesto
+chcete, aby se otázka zobrazila, použijte místo <quote>=</quote>
+operátor <quote>?=</quote>. Více též
+<xref linkend="preseed-seenflag"/>.
+
+</para><para>
+
 Některé často používané proměnné mohou mít i kratší variantu, Pokud je
 tato varianta dostupná, upřednostňujeme ji zde před úplnou formou.
 Konkrétně proměnnou <literal>preseed/url</literal> zde zkracujeme na
-<literal>url</literal>, což s sebou nese i nějakou magii ohledně
-zkracování samotných url. Jiným příkladem je alias
+<literal>url</literal>. Jiným příkladem je alias
 <literal>tasks</literal>, který vlastně znamená
 <literal>tasksel:tasksel/first</literal>.
 
@@ -867,8 +874,10 @@ jako <classname>mirror/suite</classname>.
 
 <informalexample role="example"><screen>
 # Zvolíte-li ftp, nemusíte nastavovat mirror/country
-#d-i mirror/protocol string ftp
-d-i mirror/country string enter information manually
+#d-i mirror/protocol string ftp<phrase condition="etch">
+d-i mirror/country string enter information manually</phrase><phrase
+condition="lenny">
+d-i mirror/country string manual</phrase>
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -906,12 +915,22 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 #d-i partman-auto/init_automatically_partition \
 #      select Asistované - použít největší spojité volné místo
 
+<phrase condition="etch">
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení může být v tradičním formátu nebo ve formátu devfs.
 # Pokud to metoda podporuje, můžete zadat několik disků oddělených
 # mezerami.
 # Například pro použití prvního disku, který devfs najde:
 d-i partman-auto/disk string /dev/discs/disc0/disc
+</phrase><phrase condition="lenny">
+# Alternativně můžete zadat k automatickému dělení celý disk. Název
+# zařízení musí být v tradičním formátu (ne ve formátu devfs).
+# Například pro použití prvního SCSI/SATA disku:
+d-i partman-auto/disk string /dev/sda
+# Poznámka: Chcete-li použít libovolný nalezený disk bez ohledu na
+# název jeho zařízení, předchozí řádek zakomentujte. Toto však bude
+# fungovat pouze na systémech s jediným diskem.
+</phrase>
 # Dále musíte zvolit metodu, která se má použít. Momentálně jsou
 # dostupné metody "regular", "lvm" a "crypto".
 d-i partman-auto/method string lvm
@@ -1055,46 +1074,13 @@ d-i clock-setup/utc boolean true
 # Proměnnou můžete nastavit na libovolnou platnou hodnotu $TZ;
 # Seznam časových pásem naleznete v /usr/share/zoneinfo/.
 d-i time/zone string Europe/Prague
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-apt">
-  <title>Nastavení APT</title>
-<para>
-
-Nastavení souboru <filename>/etc/apt/sources.list</filename>
-a několika základních parametrů je plně řízeno typem instalace
-a dříve zodpovězenými otázkami. Volitelně můžete přidat další
-(lokální) archivy.
-
-</para>
-
-<informalexample role="example"><screen>
-# Můžete si zvolit instalaci softwaru ze sekcí non-free a contrib.
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-# Odkomentujte, pokud nechcete používat síťové zrcadlo.
-#d-i apt-setup/use_mirror boolean false
-# Odkomentujte, pokud nechcete přidat zdroje s opravami, nebo pokud
-# chcete použít jiný server než security.debian.org.
-#d-i apt-setup/security_host string
-
-# Další archivy, k dispozici jsou local[0-9]
-#d-i apt-setup/local0/repository string \
-#       http://muj.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# Povolí řádky deb-src
-#d-i apt-setup/local0/source boolean true
-# URL k veřejnému klíči lokálního archivu; Klíč musíte zadat, protože
-# jinak si apt bude stěžovat na neautentizovaný archiv a příslušný
-# řádek v sources.list zůstane zakomentovaný
-#d-i apt-setup/local0/key string http://local.server/key
-
-# Instalace vyžaduje, aby byly všechny repositáře autentizovány
-# známým gpg klíčem. Tímto nastavením můžete autentizaci potlačit.
-# Varování: Nebezpečné, není doporučeno.
-#d-i debian-installer/allow_unauthenticated string true
+<phrase condition="lenny">
+# Určuje, zda se mají při instalaci nastavit hodiny pomocí NTP.
+d-i clock-setup/ntp boolean true
+# NTP server, který se má použít. Výchozí hodnota je většinou
+# dostačující.
+#d-i clock-setup/ntp-server tak.cesnet.cz
+</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1138,6 +1124,13 @@ hrubou silou.
 #d-i passwd/user-password-again password nebezpecne
 # nebo šifrované pomocí MD5 hashe.
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Nastaví UID běžného uživatele (jinak se použije výchozí hodnota).
+#d-i passwd/user-uid string 1010
+<phrase condition="lenny">
+# Uživatelský účet bude automaticky přidán do několika standardních
+# skupin. Chcete-li to změnit, zadejte seznam požadovaných skupin.
+#d-i passwd/user-default-groups string audio cdrom video
+</phrase>
 </screen></informalexample>
 
 <para>
@@ -1174,33 +1167,59 @@ týkají instalace jádra.
 # Vybere generátor initramfs, kterým se vygeneruje initrd pro jádra
 # řady 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
+<phrase condition="lenny">
+# (Meta) balík jádra, který se má nainstalovat; nechcete-li instalovat
+# žádné jádro, zadejte "none".
+#d-i base-installer/kernel/image linux-image-2.6-486
+</phrase>
 </screen></informalexample>
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
-  <title>Instalace zavaděče</title>
+  <sect2 id="preseed-apt">
+  <title>Nastavení APT</title>
+<para>
+
+Nastavení souboru <filename>/etc/apt/sources.list</filename>
+a několika základních parametrů je plně řízeno typem instalace
+a dříve zodpovězenými otázkami. Volitelně můžete přidat další
+(lokální) archivy.
+
+</para>
 
 <informalexample role="example"><screen>
-# Výchozím zavaděčem (pro x86) je Grub. Chcete-li místo něj instalovat
-# LILO, odkomentujte následující:
-#d-i grub-installer/skip boolean true
+# Můžete si zvolit instalaci softwaru ze sekcí non-free a contrib.
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+# Odkomentujte, pokud nechcete používat síťové zrcadlo.
+#d-i apt-setup/use_mirror boolean false
+<phrase condition="etch">
+# Odkomentujte, pokud nechcete přidat zdroje s opravami, nebo pokud
+# chcete použít jiný server než security.debian.org.
+#d-i apt-setup/security_host string
+</phrase><phrase condition="lenny">
+# Vyberte, které aktualizační služby chcete využívat a zadejte
+# jejich zrcadla. Příklad ukazuje výchozí hodnoty.
+#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org
+</phrase>
 
-# Toto je bezpečné nastavení - pokud nenalezne jiný operační systém,
-# nainstaluje Grub do MBR.
-d-i grub-installer/only_debian boolean true
+# Další archivy, k dispozici jsou local[0-9]
+#d-i apt-setup/local0/repository string \
+#       http://muj.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Povolí řádky deb-src
+#d-i apt-setup/local0/source boolean true
+# URL k veřejnému klíči lokálního archivu; Klíč musíte zadat, protože
+# jinak si apt bude stěžovat na neautentizovaný archiv a příslušný
+# řádek v sources.list zůstane zakomentovaný
+#d-i apt-setup/local0/key string http://muj.server/klic
 
-# Toto nainstaluje Grub do MBR i když nalezne jiný operační systém,
-# což je méně bezpečné, protože se jiný systém nemusí zavést.
-d-i grub-installer/with_other_os boolean true
-
-# Alternativně můžete instalovat jinam než do MBR - odkomentujete
-# a upravte tyto řádky:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# Pro instalaci Grubu na více disků:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# Instalace vyžaduje, aby byly všechny repositáře autentizovány
+# známým gpg klíčem. Tímto nastavením můžete autentizaci potlačit.
+# Varování: Nebezpečné, není doporučeno.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1266,9 +1285,14 @@ můžete jednoduše použít i na příkazové řádce jádra.
 </para>
 
 <informalexample role="example"><screen>
-tasksel tasksel/first multiselect standard, desktop
 #tasksel tasksel/first multiselect standard, web-server
+<phrase condition="lenny">
+# Pokud je vybrána desktopová úloha, nainstaluje místo výchozího GNOME
+# desktopy KDE a Xfce.
+#tasksel tasksel/desktop multiselect kde, xfce
+</phrase><phrase condition="etch">
 #tasksel tasksel/first multiselect standard, kde-desktop
+</phrase>
 
 # Samostatné balíky pro instalaci.
 #d-i pkgsel/include string openssh-server build-essential
@@ -1279,6 +1303,38 @@ tasksel tasksel/first multiselect standard, desktop
 # na CD. Výchozí hodnotou je zákaz posílání tohoto seznamu, ale měli
 # byste zvážit jeho povolení.
 #popularity-contest popularity-contest/participate boolean false
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-bootloader">
+  <title>Instalace zavaděče</title>
+
+<informalexample role="example"><screen>
+# Výchozím zavaděčem (pro x86) je Grub. Chcete-li místo něj instalovat
+# LILO, odkomentujte následující:
+#d-i grub-installer/skip boolean true
+<phrase condition="lenny">
+# Jestliže chcete přeskočit také instalaci LILA a neinstalovat žádný
+# zavaděč, odkomentujte ještě toto:
+#d-i lilo-installer/skip boolean true
+</phrase>
+
+# Toto je bezpečné nastavení - pokud nenalezne jiný operační systém,
+# nainstaluje Grub do MBR.
+d-i grub-installer/only_debian boolean true
+
+# Toto nainstaluje Grub do MBR i když nalezne jiný operační systém,
+# což je méně bezpečné, protože se jiný systém nemusí zavést.
+d-i grub-installer/with_other_os boolean true
+
+# Alternativně můžete instalovat jinam než do MBR - odkomentujete
+# a upravte tyto řádky:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Pro instalaci Grubu na více disků:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
 </screen></informalexample>
 
   </sect2>
@@ -1429,9 +1485,6 @@ testování a ladění konfiguračního souboru s přednastavením.
 Přednastavujete-li pomocí zaváděcích parametrů, můžete použít
 speciální operátor <quote>?=</quote>, kterým instalátor donutíte, aby
 danou otázku zobrazil. Například <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>hodnota</replaceable></userinput>.
-
-</para><para>
-
 To samozřejmě funguje jen u parametrů, kterým odpovídá nějaká otázka
 zobrazená během instalace, tj. nefunguje to pro <quote>interní</quote>
 parametry.
@@ -1470,7 +1523,7 @@ dalších souborů se specifickým nastavením pro danou situaci.
 # Mnohem pružnější je použití shellového příkazu, který vrátí názvy
 # souborů, jež se mají nahrát.
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Nejpružnější možnost stáhne program a spustí jej. Program může
 # používat příkazy pro manipulaci s databází debconfu jako např.
