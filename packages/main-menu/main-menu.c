@@ -680,6 +680,8 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	return EXIT_FAILURE;
 }
 
+int di_config_package_depth=0;
+
 /*
  * Configure all dependencies, special case for virtual packages.
  * This is done depth-first.
@@ -691,10 +693,10 @@ static int di_config_package(di_system_package *p,
 	di_slist_node *node;
 	di_system_package *dep;
 
-	//di_log(DI_LOG_LEVEL_DEBUG, "configure %s, status: %d\n", p->p.package, p->p.status);
+	//di_log(DI_LOG_LEVEL_DEBUG, "configure %s, status: %d", p->p.package, p->p.status);
 
 	if (p->p.type == di_package_type_virtual_package) {
-		//di_log(DI_LOG_LEVEL_DEBUG, "virtual package %s\n", p->p.package);
+		//di_log(DI_LOG_LEVEL_DEBUG, "virtual package %s", p->p.package);
 		if (virtfunc)
 			return virtfunc(p);
 		else
@@ -711,7 +713,14 @@ static int di_config_package(di_system_package *p,
 		if (d->type != di_package_dependency_type_depends)
 			continue;
 		/* Recursively configure this package */
-		switch (di_config_package(dep, virtfunc)) {
+		di_config_package_depth++;
+		if (di_config_package_depth > 1000) {
+			di_log(DI_LOG_LEVEL_WARNING, "Deep recursion configuring package %s (dep loop?)", p->p.package);
+			return -1;
+		}
+		ret = di_config_package(dep, virtfunc);
+		di_config_package_depth--;
+		switch (ret) {
 			case -1:
 				return -1;
 			case EXIT_BACKUP:

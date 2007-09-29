@@ -19,12 +19,9 @@ demo: $(BIN)
 	/usr/share/debconf/frontend ./$(BIN)
 	rm -f main-menu.template
 
-# Size optimized and stripped binary target.
+# Size optimized binary target.
 small: CFLAGS:=-Os $(CFLAGS) -DSMALL
 small: clean $(BIN)
-ifndef DEBUG
-	strip --remove-section=.comment --remove-section=.note $(BIN)
-endif
 	ls -l $(BIN)
 
 clean:
