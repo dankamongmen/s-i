@@ -76,11 +76,8 @@ case $prefix in
 		disc_offered_devfs="$bootfs_devfs"
 		db_register lilo-installer/bootdev_raid lilo-installer/bootdev
 	;;
-	/dev/[hs]d[a-z]|/dev/cciss/c[0-9]d[0-9]|/dev/ida/c[0-9]d[0-9])
-		disc_offered_devfs="$prefix"
-	;;
 	*)
-		disc_offered_devfs=$(echo "$bootfs_devfs" | sed "s:\(.*\)/.*:\1/disc:")
+		disc_offered_devfs="$prefix"
 	;;
 esac
 disc_offered=$(mapdevfs "$disc_offered_devfs")
@@ -111,15 +108,8 @@ case "$RET" in
 			db_get lilo-installer/manual_bootdev
 	
 			case "$RET" in
-				/dev/ide*|/dev/discs/*|/dev/scsi/*|/dev/md/*)
-					if [ -b "$RET" ]; then
-						bootdev="$(mapdevfs $RET)"
-						not_done=0
-						part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
-					fi
-				;;
 				/dev/[hs]d[a-z]*|/dev/md*)
-					bootdev=$RET;
+					bootdev="$(mapdevfs $RET)";
 					not_done=0
 					part=$(echo $bootdev | sed 's/.*\([0-9]\)/\1/')
 				;;
@@ -154,7 +144,7 @@ db_progress info lilo-installer/progress_active
 if (echo "${bootdev}" | grep -v '/c[0-9]d[0-9]$' | grep -q '[0-9]$') \
   && [ "${raid_boot}" = "no" ]; then
 	# Installing to a partition, check if it is already marked active
-	if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\(part\|[hs]d[a-z]\)${part} " | grep -q '\*'; then
+	if ! fdisk -l ${disc_offered_devfs} | grep "^/dev[a-z0-9/]\+\([hs]d[a-z]\)${part} " | grep -q '\*'; then
 		# partition is not marked active, offer to make it so
 		db_input high lilo-installer/activate-part || [ $? -eq 30 ]
 		if ! db_go; then
