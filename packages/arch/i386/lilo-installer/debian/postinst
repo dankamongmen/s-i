@@ -204,7 +204,7 @@ for arg in $(cat /proc/cmdline); do
 done
 IFS="$OLDIFS"
 
-defconsole=$(sed -e 's/.*console=/console=/' /proc/cmdline)
+defconsole=$(sed -e 's/.*console=\([^ ]*\).*/console=\1/' /proc/cmdline)
 if echo "$defconsole" | grep -q console=ttyS; then
 	PORT=$(echo "$defconsole" | sed -e 's%^console=ttyS%%' -e 's%,.*%%')
 	if echo "$defconsole" | grep -q ','; then
