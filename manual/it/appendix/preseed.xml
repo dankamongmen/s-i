@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 48636 -->
+<!-- original version: 49321 -->
 
 
 <!--
@@ -1586,7 +1586,14 @@ d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="le
 # Il nome del dispositivo deve essere dato nel tradizionale formato
 # non-devfs.
 # Per esempio, per usare il primo disco SCSI/SATA:
-d-i partman-auto/disk string /dev/sda</phrase>
+d-i partman-auto/disk string /dev/sda
+<!--
+# Note: If you want to use whatever disk is available, no matter
+# what its device name, comment the line above out. This will only work if
+# the system only has one disk.
+--># Nota: per usare qualsiasi disco disponibile, a prescindere dal
+nome del device specificato, commentare la riga precedente. Questo
+funziona solo se il sistema dispone di un solo disco.</phrase>
 <!--
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
@@ -2004,14 +2011,23 @@ aggiungere altri repository (anche locali).
 # Uncomment this if you don't want to use a network mirror.
 --># Togliere il commento alla prossima riga se non si vuole usare
 # un mirror.
-#d-i apt-setup/use_mirror boolean false
+#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
 <!--
 # Uncomment this to avoid adding security sources, or
 # add a hostname to use a different server than security.debian.org.
 --># Togliere il commento alla prossima riga per evitare l'inserimento
 # delle sorgenti per la sicurezza oppure per usare un server diverso da
 # security.debian.org.
-#d-i apt-setup/security_host string
+#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+<!--
+# Select which update services to use; define the mirrors to be used.
+# Values shown below are the normal defaults.
+--># Scegliere i servizi di aggiornamento da utilizzare; definire quali
+# mirror devono essere usati. I valori riportati in seguito sono quelli
+# predefiniti.
+#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
 
 <!--
 # Additional repositories, local[0-9] available
@@ -2132,7 +2148,7 @@ sulla riga di comando del kernel.
 # instead of the default gnome desktop.
 --># Quando è selezionato il task desktop, si può installare kde e xfce
 # al posto del desktop predefinito gnome.
-#tasksel tasksel/desktop multiselect kde-desktop, xfce-desktop</phrase><phrase condition="etch">
+#tasksel tasksel/desktop multiselect kde, xfce</phrase><phrase condition="etch">
 #tasksel tasksel/first multiselect standard, kde-desktop</phrase>
 
 <!--

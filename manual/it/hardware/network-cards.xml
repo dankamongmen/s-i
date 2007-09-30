@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43693 -->
+<!-- original version: 48981 -->
 
 
  <sect1 id="network-cards">
@@ -292,9 +292,9 @@ distinguish between them and it is not certain which driver will be loaded.
 If this happens to be the wrong one, the NIC may not work, or work badly.
 -->
 
-Esistono diverse schede di rete PCI che hanno lo stesso identificativo PCI
-ma che sono supportate da driver simili ma comunque diversi. Alcune schede
-funzionano con il driver <literal>tulip</literal>, altre con il driver
+Esistono diverse schede di rete PCI con lo stesso identificativo PCI
+ma supportate da driver simili ma comunque diversi. Alcune schede
+funzionano con il driver <literal>tulip</literal>, le altre con il driver
 <literal>dfme</literal>. Dato che hanno lo stesso identificativo il kernel
 non è in grado di distinguerle e non può scegliere con certezza quale
 driver deve essere caricato. Nel caso venga caricato il driver sbagliato
@@ -306,22 +306,35 @@ la scheda di rete potrebbe non funzionare o funzionare male.
 This is a common problem on Netra systems with a Davicom (DEC-Tulip
 compatible) NIC. In that case the <literal>tulip</literal> driver is
 probably the correct one.
-
-During the installation the solution is to switch to a shell and unload the
-wrong driver module using
-<userinput>modprobe -r <replaceable>module</replaceable></userinput> (or
-both, if they are both loaded). After that you can load the correct module
-using <userinput>modprobe <replaceable>module</replaceable></userinput>.
+You can prevent this issue by blacklisting the wrong driver module as
+described in <xref linkend="module-blacklist"/>.
 -->
 
 Questo è un problema molto comune sui sistemi Netra con una scheda di
 rete Davicom (compatibile con DEC-Tulip). In questo caso il driver
-corretto è quello <literal>tulip</literal>.
-Durante l'installazione si può attivare una shell, rimuovere il modulo
-con il driver errato usando <userinput>modprobe -r
+corretto è quello <literal>tulip</literal>. È possibile prevenire questo
+problema inserendo nella blacklist i moduli con i driver sbagliati come
+descritto in <xref linkend="module-blacklist"/>.
+
+</para><para>
+
+<!--
+An alternative solution during the installation is to switch to a shell
+and unload the wrong driver module using
+<userinput>modprobe -r <replaceable>module</replaceable></userinput> (or
+both, if they are both loaded). After that you can load the correct module
+using <userinput>modprobe <replaceable>module</replaceable></userinput>.
+Note that the wrong module may then still be loaded when the system is
+rebooted.
+-->
+
+Una soluzione alternativa è attivare una shell durante l'installazione,
+rimuovere il modulo con il driver errato usando <userinput>modprobe -r
 <replaceable>modulo</replaceable></userinput> (o entrambi, se sono
 stati caricati ambedue). Poi si può caricare il modulo corretto con
 <userinput>modprobe <replaceable>modulo</replaceable></userinput>.
+Notare che il modulo sbagliato potrebbe essere nuovamente caricato quando
+si riavvia il sistema.
 
 </para>
    </sect3>
@@ -338,7 +351,7 @@ blade systems.
 -->
 
 Il driver di rete <literal>cassini</literal> non funziona con i sistemi
-Sun B100 blade.
+blade Sun B100.
 
 </para>
    </sect3>
