@@ -299,6 +299,7 @@ if ! is_not_loaded ohci1394 || ! is_not_loaded firewire-ohci; then
 			sbp2module=firewire-sbp2
 		elif is_available sbp2; then
 			sbp2module=sbp2
+		fi
 		if [ -n "$sbp2module" ]; then
 			db_subst hw-detect/load_progress_step CARDNAME "FireWire CDROM support"
 			db_subst hw-detect/load_progress_step MODULE "$sbp2module"
