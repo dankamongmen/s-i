@@ -210,12 +210,15 @@ if echo "$defconsole" | grep -q console=ttyS; then
 	if echo "$defconsole" | grep -q ','; then
 		SPEED=$(echo "$defconsole" | sed -e 's%^console=ttyS[0-9]\+,%%' -e 's% .*%%')
 		SERIAL="$PORT,$SPEED"
+		db_subst lilo-installer/port-speed SPEED "${SPEED}"
+		db_metaget lilo-installer/port-speed Description
+		PORT_SPEED="$RET"
 	else
 		SERIAL="$PORT"
 	fi
 
 	db_subst lilo-installer/serial-console PORT "ttyS${PORT}"
-	db_subst lilo-installer/serial-console SPEED "${SPEED}"
+	db_subst lilo-installer/serial-console PORT_SPEED "${PORT_SPEED}"
 	db_input medium lilo-installer/serial-console || [ $? -eq 30 ]
 	if ! db_go; then
 		db_progress stop
