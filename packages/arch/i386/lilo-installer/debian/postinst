@@ -236,8 +236,16 @@ if [ "${SERIAL}" ]; then
 	fi
 fi
 
-if [ -e "/target/initrd.img" ]; then
-	INITRD="	initrd=/initrd.img"
+if db_get base-installer/kernel/linux/link_in_boot; then
+	if [ "$RET" = "true" ]; then
+		BOOT="/boot"
+	fi
+else
+	log "warning: Failed to get debconf answer 'base-installer/kernel/linux/link_in_boot'."
+fi
+
+if [ -e "/target${BOOT}/initrd.img" ]; then
+	INITRD="	initrd=${BOOT}/initrd.img"
 	OLD_INITRD="${INITRD}.old"
 fi
 
@@ -348,7 +356,7 @@ ${SERIAL_CONSOLE}
 #
 default=Linux
 
-image=/vmlinuz
+image=${BOOT}/vmlinuz
 	label=Linux
 	read-only
 #	restricted
@@ -356,7 +364,7 @@ image=/vmlinuz
 ${APPEND}
 ${INITRD}
 
-image=/vmlinuz.old
+image=${BOOT}/vmlinuz.old
 	label=LinuxOLD
 	read-only
 	optional
