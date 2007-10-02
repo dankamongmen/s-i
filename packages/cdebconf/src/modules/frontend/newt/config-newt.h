@@ -7,14 +7,14 @@
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
 
-#define create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
+#define cdebconf_newt_create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
-void newt_create_window(const int width, const int height, const char *title, const char *priority);
-
-int
-newt_get_text_height(const char *text, int win_width);
+void cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority);
 
 int
-newt_get_text_width(const char *text);
+cdebconf_newt_get_text_height(const char *text, int win_width);
+
+int
+cdebconf_newt_get_text_width(const char *text);
 
 #endif /* _CDEBCONF_CONFIG_NEWT_H_ */

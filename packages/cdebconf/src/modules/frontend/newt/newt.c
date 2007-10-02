@@ -162,7 +162,7 @@ help_text(struct frontend *obj)
 }
 
 void
-newt_create_window(const int width, const int height, const char *title, const char *priority)
+cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority)
 {
     static const char *sigils[][2] = {
         { "low",      "." },
@@ -192,7 +192,7 @@ newt_create_window(const int width, const int height, const char *title, const c
 }
 
 int
-newt_get_text_height(const char *text, int win_width)
+cdebconf_newt_get_text_height(const char *text, int win_width)
 {
     newtComponent textbox, f;
     int t_height;
@@ -220,14 +220,14 @@ newt_get_text_height(const char *text, int win_width)
 #endif
     t_height = newtTextboxGetNumLines(textbox);
     // This is needed so the textbox gets freed...ick
-    f = create_form(NULL);
+    f = cdebconf_newt_create_form(NULL);
     newtFormAddComponent(f, textbox);
     newtFormDestroy(f);
     return t_height;
 }
 
 int
-newt_get_text_width(const char *text)
+cdebconf_newt_get_text_width(const char *text)
 {
     int t_width = 0;
     const char *p = text;
@@ -257,7 +257,7 @@ min_window_height(struct question *q, int win_width)
 
     q_ext_text = q_get_extended_description(q);
     if (q_ext_text != NULL)
-        height = newt_get_text_height(q_ext_text, win_width) + 1;
+        height = cdebconf_newt_get_text_height(q_ext_text, win_width) + 1;
     if (strcmp(type, "multiselect") == 0 || strcmp(type, "select") == 0)
         height += 4; // at least three lines for choices + blank line
     else if (strcmp(type, "string") == 0 || strcmp(type, "password") == 0)
@@ -335,7 +335,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     win_width = width-7;
     /*  There are 5 characters for sigils, plus 4 for borders */
     strtruncate(obj->title, win_width-9);
-    t_height = newt_get_text_height(full_description, win_width);
+    t_height = cdebconf_newt_get_text_height(full_description, win_width);
     if (t_height+extra <= height-5)
         win_height = t_height+extra;
     else {
@@ -351,23 +351,23 @@ show_separate_window(struct frontend *obj, struct question *q)
     free(full_description);
     full_description = wrappedtext;
 #endif
-    t_width = newt_get_text_width(full_description);
-    t_width_descr = newt_get_text_width(descr);
+    t_width = cdebconf_newt_get_text_width(full_description);
+    t_width_descr = cdebconf_newt_get_text_width(descr);
     if (t_width_descr > t_width)
         t_width = t_width_descr;
-    t_width_buttons = 2*BUTTON_PADDING + newt_get_text_width(continue_text(obj)) + 2;
+    t_width_buttons = 2*BUTTON_PADDING + cdebconf_newt_get_text_width(continue_text(obj)) + 2;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
-        t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
+        t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
+    t_width_title = cdebconf_newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
-    newt_create_window(win_width, win_height, obj->title, q->priority);
-    form = create_form(NULL);
+    cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
+    form = cdebconf_newt_create_form(NULL);
     if (format_note)
         newtFormAddComponent(form, newtLabel((win_width - strwidth(descr))/2, 0, descr));
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
@@ -428,7 +428,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
     full_description = wrappedtext;
 #endif
     if (full_description != NULL)
-        t_height = newt_get_text_height(full_description, win_width);
+        t_height = cdebconf_newt_get_text_height(full_description, win_width);
     else
         t_height = 0;
     if (t_height + 6 <= height-5)
@@ -439,20 +439,20 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
         t_width_scroll = 2;
     }
     t_height = win_height - 6;
-    t_width = newt_get_text_width(full_description);
-    t_width_buttons = 2*BUTTON_PADDING + newt_get_text_width(continue_text(obj)) + 2;
+    t_width = cdebconf_newt_get_text_width(full_description);
+    t_width_buttons = 2*BUTTON_PADDING + cdebconf_newt_get_text_width(continue_text(obj)) + 2;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
-        t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
+        t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
+    t_width_title = cdebconf_newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
-    newt_create_window(win_width, win_height, obj->title, q->priority);
-    form = create_form(NULL);
+    cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
+    form = cdebconf_newt_create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, tflags);
     assert(textbox);
     if (full_description != NULL)
@@ -526,7 +526,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
     answer = malloc(sizeof(char) * count);
     sel_height = count;
-    form = create_form(NULL);
+    form = cdebconf_newt_create_form(NULL);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -535,11 +535,11 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     full_description = wrappedtext;
 #endif
     sel_width = strlongest(choices_trans, count);
-    t_width = newt_get_text_width(full_description);
-    t_width_buttons = 2*BUTTON_PADDING + newt_get_text_width(continue_text(obj)) + 2;
+    t_width = cdebconf_newt_get_text_width(full_description);
+    t_width_buttons = 2*BUTTON_PADDING + cdebconf_newt_get_text_width(continue_text(obj)) + 2;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
-        t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
+        t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
     //  Truncate too wide items
@@ -560,7 +560,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
-    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
+    t_width_title = cdebconf_newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     if (show_ext_desc && full_description) {
@@ -578,7 +578,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
         win_height = height-5;
         sel_height = win_height - t_height - 5;
     }
-    newt_create_window(win_width, win_height, obj->title, q->priority);
+    cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
     if (count > sel_height) {
         scrollbar = newtVerticalScrollbar((win_width+sel_width+5)/2, 1+t_height+1, sel_height,
                 NEWT_COLORSET_WINDOW, NEWT_COLORSET_ACTCHECKBOX);
@@ -586,7 +586,7 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     }
     else
         scrollbar = NULL;
-    sform = create_form(scrollbar);
+    sform = cdebconf_newt_create_form(scrollbar);
     newtFormSetBackground(sform, NEWT_COLORSET_CHECKBOX);
     newtFormSetHeight(sform, sel_height);
     newtFormSetWidth(sform, sel_width+5);
@@ -679,7 +679,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         return DC_NOTOK;
 
     sel_height = count;
-    form = create_form(NULL);
+    form = cdebconf_newt_create_form(NULL);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
@@ -688,11 +688,11 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     full_description = wrappedtext;
 #endif
     sel_width = strlongest(choices_trans, count);
-    t_width = newt_get_text_width(full_description);
+    t_width = cdebconf_newt_get_text_width(full_description);
     t_width_buttons = 2*BUTTON_PADDING;
     if (obj->methods.can_go_back(obj, q))
         //  Add an interspace
-        t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
+        t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
     //  Truncate too wide items
@@ -713,7 +713,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         t_width = sel_width;
     if (win_width > t_width + 8)
         win_width = t_width + 8;
-    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
+    t_width_title = cdebconf_newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
     if (show_ext_desc && full_description) {
@@ -733,7 +733,7 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     }
     if (count > sel_height)
         listflags |= NEWT_FLAG_SCROLL;
-    newt_create_window(win_width, win_height, obj->title, q->priority);
+    cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
     listbox = newtListbox((win_width-sel_width-3)/2, 1+t_height+1, sel_height, listflags);
     defval = (char *)question_getvalue(q, "");
     for (i = 0; i < count; i++) {
@@ -805,7 +805,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
     full_description = wrappedtext;
 #endif
     if (full_description != NULL)
-        t_height = newt_get_text_height(full_description, win_width);
+        t_height = cdebconf_newt_get_text_height(full_description, win_width);
     else
         t_height = 0;
     if (t_height + 4 <= height-5)
@@ -816,23 +816,23 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
         t_width_scroll = 2;
     }
     t_height = win_height - 4;
-    t_width = newt_get_text_width(full_description);
+    t_width = cdebconf_newt_get_text_width(full_description);
     t_width_buttons = 2*BUTTON_PADDING;
-    t_width_buttons += newt_get_text_width(yes_text(obj)) + 3;
-    t_width_buttons += newt_get_text_width(no_text(obj)) + 3;
+    t_width_buttons += cdebconf_newt_get_text_width(yes_text(obj)) + 3;
+    t_width_buttons += cdebconf_newt_get_text_width(no_text(obj)) + 3;
     if (obj->methods.can_go_back(obj, q))
         t_width_buttons += 3;
     if (obj->methods.can_go_back(obj, q))
-        t_width_buttons += newt_get_text_width(goback_text(obj)) + 3;
+        t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
-    t_width_title = newt_get_text_width(obj->title) + TITLE_PADDING;
+    t_width_title = cdebconf_newt_get_text_width(obj->title) + TITLE_PADDING;
     if (t_width_title > win_width)
         win_width = t_width_title;
-    newt_create_window(win_width, win_height, obj->title, q->priority);
-    form = create_form(NULL);
+    cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
+    form = cdebconf_newt_create_form(NULL);
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
     assert(textbox);
     if (full_description != NULL)
@@ -1169,7 +1169,7 @@ newt_make_progress_bar(struct frontend *obj, const char *info)
     else
         data->scale_info = strdup(info);
     if (info)
-        text_height = newt_get_text_height(info, win_width);
+        text_height = cdebconf_newt_get_text_height(info, win_width);
     else
         text_height = 0;
     /* Minimal height set to 2 to prevent box flashing */
@@ -1196,7 +1196,7 @@ newt_make_progress_bar(struct frontend *obj, const char *info)
         data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
         data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, text_height, flags);
         data->scale_textbox_height = text_height;
-        data->scale_form = create_form(NULL);
+        data->scale_form = cdebconf_newt_create_form(NULL);
         newtFormAddComponents(data->scale_form, data->scale_bar, data->scale_textbox, NULL);
         if (obj->methods.can_cancel_progress(obj)) {
             data->scale_cancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1, win_height-2, cancel_text(obj));
