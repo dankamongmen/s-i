@@ -956,6 +956,8 @@ default_disk_label () {
 		    echo mac;;
 		ps3)
 		    echo msdos;;
+		cell)
+		    echo msdos;;
 		*)
 		    echo UNKNOWN;;
 	    esac;;
