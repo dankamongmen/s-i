@@ -228,7 +228,7 @@ human2longint () {
 	frac=${human#$int}
 	frac="${frac#[.,]}0000" # to be sure there are at least 4 digits
 	frac=${frac%${frac#????}} # only the first 4 digits of $frac
-	longint=$(($int * 10000 + $frac))
+	longint=$(expr "$int" \* 10000 + "$frac")
 	case $suffix in
 	k|K)
 		longint=${longint%?}
