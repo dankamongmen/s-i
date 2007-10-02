@@ -134,7 +134,7 @@ copy_byte(int in, int out)
 }
 
 int 
-newt_handler_entropy_text(struct frontend *obj, struct question *q)
+cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
 {
     void *newt;
     newtComponent form;
