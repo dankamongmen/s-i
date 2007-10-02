@@ -59,11 +59,20 @@ struct plugin *plugin_new(const char *frontend, const char *filename)
         return NULL;
     }
 
-    symbollen = strlen(frontend) + 9 + strlen(plugin->name) + 1;
+    symbollen = strlen(frontend) + 18 + strlen(plugin->name) + 1;
     symbol = malloc(symbollen);
-    snprintf(symbol, symbollen, "%s_handler_%s", frontend, typesymbol);
-
+    snprintf(symbol, symbollen, "cdebconf_%s_handler_%s", frontend,
+             typesymbol);
     plugin->handler = dlsym(plugin->module, symbol);
+    free(symbol);
+    if (plugin->handler == NULL) {
+        /* Let's try with the old style symbol name. */
+        symbollen = strlen(frontend) + 9 + strlen(plugin->name) + 1;
+        symbol = malloc(symbollen);
+        snprintf(symbol, symbollen, "%s_handler_%s", frontend, typesymbol);
+        plugin->handler = dlsym(plugin->module, symbol);
+        free(symbol);
+    }
     if (plugin->handler == NULL) {
         INFO(INFO_WARN, "Malformed plugin module %s", filename);
         plugin_delete(plugin);
