@@ -31,6 +31,7 @@ static struct map map_machine[] = {
 
 static struct map map_platform[] = {
 	{ "PS3", "ps3" },
+	{ "Cell", "cell" },
 	{ NULL, NULL }
 };
 
