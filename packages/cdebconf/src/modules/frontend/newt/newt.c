@@ -113,7 +113,7 @@ typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
 static void newt_progress_stop(struct frontend *obj);
 
-#include "config-newt.h"
+#include "cdebconf_newt.h"
 
 /*  Horizontal offset between buttons and text box */
 #define TEXT_PADDING 1

@@ -1,6 +1,6 @@
 
-#ifndef _CDEBCONF_CONFIG_NEWT_H_
-#define _CDEBCONF_CONFIG_NEWT_H_
+#ifndef _CDEBCONF_NEWT_H_
+#define _CDEBCONF_NEWT_H_
 
 /*  Horizontal offset between buttons and text box */
 #define TEXT_PADDING 1
@@ -17,4 +17,4 @@ cdebconf_newt_get_text_height(const char *text, int win_width);
 int
 cdebconf_newt_get_text_width(const char *text);
 
-#endif /* _CDEBCONF_CONFIG_NEWT_H_ */
+#endif /* _CDEBCONF_NEWT_H_ */
