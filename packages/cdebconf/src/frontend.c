@@ -172,7 +172,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 		snprintf(tmp, sizeof(tmp), "%s/%s.so", modpath, modname);
 		//Frontend switching works when dlopening with RTLD_LAZY
 		//The real reason why it segfaultes with RTLD_NOW has yet to be found
-		if ((dlh = dlopen(tmp, RTLD_LAZY)) == NULL)
+		if ((dlh = dlopen(tmp, RTLD_NOW | RTLD_GLOBAL)) == NULL)
 			DIE("Cannot load frontend module %s: %s", tmp, dlerror());
 
 		if ((mod = (struct frontend_module *)dlsym(dlh, "debconf_frontend_module")) == NULL)
