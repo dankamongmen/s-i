@@ -156,7 +156,7 @@ class ProvidedSymbol(Symbol):
     def linker_name(self):
         if self.default_version or self.version == "Base":
             return self.name
-        return ["%s@%s" % (self.name, self.version)]
+        return "%s@%s" % (self.name, self.version)
 
 # Return a set of symbols provided by a library
 def provided_symbols(obj):
