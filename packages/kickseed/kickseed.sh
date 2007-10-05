@@ -181,11 +181,8 @@ kickseed () {
 				# TODO: temporary hack to make at least the
 				# standard desktop work
 				case $group in
-					Ubuntu\ Standard)
-						echo 'task:ubuntu-standard' >> "$SPOOL/parse/$SECTION.section"
-						;;
-					Kubuntu\ Standard)
-						echo 'task:kubuntu-standard' >> "$SPOOL/parse/$SECTION.section"
+					*\ Standard)
+						echo 'task:standard' >> "$SPOOL/parse/$SECTION.section"
 						;;
 					Ubuntu\ Desktop)
 						echo 'task:ubuntu-desktop' >> "$SPOOL/parse/$SECTION.section"
