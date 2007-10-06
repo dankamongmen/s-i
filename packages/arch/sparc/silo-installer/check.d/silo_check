@@ -68,17 +68,17 @@ silo_boot_fs_check() {
 	esac
 }
 
-silo_disk_type_check() {
+silo_label_type_check() {
 	if [ "$boot_dev" ]; then
 		cd "$boot_dev"
-		open_dialog GET_DISK_TYPE
-		read_line disk_type
+		open_dialog GET_LABEL_TYPE
+		read_line label_type
 		close_dialog
-		# parted-server tells us that disk_type is loop when opening a raid
+		# parted-server tells us that label_type is loop when opening a raid
 		# device. We don't fail for that now.
-		if [ "$disk_type" != "sun" ] && [ "$disk_type" != "loop" ]; then
+		if [ "$label_type" != "sun" ] && [ "$label_type" != "loop" ]; then
 			db_subst silo-installer/silo_bad_disk SILO_PART "$boot_name"
-			db_subst silo-installer/silo_bad_disk SILO_DISK "$disk_type"
+			db_subst silo-installer/silo_bad_disk SILO_DISK "$label_type"
 			db_input critical silo-installer/silo_bad_disk || true
 			db_go || exit 1
 		fi
@@ -87,7 +87,7 @@ silo_disk_type_check() {
 
 check_sparc
 eval "$(boot_part_params)"
-silo_disk_type_check
+silo_label_type_check
 silo_boot_fs_check
 eval "$(prom_major_version)"
 [ -n "$prom_major" ] || exit 0
