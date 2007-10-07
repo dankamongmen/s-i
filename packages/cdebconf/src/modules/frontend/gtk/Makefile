@@ -38,7 +38,8 @@ MODCFLAGS += -Werror
 # warn about undefined preprocessor identifiers
 MODCFLAGS += -Wundef
 # warn about casting of pointers to increased alignment requirements
-MODCFLAGS += -Wcast-align
+# (XXX: can't be used due to broken GTK_PROGRESS_BAR)
+#MODCFLAGS += -Wcast-align
 # make string constants const
 MODCFLAGS += -Wwrite-strings
 # warn about comparisons between signed and unsigned values
