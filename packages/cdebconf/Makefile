@@ -19,12 +19,12 @@ install:
 	$(MAKE) -C man $@
 
 clean: 
-	-rm -f *-stamp
-	-$(MAKE) -C src $@
+	rm -f *-stamp
+	[ ! -f globalmakeflags ] || $(MAKE) -C src $@
 
 distclean: clean
-	-rm -f config.status config.log config.cache globalmakeflags
-	-rm -rf autom4te.cache
-	-rm -f src/cdebconf.conf-dist src/Makefile src/config.h man/Makefile
+	rm -f config.status config.log config.cache globalmakeflags
+	rm -rf autom4te.cache
+	rm -f src/cdebconf.conf-dist src/Makefile src/config.h man/Makefile
 
 .PHONY: cdebconf clean distclean
