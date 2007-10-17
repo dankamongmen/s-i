@@ -15,7 +15,7 @@ error () {
 	exit 1
 }
 
-# Function to implement the behaviour documented in README.pressed_fetch
+# Function to implement the behaviour documented in README.preseed_fetch
 make_absolute_url() {
 	url="$1"
 	last="$2"
