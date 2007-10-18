@@ -184,7 +184,7 @@ db_progress INFO hw-detect/detect_progress_step
 # TODO: Can possibly be removed if udev will load yenta_socket automatically
 # Load yenta_socket, if hardware is available, for Cardbus cards.
 if [ -d /sys/bus/pci/devices ] && \
-	grep -q 0x060700 /sys/bus/pci/devices/*/class && \
+	grep -q 0x060700 /sys/bus/pci/devices/*/class 2>/dev/null && \
 	! grep -q ^yenta_socket /proc/modules; then
 	db_subst hw-detect/load_progress_step CARDNAME "Cardbus bridge"
 	db_subst hw-detect/load_progress_step MODULE "yenta_socket"
