@@ -844,9 +844,8 @@ same as <classname>mirror/suite</classname>.
 
 <informalexample role="example"><screen>
 # If you select ftp, the mirror/country string does not need to be set.
-#d-i mirror/protocol string ftp<phrase condition="etch">
-d-i mirror/country string enter information manually</phrase><phrase condition="lenny">
-d-i mirror/country string manual</phrase>
+#d-i mirror/protocol string ftp
+d-i mirror/country string manual
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -886,17 +885,13 @@ correct one will be selected before using preseeding.
 #d-i partman-auto/init_automatically_partition \
 #      select Guided - use the largest continuous free space
 
-<phrase condition="etch"># Alternatively, you can specify a disk to partition. The device name
-# can be given in either devfs or traditional non-devfs format.
-# For example, to use the first disk:
-d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
 # Alternatively, you can specify a disk to partition. The device name must
 # be given in traditional non-devfs format.
 # For example, to use the first SCSI/SATA hard disk:
 d-i partman-auto/disk string /dev/sda
 # Note: If you want to use whatever disk is available, no matter
 # what its device name, comment the line above out. This will only work if
-# the system only has one disk.</phrase>
+# the system only has one disk.
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
 d-i partman-auto/method string lvm
@@ -1039,13 +1034,12 @@ d-i clock-setup/utc boolean true
 
 # You may set this to any valid setting for $TZ; see the contents of
 # /usr/share/zoneinfo/ for valid values.
-d-i time/zone string US/Eastern<phrase condition="lenny">
+d-i time/zone string US/Eastern
 
 # Controls whether to use NTP to set the clock during the install
 d-i clock-setup/ntp boolean true
 # NTP server to use. The default is almost always fine here.
 #d-i clock-setup/ntp-server ntp.example.com
-</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1091,11 +1085,11 @@ MD5 hash allows for brute force attacks.
 # or encrypted using an MD5 hash.
 #d-i passwd/user-password-crypted password [MD5 hash]
 # Create the first user with the specified UID instead of the default.
-#d-i passwd/user-uid string 1010<phrase condition="lenny">
+#d-i passwd/user-uid string 1010
 
 # The user account will be added to some standard initial groups. To
 # override that, use this.
-#d-i passwd/user-default-groups string audio cdrom video</phrase>
+#d-i passwd/user-default-groups string audio cdrom video
 </screen></informalexample>
 
 <para>
@@ -1130,11 +1124,11 @@ installation. The only questions asked concern the installation of the kernel.
 
 <informalexample role="example"><screen>
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
 # The kernel image (meta) package to be installed; "none" can be used if no
 # kernel is to be installed.
-#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1154,15 +1148,12 @@ earlier questions. You can optionally add other (local) repositories.
 #d-i apt-setup/non-free boolean true
 #d-i apt-setup/contrib boolean true
 # Uncomment this if you don't want to use a network mirror.
-#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
-# Uncomment this to avoid adding security sources, or
-# add a hostname to use a different server than security.debian.org.
-#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+#d-i apt-setup/use_mirror boolean false
 # Select which update services to use; define the mirrors to be used.
 # Values shown below are the normal defaults.
 #d-i apt-setup/services-select multi-select security, volatile
 #d-i apt-setup/security_host string security.debian.org
-#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
+#d-i apt-setup/volatile_host string volatile.debian.org
 
 # Additional repositories, local[0-9] available
 #d-i apt-setup/local0/repository string \
@@ -1245,11 +1236,10 @@ to be used easily on the kernel command line as well.
 </para>
 
 <informalexample role="example"><screen>
-#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+#tasksel tasksel/first multiselect standard, web-server
 # If the desktop task is selected, install the kde and xfce desktops
 # instead of the default gnome desktop.
-#tasksel tasksel/desktop multiselect kde, xfce</phrase><phrase condition="etch">
-#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
+#tasksel tasksel/desktop multiselect kde, xfce
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
@@ -1269,10 +1259,10 @@ to be used easily on the kernel command line as well.
 <informalexample role="example"><screen>
 # Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
-#d-i grub-installer/skip boolean true<phrase condition="lenny">
+#d-i grub-installer/skip boolean true
 # To also skip installing lilo, and install no bootloader, uncomment this
 # too:
-#d-i lilo-installer/skip boolean true</phrase>
+#d-i lilo-installer/skip boolean true
 
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.
