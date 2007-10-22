@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 untranslated -->
+<!-- original version: 49850 untranslated -->
 
  <sect1 id="linux-upgrade">
  <title>Installing &debian; from a Unix/Linux System</title>
@@ -26,6 +26,19 @@ otherwise doesn't play friendly with various boot or installation
 media.
 
 </para>
+
+<note><para>
+
+As this is a mostly manual procedure, you should bear in mind that you
+will need to do a lot of basic configuration of the system yourself,
+which will also require more knowledge of Debian and of Linux in general
+than performing a regular installation. You cannot expect this procedure
+to result in a system that is identical to a system from a regular
+installation. You should also keep in mind that this procedure only
+gives the basic steps to set up a system. Additional installation and/or
+configuration steps may be needed.
+
+</para></note>
 
   <sect2>
   <title>Getting Started</title>
@@ -201,6 +214,49 @@ compatible with the Debian base system, for example:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+   <title>Create device files</title>
+<para>
+
+At this point <filename>/dev/</filename> only contains very basic device
+files. For the next steps of the installation additional device files may
+be needed. There are different ways to go about this and which method you
+should use depends on the host system you are using for the installation,
+on whether you intend to use a modular kernel or not, and on whether you
+intend to use dynamic (e.g. using <classname>udev</classname>) or static
+device files for the new system.
+
+</para><para>
+
+A few of the available options are:
+
+<itemizedlist>
+<listitem><para>
+
+create a default set of static device files using
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+manually create only specific device files using <command>MAKEDEV</command>
+
+</para></listitem>
+<listitem><para>
+
+bind mount /dev from your host system on top of /dev in the target system;
+note that the postinst scripts of some packages may try to create device
+files, so this option should only be used with care
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <title>Mount Partitions</title>
@@ -515,6 +571,12 @@ The second command will install <command>grub</command> (in this case in
 the MBR of <literal>hda</literal>). The last command will create a sane
 and working <filename>/boot/grub/menu.lst</filename>.
 
+</para><para>
+
+Note that this assumes that a <filename>/dev/hda</filename> device file has
+been created. There are alternative methods to install <command>grub</command>,
+but those are outside the scope of this appendix.
+
 </para><para arch="x86">
 
 Here is a basic <filename>/etc/lilo.conf</filename> as an example:
@@ -526,6 +588,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
