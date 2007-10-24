@@ -33,6 +33,8 @@ saveline () {
 valid () {
 	line="$1"
 
+	[ "${line%%:*}" = "deb cdrom" ] || return 0
+
 	tmp=$($chroot $ROOT tempfile)
 	echo "$line" > $ROOT$tmp
 	
