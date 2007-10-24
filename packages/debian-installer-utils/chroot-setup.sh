@@ -1,4 +1,3 @@
-#!/bin/sh -e
 # Setup for using apt to install packages in /target.
 
 mountpoints () {
