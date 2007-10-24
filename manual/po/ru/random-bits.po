@@ -7,15 +7,14 @@ msgstr ""
 "Project-Id-Version: random-bits\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2007-10-22 00:09+0000\n"
-"PO-Revision-Date: 2007-07-10 21:31+0400\n"
+"PO-Revision-Date: 2007-10-24 21:05+0400\n"
 "Last-Translator: D-R L10N Team <debian-l10n-russian@lists.debian.org>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Tag: title
 #: random-bits.xml:4
@@ -814,6 +813,14 @@ msgid ""
 "the basic steps to set up a system. Additional installation and/or "
 "configuration steps may be needed."
 msgstr ""
+"Так как это, по большей части, ручная процедура, вы должны помнить, что вам "
+"придётся сделать множество начальных настроек системы самостоятельно, "
+"которые также требуют больше знаний о Debian и Linux в общем, чем при "
+"выполнение обычной установки. Вы не должны ожидать, что эта процедура "
+"настроит вам систему так, как это делается при обычной установке. "
+"Также вы должны помнить,что эта процедура выполняется только основные "
+"этапы настройки системы. Может потребоваться дополнительная установка "
+"и/или настройка."
 
 #. Tag: title
 #: random-bits.xml:373
@@ -1069,7 +1076,7 @@ msgstr "# export TERM=<replaceable>xterm-color</replaceable>"
 #: random-bits.xml:525
 #, no-c-format
 msgid "Create device files"
-msgstr ""
+msgstr "Создание файлов устройств"
 
 #. Tag: para
 #: random-bits.xml:526
@@ -1083,18 +1090,26 @@ msgid ""
 "to use dynamic (e.g. using <classname>udev</classname>) or static device "
 "files for the new system."
 msgstr ""
+"В данный момент <filename>/dev/</filename> содержит только основные "
+"файлы устройств. Для следующих этапов установки могут потребоваться "
+"дополнительные файлы устройств. Есть несколько способов создать их, "
+"но какой из них лучший зависит от системы, с которой производится "
+"установка, будете ли вы использовать модульное ядро или нет, и будут "
+"ли использоваться динамические (например, с помощью "
+"<classname>udev</classname>) статические файлы устройств в новой "
+"системе."
 
 #. Tag: para
 #: random-bits.xml:536
 #, no-c-format
 msgid "A few of the available options are:"
-msgstr ""
+msgstr "Некоторые доступные параметры:"
 
 #. Tag: para
 #: random-bits.xml:541
 #, no-c-format
 msgid "create a default set of static device files using"
-msgstr ""
+msgstr "создание используемого по умолчанию набора статических файлов устройств"
 
 #. Tag: screen
 #: random-bits.xml:544
@@ -1103,13 +1118,16 @@ msgid ""
 "# cd /dev\n"
 "# MAKEDEV generic"
 msgstr ""
+"# cd /dev\n"
+"# MAKEDEV generic"
 
 #. Tag: para
 #: random-bits.xml:547
 #, no-c-format
-msgid ""
-"manually create only specific device files using <command>MAKEDEV</command>"
+msgid "manually create only specific device files using <command>MAKEDEV</command>"
 msgstr ""
+"создание вручную только выбранных файлов устройств с помощью "
+"<command>MAKEDEV</command>"
 
 #. Tag: para
 #: random-bits.xml:552
@@ -1119,6 +1137,10 @@ msgid ""
 "note that the postinst scripts of some packages may try to create device "
 "files, so this option should only be used with care"
 msgstr ""
+"привязать смонтированный /dev имеющейся системы поверх /dev в "
+"устанавливаемой системе; заметим, что сценарии postinst некоторых пакетов "
+"могут попытаться создать файлы устройств, поэтому данный параметр нужно "
+"использовать осторожно"
 
 #. Tag: title
 #: random-bits.xml:565
@@ -1634,6 +1656,9 @@ msgid ""
 "been created. There are alternative methods to install <command>grub</"
 "command>, but those are outside the scope of this appendix."
 msgstr ""
+"Заметим, что это предполагает, что файловое устройство "
+"<filename>/dev/hda</filename> было создано ранее. Есть другие методы "
+"установки <command>grub</command>, но они здесь не описаны."
 
 #. Tag: para
 #: random-bits.xml:775
@@ -1643,7 +1668,7 @@ msgstr "Вот простой <filename>/etc/lilo.conf</filename> в качес�
 
 #. Tag: screen
 #: random-bits.xml:779
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "boot=/dev/<replaceable>hda6</replaceable>\n"
 "root=/dev/<replaceable>hda6</replaceable>\n"
@@ -1660,6 +1685,7 @@ msgstr ""
 "delay=20\n"
 "lba32\n"
 "image=/vmlinuz\n"
+"initrd=/initrd.img\n"
 "label=Debian"
 
 #. Tag: para
@@ -2051,10 +2077,8 @@ msgstr "Настроить сеть автоматически с помощью
 #. Tag: para
 #: random-bits.xml:991
 #, no-c-format
-msgid ""
-"IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
-msgstr ""
-"IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgid "IP address: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
+msgstr "IP-адрес: <userinput><replaceable>192.168.0.1</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:996
@@ -2062,8 +2086,7 @@ msgstr ""
 msgid ""
 "Point-to-point address: <userinput><replaceable>192.168.0.2</replaceable></"
 "userinput>"
-msgstr ""
-"Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
+msgstr "Адрес PPP: <userinput><replaceable>192.168.0.2</replaceable></userinput>"
 
 #. Tag: para
 #: random-bits.xml:1002
@@ -2308,7 +2331,7 @@ msgstr ""
 
 #. Tag: para
 #: random-bits.xml:1160
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "It is also available as a special <quote>mini</quote> ISO image<footnote id="
 "\"gtk-miniiso\"> <para> The mini ISO image can be downloaded from a Debian "
@@ -2320,16 +2343,15 @@ msgid ""
 msgstr ""
 "Также доступен специальный <quote>mini</quote> ISO образ<footnote id=\"gtk-"
 "miniiso\"> <para> Образ mini ISO можно скачать с сервера-зеркала Debian "
-"действуя по описанию из <xref linkend=\"downloading-files\"/>. Ищите <phrase "
-"condition=\"etch\"><filename>gtk-miniiso</filename></phrase> <phrase "
-"condition=\"lenny\"><filename>netboot/gtk/mini.iso</filename></phrase>. </"
-"para> </footnote>, который, в основном, полезен для тестов; в этом случае "
+"действуя по описанию из <xref linkend=\"downloading-files\"/>. Ищите "
+"<filename>netboot/gtk/mini.iso</filename>. </para> </footnote>, который, "
+"в основном, полезен для тестов; в этом случае "
 "образ загружается при вводе <userinput>install</userinput>. При загрузке по "
 "сети графическая версия программы установки недоступна."
 
 #. Tag: para
 #: random-bits.xml:1175
-#, fuzzy, no-c-format
+#, no-c-format
 msgid ""
 "For &arch-title;, currently only an experimental <quote>mini</quote> ISO "
 "image is available<footnote id=\"gtk-miniiso\"> <para> The mini ISO image "
@@ -2341,9 +2363,8 @@ msgstr ""
 "Для &arch-title; в данный момент доступен только экспериментальный "
 "<quote>mini</quote> ISO образ<footnote id=\"gtk-miniiso\"> <para> Образ mini "
 "ISO можно скачать с сервера-зеркала Debian действуя по описанию из <xref "
-"linkend=\"downloading-files\"/>. Ищите <phrase condition=\"etch"
-"\"><filename>gtk-miniiso</filename></phrase> <phrase condition=\"lenny"
-"\"><filename>netboot/gtk/mini.iso</filename></phrase>. </para> </footnote>. "
+"linkend=\"downloading-files\"/>. Ищите "
+"<filename>netboot/gtk/mini.iso</filename>. </para> </footnote>. "
 "Он должен работать почти на всех системах PowerPC с графической картой ATI, "
 "но не факт, что будет работать на других системах."
 
@@ -2543,3 +2564,4 @@ msgstr ""
 #, no-c-format
 msgid "# chroot /target"
 msgstr "# chroot /target"
+
