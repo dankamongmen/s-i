@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 49321 -->
+<!-- original version: 49849 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -891,9 +891,8 @@ der gleiche wie der für <classname>mirror/suite</classname>.
 
 <informalexample role="example"><screen>
 # Wenn Sie FTP wählen, muss mirror/country nicht gesetzt werden.
-#d-i mirror/protocol string ftp<phrase condition="etch">
-d-i mirror/country string enter information manually</phrase><phrase condition="lenny">
-d-i mirror/country string manual</phrase>
+#d-i mirror/protocol string ftp
+d-i mirror/country string manual
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -940,11 +939,6 @@ Voreinstellung nutzen.
 #d-i partman-auto/init_automatically_partition \
 #      select Geführt - den größten freien Speicherbereich benutzen
 
-<phrase condition="etch"># Alternativ können Sie eine Festplatte angeben, die partitioniert
-# werden soll. Der Gerätename kann entweder als devfs-Bezeichnung
-# oder im traditionellen Format angegeben werden. 
-# Um z.B. die erste Platte zu nutzen:
-d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="lenny">
 # Alternativ können Sie eine Festplatte angeben, die partitioniert
 # werden soll. Der Gerätename muss im traditionellen Format (nicht devfs)
 # angegeben werden.
@@ -952,7 +946,7 @@ d-i partman-auto/disk string /dev/discs/disc0/disc</phrase><phrase condition="le
 d-i partman-auto/disk string /dev/sda
 # Hinweis: Wenn Sie einfach die einzige Festplatte nutzen möchten, die verfügbar
 # ist, unabhängig von ihrem Gerätenamen, kommentieren Sie obige Zeile aus. Das
-# funktioniert aber nur, wenn das System lediglich eine Festplatte enthält.</phrase>
+# funktioniert aber nur, wenn das System lediglich eine Festplatte enthält.
 # Zusätzlich müssen Sie angeben, welche Partitionierungsmethode genutzt werden
 # soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
 d-i partman-auto/method string lvm
@@ -1102,7 +1096,7 @@ d-i clock-setup/utc boolean true
 
 # Sie können dies auf jeden gültigen Wert für $TZ setzen; siehe
 # /usr/share/zoneinfo/ für passende Werte.
-d-i time/zone string Europe/Berlin<phrase condition="lenny">
+d-i time/zone string Europe/Berlin
 
 # Legt fest, ob NTP genutzt werden soll, um während der Installation die Uhr
 # zu stellen.
@@ -1110,7 +1104,6 @@ d-i clock-setup/ntp boolean true
 # NTP-Server, der genutz werden soll. Der Standard sollte in den allermeisten
 # Fällen funktionieren.
 #d-i clock-setup/ntp-server ntp.example.com
-</phrase>
 </screen></informalexample>
 
   </sect2>
@@ -1159,11 +1152,11 @@ die Gefahr von Brute-Force-Attacken.
 #d-i passwd/user-password-crypted password [MD5 hash]
 # Den ersten Benutzer mit der angegebenen Benutzer-ID (UID) erstellen
 # statt mit der Standard-UID.
-#d-i passwd/user-uid string 1010<phrase condition="lenny">
+#d-i passwd/user-uid string 1010
 
 # Der Benutzerzugang wird zu einigen Standard-Benutzergruppen hinzugefügt.
 # Um dies zu überschreiben, benutzen Sie:
-#d-i passwd/user-default-groups string audio cdrom video</phrase>
+#d-i passwd/user-default-groups string audio cdrom video
 
 </screen></informalexample>
 
@@ -1201,11 +1194,11 @@ Kernels.
 <informalexample role="example"><screen>
 # Den initramfs-Generator wählen, der zur Erstellung der initrd für
 # 2.6-Kernels genutzt werden soll.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird<phrase condition="lenny">
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
 # Das Kernel-Image- (Meta-) Paket, das installiert werden soll; "none" kann
 # verwendet werden, wenn kein Kernel installiert werden soll.
-#d-i base-installer/kernel/image linux-image-2.6-486</phrase>
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1228,17 +1221,13 @@ weitere (lokale) Paketquellen (Repositories) hinzufügen.
 #d-i apt-setup/contrib boolean true
 # Entfernen Sie das folgende Kommentarzeichen, wenn Sie keinen Netzwerk-
 # Spiegel verwenden möchten.
-#d-i apt-setup/use_mirror boolean false<phrase condition="etch">
-# Entfernen Sie hier das Kommentarzeichen, um das Hinzufügen von Paketquellen
-# für Sicherheitsaktualisierungen zu vermeiden oder fügen Sie einen Host-Namen
-# hinzu, um einen anderen Server anstatt von security.debian.org zu verwenden.
-#d-i apt-setup/security_host string</phrase><phrase condition="lenny">
+#d-i apt-setup/use_mirror boolean false
 # Wählen Sie, welche Update-Dienste genutzt werden sollen; legen Sie die
 # zu verwendenden Spiegelserver fest. Die hier angegebenen Werte sind die
 # normalen Standardwerte.
 #d-i apt-setup/services-select multi-select security, volatile
 #d-i apt-setup/security_host string security.debian.org
-#d-i apt-setup/volatile_host string volatile.debian.org</phrase>
+#d-i apt-setup/volatile_host string volatile.debian.org
 
 # Zusätzliche Paketquellen, "local[0-9]" verfügbar
 #d-i apt-setup/local0/repository string \
@@ -1324,11 +1313,10 @@ verwenden können.
 </para>
 
 <informalexample role="example"><screen>
-#tasksel tasksel/first multiselect standard, web-server<phrase condition="lenny">
+#tasksel tasksel/first multiselect standard, web-server
 # Wenn die Programmgruppe "desktop" (Arbeitsplatz-System) ausgewählt ist,
 # den KDE- und XFCE-Desktop statt dem Standard-Gnome-Desktop installieren.
-#tasksel tasksel/desktop multiselect kde, xfce</phrase><phrase condition="etch">
-#tasksel tasksel/first multiselect standard, kde-desktop</phrase>
+#tasksel tasksel/desktop multiselect kde, xfce
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
@@ -1349,10 +1337,10 @@ verwenden können.
 <informalexample role="example"><screen>
 # Grub ist (für x86) der Standard-Bootloader. Wenn Sie stattdessen lilo
 # installieren möchten, entfernen Sie hier das Kommentarzeichen:
-#d-i grub-installer/skip boolean true<phrase condition="lenny">
+#d-i grub-installer/skip boolean true
 # Um auch die Installation von lilo zu unterdrücken und überhaupt keinen
 # Bootloader zu installieren, entfernen Sie auch hier das Kommentarzeichen:
-#d-i lilo-installer/skip boolean true</phrase>
+#d-i lilo-installer/skip boolean true
 
 # Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
 # automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
