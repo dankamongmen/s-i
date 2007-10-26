@@ -16,14 +16,16 @@ if [ "$ROOT" ]; then
 fi
 
 tmp=$($chroot $ROOT tempfile)
-# apt-cdrom can be interactive, avoid that
-$logoutput $chroot $ROOT apt-cdrom add \
-	-o Dir::Etc::SourceList=$tmp \
-	</dev/null
-cat $ROOT$tmp >> $file
-rm -f $ROOT$tmp $ROOT$tmp~
 
-if ! apt-setup-verify $file; then
+# apt-cdrom can be interactive, avoid that
+if $logoutput $chroot $ROOT apt-cdrom add \
+   -o Dir::Etc::SourceList=$tmp \
+   </dev/null; then
+	cat $ROOT$tmp >> $file
+else
+	rm -f $ROOT$tmp $ROOT$tmp~
 	db_input critical apt-setup/cdrom/failed || true
 	db_go || exit 10
 fi
+
+rm -f $ROOT$tmp $ROOT$tmp~
