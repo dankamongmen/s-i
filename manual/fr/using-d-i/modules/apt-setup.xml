@@ -1,4 +1,4 @@
-<!-- original version: 43573 -->
+<!-- original version: 49871 -->
 
    <sect3 id="apt-setup">
    <title>La configuration d'apt</title>
@@ -28,10 +28,114 @@ paquets.
 </para><para>
 
 <command>Apt</command> doit être configuré pour qu'il sache où récupérer les paquets.
-L'installateur prend en charge cela automatiquement en fonction des informations contenues
-sur le support d'installation. Les résultats de cette configuration sont écrits dans
+Les résultats de cette configuration sont écrits dans
 le fichier <filename>/etc/apt/sources.list</filename>. Vous pouvez le consulter et le modifier
 à votre guise quand l'installation est terminée.
 
 </para>
-   </sect3>
+
+<para>
+Quand la priorité de l'installation est la priorité par défaut, l'installateur prend
+automatiquement en charge cette configuration, en fonction de la méthode d'installation
+et des choix précédemment faits. Dans la plupart des cas, il installe automatiquement un miroir
+pour les mises à jour de sécurité et, si vous installez la distribution stable, un miroir pour le service de
+mise à jour <quote>volatile</quote>.
+</para>
+<para>
+Quand la priorité de l'installation est une priorité plus basse (en mode expert par exemple),
+vous pourrez prendre davantage de décisions. Vous pouvez choisir d'utiliser ou non les services
+de mise à jour (sécurité ou volatile), vous pouvez choisir d'ajouter des paquets appartenant aux
+sections <quote>contrib</quote> ou <quote>non-free</quote> de la distribution.
+</para> 
+ 
+
+   <sect4 id="apt-setup-mirror">
+    <title>Utiliser un miroir réseau</title>
+
+<para>
+
+Dans la plupart des cas, la question concernant l'utilisation ou non d'un
+miroir réseau est posée et, dans la plupart des cas, la réponse par défaut
+est correcte. Cependant il existe des exceptions.
+
+</para>
+<para>
+
+Si vous ne faites pas d'installation à partir d'un jeu complet de CD/DVD, l'utilisation
+d'un miroir réseau est conseillée. En effet, sans miroir réseau, vous n'installerez qu'un système
+réduit au minimum. Et si vous ne possédez pas une bonne connexion internet, il vaut
+mieux ne pas choisir la tâche <literal>desktop</literal>.
+</para>
+
+<para>
+
+Si vous faites une installation à partir d'un jeu complet de CD ou d'une image CD (pas une image DVD),
+le miroir réseau n'est pas nécessaire&nbsp;; cependant il est recommandé car un cédérom ne contient
+que peu de paquets. L'installateur ne permet pas pour l'instant d'utiliser plusieurs
+images CD/DVD pendant l'installation <footnote>
+
+<para>
+Il est prévu d'ajouter cette option.</para></footnote>.
+
+Si vous ne possédez pas une bonne connexion internet, il reste préférable
+de ne pas choisir un miroir réseau et de terminer l'installation avec ce qui
+se trouve sur le cédérom. Après l'installation, c'-à-d après le lancement
+du nouveau système, vous pourrez ajouter d'autres paquets.
+</para>
+<para>
+Si vous faites une installation à partir d'un DVD ou d'une image DVD, la
+nécessité d'un miroir réseau est moins grande mais il y a toujours un risque
+que certains paquets ne soient pas sur le premier DVD. C'est particulièrement vrai
+quand vous faites une installation dans une autre langue que l'anglais. Les paquets de polices
+et les paquets de localisation sont par exemple sur le second DVD. Ainsi, avec une connexion
+de bonne qualité, il est encore raisonnable d'utiliser un miroir.
+</para>
+<para>
+<!-- This should probably be documented a bit more extensively in
+     post-install instead. -->
+
+Pour ajouter des paquets après l'installation, deux options sont disponibles&nbsp;:
+
+<orderedlist>
+<listitem><para>
+
+si vous avez d'autres images CD/DVD (provenant du jeu qui vous a servi pour
+l'installation), vous pouvez ajouter ces images au fichier
+<filename>sources.list</filename> avec la commande <command>apt-cdrom</command>&nbsp;;
+
+</para></listitem>
+<listitem><para>
+
+ajouter un miroir au fichier <filename>sources.list</filename> avec un éditeur de textes.
+
+</para></listitem>
+</orderedlist>
+
+Vous pouvez maintenant utiliser l'une des interfaces de gestion des paquets pour
+choisir et installer des paquets supplémentaires <footnote>
+
+<para>
+Il est possible d'ajouter à la fois des images de CD/DVD <emphasis>et</emphasis>
+un miroir réseau dans le fichier <filename>sources.list</filename>. Ajouter un miroir réseau
+offre l'avantage suivant&nbsp;: les paquets installables appartenant aux versions de la distribution
+seront mis à jour.
+</para></footnote>.
+
+</para>
+
+<para>
+En résumé, choisir un miroir réseau est une bonne idée, sauf si votre
+connexion internet n'est pas de bonne qualité. Si la version courante d'un paquet
+est présente sur le CD/DVD, l'installateur l'utilisera.
+La quantité de données téléchargées à partir d'un miroir dépend a) des tâches
+choisies lors de la prochaine étape de l'installation, b) des paquets nécessaires à ces tâches
+et c) de la présence de ces paquets sur le CD/DVD.
+</para>
+<para>
+Il faut noter que même si vous avez choisi de ne pas utiliser de miroir,
+certains paquets peuvent être téléchargés sur internet&nbsp;: par exemple, quand les
+services de mises à jour (sécurité ou volatile) ont été installés et que de nouvelles versions
+de ces paquets existent.
+</para>
+</sect4>
+     </sect3>

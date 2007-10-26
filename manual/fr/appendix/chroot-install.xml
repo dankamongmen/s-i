@@ -1,4 +1,4 @@
-<!-- original version: 44410 -->
+<!-- original version: 49850 -->
 
  <sect1 id="linux-upgrade">
  <title>Installer &debian; à partir d'un système Unix/Linux</title>
@@ -11,7 +11,7 @@ qui est exposé dans la suite de ce manuel. Les utilisateurs
 qui changeaient leur distribution Red Hat, Mandrake et Suse pour &debian;
 réclamaient ce guide d'installation. Dans cette 
 partie, on suppose que le lecteur a acquis une certaine familiarité avec 
-les commandes *nix et qu'il sait parcourir le système de fichiers. 
+les commandes *nix et qu'il sait parcourir un système de fichiers.
 <prompt>$</prompt> symbolisera une commande qui devra être saisie dans 
 le système actuel, alors que <prompt>#</prompt> fera référence à une commande 
 qui devra être saisie dans le <emphasis>chroot</emphasis> Debian.
@@ -27,6 +27,16 @@ d'installation ou aux systèmes d'amorçage.
 
 </para>
 
+<note><para>
+
+Cette procédure étant essentiellement <quote>manuelle</quote>, sachez que
+la configuration du système vous demandera beaucoup de temps. Elle vous demandera aussi
+plus de connaissances de Debian et de Linux en général qu'une installation standard.
+Cette procédure ne peut résulter en un système identique à un système installé normalement.
+Elle ne donne que les premières étapes de la configuration d'un système. D'autres étapes
+seront sans doute nécessaires.
+</para></note>
+   
   <sect2>
   <title>Pour commencer</title>
 <para>
@@ -40,7 +50,7 @@ de bureau comme GNOME ou KDE).
 
 </para><para>
 
-Pour créer un système de fichiers sur vos partitions, par exemple, pour créer
+Pour créer un système de fichiers sur les partitions, par exemple, pour créer
 un système de fichiers ext3 sur la partition <filename>/dev/hda6</filename>
 (ce sera la partition racine dans notre exemple), il suffit de faire&nbsp;:
 
@@ -201,6 +211,48 @@ pour être compatible avec le système de base de Debian. Par exemple&nbsp;:
 </screen></informalexample>
 
 </para>
+<sect3>
+
+   <title>Créer les fichiers de périphériques</title>
+<para>
+
+Pour l'instant, <filename>/dev/</filename> contient seulement des fichiers élémentaires.
+D'autres fichiers seront nécessaires pour les prochaines étapes de l'installation.
+La manière de les créer dépend du système sur lequel l'installation se fait&nbsp;; elle
+dépend aussi du noyau que vous utiliserez (modulaire ou pas) et du choix entre fichiers
+dynamiques (en utilisant <classname>udev</classname>) ou fichiers statiques pour le nouveau
+système.
+
+</para><para>
+
+Voici quelques options disponibles&nbsp;:
+
+<itemizedlist>
+<listitem><para>
+
+créer un ensemble standard de fichiers de périphériques statiques avec
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+créer seulement quelques fichiers choisis avec la commande <command>MAKEDEV</command>
+
+</para></listitem>
+<listitem><para>
+
++bind mount /dev from your host system on top of /dev in the target system;
+Il faut remarquer que les scripts postinst de certains paquets peuvent essayer
+de créer des fichiers de périphériques&nbsp;; cette option doit être employée avec précaution.
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+</sect3>
 
    <sect3>
    <title>Monter les partitions</title>
@@ -520,7 +572,16 @@ L'installation et la configuration de <classname>grub</classname> est aussi simp
 La deuxième commande installe <command>grub</command>
 (ici, sur le MBR de <literal>hda</literal>). La dernière commande crée
 un fichier <filename>/boot/grub/menu.lst</filename> fonctionnel.
-</para><para arch="x86">
+</para>
+<para>
+
+On suppose ici qu'un fichier <filename>/dev/hda</filename> a été créé.
+Il y a d'autres méthodes pour installer <command>grub</command>,
+mais elles sortent du cadre de cette annexe.
+
+</para>
+
+<para arch="x86">
 
 Voici un exemple simple de fichier <filename>/etc/lilo.conf</filename>&nbsp;:
 
@@ -531,6 +592,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
