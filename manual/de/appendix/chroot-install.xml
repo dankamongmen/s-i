@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 49850 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian; von einem anderen Unix/Linux-System aus installieren</title>
@@ -23,12 +23,26 @@ Kommando im Debian-chroot ausgeführt wird.
 Sobald Sie das neue Debian-System nach Ihren Wünschen konfiguriert haben,
 können Sie Ihre evtl. vorhandenen eigenen Dateien hinüber verschieben und
 loslegen. Deswegen wird dies auch die
-<quote>zero-downtime</quote>-&debian;-Installation (Installation ohne eine
+<quote>zero-downtime</quote>-Installation (Installation ohne eine
 Zeitspanne, während der das System nicht verfügbar ist) genannt. Es ist ebenso
 ein geschickter Weg, mit Hardwarekomponenten zurechtzukommen, die sich sonst
 nicht gut mit verschiedenen Boot- oder Installationsmedien vertragen.
 
 </para>
+
+<note><para>
+
+Da dies überwiegend eine manuelle Prozedur ist, sollten Sie im Hinterkopf
+behalten, dass Sie einen erheblichen Teil der grundlegenden
+Systemkonfiguration selbst erledigen müssen, was auch mehr Wissen über
+Debian und über Linux allgemein erfordert als eine reguläre Installation.
+Sie können nicht davon ausgehen, dass Sie durch diese Prozedur ein System
+erhalten, das identisch ist zu dem aus einer normalen Installation. Sie
+sollten auch bedenken, dass in dieser Prozedur nur die grundlegenden
+Schritte zur Systemkonfiguration beschrieben sind. Es könnten zusätzliche
+Installations- oder Konfigurationsschritte erforderlich sein.
+
+</para></note>
 
   <sect2>
   <title>Es geht los!</title>
@@ -214,6 +228,55 @@ anpassen, so dass sie mit dem Debian-Basissystem kompatibel ist, zum Beispiel:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+
+   <title>Gerätedateien erzeugen</title>
+<para>
+
+An diesem Punkt enthält <filename>/dev/</filename> nur sehr grundlegende
+Gerätedateien. Für die nächsten Schritte der Installation könnten
+zusätzliche Gerätedateien benötigt werden. Es gibt verschiedene Wege, hiermit
+umzugehen; welchen Sie benutzen, hängt von verschiedenen Faktoren ab:
+welches Gast-System Sie für die Installation verwenden, ob Sie vorhaben,
+einen modularen Kernel zu verwenden oder nicht und ob Sie für das neue
+System dynamische Gerätedateien (z.B. mittels <classname>udev</classname>)
+benutzen möchten oder statische.
+
+</para><para>
+
+Einige der verfügbaren Optionen sind:
+
+<itemizedlist>
+<listitem><para>
+
+erzeugen Sie einen Standardsatz von statischen Gerätedateien, indem Sie
+Folgendes ausführen:
+
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+erzeugen Sie manuell nur bestimmte Gerätedateien mittels
+<command>MAKEDEV</command>.
+
+</para></listitem>
+<listitem><para>
+
+binden Sie das Verzeichnis /dev aus Ihrem Gast-System als /dev in Ihr
+Zielsystem ein. Beachten Sie, dass die postinst-Skripte einiger Pakete
+versuchen könnten, neue Gerätedateien zu erzeugen; deshalb sollte diese
+Option nur mit Vorsicht verwendet werden.
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <title>Partitionen einbinden</title>
@@ -538,6 +601,13 @@ Master Boot Record (MBR) von <literal>hda</literal>). Der letzte Befehl erzeugt
 eine schöne funktionierende Konfigurationsdatei
 <filename>/boot/grub/menu.lst</filename>.
 
+</para><para>
+
+Beachten Sie, dass hier davon ausgegangen wird, dass eine Gerätedatei namens
+<filename>/dev/hda</filename> erzeugt worden ist. Es gibt alternative
+Möglichkeiten, <command>grub</command> zu installieren, aber das ist nicht
+Thema dieses Abschnitts.
+
 </para><para arch="x86">
 
 Hier ein grundsätzliches Beispiel einer <filename>/etc/lilo.conf</filename>:
@@ -549,6 +619,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
