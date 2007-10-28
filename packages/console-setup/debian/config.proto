@@ -181,6 +181,8 @@ ask_debconf () {
 # ppc/chrp	pc,mac		"machine: CHRP"
 # ppc/pmac	mac		"machine: PowerMac|[Pp]ower[Bb]ook*|Power|iMac*|PowerMac1*"
 # ppc/prep	pc		"machine: PReP"
+# ppc/ps3	pc		"platform: PS3"
+# ppc/cell	pc		"platform: Cell"
 # ppc/{bbox,mbx,ppc64,82xx,8xx} Not yet supported by Debian
 
 # arm/*		pc		(refered to as 'arm' only)
@@ -197,12 +199,17 @@ guess_arch () {
     
     if [ "$arch" = 'powerpc' -o "$arch" = 'm68k' ]; then
 	if [ "$arch" = powerpc ]; then
-	    line=`sed -n 's/^machine.*: *//p' /proc/cpuinfo`
-	    if [ "$line" = '' ]; then
-		echo unknown
-		return 0
+	    line=`sed -n 's/^platform.*: *//p' /proc/cpuinfo`
+	    if [ "$line" = PS3 ] || [ "$line" = Cell ]; then
+		subarch=`echo $line|tr A-Z a-z`
+	    else
+		line=`sed -n 's/^machine.*: *//p' /proc/cpuinfo`
+		if [ "$line" = '' ]; then
+		    echo unknown
+		    return 0
+		fi
+		subarch=`echo $line|tr A-Z a-z`
 	    fi
-	    subarch=`echo $line|tr A-Z a-z`
 	elif [ "$arch" = m68k ]; then
 	    line=`sed -n 's/^Model.*: *//p' /proc/hardware`
 	    if [ "$line" = '' ]; then
@@ -1013,6 +1020,10 @@ case "$arch" in
 	model_priority=medium
 	;;
     powerpc/prep)
+	default_model=pc105
+	model_priority=medium
+	;;
+    powerpc/ps3|powerpc/cell)
 	default_model=pc105
 	model_priority=medium
 	;;
