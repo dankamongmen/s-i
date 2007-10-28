@@ -13,10 +13,10 @@ ks_run_script () {
 	SCRIPT="$4"
 
 	if [ "$CHROOTED" = 1 ]; then
-		chroot=chroot
+		in_target=in-target
 		root=/target
 	else
-		chroot=
+		in_target=
 		root=
 	fi
 
@@ -24,7 +24,7 @@ ks_run_script () {
 	cp "$SCRIPT" "$root/tmp/ks-script"
 	chmod 700 "$root/tmp/ks-script"
 	log-output -t kickseed --pass-stdout \
-		$chroot $root "$INTERPRETER" /tmp/ks-script
+		$in_target "$INTERPRETER" /tmp/ks-script
 }
 
 ks_run_handler () {
