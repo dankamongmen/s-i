@@ -1,17 +1,16 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43573 -->
+<!-- original version: 49871 -->
 
    <sect3 id="apt-setup">
    <title>apt konfigurieren (apt-setup)</title>
 
 <para>
 
-Eines der Programme, das zur Paketinstallation auf einem &debian;-System
-verwendet werden kann, ist  <command>apt-get</command> aus dem Paket
+Eines der Programme, die zur Paketinstallation auf einem &debian;-System
+verwendet werden können, ist  <command>apt-get</command> aus dem Paket
 <classname>apt</classname><footnote>
 
 <para>
-
 Beachten Sie, dass das Programm, das letztendlich die Pakete installiert,
 <command>dpkg</command> heißt. Allerdings ist dies mehr ein
 Low-Level-Programm (was unter anderem bedeutet, dass es nicht direkt vom
@@ -20,13 +19,12 @@ höher und wird <command>dpkg</command> nach Bedarf aufrufen. Es weiß, wie
 es die Pakete von Ihrer CD, über Netzwerk oder sonst woher bekommen kann.
 Außerdem kann es automatisch andere Pakete mit installieren, die benötigt
 werden, damit die Pakete, die Sie installieren möchten, korrekt funktionieren.
-
 </para>
 
 </footnote>.
 Es gibt auch andere Frontends (Bedienoberflächen, die anders aussehen können,
 aber im Hintergrund die gleichen Prozesse nutzen) für die Paketverwaltung wie
-<command>aptitude</command> und <command>synaptic</command>. Diese Frontends
+<command>aptitude</command> oder <command>synaptic</command>. Diese Frontends
 werden für neue Debian-Benutzer empfohlen, da sie einige zusätzliche Funktionen
 (wie Paketsuche und Statusüberprüfungen) in einer hübschen Oberfläche integriert
 haben. <command>aptitude</command> ist jetzt das empfohlene Werkzeug für das
@@ -35,12 +33,144 @@ Paketmanagement.
 </para><para>
 
 <command>apt</command> muss konfiguriert werden, so dass es weiß, woher es
-benötigte Pakete bekommen kann. Der Installer erledigt dies überwiegend
-automatisch, basierend darauf, was ihm über Ihr Installationsmedium bekannt ist.
-Das Ergebnis dieser Konfiguration wird in die Datei
-<filename>/etc/apt/sources.list</filename> eingetragen; Sie können die Datei
-näher untersuchen und an Ihre Bedürfnisse anpassen, nachdem die Installation
-vollendet ist.
+benötigte Pakete bekommen kann. Das Ergebnis dieser Konfiguration wird in die
+Datei <filename>/etc/apt/sources.list</filename> geschrieben. Sie können sie
+anschauen und an Ihre Bedürfnisse anpassen, nachdem die Installation beendet
+ist.
+
+</para><para>
+
+Wenn Sie mit Standard-Priorität installieren, kümmert sich der Installer
+größtenteils automatisch um die Konfiguration, basierend auf der
+Installationsmethode, die Sie nutzen, und unter Umständen auch durch
+Verwendung von vorher im Installationsverlauf bereits von Ihnen getroffenen
+Entscheidungen. In den meisten Fällen wird der Installer automatisch
+einen Spiegel-Server für Sicherheitsaktualisierungen hinzufügen sowie,
+falls Sie die stable-Distribution installieren, einen Spiegelserver für
+den <quote>Volatile</quote>-Aktualisierungs-Service.
+
+</para><para>
+
+Wenn Sie mit einer niedrigeren Priorität installieren (z.B. im Experten-Modus),
+haben Sie die Möglichkeit, mehr Entscheidungen selbst zu treffen. Sie können
+wählen, ob Sie den Sicherheits- oder Volatile-Aktualisierungs-Service nutzen
+möchten oder nicht und ob Sie Pakete aus den <quote>contrib</quote>- und
+<quote>non-free</quote>-Bereichen des Archivs verwenden möchten.
+
+ </para>
+
+    <sect4 id="apt-setup-mirror">
+    <title>Einen Internet-Spiegelserver verwenden</title>
+
+<para>
+
+Eine Frage, die Ihnen in den meisten Fällen gestellt wird, ist, ob Sie
+einen Internet-Spiegelserver als Paketquelle verwenden möchten oder nicht.
+Meistens können Sie die Standardantwort übernehmen, aber es gibt einige
+Ausnahmen.
+
+</para><para>
+
+Falls Sie <emphasis>nicht</emphasis> von einer Komplett-CD oder -DVD
+(bzw. einem Komplett-CD/DVD-Image) installieren, sollten Sie auf jeden
+Fall einen Internet-Spiegelserver verwenden, da Sie ansonsten nur ein sehr
+minimalistisches System erhalten werden. Wenn Sie aber nur über eine
+relativ langsame Internet-Verbindung verfügen, empfiehlt es sich in diesem
+Fall, im nächsten Schritt <emphasis>nicht</emphasis> die
+<literal>Arbeitsplatz</literal>-Programmgruppe zur Installation auszuwählen.
+
+</para><para>
+
+Wenn Sie von einer Komplett-CD (bzw. einem Komplett-CD-Image) installieren
+(nicht DVD), ist es nicht zwingend erforderlich, einen
+Internet-Spiegelserver zu verwenden, aber es wird trotzdem dringend empfohlen,
+da eine einzelne CD nur eine limitierte Anzahl von Paketen enthält. Der
+Installer unterstützt derzeit noch nicht die Verwendung von mehreren
+CD- oder DVD-Images während der Installation<footnote>
+
+<para>
+Eine entsprechende Möglichkeit ist aber in Planung.
+</para>
+
+</footnote>. Sollten Sie nur über eine relativ langsame Internet-Verbindung
+verfügen, wird hier trotzdem empfohlen, <emphasis>keinen</emphasis>
+Internet-Spiegelserver auszuwählen, sondern die Installation unter der
+Verwendung der auf der CD verfügbaren Pakete zu beenden und zusätzliche
+Pakete nach der Installation hinzuzufügen (also nach dem Neustart, wenn
+Sie Ihr neues System gebootet haben).
+
+</para><para>
+
+Wenn Sie von einer DVD (bzw. einem DVD-Image) installieren, ist die
+Notwendigkeit, einen Internet-Spiegel zu benutzen, erheblich kleiner, aber
+es besteht trotzdem die Möglichkeit, dass einige Pakete der
+Programmgruppen, die Sie im nächsten Schritt auswählen, nicht auf der ersten
+DVD enthalten sind. Dies könnte speziell dann der Fall sein, wenn Sie in
+einer anderen Sprache als Englisch installieren: einige Schrift- und
+Lokalisierungspakete befinden sich bekanntermaßen auf der zweiten DVD.
+Wenn Sie über eine performante Internet-Verbindung verfügen, ist es also immer
+empfehlenswert, einen Netzwerk-Spiegelserver zu verwenden.
+
+</para><para>
+
+<!-- This should probably be documented a bit more extensively in
+     post-install instead. -->
+Um nach der Installation zusätzliche Pakete zu installieren, haben Sie zwei
+Möglichkeiten:
+
+<orderedlist>
+<listitem><para>
+
+Falls Sie über weitere CDs/DVDs bzw. entsprechende Images verfügen (aus
+dem gleichen CD-/DVD-Satz wie die Installations-CD/DVD, die Sie verwendet
+haben), können Sie diese zu Ihrer <filename>sources.list</filename>
+hinzufügen, indem Sie <command>apt-cdrom</command> verwenden;
+
+</para></listitem>
+<listitem><para>
+
+Sie können von Hand einen Spiegelserver zu Ihrer
+<filename>sources.list</filename> hinzufügen, indem Sie einen Texteditor
+verwenden.
+
+</para></listitem>
+</orderedlist>
+
+Benutzen Sie danach eines der Frontends zum Paketmangement, um zusätzliche
+Pakete auszuwählen und zu installieren<footnote>
+
+<para>
+Es ist auch möglich, sowohl zusätzliche CDs oder DVDs zur
+<filename>/etc/apt/sources.list</filename> hinzufügen
+<emphasis>und</emphasis> dann auch noch einen Internet-Spiegel.
+Diese hätte den Vorteil, dass Sie so auch aktualisierte Versionen von
+Paketen bekommen, wenn sogenannte <quote>Point-Releases</quote>
+(Zwischen-Updates, um gravierende Fehler oder Sicherheitslücken zu beheben)
+der Distribution veröffentlicht werden.
+</para>
+
+</footnote>.
+
+</para><para>
+
+Noch mal zusammengefasst: einen Internet-Spiegelserver auszuwählen, ist
+grundsätzlich eine gute Idee, außer Sie haben eine langsame
+Internet-Verbindung. Falls die aktuellste Version eines Paketes auf Ihrer
+CD/DVD enthalten ist, wird der Installer auf jeden Fall auch das Paket von
+der CD/DVD verwenden. Die Menge der Daten, die über die Internet-Verbindung
+heruntergeladen wird, hängt also von mehreren Faktoren ab: a) welche
+Programmgruppen Sie im nächsten Schritt auswählen, b) welche Pakete für
+diese Programmgruppen benötigt werden und c) welche dieser Pakete auf
+Ihrer CD/DVD enthalten sind.
+
+</para><para>
+
+Beachten Sie, dass einige Pakete trotzdem über das Internet heruntergeladen
+werden könnten, auch wenn Sie keinen Internet-Spiegel ausgewählt haben,
+nämlich wenn eine aktualisierte Paketversion über den Sicherheits- oder
+Volatile-Aktualisierungs-Service verfügbar ist (dazu müssen diese Dienste
+konfiguriert worden sein).
 
 </para>
+</sect4>
    </sect3>
