@@ -6,14 +6,6 @@ set -e
 
 ARCH=`udpkg --print-architecture`
 
-modify_cyrconfig() {
-	if [ "$2" ]; then
-		sed -e "s/^$1 .*\$/$1 $2/" \
-		    $cyrconfig > $cyrconfig.tmp && \
-		    mv $cyrconfig.tmp $cyrconfig
-	fi
-}
-
 db_get debian-installer/locale
 LOCALE="$RET"
 
@@ -81,6 +73,10 @@ case "$consoletype" in
 	;;
     cyr)
 	apt-install console-cyrillic || true
+	;;
+    console-setup)
+	apt-install console-setup || true
+	db_set debian-installer/keymap '' || true
 	;;
 esac
 
