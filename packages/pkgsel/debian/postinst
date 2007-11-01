@@ -39,12 +39,25 @@ config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
 
 db_progress STEP 1
 
-# Install popularity-contest but remove it if the user decides not to
-# participate.
-if in-target sh -c "$config debconf-apt-progress --from 1 --to 5 --logstderr -- apt-get -o APT::Install-Recommends=false -q -y -f install popularity-contest"; then
-	if ! grep -q '^PARTICIPATE=\"*yes\"*' /target/etc/popularity-contest.conf; then
-		in-target dpkg --purge popularity-contest
-	fi
+partsdir="/usr/lib/pre-pkgsel.d"
+if [ -d "$partsdir" ]; then
+	for script in `ls "$partsdir"/*`; do
+		base=$(basename $script | sed 's/[0-9]*//')
+		if ! db_progress INFO pkgsel/progress/$base; then
+			db_subst pkgsel/progress/fallback SCRIPT "$base"
+			db_progress INFO pkgsel/progress/fallback
+		fi
+		if [ -x "$script" ] ; then
+			# be careful to preserve exit code
+			if log-output -t pkgsel "$script"; then
+				:
+			else
+				warning "$script returned error code $?"
+			fi
+		else
+			error "Unable to execute $script"
+		fi
+	done
 fi
 
 db_get pkgsel/include
