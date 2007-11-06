@@ -20,6 +20,7 @@ else
 fi
 
 syspaths=
+scan_partition=false
 case $TYPE in
     partition)
 	for x in /sys/block/*/*; do
@@ -27,7 +28,7 @@ case $TYPE in
 		syspaths="${syspaths:+$syspaths }$x"
 	done
 	TYPE=disk
-	scan_partition=true
+	scan_partition=true # will check workaround misdetected usb
 	;;
     *)
 	for x in /sys/block/*; do
