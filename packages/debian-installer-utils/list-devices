@@ -27,6 +27,7 @@ case $TYPE in
 		syspaths="${syspaths:+$syspaths }$x"
 	done
 	TYPE=disk
+	scan_partition=true
 	;;
     *)
 	for x in /sys/block/*; do
@@ -50,7 +51,7 @@ for x in $syspaths; do
 	esac
 	# Some USB sticks and CD drives are misdetected as floppy
 	# This allows to scan for those
-	if ! $match && [ "$TYPE" = maybe-usb-floppy ]; then
+	if ! $match && ( $scan_partition || [ "$TYPE" = maybe-usb-floppy ] ); then
 		if udevinfo -q env -p "$devpath" 2>/dev/null | \
 		   grep -q '^ID_BUS=usb' && \
 		   udevinfo -q env -p "$devpath" 2>/dev/null | \
