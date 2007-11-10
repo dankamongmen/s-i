@@ -16,16 +16,16 @@ for dir in $(find "/proc/device-tree/" -type d); do
 	# drivers/macintosh
 	if [ "$name" = fan ]; then
 		case $compatible in
-			adt7460|adt7467)
-				# not in d-i yet
-				# echo "therm_adt746x:iBook/AlBook G4 ADT746x thermostat"
-				register-module therm_adt746x
-				;;
-			adm1030)
-				# not in d-i yet
-				# echo "therm_windtunnel:G4 Windtunnel thermostat"
-				register-module therm_windtunnel
-				;;
+		    adt7460|adt7467)
+			# not in d-i yet
+			# echo "therm_adt746x:iBook/AlBook G4 ADT746x thermostat"
+			register-module therm_adt746x
+			;;
+		    adm1030)
+			# not in d-i yet
+			# echo "therm_windtunnel:G4 Windtunnel thermostat"
+			register-module therm_windtunnel
+			;;
 		esac
 	# drivers/net
 	elif [ "$name" = radio ]; then

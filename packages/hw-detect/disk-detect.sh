@@ -15,7 +15,7 @@ is_not_loaded() {
 
 list_modules_dir() {
 	if [ -d "$1" ]; then
-		find $1 -type f | sed -e 's/\.k\?o$//' -e 's/.*\///'
+		find $1 -type f | sed 's/\.ko$//; s/.*\///'
 	fi
 }
 
@@ -96,11 +96,7 @@ hw-detect disk-detect/detect_progress_title || true
 while ! disk_found; do
 	CHOICES=""
 	for mod in $(list_disk_modules | sort); do
-		if [ -z "$CHOICES" ]; then
-			CHOICES="$mod"
-		else
-			CHOICES="$CHOICES, $mod"
-		fi
+		CHOICES="${CHOICES:+$CHOICES, }$mod"
 	done
 
 	if [ -n "$CHOICES" ]; then
@@ -162,7 +158,6 @@ if [ "$RET" = true ]; then
 			if anna-install partman-dmraid; then
 				# Activate devices
 				log-output -t disk-detect dmraid -ay
-
 			else
 				logger -t disk-detect "Error loading partman-dmraid; dmraid devices not activated"
 			fi

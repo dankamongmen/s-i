@@ -24,7 +24,7 @@ load_module() {
 	local priority=low
 
 	case "$module" in
-	"plip")
+	    "plip")
 		module_probe parport_pc high
 		priority=high
 		;;
@@ -34,7 +34,7 @@ load_module() {
 }
 
 list_modules_dir() {
-	find $1 -type f | sed -e 's/\.k\?o$//' -e 's/.*\///'
+	find $1 -type f | sed 's/\.ko$//; s/.*\///'
 }
 
 list_nic_modules() {
@@ -65,7 +65,7 @@ compare_devs() {
 DEVNAMES_STATIC=/etc/network/devnames-static.gz
 TEMP_EXTRACT=/tmp/devnames-static.txt
 get_static_modinfo() {
-	local module="$(echo $1 | sed 's/\.k\?o//')"
+	local module="$(echo $1 | sed 's/\.ko//')"
 	local modinfo=""
 
 	if [ ! -f "$TEMP_EXTRACT" ]; then
@@ -86,10 +86,12 @@ ethernet_found() {
 	local ifaces=0
 	local firewire=0
 
-	for iface in $(sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//"| sed "s/^ *//"); do
+	for iface in $(sed -e "s/lo://" < /proc/net/dev | \
+			grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//; s/^ *//"); do
 		ifaces=$(expr $ifaces + 1)
 		if [ -f /etc/network/devnames ]; then
-			if grep "^$iface:" /etc/network/devnames | grep -q -i firewire; then
+			if grep "^$iface:" /etc/network/devnames | \
+			   grep -q -i firewire; then
 				firewire=$(expr $firewire + 1)
 			fi
 		fi
@@ -178,11 +180,7 @@ while ! ethernet_found; do
 			fi
 			mod="$mod: $modinfo"
 		fi
-		if [ -z "$CHOICES" ]; then
-			CHOICES="$mod"
-		else
-			CHOICES="$CHOICES, $mod"
-		fi
+		CHOICES="${CHOICES:+$CHOICES, }$mod"
 	done
 
 	if [ -n "$CHOICES" ]; then

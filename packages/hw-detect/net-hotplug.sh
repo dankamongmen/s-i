@@ -13,11 +13,11 @@ if [ -z "$INTERFACE" ]; then
 fi
 
 case $ACTION in
-	add|register)
-		log "Detected hotpluggable network interface $INTERFACE"
-		mkdir -p /etc/network
-		echo "$INTERFACE" >>/etc/network/devhotplug
-		;;
+    add|register)
+	log "Detected hotpluggable network interface $INTERFACE"
+	mkdir -p /etc/network
+	echo "$INTERFACE" >>/etc/network/devhotplug
+	;;
 esac
 
 exit 0

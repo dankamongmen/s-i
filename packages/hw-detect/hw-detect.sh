@@ -88,7 +88,8 @@ load_module() {
 		IFS="$IFS_SAVE"
 	else   
 		log "Error loading '$module'"
-		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && [ "$module" != ide-cd ]; then
+		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && \
+		   [ "$module" != ide-cd ]; then
 			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
@@ -102,7 +103,7 @@ load_module() {
 get_ide_chipset_info() {
 	for ide_module in $(find /lib/modules/*/kernel/drivers/ide/pci/ -type f 2>/dev/null); do
 		if [ -e $ide_module ]; then
-			baseidemod=$(echo $ide_module | sed 's/\.o$//' | sed 's/\.ko$//' | sed 's/.*\///')
+			baseidemod=$(echo $ide_module | sed 's/\.ko$//; s/.*\///')
 			echo "$baseidemod:IDE chipset support"
 		fi
 	done
@@ -112,7 +113,8 @@ get_ide_chipset_info() {
 get_detected_hw_info() {
 	if [ "${SUBARCH%%/*}" = powerpc ]; then
 		discover-mac-io
-		if [ "$SUBARCH" = powerpc/chrp_rs6k ] || [ "$SUBARCH" = powerpc/chrp_ibm ]; then
+		if [ "$SUBARCH" = powerpc/chrp_rs6k ] || \
+		   [ "$SUBARCH" = powerpc/chrp_ibm ]; then
 			discover-ibm
 		fi
 	fi
@@ -223,10 +225,7 @@ for device in $ALL_HW_INFO; do
 		fi
 		
 		if in_list "$module" "$AVAIL_MODULES"; then
-			if [ -n "$LIST" ]; then
-				LIST="$LIST, "
-			fi
-			LIST="$LIST$module ($(echo "$cardname" | sed 's/,/ /g'))"
+			LIST="${LIST:+$LIST, }$module ($(echo "$cardname" | sed 's/,/ /g'))"
 			PROCESSED="$PROCESSED $module"
 		else
 			missing_module "$module" "$cardname"
@@ -415,7 +414,8 @@ if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
 fi
 
 # Try to do this only once..
-if [ "$have_pcmcia" -eq 1 ] && ! grep -q pcmciautils /var/lib/apt-install/queue 2>/dev/null; then
+if [ "$have_pcmcia" -eq 1 ] && \
+   ! grep -q pcmciautils /var/lib/apt-install/queue 2>/dev/null; then
 	log "Detected PCMCIA, installing pcmciautils."
 	apt-install pcmciautils || true
 
@@ -453,23 +453,23 @@ fi
 
 # Install optimised libc based on CPU type
 case "$(udpkg --print-architecture)" in
-	i386)
-		case "$(grep '^cpu family' /proc/cpuinfo | cut -d: -f2)" in
-			" 6"|" 15")
-				# intel 686 or Amd k6.
-				apt-install libc6-i686 || true
-	                ;;
-		esac
+    i386)
+	case "$(grep '^cpu family' /proc/cpuinfo | cut -d: -f2)" in
+	    " 6"|" 15")
+		# intel 686 or Amd k6.
+		apt-install libc6-i686 || true
+                ;;
+	esac
 	;;
-	sparc)
-		if grep -q '^type.*: sun4u' /proc/cpuinfo ; then
-			# sparc v9 or v9b
-			if grep -q '^cpu.*: .*UltraSparc III' /proc/cpuinfo; then
-				apt-install libc6-sparcv9b || true
-			else
-				apt-install libc6-sparcv9 || true
-			fi
+    sparc)
+	if grep -q '^type.*: sun4u' /proc/cpuinfo ; then
+		# sparc v9 or v9b
+		if grep -q '^cpu.*: .*UltraSparc III' /proc/cpuinfo; then
+			apt-install libc6-sparcv9b || true
+		else
+			apt-install libc6-sparcv9 || true
 		fi
+	fi
 	;;
 esac
 
