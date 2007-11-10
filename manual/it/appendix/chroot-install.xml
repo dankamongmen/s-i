@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 49850 -->
 
 
  <sect1 id="linux-upgrade">
@@ -47,7 +47,30 @@ nemmeno momentaneamente, l'uso del sistema, inoltre è un modo ingegnoso
 per gestire hardware che potrebbe avere problemi con i normali metodi di
 avvio o installazione.
 
-</para>
+</para><note><para>
+
+<!--
+As this is a mostly manual procedure, you should bear in mind that you
+will need to do a lot of basic configuration of the system yourself,
+which will also require more knowledge of Debian and of Linux in general
+than performing a regular installation. You cannot expect this procedure
+to result in a system that is identical to a system from a regular
+installation. You should also keep in mind that this procedure only
+gives the basic steps to set up a system. Additional installation and/or
+configuration steps may be needed.
+-->
+
+Questa è per lo più una procedura manuale, si deve tenere in mente che è
+necessario fare da soli molte configurazioni di base del sistema che
+richiedono una conoscenza più approfondita di Debian e di Linux in generale
+rispetto a una normale installazione. Non ci si deve aspettare che seguendo
+questa procedura si ottenga un sistema identico a quello che si otterrebbe
+con una normale installazione. Si deve anche tenere in mente che questa
+procedura contiene solo i passi basilari per la configurazione di un sistema;
+potrebbero essere necessarie altre operazioni di installazione e/o
+configurazione.
+
+</para></note>
 
   <sect2>
   <!-- <title>Getting Started</title> -->
@@ -346,6 +369,81 @@ terminale con uno compatibile con il sistema Debian di base, per esempio:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+   <!-- <title>Create device files</title> -->
+   <title>Creazione dei file di device</title>
+<para>
+
+<!--
+At this point <filename>/dev/</filename> only contains very basic device
+files. For the next steps of the installation additional device files may
+be needed. There are different ways to go about this and which method you
+should use depends on the host system you are using for the installation,
+on whether you intend to use a modular kernel or not, and on whether you
+intend to use dynamic (e.g. using <classname>udev</classname>) or static
+device files for the new system.
+-->
+
+A questo punto <filename>/dev/</filename> contiene solo i file di device
+più basilari, però i prossimi passi dell'installazione potrebbero aver
+bisogno di altri file di device. Ci sono più modi per proseguire, la scelta
+dipende dal sistema che sta ospitando l'installazione, dall'intenzione
+di usare un kernel modulare oppure no, e dall'intenzione di usare file
+di device dinamici (per esempio usando <classname>udev</classname>) o
+statici.
+
+</para><para>
+
+<!--
+A few of the available options are:
+-->
+
+Alcune delle possibili soluzioni sono:
+
+<itemizedlist>
+<listitem><para>
+
+<!--
+create a default set of static device files using
+-->
+
+creare un set predefinito di file di device statici usando
+
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+<!--
+manually create only specific device files using <command>MAKEDEV</command>
+-->
+
+creare manualmente solo dei file di device specifici usando
+<command>MAKEDEV</command>
+
+</para></listitem>
+<listitem><para>
+
+<!--
+bind mount /dev from your host system on top of /dev in the target system;
+note that the postinst scripts of some packages may try to create device
+files, so this option should only be used with care
+-->
+
+collegare con mount la /dev del sistema che ospita l'installazione sopra
+la /dev del sistema che si sta installando; notare che gli script di
+post-installazione di alcuni pacchetti potrebbero provare a creare file
+di device quindi questo metodo deve essere usato con molta cautela.
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <!-- <title>Mount Partitions</title> -->
@@ -837,6 +935,19 @@ Il secondo comando installa <command>grub</command> (in questo caso nel MBR
 di <literal>hda</literal>). L'ultimo comando crea un file
 <filename>/boot/grub/menu.lst</filename> corretto e funzionante.
 
+</para><para>
+
+<!--
+Note that this assumes that a <filename>/dev/hda</filename> device file has
+been created. There are alternative methods to install <command>grub</command>,
+but those are outside the scope of this appendix.
+-->
+
+Notare che si suppone che il device <filename>/dev/hda</filename>
+sia già stato creato. Esistono anche altri metodi per installare
+<command>grub</command>, ma questi non rientrano fra gli scopi di
+questa appendice.
+
 </para><para arch="x86">
 
 <!--
@@ -852,6 +963,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
