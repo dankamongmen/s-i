@@ -10,13 +10,9 @@ chroot_setup () {
 	   [ ! -d /target/proc ]; then
 		return 1
 	fi
-	case $(uname -r | cut -d . -f 1,2) in
-	    2.6)
-		if [ ! -d /target/sys ] ; then
-			return 1
-		fi
-		;;
-	esac
+	if [ ! -d /target/sys ] ; then
+		return 1
+	fi
 
 	if [ -e /var/run/chroot-setup.lock ]; then
 		cat >&2 <<EOF
@@ -58,14 +54,10 @@ EOF
 	fi
 
 	# For installing >=2.6.14 kernels we also need sysfs mounted
-	# Only mount it if not mounted already and we're running 2.6
-	case $(uname -r | cut -d . -f 1,2) in
-	    2.6)
-		if [ ! -d /target/sys/devices ] ; then
-			mount -t sysfs sysfs /target/sys
-		fi
-		;;
-	esac
+	# Only mount it if not mounted already
+	if [ ! -d /target/sys/devices ] ; then
+		mount -t sysfs sysfs /target/sys
+	fi
 
 	# Try to enable proxy when using HTTP.
 	# What about using ftp_proxy for FTP sources?
