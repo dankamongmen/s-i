@@ -6,8 +6,16 @@ hw-detect (1.57) UNRELEASED; urgency=low
 
   [ Frans Pop ]
   * Various code and whitespace cleanups.
+  * No longer load isofs by default as it's loaded automatically when mount is
+    called with '-t iso9660' which we do both in cdrom-detect and iso-scan.
+  * No longer explicitly load ide-core.
+  * Stop loading all IDE driver modules by default as they should be loaded
+    correctly automatically by the kernel/udev. For now, the old behavior can
+    still be forced by booting with hw-detect/load-ide=true.
+    The ide-floppy driver module may not be loaded automatically, but
+    mountfloppy (0.14) will try to load it when needed.
 
- -- Frans Pop <fjp@debian.org>  Sat, 10 Nov 2007 05:08:38 +0100
+ -- Frans Pop <fjp@debian.org>  Mon, 12 Nov 2007 11:09:39 +0100
 
 hw-detect (1.56) unstable; urgency=low
 
