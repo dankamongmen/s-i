@@ -43,15 +43,20 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 	FLOPPYDEV=/dev/fd0
 	
 	if [ ! -e $FLOPPYDEV ]; then
-		log-output -t mountfloppy modprobe floppy || true
+		log-output -t mountfloppy modprobe -q floppy || true
+		update-dev
 	fi
 
 	if ! grep -q ^vfat /proc/modules ; then
-		log-output -t mountfloppy modprobe vfat || true
+		log-output -t mountfloppy modprobe -q vfat || true
 	fi
 	
+	# Cannot find a device, or found the wrong device.
 	if [ ! -e "$FLOPPYDEV" ] || ! try_mount $FLOPPYDEV $FLOPPYMNT; then
-		# Cannot find a device, or found the wrong device.
+		# Maybe the system has an ide-floppy device?
+		log-output -t mountfloppy modprobe -q ide-floppy || true
+		update-dev
+
 		# Ask for help from the user and try it again.
 		FLOPPYDEV=$(ask_dev)
 		try_mount $FLOPPYDEV $FLOPPYMNT
