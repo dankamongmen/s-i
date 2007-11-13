@@ -62,7 +62,7 @@ for LANG in `grep -v "^#" $LANGUAGES`; do
 	CLEVEL[$LEVEL]=`echo "scale=2; ${CLEVEL[$LEVEL]} + $CURR" | bc`
     done
 
-    TOTAL=`echo "scale=2;$TOTAL / 4"|bc`
+    TOTAL=`echo "scale=2;$TOTAL / 5"|bc`
     echo -e "\t ->$TOTAL%<-"  >>$WD/results/quick-overview.txt
 
     if [ -f level1/master/$LANG.po ]; then
@@ -72,7 +72,7 @@ for LANG in `grep -v "^#" $LANGUAGES`; do
     	test -z $MASTERF && MASTERF=0
     	MASTERU=`echo $MASTER | sed -e "s/.*f//g"  | sed -e "s/u//g";`
     	test -z $MASTERU && MASTERU=0
-    	MASTERP=`echo "scale=4; (100 / ($MASTERT + $MASTERF + $MASTERU) ) * $MASTERT" | bc`
+    	MASTERP=`echo "scale=5; (100 / ($MASTERT + $MASTERF + $MASTERU) ) * $MASTERT" | bc`
     	echo -e "\t$MASTER ($MASTERP%)"  >>$WD/results/quick-overview.txt
     fi
     echo  >>$WD/results/quick-overview.txt
