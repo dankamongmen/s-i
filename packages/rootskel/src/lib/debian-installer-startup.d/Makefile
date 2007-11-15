@@ -45,6 +45,12 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S40framebuffer-module-linux-alpha \
 	S04countcpus-linux-alpha
    endif
+
+  ifneq (,$(filter arm,$(DEB_HOST_ARCH_CPU)))
+    files += \
+	S02netwinder-net
+   endif
+
 endif
 
 include ../../../Makefile.inc
