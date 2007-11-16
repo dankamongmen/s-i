@@ -23,7 +23,7 @@
 int main(int argc, char** argv)
 {
   struct statfs stat;
-  
+
   if (argc != 2) {
     printf("Wrong number of arguments, use: print-inodes mount-point\n");
     return 1;
