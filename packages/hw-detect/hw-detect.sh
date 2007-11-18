@@ -438,6 +438,7 @@ fi
 if [ -d /proc/acpi ]; then
 	apt-install acpi || true
 	apt-install acpid || true
+	apt-install acpi-support-base || true
 fi
 
 # If hardware has support for pmu, install pbbuttonsd
