@@ -31,33 +31,35 @@ for dev in /var/lib/partman/devices/*; do
 	done
 	close_dialog
 
+	# Check if device/partitions are used for LVM (PV)
 	for id in $partitions; do
-		lvm=no
+		lvm=
 
 		# If the device is in fact being used for lvm, mark it as such.
 		# This is a hack and it only works for full block devices, not
 		# partitions. It makes raid devices used for lvm show up as such.
 		if pvdisplay $(cat $dev/device) >/dev/null 2>&1 ; then
-			lvm=yes
+			lvm=1
+		else
+			open_dialog GET_FLAGS $id
+			while { read_line flag; [ "$flag" ]; }; do
+				if [ "$flag" = lvm ]; then
+					lvm=1
+					# can not break here
+				fi
+			done
+			close_dialog
 		fi
-	
-		open_dialog GET_FLAGS $id
-		while { read_line flag; [ "$flag" ]; }; do
-			if [ "$flag" = lvm ]; then
-				lvm=yes
-				# can not break here
-			fi
-		done
-		close_dialog
-		if [ "$lvm" = yes ]; then
+		if [ "$lvm" ]; then
 			mkdir -p $id
 			echo lvm >$id/method
 		fi
 	done
 
+	# Check if device is a logical volume
 	if [ -f device ]; then
 		# Obtain the VG from the device name
-		device=`cat device`
+		device=$(cat device)
 		case "$device" in
 		    # LVM2
 		    /dev/mapper/*)
@@ -71,13 +73,14 @@ for dev in /var/lib/partman/devices/*; do
 			vg=$(sed 's,^/[^/]*/\([^/]*\)/.*,\1,' device)
 			;;
 		esac
-		is_vg=no
+		is_lv=
 		for vgs in $vgroups; do
-			[ "$vgs" = "$vg" ] && is_vg=yes
+			[ ! "$vgs" = "$vg" ] || is_lv=1
 		done
-		if [ "$is_vg" = "yes" ] ; then
-			# this is an activated logical volume
-			# let's create label on it
+
+		# If this is a new logical volume
+		if [ "$is_lv" ]; then
+			# create a label
 			open_dialog NEW_LABEL loop
 			close_dialog
 			# find the free space
