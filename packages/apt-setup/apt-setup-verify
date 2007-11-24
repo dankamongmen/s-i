@@ -12,7 +12,16 @@ if [ "$1" = "--invalid" ]; then
 fi
 
 file="$1"
-saveto="$2"
+if [ "$2" != "--" ]; then
+	saveto="$2"
+fi
+
+while [ -n "$1" ] && [ "$1" != "--" ]; do
+	shift 1
+done
+if [ "$1" = "--" ]; then
+	shift 1
+fi
 
 logoutput=""
 if [ "$CATCHLOG" ]; then
@@ -20,8 +29,10 @@ if [ "$CATCHLOG" ]; then
 fi
 
 chroot=
+intarget=
 if [ "$ROOT" ]; then
 	chroot=chroot
+	intarget=in-target
 fi
 
 saveline () {
@@ -32,15 +43,20 @@ saveline () {
 
 valid () {
 	line="$1"
+	shift 1
 
 	[ "${line%%:*}" != "deb cdrom" ] || return 0
 
 	tmp=$($chroot $ROOT tempfile)
 	echo "$line" > $ROOT$tmp
-	
-	if $logoutput $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
-		-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update
-	then
+	code=0
+	$logoutput $intarget debconf-apt-progress \
+		--logstderr --dlwaypoint 100 "${@:---no-progress}" -- \
+		apt-get -o APT::Get::List-Cleanup=false \
+			-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update || code=$?
+	if [ "$code" == 30 ]; then
+		exit 30 # canceled
+	elif [ "$code" == 0 ]; then
 		rm -f $ROOT$tmp
 	else
 		rm -f $ROOT$tmp
@@ -65,12 +81,21 @@ for line in $(sed 's/^/:/' $file); do
 			saveline ""
 		fi
 
-		if [ -z "$NOTEST" ] && valid "$line"; then
+		if [ -z "$NOTEST" ] && valid "$line" "$@"; then
 			gooditems=$(expr "$gooditems" + 1)
 			saveline "$line"
 		else
 			saveline "# Line commented out by installer because it failed to verify:"
 			saveline "#$line"
+		fi
+		
+		# shift away remaining options to avoid passing them
+		# to debconf-apt-progress a second time.
+		while [ -n "$1" ] && [ "$1" != "--" ]; do
+			shift 1
+		done
+		if [ "$1" = "--" ]; then
+			shift 1
 		fi
 	else
 		# Ignore leading empty lines

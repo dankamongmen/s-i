@@ -6,11 +6,12 @@ is passed the name of a temporary file that it can write sources.list lines
 (and comments) to.
 
 After the generator finishes writing the file, apt-setup-verify will be run
-on it to verify that each line of the sources sources works, and it will be
+on it to verify that each line of the sources works, and it will be
 added to the sources.list. Generators can also run apt-setup-verify
 themselves and do their own error recovery if it fails. apt-setup-verify
 tests each line of the file and comments out lines that do not work, and
-exits nonzero if all deb and deb-src lines in the file failed.
+exits zero if all deb and deb-src lines in the file are ok, 30 if the
+verification process was canceled, and otherwise nonzero on error.
 
 Generators should add both "deb" lines and corresponding
 deb-src lines to the sources.list. apt-setup-verify will handle commenting
@@ -24,6 +25,17 @@ a progress bar text template named apt-setup/progress/<generator>, where
 after the first dot (if any) will also be removed when constructing the
 progress template name, so that different scripts that share the same
 purpose can easily be written.
+
+Generators can advance the progress bar from PROGRESS_FROM up to
+PROGRESS_TO, or it will be moved to the next step before the next
+generator is started.
+
+apt-setup-verify runs apt-get update inside debconf-apt-progress, to update
+the progress bar with apt progress information. By default,
+debconf-apt-progress is not allowed to move the progress bar. To override
+this, pass apt-setup-verify options after "--"; these options will be
+passed on to debconf-apt-progress. For example:
+	apt-setup-verify file -- --from 1 --to 100
 
 Note that apt-setup and its generators may be run against some other system
 in a chroot. (i.e., when installing Debian.) If apt-setup is running this

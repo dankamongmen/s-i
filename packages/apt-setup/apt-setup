@@ -2,7 +2,6 @@
 set -e
 
 . /usr/share/debconf/confmodule
-db_capb backup
 
 gendir=/usr/lib/apt-setup/generators
 
@@ -34,23 +33,37 @@ warning() {
 }
 
 gencount=`ls "$gendir"/* | wc -l`
-db_progress START 0 $gencount apt-setup/progress/title
+db_capb backup progresscancel
+db_progress START 0 $(expr "$gencount" \* 200) apt-setup/progress/title
+
+PROGRESS_FROM=0
+PROGRESS_TO=100
+export PROGRESS_FROM
+export PROGRESS_TO
+progress_advance() {
+	db_progress SET $PROGRESS_TO || true
+	PROGRESS_FROM=$PROGRESS_TO
+	PROGRESS_TO=$(expr $PROGRESS_FROM + 100)
+}
 
 for generator in $gendir/*; do
 	base=$(basename $generator | sed 's/[0-9]*//')
 	base="${base%%.*}"
 	if ! db_progress INFO apt-setup/progress/$base; then
 		db_subst apt-setup/progress/fallback SCRIPT "$base"
-		db_progress INFO apt-setup/progress/fallback
+		db_progress INFO apt-setup/progress/fallback || true
 	fi
 	
 	tmp=$($chroot $ROOT tempfile)
 
 	code=0
 	$generator $ROOT$tmp || code=$?
+	progress_advance
+
 	case $code in
 	    0)
-		if ! apt-setup-verify $ROOT$tmp $ROOT/etc/apt/sources.list.new; then
+		if ! apt-setup-verify $ROOT$tmp
+			$ROOT/etc/apt/sources.list.new -- --from=$PROGRESS_FROM --to=$PROGRESS_TO; then
 			warning "$generator output did not verify"
 		fi
 		;;
@@ -63,6 +76,7 @@ for generator in $gendir/*; do
 		log "$generator backed up"
 		rm -f $ROOT$tmp $ROOT/etc/apt/sources.list.new
 		db_progress STOP
+		db_capb backup
 		exit 10
 		;;
 	    *)
@@ -70,7 +84,8 @@ for generator in $gendir/*; do
 		;;
 	esac
 	rm -f $ROOT$tmp
-	db_progress STEP 1
+
+	progress_advance
 done
 mv $ROOT/etc/apt/sources.list.new $ROOT/etc/apt/sources.list
 if [ -s $ROOT/etc/apt/apt.conf.new ]; then
@@ -80,3 +95,4 @@ else
 fi
 
 db_progress STOP
+db_capb backup

@@ -184,7 +184,7 @@ while [ ! "$done" ]; do
 
 	echo "deb $protocol://$hostname$directory $codename $dists" > $file
 	
-	if apt-setup-verify $file; then
+	if apt-setup-verify $file -- --from $PROGRESS_FROM --to $PROGRESS_TO; then
 		done=1
 	else
 		db_set apt-setup/mirror/error Retry
@@ -192,7 +192,7 @@ while [ ! "$done" ]; do
 		db_go || exit 10
 		db_get apt-setup/mirror/error
 		if [ "$RET" = "Change mirror" ]; then
-			choose-mirror || true
+			choose-mirror -n || true
 		elif [ "$RET" = Ignore ]; then
 			exit 1
 		fi
