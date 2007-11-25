@@ -1,11 +1,11 @@
-LINGUAS=bg ca cs de en es eu fi fr gl he hu it ja ko nl pt ru sk sq sv th tr
+LINGUAS=bg ca cs de en es eu fi fr gl he hu it ja ko nb nl pt ru sk sq sv th tr
 
 all: templates/all.nsh templates/dialog.nsh po/messages.pot
 
 templates/dialog.nsh: templates/all.nsh
 	for i in $(LINGUAS) ; do \
 		echo "Push \$${`LANGUAGE=$$i ./win32-loader.sh LANG_ENGLISH`}" ; \
-		echo "Push `LANGUAGE=$$i ./win32-loader.sh English`" ; \
+		echo "Push \"`LANGUAGE=$$i ./win32-loader.sh English`\"" ; \
 	done > $@
 
 templates/all.nsh: $(foreach lang, $(LINGUAS), templates/$(lang).nsh)
