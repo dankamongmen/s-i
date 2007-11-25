@@ -24,44 +24,28 @@ static PedExceptionOption my_exception_handler(PedException* ex) {
 	return PED_EXCEPTION_CANCEL;
 }
 
-/* NOTE:
- * DO NOT base new code in other parts of d-i on this function: it will not
- * work when using udev without devfs compatibility. New code should use
- * 'list-devices disk' from the shell instead.
- */
 static int get_all_disks(PedDevice *discs[], int max_disks) {
-	DIR *devdir;
-	struct dirent *direntry;
+	FILE *fp;
+	char buf[1024];
 	int disk_count = 0;
 
-	devdir = opendir("/dev/discs");
-	if(devdir == NULL) {
-		di_log(DI_LOG_LEVEL_ERROR, "Failed to open disc directory");
+	fp = popen("list-devices disk", "r");
+	if (fp == NULL) {
+		di_log(DI_LOG_LEVEL_ERROR, "Failed to list disks");
 		return(0);
 	}
-
-	while((direntry = readdir(devdir)) != NULL) {
-		char *fullname = NULL;
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		PedDevice *dev;
-
-		if(direntry->d_name[0] == '.')
-			continue;
-
+		if (buf[strlen(buf) - 1] == '\n')
+			buf[strlen(buf) - 1] = '\0';
 		if (disk_count >= max_disks) {
 			di_log(DI_LOG_LEVEL_INFO, "More than %d discs", max_disks);
 			break;
 		}
-
-		asprintf(&fullname, "%s/%s/%s", "/dev/discs",
-			direntry->d_name, "disc");
-
-		if ((dev = ped_device_get(fullname)) && !dev->read_only)
+		if ((dev = ped_device_get(buf)) && !dev->read_only)
 			discs[disk_count++] = dev;
-		free(fullname);
 	}
-
-	closedir(devdir);
-
+	fclose(fp);
 	return(disk_count);
 }
 
