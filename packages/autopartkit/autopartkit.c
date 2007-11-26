@@ -858,7 +858,7 @@ makefs(const char *devpath, const char *fstype)
     else if (0 == strcmp("ext2", fstype))
         mkfs = "/sbin/mkfs.ext2";
     else if (0 == strcmp("ext3", fstype))
-        mkfs = "/sbin/mkfs.ext3 -O resize_inode";
+        mkfs = "/sbin/mkfs.ext3";
     else if (0 == strcmp("jfs", fstype))
         mkfs = "/sbin/mkfs.jfs";
     else if (0 == strcmp("xfs", fstype))
