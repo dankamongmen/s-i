@@ -150,7 +150,7 @@ get_default_menu_item(di_slist *list)
 		}
 		/* If menutest says this item should be default, make it so */
 		if (!isdefault(p)) {
-			//di_log(DI_LOG_LEVEL_DEBUG, "isdefalt says no");
+			//di_log(DI_LOG_LEVEL_DEBUG, "isdefault says no");
 			continue;
 		}
 		/* If all of the virtual packages provided by a
