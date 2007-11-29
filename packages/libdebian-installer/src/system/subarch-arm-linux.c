@@ -20,6 +20,10 @@ static struct map map_hardware[] = {
     { "Compaq-PersonalServer" , "netwinder" },
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
+    { "Buffalo/Revogear Kurobox Pro", "orion" },
+    { "D-Link DNS-323", "orion" },
+    { "Marvell Orion-NAS Reference Design", "orion" },
+    { "Marvell Orion-2 Development Board", "orion" },
     { "Intel EP80219", "iop32x" },
     { "Intel IQ31244", "iop32x" },
     { "Intel IQ80321", "iop32x" },
