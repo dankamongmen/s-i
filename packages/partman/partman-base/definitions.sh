@@ -845,6 +845,8 @@ default_disk_label () {
 		    echo msdos;;
 		ixp4xx)
 		    echo msdos;;
+		orion)
+		    echo msdos;;
 		riscstation)
 		    echo msdos;;
 		netwinder)
