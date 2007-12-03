@@ -13,34 +13,34 @@ if grep -q "/dev/md" $dev/device; then
 	lvm=yes
 elif grep -q "/dev/mapper/" $dev/device; then
 	# LVM on device-mapper crypto
-	if type dmsetup > /dev/null 2>&1; then
+	if type dmsetup >/dev/null 2>&1; then
 		device=$(cat $dev/device)
-		if [ "$(dmsetup status $device | cut -d' ' -f3)" = "crypt" ]; then
+		if [ "$(dmsetup status $device | cut -d' ' -f3)" = crypt ]; then
 			lvm=yes
 		fi
 	fi
 fi
 
 # sparc can not have LVM starting at 0 or it will destroy the partition table
-if [ "$(udpkg --print-architecture)" = "sparc" ] && [ "${id%%-*}" = "0" ] && [ "$lvm" = "no" ]; then
+if [ "$(udpkg --print-architecture)" = sparc ] && \
+   [ "${id%%-*}" = 0 ] && [ $lvm = no ]; then
     exit 0
 fi
 
 if [ $lvm = no ]; then
 	open_dialog VALID_FLAGS $id
 	while { read_line flag; [ "$flag" ]; }; do
-	    if [ "$flag" = lvm ]; then
-		lvm=yes
-	    fi
+		if [ "$flag" = lvm ]; then
+			lvm=yes
+		fi
 	done
 	close_dialog
 fi
 
 if [ $lvm = no ]; then
-    exit 0
+	exit 0
 fi
 
 db_metaget partman/method_long/lvm description
 
 printf "lvm\t${RET}\n"
-
