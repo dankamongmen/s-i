@@ -38,6 +38,11 @@ for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
 			continue
 		fi
 
+		# ks is only useful to kickseed in the first stage.
+		if [ "$var" = ks ]; then
+			continue
+		fi
+
 		# Skip debconf variables
 		varnoslash="${var##*/*}"
 		if [ "$varnoslash" = "" ]; then
