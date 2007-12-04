@@ -15,8 +15,8 @@ preseed_handler () {
 		esac
 	done
 
-	if [ $# -ne 3 ]; then
-		warn "preseed command requires key, type, and value"
+	if [ $# -ne 2 ] && [ $# -ne 3 ]; then
+		warn "preseed command requires key, type, and optional value"
 		return
 	fi
 
