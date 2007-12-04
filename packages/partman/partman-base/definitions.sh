@@ -1151,6 +1151,28 @@ $items"
 	fi
 }
 
+commit_changes () {
+	local template
+	template=$1
+
+	for s in /lib/partman/commit.d/*; do
+		if [ -x $s ]; then
+			$s || {
+				db_input critical $template || true
+				db_go || true
+				for s in /lib/partman/init.d/*; do
+					if [ -x $s ]; then
+						$s || return 255
+					fi
+				done
+				return 1
+			}
+		fi
+	done
+
+	return 0
+}
+
 log '*******************************************************'
 
 # Local Variables:
