@@ -53,22 +53,6 @@ if [ -z "$id" ]; then
     close_dialog
     # do not try to create partition table on sw RAID device or LVM LV
     if [ "$x" = loop ]; then
-    	# But allow crypto devices to be deleted
-	if [ -e "$dev/crypt_realdev" ]; then
-		if [ ! -e "/lib/partman/auto-shared.sh" ] ; then
-			exit 0
-		fi
-
-		device="$(cat "$dev/device")"
-		dmdevice="${device##/dev/mapper/}"
-		if [ "$device" = "$dmdevice" ]; then
-			exit 0
-		fi
-
-		. /lib/partman/auto-shared.sh
-		dm_wipe_dev "$dmdevice" || exit 1
-		dm_update_parted || exit 1
-	fi
         exit 0
     fi
     mklabel=$(echo /lib/partman/storage_device/[0-9][0-9]label/do_option)
