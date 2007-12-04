@@ -42,20 +42,7 @@ ask_for_source () {
 }
 
 perform_copying () {
-    for s in /lib/partman/commit.d/*; do
-	if [ -x $s ]; then
-	    $s || {
-		db_input high partman-partitioning/copy_commit_failed || true
-		db_go || true
-		for s in /lib/partman/init.d/*; do
-		    if [ -x $s ]; then
-			$s || exit 0
-		    fi
-		done
-		exit 0
-	    }
-	fi
-    done
+    commit_changes partman-partitioning/copy_commit_failed || exit 0
 
     name_progress_bar partman-partitioning/progress_copying
     open_dialog COPY_PARTITION $id $source_dev $source_id

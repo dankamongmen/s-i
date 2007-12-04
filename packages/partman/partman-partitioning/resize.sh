@@ -149,20 +149,7 @@ ask_for_size () {
 
 perform_resizing () {
     if [ "$virtual" = no ]; then
-	for s in /lib/partman/commit.d/*; do
-	    if [ -x $s ]; then
-		$s || {
-		    db_input high partman-partitioning/new_size_commit_failed || true
-		    db_go || true
-		    for s in /lib/partman/init.d/*; do
-			if [ -x $s ]; then
-			    $s || exit 100
-			fi
-		    done
-		    exit 100
-		}
-	    fi
-	done
+	commit_changes partman-partitioning/new_size_commit_failed || exit 100
     fi
 
     disable_swap
