@@ -27,20 +27,7 @@ do_initial_setup() {
 
 	# Commit the changes
 	confirm_changes "partman-lvm" || exit 0
-	for s in /lib/partman/commit.d/*; do
-		if [ -x $s ]; then
-			$s || {
-				db_input critical partman-lvm/commit_failed || true
-				db_go || true
-				for s in /lib/partman/init.d/*; do
-					if [ -x $s ]; then
-						$s || exit 255
-					fi
-				done
-				exit 0
-			}
-		fi
-	done
+	commit_changes partman-lvm/commit_failed || exit $?
 
 	# initialize (pvcreate) all volumes that are not already prepared
 	for pv in $(pv_list); do
