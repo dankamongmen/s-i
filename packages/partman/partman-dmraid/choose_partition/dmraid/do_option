@@ -43,20 +43,7 @@ done
 
 # Commit the changes
 confirm_changes "partman-dmraid" || exit 0
-for s in /lib/partman/commit.d/*; do
-	if [ -x $s ]; then
-		$s || {
-			db_input critical partman-dmraid/commit_failed || true
-			db_go || true
-			for s in /lib/partman/init.d/*; do
-				if [ -x $s ]; then
-					$s || exit 255
-				fi
-			done
-			exit 0
-		}
-	fi
-done
+commit_changes partman-dmraid/commit_failed || exit $?
 
 # Reset signal handling to defaults
 trap - HUP INT QUIT PIPE TERM EXIT
