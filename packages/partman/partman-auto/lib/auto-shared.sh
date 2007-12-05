@@ -100,6 +100,7 @@ wipe_disk() {
 	types=$(read_list)
 	close_dialog
 
+	. /lib/partman/lib/new-label.sh
 	label_type=$(default_disk_label)
 
 	if ! expr "$types" : ".*${label_type}.*" >/dev/null; then
@@ -117,14 +118,14 @@ wipe_disk() {
 	fi
 
 	if [ "$label_type" = sun ]; then
-		db_input critical partman/confirm_write_new_label
+		db_input critical partman-partitioning/confirm_write_new_label
 		db_go || exit 0
-		db_get partman/confirm_write_new_label
+		db_get partman-partitioning/confirm_write_new_label
 		if [ "$RET" = false ]; then
-			db_reset partman/confirm_write_new_label
+			db_reset partman-partitioning/confirm_write_new_label
 			exit 1
 		fi
-		db_reset partman/confirm_write_new_label
+		db_reset partman-partitioning/confirm_write_new_label
 	fi
 	
 	open_dialog NEW_LABEL "$label_type"
