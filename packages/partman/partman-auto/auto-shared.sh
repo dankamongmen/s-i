@@ -29,6 +29,9 @@ lvm_wipe_disk() {
 		return 1
 	fi
 
+	# We need devicemapper support
+	modprobe dm-mod >/dev/null 2>&1
+
 	# Check all VG's
 	for vg in $(vg_list); do
 		pvs=$(vg_list_pvs $vg)
@@ -59,7 +62,7 @@ lvm_wipe_disk() {
 	done
 
 	# Make sure that parted has no stale LVM info
-	restart="0"
+	restart=""
 	for tmpdev in $DEVICES/*; do
 		[ -d "$tmpdev" ] || continue
 
@@ -74,10 +77,10 @@ lvm_wipe_disk() {
 		fi
 
 		rm -rf $tmpdev
-		restart="1"
+		restart=1
 	done
 
-	if [ $restart ]; then
+	if [ "$restart" ]; then
 		stop_parted_server
 		restart_partman || return 1
 	fi
