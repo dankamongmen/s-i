@@ -1,4 +1,4 @@
-. /lib/partman/definitions.sh
+. /lib/partman/lib/base.sh
 . /lib/partman/recipes.sh
 . /lib/partman/lvm_tools.sh
 . /lib/partman/auto-shared.sh

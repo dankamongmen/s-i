@@ -1,4 +1,4 @@
-. /lib/partman/definitions.sh
+. /lib/partman/lib/base.sh
 
 # Avoid warnings from lvm2 tools about open file descriptors
 # Setting this here should avoid them for partman as a whole
