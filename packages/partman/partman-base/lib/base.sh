@@ -482,6 +482,16 @@ log () {
 # The functions below are not yet documented
 ####################################################################
 
+# Returns free memory in kB
+memfree () {
+	if [ -e /proc/meminfo ]; then
+		echo $(grep MemFree /proc/meminfo | head -1 | \
+			sed 's/.*:[[:space:]]*\([0-9]*\).*/\1/')
+	else
+		echo 0
+	fi
+}
+
 # TODO: this should not be global
 humandev () {
     local host bus target part lun idenum targtype scsinum linux
