@@ -1,6 +1,6 @@
 . /lib/partman/lib/base.sh
 . /lib/partman/lib/recipes.sh
-. /lib/partman/lvm_tools.sh
+. /lib/partman/lib/lvm-base.sh
 . /lib/partman/lib/auto-shared.sh
 
 bail_out() {

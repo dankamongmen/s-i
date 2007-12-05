@@ -9,11 +9,11 @@ lvm_wipe_disk() {
 	dev="$1"
 	cd $dev
 
-	if [ ! -e /lib/partman/lvm_tools.sh ]; then
+	if [ ! -e /lib/partman/lib/lvm-base.sh ]; then
 		return 0
 	fi
 
-	. /lib/partman/lvm_tools.sh
+	. /lib/partman/lib/lvm-base.sh
 
 	# Check if the device already contains any physical volumes
 	realdev=$(mapdevfs "$(cat $dev/device)")
