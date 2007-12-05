@@ -1,7 +1,7 @@
 . /lib/partman/lib/base.sh
-. /lib/partman/recipes.sh
+. /lib/partman/lib/recipes.sh
 . /lib/partman/lvm_tools.sh
-. /lib/partman/auto-shared.sh
+. /lib/partman/lib/auto-shared.sh
 
 bail_out() {
 	db_input critical partman-auto-lvm/$1 || true
