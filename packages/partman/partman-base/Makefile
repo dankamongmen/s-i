@@ -1,5 +1,5 @@
 CFLAGS=-Wall -Os -D_GNU_SOURCE
-LIBS=-lparted -ldl
+LIBS=-lparted
 
 all: parted_server parted_devices partmap stralign
 
