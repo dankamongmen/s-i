@@ -9,6 +9,48 @@ abort () {
 	exit $1
 }
 
+# Implemented here instead of init.d because anna displays a progress bar
+# which conflicts with the init.d progress bar
+load_extra () {
+	local auto memreq_lvm memreq_crypto
+
+	if [ -f /var/lib/partman/loaded-extra ]; then
+		return 0
+	fi
+	>/var/lib/partman/loaded-extra
+
+	# Rough memory requirements in kB; could be made arch dependent
+	memreq_lvm=7500
+	memreq_crypto=11000	# 1MB more than limit in partman-crypto
+
+	auto=""
+	if [ -f /lib/partman/lib/auto-shared.sh ]; then
+		auto=1
+	fi
+
+	# partman-lvm is loaded first, then partman-crypto
+	if [ ! -f /lib/partman/lib/lvm-base.sh ] && \
+	   [ $(memfree) -ge $memreq_lvm ]; then
+		if [ "$auto" ]; then
+			anna-install partman-auto-lvm
+		else
+			anna-install partman-lvm
+		fi
+	else
+		logger -t partman "Insufficient free memory to load LVM support"
+	fi
+	if [ ! -f /lib/partman/lib/crypto-base.sh ] && \
+	   [ $(memfree) -ge $memreq_crypto ]; then
+		if [ "$auto" ]; then
+			anna-install partman-auto-crypto
+		else
+			anna-install partman-crypto
+		fi
+	else
+		logger -t partman "Insufficient free memory to load crypto support"
+	fi
+}
+
 db_capb backup
 
 ###########################################################
@@ -61,6 +103,9 @@ export debconf_select_lead
 #fi
 
 mkdir -p /var/lib/partman
+
+# Load additional components when sufficent memory is available
+load_extra
 
 while true; do
 	initcount=$(ls /lib/partman/init.d/* | wc -l)
