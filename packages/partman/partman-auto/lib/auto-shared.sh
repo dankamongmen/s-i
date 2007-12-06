@@ -100,7 +100,7 @@ wipe_disk() {
 	types=$(read_list)
 	close_dialog
 
-	. /lib/partman/lib/new-label.sh
+	. /lib/partman/lib/disk-label.sh
 	label_type=$(default_disk_label)
 
 	if ! expr "$types" : ".*${label_type}.*" >/dev/null; then
