@@ -484,9 +484,13 @@ log () {
 
 # Returns free memory in kB
 memfree () {
+	local free buff
 	if [ -e /proc/meminfo ]; then
-		echo $(grep MemFree /proc/meminfo | head -1 | \
+		free=$(grep MemFree /proc/meminfo | head -n1 | \
 			sed 's/.*:[[:space:]]*\([0-9]*\).*/\1/')
+		buff=$(grep Buffers /proc/meminfo | head -n1 | \
+			sed 's/.*:[[:space:]]*\([0-9]*\).*/\1/')
+		echo $(($free + $buff))
 	else
 		echo 0
 	fi
