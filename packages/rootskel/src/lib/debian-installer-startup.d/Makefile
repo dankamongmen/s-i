@@ -17,7 +17,6 @@ endif
 files = \
 	S01mount \
 	S02module-params \
-	S03hotplug \
 	S10syslog \
 	S20templates \
 	S35term

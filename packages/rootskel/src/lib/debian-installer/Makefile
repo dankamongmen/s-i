@@ -18,7 +18,6 @@ files = \
 	init-debug
 
 files_exec = \
-	coldplug \
 	exit \
 	exit-command \
 	init-udev-devices \
