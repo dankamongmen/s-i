@@ -53,7 +53,7 @@ makedev () {
 mkdir -p 755 /dev
 
 for i in 0 1 2 3 4 5 6 7; do
-	if sys_dev=`cat /sys/block/fd$i/dev 2>/dev/null`; then
+	if sys_dev=$(cat /sys/block/fd$i/dev 2>/dev/null); then
 		case $sys_dev in
 			2:0) makedev  /dev/fd"$i" b 2 0 ;;	    
 			2:1) makedev  /dev/fd"$i" b 2 1 ;;	    
@@ -82,7 +82,9 @@ test_disk_lbl () {
     str=$3
     shift 3
     shift $n
-    if [ "$nb_words" = "1" -a "$str" = "$1" ] || [ "$nb_words" = "2" -a "$str" = "$1 $2" ]  || [ "$nb_words" = "3" -a "$str" = "$1 $2 $3" ] ; then
+    if ([ "$nb_words" = "1" ] && [ "$str" = "$1" ]) || \
+       ([ "$nb_words" = "2" ] && [ "$str" = "$1 $2" ])  || \
+       ([ "$nb_words" = "3" ] && [ "$str" = "$1 $2 $3" ]) ; then
 	    return 0
     fi
     return 1   
@@ -153,7 +155,7 @@ while [ "$LOADED" = 0 ]; do
 				# whatever.
 				if try_mount $dev $ROOT_FS floppy; then
 					if [ -e floppy/disk.lbl ] ; then
-						disk_lbl=`cat floppy/disk.lbl`
+						disk_lbl=$(cat floppy/disk.lbl)
 						if ! test_disk_lbl 0 1 "System:" $disk_lbl || \
 							! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
 							ERR="$ERR; $dev: not a $SYSTEM floppy"
@@ -199,10 +201,11 @@ while [ "$LOADED" = 0 ]; do
 	# Hard to do in a pipeline..
 	echo 0 > /tmp/zcat_failure
 	cd mnt
-	(zcat ../floppy/initrd.gz || echo 1 > /tmp/zcat_failure ) | cpio -i -V || abort "failed to extract initrd (may be out of space on ram disk)"
+	(zcat ../floppy/initrd.gz || echo 1 > /tmp/zcat_failure ) | cpio -i -V || \
+	 abort "failed to extract initrd (may be out of space on ram disk)"
 	cd ..
 
-	if [ "`cat /tmp/zcat_failure`" = 0 ]; then
+	if [ "$(cat /tmp/zcat_failure)" = 0 ]; then
 		LOADED=1
 	else
 		echo "install media seems to be bad!" >&2

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-log () {
+log() {
 	if [ -S /dev/log ]; then
 		logger -t coldplug "$@"
 	else
@@ -8,7 +8,7 @@ log () {
 	fi
 }
 
-run_hotplug_rc () {
+run_hotplug_rc() {
 	log "Running $1"
 	if $1 start; then
 		log "$(printf "   %-8s [success]\n" "$2")"
@@ -22,14 +22,14 @@ if [ -d /etc/hotplug ]; then
 		basename="${RC#/etc/hotplug/}"
 		name="${basename%.rc}"
 		case $name in
-			pci|usb|ide|scsi)
-				# Defer these until last so that we can
-				# guarantee ordering.
-				continue
-				;;
-			*)
-				run_hotplug_rc "$RC" "$name"
-				;;
+		     pci|usb|ide|scsi)
+			# Defer these until last so that we can
+			# guarantee ordering
+			continue
+			;;
+		     *)
+			run_hotplug_rc "$RC" "$name"
+			;;
 		esac
 	done
 	for name in pci usb ide scsi; do

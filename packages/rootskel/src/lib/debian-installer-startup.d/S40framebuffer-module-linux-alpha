@@ -1,8 +1,9 @@
-if [ -n "$TERM_FRAMEBUFFER_TRY" -a "`debconf-get debian-installer/framebuffer`" = true ]; then
-	case "`archdetect`" in
-		alpha/*)
-			echo "Trying to enable the frame buffer..."
-			modprobe -q tgafb >/dev/null 2>&1 || \
-			true
+if [ -n "$TERM_FRAMEBUFFER_TRY" ] && \
+   [ "$(debconf-get debian-installer/framebuffer)" = true ]; then
+	case "$(archdetect)" in
+	    alpha/*)
+		echo "Trying to enable the frame buffer..."
+		modprobe -q tgafb >/dev/null 2>&1 || true
+		;;
 	esac
 fi
