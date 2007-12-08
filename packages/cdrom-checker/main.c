@@ -155,12 +155,9 @@ int check_cdrom() {
 }
 
 int main(int argc, char **argv) {
-	system("touch /tmp/test");
-	system("logger init");
-        di_system_init(basename(argv[0]));
+        di_/system_init(basename(argv[0]));
 	/* initialize the debconf frontend */
 	debconf = debconfclient_new();
-	system("logger after");
 
 	/* ask if we should proceed with the checking */
 	debconf_set(debconf, "cdrom-checker/start", "false");
@@ -176,7 +173,6 @@ int main(int argc, char **argv) {
 		}
 		return(EXIT_SUCCESS);
 	}
-	system("logger after-quest");
 
 	detect_cdrom();
 
