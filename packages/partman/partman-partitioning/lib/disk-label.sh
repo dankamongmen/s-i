@@ -155,6 +155,7 @@ default_disk_label () {
 create_new_label() {
 	local dev default_type chosen_type types
 	dev="$1"
+	prompt_for_label="$2"
 
 	[ -d "$dev" ] || return 1
 	cd $dev
@@ -178,15 +179,20 @@ create_new_label() {
 		fi
 	fi
 
-	if expr "$types" : ".*${default_label}.*" >/dev/null; then
-		db_set partman-partitioning/choose_label "$default_label"
-		PRIORITY=low
-	fi
-	db_input $PRIORITY partman-partitioning/choose_label || true
-	db_go || exit 1
-	db_get partman-partitioning/choose_label
+	if [ "$prompt_for_label" = no ] && \
+	   expr "$types" : ".*${default_label}.*" >/dev/null; then
+		chosen_type="$default_label"
+	else
+		if expr "$types" : ".*${default_label}.*" >/dev/null; then
+			db_set partman-partitioning/choose_label "$default_label"
+			PRIORITY=low
+		fi
+		db_input $PRIORITY partman-partitioning/choose_label || true
+		db_go || exit 1
+		db_get partman-partitioning/choose_label
 
-	chosen_type="$RET"
+		chosen_type="$RET"
+	fi
 
 	if [ "$chosen_type" = sun ]; then
 		db_input critical partman-partitioning/confirm_write_new_label
