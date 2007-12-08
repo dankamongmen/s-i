@@ -25,6 +25,8 @@ device_remove_lvm() {
 	modprobe dm-mod >/dev/null 2>&1
 
 	# Check all VG's
+	# BUGME: the greps in this loop should be properly bounded so they
+	#	 do not match on partial matches!
 	for vg in $(vg_list); do
 		pvs=$(vg_list_pvs $vg)
 		
