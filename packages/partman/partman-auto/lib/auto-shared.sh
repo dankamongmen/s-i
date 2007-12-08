@@ -90,60 +90,11 @@ wipe_disk() {
 
 	lvm_wipe_disk "$dev" || return 1
 
-	cd $dev
-
-	open_dialog LABEL_TYPES
-	types=$(read_list)
-	close_dialog
-
+	# Create new disk label; don't prompt for label
 	. /lib/partman/lib/disk-label.sh
-	label_type=$(default_disk_label)
+	create_new_label "$dev" no || return 1
 
-	if ! expr "$types" : ".*${label_type}.*" >/dev/null; then
-		label_type=msdos # most widely used
-	fi
-	
-	# Use gpt instead of msdos disklabel for disks larger than 2TB
-	if expr "$types" : ".*gpt.*" >/dev/null; then
-		if [ "$label_type" = msdos ]; then
-			disksize=$(cat size)
-			if $(longint_le $(human2longint 2TB) $disksize); then
-				label_type=gpt
-			fi
-		fi
-	fi
-
-	if [ "$label_type" = sun ]; then
-		db_input critical partman-partitioning/confirm_write_new_label
-		db_go || exit 0
-		db_get partman-partitioning/confirm_write_new_label
-		if [ "$RET" = false ]; then
-			db_reset partman-partitioning/confirm_write_new_label
-			exit 1
-		fi
-		db_reset partman-partitioning/confirm_write_new_label
-	fi
-	
-	open_dialog NEW_LABEL "$label_type"
-	close_dialog
-	
-	if [ "$label_type" = sun ]; then
-		# write the partition table to the disk
-		disable_swap
-		open_dialog COMMIT
-		close_dialog
-		sync
-		# reread it from there
-		open_dialog UNDO
-		close_dialog
-		enable_swap
-	fi
-
-	# Different types partition tables support different visuals.  Some
-	# have partition names other don't have, some have extended and
-	# logical partitions, others don't.  Hence we have to regenerate the
-	# list of the visuals
-	rm -f visuals
+	cd $dev
 
 	free_space=''
 	open_dialog PARTITIONS
