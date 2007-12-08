@@ -1,5 +1,4 @@
-## this file contains a bunch of shared code between partman-auto
-## and partman-auto-lvm.
+## Shared code for all guided partitioning components
 
 # Wipes any traces of LVM from a disk
 # Normally you wouldn't want to use this function, 
@@ -25,7 +24,7 @@ lvm_wipe_disk() {
 	db_input critical partman-auto/purge_lvm_from_device
 	db_go || return 1
 	db_get partman-auto/purge_lvm_from_device
-	if [ "$RET" != "true" ]; then
+	if [ "$RET" != true ]; then
 		return 1
 	fi
 
@@ -68,11 +67,8 @@ lvm_wipe_disk() {
 
 		realdev=$(cat $tmpdev/device)
 
-		if ! $(echo "$realdev" | grep -q "/dev/mapper/"); then
-			continue
-		fi
-
-		if [ -b "$realdev" ]; then
+		if [ -b "$realdev" ] || \
+		   ! $(echo "$realdev" | grep -q "/dev/mapper/"); then
 			continue
 		fi
 
@@ -109,9 +105,9 @@ wipe_disk() {
 	
 	# Use gpt instead of msdos disklabel for disks larger than 2TB
 	if expr "$types" : ".*gpt.*" >/dev/null; then
-		if [ "$label_type" = msdos ] ; then
+		if [ "$label_type" = msdos ]; then
 			disksize=$(cat size)
-			if $(longint_le $(human2longint 2TB) $disksize) ; then
+			if $(longint_le $(human2longint 2TB) $disksize); then
 				label_type=gpt
 			fi
 		fi
@@ -161,118 +157,116 @@ wipe_disk() {
 	close_dialog
 }
 
-### XXXX: i am not 100% sure if this is exactly what this code is doing.
+### XXXX: I am not 100% sure if this is exactly what this code is doing.
 ### XXXX: rename is of course an option. Just remember to do it here, in
 ### XXXX: perform_recipe and in partman-auto-lvm
 create_primary_partitions() {
-
 	cd $dev
 
-	while
-	    [ "$free_type" = pri/log ] \
-	    && echo $scheme | grep '\$primary{' >/dev/null
-	do
-	    pull_primary
-	    set -- $primary
-	    open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
-	    read_line num id size type fs path name
-	    close_dialog
-	    if [ -z "$id" ]; then
-		db_progress STOP
-		autopartitioning_failed
-	    fi
-	    neighbour=$(partition_after $id)
-	    if [ "$neighbour" ]; then
-		open_dialog PARTITION_INFO $neighbour
-		read_line x1 new_free_space x2 new_free_type fs x3 x4
-		close_dialog
-	    fi
-	    if 
-		[ -z "$neighbour" -o "$fs" != free \
-		  -o "$new_free_type" = primary -o "$new_free_type" = unusable ]
-	    then
-		open_dialog DELETE_PARTITION $id
-		close_dialog
-		open_dialog NEW_PARTITION primary $4 $free_space end ${1}000001
+	while [ "$free_type" = pri/log ] && \
+	      echo $scheme | grep '\$primary{' >/dev/null; do
+		pull_primary
+		set -- $primary
+		open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
 		read_line num id size type fs path name
 		close_dialog
 		if [ -z "$id" ]; then
-		    db_progress STOP
-		    autopartitioning_failed
+			db_progress STOP
+			autopartitioning_failed
 		fi
-		neighbour=$(partition_before $id)
+		neighbour=$(partition_after $id)
 		if [ "$neighbour" ]; then
-		    open_dialog PARTITION_INFO $neighbour
-		    read_line x1 new_free_space x2 new_free_type fs x3 x4
-		    close_dialog
+			open_dialog PARTITION_INFO $neighbour
+			read_line x1 new_free_space x2 new_free_type fs x3 x4
+			close_dialog
 		fi
-		if 
-		    [ -z "$neighbour" -o "$fs" != free -o "$new_free_type" = unusable ]
-		then
-		    open_dialog DELETE_PARTITION $id
-		    close_dialog
-		    break
+		if [ -z "$neighbour" ] || [ "$fs" != free ] || \
+		   [ "$new_free_type" = primary ] || \
+		   [ "$new_free_type" = unusable ]; then
+			open_dialog DELETE_PARTITION $id
+			close_dialog
+			open_dialog NEW_PARTITION primary $4 $free_space end ${1}000001
+			read_line num id size type fs path name
+			close_dialog
+			if [ -z "$id" ]; then
+				db_progress STOP
+				autopartitioning_failed
+			fi
+			neighbour=$(partition_before $id)
+			if [ "$neighbour" ]; then
+				open_dialog PARTITION_INFO $neighbour
+				read_line x1 new_free_space x2 new_free_type fs x3 x4
+				close_dialog
+			fi
+			if [ -z "$neighbour" ] || [ "$fs" != free ] ||
+			   [ "$new_free_type" = unusable ]; then
+				open_dialog DELETE_PARTITION $id
+				close_dialog
+				break
+			fi
 		fi
-	    fi
-	    shift; shift; shift; shift
-	    setup_partition $id $*
-	    primary=''
-	    scheme="$logical"
-	    free_space=$new_free_space
-	    free_type="$new_free_type"
+		shift; shift; shift; shift
+		setup_partition $id $*
+		primary=''
+		scheme="$logical"
+		free_space=$new_free_space
+		free_type="$new_free_type"
 	done
 }
 
 create_partitions() {
-foreach_partition '
-    if [ -z "$free_space" ]; then
-        db_progress STOP
-	autopartitioning_failed
-    fi
-    open_dialog PARTITION_INFO $free_space
-    read_line x1 free_space x2 free_type fs x3 x4
-    close_dialog
-    if [ "$fs" != free ]; then
-        free_type=unusable
-    fi
-    case "$free_type" in
-	primary|logical)
-	    type="$free_type"
-	    ;;
-	pri/log)
-	    type=logical
-	    ;;
-	unusable)
-            db_progress STOP
-	    autopartitioning_failed
-	    ;;
-    esac
-    if [ "$last" = yes ]; then
-        open_dialog NEW_PARTITION $type $4 $free_space full ${1}000001
-    else
-        open_dialog NEW_PARTITION $type $4 $free_space beginning ${1}000001
-    fi
-    read_line num id size type fs path name
-    close_dialog
-    if [ -z "$id" ]; then
-        db_progress STOP
-	autopartitioning_failed
-    fi
-    # Mark the partition LVM only if it is actually LVM and add it to vgpath
-    if echo "$*" | grep -q "method{ lvm }"; then
-	devfspv_devices="$devfspv_devices $path"
-	open_dialog GET_FLAGS $id
-	flags=$(read_paragraph)
+    foreach_partition '
+	if [ -z "$free_space" ]; then
+		db_progress STOP
+		autopartitioning_failed
+	fi
+	open_dialog PARTITION_INFO $free_space
+	read_line x1 free_space x2 free_type fs x3 x4
 	close_dialog
-	open_dialog SET_FLAGS $id
-	write_line "$flags"
-	write_line lvm
-	write_line NO_MORE
+	if [ "$fs" != free ]; then
+		free_type=unusable
+	fi
+
+	case "$free_type" in
+	    primary|logical)
+		type="$free_type"
+		;;
+	    pri/log)
+		type=logical
+		;;
+	    unusable)
+		db_progress STOP
+		autopartitioning_failed
+		;;
+	esac
+
+	if [ "$last" = yes ]; then
+		open_dialog NEW_PARTITION $type $4 $free_space full ${1}000001
+	else
+		open_dialog NEW_PARTITION $type $4 $free_space beginning ${1}000001
+	fi
+	read_line num id size type fs path name
 	close_dialog
-    fi
-    shift; shift; shift; shift
-    setup_partition $id $*
-    free_space=$(partition_after $id)'
+	if [ -z "$id" ]; then
+		db_progress STOP
+		autopartitioning_failed
+	fi
+
+	# Mark the partition LVM only if it is actually LVM and add it to vgpath
+	if echo "$*" | grep -q "method{ lvm }"; then
+		devfspv_devices="$devfspv_devices $path"
+		open_dialog GET_FLAGS $id
+		flags=$(read_paragraph)
+		close_dialog
+		open_dialog SET_FLAGS $id
+		write_line "$flags"
+		write_line lvm
+		write_line NO_MORE
+		close_dialog
+	fi
+	shift; shift; shift; shift
+	setup_partition $id $*
+	free_space=$(partition_after $id)'
 }
 
 get_auto_disks() {
