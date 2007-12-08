@@ -155,7 +155,7 @@ int check_cdrom() {
 }
 
 int main(int argc, char **argv) {
-        di_/system_init(basename(argv[0]));
+        di_system_init(basename(argv[0]));
 	/* initialize the debconf frontend */
 	debconf = debconfclient_new();
 
