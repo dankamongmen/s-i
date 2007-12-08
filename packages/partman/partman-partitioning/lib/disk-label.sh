@@ -158,6 +158,12 @@ create_new_label() {
 	prompt_for_label="$2"
 
 	[ -d "$dev" ] || return 1
+
+	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
+		. /lib/partman/lib/lvm-remove.sh
+		device_remove_lvm "$dev" || return 1
+	fi
+
 	cd $dev
 
 	open_dialog LABEL_TYPES

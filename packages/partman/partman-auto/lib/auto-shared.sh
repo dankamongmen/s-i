@@ -4,11 +4,6 @@ auto_init_disk() {
 	local dev
 	dev="$1"
 
-	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
-		. /lib/partman/lib/lvm-remove.sh
-		device_remove_lvm "$dev" || return 1
-	fi
-
 	# Create new disk label; don't prompt for label
 	. /lib/partman/lib/disk-label.sh
 	create_new_label "$dev" no || return 1
