@@ -66,7 +66,7 @@ int mount_cdrom() {
 		return(EXIT_SUCCESS);
 
 	/* unable to mount the cdrom device */
-	debconf_subst(debconf,"cdrom-checker/mntfailed", "CDROM", cdrom_device);
+	debconf_subst(debconf, "cdrom-checker/mntfailed", "CDROM", cdrom_device);
 	debconf_input(debconf, "high", "cdrom-checker/mntfailed");
 	debconf_go(debconf);
 	return(EXIT_FAILURE);
@@ -202,7 +202,7 @@ int main(int argc, char **argv) {
 		debconf_set(debconf, "cdrom-checker/nextcd", "false");
 		debconf_input(debconf, "high", "cdrom-checker/nextcd");
 		debconf_go(debconf);
-		debconf_get(debconf,"cdrom-checker/nextcd");
+		debconf_get(debconf, "cdrom-checker/nextcd");
 		if(!strstr(debconf->value, "true"))
 			break;
 	}
