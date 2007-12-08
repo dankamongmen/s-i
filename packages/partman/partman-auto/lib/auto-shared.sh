@@ -1,94 +1,13 @@
 ## Shared code for all guided partitioning components
 
-# Wipes any traces of LVM from a disk
-# Normally you wouldn't want to use this function, 
-# but wipe_disk() which will also call this function.
-lvm_wipe_disk() {
-	local dev realdev vg pvs pv lv tmpdev restart
-	dev="$1"
-	cd $dev
-
-	if [ ! -e /lib/partman/lib/lvm-base.sh ]; then
-		return 0
-	fi
-
-	. /lib/partman/lib/lvm-base.sh
-
-	# Check if the device already contains any physical volumes
-	realdev=$(mapdevfs "$(cat $dev/device)")
-	if ! pv_on_device "$realdev"; then
-		return 0
-	fi
-
-	# Ask for permission to erase LVM volumes 
-	db_input critical partman-auto/purge_lvm_from_device
-	db_go || return 1
-	db_get partman-auto/purge_lvm_from_device
-	if [ "$RET" != true ]; then
-		return 1
-	fi
-
-	# We need devicemapper support
-	modprobe dm-mod >/dev/null 2>&1
-
-	# Check all VG's
-	for vg in $(vg_list); do
-		pvs=$(vg_list_pvs $vg)
-		
-		# Only deal with VG's on the selected disk
-		if ! $(echo "$pvs" | grep -q "$realdev"); then
-			continue
-		fi
-
-		# Make sure the VG don't span any other disks
-		if $(echo -n "$pvs" | grep -q -v "$realdev"); then
-			log-output -t partman-auto-lvs vgs
-			db_input critical partman-auto/cannot_purge_lvm_from_device || true
-			db_go || true
-			return 1
-		fi
-
-		# Remove LV's from the VG
-		for lv in $(vg_list_lvs $vg); do
-			lv_delete $vg $lv
-		done
-
-		# Remove the VG and its PV's 
-		vg_delete $vg
-		for pv in $pvs; do
-			pv_delete $pv
-		done
-	done
-
-	# Make sure that parted has no stale LVM info
-	restart=""
-	for tmpdev in $DEVICES/*; do
-		[ -d "$tmpdev" ] || continue
-
-		realdev=$(cat $tmpdev/device)
-
-		if [ -b "$realdev" ] || \
-		   ! $(echo "$realdev" | grep -q "/dev/mapper/"); then
-			continue
-		fi
-
-		rm -rf $tmpdev
-		restart=1
-	done
-
-	if [ "$restart" ]; then
-		stop_parted_server
-		restart_partman || return 1
-	fi
-
-	return 0
-}
-
 wipe_disk() {
 	local dev
 	dev="$1"
 
-	lvm_wipe_disk "$dev" || return 1
+	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
+		. /lib/partman/lib/lvm-remove.sh
+		device_remove_lvm "$dev" || return 1
+	fi
 
 	# Create new disk label; don't prompt for label
 	. /lib/partman/lib/disk-label.sh
@@ -109,8 +28,8 @@ wipe_disk() {
 }
 
 ### XXXX: I am not 100% sure if this is exactly what this code is doing.
-### XXXX: rename is of course an option. Just remember to do it here, in
-### XXXX: perform_recipe and in partman-auto-lvm
+### XXXX: Rename is of course an option. Just remember to do it here, in
+### XXXX: perform_recipe and in partman-auto-lvm.
 create_primary_partitions() {
 	cd $dev
 
