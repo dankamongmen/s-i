@@ -1,8 +1,7 @@
 . /lib/partman/lib/lvm-base.sh
 
 # Wipes any traces of LVM from a disk
-# Normally you wouldn't want to use this function, 
-# but wipe_disk() which will also call this function.
+# Normally called from a function that initializes a device
 device_remove_lvm() {
 	local dev realdev vg pvs pv lv tmpdev restart
 	dev="$1"

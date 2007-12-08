@@ -1,6 +1,6 @@
 ## Shared code for all guided partitioning components
 
-wipe_disk() {
+auto_init_disk() {
 	local dev
 	dev="$1"
 

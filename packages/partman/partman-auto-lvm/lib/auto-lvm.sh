@@ -31,7 +31,7 @@ auto_lvm_prepare() {
 
 	choose_recipe lvm "$target" "$free_size" || return $?
 
-	wipe_disk "$dev" || return $?
+	auto_init_disk "$dev" || return $?
 
 	# Check if partition is usable; use existing partman-auto template as we depend on it
 	if [ "$free_type" = unusable ]; then
