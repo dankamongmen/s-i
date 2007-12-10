@@ -27,6 +27,7 @@ device_remove_lvm() {
 	# Check all VG's
 	# BUGME: the greps in this loop should be properly bounded so they
 	#	 do not match on partial matches!
+	#        Except that we want partial matches for disks...
 	for vg in $(vg_list); do
 		pvs=$(vg_list_pvs $vg)
 		
