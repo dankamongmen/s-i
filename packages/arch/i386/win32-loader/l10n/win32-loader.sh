@@ -43,9 +43,9 @@ langstring ()
 }
 
 # translate:
-# This must be the string used by Windows to represent your
-# language's charset.  If you don't know, check [wine]/tools/wmc/lang.c,
-# or http://www.microsoft.com/globaldev/reference/WinCP.mspx
+# This must be the string used by GNU iconv to represent the charset used
+# by Windows for your language.  If you don't know, check
+# [wine]/tools/wmc/lang.c, or http://www.microsoft.com/globaldev/reference/WinCP.mspx
 #
 # IMPORTANT: In the rest of this file, only the subset of UTF-8 that can be
 # converted to this charset should be used.
