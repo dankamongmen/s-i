@@ -74,11 +74,7 @@ do_vg_create() {
 	for pv in $(pv_list_free); do
 		pv_get_info "$pv"
 		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
-		if [ -z "$pvs" ]; then
-			pvs="$output"
-		else
-			pvs="$pvs, $output"
-		fi
+		pvs="${pvs:+$pvs, }$output"
 	done
 	if [ -z "$pvs" ]; then
 		db_input critical partman-lvm/nopartitions
@@ -152,11 +148,7 @@ do_vg_delete() {
 		vg_get_info "$vg"
 		[ "$LVS" -eq 0 ] || continue
 		output=$(printf "%-30s (%sMB)" "$vg" "$SIZE")
-		if [ -z "$vgs" ]; then
-			vgs="$output"
-		else
-			vgs="$vgs, $output"
-		fi
+		vgs="${vgs:+$vgs, }$output"
 	done
 	if [ -z "$vgs" ]; then
 		db_input critical partman-lvm/vgdelete_novg
@@ -200,11 +192,7 @@ do_vg_extend() {
 	for pv in $(pv_list_free); do
 		pv_get_info "$pv"
 		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
-		if [ -z "$pvs" ]; then
-			pvs="$output"
-		else
-			pvs="$pvs, $output"
-		fi
+		pvs="${pvs:+$pvs, }$output"
 	done
 	if [ -z "$pvs" ]; then
 		db_input critical partman-lvm/nopartitions
@@ -217,11 +205,7 @@ do_vg_extend() {
 	for vg in $(vg_list); do
 		vg_get_info "$vg"
 		output=$(printf "%-30s (%sMB)" "$vg" "$SIZE")
-		if [ -z "$vgs" ]; then
-			vgs="$output"
-		else
-			vgs="$vgs, $output"
-		fi
+		vgs="${vgs:+$vgs, }$output"
 	done
 	if [ -z "$vgs" ]; then
 		db_input critical partman-lvm/vgextend_novg
@@ -274,11 +258,7 @@ do_vg_reduce() {
 		vg_get_info "$vg"
 		[ "$PVS" -gt 1 ] || continue
 		output=$(printf "%-30s (%sMB - %s)" "$vg" "$FREE" "$PVS $RET")
-		if [ -z "$vgs" ]; then
-			vgs="$output"
-		else
-			vgs="$vgs, $output"
-		fi
+		vgs="${vgs:+$vgs, }$output"
 	done
 	if [ -z "$vgs" ]; then
 		db_input critical partman-lvm/vgreduce_novg
@@ -299,11 +279,7 @@ do_vg_reduce() {
 	for pv in $(vg_list_pvs "$vg"); do
 		pv_get_info "$pv"
 		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
-		if [ -z "$pvs" ]; then
-			pvs="$output"
-		else
-			pvs="$pvs, $output"
-		fi
+		pvs="${pvs:+$pvs, }$output"
 	done
 
 	# Prompt for PVs to use
@@ -323,7 +299,7 @@ do_vg_reduce() {
 	# Check if all PVs were selected and delete in that case
 	count=$(echo -n "$pvs" | wc -w)
 	vg_get_info "$vg"
-	if [ "$count" -eq "$PVS" ]; then
+	if [ $count -eq $PVS ]; then
 		if ! vg_delete "$vg"; then 
 			db_input critical partman-lvm/vgdelete_error
 			db_go || true
@@ -353,13 +329,8 @@ do_lv_create() {
 	for vg in $(vg_list_free); do
 		vg_get_info "$vg"
 		output=$(printf "%-30s (%sMB)" "$vg" "$FREE")
-		if [ -z "$vgs" ]; then
-			vgs="$output"
-		else
-			vgs="$vgs, $output"
-		fi
+		vgs="${vgs:+$vgs, }$output"
 	done
-
 	if [ -z "$vgs" ]; then
 		db_input critical partman-lvm/lvcreate_nofreevg
 		db_go || true
@@ -443,11 +414,7 @@ do_lv_delete() {
 		db_metaget partman-lvm/text/lvdelete_invg description
 		lv_get_info "$vg" "$lv"
 		output=$(printf "%-30s (%sMB - %s)" "$lv" "$SIZE" "$RET")
-		if [ -z "$lvs" ]; then
-			lvs="$output"
-		else
-			lvs="$lvs, $output"
-		fi
+		lvs="${lvs:+$lvs, }$output"
 	done
 
 	if [ -z "$lvs" ]; then
