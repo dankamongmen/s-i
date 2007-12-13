@@ -139,11 +139,7 @@ do_vg_create() {
 		db_input critical partman-lvm/vgcreate_error
 		db_go || true
 	else
-		db_subst partman-lvm/text/in_use VG "$vg"
-		db_metaget partman-lvm/text/in_use description
-		for pv in $pvs; do
-			partman_lock_unit "$pv" "$RET"
-		done
+		vg_lock_pvs "$vg" $pvs
 	fi
 }
 
@@ -263,9 +259,7 @@ do_vg_extend() {
 			db_go || true
 			return
 		else
-			db_subst partman-lvm/text/in_use VG "$vg"
-			db_metaget partman-lvm/text/in_use description
-			partman_lock_unit "$pv" "$RET"
+			vg_lock_pvs "$vg" $pv
 		fi
 	done
 }

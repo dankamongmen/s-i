@@ -418,12 +418,25 @@ vg_list_lvs() {
 	lvm_get_info lvs lv_name "$1"
 }
 
+# Lock device(s) holding a PV
+vg_lock_pvs() {
+	local name pv
+	name="$1"
+	shift
+
+	db_subst partman-lvm/text/in_use VG "$name"
+	db_metaget partman-lvm/text/in_use description
+	for pv in $*; do
+		partman_lock_unit "$pv" "$RET"
+	done
+}
+
 # Create a volume group
 vg_create() {
 	local vg pv
 	vg="$1"
-
 	shift
+
 	for pv in $*; do
 		pv_create "$pv" || return 1
 	done
