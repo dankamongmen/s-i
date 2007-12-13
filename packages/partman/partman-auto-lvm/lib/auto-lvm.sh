@@ -117,7 +117,7 @@ auto_lvm_prepare() {
 
 auto_lvm_perform() {
 	# Use hostname as default vg name (if available)
-	local defvgname
+	local defvgname pv
 	db_get partman-auto-lvm/new_vg_name
 	if [ -z "$RET" ]; then
 		if [ -s /etc/hostname ]; then
@@ -151,6 +151,7 @@ auto_lvm_perform() {
 	else
 		bail_out vg_create_error
 	fi
+	vg_lock_pvs "$VG_name" $pv_devices
 
 	# Default to accepting the autopartitioning
 	menudir_default_choice /lib/partman/choose_partition finish finish || true
