@@ -13,7 +13,7 @@ log-output -t partman pvscan
 log-output -t partman vgscan
 
 if [ -x /sbin/vgdisplay ]; then
-	vgroups=$(/sbin/vgdisplay | grep '^[ ]*VG Name' | 
+	vgroups=$(/sbin/vgdisplay | grep '^[ ]*VG Name' | \
 		sed -e 's/.*[[:space:]]\(.*\)$/\1/' | sort)
 else
 	vgroups=''
@@ -40,7 +40,7 @@ for dev in /var/lib/partman/devices/*; do
 		if pvdisplay $(cat $dev/device) >/dev/null 2>&1 ; then
 			lvm=yes
 		fi
-	
+
 		open_dialog GET_FLAGS $id
 		while { read_line flag; [ "$flag" ]; }; do
 			if [ "$flag" = lvm ]; then
@@ -96,7 +96,7 @@ for dev in /var/lib/partman/devices/*; do
 				read_line num id size type fs path name
 				close_dialog
 				if [ "$id" ]; then
-					open_dialog GET_FILE_SYSTEM $id 
+					open_dialog GET_FILE_SYSTEM $id
 					read_line filesystem
 					close_dialog
 					if [ "$filesystem" != none ]; then

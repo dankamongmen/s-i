@@ -308,7 +308,7 @@ update_partition () {
 		$u $1 $part
 	done
 }
-        
+      
 DEVICES=/var/lib/partman/devices
 
 # 0, 1 and 2 are standard input, output and error.
@@ -383,7 +383,7 @@ error_handler () {
 		db_progress INFO $info
 		while { read_line frac state; [ "$frac" != ready ]; }; do
 		    if [ "$state" ]; then
-			db_subst $info STATE "$state" 
+			db_subst $info STATE "$state"
 			db_progress INFO $info
 		    fi
 		    db_progress SET $frac
@@ -922,7 +922,7 @@ confirm_changes () {
 			partitions="$partitions $id,$num"
 		done
 		close_dialog
-	
+
 		for part in $partitions; do
 			id=${part%,*}
 			num=${part#*,}
@@ -932,7 +932,7 @@ confirm_changes () {
 			# formatted or formatted before the method is specified
 			[ -f $id/filesystem -o ! -f $id/formatted \
 			  -o $id/formatted -ot $id/method ] || continue
-			# if it is already formatted filesystem it must be formatted 
+			# if it is already formatted filesystem it must be formatted
 			# before the method or filesystem is specified
 			[ ! -f $id/filesystem -o ! -f $id/formatted \
 			  -o $id/formatted -ot $id/method \

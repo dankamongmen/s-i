@@ -12,14 +12,14 @@ for dev in $DEVICES/*; do
         partitions="$partitions $id,$num"
     done
     close_dialog
-    
+  
     for part in $partitions; do
         id=${part%,*}
         num=${part#*,}
 	[ -f $id/method -a -f $id/format ] || continue
 	method=$(cat $id/method)
 	if [ "$method" = swap ]; then
-	    if 
+	    if
 		[ -f $id/formatted -a $id/formatted -nt $id/method ]
 	    then
 		continue
@@ -50,7 +50,7 @@ for dev in $DEVICES/*; do
 		fi
 		db_progress STOP
 	    fi
-	    
+	  
 	    if [ "$status" != OK ]; then
 		db_subst partman-basicfilesystems/create_swap_failed TYPE linux-swap
 		db_subst partman-basicfilesystems/create_swap_failed PARTITION "$num"

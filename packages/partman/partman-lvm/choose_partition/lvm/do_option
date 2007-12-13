@@ -173,7 +173,7 @@ do_vg_delete() {
 	[ "$RET" = "true" ] || return
 
 	pvs=$(vg_list_pvs "$vg")
-	if ! vg_delete "$vg"; then 
+	if ! vg_delete "$vg"; then
 		db_input critical partman-lvm/vgdelete_error
 		db_go || true
 	else
@@ -300,7 +300,7 @@ do_vg_reduce() {
 	count=$(echo -n "$pvs" | wc -w)
 	vg_get_info "$vg"
 	if [ $count -eq $PVS ]; then
-		if ! vg_delete "$vg"; then 
+		if ! vg_delete "$vg"; then
 			db_input critical partman-lvm/vgdelete_error
 			db_go || true
 		fi

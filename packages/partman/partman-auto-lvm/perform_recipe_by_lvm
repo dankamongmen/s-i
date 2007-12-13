@@ -91,7 +91,7 @@ foreach_partition '
 	printf "%s" "$device" >$dev/device
 	printf "%s" "$4" >$dev/size
 	printf "%s" "$VG_name - $lvname" >$dev/model
-	
+
 	cd $dev
 	open_dialog OPEN "$(cat $dev/device)"
 	read_line response
@@ -101,7 +101,7 @@ foreach_partition '
 		rm -rf $dev
 		autopartitioning_failed
 	fi
-	
+
 	open_dialog NEW_LABEL loop
 	close_dialog
 
@@ -121,7 +121,7 @@ foreach_partition '
 	open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
 	read_line num id size type fs path name
 	close_dialog
-	
+
 	shift; shift; shift; shift
 	setup_partition $id $*
 	db_progress STEP 1

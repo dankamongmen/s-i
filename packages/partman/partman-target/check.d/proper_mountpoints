@@ -8,18 +8,18 @@ no_root () {
 	for i in /lib/partman/fstab.d/*; do
 	    [ -x "$i" ] || continue
 	    $i
-	done | 
+	done |
 	while read fs mp type options dump pass; do
 	    echo $mp
 	done
     )
-    
+  
     for mp in $mountpoints; do
 	if [ "$mp" = / ]; then
 	    return 0
 	fi
     done
-    
+  
     db_input critical partman-target/no_root || true
     db_go || true
     exit 1
@@ -31,7 +31,7 @@ same_mountpoints () {
 	for i in /lib/partman/fstab.d/*; do
 	    [ -x "$i" ] || continue
 	    $i
-	done | 
+	done |
 	while read fs mp type options dump pass; do
 	    case "$mp" in
 		(/*)
@@ -40,7 +40,7 @@ same_mountpoints () {
 	done |
 	sort
     )
-    
+  
     oldmp=' '
     for x in $mountpoints; do
 	mp=${x%,*}

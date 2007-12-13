@@ -265,7 +265,7 @@ choose_recipe () {
 	type=$1
 	target="$2"
 	free_size=$3
-	
+
 	# Preseeding of recipes
 	db_get partman-auto/expert_recipe
 	if [ -n "$RET" ]; then
@@ -285,7 +285,7 @@ choose_recipe () {
 	fi
 
 	recipedir=$(get_recipedir)
-	
+
 	choices=''
 	default_recipe=no
 	db_get partman-auto/choose_recipe
@@ -303,13 +303,13 @@ choose_recipe () {
 			fi
 		fi
 	done
-	
+
 	if [ -z "$choices" ]; then
 		db_input critical partman-auto/no_recipe || true
 		db_go || true # TODO handle backup right
 		return 1
 	fi
- 
+
 	db_subst partman-auto/choose_recipe TARGET "$target"
 	debconf_select high partman-auto/choose_recipe "$choices" "$default_recipe"
 	if [ $? = 255 ]; then

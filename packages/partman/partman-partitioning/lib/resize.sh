@@ -298,7 +298,7 @@ perform_resizing () {
 	db_progress STOP
     else
 	# resize virtual partitions, ext2, ext3, swap, fat16, fat32
-	# and probably reiserfs 
+	# and probably reiserfs
 	name_progress_bar partman-partitioning/progress_resizing
 	open_dialog RESIZE_PARTITION $oldid $newsize
 	read_line newid
@@ -316,7 +316,7 @@ perform_resizing () {
 		$s || exit 100
 	    fi
 	done
-    else 
+    else
 	partitions=''
 	open_dialog PARTITIONS
 	while { read_line num part size type fs path name; [ "$part" ]; }; do

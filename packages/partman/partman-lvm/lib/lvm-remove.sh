@@ -4,14 +4,14 @@
 remove_lvm_find_vgs() {
 	local realdev vg pvs
 	realdev="$1"
-	
+
 	# Check all VGs to see which PV needs removing
 	# BUGME: the greps in this loop should be properly bounded so they
 	#	 do not match on partial matches!
 	#        Except that we want partial matches for disks...
 	for vg in $(vg_list); do
 		pvs="$(vg_list_pvs $vg)"
-		
+
 		if ! $(echo "$pvs" | grep -q "$realdev"); then
 			continue
 		fi
@@ -52,7 +52,7 @@ device_remove_lvm() {
 		lvs="${lvs:+$lvs$NL}$(vg_list_lvs $vg)"
 	done
 
-	# Ask for permission to erase LVM volumes 
+	# Ask for permission to erase LVM volumes
 	lvtext=""
 	for lv in $lvs; do
 		lvtext="${lvtext:+$lvtext, }$lv"

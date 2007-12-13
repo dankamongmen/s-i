@@ -2167,7 +2167,7 @@ make_fifos()
     make_fifo(infifo_name);
     make_fifo(outfifo_name);
     make_fifo(stopfifo_name);
-}   
+} 
 
 int
 write_pid_file()
@@ -2188,10 +2188,10 @@ write_pid_file()
 			exit(250);
 		}
 	}
-	
+
 	// Truncate the pid file and continue
 	freopen(pidfile_name, "w", fd);
-        
+      
         fprintf(fd, "%d", (int)(getpid()));
         fclose(fd);
         return 0;
@@ -2223,7 +2223,7 @@ prnt_sig_hdlr(int signal)
                 // We'll only get SIGCHLD if our child has pre-deceased us
                 // In this case we should exit with its error code
                 case SIGCHLD:
-                    if (waitpid(-1, &status, WNOHANG) < 0) 
+                    if (waitpid(-1, &status, WNOHANG) < 0)
                         exit(0);
                     if (WIFEXITED(status))
                         exit(WEXITSTATUS(status));
@@ -2349,13 +2349,13 @@ main(int argc, char *argv[])
         sigemptyset(&act.sa_mask);
 
         // Set up signal handling for parent
-        if  ((sigaction(SIGCHLD, &act, &oldact) < 0) 
+        if  ((sigaction(SIGCHLD, &act, &oldact) < 0)
           || (sigaction(SIGUSR1, &act, &oldact) < 0))
         {
             fprintf(stderr, "Could not set up signal handling for parent\n");
             exit(251);
         }
-        
+      
         // The parent process should wait; we die once child is
         // initialised (signalled by a SIGUSR1)
         if (fork()) {
@@ -2363,13 +2363,13 @@ main(int argc, char *argv[])
         }
 
         // Set up signal handling for child
-        if  ((sigaction(SIGCHLD, &oldact, NULL) < 0) 
+        if  ((sigaction(SIGCHLD, &oldact, NULL) < 0)
           || (sigaction(SIGUSR1, &oldact, NULL) < 0))
         {
             fprintf(stderr, "Could not set up signal handling for child\n");
             exit(250);
         }
- 
+
         // Continue as a daemon process
         logfile = fopen(logfile_name, "a+");
         if (logfile == NULL) {

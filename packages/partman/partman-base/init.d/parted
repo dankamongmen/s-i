@@ -32,12 +32,12 @@ if [ ! -f /var/run/parted_server.pid ]; then
 	mv $DEVICES /var/lib/partman/old_devices
     fi
     mkdir $DEVICES || true
-    
+  
     IFS="$NL"
-    for partdev in $(parted_devices | 
-	    grep -v '^/dev/md' | 
-	    sed 's,^/dev/\(ide\|scsi\|[hs]d\),!/dev/\1,' | 
-	    sort | 
+    for partdev in $(parted_devices |
+	    grep -v '^/dev/md' |
+	    sed 's,^/dev/\(ide\|scsi\|[hs]d\),!/dev/\1,' |
+	    sort |
 	    sed 's,^!,,' ); do
 
 	IFS="$TAB"
@@ -61,7 +61,7 @@ if [ ! -f /var/run/parted_server.pid ]; then
 	printf "%s" "$1" >$dev/device
 	printf "%s" "$2" >$dev/size
 	printf "%s" "$3" >$dev/model
-	
+
 	cd $dev
 	open_dialog OPEN "$(cat $dev/device)"
 	read_line response
