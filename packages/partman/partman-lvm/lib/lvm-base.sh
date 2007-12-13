@@ -181,6 +181,8 @@ lvm_name_ok() {
 ###############################################################################
 
 # Check if a device contains PVs
+# If called for a disk, this will also check all partitions;
+# if called for anything other, it can return false positives!
 pv_on_device() {
 	local device
 	device="$1"
