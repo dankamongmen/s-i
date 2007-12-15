@@ -8,6 +8,11 @@ if [ "$RET" != false ]; then
 	exit 0
 fi
 
+# This file tells console-data (>= 2:1.04-2) to not display the
+# keymap/policy question when it is being installed
+mkdir -p /target/tmp/debian-installer
+> /target/tmp/debian-installer/keymap-policy-default
+
 apt-install console-tools console-data console-common || true
 
 db_get debian-installer/keymap
