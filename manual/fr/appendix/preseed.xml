@@ -1,4 +1,4 @@
-<!-- original version: 50076 -->
+<!-- original version: 50443 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -729,7 +729,7 @@ avant de charger le fichier de préconfiguration, utilisez un paramètre comme c
 
 Quand vous utilisez la préconfiguration de type <quote>network</quote>
 (avec <quote>preseed/url</quote>), il n'est pas possible normalement de préconfigurer le réseau.
-Cependant il existe un truc.
+Cependant on peut utiliser l'astuce suivante.
 Pour définir par exemple l'adresse de l'interface réseau, il suffit de
 forcer la configuration du réseau à s'exécuter une nouvelle fois après que le
 fichier de préconfiguration a été chargé. Le script <quote>preseed/run</quote> suivant
@@ -863,7 +863,7 @@ d-i partman-auto/disk string /dev/sda
 # Note : commentez la ligne précédente si vous voulez utiliser le seul disque
 # disponible sur le système, quelque soit son nom. 
 # Il faudra aussi indiquer la méthode à utiliser.
-# Actuellement les méthodes disponibles sont : "regular", "lvm" et "crypto".
+# Actuellement les méthodes disponibles sont : regular, lvm et crypto.
 d-i partman-auto/method string lvm
 
 # Si l'un des disques à partitionner automatiquement contient une ancienne
@@ -910,7 +910,8 @@ d-i partman-auto/choose_recipe \
 #                      method{ swap } format{ }                \
 #              .
 
-# Partman créera automatiquement les partitions sans demander de confirmation.
+# Si vous avez indiqué la méthode à utiliser, Partman créera automatiquement
+# les partitions sans demander de confirmation.
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
    select Finish partitioning and write changes to disk
