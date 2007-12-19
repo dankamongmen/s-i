@@ -76,7 +76,9 @@ auto_lvm_prepare() {
 	    powerpc/prep)
 		: ;;
 	    *)
-		if ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
+		# TODO: make check more explicit, mountpoint{ / }?
+		if ! echo "$normalscheme" | grep -q "[[:space:]]/[[:space:]]" && \
+		   ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
 			db_input critical partman-auto-lvm/no_boot || true
 			db_go || return 30
 			db_get partman-auto-lvm/no_boot || true
