@@ -13,8 +13,17 @@ case $TYPE in
 	;;
 esac
 
-if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
-	:
+if [ ! -d /sys/block ]; then
+	exit 0
+fi
+if type udevadm >/dev/null 2>&1; then
+	device_info () {
+		udevadm info -q "$1" -p "$2" 2>/dev/null
+	}
+elif type udevinfo >/dev/null 2>&1; then
+	device_info () {
+		udevinfo -q "$1" -p "$2" 2>/dev/null
+	}
 else
 	exit 0
 fi
@@ -52,14 +61,12 @@ for x in $syspaths; do
 		;;
 	esac
 	if ! $match && [ "$TYPE" = cd ]; then
-		if udevinfo -q env -p "$devpath" 2>/dev/null | \
-		   grep -q '^ID_CDROM='; then
+		if device_info env "$devpath" | grep -q '^ID_CDROM='; then
 			match=:
 		fi
 	fi
 	if ! $match; then
-		if udevinfo -q env -p "$devpath" 2>/dev/null | \
-		   grep -q "^ID_TYPE=$TYPE"; then
+		if device_info env "$devpath" | grep -q "^ID_TYPE=$TYPE"; then
 			match=:
 		fi
 	fi
@@ -73,16 +80,13 @@ for x in $syspaths; do
 	# Some USB sticks and CD drives are misdetected as floppy
 	# This allows to scan for those
 	if ! $match && ( $scan_partition || [ "$TYPE" = maybe-usb-floppy ] ); then
-		if udevinfo -q env -p "$devpath" 2>/dev/null | \
-		   grep -q '^ID_BUS=usb' && \
-		   udevinfo -q env -p "$devpath" 2>/dev/null | \
-		   grep -q '^ID_TYPE=floppy'; then
+		if device_info env "$devpath" | grep -q '^ID_BUS=usb' && \
+		   device_info env "$devpath" | grep -q '^ID_TYPE=floppy'; then
 			match=:
 		fi
 	fi
 	if $match; then
-		if ! name="$(udevinfo -q name -p "$devpath" \
-				2>/dev/null)"; then
+		if ! name="$(device_info name "$devpath")"; then
 			name="$(printf %s "${devpath##*/}" | \
 				sed 's,!,/,g')"
 		fi
