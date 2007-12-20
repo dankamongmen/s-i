@@ -93,8 +93,15 @@ case "`archdetect`" in
 			fi
 		fi
 
-		if [ -d /sys/block ] && type udevinfo >/dev/null 2>&1; then
-			bootfs_disk_syspath="$(dirname "$(udevinfo -q path -n "$bootfs_devfs")")"
+		bootfs_disk_syspath=
+		if [ -d /sys/block ]; then
+			if type udevadm >/dev/null 2>&1; then
+				bootfs_disk_syspath="$(dirname "$(udevadm info -q path -n "$bootfs_devfs")")"
+			elif type udevinfo >/dev/null 2>&1; then
+				bootfs_disk_syspath="$(dirname "$(udevinfo -q path -n "$bootfs_devfs")")"
+			fi
+		fi
+		if [ "$bootfs_disk_syspath" ]; then
 			# TODO: device symlinks are allegedly slated to go
 			# away, but it's not entirely clear what their
 			# replacement will be yet ...
