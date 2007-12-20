@@ -87,6 +87,9 @@ EOF
 	# Avoid debconf mailing notes.
 	DEBCONF_ADMIN_EMAIL=""
 	export DEBCONF_ADMIN_EMAIL
+	# Avoid apt-listchanges doing anything.
+	APT_LISTCHANGES_FRONTEND=none
+	export APT_LISTCHANGES_FRONTEND
 
 	return 0
 }
