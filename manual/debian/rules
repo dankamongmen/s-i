@@ -25,15 +25,20 @@ doc-base-stamp:
 	@echo $(ARCHS)
 	rm -f $@
 	rm -rf debian/installation-guide-*.doc-base.*
-	set -e && cd debian && \
-	    for arch in $(ARCHS) ; do \
-		for lang in $(LANGS) ; do \
-		    arch_full="$$(grep "^$$arch[[:space:]]" archlist | cut -f 2)" ; \
-		    lang_full="$$(grep "^$$lang[[:space:]]" langlist | cut -f 2)" ; \
+	set -e; cd debian && \
+	    for arch in $(ARCHS); do \
+		for lang in $(LANGS); do \
+		    arch_full="$$(grep "^$$arch[[:space:]]" archlist | cut -f 2)"; \
+		    lang_full="$$(grep "^$$lang[[:space:]]" langlist | cut -f 2)"; \
+		    lang_id="$$(echo $$lang | tr A-Z a-z | sed "s/_/-/")"; \
 		    sed -e "s:%ARCH%:$$arch:g" -e "s:%ARCH_FULL%:$$arch_full:g" \
 			-e "s:%LANG%:$$lang:g" -e "s:%LANG_FULL%:$$lang_full:g" \
-			doc-base.TEMPLATE > installation-guide-$$arch.doc-base.$$lang ; \
-		done ; \
+			-e "s:%LANG_ID%:$$lang_id:g" \
+			TEMPLATE.doc-base >installation-guide-$$arch.doc-base.$$lang; \
+		    if [ ! -e manual/$$arch/$$lang/install.$$lang.pdf ]; then \
+			    sed -i "/Format: pdf/,/^$$/d" installation-guide-$$arch.doc-base.$$lang; \
+		    fi; \
+		done; \
 	    done
 	touch $@
 
