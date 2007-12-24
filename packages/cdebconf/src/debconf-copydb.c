@@ -64,6 +64,9 @@ int main(int argc, char **argv)
     if (optind + 2 > argc)
         usage(argv[0]);
 
+    /* always load all translations */
+    unsetenv("DEBCONF_DROP_TRANSLATIONS");
+
     db1name = argv[optind];
     db2name = argv[optind+1];
 
