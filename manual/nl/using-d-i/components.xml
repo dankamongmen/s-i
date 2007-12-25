@@ -1,4 +1,4 @@
-<!-- original version: 43965 -->
+<!-- original version: 50618 -->
 
  <sect1 id="module-details">
  <title>Individuele modules gebruiken</title>
@@ -51,6 +51,8 @@ zijn, moet de hardwareherkenning later in het proces worden herhaald.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -65,7 +67,7 @@ gebruiker en klaar voor het echte werk.
 Zoals de titel van deze sectie aangeeft, is de voornaamste taak van de volgende
 modules het indelen van uw harde schijven, het creëren van bestandssystemen en
 het toekennen van aanhechtpunten. Optioneel kunnen nauw gerelateerde zaken als
-LVM of RAID worden geconfigureerd.
+RAID, LVM of versleutelde partities worden geconfigureerd.
 
 </para>
 
@@ -77,21 +79,6 @@ LVM of RAID worden geconfigureerd.
 &module-mdcfg.xml;
 &module-partman-lvm.xml;
 &module-partman-crypto.xml;
-  </sect2>
-
-  <sect2 id="di-system-setup">
-  <title>Algemene instellingen van het systeem</title>
-<para>
-
-Na de schijfindeling stelt het installatiesysteem nog enkele vragen die
-gebruikt zullen worden voor enkele algemene instellingen van het systeem
-dat op het punt staat geïnstalleerd te worden.
-
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
   </sect2>
 
   <sect2 id="di-install-base">
@@ -108,17 +95,30 @@ netwerkverbinding heeft, kan dit enige tijd in beslag nemen.
 &module-base-installer.xml;
   </sect2>
 
-
-  <sect2 id="di-install-software">
-  <title>Installing Additional Software</title>
+  <sect2 id="di-user-setup">
+  <title>Gebruikers en wachtwoorden instellen</title>
 <para>
 
-Nadat het basissysteem is geïnstalleerd, beschikt u over een bruikbaar systeem,
-maar met beperkte functionaliteit. De meeste gebruikers zullen aanvullende
+Nadat het basissysteem is geïnstalleerd, zal het installatiesysteem u in
+staat stellen om het <quote>root</quote> account en/of een account voor de
+eerste gebruiker in te stellen. Accounts voor andere gebruikers kunnen worden
+aangemaakt nadat de installatie is afgerond.
+
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
+  <sect2 id="di-install-software">
+  <title>Aanvullende software installeren</title>
+<para>
+
+Op dit punt beschikt u over een bruikbaar systeem, maar met beperkte
+functionaliteit. De meeste gebruikers zullen aanvullende
 programmatuur op het systeem willen installeren om het aan te passen aan hun
 behoeften. Het installatiesysteem maakt dit mogelijk. Deze stap kan, zeker
 indien u een langzame computer of netwerkverbinding heeft, nog meer tijd in
-beslag nemen dan de installatie van het basissysteem
+beslag nemen dan de installatie van het basissysteem.
 
 </para>
 
@@ -158,12 +158,13 @@ linkend="boot-dev-select-sun"/>.</phrase>
   <title>De installatie afronden</title>
 <para>
 
-Dit zijn de laatste acties die moeten worden uitgevoerd voordat de
-computer kan worden opgestart met uw nieuwe systeem. Het bestaat
-voornamelijk uit het afwerken van losse eindjes van &d-i;.
+Dit is de laatste stap van het installatieproces voor Debian waarbij het
+installatiesysteem nog enkele afrondende taken uitvoert.
+Het bestaat voornamelijk uit het afwerken van losse eindjes van &d-i;.
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
