@@ -49,6 +49,8 @@ hardware detection needs to be repeated later in the process.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -62,8 +64,8 @@ and ready to do some real work.
 
 As the title of this section indicates, the main task of the next few
 components lies in partitioning your disks, creating filesystems,
-assigning mountpoints and optionally configuring closely related issues
-like LVM or RAID devices.
+assigning mountpoints and optionally configuring closely related options
+like RAID, LVM or encrypted devices.
 
 </para>
 
@@ -77,20 +79,6 @@ like LVM or RAID devices.
 &module-partman-crypto.xml;
   </sect2>
   
-  <sect2 id="di-system-setup">
-  <title>Setting up the System</title>
-<para>
-
-After partitioning the installer asks a few more questions that will be
-used to set up the system it is about to install.
-	
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
-
   <sect2 id="di-install-base">
   <title>Installing the Base System</title>
 <para>
@@ -104,18 +92,33 @@ take some time.
 
 &module-base-installer.xml;
   </sect2>
-  
+
+  <sect2 id="di-user-setup">
+  <title>Setting Up Users And Passwords</title>
+<para>
+
+After the base system has been installed, the installer will allow you
+to set up the <quote>root</quote> account and/or an account for the first
+user. Other user accounts can be created after the installation has been
+completed.
+
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
   <sect2 id="di-install-software">
   <title>Installing Additional Software</title>
 <para>
 
-After the base system is installed, you have a usable but limited system.
+At this point you have a usable but limited system.
 Most users will want to install additional software on the system to tune it to
 their needs, and the installer allows you do so. This step can take even
 longer than installing the base system if you have a slow computer or
-network.
+network connection.
 
 </para>
+
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
@@ -153,11 +156,13 @@ linkend="boot-dev-select-sun"/>.</phrase>
   <title>Finishing the Installation</title>
 <para>
 
-These are the last bits to do before rebooting to your new system. It
-mostly consists of tidying up after the &d-i;.
+This is the last step in the Debian installation process during which the
+installer will do any last minute tasks.
+It mostly consists of tidying up after the &d-i;.
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
