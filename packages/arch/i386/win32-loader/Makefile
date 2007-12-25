@@ -13,8 +13,12 @@ ifdef NETWORK_BASE_URL
 MAKENSIS	+= -DNETWORK_BASE_URL=$(NETWORK_BASE_URL)
 endif
 
-# partmap and fs
-GRUB_MODULES	+= pc fat ntfs
+# hard disk
+GRUB_MODULES	+= biosdisk
+# partmap
+GRUB_MODULES	+= pc gpt
+# fs
+GRUB_MODULES	+= fat ntfs
 # used in our grub.cfg
 GRUB_MODULES	+= search linux _linux boot
 # might be useful for debugging
