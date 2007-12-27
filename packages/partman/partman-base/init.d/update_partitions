@@ -8,12 +8,7 @@ for dev in /var/lib/partman/devices/*; do
     partitions=
     open_dialog PARTITIONS
     while { read_line partinfo; [ "$partinfo" ]; }; do
-	if [ "$partitions" ]; then
-	    partitions="$partitions
-$partinfo"
-	else
-	    partitions="$partinfo"
-	fi
+	partitions="${partitions:+$partitions$NL}$partinfo"
     done
     close_dialog
 
@@ -28,4 +23,3 @@ $partinfo"
     done
     restore_ifs
 done
-
