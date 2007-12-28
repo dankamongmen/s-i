@@ -9,26 +9,27 @@ cd $dev
 [ ! -f sataraid ] || exit 0
 
 if [ -f $id/method ]; then
-    method=$(cat $id/method)
+	method=$(cat $id/method)
 else
-    method=dont_use
+	method=dont_use
 fi
 
-if [ -f $id/filesystem ] && ([ "$method" = keep ] || [ "$method" = format ]); then
-    fs=$(cat $id/filesystem)
-    db_metaget partman/filesystem_long/$fs description || RET=''
-    if [ "$RET" ]; then
-	description="$RET"
-    else
-	description="$fs"
-    fi
+if [ -f $id/filesystem ] && \
+   ([ "$method" = keep ] || [ "$method" = format ]); then
+	fs=$(cat $id/filesystem)
+	db_metaget partman/filesystem_long/$fs description || RET=''
+	if [ "$RET" ]; then
+		description="$RET"
+	else
+		description="$fs"
+	fi
 else
-    db_metaget partman/method_long/$method description || RET=''
-    if [ "$RET" ]; then
-	description="$RET"
-    else
-	description="$method"
-    fi
+	db_metaget partman/method_long/$method description || RET=''
+	if [ "$RET" ]; then
+		description="$RET"
+	else
+		description="$method"
+	fi
 fi
 
 db_metaget partman-target/text/method description

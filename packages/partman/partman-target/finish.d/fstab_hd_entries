@@ -3,21 +3,21 @@
 [ -f /target/etc/fstab ] || exit 0
 
 fstab=$(
-    for i in /lib/partman/fstab.d/*; do
-	[ -x "$i" ] || continue
-	$i
-    done |
-    while read fs mp type options dump pass; do
-	echo $mp $fs $type $options $dump $pass
-    done |
-    sort |
-    while read mp fs type options dump pass; do
-	case "$fs" in
-	    (/*)
-		printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$(mapdevfs $fs)" "${mp}" "$type" "$options" "$dump" "$pass"
-		;;
-	esac
-    done
+	for i in /lib/partman/fstab.d/*; do
+		[ -x "$i" ] || continue
+		$i
+	done |
+	while read fs mp type options dump pass; do
+		echo $mp $fs $type $options $dump $pass
+	done |
+	sort |
+	while read mp fs type options dump pass; do
+		case "$fs" in
+		    (/*)
+			printf "%-15s %-15s %-7s %-15s %-7s %s\n" "$(mapdevfs $fs)" "${mp}" "$type" "$options" "$dump" "$pass"
+			;;
+		esac
+	done
 )
 
 echo "$fstab" >>/target/etc/fstab

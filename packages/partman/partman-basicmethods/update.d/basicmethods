@@ -19,16 +19,16 @@ method=$(cat $id/method)
 case "$method" in
     keep|format)
 	if [ -f $id/acting_filesystem ]; then
-	    filesystem=$(cat $id/acting_filesystem)
-	    db_metaget partman/filesystem_short/"$filesystem" description || RET=''
-	    printf "${RET:-$filesystem}" >$id/visual_filesystem
+		filesystem=$(cat $id/acting_filesystem)
+		db_metaget partman/filesystem_short/"$filesystem" description || RET=''
+		printf "${RET:-$filesystem}" >$id/visual_filesystem
 	else
-	    >$id/visual_filesystem
+		>$id/visual_filesystem
 	fi
 	if [ -f $id/mountpoint ]; then
-	    cat $id/mountpoint >$id/visual_mountpoint
+		cat $id/mountpoint >$id/visual_mountpoint
 	else
-	    >$id/visual_mountpoint
+		>$id/visual_mountpoint
 	fi
 	;;
 esac

@@ -12,9 +12,9 @@ cd $dev
 
 full_options=''
 for op in $(cat /lib/partman/mountoptions/$filesystem); do
-    if [ -f $part/options/$op ]; then
-	full_options="${full_options:+$full_options,}$(cat $part/options/$op)"
-    fi
+	if [ -f $part/options/$op ]; then
+		full_options="${full_options:+$full_options,}$(cat $part/options/$op)"
+	fi
 done
 db_set $tpl "$full_options"
 db_input critical $tpl || true
@@ -24,6 +24,6 @@ rm -rf $part/options
 mkdir $part/options
 IFS=,
 for op in $RET; do
-    op=${op# }
-    echo "$op" >$part/options/${op%% *}
+	op=${op# }
+	echo "$op" >$part/options/${op%% *}
 done

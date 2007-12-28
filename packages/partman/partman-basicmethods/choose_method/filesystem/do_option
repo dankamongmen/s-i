@@ -9,33 +9,31 @@ id=$3
 mkdir -p $dev/$id
 
 existing=no
-for j in \
-    $(
-        for i in /lib/partman/valid_filesystems/*; do
-            [ -x $i ] || continue
-	   $i $dev $id existing
-        done
-    )
-do
-    if [ "$j" = "$fs" ]; then
-        existing=yes
-    fi
+for j in $(
+		for i in /lib/partman/valid_filesystems/*; do
+			[ -x $i ] || continue
+			$i $dev $id existing
+		done
+	); do
+		if [ "$j" = "$fs" ]; then
+			existing=yes
+		fi
 done
 
 if [ $existing = yes ]; then
-    echo keep >$dev/$id/method
-    rm -f $dev/$id/format
-    > $dev/$id/use_filesystem
+	echo keep >$dev/$id/method
+	rm -f $dev/$id/format
+	> $dev/$id/use_filesystem
 else
-    echo format >$dev/$id/method
-    > $dev/$id/format
-    > $dev/$id/use_filesystem
+	echo format >$dev/$id/method
+	> $dev/$id/format
+	> $dev/$id/use_filesystem
 fi
 
 echo $fs >$dev/$id/filesystem
 
 if [ ! -d $dev/$id/options ]; then
-    mkdir $dev/$id/options
+	mkdir $dev/$id/options
 fi
 
 update_partition $dev $id
