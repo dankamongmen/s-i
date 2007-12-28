@@ -45,12 +45,12 @@ auto_lvm_prepare() {
 	decode_recipe $recipe lvm
 
 	# Make sure the recipe contains lvmok tags
-	if ! echo "$scheme" | grep -q "lvmok"; then
+	if ! echo "$scheme" | grep -q lvmok; then
 		bail_out unusable_recipe
 	fi
 
 	# Make sure a boot partition isn't marked as lvmok
-	if echo "$scheme" | grep "lvmok" | grep -q "[[:space:]]/boot[[:space:]]"; then
+	if echo "$scheme" | grep lvmok | grep -q "[[:space:]]/boot[[:space:]]"; then
 		bail_out unusable_recipe
 	fi
 
@@ -63,7 +63,7 @@ auto_lvm_prepare() {
 	### - recipe 2 everything that can go on lvm and it's calculated in perform_recipe_by_lvm.
 
 	# Get the scheme of partitions that must be created outside LVM
-	normalscheme=$(echo "$scheme" | grep -v "lvmok")
+	normalscheme=$(echo "$scheme" | grep -v lvmok)
 
 	# Check if the scheme contains a boot partition; if not warn the user
 	# Except for powerpc/prep as that has the kernel in the prep partition
@@ -105,7 +105,7 @@ auto_lvm_prepare() {
 
 	create_partitions
 
-	if ! confirm_changes "partman-lvm"; then
+	if ! confirm_changes partman-lvm; then
 		return 30
 	fi
 

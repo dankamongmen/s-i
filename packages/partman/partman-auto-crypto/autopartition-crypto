@@ -4,11 +4,11 @@
 . /lib/partman/lib/crypto-base.sh
 
 dev="$1"
-method="crypto"
+method=crypto
 
 auto_lvm_prepare $dev $method || exit 1
 
-found="no"
+found=no
 for dev in $DEVICES/*; do
 	[ -d "$dev" ] || continue
 	cd $dev
@@ -26,9 +26,9 @@ for dev in $DEVICES/*; do
 		method=$(cat $id/method)
 		[ $method = crypto ] || continue
 
-		echo "dm-crypt" > $id/crypto_type
-		crypto_prepare_method "$dev/$id" "dm-crypt" || exit 1
-		found="yes"
+		echo dm-crypt > $id/crypto_type
+		crypto_prepare_method "$dev/$id" dm-crypt || exit 1
+		found=yes
 		break
 	done
 	[ $found = yes ] && break

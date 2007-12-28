@@ -266,11 +266,11 @@ perform_resizing () {
 			db_subst partman-basicfilesystems/check_failed TYPE "$fs"
 			db_subst partman-basicfilesystems/check_failed PARTITION "$num"
 			db_subst partman-basicfilesystems/check_failed DEVICE "$(humandev $(cat device))"
-			db_set partman-basicfilesystems/check_failed 'true'
+			db_set partman-basicfilesystems/check_failed true
 			db_input critical partman-basicfilesystems/check_failed || true
 			db_go || true
 			db_get partman-basicfilesystems/check_failed
-			if [ "$RET" = 'true' ]; then
+			if [ "$RET" = true ]; then
 				exit 100
 			fi
 		fi

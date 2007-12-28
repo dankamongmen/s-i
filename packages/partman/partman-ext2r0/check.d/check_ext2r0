@@ -31,11 +31,11 @@ for dev in $DEVICES/*; do
 		if [ "$status" != good ]; then
 		    db_subst partman-ext2r0/check_failed PARTITION "$num"
 		    db_subst partman-ext2r0/check_failed DEVICE $(humandev $(cat device))
-		    db_set partman-ext2r0/check_failed 'true'
+		    db_set partman-ext2r0/check_failed true
 		    db_input critical partman-ext2r0/check_failed || true
 		    db_go || true
 		    db_get partman-ext2r0/check_failed
-		    if [ "$RET" = 'true' ]; then
+		    if [ "$RET" = true ]; then
 			exit 1
 		    fi
 		fi

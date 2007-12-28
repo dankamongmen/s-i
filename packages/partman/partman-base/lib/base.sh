@@ -844,7 +844,7 @@ partman_lock_unit() {
 		cd $dev
 
 		# First check if we should lock a device
-		if [ -e "device" ]; then
+		if [ -e device ]; then
 			testdev=$(mapdevfs $(cat device))
 			if [ "$device" = "$testdev" ]; then
 				echo "$message" > locked
@@ -874,7 +874,7 @@ partman_unlock_unit() {
 		cd $dev
 
 		# First check if we should unlock a device
-		if [ -e "device" ]; then
+		if [ -e device ]; then
 			testdev=$(mapdevfs $(cat device))
 			if [ "$device" = "$testdev" ]; then
 				rm -f locked

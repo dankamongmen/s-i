@@ -314,7 +314,7 @@ lv_create() {
 	lv="$2"
 	size="$3"
 
-	if [ "$size" = "full" ]; then
+	if [ "$size" = full ]; then
 		vg_get_info "$vg"
 		if [ "$FREEPE" -lt 1 ]; then
 			return 1

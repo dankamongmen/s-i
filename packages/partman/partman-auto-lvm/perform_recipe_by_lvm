@@ -9,7 +9,7 @@ recipe=$2
 
 decode_recipe $recipe lvm
 
-scheme=$(echo "$scheme" | grep "lvmok")
+scheme=$(echo "$scheme" | grep lvmok)
 
 partstep=$(echo "$scheme" | wc -l)
 partstep=$(expr $partstep + 3)
@@ -72,7 +72,7 @@ foreach_partition '
 		name_number=$(($name_number + 1))
 	fi
 
-	if [ "$last" = "yes" ]; then
+	if [ "$last" = yes ]; then
 		lv_create $VG_name "$lvname" full || autopartitioning_failed
 	else
 		lv_create $VG_name "$lvname" $(($1/1024)) || autopartitioning_failed

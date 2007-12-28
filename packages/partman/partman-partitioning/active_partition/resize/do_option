@@ -43,11 +43,11 @@ fi
 human_resize_range
 
 if [ "$virtual" = no ]; then
-	db_set partman-partitioning/confirm_resize 'false'
+	db_set partman-partitioning/confirm_resize false
 	db_input critical partman-partitioning/confirm_resize || true
 	db_go || exit 0
 	db_get partman-partitioning/confirm_resize
-	[ "$RET" = 'true' ] || exit 0
+	[ "$RET" = true ] || exit 0
 fi
 
 ask_for_size || exit $?

@@ -27,7 +27,7 @@ do_initial_setup() {
 	log-output -t partman-lvm vgscan
 
 	# Commit the changes
-	confirm_changes "partman-lvm" || exit 0
+	confirm_changes partman-lvm || exit 0
 	commit_changes partman-lvm/commit_failed || exit $?
 
 	# initialize (pvcreate) all volumes that are not already prepared
@@ -45,11 +45,11 @@ do_initial_setup() {
 		count=$(vg_list | wc -l)
 		if [ $count -gt 0 ]; then
 			db_subst partman-lvm/activevg COUNT $count
-			db_set partman-lvm/activevg "false"
+			db_set partman-lvm/activevg false
 			db_input critical partman-lvm/activevg
 			db_go || true
 			db_get partman-lvm/activevg
-			[ "$RET" = "true" ] && log-output -t partman-lvm vgchange -a y
+			[ "$RET" = true ] && log-output -t partman-lvm vgchange -a y
 			# TODO: We need to update and lock the devices that LVM just claimed
 		fi
 		# ask only the first time
@@ -167,11 +167,11 @@ do_vg_delete() {
 
 	# Confirm
 	db_subst partman-lvm/vgdelete_confirm VG $vg
-	db_set partman-lvm/vgdelete_confirm "false"
+	db_set partman-lvm/vgdelete_confirm false
 	db_input critical partman-lvm/vgdelete_confirm
 	db_go || true
 	db_get partman-lvm/vgdelete_confirm
-	[ "$RET" = "true" ] || return
+	[ "$RET" = true ] || return
 
 	pvs=$(vg_list_pvs "$vg")
 	if ! vg_delete "$vg"; then
@@ -391,7 +391,7 @@ do_lv_create() {
 	# might not be accurate, resulting in an error because the VG is
 	# not big enough (see #250594).
 	if [ "$size" = "$max_size" ]; then
-		size="full"
+		size=full
 	fi
 
 	if ! lv_create "$vg" "$lv" "$size"; then
