@@ -17,7 +17,7 @@ default_disk_label () {
 			echo bsd
 		else
 			echo msdos
-		fi;;	  
+		fi;;
 	    arm|armel)
 		case "$sub" in
 		    iop32x)
