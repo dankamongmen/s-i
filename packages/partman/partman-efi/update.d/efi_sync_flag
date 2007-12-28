@@ -4,7 +4,7 @@
 # efi and sets it for partition whose method is efi
 
 if [ ! -d /proc/efi ] && [ ! -d /sys/firmware/efi ]; then
-    exit 0
+	exit 0
 fi
 
 . /lib/partman/lib/base.sh
@@ -20,37 +20,38 @@ path=$7
 cd $dev
 
 if [ $fs = free ]; then
-    exit 0
+	exit 0
 fi
 
 method=
 if [ -f $id/method ]; then
-    method=$(cat $id/method)
+	method=$(cat $id/method)
 fi
 
 flags=''
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
-    if [ "$flag" != boot ]; then
-	flags="${flags:+$flags$NL}$flag"
-    fi
+	if [ "$flag" != boot ]; then
+		flags="${flags:+$flags$NL}$flag"
+	fi
 done
 close_dialog
 
-if [ "$method" = efi -a ! -f $id/bootable ]; then
-    open_dialog SET_FLAGS $id
-    write_line "$flags"
-    write_line boot
-    write_line NO_MORE
-    close_dialog
-    >$id/bootable
-    >$id/efi_bootable
-    RET=''
-elif [ "$method" != efi -a -f $id/bootable -a -f $id/efi_bootable ]; then
-    open_dialog SET_FLAGS $id
-    write_line "$flags"
-    write_line NO_MORE
-    close_dialog
-    rm $id/bootable
-    rm $id/efi_bootable
+if [ "$method" = efi ] && [ ! -f $id/bootable ]; then
+	open_dialog SET_FLAGS $id
+	write_line "$flags"
+	write_line boot
+	write_line NO_MORE
+	close_dialog
+	>$id/bootable
+	>$id/efi_bootable
+	RET=''
+elif [ "$method" != efi ] && [ -f $id/bootable ] && \
+     [ -f $id/efi_bootable ]; then
+	open_dialog SET_FLAGS $id
+	write_line "$flags"
+	write_line NO_MORE
+	close_dialog
+	rm $id/bootable
+	rm $id/efi_bootable
 fi

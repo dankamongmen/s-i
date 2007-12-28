@@ -26,46 +26,45 @@ name=$8
 cd $dev
 
 if [ $fs = free ]; then
-    exit 0
+	exit 0
 fi
 
 method=
 if [ -f $id/method ]; then
-    method=$(cat $id/method)
+	method=$(cat $id/method)
 fi
 
 read_flags () {
-    local flag
-    open_dialog GET_FLAGS $1
-    while { read_line flag; [ "$flag" ]; }; do
-	if [ "$flag" != boot ]; then
-	    echo "$flag"
-	fi
-    done
-    close_dialog
+	local flag
+	open_dialog GET_FLAGS $1
+	while { read_line flag; [ "$flag" ]; }; do
+		if [ "$flag" != boot ]; then
+			echo "$flag"
+		fi
+	done
+	close_dialog
 }
 
-if [ "$method" = newworld -a ! -f $id/bootable ]; then
-    flags=$(read_flags $id)
-    open_dialog SET_FLAGS $id
-    write_line "$flags"
-    write_line boot
-    write_line NO_MORE
-    close_dialog
-    >$id/bootable
-    >$id/newworld_bootable
-elif
-    [ "$method" != newworld -a -f $id/bootable -a -f $id/newworld_bootable ]
-then
-    flags=$(read_flags $id)
-    open_dialog SET_FLAGS $id
-    write_line "$flags"
-    write_line NO_MORE
-    close_dialog
-    rm $id/bootable
-    rm $id/newworld_bootable
+if [ "$method" = newworld ] && [ ! -f $id/bootable ]; then
+	flags=$(read_flags $id)
+	open_dialog SET_FLAGS $id
+	write_line "$flags"
+	write_line boot
+	write_line NO_MORE
+	close_dialog
+	>$id/bootable
+	>$id/newworld_bootable
+elif [ "$method" != newworld ] && [ -f $id/bootable ] && \
+     [ -f $id/newworld_bootable ]; then
+	flags=$(read_flags $id)
+	open_dialog SET_FLAGS $id
+	write_line "$flags"
+	write_line NO_MORE
+	close_dialog
+	rm $id/bootable
+	rm $id/newworld_bootable
 fi
 
 if [ "$method" != newworld ]; then
-    rm -f $id/newworld_bootable
+	rm -f $id/newworld_bootable
 fi
