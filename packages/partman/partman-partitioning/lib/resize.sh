@@ -1,4 +1,5 @@
 . /lib/partman/lib/base.sh
+. /lib/partman/lib/commit.sh
 
 # Sets $virtual; used by other functions here.
 check_virtual () {
