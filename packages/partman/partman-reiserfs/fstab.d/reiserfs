@@ -33,21 +33,21 @@ for dev in $DEVICES/*; do
 	filesystem=$(cat $id/acting_filesystem)
 	case "$filesystem" in
 	    reiserfs)
-    		# due to #249322, #255135, #258117:
-    		if [ "$mountpoint" = /tmp ]; then
+		# due to #249322, #255135, #258117:
+		if [ "$mountpoint" = /tmp ]; then
 		    rm -f $id/options/noexec
-    		fi
-    		if [ "$mountpoint" = /boot \
-	  	     -o \( "$mountpoint" = / -a "$has_boot" = no \) ]; then
+		fi
+		if [ "$mountpoint" = /boot \
+		     -o \( "$mountpoint" = / -a "$has_boot" = no \) ]; then
 			> $id/options/notail
-    		fi
-    		options=$(get_mountoptions $dev $id)
-    		if [ "$mountpoint" = / ]; then
+		fi
+		options=$(get_mountoptions $dev $id)
+		if [ "$mountpoint" = / ]; then
 			pass=1
-    		else
+		else
 			pass=2
-    		fi
-    		echo "$path" "$mountpoint" reiserfs $options 0 $pass
+		fi
+		echo "$path" "$mountpoint" reiserfs $options 0 $pass
 		;;
 	esac
     done

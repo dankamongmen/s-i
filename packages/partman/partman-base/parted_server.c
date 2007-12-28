@@ -2180,7 +2180,7 @@ write_pid_file()
 
         status = fscanf(fd, "%d", &oldpid);
         if (status != 0 && status != EOF) {
-        	// If kill(oldpid, 0) == 0 the process is still alive
+		// If kill(oldpid, 0) == 0 the process is still alive
 		// so we abort
 		if (kill(oldpid, 0) == 0) {
 			fprintf(stderr, "Not starting: process %d still exists\n", oldpid);

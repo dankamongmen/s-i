@@ -153,7 +153,7 @@ partition_tree_choices () {
 		# A hack to make sure each line in the table is unique and
 		# selectable by debconf -- pad lines with varying amounts of
 		# whitespace.
-    		whitespace_hack="$NBSP$whitespace_hack"
+		whitespace_hack="$NBSP$whitespace_hack"
 		echo "$line$whitespace_hack"
 	done
 }

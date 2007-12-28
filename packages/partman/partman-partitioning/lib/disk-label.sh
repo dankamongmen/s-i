@@ -76,7 +76,7 @@ default_disk_label () {
 		    *vme*)
 			echo msdos;;
 		    sun*)
-	    		echo sun;;
+			echo sun;;
 		    *)
 			echo UNKNOWN;;
 		esac;;
