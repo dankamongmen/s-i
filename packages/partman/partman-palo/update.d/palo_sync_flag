@@ -29,12 +29,7 @@ flags=''
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
     if [ "$flag" != palo ]; then
-	if [ "$flags" ]; then
-	    flags="$flags
-$flag"
-	else
-	    flags="$flag"
-	fi
+	flags="${flags:+$flags$NL}$flag"
     else
 	has_palo=yes
     fi

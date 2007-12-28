@@ -39,12 +39,7 @@ flags=''
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
 	if [ "$flag" != lvm ]; then
-		if [ "$flags" ]; then
-			flags="$flags
-$flag"
-		else
-			flags="$flag"
-		fi
+		flags="${flags:+$flags$NL}$flag"
 	else
 		has_lvm=yes
 	fi
@@ -58,15 +53,12 @@ for flag in $flags; do
 		continue
 	elif [ "$flag" = swap ]; then
 		continue
-	elif [ -n "$cleanflags" ]; then
-		cleanflags="$cleanflags
-$flag"
 	else
-		cleanflags="$flag"
+		cleanflags="${cleanflags:+$cleanflags$NL}$flag"
 	fi
 done
 
-if [ "$method" = '' ] && [ "$has_lvm" = yes ]; then
+if [ -z "$method" ] && [ "$has_lvm" = yes ]; then
 	echo lvm >$dev/$id/method
 	rm -f $dev/$id/use_filesystem
 	rm -f $dev/$id/format

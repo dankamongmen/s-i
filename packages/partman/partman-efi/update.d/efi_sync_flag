@@ -32,12 +32,7 @@ flags=''
 open_dialog GET_FLAGS $id
 while { read_line flag; [ "$flag" ]; }; do
     if [ "$flag" != boot ]; then
-	if [ "$flags" ]; then
-	    flags="$flags
-$flag"
-	else
-	    flags="$flag"
-	fi
+	flags="${flags:+$flags$NL}$flag"
     fi
 done
 close_dialog
