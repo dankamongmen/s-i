@@ -61,10 +61,9 @@ for dev in $DEVICES/*; do
 					db_progress START 0 3 partman/text/formatting
 					db_progress INFO $template
 					db_progress SET 1
+					usage=''
 					if [ -f $id/usage ]; then
 						usage="-T $(cat $id/usage)"
-					else
-						usage=''
 					fi
 					if log-output -t partman --pass-stdout \
 					   mkfs.ext2 $device $usage >/dev/null; then
@@ -76,17 +75,18 @@ for dev in $DEVICES/*; do
 					db_progress STOP
 				fi
 				if [ "$status" = OK ]; then
+					label=''
 					if [ -f $id/label ]; then
-						label=$(cat $id/label|
-						sed 's/\(................\).*/\1/g')
-					else
-						label=''
+						label=$(cat $id/label | \
+							sed 's/\(................\).*/\1/g')
 					fi
 					if [ "$label" ]; then
-						log-output -t partman --pass-stdout tune2fs -L "$label" $device >/dev/null
+						log-output -t partman --pass-stdout \
+							tune2fs -L "$label" $device >/dev/null
 					fi
 					if [ -f $id/reserved_for_root ]; then
-						log-output -t partman --pass-stdout tune2fs -m $(cat $id/reserved_for_root) $device >/dev/null
+						log-output -t partman --pass-stdout \
+							tune2fs -m $(cat $id/reserved_for_root) $device >/dev/null
 					fi
 				fi
 				;;

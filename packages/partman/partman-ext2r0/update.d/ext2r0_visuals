@@ -15,27 +15,21 @@ cd $dev
 # consuming file system detection. check using tune2fs only once.
 # From now on, we no longer need to run tune2fs but simply check
 # for the existence of detected_ext2r0.
-if \
-    [ ! -f /var/lib/partman/filesystems_detected ] \
-    && [ -f $id/detected_filesystem ] \
-    && [ "$(cat $id/detected_filesystem)" = ext2 ]
-then
-    if \
-        $(tune2fs -l $path | grep -q '^Filesystem revision #: \+0 (original)$')
-    then
-        >$id/detected_ext2r0
-    else
-        rm -f $id/detected_ext2r0
-    fi
+if [ ! -f /var/lib/partman/filesystems_detected ] && \
+   [ -f $id/detected_filesystem ] && \
+   [ "$(cat $id/detected_filesystem)" = ext2 ]; then
+	if $(tune2fs -l $path | \
+	     grep -q '^Filesystem revision #: \+0 (original)$'); then
+		>$id/detected_ext2r0
+	else
+		rm -f $id/detected_ext2r0
+	fi
 fi
 
 # List the ext2r0 partition as ext2r0 in the main partman screen
-if \
-    [ "$fs" != free -a -f $id/detected_filesystem -a ! -f $id/method ] \
-    && [ "$(cat $id/detected_filesystem)" = ext2 -a -f $id/detected_ext2r0 ]
-then
-    db_metaget partman/filesystem_short/ext2r0 description || RET=''
-    RET="${RET:-ext2r0}"
-    printf "$RET" >$id/visual_filesystem
+if [ "$fs" != free ] && [ ! -f $id/method ] && [ -f $id/detected_filesystem ] && \
+   [ "$(cat $id/detected_filesystem)" = ext2 ] && [ -f $id/detected_ext2r0 ]; then
+	db_metaget partman/filesystem_short/ext2r0 description || RET=''
+	RET="${RET:-ext2r0}"
+	printf "$RET" >$id/visual_filesystem
 fi
-
