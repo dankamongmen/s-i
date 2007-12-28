@@ -328,6 +328,8 @@ perform_resizing () {
 		cp -r $oldid/* $newid/
 	fi
 	if [ "$virtual" = no ]; then
+		device_cleanup_partitions
+
 		for s in /lib/partman/init.d/*; do
 			if [ -x $s ]; then
 				$s || exit 100

@@ -1,11 +1,15 @@
 #!/bin/sh
 
 . /lib/partman/lib/base.sh
+. /lib/partman/lib/commit.sh
 
 disable_swap
 for dev in $DEVICES/*; do
 	[ -d "$dev" ] || continue
 	cd $dev
+
 	open_dialog COMMIT
 	close_dialog
+
+	device_cleanup_partitions
 done

@@ -1,5 +1,6 @@
 # base.sh is already sourced through lvm-base.sh
 . /lib/partman/lib/lvm-base.sh
+. /lib/partman/lib/commit.sh
 . /lib/partman/lib/auto-shared.sh
 . /lib/partman/lib/recipes.sh
 
@@ -114,6 +115,7 @@ auto_lvm_prepare() {
 	open_dialog COMMIT
 	close_dialog
 
+	device_cleanup_partitions
 	update_all
 }
 

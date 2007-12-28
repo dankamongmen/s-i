@@ -120,6 +120,27 @@ $items"
 	fi
 }
 
+# Remove directories for partitions that no longer exist
+# Device directory must be current
+device_cleanup_partitions () {
+	local partitions pdirs pdir
+
+	partitions=
+	open_dialog PARTITIONS
+	while { read_line x1 id x; [ "$id" ]; }; do
+		partitions="${partitions:+$partitions$NL}$id"
+	done
+	close_dialog
+
+	pdirs="$(find . -type d | cut -d/ -f2 | sort -u |
+		grep "^[0-9]\+-[0-9]\+$")"
+	for pdir in $pdirs; do
+		if ! echo "$partitions" | grep -q "^$pdir$"; then
+			rm -rf $pdir
+		fi
+	done
+}
+
 commit_changes () {
 	local template
 	template=$1
