@@ -25,9 +25,7 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		exit $RET
 	fi
 
-	if [ -d /var/lib/partman/old_devices ]; then
-		rm -rf /var/lib/partman/old_devices
-	fi
+	rm -rf /var/lib/partman/old_devices
 	if [ -d $DEVICES ]; then
 		mv $DEVICES /var/lib/partman/old_devices
 	fi
@@ -71,4 +69,6 @@ if [ ! -f /var/run/parted_server.pid ]; then
 			rm -rf $dev
 		fi
 	done
+
+	rm -rf /var/lib/partman/old_devices
 fi
