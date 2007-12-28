@@ -9,17 +9,17 @@ fi
 
 # Obtain the size of an MD device
 get_size () {
-    while [ -z "$(echo "$line" | grep "^md$NUMBER :")" ]; do
-        read line
-        [ $? -eq 1 ] && break  # EOF
-    done
-    read line
-    size=$(echo "$line" | sed -e 's/ blocks.*//')
-    # If the sed failed, the line didn't contain the size; just
-    # return 0 in that case.
-    if [ "$size" = "$line" ]; then
-        size=0
-    fi
+	while [ -z "$(echo "$line" | grep "^md$NUMBER :")" ]; do
+		read line
+		[ $? -eq 1 ] && break  # EOF
+	done
+	read line
+	size=$(echo "$line" | sed -e 's/ blocks.*//')
+	# If the sed failed, the line didn't contain the size; just
+	# return 0 in that case.
+	if [ "$size" = "$line" ]; then
+		size=0
+	fi
 }
 
 # Create the raid devices
@@ -51,11 +51,11 @@ for i in $(grep ^md /proc/mdstat | grep -v inactive | \
 	open_dialog OPENED "$DEVNODE"
 	read_line response
 	close_dialog
-	if [ "$response" = "no" ]; then
+	if [ "$response" = no ]; then
 		open_dialog OPEN "$DEVNODE"
 		read_line response
 		close_dialog
-		if [ "$response" = "failed" ]; then
+		if [ "$response" = failed ]; then
 			rm -rf ${DEVICE}
 		fi
 	fi
@@ -66,26 +66,26 @@ for i in $(grep ^md /proc/mdstat | grep -v inactive | \
 	open_dialog PARTITIONS
 	free_space=''
 	while { read_line num id size type fs path name; [ "$id" ]; }; do
-	    if [ "$fs" = free ]; then
-	        free_space=$id
-	        free_size=$size
-	    fi
+		if [ "$fs" = free ]; then
+			free_space=$id
+			free_size=$size
+		fi
 	done
 	close_dialog
 
 	if [ "$free_space" ]; then
-	    open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
-	    read_line num id size type fs path name
-	    close_dialog
-	    if [ "$id" ]; then
-		open_dialog GET_FILE_SYSTEM $id
-		read_line filesystem
+		open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
+		read_line num id size type fs path name
 		close_dialog
-		if [ "$filesystem" != none ]; then
-		    open_dialog CHANGE_FILE_SYSTEM $id $filesystem
-		    close_dialog
+		if [ "$id" ]; then
+			open_dialog GET_FILE_SYSTEM $id
+			read_line filesystem
+			close_dialog
+			if [ "$filesystem" != none ]; then
+				open_dialog CHANGE_FILE_SYSTEM $id $filesystem
+				close_dialog
+			fi
 		fi
-	    fi
 	fi
 
 	open_dialog DISK_UNCHANGED
