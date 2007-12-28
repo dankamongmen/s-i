@@ -308,7 +308,7 @@ update_partition () {
 		$u $1 $part
 	done
 }
-      
+
 DEVICES=/var/lib/partman/devices
 
 # 0, 1 and 2 are standard input, output and error.
