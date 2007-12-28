@@ -1,7 +1,7 @@
-. /lib/partman/lib/base.sh
-. /lib/partman/lib/recipes.sh
+# base.sh is already sourced through lvm-base.sh
 . /lib/partman/lib/lvm-base.sh
 . /lib/partman/lib/auto-shared.sh
+. /lib/partman/lib/recipes.sh
 
 bail_out() {
 	db_input critical partman-auto-lvm/$1 || true
