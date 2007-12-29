@@ -1,11 +1,11 @@
-<!-- original version: 43965 -->
+<!-- original version: 50618 -->
 
  <sect1 id="module-details">
  <title>Utilisation des composants</title>
 <para>
 
 Dans cette section, nous décrirons en détail chaque composant de 
-l'installateur. Ces composants, groupés en étapes facilement identifiables,
+l'installateur. Ces composants
 sont présentés selon leur ordre d'apparition dans le 
 processus d'installation. Notez que les modules ne sont pas tous utilisés dans
 toutes les installations. Leur utilisation dépend du matériel et du 
@@ -47,6 +47,9 @@ nécessaires.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
+
 
   </sect2>
 
@@ -60,7 +63,7 @@ opérationnel et connaît les besoins de l'utilisateur.
 Comme l'indique le titre de cette section, la tâche des composants de cette
 étape est de partitionner les disques, créer les systèmes de fichiers et
 déclarer les points de montage. Des tâches proches, comme la configuration de
-périphériques LVM ou RAID, peuvent aussi être menées à bien.
+périphériques chiffrés ou de périphériques LVM ou RAID, peuvent aussi être menées à bien.
 
 </para>
 
@@ -75,23 +78,7 @@ périphériques LVM ou RAID, peuvent aussi être menées à bien.
 
   </sect2>
 
-
-  <sect2 id="di-system-setup">
-  <title>Configuration du système</title>
-<para>
-
-Après le partitionnement, l'installateur pose d'autres questions qui servent
-à définir le système qu'il va installer.
-
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
-
-
-  <sect2 id="di-install-base">
+ <sect2 id="di-install-base">
   <title>L'installation du système de base</title>
 <para>
 
@@ -107,11 +94,25 @@ prendre du temps.
 
   </sect2>
 
+  <sect2 id="di-user-setup">
+  <title>Installation des utilisateurs et des mots de passe</title>
+
+<para>
+
+Après l'installation du système de base, l'installateur vous propose de créer
+le compte du superutilisateur (<quote>root</quote>) puis le compte du premier utilisateur.
+D'autres comptes peuvent être créés une fois l'installation du système terminée.
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
+
   <sect2 id="di-install-software">
   <title>Installation de logiciels supplémentaires</title>
 <para>
 
-Après l'installation du système de base, vous avez un système viable mais limité.
+Pour l'instant, vous avez un système viable mais limité.
 La plupart des utilisateurs voudront installer d'autres logiciels et l'installateur le
 permet. Cette étape peut prendre plus de temps que l'installation du système de base
 sur des ordinateurs lents.
@@ -151,14 +152,14 @@ qu'il s'amorce sur le réseau&nbsp;: voyez <xref linkend="boot-dev-select-sun"/>
   </sect2>
 
   <sect2 id="di-finish">
-  <title>Comment terminer l'installation ?</title>
+  <title>La fin de l'installation</title>
 <para>
 
-Avant de relancer la machine pour amorcer le système, il reste un nettoyage 
-à faire après le travail de l'installateur.
+Dans cette dernière étape du processus d'installation, les tâches de dernière minute sont
+effectuées. Elles consistent essentiellement en un nettoyage après le travail de l'installateur.
 
 </para>
-
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
