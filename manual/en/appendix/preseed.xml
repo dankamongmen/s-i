@@ -858,6 +858,25 @@ d-i mirror/http/proxy string
 
   </sect2>
 
+  <sect2 id="preseed-time">
+  <title>Clock and time zone setup</title>
+
+<informalexample role="example"><screen>
+# Controls whether or not the hardware clock is set to UTC.
+d-i clock-setup/utc boolean true
+
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+d-i time/zone string US/Eastern
+
+# Controls whether to use NTP to set the clock during the install
+d-i clock-setup/ntp boolean true
+# NTP server to use. The default is almost always fine here.
+#d-i clock-setup/ntp-server ntp.example.com
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-partman">
   <title>Partitioning</title>
 <para>
@@ -1026,21 +1045,22 @@ d-i partman/confirm boolean true
 
   </sect2>
 
-  <sect2 id="preseed-time">
-  <title>Clock and time zone setup</title>
+  <sect2 id="preseed-base-installer">
+  <title>Base system installation</title>
+<para>
+
+There is actually not very much that can be preseeded for this stage of the
+installation. The only questions asked concern the installation of the kernel.
+
+</para>
 
 <informalexample role="example"><screen>
-# Controls whether or not the hardware clock is set to UTC.
-d-i clock-setup/utc boolean true
+# Select the initramfs generator used to generate the initrd for 2.6 kernels.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
-# You may set this to any valid setting for $TZ; see the contents of
-# /usr/share/zoneinfo/ for valid values.
-d-i time/zone string US/Eastern
-
-# Controls whether to use NTP to set the clock during the install
-d-i clock-setup/ntp boolean true
-# NTP server to use. The default is almost always fine here.
-#d-i clock-setup/ntp-server ntp.example.com
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1112,26 +1132,6 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </screen></informalexample>
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-base-installer">
-  <title>Base system installation</title>
-<para>
-
-There is actually not very much that can be preseeded for this stage of the
-installation. The only questions asked concern the installation of the kernel.
-
-</para>
-
-<informalexample role="example"><screen>
-# Select the initramfs generator used to generate the initrd for 2.6 kernels.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
-
-# The kernel image (meta) package to be installed; "none" can be used if no
-# kernel is to be installed.
-#d-i base-installer/kernel/image linux-image-2.6-486
-</screen></informalexample>
-
   </sect2>
 
   <sect2 id="preseed-apt">
