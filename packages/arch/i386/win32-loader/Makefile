@@ -18,7 +18,7 @@ GRUB_MODULES	+= biosdisk
 # partmap
 GRUB_MODULES	+= pc gpt
 # fs
-GRUB_MODULES	+= fat ntfs
+GRUB_MODULES	+= fat ntfs ntfscomp
 # used in our grub.cfg
 GRUB_MODULES	+= search linux _linux boot
 # might be useful for debugging
