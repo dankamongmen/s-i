@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -852,23 +852,46 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:772
+#, no-c-format
+msgid ""
+      "# Controls whether or not the hardware clock is set to UTC.\n"
+      "d-i clock-setup/utc boolean true\n"
+      "\n"
+      "# You may set this to any valid setting for $TZ; see the contents of\n"
+      "# /usr/share/zoneinfo/ for valid values.\n"
+      "d-i time/zone string US/Eastern\n"
+      "\n"
+      "# Controls whether to use NTP to set the clock during the install\n"
+      "d-i clock-setup/ntp boolean true\n"
+      "# NTP server to use. The default is almost always fine here.\n"
+      "#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid "Using preseeding to partition the harddisk is very much limited to what is supported by <classname>partman-auto</classname>. You can choose to partition either existing free space on a disk or a whole disk. The layout of the disk can be determined by using a predefined recipe, a custom recipe from a recipe file or a recipe included in the preconfiguration file. It is currently not possible to partition multiple disks using preseeding."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid "The identification of disks is dependent on the order in which their drivers are loaded. If there are multiple disks in the system, make very sure the correct one will be selected before using preseeding."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, no-c-format
 msgid ""
       "# If the system has free space you can choose to only partition that space.\n"
@@ -938,31 +961,31 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid "You can also use preseeding to set up partitions on software RAID arrays. Supported are RAID levels 0, 1 and 5, creating degraded arrays and specifying spare devices. If you are using RAID 1, you can preseed grub to install to all devices used in the array; see <xref linkend=\"preseed-bootloader\"/>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid "This type of automated partitioning is easy to get wrong. It is also a very new component that may still have some bugs or missing error handling. The responsibility to get the various recipes right (so they make sense and don't conflict) lies with the user. Check <filename>/var/log/syslog</filename> if you run into problems."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid "Note that only RAID 0 and RAID 1 have been tested by the developers of the component. RAID 5 is untested. Advanced RAID setup with degraded arrays or spare devices has only been tested lightly."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:822
+#: preseed.xml:829
 #, no-c-format
 msgid ""
       "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1013,48 +1036,49 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:827
-#, no-c-format
-msgid "Clock and time zone setup"
-msgstr ""
-
-#. Tag: screen
-#: preseed.xml:829
-#, no-c-format
-msgid ""
-      "# Controls whether or not the hardware clock is set to UTC.\n"
-      "d-i clock-setup/utc boolean true\n"
-      "\n"
-      "# You may set this to any valid setting for $TZ; see the contents of\n"
-      "# /usr/share/zoneinfo/ for valid values.\n"
-      "d-i time/zone string US/Eastern\n"
-      "\n"
-      "# Controls whether to use NTP to set the clock during the install\n"
-      "d-i clock-setup/ntp boolean true\n"
-      "# NTP server to use. The default is almost always fine here.\n"
-      "#d-i clock-setup/ntp-server ntp.example.com"
-msgstr ""
-
-#. Tag: title
 #: preseed.xml:834
 #, no-c-format
-msgid "Account setup"
+msgid "Base system installation"
 msgstr ""
 
 #. Tag: para
 #: preseed.xml:835
 #, no-c-format
+msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:842
+#, no-c-format
+msgid ""
+      "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
+      "#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
+      "\n"
+      "# The kernel image (meta) package to be installed; \"none\" can be used if no\n"
+      "# kernel is to be installed.\n"
+      "#d-i base-installer/kernel/image linux-image-2.6-486"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:847
+#, no-c-format
+msgid "Account setup"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:848
+#, no-c-format
 msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, no-c-format
 msgid ""
       "# Skip creation of a root account (normal user account will be able to\n"
@@ -1086,45 +1110,21 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is setup to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid "An MD5 hash for a password can be generated using the following command."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-msgstr ""
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr ""
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
-msgstr ""
-
-#. Tag: screen
-#: preseed.xml:882
-#, no-c-format
-msgid ""
-      "# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
-      "#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-      "\n"
-      "# The kernel image (meta) package to be installed; \"none\" can be used if no\n"
-      "# kernel is to be installed.\n"
-      "#d-i base-installer/kernel/image linux-image-2.6-486"
 msgstr ""
 
 #. Tag: title

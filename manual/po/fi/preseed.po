@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: 2007-03-13 05:59+0200\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
@@ -1519,11 +1519,40 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr "Kellon ja aikavyöhykkeen asetukset"
+
+#. Tag: screen
+#: preseed.xml:772
+#, fuzzy, no-c-format
+msgid ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+"# Määrittää onko laitekello maailmanajassa vai paikallisessa ajassa.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Tämä voivaan asettaa mihin tahansa kelvolliseen ympäristömuuttujan\n"
+"# $TZ arvoon; kelvolliset arvot löytyvät hakemistosta /usr/share/zoneinfo/.\n"
+"d-i time/zone string Europe/Helsinki"
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr "Osiointi"
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1541,7 +1570,7 @@ msgstr ""
 "ole mahdollista käyttää valmiita vastauksia useiden levyjen osioimiseen."
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1553,7 +1582,7 @@ msgstr ""
 "tulevan valituksi valmiita vastauksia käytettäessä."
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1687,13 +1716,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Osiointi käyttäen RAIDia"
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1709,7 +1738,7 @@ msgstr ""
 "käytetyille laitteille; katso <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1725,7 +1754,7 @@ msgstr ""
 "<filename>/var/log/syslog</filename> jos pulmia ilmenee."
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1737,7 +1766,7 @@ msgstr ""
 "varalaitteita on testattu vain hieman."
 
 #. Tag: screen
-#: preseed.xml:822
+#: preseed.xml:829
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1835,42 +1864,46 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:827
+#: preseed.xml:834
 #, no-c-format
-msgid "Clock and time zone setup"
-msgstr "Kellon ja aikavyöhykkeen asetukset"
+msgid "Base system installation"
+msgstr "Perusjärjestelmän asennus"
+
+#. Tag: para
+#: preseed.xml:835
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Tässä asennuksen vaiheessa ei oikeastaan ole kovinkaan paljoa mahdollista "
+"käyttää valmiita vastauksia. Ainoat kysymykset koskevat ytimen asentamista."
 
 #. Tag: screen
-#: preseed.xml:829
+#: preseed.xml:842
 #, fuzzy, no-c-format
 msgid ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
-"\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
 msgstr ""
-"# Määrittää onko laitekello maailmanajassa vai paikallisessa ajassa.\n"
-"d-i clock-setup/utc boolean true\n"
-"\n"
-"# Tämä voivaan asettaa mihin tahansa kelvolliseen ympäristömuuttujan\n"
-"# $TZ arvoon; kelvolliset arvot löytyvät hakemistosta /usr/share/zoneinfo/.\n"
-"d-i time/zone string Europe/Helsinki"
+"# Valitaan  initramfs:n tekevä ohjelma jolla initrd tehdään 2.6-ytimille.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:834
+#: preseed.xml:847
 #, no-c-format
 msgid "Account setup"
 msgstr "Käyttäjätunnusten luonti"
 
 #. Tag: para
-#: preseed.xml:835
+#: preseed.xml:848
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1882,7 +1915,7 @@ msgstr ""
 "käyttää joko ilmitekstiä tai MD5 <emphasis>tiivistettä</emphasis> (hash)."
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1899,7 +1932,7 @@ msgstr ""
 "mahdollisuudet."
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, fuzzy, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1951,7 +1984,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1971,50 +2004,17 @@ msgstr ""
 "<command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
 msgstr "Salasanan MD5-tiiviste saadaan tehtyä seuraavalla komennolla."
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr "Perusjärjestelmän asennus"
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Tässä asennuksen vaiheessa ei oikeastaan ole kovinkaan paljoa mahdollista "
-"käyttää valmiita vastauksia. Ainoat kysymykset koskevat ytimen asentamista."
-
-#. Tag: screen
-#: preseed.xml:882
-#, fuzzy, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
-msgstr ""
-"# Valitaan  initramfs:n tekevä ohjelma jolla initrd tehdään 2.6-ytimille.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:887

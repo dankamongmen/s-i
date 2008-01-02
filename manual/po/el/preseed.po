@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: 2007-03-20 12:04+0200\n"
 "Last-Translator: \n"
 "Language-Team:  <en@li.org>\n"
@@ -1585,11 +1585,41 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr "Ρύθμιση ρολογιού και χρονικής ζώνης"
+
+#. Tag: screen
+#: preseed.xml:772
+#, fuzzy, no-c-format
+msgid ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+"# Ελέγχει αν το ρολόι του υπολογιστή σας είναι ρυθμισμένο ή όχι σε UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Μπορείτε να ορίσετε οποιαδήποτε έγκυρη ρύθμιση για την $TZ; δείτε τα # "
+"περιεχόμενα του\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern"
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr "Διαμέριση"
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1609,7 +1639,7 @@ msgstr ""
 "διαμέριση πολλών δίσκων με χρήση προρύθμισης."
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1621,7 +1651,7 @@ msgstr ""
 "επιλεχθεί ο σωστός πριν να χρησιμοποιήσετε preseeding."
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1767,13 +1797,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Διαμέριση με χρήση RAID"
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1791,7 +1821,7 @@ msgstr ""
 "\"/>."
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1808,7 +1838,7 @@ msgstr ""
 "syslog</filename> αντιμετωπίσετε προβλήματα."
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1821,7 +1851,7 @@ msgstr ""
 "ελεγχθεί ελάχιστα."
 
 #. Tag: screen
-#: preseed.xml:822
+#: preseed.xml:829
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1926,43 +1956,49 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:827
+#: preseed.xml:834
 #, no-c-format
-msgid "Clock and time zone setup"
-msgstr "Ρύθμιση ρολογιού και χρονικής ζώνης"
+msgid "Base system installation"
+msgstr "Εγκατάσταση του βασικού συστήματος"
+
+#. Tag: para
+#: preseed.xml:835
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Στην πραγματικότητα, δεν υπάρχουν πολλά πράγματα για τα οποία μπορείτε να "
+"χρησιμοποιήσετε preseeding σ' αυτό το στάδιο της εγκατάστασης. Οι μόνες "
+"ερωτήσεις που γίνονται αφορούν την εγκατάσταση του πυρήνα."
 
 #. Tag: screen
-#: preseed.xml:829
+#: preseed.xml:842
 #, fuzzy, no-c-format
 msgid ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
-"\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
 msgstr ""
-"# Ελέγχει αν το ρολόι του υπολογιστή σας είναι ρυθμισμένο ή όχι σε UTC.\n"
-"d-i clock-setup/utc boolean true\n"
-"\n"
-"# Μπορείτε να ορίσετε οποιαδήποτε έγκυρη ρύθμιση για την $TZ; δείτε τα # "
-"περιεχόμενα του\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern"
+"# Επιλέξτε το πρόγραμμα δημιουργίας του συστήματος αρχείων initramfs, που # "
+"χρησιμοποιήθηκε για την δημιουργία του δίσκου μνήμης initrd για πυρήνες "
+"2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:834
+#: preseed.xml:847
 #, no-c-format
 msgid "Account setup"
 msgstr "Ρύθμιση Λογαριασμού"
 
 #. Tag: para
-#: preseed.xml:835
+#: preseed.xml:848
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1975,7 +2011,7 @@ msgstr ""
 "κρυπτογραφημένο (clear text) είτε MD5 <emphasis>hashes</emphasis>."
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1992,7 +2028,7 @@ msgstr ""
 "force attacks)."
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, fuzzy, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -2046,7 +2082,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -2067,7 +2103,7 @@ msgstr ""
 "την εντολή <command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
@@ -2076,46 +2112,10 @@ msgstr ""
 "χρησιμοποιώντας την ακόλουθη εντολή."
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr "Εγκατάσταση του βασικού συστήματος"
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Στην πραγματικότητα, δεν υπάρχουν πολλά πράγματα για τα οποία μπορείτε να "
-"χρησιμοποιήσετε preseeding σ' αυτό το στάδιο της εγκατάστασης. Οι μόνες "
-"ερωτήσεις που γίνονται αφορούν την εγκατάσταση του πυρήνα."
-
-#. Tag: screen
-#: preseed.xml:882
-#, fuzzy, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
-msgstr ""
-"# Επιλέξτε το πρόγραμμα δημιουργίας του συστήματος αρχείων initramfs, που # "
-"χρησιμοποιήθηκε για την δημιουργία του δίσκου μνήμης initrd για πυρήνες "
-"2.6.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:887

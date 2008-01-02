@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: 2007-11-14 21:23+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -1549,11 +1549,46 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr "Configuração do relógio e fuso horário"
+
+#. Tag: screen
+#: preseed.xml:772
+#, no-c-format
+msgid ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+"# Controla se o relógio de hardware está ou não definido para UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Pode definir este valor como qualquer definição válida para $TZ;\n"
+"# para valores válidos veja o conteúdo de /usr/share/zoneinfo/.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controla se vai ser utilizado NTP para acertar o relógio durante a "
+"instalação\n"
+"d-i clock-setup/ntp boolean true\n"
+"# Servidor NTP a utilizar. O valor pré-definido está quase sempre bem.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr "Particionamento"
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1572,7 +1607,7 @@ msgstr ""
 "utilizando o preseeding."
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1585,7 +1620,7 @@ msgstr ""
 "preseeding."
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1722,13 +1757,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Particionamento utilizando RAID"
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1744,7 +1779,7 @@ msgstr ""
 "veja <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1760,7 +1795,7 @@ msgstr ""
 "utilizador. Se tiver problemas veja <filename>/var/log/syslog</filename>."
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1772,7 +1807,7 @@ msgstr ""
 "arrays' ou dispositivos de reserva foram apenas ligeiramente testados."
 
 #. Tag: screen
-#: preseed.xml:822
+#: preseed.xml:829
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1872,48 +1907,51 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:827
+#: preseed.xml:834
 #, no-c-format
-msgid "Clock and time zone setup"
-msgstr "Configuração do relógio e fuso horário"
+msgid "Base system installation"
+msgstr "Instalação do sistema base"
 
-#. Tag: screen
-#: preseed.xml:829
+#. Tag: para
+#: preseed.xml:835
 #, no-c-format
 msgid ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
-"\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
-"\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
 msgstr ""
-"# Controla se o relógio de hardware está ou não definido para UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"Na verdade não há muito a que possa ser feito preseed nesta etapa da "
+"instalação. As únicas perguntas colocadas referem-se à instalação do kernel."
+
+#. Tag: screen
+#: preseed.xml:842
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# Pode definir este valor como qualquer definição válida para $TZ;\n"
-"# para valores válidos veja o conteúdo de /usr/share/zoneinfo/.\n"
-"d-i time/zone string US/Eastern\n"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
+msgstr ""
+"# Escolha o gerador de initramfs a utilizar para gerar o initrd para kernels "
+"2.6.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# Controla se vai ser utilizado NTP para acertar o relógio durante a "
-"instalação\n"
-"d-i clock-setup/ntp boolean true\n"
-"# Servidor NTP a utilizar. O valor pré-definido está quase sempre bem.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# O (meta) pacote de imagem do kernel a ser instalado; para não ser "
+"instalado nenhum kernel pode ser utilizado \"none\".\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
 
 #. Tag: title
-#: preseed.xml:834
+#: preseed.xml:847
 #, no-c-format
 msgid "Account setup"
 msgstr "Configuração de contas"
 
 #. Tag: para
-#: preseed.xml:835
+#: preseed.xml:848
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1925,7 +1963,7 @@ msgstr ""
 "texto simples ou <emphasis>hashes</emphasis> MD5."
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1941,7 +1979,7 @@ msgstr ""
 "segurança já que o acesso a hashes MD5 permite ataques \"à bruta\"."
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -2000,7 +2038,7 @@ msgstr ""
 "#d-i passwd/user-default-groups string audio cdrom video"
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -2020,7 +2058,7 @@ msgstr ""
 "autenticação SSH ou <command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
@@ -2028,48 +2066,10 @@ msgstr ""
 "Pode ser gerada uma hash MD5 para uma password utilizando o seguinte comando."
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr "Instalação do sistema base"
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Na verdade não há muito a que possa ser feito preseed nesta etapa da "
-"instalação. As únicas perguntas colocadas referem-se à instalação do kernel."
-
-#. Tag: screen
-#: preseed.xml:882
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
-msgstr ""
-"# Escolha o gerador de initramfs a utilizar para gerar o initrd para kernels "
-"2.6.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# O (meta) pacote de imagem do kernel a ser instalado; para não ser "
-"instalado nenhum kernel pode ser utilizado \"none\".\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
 
 #. Tag: title
 #: preseed.xml:887

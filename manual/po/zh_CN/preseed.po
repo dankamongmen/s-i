@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: 2007-12-08 20:32+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
@@ -1395,11 +1395,45 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr "时钟与时区设置"
+
+#. Tag: screen
+#: preseed.xml:772
+#, no-c-format
+msgid ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr "分区"
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1415,7 +1449,7 @@ msgstr ""
 "磁盘。"
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1426,7 +1460,7 @@ msgstr ""
 "确的那一个。"
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1563,13 +1597,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "使用 RAID 分区"
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1583,7 +1617,7 @@ msgstr ""
 "列中的所有设备；参见 <xref linkend=\"preseed-bootloader\"/>。"
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1597,7 +1631,7 @@ msgstr ""
 "一下 <filename>/var/log/syslog</filename>。"
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1608,145 +1642,148 @@ msgstr ""
 "RAID 设置像降级阵列或额外设备只经过了轻量级的测试。"
 
 #. Tag: screen
-#: preseed.xml:822
-#, no-c-format
-msgid ""
-"# NOTE: this option is of beta release quality and should be used carefully\n"
-"\n"
-"# The method should be set to \"raid\".\n"
-"#d-i partman-auto/method string raid\n"
-"# Specify the disks to be partitioned. They will all get the same layout,\n"
-"# so this will only work if the disks are the same size.\n"
-"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
-"\n"
-"# Next you need to specify the physical partitions that will be used. \n"
-"#d-i partman-auto/expert_recipe string \\\n"
-"#      multiraid ::                                         \\\n"
-"#              1000 5000 4000 raid                          \\\n"
-"#                      $primary{ } method{ raid }           \\\n"
-"#              .                                            \\\n"
-"#              64 512 300% raid                             \\\n"
-"#                      method{ raid }                       \\\n"
-"#              .                                            \\\n"
-"#              500 10000 1000000000 raid                    \\\n"
-"#                      method{ raid }                       \\\n"
-"#              .\n"
-"\n"
-"# Last you need to specify how the previously defined partitions will be\n"
-"# used in the RAID setup. Remember to use the correct partition numbers\n"
-"# for logical partitions.\n"
-"# Parameters are:\n"
-"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
-"mountpoint&gt; \\\n"
-"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
-"# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
-"#d-i partman-auto-raid/recipe string \\\n"
-"#    1 2 0 ext3 /                                           \\\n"
-"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
-"#    .                                                      \\\n"
-"#    1 2 0 swap -                                           \\\n"
-"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
-"#    .                                                      \\\n"
-"#    0 2 0 ext3 /home                                       \\\n"
-"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
-"#    .\n"
-"\n"
-"# This makes partman automatically partition without confirmation.\n"
-"d-i partman-md/confirm boolean true\n"
-"d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
-"d-i partman/confirm boolean true"
-msgstr ""
-"# NOTE: this option is of beta release quality and should be used carefully\n"
-"\n"
-"# The method should be set to \"raid\".\n"
-"#d-i partman-auto/method string raid\n"
-"# Specify the disks to be partitioned. They will all get the same layout,\n"
-"# so this will only work if the disks are the same size.\n"
-"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
-"\n"
-"# Next you need to specify the physical partitions that will be used. \n"
-"#d-i partman-auto/expert_recipe string \\\n"
-"#      multiraid ::                                         \\\n"
-"#              1000 5000 4000 raid                          \\\n"
-"#                      $primary{ } method{ raid }           \\\n"
-"#              .                                            \\\n"
-"#              64 512 300% raid                             \\\n"
-"#                      method{ raid }                       \\\n"
-"#              .                                            \\\n"
-"#              500 10000 1000000000 raid                    \\\n"
-"#                      method{ raid }                       \\\n"
-"#              .\n"
-"\n"
-"# Last you need to specify how the previously defined partitions will be\n"
-"# used in the RAID setup. Remember to use the correct partition numbers\n"
-"# for logical partitions.\n"
-"# Parameters are:\n"
-"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
-"mountpoint&gt; \\\n"
-"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
-"# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
-"#d-i partman-auto-raid/recipe string \\\n"
-"#    1 2 0 ext3 /                                           \\\n"
-"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
-"#    .                                                      \\\n"
-"#    1 2 0 swap -                                           \\\n"
-"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
-"#    .                                                      \\\n"
-"#    0 2 0 ext3 /home                                       \\\n"
-"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
-"#    .\n"
-"\n"
-"# This makes partman automatically partition without confirmation.\n"
-"d-i partman-md/confirm boolean true\n"
-"d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
-"d-i partman/confirm boolean true"
-
-#. Tag: title
-#: preseed.xml:827
-#, no-c-format
-msgid "Clock and time zone setup"
-msgstr "时钟与时区设置"
-
-#. Tag: screen
 #: preseed.xml:829
 #, no-c-format
 msgid ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"# NOTE: this option is of beta release quality and should be used carefully\n"
 "\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
+"# The method should be set to \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Specify the disks to be partitioned. They will all get the same layout,\n"
+"# so this will only work if the disks are the same size.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
 "\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# Next you need to specify the physical partitions that will be used. \n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Last you need to specify how the previously defined partitions will be\n"
+"# used in the RAID setup. Remember to use the correct partition numbers\n"
+"# for logical partitions.\n"
+"# Parameters are:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
+"mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# This makes partman automatically partition without confirmation.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
 msgstr ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"# NOTE: this option is of beta release quality and should be used carefully\n"
 "\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
+"# The method should be set to \"raid\".\n"
+"#d-i partman-auto/method string raid\n"
+"# Specify the disks to be partitioned. They will all get the same layout,\n"
+"# so this will only work if the disks are the same size.\n"
+"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
 "\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# Next you need to specify the physical partitions that will be used. \n"
+"#d-i partman-auto/expert_recipe string \\\n"
+"#      multiraid ::                                         \\\n"
+"#              1000 5000 4000 raid                          \\\n"
+"#                      $primary{ } method{ raid }           \\\n"
+"#              .                                            \\\n"
+"#              64 512 300% raid                             \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .                                            \\\n"
+"#              500 10000 1000000000 raid                    \\\n"
+"#                      method{ raid }                       \\\n"
+"#              .\n"
+"\n"
+"# Last you need to specify how the previously defined partitions will be\n"
+"# used in the RAID setup. Remember to use the correct partition numbers\n"
+"# for logical partitions.\n"
+"# Parameters are:\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
+"mountpoint&gt; \\\n"
+"#          &lt;devices&gt; &lt;sparedevices&gt;\n"
+"# RAID levels 0, 1 and 5 are supported; devices are separated using \"#\"\n"
+"#d-i partman-auto-raid/recipe string \\\n"
+"#    1 2 0 ext3 /                                           \\\n"
+"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#    .                                                      \\\n"
+"#    1 2 0 swap -                                           \\\n"
+"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#    .                                                      \\\n"
+"#    0 2 0 ext3 /home                                       \\\n"
+"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#    .\n"
+"\n"
+"# This makes partman automatically partition without confirmation.\n"
+"d-i partman-md/confirm boolean true\n"
+"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman/choose_partition \\\n"
+"       select Finish partitioning and write changes to disk\n"
+"d-i partman/confirm boolean true"
 
 #. Tag: title
 #: preseed.xml:834
+#, no-c-format
+msgid "Base system installation"
+msgstr "基本系统安装"
+
+#. Tag: para
+#: preseed.xml:835
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr "本阶段的安装并没有多少东西需要预置。仅有一个与内核安装相关的问题。"
+
+#. Tag: screen
+#: preseed.xml:842
+#, no-c-format
+msgid ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
+"\n"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
+msgstr ""
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
+"\n"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
+
+#. Tag: title
+#: preseed.xml:847
 #, no-c-format
 msgid "Account setup"
 msgstr "帐号设置"
 
 #. Tag: para
-#: preseed.xml:835
+#: preseed.xml:848
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1757,7 +1794,7 @@ msgstr ""
 "或 MD5 <emphasis>哈希</emphasis> 值。"
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1770,7 +1807,7 @@ msgstr ""
 "MD5 哈希值相对安全一些，但也会造成安全的假象，MD5 哈希值也可以被暴力破解。"
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1828,7 +1865,7 @@ msgstr ""
 "#d-i passwd/user-default-groups string audio cdrom video"
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1845,54 +1882,17 @@ msgstr ""
 "root 登录(例如使用 SSH key 认证或 sudo)。"
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
 msgstr "密码的 MD5 哈希值可以用下面命令产生。"
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tme\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr "基本系统安装"
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr "本阶段的安装并没有多少东西需要预置。仅有一个与内核安装相关的问题。"
-
-#. Tag: screen
-#: preseed.xml:882
-#, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
-msgstr ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
 
 #. Tag: title
 #: preseed.xml:887

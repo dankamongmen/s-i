@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-14 01:09+0000\n"
+"POT-Creation-Date: 2008-01-02 01:09+0000\n"
 "PO-Revision-Date: 2007-03-18 19:17+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
@@ -1471,11 +1471,40 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:770
 #, no-c-format
+msgid "Clock and time zone setup"
+msgstr "Óra és időzóna beállítás"
+
+#. Tag: screen
+#: preseed.xml:772
+#, fuzzy, no-c-format
+msgid ""
+"# Controls whether or not the hardware clock is set to UTC.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# You may set this to any valid setting for $TZ; see the contents of\n"
+"# /usr/share/zoneinfo/ for valid values.\n"
+"d-i time/zone string US/Eastern\n"
+"\n"
+"# Controls whether to use NTP to set the clock during the install\n"
+"d-i clock-setup/ntp boolean true\n"
+"# NTP server to use. The default is almost always fine here.\n"
+"#d-i clock-setup/ntp-server ntp.example.com"
+msgstr ""
+"# Meghatározza, a hardver óra az UTC szerint jár-e.\n"
+"d-i clock-setup/utc boolean true\n"
+"\n"
+"# Bármilyen érvényes $TZ értékre állítható; lásd a\n"
+"# /usr/share/zoneinfo/ tartalmát az érvényes értékekről.\n"
+"d-i time/zone string US/Eastern"
+
+#. Tag: title
+#: preseed.xml:777
+#, no-c-format
 msgid "Partitioning"
 msgstr "Particionálás"
 
 #. Tag: para
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid ""
 "Using preseeding to partition the harddisk is very much limited to what is "
@@ -1492,7 +1521,7 @@ msgstr ""
 "recepttel. Jelenleg nem lehet több lemezt particionálni előírással."
 
 #. Tag: para
-#: preseed.xml:782
+#: preseed.xml:789
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1503,7 +1532,7 @@ msgstr ""
 "esetén ügyelj nagyon, hogy a helyeset válaszd az előírás előtt."
 
 #. Tag: screen
-#: preseed.xml:790
+#: preseed.xml:797
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
@@ -1635,13 +1664,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:795
+#: preseed.xml:802
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Particionálás RAID használatával"
 
 #. Tag: para
-#: preseed.xml:796
+#: preseed.xml:803
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1656,7 +1685,7 @@ msgstr ""
 "itt: <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:806
+#: preseed.xml:813
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also a very "
@@ -1672,7 +1701,7 @@ msgstr ""
 "filename> fájlt."
 
 #. Tag: para
-#: preseed.xml:814
+#: preseed.xml:821
 #, no-c-format
 msgid ""
 "Note that only RAID 0 and RAID 1 have been tested by the developers of the "
@@ -1684,7 +1713,7 @@ msgstr ""
 "tesztelt."
 
 #. Tag: screen
-#: preseed.xml:822
+#: preseed.xml:829
 #, no-c-format
 msgid ""
 "# NOTE: this option is of beta release quality and should be used carefully\n"
@@ -1782,42 +1811,46 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:827
+#: preseed.xml:834
 #, no-c-format
-msgid "Clock and time zone setup"
-msgstr "Óra és időzóna beállítás"
+msgid "Base system installation"
+msgstr "Az Alaprendszer telepítése"
+
+#. Tag: para
+#: preseed.xml:835
+#, no-c-format
+msgid ""
+"There is actually not very much that can be preseeded for this stage of the "
+"installation. The only questions asked concern the installation of the "
+"kernel."
+msgstr ""
+"Jelenleg nincs sok előírható a telepítő e részéhez. Csak a kernel "
+"telepítéséhez vannak kérdések."
 
 #. Tag: screen
-#: preseed.xml:829
+#: preseed.xml:842
 #, fuzzy, no-c-format
 msgid ""
-"# Controls whether or not the hardware clock is set to UTC.\n"
-"d-i clock-setup/utc boolean true\n"
+"# Select the initramfs generator used to generate the initrd for 2.6 "
+"kernels.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# You may set this to any valid setting for $TZ; see the contents of\n"
-"# /usr/share/zoneinfo/ for valid values.\n"
-"d-i time/zone string US/Eastern\n"
-"\n"
-"# Controls whether to use NTP to set the clock during the install\n"
-"d-i clock-setup/ntp boolean true\n"
-"# NTP server to use. The default is almost always fine here.\n"
-"#d-i clock-setup/ntp-server ntp.example.com"
+"# The kernel image (meta) package to be installed; \"none\" can be used if "
+"no\n"
+"# kernel is to be installed.\n"
+"#d-i base-installer/kernel/image linux-image-2.6-486"
 msgstr ""
-"# Meghatározza, a hardver óra az UTC szerint jár-e.\n"
-"d-i clock-setup/utc boolean true\n"
-"\n"
-"# Bármilyen érvényes $TZ értékre állítható; lásd a\n"
-"# /usr/share/zoneinfo/ tartalmát az érvényes értékekről.\n"
-"d-i time/zone string US/Eastern"
+"# A 2.6 kernel számára használt initramfs előállító választása.\n"
+"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:834
+#: preseed.xml:847
 #, no-c-format
 msgid "Account setup"
 msgstr "Fiók beállítások"
 
 #. Tag: para
-#: preseed.xml:835
+#: preseed.xml:848
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -1829,7 +1862,7 @@ msgstr ""
 "emphasis> kódok."
 
 #. Tag: para
-#: preseed.xml:842
+#: preseed.xml:855
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -1844,7 +1877,7 @@ msgstr ""
 "elkövetett nyers erejű támadást."
 
 #. Tag: screen
-#: preseed.xml:852
+#: preseed.xml:865
 #, fuzzy, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -1896,7 +1929,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:854
+#: preseed.xml:867
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -1915,50 +1948,17 @@ msgstr ""
 "command>)."
 
 #. Tag: para
-#: preseed.xml:864
+#: preseed.xml:877
 #, no-c-format
 msgid ""
 "An MD5 hash for a password can be generated using the following command."
 msgstr "Egy MD5 hash egy jelszóhoz az alábbi paranccsal készíthető."
 
 #. Tag: screen
-#: preseed.xml:868
+#: preseed.xml:881
 #, no-c-format
 msgid "$ echo \"r00tme\" | mkpasswd -s -H MD5"
 msgstr "$ echo \"r00tmagam\" | mkpasswd -s -H MD5"
-
-#. Tag: title
-#: preseed.xml:874
-#, no-c-format
-msgid "Base system installation"
-msgstr "Az Alaprendszer telepítése"
-
-#. Tag: para
-#: preseed.xml:875
-#, no-c-format
-msgid ""
-"There is actually not very much that can be preseeded for this stage of the "
-"installation. The only questions asked concern the installation of the "
-"kernel."
-msgstr ""
-"Jelenleg nincs sok előírható a telepítő e részéhez. Csak a kernel "
-"telepítéséhez vannak kérdések."
-
-#. Tag: screen
-#: preseed.xml:882
-#, fuzzy, no-c-format
-msgid ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
-"\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
-"# kernel is to be installed.\n"
-"#d-i base-installer/kernel/image linux-image-2.6-486"
-msgstr ""
-"# A 2.6 kernel számára használt initramfs előállító választása.\n"
-"#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
 #: preseed.xml:887
