@@ -89,14 +89,11 @@ for line in $(sed 's/^/:/' $file); do
 			saveline "#$line"
 		fi
 		
-		# shift away remaining options to avoid passing them
+		# Shift away remaining options to avoid passing them
 		# to debconf-apt-progress a second time.
-		while [ -n "$1" ] && [ "$1" != "--" ]; do
-			shift 1
+		while [ "$1" ]; do
+			shift
 		done
-		if [ "$1" = "--" ]; then
-			shift 1
-		fi
 	else
 		# Ignore leading empty lines
 		if [ $items != 0 ] || [ "$line" ]; then
