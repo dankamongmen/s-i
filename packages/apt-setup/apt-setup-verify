@@ -6,22 +6,22 @@ NL="
 "
 
 NOTEST=""
-if [ "$1" = "--invalid" ]; then
-	NOTEST=1
+while [ "$1" ]; do
+	case "$1" in
+	    --)
+		shift
+		break ;;
+	    --invalid)
+		NOTEST=1 ;;
+	    *)
+		if [ -z "$file" ]; then
+			file="$1"
+		else
+			saveto="$1"
+		fi ;;
+	esac
 	shift
-fi
-
-file="$1"
-if [ "$2" != "--" ]; then
-	saveto="$2"
-fi
-
-while [ -n "$1" ] && [ "$1" != "--" ]; do
-	shift 1
 done
-if [ "$1" = "--" ]; then
-	shift 1
-fi
 
 logoutput=""
 if [ "$CATCHLOG" ]; then
@@ -43,7 +43,7 @@ saveline () {
 
 valid () {
 	line="$1"
-	shift 1
+	shift
 
 	[ "${line%%:*}" != "deb cdrom" ] || return 0
 
@@ -54,9 +54,9 @@ valid () {
 		--logstderr --dlwaypoint 100 "${@:---no-progress}" -- \
 		apt-get -o APT::Get::List-Cleanup=false \
 			-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update || code=$?
-	if [ "$code" == 30 ]; then
+	if [ $code -eq 30 ]; then
 		exit 30 # canceled
-	elif [ "$code" == 0 ]; then
+	elif [ $code -eq 0 ]; then
 		rm -f $ROOT$tmp
 	else
 		rm -f $ROOT$tmp
