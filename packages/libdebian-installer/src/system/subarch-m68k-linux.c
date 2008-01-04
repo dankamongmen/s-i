@@ -13,6 +13,7 @@ struct map {
 
 static struct map map_model[] = {
 	{ "Amiga", "amiga" },
+	{ "ARAnyM", "atari" },
 	{ "Atari", "atari" },
 	{ "Macintosh", "mac" },
 	{ "BVME", "bvme6000" },
