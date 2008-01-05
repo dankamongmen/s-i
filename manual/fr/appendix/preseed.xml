@@ -1,4 +1,4 @@
-<!-- original version: 50443 -->
+<!-- original version: 50744 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -828,6 +828,25 @@ d-i mirror/http/proxy string
 
   </sect2>
 
+  <sect2 id="preseed-time">
+  <title>Configuration du fuseau horaire</title>
+
+<informalexample role="example"><screen>
+# Cette commande permet de régler l'horloge matérielle sur UTC :
+d-i clock-setup/utc boolean true
+
+# Vous pouvez mettre toute valeur acceptée pour $TZ.
+# Voyez ce que contient /usr/share/zoneinfo/ pour les valeurs possibles.
+d-i time/zone string Europe/Paris
+
+# La ligne suivante autorise l'utilisation de NTP pour régler l'horloge pendant l'installation :
+d-i clock-setup/ntp boolean true
+# Le serveur NTP à utiliser. Le serveur par défaut est presque toujours correct.
+#d-i clock-setup/ntp-server ntp.example.com
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-partman">
   <title>Partitionnement</title>
 <para>
@@ -994,21 +1013,22 @@ d-i partman/confirm boolean true
 
   </sect2>
 
-  <sect2 id="preseed-time">
-  <title>Configuration du fuseau horaire</title>
+  <sect2 id="preseed-base-installer">
+  <title>Installation du système de base</title>
+<para>
+
+Peu d'éléments peuvent être préconfigurés à cette étape de l'installation.
+Les seules questions posées concernent l'installation du noyau.
+
+</para>
 
 <informalexample role="example"><screen>
-# Cette commande règle l'horloge matérielle sur UTC :
-d-i clock-setup/utc boolean true
+# Choix du générateur initramfs pour créer l'initrd des noyaux 2.6.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
-# Vous pouvez mettre toute valeur acceptée pour $TZ.
-# Voyez ce que contient /usr/share/zoneinfo/ pour les valeurs possibles.
-d-i time/zone string US/Eastern
-
-# La ligne suivante autorise l'utilisation de NTP pour régler l'horloge pendant l'installation :
-d-i clock-setup/ntp boolean true
-# Le serveur NTP à utiliser. Le serveur par défaut est presque toujours correct.
-#d-i clock-setup/ntp-server ntp.example.com
+# Version du noyau à installer (nom du paquet). Utilisez <emphasis>none</emphasis> si vous ne voulez pas
+# installer de noyau.
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1080,26 +1100,6 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </screen></informalexample>
 
 </para>
-
-  </sect2>
-
-  <sect2 id="preseed-base-installer">
-  <title>Installation du système de base</title>
-<para>
-
-Peu d'éléments peuvent être préconfigurés à cette étape de l'installation.
-Les seules questions posées concernent l'installation du noyau.
-
-</para>
-
-<informalexample role="example"><screen>
-# Choix du générateur initramfs pour créer l'initrd des noyaux 2.6.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
-
-# Version du noyau à installer (nom du paquet). Utilisez <emphasis>none</emphasis> si vous ne voulez pas
-# installer de noyau.
-#d-i base-installer/kernel/image linux-image-2.6-486
-</screen></informalexample>
 
   </sect2>
 
@@ -1252,7 +1252,7 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
-  <title>Pour terminer la première partie de l'installation</title>
+  <title>Pour terminer l'installation</title>
 
 <informalexample role="example"><screen>
 # Pour éviter le dernier message disant que l'installation est terminée :
