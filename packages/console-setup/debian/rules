@@ -44,7 +44,7 @@ build: main_build debian/console-setup.config debian/console-setup-mini.config
 clean:
 	dh_testdir
 	debconf-updatepo
-	-$(MAKE) maintainer-clean
+	$(MAKE) maintainer-clean
 	-rm -f build main_build
 	-rm -f debian/*.config
 	-rm -f debian/*~
@@ -213,8 +213,6 @@ install-udeb: build
 		debian/console-setup-udeb/usr/lib/base-installer.d/20console-setup
 	dh_installdirs -p console-setup-udeb etc/default
 	dh_installdirs -p console-setup-udeb etc/console-setup/
-	dh_installdirs -p console-setup-udeb usr/share/doc/console-setup-mini/examples/
-	cp config debian/console-setup-udeb/usr/share/doc/console-setup-mini/examples/console-setup
 	rm -rf `find debian/console-setup-udeb -name .cvsignore`
 	rm -rf `find debian/console-setup-udeb -name .svn`
 
