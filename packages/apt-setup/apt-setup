@@ -32,14 +32,15 @@ warning() {
         log "warning: $@"
 }
 
-gencount=`ls "$gendir"/* | wc -l`
+gencount=$(ls "$gendir"/* | wc -l)
 db_capb backup progresscancel
-db_progress START 0 $(expr "$gencount" \* 200) apt-setup/progress/title
+db_progress START 0 $(expr $gencount \* 200) apt-setup/progress/title
 
 PROGRESS_FROM=0
 PROGRESS_TO=100
 export PROGRESS_FROM
 export PROGRESS_TO
+
 progress_advance() {
 	db_progress SET $PROGRESS_TO || true
 	PROGRESS_FROM=$PROGRESS_TO
@@ -62,9 +63,9 @@ for generator in $gendir/*; do
 
 	case $code in
 	    0)
-		if ! apt-setup-verify $ROOT$tmp \
-			$ROOT/etc/apt/sources.list.new \
-			-- --from=$PROGRESS_FROM --to=$PROGRESS_TO; then
+		if ! apt-setup-verify \
+			--from $PROGRESS_FROM --to $PROGRESS_TO \
+			$ROOT$tmp $ROOT/etc/apt/sources.list.new; then
 			warning "$generator output did not verify"
 		fi
 		;;

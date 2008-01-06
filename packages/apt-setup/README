@@ -31,14 +31,16 @@ PROGRESS_TO, or it will be moved to the next step before the next
 generator is started.
 
 apt-setup-verify runs apt-get update inside debconf-apt-progress, to update
-the progress bar with apt progress information. By default,
-debconf-apt-progress is not allowed to move the progress bar. To override
-this, pass apt-setup-verify options after "--"; these options will be
-passed on to debconf-apt-progress. For example:
-	apt-setup-verify file -- --from 1 --to 100
+the progress bar with apt progress information. By default the progress bar
+will not be moved. Use --from and --to options to override this. The values
+of these options will be used as start and end points for the progress bar;
+each source line to be tested will get an equal share. The resulting values
+are passed on to debconf-apt-progress.
+For example:
+	apt-setup-verify --from 1 --to 100 <file>
 
 Note that apt-setup and its generators may be run against some other system
-in a chroot. (i.e., when installing Debian.) If apt-setup is running this
+in a chroot (i.e., when installing Debian). If apt-setup is running this
 way, then ROOT will be set to the root of the chroot that it is acting on
 and all sources.list validation will occur inside the chroot.
 
