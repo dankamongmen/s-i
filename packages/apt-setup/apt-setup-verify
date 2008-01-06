@@ -6,35 +6,13 @@ NL="
 "
 
 NOTEST=""
-PROGRESS=""
-PROGRESS_FROM=""
-PROGRESS_TO=""
-while [ "$1" ]; do
-	case "$1" in
-	    --invalid)
-		NOTEST=1 ;;
-	    --from)
-		shift
-		PROGRESS_FROM=$1 ;;
-	    --to)
-		shift
-		PROGRESS_TO=$1 ;;
-	    *)
-		if [ -z "$file" ]; then
-			file="$1"
-		else
-			saveto="$1"
-		fi ;;
-	esac
+if [ "$1" = "--invalid" ]; then
+	NOTEST=1
 	shift
-done
-
-if [ "$PROGRESS_FROM" ] && [ "$PROGRESS_TO" ] && \
-   [ $PROGRESS_FROM -lt $PROGRESS_TO ]; then
-	PROGRESS=1
-else
-	DAP_OPTS="--no-progress"
 fi
+
+file="$1"
+saveto="$2"
 
 logoutput=""
 if [ "$CATCHLOG" ]; then
@@ -42,10 +20,8 @@ if [ "$CATCHLOG" ]; then
 fi
 
 chroot=
-intarget=
 if [ "$ROOT" ]; then
 	chroot=chroot
-	intarget=in-target
 fi
 
 saveline () {
@@ -55,31 +31,22 @@ saveline () {
 }
 
 valid () {
-	local line="$1"
-	local dap_opts="$2"
+	line="$1"
 
 	[ "${line%%:*}" != "deb cdrom" ] || return 0
 
 	tmp=$($chroot $ROOT tempfile)
 	echo "$line" > $ROOT$tmp
-	code=0
-	$logoutput $intarget debconf-apt-progress --logstderr $dap_opts -- \
-		apt-get -o APT::Get::List-Cleanup=false \
-			-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update || code=$?
-	if [ $code -eq 30 ]; then
-		exit 30 # canceled
-	elif [ $code -eq 0 ]; then
+	
+	if $logoutput $chroot $ROOT apt-get -o APT::Get::List-Cleanup=false \
+		-o Dir::Etc::sourcelist=$tmp $ASV_TIMEOUT update
+	then
 		rm -f $ROOT$tmp
 	else
 		rm -f $ROOT$tmp
 		false
 	fi
 }
-
-if [ "$PROGRESS" ]; then
-	tot_items=$(grep -Ev "^(#.*|)[[:space:]]*$" $file | wc -l)
-	p_from=$PROGRESS_FROM
-fi
 
 items=0
 gooditems=0
@@ -91,23 +58,15 @@ IFS="$NL"
 for line in $(sed 's/^/:/' $file); do
 	IFS="$OLDIFS"
 	line="${line#:}"
-	if echo "$line" | grep -Evq "^(#.*|)[[:space:]]*$"; then
-		items=$(expr $items + 1)
+	if expr "$line" : '.*[^ ].*' >/dev/null && [ "$(expr "$line" : "#")" != 1 ]; then
+		items=$(expr "$items" + 1)
 		# Write blank line between generators
 		if [ $items = 1 ] && [ -f "$saveto" ]; then
 			saveline ""
 		fi
 
-		if [ "$PROGRESS" ]; then
-			[ $items -eq 1 ] || p_from=$p_to
-			p_to=$(expr $PROGRESS_FROM + \
-				\( $PROGRESS_TO - $PROGRESS_FROM \) \* \
-				$items / $tot_items)
-			DAP_OPTS="--dlwaypoint 100 --from $p_from --to $p_to"
-		fi
-
-		if [ -z "$NOTEST" ] && valid "$line" "$DAP_OPTS"; then
-			gooditems=$(expr $gooditems + 1)
+		if [ -z "$NOTEST" ] && valid "$line"; then
+			gooditems=$(expr "$gooditems" + 1)
 			saveline "$line"
 		else
 			saveline "# Line commented out by installer because it failed to verify:"
@@ -115,12 +74,12 @@ for line in $(sed 's/^/:/' $file); do
 		fi
 	else
 		# Ignore leading empty lines
-		if [ $items -ne 0 ] || [ "$line" ]; then
+		if [ $items != 0 ] || [ "$line" ]; then
 			saveline "$line"
 		fi
 	fi
 done
 
-if [ $gooditems -ne $items ]; then
+if [ "$gooditems" != "$items" ]; then
 	exit 1
 fi
