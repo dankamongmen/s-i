@@ -427,6 +427,10 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 		fi
 		if [ $i -eq 1 ]; then
 			# Select strings without a level
+			# NOTE: this will fail in the case where a string exists in
+			# more than one package POT file and has no level set in one
+			# of them, but does have it set in others! The string will
+			# then end up in the highest level that is explicitly set.
 			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.none
 			# Select strings with level 1 set
 			msggrep -X -E -e ":sl1:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.sl1
