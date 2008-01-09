@@ -434,6 +434,11 @@ fi
 if [ "$WITHLEVELS" = "Y" ] ; then
 	for i in `seq 2 $NUMLEVELS`; do
 		dir=po/sublevel$i
+		# Sanity check
+		if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
+			echo "Error: directory for sublevel$i does not exist"
+			exit 1
+		fi
 		level="sublevel $i "
 		if [ "$DEBUG" = "Y" ] ; then
 			echo -n "Creating the ${level}template.pot file..."
@@ -645,7 +650,7 @@ if [ "$SYNCPKGS" = "Y" ]; then
 			fi
 		fi
 		if [ "$DEBUG" = "Y" ] ; then
-			echo -n "      - rebuild languages files: "
+			echo "      - rebuild language files:"
 		fi
 		# For each language listed in packages/po, update PO files
 		for lang in $languages ; do
