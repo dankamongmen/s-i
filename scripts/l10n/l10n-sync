@@ -451,16 +451,26 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 			if [ "$DEBUG" = "Y" ] ; then
 				echo -n "Commiting the ${level}template.pot file..."
 			fi
+			if [ "$ONLINE" = "Y" ] ; then
+				$svn commit -m"${COMMIT_MARKER} Update ${level}template file from the l10n synchronisation script" $DI_COPY/packages/${dir}/template.pot || svnerr
+			fi
+			if [ "$DEBUG" = "Y" ] ; then
+				echo Done.
+			fi
 		fi
-		cd $DI_COPY/packages/${dir}
+	done
+	msggrep -X -E -v -e ":sl[2-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/po/sublevel1/template.pot
+	if [ "$ATOMIC_COMMITS" = "Y" ] ; then
+		if [ "$DEBUG" = "Y" ] ; then
+			echo -n "Commiting the ${level}template.pot file..."
+		fi
 		if [ "$ONLINE" = "Y" ] ; then
-			$svn commit -m"${COMMIT_MARKER} Update ${level}template file from the l10n synchronisation script" template.pot || svnerr
+			$svn commit -m"${COMMIT_MARKER} Update ${level}template file from the l10n synchronisation script" $DI_COPY/packages/sublevel1/template.pot || svnerr
 		fi
 		if [ "$DEBUG" = "Y" ] ; then
 			echo Done.
 		fi
-	done
-	msggrep -X -E -v -e ":sl[2-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/po/sublevel1/template.pot
+	fi
 fi
 
 # For each PO file in packages/po/sublevel* or packages/po:
