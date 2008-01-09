@@ -162,7 +162,7 @@ then
 fi
 
 if [ "$LEVELS" -gt 9 ] ; then
-	echo "Maximal 9 levels supported"
+	echo Maximum of 9 sublevels supported
 	exit 1
 fi
 
@@ -393,6 +393,9 @@ fi
 cd $DI_COPY/packages
 
 # First we create the overall template.pot file
+if [ "$DEBUG" = "Y" ] ; then
+	echo Merging all package templates.pot files...
+fi
 # Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
 if ! msgcat ${pots} >/dev/null 2>&1 ; then
 	svnerr
@@ -439,6 +442,12 @@ fi
 if [ "$WITHLEVELS" = "Y" ] ; then
 	# Temporarily restore charset header
 	sed -i 's/charset=CHARSET/charset=UTF-8/g' ${DI_COPY}/packages/po/template.pot
+	# Sanity check: template.pot should not contain incorrect sublevels
+	if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" \
+	   	${DI_COPY}/packages/po/template.pot)" ]; then
+		echo "Invalid sublevel comments detected in template.pot"
+		exit 1
+	fi
 	for i in `seq 1 $NUMLEVELS`; do
 		dir=po/sublevel$i
 		# Sanity check
