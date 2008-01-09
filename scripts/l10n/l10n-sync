@@ -161,6 +161,11 @@ then
 	exit 1
 fi
 
+if [ "$LEVELS" -gt 9 ] ; then
+	echo "Maximal 9 levels supported"
+	exit 1
+fi
+
 # If LEVELS<=1 we use the old way (no levels)
 if [ "$LEVELS" -gt 1 ] ; then
 	WITHLEVELS=Y
@@ -429,9 +434,11 @@ if [ "$ATOMIC_COMMITS" = "Y" ] ; then
 	fi
 fi
 
-# Now we create all templates.pot files
+# Now we create templates.pot files for the sublevels
 # OK, should be a nice loop...:-)
 if [ "$WITHLEVELS" = "Y" ] ; then
+	# Temporarily restore charset header
+	sed -i 's/charset=CHARSET/charset=UTF-8/g' ${DI_COPY}/packages/po/template.pot
 	for i in `seq 1 $NUMLEVELS`; do
 		dir=po/sublevel$i
 		# Sanity check
@@ -444,10 +451,21 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 			echo -n "Creating the ${level}template.pot file..."
 		fi
 		if [ $i -eq 1 ]; then
-			msggrep -X -E -v -e ":sl[2-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/po/sublevel1/template.pot
+			# Select strings without a level
+			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.none
+			# Select strings with level 1 set
+			msggrep -X -E -e ":sl1:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.sl1
+			# Merge them
+			msgcat ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1 >${DI_COPY}/packages/${dir}/template.pot
+			rm ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1
 		else
-			msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot
+			# Select strings with level N set, but exclude any strings that
+			# also have a level smaller than N set to avoid duplicates
+			msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot | \
+				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+				>${DI_COPY}/packages/${dir}/template.pot
 		fi
+		sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
 		if [ "$DEBUG" = "Y" ] ; then
 			echo Done.
 		fi
@@ -463,6 +481,8 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 			fi
 		fi
 	done
+	# Reset the charset header again
+	sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/po/template.pot
 fi
 
 # For each PO file in packages/po/sublevel* or packages/po:
@@ -476,7 +496,7 @@ for i in $LEVELS; do
 		level="level $i "
 	else
 		dir=po
-		leve=""
+		level=""
 	fi
 	if [ "$DEBUG" = "Y" ] ; then
 		echo "Update ${level}PO files:"
