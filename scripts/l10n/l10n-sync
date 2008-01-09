@@ -16,8 +16,7 @@ COMMIT_MARKER="[l10n] [SILENT_COMMIT]"
 # Defaults
 ONLINE=N
 ATOMIC_UPDATES=N
-ATOMIC_COMMITS=N
-BIG_COMMITS=N
+COMMIT=N
 DEBUG=N
 KEEP_REVISION=N
 FORCE_RUN=N
@@ -35,10 +34,6 @@ echo  "    --online            : Work online (will update the local copy on"
 echo  "                          the fly)"
 echo  "    --commit            : Commit changed files (implies --online)"
 echo  "                          Files are by default commited in big chunks"
-echo  "    --atomic            : Files will be commited at each change"
-echo  "                          (will often trigger commit storms!"
-echo  "                          Handle with care!)"
-echo  "                          implies --online"
 echo  "    --force             : Forced run even if 'run=0'"
 echo  "                          appears in packages/po/run-l10n-sync"
 echo  "                          Should only be used in manual runs"
@@ -103,16 +98,12 @@ while $MORETODO ; do
 		DEBUG=Y
 		shift
 		;;
-	"--atomic")
-		ATOMIC_COMMITS=Y
-		shift
-		;;      
 	"--atomic-updates")
 		ATOMIC_UPDATES=Y
 		shift
 		;;      
 	"--commit")
-		BIG_COMMITS=Y
+		COMMIT=Y
 		shift
 		;;
 	"--force")
@@ -178,13 +169,8 @@ else
 fi
 
 # If we asked for commits we are online...:-)
-if [ "$ATOMIC_COMMITS" = "Y" -o "$ATOMIC_UPDATES" = "Y" -o "$BIG_COMMITS" = "Y" ] ; then
+if [ "$ATOMIC_UPDATES" = "Y" -o "$COMMIT" = "Y" ] ; then
 	ONLINE=Y
-fi
-
-# If we asked for atomic commits, we don't want big commits
-if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-	BIG_COMMITS=N
 fi
 
 
@@ -364,18 +350,8 @@ if [ "$UPDATEPO" = "Y" ]; then
 		if [ "$DEBUG" = "Y" ] ; then
 			echo Done.
 		fi
-		if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "    - Commit..."
-			fi
-			cd $DI_COPY/packages/$i/debian/po
-			$svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on $DI_COPY/packages/$i" || svnerr
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
-		fi
 	done
-	if [ "$BIG_COMMITS" = "Y" ] ; then
+	if [ "$COMMIT" = "Y" ] ; then
 		cd $DI_COPY/packages
 		$svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
 	fi
@@ -426,16 +402,6 @@ fi
 if [ "$DEBUG" = "Y" ] ; then
 	echo Done.
 fi
-if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-	if [ "$DEBUG" = "Y" ] ; then
-		echo -n "Commiting the general template.pot file..."
-	fi
-	cd $DI_COPY/packages/po
-	$svn commit -m"${COMMIT_MARKER} Update general template file from the l10n synchronisation script" template.pot || svnerr
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Done.
-	fi
-fi
 
 # Now we create template.pot files for the sublevels
 # OK, should be a nice loop...:-)
@@ -477,17 +443,6 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 		sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
 		if [ "$DEBUG" = "Y" ] ; then
 			echo Done.
-		fi
-		if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "Commiting the ${level}template.pot file..."
-			fi
-			if [ "$ONLINE" = "Y" ] ; then
-				$svn commit -m"${COMMIT_MARKER} Update ${level}template file from the l10n synchronisation script" $DI_COPY/packages/${dir}/template.pot || svnerr
-			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
 		fi
 	done
 	# Reset the charset header again
@@ -615,17 +570,8 @@ for i in $LEVELS; do
 		fi
 		msgattrib --width=79 --no-obsolete $po.new >$po
 		rm $po.new
-		if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "     - Commit back to SVN..."
-			fi
-			$svn commit -m"${COMMIT_MARKER} Updated packages/$dir/$po with general template.pot" $po || svnerr
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
-		fi
 	done
-	if [ "$BIG_COMMITS" = "Y" ] ; then
+	if [ "$COMMIT" = "Y" ] ; then
 		if [ "$DEBUG" = "Y" ] ; then
 			echo -n "Commit all general PO files to SVN..."
 		fi
@@ -754,22 +700,9 @@ EOF
 				fi
 			fi
 		done
-		if [ "$ATOMIC_COMMITS" = "Y"  ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "      - commiting back updated files..."
-			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				$svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/$dir" *.po || svnerr
-			else
-				$svn commit -m"${COMMIT_MARKER} Synchronising with $lang files from packages/$dir" *.po >/dev/null 2>&1 || svnerr
-			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
-		fi
 	done
 	
-	if [ "$BIG_COMMITS" = "Y" ] ; then
+	if [ "$COMMIT" = "Y" ] ; then
 		cd $DI_COPY/packages
 		svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
 	fi
