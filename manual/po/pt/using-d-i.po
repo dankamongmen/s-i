@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: using-d-i\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-28 01:09+0000\n"
+"POT-Creation-Date: 2008-01-09 01:10+0000\n"
 "PO-Revision-Date: 2007-12-28 19:46+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -1327,10 +1327,10 @@ msgid ""
 "example <userinput>Europe/London</userinput> or <userinput>UTC</userinput>."
 msgstr ""
 "Em alternativa, o fuso horário pode ser definido mesmo no inicio da "
-"instalação ao passar o parâmetro <userinput>time/zone=<replaceable>value"
-"</replaceable></userinput> no arranque do sistema de instalação. O valor "
-"claro que deve ser um fuso horário válido, por exemplo <userinput>"
-"Europe/London</userinput> ou <userinput>UTC</userinput>."
+"instalação ao passar o parâmetro <userinput>time/zone=<replaceable>value</"
+"replaceable></userinput> no arranque do sistema de instalação. O valor claro "
+"que deve ser um fuso horário válido, por exemplo <userinput>Europe/London</"
+"userinput> ou <userinput>UTC</userinput>."
 
 #. Tag: para
 #: using-d-i.xml:825
@@ -1360,11 +1360,11 @@ msgid ""
 msgstr ""
 "Nesta altura, após ter sido feita uma última vez a detecção do hardware, o  "
 "&d-i; deverá estar na sua máxima força, personalizado para as necessidades "
-"do utilizador e pronto para realizar algum verdadeiro trabalho. Como o título "
-"desta secção indica, a tarefa principal dos próximos componentes resume-se "
-"em particionar os seus discos, criar os sistemas de ficheiros, atribuir "
-"pontos de montagem e opcionalmente configurar opções relacionadas tais como "
-"RAID, LVM e dispositivos encriptados."
+"do utilizador e pronto para realizar algum verdadeiro trabalho. Como o "
+"título desta secção indica, a tarefa principal dos próximos componentes "
+"resume-se em particionar os seus discos, criar os sistemas de ficheiros, "
+"atribuir pontos de montagem e opcionalmente configurar opções relacionadas "
+"tais como RAID, LVM e dispositivos encriptados."
 
 #. Tag: para
 #: using-d-i.xml:860
@@ -4593,11 +4593,11 @@ msgid ""
 msgstr ""
 "No modo expert poderá sempre poder escolher se o relógio está ou não "
 "definido para UTC.  <phrase arch=\"m68k;powerpc\">Os relógios de hardware "
-"Macintosh estão normalmente definidos para hora local. Se quer utilizar 'dual-"
-"boot', escolha hora local em vez de UTC.</phrase> <phrase arch=\"x86"
+"Macintosh estão normalmente definidos para hora local. Se quer utilizar "
+"'dual-boot', escolha hora local em vez de UTC.</phrase> <phrase arch=\"x86"
 "\">Sistemas que (também) corram Dos ou Windows estão normalmente definidos "
-"para hora local. Se deseja utilizar 'dual-boot', escolha hora local em vez de "
-"UTC.</phrase>"
+"para hora local. Se deseja utilizar 'dual-boot', escolha hora local em vez "
+"de UTC.</phrase>"
 
 #. Tag: para
 #: using-d-i.xml:2868
@@ -4626,8 +4626,8 @@ msgid ""
 "new Debian system."
 msgstr ""
 "Ser-lhe-á pedido que remova o meio de arranque (CD, disquete, etc) que "
-"utilizou para arrancar o instalador. Depois disso o sistema irá reiniciar "
-"já no seu novo sistema Debian."
+"utilizou para arrancar o instalador. Depois disso o sistema irá reiniciar já "
+"no seu novo sistema Debian."
 
 #. Tag: para
 #: using-d-i.xml:2891
@@ -4639,9 +4639,9 @@ msgid ""
 "installation."
 msgstr ""
 "Após a questão final o sistema irá ser parado porque não é suportado "
-"reiniciar em &arch-title;. Você, então, terá de fazer IPL &debian; a "
-"partir do DASD que escolheu para sistema de ficheiros root durante as "
-"primeiras etapas da instalação."
+"reiniciar em &arch-title;. Você, então, terá de fazer IPL &debian; a partir "
+"do DASD que escolheu para sistema de ficheiros root durante as primeiras "
+"etapas da instalação."
 
 #. Tag: title
 #: using-d-i.xml:2904
@@ -4927,12 +4927,45 @@ msgstr ""
 #: using-d-i.xml:3077
 #, no-c-format
 msgid ""
+"The <command>ssh</command> server in the installer uses a default "
+"configuration that does not send keep-alive packets. In principle, a "
+"connection to the system being installed should be kept open indefinitely. "
+"However, in some situations &mdash; depending on your local network setup "
+"&mdash; the connection may be lost after some period of inactivity. One "
+"common case where this can happen is when there is some form of Network "
+"Address Translation (NAT) somewhere between the client and the system being "
+"installed. Depending on at which point of the installation the connection "
+"was lost, you may or may not be able to resume the installation after "
+"reconnecting."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:3090
+#, no-c-format
+msgid ""
+"You may be able to avoid the connection being dropped by adding the option "
+"<userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></"
+"userinput> when starting the <command>ssh</command> connection, or by adding "
+"that option in your <command>ssh</command> configuration file. Note however "
+"that in some cases adding this option may also <emphasis>cause</emphasis> a "
+"connection to be dropped (for example if keep-alive packets are sent during "
+"a brief network outage, from which <command>ssh</command> would otherwise "
+"have recovered), so it should only be used when needed."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:3103
+#, fuzzy, no-c-format
+msgid ""
 "If you install several computers in turn and they happen to have the same IP "
 "address or hostname, <command>ssh</command> will refuse to connect to such "
 "host. The reason is that it will have different fingerprint, which is "
 "usually a sign of a spoofing attack. If you are sure this is not the case, "
 "you will need to delete the relevant line from <filename>~/.ssh/known_hosts</"
-"filename> and try again."
+"filename><footnote> <para> The following command will remove an existing "
+"entry for a host: <command>ssh-keygen -R &lt;<replaceable>hostname</"
+"replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>. </"
+"para> </footnote> and try again."
 msgstr ""
 "Se você instalar vários computadores de cada vez e estes tiverem o mesmo "
 "endereço IP ou hostname, o <command>ssh</command> irá recusar-se a ligar a "
@@ -4942,7 +4975,7 @@ msgstr ""
 "<filename>~/.ssh/known_hosts</filename> e tentar novamente."
 
 #. Tag: para
-#: using-d-i.xml:3086
+#: using-d-i.xml:3119
 #, no-c-format
 msgid ""
 "After the login you will be presented with an initial screen where you have "
@@ -4962,7 +4995,7 @@ msgstr ""
 "SSH para o menu de instalação, mas pode iniciar várias sessões para shells."
 
 #. Tag: para
-#: using-d-i.xml:3096
+#: using-d-i.xml:3129
 #, no-c-format
 msgid ""
 "After you have started the installation remotely over SSH, you should not go "
@@ -4978,7 +5011,7 @@ msgstr ""
 "sistema instalado."
 
 #. Tag: para
-#: using-d-i.xml:3104
+#: using-d-i.xml:3137
 #, no-c-format
 msgid ""
 "Also, if you are running the SSH session from an X terminal, you should not "

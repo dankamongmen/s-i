@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2007-12-28 01:09+0000\n"
+"POT-Creation-Date: 2008-01-09 01:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2355,23 +2355,35 @@ msgstr ""
 #. Tag: para
 #: using-d-i.xml:3077
 #, no-c-format
-msgid "If you install several computers in turn and they happen to have the same IP address or hostname, <command>ssh</command> will refuse to connect to such host. The reason is that it will have different fingerprint, which is usually a sign of a spoofing attack. If you are sure this is not the case, you will need to delete the relevant line from <filename>~/.ssh/known_hosts</filename> and try again."
+msgid "The <command>ssh</command> server in the installer uses a default configuration that does not send keep-alive packets. In principle, a connection to the system being installed should be kept open indefinitely. However, in some situations &mdash; depending on your local network setup &mdash; the connection may be lost after some period of inactivity. One common case where this can happen is when there is some form of Network Address Translation (NAT) somewhere between the client and the system being installed. Depending on at which point of the installation the connection was lost, you may or may not be able to resume the installation after reconnecting."
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:3086
+#: using-d-i.xml:3090
+#, no-c-format
+msgid "You may be able to avoid the connection being dropped by adding the option <userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></userinput> when starting the <command>ssh</command> connection, or by adding that option in your <command>ssh</command> configuration file. Note however that in some cases adding this option may also <emphasis>cause</emphasis> a connection to be dropped (for example if keep-alive packets are sent during a brief network outage, from which <command>ssh</command> would otherwise have recovered), so it should only be used when needed."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:3103
+#, no-c-format
+msgid "If you install several computers in turn and they happen to have the same IP address or hostname, <command>ssh</command> will refuse to connect to such host. The reason is that it will have different fingerprint, which is usually a sign of a spoofing attack. If you are sure this is not the case, you will need to delete the relevant line from <filename>~/.ssh/known_hosts</filename><footnote> <para> The following command will remove an existing entry for a host: <command>ssh-keygen -R &lt;<replaceable>hostname</replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>. </para> </footnote> and try again."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:3119
 #, no-c-format
 msgid "After the login you will be presented with an initial screen where you have two possibilities called <guimenuitem>Start menu</guimenuitem> and <guimenuitem>Start shell</guimenuitem>. The former brings you to the main installer menu, where you can continue with the installation as usual. The latter starts a shell from which you can examine and possibly fix the remote system. You should only start one SSH session for the installation menu, but may start multiple sessions for shells."
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:3096
+#: using-d-i.xml:3129
 #, no-c-format
 msgid "After you have started the installation remotely over SSH, you should not go back to the installation session running on the local console. Doing so may corrupt the database that holds the configuration of the new system. This in turn may result in a failed installation or problems with the installed system."
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:3104
+#: using-d-i.xml:3137
 #, no-c-format
 msgid "Also, if you are running the SSH session from an X terminal, you should not resize the window as that will result in the connection being terminated."
 msgstr ""
