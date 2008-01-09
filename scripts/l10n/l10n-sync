@@ -432,7 +432,7 @@ fi
 # Now we create all templates.pot files
 # OK, should be a nice loop...:-)
 if [ "$WITHLEVELS" = "Y" ] ; then
-	for i in `seq 2 $NUMLEVELS`; do
+	for i in `seq 1 $NUMLEVELS`; do
 		dir=po/sublevel$i
 		# Sanity check
 		if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
@@ -443,7 +443,11 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 		if [ "$DEBUG" = "Y" ] ; then
 			echo -n "Creating the ${level}template.pot file..."
 		fi
-		msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot
+		if [ $i -eq 1 ]; then
+			msggrep -X -E -v -e ":sl[2-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/po/sublevel1/template.pot
+		else
+			msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot
+		fi
 		if [ "$DEBUG" = "Y" ] ; then
 			echo Done.
 		fi
@@ -459,18 +463,6 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 			fi
 		fi
 	done
-	msggrep -X -E -v -e ":sl[2-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/po/sublevel1/template.pot
-	if [ "$ATOMIC_COMMITS" = "Y" ] ; then
-		if [ "$DEBUG" = "Y" ] ; then
-			echo -n "Commiting the ${level}template.pot file..."
-		fi
-		if [ "$ONLINE" = "Y" ] ; then
-			$svn commit -m"${COMMIT_MARKER} Update ${level}template file from the l10n synchronisation script" $DI_COPY/packages/sublevel1/template.pot || svnerr
-		fi
-		if [ "$DEBUG" = "Y" ] ; then
-			echo Done.
-		fi
-	fi
 fi
 
 # For each PO file in packages/po/sublevel* or packages/po:
