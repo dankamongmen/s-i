@@ -6,10 +6,6 @@
 #
 # Translators, DO NOT USE IT YOURSELVES!!!!
 #
-# See installer/doc/i18n/i18n.txt for details about 
-# the single master file for translations
-
-# 2006/09/23: implement two levels, so two master files
 
 COMMIT_MARKER="[l10n] [SILENT_COMMIT]"
 
@@ -485,29 +481,10 @@ for i in $LEVELS; do
 		fi
 		debug "     - Merge with template.pot:"
 		if [ "$DEBUG" = "Y" ] ; then
-			# In case some msgids are duplicate
-			# Does not work on woody systems..:-(
-			#if ! msguniq $po > $po.uniq ; then
-			#  gettexterr
-			#fi
-			# Now do the real merge
-			# The following does not work on woody (gluck for instance)
-			# msgmerge -U $po template.pot
 			if ! msgmerge --previous $po template.pot >$po.new ; then
 				gettexterr
 			fi
 		else
-			# In case some msgids are duplicate
-			# Does not work on woody systems..:-(
-			#if ! msguniq $po > $po.uniq ; then
-			#  gettexterr
-			#fi
-			# Now do the real merge
-			# The following does not work on woody (gluck for instance)
-			# msgmerge -U $po template.pot >/dev/null 2>&1
-			#
-			# Will not mark strings in the PO but not in the POT as obsolete
-			# so not appropriate for cases when a merge occurs
 			if ! msgmerge --previous $po template.pot >$po.new 2>/dev/null ; then
 				gettexterr
 			fi
@@ -638,15 +615,5 @@ else
 	debug Not syncing D-I packages as requested.
 fi
 
-#if [ "$SPLIT" -gt 1 ]; then
-#	for level in `seq 2 $SPLIT`; do
-#		for lang in $languages ; do
-#			msggrep -X -E -e ":sl${level}:" ${DI_COPY}/packages/po/${lang}.po >${DI_COPY}/packages/po/split${level}/${lang}.po
-#		done
-#	done
-#	for lang in $languages ; do
-#		msggrep -X -E -v -e ":sl[2-${SPLIT}]:" ${DI_COPY}/packages/po/${lang}.po >${DI_COPY}/packages/po/split1/${lang}.po
-#	done
-#fi
 # Remove the lock file
 rm -f $LOCKFILE || true
