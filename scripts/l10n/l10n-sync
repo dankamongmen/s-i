@@ -15,7 +15,6 @@ COMMIT_MARKER="[l10n] [SILENT_COMMIT]"
 
 # Defaults
 ONLINE=N
-ATOMIC_UPDATES=N
 COMMIT=N
 DEBUG=N
 KEEP_REVISION=N
@@ -33,15 +32,11 @@ echo  "    --debug             : Verbose output"
 echo  "    --online            : Work online (will update the local copy on"
 echo  "                          the fly)"
 echo  "    --commit            : Commit changed files (implies --online)"
-echo  "                          Files are by default commited in big chunks"
 echo  "    --force             : Forced run even if 'run=0'"
 echo  "                          appears in packages/po/run-l10n-sync"
 echo  "                          Should only be used in manual runs"
 echo  "    --noupdatepo        : Do not run debconf-updatepo for each package"
 echo  "    --nosyncpkgs        : Do not sync PO files for each package"
-echo  "    --atomic-updates    : Do a \"svn up\" before each step"
-echo  "                          (VERY time consuming)"
-echo  "                          implies --online"
 echo  "    --keep-revision     : Force keeping the old PO-Revision-Date"
 echo  "                          for a given language"
 echo  "                          meant for use when switching a language"
@@ -98,10 +93,6 @@ while $MORETODO ; do
 		DEBUG=Y
 		shift
 		;;
-	"--atomic-updates")
-		ATOMIC_UPDATES=Y
-		shift
-		;;      
 	"--commit")
 		COMMIT=Y
 		shift
@@ -169,7 +160,7 @@ else
 fi
 
 # If we asked for commits we are online...:-)
-if [ "$ATOMIC_UPDATES" = "Y" -o "$COMMIT" = "Y" ] ; then
+if [ "$COMMIT" = "Y" ] ; then
 	ONLINE=Y
 fi
 
@@ -327,17 +318,6 @@ if [ "$UPDATEPO" = "Y" ]; then
 			echo "  $i:"
 		fi
 		cd $DI_COPY/packages/$i/debian
-		if [ "$ATOMIC_UPDATES" = "Y" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "    - Update..."
-				$svn update || svnerr
-			else
-				$svn update >/dev/null 2>&1 || svnerr
-			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
-		fi
 		if [ "$DEBUG" = "Y" ] ; then
 			echo -n "    - Debconf-updatepo..."
 		fi
