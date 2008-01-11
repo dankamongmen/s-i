@@ -15,7 +15,7 @@ COMMIT=N
 DEBUG=N
 KEEP_REVISION=N
 FORCE_RUN=N
-LEVELS=1
+NUMLEVELS=1
 UPDATEPO=Y
 SYNCPKGS=Y
 svn=svn
@@ -126,7 +126,7 @@ while $MORETODO ; do
 		shift
 		;;
 	"--split="*)
-		LEVELS=`echo $1|cut -f2 -d=`
+		NUMLEVELS=`echo $1|cut -f2 -d=`
 		shift
 		;;
 	"--debconf-updatepo="*)
@@ -151,19 +151,15 @@ then
 	exit 1
 fi
 
-if [ "$LEVELS" -gt 9 ] ; then
+if [ "$NUMLEVELS" -gt 9 ] ; then
 	echo Maximum of 9 sublevels supported
 	exit 1
-fi
-
-# If LEVELS<=1 we use the old way (no levels)
-if [ "$LEVELS" -gt 1 ] ; then
+elif [ "$NUMLEVELS" -gt 1 ] ; then
 	WITHLEVELS=Y
-	NUMLEVELS=$LEVELS
 	LEVELS=`seq 1 $LEVELS`
 else
+	# If NUMLEVELS<=1 we use the old way (no levels)
 	WITHLEVELS=N
-	NUMLEVELS=1
 	LEVELS=1
 fi
 
@@ -372,7 +368,7 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 		echo "Invalid sublevel comments detected in template.pot"
 		exit 1
 	fi
-	for i in `seq 1 $NUMLEVELS`; do
+	for i in $LEVELS; do
 		dir=po/sublevel$i
 		# Sanity check
 		if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
