@@ -73,6 +73,18 @@ echo "Lock file NOT removed"
 exit 3
 }
 
+debug() {
+	if [ "$DEBUG" = "Y" ]; then
+		echo "$*"
+	fi
+}
+
+debugn() {
+	if [ "$DEBUG" = "Y" ]; then
+		echo -n "$*"
+	fi
+}
+
 ##  Command line parsing
 MORETODO=true
 while $MORETODO ; do
@@ -205,9 +217,7 @@ for i in msgcat msgmerge msgattrib `echo ${debconfupdatepo} | awk '{print $1};'`
 done
 
 # Do not accept working on an unclean copy
-if [ "$DEBUG" = "Y" ] ; then
-	echo Checking the SVN repository for conflict files...
-fi
+debug  Checking the SVN repository for conflict files...
 if $(svn st $DI_COPY/packages | grep -q "^C") ; then
 	echo $DI_COPY seems to contain some SVN conflict files
 	echo Please fix this before lauching the script again...
@@ -218,13 +228,9 @@ fi
 # to get the run-l10n-sync file
 cd $DI_COPY/packages/po
 if [ "$ONLINE" = "Y" ] ; then
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Synchronising $DI_COPY/packages:
-		$svn update || svnerr
-		echo Done.
-	else
-		$svn update >/dev/null 2>&1 || svnerr
-	fi
+	debug Synchronising $DI_COPY/packages:
+	$svn update || svnerr
+	debug Done.
 fi
 
 # Check the packages/po/run-l10n-sync file
@@ -263,13 +269,9 @@ fi
 # First, update the copy of D-I repository
 cd $DI_COPY/packages
 if [ "$ONLINE" = "Y" ] ; then
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Synchronising $DI_COPY/packages:
-		$svn update || svnerr
-		echo Done.
-	else
-		$svn update >/dev/null 2>&1 || svnerr
-	fi
+	debug Synchronising $DI_COPY/packages:
+	$svn update || svnerr
+	debug Done.
 fi
 
 # In case a merge has to be done with another directory
@@ -277,13 +279,9 @@ fi
 if [ -n "$MERGEDIR" ] ; then
 	cd $MERGEDIR/packages/po
 	if [ "$ONLINE" = "Y" ] ; then
-		if [ "$DEBUG" = "Y" ] ; then
-			echo Synchronising the merge directory $MERGEDIR/packages/po:
-			$svn update || svnerr
-			echo Done.
-		else
-			$svn update >/dev/null 2>&1 || svnerr
-		fi
+		debug Synchronising the merge directory $MERGEDIR/packages/po:
+		$svn update || svnerr
+		debug Done.
 	fi
 fi
 
@@ -309,49 +307,35 @@ done
 #  1b) run debconf-updatepo
 #  1c) commit back the changes
 if [ "$UPDATEPO" = "Y" ]; then
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Run debconf-updatepo for all packages:
-	fi
+	debug Run debconf-updatepo for all packages:
 
 	for i in  $packages; do 
-		if [ "$DEBUG" = "Y" ] ; then
-			echo "  $i:"
-		fi
+		debug "  $i:"
 		cd $DI_COPY/packages/$i/debian
-		if [ "$DEBUG" = "Y" ] ; then
-			echo -n "    - Debconf-updatepo..."
-		fi
+		debugn "    - Debconf-updatepo..."
 		cd $DI_COPY/packages/$i/debian
 		if [ "$DEBUG" = "Y" ] ; then
 			$debconfupdatepo
 		else
 			$debconfupdatepo >/dev/null 2>&1
 		fi
-		if [ "$DEBUG" = "Y" ] ; then
-			echo Done.
-		fi
+		debug Done.
 	done
 	if [ "$COMMIT" = "Y" ] ; then
 		cd $DI_COPY/packages
 		$svn commit -m"${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
 	fi
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Done.
-	fi
+	debug Done.
 
 else
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Not running debconf-updatepo for packages as requested.
-	fi
+	debug Not running debconf-updatepo for packages as requested.
 fi
 
 # 2) Merge all templates.pot files together
 cd $DI_COPY/packages
 
 # First we create the overall template.pot file
-if [ "$DEBUG" = "Y" ] ; then
-	echo Merging all package templates.pot files...
-fi
+debug Merging all package templates.pot files...
 # Check that the next msgcat will not fail (otherwise the template.pot would be empty!)
 if ! msgcat ${pots} >/dev/null 2>&1 ; then
 	svnerr
@@ -379,9 +363,7 @@ else
 	echo ERROR : no $DI_COPY/packages/po/header.pot file. Cannot continue.
 	exit 1
 fi
-if [ "$DEBUG" = "Y" ] ; then
-	echo Done.
-fi
+debug Done.
 
 # Now we create template.pot files for the sublevels
 # OK, should be a nice loop...:-)
@@ -402,9 +384,7 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 			exit 1
 		fi
 		level="sublevel $i "
-		if [ "$DEBUG" = "Y" ] ; then
-			echo -n "Creating the ${level}template.pot file..."
-		fi
+		debugn "Creating the ${level}template.pot file..."
 		if [ $i -eq 1 ]; then
 			# Select strings without a level
 			# NOTE: this will fail in the case where a string exists in
@@ -425,9 +405,7 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 				>${DI_COPY}/packages/${dir}/template.pot
 		fi
 		sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
-		if [ "$DEBUG" = "Y" ] ; then
-			echo Done.
-		fi
+		debug Done.
 	done
 	# Reset the charset header again
 	sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/po/template.pot
@@ -446,9 +424,7 @@ for i in $LEVELS; do
 		dir=po
 		level=""
 	fi
-	if [ "$DEBUG" = "Y" ] ; then
-		echo "Update ${level}PO files:"
-	fi
+	debug "Update ${level}PO files:"
 	cd $DI_COPY/packages/$dir
 	# The languages variable will contain the list of *supported* languages
 	# Supported languages will have PO files content spread over
@@ -474,26 +450,18 @@ for i in $LEVELS; do
 	
 	for po in *.po ; do
 		lang=$(basename $po .po)
-		if [ "$DEBUG" = "Y" ] ; then
-			echo "   $lang:"
-		fi
+		debug "   $lang:"
 		if [ "$ONLINE" = "Y" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "     - Update from SVN..."
-			fi
+			debugn "     - Update from SVN..."
 			if [ "$DEBUG" = "Y" ] ; then
 				$svn update || svnerr
 			else
 				$svn update >/dev/null 2>&1 || svnerr
 			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
+			debug Done.
 		fi
 		if [ -n "$MERGEDIR" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo "     - Merge with $MERGEDIR/packages/$dir/$lang.po"
-			fi
+			debug "     - Merge with $MERGEDIR/packages/$dir/$lang.po"
 			if [ -f "$MERGEDIR/packages/$dir/$lang.po" ] ; then
 				if [ -f $po ]; then
 					if ! msgcat --use-first "$MERGEDIR/packages/$dir/$lang.po" $po >$po.new ; then
@@ -504,26 +472,18 @@ for i in $LEVELS; do
 			fi
 		fi
 		if [ "$i" -gt 1 ]; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "     - Merge with other levels:"
-			fi
+			debugn "     - Merge with other levels:"
 			previous=`expr $i - 1`
 			for j in `seq 1 $previous`; do
-				if [ "$DEBUG" = "Y" ] ; then
-					echo -n " $j"
-				fi
+				debugn " $j"
 				if [ -f $po -a -f ../sublevel$j/$po ]; then
 					msgcat --use-first ../sublevel$j/$po $po >$po.new
 					mv $po.new $po
 				fi
 			done
-			if [ "$DEBUG" = "Y" ] ; then
-				echo ""
-			fi
+			debug ""
 		fi
-		if [ "$DEBUG" = "Y" ] ; then
-			echo "     - Merge with template.pot:"
-		fi
+		debug "     - Merge with template.pot:"
 		if [ "$DEBUG" = "Y" ] ; then
 			# In case some msgids are duplicate
 			# Does not work on woody systems..:-(
@@ -556,13 +516,9 @@ for i in $LEVELS; do
 		rm $po.new
 	done
 	if [ "$COMMIT" = "Y" ] ; then
-		if [ "$DEBUG" = "Y" ] ; then
-			echo -n "Commit all general PO files to SVN..."
-		fi
+		debugn "Commit all general PO files to SVN..."
 		$svn commit -m"${COMMIT_MARKER} Updated packages/$dir/* with general template.pot" *.po template.pot || svnerr
-		if [ "$DEBUG" = "Y" ] ; then
-			echo Done.
-		fi
+		debug Done.
 	fi
 done
 
@@ -588,36 +544,24 @@ fi
 # 4b) update debian/po/*.po files with files in packages/po/
 # 4c) commit back the changes to D-I SVN
 if [ "$SYNCPKGS" = "Y" ]; then
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Updating D-I packages:
-	fi
+	debug Updating D-I packages:
 	
 	for package in $packages ; do
-		if [ "$DEBUG" = "Y" ] ; then
-			echo "   $package:"
-		fi
+		debug "   $package:"
 		cd $DI_COPY/packages/$package/debian/po
 		if [ "$ONLINE" = "Y" ] ; then
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "      - synchronize with D-I repository..."
-			fi
+			debugn "      - synchronize with D-I repository..."
 			if [ "$DEBUG" = "Y" ] ; then
 				$svn update || svnerr
 			else
 				$svn update >/dev/null 2>&1 || svnerr
 			fi
-			if [ "$DEBUG" = "Y" ] ; then
-				echo Done.
-			fi
+			debug Done.
 		fi
-		if [ "$DEBUG" = "Y" ] ; then
-			echo "      - rebuild language files:"
-		fi
+		debug "      - rebuild language files:"
 		# For each language listed in packages/po, update PO files
 		for lang in $languages ; do
-			if [ "$DEBUG" = "Y" ] ; then
-				echo -n "$lang "
-			fi
+			debugn "$lang "
 			cat >$lang.po.new <<EOF
 # THIS FILE IS AUTOMATICALLY GENERATED FROM THE MASTER FILE
 # packages/po/$lang.po
@@ -691,9 +635,7 @@ EOF
 		svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
 	fi
 else
-	if [ "$DEBUG" = "Y" ] ; then
-		echo Not syncing D-I packages as requested.
-	fi
+	debug Not syncing D-I packages as requested.
 fi
 
 #if [ "$SPLIT" -gt 1 ]; then
