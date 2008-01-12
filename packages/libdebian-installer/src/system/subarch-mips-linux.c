@@ -48,6 +48,15 @@ static struct cpu system_qemu_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_malta_cpu[] = {
+	{ "MIPS 4K", "4kc-malta" },
+	{ "MIPS 24K", "4kc-malta" },
+	{ "MIPS 34K", "4kc-malta" },
+	{ "MIPS 5K", "5kc-malta" },
+	{ "MIPS 20K", "5kc-malta" },
+	{ NULL, "unknown" }
+};
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -61,6 +70,7 @@ static struct systype system_type[] = {
 	{"SGI O2", system_sgi_o2_cpu },
 	{"SiByte BCM9", system_sibyte_sb1_cpu }, /* match Broadcom SB1 boards */
 	{"Qemu", system_qemu_cpu },
+	{"MIPS Malta", system_malta_cpu },
 	{ NULL, system_unknown_cpu }
 };
 

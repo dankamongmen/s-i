@@ -42,6 +42,15 @@ static struct cpu system_qemu_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_malta_cpu[] = {
+	{ "MIPS 4K", "4kc-malta" },
+	{ "MIPS 24K", "4kc-malta" },
+	{ "MIPS 34K", "4kc-malta" },
+	{ "MIPS 5K", "5kc-malta" },
+	{ "MIPS 20K", "5kc-malta" },
+	{ NULL, "unknown" }
+};
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -62,6 +71,7 @@ static struct systype system_type[] = {
 	{"Cobalt ", system_cobalt_cpu }, /* match any Cobalt machine; new kernels */
 	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu }, /* Broadcom based APs/NAS */
 	{"Qemu", system_qemu_cpu },
+	{"MIPS Malta", system_malta_cpu },
 	{ NULL, system_unknown_cpu }
 };
 
