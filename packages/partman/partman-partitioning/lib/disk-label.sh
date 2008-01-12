@@ -69,8 +69,7 @@ default_disk_label () {
 		    amiga)
 			echo amiga;;
 		    atari|q40)
-			# unsupported by parted
-			echo UNSUPPORTED;;
+			echo atari;;
 		    mac)
 			echo mac;;
 		    *vme*)
