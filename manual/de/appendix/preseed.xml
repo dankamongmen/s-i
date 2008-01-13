@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 50443 -->
+<!-- original version: 50744 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -906,6 +906,27 @@ d-i mirror/http/proxy string
 
   </sect2>
 
+  <sect2 id="preseed-time">
+  <title>Einrichtung von Uhr und Zeitzone</title>
+
+<informalexample role="example"><screen>
+# Legt fest, ob die Hardware-(CMOS-)Uhr auf UTC eingestellt ist oder nicht.
+d-i clock-setup/utc boolean true
+
+# Sie können hier irgendeinen, für $TZ gültigen Wert eingeben; gültige
+# Werte finden Sie in /usr/share/zoneinfo/.
+d-i time/zone string US/Eastern
+
+# Hier wird eingestellt, ob NTP benutzt wird, um während der Installation
+# die Uhr zu stellen.
+d-i clock-setup/ntp boolean true
+# NTP-Server, der genutzt werden soll. Der Standardwert sollte für die
+# meisten Fälle passend sein.
+#d-i clock-setup/ntp-server ntp.example.com
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-partman">
   <title>Partitionierung</title>
 <para>
@@ -1089,23 +1110,24 @@ d-i partman/confirm boolean true
 
   </sect2>
 
-  <sect2 id="preseed-time">
-  <title>Einstellung von Zeit und Zeitzone</title>
+  <sect2 id="preseed-base-installer">
+  <title>Installation des Basissystems</title>
+<para>
+
+Es gibt momentan nicht viel, was für diesen Teil der Installation
+voreingestellt werden kann. Die einzigen gestellten Fragen betreffen die
+Installation des Kernels.
+
+</para>
 
 <informalexample role="example"><screen>
-# Einstellung, ob die Hardware- (CMOS-) Uhr auf UTC eingestellt ist.
-d-i clock-setup/utc boolean true
+# Wählen Sie den initramfs-Generator, der genutzt werden soll, um die initrd
+# für 2.6-Kernels zu erzeugen.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
-# Sie können dies auf jeden gültigen Wert für $TZ setzen; siehe
-# /usr/share/zoneinfo/ für passende Werte.
-d-i time/zone string Europe/Berlin
-
-# Legt fest, ob NTP genutzt werden soll, um während der Installation die Uhr
-# zu stellen.
-d-i clock-setup/ntp boolean true
-# NTP-Server, der genutz werden soll. Der Standard sollte in den allermeisten
-# Fällen funktionieren.
-#d-i clock-setup/ntp-server ntp.example.com
+# Das Kernel-Image-(Meta-)Paket, das installiert werden soll; "none" kann
+# genutzt werden, wenn kein Kernel installiert werden soll.
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1181,28 +1203,6 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </screen></informalexample>
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-base-installer">
-  <title>Installation des Basissystems</title>
-<para>
-
-Es gibt derzeit nicht viel, was an diesem Punkt der Installation voreingestellt
-werden kann. Die einzigen gestellten Fragen betreffen die Installation des
-Kernels.
-
-</para>
-
-<informalexample role="example"><screen>
-# Den initramfs-Generator wählen, der zur Erstellung der initrd für
-# 2.6-Kernels genutzt werden soll.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
-
-# Das Kernel-Image- (Meta-) Paket, das installiert werden soll; "none" kann
-# verwendet werden, wenn kein Kernel installiert werden soll.
-#d-i base-installer/kernel/image linux-image-2.6-486
-</screen></informalexample>
-
   </sect2>
 
   <sect2 id="preseed-apt">
@@ -1367,7 +1367,7 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
-  <title>Die erste Stufe der Installation beenden</title>
+  <title>Die Installation beenden</title>
 
 <informalexample role="example"><screen>
 # Die letzte Meldung "Installation abgeschlossen" unterdrücken.
@@ -1378,7 +1378,7 @@ d-i finish-install/reboot_in_progress note
 #d-i cdrom-detect/eject boolean false
 
 # Durch die folgende Zeile wird der Installer nach Abschluss der
-# Installation heruntergefahren, es wird aber nicht das neue System
+# Installation nur heruntergefahren, es wird nicht das neue System
 # gestartet.
 #d-i debian-installer/exit/halt boolean true
 </screen></informalexample>

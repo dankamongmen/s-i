@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
 
    <sect3 id="network-console">
    <title>Installation über das Netzwerk (network-console)</title>
@@ -11,8 +11,8 @@ Eine der interessanteren Komponenten ist
 einen großen Teil der Installation über das Netzwerk via SSH zu erledigen.
 Die Nutzung des Netzwerks bedeutet, dass Sie die ersten Schritte der
 Installation auf der Konsole durchführen müssen, zumindest bis zu dem Punkt,
-wo das Netzwerk eingerichtet wird. (Obwohl Sie auch diesen Teil automatisieren
-können; siehe <xref linkend="automatic-install"/>.)
+wo das Netzwerk eingerichtet wird (obwohl Sie auch diesen Teil automatisieren
+können; siehe <xref linkend="automatic-install"/>).
 
 </para><para arch="not-s390">
 
@@ -76,14 +76,50 @@ angezeigt und Sie müssen ihn vergleichen und bestätigen, dass er korrekt ist.
 
 </para><note><para>
 
+Der <command>ssh</command>-Server im Installer nutzt eine
+Standard-Konfiguration, in der keine <quote>keep-alive</quote>-Pakete
+gesendet werden. Prinzipiell sollte die Verbindung zu dem zu installierenden
+System unbegrenzt offen gehalten werden. Allerdings könnte es &ndash;
+abhängig von Ihrer Netzwerkkonfiguration vor Ort &ndash; passieren,
+dass nach einiger Zeit der Inaktivität die Verbindung verloren geht.
+Ein üblicher Fall, in dem dies vorkommen könnte, ist, wenn eine Form
+von NAT (Network Address Translation) irgendwo zwischen dem Klient und
+dem zu installierenden System existiert. Abhängig davon, an welchem Punkt
+der Installation die Verbindung abgebrochen ist, ist es möglich oder
+unmöglich, die Installation fortsetzen, wenn die Verbindung wieder
+aufgebaut wurde.
+
+</para><para>
+
+Sie können vielleicht vermeiden, dass die Verbindung abbricht, indem Sie
+die Option
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>Wert</replaceable></userinput>
+hinzufügen, wenn Sie die <command>ssh</command>-Verbindung aufbauen,
+oder indem Sie diese Option zu Ihrer <command>ssh</command>-Konfigurationsdatei
+hinzufügen. Beachten Sie aber, dass gerade das Hinzufügen dieser Option
+einen Verbindungsabbruch <emphasis>verursachen</emphasis> kann (z.B. wenn
+<quote>keep-alive</quote>-Pakete während eines kurzem Netzwerk-Ausfalls
+gesendet werden, von dem <command>ssh</command> sonst nichts mitbekommen
+hätte), deshalb sollte sie nur genutzt werden, falls dies nötig ist.
+
+</para></note>
+
+<note><para>
+
 Wenn Sie mehrere Computer hintereinander installieren und diese haben die
 gleiche IP-Adresse oder den gleichen Hostnamen, wird <command>ssh</command>
 sich weigern, sich mit einem solchen Host zu verbinden. Der Grund hierfür ist,
 dass diese Rechner unterschiedliche Fingerabdrücke haben, was üblicherweise
 ein Zeichen für eine Spoofing-Attacke ist. Wenn Sie sicher sind, dass dies
 nicht der Fall ist, müssen Sie die entsprechende Zeile aus
-<filename>~/.ssh/known_hosts</filename> entfernen und können es dann noch
-einmal probieren.
+<filename>~/.ssh/known_hosts</filename> entfernen<footnote>
+ 
+<para>
+Der folgende Befehl entfernt einen vorhandenen Eintrag für einen Rechner:
+<command>ssh-keygen -R &lt;<replaceable>Rechnername</replaceable>|<replaceable>IP&ndash;Adresse</replaceable>&gt;</command>.
+</para>
+
+</footnote> und können es dann noch einmal probieren.
 
 </para></note><para>
 
