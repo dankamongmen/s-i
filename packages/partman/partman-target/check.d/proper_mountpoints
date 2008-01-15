@@ -59,5 +59,29 @@ same_mountpoints () {
 	done
 }
 
+# Some directories must be on the root file system
+must_be_on_root () {
+	mountpoints=$(
+		for i in /lib/partman/fstab.d/*; do
+			[ -x "$i" ] || continue
+			$i
+		done |
+		while read fs mp type options dump pass; do
+			echo $mp
+		done
+	)
+
+	for mp in $mountpoints; do
+		case $mp in
+		    /bin|/etc|/lib*|/sbin)
+			db_subst partman-target/must_be_on_root MOUNTPOINT "$mp"
+			db_input critical partman-target/must_be_on_root || true
+			db_go || true
+			exit 1
+		esac
+	done
+}
+
 no_root
 same_mountpoints
+must_be_on_root
