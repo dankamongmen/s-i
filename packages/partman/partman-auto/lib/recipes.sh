@@ -178,13 +178,13 @@ partition_after () {
 
 pull_primary () {
 	primary=''
-	logical=''
+	scheme_rest=''
 	foreach_partition '
 		if [ -z "$primary" ] && \
 		   echo $* | grep '\''\$primary{'\'' >/dev/null; then
 			primary="$*"
 		else
-			logical="${logical:+$logical$NL}$*"
+			scheme_rest="${scheme_rest:+$scheme_rest$NL}$*"
 		fi'
 }
 

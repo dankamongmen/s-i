@@ -22,14 +22,11 @@ auto_init_disk() {
 	close_dialog
 }
 
-### XXXX: I am not 100% sure if this is exactly what this code is doing.
-### XXXX: Rename is of course an option. Just remember to do it here, in
-### XXXX: perform_recipe and in partman-auto-lvm.
 create_primary_partitions() {
 	cd $dev
 
 	while [ "$free_type" = pri/log ] && \
-	      echo $scheme | grep '\$primary{' >/dev/null; do
+	      echo $scheme | grep -q '\$primary{'; do
 		pull_primary
 		set -- $primary
 		open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
@@ -45,7 +42,11 @@ create_primary_partitions() {
 			read_line x1 new_free_space x2 new_free_type fs x3 x4
 			close_dialog
 		fi
-		if [ -z "$neighbour" ] || [ "$fs" != free ] || \
+		if [ -z "$scheme_rest" ]; then
+			# If this is the last partition to be created, it does
+			# not matter if we have space left for more partitions
+			:
+		elif [ -z "$neighbour" ] || [ "$fs" != free ] || \
 		   [ "$new_free_type" = primary ] || \
 		   [ "$new_free_type" = unusable ]; then
 			open_dialog DELETE_PARTITION $id
@@ -73,7 +74,7 @@ create_primary_partitions() {
 		shift; shift; shift; shift
 		setup_partition $id $*
 		primary=''
-		scheme="$logical"
+		scheme="$scheme_rest"
 		free_space=$new_free_space
 		free_type="$new_free_type"
 	done
