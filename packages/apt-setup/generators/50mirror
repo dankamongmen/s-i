@@ -28,29 +28,61 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	if [ -e /cdrom/.disk/cd_type ]; then
 		cd_type=$(cat /cdrom/.disk/cd_type)
 	fi
+	cd_count=$(grep "^deb cdrom:" $ROOT/etc/apt/sources.list.new | wc -l)
 
 	case "$cd_type" in
 	    not_complete)
-		db_metaget apt-mirror/use/netinst description
-		db_subst apt-setup/use_mirror EXPLANATION "$RET"
 		use_mirror=true
-		use_prio=medium ;;
+		use_prio=medium
+		db_metaget apt-setup/use/netinst description
+		db_subst apt-setup/use_mirror EXPLANATION "$RET"
+		;;
 	    full_cd)
-		db_metaget apt-mirror/use/full_cd1 description
-		explanation="$RET"
-		db_metaget apt-mirror/use/full_cd2 description
-		explanation="$explanation$NL$NL$RET"
-		db_subst apt-setup/use_mirror EXPLANATION "$explanation"
 		use_mirror=true
-		use_prio=high ;;
+		use_prio=high
+		if [ $cd_count -le 8 ]; then
+			if [ $cd_count -eq 1 ]; then
+				db_metaget apt-setup/use/cd description
+			elif [ $cd_count -le 3 ]; then
+				db_metaget apt-setup/use/cd-set1 description
+				RET="$(printf "$RET" "$cd_count")"
+			else
+				db_metaget apt-setup/use/cd-set2 description
+				RET="$(printf "$RET" "$cd_count")"
+			fi
+			explanation="$RET"
+			if [ $cd_count -le 3 ]; then
+				db_metaget apt-setup/use/inet1 description
+				explanation="$explanation $RET"
+				db_metaget apt-setup/use/cd-note description
+				explanation="$explanation$NL$NL$RET"
+			else
+				db_metaget apt-setup/use/inet2 description
+				explanation="$explanation $RET"
+			fi
+			db_subst apt-setup/use_mirror EXPLANATION "$explanation"
+		else
+			use_mirror=false
+			use_prio=low
+		fi
+		;;
 	    dvd)
-		db_metaget apt-mirror/use/dvd description
-		db_subst apt-setup/use_mirror EXPLANATION "$RET"
 		use_mirror=false
-		use_prio=high ;;
+		use_prio=high
+		if [ $cd_count -eq 1 ]; then
+			db_metaget apt-setup/use/dvd description
+			explanation="$RET"
+			db_metaget apt-setup/use/inet2 description
+			explanation="$explanation $RET"
+			db_subst apt-setup/use_mirror EXPLANATION "$explanation"
+		else
+			use_prio=low
+		fi
+		;;
 	    *)
 		use_mirror=true
-		use_prio=high ;;
+		use_prio=high
+		;;
 	esac
 
 	# Default to false if no network selected in netcfg

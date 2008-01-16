@@ -12,7 +12,7 @@ Template: apt-setup/cdrom/set-first
 Type: boolean
 Default: false
 #flag:translate!:3
-Description: Scan another CD or DVD?
+_Description: Scan another CD or DVD?
  Your installation CD or DVD has been scanned; its label is:
  .
  ${LABEL}
@@ -28,7 +28,7 @@ Template: apt-setup/cdrom/set-next
 Type: boolean
 Default: false
 #flag:translate!:3
-Description: Scan another CD or DVD?
+_Description: Scan another CD or DVD?
  The CD or DVD with the following label has been scanned:
  .
  ${LABEL}
@@ -39,7 +39,7 @@ Template: apt-setup/cdrom/set-double
 Type: boolean
 Default: true
 #flag:translate!:3
-Description: Scan another CD or DVD?
+_Description: Scan another CD or DVD?
  The CD or DVD with the following label has already been scanned:
  .
  ${LABEL}
@@ -49,16 +49,17 @@ Description: Scan another CD or DVD?
 Template: apt-setup/cdrom/set-failed
 Type: boolean
 Default: true
-Description: Scan another CD or DVD?
- An attempt to configure apt to install additional packages from the CD
- failed.
+_Description: Scan another CD or DVD?
+ An attempt to configure apt to install additional packages from the
+ CD/DVD failed.
  .
  Please check that the CD/DVD has been inserted correctly.
 
-# This template uses the same text as apt-cdrom
 Template: apt-setup/cdrom/media-change
 Type: text
-Description: Media change
+# This template uses the same text as used in the package apt-cdrom
+# Do not translate "/cdrom/"
+_Description: Media change
  /cdrom/:Please insert the disc labeled: '${LABEL}' in the drive '/cdrom/'
  and press enter.
 
@@ -66,3 +67,41 @@ Template: finish-install/progress/apt-cdrom-setup
 Type: text
 # finish-install progress bar item
 _Description: Disabling netinst CD in sources.list...
+
+Template: apt-setup/use/netinst_old
+Type: text
+_Description: If you are installing from a netinst CD and choose not to use a mirror, you will end up with only a very minimal base system.
+
+Template: apt-setup/use/netinst
+Type: text
+_Description: You are installing from a netinst CD, which by itself only allows installation of a very minimal base system. Use a mirror to install a more complete system.
+
+Template: apt-setup/use/cd
+Type: text
+_Description: You are installing from a CD, which contains a limited selection of packages.
+
+Template: apt-setup/use/cd-set1
+Type: text
+# The value of %i can be 2 or 3
+_Description: You have scanned %i CDs. Even though these contain a fair selection of packages, some may be missing (notably some packages needed to support languages other than English).
+
+Template: apt-setup/use/cd-set2
+Type: text
+# The value of %i can be from 4 to 8
+_Description: You have scanned %i CDs. Even though these contain a large selection of packages, some may be missing.
+
+Template: apt-setup/use/cd-note
+Type: text
+_Description: Note that using a mirror can result in a large amount of data being downloaded during the next step of the installation.
+
+Template: apt-setup/use/dvd
+Type: text
+_Description: You are installing from a DVD. Even though the DVD contains a large selection of packages, some may be missing.
+
+Template: apt-setup/use/inet1
+Type: text
+_Description: Unless you don't have a good Internet connection, use of a mirror is recommended, especially if you plan to install a graphical desktop environment.
+
+Template: apt-setup/use/inet2
+Type: text
+_Description: If you have a reasonably good Internet connection, use of a mirror is suggested if you plan to install a graphical desktop environment.
