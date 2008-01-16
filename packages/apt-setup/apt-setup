@@ -33,7 +33,10 @@ warning() {
 }
 
 gencount=$(ls "$gendir"/* | wc -l)
-db_capb backup progresscancel
+# Option to cancel progress bar disabled as there are issues with it;
+# see also apt-setup-verify
+#db_capb backup progresscancel
+db_capb backup
 db_progress START 0 $(expr $gencount \* 200) apt-setup/progress/title
 
 PROGRESS_FROM=0
