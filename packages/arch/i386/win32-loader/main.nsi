@@ -178,7 +178,6 @@ readme_file_not_found:
   ${If} $windows_version == "95"
   ${OrIf} $windows_version == "98"
     StrCpy $windows_boot_method direct
-    Goto windows_version_ok
   ${Endif}
   ${If} $windows_version == "2000"
   ${OrIf} $windows_version == "XP"
