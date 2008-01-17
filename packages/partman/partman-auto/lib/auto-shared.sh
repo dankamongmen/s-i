@@ -22,6 +22,23 @@ auto_init_disk() {
 	close_dialog
 }
 
+# Mark a partition as LVM and add it to vgpath
+mark_partition_as_lvm() {
+	local id
+	id=$1
+	shift
+
+	devfspv_devices="$devfspv_devices $path"
+	open_dialog GET_FLAGS $id
+	flags=$(read_paragraph)
+	close_dialog
+	open_dialog SET_FLAGS $id
+	write_line "$flags"
+	write_line lvm
+	write_line NO_MORE
+	close_dialog
+}
+
 create_primary_partitions() {
 	cd $dev
 
@@ -72,6 +89,9 @@ create_primary_partitions() {
 			fi
 		fi
 		shift; shift; shift; shift
+		if echo "$*" | grep -q "method{ lvm }"; then
+			mark_partition_as_lvm $id $*
+		fi
 		setup_partition $id $*
 		primary=''
 		scheme="$scheme_rest"
@@ -117,20 +137,10 @@ create_partitions() {
 		db_progress STOP
 		autopartitioning_failed
 	fi
-
-	# Mark the partition LVM only if it is actually LVM and add it to vgpath
-	if echo "$*" | grep -q "method{ lvm }"; then
-		devfspv_devices="$devfspv_devices $path"
-		open_dialog GET_FLAGS $id
-		flags=$(read_paragraph)
-		close_dialog
-		open_dialog SET_FLAGS $id
-		write_line "$flags"
-		write_line lvm
-		write_line NO_MORE
-		close_dialog
-	fi
 	shift; shift; shift; shift
+	if echo "$*" | grep -q "method{ lvm }"; then
+		mark_partition_as_lvm $id $*
+	fi
 	setup_partition $id $*
 	free_space=$(partition_after $id)'
 }

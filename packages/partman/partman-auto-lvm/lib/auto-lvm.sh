@@ -89,19 +89,19 @@ auto_lvm_prepare() {
 	esac
 
 	# Creating envelope
-	scheme="$normalscheme${NL}100 1000 1000000000 ext3 method{ $method }"
+	scheme="$normalscheme${NL}100 1000 1000000000 ext3 \$primary{ } method{ $method }"
 
 	expand_scheme
 
 	clean_method
-
-	create_primary_partitions
 
 	# This variable will be used to store the partitions that will be LVM
 	# by create_partitions; zero it to be sure it's not cluttered.
 	# It will be used later to provide real paths to partitions to LVM.
 	# (still one atm)
 	devfspv_devices=''
+
+	create_primary_partitions
 
 	create_partitions
 
