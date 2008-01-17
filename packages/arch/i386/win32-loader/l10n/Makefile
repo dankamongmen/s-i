@@ -9,7 +9,7 @@ templates/dialog.nsh: templates/all.nsh
 	done > $@
 
 templates/all.nsh: $(foreach lang, $(LINGUAS), templates/$(lang).nsh)
-	cat $^ > $@
+	for i in $^ ; do echo "; BEGIN $$i" ; cat $$i ; echo "; END $$i" ; done > $@
 
 win32-loader: win32-loader.c
 	gcc -DTEXTDOMAINDIR=\"$(CURDIR)/locale\" $^ -o $@
