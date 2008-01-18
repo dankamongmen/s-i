@@ -189,7 +189,7 @@ char *command_stop(struct confmodule *, char *);
 char *command_progress(struct confmodule *, char *);
 
 /**
- * @brief handler for the X_LOADTEMPLATE debconf command
+ * @brief handler for the X_LOADTEMPLATEFILE debconf command
  *
  * Loads a new template into the debconf database
  *
