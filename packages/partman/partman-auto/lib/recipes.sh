@@ -106,24 +106,19 @@ decode_recipe () {
 }
 
 foreach_partition () {
-	local - doing IFS partition former last
+	local - doing IFS pcount last partition
 	doing=$1
+	pcount=$(echo "$scheme" | wc -l)
+	last=no
+
 	IFS="$NL"
-	former=''
 	for partition in $scheme; do
 		restore_ifs
-		if [ "$former" ]; then
-			set -- $former
-			last=no
-			eval "$doing"
-		fi
-		former="$partition"
-	done
-	if [ "$former" ]; then
-		set -- $former
-		last=yes
+		[ $pcount -gt 1 ] || last=yes
+		set -- $partition
 		eval "$doing"
-	fi
+		pcount=$(($pcount - 1))
+	done
 }
 
 min_size () {
