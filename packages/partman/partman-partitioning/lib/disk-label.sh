@@ -81,6 +81,9 @@ default_disk_label () {
 		esac;;
 	    mips)
 		case "$sub" in
+		    4kc-malta | 5kc-malta)
+			# MIPS Malta
+			echo msdos;;
 		    r4k-ip22 | r5k-ip22 | r8k-ip26 | r10k-ip28)
 			# Indy
 			echo dvh;;
@@ -100,6 +103,9 @@ default_disk_label () {
 		esac;;
 	    mipsel)
 		case "$sub" in
+		    4kc-malta | 5kc-malta)
+			# MIPS Malta
+			echo msdos;;
 		    # DECstation
 		    r3k-kn02)
 			echo msdos;;
