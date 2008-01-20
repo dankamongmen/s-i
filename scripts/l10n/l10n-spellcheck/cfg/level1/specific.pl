@@ -88,6 +88,12 @@ sub checkSpecials (@)
 	    $unmatched=1;
 	}
 
+	if ($_ =~ /#. Do not translate "\/cdrom\/"/ && $msgid =~ /cdrom/ && $msgstr !~ /cdrom/)
+	{
+	    print "# >>> \"cdrom\" should not be translated <<<\n";		
+	    $unmatched=1;
+	}
+
 	if ($_ =~ /#.\s+Type:\s+select/ && $_ =~ /#.\s+Choices/ )
 	    {
 		while ($msgid =~ /,/g) { $count_id++ };
