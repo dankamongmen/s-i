@@ -717,6 +717,12 @@ command_progress(struct confmodule *mod, char *arg)
     {
         mod->frontend->methods.progress_stop(mod->frontend);
     }
+    else
+    {
+        asprintf(&out, "%u unknown subcommand %s",
+                CMDSTATUS_SYNTAXERROR, argv[0]);
+        return out;
+    }
 
     asprintf(&out, "%u OK", CMDSTATUS_SUCCESS);
     return out;
