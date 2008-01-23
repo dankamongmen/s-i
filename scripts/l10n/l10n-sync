@@ -73,7 +73,7 @@ exit 1
 # on stdout). Use the --pass option if output of the command is redirected.
 # Messages are redirected to stderr because of the --pass option.
 log_cmd() {
-	local progress message command redir
+	local progress message redir
 	if [ "$1" = "--pass" ] ; then
 		redir="$REDIRERR"
 		shift
@@ -89,7 +89,6 @@ log_cmd() {
 		message="$2"
 		shift 2
 	fi
-	command="$@"
 
 	if [ "$message" ] ; then
 		if [ "$QUIET" = N ] ; then
@@ -99,7 +98,7 @@ log_cmd() {
 	fi
 
 	RET=0
-	eval "$command $redir" || RET=$?
+	eval "$@" $redir || RET=$?
 
 	if [ "$progress" ] && [ "$QUIET" = N ] ; then
 		[ $RET -eq 0 ] && echo " done." >&2 || echo " failed." >&2
