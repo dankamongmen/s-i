@@ -1,0 +1,204 @@
+#! /bin/bash
+set -e
+
+# Determine how complete translations are for the next release of D-I.
+# Should be run by the D-I release manager as part of the preparations
+# for a new release. The resulting file should be included in images
+# and is used by localechooser to print a warning in case a translation
+# is incomplete.
+
+# Copyright: Frans Pop <fjp@debian.org>, 2008
+
+NUMLEVELS=5
+REPO=svn://svn.debian.org/svn/d-i
+PTAGS=$REPO/tags/packages
+
+OLDIFS="$IFS"
+NL="
+"
+
+info() {
+	echo "I: $*" >&2
+}
+error() {
+	echo "E: $*" >&2
+}
+
+# Remove comment lines and blank lines
+real_contents() {
+	grep -Ev "^(#.*|)[[:space:]]*$" $1
+}
+
+# For a few packages the source name does not match its directory
+correct_exceptions() {
+	echo $1 | sed -r "s:/(dasd|netdevice)$:/s390-\1:"
+}
+
+# Use rmadison to get the current version of a package in testing
+#TODO: allow to specify a different version to use
+get_version() {
+	local sp madison
+	sp=$1
+
+	madison="$(rmadison -s testing $sp | grep source)"
+	if [ -z "$madison" ]; then
+		error "error getting madison info for $sp for 'testing'"
+		exit 1
+	elif [ $(echo "$madison" | wc -l) -gt 1 ]; then
+		error "got multiple lines from madison for $sp"
+		exit 1
+	fi
+	echo "$madison" | cut -d"|" -f2 | sed "s/[[:space:]]//g"
+}
+
+# Output number of translated/fuzzy/untranslated messages in a file
+po_status() {
+	local pofile stat_info type stats
+	pofile=$1
+
+	stat_info=$(msgfmt --stat -c -o /dev/null $pofile 2>&1 | \
+		grep -E "^[0-9]+ .* messages?")
+	for type in translated fuzzy untranslated; do
+		if $(echo $stat_info | grep -Eq "[0-9]+ $type"); then
+			stats=${stats:+$stats }$(echo $stat_info | \
+				sed -r "s/(^|.*[^0-9])([0-9]+) $type.*/\2/")
+		else
+			stats=${stats:+$stats }0
+		fi
+	done
+	echo "$stats"
+}
+
+# Split a PO or POT file into the different sublevels
+# This function uses the same logic as l10n-sync and should be kept
+# in sync with that!
+split_levels() {
+	local pofile lpofile i
+	pofile=$1
+
+	[ -f $pofile ] || return 0
+	for i in $(seq 1 $NUMLEVELS); do
+		lpofile=sublevel$i/$(basename $pofile)
+		mkdir -p sublevel$i
+
+		if [ $i -eq 1 ]; then
+			# Select strings without a level
+			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pofile \
+				>$lpofile.none
+			# Select strings with level 1 set
+			msggrep -X -E -e ":sl1:" $pofile >$lpofile.sl1
+			# Merge them
+			msgcat $lpofile.none $lpofile.sl1 >$lpofile
+			rm $lpofile.none $lpofile.sl1
+		else
+			# Select strings with level N set, but exclude any strings that
+			# also have a level smaller than N set to avoid duplicates
+			msggrep -X -E -e ":sl$i:" $pofile | \
+				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+				>$lpofile
+		fi
+	done
+}
+
+svn export $REPO/trunk/packages/po/packages_list >/dev/null
+
+version=$(get_version localechooser)
+
+mkdir -p stats
+rm -f stats/*
+
+info "Gathering the data..."
+
+languages=""
+for package in $(real_contents packages_list | sort); do
+	source=$(correct_exceptions $package)
+	s_name=$(basename $source)
+	#[ $s_name = partman-base ] || [ $s_name = netcfg ] || continue
+	#TODO: allow to ignore a package
+
+	version=$(get_version $s_name)
+
+	info "processing $source ($version)"
+	if [ ! -d $s_name/$version/po ]; then
+		mkdir -p $s_name/$version
+		cd $s_name/$version
+		if ! svn export $PTAGS/$package/$version/debian/po >/dev/null; then
+			error "no tag for $package ($version) found!"
+			exit 1
+		fi
+	else
+		cd $s_name/$version
+	fi
+
+	# We need the templates file in case a translation is missing
+	sed -i 's/charset=CHARSET/charset=UTF-8/g' po/templates.pot
+	split_levels po/templates.pot
+	for level in $(seq 1 $NUMLEVELS); do
+		echo "template: $(po_status sublevel$level/templates.pot)" \
+			>../../stats/$s_name.$level
+	done
+
+	for pofile in po/*.po; do
+		lang=$(basename $pofile .po)
+		if ! echo "$languages" | grep -q "^$lang$"; then
+			languages=${languages:+$languages$NL}$lang
+		fi
+		split_levels $pofile
+		for level in $(seq 1 $NUMLEVELS); do
+			if stats="$(po_status sublevel$level/$lang.po)"; then
+				echo "$lang: $stats" >>../../stats/$s_name.$level
+			fi
+		done
+	done
+	cd ../..
+done
+
+info "Calculating statistics..."
+
+languages="$(echo "$languages" | grep -v "^en$" | sort)"
+> translation-status
+for lang in $languages; do
+	for level in $(seq 1 $NUMLEVELS); do
+		# Take level 1 and 2 together
+		if [ $level -ne 2 ]; then
+			total=0; t_trans=0; t_untrans=0
+		fi
+
+		# If a translation was not present for a package, take the
+		# values from the template (which is always untranslated)
+		for plfile in stats/*.$level; do
+			if ! stat=$(grep "^$lang:" $plfile); then
+				stat="$(grep "^template:" $plfile)"
+			fi
+			trans=$(echo "$stat" | awk '{print $2}')
+			fuzzy=$(echo "$stat" | awk '{print $3}')
+			untrans=$(echo "$stat" | awk '{print $4}')
+			t_trans=$(($t_trans + $trans))
+			t_untrans=$(($t_untrans + $fuzzy + $untrans))
+		done
+		total=$(($t_trans + $t_untrans))
+
+		[ $level -gt 1 ] || continue
+		if [ $t_untrans -gt 0 ]; then
+			if [ $(($t_trans * 100 / $total)) -gt 90 ]; then
+				info "$lang is mostly translated at $level: $t_trans/$total"
+				echo "$lang: $level M" >>translation-status
+			elif [ $(($t_trans * 100 / $total)) -gt 50 ]; then
+				info "$lang is partially translated at $level: $t_trans/$total"
+				echo "$lang: $level P" >>translation-status
+			elif [ $(($t_trans * 100 / $total)) -gt 0 ]; then
+				info "$lang is limited translated at $level: $t_trans/$total"
+				echo "$lang: $level L" >>translation-status
+			else
+				info "$lang is untranslated at $level"
+				echo "$lang: $level U" >>translation-status
+			fi
+			break
+		elif [ $level -eq $NUMLEVELS ]; then
+			info "$lang is fully translated"
+			echo "$lang: $level F" >>translation-status
+		fi
+	done
+done
+
+rm packages_list
