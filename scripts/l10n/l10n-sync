@@ -65,13 +65,16 @@ fi
 exit 1
 }
 
+# Syntax: log_cmd [-m|-p "<message>"] command <arguments>
+# Note that any quotes in the <arguments> must be escaped to preserve them.
+#
 # Unless --nolog was passed, all output of the command will be redirected
 # to the log file.
-# A progress message can be printed when the command is executed by using
-# the option [-m|-p <message>]. With -m just the message will be printed,
-# with -p the result of the command will be printed after the message (only
-# on stdout). Use the --pass option if output of the command is redirected.
-# Messages are redirected to stderr because of the --pass option.
+# If the -m or -p option is used, a progress message is be printed when the
+# command is executed. With -m just the message will be printed, with -p the
+# result of the command will be printed after the message (only on stdout).
+# Use the --pass option if output of the command is redirected; because of
+# this option messages are redirected to stderr.
 log_cmd() {
 	local progress message redir
 	if [ "$1" = "--pass" ] ; then
@@ -379,7 +382,7 @@ if [ "$UPDATEPO" = "Y" ]; then
 	if [ "$COMMIT" = "Y" ] ; then
 		cd $DI_COPY/packages
 		log_cmd -p "  - Commit changes to SVN..." \
-			$svn commit -m "${COMMIT_MARKER} Run debconf-updatepo on all packages" || svnerr
+			$svn commit -m \"$COMMIT_MARKER Run debconf-updatepo on all packages\" || svnerr
 	fi
 
 else
@@ -536,7 +539,7 @@ for i in $LEVELS; do
 	done
 	if [ "$COMMIT" = "Y" ] ; then
 		log_cmd -p "- Commit all general PO files to SVN..." \
-			$svn commit -m"${COMMIT_MARKER} Updated packages/$dir/* with general template.pot" *.po template.pot || svnerr
+			$svn commit -m \"$COMMIT_MARKER Updated packages/$dir/* with general template.pot\" *.po template.pot || svnerr
 	fi
 done
 
@@ -631,7 +634,7 @@ EOF
 	if [ "$COMMIT" = "Y" ] ; then
 		cd $DI_COPY/packages
 		log_cmd -p "Commit changes to SVN..." \
-			svn commit -m"${COMMIT_MARKER} Synchronising with translation files from packages/po" || svnerr
+			svn commit -m \"$COMMIT_MARKER Synchronising with translation files from packages/po\" || svnerr
 	fi
 else
 	log "- Not syncing D-I packages as requested"
