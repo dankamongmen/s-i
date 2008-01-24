@@ -7,6 +7,32 @@ set -e
 # and is used by localechooser to print a warning in case a translation
 # is incomplete.
 
+# It is suggested to run this script from an empty directory.
+# The output of the script is the file 'translation-status'.
+# Format of that file is '<lang>: <sublevel> <status>', where:
+# - <sublevel> is the first sublevel that is not fully translated or,
+#   if the language /is/ fully translated, the highest sublevel;
+# - <status> is: F (full), M (mostly: >90%), P (partial: 50-90%),
+#   L (limited: <50%).
+# Note that sublevels 1 and 2 are taken together.
+
+# By default the script will:
+# - process all packages listed in trunk/packages/po/packageas_list;
+# - use the version of each package currently in testing.
+#
+# It is possible to use a different version or to skip a package by
+# creating a file 'packages_exceptions'. Example of contents:
+# <package>	x.y	# Use version x.y instead of version in testing
+# <package>	-	# Skip this package
+#
+# Notes regarding the use of exceptions:
+# - other version: only to be used if that version has already been
+#   uploaded and tagged and will be migrated to testing _before_ the
+#   release;
+# - skip package: only to be used if a new package has been added in
+#   the repository and is listed in packages_list, but is not yet used
+#   in this release.
+
 # Copyright: Frans Pop <fjp@debian.org>, 2008
 
 NUMLEVELS=5
@@ -35,10 +61,24 @@ correct_exceptions() {
 }
 
 # Use rmadison to get the current version of a package in testing
-#TODO: allow to specify a different version to use
+# Check first if an exception has been defined
 get_version() {
 	local sp madison
 	sp=$1
+
+	if [ -r packages_exceptions ]; then
+		version=$(grep "^$sp[[:space:]]" packages_exceptions | \
+			  awk '{print $2}')
+		if [ "$version" = "-" ]; then
+			info "EXCEPTION: skipping $sp"
+			echo "$s_name (skipped)" >>packages.log
+			return 1
+		elif [ "$version" ]; then
+			info "EXCEPTION: using version '$version' for $sp"
+			echo "$version"
+			return 0
+		fi
+	fi
 
 	madison="$(rmadison -s testing $sp | grep source)"
 	if [ -z "$madison" ]; then
@@ -82,17 +122,18 @@ split_levels() {
 		mkdir -p sublevel$i
 
 		if [ $i -eq 1 ]; then
-			# Select strings without a level
+			# Select strings without a sublevel
 			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pofile \
 				>$lpofile.none
-			# Select strings with level 1 set
+			# Select strings with sublevel 1 set
 			msggrep -X -E -e ":sl1:" $pofile >$lpofile.sl1
 			# Merge them
 			msgcat $lpofile.none $lpofile.sl1 >$lpofile
 			rm $lpofile.none $lpofile.sl1
 		else
-			# Select strings with level N set, but exclude any strings that
-			# also have a level smaller than N set to avoid duplicates
+			# Select strings with sublevel N set, but exclude any
+			# strings that also have a sublevel smaller than N set
+			# to avoid duplicates
 			msggrep -X -E -e ":sl$i:" $pofile | \
 				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
 				>$lpofile
@@ -108,26 +149,29 @@ mkdir -p stats
 rm -f stats/*
 
 info "Gathering the data..."
+> packages.log
 
 languages=""
 for package in $(real_contents packages_list | sort); do
 	source=$(correct_exceptions $package)
 	s_name=$(basename $source)
-	#[ $s_name = partman-base ] || [ $s_name = netcfg ] || continue
-	#TODO: allow to ignore a package
 
-	version=$(get_version $s_name)
+	if ! version=$(get_version $s_name); then
+		# packages_exceptions says to skip the package
+		continue
+	fi
 
-	info "processing $source ($version)"
+	info "processing $package ($version)"
+	echo "$s_name ($version)" >>packages.log
 	if [ ! -d $s_name/$version/po ]; then
 		mkdir -p $s_name/$version
-		cd $s_name/$version
+		pushd $s_name/$version >/dev/null
 		if ! svn export $PTAGS/$package/$version/debian/po >/dev/null; then
 			error "no tag for $package ($version) found!"
 			exit 1
 		fi
 	else
-		cd $s_name/$version
+		pushd $s_name/$version >/dev/null
 	fi
 
 	# We need the templates file in case a translation is missing
@@ -150,16 +194,16 @@ for package in $(real_contents packages_list | sort); do
 			fi
 		done
 	done
-	cd ../..
+	popd >/dev/null
 done
 
 info "Calculating statistics..."
+> translation-status
 
 languages="$(echo "$languages" | grep -v "^en$" | sort)"
-> translation-status
 for lang in $languages; do
 	for level in $(seq 1 $NUMLEVELS); do
-		# Take level 1 and 2 together
+		# Sublevels 1 and 2 are taken together
 		if [ $level -ne 2 ]; then
 			total=0; t_trans=0; t_untrans=0
 		fi
@@ -178,7 +222,9 @@ for lang in $languages; do
 		done
 		total=$(($t_trans + $t_untrans))
 
+		# Sublevels 1 and 2 are taken together
 		[ $level -gt 1 ] || continue
+
 		if [ $t_untrans -gt 0 ]; then
 			if [ $(($t_trans * 100 / $total)) -gt 90 ]; then
 				info "$lang is mostly translated at $level: $t_trans/$total"
@@ -200,5 +246,3 @@ for lang in $languages; do
 		fi
 	done
 done
-
-rm packages_list
