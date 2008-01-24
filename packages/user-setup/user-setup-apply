@@ -30,9 +30,11 @@ setpassword () {
 	USER="$1"
 	PASSWD="$2"
 	if [ "$3" = true ]; then
-		PRECRYPTED=-e
+		OPTS=-e
+	else
+		OPTS=-m
 	fi
-	$chroot $ROOT chpasswd $PRECRYPTED -m <<EOF
+	$chroot $ROOT chpasswd $OPTS <<EOF
 $USER:$PASSWD
 EOF
 }
