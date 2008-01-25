@@ -43,8 +43,8 @@ OLDIFS="$IFS"
 NL="
 "
 
-info() {
-	echo "I: $*" >&2
+log() {
+	echo "$*"
 }
 error() {
 	echo "E: $*" >&2
@@ -55,37 +55,32 @@ real_contents() {
 	grep -Ev "^(#.*|)[[:space:]]*$" $1
 }
 
-# For a few packages the source name does not match its directory
-correct_exceptions() {
-	echo $1 | sed -r "s:/(dasd|netdevice)$:/s390-\1:"
-}
-
 # Use rmadison to get the current version of a package in testing
 # Check first if an exception has been defined
 get_version() {
-	local sp madison
-	sp=$1
+	local package madison
+	package=$1
 
 	if [ -r packages_exceptions ]; then
-		version=$(grep "^$sp[[:space:]]" packages_exceptions | \
+		version=$(grep "^$package[[:space:]]" packages_exceptions | \
 			  awk '{print $2}')
 		if [ "$version" = "-" ]; then
-			info "EXCEPTION: skipping $sp"
-			echo "$s_name (skipped)" >>packages.log
+			log "- EXCEPTION: skipping $package"
+			echo "$package (skipped)" >>packages.log
 			return 1
 		elif [ "$version" ]; then
-			info "EXCEPTION: using version '$version' for $sp"
+			log "- EXCEPTION: using version '$version' for $package"
 			echo "$version"
 			return 0
 		fi
 	fi
 
-	madison="$(rmadison -s testing $sp | grep source)"
+	madison="$(rmadison -s testing $package | grep source)"
 	if [ -z "$madison" ]; then
-		error "error getting madison info for $sp for 'testing'"
+		error "error getting madison info for $package for 'testing'"
 		exit 1
 	elif [ $(echo "$madison" | wc -l) -gt 1 ]; then
-		error "got multiple lines from madison for $sp"
+		error "got multiple lines from madison for $package"
 		exit 1
 	fi
 	echo "$madison" | cut -d"|" -f2 | sed "s/[[:space:]]//g"
@@ -148,30 +143,29 @@ version=$(get_version localechooser)
 mkdir -p stats
 rm -f stats/*
 
-info "Gathering the data..."
+log "Gathering the data..."
 > packages.log
 
 languages=""
-for package in $(real_contents packages_list | sort); do
-	source=$(correct_exceptions $package)
-	s_name=$(basename $source)
+for p_dir in $(real_contents packages_list | sort); do
+	package=$(basename $p_dir)
 
-	if ! version=$(get_version $s_name); then
+	if ! version=$(get_version $package); then
 		# packages_exceptions says to skip the package
 		continue
 	fi
 
-	info "processing $package ($version)"
-	echo "$s_name ($version)" >>packages.log
-	if [ ! -d $s_name/$version/po ]; then
-		mkdir -p $s_name/$version
-		pushd $s_name/$version >/dev/null
-		if ! svn export $PTAGS/$package/$version/debian/po >/dev/null; then
-			error "no tag for $package ($version) found!"
+	log "- processing $p_dir ($version)"
+	echo "$package ($version)" >>packages.log
+	if [ ! -d $package/$version/po ]; then
+		mkdir -p $package/$version
+		pushd $package/$version >/dev/null
+		if ! svn export $PTAGS/$p_dir/$version/debian/po >/dev/null; then
+			error "no tag $p_dir/$version found!"
 			exit 1
 		fi
 	else
-		pushd $s_name/$version >/dev/null
+		pushd $package/$version >/dev/null
 	fi
 
 	# We need the templates file in case a translation is missing
@@ -179,7 +173,7 @@ for package in $(real_contents packages_list | sort); do
 	split_levels po/templates.pot
 	for level in $(seq 1 $NUMLEVELS); do
 		echo "template: $(po_status sublevel$level/templates.pot)" \
-			>../../stats/$s_name.$level
+			>../../stats/$package.$level
 	done
 
 	for pofile in po/*.po; do
@@ -190,14 +184,14 @@ for package in $(real_contents packages_list | sort); do
 		split_levels $pofile
 		for level in $(seq 1 $NUMLEVELS); do
 			if stats="$(po_status sublevel$level/$lang.po)"; then
-				echo "$lang: $stats" >>../../stats/$s_name.$level
+				echo "$lang: $stats" >>../../stats/$package.$level
 			fi
 		done
 	done
 	popd >/dev/null
 done
 
-info "Calculating statistics..."
+log "Calculating statistics..."
 > translation-status
 
 languages="$(echo "$languages" | grep -v "^en$" | sort)"
@@ -227,21 +221,21 @@ for lang in $languages; do
 
 		if [ $t_untrans -gt 0 ]; then
 			if [ $(($t_trans * 100 / $total)) -gt 90 ]; then
-				info "$lang is mostly translated at $level: $t_trans/$total"
+				log "- $lang is mostly translated at $level: $t_trans/$total"
 				echo "$lang: $level M" >>translation-status
 			elif [ $(($t_trans * 100 / $total)) -gt 50 ]; then
-				info "$lang is partially translated at $level: $t_trans/$total"
+				log "- $lang is partially translated at $level: $t_trans/$total"
 				echo "$lang: $level P" >>translation-status
 			elif [ $(($t_trans * 100 / $total)) -gt 0 ]; then
-				info "$lang is limited translated at $level: $t_trans/$total"
+				log "- $lang is limited translated at $level: $t_trans/$total"
 				echo "$lang: $level L" >>translation-status
 			else
-				info "$lang is untranslated at $level"
+				log "- $lang is untranslated at $level"
 				echo "$lang: $level U" >>translation-status
 			fi
 			break
 		elif [ $level -eq $NUMLEVELS ]; then
-			info "$lang is fully translated"
+			log "- $lang is fully translated"
 			echo "$lang: $level F" >>translation-status
 		fi
 	done
