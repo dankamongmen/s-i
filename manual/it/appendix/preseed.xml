@@ -1,6 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 50076 -->
-
+<!-- original version: 50744 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1515,6 +1514,33 @@ d-i mirror/http/proxy string
 </screen></informalexample>
   </sect2>
 
+  <sect2 id="preseed-time">
+  <!-- <title>Clock and time zone setup</title> -->
+  <title>Impostazione dell'orologio e del fuso orario</title>
+<informalexample role="example"><screen>
+<!--
+# Controls whether or not the hardware clock is set to UTC.
+--># Controlla se l'orologio hardware deve essere impostato o meno su UTC.
+d-i clock-setup/utc boolean true
+
+<!--
+# You may set this to any valid setting for $TZ; see the contents of
+# /usr/share/zoneinfo/ for valid values.
+--># Questo può essere impostato con qualsiasi valore valido per $TZ; si
+# consulti /usr/share/zoneinfo/ per i valori validi.
+d-i time/zone string US/Eastern
+
+<!--
+# Controls whether to use NTP to set the clock during the install
+--># Determina se usare NTP per impostare l'orologio durante l'installazione
+d-i clock-setup/ntp boolean true
+<!--
+# NTP server to use. The default is almost always fine here.
+--># Server NTP da usare. Quasi sempre è possibile usare quello predefito.
+#d-i clock-setup/ntp-server ntp.example.com
+</screen></informalexample>
+  </sect2>
+
   <sect2 id="preseed-partman">
   <!-- <title>Partitioning</title> -->
   <title>Partizionamento</title>
@@ -1538,7 +1564,6 @@ inclusa nel file di preconfigurazione. Attualmente con la preconfigurazione
 non è possibile partizionare più di un disco.
 
 </para>
-
 <warning><para>
 
 <!--
@@ -1638,8 +1663,8 @@ d-i partman-auto/choose_recipe \
 # (logical) line. This example creates a small /boot partition, suitable
 # swap, and uses the rest of the space for the root partition:
 --># Altrimenti, è possibile mettere un'intera ricetta in una riga. Questo
-# esempio crea una piccola partizione /boot, un'area swap appropriata e usa
-# il resto dello spazio per la partizione root:
+# esempio crea una piccola partizione /boot, un'area swap appropriata e
+# usa il resto dello spazio per la partizione root:
 #d-i partman-auto/expert_recipe string                         \
 #      boot-root ::                                            \
 #              40 50 100 ext3                                  \
@@ -1658,8 +1683,10 @@ d-i partman-auto/choose_recipe \
 #              .
 
 <!--
-# This makes partman automatically partition without confirmation.
---># Questo fa in modo che partman partizioni automaticamente senza conferma.
+# This makes partman automatically partition without confirmation, provided
+# that you told it what to do using one of the methods above.
+--># Questo fa eseguire a partman il partizionamento automatico in base a
+# quanto indicato con uno dei metodi precedenti, senza chidere conferma.
 d-i partman/confirm_write_new_label boolean true
 d-i partman/choose_partition \
 <!--
@@ -1794,30 +1821,34 @@ d-i partman/confirm boolean true
 </screen></informalexample>
   </sect2>
 
-  <sect2 id="preseed-time">
-  <!-- <title>Clock and time zone setup</title> -->
-  <title>Impostazione dell'orologio e del fuso orario</title>
+  <sect2 id="preseed-base-installer">
+  <!-- <title>Base system installation</title> -->
+  <title>Installazione del sistema di base</title>
+<para>
+
+<!--
+There is actually not very much that can be preseeded for this stage of the
+installation. The only questions asked concern the installation of the kernel.
+-->
+
+Al momento non c'è molto da preconfigurare per questo passo
+dell'installazione. Le uniche domande riguardano l'installazione del
+kernel.
+
+</para>
+
 <informalexample role="example"><screen>
 <!--
-# Controls whether or not the hardware clock is set to UTC.
---># Controlla se l'orologio hardware deve essere impostato o meno su UTC.
-d-i clock-setup/utc boolean true
+# Select the initramfs generator used to generate the initrd for 2.6 kernels.
+--># Selezionare il programma per la creazione dell'initrd per i kernel 2.6.
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
 <!--
-# You may set this to any valid setting for $TZ; see the contents of
-# /usr/share/zoneinfo/ for valid values.
---># Questo può essere impostato con qualsiasi valore valido per $TZ; si
-# consulti /usr/share/zoneinfo/ per i valori validi.
-d-i time/zone string US/Eastern
-
-<!--
-# Controls whether to use NTP to set the clock during the install
---># Determina se usare NTP per impostare l'orologio durante l'installazione
-d-i clock-setup/ntp boolean true
-<!--
-# NTP server to use. The default is almost always fine here.
---># Server NTP da usare. Quasi sempre è possibile usare quello predefito.
-#d-i clock-setup/ntp-server ntp.example.com
+# The kernel image (meta) package to be installed; "none" can be used if no
+# kernel is to be installed.
+--># Il (meta)pacchetto con l'immagine del kernel da installare; per non
+# installare un kernel inserire "none".
+#d-i base-installer/kernel/image linux-image-2.6-486
 </screen></informalexample>
   </sect2>
 
@@ -1939,36 +1970,6 @@ $ echo "r00tme" | mkpasswd -s -H MD5
 </screen></informalexample>
 
 </para>
-  </sect2>
-
-  <sect2 id="preseed-base-installer">
-  <!-- <title>Base system installation</title> -->
-  <title>Installazione del sistema di base</title>
-<para>
-
-<!--
-There is actually not very much that can be preseeded for this stage of the
-installation. The only questions asked concern the installation of the kernel.
--->
-
-Al momento non ci sono molte cose da preconfigurare in questo passo
-dell'installazione. Le uniche domande riguardano l'installazione del kernel.
-
-</para>
-
-<informalexample role="example"><screen>
-<!--
-# Select the initramfs generator used to generate the initrd for 2.6 kernels.
---># Selezionare il programma per la creazione dell'initrd per i kernel 2.6.
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
-
-<!--
-# The kernel image (meta) package to be installed; "none" can be used if no
-# kernel is to be installed.
---># Il (meta)pacchetto con l'immagine del kernel da installare; per non
-# installare un kernel inserire "none".
-#d-i base-installer/kernel/image linux-image-2.6-486
-</screen></informalexample>
   </sect2>
 
   <sect2 id="preseed-apt">
@@ -2198,8 +2199,8 @@ d-i grub-installer/with_other_os boolean true
   </sect2>
 
   <sect2 id="preseed-finish">
-  <!-- <title>Finishing up the first stage install</title> -->
-  <title>Termine della prima fase dell'installazione</title>
+  <!-- <title>Finishing up the installation</title> -->
+  <title>Termine dell'installazione</title>
 <informalexample role="example"><screen>
 <!--
 # Avoid that last message about the install being complete.

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
 
    <sect3 id="network-console">
    <!-- <title>Installation Over the Network</title> -->
@@ -134,12 +134,63 @@ la sua correttezza.
 </para><note><para>
 
 <!--
+The <command>ssh</command> server in the installer uses a default
+configuration that does not send keep-alive packets. In principle,
+a connection to the system being installed should be kept open
+indefinitely. However, in some situations &mdash; depending on your
+local network setup &mdash; the connection may be lost after some
+period of inactivity. One common case where this can happen is when
+there is some form of Network Address Translation (NAT) somewhere 
+between the client and the system being installed. Depending on at
+which point of the installation the connection was lost, you may or
+may not be able to resume the installation after reconnecting.
+-->
+
+Il server <command>ssh</command> nell'installatore usa una configurazione
+predefinita che non prevede l'invio di pacchetti keep-alive. In linea di
+principio una connessione verso un sistema in fase di installazione dovrebbe
+essere tenuta aperta indefinitamente. Purtroppo, in alcune situazioni che
+dipendono dalla configurazione della propria rete locale, la connessione
+potrebbe essere interrotta dopo un certo periodo di inattività. Uno dei casi
+più comuni in cui si può verificare questo problema è quando fra il client e
+il sistema che si sta installando è presente una qualche forma di NAT
+(Network Address Translation). La possibilità di riprendere l'installazione
+dopo che la connessione è stata interrotta dipende dal punto a cui era
+l'installazione al momento dell'interruzione.
+
+</para><para>
+
+<!--
+You may be able to avoid the connection being dropped by adding the option
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></userinput>
+when starting the <command>ssh</command> connection, or by adding that
+option in your <command>ssh</command> configuration file. Note however
+that in some cases adding this option may also <emphasis>cause</emphasis>
+a connection to be dropped (for example if keep-alive packets are sent
+during a brief network outage, from which <command>ssh</command> would
+otherwise have recovered), so it should only be used when needed.
+-->
+
+È possibile evitare che la connessione sia interrotta aggiungendo l'opzione
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>valore</replaceable></userinput>
+all'apertura della connessione <command>ssh</command> oppure aggiungendo la
+stessa opzione nel file di configurazione di <command>ssh</command>. Si noti
+che in alcuni casi l'aggiunta di questa opzione potrebbe addirittura
+<emphasis>causare</emphasis> l'interruzione della connessione (per esempio
+se i pacchetti keep-alive sono spediti durante una breve indisponibilità
+della rete, dalla quale <command>ssh</command> poteva recuperare) quindi
+deve essere usata solo quando necessario.
+
+</para></note>
+<note><para>
+
+<!--
 If you install several computers in turn and they happen to have the
 same IP address or hostname, <command>ssh</command> will refuse to connect
 to such host. The reason is that it will have different fingerprint, which
 is usually a sign of a spoofing attack. If you are sure this is not the
 case, you will need to delete the relevant line from
-<filename>~/.ssh/known_hosts</filename> and try again.
+<filename>~/.ssh/known_hosts</filename><footnote>
 -->
 
 Se si esegue l'installazione su più computer, uno di seguito all'altro,
@@ -148,8 +199,25 @@ può capitare che abbiano lo stesso indirizzo IP o lo stesso nomehost e che
 comportamento è che hanno i computer hanno comunque dei fingerprint diversi,
 e questo è solitamente il segnale di un attacco spoofing. Se si è sicuri di
 non essere vittime di un attacco allora si deve cancellare dal file
-<filename>~/.ssh/known_hosts</filename> la riga relativa al computer e poi
-provare nuovamente la connessione.
+<filename>~/.ssh/known_hosts</filename> la riga relativa al computer<footnote>
+
+<para>
+
+<!--
+The following command will remove an existing entry for a host:
+<command>ssh-keygen -R &lt;<replaceable>hostname</replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>.
+-->
+
+Il seguente comando rimuove la riga esistente per un host:
+<command>ssh-keygen -R &lt;<replaceable>nomehost</replaceable>|<replaceable>indirizzo&nbsp;IP</replaceable>&gt;</command>.
+
+</para>
+
+<!--
+</footnote> and try again.
+-->
+
+</footnote> e poi provare nuovamente la connessione.
 
 </para></note><para>
 

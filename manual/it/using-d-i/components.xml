@@ -1,6 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43965 -->
-
+<!-- original version: 50618 -->
 
  <sect1 id="module-details">
  <!-- <title>Using Individual Components</title> -->
@@ -87,6 +86,8 @@ più avanti, nel processo.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -109,15 +110,15 @@ lavoro vero.
 <!--
 As the title of this section indicates, the main task of the next few
 components lies in partitioning your disks, creating filesystems,
-assigning mountpoints and optionally configuring closely related issues
-like LVM or RAID devices.
+assigning mountpoints and optionally configuring closely related options
+like RAID, LVM or encrypted devices.
 -->
 
-Come il titolo di questa sezione suggerisce, il compito principale dei
+Come suggerisce il titolo di questa sezione, il compito principale dei
 prossimi pochi componenti ricade nel partizionamento dei dischi, nella
-creazione dei file system, nell'assegnamento dei punti di mount e,
-opzionalmente, nella configurazione di aspetti correlati da vicino come i
-dispositivi LVM o RAID.
+creazione dei file system, nell'assegnazione dei punti di mount e
+nella configurazione, se necessaria, delle opzioni a essi strettamente
+correlate come i dispositivi RAID, LVM o cifrati.
 
 </para>
 
@@ -129,27 +130,6 @@ dispositivi LVM o RAID.
 &module-mdcfg.xml;
 &module-partman-lvm.xml;
 &module-partman-crypto.xml;
-
-  </sect2>
-
-  <sect2 id="di-system-setup">
-  <!-- <title>Setting up the System</title> -->
-  <title>Configurazione del sistema</title>
-<para>
-
-<!--
-After partitioning the installer asks a few more questions that will be
-used to set up the system it is about to install.
--->
-
-Dopo il partizionamento il programma pone qualche altra domanda necessaria
-per la configurazione del sistema che si sta installando.
-
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
 
   </sect2>
 
@@ -176,20 +156,43 @@ connessione di rete lenta, ciò potrebbe richiedere un certo tempo.
 
   </sect2>
 
+  <sect2 id="di-user-setup">
+  <!-- <title>Setting Up Users And Passwords</title> -->
+  <title>Impostazione di utenti e password</title>
+<para>
+
+<!--
+After the base system has been installed, the installer will allow you
+to set up the <quote>root</quote> account and/or an account for the first
+user. Other user accounts can be created after the installation has been
+completed.
+-->
+
+Dopo aver installato il sistema di base, l'installatore permette di
+configurare l'account <quote>root</quote> e/o un account per il primo
+utente. Si possono creare altri account utente una volta completata
+l'installazione.
+
+</para>
+
+&module-user-setup.xml;
+
+  </sect2>
+
   <sect2 id="di-install-software">
   <!-- <title>Installing Additional Software</title> -->
   <title>Installazione di altri programmi</title>
 <para>
 
 <!--
-After the base system is installed, you have a usable but limited system.
+At this point you have a usable but limited system.
 Most users will want to install additional software on the system to tune it to
 their needs, and the installer allows you do so. This step can take even
 longer than installing the base system if you have a slow computer or
-network.
+network connection.
 -->
 
-Dopo l'installazione del sistema di base è disponibile un sistema usabile ma
+A questo punto è disponibile un sistema usabile ma
 molto limitato. La maggior parte degli utenti vuole installare altri programmi
 per adattare il sistema alle proprie necessità, e il programma d'installazione
 consente di farlo. Se si possiede un computer lento o una connessione di rete
@@ -247,15 +250,18 @@ linkend="boot-dev-select-sun"/>.</phrase>
 <para>
 
 <!--
-These are the last bits to do before rebooting to your new system. It
-mostly consists of tidying up after the &d-i;.
+This is the last step in the Debian installation process during which the
+installer will do any last minute tasks.
+It mostly consists of tidying up after the &d-i;.
 -->
 
-Sono le ultime piccole cose da fare prima di riavviare il nuovo sistema.
-Consistono principalmente nel mettere in ordine dopo il &d-i;.
+Questo è l'ultimo passo del processo d'installazione di Debian durante
+il quale l'installatore compie le ultime operazioni che consistono
+principalmente nel mettere in ordine dopo il &d-i;.
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
 
   </sect2>
