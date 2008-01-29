@@ -59,7 +59,7 @@ fi
 
 partsdir="/usr/lib/pre-pkgsel.d"
 if [ -d "$partsdir" ]; then
-	for script in `ls "$partsdir"/*`; do
+	for script in `ls "$partsdir"/* 2>/dev/null`; do
 		base=$(basename $script | sed 's/[0-9]*//')
 		if ! db_progress INFO pkgsel/progress/$base; then
 			db_subst pkgsel/progress/fallback SCRIPT "$base"
