@@ -42,30 +42,31 @@ usage() {
 		echo
 	fi
 	cat <<EOF
-Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]"
-       $(basename $0) krelease|mrelease [<architecture> ...]"
-       $(basename $0) kclean|mclean [<architecture> ...]"
+Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]
+       $(basename $0) krelease|mrelease [<architecture> ...]
+       $(basename $0) kclean|mclean [<architecture> ...]
 
-Operations starting with 'k' act on linux-kernel-* source packages;"
-those starting with 'm' on linux-module-* packages:"
- - build:   retrieve dependencies and build the udebs"
- - release: show changes; after confirmation call 'debcommit --release'"
- - clean:   remove built and temporary files"
+Operations starting with 'k' act on linux-kernel-* source packages;
+those starting with 'm' on linux-module-* packages:
+ - build:   retrieve dependencies and build the udebs
+ - release: show changes; after confirmation call 'debcommit --release'
+            (see svndirs(1) on how to make tagging work from a branch!)
+ - clean:   remove built and temporary files
 
-If no architecture is specified, an operation will be performed for all"
-official architectures."
+If no architecture is specified, an operation will be performed for all
+official architectures.
 
-Options for 'kbuild' and 'mbuild' operations:"
- -k            keep the temporary files (incl. downloaded dependencies) used"
-               during the build; useful for repeated builds when making"
-               changes to udeb contents or solving build errors"
- --dch         update changelog; automatically adds new entry (if needed)"
-               and a line describing updates in dependencies used"
- -m <extra changelog entry>"
-               add additional lines in changelog; implies --dch"
- -d <distribution>"
-               set named target distribution in changelog"
- --incoming    also check 'incoming' for dependencies"
+Options for 'kbuild' and 'mbuild' operations:
+ -k            keep the temporary files (incl. downloaded dependencies) used
+               during the build; useful for repeated builds when making
+               changes to udeb contents or solving build errors
+ --dch         update changelog; automatically adds new entry (if needed)
+               and a line describing updates in dependencies used
+ -m <extra changelog entry>
+               add additional lines in changelog; implies --dch
+ -d <distribution>
+               set named target distribution in changelog
+ --incoming    also check 'incoming' for dependencies
 EOF
 	exit 1
 }
