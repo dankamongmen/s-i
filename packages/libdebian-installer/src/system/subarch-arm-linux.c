@@ -22,6 +22,7 @@ static struct map map_hardware[] = {
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
     { "Buffalo/Revogear Kurobox Pro", "orion" },
     { "D-Link DNS-323", "orion" },
+    { "QNAP TS-109/TS-209", "orion" },
     { "Marvell Orion-NAS Reference Design", "orion" },
     { "Marvell Orion-2 Development Board", "orion" },
     { "Intel EP80219", "iop32x" },
