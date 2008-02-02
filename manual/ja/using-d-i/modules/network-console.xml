@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
 
    <sect3 id="network-console">
 <!--
@@ -131,19 +131,82 @@ you will have to confirm that it is correct.
 </para><note><para>
 
 <!--
+The <command>ssh</command> server in the installer uses a default
+configuration that does not send keep-alive packets. In principle,
+a connection to the system being installed should be kept open
+indefinitely. However, in some situations &mdash; depending on your
+local network setup &mdash; the connection may be lost after some
+period of inactivity. One common case where this can happen is when
+there is some form of Network Address Translation (NAT) somewhere 
+between the client and the system being installed. Depending on at
+which point of the installation the connection was lost, you may or
+may not be able to resume the installation after reconnecting.
+-->
+インストーラの <command>ssh</command> サーバは、
+keep-alive パケットを送らないというデフォルト設定を使用します。
+原則的に、インストールするシステムへの接続は、無期限に保たれるべきです。
+しかし、ある状況下 (あなたのローカルネットワークの設定に依存する) では、
+不使用時間が続くと接続を失う可能性があります。
+よくある状況は、クライアントとインストールするシステムの間のどこかに、
+ネットワークアドレス変換 (NAT) があることです。
+接続が失われた際のインストールのポイントにより、
+再接続後にインストールを再開できるかどうかが決まるでしょう。
+
+</para><para>
+
+<!--
+You may be able to avoid the connection being dropped by adding the option
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></userinput>
+when starting the <command>ssh</command> connection, or by adding that
+option in your <command>ssh</command> configuration file. Note however
+that in some cases adding this option may also <emphasis>cause</emphasis>
+a connection to be dropped (for example if keep-alive packets are sent
+during a brief network outage, from which <command>ssh</command> would
+otherwise have recovered), so it should only be used when needed.
+-->
+<command>ssh</command> 接続を開始する際や、
+<command>ssh</command> の設定ファイルに、オプション 
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></userinput> 
+を追加して、接続が切れるのを回避できるかもしれません。
+しかしある状況下では、このオプションを追加すると、
+接続が切れる<emphasis>原因</emphasis>になるかもしれないことにご注意ください
+(例えば、普段なら <command>ssh</command> が復旧してしまうような、
+短時間のネットワーク障害中に keep-alive パケットを送るなど)。
+そのため、使用は必要最小限にするべきです。
+
+
+</para></note>
+
+<note><para>
+
+<!--
 If you install several computers in turn and they happen to have the
 same IP address or hostname, <command>ssh</command> will refuse to connect
 to such host. The reason is that it will have different fingerprint, which
 is usually a sign of a spoofing attack. If you are sure this is not the
 case, you will need to delete the relevant line from
-<filename>~/.ssh/known_hosts</filename> and try again.
+<filename>~/.ssh/known_hosts</filename><footnote>
 -->
 順番にいくつものコンピュータにインストールして、
 同じ IP アドレスやホスト名を持っていたりすると、
 <command>ssh</command> はそういったホストへの接続を拒否します。
 指紋が異なっているというのは、通常なりすまし攻撃のサインです。
 なりすまし攻撃ではないことが確かなら、<filename>~/.ssh/known_hosts</filename>
-から関連する行を削除して、もう一度行う必要があります。
+から関連する行を削除して<footnote>
+ 
+<para>
+<!--
+The following command will remove an existing entry for a host:
+<command>ssh-keygen -R &lt;<replaceable>hostname</replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>.
+-->
+以下のコマンドで、既存のホストエントリを削除できます。
+<command>ssh-keygen -R &lt;<replaceable>hostname</replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>
+</para>
+
+<!--
+</footnote> and try again.
+-->
+</footnote>、もう一度行う必要があります。
 
 </para></note><para>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 50736 -->
 
  <sect1 id="linux-upgrade">
 <!--
@@ -29,7 +29,7 @@ command entered in the Debian chroot.
 Red Hat, Mandrake, SUSE から &debian; に移行するユーザの要望で書かれました。
 本節では、*nix コマンドの入力について熟知し、
 ファイルシステムを操作できるのが前提となっています。
-また、<prompt>#</prompt>が Debian chroot に入力されたコマンドを示し、
+本節では、<prompt>#</prompt>が Debian chroot に入力されたコマンドを示し、
 <prompt>$</prompt> はユーザの現在のシステムに入力されるコマンドを表します。
 
 
@@ -52,7 +52,55 @@ media.
 
 </para>
 
+<note><para>
+
+<!--
+As this is a mostly manual procedure, you should bear in mind that you
+will need to do a lot of basic configuration of the system yourself,
+which will also require more knowledge of Debian and of Linux in general
+than performing a regular installation. You cannot expect this procedure
+to result in a system that is identical to a system from a regular
+installation. You should also keep in mind that this procedure only
+gives the basic steps to set up a system. Additional installation and/or
+configuration steps may be needed.
+-->
+これはほとんど手作業になりますから、
+自分でシステムの大量の基本設定を行う必要があり、
+それには通常のインストールよりも Debian や Linuxの知識が必要なことを、
+覚えておいてください。
+また、この手順で通常のインストールと同じシステムになると期待してはいけません。
+これはシステムをセットアップする基本的な手順でしかありません。
+追加インストールや追加設定が必要になるかもしれません。
+
+</para></note>
+
+<note><para>
+
+<!--
+As this is a mostly manual procedure, you should bear in mind that you
+will need to do a lot of basic configuration of the system yourself,
+which will also require more knowledge of Debian and of Linux in general
+than performing a regular installation. You cannot expect this procedure
+to result in a system that is identical to a system from a regular
+installation. You should also keep in mind that this procedure only
+gives the basic steps to set up a system. Additional installation and/or
+configuration steps may be needed.
+-->
+これはほぼ手作業となりますので、多くのシステムの基本設定が必要なことや、
+通常のインストールを実行するよりも、
+Debian や Linux についての一般的な知識が必要になることを念頭に置くべきです。
+この手順により得られるシステムが、通常のインストールにより得られるシステムと、
+同一になることは期待できません。
+この手順が、システムをセットアップする基本的な手順に過ぎないことも、
+念頭に置いてください。
+追加で、インストールや設定の手順が、必要になる可能性があります。
+
+</para></note>
+
   <sect2>
+<!--
+  <title>Getting Started</title>
+-->
   <title>はじめに</title>
 <para>
 
@@ -329,6 +377,81 @@ Debian 基本システムと互換のある端末定義にする必要があるかもしれません。
 </para>
 
    <sect3>
+<!--
+   <title>Create device files</title>
+-->
+   <title>デバイスファイルの作成</title>
+<para>
+
+<!--
+At this point <filename>/dev/</filename> only contains very basic device
+files. For the next steps of the installation additional device files may
+be needed. There are different ways to go about this and which method you
+should use depends on the host system you are using for the installation,
+on whether you intend to use a modular kernel or not, and on whether you
+intend to use dynamic (e.g. using <classname>udev</classname>) or static
+device files for the new system.
+-->
+この時点で、<filename>/dev/</filename> には、
+非常に基本的なデバイスファイルがあるだけです。
+おそらくインストールの次のステップで、追加デバイスファイルが必要になります。
+インストールに使用するホストシステムがモジュール化カーネルを使用するかどうかや、
+新しいシステムで動的デバイスファイル (例: <classname>udev</classname> を使用)
+と静的デバイスファイルのどちらを使用するかにより、
+どの方法で行うかが異なります。
+
+
+</para><para>
+
+<!--
+A few of the available options are:
+-->
+以下のような選択肢があります。
+
+<itemizedlist>
+<listitem><para>
+
+<!--
+create a default set of static device files using
+-->
+次のようにしてデフォルトの静的デバイスファイル群を作成します。
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+<!--
+manually create only specific device files using <command>MAKEDEV</command>
+-->
+<command>MAKEDEV</command> を使用して、
+指定したデバイスファイルのみを手で作成します。
+
+</para></listitem>
+<listitem><para>
+
+<!--
+bind mount /dev from your host system on top of /dev in the target system;
+note that the postinst scripts of some packages may try to create device
+files, so this option should only be used with care
+-->
+ホストシステムの /dev をターゲットシステムの /dev の先頭にマウントします。
+いくつかのパッケージの postinst スクリプトでは、
+デバイスファイルを作成しようとするのに注意してください。
+そのため、この選択肢は注意深く使用するべきです。
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
+
+   <sect3>
+<!--
+   <title>Mount Partitions</title>
+-->
    <title>パーティションのマウント</title>
 <para>
 
@@ -592,10 +715,10 @@ debootstrap は、追加パッケージをインストールする、
 以下の例はソースパッケージとセキュリティ更新を追加しています。
 
 <informalexample><screen>
-deb-src http://ftp.us.debian.org/debian etch main
+deb-src http://ftp.us.debian.org/debian &releasename; main
 
-deb http://security.debian.org/ etch/updates main
-deb-src http://security.debian.org/ etch/updates main
+deb http://security.debian.org/ &releasename;/updates main
+deb-src http://security.debian.org/ &releasename;/updates main
 </screen></informalexample>
 
 <!--
@@ -793,6 +916,18 @@ and working <filename>/boot/grub/menu.lst</filename>.
 最後のコマンドで、
 正しく動作する <filename>/boot/grub/menu.lst</filename> を作成します。
 
+</para><para>
+
+<!--
+Note that this assumes that a <filename>/dev/hda</filename> device file has
+been created. There are alternative methods to install <command>grub</command>,
+but those are outside the scope of this appendix.
+-->
+注意: <filename>/dev/hda</filename> デバイスファイルは、
+すでに作成されていると仮定しています。
+<command>grub</command> のインストールには別の方法もありますが、
+それはこの付録では扱いません。
+
 </para><para arch="x86">
 
 <!--
@@ -807,6 +942,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 

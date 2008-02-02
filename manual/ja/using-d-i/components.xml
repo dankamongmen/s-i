@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43965 -->
+<!-- original version: 50618 -->
 
  <sect1 id="module-details">
 <!--
@@ -89,6 +89,8 @@ hardware detection needs to be repeated later in the process.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -111,13 +113,14 @@ and ready to do some real work.
 <!--
 As the title of this section indicates, the main task of the next few
 components lies in partitioning your disks, creating filesystems,
-assigning mountpoints and optionally configuring closely related issues
-like LVM or RAID devices.
+assigning mountpoints and optionally configuring closely related options
+like RAID, LVM or encrypted devices.
 -->
 本節のタイトルが表すように、
-以下、少数のコンポーネントの主なタスクは、ディスクのパーティションを分割し、
+以下、少数のコンポーネントの主なタスクは、
+ディスクのパーティションを分割し、
 ファイルシステムを作成し、マウントポイントを割り当てて、
-LVM や RAID 装置のような密接に関係する件のオプション設定を行うことです。
+LVM や RAID、暗号化デバイスのような密接に関係する件のオプション設定を行うことです。
 
 </para>
 
@@ -131,27 +134,6 @@ LVM や RAID 装置のような密接に関係する件のオプション設定を行うことです。
 &module-partman-crypto.xml;
   </sect2>
   
-  <sect2 id="di-system-setup">
-<!--
-  <title>Setting up the System</title>
--->
-  <title>システムのセットアップ</title>
-<para>
-
-<!--
-After partitioning the installer asks a few more questions that will be
-used to set up the system it is about to install.
--->
-パーティションの分割が終わると、
-インストーラはインストールを行うシステムの設定に関する質問をしてきます。
-	
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
-
   <sect2 id="di-install-base">
 <!--
   <title>Installing the Base System</title>
@@ -174,7 +156,30 @@ take some time.
 
 &module-base-installer.xml;
   </sect2>
-  
+
+  <sect2 id="di-user-setup">
+<!--
+  <title>Setting Up Users And Passwords</title>
+-->
+  <title>ユーザとパスワードのセットアップ</title>
+<para>
+
+<!--
+After the base system has been installed, the installer will allow you
+to set up the <quote>root</quote> account and/or an account for the first
+user. Other user accounts can be created after the installation has been
+completed.
+-->
+ベースシステムのインストールが終わると、
+インストーラは  <quote>root</quote> アカウントや、
+最初のユーザアカウントのセットアップを行います。
+その他のユーザアカウントは、インストール完了後に作成してください。
+
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
   <sect2 id="di-install-software">
 <!--
   <title>Installing Additional Software</title>
@@ -183,21 +188,21 @@ take some time.
 <para>
 
 <!--
-After the base system is installed, you have a usable but limited system.
+At this point you have a usable but limited system.
 Most users will want to install additional software on the system to tune it to
 their needs, and the installer allows you do so. This step can take even
 longer than installing the base system if you have a slow computer or
-network.
+network connection.
 -->
-基本システムのインストールが終わると、
-制限されたシステムが利用できるようになります。
+この時点では、制限されたシステムが利用できるようになります。
 ほとんどのユーザは、お好みに調整するのに、
 追加ソフトウェアをシステムにインストールするでしょうが、
 これはインストーラから行えます。
-遅いコンピュータや回線を使用していると、
+遅いコンピュータやネットワーク接続を使用していると、
 このステップは基本システムのインストールよりも時間がかかります。
 
 </para>
+
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
@@ -250,14 +255,16 @@ OpenBoot に設定するのでしたら、
 <para>
 
 <!--
-These are the last bits to do before rebooting to your new system. It
-mostly consists of tidying up after the &d-i;.
+This is the last step in the Debian installation process during which the
+installer will do any last minute tasks.
+It mostly consists of tidying up after the &d-i;.
 -->
-新しいシステムを再起動する前に、ほんの少し行うことがあります。
-ほとんどが &d-i; の後片付けです。
+Debian のインストールプロセスの中で、インストーラが行う数タスクが、
+最後のステップになります。ほとんどが &d-i; の後片付けです。
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
