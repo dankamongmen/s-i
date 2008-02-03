@@ -29,8 +29,9 @@ register_cd () {
 	# the CD, and that one of the testing, stable, or unstable links will
 	# point to it. Since the CDs currently have many links, parse the
 	# Release file to get the actual suite name to use.
-	for distlink in stable testing unstable ; do
-		relfile=/cdrom/dists/$distlink/Release
+	# Prefer the suite in default-release.
+	for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
+		relfile=/cdrom/dists/$dir/Release
 		if [ -e $relfile ] &&
 		   egrep -q 'Architectures:.* '$(udpkg --print-architecture)'( |$)' $relfile
 	   	then
