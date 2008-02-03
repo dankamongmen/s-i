@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
 
    <sect3 id="network-console">
    <title>Instalace přes síť</title>
@@ -72,13 +72,42 @@ zda je správný.
 
 </para><note><para>
 
+<command>ssh</command> server v instalačním systému používá výchozí
+nastavení, které neposílá pakety pro udržování spojení. Teoreticky to
+ničemu nevadí, ale prakticky se může stát, že se po určité době
+neaktivity spojení rozpadne. Typickým příkladem může být překlad adres
+(NAT) někde po cestě mezi klientem a instalovaným systémem. Opětovné
+připojení a pokračování v instalace se může, ale nemusí podařit
+&mdash; závisí na kroku instalace, ve kterém se spojení přerušilo.
+
+</para><para>
+
+Rozpadávání spojení můžete předejít tak, že při
+spuštění <command>ssh</command> klienta použijete parametr
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>hodnota</replaceable></userinput>,
+případně že tento parametr zadáte do konfiguračního
+souboru <command>ssh</command>. Mějte však na paměti, že v některých
+případech může právě tento parametr <emphasis>způsobit</emphasis>
+rozpadávání spojení (například pokud se udržovací paket odešle během
+krátkodobého výpadku sítě, který by jinak <command>ssh</command>
+ustálo).
+
+</para></note><note><para>
+
 Instalujete-li postupně několik počítačů, které mají stejnou IP adresu
 nebo jméno, <command>ssh</command> se odmítne k takovému počítači
 připojit. Důvodem je odlišný kryptografický otisk, což obvykle
 indikuje útok, kdy se záškodník vydává za cílový počítač. Pokud jste
 si jisti, že to není tento případ, budete muset ze souboru
-<filename>~/.ssh/known_hosts</filename> smazat příslušný řádek
-a připojení zopakovat.
+<filename>~/.ssh/known_hosts</filename> smazat příslušný
+řádek<footnote><para>
+
+Například příkazem
+<command>ssh-keygen -R &lt;<replaceable>počítač</replaceable>&gt;</command>
+nebo
+<command>ssh-keygen -R &lt;<replaceable>IP&nbsp;adr.</replaceable>&gt;</command>.
+
+</para></footnote> a připojení zopakovat.
 
 </para></note><para>
 

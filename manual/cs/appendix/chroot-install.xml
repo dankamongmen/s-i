@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 44410 -->
+<!-- original version: 50736 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalace Debianu ze stávajícího unixového/linuxového systému</title>
@@ -23,7 +23,15 @@ uživatelská data a plynule přejít k nové distribuci bez zbytečných
 prostojů. Tento druh instalace je též vhodný pro systémy s podivným
 hardwarem, který jinak není podporován instalačními médii.
 
-</para>
+</para><note><para>
+
+Protože se z velké části jedná o ruční postup, měli byste mít na
+paměti, že spoustu věcí, které běžně řeší instalační program sám, nyní
+budete muset provádět sami. To také klade větší nároky na znalosti
+Debianu a GNU/Linuxu obecně. Následující návod řeší pouze základní
+nastavení systému, je možné, že bude potřeba provést další kroky.
+
+</para></note>
 
   <sect2>
   <title>Přípravné práce</title>
@@ -200,6 +208,53 @@ základním systémem Debianu:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+   <title>Vytvoření souborů zařízení</title>
+<para>
+
+Adresář <filename>/dev</filename> nyní obsahuje několik základních
+souborů zařízení, avšak pro další instalaci může být zapotřebí
+dalších zařízení. Další postup závisí na různých faktorech, jako je
+typ hostitelského systému, zda hodláte použít modulární jádro a zda
+chcete soubory zařízení v novém systému spravovat staticky nebo
+dynamicky (například pomocí <classname>udev</classname>).
+
+</para><para>
+
+Několik možných postupů:
+
+<itemizedlist>
+<listitem><para>
+
+Vytvořte základní sadu statických souborů zařízení příkazy:
+
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+Pomocí příkazu <command>MAKEDEV</command> ručně vytvořte pouze ty
+soubory zařízení, které potřebujete.
+
+</para></listitem>
+<listitem><para>
+
+Do instalovaného systému připojte adresář <filename>/dev</filename>
+z hostitelského systému (parametr <userinput>bind</userinput>
+příkazu <command>mount</command>). S touto možností byste však měli
+být opatrní, protože některé balíky při instalaci vytvářejí nová
+zařízení, což nemusí být to, co chcete, aby se promítlo do
+hostitelského systému.
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <title>Připojení oblastí</title>
@@ -391,10 +446,10 @@ dalších balíků, ale je možné, že budete chtít přidat další zdroje,
 například pro bezpečnostní aktualizace, nebo pro zdrojové balíky:
 
 <informalexample><screen>
-deb-src http://ftp.cz.debian.org/debian etch main
+deb-src http://ftp.cz.debian.org/debian &releasename; main
 
-deb http://security.debian.org/ etch/updates main
-deb-src http://security.debian.org/ etch/updates main
+deb http://security.debian.org/ &releasename;/updates main
+deb-src http://security.debian.org/ &releasename;/updates main
 </screen></informalexample>
 
 Po úpravách seznamu zdrojů nezapomeňte spustit příkaz
@@ -523,6 +578,11 @@ konfigurační soubor <filename>/boot/grub/menu.lst</filename>.
 
 </para><para arch="x86">
 
+V příkladu se předpokládá existence souboru zařízení
+<filename>/dev/hda</filename>.
+
+</para><para arch="x86">
+
 Pro inspiraci nabízíme minimální <filename>/etc/lilo.conf</filename>:
 
 <informalexample><screen>
@@ -532,6 +592,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
