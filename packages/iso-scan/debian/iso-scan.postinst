@@ -41,10 +41,10 @@ register_cd () {
 			db_set cdrom/suite $suite
 			db_set cdrom/codename $codename
 			db_subst iso-scan/success SUITE $suite
-			
+
 			description=`sed -n 's/^Description: *//p' $relfile`
 			db_subst iso-scan/success DESCRIPTION $description
-			
+
 			return 0
 		fi
 	done
@@ -77,6 +77,10 @@ try_iso () {
 					anna-install choose-mirror || true
 				else
 					anna-install apt-cdrom-setup || true
+
+					# Install <codename>-support udeb (if available).
+					db_get cdrom/codename
+					anna-install $RET-support || true
 				fi
 				exit 0
 			else
