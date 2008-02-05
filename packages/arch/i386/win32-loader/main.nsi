@@ -1,5 +1,5 @@
 ; Debian-Installer Loader
-; Copyright (C) 2007  Robert Millan <rmh@aybabtu.com>
+; Copyright (C) 2007,2008  Robert Millan <rmh@aybabtu.com>
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -62,7 +62,8 @@ UninstPage instfiles
 
 Var /GLOBAL c
 Var /GLOBAL d
-Var /GLOBAL preseed
+Var /GLOBAL preseed_cmdline
+Var /GLOBAL preseed_cfg
 Var /GLOBAL proxy
 Var /GLOBAL arch
 
@@ -114,8 +115,8 @@ Function ShowExpert
 ; Do initialisations as early as possible, but not before license has been
 ; accepted unless absolutely necessary.
 
-; ********************************************** Initialise $preseed
-  StrCpy $preseed " "
+; ********************************************** Initialise $preseed_cmdline
+  StrCpy $preseed_cmdline " "
 ; ********************************************** Initialise $c
   ; FIXME: this line is duplicated in the uninstaller.  keep in sync!
   ${GetRoot} $WINDIR $c
@@ -220,7 +221,9 @@ Function ShowRescue
 
   ReadINIStr $0 $PLUGINSDIR\rescue.ini "Field 3" "State"
   ${If} $0 == "1"
-    StrCpy $preseed "$preseed rescue/enable=true"
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i rescue/enable boolean true"
   ${Endif}
 FunctionEnd
 
@@ -263,9 +266,9 @@ ${Endif}
 
 ; ********************************************** Preseed vga mode
   ${If} "$user_interface" == "graphical"
-    StrCpy $preseed "$preseed video=vesa:ywrap,mtrr vga=788"
+    StrCpy $preseed_cmdline "$preseed_cmdline video=vesa:ywrap,mtrr vga=788"
   ${Else}
-    StrCpy $preseed "$preseed vga=normal"
+    StrCpy $preseed_cmdline "$preseed_cmdline vga=normal"
   ${EndIf}
 FunctionEnd
 
@@ -278,7 +281,7 @@ Function Download
     Pop $1
     ; Filename
     Pop $2
-    ; Let it fail?
+    ; Allow it to fail?
     Pop $3
     Var /GLOBAL nsisdl_proxy
     ${If} $proxy == ""
@@ -363,9 +366,15 @@ Function ShowDesktop
   ${Endif}
 !ifdef NETWORK_BASE_URL
   ${If} $debian_release == "etch"
-    StrCpy $preseed "$preseed tasks=\$\"$_desktop-desktop, standard\$\""
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+tasksel tasksel/first multiselect $_desktop-desktop, standard$\n\
+tasksel tasksel/first seen true"
   ${Else}
-    StrCpy $preseed "$preseed desktop=$_desktop-desktop"
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+tasksel tasksel/desktop multiselect $_desktop-desktop$\n\
+tasksel tasksel/desktop seen true"
   ${Endif}
 !else
 !endif
@@ -415,7 +424,7 @@ proxyless:
       ${If} $1 != ""
         StrCpy $0 "$0_$1"
       ${Endif}
-      StrCpy $preseed "$preseed locale=$0"
+      StrCpy $preseed_cmdline "$preseed_cmdline locale=$0"
     ${Endif}
   ${Endif}
 
@@ -427,7 +436,7 @@ proxyless:
     ${If} $0 == ""
       StrCpy $0 "localdomain"
     ${Endif}
-    StrCpy $preseed "$preseed domain?=$0"
+    StrCpy $preseed_cmdline "$preseed_cmdline domain?=$0"
   ${EndIf}
 
 ; ********************************************** preseed timezone
@@ -437,7 +446,9 @@ proxyless:
   ${Endif}
   ReadINIStr $0 $PLUGINSDIR\maps.ini "timezones" "$0"
   ${If} $0 != ""
-    StrCpy $preseed "$preseed time/zone?=$0"
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i time/zone string $0"
   ${Endif}
 
 ; ********************************************** preseed keymap
@@ -451,13 +462,18 @@ proxyless:
   ${If} $0 != ""
     ${If} $expert == true
       MessageBox MB_YESNO|MB_ICONQUESTION $(detected_keyboard_is) IDNO keyboard_bad_guess
-      StrCpy $preseed "$preseed console-keymaps-at/keymap=$0"
+      StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i console-keymaps-at/keymap select $0$\n\
+d-i console-keymaps-at/keymap seen true"
       Goto keyboard_end
 keyboard_bad_guess:
       MessageBox MB_OK $(keyboard_bug_report)
 keyboard_end:
     ${Else}
-      StrCpy $preseed "$preseed console-keymaps-at/keymap?=$0"
+      StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i console-keymaps-at/keymap select $0"
     ${Endif}
   ${Endif}
 
@@ -469,19 +485,21 @@ keyboard_end:
     ${If} $0 == ""
       StrCpy $0 "debian"
     ${Endif}
-    StrCpy $preseed "$preseed hostname?=$0"
+    StrCpy $preseed_cmdline "$preseed_cmdline hostname?=$0"
   ${EndIf}
 
 ; ********************************************** preseed priority
   ${If} $expert == true
-    StrCpy $preseed "$preseed priority=low"
+    StrCpy $preseed_cmdline "$preseed_cmdline priority=low"
   ${Endif}
 
 ; ********************************************** preseed user-fullname
   systeminfo::username
   Pop $0
   ${If} $0 != ""
-    StrCpy $preseed "$preseed passwd/user-fullname?=\$\"$0\$\""
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i passwd/user-fullname string $0"
   ${Endif}
 
 !ifdef NETWORK_BASE_URL
@@ -492,7 +510,18 @@ keyboard_end:
   Push "${NETWORK_BASE_URL}"
   Call Download
   ${If} $0 == "success"
-    StrCpy $preseed "$preseed preseed/url=${NETWORK_BASE_URL}/preseed.cfg"
+    StrCpy $preseed_cfg "$preseed_cfg$\n$\n"
+    ClearErrors
+    FileOpen $0 $PLUGINSDIR\preseed.cfg r
+network_preseed_loop:
+    FileRead $0 $1
+    IfErrors +3
+    StrCpy $preseed_cfg "\
+$preseed_cfg\
+$1"
+    Goto network_preseed_loop
+    FileClose $0
+    StrCpy $preseed_cfg "$preseed_cfg$\n"
   ${Endif}
 !endif
 
@@ -511,23 +540,23 @@ keyboard_end:
 !ifdef NETWORK_BASE_URL
     WriteINIStr $PLUGINSDIR\custom.ini "Field 8" "State" "$base_url"
 !endif
-    WriteINIStr $PLUGINSDIR\custom.ini "Field 9" "State" "$preseed"
+    WriteINIStr $PLUGINSDIR\custom.ini "Field 9" "State" "$preseed_cmdline"
     InstallOptions::dialog $PLUGINSDIR\custom.ini
     ReadINIStr $proxy		$PLUGINSDIR\custom.ini "Field 6" "State"
     ReadINIStr $boot_ini	$PLUGINSDIR\custom.ini "Field 7" "State"
 !ifdef NETWORK_BASE_URL
     ReadINIStr $base_url	$PLUGINSDIR\custom.ini "Field 8" "State"
 !endif
-    ReadINIStr $preseed		$PLUGINSDIR\custom.ini "Field 9" "State"
+    ReadINIStr $preseed_cmdline	$PLUGINSDIR\custom.ini "Field 9" "State"
   ${Endif}
 
 ; do this inmediately after custom.ini, because proxy settings can be
 ; overriden there
 ; ********************************************** preseed proxy
   ${If} $proxy == ""
-    StrCpy $preseed "$preseed mirror/http/proxy="
+    StrCpy $preseed_cmdline "$preseed_cmdline mirror/http/proxy="
   ${Else}
-    StrCpy $preseed "$preseed mirror/http/proxy=http://$proxy/"
+    StrCpy $preseed_cmdline "$preseed_cmdline mirror/http/proxy=http://$proxy/"
   ${Endif}
 FunctionEnd
 
@@ -573,20 +602,37 @@ Section "Debian-Installer Loader"
 
 ; We're about to write down our preseed line.  This would be a nice place
 ; to add post-install parameters.
-  StrCpy $preseed "$preseed --"
+  StrCpy $preseed_cmdline "$preseed_cmdline --"
 
 ; ********************************************** preseed quietness
   ${If} $expert == false
-    StrCpy $preseed "$preseed quiet"
+    StrCpy $preseed_cmdline "$preseed_cmdline quiet"
   ${Endif}
 
+; ********************************************** grub.cfg
   FileOpen $0 $c\grub.cfg w
   FileWrite $0 "\
 search	--set /debian/initrd.gz$\n\
-linux	/debian/linux $preseed$\n\
+linux	/debian/linux $preseed_cmdline$\n\
 initrd	/debian/initrd.gz$\n\
 boot"
   FileClose $0
+
+; ********************************************** cpio hack
+  File /oname=$PLUGINSDIR\cpio.exe /usr/share/win32/cpio.exe
+  File /oname=$PLUGINSDIR\gzip.exe /usr/share/win32/gzip.exe
+
+  FileOpen $0 $PLUGINSDIR\preseed.cfg w
+  FileWrite $0 "$preseed_cfg$\n"
+  FileClose $0
+
+  ; cpio awkward CLI, meet Winf**k awkward CLI
+  FileOpen $0 $PLUGINSDIR\cpio_list w
+  FileWrite $0 "preseed.cfg"
+  FileClose $0
+
+  nsExec::Exec '"cmd.exe" /c cd $PLUGINSDIR && cpio.exe -o -H newc < cpio_list > newc_chunk'
+  nsExec::Exec '"cmd.exe" /c cd $PLUGINSDIR && gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz'
 
 ; ********************************************** Needed for systems with compressed NTFS
   nsExec::Exec '"compact" /u $c\g2ldr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
