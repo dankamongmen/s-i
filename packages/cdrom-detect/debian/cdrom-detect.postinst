@@ -175,6 +175,10 @@ if [ ! -e /cdrom/.disk/base_installable ]; then
 	anna-install choose-mirror || true
 else
 	anna-install apt-cdrom-setup || true
+
+	# Install <codename>-support udeb (if available).
+	db_get cdrom/codename
+	anna-install $RET-support || true
 fi
 
 exit 0
