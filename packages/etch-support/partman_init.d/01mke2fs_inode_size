@@ -1,11 +1,6 @@
 #! /bin/sh
 set -e
 
-case $(archdetect) in
-    i386/*|amd64/*)
-	if grep -q "inode_size = 256" /etc/mke2fs.conf; then
-		sed -ir "s/(inode_size =) 256/\1 128/" /etc/mke2fs.conf
-		logger -t partman "Default inode size for mk2efs changed to 128"
-	fi
-	;;
-esac
+# Replace mke2fs.conf to ensure defaults compatible with Etch
+cp /etc/mke2fs.conf /etc/mke2fs.conf.orig
+cp /usr/share/etch-support/mke2fs.conf /etc/mke2fs.conf
