@@ -32,7 +32,7 @@
 #   - take parameter specifying version range
 
 suite1=unstable
-suite2=testing
+suite2=stable
 
 changelog=$1/debian/changelog
 package=$(basename $(echo $1 | sed "s:/*$::"))
@@ -59,8 +59,9 @@ get_version () {
 	if [ -z "$rmadison_out" ]; then
 		get_rmadison 
 	fi
-	# Assumes higest version listed last
-	echo "$rmadison_out" | grep " $1 " | awk '{print $3}' | tail -n1
+	# Assumes higest version listed last; ignore stable updates
+	echo "$rmadison_out" | grep " $1 " | awk '{print $3}' | \
+		tail -n1 | sed -r "s/[a-z]+[0-9]$//"
 }
 
 checkversion () {
