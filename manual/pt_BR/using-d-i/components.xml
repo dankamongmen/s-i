@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43965 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.08.23 -->
+<!-- original version: 50618 -->
 <!-- updated 39622:43965 by Felipe Augusto van de Wiel (faw) 2007.01.14 -->
+<!-- updated 43965:50618 by Felipe Augusto van de Wiel (faw) 2008.02.06 -->
 
  <sect1 id="module-details">
  <title>Usando os componentes individuais</title>
@@ -54,6 +54,8 @@ repetida depois durante este processo.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -67,8 +69,8 @@ a necessidade do usuário e pronto para fazer algum trabalho real.
 
 Como o título desta seção indica, a tarefa principal dos próximos poucos
 componentes se resume em particionar seus discos, criar sistemas de
-arquivos, especificar pontos de montagem e opcionalmente configurar
-coisas mais especificas como LVM ou dispositivos de RAID.
+arquivos, especificar pontos de montagem e opcionalmente configurar opções
+mais diretamente relacionadas como dispositivos RAID, LVM ou criptografados.
 
 </para>
 
@@ -81,20 +83,6 @@ coisas mais especificas como LVM ou dispositivos de RAID.
 &module-partman-lvm.xml;
 &module-partman-crypto.xml;
   </sect2>
-
-  <sect2 id="di-system-setup">
-  <title>Configurando o Sistema</title>
-<para>
-
-Após o particionamento o instalador fará mais algumas perguntas que serão
-usadas para configurar o sistema que está para ser instalado.
-       
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
 
   <sect2 id="di-install-base">
   <title>Instalando o sistema básico</title>
@@ -110,17 +98,32 @@ isto pode levar algum tempo.
 &module-base-installer.xml;
   </sect2>
 
+  <sect2 id="di-user-setup">
+  <title>Configurando Usuários e Senhas</title>
+<para>
+
+Após o sistema básico estar instalado, o instalador abrirá opção para você
+configurar a conta do <quote>root</quote> e/ou uma conta para o primeiro
+usuário. Outras contas de usuário podem ser criadas após a instalação ter
+sido completada.
+
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
   <sect2 id="di-install-software">
   <title>Instalando Programas Adicionais</title>
 <para>
 
-Após o sistema básico estar instalado, você tem um sistema usável mas limitado.
+Neste momento, você tem um sistema usável mas limitado.
 A maioria dos usuários vai querer instalar programas adicionais no sistema para
 personalizá-lo às suas necessidades, e o instalador permite que você faça isso.
 Este passo posso ser ainda mais demorado do que a instalação do sistema básico
 se você tem uma conexão de rede ou computador lento(s).
 
 </para>
+
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
@@ -158,11 +161,13 @@ OpenBoot para inicializar através da rede por padrão, veja
   <title>Finalizando a Instalação</title>
 <para>
 
-Estes são os últimos detalhes a serem feitos antes de reiniciar para seu
-Debian. Eles consistem mais em configurações após &d-i;.
+Esta é a última etapa do processo de instalação do Debian durante o qual
+o instalador fará quaisquer tarefas restantes.
+Ela consiste, em sua maioria, de ajustes dos últimos detalhes pós &d-i;.
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 

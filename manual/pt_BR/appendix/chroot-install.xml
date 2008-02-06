@@ -1,9 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.08.06 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.10.15 -->
-<!-- updated 41453:44016 by Felipe Augusto van de Wiel (faw) 2007.01.16 -->
+<!-- original version: 50736 -->
 <!-- updated 44016:44410 by Felipe Augusto van de Wiel (faw) 2007.02.18 -->
+<!-- updated 44410:50736 by Felipe Augusto van de Wiel (faw) 2008.02.06 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalando a &debian; a partir de um sistema Unix/Linux</title>
@@ -32,6 +30,19 @@ não se comportam de forma amigável com vários tipos de
 inicialização ou mídias de instalação.
 
 </para>
+
+<note><para>
+
+Como esse é, em sua grande maioria, um procedimento manual, tenha em mente
+que você mesmo terá que fazer várias configurações básicas do sistema, o que
+também demandará muito mais conhecimento do Debian e do Linux em geral do
+que a execução de uma instalação normal. Você não pode esperar que este
+procedimento resulte em um sistema idêntico ao de uma instalação normal.
+Você deverá ter em mente que este procedimento só dá os passos básicos
+para configurar um sistema. Passos adicionais de instalação e/ou configuração
+podem ser necessários.
+
+</para></note>
 
   <sect2>
   <title>Iniciando</title>
@@ -214,6 +225,51 @@ terminal para ser compatível com o sistema base Debian, por exemplo:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+   <title>Criar arquivos de dispositivo <quote>device files</quote></title>
+<para>
+
+Neste ponto, o <filename>/dev/</filename> contém somente arquivos de
+dispositivos básicos. Para os próximos passos da instalação, arquivos de
+dispositivos adicionais podem ser necessários. Há diferentes formas de
+lidar com isso e qual método você deverá usar depende do sistema hospedeiro
+que você está usando para a instalação, se você pretende ou não usar um
+kernel modular, e se você pretende usar arquivos de dispositivo dinâmicos
+(e.g. usando <classname>udev</classname>) ou estáticos para o novo sistema.
+
+</para><para>
+
+Algumas das opções disponíveis são:
+
+<itemizedlist>
+<listitem><para>
+
+criar um conjunto padrão de arquivos de dispositivo estáticos usando
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+manualmente, criar somente arquivos de dispositivo específicos usando
+<command>MAKEDEV</command>
+
+</para></listitem>
+<listitem><para>
+
+montar por <quote>bind</quote> o /dev do seu sistema hospedeiro sobre o /dev
+do sistema alvo; note que os scripts <quote>postinst</quote> de alguns
+pacotes podem tentar criar arquivos de dispositivo, por isso essa opção deverá
+ser usada com cuidado
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <title>Montando as Partições</title>
@@ -405,10 +461,10 @@ pode querer adicionar algumas fontes extra, por exemplo, para os códigos-fonte
 dos pacotes e atualizações de segurança:
 
 <informalexample><screen>
-deb-src http://ftp.us.debian.org/debian etch main
+deb-src http://ftp.us.debian.org/debian &releasename; main
 
-deb http://security.debian.org/ etch/updates main
-deb-src http://security.debian.org/ etch/updates main
+deb http://security.debian.org/ &releasename;/updates main
+deb-src http://security.debian.org/ &releasename;/updates main
 </screen></informalexample>
 
 Tenha certeza de executar <userinput>aptitude update</userinput> após ter
@@ -531,8 +587,14 @@ Instalar e configurar o <classname>grub</classname> é tão fácil quanto:
 </screen></informalexample>
 
 O segundo comando irá instalar o <command>grub</command> (neste caso na MBR
-do <literal>hda</literal>). O último comando irá criar um arquivo
+do <literal>hda</literal>). O último comando criará um arquivo
 <filename>/boot/grub/menu.lst</filename> são e funcional.
+
+</para><para>
+
+Note que isto assume que um arquivo de dispositivo
+<filename>/dev/hda</filename> foi criado. Há métodos alternativos para instalar
+o <command>grub</command> mas eles estão fora do escopo deste apêndice.
 
 </para><para arch="x86">
 
@@ -546,6 +608,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
