@@ -364,7 +364,6 @@ Function ShowDesktop
   ${If} $_desktop == "gnome"
     Return ; GNOME is already default, do nothing
   ${Endif}
-!ifdef NETWORK_BASE_URL
   ${If} $debian_release == "etch"
     StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
@@ -376,8 +375,6 @@ $preseed_cfg$\n\
 tasksel tasksel/desktop multiselect $_desktop-desktop$\n\
 tasksel tasksel/desktop seen true"
   ${Endif}
-!else
-!endif
 FunctionEnd
 
 Function ShowCustom
