@@ -160,10 +160,8 @@ create_text () {
             CHARSET=EUC-KR ;;
         ru)
             CHARSET=KOI8-R ;;
-        cs|el|hu|ro|zh_CN|zh_TW)
-            CHARSET=UTF-8 ;;
         *)
-            CHARSET=ISO-8859-1 ;;
+            CHARSET=UTF-8 ;;
     esac
     
     HOME=$tempdir w3m -dump $tempdir/install.${language}.corr.html \
