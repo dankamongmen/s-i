@@ -156,8 +156,6 @@ create_text () {
     case "$language" in
         ja)
             CHARSET=EUC-JP ;;
-        ko)
-            CHARSET=EUC-KR ;;
         ru)
             CHARSET=KOI8-R ;;
         *)
