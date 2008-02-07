@@ -29,7 +29,7 @@ if [ $(grep "^deb cdrom:" /target/etc/apt/sources.list | wc -l) -gt 1 ]; then
 fi
 
 ERRCODE=0
-in-target sh -c "debconf-apt-progress --logstderr --no-progress -- apt-get -o APT::Install-Recommends=false -y --no-remove install $packages" || ERRCODE=$?
+in-target sh -c "debconf-apt-progress --no-progress --logstderr -- apt-get -o APT::Install-Recommends=false -q -y --no-remove install $packages" || ERRCODE=$?
 
 if [ "$MULTICD" ]; then
 	load-install-cd "/target" || true
