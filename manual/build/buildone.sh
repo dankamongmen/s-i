@@ -278,13 +278,6 @@ for format in $formats ; do
                 continue
             fi
             ;;
-        ko)
-            if [ "$web_build" ] && [ "$format" = "pdf" -o "$format" = "ps" ] ; then
-                echo "Warning: pdf and ps formats are currently not supported for Korean for the website"
-                BUILD_SKIP="$BUILD_SKIP $format"
-                continue
-            fi
-            ;;
     esac
 
     case $format in
