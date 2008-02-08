@@ -154,12 +154,8 @@ create_text () {
 
     # Set encoding for output file
     case "$language" in
-        ja)
-            CHARSET=EUC-JP ;;
-        ru)
-            CHARSET=KOI8-R ;;
-        *)
-            CHARSET=UTF-8 ;;
+        ru)  CHARSET=KOI8-R ;;
+        *)   CHARSET=UTF-8 ;;
     esac
     
     HOME=$tempdir w3m -dump $tempdir/install.${language}.corr.html \
