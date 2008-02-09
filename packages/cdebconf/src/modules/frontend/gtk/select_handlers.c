@@ -440,6 +440,26 @@ static gulong connect_signal_to_row(GObject * object, const gchar * signal,
                                  0 /* no connect options */);
 }
 
+/** Handler for the "cursor-changed" signal that forces the cursor to stay on
+ * the first column.
+ *
+ * This will disallow the selection of option descriptions during multiselect.
+ *
+ * @param view the tree view
+ * @param fe cdebconf frontend
+ */
+static void handle_cursor_changed(GtkTreeView * view,
+                                  struct frontend * fe)
+{
+    GtkTreePath * path;
+
+    gtk_tree_view_get_cursor(view, &path, NULL);
+    g_signal_handlers_block_by_func(view, handle_cursor_changed, fe);
+    gtk_tree_view_set_cursor(view, path, gtk_tree_view_get_column(view, 0),
+                             FALSE /* no editing */);
+    g_signal_handlers_unblock_by_func(view, handle_cursor_changed, fe);
+}
+
 /** Create widget for multiselect question in single question form.
  *
  * This will also register the corresponding setter function.
@@ -486,6 +506,9 @@ static int create_multiselect_list(struct frontend * fe,
     if (!IS_SPECIAL_QUESTION(question)) {
         hide_expanders(GTK_TREE_VIEW(view));
     }
+
+    g_signal_connect(G_OBJECT(view), "cursor-changed",
+                     G_CALLBACK(handle_cursor_changed), fe);
 
     /* select the first row */
     gtk_tree_model_get_iter_first(model, &iter);
