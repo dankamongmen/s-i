@@ -278,6 +278,19 @@ static gboolean handle_cancel_key(GtkWidget * widget, GdkEventKey * key,
     return FALSE;
 }
 
+/** Handler for the "clicked" signal on cancel button.
+ *
+ * @param widget button
+ * @param fe cdebconf frontend
+ */
+static void handle_cancel_click(GtkWidget * widget,
+                                struct frontend * fe)
+{
+    /* Give user feedback that button has been clicked. */
+    gtk_widget_set_sensitive(widget, FALSE);
+    cdebconf_gtk_set_answer_goback(fe);
+}
+
 /** Create the "Cancel" button.
  *
  * @param progress_data progress data
@@ -295,7 +308,7 @@ static void create_cancel_button(struct progress_data * progress_data)
     g_free(label);
 
     g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(cdebconf_gtk_set_answer_goback), fe);
+                     G_CALLBACK(handle_cancel_click), fe);
     cdebconf_gtk_add_global_key_handler(
         fe, button, G_CALLBACK(handle_cancel_key));
     cdebconf_gtk_add_button(fe, button);
