@@ -253,7 +253,7 @@ void cdebconf_gtk_hide_progress(struct frontend * fe)
                                  progress_data->progress_box);
         }
         if (NULL != progress_data->cancel_button) {
-            gtk_container_remove(GTK_CONTAINER(fe_data->target_box),
+            gtk_container_remove(GTK_CONTAINER(fe_data->action_box),
                                  progress_data->cancel_button);
         }
     }

@@ -477,7 +477,7 @@ static void wait_answer(struct frontend * fe)
  *    for the next frontend call.
  *
  * If a progress was running, the widgets are hidden at the beginning
- * of the procedure.
+ * of the procedure and shown at the end.
  *
  * @param fe cdebconf frontend
  * @return the debconf status corresponding to user actions
@@ -535,6 +535,9 @@ int cdebconf_gtk_go(struct frontend * fe)
     }
     cdebconf_gtk_empty_target_box(fe);
     destroy_buttons(fe);
+    if (NULL != fe_data->progress_data) {
+        cdebconf_gtk_show_progress(fe);
+    }
     gdk_threads_leave();
 
 end:
