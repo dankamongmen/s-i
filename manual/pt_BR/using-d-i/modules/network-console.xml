@@ -1,5 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
+<!-- updated 31173:50787 by Felipe Augusto van de Wiel (faw) 2008.02.09 -->
 
    <sect3 id="network-console">
    <title>Instalação Pela Rede</title>
@@ -72,12 +73,46 @@ se está correto.
 
 </para><note><para>
 
+O servidor <command>ssh</command> no instalador usa uma configuração
+padrão que não envia pacotes <quote>keep-alive</quote>. Em princípio,
+uma conexão ao sistema sendo instalado deveria ser mantida aberta
+indefinidamente. No entanto, em algumas situações &mdash; dependendo
+da sua configuração de rede local &mdash; a conexão pode ser perdida
+após um período de inatividade. Um caso comum onde isso pode acontecer
+é quando há alguma forma de Tradução de Endereços de Rede (NAT &mdash;
+<quote>Network Address Translation</quote>) em algum lugar entre o cliente
+e o sistema sendo instalado. Dependendo do ponto da instalação no qual a
+conexão foi perdida, você pode ou não ser capaz de retomar a instalação
+após reconectar.
+
+</para><para>
+
+Você pode evitar que a conexão caia adicionando a opção
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>valor</replaceable></userinput>
+quando iniciar a conexão <command>ssh</command>, ou adicionando essa opção
+no arquivo de configuração do <command>ssh</command>. Note, no entanto, que
+em alguns casos, adicionar esta opção pode também <emphasis>causar</emphasis>
+quedas de conexão (por exemplo, se pacotes <quote>keep-alive</quote> são
+enviados durante uma breve queda na rede, da qual o <command>ssh</command>
+teria retomado), portanto só deverá ser usada quando necessário.
+
+</para></note>
+
+<note><para>
+
 Se você instalar vários computadores ao mesmo tempo e acontecer de ter
 o mesmo endereço IP ou nome de host, <command>ssh</command> recusará a
 conectar a este host. A razão é que ele terá um fingerprint diferente,
 o que geralmente é um sinal de ataque de spoofing. Se você estiver 
 certo de que este não é o caso, você precisa remover a linha relevante
-do <filename>~/.ssh/known_hosts</filename> e tentar novamente.
+do <filename>~/.ssh/known_hosts</filename><footnote>
+
+<para>
+O seguinte comando removerá uma entrada existente para uma máquina:
+<command>ssh-keygen -R &lt;<replaceable>nome&nbsp;da&nbsp;máquina</replaceable>|<replaceable>endereço&nbsp;IP</replaceable>&gt;</command>.
+</para>
+
+</footnote> e tentar novamente.
 
 </para></note><para>
 

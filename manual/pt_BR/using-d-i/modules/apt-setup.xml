@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43573 -->
-<!-- revised by Herbert Parentes  Fortes Neto (hpfn) 2006.02.05 -->
+<!-- original version: 49871 -->
 <!-- updated 33820:43573 by Felipe Augusto van de Wiel (faw) 2007.01.20 -->
+<!-- updated 43573:49871 by Felipe Augusto van de Wiel (faw) 2007.02.09 -->
 
    <sect3 id="apt-setup">
    <title>Configurando o apt</title>
@@ -13,7 +13,6 @@ Uma das ferramentas usadas para instalar pacotes em um sistema &debian;
 <classname>apt</classname><footnote>
 
 <para>
-
 Note que o programa que realmente instala os pacotes se chama
 <command>dpkg</command>.  Contudo, esse programa é mais uma ferramenta de
 baixo nível.  <command>apt-get</command> é uma ferramenta de alto nível
@@ -21,7 +20,6 @@ que irá invocar o <command>dpkg</command> de forma apropriada. Ele sabe
 como obter pacotes do seu CD, de sua rede, ou de onde for necessário. Ele
 também é capaz de instalar automaticamente outros pacotes que são requeridos
 para fazer o pacote que você está tentando instalar funcionar corretamente.
-
 </para>
 
 </footnote>.
@@ -35,12 +33,129 @@ agora o utilitário recomendado para o gerenciamento de pacotes.
 
 </para><para>
 
-<command>apt</command> deve ser configurado para que ele saiba de onde obter
-os pacotes. O instalador cuida disso de forma ampla e automática, baseado no
-que sabe sobre seu ambiente de instalação. Os resultados desta configuração
-são escritos no arquivo <filename>/etc/apt/sources.list</filename>.  E você
-pode examinar e editar esse arquivo de acordo com seu gosto, após o
-término da instalação.
+<command>apt</command> deve ser configurado de forma que ele saiba de onde
+obter os pacotes. Os resultados desta configuração são escritos no arquivo
+<filename>/etc/apt/sources.list</filename>.  Você pode examinar e editar
+esse arquivo de acordo com seu gosto, após a instalação ter sido completada.
+
+</para><para>
+
+Se você está instalando na prioridade padrão, o instalador cuidará
+automaticamente da configuração na maioria dos casos, baseado no método
+de instalação que você está usando e possivelmente usando as escolhas que
+você fez anteriormente na instalação. Na maioria dos casos, o instalador
+adicionará, automaticamente, um espelho de segurança e, se você estiver
+instalando a distribuição estável (<quote>stable</quote>), um espelho para
+o serviço de atualização volátil (<quote>volatile</quote>).
+
+</para><para>
+
+Se você está instalando em uma prioridade mais baixa (e.g. modo expert), você
+poderá tomar mais decisões por conta própria. Você pode escolher se quer ou
+não usar os serviços de atualização de segurança e ou volátil
+(<quote>volatile</quote>), e você pode optar por adicionar pacotes das seções
+<quote>contrib</quote> e <quote>non-free</quote> (não-livre) do repositório.
 
 </para>
+
+    <sect4 id="apt-setup-mirror">
+    <title>Usando um espelho de rede</title>
+
+<para>
+
+Uma questão que será feita na maioria dos casos é usar ou não um espelho
+de rede como uma origem para os pacotes. Na maioria dos casos a resposta
+padrão deverá ser o bastante, mas há algumas exceções.
+
+</para><para>
+
+Se você <emphasis>não</emphasis> está instalando a partir de um CD ou DVD
+completo ou usando uma imagem CD/DVD completa, você realmente deveria usar
+um espelho de rede, caso contrário você acabará com um sistema realmente
+mínimo. No entanto, se você possui uma conexão limitada com a Internet é
+melhor <emphasis>não</emphasis> selecionar a tarefa <literal>área de
+trabalho</literal> na próxima etapa da instalação.
+
+</para><para>
+
+Se você está instalando a partir de um CD completo ou usando uma imagem de
+CD (não um DVD), usar um espelho de rede não é necessário, mas ainda assim
+fortemente recomendado porque um único CD contém somente um número limite de
+pacotes. Atualmente, o instalador não suporta o uso de múltiplas imagens de
+CD ou DVD durante a instalação<footnote>
+
+<para>
+Esta opção está nos planos para ser adicionada.
+</para>
+
+</footnote>. Se você possui uma conexão com a Internet limitada, pode ser
+que seja melhor <emphasis>não</emphasis> escolhe um espelho de rede neste
+momento, ao invés disso, finalizar a instalação usando somente o que está
+disponível no CD e instalar pacotes adicionais após a instalação (i.e. após
+você ter reinicializado em seu novo sistema).
+
+</para><para>
+
+Se você está instalando a partir de um DVD ou usando uma imagem de DVD, a
+necessidade de usar um espelho de rede é muito menor, mas ainda existe a
+chance de que alguns pacotes que façam parte das tarefas que você selecionar
+na próxima etapa, não estejam incluídos no primeiro DVD. Isso é especialmente
+verdade se você está instalando num outro idioma que não o inglês: sabe-se que
+várias fontes e pacotes de localização estão no segundo DVD. Portanto, se você
+tem uma conexão razoável com a Internet, ainda é recomendado que você use um
+espelho de rede.
+
+</para><para>
+
+<!-- This should probably be documented a bit more extensively in
+     post-install instead. -->
+Para instalar pacotes adicionais após a instalação você tem duas opções:
+
+<orderedlist>
+<listitem><para>
+
+se você possui imagens adicionais de CD/DVD disponíveis (do mesmo conjunto
+do CD/DVD de instalação que você está usando), você pode adicioná-las ao
+<filename>sources.list</filename> usando o <command>apt-cdrom</command>;
+
+</para></listitem>
+<listitem><para>
+
+adicionar manualmente um espelho ao <filename>sources.list</filename> usando
+um editor.
+
+</para></listitem>
+</orderedlist>
+
+Então, você pode usar uma das interfaces de gerenciamento de pacotes para
+selecionar e instalar pacotes adicionais<footnote>
+
+<para>
+É possível adicionar CDs ou DVD <emphasis>e</emphasis> um espelho de rede
+no <filename>/etc/apt/sources.list</filename>. Além disso, adicionar um
+espelho de rede possui agrega a vantagem de disponibilizar para instalação
+as atualizações de pacotes vindos dos lançamentos pontuais da distribuição.
+</para>
+
+</footnote>.
+
+</para><para>
+
+Em suma: selecionar um espelho de rede é, geralmente, uma boa idéia, exceto
+se você não possui uma boa conexão com a Internet. Se a versão atual de um
+pacote está disponível no CD/DVD, o instalador sempre usará essa versão.
+A quantidade de dados que serão baixados se você selecionar um espelho
+depende de a) as tarefas que você selecionar na próxima etapa da instalação,
+b) quais pacotes são necessários para tais tarefas, e c) quais desses pacotes
+estão presentes no CD/DVD.
+
+</para><para>
+
+Note que mesmo se você escolher não usar um espelho de rede, alguns pacotes
+podem ser baixados da Internet se há uma atualização de segurança ou
+volátil (<quote>volatile</quote>) disponível para eles e se esses serviços
+estão configurados.
+
+</para>
+</sect4>
    </sect3>
