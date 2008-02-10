@@ -80,6 +80,9 @@ struct progress_data {
      * @see frontend_data#action_box
      */
     GtkWidget * cancel_button;
+
+    /** store title in order to restore it after a GO inside PROGRESS */
+    gchar * fe_title;
 };
 
 /** Create the progress bar widget in the given container.
@@ -209,6 +212,9 @@ static void destroy_progress_box(struct progress_data * progress_data)
 /** Show the progress widgets.
  *
  * This will actually add the widgets to the corresponding containers.
+ * The main title saved when starting the PROGRESS operation will be restored
+ * from the value saved when START was called.  This is needed when GO is
+ * called during a PROGRESS operation.
  *
  * @param fe cdebconf frontend
  * @see cdebconf_gtk_hide_progress
@@ -230,6 +236,10 @@ void cdebconf_gtk_show_progress(struct frontend * fe)
             GTK_BOX(fe_data->action_box), progress_data->cancel_button,
             TRUE /* expand */, TRUE /* fill */, DEFAULT_PADDING);
     }
+    /* restore main title */
+    g_free(fe->title);
+    fe->title = g_strdup(progress_data->fe_title);
+    cdebconf_gtk_update_frontend_title(fe);
     gtk_widget_show_all(progress_data->progress_box);
     gtk_widget_show_all(fe_data->action_box);
 }
@@ -360,6 +370,7 @@ static gboolean init_progress(struct frontend * fe)
         return FALSE;
     }
     progress_data->fe = fe;
+    progress_data->fe_title = g_strdup(fe->title);
     create_progress_box(progress_data);
     if (CAN_CANCEL_PROGRESS(fe)) {
         create_cancel_button(progress_data);
@@ -381,6 +392,7 @@ static void destroy_progress(struct frontend * fe)
     if (NULL == progress_data) {
         return;
     }
+    g_free(progress_data->fe_title);
     fe_data->progress_data = NULL;
     destroy_cancel_button(progress_data);
     destroy_progress_box(progress_data);
