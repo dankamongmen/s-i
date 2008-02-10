@@ -97,12 +97,8 @@ static int handle_boolean_radio(struct frontend * fe,
 
     value = question_getvalue(question, "");
     if (NULL != value && 0 == strcmp(value, "true")) {
-        /* XXX: only one needed? */
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_false), FALSE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_true), TRUE);
     } else {
-        /* XXX: only one needed? */
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_false), TRUE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_true), FALSE);
     }
 
