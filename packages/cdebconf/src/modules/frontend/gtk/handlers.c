@@ -83,6 +83,7 @@ static int handle_boolean_radio(struct frontend * fe,
     GtkWidget * container;
     char * false_label;
     char * true_label;
+    const char * value;
 
     false_label = cdebconf_gtk_get_text(fe, "debconf/no", "No");
     radio_false = gtk_radio_button_new_with_label(
@@ -94,7 +95,8 @@ static int handle_boolean_radio(struct frontend * fe,
         GTK_RADIO_BUTTON(radio_false), true_label);
     g_free(true_label);
 
-    if (0 == strcmp(question_getvalue(question, ""), "true")) {
+    value = question_getvalue(question, "");
+    if (NULL != value && 0 == strcmp(value, "true")) {
         /* XXX: only one needed? */
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_false), FALSE);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio_true), TRUE);
@@ -115,7 +117,7 @@ static int handle_boolean_radio(struct frontend * fe,
     cdebconf_gtk_add_common_layout(fe, question, question_box, container);
 
     if (cdebconf_gtk_is_first_question(question)) {
-        if (0 == strcmp(question_getvalue(question, ""), "true")) {
+        if (NULL != value && 0 == strcmp(value, "true")) {
             gtk_widget_grab_focus(radio_true);
         } else {
             gtk_widget_grab_focus(radio_false);
