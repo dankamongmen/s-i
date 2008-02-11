@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43965 -->
+<!-- original version: 50618 -->
 
  <sect1 id="module-details">
  <title>Utilització dels elements individualment</title>
@@ -51,6 +51,8 @@ maquinari posteriorment.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
 
   </sect2>
 
@@ -65,7 +67,7 @@ de l'usuari i preparat per fer la feina real.
 Tal i com indica el títol d'aquesta secció, la tasca principal del pròxims
 elements és fer les particions als vostres discs, crear els sistemes de
 fitxers, assignar els punts de muntatges i, opcionalment, configurar
-qüestions estretament relacionades com l'LVM o els dispositius RAID.
+opcions estretament relacionades com dispositius RAID, LVM o xifrats.
 
 </para>
 
@@ -78,20 +80,6 @@ qüestions estretament relacionades com l'LVM o els dispositius RAID.
 &module-partman-lvm.xml;
 &module-partman-crypto.xml;
   </sect2>
-
-  <sect2 id="di-system-setup">
-  <title>Configuració del sistema</title>
-<para>
-
-Després de particionar, l'instal·lador fa unes poques preguntes més
-per a configurar el sistema que s'està a punt d'instal·lar.
-
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
 
   <sect2 id="di-install-base">
   <title>Instal·lació del sistema base</title>
@@ -107,18 +95,33 @@ connexió de xarxa lents pot portar el seu temps.
 &module-base-installer.xml;
   </sect2>
 
+  <sect2 id="di-user-setup">
+  <title>Configuració d'usuaris i contrasenyes</title>
+<para>
+
+Després d'instal·lar el sistema base, l'instal·lador us permetrà configurar
+el compte de superusuari <quote>root</quote> i/o un compte per al primer
+usuari. Altres usuaris es poden crear després que la instal·lació s'hagi
+acabat.
+
+</para>
+
+&module-user-setup.xml;
+</sect2>
+
   <sect2 id="di-install-software">
   <title>Instal·lació de programari addicionals</title>
 <para>
 
-Després d'instal·lar el sistema base, disposareu d'un sistema usable
-però limitat. La majoria d'usuaris prefereixen instal·lar programari
-addicional al sistema per tal d'adaptar-lo a les seves necessitats,
-i és possible fer-ho amb l'instal·lador. Aquest pas por portar encara
-més temps que la instal·lació del sistema base si teniu una màquina
-o xarxa lentes.
+En aquest punt disposareu d'un sistema usable però limitat. La majoria
+d'usuaris prefereixen instal·lar programari addicional al sistema per
+tal d'adaptar-lo a les seves necessitats, i és possible fer-ho amb
+l'instal·lador. Aquest pas por portar encara més temps que la
+instal·lació del sistema base si teniu una màquina o connexió de xarxa
+lenta.
 
 </para>
+
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
@@ -156,11 +159,13 @@ des de la xarxa predeterminada, vegeu
   <title>Finalització de la instal·lació</title>
 <para>
 
-Aquests són els últims detalls per fer abans de tornar a arrencar el nou
-sistema, principalment ordenar les coses després del &d-i;
+Aquest és l'últim punt en el procés d'instal·lació durant el qual
+l'instal·lador farà tasques d'última hora. Principalment netejar el que
+ha deixat el &d-i;
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
