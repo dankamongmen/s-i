@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43573 -->
+<!-- original version: 49871 -->
 
    <sect3 id="apt-setup">
    <title>Configuració de l'apt</title>
@@ -11,7 +11,6 @@ Una de les eines més utilitzades per a instal·lar paquets en sistemes
 part de paquet <classname>apt</classname><footnote>
 
 <para>
-
 Fixeu-vos que el programa que realment instal·la els paquets és
 <command>dpkg</command>. Tanmateix, aquesta és una eina de més baix
 nivell. L'<command>apt-get</command> és una eina de més alt nivell que
@@ -19,7 +18,6 @@ invoca <command>dpkg</command> com correspon. Permet obtenir paquets del
 CD, la xarxa, o qualsevol altre lloc. També facilita la instal·lació
 automàtica de les anomenades dependències, altres paquets que fan
 falta per a que el que estigueu instal·lant funcioni correctament.
-
 </para>
 
 </footnote>
@@ -34,11 +32,126 @@ recomanada per a la gestió de paquets.
 </para><para>
 
 L'<command>apt</command> s'ha de configurar per saber d'on
-obtenir els paquets. L'instal·lador procurarà fer-ho
-automàticament, basant-se en que coneix del vostre mitjà
-d'instal·lació. El resultat d'aquesta configuració s'escriu al
-fitxer <filename>/etc/apt/sources.list</filename>, i podeu examinar-lo
+obtenir els paquets. El resultat d'aquesta configuració s'escriu al
+fitxer <filename>/etc/apt/sources.list</filename>. Podeu examinar-lo
 i editar-lo al vostre gust després de completar la instal·lació.
 
+</para><para>
+
+Si esteu instal·lant amb la prioritat predeterminada, l'instal·lador
+s'encarregarà de bona part de la configuració automàticament, depenent del
+mètode d'instal·lació i possiblement aprofitant les opcions indicades
+anteriorment durant la instal·lació. En la majoria de casos l'instal·lador
+afegirà una rèplica de seguretat i, si esteu instal·lant una distribució
+estable, una rèplica per al servei d'actualitzacions volàtils
+(<quote>volatile</quote>).
+
+</para><para>
+
+Si instal·leu amb una prioritat més baixa (p.ex. en mode expert), podreu
+prendre més decisions. Podreu triar si voleu utilitzar els serveis
+d'actualitzacions de seguretat i/o volàtils, o si voleu afegir paquets de les
+seccions <quote>contrib</quote> i <quote>non-free</quote> de l'arxiu.
+
 </para>
+
+    <sect4 id="apt-setup-mirror">
+    <title>Utilitzar una rèplica de xarxa</title>
+
+<para>
+
+Una pregunta que es farà en la majoria de casos és si s'ha d'utilitzar o no
+una rèplica de xarxa com a origen dels paquets. La resposta predeterminada
+normalment serà correcta, però hi ha certes excepcions.
+
+</para><para>
+
+Si <emphasis>no</emphasis> esteu instal·lant des d'un CD o DVD complet o
+utilitzant una imatge de CD/DVD, hauríeu de fer servir una rèplica de xarxa,
+altrament acabareu amb un sistema molt mínim. Tanmateix, si teniu una connexió a
+Internet limitada, és millor que <emphasis>no</emphasis> seleccioneu la tasca
+<literal>desktop</literal> en el següent pas de la instal·lació.
+
+</para><para>
+
+Si instal·leu des d'un CD complet o utilitzat una imatge de CD (no DVD), no és
+necessari utilitzar una rèplica de xarxa, però és molt recomanable ja que un
+sol CD només conté un nombre molt limitat de paquets. Actualment
+l'instal·lador no suporta utilitzar múltiples imatges de CD o DVD durant la
+instal·lació<footnote>
+
+<para>
+Hi ha plans per afegir aquesta opció.
+</para>
+
+</footnote>. Si teniu una connexió a Internet limitada, segurament encara
+seria millor <emphasis>no</emphasis> seleccionar una rèplica de xarxa aquí, i
+completar la instal·lació utilitzant només el que hi ha al CD, instal·lant
+paquets addicionals després de la instal·lació (és a dir, després de reiniciar
+en el nou sistema).
+
+</para><para>
+
+Si instal·leu des d'un DVD o utilitzant una imatge de DVD, la necessitat
+d'utilitzar una rèplica de xarxa és molt més petita, però encara hi ha alguna
+possibilitat que paquets que formen part de les tasques que seleccionareu a
+continuació no estiguin inclosos al primer DVD. Això és especialment cert si
+esteu instal·lant en algun idioma que no sigui l'anglès: un nombre
+considerable de paquets de fonts i traduccions estan al segon DVD. Per tant,
+si teniu una connexió a Internet raonable, és recomanable que utilitzeu una
+rèplica de xarxa.
+
+</para><para>
+
+<!-- This should probably be documented a bit more extensively in
+     post-install instead. -->
+Per instal·lar paquets addicionals després de la instal·lació teniu dues
+opcions:
+
+<orderedlist>
+<listitem><para>
+
+si teniu imatges de CD/DVD addicionals (del mateix joc que el CD/DVD
+d'instal·lació que estigueu utilitzant), les podeu afegir al fitxer
+<filename>sources.list</filename> utilitzant l'<command>apt-cdrom</command>;
+
+</para></listitem>
+<listitem><para>
+
+utilitzar un editor per afegir una rèplica al fitxer
+<filename>sources.list</filename> manualment
+
+</para></listitem>
+</orderedlist>
+
+Aleshores podreu utilitzar un dels frontals per gestionar paquets i
+seleccionar i instal·lar paquets addicionals<footnote>
+
+<para>
+És possible afegir ambdós, algun CD o DVD addicional <emphasis>i</emphasis>
+una rèplica de xarxa, a <filename>/etc/apt/sources.list</filename>. Afegir una
+rèplica de xarxa té l'avantatge que permet instal·lar actualitzacions de
+paquets a versions estables de la distribució.
+</para>
+
+</footnote>.
+
+</para><para>
+
+En resum: seleccionar una rèplica de xarxa és normalment una bona idea,
+excepte si no teniu una bona connexió a Internet. Si la versió actual d'un
+paquet està disponible al CD/DVD, l'instal·lador sempre utilitzarà aquesta
+versió. La quantitat de dades descarregades si seleccioneu una rèplica de
+xarxa depèn de a) les tasques seleccionades al següent pas de la instal·lació,
+b) els paquets necessaris per a aquestes tasques, i c) quins d'aquests paquets
+estan disponibles al CD/DVD.
+
+</para><para>
+
+Fixeu-vos que encara que trieu no utilitzar una rèplica de xarxa, podreu
+descarregar alguns paquets d'Internet si hi ha disponible alguna actualització
+de seguretat o volàtil i s'han configurat els serveis corresponents.
+
+</para>
+</sect4>
    </sect3>
