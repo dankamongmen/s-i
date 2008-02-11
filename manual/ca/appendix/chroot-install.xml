@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44410 -->
+<!-- original version: 50736 -->
 
  <sect1 id="linux-upgrade">
  <title>Instal·lar &debian; des d'un sistema Unix/Linux</title>
@@ -26,6 +26,19 @@ treballar amb maquinari que d'altra manera no vol funcionar bé amb
 diferents arrencades o mitjans d'instal·lació.
 
 </para>
+
+<note><para>
+
+Ja que aquesta és principalment una tasca manual, heu de considerar que
+haureu de fer moltes configuracions bàsiques del sistema, que requeriran
+més coneixement en general sobre Debian i Linux que el necessari per a
+realitzar una instal·lació regular. No espereu que aquest procediment
+resulti en un sistema idèntic al que obtindríeu amb una instal·lació
+regular. També heu de tindre en compte que aquest procediment només
+descriu els passos bàsics per a configurar el sistema. Pot ser que
+siguin necessaris passos addicionals d'instal·lació i/o configuració.
+
+</para></note>
 
   <sect2>
   <title>Començar</title>
@@ -149,7 +162,7 @@ Podeu descarregar els fitxers que necessiteu del <command>debootstrap</command>
 directament de l'arxiu quan l'executeu. Podeu substituir
 <userinput>&archive-mirror;/debian</userinput> per qualsevol rèplica de
 l'arxiu a l'ordre de l'exemple de baix, preferiblement per un que estigui
-a prop vostre. Teniu una llista de less rèpliques a
+a prop vostre. Teniu una llista de les rèpliques a
 <ulink url="http://www.debian.org/misc/README.mirrors"></ulink>.
 
 </para><para>
@@ -196,7 +209,7 @@ Feu <command>chroot</command>:
 </screen></informalexample>
 
 Després d'entrar al chroot podríeu necessitar ajustar la definició
-de terminal per que siga compatible amb el sistema Debian base, per
+de terminal per que sigui compatible amb el sistema Debian base, per
 exemple:
 
 <informalexample><screen>
@@ -204,6 +217,51 @@ exemple:
 </screen></informalexample>
 
 </para>
+
+   <sect3>
+   <title>Crear fitxers de dispositiu</title>
+<para>
+
+En aquest punt <filename>/dev/</filename> només conté fitxers de dispositiu
+molt bàsics. Per als següents passos de la instal·lació pot ser que es
+requereixin fitxers de dispositiu addicionals. Hi ha diferents maneres
+d'assolir això, i el mètode que hauríeu d'emprar depèn del sistema hoste
+que esteu usant per a fer la instal·lació, de si fareu servir o no un nucli
+modular, i de si penseu usar fitxers de dispositiu estàtics o dinàmics (e.x.
+usant <classname>udev</classname>) per al nou sistema.
+
+</para><para>
+
+Algunes de les opcions disponibles són:
+
+<itemizedlist>
+<listitem><para>
+
+crear un conjunt de fitxers de dispositiu estàtic fent servir
+<informalexample><screen>
+# cd /dev
+# MAKEDEV generic
+</screen></informalexample>
+
+</para></listitem>
+<listitem><para>
+
+només crear manualment dispositius de fitxer fent servir
+<command>MAKEDEV</command>
+
+</para></listitem>
+<listitem><para>
+
+muntar vinculantment «bind mount» /dev des del vostre sistema hoste a sobre
+de /dev al sistema destí; tingueu en compte que els guions «postinst» d'alguns
+paquets poden intentar crear fitxers de dispositiu, per tant aquest opció
+s'ha usar amb cura
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3>
    <title>Muntatge de les particions</title>
@@ -321,7 +379,7 @@ Ací teniu alguns exemples senzills de
 # opcions teniu al vostre abast.
 ######################################################################
 
-# Sempre voldrem l'interfície loopback
+# Sempre voldrem la interfície loopback
 #
 auto lo
 iface lo inet loopback
@@ -381,7 +439,7 @@ ff02::3 ip6-allhosts
 Si teniu vàries targes de xarxa, ordeneu els noms dels mòduls dels
 controladors al fitxer <filename>/etc/modules</filename> amb l'ordre
 desitjat. A l'arrencada, cada targeta s'associarà amb el nom de
-l'interfície (eth0, eth1, etc.) que esperàveu.
+la interfície (eth0, eth1, etc.) que esperàveu.
 
 </para>
    </sect3>
@@ -396,10 +454,10 @@ potser voldreu afegir alguns fonts addicionals, per exemple per
 el codi font des paquets i les actualitzacions de seguretat:
 
 <informalexample><screen>
-deb-src http://ftp.es.debian.org/debian etch main
+deb-src http://ftp.es.debian.org/debian &releasename; main
 
-deb http://security.debian.org/ etch/updates main
-deb-src http://security.debian.org/ etch/updates main
+deb http://security.debian.org/ &releasename;/updates main
+deb-src http://security.debian.org/ &releasename;/updates main
 </screen></informalexample>
 
 Recordeu d'executar <userinput>aptitude update</userinput> després de
@@ -432,7 +490,7 @@ Per configurar el vostre teclat (si fa falta):
 </para><para>
 
 Mireu que el teclat no es pot configurar mentre esteu al chroot, sinó que
-estarà configurat quan reinicieu de nou.
+estarà configurat quan reinicia de nou.
 
 </para>
    </sect3>
@@ -541,6 +599,12 @@ La segona ordre instal·larà el <command>grub</command> (en aquest cas al
 MBR de <literal>hda</literal>). L'última ordre crearà un fitxer correcte
 i funcional a <filename>/boot/grub/menu.lst</filename>.
 
+</para><para>
+
+Tingueu en compte que això assumeix que s'ha creat un fitxer de dispositius
+<filename>/dev/hda</filename>. Hi ha mètodes alternatius per instal·lar
+<command>grub</command>, però aquests estan fora l'abast d'aquest apèndix.
+
 </para><para arch="x86">
 
 Ací teniu un exemple bàsic de <filename>/etc/lilo.conf</filename>:
@@ -552,6 +616,7 @@ install=menu
 delay=20
 lba32
 image=/vmlinuz
+initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
