@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 31173 -->
+<!-- original version: 50787 -->
 
    <sect3 id="network-console">
    <title>Instal·lació a través de la xarxa</title>
@@ -68,12 +68,46 @@ i haureu de confirmar que és correcta.
 
 </para><note><para>
 
+El servidor <command>ssh</command> de l'instal·lador no envia paquets
+<quote>keep-alive</quote> en la seva configuració predeterminada. En principi
+una connexió al sistema que s'està instal·lant hauria de mantenir-se oberta
+indefinidament. Tanmateix, en certes situacions &mdash; depenent de la
+configuració de la xarxa local &mdash; és possible que es perdi la connexió
+després d'un cert període d'inactivitat. Un cas típic en que això pot passar
+és quan hi ha algun tipus de NAT (<quote>Network Address Translation</quote>,
+traducció de l'adreça de xarxa) entre el client i el sistema que s'està
+instal·lant. Depenent del punt de la instal·lació en que es perdi la connexió,
+podreu continuar o no després de tornar a connectar.
+
+</para><para>
+
+Podeu evitar aquest tipus de desconnexions afegint l'opció
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>valor</replaceable></userinput>
+quan comenceu la connexió <command>ssh</command>, o afegint la mateixa opció
+al fitxer de configuració de l'<command>ssh</command>. Fixeu-vos, però, que en
+alguns casos afegir aquesta opció també pot <emphasis>causar</emphasis> la
+pèrdua de la connexió (per exemple, si els paquets <quote>keep-alive</quote>
+s'envien durant un breu tall de la xarxa, del qual <command>ssh</command>
+s'hauria recuperat altrament), així que només s'hauria d'utilitzar quan sigui
+necessari.
+
+</para></note>
+
+<note><para>
+
 Si instal·leu molts ordinadors alhora i casualment tenen la mateixa
 adreça IP o el mateix nom, <command>ssh</command> rebutjarà la
 connexió. El problema és que hi haurà empremtes digitals diferents
 per a un mateix identificador, fet que normalment s'interpreta com un
 atac. Si esteu segurs que no és el cas, esborreu la línia corresponent
-del fitxer <filename>~/.ssh/known_hosts</filename> i torneu a intentar-ho.
+del fitxer <filename>~/.ssh/known_hosts</filename><footnote>
+
+<para>
+L'ordre següent esborrarà una entrada existent corresponent a un ordinador:
+<command>ssh-keygen -R &lt;<replaceable>nom</replaceable>|<replaceable>adreça&nbsp;IP</replaceable>&gt;</command>.
+</para>
+
+</footnote> i torneu a intentar-ho.
 
 </para></note><para>
 
