@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# Copyright (C) 2006  Martin Michlmayr <tbm@cyrius.com>
+
+# This code is covered by the GNU General Public License.
+
+set -e
+
+error() {
+	echo "$@" >&2
+	exit 1
+}
+
+if [ -n "$1" ]; then
+	kvers="$1"
+	kfile=/boot/vmlinuz-$kvers
+	ifile=/boot/initrd.img-$kvers
+else
+	if [ -e /vmlinuz ]; then
+		kfile=/vmlinuz
+		ifile=/initrd.img
+	elif [ -e /boot/vmlinuz ]; then
+		kfile=/boot/vmlinuz
+		ifile=/boot/initrd.img
+	else
+		error "Cannot find a default kernel in /vmlinuz or /boot/vmlinuz"
+	fi
+fi
+
+if [ ! -e $kfile ] || [ ! -e $ifile ]; then
+	error "Can't find $kfile and $ifile"
+fi
+
+machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+case "$machine" in
+	"GLAN Tank")
+		rm -f /boot/initrd /boot/zImage
+		ln -s $ifile /boot/initrd
+		(
+			devio 'wl 0xe3a01c04,4' 'wl 0xe381104c,4'
+			cat $kfile
+		) > /boot/zImage
+	;;
+	*)
+		error "Unsupported platform."
+	;;
+esac
+

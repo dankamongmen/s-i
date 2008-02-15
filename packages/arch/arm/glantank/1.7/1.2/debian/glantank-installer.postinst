@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/debconf/confmodule
+
+log() {
+	logger -t glantank-installer "$@"
+}
+
+error() {
+	log "error: $@"
+}
+
+
+if ! apt-install glantank-utils; then
+	error "apt-install glantank-utils failed"
+	exit 1
+fi
+
+# Set up glantank-update-kernel to run on kernel upgrades.
+if ! grep -q glantank-update-kernel /target/etc/kernel-img.conf; then
+	echo "postinst_hook = glantank-update-kernel" >> \
+		target/etc/kernel-img.conf
+fi
+
+if ! in-target glantank-update-kernel; then
+	error "glantank-update-kernel failed"
+	exit 1
+fi
+
