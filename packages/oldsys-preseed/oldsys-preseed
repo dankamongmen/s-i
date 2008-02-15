@@ -74,7 +74,7 @@ case "`archdetect`" in
 			fi
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/mnt $path/defaults
-			mount -t jffs2 /dev/$config $path/mnt
+			mount -t jffs2 -o ro /dev/$config $path/mnt
 			if [ -e $path/mnt/default.tar.gz ]; then
 				(cd $path/defaults && tar -xzf $path/mnt/default.tar.gz)
 				if [ -e $path/defaults/app/etc/HOSTNAME ]; then
@@ -192,7 +192,7 @@ case "`archdetect`" in
 			fi
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/mnt $path/lpr
-			mount -t minix /dev/$config $path/mnt
+			mount -t minix -o ro /dev/$config $path/mnt
 			if [ ! -e $path/mnt/config.lrp ]; then
 				log "config.lrp does not exist in $path/mnt"
 				umount $path/mnt
