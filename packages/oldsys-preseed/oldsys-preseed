@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2005, 2006  Martin Michlmayr <tbm@cyrius.com>
+# Copyright (C) 2005, 2006, 2008  Martin Michlmayr <tbm@cyrius.com>
 
 # This code is covered by the GNU General Public License.
 
@@ -123,6 +123,58 @@ case "`archdetect`" in
 			umount $path/mnt
 			rm -rf $path/defaults
 			rmdir $path/mnt $path || true
+		else
+			exit_unknown
+		fi
+	;;
+	arm*/orion)
+		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+		if echo "$machine" | grep -q "^QNAP TS-109/TS-209"; then
+			config=$(get_mtdblock "NAS Config")
+			if [ -z "$config" ]; then
+				log "Can't find MTD partition holding the config data"
+				exit
+			fi
+			path=/tmp/oldsys-preseed
+			mkdir -p $path/sda1 $path/config
+			mount -t ext2 -o ro /dev/$config $path/config
+			MAC=$(cat $path/config/ETH0.MAC_ADDR)
+			umount $path/config
+			mount -t ext2 -o ro /dev/sda1 $path/sda1 || true
+			INTERFACE=eth0
+			if [ -e $path/sda1/.config/uLinux.conf ]; then
+				capture=0
+				eth=$(cat $path/sda1/.config/uLinux.conf | while read line; do
+					if [ $capture -gt 0 ]; then echo $line ; fi
+					if [ "$line" = "[eth0]" ]; then capture=1 ; fi
+					if [ "$line" = "" ]; then capture=0 ; fi
+				done)
+				usage=$(echo "$eth" | grep "^Usage" | sed 's/^.* //')
+				if [ "$usage" = "DHCP" ]; then
+					NET_CONFIG=dhcp
+				else
+					NET_CONFIG=static
+					IPADDRESS=$(echo "$eth" | grep "^IP Address" | sed 's/^.* //')
+					NETMASK=$(echo "$eth" | grep "^Subnet Mask" | sed 's/^.* //')
+					GATEWAY=$(echo "$eth" | grep "^Gateway" | sed 's/^.* //')
+				fi
+				for i in $(grep "Domain Name Server" $path/sda1/.config/uLinux.conf | sed 's/^.* //' | grep -v 0.0.0.0); do
+						var_add NAMESERVERS "$i"
+				done
+				HOSTNAME=$(grep "Server Name" $path/sda1/.config/uLinux.conf | sed 's/^.* //')
+				unset_matching_var "HOSTNAME" NAS$(echo "$MAC" | sed 's/^..:..:..://' | sed 's/://g')
+			else
+				NET_CONFIG=dhcp
+			fi
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.1.100
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.1.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
+				dhcp_fallback $FILE
+			fi
+			umount $path/sda1 || true
+			rmdir $path/config $path/sda1 $path || true
 		else
 			exit_unknown
 		fi
