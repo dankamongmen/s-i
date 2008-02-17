@@ -368,12 +368,12 @@ Function ShowDesktop
     StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
 tasksel tasksel/first multiselect $_desktop-desktop, standard$\n\
-tasksel tasksel/first seen true"
+tasksel tasksel/first seen false"
   ${Else}
     StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
 tasksel tasksel/desktop multiselect $_desktop-desktop$\n\
-tasksel tasksel/desktop seen true"
+tasksel tasksel/desktop seen false"
   ${Endif}
 FunctionEnd
 
@@ -445,7 +445,8 @@ proxyless:
   ${If} $0 != ""
     StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
-d-i time/zone string $0"
+d-i time/zone string $0$\n\
+d-i time/zone seen false"
   ${Endif}
 
 ; ********************************************** preseed keymap
@@ -470,7 +471,8 @@ keyboard_end:
     ${Else}
       StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
-d-i console-keymaps-at/keymap select $0"
+d-i console-keymaps-at/keymap select $0$\n\
+d-i console-keymaps-at/keymap seen false"
     ${Endif}
   ${Endif}
 
@@ -496,7 +498,8 @@ d-i console-keymaps-at/keymap select $0"
   ${If} $0 != ""
     StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
-d-i passwd/user-fullname string $0"
+d-i passwd/user-fullname string $0$\n\
+d-i passwd/user-fullname seen false"
   ${Endif}
 
 !ifdef NETWORK_BASE_URL
