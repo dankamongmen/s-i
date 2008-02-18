@@ -37,18 +37,23 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
   ifneq (,$(filter mips mipsel,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S40framebuffer-module-linux-mips
-   endif
+  endif
 
   ifneq (,$(filter alpha,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S40framebuffer-module-linux-alpha \
 	S04countcpus-linux-alpha
-   endif
+  endif
 
   ifneq (,$(filter arm,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S02netwinder-net
-   endif
+  endif
+
+  ifneq (,$(filter hppa,$(DEB_HOST_ARCH_CPU)))
+    files += \
+	S04countcpus-linux-hppa
+  endif
 
 endif
 
