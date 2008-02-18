@@ -350,7 +350,7 @@ Function ShowDesktop
   WriteINIStr $PLUGINSDIR\desktop.ini	"Field 1" "Text" $(desktop1)
   WriteINIStr $PLUGINSDIR\desktop.ini	"Field 2" "Text" "GNOME"
   WriteINIStr $PLUGINSDIR\desktop.ini	"Field 3" "Text" "KDE"
-  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 4" "Text" "XFCE"
+  WriteINIStr $PLUGINSDIR\desktop.ini	"Field 4" "Text" "Xfce"
   WriteINIStr $PLUGINSDIR\desktop.ini	"Field 5" "Text" $(desktop2)
   InstallOptions::dialog $PLUGINSDIR\desktop.ini
   ReadINIStr $0 $PLUGINSDIR\desktop.ini "Field 3" "State"
