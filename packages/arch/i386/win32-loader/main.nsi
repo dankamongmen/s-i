@@ -66,6 +66,7 @@ Var /GLOBAL preseed_cmdline
 Var /GLOBAL preseed_cfg
 Var /GLOBAL proxy
 Var /GLOBAL arch
+Var /GLOBAL bcdedit
 
 Function .onInit
   InitPluginsDir
@@ -735,12 +736,18 @@ boot"
       MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
       Quit
 !endif
+    ; FIXME: this blurb is duplicated in the uninstaller.  keep in sync!
+    GetFullPathName $bcdedit $WINDIR\Sysnative\bcdedit.exe
+    ${If} $bcdedit == ""
+      StrCpy $bcdedit $SYSDIR\bcdedit.exe
+    ${Endif}
+
     ReadRegStr $0 HKLM "Software\Debian\Debian-Installer Loader" "bootmgr"
     ${If} $0 == ""
-      nsExec::ExecToStack '"bcdedit" /create /d "$(d-i)" /application bootsector'
+      nsExec::ExecToStack '"$bcdedit" /create /d "$(d-i)" /application bootsector'
       Pop $0
       ${If} $0 != 0
-        StrCpy $0 bcdedit.exe
+        StrCpy $0 $bcdedit
         MessageBox MB_OK|MB_ICONSTOP "$(error_exec)"
         Quit
       ${Endif}
@@ -755,9 +762,9 @@ boot"
       ; and for uninstaller.
       WriteRegStr HKLM "Software\Debian\Debian-Installer Loader" "bootmgr" "$0"
     ${Endif}
-    nsExec::Exec '"bcdedit" /set $0 device boot'
-    nsExec::Exec '"bcdedit" /set $0 path \g2ldr.mbr'
-    nsExec::Exec '"bcdedit" /displayorder $0 /addlast'
+    nsExec::Exec '"$bcdedit" /set $0 device boot'
+    nsExec::Exec '"$bcdedit" /set $0 path \g2ldr.mbr'
+    nsExec::Exec '"$bcdedit" /displayorder $0 /addlast'
   ${Endif}
 SectionEnd
 
@@ -792,10 +799,16 @@ Section "Uninstall"
 
   ReadRegStr $0 HKLM "Software\Debian\Debian-Installer Loader" "bootmgr"
   ${If} $0 != ""
-    nsExec::Exec '"bcdedit" /delete $0'
+    ; FIXME: this blurb is duplicated in the installer.  keep in sync!
+    GetFullPathName $bcdedit $WINDIR\Sysnative\bcdedit.exe
+    ${If} $bcdedit == ""
+      StrCpy $bcdedit $SYSDIR\bcdedit.exe
+    ${Endif}
+
+    nsExec::Exec '"$bcdedit" /delete $0'
     Pop $0
     ${If} $0 != 0
-      StrCpy $0 bcdedit.exe
+      StrCpy $0 $bcdedit
       MessageBox MB_OK|MB_ICONSTOP "$(error_exec)"
     ${Endif}
   ${Endif}
