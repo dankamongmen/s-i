@@ -25,6 +25,10 @@ UninstallIcon "swirl.ico"
 XPStyle on
 OutFile "win32-loader.exe"
 
+; Needed to disable idiotic compatibility mode where Vista identifies itself
+; as XP.  Otherwise useless (admin privilege is the default for installers).
+RequestExecutionLevel admin
+
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include WinMessages.nsh
