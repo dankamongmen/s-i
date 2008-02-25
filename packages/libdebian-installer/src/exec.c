@@ -26,6 +26,7 @@
 
 #include <debian-installer/log.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -37,6 +38,9 @@
 #include <unistd.h>
 
 #define MAXLINE 1024
+
+#define EX_NOEXEC       126
+#define EX_NOTFOUND     127
 
 static int internal_di_exec (const char *path, bool use_path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
@@ -113,7 +117,7 @@ static int internal_di_exec (const char *path, bool use_path, const char *const 
       execve (path, (char *const *) argv, (char *const *) envp);
     else
       execv (path, (char *const *) argv);
-    exit (127);
+    exit (errno == ENOENT ? EX_NOTFOUND : EX_NOEXEC);
   }
   else if (pid < 0)
   {
