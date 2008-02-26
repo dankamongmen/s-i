@@ -91,6 +91,20 @@ module_probe() {
 	fi
 }
 
+multipath_probe() {
+    MP_VERBOSE=2
+    # Look for multipaths...
+    if [ ! -f /etc/multipath.conf ]; then
+cat <<EOF >/etc/multipath.conf
+defaults {
+    user_friendly_names yes
+}
+EOF
+    fi
+    log-output -t disk-detect /sbin/multipath -v$MP_VERBOSE
+    [ -n "$(/sbin/multipath -l)" -a $? ] && return 0 || return 1
+}
+
 hw-detect disk-detect/detect_progress_title || true
 
 while ! disk_found; do
@@ -166,3 +180,29 @@ if [ "$RET" = true ]; then
 		fi
 	fi
 fi
+
+# Activate support for DM Multipath
+db_get disk-detect/multipath/enable
+if [ "$RET" = true ]; then
+	if anna-install multipath-udeb; then
+		MODULES="dm-mod dm-multipath dm-round-robin dm-emc"
+		# We need some dm modules...
+		for MODULE in $MODULES; do
+			if is_not_loaded $MODULE; then
+				module_probe $MODULE || true
+			fi
+		done
+
+		# Look for multipaths...
+		if multipath_probe; then
+			logger -t disk-detect "Multipath devices found; enabling multipath support"
+			if ! anna-install partman-multipath; then
+				/sbin/multipath -F
+				logger -t disk-detect "Error loading partman-multipath; multipath devices deactivated"
+			fi
+		else
+			logger -t disk-detect "No multipath devices detected"
+		fi
+	fi
+fi
+
