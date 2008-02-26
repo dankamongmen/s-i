@@ -92,17 +92,17 @@ module_probe() {
 }
 
 multipath_probe() {
-    MP_VERBOSE=2
-    # Look for multipaths...
-    if [ ! -f /etc/multipath.conf ]; then
-cat <<EOF >/etc/multipath.conf
+	MP_VERBOSE=2
+	# Look for multipaths...
+	if [ ! -f /etc/multipath.conf ]; then
+		cat <<EOF >/etc/multipath.conf
 defaults {
     user_friendly_names yes
 }
 EOF
-    fi
-    log-output -t disk-detect /sbin/multipath -v$MP_VERBOSE
-    [ -n "$(/sbin/multipath -l)" -a $? ] && return 0 || return 1
+	fi
+	log-output -t disk-detect /sbin/multipath -v$MP_VERBOSE
+	[ -n "$(/sbin/multipath -l)" && $? ] && return 0 || return 1
 }
 
 hw-detect disk-detect/detect_progress_title || true
@@ -205,4 +205,3 @@ if [ "$RET" = true ]; then
 		fi
 	fi
 fi
-
