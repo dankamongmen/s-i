@@ -58,8 +58,9 @@ for dev in $DEVICES/*; do
 			fi
 			do_label="${label:+-L $label}"
 			code=0
+			# Disable lazy-count option to work around #465737
 			log-output -t partman --pass-stdout \
-				mkfs.xfs $do_label -f $device >/dev/null || code=$?
+				mkfs.xfs -l lazy-count=0 $do_label -f $device >/dev/null || code=$?
 			sync
 			db_progress STOP
 
