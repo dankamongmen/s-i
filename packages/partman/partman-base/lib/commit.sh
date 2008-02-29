@@ -5,6 +5,7 @@
 confirm_changes () {
 	local dev part partitions num id size type fs path name filesystem
 	local x template partdesc partitems items formatted_previously
+	local device dmtype
 	template="$1"
 
 	# Compute the changes we are going to do
@@ -52,9 +53,10 @@ confirm_changes () {
 			filesystem=$(cat $id/visual_filesystem)
 			# Special case d-m devices to use a different description
 			if cat device | grep -q "/dev/mapper" ; then
-				type=$(dm_table $device)
+				device=$(cat device)
+				dmtype=$(dm_table $device)
 				# multipath devices are partitioned
-				if [  "$type" != multipath ] && ! is_multipath_part $device; then
+				if [  "$dmtype" != multipath ] && ! is_multipath_part $device; then
 					partdesc="partman/text/confirm_unpartitioned_item"
 				fi
 			fi
