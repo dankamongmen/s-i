@@ -43,10 +43,6 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		# TODO: How do we signal we couldn't start parted_server properly?
 		exit $RET
 	fi
-	# Skip devices that are part of a multipathed device
-	if part_of_multipath $partdev; then
-		continue
-	fi
 
 	rm -rf /var/lib/partman/old_devices
 	if [ -d $DEVICES ]; then
@@ -70,6 +66,11 @@ if [ ! -f /var/run/parted_server.pid ]; then
 			if part_of_sataraid $partdev; then
 				continue
 			fi
+		fi
+
+		# Skip devices that are part of a multipathed device
+		if part_of_multipath $partdev; then
+			continue
 		fi
 
 		dirname=$(echo $1 | sed 's:/:=:g')
