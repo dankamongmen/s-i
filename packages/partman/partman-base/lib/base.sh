@@ -504,9 +504,36 @@ memfree () {
 	fi
 }
 
+# return the device mapper table type
+dm_table () {
+	local type=""
+	if [ -x /sbin/dmsetup ]; then
+		type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
+	fi
+	echo $type
+}
+
+# Check if a device is a partition on a multipath'ed device by checking if
+# the corresponding multipath map exists
+is_multipath_part () {
+	local type mp name
+
+	type multipath >/dev/null 2>&1 || return 1
+
+	type=$(dm_table $1)
+	[ "$type" = linear ] || return 1
+	name=$(dmsetup info --noheadings -c -oname "$1")
+
+	mp=${name%-part*}
+	if [ $(multipath -l $mp | wc -l) -gt  0 ]; then
+		return 0
+	fi
+	return 1
+}
+
 # TODO: this should not be global
 humandev () {
-    local host bus target part lun idenum targtype scsinum linux
+    local host bus target part lun idenum targtype scsinum linux wwid
     case "$1" in
 	/dev/ide/host*/bus[01]/target[01]/lun0/disc)
 	    host=`echo $1 | sed 's,/dev/ide/host\(.*\)/bus.*/target[01]/lun0/disc,\1,'`
@@ -706,10 +733,7 @@ humandev () {
 	    printf "$RET" ${type} ${device}
 	    ;;
 	/dev/mapper/*)
-	    type=""
-	    if [ -x /sbin/dmsetup ]; then
-	        type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
-	    fi
+	    type=$(dm_table "$1")
 
 	    # First check for Serial ATA RAID devices
 	    if type dmraid >/dev/null 2>&1; then
@@ -740,6 +764,16 @@ humandev () {
 	        mapping=${1#/dev/mapper/}
 	        db_metaget partman/text/dmcrypt_volume description
 	        printf "$RET" $mapping
+	    elif [ "$type" = multipath ]; then
+		device=${1#/dev/mapper/}
+		wwid=$(multipath -l ${device} | head -n 1 | sed "s/^${device} \+(\([a-f0-9]\+\)).*/\1/")
+		db_metaget partman/text/multipath description
+		printf "$RET" ${device} ${wwid}
+	    elif is_multipath_part $1; then
+		part=$(echo "$1" | sed 's%.*-part\([0-9]\+\)$%\1%')
+		device=$(echo "$1" | sed 's%/dev/mapper/\(.*\)-part[0-9]\+$%\1%')
+		db_metaget partman/text/multipath_partition description
+		printf "$RET" ${device} ${part}
 	    else
 	        # LVM2 devices are found as /dev/mapper/<vg>-<lv>.  If the vg
 	        # or lv contains a dash, the dash is replaced by two dashes.

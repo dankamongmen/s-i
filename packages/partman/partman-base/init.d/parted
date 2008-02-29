@@ -16,6 +16,25 @@ part_of_sataraid () {
 	return 1
 }
 
+part_of_multipath() {
+	local mpdev
+	type multipath >/dev/null 2>&1 || return 1
+
+	if is_multipath_part $1; then
+		return 0
+	fi
+	# The block devices that make up the multipath:
+	# Output looks like \_ 4:0:0:1 sdc 8:32 ...
+	for mpdev in $(multipath -l | \
+		       grep '_ \([0-9]\+:\)\{3\}[0-9]\+ sd[a-z]\+ [0-9]\+:[0-9]\+' | \
+		       cut -f4 -d' '); do
+		if [ "$(readlink -f /dev/$mpdev)" = $1 ]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 if [ ! -f /var/run/parted_server.pid ]; then
 	mkdir -p /var/run
 	parted_server
@@ -23,6 +42,10 @@ if [ ! -f /var/run/parted_server.pid ]; then
 	if [ $RET != 0 ]; then
 		# TODO: How do we signal we couldn't start parted_server properly?
 		exit $RET
+	fi
+	# Skip devices that are part of a multipathed device
+	if part_of_multipath $partdev; then
+		continue
 	fi
 
 	rm -rf /var/lib/partman/old_devices

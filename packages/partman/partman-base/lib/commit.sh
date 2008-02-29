@@ -52,8 +52,13 @@ confirm_changes () {
 			filesystem=$(cat $id/visual_filesystem)
 			# Special case d-m devices to use a different description
 			if cat device | grep -q "/dev/mapper" ; then
-				partdesc="partman/text/confirm_unpartitioned_item"
-			else
+				type=$(dm_table $device)
+				# multipath devices are partitioned
+				if [  "$type" != multipath ] && ! is_multipath_part $device; then
+					partdesc="partman/text/confirm_unpartitioned_item"
+				fi
+			fi
+			if [ -z "$partdesc" ]; then
 				partdesc="partman/text/confirm_item"
 				db_subst $partdesc PARTITION "$num"
 			fi
