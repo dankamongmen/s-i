@@ -26,7 +26,7 @@ part_of_multipath() {
 	# The block devices that make up the multipath:
 	# Output looks like \_ 4:0:0:1 sdc 8:32 ...
 	for mpdev in $(multipath -l | \
-		       grep '_ \([0-9]\+:\)\{3\}[0-9]\+ sd[a-z]\+ [0-9]\+:[0-9]\+' | \
+		       grep '_ \([#0-9]\+:\)\{3\}[#0-9]\+ [hs]d[a-z]\+ [0-9]\+:[0-9]\+' | \
 		       cut -f4 -d' '); do
 		if [ "$(readlink -f /dev/$mpdev)" = $1 ]; then
 			return 0
