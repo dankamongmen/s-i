@@ -116,9 +116,7 @@ waypoint 0	cleanup
 run_waypoints live-installer/progress/installing
 
 # mount /dev and /proc on target otherwise grub-installer will fail
-if grep -q udev /proc/mounts; then
-	mount -o bind /dev /target/dev
-fi
+mount -o bind /dev /target/dev
 
 if [ ! -e /target/proc/version ]; then
 	mount -o bind /proc /target/proc
