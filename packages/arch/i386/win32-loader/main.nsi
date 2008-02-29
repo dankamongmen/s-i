@@ -538,7 +538,7 @@ $1"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 1" "Text" $(custom1)
     WriteINIStr $PLUGINSDIR\custom.ini "Field 2" "Text" $(custom2)
     WriteINIStr $PLUGINSDIR\custom.ini "Field 3" "Text" $(custom3)
-    WriteINIStr $PLUGINSDIR\custom.ini "Field 4" "Text" $(custom4)
+    WriteINIStr $PLUGINSDIR\custom.ini "Field 4" "Text" "Linux cmdline:"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 5" "Text" $(custom5)
     WriteINIStr $PLUGINSDIR\custom.ini "Field 6" "State" "$proxy"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 7" "State" "$boot_ini"

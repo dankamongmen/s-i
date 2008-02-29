@@ -111,7 +111,6 @@ main (int argc, char **argv)
   langstring ("custom1",			_("Debian-Installer Loader will be setup with the following parameters.  Do NOT change any of these unless you know what you're doing."));
   langstring ("custom2",			_("Proxy settings (host:port):"));
   langstring ("custom3",			_("Location of boot.ini:"));
-  langstring ("custom4",			_("Debconf preseed line:"));
   langstring ("custom5",			_("Base URL for netboot images (linux and initrd.gz):"));
   langstring ("error",				_("Error"));
   langstring ("error_copyfiles",		_("Error: failed to copy $0 to $1."));
