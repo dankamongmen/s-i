@@ -71,12 +71,11 @@ debconf_select () {
 	done
 	u=${u#, }
 	restore_ifs
-	# TODO: This can be preseeded without having to use translated
-	# values (which are often inappropriate for preseeding across many
-	# machines due to including e.g. disk capacities) but it's nasty;
-	# you have to use runes like
-	# "20some_device__________/var/lib/partman/devices/=dev=sda".
-	# We could do with an abbreviated syntax.
+	# You can preseed questions asked through this function by using
+	# full localised text (deprecated) or by using the key (the part
+	# before the tab). Additionally, if the question was asked via
+	# ask_user below, then you can also preseed it using the name of the
+	# plugin responsible for the answer you want.
 	if [ -n "$default" ]; then
 		db_set $template "$default"
 	fi
@@ -90,6 +89,15 @@ debconf_select () {
 		if [ "$RET" = "${x#*$TAB}" ]; then
 			RET="${x%$TAB*}"
 			break
+		else
+			# Help out ask_user.
+			local key="${x%%__________*}"
+			if [ "$key" != "$x" ] && \
+			   ([ "$RET" = "$key" ] || \
+			    [ "$RET" = "${key#[0-9][0-9]}" ]); then
+				RET="${x%$TAB*}"
+				break
+			fi
 		fi
 	done
 	restore_ifs
