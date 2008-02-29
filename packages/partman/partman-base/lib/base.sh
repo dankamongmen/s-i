@@ -508,7 +508,7 @@ memfree () {
 dm_table () {
 	local type=""
 	if [ -x /sbin/dmsetup ]; then
-		type=$(/sbin/dmsetup table "$1" | head -n 1 | cut -d " " -f3)
+		type=$(/sbin/dmsetup table "$1" 2>/dev/null | head -n 1 | cut -d " " -f3)
 	fi
 	echo $type
 }
