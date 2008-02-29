@@ -295,6 +295,12 @@ choose_recipe () {
 			fi
 			if [ "$old_default_recipe" = "$name" ]; then
 				default_recipe="$recipe"
+			else
+				local base="$(basename "$recipe")"
+				if [ "$old_default_recipe" = "$base" ] || \
+				   [ "$old_default_recipe" = "${base#[0-9][0-9]}" ]; then
+					default_recipe="$recipe"
+				fi
 			fi
 		fi
 	done
