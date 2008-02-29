@@ -21,8 +21,9 @@ if ! echo $machine | grep -q "^GLAN Tank"; then
         exit 0
 fi
 
-# Record the root filesystem device for use during boot, since the slug's
-# bootloader is hardcoded to use root=/dev/ram.
+# Record the root filesystem device for use during boot, since the GLAN Tank
+# bootloader is hardcoded to use root=/dev/hda2. This setting will no longer
+# work if the ARTOP PATA driver is used.
 rootdev=$(egrep '^[^# 	]+[ 	]+/[ 	]' /etc/fstab | awk '{print $1}') || true
 
 # Translate LABEL and UUID entries into a proper device name.
@@ -59,7 +60,7 @@ if echo "$rootdev" | grep -q "="; then
 fi
 
 if [ ! -e "$rootdev" ]; then
-	rootdev=/dev/sda2
+	rootdev=/dev/hda2
 	echo "Warning: /etc/fstab parse error; guessing that the root device is $rootdev" >&2
 fi
 install -d $DESTDIR/conf
