@@ -30,8 +30,9 @@ load_extra () {
 	fi
 
 	# partman-lvm is loaded first, then partman-crypto
-	if [ ! -f /lib/partman/lib/lvm-base.sh ] && \
-	   [ $(memfree) -ge $memreq_lvm ]; then
+	if [ -f /lib/partman/lib/lvm-base.sh ]; then
+		:
+	elif [ $(memfree) -ge $memreq_lvm ]; then
 		if [ "$auto" ]; then
 			anna-install partman-auto-lvm
 		else
@@ -40,8 +41,9 @@ load_extra () {
 	else
 		logger -t partman "Insufficient free memory to load LVM support"
 	fi
-	if [ ! -f /lib/partman/lib/crypto-base.sh ] && \
-	   [ $(memfree) -ge $memreq_crypto ]; then
+	if [ -f /lib/partman/lib/crypto-base.sh ]; then
+		:
+	elif [ $(memfree) -ge $memreq_crypto ]; then
 		if [ "$auto" ]; then
 			anna-install partman-auto-crypto
 		else
