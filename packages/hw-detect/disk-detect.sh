@@ -102,7 +102,12 @@ defaults {
 EOF
 	fi
 	log-output -t disk-detect /sbin/multipath -v$MP_VERBOSE
-	[ -n "$(/sbin/multipath -l)" && $? ] && return 0 || return 1
+
+	if multipath -l 2>/dev/null | grep -q '^mpath[0-9]\+ '; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 hw-detect disk-detect/detect_progress_title || true
