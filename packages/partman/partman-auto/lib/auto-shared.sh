@@ -154,9 +154,9 @@ get_auto_disks() {
 		# Skip /dev/mapper/X and /dev/mdX but not multipath devices
 		device=$(cat $dev/device)
 		$(echo "$device" | grep -q "/dev/md[0-9]*$") && continue
-		if echo $device | grep -q ^/dev/mapper/; then
+		if echo $device | grep -q "^/dev/mapper/"; then
 			dmtype=$(dm_table $device)
-			[  "$dmtype" = multipath ] || continue
+			[ "$dmtype" = multipath ] || continue
 		fi
 		printf "$dev\t$(device_name $dev)\n"
 	done
