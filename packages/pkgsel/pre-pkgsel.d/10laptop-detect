@@ -1,8 +1,10 @@
-#!/bin/sh -e
+#!/bin/sh
 
-# Install laptop-detect on architectures know to have laptops
+set -e
+
+# Install laptop-detect on architectures known to have laptops
 case "$(archdetect)" in
 	i386/*|amd64/*|powerpc/*)
-	    apt-install laptop-detect
+	    in-target sh -c "$config debconf-apt-progress --no-progress --logstderr -- apt-get -o APT::Install-Recommends=false -q -y -f install laptop-detect" || true
 	    ;;
 esac
