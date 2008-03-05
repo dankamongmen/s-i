@@ -426,7 +426,9 @@ proxyless:
       ${If} $1 != ""
         StrCpy $0 "$0_$1"
       ${Endif}
-      StrCpy $preseed_cmdline "$preseed_cmdline locale=$0"
+      StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i debian-installer/locale string $0"
     ${Endif}
   ${Endif}
 
@@ -435,10 +437,12 @@ proxyless:
   Pop $2
   Pop $0
   ${If} $2 != 0
-    ${If} $0 == ""
-      StrCpy $0 "localdomain"
+    ${If} $0 != ""
+      StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i netcfg/get_domain string $0$\n\
+d-i netcfg/get_domain seen false"
     ${Endif}
-    StrCpy $preseed_cmdline "$preseed_cmdline domain?=$0"
   ${EndIf}
 
 ; ********************************************** preseed timezone
@@ -486,10 +490,12 @@ d-i console-keymaps-at/keymap seen false"
   Pop $2
   Pop $0
   ${If} $2 != 0
-    ${If} $0 == ""
-      StrCpy $0 "debian"
+    ${If} $0 != ""
+      StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i netcfg/get_hostname string $0$\n\
+d-i netcfg/get_hostname seen false"
     ${Endif}
-    StrCpy $preseed_cmdline "$preseed_cmdline hostname?=$0"
   ${EndIf}
 
 ; ********************************************** preseed priority
@@ -559,9 +565,13 @@ $1"
 ; overriden there
 ; ********************************************** preseed proxy
   ${If} $proxy == ""
-    StrCpy $preseed_cmdline "$preseed_cmdline mirror/http/proxy="
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i mirror/http/proxy seen true$\n"
   ${Else}
-    StrCpy $preseed_cmdline "$preseed_cmdline mirror/http/proxy=http://$proxy/"
+    StrCpy $preseed_cfg "\
+$preseed_cfg$\n\
+d-i mirror/http/proxy string http://$proxy/$\n"
   ${Endif}
 FunctionEnd
 
