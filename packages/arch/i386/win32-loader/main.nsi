@@ -646,8 +646,22 @@ boot"
   FileWrite $0 "preseed.cfg"
   FileClose $0
 
-  nsExec::Exec '"cmd.exe" /c cd $PLUGINSDIR && cpio.exe -o -H newc < cpio_list > newc_chunk'
-  nsExec::Exec '"cmd.exe" /c cd $PLUGINSDIR && gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz'
+  FileOpen $0 $PLUGINSDIR\cpio.bat w
+  FileWrite $0 "\
+cd $PLUGINSDIR$\r$\n\
+cpio.exe -o -H newc < cpio_list > newc_chunk$\r$\n\
+attrib -r $INSTDIR\initrd.gz$\r$\n\
+gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
+"
+  FileClose $0
+
+  nsExec::Exec '"$PLUGINSDIR\cpio.bat"'
+  Pop $0
+  ${If} $0 != 0
+    StrCpy $0 "cpio.bat"
+    MessageBox MB_OK|MB_ICONSTOP "$(error_exec)"
+    Quit
+  ${Endif}
 
 ; ********************************************** Needed for systems with compressed NTFS
   nsExec::Exec '"compact" /u $c\g2ldr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
