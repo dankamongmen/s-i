@@ -147,6 +147,73 @@ criticalerr() {
 	exit 3
 }
 
+
+po_last_updated() {
+	local key files file lastfile lastdate tdate
+	key=$1
+	shift
+	files="$*"
+
+	lastdate=0
+	for file in $files ; do
+		tdate=$(date -d "$(grep "^\"$key:" $file | \
+			sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%s")
+		if [ $tdate -gt $lastdate ] ; then
+			lastdate=$tdate
+			lastfile=$file
+		fi
+	done
+	echo "$lastfile"
+}
+
+# Get the whole line
+# The --no-wrap is needed because translator can span more than one line
+# The last sed statement is needed to preserve the \n at the end
+po_get_header() {
+	local key=$1
+	local file=$2
+	msgattrib --no-wrap $file | grep "^\"$key:" | sed 's/^.*: \(.*\)\\n.*$/\1/'
+}
+
+# Replace a header with a new value
+# The complex sed expression is to allow for the fact that a header may span
+# two lines; spanning three lines is not supported
+po_replace_header() {
+	local key=$1
+	local value=$2
+	local file=$3
+	sed -i "/^\"$key:/ N; s/^\"$key.*\\\\n\"\(\n.*\|$\)/\"$key: $value\\\\n\"\1/" \
+		$file
+}
+
+# Print anything up to the first msgid (the header)
+po_print_header() {
+	awk 'BEGIN {found = 0}
+	     /^msgid ""/ {found = 1}
+	     /^$/ {if (found == 1) exit}
+	     {print $0}' $1
+}
+
+# Print anything after the first msgid (the header)
+po_print_body() {
+	awk 'BEGIN {found = 0}
+	     /^msgid ""/ {if (found == 0) found = 1}
+	     /^$/ {if (found == 1) found = 2}
+	     {if (found == 2) print $0}' $1
+}
+
+# Print obsolete strings
+po_print_obsolete() {
+#	# Old "manual" version
+#	awk 'BEGIN {found = 0; lead=""}
+#	     /^#~ msgid/ {if (found == 0) {found = 1; print lead}}
+#	     {if (found == 0) lead=lead"\n"$0}
+#	     /^$/ {if (found == 0) lead=""}
+#	     {if (found == 1) print $0}' $1
+
+	msgattrib --only-obsolete --width=79 $1 | po_print_body
+}
+
 ##  Command line parsing
 MORETODO=true
 while $MORETODO ; do
@@ -400,21 +467,25 @@ log "- Merge all package templates.pot files..."
 if ! msgcat ${pots} >/dev/null 2>&1 ; then
 	svnerr
 fi
-log_cmd --pass 	msgcat ${pots} | \
+log_cmd --pass 	msgcat $pots | \
 	sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
 # Determine the most recent POT-Creation-Date for individual components
-# Include master templates.pot too so the timestamp will never be set back
-LASTDATE="$(
-	for j in ${pots} po/template.pot; do
-		date -ud "$(grep "POT-Creation-Date:" $j | sed 's/^.*: \(.*\)\\n.*$/\1/')" "+%F %R%z"
-	done | sort | tail -n 1)"
+# Include sublevel template.pot files too so the timestamp will never be set back
+mpots=""
+for i in $LEVELS; do
+	if [ -f po/sublevel$i/template.pot ]; then
+		mpots="$mpots po/sublevel$i/template.pot"
+	fi
+done
+LASTDATE="$(po_get_header "POT-Creation-Date" \
+		$(po_last_updated "POT-Creation-Date" $pots $mpots))"
+
 # We don't want all templates.pot files headers as we don't care about them
 # So we merge the generated file with a simple header.pot file
 if [ -f po/header.pot -a -s po/template.pot.new ] ; then
 	msgcat --use-first po/header.pot po/template.pot.new | \
-		sed 's/charset=UTF-8/charset=CHARSET/g' | \
-		sed "s/^.*POT-Creation-Date:.*$/\"POT-Creation-Date: $LASTDATE\\\n\"/" \
-		> po/template.pot
+		sed 's/charset=UTF-8/charset=CHARSET/g' > po/template.pot
+	po_replace_header "POT-Creation-Date" "$LASTDATE" po/template.pot
 	rm po/template.pot.new
 else
 	error "ERROR: no $DI_COPY/packages/po/header.pot file. Cannot continue."
@@ -467,14 +538,117 @@ if [ "$WITHLEVELS" = "Y" ] ; then
 fi
 log ""
 
+# Update PO files for sublevels:
+# 3a) Synchronize with D-I SVN
+# 3b) Merge the sublevel PO files into a master PO file
+# 3c) Update the master PO file from the master POT file as it will be used
+#     to update package PO files
+# 3d) Update the sublevel PO files from this master PO file and the sublevel POT file
+# 3e) commit back the changed file
+log "Phase III: update master translation files"
+if [ "$WITHLEVELS" = "Y" ] ; then
+	cd $DI_COPY/packages/po
+	languages=""
+	for po in sublevel1/*.po ; do
+		lang=$(basename $po .po)
+		# Next line is just for quicker testing
+		#[ $lang = nl ] || continue
+		log "- $lang"
+		if [ ! -r PROSPECTIVE ] || \
+		   ([ -r PROSPECTIVE ] && \
+		    ! grep -q "^$lang[[:space:]]*$" PROSPECTIVE); then
+			languages="${languages:+$languages }$lang"
+		fi
+
+		log "  - Merge sublevel PO files into master PO file and update..."
+		list=""
+		for i in $LEVELS; do
+			if [ -f sublevel$i/$lang.po ]; then
+				list="${list:+$list }sublevel$i/$lang.po"
+			fi
+		done
+		# Retain the date and translator of the last updated sublevel PO file
+		LASTFILE="$(po_last_updated "PO-Revision-Date" $list)"
+		LASTDATE="$(po_get_header "PO-Revision-Date" $LASTFILE)"
+		LASTTRANS="$(po_get_header "Last-Translator" $LASTFILE)"
+		msgcat --use-first $list >${lang}.po
+		po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
+		po_replace_header "Last-Translator" "$LASTTRANS" $lang.po
+
+		# Update the master PO file (as it's used to update package PO files)
+		log_cmd --pass msgmerge --previous $lang.po template.pot >$lang.po.new || \
+			gettexterr
+
+		# Remember obsolete strings
+		OBSOLETE="$(po_print_obsolete $lang.po.new)"
+
+		# Optionally merge with PO files from a different source
+		# Strings from the other source are preferred!
+		# Should we disallow automatic commits for this?
+		# WARNING: NOT TESTED!!!
+		if [ -n "$MERGEDIR" ] && [ -r $MERGEDIR/$lang.po ]; then
+			log "  - Merge with $MERGEDIR/$lang.po !!"
+			msgcat --use-first "$MERGEDIR/$lang.po" $lang.po.new \
+				>$lang.po.merge || gettexterr
+			log_cmd --pass msgmerge --previous $lang.po.merge template.pot | \
+				msgattrib --no-obsolete	>$lang.po.new || gettexterr
+			rm $lang.po.merge
+		fi
+
+		# Clean up new master PO file
+		msgattrib --width=79 --no-obsolete $lang.po.new >$lang.po
+		rm $lang.po.new
+
+		# Update the sublevel PO files
+		# We keep its old header and only update the POT-Creation-Date
+		for i in $LEVELS; do
+			if [ -f sublevel$i/$lang.po ]; then
+				OLDHEADER="$(po_print_header sublevel$i/$lang.po)"
+			fi
+			if [ -f sublevel$i/$lang.po ]; then
+				log_cmd --pass -m "  - Merge with template.pot for sublevel $i..." \
+					msgmerge --previous $lang.po \
+						sublevel$i/template.pot \
+					>sublevel$i/$lang.po.new || gettexterr
+				POTDATE="$(po_get_header "POT-Creation-Date" sublevel$i/$lang.po.new)"
+
+				# Combine old header and new content
+				( echo "$OLDHEADER"
+				  po_print_body sublevel$i/$lang.po.new	) | \
+					msgattrib --width=79 --no-obsolete \
+					>sublevel$i/$lang.po
+				po_replace_header "POT-Creation-Date" "$POTDATE" sublevel$i/$lang.po
+				# Append any obsolete strings to sublevel1 PO file
+				if [ $i -eq 1 ] && [ "$OBSOLETE" ]; then
+					echo "$OBSOLETE" >>sublevel$i/$lang.po
+				fi
+				rm sublevel$i/$lang.po.new
+			fi
+		done
+
+		# Remove all custom headers so they don't clutter the PO files in
+		# the packages directories
+		msgattrib --no-wrap $lang.po | \
+			grep -v "^\"X-.*: .*\\n\"$" | \
+			msgattrib --width=79 >$lang.po.new
+		mv $lang.po.new $lang.po
+	done
+
+	if [ "$COMMIT" = "Y" ] ; then
+		log_cmd -p "Commit all general PO/POT files to SVN..." \
+			$svn commit -m \"$COMMIT_MARKER Updated packages/po/* against package templates\" || svnerr
+	fi
+fi
+
 # For each PO file in packages/po/sublevel* or packages/po:
 # 3a) Synchronize with D-I SVN
 # 3b) Update with template.pot
 # 3c) Grab translations from the lower levels file(s)
 # 3d) commit back the changed file
-log "Phase III: update master translation files"
 for i in $LEVELS; do
 	if [ "$WITHLEVELS" = "Y" ] ; then
+		# Bail out; work has already been done in previous section
+		break
 		dir=po/sublevel$i
 		level="level $i "
 	else
@@ -542,23 +716,6 @@ for i in $LEVELS; do
 			$svn commit -m \"$COMMIT_MARKER Updated packages/$dir/* with general template.pot\" *.po template.pot || svnerr
 	fi
 done
-
-# If we use levels, create a temporary general file
-# (which we won't commit) to make merging in individual packages
-# much faster
-if [ "$WITHLEVELS" = "Y" ] ; then
-	cd $DI_COPY/packages/po
-	for po in sublevel1/*.po ; do
-		lang=$(basename $po .po)
-		list=""
-		for i in `seq $NUMLEVELS -1 1`; do
-			if [ -f sublevel${i}/${lang}.po ]; then
-				list="$list sublevel${i}/${lang}.po"
-			fi
-		done
-		msgcat --use-first $list >${lang}.po
-	done
-fi
 log ""
 
 # Loop over D-I packages:
@@ -580,10 +737,10 @@ if [ "$SYNCPKGS" = "Y" ]; then
 		for lang in $languages ; do
 			logn "$lang "
 			cat >$lang.po.new <<EOF
-# THIS FILE IS AUTOMATICALLY GENERATED FROM THE MASTER FILE:
-# packages/po/$lang.po
+# THIS FILE IS GENERATED AUTOMATICALLY FROM THE D-I PO MASTER FILES
+# The master files can be found under packages/po/
 #
-# DO NOT MODIFY IT DIRECTLY: SUCH CHANGES WILL BE LOST
+# DO NOT MODIFY THIS FILE DIRECTLY: SUCH CHANGES WILL BE LOST
 #
 EOF
 			log_cmd --pass msgmerge $DI_COPY/packages/po/$lang.po templates.pot | \
@@ -601,22 +758,21 @@ EOF
 				egrep -v "$filter" $lang.po >$oldfiltered
 				egrep -v "$filter" $lang.po.new >$newfiltered
 				if [ -z "$(diff $oldfiltered $newfiltered)" ] ; then
-					# Don't commit if the only chages are in filtered lines
+					# Don't commit if the only changes are in filtered lines
 					rm $lang.po.new
 				else
+					# Remember original PO-Revision-Date
+					LASTDATE="$(po_get_header "PO-Revision-Date" $lang.po)"
+					mv $lang.po.new $lang.po
 					# At least one unfiltered line changed
 					# Put the old Revision-Date back if asked for
-					if [ "$KEEP_REVISION" != "N" ] && [ "$KEEP_REVISION" = "$lang" ] ; then
-						# Grab back the PO-Revision-Date from the old file
-						old_revision=`grep -e "^\"PO-Revision-Date:" $lang.po | sed 's/\\\\n\"//g'`
-						# And replace the one from the new file with it
-						# then put all this as a result
-						sed "s/\"PO-Revision-Date:.*/$old_revision\\\\n\"/g" $lang.po.new >$lang.po
-						rm $lang.po.new
-						log_s1 "${package}/debian/po/${lang}.po" "CHANGED, revision kept"
+					if [ "$KEEP_REVISION" != "N" ] && \
+					   [ "$KEEP_REVISION" = "$lang" ] ; then
+						# Restore original PO-Revision-Date
+						po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
+						log_s1 "$package/debian/po/$lang.po" "CHANGED, revision kept"
 					else
-						mv $lang.po.new $lang.po
-						log_s1 "${package}/debian/po/${lang}.po" "CHANGED"
+						log_s1 "$package/debian/po/$lang.po" "CHANGED"
 					fi
 				fi
 				# Remove temporary files
@@ -625,7 +781,7 @@ EOF
 			else
 				mv $lang.po.new $lang.po
 				svn add $lang.po
-				log_s1 "${package}/debian/po/${lang}.po" "ADDED"
+				log_s1 "$package/debian/po/$lang.po" "ADDED"
 			fi
 		done
 		log ""
