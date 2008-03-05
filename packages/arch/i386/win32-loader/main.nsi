@@ -184,6 +184,7 @@ readme_file_not_found:
   ${If} $windows_version == "95"
   ${OrIf} $windows_version == "98"
     StrCpy $windows_boot_method direct
+    Goto windows_version_ok
   ${Endif}
   ${If} $windows_version == "2000"
   ${OrIf} $windows_version == "XP"
@@ -236,6 +237,12 @@ Function ShowGraphics
   Var /GLOBAL user_interface
   Var /GLOBAL gtk
 
+  ${If} $windows_boot_method == direct
+    ; as a workaround for bug #469533 in loadlin, we force text mode
+    StrCpy $user_interface text
+    Goto end_of_user_interface_choice
+  ${Endif}
+
 !ifndef NETWORK_BASE_URL
   Var /GLOBAL predefined_user_interface
   ReadINIStr $predefined_user_interface $d\win32-loader.ini "installer" "user_interface"
@@ -264,6 +271,8 @@ Function ShowGraphics
     StrCpy $user_interface $predefined_user_interface
   ${Endif}
 !endif
+
+end_of_user_interface_choice:
 
 ${If} $user_interface == "graphical"
   StrCpy $gtk "gtk/"
@@ -709,32 +718,8 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
   ${Endif}
 
   ${If} $windows_boot_method == direct
-!ifdef NETWORK_BASE_URL
-    Push "false"
-    Push "grub.exe"
-    Push "$INSTDIR"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
-    Push "false"
-    Push "grub.pif"
-    Push "$INSTDIR"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
-!else
-    ClearErrors
-    StrCpy $0 "$EXEDIR\$grub_exe"
-    StrCpy $1 "$INSTDIR\grub.exe"
-    CopyFiles /FILESONLY "$0" "$1"
-    IfErrors 0 +3
-      MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
-      Quit
-    StrCpy $0 "$EXEDIR\$grub_pif"
-    StrCpy $1 "$INSTDIR\grub.pif"
-    CopyFiles /FILESONLY "$0" "$1"
-    IfErrors 0 +3
-      MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
-      Quit
-!endif
+    File /oname=$INSTDIR\loadlin.exe loadlin.exe
+    File /oname=$INSTDIR\loadlin.pif loadlin.pif
   ${Endif}
 
   ${If} $windows_boot_method == bootmgr
@@ -805,7 +790,7 @@ Function .onInstSuccess
   ${Endif}
   MessageBox MB_OK '$(warning1)$warning2$(warning3)'
   ${If} $windows_boot_method == direct
-    Exec '"$INSTDIR\grub.pif"'
+    Exec '"$INSTDIR\loadlin.pif" linux $preseed_cmdline initrd=initrd.gz'
   ${Else}
     MessageBox MB_YESNO|MB_ICONQUESTION $(reboot_now) IDNO +2
     Reboot
@@ -846,8 +831,8 @@ Section "Uninstall"
   Delete $c\g2ldr
   Delete $c\g2ldr.mbr
   Delete $c\grub.cfg
-  Delete $INSTDIR\grub.exe
-  Delete $INSTDIR\grub.pif
+  Delete $INSTDIR\loadlin.exe
+  Delete $INSTDIR\loadlin.pif
   Delete $INSTDIR\linux
   Delete $INSTDIR\initrd.gz
   Delete /REBOOTOK $INSTDIR\Uninstall.exe

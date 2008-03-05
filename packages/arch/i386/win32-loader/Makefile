@@ -35,10 +35,16 @@ g2ldr: /usr/lib/grubutil/g2hdr.bin core.img
 g2ldr.mbr: /usr/lib/grubutil/g2ldr.mbr
 	cp $^ $@
 
+loadlin.pif: genpif
+	bash $^ > $@
+
+loadlin.exe: /usr/lib/loadlin/loadlin.exe.gz
+	gunzip -c $^ > $@
+
 win32-loader.exe: main.nsi maps.ini \
 		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
 		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
-		swirl.ico license
+		swirl.ico license loadlin.pif loadlin.exe
 	$(MAKE) -C l10n
 	$(MAKENSIS) main.nsi
 	du -h win32-loader.exe
@@ -91,7 +97,7 @@ netboot/install.amd/gtk/initrd.gz:
 clean:
 	$(MAKE) -C l10n clean
 	rm -f plugins/cpuid/*.dll plugins/cpuid/*.exe plugins/systeminfo/*.dll plugins/*.dll win32-loader.exe \
-		win32-loader.iso *~ */*~ license core.img g2ldr g2ldr.mbr
+		win32-loader.iso *~ */*~ license core.img g2ldr g2ldr.mbr loadlin.pif loadlin.exe
 
 distclean: clean
 	rm -f debian/compat
