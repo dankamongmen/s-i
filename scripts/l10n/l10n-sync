@@ -14,7 +14,7 @@ ONLINE=N
 COMMIT=N
 KEEP_REVISION=N
 FORCE_RUN=N
-NUMLEVELS=1
+NUMLEVELS=5
 UPDATEPO=Y
 SYNCPKGS=Y
 QUIET=N
@@ -29,7 +29,7 @@ fi
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--online] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] [--split="split levels"] [--quiet|--nolog] <D-I repository path>"
+echo  "$0 [--online] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] [--quiet|--nolog] <D-I repository path>"
 echo  "    --online            : Work online (will update the local copy on"
 echo  "                          the fly)"
 echo  "    --commit            : Commit changed files (implies --online)"
@@ -43,8 +43,6 @@ echo  "                          for a given language"
 echo  "                          meant for use when switching a language"
 echo  "                          NOT RECOMMENDED in other situations"
 echo  "    --svn               : path to the svn binary"
-echo  "    --split             : number of levels for splitted file"
-echo  "                          (0 for no split)"
 echo  "    --debconf-updatepo  : debconf-updatepo command line"
 echo  "                          (for using hacked debconf-updatepo)"
 echo  "    --merge="other_dir" : merge master files from master files"
@@ -56,13 +54,13 @@ echo  " <D-I repository path>: path to the local copy of the D-I repository"
 }
 
 svnerr() {
-echo "Error in a SVN operation, please investigate"
-echo "Trying to cleanup locks..."
-if "$DI_COPY" ;  then
-	cd $DI_COPY
-	$svn cleanup
-fi
-exit 1
+	echo "Error in a SVN operation, please investigate"
+	echo "Trying to cleanup locks..."
+	if "$DI_COPY" ;  then
+		cd $DI_COPY
+		$svn cleanup
+	fi
+	exit 1
 }
 
 # Syntax: log_cmd [-m|-p "<message>"] command <arguments>
@@ -246,9 +244,6 @@ while $MORETODO ; do
 	"--svn="*)
 		svn=`echo $1|cut -f2 -d=`
 		;;
-	"--split="*)
-		NUMLEVELS=`echo $1|cut -f2 -d=`
-		;;
 	"--debconf-updatepo="*)
 		debconfupdatepo=`echo $1|cut -f2 -d=`
 		;;
@@ -294,14 +289,8 @@ fi
 if [ "$NUMLEVELS" -gt 9 ] ; then
 	error "Maximum of 9 sublevels supported"
 	exit 1
-elif [ "$NUMLEVELS" -gt 1 ] ; then
-	WITHLEVELS=Y
-	LEVELS=`seq 1 $NUMLEVELS`
-else
-	# If NUMLEVELS<=1 we use the old way (no levels)
-	WITHLEVELS=N
-	LEVELS=1
 fi
+LEVELS=`seq 1 $NUMLEVELS`
 
 # If we asked for commits we are online...:-)
 if [ "$COMMIT" = "Y" ] ; then
@@ -467,7 +456,7 @@ log "- Merge all package templates.pot files..."
 if ! msgcat ${pots} >/dev/null 2>&1 ; then
 	svnerr
 fi
-log_cmd --pass 	msgcat $pots | \
+log_cmd --pass msgcat $pots | \
 	sed 's/charset=CHARSET/charset=UTF-8/g' >$DI_COPY/packages/po/template.pot.new
 # Determine the most recent POT-Creation-Date for individual components
 # Include sublevel template.pot files too so the timestamp will never be set back
@@ -494,48 +483,46 @@ fi
 
 # Now we create template.pot files for the sublevels
 # OK, should be a nice loop...:-)
-if [ "$WITHLEVELS" = "Y" ] ; then
-	# Temporarily restore charset header
-	sed -i 's/charset=CHARSET/charset=UTF-8/g' ${DI_COPY}/packages/po/template.pot
-	# Sanity check: template.pot should not contain incorrect sublevels
-	if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" \
-	   	${DI_COPY}/packages/po/template.pot)" ]; then
-		error "Invalid sublevel comments detected in template.pot"
+# Temporarily restore charset header
+sed -i 's/charset=CHARSET/charset=UTF-8/g' ${DI_COPY}/packages/po/template.pot
+# Sanity check: template.pot should not contain incorrect sublevels
+if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" \
+ 	${DI_COPY}/packages/po/template.pot)" ]; then
+	error "Invalid sublevel comments detected in template.pot"
+	exit 1
+fi
+for i in $LEVELS; do
+	dir=po/sublevel$i
+	# Sanity check
+	if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
+		error "Error: directory for sublevel$i does not exist"
 		exit 1
 	fi
-	for i in $LEVELS; do
-		dir=po/sublevel$i
-		# Sanity check
-		if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
-			error "Error: directory for sublevel$i does not exist"
-			exit 1
-		fi
-		level="sublevel $i "
-		log "- Create the ${level}template.pot file..."
-		if [ $i -eq 1 ]; then
-			# Select strings without a level
-			# NOTE: this will fail in the case where a string exists in
-			# more than one package POT file and has no level set in one
-			# of them, but does have it set in others! The string will
-			# then end up in the highest level that is explicitly set.
-			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.none
-			# Select strings with level 1 set
-			msggrep -X -E -e ":sl1:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.sl1
-			# Merge them
-			msgcat ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1 >${DI_COPY}/packages/${dir}/template.pot
-			rm ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1
-		else
-			# Select strings with level N set, but exclude any strings that
-			# also have a level smaller than N set to avoid duplicates
-			msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot | \
-				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
-				>${DI_COPY}/packages/${dir}/template.pot
-		fi
-		sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
-	done
-	# Reset the charset header again
-	sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/po/template.pot
-fi
+	level="sublevel $i "
+	log "- Create the ${level}template.pot file..."
+	if [ $i -eq 1 ]; then
+		# Select strings without a level
+		# NOTE: this will fail in the case where a string exists in
+		# more than one package POT file and has no level set in one
+		# of them, but does have it set in others! The string will
+		# then end up in the highest level that is explicitly set.
+		msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.none
+		# Select strings with level 1 set
+		msggrep -X -E -e ":sl1:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.sl1
+		# Merge them
+		msgcat ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1 >${DI_COPY}/packages/${dir}/template.pot
+		rm ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1
+	else
+		# Select strings with level N set, but exclude any strings that
+		# also have a level smaller than N set to avoid duplicates
+		msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot | \
+			msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+			>${DI_COPY}/packages/${dir}/template.pot
+	fi
+	sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
+done
+# Reset the charset header again
+sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/po/template.pot
 log ""
 
 # Update PO files for sublevels:
@@ -546,176 +533,97 @@ log ""
 # 3d) Update the sublevel PO files from this master PO file and the sublevel POT file
 # 3e) commit back the changed file
 log "Phase III: update master translation files"
-if [ "$WITHLEVELS" = "Y" ] ; then
-	cd $DI_COPY/packages/po
-	languages=""
-	for po in sublevel1/*.po ; do
-		lang=$(basename $po .po)
-		# Next line is just for quicker testing
-		#[ $lang = nl ] || continue
-		log "- $lang"
-		if [ ! -r PROSPECTIVE ] || \
-		   ([ -r PROSPECTIVE ] && \
-		    ! grep -q "^$lang[[:space:]]*$" PROSPECTIVE); then
-			languages="${languages:+$languages }$lang"
+cd $DI_COPY/packages/po
+languages=""
+for po in sublevel1/*.po ; do
+	lang=$(basename $po .po)
+	# Next line is just for quicker testing
+	#[ $lang = nl ] || continue
+	log "- $lang"
+	if [ ! -r PROSPECTIVE ] || \
+	   ([ -r PROSPECTIVE ] && \
+	    ! grep -q "^$lang[[:space:]]*$" PROSPECTIVE); then
+		languages="${languages:+$languages }$lang"
+	fi
+
+	log "  - Merge sublevel PO files into master PO file and update..."
+	list=""
+	for i in $LEVELS; do
+		if [ -f sublevel$i/$lang.po ]; then
+			list="${list:+$list }sublevel$i/$lang.po"
 		fi
+	done
+	# Retain the date and translator of the last updated sublevel PO file
+	LASTFILE="$(po_last_updated "PO-Revision-Date" $list)"
+	LASTDATE="$(po_get_header "PO-Revision-Date" $LASTFILE)"
+	LASTTRANS="$(po_get_header "Last-Translator" $LASTFILE)"
+	msgcat --use-first $list >${lang}.po
+	po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
+	po_replace_header "Last-Translator" "$LASTTRANS" $lang.po
 
-		log "  - Merge sublevel PO files into master PO file and update..."
-		list=""
-		for i in $LEVELS; do
-			if [ -f sublevel$i/$lang.po ]; then
-				list="${list:+$list }sublevel$i/$lang.po"
-			fi
-		done
-		# Retain the date and translator of the last updated sublevel PO file
-		LASTFILE="$(po_last_updated "PO-Revision-Date" $list)"
-		LASTDATE="$(po_get_header "PO-Revision-Date" $LASTFILE)"
-		LASTTRANS="$(po_get_header "Last-Translator" $LASTFILE)"
-		msgcat --use-first $list >${lang}.po
-		po_replace_header "PO-Revision-Date" "$LASTDATE" $lang.po
-		po_replace_header "Last-Translator" "$LASTTRANS" $lang.po
+	# Update the master PO file (as it's used to update package PO files)
+	log_cmd --pass msgmerge --previous $lang.po template.pot >$lang.po.new || \
+		gettexterr
 
-		# Update the master PO file (as it's used to update package PO files)
-		log_cmd --pass msgmerge --previous $lang.po template.pot >$lang.po.new || \
-			gettexterr
+	# Remember obsolete strings
+	OBSOLETE="$(po_print_obsolete $lang.po.new)"
 
-		# Remember obsolete strings
-		OBSOLETE="$(po_print_obsolete $lang.po.new)"
+	# Optionally merge with PO files from a different source
+	# Strings from the other source are preferred!
+	# Should we disallow automatic commits for this?
+	# WARNING: NOT TESTED!!!
+	if [ -n "$MERGEDIR" ] && [ -r $MERGEDIR/$lang.po ]; then
+		log "  - Merge with $MERGEDIR/$lang.po !!"
+		msgcat --use-first "$MERGEDIR/$lang.po" $lang.po.new \
+			>$lang.po.merge || gettexterr
+		log_cmd --pass msgmerge --previous $lang.po.merge template.pot | \
+			msgattrib --no-obsolete	>$lang.po.new || gettexterr
+		rm $lang.po.merge
+	fi
 
-		# Optionally merge with PO files from a different source
-		# Strings from the other source are preferred!
-		# Should we disallow automatic commits for this?
-		# WARNING: NOT TESTED!!!
-		if [ -n "$MERGEDIR" ] && [ -r $MERGEDIR/$lang.po ]; then
-			log "  - Merge with $MERGEDIR/$lang.po !!"
-			msgcat --use-first "$MERGEDIR/$lang.po" $lang.po.new \
-				>$lang.po.merge || gettexterr
-			log_cmd --pass msgmerge --previous $lang.po.merge template.pot | \
-				msgattrib --no-obsolete	>$lang.po.new || gettexterr
-			rm $lang.po.merge
+	# Clean up new master PO file
+	msgattrib --width=79 --no-obsolete $lang.po.new >$lang.po
+	rm $lang.po.new
+
+	# Update the sublevel PO files
+	# We keep its old header and only update the POT-Creation-Date
+	for i in $LEVELS; do
+		if [ -f sublevel$i/$lang.po ]; then
+			OLDHEADER="$(po_print_header sublevel$i/$lang.po)"
 		fi
+		if [ -f sublevel$i/$lang.po ]; then
+			log_cmd --pass -m "  - Merge with template.pot for sublevel $i..." \
+				msgmerge --previous $lang.po \
+					sublevel$i/template.pot \
+				>sublevel$i/$lang.po.new || gettexterr
+			POTDATE="$(po_get_header "POT-Creation-Date" sublevel$i/$lang.po.new)"
 
-		# Clean up new master PO file
-		msgattrib --width=79 --no-obsolete $lang.po.new >$lang.po
-		rm $lang.po.new
-
-		# Update the sublevel PO files
-		# We keep its old header and only update the POT-Creation-Date
-		for i in $LEVELS; do
-			if [ -f sublevel$i/$lang.po ]; then
-				OLDHEADER="$(po_print_header sublevel$i/$lang.po)"
+			# Combine old header and new content
+			( echo "$OLDHEADER"
+			  po_print_body sublevel$i/$lang.po.new	) | \
+				msgattrib --width=79 --no-obsolete \
+				>sublevel$i/$lang.po
+			po_replace_header "POT-Creation-Date" "$POTDATE" sublevel$i/$lang.po
+			# Append any obsolete strings to sublevel1 PO file
+			if [ $i -eq 1 ] && [ "$OBSOLETE" ]; then
+				echo "$OBSOLETE" >>sublevel$i/$lang.po
 			fi
-			if [ -f sublevel$i/$lang.po ]; then
-				log_cmd --pass -m "  - Merge with template.pot for sublevel $i..." \
-					msgmerge --previous $lang.po \
-						sublevel$i/template.pot \
-					>sublevel$i/$lang.po.new || gettexterr
-				POTDATE="$(po_get_header "POT-Creation-Date" sublevel$i/$lang.po.new)"
-
-				# Combine old header and new content
-				( echo "$OLDHEADER"
-				  po_print_body sublevel$i/$lang.po.new	) | \
-					msgattrib --width=79 --no-obsolete \
-					>sublevel$i/$lang.po
-				po_replace_header "POT-Creation-Date" "$POTDATE" sublevel$i/$lang.po
-				# Append any obsolete strings to sublevel1 PO file
-				if [ $i -eq 1 ] && [ "$OBSOLETE" ]; then
-					echo "$OBSOLETE" >>sublevel$i/$lang.po
-				fi
-				rm sublevel$i/$lang.po.new
-			fi
-		done
-
-		# Remove all custom headers so they don't clutter the PO files in
-		# the packages directories
-		msgattrib --no-wrap $lang.po | \
-			grep -v "^\"X-.*: .*\\n\"$" | \
-			msgattrib --width=79 >$lang.po.new
-		mv $lang.po.new $lang.po
+			rm sublevel$i/$lang.po.new
+		fi
 	done
 
-	if [ "$COMMIT" = "Y" ] ; then
-		log_cmd -p "Commit all general PO/POT files to SVN..." \
-			$svn commit -m \"$COMMIT_MARKER Updated packages/po/* against package templates\" || svnerr
-	fi
-fi
-
-# For each PO file in packages/po/sublevel* or packages/po:
-# 3a) Synchronize with D-I SVN
-# 3b) Update with template.pot
-# 3c) Grab translations from the lower levels file(s)
-# 3d) commit back the changed file
-for i in $LEVELS; do
-	if [ "$WITHLEVELS" = "Y" ] ; then
-		# Bail out; work has already been done in previous section
-		break
-		dir=po/sublevel$i
-		level="level $i "
-	else
-		dir=po
-		level=""
-	fi
-	log "- Update ${level}PO files"
-	cd $DI_COPY/packages/$dir
-	# The languages variable will contain the list of *supported* languages.
-	# Supported languages will have PO files content spread over D-I packages.
-	# Other languages will only have a PO file in packages/po.
-	#
-	# This allows us to have prospective translations that do not clutter
-	# up all packages. Any languages without supported locale in Debian
-	# should remain in the list of PROSPECTIVE languages.
-
-	alllanguages=$(ls -1 *.po | sed 's/\.po//g')
-	languages=""
-	if [ -f $DI_COPY/packages/po/PROSPECTIVE ] ; then
-		for language in $alllanguages ; do
-			if ! grep -q -e "^${language}$" $DI_COPY/packages/po/PROSPECTIVE ; then
-				languages="$languages $language"
-			fi
-		done
-	else
-		languages=$alllanguages
-	fi
-	
-	for po in *.po ; do
-		lang=$(basename $po .po)
-		log "- $lang"
-		if [ "$ONLINE" = "Y" ] ; then
-			log_cmd -p "  - Update from SVN..." \
-				$svn update || svnerr
-		fi
-		if [ -n "$MERGEDIR" ] ; then
-			log "  - Merge with $MERGEDIR/packages/$dir/$lang.po"
-			if [ -f "$MERGEDIR/packages/$dir/$lang.po" ] ; then
-				if [ -f $po ]; then
-					if ! msgcat --use-first "$MERGEDIR/packages/$dir/$lang.po" $po >$po.new ; then
-						gettexterr
-					fi
-					mv $po.new $po
-				fi
-			fi
-		fi
-		if [ "$i" -gt 1 ]; then
-			log "     - Merge with other levels"
-			previous=`expr $i - 1`
-			for j in `seq 1 $previous`; do
-				log " $j"
-				if [ -f $po -a -f ../sublevel$j/$po ]; then
-					msgcat --use-first ../sublevel$j/$po $po >$po.new
-					mv $po.new $po
-				fi
-			done
-		fi
-		log_cmd --pass -m "  - Merge with template.pot" \
-			msgmerge --previous $po template.pot >$po.new || gettexterr
-		msgattrib --width=79 --no-obsolete $po.new >$po
-		rm $po.new
-	done
-	if [ "$COMMIT" = "Y" ] ; then
-		log_cmd -p "- Commit all general PO files to SVN..." \
-			$svn commit -m \"$COMMIT_MARKER Updated packages/$dir/* with general template.pot\" *.po template.pot || svnerr
-	fi
+	# Remove all custom headers so they don't clutter the PO files in
+	# the packages directories
+	msgattrib --no-wrap $lang.po | \
+		grep -v "^\"X-.*: .*\\n\"$" | \
+		msgattrib --width=79 >$lang.po.new
+	mv $lang.po.new $lang.po
 done
+
+if [ "$COMMIT" = "Y" ] ; then
+	log_cmd -p "Commit all general PO/POT files to SVN..." \
+		$svn commit -m \"$COMMIT_MARKER Updated packages/po/* against package templates\" || svnerr
+fi
 log ""
 
 # Loop over D-I packages:
