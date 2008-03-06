@@ -105,6 +105,10 @@ main (int argc, char **argv)
   langstring ("di_branch1",			_("Select which version of Debian-Installer to use:"));
   langstring ("di_branch2",			_("Stable release.  This will install Debian \"stable\"."));
   langstring ("di_branch3",			_("Daily build.  This is the development version of Debian-Installer.  It will install Debian \"testing\" by default, and may be capable of installing \"stable\" or \"unstable\" as well."));
+/*
+  translate:
+  You might want to mention that so-called "known issues" page is only available in English.
+ */
   langstring ("di_branch4",			_("It is recommended that you check for known issues before using a daily build.  Would you like to do that now?"));
   langstring ("desktop1",			_("Desktop environment:"));
   langstring ("desktop2",			_("None"));
