@@ -12,8 +12,7 @@ subdirs_empty = \
 	initrd \
 	mnt \
 	proc \
-	sys \
-	usr/lib/prebaseconfig.d
+	sys
 
 files_exec = \
 	init
