@@ -6,7 +6,7 @@
 struct debconfclient *debconf = NULL;
 static char *running_kernel = NULL;
 static const char *subarchitecture;
-static int quiet = 0;
+static int quiet = 0, verbose = 0;
 
 di_packages *get_packages (void) {
 	di_packages_allocator *packages_allocator = di_system_packages_allocator_alloc();
@@ -96,7 +96,8 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 				di_package_dependency *d = node1->data;
 				if (d->type == di_package_dependency_type_reverse_enhances) {
 					package->status_want = di_package_status_want_install;
-					di_log (DI_LOG_LEVEL_DEBUG, "install %s, enhances installed packages %s", package->package, status_package->package);
+					if (verbose)
+						di_log (DI_LOG_LEVEL_DEBUG, "install %s, enhances installed packages %s", package->package, status_package->package);
 				}
 			}
 		}
@@ -121,7 +122,8 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 		if (((di_system_package *)package)->kernel_version) {
 			if (running_kernel && strcmp(running_kernel, ((di_system_package *)package)->kernel_version) == 0) {
 				package->status_want = di_package_status_want_unknown;
-				di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
+				if (verbose)
+					di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, matches kernel", package->package);
 			}
 			else {
 				continue;
@@ -132,7 +134,8 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 				if (d->type == di_package_dependency_type_provides
 				    && d->ptr && is_queued(d->ptr)) {
 					package->status_want = di_package_status_want_install;
-					di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
+					if (verbose)
+						di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
 					continue;
 				}
 			}
@@ -141,22 +144,26 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 		if (package->priority >= di_package_priority_standard) {
 			if (standard_modules || ((di_system_package *)package)->kernel_version) {
 				package->status_want = di_package_status_want_install;
-				di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
+				if (verbose)
+					di_log (DI_LOG_LEVEL_DEBUG, "install %s, priority >= standard", package->package);
 			}
 			else {
 				package->status_want = di_package_status_want_unknown;
-				di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, priority >= standard", package->package);
+				if (verbose)
+					di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, priority >= standard", package->package);
 			}
 		}
 		else if (is_queued(package)) {
 			package->status_want = di_package_status_want_install;
-			di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
+			if (verbose)
+				di_log (DI_LOG_LEVEL_DEBUG, "install %s, queued by anna-install", package->package);
 		}
 		else if (((di_system_package *)package)->installer_menu_item
 			/* we don't want to see installed packages in choices list*/
 		         && package->status != di_package_status_installed) {
 			package->status_want = di_package_status_want_unknown;
-			di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, is menu item", package->package);
+			if (verbose)
+				di_log (DI_LOG_LEVEL_DEBUG, "ask for %s, is menu item", package->package);
 		}
 	}
 
@@ -280,6 +287,7 @@ install_modules(di_packages *status, di_packages *packages) {
 			if (asprintf(&dest_file, "%s/%s", DOWNLOAD_DIR, f) == -1)
 				return 5;
 
+			di_log (DI_LOG_LEVEL_DEBUG, "retrieving %s %s", package->package, package->version);
 			if (!quiet) {
 				debconf_subst(debconf, "anna/progress_step_retr", "PACKAGE", package->package);
 				debconf_progress_info(debconf, "anna/progress_step_retr");
@@ -401,7 +409,7 @@ int main(int argc, char **argv) {
 	di_packages *packages, *status;
 	di_packages_allocator *status_allocator;
 	struct utsname uts;
-	const char *quiet_env;
+	const char *quiet_env, *verbose_env;
 
 	debconf = debconfclient_new();
 	debconf_capb(debconf, "backup");
@@ -417,6 +425,9 @@ int main(int argc, char **argv) {
 	quiet_env = getenv("ANNA_QUIET");
 	if (quiet_env && strcmp(quiet_env, "1") == 0)
 		quiet = 1;
+	verbose_env = getenv("ANNA_VERBOSE");
+	if (verbose_env && strcmp(verbose_env, "1") == 0)
+		verbose = 1;
 
 	status_allocator = di_system_packages_allocator_alloc();
 	status = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, status_allocator);
