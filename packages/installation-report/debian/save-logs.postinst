@@ -34,8 +34,8 @@ save_logs () {
 
 db_capb backup
 	
-IPADDR=$(ifconfig | grep 'inet addr:' | head -n 1 | \
-	 sed 's/.*inet addr:\([0-9.]*\).*/\1/')
+IPADDR=$(ip addr | grep '^[[:space:]]*inet ' | grep -v "127\.0\." | \
+	 head -n 1 | sed 's/.*inet \([0-9.]*\).*/\1/')
 
 if [ -n "$IPADDR" ]; then
 	db_set save-logs/menu web
