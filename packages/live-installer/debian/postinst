@@ -9,6 +9,11 @@ db_capb backup
 NEWLINE="
 "
 
+db_input low live-installer/mode || true
+db_go || exit 10 # back to menu
+db_get live-installer/mode
+mode="$RET"
+
 install_live_system () {
 	# Look at
 	PLACES=""
@@ -53,6 +58,19 @@ install_live_system () {
 		done
 		IFS=$OLD_IFS
 	done
+
+	# if we're dumping it, we need to set init=live
+	if [ "$mode" = live ]; then
+		# set the init script to use
+		if [ -d /cdrom/casper ]; then
+			db_set debian-installer/add-kernel-opts "init=casper"
+		else
+			db_set debian-installer/add-kernel-opts "init=live"
+		fi
+
+		# skip the hooks
+		return
+	fi
 
 	# run the scripts found in hook directory after copying the system
 	partsdir="/usr/lib/live-installer.d"
