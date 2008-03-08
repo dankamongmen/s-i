@@ -32,13 +32,13 @@ set_special_users() {
 STATE=0
 while :; do
 	case "$STATE" in
-	0)
+	    0)
 		# Ask how the password files should be set up.
 		db_input low passwd/shadow || true
 		# Ask if root should be allowed to login.
 		db_input medium passwd/root-login || true
-	;;
-	1)
+		;;
+	    1)
 		db_get passwd/root-login
 		if [ "$RET" = false ]; then
 			# root password will be locked
@@ -56,8 +56,8 @@ while :; do
 				db_input critical passwd/root-password-again || true
 			fi
 		fi
-	;;
-	2)
+		;;
+	    2)
 		db_get passwd/root-login
 		if [ "$RET" = false ]; then
 			# root password will be locked
@@ -90,8 +90,8 @@ while :; do
 				ROOT_PW=''
 			fi
 		fi
-	;;
-	3)
+		;;
+	    3)
 		# Ask if a non-root user should be made, if there is not
 		# already one.
 		db_get passwd/root-login
@@ -102,15 +102,15 @@ while :; do
 		elif ! is_system_user; then
 			db_input medium passwd/make-user || true
 		fi
-	;;
-	4)
+		;;
+	    4)
 		# Prompt for user info.
 		db_get passwd/make-user
 		if [ "$RET" = true ] && ! is_system_user; then
 			db_input critical passwd/user-fullname || true
 		fi
-	;;
-	5)
+		;;
+	    5)
 		# Prompt for user info.
 		db_get passwd/make-user
 		if [ "$RET" = true ] && ! is_system_user; then
@@ -120,7 +120,8 @@ while :; do
 				db_get passwd/user-fullname
 				fullname=$RET
 				if ! set_special_users; then
-					userdefault=$(echo "$fullname" | sed 's/ .*//' | LC_ALL=C tr A-Z a-z)
+					userdefault=$(echo "$fullname" | \
+						sed 's/ .*//' | LC_ALL=C tr A-Z a-z)
 				fi
 				if test -n "$userdefault" && \
 					LC_ALL=C expr "$userdefault" : '[a-z][-a-z0-9]*$' >/dev/null; then
@@ -129,8 +130,8 @@ while :; do
 			fi
 			db_input critical passwd/username || true
 		fi
-	;;
-	6)
+		;;
+	    6)
 		# Verify user.
 		db_get passwd/make-user
 		if [ "$RET" = true ] && ! is_system_user; then
@@ -161,8 +162,8 @@ while :; do
 				db_input critical passwd/user-password-again || true
 			fi
 		fi
-	;;
-	7)
+		;;
+	    7)
 		db_get passwd/make-user
 		if [ "$RET" = true ] && ! is_system_user; then
 			db_get passwd/user-password-crypted || true
@@ -194,10 +195,10 @@ while :; do
 				fi
 			fi
 		fi
-	;;
-	*)
+		;;
+	    *)
 		break
-	;;
+		;;
 	esac
 
 	if db_go; then
@@ -208,7 +209,6 @@ while :; do
 	#echo "ON STATE: $STATE"
 done
 
-if test "$STATE" = -1 
-then
+if [ "$STATE" = -1 ]; then
 	exit 10
 fi
