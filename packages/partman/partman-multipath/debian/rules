@@ -23,13 +23,11 @@ install: build
 	dh_installdirs
 	debian/install-rc init.d
 	debian/install-rc commit.d
-	debian/install-rc finish.d
-	install -m 755 finish-install \
-	     ${CURDIR}/debian/${PACKAGE}/usr/lib/finish-install.d/70multipath
 
 binary-indep: build install
 	dh_testdir
 	dh_testroot
+	dh_install
 	dh_installdebconf
 	dh_fixperms
 	dh_installdeb
