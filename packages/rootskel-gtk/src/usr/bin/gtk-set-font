@@ -10,7 +10,8 @@ GTKRC="/etc/gtk-2.0/gtkrc"
 [ -f "$GTKRC" ] || exit 1
 
 if db_get debian-installer/language && [ "$RET" ]; then
-	language="$RET"
+	# The value can be a list; take only first value
+	language="${RET%%:*}"
 else
 	language=en
 fi
