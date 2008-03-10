@@ -239,28 +239,15 @@ else
 fi
 
 # Find the display level
-# This needs to be done before checking preseeding, so we can preseed the
+# Needs to be done before checking preseeding, so we can preseed the
 # correct template.
-#
-# No framebuffer and text interface      -->level 0 (only ASCII)
-# No framebuffer and other interface     -->level 1 (only Latin1)
-# Framebuffer and non graphical interface-->level 2 and 3 (no combining langs)
-# Framebuffer and graphical interface    -->level 4 (all langs)
-# Depending on these values, we use different templates with a different
-# list of languages. These lists are created at package build-time from
-# the contents of the second field of languagelist entries.
-#
+
 #log "Frontend in use: $DEBIAN_FRONTEND"
 case $DEBIAN_FRONTEND in
     text)
-	# Stricto-sensu, the text interface could use all languages
-	# but it will most often be used in situation where the display
-	# is "poor", so let's assume that only ASCII languages may be 
-	# displayed, then
 	langname_template=$langname_ascii
 	;;
     gtk)
-	# We assume that the GTK interface handles all languages
 	langname_template=$langname_all
 	;;
     *)
@@ -285,7 +272,7 @@ esac
 #log "Language input template is $langname_template"
 
 # Support preseeding of the locale all in one variable for convenience.
-# Only check for preseeding if this is the first time localechooser is run.
+# Only check for preseeding the first time localechooser is run.
 db_get localechooser/alreadyrun
 if [ "$RET" != true ]; then
 	if db_get $localecode && [ "$RET" ]; then
