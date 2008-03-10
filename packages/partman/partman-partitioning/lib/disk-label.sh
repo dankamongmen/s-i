@@ -135,6 +135,8 @@ default_disk_label () {
 			echo msdos;;
 		    chrp_pegasos)
 			echo amiga;;
+		    pasemi)
+			echo msdos;;
 		    prep)
 			echo msdos;;
 		    powermac_newworld)

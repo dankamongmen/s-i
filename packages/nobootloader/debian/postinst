@@ -164,6 +164,19 @@ case "$(archdetect)" in
 	db_subst $template OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
 	db_input high $template || true
 	;;
+    powerpc/pasemi)
+	# TODO: Need to figure out if we need to generate the ramdisk
+	# TODO: Is this the right kernel path?
+	# TODO: Need to generate the device name based on actual disk used
+	kernel=vmlinuz
+	initrd=initrd
+
+	template=nobootloader/confirmation_powerpc_pasemi
+	db_subst $template INITRD "sata0.0:/${boot}${initrd}"
+	db_subst $template KERNFILE "sata0.0:/${boot}${kernel}"
+	db_subst $template BOOTARGS "root=$rootfs"
+	db_input high $template || true
+	;;
     arm/netwinder)
 	kernel=vmlinuz
 
