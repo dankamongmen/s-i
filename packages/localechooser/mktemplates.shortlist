@@ -45,13 +45,13 @@ for LANG in $SHORTLIST_LANGS; do
 
     # Get the default value.
     if [ "$LANG" != en ]; then
-    	field="Default-$LANG.UTF-8"
+	field="Default-$LANG.UTF-8"
     else
 	field="Default"
     fi
     LANG_DEFAULT_COUNTRY=$(awk -v ITEM="$field:" -f template_get_item.awk \
 	$TEMPLATE_TMP | head -1 | sed "s/-$LANG.UTF-8//")
-	
+
     echo "$LANG"
 
     # Write the 'template header' to the file
@@ -60,7 +60,7 @@ for LANG in $SHORTLIST_LANGS; do
     if [ -n "$LANG_DEFAULT_COUNTRY" ] ; then
 	echo "$LANG_DEFAULT_COUNTRY" >>$TEMPLATE_NEW
     fi
-    
+
     # Next we put the countrycodes in the untranslated shortlist
     SHORTLIST=
     for COUNTRYCODE in $(cat $SHORTLIST_DIR/$LANG.short | cut -f 1) ; do

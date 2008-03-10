@@ -11,6 +11,9 @@ ISO3166TAB=debian/iso-3166.tab
 # Translations location (relative to the build root directory)
 ISO3166TRANSLATIONS=debian/iso-codes
 
+templates_in=$1
+templates_out=$2
+
 # Get the ordered list of countries from the iso_3166.tab, sorted
 # according to the regionmap.
 #
@@ -21,7 +24,7 @@ CHOICES="$(./countrylist $ISO3166TAB ./regionmap | \
 
 # Now put this list as the choices in the templates
 # and defined this field as translatable (__Choices hack)
-cat debian/templates.lang | \
+cat $templates_in | \
     sed "/^Choices: \@countrylist/s/Choices:/__Choices:/g" | \
     CHOICES="$CHOICES" perl -pe 's/\@countrylist\@/$ENV{CHOICES}/g' \
     >debian/templates.tmp
@@ -68,5 +71,4 @@ done
 echo
 
 # and now we generate the templates file from all this
-po2debconf --podir debian/pobuild debian/templates.tmp >debian/templates.base
-
+po2debconf --podir debian/pobuild debian/templates.tmp >$templates_out

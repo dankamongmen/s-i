@@ -6,10 +6,7 @@ set -e
 db_capb backup
 
 localecode="debian-installer/locale"
-langlist_ascii="languagechooser/languagelist-ascii"
-langlist_latin="languagechooser/languagelist-latin"
-langlist_fb="languagechooser/languagelist-fb"
-langlist_all="languagechooser/languagelist"
+langlist="languagechooser/languagelist"
 fallbacklocalecode="debian-installer/fallbacklocale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -23,6 +20,10 @@ ISO3166TAB=/usr/share/iso-codes/iso_3166.tab
 SUPPORTEDLOCALES=/etc/SUPPORTED-short
 SHORTLISTS=/etc/shortlists
 LANGUAGELISTFILE=/usr/share/localechooser/languagelist
+LANGUAGELISTDATA=/usr/share/localechooser/languagelist.data.gz
+
+NL="
+"
 
 error() {
 	logger -t localechooser "error: $@"
@@ -80,6 +81,10 @@ locale2countrycode() {
 	fi
 }
 
+choices_add() {
+	echo "${1:+$1, }$2"
+}
+
 do_preseed() {
 	LOCALE="$1"
 	log "Locale has been preseeded to $LOCALE"
@@ -94,9 +99,9 @@ do_preseed() {
 	LANGUAGE=${LOCALE%%.*}
 	LANGUAGE=${LANGUAGE%%_*}
 	if [ -n "$LANGUAGE" ]; then
-		db_set $langlist_template $LANGUAGE
-		log "Set $langlist_template = '$LANGUAGE'"
-		db_fset $langlist_template seen $seenflag || true
+		db_set $langlist $LANGUAGE
+		log "Set $langlist = '$LANGUAGE'"
+		db_fset $langlist seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ]; then
 			local SL=""
@@ -198,45 +203,64 @@ else
 	INITIAL_LANGUAGE=C
 fi
 
-# Find the display level
+# Find the display level and set languages in the template
 # Needs to be done before checking preseeding, so we can preseed the
 # correct template.
 
 #log "Frontend in use: $DEBIAN_FRONTEND"
 case $DEBIAN_FRONTEND in
     text)
-	langlist_template=$langlist_ascii
-	;;
+	langlevel=0 ;;
     gtk)
-	langlist_template=$langlist_all
-	;;
+	langlevel=4 ;;
     *)
-	# Only keep Latin1 languages if we don't have the framebuffer
+	# Only keep Latin1 languages if we don't have a framebuffer
 	db_get debian-installer/framebuffer || true
 	if [ "$RET" = "false" ] || [ -z "$RET" ]; then
-		langlist_template=$langlist_latin
+		langlevel=1
 	else
-		langlist_template=$langlist_fb
+		langlevel=3
 	fi
 	# ASCII only if we are on serial console or a dumb terminal
 	# Both variables should already be set at init time
 	if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ]; then
-		langlist_template=$langlist_ascii	    
+		langlevel=0
 	fi
 	;;
 esac
-#log "Language input template is $langlist_template"
+#log "Language display level is $langlevel"
+
+old_langlevel=$(cat /var/lib/localechooser/langlevel 2>/dev/null || true)
+if [ "$langlevel" != "$old_langlevel" ]; then
+	rm -f /var/lib/localechooser/langlevel
+
+	OLDIFS="$IFS"
+	IFS="$NL"
+	for langline in $(zcat $LANGUAGELISTDATA | grep "^[0-$langlevel]:"); do
+		lt_codes="$(choices_add "$lt_codes" \
+			"$(echo "$langline" | cut -d: -f2)")"
+		lt_names_en="$(choices_add "$lt_names_en" \
+			"$(echo "$langline" | cut -d: -f3)")"
+		lt_names_both="$(choices_add "$lt_names_both" \
+			"$(echo "$langline" | cut -d: -f4)")"
+	done
+	IFS="$OLDIFS"
+
+	db_subst $langlist CODES "$lt_codes"
+	db_subst $langlist NAMES_EN "$lt_names_en"
+	db_subst $langlist NAMES_BOTH "$lt_names_both"
+
+	echo $langlevel >/var/lib/localechooser/langlevel
+fi
 
 # Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding the first time localechooser is run.
-db_get localechooser/alreadyrun
-if [ "$RET" != true ]; then
+if [ ! -f /var/lib/localechooser/preseeded ]; then
 	if db_get $localecode && [ "$RET" ]; then
 		do_preseed $RET
 	fi
 
-	# Prevent preseeding from being checked a second time
-	db_set localechooser/alreadyrun "true" || true
+	>/var/lib/localechooser/preseeded
 fi
 
 
@@ -260,14 +284,13 @@ while :; do
 			# Set initial language for correct display of list
 			db_set debconf/language $INITIAL_LANGUAGE
 
-			db_input critical $langlist_template || [ $? -eq 30 ]
+			db_input critical $langlist || [ $? -eq 30 ]
 		fi
 		;;
 
 	   11)	# We have a language
-		db_get $langlist_template
+		db_get $langlist
 		LANGUAGE="$RET"
-		db_set $langlist_all "$LANGUAGE"
 
 		# Determine defaults based on languagelist
 		. languagemap

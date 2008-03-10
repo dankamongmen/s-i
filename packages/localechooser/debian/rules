@@ -5,7 +5,6 @@ PACKAGE=localechooser
 build: build-stamp
 build-stamp:
 	dh_testdir
-	chmod u+x ./get-SUPPORTED ./mktemplates.country ./get-iso-codes ./mk_shortlist_templates
 	$(MAKE)
 	touch build-stamp
 
@@ -29,6 +28,9 @@ install: build
 	cat languagelist | grep -v "^#.*" | cut -d";" -f1,4- \
 		>debian/$(PACKAGE)/usr/share/localechooser/languagelist
 	chmod 0644 debian/$(PACKAGE)/usr/share/localechooser/languagelist
+	gzip -c debian/languagelist.data \
+		>debian/$(PACKAGE)/usr/share/localechooser/languagelist.data.gz
+	chmod 0644 debian/$(PACKAGE)/usr/share/localechooser/languagelist.data.gz
 	dh_installdirs etc
 	# The following while we have no other way to get SUPPORTED
 	# Should become useless when we will have it
