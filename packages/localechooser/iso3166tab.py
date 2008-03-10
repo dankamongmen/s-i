@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #
 # Read iso-codes data file and output a .tab file
-# 
+#
 # Copyright (C) 2004 Alastair McKinstry <mckinstry@debian.org>
 # Released under the GPL.
 # $Id: iso3166tab.py,v 1.2 2005/01/08 18:06:46 mckinstry Exp $
@@ -19,7 +19,7 @@ class printLines(saxutils.DefaultHandler):
 			return
 		code = attrs.get('alpha_2_code', None)
 		if code == None:
-			raise RunTimeError, "Bad file"	
+			raise RunTimeError, "Bad file"
 		if type(code) == unicode:
 			code = code.encode('UTF-8')
 		name = attrs.get('name', None)
@@ -36,7 +36,7 @@ class printLines(saxutils.DefaultHandler):
 		self.ofile.write (code + '\t' + name + '\n')
 
 
-## 
+##
 ## MAIN
 ##
 

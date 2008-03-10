@@ -11,19 +11,19 @@ LOCALE="$RET"
 # This can happen during e.g. s390 installs where localechooser is not run
 [ "$LOCALE" ] || LOCALE="C"
 
-if [ "$LOCALE" != "C" ] ; then
+if [ "$LOCALE" != "C" ]; then
 	db_get debian-installer/language
 	LANGLIST="$RET"
 fi
 
 EXTRAS=""
-if db_get localechooser/supported-locales ; then
+if db_get localechooser/supported-locales; then
 	EXTRAS="$(echo "$RET" | sed 's/,//g')"
 fi
 
 LANGUAGE="${LOCALE%%_*}"
 
-# Enable translations. 
+# Enable translations
 if [ "$LOCALE" != "C" ] || [ "$EXTRAS" ]; then
 	apt-install locales || true
 fi
@@ -54,14 +54,14 @@ ROOTPROFILE="/target/root/.profile"
 # We must map the language to its "level" from languagelist
 LANGUAGECODE=`echo $LOCALE|cut -f1 -d_`
 # For language with multiple entries such as pt/pt_BR or zh_CN/zh_TW
-# we don't really care about the entry we will match as the level will always 
-# be the same 
+# we don't really care about the entry we will match as the level will always
+# be the same
 LEVEL=`cat /usr/share/localechooser/languagelist |\
 	cut -f 2-3 -d\; | \
 	grep "$LANGUAGECODE" | \
 	head -n 1 | \
 	cut -f1 -d\;`
-if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ] ; then
+if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ]; then
 	echo "# Installed by Debian Installer:" >>$ROOTPROFILE
 	echo "#  no localization for root because $LOCALE" >>$ROOTPROFILE
 	echo "#  cannot be properly displayed at the Linux console" >>$ROOTPROFILE
@@ -70,7 +70,7 @@ if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ] ; then
 fi
 
 # If the locale isn't already valid, append it to locale.gen
-if [ -x /target/usr/sbin/validlocale ] ; then 
+if [ -x /target/usr/sbin/validlocale ]; then
 	gen=""
 	if log-output -t localechooser --pass-stdout \
 	    chroot /target/ /usr/sbin/validlocale "$LOCALE" \
@@ -94,11 +94,11 @@ if [ -x /target/usr/sbin/validlocale ] ; then
 		fi
 	done
 	if [ "$gen" ]; then
-		if [ -x /target/usr/sbin/locale-gen ] ; then 
+		if [ -x /target/usr/sbin/locale-gen ]; then
 			log-output -t localechooser --pass-stdout \
 			    chroot /target /usr/sbin/locale-gen --keep-existing >/dev/null
 		fi
 	fi
 fi
-	
+
 exit 0
