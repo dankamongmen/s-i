@@ -186,6 +186,39 @@ gtk_switch_font() {
 	fi
 }
 
+refine_locale() {
+	local old_locale=$1
+
+	for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
+	             ${LANGUAGE}_${COUNTRYCODE}; do
+		# Is the locale we inherited really a complete locale?
+		LOCALE_LANGUAGECHOOSER_COMPLETE=$(echo $old_locale | grep "_" || true)
+		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
+			# Special handling of cases where the locale
+			# in languagechooser is NOT the combination of
+			# language_COUNTRY. Used for Norwegian
+			# Bokmal transition in order to keep no_NO as
+			# locale. May be used in the future for other
+			# special cases, so we'd better keep this.
+			if [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" ] && \
+			   [ "$COUNTRYCODE" = "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
+			   [ "${LANGUAGE}_${COUNTRYCODE}" != "$old_locale" ] && \
+			   [ "$LOCALE_LANGUAGECHOOSER_COMPLETE" ]; then
+				# Explanation: we revert back to the
+				# locale inherited from the language
+				# step if the country step did NOT
+				# induce change in language and country
+				# but the resulting locale is different
+				# from the one we had in first step.
+				echo "$old_locale"
+			else
+				echo "$entry"
+			fi
+			break
+		fi
+	done
+}
+
 
 # Reset all variables
 LANGNAME=""
@@ -447,47 +480,14 @@ while :; do
 		# Refinement: we try to use the modifier inherited from language
 		# selection. However, we do this only if the locale is valid.
  
-		# No refinement if the locale was preseeded
+		# Maybe no refinement should be done if locale is preseeded?
 		if [ "$LOCALE" != "C" ]; then
 			OLDLOCALE=$LOCALE
 			LOCALE=""
 
-			db_get $localecode
-			if [ -z "$LOG" ] || [ -z "$RET" ]; then
-				for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
-				             ${LANGUAGE}_${COUNTRYCODE}; do
-					# Is the locale we inherited really a complete locale?
-					LOCALE_LANGUAGECHOOSER_COMPLETE=$(echo $OLDLOCALE | grep "_" || true)
-					if grep -q "^$entry$" $SUPPORTEDLOCALES; then
-						# Special handling of cases where the locale
-						# in languagechooser is NOT the combination of
-						# language_COUNTRY. Used for Norwegian
-						# Bokmal transition in order to keep no_NO as
-						# locale. May be used in the future for other
-						# special cases, so we'd better keep this.
-						if [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" ] && \
-						   [ "$COUNTRYCODE" = "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
-						   [ "${LANGUAGE}_${COUNTRYCODE}" != "$OLDLOCALE" ] && \
-						   [ "$LOCALE_LANGUAGECHOOSER_COMPLETE" ]; then
-							# Explanation: we revert back to the
-							# locale inherited from the language
-							# step if the country step did NOT
-							# induce change in language and country
-							# but the resulting locale is different
-							# from the one we had in first step.
-							LOCALE=$OLDLOCALE
-						else
-							LOCALE="$entry"
-						fi
-						break
-					fi
-				done
-			else
-				# LOCALE was valid
-				LOCALE=$OLDLOCALE
-			fi
-	
-			# Fall back to a supported locale.
+			LOCALE=$(refine_locale "$OLDLOCALE")
+
+			# Fall back to a supported locale
 			if [ -z "$LOCALE" ]; then
 				if grep -q "^$FALLBACKLOCALE$" $SUPPORTEDLOCALES; then
 					LOCALE="$FALLBACKLOCALE"
