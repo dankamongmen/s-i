@@ -17,7 +17,7 @@ findfs () {
 }
 
 die () {
-	template="$1"
+	local template="$1"
 	shift
 
 	error "$@"
@@ -57,141 +57,145 @@ fi
 rootfs=$(mapdevfs $rootfs_devfs)
 bootfs=$(mapdevfs $bootfs_devfs)
 
-case "`archdetect`" in
-	powerpc/chrp_pegasos)
-		kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
+case "$(archdetect)" in
+    powerpc/chrp_pegasos)
+	kernel=$(ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%')
 
-		if [ -z "$kernel" ]; then
-			kernelpath=`ls /target/boot/vmlinux-2.* | sed -e 's%/target%%'`
-			version="${kernelpath#*vmlinux-}"
-			if [ "$version" ]; then
-				if apt-install mkvmlinuz; then
-					# mkvmlinuz needs proc in /target
-					mountvirtfs proc /target/proc
-					chroot /target /usr/sbin/mkvmlinuz "$version" "$kernelpath"
-				fi
+	if [ -z "$kernel" ]; then
+		kernelpath=$(ls /target/boot/vmlinux-2.* | sed -e 's%/target%%')
+		version="${kernelpath#*vmlinux-}"
+		if [ "$version" ]; then
+			if apt-install mkvmlinuz; then
+				# mkvmlinuz needs proc in /target
+				mountvirtfs proc /target/proc
+				chroot /target /usr/sbin/mkvmlinuz "$version" "$kernelpath"
 			fi
-			kernel=`ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%'`
 		fi
+		kernel=$(ls /target/boot/vmlinuz-2.* | sed -e 's%/target/boot/%%')
+	fi
 
-		partition_offset=1
-		if [ -e /proc/device-tree/openprom/firmware-version ]; then
-			firmware_version="$(cat /proc/device-tree/openprom/firmware-version)"
-			fv1="${firmware_version%%.*}"
-			rest="${firmware_version#*.}"
-			fv2="${rest%%.*}"
-			rest="${rest#*.}"
-			fv3="${rest%%.*}"
-			if [ "$fv1" -eq 1 ]; then
-				if [ "$fv2" -eq 3 ] && [ "$fv3" -ge 99 ]; then
-					partition_offset=0
-				elif [ "$fv2" -ge 4 ]; then
-					partition_offset=0
-				fi
-			elif [ "$fv1" -ge 2 ]; then
+	partition_offset=1
+	if [ -e /proc/device-tree/openprom/firmware-version ]; then
+		firmware_version="$(cat /proc/device-tree/openprom/firmware-version)"
+		fv1="${firmware_version%%.*}"
+		rest="${firmware_version#*.}"
+		fv2="${rest%%.*}"
+		rest="${rest#*.}"
+		fv3="${rest%%.*}"
+		if [ "$fv1" -eq 1 ]; then
+			if [ "$fv2" -eq 3 ] && [ "$fv3" -ge 99 ]; then
+				partition_offset=0
+			elif [ "$fv2" -ge 4 ]; then
 				partition_offset=0
 			fi
+		elif [ "$fv1" -ge 2 ]; then
+			partition_offset=0
 		fi
+	fi
 
-		bootfs_disk_syspath=
-		if [ -d /sys/block ]; then
-			if type udevadm >/dev/null 2>&1; then
-				bootfs_disk_syspath="$(dirname "$(udevadm info -q path -n "$bootfs_devfs")")"
-			elif type udevinfo >/dev/null 2>&1; then
-				bootfs_disk_syspath="$(dirname "$(udevinfo -q path -n "$bootfs_devfs")")"
-			fi
+	bootfs_disk_syspath=
+	if [ -d /sys/block ]; then
+		if type udevadm >/dev/null 2>&1; then
+			bootfs_disk_syspath="$(dirname "$(udevadm info -q path -n "$bootfs_devfs")")"
+		elif type udevinfo >/dev/null 2>&1; then
+			bootfs_disk_syspath="$(dirname "$(udevinfo -q path -n "$bootfs_devfs")")"
 		fi
-		if [ "$bootfs_disk_syspath" ]; then
-			# TODO: device symlinks are allegedly slated to go
-			# away, but it's not entirely clear what their
-			# replacement will be yet ...
-			bootfs_disk="$(basename "$(readlink "/sys$bootfs_disk_syspath/device")")"
-			kind="$(basename "$(readlink "/sys$bootfs_disk_syspath/device/bus")")"
-			case $kind in
-				ide)
-					host="$(basename "$(dirname "$(readlink "/sys$bootfs_disk_syspath/device")")" | sed 's/[^0-9]*//')"
-					# TODO: devfs set bus to hwif->channel, which
-					# doesn't appear to be exposed. Since we only
-					# support the first controller anyway, I'm hoping
-					# that the host (hwif->index) will be good enough.
-					bus="$(echo "$bootfs_disk" | cut -d. -f1)"
-					target="$(echo "$bootfs_disk" | cut -d. -f2)"
-					lun=
-					;;
-				scsi)
-					host="$(echo "$bootfs_disk" | cut -d: -f1)"
-					bus="$(echo "$bootfs_disk" | cut -d: -f2)"
-					target="$(echo "$bootfs_disk" | cut -d: -f3)"
-					lun="$(echo "$bootfs_disk" | cut -d: -f4)"
-					;;
-			esac
-			part="$(($(echo "$bootfs_devfs" | sed 's/^.*[^0-9]//') - $partition_offset))"
-		else
-			kind=`echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%'`
-			host=`echo $bootfs_devfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%'`
-			bus=`echo $bootfs_devfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%'`
-			target=`echo $bootfs_devfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%'`
-			lun=`echo $bootfs_devfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%'`
-			part="$(($(echo "$bootfs_devfs" | sed -e 's%^.*part%%') - $partition_offset))"
-		fi
-
-		# We don't know how to map non ide or scsi disks
-		# and we have trouble when there is more than one such controller.
-		case "$kind","$host" in
-			ide,0) path="/pci/ide/disk@$bus,$target"
-				;;
-			scsi,0) path="/pci/scsi/disk@$bus,$target,$lun"
-				;;
-			*) path="<unknown path>"
-				;;
+	fi
+	if [ "$bootfs_disk_syspath" ]; then
+		# TODO: device symlinks are allegedly slated to go
+		# away, but it's not entirely clear what their
+		# replacement will be yet ...
+		bootfs_disk="$(basename "$(readlink "/sys$bootfs_disk_syspath/device")")"
+		kind="$(basename "$(readlink "/sys$bootfs_disk_syspath/device/bus")")"
+		case $kind in
+		    ide)
+			host="$(basename "$(dirname "$(readlink "/sys$bootfs_disk_syspath/device")")" | sed 's/[^0-9]*//')"
+			# TODO: devfs set bus to hwif->channel, which
+			# doesn't appear to be exposed. Since we only
+			# support the first controller anyway, I'm hoping
+			# that the host (hwif->index) will be good enough.
+			bus="$(echo "$bootfs_disk" | cut -d. -f1)"
+			target="$(echo "$bootfs_disk" | cut -d. -f2)"
+			lun=
+			;;
+		    scsi)
+			host="$(echo "$bootfs_disk" | cut -d: -f1)"
+			bus="$(echo "$bootfs_disk" | cut -d: -f2)"
+			target="$(echo "$bootfs_disk" | cut -d: -f3)"
+			lun="$(echo "$bootfs_disk" | cut -d: -f4)"
+			;;
 		esac
+		part="$(($(echo "$bootfs_devfs" | sed 's/^.*[^0-9]//') - $partition_offset))"
+	else
+		kind=$(echo $bootfs_devfs | sed -e 's%/dev/%%' -e 's%/host.*$%%')
+		host=$(echo $bootfs_devfs | sed -e 's%^.*host%%' -e 's%/bus.*$%%')
+		bus=$(echo $bootfs_devfs | sed -e 's%^.*bus%%' -e 's%/target.*$%%')
+		target=$(echo $bootfs_devfs | sed -e 's%^.*target%%' -e 's%/lun.*$%%')
+		lun=$(echo $bootfs_devfs | sed -e 's%^.*lun%%' -e 's%/part.*$%%')
+		part="$(($(echo "$bootfs_devfs" | sed -e 's%^.*part%%') - $partition_offset))"
+	fi
 
-		# map theidevice to the OF aliases from /proc/device-tree/aliases.
-		if [ -d /proc/device-tree/aliases ]; then
-			for alias in `ls /proc/device-tree/aliases/*`; do
-				device=`grep disk $alias | sed -e 's%@[^/]*/%/%g'`
-				if [ "$path" = "$device" ]; then
-					path="${alias#/proc/device-tree/aliases/}"
-				fi
-			done
-		fi
+	# We don't know how to map non ide or scsi disks
+	# and we have trouble when there is more than one such controller.
+	case "$kind","$host" in
+	    ide,0)
+		path="/pci/ide/disk@$bus,$target" ;;
+	    scsi,0)
+		path="/pci/scsi/disk@$bus,$target,$lun" ;;
+	    *)
+		path="<unknown path>" ;;
+	esac
 
-		bootcmd="boot ${path}:${part} ${boot}${kernel} root=${rootfs}"
+	# map theidevice to the OF aliases from /proc/device-tree/aliases.
+	if [ -d /proc/device-tree/aliases ]; then
+		for alias in $(ls /proc/device-tree/aliases/*); do
+			device=$(grep disk $alias | sed -e 's%@[^/]*/%/%g')
+			if [ "$path" = "$device" ]; then
+				path="${alias#/proc/device-tree/aliases/}"
+			fi
+		done
+	fi
 
-		db_subst nobootloader/confirmation_powerpc_chrp_pegasos KERNEL_BOOT "${bootcmd}"
-		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_DEVICE "${path}:${part}" 
-		db_subst nobootloader/confirmation_powerpc_chrp_pegasos OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
-		db_input high nobootloader/confirmation_powerpc_chrp_pegasos || true
+	bootcmd="boot ${path}:${part} ${boot}${kernel} root=${rootfs}"
+
+	template=nobootloader/confirmation_powerpc_chrp_pegasos
+	db_subst $template KERNEL_BOOT "${bootcmd}"
+	db_subst $template OF_BOOT_DEVICE "${path}:${part}" 
+	db_subst $template OF_BOOT_FILE "${boot}${kernel} root=${rootfs}"
+	db_input high $template || true
 	;;
-	arm/netwinder)
-		kernel=vmlinuz
-		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNDEV "$bootfs"
-		db_subst nobootloader/confirmation_arm_netwinder_nettrom KERNFILE "/${boot}${kernel}"
-		db_subst nobootloader/confirmation_arm_netwinder_nettrom ROOTDEV "$rootfs"
-		# TODO: handle serial console (#274695)
-		db_subst nobootloader/confirmation_arm_netwinder_nettrom CMDAPPEND "root=$rootfs"
-		db_input high nobootloader/confirmation_arm_netwinder_nettrom || true
-	;;
-	*)
-		db_get base-installer/kernel/linux/link_in_boot
-		link_in_boot="$RET"
-		if [ "$link_in_boot" = "true" ]; then
-			boot_link="boot/"
-		else
-			boot_link=""
-			boot=""
-			bootfs=${rootfs}
-		fi
-		if [ -e /target/${boot_link}vmlinuz ]; then
-			kernel="/${boot}vmlinuz"
-		elif [ -e /target/${boot_link}vmlinux ]; then
-			kernel="/${boot}vmlinux"
-		fi
+    arm/netwinder)
+	kernel=vmlinuz
 
-		db_subst nobootloader/confirmation_common ROOT "root=${rootfs}"
-		db_subst nobootloader/confirmation_common BOOT "${bootfs}"
-		db_subst nobootloader/confirmation_common KERNEL "${kernel}"
-		db_input high nobootloader/confirmation_common || true
+	template=nobootloader/confirmation_arm_netwinder_nettrom
+	db_subst $template KERNDEV "$bootfs"
+	db_subst $template KERNFILE "/${boot}${kernel}"
+	db_subst $template ROOTDEV "$rootfs"
+	# TODO: handle serial console (#274695)
+	db_subst $template CMDAPPEND "root=$rootfs"
+	db_input high $template || true
+	;;
+    *)
+	db_get base-installer/kernel/linux/link_in_boot
+	link_in_boot="$RET"
+	if [ "$link_in_boot" = "true" ]; then
+		boot_link="boot/"
+	else
+		boot_link=""
+		boot=""
+		bootfs=${rootfs}
+	fi
+	if [ -e /target/${boot_link}vmlinuz ]; then
+		kernel="/${boot}vmlinuz"
+	elif [ -e /target/${boot_link}vmlinux ]; then
+		kernel="/${boot}vmlinux"
+	fi
+
+	template=nobootloader/confirmation_common
+	db_subst $template ROOT "root=${rootfs}"
+	db_subst $template BOOT "${bootfs}"
+	db_subst $template KERNEL "${kernel}"
+	db_input high $template || true
 	;;
 esac
 
