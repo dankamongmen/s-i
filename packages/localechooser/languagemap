@@ -1,44 +1,47 @@
 #!/bin/sh
 #
-# This file should be automatically generated.
-#
 # Usage:
-#   LANGNAME="langname"
+#   LANGNAME=<value>
 #   . languagemap
+#
+# The calling script should provide the log() function
 
-for list in /etc/languagelist /usr/share/localechooser/languagelist ./languagelist ; do 
-	if [ -f "$list" ] ; then
+for list in /etc/languagelist /usr/share/localechooser/languagelist ./languagelist; do
+	if [ -f "$list" ]; then
 		languages="$list"
+		break
 	fi
 done
 
-log "LANGNAME=$LANGNAME"
+log "Language = '$LANGNAME'"
 
-line=$(grep "^${LANGNAME};" $languages || true)
-
+line=$(grep "^$LANGNAME;" $languages || true)
 log "line=$line"
+
+LANGUAGE=""
+COUNTRY=""
+FALLBACKLOCALE=""
+LOCALE=""
+LANGUAGELIST=""
+CONSOLE=""
+
 if [ "$line" ] ; then
 	OLD_IFS="$IFS"
 	IFS=';'
 	set $line
 	IFS="$OLD_IFS"
 
-	#echo "C: $*"
-
-	if [ "$3" ] ; then LANGUAGE="$3" ; fi
-	if [ "$4" ] ; then COUNTRY="$4" ; fi
-	if [ "$5" ] ; then FALLBACKLOCALE="$5" ; LOCALE="$5" ; fi
-	if [ "$6" ] ; then LANGUAGELIST="$6"; fi
-	if [ "$7" ] ; then CONSOLE="$7"; fi
+	if [ "$3" ]; then LANGUAGE="$3" ; fi
+	if [ "$4" ]; then COUNTRY="$4" ; fi
+	if [ "$5" ]; then FALLBACKLOCALE="$5" ; LOCALE="$5" ; fi
+	if [ "$6" ]; then LANGUAGELIST="$6"; fi
+	if [ "$7" ]; then CONSOLE="$7"; fi
 
 	if [ -z "$LANGUAGELIST" ] ; then
 		LANGUAGELIST="$LANGUAGE"
 	fi
 else
-	echo "error: Unable to locate info on language '$LANGNAME'"
-	log "error: Unable to locate info on language '$LANGNAME'"
-	FALLBACKLOCALE=""
-	LANGUAGE=""
+	log "error: Unable to locate info for language '$LANGNAME'"
 	LOCALE=C
 	COUNTRY=US
 fi

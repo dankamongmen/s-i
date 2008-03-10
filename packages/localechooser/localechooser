@@ -315,19 +315,16 @@ while :; do
 		db_get $langname_template
 		LANGNAME="$RET"
 		db_set $langname_all "$LANGNAME"
+
+		# Determine defaults based on languagelist
 		. languagemap
-		if [ -z "$LANGUAGELIST" ]; then
-			db_set "$languagecode" "$LANGUAGE"
-			log "Set $languagecode = '$LANGUAGE'"
-			LANGUAGELIST="$LANGUAGE"
-		else
-			db_set "$languagecode" "$LANGUAGELIST"
-			log "Set $languagecode = '$LANGUAGELIST'"
-		fi
+		db_set "$languagecode" "$LANGUAGELIST"
+		log "Set $languagecode = '$LANGUAGELIST'"
 		db_set "$localecode"   "$LOCALE"
 		log "Set $localecode = '$LOCALE'"
 		db_set "$fallbacklocalecode"   "$FALLBACKLOCALE"
 		log "Set $fallbacklocalecode = '$FALLBACKLOCALE'"
+
 		if [ -n "$COUNTRY" ]; then
 			db_set "$countrycode"  "$COUNTRY"
 			log "Set $countrycode = '$COUNTRY'"
@@ -337,6 +334,7 @@ while :; do
 			fi
 			log "No default country; preserving current value '$COUNTRY'"
 		fi
+
 		db_set "$consoledisplay"  "$CONSOLE"
 		log "Set $consoledisplay = '$CONSOLE'"
 
