@@ -218,13 +218,9 @@ case $DEBIAN_FRONTEND in
 	else
 		langlist_template=$langlist_fb
 	fi
-	# Try to detect serial consoles
-	[ -f /lib/debian-installer/detect-console ] && . /lib/debian-installer/detect-console
-	if [ "$TERM_TYPE" = "serial" ]; then
-		langlist_template=$langlist_ascii	    
-	fi
-	# For cases we have a dumb terminal, we're stuck with ASCII
-	if [ "$TERM" = "dumb" ]; then
+	# ASCII only if we are on serial console or a dumb terminal
+	# Both variables should already be set at init time
+	if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ]; then
 		langlist_template=$langlist_ascii	    
 	fi
 	;;
