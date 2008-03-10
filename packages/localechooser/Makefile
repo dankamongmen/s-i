@@ -1,10 +1,9 @@
 all: debian/SUPPORTED-short debian/short-tmp/shortlists debian/templates check-scripts check-data check-utf8
 
 LIST     = languagelist
-L10NLIST = languagelist.l10n
 
 debian/templates.base: mktemplates.language debian/localechooser.templates-in $(LIST) $(L10NLIST) debian/iso-3166.tab
-	LC_COLLATE=C ./mktemplates.language $(LIST) $(L10NLIST) debian/templates.lang debian/localechooser.templates-in
+	LC_COLLATE=C ./mktemplates.language $(LIST) debian/templates.lang debian/localechooser.templates-in
 	./mktemplates.country debian/templates debian/templates.lang
 
 debian/iso-codes:
@@ -28,12 +27,12 @@ check-scripts:
 		$$SH -n $$s ; \
 	done
 
-check-utf8: $(L10NLIST)
-	iconv -f utf-8 -t unicode $(L10NLIST) > /dev/null
+check-utf8: $(LIST)
+	iconv -f utf-8 -t unicode $(LIST) > /dev/null
 
 check-data:
 	# Check that the listed locale is supported, to make sure it will work.
-	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f5 | grep _` ; do \
+	@for locale in `grep -v "^#" $(LIST) | cut -d\; -f6 | grep _` ; do \
 		if grep -q "^$$locale " /usr/share/i18n/SUPPORTED ; then \
 			: ; \
 		else \

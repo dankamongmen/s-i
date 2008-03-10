@@ -9,7 +9,6 @@ use strict;
 use warnings;
 
 my $list       = shift;
-my $listl10n   = shift;
 my $template   = shift;
 my $templatein = shift;
 
@@ -18,6 +17,7 @@ my $debug = 0;
 my $show_locales = 1;
 
 my %locales;
+my %translationmap;
 
 sub get_language_names {
     my $list = shift;
@@ -29,29 +29,14 @@ sub get_language_names {
 	print if ($debug);
 	chomp;
 	next if m/^\#/;
-	my ($name, $lev, $locale, ) = split(/;/);
+	my ($name, $translation, $lev, $locale, ) = split(/;/);
 	push(@names, $name) if ("$lev" <= "$level");
+
 	$locale =~ s/@.+//;
 	# Drop modifier and charset part of locale
 	$locale =~ s/[@.].+$//;
 	$locales{$name} = $locale;
-    }
-    close(L);
-    return @names;
-}
 
-sub get_translations {
-    my ($listl10n, @names) = @_;
-    my %translations;
-    print "Loading $listl10n\n" if ($debug);
-    open(L, "< $listl10n") || die "Unable to read $listl10n";
-    while (<L>) {
-	print if ($debug);
-	chomp;
-	next if m/^\#/;
-	my ($name, $translation) = split(/: /);
-	$translation =~ s/,/\\,/g;
-        if ($show_locales && defined $locales{$name}) {
 # C. Perrier 2004/05/09 change layout
 #
 # Layout 1 : xx_YY : Translated name
@@ -70,18 +55,16 @@ sub get_translations {
 # Con : no sorting....giving a confusing screen
 #            no change to $translation
 #	      $translation = $translation;
-        }
-	$translations{$name} = $translation;
+	$translationmap{$name} = $translation;
     }
     close(L);
-    return %translations;
+    return @names;
 }
 
-my @languagenames_ascii   = get_language_names($list,0);
-my @languagenames_latin   = get_language_names($list,1);
-my @languagenames_fb   = get_language_names($list,3);
+my @languagenames_ascii = get_language_names($list,0);
+my @languagenames_latin = get_language_names($list,1);
+my @languagenames_fb    = get_language_names($list,3);
 my @languagenames_all   = get_language_names($list,4);
-my %translationmap  = get_translations($listl10n);
 
 sub order_trans {
     my ($a_locale)=$translationmap{$a}=~/^(\w+)/;
@@ -113,32 +96,24 @@ for my $name (sort_C_first @languagenames_ascii) {
     if (exists $translationmap{$name}) {
 	push(@translations_ascii, $translationmap{$name});
 	push(@sortedlanguagenames_ascii, $name);
-    } else {
-	print "Missing $name in $listl10n\n";
     }
 }
 for my $name (sort_C_first @languagenames_latin) {
     if (exists $translationmap{$name}) {
 	push(@translations_latin, $translationmap{$name});
 	push(@sortedlanguagenames_latin, $name);
-    } else {
-	print "Missing $name in $listl10n\n";
     }
 }
 for my $name (sort_C_first @languagenames_fb) {
     if (exists $translationmap{$name}) {
 	push(@translations_fb, $translationmap{$name});
 	push(@sortedlanguagenames_fb, $name);
-    } else {
-	print "Missing $name in $listl10n\n";
     }
 }
 for my $name (sort_C_first @languagenames_all) {
     if (exists $translationmap{$name}) {
 	push(@translations_all, $translationmap{$name});
 	push(@sortedlanguagenames_all, $name);
-    } else {
-	print "Missing $name in $listl10n\n";
     }
 }
 
