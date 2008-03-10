@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
-# Author: Petter Reinholdtsen
-# Date:   2003-09-27
+# Author: Petter Reinholdtsen (2003)
+# 	  Christian Perrier (2004)
 #
 # Extract language options for debian-installer
 
@@ -14,9 +14,7 @@ my $templatein = shift;
 
 my $debug = 0;
 
-my $show_locales = 1;
-
-my %locales;
+my %codes;
 my %translationmap;
 
 sub get_language_names {
@@ -29,32 +27,14 @@ sub get_language_names {
 	print if ($debug);
 	chomp;
 	next if m/^\#/;
-	my ($name, $translation, $lev, $locale, ) = split(/;/);
+	my ($code, $name, $translation, $lev, ) = split(/;/);
 	push(@names, $name) if ("$lev" <= "$level");
 
-	$locale =~ s/@.+//;
-	# Drop modifier and charset part of locale
-	$locale =~ s/[@.].+$//;
-	$locales{$name} = $locale;
+	$codes{$name} = $code;
 
-# C. Perrier 2004/05/09 change layout
-#
-# Layout 1 : xx_YY : Translated name
-# This is beta4 layout
-#             $translation = $locales{$name}.
-#                            (" " x (5 - length($locales{$name}))).
-#                            " - $name - $translation";
-# Layout 2 : English name     - Translated name
-# Pro : "natural" sorting
-# Con : English looks useless
-             $translation = $name .
-                            (" " x (22 - length($name))).
-			    "- $translation";
-# Layout 3 : Translated name
-# Pro : no useless English
-# Con : no sorting....giving a confusing screen
-#            no change to $translation
-#	      $translation = $translation;
+	$translation = $name .
+	               (" " x (22 - length($name))).
+	               "- $translation";
 	$translationmap{$name} = $translation;
     }
     close(L);
@@ -67,19 +47,17 @@ my @languagenames_fb    = get_language_names($list,3);
 my @languagenames_all   = get_language_names($list,4);
 
 sub order_trans {
-    my ($a_locale)=$translationmap{$a}=~/^(\w+)/;
-    my ($b_locale)=$translationmap{$b}=~/^(\w+)/;
-    $a_locale.="_ZZ" if length $a_locale == 2;
-    $b_locale.="_ZZ" if length $b_locale == 2;
-    return $a_locale cmp $b_locale;
+    my ($a_language)=$translationmap{$a}=~/^(\w+)/;
+    my ($b_language)=$translationmap{$b}=~/^(\w+)/;
+    return $a_language cmp $b_language;
 }
 
 #Sorts languages, making sure that the C locale is listed first
 sub sort_C_first {
     my @full_list = @_;
     my @C_locale = grep /^C$/, @full_list;
-    my @other_locales = grep !/^C$/, @full_list;
-    my @new_list = sort order_trans @other_locales;
+    my @languages = grep !/^C$/, @full_list;
+    my @new_list = sort order_trans @languages;
     unshift @new_list, @C_locale;
     return @new_list;
 }
@@ -88,6 +66,10 @@ my @translations_ascii;
 my @translations_latin;
 my @translations_fb;
 my @translations_all;
+my @languagecodes_ascii;
+my @languagecodes_latin;
+my @languagecodes_fb;
+my @languagecodes_all;
 my @sortedlanguagenames_ascii;
 my @sortedlanguagenames_latin;
 my @sortedlanguagenames_fb;
@@ -95,46 +77,58 @@ my @sortedlanguagenames_all;
 for my $name (sort_C_first @languagenames_ascii) {
     if (exists $translationmap{$name}) {
 	push(@translations_ascii, $translationmap{$name});
+	push(@languagecodes_ascii, $codes{$name});
 	push(@sortedlanguagenames_ascii, $name);
     }
 }
 for my $name (sort_C_first @languagenames_latin) {
     if (exists $translationmap{$name}) {
 	push(@translations_latin, $translationmap{$name});
+	push(@languagecodes_latin, $codes{$name});
 	push(@sortedlanguagenames_latin, $name);
     }
 }
 for my $name (sort_C_first @languagenames_fb) {
     if (exists $translationmap{$name}) {
 	push(@translations_fb, $translationmap{$name});
+	push(@languagecodes_fb, $codes{$name});
 	push(@sortedlanguagenames_fb, $name);
     }
 }
 for my $name (sort_C_first @languagenames_all) {
     if (exists $translationmap{$name}) {
 	push(@translations_all, $translationmap{$name});
+	push(@languagecodes_all, $codes{$name});
 	push(@sortedlanguagenames_all, $name);
     }
 }
 
+my $codes_ascii=join(", ", @languagecodes_ascii);
 my $langstr_ascii=join(", ", @sortedlanguagenames_ascii);
 my $nativemessages_ascii=join(", ", @translations_ascii);
+my $codes_latin=join(", ", @languagecodes_latin);
 my $langstr_latin=join(", ", @sortedlanguagenames_latin);
 my $nativemessages_latin=join(", ", @translations_latin);
+my $codes_fb=join(", ", @languagecodes_fb);
 my $langstr_fb=join(", ", @sortedlanguagenames_fb);
 my $nativemessages_fb=join(", ", @translations_fb);
+my $codes_all=join(", ", @languagecodes_all);
 my $langstr_all=join(", ", @sortedlanguagenames_all);
 my $nativemessages_all=join(", ", @translations_all);
 
 open(TIN, "< $templatein") || die "Unable to read $templatein";
 open(TOUT, "> $template") || die "Unable to write $template";
 while (<TIN>) {
+    s/\@languagecodes_ascii\@/$codes_ascii/;
     s/\@languagenames_ascii\@/$langstr_ascii/;
     s/\@nativemessages_ascii\@/$nativemessages_ascii/;
+    s/\@languagecodes_latin\@/$codes_latin/;
     s/\@languagenames_latin\@/$langstr_latin/;
     s/\@nativemessages_latin\@/$nativemessages_latin/;
+    s/\@languagecodes_fb\@/$codes_fb/;
     s/\@languagenames_fb\@/$langstr_fb/;
     s/\@nativemessages_fb\@/$nativemessages_fb/;
+    s/\@languagecodes_all\@/$codes_all/;
     s/\@languagenames_all\@/$langstr_all/;
     s/\@nativemessages_all\@/$nativemessages_all/;
     print TOUT;

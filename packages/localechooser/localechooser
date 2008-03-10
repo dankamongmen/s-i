@@ -6,10 +6,10 @@ set -e
 db_capb backup
 
 localecode="debian-installer/locale"
-langname_ascii="languagechooser/language-name-ascii"
-langname_latin="languagechooser/language-name-latin"
-langname_fb="languagechooser/language-name-fb"
-langname_all="languagechooser/language-name"
+langlist_ascii="languagechooser/languagelist-ascii"
+langlist_latin="languagechooser/languagelist-latin"
+langlist_fb="languagechooser/languagelist-fb"
+langlist_all="languagechooser/languagelist"
 fallbacklocalecode="debian-installer/fallbacklocale"
 languagecode="debian-installer/language"
 countrycode="debian-installer/country"
@@ -68,49 +68,10 @@ country2code() {
 	fi
 }
 
-# Note: this function does not properly support languages like pt_BR and zh_*;
-#	to support this, the languagelist would have to be modified
-# Note: this function is broken if C.UTF8 would be preseeded
-locale2langname() {
-	langpart="${1%%_*}"
-	if [ "$1" != "C" ]; then
-		# Match the language code with 3rd field in languagelist
-		line=$(grep -v "^#" $LANGUAGELISTFILE | cut -f1,3,4 -d\; | grep -v '^C;' | grep ";$langpart;")
-		if [ -n "$line" ]; then
-			if [ "$(echo "$line" | grep -c '')" -gt 1 ]; then
-				# More than one match; try matching the
-				# country as well.
-				countrypart="${1#*_}"
-				countrypart="${countrypart%%[@.]*}"
-				countryline="$(echo "$line" | grep ";$countrypart\$" ||true)"
-				if [ "$countryline" ]; then
-					echo "${countryline%%;*}"
-					return
-				fi
-			fi
-			echo "${line%%;*}"
-		fi
-	else
-		echo "C"
-	fi
-}
-
 locale2countrycode() {
 	if [ -n "$1" ]; then
 		if echo $1 | grep -q "_"; then
 			echo $1 | cut -f2 -d_ | cut -f1 -d@ | cut -f1 -d\.
-		else
-			echo
-		fi
-	else
-		error "Missing argument"
-	fi
-}
-
-locale2langcode() {
-	if [ -n "$1" ]; then
-		if echo $1 | grep -q "_"; then
-			echo "${1%%_*}"
 		else
 			echo
 		fi
@@ -130,12 +91,12 @@ do_preseed() {
 	
 	# Only populate debconf if this is a supported locale
 	# and if the language is supported in D-I
-	LANGUAGE=$(locale2langcode "$LOCALE")
-	LANGNAME=$(locale2langname "$LOCALE")
-	if [ -n "$LANGNAME" ]; then
-		db_set $langname_template $LANGNAME
-		log "Set $langname_template = '$LANGNAME'"
-		db_fset $langname_template seen $seenflag || true
+	LANGUAGE=${LOCALE%%.*}
+	LANGUAGE=${LANGUAGE%%_*}
+	if [ -n "$LANGUAGE" ]; then
+		db_set $langlist_template $LANGUAGE
+		log "Set $langlist_template = '$LANGUAGE'"
+		db_fset $langlist_template seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ]; then
 			local SL=""
@@ -171,7 +132,7 @@ do_preseed() {
 install_lang_specific() {
 	if [ "$LOCALE" != "C" ]; then
 		case "$LANGUAGE" in
-		    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
+		    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh*)
 			# We need a complete font for later steps
 			anna-install bterm-unifont
 			;;
@@ -221,11 +182,10 @@ refine_locale() {
 
 
 # Reset all variables
-LANGNAME=""
+LANGUAGE=""
 COUNTRY=""
 COUTRYNAME=""
 LOCALE=""
-LANGUAGE=""
 
 # debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
@@ -245,31 +205,31 @@ fi
 #log "Frontend in use: $DEBIAN_FRONTEND"
 case $DEBIAN_FRONTEND in
     text)
-	langname_template=$langname_ascii
+	langlist_template=$langlist_ascii
 	;;
     gtk)
-	langname_template=$langname_all
+	langlist_template=$langlist_all
 	;;
     *)
 	# Only keep Latin1 languages if we don't have the framebuffer
 	db_get debian-installer/framebuffer || true
 	if [ "$RET" = "false" ] || [ -z "$RET" ]; then
-		langname_template=$langname_latin
+		langlist_template=$langlist_latin
 	else
-		langname_template=$langname_fb
+		langlist_template=$langlist_fb
 	fi
 	# Try to detect serial consoles
 	[ -f /lib/debian-installer/detect-console ] && . /lib/debian-installer/detect-console
 	if [ "$TERM_TYPE" = "serial" ]; then
-		langname_template=$langname_ascii	    
+		langlist_template=$langlist_ascii	    
 	fi
 	# For cases we have a dumb terminal, we're stuck with ASCII
 	if [ "$TERM" = "dumb" ]; then
-		langname_template=$langname_ascii	    
+		langlist_template=$langlist_ascii	    
 	fi
 	;;
 esac
-#log "Language input template is $langname_template"
+#log "Language input template is $langlist_template"
 
 # Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding the first time localechooser is run.
@@ -304,14 +264,14 @@ while :; do
 			# Set initial language for correct display of list
 			db_set debconf/language $INITIAL_LANGUAGE
 
-			db_input critical $langname_template || [ $? -eq 30 ]
+			db_input critical $langlist_template || [ $? -eq 30 ]
 		fi
 		;;
 
 	   11)	# We have a language
-		db_get $langname_template
-		LANGNAME="$RET"
-		db_set $langname_all "$LANGNAME"
+		db_get $langlist_template
+		LANGUAGE="$RET"
+		db_set $langlist_all "$LANGUAGE"
 
 		# Determine defaults based on languagelist
 		. languagemap

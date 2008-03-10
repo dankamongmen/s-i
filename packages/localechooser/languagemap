@@ -13,12 +13,11 @@ for list in /etc/languagelist /usr/share/localechooser/languagelist ./languageli
 	fi
 done
 
-log "Language = '$LANGNAME'"
+log "Language = '$LANGUAGE'"
 
-line=$(grep "^$LANGNAME;" $languages || true)
+line=$(grep "^$LANGUAGE;" $languages || true)
 log "line=$line"
 
-LANGUAGE=""
 COUNTRY=""
 FALLBACKLOCALE=""
 LOCALE=""
@@ -31,17 +30,18 @@ if [ "$line" ] ; then
 	set $line
 	IFS="$OLD_IFS"
 
-	if [ "$3" ]; then LANGUAGE="$3" ; fi
-	if [ "$4" ]; then COUNTRY="$4" ; fi
-	if [ "$5" ]; then FALLBACKLOCALE="$5" ; LOCALE="$5" ; fi
-	if [ "$6" ]; then LANGUAGELIST="$6"; fi
-	if [ "$7" ]; then CONSOLE="$7"; fi
+	if [ "$3" ]; then COUNTRY="$3" ; fi
+	if [ "$4" ]; then FALLBACKLOCALE="$4" ; LOCALE="$4" ; fi
+	if [ "$5" ]; then LANGUAGELIST="$5"; fi
+	if [ "$6" ]; then CONSOLE="$6"; fi
 
 	if [ -z "$LANGUAGELIST" ] ; then
 		LANGUAGELIST="$LANGUAGE"
 	fi
 else
-	log "error: Unable to locate info for language '$LANGNAME'"
-	LOCALE=C
+	log "error: Unable to locate info for language '$LANGUAGE'"
+	LANGUAGE=C
 	COUNTRY=US
+	LOCALE=C
+	LANGUAGELIST=en
 fi
