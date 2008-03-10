@@ -167,6 +167,27 @@ do_preseed() {
 	fi
 }
 
+# Install specific packages depending on selected language   
+# Those we install here are those required immediately
+# Otherwise we will install them in finish-install
+install_lang_specific() {
+	if [ "$LOCALE" != "C" ]; then
+		case "$LANGUAGE" in
+		    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
+			# We need a complete font for later steps
+			anna-install bterm-unifont
+			;;
+		esac
+	fi
+}
+
+# Switch font for graphical installer
+gtk_switch_font() {
+	if type gtk-set-font >/dev/null 2>&1; then
+		gtk-set-font || true
+	fi
+}
+
 # Reset all variables
 LANGNAME=""
 COUNTRY=""
@@ -295,22 +316,8 @@ fi
 db_set "debconf/language" "$LANGUAGELIST"
 log "Set debconf/language = '$LANGUAGELIST'"
 
-# Install specific packages depending on selected language   
-# Those we install here are those required immediately
-# Otherwise we will install them in finish-install
-if [ "$LOCALE" != "C" ]; then
-	case "$LANGUAGE" in
-		ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh)
-		# We need a complete font for later steps
-		anna-install bterm-unifont
-		;;
-	esac
-fi     
-
-# Switch font for graphical installer
-if type gtk-set-font >/dev/null 2>&1; then
-	gtk-set-font || true
-fi
+install_lang_specific
+gtk_switch_font
 
 # BEGIN COUNTRY SELECTION
 
