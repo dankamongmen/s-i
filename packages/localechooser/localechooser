@@ -200,9 +200,9 @@ db_register "$languagecode" "debconf/language"
 # Only display the translated texts (ie the English "translation")
 # when in UTF-8 mode.
 if echo $LANG $LC_CTYPE | grep -q UTF-8; then
-	db_set debconf/language en
+	INITIAL_LANGUAGE=en
 else
-	db_set debconf/language C
+	INITIAL_LANGUAGE=C
 fi
 
 # Find the display level
@@ -272,6 +272,9 @@ STATE=10
 while :; do
 	case "$STATE" in
 	   10)	# Display language list
+		# Set initial language for correct display of list
+		db_set debconf/language $INITIAL_LANGUAGE
+
 		db_input critical $langname_template || [ $? -eq 30 ]
 		;;
 
