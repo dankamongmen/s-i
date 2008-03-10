@@ -305,10 +305,20 @@ STATE=10
 while :; do
 	case "$STATE" in
 	   10)	# Display language list
-		# Set initial language for correct display of list
-		db_set debconf/language $INITIAL_LANGUAGE
+		sel_language=1
+		# Disabled because of #470258: template is set to true too early
+		if false && \
+		   db_get debconf/translations-dropped && [ "$RET" = true ]; then
+			if db_fget $langname_template seen && [ "$RET" != true ]; then
+				sel_language=""
+				db_input high localechooser/no-language-select || true
+			fi
+		else
+			# Set initial language for correct display of list
+			db_set debconf/language $INITIAL_LANGUAGE
 
-		db_input critical $langname_template || [ $? -eq 30 ]
+			db_input critical $langname_template || [ $? -eq 30 ]
+		fi
 		;;
 
 	   11)	# We have a language
@@ -339,7 +349,8 @@ while :; do
 		log "Set $consoledisplay = '$CONSOLE'"
 
 		[ -f /etc/lsb-release ] && . /etc/lsb-release
-		if [ "$X_INSTALLATION_MEDIUM" = "floppy" ] && [ $LANGUAGE != en ]; then
+		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
+		   [ "$X_INSTALLATION_MEDIUM" = "floppy" ]; then
 			db_input high localechooser/no-translations-yet || true
 			db_go || true
 		fi
