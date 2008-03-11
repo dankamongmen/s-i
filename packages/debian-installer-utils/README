@@ -15,10 +15,12 @@ later installation (at the end of base-installation).
 If /target is already set up, the package will be installed straightaway.
 apt-install makes use of in-target and debconf-apt-progress to allow
 configuration questions to be asked and to allow media changes if multiple
-CD/DVD sources have been set up. In case of multiple CD/DVD sources,
-apt-install will unmount the installation CD/DVD in the D-I environment
-for the duration of the package installation; the installation CD/DVD is
-reloaded afterwards.
+CD/DVD sources have been set up.
+In case multiple CD/DVD sources are defined in the sources.list and the
+installation CD is not already unmounted, apt-install will unmount it
+in the D-I environment for the duration of the package installation so as not
+to block CD changes by apt in the target environment. Afterwards, if it was
+mounted at the start, it will ensure the installation CD/DVD is reloaded.
 
 in-target: Runs the specified command in /target and returns its exit
 status. The debconf passthrough frontend is used to make debconf questions
