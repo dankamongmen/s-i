@@ -145,8 +145,10 @@ install_lang_specific() {
 	fi
 }
 
-# Switch font for graphical installer
-gtk_switch_font() {
+# Change language and switch font for graphical installer
+set_debconf_language() {
+	db_set "debconf/language" "$1"
+
 	if type gtk-set-font >/dev/null 2>&1; then
 		gtk-set-font || true
 	fi
@@ -282,7 +284,7 @@ while :; do
 			fi
 		else
 			# Set initial language for correct display of list
-			db_set debconf/language $INITIAL_LANGUAGE
+			set_debconf_language $INITIAL_LANGUAGE
 
 			db_input critical $langlist || [ $? -eq 30 ]
 		fi
@@ -321,11 +323,9 @@ while :; do
 			db_go || true
 		fi
 
-		db_set "debconf/language" "$LANGUAGELIST"
-		log "Set debconf/language = '$LANGUAGELIST'"
+		set_debconf_language "$LANGUAGELIST"
 
 		install_lang_specific
-		gtk_switch_font
 
 		STATE=19
 		continue
