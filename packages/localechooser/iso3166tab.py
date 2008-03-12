@@ -6,11 +6,52 @@
 # Released under the GPL.
 # $Id: iso3166tab.py,v 1.2 2005/01/08 18:06:46 mckinstry Exp $
 
-from xml.sax import saxutils, make_parser, saxlib, saxexts, ContentHandler
+from xml.sax import _exceptions, handler, make_parser, SAXException, ContentHandler
 from xml.sax.handler import feature_namespaces
 import sys, os, getopt, urllib2
 
-class printLines(saxutils.DefaultHandler):
+class ErrorPrinter:
+    "A simple class that just prints error messages to standard out."
+
+    def __init__(self, level=0, outfile=sys.stderr):
+        self._level = level
+        self._outfile = outfile
+
+    def warning(self, exception):
+        if self._level <= 0:
+            self._outfile.write("WARNING in %s: %s\n" %
+                               (self.__getpos(exception),
+                                exception.getMessage()))
+
+    def error(self, exception):
+        if self._level <= 1:
+            self._outfile.write("ERROR in %s: %s\n" %
+                               (self.__getpos(exception),
+                                exception.getMessage()))
+
+    def fatalError(self, exception):
+        if self._level <= 2:
+            self._outfile.write("FATAL ERROR in %s: %s\n" %
+                               (self.__getpos(exception),
+                                exception.getMessage()))
+
+    def __getpos(self, exception):
+        if isinstance(exception, _exceptions.SAXParseException):
+            return "%s:%s:%s" % (exception.getSystemId(),
+                                 exception.getLineNumber(),
+                                 exception.getColumnNumber())
+        else:
+            return "<unknown>"
+
+class DefaultHandler(handler.EntityResolver, handler.DTDHandler,
+                     handler.ContentHandler, handler.ErrorHandler):
+    """Default base class for SAX2 event handlers. Implements empty
+    methods for all callback methods, which can be overridden by
+    application implementors. Replaces the deprecated SAX1 HandlerBase
+    class."""
+
+
+class printLines(DefaultHandler):
 	def __init__(self, ofile):
 		self.ofile = ofile
 
@@ -43,14 +84,14 @@ class printLines(saxutils.DefaultHandler):
 
 ofile = sys.stdout
 p = make_parser()
-p.setErrorHandler(saxutils.ErrorPrinter())
+p.setErrorHandler(ErrorPrinter())
 try:
 	dh = printLines(ofile)
 	p.setContentHandler(dh)
 	p.parse(sys.argv[1])
 except IOError,e:
 	print in_sysID+": "+str(e)
-except saxlib.SAXException,e:
+except SAXException,e:
 	print str(e)
 
 ofile.close()
