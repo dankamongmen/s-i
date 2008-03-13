@@ -414,9 +414,9 @@ while :; do
 		# (unless a country was selected from the short list)
 		if [ "$askedshort" = 1 ]; then
 			db_get $shortlist
-			if [ -n "$RET" ] && [ "$RET" != "other" ]; then
-				COUNTRYCODE="$RET"
-				db_set $shortlist_template $COUNTRYCODE
+			COUNTRYCODE="$RET"
+			db_set $shortlist_template $COUNTRYCODE
+			if [ "$COUNTRYCODE" != "other" ]; then
 				STATE=23
 				continue
 			fi
@@ -425,6 +425,9 @@ while :; do
 				# Set correct default
 				db_set $fulllist "$DEFAULT_COUNTRY"
 				log "Set $fulllist = '$DEFAULT_COUNTRY'"
+
+				# Clear so we can back up and keep selection
+				DEFAULT_COUNTRY=""
 			fi
 		fi
 
