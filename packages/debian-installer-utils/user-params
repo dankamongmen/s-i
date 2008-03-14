@@ -8,8 +8,10 @@ else
 fi
 
 # sed out multi-word quoted value settings
+# replace '?=' by '=' (debconf variables with seen flag unset)
 for item in $(sed -e 's/[^ =]*="[^"]*[ ][^"]*"//g' \
-                  -e "s/[^ =]*='[^']*[ ][^']*'//g" $CMDLINE); do
+		  -e "s/[^ =]*='[^']*[ ][^']*'//g" \
+		  -e "s/?=/=/g" $CMDLINE); do
 	var="${item%=*}"
 
 	if [ "$item" = "--" ]; then
