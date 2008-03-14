@@ -155,12 +155,24 @@ settings</guimenu> menu where you should select <menuchoice>
 <guimenu>Use as:</guimenu> <guimenuitem>physical volume for
 RAID</guimenuitem> </menuchoice>.)
 
-</para><warning><para>
+</para><note><para>
+
+Make sure that the system can be booted with the partitioning scheme
+you are planning. In general it will be necessary to create a separate
+file system for <filename>/boot</filename> when using RAID for the root
+(<filename>/</filename>) file system.
+Most boot loaders <phrase arch="x86">(including lilo and grub)</phrase>
+do support mirrored (not striped!) RAID1, so using for example RAID5 for
+<filename>/</filename> and RAID1 for <filename>/boot</filename> can be
+an option.
+
+</para></note>
+<warning><para>
 
 Support for MD is a relatively new addition to the installer.
 You may experience problems for some RAID levels and in combination
 with some bootloaders if you try to use MD for the root
-(<filename>/</filename>) filesystem. For experienced users, it may be
+(<filename>/</filename>) file system. For experienced users, it may be
 possible to work around some of these problems by executing some
 configuration or installation steps manually from a shell.
 
