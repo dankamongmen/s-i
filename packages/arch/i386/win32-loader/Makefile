@@ -100,5 +100,4 @@ clean:
 		win32-loader.iso *~ */*~ license core.img g2ldr g2ldr.mbr loadlin.pif loadlin.exe
 
 distclean: clean
-	rm -f debian/compat
 	rm -rf netboot
