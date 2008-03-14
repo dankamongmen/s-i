@@ -124,7 +124,7 @@ netboot/stable/% netboot/daily/%: % netboot_dirs
 clean:
 	$(MAKE) -C l10n clean
 	rm -f plugins/cpuid/*.dll plugins/cpuid/*.exe plugins/systeminfo/*.dll plugins/*.dll win32-loader.exe \
-		win32-loader.iso *~ */*~ license core.img g2ldr g2ldr.mbr loadlin.pif loadlin.exe
+		*.iso *~ */*~ license core.img g2ldr g2ldr.mbr loadlin.pif loadlin.exe
 
 distclean: clean
 	rm -rf netboot
