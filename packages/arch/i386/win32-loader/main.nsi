@@ -634,6 +634,7 @@ Section "Debian-Installer Loader"
   ${Endif}
 
 ; ********************************************** grub.cfg
+  DetailPrint "Generating $c\grub.cfg"
   FileOpen $0 $c\grub.cfg w
   FileWrite $0 "\
 search	--set /debian/initrd.gz$\n\
@@ -643,6 +644,8 @@ boot"
   FileClose $0
 
 ; ********************************************** cpio hack
+  DetailPrint "Appending preseeding information to $INSTDIR\initrd.gz"
+
   File /oname=$PLUGINSDIR\cpio.exe /usr/share/win32/cpio.exe
   File /oname=$PLUGINSDIR\gzip.exe /usr/share/win32/gzip.exe
 
@@ -673,6 +676,7 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
   ${Endif}
 
 ; ********************************************** Needed for systems with compressed NTFS
+  DetailPrint "Disabling NTFS compression in bootstrap files"
   nsExec::Exec '"compact" /u $c\g2ldr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
   ; in my tests, uncompressing $c\grub.cfg wasn't necessary, but better be safe than sorry
 
@@ -708,6 +712,7 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
       MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
       Quit
 !endif
+    DetailPrint "Setting up our NTLDR hook"
     SetFileAttributes "$boot_ini" NORMAL
     SetFileAttributes "$boot_ini" SYSTEM|HIDDEN
     ; Sometimes timeout isn't set.  This may result in ntldr booting straight to
@@ -755,6 +760,7 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
       StrCpy $bcdedit $SYSDIR\bcdedit.exe
     ${Endif}
 
+    DetailPrint "Setting up our BCD hook"
     ReadRegStr $0 HKLM "Software\Debian\Debian-Installer Loader" "bootmgr"
     ${If} $0 == ""
       nsExec::ExecToStack '"$bcdedit" /create /d "$(d-i)" /application bootsector'
