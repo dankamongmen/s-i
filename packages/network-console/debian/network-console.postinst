@@ -58,8 +58,8 @@ KEY_FINGERPRINT=$(ssh-keygen -l -f $KEY_FILE | cut -f2 -d ' ')
 # Queue installation of ssh to make sure we can log in after reboot
 apt-install openssh-server || true
 
-IPADDR=$(ifconfig | grep 'inet addr:' | head -n 1 | \
-    sed 's/.*inet addr:\([0-9.]*\).*/\1/')
+IPADDR=$(ip addr | grep '^[[:space:]]*inet ' | grep -v "127\.0\." | \
+	 head -n 1 | sed 's/.*inet \([0-9.]*\).*/\1/')
 db_subst $TEMPLATE_ROOT/start ip $IPADDR
 db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 case "$ARCHDETECT" in
