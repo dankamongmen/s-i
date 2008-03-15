@@ -66,59 +66,61 @@ plugins/string.dll: plugins/string.c
 
 iso: stable.iso daily.iso
 stable.iso: \
-  netboot/download-stamp \
+  netboot/download-stable-stamp \
   netboot/stable/win32-loader.exe netboot/stable/g2ldr netboot/stable/g2ldr.mbr \
   netboot/stable/autorun.inf netboot/stable/win32-loader.ini \
   $(NULL)
 	genisoimage -r -J -o $@ netboot/stable
 
 daily.iso: \
-  netboot/download-stamp \
+  netboot/download-daily-stamp \
   netboot/daily/win32-loader.exe netboot/daily/g2ldr netboot/daily/g2ldr.mbr \
   netboot/daily/autorun.inf netboot/daily/win32-loader.ini \
   $(NULL)
 	genisoimage -r -J -o $@ netboot/daily
 
-netboot/download-stamp: \
-  netboot/stable/install.386/vmlinuz netboot/stable/install.386/initrd.gz netboot/stable/install.386/gtk/initrd.gz \
-  netboot/stable/install.amd/vmlinuz netboot/stable/install.amd/initrd.gz netboot/stable/install.amd/gtk/initrd.gz \
-  netboot/daily/install.386/vmlinuz netboot/daily/install.386/initrd.gz netboot/daily/install.386/gtk/initrd.gz \
-  netboot/daily/install.amd/vmlinuz netboot/daily/install.amd/initrd.gz netboot/daily/install.amd/gtk/initrd.gz
+BASE_URL=http://ftp.nl.debian.org/debian/dists/stable/main
+netboot/download-stable-stamp:
+	mkdir -p netboot/stable/install.{386,amd}/gtk
+	wget $(BASE_URL)/installer-i386/current/images/netboot/debian-installer/i386/linux \
+		-O netboot/stable/install.386/vmlinuz
+	wget $(BASE_URL)/installer-i386/current/images/netboot/debian-installer/i386/initrd.gz \
+		-O netboot/stable/install.386/initrd.gz
+	wget $(BASE_URL)/installer-i386/current/images/netboot/gtk/debian-installer/i386/initrd.gz \
+		-O netboot/stable/install.386/gtk/initrd.gz
+	wget $(BASE_URL)/installer-amd64/current/images/netboot/debian-installer/amd64/linux \
+		-O netboot/stable/install.amd/vmlinuz
+	wget $(BASE_URL)/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz \
+		-O netboot/stable/install.amd/initrd.gz
+	wget $(BASE_URL)/installer-amd64/current/images/netboot/gtk/debian-installer/amd64/initrd.gz \
+		-O netboot/stable/install.amd/gtk/initrd.gz
 	touch $@
 
-netboot_dirs:
-	mkdir -p netboot/{stable,daily}/install.{386,amd}/gtk
-netboot/stable/install.386/vmlinuz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-i386/current/images/netboot/debian-installer/i386/linux -O $@
-netboot/stable/install.386/initrd.gz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-i386/current/images/netboot/debian-installer/i386/initrd.gz -O $@
-netboot/stable/install.386/gtk/initrd.gz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-i386/current/images/netboot/gtk/debian-installer/i386/initrd.gz -O $@
-netboot/stable/install.amd/vmlinuz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux -O $@
-netboot/stable/install.amd/initrd.gz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz -O $@
-netboot/stable/install.amd/gtk/initrd.gz: netboot_dirs
-	wget http://ftp.nl.debian.org/debian/dists/stable/main/installer-amd64/current/images/netboot/gtk/debian-installer/amd64/initrd.gz -O $@
-netboot/daily/install.386/vmlinuz: netboot_dirs
-	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/debian-installer/i386/linux -O $@
-netboot/daily/install.386/initrd.gz: netboot_dirs
-	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/debian-installer/i386/initrd.gz -O $@
-netboot/daily/install.386/gtk/initrd.gz: netboot_dirs
-	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/gtk/debian-installer/i386/initrd.gz -O $@
-netboot/daily/install.amd/vmlinuz: netboot_dirs
-	wget http://people.debian.org/~aba/d-i/images/daily/netboot/debian-installer/amd64/linux -O $@
-netboot/daily/install.amd/initrd.gz: netboot_dirs
-	wget http://people.debian.org/~aba/d-i/images/daily/netboot/debian-installer/amd64/initrd.gz -O $@
-netboot/daily/install.amd/gtk/initrd.gz: netboot_dirs
-	wget http://people.debian.org/~aba/d-i/images/daily/netboot/gtk/debian-installer/amd64/initrd.gz -O $@
+netboot/download-daily-stamp:
+	mkdir -p netboot/daily/install.{386,amd}/gtk
+	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/debian-installer/i386/linux \
+		-O netboot/daily/install.386/vmlinuz
+	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/debian-installer/i386/initrd.gz \
+		-O netboot/daily/install.386/initrd.gz
+	wget http://people.debian.org/~joeyh/d-i/images/daily/netboot/gtk/debian-installer/i386/initrd.gz \
+		-O netboot/daily/install.386/gtk/initrd.gz
+	wget http://people.debian.org/~aba/d-i/images/daily/netboot/debian-installer/amd64/linux \
+		-O netboot/daily/install.amd/vmlinuz
+	wget http://people.debian.org/~aba/d-i/images/daily/netboot/debian-installer/amd64/initrd.gz \
+		-O netboot/daily/install.amd/initrd.gz
+	wget http://people.debian.org/~aba/d-i/images/daily/netboot/gtk/debian-installer/amd64/initrd.gz \
+		-O netboot/daily/install.amd/gtk/initrd.gz
+	touch $@
 
-netboot/stable/autorun.inf netboot/daily/autorun.inf: autorun.inf netboot_dirs
+netboot/stable/autorun.inf netboot/daily/autorun.inf: autorun.inf
+	mkdir -p netboot/{stable,daily}
 	todos < $< > $@
-netboot/stable/win32-loader.ini netboot/daily/win32-loader.ini: win32-loader.ini netboot_dirs
+netboot/stable/win32-loader.ini netboot/daily/win32-loader.ini: win32-loader.ini
+	mkdir -p netboot/{stable,daily}
 	todos < $< > $@
 
-netboot/stable/% netboot/daily/%: % netboot_dirs
+netboot/stable/% netboot/daily/%: %
+	mkdir -p netboot/{stable,daily}
 	cp $(shell basename $@) $@
 
 clean:
