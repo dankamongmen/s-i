@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 49871 -->
+<!-- original version: 51744 untranslated -->
 
    <sect3 id="apt-setup">
    <title>apt konfigurieren (apt-setup)</title>
@@ -59,6 +59,64 @@ möchten oder nicht und ob Sie Pakete aus den <quote>contrib</quote>- und
 
  </para>
 
+    <sect4 id="apt-setup-cdset">
+    <title>Von mehr als einer CD oder DVD installieren</title>
+
+<para>
+
+Wenn Sie von einer CD oder DVD installieren, die Teil eines Sets mehrerer
+Disks ist, wird der Installer Sie fragen, ob Sie weitere CDs oder DVDs
+scannen möchten. Falls Sie tatsächlich weitere Disks aus diesem Set
+vorliegen haben, sollten Sie dies vielleicht tun, so dass der Installer
+die Pakete, die auf diesen Disks enthalten sind, verwenden kann.
+
+</para><para>
+
+Falls Sie jedoch keine weiteren CDs oder DVDs haben, ist dies kein Problem:
+es ist nicht zwingend nötig, diese zu verwenden. Falls Sie auch keinen
+Internet-Spiegelserver verwenden (wie im nächsten Abschnitt beschrieben),
+kann dies bedeuten, dass nicht alle Pakete installiert werden können, die
+Sie im nächsten Schritt der Installation über die Programmgruppen auswählen.
+
+</para>
+<note><para>
+
+Pakete sind auf den CDs (und DVDs) in der Reihenfolge Ihrer Popularität
+enthalten. Dies bedeutet, dass für die meisten Anwendungsfälle nur die ersten
+CDs eines Sets benötigt werden; nur sehr wenige Leute benutzen wirklich
+Pakete von den letzten CDs eines Sets.
+
+</para><para>
+
+Das heißt ebenfalls, dass es einfach Geldverschwendung ist, einen kompletten
+CD-Satz zu kaufen oder herunterzuladen und zu brennen, da Sie die meisten
+davon nie nutzen werden. In den meisten Fällen werden Sie besser fahren, wenn
+Sie sich lediglich die ersten 3 bis 8 CDs besorgen und alle weiteren,
+zusätzlichen Pakete, die Sie benötigen könnten, über das Internet von einem
+Spiegelserver installieren. Das Gleiche gilt für DVD-Sets: die erste, oder
+vielleicht die ersten zwei DVDs, werden für die meisten Bedürfnisse ausreichen.
+
+</para><para>
+
+Eine einfache Richtlinie ist, dass für eine reguläre Arbeitsplatz-Installation
+(unter Verwendung der GNOME-Desktop-Umgebung) nur die ersten drei CDs benutzt
+werden. Für die alternativen Desktop-Umgebungen (KDE oder Xfce) werden
+zusätzliche CDs benötigt. Die erste DVD deckt alle drei Desktop-Umgebungen ab.
+
+</para></note>
+<para>
+
+Falls Sie mehrere CDs oder DVDs scannen, wird der Installer Sie auffordern,
+die Disk auszutauschen, wenn Pakete von einer anderen CD/DVD gebraucht werden,
+als gerade im Laufwerk ist. Beachten Sie, dass nur CDs oder DVDs gescannt
+werden sollten, die zu dem gleichen Set gehören. Die Reihenfolge, in der sie
+gescannt werden, ist nicht wirklich von Bedeutung, aber es reduziert die
+Wahrscheinlichkeit von Fehlern, wenn sie in aufsteigender Reihenfolge
+eingelegt werden.
+
+</para>
+    </sect4>
+
     <sect4 id="apt-setup-mirror">
     <title>Einen Internet-Spiegelserver verwenden</title>
 
@@ -81,18 +139,11 @@ Fall, im nächsten Schritt <emphasis>nicht</emphasis> die
 
 </para><para>
 
-Wenn Sie von einer Komplett-CD (bzw. einem Komplett-CD-Image) installieren
-(nicht DVD), ist es nicht zwingend erforderlich, einen
+Wenn Sie von einer Komplett-CD (bzw. einem Komplett-CD-Image) installieren,
+ist es nicht zwingend erforderlich, einen
 Internet-Spiegelserver zu verwenden, aber es wird trotzdem dringend empfohlen,
-da eine einzelne CD nur eine limitierte Anzahl von Paketen enthält. Der
-Installer unterstützt derzeit noch nicht die Verwendung von mehreren
-CD- oder DVD-Images während der Installation<footnote>
-
-<para>
-Eine entsprechende Möglichkeit ist aber in Planung.
-</para>
-
-</footnote>. Sollten Sie nur über eine relativ langsame Internet-Verbindung
+da eine einzelne CD nur eine limitierte Anzahl von Paketen enthält.
+Sollten Sie nur über eine relativ langsame Internet-Verbindung
 verfügen, wird hier trotzdem empfohlen, <emphasis>keinen</emphasis>
 Internet-Spiegelserver auszuwählen, sondern die Installation unter der
 Verwendung der auf der CD verfügbaren Pakete zu beenden und zusätzliche
@@ -101,75 +152,58 @@ Sie Ihr neues System gebootet haben).
 
 </para><para>
 
-Wenn Sie von einer DVD (bzw. einem DVD-Image) installieren, ist die
-Notwendigkeit, einen Internet-Spiegel zu benutzen, erheblich kleiner, aber
-es besteht trotzdem die Möglichkeit, dass einige Pakete der
-Programmgruppen, die Sie im nächsten Schritt auswählen, nicht auf der ersten
-DVD enthalten sind. Dies könnte speziell dann der Fall sein, wenn Sie in
-einer anderen Sprache als Englisch installieren: einige Schrift- und
-Lokalisierungspakete befinden sich bekanntermaßen auf der zweiten DVD.
-Wenn Sie über eine performante Internet-Verbindung verfügen, ist es also immer
-empfehlenswert, einen Netzwerk-Spiegelserver zu verwenden.
+Wenn Sie von einer DVD (bzw. einem DVD-Image) installieren, sollten alle
+Pakete, die während der Installation benötigt werden, auf der ersten DVD
+enthalten sein. Das Gleiche gilt, wenn Sie mehrere CDs gescannt haben, wie
+im vorherigen Abschnitt beschrieben. Die Nutzung eines Internet-Spiegelservers
+ist in diesen Fällen optional.
 
 </para><para>
 
-<!-- This should probably be documented a bit more extensively in
-     post-install instead. -->
-Um nach der Installation zusätzliche Pakete zu installieren, haben Sie zwei
-Möglichkeiten:
+One advantage of adding a network mirror is that updates that have occurred
+since the CD/DVD set was created and have been included in a point release,
+will become available for installation, thus extending the life of your CD/DVD
+set without compromising the security or stability of the installed system.
+
+</para><para>
+
+In summary: selecting a network mirror is generally a good idea, except
+if you do not have a good Internet connection. If the current version of
+a package is available from CD/DVD, the installer will always use that.
+The amount of data that will be downloaded if you do select a mirror thus
+depends on
 
 <orderedlist>
 <listitem><para>
 
-Falls Sie über weitere CDs/DVDs bzw. entsprechende Images verfügen (aus
-dem gleichen CD-/DVD-Satz wie die Installations-CD/DVD, die Sie verwendet
-haben), können Sie diese zu Ihrer <filename>sources.list</filename>
-hinzufügen, indem Sie <command>apt-cdrom</command> verwenden;
+the tasks you select in the next step of the installation,
 
 </para></listitem>
 <listitem><para>
 
-Sie können von Hand einen Spiegelserver zu Ihrer
-<filename>sources.list</filename> hinzufügen, indem Sie einen Texteditor
-verwenden.
+which packages are needed for those tasks,
+
+</para></listitem>
+<listitem><para>
+ 
+which of those packages are present on the CDs or DVDs you have scanned, and
+
+</para></listitem>
+<listitem><para>
+
+whether any updated versions of packages included on the CDs or DVDs are
+available from a mirror (either a regular package mirror, or a mirror for
+security or volatile updates).
 
 </para></listitem>
 </orderedlist>
 
-Benutzen Sie danach eines der Frontends zum Paketmangement, um zusätzliche
-Pakete auszuwählen und zu installieren<footnote>
-
-<para>
-Es ist auch möglich, sowohl zusätzliche CDs oder DVDs zur
-<filename>/etc/apt/sources.list</filename> hinzufügen
-<emphasis>und</emphasis> dann auch noch einen Internet-Spiegel.
-Diese hätte den Vorteil, dass Sie so auch aktualisierte Versionen von
-Paketen bekommen, wenn sogenannte <quote>Point-Releases</quote>
-(Zwischen-Updates, um gravierende Fehler oder Sicherheitslücken zu beheben)
-der Distribution veröffentlicht werden.
-</para>
-
-</footnote>.
-
 </para><para>
 
-Noch mal zusammengefasst: einen Internet-Spiegelserver auszuwählen, ist
-grundsätzlich eine gute Idee, außer Sie haben eine langsame
-Internet-Verbindung. Falls die aktuellste Version eines Paketes auf Ihrer
-CD/DVD enthalten ist, wird der Installer auf jeden Fall auch das Paket von
-der CD/DVD verwenden. Die Menge der Daten, die über die Internet-Verbindung
-heruntergeladen wird, hängt also von mehreren Faktoren ab: a) welche
-Programmgruppen Sie im nächsten Schritt auswählen, b) welche Pakete für
-diese Programmgruppen benötigt werden und c) welche dieser Pakete auf
-Ihrer CD/DVD enthalten sind.
-
-</para><para>
-
-Beachten Sie, dass einige Pakete trotzdem über das Internet heruntergeladen
-werden könnten, auch wenn Sie keinen Internet-Spiegel ausgewählt haben,
-nämlich wenn eine aktualisierte Paketversion über den Sicherheits- oder
-Volatile-Aktualisierungs-Service verfügbar ist (dazu müssen diese Dienste
-konfiguriert worden sein).
+Note that the last point means that, even if you choose not to use a network
+mirror, some packages may still be downloaded from the Internet if there is a
+security or volatile update available for them and those services have been
+configured.
 
 </para>
 </sect4>
