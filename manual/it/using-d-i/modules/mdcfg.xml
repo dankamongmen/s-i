@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 50619 -->
+<!-- original version: 51911 -->
 
    <sect3 id="mdcfg">
    <!-- <title>Configuring Multidisk Devices (Software RAID)</title> -->
@@ -277,13 +277,35 @@ in RAID (questo si può fare con <command>partman</command>, nel menu
 <guimenu>Usato come:</guimenu> <guimenuitem>volume fisico per il
 RAID</guimenuitem> </menuchoice>).
 
-</para><warning><para>
+</para><note><para>
+
+<!--
+Make sure that the system can be booted with the partitioning scheme
+you are planning. In general it will be necessary to create a separate
+file system for <filename>/boot</filename> when using RAID for the root
+(<filename>/</filename>) file system.
+Most boot loaders <phrase arch="x86">(including lilo and grub)</phrase>
+do support mirrored (not striped!) RAID1, so using for example RAID5 for
+<filename>/</filename> and RAID1 for <filename>/boot</filename> can be
+an option.
+-->
+
+Assicurarsi che il sistema si possa avviare con lo schema di partizionamento
+che si intende applicare. In generale per utilizzare il file system di root
+(<filename>/</filename>) in RAID è necessario creare un file system separato
+per <filename>/boot</filename>. La maggior parte dei boot loader
+<phrase arch="x86">(compresi lilo e grub)</phrase> supportano il RAID1 in
+mirror (non in strisce), quindi una soluzione può essere usare RAID5 per
+<filename>/</filename> e RAID1 per <filename>/boot</filename>.
+
+</para></note>
+<warning><para>
 
 <!--
 Support for MD is a relatively new addition to the installer.
 You may experience problems for some RAID levels and in combination
 with some bootloaders if you try to use MD for the root
-(<filename>/</filename>) filesystem. For experienced users, it may be
+(<filename>/</filename>) file system. For experienced users, it may be
 possible to work around some of these problems by executing some
 configuration or installation steps manually from a shell.
 -->
