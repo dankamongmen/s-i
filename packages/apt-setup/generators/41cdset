@@ -30,12 +30,8 @@ chroot=
 if [ "$ROOT" ]; then
 	chroot=chroot
 
-	# Let apt-cdrom do its own mounting (was disabled in base-installer)
-	rm -f $ROOT/etc/apt/apt.conf.d/00NoMountCDROM
-
 	# We can only change CDs if current CD is unmounted
 	$logoutput umount /cdrom || true
-	$logoutput $chroot $ROOT umount /cdrom || true
 fi
 
 tmp=$($chroot $ROOT tempfile)
