@@ -482,47 +482,59 @@ else
 fi
 
 # Now we create template.pot files for the sublevels
-# OK, should be a nice loop...:-)
+pot_master=${DI_COPY}/packages/po/template.pot
+
 # Temporarily restore charset header
-sed -i 's/charset=CHARSET/charset=UTF-8/g' ${DI_COPY}/packages/po/template.pot
+sed -i 's/charset=CHARSET/charset=UTF-8/g' $pot_master
 # Sanity check: template.pot should not contain incorrect sublevels
-if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" \
- 	${DI_COPY}/packages/po/template.pot)" ]; then
+if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
 	error "Invalid sublevel comments detected in template.pot"
 	exit 1
 fi
 for i in $LEVELS; do
-	dir=po/sublevel$i
 	# Sanity check
 	if [ ! -d ${DI_COPY}/packages/po/sublevel$i ]; then
 		error "Error: directory for sublevel$i does not exist"
 		exit 1
 	fi
-	level="sublevel $i "
-	log "- Create the ${level}template.pot file..."
+	pot_sublevel=${DI_COPY}/packages/po/sublevel$i/template.pot
+	log "- Create the template.pot file for sublevel $i..."
 	if [ $i -eq 1 ]; then
 		# Select strings without a level
 		# NOTE: this will fail in the case where a string exists in
 		# more than one package POT file and has no level set in one
 		# of them, but does have it set in others! The string will
 		# then end up in the highest level that is explicitly set.
-		msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.none
+		msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pot_master >$pot_sublevel.none
 		# Select strings with level 1 set
-		msggrep -X -E -e ":sl1:" ${DI_COPY}/packages/po/template.pot >${DI_COPY}/packages/${dir}/template.pot.sl1
+		msggrep -X -E -e ":sl1:" $pot_master >$pot_sublevel.sl1
 		# Merge them
-		msgcat ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1 >${DI_COPY}/packages/${dir}/template.pot
-		rm ${DI_COPY}/packages/${dir}/template.pot.none ${DI_COPY}/packages/${dir}/template.pot.sl1
+		msgcat $pot_sublevel.none $pot_sublevel.sl1 >$pot_sublevel.new
+		rm $pot_sublevel.none $pot_sublevel.sl1
 	else
 		# Select strings with level N set, but exclude any strings that
 		# also have a level smaller than N set to avoid duplicates
-		msggrep -X -E -e ":sl$i:" ${DI_COPY}/packages/po/template.pot | \
+		msggrep -X -E -e ":sl$i:" $pot_master | \
 			msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
-			>${DI_COPY}/packages/${dir}/template.pot
+			>$pot_sublevel.new
 	fi
-	sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/${dir}/template.pot
+	sed -i 's/charset=UTF-8/charset=CHARSET/g' $pot_sublevel.new
+
+	# If the only change is the POT-Creation-Date, then ignore it
+	oldfiltered=`tempfile`
+	newfiltered=`tempfile`
+	filter="^\"POT-Creation-Date:"
+	egrep -v "$filter" $pot_sublevel >$oldfiltered
+	egrep -v "$filter" $pot_sublevel.new >$newfiltered
+	if [ -z "$(diff $oldfiltered $newfiltered)" ]; then
+		rm $pot_sublevel.new
+	else
+		mv $pot_sublevel.new $pot_sublevel
+	fi
+	rm $oldfiltered $newfiltered
 done
 # Reset the charset header again
-sed -i 's/charset=UTF-8/charset=CHARSET/g' ${DI_COPY}/packages/po/template.pot
+sed -i 's/charset=UTF-8/charset=CHARSET/g' $pot_master
 log ""
 
 # Update PO files for sublevels:
@@ -684,8 +696,7 @@ EOF
 					fi
 				fi
 				# Remove temporary files
-				rm -f $oldfiltered
-				rm -f $newfiltered
+				rm $oldfiltered $newfiltered
 			else
 				mv $lang.po.new $lang.po
 				svn add $lang.po
