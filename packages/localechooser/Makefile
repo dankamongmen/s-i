@@ -14,8 +14,9 @@ debian/iso-codes:
 debian/iso-3166.tab:
 	./iso3166tab.py /usr/share/xml/iso-codes/iso_3166.xml >debian/iso-3166.tab
 
-debian/templates: debian/templates.base debian/short-tmp/shortlists
+debian/templates: $(LIST) debian/templates.base debian/short-tmp/shortlists
 	./mktemplates.shortlist
+	./mktemplates.warnings $(LIST) debian/templates
 
 debian/SUPPORTED-short:
 	./get-SUPPORTED

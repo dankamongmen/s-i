@@ -154,6 +154,41 @@ set_debconf_language() {
 	fi
 }
 
+# Determine which template to display to warn for incomplete translations
+# and fill in the variable contents
+warning_template() {
+	local status template tbase twarn tabort
+	status=$1
+	tbase=localechooser/translation
+
+	case $status in
+	    0)	twarn=incomplete; tabort=abort ;;
+	    1)	twarn=normal-ok; tabort=abort ;;
+	    2)	twarn=partial; tabort=maybe-abort ;;
+	    3)	twarn=mostly-ok ;;
+	    4)	twarn=exceptions ;;
+	esac
+	if [ $status -le 2 ]; then
+		template=$tbase/warn-severe
+		db_metaget $tbase/text/$tabort description
+		db_subst $template TXT-ABORT "$RET"
+	else
+		template=$tbase/warn-light
+	fi
+
+	# Languages that have fallbacks may have special templates
+	if [ "$twarn" != exceptions ] && \
+	   expr $LANGUAGELIST : ".*:" >/dev/null && \
+	   db_metaget $tbase/text/warn_$twarn/$LANGUAGE description; then
+		:
+	else
+		db_metaget $tbase/text/warn_$twarn description
+	fi
+	db_subst $template TXT-WARN "$RET"
+
+	echo $template
+}
+
 refine_locale() {
 	local old_locale=$1
 
@@ -280,7 +315,7 @@ while :; do
 		   db_get debconf/translations-dropped && [ "$RET" = true ]; then
 			if db_fget $langname_template seen && [ "$RET" != true ]; then
 				sel_language=""
-				db_input high localechooser/no-language-select || true
+				db_input high localechooser/translation/no-select || true
 			fi
 		else
 			# Set initial language for correct display of list
@@ -316,14 +351,38 @@ while :; do
 		db_set "$consoledisplay"  "$CONSOLE"
 		log "Set $consoledisplay = '$CONSOLE'"
 
+		db_set "debconf/language" "$LANGUAGELIST"
+		log "Set debconf/language = '$LANGUAGELIST'"
+
 		[ -f /etc/lsb-release ] && . /etc/lsb-release
 		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
 		   [ "$X_INSTALLATION_MEDIUM" = "floppy" ]; then
-			db_input high localechooser/no-translations-yet || true
-			db_go || true
+			db_input high localechooser/translation/none-yet || true
 		fi
+		;;
 
+	   12)	# Warn if translation is incomplete
 		set_debconf_language "$LANGUAGELIST"
+
+		# Display warning for incomplete translations; skip it for
+		# automated installs to prevent a loop if the default is false
+		twarning=""
+		if [ "$sel_language" ] && \
+		   db_get debconf/priority && [ "$RET" != critical ] && \
+		   tstatus=$(translation-check "$LANGUAGE"); then
+			twarning=$(warning_template $tstatus)
+			db_input high $twarning || [ $? -eq 30 ]
+		fi
+		;;
+
+	   13)	# Continue or choose alternative language
+		if [ "$twarning" ]; then
+			if db_get $twarning && [ "$RET" = false ]; then
+				db_reset $twarning
+				STATE=10
+				continue
+			fi
+		fi
 
 		install_lang_specific
 
