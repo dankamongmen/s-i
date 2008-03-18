@@ -223,7 +223,7 @@ create_new_label() {
 
 	if [ "$chosen_type" = sun ]; then
 		# write the partition table to the disk
-		disable_swap
+		disable_swap "$dev"
 		open_dialog COMMIT
 		close_dialog
 		sync

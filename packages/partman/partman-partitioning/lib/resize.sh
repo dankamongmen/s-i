@@ -159,7 +159,7 @@ perform_resizing () {
 		commit_changes partman-partitioning/new_size_commit_failed || exit 100
 	fi
 
-	disable_swap
+	disable_swap "$dev"
 
 	if [ "$virtual" = no ] && \
 	   [ -f $oldid/detected_filesystem ] && \
