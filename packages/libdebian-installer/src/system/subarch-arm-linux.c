@@ -1,8 +1,5 @@
-#include <ctype.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <strings.h>
+#include <ctype.h> #include <stdlib.h> #include <stdio.h> #include
+<string.h> #include <strings.h>
 
 #include <debian-installer/system/subarch.h>
 
@@ -20,11 +17,11 @@ static struct map map_hardware[] = {
     { "Compaq-PersonalServer" , "netwinder" },
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
-    { "Buffalo/Revogear Kurobox Pro", "orion" },
-    { "D-Link DNS-323", "orion" },
-    { "QNAP TS-109/TS-209", "orion" },
-    { "Marvell Orion-NAS Reference Design", "orion" },
-    { "Marvell Orion-2 Development Board", "orion" },
+    { "Buffalo/Revogear Kurobox Pro", "orion5x" },
+    { "D-Link DNS-323", "orion5x" },
+    { "QNAP TS-109/TS-209", "orion5x" },
+    { "Marvell Orion-NAS Reference Design", "orion5x" },
+    { "Marvell Orion-2 Development Board", "orion5x" },
     { "Intel EP80219", "iop32x" },
     { "Intel IQ31244", "iop32x" },
     { "Intel IQ80321", "iop32x" },
