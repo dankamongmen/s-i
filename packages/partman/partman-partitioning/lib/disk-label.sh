@@ -26,7 +26,7 @@ default_disk_label () {
 			echo msdos;;
 		    ixp4xx)
 			echo msdos;;
-		    orion)
+		    orion5x)
 			echo msdos;;
 		    riscstation)
 			echo msdos;;
