@@ -118,7 +118,12 @@ main (int argc, char **argv)
   langstring ("custom5",			_("Base URL for netboot images (linux and initrd.gz):"));
   langstring ("error",				_("Error"));
   langstring ("error_copyfiles",		_("Error: failed to copy $0 to $1."));
+  langstring ("generating",			_("Generating $0"));
+  langstring ("appending_preseeding",		_("Appending preseeding information to $0"));
   langstring ("error_exec",			_("Error: unable to run $0."));
+  langstring ("disabling_ntfs_compression",	_("Disabling NTFS compression in bootstrap files"));
+  langstring ("registering_ntldr",		_("Registering Debian-Installer in NTLDR"));
+  langstring ("registering_bootmgr",		_("Registering Debian-Installer in BootMgr"));
   langstring ("error_bcdedit_extract_id",	_("Error: failed to parse bcdedit.exe output."));
   langstring ("boot_ini_not_found",		_("Error: $boot_ini not found.  Is this really Windows $windows_version?"));
   langstring ("warning1",			_("VERY IMPORTANT NOTICE:\\n\\n"));
