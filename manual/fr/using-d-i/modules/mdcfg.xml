@@ -1,11 +1,11 @@
-<!-- original version: 50619 -->
+<!-- original version: 51911 -->
 
 <sect3 id="mdcfg">
  <title>Configuration d'un périphérique multidisque (RAID logiciel)</title>
 <para>
 Si vous avez plusieurs disques durs <footnote><para>
 
-Pour être honnête, on peut construire un périphérique multidisque
+Pour tout dire, on peut construire un périphérique multidisque
 même avec les partitions d'un seul disque, mais ça n'apporte pas grand chose.
 </para></footnote>
 
@@ -141,13 +141,25 @@ choisirez <menuchoice><guimenu>Utiliser comme :</guimenu>
 <guimenuitem>volume physique pour RAID</guimenuitem>
 </menuchoice>
 </para>
+
+<note><para>
+
+Assurez-vous que le système peut être amorcé avec le schéma de partitionnement prévu.
+Quand on utilise RAID pour le système de fichiers racine (<filename>/</filename>), il est
+nécessaire de créer un système de fichiers distinct pour <filename>/boot</filename>.
+La plupart des programmes d'amorçage <phrase arch="x86">(lilo et grub par exemple)</phrase>
+ne peuvent fonctionner qu'avec le type RAID1 (RAID en mode miroir). Ansi, il est possible d'utiliser
+RAID5 pour <filename>/</filename> et RAID1 pour <filename>/boot</filename>.
+
+</para></note>
+
 <warning><para>
 L'installateur gère le RAID logiciel depuis peu. Vous pourrez rencontrer
 des problèmes, pour certains niveaux RAID et en combinaison avec les
 programmes d'amorçage, si vous essayez d'utiliser un périphérique de ce type 
 pour la partition racine, <filename>/</filename>. Les experts pourront
 sans doute contourner ces problèmes en exécutant certaines étapes de 
-configuration ou d'installation dans un shell.
+configuration ou d'installation dans un <quote>shell</quote>.
 </para></warning>
 <para>
 Ensuite, vous choisissez <guimenuitem>Configurer le RAID logiciel</guimenuitem>
