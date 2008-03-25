@@ -489,7 +489,7 @@ while 1:
     for name in needed_symbols:
         if not name in symbol_provider:
             if not needed_symbols[name].weak:
-                raise "No library provides non-weak %s" % symbol
+                raise "No library provides non-weak %s" % name
         else:
             lib = symbol_provider[name]
             library_symbols_used[lib].add(library_symbols[lib][name])
