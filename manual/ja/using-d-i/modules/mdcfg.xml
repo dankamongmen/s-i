@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="EUC-JP"?>
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 50619 -->
+<!-- original version: 51911 -->
 
    <sect3 id="mdcfg">
 <!--
@@ -242,13 +242,35 @@ MD デバイスを作成するには、RAID で使うための
 を選択して出てくる、<guimenu>パーティション設定</guimenu> メニューの
 <command>partman</command> で行えます)
 
-</para><warning><para>
+</para><note><para>
+
+<!--
+Make sure that the system can be booted with the partitioning scheme
+you are planning. In general it will be necessary to create a separate
+file system for <filename>/boot</filename> when using RAID for the root
+(<filename>/</filename>) file system.
+Most boot loaders <phrase arch="x86">(including lilo and grub)</phrase>
+do support mirrored (not striped!) RAID1, so using for example RAID5 for
+<filename>/</filename> and RAID1 for <filename>/boot</filename> can be
+an option.
+-->
+計画しているパーティション分割方式で、
+システムがブートできることを確認してください。
+通常、ルート (<filename>/</filename>) ファイルシステムに RAID を使用する際には、
+<filename>/boot</filename> を独立したファイルシステムにする必要があります。
+ほとんどのブートローダ<phrase arch="x86"> (lilo や grub など) </phrase>は、
+ミラーリングした (ストライピングではなく!) RAID1 をサポートしています。
+そのため、<filename>/</filename> に RAID5 を用い、
+<filename>/boot</filename> に RAID1 を用いる例が選択したり得ます。
+
+</para></note>
+<warning><para>
 
 <!--
 Support for MD is a relatively new addition to the installer.
 You may experience problems for some RAID levels and in combination
 with some bootloaders if you try to use MD for the root
-(<filename>/</filename>) filesystem. For experienced users, it may be
+(<filename>/</filename>) file system. For experienced users, it may be
 possible to work around some of these problems by executing some
 configuration or installation steps manually from a shell.
 -->
