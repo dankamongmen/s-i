@@ -114,6 +114,10 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
 
   this->sections.resize (this->shnum);
 
+  section_GNU_VERDEF = NULL;
+  section_GNU_VERNEED = NULL;
+  section_GNU_VERSYM = NULL;
+
   for (unsigned int i = 0; i < this->shnum; i++)
   {
     section *temp;
@@ -148,6 +152,8 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
   Phdr *phdrs = static_cast <Phdr *> (static_cast <void *> (static_cast <char *> (this->mem) + this->phoff));
 
   this->segments.resize (this->phnum);
+
+  segment_INTERP = NULL;
 
   for (unsigned int i = 0; i < this->phnum; i++)
   {
@@ -376,7 +382,7 @@ section_real<_class, _data, section_type_GNU_VERSYM>::section_real (void *header
   this->versyms.reserve (max);
 
   for (unsigned int i = 0; i < max; i++)
-    this->versyms.push_back (versyms[i]);
+    this->versyms.push_back (convert<_data, typeof (versyms[i])> () (versyms[i]));
 }
 
 template <typename _class, typename _data>
