@@ -21,6 +21,7 @@ struct frontend;
 
 #define DCF_CAPB_BACKUP		(1UL << 0)
 #define DCF_CAPB_PROGRESSCANCEL	(1UL << 1)
+#define DCF_CAPB_ALIGN		(1UL << 2)
 
 struct frontend_module {
     int (*initialize)(struct frontend *, struct configuration *);
@@ -35,6 +36,7 @@ struct frontend_module {
     bool (*can_go_back)(struct frontend *, struct question *);
     bool (*can_go_forward)(struct frontend *, struct question *);
     bool (*can_cancel_progress)(struct frontend *);
+    bool (*can_align)(struct frontend *, struct question *);
 
     void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
     int (*progress_set) (struct frontend *fe, int val);

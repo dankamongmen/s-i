@@ -108,6 +108,11 @@ static bool frontend_can_cancel_progress(struct frontend *ui)
 	return false;
 }
 
+static bool frontend_can_align(struct frontend *ui)
+{
+	return false;
+}
+
 static void frontend_progress_start(struct frontend *ui, int min, int max, const char *title)
 {
 	DELETE(ui->progress_title);
@@ -216,6 +221,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(can_go_back);
 	SETMETHOD(can_go_forward);
 	SETMETHOD(can_cancel_progress);
+	SETMETHOD(can_align);
 	SETMETHOD(progress_start);
 	SETMETHOD(progress_set);
 	SETMETHOD(progress_step);

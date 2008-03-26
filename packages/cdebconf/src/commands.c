@@ -127,9 +127,12 @@ command_capb(struct confmodule *mod, char *arg)
             mod->frontend->capability |= DCF_CAPB_BACKUP;
         else if (strcmp(argv[i], "progresscancel") == 0)
             mod->frontend->capability |= DCF_CAPB_PROGRESSCANCEL;
+        else if (strcmp(argv[i], "align") == 0)
+            mod->frontend->capability |= DCF_CAPB_ALIGN;
     }
 
-    if (asprintf(&out, "%u multiselect backup progresscancel", CMDSTATUS_SUCCESS) == -1)
+    if (asprintf(&out, "%u multiselect backup progresscancel align",
+                 CMDSTATUS_SUCCESS) == -1)
         DIE("Out of memory");
 
     plugin_state = NULL;
