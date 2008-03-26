@@ -63,4 +63,6 @@ typedef const char * (* lookup_function)(const char * name, void * user_data);
 #define LOOKUP_FUNCTION(F) ((lookup_function) F)
 char * strexpand(const char * src, lookup_function func, void * user_data);
 
+int stralign(char **strs, int count, const char *delim);
+
 #endif

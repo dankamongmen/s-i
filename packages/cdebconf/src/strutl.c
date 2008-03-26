@@ -588,6 +588,76 @@ strtruncate (char *what, size_t maxsize)
     return 1;
 }
 
+int stralign(char **strs, int count, const char *delim)
+{
+    unsigned int i;
+    unsigned int j;
+    unsigned int * cells_per_line;
+    unsigned int num_columns;
+    unsigned int * column_widths;
+    size_t * column_sizes;
+    char * next_cell;
+    char * cell;
+    size_t max_str_size;
+    char * new_str;
+
+    cells_per_line = malloc(sizeof (unsigned int) * count);
+    memset(cells_per_line, 0, sizeof (unsigned int) * count);
+
+    num_columns = 0;
+    column_widths = NULL;
+    column_sizes = NULL;
+    for (i = 0; i < count; i++) {
+        next_cell = strs[i];
+        for (j = 0; NULL != next_cell; j++) {
+            cells_per_line[i] = j + 1;
+            if (num_columns < cells_per_line[i]) {
+                num_columns = j + 1;
+                column_widths = realloc(column_widths,
+                                        sizeof (unsigned int) * num_columns);
+                column_widths[j] = 0;
+                column_sizes = realloc(column_sizes,
+                                        sizeof (size_t) * num_columns);
+                column_sizes[j] = 0;
+            }
+            cell = strsep(&next_cell, delim);
+            if (NULL != next_cell) {
+                column_widths[j] = MAX(column_widths[j], strwidth(cell));
+                column_sizes[j] = MAX(column_sizes[j],
+                                      strlen(cell) + 2 /* extra spaces */);
+            } else {
+                column_sizes[j] = MAX(column_sizes[j], strlen(cell));
+            }
+        }
+    }
+    max_str_size = 0;
+    for (j = 0; j < num_columns; j++) {
+        max_str_size += column_sizes[j];
+    }
+    free(column_sizes);
+    for (i = 0; i < count; i++) {
+        new_str = malloc(sizeof (char) * max_str_size + 1);
+        next_cell = new_str;
+        *next_cell = '\0';
+        cell = strs[i];
+        for (j = 0; j < cells_per_line[i]; j++) {
+            strcpy(next_cell, cell);
+            if (0 != column_widths[j]) {
+                strpad(next_cell, column_widths[j] + 2 /* extra space */);
+            }
+            next_cell += strlen(next_cell);
+            cell += strlen(cell) + 1;
+        }
+        free(strs[i]);
+        strs[i] = new_str;
+    }
+
+    free(column_widths);
+    free(cells_per_line);
+
+    return 0;
+}
+
 #define ROPE_SIZE 256
 #define VAR_SIZE 100
 
