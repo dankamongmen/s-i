@@ -208,6 +208,12 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 		logcount++;
 	} while (i > 0);
 
+	if (obj->methods.can_align(obj, q)) {
+		stralign(choices_translated, count, "\t");
+		/* Display only one column to get meaningful alignment. */
+		width = 1;
+	}
+
 	/*  Set string arrays  */
 	for (i=0; i < count; i++)
 	{
@@ -767,6 +773,39 @@ text_can_go_back(struct frontend *obj, struct question *q)
 }
 
 /*
+ * Function: text_can_align
+ * Input: struct frontend *obj - frontend object
+ *        struct question *q - question object
+ * Output: int - DC_OK, DC_NOTOK
+ * Description: tells whether confmodule supports aligning columns
+ * Assumptions: none
+ */
+static bool
+text_can_align(struct frontend *obj, struct question *q)
+{
+	return (obj->capability & DCF_CAPB_ALIGN);
+}
+
+/*
+ * Function: text_lookup_directive
+ * Input: struct frontend *obj - frontend object
+ *        const char *directive - the directive
+ * Output: const char * - directive value or NULL
+ * Description: returns directive value in the given context
+ * Assumptions: none
+ */
+static const char *
+text_lookup_directive(struct frontend *obj, const char *directive)
+{
+	if (obj->methods.can_align(obj, obj->questions) &&
+	    strcmp("TAB", directive) == 0) {
+		return "\t";
+	}
+	/* Remove unhandled directives */
+	return "";
+}
+
+/*
  * Function: text_go
  * Input: struct frontend *obj - frontend object
  * Output: int - DC_OK, DC_NOTOK
@@ -891,7 +930,9 @@ static void text_progress_stop(struct frontend *obj)
 struct frontend_module debconf_frontend_module =
 {
 	initialize: text_initialize,
+	lookup_directive: text_lookup_directive,
 	can_go_back: text_can_go_back,
+	can_align: text_can_align,
 	go: text_go,
 	progress_start: text_progress_start,
 	progress_set: text_progress_set,
