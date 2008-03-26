@@ -140,7 +140,7 @@ static void add_description(struct frontend * fe, struct question * question,
     GtkTextIter end;
     char * description;
 
-    description = q_get_description(question);
+    description = q_get_description(fe, question);
     /* XXX: check NULL! */
     view = gtk_text_view_new();
     /* XXX: check NULL! */
@@ -185,7 +185,7 @@ static void add_extended_description(struct frontend * fe,
     /* here is created the question's extended description, but only
      * if the question's extended description actually exists
      */
-    ext_description = q_get_extended_description(question);
+    ext_description = q_get_extended_description(fe, question);
     if ('\0' != ext_description[0]) {
         view = gtk_text_view_new();
         buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));

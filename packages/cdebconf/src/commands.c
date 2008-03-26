@@ -463,7 +463,7 @@ command_metaget(struct confmodule *mod, char *arg)
         return out;
     }
 
-    value = question_get_field(q, "", argv[1]);
+    value = question_get_raw_field(q, "", argv[1]);
     if (value == NULL)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, argv[1]);
     else
@@ -652,7 +652,7 @@ command_progress(struct confmodule *mod, char *arg)
                     CMDSTATUS_BADQUESTION, argv[3]);
             return out;
         }
-        value = question_get_field(q, "", "description");
+        value = question_get_raw_field(q, "", "description");
         question_deref(q);
         if (value == NULL)
         {
@@ -696,7 +696,7 @@ command_progress(struct confmodule *mod, char *arg)
                     CMDSTATUS_BADQUESTION, argv[1]);
             return out;
         }
-        value = question_get_field(q, "", "description");
+        value = question_get_raw_field(q, "", "description");
         question_deref(q);
         if (value == NULL)
         {
@@ -745,7 +745,7 @@ command_settitle(struct confmodule *mod, char *arg)
         asprintf(&out, "%u %s does not exist", CMDSTATUS_BADQUESTION, arg);
 	return out;
     }
-    value = question_get_field(q, "", "description");
+    value = question_get_raw_field(q, "", "description");
     question_deref(q);
     if (value == NULL)
     {

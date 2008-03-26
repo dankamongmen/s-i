@@ -141,9 +141,9 @@ GtkTreeModel * cdebconf_gtk_choice_model_create_full(
         return NULL;
     };
 
-    raw_indices = q_get_indices(question);
-    raw_choices = q_get_choices_vals(question);
-    raw_translated_choices = q_get_choices(question);
+    raw_indices = q_get_indices(fe, question);
+    raw_choices = q_get_choices_vals(fe, question);
+    raw_translated_choices = q_get_choices(fe, question);
     count = strgetargc(raw_choices);
     g_assert(0 < count);
     /* check NULLs! */

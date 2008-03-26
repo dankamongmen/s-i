@@ -173,6 +173,10 @@ static const char * lookup_vars(const char * name,
 {
     struct questionvariable * current;
 
+    /* Skip directives */
+    if ('!' == name[0]) {
+        return NULL;
+    }
     for (current = variables; NULL != current; current = current->next) {
         if (0 == strcmp(current->variable, name)) {
             return current->value;
@@ -186,7 +190,7 @@ static char *question_expand_vars(const struct question *q, const char *field)
     return strexpand(field, LOOKUP_FUNCTION(lookup_vars), q->variables);
 }
 
-char *question_get_field(const struct question *q, const char *lang,
+char *question_get_raw_field(const struct question *q, const char *lang,
 	const char *field)
 {
     char *ret; 
@@ -206,6 +210,24 @@ char *question_get_field(const struct question *q, const char *lang,
         return ret;
 }
 
+static const char * lookup_directive(const char * directive, struct frontend * fe)
+{
+    assert('!' == directive[0]);
+    return fe->methods.lookup_directive(fe, directive + 1 /* drop '!' */);
+}
+
+char * question_get_field(struct frontend * fe, const struct question * q,
+                          const char * lang, const char * field)
+{
+    char * raw;
+    char * ret;
+
+    raw = question_get_raw_field(q, lang, field);
+    ret = strexpand(raw, LOOKUP_FUNCTION(lookup_directive), fe);
+    free(raw);
+    return ret;
+}
+
 /*
  * Function: question_get_text
  * Input: struct frontend *obj - frontend object
@@ -221,7 +243,7 @@ question_get_text(struct frontend *obj, const char *template,
 {
 	struct question *q = obj->qdb->methods.get(obj->qdb, template);
 	const char *text;
-	text = (q ? q_get_description(q) : fallback);
+	text = (q ? q_get_description(obj, q) : fallback);
 	question_deref(q);
 	return text;
 }

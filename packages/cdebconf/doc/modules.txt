@@ -302,6 +302,11 @@ All methods returning int should be returning DC_OK/DC_NOTOK, as above.
   Currently, the only capability supported is DCF_CAPB_BACKUP, which
   means the front end is capable of backing up, so return either
   0 of DCF_CAPB_BACKUP.
+* const char * lookup_directive(struct frontend *, const char *)
+  Return the proper value for the given directive.  If NULL is returned,
+  the directive is not expanded.
+  The default method always returns "" to remove unhandled directives from
+  queried question fields.
 * int add(struct frontend *, struct question *):
   Add question. Default implementation adds the question to "questions"
   attribute

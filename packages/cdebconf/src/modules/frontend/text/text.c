@@ -161,8 +161,8 @@ static void wrap_print(const char *str)
  */
 static void text_handler_displaydesc(struct frontend *obj, struct question *q) 
 {
-	char *descr = q_get_description(q);
-	char *ext_descr = q_get_extended_description(q);
+	char *descr = q_get_description(obj, q);
+	char *ext_descr = q_get_extended_description(obj, q);
 	if (strcmp(q->template->type, "note") == 0 ||
 	    strcmp(q->template->type, "error") == 0)
 	{
@@ -194,7 +194,7 @@ get_answer(char *answer, int size)
 static void
 show_help (struct frontend *obj, struct question *q)
 {
-	char *descr = q_get_description(q);
+	char *descr = q_get_description(obj, q);
 	printf("%s", question_get_text(obj, "debconf/text-help-keystrokes", "KEYSTROKES:"));
 	printf("\n  %c  ", CHAR_HELP);
 	printf("%s", question_get_text(obj, "debconf/text-help-help", "Display this help message"));
@@ -388,9 +388,9 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 	int i, j, count = 0, dcount, choice;
 	int *tindex = NULL;
 	int ret = DC_OK;
-	const char *indices = q_get_indices(q);
+	const char *indices = q_get_indices(obj, q);
 
-	count = strgetargc(q_get_choices_vals(q));
+	count = strgetargc(q_get_choices_vals(obj, q));
 	if (count <= 0)
 		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
@@ -400,7 +400,7 @@ static int text_handler_multiselect(struct frontend *obj, struct question *q)
 		choices[i] = choices_translated[i] = NULL;
 	}
 	tindex = malloc(sizeof(int) * count);
-	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+	if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_translated, tindex, count) != count)
 	{
 		ret = DC_NOTOK;
 		goto CleanUp_TINDEX;
@@ -515,9 +515,9 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 	const char *defval = question_getvalue(q, "");
 	int *tindex = NULL;
 	int ret = DC_OK;
-	const char *indices = q_get_indices(q);
+	const char *indices = q_get_indices(obj, q);
 
-	count = strgetargc(q_get_choices_vals(q));
+	count = strgetargc(q_get_choices_vals(obj, q));
 	if (count <= 0)
 		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
@@ -527,7 +527,7 @@ static int text_handler_select(struct frontend *obj, struct question *q)
 		choices[i] = choices_translated[i] = NULL;
 	}
 	tindex = malloc(sizeof(int) * count);
-	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+	if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_translated, tindex, count) != count)
 	{
 		ret = DC_NOTOK;
 		goto CleanUp_TINDEX;

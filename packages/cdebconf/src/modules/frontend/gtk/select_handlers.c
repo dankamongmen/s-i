@@ -265,7 +265,7 @@ static int create_select_list(struct frontend * fe, struct question * question,
         hide_expanders(GTK_TREE_VIEW(view));
     }
 
-    description = q_get_description(question);
+    description = q_get_description(fe, question);
     text_renderer = gtk_cell_renderer_text_new();
     gtk_tree_view_insert_column_with_attributes(
         GTK_TREE_VIEW(view), -1 /* insert at the end */,

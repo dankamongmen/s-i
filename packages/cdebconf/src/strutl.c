@@ -608,7 +608,13 @@ char * strexpand(const char * src, lookup_function func, void * user_data)
         var[j] = '\0';
         dest_size += rope[rope_index++].len;
         rope[rope_index].str = func(var, user_data);
-        rope[rope_index].len = strlen(rope[rope_index].str);
+        /* Handle skips */
+        if (NULL == rope[rope_index].str) {
+            rope[rope_index].str = &src[i - j - 2 /* "${" */];
+            rope[rope_index].len = j + 3; /* "${}" */
+        } else {
+            rope[rope_index].len = strlen(rope[rope_index].str);
+        }
         dest_size += rope[rope_index++].len;
         /* skip '}' */
         rope[rope_index].str = &src[i + 1];

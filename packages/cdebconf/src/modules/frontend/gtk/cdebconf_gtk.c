@@ -88,7 +88,7 @@ char * cdebconf_gtk_get_text(struct frontend * fe, const char * template,
     struct question * question = fe->qdb->methods.get(fe->qdb, template);
     char * text;
 
-    text = question ? q_get_description(question) : g_strdup(fallback);
+    text = question ? q_get_description(fe, question) : g_strdup(fallback);
     question_deref(question);
     return text;
 }

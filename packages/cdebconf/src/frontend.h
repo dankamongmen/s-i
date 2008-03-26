@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "constants.h"
+#include "strutl.h"
 
 #undef _
 #define _(x) (x)
@@ -25,6 +26,7 @@ struct frontend_module {
     int (*initialize)(struct frontend *, struct configuration *);
     int (*shutdown)(struct frontend *);
     unsigned long (*query_capability)(struct frontend *);
+    const char * (*lookup_directive)(struct frontend *, const char *);
     void (*set_title)(struct frontend *, const char *title);
     void (*info)(struct frontend *, struct question *);
     int (*add)(struct frontend *, struct question *q);

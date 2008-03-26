@@ -104,7 +104,7 @@ static gboolean handle_exposed_banner(GtkWidget * widget,
     char * text;
 
     if (NULL != fe->info) {
-        text = q_get_description(fe->info);
+        text = q_get_description(fe, fe->info);
         message = g_strdup_printf(
             "<b><span foreground=\"#ffffff\">%s</span></b>", text);
         layout = gtk_widget_create_pango_layout(

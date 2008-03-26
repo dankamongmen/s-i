@@ -8,11 +8,16 @@
 #define DC_QFLAG_SEEN		(1 << 0)
 #define DC_QFLAG_DONTPARSE	(1 << 1)
 
-#define q_get_extended_description(q)   question_get_field((q), "", "extended_description")
-#define q_get_description(q)  		question_get_field((q), "", "description")
-#define q_get_choices(q)		question_get_field((q), "", "choices")
-#define q_get_choices_vals(q)		question_get_field((q), "C", "choices")
-#define q_get_indices(q)		question_get_field((q), "", "indices")
+#define q_get_extended_description(fe, q)  question_get_field((fe), (q), "", "extended_description")
+#define q_get_description(fe, q)           question_get_field((fe), (q), "", "description")
+#define q_get_choices(fe, q)               question_get_field((fe), (q), "", "choices")
+#define q_get_choices_vals(fe, q)          question_get_raw_field((q), "C", "choices")
+#define q_get_indices(fe, q)               question_get_field((fe), (q), "", "indices")
+#define q_get_raw_extended_description(q)  question_get_raw_field((q), "", "extended_description")
+#define q_get_raw_description(q)           question_get_raw_field((q), "", "description")
+#define q_get_raw_choices(q)               question_get_raw_field((q), "", "choices")
+#define q_get_raw_choices_vals(q)          question_get_raw_field((q), "C", "choices")
+#define q_get_raw_indices(q)               question_get_raw_field((q), "", "indices")
 
 struct template;
 struct frontend;
@@ -67,8 +72,10 @@ const char *question_get_variable(const struct question *q, const char *var);
 
 void question_owner_add(struct question *q, const char *owner);
 void question_owner_delete(struct question *q, const char *owner);
-char *question_get_field(const struct question *q, const char *lang,
+char *question_get_raw_field(const struct question *q, const char *lang,
 	const char *field);
+char *question_get_field(struct frontend *obj, const struct question *q,
+        const char *lang, const char *field);
 
 const char *question_get_text(struct frontend *obj, const char *template,
               const char *fallback);

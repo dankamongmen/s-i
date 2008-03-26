@@ -73,6 +73,13 @@ static unsigned long frontend_query_capability(struct frontend *f)
 	return 0;
 }
 
+static const char * frontend_lookup_directive(struct frontend *obj,
+                                              const char *directive)
+{
+	/* Remove unhandled directives. */
+	return "";
+}
+
 static void frontend_set_title(struct frontend *f, const char *title)
 {
 	DELETE(f->title);
@@ -200,6 +207,7 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(initialize);
 	SETMETHOD(shutdown);
 	SETMETHOD(query_capability);
+	SETMETHOD(lookup_directive);
 	SETMETHOD(set_title);
 	SETMETHOD(info);
 	SETMETHOD(add);

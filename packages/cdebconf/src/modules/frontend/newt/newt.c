@@ -245,13 +245,13 @@ cdebconf_newt_get_text_width(const char *text)
 }
 
 static int
-min_window_height(struct question *q, int win_width)
+min_window_height(struct frontend *obj, struct question *q, int win_width)
 {
     int height = 3;
     char *type = q->template->type;
     char *q_ext_text;
 
-    q_ext_text = q_get_extended_description(q);
+    q_ext_text = q_get_extended_description(obj, q);
     if (q_ext_text != NULL)
         height = cdebconf_newt_get_text_height(q_ext_text, win_width) + 1;
     if (strcmp(type, "multiselect") == 0 || strcmp(type, "select") == 0)
@@ -263,22 +263,22 @@ min_window_height(struct question *q, int win_width)
 }
 
 static int
-need_separate_window(struct question *q)
+need_separate_window(struct frontend *obj, struct question *q)
 {
     int width = 80, height = 24;
     int x;
 
     newtGetScreenSize(&width, &height);
-    x = min_window_height(q, width-7);
+    x = min_window_height(obj, q, width-7);
     return (x >= height-5);
 }
 
 static char *
-get_full_description(struct question *q)
+get_full_description(struct frontend *obj, struct question *q)
 {
     char *res = NULL;
-    char *descr = q_get_description(q);
-    char *ext_descr = q_get_extended_description(q);
+    char *descr = q_get_description(obj, q);
+    char *ext_descr = q_get_extended_description(obj, q);
 
     assert(descr);
     assert(ext_descr);
@@ -312,8 +312,8 @@ show_separate_window(struct frontend *obj, struct question *q)
 #else
     int flags = NEWT_FLAG_WRAP;
 #endif
-    char *descr = q_get_description(q);
-    char *ext_descr = q_get_extended_description(q);
+    char *descr = q_get_description(obj, q);
+    char *ext_descr = q_get_extended_description(obj, q);
 
     assert(descr);
     assert(ext_descr);
@@ -325,7 +325,7 @@ show_separate_window(struct frontend *obj, struct question *q)
         full_description = strdup(ext_descr);
     }
     else
-        full_description = get_full_description(q);
+        full_description = get_full_description(obj, q);
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
@@ -410,7 +410,7 @@ generic_handler_string(struct frontend *obj, struct question *q, int eflags)
 #endif
     char *defval;
     const char *result;
-    char *full_description = get_full_description(q);
+    char *full_description = get_full_description(obj, q);
 
     eflags |= NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT;
     newtGetScreenSize(&width, &height);
@@ -496,8 +496,8 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     size_t res;
     wchar_t c;
     int *tindex = NULL;
-    const char *indices = q_get_indices(q);
-    char *full_description = get_full_description(q);
+    const char *indices = q_get_indices(obj, q);
+    char *full_description = get_full_description(obj, q);
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
     char *wrappedtext;
@@ -509,13 +509,13 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     newtGetScreenSize(&width, &height);
     win_width = width-7;
     strtruncate(obj->title, win_width-9);
-    count = strgetargc(q_get_choices_vals(q));
+    count = strgetargc(q_get_choices_vals(obj, q));
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
     defvals = malloc(sizeof(char *) * count);
@@ -648,8 +648,8 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     char **choices, **choices_trans, *defval;
     int count = 0, i, ret, defchoice = -1;
     int *tindex = NULL;
-    const char *indices = q_get_indices(q);
-    char *full_description = get_full_description(q);
+    const char *indices = q_get_indices(obj, q);
+    char *full_description = get_full_description(obj, q);
     char *p;
     size_t res;
     int k;
@@ -665,13 +665,13 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     newtGetScreenSize(&width, &height);
     win_width = width-7;
     strtruncate(obj->title, win_width-9);
-    count = strgetargc(q_get_choices_vals(q));
+    count = strgetargc(q_get_choices_vals(obj, q));
     if (count <= 0)
         return DC_NOTOK;
     choices = malloc(sizeof(char *) * count);
     choices_trans = malloc(sizeof(char *) * count);
     tindex = malloc(sizeof(int) * count);
-    if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_trans, tindex, count) != count)
+    if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
     sel_height = count;
@@ -788,7 +788,7 @@ newt_handler_boolean(struct frontend *obj, struct question *q)
 #else
     int flags = NEWT_FLAG_WRAP;
 #endif
-    char *full_description = get_full_description(q);
+    char *full_description = get_full_description(obj, q);
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
@@ -878,7 +878,7 @@ newt_handler_multiselect(struct frontend *obj, struct question *q)
 {
     int separate_window, ret;
 
-    separate_window = need_separate_window(q);
+    separate_window = need_separate_window(obj, q);
     while (1) {
         if (separate_window) {
             ret = show_separate_window(obj, q);
@@ -906,7 +906,7 @@ newt_handler_select(struct frontend *obj, struct question *q)
 {
     int separate_window, ret;
 
-    separate_window = need_separate_window(q);
+    separate_window = need_separate_window(obj, q);
     while (1) {
         if (separate_window) {
             ret = show_separate_window(obj, q);
@@ -1095,7 +1095,7 @@ newt_go(struct frontend *obj)
                     newtCls();
                 }
                 if (obj->info != NULL) {
-                    char *text = q_get_description(obj->info);
+                    char *text = q_get_description(obj, obj->info);
                     if (text)
                         newtDrawRootText(0, 0, text);
                     free(text);
@@ -1236,7 +1236,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     newtSetColors(newtAltColorPalette);
     newtCls();
     if (obj->info != NULL) {
-        char *text = q_get_description(obj->info);
+        char *text = q_get_description(obj, obj->info);
         if (text)
             newtDrawRootText(0, 0, text);
         free(text);
