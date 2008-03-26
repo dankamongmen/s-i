@@ -16,7 +16,7 @@ my $debug = 0;
 
 my %codes;
 my %levels;
-my %translationmap;
+my %translations;
 
 sub get_language_names {
     my $list = shift;
@@ -32,11 +32,7 @@ sub get_language_names {
 
 	$codes{$name} = $code;
 	$levels{$name} = $level;
-
-	$translation = $name .
-	               (" " x (22 - length($name))).
-	               "- $translation";
-	$translationmap{$name} = $translation;
+	$translations{$name} = $translation;
     }
     close(L);
     return @names;
@@ -45,9 +41,7 @@ sub get_language_names {
 my @languagenames = get_language_names($list);
 
 sub order_trans {
-    my ($a_language)=$translationmap{$a}=~/^(\w+)/;
-    my ($b_language)=$translationmap{$b}=~/^(\w+)/;
-    return $a_language cmp $b_language;
+    return $a cmp $b;
 }
 
 #Sorts languages, making sure that the C locale is listed first
@@ -63,14 +57,14 @@ sub sort_C_first {
 open(TOUT, "> $outfile") || die "Unable to write $outfile";
 for my $name (sort_C_first @languagenames) {
     my $line;
-    if (exists $translationmap{$name}) {
+    if (exists $translations{$name}) {
 	$line = $levels{$name}.
 		":".
 		$codes{$name}.
 		":".
 		$name.
 		":".
-		$translationmap{$name};
+		$translations{$name};
 	print TOUT $line, "\n";
     }
 }

@@ -274,13 +274,15 @@ if [ "$langlevel" != "$old_langlevel" ]; then
 	OLDIFS="$IFS"
 	IFS="$NL"
 	for langline in $(zcat $LANGUAGELISTDATA | grep "^[0-$langlevel]:"); do
+		name_en="$(echo "$langline" | cut -d: -f3)"
 		lt_codes="$(choices_add "$lt_codes" \
 			"$(echo "$langline" | cut -d: -f2)")"
 		lt_names_en="$(choices_add "$lt_names_en" \
-			"$(echo "$langline" | cut -d: -f3)")"
+			"$name_en")"
 		lt_names_both="$(choices_add "$lt_names_both" \
-			"$(echo "$langline" | cut -d: -f4)")"
+			"$name_en\${!TAB}-\${!TAB}$(echo "$langline" | cut -d: -f4)")"
 	done
+	unset name_en
 	IFS="$OLDIFS"
 
 	db_subst $langlist CODES "$lt_codes"
@@ -321,6 +323,7 @@ while :; do
 			# Set initial language for correct display of list
 			set_debconf_language $INITIAL_LANGUAGE
 
+			db_capb backup align
 			db_input critical $langlist || [ $? -eq 30 ]
 		fi
 		;;
@@ -603,6 +606,7 @@ while :; do
 			STATE=$(($STATE - 1))
 		fi
 	fi
+	db_capb backup
 done
 
 if [ $STATE -eq 0 ]; then
