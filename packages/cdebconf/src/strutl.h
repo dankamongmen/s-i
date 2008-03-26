@@ -56,6 +56,7 @@ int strwrap(const char *str, const int width, char *lines[], int maxlines);
 int strlongest(char **strs, int count);
 
 size_t strwidth(const char *width);
+int strpad(char *what, size_t maxsize);
 int strtruncate (char *what, size_t maxsize);
 
 typedef const char * (* lookup_function)(const char * name, void * user_data);
