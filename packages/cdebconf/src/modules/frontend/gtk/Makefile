@@ -9,7 +9,8 @@ OBJS = cdebconf_gtk.opic \
        progress.opic \
        go.opic \
        handlers.opic \
-       ui.opic
+       ui.opic \
+       align_text_renderer.opic
 
 ifneq ($(strip $(filter -DDI_UDEB, $(CFLAGS))),)
 OBJS += screenshot.opic di.opic

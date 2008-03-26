@@ -54,6 +54,9 @@
 /** Default padding used troughout the GTK+ frontend. */
 #define DEFAULT_PADDING 6
 
+/* Unused area between "aligned" columns in pango units. */
+#define COLUMN_SPACING 20000
+
 #ifdef DI_UDEB
 /** Paths to the directory containing images used by the GTK+ frontend. */
 # define BASE_IMAGE_PATH \
@@ -78,6 +81,10 @@
 /** Can the user "go back" in the current frontend run? */
 #define CAN_GO_BACK(Frontend) \
     (Frontend->methods.can_go_back(Frontend, Frontend->questions))
+
+/** Should tab separated fields be aligned in select and multiselect? */
+#define CAN_ALIGN(Frontend) \
+    (Frontend->methods.can_align(Frontend, Frontend->questions))
 
 /** Is the question the only one in the current GO? */
 #define IS_QUESTION_SINGLE(Question) \

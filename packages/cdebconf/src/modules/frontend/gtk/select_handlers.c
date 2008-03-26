@@ -52,6 +52,7 @@
 #include "descriptions.h"
 #include "choice_model.h"
 #include "ui.h"
+#include "align_text_renderer.h"
 
 /** Setter function for the select handler in multiple questions form.
  *
@@ -227,6 +228,107 @@ static gboolean focus_path(GtkTreeView * view, GdkEventExpose * event,
     return FALSE; /* propagate the event */
 }
 
+/** Adjust tab stops in the given tab array to display all the given values.
+ *
+ * @param widget widget where the tabs will be renderered
+ * @param tab_array tab array to update
+ * @param NULL terminated list of values to be renderered
+ */
+static void adjust_tabs_for_choice(GtkWidget * widget,
+                                   PangoTabArray * tab_array, char ** values)
+{
+    gint columns;
+    gint value_width;
+    gint previous_location;
+    gint location;
+    gint i;
+
+    columns = g_strv_length(values);
+    if (pango_tab_array_get_size(tab_array) < columns - 1) {
+        pango_tab_array_resize(tab_array, columns - 1);
+    }
+    previous_location = 0;
+    for (i = 0; NULL != values[i + 1]; i++) {
+        value_width = cdebconf_gtk_get_text_width(widget, values[i])
+                      + COLUMN_SPACING;
+        pango_tab_array_get_tab(tab_array, i, NULL /* don't get alignment */,
+                                &location);
+        if (location - previous_location < value_width) {
+            location = previous_location + value_width;
+            pango_tab_array_set_tab(tab_array, i, PANGO_TAB_LEFT, location);
+        }
+        previous_location = location;
+    }
+
+#if 0
+    /* DEBUG: dump tabs */
+    g_warning("dump after value[0]: %s", values[i]);
+    for (i = 0; pango_tab_array_get_size(tab_array) > i; i++) {
+        pango_tab_array_get_tab(tab_array, i, NULL /* don't get alignment */,
+                                &location);
+        g_warning("%d: %d", i, location);
+    }
+#endif
+}
+
+/** Adjust tab stops in the given tab array to render all the "columns"
+ * (separated by a tab) in the translated choice of the given model.
+ *
+ * @param widget widget where the choices will be rendered
+ * @param tab_array tab array to update
+ * @param model a choice model
+ */
+static void adjust_tabs(GtkWidget * widget, PangoTabArray * tab_array,
+                        GtkTreeModel * model)
+{
+    char * choice;
+    char ** values;
+    GtkTreeIter iter;
+    gboolean valid;
+
+    valid = gtk_tree_model_get_iter_first(model, &iter);
+    while (valid) {
+        gtk_tree_model_get(model, &iter,
+            /* column: */ CHOICE_MODEL_TRANSLATED_VALUE, &choice,
+            -1 /* end of list */);
+        values = g_strsplit(choice, "\t", 0 /* split all */);
+        adjust_tabs_for_choice(widget, tab_array, values);
+        g_free(choice);
+        g_strfreev(values);
+        valid = gtk_tree_model_iter_next(model, &iter);
+    }
+}
+
+/** Insert the column displaying translated choices in the given GtkTreeView.
+ *
+ * @param fe frontend
+ * @param view column destination
+ */
+static void insert_choice_column(struct frontend * fe, GtkTreeView * view)
+{
+    GtkCellRenderer * renderer;
+    PangoTabArray * tab_array;
+
+    if (CAN_ALIGN(fe)) {
+        /* XXX: check NULL */
+        tab_array = pango_tab_array_new(0 /* start with no tabs */,
+                                        FALSE /* use pango unit */);
+        adjust_tabs(GTK_WIDGET(view), tab_array,
+                    gtk_tree_view_get_model(view));
+        renderer = cdebconf_gtk_align_text_renderer_new();
+        cdebconf_gtk_align_text_renderer_set_tab_array(
+            ALIGN_TEXT_RENDERER(renderer), tab_array);
+        pango_tab_array_free(tab_array);
+    } else {
+        renderer = gtk_cell_renderer_text_new();
+    }
+    gtk_tree_view_insert_column_with_attributes(
+        view, -1 /* insert at the end */,
+        NULL /* no title */, renderer,
+        "text", CHOICE_MODEL_TRANSLATED_VALUE,
+        NULL /* end of attribute list */);
+}
+
 /** Create widget for select question in single question form.
  *
  * This will also register the corresponding setter function.
@@ -245,8 +347,6 @@ static int create_select_list(struct frontend * fe, struct question * question,
     GtkWidget * view;
     GtkWidget * scroll;
     GtkWidget * frame;
-    GtkCellRenderer * text_renderer;
-    char * description;
 
     /* check NULL! */
     view = gtk_tree_view_new_with_model(model);
@@ -265,14 +365,7 @@ static int create_select_list(struct frontend * fe, struct question * question,
         hide_expanders(GTK_TREE_VIEW(view));
     }
 
-    description = q_get_description(fe, question);
-    text_renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_insert_column_with_attributes(
-        GTK_TREE_VIEW(view), -1 /* insert at the end */,
-        description /* title */, text_renderer,
-        "text", CHOICE_MODEL_TRANSLATED_VALUE,
-        NULL /* end of attribute list */);
-    g_free(description);
+    insert_choice_column(fe, GTK_TREE_VIEW(view));
 
     g_signal_connect_swapped(G_OBJECT(view), "row-activated",
                              G_CALLBACK(cdebconf_gtk_set_answer_ok), fe);
@@ -480,7 +573,6 @@ static int create_multiselect_list(struct frontend * fe,
     GtkWidget * scroll;
     GtkWidget * frame;
     GtkCellRenderer * toggle_renderer;
-    GtkCellRenderer * text_renderer;
     GtkTreePath * path;
 
     view = gtk_tree_view_new_with_model(model);
@@ -496,12 +588,7 @@ static int create_multiselect_list(struct frontend * fe,
         "active", CHOICE_MODEL_SELECTED,
         NULL /* end of attribute list */);
 
-    text_renderer = gtk_cell_renderer_text_new();
-    gtk_tree_view_insert_column_with_attributes(
-        GTK_TREE_VIEW(view), -1 /* insert at the end */,
-        NULL /* no title */, text_renderer,
-        /* column: */ "text", CHOICE_MODEL_TRANSLATED_VALUE,
-        NULL /* end of list */);
+    insert_choice_column(fe, GTK_TREE_VIEW(view));
 
     if (!IS_SPECIAL_QUESTION(question)) {
         hide_expanders(GTK_TREE_VIEW(view));

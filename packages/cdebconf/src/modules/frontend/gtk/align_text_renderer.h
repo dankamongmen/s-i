@@ -33,36 +33,55 @@
  *
  *****************************************************************************/
 
-/** @file ui.h
- * Common user interface related functions for the GTK+ frontend of cdebconf
- * (header)
+/** @file align_text_renderer.h
+ * GtkCellRenderer for text aligned with tab stops (header)
  */
 
-#ifndef _UI_H_
-#define _UI_H_
+#ifndef _ALIGN_TEXT_RENDERER_H_
+#define _ALIGN_TEXT_RENDERER_H_
 
 #include <gtk/gtk.h>
 
-#include "frontend.h"
-#include "question.h"
+#define TYPE_ALIGN_TEXT_RENDERER (cdebconf_gtk_align_text_renderer_get_type())
 
-gboolean cdebconf_gtk_create_main_window(struct frontend * fe);
+#define ALIGN_TEXT_RENDERER(obj) \
+    (G_TYPE_CHECK_INSTANCE_CAST( \
+        (obj), TYPE_ALIGN_TEXT_RENDERER, AlignTextRenderer))
+#define ALIGN_TEXT_RENDERER_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_CAST((klass), \
+                             TYPE_ALIGN_TEXT_RENDERER, \
+			     AlignTextRendererClass))
+#define IS_TEXT_ALIGN_RENDERER(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE((obj), TYPE_TEXT_ALIGN_RENDERER))
+#define IS_TEXT_ALIGN_RENDERER_CLASS(klass) \
+    (G_TYPE_CHECK_CLASS_TYPE((klass), TYPE_TEXT_ALIGN_RENDERER))
+#define TEXT_ALIGN_RENDERER_GET_CLASS(obj) \
+    (G_TYPE_INSTANCE_GET_CLASS((obj), \
+                               TYPE_ALIGN_TEXT_RENDERER, \
+                               AlignTextRendererClass))
 
-void cdebconf_gtk_destroy_main_window(struct frontend * fe);
+typedef struct _AlignTextRenderer AlignTextRenderer;
+typedef struct _AlignTextRendererClass AlignTextRendererClass;
 
-void cdebconf_gtk_update_frontend_title(struct frontend * fe);
+struct _AlignTextRenderer {
+    GtkCellRenderer parent;
 
-void cdebconf_gtk_show_buttons(struct frontend * fe);
+    gchar * text;
+    PangoTabArray * tab_array;
+};
 
-void cdebconf_gtk_show_target_box(struct frontend * fe);
+struct _AlignTextRendererClass {
+    GtkCellRendererClass parent_class;
+    void (* set_tab_array)(AlignTextRenderer * renderer,
+                           PangoTabArray * tab_array);
+};
 
-void cdebconf_gtk_hide_target_box(struct frontend * fe);
+GType cdebconf_gtk_align_text_renderer_get_type(void);
+GtkCellRenderer * cdebconf_gtk_align_text_renderer_new(void);
+void cdebconf_gtk_align_text_renderer_set_tab_array(
+    AlignTextRenderer * renderer, PangoTabArray * tab_array);
 
-void cdebconf_gtk_empty_target_box(struct frontend * fe);
-
-gint cdebconf_gtk_get_text_width(GtkWidget * widget, gchar * text);
-
-#endif /* !_UI_H_ */
+#endif /* ! _ALIGN_TEXT_RENDERER_H_ */
 
 /* vim: et sw=4 si
  */

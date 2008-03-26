@@ -396,6 +396,24 @@ static void cdebconf_gtk_set_title(struct frontend * fe, const char * title)
 #endif
 }
 
+/** Implements the lookup_directive function of cdebconf frontends.
+ *
+ * When the align cabability is set, the TAB directive returns "\t".
+ *
+ * @param fe cdebconf frontend
+ * @param directive the directive name
+ * @return the expansion value, or NULL if expansion should be skipped
+ */
+static const char * cdebconf_gtk_lookup_directive(struct frontend * fe,
+                                                  const char * directive)
+{
+    if (CAN_ALIGN(fe) && 0 == strcmp(directive, "TAB")) {
+        return "\t";
+    }
+    /* Remove unhandled directives */
+    return "";
+}
+
 /** Implements the can_go_back function of cdebconf frontends.
  *
  * @param fe cdebconf frontend
@@ -408,13 +426,27 @@ static bool cdebconf_gtk_can_go_back(struct frontend * fe,
     return DCF_CAPB_BACKUP == (fe->capability & DCF_CAPB_BACKUP);
 }
 
+/** Implements the can_align function of cdebconf frontends.
+ *
+ * @param fe cdebconf frontend
+ * @param question question which needs to be aligned
+ * @return TRUE if align is possible, FALSE otherwise
+ */
+static bool cdebconf_gtk_can_align(struct frontend * fe,
+                                   struct question * question)
+{
+    return DCF_CAPB_ALIGN == (fe->capability & DCF_CAPB_ALIGN);
+}
+
 /** Describe our frontend implementation to cdebconf.
  */
 struct frontend_module debconf_frontend_module = {
     initialize: cdebconf_gtk_initialize,
     shutdown: cdebconf_gtk_shutdown,
     can_go_back: cdebconf_gtk_can_go_back,
+    can_align: cdebconf_gtk_can_align,
     set_title: cdebconf_gtk_set_title,
+    lookup_directive: cdebconf_gtk_lookup_directive,
     /* see go.c */
     go: cdebconf_gtk_go,
     /* see progress.c */

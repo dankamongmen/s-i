@@ -593,5 +593,23 @@ void cdebconf_gtk_empty_target_box(struct frontend * fe)
                          (GtkCallback) gtk_widget_destroy, NULL /* no data */);
 }
 
+/** Returns the width (in pango units) of the given text.
+ *
+ * @param widget widget where the text will be renderered
+ * @param text text to be rendered
+ * @return width of the text in pango units
+ */
+gint cdebconf_gtk_get_text_width(GtkWidget * widget, gchar * text)
+{
+    PangoLayout * layout;
+    gint width;
+
+    layout = gtk_widget_create_pango_layout(widget, text);
+    pango_layout_get_size(layout, &width, NULL /* no height */);
+    g_object_unref(layout);
+
+    return width;
+}
+
 /* vim: et sw=4 si
  */
