@@ -85,6 +85,69 @@ choices_add() {
 	echo "${1:+$1, }$2"
 }
 
+# Determine the display level
+language_display_level() {
+	local level
+
+	#log "Frontend in use: $DEBIAN_FRONTEND"
+	case $DEBIAN_FRONTEND in
+	    text)
+		level=0 ;;
+	    gtk)
+		level=4 ;;
+	    *)
+		# Only keep Latin1 languages if we don't have a framebuffer
+		db_get debian-installer/framebuffer || true
+		if [ "$RET" = "false" ] || [ -z "$RET" ]; then
+			level=1
+		else
+			level=3
+		fi
+		# ASCII only if we are on serial console or a dumb terminal
+		# Both variables should already be set at init time
+		if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ]; then
+			level=0
+		fi
+		;;
+	esac
+
+	#log "Language display level is $level"
+	echo $level
+}
+
+# Build list of available languages for a display level
+build_language_template() {
+	local level=$1
+	local oldlevel=$(cat /var/lib/localechooser/langlevel \
+		2>/dev/null || true)
+	if [ "$level" = "$oldlevel" ]; then
+		return 0
+	fi
+
+	local OLDIFS IFS line name codes names_en names_both
+	rm -f /var/lib/localechooser/langlevel
+
+	OLDIFS="$IFS"
+	IFS="$NL"
+	for line in $(zcat $LANGUAGELISTDATA | grep "^[0-$level]:"); do
+		name="$(echo "$line" | cut -d: -f3)"
+		codes="$(choices_add "$codes" \
+			"$(echo "$line" | cut -d: -f2)")"
+		names_en="$(choices_add "$names_en" \
+			"$name")"
+		names_both="$(choices_add "$names_both" \
+			"$name\${!TAB}-\${!TAB}$(echo "$line" | cut -d: -f4)")"
+	done
+	IFS="$OLDIFS"
+
+	db_subst $langlist CODES "$codes"
+	db_subst $langlist NAMES_EN "$names_en"
+	db_subst $langlist NAMES_BOTH "$names_both"
+
+	echo $level >/var/lib/localechooser/langlevel
+}
+
+
 do_preseed() {
 	LOCALE="$1"
 	log "Locale has been preseeded to $LOCALE"
@@ -243,54 +306,7 @@ fi
 # Find the display level and set languages in the template
 # Needs to be done before checking preseeding, so we can preseed the
 # correct template.
-
-#log "Frontend in use: $DEBIAN_FRONTEND"
-case $DEBIAN_FRONTEND in
-    text)
-	langlevel=0 ;;
-    gtk)
-	langlevel=4 ;;
-    *)
-	# Only keep Latin1 languages if we don't have a framebuffer
-	db_get debian-installer/framebuffer || true
-	if [ "$RET" = "false" ] || [ -z "$RET" ]; then
-		langlevel=1
-	else
-		langlevel=3
-	fi
-	# ASCII only if we are on serial console or a dumb terminal
-	# Both variables should already be set at init time
-	if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ]; then
-		langlevel=0
-	fi
-	;;
-esac
-#log "Language display level is $langlevel"
-
-old_langlevel=$(cat /var/lib/localechooser/langlevel 2>/dev/null || true)
-if [ "$langlevel" != "$old_langlevel" ]; then
-	rm -f /var/lib/localechooser/langlevel
-
-	OLDIFS="$IFS"
-	IFS="$NL"
-	for langline in $(zcat $LANGUAGELISTDATA | grep "^[0-$langlevel]:"); do
-		name_en="$(echo "$langline" | cut -d: -f3)"
-		lt_codes="$(choices_add "$lt_codes" \
-			"$(echo "$langline" | cut -d: -f2)")"
-		lt_names_en="$(choices_add "$lt_names_en" \
-			"$name_en")"
-		lt_names_both="$(choices_add "$lt_names_both" \
-			"$name_en\${!TAB}-\${!TAB}$(echo "$langline" | cut -d: -f4)")"
-	done
-	unset name_en
-	IFS="$OLDIFS"
-
-	db_subst $langlist CODES "$lt_codes"
-	db_subst $langlist NAMES_EN "$lt_names_en"
-	db_subst $langlist NAMES_BOTH "$lt_names_both"
-
-	echo $langlevel >/var/lib/localechooser/langlevel
-fi
+build_language_template $(language_display_level)
 
 # Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding the first time localechooser is run.
