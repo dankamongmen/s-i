@@ -518,6 +518,10 @@ show_multiselect_window(struct frontend *obj, struct question *q, int show_ext_d
     if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
 
+    if (obj->methods.can_align(obj, q)) {
+        stralign(choices_trans, count, "\t");
+    }
+
     defvals = malloc(sizeof(char *) * count);
     defcount = strchoicesplit(question_getvalue(q, ""), defvals, count);
     answer = malloc(sizeof(char) * count);
@@ -673,6 +677,10 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
     tindex = malloc(sizeof(int) * count);
     if (strchoicesplitsort(q_get_choices_vals(obj, q), q_get_choices(obj, q), indices, choices, choices_trans, tindex, count) != count)
         return DC_NOTOK;
+
+    if (obj->methods.can_align(obj, q)) {
+        stralign(choices_trans, count, "\t");
+    }
 
     sel_height = count;
     form = cdebconf_newt_create_form(NULL);
@@ -1139,6 +1147,23 @@ newt_can_cancel_progress(struct frontend *obj)
     return (obj->capability & DCF_CAPB_PROGRESSCANCEL);
 }
 
+static bool
+newt_can_align(struct frontend *obj)
+{
+    return (obj->capability & DCF_CAPB_ALIGN);
+}
+
+static const char *
+newt_lookup_directive(struct frontend *obj, const char *directive)
+{
+    if (obj->methods.can_align(obj, obj->questions) &&
+        strcmp("TAB", directive) == 0) {
+        return "\t";
+    }
+    /* Remove unhandled directives */
+    return "";
+}
+
 static void
 newt_make_progress_bar(struct frontend *obj, const char *info)
 {
@@ -1333,9 +1358,11 @@ struct frontend_module debconf_frontend_module =
 {
 initialize: newt_initialize,
 shutdown: newt_shutdown,
+lookup_directive: newt_lookup_directive,
 go: newt_go,
 can_go_back: newt_can_go_back,
 can_cancel_progress: newt_can_cancel_progress,
+can_align: newt_can_align,
 progress_start: newt_progress_start,
 progress_set:   newt_progress_set,
 progress_info:  newt_progress_info,
