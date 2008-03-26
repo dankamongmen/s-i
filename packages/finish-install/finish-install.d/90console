@@ -19,7 +19,11 @@ write_console() {
 # not give reliable answers about what sort of terminal
 # we have.  The stdin of /sbin/debian-installer seems
 # to tell the truth.
-inst_pid=$(pidof debian-installer | sed "s/ /\n/g" | sort -n | head -n 1)
+
+# Workaround for pidof regression in busybox 1.9.1 (#472846)
+#inst_pid=$(pidof debian-installer | sed "s/ /\n/g" | sort -n | head -n 1)
+inst_pid=$(ps | grep "[/]sbin/debian-installer" | \
+	sed -r "s/^ *([1-9]*).*/\1/" | sort -n | head -n 1)
 rawconsole=$(readlink /proc/${inst_pid}/fd/0)
 console=$(mapdevfs "$rawconsole") 
 rawconsole=${rawconsole#/dev/}
