@@ -1,5 +1,6 @@
 #include "common.h"
 #include "strutl.h"
+#include "question.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -562,5 +563,69 @@ strtruncate (char *what, size_t maxsize)
         *p = '.';
     *p = '\0';
     return 1;
-}  
+}
+
+#define ROPE_SIZE 256
+#define VAR_SIZE 100
+
+char * strexpand(const char * src, lookup_function func, void * user_data)
+{
+    struct {
+        const char * str;
+        size_t len;
+    } rope[ROPE_SIZE];
+    int rope_index = 0;
+    int i;
+    int j;
+    char var[VAR_SIZE];
+    size_t dest_size = 1;
+    char * dest;
+    char * buf;
+
+    if (NULL == src) {
+        return NULL;
+    }
+
+    /* 1. create the rope */
+    rope[rope_index].str = src;
+    rope[rope_index].len = 0;
+    for (i = 0; '\0' != src[i]; i++) {
+        if ('$' != src[i] || '{' != src[i + 1]) {
+            rope[rope_index].len++;
+            continue;
+        }
+        if (rope_index >= ROPE_SIZE) {
+            return NULL;
+        }
+        i += 2; /* skip "${" */
+        for (j = 0; j < VAR_SIZE && '\0' != src[i] && '}' != src[i]; j++) {
+            var[j] = src[i++];
+        }
+        if ('\0' == src[i]) {
+            rope[rope_index].len = strlen(rope[rope_index].str);
+            break;
+        }
+        var[j] = '\0';
+        dest_size += rope[rope_index++].len;
+        rope[rope_index].str = func(var, user_data);
+        rope[rope_index].len = strlen(rope[rope_index].str);
+        dest_size += rope[rope_index++].len;
+        /* skip '}' */
+        rope[rope_index].str = &src[i + 1];
+        rope[rope_index].len = 0;
+    }
+    dest_size += rope[rope_index].len;
+
+    /* 2. dump rope content */
+    if (NULL == (dest = malloc(dest_size))) {
+        return NULL;
+    }
+    buf = dest;
+    for (i = 0; i <= rope_index; i++) {
+        strncpy(buf, rope[i].str, rope[i].len);
+        buf += rope[i].len;
+    }
+    *buf = '\0';
+    return dest;
+}
 

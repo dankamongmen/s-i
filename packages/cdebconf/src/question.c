@@ -167,82 +167,23 @@ void question_owner_delete(struct question *q, const char *owner)
 	}
 }
 
+/* used by question_expand_vars */
+static const char * lookup_vars(const char * name,
+                                struct questionvariable * variables)
+{
+    struct questionvariable * current;
+
+    for (current = variables; NULL != current; current = current->next) {
+        if (0 == strcmp(current->variable, name)) {
+            return current->value;
+        }
+    }
+    return "";
+}
+
 static char *question_expand_vars(const struct question *q, const char *field)
 {
-    int i = 0;
-    const char *p = field, *varend;
-    char var[100];
-    struct questionvariable *qvi;
-    size_t size;
-    char *buf;
-
-    if (p == 0) return NULL;
-    if (*p == 0) return strdup("");
-    size = strlen(field);
-
-    while (*p != 0)
-    {
-        if (*p != '$' || *(p+1) != '{')
-        {
-            p++;
-            continue;
-        }
-        varend = p+2;
-        while (*varend != 0 && *varend != '}')
-            varend++;
-        if (*varend == 0)
-        {
-            p++;
-            continue;
-        }
-        strncpy(var, p+2, varend-(p+2));
-        var[varend-(p+2)] = 0;
-        for (qvi = q->variables; qvi != 0; qvi = qvi->next)
-            if (strcmp(qvi->variable, var) == 0)
-                break;
-        if (qvi != 0)
-            size += strlen(qvi->value) - (strlen(var)+3);
-        p = varend + 1;
-    }
-
-    buf = calloc(1, size+1);
-
-    p = field;
-    while (*p != 0 && i < size)
-    {
-        /* is this a variable string? */
-        if (*p != '$' || *(p+1) != '{') 
-        {
-            buf[i++] = *p++;
-            continue;
-        }
-
-        /* look for the end of the variable */
-        varend = p + 2;
-        while (*varend != 0 && *varend != '}') varend++;
-        /* didn't find it? then don't consider this a variable */
-        if (*varend == 0)
-        {
-            buf[i++] = *p++;
-            continue;
-        }
-
-        strncpy(var, p+2, varend-(p+2));
-        var[varend-(p+2)] = 0;
-
-        for (qvi = q->variables; qvi != 0; qvi = qvi->next)
-            if (strcmp(qvi->variable, var) == 0)
-                break;
-
-        if (qvi != 0)
-        {
-            strvacat(buf, size+1, qvi->value, NULL);
-            i = strlen(buf);
-        }
-
-        p = varend + 1;
-    }
-    return buf;
+    return strexpand(field, LOOKUP_FUNCTION(lookup_vars), q->variables);
 }
 
 char *question_get_field(const struct question *q, const char *lang,

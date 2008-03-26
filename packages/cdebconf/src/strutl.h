@@ -7,6 +7,7 @@
 #define _STRUTL_H_
 
 #include <string.h>
+#include "question.h"
 
 /**
  * @brief strcmp with explicit start/stop 
@@ -56,5 +57,9 @@ int strlongest(char **strs, int count);
 
 size_t strwidth(const char *width);
 int strtruncate (char *what, size_t maxsize);
+
+typedef const char * (* lookup_function)(const char * name, void * user_data);
+#define LOOKUP_FUNCTION(F) ((lookup_function) F)
+char * strexpand(const char * src, lookup_function func, void * user_data);
 
 #endif
