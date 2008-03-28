@@ -677,11 +677,6 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
     Quit
   ${Endif}
 
-; ********************************************** Needed for systems with compressed NTFS
-  DetailPrint "$(disabling_ntfs_compression)"
-  nsExec::Exec '"compact" /u $c\g2ldr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
-  ; in my tests, uncompressing $c\grub.cfg wasn't necessary, but better be safe than sorry
-
 ; ********************************************** Do bootloader last, because it's the most dangerous
   ${If} $windows_boot_method == ntldr
     ${Unless} ${FileExists} "$boot_ini"
@@ -787,6 +782,12 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
     nsExec::Exec '"$bcdedit" /set $0 path \g2ldr.mbr'
     nsExec::Exec '"$bcdedit" /displayorder $0 /addlast'
   ${Endif}
+
+; ********************************************** Needed for systems with compressed NTFS
+  DetailPrint "$(disabling_ntfs_compression)"
+  nsExec::Exec '"compact" /u $c\g2ldr $c\g2ldr.mbr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
+  ; in my tests, uncompressing $c\grub.cfg wasn't necessary, but better be safe than sorry
+
 SectionEnd
 
 Function .onInstSuccess
