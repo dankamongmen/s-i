@@ -645,11 +645,11 @@ boot"
   FileClose $0
 
 ; ********************************************** cpio hack
-  StrCpy $0 "$INSTDIR\initrd.gz"
-  DetailPrint "$(appending_preseeding)"
-
   File /oname=$PLUGINSDIR\cpio.exe /usr/share/win32/cpio.exe
   File /oname=$PLUGINSDIR\gzip.exe /usr/share/win32/gzip.exe
+
+  StrCpy $0 "$INSTDIR\initrd.gz"
+  DetailPrint "$(appending_preseeding)"
 
   FileOpen $0 $PLUGINSDIR\preseed.cfg w
   FileWrite $0 "$preseed_cfg$\n"
