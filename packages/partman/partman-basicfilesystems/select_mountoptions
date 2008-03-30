@@ -4,15 +4,9 @@
 
 dev=$1
 id=$2
-# Backwards compatibility: if $3 is passed and that template exists,
-# use that instead of the new common template
-if [ "$3" ] && db_get $3; then
-	newopt=''; tpl=$3
-else
-	newopt=1;  tpl=partman-basicfilesystems/mountoptions
-fi
 part=$dev/$id
 filesystem=$(cat $part/acting_filesystem)
+tpl=partman-basicfilesystems/mountoptions
 
 cd $dev
 
@@ -20,15 +14,13 @@ full_options=''
 all_options=''
 descriptions=''
 for op in $(cat /lib/partman/mountoptions/$filesystem); do
-	if [ "$newopt" ]; then
-		if db_metaget partman-basicfilesystems/text/$op description && \
-		   [ "$RET" ]; then
-			all_options="${all_options:+$all_options, }$op"
-			descriptions="${descriptions:+$descriptions, }$RET"
-		else
-			logger -t partman "Error: no description for mount option $op found; skipping"
-			break
-		fi
+	if db_metaget partman-basicfilesystems/text/$op description && \
+	   [ "$RET" ]; then
+		all_options="${all_options:+$all_options, }$op"
+		descriptions="${descriptions:+$descriptions, }$RET"
+	else
+		logger -t partman "Error: no description for mount option $op found; skipping"
+		break
 	fi
 
 	if [ -f $part/options/$op ]; then
@@ -36,10 +28,8 @@ for op in $(cat /lib/partman/mountoptions/$filesystem); do
 	fi
 done
 
-if [ "$newopt" ]; then
-	db_subst $tpl options "$all_options"
-	db_subst $tpl descriptions "$descriptions"
-fi
+db_subst $tpl options "$all_options"
+db_subst $tpl descriptions "$descriptions"
 db_set $tpl "$full_options"
 db_input critical $tpl || true
 db_go || exit
