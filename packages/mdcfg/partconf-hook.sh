@@ -1,14 +1,13 @@
 #!/bin/sh
 
-[ -z "$1" ] && exit 0
+[ "$1" ] || exit 0
 
-DEVICE=`echo $1 | sed -e "s/\/dev\///"`
+DEVICE=$(echo $1 | sed -e "s:/dev/::")
 
-echo ${DEVICE}
+echo $DEVICE
 
-if grep -q "${DEVICE}" /proc/mdstat; then
-  exit 1
+if grep -q "$DEVICE" /proc/mdstat; then
+	exit 1
 else
-  exit 0
+	exit 0
 fi
-
