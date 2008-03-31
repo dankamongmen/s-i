@@ -22,8 +22,7 @@ MODULE_DIR="/lib/modules/*"
 abort () {
 	echo $1 >&2
 	echo "Giving up!" >&2
-	sleep 5000
-	exit
+	exit 1
 }
 
 debugshell () {
@@ -75,150 +74,86 @@ echo
 echo
 echo
 
-# no grep in klibc, replaced by this horrible hack in sh
-test_disk_lbl () {
-    n=$1
-    nb_words=$2
-    str=$3
-    shift 3
-    shift $n
-    if ([ "$nb_words" = "1" ] && [ "$str" = "$1" ]) || \
-       ([ "$nb_words" = "2" ] && [ "$str" = "$1 $2" ])  || \
-       ([ "$nb_words" = "3" ] && [ "$str" = "$1 $2 $3" ]) ; then
-	    return 0
-    fi
-    return 1   
-}
-
-try_mount () {
-    # TO REMOVE, there is a bug somewhere in the kernel, the first
-    # mount command fail when changing floppy disk
-    # so we have to launch mount twice
-	local dev=$1
-	local fs=$2
-	local dir=$3
-	mount -o ro -t $fs $dev $dir 2> /dev/null || true
-	umount $dir 2> /dev/null || true
-	if mount -o ro -t $fs $dev $dir 2> /dev/null; then
-		return 0
-	fi
-	return 1
-}
-
 LOADED=0
 while [ "$LOADED" = 0 ]; do
-	MOUNTED=0
 	nb_timeout=3
-	while [ "$MOUNTED" = 0 ]; do
-		echo
-		echo "Insert the $ROOT_LABEL."
+	
+	echo
+	echo "Insert the $ROOT_LABEL."
 		
-		OLDPRINTK=$(cat /proc/sys/kernel/printk)
-		echo 0 > /proc/sys/kernel/printk
-		echo -n "Press Enter when ready"
-		if [ $nb_timeout = 0 ]; then
-			echo -n ":"
-			read line
+	OLDPRINTK=$(cat /proc/sys/kernel/printk)
+	echo 0 > /proc/sys/kernel/printk
+	echo -n "Press Enter when ready"
+	if [ $nb_timeout = 0 ]; then
+		echo -n ":"
+		read line
+	else
+		# boot floppy has no USB keyboard driver
+		# so we use a timeout instead
+		READ_TIMEOUT=30 #seconds
+		echo -n ", or wait $READ_TIMEOUT seconds: "
+		if read -t $READ_TIMEOUT line; then
+			# it is not a usb keyboard so
+			# we no longer need a timeout
+			nb_timeout=0
 		else
-			# boot floppy has no USB keyboard driver
-			# so we use a timeout instead
-			READ_TIMEOUT=30 #seconds
-			echo -n ", or wait $READ_TIMEOUT seconds: "
-			if read -t $READ_TIMEOUT line; then
-				# it is not a usb keyboard so
-				# we no longer need a timeout
-				nb_timeout=0
-			else
-				nb_timeout=$(($nb_timeout -1))
-			fi
+			nb_timeout=$(($nb_timeout -1))
 		fi
-		echo ""
-		echo $OLDPRINTK > /proc/sys/kernel/printk
+	fi
+	echo ""
+	echo $OLDPRINTK > /proc/sys/kernel/printk
+	
+	# Look for any storage devices we can find.
+	# Only ones that we have modules loaded for should exist,
+	# so this is not at brute-force as it may seem.
+	# It's done each time through the loop as USB devices may
+	# be inserted at any time.
+	DEVS=""
+	if [ -z "$INSTALL_MEDIA_DEV" ]; then
+		DEVS=/dev/fd?
+	elif [ -e "$INSTALL_MEDIA_DEV" ]; then
+		DEVS="$INSTALL_MEDIA_DEV"
+	fi
 		
-		# Look for any storage devices we can find.
-		# Only ones that we have modules loaded for should exist,
-		# so this is not at brute-force as it may seem.
-		# It's done each time through the loop as USB devices may
-		# be inserted at any time.
-	        DEVS=""
-		if [ -z "$INSTALL_MEDIA_DEV" ]; then
-			DEVS=/dev/fd?
-		elif [ -e "$INSTALL_MEDIA_DEV" ]; then
-			DEVS="$INSTALL_MEDIA_DEV"
-		fi
-		
-		ERR=""
-		for dev in $DEVS; do
-			if [ "$MOUNTED" = 0 ] && [ -b $dev ]; then
-				# XXX as a mount point, /floppy is not
-				# quite right, as this may be USB storage,
-				# whatever.
-				if try_mount $dev $ROOT_FS floppy; then
-					if [ -e floppy/disk.lbl ] ; then
-						disk_lbl=$(cat floppy/disk.lbl)
-						if ! test_disk_lbl 0 1 "System:" $disk_lbl || \
-							! test_disk_lbl 1 1 "$SYSTEM" $disk_lbl; then
-							ERR="$ERR; $dev: not a $SYSTEM floppy"
-						elif ! test_disk_lbl 2 3 "Label: $ROOT_LABEL" $disk_lbl; then
-							ERR="$ERR; $dev: not the $ROOT_LABEL"
-						else
-							cat floppy/disk.lbl
-							MOUNTED=1
-						fi
-					else
-						echo "The disk has no label, continuing anyway."
-						MOUNTED=1
-					fi
-					if [ "$MOUNTED" = 0 ]; then
-						umount floppy || echo "umount failed!"
-					fi
-				else
-					ERR="$ERR; $dev: cannot mount"
-				fi
+	for dev in $DEVS; do
+		if [ "$LOADED" = 0 ] && [ -b $dev ]; then
+			if ! mount -t tmpfs -o size=100M tmpfs mnt 2>/dev/null && \
+			   ! mount -t shm shm mnt 2>/dev/null; then
+				abort "Cannot mount mnt"
 			fi
-		done
-
-		if [ "$MOUNTED" = 0 ]; then
-			if [ -n "$ERR" ]; then
-				# ERR begins with a semicolon
-				echo "Cannot find $ROOT_LABEL$ERR"
+			cd mnt
+			echo -n "Trying $dev..."
+			# cpio -V will add dots as the floppy is read.
+			# Make sure to catch errors from the cat (tricky).
+			# Also, klibc zcat refules to read device files, so the
+			# use of cat below is not useless. zcat will also
+			# complain about trailing NULL padding, so
+			# /dev/null it.
+			echo 0 > /tmp/cat_failure
+			if ( cat $dev || echo 1 > /tmp/cat_failure ) | zcat 2>/dev/null | cpio -i -V  && \
+			   [ "$(cat /tmp/cat_failure)" = 0 ]; then
+				LOADED=1
+				echo "loaded."
+				cd ..
 			else
-				echo "No devices found!"
+				echo "install media seems to be bad, or $ROOT_LABEL not inserted!" >&2
+				cd ..
+				umount mnt
 			fi
 		fi
 	done
 
-	if ! mount -t tmpfs -o size=100M tmpfs mnt 2>/dev/null && \
-		! mount -t shm shm mnt 2>/dev/null; then
-		echo "Cannot mount mnt"
-		continue
+	if [ "$LOADED" = 0 ]; then
+		if [ -z "$DEVS" ]; then
+			echo "No devices found!"
+		else
+			echo "Cannot find $ROOT_LABEL"
+		fi
 	fi
-
-
-	echo -n "Loading.."
-	# pipe_progress adds dots to the above line while there is
-	# activity. But we must be sure to catch errors from the zcat.
-	# Hard to do in a pipeline..
-	echo 0 > /tmp/zcat_failure
-	cd mnt
-	(zcat ../floppy/initrd.gz || echo 1 > /tmp/zcat_failure ) | cpio -i -V || \
-	 abort "failed to extract initrd (may be out of space on ram disk)"
-	cd ..
-
-	if [ "$(cat /tmp/zcat_failure)" = 0 ]; then
-		LOADED=1
-	else
-		echo "install media seems to be bad!" >&2
-		debugshell "bad media mounted"
-		umount mnt
-	fi
-	
-	umount floppy
 done
 
 debugshell "filesystem loaded and set up"
 
-# dev will be unmounted by debian-installer-startup
 umount proc
 
 echo "Starting the installer..."
