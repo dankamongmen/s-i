@@ -127,7 +127,7 @@ get_partitions() {
 		NUM_PART=$(($NUM_PART + 1))
 	done
 
-	if [ -z "$PARTITIONS" ] ; then
+	if [ -z "$PARTITIONS" ]; then
 		db_input critical mdcfg/noparts
 		db_go
 		return 1
@@ -369,13 +369,13 @@ md_create_raid5() {
 
 	db_get mdcfg/raid5devcount
 	DEV_COUNT="$RET"
-	if [ $DEV_COUNT -lt 3 ] ; then
+	if [ $DEV_COUNT -lt 3 ]; then
 		DEV_COUNT=3 # Minimum number for RAID5
 	fi
 	db_get mdcfg/raid5sparecount
 	SPARE_COUNT="$RET"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
-	if [ $REQUIRED -gt $NUM_PART ] ; then
+	if [ $REQUIRED -gt $NUM_PART ]; then
 		db_subst mdcfg/notenoughparts NUM_PART "$NUM_PART"
 		db_subst mdcfg/notenoughparts REQUIRED "$REQUIRED"
 		db_input critical mdcfg/notenoughparts
