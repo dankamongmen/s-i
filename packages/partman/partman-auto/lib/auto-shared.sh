@@ -189,9 +189,10 @@ get_auto_disks() {
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
 
-		# Skip /dev/mapper/X and /dev/mdX but not multipath devices
+		# Skip /dev/mapper/X (except multipath) devices and
+		# RAID (/dev/md/X and /dev/mdX) devices
 		device=$(cat $dev/device)
-		$(echo "$device" | grep -q "/dev/md[0-9]*$") && continue
+		$(echo "$device" | grep -Eq "/dev/md/?[0-9]*$") && continue
 		if echo $device | grep -q "^/dev/mapper/"; then
 			dmtype=$(dm_table $device)
 			[ "$dmtype" = multipath ] || continue
