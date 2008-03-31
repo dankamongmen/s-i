@@ -18,6 +18,15 @@ md_delete_verify() {
 	DEVICES=$(echo $INFO | sed -e "s/.*:\(.*\)/\1/")
 	NUMBER=$(echo $DEVICE | sed -e "s/^md//")
 
+	# Also handle the case where the first does not exist
+	if [ -b /dev/md/$NUMBER ]; then
+		MDDEV=/dev/md/$NUMBER
+	elif [ -b /dev/md$NUMBER ]; then
+		MDDEV=/dev/md$NUMBER
+	else
+		return 1
+	fi
+
 	db_set mdcfg/deleteverify false
 	db_subst mdcfg/deleteverify DEVICE "/dev/$DEVICE"
 	db_subst mdcfg/deleteverify TYPE "$TYPE"
@@ -30,10 +39,10 @@ md_delete_verify() {
 	    true)
 		# Stop the MD device and zero the superblock
 		# of all the component devices
-		DEVICES=$(mdadm -Q --detail /dev/md/$NUMBER | \
+		DEVICES=$(mdadm -Q --detail $MDDEV | \
 			  grep -E "(active|spare)" | sed -e 's/.* //')
-		logger -t mdcfg "Removing /dev/md/$NUMBER ($DEVICES)"
-		log-output -t mdcfg mdadm --stop /dev/md/$NUMBER || return 1
+		logger -t mdcfg "Removing $MDDEV ($DEVICES)"
+		log-output -t mdcfg mdadm --stop $MDDEV || return 1
 		for DEV in "$DEVICES"; do
 			log-output -t mdcfg \
 				mdadm --zero-superblock --force $DEV || return 1
@@ -494,8 +503,13 @@ modprobe raid456 >/dev/null 2>&1 || modprobe raid5 >/dev/null 2>&1
 # Try to detect MD devices, and start them
 # mdadm will fail if /dev/md does not already exist
 mkdir -p /dev/md
+
 log-output -t mdcfg --pass-stdout \
 	mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
+# Convert to /dev/md/X notation as then both /dev/mdX and /dev/md/X
+# are created when the array is assembled
+sed -i "s:/dev/md\([0-9]\):/dev/md/\1:" /tmp/mdadm.conf
+
 log-output -t mdcfg \
 	mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
 
