@@ -1,5 +1,10 @@
 #! /bin/sh
 
-rm -f /target/usr/bin/debconf-apt-progress
-log-output -t etch-support chroot /target dpkg-divert --package etch-support \
-	--rename --quiet --remove /usr/bin/debconf-apt-progress
+dap=/usr/bin/debconf-apt-progress
+
+# Only if diverted
+if [ "$(chroot /target dpkg-divert --list $dap)" ]; then
+	rm -f /target/$dap
+	log-output -t etch-support chroot /target \
+		dpkg-divert --package etch-support --rename --quiet --remove $dap
+fi
