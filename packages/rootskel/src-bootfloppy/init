@@ -125,10 +125,9 @@ while [ "$LOADED" = 0 ]; do
 			echo -n "Trying $dev..."
 			# cpio -V will add dots as the floppy is read.
 			# Make sure to catch errors from the cat (tricky).
-			# Also, klibc zcat refules to read device files, so the
+			# Also, klibc zcat refuses to read device files, so the
 			# use of cat below is not useless. zcat will also
-			# complain about trailing NULL padding, so
-			# /dev/null it.
+			# complain about trailing NULL padding, so /dev/null it.
 			echo 0 > /tmp/cat_failure
 			if ( cat $dev || echo 1 > /tmp/cat_failure ) | zcat 2>/dev/null | cpio -i -V  && \
 			   [ "$(cat /tmp/cat_failure)" = 0 ]; then
