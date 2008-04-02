@@ -96,12 +96,11 @@ language_display_level() {
 	    gtk)
 		level=4 ;;
 	    *)
-		# Only keep Latin1 languages if we don't have a framebuffer
-		db_get debian-installer/framebuffer || true
-		if [ "$RET" = "false" ] || [ -z "$RET" ]; then
-			level=1
-		else
+		# Keep only Latin1 languages if we don't have a framebuffer
+		if [ "$TERM_FRAMEBUFFER" ]; then
 			level=3
+		else
+			level=1
 		fi
 		# ASCII only if we are on serial console or a dumb terminal
 		# Both variables should already be set at init time
