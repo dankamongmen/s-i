@@ -294,8 +294,9 @@ LOCALE=""
 # debconf/language is an alias for debian-installer/language
 db_register "$languagecode" "debconf/language"
 
-# Only display the translated texts (ie the English "translation")
-# when in UTF-8 mode.
+# Only display the translated texts (ie the English "translation") when in
+# UTF-8 mode. Note: seems the only case this triggers is serial console;
+# probably not needed anymore: we already limit which languages we display.
 if echo $LANG $LC_CTYPE | grep -q UTF-8; then
 	INITIAL_LANGUAGE=en
 else
