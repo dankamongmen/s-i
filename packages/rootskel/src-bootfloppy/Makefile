@@ -2,7 +2,6 @@ dir =
 
 subdirs_empty = \
 	dev \
-	floppy \
 	initrd \
 	lib \
 	mnt \
@@ -12,5 +11,12 @@ subdirs_empty = \
 files_exec = \
 	init
 
+build: init
+
+init: init.c
+	klcc -Os -Wall -shared init.c -o init
+
+clean:
+	rm -f init
 
 include ../Makefile.inc
