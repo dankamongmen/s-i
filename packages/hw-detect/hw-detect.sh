@@ -288,6 +288,24 @@ if [ -z "$LIST" ]; then
 	db_progress STEP $MODULE_STEPS
 fi
 
+# Load ide-generic and check if that results in new block devices.
+# If so, make sure it is added to the initrd for the installed system.
+# Note: this may need to be done for more systems than just systems
+# that have an ISA bus, but that seems like a good start; it could also
+# be done unconditionally.
+if [ -z "$LOAD_IDE" ] && is_not_loaded ide-generic && \
+   [ -e /sys/bus/isa ] && is_available ide-generic; then
+	update-dev
+	blockdev_count=$(ls /sys/block | wc -w)
+
+	log "ISA bus detected; loading module 'ide-generic'"
+	load_module ide-generic
+	update-dev
+	if [ $(ls /sys/block | wc -w) -gt $blockdev_count ]; then
+		register-module -i ide-generic
+	fi
+fi
+
 if ! is_not_loaded ohci1394 || ! is_not_loaded firewire-ohci; then
 	# if firewire was found, try to enable firewire cd support
 	if is_not_loaded sbp2 && is_not_loaded firewire-sbp2 && \
@@ -482,9 +500,7 @@ fi
 
 sysfs-update-devnames
 
-# Let userspace /dev tools rescan the devices.
-if type update-dev >/dev/null 2>&1; then
-	update-dev
-fi
+# Let userspace /dev tools rescan the devices
+update-dev
 
 exit 0
