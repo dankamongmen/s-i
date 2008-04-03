@@ -36,8 +36,7 @@ is_not_loaded() {
 }
 
 is_available () {
-	find /lib/modules/$(uname -r)/ | sed 's!.*/!!' | cut -d . -f 1 | \
-	grep -q "^$1$"
+	[ "$(modprobe -l $1)" ] || return 1
 }
 
 # Module as first parameter, description of device the second.
