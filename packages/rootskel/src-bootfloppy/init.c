@@ -184,7 +184,7 @@ void promptfloppy (void) {
 }
 
 int loadfloppy_dev (char *dev) {
-	int i, status, err=0;
+	int status, err=0;
 	int cat_pid, zcat_pid, cpio_pid;
 	int pipe_a[2], pipe_b[2];
 	struct stat buf;
