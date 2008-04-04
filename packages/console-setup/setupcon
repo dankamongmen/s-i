@@ -285,25 +285,34 @@ if [ "$font_only" != yes ]; then
     fi
     
     if which loadkeys >/dev/null; then
-	if [ "$save" != yes ] && \
-	   [ -f /etc/console-setup/boottime.kmap.gz ]; then
-	    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
-	elif which ckbcomp >/dev/null; then
+	if which ckbcomp >/dev/null; then
 	    if [ "$CHARMAP" != UTF-8 ]; then
 		acm_option="-charmap $CHARMAP"
 	    else
 		acm_option=''
 	    fi
 	    if [ "$save_only" != yes ]; then
-		ckbcomp $acm_option -model "$XKBMODEL" \
-		    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
-		    | eval loadkeys $verbose
+		if \
+		    [ "$VARIANT" = '' ] \
+		    && [ -f /etc/console-setup/boottime.kmap.gz ] \
+		    && [ ! /etc/console-setup/boottime.kmap.gz \
+		           -ot /etc/default/console-setup ]
+		then
+		    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
+		else
+		    ckbcomp $acm_option -model "$XKBMODEL" \
+			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
+			| eval loadkeys $verbose
+		fi
 	    fi
 	    if which gzip >/dev/null && [ "$save" = yes ]; then
 		ckbcomp $acm_option -model "$XKBMODEL" \
 		    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
 		    | gzip -9 >/etc/console-setup/boottime.kmap.gz
 	    fi
+	elif [ "$save_only" != yes ] && \
+	     [ -f /etc/console-setup/boottime.kmap.gz ]; then
+	    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
 	fi
     fi
 fi
