@@ -126,7 +126,7 @@ locale_get (void)
 	int ret = 0;
 
 	struct debconfclient *client = mydebconf_client ();
-	// languagechooser sets locale of the form xx_YY
+	// localechooser sets locale of the form xx_YY
 	// NO encoding used.
 
 	ret = debconf_get (client, "debian-installer/locale");
