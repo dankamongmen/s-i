@@ -11,6 +11,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp
+	rm -rf debian/locales debian/sort-tmp
 	$(MAKE) clean Mirrors.masterlist
 	dh_clean debian/choose-mirror-bin.templates
 
@@ -35,9 +36,9 @@ binary-arch: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf -a
-	# Sort countries (including in translations)
+	# Sort mirror countries (including translations)
 	# MUST be after dh_installdebconf
-	./sort-countries
+	./sort-templates
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
