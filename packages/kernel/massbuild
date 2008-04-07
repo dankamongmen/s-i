@@ -256,6 +256,22 @@ has_recent_upload() {
 	return 1
 }
 
+check_kernel_wedge() {
+	KWDEP=$(grep "Depends:.*kernel-wedge" $USOURCE/debian/control.stub | 
+		sed "s/.*kernel-wedge *(>= \([^)]*\)).*/\1/")
+	KWINST=$(dpkg -l kernel-wedge | grep ^ii | awk '{print $3}')
+	if [ -z "$KWDEP" ]; then
+		log "* Error: could not determine kernel-wedge dependency"
+	elif [ -z "$KWDEP" ]; then
+		log "* Error: could not determine installed kernel-wedge version"
+	elif dpkg --compare-versions $KWINST lt $KWDEP; then
+		log "* Error: kernel-wedge version $KWDEP needed (have $KWINST)"
+	else
+		return 0
+	fi
+	return 1
+}
+
 select_source() {
 	local bdep=$1
 	case $bdep in
@@ -532,6 +548,10 @@ for uarch in $UARCHES; do
 
 		clean_arch $arch
 		rm -f massbuild.$arch.log
+
+		if ! check_kernel_wedge; then
+			continue
+		fi
 
 		cd $USOURCE
 		ARCH_TDIR=../$arch
