@@ -526,6 +526,23 @@ for uarch in $UARCHES; do
 				log "* There were errors building udebs for $arch"
 				clean_arch $arch
 			else
+				# Merge binary and source changes files if needed
+				cd ..
+				achanges="$(ls -1 $UBASE-*_$arch.changes)"
+				if [ $(echo "$achanges" | wc -l) -eq 1 ]; then
+					schanges=$(echo $achanges | \
+						sed "s/_$arch/_source/")
+					if [ -f $schanges ]; then
+						log "  Merging changes files..."
+						mergechanges -f $achanges $schanges
+						rm $achanges $schanges
+					fi
+				else
+					log "* Error: too many changes files found"
+					clean_arch $arch
+				fi
+				cd $USOURCE
+
 				mkdir -p ../$OUTDIR
 				mv ../$UBASE-$arch-2.6_*.* ../$OUTDIR
 				mv ../*_$arch.udeb ../$OUTDIR
