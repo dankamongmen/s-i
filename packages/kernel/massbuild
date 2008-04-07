@@ -157,7 +157,7 @@ for arch in $ARCHES; do
 done
 
 # Check that needed commands are available
-for cmd in kernel-wedge fakeroot; do
+for cmd in kernel-wedge fakeroot dch mergechanges; do
 	if ! type "$cmd" >/dev/null; then
 		echo "Error: command '$cmd' is not available"
 		exit 1
@@ -439,23 +439,6 @@ esac
 ## Rest of processing is for builds
 if [ $OPERATION != kbuild ] && [ $OPERATION != mbuild ]; then
 	exit 0
-fi
-
-# Require dpkg-cross unless we are building only for a single architecture
-# and that architecture matches the host we're running on.
-no_cross=""
-hostarch_cpu=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
-set $UARCHES
-if [ ${#@} -eq 1 ]; then
-	arch=$(list_arches "$UARCHES")
-	set $arch
-	if [ ${#@} -eq 1 ] && [ "$arch" = $hostarch_cpu ]; then
-		no_cross=1
-	fi
-fi
-if [ -z "$no_cross" ] && ! dpkg -l dpkg-cross | grep -q "^ii"; then
-	echo "Error: dpkg-cross is not installed; unable to proceed"
-	exit 1
 fi
 
 
