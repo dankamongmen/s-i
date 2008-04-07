@@ -394,6 +394,42 @@ get_depends() {
 	return $?
 }
 
+merge_changes() {
+	local bchanges schanges hostarch
+
+	cd ..
+	bchanges="$(ls -1 $UBASE-*_$arch.changes)"
+	case $(echo "$bchanges" | wc -l) in
+	   0)
+		log "* Error: no changes files found"
+		clean_arch $arch
+		;;
+	   1)
+		hostarch=$(dpkg-architecture -qDEB_HOST_ARCH_CPU 2>/dev/null)
+		schanges=$(echo $bchanges | sed "s/_$arch/_source/")
+		if [ $arch = $hostarch ]; then
+			# Delete redundant source changes file
+			rm -f $schanges
+		else
+			# Cross build: merge binary and source changes files
+			if [ -f $schanges ]; then
+				log "  Merging changes files..."
+				mergechanges -f $bchanges $schanges
+				rm $bchanges $schanges
+			else
+				log "* Error: cross build, but no source changes files found"
+				clean_arch $arch
+			fi
+		fi
+		;;
+	   *)
+		log "* Error: too many changes files found"
+		clean_arch $arch
+		;;
+	esac
+	cd $USOURCE
+}
+
 
 ### MAINLINE
 
@@ -510,21 +546,7 @@ for uarch in $UARCHES; do
 				clean_arch $arch
 			else
 				# Merge binary and source changes files if needed
-				cd ..
-				achanges="$(ls -1 $UBASE-*_$arch.changes)"
-				if [ $(echo "$achanges" | wc -l) -eq 1 ]; then
-					schanges=$(echo $achanges | \
-						sed "s/_$arch/_source/")
-					if [ -f $schanges ]; then
-						log "  Merging changes files..."
-						mergechanges -f $achanges $schanges
-						rm $achanges $schanges
-					fi
-				else
-					log "* Error: too many changes files found"
-					clean_arch $arch
-				fi
-				cd $USOURCE
+				merge_changes
 
 				mkdir -p ../$OUTDIR
 				mv ../$UBASE-$arch-2.6_*.* ../$OUTDIR
