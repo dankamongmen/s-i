@@ -219,7 +219,7 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 	{
 		/*  Trailing spaces are a placeholder to add [*] for
 		    selected values */
-		asprintf(&(fchoices[i]), "  %d. %s    ", i+1, choices_translated[i]);
+		asprintf(&(fchoices[i]), "%3d. %s    ", i+1, choices_translated[i]);
 		if (selected[tindex[i]])
 			strcpy(fchoices[i]+strlen(fchoices[i])-3, "[*]");
 		if (strwidth(fchoices[i]) < choice_min || choice_min == -1)
