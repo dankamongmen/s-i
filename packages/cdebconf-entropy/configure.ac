@@ -13,6 +13,8 @@ if test "$with_debug" == "yes"; then
   CFLAGS="$CFLAGS -g -D_DEBUG_"
 fi
 
+FRONTENDS="text"
+
 AC_CHECK_LIB(newt, newtInit, FRONTENDS="$FRONTENDS newt", echo
  "*** Cannot build Newt plugin ***")
 

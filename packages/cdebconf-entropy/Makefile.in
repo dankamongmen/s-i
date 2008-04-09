@@ -26,6 +26,9 @@ install: $(PLUGIN_MODULES)
 		install -m644 $$p $(DESTDIR)/$(moddir)/$${p%%-*}/$${p#*-} ; \
 	done
 
+text-plugin-$(PACKAGE).so: text-plugin-$(PACKAGE).opic
+	$(CC) $(LDFLAGS) -shared -o $@ text-plugin-$(PACKAGE).opic
+
 newt-plugin-$(PACKAGE).so: newt-plugin-$(PACKAGE).opic
 	$(CC) $(LDFLAGS) -shared -lnewt -ltextwrap -o $@ newt-plugin-$(PACKAGE).opic
 
