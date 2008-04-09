@@ -8,6 +8,8 @@
  *
  */
 
+#define _GNU_SOURCE
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -72,12 +74,27 @@ help_text(struct frontend *obj)
 }
 
 static const char *
+action_text(struct frontend *obj)
+{
+    return question_get_text(obj, "debconf/entropy/text/action", "Enter random characters");
+}
+
+static const char *
+entropy_help_text(struct frontend *obj)
+{
+    return question_get_text(obj, "debconf/entropy/text/help",
+        "You can help speed up the process by entering random characters on "
+        "the keyboard, or just wait until enough key data has been collected "
+        "(which can take a long time).");
+}
+
+static const char *
 success_text(struct frontend *obj, struct question *q)
 {
     const char *success;
 
     if (NULL == (success = question_get_variable(q, "SUCCESS"))) {
-        success = "partman-crypto/entropy-success";
+        success = "debconf/entropy/success";
     }
     return question_get_text(obj, success,
       "Key data has been created successfully.");
@@ -222,8 +239,7 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     int t_width, t_height;
     int t_width_buttons, t_width_title, t_width_scroll = 0;
     int win_width, win_height;
-    char *ext_description;
-    char *short_description;
+    char *description;
     const char *result;
 
 #ifdef HAVE_LIBTEXTWRAP
@@ -240,18 +256,18 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     /*  There are 5 characters for sigils, plus 4 for borders */
     strtruncate(obj->title, win_width-9);
 
-    ext_description = question_get_field((q), "", "extended_description");
-    short_description = question_get_field(q, "", "description");
+    asprintf(&description, "%s\n\n%s", question_get_field((q), "", "description"),
+        entropy_help_text(obj));
 
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
     textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
-    wrappedtext = textwrap(&tw, ext_description);
-    free(ext_description);
-    ext_description = wrappedtext;
+    wrappedtext = textwrap(&tw, description);
+    free(description);
+    description = wrappedtext;
 #endif
 
-    t_height = cdebconf_newt_get_text_height(ext_description, win_width);
+    t_height = cdebconf_newt_get_text_height(description, win_width);
     if (t_height + 6 + 4 <= height-5)
         win_height = t_height + 6 + 4;
     else {
@@ -261,7 +277,7 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     }
 
     t_height = win_height - (6 + 4);
-    t_width = cdebconf_newt_get_text_width(ext_description);
+    t_width = cdebconf_newt_get_text_width(description);
     t_width_buttons = 2*BUTTON_PADDING;
     t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     t_width_buttons += cdebconf_newt_get_text_width(continue_text(obj)) + 3;
@@ -292,10 +308,9 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     newtFormAddComponent(*form, bOK);
 
     newtScaleSet(scale, 0);
-    newtTextboxSetText(textbox, ext_description);
-    newtTextboxSetText(textbox2, short_description);
-    free(ext_description);
-    free(short_description);
+    newtTextboxSetText(textbox, description);
+    newtTextboxSetText(textbox2, action_text(obj));
+    free(description);
 }
 
 /* vim:set ts=4 sw=4 expandtab: */
