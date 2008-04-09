@@ -299,9 +299,14 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     scale = newtScale(TEXT_PADDING, 1+t_height+1, win_width-2*TEXT_PADDING, keysize);
     textbox2 = newtTextbox(TEXT_PADDING, 1+t_height+3, t_width, 1, tflags);
     entry = newtEntry(TEXT_PADDING, 1+t_height+5, "", t_width, &result, eflags);
-    bCancel = newtCompactButton((TEXT_PADDING + BUTTON_PADDING - 1), win_height-2, goback_text(obj));
 
-    newtFormAddComponents(*form, scale, textbox, textbox2, entry, bCancel, NULL);
+    newtFormAddComponents(*form, scale, textbox, textbox2, entry, NULL);
+    if (obj->methods.can_go_back(obj, q)) {
+        bCancel = newtCompactButton((TEXT_PADDING + BUTTON_PADDING - 1), win_height-2, goback_text(obj));
+        newtFormAddComponents(*form, bCancel, NULL);
+    } else {
+        bCancel = NULL;
+    }
 
     bOK = newtCompactButton((win_width - TEXT_PADDING - BUTTON_PADDING - strwidth(continue_text(obj))-3), win_height-2, continue_text(obj));
     newtComponentTakesFocus(bOK, 0);
