@@ -23,6 +23,7 @@ static struct map map_hardware[] = {
     { "Buffalo/Revogear Kurobox Pro", "orion5x" },
     { "D-Link DNS-323", "orion5x" },
     { "QNAP TS-109/TS-209", "orion5x" },
+    { "Buffalo Linkstation Pro/Live", "orion5x" },
     { "Marvell Orion-NAS Reference Design", "orion5x" },
     { "Marvell Orion-2 Development Board", "orion5x" },
     { "Intel EP80219", "iop32x" },
