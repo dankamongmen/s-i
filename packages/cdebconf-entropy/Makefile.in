@@ -12,6 +12,8 @@ PACKAGE=@PACKAGE@
 CC=@CC@
 CFLAGS=@CFLAGS@ -I.
 LDFLAGS=@LDFLAGS@
+GTK_CFLAGS=@GTK_CFLAGS@
+GTK_LIBS=@GTK_LIBS@
 
 FRONTENDS=@FRONTENDS@
 PLUGIN_MODULES=$(addsuffix -plugin-$(PACKAGE).so,$(FRONTENDS))
@@ -27,6 +29,9 @@ install: $(PLUGIN_MODULES)
 newt-plugin-$(PACKAGE).so: newt-plugin-$(PACKAGE).opic
 	$(CC) $(LDFLAGS) -shared -lnewt -ltextwrap -o $@ newt-plugin-$(PACKAGE).opic
 
+gtk-plugin-$(PACKAGE).so: gtk-plugin-$(PACKAGE).opic
+	$(CC) $(LDFLAGS) -shared -o $@ $^ $(GTK_LIBS)
+
 clean:
 	rm -f $(PLUGIN_MODULES)
 	rm -f *.opic
@@ -34,6 +39,10 @@ clean:
 distclean: clean
 	rm -f config.log config.status
 	rm -f Makefile
+
+gtk-%.opic: gtk-%.c
+	@echo "Compiling $< to $@"
+	$(CC) $(CFLAGS) $(GTK_CFLAGS) -fPIC -o $@ -c $<
 
 %.opic: %.c
 	@echo "Compiling $< to $@"
