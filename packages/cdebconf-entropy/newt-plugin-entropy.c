@@ -5,8 +5,8 @@
  * See debian/copyright
  *
  * $Id$
- * 
- */ 
+ *
+ */
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -42,7 +42,7 @@
 extern int strtruncate (char *what, size_t maxsize);
 extern size_t strwidth (const char *what);
 
-static void 
+static void
 prepare_window(newtComponent *, struct frontend *, struct question *, int);
 
 static char rnd_byte;
@@ -61,7 +61,7 @@ continue_text(struct frontend *obj)
 
 static const char *
 goback_text(struct frontend *obj)
-{   
+{
     return question_get_text(obj, "debconf/button-goback", "Go Back");
 }
 
@@ -74,11 +74,11 @@ help_text(struct frontend *obj)
 static const char *
 success_text(struct frontend *obj)
 {
-    return question_get_text(obj, "partman-crypto/entropy-text-success", 
+    return question_get_text(obj, "partman-crypto/entropy-success",
       "Key data has been created successfully.");
 }
 
-static int 
+static int
 copy_byte(int in, int out)
 {
     ssize_t n;
@@ -88,7 +88,7 @@ copy_byte(int in, int out)
         error("read: %s", (n == 0) ? "short read" : strerror(errno));
         return -1;
     }
-    
+
     /* newtFormWatchFd for some reason doesn't detect when the
      * fifo is writable, so this write can block if there isn't
      * anyone reading from the fifo.
@@ -103,8 +103,8 @@ copy_byte(int in, int out)
     return 0;
 }
 
-int 
-cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
+int
+cdebconf_newt_handler_entropy(struct frontend *obj, struct question *q)
 {
     newtComponent form;
     struct newtExitStruct nstat;
@@ -115,12 +115,12 @@ cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
     int want_data = 1;
     int randfd = 0;
     int fifofd = 0;
- 
+
     if (mlock(&rnd_byte, sizeof(rnd_byte)) < 0) {
         error("mlock failed: %s", strerror(errno));
         goto errout;
     }
-        
+
     if (mkfifo(FIFO, 0600) < 0) {
         error("mkfifo(%s): %s", FIFO, strerror(errno));
         goto errout;
@@ -137,7 +137,7 @@ cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
         error("open(%s): %s", FIFO, strerror(errno));
         goto errout;
     }
-   
+
     keysize = KEYSIZE;
     p = question_get_variable(q, "KEYSIZE");
     if (p)
@@ -145,7 +145,7 @@ cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
 
     prepare_window(&form, obj, q, keysize);
     newtFormWatchFd(form, randfd, NEWT_FD_READ);
-    
+
     while (1) {
         newtPushHelpLine(help_text(obj));
         newtFormRun(form, &nstat);
@@ -157,7 +157,7 @@ cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
                 error("exit from unknown component");
                 break;
             }
-            
+
             if (nstat.u.co == bOK) {
                 ret = DC_OK;
                 break;
@@ -167,15 +167,15 @@ cdebconf_newt_handler_entropy_text(struct frontend *obj, struct question *q)
                 ret = DC_GOBACK;
                 break;
             }
-        } 
-        
+        }
+
         /* Data is ready */
         if (nstat.reason == NEWT_EXIT_FDREADY && want_data) {
             if (copy_byte(randfd, fifofd) < 0) {
                 ret = DC_NOTOK;
                 break;
             }
-            
+
             nwritten++;
             newtScaleSet(scale, nwritten);
             newtEntrySet(entry, "", 0);
@@ -195,7 +195,7 @@ errout:
         close(randfd);
     if (fifofd)
         close(fifofd);
-    
+
     unlink(FIFO);
 
     munlock(&rnd_byte, sizeof(rnd_byte));
@@ -221,7 +221,7 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
 #else
     int tflags = NEWT_FLAG_WRAP;
 #endif
-    int eflags = NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_PASSWORD; 
+    int eflags = NEWT_ENTRY_SCROLL | NEWT_FLAG_RETURNEXIT | NEWT_FLAG_PASSWORD;
 
     newtGetScreenSize(&width, &height);
     win_width = width-7;
@@ -256,7 +256,7 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
 
     if (t_width_buttons > t_width)
         t_width = t_width_buttons;
-    
+
     if (win_width > t_width + 2*TEXT_PADDING + t_width_scroll)
         win_width = t_width + 2*TEXT_PADDING + t_width_scroll;
 
@@ -266,7 +266,7 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
 
     cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
     *form = newtForm(NULL, NULL, 0);
-    
+
     textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, tflags);
     scale = newtScale(TEXT_PADDING, 1+t_height+1, win_width-2*TEXT_PADDING, keysize);
     textbox2 = newtTextbox(TEXT_PADDING, 1+t_height+3, t_width, 1, tflags);

@@ -1,5 +1,6 @@
-AC_INIT(newt-plugin-entropy-text.c)
-PACKAGE=entropy-text
+AC_INIT
+
+PACKAGE=entropy
 AC_DEFINE_UNQUOTED(PACKAGE,"$PACKAGE")
 
 AC_PROG_MAKE_SET
