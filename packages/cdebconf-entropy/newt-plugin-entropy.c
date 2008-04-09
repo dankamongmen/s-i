@@ -111,6 +111,7 @@ cdebconf_newt_handler_entropy(struct frontend *obj, struct question *q)
     const char *p;
     int ret = DC_NOTOK;
     int keysize;
+    const char *fifo = NULL;
     int nwritten = 0;
     int want_data = 1;
     int randfd = 0;
@@ -121,8 +122,12 @@ cdebconf_newt_handler_entropy(struct frontend *obj, struct question *q)
         goto errout;
     }
 
-    if (mkfifo(FIFO, 0600) < 0) {
-        error("mkfifo(%s): %s", FIFO, strerror(errno));
+    if (NULL == (fifo = question_get_variable(q, "FIFO"))) {
+        fifo = FIFO;
+    }
+
+    if (mkfifo(fifo, 0600) < 0) {
+        error("mkfifo(%s): %s", fifo, strerror(errno));
         goto errout;
     }
 
@@ -132,9 +137,9 @@ cdebconf_newt_handler_entropy(struct frontend *obj, struct question *q)
         goto errout;
     }
 
-    fifofd = open(FIFO, O_WRONLY);
+    fifofd = open(fifo, O_WRONLY);
     if (fifofd < 0) {
-        error("open(%s): %s", FIFO, strerror(errno));
+        error("open(%s): %s", fifo, strerror(errno));
         goto errout;
     }
 
@@ -196,7 +201,9 @@ errout:
     if (fifofd)
         close(fifofd);
 
-    unlink(FIFO);
+    if (NULL != fifo) {
+        unlink(fifo);
+    }
 
     munlock(&rnd_byte, sizeof(rnd_byte));
     return ret;
