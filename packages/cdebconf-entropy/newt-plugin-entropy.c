@@ -72,9 +72,14 @@ help_text(struct frontend *obj)
 }
 
 static const char *
-success_text(struct frontend *obj)
+success_text(struct frontend *obj, struct question *q)
 {
-    return question_get_text(obj, "partman-crypto/entropy-success",
+    const char *success;
+
+    if (NULL == (success = question_get_variable(q, "SUCCESS"))) {
+        success = "partman-crypto/entropy-success";
+    }
+    return question_get_text(obj, success,
       "Key data has been created successfully.");
 }
 
@@ -187,7 +192,7 @@ cdebconf_newt_handler_entropy(struct frontend *obj, struct question *q)
 
             if (nwritten == keysize) {
                 /* Done - activate OK button */
-                newtTextboxSetText(textbox, success_text(obj));
+                newtTextboxSetText(textbox, success_text(obj, q));
                 newtComponentTakesFocus(bOK, 1);
                 newtFormSetCurrent(form, bOK);
                 want_data = 0;
