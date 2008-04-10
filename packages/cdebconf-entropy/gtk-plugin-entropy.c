@@ -78,7 +78,7 @@ static gboolean add_action_text(struct entropy * entropy_data,
 
     action_text = cdebconf_gtk_get_text(
         entropy_data->fe, "debconf/entropy/gtk/action",
-        "Enter random characters or random mouse movements");
+        "Enter random characters or move mouse randomly");
     label = gtk_label_new(action_text);
     g_free(action_text);
 
