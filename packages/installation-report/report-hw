@@ -29,8 +29,8 @@ list_loaded_modules () {
 uname -a 2>&1 | addinfo "umame -a"
 
 if type lspci >/dev/null 2>&1; then
-	lspci -nn  2>&1 | addinfo "lspci -nn"
-	lspci -vnn 2>&1 | addinfo "lspci -vnn"
+	lspci -knn 2>&1 | addinfo "lspci -knn"
+	#lspci -vnn 2>&1 | addinfo "lspci -vnn"
 
 	# List which modules are referring to which PCI devices
 	if [ -d /sys/bus/pci/devices ] ; then
@@ -41,14 +41,18 @@ else
 	addfile /proc/bus/pci/devices
 fi
 
+if type prtconf >/dev/null 2>&1 ; then
+	prtconf 2>&1 | addinfo "prtconf"
+fi
+
 lsmod 2>&1 | addinfo lsmod
 df 2>&1 | addinfo df
 free 2>&1 | addinfo free
 
-pccardctl status 2>&1 | addinfo "cardctl status"
-pccardctl ident 2>&1 | addinfo "cardctl ident"
-cardctl status 2>&1 | addinfo "cardctl status"
-cardctl ident 2>&1 | addinfo "cardctl ident"
+if type pccardctl >/dev/null 2>&1; then
+	pccardctl status 2>&1 | addinfo "pccardctl status"
+	pccardctl ident 2>&1 | addinfo "pccardctl ident"
+fi
 
 if type dmraid >/dev/null 2>&1; then
 	dmraid -s 2>&1 | addinfo "dmraid -s"
