@@ -12,7 +12,8 @@ languagecode="debian-installer/language"
 countrycode="debian-installer/country"
 consoledisplay="debian-installer/consoledisplay"
 shortlist="countrychooser/shortlist"
-fulllist="countrychooser/country-name"
+continentlist="countrychooser/continentlist"
+countrylist="countrychooser/countrylist"
 supportedlocales="localechooser/supported-locales"
 
 # This is the iso_3166.tab file location
@@ -34,40 +35,6 @@ log() {
 	logger -t localechooser "info: $@"
 }
 
-
-code2country() {
-	if [ -n "$1" ]; then
-		# Return a "safe default" in case the iso-3166 file
-		# isn't available
-		if [ -f "$ISO3166TAB" ]; then
-			line=$(grep "$1" "$ISO3166TAB")
-
-			if [ -z "$line" ]; then
-				line="US	United States"
-			fi
-		else
-			line="US	United States"
-		fi
-		# Remember that country names may have
-		# spaces so the code is different than in
-		# country2code.
-		echo $line | cut -b 4-
-	else
-		echo
-	fi
-}
-
-country2code() {
-	COUNTRYNAME=$(echo "$1" | sed 's/\\,/,/g')
-	line=`grep -- "$COUNTRYNAME$" $ISO3166TAB`
-
-	if [ -n "$line" ]; then
-		set $line
-		if [ -n "$1" ]; then
-			echo "$1"
-		fi
-	fi
-}
 
 locale2countrycode() {
 	if [ -n "$1" ]; then
@@ -166,18 +133,12 @@ do_preseed() {
 		db_fset $langlist seen $seenflag || true
 		COUNTRY=$(locale2countrycode "$LOCALE")
 		if [ -n "$COUNTRY" ]; then
-			local SL=""
-			if grep -q "^${LANGUAGE}_${COUNTRY}$" $SHORTLISTS ; then
-				SL=${LANGUAGE}_${COUNTRY}
-			elif grep -q "^$LANGUAGE$" $SHORTLISTS ; then
-				SL=$LANGUAGE
-			fi
-			if [ "$SL" ]; then
-				db_set $shortlist-$SL "$COUNTRY"
-				log "Set $shortlist-$SL = '$COUNTRY'"
-				db_fset $shortlist-$SL seen $seenflag || true
-			fi
-			db_fset $fulllist seen $seenflag || true
+			db_set $countrycode "$COUNTRY"
+			log "Set $countrycode = '$COUNTRY'"
+			db_fset $countrycode seen $seenflag || true
+			db_fset $continentlist seen $seenflag || true
+			country_preseeded=1
+
 			if grep -q "^$LOCALE$" $SUPPORTEDLOCALES ; then
 				db_set $localecode $LOCALE
 				db_fset $localecode seen $seenflag || true
@@ -219,7 +180,7 @@ set_debconf_language() {
 # Determine which template to display to warn for incomplete translations
 # and fill in the variable contents
 warning_template() {
-	local status template tbase twarn tabort
+	local RET status template tbase twarn tabort
 	status=$1
 	tbase=localechooser/translation
 
@@ -251,8 +212,47 @@ warning_template() {
 	echo $template
 }
 
+# Returns 0 if the template has the country among its choices
+has_country() {
+	local RET template country
+	template="$1"
+	country="$2"
+
+	[ "$country" ] || return 1
+
+	db_metaget $template Choices-C
+	echo "$RET" | grep -q "$country"
+}
+
+# Set defaults for continent based on country
+set_default_continent() {
+	local OLDIFS IFS RET country continents c continent
+	country="$1"
+
+	if [ -z "$country" ]; then
+		db_reset $continentlist
+		return
+	fi
+
+	# Use Choices-en.UTF-8 to avoid getting translated values
+	db_metaget $continentlist Choices-en.UTF-8
+	continents=$(echo $RET | sed "s/, /,/g")
+
+	OLDIFS="$IFS"
+	IFS=,
+	for continent in $continents; do
+		IFS="$OLDIFS"
+		c=$(echo "$continent" | sed "s/ /_/g")
+		if has_country $countrylist/$c "$country"; then
+			db_set $continentlist "$continent"
+			break
+		fi
+	done
+}
+
 refine_locale() {
-	local old_locale=$1
+	local old_locale entry
+	old_locale=$1
 
 	for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	             ${LANGUAGE}_${COUNTRYCODE}; do
@@ -266,7 +266,7 @@ refine_locale() {
 			# locale. May be used in the future for other
 			# special cases, so we'd better keep this.
 			if [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" ] && \
-			   [ "$COUNTRYCODE" = "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
+			   [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
 			   [ "${LANGUAGE}_${COUNTRYCODE}" != "$old_locale" ] && \
 			   [ "$LOCALE_LANGUAGECHOOSER_COMPLETE" ]; then
 				# Explanation: we revert back to the
@@ -310,6 +310,7 @@ build_language_template $(language_display_level)
 
 # Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding the first time localechooser is run.
+country_preseeded=""
 if [ ! -f /var/lib/localechooser/preseeded ]; then
 	if db_get $localecode && [ "$RET" ]; then
 		do_preseed $RET
@@ -357,14 +358,8 @@ while :; do
 		db_set "$fallbacklocalecode"   "$FALLBACKLOCALE"
 		log "Set $fallbacklocalecode = '$FALLBACKLOCALE'"
 
-		if [ -n "$COUNTRY" ]; then
-			db_set "$countrycode"  "$COUNTRY"
-			log "Set $countrycode = '$COUNTRY'"
-		else
-			if db_get "$countrycode" && [ "$RET" ]; then
-				COUNTRY="$RET"
-			fi
-			log "No default country; preserving current value '$COUNTRY'"
+		if [ -n "$DEFAULT_COUNTRY" ]; then
+			log "Default country = '$DEFAULT_COUNTRY'"
 		fi
 
 		db_set "$consoledisplay"  "$CONSOLE"
@@ -410,10 +405,6 @@ while :; do
 		;;
 
 	   19)	# Prepare for country selection
-		# This is needed later in the script
-		COUNTRYCODE_LANGUAGECHOOSER=$COUNTRY
-		DEFAULT_COUNTRY=$(code2country $COUNTRY)
-
 		# Keep track of values we have after language selection step
 		LOCALE_LANGUAGECHOOSER=$LOCALE
 		LANGUAGECODE_LANGUAGECHOOSER=$LANGUAGE
@@ -435,50 +426,59 @@ while :; do
 		fi
 
 		# At this point we should have either xx, or xx_YY in LOCALE
-		fullprio=critical
+		allprio=critical
 		shortprio=critical
 		;;
 
 	   20)	# Display a country shortlist if there is one
-		askedshort=0
+		askedshort=
+		db_get $countrycode
+		current_country="$RET"
+
 		# If the fallback locale does not include a country code
 		# (and thus no underscore character), we must prompt for a
-		# country, thus show the full list only. Example: Esperanto.
+		# country and thus display all countries. Example: Esperanto.
 		# The next "if" test will be false and "askedshort" remains
-		# 0, so no short country list question and the long list is
-		# shown at critical priority because we need a country.
+		# unset, so no short country list question and continent
+		# dialogs are shown at critical priority as we need a country.
 		if echo $FALLBACKLOCALE | grep "_" >/dev/null 2>&1; then
-			# Otherwise, we prompt with the short list
-			# for languages that are listed in /etc/shortlists
-			# and with the full list for others, but only
-			# at medium priority then
+			# Otherwise, prompt with the short list for languages
+			# that are listed in /etc/shortlists; for others prompt
+			# with all continents/countries (at medium priority)
 			if [ "$use_lang" ]; then
 				shortlist_template="$shortlist-$use_lang"
 				db_unregister $shortlist || true
 				db_register $shortlist_template $shortlist
-				if db_get $shortlist_template && [ "$RET" ]; then
-					db_set $shortlist $RET
-				fi
-				if db_fget $shortlist_template seen; then
+				if db_fget $countrycode seen; then
 					db_fset $shortlist seen $RET || true
 				fi
 
+				# Set default value
+				if [ $LASTSTATE -ne 21 ]; then
+					current_short=""
+					if [ "$current_country" ]; then
+						if has_country $shortlist "$current_country"; then
+							current_short="$current_country"
+						else
+							current_short=other
+						fi
+					elif has_country $shortlist "$DEFAULT_COUNTRY"; then
+						current_short="$DEFAULT_COUNTRY"
+					fi
+					db_set $shortlist "$current_short"
+				fi
+
 				# If the current (preseeded) value is not in the
-				# shortlist, show the full list instead.
-				db_get $shortlist
-				country_default="$RET"
-				db_metaget $shortlist Choices-C
-				if [ -z "$country_default" ] || \
-				   echo "$RET" | grep -q "$country_default"; then
+				# shortlist, ask for continent/country instead
+				if [ -z "$country_preseeded" ] || \
+				   [ "$current_short" != other ]; then
 					db_input $shortprio $shortlist || [ $? -eq 30 ]
 					askedshort=1
-				else
-					db_set $shortlist_template other
-					DEFAULT_COUNTRY=$(code2country $country_default)
 				fi
+				country_preseeded=""
 			else
-				fullprio=medium
-				# Display full list after backing up from locale
+				allprio=medium
+				# Display continents after backing up from locale
 				# selection for countries without shortlist
 				if [ $LASTSTATE -gt 21 ]; then
 					STATE=21
@@ -488,41 +488,58 @@ while :; do
 		fi
 		;;
 
-	   21)	# Display full country list
-		# (unless a country was selected from the short list)
-		if [ "$askedshort" = 1 ]; then
+	   21)	# Check if a country was selected from the short list
+		# and if not, allow to select a continent
+		if [ "$askedshort" ]; then
 			db_get $shortlist
 			COUNTRYCODE="$RET"
-			db_set $shortlist_template $COUNTRYCODE
 			if [ "$COUNTRYCODE" != "other" ]; then
-				STATE=23
+				STATE=24
 				continue
 			fi
-		else
-			if [ "$DEFAULT_COUNTRY" ]; then
-				# Set correct default
-				db_set $fulllist "$DEFAULT_COUNTRY"
-				log "Set $fulllist = '$DEFAULT_COUNTRY'"
+		fi
 
-				# Clear so we can back up and keep selection
-				DEFAULT_COUNTRY=""
+		# Set default value
+		if [ $LASTSTATE -ne 22 ]; then
+			if [ "$current_country" ]; then
+				set_default_continent "$current_country"
+			else
+				set_default_continent "$DEFAULT_COUNTRY"
+			fi
+		else
+			# Backed up; reset continent template if no country
+			# was actually selected so it can get a new default
+			if [ -z "$current_country" ]; then
+				db_reset $tpl_continent
 			fi
 		fi
-
-		db_input $fullprio $fulllist || [ $? -eq 30 ]
+		db_input $allprio $continentlist || [ $? -eq 30 ]
 		;;
 
-	   22)	# Check reply from full list
-		db_get $fulllist
-		COUNTRYCODE="$(country2code "$RET")" || true
-		if [ -z "$COUNTRYCODE" ]; then
-			# User probably selected a region
-			STATE=21
-			continue
+	   22)	# Select a country on the continent
+		db_get $continentlist
+		tpl_continent="$countrylist/$(echo $RET | sed "s/ /_/g")"
+		if db_fget $countrycode seen; then
+			db_fset $tpl_continent seen $RET || true
 		fi
+
+		if [ "$current_country" ] && \
+		   has_country $tpl_continent "$current_country"; then
+			db_set $tpl_continent "$current_country"
+		elif db_get $tpl_continent && [ -z "$RET" ] && \
+		   has_country $tpl_continent "$DEFAULT_COUNTRY"; then
+			db_set $tpl_continent "$DEFAULT_COUNTRY"
+		fi
+
+		db_input $allprio $tpl_continent || [ $? -eq 30 ]
 		;;
 
-	   23)	# We have a country
+	   23)	# Get the selected country
+		db_get $tpl_continent
+		COUNTRYCODE="$RET"
+		;;
+
+	   24)	# We have a country
 		db_set "$countrycode"  "$COUNTRYCODE"
 		log "Set $countrycode = '$COUNTRYCODE'"
 
@@ -562,7 +579,7 @@ while :; do
 		# language list we got from languagechooser.
 		# We shouldn't just add this before the former list in case
 		# the country is changed several times.
-		if [ "$COUNTRYCODE" != "$COUNTRYCODE_LANGUAGECHOOSER" ] && \
+		if [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
 		   [ "$COUNTRYCODE" ] && [ "$LANGUAGE" ] && \
 		   [ "$LOCALE" != "C" ] && [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
 			LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:$LANGUAGELIST
