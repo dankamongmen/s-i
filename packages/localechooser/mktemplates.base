@@ -39,8 +39,8 @@ for pofile in debian/po/*.po ; do
 	# the translation with the templates translations
 	if [ -f $ISO3166TRANSLATIONS/$pofilename ]; then
 		# msgcat will properly handle different encodings
-		msgcat debian/po/$pofilename \
-			$ISO3166TRANSLATIONS/$pofilename \
+		msgcat --use-first $ISO3166TRANSLATIONS/$pofilename \
+			debian/po/$pofilename \
 			> debian/pobuild/$pofilename 2>/dev/null
 
 		msgmerge -U debian/pobuild/$pofilename \
