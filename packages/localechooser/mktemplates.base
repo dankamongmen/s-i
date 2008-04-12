@@ -33,22 +33,22 @@ debconf-updatepo --podir debian/pobuild
 
 # process each existing file in debian/po
 for pofile in debian/po/*.po ; do
-    pofilename=`basename $pofile`
-    printf "$pofilename "
-    # If the country names are translated, we need to merge
-    # the translation with the templates translations
-    if [ -f $ISO3166TRANSLATIONS/$pofilename ]; then
-	# msgcat will properly handle different encodings
-	msgcat debian/po/$pofilename \
-	       $ISO3166TRANSLATIONS/$pofilename \
-	       > debian/pobuild/$pofilename 2>/dev/null
+	pofilename=$(basename $pofile)
+	printf "$pofilename "
+	# If the country names are translated, we need to merge
+	# the translation with the templates translations
+	if [ -f $ISO3166TRANSLATIONS/$pofilename ]; then
+		# msgcat will properly handle different encodings
+		msgcat debian/po/$pofilename \
+			$ISO3166TRANSLATIONS/$pofilename \
+			> debian/pobuild/$pofilename 2>/dev/null
 
-	msgmerge -U debian/pobuild/$pofilename \
-                 debian/pobuild/templates.pot
-    else
-	# just use what's translated
-	cp $pofile debian/pobuild/$pofilename
-    fi
+		msgmerge -U debian/pobuild/$pofilename \
+			debian/pobuild/templates.pot
+	else
+		# just use what's translated
+		cp $pofile debian/pobuild/$pofilename
+	fi
 done
 echo
 
