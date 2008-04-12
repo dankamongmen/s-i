@@ -7,6 +7,52 @@ Type: text
 # :sl1:
 _Description: Choose language
 
+Template: debian-installer/locale
+Type: select
+Choices: ${LOCALELIST}
+# :sl2:
+_Description: Choose a locale:
+ Based on your language and country choices, the following locale
+ parameters are supported.
+
+Template: debian-installer/fallbacklocale
+Type: select
+Choices: ${LOCALELIST}
+Description: for internal use only
+
+Template: debian-installer/language
+Type: string
+Description: for internal use only
+
+Template: debian-installer/country
+Type: string
+Description: for internal use; can be preseeded
+
+Template: debian-installer/consoledisplay
+Type: string
+Description: for internal use only
+
+Template: debian-installer/charmap
+Type: string
+Description: for internal use; cannot be preseeded
+ This variable is meant for console-setup use.
+
+Template: finish-install/progress/localechooser
+Type: text
+# finish-install progress bar item
+# :sl1:
+_Description: Storing language...
+
+Template: localechooser/languagelist
+Type: select
+Choices-C: ${CODES}
+Choices: ${NAMES_EN}
+Choices-en.UTF-8: ${NAMES_BOTH}
+Default: en
+Description: Choose a language:
+ Please choose the language used for the installation process. This
+ language will be the default language for the final system.
+
 Template: localechooser/translation/none-yet
 Type: note
 # :sl1:
@@ -85,39 +131,7 @@ Type: text
 # :sl1:
 _Description: If you choose not to continue, you will be given the option of selecting a different language, or you can abort the installation.
 
-Template: languagechooser/languagelist
-Type: select
-Choices-C: ${CODES}
-Choices: ${NAMES_EN}
-Choices-en.UTF-8: ${NAMES_BOTH}
-Default: en
-Description: Choose a language:
- Please choose the language used for the installation process. This
- language will be the default language for the final system.
-
-Template: debian-installer/language
-Type: string
-Description: for internal use only
-
-Template: debian-installer/country
-Type: string
-Description: for internal use; can be preseeded
-
-Template: debian-installer/consoledisplay
-Type: string
-Description: for internal use only
-
-Template: languagechooser/locale
-Type: string
-Description: for internal use; can be preseeded
-
-Template: finish-install/progress/localechooser
-Type: text
-# finish-install progress bar item
-# :sl1:
-_Description: Storing language...
-
-Template: countrychooser/shortlist
+Template: localechooser/shortlist
 Type: select
 #flag:translate!:1
 # "other", here, is added to the list of countries that will be displayed
@@ -130,24 +144,6 @@ __Choices: ${SHORTLIST}, other
 _Description: Choose a country, territory or area:
  Based on your language, you are probably located in one of these countries
  or regions.
-
-Template: debian-installer/locale
-Type: select
-Choices: ${LOCALELIST}
-# :sl2:
-_Description: Choose a locale:
- Based on your language and country choices, the following locale
- parameters are supported.
-
-Template: debian-installer/fallbacklocale
-Type: select
-Choices: ${LOCALELIST}
-Description: for internal use only
-
-Template: debian-installer/charmap
-Type: string
-Description: for internal use; cannot be preseeded
- This variable is meant for console-setup use.
 
 Template: localechooser/supported-locales
 Type: multiselect
