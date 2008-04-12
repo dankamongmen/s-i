@@ -14,6 +14,7 @@ clean:
 	rm -f build-stamp
 	$(MAKE) clean
 	rm -rf debian/pobuild debian/iso-codes debian/short-tmp debian/locales debian/SUPPORTED-short
+	rm -rf debian/locales debian/sort-tmp
 	dh_clean
 
 install: build
@@ -41,6 +42,9 @@ binary-indep: build install
 	dh_testdir
 	dh_testroot
 	dh_installdebconf
+	# Sort countries and continents (including translations)
+	# MUST be after dh_installdebconf
+	./sort-templates
 	cp debian/localechooser.isinstallable debian/localechooser/DEBIAN/isinstallable
 	dh_strip
 	dh_compress

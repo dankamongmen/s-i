@@ -9,20 +9,19 @@ my $iso3166tab=shift;
 my $regionmap=shift;
 my $outfile=shift;
 
-# These are the regions to use. This specifies what order should be used.
-# This should correspond to the countrychooser/continent template.
+# These are the regions to use. The list should be sorted alphabetically.
 my @known_regions = (
-	gettext("North America"),
-	gettext("Central America"),
-	gettext("South America"),
-	gettext("Caribbean"),
-	gettext("Europe"),
-	gettext("Asia"),
 	gettext("Africa"),
-	gettext("Atlantic Ocean"),
-	gettext("Indian Ocean"),
-	gettext("Oceania"),
 	gettext("Antarctica"),
+	gettext("Asia"),
+	gettext("Atlantic Ocean"),
+	gettext("Caribbean"),
+	gettext("Central America"),
+	gettext("Europe"),
+	gettext("Indian Ocean"),
+	gettext("North America"),
+	gettext("Oceania"),
+	gettext("South America"),
 	gettext("other"),
 );
 
@@ -40,7 +39,7 @@ while (<L>) {
 	my ($code, $country) = split(' ', $_, 2);
 	# Bubulle 5/25/2004 We should find a way to avoid enforcing ASCII here
 	if ($country !~ /^[-_A-Za-z0-9 !@#$%^&Z*()-_+={};:'",.<>?|]+$/) {
-		print STDERR "Skipping country $country; not ASCII\n";
+		print STDERR "I: skipping country $country; not ASCII\n";
 		next;
 	}
 
@@ -65,7 +64,7 @@ while (<R>) {
 			exit 1
 		}
 	} elsif ($code ne 'unlisted') {
-		print STDERR "skipping country code '$code': in $regionmap but not in $iso3166tab\n";
+		print STDERR "I: skipping country code '$code': in $regionmap but not in $iso3166tab\n";
 	}
 }
 close R;
@@ -74,7 +73,7 @@ close R;
 foreach my $code (keys %codes_listed) {
 	if ($codes_listed{$code} == 0) {
 		push @{$regions{"other"}}, $code2country{$code};
-		print STDERR "unknown region for country $code: not listed in $regionmap\n";
+		print STDERR "W: unknown region for country $code: not listed in $regionmap\n";
 	}
 }
 
@@ -102,7 +101,7 @@ foreach my $region (@known_regions) {
 		print TOUT "_Description: ", gettext("Choose a country, territory or area:"), "\n";
 		print TOUT "\n";
 	} else {
-		print STDERR "skipping region $region: no associated countries in $regionmap\n";
+		print STDERR "I: skipping region $region: no associated countries in $regionmap\n";
 		delete $regions{$region};
 	}
 }
