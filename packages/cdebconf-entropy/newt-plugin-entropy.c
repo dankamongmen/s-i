@@ -256,8 +256,8 @@ prepare_window(newtComponent *form, struct frontend *obj, struct question *q, in
     /*  There are 5 characters for sigils, plus 4 for borders */
     strtruncate(obj->title, win_width-9);
 
-    asprintf(&description, "%s\n\n%s", question_get_field((q), "", "description"),
-        entropy_help_text(obj));
+    asprintf(&description, "%s\n\n%s",
+        question_get_field(obj, q, "", "description"), entropy_help_text(obj));
 
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_init(&tw);
