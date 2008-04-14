@@ -22,13 +22,7 @@
 
 #include <cdebconf/frontend.h>
 #include <cdebconf/question.h>
-
-/* XXX: from cdebconf/strutl.c ; should not be defined like that */
-extern int strtruncate (char * what, size_t maxsize);
-extern size_t strwidth (const char * what);
-extern int strwrap(const char * str, const int width, char * lines[],
-                   int maxlines);
-
+#include <cdebconf/strutl.h>
 
 #define MODULE "entropy"
 #define FIFO "/var/run/random.fifo"
