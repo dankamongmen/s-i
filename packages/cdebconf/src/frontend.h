@@ -8,7 +8,6 @@
 #include <stdbool.h>
 
 #include "constants.h"
-#include "strutl.h"
 
 #undef _
 #define _(x) (x)
