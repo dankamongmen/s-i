@@ -40,6 +40,7 @@ struct entropy {
     struct question * question;
     long keysize;
     long bytes_read;
+    int last_progress;
     const char * fifo;
     const char * success_template;
     int random_fd;
@@ -63,23 +64,29 @@ static void destroy_entropy(struct entropy * entropy_data)
     free(entropy_data);
 }
 
-static int move_byte(struct entropy * entropy_data)
+static int move_bytes(struct entropy * entropy_data)
 {
     size_t n;
 
-    n = read(entropy_data->random_fd, &entropy_data->random_byte,
-             sizeof (char));
-    if (1 > n) {
-        error("read failed: %s", strerror(errno));
-        return DC_NOTOK;
+    while (entropy_data->bytes_read < entropy_data->keysize) {
+        n = read(entropy_data->random_fd, &entropy_data->random_byte,
+                 sizeof (char));
+        if (sizeof (char) != n) {
+            if (EAGAIN == errno) {
+                break;
+            }
+            error("read failed: %s", strerror(errno));
+            return DC_NOTOK;
+        }
+        n = write(entropy_data->fifo_fd, &entropy_data->random_byte,
+                  sizeof (char));
+        if (sizeof (char) != n) {
+            error("write failed: %s", strerror(errno));
+            return DC_NOTOK;
+        }
+        entropy_data->random_byte = 0;
+        entropy_data->bytes_read++;
     }
-    n = write(entropy_data->fifo_fd, &entropy_data->random_byte,
-              sizeof (char));
-    if (1 > n) {
-        error("write failed: %s", strerror(errno));
-        return DC_NOTOK;
-    }
-    entropy_data->random_byte = 0;
     return DC_OK;
 }
 
@@ -112,6 +119,7 @@ static struct entropy * init_entropy(struct frontend * fe,
     memset(entropy_data, 0, sizeof (struct entropy));
     entropy_data->fe = fe;
     entropy_data->question = question;
+    entropy_data->last_progress = -1;
     if (-1 == mlock(&entropy_data->random_byte, sizeof (char))) {
         error("mlock failed: %s", strerror(errno));
         goto failed;
@@ -121,7 +129,7 @@ static struct entropy * init_entropy(struct frontend * fe,
     if (NULL == entropy_data->success_template) {
         entropy_data->success_template = "debconf/entropy/success";
     }
-    entropy_data->random_fd = open("/dev/random", O_RDONLY);
+    entropy_data->random_fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
     if (-1 == entropy_data->random_fd) {
         error("open random_fd failed: %s", strerror(errno));
         goto failed;
@@ -208,11 +216,12 @@ static void print_success(struct entropy * entropy_data)
 
 static void print_progress(struct entropy * entropy_data)
 {
-    unsigned int progress;
+    int progress;
 
     progress = (double) (entropy_data->bytes_read) /
                (double) (entropy_data->keysize) * 100.0;
-    if (0 == (progress % 10)) {
+    if (entropy_data->last_progress < progress) {
+        entropy_data->last_progress = progress;
         printf("\n---> %d%%\n", progress);
         if (100 == progress) {
             print_success(entropy_data);
@@ -279,8 +288,7 @@ static int gather_entropy(struct entropy * entropy_data)
         }
         tcsetattr(0, TCSANOW, &oldt);
         if (FD_ISSET(entropy_data->random_fd, &fds)) {
-            move_byte(entropy_data);
-            entropy_data->bytes_read++;
+            move_bytes(entropy_data);
             print_progress(entropy_data);
         }
     }
