@@ -179,8 +179,9 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	if (lowmem_mode) {
 		for (node = (*packages)->list.head; node; node = node->next) {
 			package = node->data;
-			if ( package->status_want == di_package_status_want_install &&
-			     ((di_system_package *)package)->installer_menu_item == 0) {
+			if (package->status_want == di_package_status_want_install &&
+			    ((di_system_package *)package)->installer_menu_item == 0 &&
+			    !is_queued(package)) {
 				package->status_want = di_package_status_want_unknown;
 			}
 		}
