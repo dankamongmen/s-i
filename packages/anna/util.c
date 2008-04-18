@@ -77,7 +77,7 @@ size_t package_to_choice(di_package *package, char *buf, size_t size) {
 	return n;
 }
 
-char *list_to_choices(di_package **packages) {
+char *list_to_choices(di_package **packages, int c_values) {
 	char buf[200], *ret;
 	int count = 0;
 	size_t ret_size = 1024, ret_used = 1, size;
@@ -86,7 +86,10 @@ char *list_to_choices(di_package **packages) {
 	ret = di_malloc(1024);
 	ret[0] = '\0';
 	while ((p = packages[count])) {
-		size = package_to_choice(p, buf, 200);
+		if (c_values)
+			size = choice_strcpy(buf, p->package, 200);
+		else
+			size = package_to_choice(p, buf, 200);
 		if (ret_used + size + 2 > ret_size) {
 			ret_size += 1024;
 			ret = di_realloc(ret, ret_size);

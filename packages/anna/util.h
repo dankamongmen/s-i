@@ -5,7 +5,7 @@ int get_lowmem_level (void);
 int is_queued(di_package *package);
 bool is_installed(di_package *p, di_packages *status);
 size_t package_to_choice(di_package *package, char *buf, size_t size);
-char *list_to_choices(di_package **packages);
+char *list_to_choices(di_package **packages, int c_values);
 int get_package (di_package *package, char *dest);
 int md5sum(const char* sum, const char *file);
 int skip_package(di_package *p);

@@ -67,7 +67,7 @@ int packages_ok (di_packages *packages) {
 static int choose_modules(di_packages *status, di_packages **packages) {
 	char *choose_modules_question = "anna/choose_modules" ;
 	char *question_priority = "medium";
-	char *choices;
+	char *choices_c, *choices;
 	int package_count = 0;
 	di_package *package, *status_package, **package_array;
 	di_slist_node *node, *node1;
@@ -200,11 +200,14 @@ static int choose_modules(di_packages *status, di_packages **packages) {
 	}
 
 	qsort(package_array, package_count, sizeof(di_package *), package_name_compare);
-	choices = list_to_choices(package_array);
+	choices_c = list_to_choices(package_array, true);
+	choices = list_to_choices(package_array, false);
+	debconf_subst(debconf, choose_modules_question, "CHOICES-C", choices_c);
 	debconf_subst(debconf, choose_modules_question, "CHOICES", choices);
 
 	debconf_input(debconf, question_priority, choose_modules_question);
 
+	di_free(choices_c);
 	di_free(choices);
 	di_free(package_array);
 
