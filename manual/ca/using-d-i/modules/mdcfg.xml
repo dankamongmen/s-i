@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 50619 -->
+<!-- original version: 51911 -->
 
    <sect3 id="mdcfg">
    <title>Configuració de dispositius de discs múltiples (RAID de programari)</title>
@@ -155,7 +155,18 @@ en el menú <guimenu>Paràmetres de la partició</guimenu> del
 <guimenu>Utilitza-ho com:</guimenu> <guimenuitem>volum físic per a
 RAID</guimenuitem> </menuchoice>).
 
-</para><warning><para>
+</para><note><para>
+
+Assegureu-vos que el sistema de fitxers es pot arrencar amb l'esquema
+de partició que esteu planejant. En general si voleu fer servir RAID per
+al sistema de fitxers arrel (<filename>/</filename>), serà necessari crear
+un sistema de fitxers separat per a <filename>/boot</filename>. La majoria
+de gestors d'arrencada <phrase arch="x86">(incloent lilo i grub)</phrase>
+suporten RAID1 en mirall (no en bandes!), per tant, una opció és usar RAID5
+per a <filename>/</filename> i RAID1 per a <filename>/boot</filename>.
+
+</para></note>
+<warning><para>
 
 El suport per MD és una addició relativament nova a l'instal·lador.
 Podeu experimentar problemes per alguns nivells de RAID i en
@@ -210,7 +221,7 @@ actives.
 
 <para>
 
-És perfectament possible tenen diversos tipus de MD a la vegada. Per
+És perfectament possible tenir diversos tipus de MD a la vegada. Per
 exemple, si teniu tres discs durs de 200 GiB dedicats a MD, i cadascun
 conté dues particions de 100 GiB, podeu combinar les primeres particions
 dels tres discs en un RAID0 (partició ràpida de 300 GiB per edició de vídeo)
