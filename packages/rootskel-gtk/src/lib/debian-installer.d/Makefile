@@ -15,8 +15,10 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 files = \
-	S62directfb-hw-accel \
-	S62directfb-left-handed
+	S62directfb-hw-accel
+
+files_exec = \
+	S62directfb-mouse-settings
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
