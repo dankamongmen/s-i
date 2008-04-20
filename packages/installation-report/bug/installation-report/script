@@ -61,18 +61,12 @@ perl -e '
 	}
 ' /usr/share/installation-report/install-report.template "$bootmethod" "$image" "$machine" | tail -n +2 >&3
 
-if [ ! -e "$logsavedir" ] || [ ! -e "$logsavedir/hardware-summary" ]; then
-	if [ -e "/var/log/debian-installer" ]; then # old name
-		logsavedir=/var/log/debian-installer
-	fi
-fi
-
 if [ ! -e "$logsavedir/hardware-summary" ]; then
 	_ "Cannot find installation logs in /var/log/installer"
 	echo
-	yesno "$(_ "Use installation logs from another location? [Y/n] ") " yep
-	if [ "$REPLY" = yep ]; then
-		while [ ! -e "$logsavedir/hardware-summary" ]; do
+	while [ ! -e "$logsavedir/hardware-summary" ]; do
+		yesno "$(_ "Use installation logs from another location? [Y/n] ") " yep
+		if [ "$REPLY" = yep ]; then
 			_ "Enter location of installation logs:"
 			printf " "
 			read logsavedir
@@ -80,8 +74,10 @@ if [ ! -e "$logsavedir/hardware-summary" ]; then
 				_ "$logsavedir/hardware-summary does not exist"
 				echo
 			fi
-		done
-	fi
+		else
+			exit 0
+		fi
+	done
 fi
 
 getlog () {
