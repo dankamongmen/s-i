@@ -103,19 +103,6 @@ static void set_value_from_select(struct question * question,
     }
 }
 
-/** Determine if a choice is top-level for countrychooser/country-name.
- *
- * @param index choice index
- * @param choice choice canonical value
- * @param choice_translated choice translated value
- * @return TRUE if top-level, FALSE otherwise
- */
-static gboolean is_country(int index, const char * choice,
-                           const char * choice_translated)
-{
-    return '-' == choice_translated[0] && '-' == choice_translated[1];
-}
-
 /** Determine if a choice is top-level for partman/choose_partition.
  *
  * @param index choice index
@@ -138,7 +125,6 @@ static const struct {
     /** expand all parents */
     gboolean expand_all;
 } special_questions[] = {
-    { "countrychooser/country-name", is_country, FALSE },
     { "partman/choose_partition", is_disk, TRUE },
     { NULL, NULL, FALSE }
 };
