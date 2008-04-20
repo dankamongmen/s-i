@@ -192,6 +192,7 @@ if [ "$RET" = true ]; then
 	if anna-install multipath-udeb; then
 		MODULES="dm-mod dm-multipath dm-round-robin dm-emc"
 		# We need some dm modules...
+		depmod -a > /dev/null 2>&1 || true
 		for MODULE in $MODULES; do
 			if is_not_loaded $MODULE; then
 				module_probe $MODULE || true
