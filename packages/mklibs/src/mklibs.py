@@ -414,8 +414,12 @@ while 1:
     libraries = set(force_libs)
     for obj in objects.values():
         for symbol in undefined_symbols(obj):
-            debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s" % (symbol, symbol.weak))
-            needed_symbols[str(symbol)] = symbol
+            # Some undefined symbols in libthread_db are defined in
+            # the application that uses it.
+            if (not (re.search("libthread_db\.so", obj)
+                     and re.search("^ps_", str(symbol)))):
+                debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s" % (symbol, symbol.weak))
+                needed_symbols[str(symbol)] = symbol
         libraries.update(library_depends(obj))
 
     # calculate what symbols are present in small_libs and available_libs
