@@ -2,30 +2,40 @@
 
 . /usr/share/debconf/confmodule
 
+# Translate device from /proc/mdstat (mdX) to device node
+md_devnode() {
+	local num=$(echo $1 | sed -e "s/^md//")
+
+	# Also handle the case where the first does not exist
+	if [ -b /dev/md/$num ]; then
+		echo /dev/md/$num
+	elif [ -b /dev/md$num ]; then
+		echo /dev/md$num
+	else
+		return 1
+	fi
+}
+
+md_get_level() {
+	echo $(mdadm -Q --detail $1 | grep "Raid Level" | sed "s/.*: //")
+}
+
 md_get_devices() {
 	DEVICES=""
-	for i in $(grep ^md /proc/mdstat | \
-		   sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1_\2/'); do
-		DEVICES="${DEVICES:+$DEVICES, }$i"
+	for DEVICE in $(grep ^md /proc/mdstat | \
+		   sed -e 's/^\(md.*\) : .*/\1/'); do
+		MDDEV=$(md_devnode $DEVICE) || return 1
+		TYPE=$(md_get_level $MDDEV)
+		DEVICES="${DEVICES:+$DEVICES, }${DEVICE}_$TYPE"
 	done
 }
 
 md_delete_verify() {
 	DEVICE=$(echo "$1" | sed -e "s/^\(md.*\)_.*/\1/")
-	INFO=$(grep "^$DEVICE[ :]" /proc/mdstat | \
-		sed -e "s/^md.* : active \([[:alnum:]]*\) \(.*\)/\1:\2/")
-	TYPE=$(echo $INFO | sed -e "s/\(.*\):.*/\1/")
-	DEVICES=$(echo $INFO | sed -e "s/.*:\(.*\)/\1/")
-	NUMBER=$(echo $DEVICE | sed -e "s/^md//")
-
-	# Also handle the case where the first does not exist
-	if [ -b /dev/md/$NUMBER ]; then
-		MDDEV=/dev/md/$NUMBER
-	elif [ -b /dev/md$NUMBER ]; then
-		MDDEV=/dev/md$NUMBER
-	else
-		return 1
-	fi
+	DEVICES=$(grep "^$DEVICE[ :]" /proc/mdstat | \
+		sed -e "s/^.*active \(.*\)/\1/; s/raid[0-9]* //")
+	MDDEV=$(md_devnode $DEVICE) || return 1
+	TYPE=$(md_get_level $MDDEV)
 
 	db_set mdcfg/deleteverify false
 	db_subst mdcfg/deleteverify DEVICE "/dev/$DEVICE"
@@ -40,7 +50,8 @@ md_delete_verify() {
 		# Stop the MD device and zero the superblock
 		# of all the component devices
 		DEVICES=$(mdadm -Q --detail $MDDEV | \
-			  grep -E "(active|spare)" | sed -e 's/.* //')
+			  grep -E "^[[:space:]]*[0-9].*(active|spare)" | \
+			  sed -e 's/.* //')
 		logger -t mdcfg "Removing $MDDEV ($DEVICES)"
 		log-output -t mdcfg mdadm --stop $MDDEV || return 1
 		for DEV in "$DEVICES"; do
