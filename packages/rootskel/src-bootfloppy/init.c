@@ -49,7 +49,7 @@ int waitchild (void) {
 
 /* Not a real modprobe, you have to tell it the path to the module
  * within the modules directory. */
-int modprobe (char *module) {
+int do_modprobe (char *module) {
 	char *m;
 	struct utsname buf;
 
@@ -65,7 +65,7 @@ int modprobe (char *module) {
 	}
 }
 
-int mount (char *type, char *device, char *dir, char *options) {
+int do_mount (char *type, char *device, char *dir, char *options) {
 	if (fork() == 0) {
 		if (options)
 			execlp("mount", "mount", "-t", type, "-o", options, device, dir, NULL);
@@ -78,7 +78,7 @@ int mount (char *type, char *device, char *dir, char *options) {
 	}
 }
 
-int umount (char *dir) {
+int do_umount (char *dir) {
 	if (fork() == 0) {
 		execlp("umount", "umount", dir, NULL);
 		exit(1);
@@ -124,11 +124,11 @@ void setup (void) {
 	/* set path, including path to klibc programs */
 	setenv("PATH", "/usr/bin:/bin:/usr/sbin:/sbin:/usr/lib/klibc/bin", 1);
 
-	if (mount("proc", "proc", "proc", NULL) != 0 ||
-	    mount("sysfs", "sysfs", "sys", NULL) != 0) {
+	if (do_mount("proc", "proc", "proc", NULL) != 0 ||
+	    do_mount("sysfs", "sysfs", "sys", NULL) != 0) {
 		error(NULL);
 	}
-	if (modprobe("kernel/drivers/block/floppy") != 0) {
+	if (do_modprobe("kernel/drivers/block/floppy") != 0) {
 		error(NULL);
 	}
 
@@ -149,8 +149,8 @@ void setup (void) {
 }
 
 void startinstaller (void) {
-	umount("proc");
-	umount("sys");
+	do_umount("proc");
+	do_umount("sys");
 	printf("Starting the installer...\n");
 	if (execlp("run-init", "run-init", "mnt", "/init", NULL) != 0) {
 		error("run-init failed");
@@ -194,8 +194,8 @@ int loadfloppy_dev (char *dev) {
 		return 0;
 	printf("Trying %s...", dev);
 
-	if (mount("tmpfs", "tmpfs", "mnt", "size=100M") != 0 &&
-	    mount("shm", "shm", "mnt", NULL) != 0) {
+	if (do_mount("tmpfs", "tmpfs", "mnt", "size=100M") != 0 &&
+	    do_mount("shm", "shm", "mnt", NULL) != 0) {
 		error("failed to mount ramdisk");
 	}
 
@@ -267,7 +267,7 @@ int loadfloppy_dev (char *dev) {
 
 	if (err) {
 		fprintf(stderr, "Error extracting image (wrong floppy?)\n");
-		umount("mnt");
+		do_umount("mnt");
 		return 0;
 	}
 	else {
