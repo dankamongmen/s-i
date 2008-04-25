@@ -1,4 +1,4 @@
-<!-- original version:  49849 -->
+<!-- original version:  52727 -->
 
  <sect1 id="boot-parms"><title>Paramètres d'amorçage</title>
 <para>
@@ -361,7 +361,7 @@ Voyez <xref linkend="preseed-auto"/> pour des précisions.
 
 Avant de réamorcer, l'installateur éjecte automatiquement le support optique
 utilisé pendant l'installation. Cela peut être inutile si le système ne s'amorce
-pas automiquement à partir du cédérom. Parfois cela peut n'être pas souhaitable si,
+pas automatiquement à partir du cédérom. Parfois cela peut n'être pas souhaitable si,
 par exemple, le lecteur optique ne peut pas réinsérer le support lui-même et si
 l'utilisateur n'est pas là pour le faire. Certains types de lecteurs ne peuvent pas
 recharger automatiquement le support.
@@ -393,7 +393,7 @@ pour désactiver cette authentification.
 <term>ramdisk_size</term>
 <listitem><para>
 
-Ce paramètre devrait déjà possédé une valeur correcte là où il est
+Ce paramètre devrait déjà posséder une valeur correcte là où il est
 nécessaire. Changez-la quand vous voyez des messages d'erreur au moment
 de l'amorçage qui indiquent que le disque virtuel ne peut être
 chargé complètement. La valeur est en Ko.
@@ -402,11 +402,44 @@ chargé complètement. La valeur est en Ko.
 </varlistentry>
 
 <varlistentry condition="gtk">
-<term>mouse/left</term>
+<term>mouse/protocol</term>
 <listitem><para>
 
 Avec l'installateur graphique (interface <emphasis>gtk</emphasis>), il est possible
-d'utiliser une
+d'indiquer le protocole à utiliser avec ce paramètre. Les valeurs possibles <footnote>
+
+<para>
+Voyez la page du manuel,
+<citerefentry><refentrytitle>directfbrc</refentrytitle>
+<manvolnum>5</manvolnum></citerefentry> pour des précisions.
+</para>
+
+</footnote>sont&nbsp;:
+<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
+<userinput>MS</userinput>, <userinput>MS3</userinput>,
+<userinput>MouseMan</userinput> and <userinput>MouseSystems</userinput>.
+Le protocole par défaut fonctionne correctement dans la plupart des cas.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/device</term>
+<listitem><para>
+
+Avec l'installateur graphique (interface <emphasis>gtk</emphasis>), il est possible
+d'indiquer le périphérique à utiliser avec ce paramètre. C'est surtout utile quand
+la souris est connectée à un port série. Par exemple&nbsp;:
+<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/left</term>
+<listitem><para>
+
+L'installateur graphique permet aussi de déclarer une
 souris pour gaucher en mettant ce paramètre à <userinput>true</userinput>.
 
 </para></listitem>
@@ -516,7 +549,7 @@ Voyez <xref linkend="pkgsel"/> pour des précisions.
 <para>
 
 Selon la documentation du noyau Linux, il est possible de passer des paramètres
-aux pilotes de phériphériques compilés dans le noyau. Cependant, il existe une différence
+aux pilotes de périphériques compilés dans le noyau. Cependant, il existe une différence
 entre la façon de charger un module pendant l'installation et la façon de le charger sur
 un système installé. Aussi, quand les pilotes sont compilés en modules, il n'est pas possible
 de leur passer des paramètres de la manière habituelle. Une syntaxe spéciale est nécessaire.
