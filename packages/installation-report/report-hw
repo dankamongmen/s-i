@@ -14,28 +14,11 @@ addfile () {
 	fi
 }
 
-list_loaded_modules () {
-	for address in /sys/bus/pci/devices/*; do
-		if [ -d "$address/driver/module" ]; then
-			module=$(basename "$(readlink $address/driver/module)")
-			if grep -q "^$module " /proc/modules; then
-				address=$(basename "$address" | sed s/0000://)
-				echo "$(lspci -n -s "$address" | tail -n 1 | cut -d ' ' -f 3) $module"
-			fi
-		fi
-	done
-}
-
 uname -a 2>&1 | addinfo "umame -a"
 
 if type lspci >/dev/null 2>&1; then
 	lspci -knn 2>&1 | addinfo "lspci -knn"
 	#lspci -vnn 2>&1 | addinfo "lspci -vnn"
-
-	# List which modules are referring to which PCI devices
-	if [ -d /sys/bus/pci/devices ] ; then
-		list_loaded_modules | addinfo modulemap
-	fi
 else
 	addfile /proc/pci
 	addfile /proc/bus/pci/devices
