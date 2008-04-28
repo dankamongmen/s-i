@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52821 untranslated -->
+<!-- original version: 52902 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -679,7 +679,7 @@ an install, you can use the command <command>debconf-set-selections -c
 
 
  <sect1 id="preseed-contents">
- <title>Contents of the preconfiguration file</title>
+ <title>Contents of the preconfiguration file (for &releasename;)</title>
 <para>
 
 The configuration fragments used in this appendix are also available as an
@@ -771,11 +771,15 @@ the following hack to work around that, for example if you'd like to set a
 static address for the network interface. The hack is to force the network
 configuration to run again after the preconfiguration file has been loaded
 by creating a <quote>preseed/run</quote> script containing the following
-lines:
+commands:
 
 <informalexample><screen>
 killall.sh; netcfg
 </screen></informalexample>
+
+</para><para>
+
+The following debconf variables are relevant for network configuration.
 
 </para>
 
@@ -1286,6 +1290,12 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # To install grub to multiple disks:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Optional password for grub, either in clear text
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# or encrypted using an MD5 hash.
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
   </sect2>
