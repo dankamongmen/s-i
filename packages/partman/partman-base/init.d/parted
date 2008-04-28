@@ -65,18 +65,6 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		size=$2
 		model=$3
 
-		# As /dev/md devices are currently grepped out, this is dead code.
-		# However, it could fix the reason they are grepped out and it is
-		# a useful reminder. References: #476894, #475479.
-		# Convert /dev/mdX to /dev/md/X (if that exists) as the latter
-		# form is preferred in partman.
-		if echo "$device" | grep -q "/dev/md[0-9]"; then
-			raid_device="$(echo "$device" | sed "s:md:md/:")"
-			if [ -b $raid_device ]; then
-				device=$raid_device
-			fi
-		fi
-
 		# Skip devices that are part of a dmraid device
 		if type dmraid >/dev/null 2>&1; then
 			if part_of_sataraid $device; then

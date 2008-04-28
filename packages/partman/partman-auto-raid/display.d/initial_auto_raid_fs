@@ -9,9 +9,9 @@ fix_raid_fs() {
 	fstype=$2
 	mountpoint=$3
 
-	dev="/var/lib/partman/devices/=dev=md=$raidnum"
+	dev="/var/lib/partman/devices/=dev=md$raidnum"
 	if [ ! -d $dev ]; then
-		logger -t partman-auto-raid "Error: directory for /dev/md/$raidnum not found"
+		logger -t partman-auto-raid "Error: directory for /dev/md$raidnum not found"
 		db_set partman-auto-raid/error false
 		db_input critical partman-auto-raid/error
 		db_go
@@ -21,7 +21,7 @@ fix_raid_fs() {
 
 	id=$(ls -d 0-*)
 	if [ -z $id ]; then
-		logger -t partman-auto-raid "Error: incorrect directory for /dev/md/$raidnum"
+		logger -t partman-auto-raid "Error: incorrect directory for /dev/md$raidnum"
 		db_set partman-auto-raid/error false
 		db_input critical partman-auto-raid/error
 		db_go

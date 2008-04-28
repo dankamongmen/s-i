@@ -195,7 +195,7 @@ md_create_raid0() {
 
 	RAID_DEVICES="$(echo $RET | sed -e 's/,//g')"
 	log-output -t mdcfg \
-		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid0 \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid0 \
 		      -n $SELECTED $RAID_DEVICES
 }
 
@@ -333,7 +333,7 @@ md_create_raid1() {
 	logger -t mdcfg "Raid devices count: $DEV_COUNT"
 	logger -t mdcfg "Spare devices count: $SPARE_COUNT"
 	log-output -t mdcfg \
-		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid1 \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid1 \
 		      -n $DEV_COUNT -x $SPARE_COUNT $RAID_DEVICES $MISSING_DEVICES \
 		      $SPARE_DEVICES $MISSING_SPARES
 }
@@ -475,7 +475,7 @@ md_create_raid5() {
 	logger -t mdcfg "Raid devices count: $DEV_COUNT"
 	logger -t mdcfg "Spare devices count: $SPARE_COUNT"
 	log-output -t mdcfg \
-		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid5 \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid5 \
 		      -n $DEV_COUNT -x $SPARE_COUNT $RAID_DEVICES \
 		      $SPARE_DEVICES $MISSING_SPARES
 }
@@ -517,9 +517,6 @@ mkdir -p /dev/md
 
 log-output -t mdcfg --pass-stdout \
 	mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
-# Convert to /dev/md/X notation as then both /dev/mdX and /dev/md/X
-# are created when the array is assembled
-sed -i "s:/dev/md\([0-9]\):/dev/md/\1:" /tmp/mdadm.conf
 
 log-output -t mdcfg \
 	mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes

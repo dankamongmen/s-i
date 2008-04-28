@@ -11,9 +11,6 @@
 #
 ## Detect and start MD devices
 #/sbin/mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
-## Convert to /dev/md/X notation as then both /dev/mdX and /dev/md/X
-## are created when the array is assembled
-#sed -i "s:/dev/md\([0-9]\):/dev/md/\1:" /tmp/mdadm.conf
 #/sbin/mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
 
 # Mark all RAID partitions as being MD
@@ -63,13 +60,13 @@ done
 #for i in $(grep md /proc/mdstat | \
 #	    sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
 #	NUMBER=$(echo $i | sed -e "s/^md//")
-#	DEVICE="/var/lib/partman/devices/=dev=md=$NUMBER"
+#	DEVICE="/var/lib/partman/devices/=dev=md$NUMBER"
 #	mkdir -p $DEVICE
 #	cd $DEVICE
-#	echo "/dev/md/$NUMBER" > $DEVICE/device
+#	echo "/dev/md$NUMBER" > $DEVICE/device
 #	echo Unknown > $DEVICE/model
 #	echo "0" > $DEVICE/size
-#	open_dialog OPEN "/dev/md/$NUMBER"
+#	open_dialog OPEN "/dev/md$NUMBER"
 #	read_line response
 #	close_dialog
 #	if [ "$response" = failed ]; then

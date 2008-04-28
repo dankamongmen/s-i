@@ -73,10 +73,10 @@ create_raid() {
 	fi
 
 	if ! log-output -t partman-auto-raid \
-		mdadm --create /dev/md/$MD_NUM --auto=yes --force -R -l raid$RAID_TYPE \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid$RAID_TYPE \
 		      -n $DEV_COUNT $MDADM_PARAMS
 	then
-		logger -t partman-auto-raid "Error creating array /dev/md/$MD_NUM"
+		logger -t partman-auto-raid "Error creating array /dev/md$MD_NUM"
 		exit 1
 	fi
 }
