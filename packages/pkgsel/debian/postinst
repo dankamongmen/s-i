@@ -5,6 +5,7 @@ set -e
 # Avoid perl warnings in any of the chroot calls below
 export LANG=C
 
+REMOUNT_CD=""
 DIVERTS='/usr/bin/scrollkeeper-update /usr/bin/scrollkeeper-rebuilddb /usr/bin/fc-cache'
 
 log() {
@@ -19,17 +20,11 @@ cleanup () {
 	done
 }
 
-load_cd1() {
-	if [ "$MULTICD" ]; then
+load_install_cd() {
+	if [ "$REMOUNT_CD" ]; then
 		load-install-cd "/target" || true
 	fi
 }
-
-# Check if we have multiple CDs listed in sources.list
-MULTICD=""
-if [ $(grep "^deb cdrom:" /target/etc/apt/sources.list | wc -l) -gt 1 ]; then
-	MULTICD=1
-fi
 
 db_progress START 0 100 debian-installer/pkgsel/title
 db_progress INFO pkgsel/progress/init
@@ -53,8 +48,9 @@ db_progress STEP 1
 
 # Unmount the installation CD to allow CD changing; as it may be needed
 # again after pkgsel, make sure it is reloaded before exiting
-if [ "$MULTICD" ]; then
+if [ -e /var/lib/install-cd.id ]; then
 	log-output -t pkgsel umount /cdrom || true
+	REMOUNT_CD=1
 fi
 
 partsdir="/usr/lib/pre-pkgsel.d"
@@ -98,7 +94,7 @@ if [ "$ret" != 0 ]; then
 		log "cleanup failed"
 	fi
 	db_progress STOP
-	load_cd1
+	load_install_cd
 	exit $ret
 fi
 
@@ -118,7 +114,7 @@ if [ "$RET" ]; then
 			log "cleanup failed"
 		fi
 		db_progress STOP
-		load_cd1
+		load_install_cd
 		exit $ret
 	fi
 fi
@@ -140,4 +136,4 @@ fi
 db_progress STEP 3
 db_progress STOP
 
-load_cd1
+load_install_cd
