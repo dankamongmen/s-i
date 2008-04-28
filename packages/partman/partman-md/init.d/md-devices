@@ -27,10 +27,10 @@ for i in $(grep ^md /proc/mdstat | grep -v inactive | \
 	   sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
 	NUMBER="${i#md}"
 	if [ -e "/dev/md/${NUMBER}" ]; then
-		DEVICE="/var/lib/partman/devices/=dev=md=${NUMBER}"
+		DEVICE="$DEVICES/=dev=md=${NUMBER}"
 		DEVNODE="/dev/md/${NUMBER}"
 	else
-		DEVICE="/var/lib/partman/devices/=dev=md${NUMBER}"
+		DEVICE="$DEVICES/=dev=md${NUMBER}"
 		DEVNODE="/dev/md${NUMBER}"
 	fi
 	mkdir -p ${DEVICE}

@@ -14,7 +14,7 @@
 #/sbin/mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
 
 # Mark all RAID partitions as being MD
-for dev in /var/lib/partman/devices/*; do
+for dev in $DEVICES/*; do
 	[ -d "$dev" ] || continue
 	cd $dev
 
@@ -60,7 +60,7 @@ done
 #for i in $(grep md /proc/mdstat | \
 #	    sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
 #	NUMBER=$(echo $i | sed -e "s/^md//")
-#	DEVICE="/var/lib/partman/devices/=dev=md$NUMBER"
+#	DEVICE="$DEVICES/=dev=md$NUMBER"
 #	mkdir -p $DEVICE
 #	cd $DEVICE
 #	echo "/dev/md$NUMBER" > $DEVICE/device
