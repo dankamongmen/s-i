@@ -5,7 +5,8 @@ set -e
 
 file="$1"
 
-if [ ! -e /cdrom/.disk/cd_type ] || [ -d /hd-media ]; then
+if [ ! -e /cdrom/.disk/cd_type ] || [ -d /hd-media ] || \
+   [ ! -e /var/lib/install-cd.id ]; then
 	exit 0
 fi
 # multi-arch CDs have cd_type 'non_complete'
@@ -36,15 +37,7 @@ fi
 
 tmp=$($chroot $ROOT tempfile)
 
-cd_label=$(get_label)
-if [ "$ROOT" ]; then
-	# Save identification of installation CD
-	$logoutput --pass-stdout $chroot $ROOT \
-		apt-cdrom ident | grep "^Identifying" | cut -d" " -f2 \
-		>/var/lib/install-cd.id
-	echo "$cd_label" >>/var/lib/install-cd.id
-fi
-
+cd_label=$(tail -n1 /var/lib/install-cd.id)
 db_subst apt-setup/cdrom/set-first LABEL "$cd_label"
 db_input high apt-setup/cdrom/set-first || true
 if ! db_go; then

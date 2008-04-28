@@ -9,6 +9,36 @@ if [ ! -e /cdrom/.disk/base_installable ]; then
 	exit 0
 fi
 
+remount_cd() {
+	if [ "$ROOT" ] && [ ! -d /hd-media ]; then
+		db_get cdrom-detect/cdrom_device
+		$logoutput mount -t iso9660 -o ro,exec $RET /cdrom || true
+	fi
+}
+
+bail_out() {
+	remount_cd
+	rm -f $ROOT$tmp $ROOT$tmp~
+	rm -f /var/lib/install-cd.id
+
+	db_input critical apt-setup/cdrom/failed || true
+	db_go || exit 10
+	exit 1
+}
+
+# Save identification of installation CD
+save_label() {
+	local ident
+
+	if ! ident="$($logoutput --pass-stdout $chroot $ROOT apt-cdrom ident)"; then
+		bail_out
+	fi
+	echo "$ident" | grep "^Identifying" | cut -d" " -f2 \
+		>/var/lib/install-cd.id
+	echo "$ident" | grep "^Stored label:" | sed "s/^[^:]*: //" \
+		>>/var/lib/install-cd.id
+}
+
 logoutput=""
 if [ "$CATCHLOG" ]; then
 	logoutput="log-output -t apt-setup"
@@ -17,6 +47,15 @@ fi
 chroot=
 if [ "$ROOT" ]; then
 	chroot=chroot
+
+	# Allow apt-cdrom to manage mounting/unmounting CDs in /target
+	# (except for hd-media installs)
+	if [ ! -d /hd-media ]; then
+		rm -f $ROOT/etc/apt/apt.conf.d/00NoMountCDROM
+
+		# Also removes the bind-mount in /target
+		$logoutput umount /cdrom || true
+	fi
 fi
 
 tmp=$($chroot $ROOT tempfile)
@@ -26,10 +65,13 @@ if $logoutput $chroot $ROOT apt-cdrom add \
    -o Dir::Etc::SourceList=$tmp \
    </dev/null; then
 	cat $ROOT$tmp >> $file
+
+	if [ "$ROOT" ] && [ ! -d /hd-media ]; then
+		save_label
+	fi
 else
-	rm -f $ROOT$tmp $ROOT$tmp~
-	db_input critical apt-setup/cdrom/failed || true
-	db_go || exit 10
+	bail_out
 fi
 
+remount_cd
 rm -f $ROOT$tmp $ROOT$tmp~
