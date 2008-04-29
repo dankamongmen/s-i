@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52821 -->
+<!-- original version: 52911 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -331,20 +331,21 @@ geben Sie einfach
 für jede Voreinstellungsvariable, die in den Beispielen dieses Abschnitts
 aufgelistet ist, am Bootprompt an. Falls ein Wert verwendet werden soll,
 um Pakete für das Zielsystem zu konfigurieren, müssen Sie den
-<firstterm>Eigentümer</firstterm> (Owner <footnote>
+<firstterm>Eigentümer</firstterm> (owner<footnote>
 
 <para>
-Der Owner einer Debconf-Variable (oder Vorlage) ist normalerweise der Name
-des Pakets, das die entsprechende Debconf-Vorlage enthält. Bei Variablen, die
-im Installer selbst verwendet werden, ist der Owner <quote>d-i</quote>.
-Vorlagen und Variablen können auch mehr als einen Owner haben, was dabei
-hilfreich sein kann, herauszufinden, ob sie aus der Debconf-Datenbank entfernt
+Der Eigentümer (owner) einer debconf-Variable (oder eines Templates) ist
+normalerweise der Name des Pakets, das die entsprechende debconf-Vorlage
+enthält. Bei Variablen, die im Installer selbst verwendet werden, ist der
+Eigentümer <quote>d-i</quote>.
+Vorlagen und Variablen können auch mehr als einen Eigentümer haben, was dabei
+hilfreich sein kann, herauszufinden, ob sie aus der debconf-Datenbank entfernt
 werden können, wenn das Paket komplett vom System entfernt wird.
 </para>
 
 </footnote>) der Variable voranstellen wie hier:
 <userinput><replaceable>Eigentümer</replaceable>:<replaceable>Pfad/zur/Variable</replaceable>=<replaceable>Wert</replaceable></userinput>. Geben Sie den
-Eigentümer nicht an, wird der Wert der Variable nicht in die Debconf-Datenbank
+Eigentümer nicht an, wird der Wert der Variable nicht in die debconf-Datenbank
 des Zielsystems kopiert und bleibt deshalb bei der Konfiguration des
 entsprechenden Pakets ungenutzt.
 
@@ -613,7 +614,7 @@ DHCP-Voreinstellung sollte nur mit Vorsicht durchgeführt werden.
 Die Voreinstellungsdatei hat das gleiche Format, wie es
 auch vom Befehl <command>debconf-set-selections</command>
 verwendet wird. Das grundsätzliche Format einer Zeile in einer
-Voreinstellungsdatei ist folgendes:
+Voreinstellungsdatei ist Folgendes:
 
 <informalexample><screen>
 &lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;
@@ -636,6 +637,15 @@ eine Voreinstellungsdatei schreibt:
   (<quote><literal>\</literal></quote>) als Zeilenvorsetzungszeichen angefügt
   wird. Eine gute Stelle, um die Zeile aufzuteilen, ist hinter dem Namen der Frage;
   eine schlechte ist zwischen Typ und Wert.
+</para></listitem>
+<listitem><para>
+  Für debconf-Variablen (Templates), die im Installer selbst benutzt werden,
+  muss der Eigentümer (owner) auf <quote>d-i</quote> gesetzt werden; um
+  Variablen im neu installierten System voreinzustellen, muss der Name des
+  Paketes, das die entsprechenden debconf-Templates enthält, verwendet werden.
+  Nur Variablen, deren Eigentümer auf einen anderen Wert als <quote>d-i</quote>
+  gesetzt ist, werden der debconf-Datenbank des installierten Systems
+  zugewiesen.
 </para></listitem>
 <listitem><para>
   Für die meisten Fragen müssen bei der Voreinstellung die gültigen Werte
@@ -717,7 +727,7 @@ Voreinstellungsdatei gültig ist, können Sie den Befehl
 
 
  <sect1 id="preseed-contents">
- <title>Inhalt der Voreinstellungsdatei</title>
+ <title>Inhalt der Voreinstellungsdatei (für &releasename-cap;)</title>
 <para>
 
 Die Konfigurationsfragmente, die in diesem Abschnitt benutzt werden, sind
@@ -813,11 +823,15 @@ diese Einschränkung zu umgehen, wenn Sie zum Beispiel eine statische
 Adresse für die Netzwerk-Schnittstelle setzen möchten. Der Hack erzwingt, dass
 die Netzwerkkonfiguration erneut abläuft, nachdem die Voreinstellungsdatei
 geladen wurde. Dazu wird ein <quote>preseed/run</quote>-Script erzeugt
-mit den folgenden Zeilen:
+mit den folgenden Befehlen:
 
 <informalexample><screen>
 killall.sh; netcfg
 </screen></informalexample>
+
+</para><para>
+
+Die folgenden debconf-Variablen sind für Netzwerk-Konfiguration relevant.
 
 </para>
 
@@ -1203,7 +1217,8 @@ Authentifizierung mit SSH-Schlüssel oder per sudo).
 
 </para><para>
 
-Ein MD5-Hash für ein Passwort kann mit dem folgenden Befehl generiert werden:
+Der folgende Befehl kann verwendet werden, um einen MD5-Hash für ein Passwort
+zu generieren:
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -m md5
@@ -1369,8 +1384,21 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # Um grub auf mehrere Festplatten zu installieren:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Optionales Passwort für grub, entweder als Klartext ...
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# ... oder verschlüsselt mittels MD5-Hash; siehe grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
+<para>
+
+Ein MD5-Hash für ein <classname>grub</classname>-Passwort kann mit dem
+Befehl <command>grub-md5-crypt</command> generiert werden oder mit dem
+Kommando aus dem Beispiel in <xref linkend="preseed-account"/>.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-finish">
