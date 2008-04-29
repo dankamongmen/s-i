@@ -291,6 +291,13 @@ if [ "$font_only" != yes ]; then
 	    else
 		acm_option=''
 	    fi
+
+	    if [ "$XKBRULES" ]; then
+		rules_option="-rules $XKBRULES"
+	    else
+		rules_option=''
+	    fi
+
 	    if [ "$save_only" != yes ]; then
 		if \
 		    [ "$VARIANT" = '' ] \
@@ -300,13 +307,13 @@ if [ "$font_only" != yes ]; then
 		then
 		    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
 		else
-		    ckbcomp $acm_option -model "$XKBMODEL" \
+		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
 			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
 			| eval loadkeys $verbose
 		fi
 	    fi
 	    if which gzip >/dev/null && [ "$save" = yes ]; then
-		ckbcomp $acm_option -model "$XKBMODEL" \
+		ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
 		    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
 		    | gzip -9 >/etc/console-setup/boottime.kmap.gz
 	    fi
