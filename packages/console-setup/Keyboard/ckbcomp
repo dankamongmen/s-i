@@ -2327,7 +2327,7 @@ if (@layouts) {
 	or die "$0: ". xfilename ("rules/$rules") .": $!\n";
     my $oldline = '';
     my @antecedents;
-    my $consequent_name;
+    my @consequents;
     my $match_found = 0;
     while (<RULES>) {
 	next if (/^\s*\/\//);
@@ -2349,7 +2349,7 @@ if (@layouts) {
 	}
 	if (/^! ?(.+)= ?(.+)$/) {
 	    @antecedents = split ' ', $1;
-	    ($consequent_name = $2) =~ s/ //g;
+	    @consequents = split ' ', $2;
 	    foreach my $i (0 .. $#antecedents) {
 		if ($antecedents[$i] eq 'model') {
 		    $antecedents[$i] = $model;
@@ -2387,7 +2387,7 @@ if (@layouts) {
 	if (/^(.+)= ?(.+)$/) {
 	    next if ($match_found);
 	    my @antecedent_patterns = split ' ', $1;
-	    my $consequent = $2;
+	    my $consequent_str = $2;
 	    @antecedent_patterns == @antecedents 
 		or die "Bad number of antecedents";
 	    my $matches = 1;
@@ -2400,35 +2400,43 @@ if (@layouts) {
 	    }
 	    if ($matches) {
 		$match_found = $antecedents[0] ne 'OPTIONS';
-		$consequent =~ s/ //g;
-		$consequent =~ s/%\(/\(%/g;
-		$consequent =~ s/%_/_%/g;
-		$consequent =~ s/%m/$model/g;
-		$consequent =~ s/%l\[1\]/$layouts[0]/g;
-		$consequent =~ s/%l\[2\]/$layouts[1]/g;
-		$consequent =~ s/%l\[3\]/$layouts[2]/g;
-		$consequent =~ s/%l\[4\]/$layouts[3]/g;
-		$consequent =~ s/%l/$layouts[0]/g;
-		$consequent =~ s/%v\[1\]/$variants[0]/g;
-		$consequent =~ s/%v\[2\]/$variants[1]/g;
-		$consequent =~ s/%v\[3\]/$variants[2]/g;
-		$consequent =~ s/%v\[4\]/$variants[3]/g;
-		$consequent =~ s/%v/$variants[0]/g;
-		$consequent =~ s/\(\)//g;
-		if ($consequent =~ /^\+/) {
-		    if ($consequent_name eq 'keycodes') {
-			$rules_keycodes = $rules_keycodes . $consequent;
-		    } elsif ($consequent_name eq 'symbols') {
-			$rules_symbols = $rules_symbols . $consequent;
-		    }
-		} else {
-		    if ($consequent_name eq 'keycodes') {
-			if (! $rules_keycodes) {
-			    $rules_keycodes = $consequent;
+		my @consequent_values = split ' ', $2;
+		@consequent_values == @consequents
+		    or die sprintf ("Bad number of consequents: %d != %d",
+				    scalar (@consequent_values),
+				    scalar (@consequents));
+		for my $i (0 .. $#consequents) {
+		    $consequent_values[$i] =~ s/%\(/\(%/g;
+		    $consequent_values[$i] =~ s/%_/_%/g;
+		    $consequent_values[$i] =~ s/%m/$model/g;
+		    $consequent_values[$i] =~ s/%l\[1\]/$layouts[0]/g;
+		    $consequent_values[$i] =~ s/%l\[2\]/$layouts[1]/g;
+		    $consequent_values[$i] =~ s/%l\[3\]/$layouts[2]/g;
+		    $consequent_values[$i] =~ s/%l\[4\]/$layouts[3]/g;
+		    $consequent_values[$i] =~ s/%l/$layouts[0]/g;
+		    $consequent_values[$i] =~ s/%v\[1\]/$variants[0]/g;
+		    $consequent_values[$i] =~ s/%v\[2\]/$variants[1]/g;
+		    $consequent_values[$i] =~ s/%v\[3\]/$variants[2]/g;
+		    $consequent_values[$i] =~ s/%v\[4\]/$variants[3]/g;
+		    $consequent_values[$i] =~ s/%v/$variants[0]/g;
+		    $consequent_values[$i] =~ s/\(\)//g;
+		    if ($consequent_values[$i] =~ /^\+/) {
+			if ($consequents[$i] eq 'keycodes') {
+			    $rules_keycodes = $rules_keycodes .
+				$consequent_values[$i];
+			} elsif ($consequents[$i] eq 'symbols') {
+			    $rules_symbols = $rules_symbols .
+				$consequent_values[$i];
 			}
-		    } elsif ($consequent_name eq 'symbols') {
-			if (! $rules_symbols) {
-			    $rules_symbols = $consequent;
+		    } else {
+			if ($consequents[$i] eq 'keycodes') {
+			    if (! $rules_keycodes) {
+				$rules_keycodes = $consequent_values[$i];
+			    }
+			} elsif ($consequents[$i] eq 'symbols') {
+			    if (! $rules_symbols) {
+				$rules_symbols = $consequent_values[$i];
+			    }
 			}
 		    }
 		}
