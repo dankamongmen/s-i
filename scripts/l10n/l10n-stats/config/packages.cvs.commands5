@@ -25,9 +25,14 @@ cd ../..
 #echo -n "dpkg "
 #svn -q co svn://svn.debian.org/dpkg/trunk/po dpkg/po
 rm -rf dpkg
-git-clone ssh://git.debian.org/git/dpkg/dpkg >/dev/null 2>&1
-
-
+if [ `hostname` == "alioth ] ; then
+	git clone /git/dpkg/dpkg.git >/dev/null 2>&1
+else
+	git clone git://git.debian.org/git/dpkg/dpkg.git >/dev/null 2>&1
+fi
+cd dpkg
+git checkout -b lenny origin/lenny
+cd ..
 
 #get apt:
 #echo -n "apt "
