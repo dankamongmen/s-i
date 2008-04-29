@@ -2718,6 +2718,26 @@ sub symbols_for_group {
     }
 }
 
+# KPDL needs a special tweak for certain layouts.
+sub adjust_symbols {
+    my $key = shift;
+    if ($key eq 'KPDL') {
+	my @newsymbols;
+	for my $symbol (@_) {
+	    if ($symbol eq 'period') {
+		push @newsymbols, 'KP_Decimal';
+	    } elsif ($symbol eq 'comma') {
+		push @newsymbols, 'KP_Separator';
+	    } else {
+		push @newsymbols, $symbol;
+	    }
+	}
+	return @newsymbols;
+    } else {
+	return @_;
+    }
+}
+
 sub xkb_key {
     if ($stream =~ /^key</i) {
 	$stream =~ s/^key<([^>]+)>\{([^\}]*?)\};(.*)/$3/i
@@ -2737,6 +2757,7 @@ sub xkb_key {
 		if ($list =~ s/^\[([^\]]*?)\],(.*)/$2/) {
 		    (my $symbols = $1) =~ s/,/ /g;
 		    my @groupsymbols = split ' ', $symbols;
+		    @groupsymbols = adjust_symbols $key, @groupsymbols;
 		    symbols_for_group $code, $group, @groupsymbols;
 		    $group++;
 		    next;
@@ -2747,6 +2768,7 @@ sub xkb_key {
 		    my $group = $1 - 1 + $base_group;
 		    (my $symbols = $2) =~ s/,/ /g;
 		    my @groupsymbols = split ' ', $symbols;
+		    @groupsymbols = adjust_symbols $key, @groupsymbols;
 		    symbols_for_group $code, $group, @groupsymbols;
 		    next;
 		}
