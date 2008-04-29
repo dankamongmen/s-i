@@ -285,6 +285,13 @@ refine_locale() {
 	done
 }
 
+# Extract a value from /etc/lsb-release
+lsb_extract () {
+	[ -f /etc/lsb-release ] || return 0
+	grep "^$1=" /etc/lsb-release | \
+		sed 's/^[^=]*=//; s/^"//; s/"$//' || true
+}
+
 
 # Reset all variables
 LANGUAGE=""
@@ -369,7 +376,7 @@ while :; do
 		db_set "debconf/language" "$LANGUAGELIST"
 		log "Set debconf/language = '$LANGUAGELIST'"
 
-		[ -f /etc/lsb-release ] && . /etc/lsb-release
+		X_INSTALLATION_MEDIUM="$(lsb_extract X_INSTALLATION_MEDIUM)"
 		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
 		   [ "$X_INSTALLATION_MEDIUM" = "floppy" ]; then
 			db_input high localechooser/translation/none-yet || true
