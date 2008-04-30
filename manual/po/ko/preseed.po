@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-04-30 00:09+0000\n"
-"PO-Revision-Date: 2008-02-27 14:23+0900\n"
+"PO-Revision-Date: 2008-05-01 05:02+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1042,7 +1042,7 @@ msgid ""
 "debconf template should be used. Only variables that have their owner set to "
 "something other than <quote>d-i</quote> will be propagated to the debconf "
 "database for the installed system."
-msgstr ""
+msgstr "설치 프로그램에서 사용하는 debconf 변수(템플리트)의 경우, 소유자를 <quote>d-i</quote>라고 해야 합니다. 설치한 시스템에서 사용할 변수를 미리 설정하려면, 해당 debconf 템플리트가 들어 있는 패키지의 이름을 사용해야 합니다. 소유자가 <quote>d-i</quote>가 아닌 변수만 설치한 시스템의 debconf 데이터베이스에 적용됩니다."
 
 #. Tag: para
 #: preseed.xml:592
@@ -1165,10 +1165,10 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:661
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Contents of the preconfiguration file"
 msgid "Contents of the preconfiguration file (for &releasename;)"
-msgstr "미리 설정 파일의 내용"
+msgstr "미리 설정 파일의 내용 (&releasename;용)"
 
 #. Tag: para
 #: preseed.xml:667
@@ -1312,7 +1312,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:736
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Although preseeding the network configuration is normally not possible "
 #| "when using network preseeding (using <quote>preseed/url</quote>), you can "
@@ -1329,12 +1329,7 @@ msgid ""
 "configuration to run again after the preconfiguration file has been loaded "
 "by creating a <quote>preseed/run</quote> script containing the following "
 "commands:"
-msgstr ""
-"네트워크를 통해 미리 설정을 하는 경우 (<quote>preseed/url</quote> 사용) 네트"
-"워크 설정을 미리 설정하는 게 보통 불가능하지만, 다음 방법을 이용해 피해갈 수 "
-"있습니다. 예를 들어 네트워크 인터페이스에 고정 주소를 부여하는 방법입니다. 다"
-"음 라인에 들어 있는 <quote>preseed/run</quote> 스크립트를 만들어서 미리 설정 "
-"파일을 읽어들인 후에 네트워크 설정을 다시 실행합니다:"
+msgstr "네트워크를 통해 미리 설정을 하는 경우 (<quote>preseed/url</quote> 사용) 네트워크 설정을 미리 설정하는 게 보통 불가능하지만, 다음 방법을 이용해 피해갈 수 있습니다. 예를 들어 네트워크 인터페이스에 고정 주소를 부여하는 방법입니다. 다음 명령이 들어 있는 <quote>preseed/run</quote> 스크립트를 만들어서 미리 설정 파일을 읽어들인 후에 네트워크 설정을 다시 실행합니다:"
 
 #. Tag: screen
 #: preseed.xml:746
@@ -1346,7 +1341,7 @@ msgstr "killall.sh; netcfg"
 #: preseed.xml:748
 #, no-c-format
 msgid "The following debconf variables are relevant for network configuration."
-msgstr ""
+msgstr "다음 debconf 변수가 네트워크 설정과 관계가 있습니다."
 
 #. Tag: screen
 #: preseed.xml:754
@@ -2011,7 +2006,7 @@ msgstr ""
 #, no-c-format
 msgid ""
 "The following command can be used to generate an MD5 hash for a password:"
-msgstr ""
+msgstr "암호에 대한 MD5 해시를 만드려면 다음 명령을 사용할 수 있습니다:"
 
 #. Tag: screen
 #: preseed.xml:900
@@ -2243,7 +2238,7 @@ msgstr "부트로더 설치"
 
 #. Tag: screen
 #: preseed.xml:987
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 #| "# instead, uncomment this:\n"
@@ -2324,7 +2319,13 @@ msgstr ""
 "#d-i grub-installer/with_other_os boolean false\n"
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "# GRUB을 여러 디스크에 설치하려면:\n"
-"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
+"#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)\n"
+"\n"
+"# GRUB 암호를 쓸 수도 있습니다. 일반 텍스트로 쓰거나,\n"
+"#d-i grub-installer/password password r00tme\n"
+"#d-i grub-installer/password-again password r00tme\n"
+"# 아니면 MD5 해시로 암호화한 암호를 쓸 수 있습니다. grub-md5-crypt(8) 참고.\n"
+"#d-i grub-installer/password-crypted password [MD5 해시]"
 
 #. Tag: para
 #: preseed.xml:989
@@ -2333,7 +2334,7 @@ msgid ""
 "An MD5 hash for a password for <classname>grub</classname> can be generated "
 "using <command>grub-md5-crypt</command>, or using the command from the "
 "example in <xref linkend=\"preseed-account\"/>."
-msgstr ""
+msgstr "<classname>grub</classname>에 대한 암호의 MD5 해시는 <command>grub-md5-crypt</command> 명령을 사용해 만들어 낼 수 있습니다. 아니면 <xref linkend=\"preseed-account\"/> 부분의 예제 명령을 사용해서 만들어 낼 수 있습니다."
 
 #. Tag: title
 #: preseed.xml:999
