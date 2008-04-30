@@ -33,9 +33,8 @@ bootloader_handler_common () {
 				shift 2
 				;;
 			--md5pass)
-				# requires grub-installer 1.09
-				ks_preseed d-i grub-installer/password password "$2"
-				ks_preseed d-i grub-installer/password-crypted boolean true
+				# requires grub-installer 1.31
+				ks_preseed d-i grub-installer/password-crypted password "$2"
 				shift 2
 				;;
 			--useLilo)
