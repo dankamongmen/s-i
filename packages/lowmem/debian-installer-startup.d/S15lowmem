@@ -5,21 +5,33 @@ if [ -z "$ram" ]; then
 else
 	ram=$(expr $ram / 1024) # convert to megabytes
 
-	# Set level1 to the minimum amount of memory that will support an
+
+	# Set level1 to the lowest amount of memory that will support an
 	# install not in lowmem mode. (This is the max memory footprint of
 	# the installer in non lowmem mode up to running the partitioner
 	# and swapon.)
-	# Set level2 to the minimum amount of memory that will support an
+	# Use Portuguese as language and choose Guided partitioning with all
+	# partitions separate to test this!
+	#
+	# Set level2 to the lowest amount of memory that will support an
 	# install in lowmem mode. (This is the max memory footprint of the
 	# installer in lowmem mode up to running the partitioner
 	# and swapon.)
-	# Set min to absolute minimum of memory needed for an install.
+	# Again, choose Guided partitioning with all partitions separate.
+	#
+	# Set min to absolute minimum amount of memory needed for an install.
+
 	ARCH=$(udpkg --print-architecture)
 	case $ARCH in
 		alpha)
 			level1=82
 			level2=55
 			min=39
+		;;
+		amd64)
+			level1=50 # MT=52108, qemu: -m 56
+			level2=46 # MT=48068, qemu: -m 52
+			min=31    # MT=31912, qemu: -m 36
 		;;
 		arm|armel)
 			level1=60 # not sure but more than 32
@@ -31,10 +43,10 @@ else
 			level2=24
 			min=18
 		;;
-		i386|amd64)
-			level1=42 # MT=45764, qemu=48 (auto-LVM works)
-			level2=36 # MT=37776, qemu=40
-			min=28    # MT=29672, qemu=32
+		i386)
+			level1=39 # MT=40456, qemu: -m 44
+			level2=36 # MT=37392, qemu: -m 40
+			min=24    # MT=25224, qemu: -m 28
 		;;
 		mips)
 			level1=57
