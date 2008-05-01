@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-. /lib/partman/definitions.sh
+. /lib/partman/lib/base.sh
 
 # Verify that /boot is on an ext2 partition on a disk using BSD
 # disklabels, so that the system will actually be bootable.
@@ -80,11 +80,7 @@ then
 		fi
 	fi
 
-	label=$(parted "$disk" print | sed -n 's/Partition Table: //p')
-	if [ -z "$label" ]; then
-		# string in old parted
-		label=$(parted "$disk" print | sed -n 's/Disk label type: //p')
-	fi
+	label=$(partmap "$disk")
 	if [ "$label" != "bsd" ]; then
 		. /usr/share/debconf/confmodule
 
