@@ -1,13 +1,6 @@
 #!/bin/sh
 
-if [ "$1" = partman ]; then
-	# Use partman if possible.
-	. /lib/partman/definitions.sh
-	partman_avail=1
-else
-	. /usr/share/debconf/confmodule
-	partman_avail=0
-fi
+. /usr/share/debconf/confmodule
 
 #
 # convert the return values from "xx (yy)" => "xx"
@@ -135,29 +128,10 @@ addinfos_lv() {
 
 # get all available physical volumes
 enum_pvs() {
-	if [ ! "$partman_avail" ]; then
-		# Not in partman, so use partconf's find-partitions to find
-		# partitions marked as lvm volumes.
-		/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null | grep "[[:space:]]LVM[[:space:]]" | cut -f1
-	else
-		# In partman, so scan the partman devices and find
-		# partitions that have their method set to lvm. We don't
-		# rely on the partition flags since that does not work for
-		# raid partitions.
-		for dev in $DEVICES/*; do
-			[ -d "$dev" ] || continue
-			cd $dev
-			open_dialog PARTITIONS
-			while { read_line num id size type fs path name; [ "$id" ]; }; do
-				[ -f $id/method ] || continue
-				method=$(cat $id/method)
-				if [ "$method" = lvm ]; then
-					echo $path
-				fi
-			done
-			close_dialog
-		done
-	fi
+	# Use partconf's find-partitions to find partitions
+	# marked as lvm volumes.
+	/usr/lib/partconf/find-partitions --ignore-fstype 2>/dev/null | \
+		grep "[[:space:]]LVM[[:space:]]" | cut -f1
 }
 	
 
