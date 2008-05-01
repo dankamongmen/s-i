@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 50744 -->
+<!-- original version: 52911 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -35,6 +35,13 @@ Přednastavení nabízí možnost předem odpovědět na otázky, které se ptá
 instalační program. Díky tomu pak nemusíte do většiny instalací
 zasahovat a dokonce můžete využít některých vlastností, které jinak
 nejsou dostupné.
+
+</para><para>
+
+Přednastavení není povinné. Použijete-li prázdný soubor s odpověďmi,
+instalace bude probíhat úplně stejně jako při běžné instalaci. Každá
+otázka, kterou přednastavíte, jistým způsobem odchýlí instalaci od
+standardní cesty.
 
 </para>
 
@@ -645,6 +652,15 @@ několik pravidel.
   a hodnotou.
 </para></listitem>
 <listitem><para>
+  Pro debconf proměnné (šablony), které jsou součástí samotného
+  instalačního programu, by měl být vlastník nastaven
+  na <quote>d-i</quote>. Pro přednastavení ostatních proměnných
+  používaných během instalace by se měl jako vlastník používat název
+  balíku, který obsahuje příslušnou šablonu. Do debconf databáze
+  v nainstalovaném systému se přenesou pouze proměnné, které mají jako
+  vlastníka nastaveno něco jiného než <quote>d-i</quote>.
+</para></listitem>
+<listitem><para>
   Většina otázek vyžaduje zadání hodnot v angličtině, avšak existují
   výjimky jako třeba <classname>partman</classname>, kde musíte použít
   přeložené hodnoty.
@@ -711,7 +727,7 @@ souboru příkazem <command>debconf-set-selections -c
  </sect1>
 
  <sect1 id="preseed-contents">
- <title>Obsah souboru s přednastavením</title>
+ <title>Obsah souboru s přednastavením (pro &releasename;)</title>
 <para>
 
 Útržky konfigurace použité v této části jsou také dostupné jako
@@ -801,7 +817,15 @@ ze sítě (tj. při použití <quote>preseed/url</quote>), můžete to obejít
 následujícím hackem (např. pokud chcete síťovému rozhraní nastavit
 statickou adresu). Hack spočívá ve vynucení opětovné konfigurace sítě
 po načtení souboru s přednastavením. Stačí vytvořit skript pro
-<quote>preseed/run</quote> obsahující následující řádky:
+<quote>preseed/run</quote> obsahující následující příkazy:
+
+<informalexample><screen>
+killall.sh; netcfg
+</screen></informalexample>
+
+</para><para>
+
+Pro nastavení sítě lze využít následující proměnné:
 
 </para>
 
@@ -1183,7 +1207,7 @@ a dříve zodpovězenými otázkami. Volitelně můžete přidat další
 #d-i apt-setup/use_mirror boolean false
 # Vyberte, které aktualizační služby chcete využívat a zadejte
 # jejich zrcadla. Příklad ukazuje výchozí hodnoty.
-#d-i apt-setup/services-select multi-select security, volatile
+#d-i apt-setup/services-select multiselect security, volatile
 #d-i apt-setup/security_host string security.debian.org
 #d-i apt-setup/volatile_host string volatile.debian.org
 
@@ -1311,8 +1335,21 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # Pro instalaci Grubu na více disků:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Volitelné heslo pro Grub buď v čitelné podobě
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# nebo zašifrované pomocí MD5 hashe, viz grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
+<para>
+
+MD5 hash hesla pro <classname>grub</classname> můžete získat buď
+příkazem <command>grub-md5-crypt</command>, nebo příkazem uvedeným
+v příkladu v části <xref linkend="preseed-account"/>.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-finish">
