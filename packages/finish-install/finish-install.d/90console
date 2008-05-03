@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+
 log() {
 	logger -t finish-install "$@"
 }
@@ -14,6 +16,11 @@ write_console() {
 		echo "$1" >> "$2"
 	fi
 }		
+
+KEEP_VT=
+if db_get finish-install/keep-consoles && [ "$RET" = true ]; then
+	KEEP_VT=1
+fi
 
 # Since this script is running with debconf, 'tty' does
 # not give reliable answers about what sort of terminal
@@ -43,8 +50,12 @@ case "$console" in
 	if [ -z "$ttyspeed" ]; then ttyspeed=9600; fi
 
 	if [ -f /target/etc/inittab ]; then
-		sed -i -e "s/^\([1-6]\):/#\1:/" \
-		    -e "s/^#T0\(.*\)ttyS.*/T$ttyline\1$console $ttyspeed $ttyterm/" \
+		# Disable regular VTs
+		if [ -z "$KEEP_VT" ]; then
+			sed -i -e "s/^\([1-6]\):/#\1:/" /target/etc/inittab
+		fi
+		# Enable serial console
+		sed -i -e "s/^#T0\(.*\)ttyS.*/T$ttyline\1$console $ttyspeed $ttyterm/" \
 		    /target/etc/inittab
 	fi
 	if [ -f /target/etc/event.d/tty1 ]; then
@@ -88,7 +99,9 @@ if [ -e $DT_ROOT/chosen/linux,stdout-path ]; then
 	log "Setting up virtualized serial console on /dev/$console"
 	if [ -f /target/etc/inittab ]; then
 		# Disable regular VTs
-		sed -i -e "s/^\([1-6]\):/#\1:/" /target/etc/inittab
+		if [ -z "$KEEP_VT" ]; then
+			sed -i -e "s/^\([1-6]\):/#\1:/" /target/etc/inittab
+		fi
 
 		console_line="co:2345:respawn:/sbin/getty $console 9600 vt100"
 		if grep -q "^#\?co:" /target/etc/inittab; then
