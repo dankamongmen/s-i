@@ -308,7 +308,10 @@ rm -R $destination/* &>/dev/null
 export manual_release="lenny"
 export manual_target="for_alioth"
 
-if [ -z "$RETRY" ]; then
+if [ "$DI_BUILDING_FROM_MAIN" ] && [ "$DI_BUILD_MANUAL" = 0 ]; then
+    echo "Not building D-I Manual (as per configuration settings)" >$mainlog
+    exit 0
+elif [ -z "$RETRY" ]; then
     : >$logdir/svn_up.log
     : >$logdir/svn_ci.log
     echo "Starting D-I Manual build -- $(date -u)" >$mainlog

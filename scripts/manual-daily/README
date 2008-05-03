@@ -1,8 +1,33 @@
 The scripts and other files in this directory are used for the daily builds
 of the Debian Installer manual that are published on alioth.
-Currently these scripts are run on a private box at my home.
-They are only kept in the repo to keep them from getting lost.
+As it is convenient to use the same infrastructure, the scripts also build
+the developers reference for the installer (D-I Internals).
+
+The builds are currently run by Felipe Augusto van de Wiel <faw@funlabs.org>.
 
 The scripts may be considered published under the GPL.
 
 Frans Pop <elendil@planet.nl>
+
+----------------
+
+The build scripts source a configuration file in the user's home directory.
+Below is an example of a possible configuration file.
+
+<example ~/.d-i_manual_daily>
+# Configuration settings for "daily" builds of the Installation Guide
+# and the developers reference (D-I Internals)
+
+# By default the manual is built and the developer reference is not
+#DI_BUILD_MANUAL=0
+#DI_BUILD_DEVREF=1
+
+ROOT=/srv/d-i_daily
+source=$ROOT/manual
+devref=$ROOT/internals
+destination=$ROOT/build
+logdir=$ROOT/log
+
+NAME_FROM="D.I. Developer"
+MAIL_FROM="developer@debian.org"
+</example>
