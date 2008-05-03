@@ -885,27 +885,14 @@ enable_swap () {
 disable_swap () {
     [ -f /proc/swaps ] || return 0
     if [ "$1" ] && [ -d "$1" ]; then
-	local swaps dev
-	local startdir="$(pwd)"
-	swaps=
+	local path device dev
 	dev="$1"
 	cd $dev
-	open_dialog PARTITIONS
-	while { read_line num id size type fs path name; [ "$id" ]; }; do
-	    [ $fs != free ] || continue
-	    [ -f "$id/method" ] || continue
-	    method=$(cat $id/method)
-	    if [ "$method" = swap ]; then
-		swaps="$swaps $path"
-	    fi
-	done
-	close_dialog
-	for path in $swaps; do
-	    if grep -q "^$(readlink -f "$path") " /proc/swaps; then
-		swapoff $path
-	    fi
-	done
-	cd "$startdir"
+	device=$(cat device)
+	grep "^$device" /proc/swaps \
+	    | while read path x; do
+		  swapoff $path
+	      done
     else
 	grep '^/dev' /proc/swaps \
 	    | while read path x; do
