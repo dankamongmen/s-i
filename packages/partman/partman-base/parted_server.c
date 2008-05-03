@@ -1805,7 +1805,7 @@ command_new_partition()
         else if (!strcasecmp(s_type, "logical"))
                 type = PED_PARTITION_LOGICAL;
         else
-                critical_error("Bad label type: %s", s_type);
+                critical_error("Bad partition type: %s", s_type);
         log("requested partition with type %s", s_type);
         free(s_type);
 
