@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52821 -->
+<!-- original version: 52911 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1055,44 +1055,75 @@ file di preconfigurazione.
 
 <itemizedlist>
 <listitem><para>
+
 <!--
   Put only a single space or tab between type and value: any additional
   whitespace will be interpreted as belonging to the value.
 -->
-  Inserire un singolo spazio o un solo tab fra tipo e valore: ogni ulteriore
-  spazio viene interpretato come appartenente al valore.
+
+Inserire un singolo spazio o un solo tab fra tipo e valore: ogni ulteriore
+spazio viene interpretato come appartenente al valore.
+
 </para></listitem>
 <listitem><para>
+
 <!--
   A line can be split into multiple lines by appending a backslash
   (<quote><literal>\</literal></quote>) as the line continuation character.
   A good place to split a line is after the question name; a bad place is
   between type and value.
 -->
-  Una riga può essere spezzata su più righe aggiungendo un backslash
-  (<quote><literal>\</literal></quote>) come carattere di continuazione
-  della riga. Un buon punto in cui spezzare una riga è dopo il nome della
-  domanda; invece un punto pessimo è fra il tipo e il valore.
+
+Una riga può essere spezzata su più righe aggiungendo un backslash
+(<quote><literal>\</literal></quote>) come carattere di continuazione
+della riga. Un buon punto in cui spezzare una riga è dopo il nome della
+domanda; invece un punto pessimo è fra il tipo e il valore.
+
 </para></listitem>
 <listitem><para>
+
+<!--
+  For debconf variables (templates) used in the installer itself, the
+  owner should be set to <quote>d-i</quote>; to preseed variables used
+  in the installed system, the name of the package that contains the
+  corresponding debconf template should be used. Only variables that have
+  their owner set to something other than <quote>d-i</quote> will be
+  propagated to the debconf database for the installed system.
+-->
+
+Le variabili debconf (modelli) usate nell'installatore stesso devono avere
+come proprietario <quote>d-i</quote>; per preconfigurare le variabili usate
+nel sistema installato, si deve usare il nome del pacchetto che contiene il
+corrispondente modello debconf. Solo le variabili che hanno un proprietario
+diverso da <quote>d-i</quote> saranno propagate al database debconf del
+sistema installato.
+
+</para></listitem>
+<listitem><para>
+
 <!--
   Most questions need to be preseeded using the values valid in English and
   not the translated values. However, there are some questions (for example
   in <classname>partman</classname>) where the translated values need to be
   used.
 -->
-  La maggior parte delle domande deve essere preconfigurata usando i valori
-  validi per la lingua inglese e non usando i valori tradotti. Comunque,
-  esistono delle domande (per esempio in <classname>partman</classname>) in
-  cui è necessario usare i valori tradotti.
+
+La maggior parte delle domande deve essere preconfigurata usando i valori
+validi per la lingua inglese e non usando i valori tradotti. Comunque,
+esistono delle domande (per esempio in <classname>partman</classname>) in
+cui è necessario usare i valori tradotti.
+
 </para></listitem>
 <listitem><para>
+
 <!--
   Some questions take a code as value instead of the English text that is
   shown during installation.
 -->
-  Alcune domande accettano come valore un codice anziché il testo in
-  inglese mostrato durante l'installazione.
+
+Alcune domande accettano come valore un codice anziché il testo in
+inglese mostrato durante l'installazione.
+
 </para></listitem>
 </itemizedlist>
 
@@ -1205,8 +1236,8 @@ prima di effettuare un'installazione si può usare il comando
 
 
  <sect1 id="preseed-contents">
- <!-- <title>Contents of the preconfiguration file</title> -->
- <title>Contenuto del file di preconfigurazione</title>
+ <!-- <title>Contents of the preconfiguration file (for &releasename;)</title> -->
+ <title>Contenuto del file di preconfigurazione (per &releasename;)</title>
 <para>
 
 <!--
@@ -1369,7 +1400,7 @@ the following hack to work around that, for example if you'd like to set a
 static address for the network interface. The hack is to force the network
 configuration to run again after the preconfiguration file has been loaded
 by creating a <quote>preseed/run</quote> script containing the following
-lines:
+commands:
 -->
 
 Nonostante la preconfigurazione della rete non sia normalmente disponibile
@@ -1379,11 +1410,19 @@ un trucco; per esempio se si vuole forzare un indirizzo statico per
 l'interfaccia di rete. Il trucco consiste nel forzare la ripetizione
 della configurazione della rete dopo che il file di preconfigurazione
 è stato caricato creando uno script da eseguire tramite
-<quote>preseed/run</quote> contenente le seguenti righe:
+<quote>preseed/run</quote> contenente i seguenti comandi:
 
 <informalexample><screen>
 killall.sh; netcfg
 </screen></informalexample>
+
+</para><para>
+
+<!--
+The following debconf variables are relevant for network configuration.
+-->
+
+Le seguenti variabili debconf sono legate alla configurazione della rete.
 
 </para>
 
@@ -1974,10 +2013,10 @@ chiave SSH oppure con sudo).
 </para><para>
 
 <!--
-An MD5 hash for a password can be generated using the following command.
+The following command can be used to generate an MD5 hash for a password:
 -->
 
-Un hash MD5 di una password può essere creato usando il seguente comando.
+Si può usare il seguente comando per creare un hash MD5 di una password:
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -m md5
@@ -2209,7 +2248,31 @@ d-i grub-installer/with_other_os boolean true
 # To install grub to multiple disks:
 --># Per installare grub su più dischi:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+<!--
+# Optional password for grub, either in clear text
+--># Passowrd opzionale per grub, può essere in chiaro
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+<!--
+# or encrypted using an MD5 hash, see grub-md5-crypt(8).
+--># oppure criptata in un hash MD5, si veda grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
+
+<para>
+
+<!--
+An MD5 hash for a password for <classname>grub</classname> can be generated
+using <command>grub-md5-crypt</command>, or using the command from the
+example in <xref linkend="preseed-account"/>.
+-->
+
+L'hash MD5 per una password per <classname>grub</classname> può essere
+generato usando <command>grub-md5-crypt</command>, oppure usando il comando
+dell'esempio in <xref linkend="preseed-account"/>.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-finish">
