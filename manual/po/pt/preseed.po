@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-04-30 00:09+0000\n"
-"PO-Revision-Date: 2008-04-27 19:39+0100\n"
+"PO-Revision-Date: 2008-05-04 19:39+0100\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -1103,6 +1103,12 @@ msgid ""
 "something other than <quote>d-i</quote> will be propagated to the debconf "
 "database for the installed system."
 msgstr ""
+"Para as variáveis de debconf (templates) utilizadas no próprio instalador, o "
+"dono deve ser definido como <quote>d-i</quote>; para fazer 'preseed' a "
+"variáveis utilizadas no sistema instalado, deve ser utilizado o nome do "
+"pacote que contém o correspondente template debconf. Apenas variáveis que "
+"tenham o dono definido para algo que não <quote>d-i</quote> é que serão "
+"propagadas para a base de dados do debconf do sistema instalado."
 
 #. Tag: para
 #: preseed.xml:592
@@ -2095,6 +2101,7 @@ msgstr ""
 msgid ""
 "The following command can be used to generate an MD5 hash for a password:"
 msgstr ""
+"Pode ser utilizado o seguinte comando para gerar um hash MD5 para uma palavra-passe:"
 
 #. Tag: screen
 #: preseed.xml:900
@@ -2332,7 +2339,7 @@ msgstr "Instalação do gestor de arranque"
 
 #. Tag: screen
 #: preseed.xml:987
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 #| "# instead, uncomment this:\n"
@@ -2392,19 +2399,19 @@ msgid ""
 "# or encrypted using an MD5 hash, see grub-md5-crypt(8).\n"
 "#d-i grub-installer/password-crypted password [MD5 hash]"
 msgstr ""
-"# O grub é o gestor de arranque pré-definido (para x86). Se quer, em vez\n"
+"# O grub é o gestor de arranque pré-definido (para x86). Se quiser, em vez\n"
 "# disso, o lilo instalado, descomente isto:\n"
 "#d-i grub-installer/skip boolean true\n"
-"# Para também evistar instalar o lilo, e não instalar um gestor de\n"
+"# Para evitar também instalar o lilo, e não instalar um gestor de\n"
 "# arranque, descomente também isto:\n"
 "#d-i lilo-installer/skip boolean true\n"
 "\n"
-"# Isto é relativamente seguro definir, faz o grub instalar-se\n"
+"# Isto é relativamente seguro de definir, faz o grub instalar-se\n"
 "automaticamente no MBR se não for detectado nenhum outro sistema operativo\n"
 "na máquina.\n"
 "d-i grub-installer/only_debian boolean true\n"
 "\n"
-"# Isto faz com que o grub-installer instale para o MBR se também encontrar\n"
+"# Isto faz com que o grub-installer instale no MBR se também encontrar\n"
 "# algum outro SO, que é menos seguro pois pode não ser possível arrancar\n"
 "# esse outro SO.\n"
 "d-i grub-installer/with_other_os boolean true\n"
@@ -2416,6 +2423,12 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0)\n"
 "# Para instalar o grub em vários discos:\n"
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
+"\n"
+"# Palavra-passe opcional para o grub, em texto visível\n"
+"#d-i grub-installer/password password r00tme\n"
+"#d-i grub-installer/password-again assword r00tme\n"
+"# ou encriptada utilizando um hash MD5, veja grub-md5-crypt(8).\n"
+"#d-i grub-installer/password-crypted password [hash MD5]"
 
 #. Tag: para
 #: preseed.xml:989
@@ -2425,6 +2438,9 @@ msgid ""
 "using <command>grub-md5-crypt</command>, or using the command from the "
 "example in <xref linkend=\"preseed-account\"/>."
 msgstr ""
+"Pode ser gerado um hash MD5 para uma palavra-passe para o <classname>grub"
+"</classname> utilizando o <command>grub-md5-crypt</command>, ou utilizando "
+"o comando do exemplo em <xref linkend=\"preseed-account\"/>."
 
 #. Tag: title
 #: preseed.xml:999
