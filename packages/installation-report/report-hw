@@ -49,7 +49,9 @@ for file in cpuinfo ioports iomem interrupts meminfo bus/usb/devices \
 	bus/input/devices; do
 	addfile /proc/$file
 done
-dmidecode 2>&1 | addinfo dmidecode
+if type dmidecode >/dev/null 2>&1; then
+	dmidecode 2>&1 | addinfo dmidecode
+fi
 
 if [ "$DEBIAN_FRONTEND" = gtk ]; then
 	addfile /proc/fb
