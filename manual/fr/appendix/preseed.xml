@@ -1,4 +1,4 @@
-<!-- original version: 52853 -->
+<!-- original version: 52911 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -582,6 +582,13 @@ Voici quelques règles pour écrire un fichier de préconfiguration.
   Ce n'est pas très heureux de la couper entre le type et la valeur.
 </para></listitem>
 <listitem><para>
+  Le propriétaire des variables debconf utilisées dans l'installateur lui-même
+  doit être <quote>d-i</quote>. Pour les variables utilisées dans le système installé,
+  le propriétaire doit correspondre au nom du paquet qui contient ces variables.
+  Seules les variables dont le propriétaire n'est pas <quote>d-i</quote> sont
+  conservées dans la base de données debconf du système installé.
+</para></listitem>
+<listitem><para>
   La plupart des valeurs doivent être en anglais et non pas en français. Mais il existe
   des valeurs, dans <classname>partman</classname> par exemple, qui doivent être données
   en français.
@@ -1103,7 +1110,7 @@ autre manière, par exemple authentification avec clé SSH, ou <command>sudo</co
 
 </para>
 <para>
-Un hachage MD5 pour le mot de passe peut être obtenu de la manière suivante.
+Un hachage MD5 pour le mot de passe peut être obtenu de la manière suivante&nbsp;:
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -m md5
@@ -1245,7 +1252,7 @@ facilement sur la ligne de commande du noyau.
 # sur la machine.
 d-i grub-installer/only_debian boolean true
 
-# Ce paramètre installe grub sur le secteur d'amorçage principal même s'il
+# Ce paramètre installe grub sur le secteur d'amorçage principal (<emphasis>MBR</emphasis>) même s'il
 # existe un autre système d'exploitation, ce qui est moins sûr car il pourrait
 # ne pas savoir amorcer cet autre système.
 d-i grub-installer/with_other_os boolean true
@@ -1257,8 +1264,21 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # Pour installer grub sur plusieurs disques :
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Mot de passe facultatif pour grub, soit en clair (simple texte) :
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# soit chiffré avec un hachage MD5, voyez grub-md5-crypt(8) :
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
+<para>
+
+Un mot de passe chiffré avec un hachage MD5 pour <classname>grub</classname>
+peut être créé avec la commande <command>grub-md5-crypt</command> ou avec la commande
+donnée dans l'exemple de <xref linkend="preseed-account"/>.  
+
+</para>
   </sect2>
 
   <sect2 id="preseed-finish">
