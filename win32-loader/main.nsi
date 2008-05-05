@@ -570,8 +570,6 @@ $1"
 !endif
 
 ; ********************************************** Display customisation dialog now
-  Var /GLOBAL boot_ini
-  StrCpy $boot_ini "$c\boot.ini"
   ${If} $expert == true
     File /oname=$PLUGINSDIR\custom.ini templates/custom.ini
     WriteINIStr $PLUGINSDIR\custom.ini "Field 1" "Text" $(custom1)
@@ -580,14 +578,12 @@ $1"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 4" "Text" "Linux cmdline:"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 5" "Text" $(custom5)
     WriteINIStr $PLUGINSDIR\custom.ini "Field 6" "State" "$proxy"
-    WriteINIStr $PLUGINSDIR\custom.ini "Field 7" "State" "$boot_ini"
 !ifdef NETWORK_BASE_URL
     WriteINIStr $PLUGINSDIR\custom.ini "Field 8" "State" "$base_url"
 !endif
     WriteINIStr $PLUGINSDIR\custom.ini "Field 9" "State" "$preseed_cmdline"
     InstallOptions::dialog $PLUGINSDIR\custom.ini
     ReadINIStr $proxy		$PLUGINSDIR\custom.ini "Field 6" "State"
-    ReadINIStr $boot_ini	$PLUGINSDIR\custom.ini "Field 7" "State"
 !ifdef NETWORK_BASE_URL
     ReadINIStr $base_url	$PLUGINSDIR\custom.ini "Field 8" "State"
 !endif
@@ -703,10 +699,68 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
 
 ; ********************************************** Do bootloader last, because it's the most dangerous
   ${If} $windows_boot_method == ntldr
-    ${Unless} ${FileExists} "$boot_ini"
-      MessageBox MB_OK|MB_ICONSTOP $(boot_ini_not_found)
-      Quit
-    ${Endif}
+    Var /GLOBAL boot_ini
+
+    ; boot.ini is in the "System partition" (see http://en.wikipedia.org/wiki/System_partition_and_boot_partition)
+    ;
+    ; We have no idea where that could be, so we just probe everything.
+    ; This is REALLY ugly, but do we have a better way?
+
+    StrCpy $boot_ini "$c\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "c:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "d:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "e:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "f:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "g:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "h:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "i:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "j:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "k:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "l:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "m:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "n:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "o:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "p:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "q:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "r:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "s:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "t:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "u:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "v:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "w:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "x:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "y:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+    StrCpy $boot_ini "z:\boot.ini"
+    IfFileExists "$boot_ini" found_boot_ini
+
+    MessageBox MB_OK|MB_ICONSTOP $(boot_ini_not_found)
+    Quit
+found_boot_ini:
+
 !ifdef NETWORK_BASE_URL
     Push "false"
     Push "g2ldr"
