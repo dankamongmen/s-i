@@ -125,7 +125,7 @@ main (int argc, char **argv)
   langstring ("registering_ntldr",		_("Registering Debian-Installer in NTLDR"));
   langstring ("registering_bootmgr",		_("Registering Debian-Installer in BootMgr"));
   langstring ("error_bcdedit_extract_id",	_("Error: failed to parse bcdedit.exe output."));
-  langstring ("boot_ini_not_found",		_("Error: $boot_ini not found.  Is this really Windows $windows_version?"));
+  langstring ("boot_ini_not_found",		_("Error: boot.ini not found.  Is this really Windows $windows_version?"));
   langstring ("warning1",			_("VERY IMPORTANT NOTICE:\\n\\n"));
 /*
   translate:
