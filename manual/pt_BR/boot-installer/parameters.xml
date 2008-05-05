@@ -1,7 +1,7 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 49849 -->
+<!-- original version: 52727 -->
 <!-- revised by Felipe Augusto van de Wiel (faw) 2007.07.28 -->
-<!-- updated 48421:49849 by Felipe Augusto van de Wiel (faw) 2008.02.06 -->
+<!-- updated 48421:52727 by Felipe Augusto van de Wiel (faw) 2008.05.04 -->
 
  <sect1 id="boot-parms"><title>Parâmetros de Inicialização</title>
 <para>
@@ -46,7 +46,6 @@ onde <replaceable>ram</replaceable> será ajustado para a quantidade de
 memória, seguindo os sufixos <quote>k</quote> para kilobytes, ou
 <quote>m</quote> para megabytes.
 <userinput>mem=64m</userinput> significa 64MB de RAM.
-
 
 </para><para condition="supports-serial-console">
 
@@ -109,7 +108,6 @@ serão mostradas.
 
 </para><para>
 
-
 A instalação padrão usa <userinput>priority=high</userinput>.
 Isto significa que ambas mensagens com prioridade <quote>high</quote> (alta) e
 <quote>critical</quote> (crítica) serão mostradas, mas não as de prioridade
@@ -117,7 +115,6 @@ média e baixa. Caso encontre problemas, o programa de instalação ajustará a
 prioridade conforme necessário.
 
 </para><para>
-
 
 Se adicionar <userinput>priority=medium</userinput> como parâmetro de
 inicialização, lhe será mostrado um menu de instalação e ganhará mais controle
@@ -130,6 +127,7 @@ mostrará somente mensagens críticas e tentará fazer a coisa certa sem bagunç
 
 </para></listitem>
 </varlistentry>
+
 
 <varlistentry>
 <term>DEBIAN_FRONTEND</term>
@@ -159,6 +157,7 @@ interface <userinput>gtk</userinput>.
 
 </para></listitem>
 </varlistentry>
+
 
 <varlistentry>
 <term>BOOT_DEBUG</term>
@@ -253,6 +252,7 @@ Tais problemas foram relatados no Amiga 1200 e SE/30.
 </para><para arch="hppa">
 
 Tais problemas foram relatados no hppa.
+
 </para><note arch="sparc"><para>
 
 Por causa de problemas de exibição em alguns sistemas, o suporte a
@@ -264,7 +264,6 @@ parâmetro <userinput>debian-installer/framebuffer=true</userinput> ou,
 de forma abreviada, <userinput>fb=true</userinput>.
 
 </para></note></listitem>
-
 </varlistentry>
 
 <varlistentry arch="not-s390">
@@ -311,8 +310,8 @@ notebooks apresentam este mal comportamento.
 </para></listitem>
 </varlistentry>
 
-<varlistentry>                                       
-<term>disk-detect/dmraid/enable (dmraid)</term>                        
+<varlistentry>
+<term>disk-detect/dmraid/enable (dmraid)</term>
 <listitem><para>
 
 Defina como <userinput>true</userinput> para habilitar o suporte a discos
@@ -360,7 +359,7 @@ para detalhes.
 </varlistentry>
 
 <varlistentry>
-<term>auto-install/enable (auto)</term> 
+<term>auto-install/enable (auto)</term>
 <listitem><para>
 
 Atrasar perguntas que normalmente são feitas antes da pré-configuração é
@@ -412,6 +411,42 @@ Este parâmetro deveria já estar definido para um valor correto onde for
 necessário; defina-o apenas se você estiver vendo erros durante a
 inicialização que indicam que o ramdisk não pode ser completamente
 carregado. O valor é em kB.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/protocol</term>
+<listitem><para>
+
+Para a interface gtk (instalador gráfico), usuários podem configurar
+o protocolo do mouse a ser usado definindo este parâmetro.
+Os valores aceitos são<footnote>
+
+<para>
+Veja a página man para
+<citerefentry><refentrytitle>directfbrc</refentrytitle>
+<manvolnum>5</manvolnum></citerefentry> para informações adicionais.
+</para>
+
+</footnote>:
+<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
+<userinput>MS</userinput>, <userinput>MS3</userinput>,
+<userinput>MouseMan</userinput> e <userinput>MouseSystems</userinput>.
+Na maioria dos casos o protocolo padrão (<quote>default</quote> deveria
+funcionar corretamente.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/device</term>
+<listitem><para>
+
+Para a interface gtk (instalador gráfico), usuários podem especificar o
+dispositivo de mouse a ser usado definindo este parâmetro. Isto é útil se
+o mouse está conectado a uma porta serial (mouse serial). Exemplo:
+<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
 
 </para></listitem>
 </varlistentry>

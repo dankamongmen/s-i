@@ -1,7 +1,8 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52821  -->
+<!-- original version: 52911  -->
 <!-- updated 48960:49321 by Felipe Augusto van de Wiel (faw) 2007.10.07 -->
 <!-- updated 49321:52424 by Felipe Augusto van de Wiel (faw) 2008.04.12 -->
+<!-- updated 52821:52911 by Felipe Augusto van de Wiel (faw) 2008.05.04 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -628,6 +629,14 @@ pré-configuração.
   da pergunta; um lugar ruim é entre o tipo e o valor.
 </para></listitem>
 <listitem><para>
+  Para variáveis debconf (modelos) usadas no próprio instalador, o dono
+  deverá ser configurado como <quote>d-i</quote>; para pré-configurar
+  variáveis usadas no sistema instalado, o nome do pacote que contém o
+  modelo debconf correspondente deverá ser usado. Somente variáveis que
+  tem o dono configurado para algo diferente de <quote>d-i</quote> serão
+  propagadas para o banco de dados debconf do sistemas instalado.
+</para></listitem>
+<listitem><para>
   A maioria das questões precisa ser pré-configurada usando os valores válidos
   em inglês e não os valores traduzidos. No entanto, há algumas questões (por
   exemplo em <classname>partman</classname>) onde os valores traduzidos precisam
@@ -702,7 +711,8 @@ fazer uma instalação, você pode usar o comando
 
 
  <sect1 id="preseed-contents">
- <title>Conteúdo do arquivo de pré-configuração</title>
+ <title>Conteúdo do arquivo de pré-configuração (para &releasename;)</title>
+
 <para>
 
 Os fragmentos de configuração usados neste apêndice estão também disponíveis
@@ -795,11 +805,15 @@ para contornar esta situação, por exemplo, se você gostaria de definir um
 endereço estático para a interface de rede. O <quote>hack</quote> é forçar a
 configuração de rede a ser realizada novamente após o arquivo de
 pré-configuração já ter sido carregado, isto é feito através da criação do
-script <quote>preseed/run</quote> contendo as seguintes linhas:
+script <quote>preseed/run</quote> contendo os seguintes comandos:
 
 <informalexample><screen>
 killall.sh; netcfg
 </screen></informalexample>
+
+</para><para>
+
+As seguintes variáveis debconf são relevantes para configuração de rede.
 
 </para>
 
@@ -1156,7 +1170,7 @@ chave SSH ou <command>sudo</command>).
 
 </para><para>
 
-Um hash MD5 para senha pode ser gerado com o seguinte comando.
+O seguinte comando pode ser usado para gerar um hash MD5 para uma senha:
 
 <informalexample><screen>
 $ echo "r00tme" | mkpasswd -s -m md5
@@ -1312,8 +1326,21 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # To install grub to multiple disks:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Optional password for grub, either in clear text
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# or encrypted using an MD5 hash, see grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
+<para>
+
+Um hash MD5 para uma senha para o <classname>grub</classname> pode ser
+gerado usando <command>grub-md5-crypt</command>, ou usando o comando a
+partir do exemplo em <xref linkend="preseed-account"/>.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-finish">
