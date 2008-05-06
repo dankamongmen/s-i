@@ -1148,7 +1148,7 @@ newt_can_cancel_progress(struct frontend *obj)
 }
 
 static bool
-newt_can_align(struct frontend *obj)
+newt_can_align(struct frontend *obj, struct question *q)
 {
     return (obj->capability & DCF_CAPB_ALIGN);
 }

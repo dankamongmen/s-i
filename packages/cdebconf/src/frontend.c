@@ -108,7 +108,7 @@ static bool frontend_can_cancel_progress(struct frontend *ui)
 	return false;
 }
 
-static bool frontend_can_align(struct frontend *ui)
+static bool frontend_can_align(struct frontend *ui, struct question *q)
 {
 	return false;
 }
