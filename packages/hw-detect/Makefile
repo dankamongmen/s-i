@@ -57,8 +57,6 @@ else
 	$(INSTALL) detect-stub.sh $(bindir)/hw-detect
 endif
 
-install-disk-detect:
-
 install-ethdetect: ethdetect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) ethdetect.sh $(bindir)/ethdetect
