@@ -48,12 +48,10 @@ auth_post () {
 	fi
 
 	if [ -e "$POSTSPOOL/auth.handler/nis" ]; then
-		sed '/^\(passwd\|group\|shadow\):/s/$/ nis/;
+		sed -i '/^\(passwd\|group\|shadow\):/s/$/ nis/;
 			/^hosts:/s/files/files nis/;
 			/^\(protocols\|services\):/s/$/ nis/' \
-			< /target/etc/nsswitch.conf \
-			> /target/etc/nsswitch.conf.new
-		mv /target/etc/nsswitch.conf.new /target/etc/nsswitch.conf
+			/target/etc/nsswitch.conf
 		apt-install nis || true
 	fi
 
