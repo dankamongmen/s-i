@@ -162,23 +162,29 @@ static void refresh_progress_bar(struct entropy * entropy_data)
     gdk_threads_leave();
 }
 
-static gboolean move_byte(struct entropy * entropy_data)
+static gboolean move_bytes(struct entropy * entropy_data)
 {
     gssize n;
 
-    n = read(entropy_data->random_fd, &entropy_data->random_byte,
-             sizeof (guint8));
-    if (1 > n) {
-        g_critical("read failed: %s", strerror(errno));
-        return FALSE;
+    while (entropy_data->bytes_read < entropy_data->keysize) {
+        n = read(entropy_data->random_fd, &entropy_data->random_byte,
+                 sizeof (guint8));
+        if (1 > n) {
+            if (EAGAIN == errno) {
+                break;
+            }
+            g_critical("read failed: %s", strerror(errno));
+            return FALSE;
+        }
+        n = write(entropy_data->fifo_fd, &entropy_data->random_byte,
+                  sizeof (guint8));
+        if (1 > n) {
+            g_critical("write failed: %s", strerror(errno));
+            return FALSE;
+        }
+        entropy_data->random_byte = 0;
+        entropy_data->bytes_read++;
     }
-    n = write(entropy_data->fifo_fd, &entropy_data->random_byte,
-              sizeof (guint8));
-    if (1 > n) {
-        g_critical("write failed: %s", strerror(errno));
-        return FALSE;
-    }
-    entropy_data->random_byte = 0;
     return TRUE;
 }
 
@@ -202,11 +208,10 @@ static void * gather_entropy(struct entropy * entropy_data)
             /* answer set by others, let's quit */
             return NULL;
         }
-        if (!move_byte(entropy_data)) {
+        if (!move_bytes(entropy_data)) {
             cdebconf_gtk_set_answer_notok(entropy_data->fe);
             return NULL;
         }
-        entropy_data->bytes_read++;
         refresh_progress_bar(entropy_data);
     }
     allow_continue(entropy_data);
@@ -259,7 +264,7 @@ static struct entropy * init_entropy(struct frontend * fe,
     if (NULL == entropy_data->success_template) {
         entropy_data->success_template = "debconf/entropy/success";
     }
-    entropy_data->random_fd = open("/dev/random", O_RDONLY);
+    entropy_data->random_fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
     if (-1 == entropy_data->random_fd) {
         g_critical("open random_fd failed: %s", strerror(errno));
         goto failed;
