@@ -505,13 +505,13 @@ int cdebconf_gtk_go(struct frontend * fe)
     question_box = create_question_box(fe, fe_data->target_box);
     /* Hide the target box while we create the questions to avoid flicker. */
     cdebconf_gtk_hide_target_box(fe);
+    if (CAN_GO_BACK(fe)) {
+        create_goback_button(fe);
+    }
     if (!call_question_handlers(fe, question_box)) {
         /* an handler was missing */
         cdebconf_gtk_set_answer(fe, DC_NOTIMPL);
         goto end;
-    }
-    if (CAN_GO_BACK(fe)) {
-        create_goback_button(fe);
     }
     if (!is_action_box_filled(fe)) {
         create_default_buttons(fe);
