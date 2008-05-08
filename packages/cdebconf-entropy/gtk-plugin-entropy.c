@@ -51,7 +51,11 @@ static void handle_continue(GtkWidget * button, struct entropy * entropy_data)
 static gboolean add_help_text(struct entropy * entropy_data,
                               GtkWidget * container)
 {
-    GtkWidget * label;
+    GtkWidget * view;
+    GtkTextBuffer * buffer;
+    GtkTextIter start;
+    GtkTextIter end;
+    GtkStyle * style;
     char * help_text;
 
     help_text = cdebconf_gtk_get_text(
@@ -59,14 +63,28 @@ static gboolean add_help_text(struct entropy * entropy_data,
         "You can help speed up the process by entering random characters on "
         "the keyboard or by moving the mouse randomly, or just wait until "
         "enough key data has been collected (which can take a long time).");
-    label = gtk_label_new(help_text);
+    /* XXX: check NULL! */
+    view = gtk_text_view_new();
+    /* XXX: check NULL! */
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+    gtk_text_buffer_set_text(buffer, help_text, -1 /* until '\0' */);
     g_free(help_text);
-
-    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-    gtk_misc_set_alignment(GTK_MISC(label), 0 /* left */, 0 /* top */);
-    gtk_box_pack_start(GTK_BOX(container), label, FALSE /* no expand */,
-                       TRUE /* fill */, DEFAULT_PADDING);
-
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(view), FALSE);
+    gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(view), FALSE);
+    gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(view), GTK_WRAP_WORD_CHAR);
+    gtk_text_view_set_left_margin(GTK_TEXT_VIEW(view), DEFAULT_PADDING);
+    gtk_text_view_set_right_margin(GTK_TEXT_VIEW(view), DEFAULT_PADDING);
+    gtk_text_buffer_create_tag(buffer, "italic", "style",
+                               PANGO_STYLE_ITALIC, NULL);
+    gtk_text_buffer_get_start_iter(buffer, &start);
+    gtk_text_buffer_get_end_iter(buffer, &end);
+    gtk_text_buffer_apply_tag_by_name(buffer, "italic", &start, &end);
+    style = gtk_widget_get_style(
+        gtk_widget_get_toplevel(entropy_data->continue_button));
+    gtk_widget_modify_base(view, GTK_STATE_NORMAL, style->bg);
+    gtk_box_pack_start(GTK_BOX(container), view,
+                       FALSE /* don't expand */, FALSE /* don't fill */,
+                       DEFAULT_PADDING);
     return TRUE;
 }
 
