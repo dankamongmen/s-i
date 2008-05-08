@@ -223,6 +223,7 @@ static gboolean move_bytes(struct entropy * entropy_data)
 static void allow_continue(struct entropy * entropy_data)
 {
     gdk_threads_enter();
+    gtk_widget_set_sensitive(entropy_data->entry, FALSE);
     gtk_widget_set_sensitive(entropy_data->continue_button, TRUE);
     gdk_threads_leave();
 }
