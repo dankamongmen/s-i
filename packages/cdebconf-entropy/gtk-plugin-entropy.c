@@ -192,6 +192,7 @@ static void allow_continue(struct entropy * entropy_data)
 {
     gchar * label;
 
+    gdk_threads_enter();
     label = cdebconf_gtk_get_text(
         entropy_data->fe, entropy_data->success_template,
         "Key data has been created successfully.");
@@ -199,6 +200,7 @@ static void allow_continue(struct entropy * entropy_data)
         GTK_PROGRESS_BAR(entropy_data->progress_bar), label);
     g_free(label);
     gtk_widget_set_sensitive(entropy_data->continue_button, TRUE);
+    gdk_threads_leave();
 }
 
 static void * gather_entropy(struct entropy * entropy_data)
