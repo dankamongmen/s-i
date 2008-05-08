@@ -240,6 +240,8 @@ static void * gather_entropy(struct entropy * entropy_data)
             return NULL;
         }
         refresh_progress_bar(entropy_data);
+        /* Reset text entry to prevent overflow. */
+        gtk_entry_set_text(GTK_ENTRY(entropy_data->entry), "");
     }
     allow_continue(entropy_data);
     return NULL /* no one cares */;
