@@ -172,12 +172,26 @@ static GtkWidget * create_entropy_widget(struct entropy * entropy_data)
 
 static void refresh_progress_bar(struct entropy * entropy_data)
 {
+    gdouble fraction;
+    gchar * label;
+
+    fraction = (gdouble) entropy_data->bytes_read /
+               (gdouble) entropy_data->keysize;
+    if (1.0 <= fraction) {
+        label = cdebconf_gtk_get_text(
+            entropy_data->fe, entropy_data->success_template,
+            "Key data has been created successfully.");
+    } else {
+        label = g_strdup_printf("%2.0f%%", fraction * 100.0);
+    }
     gdk_threads_enter();
     gtk_progress_bar_set_fraction(
         GTK_PROGRESS_BAR(entropy_data->progress_bar),
-        (gdouble) entropy_data->bytes_read /
-        (gdouble) entropy_data->keysize);
+        fraction);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(entropy_data->progress_bar),
+                              label);
     gdk_threads_leave();
+    g_free(label);
 }
 
 static gboolean move_bytes(struct entropy * entropy_data)
@@ -208,15 +222,7 @@ static gboolean move_bytes(struct entropy * entropy_data)
 
 static void allow_continue(struct entropy * entropy_data)
 {
-    gchar * label;
-
     gdk_threads_enter();
-    label = cdebconf_gtk_get_text(
-        entropy_data->fe, entropy_data->success_template,
-        "Key data has been created successfully.");
-    gtk_progress_bar_set_text(
-        GTK_PROGRESS_BAR(entropy_data->progress_bar), label);
-    g_free(label);
     gtk_widget_set_sensitive(entropy_data->continue_button, TRUE);
     gdk_threads_leave();
 }
