@@ -15,7 +15,8 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 files = \
-	S62directfb-hw-accel
+	S62directfb-hw-accel \
+	S62directfb-cairo-workaround
 
 files_exec = \
 	S62directfb-mouse-settings
