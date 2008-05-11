@@ -43,6 +43,82 @@ struct entropy {
     GThread * gathering_thread;
 };
 
+static void destroy_entropy(struct entropy * entropy_data)
+{
+    if (NULL != entropy_data->gathering_thread) {
+        (void) g_thread_join(entropy_data->gathering_thread);
+    }
+    if (0 < entropy_data->fifo_fd) {
+        (void) close(entropy_data->fifo_fd);
+    }
+    if (NULL != entropy_data->fifo) {
+        (void) unlink(entropy_data->fifo);
+    }
+    if (0 < entropy_data->random_fd) {
+        (void) close(entropy_data->random_fd);
+    }
+    (void) munlock(&entropy_data->random_byte, sizeof (guint8));
+    if (NULL != entropy_data->progress_bar) {
+        g_object_unref(G_OBJECT(entropy_data->progress_bar));
+    }
+    if (NULL != entropy_data->entry) {
+        g_object_unref(G_OBJECT(entropy_data->entry));
+    }
+    if (NULL != entropy_data->continue_button) {
+        g_object_unref(G_OBJECT(entropy_data->continue_button));
+    }
+    g_free(entropy_data);
+}
+
+static struct entropy * init_entropy(struct frontend * fe,
+                                     struct question * question)
+{
+    struct entropy * entropy_data;
+
+    if (NULL == (entropy_data = g_malloc0(sizeof (struct entropy)))) {
+        g_critical("g_malloc0 failed.");
+        return NULL;
+    }
+    entropy_data->fe = fe;
+    if (-1 == mlock(&entropy_data->random_byte, sizeof (guint8))) {
+        g_critical("mlock failed: %s", strerror(errno));
+        goto failed;
+    }
+    entropy_data->success_template = question_get_variable(
+        question, "SUCCESS");
+    if (NULL == entropy_data->success_template) {
+        entropy_data->success_template = "debconf/entropy/success";
+    }
+    entropy_data->random_fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
+    if (-1 == entropy_data->random_fd) {
+        g_critical("open random_fd failed: %s", strerror(errno));
+        goto failed;
+    }
+    entropy_data->fifo = question_get_variable(question, "FIFO");
+    if (NULL == entropy_data->fifo) {
+        entropy_data->fifo = FIFO;
+    }
+    if (-1 == mkfifo(entropy_data->fifo, 0600)) {
+        g_critical("mkfifo failed: %s", strerror(errno));
+        goto failed;
+    }
+    entropy_data->fifo_fd = open(entropy_data->fifo, O_WRONLY);
+    if (-1 == entropy_data->fifo_fd) {
+        g_critical("open fifo_fd failed: %s", strerror(errno));
+        goto failed;
+    }
+    return entropy_data;
+
+failed:
+    destroy_entropy(entropy_data);
+    return NULL;
+}
+
+static void cleanup(GtkWidget * widget, struct entropy * entropy_data)
+{
+    destroy_entropy(entropy_data);
+}
+
 static void handle_continue(GtkWidget * button, struct entropy * entropy_data)
 {
     cdebconf_gtk_set_answer_ok(entropy_data->fe);
@@ -167,6 +243,8 @@ static GtkWidget * create_entropy_widget(struct entropy * entropy_data)
     g_object_ref(G_OBJECT(entry));
     entropy_data->entry = entry;
 
+    g_signal_connect(vbox, "destroy", G_CALLBACK(cleanup), entropy_data);
+
     return vbox;
 }
 
@@ -247,82 +325,6 @@ static void * gather_entropy(struct entropy * entropy_data)
     return NULL /* no one cares */;
 }
 
-static void destroy_entropy(struct entropy * entropy_data)
-{
-    if (NULL != entropy_data->gathering_thread) {
-        (void) g_thread_join(entropy_data->gathering_thread);
-    }
-    if (0 < entropy_data->fifo_fd) {
-        (void) close(entropy_data->fifo_fd);
-    }
-    if (NULL != entropy_data->fifo) {
-        (void) unlink(entropy_data->fifo);
-    }
-    if (0 < entropy_data->random_fd) {
-        (void) close(entropy_data->random_fd);
-    }
-    (void) munlock(&entropy_data->random_byte, sizeof (guint8));
-    if (NULL != entropy_data->progress_bar) {
-        g_object_unref(G_OBJECT(entropy_data->progress_bar));
-    }
-    if (NULL != entropy_data->entry) {
-        g_object_unref(G_OBJECT(entropy_data->entry));
-    }
-    if (NULL != entropy_data->continue_button) {
-        g_object_unref(G_OBJECT(entropy_data->continue_button));
-    }
-    g_free(entropy_data);
-}
-
-static struct entropy * init_entropy(struct frontend * fe,
-                                     struct question * question)
-{
-    struct entropy * entropy_data;
-
-    if (NULL == (entropy_data = g_malloc0(sizeof (struct entropy)))) {
-        g_critical("g_malloc0 failed.");
-        return NULL;
-    }
-    entropy_data->fe = fe;
-    if (-1 == mlock(&entropy_data->random_byte, sizeof (guint8))) {
-        g_critical("mlock failed: %s", strerror(errno));
-        goto failed;
-    }
-    entropy_data->success_template = question_get_variable(
-        question, "SUCCESS");
-    if (NULL == entropy_data->success_template) {
-        entropy_data->success_template = "debconf/entropy/success";
-    }
-    entropy_data->random_fd = open("/dev/random", O_RDONLY | O_NONBLOCK);
-    if (-1 == entropy_data->random_fd) {
-        g_critical("open random_fd failed: %s", strerror(errno));
-        goto failed;
-    }
-    entropy_data->fifo = question_get_variable(question, "FIFO");
-    if (NULL == entropy_data->fifo) {
-        entropy_data->fifo = FIFO;
-    }
-    if (-1 == mkfifo(entropy_data->fifo, 0600)) {
-        g_critical("mkfifo failed: %s", strerror(errno));
-        goto failed;
-    }
-    entropy_data->fifo_fd = open(entropy_data->fifo, O_WRONLY);
-    if (-1 == entropy_data->fifo_fd) {
-        g_critical("open fifo_fd failed: %s", strerror(errno));
-        goto failed;
-    }
-    return entropy_data;
-
-failed:
-    destroy_entropy(entropy_data);
-    return NULL;
-}
-
-static void cleanup(struct question * question, struct entropy * entropy_data)
-{
-    destroy_entropy(entropy_data);
-}
-
 static gboolean set_keysize(struct entropy * entropy_data,
                             struct question * question) {
     const char * keysize_string;
@@ -344,6 +346,12 @@ static gboolean set_keysize(struct entropy * entropy_data,
         return FALSE;
     }
     return TRUE;
+}
+
+static void set_nothing(struct question * question, void * dummy)
+{
+    /* entropy questions do not put anything in the database */
+    return;
 }
 
 int cdebconf_gtk_handler_entropy(struct frontend * fe,
@@ -382,8 +390,8 @@ int cdebconf_gtk_handler_entropy(struct frontend * fe,
 
     gtk_widget_grab_focus(entropy_data->entry);
 
-    cdebconf_gtk_register_setter(fe, SETTER_FUNCTION(cleanup), question,
-                                 entropy_data);
+    cdebconf_gtk_register_setter(fe, SETTER_FUNCTION(set_nothing), question,
+                                 NULL);
 
     return DC_OK;
 
