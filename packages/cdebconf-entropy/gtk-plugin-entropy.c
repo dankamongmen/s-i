@@ -38,21 +38,22 @@ struct entropy {
     const char * success_template;
     guint64 bytes_read;
     int random_fd;
+    GIOChannel * random_channel;
+    guint random_source_id;
     int fifo_fd;
     guint8 random_byte;
-    GThread * gathering_thread;
 };
 
 static void destroy_entropy(struct entropy * entropy_data)
 {
-    if (NULL != entropy_data->gathering_thread) {
-        (void) g_thread_join(entropy_data->gathering_thread);
-    }
     if (0 < entropy_data->fifo_fd) {
         (void) close(entropy_data->fifo_fd);
     }
     if (NULL != entropy_data->fifo) {
         (void) unlink(entropy_data->fifo);
+    }
+    if (NULL == entropy_data->random_channel) {
+        g_io_channel_unref(entropy_data->random_channel);
     }
     if (0 < entropy_data->random_fd) {
         (void) close(entropy_data->random_fd);
@@ -94,6 +95,11 @@ static struct entropy * init_entropy(struct frontend * fe,
         g_critical("open random_fd failed: %s", strerror(errno));
         goto failed;
     }
+    entropy_data->random_channel = g_io_channel_unix_new(entropy_data->random_fd);
+    if (NULL == entropy_data->random_channel) {
+        g_critical("g_io_channel_unix_new failed.");
+        goto failed;
+    }
     entropy_data->fifo = question_get_variable(question, "FIFO");
     if (NULL == entropy_data->fifo) {
         entropy_data->fifo = FIFO;
@@ -116,6 +122,9 @@ failed:
 
 static void cleanup(GtkWidget * widget, struct entropy * entropy_data)
 {
+    if (0 != entropy_data->random_source_id) {
+        g_source_remove(entropy_data->random_source_id);
+    }
     destroy_entropy(entropy_data);
 }
 
@@ -306,23 +315,34 @@ static void allow_continue(struct entropy * entropy_data)
     gdk_threads_leave();
 }
 
-static void * gather_entropy(struct entropy * entropy_data)
+static gboolean gather_entropy(GIOChannel *source, GIOCondition condition,
+                               struct entropy * entropy_data)
 {
-    while (entropy_data->bytes_read < entropy_data->keysize) {
-        if (DC_NO_ANSWER != cdebconf_gtk_get_answer(entropy_data->fe)) {
-            /* answer set by others, let's quit */
-            return NULL;
-        }
-        if (!move_bytes(entropy_data)) {
-            cdebconf_gtk_set_answer_notok(entropy_data->fe);
-            return NULL;
-        }
-        refresh_progress_bar(entropy_data);
-        /* Reset text entry to prevent overflow. */
-        gtk_entry_set_text(GTK_ENTRY(entropy_data->entry), "");
+    if (DC_NO_ANSWER != cdebconf_gtk_get_answer(entropy_data->fe)) {
+        return FALSE;
     }
+    if (G_IO_ERR == (condition & G_IO_ERR)) {
+        return FALSE;
+    }
+    if (G_IO_IN != (condition & G_IO_IN)) {
+        /* Wait for some data. */
+	return TRUE;
+    }
+
+    if (!move_bytes(entropy_data)) {
+	cdebconf_gtk_set_answer_notok(entropy_data->fe);
+	return FALSE;
+    }
+    refresh_progress_bar(entropy_data);
+    /* Reset text entry to prevent overflow. */
+    gtk_entry_set_text(GTK_ENTRY(entropy_data->entry), "");
+
+    if (entropy_data->bytes_read < entropy_data->keysize) {
+	return TRUE;
+    }
+
     allow_continue(entropy_data);
-    return NULL /* no one cares */;
+    return FALSE;
 }
 
 static gboolean set_keysize(struct entropy * entropy_data,
@@ -378,13 +398,9 @@ int cdebconf_gtk_handler_entropy(struct frontend * fe,
         goto failed;
     }
 
-    entropy_data->gathering_thread = g_thread_create(
-        (GThreadFunc) gather_entropy, entropy_data,
-        TRUE /* joinable */, NULL /* no gerror */);
-    if (NULL == entropy_data->gathering_thread) {
-        g_critical("g_thread_create failed.");
-        goto failed;
-    }
+    entropy_data->random_source_id = g_io_add_watch(
+        entropy_data->random_channel, G_IO_IN | G_IO_ERR,
+        (GIOFunc) gather_entropy, entropy_data);
 
     cdebconf_gtk_add_common_layout(fe, question, question_box, widget);
 
