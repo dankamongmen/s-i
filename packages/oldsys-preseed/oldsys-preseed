@@ -130,7 +130,8 @@ case "`archdetect`" in
 	;;
 	arm*/orion5x)
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
-		if echo "$machine" | grep -q "^QNAP TS-109/TS-209"; then
+		if echo "$machine" | grep -q "^QNAP TS-109/TS-209" ||
+		   echo "$machine" | grep -q "^QNAP TS-409"; then
 			config=$(get_mtdblock "NAS Config")
 			if [ -z "$config" ]; then
 				log "Can't find MTD partition holding the config data"
