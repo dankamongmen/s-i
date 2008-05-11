@@ -176,41 +176,6 @@ case "`archdetect`" in
 			exit_unknown
 		fi
 	;;
-	mipsel/bcm947xx)
-		# Some BCM947xx devices use NVRAM to store their Linux
-		# configuration, some use a Linux filesystem.  We only
-		# support the latter at the moment.
-		if [ 1 ]; then
-			check_file /proc/mtd
-			config=$(get_mtdblock "config")
-			if [ -z "$config" ]; then
-				log "Can't find MTD partition holding Linux config"
-				exit
-			fi
-			path=/tmp/oldsys-preseed
-			mkdir -p $path/mnt $path/lpr
-			mount -t minix -o ro /dev/$config $path/mnt
-			if [ ! -e $path/mnt/config.lrp ]; then
-				log "config.lrp does not exist in $path/mnt"
-				umount $path/mnt
-				exit
-			fi
-			cd $path/lpr
-			tar -xzf $path/mnt/config.lrp
-			parse_unix_tree $path/lpr
-			parse_leaf_tree $path/lpr
-			parse_network_interfaces $path/lpr/etc/network/interfaces "vlan6"
-			if [ "$INTERFACE" = "vlan6" ]; then
-				INTERFACE=eth0
-			fi
-			DEFAULT_HOSTNAME="WGT634U"
-			umount $path/mnt
-			rm -rf $path/lpr
-			rmdir $path/mnt $path || true
-		else
-			parse_bcm947xx_nvram "$(nvram show)"
-		fi
-	;;
 	*)
 		exit_unknown
 	;;
