@@ -136,10 +136,7 @@ case "`archdetect`" in
 				exit
 			fi
 			path=/tmp/oldsys-preseed
-			mkdir -p $path/sda1 $path/config
-			mount -t ext2 -o ro /dev/$config $path/config
-			MAC=$(cat $path/config/ETH0.MAC_ADDR)
-			umount $path/config
+			mkdir -p $path/sda1
 			mount -t ext2 -o ro /dev/sda1 $path/sda1 || true
 			INTERFACE=eth0
 			if [ -e $path/sda1/.config/uLinux.conf ]; then
@@ -174,7 +171,7 @@ case "`archdetect`" in
 				dhcp_fallback $FILE
 			fi
 			umount $path/sda1 || true
-			rmdir $path/config $path/sda1 $path || true
+			rmdir $path/sda1 $path || true
 		else
 			exit_unknown
 		fi
