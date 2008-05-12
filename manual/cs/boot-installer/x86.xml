@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 51739 -->
+<!-- original version: 53296 -->
 
   <sect2 arch="x86"><title>Zavedení z CD-ROM</title>
 
@@ -332,52 +332,102 @@ zavádět z TFTP.
    </sect3>
   </sect2>
 
-  <sect2 arch="x86"><title>Zaváděcí výzva</title>
+  <sect2 arch="x86" id="boot-screen">
+  <title>Zaváděcí obrazovka</title>
 <para>
 
 Při zavádění instalačního programu se objeví grafická obrazovka
-s logem Debianu, pod kterým se nachází tzv. zaváděcí výzva (boot
-prompt):
+s logem Debianu a nabídkou:
 
 <informalexample><screen>
-Press F1 for help, or ENTER to boot:
+Installer boot menu
+
+Install
+Graphical install
+Advanced options       >
+Help
+
+Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
 
-Zde se můžete porozhlédnout po nápovědě, která se skrývá pod klávesami
-<keycap>F1</keycap> až <keycap>F10</keycap>, nebo můžete stisknout
-&enterkey; a zavést systém s výchozími hodnotami.
+V závislosti na zvoleném způsobu instalace nemusí být dostupná
+možnost grafické instalace (<quote>Graphical install</quote>).
 
 </para><para>
 
-Pokud chcete zadat některé z parametrů, o kterých jste se dočetli
-v nápovědě pod klávesami <keycap>F3</keycap> až <keycap
-condition="etch">F8</keycap>,
-nezapomeňte na prvním místě zadat název jádra, které chcete zavést
-(implicitní je <userinput>install</userinput>). Celý řádek by tedy
-vypadal třeba takto: <userinput>install fb=false</userinput>.
-Jestliže stisknete pouze &enterkey;, je to stejné, jako kdyby jste
-zadali <userinput>install</userinput> bez dalších parametrů.
+Pro běžnou instalaci vyberte šipkami buď položku <quote>Install</quote>
+(instalace v textovém režimu), nebo <quote>Graphical install</quote>
+(instalace v grafickém režimu) a potvrďte klávesou &enterkey;. Na
+položku se také můžete dostat stiskem prvního zvýrazněného písmena.
+
+</para><para>
+
+Položka <quote>Advanced options</quote> otevře další nabídku, kde si
+můžete zvolit pokročilé způsoby instalace, jako je expertní režim,
+záchranný režim a automatizovaná instalace.
+
+</para><para>
+
+Pokud potřebujete jádru nebo instalačnímu systému předat nějaké
+zaváděcí parametry, stiskněte na zvolené položce klávesu &tabkey;.
+Zobrazí se výzva <prompt>boot:</prompt>, na které bude vypsán celý
+příkaz k zavedení instalace. Sem můžete přidat požadované parametry
+(nejběžnější parametry jsou zmíněny v nápovědě - viz níže). Ze
+zaváděcího řádku můžete zavést instalaci klávesou &enterkey;, případně
+se klávesou &escapekey; vrátit na úvodní obrazovku.
+
+</para><para>
+
+Položka <quote>Help</quote> zobrazí první obrazovku nápovědy se
+stručným přehledem nápovědných obrazovek. Zde se můžete porozhlédnout
+po nápovědě, která se skrývá pod klávesami <keycap>F1</keycap> až
+<keycap>F10</keycap>, nebo můžete stisknout &enterkey; a zavést systém
+s výchozími hodnotami. Pamatujte, že z nápovědy se nelze vrátit zpět
+do hlavní nabídky. Obrazovky F3 a F4 popisují příkazy, které jsou
+ekvivalentní položkám v menu. Tyto příkazy můžete zadat do příkazového
+řádku, který se nachází na každé nápovědné obrazovce:
+
+<informalexample><screen>
+<prompt>Press F1 for the help index, or ENTER to boot:</prompt>
+</screen></informalexample>
+
+Za příkazem pro zavedení instalace (výchozí je
+<userinput>install</userinput>) můžete zadat volitelné parametry,
+které jsou popsány v nápovědě. Celý řádek by tedy vypadal třeba
+takto: <userinput>install fb=false</userinput>. Jestliže stisknete
+pouze &enterkey;, je to stejné, jako kdyby jste zadali
+<userinput>install</userinput> bez dalších parametrů.
 
 <note><para>
 
-Instalujete-li systém přes zařízení pro vzdálenou správu, jež nabízí
-textové rozhraní k VGA konzoli (např. Compaq <quote>integrated Lights
-Out</quote> (iLO), HP <quote>Integrated Remote Assistant</quote>
-(IRA), ...), je možné že neuvidíte grafickou část obrazovky a někdy
-dokonce ani zaváděcí výzvu. Můžete se pokusit naslepo stisknout
-klávesu <keycap>F1</keycap><footnote><para>
+Klávesnice se nyní chová podle standardního rozložení americké
+angličtiny, což by v našich krajích neměl být problém, protože
+základní rozložení je až na prohozené Y/Z stejné, liší se pouze horní
+řada a pomocné znaky, které bývají na klávesnicích předtištěny v obou
+variantách. Horší to mají třeba Francouzi s jejich rozložením AZERTY
+&mdash; v takovém případě snad pomůže článek z Wikipedie zabývající se
+<ulink url="&url-us-keymap;">US rozložením</ulink>.
 
-Pro některá zařízení to znamená použít speciální sekvenci kláves,
-například IRA používá <keycombo> <keycap>Ctrl</keycap>
-<keycap>F</keycap> </keycombo>,&nbsp;<keycap>1</keycap>.
+</para></note><note><para>
 
-</para></footnote>
+Instalujete-li na systému, který má v BIOSu nastaveno použití sériové
+konzole, je možné že neuvidíte grafickou část obrazovky a někdy
+dokonce ani zaváděcí nabídku. To stejné vás může potkat v případech,
+kdy instalujete přes zařízení pro vzdálenou správu, jež nabízí textové
+rozhraní k VGA konzoli (např. Compaq <quote>integrated Lights
+Out</quote> (iLO), nebo HP <quote>Integrated Remote Assistant</quote>
+(IRA)).
 
-a přepnout se tak na (textovou) obrazovku s nápovědou. Zde by už mělo
-fungovat echo, tj. znaky, které na klávesnici napíšete, by měly být
-normálně vidět na řádku se zaváděcí výzvou. Chcete-li instalačnímu
-systému zakázat použití grafického framebufferu ve zbytku instalace,
-přidejte na řádek parametr <userinput>fb=false</userinput>.
+</para><para>
+
+Můžete se pokusit naslepo stisknout klávesu &escapekey;, a přepnout se
+na textovou zaváděcí výzvu, případně stisknout <quote>H</quote> a
+následně &enterkey;, což by vás mělo přepnout na (textovou) obrazovku
+s nápovědou popsanou výše. Zde by už mělo fungovat echo, tj. znaky,
+které na klávesnici napíšete, by měly být normálně vidět na řádku se
+zaváděcí výzvou. Chcete-li instalačnímu systému zakázat použití
+grafického framebufferu ve zbytku instalace, přidejte na řádek
+parametr <userinput>fb=false</userinput>.
 
 </para></note></para>
   </sect2>
