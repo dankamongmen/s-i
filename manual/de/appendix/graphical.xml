@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52910 -->
+<!-- original version: 53316 -->
 
  <sect1 condition="gtk" id="graphical">
  <title>Der Grafische Installer</title>
@@ -24,29 +24,29 @@ in einem Bild darstellen zu können.
 </para><para arch="x86">
 
 Der grafische Installer ist auf allen CD-Images und sowie bei der
-hd-media-Installationsmethode verfügbar. Da er eine separate initrd nutzt
-(die auch erheblich größer ist als beim normalen Installer), muss er mit
-<userinput>installgui</userinput> gebootet werden statt mit
-<userinput>install</userinput>. Analog dazu werden der Experten- und der
-Rettungs-Modus mit <userinput>expertgui</userinput> beziehungsweise
-<userinput>rescuegui</userinput> gebootet.
+hd-media-Installationsmethode verfügbar. Um den grafischen Installer zu
+booten, wählen Sie einfach die entsprechende Option aus dem Bootmenü.
+Den Experten- und Rettungsmodus des grafischen Installers können Sie im
+Menü unter <quote>Advanced options</quote> (erweiterte Optionen) starten.
+Die früher benötigten Boot-Kommandos (<userinput>installgui</userinput>,
+<userinput>expertgui</userinput> und <userinput>rescuegui</userinput>)
+können immer noch verwendet werden, wenn der Boot-Prompt angezeigt wird;
+dies ist der Fall, nachdem Sie die Option <quote>Help</quote> (Hilfe)
+aus dem Menü ausgewählt haben.
 
 </para><para arch="x86">
 
-Außerdem ist er auf einem speziellen <quote>mini</quote> ISO-Image
-erhältlich<footnote id="gtk-miniiso">
+Es gibt auch ein Image für den grafischen Installer, das per Netboot
+gestartet werden kann. Außerdem existiert noch ein spezielles
+<quote>mini</quote>-ISO-Image<footnote id="gtk-miniiso">
 
 <para>
 Das mini-ISO-Image kann von einem Debian-Spiegelserver heruntergeladen werden
 (wie in <xref linkend="downloading-files"/> beschrieben). Suchen Sie nach
 <filename>netboot/gtk/mini.iso</filename>.
-
-<quote>gtk-miniiso</quote>.
 </para>
 
-</footnote>, das hauptsächlich für Testzwecke verwendet wird; bei diesem Image
-wird einfach mit <userinput>install</userinput> gebootet. Es gibt kein Image
-mit grafischem Installer, dass per netboot gestartet werden kann.
+</footnote>, das hauptsächlich für Testzwecke verwendet wird.
 
 </para><para arch="powerpc">
 
@@ -64,6 +64,17 @@ funktionieren, wird aber wahrscheinlich auf anderen Systemen nicht laufen.
 
 </para><para>
 
+Wie auch bei dem normalen Installer ist es möglich, Boot-Parameter hinzuzufügen,
+wenn der grafische Installer gestartet wird. Einer dieser Parameter ermöglicht
+es, die Maus für Linkshänder zu konfigurieren. Mit einem anderen kann die
+Geräteschnittstelle für die Maus ausgewählt werden (z.B. für eine serielle
+Maus) sowie das Maus-Protokoll. Weitere gültige Parameter finden Sie in
+<xref linkend="boot-parms"/>. <phrase arch="x86"><xref linkend="boot-screen"/>
+gibt Informationen, wie Sie die Parameter dem Boot-Kommando hinzufügen</phrase>.
+
+</para>
+<note><para>
+
 Der grafische Installer benötigt erheblich mehr Arbeitsspeicher als der
 normale Installer, und zwar mindestens &minimum-memory-gtk;. Falls nicht
 genügend Speicher verfügbar ist, wird automatisch das normale
@@ -71,12 +82,13 @@ genügend Speicher verfügbar ist, wird automatisch das normale
 
 </para><para>
 
-Sie können zusätzliche Boot-Parameter angeben, wenn Sie den grafischen
-Installer starten, genauso wie beim normalen Installer. Ein solcher Parameter
-erlaubt es zum Beispiel, die Maus für Linkshänder zu konfigurieren.
-<xref linkend="boot-parms"/> gibt Infos über gültige Parameter.
+Wenn der installierte Arbeitsspeicher in Ihrem System kleiner als
+&minimum-memory; ist, könnte der Start des grafischen Installers
+fehlschlagen, wobei jedoch der reguläre Installer korrekt booten würde.
+Es wird empfohlen, auf Systemen mit wenig Arbeitsspeicher den regulären
+Installer zu verwenden.
 
-</para>
+</para></note>
 
   <sect2 id="gtk-using">
   <title>Den grafischen Installer verwenden</title>
@@ -118,20 +130,18 @@ wieder dorthin zurück zu gelangen.
   <title>Bekannte Probleme</title>
 <para>
 
-ETCH ist die erste &debian;-Veröffentlichung, die den grafischen Installer
-und damit eine relativ neue Technologie nutzt. Es gibt einige bekannte
-Probleme, auf die Sie während der Installation stoßen könnten. Wir gehen davon
-aus, diese bis zur nächsten &debian;-Version lösen zu können.
+Das grafische Frontend für den Installer ist noch relativ neu; deshalb gibt
+es einige, bereits bekannte Probleme. Wir arbeiten bereits daran, diese
+zu lösen.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
 
-Auf einigen Seiten sind die Texte nicht schön in Spalten formatiert, wie es
-eigentlich sein sollte. Das augenscheinlichste Beispiel hierfür ist der erste
-Bildschirm, auf dem Sie Ihre Sprache auswählen. Ein anderes ist der
-Hauptbildschirm von partman (dem Partitionierungsprogramm).
+Auf einigen Seiten sind die Texte noch nicht schön in Spalten formatiert, wie
+es eigentlich sein sollte. Dies ist überwiegend während der Partitionierung
+der Fall.
 
 </para></listitem>
 <listitem><para>
@@ -149,18 +159,9 @@ Die Unterstützung für Touchpads auf Laptops ist noch nicht optimal.
 </para></listitem>
 <listitem><para>
 
-Die Unterstützung für verschlüsselte Partitionen ist eingeschränkt, da es
-unmöglich ist, zufällige Schlüssel zu erzeugen. Es ist jedoch möglich, eine
-verschlüsselte Partition unter Verwendung einer Passphrase als Schlüssel
-einzurichten.
-
-</para></listitem>
-
-<listitem><para>
-
 Im grafischen Frontend ist es derzeit nicht möglich, eine Shell zu starten.
-Das bedeutet, dass der entsprechende Eintrag des Hauptmenüs im
-Installationssystem und im Rettungsmodus nicht angezeigt wird (während er
+Das bedeutet, dass der entsprechende Eintrag im Hauptmenü des
+Installationssystems und im Rettungsmodus nicht angezeigt wird (während er
 verfügbar ist, wenn Sie das normale textbasierte Frontend benutzen).
 Stattdessen müssen Sie (wie bereits vorher beschrieben) auf die
 virtuellen Konsolen VT2 und VT3 wechseln und dort die Shell benutzen.
