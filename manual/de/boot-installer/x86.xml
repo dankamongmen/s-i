@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 51739 -->
+<!-- original version: 53296 -->
 
   <sect2 arch="x86"><title>Von einer CD-ROM starten</title>
 
@@ -347,57 +347,108 @@ bietet Bootdisketten und sogar BootROMs an, die einen TFTP-Boot durchführen.
    </sect3>
   </sect2>
 
-  <sect2 arch="x86"><title>Der Boot-Prompt</title>
+  <sect2 arch="x86" id="boot-screen">
+  <title>Der Start-Bildschirm (Boot-Screen)</title>
 <para>
 
 Wenn der Installer startet, sollte Ihnen ein hübscher grafischer Bildschirm
-angezeigt werden mit dem Debian-Logo und dem Boot-Prompt:
+angezeigt werden mit dem Debian-Logo und einem Menü:
 
 <informalexample><screen>
-Press F1 for help, or ENTER to boot:
+Installer boot menu
+
+Install
+Graphical install
+Advanced options       >
+Help
+
+Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
 
-Drücken Sie am Boot-Prompt einfach &enterkey;, um den Installer mit den
-Standardoptionen zu starten, oder geben Sie eine andere Bootmethode an
-sowie optionale Bootparameter.
+Abhängig von der Installationsmethode, die Sie nutzen, ist der Menüeintrag
+<quote>Graphical install</quote> möglicherweise nicht vorhanden.
 
 </para><para>
 
-Informationen zu verfügbaren Bootmethoden und Bootparametern, die für
-Sie nützlich sein könnten, bekommen Sie, indem Sie die Tasten
-<keycap>F2</keycap> bis <keycap>F8</keycap> drücken. Sollten Sie irgendwelche
-Parameter am Boot-Prompt eingeben, denken Sie daran, die Bootmethode
-(Standard hierfür ist <userinput>install</userinput>) sowie ein nachfolgendes
-Leerzeichen vor den ersten Parameter zu stellen (z.B.
+Für eine normale Installation wählen Sie entweder <quote>Install</quote>
+oder <quote>Graphical install</quote> &ndash; Sie können die Pfeiltasten
+Ihrer Tastatur dazu verwenden oder den jeweils ersten (hervorgehobenen)
+Buchstaben &ndash; drücken Sie danach &enterkey;, um den Installer zu starten.
+
+</para><para>
+
+Der Menüeintrag <quote>Advanced options</quote> öffnet ein zweites Menü,
+über das Sie den Installer im Expertenmodus, im Rettungsmodus und im
+Modus für automatisierte Installationen starten können.
+
+</para><para>
+
+Wenn Sie irgendwelche Boot-Parameter hinzufügen möchten oder müssen
+(entweder für den Installer oder den Kernel), drücken Sie &tabkey;. Es wird
+dann das Standard-Boot-Kommando für den gewählten Menüeintrag angezeigt
+und Sie können zusätzliche Optionen hinzufügen. Der Hilfebildschirm (siehe
+unten) listet ein paar bekannte, mögliche Optionen auf. Drücken Sie
+&enterkey;, um den Installer mit Ihren neuen Optionen zu booten; wenn
+Sie &escapekey; drücken, kommen Sie zurück zum Boot-Menü.
+
+</para><para>
+
+Der Menüeintrag <quote>Help</quote> bringt Sie zum den ersten Hilfebildschirm,
+der eine Übersicht über die verfügbaren Hilfeseiten enthält. Beachten Sie,
+dass es nicht möglich ist, zum Boot-Menü zurückzugelangen, sobald die Hilfeseiten
+angezeigt werden. Allerdings sind auf den Hilfeseiten F3 und F4 Kommandos
+aufgelistet, die den Menüeinträgen im Boot-Menü entsprechen. Alle Hilfeseiten
+haben einen Boot-Prompt, in dem das Boot-Kommando eingetippt werden kann:
+
+<informalexample><screen>
+Press F1 for the help index, or ENTER to boot:
+</screen></informalexample>
+
+Sie können hier einfach &enterkey; drücken, um den Installer mit den
+Standardoptionen zu booten, oder Sie geben ein spezielles Boot-Kommando
+mit optionalen Parametern ein. Einige Boot-Parameter, die vielleicht
+nützlich sein könnten, finden Sie auf den verschiedenen Hilfeseiten.
+Falls Sie solche Parameter auf der Boot-Kommandozeile eingeben, stellen
+Sie sicher, dass Sie davor einen Befehl für die Boot-Methode eingeben
+(der Standard ist <userinput>install</userinput>) gefolgt von einem
+Leerzeichen, und erst danach den oder die Parameter (z.B.
 <userinput>install fb=false</userinput>).
 
 <note><para>
 
-Wenn Sie das System über ein Remote-Management-Gerät installieren, das
-Ihnen eine Textoberfläche auf der VGA-Konsole bereitstellt, könnte es sein,
-dass Sie den grafischen Einführungsbildschirm beim Booten des Installers
-nicht sehen; vielleicht sehen Sie nicht einmal einen Boot-Prompt.
-Dies kommt zum Beispiel bei den Textkonsolen von Compaq's
-<quote>integrated Lights Out</quote> (iLO) und HP's
-<quote>Integrated Remote Assistant</quote> (IRA) vor. Sie können hier blind
-<keycap>F1</keycap> drücken <footnote>
-
-<para>
-
-In einigen Fällen erfordern diese Geräte spezielle Tastensequenzen, um diese
-Tastatureingabe zu ermöglichen; der IRA z.B. nutzt <keycombo>
-<keycap>Ctrl</keycap> <keycap>F</keycap> </keycombo>,&nbsp;<keycap>1</keycap>.
- 
-</para>
-
-</footnote>, um diesen Bildschirm zu verlassen und zum Hilfetext zu gelangen.
-Sobald Sie einmal den Einführungsbildschirm hinter sich haben und die
-Hilfeseite sehen, werden Ihre Tastatureingaben wie erwartet am Prompt
-angezeigt. Um den Installer anzuweisen, für den Rest der Installation keinen
-Framebuffer mehr zu verwenden, geben Sie am Boot-Prompt
-<userinput>fb=false</userinput> ein, wie es auch im Hilfetext steht.
+Es wird zu diesem Zeitpunkt davon ausgegangen, dass Sie eine Tastatur
+mit Amerikanisch-englischem Layout verwenden. Falls Sie eine andere
+(länder-spezifische) Tastaturbelegung haben, könnte es sein, dass die
+Zeichen, die auf dem Bildschirm erscheinen, andere sind, als Sie aufgrund
+der Beschriftung der Tasten erwarten. Wikipedia enthält eine
+<ulink url="&url-us-keymap;">Darstellung der US-Tastaturbelegung</ulink>,
+die als Referenz verwendet werden kann, um die jeweils passenden Tasten zu
+finden.
 
 </para></note>
-</para>
+<note><para>
+
+Falls Sie ein System verwenden, dessen BIOS konfiguriert ist, eine serielle
+Konsole zu verwenden, können Sie möglicherweise den ersten grafischen
+Startbildschirm nicht sehen; vielleicht sehen Sie nicht einmal das Boot-Menü.
+Das Gleiche kann vorkommen, falls Sie über ein Remote-Management-Gerät
+installieren, das ein Text-Interface auf der VGA-Konsole bereitstellt.
+Beispiele für solche Geräte sind die Textkonsolen von Compaqs
+<quote>integrated Lights Out</quote> (iLO) und von HPs <quote>Integrated
+Remote Assistant</quote> (IRA).
+
+</para><para>
+
+Um den grafischen Startbildschirm zu umgehen, können Sie entweder blind
+&escapekey; drücken, um zu einem Text-Boot-Prompt zu gelangen, oder Sie
+drücken (ebenfalls blind) <quote>H</quote> gefolgt von &enterkey;, um den
+oben beschriebenen Hilfebildschirm anzuzeigen. Danach sollten die Tasten,
+die Sie drücken, am Boot-Prompt angezeigt werden. Um für den Rest der
+Installation zu verhindern, dass der Installer den Framebuffer benutzt,
+sollten Sie (zusätzlich zu Ihren Optionen) <userinput>fb=false</userinput>
+verwenden, wie im Hilfetext beschrieben.
+
+ </para></note>
+ </para>
 
   </sect2>
