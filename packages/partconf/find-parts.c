@@ -15,7 +15,6 @@
 #endif
 
 #include "partconf.h"
-#include <debian-installer.h>
 
 // If it's an LVM volume, it's on the form
 // /dev/<group>/<volume> and there's info in
