@@ -205,6 +205,7 @@ static GtkWidget * create_entropy_widget(struct entropy * entropy_data)
         g_critical("cdebconf_gtk_create_continue_button failed.");
         return NULL;
     }
+    GTK_WIDGET_UNSET_FLAGS(continue_button, GTK_CAN_FOCUS);
     gtk_widget_set_sensitive(continue_button, FALSE);
     g_signal_connect(continue_button, "clicked", G_CALLBACK(handle_continue),
                      entropy_data);
@@ -244,6 +245,7 @@ static GtkWidget * create_entropy_widget(struct entropy * entropy_data)
         g_critical("gtk_entry_new failed.");
         return NULL;
     }
+    GTK_WIDGET_SET_FLAGS(entry, GTK_CAN_DEFAULT);
     gtk_entry_set_visibility(GTK_ENTRY(entry), FALSE /* password style */);
     gtk_entry_set_activates_default(GTK_ENTRY(entry),
                                     TRUE /* activate on Enter */);
@@ -312,6 +314,8 @@ static void allow_continue(struct entropy * entropy_data)
     gdk_threads_enter();
     gtk_widget_set_sensitive(entropy_data->entry, FALSE);
     gtk_widget_set_sensitive(entropy_data->continue_button, TRUE);
+    GTK_WIDGET_SET_FLAGS(entropy_data->continue_button, GTK_CAN_FOCUS);
+    gtk_widget_grab_default(entropy_data->continue_button);
     gdk_threads_leave();
 }
 
@@ -405,6 +409,7 @@ int cdebconf_gtk_handler_entropy(struct frontend * fe,
     cdebconf_gtk_add_common_layout(fe, question, question_box, widget);
 
     gtk_widget_grab_focus(entropy_data->entry);
+    gtk_widget_grab_default(entropy_data->entry);
 
     cdebconf_gtk_register_setter(fe, SETTER_FUNCTION(set_nothing), question,
                                  NULL);
