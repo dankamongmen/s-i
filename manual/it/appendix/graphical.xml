@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52960 -->
+<!-- original version: 53316 -->
 
  <sect1 condition="gtk" id="graphical">
  <!-- <title>The Graphical Installer</title> -->
@@ -43,29 +43,34 @@ di un'unica schermata.
 
 <!--
 The graphical installer is available with all CD images and with the
-hd-media installation method. As the graphical installer uses a separate
-(much larger) initrd than the regular installer, it has to be booted using
-<userinput>installgui</userinput> instead of <userinput>install</userinput>.
-Analogous, the expert and rescue modes are booted using
-<userinput>expertgui</userinput> and <userinput>rescuegui</userinput>
-respectively.
+hd-media installation method. To boot the graphical installer simply select
+the relevant option from the boot menu. Expert and rescue mode for the
+graphical installer can be selected from the <quote>Advanced options</quote>
+menu. The previously used boot methods <userinput>installgui</userinput>,
+<userinput>expertgui</userinput> and <userinput>rescuegui</userinput> can
+still be used from the boot prompt which is shown after selecting the
+<quote>Help</quote> option in the boot menu.
 -->
 
 L'Installatore grafico è disponibile in tutte le immagini di CD e con il
-metodo d'installazione da disco fisso. L'installatore grafico usa un initrd
-diverso (molto più grande) dall'installatore tradizionale, e si avvia usando
-<userinput>installgui</userinput> al posto di <userinput>install</userinput>.
-In modo analogo le modalità esperto e ripristino si avviano rispettivamente
-con <userinput>expertgui</userinput> e <userinput>rescuegui</userinput>.
+metodo d'installazione da disco fisso. Per avviare l'installatore grafico
+è sufficiente scegliere la voce corrispondente nel menu di avvio. Le
+modalità esperto e di ripristino dell'installatore grafico si trovano nel
+menu <quote>Opzioni avanzate</quote>. È comunque ancora possibile usare i
+vecchi metodi di avvio <userinput>installgui</userinput>,
+<userinput>expertgui</userinput> e <userinput>rescuegui</userinput> dal
+prompt di avvio che appare dopo aver selezionato <quote>Aiuto</quote> nel
+menu di avvio.
 
 </para><para arch="x86">
 
 <!--
-It is also available as a special <quote>mini</quote> ISO
-image<footnote id="gtk-miniiso">
+There is also a graphical installer image that can be netbooted. And there
+is a special <quote>mini</quote> ISO image<footnote id="gtk-miniiso">
 -->
 
-Inoltre è disponibile un'immagine ISO speciale denominata
+Esiste anche una immagine dell'installatore grafico che può essere avviata
+da rete; inoltre è disponibile un'immagine ISO speciale denominata
 <quote>mini</quote><footnote id="gtk-miniiso">
 
 <para>
@@ -83,15 +88,10 @@ cerchi <filename>netboot/gtk/mini.iso</filename>.
 </para>
 
 <!--
-</footnote>, which is mainly useful for testing; in this case the image is
-booted just using <userinput>install</userinput>. There is no graphical
-installer image that can be netbooted.
+</footnote>, which is mainly useful for testing.
 -->
 
-</footnote>, che è particolarmente utile per i test; con questa immagine
-l'avvio avviene semplicemente usando <userinput>install</userinput>. Non
-esistono immagini dell'installatore grafico che possono essere avviate
-dalla rete.
+</footnote>, che è particolarmente utile per i test.
 
 </para><para arch="powerpc">
 
@@ -131,8 +131,9 @@ con scheda video ATI, ma è improbabile che funzioni su altri sistemi.
 Just as with the regular installer it is possible to add boot parameters
 when starting the graphical installer. One of those parameters allows to
 configure the mouse for left-handed use. Others allow to select the mouse
-device (e.g. for a serial mouse) and the mouse protocol.
-See <xref linkend="boot-parms"/> for valid parameters.
+device (e.g. for a serial mouse) and the mouse protocol. See
+<xref linkend="boot-parms"/> for valid parameters<phrase arch="x86"> and
+<xref linkend="boot-screen"/> for information on how to pass them</phrase>.
 -->
 
 Come per l'installatore tradizionale è possibile aggiungere dei parametri
@@ -140,7 +141,8 @@ d'avvio anche per l'installatore grafico. Uno di questi parametri permette
 di configurare l'uso del mouse con la mano sinistra; altri consentono di
 scegliere il device del mouse (per esempio con un mouse seriale) e il
 protocollo per il mouse. Si consulti <xref linkend="boot-parms"/> per
-conoscere quali sono i parametri validi.
+conoscere quali sono i parametri validi<phrase arch="x86"> e
+<xref linkend="boot-screen"/> per le informazioni su come passarli</phrase>.
 
 </para>
 <note><para>
@@ -238,16 +240,13 @@ eseguita sul VT5, quindi si deve usare <keycombo><keycap>Alt</keycap>
 <para>
 
 <!--
-Etch is the first release that includes the graphical installer and uses
-some relatively new technology. There are a few known issues that you may
-run into during the installation. We expect to be able to fix these issues
-for the next release of &debian;.
+The graphical frontend to the installer is relatively new and because of
+that there are some known issues. We continue to work on resolving these.
 -->
 
-Etch è la prima release che include l'installatore grafico il quale usa una
-tecnologia relativamente nuova. Ci sono alcuni problemi noti che potrebbero
-manifestarsi durante l'installazione. La correzione di questi problemi è
-prevista per la prossima release di &debian;.
+L'interfaccia grafica dell'installatore è relativamente nuova e per questo
+motivo ci sono dei problemi noti ancora non risolti. Stiamo lavorando alla
+loro risoluzione.
 
 </para>
 
@@ -255,14 +254,12 @@ prevista per la prossima release di &debian;.
 <listitem><para>
 
 <!--
-Information on some screens is not nicely formatted into columns as it
-should be. The most obvious example is the first screen where you select
-your language. Another example is the main screen of partman.
+Information on some screens is not yet nicely formatted into columns as it
+should be. This is most visible during partitioning.
 -->
 
-In alcune schermate le informazioni non sono ben formattate in colonne.
-L'esempio più evidente è la schermata dalla quale si può scegliere la
-lingua. Un altro esempio è la schermata principale di partman.
+In alcune schermate le informazioni non sono ancora ben formattate in
+colonne. Questo è particolarmente visibile durante il partizionamento.
 
 </para></listitem>
 <listitem><para>
@@ -286,20 +283,6 @@ Support for touchpads is not yet optimal.
 -->
 
 Il supporto per i touchpad non è ancora perfetto.
-
-</para></listitem>
-<listitem><para>
-
-<!--
-Support for creating encrypted partitions is limited as it is not possible
-to generate a random encryption key. It is possible to set up an encrypted
-partition using a passphrase as encryption key.
--->
-
-Il supporto per la creazione di partizioni cifrate è limitato: non è
-possibile creare una chiave di cifratura casuale, invece è possibile
-impostare una partizione cifrata con una passphrase come chiave di
-cifratura.
 
 </para></listitem>
 <listitem><para>
