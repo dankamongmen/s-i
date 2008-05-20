@@ -100,6 +100,9 @@ if ($newwrongmsgstrs >= 0) {
   $spellreport .= " (from $oldwrongmsgstrs)" if ($oldwrongmsgstrs >= 0);
   $spellreport .= "\n";
 }
+$spellreport .= "\n";
+$spellreport .= "Check http://d-i.alioth.debian.org/spellcheck/ for details\n";
+$spellreport .= "\n";
 
 
 # Display report if not empty
