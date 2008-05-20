@@ -195,69 +195,6 @@ to <command>tftpd</command> as the filename to boot.
 
 </para>
 
-   <sect3 arch="mipsel">
-   <title>DECstation TFTP Images</title>
-<para>
-
-For DECstations, there are tftpimage files for each subarchitecture,
-which contain both kernel and installer in one file. The naming
-convention is
-<filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>.
-Copy the tftpimage file you would like to use to
-<userinput>/tftpboot/tftpboot.img</userinput> if you work with the
-example BOOTP/DHCP setups described above.
-
-</para><para>
-
-The DECstation firmware boots by TFTP with the command <userinput>boot
-<replaceable>#</replaceable>/tftp</userinput>, where
-<replaceable>#</replaceable> is the number of the TurboChannel device
-from which to boot. On most DECstations this is <quote>3</quote>.  If the
-BOOTP/DHCP server does not supply the filename or you need to pass
-additional parameters, they can optionally be appended with the
-following syntax:
-
-</para><para>
-
-<userinput>boot #/tftp/filename param1=value1 param2=value2 ...</userinput>
-
-</para><para>
-
-Several DECstation firmware revisions show a problem with regard to
-net booting: the transfer starts, but after some time it stops with
-an <computeroutput>a.out err</computeroutput>. This can have several reasons:
-
-<orderedlist>
-<listitem><para>
-
-The firmware does not respond to ARP requests during a TFTP
-transfer. This leads to an ARP timeout and the transfer stops.  The
-solution is to add the MAC address of the Ethernet card in the
-DECstation statically to the ARP table of the TFTP server.  This is
-done by running <userinput>arp -s
-<replaceable>IP-address</replaceable>
-<replaceable>MAC-address</replaceable></userinput> as root on the
-machine acting as TFTP server. The MAC-address of the DECstation can
-be read out by entering <command>cnfg</command> at the DECstation
-firmware prompt.
-
-</para></listitem>
-<listitem><para>
-
-The firmware has a size limit on the files that can be booted
-by TFTP.
-
-</para></listitem>
-</orderedlist>
-
-There are also firmware revisions that cannot boot via TFTP at all. An
-overview about the different firmware revisions can be found at the
-NetBSD web pages:
-<ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
-
    <sect3 arch="alpha">
    <title>Alpha TFTP Booting</title>
 <para>
