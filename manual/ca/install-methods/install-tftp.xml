@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44002 -->
+<!-- original version: 53452 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparació dels fitxers per a l'arrencada en xarxa TFTP</title>
@@ -198,70 +198,6 @@ que el servidor dhcp està configurat per passar
 <command>tftpd</command> com a nom del fitxer d'arrencada.
 
 </para>
-
-   <sect3 arch="mipsel">
-   <title>Imatges de TFTP per a DECstation</title>
-<para>
-
-Per a DECstations, hi ha fitxers tftpimage de cada subarquitectura,
-els quals contenen el nucli i l'instal·lador en un únic fitxer. La
-convenció quant al nom és
-<filename><replaceable>subarquitectura</replaceable>/netboot-boot.img</filename>.
-Copieu el fitxer tftpimage que voleu fer servir a
-<userinput>/tftpboot/tftpboot.img</userinput> si esteu emprant els
-ajusts del BOOTP/DHCP dels exemples descrits amunt.
-
-</para><para>
-
-El firmware de les DECstation arrenca mitjançant el TFTP amb l'ordre
-<userinput>boot<replaceable>#</replaceable>/tftp</userinput>, on
-<replaceable>#</replaceable> és el número del dispositiu TurboChannel
-des del qual s'arrenca. En la majoria de DECstations és <quote>3</quote>.
-Si el servidor BOOTP/DHCP no proporciona el nom del fitxer o necessiteu
-passar-hi paràmetres addicionals, podeu afegir-los amb la següent
-sintaxi:
-
-</para><para>
-
-<userinput>boot #/tftp/nom-de-fitxer param1=valor1 param2=valor2 ...</userinput>
-
-</para><para>
-
-Nombroses revisions del firmware DECstation tenen un problema respecte
-de l'arrencada en xarxa: la transferència comença, però al cap d'una
-estona s'atura amb un <computeroutput>a.out err</computeroutput>. Això
-pot ser degut a:
-
-<orderedlist>
-<listitem><para>
-
-El firmware no respon a les peticions ARP durant la transferència TFTP,
-cosa que provoca un missatge d'acabament del temps de l'ARP i l'aturada
-de la transferència. La solució consisteix a afegir l'adreça MAC de la
-targeta Ethernet de la DECstation estàticament a la taula ARP del servidor
-TFTP. Això es fa executant <userinput>arp -s
-<replaceable>adreça-IP</replaceable>
-<replaceable>adreça-MAC</replaceable></userinput> com a superusuari a la
-màquina que fa de servidor TFTP. L'adreça MAC de la DECstation es pot
-obtenir introduint <command>cnfg</command> a l'indicador del firmware de
-la DECstation.
-
-</para></listitem>
-<listitem><para>
-
-El firmware té un límit de mida dels fitxers que poden arrencar-se
-mitjançant el TFTP.
-
-</para></listitem>
-</orderedlist>
-
-Hi ha també revisions del firmware revisions que no poden arrencar-se amb
-el TFTP. Podeu trobar informació sobre les diferents revisions del firmware
-a les pàgines web del NetBSD:
-<ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
 
    <sect3 arch="alpha">
    <title>Arrencada TFTP dels Alpha</title>
