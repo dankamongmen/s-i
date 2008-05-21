@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2008-03-28 00:09+0000\n"
+"POT-Creation-Date: 2008-05-21 00:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1065,53 +1065,23 @@ msgstr ""
 #. Tag: title
 #: install-methods.xml:1390
 #, no-c-format
-msgid "DECstation TFTP Images"
+msgid "Alpha TFTP Booting"
 msgstr ""
 
 #. Tag: para
 #: install-methods.xml:1391
 #, no-c-format
-msgid "For DECstations, there are tftpimage files for each subarchitecture, which contain both kernel and installer in one file. The naming convention is <filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>. Copy the tftpimage file you would like to use to <userinput>/tftpboot/tftpboot.img</userinput> if you work with the example BOOTP/DHCP setups described above."
-msgstr ""
-
-#. Tag: para
-#: install-methods.xml:1401
-#, no-c-format
-msgid "The DECstation firmware boots by TFTP with the command <userinput>boot <replaceable>#</replaceable>/tftp</userinput>, where <replaceable>#</replaceable> is the number of the TurboChannel device from which to boot. On most DECstations this is <quote>3</quote>. If the BOOTP/DHCP server does not supply the filename or you need to pass additional parameters, they can optionally be appended with the following syntax:"
-msgstr ""
-
-#. Tag: userinput
-#: install-methods.xml:1413
-#, no-c-format
-msgid "boot #/tftp/filename param1=value1 param2=value2 ..."
-msgstr ""
-
-#. Tag: para
-#: install-methods.xml:1415
-#, no-c-format
-msgid "Several DECstation firmware revisions show a problem with regard to net booting: the transfer starts, but after some time it stops with an <computeroutput>a.out err</computeroutput>. This can have several reasons: <orderedlist> <listitem><para> The firmware does not respond to ARP requests during a TFTP transfer. This leads to an ARP timeout and the transfer stops. The solution is to add the MAC address of the Ethernet card in the DECstation statically to the ARP table of the TFTP server. This is done by running <userinput>arp -s <replaceable>IP-address</replaceable> <replaceable>MAC-address</replaceable></userinput> as root on the machine acting as TFTP server. The MAC-address of the DECstation can be read out by entering <command>cnfg</command> at the DECstation firmware prompt. </para></listitem> <listitem><para> The firmware has a size limit on the files that can be booted by TFTP. </para></listitem> </orderedlist> There are also firmware revisions that cannot boot via TFTP at all. An overview about the different firmware revisions can be found at the NetBSD web pages: <ulink url=\"http://www.netbsd.org/Ports/pmax/board-list.html#proms\"></ulink>."
-msgstr ""
-
-#. Tag: title
-#: install-methods.xml:1453
-#, no-c-format
-msgid "Alpha TFTP Booting"
-msgstr ""
-
-#. Tag: para
-#: install-methods.xml:1454
-#, no-c-format
 msgid "On Alpha, you must specify the filename (as a relative path to the boot image directory) using the <userinput>-file</userinput> argument to the SRM <userinput>boot</userinput> command, or by setting the <userinput>BOOT_FILE</userinput> environment variable. Alternatively, the filename can be given via BOOTP (in ISC <command>dhcpd</command>, use the <userinput>filename</userinput> directive). Unlike Open Firmware, there is <emphasis>no default filename</emphasis> on SRM, so you <emphasis>must</emphasis> specify a filename by either one of these methods."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1469
+#: install-methods.xml:1406
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1470
+#: install-methods.xml:1407
 #, no-c-format
 msgid ""
       "Some SPARC architectures add the subarchitecture names, such as <quote>SUN4M</quote> or <quote>SUN4C</quote>, to the filename. Thus, if your system's subarchitecture is a SUN4C, and its IP is 192.168.1.3, the filename would be <filename>C0A80103.SUN4C</filename>. However, there are also subarchitectures where the file the client looks for is just <filename>client-ip-in-hex</filename>. An easy way to determine the hexadecimal code for the IP address is to enter the following command in a shell (assuming the machine's intended IP is 10.0.0.4). <informalexample><screen>\n"
@@ -1120,85 +1090,85 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1486
+#: install-methods.xml:1423
 #, no-c-format
 msgid "If you've done all this correctly, giving the command <userinput>boot net</userinput> from the OpenPROM should load the image. If the image cannot be found, try checking the logs on your tftp server to see which image name is being requested."
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1493
+#: install-methods.xml:1430
 #, no-c-format
 msgid "You can also force some sparc systems to look for a specific file name by adding it to the end of the OpenPROM boot command, such as <userinput>boot net my-sparc.image</userinput>. This must still reside in the directory that the TFTP server looks in."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1504
+#: install-methods.xml:1441
 #, no-c-format
 msgid "BVM/Motorola TFTP Booting"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1505
+#: install-methods.xml:1442
 #, no-c-format
 msgid "For BVM and Motorola VMEbus systems copy the files &bvme6000-tftp-files; to <filename>/tftpboot/</filename>."
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1510
+#: install-methods.xml:1447
 #, no-c-format
 msgid "Next, configure your boot ROMs or BOOTP server to initially load the <filename>tftplilo.bvme</filename> or <filename>tftplilo.mvme</filename> files from the TFTP server. Refer to the <filename>tftplilo.txt</filename> file for your subarchitecture for additional system-specific configuration information."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1522
+#: install-methods.xml:1459
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1523
+#: install-methods.xml:1460
 #, no-c-format
 msgid "On SGI machines you can rely on the <command>bootpd</command> to supply the name of the TFTP file. It is given either as the <userinput>bf=</userinput> in <filename>/etc/bootptab</filename> or as the <userinput>filename=</userinput> option in <filename>/etc/dhcpd.conf</filename>."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1535
+#: install-methods.xml:1472
 #, no-c-format
 msgid "Broadcom BCM91250A and BCM91480B TFTP Booting"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1536
+#: install-methods.xml:1473
 #, no-c-format
 msgid "You don't have to configure DHCP in a special way because you'll pass the full path of the file to be loaded to CFE."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1641
+#: install-methods.xml:1578
 #, no-c-format
 msgid "Automatic Installation"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1642
+#: install-methods.xml:1579
 #, no-c-format
 msgid "For installing on multiple computers it's possible to do fully automatic installations. Debian packages intended for this include <classname>fai</classname> (which uses an install server), <classname>replicator</classname>, <classname>systemimager</classname>, <classname>autoinstall</classname>, and the Debian Installer itself."
 msgstr ""
 
 #. Tag: title
-#: install-methods.xml:1655
+#: install-methods.xml:1592
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1656
+#: install-methods.xml:1593
 #, no-c-format
 msgid "The Debian Installer supports automating installs via preconfiguration files. A preconfiguration file can be loaded from the network or from removable media, and used to fill in answers to questions asked during the installation process."
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1663
+#: install-methods.xml:1600
 #, no-c-format
 msgid "Full documentation on preseeding including a working example that you can edit is in <xref linkend=\"appendix-preseed\"/>."
 msgstr ""
