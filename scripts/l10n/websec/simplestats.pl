@@ -101,7 +101,8 @@ if ($newwrongmsgstrs >= 0) {
   $spellreport .= "\n";
 }
 $spellreport .= "\n";
-$spellreport .= "Check http://d-i.alioth.debian.org/spellcheck/ for details\n";
+$spellreport .= "Check http://d-i.alioth.debian.org/l10n-stats/ to access D-I levels material\n";
+$spellreport .= "Check http://d-i.alioth.debian.org/spellcheck/ for details about spellchecker issues\n";
 $spellreport .= "\n";
 
 
