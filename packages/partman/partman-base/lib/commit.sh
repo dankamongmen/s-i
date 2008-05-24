@@ -51,6 +51,8 @@ confirm_changes () {
 				continue
 			}
 			filesystem=$(cat $id/visual_filesystem)
+
+			partdesc=""
 			# Special case d-m devices to use a different description
 			if cat device | grep -q "/dev/mapper" ; then
 				device=$(cat device)
