@@ -1,19 +1,17 @@
 protocol_fetch() {
 	local url="$1"
 	local file="$2"
-	iters=0
 
 	# use the proxy for wgets (should speed things up)
-	if db_get mirror/http/proxy; then
-		export http_proxy="$RET"
+	if db_get mirror/$proto/proxy; then
+		export ${proto}_proxy="$RET"
 	fi
 
-	while [ $iters -lt 3 ]; do
+	for i in 1 2 3; do
 		# TODO add progress bar
 		if wget -q "$url" -O "$file"; then
 			return 0
 		fi
-		iters=$(($iters + 1))
 	done
 	return 1
 }
