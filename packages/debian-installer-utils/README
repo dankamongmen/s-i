@@ -31,6 +31,29 @@ debconf-get: Prints out the value of a debconf question.
 
 debconf-set: Sets a debconf question to a value.
 
+fetch-url:   fetch-url [-c|-r] <url> <file>
+Grabs the url and puts it in the file.  It uses methods for each protocol
+that it finds in /usr/lib/fetch-url/ (this allows for new protocols
+to be added).  It returns 0 on success, 1 on failure.
+The options modify its behaviour thus (for those methods where they
+make sense -- ftp & http currently -- otherwise they're ignored):
+
+  -r	Retry.  For retryable errors on methods that are worth
+	retrying (i.e. http/ftp downloads), will repeat the download
+	attempt once.
+
+  -c	Continuation Retry.  Likewise, retries, but will attempt to
+	continue (i.e. with wget's -c) the download, and will try up
+	to 3 times after the initial attempt.
+	Only use this if you're downloading something that subsequently
+	gets checksummed, as rumour has it that busybox's wget is not
+	very bright when it comes to continuing partial downloads.
+
+  It's probably best not to combine these two options, as they're
+  currently implemented in nested loops, and the combination will retry
+  too many times, and alternate between full and continuation attempts
+  in a senseless manner.
+
 register-module: Register a module to go in /etc/modules on the target. May
 be called before the target is mounted. Can optionally pass parameters that
 should be passed to the module on load; these are added to the appropriate

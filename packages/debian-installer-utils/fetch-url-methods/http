@@ -1,0 +1,25 @@
+protocol_fetch() {
+	local url file RETVAL i j
+	url="$1"
+	file="$2"
+
+	# use the proxy for wgets (should speed things up)
+	if db_get mirror/$proto/proxy; then
+		export ${proto}_proxy="$RET"
+	fi
+
+	RETVAL=0
+	for i in 1 2; do
+		wget -q -O "$file" "$url" || RETVAL=$?
+		[ $RETVAL != 0 ] || return 0
+
+		if [ "$TRY_CONTINUE" ]; then
+			for j in 1 2 3; do
+				wget -c -q "$url" -O "$file" || RETVAL=$?
+				[ $RETVAL != 0 ] || return 0
+			done
+		fi
+		[ "$TRY_REPEAT" ] || break
+	done
+	return $RETVAL
+}
