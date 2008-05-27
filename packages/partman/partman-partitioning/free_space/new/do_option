@@ -125,10 +125,12 @@ ask_for_place () {
 }
 
 create_new_partition () {
+	# $type, $freeid, $place, and $size are global, passed down from
+	# elsewhere. TODO: these should really be function arguments.
 	open_dialog NEW_PARTITION $type ext2 $freeid $place $size
-	local num id size type fs path name mp mplist mpcurrent numparts device
+	local num id fs mp mplist mpcurrent numparts device
 	id=''
-	read_line num id size type fs path name
+	read_line num id x1 x2 x3 x4 x5
 	close_dialog
 
 	partitions=''
@@ -165,7 +167,7 @@ create_new_partition () {
 				[ -d $dev ] || continue
 				cd $dev
 				open_dialog PARTITIONS
-				while { read_line num id size type fs path name; [ "$id" ]; }; do
+				while { read_line num id x1 x2 fs x3 x4; [ "$id" ]; }; do
 					[ $fs != free ] || continue
 					[ -f "$id/method" ] || continue
 					[ -f "$id/acting_filesystem" ] || continue
