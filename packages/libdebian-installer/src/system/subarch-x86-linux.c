@@ -215,6 +215,7 @@ struct map {
 
 static struct map map_manufacturer[] = {
 	{ "Apple Computer, Inc.", "mac" },
+	{ "Apple Inc.", "mac" },
 	{ NULL, NULL }
 };
 
