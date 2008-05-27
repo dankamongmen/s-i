@@ -4,7 +4,9 @@ protocol_fetch() {
 	mountfloppy || true
 	touch /var/run/preseed-usedfloppy
 
-	if [ ! -e "$FILE" ] || ! cp "$FILE" $2; then
+	if [ ! -e "$FILE" ]; then
+		return 4
+	elif ! cp "$FILE" $2; then
 		return 1
 	else
 		return 0
