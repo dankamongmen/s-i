@@ -34,6 +34,11 @@ echo $fs >$dev/$id/filesystem
 
 if [ ! -d $dev/$id/options ]; then
 	mkdir $dev/$id/options
+	if [ -f /lib/partman/mountoptions/${fs}_defaults ]; then
+		for op in $(cat /lib/partman/mountoptions/${fs}_defaults); do
+			echo "$op" >"$dev/$id/options/$op"
+		done
+	fi
 fi
 
 update_partition $dev $id
