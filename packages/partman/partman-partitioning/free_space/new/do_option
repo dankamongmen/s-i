@@ -154,6 +154,11 @@ create_new_partition () {
 		>$id/use_filesystem
 		echo ext3 >$id/filesystem
 		mkdir -p $id/options
+		if [ -f /lib/partman/mountoptions/ext3_defaults ]; then
+			for op in $(cat /lib/partman/mountoptions/ext3_defaults); do
+				echo "$op" >"$id/options/$op"
+			done
+		fi
 		mplist='/ /home /usr /var /tmp /usr/local /opt /srv /boot'
 		mpcurrent=$(
 			for dev in $DEVICES/*; do
