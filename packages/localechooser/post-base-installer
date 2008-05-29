@@ -4,6 +4,33 @@ set -e
 
 . /usr/share/debconf/confmodule
 
+# Avoid locale errors when using apt-install (logical consequence
+# of the fact that locales is not yet installed).
+export IT_LANG_OVERRIDE=C
+
+log() {
+	logger -t localechooser "$@"
+}
+
+error() {
+	log "error: $@"
+}
+
+# If locale is invalid, add it to locale.gen
+add_if_invalid() {
+	local locale=$1
+
+	# Use LANG=C to avoid locale errors from perl
+	if LANG=C chroot /target /usr/sbin/validlocale "$locale" \
+	   >>/target/etc/locale.gen 2>/dev/null; then
+		# locale is valid and available
+		return 1
+	else
+		log "Adding locale '$locale'"
+	fi
+}
+
+
 db_get debian-installer/locale
 LOCALE="$RET"
 
@@ -69,36 +96,30 @@ if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ]; then
 	echo "LANGUAGE=C" >>$ROOTPROFILE
 fi
 
-# If the locale isn't already valid, append it to locale.gen
+# Generate selected locales that are not already valid
 if [ -x /target/usr/sbin/validlocale ]; then
 	gen=""
-	if log-output -t localechooser --pass-stdout \
-	    chroot /target/ /usr/sbin/validlocale "$LOCALE" \
-	    >> /target/etc/locale.gen; then
-		: # Nothing to do
-	else
-		# New locale added to locale.gen, generate it
+	if add_if_invalid "$LOCALE"; then
 		gen=1
 	fi
 	for loc in $EXTRAS; do
-		if [ "$loc" = "$LOCALE" ]; then
-			continue
-		fi
-		if log-output -t localechooser --pass-stdout \
-		    chroot /target/ /usr/sbin/validlocale "$loc" \
-		    >> /target/etc/locale.gen; then
-			: # Nothing to do
-		else
-			# New locale added to locale.gen, generate it
+		if [ "$loc" != "$LOCALE" ] && \
+		   add_if_invalid "$loc"; then
 			gen=1
 		fi
 	done
 	if [ "$gen" ]; then
 		if [ -x /target/usr/sbin/locale-gen ]; then
+			log "Generating added locales..."
 			log-output -t localechooser --pass-stdout \
-			    chroot /target /usr/sbin/locale-gen --keep-existing >/dev/null
+				chroot /target /usr/sbin/locale-gen \
+				--keep-existing > /dev/null
+		else
+			error "the command 'locale-gen' is not available"
 		fi
 	fi
+else
+	error "the command 'validlocale' is not available"
 fi
 
 exit 0
