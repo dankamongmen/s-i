@@ -9,8 +9,9 @@ if [ "$RET" != false ]; then
 fi
 
 # Avoid displaying console-data's keymap policy question
+# Use LANG=C to avoid perl warnings
 echo "console-data console-data/keymap/policy select Don't touch keymap" | \
-	chroot /target debconf-set-selections
+	LANG=C chroot /target debconf-set-selections
 
 apt-install console-tools console-data console-common || true
 
