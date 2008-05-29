@@ -81,7 +81,7 @@ EOF
 	DEBIAN_PRIORITY=$(debconf-get debconf/priority || true)
 	export DEBIAN_PRIORITY
 
-	LANG=$(debconf-get debian-installer/locale || true)
+	LANG=${IT_LANG_OVERRIDE:-$(debconf-get debian-installer/locale || true)}
 	export LANG
 	export PERL_BADLANG=0
 
