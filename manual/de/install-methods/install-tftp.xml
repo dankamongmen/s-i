@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44002 -->
+<!-- original version: 53452 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Dateien vorbereiten für TFTP-Netzwerk-Boot</title>
@@ -210,69 +210,6 @@ der DHCP-Server konfiguriert ist, <filename>/debian-installer/ia64/elilo.efi</fi
 als zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
 
 </para>
-
-   <sect3 arch="mipsel">
-   <title>DECstation-TFTP-Images</title>
-<para>
-
-Für DECstations gibt es tftp-Image-Dateien für jede Unterarchitektur,
-die sowohl Kernel wie auch den Installer in einer Datei enthalten.
-Sie sind nach dem Schema
-<filename><replaceable>subarchitecture</replaceable>/netboot-boot.img</filename>
-benannt. Kopieren Sie die tftp-Image-Datei, die Sie benutzen wollen,
-nach <userinput>/tftpboot/tftpboot.img</userinput> (wenn Sie das obige Beispiel
-mit BOOTP/DHCP verwenden).
-
-</para><para>
-
-Die DECstation-Firmware bootet per TFTP mit dem Befehl
-<userinput>boot <replaceable>#</replaceable>/tftp</userinput>, wobei
-<replaceable>#</replaceable> die Nummer des TurboChannel-Gerätes ist,
-von dem gebootet werden soll. Auf den meisten DECstations ist dies
-<quote>3</quote>.
-Wenn der BOOTP-/DHCP-Server den Dateinamen nicht angibt oder falls Sie
-zusätzliche Parameter angeben müssen, können Sie folgende Syntax verwenden:
-
-</para><para>
-
-<userinput>boot #/tftp/filename param1=value1 param2=value2 ...</userinput>
-
-</para><para>
-
-Mehrere Versionen der DECstation-Firmware haben ein Problem betreffend das
-Booten per Netzwerk: die Übertragung beginnt, aber nach einiger Zeit stoppt
-sie mit einem Fehler (<computeroutput>a.out err</computeroutput>).
-Dies kann verschiedene Gründe haben:
-
-<orderedlist>
-<listitem><para>
-
-Die Firmware antwortet nicht auf ARP-Anfragen während des TFTP-Transfers.
-Dies führt zu einem ARP-Timeout und der Transfer stoppt. Die Lösung
-ist, die MAC-Adresse von der Ethernet-Karte der DECstation fest in die
-ARP-Tabelle des TFTP-Servers einzutragen. Dies erledigen Sie mit
-<userinput>arp -s <replaceable>IP-address</replaceable>
-<replaceable>MAC-address</replaceable></userinput> als root auf dem
-Rechner, der als TFTP-Server agiert. Die MAC-Adresse der DECstation
-können Sie auslesen, indem Sie <command>cnfg</command> am Firmware-Prompt
-eingeben.
-
-</para></listitem>
-<listitem><para>
-
-Die Firmware hat ein Limit für die Größe der Dateien, die per TFTP
-gebootet werden.
-
-</para></listitem>
-</orderedlist>
-
-Es gibt ebenfalls Firmware-Versionen, die überhaupt nicht per TFTP booten
-können. Auf den NetBSD-Websites finden Sie einen Überblick über die
-verschiedenen Firmware-Versionen:
-<ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
 
    <sect3 arch="alpha">
    <title>TFTP-Boot von Alpha-Systemen</title>
