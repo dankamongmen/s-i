@@ -225,8 +225,8 @@ static void drawdesc(struct frontend *ui, struct question *q)
 {
 	WINDOW *qrywin = UIDATA(ui)->qrywin;
 	WINDOW *descwin = UIDATA(ui)->descwin;
-	char *descr = q_get_description(q);
-	char *ext_descr = q_get_extended_description(q);
+	char *descr = q_get_description(ui, q);
+	char *ext_descr = q_get_extended_description(ui, q);
 
 	drawframe(ui, WIN_QUERY, ui->title);
 	wrapprint(qrywin, descr, 0, COLS-2);
@@ -369,13 +369,13 @@ static int nchandler_select(struct frontend *ui, struct question *q)
 	WINDOW *win = UIDATA(ui)->qrywin;
 
 	/* Parse out all the choices */
-	count = strchoicesplit(q_get_choices_vals(q), choices, DIM(choices));
+	count = strchoicesplit(q_get_choices_vals(ui, q), choices, DIM(choices));
 	if (count <= 0) return DC_NOTOK;
 	if (count == 1)
 		defval = choices[0];
 
-	strchoicesplit(q_get_choices(q), choices_translated, DIM(choices_translated));
-	dcount = strchoicesplit(question_get_field(q, "C", "value"), defaults, DIM(defaults));
+	strchoicesplit(q_get_choices(ui, q), choices_translated, DIM(choices_translated));
+	dcount = strchoicesplit(question_get_field(ui, q, "C", "value"), defaults, DIM(defaults));
 
 	/* See what the currently selected value should be -- either a
 	 * previously selected value, or the default for the question

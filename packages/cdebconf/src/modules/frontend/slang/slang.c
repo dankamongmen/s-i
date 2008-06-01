@@ -202,8 +202,8 @@ static void slang_wrapprint(struct slwindow *win, const char *str, int start)
 static void slang_drawdesc(struct frontend *ui, struct question *q)
 {
 	struct uidata *uid = UIDATA(ui);
-	char *descr = q_get_description(q);
-	char *ext_descr = q_get_extended_description(q);
+	char *descr = q_get_description(ui, q);
+	char *ext_descr = q_get_extended_description(ui, q);
 
 	/* Clear the windows */
 	slang_drawwin(&uid->qrywin);
@@ -290,14 +290,14 @@ static int slang_keyhandler(struct frontend *ui, struct question *q, int *pos,
 static char *get_text(struct frontend *obj, const char *template, char *fallback)
 {
         struct question *q = obj->qdb->methods.get(obj->qdb, template);
-        return q ? q_get_description(q) : fallback;
+        return q ? q_get_description(obj, q) : fallback;
 }
 
 static char *button_text(struct frontend *obj, const char *template, char *fallback)
 {
 	char text[50];
         struct question *q = obj->qdb->methods.get(obj->qdb, template);
-	sprintf(text, "< %s >", q ? q_get_description(q) : fallback);
+	sprintf(text, "< %s >", q ? q_get_description(obj, q) : fallback);
 	return strdup(text);
 }
 
@@ -368,7 +368,7 @@ static int slang_boolean(struct frontend *ui, struct question *q)
 	if (!yes_text)	yes_text = get_text(ui, "debconf/button-yes", "Yes");
 	if (!no_text)  	no_text = get_text(ui, "debconf/button-no", "No");
 
-	value = question_get_field(q, "C", "value");
+	value = question_get_field(ui, q, "C", "value");
 
 	ans = (strcmp(value, "true") == 0);
 	pos = (ans ? 2 : 3);
@@ -428,24 +428,24 @@ static int slang_getselect(struct frontend *ui, struct question *q, int multi)
 	char *selected;
 	char answer[1024] = {0};
 	int *tindex = NULL;
-	const char *indices = q_get_indices(q);
+	const char *indices = q_get_indices(ui, q);
 	int i, j, count, dcount, ret = 0, val = 0, pos = 2, xpos, ypos;
 	int top, bottom, longest, ch;
 	struct uidata *uid = UIDATA(ui);
 	struct slwindow *win = &uid->qrywin;
 
 	/* Parse out all the choices */
-	count = strgetargc(q_get_choices_vals(q));
+	count = strgetargc(q_get_choices_vals(ui, q));
 	if (count <= 0)
 		return DC_NOTOK;
 	choices = malloc(sizeof(char *) * count);
 	choices_translated = malloc(sizeof(char *) * count);
 	tindex = malloc(sizeof(int) * count);
-	if (strchoicesplitsort(q_get_choices_vals(q), q_get_choices(q), indices, choices, choices_translated, tindex, count) != count)
+	if (strchoicesplitsort(q_get_choices_vals(ui, q), q_get_choices(ui, q), indices, choices, choices_translated, tindex, count) != count)
 		return DC_NOTOK;
 
 	defaults = malloc(sizeof(char *) * count);
-	dcount = strchoicesplit(question_get_field(q, "C", "value"), defaults, count);
+	dcount = strchoicesplit(question_get_field(ui, q, "C", "value"), defaults, count);
 	INFO(INFO_VERBOSE, "Parsed out %d choices, %d defaults", count, dcount);
 	if (dcount <= 0) return DC_NOTOK;
 	if (count == 1 && !multi)
@@ -592,7 +592,7 @@ static int slang_getstring(struct frontend *ui, struct question *q, char showch)
 	int xpos = 0, ypos = win->y + win->border + 4;
 	int cursor;
 
-	STRCPY(value, question_get_field(q, "C", "value"));
+	STRCPY(value, question_get_field(ui, q, "C", "value"));
 	cursor = strlen(value);
 
 	/* TODO: scrolling */
