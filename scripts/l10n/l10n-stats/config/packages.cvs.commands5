@@ -1,12 +1,6 @@
 
 
 #echo -n "aptitude "
-#mkdir -p aptitude/po
-#rm -rf aptitude/po/*
-#cd aptitude/po
-#cp ~dburrows/public_html/darcs/aptitude/po/* aptitude/po/
-#wget -q -O - http://people.debian.org/~dburrows/darcs/aptitude/po/ | wget -q --force-html --base=http://people.debian.org/~dburrows/darcs/aptitude/po/ -i -
-#cd ../..
 rm -rf aptitude
 hg clone http://hg.debian.org/hg/aptitude/head aptitude
 
@@ -23,7 +17,6 @@ cd ../..
 
 
 #echo -n "dpkg "
-#svn -q co svn://svn.debian.org/dpkg/trunk/po dpkg/po
 rm -rf dpkg
 if [ `hostname` == "alioth" ] ; then
 	git clone /git/dpkg/dpkg.git >/dev/null 2>&1
@@ -34,13 +27,7 @@ cd dpkg
 git checkout -b lenny origin/lenny
 cd ..
 
-#get apt:
 #echo -n "apt "
-#mkdir -p apt/po
-#cd apt/po/
-#rm -rf *
-#wget -q -O - http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ | wget -q --force-html --base=http://www.perrier.eu.org/debian/packages/d-i/level4/apt-main/po/ -i -
-#rm *gif* *html*
 rm -rf apt
 bzr checkout --quiet --lightweight bzr+ssh://bzr.debian.org/bzr/apt/debian-sid apt 2>/dev/null
 
