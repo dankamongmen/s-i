@@ -1,12 +1,10 @@
 touch $HOME/.cvspass
 
 #echo -n "tasksel "
-svn co svn://svn.debian.org/tasksel/trunk tasksel > /dev/null 2>&1
+git clone -q ssh://git.debian.org/git/tasksel/tasksel.git
 
 #echo -n "iso-codes "
 svn -q co svn+ssh://svn.debian.org/svn/pkg-isocodes/trunk/iso-codes
-#(cd iso-codes/iso_3166; chmod u+x ../iso2pot.py ; ../iso2pot.py --is-version dummy --comments alpha_3_code --fields name,official_name,common_name --outfile iso_3166.pot iso_3166.xml ; cp iso_3166.pot ../../../packages.unstable2/iso-codes/iso_3166)
-#(cd iso-codes/iso_3166; chmod u+x ../iso2pot.py ; ../iso2pot.py --is-version dummy --comments alpha_3_code --fields name,official_name,common_name --outfile iso_3166.pot iso_3166.xml)
 
 #echo -n "console-data "
 rm -rf console-data
@@ -17,17 +15,7 @@ svn -q co svn://svn.debian.org/console-data/trunk/debian console-data/debian
 cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/popcon co popularity-contest
 
 # echo -n "eject "
-# This only works from alioth.d.o. See Frank Lichtenheld <djpig@debian.org>
-# rm -rf eject
-# cvs -z3 -Q -d:pserver:anonymous@source.djpig.de:/srv/source.djpig.de/cvs/ co -d eject eject
-#for i in eject ; do
-#	echo -n "$i "
-#	rm -rf $i
-#	apt-get -t unstable source $i >/dev/null
-#	rm -f *.tar.gz *.dsc *.diff.gz
-#	mv $i* $i
-#done
 rm -rf eject
-git-clone ssh://git.debian.org/git/collab-maint/eject >/dev/null 2>&1
+git-clone -q ssh://git.debian.org/git/collab-maint/eject
 
 
