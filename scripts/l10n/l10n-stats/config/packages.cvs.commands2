@@ -1,7 +1,12 @@
 touch $HOME/.cvspass
 
 #echo -n "tasksel "
-git clone -q ssh://git.debian.org/git/tasksel/tasksel.git
+rm -rf tasksel
+if [ `hostname` == "alioth" ] ; then
+	git clone -q /git/tasksel/tasksel.git
+else
+	git clone -q git://git.debian.org/git/tasksel/tasksel.git
+fi
 
 #echo -n "iso-codes "
 svn -q co svn+ssh://svn.debian.org/svn/pkg-isocodes/trunk/iso-codes
@@ -16,6 +21,10 @@ cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/popcon co popular
 
 # echo -n "eject "
 rm -rf eject
-git-clone -q ssh://git.debian.org/git/collab-maint/eject
+if [ `hostname` == "alioth" ] ; then
+	git clone -q /git/git/collab-maint/eject
+else
+	git clone -q git://git.debian.org/git/git/collab-maint/eject
+fi
 
 
