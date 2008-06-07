@@ -1870,19 +1870,6 @@ my %xkbsym_table = (
     'Hangul_AraeA' => '318d',
     'Hangul_AraeAE' => '318e',
 # Keypad keys
-    'KP_Home' => 'VoidSymbol',
-    'KP_Left' => 'VoidSymbol',
-    'KP_Up' => 'VoidSymbol',
-    'KP_Right' => 'VoidSymbol',
-    'KP_Down' => 'VoidSymbol',
-    'KP_Prior' => 'VoidSymbol',
-    'KP_Page_Up' => 'VoidSymbol',
-    'KP_Next' => 'VoidSymbol',
-    'KP_Page_Down' => 'VoidSymbol',
-    'KP_End' => 'VoidSymbol',
-    'KP_Begin' => 'VoidSymbol',
-    'KP_Insert' => 'VoidSymbol',
-    'KP_Delete' => 'VoidSymbol',
     'KP_Multiply' => 'KP_Multiply',
     'KP_Add' => 'KP_Add',
     'KP_Seprator' => 'KP_Comma', # Is this recognised by X ?
@@ -1901,6 +1888,20 @@ my %xkbsym_table = (
     'KP_8' => 'KP_8',
     'KP_9' => 'KP_9',
     'KP_Enter' => 'KP_Enter',
+# Keypad keys (alternate level)
+    'KP_Home' => 'KP_7',
+    'KP_Left' => 'KP_4',
+    'KP_Up' => 'KP_8',
+    'KP_Right' => 'KP_6',
+    'KP_Down' => 'KP_2',
+    'KP_Prior' => 'KP_9',
+    'KP_Page_Up' => 'KP_9',
+    'KP_Next' => 'KP_3',
+    'KP_Page_Down' => 'KP_3',
+    'KP_End' => 'KP_1',
+    'KP_Begin' => 'VoidSymbol', # What does correspond to this?
+    'KP_Insert' => 'KP_0',
+    'KP_Delete' => 'VoidSymbol', # has to be 'KP_Period' or 'KP_Decimal'
 # Keypad keys with missing support in the kernel
     'KP_Space' => 'space',
     'KP_Equal' => 'equal',
@@ -2710,7 +2711,8 @@ sub symbols_for_group {
 	my $level = 0;
 	for my $symbol (@_) {
 	    if ($symbol !~ /\(/ && $symbol =~ /./
-		&& ($symbol !~ /^(?:nosymbol|any)$/i
+		&& (! defined $xkbsym_table{$symbol}
+		    || $xkbsym_table{$symbol} ne 'NoSymbol'
 		    || ! defined $symbols_table{$code}[$group][$level])) {
 		$symbols_table{$code}[$group][$level] = $symbol;
 	    }
@@ -2719,27 +2721,8 @@ sub symbols_for_group {
     }
 }
 
-# KPDL needs a special tweak for certain layouts.
-sub adjust_symbols {
-    my $key = shift;
-    if ($key eq 'KPDL') {
-	my @newsymbols;
-	for my $symbol (@_) {
-	    if ($symbol eq 'period') {
-		push @newsymbols, 'KP_Decimal';
-	    } elsif ($symbol eq 'comma') {
-		push @newsymbols, 'KP_Separator';
-	    } else {
-		push @newsymbols, $symbol;
-	    }
-	}
-	return @newsymbols;
-    } else {
-	return @_;
-    }
-}
-
 sub xkb_key {
+    my $default_key_type = $_[0];
     if ($stream =~ /^key</i) {
 	$stream =~ s/^key<([^>]+)>\{([^\}]*?)\};(.*)/$3/i
 	    or syntax_error "key definition";
@@ -2758,7 +2741,6 @@ sub xkb_key {
 		if ($list =~ s/^\[([^\]]*?)\],(.*)/$2/) {
 		    (my $symbols = $1) =~ s/,/ /g;
 		    my @groupsymbols = split ' ', $symbols;
-		    @groupsymbols = adjust_symbols $key, @groupsymbols;
 		    symbols_for_group $code, $group, @groupsymbols;
 		    $group++;
 		    next;
@@ -2769,18 +2751,17 @@ sub xkb_key {
 		    my $group = $1 - 1 + $base_group;
 		    (my $symbols = $2) =~ s/,/ /g;
 		    my @groupsymbols = split ' ', $symbols;
-		    @groupsymbols = adjust_symbols $key, @groupsymbols;
 		    symbols_for_group $code, $group, @groupsymbols;
 		    next;
 		}
 		# type = "...."
-		if ($list =~ (s/^type(\[Group1\])?
-                              =\"([^\"]+)\",(.*)/$3/x)) {
+		if ($list =~ (s/^type(?:\[Group1\])?
+                              =\"([^\"]+)\",(.*)/$2/x)) {
 		    if ($method == $replace_method
 			|| $method == $override_method
 			|| ($method == $augment_method
 			    && ! defined $types_table{$code})) {
-			$types_table{$code} = $2;
+			$types_table{$code} = $1;
 		    }
 		    next;
 		}
@@ -2796,6 +2777,10 @@ sub xkb_key {
 		die "$0: garbage in a key definition: \"$list\""
 		    ." in $filename.\n";
 	    }
+	    if (! defined $types_table{$code}
+		|| $types_table{$code} eq 'DEFAULT') {
+		$types_table{$code} = $default_key_type;
+	    }
 	}
 	return 1;
     } else {
@@ -2805,6 +2790,7 @@ sub xkb_key {
 
 sub xkb_symbols_definitions {
     my $oldmethod = $method;
+    my $default_key_type = 'DEFAULT';
     while ($stream) {
 	$method = $oldmethod;
 
@@ -2820,6 +2806,11 @@ sub xkb_symbols_definitions {
 	    next;
 	}
 
+	if ($stream =~ (s/^key\.type(?:\[Group1\])?=\"([^\"]+)\";(.*)/$2/)) {
+	    $default_key_type = $1;
+	    next;
+	}
+	
 	if ($stream =~ s/^[a-zA-Z0-9]+\.[a-zA-Z0-9]+=.*?;(.*)/$1/i) {
 	    next;
 	}
@@ -2829,7 +2820,7 @@ sub xkb_symbols_definitions {
 	    next;
 	}
 
-	if (xkb_key) {
+	if (xkb_key $default_key_type) {
 	    next;
 	}
 
@@ -3183,7 +3174,7 @@ sub flatten {
                       |FOUR_LEVEL_SEMIALPHABETIC
                       |SEPARATE_CAPS_AND_SHIFT_ALPHABETIC
 		      |KEYPAD|FOUR_LEVEL_X|FOUR_LEVEL_MIXED_KEYPAD
-		      |FOUR_LEVEL_KEYPAD|FOUR_LEVEL_KEYPAD
+		      |FOUR_LEVEL_KEYPAD
                       )$/x) {
 		    # Level1: plain
 		    # Level2: shift
@@ -3313,15 +3304,77 @@ sub flatten {
 	my $kp = undef;
 	for my $x (0 .. 15) {
 	    my $coord = 16 * $group + $x;
-	    if ($vector[$coord] =~ /^KP_/ && ! defined $kp) {
+	    if ($vector[$coord] =~ /^KP_/) {
 		$kp = $vector[$coord];
+		last;
 	    }
+	}
+	if ($types_table{$key} =~ /^(KEYPAD|FOUR_LEVEL_X
+                                    |FOUR_LEVEL_MIXED_KEYPAD
+		                    |FOUR_LEVEL_KEYPAD)$/x
+	    && ! defined $kp) {
+	    $kp = 'VoidSymbol';
 	}
 	if ($kp) {
 	    for my $x (0 .. 15) {
 		my $coord = 16 * $group + $x;
-		if ($vector[$coord] eq 'VoidSymbol') {
-		    $vector[$coord] = $kp;
+		for ($vector[$coord]) {
+		    if (/^VoidSymbol$/) {
+			# KP_Begin and KP_Delete are mapped to VoidSymbol
+			$vector[$coord] = $kp;
+		    } elsif (/$xkbsym_table{'plus'}/) {# not anchored match!
+			$vector[$coord] = 'KP_Add';
+		    } elsif (/$xkbsym_table{'minus'}/) {
+			$vector[$coord] = 'KP_Subtract';
+		    } elsif (/$xkbsym_table{'asterisk'}/) {
+			$vector[$coord] = 'KP_Multiply';
+		    } elsif (/$xkbsym_table{'slash'}/) {
+			$vector[$coord] = 'KP_Divide';
+		    } elsif (/$xkbsym_table{'comma'}/) {
+			$vector[$coord] = 'KP_Comma';
+		    } elsif (/$xkbsym_table{'period'}/) {
+			$vector[$coord] = 'KP_Period';
+		    } elsif (/$xkbsym_table{'0'}/) {
+			$vector[$coord] = 'KP_0';
+		    } elsif (/$xkbsym_table{'1'}/) {
+			$vector[$coord] = 'KP_1';
+		    } elsif (/$xkbsym_table{'2'}/) {
+			$vector[$coord] = 'KP_2';
+		    } elsif (/$xkbsym_table{'3'}/) {
+			$vector[$coord] = 'KP_3';
+		    } elsif (/$xkbsym_table{'4'}/) {
+			$vector[$coord] = 'KP_4';
+		    } elsif (/$xkbsym_table{'5'}/) {
+			$vector[$coord] = 'KP_5';
+		    } elsif (/$xkbsym_table{'6'}/) {
+			$vector[$coord] = 'KP_6';
+		    } elsif (/$xkbsym_table{'7'}/) {
+			$vector[$coord] = 'KP_7';
+		    } elsif (/$xkbsym_table{'8'}/) {
+			$vector[$coord] = 'KP_8';
+		    } elsif (/$xkbsym_table{'9'}/) {
+			$vector[$coord] = 'KP_9';
+		    } elsif (/^(Return|Enter)$/) {
+			$vector[$coord] = 'KP_Enter';
+		    } elsif (/^Home$/) {
+			$vector[$coord] = 'KP_7';
+		    } elsif (/^Left$/) {
+			$vector[$coord] = 'KP_4';
+		    } elsif (/^Up$/) {
+			$vector[$coord] = 'KP_8';
+		    } elsif (/^Right$/) {
+			$vector[$coord] = 'KP_6';
+		    } elsif (/^Down$/) {
+			$vector[$coord] = 'KP_2';
+		    } elsif (/^Prior$/) {
+			$vector[$coord] = 'KP_9';
+		    } elsif (/^Next$/) {
+			$vector[$coord] = 'KP_3';
+		    } elsif (/^End$/) {
+			$vector[$coord] = 'KP_1';
+		    } elsif (/^Insert$/) {
+			$vector[$coord] = 'KP_0';
+		    }
 		}
 	    }
 	}
