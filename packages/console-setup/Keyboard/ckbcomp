@@ -20,8 +20,9 @@
 use warnings 'all';
 use strict;
 
+my $debug_flag = 1;
 sub debug {
-    if (1) {
+    if ($debug_flag) {
 	print STDERR "@_";
     }
 }
@@ -164,8 +165,8 @@ my %keycodes_table; # x keysym -> x key code
 my %aliases;        # x keysym -> x keysym
 
 my %symbols_table;   # x key code -> [[symbols for group0,...],
-                     #               [symbols for group1,...], ...]
-my %types_table;     # x key code -> key type (i.e. "PC_BREAK" or "TWO_LEVEL")
+                     #                [symbols for group1,...], ...]
+my %types_table;     # x key code -> key type (i.e. "TWO_LEVEL")
 
 my $augment_method = 1;   # Constants for different XKB include methods
 my $override_method = 2;
@@ -2773,12 +2774,13 @@ sub xkb_key {
 		    next;
 		}
 		# type = "...."
-		if ($list =~ (s/^type=\"([^\"]+)\",(.*)/$2/)) {
+		if ($list =~ (s/^type(\[Group1\])?
+                              =\"([^\"]+)\",(.*)/$3/x)) {
 		    if ($method == $replace_method
 			|| $method == $override_method
 			|| ($method == $augment_method
 			    && ! defined $types_table{$code})) {
-			$types_table{$code} = $1;	
+			$types_table{$code} = $2;
 		    }
 		    next;
 		}
@@ -3006,7 +3008,7 @@ foreach my $key (keys %symbols_table) {
     }
 }
 
-# later in the code we use that the distance is always less than 1000000
+# later we use that the distance is an even number less than 1000000
 sub distance {
     my $x = $_[0];
     my $y = $_[1];
@@ -3015,7 +3017,7 @@ sub distance {
     if (($x | 0x0f) != ($y | 0x0f)) {
 	$bottom = $bottom & 0x0f;
     }
-    return  (($y - $bottom) << 6) | ($x - $bottom);
+    return  ((($y - $bottom) << 6) | ($x - $bottom)) << 1;
 }
 
 sub uni_to_legacy {
@@ -3134,6 +3136,16 @@ sub approximate {
 
 # Fill @vector with data for key number $_[0]
 sub flatten {
+    #    Kernel         X
+    # -----------------------------------------
+    # 1  Shift          level 2 (Shift)
+    # 2  AltGr          levels 3 and 4 (AltGr)
+    # 4  Control        Control
+    # 8  Alt            Alt
+    # 0                 Group1
+    # 16 ShiftL         Group2
+    # 32 ShiftR         Group4
+    # 48 ShiftL+ShiftR  Group3
     my $key = $_[0];
     @vector = ();
     @quality = ();
@@ -3153,12 +3165,7 @@ sub flatten {
 	}
 	next if ($real_group < 0);
 	for my $level (0..3) {
-	    my $coord = $level + ($group << 4);
 	    my $real_level = $level;
-	    if ($types_table{$key} =~ /PC_BREAK|PC_SYSRQ
-                                       |CTRL\+ALT|SHIFT\+ALT/x) {
-		$real_level = 0;
-	    }
 	    while ($real_level > $#{$symbols_table{$key}[$real_group]}) {
 		if ($real_level == 2) {
 		    $real_level = $real_level - 2;
@@ -3167,89 +3174,93 @@ sub flatten {
 		}
 	    }
 	    next if ($real_level < 0);
+	    my $coord;
+	    for ($types_table{$key}) {
+		if (/^(DEFAULT|ONE_LEVEL|TWO_LEVEL
+                      |THREE_LEVEL|ALPHABETIC
+                      |EIGHT_LEVEL|EIGHT_LEVEL_ALPHABETIC
+                      |FOUR_LEVEL|FOUR_LEVEL_ALPHABETIC
+                      |FOUR_LEVEL_SEMIALPHABETIC
+                      |SEPARATE_CAPS_AND_SHIFT_ALPHABETIC
+		      |KEYPAD|FOUR_LEVEL_X|FOUR_LEVEL_MIXED_KEYPAD
+		      |FOUR_LEVEL_KEYPAD|FOUR_LEVEL_KEYPAD
+                      )$/x) {
+		    # Level1: plain
+		    # Level2: shift
+		    # Level3: altgr
+		    # Level4: shift+altgr
+		    $coord = ($group << 4) + $level;
+		} elsif (/^(PC_BREAK|PC_CONTROL_LEVEL2
+                           |PC_LCONTROL_LEVEL2|PC_RCONTROL_LEVEL2)$/x) {
+		    # Level1: plain
+		    # Level2: control
+		    if ($level == 0 || $level == 2) {
+			$coord = ($group << 4) + $level;
+		    } else {
+			$coord = ($group << 4) + $level + 3;
+		    }
+		} elsif (/^(PC_SYSRQ|PC_ALT_LEVEL2
+                           |PC_LALT_LEVEL2|PC_RALT_LEVEL2)$/x) {
+		    # Level1: plain
+		    # Level2: alt
+		    if ($level == 0 || $level == 2) {
+			$coord = ($group << 4) + $level;
+		    } else {
+			# notice that $level is 1 or 3
+			$coord = ($group << 4) + $level + 7;
+		    }
+		} elsif (/^SHIFT\+ALT$/) {
+		    # Level1: plain
+		    # Level2: shift+alt
+		    if ($level == 0 || $level == 2) {
+			$coord = ($group << 4) + $level;
+		    } else {
+			$coord = ($group << 4) + $level + 8;
+		    }
+		} elsif (/^CTRL\+ALT$/) {
+		    # Level1: plain
+		    # Level2: control+alt
+		    if ($level == 0 || $level == 2) {
+			$coord = ($group << 4) + $level;
+		    } else {
+			$coord = ($group << 4) + $level + 11;
+		    }
+		} else {
+		    warning "Unknown key type $types_table{$key}\n";
+		}
+	    }
 	    my $xkeysym = $symbols_table{$key}[$real_group][$real_level];
 	    my $is_special = ($xkeysym !~ /^U[0-9a-fA-F]+$/
 			      && defined $xkbsym_table{$xkeysym}
 			      && ($xkbsym_table{$xkeysym}
 				  !~ /^[0-9a-fA-F]{4}$/));
 	    my $kernelkeysym = x_to_kernelsym ($xkeysym);
-	    $vector[$coord] = $kernelkeysym;
 	    my $ascii = x_to_ascii ($xkeysym);
-	    next unless (defined $ascii or $is_special);
+	    approximate ($coord, $kernelkeysym, 0);
 	    for my $approximated_group (0 .. 3) {
 		for my $approximated_level (0 .. 3) {
 		    my $approximated_coord = ($approximated_level
 					      + ($approximated_group << 4));
 		    my $distance = distance ($approximated_coord, $coord);
+		    approximate ($approximated_coord,
+				 $kernelkeysym, $distance);
 		    if (defined $ascii) {
 			approximate (($approximated_coord | 0x08), 
-				     $metasyms[$ascii + 1], $distance);
+				     $metasyms[$ascii + 1], $distance + 1);
 			approximate (($approximated_coord | 0x04), 
-				     $controlsyms[$ascii + 1], $distance);
+				     $controlsyms[$ascii + 1], $distance + 1);
 			approximate (($approximated_coord | 0x0c), 
-				     $metacontrolsyms[$ascii + 1], $distance);
+				     $metacontrolsyms[$ascii + 1], 
+				     $distance + 1);
 		    } elsif ($is_special) {
 			approximate (($approximated_coord | 0x08), 
-				     $kernelkeysym, $distance);
+				     $kernelkeysym, $distance + 1);
 			approximate (($approximated_coord | 0x04), 
-				     $kernelkeysym, $distance);
+				     $kernelkeysym, $distance + 1);
 			approximate (($approximated_coord | 0x0c), 
-				     $kernelkeysym, $distance);
+				     $kernelkeysym, $distance + 1);
 		    }
 		}
-	    }
-	}
-	if ($types_table{$key} eq 'PC_BREAK' 
-	    && $#{$symbols_table{$key}[$real_group]} >= 1) {
-	    my $xkeysym = $symbols_table{$key}[$real_group][1];
-	    my $kernelkeysym = x_to_kernelsym ($xkeysym);
-	    if ($kernelkeysym ne 'VoidSymbol') {
-		my $coord = ($group << 4);
-		$vector[$coord + 4] = $kernelkeysym;
-		$vector[$coord + 5] = $kernelkeysym;
-		$vector[$coord + 6] = $kernelkeysym;
-		$vector[$coord + 7] = $kernelkeysym;
-		$vector[$coord + 12] = $kernelkeysym;
-		$vector[$coord + 13] = $kernelkeysym;
-		$vector[$coord + 14] = $kernelkeysym;
-		$vector[$coord + 15] = $kernelkeysym;
-	    }
-	} elsif ($types_table{$key} eq 'PC_SYSRQ' 
-	    && $#{$symbols_table{$key}[$real_group]} >= 1) {
-	    my $xkeysym = $symbols_table{$key}[$real_group][1];
-	    my $kernelkeysym = x_to_kernelsym ($xkeysym);
-	    if ($kernelkeysym ne 'VoidSymbol') {
-		my $coord = ($group << 4);
-		$vector[$coord + 8] = $kernelkeysym;
-		$vector[$coord + 9] = $kernelkeysym;
-		$vector[$coord + 10] = $kernelkeysym;
-		$vector[$coord + 11] = $kernelkeysym;
-		$vector[$coord + 12] = $kernelkeysym;
-		$vector[$coord + 13] = $kernelkeysym;
-		$vector[$coord + 14] = $kernelkeysym;
-		$vector[$coord + 15] = $kernelkeysym;
-	    }
-	} elsif ($types_table{$key} eq 'CTRL+ALT' 
-	    && $#{$symbols_table{$key}[$real_group]} >= 1) {
-	    my $xkeysym = $symbols_table{$key}[$real_group][1];
-	    my $kernelkeysym = x_to_kernelsym ($xkeysym);
-	    if ($kernelkeysym ne 'VoidSymbol') {
-		my $coord = ($group << 4);
-		$vector[$coord + 12] = $kernelkeysym;
-		$vector[$coord + 13] = $kernelkeysym;
-		$vector[$coord + 14] = $kernelkeysym;
-		$vector[$coord + 15] = $kernelkeysym;
-	    }
-	} elsif ($types_table{$key} eq 'SHIFT+ALT' 
-	    && $#{$symbols_table{$key}[$real_group]} >= 1) {
-	    my $xkeysym = $symbols_table{$key}[$real_group][1];
-	    my $kernelkeysym = x_to_kernelsym ($xkeysym);
-	    if ($kernelkeysym ne 'VoidSymbol') {
-		my $coord = ($group << 4);
-		$vector[$coord + 9] = $kernelkeysym;
-		$vector[$coord + 11] = $kernelkeysym;
-		$vector[$coord + 13] = $kernelkeysym;
-		$vector[$coord + 15] = $kernelkeysym;
 	    }
 	}
     }
@@ -3265,36 +3276,36 @@ sub flatten {
 	next unless (defined $mask);
 	for my $mod (4, 8, 12) {
 	    if ($vector[$coord + $mod] eq 'VoidSymbol'
-		&& ($vector[($coord + $mod) | $mask] eq 'VoidSymbol')) {
+		&& ($vector[($coord + $mod) ^ $mask] eq 'VoidSymbol')) {
 		$vector[$coord + $mod] = $vector[$coord];
 	    }
 	}
     }
     
+    # Without this it would be possible to lock permanently
+    # the modifier key such as Control or Alt
     for my $coord (0 .. 63) {
 	my $mask = $kernel_modifiers{$vector[$coord]};
 	if (defined $mask) {
-	    $vector[$coord | $mask] = $vector[$coord];
+	    $vector[$coord ^ $mask] = $vector[$coord];
 	}
     }
     
     for my $coord (16 .. 63) {
-	if ($vector[$coord] eq 'ShiftL') {
-	    $vector[$coord] = 'VoidSymbol';
-	} elsif ($vector[$coord] eq 'ShiftL_Lock') {
+	if ($vector[$coord] =~ /^(ShiftL|ShiftL_Lock)$/) {
 	    $vector[$coord] = 'VoidSymbol';
 	}
     }
 
     for my $coord (0 .. 15) {
-	if ($vector[$coord] eq 'ShiftL') {
-	    $vector[$coord + 16] = 'ShiftR';
-	    $vector[$coord + 32] = 'ShiftR';
+	if ($vector[$coord] eq 'ShiftL_Lock') {   #  0 => 16
+	    $vector[$coord + 16] = 'ShiftR_Lock'; # 16 => 48
+	    $vector[$coord + 32] = 'ShiftR_Lock'; # 32 => 0
+	    $vector[$coord + 48] = 'ShiftL_Lock'; # 48 => 32
+	} elsif ($vector[$coord] eq 'ShiftL') {
+	    $vector[$coord + 16] = 'ShiftL';
+	    $vector[$coord + 32] = 'ShiftL';
 	    $vector[$coord + 48] = 'ShiftL';
-	} elsif ($vector[$coord] eq 'ShiftL_Lock') {
-	    $vector[$coord + 16] = 'ShiftR_Lock';
-	    $vector[$coord + 32] = 'ShiftR_Lock';
-	    $vector[$coord + 48] = 'ShiftL_Lock';
 	}
     }
 
