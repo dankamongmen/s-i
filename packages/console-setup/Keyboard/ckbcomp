@@ -1312,6 +1312,8 @@ my %xkbsym_table = (
     'minutes' => '2032',
     'seconds' => '2033',
     'caret' => '2038',
+    'guilsinglleft' => '2039',
+    'guilsinglright' => '203a',
     'overline' => '203e',
     'zerosuperior' => '2070',
     'foursuperior' => '2074',
@@ -2095,6 +2097,9 @@ my %xkbsym_table = (
     'XF86_Ungrab' => 'VoidSymbol',
     'XF86_Next_VMode' => 'VoidSymbol',
     'XF86_Prev_VMode' => 'VoidSymbol',
+    'XF86Copy' => 'VoidSymbol',
+    'XF86Cut' => 'VoidSymbol',
+    'XF86Paste' => 'VoidSymbol',
 # I do not know the Unicodes of these
     '0x13a4' => 'VoidSymbol', # Special symbol for X?
     'leftcaret' => 'VoidSymbol', # Is this recognised by X ?
@@ -2108,6 +2113,7 @@ my %xkbsym_table = (
     'Zenkaku_Hankaku' => 'VoidSymbol', # Is this recognised by X ?
     'Kanji' => 'VoidSymbol', # Is this recognised by X ?
     'Hangul' => 'VoidSymbol', # Is this recognised by X ?
+    'Hangul_Hanja' => 'VoidSymbol', # Is this recognised by X ?
     'braille_dot_1' => 'VoidSymbol', # Is this recognised by X ?
     'braille_dot_2' => 'VoidSymbol', # Is this recognised by X ?
     'braille_dot_3' => 'VoidSymbol', # Is this recognised by X ?
@@ -2124,6 +2130,7 @@ my %xkbsym_table = (
     'SunAudioRaiseVolume' => 'VoidSymbol',
     'SunCopy' => 'VoidSymbol',
     'SunCut' => 'VoidSymbol',
+    'SunPaste' => 'VoidSymbol',
     'SunAgain' => 'VoidSymbol',
     'SunUndo' => 'VoidSymbol',
     'SunFind' => 'VoidSymbol',
@@ -2132,7 +2139,6 @@ my %xkbsym_table = (
     'SunF37' => 'VoidSymbol',
     'SunFront' => 'VoidSymbol',
     'SunOpen' => 'VoidSymbol',
-    'SunPaste' => 'VoidSymbol',
     'SunPowerSwitch' => 'VoidSymbol',
     'SunPowerSwitchShift' => 'VoidSymbol',
     'SunProps' => 'VoidSymbol',
@@ -2851,7 +2857,7 @@ sub xkb_symbols_definitions {
 	}
 
 	if ($stream =~ /^virtual_modifiers/i) {
-	    $stream =~ (s/^virtual_modifiers\s?[a-zA-Z0-9_]+;(.*)/$1/ix)
+	    $stream =~ (s/^virtual_modifiers\s?[a-zA-Z0-9_,]+;(.*)/$1/ix)
 		or syntax_error "virtual_modifiers";
 	    next;
 	}
