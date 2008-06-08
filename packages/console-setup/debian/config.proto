@@ -1211,74 +1211,78 @@ if [ "$got_xkboptions" = yes ]; then
     default_compose='No compose key'
     for option in `echo $XKBOPTIONS | sed 's/,/ /g'`; do
 	case "$option" in
-	    grp:caps_toggle)
-		default_toggle='Caps Lock';;
-	    grp:toggle)
-		default_toggle='Right Alt';;
-	    grp:rctrl_toggle)
-		default_toggle='Right Control';;
-	    grp:rshift_toggle)
-		default_toggle='Right Shift';;
-	    grp:rwin_toggle)
-		default_toggle='Right Logo key';;
-	    grp:menu_toggle)
-		default_toggle='Menu key';;
+	    compose:caps)
+		default_compose='Caps Lock';;
+	    compose:lwin)
+		default_compose='Left Logo key';;
+	    compose:menu)
+		default_compose='Menu key';;
+	    compose:ralt)
+		default_compose='Right Alt';;
+	    compose:rctrl)
+		default_compose='Right Control';;
+	    compose:rwin)
+		default_compose='Right Logo key';;
+	    grp:alt_caps_toggle)
+		default_toggle='Alt+Caps Lock';;
 	    grp:alt_shift_toggle)
 		default_toggle='Alt+Shift';;
-	    grp:ctrl_shift_toggle)
-		default_toggle='Control+Shift';;
-	    grp:shift_caps_toggle)
-		default_toggle='Shift+Caps Lock';;
+	    grp:caps_toggle)
+		default_toggle='Caps Lock';;
 	    grp:ctrl_alt_toggle)
 		default_toggle='Control+Alt';;
-	    grp:shifts_toggle)
-		default_toggle='Both Shift keys together';;
-	    grp:ctrls_toggle)
-		default_toggle='Both Control keys together';;
-	    grp:alts_toggle)
-		default_toggle='Both Alt keys together';;
+	    grp:ctrl_shift_toggle)
+		default_toggle='Control+Shift';;
 	    grp:lalt_toggle)
 		default_toggle='Left Alt';;
+	    grp:lctrl_lshift_toggle)
+		default_toggle='Left Control+Left Shift';;
 	    grp:lctrl_toggle)
 		default_toggle='Left Control';;
 	    grp:lshift_toggle)
 		default_toggle='Left Shift';;
-	    grp:lwin_toggle)
-		default_toggle='Left Logo key';;
-	    grp:switch)
-		default_switch='Right Alt';;
 	    grp:lswitch)
 		default_switch='Left Alt';;
-	    grp:rwin_switch)
-		default_switch='Right Logo key';;
 	    grp:lwin_switch)
 		default_switch='Left Logo key';;
+	    grp:lwin_toggle)
+		default_toggle='Left Logo key';;
+	    grp:menu_toggle)
+		default_toggle='Menu key';;
+	    grp:rctrl_toggle)
+		default_toggle='Right Control';;
+	    grp:rshift_toggle)
+		default_toggle='Right Shift';;
+	    grp:rwin_switch)
+		default_switch='Right Logo key';;
+	    grp:rwin_toggle)
+		default_toggle='Right Logo key';;
+	    grp:sclk_toggle)
+		default_toggle='Scroll Lock key';;
+	    grp:switch)
+		default_switch='Right Alt';;
+	    grp:toggle)
+		default_toggle='Right Alt';;
 	    grp:win_switch)
 		default_switch='Both Logo keys';;
-	    lv3:ralt_switch)
-		default_altgr='Right Alt';;
-	    lv3:switch)
-		default_altgr='Right Control';;
-	    lv3:menu_switch)
-		default_altgr='Menu key';;
-	    lv3:rwin_switch)
-		default_altgr='Right Logo key';;
-	    lv3:lwin_switch)
-		default_altgr='Left Logo key';;
-	    lv3:win_switch)
-		default_altgr='Both Logo keys';;
+	    lv3:alt_switch)
+		default_altgr='Both Alt keys';;
+	    lv3:enter_switch)
+		default_altgr='Keypad Enter key';;
 	    lv3:lalt_switch)
 		default_altgr='Left Alt';;
-	    compose:ralt)
-		default_compose='Right Alt';;
-	    compose:rwin)
-		default_compose='Right Logo key';;
-	    compose:rctrl)
-		default_compose='Right Control';;
-	    compose:menu)
-		default_compose='Menu key';;
-	    compose:caps)
-		default_compose='Caps Lock';;
+	    lv3:lwin_switch)
+		default_altgr='Left Logo key';;
+	    lv3:menu_switch)
+		default_altgr='Menu key';;
+	    lv3:ralt_switch)
+		default_altgr='Right Alt';;
+	    lv3:rwin_switch)
+		default_altgr='Right Logo key';;
+	    lv3:switch)
+		default_altgr='Right Control';;
+	    lv3:win_switch)
+		default_altgr='Both Logo keys';;
 	    grp_led:scroll)
 		;;
 	    *)
@@ -1487,16 +1491,14 @@ while :; do
 			toggle=alt_shift_toggle;;
 		    Control+Shift)
 			toggle=ctrl_shift_toggle;;
-		    Shift+Caps\ Lock)
-			toggle=shift_caps_toggle;;
+		    Left\ Control+Left\ Shift)
+			toggle=lctrl_lshift_toggle;;
+		    Scroll\ Lock\ key)
+			toggle=sclk_toggle;;
+		    Alt+Caps\ Lock)
+			toggle=alt_caps_toggle;;
 		    Control+Alt)
 			toggle=ctrl_alt_toggle;;
-		    Both\ Shift\ keys\ together)
-		        toggle=shifts_toggle;;
-		    Both\ Control\ keys\ together)
-		        toggle=ctrls_toggle;;
-		    Both\ Alt\ keys\ together)
-		        toggle=alts_toggle;;
 		    Left\ Alt)
 		        lalt_allocated=yes
 		        toggle=lalt_toggle;;
@@ -1583,6 +1585,8 @@ while :; do
 			    altgr=menu_switch
 			    menu_allocated=yes
 			fi;;
+		    Keypad?Enter?key)
+			altgr=enter_switch;;
 		    Right?Logo?key)
 			if [ "$rwin_allocated" != yes ]; then
 			    altgr=rwin_switch
@@ -1601,6 +1605,15 @@ while :; do
 			    altgr=win_switch
 			    rwin_allocated=yes
 			    lwin_allocated=yes
+			fi;;
+		    Both?Alt?keys)
+			if \
+			    [ "$lalt_allocated" != yes ] \
+			    && [ "$ralt_allocated" != yes ]
+			then
+			    altgr=alt_switch
+			    ralt_allocated=yes
+			    lalt_allocated=yes
 			fi;;
 		    Left?Alt)
 			if [ "$lalt_allocated" != yes ]; then
@@ -1630,6 +1643,11 @@ while :; do
 			if [ "$rwin_allocated" != yes ]; then
 			    compose=rwin
 			    rwin_allocated=yes
+			fi;;
+		    Left?Logo?key)
+			if [ "$lwin_allocated" != yes ]; then
+			    compose=lwin 
+			    lwin_allocated=yes
 			fi;;
 		    Right?Control)
 			if [ "$rctrl_allocated" != yes ]; then
