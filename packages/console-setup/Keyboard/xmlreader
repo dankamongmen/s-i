@@ -100,7 +100,8 @@ sub parse_configItem {
 	    if (! %{$arg->[0]}) {
 		$description = parse_text $arg;
 	    }
-	} elsif ($tag eq 'shortDescription' || $tag eq '_description' || $tag eq 'vendor') {
+	} elsif ($tag =~ /^(shortDescription|_description
+                           |vendor|languageList)$/x) {
 	} elsif ($tag eq 0) {
 	    warning "configItem: Garbage in configItem: $arg.\n" if ($arg !~ /^\s*$/);
 	} else {
