@@ -3190,7 +3190,7 @@ sub flatten {
                       |FOUR_LEVEL_SEMIALPHABETIC
                       |SEPARATE_CAPS_AND_SHIFT_ALPHABETIC
 		      |KEYPAD|FOUR_LEVEL_X|FOUR_LEVEL_MIXED_KEYPAD
-		      |FOUR_LEVEL_KEYPAD
+		      |FOUR_LEVEL_KEYPAD|LOCAL_EIGHT_LEVEL
                       )$/x) {
 		    # Level1: plain
 		    # Level2: shift
@@ -3234,6 +3234,7 @@ sub flatten {
 		    }
 		} else {
 		    warning "Unknown key type $types_table{$key}\n";
+		    $coord = ($group << 4) + $level;
 		}
 	    }
 	    my $xkeysym = $symbols_table{$key}[$real_group][$real_level];
