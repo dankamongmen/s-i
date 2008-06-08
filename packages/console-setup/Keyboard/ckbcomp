@@ -3312,24 +3312,55 @@ sub flatten {
 	my $mask = $kernel_modifiers{$vector[$coord]};
 	if (defined $mask) {
 	    $vector[$coord ^ $mask] = $vector[$coord];
+	    if ($compact) {
+		# AltGr = 0x02,  ShiftL = 0x10
+		if (($mask & 0x02) && ($mask & 0x10)) {
+		    $vector[$coord ^ $mask ^ 0x02] = $vector[$coord];
+		    $vector[$coord ^ $mask ^ 0x10] = $vector[$coord];
+		} elsif ($mask & 0x02) {
+		    $vector[$coord ^ $mask ^ 0x10] = $vector[$coord];
+		    $vector[$coord ^ $mask ^ 0x10 ^ 0x02] = $vector[$coord];
+		} elsif ($mask & 0x10) {
+		    $vector[$coord ^ $mask ^ 0x02] = $vector[$coord];
+		    $vector[$coord ^ $mask ^ 0x02 ^ 0x10] = $vector[$coord];
+		}
+	    }
 	}
     }
     
-    for my $coord (16 .. 63) {
-	if ($vector[$coord] =~ /^(ShiftL|ShiftL_Lock)$/) {
-	    $vector[$coord] = 'VoidSymbol';
+    if (! $compact) {
+	for my $coord (16 .. 63) {
+	    if ($vector[$coord] =~ /^(ShiftL|ShiftL_Lock)$/) {
+		$vector[$coord] = 'VoidSymbol';
+	    }
 	}
-    }
-
-    for my $coord (0 .. 15) {
-	if ($vector[$coord] eq 'ShiftL_Lock') {   #  0 => 16
-	    $vector[$coord + 16] = 'ShiftR_Lock'; # 16 => 48
-	    $vector[$coord + 32] = 'ShiftR_Lock'; # 32 => 0
-	    $vector[$coord + 48] = 'ShiftL_Lock'; # 48 => 32
-	} elsif ($vector[$coord] eq 'ShiftL') {
-	    $vector[$coord + 16] = 'ShiftL';
-	    $vector[$coord + 32] = 'ShiftL';
-	    $vector[$coord + 48] = 'ShiftL';
+	for my $coord (0 .. 15) {
+	    if ($vector[$coord] eq 'ShiftL_Lock') {   #  0 => 16
+		$vector[$coord + 16] = 'ShiftR_Lock'; # 16 => 48
+		$vector[$coord + 32] = 'ShiftR_Lock'; # 32 => 0
+		$vector[$coord + 48] = 'ShiftL_Lock'; # 48 => 32
+	    } elsif ($vector[$coord] eq 'ShiftL') {
+		$vector[$coord + 16] = 'ShiftL';
+		$vector[$coord + 32] = 'ShiftL';
+		$vector[$coord + 48] = 'ShiftL';
+	    }
+	}
+    } else {
+	for my $coord (16 .. 63) {
+	    if ($vector[$coord] =~ /^(AltGr|AltGr_Lock)$/) {
+		$vector[$coord] = 'VoidSymbol';
+	    }
+	}
+	for my $coord (0 .. 15) {
+	    if ($vector[$coord] eq 'AltGr_Lock') {
+		$vector[$coord + 16] = 'AltGr_Lock';
+		$vector[$coord + 32] = 'AltGr_Lock';
+		$vector[$coord + 48] = 'AltGr_Lock';
+	    } elsif ($vector[$coord] eq 'AltGr') {
+		$vector[$coord + 16] = 'AltGr';
+		$vector[$coord + 32] = 'AltGr';
+		$vector[$coord + 48] = 'AltGr';
+	    }
 	}
     }
 
