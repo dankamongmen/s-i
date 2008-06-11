@@ -1,8 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44002 -->
-<!-- revised by Herbert P Fortes Neto 2006.05.02 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.07 -->
-<!-- updated 39614:44002 by Felipe Augusto van de Wiel (faw) 2007.01.15 -->
+<!-- original version: 53452 -->
+<!-- updated 39614:53452 by Felipe Augusto van de Wiel (faw) 2008.06.10 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparando os arquivos para inicialização via rede usando TFTP</title>
@@ -208,72 +206,6 @@ Tenha certeza que seu servidor dhcp está configurado para passar o arquivo
 <command>tftpd</command> para inicializar através dele.
 
 </para>
-
-
-   <sect3 arch="mipsel">
-   <title>Imagens TFTP do DECstation</title>
-<para>
-
-Para as DECstations, existem arquivos tftpimage para cada
-sub-arquitetura, que contém ambos os kernels e o programa de
-instalação em um arquivo. A convenção de nomes é
-<filename><replaceable>subarquitetura</replaceable>/netboot-boot.img</filename>.
-Copie o arquivo tftpimage que deseja usar para
-<userinput>/tftpboot/tftpboot.img</userinput> caso você utilize o
-exemplo BOOTP/DHCP descritos acima.
-
-</para><para>
-
-A firmware do DECstation é inicializada pelo TFTP com o comando
-<userinput>boot<replaceable>#</replaceable>/tftp</userinput>, onde
-<replaceable>#</replaceable> é o número do dispositivo TurboChannel
-que será inicializado. Na maioria das DECstations este número é
-o <quote>3</quote>. Se o servidor BOOTP/DHCP não fornecer o nome de arquivo
-ou você precisar passar parâmetros adicionais, eles poderão
-ser opcionalmente adicionados com a seguinte sintaxe:
-
-</para><para>
-
-<userinput>boot #/tftp/filename param1=value1 param2=value2 ...</userinput>
-
-</para><para>
-
-Diversas revisões da firmware da DECstation mostram um problema
-relacionado com a inicialização via rede: a transferência
-inicia, mas após algum tempo ela para com o erro
-<computeroutput>a.out err</computeroutput>. Isto pode ter diversas
-razões:
-
-<orderedlist>
-<listitem><para>
-
-A firmware não responde a uma requisição ARP durante uma
-transferência TFTP. Isto leva a um timeout de ARP e a transferência é
-interrompida. A solução é adicionar o endereço MAC da
-placa ethernet na DECstation estaticamente para a tabela ARP do
-servidor de TFTP. Isto é feito rodando <userinput>arp -s
-<replaceable>IP-address</replaceable>
-<replaceable>MAC-address</replaceable></userinput> como root na
-máquina que atua como servidor TFTP. O endereço MAC da DECstation
-pode ser lido entrando com o comando <command>cnfg</command>
-no aviso da firmware da DECstation.
-
-</para></listitem>
-<listitem><para>
-
-A firmware tem o limite de tamanho nos arquivos que podem ser
-inicializados através do TFTP.
-
-</para></listitem>
-</orderedlist>
-
-Existem também revisões de firmware que não permitem inicializações
-através do TFTP. Uma visão sobre as diferentes revisões de firmware
-podem ser encontradas nas páginas web do NetBSD:
-<ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
 
    <sect3 arch="alpha">
    <title>Inicialização através de TFTP no Alpha</title>
