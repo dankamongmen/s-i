@@ -420,6 +420,7 @@ static int validate_mirror(void) {
 
 	if (! manual_entry) {
 		char *mirror;
+		char *root;
 
 		/*
 		 * Copy information about the selected
@@ -430,10 +431,15 @@ static int validate_mirror(void) {
 		debconf_get(debconf, mir);
 		mirror = strdup(debconf->value);
 		debconf_set(debconf, host, mirror);
-		debconf_set(debconf, dir, mirror_root(mirror));
+		root = mirror_root(mirror);
 		free(mirror);
-
-		valid = find_suite();
+		if (root == NULL) {
+			valid = 0;
+		}
+		else {
+			debconf_set(debconf, dir, root);
+			valid = find_suite();
+		}
 	}
 	else {
 		/* check to see if the entered data is basically ok */
