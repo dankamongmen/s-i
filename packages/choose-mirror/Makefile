@@ -1,5 +1,5 @@
-USE_HTTP=1
-#USE_FTP=1
+export USE_HTTP=1
+#export USE_FTP=1
 USE_FTP_MANUAL=1
 
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
@@ -65,10 +65,10 @@ debian/choose-mirror-bin.templates: $(MASTERLIST) $(templates) debian/httplist-c
 	./mktemplates $(templates)
 
 mirrors_http.h: $(MASTERLIST)
-	./mirrorlist http $^
+	if [ "$$USE_HTTP" ]; then ./mirrorlist http $^; fi
 
 mirrors_ftp.h: $(MASTERLIST)
-	./mirrorlist ftp $^
+	if [ "$$USE_FTP" ]; then ./mirrorlist ftp $^; fi
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
 
