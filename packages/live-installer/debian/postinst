@@ -39,26 +39,29 @@ install_live_system () {
 
 		COUNT=0
 		OLD_IFS=$IFS
-		IFS=$NEWLINE
-		for item in `find .`; do
-			# We need to be ensure it's not a symbolic link otherwise
-			# it breaks links for directories.
-			if [ -d "$item" ] && [ ! -h "$item" ]; then
-				mkdir -p /target/"$item"
-			else
-				mkdir -p /target/"$(dirname $item)"
-				rm -f /target/"$item"
-				cp -a "$item" /target/"$item"
-			fi
+		mkdir -p /target
+		# use tar from inside the live filesystem to create
+		# the tarball, because busybox tar in d-i does not 
+		# support creating tarballs.
+		# 
+		# The --exclude is a paranoia measure, in case this program
+		# is running from the toplevel of a live filesystem,
+		# which is not normally the case.
+		exec 4>&0
+		chroot . tar c . --exclude=target | \
+		(chdir /target && tar xv) | \
+		(
+			while read line; do
+				COUNT=$(($COUNT + 1))
+				CURRENT=$(($COUNT * 100 / $STEPS))
 
-			COUNT=$(($COUNT + 1))
-			CURRENT=$(($COUNT * 100 / $STEPS))
+				[ x$CURRENT = x$LAST_UPDATE ] && continue
 
-			[ x$CURRENT = x$LAST_UPDATE ] && continue
-
-			LAST_UPDATE=$CURRENT
-			db_progress STEP 1
-		done
+				LAST_UPDATE=$CURRENT
+				db_progress STEP 1 <&4
+			done
+		)
+		exec 0>&4
 		IFS=$OLD_IFS
 	done
 
