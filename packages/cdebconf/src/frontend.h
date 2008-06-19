@@ -48,30 +48,30 @@ struct frontend_module {
 struct frontend {
     /* module name */
     char *name;
-	/* module handle */
-	void *handle;
-	/* configuration data */
-	struct configuration *config;
+    /* module handle */
+    void *handle;
+    /* configuration data */
+    struct configuration *config;
     /* config path - base of instance configuration */
     char configpath[DEBCONF_MAX_CONFIGPATH_LEN];
-	/* database handle for templates and config */
-	struct template_db *tdb;
-	struct question_db *qdb;
-	/* frontend capabilities */
-	unsigned long capability;
-	/* private data */
-	void *data;
-
-	/* class variables */
-	struct question *questions;
-	int interactive;
-	char *capb;
-	char *title;
+    /* database handle for templates and config */
+    struct template_db *tdb;
+    struct question_db *qdb;
+    /* frontend capabilities */
+    unsigned long capability;
+    /* private data */
+    void *data;
+    
+    /* class variables */
+    struct question *questions;
+    int interactive;
+    char *capb;
+    char *title;
     struct question *info;
-	char *progress_title;
+    char *progress_title;
     int progress_min, progress_max, progress_cur;
-	
-	/* methods */
+    	
+    /* methods */
     struct frontend_module methods;
     /* path to plugins */
     char *plugin_path;
