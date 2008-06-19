@@ -17,6 +17,7 @@ mode="$RET"
 install_live_system () {
 	# Look at
 	PLACES=""
+	PLACE_FOUND=0
 
 	# Load filesystem support
 	for script in $(ls /lib/live-installer/*); do
@@ -28,6 +29,8 @@ install_live_system () {
 
 		SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
 		info "Using $SUPPORT support for $place"
+
+		PLACE_FOUND=1
 
 		eval ${SUPPORT}_prepare
 		STEPS=$(eval ${SUPPORT}_count)
@@ -58,6 +61,11 @@ install_live_system () {
 		done
 		IFS=$OLD_IFS
 	done
+
+	if [ ${PLACE_FOUND} -eq 0 ]; then
+		error "Could not find any live images"
+		exit 1
+	fi
 
 	# if we're dumping it, we need to set boot=live
 	if [ "$mode" = live ]; then
