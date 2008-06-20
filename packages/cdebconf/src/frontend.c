@@ -4,6 +4,8 @@
 #include "database.h"
 #include "frontend.h"
 #include "question.h"
+#include "template.h"
+#include "strutl.h"
 
 #include <dlfcn.h>
 #include <string.h>
@@ -28,9 +30,38 @@ static int frontend_add(struct frontend *obj, struct question *q)
 			qlast = qlast->next;
 		}
 		/* Question asked twice. debconf ignores the second question and
-		   will we. */
+		   so will we. */
 		if (qlast == q)
 			return DC_OK;
+		qlast->next = q;
+		q->prev = qlast;
+	}
+
+	question_ref(q);
+
+	return DC_OK;
+}
+
+static int frontend_add_noninteractive(struct frontend *obj, struct question *q)
+{
+	struct question *qlast;
+	ASSERT(q != NULL);
+	ASSERT(q->prev == NULL);
+	ASSERT(q->next == NULL);
+
+	//INFO(INFO_DEBUG, "adding noninteractive question");
+
+	qlast = obj->questions_noninteractive;
+	if (qlast == NULL)
+	{
+		obj->questions_noninteractive = q;
+	}
+	else
+	{
+		while (qlast != q && qlast->next != NULL)
+		{
+			qlast = qlast->next;
+		}
 		qlast->next = q;
 		q->prev = qlast;
 	}
@@ -45,6 +76,54 @@ static int frontend_go(struct frontend *obj)
 	return DC_OK;
 }
 
+static int frontend_go_noninteractive(struct frontend *obj)
+{
+	struct question *q = obj->questions_noninteractive;
+
+	while (q != NULL) {
+		char *type = q->template->type;
+
+		//INFO(INFO_DEBUG, "frontend_go_noninteractive; type %s", type);
+
+		/* This is a hack to make noninteractive selects be set to
+		 * the first item in the select list if their value is not
+		 * set, or is set to something not in the list. This is for
+		 * consistency with debconf. */
+		if (strcmp(type, "select") == 0) {
+			int i, ok=0;
+			char **choices=NULL;
+			char *val = (char *) question_getvalue(q, "");
+			int count = strgetargc(q_get_choices_vals(obj, q));
+			if (count) {
+				choices = malloc(sizeof(char *) * count);
+				if (strchoicesplit(q_get_choices_vals(obj, q), choices, count) != count)
+					return DC_NOTOK;
+			
+					for (i = 0; i < count; i++) {
+					if (val && strcmp(val, choices[i]) == 0) {
+						ok=1;
+						break;
+					}
+				}
+			}
+
+			if (! ok) {
+				if (count)
+					question_setvalue(q, choices[0]);
+				else
+					question_setvalue(q, "");
+			}
+
+			if (choices)
+				free(choices);
+		}
+
+		q = q->next;
+	}
+
+	return DC_OK;
+}
+
 static void frontend_clear(struct frontend *obj)
 {
 	struct question *q;
@@ -53,6 +132,14 @@ static void frontend_clear(struct frontend *obj)
 	{
 		q = obj->questions;
 		obj->questions = obj->questions->next;
+		q->next = q->prev = NULL;
+		question_deref(q);
+	}
+
+	while (obj->questions_noninteractive != NULL)
+	{
+		q = obj->questions_noninteractive;
+		obj->questions_noninteractive = obj->questions_noninteractive->next;
 		q->next = q->prev = NULL;
 		question_deref(q);
 	}
@@ -227,6 +314,8 @@ struct frontend *frontend_new(struct configuration *cfg, struct template_db *tdb
 	SETMETHOD(progress_step);
 	SETMETHOD(progress_info);
 	SETMETHOD(progress_stop);
+	SETMETHOD(add_noninteractive);
+	SETMETHOD(go_noninteractive);
 
 #undef SETMETHOD
 

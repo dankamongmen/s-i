@@ -54,6 +54,8 @@ command_input(struct confmodule *mod, char *arg)
 
     if (visible)
         visible = mod->frontend->methods.add(mod->frontend, q);
+    else
+        mod->frontend->methods.add_noninteractive(mod->frontend, q);
 
     if (q->priority != NULL)
         free(q->priority);
@@ -220,6 +222,7 @@ command_go(struct confmodule *mod, char *arg)
 	mod->frontend->questions = q;
     }
 
+    mod->frontend->methods.go_noninteractive(mod->frontend);
     ret = mod->frontend->methods.go(mod->frontend);
     if (ret == CMDSTATUS_GOBACK || mod->backed_up != 0)
     {

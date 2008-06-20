@@ -43,6 +43,9 @@ struct frontend_module {
     int (*progress_step)(struct frontend *fe, int step);
     int (*progress_info)(struct frontend *fe, const char *info);
     void (*progress_stop)(struct frontend *fe);
+   
+    int (*go_noninteractive)(struct frontend *);
+    int (*add_noninteractive)(struct frontend *, struct question *q);
 };
 
 struct frontend {
@@ -75,6 +78,8 @@ struct frontend {
     struct frontend_module methods;
     /* path to plugins */
     char *plugin_path;
+    	/* separate list of noninteractive questions */
+	struct question *questions_noninteractive;
 };
 
 struct frontend *frontend_new(struct configuration *, struct template_db *, struct question_db *);
