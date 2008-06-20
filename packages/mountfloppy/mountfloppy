@@ -1,32 +1,6 @@
 #!/bin/sh
-. /usr/share/debconf/confmodule
 
 FLOPPYMNT=/floppy
-
-ask_dev() {
-	DEVS=""
-	for dev in $(list-devices floppy); do
-		# TODO if sfdisk or something similar were available, we could
-		# do this:
-		#        SIZE=sfdisk -s $DEV
-		#        if [ "$SIZE" -eq '1440' -o "$SIZE" -eq '2880' ]; then
-		if [ -b "$dev" ]; then
-			if [ -z "$DEVS" ]; then
-				DEVS="$dev"
-			else
-				DEVS="$DEVS, $dev"
-			fi
-		fi
-	done
-	db_subst retriever/floppy/device DEVS $DEVS
-	db_input high retriever/floppy/device
-	db_go 
-	db_get retriever/floppy/device
-	if [ "$RET" = Cancel ]; then
-		exit 1
-	fi
-	echo $RET
-}
 
 try_mount() {
 	# TO REMOVE, there is a bug somewhere in the kernel, the first
@@ -56,9 +30,6 @@ if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
 		# Maybe the system has an ide-floppy device?
 		log-output -t mountfloppy modprobe -q ide-floppy || true
 		update-dev
-
-		# Ask for help from the user and try it again.
-		FLOPPYDEV=$(ask_dev)
 		try_mount $FLOPPYDEV $FLOPPYMNT
 	fi
 fi
