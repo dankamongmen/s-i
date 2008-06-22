@@ -8,7 +8,7 @@ subdirs = \
 
 subdirs_empty = \
 	dev \
-	floppy \
+	media \
 	initrd \
 	mnt \
 	proc \
