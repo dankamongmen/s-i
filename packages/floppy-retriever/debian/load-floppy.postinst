@@ -10,7 +10,7 @@ warning() {
 	log "warning: $@"
 }
 
-FLOPPYMNT=/floppy
+MNT=/media
 
 # SPARC floppy drives don't have an eject button. Dropping to PROM
 # and calling eject-floppy isn't the best way to go..
@@ -39,11 +39,11 @@ while true; do
 	fi
 
 	label=""
-	mountfloppy
-	if [ -e $FLOPPYMNT/disk.lbl ]; then
-		label=$(cat $FLOPPYMNT/disk.lbl | grep "^Label" | sed "s/Label://")
+	mountmedia driver
+	if [ -e $MNT/disk.lbl ]; then
+		label=$(cat $MNT/disk.lbl | grep "^Label" | sed "s/Label://")
 	fi
-	umount $FLOPPYMNT
+	umount $MNT
 
 	# a floppy disk_N (N>=2) must be loaded after disk_N-1
 	disk_name=$(echo $label | cut -d':' -f1)
