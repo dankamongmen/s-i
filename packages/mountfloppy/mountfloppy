@@ -6,13 +6,27 @@ fi
 
 FLOPPYMNT=/floppy
 
+devlist() {
+	if [ "$WANTDRIVER" ]; then
+		# Ordering: First look for USB media (also finding whole fixed
+		# disks, but that's ok). Then look for floppies. Finally, try
+		# scanning partitions last.
+		list-devices disk
+		list-devices maybe-usb-floppy
+		list-devices floppy
+		list-devices partition
+	else
+		list-devices floppy
+	fi
+}
+
 try_mount() {
 	# TO REMOVE, there is a bug somewhere in the kernel, the first
 	# mount command fail when changing floppy disk
 	# so we have to launch mount twice
-	mount $1 -tauto $2 || true
-	umount $2 || true
-	mount $1 -tauto $2
+	mount $1 -tauto $FLOPPYMNT || true
+	umount $FLOPPYMNT || true
+	mount $1 -tauto $FLOPPYMNT
 
 	checkcontents
 }
@@ -22,7 +36,7 @@ checkcontents() {
 		# Make sure this is a driver floppy by checking the files on
 		# it. Check for regular debs, udebs, and to be on the safe
 		# side, check for *.ude files (msdos file names...)
-		for filename in $2/*.deb $2/*.udeb $2/*.ude; do
+		for filename in $FLOPPYMNT/*.deb $FLOPPYMNT/*.udeb $FLOPPYMNT/*.ude; do
 			if [ -f "$filename" ]; then
 				return 0 # success
 			fi
@@ -35,21 +49,35 @@ checkcontents() {
 }
 
 if ! ( mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$" && checkcontents ); then
-	# This is a good reasonable default, but will fail for
-	# USB floppys.
+	if ! grep -q ^vfat /proc/modules ; then
+		log-output -t mountfloppy modprobe -q vfat || true
+	fi
+
+	# Repeat twice if necessary, to accomodate devices that need some
+	# time to initialise, like USB devices.
+	for i in 1 2; do
+		for dev in $(devlist); do
+			if try_mount $dev; then
+				exit 0 # success
+			fi
+		done
+		
+		if [ "$i" = 1 ]; then       
+			# Give USB time to settle, make sure all devices are
+			# seen next time though.
+			sleep 5
+		fi
+	done
+
+	# Maybe the floppy module needs to be explicitly loaded?
 	FLOPPYDEV=/dev/fd0
-	
 	if [ ! -e $FLOPPYDEV ]; then
 		log-output -t mountfloppy modprobe -q floppy || true
 		update-dev
 	fi
-
-	if ! grep -q ^vfat /proc/modules ; then
-		log-output -t mountfloppy modprobe -q vfat || true
-	fi
 	
 	# Cannot find a device, or found the wrong device.
-	if [ ! -e "$FLOPPYDEV" ] || ! try_mount $FLOPPYDEV $FLOPPYMNT; then
+	if [ ! -e "$FLOPPYDEV" ] || ! try_mount $FLOPPYDEV; then
 		# Maybe the system has an ide-floppy device?
 		log-output -t mountfloppy modprobe -q ide-floppy || true
 		update-dev
