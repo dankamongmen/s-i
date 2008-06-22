@@ -14,6 +14,10 @@ try_mount() {
 	umount $2 || true
 	mount $1 -tauto $2
 
+	checkcontents
+}
+
+checkcontents() {
 	if [ "$WANTDRIVER" ]; then
 		# Make sure this is a driver floppy by checking the files on
 		# it. Check for regular debs, udebs, and to be on the safe
@@ -30,7 +34,7 @@ try_mount() {
 	fi
 }
 
-if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then
+if ! ( mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$" && checkcontents ); then
 	# This is a good reasonable default, but will fail for
 	# USB floppys.
 	FLOPPYDEV=/dev/fd0
