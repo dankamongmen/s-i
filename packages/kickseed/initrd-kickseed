@@ -101,8 +101,9 @@ esac
 
 case $KSCFG in
 	/floppy/*)
-		mountfloppy || true
-		trap 'umount /floppy || true' EXIT HUP INT QUIT TERM
+		mountmedia floppy || true
+		KSCFG="/media/${KSCFG#/floppy/}"
+		trap 'umount /media || true' EXIT HUP INT QUIT TERM
 		;;
 	/media/*)
 		device="${KSCFG#/media/}"
