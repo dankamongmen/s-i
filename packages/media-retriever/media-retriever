@@ -46,7 +46,7 @@ case "x$cmd" in
 			exit 1
 		fi
 		# This could take a while, so a progress bar.
-		db_progress START 0 $FILE_COUNT retriever/floppy/packages/progress
+		db_progress START 0 $FILE_COUNT retriever/media/packages/progress
 		for filename in $FILES; do
 			udpkg -f "$filename" | sed 's/Priority: .*/Priority: standard/' >> "$1"
 			path="`echo "$filename" | sed 's,^/media/,,'`"
@@ -60,7 +60,7 @@ case "x$cmd" in
 	xerror)
 		umount $MNT || true
 
-		T="retriever/floppy/error"
+		T="retriever/media/error"
 		db_input critical "$T" || true
 		db_go
 		exit 2

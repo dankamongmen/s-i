@@ -4,7 +4,7 @@ set -e
 . /usr/share/debconf/confmodule
 
 log() {
-	logger -t load-floppy "$@"
+	logger -t load-media "$@"
 }
 warning() {
 	log "warning: $@"
@@ -16,10 +16,10 @@ MNT=/media
 # and calling eject-floppy isn't the best way to go..
 eject /dev/fd0 >/dev/null 2>&1 || true
 
-T=retriever/floppy/loadnow
-A=retriever/floppy/loadanother
-U=retriever/floppy/unknown
-W=retriever/floppy/warning
+T=retriever/media/loadnow
+A=retriever/media/loadanother
+U=retriever/media/unknown
+W=retriever/media/warning
 
 Q=$T
 Q_default=true
@@ -45,7 +45,7 @@ while true; do
 	fi
 	umount $MNT
 
-	# a floppy disk_N (N>=2) must be loaded after disk_N-1
+	# a disk_N (N>=2) must be loaded after disk_N-1
 	disk_name=$(echo $label | cut -d':' -f1)
 	disk_type=$(echo $label | cut -d':' -f2)
 	disk_nb=$(echo $label | cut -d':' -f3)
@@ -63,7 +63,7 @@ while true; do
 			db_go
 		else
 			# DISK OK
-			anna floppy-retriever
+			anna media-retriever
 			old_disk_type="$disk_type"
 			Q=$A
 			if [ ! "$disk_nb" ] || [ $disk_nb -eq 2 ]; then
@@ -71,14 +71,13 @@ while true; do
 			fi
 		fi
 	else
-		# UNKNOWN FLOPPY
-		warning "Unknown floppy present"
+		warning "Unknown media present"
 		db_set $U false || true
 		db_input critical $U || true
 		db_go
 		db_get $U
 		if [ "$RET" = true ]; then
-			anna floppy-retriever
+			anna media-retriever
 			old_disk_type=""
 			Q=$A
 			Q_default=false
