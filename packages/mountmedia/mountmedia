@@ -30,27 +30,31 @@ try_mount() {
 	umount $MNT || true
 	mount $1 -tauto $MNT
 
-	checkcontents
+	checkcontents $MNT
 }
 
 checkcontents() {
+	dir="$1"
+
 	if [ "$WANTDRIVER" ]; then
 		# Make sure this is driver media by checking the files on
 		# it. Check for regular debs, udebs, and to be on the safe
 		# side, check for *.ude files (msdos file names...)
-		for filename in $MNT/*.deb $MNT/*.udeb $MNT/*.ude; do
+		for filename in $dir/*.deb $dir/*.udeb $dir/*.ude; do
 			if [ -f "$filename" ]; then
 				return 0 # success
 			fi
 		done
-		umount $2
+		# umount can legitimatly fail if something is keeping
+		# it open
+		umount $dir 2>/dev/null || true
 		return 1
 	else
 		return 0 
 	fi
 }
 
-if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents ); then
+if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents $MNT ); then
 	if ! grep -q ^vfat /proc/modules ; then
 		log-output -t mountmedia modprobe -q vfat || true
 	fi
@@ -77,9 +81,13 @@ if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents ); then
 		log-output -t mountmedia modprobe -q floppy || true
 		update-dev
 	fi
-	
-	# Cannot find a device, or found the wrong device.
+
 	if [ ! -e "$DEV" ] || ! try_mount $DEV; then
+		# Special case for an already mounted /hd-media.
+		if [ "$WANTDRIVER" ] && [ -d /hd-media ] && checkcontents /hd-media; then
+			mount --bind /hd-media /media
+		fi
+
 		# Maybe the system has an ide-floppy device?
 		log-output -t mountmedia modprobe -q ide-floppy || true
 		update-dev
