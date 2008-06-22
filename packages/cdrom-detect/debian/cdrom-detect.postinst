@@ -63,12 +63,12 @@ do
 	fi
  
 	# If no device was detected, perhaps a driver floppy is needed.
-	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
-		db_input critical cdrom-detect/load_floppy
+	if [ -e /usr/lib/debian-installer/retriever/media-retriever ]; then
+		db_input critical cdrom-detect/load_media
 		db_go
-		db_get cdrom-detect/load_floppy
+		db_get cdrom-detect/load_media
 		if [ "$RET" = true ]; then
-			anna floppy-retriever
+			anna media-retriever
 			hw-detect cdrom-detect/detect_progress_title || true
 			continue
 		fi
