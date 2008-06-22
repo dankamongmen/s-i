@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$1" = driver ]; then
+	WANTDRIVER=1
+fi
+
 FLOPPYMNT=/floppy
 
 try_mount() {
@@ -9,6 +13,21 @@ try_mount() {
 	mount $1 -tauto $2 || true
 	umount $2 || true
 	mount $1 -tauto $2
+
+	if [ "$WANTDRIVER" ]; then
+		# Make sure this is a driver floppy by checking the files on
+		# it. Check for regular debs, udebs, and to be on the safe
+		# side, check for *.ude files (msdos file names...)
+		for filename in $2/*.deb $2/*.udeb $2/*.ude; do
+			if [ -f "$filename" ]; then
+				return 0 # success
+			fi
+		done
+		umount $2
+		return 1
+	else
+		return 0 
+	fi
 }
 
 if ! mount | cut -d' ' -f3 | grep -q "^$FLOPPYMNT$"; then

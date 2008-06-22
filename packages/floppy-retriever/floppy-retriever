@@ -9,7 +9,7 @@ shift
 
 case "x$cmd" in
 	xconfig)
-		mountfloppy
+		mountfloppy driver
 		for f in include exclude; do
 			if [ -e $FLOPPYMNT/udeb_$f ]; then
 				ln -sf $FLOPPYMNT/udeb_$f /var/cache/anna/$f
@@ -18,7 +18,7 @@ case "x$cmd" in
 	;;
 
 	xretrieve)
-		mountfloppy
+		mountfloppy driver
 		if [ -e $FLOPPYMNT/$1 ]; then
 			ln -sf $FLOPPYMNT/$1 "$2"
 			exit $?
@@ -30,7 +30,7 @@ case "x$cmd" in
 	xpackages)
 		# generate a Packages file based on what udebs are on the
 		# floppy
-		mountfloppy
+		mountfloppy driver
 		rm -f "$1"
 		touch "$1"
 		# Check for regular debs, udebs, and to be on the safe side,
