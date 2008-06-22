@@ -206,17 +206,17 @@ while ! ethernet_found; do
 		fi
 	fi
 
-	if [ -e /usr/lib/debian-installer/retriever/floppy-retriever ]; then
+	if [ -e /usr/lib/debian-installer/retriever/media-retriever ]; then
 		db_capb backup
-		db_input critical hw-detect/load_floppy
+		db_input critical hw-detect/load_media
 		if ! db_go; then
 			cleanup
 			exit 10
 		fi
 		db_capb
-		db_get hw-detect/load_floppy
+		db_get hw-detect/load_media
 		if [ "$RET" = true ] && \
-		   anna floppy-retriever && \
+		   anna media-retriever && \
 		   hw-detect ethdetect/detect_progress_title; then
 			continue
 		fi
