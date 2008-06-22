@@ -105,15 +105,15 @@ web)
 	fi
 ;;
 floppy)
-	test -d /floppy || mkdir /floppy
-	umount /floppy 2>/dev/null || true
+	test -d /media || mkdir /media
+	umount /media 2>/dev/null || true
 
 	db_input critical save-logs/insert_floppy || [ $? -eq 30 ]
 	db_go
 
-	if mountfloppy ; then
-		save_logs /floppy
-		umount /floppy
+	if mountmedia floppy ; then
+		save_logs /media
+		umount /media
 		db_progress STEP 1
 		db_progress STOP
 	else
