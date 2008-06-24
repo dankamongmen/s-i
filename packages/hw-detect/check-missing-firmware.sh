@@ -91,7 +91,7 @@ while read_log && ask_load_firmware; do
 	if mountmedia driver; then
 		grepfor="$(echo "$files" | sed -e 's/ /\n/g')"
 		for filename in /media/*.deb /media/*.udeb /media/*.ude; do
-			if [ -f "$filenmame" ]; then
+			if [ -f "$filename" ]; then
 				if list_deb_firmware "$filename" | grep -qF "$grepfor"; then
 					unstall_firmware_pkg "$filename" || true
 				fi
