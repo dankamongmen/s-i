@@ -34,10 +34,19 @@ read_log () {
 	fi
 }
 
+first=1
 ask_load_firmware () {
 	db_subst hw-detect/load_firmware FILES "$files"
-	db_input high hw-detect/load_firmware || true
-	db_go || true
+	if ! db_input high hw-detect/load_firmware; then
+		if [ ! "$first" ]; then
+			exit 1;
+		else
+			first=""
+		fi
+	fi
+	if ! db_go; then
+		exit 10 # back up
+	fi
 	db_get hw-detect/load_firmware
 	if [ "$RET" = true ]; then
 		return 0
@@ -79,8 +88,8 @@ while read_log && ask_load_firmware; do
 	# Try to load udebs (or debs) that contain the missing firmware.
 	# This does not use anna because debs can have arbitrary
 	# dependencies, which anna might try to install.
-	if mountmedia drivers; then
-		grepfor="$(echo "$files" | sed -e 's/ /\n/')"
+	if mountmedia driver; then
+		grepfor="$(echo "$files" | sed -e 's/ /\n/g')"
 		for filename in /media/*.deb /media/*.udeb /media/*.ude; do
 			if [ -f "$filenmame" ]; then
 				if list_deb_firmware "$filename" | grep -qF "$grepfor"; then
