@@ -497,6 +497,8 @@ if [ -n "$MISSING_MODULES_LIST" ]; then
 	log "Missing modules '$MISSING_MODULES_LIST"
 fi
 
+check-missing-firmware
+
 sysfs-update-devnames
 
 # Let userspace /dev tools rescan the devices

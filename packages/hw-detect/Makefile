@@ -43,6 +43,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL_DATA) net-hotplug.rules $(udevdir)/010_net-hotplug.rules
 	$(INSTALL) -d $(udevlibdir)
 	$(INSTALL) firmware.agent $(udevlibdir)
+	$(INSTALL) check-missing-firmware.sh $(bindir)/check-missing-firmware
 	$(INSTALL) -d $(hpdir)/net
 	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
 	$(INSTALL) -d $(fidir)
