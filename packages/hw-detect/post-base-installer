@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+. /usr/share/debconf/confmodule
 
 # install cached firmware debs
 if [ -d /var/cache/firmware ]; then
@@ -9,8 +10,13 @@ if [ -d /var/cache/firmware ]; then
 			# TODO debconf passthrough
 			in-target dpkg -i "/tmp/$deb" || true
 			rm -f "/target/tmp/$deb"
+			need_nonfree=1
 		fi
 	done
+fi
+
+if [ "$need_nonfree" ]; then
+	db_set apt-setup/non-free true
 fi
 
 # copy any loose firmware files to /target too
