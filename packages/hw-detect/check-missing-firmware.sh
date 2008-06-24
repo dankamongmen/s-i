@@ -55,7 +55,7 @@ ask_load_firmware () {
 	fi
 }
 
-listdeb_firmware () {
+list_deb_firmware () {
 	ar p "$1" data.tar.gz | tar zt \
 		| grep '^\./lib/firmware/' \
 		| sed -e 's!^\./lib/firmware/!!'
@@ -89,14 +89,15 @@ while read_log && ask_load_firmware; do
 	# This does not use anna because debs can have arbitrary
 	# dependencies, which anna might try to install.
 	if mountmedia driver; then
-		grepfor="$(echo "$files" | sed -e 's/ /\n/g')"
+		echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
 		for filename in /media/*.deb /media/*.udeb /media/*.ude; do
 			if [ -f "$filename" ]; then
-				if list_deb_firmware "$filename" | grep -qF "$grepfor"; then
-					unstall_firmware_pkg "$filename" || true
+				if list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
+					install_firmware_pkg "$filename" || true
 				fi
 			fi
 		done
+		rm -f /tmp/grepfor
 		umount /media || true
 	fi
 
