@@ -55,6 +55,12 @@ checkcontents() {
 }
 
 if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents $MNT ); then
+	# Special case for an already mounted /hd-media.
+	if [ "$WANTDRIVER" ] && [ -d /hd-media ] && checkcontents /hd-media; then
+		mount --bind /hd-media /media
+		exit 0
+	fi
+
 	if ! grep -q ^vfat /proc/modules ; then
 		log-output -t mountmedia modprobe -q vfat || true
 	fi
@@ -83,12 +89,6 @@ if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents $MNT ); then
 	fi
 
 	if [ ! -e "$DEV" ] || ! try_mount $DEV; then
-		# Special case for an already mounted /hd-media.
-		if [ "$WANTDRIVER" ] && [ -d /hd-media ] && checkcontents /hd-media; then
-			mount --bind /hd-media /media
-			exit 0
-		fi
-
 		# Maybe the system has an ide-floppy device?
 		log-output -t mountmedia modprobe -q ide-floppy || true
 		update-dev
