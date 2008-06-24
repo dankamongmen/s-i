@@ -59,7 +59,7 @@ while read_log && ask_load_firmware; do
 
 	# also look for loose firmware files on the media
 	if mountmedia; then
-		for file in $(files); do
+		for file in $files; do
 			if [ -e "/media/$file" ]; then
 				mkdir -p /lib/firmware
 				rm -f "/lib/firmware/$file"
@@ -70,7 +70,7 @@ while read_log && ask_load_firmware; do
 	fi
 
 	# remove and reload modules so they see the new firmware
-	for module in $(modules); do
+	for module in $modules; do
 		modprobe -r $module || true
 		modprobe $module || true
 	done
