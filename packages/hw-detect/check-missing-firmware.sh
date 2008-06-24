@@ -19,7 +19,9 @@ read_log () {
 				modules="$module $modules"
 			fi
 			file="${line#* }"
-			files="$file $files"
+			if [ -n "$file" ]; then
+				files="$file $files"
+			fi
 		done
 		IFS="$OLDIFS"
 		rm -f $LOG.old
