@@ -6,6 +6,7 @@ set -e
 if [ -d /lib/firmware ]; then
 	for f in /lib/firmware/*; do
 		if [ -e "$f" ]; then
+			mkdir -p /target/lib/firmware/
 			cp -a "$f" /target/lib/firmware/
 		fi
 	done
@@ -17,7 +18,7 @@ if [ -d /var/cache/firmware ]; then
 		if [ -f "$deb" ]; then
 			cp -a "$deb" /target/tmp
 			# TODO debconf passthrough
-			in-target dpkg -i "/tmp/$deb" || true
+			in-target dpkg -i "/tmp/$(basename "$deb")" || true
 			rm -f "/target/tmp/$deb"
 			need_nonfree=1
 		fi
