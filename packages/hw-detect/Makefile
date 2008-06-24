@@ -20,6 +20,7 @@ udevlibdir=$(DESTDIR)/lib/udev
 didir=$(DESTDIR)/lib/debian-installer.d
 fidir=$(DESTDIR)/usr/lib/finish-install.d
 sharedir=$(DESTDIR)/usr/share/hw-detect/
+postbaseinstallerdir=$(DESTDIR)/usr/lib/post-base-installer.d/
 
 INSTALL=install
 INSTALL_DATA = ${INSTALL} -m 644
@@ -44,6 +45,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) -d $(udevlibdir)
 	$(INSTALL) firmware.agent $(udevlibdir)
 	$(INSTALL) check-missing-firmware.sh $(bindir)/check-missing-firmware
+	$(INSTALL) -d $(postbaseinstallerdir)
+	$(INSTALL) post-base-installer $(postbaseinstallerdir)/50hw-detect
 	$(INSTALL) -d $(hpdir)/net
 	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
 	$(INSTALL) -d $(fidir)
