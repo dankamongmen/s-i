@@ -56,7 +56,7 @@ checkcontents() {
 
 if ! ( mount | cut -d' ' -f3 | grep -q "^$MNT$" && checkcontents $MNT ); then
 	# Special case for an already mounted /hd-media.
-	if [ "$WANTDRIVER" ] && [ -d /hd-media ] && checkcontents /hd-media; then
+	if [ -d /hd-media ] && checkcontents /hd-media; then
 		mount --bind /hd-media /media
 		exit 0
 	fi
