@@ -2,6 +2,15 @@
 set -e
 . /usr/share/debconf/confmodule
 
+# copy any loose firmware files to /target
+if [ -d /lib/firmware ]; then
+	for f in /lib/firmware/*; do
+		if [ -e "$f" ]; then
+			cp -a "$f" /target/lib/firmware/
+		fi
+	done
+fi
+
 # install cached firmware debs
 if [ -d /var/cache/firmware ]; then
 	for deb in /var/cache/firmware/*.deb; do
@@ -17,13 +26,4 @@ fi
 
 if [ "$need_nonfree" ]; then
 	db_set apt-setup/non-free true
-fi
-
-# copy any loose firmware files to /target too
-if [ -d /lib/firmware ]; then
-	for f in /lib/firmware/*; do
-		if [ -e "$f" ]; then
-			cp -a "$f" /target/lib/firmware/
-		fi
-	done
 fi

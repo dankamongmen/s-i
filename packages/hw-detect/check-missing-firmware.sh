@@ -45,7 +45,19 @@ ask_load_firmware () {
 }
 
 while read_log && ask_load_firmware; do
-	# try to load udebs (or debs)
+	# first, look for loose firmware files on the media
+	if mountmedia; then
+		for file in $files; do
+			if [ -e "/media/$file" ]; then
+				mkdir -p /lib/firmware
+				rm -f "/lib/firmware/$file"
+				cp -a "/media/$file" /lib/firmware/ || true
+			fi
+		done
+		umount /media || true
+	fi
+
+	# then try to load udebs (or debs)
 	if mountmedia drivers; then
 		# copy any debs to a holding cache,
 		# for installation into /target later
@@ -55,18 +67,6 @@ while read_log && ask_load_firmware; do
 			mv /var/cache/firmware/new/* /var/cache/firmware
 			rmdir /var/cache/firmware/new
 		fi
-		umount /media || true
-	fi
-
-	# also look for loose firmware files on the media
-	if mountmedia; then
-		for file in $files; do
-			if [ -e "/media/$file" ]; then
-				mkdir -p /lib/firmware
-				rm -f "/lib/firmware/$file"
-				cp -a "/media/$file" /lib/firmware/ || true
-			fi
-		done
 		umount /media || true
 	fi
 
