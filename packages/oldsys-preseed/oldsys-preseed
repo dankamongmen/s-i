@@ -130,7 +130,41 @@ case "`archdetect`" in
 	;;
 	arm*/orion5x)
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
-		if echo "$machine" | grep -q "^QNAP TS-109/TS-209" ||
+		if echo "$machine" | grep -q "^HP Media Vault mv2120"; then
+			path=/tmp/oldsys-preseed
+			mkdir -p $path/sda5
+			mount -t ext3 -o ro /dev/sda5 $path/sda5 || true
+			INTERFACE=eth0
+			if [ -e $path/sda5/etc/nas_conf_db.xml ]; then
+				dhcp=$(remove_xml $(grep "<dhcpenabled>" $path/sda5/etc/nas_conf_db.xml))
+				if [ "$dhcp" == "true" ]; then
+					NET_CONFIG=dhcp
+				else
+					NET_CONFIG=static
+					IPADDRESS=$(remove_xml $(grep "<ipaddr>" $path/sda5/etc/nas_conf_db.xml))
+					NETMASK=$(remove_xml $(grep "<netmask>" $path/sda5/etc/nas_conf_db.xml))
+					GATEWAY=$(remove_xml $(grep "<gateway>" $path/sda5/etc/nas_conf_db.xml))
+					for i in $(grep "<dnsserver>" $path/sda5/etc/nas_conf_db.xml); do
+							var_add NAMESERVERS $(remove_xml $i)
+					done
+				fi
+				HOSTNAME=$(remove_xml $(grep "<hostname>" $path/sda5/etc/nas_conf_db.xml | head -n 1))
+				unset_matching_var "HOSTNAME" "HPMediaVault"
+				DOMAIN=$(remove_xml $(grep "<domain>" $path/sda5/etc/nas_conf_db.xml))
+				unset_matching_var "DOMAIN" "local"
+			else
+				NET_CONFIG=dhcp
+			fi
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.1.100
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.1.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.1.1
+				dhcp_fallback $FILE
+			fi
+			umount $path/sda5 || true
+			rmdir $path/sda5 $path || true
+		elif echo "$machine" | grep -q "^QNAP TS-109/TS-209" ||
 		   echo "$machine" | grep -q "^QNAP TS-409"; then
 			config=$(get_mtdblock "NAS Config")
 			if [ -z "$config" ]; then

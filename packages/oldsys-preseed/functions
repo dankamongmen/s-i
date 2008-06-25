@@ -119,6 +119,11 @@ var_add() {
 	fi
 }
 
+# Return the value of a XML/HTML like <foo>value</foo> staetment.
+remove_xml() {
+	echo "$1" | sed 's/[^>]*> *//' | sed 's/ *<.*//'
+}
+
 # Parse a SysConf partition, as found on the Linksys NSLU2
 # $1 = path
 parse_sysconf() {
