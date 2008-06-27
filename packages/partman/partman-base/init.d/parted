@@ -65,6 +65,11 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		size=$2
 		model=$3
 
+		# Skip mtd devices since they aren't supported by parted
+		if echo $device | grep -q '/dev/mtd'; then
+			continue
+		fi
+
 		# Skip devices that are part of a dmraid device
 		if type dmraid >/dev/null 2>&1; then
 			if part_of_sataraid $device; then
