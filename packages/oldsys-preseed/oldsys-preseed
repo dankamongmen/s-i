@@ -48,10 +48,6 @@ case "`archdetect`" in
 					INTERFACE=eth1
 				fi
 			fi
-			# Use DHCP if the original IP from the firmware has never been changed
-			if [ "$IPADDRESS" = "192.168.1.77" ]; then
-				unset NET_CONFIG
-			fi
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.77
 				NETMASK=255.255.255.0
@@ -82,11 +78,6 @@ case "`archdetect`" in
 					DEFAULT_HOSTNAME=$(cut -d . -f 1 $path/defaults/app/etc/HOSTNAME)
 					DEFAULT_DOMAIN=$(cut -d . -f 2- $path/defaults/app/etc/HOSTNAME)
 				fi
-				if [ -e $path/defaults/app/cfg/cfg_nic0 ]; then
-					parse_ifconfig $path/defaults/app/cfg/cfg_nic0
-					[ -n "$IPADDRESS" ] && DEFAULT_IPADDRESS=$IPADDRESS
-					unset IPADDRESS NETMASK GATEWAY
-				fi
 			fi
 			parse_unix_tree $path/mnt
 			INTERFACE=eth0
@@ -95,15 +86,6 @@ case "`archdetect`" in
 			else
 				NET_CONFIG=static
 				parse_ifconfig $path/mnt/cfg/cfg_nic0
-			fi
-			# Use DHCP if the original IP from the firmware has never been changed.
-			# The default IP address 192.168.1.100 but defaults/app/cfg/cfg_nic0
-			# could theoretically contain a different value so take both into account.
-			# Set the fallback to 192.168.1.100 so a fixed value can be documented.
-			if [ "$IPADDRESS" = "$DEFAULT_IPADDRESS" -o "$IPADDRESS" = "192.168.1.100" ]; then
-				unset NET_CONFIG
-				IPADDRESS=192.168.1.100
-				unset NETMASK GATEWAY
 			fi
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.100
