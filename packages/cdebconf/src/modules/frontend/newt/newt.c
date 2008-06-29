@@ -75,37 +75,42 @@ struct newt_data {
 };
 
 struct newtColors newtAltColorPalette = {
-	"white", "blue", 			/* root fg, bg */
-	/*"black", "lightgray",*/			/* border fg, bg */
+	/*"white", "blue",*/ 			/* root fg, bg */
+	"white", "black", 			/* root fg, bg */
+	/*"black", "lightgray",*/		/* border fg, bg */
 	"white", "black",			/* border fg, bg */
-	/*"black", "lightgray",*/			/* window fg, bg */
+	/*"black", "lightgray",*/		/* window fg, bg */
 	"white", "black",			/* window fg, bg */
 	/*"white", "black",*/			/* shadow fg, bg */
-	"white", "blue",			/* shadow fg, bg */
+	"white", "black",			/* shadow fg, bg */
 	/*"red", "lightgray",*/			/* title fg, bg */
 	"yellow", "black",			/* title fg, bg */
-	"brightred", "gray",			/* button fg, bg */
+	/*"brightred", "gray",*/		/* button fg, bg */
+	"black", "lightgray",			/* button fg, bg */
 	"gray", "brightred",			/* active button fg, bg */
 	"white", "gray",			/* checkbox fg, bg */
 	"yellow", "brown",			/* active checkbox fg, bg */
-	"yellow", "blue",			/* entry box fg, bg */
-	/*"blue", "lightgray",*/			/* label fg, bg */
+	/*"yellow", "blue",*/			/* entry box fg, bg */
+	"white", "black",			/* entry box fg, bg */
+	/*"blue", "lightgray",*/		/* label fg, bg */
 	"brightred", "black",			/* label fg, bg */
-	/*"black", "lightgray",*/			/* listbox fg, bg */
-	"lightgray", "black",			/* listbox fg, bg */
+	/*"black", "lightgray",*/		/* listbox fg, bg */
+	"white", "black",			/* listbox fg, bg */
 	"yellow", "blue",			/* active listbox fg, bg */
-	/*"black", "lightgray",*/			/* textbox fg, bg */
+	/*"black", "lightgray",*/		/* textbox fg, bg */
 	"white", "black",			/* textbox fg, bg */
 	"lightgray", "black",			/* active textbox fg, bg */
 	/*"white", "blue",*/			/* help line */
 	"white", "black",			/* help line */
 	"yellow", "blue",			/* root text */
-	"blue",					/* scale full */
-	"red",					/* scale empty */
+	/*"blue",*/				/* scale full */
+	"gray",					/* scale full */
+	/*"red",*/				/* scale empty */
+	"lightgray",				/* scale empty */
 	"blue", "lightgray",			/* disabled entry fg, bg */
-	/*"black", "lightgray",*/			/* compact button fg, bg */
-	"lightgray", "black",			/* compact button fg, bg */
-	"yellow", "gray",			/* active & sel listbox */
+	/*"black", "lightgray",*/		/* compact button fg, bg */
+	"white", "black",			/* compact button fg, bg */
+	"black", "lightgray",			/* active & sel listbox */
 	"black", "brown"			/* selected listbox */
 };
 

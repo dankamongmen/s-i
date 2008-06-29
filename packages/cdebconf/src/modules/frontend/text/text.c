@@ -751,10 +751,18 @@ struct question_handlers {
 static int text_initialize(struct frontend *obj, struct configuration *conf)
 {
 	struct frontend_data *data = NEW(struct frontend_data);
+	char *term = getenv("TERM");
+	char *palette = getenv("FRONTEND_BACKGROUND");
 	data->previous_title = NULL;
 	obj->data = data;
 	obj->interactive = 1;
 	signal(SIGINT, SIG_IGN);
+	if (palette && !strcmp(palette, "dark") &&
+			term && (!strcmp(term, "linux") || !strcmp(term, "bterm"))) {
+		/* Hard-code for these cases */
+		printf("\e[37m\e[40m\e[1m\e[H\e[J");
+		fflush(stdout);
+	}
 	return DC_OK;
 }
 
