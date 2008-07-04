@@ -91,6 +91,9 @@ if [ -d "$partsdir" ]; then
 	done
 fi
 
+db_progress INFO pkgsel/progress/upgrade
+in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude safe-upgrade -o DPkg::options=--force-confnew" || aptfailed
+
 db_get pkgsel/include
 if [ "$RET" ]; then
 	tasksel_end=90
@@ -99,7 +102,7 @@ else
 fi
 
 db_progress INFO pkgsel/progress/tasksel
-in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 5 --to $tasksel_end --logstderr'" || aptfailed
+in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 10 --to $tasksel_end --logstderr'" || aptfailed
 
 db_get pkgsel/include
 if [ "$RET" ]; then
