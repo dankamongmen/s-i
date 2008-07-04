@@ -20,6 +20,23 @@ cleanup () {
 	done
 }
 
+aptfailed () {
+	ret=$?
+	if [ "$ret" != 0 ]; then
+		# In case packages failed to install, try to clean up.
+		in-target dpkg --configure -a || true
+
+		# TODO useful error message here (for ret != 30)
+		db_progress INFO pkgsel/progress/cleanup
+		if ! cleanup; then
+			log "cleanup failed"
+		fi
+		db_progress STOP
+		load_install_cd
+		exit $ret
+	fi
+}
+
 load_install_cd() {
 	if [ "$REMOUNT_CD" ]; then
 		load-install-cd "/target" || true
@@ -82,47 +99,21 @@ else
 fi
 
 db_progress INFO pkgsel/progress/tasksel
-ret=0
-in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 5 --to $tasksel_end --logstderr'" || ret=$?
-if [ "$ret" != 0 ]; then
-	# In case packages failed to install, try to clean up.
-	in-target dpkg --configure -a || true
-	
-	# TODO useful error message here (for ret != 30)
-	db_progress INFO pkgsel/progress/cleanup
-	if ! cleanup; then
-		log "cleanup failed"
-	fi
-	db_progress STOP
-	load_install_cd
-	exit $ret
-fi
+in-target sh -c "$config tasksel --new-install --debconf-apt-progress='--from 5 --to $tasksel_end --logstderr'" || aptfailed
 
 db_get pkgsel/include
 if [ "$RET" ]; then
 	# Allow comma-separation so that this can more easily be preseeded
 	# at the kernel command line.
 	RET="$(printf '%s' "$RET" | sed 's/,/ /g')"
-	in-target sh -c "$config debconf-apt-progress --from 90 --to 95 --logstderr -- aptitude -q --without-recommends -y install -- $RET" || ret=$?
-	if [ "$ret" != 0 ]; then
-		# In case packages failed to install, try to clean up.
-		in-target dpkg --configure -a || true
-
-		# TODO useful error message here (for ret != 30)
-		db_progress INFO pkgsel/progress/cleanup
-		if ! cleanup; then
-			log "cleanup failed"
-		fi
-		db_progress STOP
-		load_install_cd
-		exit $ret
-	fi
+	in-target sh -c "$config debconf-apt-progress --from 90 --to 95 --logstderr -- aptitude -q --without-recommends -y install -- $RET" || aptfailed
 fi
 
 db_progress INFO pkgsel/progress/cleanup
 if ! cleanup; then
 	log "cleanup failed"
 fi
+
 db_progress STEP 2
 
 if [ -x /target/usr/bin/scrollkeeper-update ]; then
