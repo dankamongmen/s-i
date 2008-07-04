@@ -1,4 +1,4 @@
-<!-- original version: 43923 -->
+<!-- original version: 54017 -->
 
 
   <sect2 arch="powerpc" id="boot-cd"><title>Amorcer depuis un cédérom</title>
@@ -74,28 +74,23 @@ l'option <guilabel>No Video Driver</guilabel>. Ensuite, cliquez sur le bouton
 
 
   <sect3 id="boot-newworld">
-  <title>Amorcer les Mac NewWorld depuis OpenFirmware</title>
+  <title>Amorcer les Mac NewWorld depuis l'OpenFirmware</title>
 <para>
 
 Vous devez déjà avoir placé les fichiers <filename>vmlinux</filename>, 
 <filename>initrd.gz</filename>, <filename>yaboot</filename> et
 <filename>yaboot.conf</filename> à la racine de votre partition HFS dans 
 <xref linkend="files-newworld"/>.
-Redémarrez votre ordinateur et immédiatement après le carillon,
-appuyez simultanément sur les touches <keycap>Option</keycap>,
-<keycap>Command (touche trèfle/Apple)</keycap>, <keycap>o</keycap> et
-<keycap>f</keycap>. Vous aurez l'invite du microprogramme OpenFirmware au 
-bout de quelques secondes&nbsp;:
+Il vous faut maintenant amorcer l'OpenFirmware (voyez <xref linkend="invoking-openfirmware"/>).
+À l'invite, saisissez
 
 <informalexample><screen>
-
 0 &gt; boot hd:<replaceable>x</replaceable>,yaboot
-
 </screen></informalexample>
 
 en remplaçant <replaceable>x</replaceable> par la numéro de la partition HFS 
 où se trouvent le noyau et les fichiers de yaboot, le tout suivi
-          par &enterkey;. Sur certaines machines, vous devrez utiliser
+par &enterkey;. Sur certaines machines, vous devrez utiliser
 <userinput>ide0:</userinput> à la place de <userinput>hd:</userinput>. Après 
 quelques secondes, vous devriez voir apparaître l'invite de yaboot.
 
@@ -127,10 +122,7 @@ système Macintosh sur une clé USB, vous devez utiliser l'invite
 du microprogramme Open Firmware car celui-ci ne recherche pas automatiquement
 les périphériques USB.
 <!-- TODO: although it could be made to; watch this space -->
-Pour obtenir l'invite, appuyez simultanément sur les touches
-<keycombo><keycap>Command</keycap> <keycap>Option</keycap>
-<keycap>o</keycap> <keycap>f</keycap></keycombo> lors de l'amorçage, voyez
-<xref linkend="invoking-openfirmware"/>.
+Voyez <xref linkend="invoking-openfirmware"/>.
 </para>
 
 <para>
@@ -184,11 +176,26 @@ le réseau.
 
 Sur les machines avec Open Firmware, comme les Macs NewWorld Power, entrez 
 simplement dans le moniteur d'amorçage (voir 
-<xref linkend="invoking-openfirmware"/>) et utilisez la commande 
-<command>boot enet:0</command>. Les machines PReP et CHRP peuvent avoir une 
-façon différente de se connecter au réseau.
+<xref linkend="invoking-openfirmware"/>) et utilisez la commande
+
+<informalexample><screen>
+0 &gt; boot enet:0
+</screen></informalexample>
+
+Si cela ne fonctionne pas, il faudra peut-être ajouter le nom du fichier&nbsp;:
+
+<informalexample><screen>
+0 &gt; boot enet:0,yaboot
+</screen></informalexample>
+
+Les machines PReP et CHRP peuvent se connecter au réseau d'une
+façon différente.
 Sur une machine PReP, vous pouvez essayer 
-<userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
+
+<informalexample><screen>
+boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable>
+</screen></informalexample>
+
 Sur certains systèmes PReP (les machines Motorola PowerStack par exemple), la commande
 <userinput>help boot</userinput> donne une description de la syntaxe et des options
 disponibles.

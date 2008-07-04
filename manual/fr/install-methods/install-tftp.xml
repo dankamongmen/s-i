@@ -1,4 +1,4 @@
-<!-- original version: 53452 -->
+<!-- original version: 54017 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Préparer les fichiers pour amorcer depuis le réseau avec TFTP</title>
@@ -122,9 +122,11 @@ Lisez le fichier <filename>/etc/inetd.conf</filename> et mémorisez le répertoi
 passé en paramètre à <command>in.tftpd</command>
 <footnote>
 <para>
-L'option <userinput>-l</userinput> autorise certaines versions de 
-<command>in.tftpd</command> à enregistrer toutes les requêtes dans le journal 
-du système&nbsp;; c'est extrêmement pratique en cas d'erreur d'amorçage.
+Toutes les alternatives à <command>in.tftpd</command> disponibles dans Debian
+doivent enregistrer les requêtes TFTP dans le journal du système. Quelques unes
+acceptent une option <userinput>-v</userinput> qui augmente la quantité d'informations
+enregistrées. En cas d'erreur d'amorçage, il est recommandé de consulter ces enregistrements
+pour rechercher les causes des erreurs.
 </para>
 </footnote>&nbsp;; vous en aurez besoin ultérieurement. 
 Si vous avez dû modifier <filename>/etc/inetd.conf</filename>, vous devrez le 
@@ -177,9 +179,35 @@ TFTP et il n'y a pas vraiment de standard.
 Sur les machines Power Macintosh NewWorld, vous devrez configurer le programme 
 d'amorçage <command>yaboot</command> comme une image d'amorçage TFTP. 
 <command>Yaboot</command> chargera les images du noyau et du disque virtuel à 
-travers TFTP. Pour amorcer sur le réseau, utilisez
-<filename>yaboot-netboot.conf</filename>. Renommez-le simplement en
-<filename>yaboot.conf</filename> dans le répertoire TFTP.
+travers TFTP. Vous devrez télécharger les fichiers suivants du répertoire <filename>netboot/</filename>&nbsp;:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para> 
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para>
 <para arch="x86">
