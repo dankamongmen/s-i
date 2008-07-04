@@ -92,7 +92,7 @@ if [ -d "$partsdir" ]; then
 fi
 
 db_progress INFO pkgsel/progress/upgrade
-in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude safe-upgrade -o DPkg::options=--force-confnew" || aptfailed
+in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude -q --without-recommends -y safe-upgrade -o DPkg::options=--force-confnew" || aptfailed
 
 db_get pkgsel/include
 if [ "$RET" ]; then
