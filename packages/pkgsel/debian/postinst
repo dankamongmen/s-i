@@ -70,6 +70,16 @@ if [ -e /var/lib/install-cd.id ]; then
 	REMOUNT_CD=1
 fi
 
+db_get pkgsel/upgrade
+if [ "$RET" = none ]; then
+	tasksel_start=5
+else
+	upgrade_type="$RET"
+	db_progress INFO pkgsel/progress/upgrade
+	in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude -q --without-recommends -y -o DPkg::options=--force-confnew '$upgrade_type'" || aptfailed
+	tasksel_start=10
+fi
+
 partsdir="/usr/lib/pre-pkgsel.d"
 if [ -d "$partsdir" ]; then
 	for script in `ls "$partsdir"/* 2>/dev/null`; do
@@ -96,15 +106,6 @@ if [ "$RET" ]; then
 	tasksel_end=90
 else
 	tasksel_end=95
-fi
-db_get pkgsel/upgrade
-if [ "$RET" = none ]; then
-	tasksel_start=5
-else
-	upgrade_type="$RET"
-	db_progress INFO pkgsel/progress/upgrade
-	in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude -q --without-recommends -y -o DPkg::options=--force-confnew '$upgrade_type'" || aptfailed
-	tasksel_start=10
 fi
 
 db_progress INFO pkgsel/progress/tasksel
