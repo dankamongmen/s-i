@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 -->
+<!-- original version: 54017 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Dateien vorbereiten für TFTP-Netzwerk-Boot</title>
@@ -78,7 +78,7 @@ SunOS 4.x, SunOS 5.x (a.k.a. Solaris) und GNU/Linux an.
 
 <note arch="x86"><para>
 
-Um die Pre-Boot-Execution-Environment- (PXE) Methode von TFTP zu nutzen,
+Um die Pre-Boot-Execution-Environment-Methode (PXE) von TFTP zu nutzen,
 benötigen Sie einen TFTP-Server mit Unterstützung für
 <userinput>tsize</userinput>. Auf einem &debian;-Server sind dies
 <classname>atftpd</classname> und <classname>tftpd-hpa</classname>;
@@ -128,10 +128,15 @@ Sie sich das Verzeichnis, das als Argument hinter <command>in.tftpd</command>
 eingetragen ist<footnote>
 
 <para>
-Das Argument <userinput>-l</userinput> aktiviert bei einigen Versionen von
-<command>in.tftpd</command> die Log-Funktion, so dass Aufzeichnungen über alle
-Anfragen im System-Log protokolliert werden; dies könnte zur Fehlersuche bei
-Bootproblemen nützlich sein.
+
+Alle in Debian verfügbaren <command>in.tftpd</command>-Alternativen
+sollten standardmäßig Protokolleinträge aller TFTP-Anfragen in das
+System-Log schreiben. Einige unterstützen das Argument
+<userinput>-v</userinput>, um die Ausführlichkeit der Einträge zu
+erhöhen. Es wird empfohlen, im Falle von Boot-Problemen diese Logeinträge
+zu kontrollieren; sie sind ein guter Anfang, um der Fehlerursache
+auf die Spur zu kommen.
+
 </para>
 
 </footnote>; Sie werden es später benötigen.
@@ -174,9 +179,9 @@ Linux-TFTP-Server benutzt.
   <title>Die TFTP-Images an ihren Platz befördern</title>
 <para>
 
-Als nächstes legen Sie die TFTP-Bootimages, die Sie benötigen und die Sie
-wie in <xref linkend="where-files"/> beschrieben finden können, im
-<command>tftpd</command>-Bootimage-Verzeichnis ab. Sie müssen unter Umständen
+Als nächstes legen Sie die TFTP-Boot-Images, die Sie benötigen und die Sie
+wie in <xref linkend="where-files"/> beschrieben bekommen können, im
+<command>tftpd</command>-Boot-Image-Verzeichnis ab. Sie müssen unter Umständen
 einen Link von diesem Image auf die Datei anlegen, die
 <command>tftpd</command> benutzt, um einen speziellen Client zu booten.
 Bedauerlicherweise hängt der Name dieser Datei von dem TFTP-Client ab und es
@@ -185,18 +190,45 @@ gibt dabei keine festen Standards.
 </para><para arch="powerpc">
 
 Auf NewWorld-PowerMacs müssen Sie den <command>yaboot</command>-Bootloader
-als TFTP-Bootimage einstellen. <command>Yaboot</command> wird dann
-selbst das Kernel- und RAM-Disk-Image per TFTP abrufen. Für Netzwerk-Boot
-benutzen Sie die Datei <filename>yaboot-netboot.conf</filename>;
-benennen sie sie einfach in <filename>yaboot.conf</filename> im TFTP-Verzeichnis
-um.
+als TFTP-Boot-Image einstellen. <command>Yaboot</command> wird dann
+selbst das Kernel- und RAM-Disk-Image per TFTP abrufen. Sie müssen die
+folgenden Dateien aus dem <filename>netboot/</filename>-Verzeichnis
+herunterladen:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 
 Alles was Sie benötigen, um per PXE zu booten, ist bereits in dem
 <filename>netboot/netboot.tar.gz</filename>-Tarball eingerichtet.
 Entpacken Sie den Tarball einfach in das
-<command>tftpd</command>-Bootimage-Verzeichnis. Stellen Sie sicher, dass
+<command>tftpd</command>-Boot-Image-Verzeichnis. Stellen Sie sicher, dass
 der DHCP-Server konfiguriert ist, <filename>pxelinux.0</filename> als
 zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
 
@@ -205,7 +237,7 @@ zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
 Um per PXE zu booten, müssen Sie nur den
 <filename>netboot/netboot.tar.gz</filename>-Tarball einrichten.
 Entpacken Sie den Tarball einfach in das
-<command>tftpd</command>-Bootimage-Verzeichnis. Stellen Sie sicher, dass
+<command>tftpd</command>-Boot-Image-Verzeichnis. Stellen Sie sicher, dass
 der DHCP-Server konfiguriert ist, <filename>/debian-installer/ia64/elilo.efi</filename>
 als zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
 
@@ -215,7 +247,7 @@ als zu bootende Datei zum <command>tftpd</command> weiterzuleiten.
    <title>TFTP-Boot von Alpha-Systemen</title>
 <para>
 Auf Alpha-Systemen müssen Sie den Dateinamen angeben (als relative
-Pfadangabe zum Bootimage-Verzeichnis), indem Sie entweder den
+Pfadangabe zum Boot-Image-Verzeichnis), indem Sie entweder den
 SRM-<userinput>boot</userinput>-Befehl mit dem Parameter
 <userinput>-file</userinput> benutzen, oder Sie setzen die
 Umgebungsvariable <userinput>BOOT_FILE</userinput>.
