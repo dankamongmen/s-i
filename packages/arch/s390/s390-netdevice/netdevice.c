@@ -578,7 +578,7 @@ static enum state_wanted confirm_iucv (void)
 	return WANT_ERROR;
 }
 
-static enum state_wanted write_ccwgroup (const char *driver_name, const char *device_name, const char *group, bool layer2)
+static int write_ccwgroup (const char *driver_name, const char *device_name, const char *group, bool layer2)
 {
 	struct sysfs_device *device;
 	struct sysfs_driver *driver;
@@ -586,38 +586,38 @@ static enum state_wanted write_ccwgroup (const char *driver_name, const char *de
 
 	driver = sysfs_open_driver ("ccwgroup", driver_name);
 	if (!driver)
-		return WANT_ERROR;
+		return -1;
 
 	attr = sysfs_get_driver_attr (driver, "group");
 	if (!attr)
-		return WANT_ERROR;
+		return -2;
 	if (sysfs_write_attribute (attr, group, strlen (group)) < 0)
-		return WANT_ERROR;
+		return -2;
 
 	sysfs_close_driver (driver);
 
 	device = sysfs_open_device ("ccwgroup", device_name);
 	if (!device)
-		return WANT_ERROR;
+		return -2;
 
 	if (layer2)
 	{
 		attr = sysfs_get_device_attr (device, "layer2");
 		if (!attr)
-			return WANT_ERROR;
+			return -2;
 		if (sysfs_write_attribute (attr, "1", 1) < 0)
-			return WANT_ERROR;
+			return -2;
 	}
 
 	attr = sysfs_get_device_attr (device, "online");
 	if (!attr)
-		return WANT_ERROR;
+		return -2;
 	if (sysfs_write_attribute (attr, "1", 1) < 0)
-		return WANT_ERROR;
+		return -2;
 
 	sysfs_close_device (device);
 
-	return WANT_NONE;
+	return 0;
 }
 
 static enum state_wanted write_ctc (void)
@@ -633,7 +633,7 @@ static enum state_wanted write_ctc (void)
 
 	ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf, false);
 	if (ret)
-		return ret;
+		return WANT_ERROR;
 
 	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->ctc.channels[0]->name);
 	config = fopen (buf, "w");
@@ -660,7 +660,7 @@ static enum state_wanted write_qeth (void)
 
 	ret = write_ccwgroup ("qeth", device_current->qeth.channels[0]->name, buf, device_current->qeth.layer2);
 	if (ret)
-		return ret;
+		return WANT_ERROR;
 
 	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->qeth.channels[0]->name);
 	config = fopen (buf, "w");
