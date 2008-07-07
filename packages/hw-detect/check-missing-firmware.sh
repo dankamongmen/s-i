@@ -76,11 +76,14 @@ while read_log && ask_load_firmware; do
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
 		for file in $files; do
-			if [ -e "/media/$file" ]; then
-				mkdir -p /lib/firmware
-				rm -f "/lib/firmware/$file"
-				cp -a "/media/$file" /lib/firmware/ || true
-			fi
+			for f in "/media/$file" "/media/firmware/$file"; do
+				if [ -e "$f" ]; then
+					mkdir -p /lib/firmware
+					rm -f "/lib/firmware/$file"
+					cp -a "$f" /lib/firmware/ || true
+					break
+				fi
+			done
 		done
 		umount /media || true
 	fi
@@ -90,7 +93,7 @@ while read_log && ask_load_firmware; do
 	# dependencies, which anna might try to install.
 	if mountmedia driver; then
 		echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
-		for filename in /media/*.deb /media/*.udeb /media/*.ude; do
+		for filename in /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude; do
 			if [ -f "$filename" ]; then
 				if list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
 					install_firmware_pkg "$filename" || true
