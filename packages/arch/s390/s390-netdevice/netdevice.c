@@ -627,12 +627,15 @@ static enum state_wanted write_ctc (void)
 	FILE *config;
 
 	/* This is necessary :/ */
+	di_exec_shell_log ("modprobe ctcm");
 	di_exec_shell_log ("modprobe ctc");
 
 	snprintf (buf, sizeof (buf), "%s,%s\n", device_current->ctc.channels[0]->name, device_current->ctc.channels[1]->name);
 
-	ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf, false);
-	if (ret)
+	ret = write_ccwgroup ("ctcm", device_current->ctc.channels[0]->name, buf, false);
+	if (ret == -1)
+		ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf, false);
+        if (ret < 0)
 		return WANT_ERROR;
 
 	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->ctc.channels[0]->name);
