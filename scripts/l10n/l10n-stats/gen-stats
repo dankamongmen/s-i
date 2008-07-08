@@ -106,6 +106,7 @@ fi
 if [ "$CONFIG" ] ; then
   if [ -r "$CONFIG" ] ; then
     . "$CONFIG"
+    export GETTEXT WD APT_OPT URL_UNSTABLE URL_TESTING SUBLEVELS
   else
     echo $CONFIG does not exist or unreadable
     exit 1
@@ -427,7 +428,7 @@ for dist in testing unstable cvs ; do
 				# Only do it for unstable
 				if [ -z "$ext" ] ; then
 					test -d $TARGET_DIR/files/$lang/ || mkdir $TARGET_DIR/files/$lang/
-					cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//'\/'/'_'}"_$lang.po"
+					cp $WD/material/packages.$dist$LEVEL/$path/$lang.po $TARGET_DIR/files/$lang/${path//\//_}"_$lang.po"
 				fi
 
 #				mv $WD/material/packages.$dist$LEVEL/$path/$lang.po.orig $WD/material/packages.$dist$LEVEL/$path/$lang.po >/dev/null 2>&1
