@@ -275,10 +275,19 @@ check_kernel_wedge() {
 select_source() {
 	local bdep=$1
 	case $bdep in
+	    # Kernel images
 	    linux-image-2.6*)
+		# Used with Debian packages
 		BDEP_SOURCE=linux-2.6
 		BDEP_BINARY_BASE=linux-image-2.6
 		;;
+	    linux-2.6*)
+		# Used with kernel packages built from upstream source
+		# (using 'make deb-pkg')
+		BDEP_SOURCE=linux-upstream
+		BDEP_BINARY_BASE=linux-2.6
+		;;
+	    # Out of tree modules (Debian packages)
 	    squashfs-modules-2.6*)
 		BDEP_SOURCE=linux-modules-extra-2.6
 		BDEP_BINARY_BASE=squashfs-modules-2.6
