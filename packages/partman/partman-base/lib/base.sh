@@ -903,10 +903,11 @@ disable_swap () {
 
 # Lock a device or partition against further modifications
 partman_lock_unit() {
-	local device message dev testdev
+	local device message cwd dev testdev
 	device="$1"
 	message="$2"
 
+	cwd="$(pwd)"
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
 		cd $dev
@@ -916,6 +917,7 @@ partman_lock_unit() {
 			testdev=$(mapdevfs $(cat device))
 			if [ "$device" = "$testdev" ]; then
 				echo "$message" > locked
+				cd "$cwd"
 				return 0
 			fi
 		fi
@@ -930,13 +932,15 @@ partman_lock_unit() {
 		done
 		close_dialog
 	done
+	cd "$cwd"
 }
 
 # Unlock a device or partition to allow further modifications
 partman_unlock_unit() {
-	local device dev testdev
+	local device cwd dev testdev
 	device="$1"
 
+	cwd="$(pwd)"
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
 		cd $dev
@@ -946,6 +950,7 @@ partman_unlock_unit() {
 			testdev=$(mapdevfs $(cat device))
 			if [ "$device" = "$testdev" ]; then
 				rm -f locked
+				cd "$cwd"
 				return 0
 			fi
 		fi
@@ -960,6 +965,7 @@ partman_unlock_unit() {
 		done
 		close_dialog
 	done
+	cd "$cwd"
 }
 
 log '*******************************************************'
