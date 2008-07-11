@@ -907,6 +907,8 @@ partman_lock_unit() {
 	device="$1"
 	message="$2"
 
+	# We need to preserve the current working directory as the caller might
+	# be working on a specific device.  See #488687 for details.
 	cwd="$(pwd)"
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
@@ -940,6 +942,7 @@ partman_unlock_unit() {
 	local device cwd dev testdev
 	device="$1"
 
+	# See partman_lock_unit() for details about $cwd.
 	cwd="$(pwd)"
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
