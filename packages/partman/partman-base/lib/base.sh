@@ -806,15 +806,15 @@ humandev () {
 	    disk="${1#/dev/}"
 	    humandev_dasd_disk /sys/block/$disk/$(readlink /sys/block/$disk/device)
 	    ;;
-	/dev/xvd[a-z])
-	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/xvd\([a-z]\).*,\1,')")
+	/dev/*vd[a-z])
+	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/x\?vd\([a-z]\).*,\1,')")
 	    drive=$(($drive - 96))
 	    linux=${1#/dev/}
 	    db_metaget partman/text/virtual_disk description
 	    printf "$RET" "$drive" "$linux"
 	    ;;
-	/dev/xvd[a-z][0-9]*)
-	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/xvd\([a-z]\).*,\1,')")
+	/dev/*vd[a-z][0-9]*)
+	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/x\?vd\([a-z]\).*,\1,')")
 	    drive=$(($drive - 96))
 	    part=$(echo $1 | sed 's,^/dev/xvd[a-z]\([0-9][0-9]*\).*,\1,')
 	    linux=${1#/dev/}
