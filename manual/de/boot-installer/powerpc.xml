@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43923 -->
+<!-- original version: 54017 -->
 
   <sect2 arch="powerpc" id="boot-cd"><title>Booten von CD-ROM</title>
 
@@ -82,11 +82,8 @@ Sie sollten die Dateien <filename>vmlinux</filename>,
 <filename>yaboot.conf</filename> bereits im Wurzelverzeichnis Ihrer
 HFS-Partition gespeichert haben (lesen Sie dazu
 <xref linkend="files-newworld"/>).
-Starten Sie den Rechner neu und drücken Sie sofort (während des
-Klingelns) die Tasten <keycap>Option</keycap>,
-<keycap>Command (Kleeblatt/Apfel)</keycap>,
-<keycap>o</keycap> und <keycap>f</keycap> gleichzeitig. Nach ein paar
-Sekunden wird der OpenFirmware-Prompt angezeigt.
+Sie müssen nun neu booten und OpenFirmware aufrufen (siehe
+<xref linkend="invoking-openfirmware"/>).
 Geben Sie am Prompt
 
 <informalexample><screen>
@@ -131,10 +128,7 @@ beschrieben vorbereitet haben. Um ein Macintosh-System von USB-Stick zu booten,
 müssen Sie den OpenFirmware-Prompt nutzen, da OpenFirmware standardmäßig
 nicht nach USB-Speicher-Geräten sucht.
 <!-- TODO: although it could be made to; watch this space -->
-Um zum Prompt zu gelangen, drücken sie während des Bootens gleichzeitig
-<keycombo><keycap>Command</keycap> <keycap>Option</keycap>
-<keycap>o</keycap> <keycap>f</keycap></keycombo> (siehe dazu
-<xref linkend="invoking-openfirmware"/>).
+Siehe dazu <xref linkend="invoking-openfirmware"/>.
 
 </para><para>
 
@@ -192,10 +186,26 @@ per Netzwerk.
 
 Auf Maschinen mit OpenFirmware, wie den NewWorld-PowerMacs, starten Sie
 den Boot-Monitor (siehe <xref linkend="invoking-openfirmware"/>) und
-benutzen den Befehl <command>boot enet:0</command>. PReP- und
-CHRP-Rechner adressieren auf unterschiedliche Weise ihre Netzwerkschnittstellen.
-Auf einer PReP-Maschine sollten Sie
-<userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput> ausprobieren.
+benutzen den Befehl
+
+<informalexample><screen>
+0 &gt; boot enet:0
+</screen></informalexample>
+
+Falls dies nicht funktioniert, müssen Sie vielleicht den Dateinamen
+hinzufügen, wie hier:
+
+<informalexample><screen>
+0 &gt; boot enet:0,yaboot
+</screen></informalexample>
+
+PReP- und CHRP-Rechner adressieren möglicherweise ihre Netzwerkschnittstellen
+anders. Auf einer PReP-Maschine sollten Sie dies ausprobieren:
+
+<informalexample><screen>
+boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable>
+</screen></informalexample>
+
 Auf einigen PReP-Systemen (z.B. Motorola PowerStack-Maschinen) gibt der Befehl
 <userinput>help boot</userinput> eventuell eine Beschreibung der Syntax sowie
 verfügbare Optionen aus.
