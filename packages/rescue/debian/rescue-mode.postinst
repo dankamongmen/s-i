@@ -144,10 +144,11 @@ choose_root () {
 	done
 
 	if [ -z "$PARTITIONS" ]; then
-		# TODO: need a sensible error here, or perhaps drop through
-		# to a fallback shell?
 		log "no partitions found!"
-		exit 1
+		db_input critical rescue/no-partitions
+		db_go || exit 10
+		export RESCUE_ROOTDEV=
+		return
 	fi
 	log "partitions found: $PARTITIONS"
 	db_subst rescue/root PARTITIONS "$PARTITIONS"
@@ -267,8 +268,14 @@ while :; do
 				continue
 			fi
 			item_name="${item#[0-9][0-9]}"
-			if db_subst "rescue/$item_name/intro" \
-				    DEVICE "${RESCUE_ROOTDEV}"; then
+			if [ -z "$RESCUE_ROOTDEV" ] && \
+			   db_get "rescue/$item_name/intro/no-target"; then
+				db_input high "rescue/$item_name/intro/no-target" || true
+				if ! db_go; then
+					continue
+				fi
+			elif db_subst "rescue/$item_name/intro" \
+				      DEVICE "${RESCUE_ROOTDEV}"; then
 				db_input high "rescue/$item_name/intro" || true
 				if ! db_go; then
 					continue
