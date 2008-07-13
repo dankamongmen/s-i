@@ -266,6 +266,13 @@ void loadkeys_wrapper (char *map)
 	}
 	if (mode == K_UNICODE) {
 		set_charset("unicode");
+	} else if (mode == K_MEDIUMRAW) { /* special case for DirectFB */
+		set_charset("unicode");
+		/* DFB: first set K_UNICODE mode */
+		if (ioctl(fd, KDSKBMODE, K_UNICODE) < 0) {
+			di_error("kbd-chooser: error setting keyboard mode\n");
+			exit(1);
+		}
 	}
 
 	keymap_name = map;
@@ -277,6 +284,13 @@ void loadkeys_wrapper (char *map)
 	}
 	do_constant();
 	loadkeys (fd);
+	if (mode == K_MEDIUMRAW) {
+		/* DFB: and restore K_MEDIUMRAW */
+		if (ioctl(fd, KDSKBMODE, K_MEDIUMRAW) < 0) {
+			di_error("kbd-chooser: error setting keyboard mode\n");
+			exit(1);
+		}
+	}
 	exit (0);
 }
 
