@@ -175,7 +175,7 @@ singleline	:	{ mod = 0; }
 			}
 		| PLAIN KEYCODE NUMBER EQUALS rvalue EOL
 			{
-			    addkey($4, 0, $6);
+			    addkey($3, 0, $5);
 			}
 		;
 modifiers	: modifiers modifier
