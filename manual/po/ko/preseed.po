@@ -1,4 +1,5 @@
 # Debian Installation Manual - preseed
+#
 # Sunjae Park <darehanl@gmail.com>, 2006.
 # Seok-moon Jang <drssay97@gmail.com>, 2005.
 # Changwoo Ryu <cwryu@debian.org>, 2005, 2006, 2007.
@@ -11,7 +12,7 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-07-13 00:09+0000\n"
-"PO-Revision-Date: 2008-05-01 05:02+0900\n"
+"PO-Revision-Date: 2008-07-13 10:25+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1574,7 +1575,7 @@ msgstr ""
 # 주의: 메세지 번역과 통일
 #. Tag: screen
 #: preseed.xml:816
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1722,10 +1723,9 @@ msgstr ""
 "# 다른 방법으로, 파티션할 디스크를 지정할 수 있습니다. 장치 이름은\n"
 "# 전통적인 DEVFS가 아닌 형식으로 지정해야 합니다.\n"
 "# 예를 들어 첫번째 SCSI/SATA 하드디스크를 사용하려면:\n"
-"d-i partman-auto/disk string /dev/sda\n"
-"# 주의: 이름이 무엇이든 간에 어떤 디스크든 사용 가능한 디스크를\n"
-"# 사용하려면, 위의 줄을 주석으로 만드십시오. 시스템에 디스크가 하나인\n"
-"# 경우 이렇게 하면 동작합니다.\n"
+"# 주의: 디스크를 지정해야 합니다. 단 디스크가 한 개이면 하지 않아도\n"
+"# 됩니다.\n"
+"#d-i partman-auto/disk string /dev/sda\n"
 "# 또 어떤 방법을 사용할 지 지정해야 합니다.\n"
 "# 현재 가능한 방법은: \"regular\", \"lvm\", \"crypto\"입니다.\n"
 "d-i partman-auto/method string lvm\n"
@@ -2272,7 +2272,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:980
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2314,6 +2314,9 @@ msgstr ""
 "\n"
 "# 추가로 설치할 패키지\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
+"# debootstrap 다음에 패키지를 업그레이드할 지 여부\n"
+"# 사용 가능한 값은: none, safe-upgrade, full-upgrade\n"
+"# d-i pkgsel/upgrade select none\n"
 "\n"
 "# 어떤 소프트웨어를 설치했는지 설치 프로그램에서 보고서를 보낼 수\n"
 "# 있습니다. 보고하지 않는 게 기본값이지만, 보고서를 보내면 데비안\n"
@@ -2411,7 +2414,7 @@ msgstr "설치 마치기"
 
 #. Tag: screen
 #: preseed.xml:1001
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Avoid that last message about the install being complete.\n"
 #| "d-i finish-install/reboot_in_progress note\n"
@@ -2441,6 +2444,10 @@ msgid ""
 "# reboot into the installed system.\n"
 "#d-i debian-installer/exit/halt boolean true"
 msgstr ""
+"# 시리얼 콘솔에서 설치하면, 일반 가상 콘솔은 (VT1-VT6) /etc/inittab에서\n"
+"# 막습니다. 다음의 주석을 지우면 가상 콘솔을 막지 않습니다.\n"
+"#d-i finish-install/keep-consoles boolean true\n"
+"\n"
 "# 설치가 끝났다는 마지막 메세지를 표시하지 않습니다.\n"
 "d-i finish-install/reboot_in_progress note\n"
 "\n"
@@ -2704,7 +2711,7 @@ msgid ""
 msgstr ""
 "# 여러 개 파일을 공백으로 구분해서 쓸 수도 있습니다. 그러면 모든\n"
 "# 파일을 읽어들입니다. 물론 포함한 파일은 그 안에 preseed/include가\n"
-"# 들어 있을 수 있습니다. 주의할 점으로, 파일이름이 상대 경로인 경우 그\n"
+"# 들어 있을 수 있습니다. 주의할 점으로, 파일 이름이 상대 경로인 경우 그\n"
 "# 파일이 포함되어 들어가는 파일이 있는 같은 디렉토리에서 찾게 됩니다.\n"
 "#d-i preseed/include string x.cfg\n"
 "\n"
@@ -2721,8 +2728,8 @@ msgstr ""
 "# 이 중에거 가장 유연한 것으로, 프로그램을 다운로드하고 이를 실행할 수 \n"
 "# 있습니다. 이 프로그램은 debconf 데이터베이스를 조작하기 위해 \n"
 "# debconf-set과 같은 명령을 사용할 수 있습니다. 여러 개의 스크립트를\n"
-"# 공백으로 구분해서 쓸 수도 있습니다. 파일이름이 상대경로로 되어 있으면\n"
-"# 프로그램을 실행하는 미리 설정파일이 있는 디렉토리에서 파일을 찾습니다.\n"
+"# 공백으로 구분해서 쓸 수도 있습니다. 파일 이름이 상대경로로 되어 있으면\n"
+"# 프로그램을 실행하는 미리 설정 파일이 있는 디렉토리에서 파일을 찾습니다.\n"
 "#d-i preseed/run string foo.sh"
 
 #. Tag: para
