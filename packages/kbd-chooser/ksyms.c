@@ -1690,12 +1690,14 @@ struct cs {
 
 /* Functions for both dumpkeys and loadkeys. */
 
+static int prefer_unicode = 0;
 
 int set_charset(const char *charset) {
 	sym *p;
 	int i;
 
 	if (!strcasecmp(charset, "unicode")) {
+		prefer_unicode = 1;
 		return 0;
 	}
 
@@ -1749,31 +1751,33 @@ ksymtocode(const char *s) {
 	int i;
 	int j;
 	int keycode;
-	int fd;
-	int kbd_mode;
+	int save_prefer_unicode;
 	int syms_start = 0;
 	sym *p;
 
 	if (!s) {
 		fprintf(stderr, "%s\n", _("null symbol found"));
-               return -1;
-        }
+		return -1;
+	}
 
-	fd = getfd();
-
-	ioctl(fd, KDGKBMODE, &kbd_mode);
 	if (!strncmp(s, "Meta_", 5)) {
-		/* Temporarily change kbd_mode to ensure that keycode is
+		/* Temporarily set prefer_unicode to ensure that keycode is
 		 * right. */
-		ioctl(fd, KDSKBMODE, K_XLATE);
+		save_prefer_unicode = prefer_unicode;
+		prefer_unicode = 0;
 		keycode = ksymtocode(s+5);
-		ioctl(fd, KDSKBMODE, kbd_mode);
+		prefer_unicode = save_prefer_unicode;
 		if (KTYP(keycode) == KT_LATIN)
 			return K(KT_META, KVAL(keycode));
+
+		/* Avoid error messages for Meta_acute with UTF-8 */
+		else if (prefer_unicode)
+			return 0;
+
 		/* fall through to error printf */
 	}
 
-        if (kbd_mode == K_UNICODE) {
+        if (prefer_unicode) {
                 for (j = 0; j < 0x80; j++)
                         if (!strcmp(s,iso646_syms[j]))
                                 return (j ^ 0xf000);
@@ -1789,7 +1793,7 @@ ksymtocode(const char *s) {
 		if (!strcmp(s, synonyms[i].synonym))
 			return ksymtocode(synonyms[i].official_name);
 
-	if (kbd_mode == K_UNICODE) {
+	if (prefer_unicode) {
 		for (i = 0; i < sizeof(charsets)/sizeof(charsets[0]); i++) {
 			p = charsets[i].charnames;
 			for (j = charsets[i].start; j < 256; j++, p++)
@@ -1844,19 +1848,16 @@ ksymtocode(const char *s) {
 int
 add_number(int code)
 {
-	int kbd_mode;
-
         if (KTYP(code) == KT_META)
                 return code;
 
-	ioctl(getfd(), KDGKBMODE, &kbd_mode);
-        if (kbd_mode == K_UNICODE && KTYP(code) >= syms_size) {
+        if (prefer_unicode && KTYP(code) >= syms_size) {
 		if ((code ^ 0xf000) < 0x80)
 		      return K(KT_LATIN, code ^ 0xf000);
                 else
                       return code;
         }
-        if (kbd_mode != K_UNICODE && KTYP(code) < syms_size)
+        if (!prefer_unicode && KTYP(code) < syms_size)
                 return code;
         return ksymtocode(codetoksym(code));
 }
@@ -1865,8 +1866,9 @@ int
 add_capslock(int code)
 {
 	if (KTYP(code) == KT_LATIN)
-		code = K(KT_LETTER, KVAL(code));
-
+		return K(KT_LETTER, KVAL(code));
+	if (KTYP(code) >= syms_size && (code ^ 0xf000) < 0x80)
+		return K(KT_LETTER, code ^ 0xf000);
 	return add_number(code);
 }
 

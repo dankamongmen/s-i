@@ -257,8 +257,17 @@ int nocompose = 0;
 void loadkeys_wrapper (char *map)
 {
 	int fd;
+	int mode;
 
 	fd = getfd();
+	if (ioctl(fd, KDGKBMODE, &mode)) {
+		di_error("kbd-chooser: error reading keyboard mode\n");
+		exit(1);
+	}
+	if (mode == K_UNICODE) {
+		set_charset("unicode");
+	}
+
 	keymap_name = map;
 
 	yywrap ();
