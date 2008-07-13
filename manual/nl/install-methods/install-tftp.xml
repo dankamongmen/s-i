@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 untranslated -->
+<!-- original version: 54017 untranslated -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparing Files for TFTP Net Booting</title>
@@ -119,9 +119,11 @@ Look in <filename>/etc/inetd.conf</filename> and remember the directory which
 is used as the argument of <command>in.tftpd</command><footnote>
 
 <para>
-The <userinput>-l</userinput> argument enables some versions of
-<command>in.tftpd</command> to log all requests to the system logs;
-this is useful for diagnosing boot errors.
+All <command>in.tftpd</command> alternatives available in Debian should
+log TFTP requests to the system logs by default. Some of them support a
+<userinput>-v</userinput> argument to increase verbosity.
+It is recommended to check these log messages in case of boot problems
+as they are a good starting point for diagnosing the cause of errors.
 </para>
 
 </footnote>; you'll need that below.
@@ -172,9 +174,36 @@ TFTP client, and there are no strong standards.
 On NewWorld Power Macintosh machines, you will need to set up the
 <command>yaboot</command> boot loader as the TFTP boot image.
 <command>Yaboot</command> will then retrieve the kernel and RAMdisk
-images via TFTP itself.  For net booting, use the
-<filename>yaboot-netboot.conf</filename>.  Just rename this to
-<filename>yaboot.conf</filename> in the TFTP directory.
+images via TFTP itself. You will need to download the following files
+from the <filename>netboot/</filename> directory:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 

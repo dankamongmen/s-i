@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53120 untranslated -->
+<!-- original version: 54252 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -925,10 +925,8 @@ correct one will be selected before using preseeding.
 # Alternatively, you can specify a disk to partition. The device name must
 # be given in traditional non-devfs format.
 # For example, to use the first SCSI/SATA hard disk:
-d-i partman-auto/disk string /dev/sda
-# Note: If you want to use whatever disk is available, no matter
-# what its device name, comment the line above out. This will only work if
-# the system only has one disk.
+# Note: A disk must be specified, unless the system has only one disk.
+#d-i partman-auto/disk string /dev/sda
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
 d-i partman-auto/method string lvm
@@ -1262,6 +1260,9 @@ to be used easily on the kernel command line as well.
 
 # Individual additional packages to install
 #d-i pkgsel/include string openssh-server build-essential
+# Whether to upgrade packages after debootstrap.
+# Allowed values: none, safe-upgrade, full-upgrade
+#d-i pkgsel/upgrade select none
 
 # Some versions of the installer can report back on what software you have
 # installed, and what software you use. The default is not to report back,
