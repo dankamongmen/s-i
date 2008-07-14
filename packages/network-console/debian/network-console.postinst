@@ -70,9 +70,17 @@ case "$ARCHDETECT" in
 	beep -e /dev/input/event0 -f 220 -l 500 -d 500 -r 3 || true
 	;;
     arm*/orion5x)
+	# QNAP devices
 	if type qcommand >/dev/null 2>&1; then
 		qcommand statusled greenon
 		qcommand buzzer short
+	fi
+	# HP mv2120
+	if [ -e /sys/class/leds/mv2120:blue:health/trigger ]; then
+        	echo none > /sys/class/leds/mv2120:blue:health/trigger
+	fi
+	if [ -e /sys/class/leds/mv2120:blue:health ]; then
+		echo 1 > /sys/class/leds/mv2120:blue:health/brightness
 	fi
 	;;
     mipsel/cobalt)
