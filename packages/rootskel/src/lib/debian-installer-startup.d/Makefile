@@ -56,6 +56,11 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S04countcpus-linux-hppa
   endif
 
+  ifneq (,$(filter arm armel,$(DEB_HOST_ARCH_CPU)))
+    files += \
+	S99signal-status
+  endif
+
 endif
 
 include ../../../Makefile.inc
