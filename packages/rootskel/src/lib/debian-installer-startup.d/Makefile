@@ -19,7 +19,8 @@ files = \
 	S02module-params \
 	S10syslog \
 	S20templates \
-	S35term
+	S35term \
+	S37speakup
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
   ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))

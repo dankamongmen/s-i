@@ -1,0 +1,14 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+
+SYNTH=$(lsmod | grep ^speakup_ | cut -d" " -f1)
+if [ -n "$SYNTH" ]; then
+	db_get base-installer/kernel/image
+	KVERS=${RET#*-image-}
+	if apt-install speakup-modules-$KVERS 1>&2; then
+		printf "\n\n# Speakup module added by debian-installer\n" \
+			>> /target/etc/modules
+		printf "$SYNTH\n" >> /target/etc/modules
+	fi
+fi

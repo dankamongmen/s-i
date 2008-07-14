@@ -1,0 +1,5 @@
+SYNTH=$(sed < /proc/cmdline -n -e 's/.*speakup\.synth=\([^ ]*\).*/\1/p')
+if [ -n "$SYNTH" ]; then
+	modprobe speakup_$SYNTH
+	debconf-set debian-installer/framebuffer false
+fi
