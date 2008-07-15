@@ -4,4 +4,9 @@
 
 set -e
 
+# stop the udev daemon before /dev/ is unmounted
+if PID=$(pidof udevd); then
+       kill -15 $PID
+fi
+
 umount -a || true
