@@ -148,11 +148,6 @@ case "`archdetect`" in
 			rmdir $path/sda5 $path || true
 		elif echo "$machine" | grep -q "^QNAP TS-109/TS-209" ||
 		   echo "$machine" | grep -q "^QNAP TS-409"; then
-			config=$(get_mtdblock "NAS Config")
-			if [ -z "$config" ]; then
-				log "Can't find MTD partition holding the config data"
-				exit
-			fi
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/sda1
 			mount -t ext2 -o ro /dev/sda1 $path/sda1 || true
