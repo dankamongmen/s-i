@@ -82,6 +82,8 @@ install_live_system () {
 		kopts=
 		if db_get debian-installer/add-kernel-opts && [ "$RET" ]; then
 			kopts="$RET"
+			# remove any existing boot= option
+			kopts="$(echo "$kopts" | sed -r "s/(^| )boot=[^ ]*"//)"
 		if
 		db_set debian-installer/add-kernel-opts \
 			"${kopts:+$kopts }boot=$bootmode"
