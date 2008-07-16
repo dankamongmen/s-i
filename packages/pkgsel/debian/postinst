@@ -76,6 +76,8 @@ if [ "$RET" = none ]; then
 else
 	upgrade_type="$RET"
 	db_progress INFO pkgsel/progress/upgrade
+	sleep 2 # allow the message to be seen
+
 	in-target sh -c "$config debconf-apt-progress --from 5 --to 10 --logstderr -- aptitude -q --without-recommends -y -o DPkg::options=--force-confnew '$upgrade_type'" || aptfailed
 	tasksel_start=10
 fi
