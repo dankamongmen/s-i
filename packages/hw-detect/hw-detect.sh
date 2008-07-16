@@ -301,7 +301,17 @@ if [ -z "$LOAD_IDE" ] && is_not_loaded ide-generic && \
 	load_module ide-generic
 	update-dev
 	if [ $(ls /sys/block | wc -w) -gt $blockdev_count ]; then
-		register-module -i ide-generic
+		log "New devices detected after loading ide-generic"
+
+		# This will tell initramfs-tools to load ide-generic
+		kopts=
+		if db_get debian-installer/add-kernel-opts && [ "$RET" ]; then
+			kopts="$RET"
+		fi
+		if ! echo "$kopt" | grep -Eq "(^| )all_generic_ide=1( |$)"
+			db_set debian-installer/add-kernel-opts \
+				"${kopts:+$kopts }all_generic_ide=1"
+		fi
 	fi
 fi
 
