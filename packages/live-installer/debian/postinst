@@ -70,14 +70,21 @@ install_live_system () {
 		exit 1
 	fi
 
-	# if we're dumping it, we need to set boot=live
+	# if we're dumping it, we need to set the boot mode
 	if [ "$mode" = live ]; then
-		# set the init script to use
+		# which init script to use
 		if [ -d /cdrom/casper ]; then
-			db_set debian-installer/add-kernel-opts "boot=casper"
+			bootmode=casper
 		else
-			db_set debian-installer/add-kernel-opts "boot=live"
+			bootmode=live
 		fi
+
+		kopts=
+		if db_get debian-installer/add-kernel-opts && [ "$RET" ]; then
+			kopts="$RET"
+		if
+		db_set debian-installer/add-kernel-opts \
+			"${kopts:+$kopts }boot=$bootmode"
 
 		# skip the hooks
 		return
