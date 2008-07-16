@@ -118,3 +118,25 @@ if [ -e $DT_ROOT/chosen/linux,stdout-path ]; then
 		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
 	fi
 fi
+
+if [ -e /sys/bus/xen ]; then
+	console=hvc0
+	log "Setting up virtualized serial console on /dev/$console"
+	if [ -f /target/etc/inittab ]; then
+		log "adding console to /etc/inittab"
+		console_line="co:2345:respawn:/sbin/getty $console 9600 linux"
+		if grep -q "^#\?co:" /target/etc/inittab; then
+			sed -i -e "s|^#\?co:.*$|$console_line|" \
+				/target/etc/inittab
+		else
+			sedexp="/^1:/i\\$console_line\\"
+			sed -i -e "$sedexp" /target/etc/inittab
+		fi
+	fi
+	if [ -f /target/etc/event.d/tty1 ]; then
+		log "adding console to /etc/event.d/tty1"
+		sed -e "s/^\(exec.*getty \).*/\1-L $console 9600 linux/" \
+		    -e "s/tty1/$console/g" \
+		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
+	fi
+fi
