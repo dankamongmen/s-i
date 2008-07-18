@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 -->
-<!-- updated 39614:53452 by Felipe Augusto van de Wiel (faw) 2008.06.10 -->
+<!-- original version: 54017 -->
+<!-- updated 39614:54017 by Felipe Augusto van de Wiel (faw) 2008.07.17 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparando os arquivos para inicialização via rede usando TFTP</title>
@@ -126,9 +126,13 @@ Olhe em <filename>/etc/inetd.conf</filename> e lembre-se do diretório que foi
 usado como argumento do <command>in.tftpd</command><footnote>
 
 <para>
-O argumento <userinput>-l</userinput> habilita algumas versões do
-<command>in.tftpd</command> a registrar todas as requisições para os
-logs do sistema; isto é útil para diagnosticar erros de inicialização.
+Todas as alternativas <command>in.tftpd</command> disponíveis no Debian
+deveriam, por padrão, registrar nos logs do sistemas todas as requisições
+TFTP. Algumas delas dão suporte ao argumento <userinput>-v</userinput>
+para aumentar o nível de detalhes (<quote>verbose</quote>).
+É recomendado verificar estas mensagens de log em caso de problemas
+de inicialização pois elas são um bom ponto de partida para diagnostica
+a causa dos erros.
 </para>
 
 </footnote>; você precisará disto abaixo.
@@ -183,11 +187,37 @@ rígidos.
 
 Em máquinas Power Macintosh NewWorld, você precisará configurar
 o gerenciador de partida <command>yaboot</command>
-como a imagem de inicialização do TFTP.
-O <command>Yaboot</command> então copiará as imagens de kernel e disco
-em RAM via TFTP. Para a inicialização via rede, use o
-<filename>yaboot-netboot.conf</filename>. Apenas renomeie este arquivo
-para <filename>yaboot.conf</filename> no diretório do TFTP.
+como a imagem de inicialização do TFTP. O <command>Yaboot</command>
+então copiará as imagens de kernel e disco em RAM via TFTP. Você terá
+que baixar os arquivos a seguir do diretório <filename>netboot/</filename>:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 Para a inicialização usando o PXE, tudo que precisa fazer já está feito no
