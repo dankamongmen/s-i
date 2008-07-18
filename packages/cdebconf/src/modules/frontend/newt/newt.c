@@ -89,7 +89,8 @@ struct newtColors newtAltColorPalette = {
 	"black", "lightgray",			/* button fg, bg */
 	"gray", "brightred",			/* active button fg, bg */
 	"white", "gray",			/* checkbox fg, bg */
-	"yellow", "brown",			/* active checkbox fg, bg */
+	/*"yellow", "brown",*/			/* active checkbox fg, bg */
+	"black", "lightgrey",			/* active checkbox fg, bg */
 	/*"yellow", "blue",*/			/* entry box fg, bg */
 	"white", "black",			/* entry box fg, bg */
 	/*"blue", "lightgray",*/		/* label fg, bg */
@@ -104,9 +105,9 @@ struct newtColors newtAltColorPalette = {
 	"white", "black",			/* help line */
 	"yellow", "blue",			/* root text */
 	/*"blue",*/				/* scale full */
-	"gray",					/* scale full */
+	"black",				/* scale full */
 	/*"red",*/				/* scale empty */
-	"lightgray",				/* scale empty */
+	"blue",					/* scale empty */
 	"blue", "lightgray",			/* disabled entry fg, bg */
 	/*"black", "lightgray",*/		/* compact button fg, bg */
 	"white", "black",			/* compact button fg, bg */
