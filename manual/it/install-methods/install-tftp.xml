@@ -1,6 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 -->
-
+<!-- original version: 54017 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <!-- <title>Preparing Files for TFTP Net Booting</title> -->
@@ -238,14 +237,18 @@ nota<footnote>
 <para>
 
 <!--
-The <userinput>-l</userinput> argument enables some versions of
-<command>in.tftpd</command> to log all requests to the system logs;
-this is useful for diagnosing boot errors.
+All <command>in.tftpd</command> alternatives available in Debian should
+log TFTP requests to the system logs by default. Some of them support a
+<userinput>-v</userinput> argument to increase verbosity.
+It is recommended to check these log messages in case of boot problems
+as they are a good starting point for diagnosing the cause of errors.
 -->
 
-L'opzione <userinput>-l</userinput> attiva su alcune versioni di
-<command>in.tftpd</command> la registrazione di tutte le richieste sul log
-di sistema, è utile per la diagnosi degli errori durante l'avvio.
+Tutte le versioni di <command>in.tftpd</command> disponibili in Debian
+registrano le richieste TFTP sul log di sistema e alcune versioni supportano
+l'opzione <userinput>-v</userinput> per aumentare la verbosità. In caso di
+problemi d'avvio, si raccomanda di verificare i messaggi nel log poiché sono
+un ottimo punto di partenza per la diagnosi della causa degli errori.
 
 </para>
 
@@ -336,17 +339,43 @@ esiste uno standard.
 On NewWorld Power Macintosh machines, you will need to set up the
 <command>yaboot</command> boot loader as the TFTP boot image.
 <command>Yaboot</command> will then retrieve the kernel and RAMdisk
-images via TFTP itself.  For net booting, use the
-<filename>yaboot-netboot.conf</filename>.  Just rename this to
-<filename>yaboot.conf</filename> in the TFTP directory.
+images via TFTP itself. You will need to download the following files
+from the <filename>netboot/</filename> directory:
 -->
 
 Sulle macchine Power Machintosh NewWorld è necessario configurare il
 bootloader <command>yaboot</command> come immagine di avvio TFTP. Sarà poi
 <command>yaboot</command> a recuperare le immagini del kernel e del ramdisk
-sempre tramite TFTP. Per l'avvio dalla rete usare
-<filename>yaboot-netboot.conf</filename>, lo si deve copiare nella directory
-TFTP e poi rinominarlo in <filename>yaboot.conf</filename>.
+sempre tramite TFTP. È necessario scaricare i seguenti file dalla directory
+<filename>netboot/</filename>:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 

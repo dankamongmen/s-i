@@ -1,6 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43923 -->
-
+<!-- original version: 54017 -->
 
   <sect2 arch="powerpc" id="boot-cd">
   <!-- <title>Booting from a CD-ROM</title> -->
@@ -131,10 +130,7 @@ You will have already placed the <filename>vmlinux</filename>,
 <filename>initrd.gz</filename>, <filename>yaboot</filename>, and
 <filename>yaboot.conf</filename> files at the root level of your HFS
 partition in <xref linkend="files-newworld"/>.
-Restart the computer, and immediately (during the chime) hold down the
-<keycap>Option</keycap>, <keycap>Command (cloverleaf/Apple)</keycap>,
-<keycap>o</keycap>, and <keycap>f</keycap> keys all together. After
-a few seconds you will be presented with the Open Firmware prompt.
+You will now have to boot into OpenFirmware (see <xref linkend="invoking-openfirmware"/>).
 At the prompt, type
 -->
 
@@ -142,12 +138,8 @@ Come primo passo si devono copiare i file <filename>vmlinux</filename>,
 <filename>initrd.gz</filename>, <filename>yaboot</filename> e
 <filename>yaboot.conf</filename> nella radice
 della partizione HFS come riportato in <xref linkend="files-newworld"/>.
-Riavviare il computer e immediatamente (durante il segnale acustico)
-premere contemporaneamente i tasti
-<keycap>Option</keycap>, <keycap>Command (quadrifoglio/mela)</keycap>,
-<keycap>o</keycap> e <keycap>f</keycap>.
-Dopo alcuni secondi si avrà accesso al prompt di Open
-Firmware. Si scriva
+Adesso è necessario avviare OpenFirmware (si veda
+<xref linkend="invoking-openfirmware"/>), poi, al prompt, scrivere
 
 <informalexample><screen>
 0 &gt; boot hd:<replaceable>x</replaceable>,yaboot
@@ -212,20 +204,14 @@ linkend="boot-usb-files"/>. To boot a Macintosh system from a USB stick,
 you will need to use the Open Firmware prompt, since Open Firmware does
 not search USB storage devices by default.
 <!\-\- TODO: although it could be made to; watch this space \-\->
-To get to the prompt, hold down
-<keycombo><keycap>Command</keycap> <keycap>Option</keycap>
-<keycap>o</keycap> <keycap>f</keycap></keycombo> all together while
-booting (see <xref linkend="invoking-openfirmware"/>).
+See <xref linkend="invoking-openfirmware"/>.
 -->
 
 Assicurarsi di aver preparato tutto seguendo le indicazioni in <xref
 linkend="boot-usb-files"/>. Per avviare un sistema Macintosh da una chiavetta
 USB è necessario usare il prompt di Open Firmware dato che Open Firmware
-non ricerca i dispositivi di memorizzazione USB autonomamente. Per ottenere
-il prompt tenere premuto i tasti <keycombo><keycap>Command</keycap>
-<keycap>Option</keycap> <keycap>o</keycap> <keycap>f</keycap></keycombo>
-tutti insieme durante l'avvio (si consulti <xref
-linkend="invoking-openfirmware"/>).
+non ricerca i dispositivi di memorizzazione USB autonomamente (si consulti
+<xref linkend="invoking-openfirmware"/>).
 
 </para><para>
 
@@ -327,22 +313,46 @@ avviarsi via rete.
 <!--
 On machines with Open Firmware, such as NewWorld Power Macs, enter the
 boot monitor (see <xref linkend="invoking-openfirmware"/>) and
-use the command <command>boot enet:0</command>.  PReP and CHRP boxes
+use the command 
+-->
+
+Su macchine con Open Firmware, come i PowerMac NewWorld, si deve
+accedere al <quote>boot monitor</quote> (si veda <xref
+linkend="invoking-openfirmware"/> e usare il comando
+
+<informalexample><screen>
+0 &gt; boot enet:0
+</screen></informalexample>
+
+<!--
+If this doesn't work, you might have to add the filename like this:
+-->
+
+Se non funziona, provare aggiungendo il nome del file in questo modo:
+
+<informalexample><screen>
+0 &gt; boot enet:0,yaboot
+</screen></informalexample>
+
+<!--
+PReP and CHRP boxes
 may have different ways of addressing the network.  On a PReP machine,
 you should try
+-->
+
+Le macchine PReP e CHRP hanno metodi diversi per indirizzare la
+rete. Su una macchina PReP si può provare
+
+<informalexample><screen>
 <userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
+</screen></informalexample>
+
+<!--
 On some PReP systems (e.g. Motorola PowerStack machines) the command
 <userinput>help boot</userinput> may give a description of syntax and
 available options.
 -->
 
-Su macchine con Open Firmware, come i PowerMac NewWorld, si deve
-accedere al <quote>boot monitor</quote> (si veda
-<xref linkend="invoking-openfirmware"/>
-e usare il comando <command>boot enet:0</command>. Le macchine
-PReP e CHRP possono avere metodi diversi di indirizzare la rete.
-Su una macchina PReP si può provare
-<userinput>boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable></userinput>.
 Su alcuni sistemi PReP (come le macchine Motorola PowerStack) il comando
 <userinput>help boot</userinput> potrebbe visualizzare una descrizione
 della sintassi e delle opzioni disponibili.
