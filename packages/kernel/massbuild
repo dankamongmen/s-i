@@ -329,9 +329,14 @@ retrieve_package() {
 	# version than their source package.
 	# The version of the module's source package is inserted between the
 	# "upstream" part of the version and the "Debian" revision.
-	local sv_base=${BDEP_SVERSION%-*}
-	local sv_rev=${BDEP_SVERSION##*-}
-	local sv_regexp="_${sv_base}([^_]*)?-${sv_rev}_"
+	if expr "$BDEP_SVERSION" : ".*-" >/dev/null; then
+		local sv_base=${BDEP_SVERSION%-*}
+		local sv_rev=${BDEP_SVERSION##*-}
+		local sv_regexp="_${sv_base}([^_]*)?-${sv_rev}_"
+	else
+		# Non-Debian style package version (custom built kernel?)
+		local sv_regexp="_${BDEP_SVERSION}_"
+	fi
 
 	case $mirror_type in
 	    disk)
