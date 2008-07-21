@@ -11,9 +11,14 @@ export LVM_SUPPRESS_FD_WARNINGS=1
 ###############################################################################
 
 # Convert common terms for disk sizes into something LVM understands.
-#  e.g. "200 gb" -> "200G"
-lvm_size_from_human() {
-	echo "$1" | tr "kmgt" "KMGT" | sed -e 's/[[:space:]]//g;s/\([KMGT]\)[bB]/\1/'
+#  e.g. "200 gb" -> "47683"
+lvm_extents_from_human() {
+	local vg size extent_size
+	vg="$1"
+	size="$2"
+
+	extent_size=$(vgs --noheadings --units K -o vg_extent_size "$vg")
+	echo $(($(human2longint "$size") / $(human2longint "$extent_size")))
 }
 
 # Convert LVM disk sizes into something human readable.
@@ -309,20 +314,12 @@ lv_list() {
 
 # Create a LV
 lv_create() {
-	local vg lv size
+	local vg lv extents
 	vg="$1"
 	lv="$2"
-	size="$3"
+	extents="$3"
 
-	if [ "$size" = full ]; then
-		vg_get_info "$vg"
-		if [ "$FREEPE" -lt 1 ]; then
-			return 1
-		fi
-		log-output -t partman-lvm lvcreate -l "$FREEPE" -n "$lv" "$vg"
-	else
-		log-output -t partman-lvm lvcreate -L "$size" -n "$lv" $vg
-	fi
+	log-output -t partman-lvm lvcreate -l "$extents" -n "$lv" $vg
 	return $?
 }
 

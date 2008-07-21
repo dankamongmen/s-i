@@ -73,9 +73,11 @@ foreach_partition '
 	fi
 
 	if [ "$last" = yes ]; then
-		lv_create $VG_name "$lvname" full || autopartitioning_failed
+		vg_get_info "$VG_name"
+		lv_create $VG_name "$lvname" $FREEPE || autopartitioning_failed
 	else
-		lv_create $VG_name "$lvname" $(($1/1024)) || autopartitioning_failed
+		extents=$(lvm_extents_from_human $VG_name "${1}K")
+		lv_create $VG_name "$lvname" $extents || autopartitioning_failed
 	fi
 
 	# Hyphens in VG or LV names are doubled under /dev/mapper

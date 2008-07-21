@@ -2,6 +2,12 @@ partman-lvm (62) UNRELEASED; urgency=low
 
   [ Jérémy Bobbio ]
   * Fix size substitution when displaying partman-lvm/lvcreate_error.
+  * Harmonize size specification used when creating new Logical Volumes:
+     - lv_create() now uses extents instead of size,
+     - lvm_size_from_human() has been renamed to lvm_extents_from_human(),
+     - As extent sizes are specific to a given Volume Group,
+       lvm_extents_from_human() take the VG name as its first argument.
+    Breaks: partman-auto-lvm (<= 27)                         (Closes: #411943)
 
  -- Jérémy Bobbio <lunar@debian.org>  Sat, 19 Jul 2008 21:44:37 +0000
 

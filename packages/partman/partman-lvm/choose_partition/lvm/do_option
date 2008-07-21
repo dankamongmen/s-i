@@ -323,7 +323,7 @@ do_vg_reduce() {
 }
 
 do_lv_create() {
-	local vgs vg output lv size max_size
+	local vgs vg output lv extents size max_size
 
 	# Find eligible VGs
 	vgs=""
@@ -384,17 +384,18 @@ do_lv_create() {
 	db_go || return
 	db_get partman-lvm/lvcreate_size
 	[ -n "$RET" ] || return
-	size=$(lvm_size_from_human "$RET")
+	size="$RET"
+	extents=$(lvm_extents_from_human "$vg" "$size")
 
 	# If the maximum free space should be used for the new LV, use the
 	# number of physical extents (PEs) because the size given by LVM
 	# might not be accurate, resulting in an error because the VG is
 	# not big enough (see #250594).
 	if [ "$size" = "$max_size" ]; then
-		size=full
+		extents=$FREEPE
 	fi
 
-	if ! lv_create "$vg" "$lv" "$size"; then
+	if ! lv_create "$vg" "$lv" "$extents"; then
 		db_subst partman-lvm/lvcreate_error VG $vg
 		db_subst partman-lvm/lvcreate_error LV $lv
 		db_subst partman-lvm/lvcreate_error SIZE $size
