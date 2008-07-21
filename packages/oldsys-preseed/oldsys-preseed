@@ -33,7 +33,7 @@ case "`archdetect`" in
 			sysconf=$(get_mtdblock "SysConf")
 			if [ -z "$sysconf" ]; then
 				log "Can't find SysConf MTD partition"
-				exit
+				exit 0
 			fi
 			parse_sysconf "/dev/$sysconf"
 			# The original NSLU2 uses a different name for the network interface
@@ -67,7 +67,7 @@ case "`archdetect`" in
 			config=$(get_mtdblock "user")
 			if [ -z "$config" ]; then
 				log "Can't find MTD partition holding config data"
-				exit
+				exit 0
 			fi
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/mnt $path/defaults
