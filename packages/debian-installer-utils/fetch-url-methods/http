@@ -37,7 +37,7 @@ protocol_fetch() {
 		wget404 -q -O "$file" "$url" || RETVAL=$?
 		[ $RETVAL = 1 ] || return $RETVAL
 
-		if [ "$TRY_CONTINUE" ] && [ -e "$file" ]; then
+		if [ "$TRY_CONTINUE" ] && [ -s "$file" ]; then
 			for j in 1 2 3; do
 				wget404 -c -q "$url" -O "$file" || RETVAL=$?
 				[ $RETVAL = 1 ] || return $RETVAL
