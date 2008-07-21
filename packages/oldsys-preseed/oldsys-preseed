@@ -112,7 +112,45 @@ case "`archdetect`" in
 	;;
 	arm*/orion5x)
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
-		if echo "$machine" | grep -q "^HP Media Vault mv2120"; then
+		if echo "$machine" | grep -q "^Buffalo/Revogear Kurobox Pro"; then
+			check_file /proc/mtd
+			rootfs=$(get_mtdblock "rootfs")
+			if [ -z "$rootfs" ]; then
+				log "Can't find rootfs MTD partition"
+				exit 0
+			fi
+			path=/tmp/oldsys-preseed
+			mkdir -p $path/rootfs
+			mount -t jffs2 -o ro /dev/$rootfs $path/rootfs || true
+			INTERFACE=eth0
+			parse_unix_tree $path/rootfs
+			netinfo=$path/rootfs/etc/netinfo
+			if [ -e "$netinfo" ]; then
+				usage=$(sed -n '/^my_ipaddress/ {s/.*=//; p}' "$netinfo")
+				if [ "$usage" = "dhcp" ]; then
+					NET_CONFIG=dhcp
+				else
+					NET_CONFIG=static
+					IP_ADDRESS=$usage
+					NETMASK=$(sed -n '/^my_subnetmask/ {s/.*=//; p}' "$netinfo")
+					GATEWAY=$(sed -n '/^my_dgw/ {s/.*=//; p}' "$netinfo")
+				fi
+			fi
+			hostinfo=$path/rootfs/etc/host.info
+			if [ -e "$hostinfo" ]; then
+				HOSTNAME=$(sed '/^hostname/ {s/.*=//; p}' "$hostinfo")
+			fi
+			unset_matching_var "HOSTNAME" "KUROBOX-PRO"
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.11.150
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.11.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.11.1
+				dhcp_fallback $FILE
+			fi
+			umount $path/rootfs || true
+			rmdir $path/rootfs $path || true
+		elif echo "$machine" | grep -q "^HP Media Vault mv2120"; then
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/sda5
 			mount -t ext3 -o ro /dev/sda5 $path/sda5 || true
