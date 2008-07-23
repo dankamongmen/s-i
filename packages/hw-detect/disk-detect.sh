@@ -211,3 +211,5 @@ if [ "$RET" = true ]; then
 		fi
 	fi
 fi
+
+check-missing-firmware

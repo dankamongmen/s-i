@@ -237,5 +237,6 @@ while ! ethernet_found; do
 	fi
 done
 
+check-missing-firmware
 sysfs-update-devnames || true
 cleanup
