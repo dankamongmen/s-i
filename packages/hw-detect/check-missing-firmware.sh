@@ -63,7 +63,7 @@ list_deb_firmware () {
 }
 
 check_deb_arch () {
-	arch=$(ar p "$1" control.tar.gz | tar zxO ./control | grep Architecture | sed -e 's/Architecture: *//')
+	arch=$(ar p "$1" control.tar.gz | tar zxO ./control | grep '^Architecture:' | sed -e 's/Architecture: *//')
 	[ "$arch" = all ] || [ "$arch" = "$(udpkg --print-architecture)" ]
 }
 
