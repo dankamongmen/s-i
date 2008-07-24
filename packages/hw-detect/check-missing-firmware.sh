@@ -6,6 +6,10 @@ LOG=/tmp/missing-firmware
 NL="
 "
 
+log () {
+	logger -t check-missing-firmware "$@"
+}
+
 read_log () {
 	modules=""
 	files=""
@@ -79,11 +83,14 @@ install_firmware_pkg () {
 }
 
 while read_log && ask_load_firmware; do
+	log "missing firmware files ($files) for $modules"
+
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
 		for file in $files; do
 			for f in "/media/$file" "/media/firmware/$file"; do
 				if [ -e "$f" ]; then
+					log "copying loose file $file"
 					mkdir -p /lib/firmware
 					rm -f "/lib/firmware/$file"
 					cp -a "$f" /lib/firmware/ || true
@@ -102,6 +109,7 @@ while read_log && ask_load_firmware; do
 		for filename in /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude; do
 			if [ -f "$filename" ]; then
 				if check_deb_arch "$filename" && list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
+					log "installing firmware package $filename"
 					install_firmware_pkg "$filename" || true
 				fi
 			fi
