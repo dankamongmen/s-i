@@ -58,7 +58,8 @@ ask_load_firmware () {
 list_deb_firmware () {
 	ar p "$1" data.tar.gz | tar zt \
 		| grep '^\./lib/firmware/' \
-		| sed -e 's!^\./lib/firmware/!!'
+		| sed -e 's!^\./lib/firmware/!!' \
+		| grep -v '^$'
 }
 
 check_deb_arch () {
