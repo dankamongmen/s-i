@@ -82,12 +82,15 @@ cleanup () {
 	rm -f $TEMP_EXTRACT
 }
 
+lsifaces () {
+	sed -e "s/lo://" < /proc/net/dev | grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//; s/^ *//"
+}
+
 ethernet_found() {
 	local ifaces=0
 	local firewire=0
 
-	for iface in $(sed -e "s/lo://" < /proc/net/dev | \
-			grep "[a-z0-9]*:[ ]*[0-9]*" | sed "s/:.*//; s/^ *//"); do
+	for iface in $(lsifaces); do
 		ifaces=$(expr $ifaces + 1)
 		if [ -f /etc/network/devnames ]; then
 			if grep "^$iface:" /etc/network/devnames | \
@@ -237,6 +240,13 @@ while ! ethernet_found; do
 	fi
 done
 
+# Some modules only try to load firmware once brought up. So bring up and
+# then down all interfaces.
+for iface in $(lsifaces); do
+	ip link set "$iface" up
+	ip link set "$iface" down
+done
 check-missing-firmware
+
 sysfs-update-devnames || true
 cleanup
