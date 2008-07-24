@@ -13,7 +13,7 @@ read_log () {
 		mv $LOG $LOG.old
 		OLDIFS="$IFS"
 		IFS="$NL"
-		for line in $(cat $LOG.old); do
+		for line in $(sort $LOG.old | uniq); do
 			module="${line%% *}"
 			if [ -n "$module" ]; then
 				modules="$module $modules"
