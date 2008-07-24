@@ -61,6 +61,11 @@ list_deb_firmware () {
 		| sed -e 's!^\./lib/firmware/!!'
 }
 
+check_deb_arch () {
+	arch=$(ar p "$1" control.tar.gz | tar zxO ./control | grep Architecture | sed -e 's/Architecture: *//')
+	[ "$arch" = all ] || [ "$arch" = "$(udpkg --print-architecture)" ]
+}
+
 install_firmware_pkg () {
 	if echo "$1" | grep -q '\.deb$'; then
 		# cache deb for installation into /target later
@@ -95,7 +100,7 @@ while read_log && ask_load_firmware; do
 		echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
 		for filename in /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude; do
 			if [ -f "$filename" ]; then
-				if list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
+				if check_deb_arch "$filename" && list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
 					install_firmware_pkg "$filename" || true
 				fi
 			fi
