@@ -24,7 +24,11 @@ read_log () {
 			fi
 			file="${line#* }"
 			if [ -n "$file" ]; then
-				files="$file $files"
+				if [ -n "$files" ]; then
+					files="$file $files"
+				else
+					files="$file"
+				fi
 			fi
 		done
 		IFS="$OLDIFS"
