@@ -8,6 +8,10 @@ if [ "$(uname)" != Linux ]; then
 	exit 0
 fi
 
+log () { 
+	logger -t disk-detect "$@"
+}
+
 is_not_loaded() {
 	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
 	   (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
@@ -110,7 +114,9 @@ EOF
 	fi
 }
 
-hw-detect disk-detect/detect_progress_title || true
+if ! hw-detect disk-detect/detect_progress_title; then
+	log "hw-detect exited nonzero"
+fi
 
 while ! disk_found; do
 	CHOICES=""

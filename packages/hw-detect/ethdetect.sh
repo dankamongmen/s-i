@@ -14,6 +14,10 @@ if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
 
+log () { 
+	logger -t ethdetect "$@"
+}
+
 is_not_loaded() {
 	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
 	   (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
@@ -171,7 +175,9 @@ module_probe() {
 	fi
 }
 
-hw-detect ethdetect/detect_progress_title || true
+if ! hw-detect ethdetect/detect_progress_title; then
+	log "hw-detect exited nonzero"
+fi
 
 while ! ethernet_found; do
 	CHOICES=""
