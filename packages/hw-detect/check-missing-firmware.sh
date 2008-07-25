@@ -11,6 +11,9 @@ log () {
 }
 
 read_log () {
+	# Give modules some time to request firmware.
+	sleep 1
+	
 	modules=""
 	files=""
 	if [ -s "$LOG" ]; then
@@ -33,6 +36,10 @@ read_log () {
 		done
 		IFS="$OLDIFS"
 		rm -f $LOG.old
+	
+		log "missing firmware files ($files) for $modules"
+	else
+		log "no missing firmware in $LOG"
 	fi
 
 	if [ -n "$modules" ]; then
@@ -87,8 +94,6 @@ install_firmware_pkg () {
 }
 
 while read_log && ask_load_firmware; do
-	log "missing firmware files ($files) for $modules"
-
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
 		for file in $files; do
