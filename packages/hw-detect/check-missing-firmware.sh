@@ -23,15 +23,11 @@ read_log () {
 		for line in $(sort $LOG.old | uniq); do
 			module="${line%% *}"
 			if [ -n "$module" ]; then
-				modules="$module $modules"
+				modules="$module${modules:+ $modules}"
 			fi
 			file="${line#* }"
 			if [ -n "$file" ]; then
-				if [ -n "$files" ]; then
-					files="$file $files"
-				else
-					files="$file"
-				fi
+				files="${files:+$files }$file"
 			fi
 		done
 		IFS="$OLDIFS"
