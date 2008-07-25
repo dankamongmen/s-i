@@ -172,12 +172,11 @@ get_manual_hw_info() {
 }
 
 # Based on syslog from #486298
+megaraid_complete() {
+	dmesg | grep -Eq "megaraid mbox: (Wait for 0 commands to complete|reset sequence completed sucessfully)"
+}
 wait_megaraid_complete() {
 	local wait=300
-
-	megaraid_complete() {
-		dmesg | grep -Eq "megaraid mbox: (Wait for 0 commands to complete|reset sequence completed sucessfully)"
-	}
 
 	if megaraid_complete; then
 		return 0
