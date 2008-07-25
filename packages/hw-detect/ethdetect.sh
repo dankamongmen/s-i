@@ -243,8 +243,8 @@ done
 # Some modules only try to load firmware once brought up. So bring up and
 # then down all interfaces.
 for iface in $(lsifaces); do
-	ip link set "$iface" up
-	ip link set "$iface" down
+	ip link set "$iface" up || true
+	ip link set "$iface" down || true
 done
 check-missing-firmware
 
