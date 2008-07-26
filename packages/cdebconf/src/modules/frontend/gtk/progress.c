@@ -134,13 +134,24 @@ static void destroy_progress_bar(struct progress_data * progress_data)
 static void create_progress_label(struct progress_data * progress_data,
                                   GtkWidget * container)
 {
+    struct frontend_data * fe_data = progress_data->fe->data;
+    GtkStyle * style;
     GtkWidget * progress_label;
+    PangoFontDescription * font_desc;
 
     /* XXX: check null! */
-    progress_label = gtk_label_new(NULL /* no text */);
+    progress_label = gtk_entry_new();
 
-    gtk_misc_set_alignment(GTK_MISC(progress_label),
-                           0 /* left */, 0 /* top */);
+    style = gtk_widget_get_style(fe_data->window);
+    gtk_widget_modify_base(progress_label, GTK_STATE_NORMAL, style->bg);
+    gtk_entry_set_editable(GTK_ENTRY(progress_label), FALSE);
+    gtk_entry_set_has_frame(GTK_ENTRY(progress_label), FALSE);
+
+    /* XXX: check null! */
+    font_desc = pango_font_description_new();
+    pango_font_description_set_style(font_desc, PANGO_STYLE_ITALIC);
+    gtk_widget_modify_font(progress_label, font_desc);
+    pango_font_description_free(font_desc);
 
     gtk_box_pack_start(GTK_BOX(container), progress_label,
                        FALSE /* don't expand */, FALSE /* don't fill */,
@@ -513,7 +524,6 @@ int cdebconf_gtk_progress_info(struct frontend * fe, const char * info)
 {
     struct frontend_data * fe_data = fe->data;
     struct progress_data * progress_data = fe_data->progress_data;
-    char * label;
 
     if (NULL == progress_data) {
         /* called out of order */
@@ -521,9 +531,7 @@ int cdebconf_gtk_progress_info(struct frontend * fe, const char * info)
     }
 
     gdk_threads_enter();
-    label = g_strdup_printf("<i> %s</i>", info);
-    gtk_label_set_markup(GTK_LABEL(progress_data->progress_label), label);
-    g_free(label);
+    gtk_entry_set_text(GTK_ENTRY(progress_data->progress_label), info);
     gdk_threads_leave();
 
     if (DC_NO_ANSWER == fe_data->answer) {
