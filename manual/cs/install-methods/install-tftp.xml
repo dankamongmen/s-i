@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 44002 -->
+<!-- original version: 54017 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Příprava souborů pro zavedení ze sítě pomocí TFTP</title>
@@ -115,10 +115,11 @@ Podívejte se do souboru <filename>/etc/inetd.conf</filename> a
 zapamatujte si název adresáře, jehož jméno je za
 <command>in.tftpd</command>;<footnote><para>
 
-Přepínač <userinput>-l</userinput> umožňuje některým verzím
-<command>in.tftpd</command> zaznamenávat všechny požadavky, které mu
-byly zaslány, do systémových logů. To je vhodné zejména v situaci, kdy
-zavádění neprobíhá tak, jak má.
+Všechny alternativní <command>in.tftpd</command> v Debianu by měly
+automaticky zaznamenávat všechny požadavky, které jim byly zaslány, do
+systémových logů. To se hodí zejména v situaci, kdy zavádění neprobíhá
+tak, jak má. Některé TFTP servery umí zvýšit svou upovídanost
+parametrem <userinput>-v</userinput>.
 
 </para></footnote> budete jej dále potřebovat. Pokud musíte změnit
 obsah souboru <filename>/etc/inetd.conf</filename>, musíte také
@@ -168,9 +169,36 @@ standardy. Proto ještě musíte na příslušný obraz vytvořit odkaz, který
 Na strojích NewWorld Power Macintosh budete muset nastavit jako
 zaváděcí TFTP obraz zavaděč <command>yaboot</command>.
 <command>Yaboot</command> si pak sám přes TFTP stáhne obrazy jádra a
-RAMdisku. Pro zavádění ze sítě použijte soubor
-<filename>yaboot-netboot.conf</filename>, který v TFTP adresáři
-přejmenujete na <filename>yaboot.conf</filename>.
+RAMdisku. Z adresáře <filename>netboot/</filename> musíte stáhnout
+následující soubory:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 
@@ -190,65 +218,6 @@ jméno souboru pro zavedení zasílal
 <filename>/debian-installer/ia64//elilo.efi</filename>.
 
 </para>
-
-   <sect3 arch="mipsel">
-   <title>TFTP obrazy pro DECstation</title>
-<para>
-
-Na počítačích DECstation existují pro každou podarchitekturu speciální
-tftp obrazy, které v jednom souboru obsahují jak jádro, tak instalační
-program. Jména těchto souborů jsou
-<filename><replaceable>podarchitektura</replaceable>/netboot-boot.img</filename>.
-Jestliže jste si nastavili BOOTP/DHCP podle našich příkladů,
-nakopírujte tftp obraz do souboru
-<filename>/tftpboot/tftpboot.img</filename>.
-
-</para><para>
-
-Z DECstation firmwaru zavedete systém přes TFTP příkazem
-<userinput>boot <replaceable>#</replaceable>/tftp</userinput>, kde
-<replaceable>#</replaceable> je číslo zařízení TurboChannel, ze
-kterého se má zavádět. Většinou to bývá <quote>3</quote>. Pokud vám
-BOOTP/DHCP server nenabídne správný obraz, nebo pokud chcete zadat
-speciální parametry, můžete použít následující syntaxi:
-
-</para><para>
-
-<userinput>boot #/tftp/obraz param1=hodnota1 param2=hodnota2 ...</userinput>
-
-</para><para>
-
-U několika revizí DECstation firmwaru se projevuje problém se
-zaváděním ze sítě: zahájí se přenos a po krátké době stahování spadne
-s hláškou  <computeroutput>a.out err</computeroutput>. To může mít
-několik příčin:
-
-<orderedlist>
-<listitem><para>
-
-Firmware neodpovídá na ARP požadavky, což po chvíli vede k vypršení
-časového kvanta ARP protokolu a přenos se zastaví. Řešením je ručně
-přidat MAC adresu síťové karty stanice do ARP tabulky TFTP
-serveru. MAC adresu získáte z promptu firmwaru příkazem
-<command>cnfg</command>. Tuto adresu pak na TFTP serveru přidáte
-příkazem <userinput>arp -s <replaceable>IP-adresa</replaceable>
-<replaceable>MAC-adresa</replaceable></userinput>.
-
-</para></listitem>
-<listitem><para>
-
-Firmware má omezení na velikost zaváděných obrazů.
-
-</para></listitem>
-</orderedlist>
-
-Také existují revize firmwaru, které neumí s TFTP pracovat vůbec.
-Přehled různých revizí můžete najít na stránkách projektu NetBSD:
-<ulink
-url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
 
    <sect3 arch="alpha">
    <title>Zavedení Alphy přes TFTP</title>

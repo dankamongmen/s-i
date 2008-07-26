@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 53120 -->
+<!-- original version: 54252 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -960,10 +960,8 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení musí být v tradičním formátu (ne ve formátu devfs).
 # Například pro použití prvního SCSI/SATA disku:
-d-i partman-auto/disk string /dev/sda
-# Poznámka: Chcete-li použít libovolný nalezený disk bez ohledu na
-# název jeho zařízení, předchozí řádek zakomentujte. Toto však bude
-# fungovat pouze na systémech s jediným diskem.
+# Poznámka: pokud má systém více disků, musíte nějaký zadat.
+#d-i partman-auto/disk string /dev/sda
 
 # Dále musíte zvolit metodu, která se má použít. Momentálně jsou
 # dostupné metody "regular", "lvm" a "crypto".
@@ -1298,6 +1296,9 @@ můžete jednoduše použít i na příkazové řádce jádra.
 
 # Samostatné balíky pro instalaci.
 #d-i pkgsel/include string openssh-server build-essential
+# Zda se mají balíky po rozbalení debootstrapem aktualizovat.
+# Povolené hodnoty: none, safe-upgrade, full-upgrade
+#d-i pkgsel/upgrade select none
 
 # Některé verze instalačního systému mohou vývojářům Debianu hlásit
 # seznam balíků, které jste nainstalovali, což pomáhá při
