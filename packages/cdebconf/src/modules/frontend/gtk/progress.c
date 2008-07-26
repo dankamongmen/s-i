@@ -146,6 +146,7 @@ static void create_progress_label(struct progress_data * progress_data,
     gtk_widget_modify_base(progress_label, GTK_STATE_NORMAL, style->bg);
     gtk_entry_set_editable(GTK_ENTRY(progress_label), FALSE);
     gtk_entry_set_has_frame(GTK_ENTRY(progress_label), FALSE);
+    GTK_WIDGET_UNSET_FLAGS(progress_label, GTK_CAN_FOCUS);
 
     /* XXX: check null! */
     font_desc = pango_font_description_new();
