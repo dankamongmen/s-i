@@ -250,7 +250,10 @@ static int confmodule_update_seen_questions(struct confmodule *mod, enum seen_ac
                 DELETE(*(mod->seen_questions + mod->number_seen_questions - 1));
                 (mod->number_seen_questions) --;
                 if (mod->number_seen_questions == 0)
+                {
                     DELETE(mod->seen_questions);
+                    break;
+                }
             }
             break;
         case STACK_SEEN_SAVE:
