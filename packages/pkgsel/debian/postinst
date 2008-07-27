@@ -59,7 +59,7 @@ for divert in $DIVERTS; do
 done
 
 # get debconf-apt-progress config, which will make it run properly later
-config=$(chroot /target debconf-apt-progress --config| sed "s/$/;/")
+config=$(chroot /target debconf-apt-progress --config | sed "s/$/;/")
 
 db_progress STEP 1
 
@@ -70,8 +70,16 @@ if [ -e /var/lib/install-cd.id ]; then
 	REMOUNT_CD=1
 fi
 
+
+# upgrade_types are incompatible with Etch and upgrade option is in
+# general untested for Etch installs, therefore skip
+if ! db_get mirror/suite || [ -z "$RET" ]; then
+	db_get cdrom/suite
+fi
+suite=$RET
+
 db_get pkgsel/upgrade
-if [ "$RET" = none ]; then
+if [ "$RET" = none ] || [ "$suite" = etch ]; then
 	tasksel_start=5
 else
 	upgrade_type="$RET"
