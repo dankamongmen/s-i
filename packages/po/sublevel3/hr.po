@@ -109,9 +109,8 @@ msgstr "Enkriptirani prostor (%s)"
 #. For example: Serial ATA RAID isw_dhiiedgihc_Volume0 (mirror)
 #. :sl3:
 #: ../partman-base.templates:48001
-#, no-c-format
 msgid "Serial ATA RAID %s (%s)"
-msgstr ""
+msgstr "Serial ATA RAID %s (%s)"
 
 #. Type: text
 #. Description
@@ -210,7 +209,7 @@ msgstr "Instaliraj GRUB boot učitavač na Serial ATA RAID disk?"
 #. :sl3:
 #: ../grub-installer.templates:3001
 msgid "Installation of GRUB on Serial ATA RAID is experimental."
-msgstr ""
+msgstr "Instalacija GRUB-a na Serial ATA RAID je eksperimentalna."
 
 #. Type: boolean
 #. Description
@@ -221,6 +220,9 @@ msgid ""
 "RAID disk. It is also assumed that disk is listed as the first hard disk in "
 "the boot order defined in the system's BIOS setup."
 msgstr ""
+"GRUB se uvijek instalira na osnovni boot zapis (MBR) Serial ATA RAID diska. "
+"Također se podrazumijeva da je disk odabran kao prvi tvrdi disk u poretku "
+"dizanja koji se podešava u BIOS-u sustava."
 
 #. Type: boolean
 #. Description
@@ -230,7 +232,7 @@ msgstr ""
 #. :sl3:
 #: ../grub-installer.templates:3001 ../grub-installer.templates:5001
 msgid "The GRUB root device is: ${GRUBROOT}."
-msgstr ""
+msgstr "Osnovni (root) uređaj u GRUB-u je: ${GRUBROOT}."
 
 #. Type: error
 #. Description
@@ -272,6 +274,9 @@ msgid ""
 "device. It is also assumed that the WWID of this device is selected as boot "
 "device in the system's FibreChannel adapter BIOS."
 msgstr ""
+"GRUB se uvijek instalira na osnovni boot zapis (MBR) multipath uređaja. "
+"Također se podrazumijeva da je WWID ovog uređaja odabran kao uređaj za "
+"dizanje sustava u BIOS-u FibreChannel adaptera."
 
 #. Type: error
 #. Description
@@ -401,6 +406,8 @@ msgid ""
 "Please enter the device name of the partition or disk onto which LILO should "
 "be installed, such as /dev/hda or /dev/sda1."
 msgstr ""
+"Molim unesite ime particije ili diska na koji se treba instalirati LILO, "
+"kao što je /dev/hda ili /dev/sda1."
 
 #. Type: error
 #. Description
@@ -575,6 +582,11 @@ msgid ""
 "be unpartitioned. If you wish, you may investigate this from a shell in the "
 "installer environment."
 msgstr ""
+"Instaler nije mogao pronaći nijednu particiju, pa nećete moći montirati "
+"korijenski datotečni sustav. Ovo može biti uzrokovano kernelom koji nije "
+"uspio otkriti vaš tvrdi disk ili nije uspio pročitati particijsku tablicu, "
+"ili disk nije particioniran. Ako želite, možete ovo istražiti koristeći "
+"ljusku u okruženju instalera."
 
 #. Type: error
 #. Description
@@ -1048,14 +1060,14 @@ msgstr "Ponovo podešavam X.org..."
 #. :sl3:
 #: ../live-installer.templates:8001
 msgid "normal"
-msgstr ""
+msgstr "normalno"
 
 #. Type: select
 #. Choices
 #. :sl3:
 #: ../live-installer.templates:8001
 msgid "live"
-msgstr ""
+msgstr "live"
 
 #. Type: select
 #. Description
@@ -1072,6 +1084,8 @@ msgid ""
 "The live system can be installed to hard disk using one of the following "
 "options."
 msgstr ""
+"Live sustav se može instalirati na tvrdi disk koristeći jednu od sljedećih "
+"opcija."
 
 #. Type: select
 #. Description
@@ -1082,6 +1096,9 @@ msgid ""
 "you choose 'live', the installed system will continue to act as a live "
 "system but it can then be launched directly from the hard disk."
 msgstr ""
+"Ako odaberete 'normalno', sustav će se instalirati kao običan sustav. "
+"Ako odaberete 'live', instalirani sustav će se nastaviti ponašati baš kao "
+"i 'live' sustav, ali će se podizati izravno s tvrdog diska."
 
 #. Type: error
 #. Description
@@ -2851,7 +2868,7 @@ msgstr ""
 #. :sl3:
 #: ../partman-lvm.templates:64001
 msgid "Unable to automatically remove LVM data"
-msgstr ""
+msgstr "Nemoguće automatski obrisati ULP podatke"
 
 #. Type: error
 #. Description
@@ -2863,6 +2880,10 @@ msgid ""
 "automatically. If you wish to use this device for partitioning, please "
 "remove its LVM data first."
 msgstr ""
+"Zbog toga što prostorne grupe na odabranom uređaju također sadržavaju i "
+"fizičke prostore na drugim uređajima, automatsko brisanje ULP podataka "
+"na njemu nije sigurna operacija. Ako želite koristiti ovaj uređaj za "
+"particioniranje, molim prvo obrišite njegove ULP podatke."
 
 #. Type: error
 #. Description
@@ -2969,6 +2990,8 @@ msgid ""
 "Changing the encryption method will set other encryption-related fields to "
 "their default values for the new encryption method."
 msgstr ""
+"Mijenjanje načina enkripcije će postaviti ostala polja vezana za enkripciju "
+"na vrijednosti koje su pretpostavljene za nov način enkripcije."
 
 #. Type: text
 #. Description
@@ -3532,7 +3555,7 @@ msgstr "Radi se enkripcijski ključ za ${DEVICE}."
 #: ../cdebconf-gtk-entropy.templates:3001
 #: ../cdebconf-text-entropy.templates:3001
 msgid "Key data has been created successfully."
-msgstr ""
+msgstr "Podaci o ključu su uspješno stvoreni."
 
 #. Type: error
 #. Description
@@ -3683,7 +3706,7 @@ msgstr "Poluautomatsko - cijeli disk, uz enkriptirani ULP"
 #. :sl3:
 #: ../partman-dmraid.templates:1001
 msgid "Write changes in SATA RAID partitioning to disk?"
-msgstr ""
+msgstr "Zapisati promjene u particioniranju SATA RAID-a na disk?"
 
 #. Type: boolean
 #. Description
@@ -3695,27 +3718,31 @@ msgid ""
 "pending changes will be written to disk as well. These changes cannot be "
 "undone."
 msgstr ""
+"Sve promjene koje ste napravili pri particioniranju vaših Serial ATA RAID "
+"diskova se moraju zapisati na disk prije nego što bude moguće koristiti te "
+"particije. Sve druge nezapisane promjene će se također zapisati na disk. "
+"Ove promjene nije moguće poništiti."
 
 #. Type: note
 #. Description
 #. :sl3:
 #: ../partman-dmraid.templates:2001
 msgid "No pending changes"
-msgstr ""
+msgstr "Nema nezapisanih promjena"
 
 #. Type: note
 #. Description
 #. :sl3:
 #: ../partman-dmraid.templates:2001
 msgid "There are no changes to commit."
-msgstr ""
+msgstr "Nema nijedne promjene za zapisivanje."
 
 #. Type: error
 #. Description
 #. :sl3:
 #: ../partman-dmraid.templates:3001
 msgid "Failed to write SATA RAID partitioning changes"
-msgstr ""
+msgstr "Zapisivanje promjena u particioniranju SATA RAID-a nije uspjelo"
 
 #. Type: error
 #. Description
@@ -3751,7 +3778,7 @@ msgstr ""
 #. Use infinitive form
 #: ../partman-dmraid.templates:6001 ../partman-dmraid.templates:8001
 msgid "Write changes in SATA RAID partitioning to disk"
-msgstr ""
+msgstr "Zapisati promjene u particioniranju SATA RAID-a na disk"
 
 #. Type: boolean
 #. Description
@@ -3762,6 +3789,9 @@ msgid ""
 "experimental. You should make sure that you have a backup of any data on "
 "your system that you do not want to lose!"
 msgstr ""
+"Podrška za SATA RAID diskove (koristeći 'dmraid') u instaleru je "
+"eksperimentalna. Provjerite da imate rezervnu (backup) kopiju svih podataka "
+"koje ne želite izgubiti sa svog sustava!"
 
 #. Type: boolean
 #. Description
@@ -3773,6 +3803,9 @@ msgid ""
 "means that the installation is not completely straightforward and that there "
 "are some important limitations."
 msgstr ""
+"Trenutno nema prave podrške za SATA RAID diskove ni u programu za "
+"particioniranje niti u boot učitavačima. Instaler ovo zaobilazi, ali to "
+"znači da instalacija nije sasvim izravna, i postoje neka važna ograničenja."
 
 #. Type: boolean
 #. Description
@@ -3783,13 +3816,16 @@ msgid ""
 "especially during partitioning and boot loader installation, can be found "
 "at: http://wiki.debian.org/DebianInstaller/SataRaid."
 msgstr ""
+"Više informacija o podršci za SATA RAID i kako je iskoristiti, posebno "
+"prilikom particioniranja i instalacije boot učitavača, moguće je pronaći "
+"na: http://wiki.debian.org/DebianInstaller/SataRaid."
 
 #. Type: boolean
 #. Description
 #. :sl3:
 #: ../partman-dmraid.templates:7001
 msgid "Please read that page carefully before proceeding."
-msgstr ""
+msgstr "Molim pažljivo pročitajte tu stranicu prije nego što nastavite."
 
 #. Type: text
 #. Description
