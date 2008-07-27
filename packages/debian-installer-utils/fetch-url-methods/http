@@ -3,29 +3,22 @@ protocol_fetch() {
 	url="$1"
 	file="$2"
 
-	if [ "$proto" = "http" ] ; then 
 	wget404() {
 	# see README.wget404 in the debian-installer-utils udeb source for more info about this
+		if [ "ftp" = "$proto" ] ; then
+			local file_not_found_pattern='bad response to RETR: 550 '
+		else
+			local file_not_found_pattern='server returned error: HTTP\/[0-9.]\+ 404 '
+		fi
+
 		local RETVAL=$( {
 			echo 1
 			wget "$@" 2>&1 >&3 && echo %OK%
 			echo %EOF%
-			} | ( sed -ne '1{h;d};/server returned error: HTTP\/1\.[01] 404 /{p;s/.*/4/;h;d};/^%OK%$/{s/.*/0/;h;d};$!p;$x;$w /dev/fd/4' >&2 ) 4>&1
+			} | ( sed -ne '1{h;d};/'"$file_not_found_pattern"'/{p;s/.*/4/;h;d};/^%OK%$/{s/.*/0/;h;d};$!p;$x;$w /dev/fd/4' >&2 ) 4>&1
 		) 3>&1
 		return $RETVAL
 	}
-	elif [ "$proto" = "ftp" ] ; then
-	wget404() {
-	# see README.wget404 in the debian-installer-utils udeb source for more info about this
-		local RETVAL=$( {
-			echo 1
-			wget "$@" 2>&1 >&3 && echo %OK%
-			echo %EOF%
-			} | ( sed -ne '1{h;d};/bad response to RETR: 550 /{p;s/.*/4/;h;d};/^%OK%$/{s/.*/0/;h;d};$!p;$x;$w /dev/fd/4' >&2 ) 4>&1
-		) 3>&1
-		return $RETVAL
-	}
-	fi
 
 	# use the proxy for wgets (should speed things up)
 	if db_get mirror/$proto/proxy; then
