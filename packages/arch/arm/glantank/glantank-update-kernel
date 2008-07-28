@@ -11,6 +11,15 @@ error() {
 	exit 1
 }
 
+
+machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+if [ "x$1" = "x--supported" ]; then
+	case "$machine" in
+		"GLAN Tank")	exit 0 ;;
+		*)		exit 1 ;;
+	esac
+fi
+
 if [ -n "$1" ]; then
 	kvers="$1"
 	kfile=/boot/vmlinuz-$kvers
@@ -31,7 +40,6 @@ if [ ! -e $kfile ] || [ ! -e $ifile ]; then
 	error "Can't find $kfile and $ifile"
 fi
 
-machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 case "$machine" in
 	"GLAN Tank")
 		rm -f /boot/initrd /boot/zImage
