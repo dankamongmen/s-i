@@ -816,7 +816,7 @@ humandev () {
 	/dev/*vd[a-z][0-9]*)
 	    drive=$(printf '%d' "'$(echo $1 | sed 's,^/dev/x\?vd\([a-z]\).*,\1,')")
 	    drive=$(($drive - 96))
-	    part=$(echo $1 | sed 's,^/dev/xvd[a-z]\([0-9][0-9]*\).*,\1,')
+	    part=$(echo $1 | sed 's,^/dev/x\?vd[a-z]\([0-9][0-9]*\).*,\1,')
 	    linux=${1#/dev/}
 	    db_metaget partman/text/virtual_partition description
 	    printf "$RET" "$drive" "$part" "$linux"
