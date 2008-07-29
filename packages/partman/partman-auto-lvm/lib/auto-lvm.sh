@@ -81,9 +81,9 @@ auto_lvm_prepare() {
 		if ! echo "$normalscheme" | grep -q "[[:space:]]/[[:space:]]" && \
 		   ! echo "$normalscheme" | grep -q "[[:space:]]/boot[[:space:]]"; then
 			db_input critical partman-auto-lvm/no_boot || true
-			db_go || return 30
+			db_go || return 255
 			db_get partman-auto-lvm/no_boot || true
-			[ "$RET" = true ] || return 30
+			[ "$RET" = true ] || return 255
 		fi
 		;;
 	esac
@@ -106,7 +106,7 @@ auto_lvm_prepare() {
 	create_partitions
 
 	if ! confirm_changes partman-lvm; then
-		return 30
+		return 255
 	fi
 
 	# Write the partition tables
