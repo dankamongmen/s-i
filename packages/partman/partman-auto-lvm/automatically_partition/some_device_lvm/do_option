@@ -3,6 +3,10 @@
 . /lib/partman/lib/base.sh
 . /lib/partman/lib/auto-shared.sh
 
-disk=$(select_auto_disk) || exit 99
-
-autopartition-lvm "$disk"
+code=255
+while [ $code -eq 255 ]; do
+	disk=$(select_auto_disk) || exit 99
+	autopartition-lvm "$disk"
+	code=$?
+done
+exit $code
