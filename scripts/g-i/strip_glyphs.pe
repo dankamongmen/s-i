@@ -1,6 +1,6 @@
 #! /usr/bin/fontforge 
 #
-#     Copyright (C) 2005 Davide Viti <zinosat@tiscali.it>
+#     Copyright (C) 2005, 2008 Davide Viti <zinosat@tiscali.it>
 #
 #     This program is free software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -25,26 +25,68 @@
 #
 # example: 
 #
-#      "strip_glyphs in.ttf out.ttf 12 u20 100:150 u200:u230 u300:65000"
+#      "strip_glyphs --input in.ttf --output out.ttf --format ttf --glyphs 12 u20 100:150 u200:u230 u300:65000"
 #    or, the opposite, strip anything _but_ the selection
-#      "strip_glyphs --include in.ttf out.ttf 12 u20 100:150 u200:u230 u300:65000"
+#      "strip_glyphs --include --input in.ttf --output out.ttf --format ttf --glyphs 12 u20 100:150 u200:u230 u300:65000"
 
-if ($argc < 4)
-   Print( "Usage: strip_glyphs in out glyphs_to_remove..." )
+if ($argc < 7)
+   Print( "Usage: strip_glyphs [--include] --format <sfd|ttf> --input <in> --output <out> --glyphs <glyphs_to_remove...>" )
    Quit()
 endif
 
-# If --include is present, then we only include the selection
-if ( Strcasecmp($1, "--include") == 0 )
-	use_inverted_selection = 1; shift
-else
-	use_inverted_selection = 0
+done_parsing=0
+use_inverted_selection=0
+format=""
+infile=""
+outfile=""
+
+while ($argc > 1 && done_parsing==0)
+   if ( $1=="--format" )
+     shift
+     if ( $argc > 1 )
+       format = $1
+       if ( format!="ttf" && format!="sfd" )
+ 	Error( "Expected one of 'ttf', 'sfd' for format" )
+       endif
+     endif
+   elseif ( $1=="--include" )
+     use_inverted_selection=1
+   elseif ( $1=="--input" )
+     shift
+     if ( $argc > 1 )
+       infile=$1
+     endif
+   elseif ( $1=="--output" )
+     shift
+     if ( $argc > 1 )
+       outfile=$1
+     endif
+   elseif ( $1=="--glyphs" )
+     shift
+     if ( $argc > 1 )
+       done_parsing=1
+     else
+ 	Error( "No glyphs specified" )
+     endif
+   else
+     break
+   endif
+
+shift
+endloop
+
+if (format=="" || infile=="" || outfile=="" || done_parsing==0 )
+  Print()
+  Print("Format:  ", format)
+  Print("Infile:  ", infile)
+  Print("Outfile: ", outfile)
+  Print()
+  Error( "Missing mandatory argument(s)" )
+  Quit()
 endif
 
-
-Open($1); shift
-Reencode("unicode")
-out = $1; shift
+ Open(infile)
+ Reencode("unicode")
 
 #
 # Loop through the arguments and select the glyphs
@@ -90,5 +132,10 @@ endif
 
 Clear()
 
-Generate(out, "")
+if (format=="ttf")
+  Generate(outfile, "")
+else
+  Save(outfile)
+endif
+
 Quit()
