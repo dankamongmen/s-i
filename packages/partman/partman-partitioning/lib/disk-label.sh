@@ -232,10 +232,4 @@ create_new_label() {
 		close_dialog
 		enable_swap
 	fi
-
-	# Different types partition tables support different visuals.
-	# Some have partition names others don't have, some have extended
-	# and logical partitions, others don't. Hence we have to regenerate
-	# the list of the visuals.
-	rm -f visuals
 }
