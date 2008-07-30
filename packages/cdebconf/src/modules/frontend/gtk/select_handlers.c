@@ -113,7 +113,7 @@ static void set_value_from_select(struct question * question,
 static gboolean is_disk(int index, const char * choice,
                         const char * choice_translated)
 {
-    return NULL == strstr(choice_translated, "    ");
+    return '>' != choice_translated[0];
 }
 
 /** List of predicates used for questions renderered as tree. */
