@@ -55,6 +55,7 @@
 #include "cdebconf_gtk.h"
 #include "fe_data.h"
 #include "handlers.h"
+#include "align_text_renderer.h"
 #include "select_handlers.h"
 #include "descriptions.h"
 #include "progress.h"
@@ -409,6 +410,12 @@ static const char * cdebconf_gtk_lookup_directive(struct frontend * fe,
 {
     if (CAN_ALIGN(fe) && 0 == strcmp(directive, "TAB")) {
         return "\t";
+    }
+    if (CAN_ALIGN(fe) && 0 == strcmp(directive, "ALIGN=CENTER")) {
+        return ALIGN_CENTER_STRING;
+    }
+    if (CAN_ALIGN(fe) && 0 == strcmp(directive, "ALIGN=RIGHT")) {
+        return ALIGN_RIGHT_STRING;
     }
     /* Remove unhandled directives */
     return "";

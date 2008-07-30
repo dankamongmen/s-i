@@ -209,7 +209,7 @@ printlist (struct frontend *obj, struct question *q, int count, char **choices_t
 	} while (i > 0);
 
 	if (obj->methods.can_align(obj, q)) {
-		stralign(choices_translated, count, "\t");
+		stralign(choices_translated, count);
 		/* Display only one column to get meaningful alignment. */
 		width = 1;
 	}
@@ -805,9 +805,14 @@ text_can_align(struct frontend *obj, struct question *q)
 static const char *
 text_lookup_directive(struct frontend *obj, const char *directive)
 {
-	if (obj->methods.can_align(obj, obj->questions) &&
-	    strcmp("TAB", directive) == 0) {
-		return "\t";
+	if (obj->methods.can_align(obj, obj->questions)) {
+		if (strcmp("TAB", directive) == 0) {
+			return STRALIGN_TAB;
+		} else if (strcmp("ALIGN=CENTER", directive) == 0) {
+			return STRALIGN_ALIGN_CENTER;
+		} else if (strcmp("ALIGN=RIGHT", directive) == 0) {
+			return STRALIGN_ALIGN_RIGHT;
+		}
 	}
 	/* Remove unhandled directives */
 	return "";

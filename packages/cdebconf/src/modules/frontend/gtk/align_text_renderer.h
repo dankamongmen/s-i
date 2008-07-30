@@ -42,6 +42,11 @@
 
 #include <gtk/gtk.h>
 
+#define ALIGN_CENTER_STRING "\xe2\x80\x84"
+#define ALIGN_CENTER_GLYPH  ((PangoGlyph) 0xa8e)
+#define ALIGN_RIGHT_STRING  "\xe2\x80\x85"
+#define ALIGN_RIGHT_GLYPH   ((PangoGlyph) 0xa8f)
+
 #define TYPE_ALIGN_TEXT_RENDERER (cdebconf_gtk_align_text_renderer_get_type())
 
 #define ALIGN_TEXT_RENDERER(obj) \
@@ -68,6 +73,8 @@ struct _AlignTextRenderer {
 
     gchar * text;
     PangoTabArray * tab_array;
+    PangoGlyph align_center_glyph;
+    PangoGlyph align_right_glyph;
 };
 
 struct _AlignTextRendererClass {

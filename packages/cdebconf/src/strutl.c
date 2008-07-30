@@ -588,21 +588,31 @@ strtruncate (char *what, size_t maxsize)
     return 1;
 }
 
-int stralign(char **strs, int count, const char *delim)
+int stralign(char **strs, int count)
 {
     unsigned int i;
     unsigned int j;
     unsigned int * cells_per_line;
     unsigned int num_columns;
     unsigned int * column_widths;
+    unsigned int * remaining_line_widths;
     size_t * column_sizes;
+    size_t * remaining_line_sizes;
     char * next_cell;
     char * cell;
-    size_t max_str_size;
+    unsigned int max_width;
+    unsigned int line_width;
+    size_t max_size;
+    size_t line_size;
+    unsigned int column_width;
+    unsigned int cell_width;
+    unsigned int left_pad;
     char * new_str;
 
     cells_per_line = malloc(sizeof (unsigned int) * count);
     memset(cells_per_line, 0, sizeof (unsigned int) * count);
+    remaining_line_widths = malloc(sizeof (unsigned int) * count);
+    remaining_line_sizes = malloc(sizeof (size_t) * count);
 
     num_columns = 0;
     column_widths = NULL;
@@ -620,33 +630,69 @@ int stralign(char **strs, int count, const char *delim)
                                         sizeof (size_t) * num_columns);
                 column_sizes[j] = 0;
             }
-            cell = strsep(&next_cell, delim);
+            cell = strsep(&next_cell, STRALIGN_TAB);
+            if (0 == strncmp(STRALIGN_ALIGN_CENTER, cell, 1) ||
+                0 == strncmp(STRALIGN_ALIGN_RIGHT, cell, 1)) {
+                cell++;
+            }
             if (NULL != next_cell) {
                 column_widths[j] = MAX(column_widths[j], strwidth(cell));
-                column_sizes[j] = MAX(column_sizes[j],
-                                      strlen(cell) + 2 /* extra spaces */);
-            } else {
                 column_sizes[j] = MAX(column_sizes[j], strlen(cell));
+            } else {
+                remaining_line_widths[i] = strwidth(cell);
+                remaining_line_sizes[i] = strlen(cell);
             }
         }
     }
-    max_str_size = 0;
-    for (j = 0; j < num_columns; j++) {
-        max_str_size += column_sizes[j];
+    max_width = 0;
+    for (i = 0; i < count; i++) {
+        line_width = remaining_line_widths[i];
+        for (j = 0; j < cells_per_line[i] - 1; j++) {
+            line_width += column_widths[j] + 2 /* extra spaces */;
+        }
+        max_width = MAX(max_width, line_width);
+    }
+    max_size = 0;
+    for (i = 0; i < count; i++) {
+        line_size = remaining_line_sizes[i];
+        line_width = remaining_line_widths[i];
+        for (j = 0; j < cells_per_line[i] - 1; j++) {
+            line_size += column_sizes[j] + 2 /* extra spaces */;
+            line_width += column_widths[j] + 2 /* extra spaces */;
+        }
+        line_size += max_width - line_width;
+        max_size = MAX(max_size, line_size);
     }
     free(column_sizes);
     for (i = 0; i < count; i++) {
-        new_str = malloc(sizeof (char) * max_str_size + 1);
+        new_str = malloc(sizeof (char) * max_size + 1);
         next_cell = new_str;
         *next_cell = '\0';
         cell = strs[i];
         for (j = 0; j < cells_per_line[i]; j++) {
-            strcpy(next_cell, cell);
-            if (0 != column_widths[j]) {
-                strpad(next_cell, column_widths[j] + 2 /* extra space */);
+            column_width = j < cells_per_line[i] - 1
+                           ? column_widths[j]
+                           : max_width - strwidth(new_str);
+            if (0 == strncmp(STRALIGN_ALIGN_CENTER, cell, 1)) {
+                cell++;
+                cell_width = strwidth(cell);
+                left_pad = (column_width - cell_width) / 2;
+            } else if (0 == strncmp(STRALIGN_ALIGN_RIGHT, cell, 1)) {
+                cell++;
+                cell_width = strwidth(cell);
+                left_pad = column_width - cell_width;
+            } else {
+                left_pad = 0;
             }
-            next_cell += strlen(next_cell);
-            cell += strlen(cell) + 1;
+            strpad(next_cell, left_pad);
+            strcat(next_cell, cell);
+            strpad(next_cell, column_width);
+            if (j < cells_per_line[i] - 1) {
+                next_cell += strlen(next_cell);
+                strcpy(next_cell, "  " /* extra space */);
+                next_cell += 2;
+                cell += strlen(cell) + 1;
+            }
         }
         free(strs[i]);
         strs[i] = new_str;

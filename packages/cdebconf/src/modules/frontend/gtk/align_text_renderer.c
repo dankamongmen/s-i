@@ -39,6 +39,8 @@
 
 #include "align_text_renderer.h"
 
+#include "cdebconf_gtk.h"
+
 enum {
     PROP_0,
 
@@ -54,6 +56,8 @@ static void cdebconf_gtk_align_text_renderer_init(AlignTextRenderer * renderer)
     GTK_CELL_RENDERER(renderer)->xpad = 2;
     GTK_CELL_RENDERER(renderer)->ypad = 2;
     renderer->tab_array = NULL;
+    renderer->align_center_glyph = 0;
+    renderer->align_right_glyph = 0;
 }
 
 static void align_text_renderer_finalize(GObject * object)
@@ -123,16 +127,81 @@ GtkCellRenderer * cdebconf_gtk_align_text_renderer_new(void)
     return g_object_new(TYPE_ALIGN_TEXT_RENDERER, NULL);
 }
 
+static void handle_right_alignment(AlignTextRenderer * renderer,
+                                   PangoLayout * layout,
+                                   GdkRectangle * cell_area)
+{
+    PangoLayoutIter * iter;
+    PangoLayoutRun * run;
+    PangoGlyphInfo * current;
+    PangoGlyphInfo * last_spacer;
+    enum {
+        ALIGN_LEFT = 0,
+        ALIGN_CENTER,
+        ALIGN_RIGHT
+    } align_mode;
+    PangoRectangle rect;
+    int i;
+
+    last_spacer = NULL;
+    align_mode = ALIGN_LEFT;
+    iter = pango_layout_get_iter(layout);
+    do {
+        if (NULL != (run = pango_layout_iter_get_run(iter))) {
+            for (i = 0; i < run->glyphs->num_glyphs; i++) {
+                current = &run->glyphs->glyphs[i];
+                if (PANGO_GLYPH_EMPTY == current->glyph) {
+                    if (NULL != last_spacer) {
+                        if (ALIGN_CENTER == align_mode) {
+                            last_spacer->geometry.width +=
+                                (current->geometry.width
+                                 - last_spacer->geometry.width
+                                 - COLUMN_SPACING) / 2;
+                            current->geometry.width =
+                                COLUMN_SPACING + last_spacer->geometry.width;
+                        } else if (ALIGN_RIGHT == align_mode) {
+                            last_spacer->geometry.width +=
+                                current->geometry.width - COLUMN_SPACING;
+                            current->geometry.width = COLUMN_SPACING;
+                        }
+                        last_spacer = NULL;
+                        align_mode = ALIGN_LEFT;
+                    }
+                } else if (renderer->align_center_glyph == current->glyph) {
+                    align_mode = ALIGN_CENTER;
+                    current->glyph = PANGO_GLYPH_EMPTY;
+                    last_spacer = current;
+                } else if (renderer->align_right_glyph == current->glyph) {
+                    align_mode = ALIGN_RIGHT;
+                    current->glyph = PANGO_GLYPH_EMPTY;
+                    last_spacer = current;
+                }
+            }
+        }
+    } while (pango_layout_iter_next_run(iter));
+    if (NULL != cell_area && NULL != last_spacer && ALIGN_LEFT != align_mode) {
+        pango_layout_get_pixel_extents(layout, NULL, &rect);
+        if (ALIGN_CENTER == align_mode) {
+            last_spacer->geometry.width +=
+                PANGO_SCALE * ((cell_area->width - rect.width) / 2);
+        } else if (ALIGN_RIGHT == align_mode) {
+            last_spacer->geometry.width +=
+                PANGO_SCALE * (cell_area->width - rect.width);
+        }
+    }
+    pango_layout_iter_free(iter);
+}
+
 static PangoLayout * get_layout(AlignTextRenderer * renderer,
-                                GtkWidget * widget)
+                                GtkWidget * widget, GdkRectangle * cell_area)
 {
     PangoLayout * layout;
 
     layout = gtk_widget_create_pango_layout(widget, renderer->text);
     pango_layout_set_width(layout, -1);
     pango_layout_set_wrap(layout, PANGO_WRAP_CHAR);
-    /* XXX? pango_layout_set_alignment */
     pango_layout_set_tabs(layout, renderer->tab_array);
+    handle_right_alignment(renderer, layout, cell_area);
     return layout;
 }
 
@@ -144,7 +213,7 @@ static void align_text_renderer_get_size(
     PangoLayout * layout;
     PangoRectangle rect;
 
-    layout = get_layout(renderer, widget);
+    layout = get_layout(renderer, widget, cell_area);
     pango_layout_get_pixel_extents(layout, NULL, &rect);
     if (NULL != height) {
         *height = cell->ypad * 2 + rect.height;
@@ -190,6 +259,34 @@ static GtkStateType get_state(GtkCellRenderer * cell, GtkWidget * widget,
     return GTK_STATE_NORMAL;
 }
 
+static PangoGlyph find_glyph(GtkWidget * widget, const gchar * str)
+{
+    PangoLayout * layout;
+    PangoLayoutIter * iter;
+    PangoLayoutRun * run;
+    PangoGlyph glyph = PANGO_GET_UNKNOWN_GLYPH(PANGO_GLYPH_EMPTY);
+
+    layout = gtk_widget_create_pango_layout(widget, str);
+    iter = pango_layout_get_iter(layout);
+    if (NULL != (run = pango_layout_iter_get_run(iter))) {
+        if (1 >= run->glyphs->num_glyphs) {
+            glyph = run->glyphs->glyphs[0].glyph;
+        }
+    }
+    pango_layout_iter_free(iter);
+    return glyph;
+}
+
+static void find_renderer_glyphs(AlignTextRenderer * renderer, GtkWidget * widget)
+{
+    if (0 == renderer->align_center_glyph) {
+        renderer->align_center_glyph = find_glyph(widget, ALIGN_CENTER_STRING);
+    }
+    if (0 == renderer->align_right_glyph) {
+        renderer->align_right_glyph = find_glyph(widget, ALIGN_RIGHT_STRING);
+    }
+}
+
 static void align_text_renderer_render(
     GtkCellRenderer * cell, GdkWindow * window, GtkWidget * widget,
     GdkRectangle * background_area, GdkRectangle * cell_area,
@@ -201,7 +298,8 @@ static void align_text_renderer_render(
     gint x_offset;
     gint y_offset;
 
-    layout = get_layout(renderer, widget);
+    find_renderer_glyphs(renderer, widget);
+    layout = get_layout(renderer, widget, cell_area);
     align_text_renderer_get_size(cell, widget, cell_area, &x_offset,
                                  &y_offset, NULL, NULL);
 
