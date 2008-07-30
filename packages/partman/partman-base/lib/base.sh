@@ -41,7 +41,8 @@ maybe_escape () {
 	fi
 }
 
-debconf_select () {
+# Deprecated debconf_select() for templates not switched to Choices-C yet.
+old_debconf_select () {
 	local IFS priority template choices default_choice default x u newchoices code
 	priority="$1"
 	template="$2"
@@ -101,6 +102,58 @@ debconf_select () {
 		fi
 	done
 	restore_ifs
+	return $code
+}
+
+debconf_select () {
+	local IFS priority template choices default keys descriptions code x
+	priority="$1"
+	template="$2"
+	choices="$3"
+	default="$4"
+
+	if ! db_metaget $template choices-c; then
+		logger -t partman "warning: $template is not using Choices-C"
+		old_debconf_select "$@"
+		return $?
+	fi
+
+	if [ -z "$default" ]; then
+		db_get "$template" && default="$RET"
+	fi
+	keys=""
+	descriptions=""
+	IFS="$NL"
+	for x in $choices; do
+		local key plugin
+		restore_ifs
+		key="${x%$TAB*}"
+		keys="${keys:+${keys}, }$key"
+		descriptions="${descriptions:+${descriptions}, }$(
+			echo "${x#*$TAB}" |
+			sed "s/ *\$//g; s/^ /$debconf_select_lead/g; s/,/\\\\,/g; s/^ /\\\\ /")"
+
+		# If the question was asked via ask_user, this allow preseeding
+		# by using the name of the plugin responsible for the answer.
+		if [ -n "$default" ]; then
+			plugin="${key%%__________*}"
+			if [ "$default" = "$plugin" ] ||
+			   [ "$default" = "${plugin#[0-9][0-9]}" ]; then
+				default="$key"
+			fi
+		fi
+	done
+	# You can preseed questions asked through this function by using
+	# the key (the part before the tab).
+	if [ -n "$default" ]; then
+		db_set $template "$default"
+	fi
+	db_subst $template CHOICES "$keys"
+	db_subst $template DESCRIPTIONS "$descriptions"
+	code=0
+	db_input $priority $template || code=1
+	db_go || return 255
+	db_get $template
 	return $code
 }
 

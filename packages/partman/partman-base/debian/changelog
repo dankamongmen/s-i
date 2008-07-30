@@ -2,6 +2,15 @@ partman-base (124) UNRELEASED; urgency=low
 
   [ Jérémy Bobbio ]
   * Fix humandev() for partitions of virtio virtual disks.
+  * Use Choices-C in debconf_select instead of mangling the localised
+    strings.  All templates using debconf_select or ask_user should now define
+    the following:
+      Choices-C: ${CHOICES}
+      Choices: ${DESCRIPTIONS}
+    In the absence of Choices-C, the old behaviour will still be supported for
+    the moment.
+  * Update partman/choose_partition, partman/storage_device,
+    partman/free_space and partman/active_partition to the new format.
 
  -- Jérémy Bobbio <lunar@debian.org>  Tue, 29 Jul 2008 15:25:08 +0000
 
