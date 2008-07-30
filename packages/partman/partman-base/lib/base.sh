@@ -29,11 +29,11 @@ maybe_escape () {
 	text="$1"
 	shift
 	if [ "$can_escape" ]; then
-		db_capb backup escape
+		db_capb backup align escape
 		code=0
 		"$@" "$(printf '%s' "$text" | debconf-escape -e)" || code=$?
 		saveret="$RET"
-		db_capb backup
+		db_capb backup align
 		RET="$saveret"
 		return $code
 	else

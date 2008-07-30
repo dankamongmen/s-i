@@ -54,8 +54,6 @@ load_extra () {
 	fi
 }
 
-db_capb backup
-
 ###########################################################
 # Compute some constants in order to make things faster.
 ###########################################################
@@ -72,7 +70,7 @@ export number_width
 # non-empty means we can escape
 can_escape=''
 if type debconf-escape >/dev/null 2>&1; then
-	db_capb backup
+	db_capb backup align
 	for cap in $RET; do
 		case $cap in
 			escape)	can_escape=yes ;;
@@ -113,6 +111,9 @@ depmod -a
 
 # Load additional components when sufficent memory is available
 load_extra
+
+# We need to set the capabilities after anna-install
+db_capb backup align
 
 while true; do
 	initcount=$(ls /lib/partman/init.d/* | wc -l)
