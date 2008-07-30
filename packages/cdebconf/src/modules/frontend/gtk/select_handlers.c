@@ -214,47 +214,72 @@ static gboolean focus_path(GtkTreeView * view, GdkEventExpose * event,
     return FALSE; /* propagate the event */
 }
 
-/** Adjust tab stops in the given tab array to display all the given values.
+/** Private structure for adjust_tabs and adjust_tabs_for_choice. */
+struct adjust_data {
+    /** Widget where the tabs will be renderered. */
+    GtkWidget * widget;
+    /** Tab array to update that will be updated. */
+    PangoTabArray * tab_array;
+};
+
+/** Adjust tab stops for the given node to display all the given values.
  *
- * @param widget widget where the tabs will be renderered
- * @param tab_array tab array to update
- * @param NULL terminated list of values to be renderered
+ * @param model model being handled
+ * @param path path of the current node
+ * @param iter iter of the current node
+ * @param adjust_data data prepared by adjust_tabs
+ * @return always FALSE (= never stop)
  */
-static void adjust_tabs_for_choice(GtkWidget * widget,
-                                   PangoTabArray * tab_array, char ** values)
+static gboolean adjust_tabs_for_node(GtkTreeModel * model, GtkTreePath * path,
+                                     GtkTreeIter * iter,
+                                     struct adjust_data * adjust_data)
 {
+    char * choice;
+    char ** values;
     gint columns;
     gint value_width;
     gint previous_location;
     gint location;
     gint i;
 
+    gtk_tree_model_get(model, iter,
+        /* column: */ CHOICE_MODEL_TRANSLATED_VALUE, &choice,
+        -1 /* end of list */);
+    values = g_strsplit(choice, "\t", 0 /* split all */);
+
     columns = g_strv_length(values);
-    if (pango_tab_array_get_size(tab_array) < columns - 1) {
-        pango_tab_array_resize(tab_array, columns - 1);
+    if (pango_tab_array_get_size(adjust_data->tab_array) < columns - 1) {
+        pango_tab_array_resize(adjust_data->tab_array, columns - 1);
     }
     previous_location = 0;
-    for (i = 0; NULL != values[i + 1]; i++) {
-        value_width = cdebconf_gtk_get_text_width(widget, values[i])
-                      + COLUMN_SPACING;
-        pango_tab_array_get_tab(tab_array, i, NULL /* don't get alignment */,
-                                &location);
+    for (i = 0; columns > i + 1; i++) {
+        value_width = cdebconf_gtk_get_text_width(
+                          adjust_data->widget, values[i]) + COLUMN_SPACING;
+        pango_tab_array_get_tab(adjust_data->tab_array, i,
+                                NULL /* don't get alignment */, &location);
         if (location - previous_location < value_width) {
             location = previous_location + value_width;
-            pango_tab_array_set_tab(tab_array, i, PANGO_TAB_LEFT, location);
+            pango_tab_array_set_tab(adjust_data->tab_array, i, PANGO_TAB_LEFT,
+                                    location);
         }
         previous_location = location;
     }
 
 #if 0
     /* DEBUG: dump tabs */
-    g_warning("dump after value[0]: %s", values[i]);
-    for (i = 0; pango_tab_array_get_size(tab_array) > i; i++) {
-        pango_tab_array_get_tab(tab_array, i, NULL /* don't get alignment */,
+    g_warning("dump after choice: %s", choice);
+    for (i = 0; pango_tab_array_get_size(adjust_data->tab_array) > i; i++) {
+        pango_tab_array_get_tab(adjust_data->tab_array, i,
+                                NULL /* don't get alignment */,
                                 &location);
         g_warning("%d: %d", i, location);
     }
 #endif
+
+    g_free(choice);
+    g_strfreev(values);
+
+    return FALSE;
 }
 
 /** Adjust tab stops in the given tab array to render all the "columns"
@@ -267,22 +292,12 @@ static void adjust_tabs_for_choice(GtkWidget * widget,
 static void adjust_tabs(GtkWidget * widget, PangoTabArray * tab_array,
                         GtkTreeModel * model)
 {
-    char * choice;
-    char ** values;
-    GtkTreeIter iter;
-    gboolean valid;
+    struct adjust_data adjust_data;
 
-    valid = gtk_tree_model_get_iter_first(model, &iter);
-    while (valid) {
-        gtk_tree_model_get(model, &iter,
-            /* column: */ CHOICE_MODEL_TRANSLATED_VALUE, &choice,
-            -1 /* end of list */);
-        values = g_strsplit(choice, "\t", 0 /* split all */);
-        adjust_tabs_for_choice(widget, tab_array, values);
-        g_free(choice);
-        g_strfreev(values);
-        valid = gtk_tree_model_iter_next(model, &iter);
-    }
+    adjust_data.widget = widget;
+    adjust_data.tab_array = tab_array;
+    gtk_tree_model_foreach(
+        model, (GtkTreeModelForeachFunc) adjust_tabs_for_node, &adjust_data);
 }
 
 /** Insert the column displaying translated choices in the given GtkTreeView.
