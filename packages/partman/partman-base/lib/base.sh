@@ -207,7 +207,7 @@ partition_tree_choices () {
 		while { read num id size type fs path name; [ "$id" ]; }; do
 			part=${dev}/$id
 			[ -f $part/view ] || continue
-			printf "%s//%s\t     %s\n" "$dev" "$id" $(cat $part/view)
+			printf "%s//%s\t%s\n" "$dev" "$id" $(cat $part/view)
 		done
 		restore_ifs
 	done | while read line; do
