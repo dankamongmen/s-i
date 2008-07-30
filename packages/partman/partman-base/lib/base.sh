@@ -192,7 +192,6 @@ ask_user () {
 
 partition_tree_choices () {
 	local IFS
-	local whitespace_hack=""
 	for dev in $DEVICES/*; do
 		[ -d $dev ] || continue
 		printf "%s//\t%s\n" $dev "$(device_name $dev)" # GETTEXT?
@@ -210,12 +209,6 @@ partition_tree_choices () {
 			printf "%s//%s\t%s\n" "$dev" "$id" $(cat $part/view)
 		done
 		restore_ifs
-	done | while read line; do
-		# A hack to make sure each line in the table is unique and
-		# selectable by debconf -- pad lines with varying amounts of
-		# whitespace.
-		whitespace_hack="$NBSP$whitespace_hack"
-		echo "$line$whitespace_hack"
 	done
 }
 
