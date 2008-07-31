@@ -170,6 +170,10 @@ create_new_label() {
 		. /lib/partman/lib/lvm-remove.sh
 		device_remove_lvm "$dev" || return 1
 	fi
+	if [ -e /lib/partman/lib/md-remove.sh ]; then
+		. /lib/partman/lib/md-remove.sh
+		device_remove_md "$dev" || return 1
+	fi
 
 	cd $dev
 
