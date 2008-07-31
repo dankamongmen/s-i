@@ -103,7 +103,7 @@ md_createmain() {
 		fi
 
 		case "$RAID_SEL" in
-		    RAID6|RAID5|RAID1)
+		    RAID10|RAID6|RAID5|RAID1)
 			md_create_array "$RAID_SEL" ;;
 		    RAID0)
 			md_create_raid0 ;;
@@ -209,6 +209,8 @@ md_create_array(){
 		MIN_SIZE=3 ;;
 	    RAID6)
 		MIN_SIZE=4 ;;
+	    RAID10)
+		MIN_SIZE=2 ;;
 	    *)
 		return ;;
 	esac
@@ -281,7 +283,7 @@ md_create_array(){
 	db_set mdcfg/raiddevs ""
 	SELECTED=0
 
-	# Loop until the correct number of active devices has been selected for RAID 5, 6
+	# Loop until the correct number of active devices has been selected for RAID 5, 6, and 10
 	# Loop until at least one device has been selected for RAID 1
 	until ([ $LEVEL -ne 1 ] && [ $SELECTED -eq $DEV_COUNT ]) || \
 	      ([ $LEVEL -eq 1 ] && [ $SELECTED -gt 0 ] && [ $SELECTED -le $DEV_COUNT ]); do
@@ -340,6 +342,23 @@ md_create_array(){
 		done
 	fi
 
+	LAYOUT=""
+	if [ $LEVEL -eq 10 ]; then
+		OK=0
+		db_set mdcfg/raid10layout "n2"
+		while [ $OK -eq 0 ]; do
+			db_input low mdcfg/raid10layout
+			db_go
+			if [ $? -eq 30 ]; then return; fi
+			db_get mdcfg/raid10layout
+			if echo $RET | grep -Eq "^[nfo][0-9]{1,2}$" && \
+			    [ $(echo $RET | sed s/.//) -le $DEV_COUNT ]; then
+				OK=1
+			fi
+		done
+		LAYOUT="--layout=$RET"
+	fi
+
 	# The number of spares the user has selected
 	NAMED_SPARES=$SELECTED
 
@@ -370,7 +389,7 @@ md_create_array(){
 	logger -t mdcfg "Raid devices count: $DEV_COUNT"
 	logger -t mdcfg "Spare devices count: $SPARE_COUNT"
 	log-output -t mdcfg \
-		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid${LEVEL} \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid${LEVEL} $LAYOUT \
 		      -n $DEV_COUNT -x $SPARE_COUNT $RAID_DEVICES \
 		      $MISSING_DEVICES $SPARE_DEVICES $MISSING_SPARES
 }

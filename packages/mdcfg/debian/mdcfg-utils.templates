@@ -46,8 +46,8 @@ _Description: Not enough RAID partitions available
 Template: mdcfg/createmain
 Type: select
 # :sl3:
-# flag:translate:5
-__Choices: RAID0, RAID1, RAID5, RAID6, Cancel
+# flag:translate:6
+__Choices: RAID0, RAID1, RAID5, RAID6, RAID10, Cancel
 # :sl3:
 _Description: Multidisk device type:
  Please choose the type of the multidisk device to be created.
@@ -97,6 +97,24 @@ _Description: Spare devices for the RAID${LEVEL} multidisk device:
  You may choose up to ${COUNT} partitions. If you choose less than ${COUNT}
  devices, the remaining partitions will be added to the array as "missing".
  You will be able to add them later to the array.
+
+Template: mdcfg/raid10layout
+Type: string
+# :sl3:
+_Description: Layout of the RAID10 multidisk device:
+ The layout must be n, o, or f (arrangement of the copies) followed
+ by a number (number of copies of each chunk). The number must be
+ smaller or equal to the number of active devices.
+ .
+ The letter is the arrangement of the copies:
+  n - near copies: Multiple copies of one data block are at similar
+      offsets in different devices.
+  f - far copies: Multiple copies have very different offsets
+  o - offset copies: Rather than the chunks being duplicated within a
+      stripe, whole stripes are duplicated but are rotated by one
+      device so duplicate blocks are on different devices.
+ .
+ NOTE: this setting cannot be changed later.
 
 Template: mdcfg/deletemenu
 Type: select
