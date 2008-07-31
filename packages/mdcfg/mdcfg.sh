@@ -213,18 +213,23 @@ md_create_array(){
 
 	LEVEL=${1#RAID}
 
-	db_set mdcfg/raid${LEVEL}devcount "$MIN_SIZE"
+	for i in devcount devs sparecount sparedevs; do
+		db_subst mdcfg/raid$i LEVEL "$LEVEL"
+	done
+	db_subst mdcfg/raiddevcount MINIMUM "$MIN_SIZE"
+
+	db_set mdcfg/raiddevcount "$MIN_SIZE"
 
 	# Get the count of active devices
 	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid${LEVEL}devcount
+		db_input critical mdcfg/raiddevcount
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
 
 		# Figure out, if the user entered a number
-		db_get mdcfg/raid${LEVEL}devcount
+		db_get mdcfg/raiddevcount
 		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
 		if [ "$RET" ]; then
 			let "OK=${RET}>0 && ${RET}<99"
@@ -232,33 +237,33 @@ md_create_array(){
 	done
 
 
-	db_set mdcfg/raid${LEVEL}sparecount "0"
+	db_set mdcfg/raidsparecount "0"
 	OK=0
 
 	# Same procedure as above, but get the number of spare partitions
 	# this time.
 	# TODO: Make a general function for this kind of stuff
 	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid${LEVEL}sparecount
+		db_input critical mdcfg/raidsparecount
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
-		db_get mdcfg/raid${LEVEL}sparecount
+		db_get mdcfg/raidsparecount
 		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
 		if [ "$RET" ]; then
 			let "OK=${RET}>=0 && ${RET}<99"
 		fi
 	done
 
-	db_get mdcfg/raid${LEVEL}devcount
+	db_get mdcfg/raiddevcount
 	DEV_COUNT="$RET"
 	if [ $LEVEL -ne 1 ]; then
 		if [ $DEV_COUNT -lt $MIN_SIZE ]; then
 			DEV_COUNT=$MIN_SIZE # Minimum number for the selected RAID level
 		fi
 	fi
-	db_get mdcfg/raid${LEVEL}sparecount
+	db_get mdcfg/raidsparecount
 	SPARE_COUNT="$RET"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
 	if [ $LEVEL -ne 1 ]; then
@@ -271,22 +276,22 @@ md_create_array(){
 		fi
 	fi
 
-	db_set mdcfg/raid${LEVEL}devs ""
+	db_set mdcfg/raiddevs ""
 	SELECTED=0
 
 	# Loop until the correct number of active devices has been selected for RAID 5
 	# Loop until at least one device has been selected for RAID 1
 	until ([ $LEVEL -ne 1 ] && [ $SELECTED -eq $DEV_COUNT ]) || \
 	      ([ $LEVEL -eq 1 ] && [ $SELECTED -gt 0 ] && [ $SELECTED -le $DEV_COUNT ]); do
-		db_subst mdcfg/raid${LEVEL}devs COUNT "$DEV_COUNT"
-		db_subst mdcfg/raid${LEVEL}devs PARTITIONS "$PARTITIONS"
-		db_input critical mdcfg/raid${LEVEL}devs
+		db_subst mdcfg/raiddevs COUNT "$DEV_COUNT"
+		db_subst mdcfg/raiddevs PARTITIONS "$PARTITIONS"
+		db_input critical mdcfg/raiddevs
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
 
-		db_get mdcfg/raid${LEVEL}devs
+		db_get mdcfg/raiddevs
 		SELECTED=0
 		for i in $RET; do
 			DEVICE=$(echo $i | sed -e "s/,//")
@@ -303,12 +308,12 @@ md_create_array(){
 		done
 	fi
 
-	# Remove partitions selected in raid${LEVEL}devs from the PARTITION list
-	db_get mdcfg/raid${LEVEL}devs
+	# Remove partitions selected in raiddevs from the PARTITION list
+	db_get mdcfg/raiddevs
 
 	prune_partitions "$RET"
 
-	db_set mdcfg/raid${LEVEL}sparedevs ""
+	db_set mdcfg/raidsparedevs ""
 	SELECTED=0
 	if [ $SPARE_COUNT -gt 0 ]; then
 		FIRST=1
@@ -316,15 +321,15 @@ md_create_array(){
 		# That means any number less than or equal to the spare count.
 		while [ $SELECTED -gt $SPARE_COUNT ] || [ $FIRST -eq 1 ]; do
 			FIRST=0
-			db_subst mdcfg/raid${LEVEL}sparedevs COUNT "$SPARE_COUNT"
-			db_subst mdcfg/raid${LEVEL}sparedevs PARTITIONS "$PARTITIONS"
-			db_input critical mdcfg/raid${LEVEL}sparedevs
+			db_subst mdcfg/raidsparedevs COUNT "$SPARE_COUNT"
+			db_subst mdcfg/raidsparedevs PARTITIONS "$PARTITIONS"
+			db_input critical mdcfg/raidsparedevs
 			db_go
 			if [ $? -eq 30 ]; then
 				return
 			fi
 
-			db_get mdcfg/raid${LEVEL}sparedevs
+			db_get mdcfg/raidsparedevs
 			SELECTED=0
 			for i in $RET; do
 				DEVICE=$(echo $i | sed -e "s/,//")
@@ -336,10 +341,10 @@ md_create_array(){
 	# The number of spares the user has selected
 	NAMED_SPARES=$SELECTED
 
-	db_get mdcfg/raid${LEVEL}devs
+	db_get mdcfg/raiddevs
 	RAID_DEVICES=$(echo $RET | sed -e "s/,//g")
 
-	db_get mdcfg/raid${LEVEL}sparedevs
+	db_get mdcfg/raidsparedevs
 	SPARE_DEVICES=$(echo $RET | sed -e "s/,//g")
 
 	MISSING_SPARES=""
