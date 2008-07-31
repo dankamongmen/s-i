@@ -103,12 +103,12 @@ md_createmain() {
 		fi
 
 		case "$RAID_SEL" in
-		    RAID5)
-			md_create_raid5 ;;
-		    RAID1)
-			md_create_raid1 ;;
+		    RAID5|RAID1)
+			md_create_array "$RAID_SEL" ;;
 		    RAID0)
 			md_create_raid0 ;;
+		    *)
+			return 1 ;;
 		esac
 	fi
 }
@@ -199,66 +199,94 @@ md_create_raid0() {
 		      -n $SELECTED $RAID_DEVICES
 }
 
-md_create_raid1() {
+md_create_array(){
 	OK=0
 
-	db_set mdcfg/raid1devcount 2
+	case "$1" in
+	    RAID1)
+		MIN_SIZE=2 ;;
+	    RAID5)
+		MIN_SIZE=3 ;;
+	    *)
+		return ;;
+	esac
+
+	LEVEL=${1#RAID}
+
+	db_set mdcfg/raid${LEVEL}devcount "$MIN_SIZE"
 
 	# Get the count of active devices
 	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid1devcount
+		db_input critical mdcfg/raid${LEVEL}devcount
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
 
 		# Figure out, if the user entered a number
-		db_get mdcfg/raid1devcount
+		db_get mdcfg/raid${LEVEL}devcount
 		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
 		if [ "$RET" ]; then
 			let "OK=${RET}>0 && ${RET}<99"
 		fi
 	done
 
-	db_set mdcfg/raid1sparecount "0"
+
+	db_set mdcfg/raid${LEVEL}sparecount "0"
 	OK=0
 
 	# Same procedure as above, but get the number of spare partitions
 	# this time.
 	# TODO: Make a general function for this kind of stuff
 	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid1sparecount
+		db_input critical mdcfg/raid${LEVEL}sparecount
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
-		db_get mdcfg/raid1sparecount
+		db_get mdcfg/raid${LEVEL}sparecount
 		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
 		if [ "$RET" ]; then
 			let "OK=${RET}>=0 && ${RET}<99"
 		fi
 	done
 
-	db_get mdcfg/raid1devcount
+	db_get mdcfg/raid${LEVEL}devcount
 	DEV_COUNT="$RET"
-	db_get mdcfg/raid1sparecount
+	if [ $LEVEL -ne 1 ]; then
+		if [ $DEV_COUNT -lt $MIN_SIZE ]; then
+			DEV_COUNT=$MIN_SIZE # Minimum number for the selected RAID level
+		fi
+	fi
+	db_get mdcfg/raid${LEVEL}sparecount
 	SPARE_COUNT="$RET"
 	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
+	if [ $LEVEL -ne 1 ]; then
+		if [ $REQUIRED -gt $NUM_PART ]; then
+			db_subst mdcfg/notenoughparts NUM_PART "$NUM_PART"
+			db_subst mdcfg/notenoughparts REQUIRED "$REQUIRED"
+			db_input critical mdcfg/notenoughparts
+			db_go mdcfg/notenoughparts
+			return
+		fi
+	fi
 
-	db_set mdcfg/raid1devs ""
+	db_set mdcfg/raid${LEVEL}devs ""
 	SELECTED=0
 
-	# Loop until at least one device has been selected
-	until [ $SELECTED -gt 0 ] && [ $SELECTED -le $DEV_COUNT ]; do
-		db_subst mdcfg/raid1devs COUNT "$DEV_COUNT"
-		db_subst mdcfg/raid1devs PARTITIONS "$PARTITIONS"
-		db_input critical mdcfg/raid1devs
+	# Loop until the correct number of active devices has been selected for RAID 5
+	# Loop until at least one device has been selected for RAID 1
+	until ([ $LEVEL -ne 1 ] && [ $SELECTED -eq $DEV_COUNT ]) || \
+	      ([ $LEVEL -eq 1 ] && [ $SELECTED -gt 0 ] && [ $SELECTED -le $DEV_COUNT ]); do
+		db_subst mdcfg/raid${LEVEL}devs COUNT "$DEV_COUNT"
+		db_subst mdcfg/raid${LEVEL}devs PARTITIONS "$PARTITIONS"
+		db_input critical mdcfg/raid${LEVEL}devs
 		db_go
 		if [ $? -eq 30 ]; then
 			return
 		fi
 
-		db_get mdcfg/raid1devs
+		db_get mdcfg/raid${LEVEL}devs
 		SELECTED=0
 		for i in $RET; do
 			DEVICE=$(echo $i | sed -e "s/,//")
@@ -266,161 +294,21 @@ md_create_raid1() {
 		done
 	done
 
-	# Add "missing" for as many devices as weren't selected
 	MISSING_DEVICES=""
-	while [ $SELECTED -lt $DEV_COUNT ]; do
-		MISSING_DEVICES="$MISSING_DEVICES missing"
-		let SELECTED++
-	done
-
-	# Remove partitions selected in raid1devs from the PARTITION list
-	db_get mdcfg/raid1devs
-
-	prune_partitions "$RET"
-
-	db_set mdcfg/raid1sparedevs ""
-	SELECTED=0
-	if [ $SPARE_COUNT -gt 0 ]; then
-		FIRST=1
-		# Loop until the correct number of devices has been selected.
-		# That means any number less than or equal to the spare count.
-		while [ $SELECTED -gt $SPARE_COUNT ] || [ $FIRST -eq 1 ]; do
-			FIRST=0
-			db_subst mdcfg/raid1sparedevs COUNT "$SPARE_COUNT"
-			db_subst mdcfg/raid1sparedevs PARTITIONS "$PARTITIONS"
-			db_input critical mdcfg/raid1sparedevs
-			db_go
-			if [ $? -eq 30 ]; then
-				return
-			fi
-
-			db_get mdcfg/raid1sparedevs
-			SELECTED=0
-			for i in $RET; do
-				DEVICE=$(echo $i | sed -e "s/,//")
-				let SELECTED++
-			done
-		done
-	fi
-
-	# The number of spares the user has selected
-	NAMED_SPARES=$SELECTED
-
-	db_get mdcfg/raid1devs
-	RAID_DEVICES=$(echo $RET | sed -e "s/,//g")
-
-	db_get mdcfg/raid1sparedevs
-	SPARE_DEVICES=$(echo $RET | sed -e "s/,//g")
-
-	MISSING_SPARES=""
-
-	COUNT=$NAMED_SPARES
-	while [ $COUNT -lt $SPARE_COUNT ]; do
-		MISSING_SPARES="$MISSING_SPARES missing"
-		let COUNT++
-	done
-
-	# Find the next available md-number
-	MD_NUM=$(grep ^md /proc/mdstat | \
-		 sed -e 's/^md\(.*\) : active .*/\1/' | sort | tail -n1)
-	if [ -z "$MD_NUM" ]; then
-		MD_NUM=0
-	else
-		let MD_NUM++
-	fi
-
-	logger -t mdcfg "Selected spare count: $NAMED_SPARES"
-	logger -t mdcfg "Raid devices count: $DEV_COUNT"
-	logger -t mdcfg "Spare devices count: $SPARE_COUNT"
-	log-output -t mdcfg \
-		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid1 \
-		      -n $DEV_COUNT -x $SPARE_COUNT $RAID_DEVICES $MISSING_DEVICES \
-		      $SPARE_DEVICES $MISSING_SPARES
-}
-
-md_create_raid5() {
-	OK=0
-
-	db_set mdcfg/raid5devcount "3"
-
-	# Get the count of active devices
-	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid5devcount
-		db_go
-		if [ $? -eq 30 ]; then
-			return
-		fi
-
-		# Figure out, if the user entered a number
-		db_get mdcfg/raid5devcount
-		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
-		if [ "$RET" ]; then
-			let "OK=${RET}>0 && ${RET}<99"
-		fi
-	done
-
-	db_set mdcfg/raid5sparecount "0"
-	OK=0
-
-	# Same procedure as above, but get the number of spare partitions
-	# this time.
-	# TODO: Make a general function for this kind of stuff
-	while [ $OK -eq 0 ]; do
-		db_input critical mdcfg/raid5sparecount
-		db_go
-		if [ $? -eq 30 ]; then
-			return
-		fi
-		db_get mdcfg/raid5sparecount
-		RET=$(echo $RET | sed -e "s/[[:space:]]//g")
-		if [ "$RET" ]; then
-			let "OK=${RET}>=0 && ${RET}<99"
-		fi
-	done
-
-	db_get mdcfg/raid5devcount
-	DEV_COUNT="$RET"
-	if [ $DEV_COUNT -lt 3 ]; then
-		DEV_COUNT=3 # Minimum number for RAID5
-	fi
-	db_get mdcfg/raid5sparecount
-	SPARE_COUNT="$RET"
-	REQUIRED=$(($DEV_COUNT + $SPARE_COUNT))
-	if [ $REQUIRED -gt $NUM_PART ]; then
-		db_subst mdcfg/notenoughparts NUM_PART "$NUM_PART"
-		db_subst mdcfg/notenoughparts REQUIRED "$REQUIRED"
-		db_input critical mdcfg/notenoughparts
-		db_go mdcfg/notenoughparts
-		return
-	fi
-
-	db_set mdcfg/raid5devs ""
-	SELECTED=0
-
-	# Loop until the correct number of active devices has been selected
-	while [ $SELECTED -ne $DEV_COUNT ]; do
-		db_subst mdcfg/raid5devs COUNT "$DEV_COUNT"
-		db_subst mdcfg/raid5devs PARTITIONS "$PARTITIONS"
-		db_input critical mdcfg/raid5devs
-		db_go
-		if [ $? -eq 30 ]; then
-			return
-		fi
-
-		db_get mdcfg/raid5devs
-		SELECTED=0
-		for i in $RET; do
-			DEVICE=$(echo $i | sed -e "s/,//")
+	if [ $LEVEL -eq 1 ]; then
+		# Add "missing" for as many devices as weren't selected
+		while [ $SELECTED -lt $DEV_COUNT ]; do
+			MISSING_DEVICES="$MISSING_DEVICES missing"
 			let SELECTED++
 		done
-	done
+	fi
 
-	# Remove partitions selected in raid5devs from the PARTITION list
-	db_get mdcfg/raid5devs
+	# Remove partitions selected in raid${LEVEL}devs from the PARTITION list
+	db_get mdcfg/raid${LEVEL}devs
 
 	prune_partitions "$RET"
 
-	db_set mdcfg/raid5sparedevs ""
+	db_set mdcfg/raid${LEVEL}sparedevs ""
 	SELECTED=0
 	if [ $SPARE_COUNT -gt 0 ]; then
 		FIRST=1
@@ -428,15 +316,15 @@ md_create_raid5() {
 		# That means any number less than or equal to the spare count.
 		while [ $SELECTED -gt $SPARE_COUNT ] || [ $FIRST -eq 1 ]; do
 			FIRST=0
-			db_subst mdcfg/raid5sparedevs COUNT "$SPARE_COUNT"
-			db_subst mdcfg/raid5sparedevs PARTITIONS "$PARTITIONS"
-			db_input critical mdcfg/raid5sparedevs
+			db_subst mdcfg/raid${LEVEL}sparedevs COUNT "$SPARE_COUNT"
+			db_subst mdcfg/raid${LEVEL}sparedevs PARTITIONS "$PARTITIONS"
+			db_input critical mdcfg/raid${LEVEL}sparedevs
 			db_go
 			if [ $? -eq 30 ]; then
 				return
 			fi
 
-			db_get mdcfg/raid5sparedevs
+			db_get mdcfg/raid${LEVEL}sparedevs
 			SELECTED=0
 			for i in $RET; do
 				DEVICE=$(echo $i | sed -e "s/,//")
@@ -448,10 +336,10 @@ md_create_raid5() {
 	# The number of spares the user has selected
 	NAMED_SPARES=$SELECTED
 
-	db_get mdcfg/raid5devs
+	db_get mdcfg/raid${LEVEL}devs
 	RAID_DEVICES=$(echo $RET | sed -e "s/,//g")
 
-	db_get mdcfg/raid5sparedevs
+	db_get mdcfg/raid${LEVEL}sparedevs
 	SPARE_DEVICES=$(echo $RET | sed -e "s/,//g")
 
 	MISSING_SPARES=""
@@ -475,9 +363,9 @@ md_create_raid5() {
 	logger -t mdcfg "Raid devices count: $DEV_COUNT"
 	logger -t mdcfg "Spare devices count: $SPARE_COUNT"
 	log-output -t mdcfg \
-		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid5 \
+		mdadm --create /dev/md$MD_NUM --auto=yes --force -R -l raid${LEVEL} \
 		      -n $DEV_COUNT -x $SPARE_COUNT $RAID_DEVICES \
-		      $SPARE_DEVICES $MISSING_SPARES
+		      $MISSING_DEVICES $SPARE_DEVICES $MISSING_SPARES
 }
 
 md_mainmenu() {
