@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2008-01-26 07:33+0000\n"
+"POT-Creation-Date: 2008-07-31 22:50+0000\n"
 "PO-Revision-Date: 2006-10-06 15:14+0700\n"
 "Last-Translator: Theppitak Karoonboonyanan <thep@linux.thai.net>\n"
 "Language-Team: Thai <l10n@opentle.org>\n"
@@ -148,7 +148,7 @@ msgstr ""
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID0"
 msgstr "RAID0"
@@ -156,7 +156,7 @@ msgstr "RAID0"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID1"
 msgstr "RAID1"
@@ -164,7 +164,7 @@ msgstr "RAID1"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID5"
 msgstr "RAID5"
@@ -172,11 +172,20 @@ msgstr "RAID5"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
+#: ../mdcfg-utils.templates:6001
+#, fuzzy
+msgid "RAID6"
+msgstr "RAID0"
+
 #. Type: select
 #. Choices
 #. :sl3:
-#: ../mdcfg-utils.templates:6001 ../mdcfg-utils.templates:16001
+#. flag:translate:5
+#. Type: select
+#. Choices
+#. :sl3:
+#: ../mdcfg-utils.templates:6001 ../mdcfg-utils.templates:12001
 msgid "Cancel"
 msgstr "ยกเลิก"
 
@@ -194,63 +203,107 @@ msgstr "ชนิดของอุปกรณ์ Multidisk:"
 msgid "Please choose the type of the multidisk device to be created."
 msgstr "กรุณาเลือกชนิดของอุปกรณ์ multidisk ที่จะสร้างขึ้น"
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
-msgid "Number of active devices for the RAID1 array:"
-msgstr "จำนวนของอุปกรณ์ที่จะใช้งานสำหรับอาร์เรย์แบบ RAID1:"
+msgid "Active devices for the RAID0 multidisk device:"
+msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID0:"
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
 msgid ""
-"The RAID1 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail."
-msgstr ""
-"อาร์เรย์แบบ RAID1 จะประกอบด้วยพาร์ทิชันที่ใช้งานและสำรอง พาร์ทิชันที่ใช้งานคือส่วนที่ถูกใช้ "
-"ส่วนอุปกรณ์สำรองจะใช้ก็ต่อเมื่ออุปกรณ์ที่ใช้อยู่มีปัญหา"
-
-#. Type: string
-#. Description
-#. :sl3:
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:7001 ../mdcfg-utils.templates:10001
-msgid "NOTE: this setting cannot be changed later."
-msgstr "หมายเหตุ: ค่านี้ไม่สามารถเปลี่ยนได้ในภายหลัง"
+"You have chosen to create a RAID0 array. Please choose the active devices in "
+"this array."
+msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID0 กรุณาเลือกอุปกรณ์ที่จะใช้งานในอาร์เรย์นี้"
 
 #. Type: string
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:8001
-msgid "Number of spare devices for the RAID1 array:"
+#, fuzzy
+msgid "Number of active devices for the RAID${LEVEL} array:"
+msgstr "จำนวนของอุปกรณ์ที่จะใช้งานสำหรับอาร์เรย์แบบ RAID1:"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+#, fuzzy
+msgid ""
+"The RAID${LEVEL} array will consist of both active and spare partitions. The "
+"active partitions are those used, while the spare devices will only be used "
+"if one or more of the active devices fail. A minimum of ${MINIMUM} active "
+"devices is required."
+msgstr ""
+"อาร์เรย์แบบ RAID5 จะประกอบด้วยพาร์ทิชันที่ใช้งานและสำรอง พาร์ทิชันที่ใช้งานคือส่วนที่ถูกใช้ "
+"ส่วนอุปกรณ์สำรองจะถูกนำมาใช้งานก็ต่อเมื่ออุปกรณที่ใช้งานมีปัญหา ต้องการอุปกรณ์ที่ใช้งานอย่างน้อย 3 "
+"ชิ้น"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+msgid "NOTE: this setting cannot be changed later."
+msgstr "หมายเหตุ: ค่านี้ไม่สามารถเปลี่ยนได้ในภายหลัง"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+msgid "Active devices for the RAID${LEVEL} multidisk device:"
+msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID0:"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} active devices."
+msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID1 ด้วยอุปกรณ์ที่จะใช้งาน ${COUNT} ชิ้น"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+msgid ""
+"Please choose which partitions are active devices. You must select exactly "
+"${COUNT} partitions."
+msgstr "กรุณาเลือกพาร์ทิชันที่จะใช้งาน คุณต้องเลือกพาร์ทิชันจำนวน ${COUNT} พาร์ทิชันพอดี"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:10001
+#, fuzzy
+msgid "Number of spare devices for the RAID${LEVEL} array:"
 msgstr "จำนวนอุปกรณ์สำรองสำหรับอาร์เรย์แบบ RAID1:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "Spare devices for the RAID1 multidisk device:"
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+msgid "Spare devices for the RAID${LEVEL} multidisk device:"
 msgstr "อุปกรณ์สำรองสำหรับอุปกรณ์ multidisk แบบ RAID1:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "You have chosen to create an RAID1 array with ${COUNT} spare devices."
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} spare devices."
 msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID1 ด้วยอุปกรณ์สำรอง ${COUNT} ชิ้น"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:9001 ../mdcfg-utils.templates:12001
+#: ../mdcfg-utils.templates:11001
 msgid ""
 "Please choose which partitions will be used as spare devices. You may choose "
 "up to ${COUNT} partitions. If you choose less than ${COUNT} devices, the "
@@ -261,115 +314,17 @@ msgstr ""
 "ถ้าคุณเลือกอุปกรณ์น้อยกว่า ${COUNT} ชิ้น พาร์ทิชันที่เหลือจะถูกนำไปรวมกับอาร์เรย์ว่าเป็น  "
 "\"missing\" ซึ่งคุณสามารถเพิ่มเข้าไปในอาร์เรย์ได้ในภายหลัง"
 
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid "Number of active devices for the RAID5 array:"
-msgstr "จำนวนอุปกรณ์ที่จะใช้งานสำหรับอาร์เรย์แบบ RAID5:"
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid ""
-"The RAID5 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail. A minimum of three active devices is "
-"required."
-msgstr ""
-"อาร์เรย์แบบ RAID5 จะประกอบด้วยพาร์ทิชันที่ใช้งานและสำรอง พาร์ทิชันที่ใช้งานคือส่วนที่ถูกใช้ "
-"ส่วนอุปกรณ์สำรองจะถูกนำมาใช้งานก็ต่อเมื่ออุปกรณที่ใช้งานมีปัญหา ต้องการอุปกรณ์ที่ใช้งานอย่างน้อย 3 "
-"ชิ้น"
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:11001
-msgid "Number of spare devices for the RAID5 array:"
-msgstr "จำนวนอุปกรณ์สำรองสำหรับอาร์เรย์แบบ RAID5:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "Spare devices for the RAID5 multidisk device:"
-msgstr "อุปกรณ์สำรองสำหรับอุปกรณ์ multidisk แบบ RAID5:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "You have chosen to create an RAID5 array with ${COUNT} spare devices."
-msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID5 ด้วยอุปกรณ์สำรอง ${COUNT} ชิ้น"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid "Active devices for the RAID0 multidisk device:"
-msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID0:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid ""
-"You have chosen to create a RAID0 array. Please choose the active devices in "
-"this array."
-msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID0 กรุณาเลือกอุปกรณ์ที่จะใช้งานในอาร์เรย์นี้"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "Active devices for the RAID1 multidisk device:"
-msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID1:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "You have chosen to create an RAID1 array with ${COUNT} active devices."
-msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID1 ด้วยอุปกรณ์ที่จะใช้งาน ${COUNT} ชิ้น"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001 ../mdcfg-utils.templates:15001
-msgid ""
-"Please choose which partitions are active devices. You must select exactly "
-"${COUNT} partitions."
-msgstr "กรุณาเลือกพาร์ทิชันที่จะใช้งาน คุณต้องเลือกพาร์ทิชันจำนวน ${COUNT} พาร์ทิชันพอดี"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "Active devices for the RAID5 multidisk device:"
-msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID5:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "You have chosen to create an RAID5 array with ${COUNT} active devices."
-msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID5 ด้วยอุปกรณ์ที่จะใช้งาน ${COUNT} ชิ้น"
-
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid "Multidisk device to be deleted:"
 msgstr "อุปกรณ์ Multidisk ที่จะลบออก:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Deleting a multidisk device will stop it and clear the superblock of all its "
 "components."
@@ -378,7 +333,7 @@ msgstr "การลบอุปกรณ์ multidisk จะหยุดใช�
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Please note this will not immediately allow you to reuse the partitions or "
 "devices in a new multidisk device. The array will however be unusable after "
@@ -390,7 +345,7 @@ msgstr ""
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "If you select a device for deletion, you will get some information about it "
 "and you will be given the option of aborting this operation."
@@ -401,28 +356,28 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices available"
 msgstr "ไม่มีอุปกรณ์ multidisk ที่ใช้ได้"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices are available for deletion."
 msgstr "ไม่มีอุปกรณ์ multidisk เหลือให้ลบออกได้"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid "Really delete this multidisk device?"
 msgstr "ต้องการลบอุปกรณ์ multidisk นี้จริงๆ หรือไม่?"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 "Please confirm whether you really want to delete the following multidisk "
 "device:"
@@ -431,7 +386,7 @@ msgstr "กรุณายืนยันว่าคุณต้องการ
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 " Device:            ${DEVICE}\n"
 " Type:              ${TYPE}\n"
@@ -444,13 +399,44 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "Failed to delete the multidisk device"
 msgstr "ลบอุปกรณ์ multidisk ไม่สำเร็จ"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "There was an error deleting the multidisk device. It may be in use."
 msgstr "เกิดข้อผิดพลาดขณะลบอุปกรณ์ multidisk อุปกรณ์อาจถูกใช้งานอยู่"
+
+#~ msgid ""
+#~ "The RAID1 array will consist of both active and spare partitions. The "
+#~ "active partitions are those used, while the spare devices will only be "
+#~ "used if one or more of the active devices fail."
+#~ msgstr ""
+#~ "อาร์เรย์แบบ RAID1 จะประกอบด้วยพาร์ทิชันที่ใช้งานและสำรอง พาร์ทิชันที่ใช้งานคือส่วนที่ถูกใช้ "
+#~ "ส่วนอุปกรณ์สำรองจะใช้ก็ต่อเมื่ออุปกรณ์ที่ใช้อยู่มีปัญหา"
+
+#~ msgid "Number of active devices for the RAID5 array:"
+#~ msgstr "จำนวนอุปกรณ์ที่จะใช้งานสำหรับอาร์เรย์แบบ RAID5:"
+
+#~ msgid "Number of spare devices for the RAID5 array:"
+#~ msgstr "จำนวนอุปกรณ์สำรองสำหรับอาร์เรย์แบบ RAID5:"
+
+#~ msgid "Spare devices for the RAID5 multidisk device:"
+#~ msgstr "อุปกรณ์สำรองสำหรับอุปกรณ์ multidisk แบบ RAID5:"
+
+#~ msgid ""
+#~ "You have chosen to create an RAID5 array with ${COUNT} spare devices."
+#~ msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID5 ด้วยอุปกรณ์สำรอง ${COUNT} ชิ้น"
+
+#~ msgid "Active devices for the RAID1 multidisk device:"
+#~ msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID1:"
+
+#~ msgid "Active devices for the RAID5 multidisk device:"
+#~ msgstr "อุปกรณ์ใช้งานสำหรับอุปกรณ์ multidisk แบบ RAID5:"
+
+#~ msgid ""
+#~ "You have chosen to create an RAID5 array with ${COUNT} active devices."
+#~ msgstr "คุณได้เลือกที่จะสร้างอาร์เรย์แบบ RAID5 ด้วยอุปกรณ์ที่จะใช้งาน ${COUNT} ชิ้น"
