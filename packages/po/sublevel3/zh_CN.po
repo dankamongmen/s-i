@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-30 22:50+0000\n"
+"POT-Creation-Date: 2008-07-31 22:50+0000\n"
 "PO-Revision-Date: 2008-01-18 01:46-0600\n"
 "Last-Translator: Ming Hua <minghua-guest@users.alioth.debian.org>\n"
 "Language-Team: Debian Chinese [GB] <debian-chinese-gb@lists.debian.org>\n"
@@ -1211,7 +1211,7 @@ msgstr ""
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID0"
 msgstr "RAID0"
@@ -1219,7 +1219,7 @@ msgstr "RAID0"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID1"
 msgstr "RAID1"
@@ -1227,10 +1227,20 @@ msgstr "RAID1"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID5"
 msgstr "RAID5"
+
+#. Type: select
+#. Choices
+#. :sl3:
+#. flag:translate:5
+#: ../mdcfg-utils.templates:6001
+#, fuzzy
+#| msgid "RAID0"
+msgid "RAID6"
+msgstr "RAID0"
 
 #. Type: select
 #. Description
@@ -1246,63 +1256,119 @@ msgstr "盘组设备类型："
 msgid "Please choose the type of the multidisk device to be created."
 msgstr "请选择要创建的盘组设备类型"
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
-msgid "Number of active devices for the RAID1 array:"
-msgstr "此 RAID1 阵列中活跃设备的个数："
+msgid "Active devices for the RAID0 multidisk device:"
+msgstr "RAID0 盘组设备中的活跃设备："
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
 msgid ""
-"The RAID1 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail."
-msgstr ""
-"RAID1 阵列同时包含活跃和空闲分区。活跃分区就是那些被使用的分区，而当一个或更"
-"多活跃设备出故障时，空闲设备就将会被启用。"
-
-#. Type: string
-#. Description
-#. :sl3:
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:7001 ../mdcfg-utils.templates:10001
-msgid "NOTE: this setting cannot be changed later."
-msgstr "注意：您稍后将无法对此设置进行修改。"
+"You have chosen to create a RAID0 array. Please choose the active devices in "
+"this array."
+msgstr "您已经选择了创建一个 RAID0 阵列。请选择这个阵列中的活跃设备。"
 
 #. Type: string
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:8001
-msgid "Number of spare devices for the RAID1 array:"
+#, fuzzy
+#| msgid "Number of active devices for the RAID1 array:"
+msgid "Number of active devices for the RAID${LEVEL} array:"
+msgstr "此 RAID1 阵列中活跃设备的个数："
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+#, fuzzy
+#| msgid ""
+#| "The RAID5 array will consist of both active and spare partitions. The "
+#| "active partitions are those used, while the spare devices will only be "
+#| "used if one or more of the active devices fail. A minimum of three active "
+#| "devices is required."
+msgid ""
+"The RAID${LEVEL} array will consist of both active and spare partitions. The "
+"active partitions are those used, while the spare devices will only be used "
+"if one or more of the active devices fail. A minimum of ${MINIMUM} active "
+"devices is required."
+msgstr ""
+"RAID5 阵列同时包含活跃和空闲分区。活跃分区就是那些被使用的分区，而当一个或更"
+"多活跃设备出故障时，空闲设备就将会被启用。在这里，最少需要三个活跃设备。"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+msgid "NOTE: this setting cannot be changed later."
+msgstr "注意：您稍后将无法对此设置进行修改。"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+#| msgid "Active devices for the RAID0 multidisk device:"
+msgid "Active devices for the RAID${LEVEL} multidisk device:"
+msgstr "RAID0 盘组设备中的活跃设备："
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+#| msgid ""
+#| "You have chosen to create an RAID1 array with ${COUNT} active devices."
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} active devices."
+msgstr "您选择了创建一个拥有 ${COUNT} 个活跃设备的 RAID1 阵列。"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+msgid ""
+"Please choose which partitions are active devices. You must select exactly "
+"${COUNT} partitions."
+msgstr "请选择将要作为活跃设备的分区。您必须选择 ${COUNT} 个分区。"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:10001
+#, fuzzy
+#| msgid "Number of spare devices for the RAID1 array:"
+msgid "Number of spare devices for the RAID${LEVEL} array:"
 msgstr "此 RAID1 阵列中空闲设备的个数："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "Spare devices for the RAID1 multidisk device:"
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+#| msgid "Spare devices for the RAID1 multidisk device:"
+msgid "Spare devices for the RAID${LEVEL} multidisk device:"
 msgstr "RAID1 盘组设备中的空闲设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "You have chosen to create an RAID1 array with ${COUNT} spare devices."
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+#| msgid ""
+#| "You have chosen to create an RAID1 array with ${COUNT} spare devices."
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} spare devices."
 msgstr "您选择了创建一个拥有 ${COUNT} 个空闲设备的 RAID1 阵列。"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:9001 ../mdcfg-utils.templates:12001
+#: ../mdcfg-utils.templates:11001
 msgid ""
 "Please choose which partitions will be used as spare devices. You may choose "
 "up to ${COUNT} partitions. If you choose less than ${COUNT} devices, the "
@@ -1313,114 +1379,17 @@ msgstr ""
 "${COUNT} 个设备，剩余的分区将被作为“missing”项加入到阵列中。稍后，您将能够将"
 "它们添加到阵列中。"
 
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid "Number of active devices for the RAID5 array:"
-msgstr "此 RAID5 阵列中活跃设备的个数："
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid ""
-"The RAID5 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail. A minimum of three active devices is "
-"required."
-msgstr ""
-"RAID5 阵列同时包含活跃和空闲分区。活跃分区就是那些被使用的分区，而当一个或更"
-"多活跃设备出故障时，空闲设备就将会被启用。在这里，最少需要三个活跃设备。"
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:11001
-msgid "Number of spare devices for the RAID5 array:"
-msgstr "此 RAID5 阵列中空闲设备的个数："
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "Spare devices for the RAID5 multidisk device:"
-msgstr "RAID5 盘组设备中的空闲设备："
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "You have chosen to create an RAID5 array with ${COUNT} spare devices."
-msgstr "您选择了创建一个拥有 ${COUNT} 个空闲设备的 RAID5 阵列。"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid "Active devices for the RAID0 multidisk device:"
-msgstr "RAID0 盘组设备中的活跃设备："
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid ""
-"You have chosen to create a RAID0 array. Please choose the active devices in "
-"this array."
-msgstr "您已经选择了创建一个 RAID0 阵列。请选择这个阵列中的活跃设备。"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "Active devices for the RAID1 multidisk device:"
-msgstr "RAID1 盘组设备中的活跃设备："
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "You have chosen to create an RAID1 array with ${COUNT} active devices."
-msgstr "您选择了创建一个拥有 ${COUNT} 个活跃设备的 RAID1 阵列。"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001 ../mdcfg-utils.templates:15001
-msgid ""
-"Please choose which partitions are active devices. You must select exactly "
-"${COUNT} partitions."
-msgstr "请选择将要作为活跃设备的分区。您必须选择 ${COUNT} 个分区。"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "Active devices for the RAID5 multidisk device:"
-msgstr "RAID5 盘组设备中的活跃设备："
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "You have chosen to create an RAID5 array with ${COUNT} active devices."
-msgstr "您选择了创建一个拥有 ${COUNT} 个活跃设备的 RAID5 阵列。"
-
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid "Multidisk device to be deleted:"
 msgstr "要删除的盘组设备："
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Deleting a multidisk device will stop it and clear the superblock of all its "
 "components."
@@ -1429,7 +1398,7 @@ msgstr "删除一个盘组设备将会停止它并清除其所有组件的 super
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Please note this will not immediately allow you to reuse the partitions or "
 "devices in a new multidisk device. The array will however be unusable after "
@@ -1441,7 +1410,7 @@ msgstr ""
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "If you select a device for deletion, you will get some information about it "
 "and you will be given the option of aborting this operation."
@@ -1451,28 +1420,28 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices available"
 msgstr "无可用的盘组 (multidisk, MD)"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices are available for deletion."
 msgstr "没有可被删除的盘组设备。"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid "Really delete this multidisk device?"
 msgstr "真的要删除这个盘组设备吗？"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 "Please confirm whether you really want to delete the following multidisk "
 "device:"
@@ -1481,7 +1450,7 @@ msgstr "请确定您是否真的想删除以下盘组设备:"
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 " Device:            ${DEVICE}\n"
 " Type:              ${TYPE}\n"
@@ -1494,28 +1463,28 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "Failed to delete the multidisk device"
 msgstr "删除盘组设备失败"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "There was an error deleting the multidisk device. It may be in use."
 msgstr "删除盘组设备时出错。该设备可能正被使用。"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:1001 ../partman-lvm.templates:24001
+#: ../lvmcfg-utils.templates:1001
 msgid "Activate existing volume groups?"
 msgstr "激活现有卷组吗？"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:1001 ../partman-lvm.templates:24001
+#: ../lvmcfg-utils.templates:1001
 msgid ""
 "${COUNT} existing volume groups have been found. Please indicate whether you "
 "want to activate them."
@@ -1582,7 +1551,7 @@ msgstr "离开"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:2002 ../partman-lvm.templates:25001
+#: ../lvmcfg-utils.templates:2002 ../partman-lvm.templates:24001
 msgid "LVM configuration action:"
 msgstr "LVM 配置动作："
 
@@ -1688,14 +1657,14 @@ msgstr "逻辑卷配置动作："
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:27001
+#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:26001
 msgid "Devices for the new volume group:"
 msgstr "新卷组使用的设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:27001
+#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:26001
 msgid "Please select the devices for the new volume group."
 msgstr "请选择新卷组使用的设备。"
 
@@ -1717,22 +1686,22 @@ msgstr "请选择新卷组使用的设备。"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:5001 ../lvmcfg-utils.templates:17001
-#: ../partman-lvm.templates:27001 ../partman-lvm.templates:40001
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:26001 ../partman-lvm.templates:39001
+#: ../partman-lvm.templates:44001
 msgid "You can select one or more devices."
 msgstr "您可以选择一个或多个设备。"
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:28001
+#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:27001
 msgid "Volume group name:"
 msgstr "卷组名："
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:28001
+#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:27001
 msgid "Please enter the name you would like to use for the new volume group."
 msgstr "请输入新卷组的名称。"
 
@@ -1754,8 +1723,8 @@ msgstr "请输入新卷组的名称。"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:7001 ../lvmcfg-utils.templates:18001
-#: ../partman-lvm.templates:29001 ../partman-lvm.templates:41001
-#: ../partman-lvm.templates:46001
+#: ../partman-lvm.templates:28001 ../partman-lvm.templates:40001
+#: ../partman-lvm.templates:45001
 msgid "No physical volumes selected"
 msgstr "没有选择物理卷"
 
@@ -1771,7 +1740,7 @@ msgstr "您尚未选择物理卷。建立新卷组的动作被中止。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:8001 ../partman-lvm.templates:30001
+#: ../lvmcfg-utils.templates:8001 ../partman-lvm.templates:29001
 msgid "No volume group name entered"
 msgstr "未输入卷组名"
 
@@ -1793,7 +1762,7 @@ msgstr "您尚未设定卷组名，请为此卷组输入一个名称。"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: error
 #. Description
-#: ../lvmcfg-utils.templates:9001 ../partman-lvm.templates:31001
+#: ../lvmcfg-utils.templates:9001 ../partman-lvm.templates:30001
 #: ../partman-auto-lvm.templates:6001
 msgid "Volume group name already in use"
 msgstr "卷组名已被使用"
@@ -1813,7 +1782,7 @@ msgstr "所选卷组名已被使用，请换用另一个名称。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:10001 ../partman-lvm.templates:32001
+#: ../lvmcfg-utils.templates:10001 ../partman-lvm.templates:31001
 msgid "Volume group name overlaps with device name"
 msgstr "卷组名与设备名重复"
 
@@ -1829,14 +1798,14 @@ msgstr "所选卷组名与某个现有设备名雷同，请换用另一个名称
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:34001
+#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:33001
 msgid "Volume group to delete:"
 msgstr "要删除的卷组："
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:34001
+#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:33001
 msgid "Please select the volume group you wish to delete."
 msgstr "请选择您要删除的卷组。"
 
@@ -1875,8 +1844,8 @@ msgstr "请选择您要删除的卷组。"
 #: ../lvmcfg-utils.templates:12001 ../lvmcfg-utils.templates:15001
 #: ../lvmcfg-utils.templates:20001 ../lvmcfg-utils.templates:25001
 #: ../lvmcfg-utils.templates:26001 ../lvmcfg-utils.templates:33001
-#: ../partman-lvm.templates:35001 ../partman-lvm.templates:38001
-#: ../partman-lvm.templates:43001 ../partman-lvm.templates:48001
+#: ../partman-lvm.templates:34001 ../partman-lvm.templates:37001
+#: ../partman-lvm.templates:42001 ../partman-lvm.templates:47001
 msgid "No volume group found"
 msgstr "未找到卷组"
 
@@ -1890,43 +1859,43 @@ msgstr "未找到卷组"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:12001 ../lvmcfg-utils.templates:15001
-#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:35001
-#: ../partman-lvm.templates:38001 ../partman-lvm.templates:43001
+#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:34001
+#: ../partman-lvm.templates:37001 ../partman-lvm.templates:42001
 msgid "No volume group has been found."
 msgstr "没有找到卷组。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:12001 ../partman-lvm.templates:35001
+#: ../lvmcfg-utils.templates:12001 ../partman-lvm.templates:34001
 msgid "The volume group may have already been deleted."
 msgstr "卷组也许已被删除。"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:36001
+#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:35001
 msgid "Really delete the volume group?"
 msgstr "真的要删除此卷组吗？"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:36001
+#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:35001
 msgid "Please confirm the ${VG} volume group removal."
 msgstr "请确认要删除的卷组 ${VG}。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:37001
+#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:36001
 msgid "Error while deleting volume group"
 msgstr "删除卷组出错"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:37001
+#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:36001
 msgid ""
 "The selected volume group could not be deleted. One or more logical volumes "
 "may currently be in use."
@@ -1935,35 +1904,35 @@ msgstr "无法删除所选卷组。一个或多个逻辑卷正在被使用。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:15001 ../partman-lvm.templates:38001
+#: ../lvmcfg-utils.templates:15001 ../partman-lvm.templates:37001
 msgid "No volume group can be deleted."
 msgstr "不能删除卷组。"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:39001
+#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:38001
 msgid "Volume group to extend:"
 msgstr "要扩展的卷组："
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:39001
+#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:38001
 msgid "Please select the volume group you wish to extend."
 msgstr "请选择要扩展的卷组。"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:40001
+#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:39001
 msgid "Devices to add to the volume group:"
 msgstr "要加入卷组的设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:40001
+#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:39001
 msgid "Please select the devices you wish to add to the volume group."
 msgstr "请选择要加入到卷组中的设备。"
 
@@ -1978,14 +1947,14 @@ msgstr "没有选择物理卷。扩展卷组的动作被中止。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:42001
+#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:41001
 msgid "Error while extending volume group"
 msgstr "扩展卷组出错"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:42001
+#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:41001
 msgid ""
 "The physical volume ${PARTITION} could not be added to the selected volume "
 "group."
@@ -1994,21 +1963,21 @@ msgstr "物理卷 ${PARTITION} 不能被加入到所选卷组中。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:43001
+#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:42001
 msgid "No volume group can be reduced."
 msgstr "不能缩小卷组。"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:44001
+#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:43001
 msgid "Volume group to reduce:"
 msgstr "要缩小的卷组："
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:44001
+#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:43001
 msgid "Please select the volume group you wish to reduce."
 msgstr "请选择要缩小的卷组。"
 
@@ -2033,7 +2002,7 @@ msgstr "请选择要从卷组中移除的设备。"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:23001 ../lvmcfg-utils.templates:24001
-#: ../partman-lvm.templates:33001 ../partman-lvm.templates:47001
+#: ../partman-lvm.templates:32001 ../partman-lvm.templates:46001
 msgid "Error while reducing volume group"
 msgstr "缩小卷组出错"
 
@@ -2049,7 +2018,7 @@ msgstr "所选的卷组 (${VG}) 不能被缩小。其中仅有一个物理卷。
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:24001 ../partman-lvm.templates:47001
+#: ../lvmcfg-utils.templates:24001 ../partman-lvm.templates:46001
 msgid ""
 "The physical volume ${PARTITION} could not be removed from the selected "
 "volume group."
@@ -2067,7 +2036,7 @@ msgstr "未能找到建立新逻辑卷需要的卷组。请创建更多的物理
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:26001 ../partman-lvm.templates:48001
+#: ../lvmcfg-utils.templates:26001 ../partman-lvm.templates:47001
 msgid ""
 "No free volume groups were found for creating a new logical volume. Please "
 "create more physical volumes and volume groups, or reduce an existing volume "
@@ -2079,14 +2048,14 @@ msgstr ""
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:49001
+#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:48001
 msgid "Logical volume name:"
 msgstr "逻辑卷名称："
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:49001
+#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:48001
 msgid "Please enter the name you would like to use for the new logical volume."
 msgstr "请输入新逻辑卷的名称。"
 
@@ -2102,14 +2071,14 @@ msgstr "请输入新逻辑卷的名称。"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:28001 ../lvmcfg-utils.templates:34001
-#: ../partman-lvm.templates:50001
+#: ../partman-lvm.templates:49001
 msgid "Volume group:"
 msgstr "卷组："
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:28001 ../partman-lvm.templates:50001
+#: ../lvmcfg-utils.templates:28001 ../partman-lvm.templates:49001
 msgid ""
 "Please select the volume group where the new logical volume should be "
 "created."
@@ -2118,14 +2087,14 @@ msgstr "请选择新逻辑卷所在的卷组。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:51001
+#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:50001
 msgid "No logical volume name entered"
 msgstr "未输入逻辑卷名"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:51001
+#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:50001
 msgid "No name for the logical volume has been entered.  Please enter a name."
 msgstr "您尚未设定逻辑卷名，请为此逻辑卷输入一个名称。"
 
@@ -2136,14 +2105,14 @@ msgstr "您尚未设定逻辑卷名，请为此逻辑卷输入一个名称。"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:30001 ../lvmcfg-utils.templates:32001
-#: ../partman-lvm.templates:52001 ../partman-lvm.templates:54001
+#: ../partman-lvm.templates:51001 ../partman-lvm.templates:53001
 msgid "Error while creating a new logical volume"
 msgstr "创建新逻辑卷出错"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:30001 ../partman-lvm.templates:52001
+#: ../lvmcfg-utils.templates:30001 ../partman-lvm.templates:51001
 msgid ""
 "The name ${LV} is already in use by another logical volume on the same "
 "volume group (${VG})."
@@ -2152,14 +2121,14 @@ msgstr "逻辑卷名 ${LV} 已被同一卷组 (${VG}) 中的另一个逻辑卷�
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:53001
+#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:52001
 msgid "Logical volume size:"
 msgstr "逻辑卷大小："
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:53001
+#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:52001
 msgid ""
 "Please enter the size of the new logical volume. The size may be entered in "
 "the following formats: 10K (Kilobytes), 10M (Megabytes), 10G (Gigabytes), "
@@ -2171,7 +2140,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:32001 ../partman-lvm.templates:54001
+#: ../lvmcfg-utils.templates:32001 ../partman-lvm.templates:53001
 msgid ""
 "Unable to create a new logical volume (${LV}) on ${VG} with the new size "
 "${SIZE}."
@@ -2196,14 +2165,14 @@ msgstr "请选择包含要删除的逻辑卷的卷组。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:55001
+#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:54001
 msgid "No logical volume found"
 msgstr "未找到逻辑卷"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:55001
+#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:54001
 msgid ""
 "No logical volume has been found.  Please create a logical volume first."
 msgstr "没有找到逻辑卷。请先创建一个逻辑卷。"
@@ -2211,7 +2180,7 @@ msgstr "没有找到逻辑卷。请先创建一个逻辑卷。"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:36001 ../partman-lvm.templates:56001
+#: ../lvmcfg-utils.templates:36001 ../partman-lvm.templates:55001
 msgid "Logical volume:"
 msgstr "逻辑卷："
 
@@ -2225,28 +2194,28 @@ msgstr "请选择要删除 ${VG} 上哪个逻辑卷。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:58001
+#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:57001
 msgid "Error while deleting the logical volume"
 msgstr "删除逻辑卷出错"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:58001
+#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:57001
 msgid "The logical volume (${LV}) on ${VG} could not be deleted."
 msgstr "${VG} 上的逻辑卷 (${LV}) 不能被删除。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:59001
+#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:58001
 msgid "No usable physical volumes found"
 msgstr "没有找到可用的物理卷"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:59001
+#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:58001
 msgid ""
 "No physical volumes (i.e. partitions) were found in your system. All "
 "physical volumes may already be in use. You may also need to load some "
@@ -2258,14 +2227,14 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:60001
+#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:59001
 msgid "Logical Volume Manager not available"
 msgstr "逻辑卷管理器不可用"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:60001
+#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:59001
 msgid ""
 "The current kernel doesn't support the Logical Volume Manager. You may need "
 "to load the lvm-mod module."
@@ -2350,6 +2319,56 @@ msgstr "RAID 物理卷"
 #: ../partman-md.templates:7001
 msgid "raid"
 msgstr "raid"
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid "Done setting up the partition"
+msgid "Remove existing software RAID partitions?"
+msgstr "分区设定结束"
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid ""
+#| "The selected device already contains the following LVM logical volumes, "
+#| "volume groups and physical volumes which are about to be removed:"
+msgid ""
+"The selected device contains partitions used for software RAID devices. The "
+"following devices and partitions are about to be removed:"
+msgstr ""
+"您所选择的设备已经包含了下列 LVM 逻辑卷、卷组和物理卷，它们将会被移除："
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+msgid "Software RAID devices about to be removed: ${REMOVED_DEVICES}"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+msgid "Partitions used by these RAID devices: ${REMOVED_PARTITIONS}"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid ""
+#| "Note that this will also permanently erase any data currently on the "
+#| "logical volumes."
+msgid ""
+"Note that this will also permanently erase any data currently on the "
+"software RAID devices."
+msgstr "注意这也将会把这些逻辑卷上现有的数据全都永久删除。"
 
 #. Type: text
 #. Description
@@ -2573,14 +2592,14 @@ msgstr "lvm"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:25001
+#: ../partman-lvm.templates:24001
 msgid "Summary of current LVM configuration:"
 msgstr "当前 LVM 配置的总结"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:25001
+#: ../partman-lvm.templates:24001
 msgid ""
 " Free Physical Volumes:  ${FREE_PVS}\n"
 " Used Physical Volumes:  ${USED_PVS}\n"
@@ -2595,14 +2614,14 @@ msgstr ""
 #. Type: note
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:26001
+#: ../partman-lvm.templates:25001
 msgid "Current LVM configuration:"
 msgstr "当前 LVM 配置"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:29001
+#: ../partman-lvm.templates:28001
 msgid ""
 "No physical volumes were selected. The creation of a new volume group has "
 "been aborted."
@@ -2611,14 +2630,14 @@ msgstr "您尚未选择物理卷。建立新卷组的动作已被中止。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:30001
+#: ../partman-lvm.templates:29001
 msgid "No name for the volume group has been entered. Please enter a name."
 msgstr "您尚未输入卷组名。请输入一个名称。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:31001
+#: ../partman-lvm.templates:30001
 msgid ""
 "The selected volume group name is already in use. Please choose a different "
 "name."
@@ -2627,7 +2646,7 @@ msgstr "所选卷组名已被使用。请选用另一个名称。"
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:32001
+#: ../partman-lvm.templates:31001
 msgid ""
 "The selected volume group name overlaps with an existing device name. Please "
 "choose a different name."
@@ -2636,14 +2655,14 @@ msgstr "所选卷组名与某个现有设备名相同。请选用另一个名称
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:33001
+#: ../partman-lvm.templates:32001
 msgid "The volume group ${VG} could not be created."
 msgstr "无法创建逻辑卷 ${VG}。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:41001
+#: ../partman-lvm.templates:40001
 msgid ""
 "No physical volumes were selected. Extension of the volume group has been "
 "aborted."
@@ -2652,21 +2671,21 @@ msgstr "没有选择物理卷。扩展卷组的动作已被中止。"
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:44001
 msgid "Devices to remove from the volume group:"
 msgstr "要从卷组中移除的设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:44001
 msgid "Please select the devices you wish to remove from the volume group."
 msgstr "请选择您想要从卷组中移除的设备。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:46001
+#: ../partman-lvm.templates:45001
 msgid ""
 "No physical volumes were selected. Reduction of the volume group was aborted."
 msgstr "没有选择物理卷。缩小卷组的动作被中止。"
@@ -2674,42 +2693,42 @@ msgstr "没有选择物理卷。缩小卷组的动作被中止。"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:56001
+#: ../partman-lvm.templates:55001
 msgid "Please select the logical volume to delete."
 msgstr "请选择要删除的逻辑卷。"
 
 #. Type: text
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:57001
+#: ../partman-lvm.templates:56001
 msgid "in VG ${VG}"
 msgstr "于卷组 ${VG}"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:61001
+#: ../partman-lvm.templates:60001
 msgid "Error while initializing physical volume"
 msgstr "初始化物理卷出错"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:61001
+#: ../partman-lvm.templates:60001
 msgid "The physical volume ${PV} could not be initialized."
 msgstr "无法对物理卷 ${PV} 初始化。"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid "Invalid logical volume or volume group name"
 msgstr "无效的逻辑卷或卷组名称"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid ""
 "Logical volume or volume group names may only contain alphanumeric "
 "characters, hyphen, plus, period and underscore. They must be 128 characters "
@@ -2723,21 +2742,21 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid "Please choose a different name."
 msgstr "请选择另一个名称。"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Remove existing logical volume data?"
 msgstr "移除现有的逻辑卷数据？"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid ""
 "The selected device already contains the following LVM logical volumes, "
 "volume groups and physical volumes which are about to be removed:"
@@ -2747,28 +2766,28 @@ msgstr ""
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Logical volume(s) to be removed: ${LVTARGETS}"
 msgstr "要移除的逻辑卷：${LVTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Volume group(s) to be removed: ${VGTARGETS}"
 msgstr "要移除的卷组：${VGTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Physical volume(s) to be removed: ${PVTARGETS}"
 msgstr "要移除的物理卷：${PVTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid ""
 "Note that this will also permanently erase any data currently on the logical "
 "volumes."
@@ -2777,14 +2796,14 @@ msgstr "注意这也将会把这些逻辑卷上现有的数据全都永久删除
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:64001
+#: ../partman-lvm.templates:63001
 msgid "Unable to automatically remove LVM data"
 msgstr "无法自动移除 LVM 数据"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:64001
+#: ../partman-lvm.templates:63001
 msgid ""
 "Because the volume group(s) on the selected device also consist of physical "
 "volumes on other devices, it is not considered safe to remove its LVM data "

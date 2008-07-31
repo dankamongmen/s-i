@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-30 22:50+0000\n"
+"POT-Creation-Date: 2008-07-31 22:50+0000\n"
 "PO-Revision-Date: 2008-07-13 03:26+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team:  Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -1235,7 +1235,7 @@ msgstr ""
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID0"
 msgstr "RAID0"
@@ -1243,7 +1243,7 @@ msgstr "RAID0"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID1"
 msgstr "RAID1"
@@ -1251,10 +1251,20 @@ msgstr "RAID1"
 #. Type: select
 #. Choices
 #. :sl3:
-#. flag:translate:4
+#. flag:translate:5
 #: ../mdcfg-utils.templates:6001
 msgid "RAID5"
 msgstr "RAID5"
+
+#. Type: select
+#. Choices
+#. :sl3:
+#. flag:translate:5
+#: ../mdcfg-utils.templates:6001
+#, fuzzy
+#| msgid "RAID0"
+msgid "RAID6"
+msgstr "RAID0"
 
 #. Type: select
 #. Description
@@ -1270,64 +1280,125 @@ msgstr "멀티디스크 장치 종류:"
 msgid "Please choose the type of the multidisk device to be created."
 msgstr "새로 만들 멀티디스크 장치의 종류를 고르십시오."
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
-msgid "Number of active devices for the RAID1 array:"
-msgstr "RAID1 어레이의 활성 장치 개수:"
+msgid "Active devices for the RAID0 multidisk device:"
+msgstr "RAID0 멀티디스크 장치의 활성 장치:"
 
-#. Type: string
+#. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:7001
 msgid ""
-"The RAID1 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail."
+"You have chosen to create a RAID0 array. Please choose the active devices in "
+"this array."
 msgstr ""
-"RAID1 어레이는 활성 파티션과 예비 파티션으로 구성되어 있습니다. 활성 파티션"
-"을 사용하고, 예비 파티션은 활성 파티션이 실패한 경우에만 사용합니다."
-
-#. Type: string
-#. Description
-#. :sl3:
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:7001 ../mdcfg-utils.templates:10001
-msgid "NOTE: this setting cannot be changed later."
-msgstr "주의: 이 설정은 나중에 바꿀 수 없습니다."
+"RAID1 어레이를 만들도록 선택하셨습니다. 이 어레이에서 활성 장치를 고르십시오."
 
 #. Type: string
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:8001
-msgid "Number of spare devices for the RAID1 array:"
+#, fuzzy
+#| msgid "Number of active devices for the RAID1 array:"
+msgid "Number of active devices for the RAID${LEVEL} array:"
+msgstr "RAID1 어레이의 활성 장치 개수:"
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+#, fuzzy
+#| msgid ""
+#| "The RAID5 array will consist of both active and spare partitions. The "
+#| "active partitions are those used, while the spare devices will only be "
+#| "used if one or more of the active devices fail. A minimum of three active "
+#| "devices is required."
+msgid ""
+"The RAID${LEVEL} array will consist of both active and spare partitions. The "
+"active partitions are those used, while the spare devices will only be used "
+"if one or more of the active devices fail. A minimum of ${MINIMUM} active "
+"devices is required."
+msgstr ""
+"RAID1 어레이는 활성 파티션과 예비 파티션으로 구성되어 있습니다. 활성 파티션"
+"을 사용하고, 예비 파티션은 활성 파티션이 실패한 경우에만 사용합니다. 최소한 "
+"활성 장치 3개가 필요합니다."
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:8001
+msgid "NOTE: this setting cannot be changed later."
+msgstr "주의: 이 설정은 나중에 바꿀 수 없습니다."
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+#| msgid "Active devices for the RAID0 multidisk device:"
+msgid "Active devices for the RAID${LEVEL} multidisk device:"
+msgstr "RAID0 멀티디스크 장치의 활성 장치:"
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+#, fuzzy
+#| msgid ""
+#| "You have chosen to create an RAID1 array with ${COUNT} active devices."
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} active devices."
+msgstr ""
+"활성 장치 ${COUNT}개가 들어 있는 RAID1 어레이를 만들도록 선택하셨습니다."
+
+#. Type: multiselect
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:9001
+msgid ""
+"Please choose which partitions are active devices. You must select exactly "
+"${COUNT} partitions."
+msgstr ""
+"어떤 파티션을 활성 장치로 할 지 고르십시오. 정확히 파티션 ${COUNT}개를 골라"
+"야 합니다."
+
+#. Type: string
+#. Description
+#. :sl3:
+#: ../mdcfg-utils.templates:10001
+#, fuzzy
+#| msgid "Number of spare devices for the RAID1 array:"
+msgid "Number of spare devices for the RAID${LEVEL} array:"
 msgstr "RAID1 어레이의 예비 장치의 개수:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "Spare devices for the RAID1 multidisk device:"
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+#| msgid "Spare devices for the RAID1 multidisk device:"
+msgid "Spare devices for the RAID${LEVEL} multidisk device:"
 msgstr "RAID1 멀티디스크 장치의 예비 장치:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:9001
-msgid "You have chosen to create an RAID1 array with ${COUNT} spare devices."
+#: ../mdcfg-utils.templates:11001
+#, fuzzy
+#| msgid ""
+#| "You have chosen to create an RAID1 array with ${COUNT} spare devices."
+msgid ""
+"You have chosen to create a RAID${LEVEL} array with ${COUNT} spare devices."
 msgstr ""
 "예비 장치 ${COUNT}개가 들어 있는 RAID1 어레이를 만들도록 선택하셨습니다."
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:9001 ../mdcfg-utils.templates:12001
+#: ../mdcfg-utils.templates:11001
 msgid ""
 "Please choose which partitions will be used as spare devices. You may choose "
 "up to ${COUNT} partitions. If you choose less than ${COUNT} devices, the "
@@ -1338,121 +1409,17 @@ msgstr ""
 "수 있습니다. ${COUNT}개보다 적게 고른다면, 나머지 파티션은 \"누락\"으로 어레"
 "이에 더합니다. 나중에 이 파티션을 어레이에 더할 수 있습니다."
 
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid "Number of active devices for the RAID5 array:"
-msgstr "RAID5 어레이의 활성 장치 개수:"
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:10001
-msgid ""
-"The RAID5 array will consist of both active and spare partitions. The active "
-"partitions are those used, while the spare devices will only be used if one "
-"or more of the active devices fail. A minimum of three active devices is "
-"required."
-msgstr ""
-"RAID1 어레이는 활성 파티션과 예비 파티션으로 구성되어 있습니다. 활성 파티션"
-"을 사용하고, 예비 파티션은 활성 파티션이 실패한 경우에만 사용합니다. 최소한 "
-"활성 장치 3개가 필요합니다."
-
-#. Type: string
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:11001
-msgid "Number of spare devices for the RAID5 array:"
-msgstr "RAID5 어레이의 예비 장치의 개수:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "Spare devices for the RAID5 multidisk device:"
-msgstr "RAID5 멀티디스크 장치의 예비 장치:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:12001
-msgid "You have chosen to create an RAID5 array with ${COUNT} spare devices."
-msgstr ""
-"예비 장치 ${COUNT}개가 들어 있는 RAID5 어레이를 만들도록 선택하셨습니다."
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid "Active devices for the RAID0 multidisk device:"
-msgstr "RAID0 멀티디스크 장치의 활성 장치:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:13001
-msgid ""
-"You have chosen to create a RAID0 array. Please choose the active devices in "
-"this array."
-msgstr ""
-"RAID1 어레이를 만들도록 선택하셨습니다. 이 어레이에서 활성 장치를 고르십시오."
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "Active devices for the RAID1 multidisk device:"
-msgstr "RAID1 멀티디스크 장치의 활성 장치:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001
-msgid "You have chosen to create an RAID1 array with ${COUNT} active devices."
-msgstr ""
-"활성 장치 ${COUNT}개가 들어 있는 RAID1 어레이를 만들도록 선택하셨습니다."
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:14001 ../mdcfg-utils.templates:15001
-msgid ""
-"Please choose which partitions are active devices. You must select exactly "
-"${COUNT} partitions."
-msgstr ""
-"어떤 파티션을 활성 장치로 할 지 고르십시오. 정확히 파티션 ${COUNT}개를 골라"
-"야 합니다."
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "Active devices for the RAID5 multidisk device:"
-msgstr "RAID5 멀티디스크 장치의 활성 장치:"
-
-#. Type: multiselect
-#. Description
-#. :sl3:
-#: ../mdcfg-utils.templates:15001
-msgid "You have chosen to create an RAID5 array with ${COUNT} active devices."
-msgstr ""
-"활성 장치 ${COUNT}개가 들어 있는 RAID5 어레이를 만들도록 선택하셨습니다."
-
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid "Multidisk device to be deleted:"
 msgstr "지울 멀티디스크 장치:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Deleting a multidisk device will stop it and clear the superblock of all its "
 "components."
@@ -1463,7 +1430,7 @@ msgstr ""
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "Please note this will not immediately allow you to reuse the partitions or "
 "devices in a new multidisk device. The array will however be unusable after "
@@ -1476,7 +1443,7 @@ msgstr ""
 #. Type: select
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:16002
+#: ../mdcfg-utils.templates:12002
 msgid ""
 "If you select a device for deletion, you will get some information about it "
 "and you will be given the option of aborting this operation."
@@ -1487,28 +1454,28 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices available"
 msgstr "멀티디스크 장치가 없습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:17001
+#: ../mdcfg-utils.templates:13001
 msgid "No multidisk devices are available for deletion."
 msgstr "지울 멀티디스크 장치가 없습니다."
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid "Really delete this multidisk device?"
 msgstr "정말로 이 멀티디스크 장치를 지우시겠습니까?"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 "Please confirm whether you really want to delete the following multidisk "
 "device:"
@@ -1517,7 +1484,7 @@ msgstr "정말로 다음 멀티디스크 장치를 지울 지 확인하십시오
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:18001
+#: ../mdcfg-utils.templates:14001
 msgid ""
 " Device:            ${DEVICE}\n"
 " Type:              ${TYPE}\n"
@@ -1530,14 +1497,14 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "Failed to delete the multidisk device"
 msgstr "멀티디스크 장치를 지우는데 실패했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../mdcfg-utils.templates:19001
+#: ../mdcfg-utils.templates:15001
 msgid "There was an error deleting the multidisk device. It may be in use."
 msgstr ""
 "멀티디스크 장치를 지우는데 오류가 발생했습니다. 장치가 현재 사용중일 수도 있"
@@ -1546,14 +1513,14 @@ msgstr ""
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:1001 ../partman-lvm.templates:24001
+#: ../lvmcfg-utils.templates:1001
 msgid "Activate existing volume groups?"
 msgstr "기존 볼륨 그룹을 활성화하시겠습니까?"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:1001 ../partman-lvm.templates:24001
+#: ../lvmcfg-utils.templates:1001
 msgid ""
 "${COUNT} existing volume groups have been found. Please indicate whether you "
 "want to activate them."
@@ -1621,7 +1588,7 @@ msgstr "끝내기"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:2002 ../partman-lvm.templates:25001
+#: ../lvmcfg-utils.templates:2002 ../partman-lvm.templates:24001
 msgid "LVM configuration action:"
 msgstr "LVM 설정 작업:"
 
@@ -1727,14 +1694,14 @@ msgstr "논리 볼륨 설정 작업:"
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:27001
+#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:26001
 msgid "Devices for the new volume group:"
 msgstr "새 볼륨 그룹에 쓸 장치:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:27001
+#: ../lvmcfg-utils.templates:5001 ../partman-lvm.templates:26001
 msgid "Please select the devices for the new volume group."
 msgstr "새 볼륨 그룹에 사용할 장치를 선택하십시오."
 
@@ -1756,22 +1723,22 @@ msgstr "새 볼륨 그룹에 사용할 장치를 선택하십시오."
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:5001 ../lvmcfg-utils.templates:17001
-#: ../partman-lvm.templates:27001 ../partman-lvm.templates:40001
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:26001 ../partman-lvm.templates:39001
+#: ../partman-lvm.templates:44001
 msgid "You can select one or more devices."
 msgstr "한 개 혹은 그 이상의 장치를 선택할 수 있습니다."
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:28001
+#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:27001
 msgid "Volume group name:"
 msgstr "볼륨 그룹 이름:"
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:28001
+#: ../lvmcfg-utils.templates:6001 ../partman-lvm.templates:27001
 msgid "Please enter the name you would like to use for the new volume group."
 msgstr "새 볼륨 그룹에 사용하려는 이름을 입력하십시오."
 
@@ -1793,8 +1760,8 @@ msgstr "새 볼륨 그룹에 사용하려는 이름을 입력하십시오."
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:7001 ../lvmcfg-utils.templates:18001
-#: ../partman-lvm.templates:29001 ../partman-lvm.templates:41001
-#: ../partman-lvm.templates:46001
+#: ../partman-lvm.templates:28001 ../partman-lvm.templates:40001
+#: ../partman-lvm.templates:45001
 msgid "No physical volumes selected"
 msgstr "물리 볼륨을 선택하지 않았습니다"
 
@@ -1811,7 +1778,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:8001 ../partman-lvm.templates:30001
+#: ../lvmcfg-utils.templates:8001 ../partman-lvm.templates:29001
 msgid "No volume group name entered"
 msgstr "볼륨 그룹 이름을 입력하지 않았습니다."
 
@@ -1833,7 +1800,7 @@ msgstr "볼륨 그룹의 이름을 입력하지 않았습니다.  이름을 입�
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: error
 #. Description
-#: ../lvmcfg-utils.templates:9001 ../partman-lvm.templates:31001
+#: ../lvmcfg-utils.templates:9001 ../partman-lvm.templates:30001
 #: ../partman-auto-lvm.templates:6001
 msgid "Volume group name already in use"
 msgstr "볼륨 그룹 이름이 이미 사용중입니다"
@@ -1853,7 +1820,7 @@ msgstr "입력한 볼륨 그룹 이름이 이미 사용중입니다. 다른 이�
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:10001 ../partman-lvm.templates:32001
+#: ../lvmcfg-utils.templates:10001 ../partman-lvm.templates:31001
 msgid "Volume group name overlaps with device name"
 msgstr "볼륨 그룹 이름이 장치 이름과 충돌합니다"
 
@@ -1871,14 +1838,14 @@ msgstr ""
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:34001
+#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:33001
 msgid "Volume group to delete:"
 msgstr "지울 볼륨 그룹:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:34001
+#: ../lvmcfg-utils.templates:11001 ../partman-lvm.templates:33001
 msgid "Please select the volume group you wish to delete."
 msgstr "지우려는 볼륨 그룹을 선택하십시오."
 
@@ -1917,8 +1884,8 @@ msgstr "지우려는 볼륨 그룹을 선택하십시오."
 #: ../lvmcfg-utils.templates:12001 ../lvmcfg-utils.templates:15001
 #: ../lvmcfg-utils.templates:20001 ../lvmcfg-utils.templates:25001
 #: ../lvmcfg-utils.templates:26001 ../lvmcfg-utils.templates:33001
-#: ../partman-lvm.templates:35001 ../partman-lvm.templates:38001
-#: ../partman-lvm.templates:43001 ../partman-lvm.templates:48001
+#: ../partman-lvm.templates:34001 ../partman-lvm.templates:37001
+#: ../partman-lvm.templates:42001 ../partman-lvm.templates:47001
 msgid "No volume group found"
 msgstr "볼륨 그룹을 찾을 수 없습니다"
 
@@ -1932,43 +1899,43 @@ msgstr "볼륨 그룹을 찾을 수 없습니다"
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:12001 ../lvmcfg-utils.templates:15001
-#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:35001
-#: ../partman-lvm.templates:38001 ../partman-lvm.templates:43001
+#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:34001
+#: ../partman-lvm.templates:37001 ../partman-lvm.templates:42001
 msgid "No volume group has been found."
 msgstr "볼륨 그룹을 찾을 수 없습니다."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:12001 ../partman-lvm.templates:35001
+#: ../lvmcfg-utils.templates:12001 ../partman-lvm.templates:34001
 msgid "The volume group may have already been deleted."
 msgstr "볼륨 그룹이 이미 지워졌을 것입니다."
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:36001
+#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:35001
 msgid "Really delete the volume group?"
 msgstr "정말로 볼륨 그룹을 지우시겠습니까?"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:36001
+#: ../lvmcfg-utils.templates:13001 ../partman-lvm.templates:35001
 msgid "Please confirm the ${VG} volume group removal."
 msgstr "${VG} 볼륨 그룹을 지울 지 확인하십시오."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:37001
+#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:36001
 msgid "Error while deleting volume group"
 msgstr "볼륨 그룹을 지우는 데 오류가 발생했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:37001
+#: ../lvmcfg-utils.templates:14001 ../partman-lvm.templates:36001
 msgid ""
 "The selected volume group could not be deleted. One or more logical volumes "
 "may currently be in use."
@@ -1979,35 +1946,35 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:15001 ../partman-lvm.templates:38001
+#: ../lvmcfg-utils.templates:15001 ../partman-lvm.templates:37001
 msgid "No volume group can be deleted."
 msgstr "지울 수 있는 볼륨 그룹이 없습니다."
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:39001
+#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:38001
 msgid "Volume group to extend:"
 msgstr "늘릴 볼륨 그룹:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:39001
+#: ../lvmcfg-utils.templates:16001 ../partman-lvm.templates:38001
 msgid "Please select the volume group you wish to extend."
 msgstr "늘리려는 볼륨 그룹을 선택하십시오."
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:40001
+#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:39001
 msgid "Devices to add to the volume group:"
 msgstr "볼륨 그룹에 더할 장치:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:40001
+#: ../lvmcfg-utils.templates:17001 ../partman-lvm.templates:39001
 msgid "Please select the devices you wish to add to the volume group."
 msgstr "이 볼륨 그룹에 더할 장치를 선택하십시오."
 
@@ -2022,14 +1989,14 @@ msgstr "물리 볼륨을 선택하지 않았습니다. 볼륨 그룹 늘리기�
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:42001
+#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:41001
 msgid "Error while extending volume group"
 msgstr "볼륨 그룹 늘리는 데 오류가 발생했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:42001
+#: ../lvmcfg-utils.templates:19001 ../partman-lvm.templates:41001
 msgid ""
 "The physical volume ${PARTITION} could not be added to the selected volume "
 "group."
@@ -2038,21 +2005,21 @@ msgstr "${PARTITION} 물리 볼륨을 선택한 볼률 그룹에 더할 수 없�
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:43001
+#: ../lvmcfg-utils.templates:20001 ../partman-lvm.templates:42001
 msgid "No volume group can be reduced."
 msgstr "줄일 수 있는 볼륨 그룹이 없습니다."
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:44001
+#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:43001
 msgid "Volume group to reduce:"
 msgstr "줄일 볼륨 그룹:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:44001
+#: ../lvmcfg-utils.templates:21001 ../partman-lvm.templates:43001
 msgid "Please select the volume group you wish to reduce."
 msgstr "줄이려는 볼륨 그룹을 선택하십시오."
 
@@ -2077,7 +2044,7 @@ msgstr "볼륨 그룹에서 지우려는 장치를 선택하십시오."
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:23001 ../lvmcfg-utils.templates:24001
-#: ../partman-lvm.templates:33001 ../partman-lvm.templates:47001
+#: ../partman-lvm.templates:32001 ../partman-lvm.templates:46001
 msgid "Error while reducing volume group"
 msgstr "볼륨 그룹 줄이는 데 오류가 발생했습니다"
 
@@ -2095,7 +2062,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:24001 ../partman-lvm.templates:47001
+#: ../lvmcfg-utils.templates:24001 ../partman-lvm.templates:46001
 msgid ""
 "The physical volume ${PARTITION} could not be removed from the selected "
 "volume group."
@@ -2115,7 +2082,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:26001 ../partman-lvm.templates:48001
+#: ../lvmcfg-utils.templates:26001 ../partman-lvm.templates:47001
 msgid ""
 "No free volume groups were found for creating a new logical volume. Please "
 "create more physical volumes and volume groups, or reduce an existing volume "
@@ -2127,14 +2094,14 @@ msgstr ""
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:49001
+#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:48001
 msgid "Logical volume name:"
 msgstr "논리 볼륨 이름:"
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:49001
+#: ../lvmcfg-utils.templates:27001 ../partman-lvm.templates:48001
 msgid "Please enter the name you would like to use for the new logical volume."
 msgstr "새 논리 볼륨에 사용하려는 이름을 입력하십시오."
 
@@ -2150,14 +2117,14 @@ msgstr "새 논리 볼륨에 사용하려는 이름을 입력하십시오."
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:28001 ../lvmcfg-utils.templates:34001
-#: ../partman-lvm.templates:50001
+#: ../partman-lvm.templates:49001
 msgid "Volume group:"
 msgstr "볼륨 그룹:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:28001 ../partman-lvm.templates:50001
+#: ../lvmcfg-utils.templates:28001 ../partman-lvm.templates:49001
 msgid ""
 "Please select the volume group where the new logical volume should be "
 "created."
@@ -2166,14 +2133,14 @@ msgstr "논리 볼륨을 만들 볼륨 그룹을 선택하십시오."
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:51001
+#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:50001
 msgid "No logical volume name entered"
 msgstr "논리 볼륨 이름을 입력하지 않았습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:51001
+#: ../lvmcfg-utils.templates:29001 ../partman-lvm.templates:50001
 msgid "No name for the logical volume has been entered.  Please enter a name."
 msgstr "논리 볼륨의 이름을 입력하지 않았습니다.  이름을 입력하십시오."
 
@@ -2184,14 +2151,14 @@ msgstr "논리 볼륨의 이름을 입력하지 않았습니다.  이름을 입�
 #. Description
 #. :sl3:
 #: ../lvmcfg-utils.templates:30001 ../lvmcfg-utils.templates:32001
-#: ../partman-lvm.templates:52001 ../partman-lvm.templates:54001
+#: ../partman-lvm.templates:51001 ../partman-lvm.templates:53001
 msgid "Error while creating a new logical volume"
 msgstr "새 논리 볼륨을 만드는 데 오류가 발생했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:30001 ../partman-lvm.templates:52001
+#: ../lvmcfg-utils.templates:30001 ../partman-lvm.templates:51001
 msgid ""
 "The name ${LV} is already in use by another logical volume on the same "
 "volume group (${VG})."
@@ -2200,14 +2167,14 @@ msgstr "${LV} 이름이 같은 볼륨 그룹의 (${VG}) 다른 논리 볼륨에�
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:53001
+#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:52001
 msgid "Logical volume size:"
 msgstr "논리 볼륨 크기:"
 
 #. Type: string
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:53001
+#: ../lvmcfg-utils.templates:31001 ../partman-lvm.templates:52001
 msgid ""
 "Please enter the size of the new logical volume. The size may be entered in "
 "the following formats: 10K (Kilobytes), 10M (Megabytes), 10G (Gigabytes), "
@@ -2220,7 +2187,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:32001 ../partman-lvm.templates:54001
+#: ../lvmcfg-utils.templates:32001 ../partman-lvm.templates:53001
 msgid ""
 "Unable to create a new logical volume (${LV}) on ${VG} with the new size "
 "${SIZE}."
@@ -2246,14 +2213,14 @@ msgstr "지울 논리 볼륨이 들어 있는 볼륨 그룹을 선택하십시�
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:55001
+#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:54001
 msgid "No logical volume found"
 msgstr "논리 볼륨을 찾을 수 없습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:55001
+#: ../lvmcfg-utils.templates:35001 ../partman-lvm.templates:54001
 msgid ""
 "No logical volume has been found.  Please create a logical volume first."
 msgstr "논리 볼륨이 없습니다.  먼저 논리 볼륨을 만드십시오."
@@ -2261,7 +2228,7 @@ msgstr "논리 볼륨이 없습니다.  먼저 논리 볼륨을 만드십시오.
 #. Type: select
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:36001 ../partman-lvm.templates:56001
+#: ../lvmcfg-utils.templates:36001 ../partman-lvm.templates:55001
 msgid "Logical volume:"
 msgstr "논리 볼륨:"
 
@@ -2275,28 +2242,28 @@ msgstr "${VG} 볼륨 그룹에서 지울 논리 볼륨을 선택하십시오."
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:58001
+#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:57001
 msgid "Error while deleting the logical volume"
 msgstr "논리 볼륨을 지우는 데 오류가 발생했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:58001
+#: ../lvmcfg-utils.templates:37001 ../partman-lvm.templates:57001
 msgid "The logical volume (${LV}) on ${VG} could not be deleted."
 msgstr "${VG} 논리 그룹의 논리 볼륨을 (${LV}) 지울 수 없습니다."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:59001
+#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:58001
 msgid "No usable physical volumes found"
 msgstr "사용할 수 있는 물리 볼륨이 없습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:59001
+#: ../lvmcfg-utils.templates:38001 ../partman-lvm.templates:58001
 msgid ""
 "No physical volumes (i.e. partitions) were found in your system. All "
 "physical volumes may already be in use. You may also need to load some "
@@ -2309,14 +2276,14 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:60001
+#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:59001
 msgid "Logical Volume Manager not available"
 msgstr "LVM을 사용할 수 없습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:60001
+#: ../lvmcfg-utils.templates:39001 ../partman-lvm.templates:59001
 msgid ""
 "The current kernel doesn't support the Logical Volume Manager. You may need "
 "to load the lvm-mod module."
@@ -2405,6 +2372,57 @@ msgstr "RAID의 물리 볼륨"
 #: ../partman-md.templates:7001
 msgid "raid"
 msgstr "raid"
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid "Done setting up the partition"
+msgid "Remove existing software RAID partitions?"
+msgstr "파티션 준비를 마쳤습니다"
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid ""
+#| "The selected device already contains the following LVM logical volumes, "
+#| "volume groups and physical volumes which are about to be removed:"
+msgid ""
+"The selected device contains partitions used for software RAID devices. The "
+"following devices and partitions are about to be removed:"
+msgstr ""
+"선택한 장치에 들어 있는 다음 LVM 물리 볼륨, 볼륨 그룹, 물리 볼륨을 지울 예정"
+"입니다:"
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+msgid "Software RAID devices about to be removed: ${REMOVED_DEVICES}"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+msgid "Partitions used by these RAID devices: ${REMOVED_PARTITIONS}"
+msgstr ""
+
+#. Type: boolean
+#. Description
+#. :sl3:
+#: ../partman-md.templates:8001
+#, fuzzy
+#| msgid ""
+#| "Note that this will also permanently erase any data currently on the "
+#| "logical volumes."
+msgid ""
+"Note that this will also permanently erase any data currently on the "
+"software RAID devices."
+msgstr "또 이렇게 하면 논리 볼륨에 들어 있는 현재 데이터를 완전히 지웁니다."
 
 #. Type: text
 #. Description
@@ -2627,14 +2645,14 @@ msgstr "LVM"
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:25001
+#: ../partman-lvm.templates:24001
 msgid "Summary of current LVM configuration:"
 msgstr "현재 LVM 설정 정리:"
 
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:25001
+#: ../partman-lvm.templates:24001
 msgid ""
 " Free Physical Volumes:  ${FREE_PVS}\n"
 " Used Physical Volumes:  ${USED_PVS}\n"
@@ -2649,14 +2667,14 @@ msgstr ""
 #. Type: note
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:26001
+#: ../partman-lvm.templates:25001
 msgid "Current LVM configuration:"
 msgstr "현재 LVM 설정:"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:29001
+#: ../partman-lvm.templates:28001
 msgid ""
 "No physical volumes were selected. The creation of a new volume group has "
 "been aborted."
@@ -2667,14 +2685,14 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:30001
+#: ../partman-lvm.templates:29001
 msgid "No name for the volume group has been entered. Please enter a name."
 msgstr "볼륨 그룹의 이름을 입력하지 않았습니다. 이름을 입력하십시오."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:31001
+#: ../partman-lvm.templates:30001
 msgid ""
 "The selected volume group name is already in use. Please choose a different "
 "name."
@@ -2684,7 +2702,7 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:32001
+#: ../partman-lvm.templates:31001
 msgid ""
 "The selected volume group name overlaps with an existing device name. Please "
 "choose a different name."
@@ -2695,14 +2713,14 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:33001
+#: ../partman-lvm.templates:32001
 msgid "The volume group ${VG} could not be created."
 msgstr "${VG} 볼륨 그룹을 만들 수 없습니다."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:41001
+#: ../partman-lvm.templates:40001
 msgid ""
 "No physical volumes were selected. Extension of the volume group has been "
 "aborted."
@@ -2711,21 +2729,21 @@ msgstr "물리 볼륨을 선택하지 않았습니다. 볼륨 그룹 늘리기 �
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:44001
 msgid "Devices to remove from the volume group:"
 msgstr "볼륨 그룹에서 지울 장치:"
 
 #. Type: multiselect
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:45001
+#: ../partman-lvm.templates:44001
 msgid "Please select the devices you wish to remove from the volume group."
 msgstr "볼륨 그룹에서 지우려는 장치를 선택하십시오."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:46001
+#: ../partman-lvm.templates:45001
 msgid ""
 "No physical volumes were selected. Reduction of the volume group was aborted."
 msgstr "물리 볼륨을 선택하지 않았습니다. 볼륨 그룹 줄이기 작업을 중지합니다."
@@ -2733,42 +2751,42 @@ msgstr "물리 볼륨을 선택하지 않았습니다. 볼륨 그룹 줄이기 �
 #. Type: select
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:56001
+#: ../partman-lvm.templates:55001
 msgid "Please select the logical volume to delete."
 msgstr "볼륨 그룹에서 지울 논리 볼륨을 선택하십시오."
 
 #. Type: text
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:57001
+#: ../partman-lvm.templates:56001
 msgid "in VG ${VG}"
 msgstr "볼륨 그룹 ${VG}에 있음"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:61001
+#: ../partman-lvm.templates:60001
 msgid "Error while initializing physical volume"
 msgstr "물리 볼륨을 초기화하는 데 오류가 발생했습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:61001
+#: ../partman-lvm.templates:60001
 msgid "The physical volume ${PV} could not be initialized."
 msgstr "${PV} 물리 볼륨을 초기화할 수 없습니다."
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid "Invalid logical volume or volume group name"
 msgstr "사용할 수 없는 논리 볼륨 이름이거나 볼륨 그룹 이름입니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid ""
 "Logical volume or volume group names may only contain alphanumeric "
 "characters, hyphen, plus, period and underscore. They must be 128 characters "
@@ -2783,21 +2801,21 @@ msgstr ""
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:62001
+#: ../partman-lvm.templates:61001
 msgid "Please choose a different name."
 msgstr "다른 이름을 선택하십시오."
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Remove existing logical volume data?"
 msgstr "기존의 논리 볼륨 데이터를 지우시겠습니까?"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid ""
 "The selected device already contains the following LVM logical volumes, "
 "volume groups and physical volumes which are about to be removed:"
@@ -2808,28 +2826,28 @@ msgstr ""
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Logical volume(s) to be removed: ${LVTARGETS}"
 msgstr "지울 논리 볼륨: ${LVTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Volume group(s) to be removed: ${VGTARGETS}"
 msgstr "지울 볼륨 그룹: ${VGTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid "Physical volume(s) to be removed: ${PVTARGETS}"
 msgstr "지울 물리 볼륨: ${PVTARGETS}"
 
 #. Type: boolean
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:63001
+#: ../partman-lvm.templates:62001
 msgid ""
 "Note that this will also permanently erase any data currently on the logical "
 "volumes."
@@ -2838,14 +2856,14 @@ msgstr "또 이렇게 하면 논리 볼륨에 들어 있는 현재 데이터를 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:64001
+#: ../partman-lvm.templates:63001
 msgid "Unable to automatically remove LVM data"
 msgstr "LVM 데이터를 자동으로 지울 수 없습니다"
 
 #. Type: error
 #. Description
 #. :sl3:
-#: ../partman-lvm.templates:64001
+#: ../partman-lvm.templates:63001
 msgid ""
 "Because the volume group(s) on the selected device also consist of physical "
 "volumes on other devices, it is not considered safe to remove its LVM data "
