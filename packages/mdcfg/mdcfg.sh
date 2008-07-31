@@ -502,31 +502,30 @@ md_mainmenu() {
 
 ### Main of script ###
 
-# Try to load the necesarry modules.
-# Supported schemes: RAID 0, RAID 1, RAID 5
-depmod -a >/dev/null 2>&1
-modprobe md >/dev/null 2>&1 || modprobe md-mod >/dev/null 2>&1
-modprobe raid0 >/dev/null 2>&1
-modprobe raid1 >/dev/null 2>&1
-# kernels >=2.6.18 have raid456
-modprobe raid456 >/dev/null 2>&1 || modprobe raid5 >/dev/null 2>&1
+# Load the modules and scan for MD devices if needed
+if ! [ -e /proc/mdstat ]; then
+	# Try to load the necesarry modules.
+	depmod -a >/dev/null 2>&1
+	modprobe md-mod >/dev/null 2>&1
 
-# Try to detect MD devices, and start them
-# mdadm will fail if /dev/md does not already exist
-mkdir -p /dev/md
+	# Make sure that we have md-support
+	if [ ! -e /proc/mdstat ]; then
+		db_set mdcfg/nomd false
+		db_input high mdcfg/nomd
+		db_go
+		exit 0
+	fi
 
-log-output -t mdcfg --pass-stdout \
-	mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
+	# Try to detect MD devices, and start them
+	# mdadm will fail if /dev/md does not already exist
+	mkdir -p /dev/md
 
-log-output -t mdcfg \
-	mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
+	log-output -t mdcfg --pass-stdout \
+		mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
 
-# Make sure that we have md-support
-if [ ! -e /proc/mdstat ]; then
-	db_set mdcfg/nomd false
-	db_input high mdcfg/nomd
-	db_go
-	exit 0
+	log-output -t mdcfg \
+		mdadm --assemble --scan --run \
+		--config=/tmp/mdadm.conf --auto=yes
 fi
 
 # Force mdadm to be installed on the target system

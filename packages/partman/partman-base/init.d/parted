@@ -6,6 +6,15 @@ set -e
 
 ORIG_IFS="$IFS"
 
+is_inactive_md() {
+	local number
+	number=$(echo "$1" | sed -n -e 's,/dev/md/\?,,p')
+	if [ "$number" ] && ! grep -q "^md$number : active" /proc/mdstat; then
+		return 0
+	fi
+	return 1
+}
+
 part_of_sataraid () {
 	local raiddev
 	for raiddev in $(dmraid -r -c); do
@@ -52,8 +61,7 @@ if [ ! -f /var/run/parted_server.pid ]; then
 
 	IFS="$NL"
 	for partdev in $(parted_devices |
-		grep -v '^/dev/md' |
-		sed 's,^/dev/\(ide\|scsi\|[hs]d\),!/dev/\1,' |
+		sed 's,^/dev/\(ide\|scsi\|[hs]d\|md/\?[0-9]\+\),!/dev/\1,' |
 		sort |
 		sed 's,^!,,' ); do
 
@@ -68,6 +76,13 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		# Skip mtd devices since they aren't supported by parted
 		if echo $device | grep -q '/dev/mtd'; then
 			continue
+		fi
+
+		# Skip MD devices which are not active
+		if [ -e /proc/mdstat ]; then
+			if is_inactive_md $device; then
+				continue
+			fi
 		fi
 
 		# Skip devices that are part of a dmraid device

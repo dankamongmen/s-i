@@ -2,16 +2,25 @@
 
 . /lib/partman/lib/base.sh
 
-# Load modules
-#depmod -a 1>/dev/null 2>&1
-#modprobe md 1>/dev/null 2>&1 || modprobe md-mod 1>/dev/null 2>&1
-#
-## Load supported personalities
-#modprobe raid1 1>/dev/null 2>&1
-#
-## Detect and start MD devices
-#/sbin/mdadm --examine --scan --config=partitions >/tmp/mdadm.conf
-#/sbin/mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes
+# Check if we have RAID
+if [ ! -f /proc/mdstat ]; then
+	exit 0
+fi
+
+# Obtain the size of an MD device
+get_size () {
+	while [ -z "$(echo "$line" | grep "^md$NUMBER :")" ]; do
+		read line
+		[ $? -eq 1 ] && break  # EOF
+	done
+	read line
+	size=$(echo "$line" | sed -e 's/ blocks.*//')
+	# If the sed failed, the line didn't contain the size; just
+	# return 0 in that case.
+	if [ "$size" = "$line" ]; then
+		size=0
+	fi
+}
 
 # Mark all RAID partitions as being MD
 for dev in $DEVICES/*; do
@@ -28,6 +37,7 @@ for dev in $DEVICES/*; do
 	done
 	close_dialog
 
+	# Check if device/partitions are used for software RAID
 	for id in $partitions; do
 		md=no
 		open_dialog GET_FLAGS $id
@@ -43,38 +53,57 @@ for dev in $DEVICES/*; do
 		fi
 	done
 
-	# Next, check if the device is a part of an MD setup
-#	if [ -f device ]; then
-#		DEVICE=`sed -e "s/\/dev\///" device`
-#		grep -q "${DEVICE}" /proc/mdstat
-#		if [ $? -eq 0 ]; then
-#			open_dialog NEW_LABEL loop
-#			close_dialog
-#		fi
-#	fi
-done
+	# Check if the device is a software RAID device
+	if [ -f device ]; then
+		NUMBER=$(sed -e 's,/dev/md/\?,,' device)
+		if ! grep -q "^md$NUMBER :" /proc/mdstat; then
+			continue
+		fi
 
-# Create the raid devices
-# NOTE: /dev/md/X does not necessarily exist; /dev/mdX can exist alone
-#       (see #470374 for reference)
-#for i in $(grep md /proc/mdstat | \
-#	    sed -e 's/^\(md.*\) : active \([[:alnum:]]*\).*/\1/'); do
-#	NUMBER=$(echo $i | sed -e "s/^md//")
-#	DEVICE="$DEVICES/=dev=md$NUMBER"
-#	mkdir -p $DEVICE
-#	cd $DEVICE
-#	echo "/dev/md$NUMBER" > $DEVICE/device
-#	echo Unknown > $DEVICE/model
-#	echo "0" > $DEVICE/size
-#	open_dialog OPEN "/dev/md$NUMBER"
-#	read_line response
-#	close_dialog
-#	if [ "$response" = failed ]; then
-#		rm -rf $DEVICE
-#	fi
-#
-#	open_dialog NEW_LABEL loop
-#	close_dialog
-#done
+		# Set an appropriate value for device model
+		db_metaget partman-md/text/device description
+		echo "${RET}" > model
+
+		# fix size
+		get_size < /proc/mdstat
+		sector_size=$(grep " sectors" /proc/mdstat | sed -e 's/[^0-9]\+//g')
+		if [ -z "$sector_size" ]; then
+			sector_size=1024
+		fi
+		size=$(($size * $sector_size))
+		echo "$size" > size
+
+		# create a label
+		open_dialog NEW_LABEL loop
+		close_dialog
+		# find the free space
+		open_dialog PARTITIONS
+		free_space=''
+		while { read_line num id size type fs path name; [ "$id" ]; }; do
+			if [ "$fs" = free ]; then
+				free_space=$id
+				free_size=$size
+			fi
+		done
+		close_dialog
+		# create partition in the free space
+		if [ "$free_space" ]; then
+			open_dialog NEW_PARTITION primary ext2 $free_space full $free_size
+			read_line num id size type fs path name
+			close_dialog
+			if [ "$id" ]; then
+				open_dialog GET_FILE_SYSTEM $id
+				read_line filesystem
+				close_dialog
+				if [ "$filesystem" != none ]; then
+					open_dialog CHANGE_FILE_SYSTEM $id $filesystem
+					close_dialog
+				fi
+			fi
+		fi
+		open_dialog DISK_UNCHANGED
+		close_dialog
+	fi
+done
 
 exit 0
