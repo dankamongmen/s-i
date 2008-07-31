@@ -103,7 +103,7 @@ md_createmain() {
 		fi
 
 		case "$RAID_SEL" in
-		    RAID5|RAID1)
+		    RAID6|RAID5|RAID1)
 			md_create_array "$RAID_SEL" ;;
 		    RAID0)
 			md_create_raid0 ;;
@@ -207,6 +207,8 @@ md_create_array(){
 		MIN_SIZE=2 ;;
 	    RAID5)
 		MIN_SIZE=3 ;;
+	    RAID6)
+		MIN_SIZE=4 ;;
 	    *)
 		return ;;
 	esac
@@ -279,7 +281,7 @@ md_create_array(){
 	db_set mdcfg/raiddevs ""
 	SELECTED=0
 
-	# Loop until the correct number of active devices has been selected for RAID 5
+	# Loop until the correct number of active devices has been selected for RAID 5, 6
 	# Loop until at least one device has been selected for RAID 1
 	until ([ $LEVEL -ne 1 ] && [ $SELECTED -eq $DEV_COUNT ]) || \
 	      ([ $LEVEL -eq 1 ] && [ $SELECTED -gt 0 ] && [ $SELECTED -le $DEV_COUNT ]); do

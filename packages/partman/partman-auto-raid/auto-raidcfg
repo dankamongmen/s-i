@@ -8,7 +8,8 @@ create_raid() {
 	RAID_TYPE="$1"
 	DEV_COUNT="$2"
 
-	if [ "$DEV_COUNT" -lt 3 ] && [ $RAID_TYPE = "5" ] ; then
+	if ([ "$DEV_COUNT" -lt 3 ] && [ $RAID_TYPE = "5" ]) ||
+	   ([ "$DEV_COUNT" -lt 4 ] && [ $RAID_TYPE = "6" ]); then
 		db_input critical partman-auto-raid/notenoughparts
 		db_go partman-auto-raid/notenoughparts
 		exit 9
