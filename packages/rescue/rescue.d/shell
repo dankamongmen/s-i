@@ -7,7 +7,8 @@ chroot_has () {
 }
 
 chroot_run () {
-	debconf-disconnect chroot /target "$@"
+	db_subst rescue/shell/title DEVICE "$RESCUE_ROOTDEV"
+	start-shell rescue/shell/title chroot /target "$@"
 }
 
 # Work out a sensible $PATH with respect to /target.
