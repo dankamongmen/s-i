@@ -10,6 +10,13 @@ partman-lvm (62) UNRELEASED; urgency=low
     Breaks: partman-auto-lvm (<= 27)                         (Closes: #411943)
   * Preserve "align" capability in choose_partition/lvm/do_option.
     Requires cdebconf (>= 0.133).
+  * Activate Volume Groups during partman initialization: like MD devices,
+    there is now 2 different init.d scripts:
+      - lvm-devices, run before parted, is responsible for scanning and
+        activating Volume Groups,
+      - lvm, run later, will ensure that Physical Volumes have "lvm" as
+        method, and create free space for Logical Volumes if needed.
+  * Remove obsolete template partman-lvm/activevg.
 
  -- Jérémy Bobbio <lunar@debian.org>  Sat, 19 Jul 2008 21:44:37 +0000
 

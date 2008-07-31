@@ -10,21 +10,12 @@
 #####################################
 
 do_initial_setup() {
-	# load required kernel modules
-	depmod -a >/dev/null 2>&1
-	modprobe dm-mod >/dev/null 2>&1
-	modprobe lvm-mod >/dev/null 2>&1
-
 	# make sure that lvm is available
 	if ! grep -q "[0-9] device-mapper$" /proc/misc ; then
 		db_input critical partman-lvm/nolvm
 		db_go
 		exit 0
 	fi
-
-	# scan for logical volumes
-	log-output -t partman-lvm pvscan
-	log-output -t partman-lvm vgscan
 
 	# Commit the changes
 	confirm_changes partman-lvm || exit 0
@@ -39,22 +30,6 @@ do_initial_setup() {
 			exit 0
 		fi
 	done
-
-	if [ ! -f /var/cache/partman-lvm/first ]; then
-		# try to activate old volume groups
-		count=$(vg_list | wc -l)
-		if [ $count -gt 0 ]; then
-			db_subst partman-lvm/activevg COUNT $count
-			db_set partman-lvm/activevg false
-			db_input critical partman-lvm/activevg
-			db_go || true
-			db_get partman-lvm/activevg
-			[ "$RET" = true ] && log-output -t partman-lvm vgchange -a y
-			# TODO: We need to update and lock the devices that LVM just claimed
-		fi
-		# ask only the first time
-		mkdir -p /var/cache/partman-lvm && touch /var/cache/partman-lvm/first
-	fi
 }
 
 do_display() {

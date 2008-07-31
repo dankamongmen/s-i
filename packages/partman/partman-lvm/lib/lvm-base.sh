@@ -216,6 +216,11 @@ pv_get_info() {
 	return 0
 }
 
+# Get VG for a PV
+pv_get_vg() {
+	lvm_get_info pvs vg_name "$1"
+}
+
 # Get all PVs
 pv_list() {
 	# Scan the partman devices and find partitions that have lvm as method.
