@@ -3,9 +3,7 @@
 DESTDIR = debian/etch-support
 
 scripts = \
-	base-installer.d/01kernel_etchnhalf \
-	post-base-installer.d/01divert-debconf-apt-progress \
-	finish-install.d/91restore-debconf-apt-progress
+	base-installer.d/01kernel_etchnhalf
 
 build:
 	dh_testdir
@@ -25,7 +23,6 @@ install: build
 	install -m0755 partman_init.d/01replace_mke2fs_conf \
 		$(DESTDIR)/lib/partman/init.d/
 	install -m0644 mke2fs.conf $(DESTDIR)/usr/share/etch-support/
-	install -m0755 debconf-apt-progress $(DESTDIR)/usr/share/etch-support/
 
 binary-indep: build install
 	dh_testdir
