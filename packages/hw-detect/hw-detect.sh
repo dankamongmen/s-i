@@ -428,8 +428,21 @@ fi
 if [ "$PCMCIA_INIT" ]; then
 	if is_not_loaded pcmcia_core; then
 		db_input medium hw-detect/start_pcmcia || true
-		db_input low hw-detect/pcmcia_resources || true
+
+		# Ask resources at the same time on GTK+ frontend
+		if [ "$DEBIAN_FRONTEND" = "gtk" ]; then
+			db_input low hw-detect/pcmcia_resources || true
+		fi
 		db_go || true
+
+		# For other frontends, ask only if PCMCIA shoul be started
+		if ! [ "$DEBIAN_FRONTEND" = "gtk" ]; then
+			db_get hw-detect/start_pcmcia || true
+			if [ "$RET" = true ]; then
+				db_input low hw-detect/pcmcia_resources || true
+				db_go || true
+			fi
+		fi
 		if db_get hw-detect/pcmcia_resources && [ "$RET" ]; then
 			apply_pcmcia_resource_opts $RET
 		fi
