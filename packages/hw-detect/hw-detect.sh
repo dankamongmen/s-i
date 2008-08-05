@@ -447,7 +447,7 @@ if [ "$PCMCIA_INIT" ]; then
 			apply_pcmcia_resource_opts $RET
 		fi
 	fi
-	if db_go && db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
+	if db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
 		db_progress INFO hw-detect/pcmcia_step
 		$PCMCIA_INIT start 2>&1 | log
 		db_progress STEP $OTHER_STEPSIZE
