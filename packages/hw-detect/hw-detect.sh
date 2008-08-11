@@ -14,8 +14,6 @@ NEWLINE="
 "
 MISSING_MODULES_LIST=""
 SUBARCH="$(archdetect)"
-KERNEL_MAJOR="$(uname -r | cut -d . -f 1,2)"
-KERNEL_FLAVOUR="$(uname -r | cut -d - -f 3-)"
 
 finish_install=/usr/lib/finish-install.d/30hw-detect
 
@@ -35,10 +33,6 @@ log () {
 is_not_loaded() {
 	! ((cut -d" " -f1 /proc/modules | grep -q "^$1\$") || \
 	   (cut -d" " -f1 /proc/modules | sed -e 's/_/-/g' | grep -q "^$1\$"))
-}
-
-is_loaded() {
-	! (is_not_loaded "$1")
 }
 
 is_available () {
@@ -547,11 +541,6 @@ case "$(udpkg --print-architecture)" in
 	fi
 	;;
 esac
-
-# Install atl2-modules if it is in use
-if is_loaded "atl2"; then
-	apt-install atl2-modules-$KERNEL_MAJOR-$KERNEL_FLAVOUR
-fi
 
 # Some hardware may need extra time to initialize:
 
