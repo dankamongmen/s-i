@@ -44,7 +44,7 @@ download ()
 		$_wget -P $_target $_mirror/$i
 	done
 
-	for i in $(debootstrap --keep-debootstrap-dir --print-debs --arch $_arch $_dist $_target ); do
+	for i in $(debootstrap --keep-debootstrap-dir --print-debs --arch $_arch $_dist $_workdir); do
 		_file=$(grep "/${i}_.*_\(all\|${_arch}\)\.deb$" $_workdir/deblist)
 		$_wget -P $_target $_mirror/$_file
 	done
