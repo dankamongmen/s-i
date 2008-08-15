@@ -138,7 +138,7 @@ case "`archdetect`" in
 			fi
 			hostinfo=$path/rootfs/etc/host.info
 			if [ -e "$hostinfo" ]; then
-				HOSTNAME=$(sed '/^hostname/ {s/.*=//; p}' "$hostinfo")
+				HOSTNAME=$(sed -n '/^hostname/ {s/.*=//; p}' "$hostinfo")
 			fi
 			unset_matching_var "HOSTNAME" "KUROBOX-PRO"
 			if [ "$NET_CONFIG" != "static" ]; then
