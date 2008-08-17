@@ -69,6 +69,14 @@ case "$ARCHDETECT" in
 	modprobe ixp4xx-beeper || true
 	beep -e /dev/input/event0 -f 220 -l 500 -d 500 -r 3 || true
 	;;
+    arm*/iop32x)
+	machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+	case "$machine" in
+		"Thecus N2100")
+			beep -e /dev/input/event0 -f 220 -l 500 -d 500 -r 3 || true
+		;;
+	esac
+	;;
     arm*/orion5x)
 	# Buffalo devices
 	if type micro_evtd.command >/dev/null 2>&1; then
