@@ -70,6 +70,10 @@ case "$ARCHDETECT" in
 	beep -e /dev/input/event0 -f 220 -l 500 -d 500 -r 3 || true
 	;;
     arm*/orion5x)
+	# Buffalo devices
+	if type micro_evtd.command >/dev/null 2>&1; then
+		micro_evtd.command init
+	fi
 	# QNAP devices
 	if type qcommand >/dev/null 2>&1; then
 		qcommand statusled greenon
