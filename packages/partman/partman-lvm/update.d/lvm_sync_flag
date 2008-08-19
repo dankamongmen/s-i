@@ -24,15 +24,12 @@ if [ -f $id/method ]; then
 	method=$(cat $id/method)
 fi
 
-# As setting flags on RAID devices does not work and causes errors from
-# libparted, do not attempt to sync flags in case of LVM on RAID.
-# This is in line with the hacks in init.d/lvm and undo.d/lvm.
-# Note: must cover both /dev/md/X and /dev/mdX devices.
-if [ -f device ]; then
-	case $(cat device) in
-	    /dev/md*)
-		exit 0 ;;
-	esac
+# Don't fiddle with label on devices where there is no "real" partitioning
+open_dialog GET_LABEL_TYPE
+read_line label
+close_dialog
+if [ "$label" = loop ]; then
+	exit 0
 fi
 
 has_lvm=no
