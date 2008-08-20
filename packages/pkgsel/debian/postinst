@@ -92,6 +92,16 @@ fi
 
 partsdir="/usr/lib/pre-pkgsel.d"
 if [ -d "$partsdir" ]; then
+	scriptcount=$(ls "$partsdir"/* 2>/dev/null | wc -l)
+	if [ $scriptcount -lt 10 ]; then
+		scripts_range=$(($scriptcount * 10))
+	else
+		scripts_range=100
+	fi
+	scripts_start=$tasksel_start
+	tasksel_start=$(($scripts_start + $scripts_range))
+
+	scriptcur=0
 	for script in $(ls "$partsdir"/* 2>/dev/null); do
 		base=$(basename $script | sed 's/[0-9]*//')
 		if ! db_progress INFO pkgsel/progress/$base; then
@@ -108,6 +118,10 @@ if [ -d "$partsdir" ]; then
 		else
 			error "Unable to execute $script"
 		fi
+
+		# Advance progress bar
+		scriptcur=$(($scriptcur + 1))
+		db_progress SET $(($scripts_start + $scripts_range * $scriptcur / $scriptcount))
 	done
 fi
 
