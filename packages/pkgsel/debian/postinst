@@ -15,7 +15,7 @@ warning() {
 	log "warning: $@"
 }
 
-cleanup () {
+cleanup() {
 	for divert in $DIVERTS; do
 		rm -f "/target$divert"
 		log-output -t pkgsel chroot /target dpkg-divert \
@@ -23,7 +23,7 @@ cleanup () {
 	done
 }
 
-aptfailed () {
+aptfailed() {
 	ret=$?
 	if [ "$ret" != 0 ]; then
 		# In case packages failed to install, try to clean up.
@@ -92,13 +92,13 @@ fi
 
 partsdir="/usr/lib/pre-pkgsel.d"
 if [ -d "$partsdir" ]; then
-	for script in `ls "$partsdir"/* 2>/dev/null`; do
+	for script in $(ls "$partsdir"/* 2>/dev/null); do
 		base=$(basename $script | sed 's/[0-9]*//')
 		if ! db_progress INFO pkgsel/progress/$base; then
 			db_subst pkgsel/progress/fallback SCRIPT "$base"
 			db_progress INFO pkgsel/progress/fallback
 		fi
-		if [ -x "$script" ] ; then
+		if [ -x "$script" ]; then
 			# be careful to preserve exit code
 			if log-output -t pkgsel "$script"; then
 				:
