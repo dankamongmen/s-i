@@ -880,13 +880,6 @@ static int text_go(struct frontend *obj)
 				putchar('\n');
 				if (ret == DC_OK)
 					obj->qdb->methods.set(obj->qdb, q);
-				else if (ret == DC_GOBACK && q->prev != NULL)
-					q = q->prev;
-				else {
-					if (plugin)
-						plugin_delete(plugin);
-					return ret;
-				}
 				if (plugin)
 					plugin_delete(plugin);
 				break;
@@ -896,8 +889,10 @@ static int text_go(struct frontend *obj)
 			return DC_NOTIMPL;
 		if (ret == DC_OK)
 			q = q->next;
+		else if (ret == DC_GOBACK)
+			q = q->prev;
 	}
-	return DC_OK;
+	return ret;
 }
 
 static void text_progress_start(struct frontend *obj, int min, int max, const char *title)
