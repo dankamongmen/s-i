@@ -889,8 +889,11 @@ static int text_go(struct frontend *obj)
 			return DC_NOTIMPL;
 		if (ret == DC_OK)
 			q = q->next;
-		else if (ret == DC_GOBACK)
-			q = q->prev;
+		else if (ret == DC_GOBACK) {
+			do {
+			    q = q->prev;
+			} while (q != NULL && 0 == strcmp("error", q->template->type));
+		}
 	}
 	return ret;
 }

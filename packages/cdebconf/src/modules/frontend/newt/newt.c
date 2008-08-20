@@ -1126,8 +1126,11 @@ newt_go(struct frontend *obj)
         }
         if (ret == DC_OK)
             q = q->next;
-        else if (ret == DC_GOBACK)
-            q = q->prev;
+        else if (ret == DC_GOBACK) {
+            do {
+                q = q->prev;
+            } while (q != NULL && 0 == strcmp("error", q->template->type));
+	}
     }
     if (cleared && !data->scale_form)
         newtFinished();
