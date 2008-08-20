@@ -1119,15 +1119,6 @@ newt_go(struct frontend *obj)
                 newtPopHelpLine();
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
-                else if (ret == DC_GOBACK && q->prev != NULL)
-                    q = q->prev;
-                else {
-                    if (cleared && !data->scale_form)
-                        newtFinished();
-                    if (plugin)
-                        plugin_delete(plugin);
-                    return ret;
-                }
                 if (plugin)
                     plugin_delete(plugin);
                 break;
@@ -1135,10 +1126,12 @@ newt_go(struct frontend *obj)
         }
         if (ret == DC_OK)
             q = q->next;
+        else if (ret == DC_GOBACK)
+            q = q->prev;
     }
     if (cleared && !data->scale_form)
         newtFinished();
-    return DC_OK;
+    return ret;
 }
 
 static bool
