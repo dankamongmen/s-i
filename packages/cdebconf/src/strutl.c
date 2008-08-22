@@ -704,24 +704,32 @@ int stralign(char **strs, int count)
     return 0;
 }
 
-#define ROPE_SIZE 256
+#define INITIAL_ROPE_SIZE 128
 #define VAR_SIZE 100
+
+struct rope {
+    const char * str;
+    size_t len;
+};
 
 char * strexpand(const char * src, lookup_function func, void * user_data)
 {
-    struct {
-        const char * str;
-        size_t len;
-    } rope[ROPE_SIZE];
-    int rope_index = 0;
+    struct rope * rope;
+    void * tmp;
+    size_t rope_size = INITIAL_ROPE_SIZE;
+    unsigned int rope_index = 0;
     int i;
     int j;
     char var[VAR_SIZE];
     size_t dest_size = 1;
-    char * dest;
+    char * dest = NULL;;
     char * buf;
 
     if (NULL == src) {
+        return NULL;
+    }
+
+    if (NULL == (rope = malloc(sizeof (struct rope) * rope_size))) {
         return NULL;
     }
 
@@ -733,8 +741,13 @@ char * strexpand(const char * src, lookup_function func, void * user_data)
             rope[rope_index].len++;
             continue;
         }
-        if (rope_index >= ROPE_SIZE) {
-            return NULL;
+        if (rope_index >= rope_size - 2 /* room for skips */) {
+            rope_size = rope_size * 2;
+            tmp = realloc(rope, sizeof (struct rope) * rope_size);
+            if (NULL == tmp) {
+                goto end;
+            }
+            rope = tmp;
         }
         i += 2; /* skip "${" */
         for (j = 0; j < VAR_SIZE && '\0' != src[i] && '}' != src[i]; j++) {
@@ -763,7 +776,7 @@ char * strexpand(const char * src, lookup_function func, void * user_data)
 
     /* 2. dump rope content */
     if (NULL == (dest = malloc(dest_size))) {
-        return NULL;
+        goto end;
     }
     buf = dest;
     for (i = 0; i <= rope_index; i++) {
@@ -771,6 +784,9 @@ char * strexpand(const char * src, lookup_function func, void * user_data)
         buf += rope[i].len;
     }
     *buf = '\0';
+
+end:
+    free(rope);
     return dest;
 }
 
