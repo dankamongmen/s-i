@@ -843,6 +843,11 @@ command_data(struct confmodule *mod, char *arg)
             q->template = t;
             template_ref(t);
         }
+        else if (q->template != t) {
+            template_deref(q->template);
+            q->template = t;
+            template_ref(t);
+        }
         template_lset(t, NULL, item, value);
         mod->questions->methods.set(mod->questions, q);
         question_deref(q);
