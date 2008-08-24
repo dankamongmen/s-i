@@ -180,6 +180,8 @@ get_all_partitions(struct partition *parts[], const int max_parts, bool ignore_f
     while ((dev = ped_device_get_next(dev)) != NULL) {
         if (dev->read_only)
             continue;
+        if (strstr(dev->path, "/dev/mtd") == dev->path)
+            continue;
         if (!ped_disk_probe(dev))
             continue;
         disk = ped_disk_new(dev);
