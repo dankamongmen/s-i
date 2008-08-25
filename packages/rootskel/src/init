@@ -8,7 +8,7 @@ mount /proc
 mount /sys
 /lib/debian-installer/start-udev
 
-init='busybox init'
+init='/bin/busybox init'
 for i in $(cat /proc/cmdline); do
 	case $i in
 		init=*)
@@ -17,4 +17,4 @@ for i in $(cat /proc/cmdline); do
 	esac
 done
 debugshell "before init"
-exec $init
+exec /sbin/reopen-console $init
