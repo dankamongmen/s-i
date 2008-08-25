@@ -154,22 +154,22 @@ auto_lvm_perform() {
 		db_input medium partman-auto-lvm/new_vg_name || eval $noninteractive
 		db_go || return 1
 		db_get partman-auto-lvm/new_vg_name
-		VG_name="$RET"
+		defvgname="$RET"
 
 		# Check that the volume group name is not in use
-		if ! vg_get_info "$VG_name"; then
+		if ! vg_get_info "$defvgname"; then
 			break
 		fi
 		noninteractive="bail_out vg_exists"
 		db_register partman-auto-lvm/new_vg_name_exists partman-auto-lvm/new_vg_name
 	done
 
-	if vg_create "$VG_name" $pv_devices; then
-		perform_recipe_by_lvm $VG_name $recipe
+	if vg_create "$defvgname" $pv_devices; then
+		perform_recipe_by_lvm $defvgname $recipe
 	else
 		bail_out vg_create_error
 	fi
-	vg_lock_pvs "$VG_name" $pv_devices
+	vg_lock_pvs "$defvgname" $pv_devices
 
 	# Default to accepting the autopartitioning
 	menudir_default_choice /lib/partman/choose_partition finish finish || true
