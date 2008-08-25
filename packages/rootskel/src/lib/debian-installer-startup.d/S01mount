@@ -1,11 +1,3 @@
-# Make sure proc and devfs are mounted when we continue.
-if [ ! -d /proc/self ] ; then
-	mount -t proc proc /proc
-fi
-if grep -q '[[:space:]]sysfs' /proc/filesystems; then
-	mount -t sysfs sysfs /sys
-fi
-
 # Cleanup after the first init, which leaves the initrd mounted
 # on /initrd (if we're not using initramfs)
 umount /initrd/dev 2>/dev/null
