@@ -40,7 +40,7 @@ device_remove_md() {
 		db_reset partman-md/device_remove_md
 	fi
 	if [ "$confirm" != true ]; then
-		return 1
+		return 255
 	fi
 
 	if [ -e /lib/partman/lib/lvm-remove.sh ]; then

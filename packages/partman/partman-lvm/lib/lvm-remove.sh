@@ -82,7 +82,7 @@ device_remove_lvm() {
 		db_reset partman-lvm/device_remove_lvm
 	fi
 	if [ "$confirm" != true ]; then
-		return 1
+		return 255
 	fi
 
 	# We need devicemapper support here
