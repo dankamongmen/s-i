@@ -28,7 +28,6 @@ mark_partition_as_lvm() {
 	id=$1
 	shift
 
-	pv_devices="$pv_devices $path"
 	open_dialog GET_FLAGS $id
 	flags=$(read_paragraph)
 	close_dialog
@@ -128,7 +127,10 @@ create_primary_partitions() {
 		fi
 		shift; shift; shift; shift
 		if echo "$*" | grep -q "method{ lvm }"; then
+			pv_devices="$pv_devices $path"
 			mark_partition_as_lvm $id $*
+		elif echo "$*" | grep -q "method{ crypto }"; then
+			pv_devices="$pv_devices /dev/mapper/${path##*/}_crypt"
 		fi
 		setup_partition $id $*
 		primary=''
@@ -177,7 +179,10 @@ create_partitions() {
 	fi
 	shift; shift; shift; shift
 	if echo "$*" | grep -q "method{ lvm }"; then
+		pv_devices="$pv_devices $path"
 		mark_partition_as_lvm $id $*
+	elif echo "$*" | grep -q "method{ crypto }"; then
+		pv_devices="$pv_devices /dev/mapper/${path##*/}_crypt"
 	fi
 	setup_partition $id $*
 	free_space=$(partition_after $id)'

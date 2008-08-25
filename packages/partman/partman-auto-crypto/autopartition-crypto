@@ -37,15 +37,13 @@ done
 crypto_check_setup || exit 1
 crypto_setup no || exit 1
 
-# This is a kludge to workaround parted's refusal to allow dm devices
-# to be used for LVM
-for dev in $DEVICES/*; do
+# Fix method on PVs now that the crypto devices have been created
+# ($pv_devices has been properly set by auto_lvm_prepare)
+for pv in $pv_devices; do
+	dev="$(dev_to_partman $pv)"
 	[ -d "$dev" ] || continue
 	[ -f "$dev/crypt_realdev" ] || continue
 	[ -f "$dev/device" ] || continue
-
-	# Found it
-	pv_devices=$(cat $dev/device)
 
 	# We should have only one partition, but lets be thorough
 	cd $dev
