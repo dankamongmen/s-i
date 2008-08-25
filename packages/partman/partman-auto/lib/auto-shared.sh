@@ -213,3 +213,22 @@ select_auto_disk() {
 
 # TODO: Add a select_auto_disks() function
 # Note: This needs a debconf_multiselect equiv.
+
+# Maps a devfs name to a partman directory
+dev_to_partman () {
+	local dev_name="$1"
+
+	local mapped_dev_name="$(mapdevfs $dev_name)"
+	if [ -n "$mapped_dev_name" ]; then
+		dev_name="$mapped_dev_name"
+	fi
+
+	for dev in $DEVICES/*; do
+		# mapdevfs both to allow for different ways to refer to the
+		# same device using devfs, and to allow user input in
+		# non-devfs form
+		if [ "$(mapdevfs $(cat $dev/device))" = "$dev_name" ]; then
+			echo $dev
+		fi
+	done
+}
