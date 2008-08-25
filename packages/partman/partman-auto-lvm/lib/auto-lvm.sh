@@ -17,6 +17,21 @@ add_envelope() {
 	echo "$scheme${NL}100 1000 1000000000 ext3 \$primary{ } method{ $method }"
 }
 
+# Create the partitions needed by a recipe to hold all PVs
+# (need $scheme and $pv_devices in scope)
+auto_lvm_create_partitions() {
+	local dev free_size
+	dev=$1
+
+	get_last_free_partition_infos $dev
+	free_size=$(convert_to_megabytes $free_size)
+
+	expand_scheme
+
+	create_primary_partitions
+	create_partitions
+}
+
 auto_lvm_prepare() {
 	local main_device method size free_size normalscheme target
 	main_device=$1
@@ -48,7 +63,6 @@ auto_lvm_prepare() {
 		db_go || true
 		return 1
 	fi
-	free_size=$(convert_to_megabytes $free_size)
 
 	decode_recipe $recipe lvm
 
@@ -61,6 +75,12 @@ auto_lvm_prepare() {
 	if echo "$scheme" | grep lvmok | grep -q "[[:space:]]/boot[[:space:]]"; then
 		bail_out unusable_recipe
 	fi
+
+	# This variable will be used to store the partitions that will be LVM
+	# by create_partitions; zero it to be sure it's not cluttered.
+	# It will be used later to provide real paths to partitions to LVM.
+	# (still one atm)
+	pv_devices=''
 
 	### Situation
 	### We have a recipe foo from arch bar. we don't know anything other than what
@@ -97,18 +117,7 @@ auto_lvm_prepare() {
 	esac
 
 	scheme="$(add_envelope "$normalscheme")"
-
-	expand_scheme
-
-	clean_method
-
-	# This variable will be used to store the partitions that will be LVM
-	# by create_partitions; zero it to be sure it's not cluttered.
-	pv_devices=''
-
-	create_primary_partitions
-
-	create_partitions
+	auto_lvm_create_partitions $main_device
 
 	if ! confirm_changes partman-lvm; then
 		return 255
