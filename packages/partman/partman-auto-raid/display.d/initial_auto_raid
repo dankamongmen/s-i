@@ -6,24 +6,6 @@
 . /lib/partman/lib/base.sh
 . /lib/partman/lib/commit.sh
 
-dev_to_partman () {
-	local dev_name="$1"
-
-	local mapped_dev_name="$(mapdevfs $dev_name)"
-	if [ -n "$mapped_dev_name" ]; then
-		dev_name="$mapped_dev_name"
-	fi
-
-	for dev in $DEVICES/*; do
-		# mapdevfs both to allow for different ways to refer to the
-		# same device using devfs, and to allow user input in
-		# non-devfs form
-		if [ "$(mapdevfs $(cat $dev/device))" = "$dev_name" ]; then
-			echo $dev
-		fi
-	done
-}
-
 # See if we are supposed to run and only run once
 db_get partman-auto/method
 if [ "$RET" != raid ] || \
