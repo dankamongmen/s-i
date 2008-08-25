@@ -1,13 +1,15 @@
 ## Shared code for all guided partitioning components
 
-auto_init_disk() {
+auto_init_disks() {
 	local dev
-	dev="$1"
 
 	# Create new disk label; don't prompt for label
 	. /lib/partman/lib/disk-label.sh
-	prepare_new_labels "$dev" || return 1
-	create_new_label "$dev" no || return 1
+	prepare_new_labels "$@" || return 1
+
+	for dev in "$@"; do
+		create_new_label "$dev" no || return 1
+	done
 }
 
 get_last_free_partition_infos() {
