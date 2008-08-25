@@ -9,7 +9,16 @@ recipe=$2
 
 decode_recipe $recipe lvm
 
-scheme=$(echo "$scheme" | grep lvmok)
+lvmscheme=$(echo "$scheme" | grep lvmok)
+
+# Filter partitions for the current VG
+scheme=$(echo "$lvmscheme" | grep "in_vg{ *$VG_name *}")
+
+# Add partitions without an explicit VG if we are working on the default VG
+db_get partman-auto-lvm/new_vg_name
+if [ "$VG_name" = "$RET" ]; then
+	scheme="${scheme:+$scheme$NL}$(echo "$lvmscheme" | grep -v 'in_vg{')"
+fi
 
 partstep=$(echo "$scheme" | wc -l)
 partstep=$(expr $partstep + 3)
