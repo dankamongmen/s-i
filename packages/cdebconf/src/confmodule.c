@@ -181,15 +181,15 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
             DIE("Cannot execute client config script");
             break;
         case 0:
-            /* 20=read/to, 21=write/to, 22=read/from, 23=write/from, 24=null */
+            /* 50=read/to, 51=write/to, 52=read/from, 53=write/from, 54=null */
             config[4] = open("/dev/null", O_RDWR);
             for (i = 0; i < 5; i++)
-                check_fd(config[i], 20 + i, old);
+                check_fd(config[i], 50 + i, old);
             for (i = 0; i <= 2; i++)
-                dup2(old[i] ? i : 24, DEBCONF_OLD_FD_BASE + i);
-            dup2(20, 0); dup2(23, 1); dup2(23, 3);
+                dup2(old[i] ? i : 54, DEBCONF_OLD_FD_BASE + i);
+            dup2(50, 0); dup2(53, 1); dup2(53, 3);
             for (i = 0; i < 5; i++)
-                close(20 + i);
+                close(50 + i);
 
             args = (char **)malloc(sizeof(char *) * argc);
             for (i = 1; i < argc; i++)
