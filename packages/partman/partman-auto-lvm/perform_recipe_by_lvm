@@ -48,7 +48,11 @@ db_progress STEP 1
 
 name_number=1
 foreach_partition '
-	if echo $* | grep -q "mountpoint{"; then
+	if echo $* | grep -q "lv_name{"; then
+		lvname=$(echo $* | sed \
+			-e "s/.*lv_name{  *\([^ }]*\) *}.*/\1/g"
+		)
+	elif echo $* | grep -q "mountpoint{"; then
 		lvname=$(echo $* | sed \
 			-e "s/.*mountpoint{  *\([^ }]*\) *}.*/\1/g" \
 			-e "s!//!/!g" \
