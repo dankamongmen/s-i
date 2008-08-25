@@ -2,7 +2,7 @@
 
 # List PVs to be removed to initialize a device
 remove_lvm_find_vgs() {
-	local realdev vg pvs
+	local realdev vg pvs pv disk
 	realdev="$1"
 
 	# Check all VGs to see which PV needs removing
@@ -16,12 +16,20 @@ remove_lvm_find_vgs() {
 			continue
 		fi
 
+		pvs="$(echo -n "$pvs" | grep -v "$realdev")"
 		# Make sure the VG doesn't span any other disks
-		if $(echo -n "$pvs" | grep -q -v "$realdev"); then
-			log-output -t partman-lvm vgs
-			db_input critical partman-lvm/device_remove_lvm_span || true
-			db_go || true
-			return 1
+		if [ "$pvs" ]; then
+			# Except on disks that are going to be auto-partitioned
+			db_get partman-auto/disk || RET=""
+			for disk in $RET; do
+				pvs="$(echo -n "$pvs" | grep -v "$disk")"
+			done
+			if [ "$pvs" ]; then
+				log-output -t partman-lvm vgs
+				db_input critical partman-lvm/device_remove_lvm_span || true
+				db_go || true
+				return 1
+			fi
 		fi
 		echo "$vg"
 	done
