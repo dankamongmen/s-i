@@ -34,7 +34,7 @@ decode_recipe () {
 	if [ -z "$ram" ]; then
 		ram=$(grep ^MemTotal: /proc/meminfo | { read x y z; echo $y; })000
 	fi
-	ram=$(expr 0000000"$ram" : '0*\(..*\)......$') # convert to megabytes
+	ram=$(convert_to_megabytes $ram)
 	name="Unnamed.${unnamed}"
 	scheme=''
 	line=''

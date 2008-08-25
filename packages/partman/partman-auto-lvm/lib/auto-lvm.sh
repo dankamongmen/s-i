@@ -28,7 +28,7 @@ auto_lvm_prepare() {
 
 	target="$(humandev $(cat $dev/device)) - $(cat $dev/model)"
 	target="$target: $(longint2human $size)"
-	free_size=$(expr 0000000"$size" : '0*\(..*\)......$') # convert to megabytes
+	free_size=$(convert_to_megabytes $size)
 
 	choose_recipe lvm "$target" "$free_size" || return $?
 
@@ -40,7 +40,7 @@ auto_lvm_prepare() {
 		db_go || true
 		return 1
 	fi
-	free_size=$(expr 0000000"$free_size" : '0*\(..*\)......$') # convert to megabytes
+	free_size=$(convert_to_megabytes $free_size)
 
 	decode_recipe $recipe lvm
 

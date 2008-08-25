@@ -324,6 +324,11 @@ valid_human () {
 	return 1
 }
 
+convert_to_megabytes() {
+	local size="$1"
+	expr 0000000"$size" : '0*\(..*\)......$'
+}
+
 stop_parted_server () {
 	open_infifo
 	write_line "QUIT"

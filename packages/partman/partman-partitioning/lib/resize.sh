@@ -125,7 +125,7 @@ ask_for_size () {
 			    *%)
 				digits=$(expr "$RET" : '\([1-9][0-9]*\) *%$')
 				if [ "$digits" ]; then
-					maxmb=$(expr 0000000"$maxsize" : '0*\(..*\)......$')
+					maxmb=$(convert_to_megabytes $maxsize)
 					newsize=$(($digits * $maxmb / 100))000000
 				fi
 				;;
