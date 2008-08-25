@@ -10,6 +10,13 @@ bail_out() {
 	exit 1
 }
 
+# Add a partition to hold a Physical Volume to the given receipe
+# (Need $method in scope.)
+add_envelope() {
+	local scheme="$1"
+	echo "$scheme${NL}100 1000 1000000000 ext3 \$primary{ } method{ $method }"
+}
+
 auto_lvm_prepare() {
 	local main_device method size free_size normalscheme target
 	main_device=$1
@@ -89,8 +96,7 @@ auto_lvm_prepare() {
 		;;
 	esac
 
-	# Creating envelope
-	scheme="$normalscheme${NL}100 1000 1000000000 ext3 \$primary{ } method{ $method }"
+	scheme="$(add_envelope "$normalscheme")"
 
 	expand_scheme
 
