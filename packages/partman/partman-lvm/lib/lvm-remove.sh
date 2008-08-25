@@ -120,9 +120,7 @@ device_remove_lvm() {
 	done
 
 	if [ "$restart" ]; then
-		stop_parted_server
-		restart_partman || return 1
+		return 99
 	fi
-
 	return 0
 }

@@ -160,21 +160,39 @@ default_disk_label () {
 }
 
 prepare_new_labels() {
-	local dev devs
+	local dev devs restart code
 	devs="$*"
 
+	restart=
 	for dev in $devs; do
 		[ -d "$dev" ] || continue
 
 		if [ -e /lib/partman/lib/lvm-remove.sh ]; then
 			. /lib/partman/lib/lvm-remove.sh
-			device_remove_lvm "$dev" || return 1
+			device_remove_lvm "$dev"
+			code=$?
+			if [ $code = 99 ]; then
+				restart=1
+			elif [ $code != 0 ]; then
+				return $code
+			fi
 		fi
 		if [ -e /lib/partman/lib/md-remove.sh ]; then
 			. /lib/partman/lib/md-remove.sh
-			device_remove_md "$dev" || return 1
+			device_remove_md "$dev"
+			code=$?
+			if [ $code = 99 ]; then
+				restart=1
+			elif [ $code != 0 ]; then
+				return $code
+			fi
 		fi
 	done
+
+	if [ "$restart" ]; then
+		stop_parted_server
+		restart_partman || return 1
+	fi
 
 	return 0
 }

@@ -1,6 +1,6 @@
 # Wipes any traces of an active MD on the given device
 device_remove_md() {
-	local dev md_dev md_devs part used_parts type removed_devices confirm
+	local dev md_dev md_devs part used_parts type removed_devices confirm code
 	dev="$1"
 	cd $dev
 
@@ -46,7 +46,12 @@ device_remove_md() {
 	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
 		. /lib/partman/lib/lvm-remove.sh
 		for md_dev in $md_devs; do
-			device_remove_lvm "$md_dev" || return 1
+			device_remove_lvm "$md_dev"
+			code=$?
+			# Ignore "ok" and "restart" return codes
+			if [ $code != 0 ] && [ $code != 99 ]; then
+				return $code
+			fi
 		done
 	fi
 	for md_dev in $md_devs; do
@@ -58,9 +63,6 @@ device_remove_md() {
 			--zero-superblock --force $part || return 1
 	done
 
-	# Restart partman to get rid of stale informations
-	stop_parted_server
-	restart_partman || return 1
-
-	return 0
+	# Please restart partman
+	return 99
 }
