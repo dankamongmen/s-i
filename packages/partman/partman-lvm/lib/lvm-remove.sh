@@ -12,7 +12,7 @@ remove_lvm_find_vgs() {
 	for vg in $(vg_list); do
 		pvs="$(vg_list_pvs $vg)"
 
-		if ! $(echo "$pvs" | grep -q "$realdev"); then
+		if ! echo "$pvs" | grep -q "$realdev"; then
 			continue
 		fi
 
