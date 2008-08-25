@@ -11,12 +11,12 @@ bail_out() {
 }
 
 auto_lvm_prepare() {
-	local dev method size free_size normalscheme target
-	dev=$1
+	local main_device method size free_size normalscheme target
+	main_device=$1
 	method=$2
 
-	[ -f $dev/size ] || return 1
-	size=$(cat $dev/size)
+	[ -f $main_device/size ] || return 1
+	size=$(cat $main_device/size)
 
 	# Be sure the modules are loaded
 	modprobe dm-mod >/dev/null 2>&1 || true
@@ -26,14 +26,14 @@ auto_lvm_prepare() {
 		log-output -t update-dev update-dev
 	fi
 
-	target="$(humandev $(cat $dev/device)) - $(cat $dev/model)"
+	target="$(humandev $(cat $main_device/device)) - $(cat $main_device/model)"
 	target="$target: $(longint2human $size)"
 	free_size=$(convert_to_megabytes $size)
 
 	choose_recipe lvm "$target" "$free_size" || return $?
 
-	auto_init_disks "$dev" || return $?
-	get_last_free_partition_infos $dev
+	auto_init_disks "$main_device" || return $?
+	get_last_free_partition_infos $main_device
 
 	# Check if partition is usable; use existing partman-auto template as we depend on it
 	if [ "$free_type" = unusable ]; then
@@ -110,7 +110,7 @@ auto_lvm_prepare() {
 
 	# Write the partition tables
 	disable_swap
-	cd $dev
+	cd $main_device
 	open_dialog COMMIT
 	close_dialog
 
