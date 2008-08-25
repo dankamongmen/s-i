@@ -31,7 +31,7 @@ remove_lvm_find_vgs() {
 # Normally called from a function that initializes a device
 # Note: if the device contains an empty PV, it will not be removed
 device_remove_lvm() {
-	local dev realdev tmpdev restart
+	local dev realdev tmpdev restart confirm
 	local pvs pv vgs vg lvs lv pvtext vgtext lvtext
 	dev="$1"
 	cd $dev
@@ -66,13 +66,22 @@ device_remove_lvm() {
 		pvtext="${pvtext:+$pvtext, }$pv"
 	done
 
-	db_subst partman-lvm/device_remove_lvm LVTARGETS "$lvtext"
-	db_subst partman-lvm/device_remove_lvm VGTARGETS "$vgtext"
-	db_subst partman-lvm/device_remove_lvm PVTARGETS "$pvtext"
-	db_input critical partman-lvm/device_remove_lvm
-	db_go || return 1
-	db_get partman-lvm/device_remove_lvm
-	if [ "$RET" != true ]; then
+	db_fget partman-lvm/device_remove_lvm seen
+	if [ $RET = true ]; then
+		# Answer has been preseeded
+		db_get partman-lvm/device_remove_lvm
+		confirm=$RET
+	else
+		db_subst partman-lvm/device_remove_lvm LVTARGETS "$lvtext"
+		db_subst partman-lvm/device_remove_lvm VGTARGETS "$vgtext"
+		db_subst partman-lvm/device_remove_lvm PVTARGETS "$pvtext"
+		db_input critical partman-lvm/device_remove_lvm
+		db_go || return 1
+		db_get partman-lvm/device_remove_lvm
+		confirm=$RET
+		db_reset partman-lvm/device_remove_lvm
+	fi
+	if [ "$confirm" != true ]; then
 		return 1
 	fi
 
