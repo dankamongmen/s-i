@@ -159,21 +159,32 @@ default_disk_label () {
 	esac
 }
 
+prepare_new_labels() {
+	local dev devs
+	devs="$*"
+
+	for dev in $devs; do
+		[ -d "$dev" ] || continue
+
+		if [ -e /lib/partman/lib/lvm-remove.sh ]; then
+			. /lib/partman/lib/lvm-remove.sh
+			device_remove_lvm "$dev" || return 1
+		fi
+		if [ -e /lib/partman/lib/md-remove.sh ]; then
+			. /lib/partman/lib/md-remove.sh
+			device_remove_md "$dev" || return 1
+		fi
+	done
+
+	return 0
+}
+
 create_new_label() {
 	local dev default_type chosen_type types
 	dev="$1"
 	prompt_for_label="$2"
 
 	[ -d "$dev" ] || return 1
-
-	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
-		. /lib/partman/lib/lvm-remove.sh
-		device_remove_lvm "$dev" || return 1
-	fi
-	if [ -e /lib/partman/lib/md-remove.sh ]; then
-		. /lib/partman/lib/md-remove.sh
-		device_remove_md "$dev" || return 1
-	fi
 
 	cd $dev
 

@@ -6,6 +6,7 @@ auto_init_disk() {
 
 	# Create new disk label; don't prompt for label
 	. /lib/partman/lib/disk-label.sh
+	prepare_new_labels "$dev" || return 1
 	create_new_label "$dev" no || return 1
 
 	cd $dev
