@@ -7,10 +7,4 @@ method="lvm"
 
 auto_lvm_prepare $dev $method || exit $?
 
-# lvm doesn't like devfs paths
-for pv in $devfspv_devices; do
-	realpath="$(mapdevfs "$pv")"
-	pv_devices="$pv_devices $realpath"
-done
-
 auto_lvm_perform || exit 1

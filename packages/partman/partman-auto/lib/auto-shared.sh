@@ -28,7 +28,7 @@ mark_partition_as_lvm() {
 	id=$1
 	shift
 
-	devfspv_devices="$devfspv_devices $path"
+	pv_devices="$pv_devices $path"
 	open_dialog GET_FLAGS $id
 	flags=$(read_paragraph)
 	close_dialog

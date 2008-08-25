@@ -97,9 +97,7 @@ auto_lvm_prepare() {
 
 	# This variable will be used to store the partitions that will be LVM
 	# by create_partitions; zero it to be sure it's not cluttered.
-	# It will be used later to provide real paths to partitions to LVM.
-	# (still one atm)
-	devfspv_devices=''
+	pv_devices=''
 
 	create_primary_partitions
 
