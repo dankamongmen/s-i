@@ -8,6 +8,11 @@ auto_init_disk() {
 	. /lib/partman/lib/disk-label.sh
 	prepare_new_labels "$dev" || return 1
 	create_new_label "$dev" no || return 1
+}
+
+get_last_free_partition_infos() {
+	local dev
+	dev="$1"
 
 	cd $dev
 
