@@ -1,6 +1,6 @@
 # Wipes any traces of an active MD on the given device
 device_remove_md() {
-	local dev md_dev md_devs part used_parts type removed_devices
+	local dev md_dev md_devs part used_parts type removed_devices confirm
 	dev="$1"
 	cd $dev
 
@@ -25,19 +25,24 @@ device_remove_md() {
 		removed_devices="${removed_devices:+$removed_devices, }${md_dev#/dev/} ($type)"
 	done
 
-	db_subst partman-md/device_remove_md REMOVED_DEVICES "$removed_devices"
-	db_subst partman-md/device_remove_md REMOVED_PARTITIONS \
-		"$(echo $used_parts | sed -e 's/ /, /')"
-	db_input critical partman-md/device_remove_md
-	db_go || return 1
-	db_get partman-md/device_remove_md
-
-	if [ "$RET" = true ]; then
-		db_reset partman-md/device_remove_md
+	db_fget partman-md/device_remove_md seen
+	if [ $RET = true ]; then
+		db_get partman-md/device_remove_md
+		confirm=$RET
 	else
+		db_subst partman-md/device_remove_md REMOVED_DEVICES "$removed_devices"
+		db_subst partman-md/device_remove_md REMOVED_PARTITIONS \
+			"$(echo $used_parts | sed -e 's/ /, /')"
+		db_input critical partman-md/device_remove_md
+		db_go || return 1
+		db_get partman-md/device_remove_md
+		confirm=$RET
 		db_reset partman-md/device_remove_md
+	fi
+	if [ "$confirm" != true ]; then
 		return 1
 	fi
+
 	if [ -e /lib/partman/lib/lvm-remove.sh ]; then
 		. /lib/partman/lib/lvm-remove.sh
 		for md_dev in $md_devs; do
