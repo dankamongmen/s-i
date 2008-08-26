@@ -55,13 +55,21 @@ in_list() {
 }
 
 snapshot_devs() {
-	echo -n `grep : /proc/net/dev | sort | cut -d':' -f1`
+	echo -n `grep : /proc/net/dev | cut -d':' -f1`
 }
 
 compare_devs() {
 	local olddevs="$1"
 	local devs="$2"
-	echo "${devs#$olddevs}" | sed -e 's/^ //'
+	local dev newdevs
+
+	newdevs=
+	for dev in $devs; do
+		if ! echo " $olddevs " | grep -q " $dev "; then
+			newdevs="${newdevs:+$newdevs }$dev"
+		fi
+	done
+	echo "$newdevs"
 }
 
 load_module() {
