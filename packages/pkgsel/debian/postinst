@@ -73,13 +73,13 @@ fi
 
 # upgrade_types are incompatible with Etch and upgrade option is in
 # general untested for Etch installs, therefore skip
-if ! db_get mirror/suite || [ -z "$RET" ]; then
-	db_get cdrom/suite
+if ! db_get mirror/codename || [ -z "$RET" ]; then
+	db_get cdrom/codename
 fi
-suite=$RET
+codename=$RET
 
 db_get pkgsel/upgrade
-if [ "$RET" = none ] || [ "$suite" = etch ]; then
+if [ "$RET" = none ] || [ "$codename" = etch ]; then
 	tasksel_start=50
 else
 	upgrade_type="$RET"
