@@ -243,3 +243,11 @@ verify_hostname() {
 	return 0
 }
 
+# Sanity check for static IP configuration: netcfg will prompt for an IP
+# address and nameserver if they are not set, so use DHCP in that case.
+sanity_check_static_config() {
+	if [ "$NONINTERACTIVE" = "yes" ] && [ -z "$IPADDRESS" -o -z "$NAMESERVERS" ]; then
+		NET_CONFIG=dhcp
+	fi
+}
+

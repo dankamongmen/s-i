@@ -51,6 +51,7 @@ case "`archdetect`" in
 					fi
 				fi
 			fi
+			sanity_check_static_config
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.77
 				NETMASK=255.255.255.0
@@ -90,6 +91,7 @@ case "`archdetect`" in
 				NET_CONFIG=static
 				parse_ifconfig $path/mnt/cfg/cfg_nic0
 			fi
+			sanity_check_static_config
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.100
 				NETMASK=255.255.255.0
@@ -144,6 +146,7 @@ case "`archdetect`" in
 				HOSTNAME=$(sed -n '/^hostname/ {s/.*=//; p}' "$hostinfo")
 			fi
 			unset_matching_var "HOSTNAME" "KUROBOX-PRO"
+			sanity_check_static_config
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.11.150
 				NETMASK=255.255.255.0
@@ -178,6 +181,7 @@ case "`archdetect`" in
 			else
 				NET_CONFIG=dhcp
 			fi
+			sanity_check_static_config
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.100
 				NETMASK=255.255.255.0
@@ -217,6 +221,7 @@ case "`archdetect`" in
 			else
 				NET_CONFIG=dhcp
 			fi
+			sanity_check_static_config
 			if [ "$NET_CONFIG" != "static" ]; then
 				IPADDRESS=192.168.1.100
 				NETMASK=255.255.255.0
