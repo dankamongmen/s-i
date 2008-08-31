@@ -161,14 +161,15 @@ add() {
 	fi
 }
 
-# Output a variable to a preseed file - even if the variable is empty
+# Output a variable to a preseed file or, iv the variable is empty, mark
+# the debconf variable as seen.
 # $1 = file name (stdout if this is empty)
 # $2 = debconf variable name
 # $3 = debconf variable type
 # $4 = variable
-really_add() {
+add_or_set_seen() {
 	if [ -z "$4" -a "$NONINTERACTIVE" = "yes" ]; then
-		add "$1" "$2" "$3" '""'
+		add "$1" "$2" "seen" "true"
 	else
 		add "$1" "$2" "$3" "$4"
 	fi
@@ -178,8 +179,8 @@ really_add() {
 # $1 = file name (stdout if this is empty)
 write_static_network() {
 	add "$1" "netcfg/get_ipaddress" "string" "$IPADDRESS"
-	really_add "$1" "netcfg/get_netmask" "string" "$NETMASK"
-	really_add "$1" "netcfg/get_gateway" "string" "$GATEWAY"
+	add_or_set_seen "$1" "netcfg/get_netmask" "string" "$NETMASK"
+	add_or_set_seen "$1" "netcfg/get_gateway" "string" "$GATEWAY"
 	add "$1" "netcfg/get_nameservers" "string" "$NAMESERVERS"
 }
 

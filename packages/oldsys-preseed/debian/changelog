@@ -1,3 +1,16 @@
+oldsys-preseed (2.4) UNRELEASED; urgency=low
+
+  * Stop preseeding the string "" when the netmask or gateway are empty
+    because netcfg will not treat this as the empty string as I assumed
+    but will complain about an invalid IP address.  Instead, mark the
+    variable as seen, thereby letting netcfg calculate appropriate
+    values.  This is the behaviour you'd expect for the netmask, but
+    it's not ideal in the case of the gateway -- unfortunately, it seems
+    it's impossible to create a preseed file that tells netcfg not to
+    use a gateway (see #497285).
+
+ -- Martin Michlmayr <tbm@cyrius.com>  Sun, 31 Aug 2008 17:33:26 +0300
+
 oldsys-preseed (2.3) unstable; urgency=low
 
   * Don't prompt for missing NPE-B firmware to allow installations
