@@ -60,7 +60,19 @@ static int internal_di_exec (const char *path, bool use_path, const char *const 
   }
 
   for (i = 0; i < pipes; i++)
-    pipe (&fds[i * 2]);
+  {
+    if (pipe (&fds[i * 2]) < 0)
+    {
+      int j;
+      di_log (DI_LOG_LEVEL_WARNING, "pipe failed");
+      for (j = 0; j < i; j++)
+      {
+        close (fds[i * 2]);
+        close (fds[i * 2 + 1]);
+      }
+      return -1;
+    }
+  }
 
   pid = fork ();
 

@@ -244,9 +244,15 @@ cleanup:
 static void callback (const di_rstring *field, const di_rstring *value, void *data)
 {
   FILE *f = data;
-  fwrite (field->string, field->size, 1, f);
+  if (fwrite (field->string, field->size, 1, f) < 1)
+  {
+    /* FIXME: can't handle write errors, but appease _FORTIFY_SOURCE=2 */
+  }
   fputs (": ", f);
-  fwrite (value->string, value->size, 1, f);
+  if (fwrite (value->string, value->size, 1, f) < 1)
+  {
+    /* FIXME: can't handle write errors, but appease _FORTIFY_SOURCE=2 */
+  }
   fputs ("\n", f);
 }
 
