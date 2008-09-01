@@ -237,7 +237,7 @@ void di_packages_parser_read_name (data, fip, field_modifier, value, user_data)
   const di_parser_fieldinfo *fip __attribute__ ((unused));
   di_rstring *field_modifier __attribute__ ((unused));
   di_rstring *value;
-  void *user_data __attribute__ ((unused));
+  void *user_data;
 {
   internal_di_package_parser_data *parser_data = user_data;
   di_package *p;
