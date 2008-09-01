@@ -22,6 +22,13 @@ if db_get hw-detect/load-ide && [ "$RET" = true ]; then
 	LOAD_IDE=1
 fi
 
+# Check for virtio devices
+if [ -d /sys/bus/pci/devices ] && \
+	grep -q 0x1af4 /sys/bus/pci/devices/*/vendor 2>/dev/null && \
+	! grep -q ^virtio_ /proc/modules; then
+	anna-install virtio-modules || true
+fi
+
 if [ -x /sbin/depmod ]; then
 	depmod -a > /dev/null 2>&1 || true
 fi
