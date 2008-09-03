@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-08-17 00:09+0000\n"
-"PO-Revision-Date: 2008-05-09 11:34+0900\n"
+"PO-Revision-Date: 2008-08-24 22:54+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -523,7 +523,7 @@ msgstr ""
 "現在の Linux カーネル (2.6.9 以降) では、最大 (インストーラがデフォルトで指定"
 "するオプションを含め) コマンドラインオプションを 32 個、環境オプションを 32 "
 "個受け取れます。この数を超えると、カーネルはパニック (クラッシュ) してしまい"
-"ます。(初期のカーネルではこの数字がもっと少ないです)"
+"ます (以前のカーネルではこの数字がもっと少ないです)。"
 
 #. Tag: para
 #: preseed.xml:357
@@ -608,12 +608,12 @@ msgstr ""
 "は、将来のバージョンでコードネームを指定して移行していけるように、"
 "<literal>&releasename;</literal> ディレクトリが含まれています。<literal>/./</"
 "literal> は、その後に続くパスが確定するように、ルートからの相対パスを示しま"
-"す (preseed/include や preseed/run で使用)。これにより、完全な URLや / で始ま"
-"るパス、前回 preseed が見つかった場所からの相対パスでファイルを指定できます。"
-"スクリプトの階層構造を壊さずに新しい場所に移動できる (例えば ウェブサーバで開"
-"始し、USB メモリにコピーする)、よりポータブルなスクリプトを構成するのに便利で"
-"す。このサンプルでは、preseed ファイルの <literal>preseed/run</literal> に "
-"<literal>/scripts/late_command.sh</literal> が設定されている場合、"
+"す (preseed/include や preseed/run で使用)。これにより、完全な URL や / で始"
+"まるパス、前回 preseed が見つかった場所からの相対パスでファイルを指定できま"
+"す。スクリプトの階層構造を壊さずに新しい場所に移動できる (例えば ウェブサーバ"
+"で開始し、USB メモリにコピーする)、よりポータブルなスクリプトを構成するのに便"
+"利です。このサンプルでは、preseed ファイルの <literal>preseed/run</literal> "
+"に <literal>/scripts/late_command.sh</literal> が設定されている場合、"
 "<literal>http://autoserver.example.com/d-i/&releasename;/./scripts/"
 "late_command.sh</literal> からファイルを取得します。"
 
@@ -1351,7 +1351,7 @@ msgstr "以下の debconf 変数は、ネットワークの設定と関係があ
 
 #. Tag: screen
 #: preseed.xml:754
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# netcfg will choose an interface that has link if possible. This makes "
 #| "it\n"
@@ -1476,7 +1476,12 @@ msgstr ""
 "# Disable that annoying WEP key dialog.\n"
 "d-i netcfg/wireless_wep string\n"
 "# The wacky dhcp hostname that some ISPs use as a password of sorts.\n"
-"#d-i netcfg/dhcp_hostname string radish"
+"#d-i netcfg/dhcp_hostname string radish\n"
+"\n"
+"# If non-free firmware is needed for the network or other hardware, you can\n"
+"# configure the installer to always try to load it, without prompting. Or\n"
+"# change to false to disable asking.\n"
+"#d-i hw-detect/load_firmware boolean true"
 
 #. Tag: title
 #: preseed.xml:759
@@ -1626,7 +1631,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:816
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1774,10 +1779,8 @@ msgstr ""
 "# Alternatively, you can specify a disk to partition. The device name must\n"
 "# be given in traditional non-devfs format.\n"
 "# For example, to use the first SCSI/SATA hard disk:\n"
-"d-i partman-auto/disk string /dev/sda\n"
-"# Note: If you want to use whatever disk is available, no matter\n"
-"# what its device name, comment the line above out. This will only work if\n"
-"# the system only has one disk.\n"
+"# Note: A disk must be specified, unless the system has only one disk.\n"
+"#d-i partman-auto/disk string /dev/sda\n"
 "# In addition, you'll need to specify the method to use.\n"
 "# The presently available methods are: \"regular\", \"lvm\" and \"crypto\"\n"
 "d-i partman-auto/method string lvm\n"
@@ -2034,8 +2037,8 @@ msgid ""
 "text values or MD5 <emphasis>hashes</emphasis>."
 msgstr ""
 "root アカウント用のパスワードや、最初のユーザアカウントの名前・パスワードは "
-"preseed できます。パスワードには、クリアテキストか MD5 <emphasis>ハッシュ</"
-"emphasis>のどちらかを使用できます。"
+"preseed できます。パスワードには、平文か MD5 <emphasis>ハッシュ</emphasis>の"
+"どちらかを使用できます。"
 
 #. Tag: para
 #: preseed.xml:874
@@ -2332,7 +2335,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:980
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2374,6 +2377,9 @@ msgstr ""
 "\n"
 "# Individual additional packages to install\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
+"# Whether to upgrade packages after debootstrap.\n"
+"# Allowed values: none, safe-upgrade, full-upgrade\n"
+"#d-i pkgsel/upgrade select none\n"
 "\n"
 "# Some versions of the installer can report back on what software you have\n"
 "# installed, and what software you use. The default is not to report back,\n"
@@ -2473,7 +2479,7 @@ msgstr "インストールの仕上げ"
 
 #. Tag: screen
 #: preseed.xml:1001
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# During installations from serial console, the regular virtual consoles\n"
 #| "# (VT1-VT6) are normally disabled in /etc/inittab. Uncomment the next\n"
@@ -2524,7 +2530,9 @@ msgstr ""
 "\n"
 "# This is how to make the installer shutdown when finished, but not\n"
 "# reboot into the installed system.\n"
-"#d-i debian-installer/exit/halt boolean true"
+"#d-i debian-installer/exit/halt boolean true\n"
+"# This will power off the machine instead of just halting it.\n"
+"#d-i debian-installer/exit/poweroff boolean true"
 
 #. Tag: title
 #: preseed.xml:1006
