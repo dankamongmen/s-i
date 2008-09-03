@@ -1,4 +1,4 @@
-LINGUAS=be bg ca cs de en es eu fi fr gl he hu it ja ko lt nb nl pl pt pt_BR ru sk sq sv th tr zh_CN zh_TW
+LINGUAS=be bg ca cs de el en es eu fi fr gl he hu it ja ko lt nb nl pl pt pt_BR ru sk sq sv th tr zh_CN zh_TW
 
 all: templates/all.nsh templates/dialog.nsh po/messages.pot
 
