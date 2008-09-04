@@ -250,14 +250,17 @@ set_default_continent() {
 	done
 }
 
+# Test if a locale includes a country part
+is_complete_locale() {
+	echo "$1" | grep -q "_"
+}
+
 refine_locale() {
 	local old_locale entry
 	old_locale=$1
 
 	for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	             ${LANGUAGE}_${COUNTRYCODE}; do
-		# Is the locale we inherited really a complete locale?
-		LOCALE_LANGUAGECHOOSER_COMPLETE=$(echo $old_locale | grep "_" || true)
 		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
 			# Special handling of cases where the locale
 			# in languagechooser is NOT the combination of
@@ -268,7 +271,7 @@ refine_locale() {
 			if [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" ] && \
 			   [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
 			   [ "${LANGUAGE}_${COUNTRYCODE}" != "$old_locale" ] && \
-			   [ "$LOCALE_LANGUAGECHOOSER_COMPLETE" ]; then
+			   is_complete_locale "$old_locale"; then
 				# Explanation: we revert back to the
 				# locale inherited from the language
 				# step if the country step did NOT
@@ -446,7 +449,7 @@ while :; do
 		# The next "if" test will be false and "askedshort" remains
 		# unset, so no short country list question and continent
 		# dialogs are shown at critical priority as we need a country.
-		if echo $FALLBACKLOCALE | grep "_" >/dev/null 2>&1; then
+		if is_complete_locale $FALLBACKLOCALE; then
 			# Otherwise, prompt with the short list for languages
 			# that are listed in /etc/shortlists; for others prompt
 			# with all continents/countries (at medium priority)
