@@ -19,18 +19,12 @@ umount /proc
 cp -a $(ls -1 / | grep -v '\(lost+found\|mnt\|proc\)') /mnt
 cd /mnt
 pivot_root . initrd
-mkdir proc
-if [ -x /sbin/udevd ]; then
-	/lib/debian-installer/init-udev-devices
-elif [ -d /lib/userdevfs/ ]; then
-	:
-else
-	echo "udev is missing. Giving up!" >&2
-	sleep 5000
-	exit
-fi
+mkdir -p /proc
 mount /proc
+mkdir -p /sys
+mount /sys
+/lib/debian-installer/start-udev
 
 # Close all open files on the initrd, and run busybox init.
 debugshell "before init"
-exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
+exec /sbin/reopen-console /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
