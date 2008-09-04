@@ -483,8 +483,11 @@ while :; do
 			# (is not complete), we want to ask for a country at
 			# critical priority; example: Esperanto.
 			# Otherwise the default country should be good, so
-			# ask only at medium priority.
-			if is_complete_locale $FALLBACKLOCALE; then
+			# ask only at medium priority unless the current
+			# country is different from the default.
+			if is_complete_locale $FALLBACKLOCALE && \
+			   ([ -z "$current_country" ] || \
+			    [ "$current_country" = "$DEFAULT_COUNTRY" ]); then
 				allprio=medium
 			fi
 
