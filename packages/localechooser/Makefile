@@ -23,7 +23,7 @@ debian/templates: $(LIST) debian/templates.base debian/short-tmp/shortlists
 debian/SUPPORTED-short:
 	./get-SUPPORTED
 
-debian/short-tmp/shortlists: debian/iso-codes
+debian/short-tmp/shortlists: debian/iso-3166.tab debian/iso-codes
 	./mkshort
 
 check-scripts:
