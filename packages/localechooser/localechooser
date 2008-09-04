@@ -258,33 +258,34 @@ is_complete_locale() {
 	echo "$1" | grep -q "_"
 }
 
-refine_locale() {
-	local lang old_locale entry
-	old_locale=$1
+# Find a supported locale which best fits the selected language and country.
+# Refinement: use the modifier inherited from language selection (if the
+# resulting locale is valid).
+get_default_locale() {
+	local lang fallback entry
 	lang=${LANGUAGE%%_*}
 
+	# Special handling of cases where the locale defined in the
+	# language list is NOT the combination of language_COUNTRY.
+	# Used for Norwegian Bokmal transition in order to keep no_NO as
+	# locale. May be used in the future for other special cases, so
+	# we'd better keep this.
+	fallback=$(echo "$FALLBACKLOCALE" | sed -e 's/[.@].*$//')
+	if [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
+	   [ "${lang}_${COUNTRYCODE}" != "$fallback" ] && \
+	   is_complete_locale "$fallback"; then
+		# Explanation: we fall back to the locale inherited from the
+		# language step if the country selection did NOT result in
+		# a change in country but the resulting locale is different
+		# from the one we had in first step.
+		return
+	fi
+
+	# Check if a valid locale exists for the selected language + country
 	for entry in ${lang}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
 	             ${lang}_${COUNTRYCODE}; do
 		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
-			# Special handling of cases where the locale
-			# in languagechooser is NOT the combination of
-			# language_COUNTRY. Used for Norwegian
-			# Bokmal transition in order to keep no_NO as
-			# locale. May be used in the future for other
-			# special cases, so we'd better keep this.
-			if [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
-			   [ "${lang}_${COUNTRYCODE}" != "$old_locale" ] && \
-			   is_complete_locale "$old_locale"; then
-				# Explanation: we revert back to the
-				# locale inherited from the language
-				# step if the country step did NOT
-				# induce change in language and country
-				# but the resulting locale is different
-				# from the one we had in first step.
-				echo "$old_locale"
-			else
-				echo "$entry"
-			fi
+			echo "$entry"
 			break
 		fi
 	done
@@ -559,17 +560,9 @@ while :; do
 		;;
 
 	   29)	# Prepare for locale selection; determine default locale
-		# Find a supported locale which best fits the selected language
-		# and country.
-		# Refinement: we try to use the modifier inherited from language
-		# selection. However, we do this only if the locale is valid.
-
-		# Maybe no refinement should be done if locale is preseeded?
+		# Should perhaps not be done if locale is preseeded?
 		if [ "$LOCALE" != "C" ]; then
-			OLDLOCALE=$LOCALE
-			LOCALE=""
-
-			LOCALE=$(refine_locale "$OLDLOCALE")
+			LOCALE="$(get_default_locale)"
 
 			# Fall back to a supported locale
 			if [ -z "$LOCALE" ]; then
