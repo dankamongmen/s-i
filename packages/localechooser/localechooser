@@ -588,7 +588,7 @@ while :; do
 		if [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
 		   [ "$COUNTRYCODE" ] && [ "$LANGUAGE" ] && \
 		   [ "$LOCALE" != "C" ] && [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
-			LANGUAGELIST=${LANGUAGE}_${COUNTRYCODE}:$LANGUAGELIST
+			LANGUAGELIST=${LANGUAGE%%_*}_${COUNTRYCODE}:$LANGUAGELIST
 			db_set "$tpl_di_language" "$LANGUAGELIST"
 			log "Set $tpl_di_language = '$LANGUAGELIST'"
 		fi
@@ -597,9 +597,9 @@ while :; do
 	   30)	# Select system locale
 		# We will select from supported locales for LANGUAGE_COUNTRY
 		if [ "$LOCALE" != "C" ]; then
-			POSSIBLELOCALES=$(grep -e "^${LANGUAGE}_${COUNTRYCODE}" $SUPPORTEDLOCALES || true)
+			POSSIBLELOCALES=$(grep -e "^${LANGUAGE%%_*}_${COUNTRYCODE}" $SUPPORTEDLOCALES || true)
 			if [ -z "$POSSIBLELOCALES" ]; then
-				POSSIBLELOCALES=$(grep -e "^${LANGUAGE}_${COUNTRYCODE_LANGUAGECHOOSER}" $SUPPORTEDLOCALES || true)
+				POSSIBLELOCALES=$(grep -e "^${LANGUAGE%%_*}_${COUNTRYCODE_LANGUAGECHOOSER}" $SUPPORTEDLOCALES || true)
 			fi
 			if [ $(echo $POSSIBLELOCALES | wc -w) -gt 1 ]; then
 				CHOICES=""
