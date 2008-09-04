@@ -213,16 +213,16 @@ warning_template() {
 	echo $template
 }
 
-# Returns 0 if the template has the country among its choices
-has_country() {
-	local RET template country
+# Test if a template has the requested value among its choices
+has_choice() {
+	local RET template value
 	template="$1"
-	country="$2"
+	value="$2"
 
-	[ "$country" ] || return 1
+	[ "$value" ] || return 1
 
 	db_metaget $template Choices-C
-	echo "$RET" | grep -q "$country"
+	echo "$RET" | grep -q "$value"
 }
 
 # Set defaults for continent based on country
@@ -243,7 +243,7 @@ set_default_continent() {
 	for continent in $continents; do
 		IFS="$ORIG_IFS"
 		c=$(echo "$continent" | sed "s/ /_/g")
-		if has_country $tpl_countrylist/$c "$country"; then
+		if has_choice $tpl_countrylist/$c "$country"; then
 			db_set $tpl_continentlist "$continent"
 			break
 		fi
@@ -464,12 +464,12 @@ while :; do
 				if [ $LASTSTATE -ne 21 ]; then
 					current_short=""
 					if [ "$current_country" ]; then
-						if has_country $tpl_shortlist "$current_country"; then
+						if has_choice $tpl_shortlist "$current_country"; then
 							current_short="$current_country"
 						else
 							current_short=other
 						fi
-					elif has_country $tpl_shortlist "$DEFAULT_COUNTRY"; then
+					elif has_choice $tpl_shortlist "$DEFAULT_COUNTRY"; then
 						current_short="$DEFAULT_COUNTRY"
 					fi
 					db_set $tpl_shortlist "$current_short"
@@ -530,10 +530,10 @@ while :; do
 		db_fset $country_template seen $RET || true
 
 		if [ "$current_country" ] && \
-		   has_country $country_template "$current_country"; then
+		   has_choice $country_template "$current_country"; then
 			db_set $country_template "$current_country"
 		elif db_get $country_template && [ -z "$RET" ] && \
-		   has_country $country_template "$DEFAULT_COUNTRY"; then
+		   has_choice $country_template "$DEFAULT_COUNTRY"; then
 			db_set $country_template "$DEFAULT_COUNTRY"
 		fi
 
