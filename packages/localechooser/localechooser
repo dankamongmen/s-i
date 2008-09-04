@@ -445,54 +445,54 @@ while :; do
 		db_get $tpl_di_country
 		current_country="$RET"
 
-		# If the fallback locale does not include a country code
-		# (and thus no underscore character), we must prompt for a
-		# country and thus display all countries. Example: Esperanto.
-		# The next "if" test will be false and "askedshort" remains
-		# unset, so no short country list question and continent
-		# dialogs are shown at critical priority as we need a country.
-		if is_complete_locale $FALLBACKLOCALE; then
-			# Otherwise, prompt with the short list for languages
-			# that are listed in /etc/shortlists; for others prompt
-			# with all continents/countries (at medium priority)
-			if [ "$use_lang" ]; then
-				shortlist_template="$tpl_shortlist/$use_lang"
-				db_unregister $tpl_shortlist || true
-				db_register $shortlist_template $tpl_shortlist
-				db_fget $tpl_di_country seen
-				db_fset $tpl_shortlist seen $RET || true
+		# Prompt with the short list for languages that are listed
+		# in /etc/shortlists; for others prompt with all continents
+		# and countries.
+		if [ "$use_lang" ]; then
+			shortlist_template="$tpl_shortlist/$use_lang"
+			db_unregister $tpl_shortlist || true
+			db_register $shortlist_template $tpl_shortlist
+			db_fget $tpl_di_country seen
+			db_fset $tpl_shortlist seen $RET || true
 
-				# Set default value
-				if [ $LASTSTATE -ne 21 ]; then
-					current_short=""
-					if [ "$current_country" ]; then
-						if has_choice $tpl_shortlist "$current_country"; then
-							current_short="$current_country"
-						else
-							current_short=other
-						fi
-					elif has_choice $tpl_shortlist "$DEFAULT_COUNTRY"; then
-						current_short="$DEFAULT_COUNTRY"
+			# Set default value
+			if [ $LASTSTATE -ne 21 ]; then
+				current_short=""
+				if [ "$current_country" ]; then
+					if has_choice $tpl_shortlist "$current_country"; then
+						current_short="$current_country"
+					else
+						current_short=other
 					fi
-					db_set $tpl_shortlist "$current_short"
+				elif has_choice $tpl_shortlist "$DEFAULT_COUNTRY"; then
+					current_short="$DEFAULT_COUNTRY"
 				fi
+				db_set $tpl_shortlist "$current_short"
+			fi
 
-				# If the current (preseeded) value is not in the
-				# shortlist, ask for continent/country instead
-				if [ -z "$country_preseeded" ] || \
-				   [ "$current_short" != other ]; then
-					db_input $shortprio $tpl_shortlist || [ $? -eq 30 ]
-					askedshort=1
-				fi
-				country_preseeded=""
-			else
+			# If the current (preseeded) value is not in the
+			# shortlist, ask for continent/country instead
+			if [ -z "$country_preseeded" ] || \
+			   [ "$current_short" != other ]; then
+				db_input $shortprio $tpl_shortlist || [ $? -eq 30 ]
+				askedshort=1
+			fi
+			country_preseeded=""
+		else
+			# If the fallback locale does not include a country
+			# (is not complete), we want to ask for a country at
+			# critical priority; example: Esperanto.
+			# Otherwise the default country should be good, so
+			# ask only at medium priority.
+			if is_complete_locale $FALLBACKLOCALE; then
 				allprio=medium
-				# Display continents after backing up from locale
-				# selection for countries without shortlist
-				if [ $LASTSTATE -gt 21 ]; then
-					STATE=21
-					continue
-				fi
+			fi
+
+			# Display continents after backing up from locale
+			# selection for countries without shortlist
+			if [ $LASTSTATE -gt 21 ]; then
+				STATE=21
+				continue
 			fi
 		fi
 		;;
