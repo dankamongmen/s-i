@@ -256,11 +256,12 @@ is_complete_locale() {
 }
 
 refine_locale() {
-	local old_locale entry
+	local lang old_locale entry
 	old_locale=$1
+	lang=${LANGUAGE%%_*}
 
-	for entry in ${LANGUAGE}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
-	             ${LANGUAGE}_${COUNTRYCODE}; do
+	for entry in ${lang}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
+	             ${lang}_${COUNTRYCODE}; do
 		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
 			# Special handling of cases where the locale
 			# in languagechooser is NOT the combination of
@@ -268,9 +269,8 @@ refine_locale() {
 			# Bokmal transition in order to keep no_NO as
 			# locale. May be used in the future for other
 			# special cases, so we'd better keep this.
-			if [ "$LANGUAGE" = "$LANGUAGECODE_LANGUAGECHOOSER" ] && \
-			   [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
-			   [ "${LANGUAGE}_${COUNTRYCODE}" != "$old_locale" ] && \
+			if [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
+			   [ "${lang}_${COUNTRYCODE}" != "$old_locale" ] && \
 			   is_complete_locale "$old_locale"; then
 				# Explanation: we revert back to the
 				# locale inherited from the language
@@ -415,7 +415,6 @@ while :; do
 	   19)	# Prepare for country selection
 		# Keep track of values we have after language selection step
 		LOCALE_LANGUAGECHOOSER=$LOCALE
-		LANGUAGECODE_LANGUAGECHOOSER=$LANGUAGE
 		# If present, keep track of charset or modifier we got previously
 		EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
 
