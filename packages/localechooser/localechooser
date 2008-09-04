@@ -124,28 +124,31 @@ do_preseed() {
 	# Only populate debconf if this is a supported locale
 	# and if the language is supported in D-I
 	LANGUAGE=${LOCALE%%.*}
-	LANGUAGE=${LANGUAGE%%_*}
-	if [ -n "$LANGUAGE" ]; then
-		db_set $tpl_languagelist $LANGUAGE
-		log "Set $tpl_languagelist = '$LANGUAGE'"
-		db_fset $tpl_languagelist seen $seenflag || true
-		COUNTRY=$(locale2countrycode "$LOCALE")
-		if [ -n "$COUNTRY" ]; then
-			db_set $tpl_di_country "$COUNTRY"
-			log "Set $tpl_di_country = '$COUNTRY'"
-			db_fset $tpl_di_country seen $seenflag || true
-			db_fset $tpl_continentlist seen $seenflag || true
-			country_preseeded=1
+	if ! has_choice $tpl_languagelist "$LANGUAGE"; then
+		LANGUAGE=${LANGUAGE%%_*}
+		if ! has_choice $tpl_languagelist "$LANGUAGE"; then
+			LOCALE=""
+			LANGUAGE=""
+			return
+		fi
+	fi
 
-			if grep -q "^$LOCALE$" $SUPPORTEDLOCALES ; then
-				db_set $tpl_di_locale $LOCALE
-				db_fset $tpl_di_locale seen $seenflag || true
-				db_fset $tpl_supportedlocales seen $seenflag || true
-				log "Set $tpl_di_locale = '$LOCALE'"
-			else
-				# The locale was invalid, empty it
-				LOCALE=""
-			fi
+	db_set $tpl_languagelist $LANGUAGE
+	log "Set $tpl_languagelist = '$LANGUAGE'"
+	db_fset $tpl_languagelist seen $seenflag || true
+	COUNTRY=$(locale2countrycode "$LOCALE")
+	if [ -n "$COUNTRY" ]; then
+		db_set $tpl_di_country "$COUNTRY"
+		log "Set $tpl_di_country = '$COUNTRY'"
+		db_fset $tpl_di_country seen $seenflag || true
+		db_fset $tpl_continentlist seen $seenflag || true
+		country_preseeded=1
+
+		if grep -q "^$LOCALE$" $SUPPORTEDLOCALES ; then
+			db_set $tpl_di_locale $LOCALE
+			db_fset $tpl_di_locale seen $seenflag || true
+			db_fset $tpl_supportedlocales seen $seenflag || true
+			log "Set $tpl_di_locale = '$LOCALE'"
 		else
 			# The locale was invalid, empty it
 			LOCALE=""
