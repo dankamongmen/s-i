@@ -21,6 +21,7 @@ SHORTLISTS=/etc/shortlists
 LANGUAGELISTFILE=/usr/share/localechooser/languagelist
 LANGUAGELISTDATA=/usr/share/localechooser/languagelist.data.gz
 
+ORIG_IFS="$IFS"
 NL="
 "
 
@@ -86,10 +87,9 @@ build_language_template() {
 		return 0
 	fi
 
-	local OLDIFS IFS line name codes names_en names_both
+	local IFS RET line name codes names_en names_both
 	rm -f /var/lib/localechooser/langlevel
 
-	OLDIFS="$IFS"
 	IFS="$NL"
 	for line in $(zcat $LANGUAGELISTDATA | grep "^[0-$level]:"); do
 		name="$(echo "$line" | cut -d: -f3)"
@@ -100,7 +100,7 @@ build_language_template() {
 		names_both="$(choices_add "$names_both" \
 			"$name\${!TAB}-\${!TAB}$(echo "$line" | cut -d: -f4)")"
 	done
-	IFS="$OLDIFS"
+	IFS="$ORIG_IFS"
 
 	db_subst $tpl_languagelist CODES "$codes"
 	db_subst $tpl_languagelist NAMES_EN "$names_en"
@@ -111,6 +111,8 @@ build_language_template() {
 
 
 do_preseed() {
+	local RET
+
 	LOCALE="$1"
 	log "Locale has been preseeded to $LOCALE"
 
@@ -167,6 +169,8 @@ install_lang_specific() {
 
 # Change language and switch font for graphical installer
 set_debconf_language() {
+	local RET
+
 	db_set "debconf/language" "$1"
 
 	if type gtk-set-font >/dev/null 2>&1; then
@@ -223,7 +227,7 @@ has_country() {
 
 # Set defaults for continent based on country
 set_default_continent() {
-	local OLDIFS IFS RET country continents c continent
+	local IFS RET country continents c continent
 	country="$1"
 
 	if [ -z "$country" ]; then
@@ -235,10 +239,9 @@ set_default_continent() {
 	db_metaget $tpl_continentlist Choices-en.UTF-8
 	continents=$(echo $RET | sed "s/, /,/g")
 
-	OLDIFS="$IFS"
 	IFS=,
 	for continent in $continents; do
-		IFS="$OLDIFS"
+		IFS="$ORIG_IFS"
 		c=$(echo "$continent" | sed "s/ /_/g")
 		if has_country $tpl_countrylist/$c "$country"; then
 			db_set $tpl_continentlist "$continent"
