@@ -119,7 +119,7 @@ do_preseed() {
 	# Only mark variables seen if this one was preseeded seen.
 	db_fget $tpl_di_locale seen
 	seenflag=$RET
-	db_fset $tpl_di_locale seen "false" || true
+	db_fset $tpl_di_locale seen false || true
 
 	# Only populate debconf if this is a supported locale
 	# and if the language is supported in D-I
@@ -339,7 +339,8 @@ while :; do
 		# Disabled because of #470258: template is set to true too early
 		if false && \
 		   db_get debconf/translations-dropped && [ "$RET" = true ]; then
-			if db_fget $langname_template seen && [ "$RET" != true ]; then
+			db_fget $langname_template seen
+			if [ "$RET" != true ]; then
 				sel_language=""
 				db_input high localechooser/translation/no-select || true
 			fi
@@ -453,9 +454,8 @@ while :; do
 				shortlist_template="$tpl_shortlist/$use_lang"
 				db_unregister $tpl_shortlist || true
 				db_register $shortlist_template $tpl_shortlist
-				if db_fget $tpl_di_country seen; then
-					db_fset $tpl_shortlist seen $RET || true
-				fi
+				db_fget $tpl_di_country seen
+				db_fset $tpl_shortlist seen $RET || true
 
 				# Set default value
 				if [ $LASTSTATE -ne 21 ]; then
@@ -523,9 +523,8 @@ while :; do
 	   22)	# Select a country on the continent
 		db_get $tpl_continentlist
 		country_template="$tpl_countrylist/$(echo $RET | sed "s/ /_/g")"
-		if db_fget $tpl_di_country seen; then
-			db_fset $country_template seen $RET || true
-		fi
+		db_fget $tpl_di_country seen
+		db_fset $country_template seen $RET || true
 
 		if [ "$current_country" ] && \
 		   has_country $country_template "$current_country"; then
