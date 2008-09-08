@@ -180,7 +180,10 @@ add_or_set_seen() {
 write_static_network() {
 	add "$1" "netcfg/get_ipaddress" "string" "$IPADDRESS"
 	add_or_set_seen "$1" "netcfg/get_netmask" "string" "$NETMASK"
-	add_or_set_seen "$1" "netcfg/get_gateway" "string" "$GATEWAY"
+	if [ -z "$GATEWAY" ]; then
+		GATEWAY=none
+	fi
+	add "$1" "netcfg/get_gateway" "string" "$GATEWAY"
 	add "$1" "netcfg/get_nameservers" "string" "$NAMESERVERS"
 }
 

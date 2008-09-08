@@ -3,11 +3,10 @@ oldsys-preseed (2.4) UNRELEASED; urgency=low
   * Stop preseeding the string "" when the netmask or gateway are empty
     because netcfg will not treat this as the empty string as I assumed
     but will complain about an invalid IP address.  Instead, mark the
-    variable as seen, thereby letting netcfg calculate appropriate
-    values.  This is the behaviour you'd expect for the netmask, but
-    it's not ideal in the case of the gateway -- unfortunately, it seems
-    it's impossible to create a preseed file that tells netcfg not to
-    use a gateway (see #497285).
+    netmask variable as seen, thereby letting netcfg calculate
+    an appropriate value, and set the gateway to "none" (a special case
+    introduced in netcfg 1.45 to specify that no gateway should be used,
+    see #497285).
   * Add a sanity check for static IP configuration: netcfg will prompt
     for an IP address and nameserver if they are not set, so use DHCP
     in that case.
