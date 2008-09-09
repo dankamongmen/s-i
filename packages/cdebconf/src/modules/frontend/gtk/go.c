@@ -358,13 +358,15 @@ static void update_question_database(struct frontend * fe)
  *
  * @param fe cdebconf frontend
  * @param question_box container for question handler widgets
- * @return FALSE if an error happened, TRUE otherwise
+ * @return DC_NOTIMPL if no handlers are available, DC_NOTOK if an error
+ *         happened, DC_OK otherwise
  */
-static gboolean call_question_handlers(struct frontend * fe,
-                                       GtkWidget * question_box)
+static int call_question_handlers(struct frontend * fe,
+                                 GtkWidget * question_box)
 {
     struct question * question;
     cdebconf_gtk_handler handler;
+    int ret;
 
     question = fe->questions;
     while (NULL != question) {
@@ -373,15 +375,15 @@ static gboolean call_question_handlers(struct frontend * fe,
             handler = find_external_handler(fe, question->template->type);
         }
         if (NULL == handler) {
-            return FALSE;
+            return DC_NOTIMPL;
         }
-        if (DC_OK != handler(fe, question, question_box)) {
+        if (DC_OK != (ret = handler(fe, question, question_box))) {
             g_warning("tag \"%s\" failed to display!", question->tag);
-            /* XXX: return FALSE? */
+            return ret;
         }
         question = question->next;
     }
-    return TRUE;
+    return DC_OK;
 }
 
 /** Create the container for question widgets in the given container.
@@ -486,6 +488,7 @@ int cdebconf_gtk_go(struct frontend * fe)
 {
     struct frontend_data * fe_data = fe->data;
     GtkWidget * question_box;
+    int ret;
 
     if (NULL == fe->questions) {
         return DC_OK;
@@ -508,9 +511,9 @@ int cdebconf_gtk_go(struct frontend * fe)
     if (CAN_GO_BACK(fe)) {
         create_goback_button(fe);
     }
-    if (!call_question_handlers(fe, question_box)) {
-        /* an handler was missing */
-        cdebconf_gtk_set_answer(fe, DC_NOTIMPL);
+    if (DC_OK != (ret = call_question_handlers(fe, question_box))) {
+        cdebconf_gtk_set_answer(fe, ret);
+        gdk_threads_leave();
         goto end;
     }
     if (!is_action_box_filled(fe)) {
