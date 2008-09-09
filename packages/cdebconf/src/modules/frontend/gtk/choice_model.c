@@ -159,7 +159,10 @@ GtkTreeModel * cdebconf_gtk_choice_model_create_full(
                                       raw_indices, choice_values,
                                       choice_translated_values,
                                       sorted_indices, count);
-    g_assert(sorted_count == count);
+    if (sorted_count != count) {
+        store = NULL;
+        goto exit;
+    }
 
     default_count = strchoicesplit(question_getvalue(question, ""),
                                    default_values, count);
@@ -207,6 +210,7 @@ GtkTreeModel * cdebconf_gtk_choice_model_create_full(
         }
     }
 
+exit:
     g_free(default_values);
     g_free(sorted_indices);
     g_free(choice_values);
