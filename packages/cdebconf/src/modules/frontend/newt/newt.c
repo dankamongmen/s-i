@@ -1124,6 +1124,8 @@ newt_go(struct frontend *obj)
                 break;
             }
         }
+        if (ret == DC_NOTOK)
+            break;
         if (ret == DC_OK)
             q = q->next;
         else if (ret == DC_GOBACK) {

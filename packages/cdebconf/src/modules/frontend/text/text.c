@@ -885,6 +885,8 @@ static int text_go(struct frontend *obj)
 				break;
 			}
 		}
+		if (ret == DC_NOTOK)
+			break;
 		if (i == DIM(question_handlers))
 			return DC_NOTIMPL;
 		if (ret == DC_OK)
