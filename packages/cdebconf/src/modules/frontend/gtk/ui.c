@@ -303,8 +303,6 @@ gboolean cdebconf_gtk_create_main_window(struct frontend * fe)
     gtk_window_set_decorated(GTK_WINDOW(window), TRUE /* resizable */);
     create_main_widgets(fe, window);
 
-    /* XXX: we might want to unconnect this signal in case of normal
-     * shutdown... */
     g_signal_connect_swapped(window, "destroy",
                              G_CALLBACK(handle_closed_main_window), fe);
 
@@ -367,6 +365,8 @@ void cdebconf_gtk_destroy_main_window(struct frontend * fe)
     GtkWidget * window = fe_data->window;
 
     if (NULL != window) {
+        g_signal_handlers_disconnect_by_func(
+            window, G_CALLBACK(handle_closed_main_window), fe);
         fe_data->window = NULL;
         g_object_unref(G_OBJECT(window));
         gtk_widget_destroy(window);
