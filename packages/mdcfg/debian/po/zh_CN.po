@@ -9,15 +9,15 @@
 # This file is distributed under the same license as debian-installer.
 #
 # Translated by Yijun Yuan (2004), Carlos Z.F. Liu (2004,2005,2006),
-# Ming Hua (2005,2006,2007,2008) and Xiyue Deng (2008).
+# Ming Hua (2005,2006,2007,2008), Xiyue Deng (2008), Kov Chai (2008).
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-08-06 20:14+0000\n"
-"PO-Revision-Date: 2008-06-21 00:37+0800\n"
-"Last-Translator: Kov Chai <tchaikov@gmail.com>\n"
+"PO-Revision-Date: 2008-09-09 23:25+0800\n"
+"Last-Translator: Deng Xiyue <manphiz@gmail.com>\n"
 "Language-Team: Simplified Chinese <debian-chinese-gb@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -192,23 +192,22 @@ msgstr "您已经选择了创建一个 RAID0 阵列。请选择这个阵列中�
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:8001
-#, fuzzy
 msgid "Number of active devices for the RAID${LEVEL} array:"
-msgstr "此 RAID1 阵列中活跃设备的个数："
+msgstr "此 RAID${LEVEL} 阵列中活跃设备的个数："
 
 #. Type: string
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:8001
-#, fuzzy
 msgid ""
 "The RAID${LEVEL} array will consist of both active and spare partitions. The "
 "active partitions are those used, while the spare devices will only be used "
 "if one or more of the active devices fail. A minimum of ${MINIMUM} active "
 "devices is required."
 msgstr ""
-"RAID5 阵列同时包含活跃和空闲分区。活跃分区就是那些被使用的分区，而当一个或更"
-"多活跃设备出故障时，空闲设备就将会被启用。在这里，最少需要三个活跃设备。"
+"RAID${LEVEL} 阵列同时包含活跃和空闲分区。活跃分区就是那些被使用的分区，而当一"
+"个或更多活跃设备出故障时，空闲设备就将会被启用。在这里，最少需要 ${MINIMUM} "
+"个活跃设备。"
 
 #. Type: string
 #. Description
@@ -224,18 +223,16 @@ msgstr "注意：您稍后将无法对此设置进行修改。"
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:9001
-#, fuzzy
 msgid "Active devices for the RAID${LEVEL} multidisk device:"
-msgstr "RAID0 盘组设备中的活跃设备："
+msgstr "RAID${LEVEL} 盘组设备中的活跃设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:9001
-#, fuzzy
 msgid ""
 "You have chosen to create a RAID${LEVEL} array with ${COUNT} active devices."
-msgstr "您选择了创建一个拥有 ${COUNT} 个活跃设备的 RAID1 阵列。"
+msgstr "您选择了创建一个拥有 ${COUNT} 个活跃设备的 RAID${LEVEL} 阵列。"
 
 #. Type: multiselect
 #. Description
@@ -250,26 +247,23 @@ msgstr "请选择将要作为活跃设备的分区。您必须选择 ${COUNT} �
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:10001
-#, fuzzy
 msgid "Number of spare devices for the RAID${LEVEL} array:"
-msgstr "此 RAID1 阵列中空闲设备的个数："
+msgstr "此 RAID${LEVEL} 阵列中空闲设备的个数："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:11001
-#, fuzzy
 msgid "Spare devices for the RAID${LEVEL} multidisk device:"
-msgstr "RAID1 盘组设备中的空闲设备："
+msgstr "此 RAID${LEVEL} 盘组设备中的空闲设备："
 
 #. Type: multiselect
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:11001
-#, fuzzy
 msgid ""
 "You have chosen to create a RAID${LEVEL} array with ${COUNT} spare devices."
-msgstr "您选择了创建一个拥有 ${COUNT} 个空闲设备的 RAID1 阵列。"
+msgstr "您选择了创建一个拥有 ${COUNT} 个空闲设备的 RAID${LEVEL} 阵列。"
 
 #. Type: multiselect
 #. Description
@@ -289,9 +283,8 @@ msgstr ""
 #. Description
 #. :sl3:
 #: ../mdcfg-utils.templates:12001
-#, fuzzy
 msgid "Layout of the RAID10 multidisk device:"
-msgstr "RAID0 盘组设备中的活跃设备："
+msgstr "RAID10 盘组设备布局："
 
 #. Type: string
 #. Description
@@ -302,6 +295,8 @@ msgid ""
 "number (number of copies of each chunk). The number must be smaller or equal "
 "to the number of active devices."
 msgstr ""
+"布局必须是 n, o, 或者 f (副本的排列)紧跟着一个数字(每个块的副本数)。数字必须"
+"小于或等于活动设备数。"
 
 #. Type: string
 #. Description
@@ -316,6 +311,11 @@ msgid ""
 "     stripe, whole stripes are duplicated but are rotated by one\n"
 "     device so duplicate blocks are on different devices."
 msgstr ""
+"这个字母决定副本的排列方式：\n"
+" n - 近副本(near copies)：一个数据块的多个副本在不同设备上有近似的偏移量。\n"
+" f - 远副本(far copies)：多个副本有差别很大的偏移量。\n"
+" o - 偏移副本(offset copies)：并不在同一条段(stripe)重复数据块(chunks)，而是"
+"重复条段但在每个设备间滚动，这样重复的块(blocks)会保存在不同的设备上。"
 
 #. Type: select
 #. Description
