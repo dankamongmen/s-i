@@ -36,10 +36,8 @@ console=$(mapdevfs "$rawconsole")
 rawconsole=${rawconsole#/dev/}
 console=${console#/dev/}
 
-# Testing for hvc and hvsi here may be useless as they would normally be
-# redirected to /dev/console, which is covered by the code section below.
 case "$console" in
-    tty[A-Z]*|hvc*|hvsi*)
+    tty[A-Z]*)
 	log "Configuring init for serial console"
 	consoletype=${console%%[0-9]*}
 	ttyline=${console#$consoletype}
