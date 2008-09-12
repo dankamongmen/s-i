@@ -93,3 +93,47 @@ Possible future hacks:
 	let user choose a partition to use as swap
 		Scan disks for existing small-ish partitions, list them,
 		and offer to turn them into swap space.
+
+Updating lowmem levels
+----------------------
+
+To update the various lowmem levels, the process is to perform installations
+with tight memory constraints. If the installer does not crash before the base
+system installation, the amount of memory can be considered fine for the lowmem
+level being tested.
+
+To limit the amount of available memory for an installations, this can be
+either done by specifying emulator settings (e.g. qemu -m option) or by booting
+the kernel with the 'mem=...' option (which will work for real machines).
+
+The levels are set in debian-installer-startup.d/S15lowmem. In order to test
+lower limits than currently allowed, parameters can be changed by booting
+with BOOT_DEBUG=3 and modifying the values before the installer starts.
+
+The level1 value should be set to the lowest amount of memory that will support
+an install not in lowmem mode. (This is the max memory footprint of the
+installer in non lowmem mode up to running the partitioner and swapon.) Use
+Portuguese as language and choose Guided partitioning with all partitions
+separate to test this!
+
+The level2 value should be set to the lowest amount of memory that will support
+an install in lowmem mode. (This is the max memory footprint of the installer
+in lowmem mode up to running the partitioner and swapon.)
+Again, choose Guided partitioning with all partitions separate.
+
+The distinction between these two levels are extremely minimal since all unused
+debconf translations are dropped after anna. In most cases, the two levels can
+probably be set to the same value. Exception is when an architecture uses
+DEBCONF_DROP_TRANSLATIONS=0. This can be necessary for installs where running
+languagechooser is postponed (as is currently the case for installs to arm NAS
+devices).
+
+In both cases, you need to set min to absolute minimum amount of memory needed
+for an install.
+
+Ideally, constraints should be tested for both netboot and businesscard images
+(businesscard CD will use slightly more memory before partitioning that netinst
+because of mirror selection).
+
+NB: the minimum memory required to run the graphical installer must
+also be tested. See rootskel (debian-installer.d/S60frontend).
