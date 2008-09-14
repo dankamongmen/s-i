@@ -3,6 +3,7 @@ set -e
 . /usr/share/debconf/confmodule
 
 LOG=/tmp/missing-firmware
+DENIED=/tmp/missing-firmware-denied
 NL="
 "
 
@@ -24,6 +25,10 @@ read_log () {
 			module="${line%% *}"
 			file="${line#* }"
 			[ -z "$module" ] || [ -z "$file" ] && continue
+
+			if grep -q "^$file$" $DENIED 2>/dev/null; then
+				continue
+			fi
 
 			modules="$module${modules:+ $modules}"
 			files="$file${files:+ $files}"
@@ -58,6 +63,7 @@ ask_load_firmware () {
 	if [ "$RET" = true ]; then
 		return 0
 	else
+		echo "$files" | tr ' ' '\n' >> $DENIED
 		return 1
 	fi
 }
