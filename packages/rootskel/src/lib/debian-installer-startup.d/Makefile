@@ -37,6 +37,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 
   ifneq (,$(filter mipsel,$(DEB_HOST_ARCH_CPU)))
     files += \
+	S59cobalt-welcome \
 	S80anna-install-mipsel
   endif
 
