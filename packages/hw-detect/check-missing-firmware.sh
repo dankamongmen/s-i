@@ -30,15 +30,13 @@ read_log () {
 		done
 		IFS="$OLDIFS"
 		rm -f $LOG.old
-	
-		log "missing firmware files ($files) for $modules"
-	else
-		log "no missing firmware in $LOG"
 	fi
 
 	if [ -n "$modules" ]; then
+		log "missing firmware files ($files) for $modules"
 		return 0
 	else
+		log "no missing firmware in $LOG"
 		return 1
 	fi
 }
