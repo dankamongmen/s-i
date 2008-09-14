@@ -34,11 +34,6 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S05fancontrol-linux-powerpc \
 	S45keyboard-linux-powerpc
   endif
-  
-  ifneq (,$(filter mips mipsel,$(DEB_HOST_ARCH_CPU)))
-    files += \
-	S40framebuffer-module-linux-mips
-  endif
 
   ifneq (,$(filter mipsel,$(DEB_HOST_ARCH_CPU)))
     files += \
