@@ -40,6 +40,11 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S40framebuffer-module-linux-mips
   endif
 
+  ifneq (,$(filter mipsel,$(DEB_HOST_ARCH_CPU)))
+    files += \
+	S80anna-install-mipsel
+  endif
+
   ifneq (,$(filter alpha,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S40framebuffer-module-linux-alpha \
@@ -58,6 +63,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 
   ifneq (,$(filter arm armel,$(DEB_HOST_ARCH_CPU)))
     files += \
+	S80anna-install-armel \
 	S99signal-status
   endif
 
