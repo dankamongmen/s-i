@@ -180,12 +180,8 @@ if [ "$RET" = true ]; then
 
 		if [ "$(dmraid -c -s)" != "No RAID disks" ]; then
 			logger -t disk-detect "Serial ATA RAID disk(s) detected; enabling dmraid support"
-			if anna-install partman-dmraid; then
-				# Activate devices
-				log-output -t disk-detect dmraid -ay
-			else
-				logger -t disk-detect "Error loading partman-dmraid; dmraid devices not activated"
-			fi
+			# Activate devices
+			log-output -t disk-detect dmraid -ay
 		else
 			logger -t disk-detect "No Serial ATA RAID disks detected"
 		fi
