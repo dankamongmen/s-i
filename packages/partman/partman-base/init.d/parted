@@ -108,6 +108,13 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		printf "%s" "$size" >$dev/size
 		printf "%s" "$model" >$dev/model
 
+		# Set the sataraid flag for dmraid arrays.
+		if type dmraid >/dev/null 2>&1; then
+			if dmraid -sa -c | grep -q $(basename $device); then
+				>$dev/sataraid
+			fi
+		fi
+
 		cd $dev
 		open_dialog OPEN "$(cat $dev/device)"
 		read_line response

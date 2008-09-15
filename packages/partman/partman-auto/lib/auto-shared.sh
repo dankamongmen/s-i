@@ -196,19 +196,30 @@ create_partitions() {
 	free_space=$(partition_after $id)'
 }
 
+is_dm_multipath() {
+	dmtype=$(dm_table $device)
+	[ "$dmtype" = multipath ] || return 1
+}
+
 get_auto_disks() {
 	local dev device dmtype
 
 	for dev in $DEVICES/*; do
 		[ -d "$dev" ] || continue
 
-		# Skip /dev/mapper/X (except multipath) devices and
-		# RAID (/dev/md/X and /dev/mdX) devices
 		device=$(cat $dev/device)
+		
+		# Skip software RAID (mdadm) devices (/dev/md/X and /dev/mdX)
 		$(echo "$device" | grep -Eq "/dev/md/?[0-9]*$") && continue
+
+		# Skip device mapper devices (/dev/mapper/)
 		if echo $device | grep -q "^/dev/mapper/"; then
-			dmtype=$(dm_table $device)
-			[ "$dmtype" = multipath ] || continue
+			# Except for dmraid or multipath devices
+			if [ -f "$dev/sataraid" ] || is_dm_multipath; then
+				:
+			else
+				continue
+			fi
 		fi
 		printf "$dev\t$(device_name $dev)\n"
 	done
