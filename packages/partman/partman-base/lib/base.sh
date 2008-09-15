@@ -573,7 +573,15 @@ dm_table () {
 	echo $type
 }
 
-# Check if a device is a partition on a multipath'ed device by checking if
+# Check if a d-m device is a multipath device
+is_multipath_dev () {
+	local type
+
+	type=$(dm_table $1)
+	[ "$type" = multipath ] || return 1
+}
+
+# Check if a d-m device is a partition on a multipath device by checking if
 # the corresponding multipath map exists
 is_multipath_part () {
 	local type mp name
