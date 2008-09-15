@@ -172,12 +172,21 @@ ask_user () {
 		default=""
 	fi
 	choices=$(
+		local first=1
 		for plugin in $dir/*; do
 			[ -d $plugin ] || continue
 			name=$(basename $plugin)
 			IFS="$NL"
 			for option in $($plugin/choices "$@"); do
-				printf "%s__________%s\n" $name "$option"
+				# If they are the first option, skip dividers
+				# (which only have a space as description)
+				if [ "$first" ] && \
+				   echo "$option" | grep -q "$TAB *$"; then
+					continue
+				else
+					printf "%s__________%s\n" $name "$option"
+					first=
+				fi
 			done
 			restore_ifs
 		done
