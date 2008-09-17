@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 54857 -->
+<!-- original version: 55679 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -885,8 +885,21 @@ d-i netcfg/wireless_wep string
 # die Firmware zu laden, ohne Nachfrage (true). Oder Sie ändern dies auf false,
 # wenn überhaupt nicht danach gefragt werden soll.
 #d-i hw-detect/load_firmware boolean true
-
 </screen></informalexample>
+
+<para>
+
+Bitte beachten Sie, dass <command>netcfg</command> die Netzmaske automatisch
+ermittelt, falls <classname>netcfg/get_netmask</classname> nicht voreingestellt
+ist. In diesem Fall muss die Variable für automatische Installationen als
+<literal>seen</literal> markiert werden. Ähnlich dazu wird <command>netcfg</command>
+auch eine geeignete Gateway-Adresse wählen, falls
+<classname>netcfg/get_gateway</classname> nicht voreingestellt wird. Es gibt
+die spezielle Möglichkeit, <classname>netcfg/get_gateway</classname> auf
+<quote>none</quote> zu setzen, um festzulegen, dass kein Gateway benutzt werden
+soll.
+
+</para>
 
   </sect2>
 
@@ -1428,9 +1441,12 @@ d-i finish-install/reboot_in_progress note
 #d-i cdrom-detect/eject boolean false
 
 # Durch die folgende Zeile wird der Installer nach Abschluss der
-# Installation nur heruntergefahren, es wird nicht das neue System
-# gestartet.
+# Installation nur heruntergefahren, kein Neustart, es wird nicht das neue
+# System gestartet.
 #d-i debian-installer/exit/halt boolean true
+# Durch die nächste Zeile wird der Rechner komplett abgeschaltet statt
+# nur gestoppt.
+#d-i debian-installer/exit/poweroff boolean true
 </screen></informalexample>
 
   </sect2>
