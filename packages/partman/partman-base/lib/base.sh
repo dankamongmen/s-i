@@ -172,21 +172,23 @@ ask_user () {
 		default=""
 	fi
 	choices=$(
-		local first=1
+		local skip_divider=1
 		for plugin in $dir/*; do
 			[ -d $plugin ] || continue
 			name=$(basename $plugin)
 			IFS="$NL"
 			for option in $($plugin/choices "$@"); do
-				# If they are the first option, skip dividers
-				# (which only have a space as description)
-				if [ "$first" ] && \
-				   echo "$option" | grep -q "$TAB *$"; then
-					continue
+				# Skip a divider (only has space as description)
+				# if it's the first option or when two in a row
+				if echo "$option" | grep -q "$TAB *$"; then
+					if [ "$skip_divider" ]; then
+						continue
+					fi
+					skip_divider=1
 				else
-					printf "%s__________%s\n" $name "$option"
-					first=
+					skip_divider=
 				fi
+				printf "%s__________%s\n" $name "$option"
 			done
 			restore_ifs
 		done
