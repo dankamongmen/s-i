@@ -59,7 +59,7 @@ confirm_changes () {
 				# dmraid and multipath devices are partitioned
 				if [ ! -f sataraid ] && \
 				   ! is_multipath_dev $device && \
-				   ! is_multipath_part $device); then
+				   ! is_multipath_part $device; then
 					partdesc="partman/text/confirm_unpartitioned_item"
 				fi
 			fi
