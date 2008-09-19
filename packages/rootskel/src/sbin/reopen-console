@@ -3,15 +3,27 @@
 # In order to give proper access to the tty, we need to locate the device
 # corresponding to the console we are actually using.
 
+NL="
+"
+
 if ! [ -f /var/run/console-device ]; then
 	# If the kernel emitted an "handover" message, then it's the one
 	console="$(dmesg -s 65535 |
 		sed -n -e 's/.*\] console handover: boot \[.*\] -> real \[\(.*\)\]$/\1/p')"
 
+	consoles=
 	if [ -z "$console" ]; then
-		# Retrieve all enabled consoles from boot log
-		consoles="$(dmesg -s 65535 |
-			sed -n -e 's/.*\] console \[\(.*\)\] enabled/\1/p')"
+		# Retrieve all enabled consoles from boot log; ignore those
+		# for which no device file exists
+		for cons in $(dmesg -s 65535 |
+			sed -n -e 's/.*\] console \[\(.*\)\] enabled/\1/p')
+		do
+			if [ -e "/dev/$cons" ]; then
+				consoles="${consoles:+$consoles$NL}$cons"
+			else
+				logger -t reopen-console "Warning: '/dev/$cons' does not exist; ignoring"
+			fi
+		done
 		# Only one console? Then we are good.
 		if [ $(echo "$consoles" | wc -l) -eq 1 ]; then
 			console="$consoles"
@@ -24,8 +36,9 @@ if ! [ -f /var/run/console-device ]; then
 			case $arg in
 			    console=*)
 				arg=${arg#console=}
-				if echo "$consoles" | grep -q "^${arg%%,*}$"; then
-					console=${arg%%,*}
+				cons=${arg%%,*}
+				if echo "$consoles" | grep -q "^$cons$"; then
+					console=$cons
 				fi
 				;;
 			esac
@@ -33,7 +46,7 @@ if ! [ -f /var/run/console-device ]; then
 	fi
 
 	if [ -z "$console" ]; then
-		# Still nothing? Default to /dev/console for safety
+		# Still nothing? Default to /dev/console.
 		console=console
 	fi
 	echo /dev/$console > /var/run/console-device
