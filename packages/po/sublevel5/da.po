@@ -25,7 +25,7 @@ msgstr ""
 #: ../partman-base.templates:54001
 #, no-c-format
 msgid "DASD %s (%s)"
-msgstr ""
+msgstr "DASD %s (%s)"
 
 #. Type: text
 #. Description
@@ -33,7 +33,7 @@ msgstr ""
 #: ../partman-base.templates:55001
 #, no-c-format
 msgid "DASD %s (%s), partition #%s"
-msgstr ""
+msgstr "DASD %s (%s), partition #%s"
 
 #. Type: text
 #. Description
@@ -43,21 +43,21 @@ msgstr ""
 #. :sl5:
 #: ../partman-palo.templates:1001 ../partman-palo.templates:4001
 msgid "PALO boot partition"
-msgstr ""
+msgstr "PALO-opstartspartition"
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partman-palo.templates:2001
 msgid "No PALO partition was found."
-msgstr ""
+msgstr "Fandt ingen PALO-partition."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partman-palo.templates:3001
 msgid "The PALO partition must be in the first 2GB."
-msgstr ""
+msgstr "Palo-partitionen skal ligge indenfor de første 2GB."
 
 #. Type: text
 #. Description
@@ -71,6 +71,12 @@ msgid ""
 "Most installations place the EFI partition on the first primary partition of "
 "the same hard disk that holds the root file system."
 msgstr ""
+"For at starte dit nye system, vil dit Itanium-systems firmware indlæse "
+"opstartsindlæseren fra sin private EFI-partition på harddisken. "
+"Opstartsindlæseren indlæser derefter styresystemet fra den samme partition. "
+"EFI-partitionen er formateret med et FAT16-filsystem markeret som opstartbar "
+"(\"bootable flag\" sat). De fleste installationer lægger EFI-partitionen på "
+"den første primære partition på den harddisk, der indeholder rodfilsystemet."
 
 #. Type: text
 #. Description
@@ -80,14 +86,14 @@ msgstr ""
 #. :sl5:
 #: ../partman-efi.templates:2001 ../partman-efi.templates:4001
 msgid "EFI boot partition"
-msgstr ""
+msgstr "EFI-opstartspatition"
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partman-efi.templates:3001
 msgid "No EFI partition was found."
-msgstr ""
+msgstr "Fandt ingen EFI-partition."
 
 #. Type: text
 #. Description
@@ -96,21 +102,21 @@ msgstr ""
 #. Up to 10 character positions
 #: ../partman-efi.templates:5001
 msgid "EFIboot"
-msgstr ""
+msgstr "EFIboot"
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../partman-efi.templates:7001
 msgid "EFI-fat16"
-msgstr ""
+msgstr "EFI-fat16"
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:1001
 msgid "Aboot installation failed.  Continue anyway?"
-msgstr ""
+msgstr "Installationen af aboot mislykkedes. Fortsæt alligevel?"
 
 #. Type: boolean
 #. Description
@@ -121,6 +127,10 @@ msgid ""
 "boot loader is a required step.  The install problem might however be "
 "unrelated to aboot, so continuing the installation may be possible."
 msgstr ""
+"Pakken aboot kunne ikke installeres på /target/. Det er et påkrævet trin at "
+"installere aboot. Dog kan det være at installationsproblemet ikke har noget "
+"med aboot at gøre, så det kan godt være at det kan lade sig gøre at "
+"fortsætte installationen alligevel."
 
 #. Type: select
 #. Description
@@ -132,13 +142,17 @@ msgid ""
 "use.  If this is not the root file system, your kernel image and the "
 "configuration file /etc/aboot.conf will be copied to that partition."
 msgstr ""
+"Aboot skal installere opstartsindlæseren på en enhed, der indeholder en ext2-"
+"partition. Vælg den ext2-partition, du ønsker at aboot skal bruge. Hvis det "
+"ikke er rodfilsystemet, bliver dit kerneaftryk samt opsætningsfilen /etc/"
+"aboot.conf kopieret til denne partition."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:3001
 msgid "Install /boot on a disk with an unsupported partition table?"
-msgstr ""
+msgstr "Installér /boot på en disk med en ikke-understøttet partitionstabel?"
 
 #. Type: boolean
 #. Description
@@ -151,13 +165,18 @@ msgid ""
 "will not be able to boot your system using aboot, and will need to boot it "
 "some other way."
 msgstr ""
+"For at kunne starte op fra SRM-konsollen, skal både aboot og den kerne, den "
+"skal indlæse, være installeret på en disk, der benytter BSD-disk mærkater i "
+"sin partitionstabel. Din /boot-mappe ligger ikke på en sådan disk. Hvis du "
+"fortsætter, vil du ikke være i stand til at starte dit system op med aboot, "
+"og vil derfor være nødt til at have en anden måde at starte systemet op på."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:4001
 msgid "Use unsupported file system type for /boot?"
-msgstr ""
+msgstr "Benyt ikke-understøttet filsystemtype til /boot?"
 
 #. Type: boolean
 #. Description
@@ -168,6 +187,10 @@ msgid ""
 "device.  This means that either the root partition must be an ext2 file "
 "system, or you must have a separate ext2 partition mounted at /boot."
 msgstr ""
+"Aboot kræver at /boot ligger på en ext2-partition på en enhed, der kan "
+"startes op fra. Det betyder at rodfilsystemet enten skal være et ext2-"
+"filsystem, eller at du skal have en separat ext2-partition monteret som /"
+"boot."
 
 #. Type: boolean
 #. Description
@@ -177,13 +200,15 @@ msgid ""
 "Currently, /boot is located on a partition of type ${PARTTYPE}.  If you keep "
 "this setting, you will not be able to boot your Debian system using aboot."
 msgstr ""
+"Lige nu ligger /boot på en partition med typen ${PARTTYPE}. Hvis du beholder "
+"denne indstilling, vil du ikke kunne starte dit Debiansystem op med aboot."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:5001
 msgid "Install without aboot?"
-msgstr ""
+msgstr "Installér uden aboot?"
 
 #. Type: boolean
 #. Description
@@ -194,6 +219,9 @@ msgid ""
 "boot loader.  To install aboot, you must have a special aboot partition at "
 "the beginning of your disk."
 msgstr ""
+"Din /boot-mappe er placeret på en disk, der ikke har plads nok til "
+"opstartsindlæseren aboot. For at installere aboot, skal du have en speciel "
+"aboot-partition i begyndelsen af din disk."
 
 #. Type: boolean
 #. Description
@@ -203,6 +231,8 @@ msgid ""
 "If you continue without correcting this problem, aboot will not be installed "
 "and you will not be able to boot your new system from the SRM console."
 msgstr ""
+"Hvis du fortsætter uden at korrigere dette problem, vil aboot ikke blive "
+"installeret, så du vil ikke kunne starte dit nye system op fra SRM-konsollen."
 
 #. Type: text
 #. Description
@@ -210,14 +240,14 @@ msgstr ""
 #. :sl5:
 #: ../aboot-installer.templates:6001
 msgid "Install aboot on a hard disk"
-msgstr ""
+msgstr "Installér aboot på en harddisk"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:7001
 msgid "No ext2 partitions found"
-msgstr ""
+msgstr "Fandt ingen ext2-partitioner"
 
 #. Type: error
 #. Description
@@ -229,48 +259,52 @@ msgid ""
 "partitioned with BSD disklabels.  You will need to configure at least one "
 "ext2 partition on your system before continuing."
 msgstr ""
+"Der blev ikke fundet nogen ext2-partitioner på din computer. For at indlæse "
+"Linuxkernen fra SRM-konsollen, skal aboot bruge en ext2-partition på en "
+"disk, der er partitioneret med BSD-diskmærkater. Du skal sætte mindst én "
+"ext2-partition op på dit system, før du fortsætter."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:8001
 msgid "Installing the aboot boot loader"
-msgstr ""
+msgstr "Installerer opstartsindlæseren aboot"
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:9001
 msgid "Installing the 'aboot' package..."
-msgstr ""
+msgstr "Installerer 'aboot'-pakken..."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:10001
 msgid "Determining aboot boot device..."
-msgstr ""
+msgstr "Udpeger aboot-opstartsenhed..."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:11001
 msgid "Installing aboot on ${BOOTDISK}..."
-msgstr ""
+msgstr "Installerer aboot på ${BOOTDISK}..."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:12001
 msgid "Configuring aboot to use partition ${PARTNUM}..."
-msgstr ""
+msgstr "Sætter aboot op til at bruge partition ${PARTNUM}..."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:13001
 msgid "Copying kernel images to ${BOOTDEV}..."
-msgstr ""
+msgstr "Kopierer kerneaftryk til ${BOOTDEV}..."
 
 #. Type: text
 #. Description
@@ -280,35 +314,35 @@ msgstr ""
 #. :sl5:
 #: ../aboot-installer.templates:14001 ../aboot-installer.templates:15001
 msgid "Aboot boot partition"
-msgstr ""
+msgstr "Aboot-opstartspartition"
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../aboot-installer.templates:16001
 msgid "aboot"
-msgstr ""
+msgstr "aboot"
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:1001
 msgid "Installing vmelilo"
-msgstr ""
+msgstr "Installerer vmelilo"
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:2001
 msgid "Installing vmelilo boot loader"
-msgstr ""
+msgstr "Installerer opstartsindlæseren vmelilo"
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:3001
 msgid "vmelilo installation failed.  Continue anyway?"
-msgstr ""
+msgstr "Installationen af vmelilo mislykkedes. Fortsæt alligevel?"
 
 #. Type: boolean
 #. Description
@@ -319,48 +353,52 @@ msgid ""
 "a boot loader is a required step.  The install problem might however be "
 "unrelated to vmelilo, so continuing the installation may be possible."
 msgstr ""
+"Pakken vmelilo kunne ikke installeres på /target/. Installationen af vmelilo "
+"som opstartsindlæser er et påkrævet trin. Installationsproblemet kan dog "
+"være uden relation til vmelilo, så det er muligt at det kan lade sig gøre at "
+"fortsætte installationen."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:4001
 msgid "Looking for root partition..."
-msgstr ""
+msgstr "Leder efter rodpartition..."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:6001
 msgid "Creating vmelilo configuration..."
-msgstr ""
+msgstr "Opretter vmelilo-opsætning..."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:7001
 msgid "Failed to create vmelilo configuration"
-msgstr ""
+msgstr "Kunne ikke oprette vmelilo-opsætning"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:7001
 msgid "The creation of the vmelilo configuration file failed."
-msgstr ""
+msgstr "Oprettelsen af vmelilo-opsætningsfilen mislykkedes."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:8001
 msgid "Installing vmelilo into bootstrap partition..."
-msgstr ""
+msgstr "Installerer vmelilo i opstartspartitionen..."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../vmelilo-installer.templates:9001
 msgid "The installation of the vmelilo boot loader failed."
-msgstr ""
+msgstr "Installationen af opstartsindlæseren vmelilo mislykkedes."
 
 #. Type: text
 #. Description
@@ -368,7 +406,7 @@ msgstr ""
 #. :sl5:
 #: ../vmelilo-installer.templates:10001
 msgid "Install the vmelilo boot loader on a hard disk"
-msgstr ""
+msgstr "Installér opstartsindlæseren vmelilo på en harddisk"
 
 #. Type: error
 #. Description
@@ -378,13 +416,15 @@ msgid ""
 "No partitions were found in your system. You may need to partition your hard "
 "drives or load additional kernel modules."
 msgstr ""
+"Fandt ingen partitioner på dit system. Du er muligvis nødt til at "
+"partitionere dine harddiske eller indlæse yderligere kernemoduler."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:2001
 msgid "No file systems found"
-msgstr ""
+msgstr "Fandt ingen filsystemer"
 
 #. Type: error
 #. Description
@@ -394,13 +434,15 @@ msgid ""
 "No usable file systems were found. You may need to load additional kernel "
 "modules."
 msgstr ""
+"Der blev ikke fundet nogen brugbare filsystemer. Du er muligvis nødt til at "
+"indlæse yderligere kernemoduler."
 
 #. Type: select
 #. Choices
 #. :sl5:
 #: ../partconf.templates:3001
 msgid "Abort"
-msgstr ""
+msgstr "Afbryd"
 
 #. Type: select
 #. Choices
@@ -410,7 +452,7 @@ msgstr ""
 #. in single-byte languages)
 #: ../partconf.templates:4001
 msgid "Leave the file system intact"
-msgstr ""
+msgstr "Efterlad filsystemet intakt"
 
 #. Type: select
 #. Choices
@@ -427,7 +469,7 @@ msgstr ""
 #. in single-byte languages)
 #: ../partconf.templates:4001 ../partconf.templates:5001
 msgid "Create swap space"
-msgstr ""
+msgstr "Opret swapområde"
 
 #. Type: select
 #. Description
@@ -437,7 +479,7 @@ msgstr ""
 #. :sl5:
 #: ../partconf.templates:4002 ../partconf.templates:5002
 msgid "Action on ${PARTITION}:"
-msgstr ""
+msgstr "Handling på ${PARTITION}:"
 
 #. Type: select
 #. Description
@@ -448,6 +490,8 @@ msgid ""
 "choose to leave this file system intact, create a new file system, or create "
 "swap space."
 msgstr ""
+"Partitionen lader allerede til at indeholde et filsystem (${FSTYPE}). Du kan "
+"vælge at efterlade det intakt, oprette et filsystem eller et swapområde."
 
 #. Type: select
 #. Description
@@ -457,6 +501,8 @@ msgid ""
 "This partition does not seem to have a file system. You can create a file "
 "system or swap space on it."
 msgstr ""
+"Denne partition lader ikke til at have et filsystem. Du kan oprette et "
+"filsystem eller et swapområde på den."
 
 #. Type: select
 #. Choices
@@ -468,7 +514,7 @@ msgstr ""
 #. "it" is a partition
 #: ../partconf.templates:6001
 msgid "Don't mount it"
-msgstr ""
+msgstr "Montér det ikke"
 
 #. Type: select
 #. Description
@@ -478,7 +524,7 @@ msgstr ""
 #. :sl5:
 #: ../partconf.templates:6002 ../partconf.templates:7001
 msgid "Mount point for ${PARTITION}:"
-msgstr ""
+msgstr "Monteringspunkt for ${PARTITION}:"
 
 #. Type: select
 #. Description
@@ -489,20 +535,23 @@ msgid ""
 "always need a root (\"/\") partition, and it's often good to have a separate "
 "partition for /home."
 msgstr ""
+"Når en partition er monteret, er den tilgængelig for brugerne på systemet. "
+"Du skal altid have en rodpartition (\"/\"), og det er ofte en god idé at "
+"have en separat partition til /home."
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../partconf.templates:7001
 msgid "Please enter where the partition should be mounted."
-msgstr ""
+msgstr "Angiv hvor partitionen skal monteres."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partconf.templates:8001
 msgid "Do you want to unmount the partitions so you can make changes?"
-msgstr ""
+msgstr "Ønsker du at afmontere partitionerne, så du kan udføre ændringer?"
 
 #. Type: boolean
 #. Description
@@ -511,27 +560,28 @@ msgstr ""
 msgid ""
 "Since the partitions have already been mounted, you cannot do any changes."
 msgstr ""
+"Da partitionerne allerede er monterede, kan du ikke udføre nogen ændringer."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:9001
 msgid "Failed to unmount partitions"
-msgstr ""
+msgstr "Kunne ikke afmontere partitionerne"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:9001
 msgid "An unexpected error occurred while unmounting the partitions."
-msgstr ""
+msgstr "Der opstod en uventet fejl under afmonteringen af partitionerne."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:9001
 msgid "The partition configuration process has been aborted."
-msgstr ""
+msgstr "Partitioneringen blev afbrudt."
 
 #. Type: text
 #. Description
@@ -539,14 +589,14 @@ msgstr ""
 #: ../partconf.templates:10001
 #, no-c-format
 msgid "Create %s file system"
-msgstr ""
+msgstr "Opret %s-filsystem"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:11001
 msgid "No root partition (/)"
-msgstr ""
+msgstr "Ingen rodpartition (/)"
 
 #. Type: error
 #. Description
@@ -556,13 +606,15 @@ msgid ""
 "You need a root partition. Please assign a partition to the root mount point "
 "before continuing."
 msgstr ""
+"Du skal have en rodpartition. Udpeg en partition til at være monteringspunkt "
+"for roden, før du fortsætter."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:12001
 msgid "Partition assigned to ${MOUNT}"
-msgstr ""
+msgstr "Partition udpeget til ${MOUNT}"
 
 #. Type: error
 #. Description
@@ -570,13 +622,14 @@ msgstr ""
 #: ../partconf.templates:12001
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr ""
+"Det giver ingen mening at montere en partition på ${MOUNT}. Ret det venligst."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:13001
 msgid "Several partitions assigned to ${MOUNT}"
-msgstr ""
+msgstr "Flere partitioner er blevet tildelt ${MOUNT}"
 
 #. Type: error
 #. Description
@@ -586,20 +639,22 @@ msgid ""
 "You cannot assign several partitions to the same mount point. Please change "
 "all but one of them."
 msgstr ""
+"Du kan ikke udpege flere partitioner til samme monteringspunkt. Ret venligst "
+"alle undtagen én."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partconf.templates:14001
 msgid "Ready to create file systems and mount partitions?"
-msgstr ""
+msgstr "Klar til at oprette filsystemer og montere partitioner?"
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../partconf.templates:14001
 msgid "File systems will be created and partitions mounted."
-msgstr ""
+msgstr "Filsystemer vil blive oprettet og partitioner monteret."
 
 #. Type: boolean
 #. Description
@@ -609,20 +664,22 @@ msgid ""
 "WARNING: This will destroy all data on the partitions you have assigned file "
 "systems to."
 msgstr ""
+"ADVARSEL: Dette vil ødelægge alle data på de partitioner, du har udpeget "
+"filsystemer til."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:15001
 msgid "Failed to create swap space on ${PARTITION}"
-msgstr ""
+msgstr "Kunne ikke oprette swapområde på ${PARTITION}"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:15001
 msgid "An error occurred when the swap space was created on ${PARTITION}."
-msgstr ""
+msgstr "Der opstod en fejl, da swapområdet blev oprettet på ${PARTITION}."
 
 #. Type: error
 #. Description
@@ -642,27 +699,29 @@ msgid ""
 "Please check the error log on the third console or /var/log/messages for "
 "more information."
 msgstr ""
+"Tjek fejlloggen på den tredje konsol eller /var/log/messages for flere "
+"oplysninger."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:16001
 msgid "Failed to activate the swap space on ${PARTITION}"
-msgstr ""
+msgstr "Kunne ikke aktivere swapområdet på ${PARTITION}"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:16001
 msgid "An error occurred when the swap space on ${PARTITION} was activated."
-msgstr ""
+msgstr "Der opstod en fejl, da swapområdet på ${PARTITION} blev aktiveret."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:17001
 msgid "Failed to create ${FS} file system on ${PARTITION}"
-msgstr ""
+msgstr "Kunne ikke oprette ${FS}-filsystem på ${PARTITION}"
 
 #. Type: error
 #. Description
@@ -671,20 +730,21 @@ msgstr ""
 msgid ""
 "An error occurred when the ${FS} file system was created on ${PARTITION}."
 msgstr ""
+"Der opstod en fejl, da ${FS}-filsystemet blev oprettet på ${PARTITION}."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:18001
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
-msgstr ""
+msgstr "Kunne ikke montere ${PARTITION} på ${MOUNT}"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:18001
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
-msgstr ""
+msgstr "Der opstod en fejl, da ${PARTITION} blev monteret på ${MOUNT}."
 
 #. Type: text
 #. Description
@@ -692,35 +752,35 @@ msgstr ""
 #. :sl5:
 #: ../partconf.templates:19001
 msgid "Configure and mount partitions"
-msgstr ""
+msgstr "Sæt partitioner op og montér dem"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../partitioner.templates:1002
 msgid "Disk to partition:"
-msgstr ""
+msgstr "Disk at partitionere:"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../partitioner.templates:1002
 msgid "Please choose one of the listed disks to create partitions on it."
-msgstr ""
+msgstr "Vælg en af de viste diske for at oprette partitioner på den."
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../partitioner.templates:1002 ../s390-dasd.templates:1002
 msgid "Select \"Finish\" at the bottom of the list when you are done."
-msgstr ""
+msgstr "Vælg \"Afslut\" i bunden af listen, når du er færdig."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partitioner.templates:2001
 msgid "No disk found"
-msgstr ""
+msgstr "Fandt ingen disk"
 
 #. Type: error
 #. Description
@@ -730,20 +790,22 @@ msgid ""
 "Unable to find any disk in your system. Maybe some kernel modules need to be "
 "loaded."
 msgstr ""
+"Kunne ikke finde nogle diske på dit system. Måske skal du indlæse nogle "
+"kernemoduler."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partitioner.templates:3001
 msgid "Partitioning error"
-msgstr ""
+msgstr "Partitioneringsfejl"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partitioner.templates:3001
 msgid "Failed to partition the disk ${DISC}."
-msgstr ""
+msgstr "Kunne ikke partitionere disken ${DISC}."
 
 #. Type: text
 #. Description
@@ -751,7 +813,7 @@ msgstr ""
 #. Main menu item
 #: ../partitioner.templates:4001
 msgid "Partition a hard drive"
-msgstr ""
+msgstr "Partitionér en harddisk"
 
 #. Type: select
 #. Choices
@@ -761,7 +823,7 @@ msgstr ""
 #. :sl5:
 #: ../s390-netdevice.templates:1001
 msgid "ctc: Channel to Channel (CTC) or ESCON connection"
-msgstr ""
+msgstr "ctc: Channel-to-Channel (CTC) eller ESCON-forbindelse"
 
 #. Type: select
 #. Choices
@@ -771,7 +833,7 @@ msgstr ""
 #. :sl5:
 #: ../s390-netdevice.templates:1001
 msgid "qeth: OSA-Express in QDIO mode / HiperSockets"
-msgstr ""
+msgstr "qeth: OSA-Express i QDIO-tilstand / HiperSockets"
 
 #. Type: select
 #. Choices
@@ -781,14 +843,14 @@ msgstr ""
 #. :sl5:
 #: ../s390-netdevice.templates:1001
 msgid "iucv: Inter-User Communication Vehicle - available for VM guests only"
-msgstr ""
+msgstr "iucv: Mellem-bruger kommunikations-transport - kun for VM-gæster"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:1002
 msgid "Network device type:"
-msgstr ""
+msgstr "Netkorts-type:"
 
 #. Type: select
 #. Description
@@ -799,13 +861,15 @@ msgid ""
 "for installing the Debian system (via NFS or HTTP). Only the listed devices "
 "are supported."
 msgstr ""
+"Vælg typen på det primære netkort, som du vil bruge til at installere Debian-"
+"systemet fra (via NFS eller HTTP). Kun de viste enheder understøttes."
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:2001
 msgid "CTC read device:"
-msgstr ""
+msgstr "CTC-læseenhed:"
 
 #. Type: select
 #. Description
@@ -815,14 +879,14 @@ msgstr ""
 #. :sl5:
 #: ../s390-netdevice.templates:2001 ../s390-netdevice.templates:3001
 msgid "The following device numbers might belong to CTC or ESCON connections."
-msgstr ""
+msgstr "Følgende enhedsnumre kan tilhøre CTC- eller ESCON-forbindelser."
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:3001
 msgid "CTC write device:"
-msgstr ""
+msgstr "CTC-skriveenhed:"
 
 #. Type: boolean
 #. Description
@@ -836,7 +900,7 @@ msgstr ""
 #: ../s390-netdevice.templates:4001 ../s390-netdevice.templates:8001
 #: ../s390-netdevice.templates:13001
 msgid "Do you accept this configuration?"
-msgstr ""
+msgstr "Vil du acceptere denne opsætning?"
 
 #. Type: boolean
 #. Description
@@ -848,41 +912,45 @@ msgid ""
 " write channel = ${device_write}\n"
 " protocol      = ${protocol}"
 msgstr ""
+"De konfigurerede indstillinger er:\n"
+" læsekanal     = ${device_read}\n"
+" skrivekanal   = ${device_write}\n"
+" protokol      = ${protocol}"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:5001
 msgid "No CTC or ESCON connections"
-msgstr ""
+msgstr "Ingen CTC- eller ESCON-forbindelser"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:5001
 msgid "Please make sure that you have set them up correctly."
-msgstr ""
+msgstr "Sørg for at du har sat dem korrekt op."
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:6001
 msgid "Protocol for this connection:"
-msgstr ""
+msgstr "Protokol for denne forbindelse:"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:7001
 msgid "Device:"
-msgstr ""
+msgstr "Enhed:"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:7001
 msgid "Please select the OSA-Express QDIO / HiperSockets device."
-msgstr ""
+msgstr "Vælg OSA-Express QDIO / HiperSockets-enhed."
 
 #. Type: boolean
 #. Description
@@ -895,13 +963,18 @@ msgid ""
 " portname = ${portname}\n"
 " layer2   = ${layer2}"
 msgstr ""
+"De indstillede parametre er:\n"
+" kanaler  = ${device0}, ${device1}, ${device2}\n"
+" port     = ${port}\n"
+" portnavn = ${portname}\n"
+" lag2     = ${layer2}"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:9001
 msgid "No OSA-Express QDIO cards / HiperSockets"
-msgstr ""
+msgstr "Ingen OSA-Express QDIO-kort / HiperSockets"
 
 #. Type: error
 #. Description
@@ -911,13 +984,15 @@ msgid ""
 "No OSA-Express QDIO cards / HiperSockets were detected. If you are running "
 "VM please make sure that your card is attached to this guest."
 msgstr ""
+"Fandt ingen OSA-Express QDIO-kort eller HiperSockets. Hvis du kører VM, så "
+"sørg for at dit kort er forbundet til denne gæst."
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:10001
 msgid "Portname:"
-msgstr ""
+msgstr "Portnavn:"
 
 #. Type: string
 #. Description
@@ -927,6 +1002,8 @@ msgid ""
 "Please enter the portname of your OSA-Express card. This name must be 1 to 8 "
 "characters long and must be equal on all systems accessing the same card."
 msgstr ""
+"Angiv portnavnet for dit OSA-Express-kort. Det skal være mellem 1 og 8 tegn "
+"langt og være det samme på alle systemer, der tilgår det samme kort."
 
 #. Type: string
 #. Description
@@ -937,34 +1014,37 @@ msgid ""
 "for cards with microcode level 2.10 or later or when you want to share a "
 "card."
 msgstr ""
+"Lad feltet stå tomt, hvis du vil bruge HiperSockets. Denne indstilling "
+"kræves for kort med microcode-niveau 2.10 eller senere, eller når du vil "
+"dele et kort."
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:10001
 msgid "The name will automatically be converted to uppercase."
-msgstr ""
+msgstr "Navnet bliver automatisk omsat til store bogstaver."
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:11001
 msgid "Port:"
-msgstr ""
+msgstr "Port:"
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:11001
 msgid "Please enter a relative port for this connection."
-msgstr ""
+msgstr "Angiv en port for denne forbindelse."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:12001
 msgid "Use this device in layer2 mode?"
-msgstr ""
+msgstr "Benyt denne enhed i lag2-tilstand?"
 
 #. Type: boolean
 #. Description
@@ -975,6 +1055,9 @@ msgid ""
 "removed from incoming IPv4 packets. Using the card in layer2 mode will make "
 "it keep the MAC addresses of IPv4 packets."
 msgstr ""
+"Som udgangspunkt benytter OSA-Express kort lag3-tilstand. I denne tilstand, "
+"fjernes LLC-hoveder fra indkommende IPv4-pakker. Hvis kortet benyttes i lag2-"
+"tilstand, bevares IPv4-pakkernes MAC-adresser."
 
 #. Type: boolean
 #. Description
@@ -984,20 +1067,22 @@ msgid ""
 "The configured parameter is:\n"
 " peer  = ${peer}"
 msgstr ""
+"Det opsatte parameter er:\n"
+" vært  = ${peer}"
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:14001
 msgid "VM peer:"
-msgstr ""
+msgstr "VM-vært:"
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-netdevice.templates:14001
 msgid "Please enter the name of the VM peer you want to connect to."
-msgstr ""
+msgstr "Angiv navnet på den VM-vært (VM-peer), du vil forbinde til."
 
 #. Type: string
 #. Description
@@ -1007,6 +1092,8 @@ msgid ""
 "If you want to connect to multiple peers, separate the names by colons, e."
 "g.  tcpip:linux1."
 msgstr ""
+"Hvis du vil forbinde til flere værter, kan du adskille navnene med kolonner, "
+"som f.eks. tcpip:linux1."
 
 #. Type: string
 #. Description
@@ -1017,6 +1104,9 @@ msgid ""
 "IUCV must be enabled in the VM user directory for this driver to work and it "
 "must be set up on both ends of the communication."
 msgstr ""
+"Standardnavnet på en TCP/IP-server på VM er TCPIP, på VIF er det $TCPIP. "
+"Bemærk: IUCV skal være aktiveret i VM-brugermappen for at denne driver kan "
+"fungere og det skal sættes op i begge ender af kommunikationen."
 
 #. Type: text
 #. Description
@@ -1024,14 +1114,14 @@ msgstr ""
 #. :sl5:
 #: ../s390-netdevice.templates:15001
 msgid "Configure the network device"
-msgstr ""
+msgstr "Sæt netkortet op"
 
 #. Type: select
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:1002
 msgid "Available disks:"
-msgstr ""
+msgstr "Tilgængelige diske:"
 
 #. Type: select
 #. Description
@@ -1041,13 +1131,15 @@ msgid ""
 "The following disk access storage devices (DASD) are available. Please "
 "select each device you want to use one at a time."
 msgstr ""
+"Følgende diskadgangs-lagerenheder (DASD) er tilgængelige. Vælg de enheder, "
+"du vil benytte en ad gangen."
 
 #. Type: string
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:2001
 msgid "Choose disk:"
-msgstr ""
+msgstr "Vælg disk:"
 
 #. Type: string
 #. Description
@@ -1057,27 +1149,29 @@ msgid ""
 "Please choose a disk. You have to specify the complete device number, "
 "including leading zeros."
 msgstr ""
+"Vælg en disk. Du skal angive det komplette enhedsnummer inklusive "
+"foranstillede nuller."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:3001
 msgid "Invalid disk"
-msgstr ""
+msgstr "Ugyldig disk"
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:3001
 msgid "An invalid device number has been chosen."
-msgstr ""
+msgstr "Der blev valgt et ugyldigt enhedsnummer."
 
 #. Type: boolean
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:4001
 msgid "Format the disk?"
-msgstr ""
+msgstr "Formatér disken?"
 
 #. Type: boolean
 #. Description
@@ -1088,6 +1182,9 @@ msgid ""
 "formatted or not. Disks need to be formatted before you can create "
 "partitions."
 msgstr ""
+"Installationsprogrammet kan ikke afgøre, om enheden ${device} allerede er "
+"blevet formateret eller ej. Diske skal formateres, før du kan oprette "
+"partitioner."
 
 #. Type: boolean
 #. Description
@@ -1097,13 +1194,15 @@ msgid ""
 "If you are sure the disk has already been correctly formatted, you don't "
 "need to do so again."
 msgstr ""
+"Hvis du er sikker på, at disken allerede er blevet formateret korrekt, "
+"behøver du ikke at gøre det igen."
 
 #. Type: text
 #. Description
 #. :sl5:
 #: ../s390-dasd.templates:5001
 msgid "Formatting ${device}..."
-msgstr ""
+msgstr "Formaterer ${device}..."
 
 #. Type: text
 #. Description
@@ -1111,7 +1210,7 @@ msgstr ""
 #. :sl5:
 #: ../s390-dasd.templates:6001
 msgid "Configure disk access storage devices (DASD)"
-msgstr ""
+msgstr "Sæt diskadgangs-lagerenheder (DASD) op"
 
 #. Type: text
 #. Description
@@ -1119,4 +1218,4 @@ msgstr ""
 #. :sl5:
 #: ../zipl-installer.templates:1001
 msgid "Install the ZIPL boot loader on a hard disk"
-msgstr ""
+msgstr "Installér opstartsindlæseren ZIPL på en harddisk"
