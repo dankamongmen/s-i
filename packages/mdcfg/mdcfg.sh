@@ -319,7 +319,7 @@ md_create_array(){
 
 	db_set mdcfg/raidsparedevs ""
 	SELECTED=0
-	if [ $SPARE_COUNT -gt 0 ]; then
+	if [ $SPARE_COUNT -gt 0 ] && [ -n "$PARTITIONS" ]; then
 		FIRST=1
 		# Loop until the correct number of devices has been selected.
 		# That means any number less than or equal to the spare count.
