@@ -5,16 +5,16 @@ LIST     = languagelist
 debian/languagelist.data: $(LIST)
 	LC_COLLATE=C ./mklanguagelist.data $(LIST) debian/languagelist.data
 
-debian/templates.base: debian/localechooser.templates-in debian/iso-3166.tab
-	./mktemplates.continents debian/iso-3166.tab regionmap debian/templates.continents
+debian/templates.base: debian/localechooser.templates-in debian/iso_3166.tab
+	./mktemplates.continents debian/iso_3166.tab regionmap debian/templates.continents
 	cat debian/localechooser.templates-in debian/templates.continents >debian/templates.base-in
 	./mktemplates.base debian/templates.base-in debian/templates.base
 
 debian/iso-codes:
 	./get-iso-codes
 
-debian/iso-3166.tab:
-	./iso3166tab.py /usr/share/xml/iso-codes/iso_3166.xml >debian/iso-3166.tab
+debian/iso_3166.tab:
+	isoquery -c | cut -f 1,4 | sort >debian/iso_3166.tab
 
 debian/templates: $(LIST) debian/templates.base debian/short-tmp/shortlists
 	./mktemplates.shortlist
@@ -23,7 +23,7 @@ debian/templates: $(LIST) debian/templates.base debian/short-tmp/shortlists
 debian/SUPPORTED-short:
 	./get-SUPPORTED
 
-debian/short-tmp/shortlists: debian/iso-3166.tab debian/iso-codes
+debian/short-tmp/shortlists: debian/iso_3166.tab debian/iso-codes
 	./mkshort
 
 check-scripts:
@@ -52,5 +52,5 @@ demo: localechooser.templates localechooser
 	DEBIAN_FRONTEND=dialog DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./localechooser
 
 clean:
-	$(RM) localechooser.templates debian/templates debian/templates.continents debian/templates.base-in debian/templates.base debian/languagelist.data SUPPORTED-short debian/iso-3166.tab
+	$(RM) localechooser.templates debian/templates debian/templates.continents debian/templates.base-in debian/templates.base debian/languagelist.data SUPPORTED-short debian/iso_3166.tab
 	$(RM) -rf debian/short-tmp debian/iso-codes
