@@ -8,9 +8,9 @@
 use warnings;
 use strict;
 
-my $iso_3166="iso_3166.tab";
+my $iso3166tab = 'debian/iso_3166.tab';
 my %country;
-open (ISO, $iso_3166) || die "$iso_3166: $!";
+open (ISO, $iso3166tab) || die "$iso3166tab: $!";
 while (<ISO>) {
 	chomp;
 	next unless length;
@@ -72,7 +72,7 @@ while (<OVERRIDE>) {
 }
 close OVERRIDE;
 
-open (TZMAP, ">tzmap") || die "tzmap: $!";
+open (TZMAP, ">debian/tzmap") || die "tzmap: $!";
 foreach my $cc (sort keys %cc2zone) {
 	my $list=join(", ", @{$cc2zone{$cc}});
 	if (@{$cc2zone{$cc}} > 1 && ! $override{$cc}) {
