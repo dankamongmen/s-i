@@ -18,10 +18,9 @@ if (! defined $hostarch) {
 	chomp $hostarch;
 }
 
-my $iso3166xml = '/usr/share/xml/iso-codes/iso_3166.xml';
+my $iso3166tab = 'debian/iso_3166.tab';
 my %iso3166;
-open ISO3166TAB, '-|:utf8', './iso3166tab.py', "$iso3166xml"
-	or die "open iso3166tab.py $iso3166xml: $!";
+open(ISO3166TAB, "< $iso3166tab") || die "Unable to read $iso3166tab";
 while (<ISO3166TAB>) {
 	/^([A-Z]+)\t(.*)$/ or next;
 	$iso3166{$1} = $2;

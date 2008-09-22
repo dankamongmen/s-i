@@ -52,22 +52,25 @@ $(MASTERLIST): force-try-update
 force-try-update: ;
 endif
 
-debian/httplist-countries: $(MASTERLIST)
+debian/iso_3166.tab:
+	isoquery -c | cut -f 1,4 | sort >debian/iso_3166.tab
+
+debian/httplist-countries: $(MASTERLIST) debian/iso_3166.tab
 	./mirrorlist httplist $^
 
-debian/ftplist-countries: $(MASTERLIST)
+debian/ftplist-countries: $(MASTERLIST) debian/iso_3166.tab
 	./mirrorlist ftplist $^
 
-debian/choose-mirror-bin.templates: $(MASTERLIST) $(templates) debian/httplist-countries debian/ftplist-countries
+debian/choose-mirror-bin.templates: $(MASTERLIST) $(templates) debian/httplist-countries debian/ftplist-countries debian/iso_3166.tab
 	# Grab ISO codes from iso-codes package
 	./get-iso-codes
 	# Build the templates
 	./mktemplates $(templates)
 
-mirrors_http.h: $(MASTERLIST)
+mirrors_http.h: $(MASTERLIST) debian/iso_3166.tab
 	if [ "$$USE_HTTP" ]; then ./mirrorlist http $^; fi
 
-mirrors_ftp.h: $(MASTERLIST)
+mirrors_ftp.h: $(MASTERLIST) debian/iso_3166.tab
 	if [ "$$USE_FTP" ]; then ./mirrorlist ftp $^; fi
 
 choose-mirror.o: mirrors_http.h mirrors_ftp.h
@@ -96,6 +99,7 @@ clean:
 	rm -f debian/templates-countries debian/httplist-countries debian/ftplist-countries
 	rm -f demo demo.templates
 	rm -rf debian/iso-codes debian/pobuild
+	rm -f debian/iso_3166.tab
 
 reallyclean: clean
 	rm -f debian/choose-mirror-bin.templates

@@ -2,16 +2,17 @@
 
 set -e
 
-#
 # Get ISO codes from the iso-codes package and extract translations
-set -e
-[ -r /usr/share/xml/iso-codes/iso_3166.xml ] || exit 1
-rm -rf debian/iso-codes >/dev/null 2>&1
+
+[ -r debian/iso_3166.tab ] || exit 1
+
+rm -rf debian/iso-codes
 mkdir debian/iso-codes
-for i in `find /usr/share/locale/ -name iso_3166.mo` ; do
-  language=`echo $i | cut -f5 -d/`
-  # Extract translations from the iso-codes package
-  msgunfmt $i >debian/iso-codes/${language}.po 2>/dev/null
+
+for i in $(find /usr/share/locale/ -name iso_3166.mo) ; do
+	language=$(echo $i | cut -f5 -d/)
+	# Extract translations from the iso-codes package
+	msgunfmt $i >debian/iso-codes/${language}.po 2>/dev/null
 done
 
 DATE="$(date +'%Y-%m-%d %H:%M%z')"
@@ -27,6 +28,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\\n"
 
 EOF
-./iso3166tab.py /usr/share/xml/iso-codes/iso_3166.xml \
-  | perl -pe 's/.*?\t(.*)/msgid "$1"\nmsgstr "$1"\n/' \
-  >>debian/iso-codes/en.po
+
+perl -pe 's/.*?\t(.*)/msgid "$1"\nmsgstr "$1"\n/' \
+	<debian/iso_3166.tab >>debian/iso-codes/en.po
