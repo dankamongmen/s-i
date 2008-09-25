@@ -48,6 +48,7 @@ sub aggregate {
 		if (! close LOG) {
 			print $fh "<br>\n";
 			print $fh "<b>failed</b> to download <a href=\"$logurl\">summary log</a>\n";
+			print $fh "<br>\n";
 			print STATS "\t0";
 			next;
 		}
