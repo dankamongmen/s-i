@@ -95,6 +95,42 @@ information.
 
 </para></listitem>
 </varlistentry>
+<varlistentry>
+
+<term>RAID6</term><listitem><para>
+
+Is similar to RAID5 except that it uses two parity devices instead of
+one.
+
+</para><para>
+
+A RAID6 array can survive up to two disk failures.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID10</term><listitem><para>
+
+RAID10 combines striping (as in RAID0) and mirroring (as in RAID1).
+It creates <replaceable>n</replaceable> copies of incoming data and
+distributes them across the partitions so that none of the copies of
+the same data are on the same device.
+The default value of <replaceable>n</replaceable> is 2, but it can be
+set to something else in expert mode. The number of partitions used
+must be at least <replaceable>n</replaceable>.
+RAID10 has different layouts for distributing the copies. The default is
+near copies. Near copies have all of the copies at about the same offset
+on all of the disks. Far copies have the copies at different offsets on
+the disks. Offset copies copy the stripe, not the individual copies.
+
+</para><para>
+
+RAID10 can be used to achieve reliability and redundancy without the
+drawback of having to calculate parity.
+
+</para></listitem>
+</varlistentry>
 </variablelist>
 
 To sum it up:
@@ -136,6 +172,27 @@ To sum it up:
   <entry>
     Size of the smallest partition multiplied by (number of devices in
     RAID minus one)
+  </entry>
+</row>
+
+<row>
+  <entry>RAID6</entry>
+  <entry>4</entry>
+  <entry>optional</entry>
+  <entry>yes</entry>
+  <entry>
+    Size of the smallest partition multiplied by (number of devices in
+    RAID minus two)
+  </entry>
+</row>
+
+<row>
+  <entry>RAID10</entry>
+  <entry>2</entry>
+  <entry>optional</entry>
+  <entry>yes</entry>
+  <entry>
+    Total of all partitions divided by the number of chunk copies (defaults to two)
   </entry>
 </row>
 
@@ -212,6 +269,24 @@ continue until you correct the issue.
 
 RAID5 has a similar setup procedure as RAID1 with the exception that you
 need to use at least <emphasis>three</emphasis> active partitions.
+
+</para></listitem>
+<listitem><para>
+
+RAID6 also has a similar setup procedure as RAID1 except thatat least
+<emphasis>four</emphasis> active partitions are required.
+
+</para></listitem>
+<listitem><para>
+
+RAID10 again has a similar setup procedure as RAID1 except in expert
+mode. In expert mode, &d-i; will ask you for the layout.
+The layout has two parts. The first part is the layout type. It is either
+<literal>n</literal> (for near copies), <literal>f</literal> (for far
+copies), or <literal>o</literal> (for offset copies). The second part is
+the number of copies to make of the data. There must be at least that
+many active devices so that all of the copies can be distributed onto
+different disks.
 
 </para></listitem>
 </itemizedlist>
