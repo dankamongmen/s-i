@@ -46,6 +46,7 @@ sub aggregate {
 		}
 		my @lines=<LOG>;
 		if (! close LOG) {
+			print $fh "<br>\n";
 			print $fh "<b>failed</b> to download <a href=\"$logurl\">summary log</a>";
 			print STATS "\t0";
 			next;
@@ -96,7 +97,7 @@ sub aggregate {
 				print $fh "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident $notes\n";
 			}
 		}
-		print $fh "</ul>\n";
+		print $fh "</ul><br>\n";
 		print STATS "\t";
 		if ($onesuccess+$onefailed > 0) {
 			print STATS ($onesuccess / ($onesuccess+$onefailed) * 100);
