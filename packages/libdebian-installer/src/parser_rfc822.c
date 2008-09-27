@@ -191,7 +191,7 @@ wildcard:
       field_string.size = 0;
 
       fip = di_hash_table_lookup (info->table, &field_string);
-          
+
       if (fip)
       {
         field_modifier_string.string = field_begin;
