@@ -69,6 +69,12 @@ int di_parser_rfc822_read (char *begin, size_t size, di_parser_info *info, di_pa
 
   while (cur < end)
   {
+    if (*cur == '\n')
+    {
+      cur++;
+      continue;
+    }
+
     nr++;
 
     if (entry_new)
@@ -196,13 +202,8 @@ wildcard:
 
 next:
       cur = value_end + 1;
-      if (cur >= end)
+      if (cur >= end || *cur == '\n')
         break;
-      if (*cur == '\n')
-      {
-        while (cur < end && *++cur == '\n');
-        break;
-      }
     }
 
     if (entry_finish && entry_finish (act, user_data))
