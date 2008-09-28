@@ -1,4 +1,4 @@
-<!-- original version: 51911 -->
+<!-- original version: 56134 -->
 
 <sect3 id="mdcfg">
  <title>Configuration d'un périphérique multidisque (RAID logiciel)</title>
@@ -58,7 +58,7 @@ plus nombreuses que les écritures de fichiers.
 Vous pouvez aussi inclure dans un tel ensemble un disque de rechange qui prendra
 la place du disque défectueux en cas de problème.  
   </para></listitem>
-</varlistentry>
+</varlistentry> 
 <varlistentry>
 
 <term>RAID5</term><listitem><para>
@@ -78,6 +78,39 @@ Comme on le voit, RAID5 est aussi fiable que RAID1 tout en évitant de la
 redondance. D'un autre côté, il sera un tout petit peu moins rapide dans les
 opérations d'écriture que RAID0, à cause du calcul de l'information de
 parité.
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID6</term><listitem><para>
+
+RAID6 est semblable à RAID5 mais il y a deux disques de parité au lieu d'un seul.
+
+</para><para>
+
+Un système RAID6 peut supporter jusqu'à deux défaillances de disque.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID10</term><listitem><para>
+
+Le niveau RAID10 combine la répartition en bandes comme dans le RAID0 et la duplication des données
+comme dans le RAID1.
+Il crée <replaceable>n</replaceable> copies des données et les distribue dans les partitions
+de manière que les copies des mêmes données ne soient pas sur le même disque.
+La valeur par défaut de <replaceable>n</replaceable> est 2, mais elle peut être modifiée
+en mode expert. Le nombre de partitions utilisées doit être au moins égal à <replaceable>n</replaceable>.
+Plusieurs schémas existent pour la répartition des copies. Par défaut, le mode <emphasis>near</emphasis>
+est utilisé. Dans ce mode les copies ont la même position sur tous les disques.
+Dans le mode <emphasis>far</emphasis> les copies ont des positions différentes sur les disques. Dans le mode
+<emphasis>offset</emphasis>, c'est la bande qui est copiée, non le bloc de données.
+
+</para><para>
+
+Le niveau RAID10 propose fiabilité et redondance sans avoir à calculer des informations de parité.
+
 </para></listitem>
 </varlistentry>
 </variablelist>
@@ -124,6 +157,26 @@ périphériques dans l'ensemble moins un.
   </entry>
 </row>
 
+<row>
+  <entry>RAID6</entry>
+  <entry>4</entry>
+  <entry>facultatif</entry>
+  <entry>oui</entry>
+  <entry>
+    Taille de la plus petite partition multipliée par le nombre des 
+périphériques dans l'ensemble moins deux.
+  </entry>
+</row>
+
+<row>
+  <entry>RAID10</entry>
+  <entry>2</entry>
+  <entry>facultatif</entry>
+  <entry>oui</entry>
+  <entry>
+    Total des partitions divisé par le nombre de copies (deux, par défaut)
+  </entry>
+</row>
 </tbody></tgroup></informaltable>
 </para>
 
@@ -148,7 +201,7 @@ Assurez-vous que le système peut être amorcé avec le schéma de partitionneme
 Quand on utilise RAID pour le système de fichiers racine (<filename>/</filename>), il est
 nécessaire de créer un système de fichiers distinct pour <filename>/boot</filename>.
 La plupart des programmes d'amorçage <phrase arch="x86">(lilo et grub par exemple)</phrase>
-ne peuvent fonctionner qu'avec le type RAID1 (RAID en mode miroir). Ansi, il est possible d'utiliser
+ne peuvent fonctionner qu'avec le type RAID1 (RAID en mode miroir, sans bande). Ainsi, il est possible d'utiliser
 RAID5 pour <filename>/</filename> et RAID1 pour <filename>/boot</filename>.
 
 </para></note>
@@ -156,7 +209,7 @@ RAID5 pour <filename>/</filename> et RAID1 pour <filename>/boot</filename>.
 <warning><para>
 L'installateur gère le RAID logiciel depuis peu. Vous pourrez rencontrer
 des problèmes, pour certains niveaux RAID et en combinaison avec les
-programmes d'amorçage, si vous essayez d'utiliser un périphérique de ce type 
+programmes d'amorçage, par exemple si vous essayez d'utiliser un périphérique de ce type 
 pour la partition racine, <filename>/</filename>. Les experts pourront
 sans doute contourner ces problèmes en exécutant certaines étapes de 
 configuration ou d'installation dans un <quote>shell</quote>.
@@ -185,11 +238,28 @@ composeront le périphérique. Ensuite vous devrez choisir dans la liste des
 partitions RAID celles qui seront actives et celles qui resteront en réserve.
 Le nombre de ces partitions devra être égal à celui donné l'instant d'avant.
 Si vous n'indiquez pas la même valeur, l'installateur ne vous laissera 
-pas continuer et vous demandera une correction.
+pas continuer et vous demandera de rectifier.
 </para></listitem>
 <listitem><para>
 RAID5 se configure comme RAID1, mais vous devez utiliser au moins trois
 partitions actives.
+</para></listitem>
+<listitem><para>
+
+RAID6 se configure comme RAID1, mais vous devez utiliser au moins quatre
+partitions actives.
+
+</para></listitem>
+<listitem><para>
+
+RAID10 se configure comme RAID1, excepté en mode expert. Dans ce mode,
+l'installateur demande le schéma de répartition des données. Ce schéma est en deux parties.
+La première est le type du schéma, soit <literal>n</literal> (pour copie <emphasis>near</emphasis>),
+soit <literal>f</literal> (pour copie <emphasis>far</emphasis>), soit
+<literal>o</literal> (pour copie <emphasis>offset</emphasis>). La seconde partie
+est le nombre de copie à faire. Il doit y avoir autant de disques actifs pour que les copies
+puissent être réparties sur ces disques.
+
 </para></listitem>
 </itemizedlist>
 

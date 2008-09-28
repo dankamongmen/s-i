@@ -1,4 +1,4 @@
-<!-- original version: 55679 -->
+<!-- original version: 56148 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -691,7 +691,8 @@ d-i debian-installer/locale string fr_FR
 
 La configuration du clavier consiste à déclarer son architecture et la carte clavier.
 La plupart du temps le type est correctement détecté et il n'y a pas besoin de
-le préconfigurer. La carte clavier doit être compatible avec le type du clavier.
+le préconfigurer. La carte clavier doit être connue par l'installateur debian et
+être compatible avec le type du clavier.
 
 <informalexample role="example"><screen>
 # Choix du clavier.
@@ -920,7 +921,9 @@ d-i partman-auto/method string lvm
 # configuration LVM, l'utilisateur recevra normalement un avertissement.
 # Cet avertissement peut être évité :  
 d-i partman-lvm/device_remove_lvm boolean true
-# De même pour la confirmation de créer les partitions lvm :
+# De même pour un Raid logiciel existant déjà :
+d-i parman-md/device_remove_md boolean true
+# Et aussi pour la confirmation concernant la création de partitions lvm :
 d-i partman-lvm/confirm boolean true
 
 # Vous pouvez choisir parmi tous les schémas prédéfinis...
@@ -975,7 +978,7 @@ d-i partman/confirm boolean true
 <para>
 
 Il est aussi possible de préconfigurer le partitionnement d'un RAID logiciel.
-Les niveaux 0,1 et 5 sont acceptés, de même que la création d'ensemble dégradé et
+Les niveaux 0,1,5,6 et 10 sont acceptés, de même que la création d'ensemble dégradé et
 de périphériques de rechange.
 Si vous utilisez RAID 1, vous pouvez préconfigurer grub pour qu'il s'installe sur tous
 les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
@@ -1022,7 +1025,7 @@ Le RAID avec ensemble dégradé ou périphériques de rechange n'a été que tr�
 # Paramètres :
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Les niveaux RAID 0, 1 et 5 sont acceptés. Les périphériques sont séparés par "#".
+# Les niveaux RAID 0, 1, 5, 6 et 10 sont acceptés. Les périphériques sont séparés par "#".
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
