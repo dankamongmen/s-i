@@ -796,6 +796,19 @@ humandev () {
 		printf "$RET" ".CCISS" "-" "$controller" "$lun" "$part" "$linux"
 	    fi
 	    ;;
+	/dev/mmcblk[0-9])
+	    drive=$(echo $1 | sed 's,^/dev/mmcblk\([0-9]\).*,\1,')
+	    linux=${1#/dev/}
+	    db_metaget partman/text/mmc_disk description
+	    printf "$RET" "$(($drive + 1))" "$linux"
+	    ;;
+	/dev/mmcblk[0-9]p[0-9]*)
+	    drive=$(echo $1 | sed 's,^/dev/mmcblk\([0-9]\).*,\1,')
+	    part=$(echo $1 | sed 's,^/dev/mmcblk[0-9]p\([0-9][0-9]*\).*,\1,')
+	    linux=${1#/dev/}
+	    db_metaget partman/text/mmc_partition description
+	    printf "$RET" "$(($drive + 1))" "$part" "$linux"
+	    ;;
 	/dev/md*|/dev/md/*)
 	    device=`echo "$1" | sed -e "s/.*md\/\?\(.*\)/\1/"`
 	    type=`grep "^md${device}[ :]" /proc/mdstat | sed -e "s/^.* : active raid\([[:alnum:]]\{,2\}\).*/\1/"`
