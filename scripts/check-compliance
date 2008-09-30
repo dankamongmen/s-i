@@ -1,0 +1,53 @@
+#! /bin/bash
+
+# Script checks whether the versions of build dependencies of D-I in testing
+# and unstable match.
+# If files from a build dependency are embedded in D-I images, the version
+# that is used to build it must be included in the release.
+#
+# If called with 'all' the script will list all build dependencies, if not it
+# will only list those for which the versions do not match.
+#
+# The script should be run from the installer/debian directory in D-I SVN.
+
+# TODO
+# - convert list to unique source packages and check those instead
+# - add ignore list for non-embedded packages and optionally ignore those
+
+ignore_m68k="amiboot atari-bootstrap emile emile-bootblocks m68k-vme-tftplilo vmelilo"
+
+get_version() {
+	local ver
+
+	# IIRC packages are listed in ascending order on version, so take last
+	ver=$(rmadison -s $2 $1 | tail -n1 | awk '{print $3}')
+	[ "$ver" ] && echo "$ver" || echo "N/A"
+}
+
+PRINT_ALL=
+if [ "$1" = all ]; then
+	PRINT_ALL=1
+fi
+
+build_deps="$(sed -nr "/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p" control | sort)"
+
+for p in $build_deps; do
+	# m68k is not a release arch, so ignore m68k-only dependencies
+	if echo " $ignore_m68k " | grep -q " $p "; then
+		continue
+	fi
+
+	# glibc-pic is a pseudo-package, check the source package instead
+	if [ "$p" = glibc-pic ]; then
+		p=glibc
+	fi
+
+	tver=$(get_version $p testing)
+	uver=$(get_version $p unstable)
+
+	if [ "$tver" != "$uver" ]; then
+		printf "%-25s %20s %20s   *\n" "$p" "$tver" "$uver"
+	elif [ "$PRINT_ALL" ]; then
+		printf "%-25s %20s %20s\n" "$p" "$tver" "$uver"
+	fi
+done
