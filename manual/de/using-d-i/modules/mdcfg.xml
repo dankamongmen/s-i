@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 51911 -->
+<!-- original version: 56134 -->
 
    <sect3 id="mdcfg">
    <title><quote>Multidisk Devices</quote> (Software-RAID) konfigurieren (partman-md)</title>
@@ -99,6 +99,45 @@ Paritäts-Informationen errechnet werden müssen.
 
 </para></listitem>
 </varlistentry>
+<varlistentry>
+
+<term>RAID6</term><listitem><para>
+
+Vergleichbar mit RAID5, allerdings verwendet RAID6 zwei Paritäts-Disks statt einer.
+
+</para><para>
+
+Ein RAID6-Array kann den Ausfall von bis zu zwei Festplatten überstehen.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID10</term><listitem><para>
+
+RAID10 vereint das Aufteilen der Daten in kleine Teile (Stripes, wie in
+RAID0) mit dem Spiegeln von Festplatten (wie in RAID1). Es erzeugt
+<replaceable>n</replaceable> Kopien der ankommenden Daten und verteilt
+Sie so über die Partitionen, dass mehrere Kopien der gleichen Daten
+nie auf der ein und derselben Festplatte liegen. Der Standardwert für
+<replaceable>n</replaceable> ist 2, aber er kann im Experten-Modus auch
+auf einen anderen Wert gesetzt werden. Die Zahl der verwendeten
+Partitionen muss mindestens <replaceable>n</replaceable> sein. RAID10
+enthält verschiedene Layouts für das Verteilen der Daten-Kopien:
+Der Standard ist <quote>near copies</quote>. Bei near copies liegen
+die Kopien an nahezu der gleichen Stelle auf allen Platten
+(ungefähr identischer Offset). Bei <quote>far copies</quote> ist der
+Offset auf den Festplatten unterschiedlich. <quote>Offset copies</quote>
+kopiert die Stripes (die aufgesplitteten Teile der Daten), nicht die
+individuellen Daten direkt.
+
+</para><para>
+
+RAID10 kann genutzt werden, Betriebssicherheit und Redundanz zu
+erreichen ohne den Nachteil, Parity-Informationen berechnen zu müssen.
+
+</para></listitem>
+</varlistentry>
 </variablelist>
 
 Um es nochmal zusammenzufassen:
@@ -138,6 +177,22 @@ Um es nochmal zusammenzufassen:
   <entry>optional</entry>
   <entry>ja</entry>
   <entry>Größe der kleinsten Partition multipliziert mit (Anzahl der Laufwerke minus 1)</entry>
+</row>
+
+<row>
+  <entry>RAID6</entry>
+  <entry>4</entry>
+  <entry>optional</entry>
+  <entry>ja</entry>
+  <entry>Größe der kleinsten Partition multipliziert mit (Anzahl der Laufwerke minus 2)</entry>
+</row>
+
+<row>
+  <entry>RAID10</entry>
+  <entry>2</entry>
+  <entry>optional</entry>
+  <entry>ja</entry>
+  <entry>Summe aller Partitionen dividiert durch die Anzahl der Daten-Kopien (Standard ist 2)</entry>
 </row>
 
 </tbody></tgroup></informaltable>
@@ -219,6 +274,26 @@ erst weitermachen, wenn dies korrigiert ist.
 Die Einrichtungsprozedur von RAID5 ist ähnlich der von RAID1 mit der
 Ausnahme, dass Sie mindestens <emphasis>drei</emphasis> aktive
 Partitionen benutzen müssen.
+
+</para></listitem>
+<listitem><para>
+
+Die Einrichtungsprozedur von RAID6 ist ebenfalls ähnlich zu der von RAID1,
+allerdings werden mindestens <emphasis>vier</emphasis> aktive Partitionen
+benötigt.
+
+</para></listitem>
+<listitem><para>
+
+Auch RAID10 hat eine Einrichtungsprozedur, die der von RAID1 ähnlich ist,
+lediglich im Experten-Modus gibt es Unterschiede. Im Experten-Modus fragt der
+&d-i; nach dem gewünschten Layout. Das Layout besteht aus zwei Teilen.
+Der erste Teil ist der Layout-Typ. Dies kann <literal>n</literal> (für
+near copies), <literal>f</literal> (für far copies) oder <literal>o</literal>
+(für offset copies) sein. Der zweite Teil ist die Anzahl der Kopien, die von
+den Daten erstellt werden sollen. Es müssen mindestens so viele aktive
+Festplatten vorhanden sein, dass alle Kopien der Daten auf verschiedene
+Platten verteilt werden können.
 
 </para></listitem>
 </itemizedlist>

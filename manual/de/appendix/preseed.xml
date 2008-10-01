@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 55679 -->
+<!-- original version: 56148 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -767,8 +767,8 @@ d-i debian-installer/locale string de_DE
 Die Tastaturkonfiguration besteht aus der Auswahl der Tastaturarchitektur
 und der Tastaturbelegung. In den meisten Fällen ist die richtige
 Architektur bereits standardmäßig vorgewählt, sodass Sie normalerweise
-nicht voreingestellt werden muss. Die Tastaturbelegung muss zur
-ausgewählten Architektur passen.
+nicht voreingestellt werden muss. Die Tastaturbelegung muss dem
+&d-i; für die ausgewählte Architektur bekannt sein.
 
 <informalexample role="example"><screen>
 # Auswahl der Tastatur.
@@ -1017,7 +1017,9 @@ d-i partman-auto/method string lvm
 # alte LVM-Konfiguration enthält, wird dem Benutzer normalerweise eine Warnung
 # angezeigt. Diese kann aber durch Voreinstellung unterdrückt werden...
 d-i partman-lvm/device_remove_lvm boolean true
-# Das gleiche gilt für die Bestätigung, die LVM-Partitionen zu schreiben.
+# Das Gleiche gilt für bereits existierende Software-RAID-Arrays:
+d-i parman-md/device_remove_md boolean true
+# Ebenfalls für die Bestätigung, die LVM-Partitionen zu schreiben.
 d-i partman-lvm/confirm boolean true
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
@@ -1074,7 +1076,7 @@ d-i partman/confirm boolean true
 <para>
 
 Sie können auch Voreinstellung verwenden, um Partitionen auf einem
-Software-RAID einzurichten. Es werden RAID-Level 0, 1 und 5 unterstützt
+Software-RAID einzurichten. Es werden RAID-Level 0, 1, 5, 6 und 10 unterstützt
 sowie die Einrichtung von degradierten Arrays und die Festlegung von
 Reserve-Geräten. Wenn Sie RAID 1 verwenden, können Sie voreinstellen,
 dass grub auf allen Geräten im Verbund installiert wird; siehe
@@ -1129,7 +1131,8 @@ degradierten Arrays und Reserve-Geräten wurden nur oberflächlich getestet.
 # Parameter sind:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID-Level 0, 1 und 5 werden unterstützt; mehrere Geräte werden mit "#" getrennt.
+# RAID-Level 0, 1, 5, 6 und 10 werden unterstützt; mehrere Geräte werden durch 
+# "#" getrennt.
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
