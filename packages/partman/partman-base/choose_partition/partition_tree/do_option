@@ -18,7 +18,9 @@ if [ -e "$dev/locked" ]; then
 	db_subst partman-base/devicelocked MESSAGE "$locked"
 	db_set partman-base/devicelocked false
 	db_input critical partman-base/devicelocked
-	db_go
+	db_capb
+	db_go || true
+	db_capb backup
 	exit 0
 fi
 
@@ -38,7 +40,9 @@ while { read_line num tmpid size type fs path name; [ "$tmpid" ]; }; do
 		db_subst partman-base/partlocked MESSAGE "$locked"
 		db_set partman-base/partlocked false
 		db_input critical partman-base/partlocked
-		db_go
+		db_capb
+		db_go || true
+		db_capb backup
 		close_dialog
 		exit 0
 	fi
