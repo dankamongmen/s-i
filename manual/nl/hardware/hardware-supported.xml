@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56244 untranslated -->
+<!-- original version: 56248 untranslated -->
 
  <sect1 id="hardware-supported">
  <title>Supported Hardware</title>
@@ -26,7 +26,7 @@ information can be found.
   <sect2><title>Supported Architectures</title>
 <para>
 
-Debian &release; supports twelve major architectures and several
+Debian &release; supports eleven major architectures and several
 variations of each architecture known as <quote>flavors</quote>.
 
 </para><para>
@@ -64,10 +64,14 @@ variations of each architecture known as <quote>flavors</quote>.
 
 <row>
   <entry morerows="4">ARM</entry>
-  <entry morerows="4">arm</entry>
+  <entry morerows="1">arm</entry>
   <entry>Netwinder and CATS</entry>
   <entry>netwinder</entry>
 </row><row>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
+</row><row>
+  <entry morerows="2">arm and armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32x</entry>
 </row><row>
@@ -76,9 +80,6 @@ variations of each architecture known as <quote>flavors</quote>.
 </row><row>
   <entry>Marvell Orion</entry>
   <entry>orion5x</entry>
-</row><row>
-  <entry>Versatile</entry>
-  <entry>versatile</entry>
 </row>
 
 <row>
@@ -139,32 +140,29 @@ variations of each architecture known as <quote>flavors</quote>.
   <entry>sb1a-bcm91480b</entry>
 </row>
 
-<row>
+<row arch="m68k">
   <entry morerows="5">Motorola 680x0</entry>
   <entry morerows="5">m68k</entry>
   <entry>Atari</entry>
   <entry>atari</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>Amiga</entry>
   <entry>amiga</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>68k Macintosh</entry>
   <entry>mac</entry>
-</row><row>
+</row><row arch="m68k">
   <entry morerows="2">VME</entry>
   <entry>bvme6000</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme147</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme16x</entry>
 </row>
 
 <row>
-  <entry morerows="2">IBM/Motorola PowerPC</entry>
-  <entry morerows="2">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
+  <entry morerows="1">IBM/Motorola PowerPC</entry>
+  <entry morerows="1">powerpc</entry>
   <entry>PowerMac</entry>
   <entry>pmac</entry>
 </row><row>
@@ -234,10 +232,11 @@ as well.
   <sect2 arch="x86" id="laptops"><title>Laptops</title>
 <para>
 
-Laptops are also supported.  Laptops are often specialized or contain
-proprietary hardware.  To see if your particular laptop works well
-with GNU/Linux, see the
-<ulink url="&url-x86-laptop;">Linux Laptop pages</ulink>
+Laptops are also supported and nowadays most laptops work out of the box.
+In case a laptop contains specialized or proprietary hardware, some specific
+functions may not be supported.  To see if your particular laptop works well
+with GNU/Linux, see for example the
+<ulink url="&url-x86-laptop;">Linux Laptop pages</ulink>.
 
 </para>
    </sect2>
@@ -248,9 +247,10 @@ with GNU/Linux, see the
 
 Multiprocessor support &mdash; also called <quote>symmetric multiprocessing</quote>
 or SMP &mdash; is available for this architecture.  The standard Debian
-&release; kernel image was compiled with SMP support.  This should not
-prevent installation, since the SMP kernel should boot on non-SMP systems;
-the kernel will simply cause a bit more overhead.
+&release; kernel image has been compiled with SMP support.  The standard
+kernel is also usable on non-SMP systems, but has a slight overhead which
+will cause a small reduction in performance. For normal system use this
+will hardly be noticable.
 
 </para><para>
 
@@ -271,7 +271,7 @@ section of the kernel config.
 
 Multiprocessor support &mdash; also called <quote>symmetric
 multiprocessing</quote> or SMP &mdash; is available for this architecture.
-The standard Debian &release; kernel image was compiled with
+The standard Debian &release; kernel image has been compiled with
 <firstterm>SMP-alternatives</firstterm> support. This means that the kernel
 will detect the number of processors (or processor cores) and will
 automatically deactivate SMP on uniprocessor systems.
@@ -400,4 +400,35 @@ system.
 &network-cards.xml;
 &supported-peripherals.xml;
 
+ </sect1>
+
+ <sect1 arch="not-s390" id="hardware-firmware">
+ <title>Devices Requiring Firmware</title>
+<para>
+
+Besides the availability of a device driver some hardware also requires
+so-called <firstterm>firmware</firstterm> or <firstterm>microcode</firstterm>
+to be loaded into the device before it can become operational. This is most
+common for network interface cards (especially wireless NICs), but for example
+some USB devices and even some hard disk controllers also require firmware.
+
+</para><para>
+
+In most cases firmware is non-free according to the criteria used by the
+&debian; project and thus cannot be included in the main distribution
+or in the installation system. If the device driver itself is included in
+the distribution and if &debian; legally can distribute the firmware,
+it will often be available as a separate package from the non-free section
+of the archive.
+
+</para><para>
+
+However, this does not mean that such hardware cannot be used during an
+installation. Starting with &debian; 5.0 the &d-i; supports loading
+firmware files or packages containing firmware from a removable medium,
+such as a floppy disk or USB stick.
+See <xref linkend="loading-firmware"/> for detailed information on how to
+load firmware files or packages during the installation.
+
+</para>
  </sect1>

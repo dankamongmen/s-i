@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53732 untranslated -->
+<!-- original version: 56251 untranslated -->
 
  <sect1 id="boot-troubleshooting">
  <title>Troubleshooting the Installation Process</title>
@@ -321,11 +321,29 @@ disables this test.
 
 </para><para>
 
+Some systems (especially laptops) that have a native resolution that is not
+a 4:3 ratio (i.e. not for example 800x600 or 1024x768) may have a blank
+display after the installer has been booted. In that case adding the boot
+parameter <userinput>vga=788</userinput><footnote>
+
+<para>
+The parameter <userinput>vga=788</userinput> will activate the VESA
+framebuffer with a resolution of 800x600. This will probably work, but may
+not be the optimal resolution for your system. A list of supported
+resulutions can be obtained by using <userinput>vga=ask</userinput>, but
+you should be aware that list may not be complete.
+</para>
+
+</footnote> may help. If that does not work,
+try adding the boot parameter <userinput>fb=false</userinput>.
+
+</para><para>
+
 If your screen begins to show a weird picture while the kernel boots,
 eg. pure white, pure black or colored pixel garbage, your system may
 contain a problematic video card which does not switch to the
 framebuffer mode properly.  Then you can use the boot parameter
-<userinput>fb=false video=vga16:off</userinput> to disable the framebuffer
+<userinput>fb=false</userinput> to disable the framebuffer
 console. Only a reduced set of
 languages will be available during the installation due to limited
 console features. See <xref linkend="boot-parms"/> for details.
