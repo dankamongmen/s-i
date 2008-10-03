@@ -1361,41 +1361,6 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
-  <sect2 id="preseed-X">
-  <title>X configuration</title>
-<para>
-
-Preseeding Debian's X config is possible, but you probably need to know
-some details about the video hardware of the machine, since Debian's X
-configurator does not do fully automatic configuration of everything.
-
-</para>
-
-<informalexample role="example"><screen>
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# Monitor autodetection is recommended.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Uncomment if you have an LCD display.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-other">
   <title>Preseeding other packages</title>
 
