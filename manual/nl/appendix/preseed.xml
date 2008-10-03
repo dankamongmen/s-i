@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 55679 untranslated -->
+<!-- original version: 56148 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -727,7 +727,7 @@ d-i debian-installer/locale string en_US
 Keyboard configuration consists of selecting a keyboard architecture and a
 keymap. In most cases the correct keyboard architecture is selected by
 default, so there's normally no need to preseed it. The keymap must
-be valid for the selected  keyboard architecture.
+be known to the &d-i; for the selected keyboard architecture.
 
 <informalexample role="example"><screen>
 # Keyboard selection.
@@ -953,6 +953,8 @@ d-i partman-auto/method string lvm
 # contains an old LVM configuration, the user will normally receive a
 # warning. This can be preseeded away...
 d-i partman-lvm/device_remove_lvm boolean true
+# The same applies to pre-existing software RAID array:
+d-i parman-md/device_remove_md boolean true
 # And the same goes for the confirmation to write the lvm partitions.
 d-i partman-lvm/confirm boolean true
 
@@ -1006,7 +1008,7 @@ d-i partman/confirm boolean true
 <para>
 
 You can also use preseeding to set up partitions on software RAID arrays.
-Supported are RAID levels 0, 1 and 5, creating degraded arrays and
+Supported are RAID levels 0, 1, 5, 6 and 10, creating degraded arrays and
 specifying spare devices.
 If you are using RAID 1, you can preseed grub to install to all devices
 used in the array; see <xref linkend="preseed-bootloader"/>.
@@ -1057,7 +1059,7 @@ spare devices has only been tested lightly.
 # Parameters are:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
