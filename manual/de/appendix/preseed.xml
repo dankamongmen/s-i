@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56148 -->
+<!-- original version: 56253 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1087,17 +1087,11 @@ dass grub auf allen Geräten im Verbund installiert wird; siehe
 <warning><para>
 
 Bei dieser Art von automatisierter Partitionierung kann leicht etwas
-falsch laufen. Auch ist diese Installer-Komponente recht neu und könnte noch
-Fehler enthalten bzw. nicht vorhandene Fehlerbehandlung. Die Verantwortung,
+falsch laufen. Auch ist diese Installer-Komponente von den Entwicklern des
+&d-i; relativ wenig getestet worden. Die Verantwortung,
 die verschiedenen Rezepte richtig hinzubekommen (so dass Sie Sinn machen
 und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
-<filename>/var/log/syslog</filename>, wenn Probleme auftreten.
-
-</para><para>
-
-Bedenken Sie, dass nur RAID 0 und RAID 1 von den Entwicklern dieser Komponente
-getestet wurden. RAID 5 ist noch ungetestet. Erweiterte RAID-Einstellungen mit
-degradierten Arrays und Reserve-Geräten wurden nur oberflächlich getestet.
+<filename>/var/log/syslog</filename> nach, wenn Probleme auftreten.
 
 </para></warning>
 
@@ -1454,47 +1448,8 @@ d-i finish-install/reboot_in_progress note
 
   </sect2>
 
-  <sect2 id="preseed-X">
-  <title>Konfiguration des X-Server-Systems</title>
-<para>
-
-Die Konfiguration von Debian's X-System voreinzustellen ist möglich, aber
-Sie müssen vielleicht einige Details über die Video-Hardware des Rechners
-kennen, da Debian's X-Konfigurationsprogramm nicht in jedem Fall eine
-vollautomatische Konfiguration durchführen kann.
-
-</para>
-
-<informalexample role="example"><screen>
-# X kann den richtigen Treiber für einige Grafikkarten erkennen, aber wenn
-# Sie eine Voreinstellung treffen, überschreiben Sie diese Auswahl. Vesa
-# sollte aber in den meisten Fällen funktionieren.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# Das Problem mit der automatischen Mauserkennung ist: wenn es schief geht,
-# wird X es wieder und wieder versuchen. Wenn also automatische Erkennung
-# voreingestellt ist, besteht die Gefahr einer Endlosschleife, falls die
-# Maus nicht erkannt werden kann.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# Die automatische Erkennung des Monitors wird empfohlen.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Entfernen Sie hier das Kommentarzeichen, wenn Sie ein LCD-Display haben.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-# Die X-Konfiguration bietet drei mögliche Wege für die Konfiguration des
-# Monitors. Dies ist die Voreinstellung für "medium", was immer verfügbar
-# ist. Der einfache Weg ("simple") ist nicht immer verfügbar und "advanced"
-# (erweitert) stellt zu viele Fragen.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
-</screen></informalexample>
-
-  </sect2>
-
   <sect2 id="preseed-other">
-  <title>Andere Pakete voreinstellen</title>
+  <title>Voreinstellung anderer Pakete</title>
 
 <informalexample role="example"><screen>
 # Abhängig davon, welche Software Sie zur Installation auswählen oder ob
@@ -1509,7 +1464,6 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 
   </sect2>
  </sect1>
-
 
  <sect1 id="preseed-advanced">
  <title>Erweiterte Optionen</title>
