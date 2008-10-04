@@ -1,4 +1,4 @@
-<!-- original version: 53732 -->
+<!-- original version: 56251 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Dysfonctionnements pendant la procédure d'installation</title>
@@ -289,12 +289,26 @@ vous devez passer le paramètre d'amorçage <userinput>no-hlt</userinput>
 qui désactive ce test.
 </para>
 <para>
+Certains systèmes, particulièrement les portables, dont la résolution par défaut
+n'est pas 4:3 (différente de 800x600 ou 1024x768 par exemple) peuvent présenter
+un écran blanc quand l'installateur a été amorcé. Dans ce cas, on peut ajouter le paramètre
+d'amorçage <userinput>vga=788</userinput> <footnote>
+<para>
+Le paramètre <userinput>vga=788</userinput> active le tampon vidéo VESA
+avec une résolution de 800x600. Cela fonctionnera probablement mais ce n'est
+sans doute pas la meilleure résolution pour votre système. Le paramètre
+<userinput>vga=ask</userinput> donne une liste des résolutions disponibles
+mais elle n'est pas complète.</para></footnote>.
+Si cela ne fonctionne pas, on peut essayer le paramètre <userinput>fb=false</userinput>.
+</para>
+
+<para>
 Si votre écran commence à afficher une image bizarre lors des démarrages
 du noyau, par exemple, un écran entièrement blanc, noir ou un écran
 contenant un mélange de couleurs, alors très certainement la carte
 video du système ne parvient pas à passer en mode
 <emphasis>framebuffer</emphasis> correctement. Dans ce cas, essayez de
-passer les paramètres d'amorçage <userinput>fb=false video=vga16:off</userinput>
+passer le paramètre d'amorçage <userinput>fb=false</userinput>
 pour désactiver la console <emphasis>framebuffer</emphasis>. Seules quelques
 langues seront utilisables pour l'installation, à cause des caractéristiques
 limitées de la console. Référez-vous à la <xref linkend="boot-parms"/> pour plus

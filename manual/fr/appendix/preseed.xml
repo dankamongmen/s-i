@@ -1,4 +1,4 @@
-<!-- original version: 56148 -->
+<!-- original version: 56253 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -987,15 +987,12 @@ les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
 <warning><para>
 
 Il est facile de se tromper avec ce type de partitionnement automatique.
-C'est aussi un nouveau composant de l'installateur, des bogues peuvent exister et
-la gestion de certaines erreurs peut manquer. Donner les bonnes formules est de
-la responsabilité de chacun. Consultez le fichier <filename>/var/log/syslog</filename>
+C'est aussi une nouvelle fonctionnalité qui a été relativement peu testée par les développeurs 
+de l'installateur. Donner les bonnes formules est de la responsabilité de chacun.
+Consultez le fichier <filename>/var/log/syslog</filename>
 si vous rencontrez des problèmes.
 </para>
-<para>
-Seuls RAID 0 et RAID 1 ont été testés par les développeurs. RAID 5 n'est pas testé.
-Le RAID avec ensemble dégradé ou périphériques de rechange n'a été que très peu testé.
-</para></warning>
+</warning>
 
 <informalexample><screen>
 # NOTE: cette option est en mode bêta et doit être utilisée avec précaution.
@@ -1324,40 +1321,6 @@ d-i finish-install/reboot_in_progress note
 #d-i debian-installer/exit/poweroff boolean true
 </screen></informalexample>
 
-</sect2>
-
-  <sect2 id="preseed-X">
-  <title>Configuration du serveur X</title>
-<para>
-
-Préconfigurer le serveur X est possible, mais vous devrez sans doute 
-connaître les caractéristiques du matériel video de votre machine. Le
-configurateur Debian du serveur X ne configure rien automatiquement.
-</para>
-<informalexample role="example"><screen>
-# X peut détecter le bon pilote pour certaines cartes, mais si vous faites une
-# préconfiguration, vous annulez ce qu'il aura choisi. Cependant vesa
-# fonctionne la plupart du temps.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# Pour la détection automatique de la souris, il faut savoir que si elle
-# échoue, X recommence sans fin le processus. Donc, s'il y a préconfiguration,
-# une boucle infinie peut apparaître si la souris n'est pas détectée.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# La détection automatique du moniteur est recommandée.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Décommentez la ligne suivante si vous possédez un écran LCD.
-#xserver-xfree86 xserver-xfree86/config/monitor/lcd boolean true
-# X possède trois méthodes pour la configuration du moniteur. Voici comment
-# présélectionner la méthode « medium », qui est toujours disponible.
-# La méthode « simple » peut ne pas être disponible et la méthode
-# « advanced » pose trop de questions.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
-</screen></informalexample>
 </sect2>
 
   <sect2 id="preseed-other">
