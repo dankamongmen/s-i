@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 53453 -->
+<!-- original version: 56257 -->
 
  <sect1 id="hardware-supported">
  <title>Podporovaná zařízení</title>
@@ -23,7 +23,7 @@ informace a uvedeme odkazy na doplňující dokumentaci.
   <sect2><title>Podporované počítačové architektury</title>
 <para>
 
-Debian &release; podporuje dvanáct hlavních počítačových architektur
+Debian &release; podporuje jedenáct hlavních počítačových architektur
 a několik jejich variant.
 
 </para><para>
@@ -62,16 +62,23 @@ a několik jejich variant.
 </row>
 
 <row>
-  <entry morerows="2">ARM a StrongARM</entry>
-  <entry morerows="2">arm</entry>
+  <entry morerows="4">ARM</entry>
+  <entry morerows="1">arm</entry>
   <entry>Netwinder a CATS</entry>
   <entry>netwinder</entry>
 </row><row>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
+</row><row>
+  <entry morerows="2">arm a armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32</entry>
 </row><row>
   <entry>Intel IXP4xx</entry>
   <entry>ixp4xx</entry>
+</row><row>
+  <entry>Marvell Orion</entry>
+  <entry>orion5x</entry>
 </row>
 
 <row>
@@ -92,14 +99,20 @@ a několik jejich variant.
 </row>
 
 <row>
-  <entry morerows="3">MIPS (big endian)</entry>
-  <entry morerows="3">mips</entry>
+  <entry morerows="5">MIPS (big endian)</entry>
+  <entry morerows="5">mips</entry>
   <entry>SGI IP22 (Indy/Indigo 2)</entry>
   <entry>r4k-ip22</entry>
 </row><row>
   <entry>SGI IP32 (O2)</entry>
   <entry>r5k-ip32</entry>
 </row><row>
+  <entry>MIPS Malta (32 bit)</entry>
+  <entry>4kc-malta</entry>
+</row><row>
+  <entry>MIPS Malta (64 bit)</entry>
+  <entry>5kc-malta</entry>
+</row><row>
   <entry>Broadcom BCM91250A (SWARM)</entry>
   <entry>sb1-bcm91250a</entry>
 </row><row>
@@ -108,11 +121,17 @@ a několik jejich variant.
 </row>
 
 <row>
-  <entry morerows="2">MIPS (little endian)</entry>
-  <entry morerows="2">mipsel</entry>
+  <entry morerows="4">MIPS (little endian)</entry>
+  <entry morerows="4">mipsel</entry>
   <entry>Cobalt</entry>
   <entry>cobalt</entry>
 </row><row>
+  <entry>MIPS Malta (32 bit)</entry>
+  <entry>4kc-malta</entry>
+</row><row>
+  <entry>MIPS Malta (64 bit)</entry>
+  <entry>5kc-malta</entry>
+</row><row>
   <entry>Broadcom BCM91250A (SWARM)</entry>
   <entry>sb1-bcm91250a</entry>
 </row><row>
@@ -120,32 +139,29 @@ a několik jejich variant.
   <entry>sb1a-bcm91480b</entry>
 </row>
 
-<row>
+<row arch="m68k">
   <entry morerows="5">Motorola 680x0</entry>
   <entry morerows="5">m68k</entry>
   <entry>Atari</entry>
   <entry>atari</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>Amiga</entry>
   <entry>amiga</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>68k Macintosh</entry>
   <entry>mac</entry>
-</row><row>
+</row><row arch="m68k">
   <entry morerows="2">VME</entry>
   <entry>bvme6000</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme147</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme16x</entry>
 </row>
 
 <row>
-  <entry morerows="2">IBM/Motorola PowerPC</entry>
-  <entry morerows="2">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
+  <entry morerows="1">IBM/Motorola PowerPC</entry>
+  <entry morerows="1">powerpc</entry>
   <entry>PowerMac</entry>
   <entry>pmac</entry>
 </row><row>
@@ -215,8 +231,10 @@ Také bude užitečné sledovat diskuzní list
   <sect2 arch="x86" id="laptops"><title>Notebooky</title>
 <para>
 
-Instalovat můžete i na notebook. Bohužel, notebooky mají často
-nestandardní nebo proprietární hardwarové prvky. Na stránce
+Instalovat můžete i na notebooky. V dnešní době funguje většina
+notebooků bez problémů. Pokud notebook obsahuje nestandardní nebo
+proprietární hardwarové prvky, je možné že tyto speciální funkce
+nebudou fungovat. Na stránce
 <ulink url="&url-x86-laptop;">Linux a notebooky</ulink>
 zjistíte, zda na vašem notebooku GNU/Linux poběží.
 
@@ -302,7 +320,7 @@ bude využívat pouze první procesor.
 Pro využití více procesorů se budete muset podívat, zda se
 nainstalovalo SMP jádro. Pokud ne, doinstalujte si příslušný balík.
 Další možnost je sestavit si vlastní jádro operačního systému, viz
-<xref linkend="kernel-baking"/>.  Pro jádro verze &kernelversion;
+<xref linkend="kernel-baking"/>. Pro jádro verze &kernelversion;
 zapnete podporu SMP tak, že v konfiguračním systému jádra vyberete
 v sekci <guimenu>&smp-config-section;</guimenu> položku
 <guimenuitem>&smp-config-option;</guimenuitem>.
@@ -376,4 +394,32 @@ aktivuje automaticky po odpojení klávesnice při vypnutém počítači.
 &network-cards.xml;
 &supported-peripherals.xml;
 
+ </sect1>
+
+ <sect1 arch="not-s390" id="hardware-firmware">
+ <title>Ovladače vyžadující firmware</title>
+<para>
+
+Některý hardware vyžaduje kromě samotného ovladače zařízení také
+<firstterm>firmware</firstterm> nebo <firstterm>mikrokód</firstterm>,
+který je třeba do zařízení před použitím nahrát. Nejčastěji se s tím
+setkáte u síťových karet (obzvláště bezdrátových), ale jsou známa
+i některá USB zařízení a dokonce řadiče disků.
+
+</para><para>
+
+Ve většině případů je firmware dle definice &debian;u nesvobodný a
+tudíž jej nelze zařadit ani do distribuce, ani do instalačního
+systému. Jestliže je ovladač samotný součástí &debian;u a firmware je
+možno legálně distribuovat, je možné, že ho naleznete jako samostatný
+balík v sekci non-free.
+
+</para><para>
+
+Naštěstí to neznamená, že takový hardware nemůžete pro instalaci
+použít. Počínaje &debian;em 5.0 podporuje &d-i; nahrávání firmwaru
+z výměnných médií, jako jsou diskety nebo USB klíčenky. Tomuto tématu
+se podrobněji věnuje kapitola <xref linkend="loading-firmware"/>.
+
+</para>
  </sect1>

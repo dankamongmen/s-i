@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 55054 -->
+<!-- original version: 56253 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -766,7 +766,7 @@ d-i debian-installer/locale string cs_CZ
 Nastavení klávesnice se skládá z výběru typu klávesnice a z výběru
 klávesové mapy. Ve většině případů je typ klávesnice rozpoznán
 automaticky, takže není potřeba jej přednastavovat. Klávesová mapa
-musí být platná v rámci daného typu.
+musí být platná v rámci daného typu a &d-i; ji musí znát.
 
 <informalexample role="example"><screen>
 # Výběr klávesnice.
@@ -875,6 +875,20 @@ d-i netcfg/wireless_wep string
 #d-i hw-detect/load_firmware boolean true
 </screen></informalexample>
 
+<para>
+
+Pokud není proměnná <classname>netcfg/get_netmask</classname>
+přednastavená, <command>netcfg</command> si síťovou masku dopočítá
+automaticky. Pro plně automatické instalace musíte v takovém případě
+nastavit proměnnou jako <literal>seen</literal>, aby instalace
+nečekala na potvrzení spočítané masky. Obdobně je možné
+nepřednastavovat proměnnou <classname>netcfg/get_gateway</classname> a
+nechat <command>netcfg</command>, aby automaticky  automaticky odhadl
+adresu brány. Jako speciální případ je možné nastavit proměnnou
+<classname>netcfg/get_gateway</classname> na hodnotu <quote>none</quote>,
+což znamená, že se brána nemá použít vůbec.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-mirror">
@@ -979,6 +993,8 @@ d-i partman-auto/method string lvm
 d-i partman-lvm/device_remove_lvm boolean true
 # To stejné platí pro potvrzení při zápisu LVM oblastí.
 d-i partman-lvm/confirm boolean true
+# A platí i pro odstranění pozůstatků předchozího softwarového RAIDu:
+d-i parman-md/device_remove_md boolean true
 
 # Můžete vybrat libovolné z přednastavených schémat dělení.
 # Pozn: hodnota musí být lokalizována (přeložena).
@@ -1031,25 +1047,18 @@ d-i partman/confirm boolean true
 <para>
 
 Pomocí přednastavení též můžete nastavit oblasti na polích softwarového
-RAIDu. Podporovány jsou RAID úrovně 0, 1 a 5, vytváření degradovaných polí
-a určení rezervních zařízení. Používáte-li RAID 1, můžete podle části
-<xref linkend="preseed-bootloader"/> přednastavit grub, aby se
-nainstaloval do všech zařízení v poli použitých.
+RAIDu. Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10, vytváření
+degradovaných polí a určení rezervních zařízení. Používáte-li RAID 1,
+můžete podle části <xref linkend="preseed-bootloader"/> přednastavit
+grub, aby se nainstaloval do všech zařízení v poli použitých.
 
 </para><warning><para>
 
 U tohoto typu automatického rozdělení se dá velice lehce něco
-pokazit. Protože se jedná o velice novou komponentu, může obsahovat chyby
-a nemusí poskytovat přesná chybová hlášení. Odpovědnost za správné zapsání
-návodu pro rozdělení (aby dával smysl a nevytvářel konflikty) nese
-uživatel. V případě problémů zkontrolujte
-<filename>/var/log/syslog</filename>.
-
-</para><para>
-
-Vemte prosím na vědomí, že vývojáři komponenty testovali pouze
-RAID 0 a 1. RAID 5 nebyl testován vůbec a RAID s degradovanými poli nebo
-rezervními disky byl testován pouze zběžně.
+pokazit. Navíc se jedná o komponentu, kterou vývojáři &d-i; testují
+relativně málo. Odpovědnost za správné zapsání návodu pro rozdělení
+(aby dával smysl a nevytvářel konflikty) nese uživatel. V případě
+problémů zkontrolujte <filename>/var/log/syslog</filename>.
 
 </para></warning>
 
@@ -1082,7 +1091,8 @@ rezervními disky byl testován pouze zběžně.
 # Parametry jsou:
 # &lt;typraidu&gt; &lt;početzařízení&gt; &lt;početrezerv&gt; &lt;typss&gt; &lt;přípbod&gt; \
 #          &lt;zařízení&gt; &lt;rezervnízařízení&gt;
-# Podporovány jsou RAID úrovně 0, 1 a 5; zařízení jsou oddělena pomocí "#"
+# Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10; zařízení jsou oddělena
+# pomocí "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
@@ -1404,8 +1414,6 @@ exim4-config exim4/dc_postmaster string
 
   </sect2>
 
--->
-
   <sect2 id="preseed-X">
   <title>Nastavení X Window</title>
 <para>
@@ -1440,6 +1448,8 @@ xserver-xorg xserver-xorg/config/monitor/mode-list \
 </screen></informalexample>
 
   </sect2>
+
+-->
 
   <sect2 id="preseed-other">
   <title>Přednastavení ostatních balíků</title>

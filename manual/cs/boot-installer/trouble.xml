@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 53732 -->
+<!-- original version: 56251 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Problémy s instalačním systémem</title>
@@ -315,13 +315,34 @@ provádění tohoto testu.
 
 </para><para>
 
+Některé systémy (obzvláště notebooky), které mají nativní rozlišení v
+jiném poměru stran než 4:3 (tj. jiné než např. 800x600 nebo 1024x768),
+mohou po zavedení instalace zobrazovat pouze prázdnou obrazovku.
+V takovém případě zkuste použít zaváděcí parametr
+<userinput>vga=788</userinput><footnote>
+
+<para>
+
+Parametr <userinput>vga=788</userinput> aktivuje VESA framebuffer s
+rozlišením 800x600. To bude nejspíš fungovat, avšak nemusí to být
+nejlepší rozlišení monitoru. Seznam podporovaných rozlišení získáte po
+použití parametru <userinput>vga=ask</userinput>, nicméně tento seznam
+nemusí být úplný.
+
+</para>
+
+</footnote>. Pokud to nepomůže, zkuste ještě parametr
+<userinput>fb=false</userinput>.
+
+</para><para>
+
 Jestliže je obraz na obrazovce během zavádění jádra
 <quote>divný</quote>, jako třeba čistě bílý, naprosto černý, nebo se
 zobrazuje barevné <quote>smetí</quote>, máte problematickou grafickou
 kartu, která se neumí správně přepnout do grafického režimu. V takovém
 případě pomůže zaváděcí parametr
-<userinput>fb=false video=vga16:off</userinput>, kterým vypnete
-grafickou konzolu. Během instalace však bude k dispozici pouze
+<userinput>fb=false</userinput>, kterým vypnete
+grafický framebuffer. Během instalace však bude k dispozici pouze
 podmnožina dostupných jazyků, protože některé jazyky nejdou v čistě
 textovém režimu zobrazit. Zaváděcí parametry popisuje
 <xref linkend="boot-parms"/>.

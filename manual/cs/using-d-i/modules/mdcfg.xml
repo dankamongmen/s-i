@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 51911 -->
+<!-- original version: 56134 -->
 
    <sect3 id="mdcfg">
    <title>Nastavení vícediskových zařízení (Softwarový RAID)</title>
@@ -98,6 +98,39 @@ paritních informací.
 
 </para></listitem>
 </varlistentry>
+<varlistentry>
+
+<term>RAID6</term><listitem><para>
+
+Je podobný jako RAID5, ale používá pro paritní informace dva disky,
+což vede k tomu, že přežije výpadek dvou disků.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID10</term><listitem><para>
+
+RAID10 kombinuje proužky (RAID0) se zrcadlením (RAID1). Vytvoří 
+<replaceable>n</replaceable> kopií příchozích dat a rozmístí je po
+discích tak, že se žádná z kopií nenachází na stejném zařízení.
+Výchozí hodnota <replaceable>n</replaceable> je 2, ale v expertním
+režimu můžete zvolit jinou hodnotu. Počet použitých oblastí musí být
+nejméně <replaceable>n</replaceable>. RAID10 má pro rozmísťování kopií
+bloků několik algoritmů. Výchozí jsou <quote>blízké kopie</quote>,
+které ukládají kopie bloku na různá zařízení na stejnou pozici.
+Další možností jsou <quote>vzdálené kopie</quote>, které ukládají
+kopie bloků na různá zařízení na zcela jinou pozici. Poslední
+<quote>offsetové kopie</quote> nekopírují jednotlivé kopie, ale celé
+proužky.
+
+</para><para>
+
+RAID10 se dá použít pro dosažení spolehlivosti a redundance bez
+nutnosti počítat paritu.
+
+</para></listitem>
+</varlistentry>
 </variablelist>
 
 Kdybychom měli shrnout podstatné vlastnosti:
@@ -137,6 +170,22 @@ Kdybychom měli shrnout podstatné vlastnosti:
   <entry>volitelně</entry>
   <entry>ano</entry>
   <entry>velikost nejmenšího zařízení krát (počet akt. zařízení v RAIDu - 1)</entry>
+</row>
+
+<row>
+  <entry>RAID6</entry>
+  <entry>4</entry>
+  <entry>volitelně</entry>
+  <entry>ano</entry>
+  <entry>velikost nejmenšího zařízení krát (počet akt. zařízení v RAIDu - 2)</entry>
+</row>
+
+<row>
+  <entry>RAID10</entry>
+  <entry>2</entry>
+  <entry>volitelně</entry>
+  <entry>ano</entry>
+  <entry>součet všech oblastí děleno počet kopií (standardně dvě)</entry>
 </row>
 
 </tbody></tgroup></informaltable>
@@ -200,11 +249,28 @@ uděláte chybu a vyberete jiný počet oblastí, nic se neděje &mdash;
 &d-i; vás nenechá pokračovat, dokud vše nespravíte.
 
 </para></listitem>
-
 <listitem><para>
 
 RAID5 se nastavuje stejně jako RAID1 s drobnou výjimkou &mdash; musíte
 použít nejméně <emphasis>tři</emphasis> aktivní zařízení.
+
+</para></listitem>
+<listitem><para>
+
+RAID5 se nastavuje stejně jako RAID1 s drobnou výjimkou &mdash; musíte
+použít nejméně <emphasis>čtyři</emphasis> aktivní zařízení.
+
+</para></listitem>
+<listitem><para>
+
+Základní nastavení RAID10 je stejné jako u RAID1. V expertním režimu
+&d-i;u budete navíc dotázáni na na rozložení pole. Rozložení se skládá
+ze dvou částí. První část určuje typ rozložení, druhá pak počet kopií
+každého bloku dat. Typ rozložení může být <literal>n</literal> (pro
+blízké kopie), <literal>f</literal> (pro vzdálené kopie)
+nebo <literal>o</literal> (pro offsetové kopie). Počet kopií musí být
+menší nebo roven počtu zařízení, aby bylo zaručeno, že se každá kopie
+zapíše na jiné zařízení.
 
 </para></listitem>
 </itemizedlist>
