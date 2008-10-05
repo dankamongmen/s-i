@@ -1,12 +1,12 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH DIBAS "1" "May 2008" "Franklin Piat" "User Commands"
+.TH DI-NETBOOT-ASSISTANT "1" "May 2008" "Franklin Piat" "User Commands"
 .\" disable hyphenation
 .nh
 .\" disable justification (adjust text to left margin only)
 .SH NAME
 di-netboot-assistant \- Debian-Installer netboot assistant
 .SH SYNOPSIS
-\fBdi\-netboot\-assistant\fR [\fB\-hv\fR] [\fB\-\-verbose\fR] [\fB\-\-offline\fR] {[install\ \fIimage\fR...] | [purge\ \fIimage\fR...]} [\fB\-\-arch=\fR\fB\fIarch\fR\fR]
+\fBdi\-netboot\-assistant\fR [\fB\-hv\fR] [\fB\-\-verbose\fR] [\fB\-\-offline\fR] {[install\ \fIimage\fR...] | [purge\ \fIimage\fR...] | [rebuild-menu] } [\fB\-\-arch=\fR\fB\fIarch\fR\fR]
 .SH DESCRIPTION
 .PP
 \fBdi\-netboot\-assistant\fR is a simple tool to download and extract latest debian installer netboot images.
@@ -26,8 +26,6 @@ install is followed by a repository name desired for installation\&. The reposit
 purge
 .RS 4
 purge will remove a previously installed d-i netboot image, according to the image name specified.
-
-.RE
 .SH "OPTIONS"
 .PP
 rebuild-menu
@@ -42,7 +40,7 @@ Print this message and exit
 Print script version and exit
 .TP
 \fB\-\-arch=\fR\fB\fIarch\fR\fR
-Specify the architecture you want to install or purge. The architecture you can use for the install action must be declared in \fI/etc/di-netboot-assistant/di-sources\&.list\fR. The architecture you can use for purge action in one of those you previously installed ! The usable architectures can be listed by leaving \fB\-\-arch=\fR empty. The default architecture is the current one (as reported by dpkg).
+Specify the architecture you want to install or purge. The architecture you can use for the install action must be declared in \fI/etc/di-netboot-assistant/di-sources\&.list\fR. The architecture you can use for purge action in one of those you previously installed ! The usable architectures can be listed by leaving \fB\-\-arch=\fR empty. The default architecture is the current one (as reported by dpkg's APT::Architecture).
 .TP
 \fB\-\-verbose\fR
 Verbose messages
@@ -51,9 +49,6 @@ Verbose messages
 Don't download the file (simply re\-extract and build menu)
 .RE
 .SH PROXY
-di-na uses wget to actually download the files. You can set the environnement variables accordingly.
+di-netboot-assistant uses wget or curl to actually download the files. You can set the environnement variables accordingly.
 .SH AUTHOR
-di-netboot-assistant was written by <fpiat@bigfoot.com>.
-.PP
-This manual page was written by Franklin PIAT <fpiat@bigfoot.com>,
-for the Debian project (but may be used by others).
+di-netboot-assistant was written by Frank Lin PIAT <fpiat@klabs.be>.

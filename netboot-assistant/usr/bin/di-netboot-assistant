@@ -2,7 +2,7 @@
 
 # A simple tool to grab and extract debian-installer netboot images.
 #
-# Copyright (C) 2008 Franklin Piat <fpiat@bigfoot.com>
+# Copyright (C) 2008 Frank Lin PIAT <fpiat@klabs.be>
 # latest version is available from:
 #     http://www.klabs.be/~fpiat/linux/debian/di-netboot-assistant/
 #
@@ -22,7 +22,7 @@
 
 # Initialize some variables.
 PACKAGE_NAME=di-netboot-assistant
-PACKAGE_VERSION=0.34
+PACKAGE_VERSION=0.36a
 OFFLINE=
 DEBUG=
 DISOURCELIST=/etc/di-netboot-assistant/di-sources.list
@@ -66,8 +66,8 @@ Options:
   --verbose       Verbose messages
   --offline       Don't download the file (simply re-extract and build menu)
   --arch=ARCH     A comma separated list of architecture to Install/Purge,
-                  or the keyword "all". It use the current machine architecture
-		  by default (APT::Architecture).
+                  or the keyword "all". It use the current machine's
+                  architecture by default (APT::Architecture).
 
 See the $PACKAGE_NAME(1) manual page for more information.
 XXX
@@ -264,14 +264,14 @@ fetch_files() {
 	local baseurl="$1"
 	local repo_loc="$2"
 	shift 2
-	local files=$@
+	local files="$@"
 	[ "$DEBUG" ] && set -x
 
 	if [ ! "$OFFLINE" ]; then
 		if which wget > /dev/null ; then
 			GETTER="wget -c -x $WGET_VERBOSITY -O"
 		elif which curl > /dev/null ; then
-			GETTER="curl $CURL_VERBOSITY -o"
+			GETTER="curl --fail $CURL_VERBOSITY -o"
 		else
 			echo "E: Can't download file. no download tool detected (wget or curl)." 1>&2
 			echo "" 1>&2
@@ -338,7 +338,7 @@ fetch_files() {
 		done
 		[ "$SUCCEED" = "true" ] && echo "... done." 1>&2
 	else
-		[ ! "$OFFLINE" ] && echo "I: No checksum fount." 1>&2
+		[ ! "$OFFLINE" ] && echo "I: No checksum found." 1>&2
 	fi	
 
 
@@ -364,7 +364,13 @@ fetch_files() {
 	[ "$DEBUG" ] && set +x
 }
 
+pxelinux_version() {
+	bin="$1"
+	tr -c '[:print:] ' '\n' < $1 | sed -n -r "/PXELINUX [.0-9]+/ s/^[^ ]* ([0-9^.]+).*/\1/ p" | sort -r | head -n 1
+}
+
 install_repo() {
+	local pxelinuxbin
 	[ "$DEBUG" ] && set -x
 	release="$1"
 	if [ -z "$release" ]; then
@@ -464,13 +470,23 @@ install_repo() {
 		esac
 
 		# PXELINUX MENUs (i386, amd64)
-		if [ ! -z "$(find "$expand_dir" -type f -name "pxelinux.0" 2>/dev/null )" ]; then
+		pxelinuxbin="$(find "$expand_dir" -type f -name "pxelinux.0" 2>/dev/null )"
+
+		if [ ! -z "$pxelinuxbin" ]; then
+			PXE_NEW_VER="$(pxelinux_version "$pxelinuxbin")"
+			PXE_CUR_VER="$(pxelinux_version "$TFTP_ROOT/debian-installer/pxelinux.0")"
+			if dpkg --compare-versions "$PXE_NEW_VER" ">>" "$PXE_CUR_VER" ; then
+				echo "I: Upgrading $TFTP_ROOT/debian-installer/pxelinux.0 ($PXE_CUR_VER to $PXE_NEW_VER)" 1>&2
+				cp -f "$pxelinuxbin" "$TFTP_ROOT/debian-installer/pxelinux.0"
+				for x in $(find "$expand_dir" -type f -name "$SYSLINUXMENU" | head -n 1) ; do
+					cp "$x" "$TFTP_ROOT/debian-installer/pxelinux.cfg/"
+				done
+			fi
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
 				mv "$x" "$x.ORIG"
 				print_do-not-edit_header "$release" > "$x"
 				sed -e "s#${REWRITEPKGPATH}/$arch/#debian-installer/$release/$arch/#" < "$x.ORIG" >> "$x"
 			done
-
 			menufragment="$metadatabasename.pxelinux.menu.fragment"
 			menufragment_serial9600="$metadatabasename.pxelinux.menu.serial-9600.fragment"
 			echo "## This is a fragment of syslinux/pxelinux menu file." > $menufragment
@@ -487,7 +503,7 @@ install_repo() {
 			fi
 
 			echo  "LABEL $release-$arch" >> $menufragment
-			printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "( $release , $arch )" >> $menufragment
+			printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "($release, $arch)" >> $menufragment
 
 			if [ ! -z "$(grep -Eiq "^[[:blank:]]*prompt[[:blank:]]+0" "$expand_dir/pxelinux.cfg/default" && grep -Eiq "^[[:blank:]]*default[[:blank:]].*/vesamenu.c32" "$expand_dir/pxelinux.cfg/default" && echo ok)" ]; then
 
@@ -509,7 +525,7 @@ install_repo() {
 	
 			if [ -f "$menufragment_serial9600" ]; then
 				echo   "LABEL $release-$arch" >> $menufragment_serial9600
-				printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "( $release , $arch )" >> $menufragment_serial9600
+				printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "($release, $arch)" >> $menufragment_serial9600
 				echo   "	KERNEL debian-installer/pxelinux.cfg/$SYSLINUXMENU" >> $menufragment_serial9600
 				echo   "	APPEND debian-installer/$release/$arch/pxelinux.cfg.serial-9600/default" >> $menufragment_serial9600
 				echo   "" >> $menufragment_serial9600
@@ -533,11 +549,9 @@ install_repo() {
 			echo "##" >> $menufragment
 
 			echo "# ### $release $arch ### " >> $menufragment
-			awk '/^image=/,/^$/' "/var/lib/tftpboot/debian-installer/$release/$arch/elilo.conf" | sed -e "s/^[[:blank:]]*label=.*$/\0-$release-$arch/" | sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 (Lenny AMD64)\"/" >> $menufragment
+			awk '/^image=/,/^$/' "${expand_dir}/elilo.conf" | sed -e "s/^[[:blank:]]*label=.*$/\0-$release-$arch/" | sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 (Lenny AMD64)\"/" >> $menufragment
 			echo "" >> $menufragment
 		fi
-
-		echo "done."
 
 		update_menu
 	done;	

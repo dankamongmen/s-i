@@ -1,6 +1,6 @@
 " Vim syntax file
 " Language:	Debian di-netboot-assistant's  di-sources.list
-" Maintainer:	Franklin Piat <fpiat@bigfoot.com>
+" Maintainer:	Frank Lin PIAT <fpiat@klabs.be>
 " Last Change:	2008/06/07
 " URL: http://www.klabs.be/~fpiat/linux/debian/di-netboot-assistant/
 " $Revision: 1.1 $
