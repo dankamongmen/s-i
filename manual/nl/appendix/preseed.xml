@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56253 untranslated -->
+<!-- original version: 56312 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -940,8 +940,8 @@ correct one will be selected before using preseeding.
 
 # Alternatively, you can specify a disk to partition. The device name must
 # be given in traditional non-devfs format.
-# For example, to use the first SCSI/SATA hard disk:
 # Note: A disk must be specified, unless the system has only one disk.
+# For example, to use the first SCSI/SATA hard disk:
 #d-i partman-auto/disk string /dev/sda
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
@@ -956,8 +956,10 @@ d-i parman-md/device_remove_md boolean true
 # And the same goes for the confirmation to write the lvm partitions.
 d-i partman-lvm/confirm boolean true
 
-# You can choose from any of the predefined partitioning recipes.
-# The standard recipes are: atomic, home and multi
+# You can choose one of the three predefined partitioning recipes:
+# - atomic: all files in one partition
+# - home:   separate /home partition
+# - multi:  separate /home, /usr, /var, and /tmp partitions
 d-i partman-auto/choose_recipe select atomic
 
 # Or provide a recipe of your own...
@@ -989,8 +991,7 @@ d-i partman-auto/choose_recipe select atomic
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1061,8 +1062,7 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 # This makes partman automatically partition without confirmation.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
