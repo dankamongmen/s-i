@@ -1,0 +1,59 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DIBAS "1" "May 2008" "Franklin Piat" "User Commands"
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.SH NAME
+di-netboot-assistant \- Debian-Installer netboot assistant
+.SH SYNOPSIS
+\fBdi\-netboot\-assistant\fR [\fB\-hv\fR] [\fB\-\-verbose\fR] [\fB\-\-offline\fR] {[install\ \fIimage\fR...] | [purge\ \fIimage\fR...]} [\fB\-\-arch=\fR\fB\fIarch\fR\fR]
+.SH DESCRIPTION
+.PP
+\fBdi\-netboot\-assistant\fR is a simple tool to download and extract latest debian installer netboot images.
+.PP
+Unless the
+\fB\-h\fR,
+\fB\-\-help\fR,
+\fB\-v\fR, or
+\fB\-\-version\fR
+option is given, one of the commands below must be present\&.
+.PP
+install
+.RS 4
+install is followed by a repository name desired for installation\&. The repository name has to be one of those declared in \fI/etc/di-netboot-assistant/di-sources\&.list\fR. The image will be installed/extracted in the default location (declared in \fI/etc/di-netboot-assistant/di-netboot-assistant.conf\fR).
+.RE
+.PP
+purge
+.RS 4
+purge will remove a previously installed d-i netboot image, according to the image name specified.
+
+.RE
+.SH "OPTIONS"
+.PP
+rebuild-menu
+.RS 4
+rebuild-menu will rebuild the to level menu. It's only usefull if you have installed some client images that have such top level menu (like i386, amd64 and ia64). This command takes no argument.
+.RE
+.PP
+\fB\-h\fR, \fB\-\-help\fR
+Print this message and exit
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print script version and exit
+.TP
+\fB\-\-arch=\fR\fB\fIarch\fR\fR
+Specify the architecture you want to install or purge. The architecture you can use for the install action must be declared in \fI/etc/di-netboot-assistant/di-sources\&.list\fR. The architecture you can use for purge action in one of those you previously installed ! The usable architectures can be listed by leaving \fB\-\-arch=\fR empty. The default architecture is the current one (as reported by dpkg).
+.TP
+\fB\-\-verbose\fR
+Verbose messages
+.TP
+\fB\-\-offline\fR
+Don't download the file (simply re\-extract and build menu)
+.RE
+.SH PROXY
+di-na uses wget to actually download the files. You can set the environnement variables accordingly.
+.SH AUTHOR
+di-netboot-assistant was written by <fpiat@bigfoot.com>.
+.PP
+This manual page was written by Franklin PIAT <fpiat@bigfoot.com>,
+for the Debian project (but may be used by others).
