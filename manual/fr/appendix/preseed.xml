@@ -1,4 +1,4 @@
-<!-- original version: 56253 -->
+<!-- original version: 56312 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -904,14 +904,12 @@ sera choisi avant de préconfigurer son partitionnement.
 <informalexample role="example"><screen>
 # Si le système possède un espace libre, vous pouvez ne partitionner que cet
 # espace.
-# Note : la valeur du choix doit être traduite.
-#d-i partman-auto/init_automatically_partition	\
-#    select Assisté - utiliser le plus grand espace disponible
+#d-i partman-auto/init_automatically_partition select biggest_free
 
 # Vous pouvez aussi choisir un disque entier. Le nom du disque doit être
-# donné selon le format traditionnel. Par exemple, pour utiliser le premier disque
-# SCSI/SATA :
+# donné selon le format traditionnel.
 # Note : un disque doit être spécifié, sauf si le système n'en possède qu'un.
+# Par exemple, pour utiliser le premier disque SCSI/SATA :
 #d-i partman-auto/disk string /dev/sda
 # Il faudra aussi indiquer la méthode à utiliser.
 # Actuellement les méthodes disponibles sont : regular, lvm et crypto.
@@ -926,14 +924,11 @@ d-i parman-md/device_remove_md boolean true
 # Et aussi pour la confirmation concernant la création de partitions lvm :
 d-i partman-lvm/confirm boolean true
 
-# Vous pouvez choisir parmi tous les schémas prédéfinis...
-# Note : la valeur du choix doit être traduit.
-d-i partman-auto/choose_recipe \
-    select All files in one partition (recommended for new users)
-#d-i partman-auto/choose_recipe \
-#   select Separate /home partition
-#d-i partman-auto/choose_recipe \
-#   select Separate /home, /usr, /var, and /tmp partitions
+# Vous pouvez choisir l'un des trois schémas prédéfinis...
+# - atomic: tous les fichiers dans une seule partition
+# - home:   partition /home distincte
+# - multi:  partitions /home, /usr, /var, et /tmp séparées
+d-i partman-auto/choose_recipe select atomic
 
 #...ou donner vous-même votre schéma.
 # Le format des schémas est expliqué dans le fichier 
@@ -963,11 +958,10 @@ d-i partman-auto/choose_recipe \
 #                      method{ swap } format{ }                \
 #              .
 
-# Si vous avez indiqué la méthode à utiliser, Partman créera automatiquement
+# Si vous avez indiqué la méthode à utiliser, partman créera automatiquement
 # les partitions sans demander de confirmation.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-   select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
