@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 55054 -->
+<!-- original version: 56253 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1308,14 +1308,14 @@ d-i debian-installer/locale string it_IT
 Keyboard configuration consists of selecting a keyboard architecture and a
 keymap. In most cases the correct keyboard architecture is selected by
 default, so there's normally no need to preseed it. The keymap must
-be valid for the selected  keyboard architecture.
+be known to the &d-i; for the selected keyboard architecture.
 -->
 
 La configurazione della tastiera consiste nella scelta di una architettura
 della tastiera e di una mappa di tastiera. Nella maggior parte dei casi
 l'architettura della tastiera viene riconosciuta automaticamente e quindi
 non è necessario farne la preconfigurazione. La mappa di tastiera deve
-essere una valida per l'architettura della tastiera scelta.
+essere ritenuta da &d-i; valida per l'architettura della tastiera scelta.
 
 <informalexample role="example"><screen>
 <!--
@@ -1505,6 +1505,30 @@ d-i netcfg/wireless_wep string
 # per disabilitare la richiesta.
 #d-i hw-detect/load_firmware boolean true
 </screen></informalexample>
+
+<para>
+
+<!--
+Please note that <command>netcfg</command> will automatically determine the
+netmask if <classname>netcfg/get_netmask</classname> is not preseeded.  In
+this case, the variable has to be marked as <literal>seen</literal> for
+automatic installations.  Similarly, <command>netcfg</command> will choose
+an appropriate address if <classname>netcfg/get_gateway</classname> is not
+set.  As a special case, you can set
+<classname>netcfg/get_gateway</classname> to <quote>none</quote> to specify
+that no gateway should be used.
+-->
+
+Notare che <command>netcfg</command> determina automaticamente la maschera
+di rete se <classname>netcfg/get_netmask</classname> non è preconfigurato;
+in caso di installazioni automatiche questa variabile deve essere marcata
+come <literal>seen</literal>. In modo similare, <command>netcfg</command>
+sceglie un indirizzo opportuno quando non è impostato
+<classname>netcfg/get_gateway</classname>. È possibile impostare
+<classname>netcfg/get_gateway</classname> a <quote>none</quote> per
+indicare che non deve essere usato alcun gateway.
+
+</para>
   </sect2>
 
   <sect2 id="preseed-mirror">
@@ -1681,6 +1705,9 @@ d-i partman-auto/method string lvm
 # partizionati automaticamente contiene già una precedente configurazione
 # LVM. Comunque anche questo può essere preconfigurato...
 d-i partman-lvm/device_remove_lvm boolean true
+<!--# The same applies to pre-existing software RAID array:
+--># La stessa cosa avviene se già esiste un array in RAID software:
+d-i parman-md/device_remove_md boolean true
 <!--
 # And the same goes for the confirmation to write the lvm partitions.
 --># E può essere preconfigurata anche la conferma alla scrittura delle
@@ -1762,48 +1789,36 @@ d-i partman/confirm boolean true
 
 <!--
 You can also use preseeding to set up partitions on software RAID arrays.
-Supported are RAID levels 0, 1 and 5, creating degraded arrays and
+Supported are RAID levels 0, 1, 5, 6 and 10, creating degraded arrays and
 specifying spare devices.
 If you are using RAID 1, you can preseed grub to install to all devices
 used in the array; see <xref linkend="preseed-bootloader"/>.
 -->
 
-Si può usare anche la preconfigurazione per impostare le partizioni su array
-in RAID software. È supportato il RAID di livello 0, 1 e 5, la creazione di
-array <emphasis>degraded</emphasis> e la scelta di dischi di scorta. Se si
-usa RAID 1 è possibile preconfigurare grub in modo da installarlo su tutti i
-dispositivi usati dall'array; si veda <xref linkend="preseed-bootloader"/>.
+Si può usare anche la preconfigurazione per impostare le partizioni su
+array in RAID software. È supportato il RAID di livello 0, 1, 5, 6 e 10
+la creazione di array <emphasis>degradati</emphasis> e la scelta di
+dischi di scorta. Se si usa RAID 1 è possibile preconfigurare grub in
+modo da installarlo su tutti i dispositivi usati dall'array; si veda
+<xref linkend="preseed-bootloader"/>.
 
 </para>
 <warning><para>
 
 <!--
-This type of automated partitioning is easy to get wrong. It is also a
-very new component that may still have some bugs or missing error
-handling. The responsibility to get the various recipes right (so they
+This type of automated partitioning is easy to get wrong. It is also
+functionality that receives relatively little testing from the developers
+of &d-i;. The responsibility to get the various recipes right (so they
 make sense and don't conflict) lies with the user.
 Check <filename>/var/log/syslog</filename> if you run into problems.
 -->
 
-È probabile che questo tipo di partizionamento automatico fallisca. Infatti
-si tratta di un componente nuovo che potrebbe avere dei bug o delle carenze
-nella gestione degli errori. La responsabilità di recuperare delle ricette
+È probabile che questo tipo di partizionamento automatico fallisca.
+Infatti questa funzionalità ha ricevuto relativamente pochi test da parte
+degli sviluppatori del &d-i;. La responsabilità di recuperare delle ricette
 corrette (cioè che abbiano senso e che non siano in conflitto) è lasciata
 all'utente. In caso di problemi si controlli in
 <filename>/var/log/syslog</filename>.
-
-</para><para>
-
-<!--
-Note that only RAID 0 and RAID 1 have been tested by the developers of the
-component. RAID 5 is untested. Advanced RAID setup with degraded arrays or
-spare devices has only been tested lightly.
--->
-
-Infine è da notare che gli sviluppatori hanno fatto dei test solo su RAID 0
-e 1. RAID 5 non è stato provato, le configurazioni di RAID più sofisticate,
-con array <emphasis>degraded</emphasis> e dischi di scorta, sono state
-provate in modo non approfondito.
 
 </para></warning>
 
@@ -1847,15 +1862,15 @@ provate in modo non approfondito.
 # Parameters are:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 --># Infine si deve specificare come devono essere utilizzate le partizioni
 # definite in precedenza all'interno del RAID. Attenzione a usare i numeri
 # di partizione corretti per le partizioni logiche.
 # I parametri sono:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Sono supportati i livelli di RAID 0, 1 e 5; i dispositivi devono essere
-# separati usando il carattere "#"
+# Sono supportati i livelli di RAID 0, 1, 5, 6 e 10; i dispositivi
+# devono essere separati usando il carattere "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
@@ -2322,66 +2337,6 @@ d-i finish-install/reboot_in_progress note
 # This will power off the machine instead of just halting it.
 --># Questo spegne la macchina anziché semplicemente arrestarla.
 #d-i debian-installer/exit/poweroff boolean true
-</screen></informalexample>
-  </sect2>
-
-  <sect2 id="preseed-X">
-  <!-- <title>X configuration</title> -->
-  <title>Configurazione di X</title>
-<para>
-
-<!--
-Preseeding Debian's X config is possible, but you probably need to know
-some details about the video hardware of the machine, since Debian's X
-configurator does not do fully automatic configuration of everything.
--->
-
-La preconfigurazione di X di Debian è possibile, ma probabilmente è
-necessario conoscere qualche dettaglio riguardo l'hardware video della
-macchina, poiché il programma Debian per la configurazione di X non riesce
-a fare una configurazione automatica di tutto.
-
-</para>
-
-<informalexample role="example"><screen>
-<!--
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
---># X può rilevare il driver corretto per alcune schede, ma se si sta
-# preconfigurando, si sovrascriverà qualsiasi cosa esso scelga. Nella
-# maggioranza dei casi vesa funzionerà ancora.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-<!--
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
---># Un avvertimento per il rilevamento automatico del mouse è che se questo
-# fallisce, X lo proverà ancora e così via. Pertanto, se si è preconfigurato
-# che debba essere fatto, c'è la possibilità di un ciclo infinito se il
-# mouse non è rilevato automaticamente.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-<!--
-# Monitor autodetection is recommended.
---># Il rilevamento automatico del monitor è raccomandato.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-<!--
-# Uncomment if you have an LCD display.
---># Scommentare se si ha uno schermo LCD.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-<!--
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
---># X ha tre percorsi di configurazione per il monitor. Ecco come
-# preconfigurare il percorso "medium", che è sempre disponibile. Il percorso
-# "simple" potrebbe non essere disponibile e il percorso "advanced" pone
-# troppe domande.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
 </screen></informalexample>
   </sect2>
 

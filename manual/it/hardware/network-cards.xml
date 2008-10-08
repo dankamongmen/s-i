@@ -1,9 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56244 -->
+<!-- original version: 56257 -->
 
- <sect2 id="network-cards">
- <!-- <title>Network Connectivity Hardware</title> -->
- <title>Schede di rete</title>
+  <sect2 id="network-cards">
+  <!-- <title>Network Connectivity Hardware</title> -->
+  <title>Schede di rete</title>
 <para>
 
 <!--
@@ -124,102 +124,46 @@ immagini non ufficiali per il Linksys NSLU2 con il microcodice proprietario.
 </para><para arch="x86">
 
 <!--
-As for ISDN, the D-channel protocol for the (old) German 1TR6 is not
-supported; Spellcaster BRI ISDN boards are also not supported by the
-&d-i;. Using ISDN during the installation is not supported.
+ISDN is supported, but not during the installation.
 -->
 
-Per quanto riguarda l'ISDN, il protocollo D-channel per il (vecchio) 1TR6
-tedesco non è supportato; le schede ISDN Spellcaster BRI ISDN non sono
-supportate dal &d-i;. L'uso di ISDN durante l'installazione non è supportato.
+L'uso di ISDN è supportato, ma non durante l'installazione.
 
 </para>
 
-  <sect3 arch="not-s390" id="nics-firmware">
-  <!-- <title>Drivers Requiring Firmware</title> -->
-  <title>Driver che richiedono un firmware</title>
+   <sect3 condition="supports-wireless" id="nics-wireless">
+   <!-- <title>Wireless Network Cards</title> -->
+   <title>Schede per reti wireless</title>
 <para>
 
 <!--
-The installation system currently does not support retrieving firmware.
-This means that any network cards that use a driver that requires firmware
-to be loaded, is not supported by default.
--->
-
-Il sistema d'installazione attualmente non supporta il recupero del firmware.
-Questo vuol dire che qualsiasi scheda di rete il cui driver ha bisogno di
-caricare il firmware non è supportata nella configurazione predefinita
-dell'installatore.
-
-</para><para>
-
-<!--
-If there is no other NIC you can use during the installation, it is still
-possible to install &debian; using a full CD-ROM or DVD image. Select the
-option to not configure a network and install using only the packages
-available from the CD/DVD. You can then install the driver and firmware you
-need after the installation is completed (after the reboot) and configure
-your network manually. Note that the firmware may be packaged separately
-from the driver and may not be available in the <quote>main</quote> section
-of the &debian; archive.
--->
-
-Se durante l'installazione non sono disponibili altre schede di rete è
-comunque possibile portare a termine l'installazione di &debian; usando le
-immagini complete di CD-ROM o DVD. Scegliere di non configurare la rete
-ed effettuare l'installazione usando solo i pacchetti disponibili sul
-CD/DVD. Il driver e il firmware possono essere installati al termine
-dell'installazione (dopo aver riavviato la macchina) e quindi procedere
-con la configurazione manuale della rete. Notare che driver e firmware
-potrebbero essere contenuti in pacchetti diversi e che il pacchetto con
-il firmware potrebbe non essere disponibile nella sezione
-<quote>main</quote> dell'archivio &debian;.
-
-</para><para>
-
-<!--
-If the driver itself <emphasis>is</emphasis> supported, you may also be
-able to use the NIC during installation by copying the firmware from some
-medium to <filename>/usr/lib/hotplug/firmware</filename>. Don't forget to
-also copy the firmware to that location for the installed system before
-the reboot at the end of the installation.
--->
-
-Se il driver <emphasis>è</emphasis> supportato allora è possibile usare la
-scheda di rete durante l'installazione a patto di copiare il firmware da
-un qualsiasi supporto in <filename>/usr/lib/hotplug/firmware</filename>. Non
-scordarsi di copiare il firmware anche nella stessa directory del sistema
-installato prima del riavvio al termine dell'installazione.
-
-</para>
-  </sect3>
-
-  <sect3 condition="supports-wireless" id="nics-wireless">
-  <!-- <title>Wireless Network Cards</title> -->
-  <title>Schede per reti wireless</title>
-<para>
-
-<!--
-Wireless NICs are in general supported as well, with one big proviso.
-A lot of wireless adapters require drivers that are either non-free or have
-not been accepted into the official Linux kernel. These NICs can generally
+Wireless networking is in general supported as well and a growing number of
+wireless adapters is supported by the official Linux kernel, although many
+of them do require firmware to be loaded.
+Wireless NICs that are not supported by the official Linux kernel can generally
 be made to work under &debian;, but are not supported during the installation.
 -->
 
-Le schede di rete wireless sono generalmente supportate, ma con un importante
-prerequisito. Molte schede di rete wireless richiedono dei driver che
-non sono liberi oppure che non sono stati accettati nel kernel Linux
-ufficiale. Queste schede di rete possono funzionare correttamente con &debian;
-ma non sono supportate durante l'installazione.
+Le reti wireless sono generalmente ben supportate e un numero crescente
+di adattatori wireless è supportato dal kernel Linux ufficiale, anche
+se molti richiedano il caricamento del firmware. I NIC wireless non
+supportati dal kernel ufficiale possono funzionare correttamente con
+&debian; ma non sono supportate durante l'installazione.
 
 </para><para>
 
 <!--
+The use of wireless networking during installation is still under development
+and whether it will work depends on the type of adaptor and the configuration
+of your wireless access point.
 If there is no other NIC you can use during the installation, it is still
 possible to install &debian; using a full CD-ROM or DVD image. Use the same
 procedure as described above for NICs that require firmware.
 -->
 
+L'uso delle reti wireless durante l'installazione è ancora in sviluppo e
+il suo funzionamento dipende dal tipo di adattatore e dalla configurazione
+del proprio access point.
 Se durante l'installazione non sono disponibili altre schede di rete è
 comunque possibile portare a termine l'installazione di &debian; usando le
 immagini complete di CD-ROM o DVD. Seguire la stessa procedura descritta
@@ -246,11 +190,11 @@ possibilità è usare il pacchetto <classname>ndiswrapper</classname> che
 permette di usare un driver per Windows.</phrase>
 
 </para>
-  </sect3>
+   </sect3>
 
-  <sect3 arch="sparc" id="nics-sparc-trouble">
-  <!-- <title>Known Issues for &arch-title;</title> -->
-  <title>Problemi noti su &arch-title;</title>
+   <sect3 arch="sparc" id="nics-sparc-trouble">
+   <!-- <title>Known Issues for &arch-title;</title> -->
+   <title>Problemi noti su &arch-title;</title>
 <para>
 
 <!--
@@ -263,9 +207,9 @@ pena ricordare.
 
 </para>
 
-   <sect4>
-   <!-- <title>Conflict between tulip and dfme drivers</title> -->
-   <title>Conflitto fra i driver tulip e dfme</title>
+    <sect4>
+    <!-- <title>Conflict between tulip and dfme drivers</title> -->
+    <title>Conflitto fra i driver tulip e dfme</title>
 <!-- BTS: #334104; may also affect other arches, but most common on sparc -->
 <para>
 
@@ -324,11 +268,11 @@ Notare che il modulo sbagliato potrebbe essere nuovamente caricato quando
 si riavvia il sistema.
 
 </para>
-   </sect4>
+    </sect4>
 
-   <sect4>
-   <!-- <title>Sun B100 blade</title> -->
-   <title>Sun B100 blade</title>
+    <sect4>
+    <!-- <title>Sun B100 blade</title> -->
+    <title>Sun B100 blade</title>
 <!-- BTS: #384549; should be checked for kernels >2.6.18 -->
 <para>
 
@@ -341,6 +285,6 @@ Il driver di rete <literal>cassini</literal> non funziona con i sistemi
 blade Sun B100.
 
 </para>
-   </sect4>
-  </sect3>
- </sect2>
+    </sect4>
+   </sect3>
+  </sect2>
