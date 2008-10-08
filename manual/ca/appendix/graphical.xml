@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52728 -->
+<!-- original version: 53316 -->
 
  <sect1 condition="gtk" id="graphical">
  <title>L'instal·lador gràfic</title>
@@ -24,17 +24,20 @@ alhora en una mateixa pantalla.
 </para><para arch="x86">
 
 L'instal·lador gràfic està disponible en totes les imatges de CD i
-amb el mètode d'instal·lació hd-media. Com l'instal·lador gràfic
-utilitza un initrd diferent (i molt més gran) que l'instal·lador
-normal, s'ha d'arrencar utilitzant <userinput>installgui</userinput>
-en lloc de <userinput>install</userinput>. Anàlogament, el mode expert
-i el mode rescat s'arrenquen utilitzant <userinput>expertgui</userinput>
-i <userinput>rescuegui</userinput> respectivament.
+amb el mètode d'instal·lació hd-media. Per arrencar l'instal·lador gràfic
+simplement seleccioneu l'opció rellevant al menú d'arrencada. El mode expert
+i de rescat de l'instal·lador gràfic es pot seleccionar des del menú
+<quote>Advanced options</quote>. Els mètodes anteriors d'arrencada 
+<userinput>installgui</userinput>, <userinput>expertgui</userinput> i 
+<userinput>rescuegui</userinput> encara poden utilitzar-se des de l'indicador
+d'arrencada que es mostra després de seleccionar l'opció <quote>Help</quote>
+al menú d'arrencada.
 
 </para><para arch="x86">
 
-També està disponible com a imatge ISO <quote>mini</quote>
-especial<footnote id="gtk-miniiso">
+Hi ha una imatge de l'instal·lador gràfic per arrencar per xarxa. També està
+disponible com a imatge ISO <quote>mini</quote> especial<footnote
+id="gtk-miniiso">
 
 <para>
 La imatge ISO mini es pot descarregar des d'una de les rèpliques de
@@ -42,10 +45,7 @@ Debian tal i com es descriu a <xref linkend="downloading-files"/>.
 Busqueu <filename>netboot/gtk/mini.iso</filename>.
 </para>
 
-</footnote>, que és útil sobretot per a fer proves; en
-aquest cas la imatge s'ha de carregar utilitzant simplement
-<userinput>install</userinput>. No hi ha cap instal·lador gràfic que
-es pugui arrencar per xarxa.
+</footnote>, que és útil sobretot per a fer proves.
 
 </para><para arch="powerpc">
 
@@ -64,6 +64,17 @@ falli en altres sistemes.
 
 </para><para>
 
+Tal i com passa en l'instal·lador normal, és possible afegir paràmetres
+d'arrencada quan s'engega l'instal·lador gràfic. Un d'aquests paràmetres
+permet configurar el ratolí per a esquerrans. Altres permeten seleccionar el
+dispositiu del ratolí (p.e. per un ratolí sèrie) i el protocol del ratolí.
+Referiu-vos a <xref linkend="boot-parms"/> per vore els paràmetres
+vàlids<phrase arch="x86">, i a <xref linkend="boot-screen"/> per vore la
+informació de com passar-los</phrase>.
+
+</para>
+<note><para>
+
 L'instal·lador gràfic requereix més memòria que l'instal·lador
 normal: &minimum-memory-gtk;. Si no hi ha prou memòria, passarà
 a utilitzar la interfície <quote>newt</quote> automàticament com
@@ -71,12 +82,12 @@ a alternativa.
 
 </para><para>
 
-Podeu especificar paràmetres d'arrencada en iniciar l'instal·lador
-gràfic tal i com ho faríeu amb l'instal·lador regular. Un d'aquests
-paràmetres us permetrà configurar el ratolí per a esquerrans. Teniu
-un llistat dels paràmetres vàlids a <xref linkend="boot-parms"/>.
+Si la quantitat de memòria en el vostre sistema està per sota de 
+&minimum-memory;, l'instal·lador gràfic podria fallar a l'arrencar mentre
+l'instal·lador normal encara hauria de funcionar. Es recomana la utilització
+de l'instal·lador normal en sistemes amb poca memòria.
 
-</para>
+</para></note>
 
   <sect2 id="gtk-using">
   <title>Utilitzar l'instal·lador gràfic</title>
@@ -115,20 +126,16 @@ per tornar-hi.
   <title>Problemes coneguts</title>
 <para>
 
-Etch és la primera versió que inclou l'instal·lador gràfic i utilitza
-tecnologia relativament nova. Us podeu trobar amb una sèrie de problemes
-coneguts durant la instal·lació. Esperem que aquests problemes estiguin
-solucionats de cara al proper llançament de &debian;.
+La interfície gràfica de l'instal·lador és relativament nova i per això té
+alguns problemes coneguts. Continuem treballant en resoldre'ls.
 
 </para>
 
 <itemizedlist>
 <listitem><para>
 
-En algunes pantalles la informació no queda formatada correctament
-en columnes. L'exemple més obvi és la primera pregunta on heu de
-seleccionar l'idioma. Un altre exemple és la pantalla principal del
-partman.
+En algunes pantalles la informació no queda encara formatada correctament
+en columnes. Açò es més visible durant el procés de partició.
 
 </para></listitem>
 <listitem><para>
@@ -151,13 +158,6 @@ això passi es tornarà a iniciar automàticament, però tot i així
 és possible que tingueu problemes amb la instal·lació. Canviar a
 una altra consola mentre l'instal·lador està en espera que introduïu
 dades hauria de funcionar sense cap problema.
-
-</para></listitem>
-<listitem><para>
-
-El suport per a crear particions xifrades està limitat ja que no és
-possible generar una clau de xifrat aleatòria. És possible establir
-una partició xifrada utilitzant una contrasenya com a clau de xifrat.
 
 </para></listitem>
 <listitem><para>

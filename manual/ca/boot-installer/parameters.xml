@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 49849 -->
+<!-- original version: 53452 -->
 
  <sect1 id="boot-parms"><title>Paràmetres d'arrencada</title>
 <para>
@@ -49,8 +49,7 @@ megabytes. Per exemple, <userinput>mem=65536K</userinput> i
 </para><para condition="supports-serial-console">
 
 Si esteu arrencant via una consola sèrie el nucli ho detectarà
-automàticament <phrase arch="mipsel"> (no en el cas de les estacions
-DEC)</phrase>.
+automàticament.
 Si disposeu d'una targeta de vídeo (framebuffer) i un teclat connectats
 a l'ordinador del qual voleu arrencar, hauríeu de passar passar el
 paràmetre
@@ -374,6 +373,18 @@ vegeu <xref linkend="preseed-auto"/>.
 </varlistentry>
 
 <varlistentry>
+<term>finish-install/keep-consoles</term>
+<listitem><para>
+
+A instal·lacions des de sèrie o des de la consola de gestió, les consoles 
+virtuals (VT1 a VT6) es deshabiliten normalment al 
+<filename>/etc/inittab</filename>.
+Poseu-ho a <userinput>true</userinput> per evitar-ho.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -422,6 +433,44 @@ completament. El valor està en KiB.
 </varlistentry>
 
 <varlistentry condition="gtk">
+<term>mouse/protocol</term>
+<listitem><para>
+
+Amb l'instal·lador gràfic (interfície gtk) els usuaris poden indicar el 
+protocol del ratolí que s'utilitzarà donant-li valor a aquest paràmetre.
+Els valors disponibles són<footnote>
+
+<para>
+Vegeu la pàgina de manual de
+<citerefentry><refentrytitle>directfbrc</refentrytitle>
+<manvolnum>5</manvolnum></citerefentry> per obtenir informació addicional.
+</para>
+
+</footnote>:
+<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
+<userinput>MS</userinput>, <userinput>MS3</userinput>,
+<userinput>MouseMan</userinput> i <userinput>MouseSystems</userinput>.
+En la major part dels casos, el protocol per defecte hauria de funcionar 
+correctament.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/device</term>
+<listitem><para>
+
+Amb l'instal·lador gràfic (interfície gtk), els usuaris poden especificar amb
+aquest paràmetre el dispositiu de ratolí que s'utilitzarà. Això pot ser
+especialment útil si el ratolí està connectat a un port sèrie (ratolí sèrie).
+Exemple:
+<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+
 <term>mouse/left</term>
 <listitem><para>
 

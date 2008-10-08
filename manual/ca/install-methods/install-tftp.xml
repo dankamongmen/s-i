@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 -->
+<!-- original version: 54017 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparació dels fitxers per a l'arrencada en xarxa TFTP</title>
@@ -123,9 +123,13 @@ Vegeu el fitxer <filename>/etc/inetd.conf</filename> i recordeu el directori
 que s'utilitza com a paràmetre del <command>in.tftpd</command><footnote>
 
 <para>
-El paràmetre <userinput>-l</userinput> fa que algunes versions del
-<command>in.tftpd</command> registrin totes les peticions als registres
-del sistema, útil per diagnosticar els errors d'arrencada.
+Totes les alternatives de l'<command>in.tftpd</command> que hi ha a Debian
+per defecte haurien d'enregistrar les peticions TFTP al registre del
+sistema. Algunes d'elles suporten un paràmetre <userinput>-v</userinput>
+per mostrar una sortida més detallada.
+Es recomana que comproveu aquests missatges registrats en el cas que patiu
+problemes d'arrencada com a punt d'inici al diagnòstic de la causa dels 
+problemes.
 </para>
 
 </footnote>; ho necessitareu després.
@@ -175,9 +179,36 @@ TFTP, i no hi existeix cap norma ben establerta.
 En màquines NewWorld Power Macintosh, heu d'establir el carregador
 d'arrencada <command>yaboot</command> com a imatge d'arrencada TFTP.
 Amb això el <command>yaboot</command> enviarà les imatges del nucli i
-el RAMdisk a través del TFTP mateix. Per arrencar en xarxa, feu servir
-<filename>yaboot-netboot.conf</filename>. Només cal reanomenar-lo com
-<filename>yaboot.conf</filename> al directori del TFTP.
+el RAMdisk a través del TFTP mateix. Necessitareu descarregar els fitxers
+següents des del directori <filename>netboot/</filename>:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 44002 -->
+<!-- original version: 53296 -->
 
   <sect2 arch="x86"><title>Arrencada des d'un CD-ROM</title>
 
@@ -69,6 +69,29 @@ Boots the <quote>bf2.4</quote> flavor.
 
 -->
 
+  </sect2>
+  <sect2 arch="x86" id="boot-win32">
+  <title>Com arrancar des de Windows</title>
+<para>
+
+Per iniciar l'instal·lador des de Windows, primer heu d'aconseguir un 
+CD-ROM/DVD-ROM o un llapis de memòria USB tal com es descriu a
+<xref linkend="official-cdrom"/> i <xref linkend="boot-usb-files"/>.
+
+</para><para>
+
+Si utilitzeu un CD o un DVD d'instal·lació, es llançarà un programa d'instal·lació
+automàticament quan inseriu el disc.
+Si el Windows no l'engega automàticament, o si esteu utilitzant un llapis de
+memòria USB, podeu executar-lo manualment accedint al dispositiu i executant
+<command>setup.exe</command>.
+
+</para><para>
+
+Després d'engegar el programa, es faran unes poques qüestions preliminars i
+el sistema estarà ja preparat per iniciar l'instal·lador de &debian;
+
+</para>
   </sect2>
 
 <!-- FIXME the documented procedure does not exactly work, commented out
@@ -324,53 +347,98 @@ que permeten l'arrencada via TFTP.
    </sect3>
   </sect2>
 
-  <sect2 arch="x86"><title>L'indicador d'arrencada</title>
+  <sect2 arch="x86" id="boot-screen">
+  <title>L'indicador d'arrencada</title>
 <para>
 
 Quan arrenqui l'instal·lador us apareixerà una pantalla gràfica
-amigable mostrant el logotip de Debian i l'indicador d'arrencada:
+amigable mostrant el logotip de Debian i un menú:
 
 <informalexample><screen>
-Press F1 for help, or ENTER to boot:
+Installer boot menu
+
+Install
+Graphical install
+Advanced options       >
+Help
+
+Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
 
-A l'indicador d'arrencada podeu o bé prémer &enterkey; per arrencar
-l'instal·lador amb les opcions predeterminades o introduir un mètode
-específic d'arrencada amb paràmetres opcionals.
+Depenent del mètode d'instal·lació que esteu utilitzant, la opció <quote>Graphical install</quote> podria no estar disponible.
 
 </para><para>
 
-Podeu accedir a informació útil sobre els mètodes d'arrencada i
-paràmetres d'arrencada prement les tecles de <keycap>F2</keycap> a
-<keycap>F8</keycap>. Si afegiu algun
-paràmetre a la línia d'ordres d'arrencada, assegureu-vos d'escriure
-el mètode d'arrencada (el predeterminat és <userinput>install</userinput>)
-i un espai abans del primer paràmetre (ex.
-<userinput>install fb=false</userinput>).
+Per una instal·lació normal, seleccioneu <quote>Install</quote> o bé l'entrada
+<quote>Graphical install</quote> &mdash; utilitzant les tecles de desplaçament
+o escrivint la primera lletra (ressaltada) &mdash; i prement &enterkey;
+a l'arrencada de l'instal·lador.
+
+</para><para>
+
+La entrada <quote>Advanced options</quote> dona accés a un segon menú que
+permet arrencar l'instal·lador en mode expert, en mode rescat i per 
+instal·lacions automatitzades.
+
+</para><para>
+
+Si voleu o necessiteu afegir paràmetres d'arrencada a l'instal·lador o al nucli,
+premeu &tabkey;. Açò mostrarà l'ordre per defecte d'arrencada de l'entrada de
+menú que tingueu seleccionada i us permetrà afegir opcions addicionals. Les
+pantalles d'ajuda (vegeu més avall) us mostren les opcions possibles més 
+habituals. Premeu &enterkey; per arrencar l'instal·lador amb les vostres opcions;
+si premeu &escapekey; us tornarà al menú d'arrencada.
+
+</para><para>
+
+Si trieu l'entrada <quote>Help</quote> us mostrarà la primera pantalla d'ajuda
+que dona una visió general de totes les pantalles d'ajuda.
+Fixeu-vos que no és possible tornar al menú d'haver mostrat les pantalles
+d'ajuda. Per altra banda, la llista d'ordres de les pantalles d'ajuda F3 i F4
+són equivalents als mètodes d'arrencada que es mostren en el menú. Totes les
+pantalles d'ajuda tenen un indicador d'arrencada on podeu escriure l'ordre 
+d'arrencada :
+
+<informalexample><screen>
+Press F1 for the help index, or ENTER to boot:
+</screen></informalexample>
+
+En aquest punt podeu prémer &enterkey; per arrencar l'instal·lador amb les
+opcions per defecte, o bé introduir una ordre d'arrencada específica i,
+opcionalment, paràmetres d'arrencada addicionals. Podeu trobar alguns
+paràmetres d'arrencada prou comuns a les diferents pantalles d'ajuda. Si
+afegiu algun paràmetre a la línia d'ordres d'arrencada, recordeu escriure
+primer el mètode (per defecte és <userinput>install</userinput>) i un espai
+abans del primer paràmetre (p.e, <userinput>install fb=false</userinput>).
 
 <note><para>
 
-Si esteu instal·lant el sistema via un dispositiu d'administració remot
-que proveeixi una interfície de text a la consola VGA, pot ser que no
-veieu la pantalla flaix gràfica en arrencar l'instal·lador, fins i tot
-pot ser que no veieu l'indicador d'arrencada. Exemples d'aquests
-dispositius inclouen la consola de text <quote>integrated Lights Out</quote>
-(iLO) de Compaq i l'<quote>Integrated Remote Assistant</quote> (IRA)
-d'HP. Podeu prémer F1 a cegues<footnote>
+En aquest moment, el teclat per defecte és l'anglès americà. Açò vol dir
+que si el vostre teclat té una disposició diferent (específica d'un idioma),
+els caràcters que apareixen a la pantalla poden ser diferents dels que 
+esperàveu escriure. La Wikipedia té un <ulink url="&url-us-keymap;">esquema de
+teclat US</ulink> que es pot utilitzar com a referència per trobar les tecles
+correctes.
+ 
+</para></note>
+<note><para>
 
-<para>
+Si utilitzeu un sistema que té la BIOS configurada per utilitzar la consola sèrie, 
+podria passar que no poguéreu vore la pantalla inicial d'arrencada fins que no
+tingueu l'instal·lador arrencat; podria ser que no veiéreu ni el menú 
+d'arrencada. El mateix pot passar quan esteu arrencant el sistema amb un 
+dispositiu de gestió remota que done una interfície de text a la consola VGA.
+Alguns exemples d'aquests dispositius són la consola text de Compaq 
+<quote>integrated Lights Out</quote> (iLO) i el 
+<quote>Integrated Remote Assistant</quote> d'HP (IRA).
 
-En algunes casos aquests dispositius requeriran seqüències d'escapament
-especials per tal que al prémer la tecla sorgeixi efecte,
-per exemple IRA usa <keycombo> <keycap>Ctrl</keycap>
-<keycap>F</keycap> </keycombo>,&nbsp;<keycap>1</keycap>.
+</para><para>
 
-</para>
-
-</footnote> per a saltar-vos aquesta pantalla i veure el text d'ajuda.
-Un cop hàgiu deixat enrere la pantalla flaix gràfica i estigueu al
-text d'ajuda les pulsacions de tecles es mostraran a l'indicador com
-s'espera. Per a deshabilitar el framebuffer per a la resta de
+Per a saltar-vos la pantalla gràfica d'arrencada podeu prémer a cegues 
+&escapekey; per obtenir un indicador d'arrencada en mode text o (igualment a
+cegues) prémer <quote>H</quote> seguit de &enterkey; per seleccionar l'opció 
+d'ajuda descrita abans. Després d'això les pulsacions de tecles es
+mostraran a l'indicador. Per a deshabilitar el framebuffer per a la resta de
 la instal·lació, haureu d'afegir també
 <userinput>fb=false</userinput> a l'indicador
 d'arrencada com descriu el text d'ajuda.

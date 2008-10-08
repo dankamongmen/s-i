@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 52829 -->
+<!-- original version: 54086 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -614,9 +614,17 @@ configuració prèvia.
 </para></listitem>
 <listitem><para>
   Una línia es pot dividir en vàries afegint una barra invertida
-  (<quote><literal>\</literal></quote>) com a caràcter per continuar.
-  Un bon lloc per dividir una línia és després del nom de la pregunta;
-  un lloc dolent és entre un tipus i un valor.
+  (<quote><literal>\</literal></quote>) com a caràcter per continuar. Un bon
+  lloc per dividir una línia és després del nom de la pregunta; un lloc dolent
+  és entre un tipus i un valor.
+</para></listitem>
+<listitem><para>
+  Les variables debconf (<emphasis>templates</emphasis> o plantilles)
+  utilitzades pel mateix instal·lador haurien de tindre <quote>d-i</quote> com
+  a propietari; per donar valor a les variables utilitzades en el sistema
+  instal·lat, s'ha d'utilitzar el nom del paquet que conté la plantilla
+  debconf corresponent. Tan sols les variables diferents de <quote>d-i</quote>
+  es propagaran a la base de dades debconf del sistema instal·lat.
 </para></listitem>
 <listitem><para>
   La major part de les preguntes s'han d'omplir utilitzant els valors
@@ -691,7 +699,7 @@ vàlid abans de fer una instal·lació, podeu utilitzar l'ordre
  </sect1>
 
  <sect1 id="preseed-contents">
- <title>Continguts del fitxer de configuració prèvia</title>
+ <title>Continguts del fitxer de configuració prèvia (per &releasename;)</title>
 <para>
 
 Els fragments de configuració emprats en aquest apèndix també són a l'abast
@@ -1108,16 +1116,16 @@ instal·lació del nucli.
 
 Es poden configurar prèviament el compte del superusuari i el nom i la
 contrasenya d'un usuari ordinari. Les contrasenyes es poden indicar bé
-de manera explícita o bé en forma de <emphasis>capolaments</emphasis> MD5.
+de manera explícita o bé en forma de <emphasis>resums</emphasis> MD5.
 
 </para>
 <warning><para>
 
 Sigueu conscients que la configuració prèvia de contrasenyes no és
 completament segura ja que qualsevol persona amb accés al fitxer de
-configuració prèvia les podrà saber. Emprar capolaments MD5 es considera
+configuració prèvia les podrà saber. Emprar resums MD5 es considera
 un poc millor a efectes de seguretat, però això pot generar, falsament,
-sensació de seguretat, car l'accés als capolaments MD5 permet els atacs
+sensació de seguretat, car l'accés als resums MD5 permet els atacs
 de força bruta.
 
 </para></warning>
@@ -1132,7 +1140,7 @@ de força bruta.
 # Contrasenya de superusuari, bé explícita
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
-# o bé xifrada fent servir un capolament MD5.
+# o bé xifrada fent servir una funció resum MD5.
 #d-i passwd/root-password-crypted password [MD5 hash]
 
 
@@ -1285,6 +1293,9 @@ que el podeu utilitzar de forma senzilla a la línia d'ordres del nucli.
 
 # Paquets addicionals per instal·lar individualment
 #d-i pkgsel/include string openssh-server build-essential
+# Actualització dels paquets després del debootstrap.
+# Valors permesos: none, safe-upgrade, full-upgrade
+#d-i pkgsel/upgrade select none
 
 # Algunes versions de l'instal·lador poden enviar informes del programari
 # que heu instal·lat, i els programes que feu servir. Per defecte no
@@ -1321,8 +1332,21 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # Per instal·lar el grub a més d'un disc:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Contrasenya opcional pel grub, en text pla
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# o utilitzant xifrat amb una funció resum MD5, vegeu grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
 </screen></informalexample>
 
+<para>
+
+Un resum MD5 per una contrasenya de <classname>grub</classname> es pot
+generar utilitzant <command>grub-md5-crypt</command>, o utilitzant l'example
+que hi ha a <xref linkend="preseed-account"/>.
+
+</para>
   </sect2>
 
 
@@ -1330,6 +1354,12 @@ d-i grub-installer/with_other_os boolean true
   <title>Finalització de la instal·lació</title>
 
 <informalexample role="example"><screen>
+
+# Durant la instal·lació des de consola sèrie, les consoles virtuals habituals
+# (VT1-VT6) normalment queden inhabilitades a /etc/inittab. Descomenteu la
+# línia següent per evitar-ho.
+#d-i finish-install/keep-consoles boolean true
+
 # Evita el darrer missatge de la instal·lació que apareix indicant-ne l'estat
 # complet.
 d-i finish-install/reboot_in_progress note

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 43923 -->
+<!-- original version: 54017 -->
 
   <sect2 arch="powerpc" id="boot-cd"><title>Arrencada des d'un CD-ROM</title>
 
@@ -77,11 +77,9 @@ per aturar el MacOS i engegar l'instal·lador.
 Necessitareu tenir els fitxers <filename>vmlinux</filename>,
 <filename>initrd.gz</filename>, <filename>yaboot</filename>, i
 <filename>yaboot.conf</filename> a l'arrel del la vostra partició
-HFS a <xref linkend="files-newworld"/>. Reinicieu l'ordinador, i
-immediatament (al chime) premeu les tecles <keycap>Option</keycap>,
-<keycap>Command (cloverleaf/Apple)</keycap>, <keycap>o</keycap>, i
-<keycap>f</keycap> al mateix temps. Després d'uns segons veureu
-l'indicador de l'Open Firmware.
+HFS a <xref linkend="files-newworld"/>.
+Ara heu d'arrencar l'OpenFirmware (vegeu <xref linkend="invoking-openfirmware"/>).
+A l'arrencada, escriviu
 
 <informalexample><screen>
 0 &gt; boot hd:<replaceable>x</replaceable>,yaboot
@@ -123,10 +121,7 @@ Per arrencar un sistema Macintosh des d'un llapis USB, necessitareu
 utilitzar l'indicador de l'Open Firmware, ja que l'Open Firmware no
 utilitza dispositius d'emmagatzemament USB predeterminat.
 <!-- TODO: although it could be made to; watch this space -->
-Per anar a l'indicador, premeu al mateix temps les tecles
-<keycombo><keycap>Command</keycap> <keycap>Option</keycap>
-<keycap>o</keycap> <keycap>f</keycap></keycombo> mentre arrenca
-(vegeu <xref linkend="invoking-openfirmware"/>).
+Vegeu <xref linkend="invoking-openfirmware"/>.
 
 </para><para>
 
@@ -185,10 +180,26 @@ l'arrencada des de xarxa.
 
 A les màquines amb Open Firmware, com els Power Mac NewWorld, entreu al
 monitor d'arrencada (vegeu <xref linkend="invoking-openfirmware"/>) i
-utilitzeu l'ordre <command>boot enet:0</command>. Les caixes PReP i CHRP
+utilitzeu l'ordre 
+
+<informalexample><screen>
+0 &gt; boot enet:0
+</screen></informalexample>
+
+Si açò no funciona, hauríeu d'afegir el nom del fitxer tal com:
+
+<informalexample><screen>
+0 &gt; boot enet:0,yaboot
+</screen></informalexample>
+
+Les màquines PReP i CHRP
 poden tenir diferent maneres d'adreçar-se a la xarxa. A les màquines PReP,
 hauríem d'intentar
-<userinput>boot net:<replaceable>addrip_servidor</replaceable>,<replaceable>fitxer</replaceable>,<replaceable>addrip_client</replaceable></userinput>.
+
+<informalexample><screen>
+boot net:<replaceable>server_ipaddr</replaceable>,<replaceable>file</replaceable>,<replaceable>client_ipaddr</replaceable>
+</screen></informalexample>
+
 En alguns sistemes PReP (ex. maquines Motorola PowerStack) l'ordre
 <userinput>help boot</userinput> pot donar una descripció de sintaxis
 i opcions disponibles.
