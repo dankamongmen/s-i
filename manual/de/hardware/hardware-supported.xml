@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56244 -->
+<!-- original version: 56257 -->
 
  <sect1 id="hardware-supported">
  <title>Unterstützte Hardware</title>
@@ -25,7 +25,7 @@ Informationen gefunden werden können.
   <sect2><title>Unterstützte Architekturen</title>
 <para>
 
-Debian &release; unterstützt zwölf Haupt-Architekturen und einige Variationen
+Debian &release; unterstützt elf Haupt-Architekturen und einige Variationen
 von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 
 </para><para>
@@ -63,10 +63,14 @@ von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 
  <row>
   <entry morerows="4">ARM</entry>
-  <entry morerows="4">arm</entry>
+  <entry morerows="1">arm</entry>
    <entry>Netwinder und CATS</entry>
    <entry>netwinder</entry>
  </row><row>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
+</row><row>
+  <entry morerows="2">arm und armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32x</entry>
 </row><row>
@@ -75,9 +79,6 @@ von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 </row><row>
   <entry>Marvell Orion</entry>
   <entry>orion5x</entry>
-</row><row>
-  <entry>Versatile</entry>
-  <entry>versatile</entry>
 </row>
 
 <row>
@@ -138,32 +139,29 @@ von jeder dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
   <entry>sb1a-bcm91480b</entry>
 </row>
 
-<row>
+<row arch="m68k">
   <entry morerows="5">Motorola 680x0</entry>
   <entry morerows="5">m68k</entry>
   <entry>Atari</entry>
   <entry>atari</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>Amiga</entry>
   <entry>amiga</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>68k Macintosh</entry>
   <entry>mac</entry>
-</row><row>
+</row><row arch="m68k">
   <entry morerows="2">VME</entry>
   <entry>bvme6000</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme147</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme16x</entry>
 </row>
 
 <row>
-  <entry morerows="2">IBM/Motorola PowerPC</entry>
-  <entry morerows="2">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
+  <entry morerows="1">IBM/Motorola PowerPC</entry>
+  <entry morerows="1">powerpc</entry>
   <entry>PowerMac</entry>
   <entry>pmac</entry>
 </row><row>
@@ -230,6 +228,19 @@ zu kontaktieren.
 &supported-s390.xml;
 &supported-sparc.xml;
 
+  <sect2 arch="x86" id="laptops"><title>Laptops</title>
+<para>
+
+Auch Laptops werden unterstützt und heutzutage funktionieren die meisten
+<quote>out of the box</quote>, also direkt ohne manuelle Nacharbeit. Falls ein
+Laptop spezialisierte oder proprietäre Hardware enthält, werden bestimmte
+Funktionen möglicherweise nicht unterstützt. Um zu erfahren, ob ein bestimmter
+Laptop gut mit GNU/Linux funktioniert, können Sie zum Beispiel die
+<ulink url="&url-x86-laptop;">Linux-on-Laptops-Seiten</ulink> besuchen.
+
+</para>
+   </sect2>
+
   <sect2 condition="defaults-smp">
   <title>Mehrprozessor-Systeme</title>
 <para>
@@ -237,9 +248,9 @@ zu kontaktieren.
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
 Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
 verfügbar. Das Standard-Kernelimage in &release; wurde mit SMP-Unterstützung
-kompiliert. Das sollte eine Installation jedoch nicht verhindern, da der
-SMP-Kernel auch auf Nicht-SMP-Systemen starten müsste; der Kernel wird
-lediglich ein bisschen mehr Overhead verursachen.
+kompiliert. Dieser Kernel ist auch auf nicht-SMP-Systemen nutzbar. Zwar hat
+er einen geringen Overhead, was zu einem kleinen Verlust an Performance führt,
+dies ist jedoch bei normaler Systemnutzung kaum zu bemerken.
 
 </para><para>
 
@@ -395,18 +406,40 @@ Tastatur vor dem Systemstart herauszieht.
 </para>
   </sect2>
 
-  <sect2 arch="x86" id="laptops"><title>Laptops</title>
-<para>
-
-Auch Laptops werden unterstützt. Laptops sind oftmals spezialisiert
-oder beinhalten proprietäre Hardware. Um herauszufinden, ob Ihr
-spezieller Laptop gut mit GNU/Linux zurechtkommt, lesen Sie die
-<ulink url="&url-x86-laptop;">Linux on Laptops-Seiten</ulink>.
-
-</para>
-   </sect2>
-
 &network-cards.xml;
 &supported-peripherals.xml;
 
+ </sect1>
+
+ <sect1 arch="not-s390" id="hardware-firmware">
+ <title>Hardware, die Firmware erfordert</title>
+<para>
+
+Neben der Verfügbarkeit eines Gerätetreiber erfordern einige Geräte
+zusätzlich sogenannte <firstterm>Firmware</firstterm> (oder
+<firstterm>Microcode</firstterm>), die in das Gerät geladen werden muss,
+damit es funktioniert. Dies ist überwiegend bei Netzwerkkarten (speziell
+für Drahtlos-Netzwerke/Wireless-LAN) üblich, aber es gibt zum Beispiel
+auch USB-Geräte und sogar einige Festplatten-Controller, die Firmware
+erfordern.
+
+</para><para>
+
+In den meisten Fällen ist Firmware im Sinne der Kriterien des
+&debian;-Projekts nicht frei und kann deshalb nicht in der
+Hauptdistribution oder im Installationssystem integriert werden. Falls der
+Gerätetreiber selbst in der Distribution enthalten ist und falls &debian;
+die Firmware legal weiterverteilen darf, ist sie aber oft als separates Paket
+in der Non-Free-Sektion des Archivs verfügbar.
+
+</para><para>
+
+Dies bedeutet aber nicht, dass solche Hardware nicht während der
+Installation verwendet werden kann. Seit &debian; 5.0 unterstützt der
+&d-i; die Möglichkeit, Firmware-Dateien oder -Pakete von einem externen
+Medium (wie einer Diskette oder einem USB-Stick) nachzuladen.
+<xref linkend="loading-firmware"/> enthält detailierte Informationen, wie
+Sie die Firmware während der Installation laden können.
+
+</para>
  </sect1>
