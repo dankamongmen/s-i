@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56253 -->
+<!-- original version: 56312 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1669,26 +1669,21 @@ preconfigurazione.
 <informalexample role="example"><screen>
 <!--
 # If the system has free space you can choose to only partition that space.
-# Note: this must be preseeded with a localized (translated) value.
-#d-i partman-auto/init_automatically_partition \
-#      select Guided - use the largest continuous free space
 --># Se il sistema ha spazio libero è possibile scegliere di partizionare
-# soltanto quello spazio. Nota: da preconfigurare con un valore
-# localizzato (cioè tradotto).
-#d-i partman-auto/init_automatically_partition \
-#      select Guidato - usare il più ampio spazio contiguo disponibile.
+# soltanto quello spazio.
+#d-i partman-auto/init_automatically_partition select biggest_free
 
 <!--
 # Alternatively, you can specify a disk to partition. The device name must
 # be given in traditional non-devfs format.
-# For example, to use the first SCSI/SATA hard disk:
 # Note: A disk must be specified, unless the system has only one disk.
+# For example, to use the first SCSI/SATA hard disk:
 --># In alternativa è possibile specificare un disco da partizionare.
 # Il nome del dispositivo deve essere dato nel tradizionale formato
 # non-devfs.
-# Per esempio, per usare il primo disco SCSI/SATA:
 # Nota: è obbligatorio specificare un disco tranne nel caso che il
 # sistema abbia un disco solo.
+# Per esempio, per usare il primo disco SCSI/SATA:
 #d-i partman-auto/disk string /dev/sda
 <!--
 # In addition, you'll need to specify the method to use.
@@ -1715,23 +1710,16 @@ d-i parman-md/device_remove_md boolean true
 d-i partman-lvm/confirm boolean true
 
 <!--
-# You can choose from any of the predefined partitioning recipes.
-# Note: this must be preseeded with a localized (translated) value.
+# You can choose from any of the predefined partitioning recipes:
+# - atomic: all files in one partition
+# - home:   separate /home partition
+# - multi:  separate /home, /usr, /var, and /tmp partitions
 --># È possibile scegliere una qualsiasi delle ricette di partizionamento
-# predefinite. Nota: da preconfigurare con un valore localizzato (cioè
-# tradotto).
-d-i partman-auto/choose_recipe \
-<!--
-       select All files in one partition (recommended for new users)
--->       select Tutti i file in una partizione (raccomandata per nuovi utenti)
-#d-i partman-auto/choose_recipe \
-<!--
-#       select Separate /home partition
--->#       select Partizione /home separata
-#d-i partman-auto/choose_recipe \
-<!--
-#       select Separate /home, /usr, /var, and /tmp partitions
--->#       select Partizioni /home, /usr, /var e /tmp separate
+# predefinite:
+# - atomic: tutti i file in una partizione
+# - home:   partizione separata per /home
+# - multi:  partizioni separate per /home, /usr, /var e /tmp
+d-i partman-auto/choose_recipe select atomic
 
 <!--
 # Or provide a recipe of your own...
@@ -1774,10 +1762,7 @@ d-i partman-auto/choose_recipe \
 --># Questo fa eseguire a partman il partizionamento automatico in base a
 # quanto indicato con uno dei metodi precedenti, senza chidere conferma.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-<!--
-       select Finish partitioning and write changes to disk
--->       select Terminare il partizionamento e scrivere i cambiamenti sul disco
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
   </sect2>
@@ -1887,10 +1872,7 @@ all'utente. In caso di problemi si controlli in
 --># Questo fa in modo che partman partizioni automaticamente senza conferma.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-<!--
-       select Finish partitioning and write changes to disk
--->       select Terminare il partizionamento e scrivere i cambiamenti sul disco
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
   </sect2>
