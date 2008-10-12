@@ -119,6 +119,10 @@ netboot/stable/win32-loader.ini netboot/daily/win32-loader.ini: win32-loader.ini
 	mkdir -p netboot/{stable,daily}
 	todos < $< > $@
 
+netboot/stable/win32-loader.exe netboot/daily/win32-loader.exe: win32-loader.exe
+	mkdir -p netboot/{stable,daily}
+	cp $^ $@
+
 netboot/stable/% netboot/daily/%: %
 	mkdir -p netboot/{stable,daily}
 	cp $(shell basename $@) $@
