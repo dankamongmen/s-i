@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-10-06 00:09+0000\n"
-"PO-Revision-Date: 2008-08-31 14:17+0900\n"
+"PO-Revision-Date: 2008-10-12 11:23+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1232,7 +1232,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:693
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Keyboard configuration consists of selecting a keyboard architecture and "
 #| "a keymap. In most cases the correct keyboard architecture is selected by "
@@ -1243,10 +1243,7 @@ msgid ""
 "keymap. In most cases the correct keyboard architecture is selected by "
 "default, so there's normally no need to preseed it. The keymap must be known "
 "to the &d-i; for the selected keyboard architecture."
-msgstr ""
-"키보드 설정은 키보드 아키텍처와 키맵을 선택하는 일입니다. 대부분 기본값으로 "
-"키보드 아키텍처가 올바르게 선택되어 있으므로, 보통 미리 설정할 필요가 없습니"
-"다. 선택한 키보드 아키텍처에 대해 키맵을 올바르게 지정해야 합니다."
+msgstr "키보드 설정은 키보드 아키텍처와 키맵을 선택하는 일입니다. 대부분 기본값으로 키보드 아키텍처가 올바르게 선택되어 있으므로, 보통 미리 설정할 필요가 없습니다. 선택한 키보드 아키텍처에 대해 &d-i;에 들어 있는 키맵을 지정해야 합니다."
 
 #. Tag: screen
 #: preseed.xml:700
@@ -1455,7 +1452,7 @@ msgid ""
 "appropriate address if <classname>netcfg/get_gateway</classname> is not set. "
 "As a special case, you can set <classname>netcfg/get_gateway</classname> to "
 "<quote>none</quote> to specify that no gateway should be used."
-msgstr ""
+msgstr "<classname>netcfg/get_netmask</classname>를 미리 지정하지 않으면 <command>netcfg</command>는 자동으로 네트마스크를 지정합니다. 자동 설치에서는 이 변수를 <literal>seen</literal>으로 표시해야 합니다. 마찬가지로 <classname>netcfg/get_gateway</classname>를 지정하지 않으면 <command>netcfg</command>는 적당한 주소로 게이트웨이를 설정합니다. 특별한 경우로, <classname>netcfg/get_gateway</classname>를 <quote>none</quote>으로 설정하면 게이트웨이를 사용하지 않습니다."
 
 #. Tag: title
 #: preseed.xml:772
@@ -1605,7 +1602,7 @@ msgstr ""
 # 주의: 메세지 번역과 통일
 #. Tag: screen
 #: preseed.xml:829
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1739,15 +1736,12 @@ msgid ""
 "d-i partman/confirm boolean true"
 msgstr ""
 "# 시스템에 빈 공간이 있으면 거기에 한 개의 파티션을 만들 수 있습니다.\n"
-"# 주의: 이 템플릿은 지역화된(번역된) 값으로 미리 설정해야 합니다.\n"
-"#d-i partman-auto/init_automatically_partition \\\n"
-"#      select 자동 - 가장 큰 연속된 공간 사용\n"
+"#d-i partman-auto/init_automatically_partition select biggest_free\n"
 "\n"
 "# 다른 방법으로, 파티션할 디스크를 지정할 수 있습니다. 장치 이름은\n"
 "# 전통적인 DEVFS가 아닌 형식으로 지정해야 합니다.\n"
+"# 주의: 디스크를 지정해야 합니다. 단 디스크가 한 개이면 하지 않아도 됩니다.\n"
 "# 예를 들어 첫번째 SCSI/SATA 하드디스크를 사용하려면:\n"
-"# 주의: 디스크를 지정해야 합니다. 단 디스크가 한 개이면 하지 않아도\n"
-"# 됩니다.\n"
 "#d-i partman-auto/disk string /dev/sda\n"
 "# 또 어떤 방법을 사용할 지 지정해야 합니다.\n"
 "# 현재 가능한 방법은: \"regular\", \"lvm\", \"crypto\"입니다.\n"
@@ -1757,17 +1751,16 @@ msgstr ""
 "# 사용자에게 경고 메세지를 보여줍니다. 이 경고도 미리 설정해서\n"
 "# 없앨 수 있습니다...\n"
 "d-i partman-lvm/device_remove_lvm boolean true\n"
+"# 마찬가지로 기존의 소프트웨어 RAID 어레이에도 적용됩니다:\n"
+"d-i partman-md/device_remove_md boolean true\n"
 "# 그리고 LVM 파티션을 쓰는 순간에 확인 질문도 미리 설정합니다.\n"
 "d-i partman-lvm/confirm boolean true\n"
 "\n"
-"# 미리 정의한 파티션 방식 중의 하나를 선택할 수 있습니다.\n"
-"# 주의: 이 템플릿은 지역화된(번역된) 값으로 미리 설정해야 합니다.\n"
-"d-i partman-auto/choose_recipe \\\n"
-"       select 모두 한 파티션에 설치 (처음 사용하는 경우 추천)\n"
-"#d-i partman-auto/choose_recipe \\\n"
-"#       select /home 파티션 분리\n"
-"#d-i partman-auto/choose_recipe \\\n"
-"#       select /home, /usr/, /var, /tmp 파티션 분리\n"
+"# 미리 정의한 파티션 방식 중의 하나를 선택할 수 있습니다:\n"
+"# - atomic: 모든 파일을 한 파티션에\n"
+"# - home:   별도의 /home 파티션\n"
+"# - multi:  별도의 /home, /usr, /var, /tmp 파티션\n"
+"d-i partman-auto/choose_recipe select atomic\n"
 "\n"
 "# 아니면 자신만의 파티션 방식을 만듭니다...\n"
 "# 파티션 방식 형식은 devel/partman-auto-recipe.txt 파일에 있습니다.\n"
@@ -1798,8 +1791,7 @@ msgstr ""
 "# 다음과 같이 하면 partman에서 확인 질문을 하지 않고 자동으로 파티션합니다.\n"
 "# 단 위에서 방법 중의 하나를 사용해서 무엇을 할 지 지정한 경우입니다.\n"
 "d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
+"d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
 #. Tag: title
@@ -1810,7 +1802,7 @@ msgstr "RAID를 사용해 파티션하기"
 
 #. Tag: para
 #: preseed.xml:835
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "You can also use preseeding to set up partitions on software RAID arrays. "
 #| "Supported are RAID levels 0, 1 and 5, creating degraded arrays and "
@@ -1823,15 +1815,11 @@ msgid ""
 "specifying spare devices. If you are using RAID 1, you can preseed grub to "
 "install to all devices used in the array; see <xref linkend=\"preseed-"
 "bootloader\"/>."
-msgstr ""
-"소프트웨어 RAID를 설정할 때 미리 설정을 할 수 있습니다. RAID 레벨 0, 1, 5를 "
-"지원하고, 비상용 어레이 및 예비 장치를 지정합니다. RAID 1을 사용한다면 GRUB"
-"을 미리 설정해서 어레이 안의 모든 장치에 GRUB을 설치할 수 있습니다. <xref "
-"linkend=\"preseed-bootloader\"/> 부분을 참고하십시오."
+msgstr "소프트웨어 RAID를 설정할 때 미리 설정을 할 수 있습니다. RAID 레벨 0, 1, 5, 6, 10을 지원하고, 비상용 어레이 및 예비 장치를 지정합니다. RAID 1을 사용한다면 GRUB을 미리 설정해서 어레이 안의 모든 장치에 GRUB을 설치할 수 있습니다. <xref linkend=\"preseed-bootloader\"/> 부분을 참고하십시오."
 
 #. Tag: para
 #: preseed.xml:845
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "This type of automated partitioning is easy to get wrong. It is also a "
 #| "very new component that may still have some bugs or missing error "
@@ -1844,15 +1832,11 @@ msgid ""
 "&d-i;. The responsibility to get the various recipes right (so they make "
 "sense and don't conflict) lies with the user. Check <filename>/var/log/"
 "syslog</filename> if you run into problems."
-msgstr ""
-"이런 방식의 자동 파티션은 잘못되기 쉽습니다. 또 버그가 있거나 오류 처리가 빠"
-"져 있을 수도 있습니다. 여러가지 방식을 올바르게 (규칙에 맞으면서 충돌하지 않"
-"게) 설정하는 책임은 사용자에게 있습니다. 문제가 발생하면 <filename>/var/log/"
-"syslog</filename> 파일을 확인하십시오."
+msgstr "이런 방식의 자동 파티션은 잘못되기 쉽습니다. 또 이 기능은 &d-i; 개발자들이 별로 테스트하지 않는 기능입니다.여러가지 방식을 올바르게 (규칙에 맞으면서 충돌하지 않게) 설정하는 책임은 사용자에게 있습니다. 문제가 발생하면 <filename>/var/log/syslog</filename> 파일을 확인하십시오."
 
 #. Tag: screen
 #: preseed.xml:855
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
 #| "carefully\n"
@@ -1976,10 +1960,9 @@ msgstr ""
 "# 마지막으로 예전에 정의한 파티션을 RAID 설정에서 어떻게 사용할 지\n"
 "# 지정합니다. 논리 파티션에 대해 올바른 파티션 번호를 사용하도록 하십시오.\n"
 "# 파라미터는 다음과 같습니다:\n"
-"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
-"mountpoint&gt; \\\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \\\n"
 "#          &lt;devices&gt; &lt;sparedevices&gt;\n"
-"# RAID 레벨 0, 1, 5를 지원합니다. 각 장치는 \"#\"으로 구분합니다.\n"
+"# RAID 레벨 0, 1, 5, 6, 10을 지원합니다. 각 장치는 \"#\"으로 구분합니다.\n"
 "#d-i partman-auto-raid/recipe string \\\n"
 "#    1 2 0 ext3 /                                           \\\n"
 "#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
@@ -1994,8 +1977,7 @@ msgstr ""
 "# 다음과 같이 하면 파티션 프로그램에서 확인 질문을 하지 않고 파티션합니다.\n"
 "d-i partman-md/confirm boolean true\n"
 "d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
+"d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
 #. Tag: title
