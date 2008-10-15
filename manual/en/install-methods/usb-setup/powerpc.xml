@@ -7,14 +7,15 @@
 
 Most USB sticks do not come pre-configured in such a way that Open
 Firmware can boot from them, so you will need to repartition the stick.
-On Mac systems, run <userinput>mac-fdisk /dev/sda</userinput>,
+On Mac systems, run
+<userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput>,
 initialise a new partition map using the <userinput>i</userinput>
 command, and create a new partition of type Apple_Bootstrap using the
 <userinput>C</userinput> command. (Note that the first "partition" will
 always be the partition map itself.) Then type
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Take care that you use the correct device name for your USB stick. The
@@ -38,7 +39,7 @@ so you will have to install <command>yaboot</command> by hand using the
 <classname>hfsutils</classname> tools. Type
 
 <informalexample><screen>
-$ hmount /dev/sda2
+$ hmount /dev/<replaceable>sdX2</replaceable>
 $ hcopy -r /usr/lib/yaboot/yaboot :
 $ hattrib -c UNIX -t tbxi :yaboot
 $ hattrib -b :
@@ -54,8 +55,9 @@ utilities.
 
 </para><para>
 
-Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and
-copy the following files from the Debian archives to the stick:
+Mount the partition
+(<userinput>mount /dev/<replaceable>sdX2</replaceable> /mnt</userinput>)
+and copy the following installer image files to the stick:
 
 <itemizedlist>
 <listitem><para>
@@ -76,11 +78,6 @@ copy the following files from the Debian archives to the stick:
 <listitem><para>
 
 <filename>boot.msg</filename> (optional boot message)
-
-</para></listitem>
-<listitem><para>
-
-Optional kernel modules
 
 </para></listitem>
 </itemizedlist>

@@ -6,15 +6,62 @@
 
 <para>
 
-To prepare the USB stick, you will need a system where GNU/Linux is
-already running and where USB is supported. You should ensure that the
-usb-storage kernel module is loaded (<userinput>modprobe
-usb-storage</userinput>) and try to find out which SCSI device the USB
-stick has been mapped to (in this example
-<filename>/dev/sda</filename> is used). To write to your stick, you
-may have to turn off its write protection switch.
+There are two installation methods possible when booting from USB stick.
+The first is to install completely from the network. The second is to
+also copy a CD image onto the USB stick and use that as a source for
+packages, possibly in combination with a mirror. This second method is
+the more common.
 
 </para><para>
+
+For the first installation method you'll need to download an installer
+image from the <filename>netboot</filename> directory (at the location
+mentioned in <xref linkend="where-files"/>) and use the
+<quote>flexible way</quote> explained below to copy the files to the USB
+stick.
+
+</para><para>
+
+Installation images for the second installation method can be found in
+the <filename>hd-media</filename> directory and either the <quote>easy
+way</quote> or the <quote>flexible way</quote> can be used to copy the
+image to the USB stick. For this installation method you will also need
+to download a CD image. The installation image and the CD image must be
+based on the same release of &d-i;. If they do not match you are likely
+to get errors<footnote>
+
+<para>
+The error message that is most likely to be displayed is that no kernel
+modules can be found. This means that the version of the kernel module
+udebs included on the CD image is different from the version of the
+running kernel.
+</para>
+
+</footnote> during the installation.
+
+</para><para>
+
+To prepare the USB stick, you will need a system where GNU/Linux is
+already running and where USB is supported. With current GNU/Linux systems
+the USB stick should be automatically recognized when you insert it. If
+it is not you should check that the usb-storage kernel module is loaded.
+When the USB stick is inserted, it will be mapped to a device which will be
+named <filename>/dev/sdX</filename>, where the <quote>X</quote> is a letter
+in the range a-z. You should be able to see to which device the USB
+stick was mapped by running the command <command>dmesg</command> after
+inserting it. To write to your stick, you may have to turn off its write
+protection switch.
+
+</para>
+<warning><para>
+
+The procedures described in this section will destroy anything already
+on the device. Make very sure that you use the correct device name for
+your USB stick. If you use the wrong device the result could be that all
+information on for example a hard disk could be lost.
+
+</para></warning>
+<para>
 
 Note that the USB stick should be at least 256 MB in size (smaller
 setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
@@ -23,47 +70,54 @@ setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
 
   <sect2 id="usb-copy-easy">
   <title>Copying the files &mdash; the easy way</title>
-<para arch="x86">
+<para>
 
 There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
-which contains all the installer files (including the kernel) as well
-as <command>SYSLINUX</command> and its configuration file. You only
-have to extract it directly to your USB stick:
+which contains all the installer files (including the kernel)
+<phrase arch="x86">as well as <classname>syslinux</classname> and its
+configuration file.</phrase>
+<phrase arch="powerpc">as well as <classname>yaboot</classname> and its
+configuration file.</phrase>
+
+</para><para>
+
+Note that, although convenient, this method does have one major
+disadvantage: the logical size of the device will be limited to 256 MB,
+even if the capacity of the USB stick is larger. You will need to
+repartition the USB stick and create new file systems to get its full
+capacity back if you ever want to use it for some different purpose.
+A second disadvantage is that you cannot copy a full CD image onto
+the USB stick, but only the smaller businesscard or netinst CD images.
+
+</para><para arch="x86">
+
+To use this image you only have to extract it directly to your USB stick:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para><para arch="powerpc">
 
-There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
-which contains all the installer files (including the kernel) as well
-as <command>yaboot</command> and its configuration file. Create a
-partition of type "Apple_Bootstrap" on your USB stick using
+Create a partition of type "Apple_Bootstrap" on your USB stick using
 <command>mac-fdisk</command>'s <userinput>C</userinput> command and
 extract the image directly to that:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
-</para>
-<warning><para>
+</para><para>
 
-Using this method will destroy anything already on the device. Make sure
-that you use the correct device name for your USB stick.
-
-</para></warning>
-<para>
-
-After that, mount the USB memory stick (<userinput>mount
-<replaceable arch="x86">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>), which will now have
+After that, mount the USB memory stick
+<phrase arch="x86">(<userinput>mount
+/dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
+<phrase arch="powerpc">(<userinput>mount
+/dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
+which will now have
 <phrase arch="x86">a FAT filesystem</phrase>
 <phrase arch="powerpc">an HFS filesystem</phrase>
-on it, and copy a Debian netinst or businesscard ISO image to it
-(see <xref linkend="usb-add-iso"/>).
+on it, and copy a Debian netinst or businesscard ISO image to it.
 Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 
 </para>
@@ -74,38 +128,22 @@ Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 <para>
 
 If you like more flexibility or just want to know what's going on, you
-should use the following method to put the files on your stick.
+should use the following method to put the files on your stick. One
+advantage of using this method is that &mdash; if the capacity of your
+USB stick is large enough &mdash; you have the option of copying a
+full CD ISO image to it.
 
 </para>
 
 &usb-setup-x86.xml;
 &usb-setup-powerpc.xml;
 
-   </sect2>
-
-   <sect2 id="usb-add-iso">
-   <title>Adding an ISO image</title>
 <para>
 
-The installer will look for a Debian ISO image on the stick as its source
-for additional data needed for the installation. So your next step is to
-copy a Debian ISO image (businesscard, netinst or even a full CD image)
-onto your stick (be sure to select one that fits). The file name of the
-image must end in <filename>.iso</filename>.
-
-</para><para>
-
-If you want to install over the network, without using an ISO image,
-you will of course skip the previous step. Moreover you will have to
-use the initial ramdisk from the <filename>netboot</filename>
-directory instead of the one from <filename>hd-media</filename>,
-because <filename>hd-media/initrd.gz</filename> does not have network
-support.
-
-</para><para>
-
-When you are done, unmount the USB memory stick (<userinput>umount
-/mnt</userinput>) and activate its write protection switch.
+If you used an <filename>hd-media</filename> image you should now copy a
+Debian ISO image (businesscard, netinst or full CD image; be sure to select
+one that fits) onto the stick. When you are done, unmount the USB memory
+stick (<userinput>umount /mnt</userinput>).
 
 </para>
   </sect2>
@@ -121,7 +159,7 @@ contain an invalid master boot record (MBR). To fix this, use the
 <classname>mbr</classname>:
 
 <informalexample><screen>
-# install-mbr /dev/<replaceable>sda</replaceable>
+# install-mbr /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para></warning>
