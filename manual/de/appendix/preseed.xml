@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56253 -->
+<!-- original version: 56312 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -995,19 +995,15 @@ Voreinstellung nutzen.
 <informalexample role="example"><screen>
 # Wenn das System freien Platz auf der Platte hat, können Sie festlegen, nur
 # diesen Platz zu partitionieren.
-# NOTE: this must be preseeded with a localized (translated) value.
-# HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
-# (übersetzt) sein.
-#d-i partman-auto/init_automatically_partition \
-#      select Geführt - den größten freien Speicherbereich benutzen
+#d-i partman-auto/init_automatically_partition select biggest_free
 
 # Alternativ können Sie eine Festplatte angeben, die partitioniert
 # werden soll. Der Gerätename muss im traditionellen Format (nicht devfs)
 # angegeben werden.
+# Hinweis: es muss zwingend eine Festplatte angegeben werden, außer wenn das
+# System nur eine einzige Festplatte hat.
 # Um z.B. die erste SCSI/SATA-Festplatte zu nutzen, kann die folgende Zeile
 # verwendet werden:
-# Hinweis: es muss eine Festplatte angegeben werden, außer wenn das System nur
-# eine einzige Festplatte hat.
 #d-i partman-auto/disk string /dev/sda
 # Zusätzlich müssen Sie angeben, welche Partitionierungsmethode genutzt werden
 # soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
@@ -1023,15 +1019,10 @@ d-i parman-md/device_remove_md boolean true
 d-i partman-lvm/confirm boolean true
 
 # Sie können eines der vordefinierten Partitionierungsrezepte wählen:
-# NOTE: this must be preseeded with a localized (translated) value.
-# HINWEIS: die Voreinstellungswerte für diese Frage müssen lokalisiert
-# (übersetzt) sein.
-d-i partman-auto/choose_recipe \
-       select Alle Dateien auf eine Partition (für Anfänger empf.)
-#d-i partman-auto/choose_recipe \
-#       select Separate /home-Partition
-#d-i partman-auto/choose_recipe \
-#       select Separate /home-, /usr-, /var- und /tmp-Partitionen
+# - atomic: alle Dateien in einer Partition
+# - home:   separate /home-Partition
+# - multi:  separate /home-, /usr-, /var- und /tmp-Partitionen
+d-i partman-auto/choose_recipe select atomic
 
 # Oder erstellen Sie ein eigenes Rezept...
 # Das Rezept-Format ist in der Datei devel/partman-auto-recipe.txt
@@ -1064,8 +1055,7 @@ d-i partman-auto/choose_recipe \
 # vorausgesetzt, Sie haben mit einer der obigen Methoden festgelegt, wie
 # partitioniert werden soll.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1141,8 +1131,7 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
