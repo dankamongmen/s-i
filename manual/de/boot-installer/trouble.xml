@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53732 -->
+<!-- original version: 56420 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Beseitigen von Problemen während der Installation</title>
@@ -178,8 +178,8 @@ zu laden.
 
 Überprüfen Sie, ob eine Gerätedatei (device node) für Ihr CD-ROM-Laufwerk
 in <filename>/dev/</filename> existiert. In dem obigen Beispiel
-wäre dies <filename>/dev/hdc</filename>. Es sollte auch
-<filename>/dev/cdroms/cdrom0</filename> existieren.
+wäre dies <filename>/dev/hdc</filename>. Auch
+<filename>/dev/cdrom</filename> sollte existieren.
 
   </para></listitem>
   <listitem><para>
@@ -344,11 +344,30 @@ das diesen Test deaktiviert.
 
 </para><para>
 
+Einige Systeme (speziell Laptops), bei denen die Original-Auflösung
+nicht dem 4:3-Seitenverhältnis entspricht (800x600 oder 1024x768
+wäre beispielweise 4:3), zeigen möglicherweise einen leeren Bildschirm,
+nachdem der Installer gebootet hat. In diesem Fall könnte der
+Boot-Parameter <userinput>vga=788</userinput><footnote>
+
+<para>
+Der Parameter <userinput>vga=788</userinput> aktiviert den VESA-Framebuffer
+mit einer Auflösung von 800x600. Dies wird zwar möglicherweise funktionieren,
+ist aber vielleicht trotzdem nicht die optimale Auflösung für Ihr System.
+Eine Liste der von Ihrem System unterstützten Auflösungen kann mit
+<userinput>vga=ask</userinput> abgefragt werden, aber Sie sollten
+vorsichtig sein: die Liste könnte unvollständig sein.
+</para>
+
+</footnote> helfen. Falls nicht, versuchen Sie <userinput>fb=false</userinput>.
+
+</para><para>
+
 Wenn Ihr Bildschirm ein eigenartiges Bild zeigt, während der Kernel bootet,
 z.B. komplett weiß, komplett schwarz oder farbiger Pixelmüll, enthält
 Ihr Rechner möglicherweise eine problematische Grafikkarte, die nicht
 ordnungsgemäß in den Framebuffer-Modus schaltet. Sie können dann den
-Boot-Parameter <userinput>fb=false video=vga16:off</userinput> benutzen,
+Boot-Parameter <userinput>fb=false</userinput> benutzen,
 um den Framebuffer auf der Konsole zu deaktivieren.
 In diesem Fall steht aufgrund von eingeschränkter Konsolenfunktionalität
 nur eine reduzierte Anzahl Sprachen zur Verfügung. <xref linkend="boot-parms"/>
