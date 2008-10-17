@@ -1,20 +1,21 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 -->
+<!-- original version: 56442 -->
 
    <sect3 arch="powerpc">
-   <title>Partitionieren eines USB-Sticks auf &arch-title;-Systemen</title>
+   <title>Den USB-Stick partitionieren</title>
 <para>
 
 Die meisten USB-Sticks sind nicht derart vorkonfiguriert, dass OpenFirmware
 davon booten kann, so dass Sie den Stick neu partitionieren müssen.
-Auf Mac-Systemen führen Sie <userinput>mac-fdisk /dev/sda</userinput> aus,
+Auf Mac-Systemen führen Sie 
+<userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput> aus,
 erzeugen mit dem <userinput>i</userinput>-Befehl eine neue Partitionstabelle
 und dann eine neue Partition des Typs Apple_Bootstrap (mit dem
 <userinput>C</userinput>-Kommando). Bedenken Sie, dass die erste <quote>Partition</quote>
 immer die Partitionstabelle selbst ist. Geben Sie dann ein:
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Sorgen Sie dafür, dass Sie den richtigen Gerätenamen des USB-Sticks
@@ -38,24 +39,30 @@ dabei ist, unterstützt USB-Speicher-Geräte nicht, deshalb müssen wir
 installieren. Geben Sie ein:
 
 <informalexample><screen>
-+$ hmount /dev/sda2
-+$ hcopy -r /usr/lib/yaboot/yaboot :
-+$ hattrib -c UNIX -t tbxi :yaboot
-+$ hattrib -b :
-+$ humount
+$ hmount /dev/<replaceable>sdX2</replaceable>
+$ hcopy -r /usr/lib/yaboot/yaboot :
+$ hattrib -c UNIX -t tbxi :yaboot
+$ hattrib -b :
+$ humount
 </screen></informalexample>
 
-Hier wieder die Warnung, den richtigen Gerätenamen zu verwenden.
+Hier nochmals die Warnung, den richtigen Gerätenamen zu verwenden.
 Die Partition darf für diese Prozedur nicht anderweitig ins Dateisystem
 eingebunden sein. Es wird hierbei der Bootloader auf die Partition geschrieben
 und mittels der HFS-Programme passend gekennzeichnet, so dass OpenFirmware ihn startet.
 Nachdem dies erledigt ist, sollten die restliche Vorbereitungen am USB-Stick mit
 den normalen Unix-Programmen vorgenommen werden. 
 
-</para><para>
+</para>
+   </sect3>
+ 
+   <sect3 arch="powerpc">
+   <title>Ein Installer-Image auf den Stick kopieren</title>
+<para>
 
-Hängen Sie die Partition ins Dateisystem ein (<userinput>mount /dev/sda2 /mnt</userinput>)
-und kopieren Sie die folgenden Dateien vom Debian-Archiv auf den Stick:
+Hängen Sie die Partition ins Dateisystem ein
+(<userinput>mount /dev/<replaceable>sdX2</replaceable> /mnt</userinput>)
+und kopieren Sie die folgenden Installer-Image-Dateien auf den Stick:
 
 <itemizedlist>
 <listitem><para>
@@ -76,11 +83,6 @@ und kopieren Sie die folgenden Dateien vom Debian-Archiv auf den Stick:
 <listitem><para>
 
 <filename>boot.msg</filename> (optionale Boot-Meldungen)
-
-</para></listitem>
-<listitem><para>
-
-Optionale Kernel-Module
 
 </para></listitem>
 </itemizedlist>
@@ -105,6 +107,14 @@ image=/vmlinux
 
 Beachten Sie bitte, dass der Wert für den Parameter <userinput>initrd-size</userinput>
 abhängig von dem Image, das Sie booten, eventuell noch erhöht werden muss.
+
+</para><para>
+
+Wenn Sie ein <filename>hd-media</filename>-Image benutzt haben, sollten Sie
+jetzt ein noch ein Debian-ISO-Image auf den Stick kopieren (businesscard-,
+netinst- oder ein Komplett-CD-Image; stellen Sie sicher, dass Sie ein Image
+verwenden, dass auf den Stick passt). Danach hängen Sie die Partition aus
+dem Dateisystem wieder aus (<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>
