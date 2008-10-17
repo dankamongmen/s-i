@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2008-09-28 00:09+0000\n"
+"POT-Creation-Date: 2008-10-17 00:09+0000\n"
 "PO-Revision-Date: 2008-10-08 23:03+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
@@ -911,12 +911,59 @@ msgstr "USB メモリでの起動用ファイルの準備"
 #: install-methods.xml:636
 #, no-c-format
 msgid ""
+"There are two installation methods possible when booting from USB stick. The "
+"first is to install completely from the network. The second is to also copy "
+"a CD image onto the USB stick and use that as a source for packages, "
+"possibly in combination with a mirror. This second method is the more common."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:644
+#, no-c-format
+msgid ""
+"For the first installation method you'll need to download an installer image "
+"from the <filename>netboot</filename> directory (at the location mentioned "
+"in <xref linkend=\"where-files\"/>) and use the <quote>flexible way</quote> "
+"explained below to copy the files to the USB stick."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:652
+#, no-c-format
+msgid ""
+"Installation images for the second installation method can be found in the "
+"<filename>hd-media</filename> directory and either the <quote>easy way</"
+"quote> or the <quote>flexible way</quote> can be used to copy the image to "
+"the USB stick. For this installation method you will also need to download a "
+"CD image. The installation image and the CD image must be based on the same "
+"release of &d-i;. If they do not match you are likely to get "
+"errors<footnote> <para> The error message that is most likely to be "
+"displayed is that no kernel modules can be found. This means that the "
+"version of the kernel module udebs included on the CD image is different "
+"from the version of the running kernel. </para> </footnote> during the "
+"installation."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:671
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To prepare the USB stick, you will need a system where GNU/Linux is "
+#| "already running and where USB is supported. You should ensure that the "
+#| "usb-storage kernel module is loaded (<userinput>modprobe usb-storage</"
+#| "userinput>) and try to find out which SCSI device the USB stick has been "
+#| "mapped to (in this example <filename>/dev/sda</filename> is used). To "
+#| "write to your stick, you may have to turn off its write protection switch."
+msgid ""
 "To prepare the USB stick, you will need a system where GNU/Linux is already "
-"running and where USB is supported. You should ensure that the usb-storage "
-"kernel module is loaded (<userinput>modprobe usb-storage</userinput>) and "
-"try to find out which SCSI device the USB stick has been mapped to (in this "
-"example <filename>/dev/sda</filename> is used). To write to your stick, you "
-"may have to turn off its write protection switch."
+"running and where USB is supported. With current GNU/Linux systems the USB "
+"stick should be automatically recognized when you insert it. If it is not "
+"you should check that the usb-storage kernel module is loaded. When the USB "
+"stick is inserted, it will be mapped to a device named <filename>/dev/sdX</"
+"filename>, where the <quote>X</quote> is a letter in the range a-z. You "
+"should be able to see to which device the USB stick was mapped by running "
+"the command <command>dmesg</command> after inserting it. To write to your "
+"stick, you may have to turn off its write protection switch."
 msgstr ""
 "USB メモリの準備をするには、 GNU/Linux が既に動いていて、USB をサポートしてい"
 "るシステムが必要になります。 usb-storage カーネルモジュールをきちんとロードし"
@@ -926,7 +973,22 @@ msgstr ""
 "トスイッチを切る必要があります。"
 
 #. Tag: para
-#: install-methods.xml:646
+#: install-methods.xml:685
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Using this method will destroy anything already on the device. Make sure "
+#| "that you use the correct device name for your USB stick."
+msgid ""
+"The procedures described in this section will destroy anything already on "
+"the device! Make very sure that you use the correct device name for your USB "
+"stick. If you use the wrong device the result could be that all information "
+"on for example a hard disk could be lost."
+msgstr ""
+"この方法を使うとデバイス上の既存の物は破壊されてしまいます。 USB メモリの正し"
+"いデバイス名を確認して使用してください。"
+
+#. Tag: para
+#: install-methods.xml:693
 #, no-c-format
 msgid ""
 "Note that the USB stick should be at least 256 MB in size (smaller setups "
@@ -936,41 +998,72 @@ msgstr ""
 "\"usb-copy-flexible\"/> のようにすれば、 より小さなセットアップが可能です)。"
 
 #. Tag: title
-#: install-methods.xml:654
+#: install-methods.xml:701
 #, no-c-format
 msgid "Copying the files &mdash; the easy way"
 msgstr "ファイルのコピー &mdash; 簡単な方法"
 
 #. Tag: para
-#: install-methods.xml:655
-#, no-c-format
+#: install-methods.xml:702
+#, fuzzy, no-c-format
+#| msgid ""
+#| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
+#| "which contains all the installer files (including the kernel) as well as "
+#| "<command>SYSLINUX</command> and its configuration file. You only have to "
+#| "extract it directly to your USB stick:"
 msgid ""
 "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> which "
-"contains all the installer files (including the kernel) as well as "
-"<command>SYSLINUX</command> and its configuration file. You only have to "
-"extract it directly to your USB stick:"
+"contains all the installer files (including the kernel) <phrase arch=\"x86"
+"\">as well as <classname>syslinux</classname> and its configuration file.</"
+"phrase> <phrase arch=\"powerpc\">as well as <classname>yaboot</classname> "
+"and its configuration file.</phrase>"
 msgstr ""
 "<command>SYSLINUX</command> や その設定ファイルと同様に、 (カーネルを含む) イ"
 "ンストーラの全ファイルが入った <filename>hd-media/boot.img.gz</filename> とい"
 "う オールインワンファイルがあります。 以下のように USB メモリに直接展開してく"
 "ださい。"
 
-#. Tag: screen
-#: install-methods.xml:662
+#. Tag: para
+#: install-methods.xml:711
 #, no-c-format
-msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
+msgid ""
+"Note that, although convenient, this method does have one major "
+"disadvantage: the logical size of the device will be limited to 256 MB, even "
+"if the capacity of the USB stick is larger. You will need to repartition the "
+"USB stick and create new file systems to get its full capacity back if you "
+"ever want to use it for some different purpose. A second disadvantage is "
+"that you cannot copy a full CD image onto the USB stick, but only the "
+"smaller businesscard or netinst CD images."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:721
+#, no-c-format
+msgid ""
+"To use this image you only have to extract it directly to your USB stick:"
+msgstr ""
+
+#. Tag: screen
+#: install-methods.xml:725
+#, fuzzy, no-c-format
+#| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
+msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>"
 msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
 
 #. Tag: para
-#: install-methods.xml:664
-#, no-c-format
+#: install-methods.xml:727
+#, fuzzy, no-c-format
+#| msgid ""
+#| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
+#| "which contains all the installer files (including the kernel) as well as "
+#| "<command>yaboot</command> and its configuration file. Create a partition "
+#| "of type \"Apple_Bootstrap\" on your USB stick using <command>mac-fdisk</"
+#| "command>'s <userinput>C</userinput> command and extract the image "
+#| "directly to that:"
 msgid ""
-"There is an all-in-one file <filename>hd-media/boot.img.gz</filename> which "
-"contains all the installer files (including the kernel) as well as "
-"<command>yaboot</command> and its configuration file. Create a partition of "
-"type \"Apple_Bootstrap\" on your USB stick using <command>mac-fdisk</"
-"command>'s <userinput>C</userinput> command and extract the image directly "
-"to that:"
+"Create a partition of type \"Apple_Bootstrap\" on your USB stick using "
+"<command>mac-fdisk</command>'s <userinput>C</userinput> command and extract "
+"the image directly to that:"
 msgstr ""
 "<command>yaboot</command> や その設定ファイルと同様に、 (カーネルを含む) イン"
 "ストーラの全ファイルが入った <filename>hd-media/boot.img.gz</filename> とい"
@@ -979,32 +1072,32 @@ msgstr ""
 "パーティションを作成し、 以下のように USB メモリに直接展開してください。"
 
 #. Tag: screen
-#: install-methods.xml:673
-#, no-c-format
-msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+#: install-methods.xml:733
+#, fuzzy, no-c-format
+#| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
 msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
 
 #. Tag: para
-#: install-methods.xml:676
-#, no-c-format
+#: install-methods.xml:735
+#, fuzzy, no-c-format
+#| msgid ""
+#| "After that, mount the USB memory stick (<userinput>mount <replaceable "
+#| "arch=\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/"
+#| "sda2</replaceable> /mnt</userinput>), which will now have <phrase arch="
+#| "\"x86\">a FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS "
+#| "filesystem</phrase> on it, and copy a Debian netinst or businesscard ISO "
+#| "image to it (see <xref linkend=\"usb-add-iso\"/>). Unmount the stick "
+#| "(<userinput>umount /mnt</userinput>) and you are done."
 msgid ""
-"Using this method will destroy anything already on the device. Make sure "
-"that you use the correct device name for your USB stick."
-msgstr ""
-"この方法を使うとデバイス上の既存の物は破壊されてしまいます。 USB メモリの正し"
-"いデバイス名を確認して使用してください。"
-
-#. Tag: para
-#: install-methods.xml:682
-#, no-c-format
-msgid ""
-"After that, mount the USB memory stick (<userinput>mount <replaceable arch="
-"\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/sda2</"
-"replaceable> /mnt</userinput>), which will now have <phrase arch=\"x86\">a "
-"FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS filesystem</phrase> "
-"on it, and copy a Debian netinst or businesscard ISO image to it (see <xref "
-"linkend=\"usb-add-iso\"/>). Unmount the stick (<userinput>umount /mnt</"
-"userinput>) and you are done."
+"After that, mount the USB memory stick <phrase arch=\"x86\">"
+"(<userinput>mount /dev/<replaceable>sdX</replaceable> /mnt</userinput>),</"
+"phrase> <phrase arch=\"powerpc\">(<userinput>mount /dev/<replaceable>sdX2</"
+"replaceable> /mnt</userinput>),</phrase> which will now have <phrase arch="
+"\"x86\">a FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS "
+"filesystem</phrase> on it, and copy a Debian netinst or businesscard ISO "
+"image to it. Unmount the stick (<userinput>umount /mnt</userinput>) and you "
+"are done."
 msgstr ""
 "その後、USB メモリ (<phrase arch=\"x86\">FAT ファイルシステム</phrase> "
 "<phrase arch=\"powerpc\">HFS ファイルシステム</phrase>になっている) をマウン"
@@ -1015,29 +1108,36 @@ msgstr ""
 "ださい (<userinput>umount /mnt</userinput>)。"
 
 #. Tag: title
-#: install-methods.xml:698
+#: install-methods.xml:752
 #, no-c-format
 msgid "Copying the files &mdash; the flexible way"
 msgstr "ファイルのコピー &mdash; 柔軟な方法"
 
 #. Tag: para
-#: install-methods.xml:699
-#, no-c-format
+#: install-methods.xml:753
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you like more flexibility or just want to know what's going on, you "
+#| "should use the following method to put the files on your stick."
 msgid ""
 "If you like more flexibility or just want to know what's going on, you "
-"should use the following method to put the files on your stick."
+"should use the following method to put the files on your stick. One "
+"advantage of using this method is that &mdash; if the capacity of your USB "
+"stick is large enough &mdash; you have the option of copying a full CD ISO "
+"image to it."
 msgstr ""
 "もっと柔軟なものがよかったり、何が起きているか知りたいのなら、 以下に説明す"
 "る USB メモリにファイルを置く方法を使用すべきです。"
 
 #. Tag: title
-#: install-methods.xml:711 install-methods.xml:800
-#, no-c-format
-msgid "USB stick partitioning on &arch-title;"
-msgstr "&arch-title; での USB メモリのパーティション分割"
+#: install-methods.xml:768 install-methods.xml:865
+#, fuzzy, no-c-format
+#| msgid "Booting the USB stick"
+msgid "Partitioning the USB stick"
+msgstr "USB メモリからの起動"
 
 #. Tag: para
-#: install-methods.xml:712
+#: install-methods.xml:769
 #, no-c-format
 msgid ""
 "We will show how to set up the memory stick to use the first partition, "
@@ -1047,15 +1147,25 @@ msgstr ""
 "を示します。"
 
 #. Tag: para
-#: install-methods.xml:717
-#, no-c-format
+#: install-methods.xml:774
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Since most USB sticks come pre-configured with a single FAT16 partition, "
+#| "you probably won't have to repartition or reformat the stick. If you have "
+#| "to do that anyway, use <command>cfdisk</command> or any other "
+#| "partitioning tool to create a FAT16 partition, and then create the "
+#| "filesystem using: <informalexample><screen>\n"
+#| "# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+#| "</screen></informalexample> Take care that you use the correct device "
+#| "name for your USB stick. The <command>mkdosfs</command> command is "
+#| "contained in the <classname>dosfstools</classname> Debian package."
 msgid ""
 "Since most USB sticks come pre-configured with a single FAT16 partition, you "
 "probably won't have to repartition or reformat the stick. If you have to do "
 "that anyway, use <command>cfdisk</command> or any other partitioning tool to "
 "create a FAT16 partition, and then create the filesystem using: "
 "<informalexample><screen>\n"
-"# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+"# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
 "the <classname>dosfstools</classname> Debian package."
@@ -1072,15 +1182,23 @@ msgstr ""
 "classname> Debian パッケージに含まれています。"
 
 #. Tag: para
-#: install-methods.xml:731
-#, no-c-format
+#: install-methods.xml:788
+#, fuzzy, no-c-format
+#| msgid ""
+#| "In order to start the kernel after booting from the USB stick, we will "
+#| "put a boot loader on the stick. Although any boot loader (e.g. "
+#| "<command>LILO</command>) should work, it's convenient to use "
+#| "<command>SYSLINUX</command>, since it uses a FAT16 partition and can be "
+#| "reconfigured by just editing a text file. Any operating system which "
+#| "supports the FAT file system can be used to make changes to the "
+#| "configuration of the boot loader."
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
-"boot loader on the stick. Although any boot loader (e.g. <command>LILO</"
-"command>) should work, it's convenient to use <command>SYSLINUX</command>, "
-"since it uses a FAT16 partition and can be reconfigured by just editing a "
-"text file. Any operating system which supports the FAT file system can be "
-"used to make changes to the configuration of the boot loader."
+"boot loader on the stick. Although any boot loader (e.g. <classname>lilo</"
+"classname>) should work, it's convenient to use <classname>syslinux</"
+"classname>, since it uses a FAT16 partition and can be reconfigured by just "
+"editing a text file. Any operating system which supports the FAT file system "
+"can be used to make changes to the configuration of the boot loader."
 msgstr ""
 "USB メモリから起動してカーネルをスタートするには、 USB メモリにブートローダを"
 "配置します。 どのブートローダ (例: <command>LILO</command>) も動作しますが、 "
@@ -1090,15 +1208,25 @@ msgstr ""
 "に利用できます。"
 
 #. Tag: para
-#: install-methods.xml:741
-#, no-c-format
+#: install-methods.xml:798
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To put <command>SYSLINUX</command> on the FAT16 partition on your USB "
+#| "stick, install the <classname>syslinux</classname> and <classname>mtools</"
+#| "classname> packages on your system, and do: <informalexample><screen>\n"
+#| "# syslinux /dev/<replaceable>sda1</replaceable>\n"
+#| "</screen></informalexample> Again, take care that you use the correct "
+#| "device name. The partition must not be mounted when starting "
+#| "<command>SYSLINUX</command>. This procedure writes a boot sector to the "
+#| "partition and creates the file <filename>ldlinux.sys</filename> which "
+#| "contains the boot loader code."
 msgid ""
-"To put <command>SYSLINUX</command> on the FAT16 partition on your USB stick, "
-"install the <classname>syslinux</classname> and <classname>mtools</"
+"To put <classname>syslinux</classname> on the FAT16 partition on your USB "
+"stick, install the <classname>syslinux</classname> and <classname>mtools</"
 "classname> packages on your system, and do: <informalexample><screen>\n"
-"# syslinux /dev/<replaceable>sda1</replaceable>\n"
+"# syslinux /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Again, take care that you use the correct device "
-"name. The partition must not be mounted when starting <command>SYSLINUX</"
+"name. The partition must not be mounted when starting <command>syslinux</"
 "command>. This procedure writes a boot sector to the partition and creates "
 "the file <filename>ldlinux.sys</filename> which contains the boot loader "
 "code."
@@ -1114,19 +1242,36 @@ msgstr ""
 "込み、 ブートローダコードを含んでいるファイル <filename>ldlinux.sys</"
 "filename> を作成します。"
 
+#. Tag: title
+#: install-methods.xml:815 install-methods.xml:912
+#, fuzzy, no-c-format
+#| msgid "Adding an ISO image"
+msgid "Adding the installer image"
+msgstr "ISO イメージの追加"
+
 #. Tag: para
-#: install-methods.xml:754
-#, no-c-format
+#: install-methods.xml:816
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and "
+#| "copy the following files from the Debian archives to the stick: "
+#| "<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel "
+#| "binary) </para></listitem> <listitem><para> <filename>initrd.gz</"
+#| "filename> (initial ramdisk image) </para></listitem> <listitem><para> "
+#| "<filename>syslinux.cfg</filename> (SYSLINUX configuration file) </para></"
+#| "listitem> <listitem><para> Optional kernel modules </para></listitem> </"
+#| "itemizedlist> If you want to rename the files, please note that "
+#| "<command>SYSLINUX</command> can only process DOS (8.3) file names."
 msgid ""
-"Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and copy "
-"the following files from the Debian archives to the stick: <itemizedlist> "
-"<listitem><para> <filename>vmlinuz</filename> (kernel binary) </para></"
-"listitem> <listitem><para> <filename>initrd.gz</filename> (initial ramdisk "
-"image) </para></listitem> <listitem><para> <filename>syslinux.cfg</filename> "
-"(SYSLINUX configuration file) </para></listitem> <listitem><para> Optional "
-"kernel modules </para></listitem> </itemizedlist> If you want to rename the "
-"files, please note that <command>SYSLINUX</command> can only process DOS "
-"(8.3) file names."
+"Mount the partition (<userinput>mount /dev/<replaceable>sdX1</replaceable> /"
+"mnt</userinput>) and copy the following installer image files to the stick: "
+"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel binary) "
+"</para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial "
+"ramdisk image) </para></listitem> </itemizedlist> You can choose between "
+"either the regular version or the graphical version of the installer. The "
+"latter can be found in the <filename>gtk</filename> subdirectory. If you "
+"want to rename the files, please note that <classname>syslinux</classname> "
+"can only process DOS (8.3) file names."
 msgstr ""
 "このパーティションをマウントし (<userinput>mount /dev/sda1 /mnt</"
 "userinput>)、 以下のファイルを Debian アーカイブから USB メモリへコピーしてく"
@@ -1139,37 +1284,53 @@ msgstr ""
 "ル名しか処理できないことに注意してください。"
 
 #. Tag: para
-#: install-methods.xml:785
+#: install-methods.xml:840
 #, no-c-format
 msgid ""
-"The <filename>syslinux.cfg</filename> configuration file should contain the "
-"following two lines:"
-msgstr ""
-"<filename>syslinux.cfg</filename> 設定ファイルには、 以下の 2 行を含まなけれ"
-"ばなりません。"
-
-#. Tag: screen
-#: install-methods.xml:790
-#, no-c-format
-msgid ""
+"Next you should create a <filename>syslinux.cfg</filename> configuration "
+"file, which at a bare minimum should contain the following two lines: "
+"<informalexample><screen>\n"
 "default vmlinuz\n"
-"append initrd=initrd.gz"
+"append initrd=initrd.gz\n"
+"</screen></informalexample> For the graphical installer you should add "
+"<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line."
 msgstr ""
-"default vmlinuz\n"
-"append initrd=initrd.gz"
 
 #. Tag: para
-#: install-methods.xml:801
+#: install-methods.xml:850 install-methods.xml:952
 #, no-c-format
+msgid ""
+"If you used an <filename>hd-media</filename> image, you should now copy a "
+"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
+"one that fits) onto the stick. When you are done, unmount the USB memory "
+"stick (<userinput>umount /mnt</userinput>)."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:866
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Most USB sticks do not come pre-configured in such a way that Open "
+#| "Firmware can boot from them, so you will need to repartition the stick. "
+#| "On Mac systems, run <userinput>mac-fdisk /dev/sda</userinput>, initialise "
+#| "a new partition map using the <userinput>i</userinput> command, and "
+#| "create a new partition of type Apple_Bootstrap using the <userinput>C</"
+#| "userinput> command. (Note that the first \"partition\" will always be the "
+#| "partition map itself.) Then type <informalexample><screen>\n"
+#| "$ hformat /dev/<replaceable>sda2</replaceable>\n"
+#| "</screen></informalexample> Take care that you use the correct device "
+#| "name for your USB stick. The <command>hformat</command> command is "
+#| "contained in the <classname>hfsutils</classname> Debian package."
 msgid ""
 "Most USB sticks do not come pre-configured in such a way that Open Firmware "
 "can boot from them, so you will need to repartition the stick. On Mac "
-"systems, run <userinput>mac-fdisk /dev/sda</userinput>, initialise a new "
-"partition map using the <userinput>i</userinput> command, and create a new "
-"partition of type Apple_Bootstrap using the <userinput>C</userinput> "
-"command. (Note that the first \"partition\" will always be the partition map "
-"itself.) Then type <informalexample><screen>\n"
-"$ hformat /dev/<replaceable>sda2</replaceable>\n"
+"systems, run <userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></"
+"userinput>, initialise a new partition map using the <userinput>i</"
+"userinput> command, and create a new partition of type Apple_Bootstrap using "
+"the <userinput>C</userinput> command. (Note that the first \"partition\" "
+"will always be the partition map itself.) Then type "
+"<informalexample><screen>\n"
+"$ hformat /dev/<replaceable>sdX2</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>hformat</command> command is contained in "
 "the <classname>hfsutils</classname> Debian package."
@@ -1187,7 +1348,7 @@ msgstr ""
 "Debian パッケージに含まれています。"
 
 #. Tag: para
-#: install-methods.xml:817
+#: install-methods.xml:883
 #, no-c-format
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
@@ -1203,14 +1364,30 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: install-methods.xml:826
-#, no-c-format
+#: install-methods.xml:892
+#, fuzzy, no-c-format
+#| msgid ""
+#| "The normal <command>ybin</command> tool that comes with <command>yaboot</"
+#| "command> does not yet understand USB storage devices, so you will have to "
+#| "install <command>yaboot</command> by hand using the <classname>hfsutils</"
+#| "classname> tools. Type <informalexample><screen>\n"
+#| "$ hmount /dev/sda2\n"
+#| "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
+#| "$ hattrib -c UNIX -t tbxi :yaboot\n"
+#| "$ hattrib -b :\n"
+#| "$ humount\n"
+#| "</screen></informalexample> Again, take care that you use the correct "
+#| "device name. The partition must not be otherwise mounted during this "
+#| "procedure. This procedure writes the boot loader to the partition, and "
+#| "uses the HFS utilities to mark it in such a way that Open Firmware will "
+#| "boot it. Having done this, the rest of the USB stick may be prepared "
+#| "using the normal Unix utilities."
 msgid ""
 "The normal <command>ybin</command> tool that comes with <command>yaboot</"
 "command> does not yet understand USB storage devices, so you will have to "
 "install <command>yaboot</command> by hand using the <classname>hfsutils</"
 "classname> tools. Type <informalexample><screen>\n"
-"$ hmount /dev/sda2\n"
+"$ hmount /dev/<replaceable>sdX2</replaceable>\n"
 "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
 "$ hattrib -c UNIX -t tbxi :yaboot\n"
 "$ hattrib -b :\n"
@@ -1238,48 +1415,45 @@ msgstr ""
 "に通常の Unix ユーティリティを使う準備ができたことになります。"
 
 #. Tag: para
-#: install-methods.xml:842
-#, no-c-format
+#: install-methods.xml:913
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and "
+#| "copy the following files from the Debian archives to the stick:"
 msgid ""
-"Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and copy "
-"the following files from the Debian archives to the stick:"
+"Mount the partition (<userinput>mount /dev/<replaceable>sdX2</replaceable> /"
+"mnt</userinput>) and copy the following installer image files to the stick:"
 msgstr ""
 "このパーティションをマウントし (<userinput>mount /dev/sda2 /mnt</"
 "userinput>)、 以下のファイルを Debian アーカイブから USB メモリへコピーしてく"
 "ださい。"
 
 #. Tag: para
-#: install-methods.xml:848
+#: install-methods.xml:920
 #, no-c-format
 msgid "<filename>vmlinux</filename> (kernel binary)"
 msgstr "<filename>vmlinux</filename> (カーネルバイナリ)"
 
 #. Tag: para
-#: install-methods.xml:853
+#: install-methods.xml:925
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (初期 RAM ディスクイメージ)"
 
 #. Tag: para
-#: install-methods.xml:858
+#: install-methods.xml:930
 #, no-c-format
 msgid "<filename>yaboot.conf</filename> (yaboot configuration file)"
 msgstr "<filename>yaboot.conf</filename> (yaboot 設定ファイル)"
 
 #. Tag: para
-#: install-methods.xml:863
+#: install-methods.xml:935
 #, no-c-format
 msgid "<filename>boot.msg</filename> (optional boot message)"
 msgstr "<filename>boot.msg</filename> (追加起動メッセージ)"
 
 #. Tag: para
-#: install-methods.xml:868
-#, no-c-format
-msgid "Optional kernel modules"
-msgstr "追加カーネルモジュール"
-
-#. Tag: para
-#: install-methods.xml:875
+#: install-methods.xml:942
 #, no-c-format
 msgid ""
 "The <filename>yaboot.conf</filename> configuration file should contain the "
@@ -1314,61 +1488,13 @@ msgstr ""
 "size</userinput> パラメータを、 増やす必要があることに注意してください。"
 
 #. Tag: title
-#: install-methods.xml:892
-#, no-c-format
-msgid "Adding an ISO image"
-msgstr "ISO イメージの追加"
-
-#. Tag: para
-#: install-methods.xml:893
-#, no-c-format
-msgid ""
-"The installer will look for a Debian ISO image on the stick as its source "
-"for additional data needed for the installation. So your next step is to "
-"copy a Debian ISO image (businesscard, netinst or even a full CD image) onto "
-"your stick (be sure to select one that fits). The file name of the image "
-"must end in <filename>.iso</filename>."
-msgstr ""
-"インストーラは、USB メモリ上の Debian ISO イメージを探し、 インストールに必要"
-"な追加データの取得元とします。 ですから次のステップは、 Debian ISO イメージ "
-"(名刺、netinst、完全版のいずれか) を、 USB メモリに (入るものを選んで) 入れる"
-"ことです。 ISO イメージのファイル名は <filename>.iso</filename> で終わってい"
-"なければなりません。"
-
-#. Tag: para
-#: install-methods.xml:901
-#, no-c-format
-msgid ""
-"If you want to install over the network, without using an ISO image, you "
-"will of course skip the previous step. Moreover you will have to use the "
-"initial ramdisk from the <filename>netboot</filename> directory instead of "
-"the one from <filename>hd-media</filename>, because <filename>hd-media/"
-"initrd.gz</filename> does not have network support."
-msgstr ""
-"ISO イメージを使わずネットワーク越しにインストールしたければ、 もちろん前の手"
-"順をスキップしてください。 さらに、<filename>hd-media/initrd.gz</filename> は"
-"ネットワークをサポートしないので、 <filename>hd-media</filename> のものの代わ"
-"りに、 <filename>netboot</filename> ディレクトリにある 初期 RAM ディスクを使"
-"わなければならないでしょう。"
-
-#. Tag: para
-#: install-methods.xml:910
-#, no-c-format
-msgid ""
-"When you are done, unmount the USB memory stick (<userinput>umount /mnt</"
-"userinput>) and activate its write protection switch."
-msgstr ""
-"終わったら、USB メモリをアンマウントし (<userinput>umount /mnt</"
-"userinput>)、 ライトプロテクトスイッチを有効にしてください。"
-
-#. Tag: title
-#: install-methods.xml:920
+#: install-methods.xml:967
 #, no-c-format
 msgid "Booting the USB stick"
 msgstr "USB メモリからの起動"
 
 #. Tag: para
-#: install-methods.xml:921
+#: install-methods.xml:968
 #, no-c-format
 msgid ""
 "If your system refuses to boot from the memory stick, the stick may contain "
@@ -1381,19 +1507,20 @@ msgstr ""
 "用してください。"
 
 #. Tag: screen
-#: install-methods.xml:928
-#, no-c-format
-msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
+#: install-methods.xml:975
+#, fuzzy, no-c-format
+#| msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
+msgid "# install-mbr /dev/<replaceable>sdX</replaceable>"
 msgstr "# install-mbr /dev/<replaceable>sda</replaceable>"
 
 #. Tag: title
-#: install-methods.xml:939
+#: install-methods.xml:986
 #, no-c-format
 msgid "Preparing Files for Hard Disk Booting"
 msgstr "ハードディスク起動ファイルの準備"
 
 #. Tag: para
-#: install-methods.xml:940
+#: install-methods.xml:987
 #, no-c-format
 msgid ""
 "The installer may be booted using boot files placed on an existing hard "
@@ -1405,7 +1532,7 @@ msgstr ""
 "動することもできます。"
 
 #. Tag: para
-#: install-methods.xml:946
+#: install-methods.xml:993
 #, no-c-format
 msgid ""
 "A full, <quote>pure network</quote> installation can be achieved using this "
@@ -1419,13 +1546,13 @@ msgstr ""
 "の激論を避けることができます。"
 
 #. Tag: para
-#: install-methods.xml:953
+#: install-methods.xml:1000
 #, no-c-format
 msgid "The installer cannot boot from files on an NTFS file system."
 msgstr "インストーラは NTFS ファイルシステムからは起動できません。"
 
 #. Tag: para
-#: install-methods.xml:957
+#: install-methods.xml:1004
 #, no-c-format
 msgid ""
 "The installer cannot boot from files on an HFS+ file system. MacOS System "
@@ -1448,7 +1575,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: install-methods.xml:968
+#: install-methods.xml:1015
 #, no-c-format
 msgid ""
 "Different programs are used for hard disk installation system booting, "
@@ -1460,7 +1587,7 @@ msgstr ""
 "別々のプログラムを使います。"
 
 #. Tag: title
-#: install-methods.xml:977
+#: install-methods.xml:1024
 #, no-c-format
 msgid ""
 "Hard disk installer booting using <command>LILO</command> or <command>GRUB</"
@@ -1470,7 +1597,7 @@ msgstr ""
 "らのインストーラの起動"
 
 #. Tag: para
-#: install-methods.xml:979
+#: install-methods.xml:1026
 #, no-c-format
 msgid ""
 "This section explains how to add to or even replace an existing linux "
@@ -1480,7 +1607,7 @@ msgstr ""
 "して、linux を追加したり、 既存の linux を交換する方法について説明します。"
 
 #. Tag: para
-#: install-methods.xml:985
+#: install-methods.xml:1032
 #, no-c-format
 msgid ""
 "At boot time, both bootloaders support loading in memory not only the "
@@ -1492,7 +1619,7 @@ msgstr ""
 "イルシステムとして使うことができます。"
 
 #. Tag: para
-#: install-methods.xml:991
+#: install-methods.xml:1038
 #, no-c-format
 msgid ""
 "Copy the following files from the Debian archives to a convenient location "
@@ -1502,19 +1629,19 @@ msgstr ""
 "(例 <filename>/boot/newinstall/</filename>) にコピーしてください。"
 
 #. Tag: para
-#: install-methods.xml:998
+#: install-methods.xml:1045
 #, no-c-format
 msgid "<filename>vmlinuz</filename> (kernel binary)"
 msgstr "<filename>vmlinuz</filename> (カーネルバイナリ)"
 
 #. Tag: para
-#: install-methods.xml:1003
+#: install-methods.xml:1050
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (RAM ディスクイメージ)"
 
 #. Tag: para
-#: install-methods.xml:1010
+#: install-methods.xml:1057
 #, no-c-format
 msgid ""
 "Finally, to configure the bootloader proceed to <xref linkend=\"boot-initrd"
@@ -1524,13 +1651,13 @@ msgstr ""
 "ください。"
 
 #. Tag: title
-#: install-methods.xml:1020
+#: install-methods.xml:1067
 #, no-c-format
 msgid "Hard Disk Installer Booting for OldWorld Macs"
 msgstr "OldWorld Mac におけるハードディスクからのインストーラの起動"
 
 #. Tag: para
-#: install-methods.xml:1021
+#: install-methods.xml:1068
 #, no-c-format
 msgid ""
 "The <filename>boot-floppy-hfs</filename> floppy uses <application>miBoot</"
@@ -1554,7 +1681,7 @@ msgstr ""
 "ためこのモデルでは <application>BootX</application> が必要です。"
 
 #. Tag: para
-#: install-methods.xml:1034
+#: install-methods.xml:1081
 #, no-c-format
 msgid ""
 "Download and unstuff the <application>BootX</application> distribution, "
@@ -1582,13 +1709,13 @@ msgstr ""
 "System Folder に置いてください。"
 
 #. Tag: title
-#: install-methods.xml:1054
+#: install-methods.xml:1101
 #, no-c-format
 msgid "Hard Disk Installer Booting for NewWorld Macs"
 msgstr "NewWorld Mac におけるハードディスクからのインストーラの起動"
 
 #. Tag: para
-#: install-methods.xml:1055
+#: install-methods.xml:1102
 #, no-c-format
 msgid ""
 "NewWorld PowerMacs support booting from a network or an ISO9660 CD-ROM, as "
@@ -1609,7 +1736,7 @@ msgstr ""
 "PowerMac をサポートしておらず、 使うべきではありません。"
 
 #. Tag: para
-#: install-methods.xml:1066
+#: install-methods.xml:1113
 #, no-c-format
 msgid ""
 "<emphasis>Copy</emphasis> (not move) the following four files which you "
@@ -1623,31 +1750,31 @@ msgstr ""
 "ラッグします)。"
 
 #. Tag: filename
-#: install-methods.xml:1076 install-methods.xml:1433
+#: install-methods.xml:1123 install-methods.xml:1480
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 #. Tag: filename
-#: install-methods.xml:1081 install-methods.xml:1438
+#: install-methods.xml:1128 install-methods.xml:1485
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 #. Tag: filename
-#: install-methods.xml:1086 install-methods.xml:1443
+#: install-methods.xml:1133 install-methods.xml:1490
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 #. Tag: filename
-#: install-methods.xml:1091 install-methods.xml:1448
+#: install-methods.xml:1138 install-methods.xml:1495
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
 
 #. Tag: para
-#: install-methods.xml:1096
+#: install-methods.xml:1143
 #, no-c-format
 msgid ""
 "Make a note of the partition number of the MacOS partition where you place "
@@ -1663,7 +1790,7 @@ msgstr ""
 "入力するコマンドで必要となります。"
 
 #. Tag: para
-#: install-methods.xml:1104
+#: install-methods.xml:1151
 #, no-c-format
 msgid "To boot the installer, proceed to <xref linkend=\"boot-newworld\"/>."
 msgstr ""
@@ -1671,13 +1798,13 @@ msgstr ""
 "トーラを起動させるには、 <xref linkend=\"boot-newworld\"/> に進んでください。"
 
 #. Tag: title
-#: install-methods.xml:1117
+#: install-methods.xml:1164
 #, no-c-format
 msgid "Preparing Files for TFTP Net Booting"
 msgstr "TFTP ネットブート用ファイルの準備"
 
 #. Tag: para
-#: install-methods.xml:1118
+#: install-methods.xml:1165
 #, no-c-format
 msgid ""
 "If your machine is connected to a local area network, you may be able to "
@@ -1693,7 +1820,7 @@ msgstr ""
 "ません。"
 
 #. Tag: para
-#: install-methods.xml:1126
+#: install-methods.xml:1173
 #, no-c-format
 msgid ""
 "You need to set up a TFTP server, and for many machines a DHCP server<phrase "
@@ -1706,7 +1833,7 @@ msgstr ""
 "必要です。"
 
 #. Tag: para
-#: install-methods.xml:1133
+#: install-methods.xml:1180
 #, no-c-format
 msgid ""
 "<phrase condition=\"supports-rarp\">The Reverse Address Resolution Protocol "
@@ -1731,7 +1858,7 @@ msgstr ""
 "こともあります。"
 
 #. Tag: para
-#: install-methods.xml:1150
+#: install-methods.xml:1197
 #, no-c-format
 msgid ""
 "For PowerPC, if you have a NewWorld Power Macintosh machine, it is a good "
@@ -1743,7 +1870,7 @@ msgstr ""
 "あります。"
 
 #. Tag: para
-#: install-methods.xml:1156
+#: install-methods.xml:1203
 #, no-c-format
 msgid ""
 "Unlike the Open Firmware found on Sparc and PowerPC machines, the SRM "
@@ -1766,7 +1893,7 @@ msgstr ""
 "スの IP の設定は、 直接 SRM コンソールから入力することもできます。"
 
 #. Tag: para
-#: install-methods.xml:1173
+#: install-methods.xml:1220
 #, no-c-format
 msgid ""
 "Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP. There "
@@ -1776,7 +1903,7 @@ msgstr ""
 "す。 Debian には <classname>rbootd</classname> パッケージが用意されています。"
 
 #. Tag: para
-#: install-methods.xml:1178
+#: install-methods.xml:1225
 #, no-c-format
 msgid ""
 "The Trivial File Transfer Protocol (TFTP) is used to serve the boot image to "
@@ -1790,7 +1917,7 @@ msgstr ""
 "4.x, SunOS 5.x (Solaris), GNU/Linux での例を示します。"
 
 #. Tag: para
-#: install-methods.xml:1186
+#: install-methods.xml:1233
 #, no-c-format
 msgid ""
 "To use the Pre-boot Execution Environment (PXE) method of TFTP booting, you "
@@ -1805,13 +1932,13 @@ msgstr ""
 "ます。"
 
 #. Tag: title
-#: install-methods.xml:1204
+#: install-methods.xml:1251
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "RARP サーバの設定"
 
 #. Tag: para
-#: install-methods.xml:1205
+#: install-methods.xml:1252
 #, no-c-format
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
@@ -1831,7 +1958,7 @@ msgstr ""
 "ください。"
 
 #. Tag: para
-#: install-methods.xml:1217
+#: install-methods.xml:1264
 #, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1856,13 +1983,13 @@ msgstr ""
 "で) 実行してください。"
 
 #. Tag: title
-#: install-methods.xml:1239
+#: install-methods.xml:1286
 #, no-c-format
 msgid "Setting up a BOOTP server"
 msgstr "BOOTP サーバの設定"
 
 #. Tag: para
-#: install-methods.xml:1240
+#: install-methods.xml:1287
 #, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
@@ -1878,7 +2005,7 @@ msgstr ""
 "ます。"
 
 #. Tag: para
-#: install-methods.xml:1248
+#: install-methods.xml:1295
 #, no-c-format
 msgid ""
 "To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
@@ -1942,7 +2069,7 @@ msgstr ""
 "userinput> 変数がマシンの MAC アドレスです。 </phrase>"
 
 #. Tag: para
-#: install-methods.xml:1281
+#: install-methods.xml:1328
 #, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
@@ -1964,13 +2091,13 @@ msgstr ""
 "<command>dhcpd</command> を再起動するだけです。"
 
 #. Tag: title
-#: install-methods.xml:1302
+#: install-methods.xml:1349
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "DHCP サーバの設定"
 
 #. Tag: para
-#: install-methods.xml:1303
+#: install-methods.xml:1350
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -1984,7 +2111,7 @@ msgstr ""
 "conf</filename> を参照)"
 
 #. Tag: screen
-#: install-methods.xml:1310
+#: install-methods.xml:1357
 #, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -2028,7 +2155,7 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: install-methods.xml:1312
+#: install-methods.xml:1359
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -2045,7 +2172,7 @@ msgstr ""
 "ションは TFTP 経由で取得するファイルの名前です。"
 
 #. Tag: para
-#: install-methods.xml:1322
+#: install-methods.xml:1369
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -2056,13 +2183,13 @@ msgstr ""
 "してください。"
 
 #. Tag: title
-#: install-methods.xml:1330
+#: install-methods.xml:1377
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "DHCP 設定での PXE 起動の有効化"
 
 #. Tag: para
-#: install-methods.xml:1331
+#: install-methods.xml:1378
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -2132,13 +2259,13 @@ msgstr ""
 "linkend=\"tftp-images\"/> 参照)"
 
 #. Tag: title
-#: install-methods.xml:1347
+#: install-methods.xml:1394
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "TFTP サーバの立ち上げ"
 
 #. Tag: para
-#: install-methods.xml:1348
+#: install-methods.xml:1395
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
@@ -2157,7 +2284,7 @@ msgstr ""
 "デフォルトで正しくセットアップできます。"
 
 #. Tag: para
-#: install-methods.xml:1360
+#: install-methods.xml:1407
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -2175,7 +2302,7 @@ msgstr ""
 "す。 必要に応じて、本節の設定例を調整してください。"
 
 #. Tag: para
-#: install-methods.xml:1370
+#: install-methods.xml:1417
 #, no-c-format
 msgid ""
 "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
@@ -2206,7 +2333,7 @@ msgstr ""
 "replaceable></userinput> を実行します。"
 
 #. Tag: para
-#: install-methods.xml:1390
+#: install-methods.xml:1437
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2236,13 +2363,13 @@ msgstr ""
 "調整してください。"
 
 #. Tag: title
-#: install-methods.xml:1412
+#: install-methods.xml:1459
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "TFTP イメージを適切な場所に配置する"
 
 #. Tag: para
-#: install-methods.xml:1413
+#: install-methods.xml:1460
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2258,7 +2385,7 @@ msgstr ""
 "TFTP クライアントによって決まり、 強制力のある標準は存在しません。"
 
 #. Tag: para
-#: install-methods.xml:1422
+#: install-methods.xml:1469
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2274,13 +2401,13 @@ msgstr ""
 "す。"
 
 #. Tag: filename
-#: install-methods.xml:1453
+#: install-methods.xml:1500
 #, no-c-format
 msgid "boot.msg"
 msgstr "boot.msg"
 
 #. Tag: para
-#: install-methods.xml:1458
+#: install-methods.xml:1505
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2297,7 +2424,7 @@ msgstr ""
 "てください。"
 
 #. Tag: para
-#: install-methods.xml:1466
+#: install-methods.xml:1513
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2314,13 +2441,13 @@ msgstr ""
 "を確認してください。"
 
 #. Tag: title
-#: install-methods.xml:1478
+#: install-methods.xml:1525
 #, no-c-format
 msgid "Alpha TFTP Booting"
 msgstr "Alpha TFTP ブート"
 
 #. Tag: para
-#: install-methods.xml:1479
+#: install-methods.xml:1526
 #, no-c-format
 msgid ""
 "On Alpha, you must specify the filename (as a relative path to the boot "
@@ -2342,13 +2469,13 @@ msgstr ""
 "ればなりません。"
 
 #. Tag: title
-#: install-methods.xml:1494
+#: install-methods.xml:1541
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "SPARC TFTP ブート"
 
 #. Tag: para
-#: install-methods.xml:1495
+#: install-methods.xml:1542
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2378,7 +2505,7 @@ msgstr ""
 "字に変更し、 (必要なら) サブアーキテクチャ名を追加しなければなりません。"
 
 #. Tag: para
-#: install-methods.xml:1511
+#: install-methods.xml:1558
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2392,7 +2519,7 @@ msgstr ""
 "い。"
 
 #. Tag: para
-#: install-methods.xml:1518
+#: install-methods.xml:1565
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2406,13 +2533,13 @@ msgstr ""
 "しても TFTP サーバが見るディレクトリの内部でなければいけません。"
 
 #. Tag: title
-#: install-methods.xml:1529
+#: install-methods.xml:1576
 #, no-c-format
 msgid "BVM/Motorola TFTP Booting"
 msgstr "BVM/Motorola TFTP ブート"
 
 #. Tag: para
-#: install-methods.xml:1530
+#: install-methods.xml:1577
 #, no-c-format
 msgid ""
 "For BVM and Motorola VMEbus systems copy the files &bvme6000-tftp-files; to "
@@ -2422,7 +2549,7 @@ msgstr ""
 "<filename>/tftpboot/</filename> にコピーしてください。"
 
 #. Tag: para
-#: install-methods.xml:1535
+#: install-methods.xml:1582
 #, no-c-format
 msgid ""
 "Next, configure your boot ROMs or BOOTP server to initially load the "
@@ -2438,13 +2565,13 @@ msgstr ""
 "てください。"
 
 #. Tag: title
-#: install-methods.xml:1547
+#: install-methods.xml:1594
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "SGI TFTP ブート"
 
 #. Tag: para
-#: install-methods.xml:1548
+#: install-methods.xml:1595
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2458,13 +2585,13 @@ msgstr ""
 "filename> の <userinput>filename=</userinput> オプションに指定します。"
 
 #. Tag: title
-#: install-methods.xml:1560
+#: install-methods.xml:1607
 #, no-c-format
 msgid "Broadcom BCM91250A and BCM91480B TFTP Booting"
 msgstr "Broadcom BCM91250A, BCM91480B の TFTP ブート"
 
 #. Tag: para
-#: install-methods.xml:1561
+#: install-methods.xml:1608
 #, no-c-format
 msgid ""
 "You don't have to configure DHCP in a special way because you'll pass the "
@@ -2474,13 +2601,13 @@ msgstr ""
 "必要はありません。"
 
 #. Tag: title
-#: install-methods.xml:1666
+#: install-methods.xml:1713
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "自動インストール"
 
 #. Tag: para
-#: install-methods.xml:1667
+#: install-methods.xml:1714
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2496,13 +2623,13 @@ msgstr ""
 "のものです。"
 
 #. Tag: title
-#: install-methods.xml:1680
+#: install-methods.xml:1727
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "Debian インストーラを用いた自動インストール"
 
 #. Tag: para
-#: install-methods.xml:1681
+#: install-methods.xml:1728
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2516,7 +2643,7 @@ msgstr ""
 "れます。"
 
 #. Tag: para
-#: install-methods.xml:1688
+#: install-methods.xml:1735
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
@@ -2524,6 +2651,59 @@ msgid ""
 msgstr ""
 "編集できる動作サンプルを含む preseed の完全なドキュメントは、 <xref linkend="
 "\"appendix-preseed\"/> にあります。"
+
+#~ msgid "USB stick partitioning on &arch-title;"
+#~ msgstr "&arch-title; での USB メモリのパーティション分割"
+
+#~ msgid ""
+#~ "The <filename>syslinux.cfg</filename> configuration file should contain "
+#~ "the following two lines:"
+#~ msgstr ""
+#~ "<filename>syslinux.cfg</filename> 設定ファイルには、 以下の 2 行を含まなけ"
+#~ "ればなりません。"
+
+#~ msgid ""
+#~ "default vmlinuz\n"
+#~ "append initrd=initrd.gz"
+#~ msgstr ""
+#~ "default vmlinuz\n"
+#~ "append initrd=initrd.gz"
+
+#~ msgid "Optional kernel modules"
+#~ msgstr "追加カーネルモジュール"
+
+#~ msgid ""
+#~ "The installer will look for a Debian ISO image on the stick as its source "
+#~ "for additional data needed for the installation. So your next step is to "
+#~ "copy a Debian ISO image (businesscard, netinst or even a full CD image) "
+#~ "onto your stick (be sure to select one that fits). The file name of the "
+#~ "image must end in <filename>.iso</filename>."
+#~ msgstr ""
+#~ "インストーラは、USB メモリ上の Debian ISO イメージを探し、 インストールに"
+#~ "必要な追加データの取得元とします。 ですから次のステップは、 Debian ISO イ"
+#~ "メージ (名刺、netinst、完全版のいずれか) を、 USB メモリに (入るものを選ん"
+#~ "で) 入れることです。 ISO イメージのファイル名は <filename>.iso</filename> "
+#~ "で終わっていなければなりません。"
+
+#~ msgid ""
+#~ "If you want to install over the network, without using an ISO image, you "
+#~ "will of course skip the previous step. Moreover you will have to use the "
+#~ "initial ramdisk from the <filename>netboot</filename> directory instead "
+#~ "of the one from <filename>hd-media</filename>, because <filename>hd-media/"
+#~ "initrd.gz</filename> does not have network support."
+#~ msgstr ""
+#~ "ISO イメージを使わずネットワーク越しにインストールしたければ、 もちろん前"
+#~ "の手順をスキップしてください。 さらに、<filename>hd-media/initrd.gz</"
+#~ "filename> はネットワークをサポートしないので、 <filename>hd-media</"
+#~ "filename> のものの代わりに、 <filename>netboot</filename> ディレクトリにあ"
+#~ "る 初期 RAM ディスクを使わなければならないでしょう。"
+
+#~ msgid ""
+#~ "When you are done, unmount the USB memory stick (<userinput>umount /mnt</"
+#~ "userinput>) and activate its write protection switch."
+#~ msgstr ""
+#~ "終わったら、USB メモリをアンマウントし (<userinput>umount /mnt</"
+#~ "userinput>)、 ライトプロテクトスイッチを有効にしてください。"
 
 #~ msgid "DECstation TFTP Images"
 #~ msgstr "DECstation TFTP イメージ"

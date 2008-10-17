@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods.po\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2008-09-28 00:09+0000\n"
+"POT-Creation-Date: 2008-10-17 00:09+0000\n"
 "PO-Revision-Date: 2008-09-29 23:06+0100\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
@@ -925,12 +925,59 @@ msgstr "Preparar Ficheiros para iniciar a partir de USB Memory Stick"
 #: install-methods.xml:636
 #, no-c-format
 msgid ""
+"There are two installation methods possible when booting from USB stick. The "
+"first is to install completely from the network. The second is to also copy "
+"a CD image onto the USB stick and use that as a source for packages, "
+"possibly in combination with a mirror. This second method is the more common."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:644
+#, no-c-format
+msgid ""
+"For the first installation method you'll need to download an installer image "
+"from the <filename>netboot</filename> directory (at the location mentioned "
+"in <xref linkend=\"where-files\"/>) and use the <quote>flexible way</quote> "
+"explained below to copy the files to the USB stick."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:652
+#, no-c-format
+msgid ""
+"Installation images for the second installation method can be found in the "
+"<filename>hd-media</filename> directory and either the <quote>easy way</"
+"quote> or the <quote>flexible way</quote> can be used to copy the image to "
+"the USB stick. For this installation method you will also need to download a "
+"CD image. The installation image and the CD image must be based on the same "
+"release of &d-i;. If they do not match you are likely to get "
+"errors<footnote> <para> The error message that is most likely to be "
+"displayed is that no kernel modules can be found. This means that the "
+"version of the kernel module udebs included on the CD image is different "
+"from the version of the running kernel. </para> </footnote> during the "
+"installation."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:671
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To prepare the USB stick, you will need a system where GNU/Linux is "
+#| "already running and where USB is supported. You should ensure that the "
+#| "usb-storage kernel module is loaded (<userinput>modprobe usb-storage</"
+#| "userinput>) and try to find out which SCSI device the USB stick has been "
+#| "mapped to (in this example <filename>/dev/sda</filename> is used). To "
+#| "write to your stick, you may have to turn off its write protection switch."
+msgid ""
 "To prepare the USB stick, you will need a system where GNU/Linux is already "
-"running and where USB is supported. You should ensure that the usb-storage "
-"kernel module is loaded (<userinput>modprobe usb-storage</userinput>) and "
-"try to find out which SCSI device the USB stick has been mapped to (in this "
-"example <filename>/dev/sda</filename> is used). To write to your stick, you "
-"may have to turn off its write protection switch."
+"running and where USB is supported. With current GNU/Linux systems the USB "
+"stick should be automatically recognized when you insert it. If it is not "
+"you should check that the usb-storage kernel module is loaded. When the USB "
+"stick is inserted, it will be mapped to a device named <filename>/dev/sdX</"
+"filename>, where the <quote>X</quote> is a letter in the range a-z. You "
+"should be able to see to which device the USB stick was mapped by running "
+"the command <command>dmesg</command> after inserting it. To write to your "
+"stick, you may have to turn off its write protection switch."
 msgstr ""
 "Para preparar o stick USB você irá necessitar dum sistema GNU/Linux que já "
 "esteja em funcionamento e onde seja suportado USB. Você deve assegurar-se "
@@ -941,7 +988,22 @@ msgstr ""
 "de protecção de escrita."
 
 #. Tag: para
-#: install-methods.xml:646
+#: install-methods.xml:685
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Using this method will destroy anything already on the device. Make sure "
+#| "that you use the correct device name for your USB stick."
+msgid ""
+"The procedures described in this section will destroy anything already on "
+"the device! Make very sure that you use the correct device name for your USB "
+"stick. If you use the wrong device the result could be that all information "
+"on for example a hard disk could be lost."
+msgstr ""
+"Utilizar este método irá destruir tudo o que estiver no dispositivo. "
+"Assegure-se que utiliza o nome de dispositivo correcto do seu stick USB."
+
+#. Tag: para
+#: install-methods.xml:693
 #, no-c-format
 msgid ""
 "Note that the USB stick should be at least 256 MB in size (smaller setups "
@@ -952,41 +1014,72 @@ msgstr ""
 ">)."
 
 #. Tag: title
-#: install-methods.xml:654
+#: install-methods.xml:701
 #, no-c-format
 msgid "Copying the files &mdash; the easy way"
 msgstr "Copiar ficheiros &mdash; a maneira simples"
 
 #. Tag: para
-#: install-methods.xml:655
-#, no-c-format
+#: install-methods.xml:702
+#, fuzzy, no-c-format
+#| msgid ""
+#| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
+#| "which contains all the installer files (including the kernel) as well as "
+#| "<command>SYSLINUX</command> and its configuration file. You only have to "
+#| "extract it directly to your USB stick:"
 msgid ""
 "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> which "
-"contains all the installer files (including the kernel) as well as "
-"<command>SYSLINUX</command> and its configuration file. You only have to "
-"extract it directly to your USB stick:"
+"contains all the installer files (including the kernel) <phrase arch=\"x86"
+"\">as well as <classname>syslinux</classname> and its configuration file.</"
+"phrase> <phrase arch=\"powerpc\">as well as <classname>yaboot</classname> "
+"and its configuration file.</phrase>"
 msgstr ""
 "Existe um ficheiro tudo-em-um <filename>hd-media/boot.img.gz</filename> que "
 "contém todos os ficheiros do instalador (incluindo o kernel) assim como o "
 "<command>SYSLINUX</command> e o seu ficheiro de configuração. Você apenas "
 "terá de o descompactar directamente para o seu stick USB: "
 
-#. Tag: screen
-#: install-methods.xml:662
+#. Tag: para
+#: install-methods.xml:711
 #, no-c-format
-msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
+msgid ""
+"Note that, although convenient, this method does have one major "
+"disadvantage: the logical size of the device will be limited to 256 MB, even "
+"if the capacity of the USB stick is larger. You will need to repartition the "
+"USB stick and create new file systems to get its full capacity back if you "
+"ever want to use it for some different purpose. A second disadvantage is "
+"that you cannot copy a full CD image onto the USB stick, but only the "
+"smaller businesscard or netinst CD images."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:721
+#, no-c-format
+msgid ""
+"To use this image you only have to extract it directly to your USB stick:"
+msgstr ""
+
+#. Tag: screen
+#: install-methods.xml:725
+#, fuzzy, no-c-format
+#| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
+msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>"
 msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
 
 #. Tag: para
-#: install-methods.xml:664
-#, no-c-format
+#: install-methods.xml:727
+#, fuzzy, no-c-format
+#| msgid ""
+#| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
+#| "which contains all the installer files (including the kernel) as well as "
+#| "<command>yaboot</command> and its configuration file. Create a partition "
+#| "of type \"Apple_Bootstrap\" on your USB stick using <command>mac-fdisk</"
+#| "command>'s <userinput>C</userinput> command and extract the image "
+#| "directly to that:"
 msgid ""
-"There is an all-in-one file <filename>hd-media/boot.img.gz</filename> which "
-"contains all the installer files (including the kernel) as well as "
-"<command>yaboot</command> and its configuration file. Create a partition of "
-"type \"Apple_Bootstrap\" on your USB stick using <command>mac-fdisk</"
-"command>'s <userinput>C</userinput> command and extract the image directly "
-"to that:"
+"Create a partition of type \"Apple_Bootstrap\" on your USB stick using "
+"<command>mac-fdisk</command>'s <userinput>C</userinput> command and extract "
+"the image directly to that:"
 msgstr ""
 "Existe um ficheiro todos em um <filename>hd-media/boot.img.gz</filename> que "
 "contém todos os ficheiros da instalador (incluindo o kernel) tal como o "
@@ -996,32 +1089,32 @@ msgstr ""
 "imagem directamente para lá:"
 
 #. Tag: screen
-#: install-methods.xml:673
-#, no-c-format
-msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+#: install-methods.xml:733
+#, fuzzy, no-c-format
+#| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
 msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
 
 #. Tag: para
-#: install-methods.xml:676
-#, no-c-format
+#: install-methods.xml:735
+#, fuzzy, no-c-format
+#| msgid ""
+#| "After that, mount the USB memory stick (<userinput>mount <replaceable "
+#| "arch=\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/"
+#| "sda2</replaceable> /mnt</userinput>), which will now have <phrase arch="
+#| "\"x86\">a FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS "
+#| "filesystem</phrase> on it, and copy a Debian netinst or businesscard ISO "
+#| "image to it (see <xref linkend=\"usb-add-iso\"/>). Unmount the stick "
+#| "(<userinput>umount /mnt</userinput>) and you are done."
 msgid ""
-"Using this method will destroy anything already on the device. Make sure "
-"that you use the correct device name for your USB stick."
-msgstr ""
-"Utilizar este método irá destruir tudo o que estiver no dispositivo. "
-"Assegure-se que utiliza o nome de dispositivo correcto do seu stick USB."
-
-#. Tag: para
-#: install-methods.xml:682
-#, no-c-format
-msgid ""
-"After that, mount the USB memory stick (<userinput>mount <replaceable arch="
-"\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/sda2</"
-"replaceable> /mnt</userinput>), which will now have <phrase arch=\"x86\">a "
-"FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS filesystem</phrase> "
-"on it, and copy a Debian netinst or businesscard ISO image to it (see <xref "
-"linkend=\"usb-add-iso\"/>). Unmount the stick (<userinput>umount /mnt</"
-"userinput>) and you are done."
+"After that, mount the USB memory stick <phrase arch=\"x86\">"
+"(<userinput>mount /dev/<replaceable>sdX</replaceable> /mnt</userinput>),</"
+"phrase> <phrase arch=\"powerpc\">(<userinput>mount /dev/<replaceable>sdX2</"
+"replaceable> /mnt</userinput>),</phrase> which will now have <phrase arch="
+"\"x86\">a FAT filesystem</phrase> <phrase arch=\"powerpc\">an HFS "
+"filesystem</phrase> on it, and copy a Debian netinst or businesscard ISO "
+"image to it. Unmount the stick (<userinput>umount /mnt</userinput>) and you "
+"are done."
 msgstr ""
 "Em seguida, monte o stick de memória USB (<userinput>mount <replaceable arch="
 "\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/sda2</"
@@ -1032,29 +1125,36 @@ msgstr ""
 "o stick (<userinput>umount /mnt</userinput>) e pronto está feito."
 
 #. Tag: title
-#: install-methods.xml:698
+#: install-methods.xml:752
 #, no-c-format
 msgid "Copying the files &mdash; the flexible way"
 msgstr "Copiar ficheiros &mdash; da maneira flexível"
 
 #. Tag: para
-#: install-methods.xml:699
-#, no-c-format
+#: install-methods.xml:753
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you like more flexibility or just want to know what's going on, you "
+#| "should use the following method to put the files on your stick."
 msgid ""
 "If you like more flexibility or just want to know what's going on, you "
-"should use the following method to put the files on your stick."
+"should use the following method to put the files on your stick. One "
+"advantage of using this method is that &mdash; if the capacity of your USB "
+"stick is large enough &mdash; you have the option of copying a full CD ISO "
+"image to it."
 msgstr ""
 "Se você aprecia maior flexibilidade ou apenas quer saber o que se está a "
 "passar, deve utilizar o seguinte método para colocar os ficheiros no stick."
 
 #. Tag: title
-#: install-methods.xml:711 install-methods.xml:800
-#, no-c-format
-msgid "USB stick partitioning on &arch-title;"
-msgstr "Particionamento do stick USB em &arch-title;"
+#: install-methods.xml:768 install-methods.xml:865
+#, fuzzy, no-c-format
+#| msgid "Booting the USB stick"
+msgid "Partitioning the USB stick"
+msgstr "Arrancar do stick USB"
 
 #. Tag: para
-#: install-methods.xml:712
+#: install-methods.xml:769
 #, no-c-format
 msgid ""
 "We will show how to set up the memory stick to use the first partition, "
@@ -1064,15 +1164,25 @@ msgstr ""
 "partição, em vez de todo o dispositivo."
 
 #. Tag: para
-#: install-methods.xml:717
-#, no-c-format
+#: install-methods.xml:774
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Since most USB sticks come pre-configured with a single FAT16 partition, "
+#| "you probably won't have to repartition or reformat the stick. If you have "
+#| "to do that anyway, use <command>cfdisk</command> or any other "
+#| "partitioning tool to create a FAT16 partition, and then create the "
+#| "filesystem using: <informalexample><screen>\n"
+#| "# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+#| "</screen></informalexample> Take care that you use the correct device "
+#| "name for your USB stick. The <command>mkdosfs</command> command is "
+#| "contained in the <classname>dosfstools</classname> Debian package."
 msgid ""
 "Since most USB sticks come pre-configured with a single FAT16 partition, you "
 "probably won't have to repartition or reformat the stick. If you have to do "
 "that anyway, use <command>cfdisk</command> or any other partitioning tool to "
 "create a FAT16 partition, and then create the filesystem using: "
 "<informalexample><screen>\n"
-"# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+"# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
 "the <classname>dosfstools</classname> Debian package."
@@ -1089,15 +1199,23 @@ msgstr ""
 "está contido no pacote Debian <classname>dosfstools</classname>."
 
 #. Tag: para
-#: install-methods.xml:731
-#, no-c-format
+#: install-methods.xml:788
+#, fuzzy, no-c-format
+#| msgid ""
+#| "In order to start the kernel after booting from the USB stick, we will "
+#| "put a boot loader on the stick. Although any boot loader (e.g. "
+#| "<command>LILO</command>) should work, it's convenient to use "
+#| "<command>SYSLINUX</command>, since it uses a FAT16 partition and can be "
+#| "reconfigured by just editing a text file. Any operating system which "
+#| "supports the FAT file system can be used to make changes to the "
+#| "configuration of the boot loader."
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
-"boot loader on the stick. Although any boot loader (e.g. <command>LILO</"
-"command>) should work, it's convenient to use <command>SYSLINUX</command>, "
-"since it uses a FAT16 partition and can be reconfigured by just editing a "
-"text file. Any operating system which supports the FAT file system can be "
-"used to make changes to the configuration of the boot loader."
+"boot loader on the stick. Although any boot loader (e.g. <classname>lilo</"
+"classname>) should work, it's convenient to use <classname>syslinux</"
+"classname>, since it uses a FAT16 partition and can be reconfigured by just "
+"editing a text file. Any operating system which supports the FAT file system "
+"can be used to make changes to the configuration of the boot loader."
 msgstr ""
 "Com o intuito de iniciar o kernel após arrancar a partir do stick USB, nós "
 "iremos colocar o gestor de arranque no stick. Apesar de qualquer gestor de "
@@ -1108,15 +1226,25 @@ msgstr ""
 "utilizado para fazer alterações à configuração do gestor de arranque."
 
 #. Tag: para
-#: install-methods.xml:741
-#, no-c-format
+#: install-methods.xml:798
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To put <command>SYSLINUX</command> on the FAT16 partition on your USB "
+#| "stick, install the <classname>syslinux</classname> and <classname>mtools</"
+#| "classname> packages on your system, and do: <informalexample><screen>\n"
+#| "# syslinux /dev/<replaceable>sda1</replaceable>\n"
+#| "</screen></informalexample> Again, take care that you use the correct "
+#| "device name. The partition must not be mounted when starting "
+#| "<command>SYSLINUX</command>. This procedure writes a boot sector to the "
+#| "partition and creates the file <filename>ldlinux.sys</filename> which "
+#| "contains the boot loader code."
 msgid ""
-"To put <command>SYSLINUX</command> on the FAT16 partition on your USB stick, "
-"install the <classname>syslinux</classname> and <classname>mtools</"
+"To put <classname>syslinux</classname> on the FAT16 partition on your USB "
+"stick, install the <classname>syslinux</classname> and <classname>mtools</"
 "classname> packages on your system, and do: <informalexample><screen>\n"
-"# syslinux /dev/<replaceable>sda1</replaceable>\n"
+"# syslinux /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Again, take care that you use the correct device "
-"name. The partition must not be mounted when starting <command>SYSLINUX</"
+"name. The partition must not be mounted when starting <command>syslinux</"
 "command>. This procedure writes a boot sector to the partition and creates "
 "the file <filename>ldlinux.sys</filename> which contains the boot loader "
 "code."
@@ -1131,19 +1259,36 @@ msgstr ""
 "arranque para a partição e cria o ficheiro <filename>ldlinux.sys</filename> "
 "que contém o código do gestor de arranque."
 
+#. Tag: title
+#: install-methods.xml:815 install-methods.xml:912
+#, fuzzy, no-c-format
+#| msgid "Adding an ISO image"
+msgid "Adding the installer image"
+msgstr "Adicionar uma imagem ISO"
+
 #. Tag: para
-#: install-methods.xml:754
-#, no-c-format
+#: install-methods.xml:816
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and "
+#| "copy the following files from the Debian archives to the stick: "
+#| "<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel "
+#| "binary) </para></listitem> <listitem><para> <filename>initrd.gz</"
+#| "filename> (initial ramdisk image) </para></listitem> <listitem><para> "
+#| "<filename>syslinux.cfg</filename> (SYSLINUX configuration file) </para></"
+#| "listitem> <listitem><para> Optional kernel modules </para></listitem> </"
+#| "itemizedlist> If you want to rename the files, please note that "
+#| "<command>SYSLINUX</command> can only process DOS (8.3) file names."
 msgid ""
-"Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and copy "
-"the following files from the Debian archives to the stick: <itemizedlist> "
-"<listitem><para> <filename>vmlinuz</filename> (kernel binary) </para></"
-"listitem> <listitem><para> <filename>initrd.gz</filename> (initial ramdisk "
-"image) </para></listitem> <listitem><para> <filename>syslinux.cfg</filename> "
-"(SYSLINUX configuration file) </para></listitem> <listitem><para> Optional "
-"kernel modules </para></listitem> </itemizedlist> If you want to rename the "
-"files, please note that <command>SYSLINUX</command> can only process DOS "
-"(8.3) file names."
+"Mount the partition (<userinput>mount /dev/<replaceable>sdX1</replaceable> /"
+"mnt</userinput>) and copy the following installer image files to the stick: "
+"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel binary) "
+"</para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial "
+"ramdisk image) </para></listitem> </itemizedlist> You can choose between "
+"either the regular version or the graphical version of the installer. The "
+"latter can be found in the <filename>gtk</filename> subdirectory. If you "
+"want to rename the files, please note that <classname>syslinux</classname> "
+"can only process DOS (8.3) file names."
 msgstr ""
 "Monte a partição (<userinput>mount /dev/sda1 /mnt</userinput>) e copie os "
 "seguintes ficheiros dos arquivos Debian para o stick: <itemizedlist> "
@@ -1157,37 +1302,68 @@ msgstr ""
 "(8.3)."
 
 #. Tag: para
-#: install-methods.xml:785
-#, no-c-format
+#: install-methods.xml:840
+#, fuzzy, no-c-format
+#| msgid ""
+#| "The <filename>syslinux.cfg</filename> configuration file should contain "
+#| "the following two lines: <informalexample><screen>\n"
+#| "default vmlinuz\n"
+#| "append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
+#| "</screen></informalexample> Please note that the <userinput>ramdisk_size</"
+#| "userinput> parameter may need to be increased, depending on the image you "
+#| "are booting."
 msgid ""
-"The <filename>syslinux.cfg</filename> configuration file should contain the "
-"following two lines:"
+"Next you should create a <filename>syslinux.cfg</filename> configuration "
+"file, which at a bare minimum should contain the following two lines: "
+"<informalexample><screen>\n"
+"default vmlinuz\n"
+"append initrd=initrd.gz\n"
+"</screen></informalexample> For the graphical installer you should add "
+"<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line."
 msgstr ""
 "O ficheiro de configuração <filename>syslinux.cfg</filename> deve conter as "
-"seguintes duas linhas:"
-
-#. Tag: screen
-#: install-methods.xml:790
-#, no-c-format
-msgid ""
+"duas linhas seguintes: <informalexample><screen>\n"
 "default vmlinuz\n"
-"append initrd=initrd.gz"
-msgstr ""
-"default vmlinuz\n"
-"append initrd=initrd.gz"
+"append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
+"</screen></informalexample> Note, por favor, que o parâmetro "
+"<userinput>ramdisk_size</userinput> poderá necessitar ser aumentado, "
+"dependendo da imagem de onde está a iniciar."
 
 #. Tag: para
-#: install-methods.xml:801
+#: install-methods.xml:850 install-methods.xml:952
 #, no-c-format
+msgid ""
+"If you used an <filename>hd-media</filename> image, you should now copy a "
+"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
+"one that fits) onto the stick. When you are done, unmount the USB memory "
+"stick (<userinput>umount /mnt</userinput>)."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:866
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Most USB sticks do not come pre-configured in such a way that Open "
+#| "Firmware can boot from them, so you will need to repartition the stick. "
+#| "On Mac systems, run <userinput>mac-fdisk /dev/sda</userinput>, initialise "
+#| "a new partition map using the <userinput>i</userinput> command, and "
+#| "create a new partition of type Apple_Bootstrap using the <userinput>C</"
+#| "userinput> command. (Note that the first \"partition\" will always be the "
+#| "partition map itself.) Then type <informalexample><screen>\n"
+#| "$ hformat /dev/<replaceable>sda2</replaceable>\n"
+#| "</screen></informalexample> Take care that you use the correct device "
+#| "name for your USB stick. The <command>hformat</command> command is "
+#| "contained in the <classname>hfsutils</classname> Debian package."
 msgid ""
 "Most USB sticks do not come pre-configured in such a way that Open Firmware "
 "can boot from them, so you will need to repartition the stick. On Mac "
-"systems, run <userinput>mac-fdisk /dev/sda</userinput>, initialise a new "
-"partition map using the <userinput>i</userinput> command, and create a new "
-"partition of type Apple_Bootstrap using the <userinput>C</userinput> "
-"command. (Note that the first \"partition\" will always be the partition map "
-"itself.) Then type <informalexample><screen>\n"
-"$ hformat /dev/<replaceable>sda2</replaceable>\n"
+"systems, run <userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></"
+"userinput>, initialise a new partition map using the <userinput>i</"
+"userinput> command, and create a new partition of type Apple_Bootstrap using "
+"the <userinput>C</userinput> command. (Note that the first \"partition\" "
+"will always be the partition map itself.) Then type "
+"<informalexample><screen>\n"
+"$ hformat /dev/<replaceable>sdX2</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>hformat</command> command is contained in "
 "the <classname>hfsutils</classname> Debian package."
@@ -1206,7 +1382,7 @@ msgstr ""
 "no pacote Debian <classname>hfsutils</classname>."
 
 #. Tag: para
-#: install-methods.xml:817
+#: install-methods.xml:883
 #, no-c-format
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
@@ -1223,14 +1399,30 @@ msgstr ""
 "para fazer alterações à configuração do gestor de arranque."
 
 #. Tag: para
-#: install-methods.xml:826
-#, no-c-format
+#: install-methods.xml:892
+#, fuzzy, no-c-format
+#| msgid ""
+#| "The normal <command>ybin</command> tool that comes with <command>yaboot</"
+#| "command> does not yet understand USB storage devices, so you will have to "
+#| "install <command>yaboot</command> by hand using the <classname>hfsutils</"
+#| "classname> tools. Type <informalexample><screen>\n"
+#| "$ hmount /dev/sda2\n"
+#| "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
+#| "$ hattrib -c UNIX -t tbxi :yaboot\n"
+#| "$ hattrib -b :\n"
+#| "$ humount\n"
+#| "</screen></informalexample> Again, take care that you use the correct "
+#| "device name. The partition must not be otherwise mounted during this "
+#| "procedure. This procedure writes the boot loader to the partition, and "
+#| "uses the HFS utilities to mark it in such a way that Open Firmware will "
+#| "boot it. Having done this, the rest of the USB stick may be prepared "
+#| "using the normal Unix utilities."
 msgid ""
 "The normal <command>ybin</command> tool that comes with <command>yaboot</"
 "command> does not yet understand USB storage devices, so you will have to "
 "install <command>yaboot</command> by hand using the <classname>hfsutils</"
 "classname> tools. Type <informalexample><screen>\n"
-"$ hmount /dev/sda2\n"
+"$ hmount /dev/<replaceable>sdX2</replaceable>\n"
 "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
 "$ hattrib -c UNIX -t tbxi :yaboot\n"
 "$ hattrib -b :\n"
@@ -1260,47 +1452,44 @@ msgstr ""
 "USB pode ser preparado utilizando os utilitários Unix comuns."
 
 #. Tag: para
-#: install-methods.xml:842
-#, no-c-format
+#: install-methods.xml:913
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and "
+#| "copy the following files from the Debian archives to the stick:"
 msgid ""
-"Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and copy "
-"the following files from the Debian archives to the stick:"
+"Mount the partition (<userinput>mount /dev/<replaceable>sdX2</replaceable> /"
+"mnt</userinput>) and copy the following installer image files to the stick:"
 msgstr ""
 "Monte a partição (<userinput>mount /dev/sda2 /mnt</userinput>) e copie para "
 "o stick os seguintes ficheiros dos arquivos Debian:"
 
 #. Tag: para
-#: install-methods.xml:848
+#: install-methods.xml:920
 #, no-c-format
 msgid "<filename>vmlinux</filename> (kernel binary)"
 msgstr "<filename>vmlinux</filename> (binário do kernel)"
 
 #. Tag: para
-#: install-methods.xml:853
+#: install-methods.xml:925
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (imagem ramdisk inicial)"
 
 #. Tag: para
-#: install-methods.xml:858
+#: install-methods.xml:930
 #, no-c-format
 msgid "<filename>yaboot.conf</filename> (yaboot configuration file)"
 msgstr "<filename>yaboot.conf</filename> (ficheiro de configuração yaboot)"
 
 #. Tag: para
-#: install-methods.xml:863
+#: install-methods.xml:935
 #, no-c-format
 msgid "<filename>boot.msg</filename> (optional boot message)"
 msgstr "<filename>boot.msg</filename> (mensagem opcional de arranque)"
 
 #. Tag: para
-#: install-methods.xml:868
-#, no-c-format
-msgid "Optional kernel modules"
-msgstr "Módulos opcionais do kernel"
-
-#. Tag: para
-#: install-methods.xml:875
+#: install-methods.xml:942
 #, no-c-format
 msgid ""
 "The <filename>yaboot.conf</filename> configuration file should contain the "
@@ -1336,62 +1525,13 @@ msgstr ""
 "está a iniciar."
 
 #. Tag: title
-#: install-methods.xml:892
-#, no-c-format
-msgid "Adding an ISO image"
-msgstr "Adicionar uma imagem ISO"
-
-#. Tag: para
-#: install-methods.xml:893
-#, no-c-format
-msgid ""
-"The installer will look for a Debian ISO image on the stick as its source "
-"for additional data needed for the installation. So your next step is to "
-"copy a Debian ISO image (businesscard, netinst or even a full CD image) onto "
-"your stick (be sure to select one that fits). The file name of the image "
-"must end in <filename>.iso</filename>."
-msgstr ""
-"O instalador irá procurar no stick uma imagem ISO Debian e pela sua fonte "
-"para dados adicionais necessários para a instalação. Por isso o próximo "
-"passo é copiar uma imagem Debian ISO (businesscard, netinst ou até uma "
-"imagem de CD completa) no seu stick (certifique-se que escolhe uma que "
-"caiba). O nome do ficheiro de tal imagem tem de terminar em <filename>.iso</"
-"filename>."
-
-#. Tag: para
-#: install-methods.xml:901
-#, no-c-format
-msgid ""
-"If you want to install over the network, without using an ISO image, you "
-"will of course skip the previous step. Moreover you will have to use the "
-"initial ramdisk from the <filename>netboot</filename> directory instead of "
-"the one from <filename>hd-media</filename>, because <filename>hd-media/"
-"initrd.gz</filename> does not have network support."
-msgstr ""
-"Se quiser instalar através da rede, sem utilizar uma imagem ISO, saltará "
-"naturalmente o passo anterior. Além disso você terá de usar a ramdisk "
-"inicial do directório <filename>netboot</filename> em vez daquela do "
-"<filename>hd-media</filename>, porque <filename>hd-media/initrd.gz</"
-"filename> não tem suporte para rede."
-
-#. Tag: para
-#: install-methods.xml:910
-#, no-c-format
-msgid ""
-"When you are done, unmount the USB memory stick (<userinput>umount /mnt</"
-"userinput>) and activate its write protection switch."
-msgstr ""
-"Quando terminar, desmonte o stick de memória USB (<userinput>umount /mnt</"
-"userinput>) e active a sua protecção de escrita."
-
-#. Tag: title
-#: install-methods.xml:920
+#: install-methods.xml:967
 #, no-c-format
 msgid "Booting the USB stick"
 msgstr "Arrancar do stick USB"
 
 #. Tag: para
-#: install-methods.xml:921
+#: install-methods.xml:968
 #, no-c-format
 msgid ""
 "If your system refuses to boot from the memory stick, the stick may contain "
@@ -1404,19 +1544,20 @@ msgstr ""
 "<classname>mbr</classname>:"
 
 #. Tag: screen
-#: install-methods.xml:928
-#, no-c-format
-msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
+#: install-methods.xml:975
+#, fuzzy, no-c-format
+#| msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
+msgid "# install-mbr /dev/<replaceable>sdX</replaceable>"
 msgstr "# install-mbr /dev/<replaceable>sda</replaceable>"
 
 #. Tag: title
-#: install-methods.xml:939
+#: install-methods.xml:986
 #, no-c-format
 msgid "Preparing Files for Hard Disk Booting"
 msgstr "Preparar Ficheiros para Arrancar a Partir de Disco Rígido."
 
 #. Tag: para
-#: install-methods.xml:940
+#: install-methods.xml:987
 #, no-c-format
 msgid ""
 "The installer may be booted using boot files placed on an existing hard "
@@ -1428,7 +1569,7 @@ msgstr ""
 "operativo ou invocando directamente o gestor de arranque da BIOS."
 
 #. Tag: para
-#: install-methods.xml:946
+#: install-methods.xml:993
 #, no-c-format
 msgid ""
 "A full, <quote>pure network</quote> installation can be achieved using this "
@@ -1442,7 +1583,7 @@ msgstr ""
 "imagens de disquetes que não são fiáveis."
 
 #. Tag: para
-#: install-methods.xml:953
+#: install-methods.xml:1000
 #, no-c-format
 msgid "The installer cannot boot from files on an NTFS file system."
 msgstr ""
@@ -1450,7 +1591,7 @@ msgstr ""
 "ficheiros NTFS."
 
 #. Tag: para
-#: install-methods.xml:957
+#: install-methods.xml:1004
 #, no-c-format
 msgid ""
 "The installer cannot boot from files on an HFS+ file system. MacOS System "
@@ -1473,7 +1614,7 @@ msgstr ""
 "ficheiros de instalação dos quais fez download."
 
 #. Tag: para
-#: install-methods.xml:968
+#: install-methods.xml:1015
 #, no-c-format
 msgid ""
 "Different programs are used for hard disk installation system booting, "
@@ -1485,7 +1626,7 @@ msgstr ""
 "<quote>OldWorld</quote>."
 
 #. Tag: title
-#: install-methods.xml:977
+#: install-methods.xml:1024
 #, no-c-format
 msgid ""
 "Hard disk installer booting using <command>LILO</command> or <command>GRUB</"
@@ -1495,7 +1636,7 @@ msgstr ""
 "<command>GRUB</command>"
 
 #. Tag: para
-#: install-methods.xml:979
+#: install-methods.xml:1026
 #, no-c-format
 msgid ""
 "This section explains how to add to or even replace an existing linux "
@@ -1506,7 +1647,7 @@ msgstr ""
 "command>."
 
 #. Tag: para
-#: install-methods.xml:985
+#: install-methods.xml:1032
 #, no-c-format
 msgid ""
 "At boot time, both bootloaders support loading in memory not only the "
@@ -1518,7 +1659,7 @@ msgstr ""
 "pode ser utilizado pelo kernel como sistema de ficheiros root."
 
 #. Tag: para
-#: install-methods.xml:991
+#: install-methods.xml:1038
 #, no-c-format
 msgid ""
 "Copy the following files from the Debian archives to a convenient location "
@@ -1529,19 +1670,19 @@ msgstr ""
 "filename>."
 
 #. Tag: para
-#: install-methods.xml:998
+#: install-methods.xml:1045
 #, no-c-format
 msgid "<filename>vmlinuz</filename> (kernel binary)"
 msgstr "<filename>vmlinuz</filename> (binário kernel)"
 
 #. Tag: para
-#: install-methods.xml:1003
+#: install-methods.xml:1050
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (imagem ramdisk)"
 
 #. Tag: para
-#: install-methods.xml:1010
+#: install-methods.xml:1057
 #, no-c-format
 msgid ""
 "Finally, to configure the bootloader proceed to <xref linkend=\"boot-initrd"
@@ -1551,13 +1692,13 @@ msgstr ""
 "linkend=\"boot-initrd\"/>."
 
 #. Tag: title
-#: install-methods.xml:1020
+#: install-methods.xml:1067
 #, no-c-format
 msgid "Hard Disk Installer Booting for OldWorld Macs"
 msgstr "Instalador para Disco Rígido para Macs OldWorld"
 
 #. Tag: para
-#: install-methods.xml:1021
+#: install-methods.xml:1068
 #, no-c-format
 msgid ""
 "The <filename>boot-floppy-hfs</filename> floppy uses <application>miBoot</"
@@ -1580,7 +1721,7 @@ msgstr ""
 "modelo."
 
 #. Tag: para
-#: install-methods.xml:1034
+#: install-methods.xml:1081
 #, no-c-format
 msgid ""
 "Download and unstuff the <application>BootX</application> distribution, "
@@ -1608,13 +1749,13 @@ msgstr ""
 "<filename>Linux Kernels</filename> no directório activo System Folder."
 
 #. Tag: title
-#: install-methods.xml:1054
+#: install-methods.xml:1101
 #, no-c-format
 msgid "Hard Disk Installer Booting for NewWorld Macs"
 msgstr "Arrancar o Instalador a partir do Disco Rígido em Macs NewWorld"
 
 #. Tag: para
-#: install-methods.xml:1055
+#: install-methods.xml:1102
 #, no-c-format
 msgid ""
 "NewWorld PowerMacs support booting from a network or an ISO9660 CD-ROM, as "
@@ -1635,7 +1776,7 @@ msgstr ""
 "é suportado e não deve ser utilizado em PowerMacs NewWorld."
 
 #. Tag: para
-#: install-methods.xml:1066
+#: install-methods.xml:1113
 #, no-c-format
 msgid ""
 "<emphasis>Copy</emphasis> (not move) the following four files which you "
@@ -1649,31 +1790,31 @@ msgstr ""
 "cada ficheiro para o ícone\tdo disco rígido)."
 
 #. Tag: filename
-#: install-methods.xml:1076 install-methods.xml:1433
+#: install-methods.xml:1123 install-methods.xml:1480
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 #. Tag: filename
-#: install-methods.xml:1081 install-methods.xml:1438
+#: install-methods.xml:1128 install-methods.xml:1485
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 #. Tag: filename
-#: install-methods.xml:1086 install-methods.xml:1443
+#: install-methods.xml:1133 install-methods.xml:1490
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 #. Tag: filename
-#: install-methods.xml:1091 install-methods.xml:1448
+#: install-methods.xml:1138 install-methods.xml:1495
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
 
 #. Tag: para
-#: install-methods.xml:1096
+#: install-methods.xml:1143
 #, no-c-format
 msgid ""
 "Make a note of the partition number of the MacOS partition where you place "
@@ -1689,20 +1830,20 @@ msgstr ""
 "Firmware quando iniciar o instalador."
 
 #. Tag: para
-#: install-methods.xml:1104
+#: install-methods.xml:1151
 #, no-c-format
 msgid "To boot the installer, proceed to <xref linkend=\"boot-newworld\"/>."
 msgstr ""
 "Para iniciar o instalador, prossiga para a <xref linkend=\"boot-newworld\"/>."
 
 #. Tag: title
-#: install-methods.xml:1117
+#: install-methods.xml:1164
 #, no-c-format
 msgid "Preparing Files for TFTP Net Booting"
 msgstr "Preparar Ficheiros para Arrancar Através da Rede por TFTP"
 
 #. Tag: para
-#: install-methods.xml:1118
+#: install-methods.xml:1165
 #, no-c-format
 msgid ""
 "If your machine is connected to a local area network, you may be able to "
@@ -1718,7 +1859,7 @@ msgstr ""
 "e a máquina configurada para suportar o arranque da sua máquina especifica."
 
 #. Tag: para
-#: install-methods.xml:1126
+#: install-methods.xml:1173
 #, no-c-format
 msgid ""
 "You need to set up a TFTP server, and for many machines a DHCP server<phrase "
@@ -1730,7 +1871,7 @@ msgstr ""
 "<phrase condition=\"supports-bootp\">, ou um servidor de BOOTP</phrase>."
 
 #. Tag: para
-#: install-methods.xml:1133
+#: install-methods.xml:1180
 #, no-c-format
 msgid ""
 "<phrase condition=\"supports-rarp\">The Reverse Address Resolution Protocol "
@@ -1755,7 +1896,7 @@ msgstr ""
 "via DHCP."
 
 #. Tag: para
-#: install-methods.xml:1150
+#: install-methods.xml:1197
 #, no-c-format
 msgid ""
 "For PowerPC, if you have a NewWorld Power Macintosh machine, it is a good "
@@ -1767,7 +1908,7 @@ msgstr ""
 "utilizar BOOTP."
 
 #. Tag: para
-#: install-methods.xml:1156
+#: install-methods.xml:1203
 #, no-c-format
 msgid ""
 "Unlike the Open Firmware found on Sparc and PowerPC machines, the SRM "
@@ -1792,7 +1933,7 @@ msgstr ""
 "SRM."
 
 #. Tag: para
-#: install-methods.xml:1173
+#: install-methods.xml:1220
 #, no-c-format
 msgid ""
 "Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP. There "
@@ -1802,7 +1943,7 @@ msgstr ""
 "BOOTP. Está disponível um pacote <classname>rbootd</classname> em Debian."
 
 #. Tag: para
-#: install-methods.xml:1178
+#: install-methods.xml:1225
 #, no-c-format
 msgid ""
 "The Trivial File Transfer Protocol (TFTP) is used to serve the boot image to "
@@ -1817,7 +1958,7 @@ msgstr ""
 "SunOS 5.x (a.k.a. Solaris), e GNU/Linux."
 
 #. Tag: para
-#: install-methods.xml:1186
+#: install-methods.xml:1233
 #, no-c-format
 msgid ""
 "To use the Pre-boot Execution Environment (PXE) method of TFTP booting, you "
@@ -1832,13 +1973,13 @@ msgstr ""
 "<classname>tftpd-hpa</classname>."
 
 #. Tag: title
-#: install-methods.xml:1204
+#: install-methods.xml:1251
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "Configurar o servidor RARP"
 
 #. Tag: para
-#: install-methods.xml:1205
+#: install-methods.xml:1252
 #, no-c-format
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
@@ -1858,7 +1999,7 @@ msgstr ""
 "ifconfig eth0</userinput>."
 
 #. Tag: para
-#: install-methods.xml:1217
+#: install-methods.xml:1264
 #, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1883,13 +2024,13 @@ msgstr ""
 "SunOS 4 (Solaris 1)."
 
 #. Tag: title
-#: install-methods.xml:1239
+#: install-methods.xml:1286
 #, no-c-format
 msgid "Setting up a BOOTP server"
 msgstr "Configurar o servidor BOOTP"
 
 #. Tag: para
-#: install-methods.xml:1240
+#: install-methods.xml:1287
 #, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
@@ -1905,7 +2046,7 @@ msgstr ""
 "server</classname>."
 
 #. Tag: para
-#: install-methods.xml:1248
+#: install-methods.xml:1295
 #, no-c-format
 msgid ""
 "To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
@@ -1969,7 +2110,7 @@ msgstr ""
 "userinput> é o endereço MAC da máquina. </phrase>"
 
 #. Tag: para
-#: install-methods.xml:1281
+#: install-methods.xml:1328
 #, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
@@ -1992,13 +2133,13 @@ msgstr ""
 "dhcpd3-server restart</userinput>."
 
 #. Tag: title
-#: install-methods.xml:1302
+#: install-methods.xml:1349
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "Configurar um servidor DHCP"
 
 #. Tag: para
-#: install-methods.xml:1303
+#: install-methods.xml:1350
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -2012,7 +2153,7 @@ msgstr ""
 "dhcp3/dhcpd.conf</filename>):"
 
 #. Tag: screen
-#: install-methods.xml:1310
+#: install-methods.xml:1357
 #, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -2056,7 +2197,7 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: install-methods.xml:1312
+#: install-methods.xml:1359
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -2074,7 +2215,7 @@ msgstr ""
 "TFTP."
 
 #. Tag: para
-#: install-methods.xml:1322
+#: install-methods.xml:1369
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -2084,13 +2225,13 @@ msgstr ""
 "reinicie-o com <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
 
 #. Tag: title
-#: install-methods.xml:1330
+#: install-methods.xml:1377
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "Possibilitar o Arranque PXE na configuração DHCP"
 
 #. Tag: para
-#: install-methods.xml:1331
+#: install-methods.xml:1378
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -2162,13 +2303,13 @@ msgstr ""
 "abaixo)."
 
 #. Tag: title
-#: install-methods.xml:1347
+#: install-methods.xml:1394
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "Disponibilizar o Servidor TFTP"
 
 #. Tag: para
-#: install-methods.xml:1348
+#: install-methods.xml:1395
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
@@ -2188,7 +2329,7 @@ msgstr ""
 "correctamente, por omissão, quando são instalados."
 
 #. Tag: para
-#: install-methods.xml:1360
+#: install-methods.xml:1407
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -2207,7 +2348,7 @@ msgstr ""
 "configuração nesta secção."
 
 #. Tag: para
-#: install-methods.xml:1370
+#: install-methods.xml:1417
 #, no-c-format
 msgid ""
 "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
@@ -2240,7 +2381,7 @@ msgstr ""
 "userinput>."
 
 #. Tag: para
-#: install-methods.xml:1390
+#: install-methods.xml:1437
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2271,13 +2412,13 @@ msgstr ""
 "servidor TFTP de Linux utiliza."
 
 #. Tag: title
-#: install-methods.xml:1412
+#: install-methods.xml:1459
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "Mover Imagens TFTP Para o Lugar"
 
 #. Tag: para
-#: install-methods.xml:1413
+#: install-methods.xml:1460
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2294,7 +2435,7 @@ msgstr ""
 "determinado pelo cliente TFTP, e não existem standards sólidos."
 
 #. Tag: para
-#: install-methods.xml:1422
+#: install-methods.xml:1469
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2310,13 +2451,13 @@ msgstr ""
 "partir do directório <filename>netboot/</filename>:"
 
 #. Tag: filename
-#: install-methods.xml:1453
+#: install-methods.xml:1500
 #, no-c-format
 msgid "boot.msg"
 msgstr "boot.msg"
 
 #. Tag: para
-#: install-methods.xml:1458
+#: install-methods.xml:1505
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2333,7 +2474,7 @@ msgstr ""
 "para arrancar."
 
 #. Tag: para
-#: install-methods.xml:1466
+#: install-methods.xml:1513
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2350,13 +2491,13 @@ msgstr ""
 "do ficheiro para arrancar."
 
 #. Tag: title
-#: install-methods.xml:1478
+#: install-methods.xml:1525
 #, no-c-format
 msgid "Alpha TFTP Booting"
 msgstr "Iniciar TFTP Alpha"
 
 #. Tag: para
-#: install-methods.xml:1479
+#: install-methods.xml:1526
 #, no-c-format
 msgid ""
 "On Alpha, you must specify the filename (as a relative path to the boot "
@@ -2379,13 +2520,13 @@ msgstr ""
 "métodos."
 
 #. Tag: title
-#: install-methods.xml:1494
+#: install-methods.xml:1541
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "Iniciar SPARC TFTP"
 
 #. Tag: para
-#: install-methods.xml:1495
+#: install-methods.xml:1542
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2417,7 +2558,7 @@ msgstr ""
 "adicionar o nome da sub-arquitectura."
 
 #. Tag: para
-#: install-methods.xml:1511
+#: install-methods.xml:1558
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2431,7 +2572,7 @@ msgstr ""
 "nome da imagem que está a ser pedida."
 
 #. Tag: para
-#: install-methods.xml:1518
+#: install-methods.xml:1565
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2445,13 +2586,13 @@ msgstr ""
 "directório onde o servidor TFTP procura."
 
 #. Tag: title
-#: install-methods.xml:1529
+#: install-methods.xml:1576
 #, no-c-format
 msgid "BVM/Motorola TFTP Booting"
 msgstr "Iniciar TFTP em BVM/Motorola"
 
 #. Tag: para
-#: install-methods.xml:1530
+#: install-methods.xml:1577
 #, no-c-format
 msgid ""
 "For BVM and Motorola VMEbus systems copy the files &bvme6000-tftp-files; to "
@@ -2461,7 +2602,7 @@ msgstr ""
 "para <filename>/tftpboot/</filename>."
 
 #. Tag: para
-#: install-methods.xml:1535
+#: install-methods.xml:1582
 #, no-c-format
 msgid ""
 "Next, configure your boot ROMs or BOOTP server to initially load the "
@@ -2476,13 +2617,13 @@ msgstr ""
 "informação adicional da configuração do sistema."
 
 #. Tag: title
-#: install-methods.xml:1547
+#: install-methods.xml:1594
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "Iniciar por TFTP em SGI"
 
 #. Tag: para
-#: install-methods.xml:1548
+#: install-methods.xml:1595
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2496,13 +2637,13 @@ msgstr ""
 "<filename>/etc/dhcpd.conf</filename>."
 
 #. Tag: title
-#: install-methods.xml:1560
+#: install-methods.xml:1607
 #, no-c-format
 msgid "Broadcom BCM91250A and BCM91480B TFTP Booting"
 msgstr "Iniciar por TFTP em Broadcom BCM91250A e BCM91480B"
 
 #. Tag: para
-#: install-methods.xml:1561
+#: install-methods.xml:1608
 #, no-c-format
 msgid ""
 "You don't have to configure DHCP in a special way because you'll pass the "
@@ -2512,13 +2653,13 @@ msgstr ""
 "caminho absoluto do ficheiro a ser carregado ao CFE."
 
 #. Tag: title
-#: install-methods.xml:1666
+#: install-methods.xml:1713
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "Instalação Automática"
 
 #. Tag: para
-#: install-methods.xml:1667
+#: install-methods.xml:1714
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2534,13 +2675,13 @@ msgstr ""
 "classname>, e o próprio instalador Debian."
 
 #. Tag: title
-#: install-methods.xml:1680
+#: install-methods.xml:1727
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "Instalação Automática Utilizando o Instalador Debian"
 
 #. Tag: para
-#: install-methods.xml:1681
+#: install-methods.xml:1728
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2554,7 +2695,7 @@ msgstr ""
 "respostas às perguntas feitas durante o processo de instalação."
 
 #. Tag: para
-#: install-methods.xml:1688
+#: install-methods.xml:1735
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
@@ -2562,6 +2703,60 @@ msgid ""
 msgstr ""
 "Toda a documentação sobre a pré-configuração e um exemplo funcional que pode "
 "editar encontra-se na <xref linkend=\"appendix-preseed\"/>."
+
+#~ msgid "USB stick partitioning on &arch-title;"
+#~ msgstr "Particionamento do stick USB em &arch-title;"
+
+#~ msgid ""
+#~ "The <filename>syslinux.cfg</filename> configuration file should contain "
+#~ "the following two lines:"
+#~ msgstr ""
+#~ "O ficheiro de configuração <filename>syslinux.cfg</filename> deve conter "
+#~ "as seguintes duas linhas:"
+
+#~ msgid ""
+#~ "default vmlinuz\n"
+#~ "append initrd=initrd.gz"
+#~ msgstr ""
+#~ "default vmlinuz\n"
+#~ "append initrd=initrd.gz"
+
+#~ msgid "Optional kernel modules"
+#~ msgstr "Módulos opcionais do kernel"
+
+#~ msgid ""
+#~ "The installer will look for a Debian ISO image on the stick as its source "
+#~ "for additional data needed for the installation. So your next step is to "
+#~ "copy a Debian ISO image (businesscard, netinst or even a full CD image) "
+#~ "onto your stick (be sure to select one that fits). The file name of the "
+#~ "image must end in <filename>.iso</filename>."
+#~ msgstr ""
+#~ "O instalador irá procurar no stick uma imagem ISO Debian e pela sua fonte "
+#~ "para dados adicionais necessários para a instalação. Por isso o próximo "
+#~ "passo é copiar uma imagem Debian ISO (businesscard, netinst ou até uma "
+#~ "imagem de CD completa) no seu stick (certifique-se que escolhe uma que "
+#~ "caiba). O nome do ficheiro de tal imagem tem de terminar em <filename>."
+#~ "iso</filename>."
+
+#~ msgid ""
+#~ "If you want to install over the network, without using an ISO image, you "
+#~ "will of course skip the previous step. Moreover you will have to use the "
+#~ "initial ramdisk from the <filename>netboot</filename> directory instead "
+#~ "of the one from <filename>hd-media</filename>, because <filename>hd-media/"
+#~ "initrd.gz</filename> does not have network support."
+#~ msgstr ""
+#~ "Se quiser instalar através da rede, sem utilizar uma imagem ISO, saltará "
+#~ "naturalmente o passo anterior. Além disso você terá de usar a ramdisk "
+#~ "inicial do directório <filename>netboot</filename> em vez daquela do "
+#~ "<filename>hd-media</filename>, porque <filename>hd-media/initrd.gz</"
+#~ "filename> não tem suporte para rede."
+
+#~ msgid ""
+#~ "When you are done, unmount the USB memory stick (<userinput>umount /mnt</"
+#~ "userinput>) and activate its write protection switch."
+#~ msgstr ""
+#~ "Quando terminar, desmonte o stick de memória USB (<userinput>umount /mnt</"
+#~ "userinput>) e active a sua protecção de escrita."
 
 #~ msgid "DECstation TFTP Images"
 #~ msgstr "Imagens TFTP DECstation"
@@ -2647,23 +2842,6 @@ msgstr ""
 #~ "kit;. Faça download deste ficheiro para a máquina que tem o RISC OS, "
 #~ "copie os componentes <filename>linloader.!Boot</filename> para o sítio, e "
 #~ "execute <filename>!dInstall</filename>."
-
-#~ msgid ""
-#~ "The <filename>syslinux.cfg</filename> configuration file should contain "
-#~ "the following two lines: <informalexample><screen>\n"
-#~ "default vmlinuz\n"
-#~ "append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
-#~ "</screen></informalexample> Please note that the <userinput>ramdisk_size</"
-#~ "userinput> parameter may need to be increased, depending on the image you "
-#~ "are booting."
-#~ msgstr ""
-#~ "O ficheiro de configuração <filename>syslinux.cfg</filename> deve conter "
-#~ "as duas linhas seguintes: <informalexample><screen>\n"
-#~ "default vmlinuz\n"
-#~ "append initrd=initrd.gz ramdisk_size=12000 root=/dev/ram rw\n"
-#~ "</screen></informalexample> Note, por favor, que o parâmetro "
-#~ "<userinput>ramdisk_size</userinput> poderá necessitar ser aumentado, "
-#~ "dependendo da imagem de onde está a iniciar."
 
 #~ msgid ""
 #~ "On a RARP server system using a Linux 2.2.x kernel, you need to populate "
