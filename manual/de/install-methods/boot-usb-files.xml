@@ -1,74 +1,134 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45616 -->
+<!-- original version: 56442 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Dateien vorbereiten für das Booten von einem USB-Memory-Stick</title>
 
 <para>
 
-Um den USB-Stick vorzubereiten, benötigen Sie ein System, auf dem
-GNU/Linux bereits läuft und das USB unterstützt. Stellen Sie sicher,
-dass das usb-storage-Kernelmodul geladen ist
-(<userinput>modprobe usb-storage</userinput>) und versuchen Sie herauszufinden,
-welches SCSI-Gerät dem USB-Stick zugewiesen wurde (in diesem Beispiel
-benutzen wir <filename>/dev/sda</filename>). Um den Stick zu beschreiben,
-müssen Sie eventuell noch den Schreibschutz-Schalter ausschalten.
+Es gibt zwei mögliche Installationsmethoden, wenn Sie von USB-Stick booten.
+Die erste wäre, komplett über das Netzwerk zu installieren und die zweite,
+ebenfalls ein CD-Image auf den USB-Stick zu kopieren und dieses als
+Paketquelle zu nutzen, möglicherweise in Kombination mit einem Spiegel-Server.
+Diese zweite Methode wird üblicherweise verwendet.
 
 </para><para>
 
+Für die erste Installationsmethode müssen Sie ein Installer-Image aus dem
+<filename>netboot</filename>-Verzeichnis (von einer der in
+<xref linkend="where-files"/> angegebenen Adressen) herunterladen und
+den unten beschriebenen <quote>flexiblen Weg</quote> nutzen, um die Dateien
+auf den USB-Stick zu kopieren.
+
+</para><para>
+
+Installations-Images für die zweite Installatiosmethode finden Sie im
+<filename>hd-media</filename>-Verzeichnis und Sie können sowohl den
+<quote>einfachen</quote> wie auch den <quote>flexiblen Weg</quote>
+benutzen, um das Image auf den Stick zu kopieren. Für diese
+Installationsmethode müssen Sie auch ein CD-Image herunterladen. Das
+Installations-Image und das CD-Image müssen auf der gleichen &d-i;-Version
+basieren. Falls die Versionen nicht übereinstimmen, werden
+wahrscheinlich während der Installation Fehler<footnote>
+
+<para>
+Die höchstwahrscheinlich angezeigte Fehlermeldung wird sein, dass keine
+Kernel-Module gefunden werden können. Dies bedeutet, dass sich die Version
+der Kernel-Modul-udeb-Dateien auf dem CD-Image von der Version des
+laufenden Kernels unterscheidet.
+</para>
+
+</footnote> auftreten.
+
+</para><para>
+
+Um den USB-Stick vorzubereiten, benötigen Sie ein System, auf dem
+GNU/Linux bereits läuft und das USB unterstützt. Auf aktuellen GNU/Linux-Systemen
+sollte der USB-Stick automatisch erkannt werden, sobald Sie ihn einstecken.
+Falls nicht, sollten Sie sicherstellen, dass das usb-storage-Kernelmodul geladen
+ist. Beim Einstecken wird der USB-Stick einem Gerät namens
+<filename>/dev/sdX</filename> zugewiesen, wobei <quote>X</quote>
+ein Buchstabe im Bereich von a bis z ist. Es sollte Ihnen möglich sein, zu
+erkennen, welchem Gerät der Stick zugewiesen wurde, indem Sie den Befehl
+<command>dmesg</command> ausführen, nachdem der USB-Stick eingesteckt wurde.
+Um den Stick zu beschreiben, müssen Sie eventuell noch mit dem entsprechenden
+Schalter den Schreibschutz deaktivieren.
+
+</para>
+<warning><para>
+
+Die hier beschriebenen Verfahren werden alle auf dem Gerät vorhandenen
+Daten zerstören! Stellen Sie auf jeden Fall sicher, dass Sie den korrekten
+Gerätenamen für den USB-Stick verwenden. Wenn Sie den falschen Gerätenamen
+benutzen, könnte das dazu führen, dass alle Dateien zum Beispiel auf einer
+Festplatte verloren gehen.
+
+</para></warning>
+<para>
+
 Beachten Sie, dass der USB-Stick mindestens 256 MB groß sein sollte
-(kleinere Setups sind möglich, wenn Sie sich nach <xref linkend="usb-copy-flexible"/>
-richten).
+(kleinere Setups sind bei Nutzung von <xref linkend="usb-copy-flexible"/>
+möglich).
 
 </para>
 
   <sect2 id="usb-copy-easy">
   <title>Die Dateien kopieren &ndash; der einfache Weg</title>
-<para arch="x86">
+<para>
 
-Es gibt ein <quote>Alles-in-einem</quote>-Image <filename>hd-media/boot.img.gz</filename>,
-das alle Dateien des Installers enthält (inklusive des Kernels) wie auch
-das <command>SYSLINUX</command>-Programm mit der zugehörigen
-Konfigurationsdatei. Sie müssen das Image lediglich direkt auf den USB-Stick
-entpacken:
+Es gibt ein <quote>Alles-in-einem</quote>-Image
+<filename>hd-media/boot.img.gz</filename>, das alle Dateien des Installers
+enthält (inklusive dem Kernel)
+<phrase arch="x86">wie auch den Bootloader
+<classname>syslinux</classname> mit der zugehörigen
+Konfigurationsdatei.</phrase>
+<phrase arch="powerpc">wie auch den Bootloader
+<classname>yaboot</classname> mit der zugehörigen Konfigurationsdatei.</phrase>
+
+</para><para>
+
+Bedenken Sie, dass diese Methode, obwohl sie bequem ist, einen
+gravierenden Nachteil hat: die logische Größe des Sticks ist begrenzt
+auf 256MB, auch wenn die Kapazität des USB-Sticks eigentlich größer ist.
+Falls Sie den Stick jemals wieder für einen anderen Zweck verwenden
+und die volle Kapazität zurückbekommen möchten, müssen Sie ihn neu
+paritionieren und die Dateisysteme neu erstellen. Ein zweiter großer
+Nachteil ist, dass Sie nicht ein Komplett-CD-Image auf den Stick
+kopieren können, sondern nur die kleineren Businesscard- oder
+Netinst-CD-Images.
+
+</para><para arch="x86">
+
+Um dieses Image zu verwenden, müssen Sie es lediglich direkt auf Ihren
+USB-Stick extrahieren:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para><para arch="powerpc">
 
-Es gibt ein <quote>Alles-in-einem</quote>-Image <filename>hd-media/boot.img.gz</filename>,
-das alle Dateien des Installers enthält (inklusive des Kernels) wie auch
-<command>yaboot</command> mit der zugehörigen Konfigurationsdatei.
-Erstellen Sie eine Partition des Typs <quote>Apple_Bootstrap</quote> auf Ihrem USB-Stick,
-indem Sie das <userinput>C</userinput>-Kommando von <command>mac-fdisk</command>
-verwenden, und entpacken Sie das Image direkt dorthin:
+Erstellen Sie eine Partition des Typs <quote>Apple_Bootstrap</quote> auf
+Ihrem USB-Stick, indem Sie das <userinput>C</userinput>-Kommando von
+<command>mac-fdisk</command> verwenden. Entpacken Sie dann das Image direkt
+dorthin:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
-</para>
-<warning><para>
+</para><para>
 
-Durch diese Methode wird alles, was auf dem Gerät gespeichert ist,
-zerstört. Versichern Sie sich, dass Sie die richtige Gerätebezeichnung
-für Ihren USB-Stick verwenden.
-
-</para></warning>
-<para>
-
-Danach hängen Sie den USB-Memory-Stick ins Dateisystem ein
-(<userinput>mount <replaceable arch="x86">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>), der jetzt ein <phrase arch="x86">FAT-Dateisystem</phrase>
-<phrase arch="powerpc">HFS-Dateisystem</phrase> enthält, und kopieren ein
-Debian-<quote>netinst</quote>- oder -<quote>businesscard</quote>-ISO-Image dorthin
-(siehe <xref linkend="usb-add-iso"/>). Achten Sie darauf,
-dass die Datei auf <filename>.iso</filename> endet. Hängen Sie den
-Stick aus dem Dateisystem aus (<userinput>umount /mnt</userinput>) &ndash; Sie
-haben es geschafft.
+Hängen Sie danach den USB-Memory-Stick ins Dateisystem ein <phrase
+arch="x86">(<userinput>mount /dev/<replaceable>sdX</replaceable>
+/mnt</userinput>),</phrase><phrase arch="powerpc">(<userinput>mount
+/dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
+der jetzt ein <phrase
+arch="x86">FAT-Dateisystem</phrase><phrase
+arch="powerpc">HFS-Dateisystem</phrase> enthält, und kopieren ein
+Debian-<quote>netinst</quote>- oder <quote>businesscard</quote>-ISO-Image
+dorthin. Hängen Sie den Stick aus dem Dateisystem aus
+(<userinput>umount /mnt</userinput>) &ndash; das war's.
 
 </para>
   </sect2>
@@ -77,46 +137,17 @@ haben es geschafft.
   <title>Die Dateien kopieren &ndash; der flexible Weg</title>
 <para>
 
-Wenn Sie flexibler sein wollen oder einfach nur wissen möchten, was passiert,
+Wenn Sie flexibler sein oder einfach nur wissen möchten, was passiert,
 sollten Sie die folgende Methode nutzen, um die Dateien auf den Stick zu
-befördern:
+befördern. Ein Vorteil dieser Methode ist, dass Sie &ndash; falls die Kapazität
+Ihres USB-Sticks dafür ausreicht &ndash; die Möglichkeit haben, ein
+Komplett-CD-ISO-Image darauf zu kopieren.
 
 </para>
 
 &usb-setup-x86.xml;
 &usb-setup-powerpc.xml;
 
-   </sect2>
-
-   <sect2 id="usb-add-iso">
-   <title>Ein ISO-Image hinzufügen</title>
-<para>
-
-Da der Stick die Quelle für zusätzliche Daten ist, die für die
-Installation benötigt werden, wird der Installer dort nach einem
-Debian-ISO-Image suchen. Sie müssen also als nächstes ein
-solches Image (<quote>businesscard</quote>,
-<quote>netinst</quote> oder
-sogar ein Komplett-Image) auf den Stick laden (wählen Sie eines, das
-auch auf den Stick passt). Der Dateiname des Images muss auf
-<filename>.iso</filename> enden.
-
-</para><para>
-
-Wenn Sie per Netzwerk booten möchten, ohne ein ISO-Image zu nutzen,
-können Sie natürlich den vorigen Schritt überspringen. Sie müssen
-dabei außerdem die Initial RAM-Disk aus dem Verzeichnis
-<filename>netboot</filename> verwenden statt aus
-<filename>hd-media</filename>, da <filename>hd-media/initrd.gz</filename>
-keine Netzwerkunterstützung hat.
-
-</para><para>
-
-Wenn Sie dies erledigt haben, hängen Sie den USB-Memory-Stick aus dem
-Dateisystem aus (<userinput>umount /mnt</userinput>) und aktivieren
-den Schreibschutz.
-
-</para>
   </sect2>
 
   <!-- TODO: doesn't this section belong later? -->
@@ -130,7 +161,7 @@ nutzen Sie folgenden <command>install-mbr</command>-Befehl aus dem Paket
 <classname>mbr</classname>:
 
 <informalexample><screen>
-# install-mbr /dev/<replaceable>sda</replaceable>
+# install-mbr /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para></warning>
