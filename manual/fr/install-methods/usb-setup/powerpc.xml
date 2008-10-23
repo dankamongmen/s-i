@@ -1,12 +1,12 @@
-<!-- original version: 33725 -->
+<!-- original version:  56442 -->
 
    <sect3 arch="powerpc">
-   <title>Partitionner un périphérique USB sur &arch-title;</title>
+   <title>Partitionner un périphérique USB</title>
 <para>
 
 La plupart des périphériques USB ne sont pas prêts à être amorcés par le
 microprogramme Open Firmware, et vous devez les repartitionner.
-Sur les systèmes Mac, faites <userinput>mac-fdisk /dev/sda</userinput>,
+Sur les systèmes Mac, faites <userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput>,
 initialisez une nouvelle table des partitions avec la commande
 <userinput>i</userinput> et créez une nouvelle partition Apple_Bootstrap
 avec la commande <userinput>C</userinput>.
@@ -14,18 +14,17 @@ Remarquez que la première partition sera toujours la table des partitions
 elle-même. Saisissez&nbsp;:
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Faites attention à utiliser le périphérique correct pour la clé. Le programme
-<command>hformat</command>  se trouve dans le paquet Debian
-<classname>hfsutils</classname>.
+<command>hformat</command> se trouve dans le paquet Debian <classname>hfsutils</classname>.
 
 </para><para>
 
 Pour pouvoir lancer le noyau après l'amorçage sur la clé, nous y mettons
 un programme d'amorçage. Le programme <command>yaboot</command> peut être
-installer sur un système de fichiers HFS et configuré en modifiant un
+installé sur un système de fichiers HFS et configuré en modifiant un
 simple fichier texte. On peut modifier la configuration du
 programme d'amorçage avec tous les systèmes d'exploitation qui acceptent
 le système de fichiers HFS.
@@ -38,7 +37,7 @@ installer <command>yaboot</command> manuellement avec les outils
 <classname>hfsutils</classname>. Saisissez&nbsp;:
 
 <informalexample><screen>
-$ hmount /dev/sda2
+$ hmount /dev/<replaceable>sdX2</replaceable>
 $ hcopy -r /usr/lib/yaboot/yaboot :
 $ hattrib -c UNIX -t tbxi :yaboot
 $ hattrib -b :
@@ -49,10 +48,16 @@ Encore une fois, faites bien attention à utiliser le nom correct pour la clé.
 La partition ne doit pas être montée pendant la procédure. Cette procédure
 met le programme d'amorçage sur la partition et utilise les outils HFS pour
 préparer ce programme à être lancé par le microprogramme Open Firmware.
-Ensuite, la clé USB peut être préparée avec les outils standards d'Unix.
+Ensuite, la clé USB peut être préparée avec les outils standard d'Unix.
 
-</para><para>
-Montez la partition (<userinput>mount /dev/sda2 /mnt</userinput>) et
+</para>
+</sect3>
+
+   <sect3 arch="powerpc">
+   <title>Ajouter l'image d'installation</title>
+
+<para>
+Montez la partition (<userinput>mount /dev/<replaceable>sdX2</replaceable> /mnt</userinput>) et
 copiez les fichiers suivants sur la clé&nbsp;:
 
 <itemizedlist>
@@ -76,11 +81,7 @@ copiez les fichiers suivants sur la clé&nbsp;:
 <filename>boot.msg</filename> (message optionnel)
 
 </para></listitem>
-<listitem><para>
 
-Modules optionnels du noyau
-
-</para></listitem>
 </itemizedlist>
 
 </para><para>
@@ -101,8 +102,15 @@ image=/vmlinux
         read-only
 </screen></informalexample>
 
-Remarquez que la valeur du paramètre <userinput>ramdisk_size</userinput>
+Remarquez que la valeur du paramètre <userinput>initrd-size</userinput>
 doit être augmentée avec la taille de l'image qui est amorcée.
+
+</para>
+<para>
+Si vous utilisez une image <filename>hd-media</filename>, vous devez copier
+une image ISO de Debian, <quote>businesscard</quote>, <quote>netinst</quote> ou l'image d'un
+disque complet sur la clé. Une fois l'image copiée, démontez la clé
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

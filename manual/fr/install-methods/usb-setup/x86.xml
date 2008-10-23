@@ -1,7 +1,7 @@
-<!-- original version: 56425 -->
+<!-- original version: 56442 -->
 
    <sect3 arch="x86">
-   <title>Partitionner un périphérique USB sur &arch-title;</title>
+   <title>Partitionner un périphérique USB</title>
 <para>
 
 Nous montrerons comment n'utiliser que la première partition,
@@ -38,7 +38,7 @@ installez les paquets <classname>syslinux</classname> et
 <classname>mtools</classname> sur votre système et saisissez la commande&nbsp;:
 
 <informalexample><screen>
-# syslinux /dev/<replaceable>sda1</replaceable>
+# syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Encore une fois, faites bien attention à utiliser le nom correct pour la clé.
@@ -47,9 +47,14 @@ La partition ne doit pas être montée au lancement de
 la partition et crée le fichier <filename>ldlinux.sys</filename> qui contient
 le code du programme d'amorçage.
 
-</para><para>
+</para>
+</sect3>
 
-Montez la partition (<userinput>mount /dev/sda1 /mnt</userinput>) et
+<sect3 arch="x86">
+   <title>Ajouter l'image d'installation</title>
+<para>
+
+Montez la partition (<userinput>mount /dev/sdX1 /mnt</userinput>) et
 copiez les fichiers suivants sur la clé&nbsp;:
 
 <itemizedlist>
@@ -87,6 +92,15 @@ les deux lignes suivantes&nbsp;:
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+Pour l'installateur graphique, vous devez ajouter à la deuxième ligne
+le paramètre <userinput>video=vesa:ywrap,mtrr vga=788</userinput>.
+</para>
+<para>
+Si vous utilisez une image <filename>hd-media</filename>, vous devez copier
+une image ISO de Debian, <quote>businesscard</quote>, <quote>netinst</quote> ou l'image d'un
+disque complet sur la clé. Une fois l'image copiée, démontez la clé
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

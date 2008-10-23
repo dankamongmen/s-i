@@ -1,17 +1,60 @@
-<!-- original version: 45616 -->
+<!-- original version: 56442 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
 
 <para>
 
+Pour amorcer à partir d'une clé USB, il existe deux méthodes. La première est de faire
+toute l'installation sur le réseau. La seconde consiste à copier une image CD sur la clé et
+à utiliser cette image comme source de paquets, source qui peut se combiner avec un miroir.
+Cette deuxième méthode est la plus commune.
+
+</para>
+<para>
+
+Pour la première méthode, vous devez télécharger une image de l'installateur
+qui se trouve dans le répertoire <filename>netboot</filename> (son adresse précise
+est mentionnée dans  <xref linkend="where-files"/>) et copier les fichiers sur la clé en
+utilisant la <quote>méthode détaillée</quote> décrite plus bas.
+
+</para>
+<para>
+
+Pour la seconde méthode, les images d'installation se trouvent dans le répertoire
+<filename>hd-media</filename>. Pour copier les fichiers sur la clé, vous pouvez utiliser 
+aussi bien l'une ou l'autre des méthodes décrites plus bas. Vous devez aussi
+télécharger une image CD. Les images de l'installation ainsi que l'image CD doivent être
+basées sur la même version de l'installateur. En cas de non correspondance, des erreurs <footnote>
+
+<para>
+Le message d'erreur le plus fréquent est qu'aucun module noyau ne peut être trouvé.
+Cela signifie que la version des <quote>udebs</quote>pour les modules du noyau
+dans l'image CD ne correspond pas à la version du noyau en cours d'exécution.
+</para></footnote>
+
+sont possibles.
+</para>
+
+<para> 
 Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
-qui gère les périphériques USB. Vérifiez que le module du noyau
-usb-storage est chargé (<userinput>modprobe usb-storage</userinput>) et trouvez
-à quel périphérique SCSI la clé USB est affectée (dans l'exemple qui suit, ce sera
-<filename>/dev/sda</filename>). Pour pouvoir écrire sur la clé, il vous faudra
+qui gère les périphériques USB. Sur les systèmes récents, la clé devrait être
+automatiquement reconnue. Si ce n'est pas le cas, vérifiez que le module du noyau
+usb-storage est chargé. Une fois insérée, la clé sera associée à un périphérique appelé
+<filename>/dev/sdX</filename>, où le <quote>X</quote> est une lettre minuscule (a-z).
+Avec la commande <command>dmesg</command>, il est possible de savoir à quel périphérique
+la clé a été associée. Pour pouvoir écrire sur la clé, il vous faudra
 enlever la protection contre l'écriture.
 </para>
+
+<warning><para>
+Les procédures décrites dans cette section détruisent ce qui se trouve sur le périphérique.
+Faites très attention à utiliser le nom correct pour la clé USB. Si vous vous trompez et
+utilisez un autre périphérique, par exemple un disque dur, toutes les données du disque
+seront perdues.
+</para></warning>
+
+
 <para>
 
 Notez que la taille de la clé doit être au moins égale à 256&nbsp;Mo. Pour des
@@ -21,47 +64,54 @@ tailles inférieures, voyez <xref linkend="usb-copy-flexible"/>.
 
   <sect2 id="usb-copy-easy">
   <title>Copie des fichiers &mdash; méthode simple</title>
-<para arch="x86">
+<para>
 
 Le fichier <filename>hd-media/boot.img.gz</filename> contient tous les
 fichiers de l'installateur, le noyau et le programme 
-<command>SYSLINUX</command> avec son fichier de configuration. Il vous suffit
-d'extraire ces fichiers dans votre clé USB&nbsp;:
+<phrase arch="x86"><command>SYSLINUX</command> avec son fichier de configuration.</phrase>
+<phrase arch="powerpc"><classname>yaboot</classname> avec son fichier de configuration.</phrase>.
+
+</para>
+
+<para>
+Bien que pratique, cette méthode possède un inconvénient majeur : la taille logique
+du périphérique est limitée à 256 Mo, même si la capacité de la clé est supérieure.
+Pour retrouver la taille réelle, il vous faudra repartitionner la clé et créer de nouveaux
+systèmes de fichiers. Il existe aussi un deuxième inconvénient : vous ne pouvez pas copier
+une image de CD complet mais seulement l'image <quote>netinst</quote> ou l'image <quote>businesscard</quote>.
+
+</para>
+<para>
+Il vous suffit d'extraire ces fichiers sur votre clé USB&nbsp;:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para>
 <para arch="powerpc">
 
-Le fichier <filename>hd-media/boot.img.gz</filename> contient tous les
-fichiers de l'installateur, le noyau et le programme
-<command>yaboot</command> avec son fichier de configuration. Créez une 
-partition <quote>Apple_Bootstrap</quote> sur la clé avec la commande 
+Créez une partition <quote>Apple_Bootstrap</quote> sur la clé avec la commande 
 <userinput>C</userinput> de <command>mac-fdisk</command> et mettez l'image
 avec&nbsp;:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 </para>
-<warning><para>
-Bien sûr, toutes les données présentes sur la clé seront détruites. Assurez-vous
-d'utiliser le périphérique correspondant à votre clé&nbsp;!
-</para>
-</warning>
+
 <para>
 
-Montez ensuite la clé (<userinput>mount 
-<replaceable arch="x86">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>),
+Montez ensuite la clé
+<phrase arch="x86">(<userinput>mount
+/dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
+<phrase arch="powerpc">(<userinput>mount
+/dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
 qui aura maintenant un système de fichiers 
 <phrase arch="x86">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>, et copiez une image ISO de type
 <quote>netinst</quote> ou <quote>businesscard</quote>.
-Consultez <xref linkend="usb-add-iso"/>. Le nom de ce fichier doit se terminer par
-<filename>.iso</filename>. Démontez la clé (<userinput>umount /mnt</userinput>)
+Démontez la clé (<userinput>umount /mnt</userinput>)
 et voilà, c'est fait&nbsp;!
 </para>
 </sect2>
@@ -72,40 +122,13 @@ et voilà, c'est fait&nbsp;!
 
 Si vous aimez la souplesse d'utilisation ou si vous voulez simplement savoir ce qui se
 passe, vous pouvez utiliser la méthode suivante pour mettre les fichiers
-sur la clé. 
+sur la clé. L'un des avantages de cette méthodes est que, si la taille de votre clé est
+assez grande, vous pouvez copier une image d'un disque entier. 
 </para>
 
 &usb-setup-x86.xml;
 &usb-setup-powerpc.xml;
 
-</sect2>
-
-<sect2 id="usb-add-iso">
-<title>Ajouter une image ISO</title>
-<para>
-
-L'installateur recherchera une image ISO Debian sur la clé où prendre les données
-nécessaires à l'installation. Il vous faut donc copier une image ISO
-(<quote>businesscard</quote>, <quote>netinst</quote> ou même l'image complète) sur la clé.
-Le nom de cette image doit se terminer par <filename>.iso</filename>.
-
-</para>
-<para>
-
-Si vous voulez faire une installation sur le réseau, sans utiliser d'image
-ISO, vous sauterez bien sûr l'étape précédente. De plus vous devrez utiliser
-le disque virtuel initial qui se trouve dans le répertoire
-<filename>netboot</filename> au lieu de celui qui se trouve dans le répertoire
-<filename>hd-media</filename>, car le fichier 
-<filename>hd-media/initrd.gz</filename> ne sait pas utiliser le réseau.
-
-</para>
-<para>
-
-Quand tout est fait, démontez la clé USB (<userinput>umount /mnt</userinput>) 
-et activez la protection contre l'écriture.
-
-</para>
 </sect2>
 
 <!-- TODO: doesn't this section belong later? -->
@@ -119,7 +142,7 @@ programme <command>install-mbr</command> qui se trouve dans le paquet
 <classname>mbr</classname>&nbsp;:
 
 <informalexample><screen>
-# install-mbr /dev/<replaceable>sda</replaceable>
+# install-mbr /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para></warning>
