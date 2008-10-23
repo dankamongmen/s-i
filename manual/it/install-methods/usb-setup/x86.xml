@@ -1,9 +1,9 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56425 -->
+<!-- original version: 56442 -->
 
    <sect3 arch="x86">
-   <!-- <title>USB stick partitioning on &arch-title;</title> -->
-   <title>Partizionamento della chiavetta USB su &arch-title;</title>
+   <!-- <title>Partitioning the USB stick</title> -->
+   <title>Partizionamento della chiavetta USB</title>
 <para>
 
 <!--
@@ -32,7 +32,7 @@ di partizionamento per creare una partizione FAT16 e poi crearci un
 filesystem usando:
 
 <informalexample><screen>
-# mkdosfs /dev/<replaceable>sda1</replaceable>
+# mkdosfs /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 <!--
@@ -50,8 +50,8 @@ comando <command>mkdosfs</command> è contenuto nel pacchetto Debian
 <!--
 In order to start the kernel after booting from the USB stick, we will
 put a boot loader on the stick. Although any boot loader
-(e.g. <command>LILO</command>) should work, it's convenient to use
-<command>SYSLINUX</command>, since it uses a FAT16 partition and can
+(e.g. <classname>lilo</classname>) should work, it's convenient to use
+<classname>syslinux</classname>, since it uses a FAT16 partition and can
 be reconfigured by just editing a text file. Any operating system
 which supports the FAT file system can be used to make changes to the
 configuration of the boot loader.
@@ -59,8 +59,8 @@ configuration of the boot loader.
 
 Per far partire il kernel dopo aver avviato da un chiavetta USB è necessario
 mettere un bootloader sulla chiavetta. Nonostante il fatto che qualsiasi
-bootloader (p.e. <command>LILO</command>) dovrebbe funzionare è più
-comodo usare <command>SYSLINUX</command> dato che utilizza una partizione
+bootloader (p.e. <classname>lilo</classname>) dovrebbe funzionare è più
+comodo usare <classname>syslinux</classname> dato che utilizza una partizione
 FAT16 e può essere riconfigurato semplicemente modificando un file di
 testo. Qualsiasi sistema operativo con supporto per il filesystem FAT può
 essere usato per fare delle modifiche alla configurazione del bootloader.
@@ -68,17 +68,17 @@ essere usato per fare delle modifiche alla configurazione del bootloader.
 </para><para>
 
 <!--
-To put <command>SYSLINUX</command> on the FAT16 partition on your USB
+To put <classname>syslinux</classname> on the FAT16 partition on your USB
 stick, install the <classname>syslinux</classname> and
 <classname>mtools</classname> packages on your system, and do:
 -->
 
-Per collocare <command>SYSLINUX</command> sulla partizione FAT16 della
+Per collocare <classname>syslinux</classname> sulla partizione FAT16 della
 chiavetta USB installare i pacchetti <classname>syslinux</classname> e
 <classname>mtools</classname> ed eseguire:
 
 <informalexample><screen>
-# syslinux /dev/<replaceable>sda1</replaceable>
+# syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 <!--
@@ -93,15 +93,23 @@ non deve essere montata quando si avvia <command>SYSLINUX</command>, la
 procedura scrive il settore di avvio sulla partizione e crea il file
 <filename>ldlinux.sys</filename> che contiene il codice del bootloader.
 
-</para><para>
+</para>
+   </sect3>
+
+   <sect3 arch="x86">
+   <!-- <title>Adding the installer image</title> -->
+   <title>Aggiunta dell'immagine dell'installatore</title>
+<para>
 
 <!--
-Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and
-copy the following files from the Debian archives to the stick:
+Mount the partition
+(<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
+and copy the following installer image files to the stick:
 -->
 
-Montare la partizione (<userinput>mount /dev/sda1 /mnt</userinput>) e
-copiare i seguenti file dall'archivio Debian sulla chiavetta:
+Montare la partizione
+(<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
+e copiare i seguenti file con l'immagine dell'installatore sulla chiavetta:
 
 <itemizedlist>
 <listitem><para>
@@ -122,48 +130,59 @@ copiare i seguenti file dall'archivio Debian sulla chiavetta:
 <filename>initrd.gz</filename> (immagine del ramdisk iniziale)
 
 </para></listitem>
-<listitem><para>
-
-<!--
-<filename>syslinux.cfg</filename> (SYSLINUX configuration file)
--->
-
-<filename>syslinux.cfg</filename> (file di configurazione di SYSLINUX)
-
-</para></listitem>
-<listitem><para>
-
-<!--
-Optional kernel modules
--->
-
-Moduli del kernel opzionali
-
-</para></listitem>
 </itemizedlist>
 
 <!--
-If you want to rename the files, please note that
-<command>SYSLINUX</command> can only process DOS (8.3) file names.
+You can choose between either the regular version or the graphical version
+of the installer. The latter can be found in the <filename>gtk</filename>
+subdirectory. If you want to rename the files, please note that
+<classname>syslinux</classname> can only process DOS (8.3) file names.
 -->
 
-Se si vuole rinominare questi file ricordarsi che <command>SYSLINUX</command>
-può gestire solo nomi di file in formato DOS (8.3).
+È possibile sceglie se usare la versione dell'installatore tradizionale
+o quella grafica. Quest'ultima può essere trovata nella sottodirectory
+<filename>gtk</filename>. Se si vuole rinominare questi file ricordarsi
+che <command>syslinux</command> può gestire solo nomi di file in formato
+DOS (8.3).
 
 </para><para>
 
 <!--
-The <filename>syslinux.cfg</filename> configuration file should
-contain the following two lines:
+Next you should create a <filename>syslinux.cfg</filename> configuration
+file, which at a bare minimum should contain the following two lines:
 -->
 
-Il file di configurazione <filename>syslinux.cfg</filename> deve contenere
-le seguenti righe:
+Poi è necessario creare il file di configurazione
+<filename>syslinux.cfg</filename>, che deve contenere almeno le seguenti
+due righe:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+<!--
+For the graphical installer you should add
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line.
+-->
+
+Per utilizzare l'installatore grafico si deve aggiungere
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> alla seconda riga.
+
+</para><para>
+
+<!--
+If you used an <filename>hd-media</filename> image, you should now copy a
+Debian ISO image (businesscard, netinst or full CD image; be sure to select
+one that fits) onto the stick. When you are done, unmount the USB memory
+stick (<userinput>umount /mnt</userinput>).
+-->
+
+Se si è utilizzato un'immagine <filename>hd-media</filename>, adesso si
+deve copiare un'immagine ISO Debian (businesscard, netinst o l'immagine
+di un CD completo; assicurarsi di sceglierne una che entra) sulla
+chiavetta. Una volta finita la copia, smontare la chiavetta USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>
