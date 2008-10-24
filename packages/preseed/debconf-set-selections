@@ -19,15 +19,19 @@ NEWLINE="
 IFS="$NEWLINE"
 CR=$(echo -en "\r")
 SPACE=$(echo -en "[ \t]")
+
+multiline=""
 # TODO: this squashes \r elsewhere in the line too
 for line in $(grep -v '^#\|^[[:space:]]*$' "$file" | sed "s/$CR//g"); do
 	IFS="$OLDIFS"
 	
-	if [ "$line" != "${line%\\\\}" ]; then
-		multiline="$multiline${line%\\\\}"
+	line="$(echo "$line" | sed 's/^[[:space:]]*//')"
+	if echo "$line" | grep -q '\\$'; then
+		multiline="${multiline:+$multiline }$(echo "$line" | \
+			sed 's/[[:space:]]*\\$//')"
 		continue
 	elif [ -n "$multiline" ]; then
-		line="$multiline$line"
+		line="$multiline $line"
 		multiline=""
 	fi
 	
