@@ -4,6 +4,12 @@ set -e
 . /usr/share/debconf/confmodule
 db_capb backup
 
+# Leave preseeded time zone untouched if seen flag is set
+db_fget time/zone seen
+if [ "$RET" = true ]; then
+	exit 0
+fi
+
 db_get debian-installer/country
 CC="$RET"
 # per-country templates are used for countries with multiple choices
@@ -15,16 +21,12 @@ if db_get "tzsetup/country/$CC"; then
 	fi
 else
 	db_register time/zone time/zone # might be registered to something else
-	# detect preseeding and avoid replacing with other value
-	db_fget time/zone seen
-	if [ "$RET" = false ]; then
-		zone=$(grep "^$CC" /usr/share/tzsetup/tzmap | cut -d ' ' -f 2)
-		db_set time/zone "$zone"
+	zone=$(grep "^$CC" /usr/share/tzsetup/tzmap | cut -d ' ' -f 2)
+	db_set time/zone "$zone"
 
-		db_subst tzsetup/selected ZONE $zone
-		db_input medium tzsetup/selected || true
-		if ! db_go; then
-			exit 10 # back to menu
-		fi
+	db_subst tzsetup/selected ZONE $zone
+	db_input medium tzsetup/selected || true
+	if ! db_go; then
+		exit 10 # back to menu
 	fi
 fi
