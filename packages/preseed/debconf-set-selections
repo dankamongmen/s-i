@@ -13,6 +13,24 @@ fi
 
 file="$1"
 
+parse_error() {
+	echo "$1" >> $logfile
+	log "Error parsing preconfiguration file; see '$logfile' for details"
+	exit 1
+}
+
+# Returns the first field in the current line
+first_field() {
+	echo "$line" | grep -q "[[:space:]]" || return 1
+	echo "$line" | sed -r 's/^([^[:space:]]*).*/\1/'
+}
+# Returns any fields after the first field in the current line
+rest_line() {
+	if echo "$line" | grep -q "[[:space:]]"; then
+		echo "$line" | sed 's/^[^[:space:]]*[[:space:]]*//'
+	fi
+}
+
 OLDIFS="$IFS"
 NEWLINE="
 "
@@ -41,20 +59,24 @@ for line in $(grep -v '^#\|^[[:space:]]*$' "$file" | sed "s/$CR//g"); do
 	var=""
 	type=""
 	val=""
-	while [ "$line" != "${line#*$SPACE}" ]; do
-		if [ -n "${line%%$SPACE*}" ]; then
-			if [ -z "$package" ]; then
-				package="${line%%$SPACE*}"
-			elif [ -z "$var" ]; then
-				var="${line%%$SPACE*}"
-			elif [ -z "$type" ]; then
-				type="${line%%$SPACE*}"
-				val="${line#*$SPACE}"
-				break
-			fi
+	if ! package="$(first_field)"; then
+		parse_error "Syntax error: unable to determine template owner"
+	fi
+	line="$(rest_line)"
+	if ! var="$(first_field)"; then
+		parse_error "Syntax error: unable to determine template name"
+	fi
+	line="$(rest_line)"
+	if ! type="$(first_field)"; then
+		# Allow for lines without separator before an empty value
+		if [ "$line" ]; then
+			type="$line"
+		else
+			parse_error "Syntax error: unable to determine template type"
 		fi
-		line="${line#*$SPACE}"
-	done
+	fi
+	line="$(rest_line)"
+	val="$line"
 
 	if [ "$type" = seen ]; then
 		# Set seen flag.
