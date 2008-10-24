@@ -599,15 +599,14 @@ There are a few rules to keep in mind when writing a preconfiguration file.
 <itemizedlist>
 <listitem><para>
   Put only a single space or tab between type and value: any additional
-  whitespace will be interpreted as belonging to the value. If you specify
-  an empty value you should still put a single space or tab after the type. 
+  whitespace will be interpreted as belonging to the value.
 </para></listitem>
 <listitem><para>
   A line can be split into multiple lines by appending a backslash
   (<quote><literal>\</literal></quote>) as the line continuation character.
   A good place to split a line is after the question name; a bad place is
-  between type and value. Splitting a line inside the value is normally not
-  supported, with the exception of partitioning recipes.
+  between type and value. Split lines will be joined into a single line
+  with all leading/trailing whitespace condensed to a single space.
 </para></listitem>
 <listitem><para>
   For debconf variables (templates) used in the installer itself, the
@@ -715,7 +714,10 @@ these questions have been asked.
 
 </para><para>
 
-The locale can be used to specify both language and country.
+The locale can be used to specify both language and country and can be any
+combination of a language supported by &d-i; and a recognized country. If
+the combination does not form a valid locale, the installer will automatically
+select a locale that is valid for the selected language.
 To specify the locale as a boot parameter, use
 <userinput>locale=<replaceable>en_US</replaceable></userinput>.
 
