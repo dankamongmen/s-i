@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: install-methods\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-10-17 00:09+0000\n"
-"PO-Revision-Date: 2008-10-23 21:40+0400\n"
+"PO-Revision-Date: 2008-10-24 22:15+0400\n"
 "Last-Translator: D-R L10N Team <debian-l10n-russian@lists.debian.org>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -925,6 +925,10 @@ msgid ""
 "in <xref linkend=\"where-files\"/>) and use the <quote>flexible way</quote> "
 "explained below to copy the files to the USB stick."
 msgstr ""
+"Для использования первого метода установки вам нужно скачать образ программы "
+"установки из каталога <filename>netboot</filename> (о том, где этот каталог см. "
+"<xref linkend=\"where-files\"/>) и воспользоваться <quote>гибким способом</quote>, "
+"описанном ниже, для копирования файлов на карту памяти USB."
 
 #. Tag: para
 #: install-methods.xml:652
@@ -942,10 +946,20 @@ msgid ""
 "from the version of the running kernel. </para> </footnote> during the "
 "installation."
 msgstr ""
+"Установочные образы для второго способа установки можно найти в "
+"каталоге <filename>hd-media</filename>, а для копирования образа использовать, "
+"или <quote>простой способ</quote> или <quote>гибкий способ</quote>. "
+"Для этого способа установки также потребуется скачать CD-образ. "
+"Установочный образ и CD-образ должны быть одного выпуска &d-i;. "
+"Если разных выпусков, то, вероятно, вы получите ошибки "
+"<footnote> <para>Сообщение об ошибке будет, скорее всего, говорить о "
+"ненайденных модулях ядра. Это означает, что версия модулей ядра "
+"udeb с образа CD отличается от версии запущенного ядра.</para> </footnote> при "
+"установке."
 
 #. Tag: para
 #: install-methods.xml:671
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To prepare the USB stick, you will need a system where GNU/Linux is "
 #| "already running and where USB is supported. You should ensure that the "
@@ -965,14 +979,17 @@ msgid ""
 "stick, you may have to turn off its write protection switch."
 msgstr ""
 "Для подготовки карты памяти USB вам нужна работающая система GNU/Linux с "
-"поддержкой USB. Убедитесь, что загружен модуль ядра usb-storage "
-"(<userinput>modprobe usb-storage</userinput>) и попытайтесь выяснить на "
-"какое устройство SCSI отображена карта памяти USB (в примере используется "
-"<filename>/dev/sda</filename>). Также выключите защиту от записи на карту."
+"поддержкой USB. В этой системе карта памяти USB должна автоматически "
+"распознаваться при вставке. Если нет, то убедитесь, что загружен модуль "
+"ядра usb-storage. Когда USB-карта вставлена, то она доступна в системе как "
+"устройство с именем <filename>/dev/sdX</filename>, где <quote>X</quote> "
+"&mdash; это буква из диапазона a-z. Вы можете определить, какое устройство "
+"появилось после вставке карты USB запустив команду "
+"<command>dmesg</command>. Также выключите защиту от записи на карту."
 
 #. Tag: para
 #: install-methods.xml:685
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Using this method will destroy anything already on the device. Make sure "
 #| "that you use the correct device name for your USB stick."
@@ -982,8 +999,10 @@ msgid ""
 "stick. If you use the wrong device the result could be that all information "
 "on for example a hard disk could be lost."
 msgstr ""
-"Естественно, это уничтожит все данные на устройстве, поэтому не ошибитесь в "
-"названии устройства карты памяти USB."
+"Процедура, описанная в этом разделе, уничтожит все данные на устройстве! "
+"Не ошибитесь в названии устройства карты памяти USB. Если вы укажите не "
+"то устройство, это может привести к полной потере информации где-то ещё, "
+"например, на жёстком диске."
 
 #. Tag: para
 #: install-methods.xml:693
@@ -1004,7 +1023,7 @@ msgstr "Копирование файлов &mdash; лёгкий путь"
 
 #. Tag: para
 #: install-methods.xml:702
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
 #| "which contains all the installer files (including the kernel) as well as "
@@ -1018,9 +1037,10 @@ msgid ""
 "and its configuration file.</phrase>"
 msgstr ""
 "Существует файл \"всё-в-одном\" &mdash; <filename>hd-media/boot.img.gz</"
-"filename>, который содержит все файлы установки (включая ядро), а также "
-"<command>SYSLINUX</command> и его файл конфигурации. Вам нужно просто "
-"распаковать его прямо на карту памяти USB:"
+"filename>, который содержит все файлы установки (включая ядро) <phrase arch=\"x86"
+"\">, а также <command>syslinux</command> и его файл настройки.</phrase> "
+"<phrase arch=\"powerpc\">, а также <classname>yaboot</classname> "
+"и его файл настройки.</phrase>"
 
 #. Tag: para
 #: install-methods.xml:711
@@ -1034,12 +1054,20 @@ msgid ""
 "that you cannot copy a full CD image onto the USB stick, but only the "
 "smaller businesscard or netinst CD images."
 msgstr ""
+"Заметим, что хотя этот метод удобен, он имеет большой недостаток: "
+"логический размер устройства ограничен 256 МБ, даже если ёмкость "
+"карты памяти USB гораздо больше. Вам нужно переразметить карту "
+"USB и создать новые файловые системы, чтобы снова получить "
+"всё пространство, если вы хотите использовать его для другой цели. "
+"Вторым недостатком является то, что вы не можете скопировать полный "
+"CD-образ на карту памяти USB,а только CD-образы меньшего размера, например "
+"businesscard или netinst."
 
 #. Tag: para
 #: install-methods.xml:721
 #, no-c-format
 msgid "To use this image you only have to extract it directly to your USB stick:"
-msgstr ""
+msgstr "Для использования образа, вам нужно просто распаковать его прямо на карту памяти USB:"
 
 #. Tag: screen
 #: install-methods.xml:725
@@ -1050,7 +1078,7 @@ msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>"
 
 #. Tag: para
 #: install-methods.xml:727
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
 #| "which contains all the installer files (including the kernel) as well as "
@@ -1063,22 +1091,20 @@ msgid ""
 "<command>mac-fdisk</command>'s <userinput>C</userinput> command and extract "
 "the image directly to that:"
 msgstr ""
-"Существует файл \"всё-в-одном\" <filename>hd-media/boot.img.gz</filename>, "
-"который содержит все файлы установки (включая ядро), а также "
-"<command>yaboot</command> и его файл конфигурации. На карте памяти USB "
-"создайте раздел с типом \"Apple_Bootstrap\" с помощью команды <command>mac-"
-"fdisk</command> <userinput>C</userinput> и распакуйте образ на этот раздел:"
+"На карте памяти USB создайте раздел с типом \"Apple_Bootstrap\" с помощью "
+"команды <command>mac-fdisk</command> <userinput>C</userinput> и "
+"распакуйте образ на этот раздел:"
 
 #. Tag: screen
 #: install-methods.xml:733
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
 msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
-msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
 
 #. Tag: para
 #: install-methods.xml:735
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "After that, mount the USB memory stick (<userinput>mount <replaceable "
 #| "arch=\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/"
@@ -1097,13 +1123,13 @@ msgid ""
 "image to it. Unmount the stick (<userinput>umount /mnt</userinput>) and you "
 "are done."
 msgstr ""
-"После этого, смонтируйте карту памяти USB (<userinput>mount <replaceable "
-"arch=\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/sda2</"
-"replaceable> /mnt</userinput>), которая теперь имеет <phrase arch=\"x86"
+"После этого, смонтируйте карту памяти USB <phrase arch=\"x86\">"
+"(<userinput>mount /dev/<replaceable>sdX</replaceable> <replaceable> /mnt</userinput>), "
+"</phrase> <phrase arch=\"powerpc\">(<userinput>mount /dev/<replaceable>sdX2</"
+"replaceable> /mnt</userinput>),</phrase> которая теперь имеет <phrase arch=\"x86"
 "\">файловую систему FAT</phrase> <phrase arch=\"powerpc\">файловую систему "
-"HFS</phrase> и скопируйте на неё ISO-образ Debian netinst или businesscard "
-"(смотрите <xref linkend=\"usb-add-iso\"/>). Размонтируйте устройство "
-"(<userinput>umount /mnt</userinput>) и всё готово."
+"HFS</phrase> и скопируйте на неё ISO-образ Debian netinst или businesscard. "
+"Размонтируйте устройство (<userinput>umount /mnt</userinput>) и всё готово."
 
 #. Tag: title
 #: install-methods.xml:752
@@ -1113,7 +1139,7 @@ msgstr "Копирование файлов &mdash; гибкий путь"
 
 #. Tag: para
 #: install-methods.xml:753
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "If you like more flexibility or just want to know what's going on, you "
 #| "should use the following method to put the files on your stick."
@@ -1126,7 +1152,9 @@ msgid ""
 msgstr ""
 "Если вам хочется большей гибкости или вы просто хотите знать, что на самом "
 "деле происходит, то можете воспользоваться следующим методом записи файлов "
-"на карту памяти."
+"на карту памяти. Преимущество использования этого метода в том, что если "
+"ёмкость карты USB достаточно велика, то вы можете скопировать на неё "
+"полный образ CD ISO."
 
 #. Tag: title
 #: install-methods.xml:768 install-methods.xml:865
@@ -1147,7 +1175,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:774
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Since most USB sticks come pre-configured with a single FAT16 partition, "
 #| "you probably won't have to repartition or reformat the stick. If you have "
@@ -1169,19 +1197,20 @@ msgid ""
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
 "the <classname>dosfstools</classname> Debian package."
 msgstr ""
-"Большинство карт памяти USB продаются с единственным разделом FAT16 но вам, "
-"вероятно, не хочется переразмечать или форматировать устройство. Если вам "
+"Так как большинство карт памяти USB продаются с единственным разделом FAT16, то вам, "
+"вероятно, не хочется переразмечать или переформатировать устройство. Если вам "
 "всё равно это нужно сделать, воспользуйтесь <command>cfdisk</command> или "
 "любой другой утилитой разметки для создания раздела FAT16, а затем создайте "
-"файловую систему:<informalexample><screen>\n"
-"# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+"файловую систему: "
+"<informalexample><screen>\n"
+"# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Обязательно вводите правильное имя устройства "
 "карты памяти USB. Команда <command>mkdosfs</command> содержится в пакете "
 "Debian <classname>dosfstools</classname>."
 
 #. Tag: para
 #: install-methods.xml:788
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "In order to start the kernel after booting from the USB stick, we will "
 #| "put a boot loader on the stick. Although any boot loader (e.g. "
@@ -1198,17 +1227,17 @@ msgid ""
 "editing a text file. Any operating system which supports the FAT file system "
 "can be used to make changes to the configuration of the boot loader."
 msgstr ""
-"Для запуска ядра после загрузки карты памяти USB, мы поместим на неё "
+"Для запуска ядра после загрузки с карты памяти USB, мы поместим на неё "
 "системный загрузчик. Хотя должен работать любой системный загрузчик "
-"(например, <command>LILO</command>), удобнее использовать <command>SYSLINUX</"
-"command>, так как он использует раздел FAT16 и настраивается простым "
-"редактированием текстового файла. Для изменения конфигурации системного "
+"(например, <command>lilo</command>), удобнее использовать <classname>syslinux</"
+"classname>, так как он использует раздел FAT16 и настраивается простым "
+"редактированием текстового файла. Для настройки системного "
 "загрузчика можно использовать любую операционную систему, которая "
 "поддерживает файловую систему FAT."
 
 #. Tag: para
 #: install-methods.xml:798
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To put <command>SYSLINUX</command> on the FAT16 partition on your USB "
 #| "stick, install the <classname>syslinux</classname> and <classname>mtools</"
@@ -1230,13 +1259,13 @@ msgid ""
 "the file <filename>ldlinux.sys</filename> which contains the boot loader "
 "code."
 msgstr ""
-"Чтобы поместить <command>SYSLINUX</command> на раздел FAT16 карты памяти "
+"Чтобы поместить <classname>syslinux</classname> на раздел FAT16 карты памяти "
 "USB, установите в систему пакеты <classname>syslinux</classname> и "
 "<classname>mtools</classname> и введите <informalexample><screen>\n"
-"# syslinux /dev/<replaceable>sda1</replaceable>\n"
+"# syslinux /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Ещё раз отметим: не ошибитесь в имени "
-"устройства. Раздел не должен быть смонтирован при запуске <command>SYSLINUX</"
-"command>. Эта процедура переписывает загрузочный сектор раздела и создаёт "
+"устройства. Раздел не должен быть смонтирован при запуске <command>syslinux</"
+"command>. Эта процедура записывает загрузочный сектор раздела и создаёт "
 "файл <filename>ldlinux.sys</filename>, который содержит код системного "
 "загрузчика."
 
@@ -1249,7 +1278,7 @@ msgstr "Добавление образа программы установки"
 
 #. Tag: para
 #: install-methods.xml:816
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and "
 #| "copy the following files from the Debian archives to the stick: "
@@ -1271,14 +1300,15 @@ msgid ""
 "want to rename the files, please note that <classname>syslinux</classname> "
 "can only process DOS (8.3) file names."
 msgstr ""
-"Смонтировав раздел (<userinput>mount /dev/sda1 /mnt</userinput>), скопируйте "
-"следующие файлы из архива Debian: <itemizedlist> <listitem><para> "
+"Смонтировав раздел (<userinput>mount /dev/<replaceable>sdX1</replaceable> "
+"/mnt</userinput>), скопируйте следующие файлы образа программы "
+"установки на карту памяти: <itemizedlist> <listitem><para> "
 "<filename>vmlinuz</filename> (файл ядра) </para></listitem> <listitem><para> "
 "<filename>initrd.gz</filename> (образ ramdisk) </para></listitem> "
-"<listitem><para> <filename>syslinux.cfg</filename> (файл настройки SYSLINUX) "
-"</para></listitem> <listitem><para> необязательные модули ядра</para></"
-"listitem> </itemizedlist> Если вы хотите переименовать файлы, учтите, что "
-"<command>SYSLINUX</command> работает только с файловыми именами DOS (8.3)."
+"</itemizedlist> Вы можете выбрать обычную версию программ установки или "
+"версию с графическим интерфейсом. Последнюю можно найти в подкаталоге "
+"<filename>gtk</filename>. Если вы хотите переименовать файлы, учтите, что "
+"<classname>syslinux</classname> работает только с файловыми именами DOS (8.3)."
 
 #. Tag: para
 #: install-methods.xml:840
@@ -1292,6 +1322,14 @@ msgid ""
 "</screen></informalexample> For the graphical installer you should add "
 "<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line."
 msgstr ""
+"Затем, вам нужно создать файл настройки <filename>syslinux.cfg</filename>, "
+"который, как минимум содержит две строки: "
+"<informalexample><screen>\n"
+"default vmlinuz\n"
+"append initrd=initrd.gz\n"
+"</screen></informalexample> Для графической версии программы "
+"установки нужно добавить "
+"<userinput>video=vesa:ywrap,mtrr vga=788</userinput> во вторую строку."
 
 #. Tag: para
 #: install-methods.xml:850 install-methods.xml:952
@@ -1302,10 +1340,14 @@ msgid ""
 "one that fits) onto the stick. When you are done, unmount the USB memory "
 "stick (<userinput>umount /mnt</userinput>)."
 msgstr ""
+"Если вы используете образ <filename>hd-media</filename>, то теперь вы "
+"должны скопировать ISO-образ Debian (businesscard, netinst или полный образ CD; "
+"проверьте, что достаточно места) на карту памяти. После завершения, "
+"размонтируйте карту памяти USB (<userinput>umount /mnt</userinput>)."
 
 #. Tag: para
 #: install-methods.xml:866
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Most USB sticks do not come pre-configured in such a way that Open "
 #| "Firmware can boot from them, so you will need to repartition the stick. "
@@ -1334,12 +1376,13 @@ msgid ""
 msgstr ""
 "С большинства карт памяти USB невозможно сразу загрузиться с помощью Open "
 "Firmware, поэтому вам придётся переразметить карту памяти. На системах Mac, "
-"запустите <userinput>mac-fdisk /dev/sda</userinput>, инициализируйте новую "
-"карту разделов с помощью команды <userinput>i</userinput> и создайте новый "
+"запустите <userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></"
+"userinput>, инициализируйте новую карту разделов с помощью команды "
+"<userinput>i</userinput> и создайте новый "
 "раздел с типом Apple_Bootstrap с помощью команды <userinput>C</userinput>. "
 "(Заметим, что первый \"раздел\" всегда будет сама карта разделов.) Затем "
 "введите <informalexample><screen>\n"
-"$ hformat /dev/<replaceable>sda2</replaceable>\n"
+"$ hformat /dev/<replaceable>sdX2</replaceable>\n"
 "</screen></informalexample> Обязательно вводите правильное имя устройства "
 "USB. Команда <command>hformat</command> содержится в пакете Debian "
 "<classname>hfsutils</classname>."
@@ -1363,7 +1406,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:892
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The normal <command>ybin</command> tool that comes with <command>yaboot</"
 #| "command> does not yet understand USB storage devices, so you will have to "
@@ -1398,10 +1441,10 @@ msgid ""
 "utilities."
 msgstr ""
 "Обычная утилита <command>ybin</command>, идущая вместе с <command>yaboot</"
-"command>, не понимает карт памяти USB, поэтому вам нужно установить "
+"command>, пока не умеет работать с картами памяти USB, поэтому вам нужно установить "
 "<command>yaboot</command> вручную с помощью утилит <classname>hfsutils</"
 "classname>. Введите <informalexample><screen>\n"
-"$ hmount /dev/sda2\n"
+"$ hmount /dev/<replaceable>sdX2</replaceable>\n"
 "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
 "$ hattrib -c UNIX -t tbxi :yaboot\n"
 "$ hattrib -b :\n"
