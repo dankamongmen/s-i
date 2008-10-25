@@ -1,4 +1,4 @@
-<!-- original version: 56473 -->
+<!-- original version: 56510 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -573,15 +573,14 @@ Voici quelques règles pour écrire un fichier de préconfiguration.
 <itemizedlist>
 <listitem><para>
   Un seul espace (ou tabulation) autorisé entre le type et la valeur.
-  Tout autre espace sera considéré comme appartenant à la valeur. Si vous spécifiez
-  une valeur vide, vous devez malgré tout mettre un espace ou une tabulation après le type. 
+  Tout autre espace sera considéré comme appartenant à la valeur.
 </para></listitem>
 <listitem><para>
   Une ligne peut être divisée en ajoutant une barre oblique inverse
   (<quote><literal>\</literal></quote>) pour signifier la continuation de la ligne.
   Il vaut mieux couper la ligne après le nom de la question.
-  Ce n'est pas très heureux de la couper entre le type et la valeur. Couper la ligne
-  à l'intérieur de la valeur n'est pas autorisé, sauf dans le cas des schémas de partitionnement.
+  Ce n'est pas très heureux de la couper entre le type et la valeur. Les lignes coupées
+  seront réunies en une seule ligne et tous les espaces superflus condensés en un seul.
 </para></listitem>
 <listitem><para>
   Le propriétaire des variables debconf utilisées dans l'installateur lui-même
@@ -681,11 +680,14 @@ qu'après que les questions ont été posées.
 </para><para>
 
 Une locale peut être choisie pour indiquer à la fois la langue et le pays.
+Toute combinaison d'une langue reconnue par l'installateur et d'un pays valable
+est acceptée. Si la combinaison ne forme pas une locale valable, l'installateur
+choisira automatiquement une locale correspondant à la langue sélectionnée.
 Pour indiquer une locale sous forme de paramètre d'amorçage, écrivez&nbsp;:
 <userinput>locale=<replaceable>fr_FR</replaceable></userinput>.
 
 <informalexample role="example"><screen>
-# indiquer à la fois la langue et le pays :
+# Pour indiquer à la fois la langue et le pays :
 d-i debian-installer/locale string fr_FR
 </screen></informalexample>
 
