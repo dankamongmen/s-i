@@ -650,10 +650,9 @@ Section "Debian-Installer Loader"
   DetailPrint "$(generating)"
   FileOpen $0 $c\grub.cfg w
   FileWrite $0 "\
-search	--set /debian/initrd.gz$\n\
 linux	/debian/linux $preseed_cmdline$\n\
 initrd	/debian/initrd.gz$\n\
-boot"
+boot$\n"
   FileClose $0
 
 ; ********************************************** cpio hack
