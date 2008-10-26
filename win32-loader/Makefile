@@ -49,8 +49,8 @@ win32-loader.exe: main.nsi maps.ini \
 	$(MAKENSIS) main.nsi
 	du -h win32-loader.exe
 
-license: license.in
-	sed -e "s/@VERSION@/$(VERSION)/g" < $^ > $@
+license: license.in debian/changelog
+	sed -e "s/@VERSION@/$(VERSION)/g" < $< > $@
 
 plugins/cpuid/test64.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c
 	$(CC) $(CFLAGS) $^ -shared -o $@
