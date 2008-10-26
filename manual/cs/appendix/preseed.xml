@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 56253 -->
+<!-- original version: 56510 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -649,7 +649,8 @@ několik pravidel.
   tak, že na konec řádku přidáte znak pro pokračování řádku
   <quote><literal>\</literal></quote> (zpětné lomítko). Je vhodné
   rozdělit řádek mezi názvem a typem otázky, ne mezi typem
-  a hodnotou.
+  a hodnotou. Po spojení řádků bude bílé místo ze začátku/konce řádku
+  spojeno do jediné mezery.
 </para></listitem>
 <listitem><para>
   Pro debconf proměnné (šablony), které jsou součástí samotného
@@ -760,6 +761,11 @@ i země. Například pomocí zaváděcího parametru jádra můžete zadat
 # Locale nastaví jazyk i zemi.
 d-i debian-installer/locale string cs_CZ
 </screen></informalexample>
+
+Zadat můžete libovolnou kombinaci jazyka podporovaného v &d-i;
+a země. Pokud kombinace netvoří platné prostředí, vybere instalační
+systém kombinaci tak, že se pokusí zachovat jazyk a k němu vybere
+platnou zemi.
 
 </para><para>
 
@@ -973,14 +979,12 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 
 <informalexample role="example"><screen>
 # Pokud má systém volné místo, můžete je vybrat k automatickému rozdělení.
-# Pozn: hodnota musí být lokalizována (přeložena).
-#d-i partman-auto/init_automatically_partition \
-#      select Asistované - použít největší spojité volné místo
+#d-i partman-auto/init_automatically_partition select biggest_free
 
 # Alternativně můžete zadat k automatickému dělení celý disk. Název
 # zařízení musí být v tradičním formátu (ne ve formátu devfs).
-# Například pro použití prvního SCSI/SATA disku:
 # Poznámka: pokud má systém více disků, musíte nějaký zadat.
+# Například pro použití prvního SCSI/SATA disku:
 #d-i partman-auto/disk string /dev/sda
 
 # Dále musíte zvolit metodu, která se má použít. Momentálně jsou
@@ -996,14 +1000,12 @@ d-i partman-lvm/confirm boolean true
 # A platí i pro odstranění pozůstatků předchozího softwarového RAIDu:
 d-i parman-md/device_remove_md boolean true
 
-# Můžete vybrat libovolné z přednastavených schémat dělení.
-# Pozn: hodnota musí být lokalizována (přeložena).
-d-i partman-auto/choose_recipe \
-       select Všechny soubory v jedné oblasti (doporučeno pro začátečníky)
-#d-i partman-auto/choose_recipe \
-#       select Samostatná oblast pro /home
-#d-i partman-auto/choose_recipe \
-#       select Samostatné oblasti pro /home, /usr, /var a /tmp
+# Můžete vybrat jedno ze tří připravených schémat dělení.
+# - atomic: všechny soubory v jedné oblasti
+# - home:   samostatná oblast /home
+# - multi:  samostatné oblasti /home, /usr, /var a /tmp
+d-i partman-auto/choose_recipe select atomic
+
 
 # Nebo zadat váš vlastní návod na dělení...
 # Formát návodu je popsán v souboru devel/partman-auto-recipe.txt.
@@ -1035,8 +1037,7 @@ d-i partman-auto/choose_recipe \
 # (Za předpokladu, že jste partmanu v předchozích krocích řekli,
 # co má dělat.)
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 

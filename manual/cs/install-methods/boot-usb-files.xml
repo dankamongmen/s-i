@@ -1,20 +1,58 @@
 <!-- $Id$ -->
-<!-- original version: 45616 -->
+<!-- original version: 56442 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Příprava souborů pro zavedení z USB zařízení</title>
 
 <para>
 
-Pro přípravu USB zařízení budete potřebovat počítač s nainstalovaným
-GNU/Linuxem a podporou USB. Pokud používáte jaderný modul usb-storage,
-ujistěte se, že je nahraný (<userinput>modprobe
-usb-storage</userinput>) a zkuste zjistit, na které zařízení je
-navázána vaše USB klíčenka (v tomto příkladu používáme
-<filename>/dev/sda</filename>). Pokud klíčenka obsahuje ochranu proti
-zápisu, vypněte ji.
+Při zavádění instalace z USB klíčenky jsou možné dva postupy. U prvního
+se instaluje kompletně ze sítě, druhý navíc na USB klíčence obsahuje
+ISO obraz instalačního systému, který se použije jako zdroj balíků pro
+instalaci (volitelně s použitím síťového zrcadla). Druhý postup je
+běžnější.
 
 </para><para>
+
+U prvního způsobu budete muset stáhnout obraz instalátoru z adresáře
+<filename>netboot</filename> (viz kapitola <xref linkend="where-files"/>)
+a dostat jej na USB klíčenku pomocí <quote>pružné cesty</quote> popsané
+níže.
+
+</para><para>
+
+Instalační obrazy pro druhý způsob se nachází v adresáři
+<filename>hd-media</filename> a funguje pro ně jak
+<quote>jednoduchá</quote>, tak <quote>pružná</quote> cesta. Mimo to
+budete muset pro tento způsob instalace stáhnout také obraz prvního
+instalačního CD, které je založeno na stejné verzi &d-i;. Nebudou-li
+verze souhlasit, nejspíš narazíte během instalace na chyby.<footnote>
+
+<para>
+
+Nejtypičtejší chybová hláška je, že nebyly nalezeny jaderné moduly. To
+znamená, že se liší verze modulů na obrazu CD a verze běžícího jádra.
+
+</para></footnote></para><para>
+
+Pro přípravu USB zařízení budete potřebovat počítač s nainstalovaným
+GNU/Linuxem a podporou USB. Dnešní systémy GNU/Linuxu by měly USB
+klíčenku rozpoznat automaticky. Pokud tomu tak není, ověřte, zda je
+nahraný jaderný modul usb-storage. Po zasunutí USB klíčenky ji systém
+naváže na zařízení <filename>/dev/sdX</filename>, kde
+<replaceable>X</replaceable> je písmeno z rozsahu a-z. Přesný název
+zařízení zjistíte z příkazu <command>dmesg</command>, kde by měl být
+o zasunutí a rozpoznání USb zařízení záznam. Pokud klíčenka obsahuje
+ochranu proti zápisu, vypněte ji.
+
+</para><warning><para>
+
+Postupem popsaným dále v kapitole si smažete všechna data, která se na
+zařízení nachází! Před spuštěním příkazů se raději několikrát
+ujistěte, že jste zařízení zadali správně, protože i drobný překlep
+může způsobit, že si smažete data na pevném disku.
+
+</para></warning><para>
 
 USB klíčenka by měla mít velikost alespoň 256 MB. Menší velikosti jsou
 podporovány pouze při ruční výrobě podle <xref
@@ -24,45 +62,53 @@ linkend="usb-copy-flexible"/>.
 
   <sect2 id="usb-copy-easy">
   <title>Kopírování souborů &mdash; jednoduchá cesta</title>
-<para arch="x86">
+<para>
 
 K dispozici máte soubor <filename>hd-media/boot.img.gz</filename>,
 který obsahuje všechny instalační soubory (včetně jádra), zavaděč
-<command>SYSLINUX</command> a jeho konfigurační soubor. Jediné co
-musíte udělat, je rozbalit ho na USB zařízení:
+<phrase arch="x86"><classname>syslinux</classname></phrase>
+<phrase arch="powerpc"><classname>yaboot</classname></phrase> a jeho
+konfigurační soubor.
+
+</para><para>
+
+I když je tento způsob vytvoření zaváděcího USB média pohodlný, má
+jednu zásadní nevýhodu: logická velikost zařízení bude vždy omezena na
+256 MB, i když je skutečná kapacita USB klíčenky mnohonásobně
+větší. Budete-li ji chtít někdy v budoucnu použít k jinému účelu a
+budete-li vyžadovat její celou kapacitu, budete ji muset přerozdělit a
+znovu vytvořit souborový systém. Druhá nevýhoda přímo vyplývá z té
+první: nikdy nebudete moci na USB klíčenku nakopírovat obraz velkého
+CD, vždy budete omezeni na menší obrazy businesscard a netinst.
+
+</para><para arch="x86">
+
+Jediné co musíte se staženým <filename>boot.img.gz</filename> udělat,
+je rozbalit ho na USB zařízení:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sda</replaceable></userinput>
+<prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sdX</replaceable></userinput>
 </screen></informalexample>
 
 </para><para arch="powerpc">
 
-K dispozici máte soubor <filename>hd-media/boot.img.gz</filename>,
-který obsahuje všechny instalační soubory (včetně jádra), zavaděč
-<command>yaboot</command> a jeho konfigurační soubor. Na USB zařízení
-vytvořte <command>mac-fdisk</command>em oblast typu
+Na USB zařízení vytvořte <command>mac-fdisk</command>em oblast typu
 <quote>Apple_Bootstrap</quote> (příkaz <userinput>C</userinput>)
-a rozbalte do ní stažený obraz:
+a stažený obraz do ní rozbalte:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sda2</replaceable></userinput>
+<prompt>#</prompt> <userinput>gzip -dc boot.img.gz &gt;/dev/<replaceable>sdX2</replaceable></userinput>
 </screen></informalexample>
 
-</para><warning><para>
+</para><para>
 
-Tímto zničíte veškerá data na zařízení, takže se raději dvakrát
-přesvědčte, že pro svou klíčenku používáte správné jméno zařízení.
-
-</para></warning><para>
-
-Na klíčence nyní bude jedna velká oblast typu <phrase
-arch="x86">FAT16.</phrase> <phrase arch="powerpc">HFS.</phrase>
-Připojte ji (<userinput>mount <replaceable
-arch="x86">/dev/sda</replaceable> <replaceable
-arch="powerpc">/dev/sda2</replaceable> /mnt</userinput>) a nakopírujte
-na ni ISO obraz malého instalačního CD (viz <xref
-linkend="usb-add-iso"/>). Nyní stačí klíčenku odpojit
-(<userinput>umount /mnt</userinput>) a je hotovo.
+Na klíčence nyní bude jedna velká oblast typu
+<phrase arch="x86">FAT16.</phrase> <phrase arch="powerpc">HFS.</phrase>
+Připojte ji (<userinput>mount
+<replaceable arch="x86">/dev/sdX</replaceable>
+<replaceable arch="powerpc">/dev/sdX2</replaceable> /mnt</userinput>)
+a nakopírujte na ni ISO obraz malého instalačního CD. Nyní stačí
+klíčenku odpojit (<userinput>umount /mnt</userinput>) a je hotovo.
 
 </para>
   </sect2>
@@ -83,33 +129,6 @@ jak místo celého USB zařízení použít pouze první oblast.</phrase>
 
   </sect2>
 
-  <sect2 id="usb-add-iso">
-  <title>Přidání ISO obrazu</title>
-<para>
-
-Instalační systém bude na USB zařízení hledat ISO obraz instalačního
-CD, ze kterého si zkopíruje další data potřebná pro instalaci. Dalším
-krokem je tedy nakopírování ISO obrazu instalačního CD na
-klíčenku. Použít můžete obrazy typu businesscard, netinst nebo, pokud
-se vejde, dokonce celé první CD. Na názvu obrazu nezáleží, ale musí
-končit příponou <filename>.iso</filename>.
-
-</para><para>
-
-Pokud nechcete použít ISO obraz a místo toho budete chtít instalovat
-ze sítě, předchozí krok samozřejmě přeskočte. Kromě toho budete muset
-použít ramdisk (<filename>initrd.gz</filename>) z adresáře
-<filename>netboot</filename>, protože ramdisk v adresáři
-<filename>hd-media</filename> neobsahuje podporu pro instalaci ze sítě.
-
-</para><para>
-
-Jestliže jste hotovi, odpojte klíčenku (<userinput>umount
-/mnt</userinput>) a zapněte ochranu proti zápisu.
-
-</para>
-  </sect2>
-
   <!-- TODO: doesn't this section belong later? -->
   <sect2 arch="x86">
   <title>Problémy se zaváděním z USB klíčenky</title>
@@ -121,7 +140,7 @@ programem <command>install-mbr</command> z balíku
 <classname>mbr</classname>:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>install-mbr /dev/<replaceable>sda</replaceable></userinput>
+<prompt>#</prompt> <userinput>install-mbr /dev/<replaceable>sdX</replaceable></userinput>
 </screen></informalexample>
 
 </para></warning>

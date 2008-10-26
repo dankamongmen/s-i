@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 56425 -->
+<!-- original version: 56442 -->
 
    <sect3 arch="x86">
    <title>Rozdělení USB zařízení</title>
@@ -12,7 +12,7 @@ však musíte provést, použijte pro vytvoření této oblasti
 vytvořte souborový systém příkazem
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>mkdosfs /dev/<replaceable>sda1</replaceable></userinput>
+<prompt>#</prompt> <userinput>mkdosfs /dev/<replaceable>sdX1</replaceable></userinput>
 </screen></informalexample>
 
 Příkaz <command>mkdosfs</command> je obsažen v balíku
@@ -22,29 +22,35 @@ používáte správný název zařízení!
 </para></note><para>
 
 Pro zavedení jádra z klíčenky je zapotřebí zavaděče. Přestože byste
-mohli použít téměř libovolný zavaděč (např. <command>LILO</command>),
-je zvykem používat <command>SYSLINUX</command>, protože používá oblast
+mohli použít téměř libovolný zavaděč (např. <classname>lilo</classname>),
+je zvykem používat <classname>syslinux</classname>, protože používá oblast
 typu FAT16 a jeho nastavení se provádí úpravou jednoduchého textového
 souboru. Díky tomu můžete zavaděč konfigurovat z téměř libovolného
 operačního systému.
 
 </para><para>
 
-Pro instalaci <command>SYSLINUX</command>u na 1. oblast USB klíčenky
+Pro instalaci <classname>syslinux</classname>u na 1. oblast USB klíčenky
 musíte mít nainstalované balíky <classname>syslinux</classname> a
 <classname>mtools</classname> a daná oblast nesmí být připojená. Poté
 zadejte příkaz
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>syslinux /dev/<replaceable>sda1</replaceable></userinput>
+<prompt>#</prompt> <userinput>syslinux /dev/<replaceable>sdX1</replaceable></userinput>
 </screen></informalexample>
 
 čímž se na začátek oblasti zapíše zaváděcí sektor a vytvoří se soubor
 <filename>ldlinux.sys</filename>, který obsahuje hlavní část zavaděče.
 
-</para><para>
+</para>
+   </sect3>
 
-Připojte oblast (<userinput>mount /dev/sda1 /mnt</userinput>)
+   <sect3 arch="x86">
+   <title>Přidání obrazu instalačního systému</title>
+<para>
+
+Připojte oblast
+(<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
 a nakopírujte na ni následující soubory:
 
 <itemizedlist>
@@ -58,31 +64,34 @@ a nakopírujte na ni následující soubory:
 <filename>initrd.gz</filename> (obraz ramdisku)
 
 </para></listitem>
-<listitem><para>
-
-<filename>syslinux.cfg</filename> (konfigurační soubor SYSLINUXu)
-
-</para></listitem>
-<listitem><para>
-
-volitelné jaderné moduly
-
-</para></listitem>
 </itemizedlist>
 
-Pokud si chcete soubory přejmenovat, pamatujte, že
-<command>SYSLINUX</command> umí pracovat pouze s DOSovými (8.3) názvy
-souborů.
+Chcete-li použít grafickou verzi instalátoru, použijte soubory
+z podadresáře <filename>gtk</filename>. Pokud si chcete soubory
+přejmenovat, pamatujte, že
+<classname>syslinux</classname> umí pracovat pouze s DOSovými názvy
+souborů (8.3).
 
 </para><para>
 
-Konfigurační soubor <filename>syslinux.cfg</filename> by měl obsahovat
-následující dvě řádky:
+Dále si vytvořte konfigurační soubor <filename>syslinux.cfg</filename>,
+který by měl obsahovat alespoň následující dva řádky:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+Pro grafickou instalaci byste na druhý řádek měli přidat ještě
+parametry <userinput>video=vesa:ywrap,mtrr vga=788</userinput>.
+
+</para><para>
+
+Pokud jste použili obraz <filename>hd-media</filename>, měli byste
+nyní na klíčenku nakopírovat ISO obraz s instalací &debian;u (použít
+můžete obrazy typu businesscard, netinst nebo, pokud se vejde, dokonce
+celé první CD) a následně USB klíčenku odpojit (<userinput>umount
+/mnt</userinput>).
 
 </para>
    </sect3>
