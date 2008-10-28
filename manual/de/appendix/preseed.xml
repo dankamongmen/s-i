@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56473 -->
+<!-- original version: 56510 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -632,16 +632,16 @@ eine Voreinstellungsdatei schreibt:
 <listitem><para>
   Fügen Sie zwischen Typ und Wert nur ein einzelnes Leerzeichen oder einen Tab
   ein; jedes zusätzliche Leerzeichen wird interpretiert, als ob es zum Wert
-  gehört. Wenn Sie einen leeren Wert angeben möchten, sollte hinter dem Typ
-  nur ein einzelnes Leerzeichen oder ein Tab folgen.
+  gehört.
 </para></listitem>
 <listitem><para>
   Eine Zeile kann in mehrere aufgeteilt werden, indem ein Backslash
-  (<quote><literal>\</literal></quote>) als Zeilenvorsetzungszeichen angefügt
+  (<quote><literal>\</literal></quote>) als Zeilenfortsetzungszeichen angefügt
   wird. Eine gute Stelle, um die Zeile aufzuteilen, ist hinter dem Namen der Frage;
-  eine schlechte ist zwischen Typ und Wert. Eine Zeile inmitten des Wertes
-  aufzuteilen wird normalerweise nicht unterstützt; einzige Ausnahme sind
-  Partitionierungsrezepte.
+  eine schlechte ist zwischen Typ und Wert. Solche geteilten Zeilen werden in eine
+  einzige zusammengeführt, wobei alle führenden (vor dem Backslash) und
+  folgenden Leerzeichen (hinter dem Backslash) in ein einziges Leerzeichen
+  konvertiert werden.
 </para></listitem>
 <listitem><para>
   Für debconf-Variablen (Templates), die im Installer selbst benutzt werden,
@@ -759,8 +759,13 @@ geladen, nachdem diese Fragen gestellt wurden.
 </para><para>
 
 Die Locale kann verwendet werden, um sowohl Sprache als auch Land anzugeben.
+Sie kann jede Kombination aus einer vom &d-i; unterstützten Sprache und einem
+anerkannten Land (jeweils als Kürzel) enthalten. Falls die angegebene Kombination
+keine gültige Locale bildet, wählt der Installer automatisch eine Locale, die 
+für die gewählte Sprache passend ist.
 Um die Locale als Boot-Parameter festzulegen, nutzen Sie
-<userinput>locale=<replaceable>de_DE</replaceable></userinput>.
+<userinput>locale=<replaceable>de_DE</replaceable></userinput>
+(Beispiel de_DE: deutsch - Deutschland).
 
 <informalexample role="example"><screen>
 # Die Locale setzt Sprache und Land.
