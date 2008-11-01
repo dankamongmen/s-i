@@ -2,7 +2,7 @@
 " Language:	Debian di-netboot-assistant's  di-sources.list
 " Maintainer:	Frank Lin PIAT <fpiat@klabs.be>
 " Last Change:	2008/06/07
-" URL: http://www.klabs.be/~fpiat/linux/debian/di-netboot-assistant/
+" URL: http://wiki.debian.org/DebianInstaller/NetbootAssistant
 " $Revision: 1.1 $
 
 " this is a very simple syntax file, based on Matthijs Mohlmann's debsources.vim
