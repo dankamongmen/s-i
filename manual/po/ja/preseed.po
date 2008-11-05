@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-10-26 00:10+0000\n"
-"PO-Revision-Date: 2008-10-08 23:22+0900\n"
+"PO-Revision-Date: 2008-10-27 22:18+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -1012,7 +1012,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:574
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Put only a single space or tab between type and value: any additional "
 #| "whitespace will be interpreted as belonging to the value."
@@ -1021,11 +1021,12 @@ msgid ""
 "whitespace will be interpreted as belonging to the value."
 msgstr ""
 "型と値の間には、空白かタブを 1 つだけおいてください。空白を追加すると、値の一"
-"部として解釈されます。"
+"部として解釈されます。空値を指定する場合は、型の後に空白かタブを、ひとつ記述"
+"したままにしてください。"
 
 #. Tag: para
 #: preseed.xml:578
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "A line can be split into multiple lines by appending a backslash "
 #| "(<quote><literal>\\</literal></quote>) as the line continuation "
@@ -1040,7 +1041,8 @@ msgid ""
 msgstr ""
 "行継続文字としてバックスラッシュ (<quote><literal>\\</literal></quote>) を付"
 "けて複数行に分割できます。質問名の後で分割するのが適当でしょう。型と値の間は"
-"よくありません。"
+"よくありません。値の途中で行を分割するのは、パーティション分割のレシピを除い"
+"て、サポートしていません。"
 
 #. Tag: para
 #: preseed.xml:585
@@ -1220,7 +1222,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:686
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The locale can be used to specify both language and country. To specify "
 #| "the locale as a boot parameter, use <userinput>locale=<replaceable>en_US</"
@@ -1233,9 +1235,11 @@ msgid ""
 "specify the locale as a boot parameter, use "
 "<userinput>locale=<replaceable>en_US</replaceable></userinput>."
 msgstr ""
-"ロケールは言語と国を両方指定します。ブートパラメータでロケールを指定するに"
-"は、<userinput>locale=<replaceable>en_US</replaceable></userinput> としてくだ"
-"さい。"
+"ロケールは言語と国を両方指定でき、&d-i; がサポートする言語と認識する国のいず"
+"れかの組み合わせでもかまいません。組み合わせが正しいロケールの形になっていな"
+"い場合、インストーラは選択した言語から正しいロケールを自動選択します。ブート"
+"パラメータでロケールを指定するには、<userinput>locale=<replaceable>en_US</"
+"replaceable></userinput> としてください。"
 
 #. Tag: screen
 #: preseed.xml:695
@@ -1626,7 +1630,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:833
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1762,14 +1766,12 @@ msgid ""
 "d-i partman/confirm boolean true"
 msgstr ""
 "# If the system has free space you can choose to only partition that space.\n"
-"# Note: this must be preseeded with a localized (translated) value.\n"
-"#d-i partman-auto/init_automatically_partition \\\n"
-"#      select Guided - use the largest continuous free space\n"
+"#d-i partman-auto/init_automatically_partition select biggest_free\n"
 "\n"
 "# Alternatively, you can specify a disk to partition. The device name must\n"
 "# be given in traditional non-devfs format.\n"
-"# For example, to use the first SCSI/SATA hard disk:\n"
 "# Note: A disk must be specified, unless the system has only one disk.\n"
+"# For example, to use the first SCSI/SATA hard disk:\n"
 "#d-i partman-auto/disk string /dev/sda\n"
 "# In addition, you'll need to specify the method to use.\n"
 "# The presently available methods are: \"regular\", \"lvm\" and \"crypto\"\n"
@@ -1784,14 +1786,11 @@ msgstr ""
 "# And the same goes for the confirmation to write the lvm partitions.\n"
 "d-i partman-lvm/confirm boolean true\n"
 "\n"
-"# You can choose from any of the predefined partitioning recipes.\n"
-"# Note: this must be preseeded with a localized (translated) value.\n"
-"d-i partman-auto/choose_recipe \\\n"
-"       select All files in one partition (recommended for new users)\n"
-"#d-i partman-auto/choose_recipe \\\n"
-"#       select Separate /home partition\n"
-"#d-i partman-auto/choose_recipe \\\n"
-"#       select Separate /home, /usr, /var, and /tmp partitions\n"
+"# You can choose one of the three predefined partitioning recipes:\n"
+"# - atomic: all files in one partition\n"
+"# - home:   separate /home partition\n"
+"# - multi:  separate /home, /usr, /var, and /tmp partitions\n"
+"d-i partman-auto/choose_recipe select atomic\n"
 "\n"
 "# Or provide a recipe of your own...\n"
 "# The recipe format is documented in the file devel/partman-auto-recipe."
@@ -1824,8 +1823,7 @@ msgstr ""
 "# This makes partman automatically partition without confirmation, provided\n"
 "# that you told it what to do using one of the methods above.\n"
 "d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
+"d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
 #. Tag: title
@@ -1852,7 +1850,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:849
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "This type of automated partitioning is easy to get wrong. It is also a "
 #| "very new component that may still have some bugs or missing error "
@@ -1866,14 +1864,15 @@ msgid ""
 "sense and don't conflict) lies with the user. Check <filename>/var/log/"
 "syslog</filename> if you run into problems."
 msgstr ""
-"自動パーティション分割でのこの形式は、誤動作をしやすいです。また、とても新し"
-"いコンポーネントで、まだバグやエラー処理漏れがあるはずです。様々な条件で正し"
-"く動作するかの責任 (理解でき衝突しない限り) は、ユーザの側にあります。問題が"
-"発生したら、<filename>/var/log/syslog</filename> をチェックしてください。"
+"自動パーティション分割でのこの形式は、誤動作をしやすいです。またこの機能は、"
+"&d-i; の開発者によって、相対的にまだあまりテストを受けていません。様々な条件"
+"で正しく動作するかの責任 (理解でき衝突しない限り) は、ユーザの側にあります。"
+"問題が発生したら、<filename>/var/log/syslog</filename> をチェックしてくださ"
+"い。"
 
 #. Tag: screen
 #: preseed.xml:859
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
 #| "carefully\n"
@@ -2017,8 +2016,7 @@ msgstr ""
 "# This makes partman automatically partition without confirmation.\n"
 "d-i partman-md/confirm boolean true\n"
 "d-i partman/confirm_write_new_label boolean true\n"
-"d-i partman/choose_partition \\\n"
-"       select Finish partitioning and write changes to disk\n"
+"d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
 #. Tag: title

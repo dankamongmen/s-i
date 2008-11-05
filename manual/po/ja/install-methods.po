@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-10-17 00:09+0000\n"
-"PO-Revision-Date: 2008-10-08 23:03+0900\n"
+"PO-Revision-Date: 2008-10-23 01:13+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -916,6 +916,10 @@ msgid ""
 "a CD image onto the USB stick and use that as a source for packages, "
 "possibly in combination with a mirror. This second method is the more common."
 msgstr ""
+"USB メモリから起動した際に、利用できるインストール法が 2 つあります。ひとつ"
+"は、完全にネットワークからインストールする方法、2 つめは、CD イメージを USB "
+"メモリにコピーし、パッケージをそこから (可能であればミラーサイトも組み合わせ"
+"て) インストールする方法です。"
 
 #. Tag: para
 #: install-methods.xml:644
@@ -926,6 +930,10 @@ msgid ""
 "in <xref linkend=\"where-files\"/>) and use the <quote>flexible way</quote> "
 "explained below to copy the files to the USB stick."
 msgstr ""
+"ひとつめのインストール法では、<filename>netboot</filename> ディレクトリ (場所"
+"は <xref linkend=\"where-files\"/> で言及) からインストーライメージをダウン"
+"ロードする必要があります。また、以下で説明する <quote>柔軟な方法</quote> で、"
+"USB メモリにファイルを書き込んでください。"
 
 #. Tag: para
 #: install-methods.xml:652
@@ -943,10 +951,19 @@ msgid ""
 "from the version of the running kernel. </para> </footnote> during the "
 "installation."
 msgstr ""
+"2 つめのインストール法向けのインストールメディアは <filename>hd-media</"
+"filename> にあり、このイメージを USB メモリにコピーして、<quote>簡単な方法</"
+"quote> にも <quote>柔軟な方法</quote> にも使用できます。このインストール法で"
+"は、CD イメージもダウンロードする必要があるでしょう。インストールイメージと "
+"CD イメージは &d-i; の同じリリースのものでなければなりません。同じものを使用"
+"しないと、おそらくインストール中にエラーになるでしょう<footnote> <para> もっ"
+"とも起こりそうなエラーは、カーネルモジュールが見つからないというものです。こ"
+"れは、CD イメージにあるカーネルモジュール udeb のバージョンが、実行中のカーネ"
+"ルのバージョンと異なることを表しています。</para> </footnote>。"
 
 #. Tag: para
 #: install-methods.xml:671
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To prepare the USB stick, you will need a system where GNU/Linux is "
 #| "already running and where USB is supported. You should ensure that the "
@@ -965,16 +982,18 @@ msgid ""
 "the command <command>dmesg</command> after inserting it. To write to your "
 "stick, you may have to turn off its write protection switch."
 msgstr ""
-"USB メモリの準備をするには、 GNU/Linux が既に動いていて、USB をサポートしてい"
-"るシステムが必要になります。 usb-storage カーネルモジュールをきちんとロードし"
-"て (<userinput>modprobe usb-storage</userinput>)、 USB メモリをマッピングして"
-"いるのがどの SCSI デバイスかを検出してみるべきです。 (この例では <filename>/"
-"dev/sda</filename> を使用します) USB メモリに書き込むために、 ライトプロテク"
-"トスイッチを切る必要があります。"
+"USB メモリの準備をするには、GNU/Linux が既に動いていて、USB をサポートしてい"
+"るシステムが必要になります。現在の GNU/Linux では、USB メモリを挿すと自動的に"
+"認識するでしょう。そうならない場合は、usb-storage カーネルモジュールをロード"
+"しているかを確認してください。USB メモリを挿すと、<filename>/dev/sdX</"
+"filename>  (<quote>X</quote> は a〜zの範囲の文字) というデバイスにマッピング"
+"されます。どのデバイスが USB メモリかは、挿した後で <command>dmesg</command> "
+"コマンドを実行すると見られます。USB メモリに書き込むには、ライトプロテクトス"
+"イッチを切る必要があります。"
 
 #. Tag: para
 #: install-methods.xml:685
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Using this method will destroy anything already on the device. Make sure "
 #| "that you use the correct device name for your USB stick."
@@ -984,8 +1003,9 @@ msgid ""
 "stick. If you use the wrong device the result could be that all information "
 "on for example a hard disk could be lost."
 msgstr ""
-"この方法を使うとデバイス上の既存の物は破壊されてしまいます。 USB メモリの正し"
-"いデバイス名を確認して使用してください。"
+"この方法を使うとデバイス上の既存の物は破壊されてしまいます! USB メモリの正し"
+"いデバイス名を必ず確認して使用してください。間違ったデバイス名を使用すると、"
+"例えばハードディスク内のすべてのデータを失うといったことが起こります。"
 
 #. Tag: para
 #: install-methods.xml:693
@@ -1005,7 +1025,7 @@ msgstr "ファイルのコピー &mdash; 簡単な方法"
 
 #. Tag: para
 #: install-methods.xml:702
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
 #| "which contains all the installer files (including the kernel) as well as "
@@ -1018,10 +1038,11 @@ msgid ""
 "phrase> <phrase arch=\"powerpc\">as well as <classname>yaboot</classname> "
 "and its configuration file.</phrase>"
 msgstr ""
-"<command>SYSLINUX</command> や その設定ファイルと同様に、 (カーネルを含む) イ"
-"ンストーラの全ファイルが入った <filename>hd-media/boot.img.gz</filename> とい"
-"う オールインワンファイルがあります。 以下のように USB メモリに直接展開してく"
-"ださい。"
+"<phrase arch=\"x86\"><classname>syslinux</classname> や、その設定ファイルと同"
+"様に、</phrase><phrase arch=\"powerpc\"><classname>yaboot</classname> や、そ"
+"の設定ファイルと同様に、</phrase>(カーネルを含む) インストーラの全ファイルが"
+"入った <filename>hd-media/boot.img.gz</filename> というオールインワンファイル"
+"があります。"
 
 #. Tag: para
 #: install-methods.xml:711
@@ -1035,24 +1056,30 @@ msgid ""
 "that you cannot copy a full CD image onto the USB stick, but only the "
 "smaller businesscard or netinst CD images."
 msgstr ""
+"これは便利ですが、この方法にはひとつの大きな欠点があることに注意してくださ"
+"い。USB メモリの容量がもっと大きかったとしても、デバイスの論理サイズが 256 "
+"MB に制限されます。他の用途にも使用したい場合は、全容量を確保し直すため、USB "
+"メモリをパーティション分割し直し、新しいファイルシステムを作成する必要があり"
+"ます。2 つめの欠点は、フル CD イメージを USB メモリにコピーはできず、もっと小"
+"さい businesscard や netinst の CD イメージしか使えないことです。"
 
 #. Tag: para
 #: install-methods.xml:721
 #, no-c-format
 msgid ""
 "To use this image you only have to extract it directly to your USB stick:"
-msgstr ""
+msgstr "このイメージを使用するには、USB メモリに直接展開するしかありません。"
 
 #. Tag: screen
 #: install-methods.xml:725
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
 msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>"
-msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>"
+msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>"
 
 #. Tag: para
 #: install-methods.xml:727
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
 #| "which contains all the installer files (including the kernel) as well as "
@@ -1065,22 +1092,20 @@ msgid ""
 "<command>mac-fdisk</command>'s <userinput>C</userinput> command and extract "
 "the image directly to that:"
 msgstr ""
-"<command>yaboot</command> や その設定ファイルと同様に、 (カーネルを含む) イン"
-"ストーラの全ファイルが入った <filename>hd-media/boot.img.gz</filename> とい"
-"う オールインワンファイルがあります。 <command>mac-fdisk</command> の "
-"<userinput>C</userinput> コマンドで USB メモリに \"Apple_Bootstrap\" タイプの"
-"パーティションを作成し、 以下のように USB メモリに直接展開してください。"
+"<command>mac-fdisk</command> の <userinput>C</userinput> コマンドで USB メモ"
+"リに \"Apple_Bootstrap\" タイプのパーティションを作成し、以下のように USB メ"
+"モリに直接展開してください。"
 
 #. Tag: screen
 #: install-methods.xml:733
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
 msgid "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
-msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>"
+msgstr "# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>"
 
 #. Tag: para
 #: install-methods.xml:735
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "After that, mount the USB memory stick (<userinput>mount <replaceable "
 #| "arch=\"x86\">/dev/sda</replaceable> <replaceable arch=\"powerpc\">/dev/"
@@ -1099,13 +1124,13 @@ msgid ""
 "image to it. Unmount the stick (<userinput>umount /mnt</userinput>) and you "
 "are done."
 msgstr ""
-"その後、USB メモリ (<phrase arch=\"x86\">FAT ファイルシステム</phrase> "
-"<phrase arch=\"powerpc\">HFS ファイルシステム</phrase>になっている) をマウン"
-"トし (<userinput>mount <replaceable arch=\"x86\">/dev/sda</replaceable> "
-"<replaceable arch=\"powerpc\">/dev/sda2</replaceable> /mnt</userinput>)、そこ"
-"に Debian netinst か、 名刺型 ISO イメージをコピーしてください (<xref "
-"linkend=\"usb-add-iso\"/> 参照)。 終わったら、USB メモリをアンマウントしてく"
-"ださい (<userinput>umount /mnt</userinput>)。"
+"その後、<phrase arch=\"x86\">FAT ファイルシステムの</phrase> <phrase arch="
+"\"powerpc\">HFS ファイルシステムの</phrase> USB メモリをマウントし <phrase "
+"arch=\"x86\">(<userinput>mount /dev/<replaceable>sdX</replaceable> /mnt</"
+"userinput>)</phrase> <phrase arch=\"powerpc\">(<userinput>mount /dev/"
+"<replaceable>sdX2</replaceable> /mnt</userinput>)</phrase>、そこに Debian の "
+"netinst か businesscard の ISO イメージをコピーしてください。USB メモリをアン"
+"マウント (<userinput>umount /mnt</userinput>) すると完了です。"
 
 #. Tag: title
 #: install-methods.xml:752
@@ -1115,7 +1140,7 @@ msgstr "ファイルのコピー &mdash; 柔軟な方法"
 
 #. Tag: para
 #: install-methods.xml:753
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "If you like more flexibility or just want to know what's going on, you "
 #| "should use the following method to put the files on your stick."
@@ -1126,15 +1151,17 @@ msgid ""
 "stick is large enough &mdash; you have the option of copying a full CD ISO "
 "image to it."
 msgstr ""
-"もっと柔軟なものがよかったり、何が起きているか知りたいのなら、 以下に説明す"
-"る USB メモリにファイルを置く方法を使用すべきです。"
+"もっと柔軟なものがよかったり、何が起きているか知りたいのなら、以下に説明する "
+"USB メモリにファイルを置く方法を使用すべきです。この方法の利点は、(USB メモリ"
+"の容量が十分大きければ) フル CD の ISO イメージをコピーするという選択しもある"
+"ということです。"
 
 #. Tag: title
 #: install-methods.xml:768 install-methods.xml:865
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Booting the USB stick"
 msgid "Partitioning the USB stick"
-msgstr "USB メモリからの起動"
+msgstr "USB メモリのパーティション分割"
 
 #. Tag: para
 #: install-methods.xml:769
@@ -1148,7 +1175,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:774
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Since most USB sticks come pre-configured with a single FAT16 partition, "
 #| "you probably won't have to repartition or reformat the stick. If you have "
@@ -1170,20 +1197,19 @@ msgid ""
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
 "the <classname>dosfstools</classname> Debian package."
 msgstr ""
-"ほとんどの USB メモリは、 FAT16 パーティション 1 つであらかじめ設定されている"
-"ので、 おそらく USB メモリのパーティション分割のやり直しや、 再フォーマットは"
-"必要ありません。 どうしてもしなければならない場合は、 <command>cfdisk</"
-"command> や他のパーティション分割ツールを使って、 FAT16 パーティションを作成"
-"し、以下のようにファイルシステムを作成してください。 "
-"<informalexample><screen>\n"
-"# mkdosfs /dev/<replaceable>sda1</replaceable>\n"
+"ほとんどの USB メモリは、FAT16 パーティション 1 つであらかじめ設定されている"
+"ので、おそらく USB メモリのパーティション分割のやり直しや、再フォーマットは必"
+"要ありません。どうしてもしなければならない場合は、<command>cfdisk</command> "
+"や他のパーティション分割ツールを使って、FAT16 パーティションを作成し、以下の"
+"ようにファイルシステムを作成してください。<informalexample><screen>\n"
+"# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> USB メモリの正確なデバイス名を使用する事に注意し"
-"てください。 <command>mkdosfs</command> は、 <classname>dosfstools</"
-"classname> Debian パッケージに含まれています。"
+"てください。<command>mkdosfs</command> は、<classname>dosfstools</classname> "
+"Debian パッケージに含まれています。"
 
 #. Tag: para
 #: install-methods.xml:788
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "In order to start the kernel after booting from the USB stick, we will "
 #| "put a boot loader on the stick. Although any boot loader (e.g. "
@@ -1200,16 +1226,16 @@ msgid ""
 "editing a text file. Any operating system which supports the FAT file system "
 "can be used to make changes to the configuration of the boot loader."
 msgstr ""
-"USB メモリから起動してカーネルをスタートするには、 USB メモリにブートローダを"
-"配置します。 どのブートローダ (例: <command>LILO</command>) も動作しますが、 "
-"FAT16 パーティションを使用し、 テキストファイルを編集するだけで再設定できるの"
-"で、 <command>SYSLINUX</command> を使用するのが便利です。 FAT ファイルシステ"
-"ムをサポートするオペレーティングシステムなら、 ブートローダの設定を変更するの"
-"に利用できます。"
+"USB メモリからブートしてカーネルを起動するには、USB メモリにブートローダを配"
+"置します。どのブートローダ (例: <classname>lilo</classname>) も動作しますが、"
+"FAT16 パーティションを使用し、テキストファイルを編集するだけで再設定できるの"
+"で、<classname>syslinux</classname> を使用するのが便利です。FAT ファイルシス"
+"テムをサポートするオペレーティングシステムなら、ブートローダの設定を変更する"
+"のに利用できます。"
 
 #. Tag: para
 #: install-methods.xml:798
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To put <command>SYSLINUX</command> on the FAT16 partition on your USB "
 #| "stick, install the <classname>syslinux</classname> and <classname>mtools</"
@@ -1231,27 +1257,27 @@ msgid ""
 "the file <filename>ldlinux.sys</filename> which contains the boot loader "
 "code."
 msgstr ""
-"USB メモリの FAT16 パーティションに <command>SYSLINUX</command> を置くには、"
-"<classname>syslinux</classname> パッケージと <classname>mtools</classname> "
-"パッケージをシステムにインストールして、 以下を実行してください。 "
+"USB メモリの FAT16 パーティションに <classname>syslinux</classname> を置くに"
+"は、<classname>syslinux</classname> パッケージと <classname>mtools</"
+"classname> パッケージをシステムにインストールして、以下を実行してください。 "
 "<informalexample><screen>\n"
-"# syslinux /dev/<replaceable>sda1</replaceable>\n"
+"# syslinux /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> 繰り返しますが、正確なデバイス名を使用するよう注"
-"意してください。 <command>SYSLINUX</command> の開始時には、 このパーティショ"
-"ンをマウントしてはなりません。 この手順ではパーティションにブートセクタを書き"
-"込み、 ブートローダコードを含んでいるファイル <filename>ldlinux.sys</"
-"filename> を作成します。"
+"意してください。 <command>syslinux</command> の開始時には、このパーティション"
+"をマウントしてはなりません。この手順ではパーティションにブートセクタを書き込"
+"み、 ブートローダコードを含んでいるファイル <filename>ldlinux.sys</filename> "
+"を作成します。"
 
 #. Tag: title
 #: install-methods.xml:815 install-methods.xml:912
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Adding an ISO image"
 msgid "Adding the installer image"
-msgstr "ISO イメージの追加"
+msgstr "インストーライメージの追加"
 
 #. Tag: para
 #: install-methods.xml:816
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and "
 #| "copy the following files from the Debian archives to the stick: "
@@ -1273,15 +1299,15 @@ msgid ""
 "want to rename the files, please note that <classname>syslinux</classname> "
 "can only process DOS (8.3) file names."
 msgstr ""
-"このパーティションをマウントし (<userinput>mount /dev/sda1 /mnt</"
-"userinput>)、 以下のファイルを Debian アーカイブから USB メモリへコピーしてく"
-"ださい。 <itemizedlist> <listitem><para> <filename>vmlinuz</filename> (カーネ"
-"ルバイナリ) </para></listitem> <listitem><para> <filename>initrd.gz</"
-"filename> (初期 RAM ディスクイメージ) </para></listitem> <listitem><para> "
-"<filename>syslinux.cfg</filename> (SYSLINUX 設定ファイル) </para></listitem> "
-"<listitem><para> 追加カーネルモジュール </para></listitem> </itemizedlist> "
-"ファイル名を変更したければ、<command>SYSLINUX</command> は DOS (8.3) のファイ"
-"ル名しか処理できないことに注意してください。"
+"このパーティションをマウントし (<userinput>mount /dev/<replaceable>sdX1</"
+"replaceable> /mnt</userinput>)、以下のインストーライメージファイルを USB メモ"
+"リへコピーしてください。<itemizedlist> <listitem><para> <filename>vmlinuz</"
+"filename> (カーネルバイナリ) </para></listitem> <listitem><para> "
+"<filename>initrd.gz</filename> (初期化 RAM ディスクイメージ) </para></"
+"listitem> </itemizedlist>インストーラは、通常版とグラフィカル版の選択ができま"
+"す。後者は、<filename>gtk</filename> サブディレクトリにあります。ファイル名を"
+"変更したければ、<classname>syslinux</classname> は DOS (8.3) のファイル名しか"
+"処理できないことに注意してください。"
 
 #. Tag: para
 #: install-methods.xml:840
@@ -1295,6 +1321,12 @@ msgid ""
 "</screen></informalexample> For the graphical installer you should add "
 "<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line."
 msgstr ""
+"次に、<filename>syslinux.cfg</filename> 設定ファイルを作成します。最低限必要"
+"なのは以下の 2 行です。<informalexample><screen>\n"
+"default vmlinuz\n"
+"append initrd=initrd.gz\n"
+"</screen></informalexample> グラフィカルインストーラ用には、2 行目に "
+"<userinput>video=vesa:ywrap,mtrr vga=788</userinput> 追加すると良いでしょう。"
 
 #. Tag: para
 #: install-methods.xml:850 install-methods.xml:952
@@ -1305,10 +1337,14 @@ msgid ""
 "one that fits) onto the stick. When you are done, unmount the USB memory "
 "stick (<userinput>umount /mnt</userinput>)."
 msgstr ""
+"<filename>hd-media</filename> イメージを使用している場合、ここで Debian の "
+"ISO イメージ (businesscard, netinst,  フル CD イメージの中から必要なものを選"
+"択してください) を USB メモリにコピーします。完了したら、USB メモリを アンマ"
+"ウントしてください (<userinput>umount /mnt</userinput>)。"
 
 #. Tag: para
 #: install-methods.xml:866
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Most USB sticks do not come pre-configured in such a way that Open "
 #| "Firmware can boot from them, so you will need to repartition the stick. "
@@ -1335,17 +1371,17 @@ msgid ""
 "for your USB stick. The <command>hformat</command> command is contained in "
 "the <classname>hfsutils</classname> Debian package."
 msgstr ""
-"ほとんどの USB メモリは、 Open Firmware で起動できるようにあらかじめ設定され"
-"ていません。 Mac システムでは、<userinput>mac-fdisk /dev/sda</userinput> を起"
-"動して、 <userinput>i</userinput> コマンドで新規パーティションマップを初期"
-"化、 <userinput>C</userinput> コマンドで Apple_Bootstrap タイプの パーティ"
-"ションを作成してください。 (注: 先頭のパーティションはいつもパーティション"
-"マップそのものになっています) その後、以下を入力してください。 "
-"<informalexample><screen>\n"
-"$ hformat /dev/<replaceable>sda2</replaceable>\n"
+"ほとんどの USB メモリは、Open Firmware で起動できるようにあらかじめ設定されて"
+"いません。Mac システムでは、<userinput>mac-fdisk /dev/<replaceable>sdX</"
+"replaceable></userinput> を起動して、<userinput>i</userinput> コマンドで新規"
+"パーティションマップを初期化し、<userinput>C</userinput> コマンドで "
+"Apple_Bootstrap タイプの パーティションを作成してください (注: 先頭の\"パー"
+"ティション\"はいつもパーティションマップそのものになっています)。その後、次の"
+"ように入力してください。<informalexample><screen>\n"
+"$ hformat /dev/<replaceable>sdX2</replaceable>\n"
 "</screen></informalexample> USB メモリの正確なデバイス名を使用する事に注意し"
-"てください。 <command>hformat</command> は、 <classname>hfsutils</classname> "
-"Debian パッケージに含まれています。"
+"てください。<command>hformat</command> コマンドは、<classname>hfsutils</"
+"classname> Debian パッケージに含まれています。"
 
 #. Tag: para
 #: install-methods.xml:883
@@ -1365,7 +1401,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:892
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The normal <command>ybin</command> tool that comes with <command>yaboot</"
 #| "command> does not yet understand USB storage devices, so you will have to "
@@ -1400,23 +1436,23 @@ msgid ""
 "utilities."
 msgstr ""
 "<command>yaboot</command> とともにある通常の <command>ybin</command> ツール"
-"は、 USB ストレージデバイスを認識しません。 そのため、<classname>hfsutils</"
-"classname> ツールを使って、 <command>yaboot</command>を手動でインストールしな"
-"ければなりません。 以下を入力してください。 <informalexample><screen>\n"
-"$ hmount /dev/sda2\n"
+"は、 USB ストレージデバイスを認識しません。そのため、<classname>hfsutils</"
+"classname> ツールを使って、<command>yaboot</command>を手動でインストールしな"
+"ければなりません。以下を入力してください。 <informalexample><screen>\n"
+"$ hmount /dev/<replaceable>sdX2</replaceable>\n"
 "$ hcopy -r /usr/lib/yaboot/yaboot :\n"
 "$ hattrib -c UNIX -t tbxi :yaboot\n"
 "$ hattrib -b :\n"
 "$ humount\n"
 "</screen></informalexample> 繰り返しますが、正確なデバイス名を使用するよう注"
-"意してください。 この手順中でパーティションをマウントする必要はありません。 "
-"この手順ではパーティションにブートローダを書き込み、 Open Firmware が起動でき"
-"るように HFS ユーティリティを使って印を付けます。 これが終われば、 USB メモリ"
-"に通常の Unix ユーティリティを使う準備ができたことになります。"
+"意してください。この手順中でパーティションをマウントする必要はありません。こ"
+"の手順ではパーティションにブートローダを書き込み、Open Firmware が起動できる"
+"ように HFS ユーティリティを使って印を付けます。これが終われば、USB メモリに通"
+"常の Unix ユーティリティを使う準備ができたことになります。"
 
 #. Tag: para
 #: install-methods.xml:913
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and "
 #| "copy the following files from the Debian archives to the stick:"
@@ -1424,9 +1460,9 @@ msgid ""
 "Mount the partition (<userinput>mount /dev/<replaceable>sdX2</replaceable> /"
 "mnt</userinput>) and copy the following installer image files to the stick:"
 msgstr ""
-"このパーティションをマウントし (<userinput>mount /dev/sda2 /mnt</"
-"userinput>)、 以下のファイルを Debian アーカイブから USB メモリへコピーしてく"
-"ださい。"
+"このパーティションをマウントし (<userinput>mount /dev/<replaceable>sdX2</"
+"replaceable> /mnt</userinput>)、以下のインストーライメージファイルを USB メモ"
+"リへコピーしてください。"
 
 #. Tag: para
 #: install-methods.xml:920
@@ -1508,10 +1544,10 @@ msgstr ""
 
 #. Tag: screen
 #: install-methods.xml:975
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
 msgid "# install-mbr /dev/<replaceable>sdX</replaceable>"
-msgstr "# install-mbr /dev/<replaceable>sda</replaceable>"
+msgstr "# install-mbr /dev/<replaceable>sdX</replaceable>"
 
 #. Tag: title
 #: install-methods.xml:986
