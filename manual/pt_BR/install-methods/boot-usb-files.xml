@@ -1,78 +1,132 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 45616 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.05.02 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.06 -->
+<!-- original version: 56442 -->
 <!-- updated 39622:45616 by Felipe Augusto van de Wiel (faw) 2007.03.12 -->
+<!-- updated 45616:56442 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Preparando os arquivos para a inicialização usando um memory stick USB</title>
 
 <para>
 
-Para preparar um memória stick USB, será necessário um sistema onde o
-GNU/Linux já esteja sendo executado e que tenha suporte a USB. Tenha certeza
-que o módulo do kernel <filename>usb-storate</filename> está carregado (
-<userinput>modprobe usb-storage</userinput>) e tente achar o dispositivo
-SCSI que recebeu a associação com a memória stick USB (neste exemplo será usado
-o dispositivo <filename>/dev/sda</filename>). Para gravar em sua memória
-stick primeiro desative a proteção contra gravação.
+Há dois métodos de instalação possível quando você está inicializando a
+partir de um pendrive USB. O primeiro é instalar completamente a partir
+da rede. O segundo é copiar também uma imagem de CD do pendrive USB e
+usá-la como origem para os pacotes, possivelmente em combinação com um
+espelho. O segundo método é mais comum.
 
 </para><para>
 
-Note que a memória stick USB deverá ter pelo menos 256MB de tamanho
-(é possível usar tamanhos menores, se seguir os passos descritos em
-<xref linkend="usb-copy-flexible"/>).
+Para o primeiro método de instalação você terá que baixa uma imagem de
+instalação do diretório <filename>netboot</filename> (no local mencionado
+em  <xref linkend="where-files"/>) e usar o <quote>método flexível</quote>,
+explicado abaixo, para copiar os arquivos para o pendrive USB.
 
+</para><para>
+
+Imagens de instalação para o segundo método de instalação podem ser
+encontradas no diretório <filename>hd-media</filename> e tanto o
+<quote>método fácil</quote> quanto o <quote>método flexível</quote>
+podem ser usados para copiar a imagem para o pendrive USB. Para este
+método de instalação você também precisará baixar uma imagem de CD. A
+imagem de instalação e a imagem do CD devem ser baseadas na mesma
+versão do &d-i;. Se as versões não combinarem você provavelmente terá
+erros<footnote>
+
+<para>
+A mensagem de erro que possivelmente será exibida é que os módulos do
+kernel não foram encontrados. Isto significa que a versão dos udebs
+de módulos do kernel incluídos na imagem do CD é diferente da versão
+do kernel sendo executado.
 </para>
 
-  <sect2 id="usb-copy-easy">
-  <title>Copiando os arquivos &mdash; o método fácil</title>
-<para arch="x86">
+</footnome> durante a instalação.
 
-Existe um arquivo <emphasis>tudo em um</emphasis> chamado
-<filename>hd-media/boot.img.gz</filename> que contém todos os arquivos
-do programa de instalação (incluindo o kernel) também como o
-<command>SYSLINUX</command> e seu arquivo de configuração. Você terá somente
-que descompacta-lo diretamente para sua memória stick USB:
+</para><para>
 
-<informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda</replaceable>
-</screen></informalexample>
-
-</para><para arch="powerpc">
-
-Existe um arquivo tudo-em-um <filename>hd-media/boot.img.gz</filename>
-que contém todos os arquivos do programa de instalação (incluindo o kernel)
-assim como o <command>yaboot</command> e seu arquivo de configuração. Crie
-uma partição do tipo "Apple_Bootstrap" em sua memória stick USB usando
-o <command>mac-fdisk</command> comando <userinput>C</userinput> e
-descompacte a imagem diretamente para lá:
-
-<informalexample><screen>
-# zcat boot.img.gz &gt; /dev/<replaceable>sda2</replaceable>
-</screen></informalexample>
+Para preparar um pendrive USB, você precisará de um sistema no qual o
+GNU/Linux já esteja sendo executado e que tenha suporte a USB. Com os
+sistemas GNU/Linux atuais o pendrive USB deveria ser reconhecido
+automaticamente quando você inserí-lo. Se isso não acontecer, você
+deveria verificar se o módulo usb-storage do kernel está carregado.
+Quando o pendrive USB é inserido, ele será mapeado como um dispositivo
+chamado <filename>/dev/sdX</filename>, onde <quote>X</quote> é uma letra
+no intervalo a-z. Você deverá ser capaz de ver para qual dispositivo o
+pendrive USB foi mapeado executando o comando <command>dmesg</command>
+após inserí-lo. Para escrever em seu pendrive, você pode ter que desligar
+a chave de proteção de escrita.
 
 </para>
 <warning><para>
 
-Usando este método tudo o que já estiver no dispositivo será destruído.
-Tenha certeza de que você está usando o nome correto do dispositivo para a
-sua memória USB.
+Os procedimentos descritos nesta seção destruirão qualquer coisa que já
+esteja no dispositivo. Tenha bastante certeza de que você está usando o
+nome do dispositivo correto para seu pendrive USB. Se você usar o
+dispositivo errado, pode ser que o resultado seja a perda de toda a
+informação, por exemplo, de um disco rígido.
 
 </para></warning>
 <para>
 
-Após isto, monte a memória stick USB (<userinput>mount
-<replaceable arch="x86">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>), que agora terá um sistema
-de arquivos <phrase arch="x86">FAT</phrase>
-<phrase arch="powerpc">HFS</phrase> dentro dele e
-copie a imagem ISO Debian netinst ou businesscard para lá
-(veja <xref linkend="usb-add-iso"/>).
-Note que o nome de arquivo deverá finalizar em
-<filename>.iso</filename>.
-Desmonte a memória stick (<userinput>umount /mnt</userinput>) e
+Note que pendrive USB deverá ter pelo menos 256MB de tamanho (é possível
+usar tamanhos menores, se você seguir os passos descritos em
+<xref linkend="usb-copy-flexible"/>).
+
+
+  <sect2 id="usb-copy-easy">
+  <title>Copiando os arquivos &mdash; o método fácil</title>
+<para>
+
+Existe um arquivo <emphasis>tudo em um</emphasis> chamado
+<filename>hd-media/boot.img.gz</filename> que contém todos os arquivos
+do instalador (incluindo o kernel)
+<phrase arch="x86">bem como o <classname>syslinux</classname> e seu
+arquivo de configuração.</phrase>
+<phrase arch="powerpc">bem como o <classname>yaboot</classname> e seu
+arquivo de configuração.</phrase>
+
+</para><para>
+
+Note que, embora conveniente, este método possui uma grande desvantagem:
+o tamanho lógico do dispositivo será limitado a 256 MB, mesmo que a
+capacidade do seu pendrive USB seja maior. Você terá que reparticionar o
+seu pendrive USB e criar um novo sistema de arquivos para ter de volta
+toda a sua capacidade se você quiser usá-lo para algum outro propósito.
+A segunda desvantagem é que você não pode copiar uma imagem de CD inteira
+no pendrive USB, somente as pequenas imagens <quote>businesscard</quote>
+ou <quote>netinst CD</quote>
+
+</para><para arch="x86">
+
+Para usar esta imagem você só tem que extraí-la diretamente para o seu
+pendrive USB:
+
+<informalexample><screen>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+</para><para arch="powerpc">
+
+Crie uma partição do tipo <quote>Apple_Bootstrap</quote> no seu pendrive USB
+usando o comando <userinput>C</userinput> do <command>mac-fdisk</command> e
+extraia a imagem diretamente para lá:
+
+<informalexample><screen>
+# zcat boot.img.gz &gt; /dev/<replaceable>sdX2</replaceable>
+</screen></informalexample>
+
+</para><para>
+
+Após isto, monte o pendrive USB
+<phrase arch="x86">(<userinput>mount
+/dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
+<phrase arch="powerpc">(<userinput>mount
+/dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
+que agora terá um sistema de arquivos
+<phrase arch="x86">FAT</phrase>
+<phrase arch="powerpc">HFS</phrase>
+dentro dele e copie a imagem ISO do Debian <quote>netinst</quote> ou
+<quote>businesscard</quote> para lá.
+Desmonte o pendrive USB (<userinput>umount /mnt</userinput>) e
 você terá concluído.
 
 </para>
@@ -82,57 +136,32 @@ você terá concluído.
   <title>Copiando os arquivos &mdash; o método flexível</title>
 <para>
 
-Se quiser mais flexibilidade ou apenas deseja saber o que está acontecendo,
-você deverá usar o seguinte método para armazenar os arquivos em sua memória
-stick.
+Se você quiser mais flexibilidade ou apenas deseja saber o que está
+acontecendo, você deverá usar o método a seguir para colocar os
+arquivos no seu pendrive. Uma vantagem de usar este método é essa &mdash;
+se a capacidade do seu pendrive USB for grande o suficiente &mdash; você
+tem a opção de copiar uma imagem ISO de CD inteiro para ele.
 
 </para>
 
 &usb-setup-x86.xml;
 &usb-setup-powerpc.xml;
 
-   </sect2>
 
-   <sect2 id="usb-add-iso">
-   <title>Adicionando uma imagem ISO</title>
-<para>
-
-O instalador irá procurar por uma imagem ISO do Debian na memória stick, já
-que ela é a fonte de dados adicionais necessários para a instalação. Assim
-o seu próximo passo é copiar a imagem ISO do Debian (businesscard, netinst ou
-até mesmo toda a imagem de um CD) para sua memória stick (tenha a certeza de
-escolher uma que caiba). O nome de arquivo da imagem deverá ser finalizado em
-<filename>.iso</filename>.
-
-</para><para>
-
-Se quiser instalar através da rede, sem usar uma imagem ISO,
-você deverá, é claro, pular o passo anterior. Ainda em tempo, você
-deverá usar um disco de memória ram inicial do diretório
-<filename>netboot</filename> ao invés do que se encontra em
-<filename>hd-media</filename>, porque o <filename>hd-media/initrd.gz</filename>
-não possui suporte a rede.
-
-</para><para>
-
-Quando terminar, desmonte a memória stick USB (<userinput>umount
-/mnt</userinput>) e ative sua proteção contra gravação.
-
-</para>
   </sect2>
 
   <!-- TODO: doesn't this section belong later? -->
   <sect2 arch="x86">
-  <title>Inicialização através da memória stick USB</title>
+  <title>Inicialização através do pendrive USB</title>
 <warning><para>
 
-Caso seu sistema se recusar em inicializar a partir da memória stick,
-ela poderá conter uma MBR inválida (master boot record). Para corrigir
-isto, use o comando <command>install-mbr</command> que vem no pacote
-<classname>mbr</classname>:
+Se seu sistema se recusar a inicializar a partir do pendrive USB, o
+pendrive pode conter um Registro Mestre de Inicialização (<quote>MBR &ndash;
+Master Boot Record</quote>). Para corrigir isto, use o comando
+<command>install-mbr</command> que vem no pacote <classname>mbr</classname>:
 
 <informalexample><screen>
-# install-mbr /dev/<replaceable>sda</replaceable>
+# install-mbr /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para></warning>
