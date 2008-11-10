@@ -1,14 +1,12 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56425 -->
-<!-- revised by Herbert Parentes Fortes Neto (hpfn) 2006.05.02 -->
-<!-- revised by Felipe Augusto van de Wiel (faw) 2006.06.03 -->
-<!-- updated by Felipe Augusto van de Wiel (faw) 2007.01.14 -->
+<!-- original version: 56442 -->
+<!-- updated 56425:56442 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
 
    <sect3 arch="x86">
-   <title>Particionamento de memória stick USB na &arch-title;</title>
+   <title>Particionamento o pendrive USB</title>
 <para>
 
-Nós iremos mostrar como configurar uma memória stick para usar a primeira
+Nós mostraremos como configurar uma memória stick para usar a primeira
 partição ao invés de todo dispositivo.
 
 </para><note><para>
@@ -21,7 +19,7 @@ outra ferramenta de particionamento para criar a partição FAT16 e
 então crie o sistema de arquivos usando:
 
 <informalexample><screen>
-# mkdosfs /dev/<replaceable>sda1</replaceable>
+# mkdosfs /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Tenha atenção de usar o nome de dispositivo correto para o stick USB.
@@ -33,8 +31,8 @@ Debian <classname>dosfstools</classname>.
 Para iniciar o kernel após a inicialização da memória stick USB,
 nós precisaremos colocar um gerenciador de partida na memória
 stick. No entanto, qualquer gerenciador de partida
-(e.g. <command>LILO</command>) deverá funcionar. É conveniente usar
-o <command>SYSLINUX</command> pois ele usa uma partição FAT16
+(e.g. <classname>lilo</classname>) deverá funcionar. É conveniente usar
+o <classname>syslinux</classname> pois ele usa uma partição FAT16
 e pode ser configurado apenas com a edição de um arquivo de textos.
 Qualquer sistema operacional que suporte o sistema de arquivos FAT
 poderá ser usado para fazer alterações na configuração do gerenciador
@@ -42,25 +40,30 @@ de partida.
 
 </para><para>
 
-Para colocar o <command>SYSLINUX</command> em uma partição FAT16 de sua
+Para colocar o <classname>syslinux</classname> em uma partição FAT16 de sua
 memória stick USB, instale os pacotes <classname>syslinux</classname> e
 <classname>mtools</classname> em seu sistema e execute:
 
 <informalexample><screen>
-# syslinux /dev/<replaceable>sda1</replaceable>
+# syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Novamente, tenha atenção ao usar o nome de dispositivo. A partição
-não deverá estar montada ao iniciar o <command>SYSLINUX</command>.
+não deverá estar montada ao iniciar o <command>syslinux</command>.
 Este processo grava um setor de partida na partição e cria um
 arquivo <filename>ldlinux.sys</filename> que contém o código do
 gerenciador de partida.
 
-</para><para>
+</para>
+   </sect3>
 
-Monte a partição (<userinput>mount /dev/sda1 /mnt</userinput>) e
-copie os seguintes arquivos de um repositório da Debian para
-a memória stick:
+   <sect3 arch="x86">
+   <title>Adicionando a imagem do instalador</title>
+<para>
+
+Monte a partição
+(<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
+e copie os seguintes arquivos de imagem do instalador para o pendrive:
 
 <itemizedlist>
 <listitem><para>
@@ -73,31 +76,35 @@ a memória stick:
 <filename>initrd.gz</filename> (imagem inicial do disco ram)
 
 </para></listitem>
-<listitem><para>
-
-<filename>syslinux.cfg</filename> (arquivo de configuração do SYSLINUX)
-
-</para></listitem>
-<listitem><para>
-
-Módulos opcionais de kernel
-
-</para></listitem>
 </itemizedlist>
 
-Se quiser renomear os arquivos, tenha atenção ao fato de que o
-<command>SYSLINUX</command> somente pode processar nomes de arquivos no
-formato (8.3) do DOS.
+Você pode escolhe entre a versão tradicional ou a versão gráfica do
+instalador. A última pode ser encontrada no subdiretório
+<filename>gtk</filename>. Se você quer renomear os arquivos, por favor,
+note que o <classname>syslinux</classname> só pode processar nomes de
+arquivos DOS (8.3).
 
 </para><para>
 
-O arquivo de configuração do SYSLINUX <filename>syslinux.cfg</filename>
-deverá conter as seguintes duas linhas:
+Na seqüência, você deverá criar um arquivo de configuração
+<filename>syslinux.cfg</filename> que, no mínimo, deveria conter as
+duas linhas a seguir:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+Para o instalador gráfico você deverá adicionar
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> à segunda linha.
+
+</para><para>
+
+Se você usou uma imagem <filename>hd-media</filename>, agora você deverá
+copiar uma imagem ISO Debian (imagem <quote>businesscard</quote>,
+<quote>netinst</quote> ou CD completo; selecione uma que caiba) no pendrive.
+Quando você tiver terminado, desmonte o pendrive USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

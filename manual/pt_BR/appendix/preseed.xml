@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 55054 -->
-<!-- updated 38960:55054 by Felipe Augusto van de Wiel (faw) 2008.08.26 -->
+<!-- original version: 56510 -->
+<!-- updated 38960:56510 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -624,7 +624,10 @@ pré-configuração.
   Uma linha pode ser dividida em múltiplas linhas adicionando uma barra
   invertida (<quote><literal>\</literal></quote>) como o caracter de
   continuação de linha. Um bom local para dividir a linha é após o nome
-  da pergunta; um lugar ruim é entre o tipo e o valor.
+  da pergunta; um lugar ruim é entre o tipo e o valor. Múltiplas linhas
+  serão transformadas em uma única linha com todos os espaços em branco
+  entre o final de uma linha e o começo da outra sendo condensando em um
+  único espaço em branco.
 </para></listitem>
 <listitem><para>
   Para variáveis debconf (modelos) usadas no próprio instalador, o dono
@@ -736,7 +739,11 @@ ser carregado após essas perguntas serem apresentadas.
 </para><para>
 
 O <quote>locale</quote> pode ser usado para especificar tanto o idioma quanto o
-país. Para especificar o <quote>locale</quote> como parâmetro de inicialização,
+país e pode ser qualquer combinação de idioma que o &d-i; dê suporte e um país
+reconhecido. Se a combinação não formar um locale válido, o instalador
+selecionará automaticamente um locale que seja valido para o idioma
+selecionado.
+Para especificar o <quote>locale</quote> como parâmetro de inicialização,
 use <userinput>locale=<replaceable>pt_BR</replaceable></userinput>.
 
 <informalexample role="example"><screen>
@@ -749,7 +756,8 @@ d-i debian-installer/locale string pt_BR
 A configuração de teclado consiste na seleção da arquitetura do teclado e do
 mapa de teclas. Na maioria dos casos a arquitetura de teclado correta é
 selecionada por padrão, então normalmente não é necessário pré-configurar. O
-mapa de teclas deve ser válido para a arquitetura de teclado selecionada.
+mapa de teclas deve ser conhecido pelo &d-i; para a arquitetura de teclado
+selecionada.
 
 <informalexample role="example"><screen>
 # Keyboard selection.
@@ -861,6 +869,19 @@ d-i netcfg/wireless_wep string
 #d-i hw-detect/load_firmware boolean true
 </screen></informalexample>
 
+<para>
+
+Por favor, note que o <command>netcfg</command> determinará automaticamente
+a máscara de rede se <classname>netcfg/get_netmask</classname> não for
+pré-configurado. Neste caso, a variável tem que ser marcada como
+<literal>seen</literal> para instalações automáticas. Similarmente, o
+<command>netcfg</command> escolherá um endereço apropriado se
+<classname>netcfg/get_gateway</classname> não for definido. Como um caso
+especial, você pode definir <classname>netcfg/get_gateway</classname> como
+<quote>none</quote> para especificar que nenhum gateway deveria ser usado.
+
+</para>
+
   </sect2>
 
   <sect2 id="preseed-mirror">
@@ -946,14 +967,12 @@ o correto será selecionado antes de usar a pré-configuração.
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
-# Note: this must be preseeded with a localized (translated) value.
-#d-i partman-auto/init_automatically_partition \
-#      select Guided - use the largest continuous free space
+#d-i partman-auto/init_automatically_partition select biggest_free
 
 # Alternatively, you can specify a disk to partition. The device name must
 # be given in traditional non-devfs format.
-# For example, to use the first SCSI/SATA hard disk:
 # Note: A disk must be specified, unless the system has only one disk.
+# For example, to use the first SCSI/SATA hard disk:
 #d-i partman-auto/disk string /dev/sda
 # In addition, you'll need to specify the method to use.
 # The presently available methods are: "regular", "lvm" and "crypto"
@@ -963,17 +982,16 @@ d-i partman-auto/method string lvm
 # contains an old LVM configuration, the user will normally receive a
 # warning. This can be preseeded away...
 d-i partman-lvm/device_remove_lvm boolean true
+# The same applies to pre-existing software RAID array:
+d-i parman-md/device_remove_md boolean true
 # And the same goes for the confirmation to write the lvm partitions.
 d-i partman-lvm/confirm boolean true
 
-# You can choose from any of the predefined partitioning recipes.
-# Note: this must be preseeded with a localized (translated) value.
-d-i partman-auto/choose_recipe \
-       select All files in one partition (recommended for new users)
-#d-i partman-auto/choose_recipe \
-#       select Separate /home partition
-#d-i partman-auto/choose_recipe \
-#       select Separate /home, /usr, /var, and /tmp partitions
+# You can choose one of the three predefined partitioning recipes:
+# - atomic: all files in one partition
+# - home:   separate /home partition
+# - multi:  separate /home, /usr, /var, and /tmp partitions
+d-i partman-auto/choose_recipe select atomic
 
 # Or provide a recipe of your own...
 # The recipe format is documented in the file devel/partman-auto-recipe.txt.
@@ -1004,8 +1022,7 @@ d-i partman-auto/choose_recipe \
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1016,8 +1033,8 @@ d-i partman/confirm boolean true
 <para>
 
 Você também pode usar pré-configuração para configurar <quote>arrays</quote>
-RAID via software. Há suporte para os níveis de RAID 0, 1 e 5, criação de
-<quote>arrays</quote> degradados e especificação de dispositivos
+RAID via software. Há suporte para os níveis de RAID 0, 1, 5, 6 e 10,
+criação de <quote>arrays</quote> degradados e especificação de dispositivos
 <quote>spare</quote>.
 Se você estiver usando RAID 1, você pode pré-configurar o grub para ser
 instalado em todos os dispositivos usando no <quote>array</quote>; veja
@@ -1027,18 +1044,11 @@ instalado em todos os dispositivos usando no <quote>array</quote>; veja
 
 <warning><para>
 
-Este tipo de particionamento automático é fácil de errar. E é um componente
-bastante novo que pode ainda ter falhas ou gerenciamento falho de erros. A
-responsabilidade de usar as várias receitas de maneira correta (de forma que
-elas tenham sentido e não conflitem) recai sobre o usuário.
+Este tipo de particionamento automático é fácil de errar. E é uma
+funcionalidade que, relativamente, é pouco testada pelos desenvolvedores do
+&d-i;. A responsabilidade de entender as várias receitas de forma correta
+(de forma que elas tenham sentido e não conflitem) recai sobre o usuário.
 Verifique <filename>/var/log/syslog</filename> se você tiver problemas.
-
-</para><para>
-
-Note que apenas RAID 0 e RAID 1 foram testados pelos desenvolvedores do
-componente. RAID 5 não está testado. Configurações avançadas de RAID com
-<quote>arrays</quote> degradados e dispositivos <quote>spare</quote> foi
-levemente testado.
 
 </para></warning>
 
@@ -1070,7 +1080,7 @@ levemente testado.
 # Parameters are:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID levels 0, 1 and 5 are supported; devices are separated using "#"
+# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
@@ -1085,8 +1095,7 @@ levemente testado.
 # This makes partman automatically partition without confirmation.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1368,41 +1377,6 @@ d-i finish-install/reboot_in_progress note
 #d-i debian-installer/exit/halt boolean true
 # This will power off the machine instead of just halting it.
 #d-i debian-installer/exit/poweroff boolean true
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-X">
-  <title>Configuração do X</title>
-<para>
-
-Pré-configurar o X do Debian é possível, mas você provavelmente precisa saber
-alguns detalhes sobre o hardware de vídeo da máquina, já que o configurador X
-do debian não faz configuração automática completa de tudo.
-
-</para>
-
-<informalexample role="example"><screen>
-# X can detect the right driver for some cards, but if you're preseeding,
-# you override whatever it chooses. Still, vesa will work most places.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# A caveat with mouse autodetection is that if it fails, X will retry it
-# over and over. So if it's preseeded to be done, there is a possibility of
-# an infinite loop if the mouse is not autodetected.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# Monitor autodetection is recommended.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Uncomment if you have an LCD display.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-# X has three configuration paths for the monitor. Here's how to preseed
-# the "medium" path, which is always available. The "simple" path may not
-# be available, and the "advanced" path asks too many questions.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
 </screen></informalexample>
 
   </sect2>

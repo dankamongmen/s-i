@@ -1,22 +1,22 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 -->
-<!-- reviewed by Felipe Augusto van de Wiel (faw) 2006.04.07 -->
+<!-- original version: 56442 -->
+<!-- updated 33725:56442 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
 
    <sect3 arch="powerpc">
-   <title>Particionamento da memória stick USB na &arch-title;</title>
+   <title>Particionamento o pendrive USB</title>
 <para>
 
-A maioria das memórias sticks USB não vêm pré-configuradas de uma
-forma que possam ser inicializadas através do Open Firmware, você 
-terá que reparticionar a memória stick. Em sistemas Mac, execute
-o comando <userinput>mac-fdisk /dev/sda</userinput>, inicialize
-o mapa da nova partição usando o comando <userinput>i</userinput>
+A maioria dos pendrives USB não vêm pré-configuradas de uma forma que
+possam ser inicializadas através do Open Firmware, você terá que
+reparticionar o pendrive. Em sistemas Mac, execute o comando
+<userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput>,
+inicialize um novo mapa de partição usando o comando <userinput>i</userinput>
 e crie uma nova partição do tipo Apple_Bootstrap usando o comando
-<userinput>C</userinput>. (note que a primeira <quote>partição</quote> será 
+<userinput>C</userinput>. (Note que a primeira <quote>partição</quote> será 
 sempre o próprio mapa da partição). Então digite
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Tenha atenção de estar usando o nome de dispositivo correto para seu 
@@ -43,7 +43,7 @@ armazenamento USB, assim você terá que instalar o
 <classname>hfsutils</classname>. Digite
 
 <informalexample><screen>
-$ hmount /dev/sda2
+$ hmount /dev/<replaceable>sdX2</replaceable>
 $ hcopy -r /usr/lib/yaboot/yaboot :
 $ hattrib -c UNIX -t tbxi :yaboot
 $ hattrib -b :
@@ -57,11 +57,16 @@ marca-lo de forma que o Open Firmware possa inicializar através dele.
 Tendo feito isto, o resto da memória stick USB poderá ser preparada usando
 utilitários padrões do Unix.
 
-</para><para>
+</para>
+   </sect3>
 
-Monte a partição (<userinput>mount /dev/sda2 /mnt</userinput>) e
-copie os seguintes arquivos do repositório da Debian para a memória
-stick:
+   <sect3 arch="powerpc">
+   <title>Adicionando a imagem do instalador</title>
+<para>
+
+Monte a partição
+(<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
+e copie os seguintes arquivos de imagem do instalador para o pendrive:
 
 <itemizedlist>
 <listitem><para>
@@ -82,11 +87,6 @@ stick:
 <listitem><para>
 
 <filename>boot.msg</filename> (mensagem de inicialização personalizada)
-
-</para></listitem>
-<listitem><para>
-
-Módulos opcionais do kernel
 
 </para></listitem>
 </itemizedlist>
@@ -112,6 +112,14 @@ image=/vmlinux
 Note que pode ser necessário aumentar o parâmetro
 <userinput>initrd-size</userinput> 
 dependendo do tamanho da imagem que estiver inicializando.
+
+</para><para>
+
+Se você usou uma imagem <filename>hd-media</filename>, agora você deverá
+copiar uma imagem ISO Debian (imagem <quote>businesscard</quote>,
+<quote>netinst</quote> ou CD completo; selecione uma que caiba) no pendrive.
+Quando você tiver terminado, desmonte o pendrive USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

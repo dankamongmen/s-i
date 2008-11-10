@@ -1,7 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 51911 -->
-<!-- updated 42251:44026 by Felipe Augusto van de Wiel (faw) 2007.01.14 -->
-<!-- updated 44026:51911 by Felipe Augusto van de Wiel (faw) 2008.04.14 -->
+<!-- original version: 56427 -->
+<!-- updated 44026:56427 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
 
    <sect3 id="mdcfg">
    <title>Configurando dispositivos Multi-Discos (RAID via Software)</title>
@@ -10,13 +9,13 @@
 Caso tenha mais de um disco rígido
 <footnote><para>
 
-Para ser honesto, você pode construir dispositivos MD até mesmo dentro de
-partições residindo dentro de uma unidade física simples, mas não lhe trará
-nada útil.
+Para ser honesto, você pode construir um dispositivo MD até mesmo dentro de
+partições residindo dentro de uma unidade física, mas isso não lhe trará
+nenhum benefício.
 
 </para></footnote>
 em seu computador, você poderá usar o <command>mdcfg</command> para configurar
-suas unidades para aumentar a performance e/ou melhorar a confiabilidade em
+suas unidades para aumentar o desempenho e/ou melhorar a confiabilidade em
 seus dados. O resultado é chamado
 <firstterm>Dispositivo Multi-Discos</firstterm> (ou após isto, sua variante
 mais famosa: <firstterm>RAID via software</firstterm>).
@@ -106,6 +105,42 @@ das informações de paridade.
 
 </para></listitem>
 </varlistentry>
+<varlistentry>
+
+<term>RAID6</term><listitem><para>
+
+Similar ao RAID5 exceto que usa dois dispositivos de paridade ao invés de um.
+
+</para><para>
+
+Um <quote>array</quote> RAID6 pode sobreviver a até dois discos falhos.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID10</term><listitem><para>
+
+RAID10 combinar <quote>striping</quote> (como no RAID0) com
+<quote>mirroring</quote> (como no RAID1). Ele cria <replaceable>n</replaceable>
+cópias dos dados entrantes e distribui-os nas partições de forma que nenhuma
+das cópias do mesmo dado fique no mesmo dispositivo.
+O valor padrão de <replaceable>n</replaceable> é 2, mas pode ser definido
+para algo diferente no modo expert. O número de partições usado deve ser
+pelo menos <replaceable>n</replaceable>.
+RAID10 tem layouts diferentes para distribuições das cópias. O padrão é
+cópias próximas. Cópias próximas têm todas as cópias ao redor do mesmo
+ponto em todos os discos. Cópias distantes têm cópias em diferentes
+pontos dos discos. Cópias <quote>offset</quote> copiam o trecho de dados,
+não as cópias individuais.
+
+</para><para>
+
+RAID10 pode ser usado para atingir confiança e redundância sem a
+contrapartida de ter que calcular paridade.
+
+</para></listitem>
+</varlistentry>
 </variablelist>
 
 Para configurar:
@@ -147,6 +182,28 @@ Para configurar:
   <entry>
     Tamanho da menos partição multiplicada pelo número de dispositivos no
 raid menos 1.
+  </entry>
+</row>
+
+<row>
+  <entry>RAID6</entry>
+  <entry>4</entry>
+  <entry>opcional</entry>
+  <entry>sim</entry>
+  <entry>
+    Tamanho da menor partição multiplicada pelo (número de dispositivos
+    no RAID menos dois)
+  </entry>
+</row>
+
+<row>
+  <entry>RAID10</entry>
+  <entry>2</entry>
+  <entry>opcional</entry>
+  <entry>sim</entry>
+  <entry>
+    Total de todas as partições divididas pelo número de cópias (que por padrão
+    é dois)
   </entry>
 </row>
 
@@ -215,19 +272,36 @@ para entrar com o número de dispositivos ativos e o número de dispositivos
 reserva que formarão o MD. Após isto, você precisará selecionar através de uma
 lista de dispositivos RAID as que se tornarão ativas e então escolher as que
 serão reserva. O número de partições selecionadas deverá ser igual ao número
-especificado anteriormente. Não se preocupe se cometer algum erro e
-selecionar um número de partições diferente, o &d-i; não lhe permitirá continuar
-até que corrija o problema.
+especificado anteriormente. Não se preocupe. Se cometer algum erro e
+selecionar um número de partições diferente, o &d-i; não permitirá que você
+continue até que o problema seja corrigido.
 
 </para></listitem>
 <listitem><para>
 
-O RAID5 tem um procedimento de configuração parecido com o RAID1 com a
-exceção de que precisará utilizar pelo menos <emphasis>três</emphasis>
-partições ativas.
+O RAID5 possui um procedimento de configuração similar ao RAID1, exceto
+que são necessárias pelo menos <emphasis>três</emphasis> partições ativas.
 
 </para></listitem>
+<listitem><para>
 
+O RAID6 possui um procedimento de configuração similar ao RAID1, exceto
+que são necessárias pelo menos <emphasis>quatro</emphasis> partições ativas.
+
+</para></listitem>
+<listitem><para>
+
+O RAID10 também possui um procedimento de configuração similar ao RAID1,
+exceto no modo expert. No modo expert, o &d-i; perguntará a você qual o
+layout. O layout tem duas partes. A primeira parte é o tipo de layout.
+Ele pode ser <literal>n</literal> (cópias próximas &ndash; <quote>near
+copies</quote>), <literal>f</literal> (cópias distantes &ndash; <quote>far
+copies</quote>) ou <literal>o</literal> (cópias <quote>offset</quote>). A
+segunda parte é o número de cópias que serão feitas dos dados. Deve haver
+no mínimo uma quantidade de dispositivos ativos para que todas as cópias
+possam ser distribuídas em discos diferentes.
+
+</para></listitem>
 </itemizedlist>
 
 <para>
