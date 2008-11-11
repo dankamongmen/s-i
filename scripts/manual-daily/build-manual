@@ -233,13 +233,15 @@ build_lang() {
         rm $langlog.arch
         [ $BUILDRESULT = 0 ] && echo >>$mainlog
 
-        # Upload logfile to alioth
-        scp $logdir/$lang.log alioth.debian.org:$ALIOTH_MAN_PATH/logs/
-        if [ $? = 0 ]; then
-            echo "  Upload of $lang.log success" >>$mainlog
-        else
-            echo "  Upload of $lang.log failed" >>$mainlog
-        fi
+        if [ "$DI_LOCAL_BUILD" != 1 ]; then
+            # Upload logfile to alioth
+            scp $logdir/$lang.log alioth.debian.org:$ALIOTH_MAN_PATH/logs/
+            if [ $? = 0 ]; then
+                echo "  Upload of $lang.log success" >>$mainlog
+            else
+                echo "  Upload of $lang.log failed" >>$mainlog
+            fi
+	fi
 
         # Check if any architectures have actually been built
         if ls $destination | grep -q "$lang\."; then
@@ -383,7 +385,11 @@ done
 
 echo >>$mainlog
 # Commit updates to POT and PO files to SVN
-commit_to_svn
+if [ "$DI_LOCAL_BUILD" = 1 ]; then
+    echo "Local build! Changes to POT/PO files are not committed to SVN." >>$mainlog
+else
+    commit_to_svn
+fi
 
 echo >>$mainlog
 # Build translations
@@ -410,13 +416,17 @@ if [ $NR_BUILDS -gt 0 ]; then
     echo >>$mainlog
     cd $destination
 
-    echo "rsyncing files to alioth..." >>$mainlog
-    rsync -qz --perms * alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
-    # rsync subdirectories individually so we can also delete obsolete files
-    for i in $(find . -type d | grep -v "^\.$"); do
-        rsync -qzr --perms --delete "$i" alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
-        checkfatal "$?" "rsync of '$i'"
-    done
+    if [ "$DI_LOCAL_BUILD" = 1 ]; then
+        echo "Local build! No changes have been uploaded." >>$mainlog
+    else
+        echo "rsyncing files to alioth..." >>$mainlog
+        rsync -qz --perms * alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
+        # rsync subdirectories individually so we can also delete obsolete files
+        for i in $(find . -type d | grep -v "^\.$"); do
+            rsync -qzr --perms --delete "$i" alioth.debian.org\:$ALIOTH_MAN_PATH/ >>$mainlog 2>&1
+            checkfatal "$?" "rsync of '$i'"
+        done
+    fi
 else
     echo "No languages built." >>$mainlog
 fi

@@ -101,10 +101,14 @@ if is_updated; then
     make
     checkfatal "$?" "building D-I Internals"
 
-    ## Copy the created files to alioth.debian.org
-    echo "rsyncing files to alioth..." >>$mainlog
-    rsync -qzr --perms index.html alioth.debian.org\:$ALIOTH_DEVREF_PATH/ >>$mainlog 2>&1
-    checkfatal "$?" "rsyncing D-I Internals"
+    if [ "$DI_LOCAL_BUILD" = 1 ]; then
+        echo "Local build! No changes have been uploaded." >>$mainlog
+    else
+        ## Copy the created files to alioth.debian.org
+        echo "rsyncing files to alioth..." >>$mainlog
+        rsync -qzr --perms index.html alioth.debian.org\:$ALIOTH_DEVREF_PATH/ >>$mainlog 2>&1
+        checkfatal "$?" "rsyncing D-I Internals"
+    fi
 else
     echo "No changes." >>$mainlog
 fi
