@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53453 -->
-<!-- updated 46426:53453 by Felipe Augusto van de Wiel (faw) 2008.06.10 -->
+<!-- original version: 56439 -->
+<!-- updated 46426:56439 by Felipe Augusto van de Wiel (faw) 2008.11.11 -->
 
  <sect1 id="hardware-supported">
  <title>Hardwares Suportados</title>
@@ -26,7 +26,7 @@ poderão ser encontradas.
   <sect2><title>Arquiteturas Suportadas</title>
 <para>
 
-O Debian &release; suporta as 11 maiores variações de arquiteturas
+O Debian &release; suporta as onze maiores variações de arquiteturas
 e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>.
 
 </para><para>
@@ -63,16 +63,24 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
 </row>
 
 <row>
-  <entry morerows="2">ARM e StrongARM</entry>
-  <entry morerows="2">arm</entry>
+  <entry morerows="4">ARM</entry>
+  <entry>arm</entry>
   <entry>Netwinder e CATS</entry>
   <entry>netwinder</entry>
 </row><row>
+  <entry>armel</entry>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
+</row><row>
+  <entry morerows="2">arm e armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32x</entry>
 </row><row>
   <entry>Intel IXP4xx</entry>
   <entry>ixp4xx</entry>
+</row><row>
+  <entry>Marvell Orion</entry>
+  <entry>orion5x</entry>
 </row>
 
 <row>
@@ -93,14 +101,20 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
 </row>
 
 <row>
-  <entry morerows="3">MIPS (big endian)</entry>
-  <entry morerows="3">mips</entry>
+  <entry morerows="5">MIPS (big endian)</entry>
+  <entry morerows="5">mips</entry>
   <entry>SGI IP22 (Indy/Indigo 2)</entry>
   <entry>r4k-ip22</entry>
 </row><row>
   <entry>SGI IP32 (O2)</entry>
   <entry>r5k-ip32</entry>
 </row><row>
+  <entry>MIPS Malta (32 bit)</entry>
+  <entry>4kc-malta</entry>
+</row><row>
+  <entry>MIPS Malta (64 bit)</entry>
+  <entry>5kc-malta</entry>
+</row><row>
   <entry>Broadcom BCM91250A (SWARM)</entry>
   <entry>sb1-bcm91250a</entry>
 </row><row>
@@ -109,11 +123,17 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
 </row>
 
 <row>
-  <entry morerows="2">MIPS (little endian)</entry>
-  <entry morerows="2">mipsel</entry>
+  <entry morerows="4">MIPS (little endian)</entry>
+  <entry morerows="4">mipsel</entry>
   <entry>Cobalt</entry>
   <entry>cobalt</entry>
 </row><row>
+  <entry>MIPS Malta (32 bit)</entry>
+  <entry>4kc-malta</entry>
+</row><row>
+  <entry>MIPS Malta (64 bit)</entry>
+  <entry>5kc-malta</entry>
+</row><row>
   <entry>Broadcom BCM91250A (SWARM)</entry>
   <entry>sb1-bcm91250a</entry>
 </row><row>
@@ -121,32 +141,29 @@ e diversas variações de cada arquitetura conhecida como <quote>sabores</quote>
   <entry>sb1a-bcm91480b</entry>
 </row>
 
-<row>
+<row arch="m68k">
   <entry morerows="5">Motorola 680x0</entry>
   <entry morerows="5">m68k</entry>
   <entry>Atari</entry>
   <entry>atari</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>Amiga</entry>
   <entry>amiga</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>68k Macintosh</entry>
   <entry>mac</entry>
-</row><row>
+</row><row arch="m68k">
   <entry morerows="2">VME</entry>
   <entry>bvme6000</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme147</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme16x</entry>
 </row>
 
 <row>
-  <entry morerows="2">IBM/Motorola PowerPC</entry>
-  <entry morerows="2">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
+  <entry morerows="1">IBM/Motorola PowerPC</entry>
+  <entry morerows="1">powerpc</entry>
   <entry>PowerMac</entry>
   <entry>pmac</entry>
 </row><row>
@@ -216,10 +233,12 @@ debian-&arch-listname;</ulink> também.
   <sect2 arch="x86" id="laptops"><title>Notebooks</title>
 <para>
 
-Os notebooks são bem suportados. Os  notebooks são normalmente
-hardwares proprietários ou especializados. Para ver se o seu
-notebook funciona bem com o GNU/Linux, veja
-<ulink url="&url-x86-laptop;">Páginas de Laptop do Linux</ulink>
+Também há suporte para os notebooks e hoje em dia a maioria deles funciona
+sem a necessidade de maiores configurações. No caso de um notebook que
+contenha hardware proprietário ou especializado, pode ser que não haja
+suporte para algumas funções específicas. Para ver se seu notebook funciona
+bem com GNU/Linux, veja, por exemplo, as
+<ulink url="&url-x86-laptop;">Páginas de Notebooks Linux</ulink>.
 
 </para>
    </sect2>
@@ -231,9 +250,9 @@ notebook funciona bem com o GNU/Linux, veja
 O suporte a Multiprocessamento &mdash; também chamado de
 <quote>symmetric multiprocessing</quote> ou SMP &mdash; está disponível para
 esta arquitetura. O kernel padrão do Debian &release; foi compilado com suporte
-a SMP. Isto não deve impedir a instalação, pois os kernels SMP devem
-inicializar em sistemas não-SMP; o kernel simplesmente causará um pouco mais de
-carga.
+a SMP. O kernel padrão também é usável em sistemas não-SMP, mas possui um
+pequeno custo que causará uma pequena redução no desempenho. Para o uso
+normal do sistema isto dificilmente será notado.
 
 </para><para>
 
@@ -323,50 +342,48 @@ da configuração do kernel.
   <sect2 id="gfx" arch="not-s390"><title>Suporte a placas de vídeo</title>
 <para arch="x86">
 
-Você deverá estar usando uma interface compatível com VGA para o
-terminal de console. Praticamente qualquer placa de vídeo moderna
-é compatível com o padrão VGA. Padrões anciões como o CGA, MDA ou
-HGA também devem funcionar, assumindo que você não precisa do suporte
-a X11. Note que o X11 não é usado durante o processo de instalação
-descrito neste documento.
+Você deverá usar uma interface compatível com VGA para o terminal de
+console. Praticamente qualquer placa de vídeo moderna é compatível
+com o padrão VGA. Padrões anciões como o CGA, MDA ou HGA também deveriam
+funcionar, assumindo que você não precisa do suporte a X11. Note que o
+X11 não é usado durante o processo de instalação descrito neste documento.
 
 </para><para>
 
-O suporte do Debian para as interfaces gráficas é determinad
-pelo suporte encontrado no sistema X11 Xorg. A maioria das
-placas de vídeo AGP, PCI e PCIe funcionam sob o XFree86. Os
-detalhes de que barramentos de vídeo suportados, monitores, placas e
-dispositivos de apontamento podem ser encontrados em
-<ulink url="&url-xorg;"></ulink>.  O Debian &release; vem
-com o Xorg versão &x11ver;.
+O suporte do Debian para as interfaces gráficas é determinado
+pelo suporte encontrado no sistema X11 do X.Org. A maioria das
+placas de vídeo AGP, PCI e PCIe funcionam sob o X.Org. Detalhes
+sobre os barramentos de vídeo para os quais há suporte, placas
+de vídeo, monitores e dispositivos de apontamento podem ser
+encontrados em <ulink url="&url-xorg;"></ulink>. O Debian &release;
+vem com o X.Org versão &x11ver;.
 
 </para><para arch="mips">
 
-<!-- FIXME: mencionar explicitamente os chips gráficos e não os
-nomes dos sistemas -->
-O X.Org X Window System é o único suportado na Indy SGI. A
+<!-- FIXME: mention explicit graphics chips and not system names -->
+Só há suporte para o X.Org X Window System na Indy SGI e O2. A
 placa de avaliação Broadcom BCM91250A tem slots que seguem o padrão PCI
-de 3.3v e suportam a emulação VGA ou framebuffer do Linux em uma diversidade
-de placas de vídeo.
+de 3.3v e oferecem suporte à emulação VGA ou framebuffer Linux em uma
+diversidade de placas de vídeo.
 Veja a <ulink url="&url-bcm91250a-hardware;">lista de compatibilidade</ulink>
 relacionada com a BCM91250A.
 
 </para><para arch="mipsel">
 
 As placas de avaliação Broadcom BCM91250A e BCM91480B tem slots que seguem
-o padrão PCI de 3.3v e suporta a emulação VGA ou framebuffer em uma
-diversidade de placas de vídeo. Veja a <ulink
+o padrão PCI de 3.3v e oferecem suporte à emulação VGA ou framebuffer Linux
+em uma diversidade de placas de vídeo. Veja a <ulink
 url="&url-bcm91250a-hardware;">lista de compatibilidade</ulink>
 relacionada com placas de avaliação Broadcom.
 
 </para><para arch="sparc">
 
-A maioria das opções de gráficos comumente encontradas em máquinas baseadas
-em Sparc são suportadas. Drivers gráficos X.org estão disponíveis para os
+Há suporte para a maioria das opções de gráficos comumente encontradas em
+máquinas baseadas em Sparc. Drivers gráficos X.org estão disponíveis para os
 <quote>framebuffers</quote> sunbw2, suncg14, suncg3, suncg6, sunleo e suntcx.
 As placas Creator3D e Elite3D (driver sunffb), placas de vídeo baseadas em
-ATI PGX24/PGX64, e placas baseadas em PermediaII (glint driver). Para usar
-uma Elite3D com X.org você adicionalmente precisa instalar o pacote
+ATI PGX24/PGX64 (driver ati), e placas baseadas em PermediaII (glint driver).
+Para usar uma Elite3D com X.org você adicionalmente precisa instalar o pacote
 <classname>afbinit</classname>, e ler a documentação incluída com ele sobre
 como ativar a placa.
 
@@ -390,4 +407,36 @@ teclado antes de inicializar o sistema.
 &network-cards.xml;
 &supported-peripherals.xml;
 
-</sect1>
+ </sect1>
+
+ <sect1 arch="not-s390" id="hardware-firmware">
+ <title>Dispositivos que requerem firmware</title>
+<para>
+
+Apesar da disponibilidade um driver de dispositivo, alguns hardwares também
+requerem os famosos <firstterm>firmware</firstterm> ou
+<firstterm>microcódigos</firstterm> sejam carregado no dispositivo antes do
+mesmo tornar-se operacional. Isto é mais comum em placas de rede (especialmente
+placas de rede sem fio) mas, por exemplo, alguns dispositivos USB e até mesmo
+alguns controladores de disco rígido também requerem firmwares.
+
+</para><para>
+
+Na maioria dos casos o firmware não é livre (<quote>non-free</quote>) de
+acordo com o critério usado pelo Projeto &debian; e portanto não pode ser
+incluído na distribuição principal ou no sistema de instalação. Se o driver
+do dispositivo estiver incluído na distribuição e se o &debian; legalmente
+puder distribuir o firmware, ele estará disponível como um pacote separado
+a partir da seção non-free do repositório.
+
+</para><para>
+
+No entanto, isto não significa que tal hardware não possa ser usado durante
+a instalação. A partir do &debian; 5.0, o &d-i; dá suporte ao carregamento
+de arquivos de firmware ou pacotes contendo firmware a partir de mídias
+removíveis, tais como disquetes ou pendrives USB.
+Veja <xref linkend="loading-firmware"/> para informação mais detalhadas
+sobre como carregar arquivos ou pacotes de firmware durante a instalação.
+
+</para>
+ </sect1>

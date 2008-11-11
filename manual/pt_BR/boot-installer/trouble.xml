@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53732 -->
-<!-- updated 33725:53732 by Felipe Augusto van de Wiel (faw) 2008.07.17 -->
+<!-- original version: 56420 -->
+<!-- updated 33725:56420 by Felipe Augusto van de Wiel (faw) 2008.11.11 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Resolvendo Problemas no Processo de Instalação</title>
@@ -174,7 +174,7 @@ carregá-lo manualmente usando <command>modprobe</command>.
 Verifique se há um nó de dispositivo (<quote>device node</quote>) para o seu
 CD-ROM sob <filename>/dev/</filename>. No exemplo acima, isto seria
 <filename>/dev/hdc</filename>.
-Também deveria existir um <filename>/dev/cdroms/cdrom0</filename>.
+Também deveria existir um <filename>/dev/cdrom</filename>.
 
   </para></listitem>
   <listitem><para>
@@ -330,12 +330,31 @@ então você deveria tentar usar o argumento de inicialização
 
 </para><para>
 
+Alguns sistemas (especialmente notebooks) que possuem uma resolução nativa
+que não é uma taxa 4:3 (i.e. não são, por exemplo, 800x600 ou 1024x768)
+podem exibir um tela em branco após o instalador ter sido inicializado.
+Nesse caso, adicionar o parâmetro de inicialização
+<userinput>vga=788</userinput><footnote>
+
+<para>
+O parâmetro <userinput>vga=788</userinput> ativará o framebuffer VESA
+com uma resolução 800x600. Isto provavelmente funcionará, mas pode não
+ser a resolução ideal para o seu sistema. Uma lista de resoluções para
+as quais há suporte pode ser obtida usando <userinput>vga=ask</userinput>,
+mas esteja ciente de que essa lista pode não estar completa.
+</para>
+
+</footnote> pode ajudar. Se isso não funcionar,
+tente adicionar o parâmetro de inicialização <userinput>fb=false</userinput>.
+
+</para><para>
+
 Se sua tela começa a mostrar uma foto distorcida enquanto o kernel
 inicializa, e.g. totalmente branca, totalmente preta ou alguma bagunça
 colorida, seu sistema pode conter uma placa de vídeo problemática que não
 muda para o modo <quote>framebuffer</quote> adequadamente. Então você
 poderá usar o argumento de inicialização
-<userinput>fb=false video=vga16:off</userinput> para desativar o console
+<userinput>fb=false</userinput> para desativar o console
 <quote>framebuffer</quote>. Somente um conjunto reduzido de idiomas estará
 disponível durante a instalação devido aos recursos limitados do console.
 Veja <xref linkend="boot-parms"/> para detalhes.
