@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53453 -->
+<!-- original version: 56439 -->
 
  <sect1 id="hardware-supported">
  <title>Maquinari suportat</title>
@@ -24,7 +24,7 @@ informació general i apunts d'on trobar més informació.
   <sect2><title>Arquitectures suportades</title>
 <para>
 
-Debian &release; suporta dotze arquitectures principals i diverses
+Debian &release; suporta onze arquitectures principals i diverses
 variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 
 </para><para>
@@ -61,16 +61,24 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 </row>
 
 <row>
-  <entry morerows="2">ARM i StrongARM</entry>
-  <entry morerows="2">arm</entry>
+  <entry morerows="4">ARM</entry>
+  <entry>arm</entry>
   <entry>Netwinder i CATS</entry>
   <entry>netwinder</entry>
 </row><row>
+  <entry>armel</entry>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
+</row><row>
+  <entry morerows="2">arm i armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32x</entry>
 </row><row>
   <entry>Intel IXP4xx</entry>
   <entry>ixp4xx</entry>
+</row><row>
+  <entry>Marvell Orion</entry>
+  <entry>orion5x</entry>
 </row>
 
 <row>
@@ -91,13 +99,19 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 </row>
 
 <row>
-  <entry morerows="3">MIPS (big endian)</entry>
-  <entry morerows="3">mips</entry>
+  <entry morerows="5">MIPS (big endian)</entry>
+  <entry morerows="5">mips</entry>
   <entry>SGI IP22 (Indy/Indigo 2)</entry>
   <entry>r4k-ip22</entry>
 </row><row>
   <entry>SGI IP32 (O2)</entry>
   <entry>r5k-ip32</entry>
+</row><row>
+  <entry>MIPS Malta (32 bits)</entry>
+  <entry>4kc-malta</entry>
+</row><row>
+  <entry>MIPS Malta (64 bits)</entry>
+  <entry>5kc-malta</entry>
 </row><row>
   <entry>Broadcom BCM91250A (SWARM)</entry>
   <entry>sb1-bcm91250a</entry>
@@ -119,32 +133,29 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
   <entry>sb1a-bcm91480b</entry>
 </row>
 
-<row>
+<row arch="m68k">
   <entry morerows="5">Motorola 680x0</entry>
   <entry morerows="5">m68k</entry>
   <entry>Atari</entry>
   <entry>atari</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>Amiga</entry>
   <entry>amiga</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>68k Macintosh</entry>
   <entry>mac</entry>
-</row><row>
+</row><row arch="m68k">
   <entry morerows="2">VME</entry>
   <entry>bvme6000</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme147</entry>
-</row><row>
+</row><row arch="m68k">
   <entry>mvme16x</entry>
 </row>
 
 <row>
-  <entry morerows="2">IBM/Motorola PowerPC</entry>
-  <entry morerows="2">powerpc</entry>
-  <entry>CHRP</entry>
-  <entry>chrp</entry>
-</row><row>
+  <entry morerows="1">IBM/Motorola PowerPC</entry>
+  <entry morerows="1">powerpc</entry>
   <entry>PowerMac</entry>
   <entry>pmac</entry>
 </row><row>
@@ -213,9 +224,11 @@ debian-&architecture;</ulink>.
   <sect2 arch="x86" id="laptops"><title>Ordinadors portàtils</title>
 <para>
 
-També estan suportats els ordinadors portàtils. Moltes vegades contenen
-maquinari especialitzat o propietari. Per vore si el vostre ordinador
-portàtil funciona correctament amb GNU/Linux, visiteu les
+També estan suportats els ordinadors portàtils i avui en dia la majoria
+funcionen sense modificacions. En el cas que el portàtil contingui
+maquinari especialitzat o propietari, algunes funcions especifiques poden
+no estar suportades. Per vore si el vostre ordinador portàtil funciona
+correctament amb GNU/Linux, visiteu les
 <ulink url="&url-x86-laptop;">pàgines d'ordinadors portàtils amb Linux</ulink>
 
 </para>
@@ -227,10 +240,11 @@ portàtil funciona correctament amb GNU/Linux, visiteu les
 
 El suport de processadors múltiples &mdash; també anomenat
 <quote>multiprocés simètric</quote> o SMP &mdash; està disponible per
-aquesta arquitectura. El nucli estàndard de Debian &release; es va
-compilar amb suport SMP. Això no hauria d'impedir-ne la instal·lació,
-ja que els nuclis SMP haurien d'arrencar també a sistemes que no siguin
-SMP; tan sols provocarà una mica més de sobrecàrrega.
+aquesta arquitectura. La imatge del nucli estàndard de Debian &release;
+s'ha compilat amb suport SMP. El nucli estàndard també és usable en
+sistemes que ni siguin SMP, però té una lleugera sobrecàrrega que
+causarà una petita reducció del rendiment. Per a ús normal del sistema
+això no es notarà.
 
 </para><para>
 
@@ -249,12 +263,13 @@ desseleccionar l'opció <quote>&smp-config-option;</quote> a la secció
 
 <para>
 
-Està disponible per aquesta arquitectura el suport processadors múltiples
-&mdash; també anomenat <quote>multiprocés simètric</quote> o SMP &mdash;.
-La imatge del nucli estàndard de Debian es va compilar amb suport
-<firstterm>SMP-alternatives</firstterm>. Açò vol dir que el nucli
-detecta el nombre de processadors (o nuclis de processador) i que
-automàticament desactivarà l'SMP a sistemes amb un processador.
+El suport de processadors múltiples &mdash; també anomenat
+<quote>multiprocés simètric</quote> o SMP &mdash; està disponible per
+aquesta arquitectura. La imatge del nucli estàndard de Debian &release;
+s'ha compilat amb suport <firstterm>SMP-alternatives</firstterm>. Açò
+vol dir que el nucli detecta el nombre de processadors (o nuclis de
+processador) i que automàticament desactivarà l'SMP a sistemes amb un
+processador.
 
 </para><para arch="i386">
 
@@ -382,4 +397,36 @@ sistema.
 &network-cards.xml;
 &supported-peripherals.xml;
 
+ </sect1>
+
+ <sect1 arch="not-s390" id="hardware-firmware">
+ <title>Dispositius que requereixen microprogramari</title>
+<para>
+
+A part de la disponibilitat d'un controlador de dispositiu, algun
+maquinari també requereix carregar l'anomenat <firstterm>firmware</firstterm>
+o <firstterm>microprogramari</firstterm> al dispositiu abans de que esdevingui
+operatiu. Això és comú en targes de xarxa (especialment targes inalambriques),
+però per exemple alguns dispositius USB o inclús algunes controladores de
+discs durs també requereixen microprogramari.
+
+</para><para>
+
+En molts casos el microprogramari no és lliure d'acord amb el criteri
+emprat pel projecte &debian; i per tant no es pot incloure en la distribució
+principal ni en el sistema d'instal·lació. Si el controlador del
+dispositiu esta inclòs en la distribució i &debian; pot distribuir legalment
+el microprogramari, aquest estarà normalment disponible com un paquet
+separat a la secció «non-free» de l'arxiu.
+
+</para><para>
+
+No obstant, això no vol dir que aquest maquinari no es pugui emprar durant
+la instal·lació. Començant amb &debian; 5.0, &d-i; suporta carregar
+fitxers de microprogramari i paquets contenint microprogramari d'un mitja
+extraïble, com un disquet o un llapis USB. Vegeu
+<xref linkend="loading-firmware"/>  per a informació detallada de com
+carregar fitxers de microprogramari o paquets durant la instal·lació.
+
+</para>
  </sect1>
