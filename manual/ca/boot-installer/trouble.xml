@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53732 -->
+<!-- original version: 56420 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Resolució de problemes del procés d'instal·lació</title>
@@ -171,7 +171,7 @@ de carregar-lo manualment amb l'ordre <command>modprobe</command>.
 Comproveu que hi ha un node de dispositiu per la vostra unitat de
 CD-ROM a <filename>/dev/</filename>. En els exemples de baix,
 açò seria el <filename>/dev/hdc</filename>.
-Hauria d'estar també el <filename>/dev/cdroms/cdrom0</filename>.
+Hauria d'estar també el <filename>/dev/cdrom</filename>.
 
   </para></listitem>
   <listitem><para>
@@ -327,11 +327,29 @@ deshabilita la comprovació.
 
 </para><para>
 
+Alguns sistemes (especialment portàtils) que tenen una resolució nativa que no
+té una ràtio 4:3 (p.ex. que no és 800x600 o 1024x768) poden mostrar una
+pantalla en blanc després d'arrencar l'instal·lador. En aquest cas afegir el
+paràmetre <userinput>vga=788</userinput><footnote>
+
+<para>
+El paràmetre <userinput>vga=788</userinput> activarà el framebuffer VESA amb
+una resolució de 800x600. Segurament funcioni, tot i que és possible que no
+sigui la resolució òptima per al sistema. Podeu obtenir una llista de
+resolucions disponibles utilitzant <userinput>vga=ask</userinput>, però
+tingueu en compte que aquesta llista pot no ser completa.
+</para>
+
+</footnote> pot ajudar. Si això no funciona, intenteu afegir el paràmetre
+d'arrencada <userinput>fb=false</userinput>.
+
+</para><para>
+
 Si la pantalla comença a comportar-se de manera estranya mentre s'arrenca
 el nucli, per exemple es posa blanca, negra, o mostra un batibull de píxels
 colorejats, potser la tarjeta de vídeo és problemàtica i no fa com cal la
 commutació al framebuffer. Podeu emprar el paràmetre d'arrencada
-<userinput>fb=false video=vga16:off</userinput> per a deshabilitar la
+<userinput>fb=false</userinput> per a deshabilitar la
 consola del framebuffer. A causa de les limitacions de la funcionalitat de
 la consola, únicament hi haurà a l'abast un nombre reduït d'idiomes per a
 la instal·lació. Consulteu <xref linkend="boot-parms"/> per als detalls.

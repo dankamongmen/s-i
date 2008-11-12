@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 54086 -->
+<!-- original version: 56510 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -610,7 +610,9 @@ configuració prèvia.
 <itemizedlist>
 <listitem><para>
   Poseu tan sols un espai o un tabulador entre tipus i valor: qualsevol espai
-  addicional s'interpretarà que pertany al valor.
+  addicional s'interpretarà que pertany al valor. Les línies separades
+  s'uniran en una sola línia amb els múltiples espais en blanc reduïts a un
+  sol espai.
 </para></listitem>
 <listitem><para>
   Una línia es pot dividir en vàries afegint una barra invertida
@@ -725,8 +727,11 @@ sols es carregarà després d'haver respost aquestes preguntes.
 
 </para><para>
 
-Es pot fer servir el locale per a especificar tant la llengua com el país.
-Per a especificar el locale com un paràmetre d'arrencada, empreu
+Es pot fer servir el locale per especificar tant la llengua com el país; pot
+estar format per qualsevol combinació d'una llengua disponible al &d-i; i un
+país reconegut. Si la combinació no és un locale vàlid, l'instal·lador
+seleccionarà automàticament un locale vàlid amb l'idioma triat.
+Per especificar el locale com un paràmetre d'arrencada, empreu
 <userinput>locale=<replaceable>ca_ES</replaceable></userinput>.
 
 <informalexample role="example"><screen>
@@ -739,8 +744,8 @@ d-i debian-installer/locale string ca_ES
 La configuració del teclat consisteix en la selecció d'una arquitectura i
 un mapa de teclat. En la majoria de casos l'arquitectura de teclat correcta
 és seleccionada per defecte, de manera que normalment no cal configurar-la
-prèviament. El mapa de teclat ha de ser vàlid per a l'arquitectura de
-teclat seleccionada.
+prèviament. El mapa de teclat ha de ser conegut pel &d-i; per a l'arquitectura
+de teclat seleccionada.
 
 <informalexample role="example"><screen>
 # Selecció del teclat.
@@ -847,7 +852,26 @@ d-i netcfg/get_domain string unassigned-domain
 d-i netcfg/wireless_wep string
 # El fastigós nom del servidor dhcp que alguns ISP empren com a contrasenya.
 #d-i netcfg/dhcp_hostname string radish
+
+# Si necessiteu microprogramari no lliure (non-free) per fer funcionar la
+# xarxa o altres components, podeu configurar l'instal·lador perquè intenti
+# carregar-lo sempre, sense preguntar-ho. O es pot canviar a «false» per
+# desactivar la pregunta.
+#d-i hw-detect/load_firmware boolean true
 </screen></informalexample>
+
+<para>
+
+Fixeu-vos que <command>netcfg</command> determinarà automàticament la màscara
+de la xarxa si no heu configurat <classname>netcfg/get_netmask</classname>
+prèviament. En aquest cas, en instal·lacions automàtiques, s'ha de marcar la
+variable com a <literal>seen</literal>. De forma similar,
+<command>netcfg</command> triarà una adreça apropiada si no definiu
+<classname>netcfg/get_gateway</classname>. Excepcionalment podeu definir
+<classname>netcfg/get_gateway</classname> com a <quote>none</quote> per
+indicar que no s'hauria d'utilitzar cap passarel·la.
+
+</para>
 
   </sect2>
 
@@ -936,38 +960,33 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 </para></warning>
 
 <informalexample role="example"><screen>
-# Si el sistema disposa d'espai lliure podeu triar de particionar només
-# aquest.
-# Nota: Aquesta s'ha de omplir amb valors localitzats (traduïts).
-#d-i partman-auto/init_automatically_partition \
-#      Selecció guiada - Utilitza l'espai lliure continu més gran
+# Si el sistema disposa d'espai lliure podeu fer la partició només
+# d'aquest espai.
+#d-i partman-auto/init_automatically_partition select biggest_free
 
-# També podeu especificar el disc que es particionarà. El nom del dispositiu
-# s'ha d'indicar en el format tradicional no devfs.
+# També podeu especificar el disc que es partirà. El nom del dispositiu
+# s'ha d'indicar en el format tradicional, no en devfs.
+# Avís: Especifiqueu sempre un disc, excepte si el sistema només en té un.
 # Per exemple, per emprar el primer disc SCSI/SATA:
-d-i partman-auto/disk string /dev/sda
-# Avís: Si voleu utilitzar qualsevol disc disponible, sense tenir en compte
-# el seu nom de dispositiu, comenteu la línia d'abans. Açò tan sols
-# funcionarà si el sistema tan sols te un disc.
-# Addicionalment, haureu d'especificar el mètode a usar.
-# Els mètodes actualment disponibles són: "regular", "lvm" i "crypto"
+#d-i partman-auto/disk string /dev/sda
+# Addicionalment, haureu d'especificar el mètode a utilitzar.
+# Els mètodes disponibles actualment són: «regular», «lvm» i «crypto».
 d-i partman-auto/method string lvm
 
-# Si un dels discs que s'ha de particionar automàticament conté una
-# configuració antiga LVM, l'usuari rebrà un avís. Això es pot
+# Si un dels discs que s'ha de partir automàticament conté una
+# configuració LVM antiga, l'usuari rebrà un avís. Això es pot
 # desactivar amb una configuració prèvia...
 d-i partman-lvm/device_remove_lvm boolean true
+# El mateix és aplicable a RAID per programari ja existent:
+d-i parman-md/device_remove_md boolean true
 # I el mateix per la confirmació d'escriptura a particions lvm.
 d-i partman-lvm/confirm boolean true
 
-# Podeu triar qualsevol de les receptes de particionat predefinides.
-# Nota: Aquesta s'ha d'omplir amb valors localitzats (traduïts).
-d-i partman-auto/choose_recipe \
-       select Tots els fitxers en una partició (recomanat per a nous usuaris)
-#d-i partman-auto/choose_recipe \
-#       select Partició /home separada
-#d-i partman-auto/choose_recipe \
-#       select Particions /home, /usr, /var i /tmp separades
+# Podeu triar un dels tres tipus de partició predefinits:
+# - atomic: tots els fitxers en una partició
+# - home:   partició /home separada
+# - multi:  particions /home, /usr, /var i /tmp separades
+d-i partman-auto/choose_recipe select atomic
 
 # O indicar-ne una pròpia...
 # El format de la recepta es descriu al fitxer devel/partman-auto-recipe.txt.
@@ -998,8 +1017,7 @@ d-i partman-auto/choose_recipe \
 # Això fa que el partman particione automàticament sense demanar confirmació,
 # amb la condició que haguéssiu dit d'utilitzar un dels mètodes de dalt.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finalitza la partició i escriu els canvis al disc
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1011,7 +1029,7 @@ d-i partman/confirm boolean true
 
 També podeu utilitzar la configuració prèvia per configurar les
 particions a una matriu RAID per programari. Els nivells de RAID
-suportats són 0, 1 i 5, creant matrius degradades i especificant els
+suportats són 0, 1, 5, 6 i 10, creant matrius degradades i especificant els
 dispositius de reemplaçament. Si esteu fent ús de RAID 1, podeu fer la
 configuració prèvia de grub per instal·lar tots els dispositius que
 s'utilitzen a la matriu; vegeu <xref linkend="preseed-bootloader"/>.
@@ -1020,19 +1038,12 @@ s'utilitzen a la matriu; vegeu <xref linkend="preseed-bootloader"/>.
 
 <warning><para>
 
-És molt fàcil equivocar-se en aquest tipus de particionament
-automatitzat. És, addicionalment, un component molt nou que encara
-pot contenir alguns errors o algun tractament d'errors oblidat. La
-responsabilitat de aconseguir les receptes correctes (de forma que
-tinguin sentit i no entren en conflicte) recau en l'usuari. Comproveu
-el fitxer <filename>/var/log/syslog</filename> si teniu algun problema.
-
-</para><para>
-
-Fixeu-vos que tan sols el RAID 0 i el RAID 1 han estat comprovats pels
-desenvolupadors del component. El RAID 5 està per comprovar. Les
-configuracions RAID amb matrius degradades amb dispositius de reemplaçament
-s'ha comprovat poc.
+És molt fàcil equivocar-se en aquest tipus de partició automatitzada.
+A més es tracta d'una funcionalitat que no rep molta atenció per part dels
+desenvolupadors del &d-i;. La responsabilitat d'aconseguir les receptes
+correctes (de forma que tinguin sentit i no entren en conflicte) recau en
+l'usuari. Comproveu el fitxer <filename>/var/log/syslog</filename> si teniu
+algun problema.
 
 </para></warning>
 
@@ -1066,8 +1077,8 @@ s'ha comprovat poc.
 # Els paràmetres són:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Els nivells de RAID 0, 1 i 5 estan suportats; els dispositius es separen
-# amb "#"
+# Els nivells de RAID 0, 1, 5, 6 i 10 estan suportats; els dispositius es
+# separen amb "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
 #          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
@@ -1082,8 +1093,7 @@ s'ha comprovat poc.
 # Açò fa que el partman particione automàticament sense demanar confirmació.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1368,46 +1378,11 @@ d-i finish-install/reboot_in_progress note
 # qual cosa és útil en algunes situacions.
 #d-i cdrom-detect/eject boolean false
 
-# Açò farà que l'instal·ler apague la màquina quan acabe, però que no es
+# Açò farà que l'instal·lador aturi la màquina quan acabe, però que no es
 # reinicie al sistema instal·lat.
 #d-i debian-installer/exit/halt boolean true
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-X">
-  <title>Configuració de l'X</title>
-<para>
-
-Es pot fer una configuració prèvia de l'X, però probablement us caldrà saber
-alguns detalls sobre el maquinari de vídeo, car el configurador de l'X
-no ho configura tot automàticament.
-
-</para>
-
-<informalexample role="example"><screen>
-# L'X pot detectar el controlador adient per a algunes targetes, però si
-# empreu una configuració prèvia, substituireu tot el que aquell seleccione.
-# Amb tot, el controlador vesa funcionarà la majoria de vegades.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# Un problema amb detecció automàtica del ratolí és que si falla, l'X la
-# tornarà intentar indefinidament. Per tant, si l'heu inclosa en la
-# configuració prèvia, hi ha la possibilitat de caure en un bucle infinit,
-# si falla la detecció.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# Es recomana fer servir la detecció automàtica del monitor.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Tragueu el comentari a això si teniu una pantalla LCD.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-# L'X té tres maneres de configurar el monitor. Aquí teniu com configurar
-# prèviament la «intermèdia» (medium), que sempre és a l'abast. La «simple»
-# pot no ser-hi, i l'«avançada» (advanced) fa massa preguntes.
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
+# Això apagarà la màquina del tot en comptes de només aturar-la.
+#d-i debian-installer/exit/poweroff boolean true
 </screen></informalexample>
 
   </sect2>

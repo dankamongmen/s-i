@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56244 -->
+<!-- original version: 56450 -->
 
  <sect2 id="network-cards">
  <title>Maquinari per a la connexió de xarxes</title>
@@ -87,59 +87,31 @@ no oficials per al Linksys NSLU2 amb el seu microcodi propietari del
 
 Tal i com passa amb l'XDSI, el protocol D-channel per a les (antigues)
 German 1TR6 no és suportat; &d-i; tampoc suporta les plaques Spellcaster
-BRI ISDN. Durant la instal·lació no se suporta l'ús de l'XDSI.
+BRI ISDN. L'XDSI funciona, però no durant la instal·lació.
 
 </para>
 
-  <sect3 arch="not-s390" id="nics-firmware">
-  <title>Controladors que requereixen microprogramari</title>
+  <sect3 condition="supports-wireless" id="nics-wireless">
+  <title>Targetes de xarxa sense fils</title>
 <para>
 
-Actualment, el sistema d'instal·lació no suporta la recuperació de
-microprogramari. Això vol dir que qualsevol targeta de xarxa que utilitzi
-un controlador el qual requereixi carregar microprogramari no és suportada
-per defecte.
+La gestió de xarxes sense fils en general també funciona, i hi ha un nombre
+creixent d'adaptadors per a diverses targetes suportades oficialment al nucli
+Linux, tot i que moltes requereixen carregar microprogramari. Les targetes de
+xarxa sense fils no suportades pel nucli Linux oficial normalment poden
+arribar a funcionar amb &debian;, però no durant el procés d'instal·lació.
 
 </para><para>
 
+L'ús de xarxes sense fils durant la instal·lació encara s'està desenvolupant
+i funcionarà o no depenent del tipus de controlador i de la configuració del
+punt d'accés.
 Si no teniu disponible cap altra NIC durant la instal·lació, encara és
 possible instal·lar &debian; utilitzant la imatge completa d'un CD-ROM o
 DVD. Seleccioneu l'opció de no configurar la xarxa i instal·leu només
 aquells paquets que estiguin disponibles al CD/DVD. Podreu instal·lar
 el controlador i el microprogramari que necessiteu quan la instal·lació
 s'hagi completat (després de reiniciar) i configurar la xarxa manualment.
-Adoneu-vos de què el microprogramari i el controlador poden estar en
-paquets diferents, i que poden no estar disponibles a la secció
-<quote>main</quote> de l'arxiu de &debian;.
-
-</para><para>
-
-Si el controlador en si <emphasis>sí</emphasis> que està suportat, podreu
-utilitzar la NIC durant la instal·lació copiant el microprogramari d'algun
-mitjà a <filename>/usr/lib/hotplug/firmware</filename>.
-No oblideu copiar-lo a la mateixa ubicació del sistema instal·lat abans de
-reiniciar al final de la instal·lació.
-
-</para>
-  </sect3>
-
-  <sect3 condition="supports-wireless" id="nics-wireless">
-  <title>Targetes de xarxa sense fils</title>
-<para>
-
-Les targetes de xarxa sense fils també estan, en general, suportades,
-però amb una condició. Molts adaptadors sense fils necessiten controladors
-que o no són lliures o no s'han acceptat al nucli oficial de Linux. Aquestes
-NIC poden ser usades en &debian;, però no estan suportades durant la
-instal·lació.
-
-</para><para>
-
-
-Si no teniu disponible cap altra NIC durant la instal·lació, encara és
-possible instal·lar &debian; utilitzant la imatge completa d'un CD-ROM o
-DVD. Utilitzeu el mateix procediment que el que s'ha descrit anteriorment
-per aquelles NIC que necessiten microprogramari.
 
 </para><para>
 

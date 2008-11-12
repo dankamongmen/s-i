@@ -1,26 +1,26 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 33725 -->
+<!-- original version: 56442 -->
 
    <sect3 arch="powerpc">
-   <title>Particionament de dispositius USB a &arch-title;</title>
+   <title>Partició de dispositius USB</title>
 <para>
 
 La major part dels dispositius USB no venen preconfigurats de manera
 que l'Open Firmware pugui arrencar des d'ells, així que necessitareu
-reparticionar el dispositiu. Als sistemes Mac, executeu
-<userinput>mac-fdisk /dev/sda</userinput>, i inicieu la nova taula
-de particions utilitzant l'ordre <userinput>i</userinput>, i creeu una
-nova partició de tipus Apple_Bootstrap utilitzant l'ordre
-<userinput>C</userinput> . (Adoneu-vos que la primera «partició» serà
-sempre la taula de particions). Aleshores escriviu
+tornar a partir el dispositiu. Als sistemes Mac, executeu
+<userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput>,
+i inicieu la nova taula de particions utilitzant l'ordre
+<userinput>i</userinput>, i creeu una nova partició de tipus Apple_Bootstrap
+utilitzant l'ordre <userinput>C</userinput>. (Fixeu-vos que la primera
+«partició» serà sempre la taula de particions.) Aleshores escriviu
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Aneu en compte d'utilitzar en nom del dispositiu correcte al vostre USB.
 L'ordre <command>hformat</command> la podeu trobar al paquet de Debian
-<classname>hfsutils</classname> .
+<classname>hfsutils</classname>.
 
 </para><para>
 
@@ -39,7 +39,7 @@ d'instal·lar <command>yaboot</command> manualment utilitzant les eines de
 <classname>hfsutils</classname>. Escriviu
 
 <informalexample><screen>
-$ hmount /dev/sda2
+$ hmount /dev/<replaceable>sdX2</replaceable>
 $ hcopy -r /usr/lib/yaboot/yaboot :
 $ hattrib -c UNIX -t tbxi :yaboot
 $ hattrib -b :
@@ -53,10 +53,16 @@ HFS per marcar-la de manera que l'Open Firmware la pugui arrencar. Fent
 açò, la resta del dispositiu USB es podria preparar per fer ús de les
 utilitats Unix normals.
 
-</para><para>
+</para>
+   </sect3>
 
-Munteu la partició (<userinput>mount /dev/sda2 /mnt</userinput>) i copieu
-els arxius següents des dels arxius de Debian a l'USB:
+   <sect3 arch="powerpc">
+   <title>Afegir la imatge de l'instal·lador</title>
+<para>
+
+Munteu la partició (<userinput>mount /dev/<replaceable>sdX2</replaceable>
+/mnt</userinput>) i copieu els fitxers de l'instal·lador següents al llapis
+USB:
 
 <itemizedlist>
 <listitem><para>
@@ -77,11 +83,6 @@ els arxius següents des dels arxius de Debian a l'USB:
 <listitem><para>
 
 <filename>boot.msg</filename> (missatge opcional d'arrencada)
-
-</para></listitem>
-<listitem><para>
-
-Mòduls de nucli opcionals
 
 </para></listitem>
 </itemizedlist>
@@ -106,6 +107,14 @@ image=/vmlinux
 
 Adoneu-vos que el paràmetre <userinput>initrd-size</userinput> es podria
 incrementar, depenent de la imatge que esteu arrencant.
+
+</para><para>
+
+Si heu utilitzat una imatge <filename>hd-media</filename>, ara hauríeu de
+copiar una imatge ISO de Debian (<quote>businesscard</quote>,
+<quote>netinst</quote> o una imatge de CD complet; assegureu-vos de triar-ne
+una que hi càpiga) al llapis USB. Finalment, desmunteu el dispositiu USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>
