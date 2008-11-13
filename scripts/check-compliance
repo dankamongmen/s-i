@@ -8,7 +8,7 @@
 # If called with 'all' the script will list all build dependencies, if not it
 # will only list those for which the versions do not match.
 #
-# The script should be run from the installer/debian directory in D-I SVN.
+# The script should be run from the installer directory in D-I SVN.
 
 # TODO
 # - convert list to unique source packages and check those instead
@@ -29,7 +29,7 @@ if [ "$1" = all ]; then
 	PRINT_ALL=1
 fi
 
-build_deps="$(sed -nr "/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p" control | sort)"
+build_deps="$(sed -nr "/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p" debian/control | sort)"
 
 for p in $build_deps; do
 	# m68k is not a release arch, so ignore m68k-only dependencies
