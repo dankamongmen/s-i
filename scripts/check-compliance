@@ -12,9 +12,10 @@
 
 # TODO
 # - convert list to unique source packages and check those instead
-# - add ignore list for non-embedded packages and optionally ignore those
 
 ignore_m68k="amiboot atari-bootstrap emile emile-bootblocks m68k-vme-tftplilo vmelilo"
+safe="apt apt-utils bc cpio cramfsprogs debhelper docbook-xsl dosfstools e2fsprogs \
+      upx-ucl tofrodos wget "
 
 get_version() {
 	local ver
@@ -29,7 +30,7 @@ if [ "$1" = all ]; then
 	PRINT_ALL=1
 fi
 
-build_deps="$(sed -nr "/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p" debian/control | sort)"
+build_deps="$(sed -nr '/^#[[:space:]]*-/ s/[^-]*- ([^ ]*).*/\1/p' debian/control | sort -u)"
 
 for p in $build_deps; do
 	# m68k is not a release arch, so ignore m68k-only dependencies
@@ -45,9 +46,18 @@ for p in $build_deps; do
 	tver=$(get_version $p testing)
 	uver=$(get_version $p unstable)
 
+	mark=
 	if [ "$tver" != "$uver" ]; then
-		printf "%-25s %20s %20s   *\n" "$p" "$tver" "$uver"
-	elif [ "$PRINT_ALL" ]; then
-		printf "%-25s %20s %20s\n" "$p" "$tver" "$uver"
+		if echo " $safe " | grep -q " $p "; then
+			mark="-"
+		else
+			mark="*"
+		fi
+	else
+		if [ -z "$PRINT_ALL" ]; then
+			continue
+		fi
 	fi
+
+	printf "%-25s %20s %20s   %s\n" "$p" "$tver" "$uver" "$mark"
 done
