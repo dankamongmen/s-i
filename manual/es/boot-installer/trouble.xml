@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44560 -->
+<!-- original version: 56669 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 
@@ -181,7 +181,7 @@ puede intentar cargarla de forma manual ejecutando la orden
 Compruebe que hay un nodo de dispositivo para su unidad de CD-ROM en
 <filename>/dev/</filename>. En el ejemplo anterior, el nodo se
 llamaría <filename>/dev/hdc</filename>.  También debería existir
-<filename>/dev/cdroms/cdrom0</filename>.
+<filename>/dev/cdrom</filename>.
 
   </para></listitem>
   <listitem><para>
@@ -345,12 +345,30 @@ deshabilitar esta prueba con el argumento de arranque
 
 </para><para>
 
+Es posible que algunos sistemas (sobre todo portátiles) que tengan una resolución
+nativa que no tenga una relación de aspecto 4:3 (no sea, por ejemplo, 800x600 ó
+1024x768) presenten una pantalla en blanco una vez el instalador haya
+arrancado. Puede arrancar el instalador con el parámetro
+<userinput>vga=788</userinput><footnote>.
+
+<para>Este parámetro <userinput>vga=788</userinput> activará el framebuffer con
+una resolución de 800x600. Aunque ésta no sea la resolución óptima para su
+sistema probablemente funcione. Puede obtener una lista de las resoluciones
+soportadas utilizando el parámetro <userinput>vga=ask</userinput>, pero ha de
+tener en cuenta que la lista puede no ser completa.
+</para>
+
+</footnote> para resolver este problema. Si eso no funciona puede intentar
+utilizar el parámetro de arranque <userinput>fb=false</userinput>.
+
+</para><para>
+
 Si su pantalla empieza a mostrar una imagen rara cuando arranca el núcleo, como
 pudiera ser mostrarse todo en blanco, o todo en negro, o con algunos pixels
 coloreados al azar mal, puede que tenga una tarjeta de vídeo problemática que
 no es capaz de cambiar al modo <quote>framebuffer</quote> correctamente. Puede
 utilizar el parámetro del arranque
-<userinput>fb=false video=vga16:off</userinput>
+<userinput>fb=false</userinput>
 para deshabilitar el framebuffer en
 consola. Si hace esto, sólo podrá ver la instalación en un conjunto reducido
 de idiomas 
@@ -396,8 +414,7 @@ USB para poder operar con algunos teclados USB no estándar. Hay, sin embargo, al
 sistemas USB mal hechos donde el controlador cuelga el sistema al arrancar. Una
 opción para evitar esta parada es deshabilitar el controlador USB en la
 configuración de la BIOS de su placa base. Otra opción es pasar el parámetro
-<userinput>debian-installer/probe/usb=false</userinput> en el arranque para
-impedir que se carguen los módulos USB.
+<userinput>nousb</userinput> en el arranque.
 
 </para>
    </sect3>
@@ -554,7 +571,7 @@ Processor: &lt;Tipo de procesador&gt;
 Memory: &lt;Cantidad de memoria RAM&gt;
 Partitions: &lt;Basta con la salida de «df -Tl», es preferible la tabla de particiones sin editar&gt;
 
-Output of lspci and lspci -n: &lt;Salida de la órdenes «lspci» y «lspci -n»&gt;
+Output of lspci -knn (o lspci -nn): &lt;Salida de la orden «lspci -knn» (o «lspci -nn»)&gt;
 
 Base System Installation Checklist: &lt;Marque según sea su caso: Escriba «O»
      si dicha fase funcionó, «E» si presentó algún fallo y déjela en blanco si
