@@ -67,6 +67,9 @@ db_subst $TEMPLATE_ROOT/start fingerprint $KEY_FINGERPRINT
 case "$ARCHDETECT" in
     arm*/ixp4xx)
 	modprobe ixp4xx-beeper || true
+	if [ -e /sys/class/leds/nslu2:green:ready/brightness ]; then
+		echo 1 > /sys/class/leds/nslu2:green:ready/brightness
+	fi
 	beep -e /dev/input/event0 -f 220 -l 500 -d 500 -r 3 || true
 	;;
     arm*/iop32x)
