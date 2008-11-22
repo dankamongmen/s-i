@@ -1,4 +1,17 @@
 #!/bin/sh
 . /usr/share/debconf/confmodule
-db_get auto-install/enable && [ "$RET" = true ] && exit 1
+
+if db_get auto-install/enable && [ "$RET" = true ]; then
+	# find at least one preseed
+	if [ -e /preseed.cfg ] ||
+	   { db_get preseed/url  && [ "$RET" ]; } ||
+	   { db_get preseed/file && [ "$RET" ]; }; then
+		# ok, so delay locale choice
+		exit 1
+	else
+		# otherwise, tell auto-install (and others) that we needed to ask
+		touch /var/run/auto-install-had-to-ask-for-preseed
+	fi
+fi
+
 exit 0

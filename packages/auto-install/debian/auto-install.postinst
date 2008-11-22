@@ -4,14 +4,9 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-# find at least one preseed, or prompt for one
-if ! [ -e /preseed.cfg ] &&
-   ! { db_get preseed/url  && [ "$RET" ]; } &&
-   ! { db_get preseed/file && [ "$RET" ]; }; then
+if [ -e /var/run/auto-install-had-to-ask-for-preseed ] ; then
 	db_input critical preseed/url || true
 	db_go || true
-	# touch a file so other scripts can see that we had to ask
-	touch /var/run/auto-install-had-to-ask-for-preseed
 fi
 
 db_get preseed/url && url="$RET"
