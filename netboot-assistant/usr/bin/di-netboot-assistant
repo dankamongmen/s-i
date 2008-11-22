@@ -371,6 +371,8 @@ pxelinux_version() {
 
 install_repo() {
 	local pxelinuxbin
+	local pxelinuxcfg
+	local ver
 	[ "$DEBUG" ] && set -x
 	release="$1"
 	if [ -z "$release" ]; then
@@ -473,6 +475,11 @@ install_repo() {
 		pxelinuxbin="$(find "$expand_dir" -type f -name "pxelinux.0" 2>/dev/null )"
 
 		if [ ! -z "$pxelinuxbin" ]; then
+			pxelinuxcfg="${pxelinuxbin%%.0}.cfg/default"
+			ver="$(sed -ne 's/# D-I config version \(.*\)/\1/p' "$pxelinuxcfg" 2>/dev/null)"
+			if [ ! -f "$pxelinuxcfg" -o "${ver:-1.0}" != "1.0" ]; then
+				echo "W:The format of this image may not be supported."
+			fi
 			PXE_NEW_VER="$(pxelinux_version "$pxelinuxbin")"
 			PXE_CUR_VER="$(pxelinux_version "$TFTP_ROOT/debian-installer/pxelinux.0")"
 			if dpkg --compare-versions "$PXE_NEW_VER" ">>" "$PXE_CUR_VER" ; then
