@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 33725 -->
+<!-- original version: 56442 -->
+<!-- revisado por Igor Támara, 16 nov 2008 -->
 <!-- traducido por jfs, 20 febrero 2005 -->
 <!-- revisado por rudy, 24 feb. 2004 -->
 
-<!-- Nota del traductor : USB stick = lápiz USB -->
-
    <sect3 arch="powerpc">
-   <title>Particionado de memoria USB en &arch-title;</title>
+   <title>Particionado de la memoria USB</title>
 <para>
 
 La mayoría de los dispositivos de memoria USB no vienen preconfigurados de
 forma que «Open Firmware» pueda arrancar desde éstos, así que tendrá que
 reparticionarlo. En los sistemas Mac ejecute
-<userinput>mac-fdisk /dev/sda</userinput>, inicialice una nueva
-tabla de particiones con la orden <userinput>i</userinput>
-y cree una nueva partición del tipo «Apple_Bootstrap» con la orden
-<userinput>C</userinput>. Tenga en cuenta que la primera «partición»
-sera la propia tabla de particiones. Una vez hecho esto escriba:
+<userinput>mac-fdisk /dev/<replaceable>sdX</replaceable></userinput>
+inicialice una nueva tabla de particiones con la orden 
+<userinput>i</userinput> y cree una nueva partición del tipo 
+«Apple_Bootstrap» con la orden <userinput>C</userinput>.  enga en cuenta
+que la primera «partición» será la propia tabla de particiones. Una vez 
+hecho esto escriba:
 
 <informalexample><screen>
-$ hformat /dev/<replaceable>sda2</replaceable>
+$ hformat /dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
 Asegúrese de usar el nombre de dispositivo correspondiente a su
@@ -45,7 +45,7 @@ utilizando para ello las herramientas <classname>hfsutils</classname>.
 Escriba:
 
 <informalexample><screen>
-$ hmount /dev/sda2
+$ hmount /dev/<replaceable>sdX2</replaceable>
 $ hcopy -r /usr/lib/yaboot/yaboot :
 $ hattrib -c UNIX -t tbxi :yaboot
 $ hattrib -b :
@@ -59,10 +59,17 @@ partición y utiliza las herramientas de HFS para marcarlo de forma
 que «Open Firmware» pueda cargarlo. Una vez hecho esto debe preparar
 su memoria USB con las herramientas habituales de Unix.
 
-</para><para>
+</para>
+   </sect3>
 
-Monte las particiones (<userinput>mount /dev/sda2 /mnt</userinput>) y
-copie los siguientes ficheros del archivo de Debian al dispositivo de memoria:
+   <sect3 arch="powerpc">
+   <title>Añadir la imagen del instalador</title>
+<para>
+
+Monte la partición
+(<userinput>mount /dev/<replaceable>sdX2</replaceable> /mnt</userinput>)
+y copie los siguientes ficheros de la imagen del instalador al
+dispositivo de memoria:
 
 <itemizedlist>
 <listitem><para>
@@ -83,11 +90,6 @@ copie los siguientes ficheros del archivo de Debian al dispositivo de memoria:
 <listitem><para>
 
 <filename>boot.msg</filename> (mensaje de arranque opcional)
-
-</para></listitem>
-<listitem><para>
-
-Módulos del núcleo opcionales
 
 </para></listitem>
 </itemizedlist>
@@ -113,6 +115,14 @@ image=/vmlinux
 Tenga en cuenta que puede tener que incrementar el parámetro
 <userinput>initrd-size</userinput> en base a la imagen que vaya
 a arrancar.
+
+</para><para>
+
+Si necesita una imagen <filename>hd-media</filename>, debería copiar en
+este momento una imagen ISO de Debian (imagen de CD businesscard, netinst
+o  completa; asegúrese de que quepa) en el dispositivo de memoria.  Cuando
+haya terminado, desmonte la memoria USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

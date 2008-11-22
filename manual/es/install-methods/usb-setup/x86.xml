@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 56425 -->
+<!-- original version: 56442 -->
+<!-- revisado por Igor Támara, 16 nov. 2008 -->
 
    <sect3 arch="x86">
-   <title>Particionado de las memorias USB en &arch-title;</title>
+   <title>Particionado de las memorias USB</title>
 
 <para>
 Le mostraremos como configurar una memoria USB para usar
@@ -17,7 +18,7 @@ reformatearlo. Si aún así tiene que hacerlo, use
 para crear la partición FAT16 y luego escriba
 
 <informalexample><screen>
-# mkdosfs /dev/<replaceable>sda1</replaceable>
+# mkdosfs /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Tenga cuidado de usar el nombre de dispositivo correcto para su memoria
@@ -28,8 +29,8 @@ USB. La orden <command>mkdosfs</command> se encuentra en el paquete
 
 Para iniciar el núcleo después de arrancar desde el dispositivo USB,
 necesitaremos colocar un gestor de arranque en él. Aunque cualquier
-gestor de arranque (como <command>LILO</command>) debería funcionar, es
-conveniente usar <command>SYSLINUX</command>, puesto que usa una
+gestor de arranque (como <command>lilo</command>) debería funcionar, es
+conveniente usar <command>syslinux</command>, puesto que usa una
 partición FAT16 y puede reconfigurarse con sólo editar un
 fichero de texto. Puede usar cualquier sistema operativo que soporte el
 sistema de ficheros FAT para hacer cambios a la configuración del
@@ -37,25 +38,29 @@ gestor de arranque.
 
 </para><para>
 
-Para ubicar <command>SYSLINUX</command> en la partición FAT16 de su
+Para ubicar <command>syslinux</command> en la partición FAT16 de su
 memoria USB, instale los paquetes <classname>syslinux</classname> y
 <classname>mtools</classname> en su sistema, y escriba
 
 <informalexample><screen>
-# syslinux /dev/<replaceable>sda1</replaceable>
+# syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Nuevamente, tenga cuidado de usar el nombre de dispositivo correcto. La
-partición no debe estar montada cuando ejecute <command>SYSLINUX</command>.
+partición no debe estar montada cuando ejecute <command>syslinux</command>.
 Este procedimiento escribe un sector de arranque en la partición y
 crea el fichero <filename>ldlinux.sys</filename> que contiene el código
 del gestor de arranque.
 
-</para><para>
+</para>
+   </sect3>
 
-Monte la partición (<userinput>mount /dev/sda1 /mnt</userinput>) y
-copie los ficheros indicados a continuación desde los archivos de Debian
-al dispositivo USB:
+   <sect3 arch="x86">
+   <title>Añadir la imagen del instalador</title>
+<para>
+
+Monte la partición (<userinput>mount /dev/sdX1 /mnt</userinput>) y
+copie los ficheros indicados a continuación al dispositivo USB:
 
 <itemizedlist>
 <listitem><para>
@@ -68,31 +73,34 @@ al dispositivo USB:
 <filename>initrd.gz</filename> (imagen inicial de disco RAM)
 
 </para></listitem>
-<listitem><para>
-
-<filename>syslinux.cfg</filename> (fichero de configuración de SYSLINUX)
-
-</para></listitem>
-<listitem><para>
-
-Módulos del núcleo opcionales
-
-</para></listitem>
 </itemizedlist>
 
-Si desea renombrar los ficheros tenga en cuenta que
-<command>SYSLINUX</command> sólo puede procesar nombres de ficheros
-DOS (8.3).
+Puede elegir entre la versión usual o la versión gráfica del instalador.
+La segunda se puede encontrar en el subdirectorio <filename>gtk</filename>.
+Si desea renombrar los ficheros, tenga en cuenta que 
+<classname>syslinux</classname> solamente puede procesar nombres de 
+ficheros estilo DOS (8.3).
 
 </para><para>
 
-El fichero de configuración <filename>syslinux.cfg</filename> debe
-contener las dos líneas siguientes:
+A continuación debe crear el fichero de configuración 
+<filename>syslinux.cfg</filename>, que como mínimo debe contener las dos 
+líneas siguientes:
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+Si usa el instalador gráfico necesitará adicionar 
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> a la segunda línea.
+
+</para><para>
+
+Si usó una imagen <filename>hd-media</filename>, debería copiar ahora una 
+imagen ISO de Debian (businesscard, netinst o una imagen completa de CD;
+asegúrese de elegir una que quepa) en la memoria USB. Cuando haya 
+terminado, desmonte la memoria USB (<userinput>umount /mnt</userinput>).
 
 
 </para>

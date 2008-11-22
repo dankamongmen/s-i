@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 45239 -->
+<!-- original version: 53452 -->
+<!-- actualizado igortamara, 17 nov. 2008 -->
 <!-- revisado jfs, 23 feb. 2005 -->
 
  <sect1 id="boot-parms"><title>Parámetros de arranque</title>
@@ -52,11 +53,10 @@ tanto <userinput>mem=65536k</userinput> como
 
 </para><para condition="supports-serial-console">
 
-Si arranca desde una consola serie el núcleo habitualmente la detectará
-automáticamente<phrase arch="mipsel"> (aunque no en las DECstations)</phrase>.
-Si desea arrancar por consola serie un ordenador que ya tiene instalados
-una tarjeta de vídeo (framebuffer) y un teclado, deberá indicárselo al
-núcleo con el parámetro
+Si arranca desde una consola serial el núcleo habitualmente la detectará
+automáticamente.  Si desea arrancar por consola serial un ordenador que
+ya tiene instalados una tarjeta de vídeo (framebuffer) y un teclado,
+deberá indicárselo al núcleo con el parámetro
 <userinput>console=<replaceable>dispositivo</replaceable></userinput>,
 donde <replaceable>dispositivo</replaceable> es su dispositivo serie,
 y será generalmente parecido a <filename>ttyS0</filename>.
@@ -220,7 +220,17 @@ través de este parámetro para que busque sólo en un dispositivo concreto.
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/framebuffer (fb)</term>
+<term>lowmem</term>
+<listitem><para>
+
+Se puede usar para forzar al insalador a un nivel lowmem más alto que el
+predeterminado por el instalador de acuerdo a la memoria disponible. Los
+valores posibles son 1 y 2, consulte <xref linkend="lowmem"/>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry><term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 En algunas arquitecturas se utiliza el framebuffer del núcleo para
@@ -277,17 +287,6 @@ arrancando el instalador con
 </varlistentry>
 
 <varlistentry>
-<term>debian-installer/probe/usb</term>
-<listitem><para>
-
-Puede evitar que se comprueben los dispositivos USB en el arranque
-definiendo este valor a <userinput>false</userinput> en caso de
-que esta comprobación de lugar a problemas.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry>
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
@@ -317,6 +316,19 @@ Si quiere evitar que se ejecuten los servicios PCMCIA deberá definir
 este parámetro a <userinput>false</userinput>.  Algunos ordenadores
 portátiles son conocidos por tener problemas en estos casos, y puede
 ser recomendable deshabilitarlo.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>disk-detect/dmraid/enable (dmraid)</term>
+<listitem><para>
+
+Establezca a <userinput>verdadero</userinput> para habilitar el soporte para
+discos RAID Serial ATA(también llamado ATA RAID, BIOS RAID o RAID falso) en el
+instalador.  Tenga en cuenta que este soporte en el momento es experimental.
+Puede encontrar más información en el <ulink url="&url-d-i-wiki;">Wiki del
+Instalador de Debian</ulink>.
 
 </para></listitem>
 </varlistentry>
@@ -393,6 +405,18 @@ utilizar esto para realizar instalaciones automatizadas.
 </varlistentry>
 
 <varlistentry>
+<term>finish-install/keep-consoles</term>
+<listitem><para>
+
+Durante las instalaciones desde una consola serial o de administración,
+normalmente se deshabilitan las consolas virtuales(VT1 a VT6) en
+<filename>/etc/inittab</filename>.
+Establezca a <userinput>true</userinput> para evitarlo.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
@@ -440,6 +464,44 @@ valor se debe dar en kB.
 </varlistentry>
 
 <varlistentry condition="gtk">
+<term>mouse/protocol</term>
+<listitem><para>
+
+Para la interfaz gtk(instalador gráfico), los usuarios pueden
+establecer el protocolo del ratón vía este parámetro.
+Los valores soportados son<footnote>
+
+<para>
+Consulte las páginas de manual para encontrar información
+adicional acerca de
+<citerefentry><refentrytitle>directfbrc</refentrytitle>
+<manvolnum>5</manvolnum></citerefentry>.
+</para>
+
+</footnote>:
+<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
+<userinput>MS</userinput>, <userinput>MS3</userinput>,
+<userinput>MouseMan</userinput> y <userinput>MouseSystems</userinput>.
+En la mayoría de los casos el protocolo predeterminado debería
+funcionar correctamente.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
+<term>mouse/device</term>
+<listitem><para>
+
+Para la interfaz gtk(instalador gráfico), los ususarios pueden 
+especificar el dispositivo del ratón vía este parámetro. Es sobre
+todo útil si el ratón está conectado a un puerto serial(ratón serial).
+Ejemplo:
+<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry condition="gtk">
 <term>mouse/left</term>
 <listitem><para>
 
@@ -456,8 +518,7 @@ gtk (instalador gráfico).
 
 La aceleración hardware en directfb está deshabilitada por omisión en
 la interfaz gtk (instalador gráfico. Debe configurar este parámetro a
-<userinput>true</userinput> si desea activarla cuando arranca el
-instalador.
+<userinput>true</userinput> si desea activarla.
 
 </para></listitem>
 </varlistentry>

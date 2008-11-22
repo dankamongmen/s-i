@@ -1,46 +1,206 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43573 -->
+<!-- original version: 51744 -->
 <!-- traducido jfs, 21 abril 2006 -->
 <!-- Revisado por Igor Tamara, enero 2007 -->
+<!-- Revisado Igor Tamara, nov 21 2008 -->
 
    <sect3 id="apt-setup">
    <title>Configurar apt</title>
 
 <para>
 
-Un de las herramientas utilizada para instalar paquetes en un sistema &debian;
-es un programa llamado <command>apt-get</command>, que está dentro
+Una de las herramientas utilizadas para instalar paquetes en un sistema &debian;
+es el programa <command>apt-get</command>, que está dentro
 del paquete <classname>apt</classname>.<footnote>
 
 <para>
 
-En realidad el programa que instala los paquetes se llama 
+En realidad el programa que instala los paquetes se llama
 <command>dpkg</command>.  Este programa es, sin embargo, una herramienta
-de bajo nivel. <command>apt-get</command> es una herramienta de 
+de bajo nivel. <command>apt-get</command> es una herramienta de
 más alto nivel que llama a <command>dpkg</command> cuando sea necesario.
-Sabe cómo obtener los 
-paquetes: de un CD, de la red o de cualquier otra ubicación.
-También es capaz de instalar otros paquetes indispensables
-para los paquetes que intenta instalar.
+Sabe cómo obtener los paquetes: de un CD, de la red o de cualquier otra
+ubicación. También es capaz de instalar otros paquetes indispensables
+para que los paquetes que usted intenta instalar funcionen adecuadamente.
 
 </para>
 
 </footnote>
-Existen otras interfaces a la gestión de paquetes, como <command>aptitude</command>
-y <command>synaptic</command> que también se utilizan. Se recomienda a los usuarios nóveles
-que utilicen estas interfaces ya que integran otras funciones
-adicionales (como la búsqueda de paquetes y comprobaciones de estado)
-en un interfaz de usuario más amigable.
-De hecho, la herramienta recomendada para gestión de paquetes es <command>aptitude</command>.
+Existen otras interfaces a la gestión de paquetes, como 
+<command>aptitude</command> y <command>synaptic</command>.  Se recomienda
+a los usuarios nóveles que utilicen estas interfaces ya que integran otras
+funciones adicionales (como la búsqueda de paquetes y comprobaciones de
+estado) en un interfaz de usuario más amigable.  De hecho, la herramienta
+recomendada para la gestión de paquetes es <command>aptitude</command>.
 
 </para><para>
 
 Debe configurar <command>apt</command> para que sepa de dónde descargar
-paquetes. El instalador intenta hacer esto de forma automática
-basándose en lo que conoce del medio de instalación que utilice. 
-Los resultados de la configuración realizada se guardan en el archivo
-<filename>/etc/apt/sources.list</filename>. Podrá examinar y editar
-este fichero a su gusto una vez haya terminado la instalación.
+paquetes. Los resultados de la configuración realizada se guardan en el
+fichero <filename>/etc/apt/sources.list</filename>. Podrá examinar y
+editar este fichero a su gusto una vez haya terminado la instalación.
+
+</para><para>
+
+Si está instalando con la prioridad predeterminada,  basado en el
+método de instalación que esté usando y posiblemente usando las
+elecciones previas en la instalación, el instalador se encargará en gran
+medida de la configuración de forma automática.  La mayor parte de
+ocasiones el instalador añadirá automáticamente una réplica de seguridad,
+y si está instalando una distribución estable, una réplica para el
+servicio de actualización <quote>volatile</quote>.
+
+</para><para>
+
+Tendrá oportunidad de tomar muchas más decisiones por su cuenta si está 
+usando en la instalación una prioridad menor (p.e. modo experto).  Puede
+elegir usar o no los servicios securidad y/o volatile, y puede elegir
+añadir paquetes de las secciones del archivo <quote>contrib</quote> y
+<quote>non-free</quote>.
 
 </para>
+
+    <sect4 id="apt-setup-cdset">
+    <title>Instalar desde uno o más CDs o DVDs</title>
+
+<para>
+
+Si instala desde un CD o un DVD que hace parte de un conjunto más grande,
+el instalador le preguntará si desea explorar CDs o DVDs adicionales.
+Si tiene CDs o DVDs adicionales, probablemente deseará hacerlo, de forma
+que el instalador pueda usar los paquetes incluídos en ellos.
+
+</para><para>
+
+Si no tiene CDs o DVDs adicionales, no hay problema: no son indispensables.
+Si tampoco usa una réplica de red(como se explica en la sección siguiente),
+podría darse que no todos los paquetes pertenecientes a las tareas que
+seleccione en el siguiente paso de la instalación puedan instalarse.
+
+</para>
+<note><para>
+
+Los paquetes se incluyen en los CDs (y DVDs) de acuerdo con su popularidad.
+Esto significa que en la mayoría de casos, solamente se necesita el primer
+CD de un conjunto y que muy poca gente realmente usa cualesquiera de los
+paquetes incluidos en el último CD de un conjunto.
+
+</para><para>
+
+También significa que comprar o descargar y quemar el conjunto completo de
+CDs es un desperdicio de dinero, debido a que usted no usará la mayoría de
+ellos.  En general, es mejor obtener solamente entre los primeros 3 y 8 CDs
+y usar una réplica de red por Internet para instalar cualquier paquete
+adicional.  De igual forma sucede con los conjuntos de DVDs: el primer DVD,
+o el primer y segundo DVD suplirían la mayoría de necesidades.
+
+</para><para>
+
+Por norma general, para una instalación de escritorio habitual(usando el
+ambiente de escritorio GNOME), basta con los primeros tres CDs.  Para los
+ambientes de escritorio alternativos(KDE o Xfce), se requieren CDs
+adicionales.  El primer DVD cubre sin problema los tres ambientes de
+escritorio.
+
+</para></note>
+<para>
+
+Si usted explora varios CDs o DVDs, el instalador le solicitará insertarlos
+uno a uno cuando necesite paquetes de otro CD/DVD que no estén en el que
+esté en la unidad. Tenga en cuenta que debería explorar únicamente CDs o
+DVDs que pertenezcan al mismo conjunto.  El orden en el que se exploren no
+interesa, pero explorarlos en orden ascendente reducirá posibles
+equivocaciones.
+
+</para>
+    </sect4>
+
+    <sect4 id="apt-setup-mirror">
+    <title>Usar una réplica en red</title>
+
+<para>
+
+Una pregunta que se hará durante la mayoría de instalaciones es si si se
+desea o no usar una réplica en red como fuente de paquetes.  En la mayoría
+de oportunidades, la respuesta predeterminada es la adecuada, pero hay
+excepciones.
+
+</para><para>
+
+Si <emphasis>no</emphasis> está instalando desde un CD o DVD commpleto o
+usando una imagen completa de CD/DVD, debería querer usar una réplica en
+red, puesto que de otra manera terminaría con un sistema muy mínimo. Pero,
+si tiene una conexión a Internet limitada, es mejor
+<emphasis>not</emphasis> seleccionar la tarea <literal>desktop</literal>
+en el paso siguiente de la instalación.
+
+</para><para>
+
+Si instala desde un solo CD completo o con una imagen completa de CD, no
+es necesaria una réplica en red, pero es muy recomendado emplearla porque un
+solo CD contiene solamente una cantidad limitada de paquetes.  Si tiene una
+conexión a Internet limitada, podría ser mejor <emphasis>no</emphasis>
+seleccionar una réplica en red en este momento y más bien culminar la
+instalación usando únicamente lo que está en el CD e instalar selectivamente
+paquetes adicionales después de la instalación (esto es, después de haber
+reiniciado en el nuevo sistema).
+
+</para><para>
+
+Si instala desde un DVD o una imagen de DVD, cualquier paquete que necesite
+druante la instalación debería estar presente en el primer DVD.  De la misma
+forma si ha explorado varios CDs como se explicó en la sección anterior.  El
+uso de una réplica en red es opcional.
+
+</para><para>
+
+Una ventaja de añadir una réplica en red es que las actualizaciones que hayan
+ocurrido desde el momento en que el conjunto de CDs/DVDs fue creado y hecho
+público, estarán disponibles para instalarse, extendiendo de esta manera la
+vida de su conjunto de CDs/DVDs sin comprometer la seguridad o estabilidad del
+sistema instalado.
+
+</para><para>
+
+En Resumen: el seleccionar una réplica en red en general es una buena idea,
+excepto si no tiene una conexión a Internet buena.  Si la versión actual de
+un paquete está disponible en un CD/DVD, el instalador siempre lo usará.
+La cantidad de datos que se descargará si usted ha seleccionado una réplica
+en red dependerá de:
+
+<orderedlist>
+<listitem><para>
+
+las tareas que seleccione en el paso siguiente de esta instalación,
+
+</para></listitem>
+<listitem><para>
+
+los paquetes que se requieran para esas tareas,
+
+</para></listitem>
+<listitem><para>
+ 
+cuales de esos paquetes estén presentes en los CDs o DVDs que haya explorado, y
+
+</para></listitem>
+<listitem><para>
+
+si hay versiones actualizadas en las réplicas en red de los paquetes incluídos
+en los CDs o DVDs(bien sea para una réplica en red de paquetes o una réplica
+de seguridad o actualizaciones volátiles).
+
+
+</para></listitem>
+</orderedlist>
+
+</para><para>
+
+Observe que el último punto significa que, incluso si usted no ha seleccionado
+una réplica en red, algunos paquetes pueden descargarse de Internet si hay
+actualizaciones de seguridad o volátiles para aquellos servicios que se hayan
+configurado.
+
+</para>
+</sect4>
    </sect3>

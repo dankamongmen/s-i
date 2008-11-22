@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 31173 -->
+<!-- original version: 56141 -->
+<!-- revisado por Igor Tamara, 16 nov 2008 -->
 <!-- revisado por ender, 31 dic 2005 -->
 <!-- traducido por jfs, 30 dic 2005 -->
 
@@ -9,7 +10,7 @@
 <para arch="not-s390">
 
 Uno de los componentes más interesantes es 
-<firstterm>network-console</firstterm>. Éste le permite hacer una
+<firstterm>network-console</firstterm>.  Éste le permite hacer una
 gran parte de la instalación a través de la red mediante SSH.
 El uso de la red implica que tiene que llevar a cabo los primeros
 pasos de la instalación a través de la consola al menos hasta 
@@ -26,7 +27,7 @@ En el caso de que esté instalando desde CD debe arrancar fijando la prioridad a
 media o llamar al menú de instalación y seleccionar <guimenuitem>Cargar
 componentes del instalador desde CD</guimenuitem> y seleccionar de la lista de
 componentes <guimenuitem>network-console: Continuar la instalación de forma
-remota utilizando SSH</guimenuitem>. Si el componente se carga correctamente
+remota utilizando SSH</guimenuitem>.  Si el componente se carga correctamente
 verá una nueva entrada de menú llamada <guimenuitem>Continuar la instalación de forma remota utilizando SSH</guimenuitem>.
 
 </para><para arch="s390">
@@ -39,7 +40,7 @@ Este es el método de instalación por omisión para las instalaciones en
 <phrase arch="not-s390">Después de seleccionar esta nueva entrada se</phrase>
 <phrase arch="s390">Se</phrase> le preguntará la contraseña a utilizar
 para conectarse con el sistema de instalación, y se confirmará esta nueva
-contraseña. Eso es todo lo que necesita. Ahora debería poder ver una pantalla
+contraseña.  Eso es todo lo que necesita.  Ahora debería poder ver una pantalla
 que le indica que debe conectarse de forma remota con el identificador de
 usuario <emphasis>installer</emphasis> y la contraseña que introdujo. Un detalle
 importante a destacar es que se le indicará también la huella digital del
@@ -73,23 +74,58 @@ es la correcta.
 
 </para><note><para>
 
+La orden <command>ssh</command> en el instalador usa una configuración
+predeteminada que no envía paquetes de keep-alive. En principio, una
+conexión al sistema que está instalándose debería mantener la conexión
+abierta de forma indefinida. Pero, en ciertas situaciones &mdash;
+dependiendo de su configuración local de red &mdash; la conexión puede
+interrumpirse después de un período de inactividad.  Un caso común 
+puede ocurrir cuando hay alguna modalidad de Traducción de Direcciónes
+de Red (NAT) en algún sitio entre el cliente y el sistema que está
+instalándose.  Dependiendo del punto en el cual la conexión se perdió,
+podría resultar imposible dar continuidad a la instalación después
+de reconectarse.
+
+</para><para>
+
+Podría evitar que caiga la conexión añadiendo la opción
+<userinput>-o&nbsp;ServerAliveInterval=<replaceable>value</replaceable></userinput>
+cuando se hace la conexión <command>ssh</command>, o adicionar tal
+opción en en su archivo de configuración de <command>ssh</command>.
+Pero tenga en cuenta que en algunos casos adicionar tal orden
+podría también <emphasis>causar</emphasis> la caída de la conexión (por
+ejemplo si los paquetes keep-alive se envían mientras haya una caída
+corta de la red, en la cuál la orden <command>ssh</command> se ha
+recuperado),  por lo tanto debe usarse únicamente cuando sea necesario.
+
+</para></note>
+
+<note><para>
 Si instala muchos sistemas de forma consecutiva y, por casualidad, comparten la
 dirección IP o nombre de equipo, puede tener problemas para conectarse a éstos
 porque <command>ssh</command> se negará a conectarse a ellos, ya
 que cada sistema tiene una huella digital distinta, lo que para <command>ssh</command>
-es indicativo de un posible ataque de suplantación. Si está seguro de que no
+es indicativo de un posible ataque de suplantación.  Si está seguro de que no
 se trata de ningún ataque deberá eliminar la línea del equipo en cuestión del fichero
-<filename>~/.ssh/known_hosts</filename> y volver a intentarlo.
+<filename>~/.ssh/known_hosts</filename><footnote>
+
+<para>
+El comando a continuación eliminará cualquier línea que existiera para un
+servidor:
+<command>ssh-keygen -R &lt;<replaceable>hostname</replaceable>|<replaceable>IP&nbsp;address</replaceable>&gt;</command>.
+</para>
+
+</footnote> and try again.
 
 </para></note><para>
 
 Después de acceder al sistema se le mostrará una pantalla de instalación inicial
 donde tendrá dos posibilidades: <guimenuitem>Arrancar menú</guimenuitem> y
-<guimenuitem>Arrancar consola</guimenuitem>. La primera de estas opciones
+<guimenuitem>Arrancar consola</guimenuitem>.  La primera de estas opciones
 le llevará al menú de instalación, donde podrá seguir con la instalación
-como lo hace habitualmente. La segunda de estas opciones ejecuta un
+como lo hace habitualmente.  La segunda de estas opciones ejecuta un
 intérprete de línea de órdenes desde el que puede examinar, y quizás arreglar,
-el sistema remoto. Sólo debería arrancar una sesión de SSH para el menú de
+el sistema remoto.  Sólo debería arrancar una sesión de SSH para el menú de
 instalación, aunque puede tener tantas sesiones como quiera con consolas
 remotas.
 
@@ -98,13 +134,8 @@ remotas.
 Una vez ha arrancado la instalación por SSH de forma remota no debería
 volver a la sesión de instalación que se está ejecutando en la consola local.
 Si lo hace, podría corromper la base de datos que guarda la configuración
-del nuevo sistema, al realizar accesos simultáneos a ella. Esto podría llevar
+del nuevo sistema, al realizar accesos simultáneos a ella.  Esto podría llevar
 a que la instalación fallara o a que tuviera problemas con el sistema que ha instalado.
-
-</para><para>
-
-Además, si está ejecutando la sesión SSH desde un terminal de X no debería
-cambiar el tamaño de la ventana, ya que esto haría que se desconectara la sesión.
 
 </para></warning>
 

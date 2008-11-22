@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44026 -->
+<!-- original version: 56428 -->
 <!-- revisado jfs, 23 febrero 2005 -->
 <!-- revisado Rudy Godoy, 22 feb. 2005 -->
 <!-- Revisado por Igor Tamara, enero 2007 -->
+<!-- Revisado por Igor Tamara, nov 20 2008 -->
 
  <chapter id="d-i-intro"><title>Usar el instalador de Debian</title>
 
@@ -32,8 +33,8 @@ es posible que se muestre el menú del instalador para que elija de éste alguna
 acción alternativa. El usuario no verá el menú del instalador
 si no se produce ningún problema, simplemente tendrá que responder las
 preguntas formuladas por cada componente en cada paso.
-Se fija prioridad crítica (<quote>critical</quote>) para cualquier notificación de un error
-serio, por lo que el usuario siempre será notificado de estos errores.
+Se fija prioridad crítica (<quote>critical</quote>) para cualquier notificación
+de un error serio, por lo que el usuario siempre será notificado de estos.
 
 </para><para>
 
@@ -66,17 +67,30 @@ conforme se instalen. Esto puede realizarse ya sea usando la orden
 argumento de arranque <userinput>priority=low</userinput>.
 El modo experto le da control total del &d-i;.
 
+</para><para condition="gtk">
+
+En esta arquitectura el &d-i; soporta dos interfaces de usuario: una 
+basada en caracteres y otra gráfica.  La interfaz basada en caracteres se 
+usa de forma predeterminada a menos que seleccione  la opción 
+<quote>Graphical install</quote> en el menú inicial de arranque.  Consulte
+más información acerca del instalador gráfico en <xref linkend="graphical"/>.
+
+</para><para condition="not-gtk">
+
+En esta arquitectura el instalador usa una interfaz basada en texto. En
+la actualidad no está deisponible una interfaz gráfica.
+
 </para><para>
 
-Las pantallas del instalador están basadas en caracteres (distinto de la,
-cada vez más familiar, interfaz gráfica). No se puede utilizar el ratón en este
-entorno. A continuación se indican algunas teclas que puede usar para moverse en
+El ratón no se puede utilizar en la interfaz basada en caracteres.  A 
+continuación se indican algunas teclas que puede usar para moverse en
 los diversos diálogos. El <keycap>Tabulador</keycap> o la tecla con la
-flecha <keycap>derecha</keycap> realizan desplazamientos <quote>hacia adelante</quote>,
-la combinación tecla <keycombo> <keycap>Shift</keycap>
-<keycap>Tabulador</keycap> </keycombo> y la tecla con la flecha
-<keycap>izquierda</keycap> desplazan <quote>hacia atrás</quote> entre los botones y
-las opciones.
+flecha <keycap>derecha</keycap> realizan desplazamientos
+<quote>hacia adelante</quote>, la combinación tecla 
+<keycombo> <keycap>Shift</keycap> <keycap>Tabulador</keycap> </keycombo> 
+y la tecla con la flecha <keycap>izquierda</keycap> desplazan 
+<quote>hacia atrás</quote> entre los botones y las opciones.
+
 Las teclas con la flecha <keycap>arriba</keycap> y <keycap>abajo</keycap>
 mueven entre los distintos elementos disponibles en una lista desplazable,
 y también desplazan a la lista en sí (cuando se llega al final de la pantalla, N. del t.). Además, en listas largas, usted puede
@@ -95,7 +109,7 @@ a continuación.
 
 </para><para>
 
-Los mensajes de error y de registro son redireccionados a la cuarta consola. Puede
+Los mensajes de error y de registro se redireccionan a la cuarta consola. Puede
 acceder a ésta pulsando
 <keycombo><keycap>Alt Izq</keycap><keycap>F4</keycap></keycombo>
 (mantenga presionada la tecla <keycap>Alt</keycap> mientras presiona la
@@ -134,7 +148,7 @@ necesite conocer de un determinado componente en la
 <term>main-menu</term><listitem><para>
 
 Muestra al usuario la lista de componentes durante el trabajo del instalador, e
-inicia el componente elegido cuando se selecciona.  Las preguntas de
+inicia un componente cuando se selecciona.  Las preguntas de
 <quote>main-menu</quote> tienen prioridad media (<quote>medium</quote>), de
 modo que no verá el menú si define su prioridad a valores alto
 (<quote>high</quote>) ó crítico (<quote>critical</quote>).  El valor
@@ -145,7 +159,7 @@ aparezca.
 
 </para><para>
 
-Puede volver al menú principal pulsando repetidamente el botón <quote>Volver</quote>
+Puede volver al menú principal pulsando repetidamente el botón &BTN-GOBACK;
 hasta salir del componente que está ejecutando.
 
 </para></listitem>
@@ -248,6 +262,23 @@ o del CD-ROM.
 </varlistentry>
 <varlistentry>
 
+<term>clock-setup</term><listitem><para>
+
+Actualiza el reloj del sistema y determina si el reloj está fijado 
+como UTC o no.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>tzsetup</term><listitem><para>
+
+Selecciona la zona horaria, basada en el lugar seleccionado previamente.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
 <term>partman</term><listitem><para>
 
 Permite al usuario particionar los discos conectados al sistema, crear
@@ -256,15 +287,6 @@ puntos de montaje. Incluye algunas características interesantes
 como son un modo totalmente automático de particionado o el
 soporte de volúmenes lógicos (LVM). Se trata de la herramienta de
 particionado recomendada para Debian.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>autopartkit</term><listitem><para>
-
-Particiona automáticamente todo el disco de acuerdo a unas preferencias
-de usuario predefinidas.
 
 </para></listitem>
 </varlistentry>
@@ -309,18 +331,10 @@ software habitualmente es mejor que los controladores baratos RAID IDE
 </varlistentry>
 <varlistentry>
 
-<term>tzsetup</term><listitem><para>
+<term>base-installer</term><listitem><para>
 
-Configura la zona horaria, basándose en la localización seleccionada
-anteriormente.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>clock-setup</term><listitem><para>
-
-Determina si el reloj está o no fijado a UTC.
+Instala el conjunto de paquetes más básico que permitirá que el
+ordenador opere con Linux cuando se reinicie.
 
 </para></listitem>
 </varlistentry>
@@ -330,15 +344,6 @@ Determina si el reloj está o no fijado a UTC.
 
 Configura la contraseña del usuario «root» (administrador) y añade
 un usuario no-administrador.
-
-</para></listitem>
-</varlistentry>
-<varlistentry>
-
-<term>base-installer</term><listitem><para>
-
-Instala el conjunto de paquetes más básico que permitirá que el
-ordenador opere con Linux cuando se reinicie.
 
 </para></listitem>
 </varlistentry>
@@ -400,10 +405,10 @@ desde la segunda consola.
 <term>save-logs</term><listitem><para> 
 
 Ofrece una forma para que el usuario pueda guardar información en un
-disco flexible, red, disco duro, u otros
-dispositivos cuando se encuentre ante un problema. De esta forma puede
-informar después, adecuadamente, sobre los problemas que ha tenido con el
-programa del instalador a los desarrolladores de Debian.
+disco flexible, red, disco duro, u otros dispositivos cuando se encuentre
+ante un problema. De esta forma puede informar después, adecuadamente,
+sobre los problemas que ha tenido con el programa del instalador a los
+desarrolladores de Debian.
 
 </para></listitem>
 </varlistentry>
@@ -413,5 +418,6 @@ programa del instalador a los desarrolladores de Debian.
  </sect1>
 
 &using-d-i-components.xml;
+&loading-firmware.xml;
 
 </chapter>

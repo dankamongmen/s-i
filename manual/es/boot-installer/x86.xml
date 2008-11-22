@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44002 -->
+<!-- original version: 56419 -->
 <!-- actualizado por rudy, 5 diciembre 2004 -->
 <!-- revisado Francisco García <franciscomanuel.garcia@hispalinux.es>, 27 enero 2005 -->
 <!-- revisado rudy, 24 feb. 2005 -->
+<!-- revisado igortamara, 17 nov. 2008 -->
 
   <sect2 arch="x86"><title>Arranque desde un CD-ROM</title>
 
@@ -72,6 +73,30 @@ Arranca la variante <quote>bf2.4</quote>.
 
 -->
 
+  </sect2>
+  <sect2 arch="x86" id="boot-win32">
+  <title>Arranque desde Windows</title>
+<para>
+
+Para lanzar el instalador desde Windows, debe obtener primero un medio de
+instalación en CD-ROM/DVD-ROM o una memoria USB configurada como se describe
+en <xref linkend="official-cdrom"/> y <xref linkend="boot-usb-files"/>.
+
+</para><para>
+
+Si usa un CD o DVD de instalación, se lanzará un programa de pre-instalación
+automáticamente cuando inserta el disco.
+En caso de que Windows no lo ejecute automáticamente, o si está usando una
+memoria USB, puede ejecutarlo manualmente accediendo al dispositivo y
+ejecutando <command>setup.exe</command>.
+
+</para><para>
+
+Después de haber iniciado el programa, se le hará una serie preliminar
+de preguntas y el sistema estará preparado para comenzar el instalador de
+&debian;.
+
+</para>
   </sect2>
 
 <!-- FIXME the documented procedure does not exactly work, commented out
@@ -320,58 +345,105 @@ arranque usando TFTP.
 
   </sect2>
 
-  <sect2 arch="x86"><title>El cursor de arranque</title>
+  <sect2 arch="x86" id="boot-screen">
+  <title>La pantalla de arranque</title>
 <para>
 
 Cuando arranca el instalador, se le presentará una pantalla gráfica amigable
-con el logo de Debian y el cursor de arranque:
+con el logo de Debian y un menú:
 
 <informalexample><screen>
-Press F1 for help, or ENTER to boot:
+Installer boot menu
+
+Install
+Graphical install
+Advanced options       >
+Help
+
+Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
 
-(<quote>Pulse F1 para ayuda o ENTER para arrancar:</quote>, n. del t.)
-En el cursor de arranque puede pulsar simplemente  &enterkey; para arrancar
-el instalador con las opciones por omisión o introducir un método de arranque
-específico y, opcionalmente, parámetros de arranque.
+De acuerdo al método de instalación que esté usando, la opción
+<quote>Graphical install</quote> podría no estar disponible.
 
 </para><para>
 
-Puede encontrar información, que le podría ser útil, sobre los parámetros
-de arranque y las opciones de arranque presionando las teclas
-<keycap>F2</keycap> a <keycap>F8</keycap>.  Si añade parámetros a la línea
-de órdenes de arranque, asegúrese de escribir el método de arranque (el
-predeterminado es <userinput>install</userinput>) y un espacio después del primer
-parámetro (p. ej. <userinput>install fb=false</userinput>). 
+Para una instalación normal, seleccione bien la opción
+<quote>Install</quote> o <quote>Graphical install</quote>(bien sea
+con las flechas del teclado o tecleando la primera letra(resaltada))
+y presione &enterkey; para iniciar el instalador.
+
+</para><para>
+
+La opción <quote>Advanced options</quote> da acceso a un segundo
+menú que permite arrancar el instalador en modos experto, rescate y
+para instalaciones automatizadas.
+
+</para><para>
+
+Si desea o requiere añadir algún parámetro al arranque bien sea al
+instalador o al núcleo, presione &tabkey;. Que desplegará la orden de
+arranque predeterminada para la opción de menú seleccionada y le permitirá
+añadir opciones adicionales.  Las ventanas de ayuda(ver más adelante) muestran
+algunas opciones comunes. Presione &enterkey; para arrancar el instalador
+con sus opciones; Si presiona &escapekey; volverá al menú de arranque y
+deshará cualquier cambio que usted haya hecho.
+
+</para><para>
+
+Al elegir la opción <quote>Help</quote> aparecerá la primera pantalla de 
+ayuda, que le ofrecerá un vistazo a las pantallas de ayuda disponibles.
+Tenga en cuenta que no es posible volver al menú de arranque después
+de que las pantallas de ayuda se han desplegado.  Pero las pantallas de
+ayuda F3 y F4 muestran órdenes equivalentes a los métodos de arranque
+listados en el menú.  Todas las pantallas de ayuda tienen un símbolo de
+arranque en el que se puede teclear la orden de arranque:
+
+<informalexample><screen>
+Press F1 for the help index, or ENTER to boot:
+</screen></informalexample>
+
+En este símbolo de arranque puede presionar &enterkey; para arrancar el
+instalador con las opciones predeterminadas o incluír una orden de
+arranque específica y opcionalmente parámetros de arranque. En las
+pantallas de ayuda puede encontrar una buena cantidad de parámetros de
+arranque que podrían ser útiles.  Si usted añade cualquier parámetro a la
+línea órdenes de arranque, asegúrese de teclear el método de arranque
+primero( el predeterminado es <userinput>install</userinput>) y un
+espacio antes del primer parámetro (p.e., 
+<userinput>install fb=false</userinput>).
 
 <note><para>
 
-Si está instalando el sistema a través de un sistema de gestión remoto que
-dispone de un interfaz de texto a la consola VGA puede que no vea la pantalla
-gráfica inicial cuando arranque el instalador. De hecho, puede que ni siquiera
-vea el cursor de arranque. Algunos ejemplos de estos sistemas son la consola de
-texto de Compaq <quote>integrated Lights Out</quote> (iLO) y la consola de HP
-<quote>Integrated Remote Assistant</quote> (IRA).
-En estos casos puede simplemente presionar F1 a ciegas
-<footnote>
+En este punto se asume que el teclado tiene como disposición Inglés
+Americano  predeterminada. Esto significa que si su teclado tiene una
+disposición distinta(específica de su idioma), los caracteres que aparecen
+en la pantalla pueden diferir de los que usted esperaría que aparecieran
+cuando teclea los parámetros. Wikipedia tiene un
+<ulink url="&url-us-keymap;">esquema de la disposición de un teclado US</ulink>
+que puede usar como referencia para encontrar las teclas correctas a usar.
 
-<para>
+</para></note>
+<note><para>
 
-En algunos casos tiene que utilizar una secuencia de escape en estos
-dispositivos para poder ejecutar esa pulsación de tecla. Por ejemplo, el
-dispositivo IR utiliza <keycombo> <keycap>Ctrl</keycap> <keycap>F</keycap>
-</keycombo>,&nbsp;<keycap>1</keycap>.
+Si está usando un sistema que tiene la BIOS configurada para usar la consola
+serial, es posible que no vea la pantalla gráfica inicial al arrancar el
+instalador; puede incluso no ver el menú de arranque.  Lo mismo puede suceder
+si está instalando el sistema vía un dispositivo de administración remota que
+provee una interfaz de texto a la consola VGA. Algunos ejemplos de estos
+dispositivos incluyen la consola de texto de Compaq <quote>integrated Lights
+Out</quote> (iLO) y la de HP <quote>Integrated Remote Assistant</quote> (IRA).
 
-</para>
+</para><para>
 
-</footnote> para saltar esta pantalla y mostrar el texto de ayuda.  Una vez
-salga de la pantalla de inicio y dentro del texto de ayuda se le mostrarán sus
-pulsaciones de teclado en el cursor como suele ser habitual. Si quiere evitar
-que el instalador utilice el <quote>framebuffer</quote> durante la instalación
-puede añadir la opción
-<userinput>fb=false</userinput> en el cursor de
-arranque tal y como se describe en el texto de ayuda.
-
+Para saltar la pantalla gráfica de arranque puede presionar sin mirar
+&escapekey; para obtener un símbolo de sistema de texto o (también sin mirar) 
+presionar <quote>H</quote> seguido de &enterkey; para seleccionar la opción
+<quote>Help</quote> descrita anteriormente. Después de haber tecleado deberá
+poder verlo en el símbolo.  Para evitar que el instalador use el framebuffer 
+para el resto de la instalación, puede añadir también 
+<userinput>fb=false</userinput> al símbolo de arranque, como se describe en
+el texto de ayuda.
 
 </para></note>
 

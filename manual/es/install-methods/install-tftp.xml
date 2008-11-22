@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44002 -->
+<!-- original version: 56425 -->
 <!-- revisado por nahoo, 1 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
+<!-- revisado igortamara, 21 nov. 2008 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparación de los ficheros para el arranque a través de red usando TFTP</title>
@@ -131,9 +132,13 @@ el directorio que usa como argumento de
 <command>in.tftpd</command><footnote>
 
 <para>
-El argumento <userinput>-l</userinput> hace que algunas
-versiones de <command>in.tftpd</command> registren todas las peticiones en los
-registros del sistemaes útil para diagnosticar fallos de arranque
+Todas las alternativas de <command>in.tftpd</command> en Debian
+deberían almacenar las solicitudes TFTP  en la registro del sistema
+de forma predeterminada.  Algunas de ellas cuentan con el argumento
+<userinput>-v</userinput> para ofrecer más información.
+Se recomienda revisar todos los mensajes de la bitácora en caso de
+problemas al arrancar puesto que son un buen punto de partida para
+diagnosticar la causa de los errores.
 
 </para>
 </footnote>, lo necesitará más adelante. Si ha tenido que cambiar
@@ -184,11 +189,37 @@ cliente TFTP, y no existe un estándar definido.
 
 En máquinas Power Macintosh NewWorld, necesitará configurar
 el gestor de arranque <command>yaboot</command> como la imagen de
-arranque de TFTP. Entonces <command>yaboot</command> obtendrá las
-imágenes del núcleo y del disco RAM a través del propio TFTP. Para el
-arranque a través de red, use <filename>yaboot-netboot.conf</filename>.
-Simplemente renómbrelo a <filename>yaboot.conf</filename> en el
-directorio de TFTP.
+arranque de TFTP. Así <command>yaboot</command> obtendrá las
+imágenes del núcleo y del disco RAM a través del propio TFTP. Deberá
+descargar del directorio <filename>netboot/</filename> los
+siguientes ficheros:
+<itemizedlist>
+<listitem><para>
+
+<filename>vmlinux</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>initrd.gz</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>yaboot.conf</filename>
+
+</para></listitem>
+<listitem><para>
+
+<filename>boot.msg</filename>
+
+</para></listitem>
+</itemizedlist>
 
 </para><para arch="x86">
 
@@ -210,70 +241,6 @@ Asegúrese de que su servidor DHCP está configurado para pasar
 <command>tftpd</command> como el nombre del fichero a arrancar.
 
 </para>
-
-   <sect3 arch="mipsel">
-   <title>Imágenes TFTP para DECstation</title>
-<para>
-
-Para DECstations existen ficheros «tftpimage» para cada subarquitectura
-que contienen tanto el núcleo como el instalador en un solo fichero. Por convención
-los nombres son del tipo
-<filename><replaceable>subarquitectura</replaceable>/netboot-boot.img</filename>.
-Copie el fichero «tftpimage» que desee usar a
-<userinput>/tftpboot/tftpboot.img</userinput> si está usando la configuración
-BOOTP/DHCP de ejemplo descrita anteriormente.
-
-</para><para>
-
-El firmware de DECstations se arranca por TFTP con la orden
-<userinput>boot <replaceable>#</replaceable>/tftp</userinput>, donde
-<replaceable>#</replaceable> es el número del dispositivo TurboChannel
-desde el cual arrancar. En la mayoría de DECstations es «3». Si el servidor
-BOOTP/DHCP no provee el nombre del fichero o necesita pasar parámetros adicionales,
-éstos se pueden añadir opcionalmente con la siguiente sintaxis:
-
-</para><para>
-
-<userinput>boot #/tftp/fichero param1=valor1 param2=valor2 ...</userinput>
-
-</para><para>
-
-Varias revisiones del firmware de DECstations presentan un problema
-respecto al arranque a través de red: la transferencia se inicia, pero después
-de algún tiempo se para mostranto el mensaje <computeroutput>a.out err</computeroutput>.
-Esto puede deberse a diversas razones:
-
-<orderedlist>
-<listitem><para>
-
-El firmware no responde a solicitudes ARP durante una transferencia
-TFTP. Esto lleva a que expire el tiempo máximo de ARP y a la paralización de la
-transferencia. La solución es añadir la dirección MAC de la tarjeta
-Ethernet de la DECstation estáticamente a la tabla ARP del servidor
-TFTP. Esto se hace ejecutando
-<userinput>arp -s
-<replaceable>Dirección IP</replaceable>
-<replaceable>Dirección MAC</replaceable></userinput>
-como superusuario en la máquina que actúe como servidor TFTP. La dirección
-MAC de la DECstation puede obtenerse con la orden
-<command>cnfg</command> en el cursor del firmware de la DECstation.
-
-</para></listitem>
-<listitem><para>
-
-El firmware tiene un límite de tamaño para los ficheros que pueden
-arrancarse a través de TFTP.
-
-</para></listitem>
-</orderedlist>
-
-También existen revisiones de firmware que no pueden arrancar
-en absoluto a través de TFTP. Puede encontrar una descripción sobre las
-diferentes revisiones de firmware en las páginas web de NetBSD:
-<ulink url="http://www.netbsd.org/Ports/pmax/board-list.html#proms"></ulink>.
-
-</para>
-   </sect3>
 
    <sect3 arch="alpha">
    <title>Arranque de TFTP en Alpha</title>

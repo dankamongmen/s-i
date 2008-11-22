@@ -1,22 +1,68 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 45616 -->
+<!-- original version: 56442 -->
 <!-- revisado por nahoo, 7 noviembre 2004 -->
 <!-- revisado por Rudy Godoy, 22 feb. 2005 -->
+<!-- revisado por Igor Támara, 16 nov. 2008 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Preparación de ficheros para el arranque desde un dispositivo de memoria USB</title>
 
 <para>
 
-Para preparar el dispositivo USB necesitará un sistema donde se esté
-ejecutando GNU/Linux con soporte USB. Deberá asegurarse que
-el módulo del núcleo «usb-storage» esté cargado
-(<userinput>modprobe usb-storage</userinput>) e intente averiguar que
-dispositivo SCSI ha sido asignado al dispositivo USB (en este ejemplo
-se usa <filename>/dev/sda</filename>). Para escribir en su dispositivo,
-probablemente deberá desactivar la protección de escritura.
+Se provee dos métodos para arrancar desde una memoria USB. El primero es
+instalar completamente desde la red. El segundo consiste en copiar una imagen
+de CD en la memoria USB y usarla como fuente de paquetes, posiblemente en
+combinación con un sitio de réplica. El segundo es más usado.
 
 </para><para>
+
+El primer método de instalación requiere descargar una imagen de instalador
+del directorio <filename>netboot</filename>(en  el sitio mencionado en
+<xref linkend="where-files"/>) y usar la <quote>forma flexible</quote>
+que se explica más adelante para copiar los ficheros en la memoria USB.
+
+</para><para>
+
+Las imágenes de instalación para el segundo método se encuentran en el
+directorio <filename>hd-media</filename> y se puede usar tanto la
+<quote>forma fácil</quote> o la <quote>forma flexible</quote> para copiar
+la imagen en la memoria USB. Este método de instalación también requerirá
+descargar la imagen del CD. La imagen de instalación y la imagen del CD
+deben coincidir con la version del &d-i;. Si no coinciden es muy probable
+que surjan errores<footnote>
+
+<para>
+El mensaje que se presenta más comunmente es que no se pudo encontrar los
+módulos del núcleo. Esto significa que la versión del módulo del núcleo
+udebs incluído en la imagen del CD difiere de la versión del núcleo que
+está en ejecución.
+</para>
+
+</footnote> durante la instalación.
+
+</para><para>
+
+Para preparar una memoria USB, necesitará un sistema en el cual ya esté
+corriendo GNU/Linux y con soporte para USB. En los sistemas GNU/Linux
+actuales la memoria USB debería reconocerse automáticamente cuando la
+inserta. Si no es así, revise que el módulo del núcleo usb-storage esté
+cargado. Cuando se inserta una memoria USB, se mapeará a un dispositivo
+llamado <filename>/dev/sdX</filename>, en el que <quote>X</quote> es una
+letra entre la a y la z. Al ejecutar la orden <command>dmesg</command>
+debería poder visualizar a qué dispositivo se mapea la memoria USB al
+insertarla. Para escribir en la memoria, es posible que deba quitar el
+seguro de protección contra escritura.
+
+</para>
+<warning><para>
+
+¡Los procedimientos descritos en esta sección destruirán lo que sea que haya
+en el dispositivo! Asegúrese de elegir correctamente el nombre del dispositivo
+para su memoria USB. Si usa el dispositivo incorrecto podría terminar
+perdiendo toda la información de, por ejemplo, un disco duro.
+
+</para></warning>
+<para>
 
 Note que el dispositivo USB, deberá tener por lo menos una capacidad de 256 MB
 (se pueden realizar configuraciones con menos capacidad, tal como se indica en
@@ -26,55 +72,58 @@ Note que el dispositivo USB, deberá tener por lo menos una capacidad de 256 MB
 
   <sect2 id="usb-copy-easy">
   <title>Copiado de los ficheros &mdash; la forma fácil</title>
-<para arch="x86">
+<para>
 
 Existe un fichero «todo en uno» <filename>hd-media/boot.img.gz</filename>
-que contiene todos los ficheros del instalador (incluyendo el núcleo)
-así como <command>SYSLINUX</command> y su fichero de configuración.
-Sólo debe extraerlo directamente en el dispositivo USB:
+que contiene todos los ficheros del instalador(incluyendo el núcleo)
+<phrase arch="x86">al igual que <classname>syslinux</classname> y su fichero
+de configuración.</phrase>
+<phrase arch="powerpc">al igual que <classname>yaboot</classname> y su
+fichero de configuración.</phrase>
+
+</para><para>
+
+Tenga en cuenta que aunque es conveniente, este método tiene una gran
+desventaja: el tamaño lógico del dispositivo se limitará a 256 MB,
+incluso si la capacidad de la memoria USB es mayor. Si quiere contar
+con la capacidad  completa de la memoria posteriormente para un uso
+diferente, tendrá que reparticionarla y crearle un nuevo sistema de
+archivos. Otra desventaja es que no puede copiar una imagen completa
+de CD en la memoria USB, solamente imágenes netinst o de tarjeta de
+presentación.
+
+</para><para arch="x86">
+
+Para usar esta imagen solamente hace falta extraer directamente en la
+memoria USB:
 
 <informalexample><screen>
-# gzip -dc boot.img.gz &gt;/dev/<replaceable>sda</replaceable>
+# zcat boot.img.gz &gt;/dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
-
-Obviamente esto destruirá todo lo que haya en el dispositivo, así
-que tenga cuidado y use el nombre de dispositivo correcto para
-su dispositivo USB.
 
 </para><para arch="powerpc">
 
-Existe un fichero «todo en uno» <filename>hd-media/boot.img.gz</filename>
-que contiene todos los ficheros del instalador (incluyendo el núcleo)
-así como <command>yaboot</command> y su fichero de configuración.
 Cree una partición del tipo «Apple_Bootstrap» en su dispositivo
 USB utilizando la orden <userinput>C</userinput> de
-<command>mac-fdisk</command> y extraiga
-la imagen directamente a éste:
+<command>mac-fdisk</command> y extraiga la imagen directamente
+a éste:
 
 <informalexample><screen>
-# zcat boot.img.gz &gt;/dev/<replaceable>sda2</replaceable>
+# zcat boot.img.gz &gt;/dev/<replaceable>sdX2</replaceable>
 </screen></informalexample>
 
-</para>
-<warning><para>
+</para><para>
 
-Obviamente esto destruirá todo lo que haya en el dispositivo, así
-que tenga cuidado y use el nombre de dispositivo correcto para
-su memoria USB.
-
-</para></warning>
-<para>
-
-Después, monte la memoria USB (<userinput>
-<replaceable arch="x86">/dev/sda</replaceable>
-<replaceable arch="powerpc">/dev/sda2</replaceable>
-/mnt</userinput>),
+Después de esto, monte la memoria USB
+<phrase arch="x86">(<userinput>mount
+/dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
+<phrase arch="powerpc">(<userinput>mount
+/dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
 que ahora tendrá un sistema de ficheros
 <phrase arch="x86">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>
-en ella, y copie una imagen ISO «netinst» o «bussinesscard» de Debian en ella.
-Por favor, tenga en cuenta que el nombre del fichero debe terminar en
-<filename>.iso</filename> (consulte <xref linkend="usb-add-iso"/>).
+en ella, y copie una imagen ISO «netinst» o «bussinesscard» de Debian
+sobre la memoria USB.
 Desmonte el dispositivo USB (<userinput>umount /mnt</userinput>) y habrá
 terminado.
 
@@ -87,38 +136,14 @@ terminado.
 
 Si desea más flexibilidad o simplemente le gusta saber que ocurre,
 podría usar el siguiente método para colocar los ficheros en su
-dispositivo USB.
+dispositivo USB. Una ventaja de este método es que &mdash; si la 
+capacidad de su memoria USB es lo suficientemente grande &mdash; 
+tendrá la opción de copiar una imagen completa de CD en ella.
 
 </para>
 
 &usb-setup-x86.xml;
 &usb-setup-powerpc.xml;
-
-   </sect2>
-   <sect2 id="usb-add-iso">
-   <title>Añadir una imagen ISO</title>
-<para>
-
-El instalador buscará una imagen ISO de Debian en la memoria para obtener los 
-datos adicionales necesarios para la instalación.  Así que el siguiente paso
-es poner cualquier imagen ISO de Debian («businesscard», «netinst» o incluso
-una completa) en su dispositivo (si cabe). El nombre de fichero para esta
-imagen debe terminar en <filename>.iso</filename>.
-
-</para><para>
-
-Si desea instalar a través de la red, sin usar una imagen ISO,
-puede, por supuesto, obviar el paso anterior. En este caso tendrá
-que usar el disco RAM inicial del directorio <filename>netboot</filename>
-en lugar del que se encuentra en <filename>hd-media</filename>, debido a que
-<filename>hd-media/initrd.gz</filename> no tiene soporte de red.
-
-</para><para>
-
-Cuando finalice, desmonte el dispositivo USB (<userinput>umount
-/mnt</userinput>) y active su protección de escritura.
-
-</para>
 
    </sect2>
 
@@ -134,7 +159,7 @@ corregirlo, use la orden <command>install-mbr</command> del
 paquete <classname>mbr</classname>:
 
 <informalexample><screen>
-# install-mbr /dev/<replaceable>sda</replaceable>
+# install-mbr /dev/<replaceable>sdX</replaceable>
 </screen></informalexample>
 
 </para></warning>
