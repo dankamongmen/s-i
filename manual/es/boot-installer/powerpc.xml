@@ -47,6 +47,7 @@ en el CD en el cursor de «OpenFirmware», similar a
 
 &boot-installer-intro-hd.xml;
 
+<!--
   <sect3><title>Arrancar CHRP desde OpenFirmware</title>
 
 <para>
@@ -55,6 +56,7 @@ en el CD en el cursor de «OpenFirmware», similar a
 
 </para>
    </sect3>
+-->
 
    <sect3><title>Arrancar PowerMacs OldWorld desde MacOS</title>
 <para>
@@ -82,12 +84,9 @@ Deberá previamente haber ubicado los ficheros
 <filename>initrd.gz</filename>, <filename>yaboot</filename> y
 <filename>yaboot.conf</filename> en la raíz de su
 partición HFS en <xref linkend="files-newworld"/>.
-Reinicie el ordenador e inmediatamente (durante la campanada)
-mantenga presionadas simultáneamente las teclas
-<keycap>Option</keycap>, <keycap>Command (cloverleaf/Apple)</keycap>,
-<keycap>o</keycap> y <keycap>f</keycap>. Después de algunos
-segundos se le presentará un cursor de «OpenFirmware». En el
-cursor escriba
+Ahora tendrá que arrancar el «OpenFirwmare»
+(consulte <xref linkend="invoking-openfirmware"/>).
+En el cursor escriba
 
 <informalexample><screen>
 0 &gt; boot hd:<replaceable>x</replaceable>,yaboot
@@ -130,10 +129,7 @@ linkend="boot-usb-files"/>. Para arrancar un sistema Macintosh desde un
 dispositivo USB, necesitará usar el cursor de «OpenFirmware», ya que «Open
 Firmware» no busca los dispositivos de almacenamiento USB de forma predeterminada.
 <!-- TODO: although it could be made to; watch this space -->
-Para obtener el cursor, pulse al mismo tiempo las teclas
-<keycombo><keycap>Command</keycap> <keycap>Option</keycap>
-<keycap>o</keycap> <keycap>f</keycap></keycombo> mientras arranca (vea <xref
-linkend="invoking-openfirmware"/>).
+Consulte <xref linkend="invoking-openfirmware"/>.
 
 </para><para>
 
@@ -192,10 +188,25 @@ desde la red.
 
 En máquinas con «Open Firmware», como las PowerMacs NewWorld, ingrese
 al monitor de arranque (vea <xref linkend="invoking-openfirmware"/>) y
-use la orden <command>boot enet:0</command>. Las máquinas PReP y CHRP
-podrían tener diferentes modos de tratar la red. En una máquina
-PReP, deberá usar
-<userinput>boot net:<replaceable>direcc_ip_servidor</replaceable>,<replaceable>fichero</replaceable>,<replaceable>direcc_ip_cliente</replaceable></userinput>.
+use la orden
+
+<informalexample><screen>
+0 &gt; boot enet:0
+</screen></informalexample>
+
+Si esto no funciona, puede que tenga que introducir el nombre de fichero así:
+
+<informalexample><screen>
+0 &gt; boot enet:0,yaboot
+</screen></informalexample>
+
+Las máquinas PReP y CHRP podrían tener diferentes modos de tratar la red. En
+una máquina PReP, deberá usar
+
+<informalexample><screen>
+boot net:<replaceable>direcc_ip_servidor</replaceable>,<replaceable>fichero</replaceable>,<replaceable>direcc_ip_cliente</replaceable>
+</screen></informalexample>
+
 Puede obtener una descripción de la sintaxis y opciones disponibles
 con la orden <userinput>help boot</userinput> en algunos sistemas PReP
 (como por ejemplo en los equipos Motorola PowerStack).
