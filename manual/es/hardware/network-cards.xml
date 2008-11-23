@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43693 -->
+<!-- original version: 56450 -->
 <!-- revisado por Steve Langasek -->
 
  <sect2 id="network-cards">
@@ -51,12 +51,6 @@ MyriCOM Gigabit Ethernet
 </para></listitem>
 </itemizedlist>
 
-</para><para arch="mipsel">
-
-Solamente se soportan las tarjetas de red integradas en las DECstations
-debido a limitaciones del núcleo. No funcionan en la actualidad las tarjetas
-opcionales de red TurboChannel.
-
 </para><para arch="s390">
 
 La lista de dispositivos de red soportados es:
@@ -81,64 +75,34 @@ OSA-Express en modo QDIO, HiperSockets y Guest-LANs
 
 </para><para arch="x86">
 
-Con respecto a RDSI (ISDN), el protocolo de canal D para el (antiguo)
-1TR6 alemán no está soportado; las tarjetas RDSI Spellcaster BRI
-tampoco están soportadas por el &d-i;. No está soportada la
-utilización de RDSI durante la instalación.
+Se soporta RDSI, pero no durante la instalación.
 
 </para>
 
-  <sect3 arch="not-s390" id="nics-firmware">
-  <title>Controladores que necesitan firmware</title>
+  <sect3 condition="supports-wireless" id="nics-wireless">
+   <title>Tarjetas de red inalámbrica</title>
 <para>
 
-El sistema de instalación no provee de facilidades actualmente para
-descargar firmware. Esto significa que cualquier tarjeta de red que
-utilice una controladora que necesite el firmware para poderse cargar
-no está soportada por omisión.
-
-</para><para>
-
-Aún puede instalar &debian; utilizando una imagen completa de CD-ROM o
+En general también se soportan las tarjetas de red inalámbricas. El núcleo
+oficial de Linux soporta un número creciente de adaptadores inalámbricos,
+aunque muchos necesitan que se cargue primero su «firmware». Aunque puede hacer
+funcionar en &debian; muchos adaptadores de red inalámbricos que no se soportan
+en el núcleo oficial de Linux, no están soportados durante el proceso de
+instalación.
+ 
+  </para><para>
+   
+Aún se está desarrollando en el programa de instalación la posibilidad de
+utilizar una red inalámbrica durante el proceso. El hecho de que funcione (o
+no) dependerá de su tipo de adaptador y de la configuración de su punto de
+acceso.
+En cualquier caso, puede instalar &debian; utilizando una imagen completa de CD-ROM o
 DVD si no puede utilizar ninguna otra tarjeta de red. Elija la opción
 que no configure la red e instale el sistema sólo con los paquetes
 disponibles en el CD/DVD. Una vez haya hecho esto podrá instalar el
-controlador y el firmware que necesita después de terminar la
+controlador y el «firmware» que necesite después de terminar la
 instalación (después del reinicio del sistema) y configurar la red
-manualmente. Tenga en cuenta que el firmware puede estar empaquetado
-al margen de la controladora y no estar disponible en la sección
-<quote>main</quote> del archivo de &debian;.
-
-</para><para>
-
-Si la controladora en sí <emphasis>está</emphasis> soportada puede
-utilizar la tarjeta durante la instalación sin más que copiar el
-firmware desde algún medio a
-<filename>/usr/lib/hotplug/firmware</filename>. No se olvide copiar el
-firmware a esta misma ubicación en el sistema instalado antes de
-reiniciar al final de la instalación.
-
-
-</para>
-  </sect3>
-
-  <sect3 condition="supports-wireless" id="nics-wireless">
-  <title>Tarjetas de red inalámbricas</title>
-<para>
-
-Existe un buen soporte de la mayoría de las tarjetas inalámbricas,
-pero con un factor que se debe tener en cuenta. Una gran cantidad de
-adaptadores inalámbricos han de utilizarse con controladores que o
-bien no son libres o bien no se han aceptado en el núcleo oficial
-Linux. Estas tarjetas generalmente pueden configurarse para que
-funcionen en &debian;, pero no están soportadas durante la instalación.
-
-</para><para>
-
-Aún puede instalar &debian; utilizando una imagen completa de CD-ROM o
-DVD si no puede utilizar ninguna otra tarjeta de red. Siga el mismo
-procedimiento que se describe más arriba para tarjetas que necesitan
-de un firmware.
+manualmente.
 
 </para><para>
 
@@ -181,11 +145,13 @@ puede que no funcione la tarjeta de red o que funcione mal.
 
 Este es un problema habitual en sistemas Netra con tarjetas Davicom
 (compatible DEC-Tulip). En estos equipos el controlador
-<literal>tulip</literal> es seguramente el que deba utilizar.
-
+<literal>tulip</literal> es seguramente el que deba utilizar.  Puede prevenir
+este problema poniendo el módulo del controlador incorrecto 
+en una lista negra, como se describe en <xref linkend="module-blacklist"/>.
+ 
 </para><para>
 
-La solución durante la instalación es cambiar a un intérprete de
+Una solución alternativa durante la instalación es cambiar a un intérprete de
 órdenes, quitar el módulo del controlador incorrecto utilizando
 <userinput>modprobe -r <replaceable>modulo</replaceable></userinput>
 (o quitar ambos, si están los dos). Y después cargar el módulo
@@ -203,7 +169,6 @@ El controlador de red <literal>cassini</literal> no funciona en
 sistemas blade Sun B100.
 
 </para>
-   </sect4>
-  </sect3>
-
- </sect2>
+  </sect4>
+ </sect3>
+</sect2>
