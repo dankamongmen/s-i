@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43965 -->
+<!-- original version: 56257 -->
 <!-- Revisado Rudy Godoy, 22 feb. 2005 -->
 <!-- Revisado por Igor Tamara, enero 2007 -->
 
@@ -43,6 +43,16 @@ hardware necesita repetirse después, durante el proceso.
 
 </para>
 
+</para><para arch="not-s390">
+
+Durante la detección de hardware &d-i; detecta si cualquiera de los
+controladores para los dispositivos hardware su sistema necesitan que se cargue
+un «firmware». Si es necesario un «firmware» pero no está disponible se
+mostrará un diálogo que le permite cargar el fichero de un medio removible.
+Para más información consulte <xref linkend="loading-firmware"/>.
+
+</para>
+
 &module-lowmem.xml;
 &module-localechooser.xml;
 &module-kbd-chooser.xml;
@@ -53,6 +63,9 @@ hardware necesita repetirse después, durante el proceso.
 &module-anna.xml;
 &module-netcfg.xml;
 &module-choose-mirror.xml;
+<!-- tzsetup is included in clock-setup -->
+&module-clock-setup.xml;
+
 
   </sect2>
 
@@ -67,7 +80,7 @@ las necesidades del usuario y listo para realizar el verdadero trabajo.
 Como lo indica el título de esta sección, la tarea principal de los
 próximos componentes radica en particionar sus discos, crear sistemas
 de ficheros, asignar puntos de montaje y opcionalmente configurar
-temas estrechamente relacionados como LVM o dispositivos RAID.
+opciones estrechamente relacionadas como LVM o dispositivos RAID.
 
 </para>
 
@@ -81,20 +94,6 @@ temas estrechamente relacionados como LVM o dispositivos RAID.
 &module-partman-crypto.xml;
   </sect2>
 
-
-  <sect2 id="di-system-setup">
-  <title>Configurar el sistema</title>
-<para>
-
-Después de particionar el instalador realizará unas preguntas adicionales
-que se utilizarán para configurar el sistema que se va a instalar.
-
-</para>
-
-&module-tzsetup.xml;
-&module-clock-setup.xml;
-&module-user-setup.xml;
-</sect2>
 
   <sect2 id="di-install-base">
   <title>Instalar el sistema base</title>
@@ -110,17 +109,33 @@ lentos, esto podría tomar algún tiempo.
 &module-base-installer.xml;
   </sect2>
 
+
+  <sect2 id="di-user-setup">
+  <title>Configurar usuarios y contraseñas</title>
+<para>
+
+El instalador le permitirá configurar la cuenta del usuario <quote>root</quote>
+(superusuario, o usuario administrador, N. del T.) y/o una cuenta para el primer
+usuario una vez haya instalado el sistema base. Puede crear otras cuentas de usuario
+una vez haya terminado el proceso de instalación.
+
+</para>
+
+&module-user-setup.xml;
+  </sect2>
+
   <sect2 id="di-install-software">
   <title>Instalar programas adicionales</title>
 <para>
 
-Una vez se haya instalado el sistema base tendrá un sistema usable
+A partir de este punto tendrá un sistema usable
 pero limitado. La mayoría de los usuarios querrán instalar programas adicionales
 en el sistema para ajustarlo a sus necesidades, y el instalador le permite 
 hacer esto. Este paso puede tardar más tiempo que la instalación del sistema
-base si tiene un ordenador lento o su red es lenta.
+base si tiene un ordenador lento o su conexión de red es lenta.
 
 </para>
+
 &module-apt-setup.xml;
 &module-pkgsel.xml;
   </sect2>
@@ -147,7 +162,6 @@ vea <xref linkend="boot-dev-select-sun"/>.</phrase>
 &module-ia64-elilo-installer.xml;
 &module-mips-arcboot-installer.xml;
 &module-mipsel-colo-installer.xml;
-&module-mipsel-delo-installer.xml;
 &module-powerpc-yaboot-installer.xml;
 &module-powerpc-quik-installer.xml;
 &module-s390-zipl-installer.xml;
@@ -159,11 +173,13 @@ vea <xref linkend="boot-dev-select-sun"/>.</phrase>
   <title>Finalizar la instalación</title>
 <para>
 
-Estas son las últimas cosas a hacer antes de reiniciar a su nuevo
-sistema. En su mayoría consiste en ordenar después del &d-i;.
+Este es el último paso en el proceso de instalación de Debian durante
+el cual el instalador realizará algunas tareas finales. 
+En su mayoría consiste en limpiar todo después del &d-i;.
 
 </para>
 
+&module-clock-setup-finish.xml;
 &module-finish-install.xml;
   </sect2>
 
