@@ -67,7 +67,7 @@ preseed_location () {
 	rm -f $tmp
 
 	log "successfully loaded preseed file from $location"
-	[ -e /var/run/delay-choosers ] && rm /var/run/delay-choosers
+	[ -e /var/run/delay_choosers ] && rm /var/run/delay_choosers
 	local last_location="$location"
 	
 	while true ; do
