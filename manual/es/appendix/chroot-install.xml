@@ -5,6 +5,7 @@
 <!-- actualizado jfs, 23 marzo 2006 -->
 <!-- actualizado jfs, enero 2007 -->
 <!-- actualizado igortamara, nov 17 2008 -->
+<!-- revisado jfs, nov 24 2008 -->
 
  <sect1 id="linux-upgrade">
  <title>Instalar &debian; desde un sistema Unix/Linux</title>
@@ -35,13 +36,13 @@ los distintos mecanismos de instalación o arranque disponibles.
 
 <note><para>
 
-Dado que este es un proceso manual en gran medida, tenga en cuenta que
-tendrá que hacer mucho de la configuración básica del sistema por su cuenta,
-que también requerirá más conocimiento de Debian y en general de Linux
-que al hacer una instalación normal. No puede esperar que este procedimiento
-resulte en un sistema que es idéntico a uno instalado de la forma usual.
-También debería recordar que este procedimiento solamente exhibe los pasos
-básicos para configurar un sistema. Es posible que se requieran ciertos
+Dado que este proceso es, en gran parte, manual ha de tener en cuenta que
+tendrá que hacer gran parte de la configuración básica del sistema por su cuenta.
+Para poder hacer esto necesitará más conocimientos de Debian y en general de Linux
+que si fuera a hacer una instalación normal. No espere que el resultado de este procedimiento
+sea un sistema idéntico al que uno obtendría si realizara la instalación normalmente.
+También debería tener en cuenta que este procedimiento solamente describe los pasos
+básicos para configurar un sistema. Es posible que puedan tener que realizarse
 pasos adicionales en la instalación y/o configuración.
 
 </para></note>
@@ -236,25 +237,25 @@ ejemplo:
 </para>
 
    <sect3>
-   <title>Crear dispositivos de ficheros</title>
+   <title>Crear ficheros de dispositivos</title>
 <para>
 
-En este punto <filename>/dev/</filename> contiene solamente dispositivos de
-ficheros muy básicos. Para los pasos siguientes de la instalación es posible
-que se necesite dispositivos de ficheros adicionales. Hay varias formas de
-hacerlo y el método que vaya a usar dependerá del sistema inicial que esté
-usando para la instalación, o si desea usar un núcleo modular o no, o si
-pretende usar dispositivos de archivos dinámicos (p.e. con
+Llegados a este punto el directorio <filename>/dev/</filename> contiene solamente ficheros
+de dispositivos muy básicos. Es posible que necesite ficheros de dispositivo adicionales
+para llevar a cabo los pasos siguientes de la instalación. Hay varias formas
+de hacerlo y el método que vaya a usar dependerá del sistema inicial que esté
+usando para la instalación, de si desea usar un núcleo modular o no, de si
+pretende usar dispositivos de archivos dinámicos (p.ej. con
 <classname>udev</classname>) o estáticos para el nuevo sistema.
 
 </para><para>
 
-A continuación algunas de las opciones disponibles:
+Algunas de las opciones disponibles son las siguientes:
 
 <itemizedlist>
 <listitem><para>
 
-cree un conjunto predeterminado de dispositivos estáticos de archivos con
+cree un conjunto predeterminado de ficheros de dispositivo estáticos con
 <informalexample><screen>
 # cd /dev
 # MAKEDEV generic
@@ -263,16 +264,16 @@ cree un conjunto predeterminado de dispositivos estáticos de archivos con
 </para></listitem>
 <listitem><para>
 
-manualmente cree solamente dispositivos de archivos específicos con
+cree manualmente solamente ficheros de dispositivos específicos con
 <command>MAKEDEV</command>
 
 </para></listitem>
 <listitem><para>
 
-Enlace el montaje de /dev de su sistema inicial encima de /dev del sistema
-objetivo; tenga en cuenta que los scripts de postinst de ciertos paquetes
-pueden tratar de crear dispositivos de archivos, por lo tanto, esta opción
-debe usarse con cuidado.
+Monte <filename>/dev</filename> del sistema original encima del directorio <filename>/dev</filename>
+del sistema objetivo utilizando un enlace de montaje («bind mount», N. del T.)
+Ha de tener en cuenta que los programas de postinstalación de algunos paquetes
+pueden tratar de crear ficheros de dispositivos. Utilice esta opción con precaución.
 
 </para></listitem>
 </itemizedlist>
@@ -613,8 +614,8 @@ MBR de <literal>hda</literal>). La última orden creará un
 
 </para><para>
 
-Tenga en cuenta que esto asume que el dispositivo de archivos 
-<filename>/dev/hda</filename> ha sido creado.  Hay métodos alternativos para 
+Estos ejemplos asumen que se ha creado el fichero de dispositov 
+<filename>/dev/hda</filename>. Existen métodos alternativos para 
 instalar <command>grub</command>,
 pero están fuera del alcance de este apéndice.
 
