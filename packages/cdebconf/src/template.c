@@ -466,7 +466,7 @@ void template_lset(struct template *t, const char *lang,
     char *orig_field;
     char *altlang;
     char *cp;
-    const char *curlang;
+    const char *curlang = NULL;
 
     if (strcasecmp(field, "tag") == 0)
     {
@@ -530,24 +530,28 @@ void template_lset(struct template *t, const char *lang,
              strcmp(lang, "C") == 0 || strncmp(lang, "en", 2) == 0)
         curlang = lang;
     else {
-        const char *wantlang_full = getlanguage();
-        char *wantlang;
         char *p;
+        struct cache_list_lang *cl;
 
-        if (!wantlang_full)
-            wantlang_full = "C";
-        wantlang = strdup(wantlang_full);
-        p = strpbrk(wantlang, "_.@");
-        if (p)
-            *p = '\0';
-        if (strncmp(lang, wantlang, strlen(wantlang)) == 0)
-            curlang = lang;
-        else {
-            INFO(INFO_VERBOSE, "Dropping %s/%s for %s (wantlang=%s)", t->tag, field, lang, wantlang);
+        getlanguage();
+        for (cl = cache_list_lang_ptr; cl != NULL; cl = cl->next) {
+            char *wantlang;
+
+            wantlang = strdup(cl->lang);
+            p = strpbrk(wantlang, "_.@");
+            if (p)
+                *p = '\0';
+            if (strncmp(lang, wantlang, strlen(wantlang)) == 0) {
+                curlang = lang;
+                free(wantlang);
+                break;
+            }
             free(wantlang);
+        }
+        if (curlang == NULL) {
+            INFO(INFO_VERBOSE, "Dropping %s/%s for %s", t->tag, field, lang);
             return;
         }
-        free(wantlang);
     }
 
     p = t->fields;
