@@ -48,9 +48,11 @@ tmp_trans=$(mktemp -p /tmp preseed_trans.XXXXXX)
 if [ -d "po/$lang" ]; then
 	cd po/$lang
 
-	sed -n "/^msgid/,/^msgstr/ p" preseed.po | grep -v msgstr | \
+	msgattrib --no-wrap preseed.po | \
+		sed -n "/^msgid/,/^msgstr/ p" | grep -v msgstr | \
 		filter_preseed >$tmp_orig
-	sed -n "/^msgstr/,/^$/ p" preseed.po | \
+	msgattrib --no-wrap preseed.po | \
+		sed -n "/^msgstr/,/^$/ p" | \
 		filter_preseed >$tmp_trans
 else
 	filter_preseed <en/appendix/preseed.xml >$tmp_orig
