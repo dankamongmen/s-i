@@ -15,8 +15,8 @@ echo "original and translation for a visual check."
 echo
 echo
 
-tmp_msgid=$(tempfile -p preseed_msgid.)
-tmp_msgstr=$(tempfile -p preseed_msgstr.)
+tmp_msgid=$(mktemp -p /tmp preseed_msgid.XXXXXX)
+tmp_msgstr=$(mktemp -p /tmp preseed_msgstr.XXXXXX)
 
 sed -n "/^msgid/,/^msgstr/ p" preseed.po | grep -v msgstr | \
 	grep "^\"#\?d-i " >$tmp_msgid
