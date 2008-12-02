@@ -8,18 +8,22 @@ filter_preseed() {
 	     }
 	     /^\"?#?d-i/ {
 		print
+	        in_setting=1
 		next
 	     }
 	     /\\+[[:space:]]*(\\n\")?$/ {
-		print
-		in_seq=1
-		next
+		if (in_setting) {
+			print
+			in_seq=1
+			next
+		}
 	     }
 	     /.*/ {
 		if (in_seq) {
 			print
 			in_seq=0
 		}
+		in_setting=0
              }'
 }
 
