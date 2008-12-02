@@ -2,6 +2,27 @@
 
 lang="$1"
 
+filter_preseed() {
+	awk '/^#~/ {
+		next
+	     }
+	     /^\"?#?d-i/ {
+		print
+		next
+	     }
+	     /\\+[[:space:]]*(\\n\")?$/ {
+		print
+		in_seq=1
+		next
+	     }
+	     /.*/ {
+		if (in_seq) {
+			print
+			in_seq=0
+		}
+             }'
+}
+
 if [ -z "$lang" ] || ([ ! -d po/"$lang" ] && [ ! -d "./$lang" ]); then
 	echo "Usage: $(basename $0) <language>"
 	exit 1
@@ -19,15 +40,15 @@ tmp_orig=$(mktemp -p /tmp preseed_orig.XXXXXX)
 tmp_trans=$(mktemp -p /tmp preseed_trans.XXXXXX)
 
 if [ -d "po/$lang" ]; then
-	cd $po
+	cd po/$lang
 
 	sed -n "/^msgid/,/^msgstr/ p" preseed.po | grep -v msgstr | \
-		grep "^\"#\?d-i " >$tmp_orig
+		filter_preseed >$tmp_orig
 	sed -n "/^msgstr/,/^$/ p" preseed.po | \
-		grep "^\"#\?d-i " >$tmp_trans
+		filter_preseed >$tmp_trans
 else
-	grep "^#\?d-i " en/appendix/preseed.xml >$tmp_orig
-	grep "^#\?d-i " $lang/appendix/preseed.xml >$tmp_trans
+	filter_preseed <en/appendix/preseed.xml >$tmp_orig
+	filter_preseed <$lang/appendix/preseed.xml >$tmp_trans
 fi
 
 echo "Number of original lines:   $(wc -l <$tmp_orig)"
