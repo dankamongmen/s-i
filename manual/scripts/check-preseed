@@ -1,0 +1,39 @@
+#! /bin/sh
+
+lang="$1"
+
+if [ -z "$lang" ] || ([ ! -d po/"$lang" ] && [ ! -d "./$lang" ]); then
+	echo "Usage: $(basename $0) <language>"
+	exit 1
+fi
+
+echo "This script performs a very basic sanity check to see if nothing has"
+echo "been missed in the translation of preseed.po. It does this by counting"
+echo "the number of lines that start with 'd-i' or '#d-i' for both msgid and"
+echo "msgstr and printing the result. It will then print a diff between the"
+echo "original and translation for a visual check."
+echo
+echo
+
+tmp_orig=$(mktemp -p /tmp preseed_orig.XXXXXX)
+tmp_trans=$(mktemp -p /tmp preseed_trans.XXXXXX)
+
+if [ -d "po/$lang" ]; then
+	cd $po
+
+	sed -n "/^msgid/,/^msgstr/ p" preseed.po | grep -v msgstr | \
+		grep "^\"#\?d-i " >$tmp_orig
+	sed -n "/^msgstr/,/^$/ p" preseed.po | \
+		grep "^\"#\?d-i " >$tmp_trans
+else
+	grep "^#\?d-i " en/appendix/preseed.xml >$tmp_orig
+	grep "^#\?d-i " $lang/appendix/preseed.xml >$tmp_trans
+fi
+
+echo "Number of original lines:   $(wc -l <$tmp_orig)"
+echo "Number of translated lines: $(wc -l <$tmp_trans)"
+echo
+
+diff -U0 $tmp_orig $tmp_trans
+
+rm -f $tmp_orig $tmp_trans
