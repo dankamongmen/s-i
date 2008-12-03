@@ -366,6 +366,9 @@ fetch_files() {
 
 pxelinux_version() {
 	bin="$1"
+	if [ ! -f "$bin" ]; then
+		return
+	fi
 	tr -c '[:print:] ' '\n' < $1 | sed -n -r "/PXELINUX [.0-9]+/ s/^[^ ]* ([0-9^.]+).*/\1/ p" | sort -r | head -n 1
 }
 
