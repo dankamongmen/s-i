@@ -104,6 +104,16 @@ print_do-not-edit_header() {
 	echo "##"
 }
 
+install_local_syslinux() {
+	local targetdir=$1
+	if [ -f "$SYSLINUX/$SYSLINUXMENU" -a -f "$SYSLINUX/pxelinux.0" ]; then
+		cp "$SYSLINUX/$SYSLINUXMENU" $targetdir/pxelinux.cfg/
+		cp "$SYSLINUX/pxelinux.0" $targetdir
+	else
+		echo "W: couldn't copy '$SYSLINUX/$SYSLINUXMENU' and/or '$SYSLINUX/pxelinux.0' to $targetdir. Install the package syslinux." 1>&2
+	fi
+}
+
 update_menu() {
 	update_pxelinux_menu
 	update_elilo_menu
@@ -142,12 +152,7 @@ update_pxelinux_menu() {
 
 	[ -d pxelinux.cfg ] && rmdir --ignore-fail-on-non-empty pxelinux.cfg
 	if [ -d pxelinux.cfg ]; then
-		if [ -f "$SYSLINUX/$SYSLINUXMENU" -a -f "$SYSLINUX/pxelinux.0" ]; then
-			cp "$SYSLINUX/$SYSLINUXMENU" pxelinux.cfg/
-			cp "$SYSLINUX/pxelinux.0" ./
-		else
-			echo "W: couldn't copy '$SYSLINUX/$SYSLINUXMENU' and/or '$SYSLINUX/pxelinux.0' to $PWD. Install the package syslinux." 1>&2
-		fi
+		install_local_syslinux ./
 	fi
 }
 
@@ -482,6 +487,10 @@ install_repo() {
 			ver="$(sed -ne 's/# D-I config version \(.*\)/\1/p' "$pxelinuxcfg" 2>/dev/null)"
 			if [ ! -f "$pxelinuxcfg" -o "${ver:-1.0}" != "1.0" ]; then
 				echo "W: The format of this image may not be supported." 1>&2
+			fi
+			[ ! -d "$TFTP_ROOT/debian-installer/pxelinux.cfg" ] && mkdir "$TFTP_ROOT/debian-installer/pxelinux.cfg"
+			if [ ! -f "$TFTP_ROOT/debian-installer/pxelinux.0" ]; then
+				install_local_syslinux "$TFTP_ROOT/debian-installer/"
 			fi
 			PXE_NEW_VER="$(pxelinux_version "$pxelinuxbin")"
 			PXE_CUR_VER="$(pxelinux_version "$TFTP_ROOT/debian-installer/pxelinux.0")"
