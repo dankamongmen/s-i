@@ -6,10 +6,17 @@
 NL="
 "
 
+console=
 if ! [ -f /var/run/console-device ]; then
-	# If the kernel emitted an "handover" message, then it's the one
+	# If the kernel emitted a "handover" message, then it's the one
 	console="$(dmesg -s 65535 |
 		sed -n -e 's/.*\] console handover: boot \[.*\] -> real \[\(.*\)\]$/\1/p')"
+
+	# Except if it is the wrong type...
+	if ["$console" ] && [ "$(console-type)" = serial ] && \
+	   expr "$console" : "tty[0-9]" >/dev/null; then
+		console=
+	fi
 
 	consoles=
 	if [ -z "$console" ]; then
