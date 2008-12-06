@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 45612 -->
+<!-- original version: 56827 -->
 <!-- traducido por jfs, 30 dic 2005 -->
+<!-- actualizado ikks, 5 dic 2008 -->
 
 <!--
 Tened cuidado con el formato de este fichero dado que se parsea
 para generar el fichero de preconfiguración.
 
 En ese fichero se incluye todo el texto dentro de marcas
-<informalexample> que tienen el atributo 'role="example"'. 
-Salvo si hay un atributo 'condition' que hace que no aplique a 
+<informalexample> que tienen el atributo 'role="example"'.
+Salvo si hay un atributo 'condition' que hace que no aplique a
 la versión específica o un atributo 'arch' que hace que no aplique
 a una arquitectura específica.
 
@@ -40,6 +41,13 @@ durante la instalación sin tener que introducir manualmente las respuestas
 mientras ésta se ejecuta.
 Esto hace posible que se automatizen la mayoría de las instalaciones e incluso
 ofrece funcionalidades que no están disponibles durante una instalación normal.
+
+</para><para>
+
+La preconfiguración no es indispensable.  Si usa un fichero vacío de
+preconfiguración, el instalador se comportará como una instalación manual
+usual.  Cada pregunta que haya preconfigurado modificará(¡si lo ha hecho bien!)
+la instalación de alguna forma con tal información.
 
 </para>
 
@@ -132,7 +140,7 @@ Puede encontrar una forma para evitar que se omitan estas preguntas con
 <xref linkend="preseed-bootparms"/>.
 
  </para><para>
- 
+
 Puede arrancar el instalador en modo <quote>auto</quote> para evitar
 las preguntas que generalmente aparecen antes de que se realice la
 preconfiguración. Esto hace que las preguntas que se harían antes de
@@ -142,7 +150,7 @@ preconfiguren. Esto también hace que la instalación se ejecute en
 prioridad crítica, lo que hace que se omitan muchas preguntas poco
 importantes. Para más información consulte <xref
 linkend="preseed-auto"/>.
- 
+
 </para>
   </sect2>
 
@@ -303,7 +311,7 @@ Tenga en cuenta que puede abreviar <filename>preseed/url</filename> a
 
 </para>
   </sect2>
-  
+ 
   <sect2 id="preseed-bootparms">
   <title>Usar parámetros de arranque para preconfigurar preguntas</title>
 <para>
@@ -347,18 +355,24 @@ utilizará durante la configuración del paquete apropiado.
 
 </para><para>
 
+Normalmente, al preconfigurar una pregunta de esta forma, la pregunta
+no se mostrará.  Para especificar un valor predeterminado para la pregunta,
+y que esta se muestre, use el operador <quote>?=</quote> en lugar de
+<quote>=</quote>. Consulte <xref linkend="preseed-seenflag"/>.
+
+</para><para>
+
 Tenga en cuenta que hay una abreviatura para las variables que se
 utilizan con más frecuencia en el indicador de arranque. Los ejemplos
-de este apéndice utilizan la abreviatura si hay una disponible en
-lugar de la variable completa.  En particular, se ha abreviado la
-variable <literal>preseed/url</literal> a <literal>url</literal> y
-tiene algunas cosas extra para permitir el uso de urls reducidas. Otro
+de este apéndice utilizan la abreviatura, si hay una disponible, en
+lugar de la variable completa.  Por ejemplo, se ha abreviado la
+variable <literal>preseed/url</literal> a <literal>url</literal>. Otro
 ejemplo es la abreviatura <literal>tasks</literal> que se traduce a
 <literal>tasksel:tasksel/first</literal>.
 
 </para><para>
 
-Un <quote>--</quote> en las opciones de arranque tiene un 
+Un <quote>--</quote> en las opciones de arranque tiene un
 significado especial. Los parámetros que aparezcan tras éste pueden copiarse
 a la configuración del cargador de arranque que se instale (si el instalador
 proporciona soporte para esa opción con el cargador de arranque
@@ -456,7 +470,7 @@ si la URL no indica un protocolo se presupone que es http,
 </para></listitem>
 <listitem><para>
 si la sección del nombre de equipo no tiene puntos se le añade el
-dominio derivado del DHCP, y 
+dominio derivado del DHCP, y
 </para></listitem>
 <listitem><para>
 si no hay ningún <literal>/</literal> tras el nombre de host se añade
@@ -503,8 +517,8 @@ añadiendo dos parámetros a la línea de órdenes del núcleo:
 <literal>auto-install/enable</literal> y controla el tiempo de espera
 de las preguntas de localización y teclado para que estas se realicen
 más adelante y puedan preconfigurarse. El parámetro
-<literal>priority</literal> es la abreviatura de 
-<literal>debconf/priority</literal>, si se fija a 
+<literal>priority</literal> es la abreviatura de
+<literal>debconf/priority</literal>, si se fija a
 <literal>critical</literal> no se hará ninguna pregunta con una
 prioridad inferior a ésta.
 
@@ -556,7 +570,7 @@ preconfiguración (en modo auto)
 </informaltable>
 
   </sect2>
-  
+ 
  <sect2 id="preseed-dhcp">
  <title>Utilizar un servidor DHCP para especificar los ficheros de preconfiguración</title>
 <para>
@@ -588,11 +602,11 @@ evitar preconfigurar todas las instalaciones que se hagan en su red.
 </para><para>
 
 Una buena forma de hacer uso de la preconfiguración de DHCP es sólo
-preconfigurar los valores específicos a su red, como puedan ser la 
+preconfigurar los valores específicos a su red, como puedan ser la
 réplica Debian a utilizar. De esta forma todas las instalaciones en su
 red cogerán automáticamente la réplica adecuada, mientras que el resto
 de la instalación se realizará de forma interactiva. Deberá tener
-cuidado si quiere utilizar preconfiguración DHCP para automatizar 
+cuidado si quiere utilizar preconfiguración DHCP para automatizar
 la instalación completa de Debian.
 
 </para>
@@ -624,21 +638,32 @@ de preconfiguración.
   Sólo se permite un espacio entre tipo de plantilla y valor. Cualquier
   espacio adicional se considerará que pertenece al valor.
 </para></listitem>
-<listitem><para> 
+<listitem><para>
  Se puede dividir una línea en múltiples líneas si se añade un barra invertida
  (<quote><literal>\</literal></quote>) como carácter de continuación de línea.
  Un buen punto para la divisón de la linea es después del nombre de la
- pregunta. Es mala idea dividir la línea entre el tipo y el valor.
+ pregunta. Es mala idea dividir la línea entre el tipo y el valor.  Las líneas
+ con saltos se unirán en una sola línea con todo el espacio al principio y al
+ final condensado en un solo espacio.
+
  </para></listitem>
  <listitem><para>
+  Para las variables debconf(plantillas) que se usan en el instalador, el
+  dueño debería ser <quote>d-i</quote>; para preconfigurar las variables
+  que se usan en el sistema instalado, debería coincidir el nombre de la
+  plantilla debconf correspondiente con el nombre del paquete.  Solamente
+  se propagarán las variables que tengan el dueño distinto a
+  <quote>d-i</quote> en la base de datos para el sistema instalado.
+</para></listitem>
+<listitem><para>
   La mayoría de las preguntas tienen que preconfigurarse con los
   valores que sean válidos en inglés y no en las traducciones de esos mismos
-  valores. Hay algunas preguntas, sin embargo (como es el caso de 
+  valores. Hay algunas preguntas, sin embargo (como es el caso de
   <classname>partman</classname>) donde se tienen que utilizar los valores
   traducidos.
  </para></listitem>
  <listitem><para>
-  Algunas preguntas toman un código como valor en lugar del campo 
+  Algunas preguntas toman un código como valor en lugar del campo
   de texto mostrado durante la instalación (en inglés).
  </para></listitem>
 </itemizedlist>
@@ -679,7 +704,7 @@ superusuario.
 
 </para><para>
 
-Si purga el paquete 
+Si purga el paquete
 <classname>installation-report</classname> se eliminará el directorio
 <filename>/var/log/installer</filename> y todos los ficheros en él
 incluidos de su sistema.
@@ -705,11 +730,11 @@ antes de hacer una instalación puede utilizar la orden
  </sect1>
 
  <sect1 id="preseed-contents">
- <title>Contenidos del fichero de preconfiguración</title>
+ <title>Contenidos del fichero de preconfiguración(para &releasename;)</title>
 <para>
 
 Los fragmentos de configuración que se utilizan en este apéndice también están
-disponible como un ejemplo de fichero de preconfiguración en 
+disponible como un ejemplo de fichero de preconfiguración en
 &urlset-example-preseed;.
 
 </para><para>
@@ -733,7 +758,11 @@ el fichero de preconfiguración se cargará después de haber hecho estas preguntas
 </para><para>
 
 <!-- N del T: En el texto original utiliza en_US, aquí cambiamos a es_ES -->
-La localización puede utilizarse para espceificar tanto el idioma como el país.
+La localización puede utilizarse para especificar tanto el idioma como el país
+y puede usarse cualquier combinación de idioma y país reconocido soportados
+por el &d-i;.  Si la combinación no constituye una localización válida, el
+instalador seleccionará automáticamente una localización válida para el
+idioma seleccionado.
 Puede utilizar
 <userinput>locale=<replaceable>es_ES</replaceable></userinput>.
 para especificar la localización como un parámetro de arranque.
@@ -748,7 +777,8 @@ d-i debian-installer/locale string es_ES
 La configuración del teclado consiste en la selección de una arquitectura
 de teclado y un mapa de teclado. En la mayor parte de los casos se selecciona
 una arquitectura de teclado correcta por omisión y no es necesario preconfigurarla.
-El mapa de teclado debe ser válido para la arquitectura de teclado seleccionada.
+El mapa de teclado debe ser conocido por el &d-i; para la arquitectura de teclado
+seleccionada.
 
 <informalexample role="example"><screen>
 # Selección de teclado
@@ -802,11 +832,15 @@ utilizar este truco para evitar esto si, por ejemplo, quiere conifgurar una
 dirección estática a la interfaz de red. El truco es obligar a que la
 configuración de red se ejecute de nuevo después de haber cargado el fichero de
 preconfiguración creando un programa <quote>preseed/run</quote> con las
-siguientes líneas:
+siguientes órdenes:
 
 <informalexample><screen>
 killall.sh; netcfg
 </screen></informalexample>
+
+</para><para>
+
+Las siguientes variables debconf son relevantes para configuración de red.
 
 </para>
 
@@ -850,7 +884,25 @@ d-i netcfg/get_domain string unassigned-domain
 d-i netcfg/wireless_wep string
 # El nombre de servidor raro que algunos ISP utilizan como una especie de contraseña
 #d-i netcfg/dhcp_hostname string radish
+
+# Si se requiere firmware no libre para la red o para otro dispositivo, puede
+# configurar el instalador para que siempre intente cargarlo, sin preguntar. O
+# cambiar a falso para inhibir la pregunta.
+#d-i hw-detect/load_firmware boolean true
 </screen></informalexample>
+
+<para>
+
+Tenga en cuenta que <command>netcfg</command> determinará automáticamente la
+máscara de red si <classname>netcfg/get_netmask</classname> no está presente.
+En cuyo caso, la variable tiene que marcarse como <literal>vista</literal> en
+el caso de instalaciones automáticas.  De la misma forma,
+<command>netcfg</command> elegirá una dirección apropiada si
+<classname>netcfg/get_gateway</classname> no ha sido establecida. La excepción
+es establecer a <classname>netcfg/get_gateway</classname> en <quote>none</quote>
+para especificar que no se debería usar puerta de enlace alguna.
+
+</para>
 
   </sect2>
 
@@ -884,7 +936,7 @@ instalación utilizado. Por omisión, el valor de
 <informalexample role="example"><screen>
 # No tiene que definir la cadena mirror/country si selecciona ftp
 #d-i mirror/protocol string ftp
-d-i mirror/country string enter information manually
+d-i mirror/country string manual
 d-i mirror/http/hostname string &archive-mirror;
 d-i mirror/http/directory string /debian
 d-i mirror/http/proxy string
@@ -894,6 +946,28 @@ d-i mirror/http/proxy string
 # Versión a utilizar para descargar componentes de la instalación
 # (opcional)
 #d-i mirror/udeb/suite string testing
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-time">
+  <title>Configuración del reloj y zona horaria</title>
+
+<informalexample role="example"><screen>
+# Controla si el reloj del sistema debe establecerse a UTC.
+d-i clock-setup/utc boolean true
+
+# Puede establecer este a cualquier valor válido para $TZ;
+# consulte en los contenidos de /usr/share/zoneinfo/ para hallar
+# valores válidos.
+d-i time/zone string US/Eastern
+
+# Controla si se usará NTP para establecer el reloj durante la
+# instalación
+d-i clock-setup/ntp boolean true
+# Servidores NTP a usar. El predeterminado sería el mejor en
+# general.
+#d-i clock-setup/ntp-server string ntp.example.com
 </screen></informalexample>
 
   </sect2>
@@ -923,41 +997,33 @@ de configurarlo si el sistema tiene más de un disco.
 <informalexample role="example"><screen>
 # Si el sistema tiene espacio libre puede elegir particionar solamente
 # este espacio.
-# Nota: esta pregunta tiene que ser preconfigurada con el valor localizado
-# (traducido)
-#d-i partman-auto/init_automatically_partition \
-#      select Guiado - utilizar el espacio libre contiguo más grande
-#
+#d-i partman-auto/init_automatically_partition select biggest_free
+
 # También puede especificar un disco a particionar. El nombre del
-# dispositivo se puede introducir tanto en formato tradicional o en
-# formato devfs.
-#  Por ejemplo, para utilizar el primer disco:
-d-i partman-auto/disk string /dev/discs/disc0/disc
+# dispositivo se se debe especificar en formato tradicional no devfs.
+# Nota: Debe especificar un disco, a menos que el sistema tenga uno
+# solo.  Por ejemplo, para usar el primer disco SCSI/SATA:
+#d-i partman-auto/disk string /dev/sda
 # Además, debe especificar el método a utilizar.
 # Los métodos disponibles actualmente son: "regular", "lvm" y "crypto"
 d-i partman-auto/method string lvm
 
 # Si alguno de los discos que va a ser automaticamente particionado
 # contiene una configuración antigua de LVM se le presentaría un
-# aviso al usuario. Esto puede preconfigurarse para que no aparezca: 
+# aviso al usuario. Esto puede preconfigurarse para que no aparezca:
 d-i partman-lvm/device_remove_lvm boolean true
+# De la misma forma para arreglos por RAID por software pre existentes:
+d-i partman-md/device_remove_md boolean true
 # Y lo mismo pasa con la confirmación para escribir las particiones
 # lvm.
 d-i partman-lvm/confirm boolean true
 
-
-# O, si quiere utilizar LVM:
-#d-i partman-auto-lvm/disk string /dev/discs/disc0/disc
-
-# Puede elegir cualquiera de las recetas de particionado predefinidas.
-# Nota: esta plantilla tiene que ser preconfigurada con el valor localizado
-# (traducido)
-d-i partman-auto/choose_recipe \
-       select All files in one partition (recommended for new users)
-#d-i partman-auto/choose_recipe \
-#       select Separate /home partition
-#d-i partman-auto/choose_recipe \
-#       select Separate /home, /usr, /var, and /tmp partitions
+# Puede elegir cualquiera de las tres recetas de particionado
+# predefinidas:
+# - atomic: todos los ficheros en una partición
+# - home:   separa la partición /home
+# - multi:  separar las particiones /home, /usr, /var y /tmp
+d-i partman-auto/choose_recipe select atomic
 
 # O indicar su propia receta...
 # El formato de las recetas está documentado en el fichero
@@ -967,7 +1033,7 @@ d-i partman-auto/choose_recipe \
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
 
 # Si no, puede colocar la receta completa en el fichero de
-# preconfiguración en una única línea (lógica). 
+# preconfiguración en una única línea (lógica).
 # Este ejemplo crea una pequeña partición /boot, una
 # partición de intercambio apropiada y usa el resto del espacio para
 # la partición raíz:
@@ -989,10 +1055,10 @@ d-i partman-auto/choose_recipe \
 #              .
 
 # La siguiente receta hace que «partman» particione automáticamente el
-# espacio sin confirmación.
+# espacio sin confirmación, en caso de que usted haya indicado qué hacer
+# con uno de los métodos mencionados anteriormente.
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
@@ -1004,7 +1070,7 @@ d-i partman/confirm boolean true
 
 También puede utilizar la preconfiguración para configurar las
 particiones en arrays RAID por software. Se puede utilizar para
-niveles RAID 0, 1 y 5, creando arrays degradados y especificando
+niveles RAID 0, 1 y 5, 6 y 10 creando arrays degradados y especificando
 dispositivos libres.
 Puede configurar grub para que se instale en todos los dispositivos
 utilizados en el array si está utilizando RAID 1, consulte <xref
@@ -1015,10 +1081,10 @@ linkend="preseed-bootloader"/>.
 <warning><para>
 
 Es fácil equivocarse en este tipo de particionado automático. También
-se trata de un componente muy nuevo que puede tener aún algunos
-errores o puede no tratar todos los errores. El usuario es responsable
-de conseguir todas las distintas recetas bien (de forma que tengan
-sentido y no entren en conflicto). Si tiene problemas compruebe
+es una funcionalidad que es poco probada por los desarrolladores del
+&d-i;.  El usuario es responsable de aplicar bien las posibles
+recetas bien (de forma que tengan sentido y no entren en conflicto).
+Si tiene problemas compruebe
 <filename>/var/log/syslog</filename>.
 
 
@@ -1063,7 +1129,7 @@ dispositivos libres.
 # Los parámetros son
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Se soportan los niveles RAID 0, 1 y 5; los dispositivos se separan
+# Se soportan los niveles RAID 0, 1 y 5,6 y 10; los dispositivos se separan
 # con "#"
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                                           \
@@ -1080,67 +1146,30 @@ dispositivos libres.
 # confirmación.
 d-i partman-md/confirm boolean true
 d-i partman/confirm_write_new_label boolean true
-d-i partman/choose_partition \
-       select Finish partitioning and write changes to disk
+d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
   </sect2>
 
-  <sect2 id="preseed-time">
-  <title>Configuración del reloj y la zona horaria</title>
-
-<informalexample role="example"><screen>
-# Controla si el reloj de hardware está o no configurado a UTC 
-# (Tiempo Universal Coordinado)
-d-i clock-setup/utc boolean true
-
-# Puede utilizar esta opción para definir un valor apropiado para $TZ.
-# Consulte los valores permitidos en /usr/share/zoneinfo/ 
-d-i time/zone string US/Eastern
-</screen></informalexample>
-
-  </sect2>
-
-  <sect2 id="preseed-apt">
-  <title>Configuración de Apt</title>
+  <sect2 id="preseed-base-installer">
+  <title>Configuración del sistema base</title>
 <para>
 
-Se configura automáticamente <filename>/etc/apt/sources.list</filename> basándose en
-el método de instalación y las respuetas dadas anteriormente. También
-se hace una configuración básica de éste. Las dos líneas mostradas
-a continuación son relevantes para la preconfiguración. Desea ayudar
-(opcionalmente) otras acciones del repositorio.
+No hay mucho que se pueda preconfigurar en esta etapa de la
+instalación. La única pregunta concerniente a la instalación
+refiere al núcleo.
 
 </para>
 
 <informalexample role="example"><screen>
-# Puede elegir instalar software de las fuentes «non-free» y «contrib».
-#d-i apt-setup/non-free boolean true
-#d-i apt-setup/contrib boolean true
-# Descomente esta línea si no quiere utilizar una réplica de red
-#d-i apt-setup/use_mirror boolean false
-# Descomente esta línea para impedir que los recursos de seguridad
-# trabajen o me añadan un servidor distinto de security.debian.org.
-#d-i apt-setup/security_host string
+# Seleccione el generador de initramfs que se emplee para generar
+# el initrd para los núcleos 2.6,
+#d-i base-installer/kernel/linux/initramfs-generators string yaird
 
-# Repositorios adicionales, se dispone de local[0-9]
-#d-i apt-setup/local0/repository string \
-#       http://local.server/debian stable main
-#d-i apt-setup/local0/comment string local server
-# Activar líneas deb-src
-#d-i apt-setup/local0/source boolean true
-# URL de la clave pública en el repositorio local. Debe indicar
-# una clave o apt se quejará indicando que el repositorio no 
-# está autenticado con lo que la línea en sources.list quedará
-# comentada.
-#d-i apt-setup/local0/key string http://local.server/key
-
-# El instalador exige que los repositorios estén autenticados con una
-# clave gpg conocida por omisión. Puede utilizar esta opción para 
-# deshabilitar la autenticación. Aviso: esta opción no es segura y no se 
-# recomienda
-#d-i debian-installer/allow_unauthenticated string true
+# El (meta) paquete de la imagen del núcleo que se vaya a instalar;
+# puede usar "none" si no se ba a instalar núcleo.
+#d-i base-installer/kernel/image string linux-image-2.6-486
 </screen></informalexample>
 
   </sect2>
@@ -1188,6 +1217,13 @@ cabo ataques de fuerza bruta sobre la contraseña.
 #d-i passwd/user-password-again password insecure
 # o cifrada utilizando un hash MD5.
 #d-i passwd/user-password-crypted password [MD5 hash]
+# Crea el primer usuario con el UID especificado en lugar del
+# predeterminado.
+#d-i passwd/user-uid string 1010
+
+# La cuenta de usuario se añadirá a ciertos grupos especiales. Para
+# cambiarlos, use lo siguiente:
+#d-i passwd/user-default-groups string audio cdrom video
 </screen></informalexample>
 
 <para>
@@ -1213,51 +1249,45 @@ $ echo "r00tme" | mkpasswd -s -m md5
 </para>
   </sect2>
 
-  <sect2 id="preseed-base-installer">
-  <title>Instalación del sistema base</title>
+  <sect2 id="preseed-apt">
+  <title>Configuración de APT</title>
 <para>
 
-No hay mucho que pueda preconfigurarse para esta fase de la instalación.
-Las únicas preguntas que se hacen son referentes a la instalación
-del núcleo.
+Tanto la configuración de <filename>/etc/apt/sources.list</filename> como
+las opciones de configuraciones básicas se automatizan completamente de
+acuerdo al método de instalación y las respuestas a preguntas anteriores.
+Puede opcionalmente colocar otros repositorios(locales).
 
 </para>
 
 <informalexample role="example"><screen>
-# Selecciona el generador initramfs para generar el «initrd» en
-# núcleos 2.6
-#d-i base-installer/kernel/linux/initramfs-generators string yaird
-</screen></informalexample>
+# Puede elegir instalar software de «non-free» y «contrib».
+#d-i apt-setup/non-free boolean true
+#d-i apt-setup/contrib boolean true
+# Descomente lo siguiente si no quiere usar una réplica en red.
+#d-i apt-setup/use_mirror boolean false
+# Seleccione qué servicios de actualización desea usar; defina
+# las réplicas en red a usar.
+# Los valores mostrados son los predeterminados.
+#d-i apt-setup/services-select multiselect security, volatile
+#d-i apt-setup/security_host string security.debian.org
+#d-i apt-setup/volatile_host string volatile.debian.org
 
-  </sect2>
+# Repositorios locales, disponibles local[0-9]
+#d-i apt-setup/local0/repository string \
+#       http://local.server/debian stable main
+#d-i apt-setup/local0/comment string local server
+# Habilitar las líneas deb-src
+#d-i apt-setup/local0/source boolean true
+# URL de la llave pública del repositorio local; debe proveer una llave o
+# apt se quejará acerca la falta de autenticidad del repsoirtorio y
+# la línea en sources.list se dejará comentada
+#d-i apt-setup/local0/key string http://local.server/key
 
-
-  <sect2 id="preseed-bootloader">
-  <title>Instalación del cargador de arranque</title>
-
-<informalexample role="example"><screen>
-# GRUB es el gestor de arranque predeterminado (para arquitectura x86).
-# Descomente esta opción si quiere instalar lilo en su lugar:
-#d-i grub-installer/skip boolean true
-
-# Esta es una configuración adecuada y segura, hace que grub se instale
-# automáticamente en el MBR si no se detecta otro sistema operativo en
-# la máquina.
-d-i grub-installer/only_debian boolean true
-
-# Lo siguiente hace que el «grub-installer» instale en el MBR en caso de
-# que se encuentre instalado otro sistema operativo. Esto es menos seguro puesto
-# que podría hacer que el otro sistema operativo no se pudiera arrancar.
-d-i grub-installer/with_other_os boolean true
-
-# Alternativamente, descomente y edite estas líneas
-# si desea instalar en una ubicación distinta al MBR:
-#d-i grub-installer/only_debian boolean false
-#d-i grub-installer/with_other_os boolean false
-#d-i grub-installer/bootdev  string (hd0,0)
-# Para instalar grub en múltiples discos:
-#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
-
+# El instalador exige por omisión que los repositorios estén autenticados
+# con una llave gpg conocida.  Puede usar esta opción para deshabilitar
+# la autenticación.  Advertencia: es inseguro y no recomendado.
+#d-i debian-installer/allow_unauthenticated string true
 </screen></informalexample>
 
   </sect2>
@@ -1325,13 +1355,18 @@ línea de órdenes del núcleo.
 </para>
 
 <informalexample role="example">
-<screen> 
-tasksel tasksel/first multiselect standard, desktop
-#tasksel tasksel/first multiselect standard, web-server 
-#tasksel tasksel/first multiselect standard, kde-desktop
+<screen>
+#tasksel tasksel/first multiselect standard, web-server
+# Si la tarea escritorio se selecciona, instalar los escritorios
+# kde y xfce en lugar del escritorio predeterminado gnome.
+#tasksel tasksel/desktop multiselect kde, xfce
 
-# Paquetes individuales que también deben instalarse
+# Paquetes individuales que también se instalan
 #d-i pkgsel/include string openssh-server build-essential
+# En caso de querer hacer actualización de paquetes después
+# de debootstrap.
+# Valores posibles: none, safe-upgrade, full-upgrade
+#d-i pkgsel/upgrade select none
 
 # Algunas versiones del instalador pueden informar de las versiones
 # de programas que tiene instalados y los programas que utiliza.
@@ -1343,54 +1378,72 @@ tasksel tasksel/first multiselect standard, desktop
 
   </sect2>
 
-  <sect2 id="preseed-finish">
-  <title>Finalizar la primera fase de la instalación</title>
+  <sect2 id="preseed-bootloader">
+  <title>Instalación del cargador de arranque</title>
 
 <informalexample role="example"><screen>
+# Grub es el gestor de arranque predeterminado (para arquitectura x86).
+# Descomente esta opción si quiere instalar lilo en su lugar:
+#d-i grub-installer/skip boolean true
+# Si quiere omitir la instalación de lilo, y no usar un gestor de arranque
+# descomente también esta línea:
+#d-i lilo-installer/skip boolean true
+
+# Esta es una configuración adecuada y segura, hace que grub se instale
+# automáticamente en el MBR si no se detecta otro sistema operativo en
+# la máquina.
+d-i grub-installer/only_debian boolean true
+
+# Lo siguiente hace que el «grub-installer» instale en el MBR en caso de
+# que se encuentre instalado otro sistema operativo. Esto es menos seguro puesto
+# que podría hacer que el otro sistema operativo no se pudiera arrancar.
+d-i grub-installer/with_other_os boolean true
+
+# Alternativamente, descomente y edite estas líneas
+# si desea instalar en una ubicación distinta al MBR:
+#d-i grub-installer/only_debian boolean false
+#d-i grub-installer/with_other_os boolean false
+#d-i grub-installer/bootdev  string (hd0,0)
+# Para instalar grub en múltiples discos:
+#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+
+# Clave opcional para grub, bien sea en texto plano
+#d-i grub-installer/password password r00tme
+#d-i grub-installer/password-again password r00tme
+# o encriptada usando un hash MD5, consulte grub-md5-crypt(8).
+#d-i grub-installer/password-crypted password [MD5 hash]
+</screen></informalexample>
+
+<para>
+
+Con la orden <command>grub-md5-crypt</command>, o con la orden del ejemplo en
+<xref linkend="preseed-account"/> se puede generar una clave hash MD5 para
+<classname>grub</classname>.
+
+</para>
+  </sect2>
+
+  <sect2 id="preseed-finish">
+  <title>Finalizar la instalación</title>
+
+<informalexample role="example"><screen>
+# En installations desde la consola serial, las consolas virutales usuales
+# (VT1-VT6) están deshabilitadas normalmente en /etc/inittab. Descomente
+# la siguiente línea para evitar este comportamiento:
+#d-i finish-install/keep-consoles boolean true
+
 # Omitir el mensaje final sobre la finalización de la instalación.
 d-i finish-install/reboot_in_progress note
 
-# Esta opción impedirá que el instalador expulse el CD durante 
+# Esta opción impedirá que el instalador expulse el CD durante
 # el reinicio, y puede ser útil en algunas circunstancias:
 #d-i cdrom-detect/eject boolean false
-</screen></informalexample>
 
-  </sect2>
-
-  <sect2 id="preseed-X">
-  <title>Configuración de X</title>
-<para>
-
-Es posible preconfigurar el entorno de las X en Debian, pero probablemente
-necesitará saber algunos detalles sobre el hardware de vídeo de la
-máquina puesto que el programa de configuración no efectúa una
-configuración totalmente automática de todo.
-
-</para>
-
-<informalexample role="example"><screen>
-# X puede detectar el controlador adecuado para algunas tarjetas, pero
-# si está preconfigurando puede modificar el que éste elija. Incluso en este caso,
-# vesa funcionará para la mayoría del hardware.
-#xserver-xorg xserver-xorg/config/device/driver select vesa
-
-# Un problema con la autodetección del ratón es que, si ésta falla, X
-# reintentará el proceso una y otra vez. De modo que si se efectúa la preconfiguración,
-# existe la posibilidad de que se produzca un bucle infinito si no se autodetecta el ratón.
-#xserver-xorg xserver-xorg/autodetect_mouse boolean true
-
-# Se recomienda la autodetección del monitor.
-xserver-xorg xserver-xorg/autodetect_monitor boolean true
-# Descomente este valor si tiene una pantalla LCD.
-#xserver-xorg xserver-xorg/config/monitor/lcd boolean true
-
-# X tiene tres métodos de configuración para el monitor. Ésta es la forma
-# de preconfigurar el método «medio», que siempre está disponible. El
-# método «simple» podría no estar disponible y el «avanzado» hace
-xserver-xorg xserver-xorg/config/monitor/selection-method \
-       select medium
-xserver-xorg xserver-xorg/config/monitor/mode-list \
-       select 1024x768 @ 60 Hz
+# Para hacer que el sistema se detenga cuando termine la instalación en
+# lugar de reiniciar al sistema instalado:
+#d-i debian-installer/exit/halt boolean true
+# Para apagar la máquina en lugar de detenerla:
+#d-i debian-installer/exit/poweroff boolean true
 </screen></informalexample>
 
   </sect2>
@@ -1432,7 +1485,7 @@ distintos puntos de la instalación.
 # formas de malversación de los valores de un fichero de preconfiguración
 # como éste. ¡Use solamente ficheros de preconfiguración de fuentes
 # confiables! Para poder gestionar esto, y porque generalmente es útil,
-# a continuación ofrecemos una forma de ejecutar automáticamente cualquier 
+# a continuación ofrecemos una forma de ejecutar automáticamente cualquier
 # orden de shell que desee dentro del instalador.
 
 # Esta primera orden se ejecuta tan pronto como sea posible, después de que
@@ -1449,7 +1502,7 @@ distintos puntos de la instalación.
 
   </sect2>
 
-  
+ 
   <sect2 id="preseed-seenflag">
   <title>Utilizar la preconfiguración para cambiar valores por omisión</title>
 <para>
@@ -1469,6 +1522,8 @@ Puede conseguir el mismo efecto en  <emphasis>todas</emphasis> las preguntas
 sin más que configurar el parámetro <classname>preseed/interactive=true</classname>
 en el indicador de arranque. Esta opción puede ser útil para probar o depurar
 su fichero de preconfiguración.
+
+</para><para>
 
 Puede hacer que el instalador le pregunte una pregunta específica utilizando
 el operador <quote>?=</quote> si está preconfigurando con parámetros del arranque.
@@ -1518,11 +1573,11 @@ ficheros.
 # se incluyen nuevos ficheros si ésta imprime los nombres de otrs
 # ficheros de preconfiguración.
 #d-i preseed/include_command \
-#      string echo if [ "`hostname`" = bob ]; then echo bob.cfg; fi
+#      string if [ "`hostname`" = bob ]; then echo bob.cfg; fi
 
 # Lo más flexible es descargar un programa y ejecutarlo. El programa
 # puede utilizar órdenes como debconf-set para manipular la base de datos
-# de debconf. 
+# de debconf.
 # Puede listar más de un programa, separándolos entre sí con espacios.
 # Tenga en cuenta que los nombres de los archivos son relativos,
 # se obtienen del mismo directorio donde está el archivo de preconfiguración

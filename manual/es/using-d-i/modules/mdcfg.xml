@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 44026 -->
+<!-- original version: 56427 -->
 <!-- Revisado por Rudy Godoy, 22 feb. 2005 -->
 <!-- Revisado por Igor Tamara, enero 2007 -->
+<!-- Revisado por ikks, nov 22 2008 -->
 
    <sect3 id="mdcfg">
    <title>Configuración de dispositivos multidisco (RAID)</title>
@@ -98,6 +99,44 @@ de la información de paridad.
 
 </para></listitem>
 </varlistentry>
+<varlistentry>
+
+<term>RAID 6</term><listitem><para>
+
+Es pareceido al RAID 5 pero usa dos dispositivos de paridad en lugar de
+uno solo.
+
+</para><para>
+
+Un arreglo RAID 6 puede sobrevivir a un daño de hasta dos discos.
+
+</para></listitem>
+</varlistentry>
+<varlistentry>
+
+<term>RAID 10</term><listitem><para>
+
+Un arreglo RAID 10 combina divisiones (como en RAID 0) y espejo (como
+en RAID 1).  Crea <replaceable>n</replaceable> copias de los datos y los
+distribuye transversalmente en las particiones de forma tal que ninguna
+de las copias de datos estén en el mismo dispositivo.
+El valor predeterminado para <replaceable>n</replaceable> es 2, pero
+puede establecerse a otro en el modo experto.  La cantidad de particiones
+usadas debe ser de por lo menos <replaceable>n</replaceable>.
+El RAID 10 tiene diferentes disposiciones para distribuir las copias. En
+principio se usa copias cercanas. Las copias cercanas tienen todas las
+copias casi con el mismo corrimiento en todos los discos.  Las copias
+lejanas tienen las copias en corrimientos distintos en los discos.  Los
+corrimientos de las copias copian las franjas y no las copias
+individuales.
+
+</para><para>
+
+Los RAID 10 buscan alcanzar la confiabilidad y redundancia evitando el
+cálculo de paridad, que aveces es visto como un inconveniente.
+
+</para></listitem>
+</varlistentry>
 </variablelist>
 
 Resumiendo:
@@ -138,7 +177,30 @@ Resumiendo:
   <entry>opcional</entry>
   <entry>sí</entry>
   <entry>
-    Tamaño de la partición más pequeña multiplicada por el número de dispositivos en RAID menos uno.
+    Tamaño de la partición más pequeña multiplicada por el número de
+    dispositivos en RAID menos uno.
+  </entry>
+</row>
+
+<row>
+  <entry>RAID 6</entry>
+  <entry>4</entry>
+  <entry>opcional</entry>
+  <entry>sí</entry>
+  <entry>
+    Tamaño de la partición más pequeña multiplicado por (el número de
+    dispositivos RAID menos dos)
+  </entry>
+</row>
+
+<row>
+  <entry>RAID 10</entry>
+  <entry>2</entry>
+  <entry>opcional</entry>
+  <entry>sí</entry>
+  <entry>
+    Total de todas las particiones dividido en el númbero de
+    porciones de copias (predeterminado a 2)
   </entry>
 </row>
 
@@ -157,7 +219,20 @@ menú <guimenu>Configuración de la partición</guimenu> donde debería seleccionar
 <menuchoice> <guimenu>Utilizar como:</guimenu> <guimenuitem>volumen físico
 para RAID</guimenuitem> </menuchoice>).
 
-</para><warning><para>
+</para>
+<note><para>
+
+Asegúrese de que el sistema puede arrancar con el esquema de particiones
+que ha planeado.  Usualmente será necesario crear un sistema de ficheros
+separado para <filename>/boot</filename> cuando se usa RAID para el
+sistema de ficheros raíz (<filename>/</filename>).
+La mayoría de cargadores de arranque <phrase arch="x86">(incluyendo a lilo
+ y grub)</phrase> soportan RAID 1 en espejo (¡sin franjas!), por lo tanto
+es posible usar RAID 5 para <filename>/</filename> y RAID 1 para
+<filename>/boot</filename>.
+
+</para></note>
+<warning><para>
 
 El soporte para MD es una característica relativamente nueva del instalador.
 Puede que experimente algún problema para algunos niveles RAID en
@@ -193,8 +268,8 @@ RAID 1 es un poco más complejo. Primero, se le preguntará el número de
 dispositivos activos y el número de dispositivos de reserva que formarán el
 MD. A continuación, necesita seleccionar de la lista de particiones RAID
 disponibles las que estarán activas y las que quedarán en reserva. El total de
-las particiones seleccionadas debe ser igual al que se dio unos segundos
-antes. No se preocupe. Si comete algún error y selecciona un número distinto de
+las particiones seleccionadas debe ser igual al que se dio anteriormente.
+No se preocupe. Si comete algún error y selecciona un número distinto de
 particiones, &d-i; no le dejará continuar hasta que solucione el problema.
 
 </para></listitem>
@@ -203,6 +278,26 @@ particiones, &d-i; no le dejará continuar hasta que solucione el problema.
 RAID 5 tiene un procedimiento de configuración similar al de RAID 1, con la
 excepción que necesita usar por lo menos <emphasis>tres</emphasis>
 particiones activas.
+
+</para></listitem>
+<listitem><para>
+
+RAID 6 también tiene un procedimiento de configuración parecido a RAID 1
+excepto que se necesita por lo menos <emphasis>four</emphasis> particiones
+activas.
+
+</para></listitem>
+<listitem><para>
+
+RAID 10 también tiene un procedimiento de configuración parecido a RAID1
+excepto en el modo experto.  En modoexperto, el &d-i; le preguntará por
+la disposición.  La disposición consta de dos partes.  La primera parte
+es el tipo de disposición.  Puede ser <literal>n</literal> (para copias
+cercanas), <literal>f</literal> (para copias lejanas), u
+<literal>o</literal> (para copias con corrimientos).  La segunda parte
+es el número de copias que se desea hacer de los datos.  Debe haber por
+lo menos tantos dispositivos activos como copias estarían distribuidas
+en diferentes discos.
 
 </para></listitem>
 </itemizedlist>
