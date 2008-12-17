@@ -352,9 +352,9 @@ if [ -z "$LOAD_IDE" ] && is_not_loaded ide-generic && \
 		if db_get debian-installer/add-kernel-opts && [ "$RET" ]; then
 			kopts="$RET"
 		fi
-		if ! echo "$kopt" | grep -Eq "(^| )all_generic_ide=1( |$)"; then
+		if ! echo "$kopt" | grep -Eq "(^| )all_generic_ide( |$)"; then
 			db_set debian-installer/add-kernel-opts \
-				"${kopts:+$kopts }all_generic_ide=1"
+				"${kopts:+$kopts }all_generic_ide"
 		fi
 	fi
 fi
