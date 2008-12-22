@@ -33,7 +33,6 @@ RequestExecutionLevel admin
 !include FileFunc.nsh
 !include WinMessages.nsh
 !insertmacro GetRoot
-!insertmacro un.GetRoot
 
 !addplugindir plugins
 !addplugindir plugins/cpuid
@@ -116,15 +115,77 @@ wider choice, where your language is more likely to be present."
   ${Endif}
 FunctionEnd
 
+Function FindFile
+  Var /GLOBAL findfile_filename
+  Var /GLOBAL findfile_return
+  Pop $findfile_filename
+
+  ; This is REALLY ugly, but do we have a better way?
+
+  StrCpy $findfile_return "c:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "d:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "e:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "f:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "g:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "h:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "i:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "j:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "k:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "l:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "m:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "n:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "o:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "p:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "q:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "r:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "s:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "t:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "u:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "v:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "w:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "x:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "y:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+  StrCpy $findfile_return "z:\$findfile_filename"
+  IfFileExists "$findfile_return" findfile_found
+
+  StrCpy $0 $findfile_filename
+  MessageBox MB_OK|MB_ICONSTOP $(system_file_not_found)
+  Quit
+
+findfile_found:
+  Push $findfile_return
+FunctionEnd
+
+
 Function ShowExpert
 ; Do initialisations as early as possible, but not before license has been
 ; accepted unless absolutely necessary.
 
 ; ********************************************** Initialise $preseed_cmdline
   StrCpy $preseed_cmdline " "
-; ********************************************** Initialise $c
-  ; FIXME: this line is duplicated in the uninstaller.  keep in sync!
-  ${GetRoot} $WINDIR $c
 
 !ifndef NETWORK_BASE_URL
 ; ********************************************** Initialise $d
@@ -168,9 +229,6 @@ readme_file_not_found:
   ${Endif}
 !endif
 
-  StrCpy $INSTDIR "$c\debian"
-  SetOutPath $INSTDIR
-
   ; Windows version is another abort condition
   Var /GLOBAL windows_version
   Var /GLOBAL windows_boot_method
@@ -199,6 +257,35 @@ readme_file_not_found:
   MessageBox MB_OK|MB_ICONSTOP $(unsupported_version_of_windows)
   Quit
 windows_version_ok:
+
+; ********************************************** Initialise $c
+; We set it to the "System partition" (see http://en.wikipedia.org/wiki/System_partition_and_boot_partition)
+
+  ${If} $windows_boot_method == ntldr
+    Push "ntldr"
+    Call FindFile
+    Pop $0
+    ${GetRoot} $0 $c
+    Goto c_is_initialized
+  ${Endif}
+  ${If} $windows_boot_method == bootmgr
+    Push "bootmgr"
+    Call FindFile
+    Pop $0
+    ${GetRoot} $0 $c
+    Goto c_is_initialized
+  ${Endif}
+  ${If} $windows_boot_method == direct
+    ; Doesn't really matter.
+    ${GetRoot} $WINDIR $c
+    Goto c_is_initialized
+  ${Endif}
+c_is_initialized:
+  ; For the uninstaller
+  WriteRegStr HKLM "Software\Debian\Debian-Installer Loader" "system_drive" "$c"
+
+  StrCpy $INSTDIR "$c\debian"
+  SetOutPath $INSTDIR
 
   File /oname=$PLUGINSDIR\expert.ini	templates/binary_choice.ini
   WriteINIStr $PLUGINSDIR\expert.ini "Field 1" "Text" $(expert1)
@@ -690,68 +777,6 @@ gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
 
 ; ********************************************** Do bootloader last, because it's the most dangerous
   ${If} $windows_boot_method == ntldr
-    Var /GLOBAL boot_ini
-
-    ; boot.ini is in the "System partition" (see http://en.wikipedia.org/wiki/System_partition_and_boot_partition)
-    ;
-    ; We have no idea where that could be, so we just probe everything.
-    ; This is REALLY ugly, but do we have a better way?
-
-    StrCpy $boot_ini "$c\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "c:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "d:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "e:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "f:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "g:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "h:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "i:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "j:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "k:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "l:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "m:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "n:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "o:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "p:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "q:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "r:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "s:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "t:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "u:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "v:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "w:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "x:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "y:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-    StrCpy $boot_ini "z:\boot.ini"
-    IfFileExists "$boot_ini" found_boot_ini
-
-    MessageBox MB_OK|MB_ICONSTOP $(boot_ini_not_found)
-    Quit
-found_boot_ini:
-
 !ifdef NETWORK_BASE_URL
     Push "false"
     Push "g2ldr"
@@ -779,13 +804,13 @@ found_boot_ini:
       Quit
 !endif
     DetailPrint "$(registering_ntldr)"
-    SetFileAttributes "$boot_ini" NORMAL
-    SetFileAttributes "$boot_ini" SYSTEM|HIDDEN
+    SetFileAttributes "$c\boot.ini" NORMAL
+    SetFileAttributes "$c\boot.ini" SYSTEM|HIDDEN
     ; Sometimes timeout isn't set.  This may result in ntldr booting straight to
     ; Windows (bad) or straight to Debian-Installer (also bad)!  Force it to 30
     ; just in case.
-    WriteIniStr "$boot_ini" "boot loader" "timeout" "30"
-    WriteIniStr "$boot_ini" "operating systems" "$c\g2ldr.mbr" '"$(d-i_ntldr)"'
+    WriteIniStr "$c\boot.ini" "boot loader" "timeout" "30"
+    WriteIniStr "$c\boot.ini" "operating systems" "$c\g2ldr.mbr" '"$(d-i_ntldr)"'
   ${Endif}
 
   ${If} $windows_boot_method == direct
@@ -881,8 +906,7 @@ FunctionEnd
 
 Section "Uninstall"
   ; Initialise $c
-  ; FIXME: this line is duplicated in the installer.  keep in sync!
-  ${un.GetRoot} $WINDIR $c
+  ReadRegStr $c HKLM "Software\Debian\Debian-Installer Loader" "system_drive"
 
   SetFileAttributes "$c\boot.ini" NORMAL
   SetFileAttributes "$c\boot.ini" SYSTEM|HIDDEN
