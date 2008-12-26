@@ -50,6 +50,9 @@ process_device(PedDevice *dev)
 		return;
 	if (is_cdrom(dev->path) || is_floppy(dev->path))
 		return;
+	/* Exclude compcache (http://code.google.com/p/compcache/) */
+	if (strstr(dev->path, "/dev/ramzswap") != NULL)
+		return;
 	printf("%s\t%lli\t%s\n",
 	       dev->path,
 	       dev->length * PED_SECTOR_SIZE_DEFAULT,
