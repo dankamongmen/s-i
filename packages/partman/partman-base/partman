@@ -138,6 +138,8 @@ while true; do
 					exitcode=$?
 					if [ $exitcode -eq 255 ]; then
 						abort 10 # back up to main menu
+					elif [ $exitcode -ge 128 ] && [ $exitcode -lt 192 ]; then
+						abort $exitcode # killed by signal
 					elif [ $exitcode -ge 100 ]; then
 						break # successful partitioning
 					else
