@@ -513,8 +513,8 @@ fi
 # Install udev into target
 apt-install udev || true
 
-# TODO: should this really be conditional on hotplug support?
-if [ -f /proc/sys/kernel/hotplug ]; then
+# Install usbutils
+if [ -d /sys/bus/usb ]; then
 	apt-install usbutils || true
 fi
 
