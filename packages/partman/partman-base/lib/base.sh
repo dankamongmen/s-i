@@ -275,17 +275,26 @@ longint2human () {
 }
 
 human2longint () {
-	local human suffix int frac longint
+	local human orighuman gotb suffix int frac longint
 	set -- $*; human="$1$2$3$4$5" # without the spaces
+	orighuman="$human"
 	human=${human%b} #remove last b
 	human=${human%B} #remove last B
+	gotb=''
+	if [ "$human" != "$orighuman" ]; then
+		gotb=1
+	fi
 	suffix=${human#${human%?}} # the last symbol of $human
 	case $suffix in
 	k|K|m|M|g|G|t|T)
 		human=${human%$suffix}
 		;;
 	*)
-		suffix=''
+		if [ "$gotb" ]; then
+			suffix=B
+		else
+			suffix=''
+		fi
 		;;
 	esac
 	int="${human%[.,]*}"
@@ -295,6 +304,10 @@ human2longint () {
 	frac=${frac%${frac#????}} # only the first 4 digits of $frac
 	longint=$(expr "$int" \* 10000 + "$frac")
 	case $suffix in
+	b|B)
+		longint=${longint%????}
+		[ "$longint" ] || longint=0
+		;;
 	k|K)
 		longint=${longint%?}
 		;;
