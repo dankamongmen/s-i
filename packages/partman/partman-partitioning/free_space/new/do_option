@@ -216,7 +216,9 @@ create_new_partition () {
 			db_subst partman/active_partition OTHERINFO "${RET}"
 			ask_user /lib/partman/active_partition "$dev" "$id"
 			exitcode="$?"
-			if [ "$exitcode" -ge 100 ]; then
+			if [ "$exitcode" -ge 128 ] && [ "$exitcode" -lt 192 ]; then
+				exit "$exitcode" # killed by signal
+			elif [ "$exitcode" -ge 100 ]; then
 				break
 			fi
 			set -e
