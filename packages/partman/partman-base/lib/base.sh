@@ -820,7 +820,7 @@ humandev () {
 
 	    # First check for Serial ATA RAID devices
 	    if type dmraid >/dev/null 2>&1; then
-		for frdisk in $(dmraid -s -c | grep -v "No RAID disks"); do
+		for frdisk in $(dmraid -s -c | grep -iv "No RAID disks"); do
 			device=${1#/dev/mapper/}
 			case "$1" in
 			    /dev/mapper/$frdisk)
