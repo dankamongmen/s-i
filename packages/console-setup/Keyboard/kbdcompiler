@@ -139,6 +139,9 @@ sub subtraction {
 	    if (! defined $kmap2->[$k] || $kmap1->[$k] ne $kmap2->[$k]) {
 		$result++;
 	    }
+	} elsif (defined $kmap2->[$k]) {
+	    # kmap1 not a superset of kmap2, so not eligible for reduction
+	    return 10000000;
 	}
     }
     return $result;
