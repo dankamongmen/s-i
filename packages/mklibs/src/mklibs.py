@@ -415,9 +415,11 @@ while 1:
     for obj in objects.values():
         for symbol in undefined_symbols(obj):
             # Some undefined symbols in libthread_db are defined in
-            # the application that uses it.
+            # the application that uses it.  __gnu_local_gp is defined
+            # specially by the linker on MIPS.
             if (not (re.search("libthread_db\.so", obj)
-                     and re.search("^ps_", str(symbol)))):
+                     and re.search("^ps_", str(symbol)))
+                and str(symbol) != "__gnu_local_gp@Base"):
                 debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s" % (symbol, symbol.weak))
                 needed_symbols[str(symbol)] = symbol
         libraries.update(library_depends(obj))
