@@ -514,11 +514,11 @@ static void modify_debconf_priority (int raise_or_lower) {
 static void adjust_default_priority (void) {
 	int pri;
 	const char *template = "debconf/priority";
-	debconf_get(debconf,  template);
+	debconf_get(debconf, template);
 
 	pri = debconf_to_pri(debconf->value);
 	
-	if ( pri > -1 && pri != local_priority) {
+	if (pri > -1 && pri != local_priority) {
 		if (local_priority > -1)
 			di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s' (%s)",
 				debconf_priorities[pri] ? debconf_priorities[pri] : "(null)", debconf->value);
@@ -530,9 +530,12 @@ static void adjust_default_priority (void) {
 static void restore_default_priority (void) {
 	const char *template = "debconf/priority";
 
-	di_log(DI_LOG_LEVEL_INFO, "Restoring default debconf priority '%s'",
-		debconf_priorities[default_priority] ? debconf_priorities[default_priority] : "(null)");
-	debconf_set(debconf, template, debconf_priorities[default_priority]);
+	if (local_priority != default_priority) {
+		di_log(DI_LOG_LEVEL_INFO, "Restoring default debconf priority '%s'",
+			debconf_priorities[default_priority] ? debconf_priorities[default_priority] : "(null)");
+		debconf_set(debconf, template, debconf_priorities[default_priority]);
+		local_priority = default_priority;
+	}
 }
 
 void notify_user_of_failure (di_system_package *p) {
@@ -619,6 +622,9 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	    debconf->value && *debconf->value)
 		debconf_set(debconf, template, debconf->value);
 
+	/* Initialize internal priority variables */
+	adjust_default_priority();
+
 	menu_startup();
 
 	seen_items = di_hash_table_new_full(di_rstring_hash, di_rstring_equal,
@@ -640,7 +646,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 				/* Success */
 				if (p->installer_menu_item < NEVERDEFAULT) {
 					last_successful_item = p->installer_menu_item;
-					modify_debconf_priority(RAISE);
+					restore_default_priority();
 					//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
 				}
 				else {
