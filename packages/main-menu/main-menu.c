@@ -40,6 +40,9 @@ int default_priority = 1;
 /* Save priority set by main-menu to detect priority changes from the user */
 int local_priority = -1;
 
+/* Force display of the menu at the current priority */
+int display_menu = 0;
+
 static struct debconfclient *debconf;
 
 static int di_config_package(di_system_package *p,
@@ -221,6 +224,27 @@ static size_t menu_entry(struct debconfclient *debconf, di_system_package *packa
 	return strlen (buf);
 }
 
+/* Priority at which the menu should be displayed */
+static int menu_priority() {
+	static int default_menu_priority = -1;
+	int menu_prio = -1;
+
+	if (default_menu_priority == -1)
+		default_menu_priority = debconf_to_pri(MENU_PRIORITY);
+
+	if (display_menu)
+		menu_prio = local_priority;
+
+	if (menu_prio < 0 ||
+	    (size_t)menu_prio >= ARRAY_SIZE(debconf_priorities))
+		menu_prio = default_menu_priority;
+
+	//di_log(DI_LOG_LEVEL_INFO, "default: %i; debconf: %i; menu: %i",
+	//	default_menu_priority, local_priority, menu_prio);
+
+	return menu_prio;
+}
+
 /* Displays the main menu via debconf and returns the selected menu item. */
 di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *allocator) {
 	di_system_package **package_array, *p;
@@ -229,7 +253,7 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 	di_system_package *menudefault = NULL, *ret = NULL;
 	int i = 0, num = 0;
 	char buf[256], *menu, *s;
-	int menu_size, menu_used, size;
+	int menu_prio, menu_size, menu_used, size;
 
 	for (node = packages->list.head; node; node = node->next) {
 		p = node->data;
@@ -289,7 +313,8 @@ di_system_package *show_main_menu(di_packages *packages, di_packages_allocator *
 		di_log(DI_LOG_LEVEL_INFO, "no default menu item"); 
 		modify_debconf_priority(LOWER);
 	}
-	debconf_input(debconf, MENU_PRIORITY, MAIN_MENU);
+	menu_prio = menu_priority();
+	debconf_input(debconf, debconf_priorities[menu_prio], MAIN_MENU);
 	debconf_go(debconf);
 	debconf_get(debconf, MAIN_MENU);
 	s = strdup(debconf->value);
@@ -475,24 +500,17 @@ static int do_menu_item(di_system_package *p) {
 
 static void modify_debconf_priority (int raise_or_lower) {
 	int pri;
-	static int menu_pri = -1;
 	const char *template = "debconf/priority";
 	debconf_get(debconf, template);
 	
-	if (menu_pri == -1)
-		debconf_to_pri(MENU_PRIORITY);
-
 	pri = debconf_to_pri(debconf->value);
 	if ( pri == -1 )
 		pri = 1;
 
 	if (raise_or_lower == LOWER) {
 		--pri;
-		/* Make sure the menu is always displayed after a single
-		 * backing up.
-		 */
-		if (menu_pri != -1 && pri > menu_pri)
-			pri = menu_pri;
+		/* Make sure the menu is always displayed after an error */
+		display_menu = 1;
 	}
 	else if (raise_or_lower == RAISE)
 		++pri;
@@ -608,7 +626,6 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	di_packages *packages;
 	di_packages_allocator *allocator;
 	int ret;
-	int last_item_backup = 0;
 
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
@@ -635,9 +652,8 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	while ((p=show_main_menu(packages, allocator))) {
 		di_slist_node *node;
 
-		if (p->installer_menu_item < NEVERDEFAULT && last_item_backup) {
-			restore_default_priority();
-			last_item_backup = 0;
+		if (p->installer_menu_item < NEVERDEFAULT && display_menu) {
+			display_menu = 0;
 		}
 		ret = do_menu_item(p);
 		adjust_default_priority();
@@ -650,17 +666,12 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 					//di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s', raising last_successful_item to %d", p->p.package, p->installer_menu_item);
 				}
 				else {
-					/* Do not raise the priority after it has been set by cdebconf-priority. */
-					if (0 == strcmp("cdebconf-priority", p->p.package)) {
-						last_item_backup = 0;
-					}
 					// di_log(DI_LOG_LEVEL_DEBUG, "Installed package '%s' but no raise since %d >= %i", p->p.package, p->installer_menu_item, NEVERDEFAULT);
 				}
 				break;
 			case EXIT_BACKUP:
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
-				modify_debconf_priority(LOWER);
-				last_item_backup = 1;
+				display_menu = 1;
 				break;
 			default:
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
