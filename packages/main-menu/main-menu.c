@@ -47,6 +47,31 @@ static int di_config_package(di_system_package *p,
 
 static void modify_debconf_priority (int raise_or_lower);
 
+static char *debconf_priorities[] =
+  {
+    "low",
+    "medium",
+    "high",
+    "critical"
+  };
+
+#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
+static int debconf_to_pri (char *priority) {
+	int i;
+	int pri = -1;
+
+	if (priority) {
+		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
+			if (0 == strcmp(priority, debconf_priorities[i]) ) {
+				pri = i;
+				break;
+			}
+		}
+	}
+
+	return pri;
+}
+
 /*
  * qsort comparison function (sort by menu item values, fall back to
  * lexical sort to resolve ties deterministically).
@@ -448,41 +473,19 @@ static int do_menu_item(di_system_package *p) {
 	return di_config_package(p, satisfy_virtual);
 }
 
-static char *debconf_priorities[] =
-  {
-    "low",
-    "medium",
-    "high",
-    "critical"
-  };
-
-#define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static void modify_debconf_priority (int raise_or_lower) {
-	int pri, i;
+	int pri;
 	static int menu_pri = -1;
 	const char *template = "debconf/priority";
 	debconf_get(debconf, template);
 	
-	if (menu_pri == -1) {
-		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
-			if (0 == strcmp(MENU_PRIORITY,
-					debconf_priorities[i]) ) {
-				menu_pri = i;
-				break;
-			}
-		}
-	}
+	if (menu_pri == -1)
+		debconf_to_pri(MENU_PRIORITY);
 
-	pri = 1;
-	if ( debconf->value ) {
-		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
-			if (0 == strcmp(debconf->value,
-					debconf_priorities[i]) ) {
-				pri = i;
-				break;
-			}
-		}
-	}
+	pri = debconf_to_pri(debconf->value);
+	if ( pri == -1 )
+		pri = 1;
+
 	if (raise_or_lower == LOWER) {
 		--pri;
 		/* Make sure the menu is always displayed after a single
@@ -509,22 +512,13 @@ static void modify_debconf_priority (int raise_or_lower) {
 }
 	
 static void adjust_default_priority (void) {
-	int pri, i;
+	int pri;
 	const char *template = "debconf/priority";
 	debconf_get(debconf,  template);
 
-	pri = 1;
-	if ( debconf->value ) {
-		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
-			if (0 == strcmp(debconf->value,
-					debconf_priorities[i]) ) {
-				pri = i;
-				break;
-			}
-		}
-	}
+	pri = debconf_to_pri(debconf->value);
 	
-	if ( pri != local_priority) {
+	if ( pri > -1 && pri != local_priority) {
 		if (local_priority > -1)
 			di_log(DI_LOG_LEVEL_INFO, "Priority changed externally, setting main-menu default to '%s' (%s)",
 				debconf_priorities[pri] ? debconf_priorities[pri] : "(null)", debconf->value);
