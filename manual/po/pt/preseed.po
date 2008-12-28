@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-12-28 01:11+0000\n"
-"PO-Revision-Date: 2008-12-03 20:39+0000\n"
+"PO-Revision-Date: 2008-12-28 10:09+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -1550,10 +1550,10 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:776
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Network configuration"
 msgid "Network console"
-msgstr "Configuração de rede"
+msgstr "Consola de rede"
 
 #. Tag: screen
 #: preseed.xml:778
@@ -1566,6 +1566,12 @@ msgid ""
 "#d-i network-console/password password r00tme\n"
 "#d-i network-console/password-again password r00tme"
 msgstr ""
+"# Utilize as seguintes definições se desejar utilizar o componente\n"
+"# network-console para instalações remotas através de SSH. Isto só faz\n"
+"# sentido se pretender fazer manualmente o resto da instalação.\n"
+"#d-i anna/choose-modules string network-console\n"
+"#d-i network-console/password password r00tme\n"
+"#d-i network-console/password-again password r00tme"
 
 #. Tag: title
 #: preseed.xml:783
@@ -2562,7 +2568,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1045
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
 #| "checks\n"
@@ -2610,9 +2616,9 @@ msgid ""
 "# packages and run commands in the target system.\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 msgstr ""
-"# o preseed do d-i é inerentemente não seguro. Nada no instalador verifica\n"
-"# se existem tentativas de buffer overflows e outros exploits nos valores\n"
-"# do ficheiro de pré-configuração tal como este. Utilize apenas ficheiros\n"
+"# O preseed do d-i é inerentemente não seguro. Nada no instalador verifica\n"
+"# se existem tentativas de buffer overflows ou outros exploits nos valores\n"
+"# de um ficheiro de pré-configuração como este. Utilize apenas ficheiros\n"
 "# de pré-configuração de proveniência de confiança! Para conseguir isso,\n"
 "# e porque normalmente é útil, aqui está uma forma de correr qualquer\n"
 "# comando da shell que queira dentro do instalador, automaticamente.\n"
@@ -2621,11 +2627,18 @@ msgstr ""
 "# preseed ser lido.\n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
 "\n"
-"# Este comando é corrido mesmo antes da instalação terminar, mas quando\n"
-"# ainda existe um directório /target utilizável. Pode fazer chroot a\n"
-"# /target e utilizá-lo directamente, ou utilizar o apt-get install e\n"
-"# comandos no alvo para instalar facilmente pacotes e correr comandos\n"
-"# no sistema alvo.\n"
+"# Este comando é corrido imediatamente antes do particionador iniciar.\n"
+"# Poderá ser útil para aplicar preseeding dinâmico de particionamento que\n"
+"# dependa do estado dos discos (que poderão não estar visíveis quando corre\n"
+"# preseed/early_command).\n"
+"#d-i partman/early_command string debconf-set partman-auto/disk \"$(list-"
+"devices disk | head -n1)\"\n"
+"\n"
+"# Este comando é corrido antes do instalador terminar, mas quando ainda\n"
+"# existe um directório /target utilizável. Pode fazer chroot a /target e\n"
+"# utilizá-lo directamente, ou utilizar os comandos apt-get install e\n"
+"# in-target para instalar facilmente pacotes e correr comandos no sistema\n"
+"# alvo.\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
