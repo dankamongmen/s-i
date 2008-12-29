@@ -174,7 +174,7 @@ if [ "$RET" = true ]; then
 	if anna-install dmraid-udeb; then
 		# Device mapper support is required to run dmraid
 		if is_not_loaded dm-mod; then
-			module_probe dm-mod
+			module_probe dm-mod || true
 		fi
 
 		if [ "$(dmraid -c -s | tr A-Z a-z)" != "no raid disks" ]; then
