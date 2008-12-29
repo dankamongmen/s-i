@@ -19,6 +19,10 @@ svn -q co svn://svn.debian.org/console-data/trunk/debian console-data/debian
 #echo -n "popularity-contest "
 cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/popcon co popularity-contest
 
+#echo -n "grub2 "
+rm -rf grub2
+svn -q co svn://svn.debian.org/svn/pkg-grub/grub2/trunk/debian
+
 # echo -n "eject "
 rm -rf eject
 if [ `hostname` == "alioth" ] ; then
@@ -26,11 +30,4 @@ if [ `hostname` == "alioth" ] ; then
 else
 	git clone -q git://git.debian.org/git/collab-maint/eject
 fi
-#apt-get $APT_OPT -t unstable source eject >/dev/null
-#rm -f *.tar.gz *.dsc *.diff.gz
-#mv eject* eject
 
-echo "X${APT_OPT}X" >~/tmp/log
-set >>~/tmp/log
-pwd >>~/tmp/log
-echo "X${DI}X" >>~/tmp/log
