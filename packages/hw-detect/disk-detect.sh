@@ -60,8 +60,6 @@ disk_found() {
 module_probe() {
 	local module="$1"
 	local priority="$2"
-	local template=""
-	local question="$template/$module"
 	local modinfo=""
 	local devs=""
 	local olddevs=""
@@ -70,6 +68,7 @@ module_probe() {
 	if ! log-output -t disk-detect modprobe -v "$module"; then
 		# Prompt the user for parameters for the module.
 		local template="hw-detect/retry_params"
+		local question="$template/$module"
 		db_unregister "$question"
 		db_register "$template" "$question"
 		db_subst "$question" MODULE "$module"
