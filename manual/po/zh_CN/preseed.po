@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-12-29 01:12+0000\n"
-"PO-Revision-Date: 2008-10-28 12:14+0800\n"
+"PO-Revision-Date: 2008-12-29 14:10+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1390,10 +1390,10 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:776
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Network configuration"
 msgid "Network console"
-msgstr "网络设置"
+msgstr "网络控制台"
 
 #. Tag: screen
 #: preseed.xml:778
@@ -1406,6 +1406,12 @@ msgid ""
 "#d-i network-console/password password r00tme\n"
 "#d-i network-console/password-again password r00tme"
 msgstr ""
+"# Use the following settings if you wish to make use of the network-console\n"
+"# component for remote installation over SSH. This only makes sense if you\n"
+"# intend to perform the remainder of the installation manually.\n"
+"#d-i anna/choose-modules string network-console\n"
+"#d-i network-console/password password r00tme\n"
+"#d-i network-console/password-again password r00tme"
 
 #. Tag: title
 #: preseed.xml:783
@@ -2358,7 +2364,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1045
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
 #| "checks\n"
@@ -2417,7 +2423,13 @@ msgstr ""
 "# This first command is run as early as possible, just after\n"
 "# preseeding is read.\n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
-"\n"
+"<phrase condition=\"squeeze\">\n"
+"# This command is run immediately before the partitioner starts. It may be\n"
+"# useful to apply dynamic partitioner preseeding that depends on the state\n"
+"# of the disks (which may not be visible when preseed/early_command runs).\n"
+"#d-i partman/early_command \\\n"
+"#       string debconf-set partman-auto/disk \"$(list-devices disk | head -n1)\"\n"
+"</phrase>\n"
 "# This command is run just before the install finishes, but when there is\n"
 "# still a usable /target directory. You can chroot to /target and use it\n"
 "# directly, or use the apt-install and in-target commands to easily install\n"
