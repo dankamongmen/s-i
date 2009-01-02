@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56827 -->
+<!-- original version: 57041 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -913,6 +913,21 @@ soll.
 
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>Netzwerk-Konsole</title>
+
+<informalexample role="example"><screen>
+# Nutzen Sie die folgenden Einstellungen, wenn Sie die Komponente "Netzwerk-
+# Konsole" für eine entfernte Installation per SSH verwenden möchten. Dies
+# macht nur Sinn, wenn Sie vorhaben, den verbleibenden Rest der Installation
+# manuell durchzuführen.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Einstellungen für den Spiegelserver</title>
 <para>
@@ -1489,7 +1504,15 @@ während der Installation auszuführen.
 # Dieser erste Befehl wird so früh wie möglich ausgeführt, direkt nachdem
 # das Lesen der Voreinstellungsdatei abgeschlossen ist.
 #d-i preseed/early_command string anna-install some-udeb
-
+<phrase condition="squeeze">
+# Der folgende Befehl wird ausgeführt direkt bevor das Partitionierungsprogramm
+# startet. Er kann nützlich sein, um dynamische Voreinstellungen für die 
+# Partitionierung festzulegen, die vom Zustand der Festplatten abhängig sind
+# (die möglicherweise noch nicht sichtbar sind, wenn preseed/early_command
+# ausgeführt wird).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 # Dieses Kommando wird ausgeführt, kurz bevor der Installer fertig ist,
 # wenn aber noch ein nutzbares /target-Verzeichnis verfügbar ist.
 # Sie können nach /target »chroot«-en und es direkt benutzen, oder benutzen
