@@ -1,5 +1,5 @@
 ; Debian-Installer Loader
-; Copyright (C) 2007,2008  Robert Millan <rmh@aybabtu.com>
+; Copyright (C) 2007,2008,2009  Robert Millan <rmh@aybabtu.com>
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -115,71 +115,6 @@ wider choice, where your language is more likely to be present."
   ${Endif}
 FunctionEnd
 
-Function FindFile
-  Var /GLOBAL findfile_filename
-  Var /GLOBAL findfile_return
-  Pop $findfile_filename
-
-  ; This is REALLY ugly, but do we have a better way?
-
-  StrCpy $findfile_return "c:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "d:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "e:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "f:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "g:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "h:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "i:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "j:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "k:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "l:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "m:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "n:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "o:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "p:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "q:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "r:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "s:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "t:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "u:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "v:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "w:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "x:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "y:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-  StrCpy $findfile_return "z:\$findfile_filename"
-  IfFileExists "$findfile_return" findfile_found
-
-  StrCpy $0 $findfile_filename
-  MessageBox MB_OK|MB_ICONSTOP $(system_file_not_found)
-  Quit
-
-findfile_found:
-  Push $findfile_return
-FunctionEnd
-
-
 Function ShowExpert
 ; Do initialisations as early as possible, but not before license has been
 ; accepted unless absolutely necessary.
@@ -262,17 +197,13 @@ windows_version_ok:
 ; We set it to the "System partition" (see http://en.wikipedia.org/wiki/System_partition_and_boot_partition)
 
   ${If} $windows_boot_method == ntldr
-    Push "ntldr"
-    Call FindFile
-    Pop $0
-    ${GetRoot} $0 $c
-    Goto c_is_initialized
-  ${Endif}
-  ${If} $windows_boot_method == bootmgr
-    Push "bootmgr"
-    Call FindFile
-    Pop $0
-    ${GetRoot} $0 $c
+  ${OrIf} $windows_boot_method == bootmgr
+    systeminfo::find_system_partition
+    Pop $c
+    ${If} $c == failed
+      ${GetRoot} $WINDIR $c
+      MessageBox MB_OK|MB_ICONEXCLAMATION $(cant_find_system_partition)
+    ${Endif}
     Goto c_is_initialized
   ${Endif}
   ${If} $windows_boot_method == direct

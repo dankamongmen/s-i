@@ -1,6 +1,7 @@
 /*
  *  systeminfo.c - return some system information for preseeding
  *  Copyright (C) 2007  Paul Wise <pabs@debian.org>
+ *  Copyright (C) 2009  Robert Millan <rmh@aybabtu.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -63,6 +64,27 @@ void __declspec(dllexport) keyboard_layout (HWND hwndParent, int string_size, ch
 	HKL hkl = GetKeyboardLayout(0);
 	wsprintf(buf, "%u", hkl);
 	pushstring(buf);
+}
+
+/* Find the partition used by ntldr or bootmgr to boot, aka the first BIOS drive.  */
+void __declspec(dllexport) find_system_partition (HWND hwndParent, int string_size, char *variables, stack_t **stacktop, extra_parameters *extra)
+{
+  EXDLL_INIT();
+  char dosdevice[3];
+
+  dosdevice[1] = ':';
+  dosdevice[2] = '\0';
+  for (dosdevice[0] = 'C'; dosdevice[0] <= 'Z'; (dosdevice[0])++)
+    {
+      if (QueryDosDeviceA (dosdevice, buf, sizeof(buf)) == 0)
+	continue;
+      if (! strcmp (buf, "\\Device\\HarddiskVolume1"))
+	{
+	  pushstring (dosdevice);
+	  return;
+	}
+    }
+  pushstring ("failed");
 }
 
 BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
