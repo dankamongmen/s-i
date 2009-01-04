@@ -1,4 +1,4 @@
-<!-- original version: 56827 -->
+<!-- original version: 57041 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -824,6 +824,20 @@ de passerelle, vous pouvez positionner cette variable à <quote>none</quote>.
 </para>
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>Console réseau</title>
+
+<informalexample role="example"><screen>
+# Pour utiliser le composant <quote>network-console</quote> et faire une installation
+# par SSH, vous pouvez vous servir des commandes suivantes. Elles n'ont de sens que si
+# vous avez l'intention de poursuivre l'installation <quote>manuellement</quote>.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Valeurs pour les miroirs</title>
 <para>
@@ -1358,7 +1372,13 @@ de l'installation.
 # La première commande est exécutée aussi tôt que possible, juste après
 # la lecture du fichier.
 #d-i preseed/early_command string anna-install some-udeb
-
+<phrase condition="squeeze">
+# Cette commande est exécutée juste avant que le partitionneur ne commence. Il peut être
+# utile de préconfigurer le partitionneur en fonction de l'état des disques
+# (qui ne sont peut-être pas visibles quand preseed/early_command est exécutée).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 # Cette commande est exécutée juste avant que l'installation ne se termine,
 # mais quand le répertoire /target est encore utilisable. Vous pouvez exécuter
 # chroot /target et utiliser cet environnement directement&nbsp;; ou bien vous
