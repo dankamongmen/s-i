@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: preseed.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2008-12-29 01:12+0000\n"
-"PO-Revision-Date: 2008-12-11 05:55+0900\n"
+"PO-Revision-Date: 2009-01-05 09:10+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-i10n-korean@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1467,10 +1467,10 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:776
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Network configuration"
 msgid "Network console"
-msgstr "네트워크 설정"
+msgstr "네트워크 콘솔"
 
 #. Tag: screen
 #: preseed.xml:778
@@ -1483,6 +1483,11 @@ msgid ""
 "#d-i network-console/password password r00tme\n"
 "#d-i network-console/password-again password r00tme"
 msgstr ""
+"# SSH을 통해 원격 설치를 하면서 network-console 컴포넌트를 사용할 경우 다음\n"
+"# 설정을 사용합니다. 이후의 모든 설치를 수동으로 하는 경우에만 이렇게 합니다.\n"
+"#d-i anna/choose_modules string network-console\n"
+"#d-i network-console/password password r00tme\n"
+"#d-i network-console/password-again password r00tme"
 
 #. Tag: title
 #: preseed.xml:783
@@ -2446,7 +2451,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1045
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
 #| "checks\n"
@@ -2502,12 +2507,20 @@ msgstr ""
 "# 방법이 만들어져 있습니다. 위험하지만 이 방법은 매우 유용하므로,\n"
 "# 다음과 같이 설치 프로그램 내에서 쉘 명령어를 실행할 수 있습니다.\n"
 "\n"
-"# 첫번째 명령어는 미리 설정 파일을 읽어들인 직후에 가능한 빨리\n"
+"# 다음 첫 번째 명령어는 미리 설정 파일을 읽어들인 직후에 가능한 빨리\n"
 "# 실행합니다. \n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
-"\n"
-"# 이 명령은 설치를 끝내기 직전에 실행됩니다. 그러나 /target디렉토리는 \n"
-"# 아직 사용할 수 있을 때입니다. /target디렉토리로 chroot해서 직접 사용할\n"
+"<phrase condition=\"squeeze\">\n"
+"# 다음 명령은 파티션 프로그램이 시작하기 직전에 실행합니다. 여기에는\n"
+"# 디스크의 상태에 따라 다르게 동적으로 파티션하는 미리 설정을 사용하면\n"
+"# 편리합니다. (preseed/early_command 명령이 실행하는 시점에서는\n"
+"# 디스크의 상태를 알 수 없습니다.)\n"
+"#d-i partman/early_command \\\n"
+"#       string debconf-set partman-auto/disk \"$(list-devices disk | head -\"\n"
+"n1)\"\n"
+"</phrase>\n"
+"# 다음 명령은 설치를 끝내기 직전에 실행합니다. 그러나 /target디렉토리는 아직\n"
+"# 사용할 수 있는 시점입니다. /target디렉토리로 chroot해서 직접 사용할\n"
 "# 수 있고 패키지를 쉽게 설치하기 위해서 apt-install과 in-target명령을 사용\n"
 "# 할 수 있습니다.\n"
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
