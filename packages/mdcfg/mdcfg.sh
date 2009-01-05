@@ -417,7 +417,7 @@ md_mainmenu() {
 ### Main of script ###
 
 # Load the modules and scan for MD devices if needed
-if ! [ -e /proc/mdstat ]; then
+if ! [ -e /proc/mdstat ] || ! [ -d /dev/md ]; then
 	# Try to load the necesarry modules.
 	depmod -a >/dev/null 2>&1
 	modprobe md-mod >/dev/null 2>&1
