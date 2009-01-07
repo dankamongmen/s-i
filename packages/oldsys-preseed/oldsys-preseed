@@ -243,10 +243,11 @@ esac
 if [ "$NONINTERACTIVE" = "yes" ]; then
 	# Just continue if d-i enters lowmem mode
 	add "$FILE" "lowmem/low" "note"
-	# Mark some network settings as seen so netcfg won't prompt the
-	# user.
-	add "$FILE" "netcfg/get_hostname" "seen" "true"
-	add "$FILE" "netcfg/get_domain" "seen" "true"
+	# Any hostname and domain names assigned from DHCP take precedence
+	# over values set here.  However, setting the values still prevents
+	# the questions from being shown, even if values come from dhcp.
+	add "$FILE" "netcfg/get_hostname" "string" "debian"
+	add "$FILE" "netcfg/get_domain" "string" "example.org"
 	# I'm not terribly happy to preseed a generic password but I guess
 	# there's no other way on some machines.
 	add "$FILE" "network-console/password" "password" "install"
