@@ -61,18 +61,13 @@ static char *debconf_priorities[] =
 #define ARRAY_SIZE(a) (sizeof(a)/sizeof(a[0]))
 static int debconf_to_pri (char *priority) {
 	int i;
-	int pri = -1;
 
-	if (priority) {
-		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i) {
-			if (0 == strcmp(priority, debconf_priorities[i]) ) {
-				pri = i;
-				break;
-			}
-		}
-	}
+	if (priority)
+		for (i = 0; (size_t)i < ARRAY_SIZE(debconf_priorities); ++i)
+			if (0 == strcmp(priority, debconf_priorities[i]))
+				return i;
 
-	return pri;
+	return -1;
 }
 
 /*
