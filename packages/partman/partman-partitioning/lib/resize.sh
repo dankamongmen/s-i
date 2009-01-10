@@ -224,9 +224,10 @@ perform_resizing () {
 	elif [ "$virtual" = no ] && \
 	     [ -f $oldid/detected_filesystem ] && \
 	     ([ "$(cat $oldid/detected_filesystem)" = ext2 ] || \
-	      [ "$(cat $oldid/detected_filesystem)" = ext3 ]); then
+	      [ "$(cat $oldid/detected_filesystem)" = ext3 ] || \
+	      [ "$(cat $oldid/detected_filesystem)" = ext4 ]); then
 
-		# Resize ext2/ext3; parted can handle simple cases but can't deal
+		# Resize ext2/ext3/ext4; parted can handle simple cases but can't deal
 		# with certain common features such as resize_inode
 		fs="$(cat $oldid/detected_filesystem)"
 		db_progress START 0 1000 partman/text/please_wait
@@ -279,7 +280,7 @@ perform_resizing () {
 		db_progress SET 500
 		if longint_le "$cursize" "$newsize"; then
 			if ! resize2fs $path; then
-				logger -t partman "Error resizing the ext2/ext3 file system to the partition size"
+				logger -t partman "Error resizing the ext2/ext3/ext4 file system to the partition size"
 				db_input high partman-partitioning/new_size_commit_failed || true
 				db_go || true
 				db_progress STOP
@@ -294,14 +295,14 @@ perform_resizing () {
 				update-dev
 
 				if ! resize2fs $path; then
-					logger -t partman "Error resizing the ext2/ext3 file system to the partition size"
+					logger -t partman "Error resizing the ext2/ext3/ext4 file system to the partition size"
 					db_input high partman-partitioning/new_size_commit_failed || true
 					db_go || true
 					db_progress STOP
 					exit 100
 				fi
 			else
-				logger -t partman "Error resizing the ext2/ext3 file system"
+				logger -t partman "Error resizing the ext2/ext3/ext4 file system"
 				db_input high partman-partitioning/new_size_commit_failed || true
 				db_go || true
 				db_progress STOP
@@ -313,7 +314,7 @@ perform_resizing () {
 
 	else
 
-		# Resize virtual partitions, ext2, ext3, swap, fat16, fat32
+		# Resize virtual partitions, ext2, ext3, ext4, swap, fat16, fat32
 		# and probably reiserfs
 		name_progress_bar partman-partitioning/progress_resizing
 		open_dialog RESIZE_PARTITION $oldid $newsize
