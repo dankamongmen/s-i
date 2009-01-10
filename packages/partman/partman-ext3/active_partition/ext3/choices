@@ -15,7 +15,7 @@ cd $dev
 filesystem=$(cat $part/acting_filesystem)
 
 case "$filesystem" in
-    ext3)
+    ext3|ext4)
 	:
 	;;
     *)
@@ -46,7 +46,7 @@ choice_label () {
 	  -o $part/formatted -ot $part/method \
 	  -o $part/formatted -ot $part/filesystem ] || return 0
 	case "$filesystem" in
-	    ext3)
+	    ext3|ext4)
 		if [ -f $part/label ]; then
 			label=$(cat $part/label)
 		else
