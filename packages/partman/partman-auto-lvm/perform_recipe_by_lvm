@@ -30,9 +30,9 @@ db_progress STEP 1
 
 # expand_scheme can't cope with decimal and lvm overhead.
 # lvm overhead gets calculated properly only using kbytes.
-# Switch to that. The worst scenario is that the last partition will be one PE smaller,
-# but in the big numbers it's nothing (4MB).
-free_size=$(vgs -o vg_free --units k --noheading --nosuffix $VG_name | sed -e 's/\..*//g')
+# Switch to that. The worst scenario is that the last partition will
+# be one PE smaller, but in the big numbers it's nothing (4MB).
+free_size=$(vgs -o vg_free --units K --noheading --nosuffix $VG_name | sed -e 's/\..*//g')
 
 newscheme=''
 foreach_partition '
