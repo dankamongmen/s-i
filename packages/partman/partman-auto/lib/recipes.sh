@@ -80,7 +80,7 @@ decode_recipe () {
 				max=$min
 			fi
 			case "$4" in # allow only valid file systems
-			    ext2|ext3|xfs|reiserfs|jfs|linux-swap|fat16|fat32|hfs)
+			    ext2|ext3|ext4|xfs|reiserfs|jfs|linux-swap|fat16|fat32|hfs)
 				fs="$4"
 				;;
 			    *)
@@ -336,7 +336,7 @@ expand_scheme() {
 		max=$3
 		fs=$4
 		case "$fs" in
-		    ext2|ext3|linux-swap|fat16|fat32|hfs)
+		    ext2|ext3|ext4|linux-swap|fat16|fat32|hfs)
 			true
 			;;
 		    *)
