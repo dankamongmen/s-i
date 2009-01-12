@@ -14,7 +14,7 @@ bail_out() {
 # (Need $method in scope.)
 add_envelope() {
 	local scheme="$1"
-	echo "$scheme${NL}100 1000 1000000000 ext3 \$primary{ } method{ $method }"
+	echo "$scheme${NL}100 1000 -1 ext3 \$primary{ } method{ $method }"
 }
 
 # Create the partitions needed by a recipe to hold all PVs

@@ -45,7 +45,7 @@ decode_recipe () {
 			line=''
 			;;
 		    ::)
-			db_metaget $line description
+			db_metaget $line description || RET=''
 			name="${RET:-Unnamed.$unnamed}"
 			line=''
 			;;
@@ -69,14 +69,15 @@ decode_recipe () {
 			if [ $factor -lt $min ]; then
 				factor=$min
 			fi
-			if expr "$3" : '[0-9][0-9]*$' >/dev/null; then
+			if [ "$3" = "-1" ] || \
+			   expr "$3" : '[0-9][0-9]*$' >/dev/null; then
 				max=$3
 			elif expr "$3" : '[0-9][0-9]*%$' >/dev/null; then
 				max=$(($ram * ${3%?} / 100))
 			else # error
 				max=$min # do not enlarge the partition
 			fi
-			if [ $max -lt $min ]; then
+			if [ $max -ne -1 ] && [ $max -lt $min ]; then
 				max=$min
 			fi
 			case "$4" in # allow only valid file systems
@@ -370,7 +371,7 @@ expand_scheme() {
 			else
 				newmin=$(($min + $unallocated * $fact / $factsum))
 			fi
-			if [ $newmin -gt $max ]; then
+			if [ $max -ne -1 ] && [ $newmin -gt $max ]; then
 				echo $max 0 $max $*
 			elif [ $newmin -lt $min ]; then
 				echo $min 0 $min $*
