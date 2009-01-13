@@ -1,6 +1,6 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56827 -->
-<!-- updated 38960:56510 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
+<!-- original version: 57041 -->
+<!-- updated 38960:57041 by Felipe Augusto van de Wiel (faw) 2009.01.13 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -884,6 +884,20 @@ especial, você pode definir <classname>netcfg/get_gateway</classname> como
 
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>Console de rede</title>
+
+<informalexample role="example"><screen>
+# Use the following settings if you wish to make use of the network-console
+# component for remote installation over SSH. This only makes sense if you
+# intend to perform the remainder of the installation manually.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Definição do espelho</title>
 <para>
@@ -1421,7 +1435,13 @@ Uma poderosa e flexível opção oferecida pelas ferramentas de pré-configuraç
 # This first command is run as early as possible, just after
 # preseeding is read.
 #d-i preseed/early_command string anna-install some-udeb
-
+<phrase condition="squeeze">
+# This command is run immediately before the partitioner starts. It may be
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
 # directly, or use the apt-install and in-target commands to easily install
