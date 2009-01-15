@@ -88,10 +88,6 @@ root_devfs="$(findfs /)"
 
 root="$(mapdevfs "$root_devfs")"
 info "root partition: $root"
-# If ATA (/dev/hd), then it must be on the first disk (/dev/hda).
-if [ "${root#/dev/hd}" != "$root" ] && [ "${root#/dev/hda}" = "$root" ]; then
-	die quik-installer/root_not_on_first_disk '/ not on first disk'
-fi
 
 boot_devfs="$(findfs /boot)"
 [ "$boot_devfs" ] || boot_devfs="$root_devfs"
@@ -100,17 +96,12 @@ info "boot partition: $boot"
 
 # The partition where quik is installed must be ext2 and
 # quik must be installed on the first disk
-if [ "$boot_devfs" != "$root_devfs" ]; then
-	if ! grep '[[:space:]]/target/boot[[:space:]]ext2[[:space:]]' /proc/mounts \
-	   >/dev/null; then
-		die quik-installer/boot_not_ext2 '/boot not ext2'
-	fi
-	if [ "${boot#/dev/hd}" != "$boot" ] && [ "${boot#/dev/hda}" = "$boot" ]; then
-		die quik-installer/boot_not_on_first_disk '/boot not on first disk'
-	fi
-elif ! grep '[[:space:]]/target[[:space:]]ext2[[:space:]]' /proc/mounts \
-     >/dev/null; then
+if ! grep "[[:space:]]/target$boot[[:space:]]ext2[[:space:]]" /proc/mounts \
+   >/dev/null; then
 	die quik-installer/boot_not_ext2 '/boot not ext2'
+fi
+if [ "${boot#/dev/hd}" != "$boot" ] && [ "${boot#/dev/hda}" = "$boot" ]; then
+	die quik-installer/boot_not_on_first_disk '/boot not on first disk'
 fi
 
 # Generate quik.conf
@@ -222,6 +213,10 @@ if [ "$ARCH" = powerpc/powermac_oldworld ]; then
 fi
 
 # Set initramfs to MODULES=dep and regenerate the initramfs
+
+db_progress STEP 1
+db_progress INFO quik-installer/progress/initramfs
+
 sed -i -e 's/MODULES=most/MODULES=dep/g' /target/etc/initramfs-tools/initramfs.conf
 in-target update-initramfs -u || true
 
