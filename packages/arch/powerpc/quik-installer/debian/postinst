@@ -212,14 +212,6 @@ if [ "$ARCH" = powerpc/powermac_oldworld ]; then
 		    "nvsetenv boot-command failed with exit status $?"
 fi
 
-# Set initramfs to MODULES=dep and regenerate the initramfs
-
-db_progress STEP 1
-db_progress INFO quik-installer/progress/initramfs
-
-sed -i -e 's/MODULES=most/MODULES=dep/g' /target/etc/initramfs-tools/initramfs.conf
-in-target update-initramfs -u || true
-
 # Done!
 
 db_progress STEP 1
