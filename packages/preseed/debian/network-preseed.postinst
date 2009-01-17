@@ -5,7 +5,9 @@ set -e
 . /lib/preseed/preseed.sh
 
 dhcp_url=$(dhcp_preseed_url)
-[ "$dhcp_url" ] && preseed_location "$dhcp_url"
+if [ "$dhcp_url" ]; then
+	preseed_location "$dhcp_url"
+fi
 preseed preseed/url
 preseed_command preseed/early_command
 
