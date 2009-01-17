@@ -120,54 +120,99 @@ def library_depends_gcc_libnames(obj):
     return ' '.join(ret)
 
 class Symbol(object):
-    def __init__(self, name, version):
-        self.name, self.version = name, version
+    def __init__(self, name, version, library):
+        self.name, self.version, self.library = name, version, library
 
     def __str__(self):
-        return "%s@%s" % (self.name, self.version)
+        ret = [self.name]
+        if self.version:
+            ret.append(self.version)
+            if self.library:
+                ret.append(self.library)
+        return '@'.join(ret)
 
 class UndefinedSymbol(Symbol):
-    def __init__(self, name, weak, version):
-        super(UndefinedSymbol, self).__init__(name, version)
-        self.weak = weak
+    def __init__(self, name, weak, version, library):
+        super(UndefinedSymbol, self).__init__(name, version, library)
+        self.weak, self.library = weak, library
 
 # Return undefined symbols in an object as a set of tuples (name, weakness)
 def undefined_symbols(obj):
     if not os.access(obj, os.F_OK):
         raise "Cannot find lib" + obj
 
-    result = []
     output = command("mklibs-readelf", "--print-symbols-undefined", obj)
+
+    result = []
     for line in output:
-        name, weak_string, version = line.split()[:3]
-        result.append(UndefinedSymbol(name, bool(eval(weak_string)), version))
+        name, weak_string, version_string, library_string = line.split()[:4]
+
+        weak = False
+        if weak_string.lower() == 'true':
+            weak = True
+
+        version = None
+        if version_string.lower() not in ('base', 'none'):
+            version = version_string
+
+        library = None
+        if library_string.lower() != 'none':
+            library = library_string
+
+        result.append(UndefinedSymbol(name, weak, version, library))
+
     return result
 
 class ProvidedSymbol(Symbol):
-    def __init__(self, name, version, default_version):
-        super(ProvidedSymbol, self).__init__(name, version)
+    def __init__(self, name, version, library, default_version):
+        super(ProvidedSymbol, self).__init__(name, version, library)
         self.default_version = default_version
 
     def base_names(self):
-        if self.default_version and self.version != "Base":
-            return ["%s@%s" % (self.name, self.version), "%s@Base" % self.name]
-        return ["%s@%s" % (self.name, self.version)]
+        ret = []
+
+        if self.version:
+            if self.library:
+                ret.append('@'.join((self.name, self.version, self.library)))
+
+            ret.append('@'.join((self.name, self.version)))
+
+            if self.default_version:
+                ret.append(self.name)
+
+        else:
+            ret.append(self.name)
+
+        return ret
 
     def linker_name(self):
-        if self.default_version or self.version == "Base":
+        if self.default_version or not self.version:
             return self.name
-        return "%s@%s" % (self.name, self.version)
+
+        return '@'.join((self.name, self.version))
 
 # Return a set of symbols provided by a library
 def provided_symbols(obj):
     if not os.access(obj, os.F_OK):
         raise "Cannot find lib" + obj
+    library = extract_soname(obj)
+
+    output = command("mklibs-readelf", "--print-symbols-provided", obj)
 
     result = []
-    output = command("mklibs-readelf", "--print-symbols-provided", obj)
     for line in output:
-        name, weak, version, default_version_string = line.split()[:4]
-        result.append(ProvidedSymbol(name, version, bool(eval(default_version_string))))
+        name, weak_string, version_string, default_version_string = line.split()[:4]
+
+        version = None
+        if version_string.lower() not in ('base', 'none'):
+            version = version_string
+
+        default_version = False
+        if default_version_string.lower() == 'true':
+            default_version = True
+
+        result.append(ProvidedSymbol(name, version, library, default_version))
+
     return result
     
 # Return real target of a symlink
@@ -481,12 +526,7 @@ while 1:
         for symbol in symbols:
             for name in symbol.base_names():
                 if name in symbol_provider:
-                    # in doubt, prefer symbols from libc
-                    if re.match("^libc[\.-]", library):
-                        library_symbols[library][name] = symbol
-                        symbol_provider[name] = library
-                    else:
-                        debug(DEBUG_SPAM, "duplicate symbol %s in %s and %s" % (symbol, symbol_provider[name], library))
+                    debug(DEBUG_SPAM, "duplicate symbol %s in %s and %s" % (symbol, symbol_provider[name], library))
                 else:
                     library_symbols[library][name] = symbol
                     symbol_provider[name] = library
@@ -542,7 +582,7 @@ while 1:
                 # may segfault in ptmalloc_init due to undefined weak reference
                 extra_pre_obj.append(sysroot + libc_extras_dir + "/soinit.o")
                 extra_post_obj.append(sysroot + libc_extras_dir + "/sofini.o")
-                symbols.add(ProvidedSymbol('__dso_handle', 'Base', True))
+                symbols.add(ProvidedSymbol('__dso_handle', None, None, True))
 
             map_file = find_pic_map(library)
             if map_file:
