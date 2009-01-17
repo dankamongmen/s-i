@@ -41,31 +41,31 @@ namespace Elf
     public:
       virtual ~file () throw ();
 
-      virtual const uint8_t get_class () const throw () = 0;
-      virtual const uint8_t get_data () const throw () = 0;
-      const uint16_t get_type () const throw () { return type; }
-      const uint16_t get_machine () const throw () { return machine; }
-      const uint32_t get_flags () const throw () { return flags; }
-      const uint16_t get_shstrndx () const throw () { return shstrndx; }
+      virtual const uint8_t get_class() const throw () = 0;
+      virtual const uint8_t get_data() const throw () = 0;
+      const uint16_t get_type() const throw () { return type; }
+      const uint16_t get_machine() const throw () { return machine; }
+      const uint32_t get_flags() const throw () { return flags; }
+      const uint16_t get_shstrndx() const throw () { return shstrndx; }
 
-      const std::vector <section *> get_sections () const throw () { return sections; };
-      const section &get_section (unsigned int i) const throw (std::out_of_range) { return *sections.at(i); };
-      const section_type<section_type_DYNAMIC> *get_section_DYNAMIC () const throw () { return section_DYNAMIC; };
-      const section_type<section_type_DYNSYM> *get_section_DYNSYM () const throw () { return section_DYNSYM; };
-      const section_type<section_type_GNU_VERDEF> *get_section_GNU_VERDEF () const throw () { return section_GNU_VERDEF; };
-      const section_type<section_type_GNU_VERNEED> *get_section_GNU_VERNEED () const throw () { return section_GNU_VERNEED; };
-      const section_type<section_type_GNU_VERSYM> *get_section_GNU_VERSYM () const throw () { return section_GNU_VERSYM; };
+      const std::vector<section *> get_sections() const throw () { return sections; };
+      const section &get_section(unsigned int i) const throw (std::out_of_range) { return *sections.at(i); };
+      const section_type<section_type_DYNAMIC> *get_section_DYNAMIC() const throw () { return section_DYNAMIC; };
+      const section_type<section_type_DYNSYM> *get_section_DYNSYM() const throw () { return section_DYNSYM; };
+      const section_type<section_type_GNU_VERDEF> *get_section_GNU_VERDEF() const throw () { return section_GNU_VERDEF; };
+      const section_type<section_type_GNU_VERNEED> *get_section_GNU_VERNEED() const throw () { return section_GNU_VERNEED; };
+      const section_type<section_type_GNU_VERSYM> *get_section_GNU_VERSYM() const throw () { return section_GNU_VERSYM; };
 
-      const std::vector <segment *> get_segments () const throw () { return segments; };
-      const segment_type<segment_type_INTERP> *get_segment_INTERP () const throw () { return segment_INTERP; };
+      const std::vector<segment *> get_segments() const throw () { return segments; };
+      const segment_type<segment_type_INTERP> *get_segment_INTERP() const throw () { return segment_INTERP; };
 
-      static file *open (const char *filename) throw (std::bad_alloc, std::runtime_error);
+      static file *open(const char *filename) throw (std::bad_alloc, std::runtime_error);
 
     protected:
-      file (void *mem, size_t len) throw (std::bad_alloc) : mem (mem), len (len) { }
+      file(void *mem, size_t len) throw (std::bad_alloc) : mem (mem), len (len) { }
 
       template<typename _class>
-        static file *open_class (void *, size_t) throw (std::bad_alloc, std::runtime_error);
+        static file *open_class(void *, size_t) throw (std::bad_alloc, std::runtime_error);
 
       uint16_t type;
       uint16_t machine;
@@ -78,14 +78,14 @@ namespace Elf
       uint16_t shnum;
       uint16_t shstrndx;
 
-      std::vector <section *> sections;
+      std::vector<section *> sections;
       section_type<section_type_DYNAMIC> *section_DYNAMIC;
       section_type<section_type_DYNSYM> *section_DYNSYM;
       section_type<section_type_GNU_VERDEF> *section_GNU_VERDEF;
       section_type<section_type_GNU_VERNEED> *section_GNU_VERNEED;
       section_type<section_type_GNU_VERSYM> *section_GNU_VERSYM;
 
-      std::vector <segment *> segments;
+      std::vector<segment *> segments;
       segment_type<segment_type_INTERP> *segment_INTERP;
 
       void *mem;
@@ -95,11 +95,11 @@ namespace Elf
   class section
   {
     public:
-      virtual ~section () throw () {}
+      virtual ~section() throw () {}
 
-      uint32_t get_type () const throw () { return type; }
-      uint64_t get_size () const throw () { return size; }
-      const std::string &get_name_string () const throw () { return name_string; }
+      uint32_t get_type() const throw () { return type; }
+      uint64_t get_size() const throw () { return size; }
+      const std::string &get_name_string() const throw () { return name_string; }
 
     protected:
       uint32_t name;
@@ -128,9 +128,9 @@ namespace Elf
     class section_type<section_type_STRTAB> : public virtual section
     {
       public:
-        std::string get_string (uint32_t offset) const throw (std::bad_alloc)
+        std::string get_string(uint32_t offset) const throw (std::bad_alloc)
         {
-          return std::string (static_cast<const char *> (mem) + offset);
+          return std::string(static_cast<const char *> (mem) + offset);
         }
     };
 
@@ -138,9 +138,9 @@ namespace Elf
     class section_type<section_type_DYNAMIC> : public virtual section
     {
       public:
-        ~section_type () throw ();
+        ~section_type() throw ();
 
-        const std::vector<dynamic *> &get_dynamics () const throw () { return dynamics; }
+        const std::vector<dynamic *> &get_dynamics() const throw () { return dynamics; }
 
       protected:
         std::vector<dynamic *> dynamics;
@@ -150,9 +150,9 @@ namespace Elf
     class section_type<section_type_DYNSYM> : public virtual section
     {
       public:
-        ~section_type () throw ();
+        ~section_type() throw ();
 
-        const std::vector<symbol *> &get_symbols () const throw () { return symbols; }
+        const std::vector<symbol *> &get_symbols() const throw () { return symbols; }
 
       protected:
         std::vector<symbol *> symbols;
@@ -162,10 +162,10 @@ namespace Elf
     class section_type<section_type_GNU_VERDEF> : public virtual section
     {
       public:
-        ~section_type () throw () { }
+        ~section_type() throw () { }
 
         const version_definition *get_version_definition(uint16_t index) const throw ();
-        const std::vector<version_definition *> &get_version_definitions () throw () { return verdefs; }
+        const std::vector<version_definition *> &get_version_definitions() throw () { return verdefs; }
 
       protected:
         std::vector<version_definition *> verdefs;
@@ -175,10 +175,10 @@ namespace Elf
     class section_type<section_type_GNU_VERNEED> : public virtual section
     {
       public:
-        ~section_type () throw () { }
+        ~section_type() throw () { }
 
         const version_requirement_entry *get_version_requirement_entry(uint16_t index) const throw ();
-        const std::vector<version_requirement *> &get_version_requirements () throw () { return verneeds; }
+        const std::vector<version_requirement *> &get_version_requirements() throw () { return verneeds; }
 
       protected:
         std::vector<version_requirement *> verneeds;
@@ -199,11 +199,11 @@ namespace Elf
   class segment
   {
     public:
-      virtual ~segment () throw () {}
+      virtual ~segment() throw () {}
 
-      uint32_t get_type () const throw () { return type; }
-      uint32_t get_flags () const throw () { return flags; }
-      uint64_t get_filesz () const throw () { return filesz; }
+      uint32_t get_type() const throw () { return type; }
+      uint32_t get_flags() const throw () { return flags; }
+      uint64_t get_filesz() const throw () { return filesz; }
 
     protected:
       uint32_t type;
@@ -223,9 +223,9 @@ namespace Elf
     class segment_type<segment_type_INTERP> : public virtual segment
     {
       public:
-        ~segment_type () throw () { }
+        ~segment_type() throw () { }
 
-        const std::string &get_interp () const throw () { return interp; }
+        const std::string &get_interp() const throw () { return interp; }
 
       protected:
         std::string interp;
@@ -234,12 +234,12 @@ namespace Elf
   class dynamic
   {
     public:
-      virtual ~dynamic () throw () {}
+      virtual ~dynamic() throw () {}
 
-      int64_t get_tag () const throw () { return tag; }
-      uint64_t get_val () const throw () { return val; }
-      uint64_t get_ptr () const throw () { return ptr; }
-      const std::string &get_val_string () const throw () { return val_string; }
+      int64_t get_tag() const throw () { return tag; }
+      uint64_t get_val() const throw () { return val; }
+      uint64_t get_ptr() const throw () { return ptr; }
+      const std::string &get_val_string() const throw () { return val_string; }
 
     protected:
       int64_t tag;
@@ -256,15 +256,15 @@ namespace Elf
       symbol() throw () : verdef(NULL), verneed(NULL) {}
       virtual ~symbol() throw () {}
 
-      uint8_t get_info () const throw () { return info; }
-      uint16_t get_shndx () const throw () { return shndx; }
-      uint64_t get_value () const throw () { return value; }
-      uint64_t get_size () const throw () { return size; }
+      uint8_t get_info() const throw () { return info; }
+      uint16_t get_shndx() const throw () { return shndx; }
+      uint64_t get_value() const throw () { return value; }
+      uint64_t get_size() const throw () { return size; }
       uint8_t get_bind () const throw () { return bind; }
       uint8_t get_type () const throw () { return type; }
-      const std::string &get_name_string () const throw () { return name_string; }
+      const std::string &get_name_string() const throw () { return name_string; }
       std::string get_version() const throw (std::bad_alloc);
-      std::string get_version_file () const throw (std::bad_alloc);
+      std::string get_version_file() const throw (std::bad_alloc);
       uint16_t get_version_data() const throw () { return versym; }
       std::string get_name_version() const throw (std::bad_alloc);
 
@@ -308,8 +308,8 @@ namespace Elf
       version_requirement() throw (std::bad_alloc);
       virtual ~version_requirement () throw () { }
 
-      const std::string &get_file () const throw () { return file_string; }
-      const std::vector<version_requirement_entry *> &get_entries () const throw () { return entries; }
+      const std::string &get_file() const throw () { return file_string; }
+      const std::vector<version_requirement_entry *> &get_entries() const throw () { return entries; }
 
     protected:
       uint32_t file;
@@ -323,9 +323,9 @@ namespace Elf
   {
     public:
       version_requirement_entry(const version_requirement &) throw ();
-      virtual ~version_requirement_entry () throw () { }
+      virtual ~version_requirement_entry() throw () { }
 
-      uint16_t get_other () const throw () { return other; }
+      uint16_t get_other() const throw () { return other; }
       const std::string &get_name() const throw () { return name_string; }
 
       const std::string &get_file() const throw ();
