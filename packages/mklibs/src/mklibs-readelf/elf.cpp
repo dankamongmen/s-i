@@ -562,38 +562,43 @@ version_requirement_data<_class, _data>::version_requirement_data (Verneed *vern
 }
 
 template <typename _class, typename _data>
-void version_requirement_data<_class, _data>::update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
+void version_requirement_data<_class, _data>::
+update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
 {
   file_string = section.get_string(file);
 
   for (std::vector<version_requirement_entry *>::iterator it = entries.begin(); it != entries.end(); ++it)
   {
     version_requirement_entry_data<_class, _data> &vernaux =
-      dynamic_cast<version_requirement_entry_data<_class, _data> &> (**it);
+      dynamic_cast<version_requirement_entry_data<_class, _data> &>(**it);
     vernaux.update_string(section);
   }
 }
 
-version_requirement_entry::version_requirement_entry(const version_requirement &verneed) throw ()
+version_requirement_entry::
+version_requirement_entry(const version_requirement &verneed) throw ()
 : verneed(verneed)
 { }
 
-const std::string &version_requirement_entry::get_file() const throw ()
+const std::string &
+version_requirement_entry::get_file() const throw ()
 {
   return verneed.get_file();
 }
 
 template <typename _class, typename _data>
-version_requirement_entry_data<_class, _data>::version_requirement_entry_data (Vernaux *vna, const version_requirement &verneed) throw ()
+version_requirement_entry_data<_class, _data>::
+version_requirement_entry_data(Vernaux *vna, const version_requirement &verneed) throw ()
 : version_requirement_entry(verneed)
 {
-  flags = convert<_data, typeof (vna->vna_flags)> () (vna->vna_flags);
-  other = convert<_data, typeof (vna->vna_other)> () (vna->vna_other);
-  name  = convert<_data, typeof (vna->vna_name)> ()  (vna->vna_name);
+  flags = convert<_data, typeof vna->vna_flags>() (vna->vna_flags);
+  other = convert<_data, typeof vna->vna_other>() (vna->vna_other);
+  name  = convert<_data, typeof vna->vna_name>()  (vna->vna_name);
 }
 
 template <typename _class, typename _data>
-void version_requirement_entry_data<_class, _data>::update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
+void version_requirement_entry_data<_class, _data>::
+update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
 {
   name_string = section.get_string(name);
 }

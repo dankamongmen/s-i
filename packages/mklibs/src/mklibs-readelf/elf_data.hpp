@@ -113,11 +113,15 @@ namespace Elf
     class section_real : public section_data<_class, _data>, public section_type<_type>
     {
       public:
-        section_real(void *a, void *b) throw () : section_data<_class, _data> (a, b) { }
+        section_real(void *a, void *b) throw ()
+        : section_data<_class, _data>(a, b)
+        { }
     };
 
   template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_DYNAMIC> : public section_data<_class, _data>, public section_type<section_type_DYNAMIC>
+    class section_real<_class, _data, section_type_DYNAMIC>
+    : public section_data<_class, _data>,
+      public section_type<section_type_DYNAMIC>
     {
       public:
         section_real(void *, void *) throw (std::bad_alloc);
@@ -126,37 +130,45 @@ namespace Elf
     };
 
   template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_DYNSYM> : public section_data<_class, _data>, public section_type<section_type_DYNSYM>
+    class section_real<_class, _data, section_type_DYNSYM>
+    : public section_data<_class, _data>,
+      public section_type<section_type_DYNSYM>
     {
       public:
-        section_real (void *, void *) throw (std::bad_alloc);
+        section_real(void *, void *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_GNU_VERDEF> : public section_data<_class, _data>, public section_type<section_type_GNU_VERDEF>
+    class section_real<_class, _data, section_type_GNU_VERDEF>
+    : public section_data<_class, _data>,
+      public section_type<section_type_GNU_VERDEF>
     {
       public:
-        section_real (void *, void *) throw (std::bad_alloc);
+        section_real(void *, void *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_GNU_VERNEED> : public section_data<_class, _data>, public section_type<section_type_GNU_VERNEED>
+    class section_real<_class, _data, section_type_GNU_VERNEED>
+    : public section_data<_class, _data>,
+      public section_type<section_type_GNU_VERNEED>
     {
       public:
-        section_real (void *, void *) throw (std::bad_alloc);
+        section_real(void *, void *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
-    class section_real<_class, _data, section_type_GNU_VERSYM> : public section_data<_class, _data>, public section_type<section_type_GNU_VERSYM>
+    class section_real<_class, _data, section_type_GNU_VERSYM>
+    : public section_data<_class, _data>,
+      public section_type<section_type_GNU_VERSYM>
     {
       public:
-        section_real (void *, void *) throw (std::bad_alloc);
+        section_real(void *, void *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
