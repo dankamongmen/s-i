@@ -402,7 +402,7 @@ segment_real<_class, _data, segment_type_INTERP>::segment_real (Phdr *header, ui
   if (this->type != PT_INTERP)
     throw std::logic_error ("Wrong segment type");
 
-  this->interp = std::string(reinterpret_cast<const char *>(this->mem + this->offset));
+  this->interp = std::string(reinterpret_cast<const char *>(this->mem));
 }
 
 template <typename _class, typename _data>

@@ -88,8 +88,8 @@ namespace Elf
       std::vector<segment *> segments;
       segment_type<segment_type_INTERP> *segment_INTERP;
 
-      uint8_t *mem;
-      size_t len;
+      uint8_t *const mem;
+      const size_t len;
   };
 
   class section
