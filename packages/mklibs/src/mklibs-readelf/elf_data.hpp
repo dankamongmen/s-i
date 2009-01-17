@@ -52,8 +52,16 @@ namespace Elf
         typedef Elf32_Vernaux Vernaux;
         typedef Elf32_Verneed Verneed;
         typedef Elf32_Versym Versym;
-        static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF32_ST_BIND (st_info); }
-        static inline uint8_t st_type (uint8_t st_info) throw () { return ELF32_ST_TYPE (st_info); }
+
+        static inline uint8_t st_bind(uint8_t st_info) throw ()
+        {
+          return ELF32_ST_BIND(st_info);
+        }
+
+        static inline uint8_t st_type(uint8_t st_info) throw ()
+        {
+          return ELF32_ST_TYPE(st_info);
+        }
       };
 
     template <>
@@ -69,8 +77,16 @@ namespace Elf
         typedef Elf64_Vernaux Vernaux;
         typedef Elf64_Verneed Verneed;
         typedef Elf64_Versym Versym;
-        static inline uint8_t st_bind (uint8_t st_info) throw () { return ELF64_ST_BIND (st_info); }
-        static inline uint8_t st_type (uint8_t st_info) throw () { return ELF64_ST_TYPE (st_info); }
+
+        static inline uint8_t st_bind(uint8_t st_info) throw ()
+        {
+          return ELF64_ST_BIND(st_info);
+        }
+
+        static inline uint8_t st_type(uint8_t st_info) throw ()
+        {
+          return ELF64_ST_TYPE(st_info);
+        }
       };
   }
 
@@ -78,17 +94,17 @@ namespace Elf
     class file_data : public file
     {
       public:
-        file_data (void *, size_t len) throw (std::bad_alloc, std::runtime_error);
+        file_data(void *, size_t len) throw (std::bad_alloc, std::runtime_error);
 
-        const uint8_t get_class () const throw () { return _class::id; }
-        const uint8_t get_data () const throw () { return _data::id; }
+        const uint8_t get_class() const throw () { return _class::id; }
+        const uint8_t get_data() const throw () { return _data::id; }
     };
 
   template <typename _class, typename _data>
     class section_data : public virtual section
     {
       public:
-        section_data (void *, void *) throw ();
+        section_data(void *, void *) throw ();
 
         virtual void update(const file &) throw (std::bad_alloc);
     };
@@ -97,14 +113,14 @@ namespace Elf
     class section_real : public section_data<_class, _data>, public section_type<_type>
     {
       public:
-        section_real (void *a, void *b) throw () : section_data<_class, _data> (a, b) { }
+        section_real(void *a, void *b) throw () : section_data<_class, _data> (a, b) { }
     };
 
   template <typename _class, typename _data>
     class section_real<_class, _data, section_type_DYNAMIC> : public section_data<_class, _data>, public section_type<section_type_DYNAMIC>
     {
       public:
-        section_real (void *, void *) throw (std::bad_alloc);
+        section_real(void *, void *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
