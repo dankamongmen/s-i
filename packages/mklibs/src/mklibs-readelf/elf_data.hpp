@@ -214,7 +214,7 @@ namespace Elf
       public:
         typedef typename _elfdef<_class>::Vernaux Vernaux;
 
-        version_requirement_entry_data (Vernaux *) throw ();
+        version_requirement_entry_data (Vernaux *, const version_requirement &) throw ();
 
         void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc);
     };

@@ -96,7 +96,9 @@ static void process_symbols_undefined (const Elf::section_type<Elf::section_type
       std::cout <<
         symbol->get_name_string () << ' ' <<
         (bind == STB_WEAK ? "True" : "False") << ' ' <<
-        symbol->get_version() << '\n';
+        symbol->get_version() <<
+        ' ' << symbol->get_version_file() <<
+        '\n';
   }
 }
 

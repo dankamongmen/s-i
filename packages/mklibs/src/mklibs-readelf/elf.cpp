@@ -445,6 +445,14 @@ std::string symbol::get_version () const throw (std::bad_alloc)
   return "Base";
 }
 
+std::string symbol::get_version_file () const throw (std::bad_alloc)
+{
+  if (verneed)
+    return verneed->get_file();
+
+  return "None";
+}
+
 std::string symbol::get_name_version () const throw (std::bad_alloc)
 {
   std::string ver;
@@ -531,18 +539,23 @@ void version_definition_data<_class, _data>::update_string(const section_type<se
     names_string.push_back(section.get_string(*it));
 }
 
+version_requirement::version_requirement() throw (std::bad_alloc)
+: file_string("None")
+{ }
+
 template <typename _class, typename _data>
 version_requirement_data<_class, _data>::version_requirement_data (Verneed *verneed) throw ()
 {
-  uint16_t cnt = convert<_data, typeof (verneed->vn_cnt)> () (verneed->vn_cnt);
-  uint32_t aux = convert<_data, typeof (verneed->vn_aux)> () (verneed->vn_aux);
+  uint16_t cnt = convert<_data, typeof (verneed->vn_cnt)> ()  (verneed->vn_cnt);
+  this->file   = convert<_data, typeof (verneed->vn_file)> () (verneed->vn_file);
+  uint32_t aux = convert<_data, typeof (verneed->vn_aux)> ()  (verneed->vn_aux);
 
   char *act = reinterpret_cast<char *> (verneed) + aux;
 
   for (int i = 0; i < cnt; i++)
   {
     Vernaux *vernaux = reinterpret_cast<Vernaux *> (act);
-    entries.push_back(new version_requirement_entry_data<_class, _data> (vernaux));
+    entries.push_back(new version_requirement_entry_data<_class, _data> (vernaux, *this));
     uint32_t next = convert<_data, typeof (vernaux->vna_next)> () (vernaux->vna_next);
     act += next;
   }
@@ -551,6 +564,8 @@ version_requirement_data<_class, _data>::version_requirement_data (Verneed *vern
 template <typename _class, typename _data>
 void version_requirement_data<_class, _data>::update_string(const section_type<section_type_STRTAB> &section) throw (std::bad_alloc)
 {
+  file_string = section.get_string(file);
+
   for (std::vector<version_requirement_entry *>::iterator it = entries.begin(); it != entries.end(); ++it)
   {
     version_requirement_entry_data<_class, _data> &vernaux =
@@ -559,8 +574,18 @@ void version_requirement_data<_class, _data>::update_string(const section_type<s
   }
 }
 
+version_requirement_entry::version_requirement_entry(const version_requirement &verneed) throw ()
+: verneed(verneed)
+{ }
+
+const std::string &version_requirement_entry::get_file() const throw ()
+{
+  return verneed.get_file();
+}
+
 template <typename _class, typename _data>
-version_requirement_entry_data<_class, _data>::version_requirement_entry_data (Vernaux *vna) throw ()
+version_requirement_entry_data<_class, _data>::version_requirement_entry_data (Vernaux *vna, const version_requirement &verneed) throw ()
+: version_requirement_entry(verneed)
 {
   flags = convert<_data, typeof (vna->vna_flags)> () (vna->vna_flags);
   other = convert<_data, typeof (vna->vna_other)> () (vna->vna_other);

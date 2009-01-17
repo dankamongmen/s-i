@@ -264,6 +264,7 @@ namespace Elf
       uint8_t get_type () const throw () { return type; }
       const std::string &get_name_string () const throw () { return name_string; }
       std::string get_version() const throw (std::bad_alloc);
+      std::string get_version_file () const throw (std::bad_alloc);
       uint16_t get_version_data() const throw () { return versym; }
       std::string get_name_version() const throw (std::bad_alloc);
 
@@ -304,21 +305,30 @@ namespace Elf
   class version_requirement
   {
     public:
+      version_requirement() throw (std::bad_alloc);
       virtual ~version_requirement () throw () { }
 
+      const std::string &get_file () const throw () { return file_string; }
       const std::vector<version_requirement_entry *> &get_entries () const throw () { return entries; }
 
     protected:
+      uint32_t file;
+
+      std::string file_string;
+
       std::vector<version_requirement_entry *> entries;
   };
 
   class version_requirement_entry
   {
     public:
+      version_requirement_entry(const version_requirement &) throw ();
       virtual ~version_requirement_entry () throw () { }
 
       uint16_t get_other () const throw () { return other; }
       const std::string &get_name() const throw () { return name_string; }
+
+      const std::string &get_file() const throw ();
 
     protected:
       uint16_t flags;
@@ -326,6 +336,8 @@ namespace Elf
       uint32_t name;
 
       std::string name_string;
+
+      const version_requirement &verneed;
   };
 }
 
