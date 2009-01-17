@@ -94,7 +94,7 @@ namespace Elf
     class file_data : public file
     {
       public:
-        file_data(void *, size_t len) throw (std::bad_alloc, std::runtime_error);
+        file_data(uint8_t *, size_t len) throw (std::bad_alloc, std::runtime_error);
 
         const uint8_t get_class() const throw () { return _class::id; }
         const uint8_t get_data() const throw () { return _data::id; }
@@ -103,8 +103,11 @@ namespace Elf
   template <typename _class, typename _data>
     class section_data : public virtual section
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_data(void *, void *) throw ();
+        section_data(Shdr *, uint8_t *) throw ();
 
         virtual void update(const file &) throw (std::bad_alloc);
     };
@@ -112,8 +115,11 @@ namespace Elf
   template <typename _class, typename _data, typename _type>
     class section_real : public section_data<_class, _data>, public section_type<_type>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *a, void *b) throw ()
+        section_real(Shdr *a, uint8_t *b) throw ()
         : section_data<_class, _data>(a, b)
         { }
     };
@@ -123,8 +129,11 @@ namespace Elf
     : public section_data<_class, _data>,
       public section_type<section_type_DYNAMIC>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *, void *) throw (std::bad_alloc);
+        section_real(Shdr *, uint8_t *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
@@ -134,8 +143,11 @@ namespace Elf
     : public section_data<_class, _data>,
       public section_type<section_type_DYNSYM>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *, void *) throw (std::bad_alloc);
+        section_real(Shdr *, uint8_t *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
@@ -145,8 +157,11 @@ namespace Elf
     : public section_data<_class, _data>,
       public section_type<section_type_GNU_VERDEF>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *, void *) throw (std::bad_alloc);
+        section_real(Shdr *, uint8_t *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
@@ -156,8 +171,11 @@ namespace Elf
     : public section_data<_class, _data>,
       public section_type<section_type_GNU_VERNEED>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *, void *) throw (std::bad_alloc);
+        section_real(Shdr *, uint8_t *) throw (std::bad_alloc);
 
         void update(const file &) throw (std::bad_alloc);
     };
@@ -167,37 +185,52 @@ namespace Elf
     : public section_data<_class, _data>,
       public section_type<section_type_GNU_VERSYM>
     {
+      private:
+        typedef typename _elfdef<_class>::Shdr Shdr;
+
       public:
-        section_real(void *, void *) throw (std::bad_alloc);
+        section_real(Shdr *, uint8_t *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
     class segment_data : public virtual segment
     {
+      private:
+        typedef typename _elfdef<_class>::Phdr Phdr;
+
       public:
-        segment_data (void *, void *) throw ();
+        segment_data (Phdr *, uint8_t *) throw ();
     };
 
   template <typename _class, typename _data, typename _type>
     class segment_real : public segment_data<_class, _data>, public segment_type<_type>
     {
+      private:
+        typedef typename _elfdef<_class>::Phdr Phdr;
+
       public:
-        segment_real (void *a, void *b) throw () : segment_data<_class, _data> (a, b) { }
+        segment_real (Phdr *a, uint8_t *b) throw () : segment_data<_class, _data> (a, b) { }
     };
 
   template <typename _class, typename _data>
     class segment_real<_class, _data, segment_type_INTERP>
     : public segment_data<_class, _data>, public segment_type<segment_type_INTERP>
     {
+      private:
+        typedef typename _elfdef<_class>::Phdr Phdr;
+
       public:
-        segment_real (void *, void *) throw (std::bad_alloc);
+        segment_real (Phdr *, uint8_t *) throw (std::bad_alloc);
     };
 
   template <typename _class, typename _data>
     class dynamic_data : public dynamic
     {
+      private:
+        typedef typename _elfdef<_class>::Dyn Dyn;
+
       public:
-        dynamic_data (void *) throw ();
+        dynamic_data (Dyn *) throw ();
 
         void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc);
     };
@@ -205,8 +238,11 @@ namespace Elf
   template <typename _class, typename _data>
     class symbol_data : public symbol
     {
+      private:
+        typedef typename _elfdef<_class>::Sym Sym;
+
       public:
-        symbol_data (void *) throw ();
+        symbol_data (Sym *) throw ();
 
         void update_string(const section_type<section_type_STRTAB> &) throw (std::bad_alloc);
         virtual void update_version (const file &, uint16_t) throw (std::bad_alloc);

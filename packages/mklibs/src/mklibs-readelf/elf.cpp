@@ -51,14 +51,14 @@ file *file::open (const char *filename) throw (std::bad_alloc, std::runtime_erro
     if ((mem = ::mmap (0, len, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0)) == MAP_FAILED)
       throw std::runtime_error ("mapping failed");
 
-    const uint8_t *buf = static_cast <uint8_t *> (mem);
+    uint8_t *buf = reinterpret_cast<uint8_t *>(mem);
 
     switch (buf[EI_CLASS])
     {
       case ELFCLASS32:
-        return open_class<file_class_32> (mem, len);
+        return open_class<file_class_32> (buf, len);
       case ELFCLASS64:
-        return open_class<file_class_64> (mem, len);
+        return open_class<file_class_64> (buf, len);
       default:
         throw std::runtime_error ("Invalid file class");
     }
@@ -71,11 +71,9 @@ file *file::open (const char *filename) throw (std::bad_alloc, std::runtime_erro
 }
 
 template<typename _class>
-file *file::open_class (void * mem, size_t len) throw (std::bad_alloc, std::runtime_error)
+file *file::open_class(uint8_t *mem, size_t len) throw (std::bad_alloc, std::runtime_error)
 {
-  const uint8_t *buf = static_cast <uint8_t *> (mem);
-
-  switch (buf[EI_DATA])
+  switch (mem[EI_DATA])
   {
     case ELFDATA2LSB:
       return new file_data<_class, file_data_2LSB> (mem, len);
@@ -87,30 +85,29 @@ file *file::open_class (void * mem, size_t len) throw (std::bad_alloc, std::runt
 }
 
 template <typename _class, typename _data>
-file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_alloc, std::runtime_error)
-: file (mem, len)
+file_data<_class, _data>::file_data(uint8_t *mem, size_t len) throw (std::bad_alloc, std::runtime_error)
+: file(mem, len)
 {
-  uint8_t *buf = static_cast <uint8_t *> (this->mem);
-  if (buf[EI_CLASS] != _class::id)
+  if (mem[EI_CLASS] != _class::id)
     throw std::runtime_error ("Wrong file class");
-  if (buf[EI_DATA] != _data::id)
+  if (mem[EI_DATA] != _data::id)
     throw std::runtime_error ("Wrong data encoding");
 
   typedef typename _elfdef<_class>::Ehdr Ehdr;
-  Ehdr *ehdr = static_cast <Ehdr *> (this->mem);
-  this->type      = convert<_data, typeof (ehdr->e_type     )> () (ehdr->e_type);
-  this->machine   = convert<_data, typeof (ehdr->e_machine  )> () (ehdr->e_machine);
-  this->phoff     = convert<_data, typeof (ehdr->e_phoff    )> () (ehdr->e_phoff);
-  this->shoff     = convert<_data, typeof (ehdr->e_shoff    )> () (ehdr->e_shoff);
-  this->flags     = convert<_data, typeof (ehdr->e_flags    )> () (ehdr->e_flags);
-  this->phentsize = convert<_data, typeof (ehdr->e_phentsize)> () (ehdr->e_phentsize);
-  this->phnum     = convert<_data, typeof (ehdr->e_phnum    )> () (ehdr->e_phnum);
-  this->shentsize = convert<_data, typeof (ehdr->e_shentsize)> () (ehdr->e_shentsize);
-  this->shnum     = convert<_data, typeof (ehdr->e_shnum    )> () (ehdr->e_shnum);
-  this->shstrndx  = convert<_data, typeof (ehdr->e_shstrndx )> () (ehdr->e_shstrndx);
+  Ehdr *ehdr = reinterpret_cast<Ehdr *>(mem);
+  this->type      = convert<_data, typeof ehdr->e_type     >()(ehdr->e_type);
+  this->machine   = convert<_data, typeof ehdr->e_machine  >()(ehdr->e_machine);
+  this->phoff     = convert<_data, typeof ehdr->e_phoff    >()(ehdr->e_phoff);
+  this->shoff     = convert<_data, typeof ehdr->e_shoff    >()(ehdr->e_shoff);
+  this->flags     = convert<_data, typeof ehdr->e_flags    >()(ehdr->e_flags);
+  this->phentsize = convert<_data, typeof ehdr->e_phentsize>()(ehdr->e_phentsize);
+  this->phnum     = convert<_data, typeof ehdr->e_phnum    >()(ehdr->e_phnum);
+  this->shentsize = convert<_data, typeof ehdr->e_shentsize>()(ehdr->e_shentsize);
+  this->shnum     = convert<_data, typeof ehdr->e_shnum    >()(ehdr->e_shnum);
+  this->shstrndx  = convert<_data, typeof ehdr->e_shstrndx >()(ehdr->e_shstrndx);
 
   typedef typename _elfdef<_class>::Shdr Shdr;
-  Shdr *shdrs = static_cast <Shdr *> (static_cast <void *> (static_cast <char *> (this->mem) + this->shoff));
+  Shdr *shdrs = reinterpret_cast<Shdr *>(mem + this->shoff);
 
   this->sections.resize (this->shnum);
 
@@ -149,7 +146,7 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
   }
 
   typedef typename _elfdef<_class>::Phdr Phdr;
-  Phdr *phdrs = static_cast <Phdr *> (static_cast <void *> (static_cast <char *> (this->mem) + this->phoff));
+  Phdr *phdrs = reinterpret_cast<Phdr *>(mem + this->phoff);
 
   this->segments.resize (this->phnum);
 
@@ -179,46 +176,45 @@ file_data<_class, _data>::file_data (void *mem, size_t len) throw (std::bad_allo
 }
 
 template <typename _class, typename _data>
-section_data<_class, _data>::section_data (void *header, void *mem) throw ()
+section_data<_class, _data>::section_data(Shdr *shdr, uint8_t *mem) throw ()
 {
-  typedef typename _elfdef<_class>::Shdr Shdr;
-  Shdr *shdr = static_cast <Shdr *> (header);
-  this->name   = convert<_data, typeof (shdr->sh_name  )> () (shdr->sh_name  );
-  this->type   = convert<_data, typeof (shdr->sh_type  )> () (shdr->sh_type  );
-  this->offset = convert<_data, typeof (shdr->sh_offset)> () (shdr->sh_offset);
-  this->size   = convert<_data, typeof (shdr->sh_size  )> () (shdr->sh_size  );
-  this->link   = convert<_data, typeof (shdr->sh_link  )> () (shdr->sh_link  );
-  this->mem = static_cast <void *> (static_cast <char *> (mem) + this->offset);
+  this->name   = convert<_data, typeof shdr->sh_name  >()(shdr->sh_name  );
+  this->type   = convert<_data, typeof shdr->sh_type  >()(shdr->sh_type  );
+  this->offset = convert<_data, typeof shdr->sh_offset>()(shdr->sh_offset);
+  this->size   = convert<_data, typeof shdr->sh_size  >()(shdr->sh_size  );
+  this->link   = convert<_data, typeof shdr->sh_link  >()(shdr->sh_link  );
+  this->mem = mem + this->offset;
 }
 
 template <typename _class, typename _data>
 void section_data<_class, _data>::update(const file &file) throw (std::bad_alloc)
 {
   const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(file.get_shstrndx()));
+    dynamic_cast<const section_type<section_type_STRTAB> &>(file.get_section(file.get_shstrndx()));
   name_string = section.get_string(name);
 }
 
-section_type<section_type_DYNAMIC>::~section_type () throw ()
+section_type<section_type_DYNAMIC>::~section_type() throw ()
 {
-  for (std::vector<dynamic *>::iterator it = dynamics.begin (); it != dynamics.end (); ++it)
+  for (std::vector<dynamic *>::iterator it = dynamics.begin(); it != dynamics.end(); ++it)
     delete *it;
 }
 
 template <typename _class, typename _data>
-section_real<_class, _data, section_type_DYNAMIC>::section_real (void *header, void *mem) throw (std::bad_alloc)
-: section_data<_class, _data> (header, mem)
+section_real<_class, _data, section_type_DYNAMIC>::section_real(Shdr *header, uint8_t *mem) throw (std::bad_alloc)
+: section_data<_class, _data>(header, mem)
 {
   if (this->type != SHT_DYNAMIC)
     throw std::logic_error ("Wrong section type");
+
   typedef typename _elfdef<_class>::Dyn Dyn;
-  Dyn *dyns = static_cast <Dyn *> (this->mem);
+  Dyn *dyns = reinterpret_cast<Dyn *>(this->mem);
   unsigned int max = this->size / sizeof (Dyn);
 
   this->dynamics.reserve (max);
 
   for (unsigned int i = 0; i < max; i++)
-    this->dynamics.push_back (new dynamic_data<_class, _data> (&dyns[i]));
+    this->dynamics.push_back(new dynamic_data<_class, _data>(&dyns[i]));
 }
 
 template <typename _class, typename _data>
@@ -227,36 +223,37 @@ void section_real<_class, _data, section_type_DYNAMIC>::update(const file &file)
   section_data<_class, _data>::update(file);
 
   const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(link));
+    dynamic_cast <const section_type<section_type_STRTAB> &>(file.get_section(link));
 
   for (std::vector<dynamic *>::iterator it = dynamics.begin(); it != dynamics.end(); ++it)
   {
     dynamic_data<_class, _data> &dynamic =
-      dynamic_cast <dynamic_data<_class, _data> &> (**it);
+      dynamic_cast<dynamic_data<_class, _data> &>(**it);
     dynamic.update_string(section);
   }
 }
 
-section_type<section_type_DYNSYM>::~section_type () throw ()
+section_type<section_type_DYNSYM>::~section_type() throw ()
 {
-  for (std::vector<symbol *>::iterator it = symbols.begin (); it != symbols.end (); ++it)
+  for (std::vector<symbol *>::iterator it = symbols.begin(); it != symbols.end(); ++it)
     delete *it;
 }
 
 template <typename _class, typename _data>
-section_real<_class, _data, section_type_DYNSYM>::section_real (void *header, void *mem) throw (std::bad_alloc)
-: section_data<_class, _data> (header, mem)
+section_real<_class, _data, section_type_DYNSYM>::section_real(Shdr *header, uint8_t *mem) throw (std::bad_alloc)
+: section_data<_class, _data>(header, mem)
 {
   if (this->type != SHT_DYNSYM)
     throw std::logic_error ("Wrong section type");
+
   typedef typename _elfdef<_class>::Sym Sym;
-  Sym *syms = static_cast <Sym *> (this->mem);
+  Sym *syms = reinterpret_cast<Sym *>(this->mem);
   unsigned int max = this->size / sizeof (Sym);
 
-  this->symbols.reserve (max);
+  this->symbols.reserve(max);
 
   for (unsigned int i = 0; i < max; i++)
-    this->symbols.push_back (new symbol_data<_class, _data> (&syms[i]));
+    this->symbols.push_back(new symbol_data<_class, _data>(&syms[i]));
 }
 
 template <typename _class, typename _data>
@@ -265,12 +262,12 @@ void section_real<_class, _data, section_type_DYNSYM>::update(const file &file) 
   section_data<_class, _data>::update (file);
 
   const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section(link));
+    dynamic_cast<const section_type<section_type_STRTAB> &>(file.get_section(link));
 
   for (unsigned int i = 0; i < symbols.size(); i++)
   {
     symbol_data<_class, _data> &symbol =
-      dynamic_cast <symbol_data<_class, _data> &> (*symbols[i]);
+      dynamic_cast <symbol_data<_class, _data> &>(*symbols[i]);
     symbol.update_string(section);
     symbol.update_version(file, i);
   }
@@ -285,22 +282,22 @@ const version_definition *section_type<section_type_GNU_VERDEF>::get_version_def
 }
 
 template <typename _class, typename _data>
-section_real<_class, _data, section_type_GNU_VERDEF>::section_real (void *header, void *mem) throw (std::bad_alloc)
-: section_data<_class, _data> (header, mem)
+section_real<_class, _data, section_type_GNU_VERDEF>::section_real(Shdr *header, uint8_t *mem) throw (std::bad_alloc)
+: section_data<_class, _data>(header, mem)
 {
   if (this->type != SHT_GNU_verdef)
     throw std::logic_error ("Wrong section type");
 
   typedef typename _elfdef<_class>::Verdef Verdef;
-  char *act = static_cast<char *> (this->mem);
+  uint8_t *act = this->mem;
   uint32_t next = 0;
 
   // TODO: Use DT_VERDEFNUM!
   do
   {
-    Verdef *verdef = reinterpret_cast<Verdef *> (act);
-    verdefs.push_back(new version_definition_data<_class, _data> (verdef));
-    next = convert<_data, typeof (verdef->vd_next)> () (verdef->vd_next);
+    Verdef *verdef = reinterpret_cast<Verdef *>(act);
+    verdefs.push_back(new version_definition_data<_class, _data>(verdef));
+    next = convert<_data, typeof verdef->vd_next>()(verdef->vd_next);
     act += next;
   }
   while (next);
@@ -312,12 +309,12 @@ void section_real<_class, _data, section_type_GNU_VERDEF>::update(const file &fi
   section_data<_class, _data>::update(file);
 
   const section_type<section_type_STRTAB> &section =
-    dynamic_cast <const section_type<section_type_STRTAB> &> (file.get_section (link));
+    dynamic_cast<const section_type<section_type_STRTAB> &>(file.get_section(link));
 
   for (std::vector<version_definition *>::iterator it = verdefs.begin(); it != verdefs.end(); ++it)
   {
     version_definition_data<_class, _data> &verdef =
-      dynamic_cast<version_definition_data<_class, _data> &> (**it);
+      dynamic_cast<version_definition_data<_class, _data> &>(**it);
     verdef.update_string(section);
   }
 }
@@ -332,22 +329,23 @@ const version_requirement_entry *section_type<section_type_GNU_VERNEED>::get_ver
 }
 
 template <typename _class, typename _data>
-section_real<_class, _data, section_type_GNU_VERNEED>::section_real (void *header, void *mem) throw (std::bad_alloc)
+section_real<_class, _data, section_type_GNU_VERNEED>::
+section_real(Shdr *header, uint8_t *mem) throw (std::bad_alloc)
 : section_data<_class, _data> (header, mem)
 {
   if (this->type != SHT_GNU_verneed)
     throw std::logic_error ("Wrong section type");
 
   typedef typename _elfdef<_class>::Verneed Verneed;
-  char *act = static_cast<char *> (this->mem);
+  uint8_t *act = this->mem;
   uint32_t next = 0;
 
   // TODO: Use DT_VERNEEDNUM!
   do
   {
-    Verneed *verneed = reinterpret_cast<Verneed *> (act);
-    verneeds.push_back(new version_requirement_data<_class, _data> (verneed));
-    next = convert<_data, typeof (verneed->vn_next)> () (verneed->vn_next);
+    Verneed *verneed = reinterpret_cast<Verneed *>(act);
+    verneeds.push_back(new version_requirement_data<_class, _data>(verneed));
+    next = convert<_data, typeof verneed->vn_next>()(verneed->vn_next);
     act += next;
   }
   while (next);
@@ -370,51 +368,49 @@ void section_real<_class, _data, section_type_GNU_VERNEED>::update(const file &f
 }
 
 template <typename _class, typename _data>
-section_real<_class, _data, section_type_GNU_VERSYM>::section_real (void *header, void *mem) throw (std::bad_alloc)
+section_real<_class, _data, section_type_GNU_VERSYM>::
+section_real (Shdr *header, uint8_t *mem) throw (std::bad_alloc)
 : section_data<_class, _data> (header, mem)
 {
   if (this->type != SHT_GNU_versym)
     throw std::logic_error ("Wrong section type");
+
   typedef typename _elfdef<_class>::Versym Versym;
-  Versym *versyms = static_cast <Versym *> (this->mem);
+  Versym *versyms = reinterpret_cast<Versym *>(this->mem);
   unsigned int max = this->size / sizeof (Versym);
 
-  this->versyms.reserve (max);
+  this->versyms.reserve(max);
 
   for (unsigned int i = 0; i < max; i++)
-    this->versyms.push_back (convert<_data, typeof (versyms[i])> () (versyms[i]));
+    this->versyms.push_back(convert<_data, typeof versyms[i]>()(versyms[i]));
 }
 
 template <typename _class, typename _data>
-segment_data<_class, _data>::segment_data (void *header, void *mem) throw ()
+segment_data<_class, _data>::segment_data (Phdr *phdr, uint8_t *mem) throw ()
 {
-  typedef typename _elfdef<_class>::Phdr Phdr;
-  Phdr *phdr = static_cast <Phdr *> (header);
-  this->type   = convert<_data, typeof (phdr->p_type  )> () (phdr->p_type);
-  this->flags  = convert<_data, typeof (phdr->p_flags )> () (phdr->p_offset);
-  this->offset = convert<_data, typeof (phdr->p_offset)> () (phdr->p_offset);
-  this->filesz = convert<_data, typeof (phdr->p_filesz)> () (phdr->p_filesz);
-  this->mem = static_cast <void *> (static_cast <char *> (mem) + this->offset);
+  this->type   = convert<_data, typeof phdr->p_type  >()(phdr->p_type);
+  this->flags  = convert<_data, typeof phdr->p_flags >()(phdr->p_offset);
+  this->offset = convert<_data, typeof phdr->p_offset>()(phdr->p_offset);
+  this->filesz = convert<_data, typeof phdr->p_filesz>()(phdr->p_filesz);
+  this->mem = mem + this->offset;
 }
 
 template <typename _class, typename _data>
-segment_real<_class, _data, segment_type_INTERP>::segment_real (void *header, void *mem) throw (std::bad_alloc)
+segment_real<_class, _data, segment_type_INTERP>::segment_real (Phdr *header, uint8_t *mem) throw (std::bad_alloc)
 : segment_data<_class, _data> (header, mem)
 {
   if (this->type != PT_INTERP)
     throw std::logic_error ("Wrong segment type");
 
-  this->interp = std::string (static_cast <char *> (mem) + this->offset);
+  this->interp = std::string(reinterpret_cast<const char *>(this->mem + this->offset));
 }
 
 template <typename _class, typename _data>
-dynamic_data<_class, _data>::dynamic_data (void *mem) throw ()
+dynamic_data<_class, _data>::dynamic_data (Dyn *dyn) throw ()
 {
-  typedef typename _elfdef<_class>::Dyn Dyn;
-  Dyn *dyn = static_cast <Dyn *> (mem);
-  this->tag = convert<_data, typeof (dyn->d_tag     )> () (dyn->d_tag);
-  this->val = convert<_data, typeof (dyn->d_un.d_val)> () (dyn->d_un.d_val);
-  this->ptr = convert<_data, typeof (dyn->d_un.d_ptr)> () (dyn->d_un.d_ptr);
+  this->tag = convert<_data, typeof dyn->d_tag     >()(dyn->d_tag);
+  this->val = convert<_data, typeof dyn->d_un.d_val>()(dyn->d_un.d_val);
+  this->ptr = convert<_data, typeof dyn->d_un.d_ptr>()(dyn->d_un.d_ptr);
   switch (this->tag)
   {
     case DT_NEEDED:
@@ -466,17 +462,15 @@ std::string symbol::get_name_version () const throw (std::bad_alloc)
 }
 
 template <typename _class, typename _data>
-symbol_data<_class, _data>::symbol_data (void *mem) throw ()
+symbol_data<_class, _data>::symbol_data (Sym *sym) throw ()
 {
-  typedef typename _elfdef<_class>::Sym Sym;
-  Sym *sym = static_cast <Sym *> (mem);
-  this->name  = convert<_data, typeof (sym->st_name )> () (sym->st_name);
-  this->info  = convert<_data, typeof (sym->st_info )> () (sym->st_info);
-  this->shndx = convert<_data, typeof (sym->st_shndx)> () (sym->st_shndx);
-  this->value = convert<_data, typeof (sym->st_value)> () (sym->st_value);
-  this->size  = convert<_data, typeof (sym->st_size )> () (sym->st_size);
-  this->bind = _elfdef<_class>::st_bind (this->info);
-  this->type = _elfdef<_class>::st_type (this->info);
+  this->name  = convert<_data, typeof sym->st_name >()(sym->st_name);
+  this->info  = convert<_data, typeof sym->st_info >()(sym->st_info);
+  this->shndx = convert<_data, typeof sym->st_shndx>()(sym->st_shndx);
+  this->value = convert<_data, typeof sym->st_value>()(sym->st_value);
+  this->size  = convert<_data, typeof sym->st_size >()(sym->st_size);
+  this->bind = _elfdef<_class>::st_bind(this->info);
+  this->type = _elfdef<_class>::st_type(this->info);
 }
 
 template <typename _class, typename _data>

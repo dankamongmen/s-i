@@ -62,10 +62,10 @@ namespace Elf
       static file *open(const char *filename) throw (std::bad_alloc, std::runtime_error);
 
     protected:
-      file(void *mem, size_t len) throw (std::bad_alloc) : mem (mem), len (len) { }
+      file(uint8_t *mem, size_t len) throw (std::bad_alloc) : mem(mem), len(len) { }
 
       template<typename _class>
-        static file *open_class(void *, size_t) throw (std::bad_alloc, std::runtime_error);
+        static file *open_class(uint8_t *, size_t) throw (std::bad_alloc, std::runtime_error);
 
       uint16_t type;
       uint16_t machine;
@@ -88,7 +88,7 @@ namespace Elf
       std::vector<segment *> segments;
       segment_type<segment_type_INTERP> *segment_INTERP;
 
-      void *mem;
+      uint8_t *mem;
       size_t len;
   };
 
@@ -110,7 +110,7 @@ namespace Elf
 
       std::string name_string;
 
-      void *mem;
+      uint8_t *mem;
   };
 
   template <typename _type>
@@ -130,7 +130,7 @@ namespace Elf
       public:
         std::string get_string(uint32_t offset) const throw (std::bad_alloc)
         {
-          return std::string(static_cast<const char *> (mem) + offset);
+          return std::string(reinterpret_cast<const char *> (mem + offset));
         }
     };
 
@@ -211,7 +211,7 @@ namespace Elf
       uint64_t offset;
       uint64_t filesz;
 
-      void *mem;
+      uint8_t *mem;
   };
 
   template <typename _type>
