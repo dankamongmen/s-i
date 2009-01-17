@@ -3,10 +3,15 @@
 set -e
 
 . /usr/share/debconf/confmodule
+. /lib/preseed/preseed.sh
 
 if [ -e /var/run/preseed_unspecified_at_boot ] ; then
-	db_input critical preseed/url || true
-	db_go || true
+	if [ -n "$(dhcp_preseed_url)" ]; then
+		rm /var/run/preseed_unspecified_at_boot
+	else
+		db_input critical preseed/url || true
+		db_go || true
+	fi
 fi
 
 db_get preseed/url && url="$RET"

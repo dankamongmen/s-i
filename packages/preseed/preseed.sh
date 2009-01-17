@@ -142,3 +142,16 @@ preseed () {
 		preseed_location "$loc" "$sum"
 	done
 }
+
+
+dhcp_preseed_url () {
+# DHCP filename preseeding.
+for file in /var/lib/dhcp/dhclient.leases /var/lib/dhcp3/dhclient.leases; do
+	if [ -r "$file" ]; then
+		FN="$(sed -n -e '/filename/s/.*"\(.*\)"./\1/p' $file)"
+		if echo "$FN" | grep -q "://" ; then
+			echo "$FN"
+		fi
+	fi
+done
+}
