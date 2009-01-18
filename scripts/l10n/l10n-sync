@@ -597,6 +597,9 @@ for po in sublevel1/*.po ; do
 	msgattrib --width=79 --no-obsolete $lang.po.new >$lang.po
 	rm $lang.po.new
 
+	# Get the master file's Content-Type header
+	MASTERENCODING=$(po_get_header "Content-Type" $lang.po)
+	
 	# Update the sublevel PO files
 	# We keep its old header and only update the POT-Creation-Date
 	for i in $LEVELS; do
@@ -616,6 +619,11 @@ for po in sublevel1/*.po ; do
 				msgattrib --width=79 --no-obsolete \
 				>sublevel$i/$lang.po
 			po_replace_header "POT-Creation-Date" "$POTDATE" sublevel$i/$lang.po
+
+			# If the master file is UTF-8, then all sublevel files *must* be UTF-8
+			echo "$MASTERENCODING" | grep -q -i utf-8 && \
+				po_replace_header "Content-Type" "text\/plain; charset=UTF-8" sublevel$i/$lang.po
+
 			# Append any obsolete strings to sublevel1 PO file
 			if [ $i -eq 1 ] && [ "$OBSOLETE" ]; then
 				echo "$OBSOLETE" >>sublevel$i/$lang.po
