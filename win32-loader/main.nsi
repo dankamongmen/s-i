@@ -674,34 +674,37 @@ boot$\n"
   FileClose $0
 
 ; ********************************************** cpio hack
-  File /oname=$PLUGINSDIR\cpio.exe /usr/share/win32/cpio.exe
-  File /oname=$PLUGINSDIR\gzip.exe /usr/share/win32/gzip.exe
+  File /oname=$INSTDIR\cpio.exe /usr/share/win32/cpio.exe
+  File /oname=$INSTDIR\gzip.exe /usr/share/win32/gzip.exe
 
   StrCpy $0 "$INSTDIR\initrd.gz"
   DetailPrint "$(appending_preseeding)"
 
-  FileOpen $0 $PLUGINSDIR\preseed.cfg w
+  FileOpen $0 $INSTDIR\preseed.cfg w
   FileWrite $0 "$preseed_cfg$\n"
   FileClose $0
 
   ; cpio awkward CLI, meet Winf**k awkward CLI
-  FileOpen $0 $PLUGINSDIR\cpio_list w
+  FileOpen $0 $INSTDIR\cpio_list w
   FileWrite $0 "preseed.cfg"
   FileClose $0
 
-  FileOpen $0 $PLUGINSDIR\cpio.bat w
+  ; IMPORTANT!!  All files accessed by this script must be in the same
+  ; filesystem as the script itself, because cmd.exe/command.com gets
+  ; confused when using absolute paths.  This is why $INSTDIR is used
+  ; instead of $PLUGINSDIR.
+  FileOpen $0 $INSTDIR\cpio.bat w
   FileWrite $0 "\
-cd $PLUGINSDIR$\r$\n\
 cpio.exe -o -H newc < cpio_list > newc_chunk$\r$\n\
-attrib -r $INSTDIR\initrd.gz$\r$\n\
-gzip.exe -1 < newc_chunk >> $INSTDIR\initrd.gz$\r$\n\
+attrib -r initrd.gz$\r$\n\
+gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
 "
   FileClose $0
 
-  nsExec::Exec '"$PLUGINSDIR\cpio.bat"'
+  nsExec::Exec '"$INSTDIR\cpio.bat"'
   Pop $0
   ${If} $0 != 0
-    StrCpy $0 "cpio.bat"
+    StrCpy $0 "$INSTDIR\cpio.bat"
     MessageBox MB_OK|MB_ICONSTOP "$(error_exec)"
     Quit
   ${Endif}
@@ -864,10 +867,5 @@ Section "Uninstall"
   Delete $c\g2ldr
   Delete $c\g2ldr.mbr
   Delete $c\grub.cfg
-  Delete $INSTDIR\loadlin.exe
-  Delete $INSTDIR\loadlin.pif
-  Delete $INSTDIR\linux
-  Delete $INSTDIR\initrd.gz
-  Delete /REBOOTOK $INSTDIR\Uninstall.exe
-  RMDir /REBOOTOK $INSTDIR
+  RMDir /r /REBOOTOK $INSTDIR
 SectionEnd
