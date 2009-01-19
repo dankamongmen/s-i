@@ -720,7 +720,7 @@ static int rfc822db_question_set(struct question_db *db, struct question *questi
     }
 
     tdelete(question, &dbdata->root, nodequestioncomp);
-    q = tsearch(question, &dbdata->root, nodequestioncomp);
+    tsearch(question, &dbdata->root, nodequestioncomp);
     dbdata->dirty = true;
     question_ref(question);
 
