@@ -321,7 +321,7 @@ static int config_read(struct configuration *cfg, const char *filename)
 						if (stackpos == 0)
 							parenttag[0] = 0;
 						else
-							snprintf(parenttag, sizeof(parenttag), stack[--stackpos]);
+							snprintf(parenttag, sizeof(parenttag), "%s", stack[--stackpos]);
 					}
 					continue;
 				}
