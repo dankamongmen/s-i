@@ -153,7 +153,7 @@ command_capb(struct confmodule *mod, char *arg)
         out = newout;
         outend = mempcpy(outend, " plugin-", 8);
         outend = mempcpy(outend, plugin->name, namelen);
-        *outend++ = '\0';
+        *outend = '\0';
     }
 
     return out;
