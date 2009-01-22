@@ -55,6 +55,21 @@ static char *_confmodule_process(struct confmodule *mod, char *in)
     return NULL;
 }
 
+/*
+ * @brief mark a file descriptor close-on-exec
+ * @param int fd - file descriptor
+ * @return int - 0 on success, -1 with errno set on error
+ */
+static int _confmodule_cloexec(int fd)
+{
+    int flags = fcntl (fd, F_GETFD);
+    if (flags < 0)
+        return flags;
+    if (fcntl (fd, F_SETFD, flags | FD_CLOEXEC) < 0)
+        return -1;
+    return 0;
+}
+
 /* public functions */
 static int confmodule_communicate(struct confmodule *mod)
 {
@@ -203,6 +218,8 @@ static pid_t confmodule_run(struct confmodule *mod, int argc, char **argv)
             close(config[0]); close(config[3]);
             mod->infd = config[2];
             mod->outfd = config[1];
+            _confmodule_cloexec(mod->infd);
+            _confmodule_cloexec(mod->outfd);
     }
 
     return pid;
