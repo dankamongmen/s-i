@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56827 -->
+<!-- original version: 57261 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -392,7 +392,7 @@ initrd. The installer will automatically check if this file is present and
 load it.
 -->
 
-Si si utilizza la preconfigurazione initrd, bisogna assicurarsi solo che
+Se si utilizza la preconfigurazione initrd, bisogna assicurarsi solo che
 il file <filename>preseed.cfg</filename> si trovi nella directory principale
 del initrd. L'installatore automaticamente verifica se questo file è presente
 e lo carica.
@@ -409,7 +409,7 @@ parameter to the end of the append line(s) for the kernel.
 
 Per gli altri metodi di preconfigurazione è necessario specificare durante
 l'avvio dell'installatore quale file usare. Normalmente questo può essere
-fatto passando al kernel determinato parametro d'avvio, manualmente durante
+fatto passando al kernel un determinato parametro d'avvio, manualmente durante
 l'avvio oppure tramite il file di configurazione del boot loader (p.e.
 <filename>syslinux.cfg</filename>) aggiungendo il parametro alla fine delle
 righe <quote>append</quote> per il kernel.
@@ -547,7 +547,7 @@ Il proprietario di una variabile debconf (o modello) è normalmente il nome
 del pacchetto che contiene il corrispondente modello. Le variabili usate
 all'interno dell'installatore hanno come proprietario <quote>d-i</quote>.
 I modelli e le variabili possono avere più di un proprietario, questo aiuta
-a determinare in quali casi possono essere eliminato dal database di debconf
+a determinare in quali casi possono essere eliminati dal database di debconf
 quando il pacchetto viene rimosso.
 
 </para>
@@ -563,7 +563,7 @@ during the configuration of the relevant package.
 </footnote> della variabile in questo modo
 <userinput><replaceable>proprietario</replaceable>:<replaceable>percorso/alla/variabile</replaceable>=<replaceable>valore</replaceable></userinput>.
 Se non si specifica il proprietario, il valore della variabile non viene
-copiato nel database di debconf sul sistema installato e quindi può essere
+copiato nel database di debconf sul sistema installato e quindi non può essere
 usato durante la successiva configurazione del relativo pacchetto.
 
 </para><para>
@@ -722,7 +722,7 @@ fetched from
 <literal>http://autoserver.example.com/d-i/&releasename;/./scripts/late_command.sh</literal>.
 -->
 
-L'ultima parte della URL (<literal>d-i/&releasename;/./preseed.cfg</literal>)
+L'ultima parte dell'URL (<literal>d-i/&releasename;/./preseed.cfg</literal>)
 è impostata in 
 <literal>auto-install/defaultroot</literal>, il cui valore predefinito
 contiene la directory <literal>&releasename;</literal> per permettere alle versioni
@@ -755,7 +755,7 @@ support from the local network infrastructure:
 
 Se non esiste un'infrastruttura DHCP o DNS locale oppure se non si vuole
 usare il percorso predefinito per il file <filename>preseed.cfg</filename>,
-è comunque possibile usare una URL esplicita oppure, quando non si usa
+è comunque possibile usare un URL esplicita oppure, quando non si usa
 l'elemento <literal>/./</literal>, viene ancorata al punto di partenza del
 percorso (cioè al terzo <literal>/</literal> nella URL). Segue un esempio
 che richiede un minimo supporto da parte della rete locale:
@@ -808,7 +808,7 @@ this is <literal>auto-install/classes</literal>, which has an alias
 <literal>classes</literal>.  This can be used thus:
 -->
 
-Oltre alla URL è possibile specificare anche altre impostazioni che non
+Oltre l'URL è possibile specificare anche altre impostazioni che non
 influenzano direttamente il comportamento del &d-i; ma che possono essere
 passate a un qualsiasi script specificato con <literal>preseed/run</literal>
 all'interno del file di preconfigurazione. Al momento l'unico esempio di
@@ -987,9 +987,9 @@ host to avoid preseeding all installs on your network.
 -->
 
 Notare che l'esempio precedente limita la specifica del nome del file ai
-soli client DHCP che s'identificano come <quote>d-i</quote>, quindi ha
+soli client DHCP che si identificano come <quote>d-i</quote>, quindi ha
 effetto solo sul programma d'installazione e non influenza i normali
-client DHCP. Si può anche inserire mettere il testo in una sezione del
+client DHCP. Si può anche mettere il testo in una sezione del
 file di configurazione in modo che sia usata da un solo host per impedire
 la preconfigurazione di tutte le macchine che si installano sulla propria
 rete.
@@ -1039,7 +1039,7 @@ del file di preconfigurazione è:
 -->
 
 <informalexample><screen>
-&lt;detentore&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt;
+&lt;proprietario&gt; &lt;nome domanda&gt; &lt;tipo domanda&gt; &lt;valore&gt;
 </screen></informalexample>
 
 </para><para>
@@ -1541,6 +1541,24 @@ indicare che non deve essere usato alcun gateway.
 </para>
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <!-- <title>Network console</title> -->
+  <title>Network console</title>
+
+<informalexample role="example"><screen>
+<!--
+# Use the following settings if you wish to make use of the network-console
+# component for remote installation over SSH. This only makes sense if you
+# intend to perform the remainder of the installation manually.
+--># Per effettuare un'installazione da remoto tramite SSH con il componente
+# network-console, usare le seguenti impostazioni. Questo ha senso se si
+# intende effettuare il resto dell'installazione manualmente.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
   <sect2 id="preseed-mirror">
   <!-- <title>Mirror settings</title> -->
   <title>Impostazioni del mirror</title>
@@ -1655,7 +1673,7 @@ currently not possible to partition multiple disks using preseeding.
 Il supporto della preconfigurazione per il partizionamento è limitato
 a quanto permette <classname>partman-auto</classname>. Si può scegliere di
 partizionare lo spazio libero esistente sul disco oppure l'intero disco.
-La struttura delle partizioni sul disco possono essere determinate usando
+La struttura delle partizioni sul disco può essere determinata usando
 una ricetta predefinita oppure una ricetta personalizzata in un file o
 inclusa nel file di preconfigurazione. Attualmente con la preconfigurazione
 non è possibile partizionare più di un disco.
@@ -2258,7 +2276,7 @@ d-i grub-installer/with_other_os boolean true
 <!--
 # Alternatively, if you want to install to a location other than the mbr,
 # uncomment and edit these lines:
---># In alternativa, se si vuole installare in una locazione differente dal
+--># In alternativa, se si vuole installare in una posizione differente dal
 # MBR, scommentare ed editare queste linee:
 #d-i grub-installer/only_debian boolean false
 #d-i grub-installer/with_other_os boolean false
@@ -2398,7 +2416,19 @@ in determinati momenti dell'installazione.
 --># Questo è primo comando, è eseguito il prima possibile, appena dopo la
 # lettura della preconfigurazione.
 #d-i preseed/early_command string anna-install some-udeb
-
+<phrase condition="squeeze">
+<!--
+# This command is run immediately before the partitioner starts. It may be
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
+--># Questo comando viene eseguito immediatamente prima di avviare il
+# partizionatore. Può essere utile per applicare una preconfigurazione
+# dinamica del partizionatore in funzione dello stato dei dischi (che
+# potrebbe non essere visibile nel momento in cui viene eseguito
+# preseed/early_command).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 <!--
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
@@ -2452,9 +2482,25 @@ debug del proprio file di preconfigurazione.
 </para><para>
 
 <!--
+Note that the <quote>d-i</quote> owner should only be used for variables
+used in the installer itself. For variables belonging to packages installed
+on the target system, you should use the name of that package instead. See
+the footnote to <xref linkend="preseed-bootparms"/>.
+-->
+
+Notare che <quote>d-i</quote> deve essere usato come proprietario delle
+sole variabili dell'installatore. Le variabili appartenenti ai pacchetti
+da installare sul sistema finale devono avere come proprietario il nome
+del pacchetto. Si veda la nota a pié di pagina in
+<xref linkend="preseed-bootparms"/>.
+
+</para><para>
+
+<!--
 If you are preseeding using boot parameters, you can make the installer ask
 the corresponding question by using the <quote>?=</quote> operator, i.e.
-<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>
+(or <userinput><replaceable>owner</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>value</replaceable></userinput>).
 This will of course only have effect for parameters that correspond to
 questions that are actually displayed during an installation and not for
 <quote>internal</quote> parameters.
@@ -2463,7 +2509,8 @@ questions that are actually displayed during an installation and not for
 Quando si usa la preconfigurazione tramite i parametri d'avvio si può
 richiedere all'installatore di chiedere comunque le domande preconfigurate
 usando l'operatore <quote>?=</quote> in questo modo
-<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valore</replaceable></userinput>.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valore</replaceable></userinput>
+(oppure <userinput><replaceable>proprietario</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>valore</replaceable></userinput>).
 Ovviamente questo ha effetto solo sui parametri che corrispondono alle
 domande che sono effettivamente visualizzate durante l'installazione e
 non sui parametri <quote>interni</quote>.
@@ -2502,7 +2549,7 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # caricati tutti. Anche i file inclusi possono avere al loro interno delle
 # direttive preseed/include. Si noti che se i nomi dei file sono relativi,
 # sono prelevati dalla stessa directory del file di preconfigurazione che
-# gli include.
+# li include.
 #d-i preseed/include string x.cfg
 
 <!--
@@ -2528,11 +2575,11 @@ un file e di mettere alcune configurazioni particolari in altri file.
 # More than one script can be listed, separated by spaces.
 # Note that if the filenames are relative, they are taken from the same
 # directory as the preconfiguration file that runs them.
---># Il massimo della flessibilità, questo scarica ed esegue un programma. Il
-# programma può usare debconf-set per manipolare il database di debconf; è
-# possibile elencare più di uno script separandoli con degli spazi. Si noti
-# che se i nomi dei file sono relativi, sono prelevati dalla stessa
-# directory del file di preconfigurazione che gli esegue.
+--># Il massimo della flessibilità, questo scarica ed esegue un programma.
+# Il programma può usare debconf-set per manipolare il database di
+# debconf; è possibile elencare più di uno script separandoli con degli
+# spazi. Si noti che se i nomi dei file sono relativi, sono prelevati
+# dalla stessa directory del file di preconfigurazione che li esegue.
 #d-i preseed/run string foo.sh
 </screen></informalexample>
 
@@ -2553,7 +2600,7 @@ caricare in cascata una preconfigurazione di tipo network, impostando
 preseed/url nei file precedenti. Ciò avvia la preconfigurazione via
 rete appena questa diviene disponibile. Nell'effettuare questa
 operazione si deve porre particolare attenzione, dato che la
-preconfigurazione viene eseguita in due occasioni distinte, aprendo la
+preconfigurazione viene eseguita in due occasioni distinte, aprendo
 la possibilità che il comando preseed/early venga eseguito nuovamente,
 con la seconda esecuzione che avviene dopo l'attivazione della rete.
 
