@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -578,65 +579,111 @@ static enum state_wanted confirm_iucv (void)
 	return WANT_ERROR;
 }
 
-static int write_ccwgroup (const char *driver_name, const char *device_name, const char *group, bool layer2)
+static enum state_wanted write_sysfs (void)
 {
 	struct sysfs_device *device;
 	struct sysfs_driver *driver;
 	struct sysfs_attribute *attr;
+	const char *driver_name = 0;
+	const char *device_name = 0;
+	char group[256];
+
+	switch (device_current->type)
+	{
+		case DEVICE_TYPE_CTC:
+			driver_name = "ctcm";
+			device_name = device_current->ctc.channels[0]->name;
+			snprintf (group, sizeof group, "%s,%s\n",
+				       	device_current->ctc.channels[0]->name,
+				       	device_current->ctc.channels[1]->name);
+
+			/* This is necessary :/ */
+			di_exec_shell_log ("modprobe ctcm");
+			break;
+		case DEVICE_TYPE_QETH:
+			driver_name = "qeth";
+			device_name = device_current->qeth.channels[0]->name;
+			snprintf (group, sizeof group, "%s,%s,%s\n",
+				       	device_current->qeth.channels[0]->name,
+				       	device_current->qeth.channels[1]->name,
+				       	device_current->qeth.channels[2]->name);
+			break;
+		case DEVICE_TYPE_IUCV:
+			return WANT_ERROR;
+	}
 
 	driver = sysfs_open_driver ("ccwgroup", driver_name);
 	if (!driver)
-		return -1;
+	{
+		syslog (LOG_ERR, "Can't open ccwgroup driver %s", driver_name);
+		return WANT_ERROR;
+	}
 
 	attr = sysfs_get_driver_attr (driver, "group");
 	if (!attr)
-		return -2;
+	{
+		syslog (LOG_ERR, "Can't open ccwgroup driver attribute group");
+		return WANT_ERROR;
+	}
+
 	if (sysfs_write_attribute (attr, group, strlen (group)) < 0)
-		return -2;
+	{
+		syslog (LOG_ERR, "Can't write ccwgroup driver attribute group");
+		return WANT_ERROR;
+	}
 
 	sysfs_close_driver (driver);
 
 	device = sysfs_open_device ("ccwgroup", device_name);
 	if (!device)
-		return -2;
+	{
+		syslog (LOG_ERR, "Can't open ccwgroup device %s", device_name);
+		return WANT_ERROR;
+	}
 
-	if (layer2)
+	if (device_current->type == DEVICE_TYPE_QETH)
 	{
 		attr = sysfs_get_device_attr (device, "layer2");
 		if (!attr)
-			return -2;
-		if (sysfs_write_attribute (attr, "1", 1) < 0)
-			return -2;
+		{
+			syslog (LOG_ERR, "Can't open ccwgroup device attribute layer2");
+			return WANT_ERROR;
+		}
+
+		if (sysfs_write_attribute (attr, device_current->qeth.layer2 ? "1" : "0", 1) < 0)
+		{
+			syslog (LOG_ERR, "Can't write ccwgroup device attribute layer2");
+			return WANT_ERROR;
+		}
 	}
 
 	attr = sysfs_get_device_attr (device, "online");
 	if (!attr)
-		return -2;
+	{
+		syslog (LOG_ERR, "Can't open ccwgroup device attribute online");
+		return WANT_ERROR;
+	}
+
 	if (sysfs_write_attribute (attr, "1", 1) < 0)
-		return -2;
+	{
+		syslog (LOG_ERR, "Can't write ccwgroup device attribute online");
+		return WANT_ERROR;
+	}
 
 	sysfs_close_device (device);
 
-	return 0;
+	return WANT_NEXT;
 }
 
 static enum state_wanted write_ctc (void)
 {
 	char buf[256];
-	int ret;
+	enum state_wanted ret;
 	FILE *config;
 
-	/* This is necessary :/ */
-	di_exec_shell_log ("modprobe ctcm");
-	di_exec_shell_log ("modprobe ctc");
-
-	snprintf (buf, sizeof (buf), "%s,%s\n", device_current->ctc.channels[0]->name, device_current->ctc.channels[1]->name);
-
-	ret = write_ccwgroup ("ctcm", device_current->ctc.channels[0]->name, buf, false);
-	if (ret == -1)
-		ret = write_ccwgroup ("ctc", device_current->ctc.channels[0]->name, buf, false);
-        if (ret < 0)
-		return WANT_ERROR;
+	ret = write_sysfs ();
+	if (ret != WANT_NEXT)
+		return ret;
 
 	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->ctc.channels[0]->name);
 	config = fopen (buf, "w");
@@ -656,14 +703,12 @@ static enum state_wanted write_ctc (void)
 static enum state_wanted write_qeth (void)
 {
 	char buf[256];
-	int ret;
+	enum state_wanted ret;
 	FILE *config;
 
-	snprintf (buf, sizeof (buf), "%s,%s,%s\n", device_current->qeth.channels[0]->name, device_current->qeth.channels[1]->name, device_current->qeth.channels[2]->name);
-
-	ret = write_ccwgroup ("qeth", device_current->qeth.channels[0]->name, buf, device_current->qeth.layer2);
-	if (ret)
-		return WANT_ERROR;
+	ret = write_sysfs ();
+	if (ret != WANT_NEXT)
+		return ret;
 
 	snprintf (buf, sizeof (buf), SYSCONFIG_DIR "config-ccw-%s", device_current->qeth.channels[0]->name);
 	config = fopen (buf, "w");
@@ -689,6 +734,7 @@ static enum state_wanted write_iucv (void)
 int main (int argc __attribute__ ((unused)), char *argv[] __attribute__ ((unused)))
 {
 	di_system_init ("s390-netdevice");
+	openlog ("s390-netdevice", 0, LOG_USER);
 
 	client = debconfclient_new ();
 	debconf_capb (client, "backup");
