@@ -1640,7 +1640,6 @@ command_change_file_system()
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
-        change_named(device_name);
         open_out();
         if (2 != iscanf("%as %as", &id, &s_fstype))
                 critical_error("Expected partition id and file system");
@@ -1656,13 +1655,23 @@ command_change_file_system()
                     s_fstype);
                 flag = ped_partition_flag_get_by_name(s_fstype);
                 if (ped_partition_is_flag_available(part, flag)) {
-                        ped_partition_set_flag(part, flag, 1);
+                        if (!ped_partition_get_flag(part, flag)) {
+                                change_named(device_name);
+                                ped_partition_set_flag(part, flag, 1);
+                        } else
+                                log("Flag %s already set", s_fstype);
                 } else {
                         critical_error("Bad file system or flag type: %s",
                                        s_fstype);
                 }
         } else {
-                ped_partition_set_system(part, fstype);
+                if (!((PED_PARTITION_FREESPACE | PED_PARTITION_METADATA |
+                       PED_PARTITION_EXTENDED) & part->type) &&
+                    fstype != part->fs_type) {
+                        change_named(device_name);
+                        ped_partition_set_system(part, fstype);
+                } else
+                        log("Already using filesystem %s", s_fstype);
         }
         free(s_fstype);
         oprintf("OK\n");

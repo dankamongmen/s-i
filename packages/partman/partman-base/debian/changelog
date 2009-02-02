@@ -13,6 +13,11 @@ partman-base (129) UNRELEASED; urgency=low
     - Add partman/early_command hook to run arbitrary commands immediately
       before partitioning (LP: #239348).
     - Exit straight away if a called script is killed by a signal.
+    - Only mark the partition table as changed due to CHANGE_FILE_SYSTEM if
+      it actually makes a change (i.e. the partition wasn't already using
+      that filesystem or didn't have that flag set). This avoids the
+      partition table being rewritten even if partman did nothing more than
+      autousing swap (LP: #287660).
 
  -- Colin Watson <cjwatson@debian.org>  Fri, 26 Dec 2008 14:11:37 +0000
 
