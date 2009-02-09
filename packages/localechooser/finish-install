@@ -40,28 +40,8 @@ consoletype=$(echo $RET | sed -e 's/=.*$//')
 case "$consoletype" in
     kbd)
 	consolefont=$(echo $RET | sed -e 's/^kbd=//')
-	if apt-install console-tools; then
-		ctconfig=/target/etc/console-tools/config
-		acm=$(echo $consolefont | sed -e 's/.*(//' -e 's/).*//')
-		[ "$acm" = utf8 ] && acm=
-		# A few workarounds of console-tools limitations below
-		# APP_CHARSET_MAP and console fonts are not set
-		# for all consoles. These workarounds should probably
-		# be removed when we switch to kbd
-		# FIXME: why 1-6 for APP_CHARSET_MAP but 2-6 for SCREEN_FONT?
-		if [ -n "$acm" ]; then
-			echo "APP_CHARSET_MAP=$acm" >>$ctconfig
-			for i in 1 2 3 4 5 6; do
-				echo "APP_CHARSET_MAP_vc$i=$acm" >>$ctconfig
-			done
-		fi
+	if apt-install kbd; then
 		consolefont=$(echo $consolefont | sed -e 's/(.*//')
-		if [ -n "$consolefont" ]; then
-			echo "SCREEN_FONT=$consolefont" >>$ctconfig
-			for i in 2 3 4 5 6; do
-				echo "SCREEN_FONT_vc$i=$consolefont" >>$ctconfig
-			done
-		fi
 		if echo "$consolefont" | grep -q "Terminus"; then
 			apt-install console-terminus || true
 		fi
