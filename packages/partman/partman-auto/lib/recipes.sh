@@ -84,6 +84,10 @@ decode_recipe () {
 			    ext2|ext3|ext4|xfs|reiserfs|jfs|linux-swap|fat16|fat32|hfs)
 				fs="$4"
 				;;
+			    \$default_filesystem)
+				db_get partman/default_filesystem
+				fs="$RET"
+				;;
 			    *)
 				fs=ext2
 				;;
@@ -201,6 +205,14 @@ setup_partition () {
 			write_line boot
 			write_line NO_MORE
 			close_dialog
+			;;
+		    \$default_filesystem{)
+			while [ "$1" != '}' ] && [ "$1" ]; do
+				shift
+			done
+			mkdir -p $id
+			db_get partman/default_filesystem
+			echo "$RET" >$id/filesystem
 			;;
 		    \$*{)
 			while [ "$1" != '}' ] && [ "$1" ]; do
