@@ -11,7 +11,7 @@ build-mini : $(gziped_ekmaps)
 %.gz : %
 	gzip -9 <$< >$@
 
-%.ekmap : 
+%.ekmap : MyKeyboardNames.pl
 	./kbdcompiler $(@:%.ekmap=%) MyKeyboardNames.pl $(xkbdir) >$@
 
 acmfiles = $(wildcard acm/*.acm)
