@@ -31,6 +31,9 @@ install: $(PLUGIN_MODULES)
 		install -m644 $$p $(DESTDIR)/$(moddir)/$${p%%-*}/$${p#*-} ; \
 	done
 
+newt-plugin-$(PACKAGE).so: newt-plugin-$(PACKAGE).opic
+	$(CC) $(LDFLAGS) -shared -lnewt -o $@ newt-plugin-$(PACKAGE).opic
+
 gtk-plugin-$(PACKAGE).so: gtk-plugin-$(PACKAGE).opic
 	$(CC) $(LDFLAGS) -shared -o $@ $^ $(GTK_LIBS) -lvte
 

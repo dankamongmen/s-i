@@ -13,7 +13,7 @@ if test "$with_debug" == "yes"; then
   CFLAGS="$CFLAGS -g -D_DEBUG_"
 fi
 
-FRONTENDS=""
+FRONTENDS="newt"
 
 PKG_CHECK_MODULES(GTK, [gtk+-directfb-2.0],
  FRONTENDS="$FRONTENDS gtk",
