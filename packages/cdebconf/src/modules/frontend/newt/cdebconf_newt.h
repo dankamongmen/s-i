@@ -7,6 +7,9 @@
 /*  Horizontal offset between text box and borders */
 #define BUTTON_PADDING 4
 
+/* Most plugins won't need to call this, but cdebconf-newt-terminal does. */
+void cdebconf_newt_setup(void);
+
 #define cdebconf_newt_create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
 void cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority);

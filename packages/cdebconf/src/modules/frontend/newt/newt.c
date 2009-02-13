@@ -164,6 +164,15 @@ help_text(struct frontend *obj)
 }
 
 void
+cdebconf_newt_setup(void)
+{
+    SLang_init_tty(0, 1, 0); /* disable flow control */
+    newtInit();
+    newtSetColors(newtAltColorPalette);
+    newtCls();
+}
+
+void
 cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority)
 {
     static const char *sigils[][2] = {
@@ -1103,10 +1112,7 @@ newt_go(struct frontend *obj)
             if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0) {
                 if (!cleared && !data->scale_form) {
                     cleared = 1;
-                    SLang_init_tty(0, 1, 0); /* disable flow control */
-                    newtInit();
-                    newtSetColors(newtAltColorPalette);
-                    newtCls();
+                    cdebconf_newt_setup();
                 }
                 if (obj->info != NULL) {
                     char *text = q_get_description(obj, obj->info);
@@ -1265,10 +1271,7 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
     obj->progress_max = max;
     obj->progress_cur = min;
     data->scale_info = NULL;
-    SLang_init_tty(0, 1, 0); /* disable flow control */
-    newtInit();
-    newtSetColors(newtAltColorPalette);
-    newtCls();
+    cdebconf_newt_setup();
     if (obj->info != NULL) {
         char *text = q_get_description(obj, obj->info);
         if (text)
