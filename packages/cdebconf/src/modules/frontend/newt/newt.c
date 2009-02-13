@@ -172,6 +172,19 @@ cdebconf_newt_setup(void)
     newtCls();
 }
 
+/* cdebconf-newt-terminal needs this in order to be able to restore the
+ * display properly after tearing down the terminal.
+ */
+char *
+cdebconf_newt_get_progress_info(struct frontend *obj)
+{
+    struct newt_data *data = (struct newt_data *)obj->data;
+    if (data->scale_info)
+        return strdup(data->scale_info);
+    else
+        return NULL;
+}
+
 void
 cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority)
 {

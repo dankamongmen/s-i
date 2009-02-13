@@ -10,6 +10,12 @@
 /* Most plugins won't need to call this, but cdebconf-newt-terminal does. */
 void cdebconf_newt_setup(void);
 
+/* Hack for the benefit of cdebconf-newt-terminal; progress_info isn't in
+ * the main frontend struct and won't fit in the obvious place without
+ * breaking the plugin ABI. Always duplicates the info string.
+ */
+char *cdebconf_newt_get_progress_info(struct frontend *obj);
+
 #define cdebconf_newt_create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
 
 void cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority);
