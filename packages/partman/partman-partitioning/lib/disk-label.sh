@@ -18,34 +18,8 @@ default_disk_label () {
 		else
 			echo msdos
 		fi;;
-	    arm|armel)
-		case "$sub" in
-		    iop32x)
-			echo msdos;;
-		    iop33x)
-			echo msdos;;
-		    ixp4xx)
-			echo msdos;;
-		    orion5x)
-			echo msdos;;
-		    riscstation)
-			echo msdos;;
-		    netwinder)
-			echo msdos;;
-		    ads)
-			echo msdos;;
-		    versatile)
-			echo msdos;;
-		    *)
-			echo UNKNOWN;;
-		esac;;
-	    armeb)
-		case "$sub" in
-		    ixp4xx)
-			echo msdos;;
-		    *)
-			echo UNKNOWN;;
-		esac;;
+	    arm|armeb|armel)
+		echo msdos;;
 	    amd64)
 		case "$sub" in
 		    mac)
