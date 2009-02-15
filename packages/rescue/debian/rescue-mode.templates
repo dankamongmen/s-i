@@ -15,11 +15,17 @@ _Description: No partitions found
 
 Template: rescue/root
 Type: select
-Choices: ${PARTITIONS}
+Choices-C: ${PARTITIONS}, none
+#flag:translate!:1
+__Choices: ${PARTITIONS}, Do not use a root file system
 # :sl2:
 _Description: Device to use as root file system:
  Enter a device you wish to use as your root file system. You will be able
  to choose among various rescue operations to perform on this file system.
+ .
+ If you choose not to use a root file system, you will be given a reduced
+ choice of operations that can be performed without one. This may be useful
+ if you need to correct a partitioning problem.
 
 Template: rescue/no-such-device
 Type: error
@@ -116,8 +122,7 @@ Type: text
 # :sl2:
 _Description: Executing a shell
  After this message, you will be given a shell in the installer environment.
- Since the installer could not find any partitions, no file systems have
- been mounted for you.
+ No file systems have been mounted for you.
 
 Template: rescue/initrd-shell/title
 Type: text

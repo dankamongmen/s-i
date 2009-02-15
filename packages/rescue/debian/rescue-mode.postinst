@@ -159,6 +159,10 @@ choose_root () {
 	db_get rescue/root
 	export RESCUE_ROOTDEV="$RET"
 	log "selected root device '$RESCUE_ROOTDEV'"
+	if [ "$RESCUE_ROOTDEV" = none ]; then
+		umount_all
+		return
+	fi
 	if [ ! -e "$RESCUE_ROOTDEV" ]; then
 		log "'$RESCUE_ROOTDEV' does not exist"
 		db_subst rescue/no-such-device DEVICE "$RESCUE_ROOTDEV"
@@ -269,7 +273,8 @@ while :; do
 				continue
 			fi
 			item_name="${item#[0-9][0-9]}"
-			if [ -z "$RESCUE_ROOTDEV" ] && \
+			if ([ -z "$RESCUE_ROOTDEV" ] || \
+			    [ "$RESCUE_ROOTDEV" = none ]) && \
 			   db_get "rescue/$item_name/intro/no-target"; then
 				db_input high "rescue/$item_name/intro/no-target" || true
 				if ! db_go; then
