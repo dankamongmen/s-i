@@ -233,7 +233,7 @@ c_is_initialized:
   ${Endif}
 
   Var /GLOBAL debian_release
-  StrCpy $debian_release lenny
+  StrCpy $debian_release squeeze
 FunctionEnd
 
 Function ShowRescue
@@ -330,7 +330,7 @@ FunctionEnd
 Function ShowBranch
   Var /GLOBAL di_branch
   StrCpy $di_branch stable
-  StrCpy $debian_release etch
+  StrCpy $debian_release lenny
   File /oname=$PLUGINSDIR\di_branch.ini	templates/binary_choice.ini
   ${If} $expert == true
     WriteINIStr $PLUGINSDIR\di_branch.ini "Field 1" "Text" $(di_branch1)
@@ -340,7 +340,7 @@ Function ShowBranch
     ReadINIStr $0 $PLUGINSDIR\di_branch.ini "Field 3" "State"
     ${If} $0 == "1"
       StrCpy $di_branch daily
-      StrCpy $debian_release lenny
+      StrCpy $debian_release squeeze
     ${Endif}
   ${Endif}
 
@@ -406,23 +406,10 @@ Function ShowDesktop
   ${Endif}
 
   ; Add the results to our preseed file
-  ${If} $debian_release == "etch"
-    ${If} $_desktop == "gnome"
-      ; GNOME is already default, do nothing (on etch, preseeding this
-      ; information makes the tasksel dialog go away, so don't do it
-      ; gratuitously!)
-      Return
-    ${Endif}
-    StrCpy $preseed_cfg "\
-$preseed_cfg$\n\
-tasksel tasksel/first multiselect $_desktop-desktop, standard$\n\
-tasksel tasksel/first seen false"
-  ${Else}
-    StrCpy $preseed_cfg "\
+  StrCpy $preseed_cfg "\
 $preseed_cfg$\n\
 tasksel tasksel/desktop multiselect $_desktop-desktop$\n\
 tasksel tasksel/desktop seen false"
-  ${Endif}
 FunctionEnd
 
 Function ShowCustom
