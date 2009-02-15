@@ -237,8 +237,14 @@ cdebconf_newt_handler_terminal(struct frontend *obj, struct question *q)
         }
         if (bterm_tempdir) {
             ENSURE_ENV;
+	    /* bterm_tempdir always starts with "/target"; remove that,
+	     * since the point of the exercise is to make things work for
+	     * programs chrooted into /target within d-i. Programs outside
+	     * the chroot will already have a working terminfo definition
+	     * anyway.
+	     */
             if (asprintf(&newenviron[cur_env++],
-                         "TERMINFO=%s", bterm_tempdir) < 0) {
+                         "TERMINFO=%s", bterm_tempdir + 7) < 0) {
                 /* Not a lot we can do; let's just go on. */
             }
 	    /* UTF-8 line-drawing characters appear not to work in bterm.
