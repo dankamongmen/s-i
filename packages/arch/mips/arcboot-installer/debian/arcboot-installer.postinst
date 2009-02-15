@@ -81,33 +81,20 @@ umount /target/proc
 
 # Fill the necessary PROM variables that will need to be set before the
 # system can be booted.
-version=$(uname -r | cut -d . -f 1,2)
 bootmin=$((`echo $bootdev |sed 's+/dev/sd++' |tr [a-h] [0-7]` * 16))
 bootdev=`grep "^\ \+8\ \+$bootmin\ \+" /proc/partitions | sed -e "s/ \+/ /g" | cut -d " " -f5`
-if [ "$version" = "2.6" ]; then
-    scsi_info=$(readlink /sys/block/$bootdev/device | sed 's/.*\///')
-    BOOTBUS=`echo $scsi_info | cut -d: -f2`
-    BOOTID=`echo $scsi_info | cut -d: -f3`
-    BOOTLUN=`echo $scsi_info | cut -d: -f4`
-else
-    BOOTBUS=`echo $bootdev |cut -d/ -f3 |sed 's/^bus//'`
-    BOOTID=`echo $bootdev |cut -d/ -f4 |sed 's/^target//'`
-    BOOTLUN=`echo $bootdev |cut -d/ -f5 |sed 's/^lun//'`
-fi
+scsi_info=$(readlink /sys/block/$bootdev/device | sed 's/.*\///')
+BOOTBUS=`echo $scsi_info | cut -d: -f2`
+BOOTID=`echo $scsi_info | cut -d: -f3`
+BOOTLUN=`echo $scsi_info | cut -d: -f4`
 
 rootmin=`echo $rootfs |sed 's+/dev/sd.++'`
 rootdev=`grep "^\ \+8\ \+$rootmin\ \+" /proc/partitions | sed -e "s/ \+/ /g" | cut -d " " -f5`
-if [ "$version" = "2.6" ]; then
-    rootdev=$(echo $rootdev | sed 's/[0-9]\+$//')
-    scsi_info=$(readlink /sys/block/$rootdev/device | sed 's/.*\///')
-    ROOTBUS=`echo $scsi_info | cut -d: -f2`
-    ROOTID=`echo $scsi_info | cut -d: -f3`
-    ROOTLUN=`echo $scsi_info | cut -d: -f4`
-else
-    ROOTBUS=`echo $rootdev |cut -d/ -f3 |sed 's/^bus//'`
-    ROOTID=`echo $rootdev |cut -d/ -f4 |sed 's/^target//'`
-    ROOTLUN=`echo $rootdev |cut -d/ -f5 |sed 's/^lun//'`
-fi
+rootdev=$(echo $rootdev | sed 's/[0-9]\+$//')
+scsi_info=$(readlink /sys/block/$rootdev/device | sed 's/.*\///')
+ROOTBUS=`echo $scsi_info | cut -d: -f2`
+ROOTID=`echo $scsi_info | cut -d: -f3`
+ROOTLUN=`echo $scsi_info | cut -d: -f4`
 
 ROOTPART=$(($rootmin - 1))
 
