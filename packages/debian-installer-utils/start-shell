@@ -32,13 +32,17 @@ show_unavailable_message () {
 }
 
 case $DEBIAN_FRONTEND in
-    text|newt)
+    text)
 	debconf-disconnect $COMMAND_LINE || true
 	;;
     *)
 	if ! have_terminal_plugin; then
 		anna-install cdebconf-$DEBIAN_FRONTEND-terminal || true
 		if ! have_terminal_plugin; then
+			if [ "$DEBIAN_FRONTEND" = newt ]; then
+				debconf-disconnect $COMMAND_LINE || true
+				exit 0
+			fi
 			show_unavailable_message
 			exit 1
 		fi
