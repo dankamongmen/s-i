@@ -21,7 +21,7 @@ build ()
 	[ -n "$ROOTCMD" ] && local _rootcmd="-r$ROOTCMD"
 
 	pushd $_dir >/dev/null
-	dpkg-buildpackage -b -us -uc $_rootcmd #-nc
+	RECURSE_EXTRA=1 dpkg-buildpackage -b -us -uc $_rootcmd #-nc
 	popd >/dev/null
 	return 0
 }
