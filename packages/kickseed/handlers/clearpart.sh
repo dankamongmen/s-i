@@ -1,5 +1,8 @@
 #! /bin/sh
 
+clearpart_method=
+clearpart_need_method=
+
 clearpart_handler () {
 	eval set -- "$(getopt -o '' -l linux,all,drives:,initlabel -- "$@")" || { warn_getopt clearpart; return; }
 	while :; do
@@ -10,8 +13,7 @@ clearpart_handler () {
 				;;
 			--all)
 				ks_log "can't clear multiple drives; assuming just the first one"
-				# needed as of partman-auto 55
-				ks_preseed d-i partman-auto/method string regular
+				clearpart_need_method=1
 				# TODO: I bet this isn't safe for installs
 				# from USB ...
 				ks_preseed d-i partman-auto/disk string /dev/discs/disc0/disc
@@ -48,8 +50,7 @@ EOF
 						warn "clearing multiple drives not supported"
 						;;
 					*)
-						# needed as of partman-auto 55
-						ks_preseed d-i partman-auto/method string regular
+						clearpart_need_method=1
 						disk="$2"
 						case $disk in
 							/dev/*)
@@ -72,3 +73,15 @@ EOF
 		esac
 	done
 }
+
+clearpart_final () {
+	if [ "$clearpart_need_method" ]; then
+		if [ -z "$clearpart_method" ]; then
+			clearpart_method=regular
+		fi
+		# needed as of partman-auto 55
+		ks_preseed d-i partman-auto/method string "$clearpart_method"
+	fi
+}
+
+register_final clearpart_final
