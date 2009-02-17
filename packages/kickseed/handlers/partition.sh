@@ -140,7 +140,7 @@ partition_handler () {
 	fi
 
 	if [ "$parttype" = lvm ]; then
-		new_recipe="$new_recipe method{ lvm }"
+		new_recipe="$new_recipe \$defaultignore{ } method{ lvm }"
 	elif [ "$filesystem" = linux-swap ]; then
 		new_recipe="$new_recipe method{ swap }"
 	elif [ "$format" ]; then
