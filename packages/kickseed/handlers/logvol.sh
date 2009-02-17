@@ -98,9 +98,12 @@ logvol_handler () {
 		if [ "$grow" ]; then
 			partition_leave_free_space=
 			if [ -z "$maxsize" ]; then
-				maxsize=$((1024 * 1024 * 1024))
+				priority=$((1024 * 1024 * 1024))
+				# requires partman-auto 84, partman-auto-lvm 32
+				maxsize=-1
+			else
+				priority="$maxsize"
 			fi
-			priority="$maxsize"
 		else
 			maxsize="$size"
 			priority="$size"
