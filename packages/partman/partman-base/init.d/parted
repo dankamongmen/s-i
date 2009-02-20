@@ -86,7 +86,8 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		fi
 
 		# Skip devices that are part of a dmraid device
-		if type dmraid >/dev/null 2>&1; then
+		if type dmraid >/dev/null 2>&1 && \
+		   dmraid -r -c >/dev/null 2>&1; then
 			if part_of_sataraid $device; then
 				continue
 			fi
@@ -109,7 +110,8 @@ if [ ! -f /var/run/parted_server.pid ]; then
 		printf "%s" "$model" >$dev/model
 
 		# Set the sataraid flag for dmraid arrays.
-		if type dmraid >/dev/null 2>&1; then
+		if type dmraid >/dev/null 2>&1 && \
+		   dmraid -s -c >/dev/null 2>&1; then
 			if dmraid -sa -c | grep -q $(basename $device); then
 				>$dev/sataraid
 			fi
