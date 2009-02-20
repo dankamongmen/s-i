@@ -98,8 +98,10 @@ $partitems"
 $items"
 		fi
 		maybe_escape "$x" db_subst $template/confirm ITEMS
+		db_capb align
 		db_input critical $template/confirm
 		db_go || true
+		db_capb backup align
 		db_get $template/confirm
 		if [ "$RET" = false ]; then
 			db_reset $template/confirm
@@ -110,8 +112,10 @@ $items"
 		fi
 	else
 		if [ "$formatted_previously" = no ]; then
+			db_capb align
 			db_input critical $template/confirm_nochanges
 			db_go || true
+			db_capb backup align
 			if [ $template = partman-dmraid ]; then
 				# for dmraid, only a note is displayed
 				return 1
@@ -158,8 +162,10 @@ commit_changes () {
 	for s in /lib/partman/commit.d/*; do
 		if [ -x $s ]; then
 			$s || {
+				db_capb align
 				db_input critical $template || true
 				db_go || true
+				db_capb backup align
 				for s in /lib/partman/init.d/*; do
 					if [ -x $s ]; then
 						$s || return 255
