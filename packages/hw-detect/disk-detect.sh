@@ -177,7 +177,7 @@ if [ "$RET" = true ]; then
 			module_probe dm-mod || true
 		fi
 
-		if [ "$(dmraid -c -s | tr A-Z a-z)" != "no raid disks" ]; then
+		if dmraid -c -s >/dev/null 2>&1; then
 			logger -t disk-detect "Serial ATA RAID disk(s) detected; enabling dmraid support"
 			# Activate devices
 			log-output -t disk-detect dmraid -ay
