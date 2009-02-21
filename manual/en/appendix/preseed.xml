@@ -1044,7 +1044,7 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 #d-i partman-auto/method string raid
 # Specify the disks to be partitioned. They will all get the same layout,
 # so this will only work if the disks are the same size.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # Next you need to specify the physical partitions that will be used. 
 #d-i partman-auto/expert_recipe string \
@@ -1067,14 +1067,14 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 #          &lt;devices&gt; &lt;sparedevices&gt;
 # RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
 
 # This makes partman automatically partition without confirmation.
