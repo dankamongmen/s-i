@@ -1,4 +1,4 @@
-<!-- original version: 57261 -->
+<!-- original version: 57651 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1012,8 +1012,8 @@ si vous rencontrez des problèmes.
 # La méthode à indiquer est "raid".
 #d-i partman-auto/method string raid
 # Indiquez les disques à partitionner. Ils auront tous les mêmes caractéristiques,
-# aussi cela ne fonctionnera que s'ils ont tous la même taille.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+# et donc cela ne fonctionnera que s'ils ont tous la même taille.
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # Ensuite, indiquez les partitions physiques à utiliser. 
 #d-i partman-auto/expert_recipe string \
@@ -1036,14 +1036,14 @@ si vous rencontrez des problèmes.
 #          &lt;devices&gt; &lt;sparedevices&gt;
 # Les niveaux RAID 0, 1, 5, 6 et 10 sont acceptés. Les périphériques sont séparés par "#".
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
 
 # Pour que partman partitionne automatiquement sans demander une confirmation :
