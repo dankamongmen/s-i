@@ -1,4 +1,5 @@
-# Copyright (C) 2005, 2006, 2008  Martin Michlmayr <tbm@cyrius.com>
+# Copyright (C) 2005, 2006, 2008, 2009  Martin Michlmayr <tbm@cyrius.com>
+# Copyright (C) 2009  Stephen Gran <sgran@debian.org>
 
 # This code is covered by the GNU General Public License (version 2
 # or higher)
@@ -246,11 +247,48 @@ verify_hostname() {
 	return 0
 }
 
-# Sanity check for static IP configuration: netcfg will prompt for an IP
-# address and nameserver if they are not set, so use DHCP in that case.
+# Convert an IP address (like 127.0.0.1) to bits.
+make_bit_address () {
+	addr=$1
+
+	first=$(( $(echo $addr | cut -d. -f1) << 24))
+	second=$(( $(echo $addr | cut -d. -f2) << 16))
+	third=$(( $(echo $addr | cut -d. -f3) << 8))
+	fourth=$(echo $addr | cut -d. -f4)
+	echo $(( $first + $second + $third + $fourth ))
+}
+
+# Check if two IP addresses are on the same network.
+address_is_in () {
+	addr=$1
+	addr2=$2
+	netmask=$3
+
+	bitaddr=$(make_bit_address $addr)
+	bitaddr2=$(make_bit_address $addr2)
+	bitmask=$(make_bit_address $netmask)
+
+	[ "$(( $bitaddr & $bitmask ))" = "$(( $bitaddr2 & $bitmask))" ]
+}
+
+# Sanity checks for static IP configuration
 sanity_check_static_config() {
+	# netcfg will prompt for an IP address and nameserver if they are
+	# not set, so use DHCP in that case.
 	if [ "$NONINTERACTIVE" = "yes" ] && [ -z "$IPADDRESS" -o -z "$NAMESERVERS" ]; then
 		NET_CONFIG=dhcp
+	fi
+	# Replicate the "gateway is unreachable" check from netcfg.
+	if [ -n "$IPADDRESS" -a -n "$GATEWAY" ]; then
+		if [ -n "$NETMASK" ]; then
+			LOCAL_NETMASK="$NETMASK"
+		else
+			# Use same default as netcfg.
+			LOCAL_NETMASK=255.255.255.0
+		fi
+		if ! address_is_in "$IPADDRESS" "$GATEWAY" "$LOCAL_NETMASK"; then
+			NET_CONFIG=dhcp
+		fi
 	fi
 }
 
