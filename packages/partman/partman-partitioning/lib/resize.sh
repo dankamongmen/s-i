@@ -105,8 +105,10 @@ human_resize_range () {
 }
 
 ask_for_size () {
-	local noninteractive digits minmb
+	local noninteractive digits minmb minsize_rounded maxsize_rounded
 	noninteractive=true
+	minsize_rounded="$(human2longint "$hminsize")"
+	maxsize_rounded="$(human2longint "$hmaxsize")"
 	while true; do
 		newsize=''
 		while [ ! "$newsize" ]; do
@@ -139,13 +141,21 @@ ask_for_size () {
 				db_input high partman-partitioning/bad_new_size || true
 				db_go || true
 			elif ! longint_le "$newsize" "$maxsize"; then
-				db_input high partman-partitioning/big_new_size || true
-				db_go || true
-				newsize=''
+				if longint_le "$newsize" "$maxsize_rounded"; then
+					newsize="$maxsize"
+				else
+					db_input high partman-partitioning/big_new_size || true
+					db_go || true
+					newsize=''
+				fi
 			elif ! longint_le "$minsize" "$newsize"; then
-				db_input high partman-partitioning/small_new_size || true
-				db_go || true
-				newsize=''
+				if longint_le "$minsize_rounded" "$newsize"; then
+					newsize="$minsize"
+				else
+					db_input high partman-partitioning/small_new_size || true
+					db_go || true
+					newsize=''
+				fi
 			fi
 		done
 
