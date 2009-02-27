@@ -103,6 +103,7 @@ for file in $POT_LIST; do
 	fi
 done
 echo "Total strings: $TOTALU=100%"
+echo
 
 #now check:
 RANK=""
@@ -114,9 +115,16 @@ GR_FUZZY=0
 GR_UNTRANSLATED=0
 rm -f $TEMP_DIR/rank.txt
 rm -rf $TEMPFILE
-for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for every language
+for lang in `ls -1 $PO_DIR | grep -v "pot"`; do #run for every language
+	[ -d "$PO_DIR/$lang" ] || continue
+
 	NAME=$(grep "^$lang[[:space:]]" "$LANG_NAMES" | cut -f 7)
-	echo "$NAME ($lang)..."
+	if [ "$NAME" ]; then
+		echo "$NAME ($lang)..."
+	else
+		echo "Skipping '$lang': not defined in '$LANG_NAMES'"
+		continue
+	fi
 
 	echo -e "Statistics of Installation Guide translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
 	MISSING=""
@@ -177,10 +185,9 @@ for lang in `ls -1 $PO_DIR | grep -v "pot" | grep -v "checkout"`; do #run for ev
   	STR=`echo "$TT + $TU + $TF" | bc`
   	echo -e "Global statistics: "$TT"t"$TF"f"$TU"u ($P%)     (total strings: $TOTALU=100%)\n(From all $lang.po files)" >> $TARGET_DIR/$lang.txt
   	if [ "$STR" -gt "$TOTALU" ]; then
-		echo "  You have more strings translated/fuzzy/untranslated than in
-  the pot-templates. Please check!" >>  $TARGET_DIR/$lang.txt
+		echo -e "  You have more strings translated/fuzzy/untranslated than in\n  the pot-templates. Please check!" >> $TARGET_DIR/$lang.txt
 	fi
-	echo >>  $TARGET_DIR/$lang.txt
+	echo >> $TARGET_DIR/$lang.txt
 
 	print_shit
 
