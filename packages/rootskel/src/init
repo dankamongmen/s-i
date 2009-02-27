@@ -14,6 +14,9 @@ for i in $(cat /proc/cmdline); do
 		init=*)
 			init=${i#init=}
 			;;
+		noshell)
+			sed -i '/^tty[23]/s/^/#/' /etc/inittab
+			;;
 	esac
 done
 debugshell "before init"
