@@ -252,7 +252,7 @@ auto_lvm_prepare() {
 auto_lvm_perform() {
 	# Use hostname as default vg name (if available)
 	local defvgname pv vg_file vg_name
-	# $pv_devices will be overriden with content from $VG_MAP_DIR
+	# $pv_devices will be overridden with content from $VG_MAP_DIR
 	local pv_devices
 
 	db_get partman-auto-lvm/new_vg_name
