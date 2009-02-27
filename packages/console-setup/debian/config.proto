@@ -65,6 +65,29 @@ set -e
 
 CONFIGFILE=/etc/default/console-setup
 
+default_ttys=''
+default_charmap=''
+default_codeset=''
+default_fontface=''
+default_fontsize=''
+default_toggle=''
+default_switch=''
+default_altgr=''
+default_compose=''
+default_model=''
+default_layout=''
+default_variant=''
+ACTIVE_CONSOLES=''
+CHARMAP=''
+CODESET=''
+FONTFACE=''
+FONTSIZE=''
+XKBMODEL=''
+XKBLAYOUT=''
+XKBVARIANT=''
+XKBOPTIONS=''
+
+
 ## PACKAGE ## Will be replaced by assignment for $package
 
 # package=console-setup
@@ -119,13 +142,16 @@ Uni3*. Combined - Latin; Slavic and non-Slavic Cyrillic'
 
 db_capb backup
 
-# Set default value for a question only if it is not seen by the user
+# Set default value for a question only if it is not seen by the user and
+# the value is non-empty
 db_default () {
     if \
 	[ -f $CONFIGFILE ] \
 	|| { db_fget $1 seen && [ "$RET" = false ]; }
     then
-	db_set $1 "$2"
+	if [ "$2" ]; then
+	    db_set $1 "$2"
+	fi
     fi
 }
 
@@ -1049,28 +1075,26 @@ case "$arch" in
 	;;
 esac    
 
-#######################################################################
+### READ THE DEFAULTS ##################################################
+
+XKBMODEL=''
+XKBLAYOUT=''
+XKBVARIANT=''
+XKBOPTIONS=''
 
 # Use the value of debian-installer/keymap to get better default
 # layout.  Lower the priority of the Debconf question to medium.
-
-# This is a desperation measure, but required for migration from
-# pre-console-setup systems without X installed. We just have to copy
-# the guesswork formerly done by xserver-xorg.config.
-
+# This guesswork is copied from xserver-xorg.config.
 if db_get debian-installer/keymap && [ "$RET" ]; then
     di_keymap="${RET##mac-usb-}"
     di_keymap="${di_keymap%%-latin1}"
 
-    XKBMODEL=''
-    XKBLAYOUT=''
-    XKBVARIANT=''
     case "$di_keymap" in
 	be2) XKBLAYOUT="be";;
-	bg) XKBLAYOUT="bg"; XKBVARIANT="bds";;
+	bg) XKBLAYOUT="us,bg";;
 	br) XKBLAYOUT="us"; XKBVARIANT="intl"; XKBMODEL="pc104";;
 	br-abnt2) XKBLAYOUT="br"; XKBVARIANT="abnt2"; XKBMODEL="abnt2";;
-	by) XKBLAYOUT="by";;
+	by) XKBLAYOUT="us,by";;
 	cf) XKBLAYOUT="ca"; XKBVARIANT="fr";;
 	croat) XKBLAYOUT="hr";;
 	cz-lat2) XKBLAYOUT="cz";;
@@ -1084,12 +1108,12 @@ if db_get debian-installer/keymap && [ "$RET" ]; then
 	fr-latin9) XKBLAYOUT="fr"; XKBVARIANT="latin9";;
 	fr_CH) XKBLAYOUT="ch"; XKBVARIANT="fr";;
 	fr) XKBLAYOUT="fr";;
-	hebrew) XKBLAYOUT="il";;
+	hebrew) XKBLAYOUT="us,il";;
 	hu) XKBLAYOUT="hu";;
 	gb) XKBLAYOUT="gb";;
 	is) XKBLAYOUT="is";;
 	it) XKBLAYOUT="it";;
-	jp106) XKBLAYOUT="jp"; XKBVARIANT="jp106"; XKBMODEL="jp106";;
+	jp106) XKBLAYOUT="us,jp"; XKBVARIANT=",jp106"; XKBMODEL="jp106";;
 	la) XKBLAYOUT="latam";;
 	lt) XKBLAYOUT="lt";; 
 	lv-latin4) XKBLAYOUT="lv";;
@@ -1098,53 +1122,26 @@ if db_get debian-installer/keymap && [ "$RET" ]; then
 	mac-fr2-ext) XKBLAYOUT="fr";;
 	mac-fr3) XKBLAYOUT="fr";;
 	mac-es) XKBLAYOUT="es";;
-	mk) XKBLAYOUT="mk";;
+	mk) XKBLAYOUT="us,mk";;
 	nl) XKBLAYOUT="nl";;
 	no) XKBLAYOUT="no";;
 	pl) XKBLAYOUT="pl";;
 	pt) XKBLAYOUT="pt";;
 	ro) XKBLAYOUT="ro";;
-	ru) XKBLAYOUT="ru";;
+	ru) XKBLAYOUT="us,ru";;
 	se) XKBLAYOUT="se";;
 	sg) XKBLAYOUT="ch"; XKBVARIANT="de";;
 	sk-qwerty) XKBLAYOUT="sk"; XKBVARIANT="qwerty";;
 	slovene) XKBLAYOUT="si";;
-	sr-cy) XKBLAYOUT="cs";;
+	sr-cy) XKBLAYOUT="cs,cs"; XKBVARIANT="latin,basic" ;;
 	trf|trfu) XKBLAYOUT="tr"; XKBVARIANT="f";;
 	trq|trqu) XKBLAYOUT="tr";;
-	ua) XKBLAYOUT="ua";;
+	ua) XKBLAYOUT="us,ua";;
 	uk) XKBLAYOUT="gb";;
 	us) XKBLAYOUT="us"; XKBMODEL="pc104";;
     esac
-
-    # Currently the following two lines are meaningless but stay here
-    # in case some wants to use the real XkbLayout and XkbVariant for
-    # the non-Latin layouts
-    XKBLAYOUT=${XKBLAYOUT#*,}
-    XKBVARIANT=${XKBVARIANT#*,}
-
-    case "$XKBLAYOUT" in
-	'')
-	    layout_priority=critical
-	    ;;
-	bg)
-	    # since there are two incompatible layouts and the console
-	    # provides only one of them
-	    default_layout="$XKBLAYOUT"
-	    default_variant="$XKBVARIANT"
-	    layout_priority=high
-	    ;;
-	*)
-	    if [ "$XKBMODEL" ]; then
-		default_model="$XKBMODEL"
-	    fi
-	    default_layout="$XKBLAYOUT"
-	    default_variant="$XKBVARIANT"
-	    layout_priority=medium
-	    ;;
-    esac
 fi
-    
+
 # Get defaults from debconf, to allow preseeding.
 if [ -d /lib/debian-installer ]; then
     if db_get console-setup/modelcode && [ "$RET" ]; then
@@ -1159,7 +1156,6 @@ if [ -d /lib/debian-installer ]; then
     fi
     if db_get console-setup/optionscode && [ "$RET" ]; then
 	XKBOPTIONS="$RET"
-	got_xkboptions=yes
     fi
     if db_get console-setup/fontsize && [ "$RET" ]; then
 	db_set console-setup/fontsize-text "$RET"
@@ -1167,31 +1163,81 @@ if [ -d /lib/debian-installer ]; then
     fi
 fi
 
+# Get default layout from xorg.conf if available
+if [ -f /etc/X11/xorg.conf ] && which awk >/dev/null; then
+    awk_expr='
+BEGIN { state=0 }
+{
+    if (state == 0) {
+        if (tolower($1) == "section" && tolower($2) == "\"inputdevice\"")
+            state = 1
+    }
+    if (state == 1) {
+        if (tolower($1) == "option") {
+            if (tolower($2) == "\"xkbmodel\"")
+                xkbmodel = $3
+            if (tolower($2) == "\"xkblayout\"")
+                xkblayout = $3
+            if (tolower($2) == "\"xkbvariant\"")
+                xkbvariant = $3
+            if (tolower($2) == "\"xkboptions\"")
+                xkboptions = $3
+        }
+        if (tolower($1) == "endsection") {
+            if (xkblayout) {
+                print "XKBLAYOUT=" xkblayout
+                if (xkbmodel) print "XKBMODEL=" xkbmodel
+                if (xkbvariant) print "XKBVARIANT=" xkbvariant
+                if (xkboptions) print "XKBOPTIONS=" xkboptions
+                exit
+            }
+            state = 0
+            xkbmodel = ""
+            xkblayout = ""
+            xkbvariant = ""
+            xkboptions = ""
+        }
+    }
+}
+'
+    eval $(awk "$awk_expr" < /etc/X11/xorg.conf)
+fi
+
 # Load the config file, if it exists.
 if [ -e $CONFIGFILE ]; then
     . $CONFIGFILE || true
-    
-    got_full_config=yes
-    got_xkboptions=yes
-    model_priority=medium
-    layout_priority=medium
+fi
+
+if [ "$ACTIVE_CONSOLES" ]; then
     default_ttys="$ACTIVE_CONSOLES"
+fi
+if [ "$CHARMAP" ]; then
     default_charmap="$CHARMAP"
+fi
+if [ "$FONTFACE" ]; then
     default_fontface="$FONTFACE"
+fi
+if [ "$FONTSIZE" ]; then
     default_fontsize="$FONTSIZE"
-    default_model="$XKBMODEL"
-
+fi
+if [ "$CODESET" ]; then
     default_codeset="`decode_codeset $CODESET`"
-
+fi
+if [ "$XKBMODEL" ] ; then
+    model_priority=medium
+    default_model="$XKBMODEL"
+fi
+if [ "$XKBLAYOUT" ]; then
+    layout_priority=medium
     case "$XKBLAYOUT" in
 	lt,lt)
-	    default_layout=${XKBLAYOUT%,*}
+	    default_layout="${XKBLAYOUT%,*}"
 	    default_variant="${XKBVARIANT%,*}"
 	    unsupported_layout=no
 	    ;;	    
 	# TODO: make s.t. to not forget to update this list
 	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|jp,jp|us,jp|us,kan|us,kh|us,la|us,lao|us,lk|us,lt|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
-	    default_layout=${XKBLAYOUT#*,}
+	    default_layout="${XKBLAYOUT#*,}"
 	    default_variant="${XKBVARIANT#*,}"
 	    unsupported_layout=no
 	    ;;	    
@@ -1205,7 +1251,13 @@ if [ -e $CONFIGFILE ]; then
     esac
 fi
 
-if [ "$got_xkboptions" = yes ]; then
+# since there are two completely different layouts 
+if [ "$default_layout" = bg -a -z "$default_variant" ]; then
+    default_variant=bds
+    layout_priority=high
+fi
+
+if [ "$XKBOPTIONS" ]; then
     default_toggle='No toggling'
     default_switch='No temporary switch'
     default_altgr='No AltGr key'
@@ -1292,23 +1344,18 @@ if [ "$got_xkboptions" = yes ]; then
     done
 fi
 
-if [ "$got_full_config" = yes ]; then
-    # Store values from config file into debconf db.
-    
-    db_set console-setup/ttys "$default_ttys"
-    db_set console-setup/charmap "$default_charmap"
-    db_set console-setup/codeset "$default_codeset"
-    db_set console-setup/fontface "$default_fontface"
-    db_set console-setup/fontsize-text "$default_fontsize"
-    db_set console-setup/fontsize-fb "$default_fontsize"
-    db_set console-setup/fontsize "$default_fontsize"
-fi
-if [ "$got_xkboptions" = yes ]; then
-    db_set console-setup/toggle "$default_toggle"
-    db_set console-setup/switch "$default_switch"
-    db_set console-setup/altgr "$default_altgr"
-    db_set console-setup/compose "$default_compose"
-fi
+# Store some of the default values into debconf db.
+db_default console-setup/ttys "$default_ttys"
+db_default console-setup/charmap "$default_charmap"
+db_default console-setup/codeset "$default_codeset"
+db_default console-setup/fontface "$default_fontface"
+db_default console-setup/fontsize-text "$default_fontsize"
+db_default console-setup/fontsize-fb "$default_fontsize"
+db_default console-setup/fontsize "$default_fontsize"
+db_default console-setup/toggle "$default_toggle"
+db_default console-setup/switch "$default_switch"
+db_default console-setup/altgr "$default_altgr"
+db_default console-setup/compose "$default_compose"
 
 #######################################################################
 
