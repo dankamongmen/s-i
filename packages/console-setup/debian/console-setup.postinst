@@ -81,32 +81,14 @@ if [ "$1" = "configure" ]; then
 	    /usr/share/doc/console-setup-mini/examples/console-setup \
 	    /usr/share/console-setup-mini/console-setup.proto \
 	    2>/dev/null >$CONFIGFILE || true
-	cat >>$CONFIGFILE <<EOF
-
-# Do not update the following md5 sum if you change
-# $CONFIGDIR/boottime.kmap.gz and Debconf will not overwrite
-# your custom keymap.  Do not update it even if you want to make
-# Debconf overwrite it.  Instead simply specify the empty string as
-# a md5 sum.
-
-BOOTTIME_KMAP_MD5=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-EOF
     fi
 
     . $CONFIGFILE || true
 
-    if \
-	[ -z "$BOOTTIME_KMAP_MD5" ] \
-	|| [ ! -f "$CONFIGDIR/boottime.kmap.gz" ] \
-	|| echo "$BOOTTIME_KMAP_MD5  $CONFIGDIR/boottime.kmap.gz" \
-	    | $md5sum -c 2>/dev/null >/dev/null
-    then
-	if which gzip >/dev/null; then
-	    ckbcomp $acm_option -model "$model" \
-		"$layout" "$variant" "$options" \
-		| gzip -9 >$CONFIGDIR/boottime.kmap.gz
-	fi
-	BOOTTIME_KMAP_MD5=`$md5sum $CONFIGDIR/boottime.kmap.gz | sed 's/ .*//'`
+    if which gzip >/dev/null; then
+	ckbcomp $acm_option -model "$model" \
+	    "$layout" "$variant" "$options" \
+	    | gzip -9 >$CONFIGDIR/cached.kmap.gz
     fi
 
     # Ensure we do not mess up the config file's ownership and permissions.
@@ -116,7 +98,7 @@ EOF
     # them via debconf, (re-)add them to the conffile.
     for var in \
 	ACTIVE_CONSOLES CHARMAP CODESET FONTFACE FONTSIZE \
-	XKBMODEL XKBLAYOUT XKBVARIANT XKBOPTIONS BOOTTIME_KMAP_MD5
+	XKBMODEL XKBLAYOUT XKBVARIANT XKBOPTIONS
     do
         if ! grep "^ *${var}=" $CONFIGFILE >/dev/null; then
 	    echo "${var}=" >>$CONFIGFILE
@@ -133,7 +115,6 @@ EOF
 	-e "s|^ *XKBLAYOUT=.*|XKBLAYOUT=\"$layout\"|" \
 	-e "s|^ *XKBVARIANT=.*|XKBVARIANT=\"$variant\"|" \
 	-e "s|^ *XKBOPTIONS=.*|XKBOPTIONS=\"$options\"|" \
-	-e "s|^ *BOOTTIME_KMAP_MD5=.*|BOOTTIME_KMAP_MD5=\"$BOOTTIME_KMAP_MD5\"|" \
 	<$CONFIGFILE >$CONFIGFILE.tmp
     
     mv -f $CONFIGFILE.tmp $CONFIGFILE

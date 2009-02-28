@@ -66,7 +66,7 @@ Sets up the font and the keyboard on Linux console.
       --force          do not check whether we are on the console
   -v, --verbose        explain what is being doing, try it if s.t. goes wrong
       --save           copy the font and the ACM in /etc/console-setup,
-                         update /etc/console-setup/boottime.kmap.gz
+                         update /etc/console-setup/cached.kmap.gz
       --save-only      only save; don't setup keyboard/font immediately
                          (implies --force)
   -h, --help           display this help and exit
@@ -209,10 +209,10 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	    && [ "${f%/*}" != /etc/console-setup ]
 	then
 	    cp "$f" /etc/console-setup/
-	    fi
+	fi
     done
     
-
+    
     if [ "$save_only" != yes ]; then
 	for console in $ACTIVE_CONSOLES; do
 	    [ -w $console ] || continue
@@ -307,14 +307,30 @@ if [ "$font_only" != yes ]; then
 		rules_option=''
 	    fi
 
+	    if \
+		[ "$VARIANT" = '' ] \
+		&& which gzip >/dev/null \
+		&& [ -d /usr/share/X11/xkb ] # /usr is mounted
+	    then
+		if \
+		    [ ! -f /etc/console-setup/cached.kmap.gz ] \
+		    || [ /etc/console-setup/cached.kmap.gz \
+		           -ot /etc/default/console-setup ]
+		then
+		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
+			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
+			| gzip -9 >/etc/console-setup/cached.kmap.gz
+		fi
+	    fi
+
 	    if [ "$save_only" != yes ]; then
 		if \
 		    [ "$VARIANT" = '' ] \
-		    && [ -f /etc/console-setup/boottime.kmap.gz ] \
-		    && [ ! /etc/console-setup/boottime.kmap.gz \
+		    && [ -f /etc/console-setup/cached.kmap.gz ] \
+		    && [ ! /etc/console-setup/cached.kmap.gz \
 		           -ot /etc/default/console-setup ]
 		then
-		    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
+		    eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
 		else
 		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
 			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
@@ -324,11 +340,11 @@ if [ "$font_only" != yes ]; then
 	    if which gzip >/dev/null && [ "$save" = yes ]; then
 		ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
 		    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
-		    | gzip -9 >/etc/console-setup/boottime.kmap.gz
+		    | gzip -9 >/etc/console-setup/cached.kmap.gz
 	    fi
 	elif [ "$save_only" != yes ] && \
-	     [ -f /etc/console-setup/boottime.kmap.gz ]; then
-	    eval loadkeys /etc/console-setup/boottime.kmap.gz $verbose
+	     [ -f /etc/console-setup/cached.kmap.gz ]; then
+	    eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
 	fi
     fi
 fi
