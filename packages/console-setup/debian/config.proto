@@ -1356,12 +1356,22 @@ if [ "$XKBOPTIONS" ]; then
 	    grp_led:scroll)
 		;;
 	    *)
-		db_fset console-setup/unsupported_options seen false
-		db_subst console-setup/unsupported_options \
-		    XKBOPTIONS "$XKBOPTIONS"
-		db_input medium console-setup/unsupported_options || true
-		db_go || true
-		db_get console-setup/unsupported_options
+		if [ -f /etc/default/console-setup ]; then
+		    db_fset console-setup/unsupported_config_options seen false
+		    db_subst console-setup/unsupported_config_options \
+			XKBOPTIONS "$XKBOPTIONS"
+		    db_input medium console-setup/unsupported_config_options \
+			|| true
+		    db_go || true
+		    db_get console-setup/unsupported_config_options
+		else
+		    db_fset console-setup/unsupported_options seen false
+		    db_subst console-setup/unsupported_options \
+			XKBOPTIONS "$XKBOPTIONS"
+		    db_input medium console-setup/unsupported_options || true
+		    db_go || true
+		    db_get console-setup/unsupported_options
+		fi
 		if [ "$RET" = true ]; then
 		    unsupported_option=yes
 		    break
