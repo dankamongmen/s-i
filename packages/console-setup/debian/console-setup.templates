@@ -29,13 +29,37 @@ _Description: Keyboard layout:
  There is more than one keyboard layout with the origin you selected.
  Please select the layout matching your keyboard.
 
-Template: console-setup/dont_ask_layout
-Type: error
-_Description: Unsupported settings in configuration file
- The configuration file /etc/default/console-setup specifies a keyboard
- layout and variant that are not supported by the configuration
- program.  Because of that, no questions about the keyboard layout will
- be asked and your current configuration will be preserved.
+Template: console-setup/unsupported_config_layout
+Type: boolean
+Default: true
+_Description: Keep unsupported settings in configuration file?
+ The configuration file /etc/default/console-setup specifies a
+ keyboard layout (${XKBLAYOUT}) which is not supported
+ by the configuration program.  Do you want to keep it?
+ .
+ If you choose to keep it then no questions about the keyboard layout
+ will be asked and your current configuration will be preserved.
+
+Template: console-setup/unsupported_layout
+Type: boolean
+Default: true
+_Description: Keep default keyboard layout (${XKBLAYOUT})?
+ The default value for the keyboard layout is based on your
+ language/region and the settings in /etc/X11/xorg.conf.  This default
+ value is ${XKBLAYOUT} and it is is not supported
+ by the configuration program.  Do you want to keep it?
+ .
+ If you choose to keep it then no questions about the keyboard layout
+ will be asked.
+
+Template: console-setup/unsupported_options
+Type: boolean
+Default: true
+_Description: Keep unsupported options (${XKBOPTIONS})?
+ The default value for the options of the keyboard layout is based on
+ your language/region and the settings in /etc/X11/xorg.conf.  This
+ default value is ${XKBOPTIONS} and it is not supported
+ by the configuration program.  Do you want to keep it?
 
 Template: console-setup/fontface
 Type: select

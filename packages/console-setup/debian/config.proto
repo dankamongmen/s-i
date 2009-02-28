@@ -1227,6 +1227,7 @@ if [ "$XKBMODEL" ] ; then
     model_priority=medium
     default_model="$XKBMODEL"
 fi
+
 if [ "$XKBLAYOUT" ]; then
     layout_priority=medium
     case "$XKBLAYOUT" in
@@ -1242,7 +1243,23 @@ if [ "$XKBLAYOUT" ]; then
 	    unsupported_layout=no
 	    ;;	    
 	*,*)
-	    unsupported_layout=yes
+	    if [ -f /etc/default/console-setup ]; then
+		db_fset console-setup/unsupported_config_layout seen false
+		db_subst console-setup/unsupported_config_layout \
+		    XKBLAYOUT "$XKBLAYOUT"
+		db_input medium console-setup/unsupported_config_layout || true
+		db_go || true
+		db_get console-setup/unsupported_config_layout
+	    else
+		db_fset console-setup/unsupported_layout seen false
+		db_subst console-setup/unsupported_layout XKBLAYOUT "$XKBLAYOUT"
+		db_input medium console-setup/unsupported_layout || true
+		db_go || true
+		db_get console-setup/unsupported_layout
+	    fi
+	    if [ "$RET" = true ]; then
+		unsupported_layout=yes
+	    fi
 	    ;;
 	*)
 	    default_layout="$XKBLAYOUT"
@@ -1339,7 +1356,17 @@ if [ "$XKBOPTIONS" ]; then
 	    grp_led:scroll)
 		;;
 	    *)
-		unsupported_layout=yes;;
+		db_fset console-setup/unsupported_options seen false
+		db_subst console-setup/unsupported_options \
+		    XKBOPTIONS "$XKBOPTIONS"
+		db_input medium console-setup/unsupported_options || true
+		db_go || true
+		db_get console-setup/unsupported_options
+		if [ "$RET" = true ]; then
+		    unsupported_option=yes
+		    break
+		fi
+		;;
 	esac
     done
 fi
@@ -1377,14 +1404,9 @@ while :; do
 	    ;;
 	2)
 	    if [ "$unsupported_layout" = yes ]; then
-		if [ "$STATE" -ge "$old_state" ]; then
-		    db_input medium console-setup/dont_ask_layout || true
-		    db_go || true
-		    db_set console-setup/layoutcode "$XKBLAYOUT"
-		    STATE=$(($STATE + 1))
-		else
-		    STATE=$(($STATE - 1))
-		fi
+		db_set console-setup/layoutcode "$XKBLAYOUT"
+		# skip the question without making Debconf loop
+		STATE=$(( $STATE + $STATE - $old_state ))
 	    elif \
 		ask_debconf console-setup/layout "$layout_priority" \
 		    layout "$default_layout"
@@ -1483,7 +1505,10 @@ while :; do
 	    fi
 	    ;;
 	4)
-	    if [ "$unsupported_layout" = yes ]; then
+	    if \
+		[ "$unsupported_layout" = yes \
+		-o "$unsupported_option" = yes ]
+	    then
 		db_set console-setup/optionscode "$XKBOPTIONS"
 		# skip the questions without making Debconf loop
 		STATE=$(( $STATE + $STATE - $old_state ))
