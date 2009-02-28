@@ -1380,6 +1380,7 @@ while :; do
 	2)
 	    if [ "$unsupported_layout" = yes ]; then
 		if [ -f /etc/default/console-setup ]; then
+		    db_reset console-setup/unsupported_config_layout || true
 		    db_fset console-setup/unsupported_config_layout seen false
 		    db_subst console-setup/unsupported_config_layout \
 			XKBLAYOUT "$XKBLAYOUT"
@@ -1392,6 +1393,7 @@ while :; do
 		    fi
 		    db_get console-setup/unsupported_config_layout
 		else
+		    db_reset console-setup/unsupported_layout || true
 		    db_fset console-setup/unsupported_layout seen false
 		    db_subst console-setup/unsupported_layout \
 			XKBLAYOUT "$XKBLAYOUT"
@@ -1519,6 +1521,7 @@ while :; do
 		-a "$unsupported_options" = yes ]
 	    then
 		if [ -f /etc/default/console-setup ]; then
+		    db_reset console-setup/unsupported_config_options || true
 		    db_fset console-setup/unsupported_config_options seen false
 		    db_subst console-setup/unsupported_config_options \
 			XKBOPTIONS "$XKBOPTIONS"
@@ -1531,6 +1534,7 @@ while :; do
 		    fi
 		    db_get console-setup/unsupported_config_options
 		else
+		    db_reset console-setup/unsupported_options || true
 		    db_fset console-setup/unsupported_options seen false
 		    db_subst console-setup/unsupported_options \
 			XKBOPTIONS "$XKBOPTIONS"
