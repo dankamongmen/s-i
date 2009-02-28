@@ -1243,23 +1243,7 @@ if [ "$XKBLAYOUT" ]; then
 	    unsupported_layout=no
 	    ;;	    
 	*,*)
-	    if [ -f /etc/default/console-setup ]; then
-		db_fset console-setup/unsupported_config_layout seen false
-		db_subst console-setup/unsupported_config_layout \
-		    XKBLAYOUT "$XKBLAYOUT"
-		db_input medium console-setup/unsupported_config_layout || true
-		db_go || true
-		db_get console-setup/unsupported_config_layout
-	    else
-		db_fset console-setup/unsupported_layout seen false
-		db_subst console-setup/unsupported_layout XKBLAYOUT "$XKBLAYOUT"
-		db_input medium console-setup/unsupported_layout || true
-		db_go || true
-		db_get console-setup/unsupported_layout
-	    fi
-	    if [ "$RET" = true ]; then
-		unsupported_layout=yes
-	    fi
+	    unsupported_layout=yes
 	    ;;
 	*)
 	    default_layout="$XKBLAYOUT"
@@ -1356,26 +1340,7 @@ if [ "$XKBOPTIONS" ]; then
 	    grp_led:scroll)
 		;;
 	    *)
-		if [ -f /etc/default/console-setup ]; then
-		    db_fset console-setup/unsupported_config_options seen false
-		    db_subst console-setup/unsupported_config_options \
-			XKBOPTIONS "$XKBOPTIONS"
-		    db_input medium console-setup/unsupported_config_options \
-			|| true
-		    db_go || true
-		    db_get console-setup/unsupported_config_options
-		else
-		    db_fset console-setup/unsupported_options seen false
-		    db_subst console-setup/unsupported_options \
-			XKBOPTIONS "$XKBOPTIONS"
-		    db_input medium console-setup/unsupported_options || true
-		    db_go || true
-		    db_get console-setup/unsupported_options
-		fi
-		if [ "$RET" = true ]; then
-		    unsupported_option=yes
-		    break
-		fi
+		unsupported_options=yes
 		;;
 	esac
     done
@@ -1414,6 +1379,40 @@ while :; do
 	    ;;
 	2)
 	    if [ "$unsupported_layout" = yes ]; then
+		if [ -f /etc/default/console-setup ]; then
+		    db_fset console-setup/unsupported_config_layout seen false
+		    db_subst console-setup/unsupported_config_layout \
+			XKBLAYOUT "$XKBLAYOUT"
+		    db_input medium console-setup/unsupported_config_layout \
+			|| true
+		    if db_go; then 
+			STATE=$(($STATE + 1))
+		    else
+			STATE=$(($STATE - 1))
+		    fi
+		    db_get console-setup/unsupported_config_layout
+		else
+		    db_fset console-setup/unsupported_layout seen false
+		    db_subst console-setup/unsupported_layout \
+			XKBLAYOUT "$XKBLAYOUT"
+		    db_input medium console-setup/unsupported_layout || true
+		    if db_go; then 
+			STATE=$(($STATE + 1))
+		    else
+			STATE=$(($STATE - 1))
+		    fi
+		    db_get console-setup/unsupported_layout
+		fi
+		if [ "$RET" != true ]; then
+		    unsupported_layout=no
+		fi
+	    else
+		# skip the question without making Debconf loop
+		STATE=$(( $STATE + $STATE - $old_state ))
+	    fi
+	    ;;
+	3)
+	    if [ "$unsupported_layout" = yes ]; then
 		db_set console-setup/layoutcode "$XKBLAYOUT"
 		# skip the question without making Debconf loop
 		STATE=$(( $STATE + $STATE - $old_state ))
@@ -1427,7 +1426,7 @@ while :; do
 		STATE=$(($STATE - 1))
 	    fi
 	    ;;
-	3)
+	4)
 	    if [ "$unsupported_layout" = yes ]; then
 		db_set console-setup/variantcode "$XKBVARIANT"
 		# skip the question without making Debconf loop
@@ -1514,10 +1513,47 @@ while :; do
 		STATE=$(($STATE - 1))
 	    fi
 	    ;;
-	4)
+	5)
+	    if \
+		[ "$unsupported_layout" = no \
+		-a "$unsupported_options" = yes ]
+	    then
+		if [ -f /etc/default/console-setup ]; then
+		    db_fset console-setup/unsupported_config_options seen false
+		    db_subst console-setup/unsupported_config_options \
+			XKBOPTIONS "$XKBOPTIONS"
+		    db_input medium console-setup/unsupported_config_options \
+			|| true
+		    if db_go; then 
+			STATE=$(($STATE + 1))
+		    else
+			STATE=$(($STATE - 1))
+		    fi
+		    db_get console-setup/unsupported_config_options
+		else
+		    db_fset console-setup/unsupported_options seen false
+		    db_subst console-setup/unsupported_options \
+			XKBOPTIONS "$XKBOPTIONS"
+		    db_input medium console-setup/unsupported_options || true
+		    if db_go; then 
+			STATE=$(($STATE + 1))
+		    else
+			STATE=$(($STATE - 1))
+		    fi
+		    db_get console-setup/unsupported_options
+		fi
+		if [ "$RET" != true ]; then
+		    unsupported_options=no
+		fi
+	    else
+		# skip the question without making Debconf loop
+		STATE=$(( $STATE + $STATE - $old_state ))
+	    fi
+	    ;;
+	6)
 	    if \
 		[ "$unsupported_layout" = yes \
-		-o "$unsupported_option" = yes ]
+		-o "$unsupported_options" = yes ]
 	    then
 		db_set console-setup/optionscode "$XKBOPTIONS"
 		# skip the questions without making Debconf loop
@@ -1770,7 +1806,7 @@ while :; do
 		db_set console-setup/optionscode "$options"
 	    fi
 	    ;;		    
-	5)
+	7)
 	    if [ "$package" = console-setup-mini ]; then
 		if [ "$STATE" -ge "$old_state" ]; then
 		    STATE=$(($STATE + 1))
@@ -1795,7 +1831,7 @@ while :; do
 		charmap=$RET
 	    fi
 	    ;;
-	6)
+	8)
 	    # It shouldn't be possible for $default_codeset to be
 	    # empty, but just a precaution.
 	    if [ "$default_codeset" ]; then
@@ -1811,7 +1847,7 @@ while :; do
 		STATE=$(($STATE - 1))
 	    fi
 	    ;;
-	7)
+	9)
 	    fontfaces=`available_fontfaces`
 	    # add commas
 	    choices=`echo "$fontfaces" | sed -e 's/$/,/g'`
@@ -1892,7 +1928,7 @@ while :; do
 	    db_get console-setup/fontface
 	    fontface=$RET
 	    ;;
-	8)
+	10)
 	    fontsizes=`available_fontsizes`
 	    # add commas
 	    choices=`echo "$fontsizes" | sed -e 's/$/,/g' `
@@ -1914,7 +1950,7 @@ while :; do
 	    fontsize=$RET
 	    db_set console-setup/fontsize "$fontsize"
 	    ;;
-	9)
+	11)
 	    db_input medium console-setup/ttys || true
 	    if db_go; then
 		STATE=$(($STATE + 1))
