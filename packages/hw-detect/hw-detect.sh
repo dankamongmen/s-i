@@ -242,6 +242,8 @@ fi
 
 # If using real hotplug, re-run the rc scripts to pick up new modules.
 # TODO: this just loads modules itself, rather than handing back a list
+# Since we've just run depmod, new modules might be available, so we
+# must trigger as well as settle.
 update-dev
 
 ALL_HW_INFO=$(get_detected_hw_info; get_manual_hw_info)
@@ -338,12 +340,12 @@ fi
 # be done unconditionally.
 if [ -z "$LOAD_IDE" ] && is_not_loaded ide-generic && \
    [ -e /sys/bus/isa ] && is_available ide-generic; then
-	update-dev
+	update-dev --settle
 	blockdev_count=$(ls /sys/block | wc -w)
 
 	log "ISA bus detected; loading module 'ide-generic'"
 	load_module ide-generic
-	update-dev
+	update-dev --settle
 	if [ $(ls /sys/block | wc -w) -gt $blockdev_count ]; then
 		log "New devices detected after loading ide-generic"
 
@@ -591,6 +593,6 @@ check-missing-firmware
 sysfs-update-devnames
 
 # Let userspace /dev tools rescan the devices
-update-dev
+update-dev --settle
 
 exit 0
