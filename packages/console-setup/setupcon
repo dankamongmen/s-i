@@ -104,6 +104,7 @@ fi
 
 if [ -f "$USER_CONFIG" ]; then
     CONFIG="$USER_CONFIG"
+    save=
 elif [ -f "$MAIN_CONFIG" ]; then
     CONFIG="$MAIN_CONFIG"
 else
@@ -325,7 +326,7 @@ if [ "$font_only" != yes ]; then
 
 	    if [ "$save_only" != yes ]; then
 		if \
-		    [ "$VARIANT" = '' ] \
+		    [ "$VARIANT" = '' ] && [ "$CONFIG" != "$USER_CONFIG" ] \
 		    && [ -f /etc/console-setup/cached.kmap.gz ] \
 		    && [ ! /etc/console-setup/cached.kmap.gz \
 		           -ot /etc/default/console-setup ]
