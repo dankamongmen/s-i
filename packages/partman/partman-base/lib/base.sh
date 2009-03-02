@@ -512,6 +512,7 @@ error_handler () {
 	db_subst partman/exception_handler CHOICES "$options"
 	if
 	    expr "$options" : '.*,.*' >/dev/null \
+	    && db_fset partman/exception_handler seen false \
 	    && db_input $priority partman/exception_handler
 	then
 	    if db_go; then
@@ -523,6 +524,7 @@ error_handler () {
 	else
 	    db_subst partman/exception_handler_note TYPE "$type"
 	    maybe_escape "$message" db_subst partman/exception_handler_note DESCRIPTION
+	    db_fset partman/exception_handler_note seen false
 	    db_input $priority partman/exception_handler_note || true
 	    db_go || true
 	    write_line "unhandled"
