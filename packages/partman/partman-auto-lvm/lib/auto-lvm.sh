@@ -120,7 +120,7 @@ auto_lvm_prepare() {
 	modprobe lvm-mod >/dev/null 2>&1 || true
 
 	if type update-dev >/dev/null 2>&1; then
-		log-output -t update-dev update-dev
+		log-output -t update-dev update-dev --settle
 	fi
 
 	if [ "$extra_devices" ]; then
