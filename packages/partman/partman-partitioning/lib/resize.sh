@@ -188,7 +188,7 @@ perform_resizing () {
 			read_line x1 x2 x3 x4 x5 path x7
 			close_dialog
 			# Wait for the device file to be created again
-			update-dev
+			update-dev --settle
 
 			if ! echo y | do_ntfsresize -f $path; then
 				logger -t partman "Error resizing the NTFS file system to the partition size"
@@ -204,14 +204,14 @@ perform_resizing () {
 			read_line x1 x2 x3 x4 x5 path x7
 			close_dialog
 			# Wait for the device file to be created
-			update-dev
+			update-dev --settle
 
 			if echo y | do_ntfsresize -f --size "$newsize" $path; then
 				open_dialog VIRTUAL_RESIZE_PARTITION $oldid $newsize
 				read_line newid
 				close_dialog
 				# Wait for the device file to be created
-				update-dev
+				update-dev --settle
 
 				if ! echo y | do_ntfsresize -f $path; then
 					logger -t partman "Error resizing the NTFS file system to the partition size"
@@ -269,7 +269,7 @@ perform_resizing () {
 			close_dialog
 		fi
 		# Wait for the device file to be created
-		update-dev
+		update-dev --settle
 
 		e2fsck_code=0
 		e2fsck -f -p $path || e2fsck_code=$?
@@ -302,7 +302,7 @@ perform_resizing () {
 				read_line newid
 				close_dialog
 				# Wait for the device file to be created
-				update-dev
+				update-dev --settle
 
 				if ! resize2fs $path; then
 					logger -t partman "Error resizing the ext2/ext3/ext4 file system to the partition size"
