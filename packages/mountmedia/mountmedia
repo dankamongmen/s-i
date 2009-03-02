@@ -90,13 +90,13 @@ if ! ( media_mounted && checkcontents $MNT ); then
 	DEV=/dev/fd0
 	if [ ! -e $DEV ]; then
 		log-output -t mountmedia modprobe -q floppy || true
-		update-dev
+		update-dev --settle
 	fi
 
 	if [ ! -e "$DEV" ] || ! try_mount $DEV; then
 		# Maybe the system has an ide-floppy device?
 		log-output -t mountmedia modprobe -q ide-floppy || true
-		update-dev
+		update-dev --settle
 		try_mount $DEV
 	fi
 fi
