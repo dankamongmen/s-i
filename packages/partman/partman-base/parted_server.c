@@ -118,6 +118,42 @@ open_in()
    the function `scanf' */
 #define iscanf(...) fscanf(infifo,__VA_ARGS__)
 
+/* Read the remainder of this line from the input FIFO, skipping leading
+ * whitespace. Sets *str to NULL if there was no data left in the FIFO (as
+ * opposed to merely optional leading whitespace followed by a newline,
+ * indicating an empty argument following the whitespace; in that case, set
+ * *str to the empty string). Caller is expected to free *str.
+ */
+void
+iscan_line(char **str, int expect_leading_newline)
+{
+        int c;
+
+        *str = NULL;
+
+        c = fgetc(infifo);
+        if (c == EOF)
+                return;
+        if (c == '\n' && expect_leading_newline) {
+                c = fgetc(infifo);
+                if (c == EOF)
+                        return;
+        }
+        while (c != EOF && c != '\n') {
+                if (isspace((unsigned char) c))
+                        c = fgetc(infifo);
+                else {
+                        ungetc(c, infifo);
+                        break;
+                }
+        }
+
+        if (c == EOF || c == '\n')
+                *str = calloc(1, 1);
+        else
+                iscanf("%a[^\n]", str);
+}
+
 void
 synchronise_with_client()
 {
@@ -287,7 +323,8 @@ pseudo_exception(char *type, char *message, char **options)
         oprintf("\n");
         if (timer_was_started)
                 start_timer();
-        if (1 != iscanf(" %a[^\n]", &str))
+        iscan_line(&str, 1);
+        if (!str)
                 critical_error("No data in infifo.");
         if (!strcmp(str, "unhandled")) {
                 log("User canceled exception handler");
@@ -1471,7 +1508,8 @@ command_set_flags()
         for (flag = first; flag <= last; flag++)
                 states[flag - first] = false;
         while (1) {
-                if (1 != iscanf(" %a[^\n]", &str))
+                iscan_line(&str, 1);
+                if (!str)
                         critical_error("No data in infifo!");
                 if (!strcmp(str, "NO_MORE"))
                         break;
@@ -1530,7 +1568,8 @@ command_set_name()
         if (part == NULL || !ped_partition_is_active(part))
                 critical_error("No such active partition: %s", id);
         log("Partition found (%s)", id);
-        if (1 != iscanf(" %a[^\n]", &name))
+        iscan_line(&name, 0);
+        if (!name)
                 critical_error("No data in infifo!");
         log("Changing name to %s", name);
         open_out();
