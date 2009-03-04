@@ -993,7 +993,7 @@ disable_swap () {
 		  swapoff $path
 	      done
     else
-	grep '^/dev' /proc/swaps \
+	grep '^/dev' /proc/swaps | grep -v '^/dev/ramzswap' \
 	    | while read path x; do
 		  swapoff $path
 	      done
