@@ -72,14 +72,21 @@ static void process_symbols_provided (const Elf::section_type<Elf::section_type_
     uint8_t bind = symbol->get_bind ();
     uint16_t shndx = symbol->get_shndx ();
     uint8_t type = symbol->get_type ();
+    const std::string &name = symbol->get_name_string ();
+
+    if (!name.size())
+      continue;
     if (shndx == SHN_UNDEF || shndx == SHN_ABS)
       continue;
-    if (type == STT_NOTYPE || type == STT_OBJECT || type == STT_FUNC || type == STT_COMMON || type == STT_TLS)
-      std::cout <<
-        symbol->get_name_string () << ' ' <<
-        (bind == STB_WEAK ? "True" : "False") << ' ' <<
-        symbol->get_version() << ' ' <<
-        (symbol->get_version_data() & 0x8000 ? "False" : "True") << '\n';
+    if (type != STT_NOTYPE && type != STT_OBJECT && type != STT_FUNC && type != STT_COMMON && type != STT_TLS)
+      continue;
+
+    std::cout <<
+      name <<
+      ' ' << (bind == STB_WEAK ? "True" : "False") <<
+      ' ' << symbol->get_version() <<
+      ' ' << (symbol->get_version_data() & 0x8000 ? "False" : "True") <<
+      '\n';
   }
 }
 
@@ -90,19 +97,24 @@ static void process_symbols_undefined (const Elf::section_type<Elf::section_type
     const Elf::symbol *symbol = *it;
     uint8_t bind = symbol->get_bind ();
     uint16_t shndx = symbol->get_shndx ();
+    uint8_t type = symbol->get_type ();
     const std::string &name = symbol->get_name_string ();
 
     if (!name.size())
       continue;
     if (shndx != SHN_UNDEF)
       continue;
-    if (bind == STB_GLOBAL || bind == STB_WEAK)
-      std::cout <<
-        symbol->get_name_string () << ' ' <<
-        (bind == STB_WEAK ? "True" : "False") << ' ' <<
-        symbol->get_version() <<
-        ' ' << symbol->get_version_file() <<
-        '\n';
+    if (type != STT_NOTYPE && type != STT_OBJECT && type != STT_FUNC && type != STT_COMMON && type != STT_TLS)
+      continue;
+    if (bind != STB_GLOBAL && bind != STB_WEAK)
+      continue;
+
+    std::cout <<
+      name << 
+      ' ' << (bind == STB_WEAK ? "True" : "False") <<
+      ' ' << symbol->get_version() <<
+      ' ' << symbol->get_version_file() <<
+      '\n';
   }
 }
 
