@@ -83,14 +83,17 @@ static void process_symbols_provided (const Elf::section_type<Elf::section_type_
   }
 }
 
-static void process_symbols_undefined (const Elf::section_type<Elf::section_type_DYNSYM> *section)
+static void process_symbols_undefined (const Elf::section_type<Elf::section_type_DYNSYM> *section, uint16_t machine)
 {
   for (std::vector<Elf::symbol *>::const_iterator it = section->get_symbols ().begin (); it != section->get_symbols ().end (); ++it)
   {
     const Elf::symbol *symbol = *it;
     uint8_t bind = symbol->get_bind ();
     uint16_t shndx = symbol->get_shndx ();
+    uint8_t type = symbol->get_type ();
     if (shndx != SHN_UNDEF)
+      continue;
+    if (machine == EM_SPARCV9 && type == STT_SPARC_REGISTER)
       continue;
     if (bind == STB_GLOBAL || bind == STB_WEAK)
       std::cout <<
@@ -128,7 +131,8 @@ static void process (command cmd, const char *filename)
       process_symbols_provided (file->get_section_DYNSYM ());
       break;
     case COMMAND_PRINT_SYMBOLS_UNDEFINED:
-      process_symbols_undefined (file->get_section_DYNSYM ());
+      process_symbols_undefined (file->get_section_DYNSYM (),
+				 file->get_machine ());
       break;
   }
 }
