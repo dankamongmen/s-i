@@ -74,11 +74,13 @@ static void process_symbols_provided (const Elf::section_type<Elf::section_type_
     uint8_t type = symbol->get_type ();
     const std::string &name = symbol->get_name_string ();
 
-    if (!name.size())
+    if (bind != STB_GLOBAL && bind != STB_WEAK)
       continue;
     if (shndx == SHN_UNDEF || shndx == SHN_ABS)
       continue;
     if (type != STT_NOTYPE && type != STT_OBJECT && type != STT_FUNC && type != STT_COMMON && type != STT_TLS)
+      continue;
+    if (!name.size())
       continue;
 
     std::cout <<
@@ -100,13 +102,13 @@ static void process_symbols_undefined (const Elf::section_type<Elf::section_type
     uint8_t type = symbol->get_type ();
     const std::string &name = symbol->get_name_string ();
 
-    if (!name.size())
+    if (bind != STB_GLOBAL && bind != STB_WEAK)
       continue;
     if (shndx != SHN_UNDEF)
       continue;
     if (type != STT_NOTYPE && type != STT_OBJECT && type != STT_FUNC && type != STT_COMMON && type != STT_TLS)
       continue;
-    if (bind != STB_GLOBAL && bind != STB_WEAK)
+    if (!name.size())
       continue;
 
     std::cout <<
