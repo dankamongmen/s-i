@@ -168,6 +168,8 @@ case "`archdetect`" in
 			mkdir -p $path/rootfs
 			mount -t minix -o ro /dev/$rootfs $path/rootfs
 			parse_sib_conf $path/rootfs/sib.conf
+			unset_matching_var "HOSTNAME" "DNS-323"
+			unset_matching_var "HOSTNAME" "CH3SNAS"
 			umount $path/rootfs
 			rmdir $path/rootfs $path || true
 			sanity_check_static_config
