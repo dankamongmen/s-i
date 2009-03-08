@@ -156,6 +156,27 @@ case "`archdetect`" in
 			fi
 			umount $path/rootfs || true
 			rmdir $path/rootfs $path || true
+		elif echo "$machine" | grep -q "^D-Link DNS-323"; then
+			check_file /proc/mtd
+			rootfs=$(get_mtdblock "MTD1")
+			if [ -z "$rootfs" ]; then
+				log "Can't find rootfs MTD partition"
+				exit 0
+			fi
+			INTERFACE=eth0
+			path=/tmp/oldsys-preseed
+			mkdir -p $path/rootfs
+			mount -t minix -o ro /dev/$rootfs $path/rootfs
+			parse_sib_conf $path/rootfs/sib.conf
+			umount $path/rootfs
+			rmdir $path/rootfs $path || true
+			sanity_check_static_config
+			if [ "$NET_CONFIG" != "static" ]; then
+				IPADDRESS=192.168.0.32
+				NETMASK=255.255.255.0
+				GATEWAY=192.168.0.1
+				[ -z "$NAMESERVERS" ] && NAMESERVERS=192.168.0.1
+			fi
 		elif echo "$machine" | grep -q "^HP Media Vault mv2120"; then
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/sda5

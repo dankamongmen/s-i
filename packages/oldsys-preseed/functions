@@ -105,6 +105,15 @@ get_var() {
 	echo "$1" | grep "^$2=" | sed "s/^$2=//"
 }
 
+# Get the value from a string in the form of var = "value" from a file.
+# Named for the sib.conf file on the D-Link DNS-323 that this function
+# was originally written for.
+# $1 = file to read
+# $2 = var to read
+get_sib_var() {
+	grep "^$2[[:space:]]*=" $1 | sed "s/^$2[[:space:]]*=[[:space:]]*\"\(.*\)\"[[:space:]]*$/\1/"
+}
+
 # Add a string to a variable; deals with the fact when a string is empty
 # $1 = variable name
 # $2 = string
@@ -144,6 +153,19 @@ parse_sysconf() {
 	DOMAIN=$(get_var "$sysconf" "domain_name")
 }
 
+# Parse the sib.conf file, as found in the D-Link DNS-323
+# $1 = path to sib.conf
+parse_sib_conf() {
+	if [ "$(get_sib_var "$1" "CF-IP-DHCP-ENABLE")" = "0" ]; then
+		NET_CONFIG=static
+	fi
+	IPADDRESS="$(get_sib_var "$1" "CF-IP-STATIC-IP")"
+	NETMASK="$(get_sib_var "$1" "CF-IP-STATIC-IP-NETMASK")"
+	GATEWAY="$(get_sib_var "$1" "CF-IP-STATIC-IP-GATEWAY")"
+	var_add NAMESERVERS "$(get_sib_var "$1" "CF-IP-DNS1")"
+	var_add NAMESERVERS "$(get_sib_var "$1" "CF-IP-DNS2")"
+	HOSTNAME="$(get_sib_var "$1" "CF-SYS-MODEL-STR")"
+}
 
 # Generating
 
