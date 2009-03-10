@@ -137,8 +137,9 @@ remove_xml() {
 # Parse a SysConf partition, as found on the Linksys NSLU2
 # $1 = path
 parse_sysconf() {
-	sysconf=$(devio "<<$1" cpb)
-	INTERFACE=$(get_var "$sysconf" "lan_interface")
+	if ! sysconf="$(devio "<<$1" '!?b.$4->' cp)"; then
+		return
+	fi
 	if [ "$(get_var "$sysconf" "bootproto")" = "static" ]; then
 		NET_CONFIG=static
 	fi
