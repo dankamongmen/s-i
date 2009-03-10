@@ -36,10 +36,9 @@ case "`archdetect`" in
 				exit 0
 			fi
 			parse_sysconf "/dev/$sysconf"
-			# IXP4xx NPE ethernet interface seems to come
-			# up as eth0 (#407460) therefore only use eth0
-			# for the installer if the NPE microcode is
-			# present
+			# IXP4xx Ethernet will always use eth0; if we don't
+			# have the required NPE firmware, assume eth1
+			# instead to allow installations via USB Ethernet.
 			if [ -e /lib/firmware/NPE-B ]; then
 				INTERFACE=eth0
 			else
