@@ -17,7 +17,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define _WIN32_WINNT  0x0500
 #include <windows.h>
 #include "exdll.h"
 
@@ -85,9 +84,4 @@ void __declspec(dllexport) find_system_partition (HWND hwndParent, int string_si
 	}
     }
   pushstring ("failed");
-}
-
-BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
-{
- return TRUE;
 }

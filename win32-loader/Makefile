@@ -4,9 +4,9 @@ export SHELL := bash
 PACKAGE	:= win32-loader
 VERSION	:= $(shell head -n 1 debian/changelog | sed -e "s/^$(PACKAGE) (\(.*\)).*/\1/g")
 
-CC		:= i586-mingw32msvc-gcc -Os
-STRIP		:= i586-mingw32msvc-strip
-CFLAGS		:= -Wl,--file-alignment,512 -Werror
+NSIS_CC		:= i586-mingw32msvc-gcc -Os
+NSIS_STRIP	:= i586-mingw32msvc-strip
+NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500
 
 MAKENSIS	:= makensis
 ifdef NETWORK_BASE_URL
@@ -43,8 +43,7 @@ loadlin.exe: /usr/lib/loadlin/loadlin.exe.gz
 
 win32-loader.exe: main.nsi maps.ini \
 		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
-		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
-		swirl.ico license loadlin.pif loadlin.exe
+		plugins/win32-loader.dll swirl.ico license loadlin.pif loadlin.exe
 	$(MAKE) -C l10n
 	$(MAKENSIS) main.nsi
 	du -h win32-loader.exe
@@ -52,17 +51,9 @@ win32-loader.exe: main.nsi maps.ini \
 license: license.in debian/changelog
 	sed -e "s/@VERSION@/$(VERSION)/g" < $< > $@
 
-plugins/cpuid/test64.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c
-	$(CC) $(CFLAGS) $^ -shared -o $@
-	$(STRIP) $@
-
-plugins/systeminfo/systeminfo.dll: plugins/systeminfo/systeminfo.c
-	$(CC) $(CFLAGS) $^ -shared -o $@
-	$(STRIP) $@
-
-plugins/string.dll: plugins/string.c
-	$(CC) $(CFLAGS) $^ -shared -o $@
-	$(STRIP) $@
+plugins/win32-loader.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c plugins/systeminfo/systeminfo.c plugins/string.c
+	$(NSIS_CC) $(NSIS_CFLAGS) $^ -shared -o $@
+	$(NSIS_STRIP) $@
 
 iso: stable.iso daily.iso
 stable.iso: \

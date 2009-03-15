@@ -1,5 +1,4 @@
 /*
- *  string.c -- String handling functions
  *  Copyright (C) 2007  Robert Millan <rmh@aybabtu.com>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -19,25 +18,7 @@
 #include <windows.h>
 #include "exdll.h"
 
-void __declspec (dllexport) bcdedit_extract_id (HWND hwndParent, int string_size, char *variables, stack_t ** stacktop, extra_parameters * extra)
+BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
 {
-  EXDLL_INIT ();
-
-  char msg[1024];
-  char *p = msg;
-
-  popstring (msg);
-
-  while (*p)
-    {
-      if (p[0] == '{' && p[37] == '}')
-	{
-	  p[38] = '\0';
-	  pushstring (p);
-	  return;
-	}
-      p++;
-    }
-
-  pushstring ("error");
+  return TRUE;
 }
