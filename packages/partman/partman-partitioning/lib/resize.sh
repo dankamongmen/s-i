@@ -21,8 +21,11 @@ get_real_device () {
 		    */disc)
 			bdev=${bdev%/disc}/part$num
 			;;
-			/dev/[hs]d[a-z])
+		    /dev/[hsv]d[a-z]|/dev/xvd[a-z])
 			bdev=$bdev$num
+			;;
+		    /dev/cciss/c[0-9]d[0-9]|/dev/cciss/c[0-9]d[0-9][0-9]|/dev/ida/c[0-9]d[0-9]|/dev/ida/c[0-9]d[0-9][0-9]|/dev/mmcblk[0-9])
+			bdev=${bdev}p$num
 			;;
 		    *)
 			log "get_real_device: strange device name $bdev"
