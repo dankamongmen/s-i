@@ -181,6 +181,10 @@ ask_debconf () {
     fi
     if [ -n "$default_description" ]; then
 	db_default $template "$default_description"
+    elif [ -n "$default_code" ]; then
+	# A default was requested, but we couldn't resolve it to a
+	# description, so we'd better ask.
+	priority=critical
     fi
 
     db_input $priority $template || true
