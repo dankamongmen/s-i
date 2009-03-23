@@ -33,18 +33,19 @@ console-setup (1.29) UNRELEASED; urgency=low
     (coming most likely from xorg.conf) are not supported.
   
   [ Colin Watson ]
-  * Fix property counts in Goha and legacy BDF fonts.
-  * Fix keymap reduction not to try to express keymap A in terms of keymap B
-    when B includes keys not mapped by A.
+  * Merge from Ubuntu:
+    - Fix property counts in Goha and legacy BDF fonts.
+    - Fix keymap reduction not to try to express keymap A in terms of keymap
+      B when B includes keys not mapped by A.
+    - If reading a user configuration file, disable --save, and don't use
+      /etc/console-setup/cached.kmap.gz; using the cached file tends to
+      cause confusion here since the maintainer scripts and init scripts are
+      expecting that to correspond to the main configuration (LP: #332728).
   * Sort the null variant to the top of the choices list rather than to the
     bottom.
   * Make %.ekmap target depend on MyKeyboardNames.pl.
   * Use printf rather than /bin/echo in setupcon; it's typically a shell
     builtin and is therefore faster.
-  * If reading a user configuration file, disable --save, and don't use
-    /etc/console-setup/cached.kmap.gz; using the cached file tends to cause
-    confusion here since the maintainer scripts and init scripts are
-    expecting that to correspond to the main configuration (LP: #332728).
 
   [ Christian Perrier ]
   * Debconf templates and debian/control reviewed by the debian-l10n-
