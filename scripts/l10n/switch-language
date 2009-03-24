@@ -76,7 +76,7 @@ cat po/$LANG.po | sed "s/Last-Translator:.*/Last-Translator: $TSL\\\\n\"/g" >po/
 mv po/$LANG.po.new po/$LANG.po
 
 echo Getting Language-Team for languagechooser
-TEAM=`grep "Language-Team:" $DI_COPY/packages/languagechooser/debian/po/$LANG.po |cut -f2 -d: |sed 's/\\\\n\\"//g'`
+TEAM=`grep "Language-Team:" $DI_COPY/packages/languagechooser/debian/po/$LANG.po |cut -f2 -d: |sed 's/\\\\n\\"//g; s,/,\\\\/,g'`
 echo $TEAM
 echo Fixing Language-Team
 cat po/$LANG.po | sed "s/Language-Team:.*/Language-Team: $TEAM\\\\n\"/g" >po/$LANG.po.new
