@@ -6,7 +6,7 @@ VERSION	:= $(shell head -n 1 debian/changelog | sed -e "s/^$(PACKAGE) (\(.*\)).*
 
 NSIS_CC		:= i586-mingw32msvc-gcc -Os
 NSIS_STRIP	:= i586-mingw32msvc-strip
-NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500
+NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500 -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
 
 MAKENSIS	:= makensis
 ifdef NETWORK_BASE_URL
@@ -52,7 +52,7 @@ license: license.in debian/changelog
 	sed -e "s/@VERSION@/$(VERSION)/g" < $< > $@
 
 plugins/win32-loader.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c plugins/systeminfo/systeminfo.c plugins/string.c
-	$(NSIS_CC) $(NSIS_CFLAGS) $^ -shared -o $@
+	$(NSIS_CC) $^ $(NSIS_CFLAGS) -shared -o $@
 	$(NSIS_STRIP) $@
 
 iso: stable.iso daily.iso

@@ -18,7 +18,7 @@
  */
 
 #include <windows.h>
-#include "exdll.h"
+#include <nsis/pluginapi.h>
 
 char buf[1024];
 

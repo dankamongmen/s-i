@@ -16,7 +16,7 @@
  */
 
 #include <windows.h>
-#include "exdll.h"
+#include <nsis/pluginapi.h>
 
 BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
 {

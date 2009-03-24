@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "exdll.h"
+#include <nsis/pluginapi.h>
 
 void __declspec(dllexport) get_arch (HWND hwndParent, int string_size, char *variables, stack_t **stacktop, extra_parameters *extra)
 {
