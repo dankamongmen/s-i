@@ -19,6 +19,7 @@
 
 use warnings 'all';
 use strict;
+use locale;
 
 my $debug_flag = 1;
 sub debug {
@@ -3149,7 +3150,7 @@ sub x_to_kernelsym {
 #	    warning "Forbidden Unicode \"U+$kernelkeysym\"\n";
 	    return 'VoidSymbol';
 	} else {
-	    if (chr($uni) =~ /\p{IsAlpha}/) {
+	    if (pack("U", $uni) =~ /\p{IsAlpha}/) {
 		my $legacy = uni_to_legacy ($uni);
 		if ($legacy ne 'VoidSymbol') {
 		    return '+'. $legacy;
@@ -3589,8 +3590,8 @@ sub print_vector {
 	for my $mask (0 .. 63) {
 	    if ($capsvector[$mask] =~ /^(\+?)U\+([0-9a-fA-F]+)$/) {
 		my $v = hex ($2);
-		my $l = ord (lc (chr ($v)));
-		my $u = ord (uc (chr ($v)));
+		my $l = ord (lc (pack ("U", $v)));
+		my $u = ord (uc (pack ("U", $v)));
 		my $c = ($v == $l ? $u : $l);
 		$capsvector[$mask] = $1 ."U+". sprintf ("%04x", $c);
 		if ($v != $c && $v gt 0x7f) {
