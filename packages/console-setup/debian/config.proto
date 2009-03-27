@@ -1170,38 +1170,33 @@ fi
 # Get default layout from xorg.conf if available
 if [ -f /etc/X11/xorg.conf ] && which awk >/dev/null; then
     awk_expr='
-BEGIN { state=0 }
 {
-    if (state == 0) {
-        if (tolower($1) == "section" && tolower($2) == "\"inputdevice\"")
-            state = 1
+    $0 = tolower($0);
+    sub("#.*","")
+    xkb = "";
+}
+
+/^[ \t]*section[ \t]+"inputdevice"/,/^[ \t]*endsection/ {
+    if ($1 == "option") {
+	if ($2 == "\"xkbmodel\"") {
+	    xkb = "XKBMODEL";
+	} else if ($2 == "\"xkblayout\"") {
+	    xkb = "XKBLAYOUT";
+	} else if ($2 == "\"xkbvariant\"") {
+	    xkb = "XKBVARIANT";
+	} else if ($2 == "\"xkboptions\"") {
+	    xkb = "XKBOPTIONS"; 
+	}
+	$1 = "";
+	$2 = "";
     }
-    if (state == 1) {
-        if (tolower($1) == "option") {
-            if (tolower($2) == "\"xkbmodel\"")
-                xkbmodel = $3
-            if (tolower($2) == "\"xkblayout\"")
-                xkblayout = $3
-            if (tolower($2) == "\"xkbvariant\"")
-                xkbvariant = $3
-            if (tolower($2) == "\"xkboptions\"")
-                xkboptions = $3
-        }
-        if (tolower($1) == "endsection") {
-            if (xkblayout) {
-                print "XKBLAYOUT=" xkblayout
-                if (xkbmodel) print "XKBMODEL=" xkbmodel
-                if (xkbvariant) print "XKBVARIANT=" xkbvariant
-                if (xkboptions) print "XKBOPTIONS=" xkboptions
-                exit
-            }
-            state = 0
-            xkbmodel = ""
-            xkblayout = ""
-            xkbvariant = ""
-            xkboptions = ""
-        }
-    }
+}
+
+xkb != "" && /^[ \t]*\"[^"]+\"[ \t]*$/ {
+    sub("^[ \t]*\"", "");
+    sub("\".*", "");
+    gsub("[ \t]", "");
+    print xkb "=\"" $0 "\"";
 }
 '
     eval $(awk "$awk_expr" < /etc/X11/xorg.conf)
@@ -1231,6 +1226,9 @@ if [ "$XKBMODEL" ] ; then
     model_priority=medium
     default_model="$XKBMODEL"
 fi
+
+XKBLAYOUT=$(echo $XKBLAYOUT | sed 's/ *//g')
+XKBVARIANT=$(echo $XKBVARIANT | sed 's/ *//g')
 
 if [ "$XKBLAYOUT" ]; then
     layout_priority=medium
