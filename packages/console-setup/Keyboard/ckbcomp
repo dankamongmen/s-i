@@ -103,16 +103,16 @@ while (@ARGV) {
 	    if (@layouts) {
 		die "$0: No more than one -layout option is allowed\n";
 	    }
-	    @layouts = split (/,/, $ARGV[0], -1);
+	    @layouts = split (/ *, */, $ARGV[0], -1);
 	    shift @ARGV;
 	} elsif (/^variant$/) {
 	    if (@variants) {
 		die "$0: No more than one -variant option is allowed\n";
 	    }
-	    @variants = split (/,/, $ARGV[0], -1);
+	    @variants = split (/ *, */, $ARGV[0], -1);
 	    shift @ARGV;
 	} elsif (/^option$/) {
-	    @options = (@options, split (/,/, $ARGV[0], -1));
+	    @options = (@options, split (/ *, */, $ARGV[0], -1));
 	    shift @ARGV;
 	} elsif (/^help$|^-help$|^\?$/) {
 	    print <<EOT;
@@ -140,12 +140,12 @@ EOT
 	}
     } else {
 	if (! @layouts) {
-	    @layouts = split (/,/, $_, -1);
+	    @layouts = split (/ *, */, $_, -1);
 	} elsif (! @variants) {
-	    @variants = split (/,/, $_, -1);
+	    @variants = split (/ *, */, $_, -1);
 	    @variants = ('') if (! @variants);
 	} else {
-	    @options = (@options, split (/,/, $_, -1));
+	    @options = (@options, split (/ *, */, $_, -1));
 	}
     }
 }
