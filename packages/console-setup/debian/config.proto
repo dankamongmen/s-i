@@ -1240,9 +1240,13 @@ if [ "$XKBLAYOUT" ]; then
 	    ;;	    
 	# TODO: make s.t. to not forget to update this list
 	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|jp,jp|us,jp|us,kan|us,kh|us,la|us,lao|us,lk|us,lt|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
-	    default_layout="${XKBLAYOUT#*,}"
-	    default_variant="${XKBVARIANT#*,}"
-	    unsupported_layout=no
+	    if [ "${XKBVARIANT%,*}" == '' ]; then
+		default_layout="${XKBLAYOUT#*,}"
+		default_variant="${XKBVARIANT#*,}"
+		unsupported_layout=no
+	    else
+		unsupported_layout=yes
+	    fi
 	    ;;	    
 	*,*)
 	    unsupported_layout=yes
