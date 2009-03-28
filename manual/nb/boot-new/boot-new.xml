@@ -1,0 +1,451 @@
+<!-- Start of file boot-new/boot-new.xml -->
+<!-- $Id: boot-new.xml 56817 2008-11-30 08:13:01Z fjp $ -->
+
+<chapter id="boot-new">
+ <title
+>Booting Into Your New Debian System</title>
+
+ <sect1 id="base-boot"
+><title
+>The Moment of Truth</title>
+<para
+>Your system's first boot on its own power is what electrical engineers call the <quote
+>smoke test</quote
+>. </para
+><para arch="x86"
+>If you did a default installation, the first thing you should see when you boot the system is the menu of the <classname
+>grub</classname
+> or possibly the <classname
+>lilo</classname
+> bootloader. The first choices in the menu will be for your new Debian system. If you had any other operating systems on your computer (like Windows) that were detected by the installation system, those will be listed lower down in the menu. </para
+><para
+>If the system fails to start up correctly, don't panic. If the installation was successful, chances are good that there is only a relatively minor problem that is preventing the system from booting Debian. In most cases such problems can be fixed without having to repeat the installation. One available option to fix boot problems is to use the installer's built-in rescue mode (see <xref linkend="rescue"/>). </para
+><para
+>If you are new to Debian and Linux, you may need some help from more experienced users. <phrase arch="x86"
+>For direct on-line help you can try the IRC channels #debian or #debian-boot on the OFTC network. Alternatively you can contact the <ulink url="&url-list-subscribe;"
+>debian-user mailing list</ulink
+>.</phrase
+> <phrase arch="not-x86"
+>For less common architectures like &arch-title;, your best option is to ask on the <ulink url="&url-list-subscribe;"
+>debian-&arch-listname; mailing list</ulink
+>.</phrase
+> You can also file an installation report as described in <xref linkend="submit-bug"/>. Please make sure that you describe your problem clearly and include any messages that are displayed and may help others to diagnose the issue. </para
+><para arch="x86"
+>If you had any other operating systems on your computer that were not detected or not detected correctly, please file an installation report. </para>
+
+  <sect2 arch="m68k"
+><title
+>BVME 6000 Booting</title>
+<para
+>If you have just performed a diskless install on a BVM or Motorola VMEbus machine: once the system has loaded the <command
+>tftplilo</command
+> program from the TFTP server, from the <prompt
+>LILO Boot:</prompt
+> prompt enter one of: <itemizedlist>
+<listitem
+><para
+><userinput
+>b6000</userinput
+> followed by &enterkey; to boot a BVME 4000/6000 </para
+></listitem
+><listitem
+><para
+><userinput
+>b162</userinput
+> followed by &enterkey; to boot an MVME162 </para
+></listitem
+><listitem
+><para
+><userinput
+>b167</userinput
+> followed by &enterkey; to boot an MVME166/167 </para
+></listitem>
+</itemizedlist>
+
+</para>
+
+   </sect2>
+
+  <sect2 arch="m68k"
+><title
+>Macintosh Booting</title>
+
+<para
+>Go to the directory containing the installation files and start up the <command
+>Penguin</command
+> booter, holding down the <keycap
+>command</keycap
+> key. Go to the <userinput
+>Settings</userinput
+> dialogue (<keycombo
+> <keycap
+>command</keycap
+> <keycap
+>T</keycap
+> </keycombo
+>), and locate the kernel options line which should look like <userinput
+>root=/dev/ram ramdisk_size=15000</userinput
+> or similar. </para
+><para
+>You need to change the entry to <userinput
+>root=/dev/<replaceable
+>yyyy</replaceable
+></userinput
+>. Replace the <replaceable
+>yyyy</replaceable
+> with the Linux name of the partition onto which you installed the system (e.g. <filename
+>/dev/sda1</filename
+>); you wrote this down earlier. For users with tiny screens, adding <userinput
+>fbcon=font:VGA8x8</userinput
+> (or <userinput
+>video=font:VGA8x8</userinput
+> on pre-2.6 kernels) may help readability. You can change this at any time. </para
+><para
+>If you don't want to start GNU/Linux immediately each time you start, uncheck the <userinput
+>Auto Boot</userinput
+> option. Save your settings in the <filename
+>Prefs</filename
+> file using the <userinput
+>Save Settings As Default</userinput
+> option. </para
+><para
+>Now select <userinput
+>Boot Now</userinput
+> (<keycombo
+> <keycap
+>command</keycap
+> <keycap
+>B</keycap
+> </keycombo
+>) to start your freshly installed GNU/Linux instead of the RAMdisk installer system. </para
+><para
+>Debian should boot, and you should see the same messages as when you first booted the installation system, followed by some new messages. </para>
+   </sect2>
+
+
+  <sect2 arch="powerpc"
+><title
+>OldWorld PowerMacs</title>
+<para
+>If the machine fails to boot after completing the installation, and stops with a <prompt
+>boot:</prompt
+> prompt, try typing <userinput
+>Linux</userinput
+> followed by &enterkey;. (The default boot configuration in <filename
+>quik.conf</filename
+> is labeled Linux). The labels defined in <filename
+>quik.conf</filename
+> will be displayed if you press the <keycap
+>Tab</keycap
+> key at the <prompt
+>boot:</prompt
+> prompt. You can also try booting back into the installer, and editing the <filename
+>/target/etc/quik.conf</filename
+> placed there by the <guimenuitem
+>Install Quik on a Hard Disk</guimenuitem
+> step. Clues for dealing with <command
+>quik</command
+> are available at <ulink url="&url-powerpc-quik-faq;"
+></ulink
+>. </para
+><para
+>To boot back into MacOS without resetting the nvram, type <userinput
+>bye</userinput
+> at the OpenFirmware prompt (assuming MacOS has not been removed from the machine). To obtain an OpenFirmware prompt, hold down the <keycombo
+> <keycap
+>command</keycap
+> <keycap
+>option</keycap
+> <keycap
+>o</keycap
+> <keycap
+>f</keycap
+> </keycombo
+> keys while cold booting the machine. If you need to reset the OpenFirmware nvram changes to the MacOS default in order to boot back to MacOS, hold down the <keycombo
+> <keycap
+>command</keycap
+> <keycap
+>option</keycap
+> <keycap
+>p</keycap
+> <keycap
+>r</keycap
+> </keycombo
+> keys while cold booting the machine. </para
+><para
+>If you use <command
+>BootX</command
+> to boot into the installed system, just select your desired kernel in the <filename
+>Linux Kernels</filename
+> folder, un-choose the ramdisk option, and add a root device corresponding to your installation; e.g. <userinput
+>/dev/hda8</userinput
+>. </para>
+   </sect2>
+
+
+  <sect2 arch="powerpc"
+><title
+>NewWorld PowerMacs</title>
+<para
+>On G4 machines and iBooks, you can hold down the <keycap
+>option</keycap
+> key and get a graphical screen with a button for each bootable OS, &debian; will be a button with a small penguin icon. </para
+><para
+>If you kept MacOS and at some point it changes the OpenFirmware <envar
+>boot-device</envar
+> variable you should reset OpenFirmware to its default configuration. To do this hold down the <keycombo
+> <keycap
+>command</keycap
+> <keycap
+>option</keycap
+> <keycap
+>p</keycap
+> <keycap
+>r</keycap
+> </keycombo
+> keys while cold booting the machine. </para
+><para
+>The labels defined in <filename
+>yaboot.conf</filename
+> will be displayed if you press the <keycap
+>Tab</keycap
+> key at the <prompt
+>boot:</prompt
+> prompt. </para
+><para
+>Resetting OpenFirmware on G3 or G4 hardware will cause it to boot &debian; by default (if you correctly partitioned and placed the Apple_Bootstrap partition first). If you have &debian; on a SCSI disk and MacOS on an IDE disk this may not work and you will have to enter OpenFirmware and set the <envar
+>boot-device</envar
+> variable, <command
+>ybin</command
+> normally does this automatically. </para
+><para
+>After you boot &debian; for the first time you can add any additional options you desire (such as dual boot options) to <filename
+>/etc/yaboot.conf</filename
+> and run <command
+>ybin</command
+> to update your boot partition with the changed configuration. Please read the <ulink url="&url-powerpc-yaboot-faq;"
+>yaboot HOWTO</ulink
+> for more information. </para>
+   </sect2>
+ </sect1>
+
+
+<!-- Start of file boot-new/mount-encrypted.xml -->
+<!-- $Id: mount-encrypted.xml 56326 2008-10-06 23:03:54Z fjp $ -->
+
+ <sect1 id="mount-encrypted-volumes">
+ <title
+>Mounting encrypted volumes</title>
+
+<para
+>If you created encrypted volumes during the installation and assigned them mount points, you will be asked to enter the passphrase for each of these volumes during the boot. The actual procedure differs slightly between dm-crypt and loop-AES. </para>
+
+  <sect2 id="mount-dm-crypt">
+  <title
+>dm-crypt</title>
+
+<para
+>For partitions encrypted using dm-crypt you will be shown the following prompt during the boot: <informalexample
+><screen
+>
+Starting early crypto disks... <replaceable>part</replaceable>_crypt(starting)
+Enter LUKS passphrase:
+</screen
+></informalexample
+> In the first line of the prompt, <replaceable
+>part</replaceable
+> is the name of the underlying partition, e.g. sda2 or md0. You are now probably wondering <emphasis
+>for which volume</emphasis
+> you are actually entering the passphrase. Does it relate to your <filename
+>/home</filename
+>? Or to <filename
+>/var</filename
+>? Of course, if you have just one encrypted volume, this is easy and you can just enter the passphrase you used when setting up this volume. If you set up more than one encrypted volume during the installation, the notes you wrote down as the last step in <xref linkend="partman-crypto"/> come in handy. If you did not make a note of the mapping between <filename
+><replaceable
+>part</replaceable
+>_crypt</filename
+> and the mount points before, you can still find it in <filename
+>/etc/crypttab</filename
+> and <filename
+>/etc/fstab</filename
+> of your new system. </para
+><para
+>The prompt may look somewhat different when an encrypted root file system is mounted. This depends on which initramfs generator was used to generate the initrd used to boot the system. The example below is for an initrd generated using <classname
+>initramfs-tools</classname
+>: <informalexample
+><screen
+>Begin: Mounting <emphasis>root file system</emphasis>... ...
+Begin: Running /scripts/local-top ...
+Enter LUKS passphrase:
+</screen
+></informalexample>
+
+</para
+><para
+>No characters (even asterisks) will be shown while entering the passphrase. If you enter the wrong passphrase, you have two more tries to correct it. After the third try the boot process will skip this volume and continue to mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/> for further information. </para
+><para
+>After entering all passphrases the boot should continue as usual. </para>
+  </sect2>
+
+  <sect2 id="mount-loop-aes">
+  <title
+>loop-AES</title>
+
+<para
+>For partitions encrypted using loop-AES you will be shown the following prompt during the boot: <informalexample
+><screen
+>Checking loop-encrypted file systems.
+Setting up /dev/loop<replaceable>X</replaceable> (/<replaceable>mountpoint</replaceable>)
+Password:
+</screen
+></informalexample>
+
+</para
+><para
+>No characters (even asterisks) will be shown while entering the passphrase. If you enter the wrong passphrase, you have two more tries to correct it. After the third try the boot process will skip this volume and continue to mount the next filesystem. Please see <xref linkend="crypto-troubleshooting"/> for further information. </para
+><para
+>After entering all passphrases the boot should continue as usual. </para>
+  </sect2>
+
+  <sect2 id="crypto-troubleshooting">
+  <title
+>Troubleshooting</title>
+
+<para
+>If some of the encrypted volumes could not be mounted because a wrong passphrase was entered, you will have to mount them manually after the boot. There are several cases. </para>
+
+<itemizedlist>
+<listitem
+><para
+>The first case concerns the root partition. When it is not mounted correctly, the boot process will halt and you will have to reboot the computer to try again. </para
+></listitem>
+<listitem
+><para
+>The easiest case is for encrypted volumes holding data like <filename
+>/home</filename
+> or <filename
+>/srv</filename
+>. You can simply mount them manually after the boot. For loop-AES this is a one-step operation: <informalexample
+><screen
+>
+<prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+<prompt>Password:</prompt>
+</screen
+></informalexample
+> where <replaceable
+>/mount_point</replaceable
+> should be replaced by the particular directory (e.g. <filename
+>/home</filename
+>). The only difference from an ordinary mount is that you will be asked to enter the passphrase for this volume. </para
+><para
+>For dm-crypt this is a bit trickier. First you need to register the volumes with <application
+>device mapper</application
+> by running: <informalexample
+><screen
+>
+<prompt>#</prompt> <userinput>/etc/init.d/cryptdisks start</userinput>
+</screen
+></informalexample
+> This will scan all volumes mentioned in <filename
+>/etc/crypttab</filename
+> and will create appropriate devices under the <filename
+>/dev</filename
+> directory after entering the correct passphrases. (Already registered volumes will be skipped, so you can repeat this command several times without worrying.) After successful registration you can simply mount the volumes the usual way: <informalexample
+><screen
+><prompt>#</prompt> <userinput>mount <replaceable>/mount_point</replaceable></userinput>
+</screen
+></informalexample>
+
+</para
+></listitem>
+<listitem
+><para
+>If any volume holding noncritical system files could not be mounted (<filename
+>/usr</filename
+> or <filename
+>/var</filename
+>), the system should still boot and you should be able to mount the volumes manually like in the previous case. However, you will also need to (re)start any services usually running in your default runlevel because it is very likely that they were not started. The easiest way to achieve this is by switching to the first runlevel and back by entering <informalexample
+><screen
+>
+<prompt>#</prompt> <userinput>init 1</userinput>
+</screen
+></informalexample
+> at the shell prompt and pressing <keycombo
+> <keycap
+>Control</keycap
+> <keycap
+>D</keycap
+> </keycombo
+> when asked for the root password. </para
+></listitem>
+</itemizedlist>
+
+  </sect2>
+ </sect1>
+<!--   End of file boot-new/mount-encrypted.xml -->
+
+ <sect1 id="login">
+ <title
+>Log In</title>
+
+<para
+>Once your system boots, you'll be presented with the login prompt. Log in using the personal login and password you selected during the installation process. Your system is now ready for use. </para
+><para
+>If you are a new user, you may want to explore the documentation which is already installed on your system as you start to use it. There are currently several documentation systems, work is proceeding on integrating the different types of documentation. Here are a few starting points. </para
+><para
+>Documentation accompanying programs you have installed can be found in <filename
+>/usr/share/doc/</filename
+>, under a subdirectory named after the program (or, more precise, the Debian package that contains the program). However, more extensive documentation is often packaged separately in special documentation packages that are mostly not installed by default. For example, documentation about the package management tool <command
+>apt</command
+> can be found in the packages <classname
+>apt-doc</classname
+> or <classname
+>apt-howto</classname
+>. </para
+><para
+>In addition, there are some special folders within the <filename
+>/usr/share/doc/</filename
+> hierarchy. Linux HOWTOs are installed in <emphasis
+>.gz</emphasis
+> (compressed) format, in <filename
+>/usr/share/doc/HOWTO/en-txt/</filename
+>. After installing <classname
+>dhelp</classname
+>, you will find a browsable index of documentation in <filename
+>/usr/share/doc/HTML/index.html</filename
+>. </para
+><para
+>One easy way to view these documents using a text based browser is to enter the following commands: <informalexample
+><screen
+>
+$ cd /usr/share/doc/
+$ w3m .
+</screen
+></informalexample
+> The dot after the <command
+>w3m</command
+> command tells it to show the contents of the current directory. </para
+><para
+>If you have a graphical desktop environment installed, you can also use its web browser. Start the web browser from the application menu and enter <userinput
+>/usr/share/doc/</userinput
+> in the address bar. </para
+><para
+>You can also type <userinput
+>info <replaceable
+>command</replaceable
+></userinput
+> or <userinput
+>man <replaceable
+>command</replaceable
+></userinput
+> to see documentation on most commands available at the command prompt. Typing <userinput
+>help</userinput
+> will display help on shell commands. And typing a command followed by <userinput
+>--help</userinput
+> will usually display a short summary of the command's usage. If a command's results scroll past the top of the screen, type <userinput
+>|&nbsp;more</userinput
+> after the command to cause the results to pause before scrolling past the top of the screen. To see a list of all commands available which begin with a certain letter, type the letter and then two tabs. </para>
+
+ </sect1>
+</chapter>
+<!--   End of file boot-new/boot-new.xml -->
