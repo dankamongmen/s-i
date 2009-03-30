@@ -179,8 +179,12 @@ if [ "$RET" = true ]; then
 
 		if dmraid -c -s >/dev/null 2>&1; then
 			logger -t disk-detect "Serial ATA RAID disk(s) detected; enabling dmraid support"
-			# Activate devices
-			log-output -t disk-detect dmraid -ay
+			# Activate only those arrays which have all disks
+			# present.
+			for dev in $(dmraid -r -c); do
+				[ -e "$dev" ] || continue
+				log-output -t disk-detect dmraid-activate "$(basename "$dev")"
+			done
 		else
 			logger -t disk-detect "No Serial ATA RAID disks detected"
 		fi
