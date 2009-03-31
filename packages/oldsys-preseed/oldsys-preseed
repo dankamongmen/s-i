@@ -238,6 +238,7 @@ case "`archdetect`" in
 						var_add NAMESERVERS "$i"
 				done
 				HOSTNAME=$(grep "Server Name" $path/sda1/.config/uLinux.conf | sed 's/^.* //')
+				MAC=$(ip addr | grep '^[[:space:]]*link/ether' | head -n 1 | sed 's/.*ether \([^ ]*\).*/\1/')
 				unset_matching_var "HOSTNAME" NAS$(echo "$MAC" | sed 's/^..:..:..://' | sed 's/://g')
 			else
 				NET_CONFIG=dhcp
