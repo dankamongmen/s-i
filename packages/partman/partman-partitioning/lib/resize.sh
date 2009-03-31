@@ -170,6 +170,7 @@ ask_for_size () {
 perform_resizing () {
 	if [ "$virtual" = no ]; then
 		commit_changes partman-partitioning/new_size_commit_failed || exit 100
+		update_partition "$dev" "$oldid" || true
 	fi
 
 	disable_swap "$dev"
