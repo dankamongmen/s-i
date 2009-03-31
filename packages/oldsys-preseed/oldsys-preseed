@@ -112,7 +112,7 @@ case "`archdetect`" in
 			exit_unknown
 		fi
 	;;
-	arm*/orion5x)
+	arm*/orion5x | arm*/kirkwood)
 		machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
 		if echo "$machine" | grep -q "^Buffalo/Revogear Kurobox Pro"; then
 			check_file /proc/mtd
@@ -213,6 +213,7 @@ case "`archdetect`" in
 			umount $path/sda5 || true
 			rmdir $path/sda5 $path || true
 		elif echo "$machine" | grep -q "^QNAP TS-109/TS-209" ||
+		   echo "$machine" | grep -q "^QNAP TS-119/TS-219"; then
 		   echo "$machine" | grep -q "^QNAP TS-409"; then
 			path=/tmp/oldsys-preseed
 			mkdir -p $path/sda1
