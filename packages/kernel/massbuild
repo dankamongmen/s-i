@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
 
-# Copyright: Frans Pop <elendil@planet.nl>, 2007
+# Copyright: Frans Pop <elendil@planet.nl>, 2007, 2009
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 2 of the License, or (at your option)
@@ -335,7 +335,8 @@ retrieve_package() {
 	# "upstream" part of the version and the "Debian" revision.
 	if expr "$BDEP_SVERSION" : ".*-" >/dev/null; then
 		local sv_base=${BDEP_SVERSION%-*}
-		local sv_rev=${BDEP_SVERSION##*-}
+		local sv_rev=$(echo ${BDEP_SVERSION##*-} | sed 's/+/%2[Bb]/g')
+
 		local sv_regexp="_${sv_base}([^_]*)?-${sv_rev}_"
 	else
 		# Non-Debian style package version (custom built kernel?)
@@ -372,8 +373,8 @@ retrieve_package() {
 	package_list="$(wget -q $url -O - | \
 		   sed "s:</tr><:</tr>\n<:g" | \
 		   grep "$BDEP_BINARY_BASE.*\.deb" | \
-		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" |
-		   sed "s/%2B/+/")"
+		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" | \
+		   sed "s/+/%2B/g")"
 	if [ "$mirror_type" != incoming ] && [ -z "$package_list" ]; then
 		echo "Failed to retrieve available build dependencies"
 		clean_arch_tmp
