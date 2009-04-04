@@ -619,17 +619,14 @@ static void remove_newlines(char *text)
 				in+=2;
 				asis=0;
 			}
+			else if (*(in+1) == 0)
+				*out = 0;
 			else if (*(in+1) == ' ')
 				asis=1;
 			else if (asis)
 				asis=0;
 			else
-			{
-				if (*(in+1) != 0)
-					*out = ' ';
-				else
-					*out = 0;
-			}
+				*out = ' ';
 		}
 		out++;
 	}
