@@ -119,6 +119,9 @@ typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
 static void newt_progress_stop(struct frontend *obj);
 
+/* Result must be freed by the caller */
+static char *get_full_description(struct frontend *obj, struct question *q);
+
 #include "cdebconf_newt.h"
 
 /*  Padding of title width, allows for leading "[!!] " before title
@@ -275,15 +278,22 @@ cdebconf_newt_get_text_width(const char *text)
 static int
 min_window_height(struct frontend *obj, struct question *q, int win_width)
 {
+    // start with a blank or description (note and error)
+    // End with <Continue>/boolean buttons + blank
     int height = 3;
     char *type = q->template->type;
-    char *q_ext_text;
+    char *q_text;
 
-    q_ext_text = q_get_extended_description(obj, q);
-    if (q_ext_text != NULL)
-        height = cdebconf_newt_get_text_height(q_ext_text, win_width) + 1;
+    if (strcmp(q->template->type, "note") == 0 || strcmp(q->template->type, "error") == 0)
+        q_text = q_get_extended_description(obj, q);
+    else
+        q_text = get_full_description(obj, q);
+    if (q_text != NULL) {
+        height += cdebconf_newt_get_text_height(q_text, win_width) + 1;
+        free (q_text);
+    }
     if (strcmp(type, "multiselect") == 0 || strcmp(type, "select") == 0)
-        height += 4; // at least three lines for choices + blank line
+        height += 4; // x lines for choices + blank line
     else if (strcmp(type, "string") == 0 || strcmp(type, "password") == 0)
         height += 2; // input line + blank line
     // the others don't need more space
@@ -298,7 +308,8 @@ need_separate_window(struct frontend *obj, struct question *q)
 
     newtGetScreenSize(&width, &height);
     x = min_window_height(obj, q, width-7);
-    return (x >= height-5);
+    return (x > height-5);
+    // 5: blue border + title + bottom frame + shadow + menu
 }
 
 static char *
