@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56827 untranslated -->
+<!-- original version: 58146 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -480,11 +480,12 @@ for you.
 
 </para><para>
 
-The <literal>auto</literal> boot label is not yet defined on all
-architectures. The same effect may be achieved by simply adding the two
+The <literal>auto</literal> boot label is not yet defined everywhere.
+The same effect may be achieved by simply adding the two
 parameters <literal>auto=true priority=critical</literal> to the kernel
 command line.  The <literal>auto</literal> parameter is an alias for
-<literal>auto-install/enable</literal> and controls the delay of the
+<literal>auto-install/enable</literal> and setting it to
+<literal>true</literal> delays the
 locale and keyboard questions until after there has been a chance to
 preseed them, while <literal>priority</literal> is an alias for
 <literal>debconf/priority</literal> and setting it to
@@ -515,6 +516,9 @@ nice effects that can be achieved by creative use of preconfiguration.
 <para>
 
 The following aliases can be useful when using (auto mode) preseeding.
+Note that these are simply short aliases for question names, and you
+always need to specify a value as well: for example,
+<literal>auto=true</literal> or <literal>interface=eth0</literal>.
 
 </para>
 
@@ -856,6 +860,20 @@ that no gateway should be used.
 
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>Network console</title>
+
+<informalexample role="example"><screen>
+# Use the following settings if you wish to make use of the network-console
+# component for remote installation over SSH. This only makes sense if you
+# intend to perform the remainder of the installation manually.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Mirror settings</title>
 <para>
@@ -1030,7 +1048,7 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 #d-i partman-auto/method string raid
 # Specify the disks to be partitioned. They will all get the same layout,
 # so this will only work if the disks are the same size.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # Next you need to specify the physical partitions that will be used. 
 #d-i partman-auto/expert_recipe string \
@@ -1053,14 +1071,14 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 #          &lt;devices&gt; &lt;sparedevices&gt;
 # RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
 
 # This makes partman automatically partition without confirmation.
@@ -1393,7 +1411,13 @@ installation.
 # This first command is run as early as possible, just after
 # preseeding is read.
 #d-i preseed/early_command string anna-install some-udeb
-
+<phrase condition="squeeze">
+# This command is run immediately before the partitioner starts. It may be
+# useful to apply dynamic partitioner preseeding that depends on the state
+# of the disks (which may not be visible when preseed/early_command runs).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 # This command is run just before the install finishes, but when there is
 # still a usable /target directory. You can chroot to /target and use it
 # directly, or use the apt-install and in-target commands to easily install
@@ -1424,9 +1448,17 @@ preconfiguration file.
 
 </para><para>
 
+Note that the <quote>d-i</quote> owner should only be used for variables
+used in the installer itself. For variables belonging to packages installed
+on the target system, you should use the name of that package instead. See
+the footnote to <xref linkend="preseed-bootparms"/>.
+
+</para><para>
+
 If you are preseeding using boot parameters, you can make the installer ask
 the corresponding question by using the <quote>?=</quote> operator, i.e.
-<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>.
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput>
+(or <userinput><replaceable>owner</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>value</replaceable></userinput>).
 This will of course only have effect for parameters that correspond to
 questions that are actually displayed during an installation and not for
 <quote>internal</quote> parameters.
