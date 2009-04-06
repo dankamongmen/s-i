@@ -8,7 +8,7 @@ NSIS_CC		:= i586-mingw32msvc-gcc -Os
 NSIS_STRIP	:= i586-mingw32msvc-strip
 NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500 -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
 
-MAKENSIS	:= makensis
+MAKENSIS	:= makensis -O/dev/null
 ifdef NETWORK_BASE_URL
 MAKENSIS	+= -DNETWORK_BASE_URL=$(NETWORK_BASE_URL)
 endif
