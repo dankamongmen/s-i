@@ -9,7 +9,7 @@
 LANGUAGE_LIST=lang2dict.txt
 COMMON_WL=./wls/di_common_wl.txt
 
-for LANGUAGE in `cat ${LANGUAGE_LIST} | sed "s:\(^#.*\)::"`; do
+for LANGUAGE in $(grep -v "^[[:space:]]*#" ${LANGUAGE_LIST}); do
     LANG=`echo  ${LANGUAGE} | awk -F, '{print $1}'`
     DICT=`echo  ${LANGUAGE} | awk -F, '{print $2}'`
     
