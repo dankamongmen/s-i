@@ -66,11 +66,15 @@ $p->parse_file($xmlfile);
 sub start_rtn {
 	my ($tagname, $text, $attr) = @_;
 	print STDERR "\nStart: $tagname\n" if $opt_d;
-	if ( $tagname =~ /appendix|sect1|sect2|sect3|para/ ) {
+
+	if ( $tagname =~ /appendix|sect1|sect2|sect3|para|informalexample|phrase/ ) {
 		$tagstatus{$tagname}{'count'} += 1;
 		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
 
 		if ( ! exists $ignore{'tag'} ) {
+			# FIXME: this ignores that 'contition' is used for many
+			# other things than the release; should be OK in practice
+			# for the preseed appendix though.
 			if ( exists $attr->{condition} ) {
 				print STDERR "Condition: $attr->{condition}\n" if $opt_d;
 				if ( $attr->{condition} ne $release ) {
@@ -89,6 +93,7 @@ sub start_rtn {
 			}
 		}
 	}
+
 	# Assumes that <title> is the first tag after a section tag
 	if ( $prevtag =~ /sect1|sect2|sect3/ ) {
 		$settitle = ( $tagname eq 'title' );
@@ -147,24 +152,32 @@ sub text_rtn {
 sub end_rtn {
 	my ($tagname) = @_;
 	print STDERR "\nEnd: $tagname\n" if $opt_d;
+
+	# Set of tags must match what's in start_rtn
+	if ( $tagname =~ /appendix|sect1|sect2|sect3|para|informalexample|phrase/ ) {
+		my $ts = $tagstatus{$tagname}{'count'};
+		$tagstatus{$tagname}{'count'} -= 1;
+		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
+		die "Invalid XML file: negative count for tag <$tagname>!" if $tagstatus{$tagname}{'count'} < 0;
+
+		if ( exists $ignore{'tag'} ) {
+			if ( $ignore{'tag'} eq $tagname && $ignore{'depth'} == $ts ) {
+				delete $ignore{'tag'};
+			}
+			return
+		}
+	}
+
 	if ( $tagname eq 'informalexample' ) {
 		$example{'print'} = 0;
 	}
+
 	if ( $tagname =~ /appendix|sect1|sect2|sect3|para/ ) {
 		delete $tagstatus{$tagname}{'title'} if exists $tagstatus{$tagname}{'title'};
-
-		if ( exists $ignore{'tag'} ) {
-			if ( $ignore{'tag'} eq $tagname && $ignore{'depth'} == $tagstatus{$tagname}{'count'} ) {
-				delete $ignore{'tag'};
-			}
-		}
 
 		if ( $example{'in_sect'} ) {
 			print "\n";
 			$example{'in_sect'} = 0;
 		}
-		$tagstatus{$tagname}{'count'} -= 1;
-		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
-		die "Invalid XML file: negative count for tag <$tagname>!" if $tagstatus{$tagname}{'count'} < 0;
 	}
 }
