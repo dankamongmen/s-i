@@ -43,11 +43,11 @@ END
 	exit 0;
 }
 
-die "Must specify release for which to generate example." if ! $opt_r;
+die "Must specify release for which to generate example.\n" if ! $opt_r;
 
 my $xmlfile = shift;
-die "Must specify XML file to parse!" if ! $xmlfile;
-die "Specified XML file \"$xmlfile\" not found." if ! -f $xmlfile;
+die "Must specify XML file to parse!\n" if ! $xmlfile;
+die "Specified XML file \"$xmlfile\" not found.\n" if ! -f $xmlfile;
 
 my $arch = $opt_a ? "$opt_a" : "i386";
 my $release = $opt_r;
@@ -61,6 +61,23 @@ $p = HTML::Parser->new(
 
 # Start parsing the specified file
 $p->parse_file($xmlfile);
+
+# Replace entities in examples
+# FIXME: should maybe be extracted from entity definition
+sub replace_entities {
+	my ($text) = @_;
+
+	$text =~ s/&archive-mirror;/http.us.debian.org/;
+	$text =~ s/&releasename;/$release/;
+
+	# Any unrecognized entities?
+	if ( $text =~ /&[^ ]+;/ ) {
+		my ($ent) = $text =~ m/.*(&[^ ]+;).*/;
+		die "Error: unrecognized entity '$ent'\n"
+	}
+
+	return $text;
+}
 
 # Execute when start tag is encountered
 sub start_rtn {
@@ -116,6 +133,8 @@ sub text_rtn {
 		# Clean leading and trailing whitespace for titles
 		$text =~ s/^[[:space:]]*//;
 		$text =~ s/[[:space:]]*$//;
+
+		$text = replace_entities($text);
 		$tagstatus{$titletag}{'title'} = $text;
 		$settitle = 0;
 	}
@@ -136,10 +155,7 @@ sub text_rtn {
 			$text =~ s/^[[:space:]]*//;
 		}
 
-		# Replace entities in examples
-		# FIXME: should maybe be extracted from entity definition
-		$text =~ s/&archive-mirror;/http.us.debian.org/;
-
+		$text = replace_entities($text);
 		print "$text";
 
 		$example{'first'} = 0;
@@ -158,7 +174,7 @@ sub end_rtn {
 		my $ts = $tagstatus{$tagname}{'count'};
 		$tagstatus{$tagname}{'count'} -= 1;
 		print STDERR "$tagname  $tagstatus{$tagname}{'count'}\n" if $opt_d;
-		die "Invalid XML file: negative count for tag <$tagname>!" if $tagstatus{$tagname}{'count'} < 0;
+		die "Invalid XML file: negative count for tag <$tagname>!\n" if $tagstatus{$tagname}{'count'} < 0;
 
 		if ( exists $ignore{'tag'} ) {
 			if ( $ignore{'tag'} eq $tagname && $ignore{'depth'} == $ts ) {
