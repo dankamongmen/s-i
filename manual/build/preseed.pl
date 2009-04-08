@@ -65,7 +65,7 @@ $p->parse_file($xmlfile);
 # Replace entities in examples
 # FIXME: should maybe be extracted from entity definition
 sub replace_entities {
-	my ($text) = @_;
+	my ($text) = shift;
 
 	$text =~ s/&archive-mirror;/http.us.debian.org/;
 	$text =~ s/&releasename;/$release/;
