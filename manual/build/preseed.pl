@@ -129,6 +129,7 @@ sub start_rtn {
 # Execute when text is encountered
 sub text_rtn {
 	my ($text) = @_;
+
 	if ( $settitle ) {
 		# Clean leading and trailing whitespace for titles
 		$text =~ s/^[[:space:]]*//;
@@ -138,7 +139,8 @@ sub text_rtn {
 		$tagstatus{$titletag}{'title'} = $text;
 		$settitle = 0;
 	}
-	if ( $example{'print'} ) {
+
+	if ( $example{'print'} && ! exists $ignore{'tag'} ) {
 		# Print section headers
 		for ($s=1; $s<=3; $s++) {
 			my $sect="sect$s";
