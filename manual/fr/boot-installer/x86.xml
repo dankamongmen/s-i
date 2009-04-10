@@ -1,4 +1,4 @@
-<!-- original version: 56419 -->
+<!-- original version:  58178 -->
 
   <sect2 arch="x86"><title>Amorcer depuis un cédérom</title>
 
@@ -151,7 +151,7 @@ Toutefois cette opération demande un grand soin.
 <para>
 Si vous voulez préserver une partition de ce disque, vous pouvez
 télécharger le fichier <filename>hd-media/initrd.gz</filename> et le noyau
-correspondant&nbsp;; copiez aussi une image CD sur le disque (assurez-vous
+correspondant&nbsp;; copiez aussi une image CD ou DVD sur le disque (assurez-vous
 que le nom de cette image finit en <literal>.iso</literal>). L'installateur
 peut alors se lancer à partir du disque dur et s'installer à partir de cette
 image, sans avoir besoin du réseau.
@@ -196,21 +196,19 @@ Pour plus de précisions, référez-vous aux pages de manuel de
 <para>
 La procédure pour <command>GRUB</command> est relativement similaire.
 Cherchez le fichier <filename>menu.lst</filename> dans le répertoire
-<filename>/boot/grub/</filename> (parfois dans
-<filename>/boot/boot/grub/</filename>), ajoutez les lignes suivantes&nbsp;:
+<filename>/boot/grub/</filename> (parfois <filename>/boot/boot/grub/</filename>),
+et ajoutez une entrée pour l'installateur, par exemple en supposant que
+<filename>/boot</filename> soit sur la premiere partition du premier disque du système&nbsp;:
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz
-initrd (hd0,0)/boot/newinstall/initrd.gz
+root   (hd0,0)
+kernel /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
 </screen></informalexample>
 
-et redémarrez.
 </para>
 <para>
-Il sera peut-être nécessaire d'augmenter 
-le paramètre <userinput>ramdisk_size</userinput>, selon l'image que vous
-démarrez.
 À partir de maintenant, il ne devrait plus y avoir de différences
 entre <command>GRUB</command> et <command>LILO</command>.
 </para>
