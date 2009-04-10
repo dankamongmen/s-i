@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 56827 -->
+<!-- original version: 58146 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -519,8 +519,8 @@ konfliktům v jmenném prostoru (a případně vám přidali kratší alias).
 
 </para><para>
 
-Příkaz <literal>auto</literal> zatím není definován na všech
-architekturách. Stejného výsledku však můžete dosáhnout přidáním dvou
+Příkaz <literal>auto</literal> zatím není definován všude. Stejného
+výsledku však můžete dosáhnout přidáním dvou
 parametrů <literal>auto=true priority=critical</literal> k parametrům
 jádra. Parametr <literal>auto</literal> je vlastně alias pro
 <literal>auto-install/enable</literal> a potlačuje zobrazení otázek
@@ -553,7 +553,9 @@ kreativního použití přednastavení.
 <para>
 
 Při použití (automatického) přednastavení se mohou hodit následující
-aliasy.
+aliasy. Poznamenejme, že aliasy zkracují pouze jméno otázky. Vždy je
+třeba přidat ještě hodnotu, například <literal>auto=true</literal>
+nebo <literal>interface=eth0</literal>.
 
 </para>
 
@@ -897,6 +899,21 @@ což znamená, že se brána nemá použít vůbec.
 </para>
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>Síťová konzole</title>
+
+<informalexample role="example"><screen>
+# Následující nastavení se hodí v situacích, kdy chcete instalovat
+# vzdáleně přes SSH pomocí komponenty network-console.
+# Toto přednastavení má smysl pouze pokud plánujete dokončit
+# instalaci ručně.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Nastavení zrcadla</title>
 <para>
@@ -1071,7 +1088,7 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 #d-i partman-auto/method string raid
 # Zadejte disky k rozdělení. Na všech bude nakonec stejné rozložení,
 # takže to bude fungovat pouze pokud mají disky stejnou velikost.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # Dále musíte zadat fyzické oblasti, které se mají použít.
 #d-i partman-auto/expert_recipe string \
@@ -1095,14 +1112,14 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 # Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10; zařízení jsou oddělena
 # pomocí "#"
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
 
 # Toto zajistí, že se partman nebude při rozdělování ptát na potvrzení.
@@ -1488,7 +1505,14 @@ instalace.
 
 # První příkaz je spuštěn co nejdříve - hned po načtení přednastavení.
 #d-i preseed/early_command string anna-install nejaky-udeb
-
+<phrase condition="squeeze">
+# Tento příkaz je spuštěn těsně před vstupem do dělení disků. Může se
+# hodit pro dynamické přednastavení rozdělení disku, které závisí na
+# aktuálním stavu disků (které ještě nemusí být vidět v době spuštění
+# předchozího příkazu preseed/early_command).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
+</phrase>
 # Tento příkaz je spuštěn těsně před koncem instalace, ale ještě je
 # připojen adresář /target. Buď můžete použít chroot na /target
 # a pracovat přímo v něm, nebo můžete použít příkaz apt-install
@@ -1523,9 +1547,18 @@ testování a ladění konfiguračního souboru s přednastavením.
 
 </para><para>
 
+Zopakujme, že vlastník <quote>d-i</quote> by se měl používat pouze pro
+proměnné používané samotným instalačním systémem. Pro proměnné
+nacházející se v instalovaných balících byste měli jako vlastníka
+použít jméno příslušného balíku (viz poznámka pod čarou u
+<xref linkend="preseed-bootparms"/>).
+
+</para><para>
+
 Přednastavujete-li pomocí zaváděcích parametrů, můžete použít
 speciální operátor <quote>?=</quote>, kterým instalátor donutíte, aby
-danou otázku zobrazil. Například <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>hodnota</replaceable></userinput>.
+danou otázku zobrazil. Například <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>hodnota</replaceable></userinput>
+(nebo <userinput><replaceable>vlastník</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>hodnota</replaceable></userinput>).
 To samozřejmě funguje jen u parametrů, kterým odpovídá nějaká otázka
 zobrazená během instalace, tj. nefunguje to pro <quote>interní</quote>
 parametry.
