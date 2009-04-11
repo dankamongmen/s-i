@@ -1196,7 +1196,15 @@ xkb != "" && /^[ \t]*\"[^"]+\"[ \t]*$/ {
     sub("^[ \t]*\"", "");
     sub("\".*", "");
     gsub("[ \t]", "");
-    print xkb "=\"" $0 "\"";
+    if ($1 !~ /[()]/) {
+	print xkb "=\"" $0 "\"";
+    } else {
+	if (xkb == "XKBLAYOUT" && $1 ~ /^[^()]+\([^()]+\)$/) {
+	    split($1, s, /[()]/);
+	    print "XKBLAYOUT=" s[1];
+	    print "XKBVARIANT=" s[2];
+	}
+    }
 }
 '
     eval $(awk "$awk_expr" < /etc/X11/xorg.conf)

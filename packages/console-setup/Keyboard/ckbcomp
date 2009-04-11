@@ -3613,8 +3613,13 @@ sub print_vector {
 		if ($vector[$mask] ne 'NoSymbol') {
 		    $KEYMAP .= "$modifier_combinations[$mask]"
 			." keycode $kernel_code = $vector[$mask]\n";
-		    $KEYMAP .= "ctrll $modifier_combinations[$mask]"
-			." keycode $kernel_code = $capsvector[$mask]\n";
+		    if ($modifier_combinations[$mask] =~ /plain/) {
+			$KEYMAP .= "ctrll"
+			    ." keycode $kernel_code = $capsvector[$mask]\n";
+		    } else {
+			$KEYMAP .= "ctrll $modifier_combinations[$mask]"
+			    ." keycode $kernel_code = $capsvector[$mask]\n";
+		    }
 		}
 	    }
 	}
