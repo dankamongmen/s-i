@@ -71,9 +71,8 @@ sub replace_entities {
 	$text =~ s/&releasename;/$release/;
 
 	# Any unrecognized entities?
-	if ( $text =~ /&[^ ]+;/ ) {
-		my ($ent) = $text =~ m/.*(&[^ ]+;).*/;
-		die "Error: unrecognized entity '$ent'\n"
+	if ( $text =~ /(&[^ ]+;)/ ) {
+		die "Error: unrecognized entity '$1'\n"
 	}
 
 	return $text;
