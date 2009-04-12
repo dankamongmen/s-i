@@ -79,7 +79,7 @@ if [ ${BRAND_NEW} -ne 1 ] ; then
 	for TO_DIFF in ${LALL} ${LUWL} ${LVAR} ${LSPC}; do
 	    if [ -f ${OLD_PATH}/${TO_DIFF} -o -f ${NEW_PATH}/${TO_DIFF} ] ; then
 		
-		diff -u0 -N \
+		diff -U 0 -N \
 		    --label old ${OLD_PATH}/${TO_DIFF} \
 		    --label new ${NEW_PATH}/${TO_DIFF} > \
 		    ${NEW_PATH}/${TO_DIFF/.txt/.diff}
