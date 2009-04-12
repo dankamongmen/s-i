@@ -3540,7 +3540,7 @@ sub flatten {
 	    $vector[$coord + 1] = 'Show_Memory';
 	    $vector[$coord + 2] = 'Show_Registers';
 	    $vector[$coord + 4] = 'Show_State';
-	    $vector[$coord + 8] = $mainsym; # or better 'Show_Registers' ?
+	    $vector[$coord + 8] = 'Show_Registers';
 	} elsif ($mainsym =~ /^KP_([0-9])$/) {
 	    my $num = $1;
 	    $vector[$coord + 2] = 'Hex_'. $num;
@@ -3572,6 +3572,8 @@ sub flatten {
 	    $vector[$coord + 8] = 'Decr_Console';
 	} elsif ($mainsym eq 'Right') {
 	    $vector[$coord + 8] = 'Incr_Console';
+	} elsif ($mainsym eq 'Up') {
+	    $vector[$coord + 8] = 'KeyboardSignal';
 	}
     }
     return @vector;
