@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 57261 -->
+<!-- original version: 58146 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -502,12 +502,13 @@ vermeiden können und vielleicht einen Alias dafür hinzufügen.
 
 </para><para>
 
-Das <literal>auto</literal>-Boot-Label ist noch nicht auf allen
-Architekturen definiert. Der selbe Effekt wird erreicht, indem die beiden
+Das <literal>auto</literal>-Boot-Label ist noch nicht überall
+definiert. Der gleiche Effekt kann auch erreicht werden, indem die beiden
 Parameter <literal>auto=true priority=critical</literal> zur
 Kernel-Kommandozeile hinzugefügt werden. Der Parameter <literal>auto</literal>
-ist ein Alias für <literal>auto-install/enable</literal> und kontrolliert den
-Aufschub der Fragen über Locale und Tastatur, bis eine Chance besteht,
+ist ein Alias für <literal>auto-install/enable</literal> und wenn er auf
+<literal>true</literal> gesetzt ist, werden die
+Fragen über Locale und Tastatur so weit zurückgestellt, bis eine Chance besteht,
 sie per Voreinstellung zu setzen. <literal>priority</literal> ist ein
 Alias für <literal>debconf/priority</literal>, und wenn er auf
 <literal>critical</literal> gesetzt wird, unterdrückt das alle Fragen mit
@@ -538,7 +539,10 @@ werden können.
 <para>
 
 Die folgenden Aliase könnten nützlich sein, wenn Sie Voreinstellung
-(Auto-Modus) benutzen.
+(im Auto-Modus) benutzen. Beachten Sie, dass dies einfach nur kurze
+Alias-Namen für Fragen-Namen sind und dass Sie immer auch einen Wert
+angeben müssen, zum Beispiel <literal>auto=true</literal> oder
+<literal>interface=eth0</literal>.
 
 </para>
 
@@ -1119,7 +1123,7 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 # Geben Sie die Festplatten an, die partitioniert werden sollen. Sie bekommen
 # alle das gleiche Layout, dies wird also nur funktionieren, wenn alle
 # Festplatten die gleiche Größe haben.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # Als nächstes müssen Sie die zu nutzenden physikalischen Partitionen einrichten.
 #d-i partman-auto/expert_recipe string \
@@ -1143,14 +1147,14 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 # RAID-Level 0, 1, 5, 6 und 10 werden unterstützt; mehrere Geräte werden durch 
 # "#" getrennt.
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
 
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.

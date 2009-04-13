@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56419 -->
+<!-- original version: 58178 -->
 
   <sect2 arch="x86"><title>Von einer CD-ROM starten</title>
 
@@ -160,10 +160,10 @@ sollten Sie dies mit Vorsicht genießen.
 
 Alternativ dazu, wenn Sie vorhaben, eine existierende Partition der Festplatte
 unverändert zu lassen, können Sie <filename>hd-media/initrd.gz</filename> und
-den dazugehörigen Kernel herunterladen oder aber ein
-CD-<quote>iso</quote>-Image auf die Platte kopieren (stellen Sie sicher, dass
+den dazugehörigen Kernel herunterladen und ein CD- oder
+DVD-<quote>iso</quote>-Image auf die Platte kopieren (stellen Sie sicher, dass
 der Name des CD-Images auf <literal>.iso</literal> endet). Der Installer kann
-dann von der Festplatte booten und Debian von der CD installieren, ohne dabei
+dann von der Festplatte booten und Debian von der CD/DVD installieren, ohne dabei
 eine Netzwerkverbindung zu benötigen.
 
 </para><para>
@@ -206,20 +206,20 @@ Mehr Details finden Sie in den Handbuchseiten von
 Für <command>grub</command> ist die Vorgehensweise ähnlich. Suchen Sie
 die Datei <filename>menu.lst</filename> im Verzeichnis
 <filename>/boot/grub/</filename> (manchmal auch in
-<filename>/boot/boot/grub/</filename>) und fügen Sie die folgenden Zeilen ein:
+<filename>/boot/boot/grub/</filename>) und fügen Sie einen Eintrag für den
+Installer hinzu, zum Beispiel wie folgt (hierbei gehen wir davon aus, dass
+<filename>/boot</filename> auf der ersten Partition der ersten Festplatte
+im System liegt):
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz
-initrd (hd0,0)/boot/newinstall/initrd.gz
+root   (hd0,0)
+kernel /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
 </screen></informalexample>
-
-Starten Sie danach den Rechner neu.
 
 </para><para>
 
-Beachten Sie, dass der Wert für <userinput>ramdisk_size</userinput>
-unter Umständen an die Größe des initrd-Images angepasst werden muss.
 Ab hier sollte es keinen Unterschied mehr geben zwischen
 <command>grub</command> und <command>lilo</command>.
 
