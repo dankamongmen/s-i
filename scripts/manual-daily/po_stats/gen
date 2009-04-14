@@ -50,22 +50,9 @@ TEMPFILE="/tmp/.gen-stats-temp-$RANDOM"
 LANG=C
 
 #some functions:
-translated () {  #how many are translated?
-	$GETTEXT/msgfmt --statistics $1 2>&1  | sed -e 's/, /§/g' | \
-		./rmnl 2 | sed -e 's/\.//g' | grep " translated" | \
-		sed -e 's/ .*$//g'
-}
-
-fuzzy() {  #how many fuzzy?
-	$GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g' | \
-		./rmnl 2 | sed -e 's/\.//g' | grep " fuzzy" | \
-		sed -e 's/ .*$//g'
-}
-
-untranslated () {  #guess, what does this do?
-	$GETTEXT/msgfmt --statistics $1 2>&1 | sed -e 's/, /§/g' | \
-		./rmnl 2 | sed -e 's/\.//g' | grep " untranslated" | \
-		sed -e 's/ .*$//g'
+get_stat () { # how many strings are translated/untranslated/fuzzy
+	$GETTEXT/msgfmt --statistics $1 2>&1 | tr "," "\n" | \
+		grep " $2" | sed -r "s/ *([0-9]+) $2.*/\1/"
 }
 
 translator () { #who is last-translator?
@@ -94,7 +81,7 @@ LANG=C
 
 POT_LIST=`ls -1 $PO_DIR/pot/`
 for file in $POT_LIST; do
-	U=`untranslated $PO_DIR/pot/$file`
+	U=`get_stat $PO_DIR/pot/$file untranslated`
 	echo "$file has $U untranslated. ($TOTALU)"
 
 	TOTALU=`expr $TOTALU + $U || echo 0`
@@ -143,9 +130,9 @@ for lang in `ls -1 $PO_DIR | grep -v "pot"`; do #run for every language
 			LASTT=`translator $file`
 
 			#strings of this package:
-			U=`untranslated $file`
-			F=`fuzzy $file`
-			T=`translated $file`
+			U=`get_stat $file untranslated`
+			F=`get_stat $file fuzzy`
+			T=`get_stat $file translated`
 			test -z "$U" && U=0
 			test -z "$F" && F=0
 			test -z "$T" && T=0
@@ -169,7 +156,7 @@ for lang in `ls -1 $PO_DIR | grep -v "pot"`; do #run for every language
 			fi
 
 		else #=if not existing
-			MISSING_U=`untranslated $PO_DIR/pot/$f`
+			MISSING_U=`get_stat $PO_DIR/pot/$f untranslated`
 			test -z $MISSING_U && MISSING_U=0
 			MISSING="$MISSING  $fileprt: "$MISSING_U"u\n"
 			#echo "  !!$path/$lang.po"
