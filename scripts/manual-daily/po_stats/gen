@@ -55,13 +55,14 @@ get_stat () { # how many strings are translated/untranslated/fuzzy
 		sed -nr "/ $2/ {s/ *([0-9]+) $2.*/\1/; p}"
 }
 
-translator () { #who is last-translator?
-  grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | sed -e 's/ <.*$//g'
+translator () { # who is last-translator?
+	grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | \
+		sed -e 's/ <.*$//g'
 }
 
 print_shit () { # print standard-text
-echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
-date -u  >> $TARGET_DIR/$lang.txt
+	echo -n "Files fetched and report generated on: " >> $TARGET_DIR/$lang.txt
+	date -u  >> $TARGET_DIR/$lang.txt
 }
 
 #########################################################################
@@ -113,7 +114,12 @@ for lang in `ls -1 $PO_DIR | grep -v "pot"`; do #run for every language
 		continue
 	fi
 
-	echo -e "Statistics of Installation Guide translation for $NAME\nSee: http://d-i.alioth.debian.org/manual/\n\nOutdated:" >  $TARGET_DIR/$lang.txt
+	cat <<EOF > $TARGET_DIR/$lang.txt
+Statistics of Installation Guide translation for $NAME
+See: http://d-i.alioth.debian.org/manual/
+
+Outdated:
+EOF
 	MISSING=""
 
 	#for total strings of a language
