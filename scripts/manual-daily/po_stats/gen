@@ -52,7 +52,7 @@ LANG=C
 #some functions:
 get_stat () { # how many strings are translated/untranslated/fuzzy
 	$GETTEXT/msgfmt --statistics $1 2>&1 | tr "," "\n" | \
-		grep " $2" | sed -r "s/ *([0-9]+) $2.*/\1/"
+		sed -nr "/ $2/ {s/ *([0-9]+) $2.*/\1/; p}"
 }
 
 translator () { #who is last-translator?
