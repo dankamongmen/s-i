@@ -56,8 +56,7 @@ get_stat () { # how many strings are translated/untranslated/fuzzy
 }
 
 translator () { # who is last-translator?
-	grep "Last-Translator: " $1 | sed -e 's/"Last-Translator: //g' | \
-		sed -e 's/ <.*$//g'
+	sed -rn "/Last-Translator: / {s/[^:]*: +(.*)\\\n.*/\1/; p}" $1
 }
 
 print_shit () { # print standard-text
