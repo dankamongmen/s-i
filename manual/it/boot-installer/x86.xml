@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56419 -->
+<!-- original version: 58178 -->
 
   <sect2 arch="x86">
   <!-- <title>Booting from a CD-ROM</title> -->
@@ -236,15 +236,15 @@ essere fatta con molta attenzione.
 Alternatively, if you intend to keep an existing partition on the hard
 drive unchanged during the install, you can download the
 <filename>hd-media/initrd.gz</filename> file and its kernel, as well as
-copy a CD iso to the drive (make sure the file is named ending in
+copy a CD (or DVD) iso to the drive (make sure the file is named ending in
 <literal>.iso</literal>). The installer can then boot from the drive
 and install from the CD image, without needing the network.
 -->
 
 In alternativa, se si vuole lasciare intatta una partizione già esistente
 sul disco, si può scaricare il file <filename>hd-media/initrd.gz</filename>
-e il relativo kernel e copiare un'immagine iso di un CD sul disco
-(assicurandosi che il nome termini in <literal>.iso</literal>).
+e il relativo kernel e copiare un'immagine iso di un CD (o di un DVD) sul
+disco (assicurandosi che il nome termini in <literal>.iso</literal>).
 In questo modo l'installatore si avvia dal disco e l'installazione avviene
 usando l'immagine del CD senza la necessità della rete.
 
@@ -316,38 +316,32 @@ Per maggiori dettagli si consultino le pagine di manuale di
 <!--
 The procedure for <command>GRUB</command> is quite similar. Locate your
 <filename>menu.lst</filename> in the <filename>/boot/grub/</filename>
-directory (sometimes in the <filename>/boot/boot/grub/</filename>),
-add the following lines:
+directory (or sometimes <filename>/boot/boot/grub/</filename>) and add an
+entry for the installer, for example (assuming <filename>/boot</filename>
+is on the first partition of the first disk in the system):
 -->
 
 La procedura per usare <command>GRUB</command> è abbastanza simile.
 Trovare il file <filename>menu.lst</filename> nella directory
 <filename>/boot/grub/</filename> (oppure in
-<filename>/boot/boot/grub/</filename>), aggiungere queste righe:
+<filename>/boot/boot/grub/</filename>) e aggiungere una voce per
+l'Installatore, per esempio (supponendo che <filename>/boot</filename>
+sia sulla prima partizione del primo disco del sistema):
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz
-initrd (hd0,0)/boot/newinstall/initrd.gz
+root   (hd0,0)
+kernel /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
 </screen></informalexample>
-
-<!--
-and reboot.
--->
-
-e riavviare.
 
 </para><para>
 
 <!--
-Note that the value of the <userinput>ramdisk_size</userinput> may need to be
-adjusted for the size of the initrd image.
 From here on, there should be no difference between <command>GRUB</command>
 or <command>LILO</command>.
 -->
 
-Notare che potrebbe essere necessario modificare il valore di
-<userinput>ramdisk_size</userinput> alla dimensione dell'immagine initrd.
 D'ora in poi non ci sono differenze fra <command>GRUB</command> e
 <command>LILO</command>.
 

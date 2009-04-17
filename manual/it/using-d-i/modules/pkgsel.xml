@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56511 -->
+<!-- original version: 58142 -->
 
    <sect3 id="pkgsel">
    <!-- <title>Selecting and Installing Software</title> -->
@@ -85,20 +85,19 @@ deselect them. You can even opt to install no tasks at all at this point.
 Alcuni task possono essere preselezionati dal sistema
 d'installazione in base alle caratteristiche del computer su cui si sta
 facendo l'installazione, se i task preselezionati non fossero di proprio
-piacimento è possibile deselezionarli. A questo punto dell'installazione
+gradimento è possibile deselezionarli. A questo punto dell'installazione
 è possibile anche non installare alcun task.
 
 </para>
 <note><para>
 
-<!-- TODO: Explain the "Standard system" task first -->
 <!--
-Unless you are using the special KDE or Xfce CDs, the <quote>Desktop
+Unless you are using the special KDE or Xfce/LXDE CDs, the <quote>Desktop
 environment</quote> task will install the GNOME desktop environment.
 -->
 
 Il task <quote>Ambiente Desktop</quote> installa l'ambiente desktop GNOME,
-a meno che non si utilizzino dei CD speciali per KDE o Xfce.
+a meno che non si utilizzino dei CD speciali per KDE o Xfce/LXDE.
 
 </para><para>
 
@@ -108,8 +107,9 @@ the installation. However, it <emphasis>is</emphasis> possible to get &d-i;
 to install a KDE desktop environment instead of GNOME by using preseeding
 (see <xref linkend="preseed-pkgsel"/>) or by adding the parameter
 <literal>desktop=kde</literal> at the boot prompt when starting the
-installer. Alternatively the more lightweight Xfce desktop environment can
-be selected by using <literal>desktop=xfce</literal>.
+installer. Alternatively the more lightweight Xfce and LXDE desktop
+environments can be selected by using <literal>desktop=xfce</literal> or
+<literal>desktop=lxde</literal>.
 -->
 
 Durante l'installazione interattiva non è possibile scegliere un
@@ -117,27 +117,45 @@ ambiente desktop diverso. Però <emphasis>è</emphasis> possibile forzare
 &d-i; a installare l'ambiente desktop KDE al posto di GNOME tramite la
 preconfigurazione (si veda <xref linkend="preseed-pkgsel"/>) oppure
 specificando <literal>desktop=kde"</literal> al prompt boot all'avvio
-dell'installatore. In alternativa è possibile installare Xfce, un ambiente
-desktop più leggero, usando <literal>desktop=xfce</literal>.
+dell'installatore. In alternativa è possibile installare un ambiente
+desktop più leggero quale Xfce o LXDE, usando
+<literal>desktop=xfce</literal> oppure <literal>desktop=lxde</literal>.
+
+</para><para arch="x86">
+
+<!--
+Some CD images (businesscard, netinst and DVD) also allow selection of
+the desired desktop environment from the graphical boot menu. Select the
+<quote>Advanced options</quote> option in the main menu and look for
+<quote>Alternative desktop environments</quote>.
+-->
+
+Alcuni tipi di immagine per CD (businesscard, netinst e DVD) permettono
+anche di scegliere l'ambiente desktop preferito dal menu d'avvio grafico.
+Selezionare l'opzione <quote>Advanced options</quote> dal menu principale
+e poi <quote>Alternative desktop environments</quote>.
 
 </para><para>
 
 <!--
-Note that this will only work if the packages needed for KDE or Xfce
+Note that this will only work if the packages needed for the desired
+desktop environment
 are actually available. If you are installing using a single full CD image,
 they will need to be downloaded from a mirror as most needed packages are
-only included on later CDs; installing KDE or Xfce this way should work
+only included on later CDs; installing KDE, Xfce or LXDE this way should work
 fine if you are using a DVD image or any other installation method.
 -->
 
-Notare che questo sistema funziona solo se i pacchetti necessari a KDE o
-Xfce sono disponibili; se l'installazione avviene con l'immagine completa
+Notare che questo sistema funziona solo se i pacchetti necessari 
+all'ambiente desktop scelto sono disponibili; se l'installazione
+avviene con l'immagine completa
 di un solo CD, sarà necessario scaricarli da un mirror dato che la maggior
 parte dei pacchetti sono inclusi negli altri CD; se per l'installazione si
-usa l'immagine di un DVD oppure un altro metodo, l'installazione di KDE
-o Xfce dovrebbe avvenire correttamente.
+usa l'immagine di un DVD oppure un altro metodo, l'installazione di KDE,
+Xfce o LXDE dovrebbe avvenire correttamente.
 
-</para><para>
+</para></note>
+<para>
 
 <!--
 The various server tasks will install software roughly as follows.
@@ -159,8 +177,23 @@ Print server: <classname>cups</classname>;
 SQL database: <classname>postgresql</classname>;
 Web server: <classname>apache2</classname>.
 
-</para></note>
-<para>
+</para><para>
+
+<!--
+The <quote>Standard system</quote> task will install any package that
+has a priority <quote>standard</quote>. This includes a lot of common
+utilities that are normally available on any Linux or Unix system. You
+should leave this task selected unless you know what you are doing and
+want a really minimal system.
+-->
+
+Il task <quote>Sistema standard</quote> installa tutti i pacchetti con
+priorità <quote>standard</quote>. Questi includono molte delle utilità
+che comunemente sono disponibili su tutti i sistemi Linux o Unix. Questo
+task dovrebbe rimanere selezionato a meno che non si sappia esattamente
+cosa si sta facendo e si voglia un sistema realmente minimale.
+
+</para><para>
 
 <!--
 Once you've selected your tasks, select &BTN-CONT;. At this point,
