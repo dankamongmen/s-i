@@ -1,98 +1,107 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58190 untranslated -->
+<!-- original version: 58190 -->
 
  <sect1 id="boot-installer-accessibility" arch="not-s390">
- <title>Accessibility</title>
+ <title>Barrierefreiheit</title>
 <para>
 
-Some users may need specific support because of e.g. some visual
-impairment.
-<phrase arch="alpha;ia64;powerpc;x86">USB braille displays are detected
-automatically, but most other</phrase>
-<phrase arch="arm;hppa;mips;mipsel;m68k;sparc">Most</phrase>
-accessibility features have to be enabled manually.
-<phrase arch="x86">On machines that support it, the boot menu emits a beep
-when it is ready to receive keystrokes.</phrase>
-Some boot parameters can <phrase arch="x86">then</phrase> be appended to
-enable accessibility features. Note that on most architectures the boot
-loader interprets your keyboard as a QWERTY keyboard.
+Einige Nutzer könnten eventuell spezielle Unterstützung benötigen, zum
+Beispiel aufgrund einer Sehbehinderung.
+<phrase arch="alpha;ia64;powerpc;x86">USB-Braillezeilen werden automatisch
+erkannt, aber die meisten anderen</phrase>
+<phrase arch="arm;hppa;mips;mipsel;m68k;sparc">Die meisten</phrase>
+Funktionalitäten für Barrierefreiheit müssen manuell aktiviert werden.
+<phrase arch="x86">Auf Rechnern, die dies unterstützen, gibt das Boot-Menü
+einen Piepton aus, wenn es bereit ist, Tastatureingaben zu verarbeiten.</phrase>
+Es können <phrase arch="x86">dann</phrase> einige Boot-Parameter angegeben
+werden, um diese Funktionalitäten zu aktivieren. Beachten Sie, dass vom
+Bootloader auf den meisten Architekturen die Tastatur so interpretiert wird,
+als wäre es eine Tastatur mit QWERTY-Layout.
 
 </para>
 
   <sect2 arch="alpha;ia64;powerpc;x86">
-  <title>USB Braille Displays</title>
+  <title>USB-Braillezeilen</title>
 <para>
 
-USB braille displays should be automatically detected. A textual version
-of the installer will then be automatically selected, and support for the
-braille display will be automatically installed on the target system.
-You can thus just press &enterkey; at the boot menu.
-Once <classname>brltty</classname> is started, you can choose a braille
-table by entering the preference menu.
+USB-Braillezeilen sollten automatisch erkannt werden. Es wird dann automatisch
+eine Textversion des Installers ausgewählt und Hardware-Unterstützung für die
+Braillezeile wird automatisch in das Zielsystem installiert. Sie müssen im
+Boot-Menü also einfach nur &enterkey; drücken. Sobald
+<classname>brltty</classname> gestartet ist, können Sie im Einstellungsmenü
+ein Braillezeilengerät auswählen.
 
 </para>
   </sect2>
 
   <sect2 arch="alpha;ia64;powerpc;x86">
-  <title>Serial Braille Displays</title>
+  <title>Serielle Braillezeilen</title>
 <para>
 
-Serial braille displays cannot safely be automatically detected
-(since that may damage some of them). You thus need to append the
+Serielle Braillezeilen können nicht sicher automatisch erkannt werden
+(dies könnte einige davon beschädigen). Daher müssen Sie den Boot-Parameter
 <userinput>brltty=<replaceable>driver</replaceable>,<replaceable>port</replaceable>,<replaceable>table</replaceable></userinput>
-boot parameter to tell <classname>brltty</classname> which driver it
-should use. <replaceable>driver</replaceable> should be replaced by the
-two-letter driver code for your terminal (see the
-<ulink url="&url-brltty-driver-codes;">driver code list</ulink>).
-<replaceable>port</replaceable> should be replaced by the name of the
-serial port the display is connected to, <userinput>ttyS0</userinput> is
-the default. <replaceable>table</replaceable> is the name of the braille
-table to be used (see the <ulink url="&url-brltty-table-codes;">table code
-list</ulink>); the English table is the default. Note that the table can
-be changed later by entering the preference menu.
+angeben, um <classname>brltty</classname> mitzuteilen, welcher Treiber
+benutzt werden soll. Sie sollten <replaceable>driver</replaceable> durch
+den zweistelligen Buchstabencode des Treibers ersetzen, den Sie für Ihre
+Braillezeile benötigen (siehe eine
+<ulink url="&url-brltty-driver-codes;">Auflistung der Treiber-Codes</ulink>).
+<replaceable>port</replaceable> sollten Sie durch den Namen des seriellen
+Anschlusses ersetzen, an den die Braillezeile angeschlossen ist;
+<userinput>ttyS0</userinput> ist der Standardwert.
+<replaceable>table</replaceable> ist der Name der Braille-Tabelle, die
+verwendet werden soll (siehe eine
+<ulink url="&url-brltty-table-codes;">Auflistung der Tabellen-Codes</ulink>);
+die englische Tabelle ist der Standard. Beachten Sie, dass Sie die
+verwendete Tabelle später im Einstellungsmenü noch ändern können.
 
 </para>
   </sect2>
 
   <sect2 arch="x86">
-  <title>Hardware Speech Synthesis</title>
+  <title>Hardware-Sprachausgabe</title>
 <para>
 
-Support for hardware speech synthesis devices is available only alongside
-support for graphical installer. You thus need to select the
-<quote>Graphical install</quote> entry in the boot menu.
+Treiberunterstützung für Hardware-Sprachausgabe-Geräte ist nur zusammen mit der
+Unterstützung für den grafischen Installer verfügbar. Sie müssen daher
+im Boot-Menü den Eintrag <quote>Graphical install</quote> auswählen.
 
-Hardware speech synthesis devices cannot be automatically detected. You
-thus need to append the
+</para><para> 
+
+Hardware-Sprachausgabe-Geräte können nicht automatisch erkannt werden.
+Sie müssen daher den Boot-Parameter
 <userinput>speakup.synth=<replaceable>driver</replaceable></userinput>
-boot parameter to tell <classname>speakup</classname> which driver it should
-use. <replaceable>driver</replaceable> should be replaced by the driver code
-for your device (see <ulink url="&url-speakup-driver-codes;">driver code
-list</ulink>). The textual version of the installer will then be
-automatically selected, and support for the speech synthesis device will be
-automatically installed on the target system.
+angeben, um <classname>speakup</classname> mitzuteilen, welcher Treiber
+verwendet werden soll. Ersetzen Sie dabei <replaceable>driver</replaceable>
+durch den Code des Treibers, den Sie für Ihr Gerät benötigen (eine
+Auflistung der Treiber-Codes finden Sie
+<ulink url="&url-speakup-driver-codes;">hier</ulink>). Es wird dann
+automatisch die Textversion des Installers ausgewählt und
+Hardware-Unterstützung für Sprachausgabe-Geräte wird automatisch in das
+Zielsystem installiert.
 
 </para>
   </sect2>
 
-  <sect2><title>Board Devices</title>
+  <sect2><title>Interne Boards/Karten</title>
 <para>
 
-Some accessibility devices are actual boards that are plugged inside the
-machine and that read text directly from the video memory. To get them
-to work framebuffer support must be disabled by using the
-<userinput>fb=false</userinput> boot parameter. This will however reduce
-the number of available languages.
+Einige Geräte für Barrierefreiheit sind letztendig Steckkarten, die innerhalb
+des Rechners eingesteckt werden und die den Text direkt aus dem Videospeicher
+auslesen. Damit sie funktionieren, muss die Framebuffer-Unterstützung
+deaktiviert werden (verwenden Sie dazu den Boot-Parameter
+<userinput>fb=false</userinput>). Dies reduziert allerdings die Anzahl der
+zur Verfügung stehenden Sprachen.
 
 </para>
   </sect2>
 
-  <sect2><title>High-Contrast Theme</title>
+  <sect2><title>Theme mit hohem Kontrast</title>
 <para>
 
-For users with low vision, the installer can use a high-contrast
-theme that makes it more readable. To enable it, append the
-<userinput>theme=dark</userinput> boot parameter.
+Für Nutzer mit verminderter Sehkraft kann der Installer ein spezielles
+Theme mit extra hohem Kontrast verwenden. Um es zu aktivieren, verwenden
+Sie den Boot-Parameter <userinput>theme=dark</userinput>.
 
 </para>
   </sect2>
