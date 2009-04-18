@@ -433,6 +433,11 @@ fi
 
 # Clean up some
 find $source/po -name "*.po~" -exec rm {} +
+if [ "$DI_LOCAL_BUILD" = 1 ]; then
+	# Needed to avoid conflicts with next svn update
+        echo "Reverting changes in PO files..." >>$mainlog
+	svn revert -R $source/po >>$mainlog 2>&1
+fi
 
 echo >>$mainlog
 echo "Done -- $(date -u)" >>$mainlog
