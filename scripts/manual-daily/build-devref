@@ -86,6 +86,7 @@ fi
 if [ "$DI_BUILDING_FROM_MAIN" ] && [ "$DI_BUILD_DEVREF" != 1 ]; then
     echo "Not building D-I Internals (as per configuration settings)" >>$mainlog
     echo >>$mainlog
+    rm -f $ROOT/lockfile
     exit 0
 else
     : >$logdir/svn_up_devref.log
@@ -115,6 +116,6 @@ fi
 
 echo >>$mainlog
 echo "Done -- $(date -u)" >>$mainlog
-rm -r $ROOT/lockfile
+rm -f $ROOT/lockfile
 
 exit 0

@@ -312,6 +312,7 @@ export manual_target="for_alioth"
 
 if [ "$DI_BUILDING_FROM_MAIN" ] && [ "$DI_BUILD_MANUAL" = 0 ]; then
     echo "Not building D-I Manual (as per configuration settings)" >$mainlog
+    rm -f $ROOT/lockfile
     exit 0
 elif [ -z "$RETRY" ]; then
     : >$logdir/svn_up.log
@@ -441,6 +442,6 @@ fi
 
 echo >>$mainlog
 echo "Done -- $(date -u)" >>$mainlog
-rm -r $ROOT/lockfile
+rm -f $ROOT/lockfile
 
 exit 0
