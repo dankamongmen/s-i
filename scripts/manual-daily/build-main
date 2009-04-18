@@ -16,14 +16,10 @@ if [ $RET = 0 ] || [ $RET = 999 ]; then
 	$ROOT/bin/build-devref
 fi
 
-if [ "$DI_LOCAL_BUILD" != 1 ]; then
-	if [ $RET = 0 ] || [ $RET = 999 ]; then
-		$ROOT/bin/mail-logs
-	else
-		echo "Build failed, not sending logs"
-	fi
-elif [ $RET != 0 ]; then
-	echo "Build failed with code '$RET'"
+if [ $RET = 0 ] || [ $RET = 999 ]; then
+	$ROOT/bin/mail-logs
+else
+	echo "Build failed, not sending logs"
 fi
 
 exit 0
