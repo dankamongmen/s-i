@@ -349,6 +349,12 @@ if is_updated en || [ ! -d "$source/integrated/en" ]; then
     update_templates >>$mainlog 2>&1
     checkfatal "$?" "updating templates"
     echo >>$mainlog
+
+    # Extract preconfiguration example from the manual
+    PRESEED="../en/appendix/preseed.xml"
+    if [ -f $PRESEED ] && [ -x preseed.pl ]; then
+        ./preseed.pl -r $manual_release $PRESEED >$destination/example-preseed.txt
+    fi
 fi
 
 # Prepare for the build of translations
@@ -398,15 +404,8 @@ for lang in $translations; do
     build_lang $lang
 done
 
-## Extract preconfiguration example from the manual
-PRESEED="../en/appendix/preseed.xml"
-if [ -f $PRESEED ] && [ -x preseed.pl ]; then
-    ./preseed.pl -r $manual_release $PRESEED >$destination/example-preseed.txt
-fi
-
-
 echo >>$mainlog
-## Copy the created files to alioth.debian.org
+# Copy the created files (if any) to alioth.debian.org
 if [ $NR_BUILDS -gt 0 ]; then
     echo "$NR_BUILDS languages have been (partially) built." >>$mainlog
 
