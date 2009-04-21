@@ -153,7 +153,7 @@ for arch in $ARCHES; do
 	if ! [ -f $UBASE-$uarch-2.6/kernel-versions ]; then
 		usage "unsupported architecture '$arch'"
 	fi
-	if ! echo "$UARCHES" | grep -q $uarch; then
+	if ! echo " $UARCHES " | grep -q " $uarch "; then
 		UARCHES="${UARCHES:+$UARCHES }$uarch"
 	fi
 done
@@ -550,13 +550,13 @@ for uarch in $UARCHES; do
 
 	USOURCE=$UBASE-$uarch-2.6
 	for arch in $(list_arches $uarch); do
-		if ! echo "$ARCHES" | egrep -q "(^| )$arch( |$)"; then
+		if ! echo " $ARCHES " | grep -q " $arch "; then
 			continue
 		fi
 
 		# Skip unofficial arches unless specifically requested
-		if echo "$UNOFFICIAL" | egrep -q "(^| )$arch( |$)" && \
-		   ! echo "$REQUESTED" | egrep -q "(^| )$arch( |$)"; then
+		if echo " $UNOFFICIAL " | grep -q " $arch " && \
+		   ! echo " $REQUESTED " | grep -q " $arch "; then
 			echo "! Skipping architecture $arch (unofficial)"
 			continue
 		fi
