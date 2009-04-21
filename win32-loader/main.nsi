@@ -184,6 +184,9 @@ readme_file_not_found:
     Goto windows_version_ok
   ${Endif}
   ${If} $windows_version == "Vista"
+; In the default install, "system partition" is not mounted.  We need a way
+; around this before Windows 7 can be enabled.
+;  ${OrIf} $windows_version == "7"
     StrCpy $windows_boot_method bootmgr
     Goto windows_version_ok
   ${Endif}
