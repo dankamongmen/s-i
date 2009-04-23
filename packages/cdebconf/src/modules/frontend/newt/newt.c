@@ -302,8 +302,11 @@ min_window_height(struct frontend *obj, struct question *q, int win_width)
     }
     if (strcmp(type, "multiselect") == 0)
         height += 4; // x lines for choices + blank line
-    else if (strcmp(type, "select") == 0)
+    else if (strcmp(type, "select") == 0) {
         height += 2; // as multiselect, but without a button and blank line
+        if (obj->methods.can_go_back(obj, q))
+            height += 2;
+    }
     else if (strcmp(type, "string") == 0 || strcmp(type, "password") == 0)
         height += 2; // input line + blank line
     // the others don't need more space
@@ -777,13 +780,15 @@ show_select_window(struct frontend *obj, struct question *q, int show_ext_desc)
         t_height = newtTextboxGetNumLines(textbox);
         newtTextboxSetHeight(textbox, t_height);
         newtFormAddComponent(form, textbox);
-        b_height = 0; // A <Go Back> button is not necessary
         select_list_top = 1+t_height+1;
     } else {
         t_height = 0;
-        b_height = 1;
         select_list_top = 1; // No description. Only insert a blank line.
     }
+    if (obj->methods.can_go_back(obj, q))
+        b_height = 2;
+    else
+        b_height = 0;
     free(full_description);
     win_height  = t_height + sel_height + b_height;
     //    3 == First blank line + blanks before and after select
