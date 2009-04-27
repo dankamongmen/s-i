@@ -5,7 +5,7 @@ set -e
 [ -r ./po_functions ] || exit 1
 . ./po_functions
 
-manual_release=${manual_release:=lenny}
+manual_release=${manual_release:=squeeze}
 
 if [ -z "$languages" ]; then
     # Buildlist of languages
