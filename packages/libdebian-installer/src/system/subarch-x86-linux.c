@@ -222,6 +222,7 @@ static struct map map_manufacturer[] = {
 const char *di_system_subarch_analyze(void)
 {
 	char *manufacturer = dmi_system_manufacturer();
+	const char *ret = "generic";
 	int i;
 
 	if (manufacturer)
@@ -231,9 +232,13 @@ const char *di_system_subarch_analyze(void)
 			if (!strncasecmp(map_manufacturer[i].entry,
 					 manufacturer,
 					 strlen(map_manufacturer[i].entry)))
-				return map_manufacturer[i].ret;
+			{
+				ret = map_manufacturer[i].ret;
+				break;
+			}
 		}
 	}
 
-	return "generic";
+	free(manufacturer);
+	return ret;
 }
