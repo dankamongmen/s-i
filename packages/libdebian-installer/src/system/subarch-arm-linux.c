@@ -18,6 +18,7 @@ static struct map map_hardware[] = {
     { "Chalice-CATS" , "netwinder" },
     { "co-EBSA285" , "netwinder" },
     { "Compaq-PersonalServer" , "netwinder" },
+    { "Freescale MX51 Babbage Board", "imx51" }, /* iMX51 reference hardware. */
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
     { "Marvell DB-88F6281-BP Development Board", "kirkwood" },
