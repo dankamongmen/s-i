@@ -15,7 +15,7 @@ fi
 
 if [ -z "$architectures" ]; then
     # Note: this list is no longer being maintained; see debian/archlist instead
-    architectures="alpha amd64 arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
+    architectures="alpha amd64 armel hppa i386 ia64 m68k mips mipsel powerpc s390 sparc"
 fi
 
 if [ -z "$destination" ]; then
