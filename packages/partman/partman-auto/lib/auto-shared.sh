@@ -55,6 +55,14 @@ ensure_primary() {
 
 	cd $dev
 
+	open_dialog USES_EXTENDED
+	read_line uses_extended
+	close_dialog
+	if [ "$uses_extended" = no ]; then
+		# No need for this on this partition table type
+		return
+	fi
+
 	open_dialog PARTITIONS
 	local have_primary=
 	local id type
