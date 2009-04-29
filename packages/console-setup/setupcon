@@ -170,7 +170,7 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	    FONT=$(echo `ls /usr/share/consolefonts/$CODESET-*.psf.gz \
                 2>/dev/null`)
 	    FONT=${FONT%% *}
-	else
+	elif [ "$FONTFACE" ] && [ "$FONTSIZE" ]; then
 	    FONT="$CODESET-$FONTFACE$FONTSIZE.psf.gz"
 	    case "$FONTSIZE" in
 		*x*)
@@ -214,7 +214,7 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
     done
     
     
-    if [ "$save_only" != yes ]; then
+    if [ "$save_only" != yes ] && [ "$LOADFONTS" ]; then
 	for console in $ACTIVE_CONSOLES; do
 	    [ -w $console ] || continue
 	    if which consolechars >/dev/null; then
