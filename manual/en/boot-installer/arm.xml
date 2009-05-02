@@ -5,104 +5,6 @@
 
 &boot-installer-intro-net.xml;
 
-   <sect3 arch="arm"><title>Booting from TFTP on Netwinder</title>
-<para>
-
-Netwinders have two network interfaces: A 10Mbps NE2000-compatible
-card (which is generally referred to as <literal>eth0</literal>) and
-a 100Mbps Tulip card.  There may be problems loading the image via TFTP
-using the 100Mbps card so it is recommended that you use the 10Mbps
-interface (the one labeled with <literal>10 Base-T</literal>).
-
-</para>
-<note><para>
-
-You need NeTTrom 2.2.1 or later to boot the installation system, and
-version 2.3.3 is recommended.  Unfortunately, firmware files are currently
-not available for download because of license issues.  If this situation
-changes, you may find new images at <ulink url="http//www.netwinder.org/"></ulink>.
-
-</para></note>
-<para>
-
-When you boot your Netwinder you have to interrupt the boot process during the
-countdown.  This allows you to set a number of firmware settings needed in
-order to boot the installer.  First of all, start by loading the default
-settings:
-
-<informalexample><screen>
-    NeTTrom command-&gt; load-defaults
-</screen></informalexample>
-
-Furthermore, you must configure the network, either with a static address:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
-</screen></informalexample>
-
-where 24 is the number of set bits in the netmask, or a dynamic address:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
-</screen></informalexample>
-
-You may also need to configure the <userinput>route1</userinput>
-settings if the TFTP server is not on the local subnet.
-
-Following these settings, you have to specify the TFTP server and the
-location of the image.  You can then store your settings to flash.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
-    NeTTrom command-&gt; setenv kerntftpfile boot.img
-    NeTTrom command-&gt; save-all
-</screen></informalexample>
-
-Now you have to tell the firmware that the TFTP image should be booted:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-</screen></informalexample>
-
-If you use a serial console to install your Netwinder, you need to add the
-following setting:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
-</screen></informalexample>
-
-Alternatively, for installations using a keyboard and monitor you have to
-set:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-You can use the <command>printenv</command> command to review your
-environment settings.  After you have verified that the settings are
-correct, you can load the image:
-
-<informalexample><screen>
-    NeTTrom command-&gt; boot
-</screen></informalexample>
-
-In case you run into any problems, a <ulink
-url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detailed
-HOWTO</ulink> is available.
-
-</para>
-   </sect3>
-
-   <sect3 arch="arm"><title>Booting from TFTP on CATS</title>
-<para>
-
-On CATS machines, use <command>boot de0:</command> or similar at the
-Cyclone prompt.
-
-</para>
-   </sect3>
   </sect2>
 
 
@@ -110,12 +12,6 @@ Cyclone prompt.
 
 &boot-installer-intro-cd.xml;
 
-<para>
-
-To boot a CD-ROM from the Cyclone console prompt, use the command
-<command>boot cd0:cats.bin</command>
-
-</para>
   </sect2>
 
 
