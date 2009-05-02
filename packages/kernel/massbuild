@@ -210,6 +210,15 @@ do_dch() {
 
 	local new_entry=""
 
+	# Use dch's default logic to determine if we need a new changelog
+	# entry or not.
+	cat $CL_TEMP | while read CL; do
+		# Avoid duplicate entries in the changelog, but limit scope
+		if ! head -n 25 debian/changelog | grep -q "\* $CL"; then
+			dch --release-heuristic=changelog "$CL"
+			new_entry=1
+		fi
+        done
 	# Sanity check
 	if ! head -n 1 debian/changelog | grep -q UNRELEASED && [ -z "$new_entry" ]; then
 		cat <<EOF
@@ -229,16 +238,7 @@ EOF
 	if [ "$DISTRIBUTION" ]; then
 		dist="--distribution $DISTRIBUTION"
 	fi
-
-	# Use dch's default logic to determine if we need a new changelog
-	# entry or not.
-	cat $CL_TEMP | while read CL; do
-		# Avoid duplicate entries in the changelog, but limit scope
-		if ! head -n 25 debian/changelog | grep -q "\* $CL"; then
-			dch --release-heuristic=changelog -r $dist "$CL"
-			new_entry=1
-		fi
-	done
+	dch $dist -r "dummy"
 }
 
 has_recent_upload() {
