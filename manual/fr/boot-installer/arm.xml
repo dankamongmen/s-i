@@ -1,123 +1,18 @@
-<!-- original version: 36639 -->
+<!-- original version: 58440 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Amorcer à partir de TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Amorcer à partir de TFTP sur une Netwinder</title>
-
-<para>
-
-Les Netwinders possèdent deux interfaces réseau&nbsp;: une carte 10&nbsp;Mbps 
-compatible NE2000 (généralement définie comme <filename>eth0</filename>) et la 
-carte Tulip en 100&nbsp;Mbps. Charger l'image par TFTP avec la carte en 100&nbsp;Mbps
-peut poser des problèmes. Il est recommandé d'utiliser la carte à 10&nbsp;Mbps
-(celle marquée <literal>10 Base-T</literal>).
-
-</para>
-<note><para>
-
-Vous aurez besoin de NeTTrom version&nbsp;2.2.1 ou supérieure pour amorcer le 
-système d'installation. Il est recommandé d'utiliser NeTTrom&nbsp;2.3.3.
-Malheureusement des problèmes de licence empêchent le chargement des fichiers du
-microprogramme. Si la situation venait à changer, les nouvelles images seraient
-<ulink url="http//www.netwinder.org/">ici</ulink>.
-
-</para></note>
-
-<para>
-
-Quand vous amorcez votre Netwinder, vous devez interrompre le processus d'amorçage
-pendant la phase de compte à rebours. Cela permet de configurer certains éléments
-nécessaires. Tout d'abord, chargez les paramètres par défaut&nbsp;:
-
-<informalexample><screen>
-    NeTTrom command-&gt; load-defaults
-</screen></informalexample>
-
-Ensuite vous devez configurer le réseau, même avec une adresse fixe :
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
-</screen></informalexample>
-
-où 24 est le nombre de bits du masque réseau, ou bien sans adresse&nbsp;:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
-</screen></informalexample>
-
-Il se peut que vous ayez aussi à configurer les réglages de
-<userinput>route1</userinput> si le serveur TFTP n'est pas sur le sous-réseau local.
-
-Ensuite vous devez indiquer le serveur TFTP et l'endroit où se trouve l'image.
-Vous pouvez alors enregistrer ces paramètres en flash.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
-    NeTTrom command-&gt; setenv kerntftpfile boot.img
-    NeTTrom command-&gt; save-all
-</screen></informalexample>
-
-Puis vous devez indiquer au microprogramme que l'image TFTP doit être amorcée&nbsp;:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-</screen></informalexample>
-
-Si vous voulez installer NetWinder avec la console série, vous devez utiliser
-la commande qui suit.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
-</screen></informalexample>
-
-Pour les installations avec clavier et moniteur, vous devez exécutez&nbsp;:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-Utilisez la commande <command>printenv</command> pour réafficher vos 
-réglages. 
-Une fois les vérifications faites, vous pouvez charger l'image&nbsp;:
-
-<informalexample><screen>
-    NeTTrom command-&gt; boot
-</screen></informalexample>
-
-En cas de problèmes, il existe un 
-<ulink url="http://www.netwinder.org/howto/Firmware-HOWTO.html">HOWTO précis</ulink>.
-
-</para>
-  </sect3>
-
-  <sect3 arch="arm"><title>Amorcer à partir de TFTP sur CATS</title>
-
-<para>
-
-Sur les machines CATS, utilisez <command>boot de0:</command>
-        ou quelque chose de similaire à l'invite de Cyclone.
-
-</para>
-   </sect3>
   </sect2>
-
-
 
   <sect2 arch="arm"><title>Amorcer depuis un cédérom</title>
 
 &boot-installer-intro-cd.xml;
 
-<para>
-Pour amorcer à partir d'un cédérom depuis l'invite sur une console
-Cyclone, utilisez la commande
-<command>boot cd0:cats.bin</command>
-</para>
   </sect2>
-  <sect2 arch="arm" id="boot-firmware"><title>Amorcer depuis un Microprogramme</title>
+
+  <sect2 arch="arm" id="boot-firmware"><title>Amorcer depuis un microprogramme</title>
 
 &boot-installer-intro-firmware.xml;
 
@@ -155,7 +50,7 @@ Déconnectez les disques des ports USB.
 </para></listitem>
 <listitem><para>
 
-Eteignez le NSLU2
+Éteignez le NSLU2
 
 </para></listitem>
 <listitem><para>
@@ -170,7 +65,6 @@ Pressez et relachez le bouton power pour lancer le NSLU2.
 
 </para></listitem>
 <listitem><para>
-
 
 Attendez dix secondes en scrutant la LED « ready/status ». Après dix secondes
 elle passera au rouge. Relachez immédiatement le bouton reset.
