@@ -1245,9 +1245,15 @@ if [ "$XKBLAYOUT" ]; then
 	    default_layout="${XKBLAYOUT%,*}"
 	    default_variant="${XKBVARIANT%,*}"
 	    unsupported_layout=no
-	    ;;	    
+	    ;;
+	jp,jp)
+	    # fix on upgrade for #526862
+	    default_layout="${XKBLAYOUT#*,}"
+	    default_variant="${XKBVARIANT#*,}"
+	    unsupported_layout=no
+	    ;;
 	# TODO: make s.t. to not forget to update this list
-	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|jp,jp|us,jp|us,kan|us,kh|us,la|us,lao|us,lk|us,lt|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
+	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|us,jp|us,kan|us,kh|us,la|us,lao|us,lk|us,lt|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
 	    if [ "${XKBVARIANT%,*}" == '' ]; then
 		default_layout="${XKBLAYOUT#*,}"
 		default_variant="${XKBVARIANT#*,}"
@@ -1443,6 +1449,7 @@ while :; do
 	    fi
 	    ;;
 	4)
+	    echo unsupported_layout=$unsupported_layout >>/tmp/cslog # asdf
 	    if [ "$unsupported_layout" = yes ]; then
 		db_set console-setup/variantcode "$XKBVARIANT"
 		# skip the question without making Debconf loop
@@ -1452,6 +1459,7 @@ while :; do
                     "variant\*${layout}" "$default_variant"
 	    then
 		variant="$RET"
+		echo variant=$variant >>/tmp/cslog # asdf
 		case "$layout" in
 		    cs)
 			case "$variant" in
@@ -1466,14 +1474,16 @@ while :; do
 			esac
 			;;
 		    jp)
+			echo variant=$variant >>/tmp/cslog # asdf
 			case "$variant" in
 			    latin)
+				# fix for missing old etch layout
 				latin=yes
-				real_layout=$layout
+				real_layout=us
 				;;
 			    *)
 				latin=no
-				real_layout=jp,jp
+				real_layout=us,jp
 				;;
 			esac
 			;;
@@ -1519,8 +1529,6 @@ while :; do
 			    db_set console-setup/variantcode "$variant,us"
 			    ;;
 		    esac
-		elif [ "$real_layout" = jp,jp ]; then
-			    db_set console-setup/variantcode "latin,$variant"
 		else
 		    db_set console-setup/variantcode ",$variant"
 		fi
