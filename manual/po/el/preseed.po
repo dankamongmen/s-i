@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2009-04-29 00:14+0000\n"
+"POT-Creation-Date: 2009-05-06 00:13+0000\n"
 "PO-Revision-Date: 2009-04-25 17:53+0300\n"
 "Last-Translator: Emmanuel Galatoulas <galaxico@quad-nrg.net>\n"
 "Language-Team: Greek <debian-l10n-greek@lists.debian.org>\n"
@@ -2074,11 +2074,60 @@ msgstr ""
 #. Tag: title
 #: preseed.xml:875
 #, no-c-format
+msgid "Controlling how partitions are mounted"
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:876
+#, no-c-format
+msgid ""
+"Normally, filesystems are mounted using a universally unique identifier "
+"(UUID) as a key; this allows them to be mounted properly even if their "
+"device name changes. UUIDs are long and difficult to read, so, if you "
+"prefer, the installer can mount filesystems based on the traditional device "
+"names, or based on a label you assign. If you ask the installer to mount by "
+"label, any filesystems without a label will be mounted using a UUID instead."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:885
+#, no-c-format
+msgid ""
+"Devices with stable names, such as LVM logical volumes, will continue to use "
+"their traditional names rather than UUIDs."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:892
+#, no-c-format
+msgid ""
+"Traditional device names may change based on the order in which the kernel "
+"discovers devices at boot, which may cause the wrong filesystem to be "
+"mounted. Similarly, labels are likely to clash if you plug in a new disk or "
+"a USB drive, and if that happens your system's behaviour when started will "
+"be random."
+msgstr ""
+
+#. Tag: screen
+#: preseed.xml:902
+#, no-c-format
+msgid ""
+"# The default is to mount by UUID, but you can also choose \"traditional\" "
+"to\n"
+"# use traditional device names, or \"label\" to try filesystem labels "
+"before\n"
+"# falling back to UUIDs.\n"
+"#d-i partman/mount_style select uuid"
+msgstr ""
+
+#. Tag: title
+#: preseed.xml:907
+#, no-c-format
 msgid "Base system installation"
 msgstr "Εγκατάσταση του βασικού συστήματος"
 
 #. Tag: para
-#: preseed.xml:876
+#: preseed.xml:908
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -2090,7 +2139,7 @@ msgstr ""
 "ερωτήσεις που γίνονται αφορούν την εγκατάσταση του πυρήνα."
 
 #. Tag: screen
-#: preseed.xml:883
+#: preseed.xml:915
 #, no-c-format
 msgid ""
 "# Select the initramfs generator used to generate the initrd for 2.6 "
@@ -2113,13 +2162,13 @@ msgstr ""
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 
 #. Tag: title
-#: preseed.xml:888
+#: preseed.xml:920
 #, no-c-format
 msgid "Account setup"
 msgstr "Ρύθμιση Λογαριασμού"
 
 #. Tag: para
-#: preseed.xml:889
+#: preseed.xml:921
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -2132,7 +2181,7 @@ msgstr ""
 "κρυπτογραφημένο (clear text) είτε MD5 <emphasis>hashes</emphasis>."
 
 #. Tag: para
-#: preseed.xml:896
+#: preseed.xml:928
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -2149,7 +2198,7 @@ msgstr ""
 "force attacks)."
 
 #. Tag: screen
-#: preseed.xml:906
+#: preseed.xml:938
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -2211,7 +2260,7 @@ msgstr ""
 "#d-i passwd/user-default-groups string audio cdrom video"
 
 #. Tag: para
-#: preseed.xml:908
+#: preseed.xml:940
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -2232,7 +2281,7 @@ msgstr ""
 "την εντολή <command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:918
+#: preseed.xml:950
 #, no-c-format
 msgid ""
 "The following command can be used to generate an MD5 hash for a password:"
@@ -2241,19 +2290,19 @@ msgstr ""
 "(hash) MD5 για ένα συνθηματικό χρήστη:"
 
 #. Tag: screen
-#: preseed.xml:922
+#: preseed.xml:954
 #, no-c-format
 msgid "$ printf \"r00tme\" | mkpasswd -s -m md5"
 msgstr "$ printf \"r00tme\" | mkpasswd -s -m md5"
 
 #. Tag: title
-#: preseed.xml:928
+#: preseed.xml:960
 #, no-c-format
 msgid "Apt setup"
 msgstr "Ρύθμιση setup"
 
 #. Tag: para
-#: preseed.xml:929
+#: preseed.xml:961
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -2267,7 +2316,7 @@ msgstr ""
 "προαιρετικά να προσθέσετε και άλλες (τοπικές) \"αποθήκες\" πακέτων."
 
 #. Tag: screen
-#: preseed.xml:937
+#: preseed.xml:969
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -2331,13 +2380,13 @@ msgstr ""
 "#d-i debian-installer/allow_unauthenticated string true"
 
 #. Tag: title
-#: preseed.xml:942
+#: preseed.xml:974
 #, no-c-format
 msgid "Package selection"
 msgstr "Επιλογή πακέτων"
 
 #. Tag: para
-#: preseed.xml:943
+#: preseed.xml:975
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -2348,73 +2397,73 @@ msgstr ""
 "αυτό το κείμενο:"
 
 #. Tag: userinput
-#: preseed.xml:952
+#: preseed.xml:984
 #, no-c-format
 msgid "standard"
 msgstr "Κανονικό σύστημα"
 
 #. Tag: userinput
-#: preseed.xml:955
+#: preseed.xml:987
 #, no-c-format
 msgid "desktop"
 msgstr "επιφάνεια εργασίας"
 
 #. Tag: userinput
-#: preseed.xml:958
+#: preseed.xml:990
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "επιφάνεια εργασίας gnome"
 
 #. Tag: userinput
-#: preseed.xml:961
+#: preseed.xml:993
 #, no-c-format
 msgid "kde-desktop"
 msgstr "επιφάνεια εργασίας kde"
 
 #. Tag: userinput
-#: preseed.xml:964
+#: preseed.xml:996
 #, no-c-format
 msgid "web-server"
 msgstr "Server ιστοσελίδων"
 
 #. Tag: userinput
-#: preseed.xml:967
+#: preseed.xml:999
 #, no-c-format
 msgid "print-server"
 msgstr "Server εκτυπώσεων"
 
 #. Tag: userinput
-#: preseed.xml:970
+#: preseed.xml:1002
 #, no-c-format
 msgid "dns-server"
 msgstr "server oνοματοδοσίας (dns-server)"
 
 #. Tag: userinput
-#: preseed.xml:973
+#: preseed.xml:1005
 #, no-c-format
 msgid "file-server"
 msgstr "Server αρχείων"
 
 #. Tag: userinput
-#: preseed.xml:976
+#: preseed.xml:1008
 #, no-c-format
 msgid "mail-server"
 msgstr "Server αλληλογραφίας"
 
 #. Tag: userinput
-#: preseed.xml:979
+#: preseed.xml:1011
 #, no-c-format
 msgid "sql-database"
 msgstr "Βάση δεδομένων SQL"
 
 #. Tag: userinput
-#: preseed.xml:982
+#: preseed.xml:1014
 #, no-c-format
 msgid "laptop"
 msgstr "Φορητός υπολογιστής"
 
 #. Tag: para
-#: preseed.xml:986
+#: preseed.xml:1018
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -2427,7 +2476,7 @@ msgstr ""
 "<userinput>Κανονικό σύστημα</userinput>."
 
 #. Tag: para
-#: preseed.xml:992
+#: preseed.xml:1024
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -2444,7 +2493,7 @@ msgstr ""
 "γραμμή εντολών του πυρήνα."
 
 #. Tag: screen
-#: preseed.xml:1002
+#: preseed.xml:1034
 #, no-c-format
 msgid ""
 "#tasksel tasksel/first multiselect standard, web-server\n"
@@ -2486,13 +2535,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:1007
+#: preseed.xml:1039
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Εγκατάσταση φορτωτή εκκίνησης"
 
 #. Tag: screen
-#: preseed.xml:1009
+#: preseed.xml:1041
 #, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -2562,7 +2611,7 @@ msgstr ""
 "#d-i grub-installer/password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:1011
+#: preseed.xml:1043
 #, no-c-format
 msgid ""
 "An MD5 hash for a password for <classname>grub</classname> can be generated "
@@ -2575,13 +2624,13 @@ msgstr ""
 "\"preseed-account\"/>."
 
 #. Tag: title
-#: preseed.xml:1021
+#: preseed.xml:1053
 #, no-c-format
 msgid "Finishing up the installation"
 msgstr "Ολοκλήρωση της εγκατάστασης"
 
 #. Tag: screen
-#: preseed.xml:1023
+#: preseed.xml:1055
 #, no-c-format
 msgid ""
 "# During installations from serial console, the regular virtual consoles\n"
@@ -2626,13 +2675,13 @@ msgstr ""
 "#d-i debian-installer/exit/poweroff boolean true"
 
 #. Tag: title
-#: preseed.xml:1028
+#: preseed.xml:1060
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "Χρήση preseeding για άλλα πακέτα"
 
 #. Tag: screen
-#: preseed.xml:1030
+#: preseed.xml:1062
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -2655,19 +2704,19 @@ msgstr ""
 "#   debconf-get-selections >> file"
 
 #. Tag: title
-#: preseed.xml:1037
+#: preseed.xml:1069
 #, no-c-format
 msgid "Advanced options"
 msgstr "Προχωρημένες επιλογές"
 
 #. Tag: title
-#: preseed.xml:1040
+#: preseed.xml:1072
 #, no-c-format
 msgid "Running custom commands during the installation"
 msgstr "Εκτέλεση προσαρμοσμένων εντολών κατά την διάρκεια της εγκατάστασης."
 
 #. Tag: para
-#: preseed.xml:1041
+#: preseed.xml:1073
 #, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
@@ -2678,7 +2727,7 @@ msgstr ""
 "σημεία της εγκατάστασης."
 
 #. Tag: screen
-#: preseed.xml:1049
+#: preseed.xml:1081
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
@@ -2773,13 +2822,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:1054
+#: preseed.xml:1086
 #, no-c-format
 msgid "Using preseeding to change default values"
 msgstr "Χρήση preseeding για την αλλαγή των προκαθορισμένων τιμών"
 
 #. Tag: para
-#: preseed.xml:1055
+#: preseed.xml:1087
 #, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
@@ -2807,7 +2856,7 @@ msgstr ""
 "προρύθμισης."
 
 #. Tag: para
-#: preseed.xml:1069
+#: preseed.xml:1101
 #, no-c-format
 msgid ""
 "Note that the <quote>d-i</quote> owner should only be used for variables "
@@ -2822,7 +2871,7 @@ msgstr ""
 "Δείτε την υποσημείωση στο κεφάλαιο <xref linkend=\"preseed-bootparms\"/>."
 
 #. Tag: para
-#: preseed.xml:1076
+#: preseed.xml:1108
 #, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
@@ -2846,13 +2895,13 @@ msgstr ""
 "quote> παραμέτρους."
 
 #. Tag: title
-#: preseed.xml:1090
+#: preseed.xml:1122
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "Αλυσιδωτή φόρτωση (chainloading) αρχείων προρυθμίσεων"
 
 #. Tag: para
-#: preseed.xml:1091
+#: preseed.xml:1123
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2869,7 +2918,7 @@ msgstr ""
 "συγκεκριμένες διαμορφώσεις σε άλλα αρχεία."
 
 #. Tag: screen
-#: preseed.xml:1101
+#: preseed.xml:1133
 #, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2931,7 +2980,7 @@ msgstr ""
 " #d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1103
+#: preseed.xml:1135
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
