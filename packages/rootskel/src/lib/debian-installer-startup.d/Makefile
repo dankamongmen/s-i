@@ -54,8 +54,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 
   ifneq (,$(filter hppa,$(DEB_HOST_ARCH_CPU)))
     files += \
-	S04countcpus-linux-hppa \
-	S45keyboard-linux-hppa
+	S04countcpus-linux-hppa
   endif
 
   ifneq (,$(filter arm armel,$(DEB_HOST_ARCH_CPU)))
