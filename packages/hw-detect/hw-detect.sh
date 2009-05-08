@@ -173,17 +173,6 @@ get_manual_hw_info() {
 		echo "ide-disk:Linux ATA DISK"
 		echo "ide-cd:Linux ATAPI CD-ROM"
 	fi
-
-	# on some hppa systems, nic and scsi won't be found because they're
-	# not on a bus that udev understands ... 
-	if [ "`udpkg --print-architecture`" = hppa ]; then
-		echo "lasi_82596:LASI Ethernet"
-		register-module lasi_82596
-		echo "lasi700:LASI SCSI"
-		register-module -i lasi700
-		echo "zalon7xx:Zalon SCSI"
-		register-module -i zalon7xx
-	fi
 }
 
 # Based on syslog from #486298
