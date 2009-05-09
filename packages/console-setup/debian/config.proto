@@ -321,6 +321,18 @@ else
     locale=C
 fi
 
+locale_lang=$(echo $locale | sed 's/_.*//')
+locale_country=$(echo $locale | sed 's/.*_//;s/\..*//;s/@.*//')
+locale_modif=
+echo $locale | grep -v -q @ || locale_modif=$(echo $locale | sed 's/.*@//')
+
+eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}__${locale_modif}}\"
+[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}}\"
+[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}__${locale_modif}}\"
+[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}}\"
+[ -n "$kbdnames" ] || kbdnames="$kbdnames_C"
+! type iconv || kbdnames="$(echo "$kbdnames" | iconv -f UTF-8)"
+
 case "$locale" in
     *KOI8*|*koi8*)
 	default_codeset=CyrKoi

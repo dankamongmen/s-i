@@ -2,6 +2,8 @@
 
 use warnings 'all';
 use strict;
+use Locale::gettext;
+use POSIX;
 
 BEGIN {
     my $file;
@@ -12,6 +14,8 @@ BEGIN {
     }
     do "$file";
 }
+
+print "kbdnames_C='\n";
 
 for my $model (keys %KeyboardNames::models) {
     my $name = $KeyboardNames::models{$model};
@@ -25,4 +29,47 @@ for my $layout (keys %KeyboardNames::layouts) {
 	my $variantname = $KeyboardNames::variants{$name}{$variant};
 	print "variant*$name*$variantname*$layout - $variant\n";
     }
+}
+
+print "'\n";
+
+# Make sure we output UTF-8
+$ENV{'LC_ALL'} = "en_US.UTF-8";
+binmode STDOUT, ":utf8";
+
+sub fixquotes {
+    my $s = shift;
+    $s =~ s/'/'"'"'/g;
+    return $s;
+}
+
+for my $mo (</usr/share/locale/*/LC_MESSAGES/xkeyboard-config.mo>) {
+    my $lang = $mo;
+    $lang =~ s:/usr/share/locale/(.*)/LC_MESSAGES/xkeyboard-config.mo:$1:;
+    print "# Generated for $lang from $mo\n";
+    $ENV{'LANGUAGE'} = $lang;
+    setlocale(LC_ALL,"");
+
+    $lang =~ s:\@:__:;
+    $lang =~ s:__Latn:__latin:; # special fixup for sr
+
+    print "kbdnames_$lang='\n";
+
+    my $d = Locale::gettext->domain("xkeyboard-config");
+
+    for my $model (keys %KeyboardNames::models) {
+	my $name = $KeyboardNames::models{$model};
+	print "model*$name*".fixquotes($d->get($model))."\n"
+    }
+    for my $layout (keys %KeyboardNames::layouts) {
+	my $name = $KeyboardNames::layouts{$layout};
+	my $local_layout = fixquotes($d->get($layout));
+	print "layout*$name*$local_layout\n";
+	print "variant*$name**$local_layout\n";
+	for my $variant (keys %{$KeyboardNames::variants{$name}}) {
+	    my $variantname = $KeyboardNames::variants{$name}{$variant};
+	    print "variant*$name*$variantname*$local_layout - ".fixquotes($d->get($variant))."\n";
+	}
+    }
+    print "'\n";
 }
