@@ -1,4 +1,4 @@
-<!-- original version: 58385 -->
+<!-- original version: 58504 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1058,6 +1058,43 @@ d-i partman/confirm boolean true
 
   </sect2>
 
+  <sect2 id="preseed-partman-mount-styles">
+  <title>Contrôler le montage des partitions</title>
+<para>
+
+Les systèmes de fichiers sont normalement montés en utilisant une clé appelée
+identifiant unique universel, UUID. Même si le nom du périphérique change, cet identifiant
+permet de monter le système de fichiers sur le bon périphérique. La lecture de ces identifiants est difficile.
+Aussi l'installateur peut monter des systèmes de fichiers en utilisant les noms traditionnels
+des périphériques ou les étiquettes que vous leur avez attribuées.
+Quand vous demandez un montage par étiquette, tout système de fichiers sans étiquette
+sera monté en utilisant un UUID.
+
+</para><para>
+
+Pour les périphériques dont les noms sont stables, comme les volumes logiques LVM, 
+les noms traditionnels seront toujours utilisés à la place des UUID.
+
+</para>
+<warning><para>
+
+les noms traditionnels des périphériques peuvent changer en fonction de l'ordre dans lequel
+ils sont découverts par le noyau au moment du démarrage. Un système de fichiers
+peut être ainsi monté sur le mauvais périphérique.
+De même les étiquettes peuvent créer des conflits si vous branchez un nouveau disque ou
+un périphérique USB. Si cela arrive, le comportement du système devient aléatoire.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+# Par défaut, les UUID sont utilisés, mais vous pouvez choisir "traditional" pour
+# utiliser les noms traditionnels des périphériques, ou "label" pour utiliser des étiquettes.
+# En l'absence d'étiquette, l'UUID est utilisé.
+#d-i partman/mount_style select uuid
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-base-installer">
   <title>Installation du système de base</title>
 <para>
@@ -1255,6 +1292,10 @@ facilement sur la ligne de commande du noyau.
 
 # Paquets supplémentaires
 #d-i pkgsel/include string openssh-server build-essential
+# Par défaut, les paquets seulement « recommandés » par les paquets installés avec
+# pkgsel/include (à la différence de leurs dépendances) ne seront pas installés.
+# Décommentez cette ligne si vous voulez les installer.
+#d-i pkgsel/include/install-recommends boolean true
 # Mise à jour des paquets après debootstrap.
 # Valeurs autorisées : none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
