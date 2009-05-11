@@ -40,15 +40,8 @@ install_live_system () {
 		COUNT=0
 		OLD_IFS=$IFS
 		mkdir -p /target
-		# use tar from inside the live filesystem to create
-		# the tarball, because busybox tar in d-i does not 
-		# support creating tarballs.
-		# 
-		# The --exclude is a paranoia measure, in case this program
-		# is running from the toplevel of a live filesystem,
-		# which is not normally the case.
 		exec 4>&0
-		chroot . tar c . --exclude=target | \
+		tar c . | \
 		(chdir /target && tar xv) | \
 		(
 			while read line; do
