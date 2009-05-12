@@ -165,7 +165,7 @@ ask_debconf () {
     prefix=$3       # The prefix for $kbdnames
     default_code=$4 # The default choice (optional)
     choices=`echo "$kbdnames" | grep "^$prefix\*" | 
-        sed -e "s/^$prefix\*[^\*]*\*//" -e 's/,//g' | sort |
+        sed -e "s/^$prefix\*[^\*]*\*//" -e 's/,/\\\\,/g' | sort |
         sed -e 's/$/,/'`
     choices=`echo $choices | sed 's/, *$//'`
 
