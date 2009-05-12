@@ -547,6 +547,10 @@ case "$locale" in
 	default_codeset=Lat7
 	codeset_priority=low
 	;;
+    ky_*)
+	default_codeset=CyrAsia
+	codeset_priority=low
+	;;
     mi_*)
 	default_codeset=Lat7
 	codeset_priority=low
@@ -835,6 +839,9 @@ case "$locale" in
 	;;
     *_LV*)
 	default_layout=lv  # Latvia
+	;;
+    *_KG*)
+	default_layout=kg  # Kyrgyzstan
 	;;
     *_MA*)
 	default_layout=ma  # Morocco
@@ -1142,6 +1149,7 @@ if db_get debian-installer/keymap && [ "$RET" ]; then
 	mac-fr2-ext) XKBLAYOUT="fr";;
 	mac-fr3) XKBLAYOUT="fr";;
 	mac-es) XKBLAYOUT="es";;
+	ky) XKBLAYOUT="us,kg";;
 	mk) XKBLAYOUT="us,mk";;
 	nl) XKBLAYOUT="nl";;
 	no) XKBLAYOUT="no";;
@@ -1272,7 +1280,7 @@ if [ "$XKBLAYOUT" ]; then
 	    unsupported_layout=no
 	    ;;
 	# TODO: make s.t. to not forget to update this list
-	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|us,kan|us,kh|us,kz|us,la|us,lao|us,lk|us,lt|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
+	cs,cs|us,am|us,ara|us,ben|us,bd|us,bg|us,bt|us,by|us,deva|us,ge|us,gh|us,gr|us,guj|us,guru|us,il|us,in|us,ir|us,iku|us,kan|us,kh|us,kz|us,la|us,lao|us,lk|us,lt|us,kg|us,mk|us,mm|us,mn|us,mv|us,mal|us,ori|us,pk|us,ru|us,scc|us,sy|us,syr|us,tel|us,th|us,tj|us,tam|us,ua|us,uz)
 	    if [ "${XKBVARIANT%,*}" = '' ]; then
 		default_layout="${XKBLAYOUT#*,}"
 		default_variant="${XKBVARIANT#*,}"
@@ -1508,7 +1516,7 @@ while :; do
 			;;
 		    # TODO: make s.t. to not forget to update this list.  Don't
 		    # forget to update also the nonlatin list in kbdcompiler
-		    am|ara|ben|bd|bg|bt|by|deva|ge|gh|gr|guj|guru|il|in|ir|iku|kan|kh|kz|la|lao|lk|mk|mm|mn|mv|mal|ori|pk|ru|scc|sy|syr|tel|th|tj|tam|ua|uz)
+		    am|ara|ben|bd|bg|bt|by|deva|ge|gh|gr|guj|guru|il|in|ir|iku|kan|kh|kz|la|lao|lk|kg|mk|mm|mn|mv|mal|ori|pk|ru|scc|sy|syr|tel|th|tj|tam|ua|uz)
 			latin=no
 			real_layout=us,$layout
 			;;
