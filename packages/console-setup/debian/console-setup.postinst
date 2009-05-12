@@ -40,11 +40,13 @@ if [ "$1" = "configure" ]; then
     codeset="$RET"
     db_get console-setup/fontface
     fontface="$RET"
+    db_metaget console-setup/use_system_font description
+    if [ "$fontface" = "$RET" ]; then
+	fontface=''
+    fi
     db_get console-setup/fontsize
     fontsize="$RET"
 
-    fontname=$codeset-$fontface$fontsize.psf.gz
-    
     if which ckbcomp-mini >/dev/null; then
 	charmap=UTF-8
     else

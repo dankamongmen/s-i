@@ -294,6 +294,7 @@ available_fontsizes () {
     echo "$fontsets" | sort | \
 	grep "^$codeset-$fontface[0-9]" | \
 	sed -e "s/^$codeset-$fontface//" | \
+	sort -n | \
 	uniq
 }
 
@@ -331,7 +332,7 @@ eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}__${locale_modif}}\"
 [ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}__${locale_modif}}\"
 [ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}}\"
 [ -n "$kbdnames" ] || kbdnames="$kbdnames_C"
-! type iconv || kbdnames="$(echo "$kbdnames" | iconv -f UTF-8)"
+! type iconv >/dev/null || kbdnames="$(echo "$kbdnames" | iconv -f UTF-8)"
 
 case "$locale" in
     *KOI8*|*koi8*)
@@ -1238,6 +1239,9 @@ if [ "$CHARMAP" ]; then
 fi
 if [ "$FONTFACE" ]; then
     default_fontface="$FONTFACE"
+elif [ -e $CONFIGFILE ]; then
+    db_metaget console-setup/use_system_font description
+    default_fontface="$RET"
 fi
 if [ "$FONTSIZE" ]; then
     default_fontsize="$FONTSIZE"
@@ -1890,6 +1894,8 @@ while :; do
 	    choices=`echo "$fontfaces" | sed -e 's/$/,/g'`
 	    # remove newlines
 	    choices=`echo $choices | sed -e 's/,$//'`
+	    db_metaget console-setup/use_system_font description
+	    choices="$choices, $RET"
 	    db_subst console-setup/fontface CHOICES "$choices"
 	    if [ -z "$default_fontface" ]; then
 		case "$codeset" in
@@ -1964,6 +1970,10 @@ while :; do
 	    fi
 	    db_get console-setup/fontface
 	    fontface=$RET
+	    db_metaget console-setup/use_system_font description
+	    if [ "$fontface" = "$RET" ]; then
+		fontface=''
+	    fi
 	    ;;
 	10)
 	    fontsizes=`available_fontsizes`
@@ -1971,21 +1981,26 @@ while :; do
 	    choices=`echo "$fontsizes" | sed -e 's/$/,/g' `
 	    # remove newlines
 	    choices=`echo $choices | sed -e 's/,$//'`
-	    if echo "$choices" | grep -q x; then
-		size_template=console-setup/fontsize-fb
+	    if [ "$choices" ]; then
+		if echo "$choices" | grep -q x; then
+		    size_template=console-setup/fontsize-fb
+		else
+		    size_template=console-setup/fontsize-text
+		fi
+		db_subst $size_template CHOICES "$choices"
+		db_input medium $size_template || true
+		if db_go; then
+		    STATE=$(($STATE + 1))
+		else
+		    STATE=$(($STATE - 1))
+		fi
+		db_get $size_template
+		fontsize=$RET
+		db_set console-setup/fontsize "$fontsize"
 	    else
-		size_template=console-setup/fontsize-text
+		db_set console-setup/fontsize ''
+		STATE=$(( $STATE + $STATE - $old_state ))
 	    fi
-	    db_subst $size_template CHOICES "$choices"
-	    db_input medium $size_template || true
-	    if db_go; then
-		STATE=$(($STATE + 1))
-	    else
-		STATE=$(($STATE - 1))
-	    fi
-	    db_get $size_template
-	    fontsize=$RET
-	    db_set console-setup/fontsize "$fontsize"
 	    ;;
 	11)
 	    db_input medium console-setup/ttys || true
