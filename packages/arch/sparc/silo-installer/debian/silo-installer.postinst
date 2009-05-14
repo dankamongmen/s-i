@@ -5,7 +5,7 @@ set -e
 db_capb backup
 
 findfs () {
-        check=$(mount | grep "on /target${1%/} " | cut -d' ' -f1)
+        check=$(mount | grep "on /target${1%/} " | tail -n1 | cut -d' ' -f1)
         if [ -n "$check" ]; then
 		mapdevfs $check
 	fi
