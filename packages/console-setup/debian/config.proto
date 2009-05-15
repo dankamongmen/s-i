@@ -1109,10 +1109,78 @@ XKBLAYOUT=''
 XKBVARIANT=''
 XKBOPTIONS=''
 
+# Get defaults from debconf, to allow preseeding.
+if [ -d /lib/debian-installer ]; then
+    if db_get console-setup/modelcode && [ "$RET" ]; then
+	default_model="$RET"
+    fi
+    if db_get console-setup/layoutcode && [ "$RET" ]; then
+	default_layout="$RET"
+	layout_priority=medium
+    fi
+    if db_get console-setup/variantcode && [ "$RET" ]; then
+	default_variant="$RET"
+    fi
+    if db_get console-setup/optionscode && [ "$RET" ]; then
+	XKBOPTIONS="$RET"
+    fi
+    if db_get console-setup/fontsize && [ "$RET" ]; then
+	db_set console-setup/fontsize-text "$RET"
+	db_set console-setup/fontsize-fb "$RET"
+    fi
+fi
+
+# Get default layout from xorg.conf if available
+# Lower the priority of the Debconf question to medium.
+if [ -f /etc/X11/xorg.conf -a -z "$XKBLAYOUT" ] && which awk >/dev/null; then
+    awk_expr='
+{
+    $0 = tolower($0);
+    sub("#.*","")
+    xkb = "";
+}
+
+/^[ \t]*section[ \t]+"inputdevice"/,/^[ \t]*endsection/ {
+    if ($1 == "option") {
+	if ($2 == "\"xkbmodel\"") {
+	    xkb = "XKBMODEL";
+	} else if ($2 == "\"xkblayout\"") {
+	    xkb = "XKBLAYOUT";
+	} else if ($2 == "\"xkbvariant\"") {
+	    xkb = "XKBVARIANT";
+	} else if ($2 == "\"xkboptions\"") {
+	    xkb = "XKBOPTIONS"; 
+	}
+	$1 = "";
+	$2 = "";
+    }
+}
+
+xkb != "" && /^[ \t]*\"[^"]+\"[ \t]*$/ {
+    sub("^[ \t]*\"", "");
+    sub("\".*", "");
+    gsub("[ \t]", "");
+    if ($1 !~ /[()]/) {
+	print xkb "=\"" $0 "\"";
+    } else {
+	if (xkb == "XKBLAYOUT" && $1 ~ /^[^()]+\([^()]+\)$/) {
+	    split($1, s, /[()]/);
+	    print "XKBLAYOUT=" s[1];
+	    print "XKBVARIANT=" s[2];
+	}
+    }
+}
+'
+    eval $(awk "$awk_expr" < /etc/X11/xorg.conf)
+    if [ "$XKBLAYOUT" ]; then
+	layout_priority=medium
+    fi
+fi
+
 # Use the value of debian-installer/keymap to get better default
-# layout.  Lower the priority of the Debconf question to medium.
-# This guesswork is copied from xserver-xorg.config.
-if db_get debian-installer/keymap && [ "$RET" ]; then
+# layout.  This guesswork is copied from xserver-xorg.config.
+# Lower the priority of the Debconf question to medium.
+if db_get debian-installer/keymap && [ "$RET" ] && [ -z "$XKBLAYOUT" ]; then
     di_keymap="${RET##mac-usb-}"
     di_keymap="${di_keymap%%-latin1}"
 
@@ -1168,70 +1236,9 @@ if db_get debian-installer/keymap && [ "$RET" ]; then
 	uk) XKBLAYOUT="gb";;
 	us) XKBLAYOUT="us"; XKBMODEL="pc104";;
     esac
-fi
-
-# Get defaults from debconf, to allow preseeding.
-if [ -d /lib/debian-installer ]; then
-    if db_get console-setup/modelcode && [ "$RET" ]; then
-	default_model="$RET"
-    fi
-    if db_get console-setup/layoutcode && [ "$RET" ]; then
-	default_layout="$RET"
+    if [ "$XKBLAYOUT" ]; then
 	layout_priority=medium
     fi
-    if db_get console-setup/variantcode && [ "$RET" ]; then
-	default_variant="$RET"
-    fi
-    if db_get console-setup/optionscode && [ "$RET" ]; then
-	XKBOPTIONS="$RET"
-    fi
-    if db_get console-setup/fontsize && [ "$RET" ]; then
-	db_set console-setup/fontsize-text "$RET"
-	db_set console-setup/fontsize-fb "$RET"
-    fi
-fi
-
-# Get default layout from xorg.conf if available
-if [ -f /etc/X11/xorg.conf ] && which awk >/dev/null; then
-    awk_expr='
-{
-    $0 = tolower($0);
-    sub("#.*","")
-    xkb = "";
-}
-
-/^[ \t]*section[ \t]+"inputdevice"/,/^[ \t]*endsection/ {
-    if ($1 == "option") {
-	if ($2 == "\"xkbmodel\"") {
-	    xkb = "XKBMODEL";
-	} else if ($2 == "\"xkblayout\"") {
-	    xkb = "XKBLAYOUT";
-	} else if ($2 == "\"xkbvariant\"") {
-	    xkb = "XKBVARIANT";
-	} else if ($2 == "\"xkboptions\"") {
-	    xkb = "XKBOPTIONS"; 
-	}
-	$1 = "";
-	$2 = "";
-    }
-}
-
-xkb != "" && /^[ \t]*\"[^"]+\"[ \t]*$/ {
-    sub("^[ \t]*\"", "");
-    sub("\".*", "");
-    gsub("[ \t]", "");
-    if ($1 !~ /[()]/) {
-	print xkb "=\"" $0 "\"";
-    } else {
-	if (xkb == "XKBLAYOUT" && $1 ~ /^[^()]+\([^()]+\)$/) {
-	    split($1, s, /[()]/);
-	    print "XKBLAYOUT=" s[1];
-	    print "XKBVARIANT=" s[2];
-	}
-    }
-}
-'
-    eval $(awk "$awk_expr" < /etc/X11/xorg.conf)
 fi
 
 # Load the config file, if it exists.
@@ -1266,7 +1273,6 @@ XKBLAYOUT=$(echo $XKBLAYOUT | sed 's/ *//g')
 XKBVARIANT=$(echo $XKBVARIANT | sed 's/ *//g')
 
 if [ "$XKBLAYOUT" ]; then
-    layout_priority=medium
     case "$XKBLAYOUT" in
 	lt,lt)
 	    default_layout="${XKBLAYOUT%,*}"
