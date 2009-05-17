@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58381 -->
+<!-- original version: 58504 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1166,6 +1166,48 @@ d-i partman/confirm boolean true
 
   </sect2>
 
+  <sect2 id="preseed-partman-mount-styles">
+  <title>Festlegen, wie Partitionen eingebunden werden</title>
+<para>
+
+Normalerweise werden Dateisysteme unter Verwendung einer eindeutigen
+Kennung, dem Universally Unique Identifier (UUID) als Schlüssel
+eingebunden; auf diesem Wege ist es möglich, sie korrekt einzubinden, selbst
+wenn sich ihr Gerätename ändert. UUIDs sind allerdings lang und schwierig
+zu lesen, daher kann der Installer die Dateisysteme, falls Sie dies bevorzugen, 
+auch basierend auf den traditionellen Gerätenamen einbinden oder aber
+basierend auf einem Label, das sie festlegen. Wenn Sie den Installer anweisen,
+die Einbindung über ein Label vorzunehmen, wird für alle Dateisysteme, die
+kein Label haben, trotzdem der UUID verwendet.
+
+</para><para>
+
+Für Geräte mit feststehenden Namen, wie zum Beispiel logischen LVM-Volumes,
+werden weiterhin die traditionellen Namen statt der UUIDs verwendet.
+
+</para>
+
+<warning><para>
+
+Die traditionellen Gerätenamen können sich basierend auf der Reihenfolge,
+in der der Kernel die Geräte beim Booten erkennt, ändern, was dazu führen
+kann, dass das falsche Dateisystem eingebunden wird. Ähnlich dazu können bei
+den Labels Überschneidungen auftreten, wenn Sie eine neue Festplatte oder
+ein USB-Laufwerk anschließen, und wenn dies passiert, ist das Verhalten
+Ihres Systems beim Starten rein willkürlich.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+# Standardeinstellung ist, mittels UUID einzubinden, Sie können aber auch
+# "traditional" wählen, um die traditionellen Gerätenamen zu nutzen, oder
+# "label", um die Einbindung per Dabeisystem-Label zu versuchen, wobei im
+# Falle eines Fehlers hier die UUIDs als Ausweichlösung verwendet werden.
+#d-i partman/mount_style select uuid
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-base-installer">
   <title>Installation des Basissystems</title>
 <para>
@@ -1379,6 +1421,12 @@ verwenden können.
 
 # Individuelle zusätzliche Pakete, die installiert werden sollen:
 #d-i pkgsel/include string openssh-server build-essential
+# Wenn Pakete, die mittels pkgsel/include (entgegen Ihrer Abhängigkeiten)
+# installiert werden, weitere Pakete lediglich vorschlagen (Recommends),
+# werden diese standardmäßig nicht installiert.
+# Entfernen Sie bei der nächsten Zeile das Rautezeichen, um solche
+# vorgeschlagenen Pakete ebenfalls zu installieren.
+#d-i pkgsel/include/install-recommends boolean true
 # Ob Pakete aktualisiert werden sollen, nachdem debootstrap beendet ist:
 # Gültige Werte: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
@@ -1508,7 +1556,6 @@ während der Installation auszuführen.
 # Dieser erste Befehl wird so früh wie möglich ausgeführt, direkt nachdem
 # das Lesen der Voreinstellungsdatei abgeschlossen ist.
 #d-i preseed/early_command string anna-install some-udeb
-<phrase condition="squeeze">
 # Der folgende Befehl wird ausgeführt direkt bevor das Partitionierungsprogramm
 # startet. Er kann nützlich sein, um dynamische Voreinstellungen für die 
 # Partitionierung festzulegen, die vom Zustand der Festplatten abhängig sind
@@ -1516,7 +1563,6 @@ während der Installation auszuführen.
 # ausgeführt wird).
 #d-i partman/early_command \
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
-</phrase>
 # Dieses Kommando wird ausgeführt, kurz bevor der Installer fertig ist,
 # wenn aber noch ein nutzbares /target-Verzeichnis verfügbar ist.
 # Sie können nach /target »chroot«-en und es direkt benutzen, oder benutzen
