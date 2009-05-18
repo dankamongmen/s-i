@@ -31,11 +31,12 @@ cd ..
 rm -rf apt
 bzr checkout --quiet --lightweight bzr+ssh://bzr.debian.org/bzr/apt/debian-sid apt 2>/dev/null
 
+# d-c has a git repo but I can't clone it
 #echo -n "dictionaries-common "
-rm -rf dictionaries-common
-cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/dict-common co dictionaries-common/debian/po
+#rm -rf dictionaries-common
+#cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/dict-common co dictionaries-common/debian/po
 
-for i in newt ; do
+for i in newt dictionaries-common ; do
 #	echo -n "$i "
 	apt-get $APT_OPT -t unstable source $i >/dev/null
 	rm -f *.tar.gz *.dsc *.diff.gz
