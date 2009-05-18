@@ -1,116 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36639 -->
+<!-- original version: 58440 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booten per TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-   <sect3 arch="arm"><title>Booten von Netwinder-Maschinen per TFTP</title>
-
-<para>
-
-Netwinder-Maschinen haben zwei Netzwerkschnittstellen: eine
-10Mbps NE2000-kompatible Karte (auf die allgemein mittels <literal>eth0</literal>
-verwiesen wird) und eine 100Mbps Tulip-Karte. Es könnte Probleme geben, das
-Image via TFTP über die 100Mbps-Karte zu laden, deshalb wird empfohlen, die
-10Mbps-Schnittstelle zu benutzen (diejenige, die mit <literal>10 Base-T</literal>
-beschriftet ist).
-
-</para>
-<note><para>
-
-Sie benötigen NeTTrom 2.2.1 oder höher, um das Installationssystem zu booten;
-empfohlen wird NeTTrom 2.3.3. Unglücklicherweise sind Firmware-Dateien derzeit
-aufgrund von Lizenzproblemen nicht zum Download verfügbar. Wenn sich diese
-Situation wieder ändert, findet Sie unter Umständen neue Images auf
-<ulink url="http//www.netwinder.org/"></ulink>.
-
-</para></note>
-<para>
-
-Wenn Sie Ihren Netwinder starten, müssen Sie den Boot-Prozess während des
-Countdowns unterbrechen. Dann ist es Ihnen möglich, einige Firmware-Einstellungen
-zu setzen, die zum Booten des Installers nötig sind. Starten Sie als erstes mit
-dem Laden der Standardeinstellungen:
-
-<informalexample><screen>
-    NeTTrom command-&gt; load-defaults
-</screen></informalexample>
-
-Des weiteren müssen Sie Ihr Netzwerk konfigurieren, entweder mit einer statischen
-Adresse ...
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
-</screen></informalexample>
-
-(wobei 24 die Anzahl der gesetzten Bits in der Netzmaske ist) oder mit einer
-dynamischen IP-Adresse:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
-</screen></informalexample>
-
-Unter Umständen müssen Sie noch die <userinput>route1</userinput>-Einstellungen
-ändern, falls sich der TFTP-Server nicht im lokalen Subnetz befindet.
-
-Dieser Anleitung folgend, müssen Sie den TFTP-Server angeben und den
-Ort/den Namen des Images. Dann können Sie Ihre Einstellungen ins Flash
-speichern.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
-    NeTTrom command-&gt; setenv kerntftpfile boot.img
-    NeTTrom command-&gt; save-all
-</screen></informalexample>
-
-Jetzt müssen Sie der Firmware sagen, dass das FTFP-Image gebootet werden soll:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-</screen></informalexample>
-
-Wenn Sie eine serielle Konsole benutzen, um Ihren Netwinder zu installieren,
-benötigen Sie noch die folgende Einstellung:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
-</screen></informalexample>
-
-Wollen Sie alternativ dazu per Tastatur und Monitor installieren, müssen
-Sie einstellen:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-Mit dem <command>printenv</command>-Kommando können Sie Ihre
-Einstellungen zur Kontrolle noch einmal überprüfen. Wenn Sie sich vergewissert
-haben, dass sie richtig sind, können Sie das Image laden:
-
-<informalexample><screen>
-    NeTTrom command-&gt; boot
-</screen></informalexample>
-
-Falls Sie auf Probleme stoßen: es gibt ein <ulink
-url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detailliertes
-HowTo</ulink>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="arm"><title>Booten von CATS-Maschinen per TFTP</title>
-
-<para>
-
-Auf CATS-Maschinen benutzen Sie das Kommando <command>boot de0:</command>
-oder ähnliches am Cyclone-Prompt.
-
-</para>
-   </sect3>
   </sect2>
 
 
@@ -118,12 +12,6 @@ oder ähnliches am Cyclone-Prompt.
 
 &boot-installer-intro-cd.xml;
 
-<para>
-
-Um eine CD-ROM vom Cyclone-Konsolen-Prompt aus zu booten, benutzen Sie
-<command>boot cd0:cats.bin</command>.
-
-</para>
   </sect2>
 
 
