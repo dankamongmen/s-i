@@ -332,7 +332,9 @@ eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}__${locale_modif}}\"
 [ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}__${locale_modif}}\"
 [ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}}\"
 [ -n "$kbdnames" ] || kbdnames="$kbdnames_C"
-! type iconv >/dev/null || kbdnames="$(echo "$kbdnames" | iconv -f UTF-8)"
+! type iconv >/dev/null || \
+    kbdnames="$(echo "$kbdnames" |
+                iconv -f UTF-8 -t $(locale charmap)//TRANSLIT)"
 
 case "$locale" in
     *KOI8*|*koi8*)
