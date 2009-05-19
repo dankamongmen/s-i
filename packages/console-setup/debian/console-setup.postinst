@@ -5,27 +5,6 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
-# The same as /usr/bin/which - in order to make this script work
-# in environments where "which" is not available
-which () {
-    local IFS
-    IFS=:
-    for i in $PATH; do
-	if [ -x "$i/$1" ]; then
-	    echo "$i/$1"
-	    return 0
-	fi
-    done
-    return 1
-}
-
-# In order to make this script work in environments where
-# "md5sum" is not available
-md5sum=`which md5sum`
-if [ -z "$md5sum" ]; then
-    md5sum=true
-fi
-
 # In d-i the config script is not executed automatically
 if [ -f /usr/share/console-setup-mini/console-setup.config ]; then
     /usr/share/console-setup-mini/console-setup.config
@@ -47,7 +26,7 @@ if [ "$1" = "configure" ]; then
     db_get console-setup/fontsize
     fontsize="$RET"
 
-    if which ckbcomp-mini >/dev/null; then
+    if type ckbcomp-mini 2>/dev/null >/dev/null; then
 	charmap=UTF-8
     else
 	db_get console-setup/charmap
@@ -86,7 +65,7 @@ if [ "$1" = "configure" ]; then
 
     . $CONFIGFILE || true
 
-    if which gzip >/dev/null; then
+    if type gzip 2>/dev/null >/dev/null; then
 	ckbcomp $acm_option -model "$model" \
 	    "$layout" "$variant" "$options" \
 	    | gzip -9 >$CONFIGDIR/cached.kmap.gz

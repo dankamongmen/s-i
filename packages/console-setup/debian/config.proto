@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #     Copyright © 2005 Anton Zinoviev <anton@lml.bas.bg>
 
@@ -221,7 +221,7 @@ ask_debconf () {
 guess_arch () {
     local arch subarch line
 
-    if which archdetect >/dev/null; then
+    if type archdetect 2>/dev/null >/dev/null; then
 	archdetect
 	return 0
     fi
@@ -310,7 +310,7 @@ encode_codeset () {
 	sed 's/[*].*//'
 }
 
-if which locale >/dev/null; then
+if type locale 2>/dev/null >/dev/null; then
     eval `locale`
 fi
 
@@ -997,7 +997,7 @@ then
 elif [ "$locale" = C ]; then
     default_charmap=UTF-8
     charmap_priority=high
-elif which locale >/dev/null; then
+elif type locale 2>/dev/null >/dev/null; then
     default_charmap=`locale charmap`
 else
     default_charmap=unknown
@@ -1132,7 +1132,10 @@ fi
 
 # Get default layout from xorg.conf if available
 # Lower the priority of the Debconf question to medium.
-if [ -f /etc/X11/xorg.conf -a -z "$XKBLAYOUT" ] && which awk >/dev/null; then
+if \
+    [ -f /etc/X11/xorg.conf -a -z "$XKBLAYOUT" ] \
+    && type awk 2>/dev/null >/dev/null
+then
     awk_expr='
 {
     $0 = tolower($0);
