@@ -30,10 +30,11 @@ setpassword () {
 	PASSWD="$2"
 	if [ "$3" = true ]; then
 		$chroot $ROOT usermod --password=$PASSWD $USER
-	fi
-	$chroot $ROOT chpasswd $OPTS <<EOF
+	else
+		$chroot $ROOT chpasswd $OPTS <<EOF
 $USER:$PASSWD
 EOF
+	fi
 }
 
 # Enable/disable shadow passwords.
