@@ -25,13 +25,13 @@ fi
 # Pass in three arguments: the user, the password, and 'true' if the
 # password has been pre-crypted (by preseeding).
 setpassword () {
-	local USER PASSWD OPTS
+	local USER PASSWD
 	USER="$1"
 	PASSWD="$2"
 	if [ "$3" = true ]; then
 		$chroot $ROOT usermod --password=$PASSWD $USER
 	else
-		$chroot $ROOT chpasswd $OPTS <<EOF
+		$chroot $ROOT chpasswd <<EOF
 $USER:$PASSWD
 EOF
 	fi
