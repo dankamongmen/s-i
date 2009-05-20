@@ -29,7 +29,7 @@ setpassword () {
 	USER="$1"
 	PASSWD="$2"
 	if [ "$3" = true ]; then
-		OPTS=-e
+		$chroot $ROOT usermod --password=$PASSWD $USER
 	fi
 	$chroot $ROOT chpasswd $OPTS <<EOF
 $USER:$PASSWD
