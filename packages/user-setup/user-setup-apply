@@ -28,10 +28,27 @@ setpassword () {
 	local USER PASSWD
 	USER="$1"
 	PASSWD="$2"
-	if [ "$3" = true ]; then
-		$chroot $ROOT usermod --password=$PASSWD $USER
+
+	local VERSION=$($chroot $ROOT dpkg -s passwd | \
+		sed -n '/^Version:/ {s/^Version: //; p}')
+	if $chroot $ROOT dpkg --compare-versions $VERSION ge 1:4.1.4-1; then
+		# support for versions with PAM support (Squeeze)
+		if [ "$3" = true ]; then
+			$chroot $ROOT usermod --password=$PASSWD $USER
+		else
+			$chroot $ROOT chpasswd <<EOF
+$USER:$PASSWD
+EOF
+		fi
 	else
-		$chroot $ROOT chpasswd <<EOF
+		# compatibility support for versions without PAM support (Lenny)
+		local OPTS
+		if [ "$3" = true ]; then
+			OPTS=-e
+		else
+			OPTS=-m
+		fi
+		$chroot $ROOT chpasswd $OPTS <<EOF
 $USER:$PASSWD
 EOF
 	fi
