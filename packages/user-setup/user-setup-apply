@@ -29,8 +29,7 @@ setpassword () {
 	USER="$1"
 	PASSWD="$2"
 
-	local VERSION=$($chroot $ROOT dpkg -s passwd | \
-		sed -n '/^Version:/ {s/^Version: //; p}')
+	local VERSION=$($chroot $ROOT dpkg-query -W -f '${Version}\n' passwd)
 	if $chroot $ROOT dpkg --compare-versions "$VERSION" ge "1:4.1.4-1"; then
 		# support for versions with PAM support (Squeeze)
 		if [ "$3" = true ]; then
