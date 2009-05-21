@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-05-10 00:14+0000\n"
-"PO-Revision-Date: 2009-05-04 22:38+0800\n"
+"PO-Revision-Date: 2009-05-21 17:01+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1819,7 +1819,7 @@ msgstr ""
 #: preseed.xml:875
 #, no-c-format
 msgid "Controlling how partitions are mounted"
-msgstr ""
+msgstr "分区挂载控制"
 
 #. Tag: para
 #: preseed.xml:876
@@ -1831,7 +1831,7 @@ msgid ""
 "prefer, the installer can mount filesystems based on the traditional device "
 "names, or based on a label you assign. If you ask the installer to mount by "
 "label, any filesystems without a label will be mounted using a UUID instead."
-msgstr ""
+msgstr "文件系统一般使用 UUID 作为关键字挂载; 这使得在设备名变更的情况下仍然可以正常挂载。UUID 本身很长不容易阅读，因此，安装程序也可以依照您的意愿使用传统设备名或者指定标签(label)挂载文件系统。假如安装程序使用标签方式，那些没有标签的文件系统仍然使用 UUID 方式挂载。"
 
 #. Tag: para
 #: preseed.xml:885
@@ -1839,7 +1839,7 @@ msgstr ""
 msgid ""
 "Devices with stable names, such as LVM logical volumes, will continue to use "
 "their traditional names rather than UUIDs."
-msgstr ""
+msgstr "具有固定名称的设备，比如 LVM 逻辑卷，将继续使用它们自己的名字而不是 UUID 方式挂载。"
 
 #. Tag: para
 #: preseed.xml:892
@@ -1850,7 +1850,7 @@ msgid ""
 "mounted. Similarly, labels are likely to clash if you plug in a new disk or "
 "a USB drive, and if that happens your system's behaviour when started will "
 "be random."
-msgstr ""
+msgstr "传统设备名会根据内核在引导时发现的次序进行调整，这将导致挂载错误的文件系统。与此类似，假如您插入一个新磁盘或 USB 设备，标签也可能有冲突发生。这样系统启动后会出现一些随机的情况。"
 
 #. Tag: screen
 #: preseed.xml:902
@@ -1863,6 +1863,10 @@ msgid ""
 "# falling back to UUIDs.\n"
 "#d-i partman/mount_style select uuid"
 msgstr ""
+"# The default is to mount by UUID, but you can also choose \"traditional\" to\n"
+"# use traditional device names, or \"label\" to try filesystem labels before\n"
+"# falling back to UUIDs.\n"
+"#d-i partman/mount_style select uuid"
 
 #. Tag: title
 #: preseed.xml:907
@@ -2203,7 +2207,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1034
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2253,6 +2257,10 @@ msgstr ""
 "\n"
 "# Individual additional packages to install\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
+"# By default, packages that are only Recommended by packages installed using\n"
+"# pkgsel/include (as opposed to their dependencies) will not be installed.\n"
+"# Uncomment this line to install Recommends as well.\n"
+"#d-i pkgsel/include/install-recommends boolean true\n"
 "# Whether to upgrade packages after debootstrap.\n"
 "# Allowed values: none, safe-upgrade, full-upgrade\n"
 "#d-i pkgsel/upgrade select none\n"
