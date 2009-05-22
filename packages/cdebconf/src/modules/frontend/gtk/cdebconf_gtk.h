@@ -72,7 +72,7 @@
  * @see create_banner()
  */
 #define LOGO_IMAGE_PATH \
-    BASE_IMAGE_PATH "/logo_debian.png"
+    BASE_IMAGE_PATH "/logo_installer.png"
 
 /** Can the progress be canceled within the current frontend run? */
 #define CAN_CANCEL_PROGRESS(Frontend) \
