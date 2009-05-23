@@ -169,27 +169,33 @@ ask_debconf () {
         sed -e 's/$/,/'`
     choices=`echo $choices | sed 's/, *$//'`
 
-    db_subst $template CHOICES "$choices"
-    default_description=`echo "$kbdnames" |  
-        grep "^$prefix\*${default_code}\*" |
-        sed -e "s/^$prefix\*${default_code}\*//"`
-    if [ -z "$default_description" ]; then
-	# For XkbVariant the empty string is usually a sensible default
+    if echo "$choices" | grep '[^\\\\],' >/dev/null; then
+	db_subst $template CHOICES "$choices"
 	default_description=`echo "$kbdnames" |  
-            grep "^$prefix\*\*" |
-            sed -e "s/^$prefix\*\*//"`
-    fi
-    if [ -n "$default_description" ]; then
-	db_default $template "$default_description"
-    elif [ -n "$default_code" ]; then
-	# A default was requested, but we couldn't resolve it to a
-	# description, so we'd better ask.
-	priority=critical
+            grep "^$prefix\*${default_code}\*" |
+            sed -e "s/^$prefix\*${default_code}\*//"`
+	if [ -z "$default_description" ]; then
+	    # For XkbVariant the empty string is usually a sensible default
+	    default_description=`echo "$kbdnames" |  
+                grep "^$prefix\*\*" |
+		sed -e "s/^$prefix\*\*//"`
+	fi
+	if [ -n "$default_description" ]; then
+	    db_default $template "$default_description"
+	elif [ -n "$default_code" ]; then
+	    # A default was requested, but we couldn't resolve it to a
+	    # description, so we'd better ask.
+	    priority=critical
+	fi
+	
+        db_input $priority $template || true
+	db_go || return 255
+	db_get $template
+    else
+	# There is only one choice - no need to use debconf
+	RET=$(echo "$choices"|sed 's/ *$//')
     fi
 
-    db_input $priority $template || true
-    db_go || return 255
-    db_get $template
     RET=`echo "$kbdnames" | grep "^$prefix\*[^\*]*\*" |
              sed 's/  */ /g' |
              grep "\*$RET\$" |
