@@ -177,17 +177,6 @@ case "$(archdetect)" in
 	db_subst $template BOOTARGS "root=$rootfs"
 	db_input high $template || true
 	;;
-    arm/netwinder)
-	kernel=vmlinuz
-
-	template=nobootloader/confirmation_arm_netwinder_nettrom
-	db_subst $template KERNDEV "$bootfs"
-	db_subst $template KERNFILE "/${boot}${kernel}"
-	db_subst $template ROOTDEV "$rootfs"
-	# TODO: handle serial console (#274695)
-	db_subst $template CMDAPPEND "root=$rootfs"
-	db_input high $template || true
-	;;
     *)
 	db_get base-installer/kernel/linux/link_in_boot
 	link_in_boot="$RET"
