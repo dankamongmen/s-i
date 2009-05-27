@@ -5,6 +5,7 @@
 <style-specification use="docbook">
 <style-specification-body>
 
+(define %charset% "UTF-8")
 (define %section-autolabel% 
   ;; Are sections enumerated?
    #t )
