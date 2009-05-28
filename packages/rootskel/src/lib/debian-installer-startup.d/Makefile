@@ -47,11 +47,6 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S04countcpus-linux-alpha
   endif
 
-  ifneq (,$(filter arm,$(DEB_HOST_ARCH_CPU)))
-    files += \
-	S02netwinder-net
-  endif
-
   ifneq (,$(filter hppa,$(DEB_HOST_ARCH_CPU)))
     files += \
 	S04countcpus-linux-hppa
