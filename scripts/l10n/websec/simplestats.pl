@@ -110,6 +110,6 @@ if ($transreport ne "" || $spellreport ne "") {
   print "$transreport\n" if ($transreport ne "");
   print "$spellreport\n" if ($spellreport ne "");
   print "\n";
-  print "Check http://d-i.alioth.debian.org/l10n-stats/ to access D-I levels material\n";
-  print "Check http://d-i.alioth.debian.org/spellcheck/ for details about spellchecker issues\n";
+  print "Check http://d-i.debian.org/l10n-stats/ to access D-I levels material\n";
+  print "Check http://d-i.debian.org/l10n-spellcheck/ for details about spellchecker issues\n";
 }
