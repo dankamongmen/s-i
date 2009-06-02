@@ -93,19 +93,22 @@ fi
 founddevs=
 if [ -d /sys/block ]; then
 	if type udevadm >/dev/null 2>&1; then
-		disk_containing () {
-			dirname "$(udevadm info -q path -n "$dev")"
+		device_info () {
+			udevadm info "$@"
 		}
 	elif type udevinfo >/dev/null 2>&1; then
-		disk_containing () {
-			dirname "$(udevinfo -q path -n "$dev")"
+		device_info () {
+			udevinfo "$@"
 		}
 	fi
 fi
-if type disk_containing >/dev/null 2>&1; then
+if type device_info >/dev/null 2>&1; then
+	disk_containing () {
+		dirname "$(device_info -q path -n "$dev")"
+	}
 	partitions="$(list-devices partition)"
 	for dev in $partitions; do
-		if ! udevinfo -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
+		if ! device_info -q env -n "$dev" | grep -q '^ID_BUS=usb$'; then
 			continue
 		fi
 		disk="$(disk_containing "$dev")"
