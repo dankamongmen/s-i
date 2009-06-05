@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # *** l10n-spellcheck.sh ***
-export LOCAL_REPOSITORY="${HOME}/d-i/levels/level4"
-export OUT_DIR="/var/lib/gforge/chroot/home/groups/d-i/htdocs/spellcheck/level4/"
+export LOCAL_REPOSITORY="${HOME}/tmp/spellcheck/level4"
+export OUT_DIR="/org/d-i.debian.org/www/l10n-spellcheck/level4/"
 
 # remove ${ALL_THESE_VARIABLES} which do not need to be spell checked
 export REMOVE_VARS="yes"
