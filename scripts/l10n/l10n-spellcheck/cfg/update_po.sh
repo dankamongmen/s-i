@@ -20,9 +20,10 @@
 #     MA 02111-1307 USA
 #
 
-TAR_FILE=/var/lib/gforge/chroot/home/groups/d-i/htdocs/l10n-stats/all-po.tar.gz
-DEST=~/d-i/levels/
+TAR_FILE=~/l10n/results/all-po.tar.gz
+DEST=~/tmp/spellcheck
 
+mkdir -p ${DEST}
 rm -fr ${DEST}/*
 
 tar xzf ${TAR_FILE} -C ${DEST}

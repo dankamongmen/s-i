@@ -191,14 +191,17 @@ fi
 	rm ${FILE_CODEPOINTS}
     fi
 
-# if a binary wl exists, use it
-if [ -f ${WLS_PATH}/${LANG}_di_wl ] ; then
-    WL_PARAM="--add-extra-dicts ${WLS_PATH}/${LANG}_di_wl"
-fi
-
 if [ ${DICT} != "null" ] ; then
+	EXTRADICT=`tempfile`
+	cat ${WLS_PATH}/${LANG}_wl.txt  ${WLS_PATH}/di_common_wl.txt 2>/dev/null | \
+		grep -E -v "^#.*" | \
+		grep -v -E "^$" | \
+		aspell --lang=${DICT} --encoding=utf-8 --dont-validate-words create master ${EXTRADICT}
+	if [ -f ${EXTRADICT} ] ; then
+	WL_PARAM="--add-extra-dicts ${EXTRADICT}"
+	fi
 # spell check the selected strings eventually using a custom wl 
-    aspell list --lang=${LANG} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} < ${FILE_TO_CHECK} > ${ALL_UNKNOWN}
+    aspell list --dont-validate-words --lang=${DICT} --encoding=utf-8 ${WL_PARAM} ${ASPELL_EXTRA_PARAM} < ${FILE_TO_CHECK} > ${ALL_UNKNOWN}
 
 # sort all the unrecognized words (don't care about upper/lower case)
 # count duplicates
@@ -222,6 +225,8 @@ else
     NEEDS_RM=`echo ${NEEDS_RM} | sed "s:${ALL_UNKNOWN}::"`
     FILES_TO_KEEP=`echo ${FILES_TO_KEEP} | sed "s:${UNKN}::"`
 fi
+
+rm ${EXTRADICT} >/dev/null 2>&1
 
 rm ${NEEDS_RM}
 

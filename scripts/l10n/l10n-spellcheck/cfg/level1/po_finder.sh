@@ -6,7 +6,8 @@ LANG=$2
 
 # English master file "template.pot" (before we found "en.po")
 if [ ${LANG} = en ] ; then
-    echo "${DI_COPY}/master/template.pot"
+    i# echo "${DI_COPY}/master/template.pot"
+    find ${DI_COPY}/POT -name "*.pot"
     exit
 fi
 
