@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58385 -->
+<!-- original version: 58504 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1913,6 +1913,73 @@ d-i partman/confirm boolean true
 </screen></informalexample>
   </sect2>
 
+  <sect2 id="preseed-partman-mount-styles">
+  <!-- <title>Controlling how partitions are mounted</title> -->
+  <title>Controllo del montaggio delle partizioni</title>
+<para>
+
+<!--
+Normally, filesystems are mounted using a universally unique identifier
+(UUID) as a key; this allows them to be mounted properly even if their
+device name changes. UUIDs are long and difficult to read, so, if you
+prefer, the installer can mount filesystems based on the traditional device
+names, or based on a label you assign. If you ask the installer to mount by
+label, any filesystems without a label will be mounted using a UUID instead.
+-->
+
+Normalmente i filesystem vengono montati usando come chiave un UUID
+(identificatore unversalmente univoco); questo permette di montarli
+correttamente anche quando cambia il nome del device. Gli UUID sono
+lunghi e diffici da leggere, quindi, se si preferisce, l'installatore
+può montare i filesystem usando il nome del device o in base a
+un'etichetta assegnata dall'utente. Qualora si chieda all'installatore
+di usare le etichette per montare i filesystem, qualsiasi filesystem
+senza un'etichetta verrà montato usando l'UUID.
+
+</para><para>
+
+<!--
+Devices with stable names, such as LVM logical volumes, will continue to use
+their traditional names rather than UUIDs.
+-->
+
+I device con nomi stabili, come i volumi logici LVM, continueranno a
+usare i loro nomi tradizionali anziché gli UUID.
+
+</para>
+
+<warning><para>
+
+<!--
+Traditional device names may change based on the order in which the kernel
+discovers devices at boot, which may cause the wrong filesystem to be
+mounted. Similarly, labels are likely to clash if you plug in a new disk or
+a USB drive, and if that happens your system's behaviour when started will
+be random.
+-->
+
+I tradizionali nomi dei device possono cambiare in base all'ordine con
+cui il kernel riconosce i device durante l'avvio, questo può comportare
+che venga montato il filesystem sbagliato. In modo simile, le etichette
+possono facilmente collidere quando si inserisce un nuovo disco o un
+dispositivo USB e, quando questo accade, il comportamento del sistema
+diventa imprevedibile.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+<!--
+# The default is to mount by UUID, but you can also choose "traditional" to
+# use traditional device names, or "label" to try filesystem labels before
+# falling back to UUIDs.
+--># Il comportamento predefinito è eseguire il mount usando l'UUID, è
+# anche possibile scegliere "traditional" per utilizzare i tradizionali
+# nomi dei device oppure "label" per provare con le etichette del
+# filesystem prima di usare gli UUID.
+#d-i partman/mount_style select uuid
+</screen></informalexample>
+  </sect2>
+
   <sect2 id="preseed-base-installer">
   <!-- <title>Base system installation</title> -->
   <title>Installazione del sistema di base</title>
@@ -2228,6 +2295,15 @@ sulla riga di comando del kernel.
 # Individual additional packages to install
 --># Ulteriori pacchetti da installare
 #d-i pkgsel/include string openssh-server build-essential
+<!--
+# By default, packages that are only Recommended by packages installed using
+# pkgsel/include (as opposed to their dependencies) will not be installed.
+# Uncomment this line to install Recommends as well.
+--># Normalmente, i pacchetti che sono solo Raccomandati dai pacchetti
+# installati con pkgsel/include (a differenza delle loro dipendenze)
+# non vengono installati. Togliere il commento dalla riga seguente per
+# installare anche i pacchetti Raccomandati.
+#d-i pkgsel/include/install-recommends boolean true
 <!--
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade
