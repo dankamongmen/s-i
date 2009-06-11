@@ -69,10 +69,9 @@ do
 	    "zh_TW") R="Traditional Chinese";;
             *) R=$CSN;;
 	 esac
-    elif [ -e "/usr/share/iso-codes/iso_639.tab" ]
+    elif [ -x "/usr/bin/isoquery" ]
     then
-	R=`cut -f 3,4 /usr/share/iso-codes/iso_639.tab | grep "^$CSN" | \
-		cut -f 2 | cut -d ";" -f 1`
+	R=`/usr/bin/isoquery -i 639 $CSN | cut -f 4 | cut -f1 -d";"`
     else
   
     case $CSN in
