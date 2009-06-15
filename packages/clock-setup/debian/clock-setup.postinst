@@ -28,38 +28,43 @@ if [ "$RET" = true ]; then
 
 	db_capb progresscancel
 	db_progress START 0 30 clock-setup/progress/title
-	db_progress INFO clock-setup/progress/ntp
-	i=0
-	exec 4>&0
-	rdate -o 123 -nvv "$server" 2>&1 |
-	while read line; do
-		if ! db_progress set $i <&4; then
-			log "rdate canceled."
-			break
-		fi
-		case "$line" in
-		    '.')
-			i=$(($i + 1))
-			;;
-		    *:*:*)
-			# new date
-			log "$line"
-			;;
-		    'rdate: adjust'*)
-			log "$line"
-			# success
-			db_progress set 30 <&4 || true
-			;;
-		    *)
-			log "$line"
-			# After an error rdate might exit or skip to the next
-			# server.  In both case, let's reset the progress bar.
-			i=0
-			;;
-		esac
-	done
-	exec 0>&4
+	if ! db_progress INFO clock-setup/progress/ntp; then
+		log "rdate canceled (before starting)."
+	else
+		i=0
+		exec 4>&0
+		rdate -o 123 -nvv "$server" 2>&1 |
+		while read line; do
+			if ! db_progress set $i <&4; then
+				log "rdate canceled."
+				break
+			fi
+			case "$line" in
+			    '.')
+				i=$(($i + 1))
+				;;
+			    *:*:*)
+				# new date
+				log "$line"
+				;;
+			    'rdate: adjust'*)
+				log "$line"
+				# success
+				db_progress set 30 <&4 || true
+				;;
+			    *)
+				log "$line"
+				# After an error rdate might exit or skip to
+				# the next server.  In both case, let's
+				# reset the progress bar.
+				i=0
+				;;
+			esac
+		done
+		exec 0>&4
+	fi
 	db_progress stop
+	db_capb
 fi
 
 tzsetup
