@@ -4,6 +4,9 @@ partman-lvm (67) UNRELEASED; urgency=low
     - The LVM tools seem to be a bit racy. Add some 'update-dev --settle'
       calls after various volume group operations to try to make things a
       little more synchronous.
+    - swapoff and umount may write to the device and thereby trigger udev
+      change events, so wait for udev to settle before calling lvremove (LP:
+      #341046).
 
  -- Colin Watson <cjwatson@debian.org>  Mon, 15 Jun 2009 15:27:26 +0100
 

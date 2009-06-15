@@ -338,6 +338,10 @@ lv_delete() {
 	swapoff $device > /dev/null 2>&1
 	umount $device > /dev/null 2>&1
 
+	# swapoff or umount may have fiddled with metadata on the block
+	# device, so we may need to wait for udev to finish rescanning it.
+	update-dev --settle
+
 	log-output -t partman-lvm lvremove -f "$device"
 	return $?
 }
