@@ -445,6 +445,7 @@ vg_create() {
 		pv_create "$pv" || return 1
 	done
 	log-output -t partman-lvm vgcreate "$vg" $* || return 1
+	update-dev --settle
 	return 0
 }
 
@@ -454,11 +455,14 @@ vg_delete() {
 	vg="$1"
 
 	log-output -t partman-lvm vgchange -a n "$vg" && \
+	update-dev --settle && \
 	log-output -t partman-lvm vgremove "$vg" && \
+	update-dev --settle && \
 	return 0
 
 	# reactivate if deleting failed
 	log-output -t partman-lvm vgchange -a y "$vg"
+	update-dev --settle
 	return 1
 }
 
