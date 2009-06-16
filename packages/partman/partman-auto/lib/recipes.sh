@@ -54,12 +54,20 @@ decode_recipe () {
 			set -- $line
 			if expr "$1" : '[0-9][0-9]*$' >/dev/null; then
 				min=$1
+			elif expr "$1" : '[0-9][0-9]*+[0-9][0-9]*%$' >/dev/null; then
+				ram_percent="${1#*+}"
+				ram_percent="${ram_percent%?}"
+				min=$((${1%%+*} + $ram * $ram_percent / 100))
 			elif expr "$1" : '[0-9][0-9]*%$' >/dev/null; then
 				min=$(($ram * ${1%?} / 100))
 			else # error
 				min=2200000000 # there is no so big storage device jet
 			fi
-			if expr "$2" : '[0-9][0-9]*%$' >/dev/null; then
+			if expr "$2" : '[0-9][0-9]*+[0-9][0-9]*%$' >/dev/null; then
+				ram_percent="${2#*+}"
+				ram_percent="${ram_percent%?}"
+				factor=$((${2%%+*} + $ram * $ram_percent / 100))
+			elif expr "$2" : '[0-9][0-9]*%$' >/dev/null; then
 				factor=$(($ram * ${2%?} / 100))
 			elif expr "$2" : '[0-9][0-9]*$' >/dev/null; then
 				factor=$2
@@ -72,6 +80,10 @@ decode_recipe () {
 			if [ "$3" = "-1" ] || \
 			   expr "$3" : '[0-9][0-9]*$' >/dev/null; then
 				max=$3
+			elif expr "$3" : '[0-9][0-9]*+[0-9][0-9]*%$' >/dev/null; then
+				ram_percent="${3#*+}"
+				ram_percent="${ram_percent%?}"
+				max=$((${3%%+*} + $ram * $ram_percent / 100))
 			elif expr "$3" : '[0-9][0-9]*%$' >/dev/null; then
 				max=$(($ram * ${3%?} / 100))
 			else # error
