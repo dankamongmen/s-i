@@ -1,0 +1,29 @@
+# This file is used to build up the control file. The kernel version and
+# "-di" are appended to the package names. Section can be left out. So can
+# architecture, which is derived from the files in the modules directory.
+# It overwrites specifications from /usr/share/kernel-wedge/package-list.
+#
+Package: kernel-image
+Depends: acpi-modules
+Provides: ufs-modules
+
+Package: fat-modules
+Priority: standard
+
+Package: nic-modules
+Depends: kernel-image, nic-shared-modules, firmware-modules, firewire-core-modules
+
+Package: scsi-modules
+Depends: kernel-image, isa-pnp-modules, scsi-core-modules, parport-modules, cdrom-core-modules, firmware-modules
+
+Package: nic-extra-modules
+Depends: kernel-image, isa-pnp-modules, nic-shared-modules, firmware-modules, crc-modules
+
+Package: nic-usb-modules
+Depends: kernel-image, nic-shared-modules, usb-modules, firmware-modules
+
+Package: ppp-modules
+Depends: serial-modules, kernel-image, crc-modules
+
+Package: pcmcia-modules
+Depends: kernel-image, isa-pnp-modules, firmware-modules
