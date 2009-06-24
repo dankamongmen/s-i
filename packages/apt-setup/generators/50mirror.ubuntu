@@ -95,6 +95,16 @@ hostname="$RET"
 db_get mirror/$protocol/directory
 directory="/${RET#/}"
 
+# Awful hack. Source for ports architectures is only available on
+# archive.ubuntu.com, not ports.ubuntu.com.
+if [ "$hostname" = ports.ubuntu.com ]; then
+	srchostname=archive.ubuntu.com
+	srcdirectory=/ubuntu
+else
+	srchostname="$hostname"
+	srcdirectory="$directory"
+fi
+
 if [ "$protocol" = http ]; then
 	db_get mirror/$protocol/proxy
 	proxy="$RET"
@@ -107,12 +117,12 @@ fi
 
 cat >> $file <<EOF
 deb $protocol://$hostname$directory $codename $dists
-deb-src $protocol://$hostname$directory $codename $dists
+deb-src $protocol://$srchostname$srcdirectory $codename $dists
 
 ## Major bug fix updates produced after the final release of the
 ## distribution.
 deb $protocol://$hostname$directory $codename-updates $dists
-deb-src $protocol://$hostname$directory $codename-updates $dists
+deb-src $protocol://$srchostname$srcdirectory $codename-updates $dists
 EOF
 
 # Even if universe isn't enabled, we write example lines for it.
@@ -133,7 +143,7 @@ cat >> $file <<EOF
 ## universe WILL NOT receive any review or updates from the Ubuntu security
 ## team.
 ${COMMENT}deb $protocol://$hostname$directory $codename universe
-${COMMENT}deb-src $protocol://$hostname$directory $codename universe
+${COMMENT}deb-src $protocol://$srchostname$srcdirectory $codename universe
 EOF
 
 # Multiverse is different, don't write anything unless enabled.
@@ -146,7 +156,7 @@ if db_get apt-setup/multiverse && [ "$RET" = true ]; then
 ## multiverse WILL NOT receive any review or updates from the Ubuntu
 ## security team.
 deb $protocol://$hostname$directory $codename multiverse
-deb-src $protocol://$hostname$directory $codename multiverse
+deb-src $protocol://$srchostname$srcdirectory $codename multiverse
 EOF
 fi
 
@@ -169,7 +179,7 @@ cat >> $file <<EOF
 ## Also, please note that software in backports WILL NOT receive any review
 ## or updates from the Ubuntu security team.
 ${COMMENT}deb $protocol://$hostname$directory $codename-backports main restricted universe multiverse
-${COMMENT}deb-src $protocol://$hostname$directory $codename-backports main restricted universe multiverse
+${COMMENT}deb-src $protocol://$srchostname$srcdirectory $codename-backports main restricted universe multiverse
 EOF
 
 if (db_get apt-setup/restricted && [ "$RET" = true ]) || \
