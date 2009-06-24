@@ -28,12 +28,12 @@ done
 close_dialog
 
 db_metaget partman-partitioning/text/biosgrub description
-description=$(stralign -25 "$RET")
+description="$RET"
 
 if [ $biosgrub = yes ]; then
 	db_metaget partman-partitioning/text/on description
-	printf "nobiosgrub\t%s%s\n" "$description" "${RET}"
+	printf "nobiosgrub\t%s\${!TAB}%s\n" "$description" "${RET}"
 else
 	db_metaget partman-partitioning/text/off description
-	printf "biosgrub\t%s%s\n" "$description" "${RET}"
+	printf "biosgrub\t%s\${!TAB}%s\n" "$description" "${RET}"
 fi
