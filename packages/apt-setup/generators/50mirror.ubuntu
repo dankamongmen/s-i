@@ -127,6 +127,14 @@ deb-src $protocol://$srchostname$srcdirectory $codename $dists
 deb $protocol://$hostname$directory $codename-updates $dists
 deb-src $protocol://$srchostname$srcdirectory $codename-updates $dists
 EOF
+if [ "$PROPOSED" = true ]; then
+	cat >> $file <<EOF
+
+## Proposed updates undergoing testing.
+deb $protocol://$hostname$directory $codename-proposed $dists
+deb-src $protocol://$srchostname$srcdirectory $codename-proposed $dists
+EOF
+fi
 
 # Even if universe isn't enabled, we write example lines for it.
 echo >> $file
