@@ -24,6 +24,24 @@ else
 	addfile /proc/bus/pci/devices
 fi
 
+if type usb-list >/dev/null 2>&1; then
+	# only available in udeb
+	usb-list 2>&1 | addinfo usb-list
+elif [ -r /proc/bus/usb/devices ]; then
+	# usbfs dropped per 2.6.31
+	addfile /proc/bus/usb/devices
+elif [ -r /sys/debug/usb/devices ]; then
+	# added per 2.6.31 but debugfs may not be mounted
+	addfile /sys/debug/usb/devices
+if type usb-devices >/dev/null 2>&1; then
+	# planned (2009/06) to be added in usbutils
+	usb-devices 2>&1 | addinfo usb-devices
+elif type lsusb >/dev/null 2>&1; then
+	lsusb 2>&1 | addinfo lsusb
+else
+	echo "No USB information available" | addinfo usb
+fi
+
 if type prtconf >/dev/null 2>&1 ; then
 	prtconf 2>&1 | addinfo "prtconf"
 fi
@@ -45,11 +63,11 @@ if type dmraid >/dev/null 2>&1; then
 	fi
 fi
 
-# Note: as of 2.6.31 /proc/bus/usb/devices has moved to debugfs
 for file in cmdline cpuinfo ioports iomem interrupts meminfo \
-	bus/usb/devices bus/input/devices; do
+	bus/input/devices; do
 	addfile /proc/$file
 done
+
 if type dmidecode >/dev/null 2>&1; then
 	dmidecode 2>&1 | addinfo dmidecode
 fi
