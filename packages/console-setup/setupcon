@@ -114,10 +114,6 @@ fi
 
 . "$CONFIG"
 
-if [ -d /lib/debian-installer ]; then
-    CHARMAP=UTF-8
-fi
-
 if [ "$verbose_option" = yes ]; then
     VERBOSE_OUTPUT=yes
 fi
@@ -127,9 +123,9 @@ else
     verbose='>/dev/null 2>&1'
 fi
 
-if which ckbcomp-mini >/dev/null && [ "$CHARMAP" != UTF-8 ]; then
+if which ckbcomp-mini >/dev/null; then
     CHARMAP=UTF-8
-    if [ "$VERBOSE_OUTPUT" = yes ]; then
+    if [ "$VERBOSE_OUTPUT" = yes -a "$CHARMAP" != UTF-8 ]; then
 	echo Only UTF-8 is supported by console-setup-mini
     fi
 fi
