@@ -1891,21 +1891,31 @@ while :; do
 	    fi
 	    ;;		    
 	7)
-	    # add commas
-	    choices=`echo "$charmaps" | sed -e 's/$/,/g' | sort `
-	    # remove newlines
-	    choices=`echo $choices | sed -e 's/,$//' `
-	    db_subst console-setup/charmap CHOICES "$choices"
-	    db_default console-setup/charmap "$default_charmap"
-	    db_input $charmap_priority console-setup/charmap || true
-	    if db_go; then
-		STATE=$(($STATE + 1))
+	    if
+		[ -d /lib/debian-installer ] \
+		    && db_get debian-installer/charmap \
+		    && [ "$RET" ]
+	    then
+		charmap=$default_charmap
+		# skip the questions without making Debconf loop
+		STATE=$(( $STATE + $STATE - $old_state ))
 	    else
-		STATE=$(($STATE - 1))
+                # add commas
+		choices=`echo "$charmaps" | sed -e 's/$/,/g' | sort `
+	        # remove newlines
+		choices=`echo $choices | sed -e 's/,$//' `
+		db_subst console-setup/charmap CHOICES "$choices"
+		db_default console-setup/charmap "$default_charmap"
+		db_input $charmap_priority console-setup/charmap || true
+		if db_go; then
+		    STATE=$(($STATE + 1))
+		else
+		    STATE=$(($STATE - 1))
+		fi
+		db_get console-setup/charmap
+		default_charmap="$RET"
+		charmap=$RET
 	    fi
-	    db_get console-setup/charmap
-	    default_charmap="$RET"
-	    charmap=$RET
 	    ;;
 	8)
 	    # It shouldn't be possible for $default_codeset to be
