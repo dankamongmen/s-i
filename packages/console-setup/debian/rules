@@ -161,6 +161,9 @@ install-mini: build
 	install -d debian/console-setup-mini/etc/console-setup/
 	install -d debian/console-setup-mini/usr/share/doc/console-setup-mini/examples/
 	cp config debian/console-setup-mini/usr/share/doc/console-setup-mini/examples/console-setup
+	$(compactize) debian/console-setup-mini/bin/setupcon
+	$(compactize) debian/console-setup-mini/usr/bin/ckbcomp-mini
+	$(compactize) debian/console-setup-mini.config
 	rm -rf `find debian/console-setup-mini -name .cvsignore`
 	rm -rf `find debian/console-setup-mini -name .svn`
 
@@ -269,6 +272,9 @@ install-udeb: build
 	dh_installdirs -p console-setup-udeb etc/default
 	dh_installdirs -p console-setup-udeb etc/console-setup/
 	cp config debian/console-setup-udeb/usr/share/console-setup-mini/console-setup.proto
+	$(compactize) debian/console-setup-udeb/bin/setupcon
+	$(compactize) debian/console-setup-udeb/usr/bin/ckbcomp-mini
+	$(compactize) debian/console-setup-udeb/usr/share/console-setup-mini/console-setup-mini.config
 	rm -rf `find debian/console-setup-udeb -name .cvsignore`
 	rm -rf `find debian/console-setup-udeb -name .svn`
 
@@ -299,6 +305,8 @@ binary-indep: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
+	$(compactize) debian/console-setup-mini/DEBIAN/postinst
+	$(compactize) debian/console-setup-udeb/DEBIAN/postinst
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
