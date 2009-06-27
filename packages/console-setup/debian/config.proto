@@ -109,14 +109,17 @@ XKBOPTIONS=''
 # ...
 # UTF-8'
 
-## KBDNAMES ## Will be replaced by assignment for $kbdnames:
+## KBDNAMES ## Will be replaced by all_kbdnames function:
 
-# kbdnames='model*logicdp*Logitech Cordless Desktop Pro
-# model*omnikey101*Northgate OmniKey 101
+# all_kbdnames () {
+#  cat <<'EOF' 
+# C*model*logidinovo*Logitech diNovo Keyboard
+# C*model*amiga*Amiga
 # ...
-# layout*el*Greek
-# ...
-# variant*it*nodeadkeys*Eliminate dead keys'
+# zh_TW*layout*al*阿爾巴尼亞
+# zh_TW*variant*al**阿爾巴尼亞
+# EOF
+# }
 
 ## CODESETS ##
 
@@ -333,11 +336,18 @@ locale_country=$(echo $locale | sed 's/.*_//;s/\..*//;s/@.*//')
 locale_modif=
 echo $locale | grep -v -q @ || locale_modif=$(echo $locale | sed 's/.*@//')
 
-eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}__${locale_modif}}\"
-[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}_${locale_country}}\"
-[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}__${locale_modif}}\"
-[ -n "$kbdnames" ] || eval kbdnames=\"\${kbdnames_${locale_lang}}\"
-[ -n "$kbdnames" ] || kbdnames="$kbdnames_C"
+lang_kbdnames () {
+    all_kbdnames \
+	| grep "^$1[*]" \
+	| sed "s/^$1[*]//"
+}
+
+kbdnames=$(lang_kbdnames ${locale_lang}_${locale_country}__${locale_modif})
+[ -n "$kbdnames" ] || kbdnames=$(lang_kbdnames ${locale_lang}_${locale_country}__${locale_modif})
+[ -n "$kbdnames" ] || kbdnames=$(lang_kbdnames ${locale_lang}_${locale_country})
+[ -n "$kbdnames" ] || kbdnames=$(lang_kbdnames ${locale_lang})
+[ -n "$kbdnames" ] || kbdnames=$(lang_kbdnames C)
+
 ! type iconv >/dev/null || \
     kbdnames="$(echo "$kbdnames" |
                 iconv -f UTF-8 -t $(locale charmap)//TRANSLIT)"

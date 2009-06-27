@@ -10,7 +10,7 @@ main_build:
 	cd Keyboard && $(MAKE) build-mini xkbdir=$(xkbdir)
 	touch main_build
 
-debian/console-setup.config debian/console-setup-mini.config: debian/config.proto main_build
+debian/console-setup.config: debian/config.proto main_build
 	awk ' \
 /## *PACKAGE *##/ { \
     printf "package=$(notdir $(basename $@))"; \
@@ -29,14 +29,49 @@ debian/console-setup.config debian/console-setup-mini.config: debian/config.prot
     next; \
 } \
 /## *KBDNAMES *##/ { \
-    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl"); \
+    printf "all_kbdnames () {\n cat <<'\''EOF'\'' | uudecode | zcat \n"; \
+    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | gzip -9 | uuencode -"); \
+    printf "EOF\n}\n"; \
     next; \
 } \
 { \
    print; \
 }' debian/config.proto >$@
 
-build: main_build debian/console-setup.config debian/console-setup-mini.config
+ debian/console-setup-mini.config: debian/config.proto main_build
+	awk ' \
+/## *PACKAGE *##/ { \
+    printf "package=$(notdir $(basename $@))"; \
+    next; \
+} \
+/## *FONTSETS *##/ { \
+    printf "fontsets='\''"; \
+    system("cd Fonts && ls *.psf | sed '\''s/.psf$$//'\''"); \
+    printf "'\''"; \
+    next; \
+} \
+/## *CHARMAPS *##/ { \
+    printf "charmaps='\''"; \
+    system("cd Keyboard && ls acm/*.acm |sed -e '\''s/^acm.//'\'' -e '\''s/.acm$$//'\''"); \
+    printf "UTF-8'\''\n"; \
+    next; \
+} \
+/## *KBDNAMES *##/ { \
+    printf "all_kbdnames () {\n cat <<'\''EOF'\'' \n"; \
+    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | grep '\''^C[*]'\''"); \
+    printf "EOF\n [ ! -f /usr/share/console-setup-mini/kbdnames.gz ] || zcat /usr/share/console-setup-mini/kbdnames.gz \n}\n"; \
+    next; \
+} \
+{ \
+   print; \
+}' debian/config.proto >$@
+
+debian/kbdnames.gz: debian/config.proto main_build
+	( cd Keyboard \
+	&& ./kbdnames-maker MyKeyboardNames.pl \
+		| grep -v '^C[*]' | gzip -9 ) >$@
+
+build: main_build debian/console-setup.config debian/console-setup-mini.config debian/kbdnames.gz
 
 .PHONY : clean
 clean:
@@ -45,6 +80,7 @@ clean:
 	$(MAKE) maintainer-clean
 	-rm -f build main_build
 	-rm -f debian/*.config
+	-rm -f debian/kbdnames.gz
 	-rm -f debian/*~
 	dh_clean
 
@@ -116,6 +152,7 @@ install-mini: build
 		usr/share/consolefonts
 	dh_install -pconsole-setup-mini Fonts/Vietnamese-Fixed16.psf.gz \
 		usr/share/consolefonts
+	dh_install -pconsole-setup-mini debian/kbdnames.gz usr/share/console-setup-mini
 	dh_install -pconsole-setup-mini Keyboard/ckbcomp-mini usr/bin
 	dh_link -pconsole-setup-mini usr/bin/ckbcomp-mini usr/bin/ckbcomp
 	dh_install -pconsole-setup-mini setupcon bin
@@ -205,8 +242,9 @@ install-udeb: build
 	dh_install -pconsole-setup-udeb Keyboard/ckbcomp-mini usr/bin
 	dh_link -pconsole-setup-udeb usr/bin/ckbcomp-mini usr/bin/ckbcomp
 	dh_install -pconsole-setup-udeb setupcon bin
-	dh_install -p console-setup-udeb debian/console-setup.config usr/share/console-setup-mini
-	chmod a+x debian/console-setup-udeb/usr/share/console-setup-mini/console-setup.config
+	dh_install -p console-setup-udeb debian/console-setup-mini.config usr/share/console-setup-mini
+	chmod a+x debian/console-setup-udeb/usr/share/console-setup-mini/console-setup-mini.config
+	dh_install -p console-setup-udeb debian/kbdnames.gz usr/share/console-setup-mini
 	dh_installdirs -p console-setup-udeb lib/debian-installer.d
 	install -m0644 debian/console-setup-udeb.startup \
 		debian/console-setup-udeb/lib/debian-installer.d/S55console-setup
