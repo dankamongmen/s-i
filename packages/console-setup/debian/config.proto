@@ -196,6 +196,7 @@ ask_debconf () {
 	db_get $template
     else
 	# There is only one choice - no need to use debconf
+	[ $STATE -gt $old_state ] || return 255
 	RET=$(echo "$choices"|sed 's/ *$//')
     fi
 
@@ -1435,6 +1436,7 @@ db_default console-setup/toggle "$default_toggle"
 db_default console-setup/switch "$default_switch"
 db_default console-setup/altgr "$default_altgr"
 db_default console-setup/compose "$default_compose"
+initial_default_model="$default_model"
 
 #######################################################################
 
@@ -1448,6 +1450,7 @@ while :; do
 		ask_debconf console-setup/model $model_priority \
 		    model $default_model
 	    then
+		default_model="$RET"
 		db_set console-setup/modelcode "$RET"
 		STATE=$(($STATE + 1))
 	    else
@@ -1499,6 +1502,7 @@ while :; do
 		ask_debconf console-setup/layout "$layout_priority" \
 		    layout "$default_layout"
 	    then
+		default_layout="$RET"
 		layout="$RET"
 		STATE=$(($STATE + 1))
 	    else
@@ -1514,6 +1518,7 @@ while :; do
 		ask_debconf console-setup/variant "$layout_priority" \
                     "variant\*${layout}" "$default_variant"
 	    then
+		default_variant="$RET"
 		variant="$RET"
 		case "$layout" in
 		    cs)
@@ -1886,29 +1891,21 @@ while :; do
 	    fi
 	    ;;		    
 	7)
-	    if [ "$package" = console-setup-mini ]; then
-		if [ "$STATE" -ge "$old_state" ]; then
-		    STATE=$(($STATE + 1))
-		else
-		    STATE=$(($STATE - 1))
-		fi
-		charmap=UTF-8
+	    # add commas
+	    choices=`echo "$charmaps" | sed -e 's/$/,/g' | sort `
+	    # remove newlines
+	    choices=`echo $choices | sed -e 's/,$//' `
+	    db_subst console-setup/charmap CHOICES "$choices"
+	    db_default console-setup/charmap "$default_charmap"
+	    db_input $charmap_priority console-setup/charmap || true
+	    if db_go; then
+		STATE=$(($STATE + 1))
 	    else
-		# add commas
-		choices=`echo "$charmaps" | sed -e 's/$/,/g' | sort `
-		# remove newlines
-		choices=`echo $choices | sed -e 's/,$//' `
-		db_subst console-setup/charmap CHOICES "$choices"
-		db_default console-setup/charmap "$default_charmap"
-		db_input $charmap_priority console-setup/charmap || true
-		if db_go; then
-		    STATE=$(($STATE + 1))
-		else
-		    STATE=$(($STATE - 1))
-		fi
-		db_get console-setup/charmap
-		charmap=$RET
+		STATE=$(($STATE - 1))
 	    fi
+	    db_get console-setup/charmap
+	    default_charmap="$RET"
+	    charmap=$RET
 	    ;;
 	8)
 	    # It shouldn't be possible for $default_codeset to be
@@ -1919,6 +1916,7 @@ while :; do
 	    db_input $codeset_priority console-setup/codeset || true
 	    if db_go; then
 		db_get console-setup/codeset
+		default_codeset="$RET"
 		codeset="`encode_codeset $RET`"
 		db_set console-setup/codesetcode "$codeset"
 		STATE=$(($STATE + 1))
@@ -2007,6 +2005,7 @@ while :; do
 		STATE=$(($STATE - 1))
 	    fi
 	    db_get console-setup/fontface
+	    default_fontface=$RET
 	    fontface=$RET
 	    db_metaget console-setup/use_system_font description
 	    if [ "$fontface" = "$RET" ]; then
@@ -2066,7 +2065,7 @@ else
     # Brasilian layout on Japanese keyboard and Japanese layout on
     # Brasilian keyboard to be possible.
     db_get console-setup/modelcode
-    if [ "$RET" = "$default_model" ]; then
+    if [ "$RET" = "$initial_default_model" ]; then
 	if [ "$layout" = br ]; then 
 	    db_set console-setup/modelcode abnt2
 	elif [ "$layout" = jp ]; then 
