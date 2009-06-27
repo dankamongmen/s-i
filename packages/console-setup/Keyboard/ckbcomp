@@ -3770,11 +3770,7 @@ if ($compact) {
 if ($arch eq 'at') {
     foreach my $key (sort {$a <=> $b} (keys %symbols_table)) {
 	my $kernel_code = $at_scancodes{$key};
-	if (! defined $kernel_code) {
-	    warning "Undefined kernel key code for $key\n";
-	    next;
-	}
-	next if ($kernel_code < 0);
+	next if (! defined $kernel_code || $kernel_code < 0);
  	if ($kernel_code == 84) {
  	    @vector = ('Last_Console') x 64;
  	} elsif ($kernel_code == 99) {
