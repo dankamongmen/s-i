@@ -4,6 +4,7 @@ SHELL = /bin/bash
 
 xkbdir = /usr/share/X11/xkb
 export xkbdir
+compactize = debian/shell_compactize
 
 main_build:
 	$(MAKE) xkbdir=$(xkbdir)
@@ -199,6 +200,18 @@ install-udeb: build
 		usr/share/console-setup-mini
 	dh_install -pconsole-setup-sun5-ekmap Keyboard/sun5.ekmap.gz \
 		usr/share/console-setup-mini
+	rm -rf `find debian/console-setup-amiga-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-amiga-ekmap -name .svn`
+	rm -rf `find debian/console-setup-ataritt-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-ataritt-ekmap -name .svn`
+	rm -rf `find debian/console-setup-macintoshold-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-macintoshold-ekmap -name .svn`
+	rm -rf `find debian/console-setup-pc-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-pc-ekmap -name .svn`
+	rm -rf `find debian/console-setup-sun4-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-sun4-ekmap -name .svn`
+	rm -rf `find debian/console-setup-sun5-ekmap -name .cvsignore`
+	rm -rf `find debian/console-setup-sun5-ekmap -name .svn`
 # console-setup-fonts-udeb
 	dh_install -pconsole-setup-fonts-udeb Fonts/Arabic-VGA16.psf \
 		usr/share/consolefonts
@@ -238,6 +251,8 @@ install-udeb: build
 		usr/share/consolefonts
 	dh_install -pconsole-setup-fonts-udeb Fonts/Vietnamese-Fixed16.psf \
 		usr/share/consolefonts
+	rm -rf `find debian/console-setup-fonts-udeb -name .cvsignore`
+	rm -rf `find debian/console-setup-fonts-udeb -name .svn`
 # console-setup-udeb
 	dh_install -pconsole-setup-udeb Keyboard/ckbcomp-mini usr/bin
 	dh_link -pconsole-setup-udeb usr/bin/ckbcomp-mini usr/bin/ckbcomp
