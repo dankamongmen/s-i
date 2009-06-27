@@ -29,6 +29,7 @@ install: build
 	install setupcon $(bootprefix)/bin/
 	install -d $(etcdir)/console-setup
 	install -m 644 Keyboard/compose.*.inc $(etcdir)/console-setup/
+	install -m 644 Keyboard/remap.inc $(etcdir)/console-setup/
 	cp -r Keyboard/ckb/ $(etcdir)/console-setup/
 #	cp Keyboard/rules $(etcdir)/console-setup/ckb/rules/console
 #	cp Keyboard/rules.xml $(etcdir)/console-setup/ckb/rules/console.xml
