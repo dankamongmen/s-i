@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+PLACES="$PLACES /cdrom/live/filesystem.ext4"
+
+ext4_prepare() {
+	modprobe ext4 || true
+
+	mkdir -p /mnt
+	umount /mnt > /dev/null 2>&1 || true
+	if ! mount -t ext4 -o loop $place /mnt; then
+		error "$place has failed to be mounted as ext4."
+		exit 1
+	fi
+
+	cd /mnt
+}
+
+ext4_teardown() {
+	umount -d /mnt > /dev/null 2>&1 || true
+}
+
+ext4_count() {
+	echo `print-inodes /mnt`
+}
