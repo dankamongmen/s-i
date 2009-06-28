@@ -1,7 +1,10 @@
 #!/usr/bin/make -f
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/autotools.mk
-
 CFLAGS=-Os -Wall -g
-DEB_DH_INSTALLDEBCONF_ARGS=-n
+
+%:
+	dh $@
+
+override_dh_installdebconf:
+	# Do not modify postrm script.
+	dh_installdebconf -n
