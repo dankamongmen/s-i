@@ -62,7 +62,7 @@ debian/console-setup.config: debian/config.proto main_build
 debian/kbdnames.gz: debian/config.proto main_build
 	( cd Keyboard \
 	&& ./kbdnames-maker MyKeyboardNames.pl \
-		| grep -v '^C[*]' | grep -v '[*]model[*]' | gzip -9 ) >$@
+		| grep -v '^C[*]' | grep -v '[*]model[*]' | sort | gzip -9 ) >$@
 
 build: main_build debian/console-setup.config debian/console-setup-mini.config debian/kbdnames.gz
 
