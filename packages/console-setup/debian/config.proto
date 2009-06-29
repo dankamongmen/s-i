@@ -1064,7 +1064,7 @@ case "$arch" in
 	model_priority=medium
 	;;
     m68k/sun*)
-	default_model=sun4 # also sun5, pc105
+	default_model=unknown # sun4, sun5 or pc105
 	model_priority=critical
 	;;
     m68k/*vme*)
@@ -1084,7 +1084,7 @@ case "$arch" in
 	model_priority=medium
 	;;
     powerpc/chrp*)
-	default_model=pc105 # also macintosh_old and maybe amiga
+	default_model=unknown # pc105, macintosh_old or maybe amiga
 	model_priority=critical
 	;;
     powerpc/mac)
@@ -1108,7 +1108,7 @@ case "$arch" in
 	model_priority=medium
 	;;
     sparc*)
-	default_model=sun4 # also sun5, pc105
+	default_model=unknown # sun4, sun5 or pc105
 	model_priority=critical
 	;;
     s390*)
@@ -1116,7 +1116,7 @@ case "$arch" in
 	model_priority=medium
 	;;
     *)
-	default_model=pc105
+	default_model=unknown
 	model_priority=critical
 	;;
 esac    
@@ -1442,15 +1442,26 @@ while :; do
     starting_state=$STATE
     case "$STATE" in
 	1)
-	    if \
-		ask_debconf console-setup/model $model_priority \
-		    model $default_model
-	    then
-		default_model="$RET"
-		db_set console-setup/modelcode "$RET"
-		STATE=$(($STATE + 1))
+	    if [ -f /usr/bin/ckbcomp-mini ]; then
+		db_set console-setup/modelcode $default_model
+		db_fset console-setup/model seen true
+		# skip the question without making Debconf loop
+		STATE=$(( $STATE + $STATE - $old_state ))
 	    else
-		STATE=$(($STATE - 1))
+		if [ $default_model = unknown ]; then
+		    model_priority=critical
+		    db_fset console-setup/model seen false
+		fi
+		if \
+		    ask_debconf console-setup/model $model_priority \
+		    model $default_model
+		then
+		    default_model="$RET"
+		    db_set console-setup/modelcode "$RET"
+		    STATE=$(($STATE + 1))
+		else
+		    STATE=$(($STATE - 1))
+		fi
 	    fi
 	    ;;
 	2)

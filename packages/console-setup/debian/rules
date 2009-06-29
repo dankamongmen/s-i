@@ -51,7 +51,7 @@ debian/console-setup.config: debian/config.proto main_build
 } \
 /## *KBDNAMES *##/ { \
     printf "all_kbdnames () {\n cat <<'\''EOF'\'' \n"; \
-    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | grep '\''^C[*]'\''"); \
+    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | grep '\''^C[*]'\'' | grep -v '\''[*]model[*]'\''"); \
     printf "EOF\n [ ! -f /usr/share/console-setup-mini/kbdnames.gz ] || zcat /usr/share/console-setup-mini/kbdnames.gz \n}\n"; \
     next; \
 } \
@@ -62,7 +62,7 @@ debian/console-setup.config: debian/config.proto main_build
 debian/kbdnames.gz: debian/config.proto main_build
 	( cd Keyboard \
 	&& ./kbdnames-maker MyKeyboardNames.pl \
-		| grep -v '^C[*]' | gzip -9 ) >$@
+		| grep -v '^C[*]' | grep -v '[*]model[*]' | gzip -9 ) >$@
 
 build: main_build debian/console-setup.config debian/console-setup-mini.config debian/kbdnames.gz
 
