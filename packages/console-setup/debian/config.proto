@@ -1141,9 +1141,17 @@ if [ -d /lib/debian-installer ]; then
     if db_get console-setup/optionscode && [ "$RET" ]; then
 	XKBOPTIONS="$RET"
     fi
+    if db_get console-setup/fontface && [ "$RET" ]; then
+	default_fontface="$RET"
+    fi
     if db_get console-setup/fontsize && [ "$RET" ]; then
-	db_set console-setup/fontsize-text "$RET"
-	db_set console-setup/fontsize-fb "$RET"
+	default_fontsize="$RET"
+    fi
+    if db_get console-setup/charmap && [ "$RET" ]; then
+	default_charmap="$RET"
+    fi
+    if db_get console-setup/codeset && [ "$RET" ]; then
+	default_codeset="$RET"
     fi
 fi
 
