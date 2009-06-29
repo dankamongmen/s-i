@@ -1,5 +1,4 @@
-#! /bin/sh
-set -e
+#!/bin/sh -e
 
 . /usr/share/debconf/confmodule
 db_capb backup
@@ -35,13 +34,20 @@ install_live_system () {
 		eval ${SUPPORT}_prepare
 		STEPS=$(eval ${SUPPORT}_count)
 
+		# Lenny's busybox does't support tar so we need to use it from
+		# the /target.
+		CHROOT=
+		if grep -q lenny /etc/default-release; then
+			CHROOT="chroot ."
+		fi
+
 		db_progress INFO live-installer/progress/copying
 
 		COUNT=0
 		OLD_IFS=$IFS
 		mkdir -p /target
 		exec 4>&0
-		tar c . | \
+		$CHROOT tar c . | \
 		(chdir /target && tar xv) | \
 		(
 			while read line; do
