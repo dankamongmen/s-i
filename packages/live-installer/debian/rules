@@ -5,6 +5,10 @@ CFLAGS=-Os -Wall -g
 %:
 	dh $@
 
+override_dh_auto_configure:
+	[ -e configure ] || ./autogen.sh
+	dh_auto_configure
+
 override_dh_installdebconf:
 	# Do not modify postrm script.
 	dh_installdebconf -n
