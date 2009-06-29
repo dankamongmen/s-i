@@ -29,9 +29,6 @@ if [ "$1" = "configure" ]; then
     db_get console-setup/charmap
     charmap="${RET:-UTF-8}"
 
-    db_get console-setup/ttys
-    ttys="$RET"
-
     db_get console-setup/modelcode
     model="$RET"
 
@@ -82,7 +79,6 @@ if [ "$1" = "configure" ]; then
     done    
     
     sed \
-	-e "s|^ *ACTIVE_CONSOLES=.*|ACTIVE_CONSOLES=\"$ttys\"|" \
 	-e "s|^ *CHARMAP=.*|CHARMAP=\"$charmap\"|" \
 	-e "s|^ *CODESET=.*|CODESET=\"$codeset\"|" \
 	-e "s|^ *FONTFACE=.*|FONTFACE=\"$fontface\"|" \

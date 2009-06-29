@@ -65,7 +65,6 @@ set -e
 
 CONFIGFILE=/etc/default/console-setup
 
-default_ttys=''
 default_charmap=''
 default_codeset=''
 default_fontface=''
@@ -1267,9 +1266,6 @@ if [ -e $CONFIGFILE ]; then
     . $CONFIGFILE || true
 fi
 
-if [ "$ACTIVE_CONSOLES" ]; then
-    default_ttys="$ACTIVE_CONSOLES"
-fi
 if [ "$CHARMAP" ]; then
     default_charmap="$CHARMAP"
 fi
@@ -1421,7 +1417,6 @@ if [ "$XKBOPTIONS" ]; then
 fi
 
 # Store some of the default values into debconf db.
-db_default console-setup/ttys "$default_ttys"
 db_default console-setup/charmap "$default_charmap"
 db_default console-setup/codeset "$default_codeset"
 db_default console-setup/fontface "$default_fontface"
@@ -2055,16 +2050,6 @@ while :; do
 		db_set console-setup/fontsize ''
 		STATE=$(( $STATE + $STATE - $old_state ))
 	    fi
-	    ;;
-	11)
-	    db_input medium console-setup/ttys || true
-	    if db_go; then
-		STATE=$(($STATE + 1))
-	    else
-		STATE=$(($STATE - 1))
-	    fi
-	    db_get console-setup/ttys
-	    ttys=$RET
 	    ;;
 	*)
 	    break
