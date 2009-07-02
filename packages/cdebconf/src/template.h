@@ -23,6 +23,7 @@ struct template
 	char *tag;
 	unsigned int ref;
 	char *type;
+	char *help;
 	struct template_l10n_fields *fields;
 	struct template *next;
 };

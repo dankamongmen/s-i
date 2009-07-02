@@ -117,6 +117,11 @@ struct newtColors newtAltColorPalette = {
 
 typedef int (newt_handler)(struct frontend *obj, struct question *q);
 
+struct newt_help_callback_data {
+    struct frontend *obj;
+    const char *tag;
+};
+
 static void newt_progress_stop(struct frontend *obj);
 
 /* Result must be freed by the caller */
@@ -171,7 +176,13 @@ cancel_text(struct frontend *obj)
 static const char *
 help_text(struct frontend *obj)
 {
-    return question_get_text(obj, "debconf/help-line", "<Tab> moves between items; <Space> selects; <Enter> activates buttons");
+    return question_get_text(obj, "debconf/help-line", "<Tab> moves; <Space> selects; <Enter> activates buttons");
+}
+
+static const char *
+help_text_f1(struct frontend *obj)
+{
+    return question_get_text(obj, "debconf/help-line", "<F1> for help; <Tab> moves; <Space> selects; <Enter> activates buttons");
 }
 
 void
@@ -194,6 +205,17 @@ cdebconf_newt_get_progress_info(struct frontend *obj)
         return strdup(data->scale_info);
     else
         return NULL;
+}
+
+/* This is global due to cdebconf_newt_create_form's interface. It might be
+ * worth fixing this at the next convenient API break.
+ */
+static struct newt_help_callback_data *help_cb_data;
+
+newtComponent
+cdebconf_newt_create_form(newtComponent scrollbar)
+{
+    return newtForm(scrollbar, help_cb_data, 0);
 }
 
 void
@@ -346,7 +368,7 @@ get_full_description(struct frontend *obj, struct question *q)
 }
 
 static int
-show_separate_window(struct frontend *obj, struct question *q)
+show_separate_window(struct frontend *obj, struct question *q, int is_help)
 {
     newtComponent form, textbox, bOk, bCancel, cRet;
     int width = 80, height = 24, t_height, t_width, win_width, win_height;
@@ -403,7 +425,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     if (t_width_descr > t_width)
         t_width = t_width_descr;
     t_width_buttons = 2*BUTTON_PADDING + cdebconf_newt_get_text_width(continue_text(obj)) + 2;
-    if (obj->methods.can_go_back(obj, q))
+    if (!is_help && obj->methods.can_go_back(obj, q))
         //  Add an interspace
         t_width_buttons += cdebconf_newt_get_text_width(goback_text(obj)) + 3;
     if (t_width_buttons > t_width)
@@ -421,7 +443,7 @@ show_separate_window(struct frontend *obj, struct question *q)
     assert(textbox);
     newtTextboxSetText(textbox, full_description);
     free(full_description);
-    if (obj->methods.can_go_back(obj, q)) {
+    if (!is_help && obj->methods.can_go_back(obj, q)) {
         bOk     = newtCompactButton(win_width - TEXT_PADDING - BUTTON_PADDING - strwidth(continue_text(obj)) - 3, win_height-2, continue_text(obj));
         bCancel = newtCompactButton(TEXT_PADDING + BUTTON_PADDING - 1,  win_height-2, goback_text(obj));
         newtFormAddComponents(form, bCancel, textbox, bOk, NULL);
@@ -952,7 +974,7 @@ newt_handler_multiselect(struct frontend *obj, struct question *q)
     separate_window = need_separate_window(obj, q);
     while (1) {
         if (separate_window) {
-            ret = show_separate_window(obj, q);
+            ret = show_separate_window(obj, q, 0);
             if (ret != DC_OK)
                 return ret;
             ret = show_multiselect_window(obj, q, 0);
@@ -980,7 +1002,7 @@ newt_handler_select(struct frontend *obj, struct question *q)
     separate_window = need_separate_window(obj, q);
     while (1) {
         if (separate_window) {
-            ret = show_separate_window(obj, q);
+            ret = show_separate_window(obj, q, 0);
             if (ret != DC_OK)
                 return ret;
             ret = show_select_window(obj, q, 0);
@@ -1030,7 +1052,7 @@ static int newt_handler_password(struct frontend *obj, struct question *q)
 static int newt_handler_note(struct frontend *obj, struct question *q)
 {
     // Sort of hack-ish, yes, but it works :-)
-    return show_separate_window(obj, q);
+    return show_separate_window(obj, q, 0);
 }
 
 /*
@@ -1072,6 +1094,23 @@ newt_handler_error(struct frontend *obj, struct question *q)
     palette.helpLineBg = oldhelpLineBg;
     newtSetColors(palette);
     return ret;
+}
+
+static void
+newt_help_callback(newtComponent co, void *d)
+{
+    struct newt_help_callback_data *data = d;
+    struct frontend *obj = data->obj;
+    struct question *q = obj->qdb->methods.get(obj->qdb, data->tag);
+
+    /* Don't allow recursive calls. */
+    newtSetHelpCallback(NULL);
+
+    show_separate_window(obj, q, 1);
+
+    newtSetHelpCallback(newt_help_callback);
+
+    question_deref(q);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -1158,9 +1197,17 @@ newt_go(struct frontend *obj)
             }
 
             if (plugin || strcmp(q->template->type, question_handlers[i].type) == 0) {
+                char *help = q_get_help(obj, q);
+                struct newt_help_callback_data my_help_cb_data;
                 if (!cleared && !data->scale_form) {
                     cleared = 1;
                     cdebconf_newt_setup();
+                }
+                if (*help) {
+                    my_help_cb_data.obj = obj;
+                    my_help_cb_data.tag = help;
+                    help_cb_data = &my_help_cb_data;
+                    newtSetHelpCallback(newt_help_callback);
                 }
                 if (obj->info != NULL) {
                     char *text = q_get_description(obj, obj->info);
@@ -1168,11 +1215,19 @@ newt_go(struct frontend *obj)
                         newtDrawRootText(0, 0, text);
                     free(text);
                 }
-                newtPushHelpLine(help_text(obj));
+                if (*help)
+                    newtPushHelpLine(help_text_f1(obj));
+                else
+                    newtPushHelpLine(help_text(obj));
                 ret = handler(obj, q);
                 newtPopHelpLine();
                 if (ret == DC_OK)
                     obj->qdb->methods.set(obj->qdb, q);
+                if (*help) {
+                    newtSetHelpCallback(NULL);
+                    help_cb_data = NULL;
+                }
+                free(help);
                 if (plugin)
                     plugin_delete(plugin);
                 break;

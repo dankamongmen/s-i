@@ -13,6 +13,7 @@
 #define q_get_choices(fe, q)               question_get_field((fe), (q), "", "choices")
 #define q_get_choices_vals(fe, q)          question_get_raw_field((q), "C", "choices")
 #define q_get_indices(fe, q)               question_get_field((fe), (q), "", "indices")
+#define q_get_help(fe, q)                  question_get_raw_field((q), "", "help")
 #define q_get_raw_extended_description(q)  question_get_raw_field((q), "", "extended_description")
 #define q_get_raw_description(q)           question_get_raw_field((q), "", "description")
 #define q_get_raw_choices(q)               question_get_raw_field((q), "", "choices")

@@ -301,6 +301,23 @@ void cdebconf_gtk_set_answer_goback(struct frontend * fe)
     cdebconf_gtk_set_answer(fe, DC_GOBACK);
 }
 
+/* documented in cdebconf_gtk.h */
+void cdebconf_gtk_help(struct frontend * fe)
+{
+    struct frontend_data * fe_data = fe->data;
+    char * description;
+    char * ext_description;
+
+    if (NULL == fe_data || NULL == fe_data->help_question)
+        return;
+
+    description = q_get_description(fe, fe_data->help_question);
+    ext_description = q_get_extended_description(fe, fe_data->help_question);
+    cdebconf_gtk_run_message_dialog(fe, description, ext_description);
+    g_free(ext_description);
+    g_free(description);
+}
+
 /** Create the event listener thread.
  *
  * @param fe cdebconf frontend

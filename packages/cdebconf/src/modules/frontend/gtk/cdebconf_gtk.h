@@ -161,6 +161,12 @@ void cdebconf_gtk_set_answer_notok(struct frontend * fe);
  */
 void cdebconf_gtk_set_answer_goback(struct frontend * fe);
 
+/** Display help for the current question.
+ *
+ * @param fe cdebconf frontend
+ */
+void cdebconf_gtk_help(struct frontend * fe);
+
 /** Force cdebconf to quit.
  *
  * This function is currently used when the main window is closed.

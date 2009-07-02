@@ -139,6 +139,48 @@ static void free_setters(struct frontend_data * fe_data)
     fe_data->setters = NULL;
 }
 
+/** Key event handler implementing the "Help" key shortcut.
+ *
+ * @param widget main widget
+ * @param key pressed key
+ * @param fe cdebconf frontend
+ * @return TRUE if "Help" shortcut has been pressed, FALSE otherwise
+ */
+static gboolean handle_help_key(GtkWidget * widget, GdkEventKey * key,
+                                struct frontend * fe)
+{
+    if (GDK_F1 == key->keyval || GDK_KP_F1 == key->keyval) {
+        cdebconf_gtk_help(fe);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/** Create the "Help" button.
+ *
+ * The button will be added to the main action box.
+ *
+ * @param fe cdebconf frontend
+ */
+static void create_help_button(struct frontend * fe)
+{
+    GtkWidget * button;
+    char * label;
+
+    label = cdebconf_gtk_get_text(fe, "debconf/button-help", "Help");
+    /* XXX: check NULL! */
+    button = gtk_button_new_with_label(label);
+    g_free(label);
+
+    g_signal_connect_swapped(G_OBJECT(button), "clicked",
+                             G_CALLBACK(cdebconf_gtk_help), fe);
+
+    cdebconf_gtk_add_button(fe, button);
+    cdebconf_gtk_set_button_secondary(fe, button, TRUE);
+    cdebconf_gtk_add_global_key_handler(
+        fe, button, G_CALLBACK(handle_help_key));
+}
+
 /** Key event handler implementing the "Go Back" key shortcut.
  *
  * @param widget main window
@@ -488,6 +530,7 @@ int cdebconf_gtk_go(struct frontend * fe)
 {
     struct frontend_data * fe_data = fe->data;
     GtkWidget * question_box;
+    struct question * question;
     int ret;
 
     if (NULL == fe->questions) {
@@ -495,6 +538,7 @@ int cdebconf_gtk_go(struct frontend * fe)
     }
 
     cdebconf_gtk_set_answer(fe, DC_NO_ANSWER);
+    fe_data->help_question = NULL;
 
     gdk_threads_enter();
 #ifdef DI_UDEB
@@ -519,6 +563,25 @@ int cdebconf_gtk_go(struct frontend * fe)
     if (!is_action_box_filled(fe)) {
         create_default_buttons(fe);
     }
+
+    /* Set up the help button if necessary. FIXME: We only offer help for
+     * the first question with help text in any given question box. It's not
+     * clear what the right thing to do here is.
+     */
+    question = fe->questions;
+    while (NULL != question) {
+        char *help = q_get_help(fe, question);
+        if (help) {
+            struct question *help_q = fe->qdb->methods.get(fe->qdb, help);
+            if (help_q) {
+                fe_data->help_question = help_q;
+                create_help_button(fe);
+                break;
+            }
+        }
+        question = question->next;
+    }
+
     cdebconf_gtk_show_target_box(fe);
     cdebconf_gtk_show_buttons(fe);
     gdk_threads_leave();
@@ -544,6 +607,8 @@ int cdebconf_gtk_go(struct frontend * fe)
     gdk_threads_leave();
 
 end:
+    question_deref(fe_data->help_question);
+    fe_data->help_question = NULL;
     free_setters(fe_data);
     return fe_data->answer;
 }

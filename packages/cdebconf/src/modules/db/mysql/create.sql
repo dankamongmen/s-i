@@ -33,6 +33,7 @@ CREATE TABLE Templates (
 	choices		CHAR(255),
 	description	CHAR(80),
 	ext_description	CHAR(255),
+	help_id		INT UNSIGNED,
 	modified	TIMESTAMP,
 	PRIMARY KEY(id),
 	KEY idx_Templates_tag(tag)

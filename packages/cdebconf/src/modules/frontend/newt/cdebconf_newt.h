@@ -16,7 +16,7 @@ void cdebconf_newt_setup(void);
  */
 char *cdebconf_newt_get_progress_info(struct frontend *obj);
 
-#define cdebconf_newt_create_form(scrollbar)          newtForm((scrollbar), NULL, 0)
+newtComponent cdebconf_newt_create_form(newtComponent scrollbar);
 
 void cdebconf_newt_create_window(const int width, const int height, const char *title, const char *priority);
 

@@ -21,6 +21,7 @@ const char *template_fields_list[] = {
         "indices",
         "description",
         "extended_description",
+        "help",
         NULL
 };
 
@@ -134,6 +135,7 @@ void template_delete(struct template *t)
 
 	DELETE(t->tag);
 	DELETE(t->type);
+	DELETE(t->help);
 	p = t->fields;
 	DELETE(t);
 	while (p != NULL)
@@ -175,6 +177,7 @@ struct template *template_dup(const struct template *t)
         struct template_l10n_fields *from, *to;
 
         ret->type = STRDUP(t->type);
+        ret->help = STRDUP(t->help);
         if (t->fields == NULL)
                 return ret;
 
@@ -349,7 +352,7 @@ static void template_field_set(struct template_l10n_fields *p,
  * Input: a field name
  * Output: the value of the given field in the given language, field
  *         name may be any of type, default, choices, indices,
- *         description and extended_description
+ *         description, extended_description and help
  * Description: get field value
  * Assumptions: 
  */
@@ -367,6 +370,8 @@ const char *template_lget(const struct template *t,
         return t->tag;
     else if (strcasecmp(field, "type") == 0)
         return t->type;
+    else if (strcasecmp(field, "help") == 0)
+        return t->help;
 
     /*   If field is Foo-xx.UTF-8 then call template_lget(t, "xx", "Foo")  */
     if (strchr(field, '-') != NULL)
@@ -428,7 +433,7 @@ const char *template_lget(const struct template *t,
  * Input: a field name
  * Output: the value of the given field in the given language, field
  *         name may be any of type, default, choices, indices,
- *         description and extended_description
+ *         description, extended_description and help
  * Description: get field value
  * Assumptions: Arguments have been previously checked, lang and field
  *              are not NULL
@@ -476,6 +481,11 @@ void template_lset(struct template *t, const char *lang,
     else if (strcasecmp(field, "type") == 0)
     {
         t->type = STRDUP(value);
+        return;
+    }
+    else if (strcasecmp(field, "help") == 0)
+    {
+        t->help = STRDUP(value);
         return;
     }
 
@@ -676,6 +686,8 @@ struct template *template_load(const char *filename)
 			t = template_new(p+10);
 		else if (strstr(p, "Type: ") == p && t != 0)
 			template_lset(t, NULL, "type", p+6);
+		else if (strstr(p, "Help: ") == p && t != 0)
+			template_lset(t, NULL, "help", p+6);
 		else if (strstr(p, "Default: ") == p && t != 0)
 			template_lset(t, NULL, "default", p+9);
 		else if (i18n && strstr(p, "Default-") == p && t != 0)

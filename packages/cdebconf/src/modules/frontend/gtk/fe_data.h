@@ -118,6 +118,9 @@ struct frontend_data
      */
     GHashTable * plugins;
 
+    /** Current question for which help will be displayed. */
+    struct question * help_question;
+
 #ifdef DI_UDEB
     /** Internal data for specific handling related to the debian-installer.
      *

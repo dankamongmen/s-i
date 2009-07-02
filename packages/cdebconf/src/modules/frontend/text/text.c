@@ -171,6 +171,24 @@ static void
 show_help (struct frontend *obj, struct question *q)
 {
 	char *descr = q_get_description(obj, q);
+	char *help = q_get_help(obj, q);
+	if (*help) {
+		struct question *help_q = obj->qdb->methods.get(obj->qdb, help);
+		if (help_q) {
+			char *help_descr = q_get_description(obj, help_q);
+			char *help_ext_descr = q_get_extended_description(obj, help_q);
+			wrap_print(help_descr);
+			printf("\n");
+			if (*help_ext_descr) {
+				wrap_print(help_ext_descr);
+				printf("\n");
+			}
+			free(help_ext_descr);
+			free(help_descr);
+			question_deref(help_q);
+		}
+		free(help);
+	}
 	printf("%s", question_get_text(obj, "debconf/text-help-keystrokes", "KEYSTROKES:"));
 	printf("\n  %c  ", CHAR_HELP);
 	printf("%s", question_get_text(obj, "debconf/text-help-help", "Display this help message"));
