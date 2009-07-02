@@ -620,7 +620,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	di_system_package *p;
 	di_packages *packages;
 	di_packages_allocator *allocator;
-	int ret;
+	int ret, exit_loop;
 
 	debconf = debconfclient_new();
 	di_system_init(basename(argv[0]));
@@ -642,9 +642,10 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 	seen_items = di_hash_table_new_full(di_rstring_hash, di_rstring_equal,
 					    seen_items_key_destroy, NULL);
 
+	exit_loop = 0;
 	allocator = di_system_packages_allocator_alloc ();
 	packages = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, allocator);
-	while ((p=show_main_menu(packages, allocator))) {
+	while (!exit_loop && (p=show_main_menu(packages, allocator))) {
 		di_slist_node *node;
 
 		if (p->installer_menu_item < NEVERDEFAULT && display_menu) {
@@ -667,6 +668,10 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 			case EXIT_BACKUP:
 				di_log(DI_LOG_LEVEL_INFO, "Menu item '%s' succeeded but requested to be left unconfigured.", p->p.package); 
 				display_menu = 1;
+				break;
+			case EXIT_INSTALLER:
+				/* Interrupt the loop and exit properly */
+				exit_loop = 1;
 				break;
 			default:
 				di_log(DI_LOG_LEVEL_WARNING, "Menu item '%s' failed.", p->p.package);
@@ -693,7 +698,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		debconf->command(debconf, "X_SAVE", NULL);
 	}
 	
-	return EXIT_FAILURE;
+	return exit_loop != 0 ? EXIT_OK : EXIT_FAILURE;
 }
 
 int di_config_package_depth=0;
@@ -753,6 +758,7 @@ static int di_config_package(di_system_package *p,
 	free(configcommand);
 	switch (ret) {
 		case EXIT_OK:
+		case EXIT_INSTALLER:
 			p->p.status = di_package_status_installed;
 			break;
 		default:

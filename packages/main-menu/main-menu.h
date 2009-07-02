@@ -22,6 +22,7 @@ enum
 {
 	EXIT_OK			= 0,
 	EXIT_BACKUP		= 10,
+	EXIT_INSTALLER		= 11,
 };
 
 /* Priority at which the menu is displayed */
