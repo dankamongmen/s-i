@@ -1,5 +1,12 @@
 #!/usr/bin/make -f
 
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+	TERMS=/usr/share/terminfo/a/ansi /usr/share/terminfo/d/dumb \
+	      /usr/share/terminfo/l/linux /usr/share/terminfo/v/vt102
+else ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
+	TERMS=/usr/share/terminfo/c/cons25
+endif
+
 build: build-stamp
 build-stamp:
 	dh_testdir
@@ -25,12 +32,6 @@ binary-indep: build
 	dh_installdebconf -i
 	dh_compress -i
 	dh_fixperms -i
-	for file in /usr/share/terminfo/a/ansi /usr/share/terminfo/d/dumb \
-		    /usr/share/terminfo/l/linux /usr/share/terminfo/v/vt102; do \
-		mkdir -p debian/di-utils-terminfo/`dirname $$file`; \
-		cp -pL $$file debian/di-utils-terminfo/$$file; \
-		chmod 644 debian/di-utils-terminfo/$$file; \
-	done
 	dh_installdeb -i
 	dh_gencontrol -i
 	dh_builddeb -i
@@ -51,6 +52,11 @@ binary-arch: install
 	dh_installdebconf -a
 	dh_compress -a
 	dh_fixperms -a
+	for file in $(TERMS); do \
+		mkdir -p debian/di-utils-terminfo/`dirname $$file`; \
+		cp -pL $$file debian/di-utils-terminfo/$$file; \
+		chmod 644 debian/di-utils-terminfo/$$file; \
+	done
 	dh_strip -a
 	dh_installdeb -a
 	dh_shlibdeps -a
