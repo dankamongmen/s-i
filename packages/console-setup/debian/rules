@@ -4,67 +4,19 @@ SHELL = /bin/bash
 
 xkbdir = /usr/share/X11/xkb
 export xkbdir
-compactize = debian/shell_compactize
+pre = debian/preprocessor
 
 main_build:
 	$(MAKE) xkbdir=$(xkbdir)
 	cd Keyboard && $(MAKE) build-mini xkbdir=$(xkbdir)
 	touch main_build
 
-debian/console-setup.config: debian/config.proto main_build
-	awk ' \
-/## *FONTSETS *##/ { \
-    printf "fontsets='\''"; \
-    system("cd Fonts && ls *.psf | sed '\''s/.psf$$//'\''"); \
-    printf "'\''"; \
-    next; \
-} \
-/## *CHARMAPS *##/ { \
-    printf "charmaps='\''"; \
-    system("cd Keyboard && ls acm/*.acm |sed -e '\''s/^acm.//'\'' -e '\''s/.acm$$//'\''"); \
-    printf "UTF-8'\''\n"; \
-    next; \
-} \
-/## *KBDNAMES *##/ { \
-    printf "all_kbdnames () {\n cat <<'\''EOF'\'' | uudecode | zcat \n"; \
-    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | gzip -9 | uuencode -"); \
-    printf "EOF\n}\n"; \
-    next; \
-} \
-{ \
-   print; \
-}' debian/config.proto >$@
-
- debian/console-setup-mini.config: debian/config.proto main_build
-	awk ' \
-/## *FONTSETS *##/ { \
-    printf "fontsets='\''"; \
-    system("cd Fonts && ls *.psf | sed '\''s/.psf$$//'\''"); \
-    printf "'\''"; \
-    next; \
-} \
-/## *CHARMAPS *##/ { \
-    printf "charmaps='\''"; \
-    system("cd Keyboard && ls acm/*.acm |sed -e '\''s/^acm.//'\'' -e '\''s/.acm$$//'\''"); \
-    printf "UTF-8'\''\n"; \
-    next; \
-} \
-/## *KBDNAMES *##/ { \
-    printf "all_kbdnames () {\n cat <<'\''EOF'\'' \n"; \
-    system("cd Keyboard && ./kbdnames-maker MyKeyboardNames.pl | grep '\''^C[*]'\'' | grep -v '\''[*]model[*]'\''"); \
-    printf "EOF\n [ ! -f /usr/share/console-setup-mini/kbdnames.gz ] || zcat /usr/share/console-setup-mini/kbdnames.gz \n}\n"; \
-    next; \
-} \
-{ \
-   print; \
-}' debian/config.proto >$@
-
-debian/kbdnames.gz: debian/config.proto main_build
+debian/kbdnames.gz: main_build
 	( cd Keyboard \
 	&& ./kbdnames-maker MyKeyboardNames.pl \
 		| grep -v '^C[*]' | grep -v '[*]model[*]' | sort | gzip -9 ) >$@
 
-build: main_build debian/console-setup.config debian/console-setup-mini.config debian/kbdnames.gz
+build: main_build debian/kbdnames.gz
 
 .PHONY : clean
 clean:
@@ -72,7 +24,6 @@ clean:
 	debconf-updatepo
 	$(MAKE) maintainer-clean
 	-rm -f build main_build
-	-rm -f debian/*.config
 	-rm -f debian/kbdnames.gz
 	-rm -f debian/*~
 	dh_clean
@@ -153,9 +104,8 @@ install-mini: build
 	install -d debian/console-setup-mini/etc/console-setup/
 	install -d debian/console-setup-mini/usr/share/doc/console-setup-mini/examples/
 	cp config debian/console-setup-mini/usr/share/doc/console-setup-mini/examples/console-setup
-	$(compactize) debian/console-setup-mini/bin/setupcon
-	$(compactize) debian/console-setup-mini/usr/bin/ckbcomp-mini
-	$(compactize) debian/console-setup-mini.config
+	$(pre) --mini debian/console-setup-mini/bin/setupcon
+	$(pre) --mini debian/console-setup-mini/usr/bin/ckbcomp-mini
 	rm -rf `find debian/console-setup-mini -name .cvsignore`
 	rm -rf `find debian/console-setup-mini -name .svn`
 
@@ -252,7 +202,9 @@ install-udeb: build
 	dh_install -pconsole-setup-udeb Keyboard/ckbcomp-mini usr/bin
 	dh_link -pconsole-setup-udeb usr/bin/ckbcomp-mini usr/bin/ckbcomp
 	dh_install -pconsole-setup-udeb setupcon bin
-	dh_install -p console-setup-udeb debian/console-setup-mini.config usr/share/console-setup-mini
+	dh_installdirs -p console-setup-udeb usr/share/console-setup-mini
+	install -m0755  debian/console-setup-mini.config \
+		debian/console-setup-udeb/usr/share/console-setup-mini
 	chmod a+x debian/console-setup-udeb/usr/share/console-setup-mini/console-setup-mini.config
 	dh_install -p console-setup-udeb debian/kbdnames.gz usr/share/console-setup-mini
 	dh_installdirs -p console-setup-udeb lib/debian-installer.d
@@ -264,9 +216,10 @@ install-udeb: build
 	dh_installdirs -p console-setup-udeb etc/default
 	dh_installdirs -p console-setup-udeb etc/console-setup/
 	cp config debian/console-setup-udeb/usr/share/console-setup-mini/console-setup.proto
-	$(compactize) debian/console-setup-udeb/bin/setupcon
-	$(compactize) debian/console-setup-udeb/usr/bin/ckbcomp-mini
-	$(compactize) debian/console-setup-udeb/usr/share/console-setup-mini/console-setup-mini.config
+	$(pre) --mini debian/console-setup-udeb/usr/lib/base-installer.d/20console-setup
+	$(pre) --mini debian/console-setup-udeb/usr/share/console-setup-mini/console-setup-mini.config
+	$(pre) --mini debian/console-setup-udeb/bin/setupcon
+	$(pre) --mini debian/console-setup-udeb/usr/bin/ckbcomp-mini
 	rm -rf `find debian/console-setup-udeb -name .cvsignore`
 	rm -rf `find debian/console-setup-udeb -name .svn`
 
@@ -297,8 +250,11 @@ binary-indep: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	$(compactize) debian/console-setup-mini/DEBIAN/postinst
-	$(compactize) debian/console-setup-udeb/DEBIAN/postinst
+	$(pre) debian/console-setup/DEBIAN/config
+	$(pre) debian/console-setup/DEBIAN/postinst
+	$(pre) --mini debian/console-setup-mini/DEBIAN/config
+	$(pre) --mini debian/console-setup-mini/DEBIAN/postinst
+	$(pre) --mini debian/console-setup-udeb/DEBIAN/postinst
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

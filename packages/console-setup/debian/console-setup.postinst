@@ -7,8 +7,18 @@ set -e
 
 # In d-i the config script is not executed automatically
 if [ -f /usr/share/console-setup-mini/console-setup.config ]; then
-    /usr/share/console-setup-mini/console-setup-mini.config
+    /usr/share/console-setup-mini/console-setup-mini.config || exit 1
 fi
+
+## KEYBOARD_PRESENT ## Will be replaced by keyboard_present function
+
+# keyboard_present () {
+#     if there is a keyboard; then
+# 	return 0
+#     else
+# 	return 1
+#     fi
+# }
 
 CONFIGDIR=/etc/console-setup
 CONFIGFILE=/etc/default/console-setup
@@ -25,6 +35,9 @@ if [ "$1" = "configure" ]; then
     fi
     db_get console-setup/fontsize
     fontsize="$RET"
+    if [ -z "$fontface" ]; then
+	fontsize=''
+    fi
 
     db_get console-setup/charmap
     charmap="${RET:-UTF-8}"
@@ -92,8 +105,11 @@ if [ "$1" = "configure" ]; then
     mv -f $CONFIGFILE.tmp $CONFIGFILE
 fi
 
-# In d-i debhelper doesn't use /etc/init.d scripts :-)
-if [ -f /usr/share/console-setup-mini/console-setup.config ]; then
+# In d-i debhelper doesn't use /etc/init.d scripts
+if \
+    [ -f /usr/share/console-setup-mini/console-setup.config ] \
+    && keyboard_present
+then
     setupcon --force --save
 fi
 

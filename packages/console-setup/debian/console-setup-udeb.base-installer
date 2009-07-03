@@ -3,9 +3,20 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-mkdir -p /target/etc/default
-cp -a /etc/default/console-setup /target/etc/default/
+## KEYBOARD_PRESENT ## Will be replaced by keyboard_present function
 
-apt-install console-setup || true
+# keyboard_present () {
+#     if there is a keyboard; then
+# 	return 0
+#     else
+# 	return 1
+#     fi
+# }
+
+if keyboard_present; then
+    mkdir -p /target/etc/default
+    cp -a /etc/default/console-setup /target/etc/default/
+    apt-install console-setup || true
+fi
 
 exit 0
