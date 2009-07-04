@@ -2593,6 +2593,8 @@ if ($keycodes =~ /(^|\+|\|)macintosh\(old\)($|\+|\|)/) {
     $arch = 'amiga';
 } elsif ($keycodes =~ /(^|\+|\|)sun(\(type[45][^\)]*\))?($|\+|\|)/) {
     $arch = 'sun';
+} elsif ($keycodes =~ /(^|\+|\|)evdev(\([^\)]*\))?($|\+|\|)/) {
+    $arch = 'evdev';
 }
 
 ########### READ ACM ###############################################
@@ -3581,7 +3583,15 @@ sub flatten {
 
 sub print_vector {
     my $kernel_code = $_[0];
+    my $only_VoidSymbol = 1;
     my $no_NoSymbol = 1;
+    for my $mask (0 .. 63) {
+	if ($vector[$mask] ne 'VoidSymbol' && $vector[$mask] ne 'NoSymbol') {
+	    $only_VoidSymbol = 0;
+	    last;
+	}
+    }
+    return if ($only_VoidSymbol);
     for my $mask (0 .. 63) {
 	if ($vector[$mask] eq 'NoSymbol') {
 	    $no_NoSymbol = 0;
@@ -3767,9 +3777,9 @@ if ($compact) {
 } else {
     $KEYMAP .= "keymaps 0-127\n";
 }
-if ($arch eq 'at') {
+if ($arch eq 'at' || $arch eq 'evdev') {
     foreach my $key (sort {$a <=> $b} (keys %symbols_table)) {
-	my $kernel_code = $at_scancodes{$key};
+	my $kernel_code = (($arch eq 'at') ? $at_scancodes{$key} : $key - 8);
 	next if (! defined $kernel_code || $kernel_code < 0);
  	if ($kernel_code == 84) {
  	    @vector = ('Last_Console') x 64;

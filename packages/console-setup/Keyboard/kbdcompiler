@@ -73,12 +73,10 @@ for my $layout (values %KeyboardNames::layouts) {
     next if ($layout eq 'nec_vndr/jp');
     my $actual_layout = (($layout eq 'cs') ? 'cs,cs'
 			 : (($layout eq 'lt') ? 'lt,lt'
-			    : (($layout eq 'jp') ? 'jp,jp'
-			       : (($nonlatin =~ / $layout /)
-				  ? "us,$layout"
-				  : $layout))));
+			    : (($nonlatin =~ / $layout /)
+			       ? "us,$layout" : $layout)));
     if (! -f "$dir/$model-$layout") {
-	if ($layout eq 'cs' or $layout eq 'jp') {
+	if ($layout eq 'cs') {
 	    execute ("./ckbcomp -compact -I. -I${xkbdir} -rules xorg"
 		     ." -model $model"
 		     ." -layout $actual_layout -variant latin,"
@@ -111,8 +109,6 @@ for my $layout (values %KeyboardNames::layouts) {
 	    } else {
 		$actual_variant = "latin,$variant";
 	    }
-	} elsif ($actual_layout eq 'jp,jp') {
-	    $actual_variant = "latin,$variant";
 	} elsif ($actual_layout eq 'lt,lt') {
 	    if ($variant eq 'us') {
 		$actual_variant = "us,basic";
