@@ -59,14 +59,14 @@ for LANGUAGE in $(sed "s:^[ \t]*#.*::" ${LANGUAGE_LIST}) ; do
 	DICT=null
     fi
 
-    echo -n "[${LANG}][${DICT}]"
+###    echo -n "[${LANG}][${DICT}]"
     check_dit.sh ${LANG} ${DICT} ${DI_COPY} ${DEST_DIR}
 
-    if  [ $? = 0 ] ; then
-	echo " done"
-    else
-	echo " no translations for ${LANG}"
-    fi
+###    if  [ $? = 0 ] ; then
+###	echo " done"
+###    else
+###	echo " no translations for ${LANG}"
+###    fi
     
     i=$((i+1))
 done

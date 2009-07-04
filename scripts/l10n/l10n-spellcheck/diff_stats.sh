@@ -46,10 +46,10 @@ if [ ! -f $NEW ] ; then
     exit 1
 fi
 
-echo ""
-echo "-------------------------"
-printf "%-8s %4s %4s %4s\n" "LANG" "OLD" "NEW" "DELTA"
-echo "-------------------------"
+###echo ""
+###echo "-------------------------"
+###printf "%-8s %4s %4s %4s\n" "LANG" "OLD" "NEW" "DELTA"
+###echo "-------------------------"
 
 for ROW in `sed 's: :,:g' ${NEW}`
   do
@@ -75,8 +75,8 @@ for ROW in `sed 's: :,:g' ${NEW}`
   
   if [ $DELTA = 0 ]; then
       DELTA="."
+  else
+      printf "%-8s %4s %4s %4s\n" $LANG $OLD_UNKN $UNKN $DELTA
   fi
-      
-  printf "%-8s %4s %4s %4s\n" $LANG $OLD_UNKN $UNKN $DELTA
 
 done
