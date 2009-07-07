@@ -102,8 +102,6 @@ $framebuffer_font || $font_size <= 512
 
 my $current_line; # when reading input files (used for error messages)
 
-my $issue_warnings; # whether to issue warnings about undefined symbols
-
 my $width;  # The width of the font in pixels
 my $height; # The height of the font in pixels
 
@@ -192,9 +190,6 @@ sub ascii {
 
 for my $c (0 ... $font_size - 1) {
     $position_type[$c] = $dont_copy_8th;
-}
-for my $c (0x20 ... 0x7e) {
-    $position_type[$c] = 0;
 }
 for my $c (0xc0 ... 0xdf) {
     $position_type[$c] = $copy_8th;
@@ -370,32 +365,36 @@ for my $bdf (@bdfs) {
 	    } else {
 		$row = hex ($1) >> -$shiftbits;
 	    }
-	    for my $i (1 ... matrix_row_size ()) {
-		push (@gliph_bytes,
-		      ($row >> 8 * (matrix_row_size () - $i)) & 0xff);
-		
+	    if (($u >= 0x2500 && $u <= 0x259f)
+		|| length($1) == 2 * matrix_row_size ()) {
+		for my $i (1 ... matrix_row_size ()) {
+		    push (@gliph_bytes,
+			  ($row >> 8 * (matrix_row_size () - $i)) & 0xff);
+		}
+		$rows++;
 	    }
-	    $rows++;
 	    next;
 	}
 	if (/^ENDCHAR/) {
-	    $rows == $height - ($beforebox + $afterbox) / matrix_row_size ()
-		or die ("$0: $bdf: invalid number of rows $rows " 
-			."at line $current_line\n");
-	    if ($u == -123456) {
-		die ("$0: $bdf: missing ENCODING before ENDCHAR " 
-		     ."at line $current_line\n");
-	    }
-	    if (! defined $gliphs{$u}) {
-		if ($beforebox < 0) {
-		    @gliph_bytes = @gliph_bytes[-$beforebox..$#gliph_bytes];
+	    if ($rows > 0) {
+		$rows == $height - ($beforebox + $afterbox) / matrix_row_size ()
+		    or die ("$0: $bdf: invalid number of rows $rows " 
+			    ."at line $current_line\n");
+		if ($u == -123456) {
+		    die ("$0: $bdf: missing ENCODING before ENDCHAR " 
+			 ."at line $current_line\n");
 		}
-		if ($afterbox < 0) {
-		    @gliph_bytes = @gliph_bytes[0 .. $#gliph_bytes+$afterbox];
+		if (! defined $gliphs{$u}) {
+		    if ($beforebox < 0) {
+			@gliph_bytes = @gliph_bytes[-$beforebox..$#gliph_bytes];
+		    }
+		    if ($afterbox < 0) {
+			@gliph_bytes = @gliph_bytes[0 .. $#gliph_bytes+$afterbox];
+		    }
+		    $gliphs{$u} = [ (0) x $beforebox,
+				    @gliph_bytes,
+				    (0) x $afterbox];
 		}
-		$gliphs{$u} = [ (0) x $beforebox,
-				@gliph_bytes,
-				(0) x $afterbox];
 	    }
 	}
 	if (/^ENDFONT$/) {
@@ -523,12 +522,13 @@ for my $equivalent (@equivalents) {
 
 ########### COMPUTE SFM ################################################
 
+my @requested;
+my %issue_warnings;
 my @delayed;
 my %positioned;
 
 for my $symbolfile (@symbols) {
-    $issue_warnings = ! ( $symbolfile =~ s/^:// );
-
+    my $warnings = ! ($symbolfile =~ s/^://);
     $current_line = 0;
     open SYMBOLS, $symbolfile or die "$0: $symbolfile: $!\n";
     while (<SYMBOLS>) {
@@ -539,37 +539,44 @@ for my $symbolfile (@symbols) {
 	/^U\+([0-9a-fA-F]+)[[:space:]]*$/ 
 	    or die "$0: $symbolfile: syntax error on line $current_line: $_\n";
 	my $u = hex ($1);
-	next if ($positioned{$u});
-	next if (! printable ($u));
-	if (@delayed < free_positions ()) {
-	    foreach my $v (@{equivalence_class ($u)}) {
-		next if ! defined $gliphs{$v};
-		if (ascii ($v)) {
-		    $sfm_table[ascii ($v)] = equivalence_class ($v);
-		} elsif ($types{$v} == $dont_copy_8th) {
-		    my $position = dont_copy_8th_position ($v);
-		    $sfm_table[$position] = equivalence_class ($v);
-		} elsif ($types{$v} == $copy_8th) {
-		    my $position = copy_8th_position ($v);
-		    $sfm_table[$position] = equivalence_class ($v);
-		} else {
-		    push @delayed, $v;
-		}
-		foreach my $w (@{equivalence_class ($u)}) {
-		    $positioned{$w} = 1;
-		}
-		last;
-	    }
-	}
-	if ($issue_warnings && ! $positioned{$u}) {
-	    if (@delayed < free_positions ()) {
-		warning sprintf ("U+%04X: no gliph defined\n", $u);
-	    } else {
-		warning sprintf ("U+%04X: no space in the font\n", $u);
-	    }
-	}
+	push @requested, $u;
+	$issue_warnings{$u} = 1 if ($warnings);
+	my $ascii = ascii $u;
+	$position_type[$ascii] = 0 if ($ascii);
     }
     close SYMBOLS;
+}
+
+for my $u (@requested) {
+    next if ($positioned{$u});
+    next if (! printable ($u));
+    if (@delayed < free_positions () || ascii ($u)) {
+	foreach my $v (@{equivalence_class ($u)}) {
+	    next if ! defined $gliphs{$v};
+	    if (ascii ($v)) {
+		$sfm_table[ascii ($v)] = equivalence_class ($v);
+	    } elsif ($types{$v} == $dont_copy_8th) {
+		my $position = dont_copy_8th_position ($v);
+		$sfm_table[$position] = equivalence_class ($v);
+	    } elsif ($types{$v} == $copy_8th) {
+		my $position = copy_8th_position ($v);
+		$sfm_table[$position] = equivalence_class ($v);
+	    } else {
+		push @delayed, $v;
+	    }
+	    foreach my $w (@{equivalence_class ($u)}) {
+		$positioned{$w} = 1;
+	    }
+	    last;
+	}
+    }
+    if (defined $issue_warnings{$u} && ! $positioned{$u}) {
+	if (@delayed < free_positions ()) {
+	    warning sprintf ("U+%04X: no gliph defined\n", $u);
+	} else {
+	    warning sprintf ("U+%04X: no space in the font\n", $u);
+	}
+    }
 }
 
 foreach my $u (@delayed) {
