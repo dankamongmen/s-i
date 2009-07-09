@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58504 -->
+<!-- original version: 59009 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1083,7 +1083,7 @@ d-i partman-auto/choose_recipe select atomic
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren,
 # vorausgesetzt, Sie haben mit einer der obigen Methoden festgelegt, wie
 # partitioniert werden soll.
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
@@ -1159,7 +1159,7 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.
 d-i partman-md/confirm boolean true
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
@@ -1476,6 +1476,13 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/password-again password r00tme
 # ... oder verschlüsselt mittels MD5-Hash; siehe grub-md5-crypt(8).
 #d-i grub-installer/password-crypted password [MD5 hash]
+
+# Verwenden Sie die folgende Option, um zusätzliche Boot-Parameter für
+# das installierte System anzugeben (falls dies vom Bootloader-Installer
+# unterstützt wird).
+# Hinweis: Optionen, die dem Installer zum Booten angegeben wurden, werden
+# automatisch auch für das installierte System hinzugefügt.
+#d-i debian-installer/add-kernel-opts string nousb
 </screen></informalexample>
 
 <para>
