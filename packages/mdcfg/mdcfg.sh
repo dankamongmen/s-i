@@ -123,7 +123,7 @@ get_partitions() {
 		grep "[[:space:]]RAID[[:space:]]" | cut -f1)
 
 	# Convert it into a proper list form for a select question
-	# (comma seperated)
+	# (comma separated)
 	NUM_PART=0
 	for i in $RAW_PARTITIONS; do
 		DEV=$(echo $i | sed -e "s/\/dev\///")
