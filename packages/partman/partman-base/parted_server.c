@@ -2323,6 +2323,7 @@ main_loop()
                 if (1 != iscanf("%as", &str))
                         critical_error("No data in infifo.");
                 log("Read command: %s", str);
+                /* Keep partman-command in sync with changes here. */
                 if (!strcasecmp(str, "QUIT"))
                         command_quit();
                 else if (!strcasecmp(str, "OPEN"))
