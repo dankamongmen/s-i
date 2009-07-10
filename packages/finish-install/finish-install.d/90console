@@ -36,6 +36,20 @@ console=$(mapdevfs "$rawconsole")
 rawconsole=${rawconsole#/dev/}
 console=${console#/dev/}
 
+if [ -f /target/etc/init/tty1.conf ]; then
+	upstart_tty1=/target/etc/init/tty1.conf
+	upstart_console () {
+		echo "/target/etc/init/$1.conf"
+	}
+elif [ -f /target/etc/event.d/tty1 ]; then
+	upstart_tty1=/target/etc/event.d/tty1
+	upstart_console () {
+		echo "/target/etc/event.d/$1"
+	}
+else
+	upstart_tty1=
+fi
+
 case "$console" in
     tty[A-Z]*)
 	log "Configuring init for serial console"
@@ -56,10 +70,10 @@ case "$console" in
 		sed -i -e "s/^#T0\(.*\)ttyS.*/T$ttyline\1$console $ttyspeed $ttyterm/" \
 		    /target/etc/inittab
 	fi
-	if [ -f /target/etc/event.d/tty1 ]; then
+	if [ "$upstart_tty1" ]; then
 		sed -e "s/^\(exec.*getty \).*/\1-L $console $ttyspeed $ttyterm/" \
 		    -e "s/tty1/$console/g" \
-		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
+		    "$upstart_tty1" > "$(upstart_console "$console")"
 	fi
 
 	write_console "$rawconsole" /target/etc/securetty
@@ -110,10 +124,10 @@ if [ -e $DT_ROOT/chosen/linux,stdout-path ]; then
 			sed -i -e "$sedexp" /target/etc/inittab
 		fi
 	fi
-	if [ -f /target/etc/event.d/tty1 ]; then
+	if [ "$upstart_tty1" ]; then
 		sed -e "s/^\(exec.*getty \).*/\1-L $console 9600 vt100/" \
 		    -e "s/tty1/$console/g" \
-		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
+		    "$upstart_tty1" > "$(upstart_console "$console")"
 	fi
 fi
 
@@ -131,10 +145,10 @@ if [ -e /sys/bus/xen ]; then
 			sed -i -e "$sedexp" /target/etc/inittab
 		fi
 	fi
-	if [ -f /target/etc/event.d/tty1 ]; then
-		log "adding console to /etc/event.d/tty1"
+	if [ "$upstart_tty1" ]; then
+		log "adding console to ${upstart_tty1#/target}"
 		sed -e "s/^\(exec.*getty \).*/\1-L $console 9600 linux/" \
 		    -e "s/tty1/$console/g" \
-		    /target/etc/event.d/tty1 > /target/etc/event.d/$console
+		    "$upstart_tty1" > "$(upstart_console "$console")"
 	fi
 fi
