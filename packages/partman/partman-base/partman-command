@@ -6,14 +6,20 @@ export DEBIAN_FRONTEND=noninteractive
 
 . /lib/partman/lib/base.sh
 
-dir="$(pwd)"
-case $dir in
-    $DEVICES/*)
-	;;
-    *)
-	echo "Must be run from a subdirectory of $DEVICES" >&2
-	exit 1
-esac
+if [ "${1#/dev/}" != "$dev" ]; then
+	dirname="$(echo "$1" | sed 's:/:=:g')"
+	cd "$DEVICES/$dirname" || exit $?
+	shift
+else
+	dir="$(pwd)"
+	case $dir in
+	    $DEVICES/*)
+		;;
+	    *)
+		echo "Must be run from a subdirectory of $DEVICES" >&2
+		exit 1
+	esac
+fi
 
 # Within each group, please keep commands in the same order as in
 # parted_server.c:main_loop().
