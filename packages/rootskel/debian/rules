@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+export DH_OPTIONS
+
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 build: build-stamp debian/templates
@@ -23,6 +25,7 @@ clean:
 
 	dh_clean
 
+install: DH_OPTIONS=
 install: build
 	dh_testdir
 	dh_testroot
@@ -34,6 +37,7 @@ endif
 
 binary-indep: build install
 
+binary-arch: DH_OPTIONS=-s
 binary-arch: build install
 	dh_testdir
 	dh_testroot
