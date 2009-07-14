@@ -99,7 +99,11 @@ create_primary_partitions() {
 	      echo $scheme | grep -q '\$primary{'; do
 		pull_primary
 		set -- $primary
-		open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
+		if [ -z "$scheme_rest" ]; then
+			open_dialog NEW_PARTITION primary $4 $free_space full ${1}000001
+		else
+			open_dialog NEW_PARTITION primary $4 $free_space beginning ${1}000001
+		fi
 		read_line num id size type fs path name
 		close_dialog
 		if [ -z "$id" ]; then
