@@ -182,7 +182,7 @@ help_text(struct frontend *obj)
 static const char *
 help_text_f1(struct frontend *obj)
 {
-    return question_get_text(obj, "debconf/help-line", "<F1> for help; <Tab> moves; <Space> selects; <Enter> activates buttons");
+    return question_get_text(obj, "debconf/help-line-f1", "<F1> for help; <Tab> moves; <Space> selects; <Enter> activates buttons");
 }
 
 void
