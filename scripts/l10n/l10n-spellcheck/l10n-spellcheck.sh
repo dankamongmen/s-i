@@ -100,8 +100,8 @@ SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
 cp ${WORK_DIR}/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
 mv ${WORK_DIR}/index.html ${OUT_DIR}
 
-echo ""
-echo "***  $SAVED_STATS  ***"
+#echo ""
+#echo "***  $SAVED_STATS  ***"
 
 if [ ${BRAND_NEW} -ne 1 ] ; then    
     diff_stats.sh ${OUT_DIR}/latest/stats.txt ${WORK_DIR}/stats.txt
