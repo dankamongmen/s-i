@@ -335,7 +335,6 @@ int reconfigure(char **pkgs, int i, int max)
 					g_questions->methods.save(g_questions);
 	
 					unsetenv("DEBIAN_HAS_FRONTEND");
-					setenv("DEBCONF_SHOWOLD", "1", 1);
 
 					strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
 	
@@ -343,7 +342,6 @@ int reconfigure(char **pkgs, int i, int max)
 					if (ret != 0) return DC_NOTOK;
 	
 					setenv("DEBIAN_HAS_FRONTEND", "1", 1);
-					unsetenv("DEBCONF_SHOWOLD");
 	
 					g_templates->methods.load(g_templates);
 					g_questions->methods.load(g_questions);
@@ -366,6 +364,9 @@ int reconfigure(char **pkgs, int i, int max)
 int main(int argc, char **argv)
 {
 	int opt, ret;
+	int unseen_only=0;
+	int default_priority=0;
+	int priority_override="low";
 
 	signal(SIGINT, sighandler);
 	setlocale (LC_ALL, "");
@@ -381,13 +382,20 @@ int main(int argc, char **argv)
 		{
 		case 'h': usage(); break;
 		case 'f': setenv("DEBIAN_FRONTEND", optarg, 1); break;
-		case 'p': g_config->set(g_config, "_cmdline::priority", optarg); break;
-		case 'd': break;
-		case 'u': break;
+		case 'p': priority_override=strdup(optarg); break;
+		case 'd': default_priority=1; break;
+		case 'u': unseen_only=1; break;
 		case 'a': opt_all = 1; break;
 		case 'F': opt_force = 1; break;
 		}
 	}
+	
+	/* Default is to force showing of old questions by default
+	 * for reconfiguring, and show low priority questions. */
+	if (! unseen_only)
+		setenv("DEBCONF_SHOWOLD", "true", 1);
+	if (! default_priority)
+		g_config->set(g_config, "_cmdline::priority", priority_override);
 	
 	/* parse the configuration info */
 	if (g_config->read(g_config, DEBCONFCONFIG) == 0)
