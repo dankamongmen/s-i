@@ -34,7 +34,7 @@ struct option g_dpc_args[] = {
 	{ "help", 0, NULL, 'h' },
 	{ "frontend", 1, NULL, 'f' },
 	{ "priority", 1, NULL, 'p' },
-	{ "default-priority", 1, NULL, 'd' },
+	{ "default-priority", 0, NULL, 'd' },
 	{ "all", 0, NULL, 'a' },
 	{ "unseen-only", 0, NULL, 'u' },
 	{ "force", 0, NULL, 'F' },
@@ -366,7 +366,7 @@ int main(int argc, char **argv)
 	int opt, ret;
 	int unseen_only=0;
 	int default_priority=0;
-	int priority_override="low";
+	char *priority_override=NULL;
 
 	signal(SIGINT, sighandler);
 	setlocale (LC_ALL, "");
@@ -398,9 +398,11 @@ int main(int argc, char **argv)
 	 * for reconfiguring, and show low priority questions. */
 	if (! unseen_only)
 		g_config->set(g_config, "_cmdline::showold", "true");
-	if (! default_priority)
+	if (priority_override)
 		g_config->set(g_config, "_cmdline::priority", priority_override);
-	
+	else if (! default_priority && (getenv("DEBIAN_PRIORITY") == NULL))
+		g_config->set(g_config, "_cmdline::priority", "low");
+
 	/* parse the configuration info */
 	if (g_config->read(g_config, DEBCONFCONFIG) == 0)
 		DIE("Error reading configuration information");
