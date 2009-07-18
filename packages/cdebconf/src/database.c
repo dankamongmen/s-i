@@ -300,7 +300,7 @@ static int question_db_is_visible(struct question_db *db, const char *name,
     wantprio = config->get(config, "_cmdline::priority", NULL);
 
     if (wantprio == NULL)
-        wantprio = getenv("DEBCONF_PRIORITY");
+        wantprio = getenv("DEBIAN_PRIORITY");
 
     if (wantprio == NULL)
         if ((qp = db->methods.get(db, "debconf/priority")) != NULL)

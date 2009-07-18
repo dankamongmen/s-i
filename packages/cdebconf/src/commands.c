@@ -311,7 +311,7 @@ command_set(struct confmodule *mod, char *arg)
             else if (strcmp(argv[0], "debconf/priority") == 0)
             {
                 debug_printf(0, "Setting debconf/priority to %s", argv[1]);
-                setenv("DEBCONF_PRIORITY", argv[1], 1);
+                setenv("DEBIAN_PRIORITY", argv[1], 1);
             }
         }
         else
