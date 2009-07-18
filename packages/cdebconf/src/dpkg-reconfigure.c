@@ -393,7 +393,7 @@ int main(int argc, char **argv)
 	/* Default is to force showing of old questions by default
 	 * for reconfiguring, and show low priority questions. */
 	if (! unseen_only)
-		setenv("DEBCONF_SHOWOLD", "true", 1);
+		g_config->set(g_config, "_cmdline::showold", "true");
 	if (! default_priority)
 		g_config->set(g_config, "_cmdline::priority", priority_override);
 	

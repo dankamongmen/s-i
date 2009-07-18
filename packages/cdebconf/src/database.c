@@ -322,7 +322,7 @@ static int question_db_is_visible(struct question_db *db, const char *name,
     if (q != NULL && (q->flags & DC_QFLAG_SEEN) != 0)
     {
         ret = DC_NO;
-        showold = getenv("DEBCONF_SHOWOLD");
+        showold = config->get(config, "_cmdline::showold", NULL);
         if (showold == NULL)
             if ((qs = db->methods.get(db, "debconf/showold")) != NULL)
             {
