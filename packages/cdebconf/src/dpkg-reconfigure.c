@@ -93,8 +93,8 @@ static void sighandler(int sig)
  ************************************************************************/
 static void usage(void)
 {
-	printf("dpkg-reconfigure [--frontend <frontend>] [--priority <priority>]\n");
-	printf("dpkg-reconfigure [-f <frontend>] [-p <priority>]\n");
+	printf("dpkg-reconfigure [--frontend <frontend>] [--priority <priority>] package\n");
+	printf("dpkg-reconfigure [-f <frontend>] [-p <priority>] package\n");
 	exit(0);
 }
 
@@ -388,6 +388,10 @@ int main(int argc, char **argv)
 		case 'a': opt_all = 1; break;
 		case 'F': opt_force = 1; break;
 		}
+	}
+	if (optind == argc) {
+		fprintf(stderr, "please specify a package to reconfigure\n");
+		exit(1);
 	}
 	
 	/* Default is to force showing of old questions by default
