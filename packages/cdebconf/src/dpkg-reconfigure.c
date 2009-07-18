@@ -388,8 +388,7 @@ int main(int argc, char **argv)
 		case 'F': opt_force = 1; break;
 		}
 	}
-	g_config = config_new();
-
+	
 	/* parse the configuration info */
 	if (g_config->read(g_config, DEBCONFCONFIG) == 0)
 		DIE("Error reading configuration information");
