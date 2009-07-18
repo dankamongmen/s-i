@@ -1156,8 +1156,8 @@ newt_initialize(struct frontend *obj, struct configuration *conf)
     newtSetColors(newtAltColorPalette);
     newtGetScreenSize(&width, &height);
     // Fill the screen so people can shift-pgup properly
-    for (i = 0; i < height; i++)
-        putchar('\n');
+    //for (i = 0; i < height; i++)
+    //    putchar('\n');
     newtFinished();
     return DC_OK;
 }
