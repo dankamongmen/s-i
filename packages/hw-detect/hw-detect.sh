@@ -427,33 +427,16 @@ apply_pcmcia_resource_opts() {
 }
 
 # get pcmcia running if possible
-PCMCIA_INIT=
-if [ -x /etc/init.d/pcmciautils ]; then
-	PCMCIA_INIT=/etc/init.d/pcmciautils
-fi
-if [ "$PCMCIA_INIT" ]; then
+PCMCIA_INIT=/etc/init.d/pcmciautils
+if [ -x "$PCMCIA_INIT" ]; then
 	if is_not_loaded pcmcia_core; then
-		db_input medium hw-detect/start_pcmcia || true
-
-		# GTK frontend: include question about resources in dialog
-		if [ "$DEBIAN_FRONTEND" = "gtk" ]; then
-			db_input low hw-detect/pcmcia_resources || true
-		fi
+		db_input low hw-detect/pcmcia_resources || true
 		db_go || true
 
-		# Other frontends: only ask about resources if PCMCIA was selected
-		if [ "$DEBIAN_FRONTEND" != "gtk" ]; then
-			db_get hw-detect/start_pcmcia || true
-			if [ "$RET" = true ]; then
-				db_input low hw-detect/pcmcia_resources || true
-				db_go || true
-			fi
-		fi
 		if db_get hw-detect/pcmcia_resources && [ "$RET" ]; then
 			apply_pcmcia_resource_opts $RET
 		fi
-	fi
-	if db_get hw-detect/start_pcmcia && [ "$RET" = true ]; then
+
 		db_progress INFO hw-detect/pcmcia_step
 		$PCMCIA_INIT start 2>&1 | log
 		db_progress STEP $OTHER_STEPSIZE
@@ -479,19 +462,18 @@ cardbus_check_netdev()
 		echo $(basename $netdev) >> /etc/network/devhotplug
 	fi
 }
-if ls /sys/class/pcmcia_socket/* >/dev/null 2>&1; then
-	for socket in /sys/class/pcmcia_socket/*; do
-		for netdev in /sys/class/net/*; do
-			cardbus_check_netdev $socket $netdev
-		done
-	done
-fi
 
 # Try to do this only once..
 if [ "$have_pcmcia" -eq 1 ] && \
    ! grep -q pcmciautils /var/lib/apt-install/queue 2>/dev/null; then
 	log "Detected PCMCIA, installing pcmciautils."
 	apt-install pcmciautils || true
+
+	for socket in /sys/class/pcmcia_socket/*; do
+		for netdev in /sys/class/net/*; do
+			cardbus_check_netdev $socket $netdev
+		done
+	done
 
 	if db_get hw-detect/pcmcia_resources && [ -n "$RET" ]; then
 		echo "mkdir /target/etc/pcmcia 2>/dev/null || true" \
