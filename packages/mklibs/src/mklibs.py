@@ -464,7 +464,7 @@ while 1:
             # specially by the linker on MIPS.
             if (not (re.search("libthread_db\.so", obj)
                      and re.search("^ps_", str(symbol)))
-                and not (re.search("^__gnu_local_gp", str(symbol)):
+                and not (re.search("^__gnu_local_gp", str(symbol)))):
                 debug(DEBUG_SPAM, "needed_symbols adding %s, weak: %s" % (symbol, symbol.weak))
                 needed_symbols[str(symbol)] = symbol
         libraries.update(library_depends(obj))
