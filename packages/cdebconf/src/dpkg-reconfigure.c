@@ -260,6 +260,48 @@ int runconfmodule(int argc, char **argv)
 	return ret;
 }
 
+int runscript (const char *pkg, const char *script, const char *param) {
+	int ret;
+	char filename[1024];
+	char *argv[5] = {0};
+	char *version = getfield(pkg, VERSIONFIELD);
+
+	snprintf(filename, sizeof(filename), INFODIR "/%s.%s", pkg, script);
+	if (! file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
+		return 0; /* it's ok if the script doesn't exist */
+	
+	if (strcmp("script", "config") == 0 || is_confmodule(filename))
+	{
+		argv[1] = filename;
+		argv[2] = param;
+		argv[3] = version;
+		if ((ret = runconfmodule(4, argv)) != 0)
+			return ret;
+	}
+	else
+	{
+		/* according to debconf:
+		 * Since a non confmodule might run other programs that
+		 * use debconf, checkpoint the db state and
+		 * reinitialize when the script finishes 
+		 */
+		g_templates->methods.save(g_templates);
+		g_questions->methods.save(g_questions);
+	
+		unsetenv("DEBIAN_HAS_FRONTEND");
+
+		strvacat(filename, sizeof(filename), " ", param, " ", version, NULL);
+		ret = system(filename);
+	
+		setenv("DEBIAN_HAS_FRONTEND", "1", 1);
+	
+		g_templates->methods.load(g_templates);
+		g_questions->methods.load(g_questions);
+	}
+
+	return ret;
+}
+
 /************************************************************************
  * Function: reconfigure
  * Inputs: pkgs - pointer to an array of packages
@@ -271,7 +313,6 @@ int runconfmodule(int argc, char **argv)
 int reconfigure(char **pkgs, int i, int max)
 {
 	int ret;
-	char *argv[5] = {0};
 	char filename[1024];
 	char *pkg;
 
@@ -279,21 +320,6 @@ int reconfigure(char **pkgs, int i, int max)
 	{
 		pkg = pkgs[i++];
 
-		snprintf(filename, sizeof(filename), INFODIR "/%s.config", pkg);
-		if (!file_exists(filename, S_IXUSR|S_IXGRP|S_IXOTH))
-		{
-			INFO(INFO_WARN, "%s is not installed, or does not use debconf", pkg);
-
-			/* Don't die, though this doesn't have a
-			   config script.. we might be doing stuff with
-			   debian-installer, which doesn't use .config
-			   scripts.  Don't uncomment this without talking
-			   to -boot first
-			   -- tfheen, 2002-09-17 */
-
-			/* continue; */
-		}
-		/* startup the confmodule; run the config script and talk to it */
 		g_frontend->methods.set_title(g_frontend, pkg);
 		if (strstr(getfield(pkg, STATUSFIELD), " ok installed") == 0)
 			DIE("%s is not fully installed", pkg);
@@ -302,52 +328,18 @@ int reconfigure(char **pkgs, int i, int max)
 		if (file_exists(filename, S_IRUSR|S_IRGRP|S_IROTH))
 			loadtemplate(filename, pkg);
 		
-		snprintf(filename, sizeof(filename), INFODIR "/%s.config", pkg);
-		if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
-		{
-			argv[1] = filename;
-			argv[2] = "reconfigure";
-			argv[3] = getfield(pkg, VERSIONFIELD);
-			if ((ret = runconfmodule(4, argv)) != 0)
-				return ret;
-		}
-		else
-		{
-			snprintf(filename, sizeof(filename), INFODIR "/%s.postinst", pkg);
-			if (file_exists(filename,S_IXUSR|S_IXGRP|S_IXOTH))
-			{
-				if (is_confmodule(filename))
-				{
-					argv[1] = filename;
-					argv[2] = "configure";
-					argv[3] = getfield(pkg, VERSIONFIELD);
-					if ((ret = runconfmodule(4, argv)) != 0)
-						return ret;
-				}
-				else
-				{
-					/* according to debconf:
-					 * Since postinst might run other programs that
-					 * use debconf, checkpoint the db state and
-					 * reinitialize when the script finishes 
-					 */
-					g_templates->methods.save(g_templates);
-					g_questions->methods.save(g_questions);
-	
-					unsetenv("DEBIAN_HAS_FRONTEND");
-
-					strvacat(filename, sizeof(filename), " configure ", getfield(pkg, VERSIONFIELD), NULL);
-	
-					ret = system(filename);
-					if (ret != 0) return DC_NOTOK;
-	
-					setenv("DEBIAN_HAS_FRONTEND", "1", 1);
-	
-					g_templates->methods.load(g_templates);
-					g_questions->methods.load(g_questions);
-				}
-			}
-		}
+		/* Simulation of reinstalling a package, without bothering with
+		   removing the files and putting them back. Just like in a
+		   regular reinstall, run config, and postinst scripts in
+		   sequence, with args. Do not run postrm, because the postrm
+		   can depend on the package's files actually being gone
+		   already. */
+		if ((ret = runscript(pkg, "prerm", "upgrade")) != 0)
+			return ret;
+		if ((ret = runscript(pkg, "config", "reconfigure")) != 0)
+			return ret;
+		if ((ret = runscript(pkg, "postinst", "configure")) != 0)
+			return ret;
 
 		i++;
 	}
