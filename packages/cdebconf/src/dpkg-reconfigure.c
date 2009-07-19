@@ -308,7 +308,7 @@ int reconfigure(char **pkgs, int i, int max)
 			argv[1] = filename;
 			argv[2] = "reconfigure";
 			argv[3] = getfield(pkg, VERSIONFIELD);
-			if ((ret = runconfmodule(4, argv)) != DC_OK)
+			if ((ret = runconfmodule(4, argv)) != 0)
 				return ret;
 		}
 		else
