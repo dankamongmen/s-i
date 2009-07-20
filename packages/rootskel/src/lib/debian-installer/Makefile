@@ -22,14 +22,12 @@ files_exec = \
 	exit-command \
 	menu
 
-ifeq ($(DEB_HOST_ARCH_OS),linux)
-  ifeq ($(DEB_HOST_ARCH_CPU),s390)
-    files += \
+ifeq ($(DEB_HOST_ARCH),s390)
+  files += \
 	detect-console:detect-console-linux-s390
-  else
-    files += \
-	detect-console:detect-console-linux
-  endif
+else
+  files += \
+	detect-console:detect-console-$(DEB_HOST_ARCH_OS)
 endif
 
 include ../../../Makefile.inc

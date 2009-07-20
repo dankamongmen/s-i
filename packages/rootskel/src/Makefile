@@ -14,7 +14,9 @@ subdirs_empty = \
 	proc \
 	sys
 
-files_exec = \
+ifeq ($(DEB_HOST_ARCH_OS),linux)
+  files_exec = \
 	init
-     
+endif
+
 include ../Makefile.inc

@@ -15,7 +15,6 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 files += \
-	S20speakup \
 	S30term \
 	S60frontend \
 	S65theme \
@@ -33,6 +32,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
   endif
 
   files += \
+	S20speakup \
 	S40term-linux \
 	S70menu-linux
 else

@@ -19,8 +19,7 @@ files = \
 	S02module-params \
 	S10syslog \
 	S20templates \
-	S35term \
-	S37speakup
+	S35term
 
 ifeq ($(DEB_HOST_ARCH_OS),linux)
   ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
@@ -58,6 +57,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S99signal-status
   endif
 
+  files += \
+	S37speakup
 endif
 
 include ../../../Makefile.inc
