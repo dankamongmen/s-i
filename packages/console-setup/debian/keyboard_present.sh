@@ -1,8 +1,7 @@
 
 
 keyboard_present () {
-    local arch kern kbdpattern class subclass protocol
-    arch="$1"
+    local kern kbdpattern class subclass protocol
 
     kern=`uname -r`
     case "$kern" in
@@ -12,20 +11,15 @@ keyboard_present () {
 	    ;;
     esac
 
-    # FIXME: someone has to check how the Atari keyboard can be tested.
-    case "$arch" in
-	m68k/atari)
-	    return 0
-	    ;;
-    esac
-
     [ -f /proc/bus/input/devices ] || return 0
-    kbdpattern="Amiga keyboard"
+    kbdpattern=''
     kbdpattern="$kbdpattern\|AT Set \|AT Translated Set\|AT Raw Set"
+    kbdpattern="$kbdpattern\|Atari Keyboard"
+    kbdpattern="$kbdpattern\|Amiga Keyboard"
     kbdpattern="$kbdpattern\|HIL keyboard"
     kbdpattern="$kbdpattern\|ADB keyboard"
     kbdpattern="$kbdpattern\|Sun Type"
-    if grep "$kbdpattern" /proc/bus/input/devices >/dev/null; then
+    if grep -i "$kbdpattern" /proc/bus/input/devices >/dev/null; then
 	return 0
     fi
 
