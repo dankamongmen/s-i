@@ -1,0 +1,15 @@
+if [ -z "$TERM_TYPE" ]; then
+	case `tty` in
+		/dev/console|/dev/cuaa[0-f]*)
+			TERM_TYPE=serial
+			;;
+		/dev/ttyv[0-f]*)
+			TERM_TYPE=virtual
+			;;
+		/dev/ttyp[0-f]*)
+			TERM_TYPE=pts
+			;;
+	esac
+fi
+
+export TERM_TYPE
