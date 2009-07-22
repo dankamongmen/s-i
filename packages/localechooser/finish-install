@@ -34,22 +34,4 @@ fi
 #        apt-install localization-config || true
 #fi
 
-
-db_get debian-installer/consoledisplay || true
-consoletype=$(echo $RET | sed -e 's/=.*$//')
-case "$consoletype" in
-    kbd)
-	consolefont=$(echo $RET | sed -e 's/^kbd=//')
-	if apt-install kbd; then
-		consolefont=$(echo $consolefont | sed -e 's/(.*//')
-		if echo "$consolefont" | grep -q "Terminus"; then
-			apt-install console-terminus || true
-		fi
-	fi
-	;;
-    cyr)
-	apt-install console-cyrillic || true
-	;;
-esac
-
 exit 0
