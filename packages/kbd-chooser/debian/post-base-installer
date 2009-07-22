@@ -8,12 +8,8 @@ if [ "$RET" != false ]; then
 	exit 0
 fi
 
-# Avoid displaying console-data's keymap policy question
-# Use LANG=C to avoid perl warnings
-echo "console-data console-data/keymap/policy select Don't touch keymap" | \
-	LANG=C chroot /target debconf-set-selections
-
-apt-install kbd console-data console-common || true
+apt-install console-setup || true
+exit 0 # console-setup will handle the rest of it
 
 db_get debian-installer/keymap
 KEYMAP=$RET
