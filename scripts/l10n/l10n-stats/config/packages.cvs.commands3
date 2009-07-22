@@ -1,26 +1,15 @@
-touch $HOME/.cvspass
+svn -q co svn://svn.debian.org/debconf/trunk/src/debconf debconf/ >/dev/null 2>&1
+cd debconf/po
+make debconf.pot > /dev/null 2>&1
+cd ../..
 
 
-#echo -n "menu "
-cvs -z3 -Q -d:pserver:anonymous@cvs.alioth.debian.org:/cvsroot/menu co menu
+for i in newt ; do
+	apt-get $APT_OPT -t unstable source $i >/dev/null
+	rm -f *.tar.gz *.dsc *.diff.gz
+	if [ ! -d "$i" ] ; then mv $i* $i ; fi
+done
 
-
-#echo -n "xorg "
-rm -rf xorg
-git-clone git+ssh://git.debian.org/git/pkg-xorg/debian/xorg.git >/dev/null 2>&1
-mv xorg/debian xserver-xorg
-# svn -q co svn://necrotic.deadbeast.net/xorg-x11/trunk/debian/xorg/debian xserver-xorg
-rm -rf xorg
-mv xserver-xorg xorg
-
-#echo -n "exim4 "
-rm -rf exim4
-mkdir exim4
-cd exim4
-svn -q co svn://svn.debian.org/svn/pkg-exim4/exim/trunk/debian > /dev/null 2>&1
-cd ../
-
-#echo -n "win32-loader "
 rm -rf win32-loader
 svn -q co svn://svn.debian.org/svn/d-i/trunk/win32-loader
 
