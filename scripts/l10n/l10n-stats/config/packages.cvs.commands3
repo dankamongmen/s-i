@@ -4,11 +4,12 @@ make debconf.pot > /dev/null 2>&1
 cd ../..
 
 
-for i in newt ; do
-	apt-get $APT_OPT -t unstable source $i >/dev/null
-	rm -f *.tar.gz *.dsc *.diff.gz
-	if [ ! -d "$i" ] ; then mv $i* $i ; fi
-done
+apt-get $APT_OPT -t unstable source newt >/dev/null
+rm -f *.tar.gz *.dsc *.diff.gz
+if [ ! -d "newt" ] ; then mv newt* newt ; fi
+cd newt
+tar xfz *.tar.gz
+cd ..
 
 rm -rf win32-loader
 svn -q co svn://svn.debian.org/svn/d-i/trunk/win32-loader
