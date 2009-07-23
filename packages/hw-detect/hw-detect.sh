@@ -457,9 +457,9 @@ cardbus_check_netdev()
 {
 	local socket="$1"
 	local netdev="$2"
-	if [ -L $netdev/device ] && \
-		[ -d $socket/device/$(basename $(readlink $netdev/device)) ]; then
-		echo $(basename $netdev) >> /etc/network/devhotplug
+	if [ -L "$netdev/device" ] && \
+		[ -d "$socket/device/$(basename "$(readlink "$netdev/device")")" ]; then
+		echo "$(basename "$netdev")" >> /etc/network/devhotplug
 	fi
 }
 
@@ -471,7 +471,7 @@ if [ "$have_pcmcia" -eq 1 ] && \
 
 	for socket in /sys/class/pcmcia_socket/*; do
 		for netdev in /sys/class/net/*; do
-			cardbus_check_netdev $socket $netdev
+			cardbus_check_netdev "$socket" "$netdev"
 		done
 	done
 
