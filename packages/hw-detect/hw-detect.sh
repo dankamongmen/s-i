@@ -436,6 +436,10 @@ if [ -x "$PCMCIA_INIT" ]; then
 		if db_get hw-detect/pcmcia_resources && [ "$RET" ]; then
 			apply_pcmcia_resource_opts $RET
 		fi
+		# cdebconf doesn't set seen flags, so this would normally be
+		# asked again on subsequent hw-detect runs, which is
+		# annoying.
+		db_fset hw-detect/pcmcia_resources seen true || true
 
 		db_progress INFO hw-detect/pcmcia_step
 		$PCMCIA_INIT start 2>&1 | log
