@@ -30,4 +30,4 @@ done
 	cd git
 	../svn-all-fast-export/svn-all-fast-export \
 		--identity-map=../authors-file $inc ../d-i.conf ../svn/d-i
-) | tee $tee log
+) 2>&1 | tee $tee log
