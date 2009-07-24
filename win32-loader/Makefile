@@ -20,9 +20,9 @@ GRUB_MODULES	+= pc gpt
 # fs
 GRUB_MODULES	+= fat ntfs ntfscomp
 # used in our grub.cfg
-GRUB_MODULES	+= search linux _linux boot
+GRUB_MODULES	+= search linux boot
 # might be useful for debugging
-GRUB_MODULES	+= cat cpuid _chain chain halt help ls reboot
+GRUB_MODULES	+= minicmd cat cpuid chain halt help ls reboot
 
 all: win32-loader.exe g2ldr g2ldr.mbr
 
