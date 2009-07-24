@@ -43,15 +43,34 @@ do_display() {
 }
 
 do_vg_create() {
-	local pvs pv output vg
+	local pvs line pv output vg pathmap
 	pvs=""
+	pathmap=""
 
 	# Look for free PVs
-	for pv in $(pv_list_free); do
-		pv_get_info "$pv"
-		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
+	IFS="$NL"
+	for line in $(pv_list_allowed_free); do
+		restore_ifs
+		local dev="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local id="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local size="${line%%$TAB*}"
+		local path="${line#*$TAB}"
+		cd $dev
+		if [ -e "$path" ] && pv_get_info "$path"; then
+			output=$(printf "%-30s (%sMB)" "$path" "$SIZE")
+		elif [ ! -s "$id/visual_filesystem" ]; then
+			output=$(printf "%-30s (%sMB)" "$path" "$(convert_to_megabytes $size)")
+		else
+			local visual="$(cat "$id/visual_filesystem")"
+			output=$(printf "%-30s (%sMB; %s)" "$path" "$(convert_to_megabytes $size)" "$visual")
+		fi
 		pvs="${pvs:+$pvs, }$output"
+		pathmap="${pathmap:+$pathmap$NL}$path$TAB$dev//$id"
+		IFS="$NL"
 	done
+	restore_ifs
 	if [ -z "$pvs" ]; then
 		db_input critical partman-lvm/nopartitions
 		db_go || true
@@ -103,8 +122,33 @@ do_vg_create() {
 		db_go || true
 		return
 	fi
-	pvs=$(echo "$RET" | sed -e 's/ *([^)]*) *//g')
-	pvs=$(csv_to_ssv "$pvs")
+	pvs=$(echo "$RET" | sed -e "s/ *([^)]*) *//g; s/ *, */\\$NL/g")
+
+	local newpvs=
+	local need_commit=
+	IFS="$NL"
+	for pv in $pvs; do
+		for line in $pathmap; do
+			restore_ifs
+			if [ "${line%%$TAB*}" = "$pv" ]; then
+				local devid="${line#*$TAB}"
+				local path
+				if path="$(pv_prepare "${devid%//*}" "${devid#*//}")"; then
+					need_commit=true
+				fi
+				newpvs="${newpvs:+$newpvs }$path"
+				break
+			fi
+			IFS="$NL"
+		done
+		IFS="$NL"
+	done
+	restore_ifs
+	pvs="$newpvs"
+
+	if [ "$need_commit" ]; then
+		do_initial_setup
+	fi
 
 	if ! vg_create "$vg" $pvs; then
 		db_subst partman-lvm/vgcreate_error VG "$vg"
@@ -160,16 +204,35 @@ do_vg_delete() {
 }
 
 do_vg_extend() {
-	local pvs pv output vgs vg
+	local pvs line pv output vgs vg pathmap
 	vgs=""
+	pathmap=""
 
 	# Get eligible PVs
 	pvs=""
-	for pv in $(pv_list_free); do
-		pv_get_info "$pv"
-		output=$(printf "%-30s (%sMB)" "$pv" "$SIZE")
+	IFS="$NL"
+	for line in $(pv_list_allowed_free); do
+		restore_ifs
+		local dev="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local id="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local size="${line%%$TAB*}"
+		local path="${line#*$TAB}"
+		cd $dev
+		if [ -e "$path" ] && pv_get_info "$path"; then
+			output=$(printf "%-30s (%sMB)" "$path" "$SIZE")
+		elif [ ! -f "$id/visual_filesystem" ]; then
+			continue
+		else
+			local visual="$(cat "$id/visual_filesystem")"
+			output=$(printf "%-30s (%sMB; %s)" "$path" "$(convert_to_megabytes $size)" "$visual")
+		fi
 		pvs="${pvs:+$pvs, }$output"
+		pathmap="${pathmap:+$pathmap$NL}$path$TAB$dev//$id"
+		IFS="$NL"
 	done
+	restore_ifs
 	if [ -z "$pvs" ]; then
 		db_input critical partman-lvm/nopartitions
 		db_go || true
@@ -208,8 +271,33 @@ do_vg_extend() {
 		db_go || true
 		return
 	fi
-	pvs=$(echo "$RET" | sed -e 's/ *([^)]*) *//g')
-	pvs=$(csv_to_ssv "$pvs")
+	pvs=$(echo "$RET" | sed -e "s/ *([^)]*) *//g; s/ *, */\\$NL/g")
+
+	local newpvs=
+	local need_commit=
+	IFS="$NL"
+	for pv in $pvs; do
+		for line in $pathmap; do
+			restore_ifs
+			if [ "${line%%$TAB*}" = "$pv" ]; then
+				local devid="${line#*$TAB}"
+				local path
+				if path="$(pv_prepare "${devid%//*}" "${devid#*//}")"; then
+					need_commit=true
+				fi
+				newpvs="${newpvs:+$newpvs }$path"
+				break
+			fi
+			IFS="$NL"
+		done
+		IFS="$NL"
+	done
+	restore_ifs
+	pvs="$newpvs"
+
+	if [ "$need_commit" ]; then
+		do_initial_setup
+	fi
 
 	for pv in $pvs; do
 		if ! vg_extend "$vg" "$pv"; then
@@ -440,6 +528,7 @@ do_initial_setup
 
 while [ 1 ]; do
 	# Get some statistics
+	allowed_pvs=$(pv_list_allowed_free | wc -l)
 	free_pvs=$(pv_list_free | wc -l)
 	used_pvs=$(pvs --noheadings | wc -l)  # All PVs
 	used_pvs=$(( $used_pvs - $free_pvs )) # Used = All PVs - Free PVs
@@ -450,7 +539,7 @@ while [ 1 ]; do
 	choices=""
 	choices_l10n=""
 	lvm_menu_add display
-	if [ $free_pvs -gt 0 ]; then
+	if [ $allowed_pvs -gt 0 ]; then
 		lvm_menu_add createvg
 	fi
 	# Other options only if there is at least one VG
@@ -482,7 +571,7 @@ while [ 1 ]; do
 		if [ $lvs -gt 0 ]; then
 			lvm_menu_add deletelv
 		fi
-		if [ $free_pvs -gt 0 ]; then
+		if [ $allowed_pvs -gt 0 ]; then
 			lvm_menu_add extendvg
 		fi
 		if [ "$do_reducevg" ]; then
