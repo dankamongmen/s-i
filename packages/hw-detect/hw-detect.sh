@@ -229,6 +229,17 @@ if [ -d /sys/bus/pci/devices ] && \
 	sleep 3 || true
 fi
 
+# Load the ethernet gadget network driver (g_ether) on S3C2410/S3C2440 (Openmoko GTA01/02)
+if [ -d /sys/bus/platform/devices/s3c2440-usbgadget -o \
+	-d /sys/bus/platform/devices/s3c2410-usbgadget ] ; then
+	db_subst hw-detect/load_progress_step CARDNAME "S3C2410/S3C2440 SoC"
+	db_subst hw-detect/load_progress_step MODULE "g_ether"
+	db_progress INFO hw-detect/load_progress_step
+	
+	log "Detected S3C2410/S3C2440 SoC, loading g_ether"
+	load_module g_ether
+fi
+
 # If using real hotplug, re-run the rc scripts to pick up new modules.
 # TODO: this just loads modules itself, rather than handing back a list
 # Since we've just run depmod, new modules might be available, so we
