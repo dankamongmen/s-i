@@ -577,7 +577,7 @@ while 1:
             symbols.update(library_symbols_used[library])
 
             # libc.so.6 needs its soinit.o and sofini.o as well as the pic
-            if soname in ("libc.so.6", "libc.so.6.1"):
+            if soname in ("libc.so.6", "libc.so.6.1", "libc.so.0.1", "libc.so.0.3"):
                 # force dso_handle.os to be included, otherwise reduced libc
                 # may segfault in ptmalloc_init due to undefined weak reference
                 extra_pre_obj.append(sysroot + libc_extras_dir + "/soinit.o")
