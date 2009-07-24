@@ -24,41 +24,120 @@ do_initial_setup () {
 			--config=/tmp/mdadm.conf --auto=yes
 }
 
-prune_partitions () {
-	local chosen="$1"
-	local new_partitions=
-	local i j
-	for i in $PARTITIONS; do
+make_choices () {
+	local line
+	descriptions=""
+	pathmap=""
+	IFS="$NL"
+	for line in $(md_list_allowed_free); do
+		restore_ifs
+		local dev="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local id="${line%%$TAB*}"
+		line="${line#*$TAB}"
+		local size="${line%%$TAB*}"
+		local path="${line#*$TAB}"
+		cd $dev
+		if [ -s "$id/visual_filesystem" ]; then
+			local visual="$(cat "$id/visual_filesystem")"
+			output=$(printf "%-30s (%sMB; %s)" "$path" "$(convert_to_megabytes $size)" "$visual")
+		else
+			output=$(printf "%-30s (%sMB)" "$path" "$(convert_to_megabytes $size)")
+		fi
+		descriptions="${descriptions:+$descriptions, }$output"
+		pathmap="${pathmap:+$pathmap$NL}$path$TAB$dev//$id"
+		IFS="$NL"
+	done
+	restore_ifs
+}
+
+count_choices () {
+	echo "$1" | sed -e "s/ *, */\\$NL/g" | wc -l
+}
+
+prune_choices () {
+	local new_descriptions=
+	while [ "$descriptions" ]; do
+		local description="${descriptions%%, *}"
+		if [ "${descriptions#*, }" = "$descriptions" ]; then
+			descriptions=
+		else
+			descriptions="${descriptions#*, }"
+		fi
+		local chosen="$1"
 		local found=0
-		for j in $chosen; do
-			if [ "$i" = "$j" ]; then
+		while [ "$chosen" ]; do
+			local choice="${chosen%%, *}"
+			if [ "${chosen#*, }" = "$chosen" ]; then
+				chosen=
+			else
+				chosen="${chosen#*, }"
+			fi
+			if [ "$description" = "$choice" ]; then
 				found=1
 				break
 			fi
 		done
 		if [ "$found" -eq 0 ]; then
-			new_partitions="${new_partitions:+$new_partitions }$i"
+			new_descriptions="${new_descriptions:+$new_descriptions, }$description"
 		fi
 	done
-	PARTITIONS="$new_partitions"
+	descriptions="$new_descriptions"
+}
+
+prepare_devices () {
+	local devices="$1"
+	local new_devices=
+	local need_commit=
+	while [ "$devices" ]; do
+		local dev="${devices%%, *}"
+		if [ "${devices#*, }" = "$devices" ]; then
+			devices=
+		else
+			devices="${devices#*, }"
+		fi
+		dev="$(echo "$dev" | sed -e 's/ *([^)]*)//g')"
+		local line
+		IFS="$NL"
+		for line in $pathmap; do
+			restore_ifs
+			if [ "${line%%$TAB*}" = "$dev" ]; then
+				local devid="${line#*$TAB}"
+				local path
+				if path="$(md_prepare "${devid%//*}" "${devid#*//}")"; then
+					need_commit=true
+				fi
+				new_devices="${new_devices:+$new_devices }$path"
+				break
+			fi
+			IFS="$NL"
+		done
+		restore_ifs
+	done
+	echo "$new_devices"
+
+	[ "$need_commit" ]
 }
 
 md_create_raid0 () {
-	db_subst partman-md/raid0devs PARTITIONS "$(ssv_to_csv "$PARTITIONS")"
-	db_set partman-md/raid0devs ''
+	db_subst partman-md/raid0devs PARTITIONS "$descriptions"
+	db_reset partman-md/raid0devs
 	db_input critical partman-md/raid0devs
 	db_go || return
 
 	db_get partman-md/raid0devs
-	RET="$(csv_to_ssv "$RET")"
-	local selected="$(echo "$RET" | wc -w)"
-	prune_partitions "$RET"
+	local selected="$(count_choices "$RET")"
+	prune_choices "$RET"
 
 	local md_num="$(md_next_device_number)"
 
 	logger -t partman-md "Number of devices in the RAID0 array md$md_num: $selected"
 
-	local raid_devices="$(csv_to_ssv "$RET")"
+	local raid_devices="$RET"
+	if raid_devices="$(prepare_devices "$raid_devices")"; then
+		do_initial_setup
+	fi
+
 	log-output -t partman-md \
 		mdadm --create /dev/md$md_num --auto=yes --force -R -l raid0 \
 		      -n $selected $raid_devices || return $?
@@ -96,8 +175,8 @@ md_create_array () {
 		dev_count="$min_size"
 	fi
 	local required="$(($dev_count + $spare_count))"
-	if [ "$level" -ne 1 ] && [ "$required" -gt "$NUM_PART" ]; then
-		db_subst partman-md/notenoughparts NUM_PART "$NUM_PART"
+	if [ "$level" -ne 1 ] && [ "$required" -gt "$num_parts" ]; then
+		db_subst partman-md/notenoughparts NUM_PART "$num_parts"
 		db_subst partman-md/notenoughparts REQUIRED "$required"
 		db_input critical partman-md/notenoughparts
 		db_go
@@ -112,12 +191,12 @@ md_create_array () {
 	until ([ "$level" -ne 1 ] && [ "$selected" -eq "$dev_count" ]) || \
 	      ([ "$level" -eq 1 ] && [ "$selected" -gt 0 ] && [ "$selected" -le "$dev_count" ]); do
 		db_subst partman-md/raiddevs COUNT "$dev_count"
-		db_subst partman-md/raiddevs PARTITIONS "$(ssv_to_csv "$PARTITIONS")"
+		db_subst partman-md/raiddevs PARTITIONS "$descriptions"
 		db_input critical partman-md/raiddevs
 		db_go || return
 
 		db_get partman-md/raiddevs
-		selected="$(echo "$RET" | wc -w)"
+		selected="$(count_choices "$RET")"
 	done
 
 	local missing_devices=
@@ -129,25 +208,25 @@ md_create_array () {
 		done
 	fi
 
-	# Remove partitions selected in raiddevs from the PARTITIONS list
+	# Remove partitions selected in raiddevs from the descriptions list
 	db_get partman-md/raiddevs
-	prune_partitions "$(csv_to_ssv "$RET")"
+	prune_choices "$RET"
 
 	db_set partman-md/raidsparedevs ''
 	selected=0
-	if [ "$spare_count" -gt 0 ] && [ -n "$PARTITIONS" ]; then
+	if [ "$spare_count" -gt 0 ] && [ -n "$descriptions" ]; then
 		local first=1
 		# Loop until the correct number of devices has been selected.
 		# That means any number less than or equal to the spare count.
 		while [ "$selected" -gt "$spare_count" ] || [ "$first" -eq 1 ]; do
 			first=0
 			db_subst partman-md/raidsparedevs COUNT "$spare_count"
-			db_subst partman-md/raidsparedevs PARTITIONS "$(ssv_to_csv "$PARTITIONS")"
+			db_subst partman-md/raidsparedevs PARTITIONS "$descriptions"
 			db_input critical partman-md/raidsparedevs
 			db_go || return
 
 			db_get partman-md/raidsparedevs
-			selected="$(echo "$RET" | wc -w)"
+			selected="$(count_choices "$RET")"
 		done
 	fi
 
@@ -170,10 +249,21 @@ md_create_array () {
 	local named_spares="$selected"
 
 	db_get partman-md/raiddevs
-	local raid_devices="$(csv_to_ssv "$RET")"
+	local raid_devices="$RET"
 
 	db_get partman-md/raidsparedevs
-	local spare_devices="$(csv_to_ssv "$RET")"
+	local spare_devices="$RET"
+
+	local need_commit=
+	if raid_devices="$(prepare_devices "$raid_devices")"; then
+		need_commit=true
+	fi
+	if spare_devices="$(prepare_devices "$spare_devices")"; then
+		need_commit=true
+	fi
+	if [ "$need_commit" ]; then
+		do_initial_setup
+	fi
 
 	local missing_spares=
 	local count="$named_spares"
@@ -201,13 +291,13 @@ do_create () {
 	db_go || return
 	db_get partman-md/createmain
 	local raid_sel="$RET"
-	PARTITIONS="$(md_get_partitions)"
-	if [ -z "$PARTITIONS" ]; then
+	make_choices
+	if [ -z "$descriptions" ]; then
 		db_input critical partman-md/noparts
 		db_go
 		return
 	fi
-	NUM_PART="$(echo "$PARTITIONS" | wc -w)"
+	num_parts="$(count_choices "$descriptions")"
 	case $raid_sel in
 	    RAID10|RAID6|RAID5|RAID1)
 		md_create_array "$raid_sel" ;;

@@ -1,30 +1,11 @@
 #!/bin/sh
 
-. /lib/partman/lib/base.sh
+. /lib/partman/lib/md-base.sh
 
 dev=$1
 id=$2
 
-# sparc can not have RAID starting at 0 or it will destroy the partition table
-if [ "$(udpkg --print-architecture)" = sparc ] && \
-   [ "${id%%-*}" = "0" ]; then
-	exit 0
-fi
-
-cd $dev
-
-md=no
-open_dialog VALID_FLAGS $id
-while { read_line flag; [ "$flag" ]; }; do
-	if [ "$flag" = raid ]; then
-		md=yes
-	fi
-done
-close_dialog
-
-if [ $md = no ]; then
-	exit 0
-fi
+md_allowed "$dev" "$id" || exit 0
 
 db_metaget partman/method_long/raid description
 

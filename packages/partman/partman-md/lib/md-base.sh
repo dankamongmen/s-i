@@ -14,6 +14,173 @@ md_devnode () {
 	fi
 }
 
+# Would this partition be allowed as a RAID physical volume?
+md_allowed () {
+	local dev=$1
+	local id=$2
+
+	cd $dev
+
+	# sparc can not have RAID starting at 0 or it will destroy the partition table
+	if [ "$(udpkg --print-architecture)" = sparc ] && \
+	   [ "${id%%-*}" = "0" ]; then
+		return 1
+	fi
+
+	local md=no
+	local fs
+	open_dialog PARTITION_INFO $id
+	read_line x1 x2 x3 x4 fs x6 x7
+	close_dialog
+	if [ "$fs" = free ]; then
+		# parted can't deal with VALID_FLAGS on free space as yet,
+		# so unfortunately we have to special-case label types.
+		local label
+		open_dialog GET_LABEL_TYPE
+		read_line label
+		close_dialog
+		case $label in
+		    amiga|bsd|dasd|gpt|mac|msdos|sun)
+			# ... by creating a partition
+			md=yes
+			;;
+		esac
+	else
+		local flag
+		open_dialog VALID_FLAGS $id
+		while { read_line flag; [ "$flag" ]; }; do
+			if [ "$flag" = raid ]; then
+				md=yes
+			fi
+		done
+		close_dialog
+	fi
+
+	[ $md = yes ]
+}
+
+md_list_allowed () {
+	local IFS
+	local partitions
+	local freenum=1
+	for dev in $DEVICES/*; do
+		[ -d $dev ] || continue
+		cd $dev
+
+		open_dialog PARTITIONS
+		partitions="$(read_paragraph)"
+		close_dialog
+
+		local id size fs path
+		IFS="$TAB"
+		echo "$partitions" |
+		while { read x1 id size x4 fs path x7; [ "$id" ]; }; do
+			restore_ifs
+			if md_allowed "$dev" "$id"; then
+				if [ "$fs" = free ]; then
+					printf "%s\t%s\t%s\t%s free #%d\n" "$dev" "$id" "$size" "$(mapdevfs "$(cat "$dev/device")")" "$freenum"
+					freenum="$(($freenum + 1))"
+				else
+					printf "%s\t%s\t%s\t%s\n" "$dev" "$id" "$size" "$(mapdevfs "$path")"
+				fi
+			fi
+			IFS="$TAB"
+		done
+		restore_ifs
+	done
+}
+
+md_list_allowed_free () {
+	local line
+
+	IFS="$NL"
+	for line in $(md_list_allowed); do
+		restore_ifs
+		local dev="${line%%$TAB*}"
+		local rest="${line#*$TAB}"
+		local id="${rest%%$TAB*}"
+		if [ -e "$dev/locked" ] || [ -e "$dev/$id/locked" ]; then
+			continue
+		fi
+		local path="${line##*$TAB}"
+		if [ ! -e "$path" ]; then
+			echo "$line"
+		else
+			local mappedpath="$(mapdevfs "$path")"
+			# Exclude partitions that are already part of a RAID
+			# set
+			if ! egrep -q "(${path#/dev/}|${mappedpath#/dev/})" /proc/mdstat; then
+				echo "$line"
+			fi
+		fi
+		IFS="$NL"
+	done
+	restore_ifs
+}
+
+# Prepare a partition for use as a RAID physical volume. If this returns
+# true, then it did some work and a commit is necessary. Prints the new
+# path.
+md_prepare () {
+	local dev="$1"
+	local id="$2"
+	local size parttype fs path
+
+	cd "$dev"
+	open_dialog PARTITION_INFO "$id"
+	read_line x1 id size freetype fs path x7
+	close_dialog
+
+	if [ "$fs" = free ]; then
+		local newtype
+
+		case $freetype in
+		    primary)
+			newtype=primary
+			;;
+		    logical)
+			newtype=logical
+			;;
+		    pri/log)
+			local parttype
+			open_dialog PARTITIONS
+			while { read_line x1 x2 x3 parttype x5 x6 x7; [ "$parttype" ]; }; do
+				if [ "$parttype" = primary ]; then
+					has_primary=yes
+				fi
+			done
+			close_dialog
+			if [ "$has_primary" = yes ]; then
+				newtype=logical
+			else
+				newtype=primary
+			fi
+			;;
+		esac
+
+		open_dialog NEW_PARTITION $newtype ext2 $id full $size
+		read_line x1 id x3 x4 x5 path x7
+		close_dialog
+	fi
+
+	mkdir -p "$id"
+	local method="$(cat "$id/method" 2>/dev/null || true)"
+	if [ "$method" = swap ]; then
+		disable_swap "$id"
+	fi
+	if [ "$method" != raid ]; then
+		echo raid >"$id/method"
+		rm -f "$id/use_filesystem"
+		rm -f "$id/format"
+		update_partition "$dev" "$id"
+		echo "$path"
+		return 0
+	fi
+
+	echo "$path"
+	return 1
+}
+
 md_get_level () {
 	echo $(mdadm -Q --detail $1 | grep "Raid Level" | sed "s/.*: //")
 }
@@ -27,53 +194,6 @@ md_get_devices () {
 		local mdtype=$(md_get_level $mddev)
 		MD_DEVICES="${MD_DEVICES:+$MD_DEVICES, }${device}_$mdtype"
 	done
-}
-
-md_get_partitions () {
-	local dev method
-
-        PARTITIONS=""
-
-	for dev in $DEVICES/*; do
-		[ -d "$dev" ] || continue
-		cd $dev
-		open_dialog PARTITIONS
-		while { read_line num id size type fs path name; [ "$id" ]; }; do
-			[ -f $id/method ] || continue
-			method=$(cat $id/method)
-			if [ "$method" = raid ]; then
-				local mappedpath="$(mapdevfs "$path")"
-				# Exclude partitions that are already part
-				# of a RAID set
-				if ! egrep -q "(${path#/dev/}|${mappedpath#/dev/})" /proc/mdstat; then
-					echo "$mappedpath"
-				fi
-			fi
-		done
-		close_dialog
-	done
-}
-
-# Converts a list of space (or newline) separated values to comma separated values
-# TODO: duplication from partman-lvm
-ssv_to_csv () {
-	local csv value
-
-	csv=""
-	for value in $1; do
-		if [ -z "$csv" ]; then
-			csv="$value"
-		else
-			csv="$csv, $value"
-		fi
-	done
-	echo "$csv"
-}
-
-# Converts a list of comma separated values to space separated values
-# TODO: duplication from partman-lvm
-csv_to_ssv () {
-	echo "$1" | sed -e 's/ *, */ /g'
 }
 
 md_db_get_number () {
