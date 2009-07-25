@@ -97,7 +97,8 @@ if [ "$LEVEL" = "3" ] || [ "$LEVEL" = "4" ]; then
 fi
 
 # Generate selected locales that are not already valid
-if [ -x /target/usr/sbin/validlocale ]; then
+if ([ "$LOCALE" != "C" ] || [ "$EXTRAS" ]) && \
+   [ -x /target/usr/sbin/validlocale ]; then
 	gen=""
 	if add_if_invalid "$LOCALE"; then
 		gen=1
