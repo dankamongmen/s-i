@@ -31,3 +31,9 @@ done
 	../svn-all-fast-export/svn-all-fast-export \
 		--identity-map=../authors-file $inc ../d-i.conf ../svn/d-i
 ) 2>&1 | tee $tee log
+
+crashes=$(ls -1 git/fast_import_crash_* 2>/dev/null || true)
+if [ -n "$crashes" ]; then
+	echo "* Crashes detected: $crashes" >&2
+	exit 1
+fi
