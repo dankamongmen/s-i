@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 58381 -->
+<!-- original version: 59739 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -838,6 +838,11 @@ Pro nastavení sítě lze využít následující proměnné:
 </para>
 
 <informalexample role="example"><screen>
+# Kompletně zakáže nastavení sítě. Hodí se pro instalace z CD
+# na nezasíťovaných zařízeních, kde by byly síťové otázky,
+# varování o nedostupné síti a dlouhé čekací doby na obtíž.
+#d-i netcfg/enable boolean false
+
 # netcfg zkusí použít rozhraní, jehož druhý konec je aktivní
 # a tím pádem přeskočí výběr ze seznamu nalezených rozhraní.
 d-i netcfg/choose_interface select auto
@@ -1053,7 +1058,7 @@ d-i partman-auto/choose_recipe select atomic
 # Následujícím řeknete partmanu, aby disk rozdělil bez potvrzení.
 # (Za předpokladu, že jste partmanu v předchozích krocích řekli,
 # co má dělat.)
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
@@ -1124,9 +1129,49 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 
 # Toto zajistí, že se partman nebude při rozdělování ptát na potvrzení.
 d-i partman-md/confirm boolean true
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+</screen></informalexample>
+
+  </sect2>
+
+  <sect2 id="preseed-partman-mount-styles">
+  <title>Způsob připojení oblastí</title>
+<para>
+
+Souborové systémy se obvykle připojují pomocí jedinečného
+univerzálního identifikátoru, tzv. UUID. To umožňuje korektní
+připojení oblastí i v případech, kdy se změní jejich jména
+zařízení. UUID jsou dlouhé a špatně se čtou, takže pokud si budete
+přát, může instalátor připojit souborové systémy pomocí tradičních
+jmen zařízení, nebo pomocí názvů oblastí, které jim přidělíte.
+Zvolíte-li připojení pomocí názvů oblastí, budou oblasti bez
+nastaveného názvu připojeny pomocí UUID.
+
+</para><para>
+
+Zařízení se stabilními jmény, jako např. logické svazky LVM, budou
+místo UUID nadále používat připojení pomocí tradičních jmen zařízení.
+
+</para>
+
+<warning><para>
+
+Tradiční jména zařízení se mohou měnit v závislosti na pořadí, ve
+kterém jádro při zavádění zařízení objeví. To může způsobit připojení
+chybného souborového systému. Podobný problém existuje v případě
+použití názvů oblastí, protože při zapojení dalšího disku (i
+externího) mohou použité názvy oblastí kolidovat a tím pádem není
+zaručeno, která oblast se připojí.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+# Výchozí je připojování pomocí UUID, ale můžete zvolit též "traditional"
+# pro použití tradičních jmen zařízení, nebo "label" pro použití názvů
+# oblastí (se záchytnou možností použití UUID).
+#d-i partman/mount_style select uuid
 </screen></informalexample>
 
   </sect2>
@@ -1329,6 +1374,10 @@ můžete jednoduše použít i na příkazové řádce jádra.
 
 # Samostatné balíky pro instalaci.
 #d-i pkgsel/include string openssh-server build-essential
+# Ve výchozím nastavení nebudou u balíků instalovaných pomocí
+# pkgsel/include instalovány jejich doporučené balíky.
+# Chcete-li instalovat i doporučené balíky, odkomentujte následující:
+#d-i pkgsel/include/install-recommends boolean true
 # Zda se mají balíky po rozbalení debootstrapem aktualizovat.
 # Povolené hodnoty: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
@@ -1375,6 +1424,11 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/password-again password r00tme
 # nebo zašifrované pomocí MD5 hashe, viz grub-md5-crypt(8).
 #d-i grub-installer/password-crypted password [MD5 hash]
+
+# Následující volbou můžete přidat další zaváděcí parametry pro
+# nainstalovaný systém (pokud to podporuje instalátor zavaděče).
+# Poznámka: parametry předané instalátoru budou přidány automaticky.
+#d-i debian-installer/add-kernel-opts string nousb
 </screen></informalexample>
 
 <para>
@@ -1505,14 +1559,14 @@ instalace.
 
 # První příkaz je spuštěn co nejdříve - hned po načtení přednastavení.
 #d-i preseed/early_command string anna-install nejaky-udeb
-<phrase condition="squeeze">
+
 # Tento příkaz je spuštěn těsně před vstupem do dělení disků. Může se
 # hodit pro dynamické přednastavení rozdělení disku, které závisí na
 # aktuálním stavu disků (které ještě nemusí být vidět v době spuštění
 # předchozího příkazu preseed/early_command).
 #d-i partman/early_command \
 #       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
-</phrase>
+
 # Tento příkaz je spuštěn těsně před koncem instalace, ale ještě je
 # připojen adresář /target. Buď můžete použít chroot na /target
 # a pracovat přímo v něm, nebo můžete použít příkaz apt-install
