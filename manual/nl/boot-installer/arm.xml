@@ -1,108 +1,10 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 36639 untranslated -->
+<!-- original version: 59771 untranslated -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booting from TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-   <sect3 arch="arm"><title>Booting from TFTP on Netwinder</title>
-<para>
-
-Netwinders have two network interfaces: A 10Mbps NE2000-compatible
-card (which is generally referred to as <literal>eth0</literal>) and
-a 100Mbps Tulip card.  There may be problems loading the image via TFTP
-using the 100Mbps card so it is recommended that you use the 10Mbps
-interface (the one labeled with <literal>10 Base-T</literal>).
-
-</para>
-<note><para>
-
-You need NeTTrom 2.2.1 or later to boot the installation system, and
-version 2.3.3 is recommended.  Unfortunately, firmware files are currently
-not available for download because of license issues.  If this situation
-changes, you may find new images at <ulink url="http//www.netwinder.org/"></ulink>.
-
-</para></note>
-<para>
-
-When you boot your Netwinder you have to interrupt the boot process during the
-countdown.  This allows you to set a number of firmware settings needed in
-order to boot the installer.  First of all, start by loading the default
-settings:
-
-<informalexample><screen>
-    NeTTrom command-&gt; load-defaults
-</screen></informalexample>
-
-Furthermore, you must configure the network, either with a static address:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
-</screen></informalexample>
-
-where 24 is the number of set bits in the netmask, or a dynamic address:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
-</screen></informalexample>
-
-You may also need to configure the <userinput>route1</userinput>
-settings if the TFTP server is not on the local subnet.
-
-Following these settings, you have to specify the TFTP server and the
-location of the image.  You can then store your settings to flash.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
-    NeTTrom command-&gt; setenv kerntftpfile boot.img
-    NeTTrom command-&gt; save-all
-</screen></informalexample>
-
-Now you have to tell the firmware that the TFTP image should be booted:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-</screen></informalexample>
-
-If you use a serial console to install your Netwinder, you need to add the
-following setting:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
-</screen></informalexample>
-
-Alternatively, for installations using a keyboard and monitor you have to
-set:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-You can use the <command>printenv</command> command to review your
-environment settings.  After you have verified that the settings are
-correct, you can load the image:
-
-<informalexample><screen>
-    NeTTrom command-&gt; boot
-</screen></informalexample>
-
-In case you run into any problems, a <ulink
-url="http://www.netwinder.org/howto/Firmware-HOWTO.html">detailed
-HOWTO</ulink> is available.
-
-</para>
-   </sect3>
-
-   <sect3 arch="arm"><title>Booting from TFTP on CATS</title>
-<para>
-
-On CATS machines, use <command>boot de0:</command> or similar at the
-Cyclone prompt.
-
-</para>
-   </sect3>
   </sect2>
 
 
@@ -110,12 +12,6 @@ Cyclone prompt.
 
 &boot-installer-intro-cd.xml;
 
-<para>
-
-To boot a CD-ROM from the Cyclone console prompt, use the command
-<command>boot cd0:cats.bin</command>
-
-</para>
   </sect2>
 
 
@@ -215,5 +111,117 @@ tool</ulink> for Windows to upgrade the firmware via the network.
 
 </para>
     </sect4>
+   </sect3>
+
+   <sect3 arch="arm" id="boot-firmware-ss4000e">
+   <title>Booting the SS4000-E</title>
+<para>
+
+Due to limitations in the SS4000-E firmware, it unfortunately is not
+possible to boot the installer without the use of a serial port at
+this time. To boot the installer, you will need a serial nullmodem
+cable; a computer with a serial port<footnote id="arm-s4ke-port">
+
+<para>
+A USB serial converter will also work.
+</para>
+
+</footnote>; and a ribbon cable with a male DB9 connector at one end,
+and a 10-pin .1" IDC header at the other<footnote id="arm-s4k-rib">
+
+<para>
+This cable is often found in older desktop machines with builtin 9-pin
+serial ports.
+</para>
+
+</footnote>.
+
+</para><para>
+
+To boot the SS4000-E, first load the Debian-provided firmware image
+(ss4000e.pkg) through the SS4000-E's web interface (go to
+<quote>administration</quote>, then to <quote>firmware</quote>, and
+upload the image). Next,
+use your serial nullmodem cable and the ribbon cable to connect to the
+serial port of the SS4000-E, and reboot the machine. You need to use a
+serial terminal application to communicate with the machine; a good
+option on a Debian GNU/Linux is to use the <command>cu</command>
+program, in the package of the same name. Assuming the serial port on
+your computer is to be found on <filename>/dev/ttyS0</filename>, use the
+following command line:
+
+</para>
+
+<informalexample><screen>
+cu -lttyS0 -s115200
+</screen></informalexample>
+
+<para>
+
+If using Windows, you may want to consider using the program
+<classname>hyperterminal</classname>. Use a baud rate of 115200,
+8 bits word length, no stop bits, and one parity bit.
+
+</para><para>
+
+When the machine boots, you will see the following line of output:
+
+</para>
+
+<informalexample><screen>
+No network interfaces found
+
+EM-7210 ver.T04 2005-12-12 (For ver.AA)
+== Executing boot script in 1.000 seconds - enter ^C to abort
+</screen></informalexample>
+
+<para>
+
+At this point, hit Control-C to interrupt the boot
+loader<footnote id="arm-s4ke-sec">
+
+<para>
+Note that you have only one second to do so; if you miss this window,
+just powercycle the machine and try again.
+</para>
+
+</footnote>. This will give you the RedBoot prompt. Enter the
+following command:
+
+</para>
+
+<informalexample><screen>
+fconfig boot_script_data
+</screen></informalexample>
+
+<para>
+
+RedBoot is now waiting for you to enter the boot script. Make sure to
+<emphasis>exactly</emphasis> enter the following script:
+
+</para>
+
+<informalexample><screen>
+fis load ramdisk.gz
+fis load zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+<para>
+
+Finish the script with an empty line, and enter <quote>y</quote> at the
+prompt to update the non-volatile configuration. Finally, use
+<quote>reset</quote> to restart the system, and allow it to boot normally.
+The installer should now come up as normal. You can either install Debian
+through the serial port, or use an SSH client to connect through SSH.
+
+</para><para>
+
+Note that it is not necessary to update the boot script after the
+installation. The system will be configured to take the root device from
+system configuration, rather than from the kernel command line. It will
+not do any harm to do so anyway, however.
+
+</para>
    </sect3>
   </sect2>
