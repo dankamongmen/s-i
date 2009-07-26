@@ -49,13 +49,11 @@ echo  >>$WD/results/quick-overview.txt
 CLEVEL[1]=0
 CLEVEL[2]=0
 CLEVEL[3]=0
-CLEVEL[4]=0
-CLEVEL[5]=0
 
 for LANG in `grep -v "^#" $LANGUAGES`; do
     TOTAL=0
     cat $LANG_LIST | grep $LANG":"  >>$WD/results/quick-overview.txt || echo $LANG:   >>$WD/results/quick-overview.txt
-    for LEVEL in `seq 5`; do
+    for LEVEL in `seq 3`; do
     	CURR=`cat $WD/results/level$LEVEL/$LANG.txt | grep "Global statistics:" | sed "s/^.*u (//g" | sed "s/%).*$//g"`
 	echo -e "\t$LEVEL: $CURR%"  >>$WD/results/quick-overview.txt
 	TOTAL=`echo "scale=2;$TOTAL + $CURR" | bc`
@@ -88,16 +86,12 @@ fi
 CLEVEL[1]=`echo "scale=2;${CLEVEL[1]} / $LC" | bc`
 CLEVEL[2]=`echo "scale=2;${CLEVEL[2]} / $LC" | bc`
 CLEVEL[3]=`echo "scale=2;${CLEVEL[3]} / $LC" | bc`
-CLEVEL[4]=`echo "scale=2;${CLEVEL[4]} / $LC" | bc`
-CLEVEL[5]=`echo "scale=2;${CLEVEL[4]} / $LC" | bc`
 
 echo "$LC languages listed: (English not included)"  >>$WD/results/quick-overview.txt
 echo "  Level1: ${CLEVEL[1]}%"  >>$WD/results/quick-overview.txt
 echo "  Level2: ${CLEVEL[2]}%"  >>$WD/results/quick-overview.txt
 echo "  Level3: ${CLEVEL[3]}%"  >>$WD/results/quick-overview.txt
-echo "  Level4: ${CLEVEL[4]}%"  >>$WD/results/quick-overview.txt
-echo "  Level5: ${CLEVEL[5]}%"  >>$WD/results/quick-overview.txt
-TOTAL=`echo "scale=2;( ${CLEVEL[1]} + ${CLEVEL[2]} + ${CLEVEL[3]} + ${CLEVEL[4]} + ${CLEVEL[5]} ) / 5" | bc`
+TOTAL=`echo "scale=2;( ${CLEVEL[1]} + ${CLEVEL[2]} + ${CLEVEL[3]} ) / 3" | bc`
 echo "        ->$TOTAL%<-" >>$WD/results/quick-overview.txt
 
 
