@@ -1,7 +1,6 @@
-<!-- original version: 58440 -->
+<!-- original version: 59771 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Amorcer à partir de TFTP</title>
-
 &boot-installer-intro-net.xml;
 
   </sect2>
@@ -26,7 +25,7 @@ Il y a trois façons de mettre le microprogramme en flash.
     <sect4 arch="arm"><title>Utiliser l'interface web du NSLU2</title>
 <para>
 
-Allez dans la section administration et choisissez l'élément <literal>Upgrade</literal>.
+Allez dans la section <quote>administration</quote> et choisissez l'élément <literal>Upgrade</literal>.
 Vous pouvez chercher l'image que vous venez de télécharger. Pressez le bouton
 <literal>Start Upgrade</literal>, confirmez, attendez quelques minutes puis
 confirmez à nouveau. Le système s'amorcera directement sur l'installateur.
@@ -107,4 +106,112 @@ url="http://www.everbesthk.com/8-download/sercomm/firmware/all_router_utility.zi
 </para>
     </sect4>
    </sect3>
+
+  <sect3 arch="arm" id="boot-firmware-ss4000e">
+   <title>Amorcer une machine SS4000-E</title>
+<para>
+
+Pour l'instant, à cause de limitations du microprogramme, il n'est pas possible
+d'amorcer l'installateur sans un port série. Vous avez besoin d'un câble série
+nullmodem, d'un ordinateur avec un port série <footnote id="arm-s4ke-port">
+
+<para>
+Un convertisseur USB série fera aussi l'affaire.
+</para>
+
+</footnote>, d'un câble en nappe avec un connecteur DB9 male à un bout et d'un
+adaptateur IDC 10 broches à l'autre <footnote id="arm-s4k-rib">
+
+<para>
+On trouve souvent ce câble sur les vieilles machines de bureau
+avec des ports série intégrés de 9 broches.
+</para>
+
+</footnote>.
+</para>
+
+<para>
+
+Pour amorcer le SS4000-E, chargez d'abord l'image du microprogramme fournie par Debian 
+(ss4000e.pkg). Cette image se trouve sur l'interface web du SS4000-E. Allez dans
+<quote>administration</quote>, puis <quote>firmware</quote>, et téléchargez l'image.
+Ensuite, utilisez votre câble nullmodem et votre câble en nappe pour la connexion au
+port série du SS4000-E et réamorcez la machine.
+Vous avez besoin d'une application terminal série pour communiquer avec la
+machine. Sur un système Debian GNU/Linux, vous pouvez utiliser le programme
+<command>cu</command> (paquet du même nom). En supposant que le port série
+de votre ordinateur se trouve sur <filename>/dev/ttyS0</filename>, utilisez la
+commande suivante :
+</para>
+
+<informalexample><screen>
+cu -lttyS0 -s115200
+</screen></informalexample>
+
+<para>
+
+Sur un système Windows, vous pouvez utiliser le programme <classname>hyperterminal</classname>.
+Utilisez un taux baud de 115200, une longueur de mot de 8 bits, aucun bit d'arrêt
+et un bit de parité.
+</para>
+
+<para>
+Quand la machine s'amorce, la ligne suivante apparaît :
+</para>
+
+<informalexample><screen>
+No network interfaces found
+
+EM-7210 ver.T04 2005-12-12 (For ver.AA)
+== Executing boot script in 1.000 seconds - enter ^C to abort
+</screen></informalexample>
+
+<para>
+
+Maintenant il faut saisir Control-C pour arrêter 
+le programme d'amorçage <footnote id="arm-s4ke-sec">
+
+<para>
+Vous n'avez qu'une seule seconde. Si vous ratez cette fenêtre
+éteignez la machine et recommencez,
+</para>
+
+</footnote>. L'invite RebBoot apparaît. Saisissez la commande suivante :
+</para>
+
+<informalexample><screen>
+fconfig boot_script_data
+</screen></informalexample>
+
+<para>
+RedBoot attend maintenant que vous indiquiez le script d'amorçage.
+Il faut saisir <emphasis>exactement</emphasis> le script suivant :
+
+</para>
+
+<informalexample><screen>
+fis load ramdisk.gz
+fis load zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+<para>
+
+Terminez le script par une ligne vide et saisissez <quote>y</quote> à l'invite de commandes
+pour mettre à jour la configuration non volatile. Enfin, utilisez
+<quote>reset</quote> pour relancer la machine en vue d'un amorçage normal.
+L'installateur devrait mainteant se présenter normalement. Vous pouvez soit installer
+Debian grâce au port série, soit utiliser un client SSH.
+</para>
+
+<para>
+
+Il n'est pas nécessaire de mettre à jour le script d'amorçage après l'installation.
+Le système sera configuré pour prendre le périphérique <quote>root</quote> d'après la
+configuration plutôt que par la ligne de commande du noyau. Cependant une telle mise à jour ne peut faire 
+aucun mal.
+ </para>
+</sect3>
+
+
   </sect2>

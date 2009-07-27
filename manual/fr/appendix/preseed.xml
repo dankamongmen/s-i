@@ -1,4 +1,4 @@
-<!-- original version: 59009 -->
+<!-- original version: 59739 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -768,15 +768,20 @@ Les variables debconf suivantes traitent de la configuration du réseau.
 </para>
  
 <informalexample role="example"><screen>
-#Netcfg choisira une interface connectée si possible. Cela empêchera d'afficher
-#une liste s'il y a plusieurs interfaces.
+# Interdire toute configuration réseau. C'est utile pour des installations
+# à partir de cédérom sur des machines sans réseau. Les questions et les avertissements
+# à propos du réseau ainsi que les temps d'attente sont fastidieux.
+#d-i netcfg/enable boolean false
+
+# Netcfg choisira une interface connectée si possible. Cela empêchera d'afficher
+# une liste s'il y a plusieurs interfaces.
 d-i netcfg/choose_interface select auto
 
 # Pour utiliser une interface particulière :
 #d-i netcfg/choose_interface select eth1
 
-#Quand le serveur dhcp est lent et que l'installateur s'arrête pour l'attendre,
-#ceci peut être utile :
+# Quand le serveur dhcp est lent et que l'installateur s'arrête pour l'attendre,
+# ceci peut être utile :
 #d-i netcfg/dhcp_timeout string 60
 
 # Si vous préférez configurer vous-même le réseau, décommentez cette ligne et
