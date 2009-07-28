@@ -166,9 +166,9 @@ fail:
 int
 cdebconf_newt_handler_terminal(struct frontend *obj, struct question *q)
 {
-    char *saved_progress_title = NULL;
+    struct question *saved_progress_title = NULL;
     int saved_progress_min, saved_progress_max, saved_progress_cur;
-    char *saved_progress_info = NULL;
+    struct question *saved_progress_info = NULL;
     const char *command_line;
     const char *term;
     char *bterm_tempdir = NULL;
@@ -178,12 +178,16 @@ cdebconf_newt_handler_terminal(struct frontend *obj, struct question *q)
 
     /* Tear down newt. */
     newtPopHelpLine();
-    if (obj->progress_title)
-        saved_progress_title = strdup(obj->progress_title);
+    if (obj->progress_title) {
+        saved_progress_title = obj->progress_title;
+        question_ref(saved_progress_title);
+    }
     saved_progress_min = obj->progress_min;
     saved_progress_max = obj->progress_max;
     saved_progress_cur = obj->progress_cur;
     saved_progress_info = cdebconf_newt_get_progress_info(obj);
+    if (saved_progress_info)
+        question_ref(saved_progress_info);
     newtFinished();
 
     command_line = question_get_variable(q, "COMMAND_LINE");
@@ -285,11 +289,11 @@ cdebconf_newt_handler_terminal(struct frontend *obj, struct question *q)
         obj->methods.progress_start(obj,
                                     saved_progress_min, saved_progress_max,
                                     saved_progress_title);
-        free(saved_progress_title);
+        question_deref(saved_progress_title);
         obj->methods.progress_set(obj, saved_progress_cur);
         if (saved_progress_info) {
             obj->methods.progress_info(obj, saved_progress_info);
-            free(saved_progress_info);
+            question_deref(saved_progress_info);
         }
     }
 
