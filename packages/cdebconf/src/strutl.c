@@ -13,6 +13,8 @@
 #endif
 #include <assert.h>
 
+#include "debian-installer.h"
+
 /*  Structure used to sort translated lists  */
 typedef struct {
     char *string;
@@ -790,3 +792,81 @@ end:
     return dest;
 }
 
+char *strjoinv(const char *sep, va_list ap)
+{
+    size_t sep_len = strlen(sep);
+    char *str;
+    size_t str_size = 0, str_alloc = 128;
+    const char *arg;
+
+    str = di_malloc(str_alloc);
+
+#define APPEND(piece, len) do { \
+    if (str_size + (len) + 1 > str_alloc) { \
+        str_alloc = (str_size + (len) + 1) * 2; \
+        str = di_realloc(str, str_alloc); \
+    } \
+    strncpy(str + str_size, (piece), (len)); \
+    str_size += (len); \
+} while (0)
+
+    arg = va_arg(ap, const char *);
+    while (arg) {
+        size_t arg_len = strlen(arg);
+        if (str_size)
+            APPEND(sep, sep_len);
+        APPEND(arg, arg_len);
+        arg = va_arg(ap, const char *);
+    }
+
+#undef APPEND
+
+    str[str_size] = '\0';
+    return str;
+}
+
+char *strjoin(const char *sep, ...)
+{
+    va_list ap;
+    char *str;
+
+    va_start(ap, sep);
+    str = strjoinv(sep, ap);
+    va_end(ap);
+    return str;
+}
+
+char *strreplace(const char *src, const char *from, const char *to)
+{
+    char *str;
+    size_t str_size = 0, str_alloc = 128;
+    char *p;
+    const char *prev;
+    size_t from_len = strlen(from), to_len = strlen(to);
+
+    str = di_malloc(str_alloc);
+
+#define APPEND(piece, len) do { \
+    if (str_size + (len) + 1 > str_alloc) { \
+        str_alloc = (str_size + (len) + 1) * 2; \
+        str = di_realloc(str, str_alloc); \
+    } \
+    strncpy(str + str_size, (piece), (len)); \
+    str_size += (len); \
+} while (0)
+
+    prev = src;
+    for (p = strstr(prev, from); p; p = strstr(prev, from)) {
+        if (p > prev)
+            APPEND(prev, p - prev);
+        APPEND(to, to_len);
+        prev = p + from_len;
+    }
+    if (*prev)
+        APPEND(prev, strlen(prev));
+
+#undef APPEND
+
+    str[str_size] = '\0';
+    return str;
+}

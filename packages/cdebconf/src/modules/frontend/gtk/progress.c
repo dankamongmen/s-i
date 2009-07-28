@@ -422,11 +422,13 @@ static void update_progress_bar(struct frontend * fe, gdouble fraction)
 {
     struct frontend_data * fe_data = fe->data;
     GtkWidget * progress_bar = fe_data->progress_data->progress_bar;
+    gchar * title_desc;
 
     g_assert(NULL != progress_bar);
 
-    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar),
-                              fe->progress_title);
+    title_desc = q_get_raw_description(fe->progress_title);
+    gtk_progress_bar_set_text(GTK_PROGRESS_BAR(progress_bar), title_desc);
+    g_free(title_desc);
     gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(progress_bar),
                                   fraction /* empty progress bar */);
 }
@@ -439,7 +441,7 @@ static void update_progress_bar(struct frontend * fe, gdouble fraction)
  * @param title initial title of the operation in progress
  */
 void cdebconf_gtk_progress_start(struct frontend * fe, int min, int max,
-                                 const char * title)
+                                 struct question * title)
 {
     struct frontend_data * fe_data = fe->data;
 
@@ -461,8 +463,9 @@ void cdebconf_gtk_progress_start(struct frontend * fe, int min, int max,
 
     init_progress(fe);
 
-    g_free(fe->progress_title);
-    fe->progress_title = g_strdup(title);
+    question_deref(fe->progress_title);
+    fe->progress_title = title;
+    question_ref(fe->progress_title);
 
     update_progress_bar(fe, 0.0 /* empty */);
 
@@ -521,19 +524,22 @@ int cdebconf_gtk_progress_set(struct frontend * fe, int val)
  * @param info current information about the operation in progress
  * @see progress_data#progress_label
  */
-int cdebconf_gtk_progress_info(struct frontend * fe, const char * info)
+int cdebconf_gtk_progress_info(struct frontend * fe, struct question * info)
 {
     struct frontend_data * fe_data = fe->data;
     struct progress_data * progress_data = fe_data->progress_data;
+    gchar * info_desc;
 
     if (NULL == progress_data) {
         /* called out of order */
         return DC_NOTOK;
     }
 
+    info_desc = q_get_raw_description(info);
     gdk_threads_enter();
-    gtk_entry_set_text(GTK_ENTRY(progress_data->progress_label), info);
+    gtk_entry_set_text(GTK_ENTRY(progress_data->progress_label), info_desc);
     gdk_threads_leave();
+    g_free(info_desc);
 
     if (DC_NO_ANSWER == fe_data->answer) {
         return DC_OK;

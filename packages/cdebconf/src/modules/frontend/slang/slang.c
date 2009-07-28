@@ -830,17 +830,21 @@ static int
 slang_progress_set(struct frontend *obj, int val);
 
 static void
-slang_progress_start(struct frontend *obj, int min, int max, const char *title)
+slang_progress_start(struct frontend *obj, int min, int max, struct question *title)
 {
 	struct uidata *uid = UIDATA(obj);
+	char *title_desc;
 	
-	DELETE(obj->progress_title);
-	obj->progress_title = strdup(title);
+	question_deref(obj->progress_title);
+	obj->progress_title = title;
+	question_ref(obj->progress_title);
 	obj->progress_min = min;
 	obj->progress_max = max;
 	
 	slang_drawwin(&uid->descwin);
-	slang_wrapprint(&uid->descwin, title, 0);
+	title_desc = q_get_raw_description(title);
+	slang_wrapprint(&uid->descwin, title_desc, 0);
+	free(title_desc);
 
 	slang_progress_set(obj, min);
 }
@@ -893,15 +897,19 @@ slang_progress_set(struct frontend *obj, int val)
 }
 
 static int
-slang_progress_info(struct frontend *obj, const char *info)
+slang_progress_info(struct frontend *obj, struct question *info)
 {
 	struct uidata *uid = UIDATA(obj);
+	char *title_desc = q_get_raw_description(obj->progress_title);
+	char *info_desc = q_get_raw_description(info);
 	char *buf = (char *)
-		malloc(strlen(obj->progress_title) + strlen(info) + 3);
+		malloc(strlen(title_desc) + strlen(info_desc) + 3);
 	
-	strcpy(buf, obj->progress_title);
+	strcpy(buf, title_desc);
 	strcat(buf, ":\n");
-	strcat(buf, info);
+	strcat(buf, info_desc);
+	free(info_desc);
+	free(title_desc);
 	
 	slang_drawwin(&uid->descwin);
 	slang_wrapprint(&uid->descwin, buf, 0);

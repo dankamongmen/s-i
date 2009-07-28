@@ -200,10 +200,11 @@ static bool frontend_can_align(struct frontend *ui, struct question *q)
 	return false;
 }
 
-static void frontend_progress_start(struct frontend *ui, int min, int max, const char *title)
+static void frontend_progress_start(struct frontend *ui, int min, int max, struct question *title)
 {
-	DELETE(ui->progress_title);
-		ui->progress_title = STRDUP(title);
+	question_deref(ui->progress_title);
+	ui->progress_title = title;
+	question_ref(ui->progress_title);
 	ui->progress_min = min;
 	ui->progress_max = max;
 	ui->progress_cur = min;
@@ -220,7 +221,7 @@ static int frontend_progress_step(struct frontend *ui, int step)
 	return ui->methods.progress_set(ui, ui->progress_cur + step);
 }
 
-static int frontend_progress_info(struct frontend *ui, const char *info)
+static int frontend_progress_info(struct frontend *ui, struct question *info)
 {
 	return DC_OK;
 }
@@ -340,7 +341,7 @@ void frontend_delete(struct frontend *obj)
 	DELETE(obj->capb);
 	DELETE(obj->title);
 	question_deref(obj->info);
-	DELETE(obj->progress_title);
+	question_deref(obj->progress_title);
 	DELETE(obj->plugin_path);
 	DELETE(obj);
 }

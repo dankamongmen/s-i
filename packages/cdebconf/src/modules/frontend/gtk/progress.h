@@ -49,11 +49,11 @@ struct progress_data;
 bool cdebconf_gtk_can_cancel_progress(struct frontend * fe);
 
 void cdebconf_gtk_progress_start(struct frontend * fe, int min, int max,
-                                 const char * title);
+                                 struct question * title);
 
 int cdebconf_gtk_progress_set(struct frontend * fe, int val);
 
-int cdebconf_gtk_progress_info(struct frontend * fe, const char * info);
+int cdebconf_gtk_progress_info(struct frontend * fe, struct question * info);
 
 void cdebconf_gtk_progress_stop(struct frontend * fe);
 

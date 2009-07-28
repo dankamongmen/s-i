@@ -71,7 +71,7 @@ struct newt_data {
                   scale_cancel,
                   perc_label;
     int           scale_textbox_height;
-    char *        scale_info;
+    struct question *scale_info;
 };
 
 struct newtColors newtAltColorPalette = {
@@ -197,13 +197,14 @@ cdebconf_newt_setup(void)
 /* cdebconf-newt-terminal needs this in order to be able to restore the
  * display properly after tearing down the terminal.
  */
-char *
+struct question *
 cdebconf_newt_get_progress_info(struct frontend *obj)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
-    if (data->scale_info)
-        return strdup(data->scale_info);
-    else
+    if (data->scale_info) {
+        question_ref(data->scale_info);
+        return data->scale_info;
+    } else
         return NULL;
 }
 
@@ -1280,12 +1281,13 @@ newt_lookup_directive(struct frontend *obj, const char *directive)
 }
 
 static void
-newt_make_progress_bar(struct frontend *obj, const char *info)
+newt_make_progress_bar(struct frontend *obj, struct question *info)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
     int width = 80, height = 24, win_width, win_height, text_height;
     int extra = 0;
     bool can_cancel_progress;
+    char *info_desc = NULL;
     bool changed = false;
 #ifdef HAVE_LIBTEXTWRAP
     textwrap_t tw;
@@ -1302,10 +1304,14 @@ newt_make_progress_bar(struct frontend *obj, const char *info)
     win_width = width-7;
     if (!info)
         info = data->scale_info;
-    else
-        data->scale_info = strdup(info);
+    else {
+        data->scale_info = info;
+        question_ref(data->scale_info);
+    }
     if (info)
-        text_height = cdebconf_newt_get_text_height(info, win_width);
+        info_desc = q_get_raw_description(info);
+    if (info_desc)
+        text_height = cdebconf_newt_get_text_height(info_desc, win_width);
     else
         text_height = 0;
     /* Minimal height set to 2 to prevent box flashing */
@@ -1324,11 +1330,14 @@ newt_make_progress_bar(struct frontend *obj, const char *info)
         }
     }
     if (!data->scale_form || changed) {
+        char *title_desc;
         if (text_height + 3 + extra <= height - 5)
             win_height = text_height + 3 + extra;
         else
             win_height = height - 5;
-        newtCenteredWindow(win_width, win_height, obj->progress_title);
+        title_desc = q_get_raw_description(obj->progress_title);
+        newtCenteredWindow(win_width, win_height, title_desc);
+        free(title_desc);
         data->scale_bar = newtScale(TEXT_PADDING, 1, win_width-2*TEXT_PADDING, obj->progress_max - obj->progress_min);
         data->scale_textbox = newtTextbox(TEXT_PADDING, 3, win_width-2*TEXT_PADDING, text_height, flags);
         data->scale_textbox_height = text_height;
@@ -1342,21 +1351,23 @@ newt_make_progress_bar(struct frontend *obj, const char *info)
         newtFormSetTimer(data->scale_form, 1);
     }
     newtScaleSet(data->scale_bar, obj->progress_cur - obj->progress_min);
-    if (info) {
+    if (info_desc) {
 #ifdef HAVE_LIBTEXTWRAP
         textwrap_init(&tw);
         textwrap_columns(&tw, win_width - 2 - 2*TEXT_PADDING);
-        wrappedtext = textwrap(&tw, info);
+        wrappedtext = textwrap(&tw, info_desc);
         newtTextboxSetText(data->scale_textbox, wrappedtext);
         free(wrappedtext);
 #else
-        newtTextboxSetText(data->scale_textbox, info);
+        newtTextboxSetText(data->scale_textbox, info_desc);
 #endif
     }
+    free(info_desc);
 }
 
 static void
-newt_progress_start(struct frontend *obj, int min, int max, const char *title)
+newt_progress_start(struct frontend *obj, int min, int max,
+                    struct question *title)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
 
@@ -1365,8 +1376,9 @@ newt_progress_start(struct frontend *obj, int min, int max, const char *title)
          * use one anyway, tear down the old progress bar first.
          */
         newt_progress_stop(obj);
-    DELETE(obj->progress_title);
-    obj->progress_title = strdup(title);
+    question_deref(obj->progress_title);
+    obj->progress_title = title;
+    question_ref(obj->progress_title);
     obj->progress_min = min;
     obj->progress_max = max;
     obj->progress_cur = min;
@@ -1420,7 +1432,7 @@ newt_progress_set(struct frontend *obj, int val)
 }
 
 static int
-newt_progress_info(struct frontend *obj, const char *info)
+newt_progress_info(struct frontend *obj, struct question *info)
 {
     struct newt_data *data = (struct newt_data *)obj->data;
     struct newtExitStruct es;
@@ -1453,7 +1465,7 @@ newt_progress_stop(struct frontend *obj)
         newtPopWindow();
         newtFinished();
         data->scale_form = data->scale_bar = data->perc_label = data->scale_textbox = data->scale_cancel = NULL;
-        free(data->scale_info);
+        question_deref(data->scale_info);
         data->scale_info = NULL;
     }
 }

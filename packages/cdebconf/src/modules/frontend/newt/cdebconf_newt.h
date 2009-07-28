@@ -14,7 +14,7 @@ void cdebconf_newt_setup(void);
  * the main frontend struct and won't fit in the obvious place without
  * breaking the plugin ABI. Always duplicates the info string.
  */
-char *cdebconf_newt_get_progress_info(struct frontend *obj);
+struct question *cdebconf_newt_get_progress_info(struct frontend *obj);
 
 newtComponent cdebconf_newt_create_form(newtComponent scrollbar);
 

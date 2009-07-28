@@ -6,7 +6,9 @@
 #ifndef _STRUTL_H_
 #define _STRUTL_H_
 
+#include <stdarg.h>
 #include <string.h>
+#include "common.h"
 #include "question.h"
 
 /**
@@ -67,5 +69,10 @@ char * strexpand(const char * src, lookup_function func, void * user_data);
 #define STRALIGN_ALIGN_CENTER "\x0e"
 #define STRALIGN_ALIGN_RIGHT  "\x0f"
 int stralign(char **strs, int count);
+
+char *strjoinv(const char *sep, va_list ap);
+char *strjoin(const char *sep, ...) ATTRIBUTE_SENTINEL;
+
+char *strreplace(const char *src, const char *from, const char *to);
 
 #endif

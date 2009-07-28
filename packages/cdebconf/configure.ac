@@ -115,7 +115,7 @@ fi
 dnl Frontends - which to include.
 
 if test -z "$FRONTEND_MODULES"; then
-    FRONTEND_MODULES=text
+    FRONTEND_MODULES="passthrough text"
 
     AC_CHECK_LIB([ncurses], [initscr], [FRONTEND_MODULES="$FRONTEND_MODULES ncurses"], [AC_MSG_WARN([cannot build ncurses frontend])])
     AC_CHECK_LIB([bogl], [bowl_flush], [FRONTEND_MODULES="$FRONTEND_MODULES bogl"], [AC_MSG_WARN([cannot build BOGL frontend])])

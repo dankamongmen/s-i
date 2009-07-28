@@ -628,7 +628,6 @@ command_progress(struct confmodule *mod, char *arg)
 {
     int min, max;
     struct question *q = NULL;
-    char *value;
     char *argv[6];
     int argc;
     char *out;
@@ -658,17 +657,9 @@ command_progress(struct confmodule *mod, char *arg)
                     CMDSTATUS_BADQUESTION, argv[3]);
             return out;
         }
-        value = question_get_raw_field(q, "", "description");
-        question_deref(q);
-        if (value == NULL)
-        {
-            asprintf(&out, "%u %s description field does not exist",
-                    CMDSTATUS_BADQUESTION, argv[3]);
-            return out;
-        }
         mod->frontend->methods.progress_start(mod->frontend,
-                min, max, value);
-        free(value);
+                min, max, q);
+        question_deref(q);
     }
     else if (strcasecmp(argv[0], "set") == 0)
     {
@@ -702,16 +693,8 @@ command_progress(struct confmodule *mod, char *arg)
                     CMDSTATUS_BADQUESTION, argv[1]);
             return out;
         }
-        value = question_get_raw_field(q, "", "description");
+        ret = mod->frontend->methods.progress_info(mod->frontend, q);
         question_deref(q);
-        if (value == NULL)
-        {
-            asprintf(&out, "%u %s description field does not exist",
-                    CMDSTATUS_BADQUESTION, argv[1]);
-            return out;
-        }
-        ret = mod->frontend->methods.progress_info(mod->frontend, value);
-        free(value);
         if (ret == DC_GOBACK)
         {
             asprintf(&out, "%u progress bar cancelled",

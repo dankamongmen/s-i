@@ -37,11 +37,11 @@ struct frontend_module {
     bool (*can_cancel_progress)(struct frontend *);
     bool (*can_align)(struct frontend *, struct question *);
 
-    void (*progress_start)(struct frontend *fe, int min, int max, const char *title);
+    void (*progress_start)(struct frontend *fe, int min, int max, struct question *title);
     int (*progress_set) (struct frontend *fe, int val);
     /* You do not have to implement _step, it will call _set by default */
     int (*progress_step)(struct frontend *fe, int step);
-    int (*progress_info)(struct frontend *fe, const char *info);
+    int (*progress_info)(struct frontend *fe, struct question *info);
     void (*progress_stop)(struct frontend *fe);
    
     int (*go_noninteractive)(struct frontend *);
@@ -71,7 +71,7 @@ struct frontend {
     char *capb;
     char *title;
     struct question *info;
-    char *progress_title;
+    struct question *progress_title;
     int progress_min, progress_max, progress_cur;
     	
     /* methods */

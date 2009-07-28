@@ -918,15 +918,20 @@ static int text_go(struct frontend *obj)
 	return ret;
 }
 
-static void text_progress_start(struct frontend *obj, int min, int max, const char *title)
+static void text_progress_start(struct frontend *obj, int min, int max, struct question *title)
 {
-	DELETE(obj->progress_title);
-	obj->progress_title = STRDUP(title);
+	char *title_desc;
+
+	question_deref(obj->progress_title);
+	obj->progress_title = title;
+	question_ref(obj->progress_title);
 	obj->progress_min = min;
 	obj->progress_max = max;
 	obj->progress_cur = min;
 
-	printf("%s  ", title);
+	title_desc = q_get_raw_description(title);
+	printf("%s  ", title_desc);
+	free(title_desc);
 	fflush(stdout);
 }
 
@@ -955,7 +960,7 @@ static void text_progress_stop(struct frontend *obj)
 	INFO(INFO_DEBUG, "%s", __FUNCTION__);
 	printf("\n");
 	fflush(stdout);
-	DELETE(obj->progress_title);
+	question_deref(obj->progress_title);
 }
 
 struct frontend_module debconf_frontend_module =
