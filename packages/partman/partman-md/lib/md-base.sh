@@ -60,34 +60,7 @@ md_allowed () {
 }
 
 md_list_allowed () {
-	local IFS
-	local partitions
-	local freenum=1
-	for dev in $DEVICES/*; do
-		[ -d $dev ] || continue
-		cd $dev
-
-		open_dialog PARTITIONS
-		partitions="$(read_paragraph)"
-		close_dialog
-
-		local id size fs path
-		IFS="$TAB"
-		echo "$partitions" |
-		while { read x1 id size x4 fs path x7; [ "$id" ]; }; do
-			restore_ifs
-			if md_allowed "$dev" "$id"; then
-				if [ "$fs" = free ]; then
-					printf "%s\t%s\t%s\t%s free #%d\n" "$dev" "$id" "$size" "$(mapdevfs "$(cat "$dev/device")")" "$freenum"
-					freenum="$(($freenum + 1))"
-				else
-					printf "%s\t%s\t%s\t%s\n" "$dev" "$id" "$size" "$(mapdevfs "$path")"
-				fi
-			fi
-			IFS="$TAB"
-		done
-		restore_ifs
-	done
+	partman_list_allowed md_allowed
 }
 
 md_list_allowed_free () {
