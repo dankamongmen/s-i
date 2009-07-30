@@ -201,6 +201,39 @@ ask_user () {
 	return 0
 }
 
+ask_active_partition () {
+	local dev=$1
+	local id=$2
+	local num=$3
+	local RET
+
+	db_subst partman/active_partition DEVICE "$(humandev $(cat device))"
+	db_subst partman/active_partition PARTITION "$num"
+
+	if [ -f $id/detected_filesystem ]; then
+		local filesystem=$(cat $id/detected_filesystem)
+		RET=''
+		db_metaget partman/filesystem_long/"$filesystem" description || RET=''
+		if [ "$RET" ]; then
+			filesystem="$RET"
+		fi
+		db_subst partman/text/there_is_detected FILESYSTEM "$filesystem"
+		db_metaget partman/text/there_is_detected description
+	else
+		db_metaget partman/text/none_detected description
+	fi
+	db_subst partman/active_partition OTHERINFO "${RET}"
+
+	if [ -f $id/detected_filesystem ] && [ -f $id/format ]; then
+		db_metaget partman/text/destroyed description
+		db_subst partman/active_partition DESTROYED "${RET}"
+	else
+		db_subst partman/active_partition DESTROYED ''
+	fi
+
+	ask_user /lib/partman/active_partition "$dev" "$id" || return $?
+}
+
 partition_tree_choices () {
 	local IFS
 	for dev in $DEVICES/*; do
