@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58504 -->
+<!-- original version: 59739 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1445,6 +1445,15 @@ Le seguenti variabili debconf sono legate alla configurazione della rete.
 </para>
 
 <informalexample role="example"><screen>
+<!--# Disable network configuration entirely. This is useful for cdrom
+# installations on non-networked devices where the network questions,
+# warning and long timeouts are a nuisance.
+--># Disattiva completamente la configurazione della rete. Questa opzione
+# è utile durante le installazioni da cdrom su dispositivi che non sono
+# in rete; in questo caso le domande riguardo la rete, gli avvertimenti
+# e le attese dei timeout sono solo una seccatura.
+#d-i netcfg/enable boolean false
+
 <!--
 # netcfg will choose an interface that has link if possible. This makes it
 # skip displaying a list if there is more than one interface.
@@ -1797,7 +1806,7 @@ d-i partman-auto/choose_recipe select atomic
 # that you told it what to do using one of the methods above.
 --># Questo fa eseguire a partman il partizionamento automatico in base a
 # quanto indicato con uno dei metodi precedenti, senza chidere conferma.
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
@@ -1907,7 +1916,7 @@ all'utente. In caso di problemi si controlli in
 # This makes partman automatically partition without confirmation.
 --># Questo fa in modo che partman partizioni automaticamente senza conferma.
 d-i partman-md/confirm boolean true
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
@@ -2379,6 +2388,16 @@ d-i grub-installer/with_other_os boolean true
 # or encrypted using an MD5 hash, see grub-md5-crypt(8).
 --># oppure criptata in un hash MD5, si veda grub-md5-crypt(8).
 #d-i grub-installer/password-crypted password [MD5 hash]
+
+<!--
+# Use the following option to add additional boot parameters for the
+# installed system (if supported by the bootloader installer).
+# Note: options passed to the installer will be added automatically.
+--># Con la prossima opzione si possono aggiungere ulteriori parametri
+# d'avvio per il sistema installato (se supportati dal bootloader
+# dell'installatore). Nota: le opzioni passate all'installatore
+# saranno aggiunte automaticamente.
+#d-i debian-installer/add-kernel-opts string nousb
 </screen></informalexample>
 
 <para>
