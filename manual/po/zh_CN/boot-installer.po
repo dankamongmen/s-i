@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-07-31 00:13+0000\n"
-"PO-Revision-Date: 2009-05-04 21:21+0800\n"
+"PO-Revision-Date: 2009-08-01 14:15+0800\n"
 "Last-Translator: Ji YongGang<jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1017,10 +1017,10 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:648
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Booting the NSLU2"
 msgid "Booting the SS4000-E"
-msgstr "引导 NSLU2"
+msgstr "引导 SS4000-E"
 
 #. Tag: para
 #: boot-installer.xml:649
@@ -1034,7 +1034,7 @@ msgid ""
 "with a male DB9 connector at one end, and a 10-pin .1\" IDC header at the "
 "other<footnote id=\"arm-s4k-rib\"> <para> This cable is often found in older "
 "desktop machines with builtin 9-pin serial ports. </para> </footnote>."
-msgstr ""
+msgstr "由于 SS4000-E 固件限制，当前除了使用串口还无法启动安装程序。为了启动安装程序，您需要一条串口 nullmodem 线； 一台带有串口的计算机<footnote id=\"arm-s4ke-port\"> <para> USB 串口转换器也可以工作。</para> </footnote>； 以及一端为公 DB9 口，另一端为 10-pin .1\" IDC 头的扁平电缆<footnote id=\"arm-s4k-rib\"> <para> 这种电缆过去常用在桌面电脑内置的 9 针串口上。</para> </footnote>。"
 
 #. Tag: para
 #: boot-installer.xml:670
@@ -1049,13 +1049,13 @@ msgid ""
 "Debian GNU/Linux is to use the <command>cu</command> program, in the package "
 "of the same name. Assuming the serial port on your computer is to be found "
 "on <filename>/dev/ttyS0</filename>, use the following command line:"
-msgstr ""
+msgstr "引导 SS4000-E 首先要通过 SS4000-E 的 web 界面(进入<quote>administration</quote>、然后选择 <quote>firmware</quote>，最后上传映像)加载 Debian 提供的固件映像(ss4000e.pkg)。接着、用您的串口 nullmodem 线和扁平电缆连接到 SS4000-E 的串口，然后重启机器。您需要使用串口终端程序与该机器通讯，在 Debian GNU/Linux 上可以选择使用 <command>cu</command> 程序，对应的软件包与此同名。假设您计算机上的串口为 <filename>/dev/ttyS0</filename>，那么在命令行上使用："
 
 #. Tag: screen
 #: boot-installer.xml:686
 #, no-c-format
 msgid "cu -lttyS0 -s115200"
-msgstr ""
+msgstr "cu -lttyS0 -s115200"
 
 #. Tag: para
 #: boot-installer.xml:688
@@ -1064,13 +1064,13 @@ msgid ""
 "If using Windows, you may want to consider using the program "
 "<classname>hyperterminal</classname>. Use a baud rate of 115200, 8 bits word "
 "length, no stop bits, and one parity bit."
-msgstr ""
+msgstr "如果是在 Windows 下，您可以考虑使用 <classname>hyperterminal</classname>。设置波特率为 115200、8 位字长、无停止位和一个奇偶校验位。"
 
 #. Tag: para
 #: boot-installer.xml:694
 #, no-c-format
 msgid "When the machine boots, you will see the following line of output:"
-msgstr ""
+msgstr "机器引导后，您可以看到下列输出内容："
 
 #. Tag: screen
 #: boot-installer.xml:700
@@ -1081,6 +1081,10 @@ msgid ""
 "EM-7210 ver.T04 2005-12-12 (For ver.AA)\n"
 "== Executing boot script in 1.000 seconds - enter ^C to abort"
 msgstr ""
+"No network interfaces found\n"
+"\n"
+"EM-7210 ver.T04 2005-12-12 (For ver.AA)\n"
+"== Executing boot script in 1.000 seconds - enter ^C to abort"
 
 #. Tag: para
 #: boot-installer.xml:702
@@ -1090,13 +1094,13 @@ msgid ""
 "s4ke-sec\"> <para> Note that you have only one second to do so; if you miss "
 "this window, just powercycle the machine and try again. </para> </footnote>. "
 "This will give you the RedBoot prompt. Enter the following command:"
-msgstr ""
+msgstr "此时，按下 Control-C 中断 boot loader<footnote id=\"arm-s4ke-sec\"> <para> 注意，您只有一秒钟来选择；如果错过了，重新开机再试一次。</para> </footnote>。接着出现 RedBoot 提示符，键入下面命令："
 
 #. Tag: screen
 #: boot-installer.xml:717
 #, no-c-format
 msgid "fconfig boot_script_data"
-msgstr ""
+msgstr "fconfig boot_script_data"
 
 #. Tag: para
 #: boot-installer.xml:719
@@ -1104,7 +1108,7 @@ msgstr ""
 msgid ""
 "RedBoot is now waiting for you to enter the boot script. Make sure to "
 "<emphasis>exactly</emphasis> enter the following script:"
-msgstr ""
+msgstr "现在 RedBoot 等待您输入引导脚本。一定要<emphasis>正确</emphasis>输入以下脚本："
 
 #. Tag: screen
 #: boot-installer.xml:726
@@ -1115,6 +1119,9 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
+"fis load ramdisk.gz\n"
+"fis load zImage\n"
+"exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r 0x01800000"
 
 #. Tag: para
 #: boot-installer.xml:728
@@ -1125,7 +1132,7 @@ msgid ""
 "quote> to restart the system, and allow it to boot normally. The installer "
 "should now come up as normal. You can either install Debian through the "
 "serial port, or use an SSH client to connect through SSH."
-msgstr ""
+msgstr "以一个空行结束脚本，然后在提示 update the non-volatile configuration 时输入 <quote>y</quote>。最后，使用 <quote>reset</quote> 重启系统，让它按普通方式引导。安装程序这时应该能正常运行。您可以根据需要使用串口安装 Debian，或者使用 SSH 客户端登录。"
 
 #. Tag: para
 #: boot-installer.xml:736
@@ -1135,7 +1142,7 @@ msgid ""
 "installation. The system will be configured to take the root device from "
 "system configuration, rather than from the kernel command line. It will not "
 "do any harm to do so anyway, however."
-msgstr ""
+msgstr "注意，在安装完成之后没有必要更新引导脚本。系统将会按照系统设置配置根设备，而不是内核命令行。当然，这也不会造成任何损坏。"
 
 # index.docbook:578, index.docbook:951, index.docbook:1764, index.docbook:2018, index.docbook:2372
 #. Tag: title
@@ -3380,24 +3387,17 @@ msgid ""
 "parameters can <phrase arch=\"x86\">then</phrase> be appended to enable "
 "accessibility features. Note that on most architectures the boot loader "
 "interprets your keyboard as a QWERTY keyboard."
-msgstr ""
-"一些用户，比如有视觉障碍的，可能需要特别的支持。<phrase arch=\"alpha;ia64;"
-"powerpc;x86\">USB 盲文点触设备(braille display) 可以自动被检测到，但多数情况"
-"下其他的</phrase> <phrase arch=\"arm;hppa;mips;mipsel;m68k;sparc\">多数情况下"
-"</phrase> 辅助功能不得不使用手动进行设置。<phrase arch=\"x86\">在能支持的机器"
-"上，接受输入时，引导菜单会发出一声 beep。</phrase> 一些引导参数可以 <phrase "
-"arch=\"x86\">接着</phrase> 被添加到后面打开辅助功能。需要注意在大多数架构下 "
-"boot loader 将您的键盘视为 QWERTY 布局。"
+msgstr "一些用户，比如有视觉障碍的，可能需要特别的支持。<phrase arch=\"alpha;ia64;powerpc;x86\">USB 盲文点显器(braille display) 可以自动被检测到，但多数情况下其他的</phrase> <phrase arch=\"arm;hppa;mips;mipsel;m68k;sparc\">多数情况下</phrase> 辅助功能不得不使用手动进行设置。<phrase arch=\"x86\">在能支持的机器上，接受输入时，引导菜单会发出一声 beep。</phrase> 一些引导参数可以 <phrase arch=\"x86\">接着</phrase> 被添加到后面打开辅助功能。需要注意在大多数架构下 boot loader 将您的键盘视为 QWERTY 布局。"
 
 #. Tag: title
 #: boot-installer.xml:2765
 #, no-c-format
 msgid "USB Braille Displays"
-msgstr "USB 盲文点触设备(Braille Display)"
+msgstr "USB 盲文点显器"
 
 #. Tag: para
 #: boot-installer.xml:2766
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "USB braille displays should be automatically detected. A textual version "
 #| "of the installer will then be automatically selected, and support for the "
@@ -3414,20 +3414,17 @@ msgid ""
 "preference menu. Documentation on key bindings for braille devices is "
 "available on the <ulink url=\"&url-brltty-driver-help;\"><classname>brltty</"
 "classname> website</ulink>."
-msgstr ""
-"USB 盲文点触设备应该可以自动被检测到。接着自动选择安装程序的文本界面，盲文点"
-"触设备也会被自动安装到最终系统中。您只需要在引导菜单中按下 &enterkey; 键。一"
-"旦 <classname>brltty</classname> 启动，您就可以通过菜单选择 braille table。"
+msgstr "系统应该可以自动检测到 USB 盲文点显器。然后自动选取安装程序的文本界面，该设备也会被自动安装到最终系统中。您只需要在引导菜单中按下 &enterkey; 键。一旦 <classname>brltty</classname> 启动，您就可以通过菜单选择 braille table。在 <ulink url=\"&url-brltty-driver-help;\"><classname>brltty</classname> website</ulink> 可以找到盲文点显器的键绑定文档。"
 
 #. Tag: title
 #: boot-installer.xml:2781
 #, no-c-format
 msgid "Serial Braille Displays"
-msgstr "串口盲文点触设备"
+msgstr "串口盲文点显器"
 
 #. Tag: para
 #: boot-installer.xml:2782
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Serial braille displays cannot safely be automatically detected (since "
 #| "that may damage some of them). You thus need to append the "
@@ -3460,17 +3457,7 @@ msgid ""
 "preference menu. Documentation on key bindings for braille devices is "
 "available on the <ulink url=\"&url-brltty-driver-help;\"><classname>brltty</"
 "classname> website</ulink>."
-msgstr ""
-"串口盲文点触设备无法安全地被自动检测到(因为可能会造成一些损坏)。您需要添加 "
-"<userinput>brltty=<replaceable>driver</replaceable>,<replaceable>port</"
-"replaceable>,<replaceable>table</replaceable></userinput> 引导参数说明 "
-"<classname>brltty</classname> 该使用哪个驱动程序。<replaceable>driver</"
-"replaceable> 应该替换为您终端的两个字母的驱动程序代码(参阅 <ulink url=\"&url-"
-"brltty-driver-codes;\">driver code list</ulink>)。<replaceable>port</"
-"replaceable> 应该替换为该设备连接使用的串口名，默认为 <userinput>ttyS0</"
-"userinput>。 <replaceable>table</replaceable> 是使用的 braille table 名(参阅 "
-"<ulink url=\"&url-brltty-table-codes;\">table code list</ulink>)；默认为英"
-"语。注意该表可以在后续菜单中选择修改。"
+msgstr "系统无法安全地检测到串口盲文点显器(因为这可能会导致某些损坏)。您需要添加 <userinput>brltty=<replaceable>driver</replaceable>,<replaceable>port</replaceable>,<replaceable>table</replaceable></userinput> 引导参数说明 <classname>brltty</classname> 该使用哪个驱动程序。<replaceable>driver</replaceable> 应该替换为您终端的两个字母的驱动程序代码(参阅 <ulink url=\"&url-brltty-driver-codes;\">driver code list</ulink>)。<replaceable>port</replaceable> 应该替换为该设备连接使用的串口名，默认为 <userinput>ttyS0</userinput>。 <replaceable>table</replaceable> 是使用的 braille table 名(参阅 <ulink url=\"&url-brltty-table-codes;\">table code list</ulink>)；默认为英语。注意该表可以在后续菜单中选择修改。该设备的键绑定文档可以在 <ulink url=\"&url-brltty-driver-help;\"><classname>brltty</classname> website</ulink> 找到。"
 
 #. Tag: title
 #: boot-installer.xml:2804
@@ -5382,44 +5369,3 @@ msgstr ""
 "      and ideas you had during the initial install.&gt;\n"
 "</screen></informalexample> 在 bug 报告中，请说明问题所在，包括内核挂起时最后"
 "见到的内核消息。描述进入问题状态所进行的步骤。"
-
-# index.docbook:1919, index.docbook:1968
-#~ msgid "Broadcom BCM91250A and BCM91480B TFTP Booting"
-#~ msgstr "Broadcom BCM91250A 与 BCM91480B TFTP 引导"
-
-#~ msgid ""
-#~ "On the Broadcom BCM91250A and BCM91480B evaluation boards, you have to "
-#~ "load the SiByl boot loader via TFTP which will then load and start the "
-#~ "Debian installer. In most cases, you will first obtain an IP address via "
-#~ "DHCP but it is also possible to configure a static address. In order to "
-#~ "use DHCP, you can enter the following command on the CFE prompt: "
-#~ "<informalexample><screen>\n"
-#~ "ifconfig eth0 -auto\n"
-#~ "</screen></informalexample> Once you have obtained an IP address, you can "
-#~ "load SiByl with the following command: <informalexample><screen>\n"
-#~ "boot 192.168.1.1:/boot/sibyl\n"
-#~ "</screen></informalexample> You need to substitute the IP address listed "
-#~ "in this example with either the name or the IP address of your TFTP "
-#~ "server. Once you issue this command, the installer will be loaded "
-#~ "automatically."
-#~ msgstr ""
-#~ "在 Broadcom BCM91250A 和 BCM91480B 开发板上，您不得不通过 TFTP 加载 SiByl "
-#~ "引导程序，它接着将加载和启动 Debian 安装程序。大多数情况下，您通过 DHCP 获"
-#~ "得 IP 地址，当然也可以指定静态地址。要使用 DHCP，您可以在下面 CFE 提示符下"
-#~ "输入命令： <informalexample><screen>\n"
-#~ "ifconfig eth0 -auto\n"
-#~ "</screen></informalexample> 一旦得到 IP 地址，就可以使用下面命令加载 "
-#~ "SiByl： <informalexample><screen>\n"
-#~ "boot 192.168.1.1:/boot/sibyl\n"
-#~ "</screen></informalexample> 您要用 TFTP 服务器的 IP 地址或域名替换上面例子"
-#~ "中的 IP 地址。输入以后，安装程序就会自动加载。"
-
-#~ msgid ""
-#~ "You cannot pass any boot parameters directly from the CFE prompt. "
-#~ "Instead, you have to edit the <filename>/boot/sibyl.conf</filename> file "
-#~ "on the TFTP server and add your parameters to the "
-#~ "<replaceable>extra_args</replaceable> variable."
-#~ msgstr ""
-#~ "您不能从 CFE 提示符直接传递启动参数。而是编辑 TFTP 服务器上的 <filename>/"
-#~ "boot/sibyl.conf</filename> 文件并添加参数到 <replaceable>extra_args</"
-#~ "replaceable> 变量。"
