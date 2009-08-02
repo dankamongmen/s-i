@@ -7,6 +7,13 @@ log() {
 	logger -t clock-setup "$@"
 }
 
+# On s390 we're not allowed to change the system clock; just run tzsetup
+case "$(archdetect)" in
+    s390/*)
+	tzsetup
+	exit 0 ;;
+esac
+
 db_input medium clock-setup/ntp || true
 if ! db_go; then
 	exit 10 # back to main menu
