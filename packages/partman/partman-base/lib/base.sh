@@ -1025,7 +1025,7 @@ disable_swap () {
 	cd $dev
 	if [ "$id" ] && [ -d "$id" ]; then
 	    open_dialog PARTITION_INFO "$id"
-	    read_line x1 x2 x3 x4 x5 x6 device x7
+	    read_line x1 x2 x3 x4 x5 device x7
 	    close_dialog
 	    # Add space to ensure we won't match substrings.
 	    device="$device "
