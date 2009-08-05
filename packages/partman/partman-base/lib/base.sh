@@ -1031,7 +1031,7 @@ disable_swap () {
 	    device=$(cat device)
 	fi
 
-	grep "^$device" /proc/swaps \
+	grep "^$device " /proc/swaps \
 	    | while read path x; do
 		  swapoff $path
 	      done
