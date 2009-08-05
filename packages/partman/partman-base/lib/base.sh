@@ -1027,11 +1027,13 @@ disable_swap () {
 	    open_dialog PARTITION_INFO "$id"
 	    read_line x1 x2 x3 x4 x5 x6 device x7
 	    close_dialog
+	    # Add space to ensure we won't match substrings.
+	    device="$device "
 	else
 	    device=$(cat device)
 	fi
 
-	grep "^$device " /proc/swaps \
+	grep "^$device" /proc/swaps \
 	    | while read path x; do
 		  swapoff $path
 	      done
