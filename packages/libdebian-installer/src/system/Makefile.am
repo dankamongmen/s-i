@@ -20,7 +20,8 @@ EXTRA_libsystem_la_SOURCES = \
 	subarch-mipsel-linux.c \
 	subarch-powerpc-linux.c \
 	subarch-sparc-linux.c \
-	subarch-x86-linux.c
+	subarch-x86-linux.c \
+	subarch-x86-kfreebsd.c
 
 libsystem_la_LIBADD = \
 	@SUBARCH_SYSTEM@
