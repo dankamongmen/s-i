@@ -1,8 +1,73 @@
+diff --git a/src/main.cpp b/src/main.cpp
+index 35535c9..dd7c447 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -66,6 +66,8 @@ int main(int argc, char **argv)
+ 
+     int min_rev = options.options.value("resume-from").toInt();
+     int max_rev = options.options.value("max-rev").toInt();
++
++    printf("resume: %i\n", min_rev);
+     if (min_rev < 1)
+         min_rev = 1;
+ 
+@@ -85,8 +87,10 @@ int main(int argc, char **argv)
+     if (max_rev < 1)
+         max_rev = svn.youngestRevision();
+     for (int i = min_rev; i <= max_rev; ++i)
+-        if (!svn.exportRevision(i))
++        if (!svn.exportRevision(i)) {
++    	    printf("svn.exportRevision(%i) failed\n", i);
+             break;
++	}
+ 
+     foreach (Repository *repo, repositories) {
+         repo->finalizeTags();
+@@ -94,5 +98,6 @@ int main(int argc, char **argv)
+     }
+ 
+     // success
++    printf("successful end of svn-all-fast-import\n");
+     return 0;
+ }
+diff --git a/src/options.cpp b/src/options.cpp
+index 892b6e1..d8c48e5 100644
+--- a/src/options.cpp
++++ b/src/options.cpp
+@@ -53,6 +53,8 @@ void Options::parseArguments(const QStringList &argumentList)
+         QString arg = arguments.takeFirst();
+         QString complement;
+ 
++        printf("arg: %s\n", qPrintable(arg));
++
+         if (arg == "--")
+             break;
+ 
+@@ -73,6 +75,7 @@ void Options::parseArguments(const QStringList &argumentList)
+         if (arg.contains('=') && complement.isEmpty()) {
+             int pos = arg.indexOf('=');
+             complement = arg.mid(pos + 1);
++	    printf("complement: %s\n", qPrintable(complement));
+             arg.truncate(pos);
+         }
+ 
 diff --git a/src/repository.cpp b/src/repository.cpp
-index 182309c..4ac63f0 100644
+index 182309c..b7faaa7 100644
 --- a/src/repository.cpp
 +++ b/src/repository.cpp
-@@ -210,7 +210,7 @@ void Repository::finalizeTags()
+@@ -31,8 +31,9 @@ public:
+         remove(repo);
+ 
+         // if the cache is too big, remove from the front
+-        while (size() >= maxSimultaneousProcesses)
+-            takeFirst()->closeFastImport();
++	// disabled to see if it's causing commit lossage JEH
++        //while (size() >= maxSimultaneousProcesses)
++        //    takeFirst()->closeFastImport();
+ 
+         // append to the end
+         append(repo);
+@@ -210,7 +211,7 @@ void Repository::finalizeTags()
          if (!message.endsWith('\n'))
              message += '\n';
          if (Options::globalOptions->switches.value("metadata", true))
@@ -11,7 +76,15 @@ index 182309c..4ac63f0 100644
  
          {
              QByteArray branchRef = tag.supportingRef.toUtf8();
-@@ -323,7 +323,7 @@ void Repository::Transaction::commit()
+@@ -259,6 +260,7 @@ void Repository::startFastImport()
+ #else
+         fastImport.start("/bin/cat", QStringList());
+ #endif
++	//printf("started git fast-import for %s\n", name->data);
+ 
+         reloadBranches();
+     }
+@@ -323,7 +325,7 @@ void Repository::Transaction::commit()
      if (!message.endsWith('\n'))
          message += '\n';
      if (Options::globalOptions->switches.value("metadata", true))
@@ -20,6 +93,16 @@ index 182309c..4ac63f0 100644
  
      {
          QByteArray branchRef = branch;
+@@ -364,6 +366,9 @@ void Repository::Transaction::commit()
+     printf(" %d modifications to \"%s\"",
+            deletedFiles.count() + modifiedFiles.count(),
+            qPrintable(repository->name));
++    printf(" (Commit #%i = SVN r%i) ",
++		    repository->commitCount,
++		    revnum);
+ 
+     while (repository->fastImport.bytesToWrite())
+         if (!repository->fastImport.waitForBytesWritten(-1))
 diff --git a/src/svn.cpp b/src/svn.cpp
 index aff7191..72d189e 100644
 --- a/src/svn.cpp
