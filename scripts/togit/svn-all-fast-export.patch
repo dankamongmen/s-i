@@ -1,0 +1,40 @@
+diff --git a/src/repository.cpp b/src/repository.cpp
+index 182309c..4ac63f0 100644
+--- a/src/repository.cpp
++++ b/src/repository.cpp
+@@ -210,7 +210,7 @@ void Repository::finalizeTags()
+         if (!message.endsWith('\n'))
+             message += '\n';
+         if (Options::globalOptions->switches.value("metadata", true))
+-            message += "\nsvn path=" + tag.svnprefix + "; revision=" + QByteArray::number(tag.revnum) + "\n";
++            message += "\nr" + QByteArray::number(tag.revnum) + "\n";
+ 
+         {
+             QByteArray branchRef = tag.supportingRef.toUtf8();
+@@ -323,7 +323,7 @@ void Repository::Transaction::commit()
+     if (!message.endsWith('\n'))
+         message += '\n';
+     if (Options::globalOptions->switches.value("metadata", true))
+-        message += "\nsvn path=" + svnprefix + "; revision=" + QByteArray::number(revnum) + "\n";
++        message += "\nr" + QByteArray::number(revnum) + "\n";
+ 
+     {
+         QByteArray branchRef = branch;
+diff --git a/src/svn.cpp b/src/svn.cpp
+index aff7191..72d189e 100644
+--- a/src/svn.cpp
++++ b/src/svn.cpp
+@@ -454,6 +454,13 @@ int SvnRevision::fetchRevProps()
+     svn_string_t *svndate = (svn_string_t*)apr_hash_get(revprops, "svn:date", APR_HASH_KEY_STRING);
+     svn_string_t *svnlog = (svn_string_t*)apr_hash_get(revprops, "svn:log", APR_HASH_KEY_STRING);
+ 
++    /* Hack to remove newline in author, for broken rev in d-i svn -- JEH */
++    char *nl=strchr((char *)svnauthor->data, '\n');
++    if (nl) {
++	    nl[0]='\0';
++	    fprintf(stderr, "author newline removal hack alert on %s!\n", (char *)svnauthor->data);
++    }
++
+     log = (char *)svnlog->data;
+     authorident = svnauthor ? identities.value((char *)svnauthor->data) : QByteArray();
+     epoch = get_epoch((char*)svndate->data);
