@@ -37,5 +37,3 @@ if [ -n "$crashes" ]; then
 	echo "* Crashes detected: $crashes" >&2
 	exit 1
 fi
-
-cp log git/svn-all-fast-export.log
