@@ -104,7 +104,7 @@ index 182309c..b7faaa7 100644
      while (repository->fastImport.bytesToWrite())
          if (!repository->fastImport.waitForBytesWritten(-1))
 diff --git a/src/svn.cpp b/src/svn.cpp
-index aff7191..72d189e 100644
+index aff7191..04cf6bf 100644
 --- a/src/svn.cpp
 +++ b/src/svn.cpp
 @@ -454,6 +454,13 @@ int SvnRevision::fetchRevProps()
@@ -121,3 +121,19 @@ index aff7191..72d189e 100644
      log = (char *)svnlog->data;
      authorident = svnauthor ? identities.value((char *)svnauthor->data) : QByteArray();
      epoch = get_epoch((char*)svndate->data);
+@@ -593,12 +600,13 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
+                          << "is an SVN rename from"
+                          << qPrintable(previous) << "rev" << rev_from;
+                 return EXIT_SUCCESS;
+-            } else {
++            } else if (0) { /* XXX HACH REMOVE JEH */
+                 // same repository but not same branch
+                 // this means this is a plain branch
+                 qDebug() << qPrintable(repository) << ": branch"
+                          << qPrintable(branch) << "is branching from"
+-                         << qPrintable(prevbranch);
++                         << qPrintable(prevbranch)
++			 << "rev" << rev_from;
+ 
+                 Repository *repo = repositories.value(repository, 0);
+                 if (!repo) {
