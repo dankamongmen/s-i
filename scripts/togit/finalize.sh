@@ -37,7 +37,7 @@ mkdir git/attic
 mv git/autopartkit.git git/delo-installer.git git/kdetect.git \
 	git/packages-build.git \
 	git/partkit.git git/pcidetect.git git/selectdevice.git \
-	git/ppcdetect.git \
+	git/ppcdetect.git git/pcmcia-udeb.git git/file-retriever.git \
 	git/linux-modules-di-arm-2.6.git git/linux-kernel-di-arm-2.6.git \
 	git/linux-modules-nonfree-di-i386-2.6.git \
 	git/linux-kernel-di-i386.git \
