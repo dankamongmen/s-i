@@ -14,7 +14,7 @@ for p in $(grep 'create repository ' d-i.conf | sed 's/create repository //'); d
 		# If a tag is created and then modified in svn,
 		# the old version will be renamed to <tag>_<rev>
 		# in git. These are clutter, so we can just remove them.
-		if echo "$vtag" | egrep -q '_[0-9]+$'; then
+		if echo "$vtag" | egrep -q '_[0-9]+$' && [ "$vtag" != "v20031106_1" ] ; then
 			printf "Old copy of changed tag found ... "
 			git tag -d "$vtag"
 		else
