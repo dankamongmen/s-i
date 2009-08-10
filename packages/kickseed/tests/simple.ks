@@ -17,6 +17,8 @@ partition swap --size=512 --maxsize=1024
 rootpw rootme
 timezone --utc America/New_York
 url --url http://archive.ubuntu.com/ubuntu
+repo --name test --baseurl http://mirror/ubuntu --distribution local --components=main,restricted --source --key=http://mirror/ubuntu/project/key
+repo --name "another test" --baseurl http://mirror/other --key=http://mirror/ubuntu/project/key2
 user cjwatson --fullname="Colin Watson" --password="foobar"
 xconfig --resolution 1280x1024
 preseed test/question1 string hello
