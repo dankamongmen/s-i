@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# It's easiest to fix this tag this way.
+cd git/net-retriever
+git tag -f v1.06 v1.06^
+cd ../..
+
 mkdir -p git/logs
 
 (
