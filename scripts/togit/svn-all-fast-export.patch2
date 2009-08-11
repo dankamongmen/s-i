@@ -1,5 +1,5 @@
 diff --git a/src/repository.cpp b/src/repository.cpp
-index f243d24..6408358 100644
+index f243d24..a0e5f4c 100644
 --- a/src/repository.cpp
 +++ b/src/repository.cpp
 @@ -15,8 +15,6 @@
@@ -31,7 +31,19 @@ index f243d24..6408358 100644
  {
      startFastImport();
      if (!branches.contains(branch)) {
-@@ -140,13 +138,21 @@ void Repository::createBranch(const QString &branch, int revnum,
+@@ -124,7 +122,10 @@ void Repository::createBranch(const QString &branch, int revnum,
+         branchRef.prepend("refs/heads/");
+ 
+     Branch &br = branches[branch];
+-    if (br.created && br.created != revnum) {
++    /* avoid rewinding master, this crashes if master exists but all
++     * commits so far have gone to a branch and the branch is then copied
++     * to master. JEH */
++    if (br.created && br.created != revnum && ! branch.startsWith("master")) {
+         QByteArray backupBranch = branchRef + '_' + QByteArray::number(revnum);
+         qWarning() << branch << "already exists; backing up to" << backupBranch;
+ 
+@@ -140,13 +141,21 @@ void Repository::createBranch(const QString &branch, int revnum,
      if (!branches.contains(branchFrom) || !branches.value(branchFrom).created) {
          qCritical() << branch << "in repository" << name
                      << "is branching from branch" << branchFrom
@@ -58,7 +70,7 @@ index f243d24..6408358 100644
  }
  
  Repository::Transaction *Repository::newTransaction(const QString &branch, const QString &svnprefix,
-@@ -320,6 +326,7 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
+@@ -320,6 +329,7 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
  
  void Repository::Transaction::commit()
  {
@@ -66,7 +78,7 @@ index f243d24..6408358 100644
      processCache.touch(repository);
  
      // create the commit message
-@@ -336,6 +343,18 @@ void Repository::Transaction::commit()
+@@ -336,6 +346,18 @@ void Repository::Transaction::commit()
  
          QTextStream s(&repository->fastImport);
          s << "commit " << branchRef << endl;

@@ -2,7 +2,22 @@
 
 # It's easiest to fix this tag this way.
 cd git/net-retriever
-git tag -f v1.06 v1.06^
+git tag -f 1.06 1.06_33219
+cd ../..
+
+# Remove some mistags that had to be created since other tags were derived
+# from them. But are not needed now.
+cd git/linux-kernel-di-sparc
+git tag -d version_0.53
+cd ../..
+cd git/linux-kernel-di-powerpc
+git tag -d version_0.54
+cd ../..
+cd git/linux-kernel-di-ia64
+git tag -d version_0.53
+cd ../..
+cd git/yaboot-installer
+git tag -d 0.20
 cd ../..
 
 mkdir -p git/logs
@@ -15,21 +30,13 @@ for p in $(grep 'create repository ' d-i.conf | sed 's/create repository //'); d
 	mv $TOP/git/$p $TOP/git/$p.git
 	cd $TOP/git/$p.git
 	
-	for vtag in $(git tag | grep ^v); do
+	for tag in $(git tag | grep ^); do
 		# If a tag is created and then modified in svn,
 		# the old version will be renamed to <tag>_<rev>
 		# in git. These are clutter, so we can just remove them.
-		if echo "$vtag" | egrep -q '_[0-9]+$' && [ "$vtag" != "v20031106_1" ] ; then
+		if echo "$tag" | egrep -q '_[0-9]+$' && [ "$tag" != "20031106_1" ] ; then
 			printf "Old copy of changed tag found ... "
-			git tag -d "$vtag"
-		else
-			# the tags are created with a 'v' prefix because
-			# that's how svn-all-fast-export handles them properly, 
-			# but we have always used just the number for tags in d-i,
-			# so rename them
-			tag=$(echo "$vtag" | sed 's/^v//')
-			git tag "$tag" "$vtag"
-			git tag -d "$vtag" >/dev/null
+			git tag -d "$tag"
 		fi
 	done
 
