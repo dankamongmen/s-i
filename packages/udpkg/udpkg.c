@@ -36,6 +36,11 @@ static int dpkg_print_architecture()
 	return 0;
 }
 
+static int dpkg_print_os()
+{
+	puts(OS_TEXT);
+	return 0;
+}
 
 static int dpkg_copyfile(const char *src, const char *dest)
 {
@@ -507,7 +512,8 @@ int main(int argc, char **argv)
 		/* name, has_arg, flag, val */
 		{ "unpack", 0, 0, 'u' },
 		{ "configure", 0, 0, 'c' },
-		{ "print-architecture", 0, 0, 'p' } ,
+		{ "print-architecture", 0, 0, 'a' } ,
+		{ "print-os", 0, 0, 'o' } ,
 		{ "force-configure", 0, &force_configure, 1 },
 		{ "no-loadtemplate", 0, &loadtemplate, 0 },
 		{ 0, 0, 0, 0 },
@@ -545,7 +551,8 @@ int main(int argc, char **argv)
 			case 'r': return dpkg_remove(packages); break;
 			case 'u': return dpkg_unpack(packages); break;
 			case 'c': return dpkg_configure(packages); break;
-			case 'p': return dpkg_print_architecture(); break;
+			case 'a': return dpkg_print_architecture(); break;
+			case 'o': return dpkg_print_os(); break;
 			case 'f': return dpkg_fields(packages); break;
 			case 0: /* option, not action */; break;
 		}
@@ -553,6 +560,6 @@ int main(int argc, char **argv)
 
 	/* if it falls through to here, some of the command line options were
 	   wrong */
-	FPRINTF(stderr, "udpkg [--force-configure] <-i|-r|--unpack|--configure|--print-architecture|-f> my.deb\n");
+	FPRINTF(stderr, "udpkg [--force-configure] <-i|-r|--unpack|--configure|--print-architecture|--print-os|-f> my.deb\n");
 	return 0;
 }

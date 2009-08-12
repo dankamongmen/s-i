@@ -1,7 +1,8 @@
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 CC=@CC@
-CFLAGS=@CFLAGS@ -D_GNU_SOURCE -DADMINDIR=\"@ADMINDIR@\" -DARCH_TEXT='"$(DEB_HOST_ARCH)"'
+CFLAGS=@CFLAGS@ -D_GNU_SOURCE -DADMINDIR=\"@ADMINDIR@\" -DARCH_TEXT='"$(DEB_HOST_ARCH)"' -DOS_TEXT='"$(DEB_HOST_ARCH_OS)"'
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=udpkg
 BUSYBOX=@BUSYBOXDIR@
