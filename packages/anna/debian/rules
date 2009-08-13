@@ -1,39 +1,11 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
+%:
+	dh $@
 
-build: build-stamp
-build-stamp:
-	dh_testdir
+override_dh_auto_build:
 # Make small unless we are building a debug package.
 ifeq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	$(MAKE) small
 else
 	$(MAKE) DEBUG=1
 endif
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	$(MAKE) clean
-	dh_clean
-
-binary-indep: 
-
-binary-arch: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs var/cache/anna
-	dh_install anna bin
-	dh_installdebconf
-	dh_compress
-	dh_fixperms
-	dh_shlibdeps
-	dh_installdeb
-	dh_strip
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary
