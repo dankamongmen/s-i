@@ -13,7 +13,7 @@ clean-local:
 
 install-real-html: html
 	$(mkinstalldirs) $(DESTDIR)$(docdir)/html
-	@list='$(wildcard html/*)'; for p in $$list; do \
+	@for p in html/*; do \
 	  echo " $(INSTALL_DATA) $$p $(DESTDIR)$(docdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(DESTDIR)$(docdir)/$$p; \
 	done
