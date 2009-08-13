@@ -1,34 +1,3 @@
-#!/usr/bin/make -f
-
-build: build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE) all strip
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	make distclean
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_install cdrom-checker bin
-
-binary-indep: build install
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf	
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+#! /usr/bin/make -f
+%:
+	dh $@
