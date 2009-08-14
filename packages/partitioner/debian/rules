@@ -1,46 +1,16 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
+%:
+	dh $@
 
-#export DH_VERBOSE=1
-ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
-
-build: build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE) all
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	rm -f debian/partitioner.postinst
-	-$(MAKE) distclean
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
+override_dh_auto_install:
 	install -m755 partitioner debian/partitioner.postinst
-	install -m755 -d debian/partitioner/usr/share/partitioner
 	for i in `find scripts/ -maxdepth 1 -type f -print`; do \
 		install -m644 $$i debian/partitioner/usr/share/partitioner/; \
 	done
 
-# Build architecture-independent files here.
-binary-indep: build install
-# We have nothing to do by default.
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 
-# Build architecture-dependent files here.
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf	
-	dh_fixperms
-	dh_strip
-	dh_installdeb
-	dh_shlibdeps
+override_dh_gencontrol:
 # fdisk-udeb is not standard priority so will not be installed by anna
 # unless partitioner depends on it
 ifeq ($(ARCH),mips)
@@ -48,7 +18,3 @@ ifeq ($(ARCH),mips)
 else ifeq ($(ARCH),m68k)
 	dh_gencontrol -- -Vfdisk:Depends="atari-fdisk-udeb, mac-fdisk-udeb"
 endif
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
