@@ -19,12 +19,12 @@ STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
 
-all: dasd
+all: dasd-config
 
-dasd: dasd.c
+dasd-config: dasd-config.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	$(STRIP) $@
 
 clean:
-	rm -f dasd
+	rm -f dasd-config
 

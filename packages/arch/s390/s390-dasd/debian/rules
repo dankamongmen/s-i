@@ -12,7 +12,6 @@ build-stamp:
 clean:
 	dh_testdir
 	rm -f build-stamp
-	rm -f debian/postinst
 	$(MAKE) clean
 	dh_clean
 
@@ -20,7 +19,6 @@ install: build
 	dh_testdir
 	dh_testroot
 	dh_clean -k
-	cp dasd debian/postinst
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -29,6 +27,7 @@ binary-indep: build install
 binary-arch: build install
 	dh_testdir
 	dh_testroot
+	dh_install
 	dh_installdebconf
 	dh_installdeb 
 	dh_shlibdeps
