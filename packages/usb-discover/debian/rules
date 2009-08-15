@@ -1,28 +1,3 @@
-#!/usr/bin/make -f
-
-build:
-
-clean:
-	dh_testdir
-	dh_testroot
-	dh_clean
-
-install:
-	dh_testdir
-	dh_clean
-	dh_installdirs usr/lib/usb-discover
-	$(MAKE) install DESTDIR=debian/usb-discover/usr/lib/usb-discover
-
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_install S33usb-linux lib/debian-installer-startup.d
-	dh_install usb-discover usr/sbin
-	dh_installdebconf
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-
-binary-arch:
-binary: build binary-indep
+#! /usr/bin/make -f
+%:
+	dh $@
