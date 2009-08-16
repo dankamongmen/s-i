@@ -1,27 +1,10 @@
 #! /usr/bin/make -f
+%:
+	dh $@
 
 PACKAGE=$(shell dh_listpackages)
 
-build: 
-build-stamp:
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	dh_clean
-
-install-dirs:
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs lib/userdevfs lib/debian-installer-startup.d
-
-install: install-dirs
-	dh_testroot
-	install S10userdevfs debian/$(PACKAGE)/lib/debian-installer-startup.d
-	dh_install init-dev update-dev subarch-dev lib/userdevfs
-	dh_installdirs dev dev/rd dev/vc dev/fb dev/pts
+override_dh_auto_install:
 	# needed in initrd for freeramdisk to work
 	mknod debian/$(PACKAGE)/dev/rd/0 b 1 0
 	mknod debian/$(PACKAGE)/dev/ram0 b 1 0
@@ -51,16 +34,3 @@ install: install-dirs
 	mknod debian/$(PACKAGE)/dev/pts/6 c 136 6 
 	mknod debian/$(PACKAGE)/dev/pts/7 c 136 7 
 	mknod debian/$(PACKAGE)/dev/ptmx c 5 2
-
-binary-indep: install
-	dh_testdir
-	dh_testroot
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-
-binary-arch: 
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
