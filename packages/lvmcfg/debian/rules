@@ -1,32 +1,7 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
+%:
+	dh $@
 
-build:
-	dh_testdir
-
-clean:
-	dh_testdir
-	dh_testroot
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs 
+override_dh_install:
 	install -m755 lvmcfg.sh debian/lvmcfg-utils/bin/lvmcfg
 	install -m755 partconf-hook.sh debian/lvmcfg/var/lib/partconf/block.d/lvmcfg.sh
-	dh_install -plvmcfg debian/isinstallable DEBIAN
-
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf	
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-
-binary-arch: build install
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
