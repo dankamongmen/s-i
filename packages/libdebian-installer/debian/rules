@@ -1,7 +1,6 @@
-#!/usr/bin/make -f
-
-DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
-DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+#! /usr/bin/make -f
+%:
+	dh --builddirectory=build $@
 
 DEB_HOST_ARCH_OS    := $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
 
@@ -20,77 +19,32 @@ configure:
 	autoreconf -i -v
 	@exit 1
 
-build/config.status: configure
-	dh_testdir
-	
-	-mkdir build
-	cd build && \
-	../configure \
-		--host=$(DEB_HOST_GNU_TYPE) \
-		--build=$(DEB_BUILD_GNU_TYPE) \
-		--prefix=/usr \
-		--mandir=\$${prefix}/share/man \
-		--infodir=\$${prefix}/share/info
-
-build: build-stamp
-build-stamp:  build/config.status
-	dh_testdir
-
-	$(MAKE) -C build
+override_dh_auto_build:
+	dh_auto_build
 ifneq ($(DEB_HOST_ARCH_OS),hurd)
 	$(MAKE) -C build/doc doc
 endif
 
-	touch $@
-
-clean:
-	dh_testdir
-	rm -f build-stamp
-
-	rm -rf build
-
+override_dh_clean:
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	-cp -f /usr/share/misc/config.sub config.sub
 endif
 ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	-cp -f /usr/share/misc/config.guess config.guess
 endif
-
 	dh_clean
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-
-	$(MAKE) -C build install DESTDIR=$(CURDIR)/debian/tmp
-
+override_dh_install:
 	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer.so.4 $(CURDIR)/debian/libdebian-installer4-udeb/lib
 	install $(CURDIR)/debian/tmp/usr/lib/libdebian-installer-extra.so.4 $(CURDIR)/debian/libdebian-installer-extra4-udeb/lib
 	dh_install --sourcedir=debian/tmp
 
-binary-indep: build install
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs
-	dh_installdocs
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
+override_dh_makeshlibs:
 	dh_makeshlibs -plibdebian-installer4 -V \
 		--add-udeb=libdebian-installer4-udeb
 	dh_makeshlibs -plibdebian-installer-extra4 -V \
 		--add-udeb=libdebian-installer-extra4-udeb
-	dh_installdeb
+
+override_dh_shlibdeps:
 	dh_shlibdeps -N libdebian-installer-extra4 -N libdebian-installer-extra4-udeb
 	dh_shlibdeps -p libdebian-installer-extra4 -p libdebian-installer-extra4-udeb -- -L$(CURDIR)/debian/libdebian-installer-extra4.shlibs.local
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install 
