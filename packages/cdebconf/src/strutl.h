@@ -8,8 +8,16 @@
 
 #include <stdarg.h>
 #include <string.h>
-#include "common.h"
 #include "question.h"
+
+#include "debian-installer/macros.h"
+
+/* Does this compiler support sentinel checking? */
+#if DI_GNUC_PREREQ(4,0)
+#  define ATTRIBUTE_SENTINEL __attribute__ ((__sentinel__))
+#else
+#  define ATTRIBUTE_SENTINEL
+#endif
 
 /**
  * @brief strcmp with explicit start/stop 

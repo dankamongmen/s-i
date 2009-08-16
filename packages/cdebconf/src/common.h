@@ -14,8 +14,6 @@
 #include "debug.h"
 #include "constants.h"
 
-#include "debian-installer/macros.h"
-
 #define DIE(fmt, args...) 					\
  	do {							\
 		fprintf(stderr, "%s:%d (%s): ", __FILE__, __LINE__, __FUNCTION__); \
@@ -48,13 +46,6 @@
 #endif
 #ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif
-
-/* Does this compiler support sentinel checking? */
-#if DI_GNUC_PREREQ(4,0)
-#  define ATTRIBUTE_SENTINEL __attribute__ ((__sentinel__))
-#else
-#  define ATTRIBUTE_SENTINEL
 #endif
 
 #endif
