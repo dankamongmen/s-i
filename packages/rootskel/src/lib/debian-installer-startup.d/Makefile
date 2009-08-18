@@ -15,8 +15,6 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 files = \
-	S01mount \
-	S02module-params \
 	S10syslog \
 	S20templates \
 	S35term
@@ -58,6 +56,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
   endif
 
   files += \
+	S01mount \
+	S02module-params \
 	S37speakup
 endif
 
