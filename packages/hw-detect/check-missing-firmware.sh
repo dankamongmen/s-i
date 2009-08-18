@@ -22,13 +22,23 @@ read_log () {
 		OLDIFS="$IFS"
 		IFS="$NL"
 		for line in $(sort $LOG.old | uniq); do
-			module="${line%% *}"
+			devpath="${line%% *}"
 			file="${line#* }"
-			[ -z "$module" ] || [ -z "$file" ] && continue
+			[ -z "$devpath" ] || [ -z "$file" ] && continue
 
 			if grep -q "^$file$" $DENIED 2>/dev/null; then
 				continue
 			fi
+
+			# Determine the module based on the logged sysfs
+			# devpath.
+			# Strip firmware subdirectory.
+			devpath=$(echo $devpath | sed 's/\/firmware\/.*//')
+			# Follow the module symlink, and see where it goes.
+			# The realpath of the destination should be
+			# something like "/sys/module/e100"
+			module=$(basename $(realpath $devpath/driver/module)) || true
+			[ -z "$module" ] && continue
 
 			modules="$module${modules:+ $modules}"
 			files="$file${files:+ $files}"
