@@ -2,56 +2,57 @@
 set -e
 . /usr/share/debconf/confmodule
 
-LOG=/tmp/missing-firmware
+MISSING=/dev/.udev/firmware-missing
 DENIED=/tmp/missing-firmware-denied
-NL="
-"
 
 log () {
 	logger -t check-missing-firmware "$@"
 }
 
-read_log () {
+check_missing () {
 	# Give modules some time to request firmware.
 	sleep 1
 	
 	modules=""
 	files=""
-	if [ -s "$LOG" ]; then
-		mv $LOG $LOG.old
-		OLDIFS="$IFS"
-		IFS="$NL"
-		for line in $(sort $LOG.old | uniq); do
-			devpath="${line%% *}"
-			file="${line#* }"
-			[ -z "$devpath" ] || [ -z "$file" ] && continue
+	if [ -d "$MISSING" ]; then
+		for file in $(find $MISSING -type l); do
+			# decode firmware filename as encoded by
+			# udev firmware.agent
+			fwfile="$(basename $file | sed -e 's#\\x2f#/#g')"
+			
+			# strip probably nonexistant firmware subdirectory
+			devpath="$(readlink $file | sed 's/\/firmware\/.*//')"
+			# the symlink is supposed to point to the device in /sys
+			if ! echo "$devpath" | grep -q '^/sys/'; then
+				devpath="/sys$devpath"
+			fi
 
-			if grep -q "^$file$" $DENIED 2>/dev/null; then
+			# The realpath of the destination of the
+			# driver/module symlink should be
+			# something like "/sys/module/e100"
+			module=$(basename $(realpath $devpath/driver/module)) || true
+			if [ -z "$module" ]; then
+				log "failed to determine module from $devpath"
 				continue
 			fi
 
-			# Determine the module based on the logged sysfs
-			# devpath.
-			# Strip firmware subdirectory.
-			devpath=$(echo $devpath | sed 's/\/firmware\/.*//')
-			# Follow the module symlink, and see where it goes.
-			# The realpath of the destination should be
-			# something like "/sys/module/e100"
-			module=$(basename $(realpath $devpath/driver/module)) || true
-			[ -z "$module" ] && continue
+			rm -f "$file"
+
+			if grep -q "^$fwfile$" $DENIED 2>/dev/null; then
+				continue
+			fi
 
 			modules="$module${modules:+ $modules}"
-			files="$file${files:+ $files}"
+			files="$fwfile${files:+ $files}"
 		done
-		IFS="$OLDIFS"
-		rm -f $LOG.old
 	fi
 
 	if [ -n "$modules" ]; then
 		log "missing firmware files ($files) for $modules"
 		return 0
 	else
-		log "no missing firmware in $LOG"
+		log "no missing firmware in $MISSING"
 		return 1
 	fi
 }
@@ -101,7 +102,7 @@ install_firmware_pkg () {
 	fi
 }
 
-while read_log && ask_load_firmware; do
+while check_missing && ask_load_firmware; do
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
 		for file in $files; do
