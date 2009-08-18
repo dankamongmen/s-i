@@ -18,7 +18,7 @@ files = \
 	init-debug
 
 files_exec = \
-	exit \
+	exit:exit-$(DEB_HOST_ARCH_OS) \
 	exit-command \
 	menu
 
