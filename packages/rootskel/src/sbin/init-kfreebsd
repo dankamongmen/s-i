@@ -11,15 +11,15 @@ set -e
 debugshell "just booted"
 
 echo "Setting default module loading path"
-sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel"
+sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel" > /dev/null
 
 echo "Setting up filesystem, please wait ..."
 mount -o update,rw -t ufs /dev/md0 /
-mount -t devfs devfs /dev/
-mount -t fdescfs fdescfs /dev/fd/
+mount -t devfs devfs /dev
+mount -t fdescfs fdescfs /dev/fd
 mount /proc
 ln -s /var/run/log /dev/log
 
 # Close all open files on the initrd, and run busybox init.
 debugshell "before init"
-exec /usr/sbin/chroot . /bin/busybox init < /dev/console > /dev/console 2>&1
+exec /bin/busybox init < /dev/console > /dev/console 2>&1
