@@ -10,7 +10,9 @@ if [ ! -d "newt" ] ; then mv newt* newt ; fi
 cd newt
 tar xfz *.tar.gz
 mv `find . -type d -name newt\-\*` newt
-cd ..
+cd newt
+for i in ../debian/patches/*.patch ; do patch -p1  <$i ; done
+cd ../..
 
 rm -rf win32-loader
 svn -q co svn://svn.debian.org/svn/d-i/trunk/win32-loader
