@@ -31,11 +31,10 @@
 #include <unistd.h>
 
 /* Returns the devfs path name normalized into a "normal" (hdaX, sdaX)
- * name.  The return value is malloced, which means that the caller
- * needs to free it.  This is kinda hairy, but I don't see any other
- * way of operating with non-devfs systems when we use devfs on the
- * boot medium.  The numbers are taken from devices.txt in the
- * Documentation subdirectory off the kernel sources.
+ * name.  This is kinda hairy, but I don't see any other way of operating
+ * with non-devfs systems when we use devfs on the boot medium.  The
+ * numbers are taken from devices.txt in the Documentation subdirectory
+ * of the kernel sources.
  */
 
 ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
