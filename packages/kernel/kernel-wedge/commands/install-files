@@ -67,6 +67,11 @@ while (<KVERS>) {
 		doit("install", "-D", "-m", 644,
 			"$sourcedir/boot/kfreebsd-$installedname.gz",
 			"debian/kernel-image-$kernelversion-$flavour-di/boot/kfreebsd$extraname.gz");
+		if (-e "$sourcedir/lib/modules/$kernelversion-$flavour/acpi.ko") {
+			doit("install", "-D", "-m", 644,
+				"$sourcedir/lib/modules/$kernelversion-$flavour/acpi.ko",
+				"debian/kernel-image-$kernelversion-$flavour-di/boot/acpi$extraname.ko");
+		}
 	}
 	else {
 		die "could not find kernel image";
