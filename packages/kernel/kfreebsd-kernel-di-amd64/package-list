@@ -1,0 +1,23 @@
+# This file is used to build up the control file. The kernel version and
+# "-di" are appended to the package names. Section can be left out. So can
+# architecture, which is derived from the files in the modules directory.
+# It overwrites specifications from /usr/share/kernel-wedge/package-list.
+#
+Package: kernel-image
+Provides: mouse-modules, ufs-modules
+Description: FreeBSD kernel binary image for the Debian installer
+ This package contains the FreeBSD kernel image for the Debian installer
+ boot images. It does _not_ provide a usable kernel for your full
+ Debian system.
+
+Package: scsi-modules
+Depends: kernel-image, scsi-core-modules
+
+Package: nic-usb-modules
+Depends: kernel-image, nic-shared-modules
+
+Package: ppp-modules
+Depends: kernel-image, core-modules
+
+Package: pcmcia-modules
+Depends: kernel-image
