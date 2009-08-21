@@ -30,6 +30,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#if defined(__linux__)
+
 /* Returns the devfs path name normalized into a "normal" (hdaX, sdaX)
  * name.  This is kinda hairy, but I don't see any other way of operating
  * with non-devfs systems when we use devfs on the boot medium.  The
@@ -196,6 +198,16 @@ ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
   
   return ret;
 }
+
+#else /* defined(__linux__) */
+
+ssize_t di_system_devfs_map_from (const char *path, char *buf, size_t n)
+{
+    /* Do nothing on other systems */
+    return snprintf (buf, n, "%s", path);
+}
+
+#endif /* defined(__linux__) */
 
 #ifndef TEST
 ssize_t di_mapdevfs (const char *path, char *buf, size_t n) __attribute__ ((alias("di_system_devfs_map_from")));
