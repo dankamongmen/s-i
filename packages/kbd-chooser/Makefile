@@ -4,7 +4,7 @@ DEB_BUILD_OPTIONS := debug:$(DEB_BUILD_OPTIONS)
 endif
 
 CFLAGS := -Wall  -I.
-ARCH := $(shell dpkg --print-architecture)
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 OBJS := loadkeys.o findfile.o ksyms.o  getfd.o
 
@@ -20,56 +20,56 @@ endif
 
 LDOPTS=  -ldebconfclient -ldebian-installer
 
-ifeq ($(ARCH),alpha)
+ifeq ($(DEB_HOST_ARCH),alpha)
 CFLAGS += -DAT_KBD  -DUSB_KBD
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),i386)
+ifeq ($(DEB_HOST_ARCH),i386)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),amd64)
+ifeq ($(DEB_HOST_ARCH),amd64)
 CFLAGS += -DAT_KBD  -DUSB_KBD
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),ia64)
+ifeq ($(DEB_HOST_ARCH),ia64)
 CFLAGS += -DAT_KBD  -DUSB_KBD 
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),mips)
+ifeq ($(DEB_HOST_ARCH),mips)
 CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),mipsel)
+ifeq ($(DEB_HOST_ARCH),mipsel)
 CFLAGS += -DAT_KBD -DUSB_KBD -DDEC_KBD
 KEYBOARDS := at usb dec
 endif
-ifeq ($(ARCH),sparc)
+ifeq ($(DEB_HOST_ARCH),sparc)
 CFLAGS += -DAT_KBD -DSPARC_KBD -DUSB_KBD 
 KEYBOARDS := at usb sparc
 endif
-ifeq ($(ARCH),powerpc)
+ifeq ($(DEB_HOST_ARCH),powerpc)
 CFLAGS +=  -DUSB_KBD -DAT_KBD -DAMIGA_KBD -DMAC_KBD
 KEYBOARDS := at usb amiga mac
 endif
-ifeq ($(ARCH),arm)
+ifeq ($(DEB_HOST_ARCH),arm)
 CFLAGS +=  -DAT_KBD -DUSB_KBD 
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),armel)
+ifeq ($(DEB_HOST_ARCH),armel)
 CFLAGS +=  -DAT_KBD -DUSB_KBD 
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),armeb)
+ifeq ($(DEB_HOST_ARCH),armeb)
 CFLAGS +=  -DAT_KBD -DUSB_KBD 
 KEYBOARDS := at usb
 endif
-ifeq ($(ARCH),m68k)
+ifeq ($(DEB_HOST_ARCH),m68k)
 CFLAGS += -DAMIGA_KBD -DATARI_KBD -DMAC_KBD -DAT_KBD -DSPARC_KBD -D__m68k__
 KEYBOARDS := amiga atari mac at sparc
 endif
 # For the moment, don't include HIL keyboards
-ifeq ($(ARCH),hppa)
+ifeq ($(DEB_HOST_ARCH),hppa)
 CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
 endif
