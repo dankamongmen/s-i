@@ -1,31 +1,3 @@
-#!/usr/bin/make -f
-
-build:
-	dh_testdir
-
-clean:
-	dh_testdir
-	dh_testroot
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_install base-installer.d usr/lib
-
-binary-indep: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	dh_installdeb
-	dh_gencontrol
-	dh_builddeb
-
-# (The package implementation is platform independant, but will only work
-#  on platforms with delo available.  Thus it is built in target
-#  'binary-indep', and target 'binary-arch' is just an alias.)
-binary-arch: build install binary-indep
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
+#! /usr/bin/make -f
+%:
+	dh $@
