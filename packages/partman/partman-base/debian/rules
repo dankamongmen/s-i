@@ -6,6 +6,14 @@
 #export DH_VERBOSE=1
 
 ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+
+ifeq ($(ARCH_OS),linux)
+DEFAULT_FS=ext3
+endif
+ifeq ($(ARCH_OS),kfreebsd)
+DEFAULT_FS=ufs
+endif
 
 export PACKAGE=partman-base
 
@@ -50,6 +58,8 @@ binary-arch: build install
 	dh_testroot
 	dh_install
 	dh_installdebconf
+	sed -i '/^Template: partman\/default_filesystem/,/^$$/s/^Default: .*/Default: $(DEFAULT_FS)/' \
+		debian/${PACKAGE}/DEBIAN/templates
 	cp debian/isinstallable debian/${PACKAGE}/DEBIAN/
 	dh_strip
 	dh_fixperms
