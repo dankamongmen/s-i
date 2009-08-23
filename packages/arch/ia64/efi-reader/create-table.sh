@@ -4,8 +4,6 @@
 # 
 #
 
-ISO_TABLE=/usr/share/iso-codes/iso_639.tab
-
 cat > table.h << EOF
 
 struct {
@@ -14,8 +12,8 @@ struct {
 	} trans_table[] = {
 EOF
 
-egrep -v "^#.*" $ISO_TABLE | egrep -v "XX"  | \
-sed -r 's/([a-z]+)\t\w+\t([a-z]+)\t.*$/{"\1"\,"\2"}\,/' \
+isoquery -i 639 -c | cut -f1,3 | \
+sed -r '/\t$/d; s/(.+)\t(.+)/{"\1"\,"\2"}\,/' \
 >> table.h
 
 
