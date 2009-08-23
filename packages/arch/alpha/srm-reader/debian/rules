@@ -1,35 +1,3 @@
-#!/usr/bin/make -f
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	-$(MAKE) clean
-	dh_clean
-
-build: build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE)
-	touch build-stamp
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean
-	dh_installdirs
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/srm-reader
-	dh_link /usr/bin/srm-reader /lib/debian-installer-startup.d/S40srm-reader
-
-binary-indep:
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	dh_fixperms
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+#! /usr/bin/make -f
+%:
+	dh $@
