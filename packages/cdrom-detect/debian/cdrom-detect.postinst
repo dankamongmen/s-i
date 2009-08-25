@@ -30,9 +30,9 @@ mkdir /cdrom 2>/dev/null || true
 
 while true
 do
-	mounted=0
+	mounted=
 
-	if db_get cdrom-detect/try-usb && [ "$RET" = "true" ]; then
+	if db_get cdrom-detect/try-usb && [ "$RET" = true ]; then
 		devices="$(list-devices usb-partition)"
 		for device in $devices; do
 			if mount -t vfat -o ro,exec $device /cdrom &&
@@ -49,7 +49,7 @@ do
 		done
 	fi
 
-	if [ "$mounted" = "1" ]; then
+	if [ "$mounted" ]; then
 		break
 	fi
 
@@ -66,7 +66,7 @@ do
 		fi
 	done
 
-	if [ "$mounted" = "1" ]; then
+	if [ "$mounted" ]; then
 		break
 	fi
 
@@ -106,7 +106,7 @@ do
 		modules="$modules, $i"
 	done
     
-	if [ "$RET" = "true" ]; then
+	if [ "$RET" = true ]; then
 		db_subst cdrom-detect/cdrom_module choices "$modules"
 		db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
 		db_go
@@ -120,7 +120,7 @@ do
 		db_get cdrom-detect/cdrom_device
 		device="$RET"
 
-		if [ "$module" != "none" ]; then
+		if [ "$module" != none ]; then
 			modprobe $module
 		fi
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
