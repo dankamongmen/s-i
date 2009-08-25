@@ -35,12 +35,12 @@ do
 	devices="$(list-devices cd; list-devices maybe-usb-floppy)"
 	for device in $devices; do
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
-			log "CD-ROM mount succeeded: device=$device"
+			log "CD-ROM mount succeeded: device=$device fstype=iso9660"
 			mounted=1
 			db_set cdrom-detect/cdrom_device $device
 			break
 		else
-			log "CD-ROM mount failed: device=$device"
+			log "CD-ROM mount failed: device=$device fstype=iso9660"
 		fi
 	done
 
@@ -102,11 +102,12 @@ do
 			modprobe $module
 		fi
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
-			log "CD-ROM mount succeeded: device=$device"
+			log "CD-ROM mount succeeded: device=$device fstype=iso9660"
+			db_set cdrom-detect/cdrom_fs iso9660
 			mounted=1
 			break
 		else
-			log "CD-ROM mount failed: device=$device"
+			log "CD-ROM mount failed: device=$device fstype=iso9660"
 			fail
 		fi
 	else
