@@ -32,6 +32,26 @@ while true
 do
 	mounted=0
 
+	if db_get cdrom-detect/try-usb && [ "$RET" = "true" ]; then
+		devices="$(list-devices usb-partition)"
+		for device in $devices; do
+			if mount -t vfat -o ro,exec $device /cdrom &&
+			   [ -e /cdrom/.disk/info ]; then
+				log "CD-ROM mount succeeded: device=$device fstype=vfat"
+				mounted=1
+				db_set cdrom-detect/cdrom_device $device
+				break
+			else
+				log "CD-ROM mount failed: device=$device fstype=vfat"
+				umount /cdrom 2>/dev/null || true
+			fi
+		done
+	fi
+
+	if [ "$mounted" = "1" ]; then
+		break
+	fi
+
 	devices="$(list-devices cd; list-devices maybe-usb-floppy)"
 	for device in $devices; do
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
