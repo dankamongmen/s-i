@@ -6,9 +6,9 @@ case $TYPE in
 	logger -t list-devices "deprecated parameter maybe-floppy"
 	TYPE=floppy
 	;;
-    cd|disk|partition|floppy|maybe-usb-floppy) ;;
+    cd|disk|partition|floppy|maybe-usb-floppy|usb-partition) ;;
     *)
-	echo "Usage: $0 cd|disk|partition|floppy|maybe-usb-floppy" >&2
+	echo "Usage: $0 cd|disk|partition|floppy|maybe-usb-floppy|usb-partition" >&2
 	exit 2
 	;;
 esac
@@ -39,6 +39,12 @@ case $TYPE in
 	TYPE=disk
 	# Also allow misdetected USB devices
 	scan_partition=:
+	;;
+    usb-partition)
+	for x in /sys/block/*/*; do
+		[ -d "$x" ] || continue
+		syspaths="${syspaths:+$syspaths }$x"
+	done
 	;;
     *)
 	for x in /sys/block/*; do
@@ -82,6 +88,13 @@ for x in $syspaths; do
 	if ! $match && ( $scan_partition || [ "$TYPE" = maybe-usb-floppy ] ); then
 		if device_info env "$devpath" | grep -q '^ID_BUS=usb' && \
 		   device_info env "$devpath" | grep -q '^ID_TYPE=floppy'; then
+			match=:
+		fi
+	fi
+	# Disk partitions, but only on USB drives
+	if ! $match && [ "$TYPE" = usb-partition ]; then
+		if device_info env "$devpath" | grep -q '^ID_BUS=usb' && \
+		   device_info env "$devpath" | grep -q '^ID_TYPE=disk'; then
 			match=:
 		fi
 	fi
