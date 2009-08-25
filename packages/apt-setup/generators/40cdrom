@@ -11,8 +11,12 @@ fi
 
 remount_cd() {
 	if [ "$ROOT" ] && [ ! -d /hd-media ]; then
+		fs=iso9660
+		if db_get cdrom-detect/cdrom_fs && [ "$RET" ]; then
+			fs="$RET"
+		fi
 		db_get cdrom-detect/cdrom_device
-		$logoutput mount -t iso9660 -o ro,exec $RET /cdrom || true
+		$logoutput mount -t "$fs" -o ro,exec $RET /cdrom || true
 	fi
 }
 

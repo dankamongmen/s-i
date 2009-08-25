@@ -29,5 +29,9 @@ while ! check_id; do
 	db_go || exit 10
 done
 
+fs=iso9660
+if db_get cdrom-detect/cdrom_fs && [ "$RET" ]; then
+	fs="$RET"
+fi
 db_get cdrom-detect/cdrom_device
-$logoutput mount -t iso9660 -o ro,exec $RET /cdrom
+$logoutput mount -t "$fs" -o ro,exec $RET /cdrom
