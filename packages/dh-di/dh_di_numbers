@@ -22,9 +22,10 @@ Within each directory, there should be a C<_numbers> file in which each line
 contains at least two space-separated fields. The first field in each line
 is a two-digit number, which will be prefixed to the entry name to provide
 ordering within the directory; the second is the entry name, which must
-correspond to a file or directory alongside the C<_numbers> file; and third
-and subsequent fields, if present, are more two-digit numbers which will be
-used to construct symlinks to the same entry.
+correspond to a file or directory alongside the C<_numbers> file; and the
+third field, if present, is another two-digit number which identifies
+another entry with the same entry name to which this entry should be a
+symlink.
 
 Files named debian/package.di-numbers list the directories to install into
 each package and the directory they should be installed to. The format is a
@@ -62,14 +63,17 @@ sub install_dir {
 	doit("install", "-d", $dest);
 
 	my %numbers;
+	my %links;
 	local (*NUMBERS, $_);
 	if (open NUMBERS, "$dir/_numbers") {
 		while (<NUMBERS>) {
 			my @fields = split;
-			next if @fields < 2;
-			$numbers{$fields[1]} = [$fields[0]];
-			if (@fields > 2) {
-				push @{$numbers{$fields[1]}}, @fields[2..-1];
+			if (@fields < 2) {
+				next;
+			} elsif (@fields == 2) {
+				push @{$numbers{$fields[1]}}, $fields[0];
+			} else {
+				push @{$links{$fields[1]}}, [@fields[0, 2]];
 			}
 		}
 	}
@@ -79,14 +83,19 @@ sub install_dir {
 		my $base = basename($file);
 		next if $base eq "_numbers";
 		if (exists $numbers{$base}) {
-			doit("cp", "-r", $file,
-			     "$dest/$numbers{$base}[0]$base");
-			for my $link (@{$numbers{$base}}[2..-1]) {
-				doit("ln", "-s", "$link$base",
-				     "$dest/$numbers{$base}$base");
+			for my $number (@{$numbers{$base}}) {
+				doit("cp", "-r", $file,
+				     "$dest/$number$base");
 			}
 		} else {
 			doit("cp", "-r", $file, "$dest/$base");
+		}
+		if (exists $links{$base}) {
+			for my $linkpair (@{$links{$base}}) {
+				my ($link, $target) = @$linkpair;
+				doit("ln", "-s", "$target$base",
+				     "$dest/$link$base");
+			}
 		}
 	}
 }
