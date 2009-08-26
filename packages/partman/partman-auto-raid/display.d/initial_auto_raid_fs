@@ -29,16 +29,25 @@ fix_raid_fs() {
 	fi
 	cd $id
 
-	if [ "$fstype" = swap ]; then
-		rm -f filesystem mountpoint use_filesystem options
+	case "$fstype" in
+	    swap)
+		rm -rf filesystem mountpoint use_filesystem options
 		echo swap >method
-	else
+		;;
+	    lvm)
+		# Register this RAID as a PV for initial_auto_raid_lvm
+		rm -rf filesystem mountpoint use_filesystem options format
+		echo lvm >method
+		echo "/dev/md$raidnum" >>/var/lib/partman/initial_auto_raid_pvs
+		;;
+	    *)
 		echo "$fstype" >filesystem
 		echo "$mountpoint" >mountpoint
 		echo format >method
 		touch use_filesystem
 		mkdir options
-	fi
+		;;
+	esac
 	touch format
 	touch formatable
 
@@ -50,6 +59,7 @@ if [ ! -f /var/lib/partman/do_initial_auto_raid_fs ]; then
 	exit 0
 fi
 rm /var/lib/partman/do_initial_auto_raid_fs
+rm -f /var/lib/partman/initial_auto_raid_pvs
 
 # Check we have the stashed value of the first RAID dev we created
 db_get partman-auto-raid/raidnum

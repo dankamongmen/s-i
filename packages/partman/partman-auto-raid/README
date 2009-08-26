@@ -23,3 +23,64 @@ ignored).
 
 -- Simon Huggins <huggie@earth.li>
 sponsored by Black Cat Networks http://www.blackcatnetworks.co.uk/
+
+It is also possible to preseed LVM over RAID.  The following example will
+create a RAID 1 setup on two hard drives with:
+
+  /dev/md0 as /boot (ext3)
+  /dev/md1 as a LVM physical volume
+  /dev/mapper/<hostname>-root as / (ext3)
+  /dev/mapper/<hostname>-swap_1 as swap
+  /dev/mapper/<hostname>-home as /home (ext3)
+
+--- 8< ---
+d-i partman-auto/method string raid
+
+d-i partman-auto/disk string /dev/sda /dev/sdb
+
+d-i partman-auto-raid/recipe string			\
+	1 2 0 ext3 /boot				\
+		/dev/sda1#/dev/sdb1			\
+	.						\
+	1 2 0 lvm -					\
+		/dev/sda5#/dev/sdb5			\
+	.
+
+# Please note that RAID partitions are tagged as "lvmignore"
+# and LVM logical volumes as "defaultignore" and "lvmok".
+d-i partman-auto/expert_recipe string			\
+	multiraid ::					\
+		100 512 256 raid			\
+			$lvmignore{ }			\
+			$primary{ }			\
+			method{ raid }			\
+		.					\
+		900 5000 4000 raid			\
+			$lvmignore{ }			\
+			method{ raid }			\
+		.					\
+		700 5000 4000 ext3			\
+			$defaultignore{ }		\
+			$lvmok{ }			\
+			method{ format }		\
+			format{ }			\
+			use_filesystem{ }		\
+			filesystem{ ext3 }		\
+			mountpoint{ / }			\
+		.					\
+		64 512 300% linux-swap			\
+			$defaultignore{ }		\
+			$lvmok{ }			\
+			method{ swap }			\
+			format{ }			\
+		.					\
+		100 1000 1000000000 ext3		\
+			$defaultignore{ }		\
+			$lvmok{ }			\
+			method{ format }		\
+			format{ }			\
+			use_filesystem{ }		\
+			filesystem{ ext3 }		\
+			mountpoint{ /home }		\
+		.
+--- >8 ---
