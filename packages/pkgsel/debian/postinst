@@ -90,6 +90,8 @@ else
 	sleep 2 # allow the message to be seen
 
 	log "checking for (security) updates to the base system"
+	# Exclude Recommends to avoid installing new packages as part of
+        # an upgrade.
 	in-target sh -c "debconf-apt-progress --from 50 --to 100 --logstderr -- aptitude -q --without-recommends -y -o DPkg::options=--force-confnew '$upgrade_type'" || aptfailed
 	tasksel_start=100
 fi
@@ -142,12 +144,10 @@ log "starting tasksel"
 db_progress INFO pkgsel/progress/tasksel
 in-target sh -c "tasksel --new-install --debconf-apt-progress='--from $tasksel_start --to $tasksel_end --logstderr'" || aptfailed
 
-db_get pkgsel/include/install-recommends
-if [ "$RET" = true ]; then
-	recommends=
-else
-	recommends='--without-recommends'
+if db_get pkgsel/include/install-recommends; then
+	log "The template pkgsel/include/install-recommends is no longer used; please use base-installer/recommends instead"
 fi
+
 db_get pkgsel/include
 if [ "$RET" ]; then
 	log "installing additional packages"
@@ -155,7 +155,7 @@ if [ "$RET" ]; then
 	# Allow comma-separation so that this can more easily be preseeded
 	# at the kernel command line.
 	RET="$(printf '%s' "$RET" | sed 's/,/ /g')"
-	in-target sh -c "debconf-apt-progress --from 900 --to 950 --logstderr -- aptitude -q $recommends -y install -- $RET" || aptfailed
+	in-target sh -c "debconf-apt-progress --from 900 --to 950 --logstderr -- aptitude -q -y install -- $RET" || aptfailed
 fi
 
 log "finishing up"
