@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 58440 -->
+<!-- original version: 59771 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booten per TFTP</title>
 
@@ -19,7 +19,7 @@
 
 &boot-installer-intro-firmware.xml;
 
-   <sect3 arch="arm" id="boot-firmware-nslu2"><title>Den NSLU2 booten</title>
+   <sect3 arch="arm" id="boot-firmware-nslu2"><title>Booten des NSLU2</title>
 <para>
 
 Es gibt drei Wege, die Installer-Firmware in das Flash zu bekommen:
@@ -114,5 +114,123 @@ Hilfsprogramm</ulink> für Windows, um die Firmware über das Netzwerk zu aktual
 
 </para>
     </sect4>
+   </sect3>
+
+   <sect3 arch="arm" id="boot-firmware-ss4000e">
+   <title>Booten des SS4000-E</title>
+<para>
+
+Aufgrund von Einschränkungen in der SS4000-E-Firmware ist es derzeit
+unglücklicherweise nicht möglich, den Installer ohne Verwendung eines
+seriellen Ports zu booten. Um den Installer zu booten, benötigen Sie
+ein serielles Nullmodem-Kabel, einen Rechner mit einem seriellen
+Port<footnote id="arm-s4ke-port">
+
+<para>
+Ein USB-Seriell-Converter funktioniert auch.
+</para>
+
+</footnote> und ein Flachbandkabel mit einem männlichen DB9-Anschluß
+auf der einen und einem 10-poligen .1" IDC-Stecker auf der anderen
+Seite<footnote id="arm-s4k-rib">
+
+<para>
+Solch ein Kabel findet sich oft in älteren Desktop-Rechnern mit
+eingebauten 9-poligen Anschlüssen für die seriellen Ports.
+</para>
+
+</footnote>.
+
+</para><para>
+
+Um den SS4000-E zu booten, laden Sie zunächst das von Debian bereitgestellte
+Firmware-Image (ss4000e.pkg) über das Web-Interface des SS4000-E (gehen
+Sie auf <quote>Administration</quote>, dann auf <quote>Firmware</quote>
+und laden Sie dann das Image hoch). Als Nächstes verwenden Sie Ihr
+Nullmodem-Kabel und das Flachbandkabel, um sich mit dem seriellen Anschluß
+des SS4000-E zu verbinden und starten Sie die Maschine neu. Sie müssen
+ein serielles Terminal-Programm benutzen, um mit dem Rechner zu kommunizieren;
+auf Debian GNU/Linux-Systemen ist es eine gute Wahl, das Programm
+<command>cu</command> aus dem gleichnamigen Paket zu verwenden.
+Angenommen, der serielle Port auf Ihrem Rechner ist
+<filename>/dev/ttyS0</filename>, benutzen Sie folgende Befehlszeile:
+
+</para>
+
+<informalexample><screen>
+cu -lttyS0 -s115200
+</screen></informalexample>
+
+<para>
+
+Wenn Sie Windows verwenden, sollten Sie vielleicht das Programm
+<classname>hyperterminal</classname> nutzen. Wählen Sie eine
+Baudrate von 115200, 8 Bit Wortlänge, kein Stopbit und ein Parity-Bit.
+
+</para><para>
+
+Beim Starten der Maschine werden Sie folgende Ausgabe sehen:
+
+</para>
+
+<informalexample><screen>
+No network interfaces found
+
+EM-7210 ver.T04 2005-12-12 (For ver.AA)
+== Executing boot script in 1.000 seconds - enter ^C to abort
+</screen></informalexample>
+
+<para>
+
+Drücken Sie an diesem Punkt Strg-C, um den Bootloader zu 
+unterbrechen<footnote id="arm-s4ke-sec">
+
+<para>
+Beachten Sie, dass Sie dazu nur eine Sekunde Zeit haben; falls Sie dies
+Zeitfenster verpasst haben, trennen Sie kurz die Stromzufuhr des Rechners und
+versuchen Sie es nach dem Start erneut.
+</para>
+
+</footnote>. Sie kommen jetzt zum RedBoot-Prompt. Geben Sie folgenden Befehl
+ein:
+
+</para>
+
+<informalexample><screen>
+fconfig boot_script_data
+</screen></informalexample>
+
+<para>
+
+RedBoot wartet jetzt darauf, dass Sie das Boot-Skript eingeben. Stellen Sie
+sicher, dass Sie <emphasis>exakt</emphasis> folgendes eintippen:
+
+</para>
+
+<informalexample><screen>
+fis load ramdisk.gz
+fis load zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+<para>
+
+Beenden Sie das Skript mit einer leeren Zeile und drücken Sie bei der
+Eingabeaufforderung <quote>y</quote>, um die nicht-flüchtige Konfiguration
+zu aktualisieren. Führen Sie zu guter Letzt einen <quote>Reset</quote>
+durch, um das System neu zu starten, und erlauben Sie ihm, normal zu
+booten. Der Installer sollte nun wie üblich erscheinen. Sie können Debian
+entweder über den seriellen Anschluß installieren oder Sie nutzen einen
+SSH-Klient, um sich mittels SSH zu verbinden.
+
+</para><para>
+
+Beachten Sie, dass es nicht nötig ist, nach der Installation das
+Boot-Skript zu aktualisieren. Das System wird so konfiguriert, dass die
+Informationen zur root-Festplatte aus der Systemkonfiguration bezogen
+werden und nicht von der Kernel-Kommandozeile. Allerdings schadet es auch
+nicht, das Boot-Skript an die neue Situation anzupassen.
+
+</para>
    </sect3>
   </sect2>
