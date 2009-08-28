@@ -105,16 +105,16 @@ int isdefault(di_system_package *p) {
 }
 
 /*
- * Menu items with a number equal to 99999 or 99900 (deprecated) are
- * intended only to be shown during package selection in anna, but not
- * in the main menu, so mark them uninstallable.
+ * Menu items with a number equal to 99999 are intended only to be shown
+ * during package selection in anna, but not in the main menu, so mark
+ * them uninstallable.
  * For other packages, run the isinstallable maintainer script and check
  * its return code.
  */
 bool isinstallable(di_system_package *p) {
 	int check;
 
-	if ((p->installer_menu_item == 99999) || (p->installer_menu_item == 99900))
+	if (p->installer_menu_item == 99999)
 		return false;
 
 	check = di_system_dpkg_package_control_file_exec(&p->p, "isinstallable", 0, NULL);
