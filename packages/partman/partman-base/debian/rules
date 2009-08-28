@@ -1,11 +1,7 @@
-#!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
-# GNU copyright 1997 to 1999 by Joey Hess.
+#! /usr/bin/make -f
+%:
+	dh --with d-i $@
 
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
 ARCH_OS=$(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 ifeq ($(ARCH_OS),linux)
@@ -15,61 +11,16 @@ ifeq ($(ARCH_OS),kfreebsd)
 DEFAULT_FS=ufs
 endif
 
-export PACKAGE=partman-base
-
 PROVIDES=made-filesystems, mounted-partitions, partitioned-harddrives, created-fstab
 
 MENUITEMNUM=4200
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE)
-	cd test && ./conversions
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-	$(MAKE) clean
-	rm -f `find . -name '*~'`
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	# Install hooks into partman-base udeb
-	debian/install-rc choose_partition
-	debian/install-rc storage_device
-	debian/install-rc active_partition
-	debian/install-rc free_space
-	debian/install-rc init.d
-	debian/install-rc undo.d
-	debian/install-rc commit.d
-	debian/install-rc finish.d
-	debian/install-rc update.d
-	debian/install-rc visual.d
-	debian/install-rc display.d
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_install
+override_dh_installdebconf:
 	dh_installdebconf
 	sed -i '/^Template: partman\/default_filesystem/,/^$$/s/^Default: .*/Default: $(DEFAULT_FS)/' \
-		debian/${PACKAGE}/DEBIAN/templates
-	cp debian/isinstallable debian/${PACKAGE}/DEBIAN/
-	dh_strip
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
+		debian/partman-base/DEBIAN/templates
+
+# TODO: This is a bit gratuitous since all the "variables" are constant
+# right now. Do we still need this flexibility?
+override_dh_gencontrol:
 	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM) -Vprovides='$(PROVIDES)'
-	dh_builddeb
-
-binary-indep: build install
-
-binary: binary-indep binary-arch
-
-.PHONY: build clean binary-indep binary-arch binary install
