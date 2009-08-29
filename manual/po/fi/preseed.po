@@ -1,12 +1,12 @@
 # Debian Installation Guide preseed.
-# Tapio Lehtonen <tale@debian.org>, 2006, 2008.
+# Tapio Lehtonen <tale@debian.org>, 2006, 2008, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-07-26 00:13+0000\n"
-"PO-Revision-Date: 2008-12-03 12:55+0200\n"
+"PO-Revision-Date: 2009-08-29 11:18+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -743,7 +743,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:461
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The <literal>auto</literal> boot label is not yet defined on all "
 #| "architectures. The same effect may be achieved by simply adding the two "
@@ -764,16 +764,7 @@ msgid ""
 "while <literal>priority</literal> is an alias for <literal>debconf/priority</"
 "literal> and setting it to <literal>critical</literal> stops any questions "
 "with a lower priority from being asked."
-msgstr ""
-"Käynnistysnimiötä <literal>auto</literal> ei vielä ole määritelty kaikille "
-"prosessoriperheille. Sama vaikutus saadaan käyttämällä parametreja "
-"<literal>auto=true priority=critical</literal> yhtä aikaa ytimen "
-"komentorivillä. <literal>auto</literal> on lyhennysmerkintä <literal>auto-"
-"install/enable</literal>:lle ja vaikuttaa maa-asetuston ja näppäimistön "
-"kysymysten viivästämiseen kunnes niihin on saatu haettua valmiit vastaukset, "
-"kun taas <literal>priority</literal> on lyhennysmerkintä <literal>debconf/"
-"priority</literal>:lle ja sen asettaminen arvoon <literal>critical</literal> "
-"estää kaikkia alhaisemman prioriteetin kysymykset."
+msgstr "Käynnistysnimiötä <literal>auto</literal> ei vielä ole määritelty kaikialla. Sama vaikutus saadaan lisäämällä parametrit <literal>auto=true priority=critical</literal> ytimen komentoriville. <literal>auto</literal> on lyhennysmerkintä <literal>auto-install/enable</literal>:lle ja arvolla <literal>true</literal> maa-asetuston ja näppäimistön kysymistä viivästetään kunnes niihin on saatu haettua valmiit vastaukset, kun taas <literal>priority</literal> on lyhennysmerkintä <literal>debconf/priority</literal>:lle ja sen asettaminen arvoon <literal>critical</literal> estää kaikkia alhaisemman prioriteetin kysymykset."
 
 #. Tag: para
 #: preseed.xml:475
@@ -1417,7 +1408,7 @@ msgstr "Seuraavat debconf-muuttujat vaikuttavat verkon asetuksiin."
 
 #. Tag: screen
 #: preseed.xml:762
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# netcfg will choose an interface that has link if possible. This makes "
 #| "it\n"
@@ -1517,6 +1508,11 @@ msgid ""
 "# change to false to disable asking.\n"
 "#d-i hw-detect/load_firmware boolean true"
 msgstr ""
+"# Poista käytöstä verkkoasetusten teko kokonaan. Tästä on hyötyä \n"
+"# asennettaessa rompulta verkkoyhteydettömässä koneessa jossa \n"
+"# kysymykset verkosta, varoitus ja pitkät aikakatkaisut ovat riesaksi\n"
+"#d-i netcfg/enable boolean false\n"
+"\n"
 "# netcfg valitsee liitännän jossa linkkivalo palaa, mikäli mahdollista.\n"
 "# Tällöin ohitetaan luettelon näyttäminen jos liitäntöjä on \n"
 "# enemmmän kuin yksi.\n"
@@ -1586,10 +1582,10 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:780
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Network configuration"
 msgid "Network console"
-msgstr "Verkkoasetukset"
+msgstr "Pääteyhteys verkon kautta"
 
 #. Tag: screen
 #: preseed.xml:782
@@ -1748,7 +1744,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:844
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1907,8 +1903,7 @@ msgstr ""
 "\n"
 "# Tai käytä omaa mallia...\n"
 "# Mallin syntaksi on kuvattu tiedostossa devel/partman-auto-recipe.txt\n"
-"# Jos mallitiedosto saadaan d-i:n saataville, siihen voidaan viitata "
-"suoraan.\n"
+"# Jos mallitiedosto saadaan d-i:n saataville, siihen voidaan viitata suoraan.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
 "\n"
 "# Jos ei saada, voidaan koko malli pistää valmiiden vastausten tiedostoon\n"
@@ -1933,7 +1928,7 @@ msgstr ""
 "\n"
 "# Tämä saa partman-moduulin tekemään osiot automaattisesti ilman\n"
 "# varmistuksia, jos sille määritettiin yksi yllä olevista tavoista.\n"
-"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman-partitioning/confirm_write_new_label boolean true\n"
 "d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
@@ -1977,7 +1972,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:870
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
 #| "carefully\n"
@@ -2082,7 +2077,7 @@ msgstr ""
 "#d-i partman-auto/method string raid\n"
 "# Määritä osioitavat levyt. Niihin tulee kaikkin sama osiointi,\n"
 "# joten tämä toimii vain jos levyt ovat samankokoisia.\n"
-"#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc\n"
+"#d-i partman-auto/disk string /dev/sda /dev/sdb\n"
 "\n"
 "# Seuraavaksi on määritettävä käytettävä fyysinen osiointi.\n"
 "#d-i partman-auto/expert_recipe string \\\n"
@@ -2101,24 +2096,23 @@ msgstr ""
 "# RAID-pakassa. Muista käyttää oikeita osioiden numeroita loogisille\n"
 "# osioille.\n"
 "# Parametrit ovat:\n"
-"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
-"mountpoint&gt; \\\n"
+"# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \\\n"
 "#          &lt;devices&gt; &lt;sparedevices&gt;\n"
 "# RAID tasot 0, 1, 5, 6 ja 10 on tuettu; laitteiden erottimena on \"#\"\n"
 "#d-i partman-auto-raid/recipe string \\\n"
 "#    1 2 0 ext3 /                                           \\\n"
-"#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \\\n"
+"#          /dev/sda1#/dev/sdb1    \\\n"
 "#    .                                                      \\\n"
 "#    1 2 0 swap -                                           \\\n"
-"#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \\\n"
+"#          /dev/sda5#/dev/sdb5    \\\n"
 "#    .                                                      \\\n"
 "#    0 2 0 ext3 /home                                       \\\n"
-"#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \\\n"
+"#          /dev/sda6#/dev/sbb6    \\\n"
 "#    .\n"
 "\n"
 "# Tämä saa partmanin tekemään osiot automaattisesti kysymättä vahvistusta.\n"
 "d-i partman-md/confirm boolean true\n"
-"d-i partman/confirm_write_new_label boolean true\n"
+"d-i partman-partitioning/confirm_write_new_label boolean true\n"
 "d-i partman/choose_partition select finish\n"
 "d-i partman/confirm boolean true"
 
@@ -2522,7 +2516,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1034
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2572,6 +2566,10 @@ msgstr ""
 "\n"
 "# Asennetaan yksittäisiä lisäpaketteja\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
+"# Vakiona ei asenneta paketteja joita pkgsel/include:n asentamat\n"
+"# paketit vain suosittelevat (riippuvuuksissa olevat paketit asennetaan).\n"
+"# Poista tästä rivistä kommentti ja suositellutkin asennetaan.\n"
+"#d-i pkgsel/include/install-recommends boolean true\n"
 "# Päivitetäänkö paketit debootstrapin jälkeen.\n"
 "# Sallitus arvot: none, safe-upgrade, full-upgrade\n"
 "#d-i pkgsel/upgrade select none\n"
