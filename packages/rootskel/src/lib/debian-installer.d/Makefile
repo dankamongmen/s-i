@@ -36,5 +36,9 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	S20speakup \
 	S40term-linux
 endif
+ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
+  files += \
+  	S40term-kfreebsd
+endif
 
 include ../../../Makefile.inc
