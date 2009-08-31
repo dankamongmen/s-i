@@ -22,7 +22,7 @@
 
 # Initialize some variables.
 PACKAGE_NAME=di-netboot-assistant
-PACKAGE_VERSION=0.36c
+PACKAGE_VERSION=0.37
 OFFLINE=
 DEBUG=
 DISOURCELIST=/etc/di-netboot-assistant/di-sources.list
@@ -34,6 +34,8 @@ TFTP_ROOT=/var/lib/tftpboot
 REWRITEPKGPATH='\(debian\|ubuntu\)-installer'
 UMASKOLD=`umask -p`
 EXTRA_DL_FILES="MD5SUMS"
+DI_ARGS=
+TARGET_ARGS=
 #MIRROR_REGEXPS=# Not defined on purpose, so user can pass the variable
 umask 0022
 
@@ -65,6 +67,8 @@ Options:
   -v, --version   Print script version and exit
   --verbose       Verbose messages
   --offline       Don't download the file (simply re-extract and build menu)
+  --di-args=      DI arguments to be appended to "install" entry.
+  --target-args=  Target system boot arguments to be appended to "install".
   --arch=ARCH     A comma separated list of architecture to Install/Purge,
                   or the keyword "all". It use the current machine's
                   architecture by default (APT::Architecture).
@@ -377,6 +381,14 @@ pxelinux_version() {
 	tr -c '[:print:] ' '\n' < $1 | sed -n -r "/PXELINUX [.0-9]+/ s/^[^ ]* ([0-9^.]+).*/\1/ p" | sort -r | head -n 1
 }
 
+tweak_pxelinux_arguments() {
+	sed -e "/^[[:blank:]]*label[[:blank:]]\+install\$/I,/^\([[:blank:]]*label[[:blank:]]^+[^\(install\)]\|[[:blank:]]*\)\$/I{s!append \(.*\)--\(.*\)!append \1 $DI_ARGS -- \2 $TARGET_ARGS!}"
+}
+
+tweak_elilo_arguments() {
+	sed -e "/^[[:blank:]]*label=install\$/,/^\([[:blank:]]*label=[^\(install\)]\|[[:blank:]]*\)\$/{s!append=\"\([^\"]*\)--\([^\"]*\)*\"!append=\"\1 $DI_ARGS -- \2 $TARGET_ARGS\"!}"
+}
+
 install_repo() {
 	local pxelinuxbin
 	local pxelinuxcfg
@@ -453,6 +465,8 @@ install_repo() {
 		echo "dist=$release" >> $metadatafile
 		echo "repo=$repo" >> $metadatafile
 		echo "dl_file=$dl_file" >> $metadatafile
+		echo "di_args=$DI_ARGS" >> $metadatafile
+		echo "target_args=$TARGET_ARGS" >> $metadatafile
 	
 		echo "I: Extracting... " 1>&2
 			
@@ -504,7 +518,8 @@ install_repo() {
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
 				mv "$x" "$x.ORIG"
 				print_do-not-edit_header "$release" > "$x"
-				sed -e "s#${REWRITEPKGPATH}/$arch/#debian-installer/$release/$arch/#" < "$x.ORIG" >> "$x"
+				sed -e "s#${REWRITEPKGPATH}/$arch/#debian-installer/$release/$arch/#" "$x.ORIG" \
+					| tweak_pxelinux_arguments >> "$x"
 			done
 			menufragment="$metadatabasename.pxelinux.menu.fragment"
 			menufragment_serial9600="$metadatabasename.pxelinux.menu.serial-9600.fragment"
@@ -568,7 +583,11 @@ install_repo() {
 			echo "##" >> $menufragment
 
 			echo "# ### $release $arch ### " >> $menufragment
-			awk '/^image=/,/^$/' "${expand_dir}/elilo.conf" | sed -e "s/^[[:blank:]]*label=.*$/\0-$release-$arch/" | sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 (Lenny AMD64)\"/" >> $menufragment
+			awk '/^image=/,/^$/' "${expand_dir}/elilo.conf" \
+				| tweak_elilo_arguments \
+				| sed -e "s/^[[:blank:]]*label=.*$/\0-$release-$arch/" \
+				| sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 (Lenny AMD64)\"/" \
+				>> $menufragment
 			echo "" >> $menufragment
 		fi
 
@@ -607,6 +626,12 @@ for option in "$@"; do
 		echo "" 1>&2
 		exit 1
 	fi ;;
+    --di-args=*)
+	DI_ARGS="$DI_ARGS ${option#--di-args=}"
+	;;
+    --target-args=*)
+	TARGET_ARGS="$TARGET_ARGS ${option#--target-args=}"
+	;;
     --offline)
 	OFFLINE=yes ;;
     --verbose)
@@ -620,6 +645,11 @@ for option in "$@"; do
     --debug)
 	# This is an undocumented feature...
 	DEBUG=yes ;;
+    --di-args| --target-args)
+	echo "E: Option $option requires a value after equal sign." 1>&2
+	echo "" 1>&2
+	exit 1
+        ;;
     -*)
 	echo "E: Unrecognized option ($option)" 1>&2
 	echo "" 1>&2
