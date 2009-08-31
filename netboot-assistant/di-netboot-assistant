@@ -31,7 +31,7 @@ SYSLINUX=/usr/lib/syslinux/
 ELILO=/usr/lib/elilo/
 DL_CACHE=/var/cache/di-netboot-assistant
 STATUS_LIB=/var/lib/di-netboot-assistant
-CONFIG_DIR=/etc/di-netboot-assistant
+TEMPLATES=/etc/di-netboot-assistant
 TFTP_ROOT=/var/lib/tftpboot
 REPO_ALIAS=""
 REWRITEPKGPATH='\(debian\|ubuntu\)-installer'
@@ -136,13 +136,13 @@ update_pxelinux_menu() {
 
 	[ ! -d "pxelinux.cfg" ] && mkdir "pxelinux.cfg"
 	echo "I: Building PXE-Linux' top-menu"
-	print_do-not-edit_header "${CONFIG_DIR}/pxelinux.HEAD" > pxelinux.cfg/default
+	print_do-not-edit_header "${TEMPLATES}/pxelinux.HEAD" > pxelinux.cfg/default
 	if [ -n "$(find "$TFTP_ROOT/debian-installer" -type d -name pxelinux.cfg.serial-9600 2>/dev/null)" ]; then
 		cp pxelinux.cfg/default pxelinux.cfg/default.serial-9600
 	else
 		[ -f "pxelinux.cfg/default.serial-9600" ] && rm pxelinux.cfg/default.serial-9600
 	fi
-	[ -f ${CONFIG_DIR}/pxelinux.HEAD ] && grep -Ev "^##" ${CONFIG_DIR}/pxelinux.HEAD >> pxelinux.cfg/default
+	[ -f ${TEMPLATES}/pxelinux.HEAD ] && grep -Ev "^##" ${TEMPLATES}/pxelinux.HEAD >> pxelinux.cfg/default
 
 	i=0
 	for x in $(ls "${STATUS_LIB}/"*.pxelinux.menu.fragment 2>/dev/null ); do
@@ -155,7 +155,7 @@ update_pxelinux_menu() {
 	i=0
 	if [ -f "pxelinux.cfg/default.serial-9600" ]; then
 		i=$(($i + 1))
-		[ -f ${CONFIG_DIR}/pxelinux.HEAD ] && cat ${CONFIG_DIR}/pxelinux.HEAD >> pxelinux.cfg/default.serial-9600
+		[ -f ${TEMPLATES}/pxelinux.HEAD ] && cat ${TEMPLATES}/pxelinux.HEAD >> pxelinux.cfg/default.serial-9600
 		for x in "${STATUS_LIB}/"*pxelinux.menu.serial-9600.fragment ; do
 			grep -Ev "^##" "$x" >> pxelinux.cfg/default.serial-9600
 			echo "" >> pxelinux.cfg/default.serial-9600
@@ -171,8 +171,8 @@ update_pxelinux_menu() {
 
 update_elilo_menu() {
 	echo "I: Building Elilo's top-menu"
-	print_do-not-edit_header "${CONFIG_DIR}/elilo.HEAD" > elilo.conf
-	[ -f ${CONFIG_DIR}/elilo.HEAD ] && grep -Ev "^##" "${CONFIG_DIR}/elilo.HEAD" >> elilo.conf
+	print_do-not-edit_header "${TEMPLATES}/elilo.HEAD" > elilo.conf
+	[ -f ${TEMPLATES}/elilo.HEAD ] && grep -Ev "^##" "${TEMPLATES}/elilo.HEAD" >> elilo.conf
 
 	i=0
 	for x in $(ls "${STATUS_LIB}/"*.elilo.conf.fragment 2>/dev/null ); do
