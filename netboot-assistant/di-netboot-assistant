@@ -604,6 +604,8 @@ MV_VERBOSITY=
 CP_VERBOSITY=
 TAR_VERBOSITY=
 ARCH=
+ACTION=
+COUNT=0
 
 if which apt-config > /dev/null 2>&1 ; then
 	ARCH=
@@ -655,6 +657,18 @@ for option in "$@"; do
 	echo "" 1>&2
 	exit 1
 	;;
+    rebuild-menu|install|purge)
+	#Actions are processed in the loop below
+    	if [ "$ACTION" ]; then
+		echo "E: Unexpected command '$option'. '$ACTION' was already specified." 1>&2
+		echo "" 1>&2
+		exit 1
+	fi
+	ACTION=$option
+	;;
+    *)
+	COUNT=$(( $COUNT + 1 ))
+	;;
     esac
 done
 
@@ -664,6 +678,26 @@ cd "$TFTP_ROOT/debian-installer"
 check_di_source_list
 releases="$(grep -vE '^#' "$DISOURCELIST" | cut -f 1 | sort -u | tr "\n" " " | sed -e 's/^[[:blank:]]\+//' )"
 
+case "$ACTION" in
+    rebuild-menu)
+        if [ $COUNT -ne 0 ]; then
+        	echo "E: Unexpected argument after command '$ACTION'." 1>&2
+        	echo "" 1>&2
+        	exit 1
+	fi
+        ;;
+    *)
+        if [ $COUNT -eq 0 ]; then
+        	echo "E: No repository name was passed for '$ACTION'." 1>&2
+        	[ ! "$OFFLINE" -a "$ACTION" = "install" ] && echo "I: Declared repositories are: $releases" 1>&2
+        	[ "$ACTION" = "purge" ] && echo "I: Installed repositories are: $( cd /var/lib/di-netboot-assistant/ ; ls | sed -e 's/--.*//' | sort -u | tr "\n" " " )" 1>&2
+        	echo "" 1>&2
+        	exit 1
+        fi
+        ;;
+esac
+
+
 ACTION=
 COUNT=0
 for option in "$@"; do
@@ -672,12 +706,6 @@ for option in "$@"; do
     	# Ignore options on this pass
     	;;
     install|purge)
-    	if [ "$ACTION" ]; then
-		echo "E: Unexpected command '$option'. '$ACTION' was already specified." 1>&2
-		echo "" 1>&2
-		exit 1
-	fi
-
 	ACTION=$option
 	;;
     rebuild-menu)
@@ -710,20 +738,6 @@ if [ "$ACTION" = "" ]; then
 	usage 1>&2
 	exit 1
 fi
-
-case "$ACTION" in
-    rebuild-menu)
-        ;;
-    *)
-        if [ $COUNT -eq 0 ]; then
-        	echo "E: No repository name was passed for '$ACTION'." 1>&2
-        	[ ! "$OFFLINE" -a "$ACTION" = "install" ] && echo "I: Declared repositories are: $releases" 1>&2
-        	[ "$ACTION" = "purge" ] && echo "I: Installed repositories are: $( cd /var/lib/di-netboot-assistant/ ; ls | sed -e 's/--.*//' | sort -u | tr "\n" " " )" 1>&2
-        	echo "" 1>&2
-        	exit 1
-        fi
-        ;;
-esac
 
 $UMASKOLD
 export UMASKOLD=
