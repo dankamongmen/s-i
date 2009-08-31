@@ -249,9 +249,55 @@ Using dnsmasq
         di-netboot-assistant install lenny
 
 
+RUNNING AS NON-ROOT
+    It is possible to run di-netboot-assistant as non root. There is actually
+    two ways to acheive that:
+
+  * Delegate to a group (that manage the system wide netboot images)
+
+        In this case, we want to delegate the management of netboot files
+        to one or more people that don't have access to root account.
+
+        Create a group and add those user to the group
+            addgroup dina-admin
+            adduser johndoe dina-admin
+
+        Purge the package (and existing files that are owned by root !).
+            # Note : you will loose existing configuration file!
+            apt-get purge di-netboot-assistant
+
+        Allow that group to modify the files
+            # note: the four lines below are on single command.
+            for dir in /var/cache/di-netboot-assistant \
+                /var/lib/di-netboot-assistant \
+                /var/lib/tftpboot/; do
+                dpkg-statoverride --update --add root dina-admin 2775 $dir
+            done
+
+            # add the following line in di-netboot-assistant.conf, so
+            # so new file are writable by other members of the group.
+            umask 0002
+
+            # Do not grant write permission on di-netboot-assistant.conf to
+            # anybody but root. This would lead to privilege escalation since
+            # the configuration file are executed (sourced) by the script.
+
+        Reinstall the package
+            apt-get install di-netboot-assistant
+
+  * Per-user tftpboot
+        It is possible to have per user configuration files and repositories.
+        The user just have to create a configuration file in
+           ~/.di-netboot-assistant/di-netboot-assistant.conf
+        and configure it. A sample file is provided in
+           /usr/share/doc/di-netboot-assistant/examples/peruser.di-netboot-assistant.conf
+
+  * Sudo
+        Do *NOT* use di-netboot-assistant with sudo.
+        Allowing sudo execution of di-netboot-assistant allows one to 
+        become root (because the sudoer can edit ~/.di-netboot-assistant/*)
+
 TODO:
-    - Allow to specify location of extraction.
-    - Allow to be invoked from non-root user (or explain dpkg-statoverride).
     - Allow to specify alternate name for repository (save 'daily' as '$date')
     - support non pxelinux platforms (yaboot powerpc, mips
       sb1-bcm91250a/sb1a-bcm91480b)
