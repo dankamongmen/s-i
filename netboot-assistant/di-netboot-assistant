@@ -40,7 +40,7 @@ EXTRA_DL_FILES="MD5SUMS"
 DI_ARGS=
 TARGET_ARGS=
 #MIRROR_REGEXPS=# Not defined on purpose, so user can pass the variable
-umask 0022
+umask $(umask | sed -e 's/.$/2/')              # files must be public.
 
 if [ -f "$HOME/.di-netboot-assistant/di-netboot-assistant.conf" ]; then
 	. "$HOME/.di-netboot-assistant/di-netboot-assistant.conf"
