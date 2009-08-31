@@ -80,7 +80,7 @@ Options:
   --alias=NAME    Rename the downloaded repository (optional).
   --arch=ARCH     A comma separated list of architecture to Install/Purge,
                   or the keyword "all". It use the current machine's
-                  architecture by default (APT::Architecture).
+                  architecture by default.
 
 See the $PACKAGE_NAME(1) manual page for more information.
 XXX
@@ -715,8 +715,7 @@ ACTION=
 COUNT=0
 
 if which apt-config > /dev/null 2>&1 ; then
-	ARCH=
-	eval $(apt-config shell ARCH APT::Architecture )
+	ARCH="$(dpkg --print-architecture)"
 fi
 
 for option in "$@"; do
