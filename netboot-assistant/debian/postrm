@@ -3,6 +3,7 @@
 
 set -e
 DL_CACHE=/var/cache/di-netboot-assistant/
+STATUS_LIB=/var/lib/di-netboot-assistant
 
 #This function should be kept in sync with function "uninstall_repo" in di-netboot-assistant
 uninstall_repo() {
@@ -69,10 +70,10 @@ remove_repocache() {
 
 case "$1" in
     purge)
-    	if [ -d /var/lib/di-netboot-assistant ]; then
+    	if [ -d ${STATUS_LIB} ]; then
 
 		[ -z "$SYSLINUXMENU" ] && SYSLINUXMENU=menu.c32
-		for x in $( find /var/lib/di-netboot-assistant -type f -name '*.conf' ) ; do
+		for x in $( find ${STATUS_LIB} -type f -name '*.conf' ) ; do
 			uninstall_repo "$x"
 		done
 
