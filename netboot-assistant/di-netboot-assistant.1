@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH DI-NETBOOT-ASSISTANT "1" "May 2008" "Franklin Piat" "User Commands"
+.TH DI-NETBOOT-ASSISTANT "1" "August 2009" "Frank Lin Piat" "User Commands"
 .\" disable hyphenation
 .nh
 .\" disable justification (adjust text to left margin only)
@@ -36,12 +36,13 @@ uncache will clean the cached files for the given netboot image. You must specif
 purge
 .RS 4
 purge is followed by a repository name desired for installation\&. \fIpurge\fR is identical to running \fIuninstall\fR then \fIuncache\fR for a given repository.
-.SH "OPTIONS"
+.RE
 .PP
 rebuild-menu
 .RS 4
-rebuild-menu will rebuild the to level menu. It's only usefull if you have installed some client images that have such top level menu (like i386, amd64 and ia64). This command takes no argument.
+rebuild-menu will rebuild the top level menu. It's only usefull if you have modified \fIdi-netboot-assistant.conf\fR and you are using some client images that have top level menu (like i386, amd64 and ia64). This command takes no argument.
 .RE
+.SH "OPTIONS"
 .PP
 \fB\-h\fR, \fB\-\-help\fR
 Print this message and exit
@@ -59,13 +60,63 @@ Specify the architecture you want to install or purge. The architecture you can 
 Verbose messages
 .TP
 \fB\-\-di-args=\fR"\fB\fIARGS\fR\fR"
-Debian-Installer boot arguments. The specified arguments will be *appended* to the one provided in the downloaded image, before the "--". (You can also define DI_ARGS in /etc/di-netboot-assistant/di-netboot-assistant.conf).
+Debian-Installer boot arguments. The specified arguments will be *appended* to the one provided in the downloaded image, before the "--". (You can also define \fBDI_ARGS=\fR in \fBdi-netboot-assistant.conf\fR).
 .TP
 \fB\-\-target\-args=\fR"\fB\fIARGS\fR\fR"
-Boot arguments for the target (installed) system. The specified arguments will be *appended* to the one provided in the downloaded image, at the very end of the line. (You can also define TARGET_ARGS in /etc/di-netboot-assistant/di-netboot-assistant.conf).
+Boot arguments for the target (installed) system. The specified arguments will be *appended* to the one provided in the downloaded image, at the very end of the line. (You can also define \fBTARGET_ARGS=\fR in \fBdi-netboot-assistant.conf\fR).
 .TP
 \fB\-\-offline\fR
-Don't download the file (simply re\-extract and build menu)
+Don't download the files (use the files cached previously).
+.RE
+.SH EXAMPLES
+
+To install a netboot image for the \fIstable\fR repository, for the default architecture.
+.br
+\fB	di-netboot-assistant install stable\fP
+.br
+
+To list the installed netboot image that can removed.
+.br
+\fB	di-netboot-assistant purge\fP
+.br
+
+To remove a netboot image for the \fIstable\fR repository, for the default architecture.
+.br
+\fB	di-netboot-assistant purge stable\fP
+.br
+
+
+.
+.SH FILES
+.PP
+\fB/etc/di-netboot-assistant/di-netboot-assistant.conf\fR
+.RS 4
+The default system-wide configuration file. The file syntax must be bash(1) compatible.
+.RE
+.PP
+\fB/etc/di-netboot-assistant/di-sources.list\fR
+.RS 4
+This file contains the list of downloadable netboot images.
+.RE
+.PP
+\fB/etc/di-netboot-assistant/pxelinux.HEAD\fR
+.RS 4
+The content of this file is prepended to the generated PXELinux config file (i.e boot menu). PXELinux bootloader is used on BIOS based i386 and amd64 systems.
+.RE
+.PP
+\fB/etc/di-netboot-assistant/elilo.HEAD\fR
+.RS 4
+The content of this file is prepended to the generated Elilo config file (i.e boot menu). Elilo bootloader is used on EFI based systems like ia64 and a few i386 systems.
+.RE
+.PP
+\fB/var/lib/di-netboot-assistant/\fR
+.RS 4
+The folder where hints about installed netboot images are stored. Do not edit those files, re-use \fBinstall\fR to modify the settings of installed image.
+.RE
+.PP
+\fB/var/cache/di-netboot-assistant/\fR
+.RS 4
+The folder where downloaded files are stored (cached) before "installing" them. Use the action \fBuncache\fR to remove cached files.
 .RE
 .SH PROXY
 di-netboot-assistant uses wget or curl to actually download the files. You can set the environnement variables accordingly.
