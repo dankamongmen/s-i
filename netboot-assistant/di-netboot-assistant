@@ -31,6 +31,7 @@ SYSLINUX=/usr/lib/syslinux/
 ELILO=/usr/lib/elilo/
 DL_CACHE=/var/cache/di-netboot-assistant/
 TFTP_ROOT=/var/lib/tftpboot
+REPO_ALIAS=""
 REWRITEPKGPATH='\(debian\|ubuntu\)-installer'
 UMASKOLD=`umask -p`
 EXTRA_DL_FILES="MD5SUMS"
@@ -46,7 +47,7 @@ fi
 # Declare some functions
 usage () {
 	cat <<XXX
-Usage: $PACKAGE_NAME [options] install DI-DIST [--offline] [--arch=ARCH]
+Usage: $PACKAGE_NAME [options] install DI-DIST [--offline] [--arch=ARCH] [--alias=NAME]
        $PACKAGE_NAME [options] purge DI-DIST [--arch=ARCH]
        $PACKAGE_NAME [options] rebuild-menu
        $PACKAGE_NAME [--help|--version|--rebuild-menu]
@@ -69,6 +70,7 @@ Options:
   --offline       Don't download the file (simply re-extract and build menu)
   --di-args=      DI arguments to be appended to "install" entry.
   --target-args=  Target system boot arguments to be appended to "install".
+  --alias=NAME    Rename the downloaded repository (optional).
   --arch=ARCH     A comma separated list of architecture to Install/Purge,
                   or the keyword "all". It use the current machine's
                   architecture by default (APT::Architecture).
@@ -270,10 +272,14 @@ purge_repos() {
 }
 
 fetch_files() {
-	local baseurl="$1"
-	local repo_loc="$2"
-	shift 2
-	local files="$@"
+	local release="$1"
+	local arch="$2"
+	local baseurl="$3"
+	local repo_loc="$4"
+	shift 4
+ 	local files="$@"
+	local metadatafile
+
 	[ "$DEBUG" ] && set -x
 
 	if [ ! "$OFFLINE" ]; then
@@ -347,7 +353,7 @@ fetch_files() {
 		done
 		[ "$SUCCEED" = "true" ] && echo "... done." 1>&2
 	else
-		[ ! "$OFFLINE" ] && echo "I: No checksum found." 1>&2
+		echo "I: No checksum found." 1>&2
 	fi	
 
 
@@ -365,7 +371,15 @@ fetch_files() {
 		done
 	fi
 
+	metadatafile="${DL_CACHE}/$(echo ${repo_loc}~~${REPO_ALIAS}--${arch}.meta | sed -e 's#/#_#g')"
+
 	if [ "$SUCCEED" = "true" ]; then
+		echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
+		echo "fetch_date=$fetch_date" >> $metadatafile
+		echo "repo=$baseurl" >> $metadatafile
+		echo "dl_file=$files" >> $metadatafile
+		echo "dist=$release" >> $metadatafile
+
 		return 0
 	else
 		exit 1
@@ -446,27 +460,34 @@ install_repo() {
 			exit 1
 		fi
 
+		if [ "$release" != "${REPO_ALIAS}" ]; then
+			echo "I: Repository '$release' filed as '${REPO_ALIAS}'." 1>&2
+		fi
+
 		repo_proto="$(echo $repo | cut -d ":" -f 1 )"
 		repo_loc="$(echo $repo | sed -e 's#^[^:]\+://##')"
-		expand_dir="$TFTP_ROOT/debian-installer/$release/$arch"
+		expand_dir="$TFTP_ROOT/debian-installer/${REPO_ALIAS}/$arch"
 
 		file=$(grep -E "^$release[[:blank:]]$arch" "$DISOURCELIST" | cut -f 4- )
 		fetch_date=""
-		fetch_files "$repo_mirror" "$repo_loc" $file
+		fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file
 		if [ -z "$fetch_date" ]; then
 			exit 1
 		fi
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		dl_file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
 
-		echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
-		echo "fetch_date=$fetch_date" >> $metadatafile
+#FIXME
+		cat "${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | sed -e 's#/#_#g')" > $metadatafile
+#		echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
+#		echo "fetch_date=$fetch_date" >> $metadatafile
+
 		echo "expand_dir=$expand_dir" >> $metadatafile
-		echo "dist=$release" >> $metadatafile
-		echo "repo=$repo" >> $metadatafile
-		echo "dl_file=$dl_file" >> $metadatafile
-		echo "di_args=$DI_ARGS" >> $metadatafile
-		echo "target_args=$TARGET_ARGS" >> $metadatafile
+#		echo "dist=$release" >> $metadatafile
+#		echo "repo=$repo" >> $metadatafile
+#		echo "dl_file=$dl_file" >> $metadatafile
+#		echo "di_args=$DI_ARGS" >> $metadatafile
+#		echo "target_args=$TARGET_ARGS" >> $metadatafile
 	
 		echo "I: Extracting... " 1>&2
 			
@@ -517,8 +538,8 @@ install_repo() {
 			fi
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
 				mv "$x" "$x.ORIG"
-				print_do-not-edit_header "$release" > "$x"
-				sed -e "s#${REWRITEPKGPATH}/$arch/#debian-installer/$release/$arch/#" "$x.ORIG" \
+				print_do-not-edit_header "$release netboot image" > "$x"
+				sed -e "s#${REWRITEPKGPATH}/$arch/#debian-installer/${REPO_ALIAS}/$arch/#" "$x.ORIG" \
 					| tweak_pxelinux_arguments >> "$x"
 			done
 			menufragment="$metadatabasename.pxelinux.menu.fragment"
@@ -536,8 +557,8 @@ install_repo() {
 				[ -f "$menufragment_serial9600" ] && rm "$menufragment_serial9600"
 			fi
 
-			echo  "LABEL $release-$arch" >> $menufragment
-			printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "($release, $arch)" >> $menufragment
+			echo  "LABEL ${REPO_ALIAS}-$arch" >> $menufragment
+			printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "(${REPO_ALIAS}, $arch)" >> $menufragment
 
 			if [ ! -z "$(grep -Eiq "^[[:blank:]]*prompt[[:blank:]]+0" "$expand_dir/pxelinux.cfg/default" && grep -Eiq "^[[:blank:]]*default[[:blank:]].*/vesamenu.c32" "$expand_dir/pxelinux.cfg/default" && echo ok)" ]; then
 
@@ -547,33 +568,35 @@ install_repo() {
 				if grep -qEi "^[[:blank:]]*include[[:blank:]]" $expand_dir/pxelinux.cfg/default ; then
 					grep -Ei "^[[:blank:]]*include[[:blank:]]" $expand_dir/pxelinux.cfg/default | sed -e 's/^[[:blank:]]*include[[:blank:]]//' >> $menufragment
 				else
-					echo   "	APPEND debian-installer/$release/$arch/pxelinux.cfg/default" >> $menufragment
+					echo   "	APPEND debian-installer/${REPO_ALIAS}/$arch/pxelinux.cfg/default" >> $menufragment
 				fi
 
 			else
 				echo   "	KERNEL debian-installer/pxelinux.cfg/$SYSLINUXMENU" >> $menufragment
-				echo   "	APPEND debian-installer/$release/$arch/pxelinux.cfg/default" >> $menufragment
+				echo   "	APPEND debian-installer/${REPO_ALIAS}/$arch/pxelinux.cfg/default" >> $menufragment
 			fi
 
 			echo   "" >> $menufragment
 	
 			if [ -f "$menufragment_serial9600" ]; then
-				echo   "LABEL $release-$arch" >> $menufragment_serial9600
-				printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "($release, $arch)" >> $menufragment_serial9600
+				echo   "LABEL ${REPO_ALIAS}-$arch" >> $menufragment_serial9600
+				printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "(${REPO_ALIAS}, $arch)" >> $menufragment_serial9600
 				echo   "	KERNEL debian-installer/pxelinux.cfg/$SYSLINUXMENU" >> $menufragment_serial9600
-				echo   "	APPEND debian-installer/$release/$arch/pxelinux.cfg.serial-9600/default" >> $menufragment_serial9600
+				echo   "	APPEND debian-installer/${REPO_ALIAS}/$arch/pxelinux.cfg.serial-9600/default" >> $menufragment_serial9600
 				echo   "" >> $menufragment_serial9600
 			fi
 		fi
 
 		# ELILO MENU (ia64)
 		if [ ! -z "$(find "$expand_dir" -type f -name 'elilo.conf' )" ]; then
++			#Rewrite existing menus
 			for x in $(find "$expand_dir" -type f -name 'elilo.conf' ); do
 				mv "$x" "$x.ORIG"
 				print_do-not-edit_header "release" > "$x"
-				sed -e "s#^\([[:blank:]]*\(image\|initrd\|message\|f[0-9]\+\)=\)#\1debian-installer/$release/$arch/#" < "$x.ORIG" >> "$x"
+				sed -e "s#^\([[:blank:]]*\(image\|initrd\|message\|f[0-9]\+\)=\)#\1debian-installer/${REPO_ALIAS}/$arch/#" < "$x.ORIG" >> "$x"
 			done
 
+			#Create overview menu.
 			menufragment="$metadatabasename.elilo.conf.fragment"
 			echo "## This is a fragment of elilo menu file." > $menufragment
 			echo "##" >> $menufragment
@@ -582,11 +605,11 @@ install_repo() {
 			echo "## It is automatically generated by $PACKAGE_NAME" >> $menufragment
 			echo "##" >> $menufragment
 
-			echo "# ### $release $arch ### " >> $menufragment
+			echo "# ### $release (${REPO_ALIAS}) $arch ### " >> $menufragment
 			awk '/^image=/,/^$/' "${expand_dir}/elilo.conf" \
 				| tweak_elilo_arguments \
-				| sed -e "s/^[[:blank:]]*label=.*$/\0-$release-$arch/" \
-				| sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 (Lenny AMD64)\"/" \
+				| sed -e "s/^[[:blank:]]*label=.*$/\0-${REPO_ALIAS}-$arch/" \
+				| sed -e "s/^\([[:blank:]]*description\)=\"\([^\"]\+\)\"/\1=\"\2 ($release $arch)\"/" \
 				>> $menufragment
 			echo "" >> $menufragment
 		fi
@@ -625,6 +648,14 @@ for option in "$@"; do
 	#Note:
 	if [ "$(echo $ARCH | grep -E '^[[:alnum:]_,]\+$')" ]; then
 		echo "E: Invalid architecture specified ($ARCH)" 1>&2
+		echo "" 1>&2
+		exit 1
+	fi ;;
+    --alias| --alias=*)
+	REPO_ALIAS="$(echo $option | sed -e 's/--alias[=]\?//' | grep -E "^[[:alnum:]_-]+$" )"
+	#Note:
+	if [ "$(echo $ARCH | grep -E '^[[:alnum:]_,]\+$')" ]; then
+		echo "E: Invalid alias name ($option)" 1>&2
 		echo "" 1>&2
 		exit 1
 	fi ;;
