@@ -402,6 +402,8 @@ fetch_files() {
 			else
 				echo "I: Reusing previously downloaded file... " 1>&2
 				fetch_date="$( grep "fetch_date" "$metadatafile" | cut -d "=" -f 2- )"
+				# Fall back, in case the file is manually added to the cache.
+				[ -z "$fetch_date" ] && fetch_date="$(date -R --reference="$file" )"
 			fi
 		fi
 	done
