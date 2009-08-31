@@ -257,6 +257,7 @@ uninstall_repo() {
 uninstall_repos() {
 	[ "$DEBUG" ] && set -x
 	del_repo="$1"
+	ignore_missing="$2"
 	current_repos="$(find  "${STATUS_LIB}/"  -name $del_repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
 
 	if [ "$(echo $ARCH | grep -E "\<all\>")" ]; then
@@ -269,10 +270,12 @@ uninstall_repos() {
 		if [ -f "${STATUS_LIB}/$del_repo--$a.conf" ]; then
 			uninstall_repo "${STATUS_LIB}/$del_repo--$a.conf"
 		else
-			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
-			echo "I: (current repository are: $current_repos)"
-			echo "" 1>&2
-			exit 1
+			if [ "$ignore_missing" != "ignore_missing" ]; then
+				echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
+				echo "I: (current repository are: $current_repos)"
+				echo "" 1>&2
+				exit 1
+			fi
 		fi
 	done
 
@@ -851,7 +854,7 @@ for option in "$@"; do
 			remove_repocaches "$option"
 			;;
 		purge)
-			uninstall_repos "$option"
+			uninstall_repos "$option" ignore_missing 
 			remove_repocaches "$option"
 			;;
 		rebuild-menu)
