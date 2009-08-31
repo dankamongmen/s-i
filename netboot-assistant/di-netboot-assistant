@@ -385,8 +385,7 @@ fetch_files() {
 				fetch_date="$(date -R)"
 			else
 				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || SUCCEED="failed"
-				echo "E: Download has Failed." 1>&2
-				[ "$WGET_VERBOSITY" != "--quiet" ] && echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
+				echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
 				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
 				if [ -f "$file" ]; then
 					echo "I: You have a previous version in your cache (see --offline option)." 1>&2
