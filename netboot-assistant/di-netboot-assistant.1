@@ -6,7 +6,7 @@
 .SH NAME
 di-netboot-assistant \- Debian-Installer netboot assistant
 .SH SYNOPSIS
-\fBdi\-netboot\-assistant\fR [\fB\-hv\fR] [\fB\-\-verbose\fR] [\fB\-\-offline\fR] {[install\ \fIimage\fR...] | [purge\ \fIimage\fR...] | [rebuild-menu] } [\fB\-\-arch=\fR\fB\fIarch\fR\fR] [\fB\-\-di\-args=\fR\fB\fIARGS\fR\fR] [\fB\-\-target\-args=\fR\fB\fIARGS\fR\fR] [\fB\-\-alias=\fR\fB\fIalias\fR\fR]
+\fBdi\-netboot\-assistant\fR [\fB\-hv\fR] [\fB\-\-verbose\fR] [\fB\-\-offline\fR] {[install\ \fIimage\fR...] | [uninstall\ \fIimage\fR...] | [uncache\ \fIimage\fR...] | [purge\ \fIimage\fR...] | [rebuild-menu] } [\fB\-\-arch=\fR\fB\fIarch\fR\fR] [\fB\-\-di\-args=\fR\fB\fIARGS\fR\fR] [\fB\-\-target\-args=\fR\fB\fIARGS\fR\fR] [\fB\-\-alias=\fR\fB\fIalias\fR\fR]
 .SH DESCRIPTION
 .PP
 \fBdi\-netboot\-assistant\fR is a simple tool to download and extract latest debian installer netboot images.
@@ -23,9 +23,19 @@ install
 install is followed by a repository name desired for installation\&. The repository name has to be one of those declared in \fI/etc/di-netboot-assistant/di-sources\&.list\fR. The image will be installed/extracted in the default location (declared in \fI/etc/di-netboot-assistant/di-netboot-assistant.conf\fR).
 .RE
 .PP
+uninstall
+.RS 4
+uninstall is followed by the name of the repository to be uninstalled (or the repository's alias if you used \fB--alias=\fR)\&. The netboot files related to that distribution will be removed from the TFTP server.
+.RE
+.PP
+uncache
+.RS 4
+uncache will clean the cached files for the given netboot image. You must specify a repository name (not an \fB--alias=\fR name).
+.RE
+.PP
 purge
 .RS 4
-purge will remove a previously installed d-i netboot image, according to the image name specified.
+purge is followed by a repository name desired for installation\&. \fIpurge\fR is identical to running \fIuninstall\fR then \fIuncache\fR for a given repository.
 .SH "OPTIONS"
 .PP
 rebuild-menu

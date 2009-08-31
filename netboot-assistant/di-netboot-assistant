@@ -48,7 +48,7 @@ fi
 usage () {
 	cat <<XXX
 Usage: $PACKAGE_NAME [options] install DI-DIST [--offline] [--arch=ARCH] [--alias=NAME]
-       $PACKAGE_NAME [options] purge DI-DIST [--arch=ARCH]
+       $PACKAGE_NAME [options] [purge|uninstall|uncache] DI-DIST [--arch=ARCH]
        $PACKAGE_NAME [options] rebuild-menu
        $PACKAGE_NAME [--help|--version|--rebuild-menu]
 
@@ -60,7 +60,8 @@ DI-DIST
 
 Commands:
     install - download and extract a netboot image.
-    purge - remove a previously installed netboot image.
+    uninstall - remove a previously installed netboot image.
+    purge - equivalent to uninstall plus uncache.
     rebuild-menu - rebuild the top level menu.
 
 Options:
@@ -207,13 +208,16 @@ check_tftp_root() {
 	fi
 }
 
-#This function should be kept in sync with function "purge_repo" in debian/postrm
-purge_repo() {
+#This function should be kept in sync with function "uninstall_repo" in debian/postrm
+uninstall_repo() {
 	dist="$1"
 	metadatabasename="$(echo $dist | sed -e 's/\.conf$//' )"
 
+	#remove di-netboot-assistant < 0.37 cached files.
 	tarfile="$(grep -E "^[[:blank:]]*dl_file=" "$dist" | sed -e 's/^[[:blank:]]*dl_file=//')"
-	[ -f "$tarfile" ] && rm "$tarfile"
+	if [ "$(echo $tarfile | sed -n 's/^./\0/p')" = "/" ];then
+		[ -f "$tarfile" ] && rm "$tarfile"
+	fi
 
 	expand_dir="$(grep -E "^[[:blank:]]*expand_dir=" "$dist" | sed -e 's/^[[:blank:]]*expand_dir=//')"
 	[ "$expand_dir" != "/" -a -d "$expand_dir" ] && rm -Rf "$expand_dir"
@@ -244,8 +248,7 @@ purge_repo() {
 	rm "$dist"
 }
 
-
-purge_repos() {
+uninstall_repos() {
 	[ "$DEBUG" ] && set -x
 	del_repo="$1"
 	current_repos="$(find  /var/lib/di-netboot-assistant/  -name $del_repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
@@ -258,7 +261,7 @@ purge_repos() {
 
 	for a in $archs ; do
 		if [ -f "/var/lib/di-netboot-assistant/$del_repo--$a.conf" ]; then
-			purge_repo "/var/lib/di-netboot-assistant/$del_repo--$a.conf"
+			uninstall_repo "/var/lib/di-netboot-assistant/$del_repo--$a.conf"
 		else
 			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
 			echo "I: (current repository are: $current_repos)" 1>&2
@@ -270,6 +273,72 @@ purge_repos() {
 	[ -d "$TFTP_ROOT/debian-installer" ] && update_menu
 	[ "$DEBUG" ] && set +x
 }
+
+#This function should be kept in sync with function "remove_repocache" in debian/postrm
+remove_repocache() {
+	local metadatafile
+	local base
+	local file
+
+	metadatafile="$1"
+	base=$(echo $metadatafile | sed -e 's/~~.*$//' )
+
+	for file in $(sed -n -e 's/^[[:blank:]]*dl_file=[[:blank:]]*//p' $metadatafile); do
+		rm $RM_VERBOSITY ${base}_"$(echo ${file}| sed -e 's#/#_#g')"
+	done
+
+	#Purge remaing files (MD5SUMS...) if there are no more cached
+	#distribution from the same repository.
+	if [ ! "$(ls -1 ${base}~~*.meta | grep -v "$metadatafile")" ]; then
+		rm $RM_VERBOSITY ${base}_*
+	fi
+
+	[ -f $metadatafile ] && rm $metadatafile
+
+}
+
+remove_repocaches() {
+	local COUNT
+	[ "$DEBUG" ] && set -x
+	del_repo="$1"
+
+	if [ ! -d "${DL_CACHE}" ]; then
+		echo "E: Failed to clean the cache, cache folder not found." 1>&2
+		exit 1
+	fi
+
+	current_repos="$(find ${DL_CACHE} -name "*~~$del_repo--*.meta" | sed -e 's/^.*--//' -e 's/\.meta//' | tr '\n' ' ')"
+	if [ ! "$current_repos" ]; then
+		echo "E: Repository '$del_repo' not cached." 1>&2
+		echo "" 1>&2
+		exit 0
+	fi
+
+	if [ "$(echo $ARCH | grep -E "\<all\>")" ]; then
+		archs="$current_repos"
+	else
+		archs="$(echo $ARCH | tr ',' ' ')"
+	fi
+
+	for a in $archs ; do
+		COUNT=0
+		for metadatafile in $(find ${DL_CACHE}/ -name "*~~${del_repo}--${a}.meta"); do
+			remove_repocache "$metadatafile"
+			COUNT=$(( $COUNT + 1 ))
+		done
+
+	        if [ $COUNT -eq 0 ]; then
+			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
+			echo "I: (current repository are: $current_repos)" 1>&2
+			echo "" 1>&2
+			exit 1
+		fi
+	done
+
+
+	[ "$DEBUG" ] && set +x
+}
+
 
 fetch_files() {
 	local release="$1"
@@ -294,6 +363,8 @@ fetch_files() {
 		fi
 		echo "I: Downloading..."
 	fi
+
+	metadatafile="${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | sed -e 's#/#_#g')"
 
 	SUCCEED="true"
 	for givenfile in $EXTRA_DL_FILES $files ; do
@@ -324,7 +395,7 @@ fetch_files() {
 				exit 1
 			else
 				echo "I: Reusing previously downloaded file... " 1>&2
-				fetch_date="$( grep "fetch_date" $metadatafile | cut -d "=" -f 2- )"
+				fetch_date="$( grep "fetch_date" "$metadatafile" | cut -d "=" -f 2- )"
 			fi
 		fi
 	done
@@ -371,14 +442,14 @@ fetch_files() {
 		done
 	fi
 
-	metadatafile="${DL_CACHE}/$(echo ${repo_loc}~~${REPO_ALIAS}--${arch}.meta | sed -e 's#/#_#g')"
-
 	if [ "$SUCCEED" = "true" ]; then
-		echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
-		echo "fetch_date=$fetch_date" >> $metadatafile
-		echo "repo=$baseurl" >> $metadatafile
-		echo "dl_file=$files" >> $metadatafile
-		echo "dist=$release" >> $metadatafile
+		if [ ! "$OFFLINE" ]; then
+			echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
+			echo "fetch_date=$fetch_date" >> $metadatafile
+			echo "repo=$baseurl" >> $metadatafile
+			echo "dl_file=$files" >> $metadatafile
+			echo "dist=$release" >> $metadatafile
+		fi
 
 		return 0
 	else
@@ -440,7 +511,7 @@ install_repo() {
 	for arch in $archs ; do
 		echo "I: Processing $release/$arch ... "
 
-		metadatabasename="/var/lib/di-netboot-assistant/${release}--${arch}"
+		metadatabasename="/var/lib/di-netboot-assistant/${REPO_ALIAS}--${arch}"
 		metadatafile="$metadatabasename.conf"
 
 		repo_orig="$(grep -E "^$release[[:blank:]]$arch\>" "$DISOURCELIST")"
@@ -478,7 +549,9 @@ install_repo() {
 		dl_file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
 
 #FIXME
+		# get the metadata from the downloaded repository
 		cat "${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | sed -e 's#/#_#g')" > $metadatafile
+
 #		echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
 #		echo "fetch_date=$fetch_date" >> $metadatafile
 
@@ -688,7 +761,7 @@ for option in "$@"; do
 	echo "" 1>&2
 	exit 1
 	;;
-    rebuild-menu|install|purge)
+    rebuild-menu|install|uninstall|uncache|purge)
 	#Actions are processed in the loop below
     	if [ "$ACTION" ]; then
 		echo "E: Unexpected command '$option'. '$ACTION' was already specified." 1>&2
@@ -709,6 +782,14 @@ cd "$TFTP_ROOT/debian-installer"
 check_di_source_list
 releases="$(grep -vE '^#' "$DISOURCELIST" | cut -f 1 | sort -u | tr "\n" " " | sed -e 's/^[[:blank:]]\+//' )"
 
+if [ "$REPO_ALIAS" ]; then
+	if [ "$ACTION" = "install" -a $COUNT -gt 1 ]; then
+        	echo "E: Option --alias can't be used with multiple repositories." 1>&2
+        	echo "" 1>&2
+        	exit 1
+	fi
+fi
+
 case "$ACTION" in
     rebuild-menu)
         if [ $COUNT -ne 0 ]; then
@@ -721,7 +802,12 @@ case "$ACTION" in
         if [ $COUNT -eq 0 ]; then
         	echo "E: No repository name was passed for '$ACTION'." 1>&2
         	[ ! "$OFFLINE" -a "$ACTION" = "install" ] && echo "I: Declared repositories are: $releases" 1>&2
-        	[ "$ACTION" = "purge" ] && echo "I: Installed repositories are: $( cd /var/lib/di-netboot-assistant/ ; ls | sed -e 's/--.*//' | sort -u | tr "\n" " " )" 1>&2
+		cached_repos="$( find ${DL_CACHE} -name "*~~*--*.meta" | sed -e 's/^.*~~//' -e 's/--.*\.meta//' | sort -u | tr "\n" " " )"
+		installed_repos="$( cd /var/lib/di-netboot-assistant/ ; ls | sed -e 's/--.*//' | sort -u | tr "\n" " " )"
+		purgabled_repos="$(echo $cached_repos $installed_repos | tr " " "\n" | sort -u | tr "\n" " ")"
+        	[ "$ACTION" = "uncache" ] && echo "I: Cached repositories are: $cached_repos" 1>&2
+        	[ "$ACTION" = "uninstall" ] && echo "I: Installed repositories are: $installed_repos" 1>&2
+        	[ "$ACTION" = "purge" ] && echo "I: Purgable repositories are: $purgabled_repos" 1>&2
         	echo "" 1>&2
         	exit 1
         fi
@@ -736,7 +822,7 @@ for option in "$@"; do
     -*)
     	# Ignore options on this pass
     	;;
-    install|purge)
+    install|uninstall|uncache|purge)
 	ACTION=$option
 	;;
     rebuild-menu)
@@ -744,12 +830,20 @@ for option in "$@"; do
         update_menu
         ;;
     *)
+	[ ! "$REPO_ALIAS" ] && REPO_ALIAS=$option
 	case "$ACTION" in
 		install)
 			install_repo "$option"
 			;;
+		uninstall)
+			uninstall_repos "$option"
+			;;
+		uncache)
+			remove_repocaches "$option"
+			;;
 		purge)
-			purge_repos "$option"
+			uninstall_repos "$option"
+			remove_repocaches "$option"
 			;;
 		rebuild-menu)
 			echo "W: Argument '$option' ignored ($ACTION expects no argument)." 1>&2

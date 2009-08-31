@@ -2,14 +2,18 @@
 # postrm script for di-netboot-assistant
 
 set -e
+DL_CACHE=/var/cache/di-netboot-assistant/
 
-#This function should be kept in sync with function "purge_repo" in di-netboot-assistant
-purge_repo() {
+#This function should be kept in sync with function "uninstall_repo" in di-netboot-assistant
+uninstall_repo() {
 	dist="$1"
 	metadatabasename="$(echo $dist | sed -e 's/\.conf$//' )"
 
+	#remove di-netboot-assistant < 0.37 cached files.
 	tarfile="$(grep -E "^[[:blank:]]*dl_file=" "$dist" | sed -e 's/^[[:blank:]]*dl_file=//')"
-	[ -f "$tarfile" ] && rm "$tarfile"
+	if [ "$(echo $tarfile | sed -n 's/^./\0/p')" = "/" ];then
+		[ -f "$tarfile" ] && rm "$tarfile"
+	fi
 
 	expand_dir="$(grep -E "^[[:blank:]]*expand_dir=" "$dist" | sed -e 's/^[[:blank:]]*expand_dir=//')"
 	[ "$expand_dir" != "/" -a -d "$expand_dir" ] && rm -Rf "$expand_dir"
@@ -40,6 +44,28 @@ purge_repo() {
 	rm "$dist"
 }
 
+#This function should be kept in sync with function "remove_repocache" in di-netboot-assistant
+remove_repocache() {
+	local metadatafile
+	local base
+	local file
+
+	metadatafile="$1"
+	base=$(echo $metadatafile | sed -e 's/~~.*$//' )
+
+	for file in $(sed -n -e 's/^[[:blank:]]*dl_file=[[:blank:]]*//p' $metadatafile); do
+		rm $RM_VERBOSITY ${base}_"$(echo ${file}| sed -e 's#/#_#g')"
+	done
+
+	#Purge remaing files (MD5SUMS...) if there are no more cached
+	#distribution from the same repository.
+	if [ ! "$(ls -1 ${base}~~*.meta | grep -v "$metadatafile")" ]; then
+		rm $RM_VERBOSITY ${base}_*
+	fi
+
+	[ -f $metadatafile ] && rm $RM_VERBOSITY $metadatafile
+
+}
 
 case "$1" in
     purge)
@@ -47,7 +73,11 @@ case "$1" in
 
 		[ -z "$SYSLINUXMENU" ] && SYSLINUXMENU=menu.c32
 		for x in $( find /var/lib/di-netboot-assistant -type f -name '*.conf' ) ; do
-			purge_repo "$x"
+			uninstall_repo "$x"
+		done
+
+		for metadatafile in $(find ${DL_CACHE}/ -name "*~~*--*.meta"); do
+			remove_repocache "$metadatafile"
 		done
 	fi
     ;;
