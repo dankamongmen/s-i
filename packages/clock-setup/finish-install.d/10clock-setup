@@ -52,19 +52,14 @@ if ! db_go; then
 fi
 
 rcsfile=/target/etc/default/rcS
-adjtimefile=/target/etc/adjtime
 
 db_get clock-setup/utc
 if [ "$RET" = true ]; then
 	sed -i -e 's:^UTC="no":UTC="yes":' -e 's:^UTC=no:UTC=yes:' $rcsfile
-	if [ -e "$adjtimefile" ]; then
-		sed -i -e 's:^LOCAL:UTC:' $adjtimefile
-	fi
+	OPT="--utc"
 else
 	sed -i -e 's:^UTC="yes":UTC="no":' -e 's:^UTC=yes:UTC=no:' $rcsfile
-	if [ -e "$adjtimefile" ]; then
-		sed -i -e 's:^UTC:LOCAL:' $adjtimefile
-	fi
+	OPT="--localtime"
 fi
 
 anna-install rtc-modules || true
@@ -89,7 +84,7 @@ cleanup () {
 }
 
 db_progress INFO clock-setup/progress/hwclock
-log-output -t clock-setup chroot /target hwclock --systohc --debug &
+log-output -t clock-setup chroot /target hwclock $OPT --systohc --debug &
 pid="$!"
 count=0
 
