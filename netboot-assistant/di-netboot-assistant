@@ -54,7 +54,7 @@ Usage: $PACKAGE_NAME [options] install DI-DIST [--offline] [--arch=ARCH] [--alia
 
 A simple tool to grab and extract debian-installer netboot images.
 
-DI-DIST 
+DI-DIST
 	The name of a debian-installer repository (as listed in
 	the file '$DISOURCELIST')
 
@@ -84,7 +84,7 @@ check_di_source_list() {
 	if [ ! -f "$DISOURCELIST" ]; then
 		echo "E: Debian Installer source file missing ($DISOURCELIST)" 1>&2
 		echo "" 1>&2
-		exit 1;
+		exit 1
 	fi
 
 	if grep -vEl '^(#.*|[[:blank:]]*|[[:alnum:]_\.-]+[	][[:alnum:]_\.-]+[	][^	]+([	][^" ]+)+)$'  "$DISOURCELIST" > /dev/null ; then
@@ -92,7 +92,7 @@ check_di_source_list() {
 		grep -vnE '^(#.*|[[:blank:]]*|[[:alnum:]_\.-]+[	][[:alnum:]_\.-]+[	][^	]+([	][^" ]+)+)$' "$DISOURCELIST" | cut -d ":" -f 1 | tr "\n" "," 1>&2
 		echo " in file '$DISOURCELIST'." 1>&2
 		echo "" 1>&2
-		exit 1;
+		exit 1
 	fi
 }
 
@@ -190,21 +190,21 @@ check_tftp_root() {
 	if [ -z "$TFTP_ROOT" -o "$TFTP_ROOT" = "." -o "$TFTP_ROOT" = "/" ]; then
 		echo "E: Invalid TFTP root specified ($TFTP_ROOT)" 1>&2
 		echo "" 1>&2
-		exit 1;
+		exit 1
 	fi
 
 	if [ ! -d "$TFTP_ROOT" ]; then
 		echo "E: TFTP root directory doesn't exists ($TFTP_ROOT)" 1>&2
 		echo "I: Make sure you installed a tftp server like tftpd-hpa or atftpd." 1>&2
 		echo "" 1>&2
-		exit 1;
+		exit 1
 	fi
 
 	[ ! -d "$TFTP_ROOT/debian-installer" ] && mkdir "$TFTP_ROOT/debian-installer"
 	if [ ! -w "$TFTP_ROOT/debian-installer" ]; then
 		echo "E: Can't write to DI directory ($TFTP_ROOT/debian-installer)" 1>&2
 		echo "" 1>&2
-		exit 1;
+		exit 1
 	fi
 }
 
@@ -408,28 +408,28 @@ fetch_files() {
 			file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
 			md5=$(md5sum $file.tmp | cut -d " " -f 1)
 			if [ "$givenfile" == "MD5SUMS" ]; then
-				continue;
+				continue
 			fi
 			echo -n "$givenfile " 1>&2
 			if ! grep -qiE "[[:blank:]]+(\./|)$givenfile[[:blank:]]*$" $csum ; then
 				echo -n " (No checksum)" 1>&2
-				continue;
+				continue
 			fi
 			if ! grep -qiE "^$md5[[:blank:]]+(\./|)$givenfile[[:blank:]]*$" $csum ; then
 				echo "FAILED" 1>&2
 				echo "E: Checksum verification failed (the file got corrupted somewhere)." 1>&2
 				SUCCEED="failed"
-				break;
+				break
 			fi
 		done
 		[ "$SUCCEED" = "true" ] && echo "... done." 1>&2
 	else
 		echo "I: No checksum found." 1>&2
-	fi	
+	fi
 
 
 	if [ ! "$OFFLINE" ]; then
-		echo "I: Moving/Removing temporary files." 1>&2		
+		echo "I: Moving/Removing temporary files." 1>&2
 		for givenfile in $EXTRA_DL_FILES $files ; do
 			f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 			file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
@@ -482,8 +482,8 @@ install_repo() {
 	release="$1"
 	if [ -z "$release" ]; then
 		echo "E: No repository specified (valid repositories are: $releases)" 1>&2
-		echo "";
-		exit 1;
+		echo ""
+		exit 1
 	fi
 
 	if ! grep -Eq "^$release\>" "$DISOURCELIST" ; then
@@ -500,7 +500,7 @@ install_repo() {
 		archs="$(echo $ARCH | tr ',' ' ')"
 	fi
 
-	
+
 	if [ -z "$( echo "$archs" | sed -e 's/[[:blank:]\?]*//g' )" ]; then
 		echo "E: No architecture specified." 1>&2
 		list_declared_arch_for_repo "$release"
@@ -561,9 +561,9 @@ install_repo() {
 #		echo "dl_file=$dl_file" >> $metadatafile
 #		echo "di_args=$DI_ARGS" >> $metadatafile
 #		echo "target_args=$TARGET_ARGS" >> $metadatafile
-	
+
 		echo "I: Extracting... " 1>&2
-			
+
 		if [ -d "$expand_dir" ]; then
 			rm -Rf "$expand_dir/*"
 		else
@@ -574,11 +574,11 @@ install_repo() {
 			*.tar.gz)
 				tar $TAR_VERBOSITY -zxf "$dl_file" --directory "$expand_dir" --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
 				tar $TAR_VERBOSITY -zxf "$dl_file" --directory "$expand_dir" ./version.info 2>/dev/null || true
-				;;			
+				;;
 			*.tar.bz2)
 				tar $TAR_VERBOSITY -jxf "$dl_file" --directory "$expand_dir" --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
 				tar $TAR_VERBOSITY -jxf "$dl_file" --directory "$expand_dir" ./version.info 2>/dev/null || true
-				;;			
+				;;
 			*.img)
 				cp $CP_VERBOSITY "$dl_file" "$expand_dir/$(basename "$f")"
 				;;
@@ -650,7 +650,7 @@ install_repo() {
 			fi
 
 			echo   "" >> $menufragment
-	
+
 			if [ -f "$menufragment_serial9600" ]; then
 				echo   "LABEL ${REPO_ALIAS}-$arch" >> $menufragment_serial9600
 				printf "	MENU LABEL Debian Installer %-20s       [SUB-MENU]\n" "(${REPO_ALIAS}, $arch)" >> $menufragment_serial9600
@@ -688,7 +688,7 @@ install_repo() {
 		fi
 
 		update_menu
-	done;	
+	done
 	[ "$DEBUG" ] && set +x
 }
 
