@@ -103,7 +103,7 @@ check_di_source_list() {
 }
 
 list_declared_arch_for_repo() {
-	echo -n "I: Declared architecures for $1 are: " 1>&2
+	echo -n "I: Declared architecures for $1 are: "
 	grep -E "^$1[[:blank:]]" "$DISOURCELIST" | cut -f 2 | sort -u | tr '\n' ' ' 1>&2
 	echo "" 1>&2
 }
@@ -201,7 +201,7 @@ check_tftp_root() {
 
 	if [ ! -d "$TFTP_ROOT" ]; then
 		echo "E: TFTP root directory doesn't exists ($TFTP_ROOT)" 1>&2
-		echo "I: Make sure you installed a tftp server like tftpd-hpa or atftpd." 1>&2
+		echo "I: Make sure you installed a tftp server like tftpd-hpa or atftpd."
 		echo "" 1>&2
 		exit 1
 	fi
@@ -270,7 +270,7 @@ uninstall_repos() {
 			uninstall_repo "${STATUS_LIB}/$del_repo--$a.conf"
 		else
 			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
-			echo "I: (current repository are: $current_repos)" 1>&2
+			echo "I: (current repository are: $current_repos)"
 			echo "" 1>&2
 			exit 1
 		fi
@@ -388,7 +388,7 @@ fetch_files() {
 				echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
 				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
 				if [ -f "$file" ]; then
-					echo "I: You have a previous version in your cache (see --offline option)." 1>&2
+					echo "I: You have a previous version in your cache (see --offline option)."
 				fi
 			fi
 		else
@@ -399,7 +399,7 @@ fetch_files() {
 				echo "" 1>&2
 				exit 1
 			else
-				echo "I: Reusing previously downloaded file... " 1>&2
+				echo "I: Reusing previously downloaded file... "
 				fetch_date="$( grep "fetch_date" "$metadatafile" | cut -d "=" -f 2- )"
 				# Fall back, in case the file is manually added to the cache.
 				[ -z "$fetch_date" ] && fetch_date="$(date -R --reference="$file" )"
@@ -409,7 +409,7 @@ fetch_files() {
 
 	csum="${DL_CACHE}/$(echo ${repo_loc}/MD5SUMS.tmp | sed -e 's#/#_#g')"
 	if [ -f "$csum" -a "$SUCCEED" = "true" ] ; then
-		echo -n "I: Computing checksums... " 1>&2
+		echo -n "I: Computing checksums... "
 		for givenfile in $EXTRA_DL_FILES $files ; do
 			f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 			file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
@@ -417,13 +417,13 @@ fetch_files() {
 			if [ "$givenfile" == "MD5SUMS" ]; then
 				continue
 			fi
-			echo -n "$givenfile " 1>&2
+			echo -n "$givenfile "
 			if ! grep -qiE "[[:blank:]]+(\./|)$givenfile[[:blank:]]*$" $csum ; then
-				echo -n " (No checksum)" 1>&2
+				echo -n " (No checksum)"
 				continue
 			fi
 			if ! grep -qiE "^$md5[[:blank:]]+(\./|)$givenfile[[:blank:]]*$" $csum ; then
-				echo "FAILED" 1>&2
+				echo "FAILED"
 				echo "E: Checksum verification failed (the file got corrupted somewhere)." 1>&2
 				SUCCEED="failed"
 				break
@@ -431,12 +431,12 @@ fetch_files() {
 		done
 		[ "$SUCCEED" = "true" ] && echo "... done." 1>&2
 	else
-		echo "I: No checksum found." 1>&2
+		echo "I: No checksum found."
 	fi
 
 
 	if [ ! "$OFFLINE" ]; then
-		echo "I: Moving/Removing temporary files." 1>&2
+		echo "I: Moving/Removing temporary files."
 		for givenfile in $EXTRA_DL_FILES $files ; do
 			f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 			file="${DL_CACHE}/$(echo ${repo_loc}/$f | sed -e 's#/#_#g')"
@@ -497,8 +497,8 @@ install_repo() {
 
 	if ! grep -Eq "^$release\>" "$DISOURCELIST" ; then
 		echo "E: Invalid repository name specified ($release)" 1>&2
-		echo "I: Declared repositories are: $releases" 1>&2
-		echo "" 1>&2
+		echo "I: Declared repositories are: $releases"
+		echo ""
 		exit 1
 	fi
 
@@ -513,7 +513,7 @@ install_repo() {
 	if [ -z "$( echo "$archs" | sed -e 's/[[:blank:]\?]*//g' )" ]; then
 		echo "E: No architecture specified." 1>&2
 		list_declared_arch_for_repo "$release"
-		echo "" 1>&2
+		echo ""
 		exit 1
 	fi
 
@@ -536,12 +536,12 @@ install_repo() {
 			echo "E: There is no entry declared for architecture '$arch' for " 1>&2
 			echo "E: repository '$release' in $DISOURCELIST" 1>&2
 			list_declared_arch_for_repo "$release"
-			echo "" 1>&2
+			echo ""
 			exit 1
 		fi
 
 		if [ "$release" != "${REPO_ALIAS}" ]; then
-			echo "I: Repository '$release' filed as '${REPO_ALIAS}'." 1>&2
+			echo "I: Repository '$release' filed as '${REPO_ALIAS}'."
 		fi
 
 		repo_proto="$(echo $repo | cut -d ":" -f 1 )"
@@ -571,7 +571,7 @@ install_repo() {
 #		echo "di_args=$DI_ARGS" >> $metadatafile
 #		echo "target_args=$TARGET_ARGS" >> $metadatafile
 
-		echo "I: Extracting... " 1>&2
+		echo "I: Extracting... "
 
 		if [ -d "$expand_dir" ]; then
 			rm -Rf "$expand_dir/*"
@@ -613,7 +613,7 @@ install_repo() {
 			PXE_NEW_VER="$(pxelinux_version "$pxelinuxbin")"
 			PXE_CUR_VER="$(pxelinux_version "$TFTP_ROOT/debian-installer/pxelinux.0")"
 			if dpkg --compare-versions "$PXE_NEW_VER" ">>" "$PXE_CUR_VER" ; then
-				echo "I: Upgrading $TFTP_ROOT/debian-installer/pxelinux.0 ($PXE_CUR_VER to $PXE_NEW_VER)" 1>&2
+				echo "I: Upgrading $TFTP_ROOT/debian-installer/pxelinux.0 ($PXE_CUR_VER to $PXE_NEW_VER)"
 				cp -f "$pxelinuxbin" "$TFTP_ROOT/debian-installer/pxelinux.0"
 				for x in $(find "$expand_dir" -type f -name "$SYSLINUXMENU" | head -n 1) ; do
 					cp "$x" "$TFTP_ROOT/debian-installer/pxelinux.cfg/"
@@ -810,13 +810,13 @@ case "$ACTION" in
     *)
         if [ $COUNT -eq 0 ]; then
         	echo "E: No repository name was passed for '$ACTION'." 1>&2
-        	[ ! "$OFFLINE" -a "$ACTION" = "install" ] && echo "I: Declared repositories are: $releases" 1>&2
+        	[ ! "$OFFLINE" -a "$ACTION" = "install" ] && echo "I: Declared repositories are: $releases"
 		cached_repos="$( find ${DL_CACHE} -name "*~~*--*.meta" | sed -e 's/^.*~~//' -e 's/--.*\.meta//' | sort -u | tr "\n" " " )"
 		installed_repos="$( cd /var/lib/di-netboot-assistant/ ; ls | sed -e 's/--.*//' | sort -u | tr "\n" " " )"
 		purgabled_repos="$(echo $cached_repos $installed_repos | tr " " "\n" | sort -u | tr "\n" " ")"
-        	[ "$ACTION" = "uncache" ] && echo "I: Cached repositories are: $cached_repos" 1>&2
-        	[ "$ACTION" = "uninstall" ] && echo "I: Installed repositories are: $installed_repos" 1>&2
-        	[ "$ACTION" = "purge" ] && echo "I: Purgable repositories are: $purgabled_repos" 1>&2
+        	[ "$ACTION" = "uncache" ] && echo "I: Cached repositories are: $cached_repos"
+        	[ "$ACTION" = "uninstall" ] && echo "I: Installed repositories are: $installed_repos"
+        	[ "$ACTION" = "purge" ] && echo "I: Purgable repositories are: $purgabled_repos"
         	echo "" 1>&2
         	exit 1
         fi
