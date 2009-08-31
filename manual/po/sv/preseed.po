@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-07-26 00:13+0000\n"
-"PO-Revision-Date: 2009-07-26 13:33+0100\n"
+"PO-Revision-Date: 2009-08-31 23:48+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
@@ -834,7 +834,7 @@ msgstr "Följande debconf-variabler är relevanta för nätverkskonfiguration."
 
 #. Tag: screen
 #: preseed.xml:762
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# netcfg will choose an interface that has link if possible. This makes "
 #| "it\n"
@@ -934,6 +934,12 @@ msgid ""
 "# change to false to disable asking.\n"
 "#d-i hw-detect/load_firmware boolean true"
 msgstr ""
+"# Inaktivera hela nätverkskonfigurationen. Detta är användbart för\n"
+"# cdrom-installationer på enheter som inte är anslutna till nätverket,\n"
+"# där nätverksfrågor, varningar och långa tidsgränser överstigs är ett\n"
+"# problem.\n"
+"#d-i netcfg/enable boolean false\n"
+"\n"
 "# netcfg kommer om möjligt att välja ett nätgränssnitt som har länk.\n"
 "# Det gör att den hoppar över att visa en lista om det finns fler än ett nätgränssnitt.\n"
 "d-i netcfg/choose_interface select auto\n"
@@ -1114,7 +1120,7 @@ msgstr "Identifieringen av diskar är beroende på ordningen som deras drivrutin
 
 #. Tag: screen
 #: preseed.xml:844
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1259,7 +1265,7 @@ msgstr ""
 "# gammal LVM-konfiguration, kommer vanligtvis användaren att bli\n"
 "# varnad. Denna varning kan tas bort genom att förinställa...\n"
 "d-i partman-lvm/device_remove_lvm boolean true\n"
-"# Samma gäller för befintliga programvaru-RAID-kedjor:\n"
+"# Samma gäller för befintlig programvaru-RAID-kedja:\n"
 "d-i partman-md/device_remove_md boolean true\n"
 "# Samma gäller för bekräftelse för att skriva lvm-partitionerna.\n"
 "d-i partman-lvm/confirm boolean true\n"
@@ -1322,7 +1328,7 @@ msgstr "Den här typen av automatiserad partitionering är lätt att göra fel. 
 
 #. Tag: screen
 #: preseed.xml:870
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
 #| "carefully\n"
@@ -1473,7 +1479,7 @@ msgstr "Kontrollera hur partitioner monteras"
 #: preseed.xml:876
 #, no-c-format
 msgid "Normally, filesystems are mounted using a universally unique identifier (UUID) as a key; this allows them to be mounted properly even if their device name changes. UUIDs are long and difficult to read, so, if you prefer, the installer can mount filesystems based on the traditional device names, or based on a label you assign. If you ask the installer to mount by label, any filesystems without a label will be mounted using a UUID instead."
-msgstr ""
+msgstr "Vanligtvis så monteras filsystem med hjälp av en universiellt unik identifierare (UUID) som en nyckel; detta tillåter att de monteras korrekt även om deras enhetsnamn ändras. UUID är långa och svåra att läsa, så om du föredrar, installationsprogrammet kan montera filsystem som är baserade på de traditionella enhetsnamnen, eller baserade på en etikett som du tilldelar det. Om du frågar installationsprogrammet att montera efter etikett så kommer alla filsystem som inte har en etikett att monteras efter ett UUID istället."
 
 #. Tag: para
 #: preseed.xml:885
@@ -1485,7 +1491,7 @@ msgstr "Enheter med stabila namn, såsom logiska LVM-volymer, kommer att fortsä
 #: preseed.xml:892
 #, no-c-format
 msgid "Traditional device names may change based on the order in which the kernel discovers devices at boot, which may cause the wrong filesystem to be mounted. Similarly, labels are likely to clash if you plug in a new disk or a USB drive, and if that happens your system's behaviour when started will be random."
-msgstr ""
+msgstr "Traditionella enhetsnamn kan ändras baserat på ordningen i vilken kärnan upptäcker enheter vid uppstart, vilket kan orsaka att fel filsystem monteras. På samma sätt kan etiketter krocka om du ansluter en ny disk eller en USB-enhet och om det händer så kan beteendet för ditt system vara slumpmässigt."
 
 #. Tag: screen
 #: preseed.xml:902
@@ -1496,6 +1502,10 @@ msgid ""
 "# falling back to UUIDs.\n"
 "#d-i partman/mount_style select uuid"
 msgstr ""
+"# Standard är att montera efter UUID, men du kan även välja \"traditional\" för\n"
+"# att använda traditionella enhetsnamn, eller \"label\" för att prova filsystemsetiketter\n"
+"# innan installationsprogrammet faller tillbaka på UUID.\n"
+"#d-i partman/mount_style select uuid"
 
 #. Tag: title
 #: preseed.xml:907
@@ -1785,7 +1795,7 @@ msgstr "Om du vill installera några individuella paket i tillägg till de paket
 
 #. Tag: screen
 #: preseed.xml:1034
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -1834,6 +1844,11 @@ msgstr ""
 "\n"
 "# Individuella paket att installera\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
+"# Som standard installeras paket som endast är rekommenderas av paket som\n"
+"# installeras av pkgsel/include (till skillnad mot deras beroenden) inte kommer.\n"
+"# att installeras.\n"
+"# Avkommentera denna rad för att även installera rekommendationer.\n"
+"#d-i pkgsel/include/install-recommends boolean true\n"
 "# Huruvida paket ska uppgraderas efter debootstrap.\n"
 "# Tillåtna värden: none, safe-upgrade, full-upgrade\n"
 "#d-i pkgsel/upgrade select none\n"
@@ -1852,7 +1867,7 @@ msgstr "Installation av starthanteraren"
 
 #. Tag: screen
 #: preseed.xml:1041
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 #| "# instead, uncomment this:\n"
@@ -1949,7 +1964,14 @@ msgstr ""
 "#d-i grub-installer/password password r00tme\n"
 "#d-i grub-installer/password-again password r00tme\n"
 "# eller krypterat med en MD5-hash, se grub-md5-crypt(8).\n"
-"#d-i grub-installer/password-crypted password [MD5-hash]"
+"#d-i grub-installer/password-crypted password [MD5-hash]\n"
+"\n"
+"# Använd följande flagga för att lägga till ytterligare parametrar för start-\n"
+"# hanteraren för det installerade systemet (om det stöds av starthanterarens\n"
+"# installationsprogram).\n"
+"# Observera: flaggor som skickas till installationsprogrammet kommer\n"
+"# automatiskt att läggas till.\n"
+"#d-i debian-installer/add-kernel-opts string nousb"
 
 #. Tag: para
 #: preseed.xml:1043
@@ -2049,7 +2071,7 @@ msgstr "Ett mycket kraftfullt och flexibelt alternativ som erbjuds av förkonfig
 
 #. Tag: screen
 #: preseed.xml:1081
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
 #| "checks\n"
@@ -2115,14 +2137,12 @@ msgstr ""
 "# Det första kommandot körs så tidigt som möjligt, direkt efter\n"
 "# att förinställningen är inläst.\n"
 "#d-i preseed/early_command string anna-install some-udeb\n"
-"<phrase condition=\"squeeze\">\n"
 "# Det här kommandot körs direkt före partitioneraren startar. Det kan vara\n"
 "# användbart för att tillämpa förinställning av dynamisk partitionering som är\n"
 "# beroende av tillståndet för diskarna (som kanske annars inte är synligt när\n"
 "# preseed/early_command kör).\n"
 "#d-i partman/early_command \\\n"
 "#       string debconf-set partman-auto/disk \"$(list-devices disk | head -n1)\"\n"
-"</phrase>\n"
 "# Det här kommandot körs precis innan installationen är färdig, men när det\n"
 "# fortfarande finns en användbar /target-katalog. Du kan göra en chroot till /target och\n"
 "# använda det direkt, eller använda apt-install och kommandon från /target för att\n"
