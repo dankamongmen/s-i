@@ -1,54 +1,10 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
+%:
+	dh $@
 
-export DH_OPTIONS
+build: debian/templates
 
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
-build: build-stamp debian/templates
-build-stamp:
-	dh_testdir
-
-	$(MAKE) build
-
-	touch $@
-
 debian/templates: debian/templates-arch
 	debian/templates-build.pl $(DEB_HOST_ARCH) < $< > $@
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp
-
-	$(MAKE) clean
-	rm -f debian/templates
-
-	dh_clean
-
-install: DH_OPTIONS=
-install: build
-	dh_testdir
-	dh_testroot
-
-	$(MAKE) install
-ifneq (,$(findstring $(shell dpkg-architecture -qDEB_BUILD_ARCH),amd64))
-	ln -s /lib debian/rootskel/lib64
-endif
-
-binary-indep: build install
-
-binary-arch: DH_OPTIONS=-s
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install
