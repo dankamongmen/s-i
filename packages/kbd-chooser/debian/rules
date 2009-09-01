@@ -1,44 +1,9 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
+%:
+	dh $@
 
 PACKAGE=kbd-chooser
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	$(MAKE)
-	touch build-stamp
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-	$(MAKE) clean
-	dh_clean
-
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-	$(MAKE) install DESTDIR=$(CURDIR)/debian/kbd-chooser
+override_dh_install:
 	install -m0755 debian/post-base-installer debian/$(PACKAGE)/usr/lib/post-base-installer.d/20kbd-chooser
 	install -m0644 debian/S55kbd-chooser debian/$(PACKAGE)/lib/debian-installer.d/S55kbd-chooser
-
-binary-indep: 
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installdebconf
-	cp debian/kbd-chooser.isinstallable debian/kbd-chooser/DEBIAN/isinstallable
-	dh_link
-	dh_strip
-	dh_fixperms
-	dh_makeshlibs
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
