@@ -1,4 +1,4 @@
-#!/usr/bin/make -f
+#! /usr/bin/make -f
 # Sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 
@@ -31,12 +31,8 @@ endif
 build: build-deb build-udeb
 
 $(debbuild)/config.status:
-	[ -d $(debbuild) ] || mkdir -p $(debbuild)
-	cd $(debbuild); \
 	CFLAGS="$(CFLAGS) $(SPEEDOPTFLAG)" \
-	../../configure \
-		--prefix=/usr \
-		--sysconfdir=/etc \
+	dh_auto_configure -B$(debbuild) -- \
 		--without-rpath \
 		--with-db="textdb rfc822db stack" \
 		--with-frontend="$(DEB_FRONTENDS)" \
@@ -47,16 +43,12 @@ $(debbuild)/config.status:
 build-deb: build-deb-stamp
 build-deb-stamp: $(debbuild)/config.status
 	dh_testdir
-	$(MAKE) -C $(debbuild)
+	dh_auto_build -B$(debbuild)
 	touch $@
 
 $(udebbuild)/config.status:
-	[ -d $(udebbuild) ] || mkdir -p $(udebbuild)
-	cd $(udebbuild); \
 	CFLAGS="$(CFLAGS) $(SIZEOPTFLAG) -fomit-frame-pointer" \
-	../../configure \
-		--prefix=/usr \
-		--sysconfdir=/etc \
+	dh_auto_configure -B$(udebbuild) -- \
 		--enable-d-i \
 		--without-rpath --with-db="rfc822db stack" \
 		--with-frontend="$(UDEB_FRONTENDS)" \
@@ -69,16 +61,16 @@ $(udebbuild)/config.status:
 build-udeb: build-udeb-stamp
 build-udeb-stamp: $(udebbuild)/config.status
 	dh_testdir
-	$(MAKE) -C $(udebbuild)
+	dh_auto_build -B$(udebbuild)
 	touch $@
 
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f *-stamp
-	-rm -rf $(debbuild) $(udebbuild)
+	dh_auto_clean -B$(debbuild)
+	dh_auto_clean -B$(udebbuild)
 	[ ! -f globalmakeflags ] || $(MAKE) -C src/test clean
-	$(MAKE) distclean
+	dh_auto_clean
 	dh_clean
 
 install: install-arch install-indep
@@ -86,12 +78,12 @@ install: install-arch install-indep
 install-arch: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k -a
+	dh_prep
 	$(MAKE) -C $(debbuild) install DESTDIR=$(CURDIR)/debian/tmp/deb \
 		TARGET=deb
 	$(MAKE) -C $(udebbuild) install DESTDIR=$(CURDIR)/debian/tmp/udeb \
 		TARGET=udeb
-	dh_install -a --sourcedir=debian/tmp
+	dh_install -a
 
 install-indep:
 
