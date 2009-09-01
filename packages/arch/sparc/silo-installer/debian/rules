@@ -1,26 +1,3 @@
-#!/usr/bin/make -f
-
-# Uncomment this to turn on verbose mode.
-#export DH_VERBOSE=1
-
-build install binary-indep:
-# No-op
-
-clean:
-	dh_testdir
-	dh_testroot
-	dh_clean
-
-# Build architecture-dependent files here.
-binary-arch:
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdebconf
-	dh_installdeb 
-	debian/install-rc check.d
-	dh_gencontrol
-	dh_builddeb
-
-binary: binary-arch binary-indep
-.PHONY: build clean binary-arch binary-indep binary install
+#! /usr/bin/make -f
+%:
+	dh --with d-i $@
