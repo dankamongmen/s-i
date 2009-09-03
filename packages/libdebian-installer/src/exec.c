@@ -45,7 +45,7 @@
 static int internal_di_exec (const char *path, bool use_path, const char *const argv[], const char *const envp[], di_io_handler *stdout_handler, di_io_handler *stderr_handler, void *io_user_data, di_process_handler *parent_prepare_handler, void *parent_prepare_user_data, di_process_handler *child_prepare_handler, void *child_prepare_user_data)
 {
   char line[MAXLINE];
-  pid_t pid;
+  pid_t pid, pid2;
   int fds[4] = { -1, }, mode = 0, pipes = 0, i;
 
   if (stdout_handler)
@@ -196,9 +196,17 @@ static int internal_di_exec (const char *path, bool use_path, const char *const 
           break;
       }
 
-    if (!waitpid (pid, &status, 0))
-      return -1;
+    /* waitpid() can be interrupted by the SIGCHLD setup in log-output
+       in case of a working poll() implementation. This depends on the
+       kernel and the scheduler. */
+    do 
+    {
+      pid2 = waitpid (pid, &status, 0);
+    } while (pid2 == -1 && errno == EINTR);
 
+    if (!pid2)
+      return -1;
+ 
     for (i = 0; i < pipes; i++)
       fclose (files[i].file); /* closes fds[i * 2] */
 
