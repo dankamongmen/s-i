@@ -35,7 +35,7 @@ install: install-main install-mini install-bdf2psf install-udeb
 install-main: build
 	dh_testdir
 	dh_testroot
-	dh_clean -pconsole-setup -k
+	dh_prep -pconsole-setup
 	$(MAKE) etcdir=debian/console-setup/etc \
 		prefix=debian/console-setup/usr install
 	rm debian/console-setup/usr/share/consolefonts/*-Terminus*.psf.gz
@@ -55,7 +55,7 @@ install-main: build
 install-mini: build
 	dh_testdir
 	dh_testroot
-	dh_clean -pconsole-setup-mini -k
+	dh_prep -pconsole-setup-mini
 	dh_install -pconsole-setup-mini Keyboard/*.ekmap.gz \
 		usr/share/console-setup-mini
 	dh_install -pconsole-setup-mini Fonts/Arabic-VGA16.psf \
@@ -113,7 +113,7 @@ install-mini: build
 install-bdf2psf: build
 	dh_testdir
 	dh_testroot
-	dh_clean -pbdf2psf -k
+	dh_prep -pbdf2psf
 	dh_install -pbdf2psf Fonts/bdf2psf usr/bin/
 	dh_install -pbdf2psf Fonts/*.equivalents Fonts/*.set \
 		Fonts/fontsets usr/share/bdf2psf
@@ -124,14 +124,14 @@ install-bdf2psf: build
 install-udeb: build
 	dh_testdir
 	dh_testroot
-	dh_clean -pconsole-setup-amiga-ekmap -k
-	dh_clean -pconsole-setup-ataritt-ekmap -k
-	dh_clean -pconsole-setup-macintoshold-ekmap -k
-	dh_clean -pconsole-setup-pc-ekmap -k
-	dh_clean -pconsole-setup-sun4-ekmap -k
-	dh_clean -pconsole-setup-sun5-ekmap -k
-	dh_clean -pconsole-setup-fonts-udeb -k
-	dh_clean -pconsole-setup-udeb -k
+	dh_prep -pconsole-setup-amiga-ekmap
+	dh_prep -pconsole-setup-ataritt-ekmap
+	dh_prep -pconsole-setup-macintoshold-ekmap
+	dh_prep -pconsole-setup-pc-ekmap
+	dh_prep -pconsole-setup-sun4-ekmap
+	dh_prep -pconsole-setup-sun5-ekmap
+	dh_prep -pconsole-setup-fonts-udeb
+	dh_prep -pconsole-setup-udeb
 # console-setup-*-ekmap
 	dh_install -pconsole-setup-amiga-ekmap Keyboard/amiga.ekmap.gz \
 		usr/share/console-setup-mini
