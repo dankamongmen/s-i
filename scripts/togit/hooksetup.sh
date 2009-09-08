@@ -4,7 +4,9 @@
 
 set -e
 
-for repo in *.git; do
+cd /git/d-i
+
+for repo in *.git attic/*.git; do
 	cd /git/d-i/$repo
 
 	proj=$(echo $repo | sed 's/\.git$//')
