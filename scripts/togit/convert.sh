@@ -27,7 +27,7 @@ for p in $(grep 'create repository ' d-i.conf | sed 's/create repository //'); d
 	if [ ! -d git/$p ]; then
 		mkdir  -p git/$p
 		cd git/$p
-		git init --bare
+		git init --bare --shared=all
 		cd ../..
 	fi
 done
