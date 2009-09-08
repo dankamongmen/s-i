@@ -24,4 +24,6 @@ END
 	# This makes the repo show up as a subproject under
 	# debian-installer in CIA.
 	git config --add hooks.cia-project "debian-installer/$proj"
+
+	echo "d-i $proj repository" > description
 done
