@@ -20,8 +20,8 @@ exec /usr/local/bin/git-commit-notice
 EOF
 	chmod 755 hooks/post-receive
 
-	git config --add hooks.mailinglist "debian-installer_cvs@packages.qa.debian.org"
-	git config --add hooks.replyto "debian-boot@lists.debian.org"
+	git config --replace-all hooks.mailinglist "debian-installer_cvs@packages.qa.debian.org"
+	git config --replace-all hooks.replyto "debian-boot@lists.debian.org"
 	# This makes the repo show up as a subproject under
 	# debian-installer in CIA.
 	git config --add hooks.cia-project "debian-installer/$proj"
