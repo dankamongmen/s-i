@@ -32,13 +32,16 @@ Print out unknown words found in filename. Options
 -p and --wordlist can be given several times."""
     lhelpstr = """What language is the text to proofread? For example fi_FI."""
     parser = OptionParser(usage=usage)
-    parser.set_defaults(verbose=False)
+    parser.set_defaults(verbose=False, listonly=True, wordlists=[])
     parser.add_option("-p", "--wordlist", 
                       action="append", type="string", dest="wordlists",
                       help="File with OK words one per line.",
                       metavar="Wordlist")
     parser.add_option("-d", "--language", 
                       action="store", type="string", dest="language",
+                      help=lhelpstr)
+    parser.add_option("-l", "--listonly", 
+                      action="store_true", dest="listonly",
                       help=lhelpstr)
     parser.add_option("-v", action="store_true", dest="verbose",
                       help="Be verbose.")
@@ -65,7 +68,11 @@ Print out unknown words found in filename. Options
 
 
 if __name__ == "__main__":
-    
+    """Use like this
+    ./make-fi-all.py -d fi_FI fi_all.po > foo.txt 2>&1
+    Then do 
+    sort foo.txt | uniq | tee unknown_words.txt | wc"""
+
     from enchant.checker import SpellChecker
 
     o, a = handleCommandLine()
@@ -79,18 +86,30 @@ if __name__ == "__main__":
         print "Erroria", value
         sys.exit(4)
 
-    #text = textF.readlines()
     if o.verbose:
         import sys
         print "Language is", o.language
         print "STDOUT encoding ", sys.stdout.encoding
-        print "sys default encoding", sys.getdefaultencoding()
+        print "sys default encoding ", sys.getdefaultencoding()
     checker = SpellChecker(o.language)
     if o.verbose:
         if checker.wants_unicode:
             print "Checker wants Unicode text to check."
         else:
             print "Checker wants normal strings text to check."
+    #Read in Personal word lists, may be several files
+    for pN in o.wordlists:
+        try:
+            pF = open(pN, "r")
+        except IOError, value:
+            print "Error, personal word list could not be opened for reading ", pN
+            sys.exit(5)
+        for word in pF.readlines():
+            if len(word) > 0:
+                if (word[0] != "#"):
+                    checker.add_to_personal(word)
+
+    unknWords={}
     for text in textF.readlines():
         utext = unicode(text, "utf-8")
         if o.verbose:
@@ -102,6 +121,20 @@ if __name__ == "__main__":
             print
         checker.set_text(utext)
         for err in checker:
-            print err.word.encode("utf-8")
-
+            if o.verbose:
+                print "isinstance basestring", isinstance(err.word, basestring)
+                print "isinstance str", isinstance(err.word, str)
+                print "isinstance unicode", isinstance(err.word, unicode)
+                print err.word.encode("utf-8")
+            if unknWords.has_key(err.word):
+                unknWords[err.word] += 1
+            else:
+                unknWords[err.word] = 1
     textF.close()
+    
+    #Sort alphabetically and print out as count word
+    wlist = unknWords.keys()
+    wlist.sort()
+    for w in wlist:
+        print str(unknWords[w]).rjust(8).encode("utf-8"), " ",
+        print w.encode("utf-8")
