@@ -24,7 +24,7 @@ EOF
 	git config --replace-all hooks.replyto "debian-boot@lists.debian.org"
 	# This makes the repo show up as a subproject under
 	# debian-installer in CIA.
-	git config --add hooks.cia-project "debian-installer/$proj"
+	git config --replace-all hooks.cia-project "debian-installer/$proj"
 
 	echo "d-i $proj repository" > description
 done
