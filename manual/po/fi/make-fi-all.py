@@ -32,7 +32,7 @@ Print out unknown words found in filename. Options
 -p and --wordlist can be given several times."""
     lhelpstr = """What language is the text to proofread? For example fi_FI."""
     parser = OptionParser(usage=usage)
-    parser.set_defaults(verbose=True)
+    parser.set_defaults(verbose=False)
     parser.add_option("-p", "--wordlist", 
                       action="append", type="string", dest="wordlists",
                       help="File with OK words one per line.",
@@ -67,12 +67,11 @@ Print out unknown words found in filename. Options
 if __name__ == "__main__":
     
     from enchant.checker import SpellChecker
-    import fi
 
     o, a = handleCommandLine()
     if o.verbose:
-        print o
-        print a
+        print "options   ", o
+        print "arguments ", a
 
     try:
         textF = open(a[0], "r")
@@ -80,29 +79,29 @@ if __name__ == "__main__":
         print "Erroria", value
         sys.exit(4)
 
-    text = textF.readlines()
-    textF.close()
+    #text = textF.readlines()
     if o.verbose:
-        print "Text as read:"
-        print text 
-        print "Text to check is:"
-        for l in text:
-            print l.strip()
-    if o.verbose:
+        import sys
         print "Language is", o.language
-    chkr = SpellChecker(o.language)
+        print "STDOUT encoding ", sys.stdout.encoding
+        print "sys default encoding", sys.getdefaultencoding()
+    checker = SpellChecker(o.language)
     if o.verbose:
-        if chkr.wants_unicode:
+        if checker.wants_unicode:
             print "Checker wants Unicode text to check."
         else:
             print "Checker wants normal strings text to check."
+    for text in textF.readlines():
+        utext = unicode(text, "utf-8")
+        if o.verbose:
+            print "Text as read:"
+            print text 
+            print "Text to check is:"
+            for u in utext:
+                print u.encode("utf-8"),
+            print
+        checker.set_text(utext)
+        for err in checker:
+            print err.word.encode("utf-8")
 
-    utext = u""
-    for t in text:
-        utext += unicode(t, "utf-8")
-    chkr.set_text(utext)
-    for err in chkr:
-        print err.word
-    
-
-    
+    textF.close()
