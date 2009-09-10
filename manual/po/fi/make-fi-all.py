@@ -108,6 +108,7 @@ if __name__ == "__main__":
             if len(word) > 0:
                 if (word[0] != "#"):
                     checker.add_to_personal(word)
+        pF.close()
 
     unknWords={}
     for text in textF.readlines():
