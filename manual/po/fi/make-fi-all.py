@@ -31,6 +31,8 @@ def handleCommandLine():
 Print out unknown words found in filename. Options
 -p and --wordlist can be given several times."""
     lhelpstr = """What language is the text to proofread? For example fi_FI."""
+    lonlyhelpstr = """List only the misspellings. This is the default, but
+added this option to be compatible with enchant."""
     parser = OptionParser(usage=usage)
     parser.set_defaults(verbose=False, listonly=True, wordlists=[])
     parser.add_option("-p", "--wordlist", 
@@ -42,15 +44,15 @@ Print out unknown words found in filename. Options
                       help=lhelpstr)
     parser.add_option("-l", "--listonly", 
                       action="store_true", dest="listonly",
-                      help=lhelpstr)
+                      help=lonlyhelpstr)
     parser.add_option("-v", action="store_true", dest="verbose",
                       help="Be verbose.")
     parser.add_option("-q", action="store_false", dest="verbose",
-                      help="Be quiet.")
+                      help="Be quiet (the default).")
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
-        parser.error("incorrect number of arguments")
+        parser.error("incorrect number of arguments, filename missing")
     if options.verbose:
         if (options.wordlists == [] or options.wordlists == None):
             print "No extra wordlist files."
@@ -69,21 +71,23 @@ Print out unknown words found in filename. Options
 
 if __name__ == "__main__":
     """Use like this
-    ./make-fi-all.py -d fi_FI fi_all.po > foo.txt 2>&1
-    Then do 
-    sort foo.txt | uniq | tee unknown_words.txt | wc"""
+    ./find-unkn-words.py -p pwl -d fi_FI fi_all.po > fi_unkn_wl.txt
+    where pwl is name of file containing OK words"""
 
     from enchant.checker import SpellChecker
+    import sys
 
     o, a = handleCommandLine()
     if o.verbose:
         print "options   ", o
         print "arguments ", a
 
+    #Try opening filename, if file can not be read we exit
+    #right now since nothing to do.
     try:
         textF = open(a[0], "r")
     except IOError, value:
-        print "Erroria", value
+        print "Can't open filename, can not do anything.", value
         sys.exit(4)
 
     if o.verbose:
@@ -105,12 +109,13 @@ if __name__ == "__main__":
             print "Error, personal word list could not be opened for reading ", pN
             sys.exit(5)
         for word in pF.readlines():
-            if len(word) > 0:
-                if (word[0] != "#"):
+            if len(word) > 0: # Don't add empty words
+                if (word[0] != "#" and word[0] != " "): #Don't add comment lines
                     checker.add_to_personal(word)
         pF.close()
 
     unknWords={}
+    #Find unknown words and count number of occurrences for each.
     for text in textF.readlines():
         utext = unicode(text, "utf-8")
         if o.verbose:
@@ -137,5 +142,5 @@ if __name__ == "__main__":
     wlist = unknWords.keys()
     wlist.sort()
     for w in wlist:
-        print str(unknWords[w]).rjust(8).encode("utf-8"), " ",
+        print str(unknWords[w]).rjust(8).encode("utf-8"), u" ",
         print w.encode("utf-8")
