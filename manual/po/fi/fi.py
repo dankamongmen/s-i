@@ -31,7 +31,7 @@
 #
 """
 
-    enchant.tokenize.en:    Tokeniser for the Finnish language
+    enchant.tokenize.fi:    Tokeniser for the Finnish language
     
     This module implements a PyEnchant text tokenizer for the Finnish
     language, based on very simple rules.
@@ -64,7 +64,16 @@ class tokenize(enchant.tokenize.tokenize):
     
     def __init__(self,text,valid_chars=(u"'",)):
         #enchant.tokenize.tokenize.__init__(self)
-        self.loc = locale.getlocale(locale.LC_ALL) # Save current locale
+        #LC_ALL not allowed as category for getlocale
+        self.savedloc = locale.getlocale(locale.LC_CTYPE) # Save current locale
+        # Python Library Reference version 2.6 chapter 23.2.1 states
+        # locale should not be changed. But I can not see how
+        # isalpha works for Finnish without using locale fi_FI.
+        # Either change locale or write my own isalpha function 
+        # for this class here. Adding only åäöÅÄÖ to valid_chars
+        # is not enough with Unicode, then tokenizer would barf
+        # on admittedly not finnish words but valid words
+        # nontheless, for example: süsses, spaß, 
         locale.setlocale(locale.LC_ALL, (u"fi_FI", u"UTF-8")) # Finnish locale
         self._valid_chars = valid_chars
         self._text = text
@@ -74,8 +83,8 @@ class tokenize(enchant.tokenize.tokenize):
             self._myIsAlpha = self._myIsAlpha_a
         self.offset = 0
 
-    #def __del__(self):
-    #    locale.setlocale(locale.LC_ALL, self.loc)
+    def __del__(self):
+        locale.setlocale(locale.LC_ALL, self.savedloc)
     #    enchant.tokenize.tokenize.__del__(self)
     
     def _myIsAlpha_a(self,c):
@@ -120,20 +129,24 @@ class tokenize(enchant.tokenize.tokenize):
 
 
 class TestTokenizeFI(unittest.TestCase):
-    """TestCases for checking behavior of English tokenization."""
+    """TestCases for checking behavior of Finnish tokenization."""
     
     def test_tokenize_fi(self):
-        """Simple regression test for english tokenization."""
+        """Simple regression test for finnish tokenization."""
         inputT = u"""Tämä on kappale. Eipä ole kovin 2 nen, mutta tarkoitus on näyttää miten sanastaja 
 toimii useiden-erilaisten sanaryppäiden kimpussa.
-Pitääpä vielä "tarkistaa" sanat jotka 'lainausmerkeissä."""
+Pitääpä vielä "tarkistaa" sanat jotka "lainausmerkeissä". Heittomerkki ja vaa'an.
+Ulkomaisia sanoja süss, spaß."""
         outputT = [
                   (u"Tämä",0),(u"on",5),(u"kappale",8),(u"Eipä",17),(u"ole",22),
                   (u"kovin",26),(u"nen",34),(u"mutta",39),(u"tarkoitus",45),
                   (u"on",55),(u"näyttää",58),(u"miten",66),(u"sanastaja",72),
                   (u"toimii",83),(u"useiden",90),(u"erilaisten",98),(u"sanaryppäiden",109),
                   (u"kimpussa",123),(u"Pitääpä",133),(u"vielä",141),(u"tarkistaa",148),
-                  (u"sanat",159),(u"jotka", 165),(u"lainausmerkeissä",172)
+                  (u"sanat",159),(u"jotka", 165),(u"lainausmerkeissä",172),
+                  (u"Heittomerkki", 191), (u"ja", 204), (u"vaa'an", 207),
+                  (u"Ulkomaisia", 215), (u"sanoja", 226), (u"süss", 233), 
+                  (u"spaß", 239)
                  ]
         for (itmO,itmV) in zip(outputT,tokenize(inputT)):
             self.assertEqual(itmO,itmV)
