@@ -111,7 +111,11 @@ if __name__ == "__main__":
         for word in pF.readlines():
             if len(word) > 0: # Don't add empty words
                 if (word[0] != "#" and word[0] != " "): #Don't add comment lines
-                    checker.add_to_personal(word)
+                    # Workaroud for Debian bug #545848
+                    checker.dict.add(word)
+                    # When bug is fixed, replace above line with
+                    # checker.add(word)
+
         pF.close()
 
     unknWords={}

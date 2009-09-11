@@ -18,7 +18,7 @@ done
 rm $$.temp1 $$.temp2
 
 # Make list of words tmispell-voikko does not accept
-${SPELLCHECKER} -l -d suomi < fi_all.po > $$.temp3
+${SPELLCHECKER} -l -d fi_FI < fi_all.po > $$.temp3
 sort $$.temp3 | uniq > finnish_unkn_wl.txt
 rm $$.temp3
 echo "Tuntemattomia sanoja " `wc -l finnish_unkn_wl.txt`
