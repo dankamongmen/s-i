@@ -146,5 +146,5 @@ if __name__ == "__main__":
     wlist = unknWords.keys()
     wlist.sort()
     for w in wlist:
-        print str(unknWords[w]).rjust(8).encode("utf-8"), u" ",
+        print str(unknWords[w]).rjust(6).encode("utf-8"), u" ",
         print w.encode("utf-8")
