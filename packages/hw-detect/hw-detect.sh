@@ -108,7 +108,7 @@ load_module() {
 	else   
 		log "Error loading '$module'"
 		if [ "$module" != floppy ] && [ "$module" != ide-floppy ] && \
-		   [ "$module" != ide-cd ]; then
+		   [ "$module" != ide-cd ] && [ "$module" != ide-generic ]; then
 			db_subst hw-detect/modprobe_error CMD_LINE_PARAM "modprobe -v $module"
 			db_input medium hw-detect/modprobe_error || [ $? -eq 30 ]
 			db_go
