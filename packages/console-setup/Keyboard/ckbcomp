@@ -342,9 +342,11 @@ my @modifier_combinations = ('plain',
 			    );
 
 # Some Unicodes cause the kernel/loadkeys to issue "Segmentation fault"
+# kbd 1.15-1 (deliberately) fails on anything in the range 0xf000..0xffff;
+# see http://bugs.debian.org/500116.
 my %forbidden;
 {
-    for my $i (0xfd00..0xfdff) {
+    for my $i (0xf000..0xffff) {
 	$forbidden{$i} = 1;
     }
 }
