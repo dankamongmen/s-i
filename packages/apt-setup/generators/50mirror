@@ -112,11 +112,11 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	fi
 
 	while true; do
-		RET=0
-		choose-mirror -n || RET=$?	# no progress bar
-		if [ $RET -eq 0 ]; then
+		CODE=0
+		choose-mirror -n || CODE=$?	# no progress bar
+		if [ $CODE -eq 0 ]; then
 			break
-		elif [ $RET -eq 10 ]; then
+		elif [ $CODE -eq 10 ]; then
 			# User backed out of choose-mirror
 			db_input critical apt-setup/no_mirror
 			db_go || exit 10
@@ -126,8 +126,8 @@ if [ -e /cdrom/.disk/base_installable ]; then
 				exit 1
 			fi
 		else
-			logger -t apt-setup "choose-mirror failed with error code $RET"
-			exit $RET
+			logger -t apt-setup "choose-mirror failed with error code $CODE"
+			exit $CODE
 		fi
 	done
 fi
