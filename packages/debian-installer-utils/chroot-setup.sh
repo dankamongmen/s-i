@@ -116,7 +116,9 @@ EOF
 chroot_cleanup () {
 	rm -f /target/usr/sbin/policy-rc.d
 	mv /target/sbin/start-stop-daemon.REAL /target/sbin/start-stop-daemon
-	mv /target/sbin/initctl.REAL /target/sbin/initctl
+	if [ -x /target/sbin/initctl.REAL ]; then
+		mv /target/sbin/initctl.REAL /target/sbin/initctl
+	fi
 
 	# Undo the mounts done by the packages during installation.
 	# Reverse sorting to umount the deepest mount points first.
