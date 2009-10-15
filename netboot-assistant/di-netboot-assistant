@@ -258,10 +258,23 @@ uninstall_repos() {
 	[ "$DEBUG" ] && set -x
 	del_repo="$1"
 	ignore_missing="$2"
-	current_repos="$(find  "${STATUS_LIB}/"  -name $del_repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
+
+	if [ ! -d "${STATUS_LIB}" ]; then
+		echo "E: Failed to uninstall repository, lib folder not found." 1>&2
+		exit 1
+	fi
+
+	installed_archs="$(find  "${STATUS_LIB}/"  -name \*$del_repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
+	if [ ! "$installed_archs" -a "$ignore_missing" != "ignore_missing" ]; then
+		installed_repos="$(find  "${STATUS_LIB}/"  -name \*--\*.conf | sed -e 's,^.*/,,' -e 's/--.*\.conf//')"
+		echo "E: Repository '$del_repo' not ininstalled." 1>&2
+		echo "I: (installed repositories are: $installed_repos)" 1>&2
+		echo "" 1>&2
+		exit 1
+	fi
 
 	if [ "$(echo $ARCH | grep -E "\<all\>")" ]; then
-		archs="$current_repos"
+		archs="$installed_archs"
 	else
 		archs="$(echo $ARCH | tr ',' ' ')"
 	fi
@@ -272,7 +285,7 @@ uninstall_repos() {
 		else
 			if [ "$ignore_missing" != "ignore_missing" ]; then
 				echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
-				echo "I: (current repository are: $current_repos)"
+				echo "I: (installed arch are: $installed_archs)"
 				echo "" 1>&2
 				exit 1
 			fi
@@ -315,21 +328,24 @@ remove_repocaches() {
 	local COUNT
 	[ "$DEBUG" ] && set -x
 	del_repo="$1"
+	ignore_missing="$2"
 
 	if [ ! -d "${DL_CACHE}" ]; then
 		echo "E: Failed to clean the cache, cache folder not found." 1>&2
 		exit 1
 	fi
 
-	current_repos="$(find ${DL_CACHE} -name "*~~$del_repo--*.meta" | sed -e 's/^.*--//' -e 's/\.meta//' | tr '\n' ' ')"
-	if [ ! "$current_repos" ]; then
+	cached_archs="$(find ${DL_CACHE} -name "*~~$del_repo--*.meta" | sed -e 's/^.*--//' -e 's/\.meta//' | tr '\n' ' ')"
+	if [ ! "$cached_archs" -a "$ignore_missing" != "ignore_missing" ]; then
+		cached_repos="$(find /home/fpiat/.di-netboot-assistant/cache -name \*~~\*--\*.meta | sed -e 's/^.*~~//' -e 's/--.*//' | tr '\n' ' ')"
 		echo "E: Repository '$del_repo' not cached." 1>&2
+		echo "I: (cached repositories are: $cached_repos)" 1>&2
 		echo "" 1>&2
-		exit 0
+		exit 1
 	fi
 
 	if [ "$(echo $ARCH | grep -E "\<all\>")" ]; then
-		archs="$current_repos"
+		archs="$cached_archs"
 	else
 		archs="$(echo $ARCH | tr ',' ' ')"
 	fi
@@ -341,9 +357,9 @@ remove_repocaches() {
 			COUNT=$(( $COUNT + 1 ))
 		done
 
-	        if [ $COUNT -eq 0 ]; then
+	        if [ $COUNT -eq 0 -a "$ignore_missing" != "ignore_missing" ]; then
 			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
-			echo "I: (current repository are: $current_repos)" 1>&2
+			echo "I: (cached archs are: $cached_archs)" 1>&2
 			echo "" 1>&2
 			exit 1
 		fi
@@ -863,7 +879,7 @@ for option in "$@"; do
 			;;
 		purge)
 			uninstall_repos "$option" ignore_missing 
-			remove_repocaches "$option"
+			remove_repocaches "$option" ignore_missing
 			;;
 		rebuild-menu)
 			echo "W: Argument '$option' ignored ($ACTION expects no argument)." 1>&2
