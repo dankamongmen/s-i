@@ -49,10 +49,9 @@ Architectures Notes:
         option pxelinux.reboottime code 211 = unsigned integer 32;
 
 	# Configure PXE options for di-netboot-assistant
-	# Those are compulsory (nothing to change).
+	# This is compulsory (nothing to change).
 	site-option-space		"pxelinux";
 	option pxelinux.magic		f1:00:74:7e;
-	option pxelinux.pathprefix	"/";
 	if exists dhcp-parameter-request-list {
 		# Always send the PXELINUX options (specified in hexadecimal)
 		option dhcp-parameter-request-list = concat(option dhcp-parameter-request-list,d0,d1,d2,d3);
@@ -241,7 +240,6 @@ Using dnsmasq
         #dhcp-option=option:router,192.168.0.1
 
         dhcp-option-force=208,f1:00:74:7e                       #PXE signature
-        dhcp-option-force=210,/                                 #tftp prefix
         dhcp-boot=debian-installer/pxelinux.0
         dhcp-option-force=209,debian-installer/pxelinux.cfg/default
 

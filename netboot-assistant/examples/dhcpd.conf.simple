@@ -40,7 +40,7 @@ next-server 192.168.0.10;
 
 # Default netboot filename.
 
-# START, For i386 or amd64 
+# note: start for i386 or amd64 
 filename "debian-installer/pxelinux.0";
 site-option-space "pxelinux";
 option pxelinux.magic f1:00:74:7e;
@@ -48,9 +48,8 @@ if exists dhcp-parameter-request-list {
 	# Always send the PXELINUX options (specified in hexadecimal)
 	option dhcp-parameter-request-list = concat(option dhcp-parameter-request-list,d0,d1,d2,d3);
 }
-option pxelinux.pathprefix "/";
-option pxelinux.configfile "debian-installer/pxelinux.cfg/default";
-# END, For i386 or amd64 
+option pxelinux.configfile "::debian-installer/pxelinux.cfg/default";
+# note: end for i386 or amd64 
 
 
 #Alternatively, for ia64, use a line like this:
