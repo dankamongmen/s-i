@@ -22,14 +22,21 @@ QuickStart:
 Architectures Notes:
 
 * i386 / amd64
-    DebianInstaller uses Syslinux's PXElinux[3] for both platform.
+    DebianInstaller uses Syslinux's PXElinux[3] for BIOS platforms.
     Syslinux is a boot-loader that provide a menu system to select
     the kernel you want to boot.
 
     di-netboot-assistant creates a "top level" menu, to select among
     the DebianInstaller netboot menu you previously installed (etch,
-    lenny, testing, daily...)
+    lenny, testing, daily...).
 
+    Absolute filenames in PXELinux:
+    Tftp filenames inside PXELinux configuration files (pxelinux.HEAD,
+    "default"...) must be prefixed with "::/" so pxelinux treats
+    them as absolute filenames. In PXELinux, path starting with a
+    slash ("/") are RELATIVE to the folder of pxelinux.0 !
+    The double column ("::/") forces PXELinux to treat them as absolute.
+    
     DHCP configuration:
     Most PC capable of netbooting use DHCP+PXE (as opposed to BOOTP).
     You can either configure the DHCP to tell the PC to start the "top
