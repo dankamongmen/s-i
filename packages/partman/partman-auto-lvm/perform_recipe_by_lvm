@@ -32,7 +32,7 @@ db_progress STEP 1
 # lvm overhead gets calculated properly only using kbytes.
 # Switch to that. The worst scenario is that the last partition will
 # be one PE smaller, but in the big numbers it's nothing (4MB).
-free_size=$(vgs -o vg_free --units K --noheading --nosuffix $VG_name | sed -e 's/\..*//g')
+free_size=$(vgs -o vg_free --units K --noheading --nosuffix $VG_name | sed -e 's/^[[:space:]]*//; s/\..*//g')
 
 newscheme=''
 foreach_partition '
