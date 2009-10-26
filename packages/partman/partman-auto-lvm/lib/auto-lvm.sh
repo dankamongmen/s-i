@@ -28,6 +28,8 @@ auto_lvm_create_partitions() {
 
 	expand_scheme
 
+	ensure_primary
+
 	create_primary_partitions
 	create_partitions
 }
