@@ -67,15 +67,12 @@ ask_for_size () {
 }
 
 ask_for_type () {
-	local noninteractive has_extended parttype
+	local noninteractive has_primary parttype
 	has_primary=no
-	has_extended=no
 	open_dialog PARTITIONS
 	while { read_line x1 x2 x3 parttype x5 x6 x7; [ "$parttype" ]; }; do
 		if [ "$parttype" = primary ]; then
 			has_primary=yes
-		elif [ "$parttype" = logical ]; then
-			has_extended=yes
 		fi
 	done
 	close_dialog
@@ -92,7 +89,7 @@ ask_for_type () {
 			type=Logical
 			;;
 		    pri/log)
-			if [ "$has_primary" = yes ] || [ "$has_extended" = yes ]; then
+			if [ "$has_primary" = yes ]; then
 				db_set partman-partitioning/new_partition_type Logical
 			else
 				db_set partman-partitioning/new_partition_type Primary
