@@ -127,7 +127,8 @@ static kbd_t *usb_preferred_keymap (kbd_t *keyboards, const char *subarch)
 }
 
 /**
- * @brief parse /proc/bus/usb/devices, looking for keyboards
+ * @brief parse /proc/bus/usb/devices or /sys/kernel/debug/usb/devices,
+ *        looking for keyboards
  */
 static kbd_t *usb_parse_proc (kbd_t *keyboards)
 {
@@ -135,27 +136,45 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 	kbd_t *k = NULL;
 	char buf[LINESIZE], *p;
 	FILE *fp;
-	int mounted_fs = 0;
+	int mounted_usbfs = 0, mounted_debugfs = 0;
 	int serr, vendorid = 0, productid = 0;
 
 	fp = fopen ("/proc/bus/usb/devices", "r");
-	if (fp == NULL) {	// try harder.
-		di_debug ("Mounting usbdevfs to look for kbd\n");
+	if (fp == NULL)		// file was moved with kernel 2.6.31
+		fp = fopen ("/sys/kernel/debug/usb/devices", "r");
+	if (fp == NULL) {	// try harder using usbfs
+		di_debug ("Mounting usbfs to look for kbd\n");
 		// redirect stderr for the moment
 		serr = dup(2);
 		close (2);
 		open ("/dev/null", O_RDWR);
-		if (system ("mount -t  usbfs usbfs /proc/bus/usb") != 0) {
-			return keyboards; // ok, now you can give up.
+		if (system ("mount -t usbfs usbfs /proc/bus/usb") == 0) {
+			mounted_usbfs = 1;
+			fp = fopen("/proc/bus/usb/devices", "r");
 		}
 		// restore stderr
 		close (2);
 		dup (serr);
-		mounted_fs = 1;
-		fp = fopen("/proc/bus/usb/devices", "r");
 	}
-	if (fp) {
-		di_debug ("Parsing /proc/bus/usb/devices\n");
+	if (fp == NULL) {	// try harder using debugfs
+		di_debug ("Mounting debugfs to look for kbd\n");
+		// redirect stderr for the moment
+		serr = dup(2);
+		close (2);
+		open ("/dev/null", O_RDWR);
+		if (system ("mount -t debugfs none /sys/kernel/debug") == 0) {
+			mounted_debugfs = 1;
+			fp = fopen("/sys/kernel/debug/usb/devices", "r");
+		}
+		// restore stderr
+		close (2);
+		dup (serr);
+	}
+	if (fp == NULL) {	// ok, now you can give up.
+		di_debug ("Failed to open usb/devices file\n");
+		return keyboards;
+	} else {
+		di_debug ("Parsing usb/devices file\n");
 		while (!feof(fp)) {
 			fgets(buf, LINESIZE, fp);
 			if ((p = strstr (buf, "Vendor=")) != NULL) {
@@ -180,11 +199,11 @@ static kbd_t *usb_parse_proc (kbd_t *keyboards)
 			}
 		}
 		fclose(fp);
-	} else {
-		di_debug ("Failed to open /proc/bus/usb/devices: %d\n", errno);
 	}
-	if (mounted_fs)
+	if (mounted_usbfs)
 		system ("umount /proc/bus/usb");
+	if (mounted_debugfs)
+		system ("umount /sys/kernel/debug");
 
 	return keyboards;
 }
