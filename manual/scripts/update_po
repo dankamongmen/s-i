@@ -39,11 +39,11 @@ for POT in `find $PODIR/pot -name "*.pot"` ; do
         echo "- updating $BASENAME.po"
         if [ -z "$PO_USEBUILD" ] ; then
             # Update existing PO file
-            msgmerge -q -U --previous --backup=simple $PO $POT
+            msgmerge -q -U --previous --backup=simple -w 79 $PO $POT
             RC=$?
         else
             # Generate temporary PO file in build directory
-            msgmerge -q $SPO $POT -o $PO
+            msgmerge -q -w 79 $SPO $POT -o $PO
             RC=$?
         fi
         if [ $RC -ne 0 ] ; then
