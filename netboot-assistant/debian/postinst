@@ -25,7 +25,10 @@ migrate_pxelinux_prefix() {
 
 case "$1" in
     configure)
-    dpkg --compare-versions "$2" lt 0.37 && migrate_pxelinux_prefix
+        oldver=$2
+        if [ "$oldver" ] && dpkg --compare-versions "$2" lt 0.37; then
+            migrate_pxelinux_prefix
+        fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
