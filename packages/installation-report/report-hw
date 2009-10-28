@@ -75,8 +75,7 @@ fi
 if [ "$DEBIAN_FRONTEND" = gtk ]; then
 	addfile /proc/fb
 	addfile /etc/directfbrc
-	dfbinfo=$(ls /usr/lib/directfb-*/bin/dfbinfo 2>/dev/null || true)
-	if [ -x "$dfbinfo" ]; then
-		$dfbinfo 2>&1 | addinfo dfbinfo
+	if type dfbinfo; then
+		dfbinfo 2>&1 | addinfo dfbinfo
 	fi
 fi
