@@ -500,6 +500,7 @@ fetch_files() {
 	if [ "$SUCCEED" = "true" ]; then
 		if [ ! "$OFFLINE" ]; then
 			echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
+			echo "format=1.0" >> $metadatafile
 			echo "fetch_date=$fetch_date" >> $metadatafile
 			echo "repo=$baseurl" >> $metadatafile
 			echo "dl_file=$files" >> $metadatafile
@@ -606,7 +607,10 @@ install_repo() {
 		dl_file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
 
 		# get existing metadata from the downloaded repository
-		cat "${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)" > $metadatafile
+		grep -v -E "^format=.*" \
+	       		"${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)" \
+			| sed -e "s/^fetch_date=/format=1.0\n\0/" \
+			> $metadatafile
 		echo "expand_dir=$expand_dir" >> $metadatafile
 #FIXME: MAke those two lines to work !
 #		echo "di_args=$DI_ARGS" >> $metadatafile
