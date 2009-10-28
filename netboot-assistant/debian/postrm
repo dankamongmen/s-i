@@ -5,6 +5,9 @@ set -e
 DL_CACHE=/var/cache/di-netboot-assistant/
 STATUS_LIB=/var/lib/di-netboot-assistant
 TFTP_ROOT=/var/lib/tftpboot
+if [ -f /var/lib/di-netboot-assistant/.old-conf-for-purge ]; then
+	. /var/lib/di-netboot-assistant/.old-conf-for-purge
+fi
 
 #This function should be kept in sync with function "uninstall_repo" in di-netboot-assistant
 uninstall_repo() {
@@ -86,9 +89,18 @@ case "$1" in
 		for x in debian-installer/pxelinux.cfg debian-installer; do
 			rmdir --ignore-fail-on-non-empty "$TFTP_ROOT/$x" || true
 		done
+
+		rm /var/lib/di-netboot-assistant/.old-conf-for-purge || true
 	fi
     ;;
-    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+    remove)
+	if [ -f /etc/di-netboot-assistant/di-netboot-assistant.conf ]; then
+		sed -e "1s/^/#BACKUP, to purge our TFT stuff when purged\n/" \
+			< /etc/di-netboot-assistant/di-netboot-assistant.conf \
+			> /var/lib/di-netboot-assistant/.old-conf-for-purge
+	fi
+    ;;
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
     ;;
 
     *)
