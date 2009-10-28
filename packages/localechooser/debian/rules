@@ -4,6 +4,14 @@
 
 PACKAGE=localechooser
 
+ARCH=$(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+ifneq ($(ARCH),s390)
+MENUITEMNUM=1000
+else # run after network-console for s390 
+MENUITEMNUM=2110
+endif
+
 override_dh_clean:
 	rm -rf debian/pobuild debian/iso-codes debian/short-tmp
 	rm -rf debian/locales debian/sort-tmp
@@ -23,3 +31,6 @@ override_dh_installdebconf:
 	# Sort countries and continents (including translations)
 	# MUST be after dh_installdebconf
 	./sort-templates
+
+override_dh_gencontrol:
+	dh_gencontrol -- -Vmenuitemnum=$(MENUITEMNUM)
