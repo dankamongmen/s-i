@@ -426,7 +426,6 @@ fetch_files() {
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		url="$baseurl/$f"
 		file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
-
 		[ -e $file.tmp ] && rm $file.tmp
 
 		# Does the checksum of the previous file match the new one?
@@ -435,13 +434,17 @@ fetch_files() {
 		if [ "$givenfile" = "MD5SUMS" ]; then
 			CSUM=md5sum
 			CSUM_FILE="$file.tmp"
+			[ "$OFFLINE" ] && cp "$file" "$file.tmp"
 			SKIP_CSUM=true
 		elif [ "$CSUM" ]; then
-			if [ "$OFFLINE" ] || check_sum $givenfile $file; then
+			if check_sum $givenfile $file; then
 				CACHED=true
+				cp "$file" "$file.tmp"
 				[ $VERBOSITY -gt 0 ] && echo "I: * $givenfile cached"
 			else
-				[ $VERBOSITY -gt 0 ] && echo "I: * $givenfile not cached"
+				[ -f "$file.tmp" ] && rm "$file.tmp"
+				[ $VERBOSITY -gt 0 ] && echo "I: * $givenfile not cached, or obsolete."
+				[ "$OFFLINE" ] && SUCCEED="failed"
 			fi
 		fi
 
@@ -452,7 +455,7 @@ fetch_files() {
 					fetch_date="$(date -R)"
 				else
 					echo "E: Checksum verification failed (file $givenfile)." 1>&2
-					exit 1
+					break
 				fi
 			else
 				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || SUCCEED="failed"
@@ -463,17 +466,16 @@ fetch_files() {
 				fi
 			fi
 		else
-			if [ ! -f "$file" ]; then
+			if [ ! -f "$file.tmp" ]; then
 				SUCCEED="failed"
 				echo "E: Can't process '$release' in offline mode, the file is missing:" 1>&2
 				echo "E: (expecting '$file' from '$url')" 1>&2
-				echo "" 1>&2
-				exit 1
+				#break
 			else
 				echo "I: Reusing previously downloaded file... "
 				fetch_date="$( grep "fetch_date" "$metadatafile" | cut -d "=" -f 2- )"
 				# Fall back, in case the file is manually added to the cache.
-				[ -z "$fetch_date" ] && fetch_date="$(date -R --reference="$file" )"
+				[ -z "$fetch_date" ] && fetch_date="$(date -R --reference="$file.tmp" )"
 			fi
 		fi
 	done
@@ -482,21 +484,19 @@ fetch_files() {
 		echo "I: No checksum found."
 	fi
 
-	# 
-	if [ ! "$OFFLINE" ]; then
-		echo "I: Moving/Removing temporary files."
-		for givenfile in $EXTRA_DL_FILES $files ; do
-			f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
-			file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
-			if [ "$SUCCEED" = "true" ]; then
-				[ -f "$file.tmp" -a -f "$file" ] && rm $RM_VERBOSITY "$file"
-				[ -f "$file.tmp" ] && mv $MV_VERBOSITY "$file.tmp" "$file"
-			else
-				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
-			fi
-		done
-	fi
+	[ $VERBOSITY -gt 0 ] && echo "I: Moving/Removing temporary files."
+	for givenfile in $EXTRA_DL_FILES $files ; do
+		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
+		file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
+		if [ "$SUCCEED" = "true" ]; then
+			[ -f "$file.tmp" -a -f "$file" ] && rm $RM_VERBOSITY "$file"
+			[ -f "$file.tmp" ] && mv $MV_VERBOSITY "$file.tmp" "$file"
+		else
+			[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
+		fi
+	done
 
+	# Save metadata
 	if [ "$SUCCEED" = "true" ]; then
 		if [ ! "$OFFLINE" ]; then
 			echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
