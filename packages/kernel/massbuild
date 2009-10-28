@@ -20,6 +20,7 @@ NO_CLEAN=""
 DO_DCH=""
 CHANGELOG_EXTRA=""
 DISTRIBUTION=""
+URGENCY=""
 LMIRROR=""
 MIRROR=""
 INCOMING=""
@@ -118,6 +119,10 @@ while true; do
 	    -d)
 		shift
 		DISTRIBUTION="$1"
+		;;
+	    -u)
+		shift
+		URGENCY="$1"
 		;;
 	    --incoming)
 		USE_INCOMING=1
@@ -238,7 +243,11 @@ EOF
 	if [ "$DISTRIBUTION" ]; then
 		dist="--distribution $DISTRIBUTION"
 	fi
-	dch $dist -r "dummy"
+	local urgency=""
+	if [ "$URGENCY" ]; then
+		urgency="--urgency $URGENCY"
+	fi
+	dch $dist $urgency -r "dummy"
 }
 
 has_recent_upload() {
