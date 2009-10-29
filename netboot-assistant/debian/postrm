@@ -95,9 +95,11 @@ case "$1" in
     ;;
     remove)
 	if [ -f /etc/di-netboot-assistant/di-netboot-assistant.conf ]; then
+		dir=/var/lib/di-netboot-assistant
+		[ ! -d $libdir ] && mkdir $libdir
 		sed -e "1s/^/#BACKUP, to purge our TFT stuff when purged\n/" \
 			< /etc/di-netboot-assistant/di-netboot-assistant.conf \
-			> /var/lib/di-netboot-assistant/.old-conf-for-purge
+			> $libdir/.old-conf-for-purge
 	fi
     ;;
     upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
