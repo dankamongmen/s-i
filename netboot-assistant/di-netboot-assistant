@@ -149,7 +149,7 @@ xREADMEx
 update_pxelinux_menu() {
 
 	[ ! -d "pxelinux.cfg" ] && mkdir "pxelinux.cfg"
-	echo "I: Building PXE-Linux' top-menu"
+	[ "$VERBOSE" ] && echo "I: Building PXE-Linux' top-menu"
 	print_do-not-edit_header "${TEMPLATES}/pxelinux.HEAD" > pxelinux.cfg/default
 	if [ -n "$(find "$TFTP_ROOT/debian-installer" -type d -name pxelinux.cfg.serial-9600 2>/dev/null)" ]; then
 		cp pxelinux.cfg/default pxelinux.cfg/default.serial-9600
@@ -190,7 +190,7 @@ update_pxelinux_menu() {
 }
 
 update_elilo_menu() {
-	echo "I: Building Elilo's top-menu"
+	[ "$VERBOSE" ] && echo "I: Building Elilo's top-menu"
 	print_do-not-edit_header "${TEMPLATES}/elilo.HEAD" > elilo.conf
 	[ -f ${TEMPLATES}/elilo.HEAD ] && grep -Ev "^##" "${TEMPLATES}/elilo.HEAD" >> elilo.conf
 
@@ -414,7 +414,6 @@ fetch_files() {
 			echo "" 1>&2
 			exit 2
 		fi
-		echo "I: Downloading..."
 	fi
 
 	metadatafile="${DL_CACHE}/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)"
@@ -440,16 +439,17 @@ fetch_files() {
 			if check_sum $givenfile $file; then
 				CACHED=true
 				cp "$file" "$file.tmp"
-				[ $VERBOSITY -gt 0 ] && echo "I: * $givenfile cached"
+				[ "$VERBOSE" ] && echo "I: File $givenfile is already cached"
 			else
 				[ -f "$file.tmp" ] && rm "$file.tmp"
-				[ $VERBOSITY -gt 0 ] && echo "I: * $givenfile not cached, or obsolete."
+				[ "$VERBOSE" -a "$OFFLINE" ] && echo "I: $givenfile not cached, or obsolete."
 				[ "$OFFLINE" ] && SUCCEED="failed"
 			fi
 		fi
 
 		# Download the file, if needed.
 		if [ ! "$OFFLINE" -a ! "$CACHED" ]; then
+			[ 0$VERBOSE -eq 1 ] && echo "I: Downloading $givenfile"
 			if $GETTER "$file.tmp" -- "$url" ; then
 				if check_sum $givenfile $file.tmp || [ "$SKIP_CSUM" ] ; then
 					fetch_date="$(date -R)"
@@ -472,7 +472,6 @@ fetch_files() {
 				echo "E: (expecting '$file' from '$url')" 1>&2
 				#break
 			else
-				echo "I: Reusing previously downloaded file... "
 				fetch_date="$( grep "^fetch_date=" "$metadatafile" | cut -d "=" -f 2- 2>/dev/null )"
 				
 				# Fall back, in case the file is manually added to the cache.
@@ -482,10 +481,10 @@ fetch_files() {
 	done
 
 	if [ ! "$CSUM" ]; then
-		echo "I: No checksum found."
+		echo "W: No checksum found."
 	fi
 
-	[ $VERBOSITY -gt 0 ] && echo "I: Moving/Removing temporary files."
+	[ $VERBOSE ] && echo "I: Moving/Removing temporary files."
 	for givenfile in $EXTRA_DL_FILES $files ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
@@ -568,7 +567,7 @@ install_repo() {
 	fi
 
 	for arch in $archs ; do
-		echo "I: Processing $release/$arch ... "
+		echo "I: Processing $release/$arch."
 
 		metadatabasename="${STATUS_LIB}/${REPO_ALIAS}--${arch}"
 		metadatafile="$metadatabasename.conf"
@@ -590,7 +589,7 @@ install_repo() {
 			exit 1
 		fi
 
-		if [ "$release" != "${REPO_ALIAS}" ]; then
+		if [ "$release" != "${REPO_ALIAS}" -a "$VERBOSE" ]; then
 			echo "I: Repository '$release' filed as '${REPO_ALIAS}'."
 		fi
 
@@ -617,7 +616,7 @@ install_repo() {
 #		echo "di_args=$DI_ARGS" >> $metadatafile
 #		echo "target_args=$TARGET_ARGS" >> $metadatafile
 
-		echo "I: Extracting... "
+		[ "$VERBOSE" ] && echo "I: Extracting... "
 
 		if [ -d "$expand_dir" ]; then
 			rm -Rf "$expand_dir/*"
@@ -747,7 +746,7 @@ install_repo() {
 }
 
 
-VERBOSITY=0
+VERBOSE= #false#
 WGET_VERBOSITY="--quiet"
 CURL_VERBOSITY="--silent"
 RM_VERBOSITY=
@@ -795,13 +794,15 @@ for option in "$@"; do
     --offline)
 	OFFLINE=yes ;;
     --verbose)
-	WGET_VERBOSITY=""
-	CURL_VERBOSITY=""
-	RM_VERBOSITY="-v"
-	MV_VERBOSITY="-v"
-	CP_VERBOSITY="-v"
-	TAR_VERBOSITY="-v"
-	VERBOSITY=1
+	VERBOSE=$(( 0$VERBOSE + 1 ))
+	if [ $VERBOSE -gt 1 ]; then
+		WGET_VERBOSITY=""
+		CURL_VERBOSITY=""
+		RM_VERBOSITY="-v"
+		MV_VERBOSITY="-v"
+		CP_VERBOSITY="-v"
+		TAR_VERBOSITY="-v"
+	fi
 	;;
     --debug)
 	# This is an undocumented feature...
