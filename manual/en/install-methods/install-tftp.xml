@@ -38,23 +38,6 @@ For PowerPC, if you have a NewWorld Power Macintosh machine, it is a
 good idea to use DHCP instead of BOOTP.  Some of the latest machines
 are unable to boot using BOOTP.
 
-</para><para arch="alpha">
-
-Unlike the Open Firmware found on Sparc and PowerPC machines, the SRM
-console will <emphasis>not</emphasis> use RARP to obtain its IP
-address, and therefore you must use BOOTP for net booting your
-Alpha<footnote>
-
-<para>
-Alpha systems can also be net-booted using the DECNet MOP (Maintenance
-Operations Protocol), but this is not covered here.  Presumably, your
-local OpenVMS operator will be happy to assist you should you have
-some burning need to use MOP to boot Linux on your Alpha.
-</para>
-
-</footnote>. You can also enter the IP configuration for network
-interfaces directly in the SRM console.
-
 </para><para arch="hppa">
 
 Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP.
@@ -220,22 +203,6 @@ your dhcp server is configured to pass
 to <command>tftpd</command> as the filename to boot.
 
 </para>
-
-   <sect3 arch="alpha">
-   <title>Alpha TFTP Booting</title>
-<para>
-On Alpha, you must specify the filename (as a relative path to the
-boot image directory) using the <userinput>-file</userinput> argument
-to the SRM <userinput>boot</userinput> command, or by setting the
-<userinput>BOOT_FILE</userinput> environment variable.  Alternatively,
-the filename can be given via BOOTP (in ISC <command>dhcpd</command>,
-use the <userinput>filename</userinput> directive).  Unlike Open
-Firmware, there is <emphasis>no default filename</emphasis> on SRM, so
-you <emphasis>must</emphasis> specify a filename by either one of
-these methods.
-
-</para>
-   </sect3>
 
    <sect3 arch="sparc">
    <title>SPARC TFTP Booting</title>
