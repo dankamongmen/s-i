@@ -42,24 +42,6 @@ Para PowerPC, si tiene una máquina Power Macintosh NewWorld, es una
 buena idea utilizar DHCP en lugar de BOOTP. Algunos de los modelos más
 recientes solamente pueden arrancar usando BOOTP.
 
-</para><para arch="alpha">
-
-A diferencia del «Open Firmware» encontrado en máquinas Sparc y PowerPC,
-la consola SRM <emphasis>no</emphasis> usará RARP para obtener su
-dirección IP, y por consiguiente deberá usar BOOTP para el arranque
-a través de red en su sistema Alpha<footnote>
-
-<para>
-
-Los sistemas Alpha también se pueden arrancar usando DECNet MOP
-(Protocolo de operaciones de mantenimiento), pero esto no se detalla
-aquí. Presumiblemente, su operador de OpenVMS local estará gustoso de
-asistirlo, deberá tener alguna razón de peso si quiere usar MOP para
-arrancar Linux en su Alpha.
-</para>
-</footnote>. También puede ingresar la configuración de las interfaces
-de red directamente en la consola SRM.
-
 </para><para arch="hppa">
 
 Algunas máquinas HPPA antiguas (como 715/75) usan RBOOTD en lugar de
@@ -237,23 +219,6 @@ Asegúrese de que su servidor DHCP está configurado para pasar
 <command>tftpd</command> como el nombre del fichero a arrancar.
 
 </para>
-
-   <sect3 arch="alpha">
-   <title>Arranque de TFTP en Alpha</title>
-<para>
-En Alpha, debe especificar el nombre del fichero (como una ruta relativa
-al directorio de imagen de arranque) usando el argumento
-<userinput>-file</userinput> a la orden <userinput>boot</userinput> de SRM,
-o definiendo la variable de entorno <userinput>BOOT_FILE</userinput>.
-Alternativamente, se puede dar el nombre del fichero a través de BOOTP
-(en la versión de <command>dhcpd</command> de ISC,
-use la directiva <userinput>filename</userinput>). A diferencia de
-«Open Firmware», en SRM <emphasis>no existe ningún nombre de fichero
-predeterminado</emphasis>, de modo que <emphasis>debe</emphasis> especificar
-un nombre de fichero por cualquiera de estos métodos.
-
-</para>
-   </sect3>
 
    <sect3 arch="sparc">
    <title>Arranque de TFTP en SPARC</title>
