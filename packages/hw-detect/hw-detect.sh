@@ -140,7 +140,7 @@ get_detected_hw_info() {
 	if [ "${SUBARCH%%/*}" = sparc ]; then
 		discover-sbus
 	fi
-	if [ -d /proc/bus/usb ]; then
+	if [ -d /sys/bus/usb ]; then
 		echo "usb-storage:USB storage"
 	fi
 }
