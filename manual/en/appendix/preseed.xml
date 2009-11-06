@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- $Id$ -->
+<!-- $Id: preseed.xml 60603 2009-09-01 17:03:55Z fjp $ -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1143,6 +1143,11 @@ installation. The only questions asked concern the installation of the kernel.
 </para>
 
 <informalexample role="example"><screen>
+# Configure APT to not install recommended packages by default. Use of this
+# option can result in an incomplete system and should only be used by very
+# experienced users.
+#d-i base-installer/install-recommends boolean false
+
 # Select the initramfs generator used to generate the initrd for 2.6 kernels.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
 
@@ -1334,8 +1339,6 @@ to be used easily on the kernel command line as well.
 #d-i pkgsel/include string openssh-server build-essential
 # By default, packages that are only Recommended by packages installed using
 # pkgsel/include (as opposed to their dependencies) will not be installed.
-# Uncomment this line to install Recommends as well.
-#d-i pkgsel/include/install-recommends boolean true
 # Whether to upgrade packages after debootstrap.
 # Allowed values: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
