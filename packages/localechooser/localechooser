@@ -598,6 +598,7 @@ while :; do
 		for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES | grep -v "^$LOCALE$"); do
 			CHOICES="${CHOICES:+$CHOICES, }$i"
 		done
+		db_subst $tpl_supportedlocales LOCALE "$LOCALE"
 		db_subst $tpl_supportedlocales LOCALELIST "$CHOICES"
 		db_input medium $tpl_supportedlocales || [ $? -eq 30 ]
 		;;
