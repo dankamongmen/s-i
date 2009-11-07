@@ -592,29 +592,7 @@ while :; do
 		fi
 		;;
 
-	   30)	# Select system locale
-		# We will select from supported locales for LANGUAGE_COUNTRY
-		if [ "$LOCALE" != "C" ]; then
-			POSSIBLELOCALES=$(grep -e "^${LANGUAGE%%_*}_${COUNTRYCODE}" $SUPPORTEDLOCALES || true)
-			if [ -z "$POSSIBLELOCALES" ]; then
-				POSSIBLELOCALES=$(grep -e "^${LANGUAGE%%_*}_${DEFAULT_COUNTRY}" $SUPPORTEDLOCALES || true)
-			fi
-			if [ $(echo $POSSIBLELOCALES | wc -w) -gt 1 ]; then
-				CHOICES=""
-				for i in $POSSIBLELOCALES ; do
-					CHOICES="${CHOICES:+$CHOICES, }$i"
-				done
-				db_subst $tpl_di_locale LOCALELIST "$CHOICES"
-				db_input medium $tpl_di_locale || [ $? -eq 30 ]
-			fi
-		fi
-		;;
-
-	   31)	# Select additional locales
-		db_get $tpl_di_locale
-		LOCALE="$RET"
-		log "Selected locale ($tpl_di_locale) = '$LOCALE'"
-
+	   30)	# Select additional locales
 		CHOICES=
 		# *.UTF-8@euro locales are deprecated; don't use them
 		for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES | grep -v "^$LOCALE$"); do
@@ -622,6 +600,22 @@ while :; do
 		done
 		db_subst $tpl_supportedlocales LOCALELIST "$CHOICES"
 		db_input medium $tpl_supportedlocales || [ $? -eq 30 ]
+		;;
+
+	   31)	# Select system locale
+		# Display only if additional locales were selected
+		db_get $tpl_supportedlocales
+		if [ "$RET" ]; then
+			db_subst $tpl_di_locale LOCALELIST "$LOCALE, $RET"
+			# TODO: when run again, preserve previous choice if in list
+			db_set $tpl_di_locale $LOCALE
+			db_input medium $tpl_di_locale || [ $? -eq 30 ]
+		fi
+		;;
+
+	   32)
+		db_get $tpl_di_locale
+		log "System locale ($tpl_di_locale) = '$RET'"
 		;;
 
 	    *)
