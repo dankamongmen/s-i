@@ -380,6 +380,11 @@ while :; do
 		db_set "$tpl_di_consoledisplay"  "$CONSOLE"
 		log "Set $tpl_di_consoledisplay = '$CONSOLE'"
 
+		db_metaget localechooser/text/country1 description
+		txt_country1=$RET
+		db_metaget localechooser/text/country2 description
+		txt_country2=$RET
+
 		X_INSTALLATION_MEDIUM="$(lsb_extract X_INSTALLATION_MEDIUM)"
 		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
 		   [ "$X_INSTALLATION_MEDIUM" = "floppy" ]; then
@@ -455,6 +460,10 @@ while :; do
 			db_register $shortlist_template $tpl_shortlist
 			db_fget $tpl_di_country seen
 			db_fset $tpl_shortlist seen $RET || true
+			db_subst $tpl_shortlist TXT1 "$txt_country1"
+			db_subst $tpl_shortlist TXT2 "$txt_country2"
+			db_metaget localechooser/text/country3-short description
+			db_subst $tpl_shortlist TXT3 "$RET"
 
 			# Set default value
 			if [ $LASTSTATE -ne 21 ]; then
@@ -534,6 +543,10 @@ while :; do
 		country_template="$tpl_countrylist/$(echo $RET | sed "s/ /_/g")"
 		db_fget $tpl_di_country seen
 		db_fset $country_template seen $RET || true
+		db_subst $country_template TXT1 "$txt_country1"
+		db_subst $country_template TXT2 "$txt_country2"
+		db_metaget localechooser/text/country3 description
+		db_subst $country_template TXT3 "$RET"
 
 		if [ "$current_country" ] && \
 		   has_choice $country_template "$current_country"; then
