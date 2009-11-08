@@ -1,4 +1,4 @@
-<!-- original version: 60603 -->
+<!-- original version: 61188 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -866,8 +866,8 @@ Le paramètre <classname>mirror/udeb/suite</classname> détermine la distributio
 des composants supplémentaires de l'installateur. On s'en sert uniquement
 quand ces composants sont récupérés sur le réseau et qu'ils doivent correspondre
 à la distribution utilisée pour construire l'<emphasis>initrd</emphasis> nécessaire à la méthode
-d'installation. Par défaut, la valeur de <classname>mirror/udeb/suite</classname>
-est égale à celle de <classname>mirror/suite</classname>.
+d'installation. En général, il n'est pas nécessaire de donner une valeur
+à ce paramètre car l'installateur la détermine automatiquement.
 
 </para>
 
@@ -1111,6 +1111,11 @@ Les seules questions posées concernent l'installation du noyau.
 </para>
 
 <informalexample role="example"><screen>
+# Configurer APT pour empêcher l'installation des paquets recommandés.
+# Cette option qui peut conduire à un sytème incomplet est réservée à des
+# utilisateurs expérimentés.
+#d-i base-installer/install-recommends boolean false
+
 # Choix du générateur initramfs pour créer l'initrd des noyaux 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
 
@@ -1300,8 +1305,6 @@ facilement sur la ligne de commande du noyau.
 #d-i pkgsel/include string openssh-server build-essential
 # Par défaut, les paquets seulement « recommandés » par les paquets installés avec
 # pkgsel/include (à la différence de leurs dépendances) ne seront pas installés.
-# Décommentez cette ligne si vous voulez les installer.
-#d-i pkgsel/include/install-recommends boolean true
 # Mise à jour des paquets après debootstrap.
 # Valeurs autorisées : none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
