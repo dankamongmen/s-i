@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2009-11-02 22:19+0000\n"
+"POT-Creation-Date: 2009-11-08 01:11+0000\n"
 "PO-Revision-Date: 2009-08-28 02:35+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -925,7 +925,7 @@ msgstr ""
 "는 점입니다."
 
 #. Tag: title
-#: install-methods.xml:651 install-methods.xml:748
+#: install-methods.xml:651 install-methods.xml:763
 #, no-c-format
 msgid "Partitioning the USB stick"
 msgstr "USB 메모리 파티션 나누기"
@@ -942,13 +942,24 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:657
-#, no-c-format
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Since most USB sticks come pre-configured with a single FAT16 partition, "
+#| "you probably won't have to repartition or reformat the stick. If you have "
+#| "to do that anyway, use <command>cfdisk</command> or any other "
+#| "partitioning tool to create a FAT16 partition, and then create the "
+#| "filesystem using: <informalexample><screen>\n"
+#| "# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
+#| "</screen></informalexample> Take care that you use the correct device "
+#| "name for your USB stick. The <command>mkdosfs</command> command is "
+#| "contained in the <classname>dosfstools</classname> Debian package."
 msgid ""
 "Since most USB sticks come pre-configured with a single FAT16 partition, you "
 "probably won't have to repartition or reformat the stick. If you have to do "
 "that anyway, use <command>cfdisk</command> or any other partitioning tool to "
-"create a FAT16 partition, and then create the filesystem using: "
-"<informalexample><screen>\n"
+"create a FAT16 partition<footnote> <para> Don't forget to set the "
+"<quote>bootable</quote> bootable flag. </para> </footnote>, and then create "
+"the filesystem using: <informalexample><screen>\n"
 "# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
@@ -964,7 +975,7 @@ msgstr ""
 "키지에 들어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:671
+#: install-methods.xml:676
 #, no-c-format
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
@@ -982,7 +993,7 @@ msgstr ""
 "떤 운영 체제라도 부트로더를 설정할 때 이용할 수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:681
+#: install-methods.xml:686
 #, no-c-format
 msgid ""
 "To put <classname>syslinux</classname> on the FAT16 partition on your USB "
@@ -1005,24 +1016,36 @@ msgstr ""
 "<filename>ldlinux.sys</filename> 파일을 만듭니다."
 
 #. Tag: title
-#: install-methods.xml:698 install-methods.xml:795
+#: install-methods.xml:703 install-methods.xml:810
 #, no-c-format
 msgid "Adding the installer image"
 msgstr "설치 프로그램 이미지 추가하기"
 
 #. Tag: para
-#: install-methods.xml:699
-#, no-c-format
+#: install-methods.xml:704
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Mount the partition (<userinput>mount /dev/<replaceable>sdX1</"
+#| "replaceable> /mnt</userinput>) and copy the following installer image "
+#| "files to the stick: <itemizedlist> <listitem><para> <filename>vmlinuz</"
+#| "filename> (kernel binary) </para></listitem> <listitem><para> "
+#| "<filename>initrd.gz</filename> (initial ramdisk image) </para></listitem> "
+#| "</itemizedlist> You can choose between either the regular version or the "
+#| "graphical version of the installer. The latter can be found in the "
+#| "<filename>gtk</filename> subdirectory. If you want to rename the files, "
+#| "please note that <classname>syslinux</classname> can only process DOS "
+#| "(8.3) file names."
 msgid ""
 "Mount the partition (<userinput>mount /dev/<replaceable>sdX1</replaceable> /"
 "mnt</userinput>) and copy the following installer image files to the stick: "
-"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel binary) "
-"</para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial "
-"ramdisk image) </para></listitem> </itemizedlist> You can choose between "
-"either the regular version or the graphical version of the installer. The "
-"latter can be found in the <filename>gtk</filename> subdirectory. If you "
-"want to rename the files, please note that <classname>syslinux</classname> "
-"can only process DOS (8.3) file names."
+"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> or "
+"<filename>linux</filename> (kernel binary) </para></listitem> "
+"<listitem><para> <filename>initrd.gz</filename> (initial ramdisk image) </"
+"para></listitem> </itemizedlist> You can choose between either the regular "
+"version or the graphical version of the installer. The latter can be found "
+"in the <filename>gtk</filename> subdirectory. If you want to rename the "
+"files, please note that <classname>syslinux</classname> can only process DOS "
+"(8.3) file names."
 msgstr ""
 "파티션을 마운트하고 (<userinput>mount /dev/<replaceable>sdX1</replaceable> /"
 "mnt</userinput>) 데비안 아카이브에서 다음 파일을 USB 메모리로 복사하십시오: "
@@ -1035,12 +1058,21 @@ msgstr ""
 "다는 점을 주의하십시오."
 
 #. Tag: para
-#: install-methods.xml:723
-#, no-c-format
+#: install-methods.xml:728
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Next you should create a <filename>syslinux.cfg</filename> configuration "
+#| "file, which at a bare minimum should contain the following two lines: "
+#| "<informalexample><screen>\n"
+#| "default vmlinuz\n"
+#| "append initrd=initrd.gz\n"
+#| "</screen></informalexample> For the graphical installer you should add "
+#| "<userinput>video=vesa:ywrap,mtrr vga=788</userinput> to the second line."
 msgid ""
 "Next you should create a <filename>syslinux.cfg</filename> configuration "
-"file, which at a bare minimum should contain the following two lines: "
-"<informalexample><screen>\n"
+"file, which at a bare minimum should contain the following two lines (change "
+"the name of the kernel binary to <quote><filename>linux</filename></quote> "
+"if you used a <filename>neboot</filename> image): <informalexample><screen>\n"
 "default vmlinuz\n"
 "append initrd=initrd.gz\n"
 "</screen></informalexample> For the graphical installer you should add "
@@ -1054,13 +1086,21 @@ msgstr ""
 "<userinput>video=vesa:ywrap,mtrr vga=788</userinput> 옵션을 덧붙입니다."
 
 #. Tag: para
-#: install-methods.xml:733 install-methods.xml:835
-#, no-c-format
+#: install-methods.xml:740
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you used an <filename>hd-media</filename> image, you should now copy a "
+#| "Debian ISO image (businesscard, netinst or full CD image; be sure to "
+#| "select one that fits) onto the stick. When you are done, unmount the USB "
+#| "memory stick (<userinput>umount /mnt</userinput>)."
 msgid ""
 "If you used an <filename>hd-media</filename> image, you should now copy a "
-"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
-"one that fits) onto the stick. When you are done, unmount the USB memory "
-"stick (<userinput>umount /mnt</userinput>)."
+"Debian ISO image<footnote> <para> You can use either a businesscard, a "
+"netinst or a full CD image (see <xref linkend=\"official-cdrom\"/>). Be sure "
+"to select one that fits. Note that the <quote>netboot <filename>mini.iso</"
+"filename></quote> image is not usable for this purpose. </para> </footnote> "
+"onto the stick. When you are done, unmount the USB memory stick "
+"(<userinput>umount /mnt</userinput>)."
 msgstr ""
 "<filename>hd-media</filename> 이미지를 사용하는 경우, 데비안 ISO 이미지를 "
 "USB 메모리에 복사해야 합니다. (비지니스 카드, 네트워크 설치, 전체 CD 이미지 "
@@ -1068,7 +1108,7 @@ msgstr ""
 "해제합니다. (<userinput>umount /mnt</userinput>)"
 
 #. Tag: para
-#: install-methods.xml:749
+#: install-methods.xml:764
 #, no-c-format
 msgid ""
 "Most USB sticks do not come pre-configured in such a way that Open Firmware "
@@ -1097,7 +1137,7 @@ msgstr ""
 "안 패키지에 들어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:766
+#: install-methods.xml:781
 #, no-c-format
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
@@ -1112,7 +1152,7 @@ msgstr ""
 "체제라도 부트로더 설정을 바꾸는 데 이용할 수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:775
+#: install-methods.xml:790
 #, no-c-format
 msgid ""
 "The normal <command>ybin</command> tool that comes with <command>yaboot</"
@@ -1147,7 +1187,7 @@ msgstr ""
 "모리의 나머지를 준비할 수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:796
+#: install-methods.xml:811
 #, no-c-format
 msgid ""
 "Mount the partition (<userinput>mount /dev/<replaceable>sdX2</replaceable> /"
@@ -1157,31 +1197,31 @@ msgstr ""
 "mnt</userinput>) 다음 설치 프로그램 파일을 USB 메모리로 복사하십시오:"
 
 #. Tag: para
-#: install-methods.xml:803
+#: install-methods.xml:818
 #, no-c-format
 msgid "<filename>vmlinux</filename> (kernel binary)"
 msgstr "<filename>vmlinux</filename> (커널 바이너리)"
 
 #. Tag: para
-#: install-methods.xml:808
+#: install-methods.xml:823
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (최초 램디스크 이미지)"
 
 #. Tag: para
-#: install-methods.xml:813
+#: install-methods.xml:828
 #, no-c-format
 msgid "<filename>yaboot.conf</filename> (yaboot configuration file)"
 msgstr "<filename>yaboot.conf</filename> (yaboot 설정 파일)"
 
 #. Tag: para
-#: install-methods.xml:818
+#: install-methods.xml:833
 #, no-c-format
 msgid "<filename>boot.msg</filename> (optional boot message)"
 msgstr "<filename>boot.msg</filename> (추가 부팅 메시지)"
 
 #. Tag: para
-#: install-methods.xml:825
+#: install-methods.xml:840
 #, no-c-format
 msgid ""
 "The <filename>yaboot.conf</filename> configuration file should contain the "
@@ -1215,14 +1255,28 @@ msgstr ""
 "</screen></informalexample> <userinput>initrd-size</userinput> 파라미터는 부"
 "팅하려는 이미지에 따라 크기를 늘려야 할 수도 있습니다."
 
-#. Tag: title
+#. Tag: para
 #: install-methods.xml:850
+#, no-c-format
+msgid ""
+"If you used an <filename>hd-media</filename> image, you should now copy a "
+"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
+"one that fits) onto the stick. When you are done, unmount the USB memory "
+"stick (<userinput>umount /mnt</userinput>)."
+msgstr ""
+"<filename>hd-media</filename> 이미지를 사용하는 경우, 데비안 ISO 이미지를 "
+"USB 메모리에 복사해야 합니다. (비지니스 카드, 네트워크 설치, 전체 CD 이미지 "
+"중에서 용량에 맞는 이미지를 하나 고르십시오.) 복사했으면 USB 메모리 마운트를 "
+"해제합니다. (<userinput>umount /mnt</userinput>)"
+
+#. Tag: title
+#: install-methods.xml:865
 #, no-c-format
 msgid "Booting the USB stick"
 msgstr "USB 메모리 부팅하기"
 
 #. Tag: para
-#: install-methods.xml:851
+#: install-methods.xml:866
 #, no-c-format
 msgid ""
 "If your system refuses to boot from the memory stick, the stick may contain "
@@ -1234,19 +1288,19 @@ msgstr ""
 "<command>install-mbr</command> 명령을 사용하십시오:"
 
 #. Tag: screen
-#: install-methods.xml:858
+#: install-methods.xml:873
 #, no-c-format
 msgid "# install-mbr /dev/<replaceable>sdX</replaceable>"
 msgstr "# install-mbr /dev/<replaceable>sdX</replaceable>"
 
 #. Tag: title
-#: install-methods.xml:869
+#: install-methods.xml:884
 #, no-c-format
 msgid "Preparing Files for Hard Disk Booting"
 msgstr "하드 디스크 부팅에 필요한 파일 준비하기"
 
 #. Tag: para
-#: install-methods.xml:870
+#: install-methods.xml:885
 #, no-c-format
 msgid ""
 "The installer may be booted using boot files placed on an existing hard "
@@ -1258,7 +1312,7 @@ msgstr ""
 "접 부트로더를 실행할 수도 있습니다."
 
 #. Tag: para
-#: install-methods.xml:876
+#: install-methods.xml:891
 #, no-c-format
 msgid ""
 "A full, <quote>pure network</quote> installation can be achieved using this "
@@ -1271,13 +1325,13 @@ msgstr ""
 "불안한 플로피와 씨름할 필요도 없습니다."
 
 #. Tag: para
-#: install-methods.xml:883
+#: install-methods.xml:898
 #, no-c-format
 msgid "The installer cannot boot from files on an NTFS file system."
 msgstr "설치 프로그램은 NTFS 파일시스템의 파일에서는 부팅할 수 없습니다."
 
 #. Tag: para
-#: install-methods.xml:887
+#: install-methods.xml:902
 #, no-c-format
 msgid ""
 "The installer cannot boot from files on an HFS+ file system. MacOS System "
@@ -1299,7 +1353,7 @@ msgstr ""
 "로드할 때 이 파티션이 필요합니다."
 
 #. Tag: para
-#: install-methods.xml:898
+#: install-methods.xml:913
 #, no-c-format
 msgid ""
 "Different programs are used for hard disk installation system booting, "
@@ -1310,7 +1364,7 @@ msgstr ""
 "라, 하드 디스크로 설치 시스템을 부팅할 때 여러 가지 프로그램을 사용합니다."
 
 #. Tag: title
-#: install-methods.xml:907
+#: install-methods.xml:922
 #, no-c-format
 msgid ""
 "Hard disk installer booting using <command>LILO</command> or <command>GRUB</"
@@ -1320,7 +1374,7 @@ msgstr ""
 "치 프로그램 부팅"
 
 #. Tag: para
-#: install-methods.xml:909
+#: install-methods.xml:924
 #, no-c-format
 msgid ""
 "This section explains how to add to or even replace an existing linux "
@@ -1331,7 +1385,7 @@ msgstr ""
 "합니다."
 
 #. Tag: para
-#: install-methods.xml:915
+#: install-methods.xml:930
 #, no-c-format
 msgid ""
 "At boot time, both bootloaders support loading in memory not only the "
@@ -1343,7 +1397,7 @@ msgstr ""
 "수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:921
+#: install-methods.xml:936
 #, no-c-format
 msgid ""
 "Copy the following files from the Debian archives to a convenient location "
@@ -1353,19 +1407,19 @@ msgstr ""
 "를 들어 <filename>/boot/newinstall/</filename>같은 위치로 복사하십시오."
 
 #. Tag: para
-#: install-methods.xml:928
+#: install-methods.xml:943
 #, no-c-format
 msgid "<filename>vmlinuz</filename> (kernel binary)"
 msgstr "<filename>vmlinuz</filename> (커널 바이너리)"
 
 #. Tag: para
-#: install-methods.xml:933
+#: install-methods.xml:948
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (램디스크 이미지)"
 
 #. Tag: para
-#: install-methods.xml:940
+#: install-methods.xml:955
 #, no-c-format
 msgid ""
 "Finally, to configure the bootloader proceed to <xref linkend=\"boot-initrd"
@@ -1375,13 +1429,13 @@ msgstr ""
 "행하십시오."
 
 #. Tag: title
-#: install-methods.xml:950
+#: install-methods.xml:965
 #, no-c-format
 msgid "Hard Disk Installer Booting for OldWorld Macs"
 msgstr "올드월드 맥에서 하드 디스크 설치 프로그램 부팅"
 
 #. Tag: para
-#: install-methods.xml:951
+#: install-methods.xml:966
 #, no-c-format
 msgid ""
 "The <filename>boot-floppy-hfs</filename> floppy uses <application>miBoot</"
@@ -1405,7 +1459,7 @@ msgstr ""
 "필요합니다."
 
 #. Tag: para
-#: install-methods.xml:964
+#: install-methods.xml:979
 #, no-c-format
 msgid ""
 "Download and unstuff the <application>BootX</application> distribution, "
@@ -1432,13 +1486,13 @@ msgstr ""
 "으십시오."
 
 #. Tag: title
-#: install-methods.xml:984
+#: install-methods.xml:999
 #, no-c-format
 msgid "Hard Disk Installer Booting for NewWorld Macs"
 msgstr "뉴월드 맥에서 하드 디스크 설치 프로그램 부팅"
 
 #. Tag: para
-#: install-methods.xml:985
+#: install-methods.xml:1000
 #, no-c-format
 msgid ""
 "NewWorld PowerMacs support booting from a network or an ISO9660 CD-ROM, as "
@@ -1458,7 +1512,7 @@ msgstr ""
 "지원하지 않고 뉴월드 파워맥에서는 사용해서는 안 됩니다."
 
 #. Tag: para
-#: install-methods.xml:996
+#: install-methods.xml:1011
 #, no-c-format
 msgid ""
 "<emphasis>Copy</emphasis> (not move) the following four files which you "
@@ -1472,31 +1526,31 @@ msgstr ""
 "다.)"
 
 #. Tag: filename
-#: install-methods.xml:1006 install-methods.xml:1344
+#: install-methods.xml:1021 install-methods.xml:1359
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 #. Tag: filename
-#: install-methods.xml:1011 install-methods.xml:1349
+#: install-methods.xml:1026 install-methods.xml:1364
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 #. Tag: filename
-#: install-methods.xml:1016 install-methods.xml:1354
+#: install-methods.xml:1031 install-methods.xml:1369
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 #. Tag: filename
-#: install-methods.xml:1021 install-methods.xml:1359
+#: install-methods.xml:1036 install-methods.xml:1374
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
 
 #. Tag: para
-#: install-methods.xml:1026
+#: install-methods.xml:1041
 #, no-c-format
 msgid ""
 "Make a note of the partition number of the MacOS partition where you place "
@@ -1511,7 +1565,7 @@ msgstr ""
 "프트에서 설치 프로그램을 부팅하는 명령에서 사용합니다."
 
 #. Tag: para
-#: install-methods.xml:1034
+#: install-methods.xml:1049
 #, no-c-format
 msgid "To boot the installer, proceed to <xref linkend=\"boot-newworld\"/>."
 msgstr ""
@@ -1519,13 +1573,13 @@ msgstr ""
 "진행하십시오."
 
 #. Tag: title
-#: install-methods.xml:1047
+#: install-methods.xml:1062
 #, no-c-format
 msgid "Preparing Files for TFTP Net Booting"
 msgstr "TFTP 네트워크 부팅에 필요한 파일 준비하기"
 
 #. Tag: para
-#: install-methods.xml:1048
+#: install-methods.xml:1063
 #, no-c-format
 msgid ""
 "If your machine is connected to a local area network, you may be able to "
@@ -1540,7 +1594,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: install-methods.xml:1056
+#: install-methods.xml:1071
 #, no-c-format
 msgid ""
 "You need to set up a TFTP server, and for many machines a DHCP server<phrase "
@@ -1552,7 +1606,7 @@ msgstr ""
 "\"supports-bootp\">, 아니면 BOOTP 서버</phrase>를 설정해야 합니다."
 
 #. Tag: para
-#: install-methods.xml:1063
+#: install-methods.xml:1078
 #, no-c-format
 msgid ""
 "<phrase condition=\"supports-rarp\">The Reverse Address Resolution Protocol "
@@ -1572,7 +1626,7 @@ msgstr ""
 "장 기능입니다. 일부 시스템은 DHCP를 이용해야만 설정할 수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1077
+#: install-methods.xml:1092
 #, no-c-format
 msgid ""
 "For PowerPC, if you have a NewWorld Power Macintosh machine, it is a good "
@@ -1584,7 +1638,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: install-methods.xml:1083
+#: install-methods.xml:1098
 #, no-c-format
 msgid ""
 "Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP. There "
@@ -1595,7 +1649,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: install-methods.xml:1088
+#: install-methods.xml:1103
 #, no-c-format
 msgid ""
 "The Trivial File Transfer Protocol (TFTP) is used to serve the boot image to "
@@ -1609,7 +1663,7 @@ msgstr ""
 "서 사용하는 명령을 예로 듭니다."
 
 #. Tag: para
-#: install-methods.xml:1096
+#: install-methods.xml:1111
 #, no-c-format
 msgid ""
 "To use the Pre-boot Execution Environment (PXE) method of TFTP booting, you "
@@ -1624,13 +1678,13 @@ msgstr ""
 "권장합니다."
 
 #. Tag: title
-#: install-methods.xml:1114
+#: install-methods.xml:1129
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "RARP 서버 준비하기"
 
 #. Tag: para
-#: install-methods.xml:1115
+#: install-methods.xml:1130
 #, no-c-format
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
@@ -1649,7 +1703,7 @@ msgstr ""
 "ifconfig eth0</userinput> 명령을 이용할 수 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1127
+#: install-methods.xml:1142
 #, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1672,13 +1726,13 @@ msgstr ""
 "는 <userinput>/usr/etc/rarpd -a</userinput>."
 
 #. Tag: title
-#: install-methods.xml:1149
+#: install-methods.xml:1164
 #, no-c-format
 msgid "Setting up a BOOTP server"
 msgstr "BOOTP 서버 준비하기"
 
 #. Tag: para
-#: install-methods.xml:1150
+#: install-methods.xml:1165
 #, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
@@ -1693,7 +1747,7 @@ msgstr ""
 "server</classname>라는 패키지로 포함되어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1158
+#: install-methods.xml:1173
 #, no-c-format
 msgid ""
 "To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
@@ -1756,7 +1810,7 @@ msgstr ""
 "phrase>"
 
 #. Tag: para
-#: install-methods.xml:1191
+#: install-methods.xml:1206
 #, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
@@ -1778,13 +1832,13 @@ msgstr ""
 "명령으로 <command>dhcpd</command>를 다시 시작하면 됩니다."
 
 #. Tag: title
-#: install-methods.xml:1213
+#: install-methods.xml:1228
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "DHCP 서버 준비하기"
 
 #. Tag: para
-#: install-methods.xml:1214
+#: install-methods.xml:1229
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -1798,7 +1852,7 @@ msgstr ""
 "일을 보십시오):"
 
 #. Tag: screen
-#: install-methods.xml:1221
+#: install-methods.xml:1236
 #, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -1842,7 +1896,7 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: install-methods.xml:1223
+#: install-methods.xml:1238
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -1859,7 +1913,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: install-methods.xml:1233
+#: install-methods.xml:1248
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -1870,13 +1924,13 @@ msgstr ""
 "작하십시오."
 
 #. Tag: title
-#: install-methods.xml:1241
+#: install-methods.xml:1256
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "DHCP 설정에서 PXE 부팅하게 만들기"
 
 #. Tag: para
-#: install-methods.xml:1242
+#: install-methods.xml:1257
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -1946,13 +2000,13 @@ msgstr ""
 "linkend=\"tftp-images\"/> 부분 참고)"
 
 #. Tag: title
-#: install-methods.xml:1258
+#: install-methods.xml:1273
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "TFTP 서버 사용하기"
 
 #. Tag: para
-#: install-methods.xml:1259
+#: install-methods.xml:1274
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
@@ -1971,7 +2025,7 @@ msgstr ""
 "이런 설정이 들어갑니다."
 
 #. Tag: para
-#: install-methods.xml:1271
+#: install-methods.xml:1286
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -1989,7 +2043,7 @@ msgstr ""
 "일 예제에서는 이 점을 고려해서 적용하십시오."
 
 #. Tag: para
-#: install-methods.xml:1281
+#: install-methods.xml:1296
 #, no-c-format
 msgid ""
 "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
@@ -2020,7 +2074,7 @@ msgstr ""
 "replaceable></userinput> 명령을 실행합니다."
 
 #. Tag: para
-#: install-methods.xml:1301
+#: install-methods.xml:1316
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2050,13 +2104,13 @@ msgstr ""
 "를 조정합니다."
 
 #. Tag: title
-#: install-methods.xml:1323
+#: install-methods.xml:1338
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "TFTP 이미지를 적당한 위치에 놓기"
 
 #. Tag: para
-#: install-methods.xml:1324
+#: install-methods.xml:1339
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2072,7 +2126,7 @@ msgstr ""
 "클라이언트가 결정하고, 어떤 표준도 없습니다."
 
 #. Tag: para
-#: install-methods.xml:1333
+#: install-methods.xml:1348
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2087,13 +2141,13 @@ msgstr ""
 "을 다운로드해야 합니다:"
 
 #. Tag: filename
-#: install-methods.xml:1364
+#: install-methods.xml:1379
 #, no-c-format
 msgid "boot.msg"
 msgstr "boot.msg"
 
 #. Tag: para
-#: install-methods.xml:1369
+#: install-methods.xml:1384
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2109,7 +2163,7 @@ msgstr ""
 "오."
 
 #. Tag: para
-#: install-methods.xml:1377
+#: install-methods.xml:1392
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2125,13 +2179,13 @@ msgstr ""
 "DHCP 서버에 설정하십시오."
 
 #. Tag: title
-#: install-methods.xml:1389
+#: install-methods.xml:1404
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "SPARC TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1390
+#: install-methods.xml:1405
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2161,7 +2215,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: install-methods.xml:1406
+#: install-methods.xml:1421
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2174,7 +2228,7 @@ msgstr ""
 "고 어떤 이미지 이름을 요청했는 지 확인하십시오."
 
 #. Tag: para
-#: install-methods.xml:1413
+#: install-methods.xml:1428
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2187,13 +2241,13 @@ msgstr ""
 "userinput>. 파일은 TFTP 서버가 찾는 디렉터리 안에 들어 있어야 합니다."
 
 #. Tag: title
-#: install-methods.xml:1424
+#: install-methods.xml:1439
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "SGI TFTP 부팅"
 
 #. Tag: para
-#: install-methods.xml:1425
+#: install-methods.xml:1440
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2207,13 +2261,13 @@ msgstr ""
 "<userinput>filename=</userinput> 옵션으로 지정합니다."
 
 #. Tag: title
-#: install-methods.xml:1533
+#: install-methods.xml:1548
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "자동 설치"
 
 #. Tag: para
-#: install-methods.xml:1534
+#: install-methods.xml:1549
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2229,13 +2283,13 @@ msgstr ""
 "할 수도 있습니다."
 
 #. Tag: title
-#: install-methods.xml:1547
+#: install-methods.xml:1562
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "데비안 설치 프로그램을 이용한 자동 설치"
 
 #. Tag: para
-#: install-methods.xml:1548
+#: install-methods.xml:1563
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2248,7 +2302,7 @@ msgstr ""
 "다. 이 파일 안에는 설치 과정에서 나오는 질문에 대한 대답이 들어 있습니다."
 
 #. Tag: para
-#: install-methods.xml:1555
+#: install-methods.xml:1570
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "

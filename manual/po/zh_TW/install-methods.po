@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2009-11-02 22:19+0000\n"
+"POT-Creation-Date: 2009-11-08 01:11+0000\n"
 "PO-Revision-Date: 2005-07-18 12:10+0800\n"
 "Last-Translator: Jhang, Jia-Wei<dreamcryer@gmail.com>\n"
 "Language-Team: debian-chinese-big5 <debian-chinese-big5@lists.debian.org>\n"
@@ -855,7 +855,7 @@ msgstr ""
 "檔案放到您的隨身碟上。"
 
 #. Tag: title
-#: install-methods.xml:651 install-methods.xml:748
+#: install-methods.xml:651 install-methods.xml:763
 #, fuzzy, no-c-format
 #| msgid "Booting the USB stick"
 msgid "Partitioning the USB stick"
@@ -876,8 +876,9 @@ msgid ""
 "Since most USB sticks come pre-configured with a single FAT16 partition, you "
 "probably won't have to repartition or reformat the stick. If you have to do "
 "that anyway, use <command>cfdisk</command> or any other partitioning tool to "
-"create a FAT16 partition, and then create the filesystem using: "
-"<informalexample><screen>\n"
+"create a FAT16 partition<footnote> <para> Don't forget to set the "
+"<quote>bootable</quote> bootable flag. </para> </footnote>, and then create "
+"the filesystem using: <informalexample><screen>\n"
 "# mkdosfs /dev/<replaceable>sdX1</replaceable>\n"
 "</screen></informalexample> Take care that you use the correct device name "
 "for your USB stick. The <command>mkdosfs</command> command is contained in "
@@ -892,7 +893,7 @@ msgstr ""
 "Debian 套件中。"
 
 #. Tag: para
-#: install-methods.xml:671
+#: install-methods.xml:676
 #, fuzzy, no-c-format
 #| msgid ""
 #| "In order to start the kernel after booting from the USB stick, we will "
@@ -917,7 +918,7 @@ msgstr ""
 "案系統的操作系統可以用來改變 boot-loader 的設定檔案。"
 
 #. Tag: para
-#: install-methods.xml:681
+#: install-methods.xml:686
 #, fuzzy, no-c-format
 #| msgid ""
 #| "To put <command>SYSLINUX</command> on the FAT16 partition on your USB "
@@ -950,14 +951,14 @@ msgstr ""
 "<filename>ldlinux.sys</filename> 檔案。"
 
 #. Tag: title
-#: install-methods.xml:698 install-methods.xml:795
+#: install-methods.xml:703 install-methods.xml:810
 #, fuzzy, no-c-format
 #| msgid "Adding an ISO image"
 msgid "Adding the installer image"
 msgstr "添加 ISO 映像"
 
 #. Tag: para
-#: install-methods.xml:699
+#: install-methods.xml:704
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Mount the partition (<userinput>mount /dev/sda1 /mnt</userinput>) and "
@@ -972,13 +973,14 @@ msgstr "添加 ISO 映像"
 msgid ""
 "Mount the partition (<userinput>mount /dev/<replaceable>sdX1</replaceable> /"
 "mnt</userinput>) and copy the following installer image files to the stick: "
-"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> (kernel binary) "
-"</para></listitem> <listitem><para> <filename>initrd.gz</filename> (initial "
-"ramdisk image) </para></listitem> </itemizedlist> You can choose between "
-"either the regular version or the graphical version of the installer. The "
-"latter can be found in the <filename>gtk</filename> subdirectory. If you "
-"want to rename the files, please note that <classname>syslinux</classname> "
-"can only process DOS (8.3) file names."
+"<itemizedlist> <listitem><para> <filename>vmlinuz</filename> or "
+"<filename>linux</filename> (kernel binary) </para></listitem> "
+"<listitem><para> <filename>initrd.gz</filename> (initial ramdisk image) </"
+"para></listitem> </itemizedlist> You can choose between either the regular "
+"version or the graphical version of the installer. The latter can be found "
+"in the <filename>gtk</filename> subdirectory. If you want to rename the "
+"files, please note that <classname>syslinux</classname> can only process DOS "
+"(8.3) file names."
 msgstr ""
 "接下來就是掛載分割區 (<userinput>mount /dev/sda1 /mnt</userinput>) 以及將下列"
 "檔案從 Debain 檔案庫拷貝到儲存上：<itemizedlist> <listitem><para> "
@@ -990,12 +992,13 @@ msgstr ""
 "<command>SYSLINUX</command> 只能處理 DOS (8.3) 格式的檔案名稱。"
 
 #. Tag: para
-#: install-methods.xml:723
+#: install-methods.xml:728
 #, fuzzy, no-c-format
 msgid ""
 "Next you should create a <filename>syslinux.cfg</filename> configuration "
-"file, which at a bare minimum should contain the following two lines: "
-"<informalexample><screen>\n"
+"file, which at a bare minimum should contain the following two lines (change "
+"the name of the kernel binary to <quote><filename>linux</filename></quote> "
+"if you used a <filename>neboot</filename> image): <informalexample><screen>\n"
 "default vmlinuz\n"
 "append initrd=initrd.gz\n"
 "</screen></informalexample> For the graphical installer you should add "
@@ -1011,17 +1014,20 @@ msgstr ""
 "userinput> 到 <quote>append</quote> 那一行。</phrase>"
 
 #. Tag: para
-#: install-methods.xml:733 install-methods.xml:835
+#: install-methods.xml:740
 #, no-c-format
 msgid ""
 "If you used an <filename>hd-media</filename> image, you should now copy a "
-"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
-"one that fits) onto the stick. When you are done, unmount the USB memory "
-"stick (<userinput>umount /mnt</userinput>)."
+"Debian ISO image<footnote> <para> You can use either a businesscard, a "
+"netinst or a full CD image (see <xref linkend=\"official-cdrom\"/>). Be sure "
+"to select one that fits. Note that the <quote>netboot <filename>mini.iso</"
+"filename></quote> image is not usable for this purpose. </para> </footnote> "
+"onto the stick. When you are done, unmount the USB memory stick "
+"(<userinput>umount /mnt</userinput>)."
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:749
+#: install-methods.xml:764
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Most USB sticks do not come pre-configured in such a way that Open "
@@ -1060,7 +1066,7 @@ msgstr ""
 "套件中。"
 
 #. Tag: para
-#: install-methods.xml:766
+#: install-methods.xml:781
 #, no-c-format
 msgid ""
 "In order to start the kernel after booting from the USB stick, we will put a "
@@ -1075,7 +1081,7 @@ msgstr ""
 "改變 boot-loader 的設定檔。"
 
 #. Tag: para
-#: install-methods.xml:775
+#: install-methods.xml:790
 #, fuzzy, no-c-format
 #| msgid ""
 #| "The normal <command>ybin</command> tool that comes with <command>yaboot</"
@@ -1125,7 +1131,7 @@ msgstr ""
 "其他部分就可以用普通的 Unix 工具來處理了。"
 
 #. Tag: para
-#: install-methods.xml:796
+#: install-methods.xml:811
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Mount the partition (<userinput>mount /dev/sda2 /mnt</userinput>) and "
@@ -1138,31 +1144,31 @@ msgstr ""
 "檔案從 Debain 檔案庫拷貝到儲存上："
 
 #. Tag: para
-#: install-methods.xml:803
+#: install-methods.xml:818
 #, no-c-format
 msgid "<filename>vmlinux</filename> (kernel binary)"
 msgstr "<filename>vmlinux</filename> (核心二進位文件)"
 
 #. Tag: para
-#: install-methods.xml:808
+#: install-methods.xml:823
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (初始化記憶體映像檔)"
 
 #. Tag: para
-#: install-methods.xml:813
+#: install-methods.xml:828
 #, no-c-format
 msgid "<filename>yaboot.conf</filename> (yaboot configuration file)"
 msgstr "<filename>yaboot.conf</filename> (yaboot 設定檔案)"
 
 #. Tag: para
-#: install-methods.xml:818
+#: install-methods.xml:833
 #, no-c-format
 msgid "<filename>boot.msg</filename> (optional boot message)"
 msgstr "<filename>boot.msg</filename> (可選的啟動資訊)"
 
 #. Tag: para
-#: install-methods.xml:825
+#: install-methods.xml:840
 #, fuzzy, no-c-format
 msgid ""
 "The <filename>yaboot.conf</filename> configuration file should contain the "
@@ -1198,14 +1204,24 @@ msgstr ""
 "<userinput>initrd-size</userinput> 參數的數值，這完全取決於您所使用的記憶體映"
 "像的大小。"
 
-#. Tag: title
+#. Tag: para
 #: install-methods.xml:850
+#, no-c-format
+msgid ""
+"If you used an <filename>hd-media</filename> image, you should now copy a "
+"Debian ISO image (businesscard, netinst or full CD image; be sure to select "
+"one that fits) onto the stick. When you are done, unmount the USB memory "
+"stick (<userinput>umount /mnt</userinput>)."
+msgstr ""
+
+#. Tag: title
+#: install-methods.xml:865
 #, no-c-format
 msgid "Booting the USB stick"
 msgstr "以 USB 隨身碟開機"
 
 #. Tag: para
-#: install-methods.xml:851
+#: install-methods.xml:866
 #, no-c-format
 msgid ""
 "If your system refuses to boot from the memory stick, the stick may contain "
@@ -1217,20 +1233,20 @@ msgstr ""
 "自 <classname>mbr</classname> 軟體套件："
 
 #. Tag: screen
-#: install-methods.xml:858
+#: install-methods.xml:873
 #, fuzzy, no-c-format
 #| msgid "# install-mbr /dev/<replaceable>sda</replaceable>"
 msgid "# install-mbr /dev/<replaceable>sdX</replaceable>"
 msgstr "# install-mbr /dev/<replaceable>sda</replaceable>"
 
 #. Tag: title
-#: install-methods.xml:869
+#: install-methods.xml:884
 #, no-c-format
 msgid "Preparing Files for Hard Disk Booting"
 msgstr "準備從硬碟開機的檔案"
 
 #. Tag: para
-#: install-methods.xml:870
+#: install-methods.xml:885
 #, no-c-format
 msgid ""
 "The installer may be booted using boot files placed on an existing hard "
@@ -1241,7 +1257,7 @@ msgstr ""
 "或者直接使用 BIOS 提供的 boot-loader 直接啟動。"
 
 #. Tag: para
-#: install-methods.xml:876
+#: install-methods.xml:891
 #, no-c-format
 msgid ""
 "A full, <quote>pure network</quote> installation can be achieved using this "
@@ -1254,13 +1270,13 @@ msgstr ""
 "不清。"
 
 #. Tag: para
-#: install-methods.xml:883
+#: install-methods.xml:898
 #, no-c-format
 msgid "The installer cannot boot from files on an NTFS file system."
 msgstr "安裝程式無法在 NTFS 檔案系統上開機。"
 
 #. Tag: para
-#: install-methods.xml:887
+#: install-methods.xml:902
 #, no-c-format
 msgid ""
 "The installer cannot boot from files on an HFS+ file system. MacOS System "
@@ -1280,7 +1296,7 @@ msgstr ""
 "和 Linux 之間交換檔案，特別是那些您下載的安裝檔案。"
 
 #. Tag: para
-#: install-methods.xml:898
+#: install-methods.xml:913
 #, no-c-format
 msgid ""
 "Different programs are used for hard disk installation system booting, "
@@ -1291,7 +1307,7 @@ msgstr ""
 "安裝程式開機時將使用不同的安裝檔案。"
 
 #. Tag: title
-#: install-methods.xml:907
+#: install-methods.xml:922
 #, no-c-format
 msgid ""
 "Hard disk installer booting using <command>LILO</command> or <command>GRUB</"
@@ -1300,7 +1316,7 @@ msgstr ""
 "使用 <command>LILO</command> 或 <command>GRUB</command>啟動硬碟安裝程式"
 
 #. Tag: para
-#: install-methods.xml:909
+#: install-methods.xml:924
 #, no-c-format
 msgid ""
 "This section explains how to add to or even replace an existing linux "
@@ -1310,7 +1326,7 @@ msgstr ""
 "或者甚至替換現有的 linux 安裝。"
 
 #. Tag: para
-#: install-methods.xml:915
+#: install-methods.xml:930
 #, no-c-format
 msgid ""
 "At boot time, both bootloaders support loading in memory not only the "
@@ -1321,7 +1337,7 @@ msgstr ""
 "擬磁碟可以被用做核心的根檔案系統。"
 
 #. Tag: para
-#: install-methods.xml:921
+#: install-methods.xml:936
 #, no-c-format
 msgid ""
 "Copy the following files from the Debian archives to a convenient location "
@@ -1331,19 +1347,19 @@ msgstr ""
 "newinstall/</filename>。"
 
 #. Tag: para
-#: install-methods.xml:928
+#: install-methods.xml:943
 #, no-c-format
 msgid "<filename>vmlinuz</filename> (kernel binary)"
 msgstr "<filename>vmlinuz</filename>(核心二進位文件)"
 
 #. Tag: para
-#: install-methods.xml:933
+#: install-methods.xml:948
 #, no-c-format
 msgid "<filename>initrd.gz</filename> (ramdisk image)"
 msgstr "<filename>initrd.gz</filename> (記憶體虛擬磁碟映像)"
 
 #. Tag: para
-#: install-methods.xml:940
+#: install-methods.xml:955
 #, no-c-format
 msgid ""
 "Finally, to configure the bootloader proceed to <xref linkend=\"boot-initrd"
@@ -1351,13 +1367,13 @@ msgid ""
 msgstr "最後，要設定 boot-loader，請進入 <xref linkend=\"boot-initrd\"/>。"
 
 #. Tag: title
-#: install-methods.xml:950
+#: install-methods.xml:965
 #, no-c-format
 msgid "Hard Disk Installer Booting for OldWorld Macs"
 msgstr "OldWorld Macs 上的硬碟開機安裝程式"
 
 #. Tag: para
-#: install-methods.xml:951
+#: install-methods.xml:966
 #, no-c-format
 msgid ""
 "The <filename>boot-floppy-hfs</filename> floppy uses <application>miBoot</"
@@ -1379,7 +1395,7 @@ msgstr ""
 "是必須的。"
 
 #. Tag: para
-#: install-methods.xml:964
+#: install-methods.xml:979
 #, no-c-format
 msgid ""
 "Download and unstuff the <application>BootX</application> distribution, "
@@ -1405,13 +1421,13 @@ msgstr ""
 "目錄中，然後把 <filename>Linux Kernels</filename> 目錄放到活動的系統目錄中。"
 
 #. Tag: title
-#: install-methods.xml:984
+#: install-methods.xml:999
 #, no-c-format
 msgid "Hard Disk Installer Booting for NewWorld Macs"
 msgstr "NewWorld Macs 下啟動硬碟安裝程式"
 
 #. Tag: para
-#: install-methods.xml:985
+#: install-methods.xml:1000
 #, no-c-format
 msgid ""
 "NewWorld PowerMacs support booting from a network or an ISO9660 CD-ROM, as "
@@ -1429,7 +1445,7 @@ msgstr ""
 "援，也一定不能用在 NewWorld PowerMacs 上。"
 
 #. Tag: para
-#: install-methods.xml:996
+#: install-methods.xml:1011
 #, no-c-format
 msgid ""
 "<emphasis>Copy</emphasis> (not move) the following four files which you "
@@ -1442,31 +1458,31 @@ msgstr ""
 "到硬碟圖示的方法來完成)。"
 
 #. Tag: filename
-#: install-methods.xml:1006 install-methods.xml:1344
+#: install-methods.xml:1021 install-methods.xml:1359
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 #. Tag: filename
-#: install-methods.xml:1011 install-methods.xml:1349
+#: install-methods.xml:1026 install-methods.xml:1364
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 #. Tag: filename
-#: install-methods.xml:1016 install-methods.xml:1354
+#: install-methods.xml:1031 install-methods.xml:1369
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 #. Tag: filename
-#: install-methods.xml:1021 install-methods.xml:1359
+#: install-methods.xml:1036 install-methods.xml:1374
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
 
 #. Tag: para
-#: install-methods.xml:1026
+#: install-methods.xml:1041
 #, fuzzy, no-c-format
 msgid ""
 "Make a note of the partition number of the MacOS partition where you place "
@@ -1480,19 +1496,19 @@ msgstr ""
 "個分割區號碼用於在 Open Firmware 提示符號下面輸入指令。"
 
 #. Tag: para
-#: install-methods.xml:1034
+#: install-methods.xml:1049
 #, no-c-format
 msgid "To boot the installer, proceed to <xref linkend=\"boot-newworld\"/>."
 msgstr "要啟動安裝程式，請進入 <xref linkend=\"boot-newworld\"/>。"
 
 #. Tag: title
-#: install-methods.xml:1047
+#: install-methods.xml:1062
 #, no-c-format
 msgid "Preparing Files for TFTP Net Booting"
 msgstr "準備以 TFTP 網路開機用的檔案"
 
 #. Tag: para
-#: install-methods.xml:1048
+#: install-methods.xml:1063
 #, no-c-format
 msgid ""
 "If your machine is connected to a local area network, you may be able to "
@@ -1506,7 +1522,7 @@ msgstr ""
 "上面的某個特殊地方，並且設定您的機器從該機器進行開機。"
 
 #. Tag: para
-#: install-methods.xml:1056
+#: install-methods.xml:1071
 #, fuzzy, no-c-format
 msgid ""
 "You need to set up a TFTP server, and for many machines a DHCP server<phrase "
@@ -1518,7 +1534,7 @@ msgstr ""
 "condition=\"supports-dhcp\">，又或 DHCP 伺服器</phrase>。"
 
 #. Tag: para
-#: install-methods.xml:1063
+#: install-methods.xml:1078
 #, fuzzy, no-c-format
 msgid ""
 "<phrase condition=\"supports-rarp\">The Reverse Address Resolution Protocol "
@@ -1538,7 +1554,7 @@ msgstr ""
 "只能透過 DHCP 來配置。</phrase>"
 
 #. Tag: para
-#: install-methods.xml:1077
+#: install-methods.xml:1092
 #, no-c-format
 msgid ""
 "For PowerPC, if you have a NewWorld Power Macintosh machine, it is a good "
@@ -1549,7 +1565,7 @@ msgstr ""
 "替 BOOTP 比較好。有些最新的機器不能從 BOOTP 開機。"
 
 #. Tag: para
-#: install-methods.xml:1083
+#: install-methods.xml:1098
 #, fuzzy, no-c-format
 msgid ""
 "Some older HPPA machines (e.g. 715/75) use RBOOTD rather than BOOTP. There "
@@ -1559,7 +1575,7 @@ msgstr ""
 "網站上能夠找到 RBOOTD 軟體套件。"
 
 #. Tag: para
-#: install-methods.xml:1088
+#: install-methods.xml:1103
 #, no-c-format
 msgid ""
 "The Trivial File Transfer Protocol (TFTP) is used to serve the boot image to "
@@ -1573,7 +1589,7 @@ msgstr ""
 "上面的一些操作例子。"
 
 #. Tag: para
-#: install-methods.xml:1096
+#: install-methods.xml:1111
 #, no-c-format
 msgid ""
 "To use the Pre-boot Execution Environment (PXE) method of TFTP booting, you "
@@ -1587,13 +1603,13 @@ msgstr ""
 "求，我們建議使用 <classname>tftpd-hpa</classname>。"
 
 #. Tag: title
-#: install-methods.xml:1114
+#: install-methods.xml:1129
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "設置 RARP 伺服器"
 
 #. Tag: para
-#: install-methods.xml:1115
+#: install-methods.xml:1130
 #, fuzzy, no-c-format
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
@@ -1611,7 +1627,7 @@ msgstr ""
 "<userinput>/sbin/ifconfig eth0</userinput> 指令。"
 
 #. Tag: para
-#: install-methods.xml:1127
+#: install-methods.xml:1142
 #, fuzzy, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1631,13 +1647,13 @@ msgstr ""
 "使用 <userinput>/usr/sbin/rarpd -a</userinput> 指令。"
 
 #. Tag: title
-#: install-methods.xml:1149
+#: install-methods.xml:1164
 #, fuzzy, no-c-format
 msgid "Setting up a BOOTP server"
 msgstr "設置 BOOTP 伺服器"
 
 #. Tag: para
-#: install-methods.xml:1150
+#: install-methods.xml:1165
 #, fuzzy, no-c-format
 msgid ""
 "There are two BOOTP servers available for GNU/Linux. The first is CMU "
@@ -1652,7 +1668,7 @@ msgstr ""
 "體套件中。"
 
 #. Tag: para
-#: install-methods.xml:1158
+#: install-methods.xml:1173
 #, fuzzy, no-c-format
 msgid ""
 "To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
@@ -1708,7 +1724,7 @@ msgstr ""
 "的 MAC 位址。 </phrase>"
 
 #. Tag: para
-#: install-methods.xml:1191
+#: install-methods.xml:1206
 #, fuzzy, no-c-format
 msgid ""
 "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
@@ -1729,13 +1745,13 @@ msgstr ""
 "令是：<userinput>/etc/init.d/dhcpd restart</userinput>。"
 
 #. Tag: title
-#: install-methods.xml:1213
+#: install-methods.xml:1228
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "設置 DHCP 伺服器"
 
 #. Tag: para
-#: install-methods.xml:1214
+#: install-methods.xml:1229
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -1745,7 +1761,7 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: install-methods.xml:1221
+#: install-methods.xml:1236
 #, fuzzy, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -1795,7 +1811,7 @@ msgstr ""
 "檔。"
 
 #. Tag: para
-#: install-methods.xml:1223
+#: install-methods.xml:1238
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -1811,7 +1827,7 @@ msgstr ""
 "TFTP 取得的檔案名稱。"
 
 #. Tag: para
-#: install-methods.xml:1233
+#: install-methods.xml:1248
 #, fuzzy, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -1821,13 +1837,13 @@ msgstr ""
 "<userinput>/etc/init.d/dhcpd restart</userinput>。"
 
 #. Tag: title
-#: install-methods.xml:1241
+#: install-methods.xml:1256
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "在 DHCP 設定中打開 PXE 開機功能"
 
 #. Tag: para
-#: install-methods.xml:1242
+#: install-methods.xml:1257
 #, fuzzy, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -1899,13 +1915,13 @@ msgstr ""
 "面的<xref linkend=\"tftp-images\"/> )。"
 
 #. Tag: title
-#: install-methods.xml:1258
+#: install-methods.xml:1273
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "啟用 TFTP 伺服器"
 
 #. Tag: para
-#: install-methods.xml:1259
+#: install-methods.xml:1274
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
@@ -1923,7 +1939,7 @@ msgstr ""
 "</screen></informalexample> Debian 套件通常在安裝後會自動把這條設定好。"
 
 #. Tag: para
-#: install-methods.xml:1271
+#: install-methods.xml:1286
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -1935,7 +1951,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1281
+#: install-methods.xml:1296
 #, fuzzy, no-c-format
 msgid ""
 "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
@@ -1962,7 +1978,7 @@ msgstr ""
 "<replaceable>inetd-pid</replaceable></userinput>。"
 
 #. Tag: para
-#: install-methods.xml:1301
+#: install-methods.xml:1316
 #, fuzzy, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -1990,13 +2006,13 @@ msgstr ""
 "這個錯誤。"
 
 #. Tag: title
-#: install-methods.xml:1323
+#: install-methods.xml:1338
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "將 TFTP 映像放到適當的位置"
 
 #. Tag: para
-#: install-methods.xml:1324
+#: install-methods.xml:1339
 #, fuzzy, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2012,7 +2028,7 @@ msgstr ""
 "個強制的標準。"
 
 #. Tag: para
-#: install-methods.xml:1333
+#: install-methods.xml:1348
 #, fuzzy, no-c-format
 #| msgid ""
 #| "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2035,13 +2051,13 @@ msgstr ""
 "TFTP 目錄。"
 
 #. Tag: filename
-#: install-methods.xml:1364
+#: install-methods.xml:1379
 #, no-c-format
 msgid "boot.msg"
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1369
+#: install-methods.xml:1384
 #, fuzzy, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2056,7 +2072,7 @@ msgstr ""
 "機所需的檔案名傳遞至 <command>tftpd</command>。"
 
 #. Tag: para
-#: install-methods.xml:1377
+#: install-methods.xml:1392
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2071,13 +2087,13 @@ msgstr ""
 "efi</filename> 以開機所需的檔案名傳遞至<command>tftpd</command>。"
 
 #. Tag: title
-#: install-methods.xml:1389
+#: install-methods.xml:1404
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "SPARC TFTP 開機"
 
 #. Tag: para
-#: install-methods.xml:1390
+#: install-methods.xml:1405
 #, fuzzy, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2105,7 +2121,7 @@ msgstr ""
 "該將所有的字母改成大寫並在必要時加上子架構名。"
 
 #. Tag: para
-#: install-methods.xml:1406
+#: install-methods.xml:1421
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2115,7 +2131,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: install-methods.xml:1413
+#: install-methods.xml:1428
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2128,13 +2144,13 @@ msgstr ""
 "仍然必須被放置在 TFTP 伺服器要查找的目錄中。"
 
 #. Tag: title
-#: install-methods.xml:1424
+#: install-methods.xml:1439
 #, fuzzy, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "SGI Indys TFTP 開機"
 
 #. Tag: para
-#: install-methods.xml:1425
+#: install-methods.xml:1440
 #, fuzzy, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2148,13 +2164,13 @@ msgstr ""
 "<userinput>filename=</userinput>選項。"
 
 #. Tag: title
-#: install-methods.xml:1533
+#: install-methods.xml:1548
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "自動化安裝"
 
 #. Tag: para
-#: install-methods.xml:1534
+#: install-methods.xml:1549
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2169,13 +2185,13 @@ msgstr ""
 "<classname>autoinstall</classname>，以及 Debian 安裝程式本身。"
 
 #. Tag: title
-#: install-methods.xml:1547
+#: install-methods.xml:1562
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "使用 Debian 安裝程式進行自動安裝"
 
 #. Tag: para
-#: install-methods.xml:1548
+#: install-methods.xml:1563
 #, fuzzy, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2187,7 +2203,7 @@ msgstr ""
 "可從移動媒介上載入，並且被用來在安裝過程中自動回答問題。"
 
 #. Tag: para
-#: install-methods.xml:1555
+#: install-methods.xml:1570
 #, fuzzy, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
