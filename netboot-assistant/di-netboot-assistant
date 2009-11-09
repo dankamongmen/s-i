@@ -129,6 +129,11 @@ install_local_syslinux() {
 }
 
 update_menu() {
+	if [ ! -d "$TFTP_ROOT/debian-installer" ]; then
+		return
+	fi
+	cd "$TFTP_ROOT/debian-installer"
+
 	update_pxelinux_menu
 	update_elilo_menu
 
@@ -297,12 +302,11 @@ uninstall_repos() {
 				echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
 				echo "I: (installed arch are: $($installed_archs | tr "\n" " "))"
 				echo "" 1>&2
-				exit 1
+				return 1
 			fi
 		fi
 	done
 
-	[ -d "$TFTP_ROOT/debian-installer" ] && update_menu
 	[ "$DEBUG" ] && set +x
 }
 
@@ -509,7 +513,7 @@ fetch_files() {
 
 		return 0
 	else
-		exit 1
+		return 1
 	fi
 	[ "$DEBUG" ] && set +x
 }
@@ -541,14 +545,14 @@ install_repo() {
 	if [ -z "$release" ]; then
 		echo "E: No repository specified (valid repositories are: $releases)" 1>&2
 		echo ""
-		exit 1
+		return 1
 	fi
 
 	if ! grep -Eq "^$release\>" "$DISOURCELIST" ; then
 		echo "E: Invalid repository name specified ($release)" 1>&2
 		echo "I: Declared repositories are: $releases"
 		echo ""
-		exit 1
+		return 1
 	fi
 
 
@@ -563,7 +567,7 @@ install_repo() {
 		echo "E: No architecture specified." 1>&2
 		list_declared_arch_for_repo "$release"
 		echo ""
-		exit 1
+		return 1
 	fi
 
 	for arch in $archs ; do
@@ -586,7 +590,7 @@ install_repo() {
 			echo "E: repository '$release' in $DISOURCELIST" 1>&2
 			list_declared_arch_for_repo "$release"
 			echo ""
-			exit 1
+			return 1
 		fi
 
 		if [ "$release" != "${REPO_ALIAS}" -a "$VERBOSE" ]; then
@@ -601,7 +605,7 @@ install_repo() {
 		fetch_date=""
 		fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file
 		if [ -z "$fetch_date" ]; then
-			exit 1
+			return 1
 		fi
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		dl_file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
@@ -740,9 +744,9 @@ install_repo() {
 			echo "" >> $menufragment
 		fi
 
-		update_menu
 	done
 	[ "$DEBUG" ] && set +x
+	return 0
 }
 
 
@@ -832,9 +836,6 @@ for option in "$@"; do
     esac
 done
 
-check_tftp_root
-cd "$TFTP_ROOT/debian-installer"
-
 check_di_source_list
 releases="$(grep -vE '^#' "$DISOURCELIST" | cut -f 1 | sort -u | tr "\n" " " | sed -e 's/^[[:blank:]]\+//' )"
 
@@ -892,16 +893,24 @@ for option in "$@"; do
 	[ ! "$REPO_ALIAS" ] && REPO_ALIAS=$option
 	case "$ACTION" in
 		install)
-			install_repo "$option"
+			check_tftp_root
+			cd "$TFTP_ROOT/debian-installer"
+			if install_repo "$option" ; then
+				update_menu
+			else
+				rmdir --ignore-fail-on-non-empty "$TFTP_ROOT/debian-installer"
+			fi
 			;;
 		uninstall)
 			uninstall_repos "$option"
+			update_menu
 			;;
 		uncache)
 			remove_repocaches "$option"
 			;;
 		purge)
 			uninstall_repos "$option" ignore_missing 
+			update_menu
 			remove_repocaches "$option" ignore_missing
 			;;
 		rebuild-menu)
