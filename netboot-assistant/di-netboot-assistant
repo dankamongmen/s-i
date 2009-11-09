@@ -474,7 +474,7 @@ fetch_files() {
 				SUCCEED="failed"
 				echo "E: Can't process '$release' in offline mode, the file is missing:" 1>&2
 				echo "E: (expecting '$file' from '$url')" 1>&2
-				#break
+				break
 			else
 				fetch_date="$( grep "^fetch_date=" "$metadatafile" | cut -d "=" -f 2- 2>/dev/null )"
 				
@@ -603,8 +603,7 @@ install_repo() {
 
 		file=$(grep -E "^$release[[:blank:]]$arch" "$DISOURCELIST" | cut -f 4- )
 		fetch_date=""
-		fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file
-		if [ -z "$fetch_date" ]; then
+		if ! fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file; then
 			return 1
 		fi
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
