@@ -90,7 +90,8 @@ case "$1" in
 		done
 
 		for x in debian-installer/pxelinux.cfg debian-installer; do
-			rmdir --ignore-fail-on-non-empty "$TFTP_ROOT/$x" || true
+			f="$TFTP_ROOT/$x"
+			[ -d "$f" ] && rmdir --ignore-fail-on-non-empty "$f" || true
 		done
 
 		if [ -f $STATUS_LIB/.old-conf-for-purge ]; then
