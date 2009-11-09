@@ -5,8 +5,8 @@ set -e
 DL_CACHE=/var/cache/di-netboot-assistant/
 STATUS_LIB=/var/lib/di-netboot-assistant
 TFTP_ROOT=/var/lib/tftpboot
-if [ -f /var/lib/di-netboot-assistant/.old-conf-for-purge ]; then
-	. /var/lib/di-netboot-assistant/.old-conf-for-purge
+if [ -f $STATUS_LIB/.old-conf-for-purge ]; then
+	. $STATUS_LIB/.old-conf-for-purge
 fi
 
 #This function should be kept in sync with function "uninstall_repo" in di-netboot-assistant
@@ -53,7 +53,7 @@ remove_repocache() {
 	base=$(echo $metadatafile | sed -e 's/~~.*$//' )
 
 	for file in $(sed -n -e 's/^[[:blank:]]*dl_file=[[:blank:]]*//p' $metadatafile); do
-		rm $RM_VERBOSITY ${base}_"$(echo ${file}| url2filename)"
+		rm $RM_VERBOSITY ${base}_"$(echo $file| url2filename)"
 	done
 
 	#Purge remaing files (MD5SUMS...) if there are no more cached
@@ -76,14 +76,14 @@ remove_pre037_md5sums() {
 
 case "$1" in
     purge)
-	if [ -d ${STATUS_LIB} ]; then
+	if [ -d $STATUS_LIB ]; then
 
-		for x in $( find ${STATUS_LIB} -type f -name '*.conf' ) ; do
+		for x in $( find $STATUS_LIB -type f -name '*.conf' ) ; do
 			uninstall_repo "$x"
 		done
 
 		if [ -d "$DL_CACHE" ]; then
-			for metadatafile in $(find ${DL_CACHE} -name "*~~*--*.meta"); do
+			for metadatafile in $(find $DL_CACHE -name "*~~*--*.meta"); do
 				remove_repocache "$metadatafile"
 			done
 
