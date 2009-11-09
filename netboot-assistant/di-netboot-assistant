@@ -637,7 +637,7 @@ install_repo() {
 		if [ ! -z "$pxelinuxbin" ]; then
 			pxelinuxcfg="${pxelinuxbin%%.0}.cfg/default"
 			ver="$(sed -ne 's/# D-I config version \(.*\)/\1/p' "$pxelinuxcfg" 2>/dev/null)"
-			if [ ! -f "$pxelinuxcfg" -o "${ver:-1.0}" != "1.0" ]; then
+			if [ ! -f "$pxelinuxcfg" ] || echo "${ver:-1.0}" | grep -q -v "^[12]\.0" ; then
 				echo "W: The format of this image may not be supported." 1>&2
 			fi
 			[ ! -d "$TFTP_ROOT/debian-installer/pxelinux.cfg" ] && mkdir "$TFTP_ROOT/debian-installer/pxelinux.cfg"
