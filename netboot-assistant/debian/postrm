@@ -74,9 +74,11 @@ case "$1" in
 			uninstall_repo "$x"
 		done
 
-		for metadatafile in $(find ${DL_CACHE}/ -name "*~~*--*.meta"); do
-			remove_repocache "$metadatafile"
-		done
+		if [ -d "$DL_CACHE" ]; then
+			for metadatafile in $(find ${DL_CACHE} -name "*~~*--*.meta"); do
+				remove_repocache "$metadatafile"
+			done
+		fi
 
 		for x in pxelinux.0 elilo.conf elilo.efi README.txt \
 			pxelinux.cfg/default pxelinux.cfg/menu.c32 \
