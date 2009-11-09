@@ -70,7 +70,6 @@ case "$1" in
     purge)
 	if [ -d ${STATUS_LIB} ]; then
 
-		[ -z "$SYSLINUXMENU" ] && SYSLINUXMENU=menu.c32
 		for x in $( find ${STATUS_LIB} -type f -name '*.conf' ) ; do
 			uninstall_repo "$x"
 		done
@@ -80,9 +79,11 @@ case "$1" in
 		done
 
 		for x in pxelinux.0 elilo.conf elilo.efi README.txt \
-			pxelinux.cfg/default pxelinux.cfg/menu.c32 ; do
-			if [ -f "$TFTP_ROOT/debian-installer/$x" ]; then
-				rm "$TFTP_ROOT/debian-installer/$x" || true
+			pxelinux.cfg/default pxelinux.cfg/menu.c32 \
+			pxelinux.cfg/vesamenu.c32 ; do
+			f="$TFTP_ROOT/debian-installer/$x"
+			if [ -f "$f" -o -L "$f" ]; then
+				rm "$f" || true
 			fi
 		done
 

@@ -26,7 +26,6 @@ PACKAGE_VERSION=0.37
 OFFLINE=
 DEBUG=
 DISOURCELIST=/etc/di-netboot-assistant/di-sources.list
-SYSLINUXMENU=menu.c32
 SYSLINUX=/usr/lib/syslinux/
 ELILO=/usr/lib/elilo/
 DL_CACHE=/var/cache/di-netboot-assistant
@@ -116,14 +115,46 @@ print_do-not-edit_header() {
 	echo "##"
 }
 
-install_local_syslinux() {
-	local targetdir=$1
-	if [ -f "$SYSLINUX/$SYSLINUXMENU" -a -f "$SYSLINUX/pxelinux.0" ]; then
-		cp "$SYSLINUX/$SYSLINUXMENU" $targetdir/pxelinux.cfg/
-		cp "$SYSLINUX/pxelinux.0" $targetdir
+find_file() {
+	if [ "$1" -a "$2" ]; then
+		find "$2" -type f -name $1 | head -n 1
 	else
-		echo "W: couldn't copy '$SYSLINUX/$SYSLINUXMENU' and/or '$SYSLINUX/pxelinux.0' to $targetdir. Install the package syslinux." 1>&2
+		echo ""
 	fi
+}
+
+install_syslinux() {
+	local src=$1
+	local dst=$2
+	local c32=$dst/pxelinux.cfg
+	local oldbin  newbin PXE_NEW_VER PXE_CUR_VER
+
+	[ ! "$src" -o ! "$dst" ] && return 1
+
+	newbin=$(find_file pxelinux.0 "$src" 2>/dev/null)
+	[ ! -f "$dst/pxelinux.0" -a ! -f "$newbin" ] && return 1
+
+	PXE_NEW_VER="$(pxelinux_version "$newbin")"
+	PXE_CUR_VER="$(pxelinux_version "$dst/pxelinux.0")"
+	if dpkg --compare-versions "$PXE_NEW_VER" "<=" "$PXE_CUR_VER" ; then
+		return 0
+	fi
+
+	echo "I: Upgrading PXELinux ($PXE_CUR_VER to $PXE_NEW_VER)"
+
+	for f in pxelinux.0 menu.c32 vesamenu.c32; do
+		srcf="$(find_file $f "$src")"
+		[ "${f#*c32}" ] || f="pxelinux.cfg/$f"
+		[ -L "$dst/$f" ] && rm "$dst/$f"
+		if [ -f "$srcf" ]; then
+			cp "$srcf" "$dst/$f"
+		else
+			[ -f "$dst/$f" ] && rm "$dst/$f"
+		fi
+	done
+	# Smooth transition to vesamenu
+	[ ! -f "$c32/menu.c32" ] && ln -s "vesamenu.c32" $c32/menu.c32
+	return 0
 }
 
 update_menu() {
@@ -181,10 +212,12 @@ update_pxelinux_menu() {
 		[ $i -eq 0 ] && rm pxelinux.cfg/default.serial-9600
 	fi
 
-	if [ -e pxelinux.cfg/default -o -e pxelinux.cfg/default.serial-9600 ]; then
-		install_local_syslinux ./
+	if [ -f pxelinux.cfg/default ]; then
+		for x in $(sed -n -e "s,^\s*KERNEL\s[\s:/]*\(.*menu.c32\).*,\1,p " pxelinux.cfg/default | sort -u ); do
+			[ ! -f ../$x ] && echo "W: Some menu binaries are missing. Install the package syslinux"
+		done
 	else
-		find pxelinux.cfg/ -type f -iregex '.*\(\.c32\|\.bak.*\|~\)$' \
+		find pxelinux.cfg/ -iregex '.*\(\.c32\|\.bak.*\|~\)$' \
 			| xargs -r rm
 
 		[ -d pxelinux.cfg ] && rmdir --ignore-fail-on-non-empty pxelinux.cfg
@@ -641,18 +674,12 @@ install_repo() {
 				echo "W: The format of this image may not be supported." 1>&2
 			fi
 			[ ! -d "$TFTP_ROOT/debian-installer/pxelinux.cfg" ] && mkdir "$TFTP_ROOT/debian-installer/pxelinux.cfg"
-			if [ ! -f "$TFTP_ROOT/debian-installer/pxelinux.0" ]; then
-				install_local_syslinux "$TFTP_ROOT/debian-installer/"
+
+			install_syslinux "$SYSLINUX" "$TFTP_ROOT/debian-installer/" || false
+			if ! install_syslinux "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
+				echo "E: No menu installed. Please file a bug." 1>&2
 			fi
-			PXE_NEW_VER="$(pxelinux_version "$pxelinuxbin")"
-			PXE_CUR_VER="$(pxelinux_version "$TFTP_ROOT/debian-installer/pxelinux.0")"
-			if dpkg --compare-versions "$PXE_NEW_VER" ">>" "$PXE_CUR_VER" ; then
-				echo "I: Upgrading $TFTP_ROOT/debian-installer/pxelinux.0 ($PXE_CUR_VER to $PXE_NEW_VER)"
-				cp -f "$pxelinuxbin" "$TFTP_ROOT/debian-installer/pxelinux.0"
-				for x in $(find "$expand_dir" -type f -name "$SYSLINUXMENU" | head -n 1) ; do
-					cp "$x" "$TFTP_ROOT/debian-installer/pxelinux.cfg/"
-				done
-			fi
+
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
 				mv "$x" "$x.ORIG"
 				print_do-not-edit_header "$release netboot image" > "$x"
@@ -689,7 +716,7 @@ install_repo() {
 				fi
 
 			else
-				echo   "	::/KERNEL debian-installer/pxelinux.cfg/$SYSLINUXMENU" >> $menufragment
+				echo   "	::/KERNEL debian-installer/pxelinux.cfg/menu.c32" >> $menufragment
 				echo   "	::/APPEND debian-installer/${REPO_ALIAS}/$arch/pxelinux.cfg/default" >> $menufragment
 			fi
 
@@ -697,7 +724,7 @@ install_repo() {
 			if [ -f "$menufragment_serial9600" ]; then
 				echo   "LABEL ${REPO_ALIAS}-$arch" >> $menufragment_serial9600
 				printf "	MENU LABEL Debian Installer %-26s [SUB-MENU]\n" "(${REPO_ALIAS}, $arch)" >> $menufragment_serial9600
-				echo   "	KERNEL ::/debian-installer/pxelinux.cfg/$SYSLINUXMENU" >> $menufragment_serial9600
+				echo   "	KERNEL ::/debian-installer/pxelinux.cfg/menu.c32" >> $menufragment_serial9600
 				echo   "	APPEND ::/debian-installer/${REPO_ALIAS}/$arch/pxelinux.cfg.serial-9600/default" >> $menufragment_serial9600
 			fi
 		fi
