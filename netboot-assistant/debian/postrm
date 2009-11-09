@@ -66,6 +66,14 @@ remove_repocache() {
 
 }
 
+remove_pre037_md5sums() {
+	#remove di-netboot-assistant < 0.37 checksum files.
+	find "$DL_CACHE" -type f ! -name '*_MD5SUMS' \
+		| grep -q "" \
+		|| find "$DL_CACHE" -type f -name '*_MD5SUMS' \
+		| xargs -r rm 
+}
+
 case "$1" in
     purge)
 	if [ -d ${STATUS_LIB} ]; then
@@ -78,6 +86,8 @@ case "$1" in
 			for metadatafile in $(find ${DL_CACHE} -name "*~~*--*.meta"); do
 				remove_repocache "$metadatafile"
 			done
+
+			remove_pre037_md5sums
 		fi
 
 		for x in pxelinux.0 elilo.conf elilo.efi README.txt \
