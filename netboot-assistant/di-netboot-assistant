@@ -447,7 +447,7 @@ fetch_files() {
 			else
 				[ -f "$file.tmp" ] && rm "$file.tmp"
 				[ "$VERBOSE" -a "$OFFLINE" ] && echo "I: $givenfile not cached, or obsolete."
-				[ "$OFFLINE" ] && SUCCEED="failed"
+				[ "$OFFLINE" ] && SUCCEED= #failed"
 			fi
 		fi
 
@@ -462,7 +462,7 @@ fetch_files() {
 					break
 				fi
 			else
-				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || SUCCEED="failed"
+				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || SUCCEED= #failed#
 				echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
 				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
 				if [ -f "$file" ]; then
@@ -471,7 +471,7 @@ fetch_files() {
 			fi
 		else
 			if [ ! -f "$file.tmp" ]; then
-				SUCCEED="failed"
+				SUCCEED= #failed#
 				echo "E: Can't process '$release' in offline mode, the file is missing:" 1>&2
 				echo "E: (expecting '$file' from '$url')" 1>&2
 				break
@@ -488,11 +488,11 @@ fetch_files() {
 		echo "W: No checksum found."
 	fi
 
-	[ $VERBOSE ] && echo "I: Moving/Removing temporary files."
+	[ "$VERBOSE" ] && echo "I: Moving/Removing temporary files."
 	for givenfile in $EXTRA_DL_FILES $files ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		file="${DL_CACHE}/$(echo ${repo_loc}/$f | url2filename)"
-		if [ "$SUCCEED" = "true" ]; then
+		if [ "$SUCCEED" ]; then
 			[ -f "$file.tmp" -a -f "$file" ] && rm $RM_VERBOSITY "$file"
 			[ -f "$file.tmp" ] && mv $MV_VERBOSITY "$file.tmp" "$file"
 		else
@@ -501,7 +501,7 @@ fetch_files() {
 	done
 
 	# Save metadata
-	if [ "$SUCCEED" = "true" ]; then
+	if [ "$SUCCEED" ]; then
 		if [ ! "$OFFLINE" ]; then
 			echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
 			echo "format=1.0" >> $metadatafile
@@ -926,7 +926,7 @@ for option in "$@"; do
     esac
 done
 
-if [ "$ACTION" = "" ]; then
+if [ ! "$ACTION" ]; then
 	usage 1>&2
 	exit 1
 fi
