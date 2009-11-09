@@ -90,7 +90,6 @@ XXX
 check_di_source_list() {
 	if [ ! -f "$DISOURCELIST" ]; then
 		echo "E: Debian Installer source file missing ($DISOURCELIST)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 
@@ -98,7 +97,6 @@ check_di_source_list() {
 		echo -n "E: Syntax error lines #"  1>&2
 		grep -vnE '^(#.*|[[:blank:]]*|[[:alnum:]_\.-]+[	][[:alnum:]_\.-]+[	][^	]+([	][^" ]+)+)$' "$DISOURCELIST" | cut -d ":" -f 1 | tr "\n" "," 1>&2
 		echo " in file '$DISOURCELIST'." 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 }
@@ -221,21 +219,18 @@ update_elilo_menu() {
 check_tftp_root() {
 	if [ -z "$TFTP_ROOT" -o "$TFTP_ROOT" = "." -o "$TFTP_ROOT" = "/" ]; then
 		echo "E: Invalid TFTP root specified ($TFTP_ROOT)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 
 	if [ ! -d "$TFTP_ROOT" ]; then
 		echo "E: TFTP root directory doesn't exists ($TFTP_ROOT)" 1>&2
 		echo "I: Make sure you installed a tftp server like tftpd-hpa or atftpd."
-		echo "" 1>&2
 		exit 1
 	fi
 
 	[ ! -d "$TFTP_ROOT/debian-installer" ] && mkdir "$TFTP_ROOT/debian-installer"
 	if [ ! -w "$TFTP_ROOT/debian-installer" ]; then
 		echo "E: Can't write to DI directory ($TFTP_ROOT/debian-installer)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 }
@@ -284,7 +279,6 @@ uninstall_repos() {
 		installed_repos="$(find  "${STATUS_LIB}/"  -name \*--\*.conf | sed -e 's,^.*/,,' -e 's/--.*\.conf//')"
 		echo "E: Repository '$del_repo' not installed." 1>&2
 		echo "I: (installed repositories are: $installed_repos)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 
@@ -301,7 +295,6 @@ uninstall_repos() {
 			if [ "$ignore_missing" != "ignore_missing" ]; then
 				echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
 				echo "I: (installed arch are: $($installed_archs | tr "\n" " "))"
-				echo "" 1>&2
 				return 1
 			fi
 		fi
@@ -354,7 +347,6 @@ remove_repocaches() {
 		cached_repos="$(find /home/fpiat/.di-netboot-assistant/cache -name \*~~\*--\*.meta | sed -e 's/^.*~~//' -e 's/--.*//' | tr '\n' ' ')"
 		echo "E: Repository '$del_repo' not cached." 1>&2
 		echo "I: (cached repositories are: $cached_repos)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 
@@ -374,7 +366,6 @@ remove_repocaches() {
 	        if [ $COUNT -eq 0 -a "$ignore_missing" != "ignore_missing" ]; then
 			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
 			echo "I: (cached archs are: $cached_archs)" 1>&2
-			echo "" 1>&2
 			exit 1
 		fi
 	done
@@ -415,7 +406,6 @@ fetch_files() {
 			GETTER="curl --fail $CURL_VERBOSITY -o"
 		else
 			echo "E: Can't download file. no download tool detected (wget or curl)." 1>&2
-			echo "" 1>&2
 			return 1
 		fi
 	fi
@@ -544,14 +534,12 @@ install_repo() {
 	release="$1"
 	if [ -z "$release" ]; then
 		echo "E: No repository specified (valid repositories are: $releases)" 1>&2
-		echo ""
 		return 1
 	fi
 
 	if ! grep -Eq "^$release\>" "$DISOURCELIST" ; then
 		echo "E: Invalid repository name specified ($release)" 1>&2
 		echo "I: Declared repositories are: $releases"
-		echo ""
 		return 1
 	fi
 
@@ -566,7 +554,6 @@ install_repo() {
 	if [ -z "$( echo "$archs" | sed -e 's/[[:blank:]\?]*//g' )" ]; then
 		echo "E: No architecture specified." 1>&2
 		list_declared_arch_for_repo "$release"
-		echo ""
 		return 1
 	fi
 
@@ -589,7 +576,6 @@ install_repo() {
 			echo "E: There is no entry declared for architecture '$arch' for " 1>&2
 			echo "E: repository '$release' in $DISOURCELIST" 1>&2
 			list_declared_arch_for_repo "$release"
-			echo ""
 			return 1
 		fi
 
@@ -777,7 +763,6 @@ for option in "$@"; do
 	#Note:
 	if [ "$(echo $ARCH | grep -E '^[[:alnum:]_,]\+$')" ]; then
 		echo "E: Invalid architecture specified ($ARCH)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi ;;
     --alias| --alias=*)
@@ -785,7 +770,6 @@ for option in "$@"; do
 	#Note:
 	if [ "$(echo $ARCH | grep -E '^[[:alnum:]_,]\+$')" ]; then
 		echo "E: Invalid alias name ($option)" 1>&2
-		echo "" 1>&2
 		exit 1
 	fi ;;
     --di-args=*)
@@ -812,19 +796,16 @@ for option in "$@"; do
 	DEBUG=yes ;;
     --di-args| --target-args)
 	echo "E: Option $option requires a value after equal sign." 1>&2
-	echo "" 1>&2
 	exit 1
         ;;
     -*)
 	echo "E: Unrecognized option ($option)" 1>&2
-	echo "" 1>&2
 	exit 1
 	;;
     rebuild-menu|install|uninstall|uncache|purge)
 	#Actions are processed in the loop below
     	if [ "$ACTION" ]; then
 		echo "E: Unexpected command '$option'. '$ACTION' was already specified." 1>&2
-		echo "" 1>&2
 		exit 1
 	fi
 	ACTION=$option
@@ -841,7 +822,6 @@ releases="$(grep -vE '^#' "$DISOURCELIST" | cut -f 1 | sort -u | tr "\n" " " | s
 if [ "$REPO_ALIAS" ]; then
 	if [ "$ACTION" = "install" -a $COUNT -gt 1 ]; then
         	echo "E: Option --alias can't be used with multiple repositories." 1>&2
-        	echo "" 1>&2
         	exit 1
 	fi
 fi
@@ -853,7 +833,6 @@ case "$ACTION" in
     rebuild-menu)
         if [ $COUNT -ne 0 ]; then
         	echo "E: Unexpected argument after command '$ACTION'." 1>&2
-        	echo "" 1>&2
         	exit 1
 	fi
         ;;
@@ -867,7 +846,6 @@ case "$ACTION" in
         	[ "$ACTION" = "uncache" ] && echo "I: Cached repositories are: $cached_repos"
         	[ "$ACTION" = "uninstall" ] && echo "I: Installed repositories are: $installed_repos"
         	[ "$ACTION" = "purge" ] && echo "I: Purgable repositories are: $purgabled_repos"
-        	echo "" 1>&2
         	exit 1
         fi
         ;;
@@ -914,11 +892,9 @@ for option in "$@"; do
 			;;
 		rebuild-menu)
 			echo "W: Argument '$option' ignored ($ACTION expects no argument)." 1>&2
-			echo "" 1>&2
 			;;
 		*)
 			echo "E: Unexpected keyword: '$option'. No action were specified." 1>&2
-			echo "" 1>&2
 			exit 1
 			;;
 	esac
