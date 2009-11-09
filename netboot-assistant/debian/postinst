@@ -16,11 +16,17 @@ migrate_pxelinux_prefix() {
     SEDCMD2='s,^\(\s*APPEND\s\+.*initrd=\)\([^:]\),\1::/\2,i'
     SEDCMD3='s,^\(\s*\(default\|display\)\s\+\)\([^:].*/\),\1::/\3,i'
 
-    sed -i -e "$SEDCMD1" $STATUS_LIB/*.pxelinux.menu.fragment
+    if [ -d "$STATUS_LIB" ]; then
+	find $STATUS_LIB -name '*.pxelinux.menu.fragment' \
+	  | xargs -r -n 1 \
+	  sed -i -e "$SEDCMD1"
+    fi
 
-    find $TFTP_ROOT/debian-installer -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) \
-     | xargs -r -n 1 \
-       sed --in-place=.mig-bak -e "$SEDCMD1" -e "$SEDCMD2" -e "$SEDCMD3"
+    if [ -d "$TFTP_ROOT/debian-installer" ]; then
+	find $TFTP_ROOT/debian-installer -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) \
+	  | xargs -r -n 1 \
+	  sed --in-place=.mig-bak -e "$SEDCMD1" -e "$SEDCMD2" -e "$SEDCMD3"
+    fi
 }
 
 case "$1" in
