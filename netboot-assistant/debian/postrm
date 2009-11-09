@@ -91,16 +91,18 @@ case "$1" in
 			rmdir --ignore-fail-on-non-empty "$TFTP_ROOT/$x" || true
 		done
 
-		rm /var/lib/di-netboot-assistant/.old-conf-for-purge || true
+		if [ -f $STATUS_LIB/.old-conf-for-purge ]; then
+		       	rm $STATUS_LIB/.old-conf-for-purge || true
+		fi
+		rmdir --ignore-fail-on-non-empty $STATUS_LIB
 	fi
     ;;
     remove)
 	if [ -f /etc/di-netboot-assistant/di-netboot-assistant.conf ]; then
-		dir=/var/lib/di-netboot-assistant
-		[ ! -d $libdir ] && mkdir $libdir
+		[ ! -d $STATUS_LIB ] && mkdir $STATUS_LIB
 		sed -e "1s/^/#BACKUP, to purge our TFT stuff when purged\n/" \
 			< /etc/di-netboot-assistant/di-netboot-assistant.conf \
-			> $libdir/.old-conf-for-purge
+			> $STATUS_LIB/.old-conf-for-purge
 	fi
     ;;
     upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
