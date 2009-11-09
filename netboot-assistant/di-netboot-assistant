@@ -157,6 +157,36 @@ install_syslinux() {
 	return 0
 }
 
+install_elilo() {
+	local src=$1
+	local dst=$2
+	local oldbin newbin elilo_new_ver elilo_cur_ver
+
+	[ ! "$src" -o ! "$dst" ] && return 1
+
+	newbin=$(find_file elilo.efi "$src" 2>/dev/null)
+	[ ! -f "$dst/elilo.efi" -a ! -f "$newbin" ] && return 1
+
+	elilo_new_ver="$(elilo_version "$newbin")"
+	elilo_cur_ver="$(elilo_version "$dst/elilo.efi")"
+	if dpkg --compare-versions "$elilo_new_ver" "<=" "$elilo_cur_ver" ; then
+		return 0
+	fi
+
+	echo "I: Upgrading elilo ($elilo_cur_ver to $elilo_new_ver)"
+
+	for f in elilo.efi; do
+		srcf="$(find_file $f "$src")"
+		if [ -f "$srcf" ]; then
+			cp -p "$srcf" "$dst/$f"
+		else
+			[ -f "$dst/$f" ] && rm "$dst/$f"
+		fi
+	done
+
+	return 0
+}
+
 update_menu() {
 	if [ ! -d "$TFTP_ROOT/debian-installer" ]; then
 		return
@@ -240,12 +270,6 @@ update_elilo_menu() {
 	if [ $i -eq 0 ]; then
 		rm elilo.conf
 		[ -f elilo.efi ] && rm elilo.efi
-	else
-		if [ -f "$ELILO/elilo.efi" ]; then
-			cp "$ELILO/elilo.efi" ./
-		else
-			echo "W: couldn't copy '$ELILO/elilo.efi' to $PWD. Install the package elilo." 1>&2
-		fi
 	fi
 }
 
@@ -550,6 +574,15 @@ pxelinux_version() {
 	fi
 }
 
+elilo_version() {
+	bin="$1"
+	if [ -f "$bin" ]; then
+		date --reference=$bin +0.%Y-%m-%d.%H-%M-%S
+	else
+		echo ""
+	fi
+}
+
 tweak_pxelinux_arguments() {
 	sed -e "/^[[:blank:]]*label[[:blank:]]\+install\$/I,/^\([[:blank:]]*label[[:blank:]]^+[^\(install\)]\|[[:blank:]]*\)\$/I{s!append \(.*\)--\(.*\)!append \1 $DI_ARGS -- \2 $TARGET_ARGS!}"
 }
@@ -677,7 +710,7 @@ install_repo() {
 
 			install_syslinux "$SYSLINUX" "$TFTP_ROOT/debian-installer/" || false
 			if ! install_syslinux "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
-				echo "E: No menu installed. Please file a bug." 1>&2
+				echo "E: No PXELinux menu installed. Please file a bug." 1>&2
 			fi
 
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
@@ -731,6 +764,12 @@ install_repo() {
 
 		# ELILO MENU (ia64, and some ia32)
 		if [ ! -z "$(find "$expand_dir" -type f -name 'elilo.conf' )" ]; then
+
+			install_elilo "$ELILO" "$TFTP_ROOT/debian-installer/" || false
+			if ! install_elilo "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
+				echo "E: No Elilo menu installed. Please file a bug." 1>&2
+			fi
+
 			#Rewrite existing menus
 			for x in $(find "$expand_dir" -type f -name 'elilo.conf' ); do
 				mv "$x" "$x.ORIG"
