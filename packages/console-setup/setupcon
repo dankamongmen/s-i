@@ -209,7 +209,11 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	fi
     done
     
-    
+    # Due to bug in splashy: do not load fonts (#540314)
+    if pidof splashy > /dev/null; then
+	LOADFONTS=''
+    fi
+
     if [ "$save_only" != yes ] && [ "$LOADFONTS" ]; then
 	for console in $ACTIVE_CONSOLES; do
 	    [ -w $console ] || continue
@@ -247,7 +251,9 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
     else
 	ACM="$CHARMAP.acm.gz"
     fi
-    if [ "$save_only" != yes ] && [ "$CHARMAP" != UTF-8 ]; then
+    if \
+	[ "$save_only" != yes ] && [ "$CHARMAP" != UTF-8 ] && [ "$LOADFONTS" ]
+    then
 	for console in $ACTIVE_CONSOLES; do
 	    [ -w $console ] || continue
 	    if which consolechars >/dev/null; then
