@@ -326,13 +326,16 @@ if [ "$font_only" != yes -a "$XKBMODEL" != unknown ]; then
     fi
     
     if [ "$save_only" != yes ]; then
-	if which kbd_mode >/dev/null; then
-	    if [ "$CHARMAP" = UTF-8 ] || [ -z "$ACM" ]; then
-		kbd_mode -u
-	    else
-		kbd_mode -a
+	for console in $ACTIVE_CONSOLES; do
+	    [ -w $console ] || continue
+	    if which kbd_mode >/dev/null; then
+		if [ "$CHARMAP" = UTF-8 ] || [ -z "$ACM" ]; then
+		    kbd_mode -u <$console
+		else
+		    kbd_mode -a <$console
+		fi
 	    fi
-	fi
+	done
     fi
     
     if which loadkeys >/dev/null; then
