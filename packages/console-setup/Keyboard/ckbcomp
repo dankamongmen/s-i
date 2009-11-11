@@ -3269,6 +3269,17 @@ sub flatten {
 	next if ($real_group < 0);
 	for my $level (0..3) {
 	    my $real_level = $level;
+	    if ($types_table{$key} eq 'ONE_LEVEL') {
+		$real_level = 0;
+	    } elsif ($types_table{$key} eq 'TWO_LEVEL') {
+		if ($real_level > 1) {
+		    $real_level = 1;
+		}
+	    } elsif ($types_table{$key} eq 'THREE_LEVEL') {
+		if ($real_level > 2) {
+		    $real_level = 2;
+		}
+	    }
 	    while ($real_level > $#{$symbols_table{$key}[$real_group]}) {
 		if ($real_level == 2) {
 		    $real_level = $real_level - 2;
