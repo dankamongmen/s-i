@@ -5,21 +5,6 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
-# In d-i the config script is not executed automatically
-if [ -f /usr/share/console-setup-mini/console-setup-mini.config ]; then
-    /usr/share/console-setup-mini/console-setup-mini.config || exit $?
-fi
-
-## KEYBOARD_PRESENT ## Will be replaced by keyboard_present function
-
-# keyboard_present () {
-#     if there is a keyboard; then
-# 	return 0
-#     else
-# 	return 1
-#     fi
-# }
-
 CONFIGDIR=/etc/console-setup
 CONFIGFILE=/etc/default/console-setup
 
@@ -27,7 +12,7 @@ if [ "$1" = "configure" ]; then
     
     db_get console-setup/codesetcode
     codeset="$RET"
-    db_get console-setup/fontface
+    db_get console-setup/_fontface
     fontface="$RET"
     db_metaget console-setup/use_system_font description
     if [ "$fontface" = "$RET" ]; then
@@ -39,42 +24,42 @@ if [ "$1" = "configure" ]; then
 	fontsize=''
     fi
 
-    db_get console-setup/charmap
+    db_get console-setup/_charmap
     charmap="${RET:-UTF-8}"
-
-    db_get console-setup/modelcode
-    model="$RET"
-
-    db_get console-setup/layoutcode
-    layout="$RET"
-
-    db_get console-setup/variantcode
-    variant="$RET"
-
-    db_get console-setup/optionscode
-    options="$RET"
-
-    if [ "$charmap" != UTF-8 ]; then
-	acm=$CONFIGDIR/$charmap.acm.gz
-	acm_option="-charmap $charmap"
-    else
-	acm=''
-	acm_option=''
-    fi
 
     if [ ! -e $CONFIGFILE ]; then
 	cat /usr/share/doc/console-setup/examples/console-setup \
-	    /usr/share/doc/console-setup-mini/examples/console-setup \
-	    /usr/share/console-setup-mini/console-setup.proto \
-	    2>/dev/null >$CONFIGFILE || true
+	    >$CONFIGFILE || true
     fi
 
     . $CONFIGFILE || true
 
-    if type gzip 2>/dev/null >/dev/null; then
-	ckbcomp $acm_option -model "$model" \
-	    "$layout" "$variant" "$options" \
-	    | gzip -9 >$CONFIGDIR/cached.kmap.gz
+    CONSOLE_MAP=${CONSOLE_MAP:-$ACM}
+
+# If $CONFFILE is produced by an old version of console-setup or by a
+# new version of console-setup-mini
+    if \
+	grep "^ *XKBLAYOUT=" $CONFIGFILE >/dev/null || \
+	! grep "^ *CHARMAP=" $CONFIGFILE >/dev/null
+    then
+	cp -a $CONFIGFILE $CONFIGFILE.tmp
+
+	cat /usr/share/doc/console-setup/examples/console-setup \
+	    >$CONFIGFILE.tmp
+
+	cat >>$CONFIGFILE.tmp <<EOF
+
+if [ -f /etc/default/keyboard ]; then
+    . /etc/default/keyboard
+fi
+######################################################################
+# You can remove the lines that follow.  They contain the contents of
+# this file before version 1.47 of console-setup.
+######################################################################
+EOF
+	sed 's/^/# /' <$CONFIGFILE >>$CONFIGFILE.tmp
+	
+	mv -f $CONFIGFILE.tmp $CONFIGFILE
     fi
 
     # Ensure we do not mess up the config file's ownership and permissions.
@@ -83,34 +68,46 @@ if [ "$1" = "configure" ]; then
     # If the admin deleted or commented some variables but then set
     # them via debconf, (re-)add them to the conffile.
     for var in \
-	ACTIVE_CONSOLES CHARMAP CODESET FONTFACE FONTSIZE \
-	XKBMODEL XKBLAYOUT XKBVARIANT XKBOPTIONS
+	VERBOSE_OUTPUT ACTIVE_CONSOLES CHARMAP CODESET FONTFACE FONTSIZE
     do
         if ! grep "^ *${var}=" $CONFIGFILE >/dev/null; then
 	    echo "${var}=" >>$CONFIGFILE
 	fi
     done    
+
+    if [ "$FONT" ] && ! grep "^ *FONT=" $CONFIGFILE >/dev/null; then
+	echo "FONT=" >>$CONFIGFILE
+    fi
+    if [ "$FONT_MAP" ] && ! grep "^ *FONT_MAP=" $CONFIGFILE >/dev/null; then
+	echo "FONT_MAP=" >>$CONFIGFILE
+    fi
+    if \
+	[ "$CONSOLE_MAP" ] \
+	&& ! grep "^ *CONSOLE_MAP=" $CONFIGFILE >/dev/null \
+	&& ! grep "^ *ACM=" $CONFIGFILE >/dev/null
+    then
+	echo "CONSOLE_MAP=" >>$CONFIGFILE
+    fi
     
     sed \
+	-e "s|^ *VERBOSE_OUTPUT=.*|VERBOSE_OUTPUT=\"${VERBOSE_OUTPUT:-no}\"|" \
+	-e "s|^ *ACTIVE_CONSOLES=.*|ACTIVE_CONSOLES=\"${ACTIVE_CONSOLES:-/dev/tty[1-6]}\"|" \
+	-e "s|^ *FONT=.*|FONT=\"$FONT\"|" \
+	-e "s|^ *FONT_MAP=.*|FONT_MAP=\"$FONT_MAP\"|" \
+	-e "s|^ *CONSOLE_MAP=.*|CONSOLE_MAP=\"$CONSOLE_MAP\"|" \
+	-e "s|^ *ACM=.*|CONSOLE_MAP=\"$CONSOLE_MAP\"|" \
 	-e "s|^ *CHARMAP=.*|CHARMAP=\"$charmap\"|" \
 	-e "s|^ *CODESET=.*|CODESET=\"$codeset\"|" \
 	-e "s|^ *FONTFACE=.*|FONTFACE=\"$fontface\"|" \
 	-e "s|^ *FONTSIZE=.*|FONTSIZE=\"$fontsize\"|" \
-	-e "s|^ *XKBMODEL=.*|XKBMODEL=\"$model\"|" \
-	-e "s|^ *XKBLAYOUT=.*|XKBLAYOUT=\"$layout\"|" \
-	-e "s|^ *XKBVARIANT=.*|XKBVARIANT=\"$variant\"|" \
-	-e "s|^ *XKBOPTIONS=.*|XKBOPTIONS=\"$options\"|" \
 	<$CONFIGFILE >$CONFIGFILE.tmp
     
     mv -f $CONFIGFILE.tmp $CONFIGFILE
 fi
 
-# In d-i debhelper doesn't use /etc/init.d scripts
-if \
-    [ -f /usr/share/console-setup-mini/console-setup-mini.config ] \
-    && keyboard_present
-then
-    setupcon --force --save
-fi
+# This works even if we are not on the console
+setupcon --save-only
+# This does nothing if we are not on the console
+setupcon
 
 #DEBHELPER#

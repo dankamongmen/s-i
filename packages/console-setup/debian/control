@@ -8,11 +8,22 @@ Build-Depends: debhelper (>= 7), po-debconf
 Standards-Version: 3.8.3
 Vcs-Svn: svn://svn.debian.org/d-i/trunk/packages/console-setup
 
+Package: keyboard-configuration
+Section: utils
+Architecture: all
+Depends: debconf (>= 0.5) | debconf-2.0, ${misc:Depends}
+Conflicts: console-setup (<< 1.47), console-setup-mini (<< 1.47)
+Description: system-wide keyboard preferences
+ This package maintains the keyboard preferences in
+ /etc/default/keyboard.  Other packages can use the information
+ provided by this package in order to configure the keyboard on the
+ console or in X Window.
+
 Package: console-setup
 Section: utils
 Architecture: all
 Recommends: kbd (>= 0.99-12) | console-tools (>= 1:0.2.3-16)
-Depends: debconf (>= 0.5) | debconf-2.0, console-terminus (>= 4.26), xkb-data (>= 0.9), ${misc:Depends}
+Depends: debconf (>= 0.5) | debconf-2.0, console-terminus (>= 4.26), xkb-data (>= 0.9), keyboard-configuration, ${misc:Depends}
 Suggests: lsb-base (>= 3.0-6), locales
 Conflicts: lsb-core (<< 2.0-6), lsb (<< 2.0-6), lsb-base (<< 3.0-6)
 Description: console font and keymap setup program
@@ -33,7 +44,7 @@ Section: utils
 Priority: extra
 Architecture: all
 Recommends: kbd | console-tools
-Depends: debconf (>= 0.5) | debconf-2.0, ${misc:Depends}
+Depends: debconf (>= 0.5) | debconf-2.0, keyboard-configuration, ${misc:Depends}
 Suggests: lsb-base (>= 3.0-6)
 Conflicts: console-setup, console-terminus, lsb-core (<< 2.0-6), lsb (<< 2.0-6), lsb-base (<< 3.0-6)
 Description: console font and keymap setup program - reduced version

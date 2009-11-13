@@ -34,6 +34,7 @@ install: build
 #	cp Keyboard/rules $(etcdir)/console-setup/ckb/rules/console
 #	cp Keyboard/rules.xml $(etcdir)/console-setup/ckb/rules/console.xml
 	install -d $(etcdir)/default
+	install -m 644 config.kbd $(etcdir)/default/keyboard
 	install -m 644 config $(etcdir)/default/console-setup
 
 .PHONY: uninstall
