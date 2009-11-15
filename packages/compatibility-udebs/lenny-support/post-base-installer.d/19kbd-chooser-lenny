@@ -1,0 +1,14 @@
+#! /bin/sh
+
+file=/usr/lib/post-base-installer.d/20kbd-chooser
+
+[ -f $file ] || exit 0
+
+# Lenny has console-setup, not keyboard-configuration
+# and asks both the layout and variant questions
+sed -i '/^keyboard-configuration/d' $file
+sed -i '/debconf-set-selections/a\# Modified for Lenny\
+console-setup console-setup/layout select ""\
+console-setup console-setup/layout seen true\
+console-setup console-setup/variant select ""\
+console-setup console-setup/variant seen true' $file
