@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 -->
+<!-- original version: 61186 -->
 
    <sect3 arch="x86">
    <title>Den USB-Stick partitionieren</title>
@@ -13,8 +13,15 @@ die erste Partition genutzt wird statt des kompletten USB-Speichers.
 Da die meisten USB-Sticks mit einer einzelnen FAT16-Partition vorkonfiguriert
 geliefert werden, müssen Sie den Stick möglicherweise nicht neu partitionieren
 oder formatieren. Falls es trotzdem nötig ist, nutzen Sie <command>cfdisk</command>
-oder ein anderes Partitionierungswerkzeug, um eine FAT16-Partition zu erzeugen
-und erstellen dann ein Dateisystem, indem Sie Folgendes eingeben:
+oder ein anderes Partitionierungswerkzeug, um eine FAT16-Partition zu
+erzeugen<footnote>
+
+<para>
+Vergessen Sie nicht, die <quote>bootable</quote>-Markierung (Boot-Flag) zu
+setzen.
+</para>
+
+</footnote>, und erstellen dann ein Dateisystem, indem Sie Folgendes eingeben:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -65,7 +72,7 @@ auf den Stick:
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (Kernel-Binär-Datei)
+<filename>vmlinuz</filename> oder <filename>linux</filename> (Kernel-Binär-Datei)
 
 </para></listitem>
 <listitem><para>
@@ -85,7 +92,9 @@ verarbeiten kann.
 
 Als nächstes sollten Sie eine Konfigurationsdatei
 <filename>syslinux.cfg</filename> erstellen, die mindestens die folgenden
-zwei Zeilen enthält:
+zwei Zeilen enthält (verwenden Sie als Name für die Kernel-Binärdatei
+<quote><filename>linux</filename></quote>, wenn Sie ein 
+<filename>neboot</filename>-Image benutzen):
 
 <informalexample><screen>
 default vmlinuz
@@ -99,9 +108,19 @@ hinzufügen.
 </para><para>
 
 Wenn Sie ein <filename>hd-media</filename>-Image benutzt haben, sollten Sie
-jetzt ein noch ein Debian-ISO-Image auf den Stick kopieren (businesscard-,
-netinst- oder ein Komplett-CD-Image; stellen Sie sicher, dass Sie ein Image
-verwenden, dass auf den Stick passt). Danach hängen Sie die Partition aus
+jetzt ein noch ein Debian-ISO-Image <footnote>
+ 
+<para>
+Sie können dafür ein Businesscard-, Netinst- oder ein Komplett-CD-Image
+verwenden (siehe <xref linkend="official-cdrom"/>). Stellen Sie sicher, dass
+das Image Ihrer Wahl auf den Stick passt. Beachten Sie, dass das 
+<quote>netboot <filename>mini.iso</filename></quote>-Image für diesen Zweck
+nicht geeignet ist.
+</para>
+
+</footnote> auf den Stick kopieren.
+
+Danach hängen Sie die Partition aus
 dem Dateisystem wieder aus (<userinput>umount /mnt</userinput>).
 
 </para>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 60479 -->
+<!-- original version: 61188 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -960,8 +960,8 @@ Paketquellen für den Installer. Es ist nur nützlich, dies einzustellen,
 wenn aktuell Komponenten des Installers über das Netzwerk geladen
 werden; dieser Wert sollte mit dem übereinstimmen, der genutzt wurde, um
 die initrd, die Sie für Ihre Installationsmethode nutzen, zu bauen.
-Standardmäßig ist der Wert für <classname>mirror/udeb/suite</classname>
-der gleiche wie der für <classname>mirror/suite</classname>.
+Normalerweise wird der Installer automatisch den korrekten Wert verwenden
+und es sollte daher keinen Grund geben, dies manuell festzulegen.
 
 </para>
 
@@ -1029,7 +1029,8 @@ Voreinstellung nutzen.
 
 <informalexample role="example"><screen>
 # Wenn das System freien Platz auf der Platte hat, können Sie festlegen, nur
-# diesen Platz zu partitionieren.
+# diesen Platz zu partitionieren. Dies zu setzen hat nur Auswirkungen, wenn
+# partman-auto/method (siehe unten) nicht gesetzt ist.
 #d-i partman-auto/init_automatically_partition select biggest_free
 
 # Alternativ können Sie eine Festplatte angeben, die partitioniert
@@ -1225,6 +1226,11 @@ Installation des Kernels.
 </para>
 
 <informalexample role="example"><screen>
+# APT konfigurieren, dass empfohlene (recommended) Pakete nicht automatisch
+# installiert werden. Die Verwendung dieser Option kann zu einem unvollständigen
+# System führen und sollte nur von sehr erfahrenen Anwendern genutzt werden.
+#d-i base-installer/install-recommends boolean false
+
 # Wählen Sie den initramfs-Generator, der genutzt werden soll, um die initrd
 # für 2.6-Kernels zu erzeugen.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
@@ -1430,9 +1436,6 @@ verwenden können.
 # Wenn Pakete, die mittels pkgsel/include (entgegen Ihrer Abhängigkeiten)
 # installiert werden, weitere Pakete lediglich vorschlagen (Recommends),
 # werden diese standardmäßig nicht installiert.
-# Entfernen Sie bei der nächsten Zeile das Rautezeichen, um solche
-# vorgeschlagenen Pakete ebenfalls zu installieren.
-#d-i pkgsel/include/install-recommends boolean true
 # Ob Pakete aktualisiert werden sollen, nachdem debootstrap beendet ist:
 # Gültige Werte: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
