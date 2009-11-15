@@ -1,4 +1,4 @@
-#!/bin/sh 
+#!/bin/sh
 
 . /usr/share/debconf/confmodule
 
@@ -7,6 +7,14 @@ db_get debian-installer/serial-console
 if [ "$RET" != false ]; then
 	exit 0
 fi
+
+# Avoid display of keyboard-configuration dialog (pulled in by
+# console-setup); just setting the seen flag fails, so first
+# set an empty value to create the question
+LANG=C chroot /target debconf-set-selections <<EOF
+keyboard-configuration keyboard-configuration/variant select ""
+keyboard-configuration keyboard-configuration/variant seen true
+EOF
 
 apt-install console-setup || true
 exit 0 # console-setup will handle the rest of it
