@@ -71,18 +71,8 @@ if [ -e /var/lib/install-cd.id ]; then
 fi
 
 
-installing_etch() {
-	local RET
-	if ! db_get mirror/codename || [ -z "$RET" ]; then
-		db_get cdrom/codename
-	fi
-	[ "$RET" = etch ] || return 1
-}
-
-# upgrade_types are incompatible with Etch and upgrade option is in
-# general untested for Etch installs, therefore skip
 db_get pkgsel/upgrade
-if [ "$RET" = none ] || installing_etch; then
+if [ "$RET" = none ]; then
 	tasksel_start=50
 else
 	upgrade_type="$RET"
