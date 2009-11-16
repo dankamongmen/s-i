@@ -453,6 +453,8 @@ while :; do
 
 		install_lang_specific
 
+		# Display language selection on backup or rerun
+		db_fset $tpl_di_language seen false || true
 		STATE=19
 		continue
 		;;
@@ -608,6 +610,8 @@ while :; do
 		db_set "$tpl_di_country"  "$COUNTRYCODE"
 		log "Set $tpl_di_country = '$COUNTRYCODE'"
 
+		# Display country selection on backup or rerun
+		db_fset $tpl_di_country seen false || true
 		STATE=29
 		continue
 		;;
@@ -664,6 +668,9 @@ while :; do
 		;;
 
 	   31)	# Select system locale
+		# Display additional locale selection on backup or rerun
+		db_fset $tpl_supportedlocales seen false || true
+
 		# Display only if additional locales were selected
 		db_get $tpl_supportedlocales
 		if [ "$RET" ]; then
@@ -674,7 +681,10 @@ while :; do
 		fi
 		;;
 
-	   32)
+	   32) # We have a locale
+		# Display system locale selection on backup or rerun
+		db_fset $tpl_di_locale seen false || true
+
 		db_get $tpl_di_locale
 		log "System locale ($tpl_di_locale) = '$RET'"
 		;;
