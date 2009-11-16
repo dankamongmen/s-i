@@ -8,11 +8,20 @@ if [ "$RET" != false ]; then
 	exit 0
 fi
 
+# Get values console-setup needs from D-I 
+db_get debian-installer/locale
+LOCALE=$RET
+db_get debian-installer/keymap
+KEYMAP=$RET
+
 # Avoid display of keyboard-configuration dialog (pulled in by
-# console-setup); just setting the seen flag fails, so first
-# set an empty value to create the question
+# console-setup); just setting the seen flag fails, so first set
+# an empty value to create the question. And set the D-I values
+# in the target environment.
 LANG=C chroot /target debconf-set-selections <<EOF
 keyboard-configuration keyboard-configuration/variant select
+d-i debian-installer/locale string $LOCALE
+d-i debian-installer/keymap string $KEYMAP
 EOF
 
 apt-install console-setup || true
