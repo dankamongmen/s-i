@@ -589,13 +589,14 @@ while :; do
 		log "Set $tpl_di_locale = '$LOCALE'"
 
 		# The code below adds lang_COUNTRY at the beginning of the
-		# language list we got from languagechooser.
-		# We shouldn't just add this before the former list in case
-		# the country is changed several times.
+		# language list we got from language selection, unless it's
+		# already included.
 		if [ "$LOCALE" != C ] && \
 		   [ "$LANGUAGE" ] && [ "$COUNTRYCODE" ] && \
 		   [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
-		   [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
+		   [ "$LANGUAGELIST" != "$LANGUAGE" ] && \
+		   ! echo ":$LANGUAGELIST:" | \
+		     grep -q ":${LANGUAGE%%_*}_$COUNTRYCODE:"; then
 			LANGUAGELIST=${LANGUAGE%%_*}_$COUNTRYCODE:$LANGUAGELIST
 			db_set "$tpl_di_language" "$LANGUAGELIST"
 			log "Set $tpl_di_language = '$LANGUAGELIST'"
