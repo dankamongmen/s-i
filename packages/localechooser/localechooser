@@ -108,14 +108,42 @@ build_language_template() {
 	echo $level >/var/lib/localechooser/langlevel
 }
 
+get_preseed() {
+	local template="$1"
+	local RET value
+
+	if db_get "$template" && [ "$RET" ]; then
+		value="$RET"
+		db_fget "$template" seen
+		log "$template preseeded to '$value' (seen: $RET)"
+
+		echo "$value"
+	fi
+}
 
 do_preseed() {
 	local RET ps_language ps_country ps_locale seenflag
 
-	ps_locale=$1
-	log "Locale has been preseeded to $ps_locale"
+	ps_language=$(get_preseed $tpl_di_language)
+	ps_country=$(get_preseed $tpl_di_country)
+	ps_locale=$(get_preseed $tpl_di_locale)
 
-	# Only mark variables seen if this one was preseeded seen.
+	# If language or country are preseeded the regular code will handle it,
+	# otherwise set default language and/or country based on locale
+	if [ "$ps_language" ] || [ "$ps_country" ]; then
+		if [ "$ps_language" ] &&
+		   ! has_choice $tpl_languagelist $lang; then
+			log "Preseeded language ignored: unknown language code"
+		fi
+		if [ "$ps_country" ]; then
+			country_preseeded=1
+		fi
+		return
+	elif [ -z "$ps_locale" ]; then
+		return # no preseeding
+	fi
+
+	# Only mark variables seen if locale was preseeded seen.
 	db_fget $tpl_di_locale seen
 	seenflag=$RET
 	db_fset $tpl_di_locale seen false || true
@@ -139,7 +167,6 @@ do_preseed() {
 		db_set $tpl_di_country "$ps_country"
 		log "Set $tpl_di_country = '$ps_country'"
 		db_fset $tpl_di_country seen $seenflag || true
-		db_fset $tpl_continentlist seen $seenflag || true
 		country_preseeded=1
 
 		if grep -q "^$ps_locale$" $SUPPORTEDLOCALES; then
@@ -211,6 +238,23 @@ warning_template() {
 	echo $template
 }
 
+# Return the first language in the list that's listed in the
+# language selection dialog
+get_current_language() {
+	local OLDIFS="$IFS"
+	local IFS lang
+
+	db_get $tpl_di_language
+	IFS=:
+	for lang in $RET; do
+		IFS="$OLDIFS"
+		if has_choice $tpl_languagelist $lang; then
+			echo $lang
+			break
+		fi
+	done
+}
+
 # Test if a template has the requested value among its choices
 has_choice() {
 	local RET template value
@@ -243,9 +287,10 @@ set_default_continent() {
 		c=$(echo "$continent" | sed "s/ /_/g")
 		if has_choice $tpl_countrylist/$c "$country"; then
 			db_set $tpl_continentlist "$continent"
-			break
+			return 0
 		fi
 	done
+	return 1
 }
 
 # Test if a locale includes a country part
@@ -311,14 +356,10 @@ fi
 # correct template.
 build_language_template $(language_display_level)
 
-# Support preseeding of the locale all in one variable for convenience.
 # Only check for preseeding the first time localechooser is run.
 country_preseeded=""
 if [ ! -f /var/lib/localechooser/preseeded ]; then
-	if db_get $tpl_di_locale && [ "$RET" ]; then
-		do_preseed $RET
-	fi
-
+	do_preseed
 	>/var/lib/localechooser/preseeded
 fi
 
@@ -335,7 +376,7 @@ while :; do
 		# Disabled because of #470258: template is set to true too early
 		if false && \
 		   db_get debconf/translations-dropped && [ "$RET" = true ]; then
-			db_fget $tpl_languagelist seen
+			db_fget $tpl_di_language seen
 			if [ "$RET" != true ]; then
 				sel_language=""
 				db_input high localechooser/translation/no-select || true
@@ -343,6 +384,13 @@ while :; do
 		else
 			# Set initial language for correct display of list
 			set_debconf_language $INITIAL_LANGUAGE
+
+			current_language=$(get_current_language)
+			if [ "$current_language" ]; then
+				db_set $tpl_languagelist $current_language
+				db_fget $tpl_di_language seen
+				db_fset $tpl_languagelist seen $RET || true
+			fi
 
 			db_capb backup align
 			db_input critical $tpl_languagelist || [ $? -eq 30 ]
@@ -507,9 +555,17 @@ while :; do
 		# Set default value
 		if [ $LASTSTATE -ne 22 ]; then
 			if [ "$current_country" ]; then
-				set_default_continent "$current_country"
+				tcountry="$current_country"
 			else
-				set_default_continent "$DEFAULT_COUNTRY"
+				tcountry="$DEFAULT_COUNTRY"
+			fi
+			if set_default_continent "$tcountry"; then
+				db_fget $tpl_di_country seen
+				db_fset $tpl_continentlist seen $RET || true
+			else
+				# Incorrect preseeding, show dialogs
+				log "Preseeded country ignored: unknown country code"
+				db_fset $tpl_di_country seen false || true
 			fi
 		else
 			# Backed up; reset continent template if no country
@@ -518,6 +574,7 @@ while :; do
 				db_reset $country_template
 			fi
 		fi
+
 		db_input $allprio $tpl_continentlist || [ $? -eq 30 ]
 		;;
 
