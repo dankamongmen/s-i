@@ -5,11 +5,13 @@ file=/usr/lib/post-base-installer.d/20kbd-chooser
 
 [ -f $file ] || exit 0
 
-# Lenny has console-setup, not keyboard-configuration
-# and asks both the layout and variant questions
+# For Lenny we also need to set charmap
+sed -i '/Get values console-setup needs/a\CHARMAP="$(LC_ALL=$LOCALE chroot /target locale charmap)"'$file
+
+# Lenny has console-setup, not keyboard-configuration and asks both
+# the layout and variant questions. Also set charmap.
 sed -i '/^keyboard-configuration/d' $file
 sed -i '/debconf-set-selections/a\# Modified for Lenny\
-console-setup console-setup/layout select ""\
-console-setup console-setup/layout seen true\
-console-setup console-setup/variant select ""\
-console-setup console-setup/variant seen true' $file
+console-setup console-setup/layoutcode string\
+console-setup console-setup/variantcode string\
+d-i debian-installer/charmap string $CHARMAP' $file
