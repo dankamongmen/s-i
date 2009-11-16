@@ -6,7 +6,6 @@ set -e
 db_capb backup
 
 tpl_di_locale="debian-installer/locale"
-tpl_di_fallbacklocale="debian-installer/fallbacklocale"
 tpl_di_language="debian-installer/language"
 tpl_di_country="debian-installer/country"
 tpl_di_consoledisplay="debian-installer/consoledisplay"
@@ -161,7 +160,7 @@ do_preseed() {
 # Those we install here are those required immediately
 # Otherwise we will install them in finish-install
 install_lang_specific() {
-	if [ "$LOCALE" != C ]; then
+	if [ "$DEFAULT_LOCALE" != C ]; then
 		case "$LANGUAGE" in
 		    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh*)
 			# We need a complete font for later steps
@@ -271,7 +270,7 @@ get_default_locale() {
 	# Used for Norwegian Bokmal transition in order to keep no_NO as
 	# locale. May be used in the future for other special cases, so
 	# we'd better keep this.
-	fallback=$(echo "$FALLBACKLOCALE" | sed -e 's/[.@].*$//')
+	fallback=$(echo "$DEFAULT_LOCALE" | sed -e 's/[.@].*$//')
 	if [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
 	   [ "${lang}_$COUNTRYCODE" != "$fallback" ] && \
 	   is_complete_locale "$fallback"; then
@@ -283,7 +282,7 @@ get_default_locale() {
 	fi
 
 	# Check if a valid locale exists for the selected language + country
-	for entry in ${lang}_$COUNTRYCODE$EXTRA_LANGUAGECHOOSER \
+	for entry in ${lang}_$COUNTRYCODE$DEFAULT_LOCALE_POSTFIX \
 	             ${lang}_$COUNTRYCODE; do
 		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
 			echo "$entry"
@@ -363,13 +362,12 @@ while :; do
 		. languagemap
 		db_set "$tpl_di_language" "$LANGUAGELIST"
 		log "Set $tpl_di_language = '$LANGUAGELIST'"
-		db_set "$tpl_di_locale"   "$LOCALE"
-		log "Set $tpl_di_locale = '$LOCALE'"
-		db_set "$tpl_di_fallbacklocale"   "$FALLBACKLOCALE"
-		log "Set $tpl_di_fallbacklocale = '$FALLBACKLOCALE'"
 
 		if [ -n "$DEFAULT_COUNTRY" ]; then
 			log "Default country = '$DEFAULT_COUNTRY'"
+		fi
+		if [ -n "$DEFAULT_LOCALE" ]; then
+			log "Default locale = '$DEFAULT_LOCALE'"
 		fi
 
 		db_set "$tpl_di_consoledisplay"  "$CONSOLE"
@@ -417,18 +415,13 @@ while :; do
 		;;
 
 	   19)	# Prepare for country selection
-		# Keep track of values we have after language selection step
-		LOCALE_LANGUAGECHOOSER=$LOCALE
-		# If present, keep track of charset or modifier we got previously
-		EXTRA_LANGUAGECHOOSER=`echo $FALLBACKLOCALE | sed -e 's/^[^.@]*//'`
-
 		FIRST_LANG="${LANGUAGELIST%%:*}"
 
 		# We use /etc/shortlists to check if we should present a shortlist
 		# As we may unregister the question for shortlists, the value for the
 		# shortlist template is also saved with the language specific question
 		use_lang=""
-		if [ "$LOCALE" != C ]; then
+		if [ "$DEFAULT_LOCALE" != C ]; then
 			if grep -q "^$FIRST_LANG" $SHORTLISTS; then
 				use_lang=$FIRST_LANG
 			elif grep -q "^$LANGUAGE" $SHORTLISTS; then
@@ -436,7 +429,6 @@ while :; do
 			fi
 		fi
 
-		# At this point we should have either xx, or xx_YY in LOCALE
 		allprio=critical
 		shortprio=critical
 		;;
@@ -491,7 +483,7 @@ while :; do
 			# Otherwise the default country should be good, so
 			# ask only at medium priority unless the current
 			# country is different from the default.
-			if is_complete_locale $FALLBACKLOCALE && \
+			if is_complete_locale $DEFAULT_LOCALE && \
 			   ([ -z "$current_country" ] || \
 			    [ "$current_country" = "$DEFAULT_COUNTRY" ]); then
 				allprio=medium
@@ -569,16 +561,21 @@ while :; do
 		;;
 
 	   29)	# Prepare for locale selection; determine default locale
+		# If present, keep track of charset or modifier we got previously
+		DEFAULT_LOCALE_POSTFIX=$(echo $DEFAULT_LOCALE | sed -e 's/^[^.@]*//')
+
 		# Should perhaps not be done if locale is preseeded?
-		if [ "$LOCALE" != C ]; then
+		if [ "$DEFAULT_LOCALE" = C ]; then
+			LOCALE=$DEFAULT_LOCALE
+		else
 			LOCALE="$(get_default_locale)"
 
 			# Fall back to a supported locale
 			if [ -z "$LOCALE" ]; then
-				if grep -q "^$FALLBACKLOCALE$" $SUPPORTEDLOCALES; then
-					LOCALE="$FALLBACKLOCALE"
+				if grep -q "^$DEFAULT_LOCALE$" $SUPPORTEDLOCALES; then
+					LOCALE="$DEFAULT_LOCALE"
 				else
-					LOCALE=$(echo $FALLBACKLOCALE | sed -e 's/[.@].*$//')
+					LOCALE=$(echo $DEFAULT_LOCALE | sed -e 's/[.@].*$//')
 				fi
 				log "Falling back to locale '$LOCALE'"
 			fi

@@ -19,8 +19,7 @@ line=$(grep "^$LANGUAGE;" $languages || true)
 log "line=$line"
 
 DEFAULT_COUNTRY=""
-FALLBACKLOCALE=""
-LOCALE=""
+DEFAULT_LOCALE=""
 LANGUAGELIST=""
 CONSOLE=""
 
@@ -30,8 +29,8 @@ if [ "$line" ] ; then
 	set $line
 	IFS="$OLD_IFS"
 
-	if [ "$3" ]; then DEFAULT_COUNTRY="$3" ; fi
-	if [ "$4" ]; then FALLBACKLOCALE="$4" ; LOCALE="$4" ; fi
+	if [ "$3" ]; then DEFAULT_COUNTRY="$3"; fi
+	if [ "$4" ]; then DEFAULT_LOCALE="$4"; fi
 	if [ "$5" ]; then LANGUAGELIST="$5"; fi
 	if [ "$6" ]; then CONSOLE="$6"; fi
 
@@ -42,6 +41,6 @@ else
 	log "error: Unable to locate info for language '$LANGUAGE'"
 	LANGUAGE=C
 	DEFAULT_COUNTRY=US
-	LOCALE=C
+	DEFAULT_LOCALE=C
 	LANGUAGELIST=en
 fi
