@@ -110,10 +110,10 @@ build_language_template() {
 
 
 do_preseed() {
-	local RET seenflag
+	local RET ps_language ps_country ps_locale seenflag
 
-	LOCALE="$1"
-	log "Locale has been preseeded to $LOCALE"
+	ps_locale=$1
+	log "Locale has been preseeded to $ps_locale"
 
 	# Only mark variables seen if this one was preseeded seen.
 	db_fget $tpl_di_locale seen
@@ -122,36 +122,31 @@ do_preseed() {
 
 	# Only populate debconf if this is a supported locale
 	# and if the language is supported in D-I
-	LANGUAGE=${LOCALE%%.*}
-	if ! has_choice $tpl_languagelist "$LANGUAGE"; then
-		LANGUAGE=${LANGUAGE%%_*}
-		if ! has_choice $tpl_languagelist "$LANGUAGE"; then
-			LOCALE=""
-			LANGUAGE=""
+	ps_language=${ps_locale%%.*}
+	if ! has_choice $tpl_languagelist "$ps_language"; then
+		ps_language=${ps_language%%_*}
+		if ! has_choice $tpl_languagelist "$ps_language"; then
 			log "Preseeded locale ignored: unsupported language"
 			return
 		fi
 	fi
 
-	db_set $tpl_languagelist $LANGUAGE
-	log "Set $tpl_languagelist = '$LANGUAGE'"
+	db_set $tpl_languagelist $ps_language
+	log "Set $tpl_languagelist = '$ps_language'"
 	db_fset $tpl_languagelist seen $seenflag || true
-	COUNTRY=$(locale2countrycode "$LOCALE")
-	if [ -n "$COUNTRY" ]; then
-		db_set $tpl_di_country "$COUNTRY"
-		log "Set $tpl_di_country = '$COUNTRY'"
+	ps_country=$(locale2countrycode "$ps_locale")
+	if [ -n "$ps_country" ]; then
+		db_set $tpl_di_country "$ps_country"
+		log "Set $tpl_di_country = '$ps_country'"
 		db_fset $tpl_di_country seen $seenflag || true
 		db_fset $tpl_continentlist seen $seenflag || true
 		country_preseeded=1
 
-		if grep -q "^$LOCALE$" $SUPPORTEDLOCALES; then
-			db_set $tpl_di_locale $LOCALE
+		if grep -q "^$ps_locale$" $SUPPORTEDLOCALES; then
+			db_set $tpl_di_locale $ps_locale
 			db_fset $tpl_di_locale seen $seenflag || true
 			db_fset $tpl_supportedlocales seen $seenflag || true
-			log "Set $tpl_di_locale = '$LOCALE'"
-		else
-			# The locale was invalid, empty it
-			LOCALE=""
+			log "Set $tpl_di_locale = '$ps_locale'"
 		fi
 	fi
 }
