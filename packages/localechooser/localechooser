@@ -178,11 +178,14 @@ do_preseed() {
 		db_fset $tpl_di_country seen $seenflag || true
 		country_preseeded=1
 
-		if grep -q "^$ps_locale$" $SUPPORTEDLOCALES; then
+		# Avoid (accidental) preseeding of legacy locales
+		if [ "$ps_locale" != "${ps_language}_$ps_country" ] && \
+		   grep -q "^$ps_locale$" $SUPPORTEDLOCALES; then
 			db_set $tpl_di_locale $ps_locale
 			db_fset $tpl_di_locale seen $seenflag || true
 			db_fset $tpl_supportedlocales seen $seenflag || true
 			log "Set $tpl_di_locale = '$ps_locale'"
+			locale_preseeded=1
 		fi
 	fi
 }
