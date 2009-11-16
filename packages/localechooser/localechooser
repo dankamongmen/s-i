@@ -68,7 +68,7 @@ language_display_level() {
 		fi
 		# ASCII only if we are on serial console, dumb or cons25 terminal
 		# Both variables should already be set at init time
-		if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ] || [ "$TERM" = "cons25" ] ; then
+		if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ] || [ "$TERM" = "cons25" ]; then
 			level=0
 		fi
 		;;
@@ -111,7 +111,7 @@ build_language_template() {
 
 
 do_preseed() {
-	local RET
+	local RET seenflag
 
 	LOCALE="$1"
 	log "Locale has been preseeded to $LOCALE"
@@ -145,7 +145,7 @@ do_preseed() {
 		db_fset $tpl_continentlist seen $seenflag || true
 		country_preseeded=1
 
-		if grep -q "^$LOCALE$" $SUPPORTEDLOCALES ; then
+		if grep -q "^$LOCALE$" $SUPPORTEDLOCALES; then
 			db_set $tpl_di_locale $LOCALE
 			db_fset $tpl_di_locale seen $seenflag || true
 			db_fset $tpl_supportedlocales seen $seenflag || true
@@ -161,7 +161,7 @@ do_preseed() {
 # Those we install here are those required immediately
 # Otherwise we will install them in finish-install
 install_lang_specific() {
-	if [ "$LOCALE" != "C" ]; then
+	if [ "$LOCALE" != C ]; then
 		case "$LANGUAGE" in
 		    ar|el|fa|he|ja|ko|ku|tr|vi|wo|zh*)
 			# We need a complete font for later steps
@@ -273,7 +273,7 @@ get_default_locale() {
 	# we'd better keep this.
 	fallback=$(echo "$FALLBACKLOCALE" | sed -e 's/[.@].*$//')
 	if [ "$COUNTRYCODE" = "$DEFAULT_COUNTRY" ] && \
-	   [ "${lang}_${COUNTRYCODE}" != "$fallback" ] && \
+	   [ "${lang}_$COUNTRYCODE" != "$fallback" ] && \
 	   is_complete_locale "$fallback"; then
 		# Explanation: we fall back to the locale inherited from the
 		# language step if the country selection did NOT result in
@@ -283,8 +283,8 @@ get_default_locale() {
 	fi
 
 	# Check if a valid locale exists for the selected language + country
-	for entry in ${lang}_${COUNTRYCODE}${EXTRA_LANGUAGECHOOSER} \
-	             ${lang}_${COUNTRYCODE}; do
+	for entry in ${lang}_$COUNTRYCODE$EXTRA_LANGUAGECHOOSER \
+	             ${lang}_$COUNTRYCODE; do
 		if grep -q "^$entry$" $SUPPORTEDLOCALES; then
 			echo "$entry"
 			break
@@ -299,11 +299,6 @@ lsb_extract () {
 		sed 's/^[^=]*=//; s/^"//; s/"$//' || true
 }
 
-
-# Reset all variables
-LANGUAGE=""
-COUNTRY=""
-LOCALE=""
 
 # debconf/language is an alias for debian-installer/language
 db_register "$tpl_di_language" "debconf/language"
@@ -433,7 +428,7 @@ while :; do
 		# As we may unregister the question for shortlists, the value for the
 		# shortlist template is also saved with the language specific question
 		use_lang=""
-		if [ "$LOCALE" != "C" ]; then
+		if [ "$LOCALE" != C ]; then
 			if grep -q "^$FIRST_LANG" $SHORTLISTS; then
 				use_lang=$FIRST_LANG
 			elif grep -q "^$LANGUAGE" $SHORTLISTS; then
@@ -458,6 +453,7 @@ while :; do
 			shortlist_template="$tpl_shortlist/$use_lang"
 			db_unregister $tpl_shortlist || true
 			db_register $shortlist_template $tpl_shortlist
+
 			db_fget $tpl_di_country seen
 			db_fset $tpl_shortlist seen $RET || true
 			db_subst $tpl_shortlist TXT1 "$txt_country1"
@@ -480,10 +476,10 @@ while :; do
 				db_set $tpl_shortlist "$current_short"
 			fi
 
-			# If the current (preseeded) value is not in the
-			# shortlist, ask for continent/country instead
-			if [ -z "$country_preseeded" ] || \
-			   [ "$current_short" != other ]; then
+			# If a preseeded value is not in the shortlist, skip
+			# to continent/country dialogs
+			if ! ([ "$country_preseeded" ] && \
+			      [ "$current_short" = other ]); then
 				db_input $shortprio $tpl_shortlist || [ $? -eq 30 ]
 				askedshort=1
 			fi
@@ -574,7 +570,7 @@ while :; do
 
 	   29)	# Prepare for locale selection; determine default locale
 		# Should perhaps not be done if locale is preseeded?
-		if [ "$LOCALE" != "C" ]; then
+		if [ "$LOCALE" != C ]; then
 			LOCALE="$(get_default_locale)"
 
 			# Fall back to a supported locale
@@ -596,10 +592,11 @@ while :; do
 		# language list we got from languagechooser.
 		# We shouldn't just add this before the former list in case
 		# the country is changed several times.
-		if [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
-		   [ "$COUNTRYCODE" ] && [ "$LANGUAGE" ] && \
-		   [ "$LOCALE" != "C" ] && [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
-			LANGUAGELIST=${LANGUAGE%%_*}_${COUNTRYCODE}:$LANGUAGELIST
+		if [ "$LOCALE" != C ] && \
+		   [ "$LANGUAGE" ] && [ "$COUNTRYCODE" ] && \
+		   [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
+		   [ "$LANGUAGELIST" != "$LANGUAGE" ]; then
+			LANGUAGELIST=${LANGUAGE%%_*}_$COUNTRYCODE:$LANGUAGELIST
 			db_set "$tpl_di_language" "$LANGUAGELIST"
 			log "Set $tpl_di_language = '$LANGUAGELIST'"
 		fi
