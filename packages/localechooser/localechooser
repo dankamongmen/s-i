@@ -340,6 +340,21 @@ get_default_locale() {
 	done
 }
 
+# Also allows to preseed with only comma as separator
+validate_supportedlocales() {
+	local choices="$1"
+	local locale current new
+
+	db_get $tpl_supportedlocales
+	current="$(echo "$RET" | sed 's/, */ /g')"
+	for locale in $current; do
+		if echo ", $choices, " | grep -q ", $locale, "; then
+			new="${new:+$new, }$locale"
+		fi
+	done
+	db_set $tpl_supportedlocales "$new"
+}
+
 # Extract a value from /etc/lsb-release
 lsb_extract () {
 	[ -f /etc/lsb-release ] || return 0
@@ -678,6 +693,10 @@ while :; do
 		for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES | grep -v "^$LOCALE$"); do
 			CHOICES="${CHOICES:+$CHOICES, }$i"
 		done
+
+		# Validate current (preseeded) values
+		validate_supportedlocales "$CHOICES"
+
 		db_subst $tpl_supportedlocales LOCALE "$LOCALE"
 		db_subst $tpl_supportedlocales LOCALELIST "$CHOICES"
 		db_input medium $tpl_supportedlocales || [ $? -eq 30 ]
