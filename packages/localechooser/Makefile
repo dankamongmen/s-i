@@ -1,4 +1,4 @@
-all: debian/languagelist.data debian/SUPPORTED-short debian/short-tmp/shortlists debian/templates check-scripts check-data check-utf8
+all: check-scripts debian/languagelist.data debian/SUPPORTED-short debian/short-tmp/shortlists debian/templates check-data check-utf8
 
 LIST     = languagelist
 
@@ -27,8 +27,10 @@ debian/short-tmp/shortlists: debian/iso_3166.tab debian/iso-codes
 	./mkshort
 
 check-scripts:
+	@set -e ; \
 	if [ -x /bin/ash ] ; then SH=ash ; else SH=dash; fi ; \
 	for s in finish-install.d/05localechooser debian/postinst languagemap localechooser ; do \
+		echo "Checking syntax of $$s" ; \
 		$$SH -n $$s ; \
 	done
 
