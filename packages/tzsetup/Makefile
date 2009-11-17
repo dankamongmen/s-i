@@ -10,4 +10,4 @@ debian/common.templates: gen-templates debian/common.templates.in /usr/share/zon
 	./gen-templates < debian/common.templates.in > debian/common.templates
 
 clean:
-	rm -f debian/tzmap debian/iso_3166.tab debian/common.templates
+	rm -f debian/tzmap debian/iso_3166.tab
