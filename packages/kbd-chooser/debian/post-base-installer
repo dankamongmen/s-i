@@ -25,27 +25,5 @@ d-i debian-installer/keymap string $KEYMAP
 EOF
 
 apt-install console-setup || true
-exit 0 # console-setup will handle the rest of it
-
-db_get debian-installer/keymap
-KEYMAP=$RET
-# Silently exit if no keymap is set
-if [ -z "$KEYMAP" ]; then
-	exit 0
-fi
-
-# Install non-Unicode variants of Turkish keymaps
-if [ "$KEYMAP" = "trqu" ]; then
-	KEYMAP="trq"
-	db_set debian-installer/keymap $KEYMAP
-fi
-if [ "$KEYMAP" = "trfu" ]; then
-	KEYMAP="trf"
-	db_set debian-installer/keymap $KEYMAP
-fi
-
-[ -n "$kbd_mode_temp" ] && kbd-mode --$kbd_mode_temp
-chroot /target install-keymap $KEYMAP
-[ -n "$kbd_mode_temp" ] && kbd-mode --unicode
 
 exit 0
