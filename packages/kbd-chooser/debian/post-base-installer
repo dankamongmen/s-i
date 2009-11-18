@@ -9,8 +9,6 @@ if [ "$RET" != false ]; then
 fi
 
 # Get values console-setup needs from D-I 
-db_get debian-installer/locale
-LOCALE=$RET
 db_get debian-installer/keymap
 KEYMAP=$RET
 
@@ -20,7 +18,6 @@ KEYMAP=$RET
 # in the target environment.
 LANG=C chroot /target debconf-set-selections <<EOF
 keyboard-configuration keyboard-configuration/variant select
-d-i debian-installer/locale string $LOCALE
 d-i debian-installer/keymap string $KEYMAP
 EOF
 
