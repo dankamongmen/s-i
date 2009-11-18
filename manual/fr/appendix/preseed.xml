@@ -1,4 +1,4 @@
-<!-- original version: 61188 -->
+<!-- original version: 61314 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -502,11 +502,14 @@ Vous devez toujours leur donner des valeurs, comme par exemple,
 
 <!-- Setting column width does not seem to work; use non-breaking spaces
      to separate columns a bit -->
+
 <informaltable frame="none">
 <tgroup cols="2"><tbody>
 <row><entry>auto</entry><entry>auto-install/enable</entry></row>
 <row><entry>classes</entry><entry>auto-install/classes</entry></row>
 <row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>language</entry><entry>debian-installer/language</entry></row>
+<row><entry>country</entry><entry>debian-installer/country</entry></row>
 <row><entry>locale</entry><entry>debian-installer/locale</entry></row>
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
@@ -688,10 +691,32 @@ est acceptée. Si la combinaison ne forme pas une locale valable, l'installateur
 choisira automatiquement une locale correspondant à la langue sélectionnée.
 Pour indiquer une locale sous forme de paramètre d'amorçage, écrivez&nbsp;:
 <userinput>locale=<replaceable>fr_FR</replaceable></userinput>.
+</para>
+<para>
+Cette méthode, très simple à utiliser, ne permet pas de préconfigurer
+toutes les combinaisons possibles de pays de langue et de locale
+<footnote>
+<para>
+Si la valeur de <literal>locale</literal> est préconfigurée avec
+<userinput>en_NL</userinput>, la locale du système installé sera 
+par défaut <literal>en_US.UTF-8</literal>. Si la locale voulue est
+<literal>en_GB.UTF-8</literal>, il faudra préconfigurer les valeurs
+individuellement.
+</para>
+</footnote>.
+Ces valeurs peuvent être préconfigurées individuellement. La langue et
+le pays peuvent être spécifiés en tant que paramètres d'amorçage.
 
 <informalexample role="example"><screen>
-# Pour indiquer à la fois la langue et le pays :
-d-i debian-installer/locale string fr_FR
+# Préconfigurer la locale seule définit la langue, le pays et la locale.
+d-i debian-installer/locale string en_US
+
+# Les valeurs peuvent être préconfigurées individuellement.
+#d-i debian-installer/language string en
+#d-i debian-installer/country string NL
+#d-i debian-installer/locale string en_GB.UTF-8
+# On peut aussi demander la création d'autres locales.
+#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8
 </screen></informalexample>
 
 </para><para>
