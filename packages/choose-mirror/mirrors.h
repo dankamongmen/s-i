@@ -1,5 +1,5 @@
 /*
- * Data structure for representing http mirror information.
+ * Data structure for representing http and ftp mirror information.
  * Contains essentially the same information as Mirrors.masterlist,
  * but only as much information as is necessary.
  */
