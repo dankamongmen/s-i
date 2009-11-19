@@ -377,6 +377,7 @@ show_separate_window(struct frontend *obj, struct question *q, int is_help)
     // buttons
     int extra = 3;
     int format_note = 0;
+    int t_voffset = 0;
     char *full_description;
     int ret;
 #ifdef HAVE_LIBTEXTWRAP
@@ -395,7 +396,8 @@ show_separate_window(struct frontend *obj, struct question *q, int is_help)
     if (strcmp(q->template->type, "note") == 0 || strcmp(q->template->type, "error") == 0)
     {
         format_note = 1;
-        extra++;
+        t_voffset = 1;
+        extra += 2;
         full_description = strdup(ext_descr);
     }
     else
@@ -439,8 +441,8 @@ show_separate_window(struct frontend *obj, struct question *q, int is_help)
     cdebconf_newt_create_window(win_width, win_height, obj->title, q->priority);
     form = cdebconf_newt_create_form(NULL);
     if (format_note)
-        newtFormAddComponent(form, newtLabel((win_width - strwidth(descr))/2, 0, descr));
-    textbox = newtTextbox(TEXT_PADDING, 1, t_width, t_height, flags);
+        newtFormAddComponent(form, newtLabel((win_width - strwidth(descr))/2, 1, descr));
+    textbox = newtTextbox(TEXT_PADDING, 1 + t_voffset, t_width, t_height, flags);
     assert(textbox);
     newtTextboxSetText(textbox, full_description);
     free(full_description);
