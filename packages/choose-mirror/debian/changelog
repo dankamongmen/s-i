@@ -8,8 +8,24 @@ choose-mirror (2.30) UNRELEASED; urgency=low
     Version field.
   * Drop backwards compatibility support for preseeding of "manual" mirror
     selection.
+  * Improve validation of suites available on selected mirror and suite
+    selection. Changes include:
+    - all suites available on a mirror get validated; if an inconsistency is
+      found in any suite (between directory/symlink names and Suite/Codename
+      fields in the Release file), the mirror will be rejected as invalid;
+    - if a release can be accessed using codename as well as suite, the
+      selection dialog will display both;
+    - proper support for oldstable; will only be listed in selection dialog if
+      it's the requested release (as installer default or through preseeding);
+    - improved support for mirror that only have codename directories, such as
+      archive.debian.org;
+    - support for mirrors that don't have codename directories (but use suite
+      names as directories);
+    - various code cleanups.
+    Many thanks to Jérémy Bobbio for reviewing the changes.
+    Closes: #405169, #418382. And solves #518319 for future releases.
 
- -- Colin Watson <cjwatson@debian.org>  Thu, 13 Aug 2009 14:38:02 +0100
+ -- Frans Pop <fjp@debian.org>  Thu, 19 Nov 2009 22:41:01 +0100
 
 choose-mirror (2.29) unstable; urgency=low
 
