@@ -223,12 +223,39 @@ int find_suite (void) {
 }
 
 static int base_on_cd = 0;
+
 static int check_base_on_cd(void) {
 	FILE *fp;
 	if ((fp = fopen("/cdrom/.disk/base_installable", "r"))) {
 		base_on_cd = 1;
 		fclose(fp);
 	}
+	return 0;
+}
+
+static int choose_protocol(void) {
+#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
+	/* Both are supported, so ask. */
+	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
+	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
+#endif
+	return 0;
+}
+
+static int get_protocol(void) {
+#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
+	debconf_get(debconf, DEBCONF_BASE "protocol");
+	protocol = strdup(debconf->value);
+#else
+#ifdef WITH_HTTP
+	debconf_set(debconf, DEBCONF_BASE "protocol", "http");
+	protocol = "http";
+#endif
+#ifdef WITH_FTP
+	debconf_set(debconf, DEBCONF_BASE "protocol", "ftp");
+	protocol = "ftp";
+#endif
+#endif /* WITH_HTTP && WITH_FTP */
 	return 0;
 }
 
@@ -289,41 +316,6 @@ static int set_country(void) {
 	debconf_set(debconf, DEBCONF_BASE "country", country);
 
 	free (countries);
-	return 0;
-}
-
-static int choose_protocol(void) {
-#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
-	/* Both are supported, so ask. */
-	debconf_subst(debconf, DEBCONF_BASE "protocol", "protocols", "http, ftp");
-	debconf_input(debconf, "medium", DEBCONF_BASE "protocol");
-#endif
-	return 0;
-}
-
-static int get_protocol(void) {
-#if defined (WITH_HTTP) && (defined (WITH_FTP) || defined (WITH_FTP_MANUAL))
-	debconf_get(debconf, DEBCONF_BASE "protocol");
-	protocol = strdup(debconf->value);
-#else
-#ifdef WITH_HTTP
-	debconf_set(debconf, DEBCONF_BASE "protocol", "http");
-	protocol = "http";
-#endif
-#ifdef WITH_FTP
-	debconf_set(debconf, DEBCONF_BASE "protocol", "ftp");
-	protocol = "ftp";
-#endif
-#endif /* WITH_HTTP && WITH_FTP */
-	return 0;
-}
-
-static int choose_suite(void) {
-	/* If the base system can be installed from CD, don't allow to
-	 * select a different suite
-	 */
-	if (! base_on_cd)
-		debconf_input(debconf, "medium", DEBCONF_BASE "suite");
 	return 0;
 }
 
@@ -472,6 +464,15 @@ static int validate_mirror(void) {
 		else
 			return 1; /* back to beginning of questions */
 	}
+}
+
+static int choose_suite(void) {
+	/* If the base system can be installed from CD, don't allow to
+	 * select a different suite
+	 */
+	if (! base_on_cd)
+		debconf_input(debconf, "medium", DEBCONF_BASE "suite");
+	return 0;
 }
 
 /* Get the codename for the selected suite. */
