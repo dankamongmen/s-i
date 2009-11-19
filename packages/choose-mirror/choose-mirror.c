@@ -390,7 +390,7 @@ static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
-	int valid;
+	int valid = 0;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
@@ -411,9 +411,7 @@ static int validate_mirror(void) {
 		debconf_set(debconf, host, mirror);
 		root = mirror_root(mirror);
 		free(mirror);
-		if (root == NULL) {
-			valid = 0;
-		} else {
+		if (root != NULL) {
 			debconf_set(debconf, dir, root);
 			valid = find_suite();
 		}
@@ -421,19 +419,15 @@ static int validate_mirror(void) {
 		/* check to see if the entered data is basically ok */
 		int ok = 1;
 		debconf_get(debconf, host);
-		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 || strchr(debconf->value, '/') != NULL) {
+		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 ||
+		    strchr(debconf->value, '/') != NULL)
 			ok = 0;
-		}
 		debconf_get(debconf, dir);
-		if (debconf->value == NULL || strcmp(debconf->value, "") == 0) {
+		if (debconf->value == NULL || strcmp(debconf->value, "") == 0)
 			ok = 0;
-		}
 
-		if (ok) {
+		if (ok)
 			valid = find_suite();
-		} else {
-			valid = 0;
-		}
 	}
 
 	free(mir);
