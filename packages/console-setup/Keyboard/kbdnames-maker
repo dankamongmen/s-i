@@ -33,12 +33,6 @@ for my $layout (keys %KeyboardNames::layouts) {
 $ENV{'LC_ALL'} = "en_US.UTF-8";
 binmode STDOUT, ":utf8";
 
-sub fixquotes {
-    my $s = shift;
-    $s =~ s/'/'"'"'/g;
-    return $s;
-}
-
 for my $mo (</usr/share/locale/*/LC_MESSAGES/xkeyboard-config.mo>) {
     my $lang = $mo;
     $lang =~ s:/usr/share/locale/(.*)/LC_MESSAGES/xkeyboard-config.mo:$1:;
@@ -52,16 +46,16 @@ for my $mo (</usr/share/locale/*/LC_MESSAGES/xkeyboard-config.mo>) {
 
     for my $model (keys %KeyboardNames::models) {
 	my $name = $KeyboardNames::models{$model};
-	print "$lang*model*$name*".fixquotes($d->get($model))."\n"
+	print "$lang*model*$name*".($d->get($model))."\n"
     }
     for my $layout (keys %KeyboardNames::layouts) {
 	my $name = $KeyboardNames::layouts{$layout};
-	my $local_layout = fixquotes($d->get($layout));
+	my $local_layout = $d->get($layout);
 	print "$lang*layout*$name*$local_layout\n";
 	print "$lang*variant*$name**$local_layout\n";
 	for my $variant (keys %{$KeyboardNames::variants{$name}}) {
 	    my $variantname = $KeyboardNames::variants{$name}{$variant};
-	    print "$lang*variant*$name*$variantname*$local_layout - ".fixquotes($d->get($variant))."\n";
+	    print "$lang*variant*$name*$variantname*$local_layout - ".($d->get($variant))."\n";
 	}
     }
 }
