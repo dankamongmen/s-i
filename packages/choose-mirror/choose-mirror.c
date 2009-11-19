@@ -396,11 +396,12 @@ static int set_proxy(void) {
 	return 0;
 }
 
+/* Check basic validity of the selected/entered mirror. */
 static int validate_mirror(void) {
 	char *mir;
 	char *host;
 	char *dir;
-	int valid = 0;
+	int valid = 1;
 
 	mir = add_protocol("mirror");
 	host = add_protocol("hostname");
@@ -421,23 +422,19 @@ static int validate_mirror(void) {
 		debconf_set(debconf, host, mirror);
 		root = mirror_root(mirror);
 		free(mirror);
-		if (root != NULL) {
+		if (root == NULL)
+			valid = 0;
+		else
 			debconf_set(debconf, dir, root);
-			valid = find_suite();
-		}
 	} else {
-		/* check to see if the entered data is basically ok */
-		int ok = 1;
+		/* check if manually entered mirror is basically ok */
 		debconf_get(debconf, host);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0 ||
 		    strchr(debconf->value, '/') != NULL)
-			ok = 0;
+			valid = 0;
 		debconf_get(debconf, dir);
 		if (debconf->value == NULL || strcmp(debconf->value, "") == 0)
-			ok = 0;
-
-		if (ok)
-			valid = find_suite();
+			valid = 0;
 	}
 
 	free(mir);
@@ -445,6 +442,19 @@ static int validate_mirror(void) {
 	free(dir);
 
 	if (valid) {
+		return 0;
+	} else {
+		/* ToDo: Could use a more appropriate error message */
+		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
+		if (debconf_go(debconf) == 30)
+			exit(10); /* back up to menu */
+		else
+			return 9; /* back up to choose_mirror */
+	}
+}
+
+static int check_mirror(void) {
+	if (find_suite()) {
 		return 0;
 	} else {
 		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
@@ -577,9 +587,10 @@ int main (int argc, char **argv) {
 		choose_country,
 		set_country,
 		choose_mirror,
+		validate_mirror,
 		choose_proxy,
 		set_proxy,
-		validate_mirror,
+		check_mirror,
 		choose_suite,
 		get_codename,
 		check_arch,
