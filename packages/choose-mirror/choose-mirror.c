@@ -32,7 +32,7 @@ static char *add_protocol(char *string) {
 	char *ret;
 
 	assert(protocol != NULL); /* Fetched by choose_protocol */
-	asprintf(&ret,DEBCONF_BASE "%s/%s",protocol,string);
+	asprintf(&ret, DEBCONF_BASE "%s/%s", protocol, string);
 	return ret;
 }
 
@@ -67,12 +67,12 @@ static struct mirror_t *mirror_list(void) {
 	assert(protocol != NULL);
 
 #ifdef WITH_HTTP
-	if (strcasecmp(protocol,"http") == 0) {
+	if (strcasecmp(protocol, "http") == 0) {
 		return mirrors_http;
 	}
 #endif
 #ifdef WITH_FTP
-	if (strcasecmp(protocol,"ftp") == 0) {
+	if (strcasecmp(protocol, "ftp") == 0) {
 		return mirrors_ftp;
 	}
 #endif
@@ -87,15 +87,15 @@ static char **mirrors_in(char *country) {
 
 	ret = malloc(num * sizeof(char *));
 	for (i = j = 0; mirrors[i].country != NULL; i++) {
-		if (j == num-1) {
+		if (j == num - 1) {
 			num *= 2;
-			ret = realloc(ret,num * sizeof(char*));
+			ret = realloc(ret, num * sizeof(char*));
 		}
 		if (strcmp(mirrors[i].country, country) == 0) {
-			ret[j++]=mirrors[i].site;
+			ret[j++] = mirrors[i].site;
 		}
 	}
-	ret[j]=NULL;
+	ret[j] = NULL;
 	return ret;
 }
 
@@ -266,7 +266,7 @@ static int choose_country(void) {
 
 #if defined (WITH_FTP_MANUAL)
 	assert(protocol != NULL);
-	if (strcasecmp(protocol,"ftp") == 0)
+	if (strcasecmp(protocol, "ftp") == 0)
 		return 0;
 #endif
 
@@ -306,7 +306,7 @@ static int set_country(void) {
 
 #if defined (WITH_FTP_MANUAL)
 	assert(protocol != NULL);
-	if (strcasecmp(protocol,"ftp") == 0)
+	if (strcasecmp(protocol, "ftp") == 0)
 		return 0;
 #endif
 
@@ -328,7 +328,7 @@ static int choose_mirror(void) {
 #ifndef WITH_FTP_MANUAL
 	manual_entry = ! strcmp(debconf->value, MANUAL_ENTRY);
 #else
-	if (! strcasecmp(protocol,"ftp") == 0)
+	if (! strcasecmp(protocol, "ftp") == 0)
 		manual_entry = ! strcmp(debconf->value, MANUAL_ENTRY);
 	else
 		manual_entry = 1;
@@ -338,7 +338,7 @@ static int choose_mirror(void) {
 		char *mir = add_protocol("mirror");
 
 		/* Prompt for mirror in selected country. */
-		list=debconf_list(mirrors_in(country));
+		list = debconf_list(mirrors_in(country));
 		debconf_subst(debconf, mir, "mirrors", list);
 		free(list);
 
@@ -599,7 +599,7 @@ int main (int argc, char **argv) {
 	};
 
 	if (argc > 1 && strcmp(argv[1], "-n") == 0)
-		show_progress=0;
+		show_progress = 0;
 
 	debconf = debconfclient_new();
 	debconf_capb(debconf, "backup");
