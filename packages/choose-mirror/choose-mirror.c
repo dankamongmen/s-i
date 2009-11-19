@@ -264,7 +264,8 @@ static int get_release(struct release_t *release, const char *name) {
 
 static int find_releases(void) {
 	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
-	int i, r = 0, bad_mirror = 0;
+	int i, r = 0;
+	int bad_mirror = 0, have_default = 0;
 	struct release_t release;
 	char *default_suite;
 
@@ -289,8 +290,10 @@ static int find_releases(void) {
 			if (get_release(&release, suites[i])) {
 				if (release.status & IS_VALID) {
 					if (strcmp(release.name, default_suite) == 0 ||
-					    strcmp(release.suite, default_suite) == 0)
+					    strcmp(release.suite, default_suite) == 0) {
 						release.status |= IS_DEFAULT;
+						have_default = 1;
+					}
 					/* Only list oldstable if it's the default */
 					if (strcmp(suites[i], "oldstable") != 0 ||
 					    (release.status & IS_DEFAULT))
@@ -317,9 +320,14 @@ static int find_releases(void) {
 			if (release.status & IS_VALID) {
 				release.status |= IS_DEFAULT;
 				releases[r++] = release;
+				have_default = 1;
 			} else {
 				bad_mirror = 1;
 			}
+		} else {
+			di_log(DI_LOG_LEVEL_WARNING,
+				"mirror does not support the specified release (%s)",
+				default_suite);
 		}
 	}
 
@@ -328,9 +336,8 @@ static int find_releases(void) {
 		debconf_progress_stop(debconf);
 	}
 
-	free(default_suite);
-
 	if (r == 0 || bad_mirror) {
+		free(default_suite);
 		if (release.name)
 			free(release.name);
 		if (release.suite)
@@ -341,6 +348,23 @@ static int find_releases(void) {
 			exit(10); /* back up to menu */
 		else
 			return 1; /* back to beginning of questions */
+	}
+
+	if (! base_on_cd && ! have_default) {
+		debconf_subst(debconf, DEBCONF_BASE "no-default",
+			"RELEASE", default_suite);
+		free(default_suite);
+
+		debconf_input(debconf, "critical", DEBCONF_BASE "no-default");
+		if (debconf_go(debconf) == 30) {
+			exit(10); /* back up to menu */
+		} else {
+			debconf_get(debconf, DEBCONF_BASE "no-default");
+			if (strcmp(debconf->value, "false"))
+				return 1; /* back to beginning of questions */
+		}
+	} else {
+		free(default_suite);
 	}
 
 	return 0;
@@ -589,6 +613,7 @@ static int set_proxy(void) {
 static int choose_suite(void) {
 	char *choices_c[MAXRELEASES], *choices[MAXRELEASES], *list;
 	int i, ret;
+	int have_default = 0;
 
 	ret = find_releases();
 	if (ret)
@@ -613,8 +638,10 @@ static int choose_suite(void) {
 				 l10n_suite(name));
 		else
 			choices[i] = l10n_suite(name);
-		if (releases[i].status & IS_DEFAULT)
+		if (releases[i].status & IS_DEFAULT) {
 			debconf_set(debconf, DEBCONF_BASE "suite", name);
+			have_default = 1;
+		}
 
 		free(name);
 	}
@@ -634,8 +661,11 @@ static int choose_suite(void) {
 	/* If the base system can be installed from CD, don't allow to
 	 * select a different suite
 	 */
+	if (! have_default)
+		debconf_fset(debconf, DEBCONF_BASE "suite", "seen", "false");
 	if (! base_on_cd)
-		debconf_input(debconf, "medium", DEBCONF_BASE "suite");
+		debconf_input(debconf, have_default ? "medium" : "critical",
+			      DEBCONF_BASE "suite");
 
 	return 0;
 }
