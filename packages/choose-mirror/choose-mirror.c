@@ -658,7 +658,7 @@ int set_codename (void) {
 int check_arch (void) {
 	char *command;
 	FILE *f = NULL;
-	char *hostname, *directory, *suite = NULL;
+	char *hostname, *directory, *codename = NULL;
 	int valid = 0;
 
 	hostname = add_protocol("hostname");
@@ -670,13 +670,13 @@ int check_arch (void) {
 	free(directory);
 	directory = strdup(debconf->value);
 
-	/* As suite has been determined previously, this should not fail */
-	debconf_get(debconf, DEBCONF_BASE "suite");
+	/* As codename has been determined previously, this should not fail */
+	debconf_get(debconf, DEBCONF_BASE "codename");
 	if (strlen(debconf->value) > 0) {
-		suite = strdup(debconf->value);
+		codename = strdup(debconf->value);
 
 		asprintf(&command, "wget -q %s://%s%s/dists/%s/main/binary-%s/Release -O - | grep ^Architecture:",
-			 protocol, hostname, directory, suite, ARCH_TEXT);
+			 protocol, hostname, directory, codename, ARCH_TEXT);
 		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		f = popen(command, "r");
 		free(command);
@@ -692,8 +692,8 @@ int check_arch (void) {
 
 	free(hostname);
 	free(directory);
-	if (suite)
-		free(suite);
+	if (codename)
+		free(codename);
 
 	if (valid) {
 		return 0;
