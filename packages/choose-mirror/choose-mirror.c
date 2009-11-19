@@ -343,85 +343,6 @@ static int find_releases(void) {
 	return 0;
 }
 
-/*
- * Using the current debconf settings for a mirror, figure out which suite
- * to use from the mirror and set mirror/suite.
- *
- * This is accomplished by downloading the Release file from the mirror.
- * Suite selection tries each suite in turn, and stops at the first one that
- * seems usable.
- *
- * If no Release file is found, returns false. That probably means the
- * mirror is broken or unreachable.
- */
-int find_suite (void) {
-	char *command;
-	FILE *f = NULL;
-	char *hostname, *directory;
-	int nbr_suites = sizeof(suites)/SUITE_LENGTH;
-	int i;
-	int ret = 0;
-	char buf[SUITE_LENGTH];
-
-	if (show_progress) {
-		debconf_progress_start(debconf, 0, 1,
-				       DEBCONF_BASE "checking_title");
-		debconf_progress_info(debconf,
-				      DEBCONF_BASE "checking_download");
-	}
-
-	hostname = add_protocol("hostname");
-	debconf_get(debconf, hostname);
-	free(hostname);
-	hostname = strdup(debconf->value);
-	directory = add_protocol("directory");
-	debconf_get(debconf, directory);
-	free(directory);
-	directory = strdup(debconf->value);
-
-	/* Try each suite in turn until one is found that works. */
-	for (i=0; i <= nbr_suites && ! ret; i++) {
-		char *suite;
-
-		if (i == 0) {
-			/* First check for a (preseeded) default suite. */
-			suite = get_default_suite();
-			if (suite == NULL)
-				continue;
-		} else {
-			suite = strdup(suites[i - 1]);
-		}
-
-		asprintf(&command, "wget -q %s://%s%s/dists/%s/Release -O - | grep ^Suite: | cut -d' ' -f 2",
-			 protocol, hostname, directory, suite);
-		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
-		f = popen(command, "r");
-		free(command);
-
-		if (f != NULL) {
-			if (fgets(buf, SUITE_LENGTH - 1, f)) {
-				if (buf[strlen(buf) - 1] == '\n')
-					buf[strlen(buf) - 1] = '\0';
-				debconf_set(debconf, DEBCONF_BASE "suite", buf);
-				ret = 1;
-			}
-		}
-
-		pclose(f);
-		free(suite);
-	}
-
-	free(hostname);
-	free(directory);
-
-	if (show_progress) {
-		debconf_progress_step(debconf, 1);
-		debconf_progress_stop(debconf);
-	}
-
-	return ret;
-}
-
 static int check_base_on_cd(void) {
 	FILE *fp;
 	if ((fp = fopen("/cdrom/.disk/base_installable", "r"))) {
@@ -646,18 +567,6 @@ static int set_proxy(void) {
 	free(px);
 
 	return 0;
-}
-
-static int check_mirror(void) {
-	if (find_suite()) {
-		return 0;
-	} else {
-		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
-		if (debconf_go(debconf) == 30)
-			exit(10); /* back up to menu */
-		else
-			return 1; /* back to beginning of questions */
-	}
 }
 
 static int choose_suite(void) {
