@@ -9,8 +9,10 @@ struct mirror_t {
 	char *root;
 };
 
-/* The string defined below must match the string used in the templates
- * (http and ftp) for this option. */
+/*
+ * The string defined below must match the string used in the templates
+ * (http and ftp) for this option.
+ */
 #define MANUAL_ENTRY "manual"
 
 #define SUITE_LENGTH 32
