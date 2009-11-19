@@ -62,6 +62,19 @@ EOF
 	mv -f $CONFIGFILE.tmp $CONFIGFILE
     fi
 
+    # For compatibility with programs that expect console-setup-mini
+    # to define XKB... variables in /etc/default/console-setup.
+    if \
+	! grep '^ *[.] */etc/default/keyboard' $CONFIGFILE >/dev/null
+    then
+	cat >>$CONFIGFILE <<EOF
+
+if [ -f /etc/default/keyboard ]; then
+    . /etc/default/keyboard
+fi
+EOF
+    fi
+
     # Ensure we do not mess up the config file's ownership and permissions.
     cp -a -f $CONFIGFILE $CONFIGFILE.tmp
 
