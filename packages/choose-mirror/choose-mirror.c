@@ -346,6 +346,21 @@ static int find_releases(void) {
 	return 0;
 }
 
+/* Try to get translation for suite names */
+static char *l10n_suite(const char *name) {
+	char *template, *l10n_name;
+
+	asprintf(&template, "%ssuites/%s", DEBCONF_BASE, name);
+	if (! debconf_metaget(debconf, template, "description") &&
+	    strlen(debconf->value))
+		l10n_name = strdup(debconf->value);
+	else
+		l10n_name = strdup(name);
+
+	free(template);
+	return l10n_name;
+}
+
 static int check_base_on_cd(void) {
 	FILE *fp;
 	if ((fp = fopen("/cdrom/.disk/base_installable", "r"))) {
@@ -595,9 +610,10 @@ static int choose_suite(void) {
 
 		choices_c[i] = strdup(name);
 		if (strcmp(name, releases[i].name) != 0)
-			asprintf(&choices[i], "%s - %s", releases[i].name, name);
+			asprintf(&choices[i], "%s - %s", releases[i].name,
+				 l10n_suite(name));
 		else
-			choices[i] = strdup(name);
+			choices[i] = l10n_suite(name);
 		if (releases[i].status & IS_DEFAULT)
 			debconf_set(debconf, DEBCONF_BASE "suite", name);
 
