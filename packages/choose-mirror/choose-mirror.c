@@ -596,10 +596,15 @@ int main (int argc, char **argv) {
 	di_system_init("choose-mirror");
 
 	while (state >= 0 && states[state]) {
-		if (states[state]() != 0) /* back up to start */
+		int res;
+
+		res = states[state]();
+		if (res == 9) /* back up */
+			state--;
+		else if (res) /* back up to start */
 			state = 0;
 		else if (debconf_go(debconf)) /* back up */
-			state = state - 1;
+			state--;
 		else
 			state++;
 	}
