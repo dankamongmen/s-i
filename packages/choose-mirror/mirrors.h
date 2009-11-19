@@ -13,9 +13,6 @@ struct mirror_t {
  * (http and ftp) for this option. */
 #define MANUAL_ENTRY "manual"
 
-/* backward compatibility with old preseed files */
-#define MANUAL_ENTRY_OLD "enter information manually"
-
 #define SUITE_LENGTH 32
 
 /* Stack of suites */
