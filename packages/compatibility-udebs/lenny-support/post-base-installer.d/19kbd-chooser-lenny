@@ -1,17 +1,22 @@
 #! /bin/sh
 set -e
 
+# Modify the following script for Lenny compatibility
 file=/usr/lib/post-base-installer.d/20kbd-chooser
 
 [ -f $file ] || exit 0
 
-# For Lenny we also need to set charmap
-sed -i '/Get values console-setup needs/a\CHARMAP="$(LC_ALL=$LOCALE chroot /target locale charmap)"'$file
+if grep -q "^CHARMAP=" $file; then
+	exit 0
+fi
 
-# Lenny has console-setup, not keyboard-configuration and asks both
-# the layout and variant questions. Also set charmap.
-sed -i '/^keyboard-configuration/d' $file
-sed -i '/debconf-set-selections/a\# Modified for Lenny\
-console-setup console-setup/layoutcode string\
-console-setup console-setup/variantcode string\
+# For Lenny we also need to set the charmap (based on the encoding
+# of the locale selected for the target system)
+sed -i '/^KEYMAP=/ a\
+\
+# Set charmap for Lenny version of console-setup\
+db_get debian-installer/locale\
+CHARMAP="$(LC_ALL=$RET chroot /target locale charmap)"' $file
+
+sed -i '/debconf-set-selections/ a\
 d-i debian-installer/charmap string $CHARMAP' $file
