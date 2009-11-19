@@ -314,7 +314,7 @@ static int find_releases(void) {
 	}
 
 	/* Try to get release using the default "suite" */
-	if (! bad_mirror && (base_on_cd || r == 0)) {
+	if (! bad_mirror && (base_on_cd || ! have_default)) {
 		memset(&release, 0, sizeof(struct release_t));
 		if (get_release(&release, default_suite)) {
 			if (release.status & IS_VALID) {
@@ -329,6 +329,8 @@ static int find_releases(void) {
 				"mirror does not support the specified release (%s)",
 				default_suite);
 		}
+		if (r == MAXRELEASES)
+			di_log(DI_LOG_LEVEL_ERROR, "array overflow: more releases than allowed by MAXRELEASES");
 	}
 
 	if (show_progress) {

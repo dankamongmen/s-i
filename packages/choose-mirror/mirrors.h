@@ -29,8 +29,13 @@ static const char suites[][SUITE_LENGTH] = {
 	/* lower preference */
 };
 
-/* Allow for one more release than nr. of suites (list terminator) */
-#define MAXRELEASES (sizeof(suites)/SUITE_LENGTH + 1)
+/*
+ * Allow for two more releases than the number of suites:
+ * - all suites
+ * - default release (if not in suites)
+ * - NULL list terminator
+ */
+#define MAXRELEASES (sizeof(suites)/SUITE_LENGTH + 2)
 
 /*
  * Data structure containing information on releases supported by a mirror
