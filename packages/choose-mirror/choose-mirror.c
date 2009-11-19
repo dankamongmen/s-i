@@ -360,42 +360,6 @@ static int choose_mirror(void) {
 	return 0;
 }
 
-static int choose_proxy(void) {
-	char *px = add_protocol("proxy");
-
-	/* Always ask about a proxy. */
-	debconf_input(debconf, "high", px);
-
-	free(px);
-	return 0;
-}
-
-static int set_proxy(void) {
-	char *px = add_protocol("proxy");
-	char *proxy_var;
-
-	asprintf(&proxy_var, "%s_proxy", protocol);
-
-	debconf_get(debconf, px);
-	if (debconf->value != NULL && strlen(debconf->value)) {
-		if (strchr(debconf->value, ':')) {
-			setenv(proxy_var, debconf->value, 1);
-		} else {
-			char *proxy_value;
-			asprintf(&proxy_value, "http://%s", debconf->value);
-			setenv(proxy_var, proxy_value, 1);
-			free(proxy_value);
-		}
-	} else {
-		unsetenv(proxy_var);
-	}
-
-	free(proxy_var);
-	free(px);
-
-	return 0;
-}
-
 /* Check basic validity of the selected/entered mirror. */
 static int validate_mirror(void) {
 	char *mir;
@@ -451,6 +415,42 @@ static int validate_mirror(void) {
 		else
 			return 9; /* back up to choose_mirror */
 	}
+}
+
+static int choose_proxy(void) {
+	char *px = add_protocol("proxy");
+
+	/* Always ask about a proxy. */
+	debconf_input(debconf, "high", px);
+
+	free(px);
+	return 0;
+}
+
+static int set_proxy(void) {
+	char *px = add_protocol("proxy");
+	char *proxy_var;
+
+	asprintf(&proxy_var, "%s_proxy", protocol);
+
+	debconf_get(debconf, px);
+	if (debconf->value != NULL && strlen(debconf->value)) {
+		if (strchr(debconf->value, ':')) {
+			setenv(proxy_var, debconf->value, 1);
+		} else {
+			char *proxy_value;
+			asprintf(&proxy_value, "http://%s", debconf->value);
+			setenv(proxy_var, proxy_value, 1);
+			free(proxy_value);
+		}
+	} else {
+		unsetenv(proxy_var);
+	}
+
+	free(proxy_var);
+	free(px);
+
+	return 0;
 }
 
 static int check_mirror(void) {
