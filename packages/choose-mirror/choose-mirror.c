@@ -151,6 +151,23 @@ static char *get_default_suite(void) {
 	return suite;
 }
 
+/*
+ * Unset most relevant seen flags to allow to correct preseeded values
+ * when mirror is bad.
+ */
+void unset_seen_flags(void) {
+	char *hostname, *directory;
+
+	hostname = add_protocol("hostname");
+	debconf_fset(debconf, hostname, "seen", "false");
+	free(hostname);
+	directory = add_protocol("directory");
+	debconf_fset(debconf, directory, "seen", "false");
+	free(directory);
+	debconf_fset(debconf, DEBCONF_BASE "country", "seen", "false");
+	debconf_fset(debconf, DEBCONF_BASE "suite", "seen", "false");
+}
+
 void log_invalid_release(const char *name, const char *field) {
 	di_log(DI_LOG_LEVEL_WARNING,
 		"broken mirror: invalid %s in Release file for %s", field, name);
@@ -339,6 +356,7 @@ static int find_releases(void) {
 	}
 
 	if (r == 0 || bad_mirror) {
+		unset_seen_flags();
 		free(default_suite);
 		if (release.name)
 			free(release.name);
@@ -353,6 +371,8 @@ static int find_releases(void) {
 	}
 
 	if (! base_on_cd && ! have_default) {
+		unset_seen_flags();
+
 		debconf_subst(debconf, DEBCONF_BASE "no-default",
 			"RELEASE", default_suite);
 		free(default_suite);
@@ -568,6 +588,7 @@ static int validate_mirror(void) {
 	if (valid) {
 		return 0;
 	} else {
+		unset_seen_flags();
 		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
 		if (debconf_go(debconf) == 30)
 			exit(10); /* back up to menu */
@@ -748,6 +769,7 @@ int check_arch (void) {
 	if (valid) {
 		return 0;
 	} else {
+		unset_seen_flags();
 		di_log(DI_LOG_LEVEL_DEBUG, "architecture not supported by selected mirror");
 		debconf_input(debconf, "critical", DEBCONF_BASE "noarch");
 		if (debconf_go(debconf) == 30)
