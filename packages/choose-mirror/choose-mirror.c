@@ -542,7 +542,6 @@ static int validate_mirror(void) {
 	if (valid) {
 		return 0;
 	} else {
-		/* ToDo: Could use a more appropriate error message */
 		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
 		if (debconf_go(debconf) == 30)
 			exit(10); /* back up to menu */
