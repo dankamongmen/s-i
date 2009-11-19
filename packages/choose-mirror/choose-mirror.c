@@ -525,7 +525,7 @@ int check_arch (void) {
 	if (strlen(debconf->value) > 0) {
 		suite = strdup(debconf->value);
 
-		asprintf(&command, "wget -q %s://%s%s/dists/%s/main/binary-%s/Release -O - | grep Architecture",
+		asprintf(&command, "wget -q %s://%s%s/dists/%s/main/binary-%s/Release -O - | grep ^Architecture:",
 			 protocol, hostname, directory, suite, ARCH_TEXT);
 		di_log(DI_LOG_LEVEL_DEBUG, "command: %s", command);
 		f = popen(command, "r");
@@ -548,7 +548,7 @@ int check_arch (void) {
 	if (valid) {
 		return 0;
 	} else {
-		di_log(DI_LOG_LEVEL_DEBUG, "Architecture not supported by selected mirror");
+		di_log(DI_LOG_LEVEL_DEBUG, "architecture not supported by selected mirror");
 		debconf_input(debconf, "critical", DEBCONF_BASE "noarch");
 		if (debconf_go(debconf) == 30)
 			exit(10); /* back up to menu */
