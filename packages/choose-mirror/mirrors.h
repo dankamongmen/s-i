@@ -22,6 +22,7 @@ struct mirror_t {
 /* Stack of suites */
 static const char suites[][SUITE_LENGTH] = {
 	/* higher preference */
+	"oldstable",
 	"stable",
 	"testing",
 	"unstable"

@@ -291,7 +291,10 @@ static int find_releases(void) {
 					if (strcmp(release.name, default_suite) == 0 ||
 					    strcmp(release.suite, default_suite) == 0)
 						release.status |= IS_DEFAULT;
-					releases[r++] = release;
+					/* Only list oldstable if it's the default */
+					if (strcmp(suites[i], "oldstable") != 0 ||
+					    (release.status & IS_DEFAULT))
+						releases[r++] = release;
 				} else {
 					bad_mirror = 1;
 					break;
