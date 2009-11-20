@@ -14,6 +14,7 @@ tpl_shortlist="localechooser/shortlist"
 tpl_continentlist="localechooser/continentlist"
 tpl_countrylist="localechooser/countrylist"
 tpl_supportedlocales="localechooser/supported-locales"
+tpl_preferredlocale="localechooser/preferred-locale"
 
 SUPPORTEDLOCALES=/etc/SUPPORTED-short
 SHORTLISTS=/etc/shortlists
@@ -343,6 +344,47 @@ get_default_locale() {
 	done
 }
 
+build_preferredlocale_choices() {
+	local lang=${1%%_*} # strip country part
+	local default=$2
+	local i ccode country locale
+	local sl_choices_c sl_choices choices_c choices
+
+	db_metaget $tpl_shortlist choices-c
+	sl_choices_c="$(echo "$RET" | sed 's/, */,/g')"
+	db_metaget $tpl_shortlist choices
+	# Allow for escaped comma's in country names
+	sl_choices="$(echo "$RET" | sed 's/\\,/#%#/g; s/, */,/g')"
+
+	i=1
+	while :; do
+		ccode="$(echo "$sl_choices_c" | cut -d, -f $i)"
+		if [ -z "$ccode" ] || [ "$ccode" = other ]; then
+			break
+		fi
+		country="$(echo "$sl_choices" | cut -d, -f $i)"
+		i=$(($i + 1))
+
+		if grep -q "^${lang}_$ccode\.UTF-8$" $SUPPORTEDLOCALES; then
+			locale=${lang}_$ccode.UTF-8
+		elif grep -q "^${lang}_$ccode$" $SUPPORTEDLOCALES; then
+			locale=${lang}_$ccode
+		else
+			continue
+		fi
+
+		choices_c="${choices_c:+$choices_c, }$locale"
+		choices="${choices:+$choices, }$country\${!TAB}-\${!TAB}$locale"
+
+		if [ "$locale" = "$default" ]; then
+			db_set $tpl_preferredlocale $LOCALE
+		fi
+	done
+	choices="$(echo "$choices" | sed 's/#%#/\\,/g')"
+	db_subst $tpl_preferredlocale CHOICES-C "$choices_c"
+	db_subst $tpl_preferredlocale CHOICES "$choices"
+}
+
 # Also allows to preseed with only comma as separator
 validate_supportedlocales() {
 	local choices="$1"
@@ -669,10 +711,6 @@ while :; do
 					log "Falling back to locale '$LOCALE'"
 				fi
 			fi
-
-			# Set the locale
-			db_set "$tpl_di_locale" "$LOCALE"
-			log "Set $tpl_di_locale = '$LOCALE'"
 		fi
 
 		# The code below adds lang_COUNTRY at the beginning of the
@@ -690,7 +728,26 @@ while :; do
 		fi
 		;;
 
-	   30)	# Select additional locales
+	   30)	# Select preferred locale if needed
+		askedpreflocale=
+		if [ -z "$locale_preseeded" ] && \
+		   ! has_choice $tpl_shortlist $COUNTRYCODE; then
+			build_preferredlocale_choices $LANGUAGE $LOCALE
+
+			db_capb backup align
+			db_input high $tpl_preferredlocale || [ $? -eq 30 ]
+			askedpreflocale=1
+		fi
+		;;
+
+	   31)	# Select additional locales
+		if [ "$askedpreflocale" ]; then
+			db_get $tpl_preferredlocale
+			LOCALE=$RET
+		fi
+		db_set "$tpl_di_locale" "$LOCALE"
+		log "Set $tpl_di_locale = '$LOCALE'"
+
 		CHOICES=
 		# *.UTF-8@euro locales are deprecated; don't use them
 		for i in $(grep -v '\.UTF-8@euro$' $SUPPORTEDLOCALES | grep -v "^$LOCALE$"); do
@@ -705,7 +762,7 @@ while :; do
 		db_input medium $tpl_supportedlocales || [ $? -eq 30 ]
 		;;
 
-	   31)	# Select system locale
+	   32)	# Select system locale
 		# Display additional locale selection on backup or rerun
 		db_fset $tpl_supportedlocales seen false || true
 
@@ -719,7 +776,7 @@ while :; do
 		fi
 		;;
 
-	   32) # We have a locale
+	   33) # We have a locale
 		# Display system locale selection on backup or rerun
 		db_fset $tpl_di_locale seen false || true
 
