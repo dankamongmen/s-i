@@ -544,8 +544,9 @@ while :; do
 			fi
 		fi
 
-		allprio=critical
-		shortprio=critical
+		shortlist_prio=critical
+		continent_prio=critical
+		country_prio=critical
 		;;
 
 	   20)	# Display a country shortlist if there is one
@@ -587,21 +588,20 @@ while :; do
 			# to continent/country dialogs
 			if ! ([ "$country_preseeded" ] && \
 			      [ "$current_short" = other ]); then
-				db_input $shortprio $tpl_shortlist || [ $? -eq 30 ]
+				db_input $shortlist_prio $tpl_shortlist || [ $? -eq 30 ]
 				askedshort=1
 			fi
 			country_preseeded=""
 		else
-			# If the fallback locale does not include a country
-			# (is not complete), we want to ask for a country at
-			# critical priority; example: Esperanto.
-			# Otherwise the default country should be good, so
-			# ask only at medium priority unless the current
-			# country is different from the default.
-			if is_complete_locale $DEFAULT_LOCALE && \
-			   ([ -z "$current_country" ] || \
-			    [ "$current_country" = "$DEFAULT_COUNTRY" ]); then
-				allprio=medium
+			# Initially show the continent dialog only at medium
+			# priority, but allow to back up from country selection
+			# to select countries on a different continent.
+			# But we need to ask for a country at critical priority
+			# if the fallback locale does not include a country
+			# (is not complete); example: Esperanto.
+			if is_complete_locale $DEFAULT_LOCALE; then
+				continent_prio=medium
+				country_prio=high
 			fi
 
 			# Display continents after backing up from locale
@@ -647,10 +647,13 @@ while :; do
 			fi
 		fi
 
-		db_input $allprio $tpl_continentlist || [ $? -eq 30 ]
+		db_input $continent_prio $tpl_continentlist || [ $? -eq 30 ]
 		;;
 
 	   22)	# Select a country on the continent
+		# Always display continent dialog when backing up
+		continent_prio=$country_prio
+
 		db_get $tpl_continentlist
 		country_template="$tpl_countrylist/$(echo $RET | sed "s/ /_/g")"
 		db_fget $tpl_di_country seen
@@ -668,7 +671,7 @@ while :; do
 			db_set $country_template "$DEFAULT_COUNTRY"
 		fi
 
-		db_input $allprio $country_template || [ $? -eq 30 ]
+		db_input $country_prio $country_template || [ $? -eq 30 ]
 		;;
 
 	   23)	# Get the selected country
