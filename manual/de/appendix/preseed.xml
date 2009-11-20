@@ -553,6 +553,8 @@ angeben müssen, zum Beispiel <literal>auto=true</literal> oder
 <row><entry>auto</entry><entry>auto-install/enable</entry></row>
 <row><entry>classes</entry><entry>auto-install/classes</entry></row>
 <row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>language</entry><entry>debian-installer/language</entry></row>
+<row><entry>country</entry><entry>debian-installer/country</entry></row>
 <row><entry>locale</entry><entry>debian-installer/locale</entry></row>
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
@@ -771,9 +773,34 @@ Um die Locale als Boot-Parameter festzulegen, nutzen Sie
 <userinput>locale=<replaceable>de_DE</replaceable></userinput>
 (Beispiel de_DE: deutsch - Deutschland).
 
+</para><para>
+
+Obwohl diese Methode sehr einfach zu nutzen ist, erlaubt sie nicht das
+Voreinstellen aller möglichen Kombinationen aus Sprache, Land und
+Locale<footnote>
+
+<para>
+Wenn zum Beispiel <literal>locale</literal> auf <userinput>en_NL</userinput>
+voreingestellt wird, würde dies zu der Standard-Locale
+<literal>en_US.UTF-8</literal> auf dem installierten System führen. Wenn aber
+stattdessen <literal>en_GB.UTF-8</literal> bevorzugt wird, müssen diese Werte
+individuell voreingestellt werden.
+</para>
+
+</footnote>. Daher können diese Werte auch individuell voreingestellt werden.
+Sprache und Land können auch als Boot-Parameter angegeben werden.
+
 <informalexample role="example"><screen>
-# Die Locale setzt Sprache und Land.
+# Das alleinige Voreinstellen der Locale setzt Sprache, Land und Locale.
 d-i debian-installer/locale string de_DE
+
+# Die Werte können ebenfalls individuell voreingestellt werden, um flexibler
+# zu sein.
+#d-i debian-installer/language string en
+#d-i debian-installer/country string NL
+#d-i debian-installer/locale string en_GB.UTF-8
+# Geben Sie optional zusätzliche Locales an, die generiert werden sollen.
+#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8
 </screen></informalexample>
 
 </para><para>
