@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: d-i-manual\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-11-18 01:11+0000\n"
-"PO-Revision-Date: 2009-09-12 09:50+0800\n"
+"PO-Revision-Date: 2009-11-21 13:31+0800\n"
 "Last-Translator: Ji YongGang <jungle@soforge.com>\n"
 "Language-Team: debian-chinese-gb <debian-chinese-gb@debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -770,27 +770,27 @@ msgstr "debian-installer/framebuffer"
 #: preseed.xml:512
 #, no-c-format
 msgid "language"
-msgstr ""
+msgstr "language"
 
 #. Tag: entry
 #: preseed.xml:512
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "debian-installer/locale"
 msgid "debian-installer/language"
-msgstr "debian-installer/locale"
+msgstr "debian-installer/language"
 
 #. Tag: entry
 #: preseed.xml:513
 #, no-c-format
 msgid "country"
-msgstr ""
+msgstr "country"
 
 #. Tag: entry
 #: preseed.xml:513
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "debian-installer/locale"
 msgid "debian-installer/country"
-msgstr "debian-installer/locale"
+msgstr "debian-installer/country"
 
 #. Tag: entry
 #: preseed.xml:514
@@ -1204,7 +1204,7 @@ msgid ""
 "instead, the values will need to be preseeded individually. </para> </"
 "footnote>. So alternatively the values can be preseeded individually. "
 "Language and country can also be specified as boot parameters."
-msgstr ""
+msgstr "虽然这个方法很容易使用，但它无法预置所有的语言、国家和地方组合<footnote> <para> 比如预置 <literal>locale</literal> 为 <userinput>en_NL</userinput> 在安装后的系统中默认的 locale 将是 <literal>en_US.UTF-8</literal>。如果想使用 <literal>en_GB.UTF-8</literal>，该值应该分别进行预置。</para> </footnote>。 因此另一种方法是单独预置各值。语言和国家可以在引导参数里面指定。"
 
 #. Tag: screen
 #: preseed.xml:716
@@ -1220,6 +1220,15 @@ msgid ""
 "# Optionally specify additional locales to be generated.\n"
 "#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 msgstr ""
+"# Preseeding only locale sets language, country and locale.\n"
+"d-i debian-installer/locale string en_US\n"
+"\n"
+"# The values can also be preseeded individually for greater flexibility.\n"
+"#d-i debian-installer/language string en\n"
+"#d-i debian-installer/country string NL\n"
+"#d-i debian-installer/locale string en_GB.UTF-8\n"
+"# Optionally specify additional locales to be generated.\n"
+"#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 
 #. Tag: para
 #: preseed.xml:718
@@ -1503,7 +1512,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:817
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The parameter <classname>mirror/udeb/suite</classname> determines the "
 #| "suite for additional components for the installer. It is only useful to "
@@ -1519,11 +1528,7 @@ msgid ""
 "suite that was used to build the initrd for the installation method used for "
 "the installation. Normally the installer will automatically use the correct "
 "value and there should be no need to set this."
-msgstr ""
-"参数 <classname>mirror/udeb/suite</classname> 决定安装程序使用的额外组件的套"
-"件。它只在组件通过网络下载并与安装时使用的 initrd 建立套件相匹配时才有效。默"
-"认情况下，<classname>mirror/udeb/suite</classname> 与 <classname>mirror/"
-"suite</classname> 的值相同。"
+msgstr "参数 <classname>mirror/udeb/suite</classname> 决定安装程序使用的额外组件的套件。它只在组件通过网络下载并与安装时使用的 initrd 建立套件相匹配时才有效。通常安装程序会自动安装并使用正确的值而毋需手动设置。"
 
 #. Tag: screen
 #: preseed.xml:828
@@ -1961,7 +1966,7 @@ msgstr "本阶段的安装并没有多少东西需要预置。仅有一个与内
 
 #. Tag: screen
 #: preseed.xml:931
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Select the initramfs generator used to generate the initrd for 2.6 "
 #| "kernels.\n"
@@ -1986,12 +1991,15 @@ msgid ""
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 msgstr ""
-"# Select the initramfs generator used to generate the initrd for 2.6 "
-"kernels.\n"
+"# Configure APT to not install recommended packages by default. Use of this\n"
+"# option can result in an incomplete system and should only be used by very\n"
+"# experienced users.\n"
+"#d-i base-installer/install-recommends boolean false\n"
+"\n"
+"# Select the initramfs generator used to generate the initrd for 2.6 kernels.\n"
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# The kernel image (meta) package to be installed; \"none\" can be used if "
-"no\n"
+"# The kernel image (meta) package to be installed; \"none\" can be used if no\n"
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 
@@ -2297,7 +2305,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1050
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2351,11 +2359,8 @@ msgstr ""
 "\n"
 "# Individual additional packages to install\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
-"# By default, packages that are only Recommended by packages installed "
-"using\n"
+"# By default, packages that are only Recommended by packages installed using\n"
 "# pkgsel/include (as opposed to their dependencies) will not be installed.\n"
-"# Uncomment this line to install Recommends as well.\n"
-"#d-i pkgsel/include/install-recommends boolean true\n"
 "# Whether to upgrade packages after debootstrap.\n"
 "# Allowed values: none, safe-upgrade, full-upgrade\n"
 "#d-i pkgsel/upgrade select none\n"
@@ -2750,10 +2755,3 @@ msgstr ""
 "也可以通过在前面设置 preseed/url 从 initrd 或者文件预置链载进入网络预置。这将"
 "使网络预置在网络连通时执行。您应该小心使用，因为这是两种预置，意味着您有机会"
 "执行 preseed/early 命令，第二个可以在网络连通后使用。"
-
-#~ msgid ""
-#~ "# Locale sets language and country.\n"
-#~ "d-i debian-installer/locale string en_US"
-#~ msgstr ""
-#~ "# Locale sets language and country.\n"
-#~ "d-i debian-installer/locale string en_US"
