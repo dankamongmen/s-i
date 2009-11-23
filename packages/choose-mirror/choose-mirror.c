@@ -184,7 +184,7 @@ static int validate_codename(struct release_t *s_release) {
 	struct release_t cn_release;
 	int ret = 1;
 
-	memset(&cn_release, 0, sizeof(struct release_t));
+	memset(&cn_release, 0, sizeof(cn_release));
 
 	/* s_release->name is the codename to check */
 	if (get_release(&cn_release, s_release->name)) {
@@ -273,8 +273,7 @@ static int get_release(struct release_t *release, const char *name) {
 	if (release->name != NULL) {
 		return 1;
 	} else {
-		if (release->suite)
-			free(release->suite);
+		free(release->suite);
 		return 0;
 	}
 }
@@ -297,13 +296,13 @@ static int find_releases(void) {
 				      DEBCONF_BASE "checking_download");
 	}
 
-	/* Initialize releases; also ensures NULL termination for .name */
-	memset(&releases, 0, MAXRELEASES * sizeof(struct release_t));
+	/* Initialize releases; also ensures NULL termination of the array */
+	memset(&releases, 0, sizeof(releases));
 
 	/* Get releases for all suites */
 	if (! base_on_cd) {
 		for (i=0; i < nbr_suites && r < MAXRELEASES; i++) {
-			memset(&release, 0, sizeof(struct release_t));
+			memset(&release, 0, sizeof(release));
 			if (get_release(&release, suites[i])) {
 				if (release.status & IS_VALID) {
 					if (strcmp(release.name, default_suite) == 0 ||
@@ -332,7 +331,7 @@ static int find_releases(void) {
 
 	/* Try to get release using the default "suite" */
 	if (! bad_mirror && (base_on_cd || ! have_default)) {
-		memset(&release, 0, sizeof(struct release_t));
+		memset(&release, 0, sizeof(release));
 		if (get_release(&release, default_suite)) {
 			if (release.status & IS_VALID) {
 				release.status |= IS_DEFAULT;
@@ -358,10 +357,8 @@ static int find_releases(void) {
 	if (r == 0 || bad_mirror) {
 		unset_seen_flags();
 		free(default_suite);
-		if (release.name)
-			free(release.name);
-		if (release.suite)
-			free(release.suite);
+		free(release.name);
+		free(release.suite);
 
 		debconf_input(debconf, "critical", DEBCONF_BASE "bad");
 		if (debconf_go(debconf) == 30)
@@ -643,19 +640,19 @@ static int choose_suite(void) {
 		return ret;
 
 	/* Also ensures NULL termination */
-	memset(choices, 0, MAXRELEASES * sizeof(char *));
-	memset(choices_c, 0, MAXRELEASES * sizeof(char *));
+	memset(choices, 0, sizeof(choices));
+	memset(choices_c, 0, sizeof(choices_c));
 
 	/* Arrays can never overflow as we've already checked releases */
 	for (i=0; releases[i].name != NULL; i++) {
 		char *name;
 
 		if (releases[i].status & GET_SUITE)
-			name = strdup(releases[i].suite);
+			name = releases[i].suite;
 		else
-			name = strdup(releases[i].name);
+			name = releases[i].name;
 
-		choices_c[i] = strdup(name);
+		choices_c[i] = name;
 		if (strcmp(name, releases[i].name) != 0)
 			asprintf(&choices[i], "%s${!TAB}-${!TAB}%s", releases[i].name,
 				 l10n_suite(name));
@@ -665,8 +662,6 @@ static int choose_suite(void) {
 			debconf_set(debconf, DEBCONF_BASE "suite", name);
 			have_default = 1;
 		}
-
-		free(name);
 	}
 
 	list = debconf_list(choices_c);
@@ -675,11 +670,6 @@ static int choose_suite(void) {
 	list = debconf_list(choices);
 	debconf_subst(debconf, DEBCONF_BASE "suite", "CHOICES", list);
 	free(list);
-
-	for (i=0; choices[i] != NULL; i++) {
-		free(choices_c[i]);
-		free(choices[i]);
-	}
 
 	/* If the base system can be installed from CD, don't allow to
 	 * select a different suite
@@ -702,7 +692,7 @@ int set_codename (void) {
 	debconf_get(debconf, DEBCONF_BASE "suite");
 	if (strlen(debconf->value) > 0) {
 		suite = strdup(debconf->value);
-		di_log(DI_LOG_LEVEL_INFO, "selected release ('suite'): %s", suite);
+		di_log(DI_LOG_LEVEL_INFO, "suite set to: %s", suite);
 
 		for (i=0; releases[i].name != NULL; i++) {
 			if (strcmp(releases[i].name, suite) == 0 ||
@@ -763,8 +753,7 @@ int check_arch (void) {
 
 	free(hostname);
 	free(directory);
-	if (codename)
-		free(codename);
+	free(codename);
 
 	if (valid) {
 		return 0;
