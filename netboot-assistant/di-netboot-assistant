@@ -431,15 +431,24 @@ remove_repocaches() {
 	[ "$DEBUG" ] && set +x
 }
 
+# ------------------------------------------------------------ #
+# check_sum()
+#       Validate a file's checksum
+# Parameters: csum_bin csum_file fname actual_file
+# Returns: (EXIT STATUS) 0=checksum is ok, 1=checksum mismatch
+# ------------------------------------------------------------ #
 check_sum() {
-	fname=$1
-	actual_file=$2
+	local csum_bin=$1		# checksum program
+	local csum_file=$2		# file containing checksum
+	local fname=$3			# file to check
+	local actual_file=$4		# original filename
+	local sum
 
-	if [ ! -f "$actual_file" -o ! -f "$CSUM_FILE" ]; then
+	if [ ! -f "$actual_file" -o ! -f "$csum_file" ]; then
 		return 1
 	fi
-	sum=$($CSUM $actual_file | cut -d " " -f 1)
-	if ! grep -qiE "^$sum[[:blank:]]+(\./|)$fname[[:blank:]]*$" $CSUM_FILE ; then
+	sum=$($csum_bin  $actual_file | cut -d " " -f 1)
+	if ! grep -qiE "^$sum[[:blank:]]+(\./|)$fname[[:blank:]]*$" $csum_file ; then
 		return 1
 	fi
 	return 0
@@ -471,8 +480,8 @@ fetch_files() {
 	metadatafile="$DL_CACHE/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)"
 
 	SUCCEED="true"
-	CSUM=
-	CSUM_FILE=/dev/null
+	csum_bin=
+	csum_file=/dev/null
 	for givenfile in $EXTRA_DL_FILES $tarfile ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		url="$baseurl/$f"
@@ -481,14 +490,14 @@ fetch_files() {
 
 		# Does the checksum of the previous file match the new one?
 		CACHED= #false#
-		SKIP_CSUM= #false#
+		skip_csum= #false#
 		if [ "$givenfile" = "MD5SUMS" ]; then
-			CSUM=md5sum
-			CSUM_FILE="$file.tmp"
+			csum_bin=md5sum
+			csum_file="$file.tmp"
 			[ "$OFFLINE" ] && cp "$file" "$file.tmp"
-			SKIP_CSUM=true
-		elif [ "$CSUM" ]; then
-			if check_sum $givenfile $file; then
+			skip_csum=true
+		elif [ "$csum_bin" ]; then
+			if check_sum $csum_bin $csum_file $givenfile $file; then
 				CACHED=true
 				cp "$file" "$file.tmp"
 				[ "$VERBOSE" ] && echo "I: File $givenfile is already cached"
@@ -503,7 +512,7 @@ fetch_files() {
 		if [ ! "$OFFLINE" -a ! "$CACHED" ]; then
 			[ 0$VERBOSE -eq 1 ] && echo "I: Downloading $givenfile"
 			if $GETTER "$file.tmp" -- "$url" ; then
-				if check_sum $givenfile $file.tmp || [ "$SKIP_CSUM" ] ; then
+				if check_sum $csum_bin $csum_file $givenfile $file.tmp || [ "$skip_csum" ] ; then
 					fetch_date="$(date -R)"
 				else
 					echo "E: Checksum verification failed (file $givenfile)." 1>&2
@@ -532,7 +541,7 @@ fetch_files() {
 		fi
 	done
 
-	if [ ! "$CSUM" ]; then
+	if [ ! "$csum_bin" ]; then
 		echo "W: No checksum found."
 	fi
 
@@ -570,7 +579,7 @@ fetch_files() {
 # extract_files()
 #	Extract (or copy) netboot image.
 # Parameters: repo_loc file expand_dir
-# Retruns: (INT) 0=Success, 1=Error
+# Returns: (EXIT STATUS) 0=Success, 1=Error
 # ------------------------------------------------------------ #
 extract_files() {
 	local repo_loc=$1		# Repository URL
