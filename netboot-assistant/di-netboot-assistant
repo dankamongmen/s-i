@@ -90,17 +90,26 @@ See the $PACKAGE_NAME(1) manual page for more information.
 XXX
 }
 
+# ------------------------------------------------------------ #
+# check_di_source_list()
+#	Check the validity of di-source.list
+# Parameters: release
+# Returns: (EXIT STATUS) 0=Success, 1=Error
+# ------------------------------------------------------------ #
 check_di_source_list() {
+	local valid_regex='^(#.*|[[:blank:]]*|[[:alnum:]_\\.-]+[	][[:alnum:]_\\.-]+[	][^	]+([	][^" ]+)+)$'
+
 	if [ ! -f "$DISOURCELIST" ]; then
 		echo "E: Debian Installer source file missing ($DISOURCELIST)" 1>&2
-		exit 1
+		return 1
 	fi
 
-	if grep -vEl '^(#.*|[[:blank:]]*|[[:alnum:]_\.-]+[	][[:alnum:]_\.-]+[	][^	]+([	][^" ]+)+)$'  "$DISOURCELIST" > /dev/null ; then
+	if grep -qvEl "$valid_regex"  "$DISOURCELIST" ; then
 		echo -n "E: Syntax error lines #"  1>&2
-		grep -vnE '^(#.*|[[:blank:]]*|[[:alnum:]_\.-]+[	][[:alnum:]_\.-]+[	][^	]+([	][^" ]+)+)$' "$DISOURCELIST" | cut -d ":" -f 1 | tr "\n" "," 1>&2
+		grep -vnE "$valid_regex" "$DISOURCELIST" \
+			| cut -d ":" -f 1 | tr "\n" "," 1>&2
 		echo " in file '$DISOURCELIST'." 1>&2
-		exit 1
+		return 1
 	fi
 }
 
@@ -957,7 +966,10 @@ for option in "$@"; do
     esac
 done
 
-check_di_source_list
+if ! check_di_source_list; then
+	exit $?
+fi
+
 releases="$(grep -vE '^#' "$DISOURCELIST" | cut -f 1 | sort -u | tr "\n" " " | sed -e 's/^[[:blank:]]\+//' )"
 
 if [ "$REPO_ALIAS" ]; then
