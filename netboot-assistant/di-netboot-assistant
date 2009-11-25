@@ -607,7 +607,7 @@ extract_files() {
 	else
 		mkdir -p "$expand_dir"
 	fi
-
+:
 	tar_opts="$dl_file --directory $expand_dir --no-same-permissions"
 	case "$(echo "$dl_file" | sed -e 's#^.*/##' )" in
 		*.tar.gz)
@@ -631,8 +631,15 @@ extract_files() {
 }
 
 
+# ------------------------------------------------------------ #
+# pxelinux_version()
+#       Retrieve PXElinux version
+# Parameters: bin
+# Returns: (STRING) PXElinux version
+# ------------------------------------------------------------ #
 pxelinux_version() {
-	bin="$1"
+	local bin="$1"		# pxelinux.0 file
+
 	if [ -f "$bin" ]; then
 		tr -c '[:print:] ' '\n' < $1 | sed -n -r "/PXELINUX [.0-9]+/ s/^[^ ]* ([0-9^.]+).*/\1/ p" | sort -r | head -n 1
 	else
@@ -640,8 +647,15 @@ pxelinux_version() {
 	fi
 }
 
+# ------------------------------------------------------------ #
+# elilo_version()
+#       Retrieve Elilo version (or use timestamp as version)
+# Parameters: bin
+# Returns: (STRING) elilo version
+# ------------------------------------------------------------ #
 elilo_version() {
-	bin="$1"
+	local bin="$1"		# elilo.efi file
+
 	if [ -f "$bin" ]; then
 		date --reference=$bin +0.%Y-%m-%d.%H-%M-%S
 	else
@@ -649,10 +663,24 @@ elilo_version() {
 	fi
 }
 
+# ------------------------------------------------------------ #
+# tweak_pxelinux_arguments()
+#       Tweak the kernel arguments in pxelinux configuration
+#	files.
+# Parameters: (PIPE) pristine configuration file
+# Returns: (STRING) tweaked configuration file
+# ------------------------------------------------------------ #
 tweak_pxelinux_arguments() {
 	sed -e "/^[[:blank:]]*label[[:blank:]]\+install\$/I,/^\([[:blank:]]*label[[:blank:]]^+[^\(install\)]\|[[:blank:]]*\)\$/I{s!append \(.*\)--\(.*\)!append \1 $DI_ARGS -- \2 $TARGET_ARGS!}"
 }
 
+# ------------------------------------------------------------ #
+# tweak_elilo_arguments()
+#       Tweak the kernel arguments in pxelinux configuration
+#	files.
+# Parameters: (PIPE) pristine configuration file
+# Returns: (STRING) tweaked configuration file
+# ------------------------------------------------------------ #
 tweak_elilo_arguments() {
 	sed -e "/^[[:blank:]]*label=install\$/,/^\([[:blank:]]*label=[^\(install\)]\|[[:blank:]]*\)\$/{s!append=\"\([^\"]*\)--\([^\"]*\)*\"!append=\"\1 $DI_ARGS -- \2 $TARGET_ARGS\"!}"
 }
