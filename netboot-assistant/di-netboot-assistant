@@ -174,12 +174,12 @@ find_file() {
 }
 
 # ------------------------------------------------------------ #
-# install_syslinux()
+# copy_syslinux_bin()
 #	Install pxelinux binaries in the target folder.
 # Parameters: src dst
 # Returns: (EXIT STATUS) 0=Success, 1=Error
 # ------------------------------------------------------------ #
-install_syslinux() {
+copy_syslinux_bin() {
 	local src=$1			# Source directory
 	local dst=$2			# Target directory
 	local c32_dir=$dst/pxelinux.cfg
@@ -214,12 +214,12 @@ install_syslinux() {
 }
 
 # ------------------------------------------------------------ #
-# install_elilo()
+# copy_elilo_bin()
 #	Install elilo binaries in the target folder.
 # Parameters: src dst
 # Returns: (EXIT STATUS) 0=Success, 1=Error
 # ------------------------------------------------------------ #
-install_elilo() {
+copy_elilo_bin() {
 	local src=$1			# Source directory
 	local dst=$2			# Target directory
 	local f srcf newbin elilo_new_ver elilo_cur_ver
@@ -787,13 +787,13 @@ elilo_version() {
 }
 
 # ------------------------------------------------------------ #
-# tweak_pxelinux_arguments()
+# tweak_syslinux_arguments()
 #       Tweak the kernel arguments in pxelinux configuration
 #	files.
 # Parameters: (PIPE) pristine configuration file
 # Returns: (STRING) tweaked configuration file
 # ------------------------------------------------------------ #
-tweak_pxelinux_arguments() {
+tweak_syslinux_arguments() {
 	sed -e "/^[[:blank:]]*label[[:blank:]]\+install\$/I,/^\([[:blank:]]*label[[:blank:]]^+[^\(install\)]\|[[:blank:]]*\)\$/I{s!append \(.*\)--\(.*\)!append \1 $DI_ARGS -- \2 $TARGET_ARGS!}"
 }
 
@@ -906,8 +906,8 @@ install_repo() {
 			fi
 			[ ! -d "$TFTP_ROOT/debian-installer/pxelinux.cfg" ] && mkdir "$TFTP_ROOT/debian-installer/pxelinux.cfg"
 
-			install_syslinux "$SYSLINUX" "$TFTP_ROOT/debian-installer/" || false
-			if ! install_syslinux "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
+			copy_syslinux_bin "$SYSLINUX" "$TFTP_ROOT/debian-installer/" || false
+			if ! copy_syslinux_bin "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
 				echo "E: No PXELinux menu installed. Please file a bug." 1>&2
 			fi
 
@@ -915,7 +915,7 @@ install_repo() {
 				mv "$x" "$x.ORIG"
 				print_do_not_edit_header "$release netboot image" > "$x"
 				sed -e "s#$REWRITEPKGPATH/$arch/#::/debian-installer/$REPO_ALIAS/$arch/#" "$x.ORIG" \
-					| tweak_pxelinux_arguments >> "$x"
+					| tweak_syslinux_arguments >> "$x"
 			done
 			menufragment="$metadatabasename.pxelinux.menu.fragment"
 			menufragment_serial9600="$metadatabasename.pxelinux.menu.serial-9600.fragment"
@@ -963,8 +963,8 @@ install_repo() {
 		# ELILO MENU (ia64, and some ia32)
 		if [ ! -z "$(find "$expand_dir" -type f -name 'elilo.conf' )" ]; then
 
-			install_elilo "$ELILO" "$TFTP_ROOT/debian-installer/" || false
-			if ! install_elilo "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
+			copy_elilo_bin "$ELILO" "$TFTP_ROOT/debian-installer/" || false
+			if ! copy_elilo_bin "$expand_dir" "$TFTP_ROOT/debian-installer/" ; then
 				echo "E: No Elilo menu installed. Please file a bug." 1>&2
 			fi
 
