@@ -438,7 +438,7 @@ uninstall_repos() {
 		exit 1
 	fi
 
-	installed_archs="$(find  "$STATUS_LIB/"  -name \*$repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
+	installed_archs="$(find  "$STATUS_LIB/"  -name \*$repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//' | tr '\n' ' ')"
 	if [ ! "$installed_archs" -a "$ignore_missing" != "ignore_missing" ]; then
 		installed_repos="$(find  "$STATUS_LIB/"  -name \*--\*.conf | sed -e 's,^.*/,,' -e 's/--.*\.conf//' | tr '\n' ' ')"
 		echo "E: Repository '$repo' not installed." 1>&2
