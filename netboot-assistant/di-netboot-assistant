@@ -707,15 +707,14 @@ install_repo() {
 			return 1
 		fi
 
-		# get existing metadata from the downloaded repository
+		# save metadata of this repository
 		grep -v -E "^format=.*" \
 	       		"$DL_CACHE/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)" \
 			| sed -e "s/^fetch_date=/format=1.0\n\0/" \
 			> $metadatafile
 		echo "expand_dir=$expand_dir" >> $metadatafile
-#FIXME: MAke those two lines to work !
-#		echo "di_args=$DI_ARGS" >> $metadatafile
-#		echo "target_args=$TARGET_ARGS" >> $metadatafile
+		echo "di_args=$DI_ARGS" >> $metadatafile
+		echo "target_args=$TARGET_ARGS" >> $metadatafile
 
 
 		# PXELINUX MENUs (i386, amd64)
