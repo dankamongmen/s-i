@@ -450,8 +450,9 @@ fetch_files() {
 	local arch="$2"
 	local baseurl="$3"
 	local repo_loc="$4"
-	shift 4
- 	local files="$@"
+	local tarfile="$5"
+	local file
+	local givenfile
 	local metadatafile
 
 	[ "$DEBUG" ] && set -x
@@ -472,7 +473,7 @@ fetch_files() {
 	SUCCEED="true"
 	CSUM=
 	CSUM_FILE=/dev/null
-	for givenfile in $EXTRA_DL_FILES $files ; do
+	for givenfile in $EXTRA_DL_FILES $tarfile ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		url="$baseurl/$f"
 		file="$DL_CACHE/$(echo $repo_loc/$f | url2filename)"
@@ -535,8 +536,8 @@ fetch_files() {
 		echo "W: No checksum found."
 	fi
 
-	[ "$VERBOSE" ] && echo "I: Moving/Removing temporary files."
-	for givenfile in $EXTRA_DL_FILES $files ; do
+	[ "$VERBOSE" ] && echo "I: Moving/Removing temporary file(s)."
+	for givenfile in $EXTRA_DL_FILES $tarfile ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		file="$DL_CACHE/$(echo $repo_loc/$f | url2filename)"
 		if [ "$SUCCEED" ]; then
@@ -554,7 +555,7 @@ fetch_files() {
 			echo "format=1.0" >> $metadatafile
 			echo "fetch_date=$fetch_date" >> $metadatafile
 			echo "repo=$baseurl" >> $metadatafile
-			echo "dl_file=$files" >> $metadatafile
+			echo "dl_file=$tarfile" >> $metadatafile
 			echo "dist=$release" >> $metadatafile
 		fi
 
@@ -658,7 +659,7 @@ install_repo() {
 		if ! fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file; then
 			return 1
 		fi
-		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
+		f=$(echo $tarfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		dl_file="$DL_CACHE/$(echo $repo_loc/$f | url2filename)"
 
 		# get existing metadata from the downloaded repository
