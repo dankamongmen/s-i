@@ -522,7 +522,7 @@ remove_repocaches() {
 
 	cached_archs="$(find $DL_CACHE -name "*~~$del_repo--*.meta" | sed -e 's/^.*--//' -e 's/\.meta//' | tr '\n' ' ')"
 	if [ ! "$cached_archs" -a "$ignore_missing" != "ignore_missing" ]; then
-		cached_repos="$(find /home/fpiat/.di-netboot-assistant/cache -name \*~~\*--\*.meta | sed -e 's/^.*~~//' -e 's/--.*//' | tr '\n' ' ')"
+		cached_repos="$(find $DL_CACHE -name \*~~\*--\*.meta | sed -e 's/^.*~~//' -e 's/--.*//' | tr '\n' ' ')"
 		echo "E: Repository '$del_repo' not cached." 1>&2
 		echo "I: (cached repositories are: $cached_repos)" 1>&2
 		exit 1
