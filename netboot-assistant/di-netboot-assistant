@@ -20,11 +20,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St - Suite 330, Boston, MA 02110, USA.
 
-# Initialize some variables.
+# Declare some constants
+TRUE="true"
+FALSE= #false#
 PACKAGE_NAME=di-netboot-assistant
 PACKAGE_VERSION=0.37
-OFFLINE=
-DEBUG=
+
+# Initialize some global variables.
+OFFLINE=$FALSE
+DEBUG=$FALSE
 DISOURCELIST=/etc/di-netboot-assistant/di-sources.list
 SYSLINUX=/usr/lib/syslinux/
 ELILO=/usr/lib/elilo/
@@ -485,7 +489,7 @@ fetch_files() {
 
 	metadatafile="$DL_CACHE/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)"
 
-	succeed="true"
+	succeed=$TRUE
 	csum_bin=
 	csum_file=/dev/null
 	for givenfile in $EXTRA_DL_FILES $tarfile ; do
@@ -495,8 +499,8 @@ fetch_files() {
 		[ -e $file.tmp ] && rm $file.tmp
 
 		# Does the checksum of the previous file match the new one?
-		cached= #false#
-		skip_csum= #false#
+		cached=$FALSE
+		skip_csum=$FALSE
 		if [ "$givenfile" = "MD5SUMS" ]; then
 			csum_bin=md5sum
 			csum_file="$file.tmp"
@@ -510,7 +514,7 @@ fetch_files() {
 			else
 				[ -f "$file.tmp" ] && rm "$file.tmp"
 				[ "$VERBOSE" -a "$OFFLINE" ] && echo "I: $givenfile not cached, or obsolete."
-				[ "$OFFLINE" ] && succeed= #failed"
+				[ "$OFFLINE" ] && succeed=$FALSE
 			fi
 		fi
 
@@ -525,7 +529,7 @@ fetch_files() {
 					break
 				fi
 			else
-				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || succeed= #failed#
+				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || succeed=$FALSE
 				echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
 				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
 				if [ -f "$file" ]; then
@@ -534,7 +538,7 @@ fetch_files() {
 			fi
 		else
 			if [ ! -f "$file.tmp" ]; then
-				succeed= #failed#
+				succeed=$FALSE
 				echo "E: Can't process '$release' in offline mode, the file is missing:" 1>&2
 				echo "E: (expecting '$file' from '$url')" 1>&2
 				break
@@ -836,7 +840,7 @@ install_repo() {
 }
 
 
-VERBOSE= #false#
+VERBOSE=$FALSE
 WGET_VERBOSITY="--quiet"
 CURL_VERBOSITY="--silent"
 RM_VERBOSITY=
@@ -880,7 +884,7 @@ for option in "$@"; do
 	TARGET_ARGS="$TARGET_ARGS ${option#--target-args=}"
 	;;
     --offline)
-	OFFLINE=yes ;;
+	OFFLINE=$TRUE ;;
     -v | --verbose)
 	VERBOSE=$(( 0$VERBOSE + 1 ))
 	if [ $VERBOSE -gt 1 ]; then
@@ -894,7 +898,7 @@ for option in "$@"; do
 	;;
     --debug)
 	# This is an undocumented feature...
-	DEBUG=yes ;;
+	DEBUG=$TRUE ;;
     --di-args| --target-args)
 	echo "E: Option $option requires a value after equal sign." 1>&2
 	exit 1
