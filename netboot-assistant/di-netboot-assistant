@@ -383,48 +383,65 @@ check_tftp_root() {
 
 
 #This function should be kept in sync with function "uninstall_repo" in debian/postrm
+
+# ------------------------------------------------------------ #
+# uninstall_repo()
+#	Remove the specfied repository
+# Parameters: dist_conf
+# Returns: (EXIT STATUS) 0
+# ------------------------------------------------------------ #
 uninstall_repo() {
-	dist="$1"
-	metadatabasename="$(echo $dist | sed -e 's/\.conf$//' )"
+	dist_conf="$1"			# Repository's .conf file
+	local s metadatabasename tarfile expand_dir dist_dir
+
+	metadatabasename="$(echo $dist_conf | sed -e 's/\.conf$//' )"
 
 	#remove di-netboot-assistant < 0.37 cached files.
-	tarfile="$(grep -E "^[[:blank:]]*dl_file=" "$dist" | sed -e 's/^[[:blank:]]*dl_file=//')"
+	tarfile="$(grep -E "^[[:blank:]]*dl_file=" "$dist_conf" | sed -e 's/^[[:blank:]]*dl_file=//')"
 	if [ "$(echo $tarfile | sed -n -e 's/^\(.\).*/\1/p')" = "/" ]; then
 		[ -f "$tarfile" ] && rm "$tarfile"
 	fi
 
-	expand_dir="$(grep -E "^[[:blank:]]*expand_dir=" "$dist" | sed -e 's/^[[:blank:]]*expand_dir=//')"
+	expand_dir="$(grep -E "^[[:blank:]]*expand_dir=" "$dist_conf" | sed -e 's/^[[:blank:]]*expand_dir=//')"
 	[ "$expand_dir" != "/" -a -d "$expand_dir" ] && rm -Rf "$expand_dir"
 
 	dist_dir="$(echo  "$expand_dir" | sed -e 's,/[^/]\+$,,')"
 	rmdir --ignore-fail-on-non-empty "$dist_dir"
 
-	pxemenufragment="$metadatabasename.pxelinux.menu.fragment"
-	[ -f "$pxemenufragment" ] && rm "$pxemenufragment"
+	s="$metadatabasename.pxelinux.menu.fragment"
+	[ -f "$s" ] && rm "$s"
 
-	pxemenufragment_serial9600="$metadatabasename.pxelinux.menu.serial-9600.fragment"
-	[ -f "$pxemenufragment_serial9600" ] && rm "$pxemenufragment_serial9600"
+	s="$metadatabasename.pxelinux.menu.serial-9600.fragment"
+	[ -f "$s" ] && rm "$s"
 
-	elilomenufragment="$metadatabasename.elilo.conf.fragment"
-	[ -f "$elilomenufragment" ] && rm "$elilomenufragment"
+	s="$metadatabasename.elilo.conf.fragment"
+	[ -f "$s" ] && rm "$s"
 
-	rm "$dist"
+	rm "$dist_conf"
 }
 
+# ------------------------------------------------------------ #
+# uninstall_repos()
+#	Remove the specfied repository for all specified archs.
+# Parameters: repo ignore_missing
+# Returns: (EXIT STATUS) 0=Success, 1=Error
+# ------------------------------------------------------------ #
 uninstall_repos() {
+	local repo="$1"			# Name of the repository
+	local ignore_missing="$2"	# Don't repo.
+	local a archs installed_archs installed_repos
+
 	[ "$DEBUG" ] && set -x
-	del_repo="$1"
-	ignore_missing="$2"
 
 	if [ ! -d "$STATUS_LIB" ]; then
 		echo "E: Failed to uninstall repository, lib folder not found." 1>&2
 		exit 1
 	fi
 
-	installed_archs="$(find  "$STATUS_LIB/"  -name \*$del_repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
+	installed_archs="$(find  "$STATUS_LIB/"  -name \*$repo--\*.conf | sed -e 's/^.*--//' -e 's/\.conf//')"
 	if [ ! "$installed_archs" -a "$ignore_missing" != "ignore_missing" ]; then
 		installed_repos="$(find  "$STATUS_LIB/"  -name \*--\*.conf | sed -e 's,^.*/,,' -e 's/--.*\.conf//' | tr '\n' ' ')"
-		echo "E: Repository '$del_repo' not installed." 1>&2
+		echo "E: Repository '$repo' not installed." 1>&2
 		echo "I: (installed repositories are: $installed_repos)" 1>&2
 		exit 1
 	fi
@@ -436,11 +453,11 @@ uninstall_repos() {
 	fi
 
 	for a in $archs ; do
-		if [ -f "$STATUS_LIB/$del_repo--$a.conf" ]; then
-			uninstall_repo "$STATUS_LIB/$del_repo--$a.conf"
+		if [ -f "$STATUS_LIB/$repo--$a.conf" ]; then
+			uninstall_repo "$STATUS_LIB/$repo--$a.conf"
 		else
 			if [ "$ignore_missing" != "ignore_missing" ]; then
-				echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
+				echo "E: Repository '$repo' for architecture '$a' doesn't exists." 1>&2
 				echo "I: (installed arch are: $($installed_archs | tr "\n" " "))"
 				return 1
 			fi
@@ -450,28 +467,42 @@ uninstall_repos() {
 	[ "$DEBUG" ] && set +x
 }
 
+
 #This function should be kept in sync with function "url2filename" in debian/postrm
+
+# ------------------------------------------------------------ #
+# url2filename()
+#	Convert an URL into a valid filename.
+# Parameters: (PIPE) url
+# Returns: (STRING) filename
+# ------------------------------------------------------------ #
 url2filename() {
 	sed -e 's#//\+#/#g' -e 's#[^[:alnum:]@+_~\.-]#_#g'
 }
 
-#This function should be kept in sync with function "remove_repocache" in debian/postrm
-remove_repocache() {
-	local metadatafile
-	local base
-	local file
 
-	metadatafile="$1"
+#This function should be kept in sync with function "remove_repocache" in debian/postrm
+
+# ------------------------------------------------------------ #
+# remove_repocache()
+#	Remove the cached file.
+# Parameters: metadatafile
+# Returns: (EXIT STATUS) 0
+# ------------------------------------------------------------ #
+remove_repocache() {
+	local metadatafile="$1"		# repository to uncache
+	local base file
+
 	base=$(echo $metadatafile | sed -e 's/~~.*$//' )
 
 	for file in $(sed -n -e 's/^[[:blank:]]*dl_file=[[:blank:]]*//p' $metadatafile); do
-		rm $RM_VERBOSITY ${base}_"$(echo $file| url2filename)"
+		rm $rm_verbosity ${base}_"$(echo $file| url2filename)"
 	done
 
-	#Purge remaing files (MD5SUMS...) if there are no more cached
+	#Purge remaing files (MD5SUMs...) if there are no more cached
 	#distribution from the same repository.
 	if [ ! "$(ls -1 ${base}~~*.meta | grep -v "$metadatafile")" ]; then
-		rm $RM_VERBOSITY ${base}_*
+		rm $rm_verbosity ${base}_*
 	fi
 
 	[ -f $metadatafile ] && rm $metadatafile
