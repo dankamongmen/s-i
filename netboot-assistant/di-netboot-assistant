@@ -566,6 +566,52 @@ fetch_files() {
 	[ "$DEBUG" ] && set +x
 }
 
+# ------------------------------------------------------------ #
+# extract_files()
+#	Extract (or copy) netboot image.
+# Parameters: repo_loc file expand_dir
+# Retruns: (INT) 0=Success, 1=Error
+# ------------------------------------------------------------ #
+extract_files() {
+	local repo_loc=$1		# Repository URL
+	local file=$2			# Downloaded (tar) file
+	local expand_dir=$3		# Target location fo extracted files
+	local dl_file tar_opts
+
+	file=$(echo $file | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
+	dl_file="$DL_CACHE/$(echo $repo_loc/$file | url2filename)"
+
+	[ "$VERBOSE" ] && echo "I: Extracting... "
+
+	if [ -d "$expand_dir" ]; then
+		rm -Rf "$expand_dir/*"		# get existing metadata from the downloaded repository
+	else
+		mkdir -p "$expand_dir"
+	fi
+
+	tar_opts="$dl_file --directory $expand_dir --no-same-permissions"
+	case "$(echo "$dl_file" | sed -e 's#^.*/##' )" in
+		*.tar.gz)
+			tar $TAR_VERBOSITY -zxf $tar_opts --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
+			tar $TAR_VERBOSITY -zxf $tar_opts ./version.info 2>/dev/null || true
+			;;
+		*.tar.bz2)
+			tar $TAR_VERBOSITY -jxf $tar_opts --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
+			tar $TAR_VERBOSITY -jxf $tar_opts ./version.info 2>/dev/null || true
+			;;
+		*.img)
+			cp $CP_VERBOSITY "$dl_file" "$expand_dir/$(basename "$file")"
+			;;
+		*)
+			echo "E: Don't know how to handle (unpack...) the file: $dl_file" 1>&2
+			return 1
+			;;
+	esac
+	return 0
+
+}
+
+
 pxelinux_version() {
 	bin="$1"
 	if [ -f "$bin" ]; then
@@ -596,7 +642,6 @@ install_repo() {
 	local pxelinuxbin
 	local pxelinuxcfg
 	local ver
-	local TAROPTS
 	[ "$DEBUG" ] && set -x
 	release="$1"
 	if [ -z "$release" ]; then
@@ -650,7 +695,6 @@ install_repo() {
 			echo "I: Repository '$release' filed as '$REPO_ALIAS'."
 		fi
 
-		repo_proto="$(echo $repo | cut -d ":" -f 1 )"
 		repo_loc="$(echo $repo | sed -e 's#^[^:]\+://##')"
 		expand_dir="$TFTP_ROOT/debian-installer/$REPO_ALIAS/$arch"
 
@@ -659,8 +703,9 @@ install_repo() {
 		if ! fetch_files "$release" "$arch" "$repo_mirror" "$repo_loc" $file; then
 			return 1
 		fi
-		f=$(echo $tarfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
-		dl_file="$DL_CACHE/$(echo $repo_loc/$f | url2filename)"
+		if ! extract_files "$repo_loc" "$file" "$expand_dir"; then
+			return 1
+		fi
 
 		# get existing metadata from the downloaded repository
 		grep -v -E "^format=.*" \
@@ -672,31 +717,6 @@ install_repo() {
 #		echo "di_args=$DI_ARGS" >> $metadatafile
 #		echo "target_args=$TARGET_ARGS" >> $metadatafile
 
-		[ "$VERBOSE" ] && echo "I: Extracting... "
-
-		if [ -d "$expand_dir" ]; then
-			rm -Rf "$expand_dir/*"
-		else
-			mkdir -p "$expand_dir"
-		fi
-
-		TAROPTS="$dl_file --directory $expand_dir --no-same-permissions"
-		case "$(echo "$dl_file" | sed -e 's#^.*/##' )" in
-			*.tar.gz)
-				tar $TAR_VERBOSITY -zxf $TAROPTS --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
-				tar $TAR_VERBOSITY -zxf $TAROPTS ./version.info 2>/dev/null || true
-				;;			
-			*.tar.bz2)
-				tar $TAR_VERBOSITY -jxf $TAROPTS --strip-components 3 --exclude "./pxelinux.0" --exclude "./pxelinux.cfg"
-				tar $TAR_VERBOSITY -jxf $TAROPTS ./version.info 2>/dev/null || true
-				;;			
-			*.img)
-				cp $CP_VERBOSITY "$dl_file" "$expand_dir/$(basename "$f")"
-				;;
-			*)
-				echo "E: Don't know how to handle (unpack...) the file: $dl_file" 1>&2
-				;;
-		esac
 
 		# PXELINUX MENUs (i386, amd64)
 		pxelinuxbin="$(find "$expand_dir" -type f -name "pxelinux.0" 2>/dev/null )"
