@@ -454,23 +454,29 @@ check_sum() {
 	return 0
 }
 
+# ------------------------------------------------------------ #
+# fetch_files()
+#       Download netboot image, and save them in the cache
+# Parameters: relase arch baseurl repo_loc tarfile
+# Returns: (EXIT STATUS) 0=Success, 1=Error
+# ------------------------------------------------------------ #
 fetch_files() {
-	local release="$1"
-	local arch="$2"
-	local baseurl="$3"
-	local repo_loc="$4"
-	local tarfile="$5"
-	local file
-	local givenfile
-	local metadatafile
+	local release="$1"		# Release (or variant)
+	local arch="$2"			# Architecture
+	local baseurl="$3"		# Download base URL
+	local repo_loc="$4"		# Destination dir
+	local tarfile="$5"		# File to download
+	local file givenfile metadatafile succeed getter
+	local f csum_bin csum_file skip_csum url cached
+	local fetch_date
 
 	[ "$DEBUG" ] && set -x
 
 	if [ ! "$OFFLINE" ]; then
 		if which wget > /dev/null ; then
-			GETTER="wget -c -x $WGET_VERBOSITY -O"
+			getter="wget -c -x $WGET_VERBOSITY -O"
 		elif which curl > /dev/null ; then
-			GETTER="curl --fail $CURL_VERBOSITY -o"
+			getter="curl --fail $CURL_VERBOSITY -o"
 		else
 			echo "E: Can't download file. no download tool detected (wget or curl)." 1>&2
 			return 1
@@ -479,7 +485,7 @@ fetch_files() {
 
 	metadatafile="$DL_CACHE/$(echo ${repo_loc}~~${release}--${arch}.meta | url2filename)"
 
-	SUCCEED="true"
+	succeed="true"
 	csum_bin=
 	csum_file=/dev/null
 	for givenfile in $EXTRA_DL_FILES $tarfile ; do
@@ -489,7 +495,7 @@ fetch_files() {
 		[ -e $file.tmp ] && rm $file.tmp
 
 		# Does the checksum of the previous file match the new one?
-		CACHED= #false#
+		cached= #false#
 		skip_csum= #false#
 		if [ "$givenfile" = "MD5SUMS" ]; then
 			csum_bin=md5sum
@@ -498,20 +504,20 @@ fetch_files() {
 			skip_csum=true
 		elif [ "$csum_bin" ]; then
 			if check_sum $csum_bin $csum_file $givenfile $file; then
-				CACHED=true
+				cached=true
 				cp "$file" "$file.tmp"
 				[ "$VERBOSE" ] && echo "I: File $givenfile is already cached"
 			else
 				[ -f "$file.tmp" ] && rm "$file.tmp"
 				[ "$VERBOSE" -a "$OFFLINE" ] && echo "I: $givenfile not cached, or obsolete."
-				[ "$OFFLINE" ] && SUCCEED= #failed"
+				[ "$OFFLINE" ] && succeed= #failed"
 			fi
 		fi
 
 		# Download the file, if needed.
-		if [ ! "$OFFLINE" -a ! "$CACHED" ]; then
+		if [ ! "$OFFLINE" -a ! "$cached" ]; then
 			[ 0$VERBOSE -eq 1 ] && echo "I: Downloading $givenfile"
-			if $GETTER "$file.tmp" -- "$url" ; then
+			if $getter "$file.tmp" -- "$url" ; then
 				if check_sum $csum_bin $csum_file $givenfile $file.tmp || [ "$skip_csum" ] ; then
 					fetch_date="$(date -R)"
 				else
@@ -519,7 +525,7 @@ fetch_files() {
 					break
 				fi
 			else
-				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || SUCCEED= #failed#
+				echo "$EXTRA_DL_FILES" | tr " " "\n" | grep -qx $f || succeed= #failed#
 				echo "E: Can't download '$release' for '$arch' ($url)." 1>&2
 				[ -f "$file.tmp" ] && rm $RM_VERBOSITY "$file.tmp"
 				if [ -f "$file" ]; then
@@ -528,7 +534,7 @@ fetch_files() {
 			fi
 		else
 			if [ ! -f "$file.tmp" ]; then
-				SUCCEED= #failed#
+				succeed= #failed#
 				echo "E: Can't process '$release' in offline mode, the file is missing:" 1>&2
 				echo "E: (expecting '$file' from '$url')" 1>&2
 				break
@@ -549,7 +555,7 @@ fetch_files() {
 	for givenfile in $EXTRA_DL_FILES $tarfile ; do
 		f=$(echo $givenfile | sed -e 's#^\./##' -e 's#^/##' -e 's#//#/#g')
 		file="$DL_CACHE/$(echo $repo_loc/$f | url2filename)"
-		if [ "$SUCCEED" ]; then
+		if [ "$succeed" ]; then
 			[ -f "$file.tmp" -a -f "$file" ] && rm $RM_VERBOSITY "$file"
 			[ -f "$file.tmp" ] && mv $MV_VERBOSITY "$file.tmp" "$file"
 		else
@@ -558,7 +564,7 @@ fetch_files() {
 	done
 
 	# Save metadata
-	if [ "$SUCCEED" ]; then
+	if [ "$succeed" ]; then
 		if [ ! "$OFFLINE" ]; then
 			echo "#$PACKAGE_NAME for '$release' ($arch)" > $metadatafile
 			echo "format=1.0" >> $metadatafile
