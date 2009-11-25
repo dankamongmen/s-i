@@ -143,12 +143,12 @@ list_declared_arch_for_repo() {
 }
 
 # ------------------------------------------------------------ #
-# print_do-not-edit_header()
+# print_do_not_edit_header()
 #	Print a "Do no edit this file" warning
 # Parameters: templatename
 # Returns: (STRING) file header comment
 # ------------------------------------------------------------ #
-print_do-not-edit_header() {
+print_do_not_edit_header() {
 	local templatename=$1		# Template filename
 
 	echo "##"
@@ -289,7 +289,7 @@ update_pxelinux_menu() {
 
 	[ ! -d "pxelinux.cfg" ] && mkdir "pxelinux.cfg"
 	[ "$VERBOSE" ] && echo "I: Building PXE-Linux' top-menu"
-	print_do-not-edit_header "$TEMPLATES/pxelinux.HEAD" > pxelinux.cfg/default
+	print_do_not_edit_header "$TEMPLATES/pxelinux.HEAD" > pxelinux.cfg/default
 	if [ -n "$(find "$TFTP_ROOT/debian-installer" -type d -name pxelinux.cfg.serial-9600 2>/dev/null)" ]; then
 		cp pxelinux.cfg/default pxelinux.cfg/default.serial-9600
 	else
@@ -340,7 +340,7 @@ update_elilo_menu() {
 	local x i
 
 	[ "$VERBOSE" ] && echo "I: Building Elilo's top-menu"
-	print_do-not-edit_header "$TEMPLATES/elilo.HEAD" > elilo.conf
+	print_do_not_edit_header "$TEMPLATES/elilo.HEAD" > elilo.conf
 	[ -f $TEMPLATES/elilo.HEAD ] && grep -Ev "^##" "$TEMPLATES/elilo.HEAD" >> elilo.conf
 
 	i=0
@@ -913,7 +913,7 @@ install_repo() {
 
 			for x in $(find "$expand_dir" -type f -a \( -name "default" -o -name "boot.txt" -o -name '*.cfg' \) ); do
 				mv "$x" "$x.ORIG"
-				print_do-not-edit_header "$release netboot image" > "$x"
+				print_do_not_edit_header "$release netboot image" > "$x"
 				sed -e "s#$REWRITEPKGPATH/$arch/#::/debian-installer/$REPO_ALIAS/$arch/#" "$x.ORIG" \
 					| tweak_pxelinux_arguments >> "$x"
 			done
@@ -971,7 +971,7 @@ install_repo() {
 			#Rewrite existing menus
 			for x in $(find "$expand_dir" -type f -name 'elilo.conf' ); do
 				mv "$x" "$x.ORIG"
-				print_do-not-edit_header "release" > "$x"
+				print_do_not_edit_header "release" > "$x"
 				sed -e "s#^\([[:blank:]]*\(image\|initrd\|message\|f[0-9]\+\)=\)#\1debian-installer/$REPO_ALIAS/$arch/#" < "$x.ORIG" >> "$x"
 			done
 
