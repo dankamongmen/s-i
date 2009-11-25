@@ -685,12 +685,20 @@ tweak_elilo_arguments() {
 	sed -e "/^[[:blank:]]*label=install\$/,/^\([[:blank:]]*label=[^\(install\)]\|[[:blank:]]*\)\$/{s!append=\"\([^\"]*\)--\([^\"]*\)*\"!append=\"\1 $DI_ARGS -- \2 $TARGET_ARGS\"!}"
 }
 
+# ------------------------------------------------------------ #
+# install_repo()
+#	Extract/Copy the downloaded file for specified archs.
+# Parameters: release
+# Returns: (EXIT STATUS) 0=Success, 1=Error
+# ------------------------------------------------------------ #
 install_repo() {
-	local pxelinuxbin
-	local pxelinuxcfg
-	local ver
+	local release="$1"		# release name to install
+	local pxelinuxbin pxelinuxcfg ver archs metadatabasename
+	local x metadatafile repo_orig repo_mirror expand_dir
+	local file fetch_date menufragment menufragment_serial9600
+
 	[ "$DEBUG" ] && set -x
-	release="$1"
+
 	if [ -z "$release" ]; then
 		echo "E: No repository specified (valid repositories are: $releases)" 1>&2
 		return 1
