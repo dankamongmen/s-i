@@ -509,11 +509,18 @@ remove_repocache() {
 
 }
 
+# ------------------------------------------------------------ #
+# remove_repocacheq()
+#	Remove the cached file.
+# Parameters: metadatafile
+# Returns: (EXIT STATUS) 0=Success, 1=Error
+# ------------------------------------------------------------ #
 remove_repocaches() {
-	local COUNT
+	local del_repo="$1"
+	local ignore_missing="$2"
+	local count cached_archs archs metadatafile a
+
 	[ "$DEBUG" ] && set -x
-	del_repo="$1"
-	ignore_missing="$2"
 
 	if [ ! -d "$DL_CACHE" ]; then
 		echo "E: Failed to clean the cache, cache folder not found." 1>&2
@@ -535,19 +542,18 @@ remove_repocaches() {
 	fi
 
 	for a in $archs ; do
-		COUNT=0
+		count=0
 		for metadatafile in $(find $DL_CACHE/ -name "*~~${del_repo}--${a}.meta"); do
 			remove_repocache "$metadatafile"
-			COUNT=$(( $COUNT + 1 ))
+			count=$(( $count + 1 ))
 		done
 
-	        if [ $COUNT -eq 0 -a "$ignore_missing" != "ignore_missing" ]; then
+	        if [ $count -eq 0 -a "$ignore_missing" != "ignore_missing" ]; then
 			echo "E: Repository '$del_repo' for architecture '$a' doesn't exists." 1>&2
 			echo "I: (cached archs are: $cached_archs)" 1>&2
 			exit 1
 		fi
 	done
-
 
 	[ "$DEBUG" ] && set +x
 }
