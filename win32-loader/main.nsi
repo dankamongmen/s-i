@@ -216,7 +216,7 @@ c_is_initialized:
   ; For the uninstaller
   WriteRegStr HKLM "Software\Debian\Debian-Installer Loader" "system_drive" "$c"
 
-  StrCpy $INSTDIR "$c\debian"
+  StrCpy $INSTDIR "$c\win32-loader"
   SetOutPath $INSTDIR
 
   File /oname=$PLUGINSDIR\expert.ini	templates/binary_choice.ini
@@ -602,7 +602,7 @@ d-i mirror/http/proxy string http://$proxy/$\n"
   ${Endif}
 FunctionEnd
 
-Section "Debian-Installer Loader"
+Section "Installer Loader"
 
 ; ******************************************************************************
 ; ***************************************** THIS IS WHERE THE REAL ACTION STARTS
@@ -656,8 +656,8 @@ Section "Debian-Installer Loader"
   DetailPrint "$(generating)"
   FileOpen $0 $c\grub.cfg w
   FileWrite $0 "\
-linux	/debian/linux $preseed_cmdline$\n\
-initrd	/debian/initrd.gz$\n\
+linux	/win32-loader/linux $preseed_cmdline$\n\
+initrd	/win32-loader/initrd.gz$\n\
 boot$\n"
   FileClose $0
 

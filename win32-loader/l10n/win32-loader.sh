@@ -1,7 +1,7 @@
 #!/bin/bash -e
 #
 # l10n support for win32-loader
-# Copyright (C) 2007  Robert Millan <rmh@aybabtu.com>
+# Copyright (C) 2007,2009  Robert Millan <rmh@aybabtu.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ gettext English > /dev/null
 # IMPORTANT: only the subset of UTF-8 that can be converted to NTLDR charset
 # (e.g. cp437) should be used in this string.  If you don't know which charset
 # applies, limit yourself to ascii.
-d_i=`gettext "Debian Installer"`
+d_i=`gettext "Continue with install process"`
 
 #  - Then we get a sample for bootmgr in the native charset.
 echo "${d_i}" | iconv -f utf-8 -t "${charset}" | langstring d-i
@@ -88,5 +88,5 @@ echo "${d_i}" | iconv -f utf-8 -t "${charset}" | langstring d-i
 (if echo "${d_i}" | iconv -f utf-8 -t "${ntldr_charset}" > /dev/null 2>&1 ; then
   echo "${d_i}" | iconv -f utf-8 -t "${ntldr_charset}"
 else
-  echo "Debian Installer"
+  echo "Continue with install process"
 fi) | langstring d-i_ntldr

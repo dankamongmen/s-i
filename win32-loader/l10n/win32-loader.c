@@ -68,16 +68,16 @@ main (int argc, char **argv)
   printf ("LoadLanguageFile \"${NSISDIR}\\Contrib\\Language files\\%s\"\n", _("English.nlf"));
   printf ("LicenseLangString license ${%s} license\n", nsis_lang);
 
-  langstring ("program_name",			_("Debian-Installer Loader"));
+  langstring ("program_name",			_("Installer Loader"));
   langstring ("error_missing_ini",		_("Cannot find win32-loader.ini."));
   langstring ("error_incomplete_ini",		_("win32-loader.ini is incomplete.  Contact the provider of this medium."));
   langstring ("detected_keyboard_is",		_("This program has detected that your keyboard type is \"$0\".  Is this correct?"));
   langstring ("keyboard_bug_report",		_("Please send a bug report with the following information:\n\n - Version of Windows.\n - Country settings.\n - Real keyboard type.\n - Detected keyboard type.\n\nThank you."));
-  langstring ("not_enough_space_for_debian",	_("There doesn't seem to be enough free disk space in drive $c.  For a complete desktop install, it is recommended to have at least 3 GB.  If there is already a separate disk or partition to install Debian, or if you plan to replace Windows completely, you can safely ignore this warning."));
+  langstring ("not_enough_space_for_debian",	_("There doesn't seem to be enough free disk space in drive $c.  For a complete desktop install, it is recommended to have at least 3 GB.  If there is already a separate disk or partition for this install, or if you plan to replace Windows completely, you can safely ignore this warning."));
   langstring ("not_enough_space_for_loader",	_("Error: not enough free disk space.  Aborting install."));
   langstring ("unsupported_version_of_windows",	_("This program doesn't support Windows $windows_version yet."));
-  langstring ("amd64_on_i386",			_("The version of Debian you're trying to install is designed to run on modern, 64-bit computers.  However, your computer is incapable of running 64-bit programs.\n\nUse the 32-bit (\"i386\") version of Debian, or the Multi-arch version which is able to install either of them.\n\nThis installer will abort now."));
-  langstring ("i386_on_amd64",			_("Your computer is capable of running modern, 64-bit operating systems.  However, the version of Debian you're trying to install is designed to run on older, 32-bit hardware.\n\nYou may still proceed with this install, but in order to take the most advantage of your computer, we recommend that you use the 64-bit (\"amd64\") version of Debian instead, or the Multi-arch version which is able to install either of them.\n\nWould you like to abort now?"));
+  langstring ("amd64_on_i386",			_("The system version you're trying to install is designed to run on modern, 64-bit computers.  However, your computer is incapable of running 64-bit programs.\n\nUse the 32-bit (\"i386\") version, or the Multi-arch version which is able to install either of them.\n\nThis installer will abort now."));
+  langstring ("i386_on_amd64",			_("Your computer is capable of running modern, 64-bit operating systems.  However, the system version you're trying to install is designed to run on older, 32-bit hardware.\n\nYou may still proceed with this install, but in order to take the most advantage of your computer, we recommend that you use the 64-bit (\"amd64\") version instead, or the Multi-arch version which is able to install either of them.\n\nWould you like to abort now?"));
 /*
   translate:
   "system partition" and "boot partition" are defined by Microsoft to mean the opposite of what a
@@ -90,8 +90,8 @@ main (int argc, char **argv)
   langstring ("expert2",			_("Normal mode.  Recommended for most users."));
   langstring ("expert3",			_("Expert mode.  Recommended for expert users who want full control of the install process."));
   langstring ("rescue1",			_("Select action:"));
-  langstring ("rescue2",			_("Install Debian GNU/Linux on this computer."));
-  langstring ("rescue3",			_("Repair an existing Debian system (rescue mode)."));
+  langstring ("rescue2",			_("Begin install on this computer."));
+  langstring ("rescue3",			_("Repair an installed system (rescue mode)."));
   langstring ("graphics1",			_("Select install mode:"));
   langstring ("graphics2",			_("Graphical install"));
   langstring ("graphics3",			_("Text install"));
@@ -120,7 +120,7 @@ main (int argc, char **argv)
   langstring ("di_branch4",			_("It is recommended that you check for known issues before using a daily build.  Would you like to do that now?"));
   langstring ("desktop1",			_("Desktop environment:"));
   langstring ("desktop2",			_("None"));
-  langstring ("custom1",			_("Debian-Installer Loader will be setup with the following parameters.  Do NOT change any of these unless you know what you're doing."));
+  langstring ("custom1",			_("The following parameters will be used.  Do NOT change any of these unless you know what you're doing."));
   langstring ("custom2",			_("Proxy settings (host:port):"));
   langstring ("custom3",			_("Location of boot.ini:"));
   langstring ("custom5",			_("Base URL for netboot images (linux and initrd.gz):"));
@@ -130,8 +130,8 @@ main (int argc, char **argv)
   langstring ("appending_preseeding",		_("Appending preseeding information to $0"));
   langstring ("error_exec",			_("Error: unable to run $0."));
   langstring ("disabling_ntfs_compression",	_("Disabling NTFS compression in bootstrap files"));
-  langstring ("registering_ntldr",		_("Registering Debian-Installer in NTLDR"));
-  langstring ("registering_bootmgr",		_("Registering Debian-Installer in BootMgr"));
+  langstring ("registering_ntldr",		_("Registering in NTLDR"));
+  langstring ("registering_bootmgr",		_("Registering in BootMgr"));
   langstring ("error_bcdedit_extract_id",	_("Error: failed to parse bcdedit.exe output."));
   langstring ("system_file_not_found",		_("Error: $0 not found.  Is this really Windows $windows_version?"));
   langstring ("warning1",			_("VERY IMPORTANT NOTICE:\\n\\n"));
@@ -142,9 +142,9 @@ main (int argc, char **argv)
   Take into account that either option has to make sense in our
   current context (i.e. be careful when using pronouns, etc).
  */
-  langstring ("warning2_direct",		_("The second stage of this install process will now be started.  After your confirmation, this program will restart Windows in DOS mode, and automaticaly load Debian Installer.\\n\\n"));
-  langstring ("warning2_reboot",		_("You need to reboot in order to proceed with your Debian install.  During your next boot, you will be asked whether you want to start Windows or Debian Installer.  Choose Debian Installer to continue with the install process.\\n\\n"));
-  langstring ("warning3",			_("During the install process, you will be offered the possibility of either reducing your Windows partition to install Debian or completely replacing it.  In both cases, it is STRONGLY RECOMMENDED that you have previously made a backup of your data.  Nor the authors of this loader neither the Debian project will take ANY RESPONSIBILITY in the event of data loss.\\n\\nOnce your Debian install is complete (and if you have chosen to keep Windows in your disk), you can uninstall the Debian-Installer Loader through the Windows Add/Remove Programs dialog in Control Panel."));
+  langstring ("warning2_direct",		_("The second stage of this install process will now be started.  After your confirmation, this program will restart Windows in DOS mode, and automaticaly load the next part of the install process.\\n\\n"));
+  langstring ("warning2_reboot",		_("You need to reboot in order to proceed with the install process.  During your next boot, you will be asked whether you want to start Windows or continue with the install process.\\n\\n"));
+  langstring ("warning3",			_("During the install process, you will be offered the possibility of either reducing your Windows partition or completely replacing it.  In both cases, it is STRONGLY RECOMMENDED that you have previously made a backup of your data.  The authors of this software will NOT take ANY RESPONSIBILITY in the event of data loss.\\n\\nOnce your install is complete (and if you have chosen to keep Windows in your disk), you can uninstall this loader through the Windows Add/Remove Programs dialog in Control Panel."));
   langstring ("reboot_now",			_("Do you want to reboot now?"));
 
   return 0;
