@@ -16,7 +16,7 @@ endif
 # hard disk
 GRUB_MODULES	+= biosdisk
 # partmap
-GRUB_MODULES	+= pc gpt
+GRUB_MODULES	+= part_msdos part_gpt
 # fs
 GRUB_MODULES	+= fat ntfs ntfscomp
 # used in our grub.cfg
