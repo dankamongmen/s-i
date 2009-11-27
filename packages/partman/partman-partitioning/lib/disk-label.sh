@@ -38,8 +38,6 @@ default_disk_label () {
 		    *)
 			echo msdos;;
 		esac;;
-	    lpia)
-		echo msdos;;
 	    m68k)
 		case "$sub" in
 		    amiga)
