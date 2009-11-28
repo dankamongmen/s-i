@@ -132,9 +132,9 @@ static char *get_default_suite(void) {
 	FILE *f = NULL;
 	char buf[SUITE_LENGTH];
 
-	/* Check for a preseeded suite/codename. */
 	debconf_get(debconf, DEBCONF_BASE "suite");
 	if (! base_on_cd && strlen(debconf->value) > 0) {
+		/* Use preseeded or previously selected value. */
 		suite = strdup(debconf->value);
 	} else {
 		/* Check for default suite/codename set at build time. */
