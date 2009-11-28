@@ -142,7 +142,7 @@ main (int argc, char **argv)
   Take into account that either option has to make sense in our
   current context (i.e. be careful when using pronouns, etc).
  */
-  langstring ("warning2_direct",		_("The second stage of this install process will now be started.  After your confirmation, this program will restart Windows in DOS mode, and automaticaly load the next part of the install process.\\n\\n"));
+  langstring ("warning2_direct",		_("The second stage of this install process will now be started.  After your confirmation, this program will restart Windows in DOS mode, and automatically load the next part of the install process.\\n\\n"));
   langstring ("warning2_reboot",		_("You need to reboot in order to proceed with the install process.  During your next boot, you will be asked whether you want to start Windows or continue with the install process.\\n\\n"));
   langstring ("warning3",			_("During the install process, you will be offered the possibility of either reducing your Windows partition or completely replacing it.  In both cases, it is STRONGLY RECOMMENDED that you have previously made a backup of your data.  The authors of this software will NOT take ANY RESPONSIBILITY in the event of data loss.\\n\\nOnce your install is complete (and if you have chosen to keep Windows in your disk), you can uninstall this loader through the Windows Add/Remove Programs dialog in Control Panel."));
   langstring ("reboot_now",			_("Do you want to reboot now?"));
