@@ -652,9 +652,9 @@ Section "Installer Loader"
   ${Endif}
 
 ; ********************************************** grub.cfg
-  StrCpy $0 "$c\grub.cfg"
+  StrCpy $0 "$c\win32-loader\grub.cfg"
   DetailPrint "$(generating)"
-  FileOpen $0 $c\grub.cfg w
+  FileOpen $0 $c\win32-loader\grub.cfg w
   FileWrite $0 "\
 linux	/win32-loader/linux $preseed_cmdline$\n\
 initrd	/win32-loader/initrd.gz$\n\
