@@ -1,6 +1,6 @@
 /*
  *  string.c -- String handling functions
- *  Copyright (C) 2007  Robert Millan <rmh@aybabtu.com>
+ *  Copyright (C) 2007,2009  Robert Millan <rmh@aybabtu.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,11 @@
  */
 
 #include <windows.h>
+#ifdef HAVE_EXDLL_H
+#include "exdll.h"
+#else
 #include <nsis/pluginapi.h>
+#endif
 
 void __declspec (dllexport) bcdedit_extract_id (HWND hwndParent, int string_size, char *variables, stack_t ** stacktop, extra_parameters * extra)
 {

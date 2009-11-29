@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2007  Robert Millan <rmh@aybabtu.com>
+ *  Copyright (C) 2007,2009  Robert Millan <rmh@aybabtu.com>
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,11 @@
  */
 
 #include <windows.h>
+#ifdef HAVE_EXDLL_H
+#include "exdll.h"
+#else
 #include <nsis/pluginapi.h>
+#endif
 
 BOOL WINAPI DllMain(HANDLE hInst, ULONG ul_reason_for_call, LPVOID lpReserved)
 {

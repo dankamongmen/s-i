@@ -6,7 +6,13 @@ VERSION	:= $(shell head -n 1 debian/changelog | sed -e "s/^$(PACKAGE) (\(.*\)).*
 
 NSIS_CC		:= i586-mingw32msvc-gcc -Os
 NSIS_STRIP	:= i586-mingw32msvc-strip
-NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500 -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
+NSIS_CFLAGS	:= -Wl,--file-alignment,512 -Werror -D_WIN32_WINNT=0x0500
+
+ifeq ($(wildcard /usr/i586-mingw32msvc/include/exdll.h), /usr/i586-mingw32msvc/include/exdll.h)
+NSIS_CFLAGS	+= -DHAVE_EXDLL_H
+else
+NSIS_CFLAGS	+= -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
+endif
 
 MAKENSIS	:= makensis -O/dev/null
 ifdef NETWORK_BASE_URL
