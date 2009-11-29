@@ -176,29 +176,49 @@ void log_invalid_release(const char *name, const char *field) {
 static int get_release(struct release_t *release, const char *name);
 
 /*
- * Try to fetch a Release file using its codename; if successful, check
- * that it matches the Release file that was fetched using the suite.
+ * Cross-validate Release file by checking if it can also be accessed using
+ * its codename if we got it using a suite and vice versa; if successful,
+ * check that it really matches the earlier Release file.
  * Returns false only if an invalid Release file was found.
  */
-static int validate_codename(struct release_t *s_release) {
-	struct release_t cn_release;
+static int cross_validate_release(struct release_t *release) {
+	struct release_t t_release;
 	int ret = 1;
 
-	memset(&cn_release, 0, sizeof(cn_release));
+	memset(&t_release, 0, sizeof(t_release));
 
-	/* s_release->name is the codename to check */
-	if (get_release(&cn_release, s_release->name)) {
-		if ((cn_release.status & IS_VALID) &&
-		    strcmp(cn_release.suite, s_release->suite) == 0) {
-			s_release->status |= (cn_release.status & GET_CODENAME);
-		} else {
-			s_release->status &= ~IS_VALID;
-			ret = 0;
+	di_log(DI_LOG_LEVEL_DEBUG, "cross %s/%s", release->name, release->suite);
+	/* Preset status field to prevent endless recursion. */
+	t_release.status = (release->status & (GET_SUITE | GET_CODENAME));
+
+	/* Only one of the two following conditions can trigger. */
+	if (release->suite != NULL && !(release->status & GET_SUITE)) {
+		/* Cross-validate the suite */
+		if (get_release(&t_release, release->suite)) {
+			if ((t_release.status & IS_VALID) &&
+			    strcmp(t_release.name, release->name) == 0) {
+				release->status |= (t_release.status & GET_SUITE);
+			} else {
+				release->status &= ~IS_VALID;
+				ret = 0;
+			}
+		}
+	}
+	if (release->name != NULL && !(release->status & GET_CODENAME)) {
+		/* Cross-validate the codename (release->name) */
+		if (get_release(&t_release, release->name)) {
+			if ((t_release.status & IS_VALID) &&
+			    strcmp(t_release.suite, release->suite) == 0) {
+				release->status |= (t_release.status & GET_CODENAME);
+			} else {
+				release->status &= ~IS_VALID;
+				ret = 0;
+			}
 		}
 	}
 
-	free(cn_release.name);
-	free(cn_release.suite);
+	free(t_release.name);
+	free(t_release.suite);
 
 	return ret;
 }
@@ -254,11 +274,10 @@ static int get_release(struct release_t *release, const char *name) {
 		    !(release->status & IS_VALID))
 			log_invalid_release(name, "Suite or Codename");
 
-		/* Check if release can also be gotten using codename */
-		if ((release->status & IS_VALID) && release->name != NULL &&
-		    !(release->status & GET_CODENAME))
-			if (! validate_codename(release))
-				log_invalid_release(name, "Codename");
+		/* Cross-validate the Release file */
+		if (release->status & IS_VALID)
+			if (! cross_validate_release(release))
+				log_invalid_release(name, (release->status & GET_SUITE) ? "Codename" : "Suite");
 
 		/* In case there is no Codename field */
 		if ((release->status & IS_VALID) && release->name == NULL)
