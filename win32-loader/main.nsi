@@ -35,6 +35,8 @@ RequestExecutionLevel admin
 !insertmacro GetRoot
 
 !addplugindir plugins
+!addplugindir plugins/cpuid
+!addplugindir plugins/systeminfo
 !include getwindowsversion.nsh
 
 ;--------------------------------
@@ -147,7 +149,7 @@ readme_file_not_found:
 !endif
 
 ; ********************************************** Initialise $arch
-  win32-loader::get_arch
+  test64::get_arch
   StrCpy $arch $0
 !ifndef NETWORK_BASE_URL
   ReadINIStr $0 $d\win32-loader.ini "installer" "arch"
@@ -199,7 +201,7 @@ windows_version_ok:
 
   ${If} $windows_boot_method == ntldr
   ${OrIf} $windows_boot_method == bootmgr
-    win32-loader::find_system_partition
+    systeminfo::find_system_partition
     Pop $c
     ${If} $c == failed
       ${GetRoot} $WINDIR $c
@@ -464,7 +466,7 @@ d-i debian-installer/locale string $0"
   ${Endif}
 
 ; ********************************************** preseed domain
-  win32-loader::domain
+  systeminfo::domain
   Pop $2
   Pop $0
   ${If} $2 != 0
@@ -490,7 +492,7 @@ d-i time/zone seen false"
   ${Endif}
 
 ; ********************************************** preseed keymap
-  win32-loader::keyboard_layout
+  systeminfo::keyboard_layout
   Pop $0
   ; lower word is the locale identifier (higher word is a handler to the actual layout)
   IntOp $0 $0 & 0x0000FFFF
@@ -517,7 +519,7 @@ d-i console-keymaps-at/keymap seen false"
   ${Endif}
 
 ; ********************************************** preseed hostname
-  win32-loader::hostname
+  systeminfo::hostname
   Pop $2
   Pop $0
   ${If} $2 != 0
@@ -535,7 +537,7 @@ d-i netcfg/get_hostname seen false"
   ${Endif}
 
 ; ********************************************** preseed user-fullname
-  win32-loader::username
+  systeminfo::username
   Pop $0
   ${If} $0 != ""
     StrCpy $preseed_cfg "\
@@ -784,7 +786,7 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
         Quit
       ${Endif}
       ; "The entry {id} was successfully created" is in top of stack now
-      win32-loader::bcdedit_extract_id
+      string::bcdedit_extract_id
       Pop $0
       ${If} $0 == "error"
         MessageBox MB_OK|MB_ICONSTOP "$(error_bcdedit_extract_id)"

@@ -49,7 +49,8 @@ loadlin.exe: /usr/lib/loadlin/loadlin.exe.gz
 
 win32-loader.exe: main.nsi getwindowsversion.nsh maps.ini \
 		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
-		plugins/win32-loader.dll swirl.ico license loadlin.pif loadlin.exe
+		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
+		swirl.ico license loadlin.pif loadlin.exe
 	$(MAKE) -C l10n
 	$(MAKENSIS) main.nsi
 	du -h win32-loader.exe
@@ -57,7 +58,15 @@ win32-loader.exe: main.nsi getwindowsversion.nsh maps.ini \
 license: license.in debian/changelog
 	sed -e "s/@VERSION@/$(VERSION)/g" < $< > $@
 
-plugins/win32-loader.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c plugins/systeminfo/systeminfo.c plugins/string.c
+plugins/cpuid/test64.dll: plugins/cpuid/cpuid.c plugins/cpuid/plugin.c
+	$(NSIS_CC) $^ $(NSIS_CFLAGS) -shared -o $@
+	$(NSIS_STRIP) $@
+
+plugins/systeminfo/systeminfo.dll: plugins/systeminfo/systeminfo.c
+	$(NSIS_CC) $^ $(NSIS_CFLAGS) -shared -o $@
+	$(NSIS_STRIP) $@
+
+plugins/string.dll: plugins/string.c
 	$(NSIS_CC) $^ $(NSIS_CFLAGS) -shared -o $@
 	$(NSIS_STRIP) $@
 
