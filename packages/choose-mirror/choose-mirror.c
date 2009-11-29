@@ -318,7 +318,7 @@ static int find_releases(void) {
 	/* Initialize releases; also ensures NULL termination of the array */
 	memset(&releases, 0, sizeof(releases));
 
-	/* Get releases for all suites */
+	/* Try to get Release files for all suites. */
 	if (! base_on_cd) {
 		for (i=0; i < nbr_suites && r < MAXRELEASES; i++) {
 			memset(&release, 0, sizeof(release));
@@ -348,7 +348,7 @@ static int find_releases(void) {
 			di_log(DI_LOG_LEVEL_INFO, "mirror does not have any suite symlinks");
 	}
 
-	/* Try to get release using the default "suite" */
+	/* Try to get Release file using the default "suite". */
 	if (! bad_mirror && (base_on_cd || ! have_default)) {
 		memset(&release, 0, sizeof(release));
 		if (get_release(&release, default_suite)) {
@@ -711,7 +711,6 @@ int set_codename (void) {
 	debconf_get(debconf, DEBCONF_BASE "suite");
 	if (strlen(debconf->value) > 0) {
 		suite = strdup(debconf->value);
-		di_log(DI_LOG_LEVEL_INFO, "suite set to: %s", suite);
 
 		for (i=0; releases[i].name != NULL; i++) {
 			if (strcmp(releases[i].name, suite) == 0 ||
@@ -723,7 +722,9 @@ int set_codename (void) {
 				else
 					codename = releases[i].suite;
 				debconf_set(debconf, DEBCONF_BASE "codename", codename);
-				di_log(DI_LOG_LEVEL_INFO, "codename set to: %s", codename);
+				di_log(DI_LOG_LEVEL_INFO,
+					"suite/codename set to: %s/%s",
+					suite, codename);
 				break;
 			}
 		}
