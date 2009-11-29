@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61183 -->
+<!-- original version: 61314 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -571,14 +571,33 @@ sind weiter unten aufgelistet.
 <variablelist>
 
 <varlistentry>
+<term>debian-installer/language (language)</term>
+<term>debian-installer/country (country)</term>
 <term>debian-installer/locale (locale)</term>
 <listitem><para>
 
-Kann genutzt werden, um sowohl die Sprache wie auch das Land für die
-Installation anzugeben. Dies funktioniert nur, wenn die angegebene
-Locale in Debian unterstützt wird. Um zum Beispiel Deutsch als Sprache
-zu verwenden und Schweiz als Land, nutzen Sie
-<userinput>locale=de_CH</userinput>.
+Es gibt zwei Wege festzulegen, welche(s) Sprache, Land und Locale für die
+Installation und das installierte System verwendet wird.
+ 
+</para><para>
+
+Die erste und einfachste Möglichkeit ist, nur den Parameter
+<literal>locale</literal> anzugeben. Sprache und Land werden dann aus diesem
+Wert abgeleitet. Sie können zum Beispiel <userinput>locale=de_CH</userinput>
+benutzen, um Deutsch als Sprache und die Schweiz als Land auswählen
+(<literal>de_CH.UTF-8</literal> wird dann als Standard-Locale für das
+installierte System festgelegt). Die Einschränkung bei diesem Weg ist, dass
+so nicht alle möglichen Kombinationen von Sprache, Land und Locale erreicht
+werden können.
+
+</para><para>
+
+Die zweite und weitaus flexiblere Möglichkeit ist, <literal>language</literal>
+(Sprache) und <literal>country</literal> (Land) separat anzugeben. In diesem
+Fall kann <literal>locale</literal> noch optional zusätzlich angegeben werden,
+um eine bestimmte Standard-Locale für das installierte System zu setzen.
+Beispiel: <userinput>language=en country=DE locale=en_GB.UTF-8</userinput>
+(Sprache: Englisch, Land: Deutschland, Locale: en_GB.UTF-8).
 
 </para></listitem>
 </varlistentry>
