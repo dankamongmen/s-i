@@ -36,8 +36,9 @@ install-configuration: build
 	dh_testdir
 	dh_testroot
 	dh_prep -pkeyboard-configuration
-	install -d debian/keyboard-configuration/usr/share/doc/keyboard-configuration/examples/
-	cp config.kbd debian/keyboard-configuration/usr/share/doc/keyboard-configuration/examples/keyboard
+	install -d debian/keyboard-configuration/usr/share/console-setup/
+	cp config.kbd debian/keyboard-configuration/usr/share/console-setup/keyboard
+	dh_link -pkeyboard-configuration usr/share/console-setup/keyboard usr/share/doc/keyboard-configuration/examples/keyboard
 	dh_installinit --no-start --name keyboard-setup -- start 06 S .
 	dh_installinit --no-start --name console-setup -- start 49 S .
 	rm -rf `find debian/keyboard-configuration -name .cvsignore`
@@ -52,10 +53,13 @@ install-main: build
 		prefix=debian/console-setup/usr install
 	rm debian/console-setup/usr/share/consolefonts/*-Terminus*.psf.gz
 	rm -rf debian/console-setup/etc/console-setup/ckb/
-	install -d debian/console-setup/usr/share/doc/console-setup/examples/
+
+	install -d debian/keyboard-configuration/usr/share/console-setup/
 	rm debian/console-setup/etc/default/keyboard
 	mv debian/console-setup/etc/default/console-setup \
-		debian/console-setup/usr/share/doc/console-setup/examples/
+		debian/console-setup/usr/share/console-setup/
+	dh_link -pconsole-setup usr/share/console-setup/console-setup \
+		 usr/share/doc/console-setup/examples/console-setup
 	install -d debian/console-setup/usr/share/lintian/overrides
 	install -m 644 debian/lintian.overrides \
 		debian/console-setup/usr/share/lintian/overrides/console-setup
