@@ -72,7 +72,8 @@ Sets up the font and the keyboard on Linux console.
   -h, --help           display this help and exit
 
 If VARIANT is not specified setupcon looks for the configuration files
-(in this order) ~/.console-setup and /etc/default/console-setup.  When
+(in this order) ~/.console-setup and if this doesn't exist then the
+combination/etc/default/keyboard + /etc/default/console-setup.  When
 a VARIANT is specified then setupcon looks for the configuration files
 ~/.console-setup.VARIANT and /etc/default/console-setup.VARIANT.
 EOF
@@ -374,7 +375,7 @@ if [ "$font_only" != yes -a "$XKBMODEL" != unknown ]; then
 		if \
 		    [ ! -f /etc/console-setup/cached.kmap.gz ] \
 		    || [ /etc/console-setup/cached.kmap.gz \
-		           -ot /etc/default/console-setup ]
+		           -ot /etc/default/keyboard ]
 		then
 		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
 			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
@@ -391,7 +392,7 @@ if [ "$font_only" != yes -a "$XKBMODEL" != unknown ]; then
 			[ "$VARIANT" = '' ] && [ "$CONFIG" != "$USER_CONFIG" ] \
 			&& [ -f /etc/console-setup/cached.kmap.gz ] \
 			&& [ ! /etc/console-setup/cached.kmap.gz \
-		        -ot /etc/default/console-setup ]
+		        -ot /etc/default/keyboard ]
 		    then
 			eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
 		    else
