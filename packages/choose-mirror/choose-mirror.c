@@ -187,7 +187,6 @@ static int cross_validate_release(struct release_t *release) {
 
 	memset(&t_release, 0, sizeof(t_release));
 
-	di_log(DI_LOG_LEVEL_DEBUG, "cross %s/%s", release->name, release->suite);
 	/* Preset status field to prevent endless recursion. */
 	t_release.status = (release->status & (GET_SUITE | GET_CODENAME));
 
