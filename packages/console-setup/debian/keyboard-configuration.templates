@@ -28,12 +28,15 @@ Type: select
 Choices: ${CHOICES}
 # :sl2:
 _Description: Keyboard model:
+ Please select the model of the keyboard of this machine.
 
 Template: keyboard-configuration/layout
 Type: select
 Choices: ${CHOICES}
 # :sl1:
 _Description: Origin of the keyboard:
+ Please select the origin of the layout matching the keyboard for this
+ machine.
 
 Template: keyboard-configuration/variant
 Type: select
@@ -46,52 +49,55 @@ Template: keyboard-configuration/unsupported_config_layout
 Type: boolean
 Default: true
 # :sl3:
-_Description: Keep unsupported settings in configuration file?
- The configuration file /etc/default/keyboard specifies a
- keyboard layout (${XKBLAYOUT}), which is not supported
- by the configuration program.
+_Description: Keep the current keyboard layout in the configuration file?
+ The current keyboard layout in the configuration file
+ /etc/default/keyboard is defined as XKBLAYOUT="${XKBLAYOUT}" and
+ XKBVARIANT="${XKBVARIANT}".
  .
  Please choose whether you want to keep it. If you choose this option,
- no questions about the keyboard layout
- will be asked and the current configuration will be preserved.
+ no questions about the keyboard layout will be asked and the current
+ configuration will be preserved.
 
 Template: keyboard-configuration/unsupported_layout
 Type: boolean
 Default: true
 # :sl3:
-_Description: Keep default keyboard layout (${XKBLAYOUT})?
- The default value for the keyboard layout is based on the currently
- defined language/region and the settings in /etc/X11/xorg.conf. This
- default value is ${XKBLAYOUT}, which is not supported
- by the configuration program.
+_Description: Keep default keyboard layout (${XKBLAYOUTVARIANT})?
+ The default value for the keyboard layout is XKBLAYOUT="${XKBLAYOUT}"
+ and XKBVARIANT="${XKBVARIANT}".  This default value is based on the
+ currently defined language/region and the settings in
+ /etc/X11/xorg.conf.
  .
  Please choose whether you want to keep it. If you choose this option,
- no questions about the keyboard layout
- will be asked.
+ no questions about the keyboard layout will be asked.
 
 Template: keyboard-configuration/unsupported_config_options
 Type: boolean
 Default: true
 # :sl3:
-_Description: Keep unsupported options (${XKBOPTIONS})?
- The configuration file /etc/default/keyboard specifies options
- for the keyboard layout (${XKBOPTIONS}) that are not
- supported by the configuration program.
+_Description: Keep current keyboard options in the configuration file?
+ The current keyboard options in the configuration file
+ /etc/default/keyboard are defined as XKBOPTIONS="${XKBOPTIONS}".
+ .
+ If you choose to keep these options, no questions about the keyboard
+ options will be asked.
 
 Template: keyboard-configuration/unsupported_options
 Type: boolean
 Default: true
 # :sl3:
-_Description: Keep unsupported options (${XKBOPTIONS})?
- The default value for the options of the keyboard layout is based on
- the currently defined language/region and the settings in /etc/X11/xorg.conf.
- This default value is ${XKBOPTIONS}, which is not supported
- by the configuration program.
+_Description: Keep default keyboard options (${XKBOPTIONS})?
+ The default value for the options of the keyboard layout is
+ XKBOPTIONS="${XKBOPTIONS}".  It is based on the currently defined
+ language/region and the settings in /etc/X11/xorg.conf.
+ .
+ If you choose to keep it, no questions about the keyboard options
+ will be asked.
 
 Template: keyboard-configuration/toggle
 Type: select
 # :sl1:
-__Choices: Caps Lock, Right Alt, Right Control, Right Shift, Right Logo key, Menu key, Alt+Shift, Control+Shift, Control+Alt, Alt+Caps Lock, Left Control+Left Shift, Left Alt, Left Control, Left Shift, Left Logo key, Scroll Lock key, No toggling
+__Choices: Caps Lock, Right Alt (AltGr), Right Control, Right Shift, Right Logo key, Menu key, Alt+Shift, Control+Shift, Control+Alt, Alt+Caps Lock, Left Control+Left Shift, Left Alt, Left Control, Left Shift, Left Logo key, Scroll Lock key, No toggling
 Default: Alt+Shift
 # :sl1:
 _Description: Method for toggling between national and Latin mode:
@@ -109,7 +115,7 @@ _Description: Method for toggling between national and Latin mode:
 Template: keyboard-configuration/switch
 Type: select
 # :sl2:
-__Choices: No temporary switch, Both Logo keys, Right Alt, Right Logo key, Left Alt, Left Logo key
+__Choices: No temporary switch, Both Logo keys, Right Alt (AltGr), Right Logo key, Left Alt, Left Logo key
 Default: No temporary switch
 # :sl2:
 _Description: Method for temporarily toggling between national and Latin input:
@@ -124,10 +130,10 @@ _Description: Method for temporarily toggling between national and Latin input:
 Template: keyboard-configuration/altgr
 Type: select
 # :sl2:
-__Choices: The default for the keyboard layout, Right Alt, Right Control, Right Logo key, Menu key, Left Alt, Left Logo key, Keypad Enter key, Both Logo keys, Both Alt keys
-Default: Right Alt
+__Choices: The default for the keyboard layout, No AltGr key, Right Alt (AltGr), Right Control, Right Logo key, Menu key, Left Alt, Left Logo key, Keypad Enter key, Both Logo keys, Both Alt keys
+Default: Right Alt (AltGr)
 # :sl2:
-_Description: AltGr key replacement:
+_Description: Key to function as AltGr:
  With some keyboard layouts, AltGr is a modifier key used to input
  some characters, primarily ones that are unusual for the language of the
  keyboard layout, such as foreign currency symbols and accented letters.
@@ -136,7 +142,7 @@ _Description: AltGr key replacement:
 Template: keyboard-configuration/compose
 Type: select
 # :sl2:
-__Choices: No compose key, Right Alt, Right Control, Right Logo key, Menu key, Left Logo key, Caps Lock
+__Choices: No compose key, Right Alt (AltGr), Right Control, Right Logo key, Menu key, Left Logo key, Caps Lock
 Default: No compose key
 # :sl2:
 _Description: Compose key:
