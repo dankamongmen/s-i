@@ -35,10 +35,10 @@ all: win32-loader.exe g2ldr g2ldr.mbr
 core.img:
 	grub-mkimage -o $@ --prefix /win32-loader $(GRUB_MODULES)
 
-g2ldr: /usr/lib/grubutil/g2hdr.bin core.img
+g2ldr: /usr/lib/grub/i386-pc/g2hdr.bin core.img
 	cat $^ > $@
 
-g2ldr.mbr: /usr/lib/grubutil/g2ldr.mbr
+g2ldr.mbr: /usr/lib/grub/i386-pc/g2ldr.mbr
 	cp $^ $@
 
 loadlin.pif: genpif
