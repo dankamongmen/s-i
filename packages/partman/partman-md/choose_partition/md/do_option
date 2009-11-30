@@ -308,7 +308,7 @@ do_create () {
 
 md_delete_verify () {
 	local device="$(echo "$1" | sed 's/^\(md.*\)_.*/\1/')"
-	local devices="$(grep "^$DEVICE[ :]" /proc/mdstat | \
+	local devices="$(grep "^$device[ :]" /proc/mdstat | \
 			 sed 's/^.*active \(.*\)/\1/; s/raid[0-9]* //')"
 	local mddev="$(md_devnode "$device")" || return 1
 	local mdtype="$(md_get_level "$mddev")"
