@@ -455,11 +455,14 @@ while :; do
 			# Set initial language for correct display of list
 			set_debconf_language $INITIAL_LANGUAGE
 
-			current_language=$(get_current_language)
-			if [ "$current_language" ]; then
-				db_set $tpl_languagelist $current_language
-				db_fget $tpl_di_language seen
-				db_fset $tpl_languagelist seen $RET || true
+			db_get $tpl_languagelist
+			if [ "$RET" != C]; then
+				current_language=$(get_current_language)
+				if [ "$current_language" ]; then
+					db_set $tpl_languagelist $current_language
+					db_fget $tpl_di_language seen
+					db_fset $tpl_languagelist seen $RET || true
+				fi
 			fi
 
 			db_capb backup align
