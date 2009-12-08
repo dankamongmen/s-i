@@ -721,16 +721,17 @@ while :; do
 
 		# The code below adds lang_COUNTRY at the beginning of the
 		# language list we got from language selection, unless it's
-		# already included.
+		# already included or no locale exists for the combination.
+		extra_lang=${LANGUAGE%%_*}_$COUNTRYCODE
 		if [ "$LOCALE" != C ] && \
 		   [ "$LANGUAGE" ] && [ "$COUNTRYCODE" ] && \
 		   [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
-		   [ "$LANGUAGELIST" != "$LANGUAGE" ] && \
-		   ! echo ":$LANGUAGELIST:" | \
-		     grep -q ":${LANGUAGE%%_*}_$COUNTRYCODE:"; then
-			LANGUAGELIST=${LANGUAGE%%_*}_$COUNTRYCODE:$LANGUAGELIST
+		   ! echo ":$LANGUAGELIST:" | grep -q ":$extra_lang:" && \
+		   grep -q "^$extra_lang" $SUPPORTEDLOCALES; then
+			LANGUAGELIST=$extra_lang:$LANGUAGELIST
 			db_set "$tpl_di_language" "$LANGUAGELIST"
 			log "Set $tpl_di_language = '$LANGUAGELIST'"
+			set_debconf_language "$LANGUAGELIST"
 		fi
 		;;
 
