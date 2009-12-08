@@ -718,21 +718,6 @@ while :; do
 				fi
 			fi
 		fi
-
-		# The code below adds lang_COUNTRY at the beginning of the
-		# language list we got from language selection, unless it's
-		# already included or no locale exists for the combination.
-		extra_lang=${LANGUAGE%%_*}_$COUNTRYCODE
-		if [ "$LOCALE" != C ] && \
-		   [ "$LANGUAGE" ] && [ "$COUNTRYCODE" ] && \
-		   [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
-		   ! echo ":$LANGUAGELIST:" | grep -q ":$extra_lang:" && \
-		   grep -q "^$extra_lang" $SUPPORTEDLOCALES; then
-			LANGUAGELIST=$extra_lang:$LANGUAGELIST
-			db_set "$tpl_di_language" "$LANGUAGELIST"
-			log "Set $tpl_di_language = '$LANGUAGELIST'"
-			set_debconf_language "$LANGUAGELIST"
-		fi
 		;;
 
 	   30)	# Select preferred locale if needed
@@ -789,6 +774,25 @@ while :; do
 
 		db_get $tpl_di_locale
 		log "System locale ($tpl_di_locale) = '$RET'"
+
+		# The code below adds lang_COUNTRY at the beginning of the
+		# language list we got from language selection, unless it's
+		# already included or no locale exists for the combination.
+		if [ "$askedpreflocale" ]; then
+			extra_lang=$(echo "$LOCALE" | sed -e 's/[.@].*$//')
+		else
+			extra_lang=${LANGUAGE%%_*}_$COUNTRYCODE
+		fi
+		if [ "$LOCALE" != C ] && \
+		   [ "$LANGUAGE" ] && [ "$COUNTRYCODE" ] && \
+		   [ "$COUNTRYCODE" != "$DEFAULT_COUNTRY" ] && \
+		   ! echo ":$LANGUAGELIST:" | grep -q ":$extra_lang:" && \
+		   grep -q "^$extra_lang" $SUPPORTEDLOCALES; then
+			LANGUAGELIST=$extra_lang:$LANGUAGELIST
+			db_set "$tpl_di_language" "$LANGUAGELIST"
+			log "Set $tpl_di_language = '$LANGUAGELIST'"
+			set_debconf_language "$LANGUAGELIST"
+		fi
 		;;
 
 	    *)
