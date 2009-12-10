@@ -442,6 +442,8 @@ STATE=10
 while :; do
 	case "$STATE" in
 	   10)	# Display language list
+		db_settitle localechooser/title/language
+
 		sel_language=1
 		# Disabled because of #470258: template is set to true too early
 		if false && \
@@ -553,6 +555,8 @@ while :; do
 		;;
 
 	   20)	# Display a country shortlist if there is one
+		db_settitle localechooser/title/location
+
 		askedshort=
 		db_get $tpl_di_country
 		current_country="$RET"
@@ -721,6 +725,8 @@ while :; do
 		;;
 
 	   30)	# Select preferred locale if needed
+		db_settitle localechooser/title/locale
+
 		askedpreflocale=
 		if [ -z "$locale_preseeded" ] && [ "$use_lang" ] && \
 		   ! has_choice $tpl_shortlist $COUNTRYCODE; then
