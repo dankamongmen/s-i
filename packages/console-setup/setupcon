@@ -255,8 +255,11 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	fi
     done
     
-    # Due to bug in splashy: do not load fonts (#540314)
-    if pidof splashy > /dev/null; then
+    # Due to bug in splashy and usplash: do not load fonts (#540314)
+    if \
+	pidof splashy > /dev/null \
+	|| pidof usplash > /dev/null
+    then
 	LOADFONTS=''
     fi
 
