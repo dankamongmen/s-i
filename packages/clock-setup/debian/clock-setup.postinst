@@ -33,6 +33,13 @@ if [ "$RET" = true ]; then
 	db_get clock-setup/ntp-server
 	server="$RET"
 
+	# Workaround for rdate failing if current date is before
+	# the epoch (1-1-1970); see #502336
+	case "$(archdetect)" in
+	    kfreebsd*) : ;;
+	    *) set-date-epoch ;;
+	esac
+
 	db_capb progresscancel
 	db_progress START 0 30 clock-setup/progress/title
 	if ! db_progress INFO clock-setup/progress/ntp; then

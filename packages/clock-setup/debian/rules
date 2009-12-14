@@ -9,10 +9,12 @@ RDATE_DEPENDS =
 endif
 
 build:
+	$(MAKE)
 
 clean:
 	dh_testdir
 	dh_testroot
+	$(MAKE) clean
 	dh_clean
 
 install: build
@@ -29,6 +31,7 @@ binary-arch: build install
 	dh_testroot
 	dh_installdebconf
 	dh_installchangelogs
+	dh_strip
 	dh_compress
 	dh_fixperms
 	dh_installdeb
