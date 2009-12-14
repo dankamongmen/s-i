@@ -1,5 +1,7 @@
 #! /bin/sh
 
+logvol_confirm=
+
 logvol_handler () {
 	vgname=
 	recommended=
@@ -136,10 +138,14 @@ logvol_handler () {
 	partition_recipe_append "$new_recipe"
 
 	[ "$clearpart_method" ] || clearpart_method=lvm
+
+	logvol_confirm=1
 }
 
 logvol_final () {
-	ks_preseed d-i partman-lvm/confirm boolean true
+	if [ "$logvol_confirm" ]; then
+		ks_preseed d-i partman-lvm/confirm boolean true
+	fi
 }
 
 register_final logvol_final
