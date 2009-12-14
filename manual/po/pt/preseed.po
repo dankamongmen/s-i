@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2009-11-18 01:11+0000\n"
-"PO-Revision-Date: 2009-08-22 15:14+0100\n"
+"PO-Revision-Date: 2009-12-14 21:11+0000\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -872,27 +872,27 @@ msgstr "debian-installer/framebuffer"
 #: preseed.xml:512
 #, no-c-format
 msgid "language"
-msgstr ""
+msgstr "idioma"
 
 #. Tag: entry
 #: preseed.xml:512
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "debian-installer/locale"
 msgid "debian-installer/language"
-msgstr "debian-installer/locale"
+msgstr "debian-installer/language"
 
 #. Tag: entry
 #: preseed.xml:513
 #, no-c-format
 msgid "country"
-msgstr ""
+msgstr "país"
 
 #. Tag: entry
 #: preseed.xml:513
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "debian-installer/locale"
 msgid "debian-installer/country"
-msgstr "debian-installer/locale"
+msgstr "debian-installer/country"
 
 #. Tag: entry
 #: preseed.xml:514
@@ -1342,6 +1342,15 @@ msgid ""
 "footnote>. So alternatively the values can be preseeded individually. "
 "Language and country can also be specified as boot parameters."
 msgstr ""
+"Embora este método seja muito fácil de utilizar, não permite 'preseeding' de "
+"todas as combinações possíveis de idioma, país e locale<footnote> <para> "
+"Fazer 'preseed' de <literal>locale</literal> para <userinput>en_NL"
+"</userinput> iria, por exemplo, resultar em <literal>en_US.UTF-8</literal> "
+"como locale predefinido para o sistema instalado. Se, por exemplo, em vez "
+"disso for preferido <literal>en_GB.UTF-8</literal>, terá de ser feito "
+"'preseed' aos valores individualmente. </para> </footnote>. Por isso em "
+"alternativa pode ser feito 'preseed' individualmente aos valores. A idioma "
+"e ao país também podem ser especificados como parâmetros de arranque." 
 
 #. Tag: screen
 #: preseed.xml:716
@@ -1357,6 +1366,15 @@ msgid ""
 "# Optionally specify additional locales to be generated.\n"
 "#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 msgstr ""
+"# Fazer 'preseed' apenas ao locale apenas define idioma, país e locale.\n"
+"d-i debian-installer/locale string en_US\n"
+"\n"
+"# Para maior flexibilidade também pode ser feito 'preseed' individualmente.\n"
+"#d-i debian-installer/language string en\n"
+"#d-i debian-installer/country string NL\n"
+"#d-i debian-installer/locale string en_GB.UTF-8\n"
+"# Opcionalmente especificar os locales adicionais a serem gerados.\n"
+"#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 
 #. Tag: para
 #: preseed.xml:718
@@ -1664,7 +1682,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:817
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The parameter <classname>mirror/udeb/suite</classname> determines the "
 #| "suite for additional components for the installer. It is only useful to "
@@ -1681,12 +1699,13 @@ msgid ""
 "the installation. Normally the installer will automatically use the correct "
 "value and there should be no need to set this."
 msgstr ""
-"O parâmetro <classname>mirror/udeb/suite</classname> determina a suite dos "
+"O parâmetro <classname>mirror/udeb/suite</classname> determina o conjunto de "
 "componentes adicionais para o instalador. Só é útil definir isto se os "
-"componentes forem realmente tirados pela rede e devem corresponder à suite "
-"que foi usada para construir o initrd para o método de instalação utilizado "
-"para a instalação. Por omissão o valor de <classname>mirror/udeb/suite</"
-"classname> é o mesmo que o <classname>mirror/suite</classname>."
+"componentes forem realmente obtidos através da rede e devem corresponder ao "
+"conjunto que foi utilizado para construir o initrd para o método de "
+"instalação utilizado para a instalação. Normalmente o instalador irá "
+"automaticamente utilizar o valor correcto e não deverá haver necessidade "
+"de definir isto."
 
 #. Tag: screen
 #: preseed.xml:828
@@ -2209,7 +2228,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:931
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Select the initramfs generator used to generate the initrd for 2.6 "
 #| "kernels.\n"
@@ -2234,12 +2253,17 @@ msgid ""
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 msgstr ""
-"# Escolha o gerador de initramfs a utilizar para gerar o initrd para kernels "
+"# Configure o APT para não instalar, por omissão, pacotes recomendados. A\n"
+"# utilização desta opção pode resultar num sistema incompleto e deve apenas\n"
+"# ser utilizado por utilizadores muito experientes.\n"
+"#d-i base-installer/install-recommends boolean false\n"
+"\n"
+"# Escolha o gerador de initramfs utilizado para gerar o initrd para kernels "
 "2.6.\n"
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "\n"
-"# O (meta) pacote de imagem do kernel a ser instalado; para não ser "
-"instalado nenhum kernel pode ser utilizado \"none\".\n"
+"# O (meta) pacote de imagem do kernel a ser instalado; pode ser utilizado\n"
+"# \"none\" para não instalar nenhum kernel.\n"
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 
 #. Tag: title
