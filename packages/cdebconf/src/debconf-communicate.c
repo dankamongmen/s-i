@@ -11,6 +11,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <locale.h>
+#include <errno.h>
 
 static struct configuration *config = NULL;
 static struct frontend *frontend = NULL;
@@ -81,6 +82,8 @@ int main(int argc, char **argv)
 {
     int code = 127;
     char buf[1024], *ret;
+    char *in;
+    size_t insize = 1024;
 
 	signal(SIGINT, sighandler);
 	signal(SIGTERM, sighandler);
@@ -117,10 +120,42 @@ int main(int argc, char **argv)
     else
         confmodule->owner = "unknown";
 
+    in = malloc(insize);
+    if (!in)
+        DIE("Out of memory");
+    memset(in, 0, insize);
+
     /* start feeding user commands to debconf ... */
-    while (fgets(buf, sizeof(buf), stdin))
-    {
-        ret = confmodule->process_command(confmodule, buf);
+    while (1) {
+        int done = 0;
+        buf[0] = 0;
+        in[0] = 0;
+        while (strchr(buf, '\n') == NULL) {
+            int r = read(0, buf, sizeof(buf) - 1);
+            if (r < 0) {
+                if (errno == EINTR)
+                    continue;
+                code = 127;
+                done = 1;
+                break;
+            }
+            if (r == 0) {
+                done = 1;
+                break;
+            }
+            buf[r] = 0;
+            if (strlen(in) + r + 1 > insize) {
+                insize += sizeof(buf);
+                in = realloc(in, insize);
+                if (!in)
+                    DIE("Out of memory");
+            }
+            strcat(in, buf);
+        }
+        if (done)
+            break;
+
+        ret = confmodule->process_command(confmodule, in);
 
         /* extract the first number as the return code */
         code = atoi(ret);
@@ -129,6 +164,7 @@ int main(int argc, char **argv)
         write(1, "\n", 1);
         free(ret);
     }
+    free(in);
 
 	/* shutting down .... sync the database and shutdown the modules */
 	save();
