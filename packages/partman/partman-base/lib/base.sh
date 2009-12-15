@@ -123,15 +123,16 @@ debconf_select () {
 	fi
 	keys=""
 	descriptions=""
+	# Use the hold space carefully here to allow us to make some
+	# substitutions on only the RHS (description).
+	choices="$(echo "$choices" | sed "h; s/.*$TAB//; s/ *\$//g; s/^ /$debconf_select_lead/g; s/,/\\\\,/g; s/^ /\\\\ /; x; s/$TAB.*//; G; s/\\n/$TAB/")"
 	IFS="$NL"
 	for x in $choices; do
 		local key plugin
 		restore_ifs
 		key="${x%$TAB*}"
 		keys="${keys:+${keys}, }$key"
-		descriptions="${descriptions:+${descriptions}, }$(
-			echo "${x#*$TAB}" |
-			sed "s/ *\$//g; s/^ /$debconf_select_lead/g; s/,/\\\\,/g; s/^ /\\\\ /")"
+		descriptions="${descriptions:+${descriptions}, }${x#*$TAB}"
 
 		# If the question was asked via ask_user, this allow preseeding
 		# by using the name of the plugin responsible for the answer.
