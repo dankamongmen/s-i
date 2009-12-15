@@ -8,6 +8,11 @@ partman-base (136) UNRELEASED; urgency=low
     - Call sed outside debconf_select's inner loop. In my benchmarks using
       two disks with eight partitions each, this reduces debconf_select's
       runtime on partman/choose_partition from 0.69 seconds to 0.07 seconds.
+    - Cache the output of partition_tree_choices for each disk, invalidating
+      the cache whenever we update a partition on the disk. In the above
+      benchmark, this saves on the order of half a second every time we
+      redisplay the partition tree when nothing has changed (e.g. on backing
+      up from a partition).
 
   [ Aurelien Jarno ]
   * [GNU/kFreeBSD] Add support for disk number > 10 and GPT naming scheme.
