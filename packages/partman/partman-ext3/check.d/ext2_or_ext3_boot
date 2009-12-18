@@ -60,6 +60,17 @@ if [ "$boot_fs" != ext2 ] && [ "$boot_fs" != ext3 ]; then
 fi
 
 # The boot file system has to be the first primary partition
+
+# ... but for now don't run the check if /boot is on RAID1.  Right now,
+# there's no good way to map a RAID device to its physical partition
+# and then run the checks on that partition (see #509799).
+if echo $boot_path | grep -q "^/dev/md"; then
+	raid=${boot_path#/dev/}
+	if grep "^$raid" /proc/mdstat | grep -q " raid1 "; then
+		exit 0
+	fi
+fi
+
 part_num=$(echo "$boot_path" | sed -e 's/.*[^0-9]\+//')
 if [ "$boot_type" != primary ] || [ "$part_num" -ne 1 ]; then
 	db_set partman/boot_not_first_partition true
