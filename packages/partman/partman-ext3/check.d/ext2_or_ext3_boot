@@ -1,6 +1,6 @@
 #!/bin/sh
-# Check that the boot partition is the 1st (primary) partition and that
-# it is of type ext2 or ext3.
+# Check that the boot partition is the 1st (primary) partition, that
+# it is of type ext2 or ext3, and that it is marked as bootable.
 
 machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//') || true
 case "$machine" in
@@ -32,10 +32,16 @@ for dev in $DEVICES/*; do
 			root_fs=$filesystem
 			root_type=$type
 			root_path=$path
+			if [ -f $id/bootable ]; then
+				root_bootable=yes
+			fi
 		elif [ "$mountpoint" = /boot ]; then
 			boot_fs=$filesystem
 			boot_type=$type
 			boot_path=$path
+			if [ -f $id/bootable ]; then
+				boot_bootable=yes
+			fi
 		fi
 	done
 	close_dialog
@@ -46,6 +52,7 @@ if [ -z "$boot_path" ]; then
 	boot_fs=$root_fs
 	boot_type=$root_type
 	boot_path=$root_path
+	boot_bootable=$root_bootable
 fi
 
 # We need an ext2 or ext3 filesystem to boot
@@ -77,6 +84,21 @@ if [ "$boot_type" != primary ] || [ "$part_num" -ne 1 ]; then
 	db_input critical partman/boot_not_first_partition || true
 	db_go || true
 	db_get partman/boot_not_first_partition
+	if [ "$RET" = true ]; then
+		exit 1
+	fi
+fi
+
+# Make sure that the boot partition is marked as bootable
+## Note: this won't work for RAID because the physical partition must be
+## marked bootable whereas we're checking the /boot partition (i.e. the
+## md partition on top of the physical partition).  However, there's
+## some code above that exists this script when /boot is on RAID1.
+if [ "$boot_bootable" != "yes" ]; then
+	db_set partman-ext3/boot_not_bootable true
+	db_input critical partman-ext3/boot_not_bootable || true
+	db_go || true
+	db_get partman-ext3/boot_not_bootable
 	if [ "$RET" = true ]; then
 		exit 1
 	fi
