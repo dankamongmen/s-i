@@ -17,6 +17,7 @@ bindir=$(DESTDIR)/bin/
 hpdir=$(DESTDIR)/etc/hotplug.d
 netdir=$(DESTDIR)/etc/network
 udevdir=$(DESTDIR)/etc/udev/rules.d
+udevlibdir=$(DESTDIR)/lib/udev
 didir=$(DESTDIR)/lib/debian-installer.d
 fidir=$(DESTDIR)/usr/lib/finish-install.d
 sharedir=$(DESTDIR)/usr/share/hw-detect/
@@ -46,6 +47,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) sysfs-update-devnames.sh $(bindir)/sysfs-update-devnames
 	$(INSTALL) -d $(udevdir)
 	$(INSTALL_DATA) net-hotplug.rules $(udevdir)/010_net-hotplug.rules
+	$(INSTALL) -d $(udevlibdir)
+	$(INSTALL) firmware.agent $(udevlibdir)
 	$(INSTALL) check-missing-firmware.sh $(bindir)/check-missing-firmware
 	$(INSTALL) -d $(postbaseinstallerdir)
 	$(INSTALL) hw-detect.post-base-installer.d/* $(postbaseinstallerdir)
