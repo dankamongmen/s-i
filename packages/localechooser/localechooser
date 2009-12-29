@@ -13,6 +13,7 @@ tpl_languagelist="localechooser/languagelist"
 tpl_shortlist="localechooser/shortlist"
 tpl_continentlist="localechooser/continentlist"
 tpl_countrylist="localechooser/countrylist"
+tpl_countrytxt="localechooser/text/country"
 tpl_supportedlocales="localechooser/supported-locales"
 tpl_preferredlocale="localechooser/preferred-locale"
 
@@ -280,6 +281,29 @@ has_choice() {
 	echo " $RET," | grep -q " $value,"
 }
 
+# Get translation of current selection in select list
+# Assumes untranslated values don't contain commas
+choice_trans() {
+	local RET template value list list_trans
+	template=$1
+	value=$2
+
+	# Use Choices-C to get the untranslated values
+	db_metaget $template Choices-C
+	list=$(echo $RET | sed 's/, */,/g')
+	db_metaget $template Choices
+	list_trans=$(echo $RET | sed 's/\\,/#%#/g; s/, */,/g')
+
+	while :; do
+		if [ "${list%%,*}" = "$value" ]; then
+			echo "${list_trans%%,*}" | sed 's/#%#/\\,/g'
+			break
+		fi
+		list=${list#*,}
+		list_trans=${list_trans#*,}
+	done
+}
+
 # Set defaults for continent based on country
 set_default_continent() {
 	local IFS RET country continents c continent
@@ -290,9 +314,9 @@ set_default_continent() {
 		return
 	fi
 
-	# Use Choices-en.UTF-8 to avoid getting translated values
-	db_metaget $tpl_continentlist Choices-en.UTF-8
-	continents=$(echo $RET | sed "s/, /,/g")
+	# Use Choices-C to get the untranslated values
+	db_metaget $tpl_continentlist Choices-C
+	continents=$(echo $RET | sed 's/, */,/g')
 
 	IFS=,
 	for continent in $continents; do
@@ -491,10 +515,10 @@ while :; do
 		db_set "$tpl_di_consoledisplay"  "$CONSOLE"
 		log "Set $tpl_di_consoledisplay = '$CONSOLE'"
 
-		db_metaget localechooser/text/country1 description
-		txt_country1=$RET
-		db_metaget localechooser/text/country2 description
-		txt_country2=$RET
+		db_metaget $tpl_countrytxt/1/country description
+		ctxt1=$RET
+		db_metaget $tpl_countrytxt/2 description
+		ctxt2=$RET
 
 		X_INSTALLATION_MEDIUM="$(lsb_extract X_INSTALLATION_MEDIUM)"
 		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
@@ -571,9 +595,9 @@ while :; do
 
 			db_fget $tpl_di_country seen
 			db_fset $tpl_shortlist seen $RET || true
-			db_subst $tpl_shortlist TXT1 "$txt_country1"
-			db_subst $tpl_shortlist TXT2 "$txt_country2"
-			db_metaget localechooser/text/country3-short description
+			db_subst $tpl_shortlist TXT1 "$ctxt1"
+			db_subst $tpl_shortlist TXT2 "$ctxt2"
+			db_metaget $tpl_countrytxt/3/shortlist description
 			db_subst $tpl_shortlist TXT3 "$RET"
 
 			# Set default value
@@ -654,6 +678,11 @@ while :; do
 			fi
 		fi
 
+		db_metaget $tpl_countrytxt/1/continent description
+		db_subst $tpl_continentlist TXT1 "$RET"
+		db_subst $tpl_continentlist TXT2 "$ctxt2"
+		db_metaget $tpl_countrytxt/3/continent description
+		db_subst $tpl_continentlist TXT3 "$RET"
 		db_input $continent_prio $tpl_continentlist || [ $? -eq 30 ]
 		;;
 
@@ -662,13 +691,15 @@ while :; do
 		continent_prio=$country_prio
 
 		db_get $tpl_continentlist
-		country_template="$tpl_countrylist/$(echo $RET | sed "s/ /_/g")"
+		continent=$RET
+		country_template="$tpl_countrylist/$(echo $continent | sed "s/ /_/g")"
 		db_fget $tpl_di_country seen
 		db_fset $country_template seen $RET || true
-		db_subst $country_template TXT1 "$txt_country1"
-		db_subst $country_template TXT2 "$txt_country2"
-		db_metaget localechooser/text/country3 description
-		db_subst $country_template TXT3 "$RET"
+		db_subst $country_template TXT1 "$ctxt1"
+		db_subst $country_template TXT2 "$ctxt2"
+		db_metaget $tpl_countrytxt/3/country description
+		db_subst $country_template TXT3 "$(printf "$RET" \
+				"$(choice_trans $tpl_continentlist "$continent")")"
 
 		if [ "$current_country" ] && \
 		   has_choice $country_template "$current_country"; then
