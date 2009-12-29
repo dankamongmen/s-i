@@ -9,6 +9,23 @@ log () {
 	logger -t check-missing-firmware "$@"
 }
 
+# Not all drivers register themselves if firmware is missing; in that
+# case determine the module via the device's modalias.
+get_module () {
+	local devpath=$1
+
+	if [ -d $devpath/driver ]; then
+		# The realpath of the destination of the driver/module
+		# symlink should be something like "/sys/module/e100"
+		basename $(realpath $devpath/driver/module) || true
+	elif [ -e $devpath/modalias ]; then
+		modalias="$(cat $devpath/modalias)"
+		# Take the last module returned by modprobe
+		modprobe --show-depends "$modalias" 2>/dev/null | \
+			sed -n -e '$s#^.*/\([^.]*\)\.ko.*$#\1#p'
+	fi
+}
+
 check_missing () {
 	# Give modules some time to request firmware.
 	sleep 1
@@ -28,10 +45,7 @@ check_missing () {
 				devpath="/sys$devpath"
 			fi
 
-			# The realpath of the destination of the
-			# driver/module symlink should be
-			# something like "/sys/module/e100"
-			module=$(basename $(realpath $devpath/driver/module)) || true
+			module=$(get_module "$devpath")
 			if [ -z "$module" ]; then
 				log "failed to determine module from $devpath"
 				continue
