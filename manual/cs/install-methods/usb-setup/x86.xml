@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 56442 -->
+<!-- original version: 61286 -->
 
    <sect3 arch="x86">
    <title>Rozdělení USB zařízení</title>
@@ -8,8 +8,12 @@
 Protože má většina USB klíčenek přednastavenou jednu velkou oblast
 typu FAT16, pravděpodobně nemusíte klíčenku přeformátovávat. Pokud to
 však musíte provést, použijte pro vytvoření této oblasti
-<command>cfdisk</command> nebo podobný nástroj pro dělení disku. Poté
-vytvořte souborový systém příkazem
+<command>cfdisk</command> nebo podobný nástroj pro dělení
+disku<footnote><para>
+
+Nezapomeňte oblasti nastavit <quote>zaváděcí</quote> příznak.
+
+</para></footnote>. Poté vytvořte souborový systém příkazem
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkdosfs /dev/<replaceable>sdX1</replaceable></userinput>
@@ -56,7 +60,7 @@ a nakopírujte na ni následující soubory:
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (jádro)
+<filename>vmlinuz</filename> nebo <filename>linux</filename> (jádro)
 
 </para></listitem>
 <listitem><para>
@@ -75,7 +79,9 @@ souborů (8.3).
 </para><para>
 
 Dále si vytvořte konfigurační soubor <filename>syslinux.cfg</filename>,
-který by měl obsahovat alespoň následující dva řádky:
+který by měl obsahovat alespoň následující dva řádky (pokud jste
+použili obraz <filename>netboot</filename>, změňte jméno souboru s
+jádrem na <quote><filename>linux</filename></quote>):
 
 <informalexample><screen>
 default vmlinuz
@@ -88,9 +94,14 @@ parametry <userinput>video=vesa:ywrap,mtrr vga=788</userinput>.
 </para><para>
 
 Pokud jste použili obraz <filename>hd-media</filename>, měli byste
-nyní na klíčenku nakopírovat ISO obraz s instalací &debian;u (použít
-můžete obrazy typu businesscard, netinst nebo, pokud se vejde, dokonce
-celé první CD) a následně USB klíčenku odpojit (<userinput>umount
+nyní na klíčenku nakopírovat ISO obraz s instalací &debian;u<footnote><para>
+
+Použít můžete obrazy typu businesscard, netinst nebo, pokud se vejde,
+dokonce celé první CD (viz část <xref linkend="official-cdrom"/>).
+Poznamenejme, že netboot obraz <filename>mini.iso</filename> není pro
+tento účel vhodný.
+
+</para></footnote> a následně USB klíčenku odpojit (<userinput>umount
 /mnt</userinput>).
 
 </para>

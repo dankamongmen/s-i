@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 60603 -->
+<!-- original version: 61896 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -566,6 +566,8 @@ nebo <literal>interface=eth0</literal>.
 <row><entry>auto</entry><entry>auto-install/enable</entry></row>
 <row><entry>classes</entry><entry>auto-install/classes</entry></row>
 <row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>language</entry><entry>debian-installer/language</entry></row>
+<row><entry>country</entry><entry>debian-installer/country</entry></row>
 <row><entry>locale</entry><entry>debian-installer/locale</entry></row>
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
@@ -759,9 +761,30 @@ Místní prostření (locale) slouží k současnému zadání jazyka
 i země. Například pomocí zaváděcího parametru jádra můžete zadat
 <userinput>locale=<replaceable>cs_CZ</replaceable></userinput>.
 
+</para><para>
+
+Tento způsob je velice jednoduchý, ale neumožňuje přednastavit všechny
+možné kombinace jazyka, země a místního prostředí<footnote><para>
+
+Například přednastavením <literal>locale</literal> na hodnotu
+<userinput>en_NL</userinput> by se jako výchozí locale pro instalovaný
+systém použilo <literal>en_US.UTF-8</literal>. Jestliže preferujete
+britský standard angličtiny (<literal>en_GB.UTF-8</literal>), musíte
+přednastavit jednotlivé proměnné.
+
+</para></footnote>. Volitelně tedy můžete přednastavit jednotlivé
+proměnné.
+
 <informalexample role="example"><screen>
-# Locale nastaví jazyk i zemi.
+# Přednastavením locale se automaticky nastaví jazyk, země a locale.
 d-i debian-installer/locale string cs_CZ
+
+# Pro větší pružnost je též možno nastavit hodnoty samostatně.
+#d-i debian-installer/language string en
+#d-i debian-installer/country string NL
+#d-i debian-installer/locale string en_GB.UTF-8
+# Volitelně můžete zadat další locale, která se mají vygenerovat.
+#d-i localechooser/supported-locales cs_CZ.UTF-8, en_US.UTF-8
 </screen></informalexample>
 
 Zadat můžete libovolnou kombinaci jazyka podporovaného v &d-i;
@@ -938,9 +961,9 @@ Parametr <classname>mirror/udeb/suite</classname> určuje verzi
 Debianu, ze které se stáhnou dodatečné komponenty instalačního
 systému. Nastavení této proměnné má smysl pouze v případě, že
 komponenty stahujete ze sítě a potřebujete, aby odpovídaly verzi
-initrd, který se používá pro instalaci.
-Výchozí hodnota <classname>mirror/udeb/suite</classname> je stejná
-jako <classname>mirror/suite</classname>.
+initrd, který se používá pro instalaci. Instalační systém obvykle
+zvolí správnou hodnotu, takže by neměl být důvod tuto proměnnou
+měnit.
 
 </para>
 
@@ -1188,6 +1211,11 @@ týkají instalace jádra.
 </para>
 
 <informalexample role="example"><screen>
+# Nastaví APT, aby implicitně neinstaloval doporučené balíky. Použití
+# této volby může znamenat instalaci nekompletního systému a měli by
+# ji používat pouze zkušení uživatelé.
+#d-i base-installer/install-recommends boolean false
+
 # Vybere generátor initramfs, kterým se vygeneruje initrd pro jádra
 # řady 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
@@ -1376,10 +1404,6 @@ můžete jednoduše použít i na příkazové řádce jádra.
 
 # Samostatné balíky pro instalaci.
 #d-i pkgsel/include string openssh-server build-essential
-# Ve výchozím nastavení nebudou u balíků instalovaných pomocí
-# pkgsel/include instalovány jejich doporučené balíky.
-# Chcete-li instalovat i doporučené balíky, odkomentujte následující:
-#d-i pkgsel/include/install-recommends boolean true
 # Zda se mají balíky po rozbalení debootstrapem aktualizovat.
 # Povolené hodnoty: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
