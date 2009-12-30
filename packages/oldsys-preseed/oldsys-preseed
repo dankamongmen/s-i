@@ -276,6 +276,9 @@ if [ "$NONINTERACTIVE" = "yes" ]; then
 	# there's no other way on some machines.
 	add "$FILE" "network-console/password" "password" "install"
 	add "$FILE" "network-console/password-again" "password" "install"
+	# Continue if there is missing firmware at ethdetect, and hope that
+	# it is not actually needed to get on the network.
+	add "$FILE" "ethdetect/prompt_missing_firmware" "boolean" "false"
 fi
 
 # Workaround for broken partconf
