@@ -71,14 +71,20 @@ check_missing () {
 	fi
 }
 
-first=1
+first_try=1
+first_ask=1
 ask_load_firmware () {
+	if [ "$first_try" ]; then
+		first_try=""
+		return 0
+	fi
+
 	db_subst hw-detect/load_firmware FILES "$files"
 	if ! db_input high hw-detect/load_firmware; then
-		if [ ! "$first" ]; then
+		if [ ! "$first_ask" ]; then
 			exit 1;
 		else
-			first=""
+			first_ask=""
 		fi
 	fi
 	if ! db_go; then
