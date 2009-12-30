@@ -5,6 +5,12 @@ set -e
 MISSING=/dev/.udev/firmware-missing
 DENIED=/tmp/missing-firmware-denied
 
+if [ "x$1" = "x-n" ]; then
+	NONINTERACTIVE=1
+else
+	NONINTERACTIVE=""
+fi
+
 log () {
 	logger -t check-missing-firmware "$@"
 }
@@ -77,6 +83,15 @@ ask_load_firmware () {
 	if [ "$first_try" ]; then
 		first_try=""
 		return 0
+	fi
+
+	if [ "$NONINTERACTIVE" ]; then
+		if [ ! "$first_ask" ]; then
+			return 1
+		else
+			first_ask=""
+			return 0
+		fi
 	fi
 
 	db_subst hw-detect/load_firmware FILES "$files"
