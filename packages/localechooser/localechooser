@@ -759,12 +759,21 @@ while :; do
 		db_settitle localechooser/title/locale
 
 		askedpreflocale=
-		if [ -z "$locale_preseeded" ] && [ "$use_lang" ] && \
-		   ! has_choice $tpl_shortlist $COUNTRYCODE; then
+		if [ -z "$locale_preseeded" ] && [ "$use_lang" ]; then
 			build_preferredlocale_choices $LANGUAGE $LOCALE
 
+			if has_choice $tpl_shortlist $COUNTRYCODE; then
+				preflocale_prio=medium
+				tpl_txt=localechooser/text/preferred-locale/multi
+			else
+				preflocale_prio=high
+				tpl_txt=localechooser/text/preferred-locale/none
+			fi
+			db_metaget $tpl_txt description
+			db_subst $tpl_preferredlocale TXT "$RET"
+
 			db_capb backup align
-			db_input high $tpl_preferredlocale || [ $? -eq 30 ]
+			db_input $preflocale_prio $tpl_preferredlocale || [ $? -eq 30 ]
 			askedpreflocale=1
 		fi
 		;;
