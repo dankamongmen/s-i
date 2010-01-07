@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 -->
+<!-- original version: 61286 -->
 
    <sect3 arch="x86">
    <!-- <title>Partitioning the USB stick</title> -->
@@ -20,16 +20,30 @@ partizione anziché l'intero dispositivo.
 Since most USB sticks come pre-configured with a single FAT16
 partition, you probably won't have to repartition or reformat the
 stick.  If you have to do that anyway, use <command>cfdisk</command>
-or any other partitioning tool to create a FAT16 partition, and then
-create the filesystem using:
+or any other partitioning tool to create a FAT16 partition<footnote>
 -->
 
 Poiché la maggior parte delle chiavette USB viene venduta con una singola
 partizione FAT16 già configurata, probabilmente non è necessario
 ripartizionare o riformattare la chiavetta. Per ripartizionare ugualmente
 la chiavetta usare <command>cfdisk</command> o un qualsiasi altro programma
-di partizionamento per creare una partizione FAT16 e poi crearci un
-filesystem usando:
+di partizionamento per creare una partizione FAT16<footnote>
+
+<para>
+
+<!--
+Don't forget to set the <quote>bootable</quote> bootable flag.
+-->
+
+Ricordarsi di attivare il flag <quote>bootable</quote>.
+
+</para>
+
+<!--
+</footnote>, and then create the filesystem using:
+-->
+
+</footnote> e poi crearci un filesystem usando:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -115,10 +129,10 @@ e copiare i seguenti file con l'immagine dell'installatore sulla chiavetta:
 <listitem><para>
 
 <!--
-<filename>vmlinuz</filename> (kernel binary)
+<filename>vmlinuz</filename> or <filename>linux</filename> (kernel binary)
 -->
 
-<filename>vmlinuz</filename> (kernel)
+<filename>vmlinuz</filename> o <filename>linux</filename> (kernel)
 
 </para></listitem>
 <listitem><para>
@@ -149,12 +163,16 @@ DOS (8.3).
 
 <!--
 Next you should create a <filename>syslinux.cfg</filename> configuration
-file, which at a bare minimum should contain the following two lines:
+file, which at a bare minimum should contain the following two lines (change
+the name of the kernel binary to <quote><filename>linux</filename></quote>
+if you used a <filename>netboot</filename> image):
 -->
 
 Poi è necessario creare il file di configurazione
-<filename>syslinux.cfg</filename>, che deve contenere almeno le seguenti
-due righe:
+<filename>syslinux.cfg</filename>, deve contenere almeno
+le due righe seguenti (modificare il nome del kernel in
+<quote><filename>linux</filename></quote> se si usa l'immagine
+<filename>netboot</filename>):
 
 <informalexample><screen>
 default vmlinuz
@@ -173,16 +191,36 @@ Per utilizzare l'installatore grafico si deve aggiungere
 
 <!--
 If you used an <filename>hd-media</filename> image, you should now copy a
-Debian ISO image (businesscard, netinst or full CD image; be sure to select
-one that fits) onto the stick. When you are done, unmount the USB memory
-stick (<userinput>umount /mnt</userinput>).
+Debian ISO image<footnote>
 -->
 
 Se si è utilizzato un'immagine <filename>hd-media</filename>, adesso si
-deve copiare un'immagine ISO Debian (businesscard, netinst o l'immagine
-di un CD completo; assicurarsi di sceglierne una che entra) sulla
-chiavetta. Una volta finita la copia, smontare la chiavetta USB
+deve copiare un'immagine ISO Debian<footnote>
+
+<para>
+
+<!--
+You can use either a businesscard, a netinst or a full CD image (see
+<xref linkend="official-cdrom"/>). Be sure to select one that fits.
+Note that the <quote>netboot <filename>mini.iso</filename></quote> image is
+not usable for this purpose.
+-->
+
+È possibile usare una qualsiasi tra le immagini businesscard, netinst o
+di un CD completo (vedere <xref linkend="official-cdrom"/>). Assicurarsi
+di sceglierne una che entra nella chiavetta. Notare che l'immagine
+<quote>netboot <filename>mini.iso</filename></quote> non può essere
+usata per questo scopo.
+
+</para>
+
+<!--
+</footnote> onto the stick. When you are done, unmount the USB memory stick
 (<userinput>umount /mnt</userinput>).
+-->
+
+</footnote> sulla chiavetta. Una volta finita la copia, smontare la
+chiavetta USB (<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

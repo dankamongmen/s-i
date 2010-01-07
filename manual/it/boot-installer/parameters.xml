@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 -->
+<!-- original version: 61314 -->
 
  <sect1 id="boot-parms">
  <!-- <title>Boot Parameters </title> -->
@@ -712,6 +712,59 @@ nuovamente l'avvio dal lettore CD dopo l'installazione iniziale.
 </varlistentry>
 
 <varlistentry>
+<term>base-installer/install-recommends (recommends)</term>
+<listitem><para>
+
+<!--
+When packages are installed using the package management system, it will
+by default also install packages that are recommended by those packages.
+Recommended packages are not strictly required for the core functionality
+of the selected software, but they do enhance that software and should,
+in the view of the package maintainers, normally be installed together
+with that software.
+-->
+
+Quando i pacchetti vengono installati usando il sistema di gestione dei
+pacchetti, con la configurazione predefinita, sono installati anche i
+pacchetti raccomandati. I pacchetti raccomandati non sono strettamente
+necessari per le funzionalità principali del programma scelto, bensì
+migliorano il programma e dovrebbero, almeno dal punto di vista dei
+manutentori dei pacchetti, essere installati insieme al programma.
+
+</para><para>
+
+<!--
+By setting this option to <userinput>false</userinput>, the package
+management system will be configured to not automatically install such
+<quote>Recommends</quote>, both during the installation and for the
+installed system.
+-->
+
+Impostando questa opzione a <userinput>false</userinput>, il sistema di
+gestione dei pacchetti verrà configurato per non installare automaticamente
+i <quote>Raccomandati</quote>, sia durante l'installazione che sul sistema
+finale.
+
+</para><para>
+
+<!--
+Note that this option allows to have a leaner system, but can also result
+in features being missing that you might normally expect to be available.
+You may have to manually install some of the recommended packages to
+obtain the full functionality you want. This option should therefore only
+be used by very experienced users.
+-->
+
+Notare che questa opzione permette di avere un sistema più snello, ma può
+comportare la perdita di alcune delle funzionalità che sono solitamente
+disponibili. Potrebbe essere necessario installare manualmente alcuni dei
+pacchetti raccomandati per avere tutte le funzionalità desiderate. Questa
+opzione dovrebbe essere usata solo dagli utenti molto esperti.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>debian-installer/allow_unauthenticated</term>
 <listitem><para>
 
@@ -888,6 +941,8 @@ seguono anche alcuni esempi.
 <variablelist>
 
 <varlistentry>
+<term>debian-installer/language (language)</term>
+<term>debian-installer/country (country)</term>
 <term>debian-installer/locale (locale)</term>
 <listitem><para>
 
@@ -898,10 +953,56 @@ For example, use <userinput>locale=de_CH</userinput> to select German as
 language and Switzerland as country.
 -->
 
-Può essere usato per impostare lingua e paese per l'installazione. Funziona
-solo se il <quote>locale</quote> specificato è supportato da Debian.
-Per esempio con <userinput>locale=de_CH</userinput> si imposta il tedesco
-come lingua e la Svizzera come paese.
+Può essere usato per impostare lingua e nazione per l'installazione.
+Funziona solo se il <quote>locale</quote> specificato è supportato da
+Debian. Per esempio con <userinput>locale=de_CH</userinput> si imposta
+il tedesco come lingua e la Svizzera come nazione.
+
+</para><para>
+
+<!--
+There are two ways to specify the language, country and locale to use for
+the installation and the installed system.
+-->
+
+Esistono due modi per specificare quali sono lingua, nazione e locale da
+usare per l'installazione e sul sistema installato.
+
+</para><para>
+
+<!--
+The first and easiest is to pass only the parameter <literal>locale</literal>.
+Language and country will then be derived from its value. You can for example
+use <userinput>locale=de_CH</userinput> to select German as language and
+Switzerland as country (<literal>de_CH.UTF-8</literal> will be set as default
+locale for the installed system). Limitation is that not all possible
+combinations of language, country and locale can be achieved this way.
+-->
+
+Il primo (più semplice) è passare solo il parametro
+<literal>locale</literal>. Lingua e nazione sono impostati a partire da
+questo valore. Per esempio è possibile usare
+<userinput>locale=de_CH</userinput> per scegliere il tedesco come lingua
+e la Svizzera come nazione (il locale predefinito sul sistema installato
+sarà <literal>de_CH.UTF-8</literal>). Questa modalità ha il limite che
+non sono possibili tutte le combinazioni di lingua, nazione e locale.
+
+</para><para>
+
+<!--
+The second, more flexible option is to specify <literal>language</literal>
+and <literal>country</literal> separately. In this case
+<literal>locale</literal> can optionally be added to specify a specific
+default locale for the installed system. Example:
+<userinput>language=en country=DE locale=en_GB.UTF-8</userinput>.
+-->
+
+Il secondo (più flessibile) è specificare separatamente i valori per
+<literal>language</literal> (lingua) e <literal>country</literal>
+(nazione). In questo caso è possibile aggiungere anche
+<literal>locale</literal> per indicare il locale predefinito sul sistema
+installato. Per esempio: <userinput>language=en country=DE
+locale=en_GB.UTF-8</userinput>.
 
 </para></listitem>
 </varlistentry>
