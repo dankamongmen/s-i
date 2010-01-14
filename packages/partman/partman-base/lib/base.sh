@@ -125,7 +125,7 @@ debconf_select () {
 	descriptions=""
 	# Use the hold space carefully here to allow us to make some
 	# substitutions on only the RHS (description).
-	choices="$(echo "$choices" | sed "h; s/.*$TAB//; s/ *\$//g; s/^ /$debconf_select_lead/g; s/,/\\\\,/g; s/^ /\\\\ /; x; s/$TAB.*//; G; s/\\n/$TAB/")"
+	choices="$(echo "$choices" | sed "h; s/.*$TAB//; s/ *\$//g; s/^ /$debconf_select_lead/g; s/,/\\\\,/g; s/^ /\\\\ /; x; s/$TAB.*//; G; s/\\n/$TAB/; s/^$TAB\$//")"
 	IFS="$NL"
 	for x in $choices; do
 		local key plugin
