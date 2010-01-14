@@ -3252,20 +3252,13 @@ sub flatten {
     my $key = $_[0];
     @vector = ();
     @quality = ();
+    my @real_group_table = ([-1, -1, -1, -1],
+			    [0, 0, 0, 0], # gr1 -> gr1 -> gr1 -> gr1
+			    [0, 1, 0, 1], # gr1 -> gr2 -> gr1 -> gr2
+			    [0, 1, 2, 0], # gr1 -> gr2 -> gr1 -> gr3
+			    [0, 1, 3, 2]);# gr1 -> gr2 -> gr3 -> gr4
     for my $group (0..3) {
-	my $real_group = $group;
-	if ($real_group == 3) {
-	    $real_group = 2;
-	} elsif ($real_group == 2) {
-	    $real_group = 3;
-	}
-	while ($real_group > $#{$symbols_table{$key}}) {
-	    if ($real_group >= 2) {
-		$real_group = $real_group - 2;
-	    } else {
-		$real_group = $real_group - 1;
-	    }
-	}
+	my $real_group = $real_group_table[1+$#{$symbols_table{$key}}][$group];
 	next if ($real_group < 0);
 	for my $level (0..3) {
 	    my $real_level = $level;

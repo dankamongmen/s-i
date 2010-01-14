@@ -10,9 +10,10 @@ The following topics are addressed:
 
      2) THE INPUT ON THE CONSOLE
    2.1) I cannot type any non-ASCII character.  How do I fix the keymap?
-   2.2) Where is the Dvorak keyboard?
-   2.3) Why the Backspace key doesn't work properly?
-   2.4) Why doesn't the CapsLock led work?
+   2.2) The layouts toggle wrong when three keyboard layouts are set!
+   2.3) Where is the Dvorak keyboard?
+   2.4) Why the Backspace key doesn't work properly?
+   2.5) Why doesn't the CapsLock led work?
 
 
 1) THE OUTPUT ON THE CONSOLE
@@ -178,7 +179,19 @@ The following topics are addressed:
       set output-meta on
 
 
-2.2) Where is the Dvorak keyboard?
+2.2) The layouts toggle wrong when three keyboard layouts are set!
+
+   Unfortunately it is impossible to implement three-layouts toggle on
+   the console.  Because of this console-setup toggle them in the
+   following order Layout 1->Layout 2->Layout 1->Layout 3.  If you
+   want different order, then use four-layout configuration.  For
+   example if you use XKBLAYOUT=rs,rs,us,rs and XKBVARIANT=latin,,,
+   the layouts will be toggled in the following order:
+
+       Serbian Latin -> Serbian Cyrillic -> US -> Serbian Cyrillic
+
+
+2.3) Where is the Dvorak keyboard?
 
    The Dvorak layouts are variants of the national layouts.  For
    example if you want to use the Norwegian variant of the Dvorak
@@ -190,7 +203,7 @@ The following topics are addressed:
    in /etc/default/console-setup.
 
 
-2.3) Why the Backspace key doesn't work properly?
+2.4) Why doesn't the Backspace key work properly?
 
    When the console is in UTF-8 mode, then the Backspace doesn't work
    properly for the non-ASCII symbols.  This is a bug in the kernel.
@@ -200,7 +213,7 @@ The following topics are addressed:
 	  1:2345:respawn:/sbin/getty -8 38400 tty1
 
 
-2.4) Why doesn't the CapsLock led work?
+2.5) Why doesn't the CapsLock led work?
 
    This happens if your working encoding is UTF-8.  Unfortunately due
    to bugs in the kernel and possibly in loadkeys also, when the
