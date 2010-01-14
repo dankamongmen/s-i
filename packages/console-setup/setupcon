@@ -179,8 +179,8 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
     if [ -z "$FONT" ]; then
 	FONT_MAP=''
 	if which ckbcomp-mini >/dev/null; then
-	    FONT=$(echo `ls /usr/share/consolefonts/$CODESET-*.psf \
-                2>/dev/null`)
+	    FONT=$(echo `ls /usr/share/consolefonts/$CODESET-*.psf* \
+		            /etc/console-setup/$CODESET-*.psf* 2>/dev/null`)
 	    FONT=${FONT%% *}
 	elif [ "$FONTFACE" ] && [ "$FONTSIZE" ]; then
 	    FONT="$CODESET-$FONTFACE$FONTSIZE.psf.gz"
@@ -357,63 +357,58 @@ if [ "$font_only" != yes -a "$XKBMODEL" != unknown ]; then
     fi
     
     if which loadkeys >/dev/null; then
-	if which ckbcomp >/dev/null; then
-	    if [ "$CHARMAP" != UTF-8 ]; then
-		acm_option="-charmap $CHARMAP"
-	    else
-		acm_option=''
-	    fi
-
-	    if [ "$XKBRULES" ]; then
-		rules_option="-rules $XKBRULES"
-	    else
-		rules_option=''
-	    fi
-
+	if [ "$CHARMAP" != UTF-8 ]; then
+	    acm_option="-charmap $CHARMAP"
+	else
+	    acm_option=''
+	fi
+	
+	if [ "$XKBRULES" ]; then
+	    rules_option="-rules $XKBRULES"
+	else
+	    rules_option=''
+	fi
+	
+	if \
+	    [ "$VARIANT" = '' ] \
+	    && which gzip >/dev/null \
+	    && [ -d /usr/share/X11/xkb ] # /usr is mounted
+	then
 	    if \
-		[ "$VARIANT" = '' ] \
-		&& which gzip >/dev/null \
-		&& [ -d /usr/share/X11/xkb ] # /usr is mounted
+		[ ! -f /etc/console-setup/cached.kmap.gz ] \
+		|| [ /etc/console-setup/cached.kmap.gz \
+		     -ot /etc/default/keyboard ] \
+		|| [ "$save" = yes ]
 	    then
+		ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
+		    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
+		    | gzip -9 >/etc/console-setup/cached.kmap.gz 2>/dev/null
+		    # avoid warnings when /etc is mounted read-only
+	    fi
+	fi
+	
+	if [ "$save_only" != yes ]; then
+	    if [ "$KMAP" -a -f "$KMAP" ]; then
+		eval loadkeys "$KMAP" $verbose
+	    else		    
 		if \
-		    [ ! -f /etc/console-setup/cached.kmap.gz ] \
-		    || [ /etc/console-setup/cached.kmap.gz \
+		    [ "$VARIANT" = '' ] && [ "$CONFIG" != "$USER_CONFIG" ] \
+		    && [ -f /etc/console-setup/cached.kmap.gz ] \
+		    && [ ! /etc/console-setup/cached.kmap.gz \
 		           -ot /etc/default/keyboard ]
 		then
-		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
-			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
-			| gzip -9 >/etc/console-setup/cached.kmap.gz 2>/dev/null
-		        # avoid warnings when /etc is mounted read-only
-		fi
-	    fi
-
-	    if [ "$save_only" != yes ]; then
-		if [ "$KMAP" -a -f "$KMAP" ]; then
-		    eval loadkeys "$KMAP" $verbose
-		else		    
-		    if \
-			[ "$VARIANT" = '' ] && [ "$CONFIG" != "$USER_CONFIG" ] \
-			&& [ -f /etc/console-setup/cached.kmap.gz ] \
-			&& [ ! /etc/console-setup/cached.kmap.gz \
-		        -ot /etc/default/keyboard ]
-		    then
-			eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
-		    else
-			ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
+		    eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
+		else
+		    if [ -d /usr/share/X11/xkb ]; then
+			ckbcomp $acm_option $rules_option \
+			    -model "$XKBMODEL" \
 			    "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
 			    | eval loadkeys $verbose
+		    elif [ -f /etc/console-setup/cached.kmap.gz ]; then
+			eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
 		    fi
 		fi
-		if which gzip >/dev/null && [ "$save" = yes ]; then
-		    ckbcomp $acm_option $rules_option -model "$XKBMODEL" \
-			"$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS" \
-			| gzip -9 >/etc/console-setup/cached.kmap.gz
-		fi
-	    elif [ "$save_only" != yes ] && \
-		[ -f /etc/console-setup/cached.kmap.gz ]; then
-		eval loadkeys /etc/console-setup/cached.kmap.gz $verbose
 	    fi
 	fi
     fi
 fi
-
