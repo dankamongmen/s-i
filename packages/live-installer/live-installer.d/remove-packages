@@ -1,8 +1,15 @@
 #!/bin/sh -e
 
-in-target apt-get --yes remove --purge live-initramfs
-if [ -f /target/var/lib/dpkg/live-initscripts.list ]; then
-	in-target apt-get --yes remove --purge live-initscripts
+if [ -d /cdrom/casper ]; then
+	# casper
+	in-target apt-get --yes remove --purge casper
+	in-target update-initramfs -k all -u
+else
+	# live-initramfs
+	in-target apt-get --yes remove --purge live-initramfs
+	if [ -f /target/var/lib/dpkg/live-sysvinit.list ]; then
+		in-target apt-get --yes remove --purge live-sysvinit
+	fi
 fi
 
 in-target apt-get --yes autoremove
