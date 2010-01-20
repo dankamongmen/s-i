@@ -881,8 +881,7 @@ humandev () {
 			case "$1" in
 			    /dev/mapper/$frdisk)
 				type=sataraid
-				superset=${device%_*}
-				desc=$(dmraid -s -c -c "$superset")
+				desc=$(dmraid -s -c -c "$device")
 				rtype=$(echo "$desc" | cut -d: -f4)
 				db_metaget partman/text/dmraid_volume description
 				printf "$RET" $device $rtype
