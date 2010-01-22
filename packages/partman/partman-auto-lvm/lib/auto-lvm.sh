@@ -10,11 +10,11 @@ bail_out() {
 	exit 1
 }
 
-# Add a partition to hold a Physical Volume to the given receipe
+# Add a partition to hold a Physical Volume to the given recipe
 # (Need $method in scope.)
 add_envelope() {
 	local scheme="$1"
-	echo "$scheme${NL}100 1000 -1 ext3 \$primary{ } method{ $method }"
+	echo "$scheme${NL}100 1000 -1 ext3 method{ $method }"
 }
 
 # Create the partitions needed by a recipe to hold all PVs
