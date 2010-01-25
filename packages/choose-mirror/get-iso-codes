@@ -15,6 +15,12 @@ for i in $(find /usr/share/locale/ -name iso_3166.mo) ; do
 	msgunfmt $i >debian/iso-codes/${language}.po 2>/dev/null
 done
 
+# If no iso-codes translation is available for se, then use nb instead
+if [ ! -f debian/iso-codes/se.po ] && [ -f debian/iso-codes/nb.po ]; then
+	cp debian/iso-codes/nb.po debian/iso-codes/se.po
+fi
+
+# Create "translation" for English
 DATE="$(date +'%Y-%m-%d %H:%M%z')"
 cat <<EOF >debian/iso-codes/en.po
 msgid ""
