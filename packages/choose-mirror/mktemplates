@@ -21,9 +21,7 @@ country_names() {
 	local code name
 	for code in $(xargs < $list); do
 		# Ensure commas in country names are escaped
-		name="$(cat debian/iso_3166.tab | \
-			sed -n -r "/^$code[[:space:]]/ s/^[^[:space:]]+[[:space:]]+//p" | \
-			sed 's/,/\\\\,/g')"
+		name="$(perl -ne 's/,/\\\\,/g; if (/^'$code'\t(.*)/) { print "$1"; }' debian/iso_3166.tab)"
 		if [ "$name" ]; then
 			echo -n ", $name"
 		else
