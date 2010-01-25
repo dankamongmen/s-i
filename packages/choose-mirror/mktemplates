@@ -37,28 +37,55 @@ printf "Insert the lists of choices into the templates file..."
 		echo
 	done
 ) | debian/templates-build.pl "$DEB_HOST_ARCH" | \
-    perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /(?:enter information manually|manual)$/ && length "'"$HTTPCHOICES"'") { s/$/, '"$HTTPCHOICES"'/; $http = 0; }' | \
-    perl -pe 'if (m,ftp/countries$,)  { $ftp  = 1; } elsif ($ftp  and /(?:enter information manually|manual)$/ && length "'"$FTPCHOICES"'") { s/$/, '"$FTPCHOICES"'/;  $ftp  = 0; }' | \
+    perl -pe 'if (m,http/countries$,) { $found = 1; } elsif ($found and /(?:enter information manually|manual)$/ && length "'"$HTTPCHOICES"'") { s/$/, '"$HTTPCHOICES"'/; $found = 0 if (m,^_Choices:,); }' | \
+    perl -pe 'if (m,ftp/countries$,) { $found = 1; } elsif ($found and /(?:enter information manually|manual)$/ && length "'"$FTPCHOICES"'") { s/$/, '"$FTPCHOICES"'/;  $found = 0 if (m,^_Choices:,); }' | \
     sed "/^_Choices: enter/s/_Choices:/__Choices:/g" \
     >debian/templates.tmp
 printf " Done.\n"
 
-# Create a temporary "pobuild" directory
-rm -rf debian/pobuild >/dev/null 2>&1
-mkdir debian/pobuild
+# Create temporary "pobuild" directories
+rm -rf debian/pobuild* >/dev/null 2>&1
+mkdir debian/pobuild.en debian/pobuild
 
 # Create the appropriate POTFILES.in file there
-cat >debian/pobuild/POTFILES.in <<EOF
+cat >debian/pobuild.en/POTFILES.in <<EOF
 [type: gettext/rfc822deb] templates.tmp
+EOF
+cat >debian/pobuild/POTFILES.in <<EOF
+[type: gettext/rfc822deb] templates2.tmp
 EOF
 
 # Create the appropriate output file also
+cat >debian/pobuild.en/output <<EOF
+2   utf8
+EOF
 cat >debian/pobuild/output <<EOF
 2   utf8
 EOF
 
-# Run debconf-updatepo on this directory
-# -->this will create pobuild/templates.pot
+# Run debconf-updatepo to create pobuild.en/templates.pot
+debconf-updatepo --podir debian/pobuild.en
+
+printf "Add English country names to country selection templates..."
+./map-cc < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild.en/en.po
+msgmerge -U debian/pobuild.en/en.po debian/pobuild.en/templates.pot 2>/dev/null
+printf " Done.\n"
+
+PODEBCONF_LIB=. po2debconf --podir debian/pobuild.en debian/templates.tmp \
+    >debian/pobuild.en/templates.tmp
+
+# Replace the Choices: field in debian/templates.tmp with the "translated"
+# Choices-en.UTF-8 field from debian/pobuild.en/templates.tmp; ensure we preserve
+# escaped commas
+EN_HTTP="$(perl -ne 'if (m,http/countries$,) { $found = 1; } elsif ($found and /^Choices-en.UTF-8:/) { s/^Choices.*: //; s/\\,/\\\\,/g; print; $found = 0; }' debian/pobuild.en/templates.tmp)"
+EN_FTP="$(perl -ne 'if (m,ftp/countries$,) { $found = 1; } elsif ($http and /^Choices-en.UTF-8:/) { s/^Choices.*: //; s/\\,/\\\\,/g; print; $found = 0; }' debian/pobuild.en/templates.tmp)"
+
+cat debian/templates.tmp | \
+    perl -pe 'if (m,http/countries$,) { $found = 1; } elsif ($found and /Choices:/ && length "'"$EN_HTTP"'") { s/: .*$/: '"$EN_HTTP"'/; $found = 0; }' | \
+    perl -pe 'if (m,ftp/countries$,) { $found = 1; } elsif ($found and /Choices:/ && length "'"$EN_FTP"'") { s/: .*$/: '"$EN_FTP"'/; $found = 0; }' \
+    >debian/templates2.tmp
+
+# Now run debconf-updatepo to create pobuild/templates.pot
 debconf-updatepo --podir debian/pobuild
 
 printf "Include country names translations into the templates file:\n"
@@ -68,52 +95,35 @@ for pofile in debian/po/*.po ; do
     pofilename=`basename $pofile`
     langname=`basename $pofilename .po`
     printf "  $langname..."
-    # If the country names are translated, we need to merge
-    # the translation with the templates translations
-    if [ -f $ISO3166TRANSLATIONS/$pofilename ]
-    then
-	# Output is verbose, don't worry
-	# Convert translations to UTF-8, and map country names to country
-	# codes in iso-codes translations
-	msgconv -t UTF-8 debian/po/$pofilename \
-		> debian/pobuild/$pofilename.other
+
+    cp $pofile debian/pobuild/$pofilename.d-i
+    # update with generated templates.pot
+    msgmerge -U debian/pobuild/$pofilename.d-i \
+		debian/pobuild/templates.pot 2>/dev/null
+    if [ -f $ISO3166TRANSLATIONS/$pofilename ]; then
+        # ensure iso-codes translations are in UTF-8
 	msgconv -t UTF-8 "$ISO3166TRANSLATIONS/$pofilename" \
-		| ./map-cc \
 		> debian/pobuild/$pofilename.iso-codes
-	# Update other template translations with templates.pot
-	msgmerge -U debian/pobuild/$pofilename.other \
-		    debian/pobuild/templates.pot 2>/dev/null
         # merge with iso-codes translations
-	msgmerge    debian/pobuild/$pofilename.iso-codes \
-		    debian/pobuild/$pofilename.other \
-		       > debian/pobuild/$pofilename 2>/dev/null
+	msgmerge debian/pobuild/$pofilename.iso-codes \
+		 debian/pobuild/$pofilename.d-i \
+		 > debian/pobuild/$pofilename 2>/dev/null
         # clean out the generated file
 	msgmerge -U debian/pobuild/$pofilename \
 		    debian/pobuild/templates.pot 2>/dev/null
-    # Else we just use what's translated
     else
-	cp $pofile debian/pobuild/$pofilename && true
+	cp debian/pobuild/$pofilename.d-i debian/pobuild/$pofilename
     fi
-    printf "Done.\n"
+    printf " done\n"
 done
 
-if [ ! -f debian/po/en.po ]; then
-    printf "  en..."
-    ./map-cc < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild/en.po
-    msgmerge -U debian/pobuild/en.po debian/pobuild/templates.pot 2>/dev/null
-    printf "Done.\n"
-fi
-
-# and now we generate the templates file from all this; confusingly, we
-# have to set the untranslated Choices to say "manual" here rather than
-# elsewhere in order to avoid breaking translations
-PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp |
-    perl -pe 'if (m,http/countries$,) { $http = 1; } elsif ($http and /^Choices:/) { s/^Choices: enter information manually/Choices: manual/; $http = 0; }' | \
-    perl -pe 'if (m,ftp/countries$,)  { $ftp = 1; }  elsif ($ftp  and /^Choices:/) { s/^Choices: enter information manually/Choices: manual/; $ftp = 0;  }' \
+# and now we generate the templates file from all this
+PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates2.tmp | \
+    sed "s/\[ Default value for .*\]//" \
     >debian/choose-mirror-bin.templates
 
 # give the new templates file the same mtime as the input file, so that
 # po2debconf doesn't decide that it needs to run debconf-updatepo
 touch -mr debian/choose-mirror-bin.templates-in debian/choose-mirror-bin.templates
 
-rm -f debian/templates.tmp
+rm -f debian/templates.tmp debian/templates2.tmp
