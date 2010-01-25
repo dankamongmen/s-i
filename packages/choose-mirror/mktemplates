@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
 # Script for generating a debconf templates file from both files
 # in debian/po/*.po and country names translations from the
 # iso-codes package
+
+TEMPLATES="$@"
 
 # Translations location (relative to the build root directory)
 ISO3166TRANSLATIONS=debian/iso-codes
@@ -13,79 +15,64 @@ if [ -z "$DEB_HOST_ARCH" ]; then
     DEB_HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
 fi
 
+# Get the English names for the country codes in the list
+country_names() {
+	local list=$1
+	local code name
+	for code in $(xargs < $list); do
+		# Ensure commas in country names are escaped
+		name="$(cat debian/iso_3166.tab | \
+			sed -n -r "/^$code[[:space:]]/ s/^[^[:space:]]+[[:space:]]+//p" | \
+			sed 's/,/\\\\,/g')"
+		if [ "$name" ]; then
+			echo -n ", $name"
+		else
+			echo "Warning: no country name found for '$code'" >&2
+			echo -n ", $code"
+		fi
+	done
+}
+
 # Get the ordered list of countries from the iso_3166.xml, sorted
 # according to the regionmap.
-#
-# We need to escape commas by preceding them with a backslash.
-HTTPCODECHOICES=`cat debian/httplist-countries`
-FTPCODECHOICES=`cat debian/ftplist-countries`
 
 printf "Creating the list of countries for HTTP mirrors..."
-HTTPCHOICES="$(xargs < debian/httplist-countries | sed 's/ /, /g')"
+HTTPCODECHOICES="$(xargs < debian/httplist-countries | sed 's/ /, /g')"
+HTTPCHOICES="$(country_names debian/httplist-countries)"
 printf " Done.\n"
 
 printf "Creating the list of countries for FTP mirrors..."
-FTPCHOICES="$(xargs < debian/ftplist-countries | sed 's/ /, /g')"
+FTPCODECHOICES="$(xargs < debian/ftplist-countries | sed 's/ /, /g')"
+FTPCHOICES="$(country_names debian/ftplist-countries)"
 printf " Done.\n"
 
 printf "Insert the lists of choices into the templates file..."
-# Now put this list as the choices in the templates
-# and defined this field as translatable (__Choices hack)
 (
-	for t in $@; do
+	for t in $TEMPLATES; do
 		cat $t
 		echo
 	done
 ) | debian/templates-build.pl "$DEB_HOST_ARCH" | \
-    perl -pe 'if (m,http/countries$,) { $found = 1; } elsif ($found and /(?:enter information manually|manual)$/ && length "'"$HTTPCHOICES"'") { s/$/, '"$HTTPCHOICES"'/; $found = 0 if (m,^_Choices:,); }' | \
-    perl -pe 'if (m,ftp/countries$,) { $found = 1; } elsif ($found and /(?:enter information manually|manual)$/ && length "'"$FTPCHOICES"'") { s/$/, '"$FTPCHOICES"'/;  $found = 0 if (m,^_Choices:,); }' | \
-    sed "/^_Choices: enter/s/_Choices:/__Choices:/g" \
+    perl -pe 'if (m,http/countries$,) { $found = 2; } elsif ($found and /^Choices-C:/ && length "'"$HTTPCODECHOICES"'") { s/$/, '"$HTTPCODECHOICES"'/; $found -= 1; }  elsif ($found and /^__Choices:/ && length "'"$HTTPCHOICES"'") { s/$/'"$HTTPCHOICES"'/; $found -= 1; }' | \
+    perl -pe 'if (m,ftp/countries$,) { $found = 2; } elsif ($found and /^Choices-C:/ && length "'"$FTPCODECHOICES"'") { s/$/, '"$FTPCODECHOICES"'/;  $found -= 1; } elsif ($found and /^__Choices:/ && length "'"$FTPCHOICES"'") { s/$/'"$FTPCHOICES"'/;  $found -= 1; }' \
     >debian/templates.tmp
 printf " Done.\n"
 
 # Create temporary "pobuild" directories
 rm -rf debian/pobuild* >/dev/null 2>&1
-mkdir debian/pobuild.en debian/pobuild
+mkdir debian/pobuild
 
 # Create the appropriate POTFILES.in file there
-cat >debian/pobuild.en/POTFILES.in <<EOF
-[type: gettext/rfc822deb] templates.tmp
-EOF
 cat >debian/pobuild/POTFILES.in <<EOF
-[type: gettext/rfc822deb] templates2.tmp
+[type: gettext/rfc822deb] templates.tmp
 EOF
 
 # Create the appropriate output file also
-cat >debian/pobuild.en/output <<EOF
-2   utf8
-EOF
 cat >debian/pobuild/output <<EOF
 2   utf8
 EOF
 
-# Run debconf-updatepo to create pobuild.en/templates.pot
-debconf-updatepo --podir debian/pobuild.en
-
-printf "Add English country names to country selection templates..."
-./map-cc < "$ISO3166TRANSLATIONS/en.po" > debian/pobuild.en/en.po
-msgmerge -U debian/pobuild.en/en.po debian/pobuild.en/templates.pot 2>/dev/null
-printf " Done.\n"
-
-PODEBCONF_LIB=. po2debconf --podir debian/pobuild.en debian/templates.tmp \
-    >debian/pobuild.en/templates.tmp
-
-# Replace the Choices: field in debian/templates.tmp with the "translated"
-# Choices-en.UTF-8 field from debian/pobuild.en/templates.tmp; ensure we preserve
-# escaped commas
-EN_HTTP="$(perl -ne 'if (m,http/countries$,) { $found = 1; } elsif ($found and /^Choices-en.UTF-8:/) { s/^Choices.*: //; s/\\,/\\\\,/g; print; $found = 0; }' debian/pobuild.en/templates.tmp)"
-EN_FTP="$(perl -ne 'if (m,ftp/countries$,) { $found = 1; } elsif ($http and /^Choices-en.UTF-8:/) { s/^Choices.*: //; s/\\,/\\\\,/g; print; $found = 0; }' debian/pobuild.en/templates.tmp)"
-
-cat debian/templates.tmp | \
-    perl -pe 'if (m,http/countries$,) { $found = 1; } elsif ($found and /Choices:/ && length "'"$EN_HTTP"'") { s/: .*$/: '"$EN_HTTP"'/; $found = 0; }' | \
-    perl -pe 'if (m,ftp/countries$,) { $found = 1; } elsif ($found and /Choices:/ && length "'"$EN_FTP"'") { s/: .*$/: '"$EN_FTP"'/; $found = 0; }' \
-    >debian/templates2.tmp
-
-# Now run debconf-updatepo to create pobuild/templates.pot
+# Run debconf-updatepo to create pobuild/templates.pot
 debconf-updatepo --podir debian/pobuild
 
 printf "Include country names translations into the templates file:\n"
@@ -118,7 +105,7 @@ for pofile in debian/po/*.po ; do
 done
 
 # and now we generate the templates file from all this
-PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates2.tmp | \
+PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates.tmp | \
     sed "s/\[ Default value for .*\]//" \
     >debian/choose-mirror-bin.templates
 
@@ -126,4 +113,4 @@ PODEBCONF_LIB=. po2debconf --podir debian/pobuild debian/templates2.tmp | \
 # po2debconf doesn't decide that it needs to run debconf-updatepo
 touch -mr debian/choose-mirror-bin.templates-in debian/choose-mirror-bin.templates
 
-rm -f debian/templates.tmp debian/templates2.tmp
+rm -f debian/templates.tmp
