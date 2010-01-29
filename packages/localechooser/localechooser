@@ -515,11 +515,6 @@ while :; do
 		db_set "$tpl_di_consoledisplay"  "$CONSOLE"
 		log "Set $tpl_di_consoledisplay = '$CONSOLE'"
 
-		db_metaget $tpl_countrytxt/1/country description
-		ctxt1=$RET
-		db_metaget $tpl_countrytxt/2 description
-		ctxt2=$RET
-
 		X_INSTALLATION_MEDIUM="$(lsb_extract X_INSTALLATION_MEDIUM)"
 		if [ "$sel_language" ] && [ $LANGUAGE != en ] && \
 		   [ "$X_INSTALLATION_MEDIUM" = "floppy" ]; then
@@ -572,6 +567,11 @@ while :; do
 				use_lang=$LANGUAGE
 			fi
 		fi
+
+		db_metaget $tpl_countrytxt/1/country description
+		ctxt1=$RET
+		db_metaget $tpl_countrytxt/2 description
+		ctxt2=$RET
 
 		shortlist_prio=critical
 		continent_prio=critical
