@@ -472,7 +472,11 @@ fi
 # Install udev into target
 apt-install udev || true
 
-# Install usbutils
+# Install pciutils/usbutils
+if [ -d /sys/bus/pci ]; then
+	apt-install pciutils || true
+fi
+
 if [ -d /sys/bus/usb ]; then
 	apt-install usbutils || true
 fi
