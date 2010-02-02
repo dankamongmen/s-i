@@ -114,6 +114,7 @@ if [ -e /cdrom/.disk/base_installable ]; then
 	while true; do
 		CODE=0
 		choose-mirror -n || CODE=$?	# no progress bar
+		db_capb backup progresscancel
 		if [ $CODE -eq 0 ]; then
 			break
 		elif [ $CODE -eq 10 ]; then
@@ -226,6 +227,7 @@ while [ ! "$done" ]; do
 		db_get apt-setup/mirror/error
 		if [ "$RET" = "Change mirror" ]; then
 			choose-mirror -n || true
+			db_capb backup progresscancel
 		elif [ "$RET" = Ignore ]; then
 			exit 1
 		fi
