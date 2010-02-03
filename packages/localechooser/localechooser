@@ -466,6 +466,10 @@ STATE=10
 LASTSTATE=0
 while :; do
 	case $STATE in
+	    0)	# Back up to menu
+		exit 10
+		;;
+
 	   10)	# Display language list
 		db_settitle localechooser/title/language
 
@@ -842,8 +846,13 @@ while :; do
 		fi
 		;;
 
-	    *)
+	   34)	# All done
 		break
+		;;
+
+	    *)
+		error "undefined STATE '$STATE'"
+		exit 1
 		;;
 	esac
 
@@ -860,9 +869,5 @@ while :; do
 	fi
 	db_capb backup
 done
-
-if [ $STATE -eq 0 ]; then
-	exit 10 # back out to main menu
-fi
 
 exit 0
