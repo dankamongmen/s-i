@@ -2,6 +2,8 @@
 . /usr/share/debconf/confmodule
 set -e
 
+ARCH=$(udpkg --print-architecture)
+
 ISO_COUNT=0
 ISO_MOUNT_COUNT=0
 MOUNTABLE_DEVS_COUNT=0
@@ -32,9 +34,8 @@ register_cd () {
 	# Prefer the suite in default-release.
 	for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
 		relfile=/cdrom/dists/$dir/Release
-		if [ -e $relfile ] &&
-		   egrep -q 'Architectures:.* '$(udpkg --print-architecture)'( |$)' $relfile
-	   	then
+		if [ -e $relfile ] && \
+		   egrep -q "Architectures:.* $ARCH( |$)" $relfile; then
 			suite=$(sed -n 's/^Suite: *//p' $relfile)
 			codename=$(sed -n 's/^Codename: *//p' $relfile)
 			log "Detected ISO with '$suite' ($codename) distribution"
