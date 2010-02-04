@@ -658,7 +658,9 @@ is_multipath_part () {
 
 # TODO: this should not be global
 humandev () {
-    local host bus target part lun idenum targtype scsinum linux wwid
+    local device disc drive host bus target part line controller lun
+    local idenum scsinum targtype linux kfreebsd mapping vglv vg lv wwid
+    local dev discipline frdisk type rtype desc n
     case "$1" in
 	/dev/ide/host*/bus[01]/target[01]/lun0/disc)
 	    host=`echo $1 | sed 's,/dev/ide/host\(.*\)/bus.*/target[01]/lun0/disc,\1,'`
@@ -754,7 +756,7 @@ humandev () {
 	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part} ${linux}
 	    ;;
 	/dev/sd[a-z]|/dev/sd[a-z][a-z])
-	    disk="${1#/dev/}"
+	    disc="${1#/dev/}"
 	    if [ -h "/sys/block/$disk/device" ]; then
 		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
 		host="${bus_id%%:*}"
@@ -775,7 +777,7 @@ humandev () {
 	    ;;
 	/dev/sd[a-z][0-9]*|/dev/sd[a-z][a-z][0-9]*)
 	    part="${1#/dev/}"
-	    disk="${part%%[0-9]*}"
+	    disc="${part%%[0-9]*}"
 	    part="${part#$disk}"
 	    if [ -h "/sys/block/$disk/device" ]; then
 		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
@@ -935,13 +937,13 @@ humandev () {
 	# DASD partition, classic
 	/dev/dasd*[0-9]*)
 	    part="${1#/dev/}"
-	    disk="${part%%[0-9]*}"
+	    disc="${part%%[0-9]*}"
 	    part="${part#$disk}"
 	    humandev_dasd_partition /sys/block/$disk/$(readlink /sys/block/$disk/device) $part
 	    ;;
 	# DASD disk, classic
 	/dev/dasd*)
-	    disk="${1#/dev/}"
+	    disc="${1#/dev/}"
 	    humandev_dasd_disk /sys/block/$disk/$(readlink /sys/block/$disk/device)
 	    ;;
 	/dev/*vd[a-z])
@@ -962,7 +964,7 @@ humandev () {
 	/dev/ad[0-9]*[sp][0-9]*)
 	    drive=$(echo $1 | sed 's,/dev/ad\([0-9]\+\).*,\1,')
 	    drive=$(($drive + 1))
-	    partition=$(echo $1 | sed 's,/dev/ad[0-9]\+[sp]\([0-9]\+\).*,\1,')
+	    part=$(echo $1 | sed 's,/dev/ad[0-9]\+[sp]\([0-9]\+\).*,\1,')
 	    kfreebsd=${1#/dev/}
 	    db_metaget partman/text/ata_partition description
 	    printf "$RET" "$drive" "$part" "$kfreebsd"
@@ -977,7 +979,7 @@ humandev () {
 	/dev/da[0-9]*[sp][0-9]*)
 	    drive=$(echo $1 | sed 's,/dev/da\([0-9]\+\).*,\1,')
 	    drive=$(($drive + 1))
-	    partition=$(echo $1 | sed 's,/dev/da[0-9]\+[sp]\([0-9]\+\).*,\1,')
+	    part=$(echo $1 | sed 's,/dev/da[0-9]\+[sp]\([0-9]\+\).*,\1,')
 	    kfreebsd=${1#/dev/}
 	    db_metaget partman/text/scsi_simple_partition description
 	    printf "$RET" "$drive" "$part" "$kfreebsd"
