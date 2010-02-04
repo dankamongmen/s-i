@@ -368,7 +368,7 @@ static int find_releases(void) {
 	}
 
 	if (show_progress) {
-		debconf_progress_step(debconf, nbr_suites);
+		debconf_progress_set(debconf, nbr_suites);
 		debconf_progress_stop(debconf);
 	}
 
