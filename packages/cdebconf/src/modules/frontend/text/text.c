@@ -961,6 +961,7 @@ static void text_progress_stop(struct frontend *obj)
 	printf("\n");
 	fflush(stdout);
 	question_deref(obj->progress_title);
+	obj->progress_title = NULL;
 }
 
 struct frontend_module debconf_frontend_module =
