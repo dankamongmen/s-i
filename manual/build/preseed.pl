@@ -67,8 +67,11 @@ $p->parse_file($xmlfile);
 sub replace_entities {
 	my $text = shift;
 
-	$text =~ s/&archive-mirror;/http.us.debian.org/;
-	$text =~ s/&releasename;/$release/;
+	$text =~ s/&archive-mirror;/http.us.debian.org/g;
+	$text =~ s/&releasename;/$release/g;
+	$text =~ s/&gt;/>/g;
+	$text =~ s/&lt;/</g;
+
 
 	# Any unrecognized entities?
 	if ( $text =~ /(&[^ ]+;)/ ) {
