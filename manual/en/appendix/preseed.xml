@@ -973,6 +973,24 @@ either existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
 a recipe file or a recipe included in the preconfiguration file.
 
+</para><para>
+
+Preseeding of advanced partition setups using RAID, LVM and encryption is
+supported, but not with the full flexibility possible when partitioning
+during a non-preseeded install.
+
+</para><para>
+
+The examples below only provide basic information on the use of recipes.
+For detailed information see the files
+<filename>partman-auto-recipe.txt</filename> and
+<filename>partman-auto-raid-recipe.txt</filename> included in the
+<classname>debian-installer</classname> package.
+Both files are also available from the
+<ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">&d-i; source
+repository</ulink>. Note that the supported functionality may change
+between releases.
+
 </para>
 
 <warning><para>
@@ -982,6 +1000,9 @@ are loaded. If there are multiple disks in the system, make very sure the
 correct one will be selected before using preseeding.
 
 </para></warning>
+
+   <sect3 id="preseed-partman-example">
+   <title>Partitioning example</title>
 
 <informalexample role="example"><screen>
 # If the system has free space you can choose to only partition that space.
@@ -1041,10 +1062,11 @@ d-i partman-auto/choose_recipe select atomic
 #                      method{ swap } format{ }                \
 #              .
 
-# The recipe format is documented in the D-I source repository in the file
-# installer/doc/devel/partman-auto-recipe.txt. This also documents how to
-# specify settings such as filesystem labels, volume group names and which
-# physical devices to include in a volume group.
+# The full recipe format is documented in the file partman-auto-recipe.txt
+# included in the 'debian-installer' package or available from D-I source
+# repository. This also documents how to specify settings such as file
+# system labels, volume group names and which physical devices to include
+# in a volume group.
 
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
@@ -1053,10 +1075,9 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
-  </sect2>
-
-  <sect2 id="preseed-partman-raid">
-  <title>Partitioning using RAID</title>
+   </sect3>
+   <sect3 id="preseed-partman-raid">
+   <title>Partitioning using RAID</title>
 <para>
 
 You can also use preseeding to set up partitions on software RAID arrays.
@@ -1077,9 +1098,7 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 
 </para></warning>
 
-<informalexample><screen>
-# NOTE: this option is of beta release quality and should be used carefully
-
+<informalexample role="example"><screen>
 # The method should be set to "raid".
 #d-i partman-auto/method string raid
 # Specify the disks to be partitioned. They will all get the same layout,
@@ -1117,6 +1136,10 @@ Check <filename>/var/log/syslog</filename> if you run into problems.
 #          /dev/sda6#/dev/sdb6       \
 #    .
 
+# For additional information see the file partman-auto-raid-recipe.txt
+# included in the 'debian-installer' package or available from D-I source
+# repository.
+
 # This makes partman automatically partition without confirmation.
 d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
@@ -1124,10 +1147,10 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-mount-styles">
-  <title>Controlling how partitions are mounted</title>
+   <sect3 id="preseed-partman-mount-styles">
+   <title>Controlling how partitions are mounted</title>
 <para>
 
 Normally, filesystems are mounted using a universally unique identifier
@@ -1161,6 +1184,7 @@ be random.
 #d-i partman/mount_style select uuid
 </screen></informalexample>
 
+   </sect3>
   </sect2>
 
   <sect2 id="preseed-base-installer">
