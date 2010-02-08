@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-01-18 00:44+0000\n"
+"POT-Creation-Date: 2010-02-08 01:11+0000\n"
 "PO-Revision-Date: 2007-03-18 19:17+0100\n"
 "Last-Translator: SZERVÁC Attila <sas@321.hu>\n"
 "Language-Team: Hungarian\n"
@@ -1712,14 +1712,21 @@ msgstr "Particionálás"
 
 #. Tag: para
 #: preseed.xml:841
-#, no-c-format
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Using preseeding to partition the harddisk is very much limited to what "
+#| "is supported by <classname>partman-auto</classname>. You can choose to "
+#| "partition either existing free space on a disk or a whole disk. The "
+#| "layout of the disk can be determined by using a predefined recipe, a "
+#| "custom recipe from a recipe file or a recipe included in the "
+#| "preconfiguration file. It is currently not possible to partition multiple "
+#| "disks using preseeding."
 msgid ""
-"Using preseeding to partition the harddisk is very much limited to what is "
-"supported by <classname>partman-auto</classname>. You can choose to "
-"partition either existing free space on a disk or a whole disk. The layout "
-"of the disk can be determined by using a predefined recipe, a custom recipe "
-"from a recipe file or a recipe included in the preconfiguration file. It is "
-"currently not possible to partition multiple disks using preseeding."
+"Using preseeding to partition the harddisk is limited to what is supported "
+"by <classname>partman-auto</classname>. You can choose to partition either "
+"existing free space on a disk or a whole disk. The layout of the disk can be "
+"determined by using a predefined recipe, a custom recipe from a recipe file "
+"or a recipe included in the preconfiguration file."
 msgstr ""
 "Az előírás használata merevlemez particionálására nagyon függ a "
 "<classname>partman-auto</classname> támogatásától. Létező szabad hely vagy "
@@ -1728,7 +1735,29 @@ msgstr ""
 "recepttel. Jelenleg nem lehet több lemezt particionálni előírással."
 
 #. Tag: para
-#: preseed.xml:852
+#: preseed.xml:849
+#, no-c-format
+msgid ""
+"Preseeding of advanced partition setups using RAID, LVM and encryption is "
+"supported, but not with the full flexibility possible when partitioning "
+"during a non-preseeded install."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:855
+#, no-c-format
+msgid ""
+"The examples below only provide basic information on the use of recipes. For "
+"detailed information see the files <filename>partman-auto-recipe.txt</"
+"filename> and <filename>partman-auto-raid-recipe.txt</filename> included in "
+"the <classname>debian-installer</classname> package. Both files are also "
+"available from the <ulink url=\"&url-d-i-websvn;/trunk/installer/doc/devel/"
+"\">&d-i; source repository</ulink>. Note that the supported functionality "
+"may change between releases."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:869
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1738,21 +1767,34 @@ msgstr ""
 "A lemezek azonosítása függ betöltött meghajtójuk sorrendjétől. Több lemez "
 "esetén ügyelj nagyon, hogy a helyeset válaszd az előírás előtt."
 
+#. Tag: title
+#: preseed.xml:878
+#, fuzzy, no-c-format
+#| msgid "Partitioning"
+msgid "Partitioning example"
+msgstr "Particionálás"
+
 #. Tag: screen
-#: preseed.xml:860
+#: preseed.xml:880
 #, fuzzy, no-c-format
 msgid ""
 "# If the system has free space you can choose to only partition that space.\n"
 "# This is only honoured if partman-auto/method (below) is not set.\n"
 "#d-i partman-auto/init_automatically_partition select biggest_free\n"
 "\n"
-"# Alternatively, you can specify a disk to partition. The device name must\n"
-"# be given in traditional non-devfs format.\n"
-"# Note: A disk must be specified, unless the system has only one disk.\n"
+"# Alternatively, you may specify a disk to partition. If the system has "
+"only\n"
+"# one disk the installer will default to using that, but otherwise the "
+"device\n"
+"# name must be given in traditional, non-devfs format (so e.g. /dev/hda or\n"
+"# /dev/sda, and not e.g. /dev/discs/disc0/disc).\n"
 "# For example, to use the first SCSI/SATA hard disk:\n"
 "#d-i partman-auto/disk string /dev/sda\n"
 "# In addition, you'll need to specify the method to use.\n"
-"# The presently available methods are: \"regular\", \"lvm\" and \"crypto\"\n"
+"# The presently available methods are:\n"
+"# - regular: use the usual partition types for your architecture\n"
+"# - lvm:     use LVM to partition the disk\n"
+"# - crypto:  use LVM within an encrypted partition\n"
 "d-i partman-auto/method string lvm\n"
 "\n"
 "# If one of the disks that are going to be automatically partitioned\n"
@@ -1771,8 +1813,6 @@ msgid ""
 "d-i partman-auto/choose_recipe select atomic\n"
 "\n"
 "# Or provide a recipe of your own...\n"
-"# The recipe format is documented in the file devel/partman-auto-recipe."
-"txt.\n"
 "# If you have a way to get a recipe file into the d-i environment, you can\n"
 "# just point at it.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
@@ -1797,6 +1837,12 @@ msgid ""
 "#              64 512 300% linux-swap                          \\\n"
 "#                      method{ swap } format{ }                \\\n"
 "#              .\n"
+"\n"
+"# The full recipe format is documented in the file partman-auto-recipe.txt\n"
+"# included in the 'debian-installer' package or available from D-I source\n"
+"# repository. This also documents how to specify settings such as file\n"
+"# system labels, volume group names and which physical devices to include\n"
+"# in a volume group.\n"
 "\n"
 "# This makes partman automatically partition without confirmation, provided\n"
 "# that you told it what to do using one of the methods above.\n"
@@ -1866,13 +1912,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:865
+#: preseed.xml:884
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Particionálás RAID használatával"
 
 #. Tag: para
-#: preseed.xml:866
+#: preseed.xml:885
 #, fuzzy, no-c-format
 #| msgid ""
 #| "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -1893,7 +1939,7 @@ msgstr ""
 "itt: <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:876
+#: preseed.xml:895
 #, fuzzy, no-c-format
 #| msgid ""
 #| "This type of automated partitioning is easy to get wrong. It is also a "
@@ -1915,7 +1961,7 @@ msgstr ""
 "filename> fájlt."
 
 #. Tag: screen
-#: preseed.xml:886
+#: preseed.xml:905
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
@@ -1969,8 +2015,6 @@ msgstr ""
 #| "       select Finish partitioning and write changes to disk\n"
 #| "d-i partman/confirm boolean true"
 msgid ""
-"# NOTE: this option is of beta release quality and should be used carefully\n"
-"\n"
 "# The method should be set to \"raid\".\n"
 "#d-i partman-auto/method string raid\n"
 "# Specify the disks to be partitioned. They will all get the same layout,\n"
@@ -1992,13 +2036,13 @@ msgid ""
 "\n"
 "# Last you need to specify how the previously defined partitions will be\n"
 "# used in the RAID setup. Remember to use the correct partition numbers\n"
-"# for logical partitions.\n"
+"# for logical partitions. RAID levels 0, 1, 5, 6 and 10 are supported;\n"
+"# devices are separated using \"#\".\n"
 "# Parameters are:\n"
 "# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
 "mountpoint&gt; \\\n"
 "#          &lt;devices&gt; &lt;sparedevices&gt;\n"
-"# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "
-"\"#\"\n"
+"\n"
 "#d-i partman-auto-raid/recipe string \\\n"
 "#    1 2 0 ext3 /                    \\\n"
 "#          /dev/sda1#/dev/sdb1       \\\n"
@@ -2009,6 +2053,10 @@ msgid ""
 "#    0 2 0 ext3 /home                \\\n"
 "#          /dev/sda6#/dev/sdb6       \\\n"
 "#    .\n"
+"\n"
+"# For additional information see the file partman-auto-raid-recipe.txt\n"
+"# included in the 'debian-installer' package or available from D-I source\n"
+"# repository.\n"
 "\n"
 "# This makes partman automatically partition without confirmation.\n"
 "d-i partman-md/confirm boolean true\n"
@@ -2064,13 +2112,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:891
+#: preseed.xml:910
 #, no-c-format
 msgid "Controlling how partitions are mounted"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:892
+#: preseed.xml:911
 #, no-c-format
 msgid ""
 "Normally, filesystems are mounted using a universally unique identifier "
@@ -2082,7 +2130,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:901
+#: preseed.xml:920
 #, no-c-format
 msgid ""
 "Devices with stable names, such as LVM logical volumes, will continue to use "
@@ -2090,7 +2138,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:908
+#: preseed.xml:927
 #, no-c-format
 msgid ""
 "Traditional device names may change based on the order in which the kernel "
@@ -2101,7 +2149,7 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:918
+#: preseed.xml:937
 #, no-c-format
 msgid ""
 "# The default is to mount by UUID, but you can also choose \"traditional\" "
@@ -2113,13 +2161,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:923
+#: preseed.xml:943
 #, no-c-format
 msgid "Base system installation"
 msgstr "Az Alaprendszer telepítése"
 
 #. Tag: para
-#: preseed.xml:924
+#: preseed.xml:944
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -2130,7 +2178,7 @@ msgstr ""
 "telepítéséhez vannak kérdések."
 
 #. Tag: screen
-#: preseed.xml:931
+#: preseed.xml:951
 #, fuzzy, no-c-format
 msgid ""
 "# Configure APT to not install recommended packages by default. Use of this\n"
@@ -2151,13 +2199,13 @@ msgstr ""
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird"
 
 #. Tag: title
-#: preseed.xml:936
+#: preseed.xml:956
 #, no-c-format
 msgid "Account setup"
 msgstr "Fiók beállítások"
 
 #. Tag: para
-#: preseed.xml:937
+#: preseed.xml:957
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -2169,7 +2217,7 @@ msgstr ""
 "emphasis> kódok."
 
 #. Tag: para
-#: preseed.xml:944
+#: preseed.xml:964
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -2184,7 +2232,7 @@ msgstr ""
 "elkövetett nyers erejű támadást."
 
 #. Tag: screen
-#: preseed.xml:954
+#: preseed.xml:974
 #, fuzzy, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -2236,7 +2284,7 @@ msgstr ""
 "#d-i passwd/user-password-crypted password [MD5 hash]"
 
 #. Tag: para
-#: preseed.xml:956
+#: preseed.xml:976
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -2255,26 +2303,26 @@ msgstr ""
 "command>)."
 
 #. Tag: para
-#: preseed.xml:966
+#: preseed.xml:986
 #, no-c-format
 msgid ""
 "The following command can be used to generate an MD5 hash for a password:"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:970
+#: preseed.xml:990
 #, no-c-format
 msgid "$ printf \"r00tme\" | mkpasswd -s -m md5"
 msgstr "$ printf \"r00tmagam\" | mkpasswd -s -m md5"
 
 #. Tag: title
-#: preseed.xml:976
+#: preseed.xml:996
 #, no-c-format
 msgid "Apt setup"
 msgstr "Az APT beállítása"
 
 #. Tag: para
-#: preseed.xml:977
+#: preseed.xml:997
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -2287,7 +2335,7 @@ msgstr ""
 "válaszoktól függően. További (úgynevezett helyi) tárak is megadhatók."
 
 #. Tag: screen
-#: preseed.xml:985
+#: preseed.xml:1005
 #, fuzzy, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -2343,13 +2391,13 @@ msgstr ""
 "#d-i debian-installer/allow_unauthenticated boolean true"
 
 #. Tag: title
-#: preseed.xml:990
+#: preseed.xml:1010
 #, no-c-format
 msgid "Package selection"
 msgstr "Csomag választás"
 
 #. Tag: para
-#: preseed.xml:991
+#: preseed.xml:1011
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -2357,73 +2405,73 @@ msgid ""
 msgstr "Az elérhető feladatok bármely kombinációja használható. Például:"
 
 #. Tag: userinput
-#: preseed.xml:1000
+#: preseed.xml:1020
 #, no-c-format
 msgid "standard"
 msgstr "szabvány"
 
 #. Tag: userinput
-#: preseed.xml:1003
+#: preseed.xml:1023
 #, no-c-format
 msgid "desktop"
 msgstr "asztal"
 
 #. Tag: userinput
-#: preseed.xml:1006
+#: preseed.xml:1026
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "gnome-desktop"
 
 #. Tag: userinput
-#: preseed.xml:1009
+#: preseed.xml:1029
 #, no-c-format
 msgid "kde-desktop"
 msgstr "kde-desktop"
 
 #. Tag: userinput
-#: preseed.xml:1012
+#: preseed.xml:1032
 #, no-c-format
 msgid "web-server"
 msgstr "web-kiszolgáló"
 
 #. Tag: userinput
-#: preseed.xml:1015
+#: preseed.xml:1035
 #, no-c-format
 msgid "print-server"
 msgstr "nyomtató-kiszolgáló"
 
 #. Tag: userinput
-#: preseed.xml:1018
+#: preseed.xml:1038
 #, no-c-format
 msgid "dns-server"
 msgstr "dns-kiszolgáló"
 
 #. Tag: userinput
-#: preseed.xml:1021
+#: preseed.xml:1041
 #, no-c-format
 msgid "file-server"
 msgstr "fájl-kiszolgáló"
 
 #. Tag: userinput
-#: preseed.xml:1024
+#: preseed.xml:1044
 #, no-c-format
 msgid "mail-server"
 msgstr "levél-kiszolgáló"
 
 #. Tag: userinput
-#: preseed.xml:1027
+#: preseed.xml:1047
 #, no-c-format
 msgid "sql-database"
 msgstr "sql-adatbázis"
 
 #. Tag: userinput
-#: preseed.xml:1030
+#: preseed.xml:1050
 #, no-c-format
 msgid "laptop"
 msgstr "laptop"
 
 #. Tag: para
-#: preseed.xml:1034
+#: preseed.xml:1054
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -2435,7 +2483,7 @@ msgstr ""
 "<userinput>szabvány</userinput> feladatot."
 
 #. Tag: para
-#: preseed.xml:1040
+#: preseed.xml:1060
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -2450,7 +2498,7 @@ msgstr ""
 "listája, mely lehetővé teszi, hogy a kernelnek is könnyen átadható legyen."
 
 #. Tag: screen
-#: preseed.xml:1050
+#: preseed.xml:1070
 #, fuzzy, no-c-format
 msgid ""
 "#tasksel tasksel/first multiselect standard, web-server\n"
@@ -2484,13 +2532,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:1055
+#: preseed.xml:1075
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Boot betöltő telepítés"
 
 #. Tag: screen
-#: preseed.xml:1057
+#: preseed.xml:1077
 #, fuzzy, no-c-format
 msgid ""
 "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -2551,7 +2599,7 @@ msgstr ""
 "#d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)"
 
 #. Tag: para
-#: preseed.xml:1059
+#: preseed.xml:1079
 #, no-c-format
 msgid ""
 "An MD5 hash for a password for <classname>grub</classname> can be generated "
@@ -2560,13 +2608,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1069
+#: preseed.xml:1089
 #, fuzzy, no-c-format
 msgid "Finishing up the installation"
 msgstr "A telepítés első szakaszának vége"
 
 #. Tag: screen
-#: preseed.xml:1071
+#: preseed.xml:1091
 #, fuzzy, no-c-format
 msgid ""
 "# During installations from serial console, the regular virtual consoles\n"
@@ -2595,13 +2643,13 @@ msgstr ""
 "#d-i cdrom-detect/eject boolean false"
 
 #. Tag: title
-#: preseed.xml:1076
+#: preseed.xml:1096
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "Más csomagok előírása"
 
 #. Tag: screen
-#: preseed.xml:1078
+#: preseed.xml:1098
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -2621,19 +2669,19 @@ msgstr ""
 "#   debconf-get-selections >> fájl"
 
 #. Tag: title
-#: preseed.xml:1085
+#: preseed.xml:1105
 #, no-c-format
 msgid "Advanced options"
 msgstr "Haladó lehetőségek"
 
 #. Tag: title
-#: preseed.xml:1088
+#: preseed.xml:1108
 #, no-c-format
 msgid "Running custom commands during the installation"
 msgstr "Egyéni parancs futtatása telepítéskor"
 
 #. Tag: para
-#: preseed.xml:1089
+#: preseed.xml:1109
 #, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
@@ -2643,7 +2691,7 @@ msgstr ""
 "szkriptek futtatása a telepítés egyes pontjain."
 
 #. Tag: screen
-#: preseed.xml:1097
+#: preseed.xml:1117
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
@@ -2711,13 +2759,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:1102
+#: preseed.xml:1122
 #, no-c-format
 msgid "Using preseeding to change default values"
 msgstr "Előírás használata alap értékek módosítására"
 
 #. Tag: para
-#: preseed.xml:1103
+#: preseed.xml:1123
 #, fuzzy, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
@@ -2748,7 +2796,7 @@ msgstr ""
 "quote> paraméterekre nem."
 
 #. Tag: para
-#: preseed.xml:1117
+#: preseed.xml:1137
 #, no-c-format
 msgid ""
 "Note that the <quote>d-i</quote> owner should only be used for variables "
@@ -2758,7 +2806,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1124
+#: preseed.xml:1144
 #, fuzzy, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
@@ -2788,13 +2836,13 @@ msgstr ""
 "quote> paraméterekre nem."
 
 #. Tag: title
-#: preseed.xml:1138
+#: preseed.xml:1158
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "Előíró fájlok lánc-betöltése"
 
 #. Tag: para
-#: preseed.xml:1139
+#: preseed.xml:1159
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2809,7 +2857,7 @@ msgstr ""
 "fájlba és pontosabb beállításokat egyes konfigurációkhoz más fájlokba."
 
 #. Tag: screen
-#: preseed.xml:1149
+#: preseed.xml:1169
 #, fuzzy, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2860,7 +2908,7 @@ msgstr ""
 "#d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1151
+#: preseed.xml:1171
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "

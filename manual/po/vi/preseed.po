@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-01-18 00:44+0000\n"
+"POT-Creation-Date: 2010-02-08 01:11+0000\n"
 "PO-Revision-Date: 2009-02-12 19:17+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -1793,14 +1793,21 @@ msgstr "Phân vùng"
 
 #. Tag: para
 #: preseed.xml:841
-#, no-c-format
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Using preseeding to partition the harddisk is very much limited to what "
+#| "is supported by <classname>partman-auto</classname>. You can choose to "
+#| "partition either existing free space on a disk or a whole disk. The "
+#| "layout of the disk can be determined by using a predefined recipe, a "
+#| "custom recipe from a recipe file or a recipe included in the "
+#| "preconfiguration file. It is currently not possible to partition multiple "
+#| "disks using preseeding."
 msgid ""
-"Using preseeding to partition the harddisk is very much limited to what is "
-"supported by <classname>partman-auto</classname>. You can choose to "
-"partition either existing free space on a disk or a whole disk. The layout "
-"of the disk can be determined by using a predefined recipe, a custom recipe "
-"from a recipe file or a recipe included in the preconfiguration file. It is "
-"currently not possible to partition multiple disks using preseeding."
+"Using preseeding to partition the harddisk is limited to what is supported "
+"by <classname>partman-auto</classname>. You can choose to partition either "
+"existing free space on a disk or a whole disk. The layout of the disk can be "
+"determined by using a predefined recipe, a custom recipe from a recipe file "
+"or a recipe included in the preconfiguration file."
 msgstr ""
 "Khả năng dùng tiến trình chèn sẵn để phân vùng đĩa cứng rất bị hạn chế thành "
 "khả năng được hỗ trợ bởi <classname>partman-auto</classname>. Bạn có thể "
@@ -1810,7 +1817,29 @@ msgstr ""
 "hình sẵn. HIện thời không thể phân vùng nhiều đĩa bằng chèn sẵn."
 
 #. Tag: para
-#: preseed.xml:852
+#: preseed.xml:849
+#, no-c-format
+msgid ""
+"Preseeding of advanced partition setups using RAID, LVM and encryption is "
+"supported, but not with the full flexibility possible when partitioning "
+"during a non-preseeded install."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:855
+#, no-c-format
+msgid ""
+"The examples below only provide basic information on the use of recipes. For "
+"detailed information see the files <filename>partman-auto-recipe.txt</"
+"filename> and <filename>partman-auto-raid-recipe.txt</filename> included in "
+"the <classname>debian-installer</classname> package. Both files are also "
+"available from the <ulink url=\"&url-d-i-websvn;/trunk/installer/doc/devel/"
+"\">&d-i; source repository</ulink>. Note that the supported functionality "
+"may change between releases."
+msgstr ""
+
+#. Tag: para
+#: preseed.xml:869
 #, no-c-format
 msgid ""
 "The identification of disks is dependent on the order in which their drivers "
@@ -1821,8 +1850,15 @@ msgstr ""
 "nhiều đĩa trong hệ thống, hãy chắc là đĩa đúng sẽ được chọn, trước khi dùng "
 "khả năng chèn sẵn."
 
+#. Tag: title
+#: preseed.xml:878
+#, fuzzy, no-c-format
+#| msgid "Partitioning"
+msgid "Partitioning example"
+msgstr "Phân vùng"
+
 #. Tag: screen
-#: preseed.xml:860
+#: preseed.xml:880
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
@@ -1895,13 +1931,19 @@ msgid ""
 "# This is only honoured if partman-auto/method (below) is not set.\n"
 "#d-i partman-auto/init_automatically_partition select biggest_free\n"
 "\n"
-"# Alternatively, you can specify a disk to partition. The device name must\n"
-"# be given in traditional non-devfs format.\n"
-"# Note: A disk must be specified, unless the system has only one disk.\n"
+"# Alternatively, you may specify a disk to partition. If the system has "
+"only\n"
+"# one disk the installer will default to using that, but otherwise the "
+"device\n"
+"# name must be given in traditional, non-devfs format (so e.g. /dev/hda or\n"
+"# /dev/sda, and not e.g. /dev/discs/disc0/disc).\n"
 "# For example, to use the first SCSI/SATA hard disk:\n"
 "#d-i partman-auto/disk string /dev/sda\n"
 "# In addition, you'll need to specify the method to use.\n"
-"# The presently available methods are: \"regular\", \"lvm\" and \"crypto\"\n"
+"# The presently available methods are:\n"
+"# - regular: use the usual partition types for your architecture\n"
+"# - lvm:     use LVM to partition the disk\n"
+"# - crypto:  use LVM within an encrypted partition\n"
 "d-i partman-auto/method string lvm\n"
 "\n"
 "# If one of the disks that are going to be automatically partitioned\n"
@@ -1920,8 +1962,6 @@ msgid ""
 "d-i partman-auto/choose_recipe select atomic\n"
 "\n"
 "# Or provide a recipe of your own...\n"
-"# The recipe format is documented in the file devel/partman-auto-recipe."
-"txt.\n"
 "# If you have a way to get a recipe file into the d-i environment, you can\n"
 "# just point at it.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
@@ -1946,6 +1986,12 @@ msgid ""
 "#              64 512 300% linux-swap                          \\\n"
 "#                      method{ swap } format{ }                \\\n"
 "#              .\n"
+"\n"
+"# The full recipe format is documented in the file partman-auto-recipe.txt\n"
+"# included in the 'debian-installer' package or available from D-I source\n"
+"# repository. This also documents how to specify settings such as file\n"
+"# system labels, volume group names and which physical devices to include\n"
+"# in a volume group.\n"
 "\n"
 "# This makes partman automatically partition without confirmation, provided\n"
 "# that you told it what to do using one of the methods above.\n"
@@ -2020,13 +2066,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:865
+#: preseed.xml:884
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr "Phân vùng bằng RAID"
 
 #. Tag: para
-#: preseed.xml:866
+#: preseed.xml:885
 #, no-c-format
 msgid ""
 "You can also use preseeding to set up partitions on software RAID arrays. "
@@ -2042,7 +2088,7 @@ msgstr ""
 "xem <xref linkend=\"preseed-bootloader\"/>."
 
 #. Tag: para
-#: preseed.xml:876
+#: preseed.xml:895
 #, no-c-format
 msgid ""
 "This type of automated partitioning is easy to get wrong. It is also "
@@ -2057,7 +2103,7 @@ msgstr ""
 "chịu. Xem <filename>/var/log/syslog</filename> nếu bạn gặp vấn đề."
 
 #. Tag: screen
-#: preseed.xml:886
+#: preseed.xml:905
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
@@ -2110,8 +2156,6 @@ msgstr ""
 #| "d-i partman/choose_partition select finish\n"
 #| "d-i partman/confirm boolean true"
 msgid ""
-"# NOTE: this option is of beta release quality and should be used carefully\n"
-"\n"
 "# The method should be set to \"raid\".\n"
 "#d-i partman-auto/method string raid\n"
 "# Specify the disks to be partitioned. They will all get the same layout,\n"
@@ -2133,13 +2177,13 @@ msgid ""
 "\n"
 "# Last you need to specify how the previously defined partitions will be\n"
 "# used in the RAID setup. Remember to use the correct partition numbers\n"
-"# for logical partitions.\n"
+"# for logical partitions. RAID levels 0, 1, 5, 6 and 10 are supported;\n"
+"# devices are separated using \"#\".\n"
 "# Parameters are:\n"
 "# &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;"
 "mountpoint&gt; \\\n"
 "#          &lt;devices&gt; &lt;sparedevices&gt;\n"
-"# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "
-"\"#\"\n"
+"\n"
 "#d-i partman-auto-raid/recipe string \\\n"
 "#    1 2 0 ext3 /                    \\\n"
 "#          /dev/sda1#/dev/sdb1       \\\n"
@@ -2150,6 +2194,10 @@ msgid ""
 "#    0 2 0 ext3 /home                \\\n"
 "#          /dev/sda6#/dev/sdb6       \\\n"
 "#    .\n"
+"\n"
+"# For additional information see the file partman-auto-raid-recipe.txt\n"
+"# included in the 'debian-installer' package or available from D-I source\n"
+"# repository.\n"
 "\n"
 "# This makes partman automatically partition without confirmation.\n"
 "d-i partman-md/confirm boolean true\n"
@@ -2207,13 +2255,13 @@ msgstr ""
 "d-i partman/confirm boolean true"
 
 #. Tag: title
-#: preseed.xml:891
+#: preseed.xml:910
 #, no-c-format
 msgid "Controlling how partitions are mounted"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:892
+#: preseed.xml:911
 #, no-c-format
 msgid ""
 "Normally, filesystems are mounted using a universally unique identifier "
@@ -2225,7 +2273,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:901
+#: preseed.xml:920
 #, no-c-format
 msgid ""
 "Devices with stable names, such as LVM logical volumes, will continue to use "
@@ -2233,7 +2281,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:908
+#: preseed.xml:927
 #, no-c-format
 msgid ""
 "Traditional device names may change based on the order in which the kernel "
@@ -2244,7 +2292,7 @@ msgid ""
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:918
+#: preseed.xml:937
 #, no-c-format
 msgid ""
 "# The default is to mount by UUID, but you can also choose \"traditional\" "
@@ -2256,13 +2304,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:923
+#: preseed.xml:943
 #, no-c-format
 msgid "Base system installation"
 msgstr "Cài đặt hệ thống cơ bản"
 
 #. Tag: para
-#: preseed.xml:924
+#: preseed.xml:944
 #, no-c-format
 msgid ""
 "There is actually not very much that can be preseeded for this stage of the "
@@ -2273,7 +2321,7 @@ msgstr ""
 "cách cài đặt hạt nhân."
 
 #. Tag: screen
-#: preseed.xml:931
+#: preseed.xml:951
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# Select the initramfs generator used to generate the initrd for 2.6 "
@@ -2307,13 +2355,13 @@ msgstr ""
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 
 #. Tag: title
-#: preseed.xml:936
+#: preseed.xml:956
 #, no-c-format
 msgid "Account setup"
 msgstr "Thiết lập tài khoản"
 
 #. Tag: para
-#: preseed.xml:937
+#: preseed.xml:957
 #, no-c-format
 msgid ""
 "The password for the root account and name and password for a first regular "
@@ -2325,7 +2373,7 @@ msgstr ""
 "dùng giá trị nhập thô (không mật mã) hay <emphasis>băm</emphasis> kiểu MD5."
 
 #. Tag: para
-#: preseed.xml:944
+#: preseed.xml:964
 #, no-c-format
 msgid ""
 "Be aware that preseeding passwords is not completely secure as everyone with "
@@ -2341,7 +2389,7 @@ msgstr ""
 "truy cập băm MD5 cho phép người khác tấn công bằng sức mạnh vũ phu."
 
 #. Tag: screen
-#: preseed.xml:954
+#: preseed.xml:974
 #, no-c-format
 msgid ""
 "# Skip creation of a root account (normal user account will be able to\n"
@@ -2399,7 +2447,7 @@ msgstr ""
 "#d-i passwd/user-default-groups string audio cdrom video"
 
 #. Tag: para
-#: preseed.xml:956
+#: preseed.xml:976
 #, no-c-format
 msgid ""
 "The <classname>passwd/root-password-crypted</classname> and "
@@ -2419,7 +2467,7 @@ msgstr ""
 "<command>sudo</command>)."
 
 #. Tag: para
-#: preseed.xml:966
+#: preseed.xml:986
 #, no-c-format
 msgid ""
 "The following command can be used to generate an MD5 hash for a password:"
@@ -2428,19 +2476,19 @@ msgstr ""
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: screen
-#: preseed.xml:970
+#: preseed.xml:990
 #, no-c-format
 msgid "$ printf \"r00tme\" | mkpasswd -s -m md5"
 msgstr "$ printf \"r00tme\" | mkpasswd -s -m md5"
 
 #. Tag: title
-#: preseed.xml:976
+#: preseed.xml:996
 #, no-c-format
 msgid "Apt setup"
 msgstr "Thiết lập apt"
 
 #. Tag: para
-#: preseed.xml:977
+#: preseed.xml:997
 #, no-c-format
 msgid ""
 "Setup of the <filename>/etc/apt/sources.list</filename> and basic "
@@ -2454,7 +2502,7 @@ msgstr ""
 "năng thêm kho phần mềm (cục bộ) khác."
 
 #. Tag: screen
-#: preseed.xml:985
+#: preseed.xml:1005
 #, no-c-format
 msgid ""
 "# You can choose to install non-free and contrib software.\n"
@@ -2515,13 +2563,13 @@ msgstr ""
 "#d-i debian-installer/allow_unauthenticated boolean true"
 
 #. Tag: title
-#: preseed.xml:990
+#: preseed.xml:1010
 #, no-c-format
 msgid "Package selection"
 msgstr "Chọn gói phần mềm"
 
 #. Tag: para
-#: preseed.xml:991
+#: preseed.xml:1011
 #, no-c-format
 msgid ""
 "You can choose to install any combination of tasks that are available. "
@@ -2531,73 +2579,73 @@ msgstr ""
 "lúc viết câu này, các công việc sẵn sàng gồm:"
 
 #. Tag: userinput
-#: preseed.xml:1000
+#: preseed.xml:1020
 #, no-c-format
 msgid "standard"
 msgstr "chuẩn"
 
 #. Tag: userinput
-#: preseed.xml:1003
+#: preseed.xml:1023
 #, no-c-format
 msgid "desktop"
 msgstr "môi trường làm việc"
 
 #. Tag: userinput
-#: preseed.xml:1006
+#: preseed.xml:1026
 #, no-c-format
 msgid "gnome-desktop"
 msgstr "môi trường làm việc Gnome"
 
 #. Tag: userinput
-#: preseed.xml:1009
+#: preseed.xml:1029
 #, no-c-format
 msgid "kde-desktop"
 msgstr "môi trường làm việc KDE"
 
 #. Tag: userinput
-#: preseed.xml:1012
+#: preseed.xml:1032
 #, no-c-format
 msgid "web-server"
 msgstr "trình phục vụ Mạng"
 
 #. Tag: userinput
-#: preseed.xml:1015
+#: preseed.xml:1035
 #, no-c-format
 msgid "print-server"
 msgstr "trình phục vụ in"
 
 #. Tag: userinput
-#: preseed.xml:1018
+#: preseed.xml:1038
 #, no-c-format
 msgid "dns-server"
 msgstr "trình phục vụ DNS"
 
 #. Tag: userinput
-#: preseed.xml:1021
+#: preseed.xml:1041
 #, no-c-format
 msgid "file-server"
 msgstr "trình phục vụ tập tin"
 
 #. Tag: userinput
-#: preseed.xml:1024
+#: preseed.xml:1044
 #, no-c-format
 msgid "mail-server"
 msgstr "trình phục vụ thư tín"
 
 #. Tag: userinput
-#: preseed.xml:1027
+#: preseed.xml:1047
 #, no-c-format
 msgid "sql-database"
 msgstr "cơ sở dữ liệu SQL"
 
 #. Tag: userinput
-#: preseed.xml:1030
+#: preseed.xml:1050
 #, no-c-format
 msgid "laptop"
 msgstr "máy tính xách tay"
 
 #. Tag: para
-#: preseed.xml:1034
+#: preseed.xml:1054
 #, no-c-format
 msgid ""
 "You can also choose to install no tasks, and force the installation of a set "
@@ -2609,7 +2657,7 @@ msgstr ""
 "<userinput>chuẩn</userinput>."
 
 #. Tag: para
-#: preseed.xml:1040
+#: preseed.xml:1060
 #, no-c-format
 msgid ""
 "If you want to install some individual packages in addition to packages "
@@ -2624,7 +2672,7 @@ msgstr ""
 "giới bằng hoặc dấu phẩy hoặc dấu cách, cũng dễ dàng dùng trên dòng lệnh."
 
 #. Tag: screen
-#: preseed.xml:1050
+#: preseed.xml:1070
 #, fuzzy, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
@@ -2685,13 +2733,13 @@ msgstr ""
 "#popularity-contest popularity-contest/participate boolean false"
 
 #. Tag: title
-#: preseed.xml:1055
+#: preseed.xml:1075
 #, no-c-format
 msgid "Boot loader installation"
 msgstr "Cài đặt bộ nạp khởi động"
 
 #. Tag: screen
-#: preseed.xml:1057
+#: preseed.xml:1077
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# Grub is the default boot loader (for x86). If you want lilo installed\n"
@@ -2796,7 +2844,7 @@ msgstr ""
 "#d-i grub-installer/password-crypted password [mẫu_MD5]"
 
 #. Tag: para
-#: preseed.xml:1059
+#: preseed.xml:1079
 #, no-c-format
 msgid ""
 "An MD5 hash for a password for <classname>grub</classname> can be generated "
@@ -2808,13 +2856,13 @@ msgstr ""
 "<xref linkend=\"preseed-account\"/>."
 
 #. Tag: title
-#: preseed.xml:1069
+#: preseed.xml:1089
 #, no-c-format
 msgid "Finishing up the installation"
 msgstr "Làm xong tiến trình cài đặt"
 
 #. Tag: screen
-#: preseed.xml:1071
+#: preseed.xml:1091
 #, no-c-format
 msgid ""
 "# During installations from serial console, the regular virtual consoles\n"
@@ -2856,13 +2904,13 @@ msgstr ""
 "#d-i debian-installer/exit/poweroff boolean true"
 
 #. Tag: title
-#: preseed.xml:1076
+#: preseed.xml:1096
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr "Chèn trước gói khác"
 
 #. Tag: screen
-#: preseed.xml:1078
+#: preseed.xml:1098
 #, no-c-format
 msgid ""
 "# Depending on what software you choose to install, or if things go wrong\n"
@@ -2881,19 +2929,19 @@ msgstr ""
 "#   debconf-get-selections >> file"
 
 #. Tag: title
-#: preseed.xml:1085
+#: preseed.xml:1105
 #, no-c-format
 msgid "Advanced options"
 msgstr "Tùy chọn cấp cao"
 
 #. Tag: title
-#: preseed.xml:1088
+#: preseed.xml:1108
 #, no-c-format
 msgid "Running custom commands during the installation"
 msgstr "Chạy lệnh riêng trong khi cài đặt"
 
 #. Tag: para
-#: preseed.xml:1089
+#: preseed.xml:1109
 #, no-c-format
 msgid ""
 "A very powerful and flexible option offered by the preconfiguration tools is "
@@ -2903,7 +2951,7 @@ msgstr ""
 "chạy lệnh hay văn lệnh tại một số điểm thời riêng trong tiến trình cài đặt."
 
 #. Tag: screen
-#: preseed.xml:1097
+#: preseed.xml:1117
 #, fuzzy, no-c-format
 #| msgid ""
 #| "# d-i preseeding is inherently not secure. Nothing in the installer "
@@ -2990,13 +3038,13 @@ msgstr ""
 "#d-i preseed/late_command string apt-install zsh; in-target chsh -s /bin/zsh"
 
 #. Tag: title
-#: preseed.xml:1102
+#: preseed.xml:1122
 #, no-c-format
 msgid "Using preseeding to change default values"
 msgstr "Dùng khả năng chèn sẵn để thay đổi giá trị mặc định"
 
 #. Tag: para
-#: preseed.xml:1103
+#: preseed.xml:1123
 #, no-c-format
 msgid ""
 "It is possible to use preseeding to change the default answer for a "
@@ -3022,7 +3070,7 @@ msgstr ""
 "thử hay gỡ lỗi tập tin cấu hình sẵn."
 
 #. Tag: para
-#: preseed.xml:1117
+#: preseed.xml:1137
 #, no-c-format
 msgid ""
 "Note that the <quote>d-i</quote> owner should only be used for variables "
@@ -3036,7 +3084,7 @@ msgstr ""
 "<xref linkend=\"preseed-bootparms\"/>."
 
 #. Tag: para
-#: preseed.xml:1124
+#: preseed.xml:1144
 #, no-c-format
 msgid ""
 "If you are preseeding using boot parameters, you can make the installer ask "
@@ -3059,13 +3107,13 @@ msgstr ""
 "đặt, không phải đối với tham số <quote>nội bộ</quote>."
 
 #. Tag: title
-#: preseed.xml:1138
+#: preseed.xml:1158
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "Tải dây chuyền tập tin định cấu hình sẵn"
 
 #. Tag: para
-#: preseed.xml:1139
+#: preseed.xml:1159
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -3081,7 +3129,7 @@ msgstr ""
 "để thiết lập chi tiết hơn cho một số cấu hình riêng trong các tập tin khác."
 
 #. Tag: screen
-#: preseed.xml:1149
+#: preseed.xml:1169
 #, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -3134,7 +3182,7 @@ msgstr ""
 "#d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1151
+#: preseed.xml:1171
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
