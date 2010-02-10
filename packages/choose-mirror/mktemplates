@@ -12,35 +12,25 @@ TEMPLATES="$@"
 ISO3166TRANSLATIONS=debian/iso-codes
 
 if [ -z "$DEB_HOST_ARCH" ]; then
-    DEB_HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
+	DEB_HOST_ARCH="$(dpkg-architecture -qDEB_HOST_ARCH)"
 fi
 
 # Get the English names for the country codes in the list
 country_names() {
-	local list=$1
-	local code name
-	for code in $(xargs < $list); do
-		# Ensure commas in country names are escaped
-		name="$(perl -ne 's/,/\\\\,/g; if (/^'$code'\t(.*)/) { print "$1"; }' debian/iso_3166.tab)"
-		if [ "$name" ]; then
-			echo -n ", $name"
-		else
-			echo "Warning: no country name found for '$code'" >&2
-			echo -n ", $code"
-		fi
-	done
+	# Ensure commas in country names end up escaped
+	perl -ne 'chomp; s/.*\t//; s/,/\\\\,/; print ", $_"' $1
 }
 
 # Get the ordered list of countries from the iso_3166.xml, sorted
 # according to the regionmap.
 
 printf "Creating the list of countries for HTTP mirrors..."
-HTTPCODECHOICES="$(xargs < debian/httplist-countries | sed 's/ /, /g')"
+HTTPCODECHOICES="$(cut -f1 debian/httplist-countries | xargs | sed 's/ /, /g')"
 HTTPCHOICES="$(country_names debian/httplist-countries)"
 printf " Done.\n"
 
 printf "Creating the list of countries for FTP mirrors..."
-FTPCODECHOICES="$(xargs < debian/ftplist-countries | sed 's/ /, /g')"
+FTPCODECHOICES="$(cut -f1 debian/ftplist-countries | xargs | sed 's/ /, /g')"
 FTPCHOICES="$(country_names debian/ftplist-countries)"
 printf " Done.\n"
 
