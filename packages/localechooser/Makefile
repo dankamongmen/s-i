@@ -54,5 +54,5 @@ demo: localechooser.templates localechooser
 	DEBIAN_FRONTEND=dialog DEBCONF_DEBUG=developer /usr/share/debconf/frontend ./localechooser
 
 clean:
-	$(RM) localechooser.templates debian/templates debian/templates.continents debian/templates.base-in debian/templates.base debian/languagelist.data SUPPORTED-short debian/iso_3166.tab
+	$(RM) localechooser.templates debian/templates debian/templates.continents debian/templates.base-in debian/templates.base debian/templates.tmp debian/languagelist.data SUPPORTED-short debian/iso_3166.tab
 	$(RM) -rf debian/short-tmp debian/iso-codes
