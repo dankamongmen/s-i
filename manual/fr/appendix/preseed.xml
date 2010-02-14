@@ -1,4 +1,4 @@
-<!-- original version: 61896 -->
+<!-- original version: 62198 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -939,8 +939,28 @@ Préconfigurer le partitionnement du disque dur est limité aux possibilités of
 par <classname>partman-auto</classname>. Vous pouvez partitionner un disque entier
 ou seulement un espace libre sur ce disque. La disposition du disque peut être
 indiquée par un schéma prédéfini, un schéma inclus dans un fichier de schémas ou un
-schéma mis dans le fichier de préconfiguration. Pour l'instant, on ne peut pas
-préconfigurer le partitionnement de plusieurs disques.
+schéma mis dans le fichier de préconfiguration.
+</para>
+
+<para>
+La préconfiguration de schémas complexes de partitionnement, utilisant
+RAID, LVM ou le chiffrage, est possible mais sans la flexibilité
+offerte lors d'une installation standard.
+</para>
+
+<para>
+
+Les exemples donnés par la suite n'offrent qu'une information
+élémentaire sur l'utilisation des schémas. Pour des précisions,
+consultez les fichiers
+<filename>partman-auto-recipe.txt</filename> et
+<filename>partman-auto-raid-recipe.txt</filename> qui font partie du
+paquet <classname>debian-installer</classname>.
+Ces deux fichiers sont aussi disponibles dans le répertoire source
+<ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">de
+&d-i;</ulink>.
+Il faut noter que les fonctionnalités disponibles peuvent changer d'une
+version à l'autre de l'installateur.
 
 </para>
 
@@ -951,6 +971,9 @@ disques. Si le système possède plusieurs disques, assurez-vous que le bon
 sera choisi avant de préconfigurer son partitionnement.
 
 </para></warning>
+ 
+  <sect3 id="preseed-partman-example">
+   <title>Exemples de partionnement</title>
 
 <informalexample role="example"><screen>
 # Si le système possède un espace libre, vous pouvez ne partitionner que cet
@@ -958,13 +981,18 @@ sera choisi avant de préconfigurer son partitionnement.
 # Mais il faut que partman-auto/method (ci-dessous) ne soit pas définie.
 #d-i partman-auto/init_automatically_partition select biggest_free
 
-# Vous pouvez aussi choisir un disque entier. Le nom du disque doit être
-# donné selon le format traditionnel.
-# Note : un disque doit être spécifié, sauf si le système n'en possède qu'un.
+# Vous pouvez aussi choisir un disque entier. Si le système ne possède
+# qu'un seul disque, l'installateur le choisira automatiquement. Si le
+# système possède plusieurs disques, le nom du disque doit être
+# donné selon le format traditionnel (par exemple, /dev/hda ou
+# /dev/sda, mais pas /dev/discs/disc0/disc).
 # Par exemple, pour utiliser le premier disque SCSI/SATA :
 #d-i partman-auto/disk string /dev/sda
 # Il faudra aussi indiquer la méthode à utiliser.
-# Actuellement les méthodes disponibles sont : regular, lvm et crypto.
+# Actuellement les méthodes disponibles sont :
+# - regular : utilisation des types de partition habituels.
+# - lvm :     utilisation de LVM pour le partitionnement du disque.
+# - crypto :  utilisation de LVM à l'intérieur d'une partition chiffrée.
 d-i partman-auto/method string lvm
 
 # Si l'un des disques à partitionner automatiquement contient une ancienne
@@ -982,9 +1010,7 @@ d-i partman-lvm/confirm boolean true
 # - multi:  partitions /home, /usr, /var, et /tmp séparées
 d-i partman-auto/choose_recipe select atomic
 
-#...ou donner vous-même votre schéma.
-# Le format des schémas est expliqué dans le fichier 
-# devel/partman-auto-recipe.txt.
+# ...ou donner vous-même votre schéma.
 # Si vous avez la possibilité d'obtenir un schéma dans l'environnement de
 # l'installateur, vous pouvez simplement pointer sur lui.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
@@ -1010,6 +1036,13 @@ d-i partman-auto/choose_recipe select atomic
 #                      method{ swap } format{ }                \
 #              .
 
+# Une documentation complète sur le format des schémas se trouve dans le
+# fichier <file>partman-auto-recipe.txt</file>, disponible dans le
+# paquet 'debian-installer' ou dans les sources de l'installateur.
+# On trouve aussi dans ce document la manière d'indiquer les étiquettes
+# de systèmes de fichiers, les noms de groupes de volumes ainsi que les
+# noms de périphériques physiques à inclure dans les groupes de volumes.
+
 # Si vous avez indiqué la méthode à utiliser, partman créera automatiquement
 # les partitions sans demander de confirmation.
 d-i partman-partitioning/confirm_write_new_label boolean true
@@ -1017,14 +1050,14 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
-  </sect2>
+ </sect3>
 
-<sect2 id="preseed-partman-raid">
+<sect3 id="preseed-partman-raid">
   <title>Partitionnement et RAID logiciel</title>
 <para>
 
 Il est aussi possible de préconfigurer le partitionnement d'un RAID logiciel.
-Les niveaux 0,1,5,6 et 10 sont acceptés, de même que la création d'ensemble dégradé et
+Les niveaux 0, 1, 5, 6 et 10 sont acceptés, de même que la création d'ensemble dégradé et
 de périphériques de rechange.
 Si vous utilisez RAID 1, vous pouvez préconfigurer grub pour qu'il s'installe sur tous
 les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
@@ -1034,15 +1067,13 @@ les périphériques de l'ensemble, voyez <xref linkend="preseed-bootloader"/>.
 
 Il est facile de se tromper avec ce type de partitionnement automatique.
 C'est aussi une nouvelle fonctionnalité qui a été relativement peu testée par les développeurs 
-de l'installateur. Donner les bonnes formules est de la responsabilité de chacun.
+de l'installateur. Il revient à chacun de trouver les bonnes formules.
 Consultez le fichier <filename>/var/log/syslog</filename>
 si vous rencontrez des problèmes.
 </para>
 </warning>
 
-<informalexample><screen>
-# NOTE: cette option est en mode bêta et doit être utilisée avec précaution.
-
+<informalexample role="example"><screen>
 # La méthode à indiquer est "raid".
 #d-i partman-auto/method string raid
 # Indiquez les disques à partitionner. Ils auront tous les mêmes caractéristiques,
@@ -1064,11 +1095,12 @@ si vous rencontrez des problèmes.
 
 # Enfin vous devez indiquer comment seront utilisées les partitions que
 # vous venez de définir. N'oubliez pas de donner les bons numéros pour
-# les partitions logiques.
+# les partitions logiques. Les niveaux RAID 0, 1, 5, 6 et 10 sont acceptés.
+# Les noms des périphériques sont séparés par un caractère « # ». 
 # Paramètres :
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Les niveaux RAID 0, 1, 5, 6 et 10 sont acceptés. Les périphériques sont séparés par "#".
+
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                    \
 #          /dev/sda1#/dev/sdb1       \
@@ -1080,6 +1112,10 @@ si vous rencontrez des problèmes.
 #          /dev/sda6#/dev/sdb6       \
 #    .
 
+# Une documentation complète se trouve dans le
+# fichier <file>partman-auto-raid-recipe.txt</file>, disponible dans le
+# paquet 'debian-installer' ou dans les sources de l'installateur.
+
 # Pour que partman partitionne automatiquement sans demander une confirmation :
 d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
@@ -1087,9 +1123,9 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
-  </sect2>
+  </sect3>
 
-  <sect2 id="preseed-partman-mount-styles">
+  <sect3 id="preseed-partman-mount-styles">
   <title>Contrôler le montage des partitions</title>
 <para>
 
@@ -1124,7 +1160,8 @@ un périphérique USB. Si cela arrive, le comportement du système devient aléa
 #d-i partman/mount_style select uuid
 </screen></informalexample>
 
-  </sect2>
+  </sect3>
+</sect2>
 
   <sect2 id="preseed-base-installer">
   <title>Installation du système de base</title>
@@ -1155,7 +1192,7 @@ Les seules questions posées concernent l'installation du noyau.
   <title>Configuration des comptes</title>
 <para>
 
-Le mot de passe de root et le nom et le mot de passe d'un premier utilisateur
+Le mot de passe de <quote>root</quote> et le nom et le mot de passe d'un premier utilisateur
 peuvent être préconfigurés. Pour les mots de passe, vous pouvez utiliser
 simplement du texte ou bien utiliser le <emphasis>hachage</emphasis> MD5.
 
