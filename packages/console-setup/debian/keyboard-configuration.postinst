@@ -5,6 +5,20 @@ set -e
 # Source debconf library.
 . /usr/share/debconf/confmodule
 
+# The same as /usr/bin/which - in order to make "which" available before
+# /usr is mounted
+which () {
+    local IFS
+    IFS=:
+    for i in $PATH; do
+	if [ -x "$i/$1" ]; then
+	    echo "$i/$1"
+	    return 0
+	fi
+    done
+    return 1
+}
+
 # In d-i the config script is not executed automatically
 if [ -f /usr/share/console-setup-mini/keyboard-configuration.config ]; then
     /usr/share/console-setup-mini/keyboard-configuration.config || exit $?
@@ -68,6 +82,13 @@ if \
     [ -f /usr/share/console-setup-mini/keyboard ] && keyboard_present
 then
     setupcon --force --save
+    if \
+	which setxkbmap >/dev/null \
+	&& [ ! -z "$DISPLAY" ] \
+	&& keyboard_present
+    then
+	setxkbmap -option '' -model "$XKBMODEL" "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS"
+    fi
 fi
 
 #DEBHELPER#

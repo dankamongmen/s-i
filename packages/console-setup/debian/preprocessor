@@ -27,6 +27,13 @@ while [ "$1" ]; do
     shift
 done
 
+templatesfile=`dirname $0`/keyboard-configuration.templates
+seentemplates=$(
+    grep '^Template: keyboard-configuration' <"$templatesfile" | \
+	grep -v unsupported | \
+	grep -v ctrl_alt_bksp | \
+	sed -e 's/Template: */printf "/' -e 's/$/ ";\n/')
+
 awk '
 /## *KEYBOARD_PRESENT *##/ {
     system("cat debian/keyboard_present.sh");
@@ -43,6 +50,10 @@ awk '
     system("cd Keyboard && ls acm/*.acm |sed -e '\''s/^acm.//'\'' -e '\''s/.acm$//'\''");
     printf "UTF-8'\''\n";
     next;
+}
+/## *SEEN TEMPLATES *##/ {
+    '"$seentemplates"'
+    printf "\n";
 }
 {
    print;
