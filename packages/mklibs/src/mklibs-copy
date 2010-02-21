@@ -26,7 +26,7 @@ import re
 import sys
 import os
 import glob
-import getopt
+import logging
 from stat import *
 
 try:
@@ -36,20 +36,16 @@ except ImportError:
 
 from mklibs.utils.main import MainBase
 
-DEBUG_NONE    = 0
-DEBUG_NORMAL  = 1
-DEBUG_VERBOSE = 2
-DEBUG_SPAM    = 3
+class Main(MainBase):
+    pass
 
-debuglevel = DEBUG_NONE
+main = Main()
 
-def debug(level, *msg):
-    if debuglevel >= level:
-        print ' '.join(msg)
+logger = logging.getLogger(__name__)
 
 # return a list of lines of output of the command
 def command(command, *args):
-    debug(DEBUG_SPAM, "calling", command, ' '.join(args))
+    logger.debug("calling %s %s", command, ' '.join(args))
     pipe = os.popen(command + ' ' + ' '.join(args), 'r')
     output = pipe.read().strip()
     status = pipe.close()
@@ -94,14 +90,14 @@ def library_depends(obj):
 
 # Return real target of a symlink
 def resolve_link(file):
-    debug(DEBUG_SPAM, "resolving", file)
+    logger.debug("resolving %s", file)
     while S_ISLNK(os.lstat(file)[ST_MODE]):
         new_file = os.readlink(file)
         if new_file[0] != "/":
             file = os.path.join(os.path.dirname(file), new_file)
         else:
             file = new_file
-    debug(DEBUG_SPAM, "resolved to", file)
+    logger.debug("resolved to %s", file)
     return file
 
 # Find complete path of a library, by searching in lib_path
@@ -126,11 +122,6 @@ def version(vers):
 vers="0.12"
 os.environ['LC_ALL'] = "C"
 
-class Main(MainBase):
-    pass
-
-main = Main()
-
 # some global variables
 lib_rpath = []
 lib_path = main.options.library_dir
@@ -150,13 +141,13 @@ objects = {}  # map from inode to filename
 for prog in proglist:
     inode = os.stat(prog)[ST_INO]
     if objects.has_key(inode):
-        debug(DEBUG_SPAM, prog, "is a hardlink to", objects[inode])
+        logger.debug("%s is a hardlink to %s", prog, objects[inode])
     elif so_pattern.match(prog):
-        debug(DEBUG_SPAM, prog, "is a library")
+        logger.debug("%s is a library", prog)
     elif open(prog).read(4)[1:] == 'ELF':
         objects[inode] = prog
     else:
-        debug(DEBUG_SPAM, prog, "is no ELF")
+        logger.debug("%s is no ELF", prog)
 
 if not ldlib:
     for obj in objects.values():
@@ -169,7 +160,7 @@ if not ldlib:
 if not ldlib:
     sys.exit("E: Dynamic linker not found, aborting.")
 
-debug(DEBUG_NORMAL, "I: Using", ldlib, "as dynamic linker.")
+logger.info('Using %s as dynamic linker', ldlib)
 
 # Check for rpaths
 for obj in objects.values():
@@ -178,11 +169,10 @@ for obj in objects.values():
         if root:
             for rpath_elem in rpath_val:
                 if not rpath_elem in lib_rpath:
-                    if debuglevel >= DEBUG_VERBOSE:
-                        print "Adding rpath " + rpath_elem + " for " + obj
+                    logger.verbose('Adding rpath %s for %s', rpath_elem, obj)
                     lib_rpath.append(rpath_elem)
         else:
-            print "warning: " + obj + " may need rpath, but --root not specified"
+            logger.warning('%s may need rpath, but --root not specified', obj)
 
 lib_path.extend(lib_rpath)
 
@@ -190,12 +180,7 @@ passnr = 1
 available_libs = []
 previous_pass_libraries = set()
 while 1:
-    debug(DEBUG_NORMAL, "I: library reduction pass", `passnr`)
-    if debuglevel >= DEBUG_VERBOSE:
-        print "Objects:",
-        for obj in objects.values():
-            print obj[obj.rfind('/') + 1:],
-        print
+    logger.info("library reduction pass %d", passnr)
 
     passnr = passnr + 1
     # Gather all already reduced libraries and treat them as objects as well
@@ -205,14 +190,14 @@ while 1:
         small_libs.append(obj)
         inode = os.stat(obj)[ST_INO]
         if objects.has_key(inode):
-            debug(DEBUG_SPAM, obj, "is hardlink to", objects[inode])
+            logger.debug("%s is hardlink to %s", obj, objects[inode])
         else:
             objects[inode] = obj
 
-    # DEBUG
     for obj in objects.values():
         small_libs.append(obj)
-        debug(DEBUG_VERBOSE, "Object:", obj)
+
+    logger.verbose('Objects: %r', ' '.join([i[i.rfind('/') + 1:] for i in objects.itervalues()]))
 
     libraries = set()
     for obj in objects.values():
@@ -233,9 +218,9 @@ while 1:
     for library in libraries:
         so_file = find_lib(library)
         if root and (re.compile("^" + root).search(so_file)):
-            debug(DEBUG_VERBOSE, "no action required for " + so_file)
+            logger.verbose("no action required for " + so_file)
             if not so_file in available_libs:
-                debug(DEBUG_VERBOSE, "adding " + so_file + " to available libs")
+                logger.verbose("adding %s to available libs", so_file)
                 available_libs.append(so_file)
             continue
         so_file_name = os.path.basename(so_file)
@@ -254,7 +239,7 @@ ld_file = find_lib(ldlib)
 ld_file_name = os.path.basename(ld_file)
 
 if not os.access(dest_path + "/" + ld_file_name, os.F_OK):
-    debug(DEBUG_NORMAL, "I: stripping and copying dynamic linker.")
+    logger.info("stripping and copying dynamic linker.")
     command(target + "objcopy", "--strip-unneeded -R .note -R .comment",
             ld_file, dest_path + "/" + ld_file_name)
 
