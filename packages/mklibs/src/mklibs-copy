@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/python
 
 # mklibs.py: An automated way to create a minimal /lib/ directory.
 #
@@ -28,6 +28,13 @@ import os
 import glob
 import getopt
 from stat import *
+
+try:
+    import mklibs
+except ImportError:
+    sys.path.append('/usr/lib/mklibs/python')
+
+from mklibs.utils.main import MainBase
 
 DEBUG_NONE    = 0
 DEBUG_NORMAL  = 1
@@ -111,100 +118,30 @@ def extract_soname(so_file):
         return soname_data.pop()
     return ""
 
-def usage(was_err):
-    if was_err:
-        outfd = sys.stderr
-    else:
-        outfd = sys.stdout
-    print >> outfd, "Usage: mklibs [OPTION]... -d DEST FILE ..."
-    print >> outfd, "Make a set of minimal libraries for FILE(s) in DEST."
-    print >> outfd, "" 
-    print >> outfd, "  -d, --dest-dir DIRECTORY     create libraries in DIRECTORY"
-    print >> outfd, "  -D, --no-default-lib         omit default libpath (", ':'.join(default_lib_path), ")"
-    print >> outfd, "  -L DIRECTORY[:DIRECTORY]...  add DIRECTORY(s) to the library search path"
-    print >> outfd, "      --ldlib LDLIB            use LDLIB for the dynamic linker"
-    print >> outfd, "      --libc-extras-dir DIRECTORY  look for libc extra files in DIRECTORY"
-    print >> outfd, "      --root ROOT              search in ROOT for library rpaths"
-    print >> outfd, "  -v, --verbose                explain what is being done"
-    print >> outfd, "  -h, --help                   display this help and exit"
-    sys.exit(was_err)
-
 def version(vers):
     print "mklibs: version ",vers
     print ""
-
-#################### main ####################
-## Usage: ./mklibs.py [OPTION]... -d DEST FILE ...
-## Make a set of minimal libraries for FILE ... in directory DEST.
-## 
-## Options:
-##   -L DIRECTORY               Add DIRECTORY to library search path.
-##   -D, --no-default-lib       Do not use default lib directories of /lib:/usr/lib
-##   -n, --dry-run              Don't actually run any commands; just print them.
-##   -v, --verbose              Print additional progress information.
-##   -V, --version              Print the version number and exit.
-##   -h, --help                 Print this help and exit.
-##   --ldlib                    Name of dynamic linker (overwrites environment variable ldlib)
-##   --libc-extras-dir          Directory for libc extra files
-##   --target                   Use as prefix for gcc or binutils calls
-## 
-##   -d, --dest-dir DIRECTORY   Create libraries in DIRECTORY.
-## 
-## Required arguments for long options are also mandatory for the short options.
 
 # Clean the environment
 vers="0.12"
 os.environ['LC_ALL'] = "C"
 
-# Argument parsing
-opts = "L:DnvVhd:r:l:"
-longopts = ["no-default-lib", "dry-run", "verbose", "version", "help",
-            "dest-dir=", "ldlib=", "libc-extras-dir=", "root="]
+class Main(MainBase):
+    pass
+
+main = Main()
 
 # some global variables
 lib_rpath = []
-lib_path = []
-dest_path = "DEST"
-ldlib = None
-include_default_lib_path = True
+lib_path = main.options.library_dir
+dest_path = main.options.dest_dir
+ldlib = main.options.ldlib
 default_lib_path = ["/lib/", "/usr/lib/", "/usr/X11R6/lib/"]
-libc_extras_dir = "/usr/lib/libc_pic"
 target = ""
-root = ""
+root = main.options.root
+include_default_lib_path = not main.options.omit_library_dir
+proglist = main.files
 so_pattern = re.compile("((lib|ld).*)\.so(\..+)*")
-
-try:
-    optlist, proglist = getopt.getopt(sys.argv[1:], opts, longopts)
-except getopt.GetoptError, msg:
-    print >> sys.stderr, msg
-    usage(1)
-
-for opt, arg in optlist:
-    if opt in ("-v", "--verbose"):
-        if debuglevel < DEBUG_SPAM:
-            debuglevel = debuglevel + 1
-    elif opt == "-L":
-        lib_path.extend(arg.split(":"))
-    elif opt in ("-d", "--dest-dir"):
-        dest_path = arg
-    elif opt in ("-D", "--no-default-lib"):
-        include_default_lib_path = "no"
-    elif opt == "--ldlib":
-        ldlib = arg
-    elif opt == "--libc-extras-dir":
-        libc_extras_dir = arg
-    elif opt in ("-r", "--root"):
-        root = arg
-    elif opt in ("-l",):
-        pass
-    elif opt in ("--help", "-h"):
-	usage(0)
-        sys.exit(0)
-    elif opt in ("--version", "-V"):
-        version(vers)
-        sys.exit(0)
-    else:
-        print "WARNING: unknown option: " + opt + "\targ: " + arg
 
 if include_default_lib_path:
     lib_path.extend(default_lib_path)

@@ -9,6 +9,9 @@ AC_PROG_CXX
 
 AC_CONFIG_FILES([
 Makefile
+lib/Makefile
+lib/mklibs/Makefile
+lib/mklibs/utils/Makefile
 src/Makefile
 src/mklibs-readelf/Makefile
 ])
