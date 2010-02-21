@@ -81,5 +81,5 @@ class MainBase(object):
             level = logging.VERBOSE
         elif self.options.verbose >= 3:
             level = logging.DEBUG
-        logging.basicConfig(level=level)
+        logging.basicConfig(level=level, format="%(levelname)s: %(message)s")
 
