@@ -1,4 +1,6 @@
-import logging
+from __future__ import absolute_import
+
+from . import logging
 import optparse
 import sys
 
@@ -75,7 +77,9 @@ class MainBase(object):
         level = logging.WARNING
         if self.options.verbose == 1:
             level = logging.INFO
-        elif self.options.verbose >= 2:
+        elif self.options.verbose == 2:
+            level = logging.VERBOSE
+        elif self.options.verbose >= 3:
             level = logging.DEBUG
         logging.basicConfig(level=level)
 
