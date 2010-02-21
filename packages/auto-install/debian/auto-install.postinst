@@ -5,6 +5,15 @@ set -e
 . /usr/share/debconf/confmodule
 . /lib/preseed/preseed.sh
 
+# Install ai-choosers
+pinst=
+for p in localechooser kbd-chooser console-setup-udeb; do
+	if [ -e /var/lib/dpkg/info/$p.postinst ]; then
+		pinst="$pinst ai-$p"
+	fi
+done
+[ -z "$pinst" ] || anna-install $pinst || true
+
 if [ -e /var/run/preseed_unspecified_at_boot ] ; then
 	if [ -n "$(dhcp_preseed_url)" ]; then
 		rm /var/run/preseed_unspecified_at_boot
