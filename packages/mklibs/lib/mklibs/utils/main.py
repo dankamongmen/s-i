@@ -42,6 +42,9 @@ class MainBase(object):
         metavar='DIRECTORY[:DIRECTORY]...',
         type='string',
     )
+    option_parser.add_option('-l',
+        metavar='LIBRARY'
+    )
     option_parser.add_option('--ldlib',
         dest='ldlib',
         help='use LDLIB for the dynamic linker',
