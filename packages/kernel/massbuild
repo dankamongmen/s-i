@@ -78,12 +78,10 @@ EOF
 }
 
 list_arches() {
-	local arch
-	for arch in $1; do
-		local udir=$UBASE-$arch$PF
-		echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
-			awk '{print $1}' | sort | uniq)
-	done
+	local uarch=$1 udir
+	udir=$UBASE-$uarch$PF
+	echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
+		awk '{print $1}' | sort | uniq)
 }
 
 [ "$1" ] || usage "operation not specified"
@@ -159,7 +157,9 @@ fi
 # Default to all possible architectures
 REQUESTED=$ARCHES
 if [ -z "$ARCHES" ]; then
-	for uarch in $(ls -d $UBASE-*$PF | cut -d- -f4); do
+	for udir in $(ls -d $UBASE-*$PF); do
+		[ -d $udir ] || continue
+		uarch=$(echo $udir | cut -d- -f4)
 		ARCHES=${ARCHES:+$ARCHES }$(list_arches $uarch)
 	done
 fi
@@ -170,9 +170,10 @@ for arch in $ARCHES; do
 	case $arch in
 	    # ppc64 is no longer supported, but kept here as example
 	    #ppc64)	uarch=powerpc ;;
-	    kfreebsd-*)	uarch=${arch#kfreebsd-} ;;
 	    *)		uarch=$arch ;;
 	esac
+	# For kfreebsd, remove the prefix
+	uarch=${uarch#kfreebsd-} ;;
 
 	if ([ "$KTYPE" = linux ] && expr $arch : kfreebsd >/dev/null) ||
 	   ! [ -f $UBASE-$uarch$PF/kernel-versions ]; then
@@ -208,9 +209,10 @@ clean_arch_tmp() {
 
 clean_arch() {
 	# Remove from both dirs to also clean manual or failed builds
-	rm -f ./$UBASE-$arch${PF}_*.*
+	local uarch=${1#kfreebsd-}
+	rm -f ./$UBASE-$uarch${PF}_*.*
 	rm -f ./*_$1.udeb
-	rm -f ./$OUTDIR/$UBASE-$arch${PF}_*.*
+	rm -f ./$OUTDIR/$UBASE-$uarch${PF}_*.*
 	rm -f ./$OUTDIR/*_$1.udeb
 }
 
