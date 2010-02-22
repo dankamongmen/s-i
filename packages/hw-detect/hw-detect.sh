@@ -483,9 +483,7 @@ fi
 
 # Install acpi
 if [ -d /proc/acpi ]; then
-	apt-install acpi || true
-	# Avoid pulling in console-{common,data} through console-tools
-	apt-install --no-recommends acpid acpi-support-base || true
+	apt-install acpi acpid acpi-support-base || true
 fi
 
 # If hardware has support for pmu, install pbbuttonsd
