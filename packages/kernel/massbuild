@@ -48,15 +48,19 @@ Usage: $(basename $0) kbuild|mbuild [OPTION ...] [<architecture> ...]
        $(basename $0) krelease|mrelease [<architecture> ...]
        $(basename $0) kclean|mclean [<architecture> ...]
 
-Operations starting with 'k' act on linux-kernel-* source packages;
-those starting with 'm' on linux-module-* packages:
+Operations starting with 'k' act on {linux,kfreebsd}-kernel-* source
+packages; those starting with 'm' on {linux,kfreebsd}-module-* packages:
  - build:   retrieve dependencies and build the udebs
  - release: show changes; after confirmation call 'debcommit --release'
             (see svndirs(1) on how to make tagging work from a branch!)
  - clean:   remove built and temporary files
 
 If no architecture is specified, an operation will be performed for all
-official architectures.
+official architectures. For kfreebsd arches can be specified both with
+and without the kfreebsd- prefix.
+
+General options:
+ --bsd         act on kfreebsd instead of linux architectures
 
 Options for 'kbuild' and 'mbuild' operations:
  -k            keep the temporary files (incl. downloaded dependencies) used
@@ -76,7 +80,7 @@ EOF
 list_arches() {
 	local arch
 	for arch in $1; do
-		local udir=$UBASE-$arch-2.6
+		local udir=$UBASE-$arch$PF
 		echo $(egrep -v "^(#|[[:space:]]*$)" $udir/kernel-versions | \
 			awk '{print $1}' | sort | uniq)
 	done
@@ -98,13 +102,17 @@ case "$OPERATION" in
 	usage "unrecognized operation" ;;
 esac
 
-UBASE=linux-$TYPE-di
-OUTDIR=massbuild.out.$TYPE
+KTYPE=linux
+PF=-2.6
 
 while true; do
 	case "$1" in
 	    "")
 		break ;;
+	    --bsd)
+		KTYPE=kfreebsd
+		PF=
+		;;
 	    -k)
 		NO_CLEAN=1
 		;;
@@ -137,11 +145,21 @@ while true; do
 	shift
 done
 
+UBASE=$KTYPE-$TYPE-di
+OUTDIR=massbuild.out.$TYPE
+
+if [ "$KTYPE" = kfreebsd ]; then
+	# Ensure all arches have kfreebsd- prefix
+	for arch in $ARCHES; do
+		arch=${arch#kfreebsd-}
+		ARCHES="${ARCHES:+$ARCHES }kfreebsd-$arch"
+	done
+fi
 
 # Default to all possible architectures
 REQUESTED=$ARCHES
 if [ -z "$ARCHES" ]; then
-	for uarch in $(ls -d $UBASE-*-2.6 | cut -d- -f4); do
+	for uarch in $(ls -d $UBASE-*$PF | cut -d- -f4); do
 		ARCHES=${ARCHES:+$ARCHES }$(list_arches $uarch)
 	done
 fi
@@ -152,10 +170,12 @@ for arch in $ARCHES; do
 	case $arch in
 	    # ppc64 is no longer supported, but kept here as example
 	    #ppc64)	uarch=powerpc ;;
+	    kfreebsd-*)	uarch=${arch#kfreebsd-} ;;
 	    *)		uarch=$arch ;;
 	esac
 
-	if ! [ -f $UBASE-$uarch-2.6/kernel-versions ]; then
+	if ([ "$KTYPE" = linux ] && expr $arch : kfreebsd >/dev/null) ||
+	   ! [ -f $UBASE-$uarch$PF/kernel-versions ]; then
 		usage "unsupported architecture '$arch'"
 	fi
 	if ! echo " $UARCHES " | grep -q " $uarch "; then
@@ -188,9 +208,9 @@ clean_arch_tmp() {
 
 clean_arch() {
 	# Remove from both dirs to also clean manual or failed builds
-	rm -f ./$UBASE-$arch-2.6_*.*
+	rm -f ./$UBASE-$arch${PF}_*.*
 	rm -f ./*_$1.udeb
-	rm -f ./$OUTDIR/$UBASE-$arch-2.6_*.*
+	rm -f ./$OUTDIR/$UBASE-$arch${PF}_*.*
 	rm -f ./$OUTDIR/*_$1.udeb
 }
 
@@ -284,7 +304,7 @@ check_kernel_wedge() {
 }
 
 select_source() {
-	local bdep=$1
+	local bdep=$1 v
 	case $bdep in
 	    # Kernel images
 	    linux-image-2.6*)
@@ -315,6 +335,11 @@ select_source() {
 		#BDEP_SOURCE=loop-aes # for kernels < 2.6.24
 		BDEP_SOURCE=linux-modules-extra-2.6
 		BDEP_BINARY_BASE=loop-aes-modules-2.6
+		;;
+	    kfreebsd-image-*)
+		v=$(echo $bdep | sed -r "s/.*image-([0-9.]+)-.*/\1/")
+		BDEP_SOURCE=kfreebsd-${v%%.*}
+		BDEP_BINARY_BASE=kfreebsd-image-$v
 		;;
 	    *)
 		echo "Unsupported build-dependency '$1'"
@@ -386,11 +411,6 @@ retrieve_package() {
 		   grep "$BDEP_BINARY_BASE.*\.deb" | \
 		   sed -r "s/^.*(href|HREF)=\"([^\"]*)\".*$/\2/" | \
 		   sed "s/+/%2B/g")"
-	if [ "$mirror_type" != incoming ] && [ -z "$package_list" ]; then
-		echo "Failed to retrieve available build dependencies"
-		clean_arch_tmp
-		exit 1
-	fi
 
 	package_list="$(echo "$package_list" | grep "${build_dep}_.*$kv_arch\.")"
 	if [ -z "$package_list" ]; then
@@ -431,13 +451,16 @@ get_depends() {
 			elif [ "$USE_INCOMING" ] && retrieve_package incoming; then
 				:
 			else
+				echo "Failed to retrieve available build dependencies"
+				clean_arch_tmp
 				exit 1
 			fi
 
 			add_changelog "Built against version $BDEP_SVERSION of $BDEP_SOURCE."
 			dpkg -x $ARCH_TDIR/$PACKAGE $ARCH_TDIR/
 		done
-		if [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
+		if [ "$KTYPE" = linux ] &&
+		   [ -d $ARCH_TDIR/lib/modules/$installedname ]; then
 			/sbin/depmod -b $ARCH_TDIR/ $installedname
 		fi
 	done
@@ -489,7 +512,7 @@ LOGFILE="$(pwd -P)/massbuild.$OPERATION.log"
 case $OPERATION in
     krelease|mrelease)
 	for uarch in $UARCHES; do
-		cd $UBASE-$uarch-2.6
+		cd $UBASE-$uarch$PF
 		log "Committing changes for $uarch..."
 		SVN_ST="$(svn st)"
 		if [ "$(echo "$SVN_ST" | egrep -q "^(\?|C)")" ]; then
@@ -557,7 +580,7 @@ for uarch in $UARCHES; do
 	echo
 	init_changelog
 
-	USOURCE=$UBASE-$uarch-2.6
+	USOURCE=$UBASE-$uarch$PF
 	for arch in $(list_arches $uarch); do
 		if ! echo " $ARCHES " | grep -q " $arch "; then
 			continue
@@ -603,7 +626,7 @@ for uarch in $UARCHES; do
 				merge_changes
 
 				mkdir -p ../$OUTDIR
-				mv ../$UBASE-$arch-2.6_*.* ../$OUTDIR
+				mv ../$UBASE-$uarch${PF}_*.* ../$OUTDIR
 				mv ../*_$arch.udeb ../$OUTDIR
 			fi
 		else
