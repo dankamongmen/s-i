@@ -1146,7 +1146,7 @@ struct question_handlers {
 static int
 newt_initialize(struct frontend *obj, struct configuration *conf)
 {
-    int i, width = 80, height = 24;
+    int width = 80, height = 24;
     const char *palette;
 
     obj->interactive = 1;
