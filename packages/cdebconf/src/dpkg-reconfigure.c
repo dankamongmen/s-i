@@ -273,7 +273,11 @@ int runscript (const char *pkg, const char *script, const char *param) {
 	if (strcmp("script", "config") == 0 || is_confmodule(filename))
 	{
 		argv[1] = filename;
-		argv[2] = param;
+		/* not actually modified, but this ultimately ends up in
+		 * execv(), which wants argv elements to be char *, so
+		 * silence the warning
+		 */
+		argv[2] = (char *) param;
 		argv[3] = version;
 		if ((ret = runconfmodule(4, argv)) != 0)
 			return ret;
