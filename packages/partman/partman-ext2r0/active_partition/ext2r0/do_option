@@ -52,15 +52,16 @@ do_mountpoint_manual () {
 			else
 				old_mountpoint=/
 			fi
-			db_set partman-ext2r0/mountpoint_manual "$old_mountpoint"
-			db_input critical partman-ext2r0/mountpoint_manual || $noninteractive
+			T=partman-basicfilesystems/mountpoint_manual
+			db_set $T "$old_mountpoint"
+			db_input critical $T || $noninteractive
 			db_go || return 1
-			db_get partman-ext2r0/mountpoint_manual
+			db_get $T
 
 			if expr "$RET" : '/[^ ]*$' >/dev/null; then
 				new_mountpoint=$RET
 			else
-				db_input high partman-ext2r0/bad_mountpoint || true
+				db_input high partman-basicfilesystems/bad_mountpoint || true
 				db_go || true
 			fi
 		done
