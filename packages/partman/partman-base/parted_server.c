@@ -1313,9 +1313,9 @@ command_partitions()
                 if (PED_PARTITION_METADATA & part->type)
                         continue;
                 /* Undoubtedly the following operator is a hack.
-                   Libparted tries to allign the partitions at
+                   Libparted tries to align the partitions at
                    cylinder boundaries but despite this it sometimes
-                   reports free spaces due to alligning and even
+                   reports free spaces due to aligning and even
                    allows creation of unaligned partitions in these
                    free spaces.  I am not sure if this is a bug or a
                    feature of libparted. */
