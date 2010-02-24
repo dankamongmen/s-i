@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2009-11-18 01:11+0000\n"
+"POT-Creation-Date: 2010-02-24 01:12+0000\n"
 "PO-Revision-Date: 2009-11-20 10:20+0100\n"
 "Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
@@ -1572,25 +1572,25 @@ msgstr ""
 "hårddisksikonen)."
 
 #. Tag: filename
-#: install-methods.xml:1034 install-methods.xml:1372
+#: install-methods.xml:1034 install-methods.xml:1361
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 #. Tag: filename
-#: install-methods.xml:1039 install-methods.xml:1377
+#: install-methods.xml:1039 install-methods.xml:1366
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 #. Tag: filename
-#: install-methods.xml:1044 install-methods.xml:1382
+#: install-methods.xml:1044 install-methods.xml:1371
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 #. Tag: filename
-#: install-methods.xml:1049 install-methods.xml:1387
+#: install-methods.xml:1049 install-methods.xml:1376
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
@@ -1728,21 +1728,29 @@ msgstr ""
 "<classname>tftpd-hpa</classname>."
 
 #. Tag: title
-#: install-methods.xml:1142
+#: install-methods.xml:1141
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "Konfigurering av RARP-server"
 
 #. Tag: para
-#: install-methods.xml:1143
-#, no-c-format
+#: install-methods.xml:1142
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
+#| "address) of the client computers to be installed. If you don't know this "
+#| "information, you can <phrase arch=\"sparc\"> pick it off the initial "
+#| "OpenPROM boot messages, use the OpenBoot <userinput>.enet-addr</"
+#| "userinput> command, or </phrase> boot into <quote>Rescue</quote> mode (e."
+#| "g., from the rescue floppy) and use the command <userinput>/sbin/ifconfig "
+#| "eth0</userinput>."
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
 "address) of the client computers to be installed. If you don't know this "
 "information, you can <phrase arch=\"sparc\"> pick it off the initial "
 "OpenPROM boot messages, use the OpenBoot <userinput>.enet-addr</userinput> "
 "command, or </phrase> boot into <quote>Rescue</quote> mode (e.g., from the "
-"rescue floppy) and use the command <userinput>/sbin/ifconfig eth0</"
+"rescue floppy) and use the command <userinput>ip addr show dev eth0</"
 "userinput>."
 msgstr ""
 "För att ställa in RARP behöver du veta Ethernet-adressen (även kallad MAC-"
@@ -1754,7 +1762,7 @@ msgstr ""
 "<userinput>/sbin/ifconfig eth0</userinput>."
 
 #. Tag: para
-#: install-methods.xml:1155
+#: install-methods.xml:1154
 #, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1778,121 +1786,13 @@ msgstr ""
 "eller <userinput>/usr/etc/rarpd -a</userinput> på SunOS 4 (Solaris 1)."
 
 #. Tag: title
-#: install-methods.xml:1177
-#, no-c-format
-msgid "Setting up a BOOTP server"
-msgstr "Konfigurera en BOOTP-server"
-
-#. Tag: para
-#: install-methods.xml:1178
-#, no-c-format
-msgid ""
-"There are two BOOTP servers available for GNU/Linux. The first is CMU "
-"<command>bootpd</command>. The other is actually a DHCP server: ISC "
-"<command>dhcpd</command>. In &debian; these are contained in the "
-"<classname>bootp</classname> and <classname>dhcp3-server</classname> "
-"packages respectively."
-msgstr ""
-"Det finns två BOOTP-servrar tillgängliga för GNU/Linux. Den första är CMU "
-"<command>bootpd</command>. Den andra är faktiskt en DHCP-server: ISC "
-"<command>dhcpd</command>. I &debian; finns dessa i paketen <classname>bootp</"
-"classname> respektive <classname>dhcp3-server</classname>."
-
-#. Tag: para
-#: install-methods.xml:1186
-#, no-c-format
-msgid ""
-"To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
-"relevant line in <filename>/etc/inetd.conf</filename>. On &debian;, you can "
-"run <userinput>update-inetd --enable bootps</userinput>, then <userinput>/"
-"etc/init.d/inetd reload</userinput> to do so. Just in case your BOOTP server "
-"does not run Debian, the line in question should look like: "
-"<informalexample><screen>\n"
-"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
-"</screen></informalexample> Now, you must create an <filename>/etc/bootptab</"
-"filename> file. This has the same sort of familiar and cryptic format as the "
-"good old BSD <filename>printcap</filename>, <filename>termcap</filename>, "
-"and <filename>disktab</filename> files. See the <filename>bootptab</"
-"filename> manual page for more information. For CMU <command>bootpd</"
-"command>, you will need to know the hardware (MAC) address of the client. "
-"Here is an example <filename>/etc/bootptab</filename>: "
-"<informalexample><screen>\n"
-"client:\\\n"
-"  hd=/tftpboot:\\\n"
-"  bf=tftpboot.img:\\\n"
-"  ip=192.168.1.90:\\\n"
-"  sm=255.255.255.0:\\\n"
-"  sa=192.168.1.1:\\\n"
-"  ha=0123456789AB:\n"
-"</screen></informalexample> You will need to change at least the <quote>ha</"
-"quote> option, which specifies the hardware address of the client. The "
-"<quote>bf</quote> option specifies the file a client should retrieve via "
-"TFTP; see <xref linkend=\"tftp-images\"/> for more details. <phrase arch="
-"\"mips\"> On SGI machines you can just enter the command monitor and type "
-"<userinput>printenv</userinput>. The value of the <userinput>eaddr</"
-"userinput> variable is the machine's MAC address. </phrase>"
-msgstr ""
-"För att använda CMU <command>bootpd</command>, måste du först kommentera "
-"bort (eller lägga till) den relevanta raden i <filename>/etc/inetd.conf</"
-"filename>. På &debian; kan du köra <userinput>update-inetd --enable bootps</"
-"userinput>, sedan <userinput>/etc/init.d/inetd reload</userinput> för att "
-"göra det. Om din BOOTP-server inte kör Debian, bör raden i fråga se ut så "
-"här: <informalexample><screen>\n"
-"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
-"</screen></informalexample> Nu måste du skapa filen <filename>/etc/bootptab</"
-"filename>. Den har samma sorts familjära och kryptiska format som de gamla "
-"goda BSD-filerna <filename>printcap</filename>, <filename>termcap</filename> "
-"och <filename>disktab</filename>. Se manualsidan för <filename>bootptab</"
-"filename> för mer information. För CMU <command>bootpd</command> behöver du "
-"känna till maskinvaruadressen (MAC) för klienten. Här är ett exempel på en "
-"<filename>/etc/bootptab</filename>: <informalexample><screen>\n"
-"client:\\\n"
-"  hd=/tftpboot:\\\n"
-"  bf=tftpboot.img:\\\n"
-"  ip=192.168.1.90:\\\n"
-"  sm=255.255.255.0:\\\n"
-"  sa=192.168.1.1:\\\n"
-"  ha=0123456789AB:\n"
-"</screen></informalexample> Du behöver ändra åtminstone alternativet "
-"<quote>ha</quote>, som anger maskinvaruadressen för klienten. Alternativet "
-"<quote>bf</quote> anger filen som klienten bör hämta via TFTP; se <xref "
-"linkend=\"tftp-images\"/> för mer detaljer. <phrase arch=\"mips\"> På SGI-"
-"maskiner kan du bara gå in kommandomonitorn och skriva <userinput>printenv</"
-"userinput>. Värdet för variabeln <userinput>eaddr</userinput> är maskinens "
-"MAC-adress. </phrase>"
-
-#. Tag: para
-#: install-methods.xml:1219
-#, no-c-format
-msgid ""
-"By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
-"easy, because it treats BOOTP clients as a moderately special case of DHCP "
-"clients. Some architectures require a complex configuration for booting "
-"clients via BOOTP. If yours is one of those, read the section <xref linkend="
-"\"dhcpd\"/>. Otherwise you will probably be able to get away with simply "
-"adding the <userinput>allow bootp</userinput> directive to the configuration "
-"block for the subnet containing the client in <filename>/etc/dhcp3/dhcpd."
-"conf</filename>, and restart <command>dhcpd</command> with <userinput>/etc/"
-"init.d/dhcpd3-server restart</userinput>."
-msgstr ""
-"Tvärtemot är konfigurering av BOOTP med ISC <command>dhcpd</command> riktigt "
-"enkelt, för att den behandlar BOOTP-klienter som vanliga specialfall av DHCP-"
-"klienter. Vissa arkitekturer kräver en komplex konfiguration för att starta "
-"upp klienter via BOOTP. Om din dator är en av dessa, läs avsnittet <xref "
-"linkend=\"dhcpd\"/>. Om inte, kommer du antagligen komma undan med att bara "
-"lägga till direktivet <userinput>allow bootp</userinput> till "
-"konfigurationsblocket för subnätet som innehåller klienten i <filename>/etc/"
-"dhcp3/dhcpd.conf</filename>, och starta om <command>dhcpd</command> med "
-"<userinput>/etc/init.d/dhcpd3-server restart</userinput>."
-
-#. Tag: title
-#: install-methods.xml:1241
+#: install-methods.xml:1175
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "Konfigurering av DHCP-server"
 
 #. Tag: para
-#: install-methods.xml:1242
+#: install-methods.xml:1176
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -1906,7 +1806,7 @@ msgstr ""
 "filename>):"
 
 #. Tag: screen
-#: install-methods.xml:1249
+#: install-methods.xml:1183
 #, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -1950,7 +1850,7 @@ msgstr ""
 "}"
 
 #. Tag: para
-#: install-methods.xml:1251
+#: install-methods.xml:1185
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -1968,7 +1868,7 @@ msgstr ""
 "hämtas via TFTP."
 
 #. Tag: para
-#: install-methods.xml:1261
+#: install-methods.xml:1195
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -1978,13 +1878,13 @@ msgstr ""
 "starta om den med <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
 
 #. Tag: title
-#: install-methods.xml:1269
+#: install-methods.xml:1203
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "Aktivera PXE-uppstart i DHCP-konfigurationen"
 
 #. Tag: para
-#: install-methods.xml:1270
+#: install-methods.xml:1204
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -2055,33 +1955,140 @@ msgstr ""
 "kärnavbildning (se <xref linkend=\"tftp-images\"/> nedan)."
 
 #. Tag: title
-#: install-methods.xml:1286
+#: install-methods.xml:1224
+#, no-c-format
+msgid "Setting up a BOOTP server"
+msgstr "Konfigurera en BOOTP-server"
+
+#. Tag: para
+#: install-methods.xml:1225
+#, no-c-format
+msgid ""
+"There are two BOOTP servers available for GNU/Linux. The first is CMU "
+"<command>bootpd</command>. The other is actually a DHCP server: ISC "
+"<command>dhcpd</command>. In &debian; these are contained in the "
+"<classname>bootp</classname> and <classname>dhcp3-server</classname> "
+"packages respectively."
+msgstr ""
+"Det finns två BOOTP-servrar tillgängliga för GNU/Linux. Den första är CMU "
+"<command>bootpd</command>. Den andra är faktiskt en DHCP-server: ISC "
+"<command>dhcpd</command>. I &debian; finns dessa i paketen <classname>bootp</"
+"classname> respektive <classname>dhcp3-server</classname>."
+
+#. Tag: para
+#: install-methods.xml:1233
+#, no-c-format
+msgid ""
+"To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
+"relevant line in <filename>/etc/inetd.conf</filename>. On &debian;, you can "
+"run <userinput>update-inetd --enable bootps</userinput>, then <userinput>/"
+"etc/init.d/inetd reload</userinput> to do so. Just in case your BOOTP server "
+"does not run Debian, the line in question should look like: "
+"<informalexample><screen>\n"
+"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
+"</screen></informalexample> Now, you must create an <filename>/etc/bootptab</"
+"filename> file. This has the same sort of familiar and cryptic format as the "
+"good old BSD <filename>printcap</filename>, <filename>termcap</filename>, "
+"and <filename>disktab</filename> files. See the <filename>bootptab</"
+"filename> manual page for more information. For CMU <command>bootpd</"
+"command>, you will need to know the hardware (MAC) address of the client. "
+"Here is an example <filename>/etc/bootptab</filename>: "
+"<informalexample><screen>\n"
+"client:\\\n"
+"  hd=/tftpboot:\\\n"
+"  bf=tftpboot.img:\\\n"
+"  ip=192.168.1.90:\\\n"
+"  sm=255.255.255.0:\\\n"
+"  sa=192.168.1.1:\\\n"
+"  ha=0123456789AB:\n"
+"</screen></informalexample> You will need to change at least the <quote>ha</"
+"quote> option, which specifies the hardware address of the client. The "
+"<quote>bf</quote> option specifies the file a client should retrieve via "
+"TFTP; see <xref linkend=\"tftp-images\"/> for more details. <phrase arch="
+"\"mips\"> On SGI machines you can just enter the command monitor and type "
+"<userinput>printenv</userinput>. The value of the <userinput>eaddr</"
+"userinput> variable is the machine's MAC address. </phrase>"
+msgstr ""
+"För att använda CMU <command>bootpd</command>, måste du först kommentera "
+"bort (eller lägga till) den relevanta raden i <filename>/etc/inetd.conf</"
+"filename>. På &debian; kan du köra <userinput>update-inetd --enable bootps</"
+"userinput>, sedan <userinput>/etc/init.d/inetd reload</userinput> för att "
+"göra det. Om din BOOTP-server inte kör Debian, bör raden i fråga se ut så "
+"här: <informalexample><screen>\n"
+"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
+"</screen></informalexample> Nu måste du skapa filen <filename>/etc/bootptab</"
+"filename>. Den har samma sorts familjära och kryptiska format som de gamla "
+"goda BSD-filerna <filename>printcap</filename>, <filename>termcap</filename> "
+"och <filename>disktab</filename>. Se manualsidan för <filename>bootptab</"
+"filename> för mer information. För CMU <command>bootpd</command> behöver du "
+"känna till maskinvaruadressen (MAC) för klienten. Här är ett exempel på en "
+"<filename>/etc/bootptab</filename>: <informalexample><screen>\n"
+"client:\\\n"
+"  hd=/tftpboot:\\\n"
+"  bf=tftpboot.img:\\\n"
+"  ip=192.168.1.90:\\\n"
+"  sm=255.255.255.0:\\\n"
+"  sa=192.168.1.1:\\\n"
+"  ha=0123456789AB:\n"
+"</screen></informalexample> Du behöver ändra åtminstone alternativet "
+"<quote>ha</quote>, som anger maskinvaruadressen för klienten. Alternativet "
+"<quote>bf</quote> anger filen som klienten bör hämta via TFTP; se <xref "
+"linkend=\"tftp-images\"/> för mer detaljer. <phrase arch=\"mips\"> På SGI-"
+"maskiner kan du bara gå in kommandomonitorn och skriva <userinput>printenv</"
+"userinput>. Värdet för variabeln <userinput>eaddr</userinput> är maskinens "
+"MAC-adress. </phrase>"
+
+#. Tag: para
+#: install-methods.xml:1266
+#, no-c-format
+msgid ""
+"By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
+"easy, because it treats BOOTP clients as a moderately special case of DHCP "
+"clients. Some architectures require a complex configuration for booting "
+"clients via BOOTP. If yours is one of those, read the section <xref linkend="
+"\"dhcpd\"/>. Otherwise you will probably be able to get away with simply "
+"adding the <userinput>allow bootp</userinput> directive to the configuration "
+"block for the subnet containing the client in <filename>/etc/dhcp3/dhcpd."
+"conf</filename>, and restart <command>dhcpd</command> with <userinput>/etc/"
+"init.d/dhcpd3-server restart</userinput>."
+msgstr ""
+"Tvärtemot är konfigurering av BOOTP med ISC <command>dhcpd</command> riktigt "
+"enkelt, för att den behandlar BOOTP-klienter som vanliga specialfall av DHCP-"
+"klienter. Vissa arkitekturer kräver en komplex konfiguration för att starta "
+"upp klienter via BOOTP. Om din dator är en av dessa, läs avsnittet <xref "
+"linkend=\"dhcpd\"/>. Om inte, kommer du antagligen komma undan med att bara "
+"lägga till direktivet <userinput>allow bootp</userinput> till "
+"konfigurationsblocket för subnätet som innehåller klienten i <filename>/etc/"
+"dhcp3/dhcpd.conf</filename>, och starta om <command>dhcpd</command> med "
+"<userinput>/etc/init.d/dhcpd3-server restart</userinput>."
+
+#. Tag: title
+#: install-methods.xml:1285
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "Aktivering av TFTP-server"
 
 #. Tag: para
-#: install-methods.xml:1287
+#: install-methods.xml:1286
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
-"<command>tftpd</command> is enabled. This is usually enabled by having "
-"something like the following line in <filename>/etc/inetd.conf</filename>: "
-"<informalexample><screen>\n"
-"tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
-"</screen></informalexample> Debian packages will in general set this up "
-"correctly by default when they are installed."
+"<command>tftpd</command> is enabled."
 msgstr ""
-"För att få TFTP-servern klar att köra, bör du först se till att "
-"<command>tftpd</command> är aktiverad. Den aktiveras normalt sett genom att "
-"ha en rad som liknar följande rad i <filename>/etc/inetd.conf</filename>: "
-"<informalexample><screen>\n"
-"tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
-"</screen></informalexample> Debian-paketen kommer normalt sett att ställa in "
-"det korrekt som standard när de installeras."
 
 #. Tag: para
-#: install-methods.xml:1299
+#: install-methods.xml:1291
+#, no-c-format
+msgid ""
+"In the case of <classname>tftpd-hpa</classname> there are two ways the "
+"service can be run. It can be started on demand by the system's "
+"<classname>inetd</classname> daemon, or it can be set up to run as an "
+"independent daemon. Which of these methods is used is selected when the "
+"package is installed and can be changed by reconfiguring the package."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:1300
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -2099,39 +2106,18 @@ msgstr ""
 "justera konfigurationsexemplen i det här avsnittet."
 
 #. Tag: para
-#: install-methods.xml:1309
+#: install-methods.xml:1310
 #, no-c-format
 msgid ""
-"Look in <filename>/etc/inetd.conf</filename> and remember the directory "
-"which is used as the argument of <command>in.tftpd</command><footnote> "
-"<para> All <command>in.tftpd</command> alternatives available in Debian "
-"should log TFTP requests to the system logs by default. Some of them support "
-"a <userinput>-v</userinput> argument to increase verbosity. It is "
-"recommended to check these log messages in case of boot problems as they are "
-"a good starting point for diagnosing the cause of errors. </para> </"
-"footnote>; you'll need that below. If you've had to change <filename>/etc/"
-"inetd.conf</filename>, you'll have to notify the running <command>inetd</"
-"command> process that the file has changed. On a Debian machine, run "
-"<userinput>/etc/init.d/inetd reload</userinput>; on other machines, find out "
-"the process ID for <command>inetd</command>, and run <userinput>kill -HUP "
-"<replaceable>inetd-pid</replaceable></userinput>."
+"All <command>in.tftpd</command> alternatives available in Debian should log "
+"TFTP requests to the system logs by default. Some of them support a "
+"<userinput>-v</userinput> argument to increase verbosity. It is recommended "
+"to check these log messages in case of boot problems as they are a good "
+"starting point for diagnosing the cause of errors."
 msgstr ""
-"Leta i filen <filename>/etc/inetd.conf</filename> och kom ihåg katalogen som "
-"används som argument till <command>in.tftpd</command><footnote> <para> Alla "
-"alternativ till <command>in.tftpd</command> i Debian ska som standard logga "
-"TFTP-begäran till systemloggarna. Några av dem har stöd för argumentet "
-"<userinput>-v</userinput> för att öka informationsnivån. Det rekommenderas "
-"att kontrollera dessa loggmeddelanden om uppstartsproblem inträffar eftersom "
-"de är en bra startpunkt för att diagnostisera problem. </para> </footnote>; "
-"du behöver det senare. Om du behövde ändra <filename>/etc/inetd.conf</"
-"filename>, behöver du meddela till den körande <command>inetd</command>-"
-"processen att filen har ändrats. På en Debian-maskin, kör <userinput>/etc/"
-"init.d/inetd reload</userinput>; på andra maskiner, ta reda på vilket "
-"process-id som <command>inetd</command> har och kör sedan <userinput>kill -"
-"HUP <replaceable>inetd-pid</replaceable></userinput>."
 
 #. Tag: para
-#: install-methods.xml:1329
+#: install-methods.xml:1318
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2162,13 +2148,13 @@ msgstr ""
 "Linux TFTP-server använder."
 
 #. Tag: title
-#: install-methods.xml:1351
+#: install-methods.xml:1340
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "Flytta TFTP-avbildningarna till rätt plats"
 
 #. Tag: para
-#: install-methods.xml:1352
+#: install-methods.xml:1341
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2185,7 +2171,7 @@ msgstr ""
 "finns inga riktiga standarder."
 
 #. Tag: para
-#: install-methods.xml:1361
+#: install-methods.xml:1350
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2201,13 +2187,13 @@ msgstr ""
 "filename>:"
 
 #. Tag: filename
-#: install-methods.xml:1392
+#: install-methods.xml:1381
 #, no-c-format
 msgid "boot.msg"
 msgstr "boot.msg"
 
 #. Tag: para
-#: install-methods.xml:1397
+#: install-methods.xml:1386
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2224,7 +2210,7 @@ msgstr ""
 "uppstart."
 
 #. Tag: para
-#: install-methods.xml:1405
+#: install-methods.xml:1394
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2240,13 +2226,13 @@ msgstr ""
 "efi</filename> till <command>tftpd</command> som filnamnet att starta upp på."
 
 #. Tag: title
-#: install-methods.xml:1417
+#: install-methods.xml:1406
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "Uppstart via TFTP för SPARC"
 
 #. Tag: para
-#: install-methods.xml:1418
+#: install-methods.xml:1407
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2278,7 +2264,7 @@ msgstr ""
 "underarkitekturens namn."
 
 #. Tag: para
-#: install-methods.xml:1434
+#: install-methods.xml:1423
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2292,7 +2278,7 @@ msgstr ""
 "avbildningsnamn som efterfrågas."
 
 #. Tag: para
-#: install-methods.xml:1441
+#: install-methods.xml:1430
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2306,13 +2292,13 @@ msgstr ""
 "i katalogen som TFTP-servern letar i."
 
 #. Tag: title
-#: install-methods.xml:1452
+#: install-methods.xml:1441
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "Uppstart via TFTP för SGI"
 
 #. Tag: para
-#: install-methods.xml:1453
+#: install-methods.xml:1442
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2326,13 +2312,13 @@ msgstr ""
 "<userinput>filename=</userinput> i <filename>/etc/dhcpd.conf</filename>."
 
 #. Tag: title
-#: install-methods.xml:1561
+#: install-methods.xml:1550
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "Automatisk installation"
 
 #. Tag: para
-#: install-methods.xml:1562
+#: install-methods.xml:1551
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2348,13 +2334,13 @@ msgstr ""
 "classname>, och själva Debian Installer."
 
 #. Tag: title
-#: install-methods.xml:1575
+#: install-methods.xml:1564
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "Automatisk installation med Debian Installer"
 
 #. Tag: para
-#: install-methods.xml:1576
+#: install-methods.xml:1565
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2368,7 +2354,7 @@ msgstr ""
 "ställs under installationsprocessen."
 
 #. Tag: para
-#: install-methods.xml:1583
+#: install-methods.xml:1572
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
@@ -2376,6 +2362,53 @@ msgid ""
 msgstr ""
 "Full dokumentation om förinställning inklusive ett fungerande exempel som du "
 "kan redigera finns i <xref linkend=\"appendix-preseed\"/>."
+
+#~ msgid ""
+#~ "To get the TFTP server ready to go, you should first make sure that "
+#~ "<command>tftpd</command> is enabled. This is usually enabled by having "
+#~ "something like the following line in <filename>/etc/inetd.conf</"
+#~ "filename>: <informalexample><screen>\n"
+#~ "tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
+#~ "</screen></informalexample> Debian packages will in general set this up "
+#~ "correctly by default when they are installed."
+#~ msgstr ""
+#~ "För att få TFTP-servern klar att köra, bör du först se till att "
+#~ "<command>tftpd</command> är aktiverad. Den aktiveras normalt sett genom "
+#~ "att ha en rad som liknar följande rad i <filename>/etc/inetd.conf</"
+#~ "filename>: <informalexample><screen>\n"
+#~ "tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
+#~ "</screen></informalexample> Debian-paketen kommer normalt sett att ställa "
+#~ "in det korrekt som standard när de installeras."
+
+#~ msgid ""
+#~ "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
+#~ "which is used as the argument of <command>in.tftpd</command><footnote> "
+#~ "<para> All <command>in.tftpd</command> alternatives available in Debian "
+#~ "should log TFTP requests to the system logs by default. Some of them "
+#~ "support a <userinput>-v</userinput> argument to increase verbosity. It is "
+#~ "recommended to check these log messages in case of boot problems as they "
+#~ "are a good starting point for diagnosing the cause of errors. </para> </"
+#~ "footnote>; you'll need that below. If you've had to change <filename>/etc/"
+#~ "inetd.conf</filename>, you'll have to notify the running <command>inetd</"
+#~ "command> process that the file has changed. On a Debian machine, run "
+#~ "<userinput>/etc/init.d/inetd reload</userinput>; on other machines, find "
+#~ "out the process ID for <command>inetd</command>, and run <userinput>kill -"
+#~ "HUP <replaceable>inetd-pid</replaceable></userinput>."
+#~ msgstr ""
+#~ "Leta i filen <filename>/etc/inetd.conf</filename> och kom ihåg katalogen "
+#~ "som används som argument till <command>in.tftpd</command><footnote> "
+#~ "<para> Alla alternativ till <command>in.tftpd</command> i Debian ska som "
+#~ "standard logga TFTP-begäran till systemloggarna. Några av dem har stöd "
+#~ "för argumentet <userinput>-v</userinput> för att öka informationsnivån. "
+#~ "Det rekommenderas att kontrollera dessa loggmeddelanden om "
+#~ "uppstartsproblem inträffar eftersom de är en bra startpunkt för att "
+#~ "diagnostisera problem. </para> </footnote>; du behöver det senare. Om du "
+#~ "behövde ändra <filename>/etc/inetd.conf</filename>, behöver du meddela "
+#~ "till den körande <command>inetd</command>-processen att filen har "
+#~ "ändrats. På en Debian-maskin, kör <userinput>/etc/init.d/inetd reload</"
+#~ "userinput>; på andra maskiner, ta reda på vilket process-id som "
+#~ "<command>inetd</command> har och kör sedan <userinput>kill -HUP "
+#~ "<replaceable>inetd-pid</replaceable></userinput>."
 
 #~ msgid ""
 #~ "The QNAP Turbo Station (TS-109, TS-209 and TS-409) requires a kernel and "

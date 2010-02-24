@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: install-methods\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2009-11-18 01:11+0000\n"
+"POT-Creation-Date: 2010-02-24 01:12+0000\n"
 "PO-Revision-Date: 2009-02-12 23:36+1030\n"
 "Last-Translator: Clytie Siddall <clytie@riverland.net.au>\n"
 "Language-Team: Vietnamese <vi-VN@googlegroups.com>\n"
@@ -1595,28 +1595,28 @@ msgstr ""
 
 # Name: don't translate / Tên: đừng dịch
 #. Tag: filename
-#: install-methods.xml:1034 install-methods.xml:1372
+#: install-methods.xml:1034 install-methods.xml:1361
 #, no-c-format
 msgid "vmlinux"
 msgstr "vmlinux"
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: filename
-#: install-methods.xml:1039 install-methods.xml:1377
+#: install-methods.xml:1039 install-methods.xml:1366
 #, no-c-format
 msgid "initrd.gz"
 msgstr "initrd.gz"
 
 # Name: don't translate / Tên: đừng dịch
 #. Tag: filename
-#: install-methods.xml:1044 install-methods.xml:1382
+#: install-methods.xml:1044 install-methods.xml:1371
 #, no-c-format
 msgid "yaboot"
 msgstr "yaboot"
 
 # Literal: don't translate / Nghĩa chữ: đừng dịch
 #. Tag: filename
-#: install-methods.xml:1049 install-methods.xml:1387
+#: install-methods.xml:1049 install-methods.xml:1376
 #, no-c-format
 msgid "yaboot.conf"
 msgstr "yaboot.conf"
@@ -1753,21 +1753,29 @@ msgstr ""
 "thích hợp: khuyên bạn dùng <classname>tftpd-hpa</classname>."
 
 #. Tag: title
-#: install-methods.xml:1142
+#: install-methods.xml:1141
 #, no-c-format
 msgid "Setting up RARP server"
 msgstr "Thiết lập trình phục vụ RARP"
 
 #. Tag: para
-#: install-methods.xml:1143
-#, no-c-format
+#: install-methods.xml:1142
+#, fuzzy, no-c-format
+#| msgid ""
+#| "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
+#| "address) of the client computers to be installed. If you don't know this "
+#| "information, you can <phrase arch=\"sparc\"> pick it off the initial "
+#| "OpenPROM boot messages, use the OpenBoot <userinput>.enet-addr</"
+#| "userinput> command, or </phrase> boot into <quote>Rescue</quote> mode (e."
+#| "g., from the rescue floppy) and use the command <userinput>/sbin/ifconfig "
+#| "eth0</userinput>."
 msgid ""
 "To set up RARP, you need to know the Ethernet address (a.k.a. the MAC "
 "address) of the client computers to be installed. If you don't know this "
 "information, you can <phrase arch=\"sparc\"> pick it off the initial "
 "OpenPROM boot messages, use the OpenBoot <userinput>.enet-addr</userinput> "
 "command, or </phrase> boot into <quote>Rescue</quote> mode (e.g., from the "
-"rescue floppy) and use the command <userinput>/sbin/ifconfig eth0</"
+"rescue floppy) and use the command <userinput>ip addr show dev eth0</"
 "userinput>."
 msgstr ""
 "Để thiết lập RARP, bạn cần biết địa chỉ Ethernet (cũng tên địa chỉ MAC) của "
@@ -1778,7 +1786,7 @@ msgstr ""
 "dụng lệnh <userinput>/sbin/ifconfig eth0</userinput>."
 
 #. Tag: para
-#: install-methods.xml:1155
+#: install-methods.xml:1154
 #, no-c-format
 msgid ""
 "On a RARP server system using a Linux 2.4 or 2.6 kernel, or Solaris/SunOS, "
@@ -1803,135 +1811,13 @@ msgstr ""
 "rarpd -a</userinput> trên hệ thống SunOS 4 (Solaris 1)."
 
 #. Tag: title
-#: install-methods.xml:1177
-#, no-c-format
-msgid "Setting up a BOOTP server"
-msgstr "Thiết lập trình phục vụ BOOTP"
-
-#. Tag: para
-#: install-methods.xml:1178
-#, no-c-format
-msgid ""
-"There are two BOOTP servers available for GNU/Linux. The first is CMU "
-"<command>bootpd</command>. The other is actually a DHCP server: ISC "
-"<command>dhcpd</command>. In &debian; these are contained in the "
-"<classname>bootp</classname> and <classname>dhcp3-server</classname> "
-"packages respectively."
-msgstr ""
-"Có hai trình phục vụ BOOTP sẵn sàng cho GNU/Linux. Trình thứ nhất là "
-"<command>bootpd</command> CMU. Trình thứ hai thật là một trình phục vụ DHCP: "
-"<command>dhcpd</command> ISC. Trong &debian; hai trình này nằm trong "
-"gói<classname>bootp</classname> và <classname>dhcp3-server</classname> riêng "
-"từng cái."
-
-#. Tag: para
-#: install-methods.xml:1186
-#, no-c-format
-msgid ""
-"To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
-"relevant line in <filename>/etc/inetd.conf</filename>. On &debian;, you can "
-"run <userinput>update-inetd --enable bootps</userinput>, then <userinput>/"
-"etc/init.d/inetd reload</userinput> to do so. Just in case your BOOTP server "
-"does not run Debian, the line in question should look like: "
-"<informalexample><screen>\n"
-"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
-"</screen></informalexample> Now, you must create an <filename>/etc/bootptab</"
-"filename> file. This has the same sort of familiar and cryptic format as the "
-"good old BSD <filename>printcap</filename>, <filename>termcap</filename>, "
-"and <filename>disktab</filename> files. See the <filename>bootptab</"
-"filename> manual page for more information. For CMU <command>bootpd</"
-"command>, you will need to know the hardware (MAC) address of the client. "
-"Here is an example <filename>/etc/bootptab</filename>: "
-"<informalexample><screen>\n"
-"client:\\\n"
-"  hd=/tftpboot:\\\n"
-"  bf=tftpboot.img:\\\n"
-"  ip=192.168.1.90:\\\n"
-"  sm=255.255.255.0:\\\n"
-"  sa=192.168.1.1:\\\n"
-"  ha=0123456789AB:\n"
-"</screen></informalexample> You will need to change at least the <quote>ha</"
-"quote> option, which specifies the hardware address of the client. The "
-"<quote>bf</quote> option specifies the file a client should retrieve via "
-"TFTP; see <xref linkend=\"tftp-images\"/> for more details. <phrase arch="
-"\"mips\"> On SGI machines you can just enter the command monitor and type "
-"<userinput>printenv</userinput>. The value of the <userinput>eaddr</"
-"userinput> variable is the machine's MAC address. </phrase>"
-msgstr ""
-"Để sử dụng <command>bootpd</command> CMU, trước tiên bạn cần phải bỏ ghi chú "
-"(hay thêm) dòng tương ứng trong trong tập tin cấu hình <filename>/etc/inetd."
-"conf</filename>. Dưới hệ điều hành &debian;, bạn có khả năng chạy lệnh "
-"<userinput>update-inetd --enable bootps</userinput>, rồi <userinput>/etc/"
-"init.d/inetd reload</userinput> để làm như thế. Trong trường hợp trình phục "
-"vụ BOOTP của bạn không chạy Debian được, dòng đó nên hình như: "
-"<informalexample><screen>\n"
-"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
-"</screen></informalexample> Sau đó, bạn cần phải tạo một tập tin <filename>/"
-"etc/bootptab</filename>. Nó có cùng một dạng thức thường và khó hiểu với "
-"những tập tin <filename>printcap</filename>, <filename>termcap</filename> và "
-"<filename>disktab</filename> của BSD. Xem trang hướng dẫn (man) "
-"<filename>bootptab</filename> để tìm thông tin thêm. Đối với tiến trình "
-"<command>bootpd</command>, bạn cần phải biết địa chỉ phần cứng (địa chỉ MAC) "
-"của máy khách. Đây là một tập tin <filename>/etc/bootptab</filename> thí "
-"dụ : <informalexample><screen>\n"
-"client:\\\n"
-"  hd=/tftpboot:\\\n"
-"  bf=tftpboot.img:\\\n"
-"  ip=192.168.1.90:\\\n"
-"  sm=255.255.255.0:\\\n"
-"  sa=192.168.1.1:\\\n"
-"  ha=0123456789AB:\n"
-"</screen></informalexample> Bạn cần phải thay đổi ít nhất tùy chọn "
-"<quote>ha</quote>, mà xác định địa chỉ phần cứng của máy khách. Tùy chọn "
-"<quote>bf</quote> xác định tập tin máy khách cần lấy bằng TFTP; xem <xref "
-"linkend=\"tftp-images\"/> để tìm chi tiết. <phrase arch=\"mips\"> Trên máy "
-"kiểu SGI, bạn có thể đơn giản vào bộ theo dõi lệnh rồi gõ "
-"<userinput>printenv</userinput> (in ra môi trường). Giá trị của biến "
-"<userinput>eaddr</userinput> là địa chỉ phần cứng (địa chỉ MAC) của máy đó. "
-"</phrase>"
-
-#. Tag: para
-#: install-methods.xml:1219
-#, fuzzy, no-c-format
-#| msgid ""
-#| "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
-#| "easy, because it treats BOOTP clients as a moderately special case of "
-#| "DHCP clients. Some architectures require a complex configuration for "
-#| "booting clients via BOOTP. If yours is one of those, read the section "
-#| "<xref linkend=\"dhcpd\"/>. In that case, you will probably be able to get "
-#| "away with simply adding the <userinput>allow bootp</userinput> directive "
-#| "to the configuration block for the subnet containing the client, and "
-#| "restart <command>dhcpd</command> with <userinput>/etc/init.d/dhcpd3-"
-#| "server restart</userinput>."
-msgid ""
-"By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
-"easy, because it treats BOOTP clients as a moderately special case of DHCP "
-"clients. Some architectures require a complex configuration for booting "
-"clients via BOOTP. If yours is one of those, read the section <xref linkend="
-"\"dhcpd\"/>. Otherwise you will probably be able to get away with simply "
-"adding the <userinput>allow bootp</userinput> directive to the configuration "
-"block for the subnet containing the client in <filename>/etc/dhcp3/dhcpd."
-"conf</filename>, and restart <command>dhcpd</command> with <userinput>/etc/"
-"init.d/dhcpd3-server restart</userinput>."
-msgstr ""
-"Mặt khác, tiến trình thiết lập BOOTP bằng <command>dhcpd</command> ISC là "
-"rất dễ dàng, vì nó xử lý các ứng dụng khách BOOTP là ứng dụng khách DHCP "
-"kiểu hơi đặc biệt. Một số kiến trúc riêng cần thiết cấu hình phức tạp để "
-"khởi động ứng dụng khách thông qua BOOTP. Nếu máy của bạn có kiến trúc như "
-"thế, hãy đọc tiết đoạn <xref linkend=\"dhcpd\"/>. Trong trường hợp đó, rất "
-"có thể là bạn đơn giản cần phải thêm chỉ thị <userinput>allow bootp</"
-"userinput> (cho phép BOOTP) vào khối cấu hình dành cho mạng phụ chứa máy "
-"chạy ứng dụng khách đó, rồi khởi chạy lại trình nền <command>dhcpd</command> "
-"bằng lệnh <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
-
-#. Tag: title
-#: install-methods.xml:1241
+#: install-methods.xml:1175
 #, no-c-format
 msgid "Setting up a DHCP server"
 msgstr "Thiết lập trình phục vụ DHCP"
 
 #. Tag: para
-#: install-methods.xml:1242
+#: install-methods.xml:1176
 #, no-c-format
 msgid ""
 "One free software DHCP server is ISC <command>dhcpd</command>. For &debian;, "
@@ -1945,7 +1831,7 @@ msgstr ""
 "filename>):"
 
 #. Tag: screen
-#: install-methods.xml:1249
+#: install-methods.xml:1183
 #, no-c-format
 msgid ""
 "option domain-name \"example.com\";\n"
@@ -2005,7 +1891,7 @@ msgstr ""
 "fixed-address\t\tđịa chỉ cố định]"
 
 #. Tag: para
-#: install-methods.xml:1251
+#: install-methods.xml:1185
 #, no-c-format
 msgid ""
 "In this example, there is one server <replaceable>servername</replaceable> "
@@ -2023,7 +1909,7 @@ msgstr ""
 "replaceable> (tên tập tin) nên là tên tập tin sẽ được lấy thông qua TFTP."
 
 #. Tag: para
-#: install-methods.xml:1261
+#: install-methods.xml:1195
 #, no-c-format
 msgid ""
 "After you have edited the <command>dhcpd</command> configuration file, "
@@ -2034,13 +1920,13 @@ msgstr ""
 "server restart</userinput>."
 
 #. Tag: title
-#: install-methods.xml:1269
+#: install-methods.xml:1203
 #, no-c-format
 msgid "Enabling PXE Booting in the DHCP configuration"
 msgstr "Bật khả năng khởi động PXE trong cấu hình DHCP"
 
 #. Tag: para
-#: install-methods.xml:1270
+#: install-methods.xml:1204
 #, no-c-format
 msgid ""
 "Here is another example for a <filename>dhcp.conf</filename> using the Pre-"
@@ -2111,33 +1997,154 @@ msgstr ""
 "hạt nhân (xem <xref linkend=\"tftp-images\"/> bên dưới)."
 
 #. Tag: title
-#: install-methods.xml:1286
+#: install-methods.xml:1224
+#, no-c-format
+msgid "Setting up a BOOTP server"
+msgstr "Thiết lập trình phục vụ BOOTP"
+
+#. Tag: para
+#: install-methods.xml:1225
+#, no-c-format
+msgid ""
+"There are two BOOTP servers available for GNU/Linux. The first is CMU "
+"<command>bootpd</command>. The other is actually a DHCP server: ISC "
+"<command>dhcpd</command>. In &debian; these are contained in the "
+"<classname>bootp</classname> and <classname>dhcp3-server</classname> "
+"packages respectively."
+msgstr ""
+"Có hai trình phục vụ BOOTP sẵn sàng cho GNU/Linux. Trình thứ nhất là "
+"<command>bootpd</command> CMU. Trình thứ hai thật là một trình phục vụ DHCP: "
+"<command>dhcpd</command> ISC. Trong &debian; hai trình này nằm trong "
+"gói<classname>bootp</classname> và <classname>dhcp3-server</classname> riêng "
+"từng cái."
+
+#. Tag: para
+#: install-methods.xml:1233
+#, no-c-format
+msgid ""
+"To use CMU <command>bootpd</command>, you must first uncomment (or add) the "
+"relevant line in <filename>/etc/inetd.conf</filename>. On &debian;, you can "
+"run <userinput>update-inetd --enable bootps</userinput>, then <userinput>/"
+"etc/init.d/inetd reload</userinput> to do so. Just in case your BOOTP server "
+"does not run Debian, the line in question should look like: "
+"<informalexample><screen>\n"
+"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
+"</screen></informalexample> Now, you must create an <filename>/etc/bootptab</"
+"filename> file. This has the same sort of familiar and cryptic format as the "
+"good old BSD <filename>printcap</filename>, <filename>termcap</filename>, "
+"and <filename>disktab</filename> files. See the <filename>bootptab</"
+"filename> manual page for more information. For CMU <command>bootpd</"
+"command>, you will need to know the hardware (MAC) address of the client. "
+"Here is an example <filename>/etc/bootptab</filename>: "
+"<informalexample><screen>\n"
+"client:\\\n"
+"  hd=/tftpboot:\\\n"
+"  bf=tftpboot.img:\\\n"
+"  ip=192.168.1.90:\\\n"
+"  sm=255.255.255.0:\\\n"
+"  sa=192.168.1.1:\\\n"
+"  ha=0123456789AB:\n"
+"</screen></informalexample> You will need to change at least the <quote>ha</"
+"quote> option, which specifies the hardware address of the client. The "
+"<quote>bf</quote> option specifies the file a client should retrieve via "
+"TFTP; see <xref linkend=\"tftp-images\"/> for more details. <phrase arch="
+"\"mips\"> On SGI machines you can just enter the command monitor and type "
+"<userinput>printenv</userinput>. The value of the <userinput>eaddr</"
+"userinput> variable is the machine's MAC address. </phrase>"
+msgstr ""
+"Để sử dụng <command>bootpd</command> CMU, trước tiên bạn cần phải bỏ ghi chú "
+"(hay thêm) dòng tương ứng trong trong tập tin cấu hình <filename>/etc/inetd."
+"conf</filename>. Dưới hệ điều hành &debian;, bạn có khả năng chạy lệnh "
+"<userinput>update-inetd --enable bootps</userinput>, rồi <userinput>/etc/"
+"init.d/inetd reload</userinput> để làm như thế. Trong trường hợp trình phục "
+"vụ BOOTP của bạn không chạy Debian được, dòng đó nên hình như: "
+"<informalexample><screen>\n"
+"bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120\n"
+"</screen></informalexample> Sau đó, bạn cần phải tạo một tập tin <filename>/"
+"etc/bootptab</filename>. Nó có cùng một dạng thức thường và khó hiểu với "
+"những tập tin <filename>printcap</filename>, <filename>termcap</filename> và "
+"<filename>disktab</filename> của BSD. Xem trang hướng dẫn (man) "
+"<filename>bootptab</filename> để tìm thông tin thêm. Đối với tiến trình "
+"<command>bootpd</command>, bạn cần phải biết địa chỉ phần cứng (địa chỉ MAC) "
+"của máy khách. Đây là một tập tin <filename>/etc/bootptab</filename> thí "
+"dụ : <informalexample><screen>\n"
+"client:\\\n"
+"  hd=/tftpboot:\\\n"
+"  bf=tftpboot.img:\\\n"
+"  ip=192.168.1.90:\\\n"
+"  sm=255.255.255.0:\\\n"
+"  sa=192.168.1.1:\\\n"
+"  ha=0123456789AB:\n"
+"</screen></informalexample> Bạn cần phải thay đổi ít nhất tùy chọn "
+"<quote>ha</quote>, mà xác định địa chỉ phần cứng của máy khách. Tùy chọn "
+"<quote>bf</quote> xác định tập tin máy khách cần lấy bằng TFTP; xem <xref "
+"linkend=\"tftp-images\"/> để tìm chi tiết. <phrase arch=\"mips\"> Trên máy "
+"kiểu SGI, bạn có thể đơn giản vào bộ theo dõi lệnh rồi gõ "
+"<userinput>printenv</userinput> (in ra môi trường). Giá trị của biến "
+"<userinput>eaddr</userinput> là địa chỉ phần cứng (địa chỉ MAC) của máy đó. "
+"</phrase>"
+
+#. Tag: para
+#: install-methods.xml:1266
+#, fuzzy, no-c-format
+#| msgid ""
+#| "By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
+#| "easy, because it treats BOOTP clients as a moderately special case of "
+#| "DHCP clients. Some architectures require a complex configuration for "
+#| "booting clients via BOOTP. If yours is one of those, read the section "
+#| "<xref linkend=\"dhcpd\"/>. In that case, you will probably be able to get "
+#| "away with simply adding the <userinput>allow bootp</userinput> directive "
+#| "to the configuration block for the subnet containing the client, and "
+#| "restart <command>dhcpd</command> with <userinput>/etc/init.d/dhcpd3-"
+#| "server restart</userinput>."
+msgid ""
+"By contrast, setting up BOOTP with ISC <command>dhcpd</command> is really "
+"easy, because it treats BOOTP clients as a moderately special case of DHCP "
+"clients. Some architectures require a complex configuration for booting "
+"clients via BOOTP. If yours is one of those, read the section <xref linkend="
+"\"dhcpd\"/>. Otherwise you will probably be able to get away with simply "
+"adding the <userinput>allow bootp</userinput> directive to the configuration "
+"block for the subnet containing the client in <filename>/etc/dhcp3/dhcpd."
+"conf</filename>, and restart <command>dhcpd</command> with <userinput>/etc/"
+"init.d/dhcpd3-server restart</userinput>."
+msgstr ""
+"Mặt khác, tiến trình thiết lập BOOTP bằng <command>dhcpd</command> ISC là "
+"rất dễ dàng, vì nó xử lý các ứng dụng khách BOOTP là ứng dụng khách DHCP "
+"kiểu hơi đặc biệt. Một số kiến trúc riêng cần thiết cấu hình phức tạp để "
+"khởi động ứng dụng khách thông qua BOOTP. Nếu máy của bạn có kiến trúc như "
+"thế, hãy đọc tiết đoạn <xref linkend=\"dhcpd\"/>. Trong trường hợp đó, rất "
+"có thể là bạn đơn giản cần phải thêm chỉ thị <userinput>allow bootp</"
+"userinput> (cho phép BOOTP) vào khối cấu hình dành cho mạng phụ chứa máy "
+"chạy ứng dụng khách đó, rồi khởi chạy lại trình nền <command>dhcpd</command> "
+"bằng lệnh <userinput>/etc/init.d/dhcpd3-server restart</userinput>."
+
+#. Tag: title
+#: install-methods.xml:1285
 #, no-c-format
 msgid "Enabling the TFTP Server"
 msgstr "Bật chạy trình phục vụ TFTP"
 
 #. Tag: para
-#: install-methods.xml:1287
+#: install-methods.xml:1286
 #, no-c-format
 msgid ""
 "To get the TFTP server ready to go, you should first make sure that "
-"<command>tftpd</command> is enabled. This is usually enabled by having "
-"something like the following line in <filename>/etc/inetd.conf</filename>: "
-"<informalexample><screen>\n"
-"tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
-"</screen></informalexample> Debian packages will in general set this up "
-"correctly by default when they are installed."
+"<command>tftpd</command> is enabled."
 msgstr ""
-"Để hiệu lực trình phục vụ TFTP, trước tiên bạn cần phải kiểm tra xem trình "
-"nền <command>tftpd</command> đã được bật chạy chưa. Bình thường nó được bật "
-"chạy bằng dòng theo đây (hay tương tự) trong tập tin cấu hình <filename>/etc/"
-"inetd.conf</filename>: <informalexample><screen>\n"
-"tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
-"</screen></informalexample> Khi bạn cài đặt các gói Debian, dòng này thường "
-"được thiết lập theo mặc định."
 
 #. Tag: para
-#: install-methods.xml:1299
+#: install-methods.xml:1291
+#, no-c-format
+msgid ""
+"In the case of <classname>tftpd-hpa</classname> there are two ways the "
+"service can be run. It can be started on demand by the system's "
+"<classname>inetd</classname> daemon, or it can be set up to run as an "
+"independent daemon. Which of these methods is used is selected when the "
+"package is installed and can be changed by reconfiguring the package."
+msgstr ""
+
+#. Tag: para
+#: install-methods.xml:1300
 #, no-c-format
 msgid ""
 "Historically, TFTP servers used <filename>/tftpboot</filename> as directory "
@@ -2155,40 +2162,18 @@ msgstr ""
 "bạn cần phải điều chỉnh những mẫu cấu hình trong phần này một cách tương ứng."
 
 #. Tag: para
-#: install-methods.xml:1309
+#: install-methods.xml:1310
 #, no-c-format
 msgid ""
-"Look in <filename>/etc/inetd.conf</filename> and remember the directory "
-"which is used as the argument of <command>in.tftpd</command><footnote> "
-"<para> All <command>in.tftpd</command> alternatives available in Debian "
-"should log TFTP requests to the system logs by default. Some of them support "
-"a <userinput>-v</userinput> argument to increase verbosity. It is "
-"recommended to check these log messages in case of boot problems as they are "
-"a good starting point for diagnosing the cause of errors. </para> </"
-"footnote>; you'll need that below. If you've had to change <filename>/etc/"
-"inetd.conf</filename>, you'll have to notify the running <command>inetd</"
-"command> process that the file has changed. On a Debian machine, run "
-"<userinput>/etc/init.d/inetd reload</userinput>; on other machines, find out "
-"the process ID for <command>inetd</command>, and run <userinput>kill -HUP "
-"<replaceable>inetd-pid</replaceable></userinput>."
+"All <command>in.tftpd</command> alternatives available in Debian should log "
+"TFTP requests to the system logs by default. Some of them support a "
+"<userinput>-v</userinput> argument to increase verbosity. It is recommended "
+"to check these log messages in case of boot problems as they are a good "
+"starting point for diagnosing the cause of errors."
 msgstr ""
-"Xem tập tin <filename>/etc/inetd.conf</filename> và nhớ thư mục được dùng "
-"làm đối số của <command>in.tftpd</command><footnote> <para> Mọi sự xen kẽ "
-"<command>in.tftpd</command> đều sẵn sàng trong Debian nên ghi lưu các yêu "
-"cầu TFTP vào bản ghi hệ thống theo mặc định. Một số sự xen kẽ nào đó hỗ trợ "
-"một đối số <userinput>-v</userinput> để tăng cấp chi tiết kết xuất. Khuyên "
-"bạn kiểm tra các thông điệp ghi lưu này trong trường hợp gặp vấn đề khởi "
-"động, vì chúng là một điểm bắt đầu hữu ích để chẩn đoán nguyên nhân của lỗi. "
-"</para> </footnote>; bạn sẽ cần đó bên dưới. Nếu bạn đã cần phải sửa đổi tập "
-"tin cấu hình <filename>/etc/inetd.conf</filename>,  bạn cũng cần phải thông "
-"báo tiến trình <command>inetd</command> rằng tập tin đó bị sửa đổi. Trên một "
-"máy chạy Debian, hãy chạy câu lệnh <userinput>/etc/init.d/inetd reload</"
-"userinput>; trên các máy khác, tìm biết mã số tiến trình (PID) của "
-"<command>inetd</command>, và chạy câu lệnh chấm dứt <userinput>kill -HUP "
-"<replaceable>PID-inetd</replaceable></userinput>."
 
 #. Tag: para
-#: install-methods.xml:1329
+#: install-methods.xml:1318
 #, no-c-format
 msgid ""
 "If you intend to install Debian on an SGI machine and your TFTP server is a "
@@ -2219,13 +2204,13 @@ msgstr ""
 "trình phục vụ TFTP Linux sử dụng."
 
 #. Tag: title
-#: install-methods.xml:1351
+#: install-methods.xml:1340
 #, no-c-format
 msgid "Move TFTP Images Into Place"
 msgstr "Xác định vị trí của ảnh TFTP"
 
 #. Tag: para
-#: install-methods.xml:1352
+#: install-methods.xml:1341
 #, no-c-format
 msgid ""
 "Next, place the TFTP boot image you need, as found in <xref linkend=\"where-"
@@ -2242,7 +2227,7 @@ msgstr ""
 "tiêu chuẩn mạnh nào."
 
 #. Tag: para
-#: install-methods.xml:1361
+#: install-methods.xml:1350
 #, no-c-format
 msgid ""
 "On NewWorld Power Macintosh machines, you will need to set up the "
@@ -2258,13 +2243,13 @@ msgstr ""
 "tập tin theo đây:"
 
 #. Tag: filename
-#: install-methods.xml:1392
+#: install-methods.xml:1381
 #, no-c-format
 msgid "boot.msg"
 msgstr "boot.msg"
 
 #. Tag: para
-#: install-methods.xml:1397
+#: install-methods.xml:1386
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2281,7 +2266,7 @@ msgstr ""
 "tin cần khởi động."
 
 #. Tag: para
-#: install-methods.xml:1405
+#: install-methods.xml:1394
 #, no-c-format
 msgid ""
 "For PXE booting, everything you should need is set up in the "
@@ -2298,13 +2283,13 @@ msgstr ""
 "như là tên tập tin cần khởi động."
 
 #. Tag: title
-#: install-methods.xml:1417
+#: install-methods.xml:1406
 #, no-c-format
 msgid "SPARC TFTP Booting"
 msgstr "Khởi động TFTP SPARC"
 
 #. Tag: para
-#: install-methods.xml:1418
+#: install-methods.xml:1407
 #, no-c-format
 msgid ""
 "Some SPARC architectures add the subarchitecture names, such as "
@@ -2334,7 +2319,7 @@ msgstr ""
 "đổi mọi chữ sang chữ hoa, cũng (nếu cần thiết) phụ thêm tên kiến trúc phụ đó."
 
 #. Tag: para
-#: install-methods.xml:1434
+#: install-methods.xml:1423
 #, no-c-format
 msgid ""
 "If you've done all this correctly, giving the command <userinput>boot net</"
@@ -2347,7 +2332,7 @@ msgstr ""
 "tra các bản ghi trên trình phục vụ TFTP để xem tên ảnh nào được yêu cầu."
 
 #. Tag: para
-#: install-methods.xml:1441
+#: install-methods.xml:1430
 #, no-c-format
 msgid ""
 "You can also force some sparc systems to look for a specific file name by "
@@ -2361,13 +2346,13 @@ msgstr ""
 "phục vụ TFTP tìm."
 
 #. Tag: title
-#: install-methods.xml:1452
+#: install-methods.xml:1441
 #, no-c-format
 msgid "SGI TFTP Booting"
 msgstr "Khởi động TFTP SGI"
 
 #. Tag: para
-#: install-methods.xml:1453
+#: install-methods.xml:1442
 #, no-c-format
 msgid ""
 "On SGI machines you can rely on the <command>bootpd</command> to supply the "
@@ -2382,13 +2367,13 @@ msgstr ""
 "tin cấu hình <filename>/etc/dhcpd.conf</filename>."
 
 #. Tag: title
-#: install-methods.xml:1561
+#: install-methods.xml:1550
 #, no-c-format
 msgid "Automatic Installation"
 msgstr "Cài đặt tự động"
 
 #. Tag: para
-#: install-methods.xml:1562
+#: install-methods.xml:1551
 #, no-c-format
 msgid ""
 "For installing on multiple computers it's possible to do fully automatic "
@@ -2404,13 +2389,13 @@ msgstr ""
 "trình cài đặt Debian chính nó."
 
 #. Tag: title
-#: install-methods.xml:1575
+#: install-methods.xml:1564
 #, no-c-format
 msgid "Automatic Installation Using the Debian Installer"
 msgstr "Cài đặt tự động bằng trình cài đặt Debian"
 
 #. Tag: para
-#: install-methods.xml:1576
+#: install-methods.xml:1565
 #, no-c-format
 msgid ""
 "The Debian Installer supports automating installs via preconfiguration "
@@ -2424,7 +2409,7 @@ msgstr ""
 "trình cài đặt."
 
 #. Tag: para
-#: install-methods.xml:1583
+#: install-methods.xml:1572
 #, no-c-format
 msgid ""
 "Full documentation on preseeding including a working example that you can "
@@ -2432,6 +2417,53 @@ msgid ""
 msgstr ""
 "Tài liệu hướng dẫn đầy đủ về phương pháp chèn trước, gồm một lời thí dụ hữu "
 "ích mà bạn có thể hiệu chỉnh, nằm trong <xref linkend=\"appendix-preseed\"/>."
+
+#~ msgid ""
+#~ "To get the TFTP server ready to go, you should first make sure that "
+#~ "<command>tftpd</command> is enabled. This is usually enabled by having "
+#~ "something like the following line in <filename>/etc/inetd.conf</"
+#~ "filename>: <informalexample><screen>\n"
+#~ "tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
+#~ "</screen></informalexample> Debian packages will in general set this up "
+#~ "correctly by default when they are installed."
+#~ msgstr ""
+#~ "Để hiệu lực trình phục vụ TFTP, trước tiên bạn cần phải kiểm tra xem "
+#~ "trình nền <command>tftpd</command> đã được bật chạy chưa. Bình thường nó "
+#~ "được bật chạy bằng dòng theo đây (hay tương tự) trong tập tin cấu hình "
+#~ "<filename>/etc/inetd.conf</filename>: <informalexample><screen>\n"
+#~ "tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot\n"
+#~ "</screen></informalexample> Khi bạn cài đặt các gói Debian, dòng này "
+#~ "thường được thiết lập theo mặc định."
+
+#~ msgid ""
+#~ "Look in <filename>/etc/inetd.conf</filename> and remember the directory "
+#~ "which is used as the argument of <command>in.tftpd</command><footnote> "
+#~ "<para> All <command>in.tftpd</command> alternatives available in Debian "
+#~ "should log TFTP requests to the system logs by default. Some of them "
+#~ "support a <userinput>-v</userinput> argument to increase verbosity. It is "
+#~ "recommended to check these log messages in case of boot problems as they "
+#~ "are a good starting point for diagnosing the cause of errors. </para> </"
+#~ "footnote>; you'll need that below. If you've had to change <filename>/etc/"
+#~ "inetd.conf</filename>, you'll have to notify the running <command>inetd</"
+#~ "command> process that the file has changed. On a Debian machine, run "
+#~ "<userinput>/etc/init.d/inetd reload</userinput>; on other machines, find "
+#~ "out the process ID for <command>inetd</command>, and run <userinput>kill -"
+#~ "HUP <replaceable>inetd-pid</replaceable></userinput>."
+#~ msgstr ""
+#~ "Xem tập tin <filename>/etc/inetd.conf</filename> và nhớ thư mục được dùng "
+#~ "làm đối số của <command>in.tftpd</command><footnote> <para> Mọi sự xen kẽ "
+#~ "<command>in.tftpd</command> đều sẵn sàng trong Debian nên ghi lưu các yêu "
+#~ "cầu TFTP vào bản ghi hệ thống theo mặc định. Một số sự xen kẽ nào đó hỗ "
+#~ "trợ một đối số <userinput>-v</userinput> để tăng cấp chi tiết kết xuất. "
+#~ "Khuyên bạn kiểm tra các thông điệp ghi lưu này trong trường hợp gặp vấn "
+#~ "đề khởi động, vì chúng là một điểm bắt đầu hữu ích để chẩn đoán nguyên "
+#~ "nhân của lỗi. </para> </footnote>; bạn sẽ cần đó bên dưới. Nếu bạn đã cần "
+#~ "phải sửa đổi tập tin cấu hình <filename>/etc/inetd.conf</filename>,  bạn "
+#~ "cũng cần phải thông báo tiến trình <command>inetd</command> rằng tập tin "
+#~ "đó bị sửa đổi. Trên một máy chạy Debian, hãy chạy câu lệnh <userinput>/"
+#~ "etc/init.d/inetd reload</userinput>; trên các máy khác, tìm biết mã số "
+#~ "tiến trình (PID) của <command>inetd</command>, và chạy câu lệnh chấm dứt "
+#~ "<userinput>kill -HUP <replaceable>PID-inetd</replaceable></userinput>."
 
 #~ msgid ""
 #~ "The QNAP Turbo Station (TS-109, TS-209 and TS-409) requires a kernel and "
