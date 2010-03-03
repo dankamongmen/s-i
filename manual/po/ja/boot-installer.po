@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-02-24 01:12+0000\n"
-"PO-Revision-Date: 2009-05-10 00:07+0900\n"
+"PO-Revision-Date: 2010-03-03 23:17+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -109,7 +109,7 @@ msgstr ""
 "す。CD セットが既に手元にあり、かつインストールするマシンが CD から直接起動で"
 "きるようならツイています! 単に <phrase arch=\"x86\"> <xref linkend=\"boot-"
 "dev-select\"/> の説明に従って、CD から起動できるようシステムを設定したあと、"
-"</phrase>CD-ROM をドライブに入れてリブートし、次の章に進んでください。"
+"</phrase>CD-ROM をドライブに入れて再起動し、次の章に進んでください。"
 
 #. Tag: para
 #: boot-installer.xml:81 boot-installer.xml:344 boot-installer.xml:812
@@ -296,10 +296,9 @@ msgstr ""
 
 #. Tag: title
 #: boot-installer.xml:223
-#, fuzzy, no-c-format
-#| msgid "Booting the NSLU2"
+#, no-c-format
 msgid "Booting the SS4000-E"
-msgstr "NSLU2 の起動"
+msgstr "SS4000-E の起動"
 
 #. Tag: para
 #: boot-installer.xml:224
@@ -314,6 +313,14 @@ msgid ""
 "other<footnote id=\"arm-s4k-rib\"> <para> This cable is often found in older "
 "desktop machines with builtin 9-pin serial ports. </para> </footnote>."
 msgstr ""
+"SS4000-E ファームウェアの制限により、残念ながら、今のところシリアルポートを使"
+"用せずにインストーラを起動できません。インストーラを起動するには、シリアルの"
+"ヌルモデムケーブル、シリアルポート<footnote id=\"arm-s4ke-port\"> <para>USB "
+"シリアルコンバータでも動作するでしょう。</para> </footnote>のあるコンピュー"
+"タ、オス DB9 コネクタと 10 ピン .1\" IDC ヘッダが付いたリボンケーブル"
+"<footnote id=\"arm-s4k-rib\"> <para>このケーブルは、しばしば 9 ピンのシリアル"
+"ポートを内蔵した古いデスクトップマシンについています。</para> </footnote>が必"
+"要になるでしょう。"
 
 #. Tag: para
 #: boot-installer.xml:245
@@ -329,12 +336,21 @@ msgid ""
 "of the same name. Assuming the serial port on your computer is to be found "
 "on <filename>/dev/ttyS0</filename>, use the following command line:"
 msgstr ""
+"SS4000-E を起動するには、まず Debian が提供するファームウェアイメージ "
+"(ss4000e.pkg) を、SS4000-E のWeb インターフェース (<quote>administration</"
+"quote> から <quote>firmware</quote> に行き、イメージをアップロード) からロー"
+"ドします。次にシリアルのヌルモデルケーブルとリボンケーブルを使用し、SS4000-E "
+"のシリアルポートに接続し、再起動してください。マシンと通信するにはシリアル"
+"ターミナルアプリケーションが必要です。Debian GNU/Linux では、<command>cu</"
+"command> プログラム (パッケージは同名) を使用すると良いでしょう。あなたのコン"
+"ピュータで、シリアルポートが <filename>/dev/ttyS0</filename> として見えている"
+"場合、以下のコマンドラインを使用してください。"
 
 #. Tag: screen
 #: boot-installer.xml:261
 #, no-c-format
 msgid "cu -lttyS0 -s115200"
-msgstr ""
+msgstr "cu -lttyS0 -s115200"
 
 #. Tag: para
 #: boot-installer.xml:263
@@ -344,12 +360,15 @@ msgid ""
 "<classname>hyperterminal</classname>. Use a baud rate of 115200, 8 bits word "
 "length, no stop bits, and one parity bit."
 msgstr ""
+"Windows を使用する場合、<classname>ハイパーターミナル</classname>プログラムを"
+"使用したいかと思います。ビットレート 115200、データビット 8、ストップビットな"
+"し、パリティビット 1 としてください。"
 
 #. Tag: para
 #: boot-installer.xml:269
 #, no-c-format
 msgid "When the machine boots, you will see the following line of output:"
-msgstr ""
+msgstr "マシンの起動時に、以下のような出力を目にすることでしょう。"
 
 #. Tag: screen
 #: boot-installer.xml:275
@@ -360,6 +379,10 @@ msgid ""
 "EM-7210 ver.T04 2005-12-12 (For ver.AA)\n"
 "== Executing boot script in 1.000 seconds - enter ^C to abort"
 msgstr ""
+"No network interfaces found\n"
+"\n"
+"EM-7210 ver.T04 2005-12-12 (For ver.AA)\n"
+"== Executing boot script in 1.000 seconds - enter ^C to abort"
 
 #. Tag: para
 #: boot-installer.xml:277
@@ -370,12 +393,17 @@ msgid ""
 "this window, just powercycle the machine and try again. </para> </footnote>. "
 "This will give you the RedBoot prompt. Enter the following command:"
 msgstr ""
+"ここで、Control-C を押してブートローダに割り込みを掛けてください<footnote id="
+"\"arm-s4ke-sec\"> <para>これには 1 秒しかないことに注意してください。このウィ"
+"ンドウを逃したら、電源を入れ直してもう一度やり直してください。</para> </"
+"footnote>。これで RedBoot プロンプトが現れます。以下のコマンドを入力してくだ"
+"さい。"
 
 #. Tag: screen
 #: boot-installer.xml:292
 #, no-c-format
 msgid "fconfig boot_script_data"
-msgstr ""
+msgstr "fconfig boot_script_data"
 
 #. Tag: para
 #: boot-installer.xml:294
@@ -384,6 +412,8 @@ msgid ""
 "RedBoot is now waiting for you to enter the boot script. Make sure to "
 "<emphasis>exactly</emphasis> enter the following script:"
 msgstr ""
+"RedBoot は起動スクリプトの入力待ちになります。以下のスクリプトを <emphasis>間"
+"違いなく</emphasis> 入力してください。"
 
 #. Tag: screen
 #: boot-installer.xml:301
@@ -394,6 +424,10 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
+"fis load ramdisk.gz\n"
+"fis load zImage\n"
+"exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
+"0x01800000"
 
 #. Tag: para
 #: boot-installer.xml:303
@@ -405,6 +439,11 @@ msgid ""
 "should now come up as normal. You can either install Debian through the "
 "serial port, or use an SSH client to connect through SSH."
 msgstr ""
+"スクリプトの末尾は空行で、不揮発設定を更新するかの問いには<quote>y</quote> を"
+"入力してください。最後に <quote>reset</quote> としてシステムを再起動し、通常"
+"の起動を行ってください。今度はインストーラが普通に立ち上がるはずです。Debian "
+"をシリアルポートからインストールできますし、SSH クライアントを用いて SSH 接続"
+"でインストールすることもできます。"
 
 #. Tag: para
 #: boot-installer.xml:311
@@ -415,6 +454,10 @@ msgid ""
 "system configuration, rather than from the kernel command line. It will not "
 "do any harm to do so anyway, however."
 msgstr ""
+"インストール後には、起動スクリプトを更新する必要がないことに注意してくださ"
+"い。システムはカーネルのコマンドラインからではなく、システム設定からルートデ"
+"バイスを取得するように設定されます。しかしそうだからといって、何も損害を与え"
+"たりはしません。"
 
 #. Tag: title
 #: boot-installer.xml:327 boot-installer.xml:795 boot-installer.xml:1453
@@ -1093,7 +1136,7 @@ msgstr ""
 "型番や、システムに他のソフトウェアが読み込まれるかによりますが、このメニュー"
 "は他のシステムとは異なっているかもしれません。ここでは <command>Boot Option "
 "Maintenance Menu</command> と <command>EFI Shell (Built-in)</command> の、少"
-"なくとも 2 つのメニュー項目が表示されます。前者の使用をお奨めしますが、これが"
+"なくとも 2 つのメニュー項目が表示されます。前者の使用をお勧めしますが、これが"
 "有効でなかったり、何らかの理由で CD から起動できない場合は、後者を使用してく"
 "ださい。"
 
@@ -1912,19 +1955,15 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:1538
-#, fuzzy, no-c-format
-#| msgid ""
-#| "To boot the installer from hard disk, you will have already completed "
-#| "downloading and placing the needed files in <xref linkend=\"boot-drive-"
-#| "files\"/>."
+#, no-c-format
 msgid ""
 "To boot the installer from hard disk, you will have already completed "
 "downloading and placing the needed files as described in <xref linkend="
 "\"boot-drive-files\"/>."
 msgstr ""
-"ハードディスクからインストーラを起動するには、既にダウンロードが完了してい"
-"て、<xref linkend=\"boot-drive-files\"/> のように、配置されている必要がありま"
-"す。"
+"ハードディスクからインストーラを起動するには、<xref linkend=\"boot-drive-"
+"files\"/> で説明しているように、既にダウンロードが完了し、配置されている必要"
+"があります。"
 
 #. Tag: title
 #: boot-installer.xml:1558
@@ -2313,14 +2352,7 @@ msgstr "USB 点字ディスプレイ"
 
 #. Tag: para
 #: boot-installer.xml:1903
-#, fuzzy, no-c-format
-#| msgid ""
-#| "USB braille displays should be automatically detected. A textual version "
-#| "of the installer will then be automatically selected, and support for the "
-#| "braille display will be automatically installed on the target system. You "
-#| "can thus just press &enterkey; at the boot menu. Once <classname>brltty</"
-#| "classname> is started, you can choose a braille table by entering the "
-#| "preference menu."
+#, no-c-format
 msgid ""
 "USB braille displays should be automatically detected. A textual version of "
 "the installer will then be automatically selected, and support for the "
@@ -2335,7 +2367,9 @@ msgstr ""
 "は、自動的に選択され、ターゲットシステムに、点字ディスプレイのサポートを自動"
 "的にインストールします。あとはブートメニューで &enterkey; を押すだけです。一"
 "度 <classname>brltty</classname> が起動すると、設定メニューから点字テーブルを"
-"選択できます。"
+"選択できます。点字デバイスのキーバインドは、<ulink url=\"&url-brltty-driver-"
+"help;\"><classname>brltty</classname> のウェブサイト</ulink> に文書がありま"
+"す。"
 
 #. Tag: title
 #: boot-installer.xml:1918
@@ -2345,22 +2379,7 @@ msgstr "シリアル接続点字ディスプレイ"
 
 #. Tag: para
 #: boot-installer.xml:1919
-#, fuzzy, no-c-format
-#| msgid ""
-#| "Serial braille displays cannot safely be automatically detected (since "
-#| "that may damage some of them). You thus need to append the "
-#| "<userinput>brltty=<replaceable>driver</replaceable>,<replaceable>port</"
-#| "replaceable>,<replaceable>table</replaceable></userinput> boot parameter "
-#| "to tell <classname>brltty</classname> which driver it should use. "
-#| "<replaceable>driver</replaceable> should be replaced by the two-letter "
-#| "driver code for your terminal (see the <ulink url=\"&url-brltty-driver-"
-#| "codes;\">driver code list</ulink>). <replaceable>port</replaceable> "
-#| "should be replaced by the name of the serial port the display is "
-#| "connected to, <userinput>ttyS0</userinput> is the default. "
-#| "<replaceable>table</replaceable> is the name of the braille table to be "
-#| "used (see the <ulink url=\"&url-brltty-table-codes;\">table code list</"
-#| "ulink>); the English table is the default. Note that the table can be "
-#| "changed later by entering the preference menu."
+#, no-c-format
 msgid ""
 "Serial braille displays cannot safely be automatically detected (since that "
 "may damage some of them). You thus need to append the "
@@ -2391,7 +2410,9 @@ msgstr ""
 "<userinput>ttyS0</userinput> です。<replaceable>table</replaceable> は、使用"
 "する点字テーブルの名前に置き換えてください (<ulink url=\"&url-brltty-table-"
 "codes;\">テーブルコードリスト</ulink> 参照)。デフォルトは英語になっています。"
-"テーブルは、後で設定メニューに入って変更できることに注意してください。"
+"テーブルは、後で設定メニューに入って変更できることに注意してください。点字デ"
+"バイスのキーバインドは、<ulink url=\"&url-brltty-driver-help;"
+"\"><classname>brltty</classname> のウェブサイト</ulink> に文書があります。"
 
 #. Tag: title
 #: boot-installer.xml:1941
@@ -3119,20 +3140,28 @@ msgstr ""
 
 #. Tag: term
 #: boot-installer.xml:2392
-#, fuzzy, no-c-format
-#| msgid "debian-installer/theme (theme)"
+#, no-c-format
 msgid "base-installer/install-recommends (recommends)"
-msgstr "debian-installer/theme (theme)"
+msgstr "base-installer/install-recommends (recommends)"
 
 #. Tag: para
 #: boot-installer.xml:2393
 #, no-c-format
+#| msgid ""
+#| "By setting this option to <userinput>false</userinput>, the package "
+#| "management system will be configured to not automatically install such "
+#| "<quote>Recommends</quote>, both during the installation and for the "
+#| "installed system."
 msgid ""
 "By setting this option to <userinput>false</userinput>, the package "
 "management system will be configured to not automatically install "
 "<quote>Recommends</quote>, both during the installation and for the "
 "installed system. See also <xref linkend=\"di-install-base\"/>."
 msgstr ""
+"このオプションを <userinput>false</userinput> にすると、インストール中でも、"
+"またインストール後でも、<quote>推奨</quote> パッケージを自動的にインストール"
+"しないように、パッケージ管理システムを設定します。<xref linkend=\"di-install-"
+"base\"/> をご覧ください。"
 
 #. Tag: para
 #: boot-installer.xml:2400
@@ -3144,6 +3173,10 @@ msgid ""
 "full functionality you want. This option should therefore only be used by "
 "very experienced users."
 msgstr ""
+"これにより、より無駄のないシステムを得られますが、通常可能であると期待する機"
+"能が欠落するかもしれないことに注意してください。完全な機能が必要な場合には、"
+"推奨パッケージを手でインストールすることになるでしょう。そのためこのオプショ"
+"ンは、経験豊富なユーザにしか有用ではないでしょう。"
 
 #. Tag: term
 #: boot-installer.xml:2412
@@ -3162,7 +3195,7 @@ msgid ""
 msgstr ""
 "デフォルトでは、既知の gpg キーで認証されたリポジトリが、インストーラには必要"
 "です。この認証を無効にするのに <userinput>true</userinput> と設定してくださ"
-"い。<emphasis role=\"bold\">警告: 危険です。お奨めしません。</emphasis>"
+"い。<emphasis role=\"bold\">警告: 危険です。お勧めしません。</emphasis>"
 
 #. Tag: term
 #: boot-installer.xml:2424
@@ -3303,17 +3336,15 @@ msgstr ""
 
 #. Tag: term
 #: boot-installer.xml:2516
-#, fuzzy, no-c-format
-#| msgid "debian-installer/locale (locale)"
+#, no-c-format
 msgid "debian-installer/language (language)"
-msgstr "debian-installer/locale (locale)"
+msgstr "debian-installer/language (language)"
 
 #. Tag: term
 #: boot-installer.xml:2517
-#, fuzzy, no-c-format
-#| msgid "debian-installer/theme (theme)"
+#, no-c-format
 msgid "debian-installer/country (country)"
-msgstr "debian-installer/theme (theme)"
+msgstr "debian-installer/country (country)"
 
 #. Tag: term
 #: boot-installer.xml:2518
@@ -3328,6 +3359,8 @@ msgid ""
 "There are two ways to specify the language, country and locale to use for "
 "the installation and the installed system."
 msgstr ""
+"インストール中やインストール後で使用する、言語・国・ロケールを指定する方法は"
+"ふたつあります。"
 
 #. Tag: para
 #: boot-installer.xml:2524
@@ -3341,6 +3374,12 @@ msgid ""
 "possible combinations of language, country and locale can be achieved this "
 "way."
 msgstr ""
+"最初の、最も簡単な方法は <literal>locale</literal> パラメータを渡すことだけで"
+"す。言語や国はその値から導かれます。例えば、言語にドイツ語、国にスイスを指定"
+"する場合、<userinput>locale=de_CH</userinput> とします (インストールしたシス"
+"テムのデフォルトロケールは <literal>de_CH.UTF-8</literal> にセットされます)。"
+"制限は、言語、国、ロケールのすべての組み合わせを、この方法で得られるわけでは"
+"ないということです。"
 
 #. Tag: para
 #: boot-installer.xml:2533
@@ -3352,6 +3391,11 @@ msgid ""
 "the installed system. Example: <userinput>language=en country=DE "
 "locale=en_GB.UTF-8</userinput>."
 msgstr ""
+"ふたつ目のもっと柔軟な選択肢は、<literal>language</literal> と "
+"<literal>country</literal> を別々に指定することです。この場合、特定のデフォル"
+"トロケールをインストールしたシステムに指定するため、任意に <literal>locale</"
+"literal> を加えられます。例: <userinput>language=en country=DE locale=en_GB."
+"UTF-8</userinput>"
 
 #. Tag: term
 #: boot-installer.xml:2545
@@ -4262,7 +4306,7 @@ msgstr ""
 #, no-c-format
 msgid "We recommend to install such systems by netbooting the installer."
 msgstr ""
-"そのようなシステムでは、インストーラをネットから起動するのをお奨めします。"
+"そのようなシステムでは、インストーラをネットから起動するのをお勧めします。"
 
 #. Tag: title
 #: boot-installer.xml:3085
@@ -4481,6 +4525,20 @@ msgstr ""
 "</screen></informalexample> バグ報告の際には、カーネルがハングした直前に表示"
 "されたカーネルメッセージを添えて、何が問題なのかを説明してください。また、問"
 "題が起きるまでにシステムに対して行ったことも記述してください。"
+
+#~ msgid ""
+#~ "When packages are installed using the package management system, it will "
+#~ "by default also install packages that are recommended by those packages. "
+#~ "Recommended packages are not strictly required for the core functionality "
+#~ "of the selected software, but they do enhance that software and should, "
+#~ "in the view of the package maintainers, normally be installed together "
+#~ "with that software."
+#~ msgstr ""
+#~ "パッケージ管理システムを使用してパッケージをインストールする際、デフォルト"
+#~ "では推奨パッケージも同時にインストールします。推奨パッケージは、選択したソ"
+#~ "フトウェアの核となる機能に対して、絶対に必要というわけではありません。しか"
+#~ "し、ソフトウェアの機能が向上しますし、パッケージメンテナの立場としては、通"
+#~ "常そのソフトウェアと一緒にインストールされるべきだと思っています。"
 
 #~ msgid ""
 #~ "Can be used to set both the language and country for the installation. "
