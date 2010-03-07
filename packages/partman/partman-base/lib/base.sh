@@ -658,7 +658,7 @@ is_multipath_part () {
 
 # TODO: this should not be global
 humandev () {
-    local device disc drive host bus target part line controller lun
+    local device disk drive host bus target part line controller lun
     local idenum scsinum targtype linux kfreebsd mapping vglv vg lv wwid
     local dev discipline frdisk type rtype desc n
     case "$1" in
@@ -756,7 +756,7 @@ humandev () {
 	    printf "$RET" ${scsinum} ${bus} ${target} ${lun} ${part} ${linux}
 	    ;;
 	/dev/sd[a-z]|/dev/sd[a-z][a-z])
-	    disc="${1#/dev/}"
+	    disk="${1#/dev/}"
 	    if [ -h "/sys/block/$disk/device" ]; then
 		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
 		host="${bus_id%%:*}"
@@ -777,7 +777,7 @@ humandev () {
 	    ;;
 	/dev/sd[a-z][0-9]*|/dev/sd[a-z][a-z][0-9]*)
 	    part="${1#/dev/}"
-	    disc="${part%%[0-9]*}"
+	    disk="${part%%[0-9]*}"
 	    part="${part#$disk}"
 	    if [ -h "/sys/block/$disk/device" ]; then
 		bus_id="$(basename "$(readlink "/sys/block/$disk/device")")"
@@ -807,19 +807,19 @@ humandev () {
 	    if [ "$host" = host ] ; then
 	       line=`echo "$line" | sed 's,target\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
 	       lun=`echo  "$line" | cut -d" " -f1`
-	       disc=`echo "$line" | cut -d" " -f2`
+	       disk=`echo "$line" | cut -d" " -f2`
 	       part=`echo "$line" | cut -d" " -f3`
 	    else
 	       line=`echo "$line" | sed 's,disc\([0-9]*\)/\([a-z]*\)\(.*\),\1 \2 \3,'`
 	       lun=`echo  "$line" | cut -d" " -f1`
 	       controller=$(($lun / 16))
 	       lun=$(($lun % 16))
-	       disc=`echo "$line" | cut -d" " -f2`
+	       disk=`echo "$line" | cut -d" " -f2`
 	       part=`echo "$line" | cut -d" " -f3`
 	    fi
 	    linux=$(mapdevfs $1)
 	    linux=${linux#/dev/}
-	    if [ "$disc" = disc ] ; then
+	    if [ "$disk" = disc ] ; then
 	       db_metaget partman/text/scsi_disk description
 	       printf "$RET" ".CCISS" "-" ${controller} ${lun} ${linux}
 	    else
@@ -937,13 +937,13 @@ humandev () {
 	# DASD partition, classic
 	/dev/dasd*[0-9]*)
 	    part="${1#/dev/}"
-	    disc="${part%%[0-9]*}"
+	    disk="${part%%[0-9]*}"
 	    part="${part#$disk}"
 	    humandev_dasd_partition /sys/block/$disk/$(readlink /sys/block/$disk/device) $part
 	    ;;
 	# DASD disk, classic
 	/dev/dasd*)
-	    disc="${1#/dev/}"
+	    disk="${1#/dev/}"
 	    humandev_dasd_disk /sys/block/$disk/$(readlink /sys/block/$disk/device)
 	    ;;
 	/dev/*vd[a-z])
