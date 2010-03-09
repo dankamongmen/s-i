@@ -77,6 +77,26 @@ check_missing () {
 	fi
 }
 
+# If found, copy firmware file; preserve subdirs.
+try_copy () {
+	local fwfile=$1
+	local sdir file f target
+
+	sdir=$(dirname $fwfile | sed "s/^\.$//")
+	file=$(basename $fwfile)
+	for f in "/media/$fwfile" "/media/firmware/$fwfile" \
+		 ${sdir:+"/media/$file" "/media/firmware/$file"}; do
+		if [ -e "$f" ]; then
+			target="/lib/firmware${sdir:+/$sdir}"
+			log "copying loose file $file from '$(dirname $f)' to '$target'"
+			mkdir -p "$target"
+			rm -f "$target/$file"
+			cp -a "$f" "$target" || true
+			break
+		fi
+	done
+}
+
 first_try=1
 first_ask=1
 ask_load_firmware () {
@@ -141,15 +161,7 @@ while check_missing && ask_load_firmware; do
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
 		for file in $files; do
-			for f in "/media/$file" "/media/firmware/$file"; do
-				if [ -e "$f" ]; then
-					log "copying loose file $file"
-					mkdir -p /lib/firmware
-					rm -f "/lib/firmware/$file"
-					cp -a "$f" /lib/firmware/ || true
-					break
-				fi
-			done
+			try_copy "$file"
 		done
 		umount /media || true
 	fi
