@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 untranslated -->
+<!-- original version: 62399 untranslated -->
 
  <sect1 id="boot-parms"><title>Boot Parameters</title>
 <para>
@@ -405,6 +405,26 @@ installation.
 </varlistentry>
 
 <varlistentry>
+<term>base-installer/install-recommends (recommends)</term>
+<listitem><para>
+
+By setting this option to <userinput>false</userinput>, the package
+management system will be configured to not automatically install
+<quote>Recommends</quote>, both during the installation and for the
+installed system. See also <xref linkend="di-install-base"/>.
+
+</para><para>
+
+Note that this option allows to have a leaner system, but can also result
+in features being missing that you might normally expect to be available.
+You may have to manually install some of the recommended packages to
+obtain the full functionality you want. This option should therefore only
+be used by very experienced users.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>debian-installer/allow_unauthenticated</term>
 <listitem><para>
 
@@ -509,13 +529,30 @@ cases. General instructions how to do this can be found in
 <variablelist>
 
 <varlistentry>
+<term>debian-installer/language (language)</term>
+<term>debian-installer/country (country)</term>
 <term>debian-installer/locale (locale)</term>
 <listitem><para>
 
-Can be used to set both the language and country for the installation.
-This will only work if the locale is supported in Debian.
-For example, use <userinput>locale=de_CH</userinput> to select German as
-language and Switzerland as country.
+There are two ways to specify the language, country and locale to use for
+the installation and the installed system.
+
+</para><para>
+
+The first and easiest is to pass only the parameter <literal>locale</literal>.
+Language and country will then be derived from its value. You can for example
+use <userinput>locale=de_CH</userinput> to select German as language and
+Switzerland as country (<literal>de_CH.UTF-8</literal> will be set as default
+locale for the installed system). Limitation is that not all possible
+combinations of language, country and locale can be achieved this way.
+
+</para><para>
+
+The second, more flexible option is to specify <literal>language</literal>
+and <literal>country</literal> separately. In this case
+<literal>locale</literal> can optionally be added to specify a specific
+default locale for the installed system. Example:
+<userinput>language=en country=DE locale=en_GB.UTF-8</userinput>.
 
 </para></listitem>
 </varlistentry>

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 untranslated -->
+<!-- original version: 61286 untranslated -->
 
    <sect3 arch="x86">
    <title>Partitioning the USB stick</title>
@@ -13,8 +13,13 @@ instead of the entire device.
 Since most USB sticks come pre-configured with a single FAT16
 partition, you probably won't have to repartition or reformat the
 stick.  If you have to do that anyway, use <command>cfdisk</command>
-or any other partitioning tool to create a FAT16 partition, and then
-create the filesystem using:
+or any other partitioning tool to create a FAT16 partition<footnote>
+
+<para>
+Don't forget to set the <quote>bootable</quote> bootable flag.
+</para>
+
+</footnote>, and then create the filesystem using:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -63,7 +68,7 @@ and copy the following installer image files to the stick:
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (kernel binary)
+<filename>vmlinuz</filename> or <filename>linux</filename> (kernel binary)
 
 </para></listitem>
 <listitem><para>
@@ -81,7 +86,9 @@ subdirectory. If you want to rename the files, please note that
 </para><para>
 
 Next you should create a <filename>syslinux.cfg</filename> configuration
-file, which at a bare minimum should contain the following two lines:
+file, which at a bare minimum should contain the following two lines (change
+the name of the kernel binary to <quote><filename>linux</filename></quote>
+if you used a <filename>netboot</filename> image):
 
 <informalexample><screen>
 default vmlinuz
@@ -94,9 +101,17 @@ For the graphical installer you should add
 </para><para>
 
 If you used an <filename>hd-media</filename> image, you should now copy a
-Debian ISO image (businesscard, netinst or full CD image; be sure to select
-one that fits) onto the stick. When you are done, unmount the USB memory
-stick (<userinput>umount /mnt</userinput>).
+Debian ISO image<footnote>
+
+<para>
+You can use either a businesscard, a netinst or a full CD image (see
+<xref linkend="official-cdrom"/>). Be sure to select one that fits.
+Note that the <quote>netboot <filename>mini.iso</filename></quote> image is
+not usable for this purpose.
+</para>
+
+</footnote> onto the stick. When you are done, unmount the USB memory stick
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

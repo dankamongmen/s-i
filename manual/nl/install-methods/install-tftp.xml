@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 untranslated -->
+<!-- original version: 62454 untranslated -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparing Files for TFTP Net Booting</title>
@@ -53,34 +53,33 @@ this section, we shall provide commands for SunOS 4.x, SunOS 5.x
 
 <note arch="x86"><para>
 
-To use the Pre-boot Execution Environment (PXE) method of TFTP
-booting, you will need a TFTP server with <userinput>tsize</userinput>
-support.  On a &debian; server, the <classname>atftpd</classname> and
-<classname>tftpd-hpa</classname> packages qualify; we recommend
-<classname>tftpd-hpa</classname>.
+For a &debian; server we recommend <classname>tftpd-hpa</classname>.
+It's written by the same author as the <classname>syslinux</classname>
+bootloader and is therefore least likely to cause issues.
+A good alternative is <classname>atftpd</classname>.
 
 </para></note>
 
 </para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
 
   <sect2 id="tftpd">
   <title>Enabling the TFTP Server</title>
 <para>
 
 To get the TFTP server ready to go, you should first make sure that
-<command>tftpd</command> is enabled.  This is usually enabled by having
-something like the following line in <filename>/etc/inetd.conf</filename>:
+<command>tftpd</command> is enabled.
 
-<informalexample><screen>
-tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
+</para><para>
 
-Debian packages will in general set this up correctly by default when they
-are installed.
+In the case of <classname>tftpd-hpa</classname> there are two ways the
+service can be run. It can be started on demand by the system's
+<classname>inetd</classname> daemon, or it can be set up to run as an
+independent daemon. Which of these methods is used is selected when the
+package is installed and can be changed by reconfiguring the package.
 
 </para>
 <note><para>
@@ -95,23 +94,11 @@ configuration examples in this section accordingly.
 </para></note>
 <para>
 
-Look in <filename>/etc/inetd.conf</filename> and remember the directory which
-is used as the argument of <command>in.tftpd</command><footnote>
-
-<para>
 All <command>in.tftpd</command> alternatives available in Debian should
 log TFTP requests to the system logs by default. Some of them support a
 <userinput>-v</userinput> argument to increase verbosity.
 It is recommended to check these log messages in case of boot problems
 as they are a good starting point for diagnosing the cause of errors.
-</para>
-
-</footnote>; you'll need that below.
-If you've had to change <filename>/etc/inetd.conf</filename>, you'll have to
-notify the running <command>inetd</command> process that the file has changed.
-On a Debian machine, run <userinput>/etc/init.d/inetd reload</userinput>; on
-other machines, find out the process ID for <command>inetd</command>, and run
-<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
 
 </para><para arch="mips">
 
