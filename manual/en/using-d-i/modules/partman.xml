@@ -31,6 +31,114 @@ autopartition, choose <guimenuitem>Manual</guimenuitem> from the menu.
 
 </para>
 
+   <sect3 id="partman-fs">
+   <title>Supported partitioning options</title>
+<para>
+
+The partitioner used in &d-i; is fairly versatile. It allows to create
+many different partitioning schemes, using various partition tables,
+file systems and advanced block devices.
+
+</para><para>
+
+Exactly which options are available depends mainly on the architecture,
+but also on other factors. For example, on systems with limited internal
+memory some options may not be available.
+Defaults may vary as well. The type of partition table used by default
+can for example be different for large capacity hard disks than for
+smaller hard disks.
+Some options can only be changed when installing at medium or low debconf
+priority; at higher priorities sensible defaults will be used.
+
+</para><para>
+
+The installer supports various forms of advanced partitioning and use of
+storage devices, which in many cases can be used in combination.
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>Logical Volume Management (LVM)</emphasis>
+  </para></listitem>
+  <listitem arch="not-s390"><para>
+    <emphasis>Software RAID</emphasis>
+  </para><para>
+    Supported are RAID levels 0, 1, 4, 5, 6 and 10.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Encryption</emphasis>
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>Serial ATA RAID</emphasis> (using <classname>dmraid</classname>)
+  </para><para>
+    Also called <quote>fake RAID</quote> or <quote>BIOS RAID</quote>.
+    Support for Serial ATA RAID is currently only available if enabled when
+    the installer is booted. Further information is available on
+    <ulink url="&url-d-i-sataraid;">our Wiki</ulink>.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Multipath</emphasis> (experimental)
+  </para><para>
+    See <ulink url="&url-d-i-multipath;">our Wiki</ulink> for information.
+    Support for multipath is currently only available if enabled when the
+    installer is booted.
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+The following file systems are supported.
+
+<itemizedlist>
+  <listitem><para>
+    <phrase arch="arm, mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+    <emphasis>ext2</emphasis>,
+    <emphasis>ext3</emphasis>,
+    <emphasis>ext4</emphasis>
+  </para><para>
+    The default file system selected in most cases is ext3; for
+    <filename>/boot</filename> partitions ext2 will be selected by default
+    when guided partitioning is used.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>jfs</emphasis> (not available on all architectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>xfs</emphasis> (not available on all architectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>reiserfs</emphasis> (optional; not available on all architectures)
+  </para><para>
+    Support for the Reiser file system is no longer available by default.
+    When the installer is running at medium or low debconf priority it can
+    be enabled by selecting the <classname>partman-reiserfs</classname>
+    component. Only version 3 of the file system is supported.
+  </para></listitem>
+  <listitem arch="arm"><para>
+    <emphasis>jffs2</emphasis>
+  </para><para>
+    Used on some systems to read flash memory. It is not possible to create
+    new jffs2 partitions.
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>qnx4</emphasis>
+  </para><para>
+    Existing partitions will be recognized and it is possible to assign
+    mount points for them. It is not possible to create new qnx4 partitions.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+  </para></listitem>
+  <listitem arch="x86,ia64"><para>
+    <emphasis>NTFS</emphasis> (read-only)
+  </para><para>
+    Existing NTFS partitions can be resized and it is possible to assign
+    mount points for them. It is not possible to create new NTFS partitions.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
+
    <sect3 id="partman-auto">
    <title>Guided Partitioning</title>
 <para>
