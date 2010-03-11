@@ -67,12 +67,6 @@ if [ -n "$MAPCDDEV" ]; then
 fi
 
 populate_media cdrom udf,iso9660 user,noauto $CDDEVICES
-# Compatability link to keep things working; etch is not migrated away
-# entirely from /cdrom.
-if [ -n "$CDDEVICES" ]; then
-	rm_dir_or_link /target/cdrom
-	ln -s media/cdrom /target/cdrom
-fi
 
 FDDEVICES=''
 for dev in $(list-devices floppy); do
