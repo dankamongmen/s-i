@@ -1,4 +1,4 @@
-<!-- original version: 61147 -->
+<!-- original version: 62454 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Préparer les fichiers pour amorcer depuis le réseau avec TFTP</title>
@@ -56,65 +56,57 @@ le nom de Solaris) et GNU/Linux.
 
 <note arch="x86"><para>
 
-Pour utiliser la méthode de démarrage par l'exécution d'un environnement de
-pré-amorçage (PXE) de TFTP, vous avez besoin d'un serveur TFTP avec
-<userinput>tsize</userinput>. Sur un serveur &debian;, les paquets
-<classname>atftpd</classname> et <classname>tftpd-hpa</classname> 
-sont bons&nbsp;; nous vous conseillons <classname>tftpd-hpa</classname>.
+Pour un serveur Debian nous recommandons <classname>tftpd-hpa</classname>.
+C'est un logiciel écrit par l'auteur du programme
+<classname>syslinux</classname>, ce qui est un gage de qualité. Une
+autre possibilité est le programme <classname>atftpd</classname>.
 
 </para></note>
 
 </para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
+
 
   <sect2 id="tftpd">
   <title>Activer le serveur TFTP</title>
 <para>
 
 Pour faire fonctionner le serveur TFTP, vous devez vous assurer au préalable 
-que <command>tftpd</command> est activé. Ce dernier est généralement activé 
-grâce à la ligne suivante dans <filename>/etc/inetd.conf</filename>&nbsp;:
+que <command>tftpd</command> est activé.
 
-<informalexample><screen>
-tftp dgram udp wait root /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
-
-Les paquets Debian, quand ils sont installés, placent correctement cette
-ligne.
 </para>
+<para>
 
+Pour <classname>tftpd-hpa</classname>, il y a deux façons de lancer le
+service. Il peut être activé à la demande par le démon
+<classname>inetd</classname> du système ou bien il peut être exécuté en
+tant que démon indépendant. Le choix de la méthode se fait à
+l'installation du paquet et peut être modifié en le reconfigurant.
+
+</para>
 <note><para>
+ 
 Les serveurs TFTP utilisaient habituellement le répertoire <filename>/tftpboot</filename> pour
 stocker les images. Cependant les paquets &debian; se servent d'autres répertoires
 pour obéir au <ulink url="&url-fhs-home;">standard sur l'organisation des fichiers</ulink>.
 Par exemple, <classname>tftpd-hpa</classname> utilise par défaut
 <filename>/var/lib/tftpboot</filename>. Vous aurez à modifier les exemples de cette section.
+
 </para></note>
-
-<para> 
-
-Lisez le fichier <filename>/etc/inetd.conf</filename> et mémorisez le répertoire
-passé en paramètre à <command>in.tftpd</command>
-<footnote>
 <para>
+
 Toutes les alternatives à <command>in.tftpd</command> disponibles dans Debian
 doivent enregistrer les requêtes TFTP dans le journal du système. Quelques unes
 acceptent une option <userinput>-v</userinput> qui augmente la quantité d'informations
 enregistrées. En cas d'erreur d'amorçage, il est recommandé de consulter ces enregistrements
 pour rechercher les causes des erreurs.
-</para>
-</footnote>&nbsp;; vous en aurez besoin ultérieurement. 
-Si vous avez dû modifier <filename>/etc/inetd.conf</filename>, vous devrez le 
-signaler au processus <command>inetd</command>. Sur une machine Debian,
-lancez <userinput>/etc/init.d/inetd reload</userinput>&nbsp;; sur les autres 
-machines, retrouvez le numéro de processus de <command>inetd</command> et 
-exécutez la commande 
-<userinput>kill -HUP <replaceable>inetd-pid</replaceable></userinput>.
 
-</para><para arch="mips">
+
+</para>
+<para arch="mips">
 
 Si vous voulez installer Debian sur une machine SGI et si votre serveur TFTP 
 est une machine GNU/Linux avec Linux 2.4.X, il vous faudra effectuer la 
