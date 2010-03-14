@@ -1,4 +1,4 @@
-<!-- original version: 61147 -->
+<!-- original version: 62602 -->
 
 <para>
 
@@ -32,6 +32,122 @@ ce côté automatique, choisissez l'option
 <guimenuitem>Manuel</guimenuitem> dans le menu.
 </para>
   
+   <sect3 id="partman-fs">
+   <title>Options de partitionnement</title>
+<para>
+Le partitionneur de l'installateur Debian est polyvalent. Il autorise la
+création de plusieurs schémas de partitionnement et permet l'utilisation de
+diverses tables de partitions, systèmes de fichiers et périphériques
+bloc complexes.
+
+</para>
+<para>
+
+Les options disponibles dépendent principalement de l'architecture mais
+aussi de différents facteurs. Ainsi sur des systèmes avec peu de
+mémoire, certaines options peuvent manquer. Les valeurs par défaut
+peuvent aussi changer. Le type des tables de partitions peut être différent
+sur les disques durs à grande capacité et sur les disques durs de
+moindre capacité. Certaines options ne sont modifiables que si la
+priorité debconf est <quote>medium</quote> ou <quote>low</quote>. Pour
+les autres priorités, des valeurs par défaut pertinentes sont utilisées.
+
+</para>
+<para>
+L'installateur accepte plusieurs formes de partitionnement ainsi que
+plusieurs types de périphériques de stockage, lesquels peuvent être
+combinés.
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>Gestion des Volumes logiques (LVM)</emphasis>
+  </para></listitem>
+  <listitem arch="not-s390"><para>
+    <emphasis>RAID logiciel</emphasis>
+  </para><para>
+    Niveaux RAID reconnus : 0, 1, 4, 5, 6, 10.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Chiffrement</emphasis>
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>RAID Serial ATA</emphasis> (avec <classname>dmraid</classname>)
+  </para><para>
+    Appelé <quote>fake RAID</quote> ou <quote>BIOS RAID</quote>.
+    Le RAID Serial ATA n'est disponible que s'il a été activé au moment
+    de l'amorçage de l'installateur. d'autres informations sont
+    disponibles sur <ulink url="&url-d-i-sataraid;">notre Wiki</ulink>.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Multipath</emphasis> (expérimental)
+  </para><para>
+    Consultez <ulink url="&url-d-i-multipath;">notre Wiki</ulink> pour des informations.
+    Le <quote>multipath</quote> n'est disponible que s'il a été activé au moment
+    de l'amorçage de l'installateur.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+<para>
+
+Les systèmes de fichiers suivants sont reconnus :
+
+<itemizedlist>
+  <listitem><para>
+    <phrase arch="arm, mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+    <emphasis>ext2</emphasis>,
+    <emphasis>ext3</emphasis>,
+    <emphasis>ext4</emphasis>
+  </para><para>
+    Le système de fichier choisi par défaut est ext3 ; pour la partition
+    <filename>/boot</filename> ext2 est choisi par défaut si le
+    partionnement assisté est utilisé.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>jfs</emphasis> (pas disponible sur toutes les architectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>xfs</emphasis> (pas disponible sur toutes les architectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>reiserfs</emphasis> (optionnel ; pas disponible sur toutes les architectures)
+  </para><para>
+    Le système Reiser n'est plus disponible automatiquement.
+    Quand l'installateur s'exécute avec une priorité debconf
+    <quote>medium</quote> ou <quote>low</quote>, il peut être activé en
+    choisissant le composant
+    <classname>partman-reiserfs</classname>. Seule la version 3 est
+    disponible.
+  </para></listitem>
+  <listitem arch="arm"><para>
+    <emphasis>jffs2</emphasis>
+  </para><para>
+    Utilisé sur certains systèmes pour lire la mémoire flash. Il n'est
+    pas possible de créer de nouvelles partitions jffs2.
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>qnx4</emphasis>
+  </para><para>
+    Les partitions existantes sont reconnues et il est possible de leur
+    attribuer des points de montages. Il n'est  pas possible de créer de
+    nouvelles partitions qnx4. 
+  </para></listitem>
+  <listitem><para>
+    <emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+  </para></listitem>
+  <listitem arch="x86,ia64"><para>
+    <emphasis>NTFS</emphasis> (read-only)
+  </para><para>
+    Les partitions existantes peuvent êtres redimensionnées et il est
+    possible de leur attribuer des points de montages. Il n'est  pas
+    possible de créer de nouvelles partitions NTFS.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
+ 
+
    <sect3 id="partman-auto">
    <title>Le partitionnement assisté</title>
 
