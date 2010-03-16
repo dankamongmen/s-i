@@ -23,7 +23,7 @@ FACES = Fixed13 Fixed14 Fixed15 Fixed16 \
 	LucidBold16 LucidBold22x12 LucidBold29x16 \
 	Goha12 Goha14 Goha16 GohaClassic12 GohaClassic14 GohaClassic16
 
-LEGACY_FACES = VGA8 VGA10 VGA12 VGA14 VGA16 VGA19
+LEGACY_FACES = VGA8 VGA10 VGA12 VGA14 VGA16 VGA19 VGA28x16 VGA32x16
 
 ALL_FACES = $(FACES) $(LEGACY_FACES)
 
@@ -105,6 +105,9 @@ VGA14-CODESETS = Arabic CyrKoi CyrSlav Greek Hebrew Lat15 Lat2 Lat38 Lat7 Uni1 U
 VGA16-CODESETS = Arabic CyrKoi CyrSlav Greek Hebrew Lat15 Lat2 Lat38 Lat7 Uni1 Uni2
 VGA19-CODESETS = Lat15
 
+VGA28x16-CODESETS = $(VGA14-CODESETS)
+VGA32x16-CODESETS = $(VGA16-CODESETS)
+
 Arabic-legacy14-BDFS = legacy14i.bdf+legacy14f.bdf+legacy14l.bdf+legacy14b.bdf
 Arabic-legacy16-BDFS = arabic_vga.bdf+u_vga16.bdf+legacy16c.bdf+legacy16f.bdf+legacy16k.bdf
 Arabic-legacy8-BDFS = legacy8f.bdf+legacy8d.bdf+legacy8i.bdf+legacy8b.bdf
@@ -144,6 +147,48 @@ Uni2-legacy14-BDFS = legacy14e.bdf+legacy14a.bdf+legacy14g.bdf+legacy14l.bdf+leg
 Uni2-legacy16-BDFS = u_vga16.bdf+legacy16a.bdf+legacy16e.bdf+legacy16h.bdf+legacy16k.bdf+legacy16b.bdf
 Uni2-legacy8-BDFS = legacy8a.bdf+legacy8c.bdf+legacy8i.bdf+legacy8b.bdf+legacy8f.bdf
 
+adddouble = $(subst .bdf,-double.bdf, $(1))
+
+Arabic-legacy32x16-BDFS = $(call adddouble $(Arabic-legacy16-BDFS))
+Armenian-legacy32x16-BDFS = $(call adddouble $(Armenian-legacy16-BDFS))
+CyrAsia-legacy32x16-BDFS = $(call adddouble $(CyrAsia-legacy16-BDFS))
+CyrKoi-legacy32x16-BDFS = $(call adddouble $(CyrKoi-legacy16-BDFS))
+CyrSlav-legacy32x16-BDFS = $(call adddouble $(CyrSlav-legacy16-BDFS))
+Ethiopian-legacy32x16-BDFS = $(call adddouble $(Ethiopian-legacy16-BDFS))
+Georgian-legacy32x16-BDFS = $(call adddouble $(Georgian-legacy16-BDFS))
+Greek-legacy32x16-BDFS = $(call adddouble $(Greek-legacy16-BDFS))
+Hebrew-legacy32x16-BDFS = $(call adddouble $(Hebrew-legacy16-BDFS))
+Lao-legacy32x16-BDFS = $(call adddouble $(Lao-legacy16-BDFS))
+Lat15-legacy32x16-BDFS = $(call adddouble $(Lat15-legacy16-BDFS))
+Lat2-legacy32x16-BDFS = $(call adddouble $(Lat2-legacy16-BDFS))
+Lat38-legacy32x16-BDFS = $(call adddouble $(Lat38-legacy16-BDFS))
+Lat7-legacy32x16-BDFS = $(call adddouble $(Lat7-legacy16-BDFS))
+Thai-legacy32x16-BDFS = $(call adddouble $(Thai-legacy16-BDFS))
+Uni1-legacy32x16-BDFS = $(call adddouble $(Uni1-legacy16-BDFS))
+Uni2-legacy32x16-BDFS = $(call adddouble $(Uni2-legacy16-BDFS))
+Uni3-legacy32x16-BDFS = $(call adddouble $(Uni3-legacy16-BDFS))
+Vietnamese-legacy32x16-BDFS = $(call adddouble $(Vietnamese-legacy16-BDFS))
+
+Arabic-legacy28x16-BDFS = $(call adddouble $(Arabic-legacy14-BDFS))
+Armenian-legacy28x16-BDFS = $(call adddouble $(Armenian-legacy14-BDFS))
+CyrAsia-legacy28x16-BDFS = $(call adddouble $(CyrAsia-legacy14-BDFS))
+CyrKoi-legacy28x16-BDFS = $(call adddouble $(CyrKoi-legacy14-BDFS))
+CyrSlav-legacy28x16-BDFS = $(call adddouble $(CyrSlav-legacy14-BDFS))
+Ethiopian-legacy28x16-BDFS = $(call adddouble $(Ethiopian-legacy14-BDFS))
+Georgian-legacy28x16-BDFS = $(call adddouble $(Georgian-legacy14-BDFS))
+Greek-legacy28x16-BDFS = $(call adddouble $(Greek-legacy14-BDFS))
+Hebrew-legacy28x16-BDFS = $(call adddouble $(Hebrew-legacy14-BDFS))
+Lao-legacy28x16-BDFS = $(call adddouble $(Lao-legacy14-BDFS))
+Lat15-legacy28x16-BDFS = $(call adddouble $(Lat15-legacy14-BDFS))
+Lat2-legacy28x16-BDFS = $(call adddouble $(Lat2-legacy14-BDFS))
+Lat38-legacy28x16-BDFS = $(call adddouble $(Lat38-legacy14-BDFS))
+Lat7-legacy28x16-BDFS = $(call adddouble $(Lat7-legacy14-BDFS))
+Thai-legacy28x16-BDFS = $(call adddouble $(Thai-legacy14-BDFS))
+Uni1-legacy28x16-BDFS = $(call adddouble $(Uni1-legacy14-BDFS))
+Uni2-legacy28x16-BDFS = $(call adddouble $(Uni2-legacy14-BDFS))
+Uni3-legacy28x16-BDFS = $(call adddouble $(Uni3-legacy14-BDFS))
+Vietnamese-legacy28x16-BDFS = $(call adddouble $(Vietnamese-legacy14-BDFS))
+
 ###################################################################
 
 # $(call add_bdf, xxx+yyy+zzz) = bdf/xxx.bdf+bdf/yyy.bdf+bdf/zzz.bdf
@@ -169,7 +214,8 @@ GOOD_PSF_FONTS = $(filter \
 		%-TerminusBoldVGA16.psf                                 \
 		%-Goha12.psf %-Goha14.psf %-Goha16.psf \
 		%-GohaClassic12.psf %-GohaClassic14.psf %-GohaClassic16.psf \
-		%-VGA8.psf %-VGA14.psf %-VGA16.psf, \
+		%-VGA8.psf %-VGA14.psf %-VGA16.psf \
+		%-VGA28x16.psf %-VGA32x16.psf, \
 	$(PSF_FONTS))
 
 GZIPED_GOOD_PSF_FONTS=$(addsuffix .gz, $(GOOD_PSF_FONTS))
@@ -184,16 +230,23 @@ $(FB_PSF_FONTS) : fb_option = --fb
 NONFB_PSF_FONTS = $(filter-out %x6.psf %x10.psf %x11.psf %x12.psf %x14.psf %x16.psf, $(ALL_PSF_FONTS))
 $(NONFB_PSF_FONTS) : fb_option =
 
+doubled_bdfs = $(call adddouble, $(BDFS_TO_DOUBLE))
+
+doubled_bdfs : $(doubled_bdfs)
+
+bdf/%-double.bdf : bdf/%.bdf
+	bdfresize -f 2 -b 1 $< >$@
+
 # Use rm soft.Makefile && make soft.Makefile in order to update soft.Makefile
 include soft.Makefile
 # The script 'fontcodesets' computes which codesets a font supports
-soft.Makefile :
+soft.Makefile : $(doubled_bdfs)
 	echo "PSF_FONTS = " $(sort $(foreach face, $(FACES), \
 	$(addsuffix -$(face).psf, $(shell ./fontcodesets $($(face)-BDFS)))) \
 	$(foreach face, $(LEGACY_FACES), \
 		$(addsuffix -$(face).psf, $($(face)-CODESETS)))) \
 	>soft.Makefile
-
+	echo "BDFS_TO_DOUBLE = " $(wildcard bdf/legacy16?.bdf bdf/legacy14?.bdf bdf/arabic_vga.bdf bdf/u_vga16.bdf) >>soft.Makefile
 
 # i.e. Arabic/univga16
 $(ALL_PSF_FONTS) : codeset/face = $(subst -,/,$(@:%.psf=%))
@@ -216,6 +269,10 @@ $(ALL_PSF_FONTS)  : VGA16-BDFS = $(if $(strip $($(codeset)-legacy16-BDFS)),\
 			$($(codeset)-legacy16-BDFS),u_vga16.bdf)
 $(ALL_PSF_FONTS)  : VGA19-BDFS = $(if $(strip $($(codeset)-legacy19-BDFS)),\
 			$($(codeset)-legacy19-BDFS),legacy19a.bdf)
+$(ALL_PSF_FONTS)  : VGA28x16-BDFS = $(if $(strip $($(codeset)-legacy28x16-BDFS)),\
+			$($(codeset)-legacy28x16-BDFS),legacy14a-double.bdf)
+$(ALL_PSF_FONTS)  : VGA32x16-BDFS = $(if $(strip $($(codeset)-legacy32x16-BDFS)),\
+			$($(codeset)-legacy32x16-BDFS),u_vga16-double.bdf)
 # i.e. bdf/univga16.bdf
 $(ALL_PSF_FONTS) : bdfs = $(call add_bdf, $($(face)-BDFS))
 # i.e. fontsets/Arabic.512
@@ -245,6 +302,7 @@ clean:
 	-rm -f *~
 	-rm -f *.psf *.psf.gz *.sfm *.log
 	-rm -f fontsets/*~
+	-rm -f bdf/*-double.bdf
 
 .PHONY: maintainer-clean
 maintainer-clean: clean
