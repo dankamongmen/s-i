@@ -79,18 +79,19 @@ if [ "$1" = "configure" ]; then
     db_set keyboard-configuration/store_defaults_in_debconf_db true
 fi
 
-# In d-i debhelper doesn't use /etc/init.d scripts
 if \
     [ -f /usr/share/console-setup-mini/keyboard ] && keyboard_present
 then
-    setupcon --force --save
     if \
 	which setxkbmap >/dev/null \
 	&& [ ! -z "$DISPLAY" ] \
 	&& keyboard_present
     then
+	setupcon --save-only
 	setxkbmap -option '' \
 	    -model "$XKBMODEL" "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS"
+    else
+	setupcon --force --save
     fi
 fi
 
