@@ -307,4 +307,5 @@ clean:
 .PHONY: maintainer-clean
 maintainer-clean: clean
 	rm soft.Makefile
-	make soft.Makefile
+	$(MAKE) soft.Makefile
+	rm -f bdf/*-double.bdf
