@@ -40,7 +40,7 @@ try_mount() {
 }
 
 
-# Is a cdrom already mounted?  If so, assume it's the right one..
+# Is a cdrom already mounted? If so, assume it's the right one.
 mount | grep -q 'on /cdrom' && exit 0
 if [ -e /cdrom/.disk/info ]; then
 	CDNAME=$(cat /cdrom/.disk/info)
@@ -55,7 +55,6 @@ log "Searching for Debian installation media..."
 mkdir /cdrom 2>/dev/null || true
 
 while true; do
-	mounted=
 	WRONG=
 
 	if db_get cdrom-detect/try-usb && [ "$RET" = true ]; then
@@ -137,7 +136,6 @@ while true; do
 		if mount -t iso9660 -o ro,exec $device /cdrom; then
 			log "CD-ROM mount succeeded: device=$device fstype=iso9660"
 			db_set cdrom-detect/cdrom_fs iso9660
-			mounted=1
 			break
 		else
 			log "CD-ROM mount failed: device=$device fstype=iso9660"
