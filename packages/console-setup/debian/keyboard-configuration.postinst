@@ -80,17 +80,10 @@ if [ "$1" = "configure" ]; then
 fi
 
 if \
-    [ -f /usr/share/console-setup-mini/keyboard ] && keyboard_present
+    [ -d /lib/debian-installer.d ] && keyboard_present
 then
-    if [ "$DISPLAY" ]; then
-	setupcon --save-only
-	if \
-	    which setxkbmap >/dev/null \
-	    && keyboard_present
-	then
-	    setxkbmap -option '' \
-		-model "$model" "$layout" "$variant" "$options"
-	fi
+    if [ "$DISPLAY" ] && which setxkbmap >/dev/null; then
+	setxkbmap -option '' -model "$model" "$layout" "$variant" "$options"
     else
 	setupcon --force --save
     fi
