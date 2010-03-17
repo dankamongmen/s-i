@@ -82,14 +82,15 @@ fi
 if \
     [ -f /usr/share/console-setup-mini/keyboard ] && keyboard_present
 then
-    if \
-	which setxkbmap >/dev/null \
-	&& [ ! -z "$DISPLAY" ] \
-	&& keyboard_present
-    then
+    if [ "$DISPLAY" ]; then
 	setupcon --save-only
-	setxkbmap -option '' \
-	    -model "$XKBMODEL" "$XKBLAYOUT" "$XKBVARIANT" "$XKBOPTIONS"
+	if \
+	    which setxkbmap >/dev/null \
+	    && keyboard_present
+	then
+	    setxkbmap -option '' \
+		-model "$model" "$layout" "$variant" "$options"
+	fi
     else
 	setupcon --force --save
     fi
