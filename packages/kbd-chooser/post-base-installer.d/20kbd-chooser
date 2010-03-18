@@ -27,6 +27,11 @@ LANG=C chroot /target debconf-set-selections <<EOF
 d-i debian-installer/keymap string $KEYMAP
 EOF
 
-apt-install console-setup || true
+case $(archdetect) in
+    kfreebsd-*|hurd-*)
+	apt-install keyboard-configuration || true ;;
+    *)
+	apt-install console-setup kbd || true ;;
+esac
 
 exit 0
