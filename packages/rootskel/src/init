@@ -11,12 +11,13 @@ mount /sys
 init='/bin/busybox init'
 for i in $(cat /proc/cmdline); do
 	case $i in
+		init=/init|init=init)
+			# This would cause an endless loop
+			: ;;
 		init=*)
-			init=${i#init=}
-			;;
+			init=${i#init=} ;;
 		noshell)
-			sed -i '/^tty[23]/s/^/#/' /etc/inittab
-			;;
+			sed -i '/^tty[23]/s/^/#/' /etc/inittab ;;
 	esac
 done
 debugshell "before init"
