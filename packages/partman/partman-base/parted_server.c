@@ -562,6 +562,12 @@ set_disk_named(const char *name, PedDisk *disk)
         if (NULL != old_disk)
                 ped_disk_destroy(old_disk);
         devices[index].disk = disk;
+        if (disk) {
+                if (ped_disk_is_flag_available(disk,
+                                               PED_DISK_CYLINDER_ALIGNMENT))
+                        ped_disk_set_flag(disk, PED_DISK_CYLINDER_ALIGNMENT,
+                                          0);
+        }
 }
 
 /* True if the partition doesn't exist on the storage device */
@@ -629,6 +635,13 @@ has_extended_partition(PedDisk *disk)
         return ped_disk_extended_partition(disk) != NULL;
 }
 
+/* Get a constraint suitable for partition creation on this disk. */
+PedConstraint *
+partition_creation_constraint(const PedDevice *cdev)
+{
+        return ped_device_get_optimal_aligned_constraint(cdev);
+}
+
 /* Add to `disk' a new extended partition starting at `start' and
    ending at `end' */
 PedPartition *
@@ -645,7 +658,7 @@ add_extended_partition(PedDisk *disk, PedSector start, PedSector end)
                 return NULL;
         }
         if (!ped_disk_add_partition(disk, extended,
-                                    ped_constraint_any(disk->dev))) {
+                                    partition_creation_constraint(disk->dev))) {
                 ped_partition_destroy(extended);
                 return NULL;
         }
@@ -661,7 +674,7 @@ maximize_extended_partition(PedDisk *disk)
         assert(has_extended_partition(disk));
         extended = ped_disk_extended_partition(disk);
         ped_disk_maximize_partition(disk, extended,
-                                    ped_constraint_any(disk->dev));
+                                    partition_creation_constraint(disk->dev));
 }
 
 /* Makes the extended partition as small as possible or removes it if
@@ -697,7 +710,7 @@ add_primary_partition(PedDisk *disk, PedFileSystemType *fs_type,
                 log("Cannot create new primary partition.");
                 return NULL;
         }
-        if (!ped_disk_add_partition(disk, part, ped_constraint_any(disk->dev))) {
+        if (!ped_disk_add_partition(disk, part, partition_creation_constraint(disk->dev))) {
                 log("Cannot add the primary partition to partition table.");
                 ped_partition_destroy(part);
                 return NULL;
@@ -724,7 +737,7 @@ add_logical_partition(PedDisk *disk, PedFileSystemType *fs_type,
                 minimize_extended_partition(disk);
                 return NULL;
         }
-        if (!ped_disk_add_partition(disk, part, ped_constraint_any(disk->dev))) {
+        if (!ped_disk_add_partition(disk, part, partition_creation_constraint(disk->dev))) {
                 ped_partition_destroy(part);
                 minimize_extended_partition(disk);
                 return NULL;
