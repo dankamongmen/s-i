@@ -466,7 +466,7 @@ mangle_fstype_name(char **fstype)
 {
         if (!strcasecmp(*fstype, "linux-swap")) {
                 free(*fstype);
-                *fstype = strdup("linux-swap(new)");
+                *fstype = strdup("linux-swap(v1)");
         }
 }
 
