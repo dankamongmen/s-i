@@ -504,14 +504,16 @@ for my $equivalent (@equivalents) {
 	    my $v = hex ($1);
 	    next if (! printable ($v));
 	    if (! defined $equiv{$v}) {
-		$equiv{$v} = [ $v ];
-	    }
-	    if ($equiv{$u} != $equiv{$v}) {
+		unshift @{$equiv{$u}}, $v;
+		$equiv{$v} = $equiv{$u};
+	    } elsif ($equiv{$u} != $equiv{$v}) {
 		my @vv = @{$equiv{$v}};
-		while (my $w = pop @vv) {
+		while (my $w = shift @vv) {
 		    unshift @{$equiv{$u}}, $w;
 		    $equiv{$w} = $equiv{$u};
 		}
+	    } else {
+		unshift @{$equiv{$u}}, $v;
 	    }
 	    $_ = $2;
 	}
