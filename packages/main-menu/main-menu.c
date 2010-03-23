@@ -32,6 +32,7 @@ const int RAISE = 1;
 const int LOWER = 0;
 
 di_hash_table *seen_items;
+di_hash_table *notinstallables;
 int last_successful_item = -1;
 
 /* Save default priority, to be able to return to it when we have to lower it */
@@ -95,6 +96,13 @@ static void seen_items_key_destroy (void *key)
 	di_free(s);
 }
 
+static void notinstallables_key_destroy (void *key)
+{
+	di_rstring *s = key;
+	di_free(s->string);
+	di_free(s);
+}
+
 int isdefault(di_system_package *p) {
 	int check;
 
@@ -120,6 +128,13 @@ bool isinstallable(di_system_package *p) {
 	check = di_system_dpkg_package_control_file_exec(&p->p, "isinstallable", 0, NULL);
 	if (check <= 0)
 		return true;
+
+	/* Add to table listing not installable packages */
+	di_rstring *p_name = di_new0(di_rstring, 1);
+	p_name->string = di_stradup(p->p.key.string, p->p.key.size);
+	p_name->size = p->p.key.size;
+	di_hash_table_insert(notinstallables, p_name, p_name);
+
 	return false;
 }
 
@@ -162,6 +177,13 @@ get_default_menu_item(di_slist *list)
 	di_system_package *p;
 	di_slist_node *node;
 
+	/* Create table listing not installable packages from scratch as
+	 * the isinstallable status can change at any time
+	 */
+	di_hash_table_destroy(notinstallables);
+	notinstallables = di_hash_table_new_full(di_rstring_hash, di_rstring_equal,
+						 notinstallables_key_destroy, NULL);
+
 	/* Traverse the list, return the first menu item that isn't installed */
 	for (node = list->head; node != NULL; node = node->next) {
 		p = node->data;
@@ -169,7 +191,7 @@ get_default_menu_item(di_slist *list)
 		if (!p->installer_menu_item ||
 		    p->p.status == di_package_status_installed ||
 		    !isinstallable(p)) {
-			//di_log(DI_LOG_LEVEL_DEBUG, "not menu item; or not installed");
+			//di_log(DI_LOG_LEVEL_DEBUG, "not a menu item, not installed or not installable");
 			continue;
 		}
 		if (p->installer_menu_item >= NEVERDEFAULT) {
@@ -641,6 +663,8 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 
 	seen_items = di_hash_table_new_full(di_rstring_hash, di_rstring_equal,
 					    seen_items_key_destroy, NULL);
+	notinstallables = di_hash_table_new_full(di_rstring_hash, di_rstring_equal,
+						 notinstallables_key_destroy, NULL);
 
 	exit_loop = 0;
 	allocator = di_system_packages_allocator_alloc ();
@@ -686,7 +710,8 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 			seen_name->string = di_stradup(seen->p.key.string,
 						       seen->p.key.size);
 			seen_name->size = seen->p.key.size;
-			di_hash_table_insert(seen_items, seen_name, seen_name);
+			if (! di_hash_table_lookup(notinstallables, &seen->p.key))
+				di_hash_table_insert(seen_items, seen_name, seen_name);
 		}
 
 		di_packages_free (packages);
