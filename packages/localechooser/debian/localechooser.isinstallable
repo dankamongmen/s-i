@@ -1,24 +1,9 @@
 #!/bin/sh
-. /usr/share/debconf/confmodule
 
-been_tried=/var/run/localechooser.been_tried
-if [ ! -e $been_tried ] ; then
-	touch $been_tried
-	if db_get auto-install/enable && [ "$RET" = true ]; then
-		# find at least one preseed
-		if [ -e /preseed.cfg ] ||
-		   { db_get preseed/url  && [ "$RET" ]; } ||
-		   { db_get preseed/file && [ "$RET" ]; }; then
-			# ok, so delay locale & kbd choice
-			touch /var/run/delay_choosers
-			exit 1
-		else
-			# otherwise, tell auto-install (and others) that the preseed wasn't specified
-			touch /var/run/preseed_unspecified_at_boot
-		fi
-	fi
-else
-	[ -e /var/run/delay_choosers ] && exit 1
+file=/var/run/auto-install.active
+
+if [ -e $file ]; then
+        exit $(cat $file)
 fi
 
 exit 0
