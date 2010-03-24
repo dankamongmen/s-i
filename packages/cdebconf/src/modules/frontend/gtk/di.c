@@ -44,9 +44,11 @@
 #include <unistd.h>
 #include <syslog.h>
 
+#if 0
 #include <directfb.h>
 /* for dfb_input_device_reload_keymap() and dfb_input_device_at() */
 #include <core/input.h>
+#endif
 #include <gtk/gtk.h>
 
 #include "question.h"
@@ -173,6 +175,7 @@ gboolean cdebconf_gtk_di_setup(struct frontend * fe)
 {
     struct frontend_data * fe_data = fe->data;
     struct di_data * di_data;
+    GdkCursor * cursor;
 
     g_assert(NULL == fe_data->di_data);
     if (NULL == (di_data = g_malloc0(sizeof (struct di_data)))) {
@@ -189,6 +192,10 @@ gboolean cdebconf_gtk_di_setup(struct frontend * fe)
 
     make_fullscreen(fe_data->window);
 
+    cursor = gdk_cursor_new(GDK_LEFT_PTR);
+    gdk_window_set_cursor(gdk_get_default_root_window(), cursor);
+    gdk_cursor_unref(cursor);
+
     return TRUE;
 }
 
@@ -202,7 +209,9 @@ gboolean cdebconf_gtk_di_setup(struct frontend * fe)
  */
 static void refresh_keymap(struct frontend * fe)
 {
+#if 0
     dfb_input_device_reload_keymap(dfb_input_device_at(DIDID_KEYBOARD));
+#endif
 }
 
 /** Returns the current text direction.

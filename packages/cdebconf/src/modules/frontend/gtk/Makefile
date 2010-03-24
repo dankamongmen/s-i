@@ -14,10 +14,10 @@ OBJS = cdebconf_gtk.opic \
 
 ifneq ($(strip $(filter -DDI_UDEB, $(CFLAGS))),)
 OBJS += screenshot.opic di.opic
-MODCFLAGS = `pkg-config --cflags gtk+-directfb-2.0 \
-                                 gthread-2.0 directfb-internal`
-MODLDFLAGS = `pkg-config --libs gtk+-directfb-2.0 \
-                                gthread-2.0 directfb-internal` -ldebian-installer
+MODCFLAGS = `pkg-config --cflags gtk+-x11-2.0 \
+                                 gthread-2.0`
+MODLDFLAGS = `pkg-config --libs gtk+-x11-2.0 \
+                                gthread-2.0` -ldebian-installer
 else
 MODCFLAGS = `pkg-config --cflags gtk+-2.0 gthread-2.0`
 MODLDFLAGS = `pkg-config --libs gtk+-2.0 gthread-2.0` -ldebian-installer
