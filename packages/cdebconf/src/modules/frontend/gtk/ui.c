@@ -454,6 +454,7 @@ gboolean cdebconf_gtk_run_message_dialog(struct frontend * fe,
     GtkWidget * dialog;
     GtkWidget * vbox;
     GtkWidget * frame;
+    GtkWidget * label;
 
     /* XXX: check NULL! */
     dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -465,13 +466,17 @@ gboolean cdebconf_gtk_run_message_dialog(struct frontend * fe,
     gtk_window_set_decorated(GTK_WINDOW(dialog), FALSE /* no decoration */);
     gtk_container_set_border_width(GTK_CONTAINER(dialog), 0 /* no border */);
 
+    /* Create a wrapped label */
+    label = gtk_label_new(message);
+    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+
     /* XXX: check NULL! */
     vbox = gtk_vbox_new(FALSE /* don't make children equal */,
                         DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX(vbox), create_dialog_title_label(title),
                        FALSE /* don't expand */, FALSE /* don't fill */,
                        0 /* no padding */);
-    gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(message),
+    gtk_box_pack_start(GTK_BOX(vbox), label,
                        FALSE /* don't expand */, FALSE /* don't fill */,
                        DEFAULT_PADDING);
     gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(),
