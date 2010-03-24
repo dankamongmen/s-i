@@ -15,21 +15,15 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 files = \
-	S62directfb-hw-accel \
-	S62directfb-cairo-workaround
-
-files_exec = \
-	S62directfb-mouse-settings
+	S62Xorg
 
 ifneq (,$(filter i386 amd64,$(DEB_HOST_ARCH_CPU)))
    files += \
-	S59check-vesa-x86 \
 	S61mouse-support-x86
 endif
 ifneq (,$(filter powerpc,$(DEB_HOST_ARCH_CPU)))
    files += \
-	S61mouse-support-powerpc \
-	S63directfb-linux-powerpc
+	S61mouse-support-powerpc
 endif
 
 include ../../../Makefile.inc
