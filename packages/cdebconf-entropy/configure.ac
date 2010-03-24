@@ -18,7 +18,7 @@ FRONTENDS="text"
 AC_CHECK_LIB(newt, newtInit, FRONTENDS="$FRONTENDS newt", echo
  "*** Cannot build Newt plugin ***")
 
-PKG_CHECK_MODULES(GTK, [gtk+-directfb-2.0],
+PKG_CHECK_MODULES(GTK, [gtk+-x11-2.0],
  FRONTENDS="$FRONTENDS gtk",
  echo "*** Cannot build GTK+ plugin ***")
 
