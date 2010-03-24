@@ -15,7 +15,7 @@ fi
 
 FRONTENDS="newt"
 
-PKG_CHECK_MODULES(GTK, [gtk+-directfb-2.0],
+PKG_CHECK_MODULES(GTK, [gtk+-x11-2.0],
  FRONTENDS="$FRONTENDS gtk",
  echo "*** Cannot build GTK+ plugin ***")
 
