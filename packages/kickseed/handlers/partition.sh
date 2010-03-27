@@ -194,6 +194,7 @@ partition_final () {
 		ks_preseed d-i partman/choose_partition string \
 			'Finish partitioning and write changes to disk'
 		ks_preseed d-i partman/confirm boolean true
+		ks_preseed d-i partman/confirm_nooverwrite boolean true
 	fi
 }
 
