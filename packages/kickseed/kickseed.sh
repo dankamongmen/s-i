@@ -178,8 +178,13 @@ kickseed () {
 				continue
 			fi
 
+			group=
 			if [ "$keyword" = '@' ]; then
 				group="${line#*[ 	]}"
+			elif [ "${keyword#@}" != "$keyword" ]; then
+				group="${line#@}"
+			fi
+			if [ "$group" ]; then
 				# TODO: temporary hack to make at least the
 				# standard desktop work
 				case $group in
