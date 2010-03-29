@@ -1,3 +1,15 @@
+partman-base (141) UNRELEASED; urgency=low
+
+  * parted 2.1 changed the semantics of ped_disk_clobber: it now zeroes out
+    the first few and last few sectors of the disk, regardless of whether
+    there appears to be a valid partition table on it.  Unfortunately, this
+    means that creating a filesystem on a whole disk device and then calling
+    ped_disk_commit_to_dev zeroes the filesystem header we just created.  To
+    avoid this, call ped_disk_commit_to_dev only if the partition doesn't
+    start at sector zero (LP: #539324, #549260).
+
+ -- Colin Watson <cjwatson@debian.org>  Mon, 29 Mar 2010 21:51:39 +0100
+
 partman-base (140) unstable; urgency=low
 
   * Don't warn about data loss on formatted/removed partitions when there

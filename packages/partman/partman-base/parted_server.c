@@ -1808,7 +1808,13 @@ command_create_file_system()
         deactivate_exception_handler();
         if ((fs = timered_file_system_create(&(part->geom), fstype)) != NULL) {
                 ped_file_system_close(fs);
-                ped_disk_commit_to_dev(disk);
+                /* If the partition is at the very start of the disk, then
+                 * we've already done all the committing we need to do, and
+                 * ped_disk_commit_to_dev will overwrite the partition
+                 * header.
+                 */
+                if (part->geom.start != 0)
+                        ped_disk_commit_to_dev(disk);
         }
         activate_exception_handler();
         free(s_fstype);
