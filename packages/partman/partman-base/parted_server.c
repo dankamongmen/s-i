@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <signal.h>
+#include <stdarg.h>
 
 /**********************************************************************
    Logging
@@ -31,15 +32,19 @@ FILE *logfile;
 /* This string is used to prepend the messages written in the log file */
 char const program_name[] = "parted_server";
 
-/* Write a message to the log-file.  Arguments are the same as in printf. */
+/* Write a message to the log-file.  Arguments are the same as in printf.
+ * Note that this deliberately uses asprintf, not xasprintf; if it fails,
+ * there's nothing useful we can do, and we might be about to exit anyway.
+ */
 /* log(const char *format, ...) */
 #define log(...) \
 	({ \
                 char *msg_log; \
-                asprintf(&msg_log, __VA_ARGS__); \
-                fprintf(logfile, "%s: %s\n", program_name, msg_log); \
-                fflush(logfile); \
-                free(msg_log); \
+                if (asprintf(&msg_log, __VA_ARGS__) >= 0) { \
+                        fprintf(logfile, "%s: %s\n", program_name, msg_log); \
+                        fflush(logfile); \
+                        free(msg_log); \
+                } \
         })
 
 /* Write a line to the log-file and exit. */
@@ -61,6 +66,22 @@ char const program_name[] = "parted_server";
 #define log_partitions(dev, disk) \
         (dump_info(logfile, dev, disk), fflush(logfile))
 
+char *
+xasprintf(const char *format, ...)
+{
+        va_list args;
+        char *result;
+
+        va_start(args, format);
+        if (vasprintf(&result, format, args) < 0) {
+                if (errno == ENOMEM)
+                        critical_error("Cannot allocate memory.");
+                return NULL;
+        }
+
+        return result;
+}
+
 /**********************************************************************
    Reading from infifo and writing to outfifo
 **********************************************************************/
@@ -78,7 +99,7 @@ open_out()
 {
         char *str;
         log("Opening outfifo");
-        asprintf(&str, "%s/outfifo", my_directory);
+        str = xasprintf("%s/outfifo", my_directory);
         outfifo = fopen(str, "w");
         if (outfifo == NULL)
                 critical_error("Can't open outfifo");
@@ -92,7 +113,7 @@ open_out()
                 char *msg_oprintf; \
                 fprintf(outfifo,__VA_ARGS__); \
                 fflush(outfifo); \
-                asprintf(&msg_oprintf, __VA_ARGS__); \
+                msg_oprintf = xasprintf(__VA_ARGS__); \
                 log("OUT: %s\n", msg_oprintf); \
                 free(msg_oprintf); \
         })
@@ -107,7 +128,7 @@ open_in()
 {
         char *str;
         log("Opening infifo");
-        asprintf(&str, "%s/infifo", my_directory);
+        str = xasprintf("%s/infifo", my_directory);
         infifo = fopen(str, "r");
         if (infifo == NULL)
                 critical_error("Can't open infifo");
@@ -159,7 +180,7 @@ synchronise_with_client()
 {
         char *str;
         FILE *stopfifo;
-        asprintf(&str, "%s/stopfifo", my_directory);
+        str = xasprintf("%s/stopfifo", my_directory);
         stopfifo = fopen(str, "r");
         if (stopfifo == NULL)
                 critical_error("Can't open stopfifo for synchronisation");
@@ -180,7 +201,7 @@ close_fifos_and_synchronise()
         fclose(infifo);
         fclose(outfifo);
         synchronise_with_client();
-        asprintf(&str, "%s/outfifo", my_directory);
+        str = xasprintf("%s/outfifo", my_directory);
         outfifo = fopen(str, "r");
         if (outfifo == NULL)
                 critical_error("Can't open outfifo for synchronisation");
@@ -189,7 +210,7 @@ close_fifos_and_synchronise()
         }
         fclose(outfifo);
         synchronise_with_client();
-        asprintf(&str, "%s/infifo", my_directory);
+        str = xasprintf("%s/infifo", my_directory);
         infifo = fopen(str, "w");
         if (infifo == NULL)
                 critical_error("Can't open infifo for synchronisation");
@@ -1032,11 +1053,11 @@ partition_info(PedDisk *disk, PedPartition *part)
                 name = ped_partition_get_name(part);
         else
                 name = "";
-        asprintf(&result, "%i\t%lli-%lli\t%lli\t%s\t%s\t%s\t%s",
-                 part->num,
-                 (part->geom).start * PED_SECTOR_SIZE_DEFAULT,
-                 (part->geom).end * PED_SECTOR_SIZE_DEFAULT + PED_SECTOR_SIZE_DEFAULT - 1,
-                 (part->geom).length * PED_SECTOR_SIZE_DEFAULT, type, fs, path, name);
+        result = xasprintf("%i\t%lli-%lli\t%lli\t%s\t%s\t%s\t%s",
+                           part->num,
+                           (part->geom).start * PED_SECTOR_SIZE_DEFAULT,
+                           (part->geom).end * PED_SECTOR_SIZE_DEFAULT + PED_SECTOR_SIZE_DEFAULT - 1,
+                           (part->geom).length * PED_SECTOR_SIZE_DEFAULT, type, fs, path, name);
         free(path);
         return result;
 }
