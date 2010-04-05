@@ -184,22 +184,24 @@ just powercycle the machine and try again.
 </footnote>. This will give you the RedBoot prompt. Enter the
 following commands:
 
-</para>
-
 <informalexample><screen>
 load -v -r -b 0x01800000 -m ymodem ramdisk.gz
 load -v -r -b 0x01008000 -m ymodem zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
 
-<para>After every 'load' command, the system will expect a file to be
-transmitted using the YMODEM protocol. When using cu, make sure you have
-the package <quote>lrzsz</quote> installed, then hit enter, followed by
-the <quote>~&lt;</quote> escape sequence to start an external program,
-and run <command>sb initrd.gz</command> or <command>sb
-vmlinuz</command>.</para>
+</para><para>
 
-<para>Alternatively, it is possible to load the kernel and ramdisk using
+After every <command>load</command> command, the system will expect a
+file to be transmitted using the YMODEM protocol. When using cu, make
+sure you have the package <classname>lrzsz</classname> installed, then
+hit enter, followed by the <quote>~&lt;</quote> escape sequence to start
+an external program, and run <command>sb initrd.gz</command> or
+<command>sb vmlinuz</command>.
+
+</para><para>
+
+Alternatively, it is possible to load the kernel and ramdisk using
 HTTP rather than YMODEM. This is faster, but requires a working HTTP
 server on the network. To do so, first swith the bootloader to RAM mode:
 
@@ -207,20 +209,28 @@ server on the network. To do so, first swith the bootloader to RAM mode:
 fis load rammode
 g
 </screen></informalexample>
-<para>This will seemingly restart the machine; but in reality, it loads
+
+</para><para>
+
+This will seemingly restart the machine; but in reality, it loads
 reboot to RAM and restarts it from there. Not doing this step will cause
-the system to hang in the necessary ip_address step that comes
-next.</para>
-<para>You will need to hit Ctrl-C again to interrupt the boot.
-Then:</para>
+the system to hang in the necessary ip_address step that comes next.
+
+</para><para>
+
+You will need to hit Ctrl-C again to interrupt the boot. Then:
+
 <informalexample><screen>
 ip_address -l 192.168.2.249 -h 192.168.2.4
 load -v -r -b 0x01800000 -m http /initrd.gz
 load -v -r -b 0x01008000 -m http /zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
-<para>
+
+</para><para>
+
 The installer will now start as usual.
+
 </para>
    </sect3>
   </sect2>
