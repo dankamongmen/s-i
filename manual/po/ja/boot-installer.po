@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-04-07 00:13+0000\n"
-"PO-Revision-Date: 2010-03-03 23:17+0900\n"
+"PO-Revision-Date: 2010-04-07 23:30+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -324,18 +324,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:245
-#, fuzzy, no-c-format
-#| msgid ""
-#| "To boot the SS4000-E, first load the Debian-provided firmware image "
-#| "(ss4000e.pkg) through the SS4000-E's web interface (go to "
-#| "<quote>administration</quote>, then to <quote>firmware</quote>, and "
-#| "upload the image). Next, use your serial nullmodem cable and the ribbon "
-#| "cable to connect to the serial port of the SS4000-E, and reboot the "
-#| "machine. You need to use a serial terminal application to communicate "
-#| "with the machine; a good option on a Debian GNU/Linux is to use the "
-#| "<command>cu</command> program, in the package of the same name. Assuming "
-#| "the serial port on your computer is to be found on <filename>/dev/ttyS0</"
-#| "filename>, use the following command line:"
+#, no-c-format
 msgid ""
 "To boot the SS4000-E, use your serial nullmodem cable and the ribbon cable "
 "to connect to the serial port of the SS4000-E, and reboot the machine. You "
@@ -345,15 +334,11 @@ msgid ""
 "computer is to be found on <filename>/dev/ttyS0</filename>, use the "
 "following command line:"
 msgstr ""
-"SS4000-E を起動するには、まず Debian が提供するファームウェアイメージ "
-"(ss4000e.pkg) を、SS4000-E のWeb インターフェース (<quote>administration</"
-"quote> から <quote>firmware</quote> に行き、イメージをアップロード) からロー"
-"ドします。次にシリアルのヌルモデルケーブルとリボンケーブルを使用し、SS4000-E "
-"のシリアルポートに接続し、再起動してください。マシンと通信するにはシリアル"
-"ターミナルアプリケーションが必要です。Debian GNU/Linux では、<command>cu</"
-"command> プログラム (パッケージは同名) を使用すると良いでしょう。あなたのコン"
-"ピュータで、シリアルポートが <filename>/dev/ttyS0</filename> として見えている"
-"場合、以下のコマンドラインを使用してください。"
+"SS4000-E を起動するには、シリアルのヌルモデルケーブルとリボンケーブルを使用"
+"し、SS4000-E のシリアルポートに接続し、再起動してください。Debian GNU/Linux "
+"では、<command>cu</command> プログラム (パッケージは同名) を使用すると良いで"
+"しょう。あなたのコンピュータで、シリアルポートが <filename>/dev/ttyS0</"
+"filename> として見えている場合、以下のコマンドラインを使用してください。"
 
 #. Tag: screen
 #: boot-installer.xml:257
@@ -395,13 +380,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:273
-#, fuzzy, no-c-format
-#| msgid ""
-#| "At this point, hit Control-C to interrupt the boot loader<footnote id="
-#| "\"arm-s4ke-sec\"> <para> Note that you have only one second to do so; if "
-#| "you miss this window, just powercycle the machine and try again. </para> "
-#| "</footnote>. This will give you the RedBoot prompt. Enter the following "
-#| "command:"
+#, no-c-format
 msgid ""
 "At this point, hit Control-C to interrupt the boot loader<footnote id=\"arm-"
 "s4ke-sec\"> <para> Note that you have only one second to do so; if you miss "
@@ -416,20 +395,15 @@ msgstr ""
 
 #. Tag: screen
 #: boot-installer.xml:286
-#, fuzzy, no-c-format
-#| msgid ""
-#| "fis load ramdisk.gz\n"
-#| "fis load zImage\n"
-#| "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
-#| "0x01800000"
+#, no-c-format
 msgid ""
 "load -v -r -b 0x01800000 -m ymodem ramdisk.gz\n"
 "load -v -r -b 0x01008000 -m ymodem zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"load -v -r -b 0x01800000 -m ymodem ramdisk.gz\n"
+"load -v -r -b 0x01008000 -m ymodem zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -444,6 +418,12 @@ msgid ""
 "program, and run <command>sb initrd.gz</command> or <command>sb vmlinuz</"
 "command>."
 msgstr ""
+"毎回の <command>load</command> コマンドの後、YMODEM プロトコルを使用してファ"
+"イルが送信されることを、システムは期待します。cu を使用する際、"
+"<classname>lrzsz</classname> パッケージがインストールされていることを確認して"
+"ください。それから enter を叩き、<quote>~&lt;</quote> エスケープシーケンスが"
+"続く外部プログラムを起動します。そして、<command>sb initrd.gz</command> や "
+"<command>sb vmlinuz</command> を実行します。"
 
 #. Tag: para
 #: boot-installer.xml:297
@@ -453,6 +433,9 @@ msgid ""
 "rather than YMODEM. This is faster, but requires a working HTTP server on "
 "the network. To do so, first swith the bootloader to RAM mode:"
 msgstr ""
+"他には、YMODEM ではなく HTTP を用いて、カーネルや RAM ディスクをロードできま"
+"す。この方が速いのですが、ネットワーク上で動作している HTTP サーバが必要にな"
+"ります。こうするには、まず速やかにブートローダを RAM モードにしてください。"
 
 #. Tag: screen
 #: boot-installer.xml:303
@@ -461,6 +444,8 @@ msgid ""
 "fis load rammode\n"
 "g"
 msgstr ""
+"fis load rammode\n"
+"g"
 
 #. Tag: para
 #: boot-installer.xml:305
@@ -470,21 +455,21 @@ msgid ""
 "RAM and restarts it from there. Not doing this step will cause the system to "
 "hang in the necessary ip_address step that comes next."
 msgstr ""
+"これは外見上、機械を再始動しますが、実際には、reboot を RAM にロードし、そこ"
+"から再始動します。このステップを踏まないと、次に来る必要な ip_address ステッ"
+"プで、システムがハングする原因になるでしょう。"
 
 #. Tag: para
 #: boot-installer.xml:311
 #, no-c-format
 msgid "You will need to hit Ctrl-C again to interrupt the boot. Then:"
 msgstr ""
+"ブートに割り込みをかけるため、もう一度 Ctrl-C を叩く必要があるでしょう。その"
+"後、以下のようにします。"
 
 #. Tag: screen
 #: boot-installer.xml:315
-#, fuzzy, no-c-format
-#| msgid ""
-#| "fis load ramdisk.gz\n"
-#| "fis load zImage\n"
-#| "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
-#| "0x01800000"
+#, no-c-format
 msgid ""
 "ip_address -l 192.168.2.249 -h 192.168.2.4\n"
 "load -v -r -b 0x01800000 -m http /initrd.gz\n"
@@ -492,8 +477,9 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"ip_address -l 192.168.2.249 -h 192.168.2.4\n"
+"load -v -r -b 0x01800000 -m http /initrd.gz\n"
+"load -v -r -b 0x01008000 -m http /zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -501,7 +487,7 @@ msgstr ""
 #: boot-installer.xml:317
 #, no-c-format
 msgid "The installer will now start as usual."
-msgstr ""
+msgstr "今度は通常のように、インストーラが起動します。"
 
 #. Tag: title
 #: boot-installer.xml:330 boot-installer.xml:798 boot-installer.xml:1456
