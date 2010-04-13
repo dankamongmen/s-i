@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 59771 -->
+<!-- original version: 62875 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booten per TFTP</title>
 
@@ -143,10 +143,7 @@ eingebauten 9-poligen Anschlüssen für die seriellen Ports.
 
 </para><para>
 
-Um den SS4000-E zu booten, laden Sie zunächst das von Debian bereitgestellte
-Firmware-Image (ss4000e.pkg) über das Web-Interface des SS4000-E (gehen
-Sie auf <quote>Administration</quote>, dann auf <quote>Firmware</quote>
-und laden Sie dann das Image hoch). Als Nächstes verwenden Sie Ihr
+Um den SS4000-E zu booten, verwenden Sie Ihr
 Nullmodem-Kabel und das Flachbandkabel, um sich mit dem seriellen Anschluß
 des SS4000-E zu verbinden und starten Sie die Maschine neu. Sie müssen
 ein serielles Terminal-Programm benutzen, um mit dem Rechner zu kommunizieren;
@@ -191,45 +188,58 @@ Zeitfenster verpasst haben, trennen Sie kurz die Stromzufuhr des Rechners und
 versuchen Sie es nach dem Start erneut.
 </para>
 
-</footnote>. Sie kommen jetzt zum RedBoot-Prompt. Geben Sie folgenden Befehl
+</footnote>. Sie kommen jetzt zum RedBoot-Prompt. Geben Sie folgende Befehle
 ein:
 
-</para>
-
 <informalexample><screen>
-fconfig boot_script_data
++load -v -r -b 0x01800000 -m ymodem ramdisk.gz
++load -v -r -b 0x01008000 -m ymodem zImage
++exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
 
-<para>
-
-RedBoot wartet jetzt darauf, dass Sie das Boot-Skript eingeben. Stellen Sie
-sicher, dass Sie <emphasis>exakt</emphasis> folgendes eintippen:
-
-</para>
-
-<informalexample><screen>
-fis load ramdisk.gz
-fis load zImage
-exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
-</screen></informalexample>
-
-<para>
-
-Beenden Sie das Skript mit einer leeren Zeile und drücken Sie bei der
-Eingabeaufforderung <quote>y</quote>, um die nicht-flüchtige Konfiguration
-zu aktualisieren. Führen Sie zu guter Letzt einen <quote>Reset</quote>
-durch, um das System neu zu starten, und erlauben Sie ihm, normal zu
-booten. Der Installer sollte nun wie üblich erscheinen. Sie können Debian
-entweder über den seriellen Anschluß installieren oder Sie nutzen einen
-SSH-Klient, um sich mittels SSH zu verbinden.
+</para><para>
+ 
+Nach jedem <command>load</command>-Befehl erwartet das System die Übermittlung
+einer Datei mittels des YMODEM-Protokolls. Wenn Sie cu verwenden, stellen
+Sie sicher, dass Sie das Paket <classname>lrzsz</classname> installiert haben,
+drücken Sie dann Enter, gefolgt von der <quote>~&lt;</quote>-Escape-Sequenz,
+um ein externes Programm zu starten, und führen Sie dann
+<command>sb initrd.gz</command> bzw. <command>sb vmlinuz</command> aus.
 
 </para><para>
 
-Beachten Sie, dass es nicht nötig ist, nach der Installation das
-Boot-Skript zu aktualisieren. Das System wird so konfiguriert, dass die
-Informationen zur root-Festplatte aus der Systemkonfiguration bezogen
-werden und nicht von der Kernel-Kommandozeile. Allerdings schadet es auch
-nicht, das Boot-Skript an die neue Situation anzupassen.
+Alternativ dazu ist es möglich, den Kernel und die Ramdisk mittels HTTP
+statt YMODEM zu laden. Dies ist schneller, erfordert jedoch einen funktionierenden
+HTTP-Server im Netzwerk. Um diesen Weg zu gehen, schalten Sie zunächst den
+Bootloader in den RAM-Modus:
+
+<informalexample><screen>
+fis load rammode
+g
+</screen></informalexample>
+
+</para><para>
+
+Dies führt scheinbar dazu, dass die Maschine neu startet; tatsächlich wird
+jedoch reboot in den RAM geladen und die Maschine von dort neu gestartet.
+Ohne diesen Schritt würde das System sich im nächsten, zwingend notwendigen
+IP-Adressen-Schritt aufhängen.
+
+</para><para>
+
+Sie müssen nochmals Strg-C drücken, um den Bootvorgang zu unterbrechen.
+Führen Sie dann folgendes aus:
+ 
+<informalexample><screen>
+ip_address -l 192.168.2.249 -h 192.168.2.4
+load -v -r -b 0x01800000 -m http /initrd.gz
+load -v -r -b 0x01008000 -m http /zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+</para><para>
+
+Der Installer wird nun wie gewöhnlich starten.
 
 </para>
    </sect3>

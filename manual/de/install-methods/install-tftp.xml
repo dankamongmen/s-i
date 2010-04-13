@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 -->
+<!-- original version: 62454 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Dateien vorbereiten für TFTP-Netzwerk-Boot</title>
@@ -55,34 +55,35 @@ SunOS 4.x, SunOS 5.x (a.k.a. Solaris) und GNU/Linux an.
 
 <note arch="x86"><para>
 
-Um die Pre-Boot-Execution-Environment-Methode (PXE) von TFTP zu nutzen,
-benötigen Sie einen TFTP-Server mit Unterstützung für
-<userinput>tsize</userinput>. Auf einem &debian;-Server sind dies
-<classname>atftpd</classname> und <classname>tftpd-hpa</classname>;
-wir empfehlen, <classname>tftpd-hpa</classname> zu verwenden.
+Für einen &debian;-Server empfehlen wir <classname>tftpd-hpa</classname>.
+Es wurde vom gleichen Autor geschrieben wie der
+<classname>syslinux</classname>-Bootloader und daher ist die Wahrscheinlichkeit,
+dass er Probleme verursacht, hierbei wohl am geringsten. Eine gute Alternative
+ist <classname>atftpd</classname>.
 
 </para></note>
 
 </para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
 
   <sect2 id="tftpd">
   <title>Den TFTP-Server aktivieren</title>
 <para>
 
 Um den TFTP-Server einzurichten, sollten Sie als Erstes sicherstellen,
-dass <command>tftpd</command> aktiv ist. Dies können Sie mit einer Zeile
-wie der folgenden in <filename>/etc/inetd.conf</filename> erreichen:
+dass <command>tftpd</command> aktiv ist.
 
-<informalexample><screen>
-tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
+</para><para>
 
-Die Debian-Pakete richten dies generell standardmäßig korrekt ein, wenn sie
-installiert werden.
+Im Falle von <classname>tftpd-hpa</classname> gibt es zwei Wege, auf dem
+der Dienst zum Laufen gebracht werden kann. Er kann bei Bedarf vom
+<classname>inetd</classname>-Daemon des Systems gestartet werden oder er
+kann eingerichtet werden, als eigenständiger Daemon zu laufen. Welche der
+beiden Methoden verwendet wird, wird bei der Installation des Pakets ausgewählt
+und kann später geändert werden, indem das Paket rekonfiguriert wird.
 
 </para>
 <note><para>
@@ -100,12 +101,6 @@ Ihre Situation anpassen.
 </para></note>
 <para>
 
-Schauen Sie sich die Datei <filename>/etc/inetd.conf</filename> an und merken
-Sie sich das Verzeichnis, das als Argument hinter <command>in.tftpd</command>
-eingetragen ist<footnote>
-
-<para>
-
 Alle in Debian verfügbaren <command>in.tftpd</command>-Alternativen
 sollten standardmäßig Protokolleinträge aller TFTP-Anfragen in das
 System-Log schreiben. Einige unterstützen das Argument
@@ -113,17 +108,6 @@ System-Log schreiben. Einige unterstützen das Argument
 erhöhen. Es wird empfohlen, im Falle von Boot-Problemen diese Logeinträge
 zu kontrollieren; sie sind ein guter Anfang, um der Fehlerursache
 auf die Spur zu kommen.
-
-</para>
-
-</footnote>; Sie werden es später benötigen.
-Wenn Sie <filename>/etc/inetd.conf</filename> ändern mussten, ist es nötig,
-dem laufenden <command>inetd</command>-Prozess mitzuteilen, dass sich die
-Konfigurationsdatei geändert hat. Auf einem Debian-Rechner erledigen Sie das
-mit <userinput>/etc/init.d/inetd reload</userinput>; auf anderen Maschinen
-müssen Sie die Prozess-ID von <command>inetd</command> herausfinden und
-<userinput>kill -HUP <replaceable>Prozess-ID</replaceable></userinput>
-ausführen.
 
 </para><para arch="mips">
 
