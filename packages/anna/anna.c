@@ -52,7 +52,7 @@ int packages_ok (di_packages *packages) {
 	}
 
 	if (!kernel_packages_present) {
-		di_log(DI_LOG_LEVEL_WARNING, "no packages for kernel in archive");
+		di_log(DI_LOG_LEVEL_WARNING, "no packages matching running kernel %s in archive", running_kernel);
 		debconf_input(debconf, "critical", "anna/no_kernel_modules");
 		if (debconf_go(debconf) == 30)
 			return 0;
