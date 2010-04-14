@@ -18,3 +18,10 @@ ifeq ($(ARCH),mips)
 else ifeq ($(ARCH),m68k)
 	dh_gencontrol -- -Vfdisk:Depends="atari-fdisk-udeb, mac-fdisk-udeb"
 endif
+
+override_dh_shlibdeps:
+	# dh_installdeb needs to come first, since
+	# debian/partitioner/DEBIAN/postinst needs to be scanned for
+	# shlibdeps.
+	dh_installdeb
+	dh_shlibdeps
