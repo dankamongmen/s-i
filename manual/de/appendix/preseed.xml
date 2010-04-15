@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61398 -->
+<!-- original version: 62798 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1040,8 +1040,25 @@ unterstützt. Sie können wählen, entweder vorhandenen freien Platz auf der
 Platte zu partitionieren oder die komplette Platte. Das Layout der Disk kann
 durch ein vordefiniertes Rezept festgelegt werden, durch ein selbst erstelltes
 aus einer Rezeptdatei oder durch ein Rezept, das in der Vorkonfigurationsdatei
-enthalten ist. Derzeit ist es nicht möglich, mehrere Festplatten per
-Voreinstellung zu partitionieren.
+enthalten ist.
+
+</para><para>
+
+Die Voreinstellung von fortgeschrittenen Partitionierungen unter Verwendung
+von RAID, LVM und Verschlüsselung ist möglich, jedoch nicht mit der vollständigen
+Flexibilität, die bei einer Installation ohne Voreinstellung möglich wäre.
+
+</para><para>
+
+Die Beispiele weiter unten bieten nur grundlegende Informationen über die
+Nutzung von Partitionierungsrezepten. Detailierte Informationen finden Sie in
+den Dateien <filename>partman-auto-recipe.txt</filename> und
+<filename>partman-auto-raid-recipe.txt</filename>, die in dem Paket
+<classname>debian-installer</classname> enthalten sind. Beide Dateien sind
+ebenfalls über das <ulink
+url="&url-d-i-websvn;/trunk/installer/doc/devel/">&d-i;-Quellcode-Repository</ulink>
+verfügbar. Beachten Sie, dass die unterstützten Funktionalitäten abhängig
+von der Version variieren können.
 
 </para>
 
@@ -1054,22 +1071,28 @@ Voreinstellung nutzen.
 
 </para></warning>
 
+   <sect3 id="preseed-partman-example">
+   <title>Partitionierungsbeispiele</title>
+
 <informalexample role="example"><screen>
 # Wenn das System freien Platz auf der Platte hat, können Sie festlegen, nur
-# diesen Platz zu partitionieren. Dies zu setzen hat nur Auswirkungen, wenn
-# partman-auto/method (siehe unten) nicht gesetzt ist.
+# diesen Platz zu partitionieren. Folgendes zu setzen hat nur Auswirkungen,
+# wenn partman-auto/method (weiter unten) nicht gesetzt ist.
 #d-i partman-auto/init_automatically_partition select biggest_free
 
-# Alternativ können Sie eine Festplatte angeben, die partitioniert
-# werden soll. Der Gerätename muss im traditionellen Format (nicht devfs)
-# angegeben werden.
-# Hinweis: es muss zwingend eine Festplatte angegeben werden, außer wenn das
-# System nur eine einzige Festplatte hat.
+# Alternativ können Sie eine Festplatte angeben, die partitioniert werden soll.
+# Falls das System nur eine einzige Festplatte enthält, wird der Installer diese
+# standardmäßig verwenden, aber andernfalls muss der Gerätename der Platte im
+# traditionellen Format (nicht devfs) angegeben werden (z.B. /dev/hda oder
+# /dev/sda, nicht jedoch etwas wie /dev/discs/disc0/disc).
 # Um z.B. die erste SCSI/SATA-Festplatte zu nutzen, kann die folgende Zeile
 # verwendet werden:
 #d-i partman-auto/disk string /dev/sda
 # Zusätzlich müssen Sie angeben, welche Partitionierungsmethode genutzt werden
-# soll. Derzeit verfügbare Methoden: "regular", "lvm" und "crypto"
+# soll. Derzeit verfügbare Methoden:
+# - regular: gewöhnliche Partitionstypen für die jeweilige Architektur verwenden
+# - lvm:     LVM verwenden, um die Platte zu partitionieren
+# - crypto:  LVM mit einer verschlüsselten Partition verwenden
 d-i partman-auto/method string lvm
 
 # Falls eine der Festplatten, die automatisch partitioniert werden sollen, eine
@@ -1088,7 +1111,6 @@ d-i partman-lvm/confirm boolean true
 d-i partman-auto/choose_recipe select atomic
 
 # Oder erstellen Sie ein eigenes Rezept...
-# Das Rezept-Format ist in der Datei devel/partman-auto-recipe.txt
 # beschrieben. Wenn Sie eine Möglichkeit haben, eine Rezeptdatei in die
 # d-i-Umgebung zu bekommen, können Sie einfach darauf verweisen:
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
@@ -1114,18 +1136,26 @@ d-i partman-auto/choose_recipe select atomic
 #                      method{ swap } format{ }                \
 #              .
 
+# Das vollständige Rezeptformat ist in der Datei partman-auto-recipe.txt
+# dokumentiert, die im Paket »debian-installer« enthalten oder im D-I-Quellcode-
+# Repository verfügbar ist. Dort ist auch dokumentiert, wie erweiterte
+# Einstellungen festgelegt werden, wie z.B. Dateisystem-Bezeichnungen, Volume-
+# gruppennamen oder welche physikalischen Geräte in einer Volumegruppe enthalten
+# sein sollen.
+
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren,
 # vorausgesetzt, Sie haben mit einer der obigen Methoden festgelegt, wie
 # partitioniert werden soll.
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
-  </sect2>
+   </sect3>
+   <sect3 id="preseed-partman-raid">
+   <title>Partitionierung mit RAID</title>
 
-  <sect2 id="preseed-partman-raid">
-  <title>Partitionierung mit RAID</title>
 <para>
 
 Sie können auch Voreinstellung verwenden, um Partitionen auf einem
@@ -1148,10 +1178,7 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 
 </para></warning>
 
-<informalexample><screen>
-# HINWEIS: diese Option hat noch Beta-Charakter und sollte mit großer Vorsicht
-# verwendet werden.
-#
+<informalexample role="example"><screen>
 # Die Partitionierungsmethode sollte auf "raid" gesetzt werden.
 #d-i partman-auto/method string raid
 # Geben Sie die Festplatten an, die partitioniert werden sollen. Sie bekommen
@@ -1174,12 +1201,13 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 
 # Als letztes muss noch angegeben werden, wie die vorher definierten Partitionen
 # im RAID-Setup verwendet werden sollen. Denken Sie daran, die korrekten
-# Partitionsnummern für die logischen Partitionen zu benutzen.
+# Partitionsnummern für die logischen Partitionen zu benutzen. Es werden die
+# RAID-Level 0, 1, 5, 6 und 10 unterstützt; Geräte werden mittels »#« voneinander
+# getrennt.
 # Parameter sind:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID-Level 0, 1, 5, 6 und 10 werden unterstützt; mehrere Geräte werden durch 
-# "#" getrennt.
+# 
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                    \
 #          /dev/sda1#/dev/sdb1       \
@@ -1191,17 +1219,22 @@ und nicht miteinander kollidieren), liegt beim Benutzer! Schauen Sie in
 #          /dev/sda6#/dev/sdb6       \
 #    .
 
+# Weitere Informationen finden Sie in der Datei partman-auto-raid-recipe.txt,
+# die im Paket »debian-installer« enthalten oder im D-I-Quellcode-Repository
+# verfügbar ist.
+
 # Dies veranlasst partman, automatisch ohne Nachfrage zu partitionieren.
 d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-mount-styles">
-  <title>Festlegen, wie Partitionen eingebunden werden</title>
+   <sect3 id="preseed-partman-mount-styles">
+   <title>Festlegen, wie Partitionen eingebunden werden</title>
 <para>
 
 Normalerweise werden Dateisysteme unter Verwendung einer eindeutigen
@@ -1240,6 +1273,7 @@ Ihres Systems beim Starten rein willkürlich.
 #d-i partman/mount_style select uuid
 </screen></informalexample>
 
+   </sect3>
   </sect2>
 
   <sect2 id="preseed-base-installer">
@@ -1460,9 +1494,6 @@ verwenden können.
 
 # Individuelle zusätzliche Pakete, die installiert werden sollen:
 #d-i pkgsel/include string openssh-server build-essential
-# Wenn Pakete, die mittels pkgsel/include (entgegen Ihrer Abhängigkeiten)
-# installiert werden, weitere Pakete lediglich vorschlagen (Recommends),
-# werden diese standardmäßig nicht installiert.
 # Ob Pakete aktualisiert werden sollen, nachdem debootstrap beendet ist:
 # Gültige Werte: none, safe-upgrade, full-upgrade
 #d-i pkgsel/upgrade select none
@@ -1487,6 +1518,11 @@ verwenden können.
 # Um auch die Installation von lilo zu unterdrücken und überhaupt keinen
 # Bootloader zu installieren, entfernen Sie auch hier das Kommentarzeichen:
 #d-i lilo-installer/skip boolean true
+
+# Mit Ausnahme von einigen ungewöhnlichen Partitionierungskonfigurationen ist
+# GRUB 2 jetzt der Standard. Falls Sie aus bestimmten Gründen GRUB Legacy
+# verwenden müssen, entfernen Sie hier das Kommentarzeichen:
+#d-i grub-installer/grub2_instead_of_grub_legacy boolean false
 
 # Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
 # automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
