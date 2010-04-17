@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 62198 untranslated -->
+<!-- original version: 62798 untranslated -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1073,6 +1073,7 @@ d-i partman-auto/choose_recipe select atomic
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
    </sect3>
@@ -1146,6 +1147,7 @@ d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
    </sect3>
@@ -1415,6 +1417,11 @@ to be used easily on the kernel command line as well.
 # To also skip installing lilo, and install no bootloader, uncomment this
 # too:
 #d-i lilo-installer/skip boolean true
+
+# With a few exceptions for unusual partitioning setups, GRUB 2 is now the
+# default. If you need GRUB Legacy for some particular reason, then
+# uncomment this:
+#d-i grub-installer/grub2_instead_of_grub_legacy boolean false
 
 # This is fairly safe to set, it makes grub install automatically to the MBR
 # if no other operating system is detected on the machine.

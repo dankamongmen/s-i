@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 59771 untranslated -->
+<!-- original version: 62875 untranslated -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booting from TFTP</title>
 
@@ -138,17 +138,13 @@ serial ports.
 
 </para><para>
 
-To boot the SS4000-E, first load the Debian-provided firmware image
-(ss4000e.pkg) through the SS4000-E's web interface (go to
-<quote>administration</quote>, then to <quote>firmware</quote>, and
-upload the image). Next,
-use your serial nullmodem cable and the ribbon cable to connect to the
-serial port of the SS4000-E, and reboot the machine. You need to use a
-serial terminal application to communicate with the machine; a good
-option on a Debian GNU/Linux is to use the <command>cu</command>
-program, in the package of the same name. Assuming the serial port on
-your computer is to be found on <filename>/dev/ttyS0</filename>, use the
-following command line:
+To boot the SS4000-E, use your serial nullmodem cable and the ribbon
+cable to connect to the serial port of the SS4000-E, and reboot the
+machine. You need to use a serial terminal application to communicate
+with the machine; a good option on a Debian GNU/Linux is to use the
+<command>cu</command> program, in the package of the same name. Assuming
+the serial port on your computer is to be found on
+<filename>/dev/ttyS0</filename>, use the following command line:
 
 </para>
 
@@ -186,41 +182,54 @@ just powercycle the machine and try again.
 </para>
 
 </footnote>. This will give you the RedBoot prompt. Enter the
-following command:
-
-</para>
+following commands:
 
 <informalexample><screen>
-fconfig boot_script_data
-</screen></informalexample>
-
-<para>
-
-RedBoot is now waiting for you to enter the boot script. Make sure to
-<emphasis>exactly</emphasis> enter the following script:
-
-</para>
-
-<informalexample><screen>
-fis load ramdisk.gz
-fis load zImage
+load -v -r -b 0x01800000 -m ymodem ramdisk.gz
+load -v -r -b 0x01008000 -m ymodem zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
 
-<para>
+</para><para>
 
-Finish the script with an empty line, and enter <quote>y</quote> at the
-prompt to update the non-volatile configuration. Finally, use
-<quote>reset</quote> to restart the system, and allow it to boot normally.
-The installer should now come up as normal. You can either install Debian
-through the serial port, or use an SSH client to connect through SSH.
+After every <command>load</command> command, the system will expect a
+file to be transmitted using the YMODEM protocol. When using cu, make
+sure you have the package <classname>lrzsz</classname> installed, then
+hit enter, followed by the <quote>~&lt;</quote> escape sequence to start
+an external program, and run <command>sb initrd.gz</command> or
+<command>sb vmlinuz</command>.
 
 </para><para>
 
-Note that it is not necessary to update the boot script after the
-installation. The system will be configured to take the root device from
-system configuration, rather than from the kernel command line. It will
-not do any harm to do so anyway, however.
+Alternatively, it is possible to load the kernel and ramdisk using
+HTTP rather than YMODEM. This is faster, but requires a working HTTP
+server on the network. To do so, first switch the bootloader to RAM mode:
+
+<informalexample><screen>
+fis load rammode
+g
+</screen></informalexample>
+
+</para><para>
+
+This will seemingly restart the machine; but in reality, it loads
+reboot to RAM and restarts it from there. Not doing this step will cause
+the system to hang in the necessary ip_address step that comes next.
+
+</para><para>
+
+You will need to hit Ctrl-C again to interrupt the boot. Then:
+
+<informalexample><screen>
+ip_address -l 192.168.2.249 -h 192.168.2.4
+load -v -r -b 0x01800000 -m http /initrd.gz
+load -v -r -b 0x01008000 -m http /zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+</para><para>
+
+The installer will now start as usual.
 
 </para>
    </sect3>
