@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61314 -->
+<!-- original version: 62943 -->
 
  <sect1 id="boot-parms"><title>Boot-Parameter</title>
 <para>
@@ -257,22 +257,16 @@ bei denen die physikalische Sicherheit eingeschränkt ist.
 Auf einigen Architekturen wird der Kernel-Framebuffer benutzt, um
 die Installation in vielen verschiedenen Sprachen anbieten zu können.
 Falls der Framebuffer auf Ihrem System Probleme macht, können Sie ihn
-mit dem Parameter <userinput>fb=false</userinput> deaktivieren.
+mit dem Parameter <userinput arch="x86">vga=normal</userinput>
+<userinput>fb=false</userinput> deaktivieren.
 Symptome für diese Probleme können Fehlermeldungen betreffend
 <quote>bterm</quote> oder <quote>bogl</quote> sein sowie ein schwarzer
 Bildschirm oder ein Einfrieren des Systems ein paar Minuten nach dem
 Installationsstart.
 
-</para><para arch="x86">
-
-Manchmal muss auch <userinput>video=vga16:off</userinput> benutzt werden,
-um die Verwendung des Framebuffers durch den Kernel zu deaktivieren. Solche
-Probleme wurden von einem Dell Inspiron mit Mobile Radeon-Grafikkarte
-berichtet.
-
 </para><para arch="hppa">
 
-Probleme mit dem Framebuffer wurden u.a. von hppa-Systemen berichtet.
+Solche Probleme wurden u.a. von hppa-Systemen berichtet.
 
 </para><note arch="sparc"><para>
 
@@ -433,19 +427,11 @@ das System nach der Basisinstallation nicht mehr vom optischen Laufwerk bootet.
 <term>base-installer/install-recommends (recommends)</term>
 <listitem><para>
 
-Wenn Pakete unter Verwendung des Paketmanagementsystems installiert werden,
-wird dies ebenfalls Pakete installieren, die von den ursprünglich zu
-installierenden nur empfohlen werden (recommend). Empfohlene Pakete werden
-für die Kernfunktionalitäten der ausgewählten Software nicht unbedingt
-benötigt, aber sie werten diese Software zusätzlich auf und sollten (aus Sicht
-der Paketebetreuer) normalerweise mit installiert werden.
-
-</para><para>
-
 Durch das Setzen dieser Option auf <userinput>false</userinput> wird das
-Paketmanagementsystem so konfiguriert, dass diese empfohlenen Pakete nicht
+Paketmanagementsystem so konfiguriert, dass empfohlene Pakete (Recommends) nicht
 automatisch mit installiert werden. Dies gilt sowohl für die Installation
-wie auch später für das installierte System.
+wie auch später für das installierte System. Siehe auch
+<xref linkend="di-install-base"/>.
 
 </para><para>
 
@@ -479,66 +465,6 @@ Dieser Parameter sollte bereits auf einen passenden Wert gesetzt sein, falls
 er benötigt wird; verändern Sie ihn nur, falls Sie Fehler während des Bootens
 beobachten, die den Schluss zulassen, dass die Ramdisk nicht komplett geladen
 werden konnte. Der Wert wird in kB angegeben.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/protocol</term>
-<listitem><para>
-
-Für das Gtk-Frontend (den grafischen Installer) kann mit diesem Parameter
-das zu verwendende Maus-Protokoll einstellt werden. Gültige Werte
-sind<footnote>
-
-<para>
-Zusätzliche Informationen finden Sie in der Manpage für
-<citerefentry><refentrytitle>directfbrc</refentrytitle>
-<manvolnum>5</manvolnum></citerefentry>.
-</para>
-
-</footnote>:
-<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
-<userinput>MS</userinput>, <userinput>MS3</userinput>,
-<userinput>MouseMan</userinput> und <userinput>MouseSystems</userinput>.
-In den meisten Fällen sollte das standardmäßig ausgewählte Protokoll
-korrekt funktionieren.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/device</term>
-<listitem><para>
-
-Für das Gtk-Frontend (den grafischen Installer) kann mit diesem Parameter
-die zu verwendende Geräteschnittstelle für die Maus einstellt werden.
-Dies ist meist nützlich, wenn die Maus an einen seriellen Port angeschlossen
-ist (serielle Maus). Beispiel:
-<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/left</term>
-<listitem><para>
-
-Für das Gtk-Frontend (den grafischen Installer) kann der Benutzer die Maus
-auf Linkshänder-Betrieb umschalten, indem dieser Parameter auf
-<userinput>true</userinput> gesetzt wird.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>directfb/hw-accel</term>
-<listitem><para>
-
-Im Gtk-Frontend (dem graphischen Installer) ist die Hardware-Beschleunigung in
-directfb (Framebuffer) standardmäßig deaktiviert. Setzen
-Sie beim Booten des Installers diesen Parameter auf
-<userinput>true</userinput>, um sie zu aktivieren.
 
 </para></listitem>
 </varlistentry>
