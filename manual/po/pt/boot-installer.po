@@ -1,13 +1,13 @@
 # Portuguese translation of the Debian Installation Manual.
 # Daniel Costa, Miguel Figueiredo e Etur, 2005.
-# Miguel Figueiredo <elmig@debianpt.org>, 2006, 2007, 2008, 2009
+# Miguel Figueiredo <elmig@debianpt.org>, 2006, 2007, 2008, 2009, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-04-19 00:12+0000\n"
-"PO-Revision-Date: 2009-12-03 21:45+0000\n"
+"PO-Revision-Date: 2010-04-19 21:56+0100\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "MIME-Version: 1.0\n"
@@ -337,7 +337,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:245
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To boot the SS4000-E, first load the Debian-provided firmware image "
 #| "(ss4000e.pkg) through the SS4000-E's web interface (go to "
@@ -358,13 +358,10 @@ msgid ""
 "computer is to be found on <filename>/dev/ttyS0</filename>, use the "
 "following command line:"
 msgstr ""
-"Para arrancar o SS4000-E, primeiro carregue a imagem de firmware "
-"disponibilizada por Debian (ss4000e.pkg) através do interface web do SS4000-"
-"E (vá a <quote>administration</quote>, e depois a <quote>firmware</quote>, e "
-"faça upload da imagem). De seguida, utilize o seu cabo nullmodem série e o "
-"cabo com fita para ligar à porta série do SS4000-E, e reinicie a máquina. "
+"Para arrancar o SS4000-E, utilize o seu cabo nullmodem série e o "
+"cabo de fita para ligar à porta série do SS4000-E, e reinicie a máquina. "
 "Tem de utilizar uma aplicação de terminal série para comunicar com a "
-"máquina; uma boa opção é utilizar num Debian GNU/Linux o programa "
+"máquina; uma boa opção é utilizar, num Debian GNU/Linux, o programa "
 "<command>cu</command>, no pacote com o mesmo nome. Assumindo que no seu "
 "computador a porta série se encontra em <filename>/dev/ttyS0</filename>, "
 "utilize a seguinte linha de comandos:"
@@ -410,7 +407,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:273
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "At this point, hit Control-C to interrupt the boot loader<footnote id="
 #| "\"arm-s4ke-sec\"> <para> Note that you have only one second to do so; if "
@@ -427,11 +424,11 @@ msgstr ""
 "arranque<footnote id=\"arm-s4ke-sec\"> <para> Note que tem apenas um segundo "
 "para o fazer; se falhar esta janela, limite-se a reiniciar a alimentação da "
 "máquina e tentar novamente. </para> </footnote>. Isto dar-lhe-à a prompt "
-"RedBoot. Introduza o seguinte comando:"
+"RedBoot. Introduza os seguintes comandos:"
 
 #. Tag: screen
 #: boot-installer.xml:286
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "fis load ramdisk.gz\n"
 #| "fis load zImage\n"
@@ -443,8 +440,8 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"load -v -r -b 0x01800000 -m ymodem ramdisk.gz\n"
+"load -v -r -b 0x01008000 -m ymodem zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -459,6 +456,12 @@ msgid ""
 "program, and run <command>sb initrd.gz</command> or <command>sb vmlinuz</"
 "command>."
 msgstr ""
+"Depois do comando <command>load</command>, o sistema irá esperar que seja "
+"transmitido um ficheiro utilizando o protocolo YMODEM. Ao utilizar o "
+"cu, assegure-se que tem instalado o pacote <classname>lrzsz</classname>, e "
+"depois carregue em enter, seguido da sequência de escape <quote>~&lt;</quote> "
+"para iniciar um programa externo, e depois execute <command>sb initrd.gz"
+"</command> ou <command>sb vmlinuz</command>."
 
 #. Tag: para
 #: boot-installer.xml:297
@@ -468,6 +471,9 @@ msgid ""
 "rather than YMODEM. This is faster, but requires a working HTTP server on "
 "the network. To do so, first switch the bootloader to RAM mode:"
 msgstr ""
+"Em alternativa, é possível carregar o kernel e ramdisk utilizando HTTP em vez "
+"de YMODEM. Isto é mais rápido, mas necessita de um servidor de HTTP na sua "
+"rede. Para o fazer, primeiro mude o gestor de arranque para o modo RAM:"
 
 #. Tag: screen
 #: boot-installer.xml:303
@@ -476,6 +482,8 @@ msgid ""
 "fis load rammode\n"
 "g"
 msgstr ""
+"fis load rammode\n"
+"g"
 
 #. Tag: para
 #: boot-installer.xml:305
@@ -485,16 +493,19 @@ msgid ""
 "RAM and restarts it from there. Not doing this step will cause the system to "
 "hang in the necessary ip_address step that comes next."
 msgstr ""
+"Isto irá reiniciar a máquina; mas na realidade, carrega o reboot para a RAM e "
+"reinicia a partir daí. Não fazer este passo irá fazer com que o sistema fique "
+"parado à espera na etapa necessária, ip_address, que vem a seguir."
 
 #. Tag: para
 #: boot-installer.xml:311
 #, no-c-format
 msgid "You will need to hit Ctrl-C again to interrupt the boot. Then:"
-msgstr ""
+msgstr "Terá de carregar novamente em Ctrl+C para interromper o arranque. Depois:"
 
 #. Tag: screen
 #: boot-installer.xml:315
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "fis load ramdisk.gz\n"
 #| "fis load zImage\n"
@@ -507,8 +518,9 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"ip_address -l 192.168.2.249 -h 192.168.2.4\n"
+"load -v -r -b 0x01800000 -m http /initrd.gz\n"
+"load -v -r -b 0x01008000 -m http /zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -516,7 +528,7 @@ msgstr ""
 #: boot-installer.xml:317
 #, no-c-format
 msgid "The installer will now start as usual."
-msgstr ""
+msgstr "O instalador irá iniciar como normalmente."
 
 #. Tag: title
 #: boot-installer.xml:330 boot-installer.xml:798 boot-installer.xml:1456
@@ -1085,7 +1097,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:779
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To bypass the graphical boot screen you can either blindly press "
 #| "&escapekey; to get a text boot prompt, or (equally blindly) press "
@@ -1109,8 +1121,8 @@ msgstr ""
 "para escolher a opção <quote>Help</quote> descrita acima. Depois disso as "
 "suas digitações devem ser ecoadas na linha de comandos. Para evitar que o "
 "instalador utilize o framebuffer para o resto da instalação, também irá "
-"querer acrescentar <userinput>fb=false</userinput> na linha de comandos, tal "
-"como é descrito no texto de ajuda."
+"querer acrescentar <userinput>vga=normal fb=false</userinput> na linha de "
+"comandos de arranque, conforme é descrito no texto de ajuda."
 
 #. Tag: title
 #: boot-installer.xml:839
@@ -2592,7 +2604,7 @@ msgstr "Dispositivos em Placa"
 
 #. Tag: para
 #: boot-installer.xml:1967
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Some accessibility devices are actual boards that are plugged inside the "
 #| "machine and that read text directly from the video memory. To get them to "
@@ -2609,8 +2621,9 @@ msgstr ""
 "Alguns dispositivos de acessibilidade são na verdade placas que são ligadas "
 "dentro da máquina e que leêm texto directamente da memória gráfica. Para pô-"
 "las a funcionar o suporte a framebuffer tem de ser desligado utilizando o "
-"parâmetro de arranque <userinput>fb=false</userinput>. No entanto isto irá "
-"reduzir o número de idiomas disponíveis."
+"parâmetro de arranque <userinput arch=\"x86\">vga=normal</userinput> "
+"<userinput>fb=false</userinput>. No entanto isto irá reduzir o número de "
+"idiomas disponíveis."
 
 #. Tag: para
 #: boot-installer.xml:1975
@@ -2619,6 +2632,9 @@ msgid ""
 "If desired a textual version of the bootloader can be activated before "
 "adding the boot parameter by typing <userinput>h</userinput> &enterkey;."
 msgstr ""
+"Se desejado, a versão textual do gestor de arranque pode ser activada antes "
+"acrescentando o parâmetro de arranque ao escrever <userinput>h</userinput> "
+"&enterkey;."
 
 #. Tag: title
 #: boot-installer.xml:1983
@@ -3025,7 +3041,7 @@ msgstr "debian-installer/framebuffer (fb)"
 
 #. Tag: para
 #: boot-installer.xml:2234
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Some architectures use the kernel framebuffer to offer installation in a "
 #| "number of languages. If framebuffer causes a problem on your system you "
@@ -3042,10 +3058,11 @@ msgid ""
 msgstr ""
 "Algumas arquitecturas utilizam o framebuffer do kernel para oferecer uma "
 "instalação em várias línguas. Se o framebuffer causar problemas no seu "
-"sistema pode desactivar esta funcionalidade através do parâmetro "
-"<userinput>fb=false</userinput>. Os sintomas do problema são mensagens de "
-"erro sobre bterm ou bogl, um ecrã em branco, ou uma paragem alguns minutos "
-"após o início da instalação."
+"sistema pode desactivar esta funcionalidade utilizando o parâmetro "
+"<userinput arch=\"x86\">vga=normal</userinput> <userinput>fb=false"
+"</userinput>. Os sintomas do problema são mensagens de erro sobre bterm ou "
+"bogl, um ecrã em branco, ou uma paragem alguns minutos após o início da "
+"instalação."
 
 #. Tag: para
 #: boot-installer.xml:2243
@@ -3305,7 +3322,7 @@ msgstr "base-installer/install-recommends (recommends)"
 
 #. Tag: para
 #: boot-installer.xml:2395
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "By setting this option to <userinput>false</userinput>, the package "
 #| "management system will be configured to not automatically install such "
@@ -3318,9 +3335,9 @@ msgid ""
 "installed system. See also <xref linkend=\"di-install-base\"/>."
 msgstr ""
 "Ao definir esta opção como <userinput>falso</userinput>, o sistema de gestão "
-"de pacotes irá ser configurado para não instalar automaticamente tais "
-"<quote>Recommends</quote>, quer durante a instalação quer para o sistema "
-"instalado."
+"de pacotes irá ser configurado para não instalar automaticamente os pacotes "
+"de <quote>Recommends</quote>, quer durante a instalação quer para o sistema "
+"instalado. Veja também <xref linkend=\"di-install-base\"/>."
 
 #. Tag: para
 #: boot-installer.xml:2402
