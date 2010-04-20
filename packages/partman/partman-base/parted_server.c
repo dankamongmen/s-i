@@ -1321,6 +1321,8 @@ void
 command_partitions()
 {
         PedPartition *part;
+        PedConstraint *creation_constraint;
+        PedSector grain_size;
         scan_device_name();
         if (dev == NULL)
                 critical_error("The device %s is not opened.", device_name);
@@ -1339,6 +1341,9 @@ command_partitions()
         }
         if (has_extended_partition(disk))
                 minimize_extended_partition(disk);
+        creation_constraint = partition_creation_constraint(dev);
+        grain_size = creation_constraint->start_align->grain_size;
+        ped_constraint_destroy(creation_constraint);
         for (part = NULL;
              NULL != (part = ped_disk_next_partition(disk, part));) {
                 char *part_info;
@@ -1348,7 +1353,7 @@ command_partitions()
                         continue;
                 /* Undoubtedly the following operator is a hack.
                    Libparted tries to align the partitions at
-                   cylinder boundaries but despite this it sometimes
+                   appropriate boundaries but despite this it sometimes
                    reports free spaces due to aligning and even
                    allows creation of unaligned partitions in these
                    free spaces.  I am not sure if this is a bug or a
@@ -1357,7 +1362,7 @@ command_partitions()
                     && ped_disk_type_check_feature(disk->type,
                                                    PED_DISK_TYPE_EXTENDED)
                     && ((part->geom).length
-                        < dev->bios_geom.sectors * dev->bios_geom.heads))
+                        < dev->bios_geom.sectors * grain_size))
                         continue;
                 /* Another hack :) */
                 if (0 == strcmp(disk->type->name, "dvh")
