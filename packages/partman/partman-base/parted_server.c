@@ -724,7 +724,7 @@ add_extended_partition(PedDisk *disk, PedSector start, PedSector end)
                 return NULL;
         }
         if (!ped_disk_add_partition(disk, extended,
-                                    partition_creation_constraint(disk->dev))) {
+                                    ped_constraint_any(disk->dev))) {
                 ped_partition_destroy(extended);
                 return NULL;
         }
@@ -740,7 +740,7 @@ maximize_extended_partition(PedDisk *disk)
         assert(has_extended_partition(disk));
         extended = ped_disk_extended_partition(disk);
         ped_disk_maximize_partition(disk, extended,
-                                    partition_creation_constraint(disk->dev));
+                                    ped_constraint_any(disk->dev));
 }
 
 /* Makes the extended partition as small as possible or removes it if
