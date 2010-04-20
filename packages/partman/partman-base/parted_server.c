@@ -660,7 +660,28 @@ has_extended_partition(PedDisk *disk)
 PedConstraint *
 partition_creation_constraint(const PedDevice *cdev)
 {
-        return ped_device_get_optimal_aligned_constraint(cdev);
+        PedConstraint *aligned, *gap_at_end, *combined;
+        PedGeometry gap_at_end_geom;
+
+        aligned = ped_device_get_optimal_aligned_constraint(cdev);
+        if (cdev->type == PED_DEVICE_DM)
+                return aligned;
+
+        /* We must ensure that there's a small gap at the end, since
+         * otherwise MD 0.90 metadata at the end of a partition may confuse
+         * mdadm into believing that both the disk and the partition
+         * represent the same RAID physical volume.
+         */
+        ped_geometry_init(&gap_at_end_geom, cdev, 0, cdev->length - 1);
+        gap_at_end = ped_constraint_new(ped_alignment_any, ped_alignment_any,
+                                        &gap_at_end_geom, &gap_at_end_geom,
+                                        1, cdev->length);
+
+        combined = ped_constraint_intersect(aligned, gap_at_end);
+
+        ped_constraint_destroy(gap_at_end);
+        ped_constraint_destroy(aligned);
+        return combined;
 }
 
 /* Add to `disk' a new extended partition starting at `start' and
