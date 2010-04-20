@@ -422,3 +422,24 @@ Type: string
 Default: ext3
 Description: for internal use; can be preseeded
  Default filesystem used for new partitions
+
+Template: partman/alignment
+Type: select
+Choices: cylinder, minimal, optimal
+Default: optimal
+Description: for internal use; can be preseeded
+ Adjust the policy for starting and ending alignment of new partitions.  You
+ can generally leave this alone unless optimal alignment causes some kind of
+ problem.
+ .
+ Cylinder alignment was required by very old DOS-era systems, and is not
+ usually needed nowadays.  However, a few buggy BIOSes may try to calculate
+ cylinder/head/sector addresses for partitions and get confused if
+ partitions aren't cylinder-aligned.
+ .
+ Minimal alignment ensures that new partitions are aligned to physical
+ blocks on the disk, avoiding performance degradation that may occur with
+ cylinder alignment particularly on modern disks.
+ .
+ Optimal alignment ensures that new partitions are aligned to a suitable
+ multiple of the physical block size, guaranteeing optimal performance.

@@ -82,6 +82,12 @@ xasprintf(const char *format, ...)
         return result;
 }
 
+enum {
+        ALIGNMENT_CYLINDER,
+        ALIGNMENT_MINIMAL,
+        ALIGNMENT_OPTIMAL
+} alignment = ALIGNMENT_OPTIMAL;
+
 /**********************************************************************
    Reading from infifo and writing to outfifo
 **********************************************************************/
@@ -587,7 +593,7 @@ set_disk_named(const char *name, PedDisk *disk)
                 if (ped_disk_is_flag_available(disk,
                                                PED_DISK_CYLINDER_ALIGNMENT))
                         ped_disk_set_flag(disk, PED_DISK_CYLINDER_ALIGNMENT,
-                                          0);
+                                          alignment == ALIGNMENT_CYLINDER);
         }
 }
 
@@ -656,6 +662,19 @@ has_extended_partition(PedDisk *disk)
         return ped_disk_extended_partition(disk) != NULL;
 }
 
+void
+set_alignment(void)
+{
+        const char *align_env = getenv("PARTMAN_ALIGNMENT");
+
+        if (align_env && !strcmp(align_env, "cylinder"))
+                alignment = ALIGNMENT_CYLINDER;
+        else if (align_env && !strcmp(align_env, "minimal"))
+                alignment = ALIGNMENT_MINIMAL;
+        else
+                alignment = ALIGNMENT_OPTIMAL;
+}
+
 /* Get a constraint suitable for partition creation on this disk. */
 PedConstraint *
 partition_creation_constraint(const PedDevice *cdev)
@@ -663,7 +682,12 @@ partition_creation_constraint(const PedDevice *cdev)
         PedConstraint *aligned, *gap_at_end, *combined;
         PedGeometry gap_at_end_geom;
 
-        aligned = ped_device_get_optimal_aligned_constraint(cdev);
+        if (alignment == ALIGNMENT_OPTIMAL)
+                aligned = ped_device_get_optimal_aligned_constraint(cdev);
+        else if (alignment == ALIGNMENT_MINIMAL)
+                aligned = ped_device_get_minimal_aligned_constraint(cdev);
+        else
+                aligned = ped_device_get_constraint(cdev);
         if (cdev->type == PED_DEVICE_DM)
                 return aligned;
 
@@ -2303,25 +2327,32 @@ command_alignment_offset()
                 critical_error("Expected partition id");
         part = partition_with_id(disk, id);
         oprintf("OK\n");
-        align = ped_device_get_minimum_alignment(dev);
+        if (alignment == ALIGNMENT_CYLINDER)
+                /* None of this is useful when using cylinder alignment. */
+                oprintf("0\n");
+        else {
+                align = ped_device_get_minimum_alignment(dev);
 
-        /* align->offset represents the offset of the lowest logical block
-         * on the disk from the disk's natural alignment, modulo the
-         * physical sector size (e.g. 4096 bytes), as a number of logical
-         * sectors (e.g. 512 bytes).  For a disk with 4096-byte physical
-         * sectors deliberately misaligned to make DOS-style 63-sector
-         * offsets work well, we would thus expect align->offset to be 1, as
-         * (1 + 63) * 512 / 4096 is an integer.
-         *
-         * To get the alignment offset of a *partition*, we thus need to
-         * start with align->offset (in bytes) plus the partition start
-         * position.
-         */
-        oprintf("%lld\n",
-                ((align->offset + part->geom.start) * dev->sector_size) %
-                dev->phys_sector_size);
+                /* align->offset represents the offset of the lowest logical
+                 * block on the disk from the disk's natural alignment,
+                 * modulo the physical sector size (e.g. 4096 bytes), as a
+                 * number of logical sectors (e.g. 512 bytes).  For a disk
+                 * with 4096-byte physical sectors deliberately misaligned
+                 * to make DOS-style 63-sector offsets work well, we would
+                 * thus expect align->offset to be 1, as (1 + 63) * 512 /
+                 * 4096 is an integer.
+                 *
+                 * To get the alignment offset of a *partition*, we thus
+                 * need to start with align->offset (in bytes) plus the
+                 * partition start position.
+                 */
+                oprintf("%lld\n",
+                        ((align->offset + part->geom.start) *
+                         dev->sector_size) %
+                        dev->phys_sector_size);
 
-        ped_alignment_destroy(align);
+                ped_alignment_destroy(align);
+        }
         free(id);
 }
 
@@ -2420,6 +2451,7 @@ main_loop()
 {
         char *str;
         int iteration = 1;
+        set_alignment();
         while (1) {
                 log("main_loop: iteration %i", iteration++);
                 open_in();
