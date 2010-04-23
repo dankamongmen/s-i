@@ -15,8 +15,14 @@ NSIS_CFLAGS	+= -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
 endif
 
 MAKENSIS	:= makensis -O/dev/null
+# Standalone version : Not linked to a website with preseed.cfg
+ifdef STANDALONE
+MAKENSIS	+= -DNOCD=yes
+endif
+
+# Network version : Linked to a website with preseed.cfg
 ifdef NETWORK_BASE_URL
-MAKENSIS	+= -DNETWORK_BASE_URL=$(NETWORK_BASE_URL)
+MAKENSIS	+= -DNETWORK_BASE_URL=$(NETWORK_BASE_URL) -DNOCD=yes
 endif
 
 # hard disk
@@ -50,7 +56,7 @@ loadlin.exe: /usr/lib/loadlin/loadlin.exe.gz
 win32-loader.exe: main.nsi getwindowsversion.nsh maps.ini \
 		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
 		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
-		swirl.ico license loadlin.pif loadlin.exe
+		swirl.ico license loadlin.pif loadlin.exe g2ldr g2ldr.mbr
 	$(MAKE) -C l10n
 	$(MAKENSIS) main.nsi
 	du -h win32-loader.exe

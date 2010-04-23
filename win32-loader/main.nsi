@@ -51,7 +51,7 @@ Page license
 Page custom ShowExpert
 Page custom ShowRescue
 Page custom ShowGraphics
-!ifdef NETWORK_BASE_URL
+!ifdef NOCD
 Page custom ShowBranch
 !endif
 Page custom ShowDesktop
@@ -122,7 +122,7 @@ Function ShowExpert
 ; ********************************************** Initialise $preseed_cmdline
   StrCpy $preseed_cmdline " "
 
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
 ; ********************************************** Initialise $d
   ${GetRoot} $EXEDIR $d
 
@@ -151,7 +151,7 @@ readme_file_not_found:
 ; ********************************************** Initialise $arch
   test64::get_arch
   StrCpy $arch $0
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
   ReadINIStr $0 $d\win32-loader.ini "installer" "arch"
   ${If} "$0:$arch" == "amd64:i386"
     MessageBox MB_OK|MB_ICONSTOP $(amd64_on_i386)
@@ -255,7 +255,7 @@ Function ShowGraphics
   Var /GLOBAL user_interface
   Var /GLOBAL gtk
 
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
   Var /GLOBAL predefined_user_interface
   ReadINIStr $predefined_user_interface $d\win32-loader.ini "installer" "user_interface"
 
@@ -278,7 +278,7 @@ Function ShowGraphics
     ${Else}
         StrCpy $user_interface graphical
     ${Endif}
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
   ${Else}
     StrCpy $user_interface $predefined_user_interface
   ${Endif}
@@ -296,7 +296,7 @@ ${Endif}
   ${EndIf}
 FunctionEnd
 
-!ifdef NETWORK_BASE_URL
+!ifdef NOCD
 
 Function Download
     ; Base URL
@@ -407,7 +407,7 @@ FunctionEnd
 Function ShowCustom
 ; Gather all the missing information before ShowCustom is displayed
 
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
 
 ; ********************************************** Media-based install
   Var /GLOBAL linux
@@ -567,13 +567,13 @@ $1"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 4" "Text" "Linux cmdline:"
     WriteINIStr $PLUGINSDIR\custom.ini "Field 5" "Text" $(custom5)
     WriteINIStr $PLUGINSDIR\custom.ini "Field 6" "State" "$proxy"
-!ifdef NETWORK_BASE_URL
+!ifdef NOCD
     WriteINIStr $PLUGINSDIR\custom.ini "Field 8" "State" "$base_url"
 !endif
     WriteINIStr $PLUGINSDIR\custom.ini "Field 9" "State" "$preseed_cmdline"
     InstallOptions::dialog $PLUGINSDIR\custom.ini
     ReadINIStr $proxy		$PLUGINSDIR\custom.ini "Field 6" "State"
-!ifdef NETWORK_BASE_URL
+!ifdef NOCD
     ReadINIStr $base_url	$PLUGINSDIR\custom.ini "Field 8" "State"
 !endif
     ReadINIStr $preseed_cmdline	$PLUGINSDIR\custom.ini "Field 9" "State"
@@ -606,7 +606,7 @@ Section "Installer Loader"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Debian-Installer Loader" "DisplayName" $(program_name)
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Debian-Installer Loader" "UninstallString" "$INSTDIR\uninstall.exe"
 
-!ifndef NETWORK_BASE_URL
+!ifndef NOCD
   ClearErrors
   StrCpy $0 "$EXEDIR\$linux"
   StrCpy $1 "$INSTDIR\linux"
@@ -690,17 +690,22 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
 
 ; ********************************************** Do bootloader last, because it's the most dangerous
   ${If} $windows_boot_method == ntldr
-!ifdef NETWORK_BASE_URL
-    Push "false"
-    Push "g2ldr"
-    Push "$c"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
-    Push "false"
-    Push "g2ldr.mbr"
-    Push "$c"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
+!ifdef NOCD
+    !ifdef NETWORK_BASE_URL
+        Push "false"
+        Push "g2ldr"
+        Push "$c"
+        Push "${NETWORK_BASE_URL}"
+        Call Download
+        Push "false"
+        Push "g2ldr.mbr"
+        Push "$c"
+        Push "${NETWORK_BASE_URL}"
+        Call Download
+    !else
+       File /oname=$INSTDIR\g2ldr g2ldr
+       File /oname=$INSTDIR\g2ldr.mbr g2ldr.mbr
+    !endif
 !else
     ClearErrors
     StrCpy $0 "$EXEDIR\$g2ldr"
@@ -732,17 +737,22 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
   ${Endif}
 
   ${If} $windows_boot_method == bootmgr
-!ifdef NETWORK_BASE_URL
-    Push "false"
-    Push "g2ldr"
-    Push "$c"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
-    Push "false"
-    Push "g2ldr.mbr"
-    Push "$c"
-    Push "${NETWORK_BASE_URL}"
-    Call Download
+!ifdef NOCD
+    !ifdef NETWORK_BASE_URL
+        Push "false"
+        Push "g2ldr"
+        Push "$c"
+        Push "${NETWORK_BASE_URL}"
+        Call Download
+        Push "false"
+        Push "g2ldr.mbr"
+        Push "$c"
+        Push "${NETWORK_BASE_URL}"
+        Call Download
+    !else
+       File /oname=$INSTDIR\g2ldr g2ldr
+       File /oname=$INSTDIR\g2ldr.mbr g2ldr.mbr
+    !endif
 !else
     ClearErrors
     StrCpy $0 "$EXEDIR\$g2ldr"
