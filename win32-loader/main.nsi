@@ -353,13 +353,7 @@ Function ShowBranch
   ${If} $di_branch == "daily"
     MessageBox MB_YESNO|MB_ICONQUESTION $(di_branch4) IDNO +2
     ExecShell "open" "http://wiki.debian.org/DebianInstaller/Today"
-    Var /GLOBAL hacker
-    ${If} $arch == "amd64"
-      StrCpy $hacker aba
-    ${Else}
-      StrCpy $hacker joeyh
-    ${Endif}
-    StrCpy $base_url "http://people.debian.org/~$hacker/d-i/images/daily/netboot/$gtkdebian-installer/$arch"
+    StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
   ${Else}
     StrCpy $base_url "http://ftp.se.debian.org/debian/dists/stable/main/installer-$arch/current/images/netboot/$gtkdebian-installer/$arch"
   ${Endif}
