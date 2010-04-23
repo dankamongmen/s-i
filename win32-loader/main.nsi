@@ -171,18 +171,15 @@ readme_file_not_found:
     StrCpy $windows_boot_method ntldr
     Goto windows_version_ok
   ${Endif}
-  ${If} ${IsWin95}
-  ${OrIf} ${IsWin98}
+  ${If} ${AtMostWinME}
     StrCpy $windows_boot_method direct
     Goto windows_version_ok
   ${Endif}
-  ${If} ${IsWin2000}
-  ${OrIf} ${IsWinXP}
-  ${OrIf} ${IsWin2003}
+  ${If} ${AtMostWin2003}
     StrCpy $windows_boot_method ntldr
     Goto windows_version_ok
   ${Endif}
-  ${If} ${IsWinVista}
+  ${If} ${AtMostWinVista}
 ; In the default install, "system partition" is not mounted.  We need a way
 ; around this before Windows 7 can be enabled.
 ;  ${OrIf} ${IsWin7}
