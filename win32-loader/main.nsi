@@ -234,9 +234,6 @@ c_is_initialized:
   ${Else}
     StrCpy $expert false
   ${Endif}
-
-  Var /GLOBAL debian_release
-  StrCpy $debian_release squeeze
 FunctionEnd
 
 Function ShowRescue
@@ -333,7 +330,6 @@ FunctionEnd
 Function ShowBranch
   Var /GLOBAL di_branch
   StrCpy $di_branch stable
-  StrCpy $debian_release lenny
   File /oname=$PLUGINSDIR\di_branch.ini	templates/binary_choice.ini
   ${If} $expert == true
     WriteINIStr $PLUGINSDIR\di_branch.ini "Field 1" "Text" $(di_branch1)
@@ -343,7 +339,6 @@ Function ShowBranch
     ReadINIStr $0 $PLUGINSDIR\di_branch.ini "Field 3" "State"
     ${If} $0 == "1"
       StrCpy $di_branch daily
-      StrCpy $debian_release squeeze
     ${Endif}
   ${Endif}
 
