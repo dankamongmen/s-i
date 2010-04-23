@@ -1,5 +1,6 @@
 ; Debian-Installer Loader
 ; Copyright (C) 2007,2008,2009  Robert Millan <rmh@aybabtu.com>
+; Copyright (C) 2010            Didier Raboud <didier@raboud.com>
 ;
 ; This program is free software: you can redistribute it and/or modify
 ; it under the terms of the GNU General Public License as published by
@@ -32,12 +33,12 @@ RequestExecutionLevel admin
 !include LogicLib.nsh
 !include FileFunc.nsh
 !include WinMessages.nsh
+!include WinVer.nsh
 !insertmacro GetRoot
 
 !addplugindir plugins
 !addplugindir plugins/cpuid
 !addplugindir plugins/systeminfo
-!include getwindowsversion.nsh
 
 ;--------------------------------
 
@@ -165,30 +166,26 @@ readme_file_not_found:
 !endif
 
   ; Windows version is another abort condition
-  Var /GLOBAL windows_version
   Var /GLOBAL windows_boot_method
-  Call GetWindowsVersion
-  Pop $windows_version
-  StrCpy $1 $windows_version 3
-  ${If} $1 == "NT "
+  ${If} ${IsNT}
     StrCpy $windows_boot_method ntldr
     Goto windows_version_ok
   ${Endif}
-  ${If} $windows_version == "95"
-  ${OrIf} $windows_version == "98"
+  ${If} ${Is95}
+  ${OrIf} ${Is98}
     StrCpy $windows_boot_method direct
     Goto windows_version_ok
   ${Endif}
-  ${If} $windows_version == "2000"
-  ${OrIf} $windows_version == "XP"
-  ${OrIf} $windows_version == "2003"
+  ${If} ${Is2000}
+  ${OrIf} ${IsXP}
+  ${OrIf} ${Is2003}
     StrCpy $windows_boot_method ntldr
     Goto windows_version_ok
   ${Endif}
-  ${If} $windows_version == "Vista"
+  ${If} ${IsVista}
 ; In the default install, "system partition" is not mounted.  We need a way
 ; around this before Windows 7 can be enabled.
-;  ${OrIf} $windows_version == "7"
+;  ${OrIf} ${Is7}
     StrCpy $windows_boot_method bootmgr
     Goto windows_version_ok
   ${Endif}

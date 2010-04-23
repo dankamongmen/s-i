@@ -53,7 +53,7 @@ loadlin.pif: genpif
 loadlin.exe: /usr/lib/loadlin/loadlin.exe.gz
 	gunzip -c $^ > $@
 
-win32-loader.exe: main.nsi getwindowsversion.nsh maps.ini \
+win32-loader.exe: main.nsi maps.ini \
 		templates/binary_choice.ini templates/graphics.ini templates/custom.ini templates/4_choices.ini \
 		plugins/cpuid/test64.dll plugins/systeminfo/systeminfo.dll plugins/string.dll \
 		swirl.ico license loadlin.pif loadlin.exe g2ldr g2ldr.mbr
