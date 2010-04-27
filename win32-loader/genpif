@@ -1,14 +1,19 @@
 #!/bin/bash -e
 
+# This script outputs a valid .pif "Program Information File"
+#
+# There is some documentation available there: http://www.smsoft.ru/en/pifdoc.htm
+
 # supress dd stderr
 exec 2>/dev/null
 
 # hello, I am a PIF
 echo -en "\x00\x78"
 
-# program name, displayed in the confirmation dialog (space-padded)
+# program name, displayed in the confirmation dialog (space-padded to 30)
 echo -en "Installer Loader              "
 
+# Conventional memory limits
 echo -en "\x80\x02\x00\x00"
 
 # exec file (zero-padded)
