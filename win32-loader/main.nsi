@@ -697,8 +697,8 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
         Push "${NETWORK_BASE_URL}"
         Call Download
     !else
-       File /oname=$INSTDIR\g2ldr g2ldr
-       File /oname=$INSTDIR\g2ldr.mbr g2ldr.mbr
+       File /oname=$c\g2ldr g2ldr
+       File /oname=$c\g2ldr.mbr g2ldr.mbr
     !endif
 !else
     ClearErrors
@@ -718,9 +718,16 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
     DetailPrint "$(registering_ntldr)"
     SetFileAttributes "$c\boot.ini" NORMAL
     SetFileAttributes "$c\boot.ini" SYSTEM|HIDDEN
+
     ; Sometimes timeout isn't set.  This may result in ntldr booting straight to
     ; Windows (bad) or straight to Debian-Installer (also bad)!  Force it to 30
-    ; just in case.
+    ; just in case. Store its eventual old value alongside
+    ; Read the already defined timeout
+    ReadIniStr $0 "$c\boot.ini" "boot loader" "timeout"
+    IfErrors no_boot_ini_timeout
+       ClearErrors
+       WriteIniStr "$c\boot.ini" "boot loader" "old_timeout_win32-loader" $0
+    no_boot_ini_timeout:
     WriteIniStr "$c\boot.ini" "boot loader" "timeout" "30"
     WriteIniStr "$c\boot.ini" "operating systems" "$c\g2ldr.mbr" '"$(d-i_ntldr)"'
   ${Endif}
@@ -744,8 +751,8 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
         Push "${NETWORK_BASE_URL}"
         Call Download
     !else
-       File /oname=$INSTDIR\g2ldr g2ldr
-       File /oname=$INSTDIR\g2ldr.mbr g2ldr.mbr
+       File /oname=$c\g2ldr g2ldr
+       File /oname=$c\g2ldr.mbr g2ldr.mbr
     !endif
 !else
     ClearErrors
@@ -828,6 +835,14 @@ Section "Uninstall"
   SetFileAttributes "$c\boot.ini" NORMAL
   SetFileAttributes "$c\boot.ini" SYSTEM|HIDDEN
   DeleteINIStr "$c\boot.ini" "operating systems" "$c\g2ldr.mbr"
+    
+  ReadIniStr $0 "$c\boot.ini" "boot loader" "old_timeout_win32-loader"
+  IfErrors no_saved_boot_ini_timeout
+     ; Restore original timeout
+     ClearErrors
+     WriteIniStr "$c\boot.ini" "boot loader" "timeout" $0
+     DeleteINIStr "$c\boot.ini" "boot loader" "old_timeout_win32-loader"
+  no_saved_boot_ini_timeout:
 
   ReadRegStr $0 HKLM "Software\Debian\Debian-Installer Loader" "bootmgr"
   ${If} $0 != ""
