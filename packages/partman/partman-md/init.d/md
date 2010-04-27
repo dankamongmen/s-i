@@ -53,8 +53,8 @@ for dev in $DEVICES/*; do
 		fi
 	done
 
-	# Check if the device is a software RAID device
-	if [ -f device ]; then
+	# Check if the device is a new software RAID device
+	if [ -f device ] && [ -z "$partitions" ]; then
 		NUMBER=$(sed -e 's,/dev/md/\?,,' device)
 		if ! grep -q "^md$NUMBER :" /proc/mdstat; then
 			continue
