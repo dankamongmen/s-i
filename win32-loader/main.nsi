@@ -724,7 +724,7 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
     ; just in case. Store its eventual old value alongside
     ; Read the already defined timeout
     ReadIniStr $0 "$c\boot.ini" "boot loader" "timeout"
-    IfErrors no_boot_ini_timeout
+    IfErrors 0 no_boot_ini_timeout
        ClearErrors
        WriteIniStr "$c\boot.ini" "boot loader" "old_timeout_win32-loader" $0
     no_boot_ini_timeout:
@@ -837,7 +837,7 @@ Section "Uninstall"
   DeleteINIStr "$c\boot.ini" "operating systems" "$c\g2ldr.mbr"
     
   ReadIniStr $0 "$c\boot.ini" "boot loader" "old_timeout_win32-loader"
-  IfErrors no_saved_boot_ini_timeout
+  IfErrors 0 no_saved_boot_ini_timeout
      ; Restore original timeout
      ClearErrors
      WriteIniStr "$c\boot.ini" "boot loader" "timeout" $0
