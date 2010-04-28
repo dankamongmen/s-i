@@ -341,7 +341,14 @@ Function ShowBranch
   ${If} $di_branch == "daily"
     MessageBox MB_YESNO|MB_ICONQUESTION $(di_branch4) IDNO +2
     ExecShell "open" "http://wiki.debian.org/DebianInstaller/Today"
-    StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
+
+    ; Daily images URL
+    ; See http://svn.debian.org/viewsvn/d-i/trunk/scripts/daily-build-aggregator for the canonical list
+    ${If} $arch == "i386"
+      StrCpy $base_url "http://people.debian.org/~joeyh/d-i/images/daily/netboot/$gtkdebian-installer/$arch"
+    ${Else} ; We have only two arches, then Else means $arch == "amd64"
+      StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
+    ${Endif}
   ${Else}
     StrCpy $base_url "http://ftp.se.debian.org/debian/dists/stable/main/installer-$arch/current/images/netboot/$gtkdebian-installer/$arch"
   ${Endif}
