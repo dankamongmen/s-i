@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 61147 -->
+<!-- original version: 62932 -->
 
 <para>
 
@@ -30,6 +30,159 @@ zasáhnout. Pokud nechcete využít automatické dělení disku, zvolte
 z nabídky <guimenuitem>Ručně</guimenuitem>.
 
 </para>
+
+   <sect3 id="partman-fs">
+   <title>Podporované možnosti dělení disků</title>
+<para>
+
+Nástroj pro dělení disků v &d-i;u je poměrně všestranný. Umožňuje
+vytvářet mnoho různých schémat dělení disků, používat různé tabulky
+oblastí, souborové systémy a pokročilá bloková zařízení.
+
+</para><para>
+
+Konkrétní dostupné možnosti závisí převážně na architektuře
+instalovaného počítače, ale také na dalších faktorech, jako je
+velikost operační paměti (při nedostatku operační paměti nemusí být
+některé možnosti k dispozici). Lišit se mohou také výchozí
+hodnoty. Například typ tabulky rozdělení disku může být různý pro
+menší a větší disky. Některé možnosti je možno změnit jen při instalaci
+se střední nebo nízkou prioritou otázek. Při vyšších prioritách se
+použijí výchozí hodnoty.
+
+</para><para>
+
+Instalační systém umožňuje použít různé druhy pokročilého dělení disku
+a zajímavých úložných zařízení, často i kombinovaně.
+
+<itemizedlist>
+<listitem><para>
+
+<emphasis>Logical Volume Management (LVM)</emphasis>
+
+</para></listitem>
+<listitem arch="not-s390"><para>
+
+<emphasis>Softwarový RAID</emphasis>
+
+  </para><para>
+
+Podporovány jsou RAID úrovně 0, 1, 4, 5, 6 a 10.
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>Šifrování</emphasis>
+
+</para></listitem>
+<listitem arch="x86"><para>
+
+<emphasis>Serial ATA RAID</emphasis> (pomocí <classname>dmraid</classname>)
+
+  </para><para>
+
+Taktéž nazývaný <quote>falešný RAID</quote> nebo <quote>BIOS
+RAID</quote>. Podpora pro Serial ATA RAID je dostupná pouze pokud ji
+povolíte při zavádění instalačního systému. Více informací naleznete
+na <ulink url="&url-d-i-sataraid;">naší Wiki</ulink>.
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>Multipath</emphasis> (experimentální)
+
+  </para><para>
+
+Podpora pro multipath je dostupná pouze pokud ji povolíte při zavádění
+instalačního systému. Více informací naleznete
+na <ulink url="&url-d-i-multipath;">naší Wiki</ulink>.
+
+</para></listitem>
+</itemizedlist>
+
+</para><para>
+
+Podporovány jsou následující souborové systémy.
+
+<itemizedlist>
+<listitem><para>
+
+  <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+  <emphasis>ext2</emphasis>,
+  <emphasis>ext3</emphasis>,
+  <emphasis>ext4</emphasis>
+
+  </para><para>
+
+Výchozí souborový systém je ve většině případů ext3. Při použití
+automatického dělení se pro <filename>/boot</filename> oblast
+implicitně použije ext2.
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>jfs</emphasis> (není dostupný na všech architekturách)
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>xfs</emphasis> (není dostupný na všech architekturách)
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>reiserfs</emphasis> (volitelný, není dostupný na všech
+architekturách)
+
+  </para><para>
+
+Podpora pro souborový systém Reiser již není dostupná automaticky, ale
+můžete ji povolit při spuštění instalace se střední nebo nízkou úrovní
+otázek tak, že necháte nahrát komponentu
+<classname>partman-reiserfs</classname>. Podporována je pouze verze 3.
+
+</para></listitem>
+<listitem arch="arm"><para>
+
+<emphasis>jffs2</emphasis>
+
+  </para><para>
+
+Na některých systémech se používá pro čtení flash paměti. Není možné
+vytvářet nové souborové systémy tohoto typu.
+
+</para></listitem>
+<listitem arch="x86"><para>
+
+<emphasis>qnx4</emphasis>
+
+  </para><para>
+
+Stávající souborové systémy budou rozpoznány a je možné jim přiřadit
+přípojné body, ale není možné vytvářet nové souborové systémy tohoto
+typu.
+
+</para></listitem>
+<listitem><para>
+
+<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+
+</para></listitem>
+<listitem arch="x86;ia64"><para>
+
+<emphasis>NTFS</emphasis> (jen pro čtení)
+
+  </para><para>
+
+U stávajících souborových systémů NTFS je možné změnit jejich velikost
+a je možné jim přiřadit přípojné body, ale není možné vytvářet nové
+souborové systémy tohoto typu.
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3 id="partman-auto">
    <title>Asistované dělení</title>

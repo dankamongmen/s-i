@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 61147 -->
+<!-- original version: 62454 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Příprava souborů pro zavedení ze sítě pomocí TFTP</title>
@@ -53,31 +53,34 @@ GNU/Linux.
 
 <note arch="x86"><para>
 
-Abyste mohli využít PXE (Pre-boot Execution Environment) metodu TFTP
-zavádění, musíte mít TFTP server s podporou
-<userinput>tsize</userinput>, například <command>tftp-hpa</command>
-nebo <classname>atftpd</classname> (doporučujeme první zmíněný).
+Pokud na serveru běží &debian;, doporučujeme použít TFTP server
+<classname>tftp-hpa</classname> od stejného autora jako zavaděč
+<classname>syslinux</classname>, protože by mezi nimi mělo nastat
+nejméně problémů. Vhodnou alternativou je i
+<classname>atftpd</classname>.
 
 </para></note></para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
 
   <sect2 id="tftpd">
   <title>Povolení TFTP serveru</title>
 <para>
 
 Aby vám TFTP server fungoval, měli byste nejprve zkontrolovat,
-zda je <command>tftpd</command> povolen. Toho obvykle docílíte
-následující řádkou v souboru <filename>/etc/inetd.conf</filename>:
+zda je <command>tftpd</command> povolen.
 
-<informalexample><screen>
-tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
+</para><para>
 
-Při instalaci z debianích balíků se o nic nemusíte starat, protože
-se tento řádek založí automaticky při instalaci balíku.
+V případě balíku <classname>tftpd-hpa</classname> existují dva
+způsoby, jak službu provozovat. Jednak se může
+<classname>tftpd-hpa</classname> spouštět jako samostatný daemon při
+startu systému, nebo může jeho spuštění zajišťovat systémový daemon
+<classname>inetd</classname> v okamžik, kdy je ho potřeba. Způsob,
+který zrovna používáte, můžete zvolit při instalaci balíku, respektive
+ho můžete kdykoliv změnit rekonfigurací balíku.
 
 </para><note><para>
 
@@ -91,23 +94,11 @@ muset cesty uváděné v této kapitole upravit pro konkrétní situaci.
 
 </para></note><para>
 
-Podívejte se do souboru <filename>/etc/inetd.conf</filename> a
-zapamatujte si název adresáře, jehož jméno je za
-<command>in.tftpd</command>;<footnote><para>
-
 Všechny alternativní <command>in.tftpd</command> v Debianu by měly
 automaticky zaznamenávat všechny požadavky, které jim byly zaslány, do
 systémových logů. To se hodí zejména v situaci, kdy zavádění neprobíhá
 tak, jak má. Některé TFTP servery umí zvýšit svou upovídanost
 parametrem <userinput>-v</userinput>.
-
-</para></footnote> budete jej dále potřebovat. Pokud musíte změnit
-obsah souboru <filename>/etc/inetd.conf</filename>, musíte také
-upozornit proces <command>inetd</command>, aby aktualizoval svá
-nastavení.  Na počítači s Debianem stačí spustit
-<userinput>/etc/init.d/inetd reload</userinput>.  Na jiných systémech
-musíte zjistit ID běžícího procesu <command>inetd</command> a spustit
-<userinput>kill -HUP <replaceable>pid-inetd</replaceable></userinput>.
 
 </para><para arch="mips">
 

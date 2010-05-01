@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 61896 -->
+<!-- original version: 62798 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1010,9 +1010,25 @@ d-i clock-setup/ntp boolean true
 Dělení disku je víceméně omezeno možnostmi, které nabízí
 <classname>partman-auto</classname>. Můžete zvolit rozdělení buď
 stávajícího volného místa, nebo celého disku. Rozvržení oblastí můžete
-nadefinovat pomocí předdefinovaného schematu, vlastního schematu ze
-souboru nebo schematu obsaženém v souboru s přednastavením. Momentálně
-není možné přednastavit rozdělení více disků.
+určit pomocí předdefinovaného schematu, vlastního schematu ze
+souboru nebo schematu obsaženém v souboru s přednastavením.
+
+</para><para>
+
+Přednastavení pokročilejších konfigurací s RAIDem, LVM a šifrováním je
+sice podporováno, ale ne s takovými možnostmi, jako při ručním dělení.
+
+</para><para>
+
+Příklady níže ukazují jen základní použití schemat. Podrobnější
+informace naleznete v souborech
+<filename>partman-auto-recipe.txt</filename> a
+<filename>partman-auto-raid-recipe.txt</filename>, které jsou součástí
+balíku <classname>debian-installer</classname>. Oba soubory jsou též
+dostupné
+ze <ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">zdrojového
+repositáře &d-i;</ulink>. Poznamenejme, že podporovaná funkcionalita
+se může mezi jednotlivými vydáními lišit.
 
 </para><warning><para>
 
@@ -1022,20 +1038,28 @@ ovladače. Jestliže se v systému nachází více disků, tak se ubezpečte,
 
 </para></warning>
 
+   <sect3 id="preseed-partman-example">
+   <title>Příklad dělení disku</title>
+
 <informalexample role="example"><screen>
 # Má-li systém nějaké volné místo, můžete si vybrat, zda chcete
 # automaticky rozdělit pouze toto volné místo. To však funguje pouze
 # pokud není nastavena proměnná partman-auto/method (níže).
 #d-i partman-auto/init_automatically_partition select biggest_free
 
-# Alternativně můžete zadat k automatickému dělení celý disk. Název
-# zařízení musí být v tradičním formátu (ne ve formátu devfs).
-# Poznámka: pokud má systém více disků, musíte nějaký zadat.
+# Alternativně můžete zadat k automatickému dělení celý disk.
+# Obsahuje-li systém pouze jediný disk, použije se tento automaticky.
+# V opačném případě musíte zadat název příslušného zařízení
+# v tradičním formátu a ne ve formátu devfs (tj. musíte zadat něco
+# jako /dev/hda nebo /dev/sda, ne /dev/discs/disc0/disc).
 # Například pro použití prvního SCSI/SATA disku:
 #d-i partman-auto/disk string /dev/sda
-
+#
 # Dále musíte zvolit metodu, která se má použít. Momentálně jsou
-# dostupné metody "regular", "lvm" a "crypto".
+# dostupné metody
+# - regular: použije typ oblastí typický na vaší architektuře
+# - lvm:     pro rozdělení disku použije LVM
+# - crypto:  použije LVM nad zašifrovanou oblastí
 d-i partman-auto/method string lvm
 
 # Pokud některý z disků určených k automatickému rozdělení obsahuje
@@ -1053,9 +1077,7 @@ d-i partman-md/device_remove_md boolean true
 # - multi:  samostatné oblasti /home, /usr, /var a /tmp
 d-i partman-auto/choose_recipe select atomic
 
-
 # Nebo zadat váš vlastní návod na dělení...
-# Formát návodu je popsán v souboru devel/partman-auto-recipe.txt.
 # Pokud umíte do prostředí d-i dostat soubor s návodem na dělení,
 # stačí na něj odkázat.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
@@ -1080,18 +1102,25 @@ d-i partman-auto/choose_recipe select atomic
 #                      method{ swap } format{ }                \
 #              .
 
+# Kompletní formát je popsán v souboru partman-auto-recipe.txt
+# dostupném v balíku "debian-installer" nebo ve zdrojovém repositáři
+# D-I. Soubor demonstruje použití i takových věcí, jako je pojmenování
+# souborových systémů, pojmenování skupin svazků a určení, ze kterých
+# fyzických zařízení se má skupina svazků skládat.
+
 # Následujícím řeknete partmanu, aby disk rozdělil bez potvrzení.
 # (Za předpokladu, že jste partmanu v předchozích krocích řekli,
 # co má dělat.)
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-raid">
-  <title>Rozdělení při použití RAIDu</title>
+   <sect3 id="preseed-partman-raid">
+   <title>Rozdělení při použití RAIDu</title>
 <para>
 
 Pomocí přednastavení též můžete nastavit oblasti na polích softwarového
@@ -1110,10 +1139,7 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 
 </para></warning>
 
-<informalexample><screen>
-# POZNÁMKA: tato možnost je zatím ve stádiu testování a měla by být
-# používána s největší opatrností.
-
+<informalexample role="example"><screen>
 # Metoda by měla být nastavena na "raid".
 #d-i partman-auto/method string raid
 # Zadejte disky k rozdělení. Na všech bude nakonec stejné rozložení,
@@ -1135,12 +1161,12 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 
 # Na závěr musíte zadat, jakým způsobem se mají dříve definované oblasti
 # použít v nastavení RAIDu. Důležité je použít správná čísla logických
-# oblastí.
+# oblastí. Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10; zařízení jsou
+# oddělena pomocí "#"
 # Parametry jsou:
 # &lt;typraidu&gt; &lt;početzařízení&gt; &lt;početrezerv&gt; &lt;typss&gt; &lt;přípbod&gt; \
 #          &lt;zařízení&gt; &lt;rezervnízařízení&gt;
-# Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10; zařízení jsou oddělena
-# pomocí "#"
+
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                    \
 #          /dev/sda1#/dev/sdb1       \
@@ -1152,6 +1178,9 @@ problémů zkontrolujte <filename>/var/log/syslog</filename>.
 #          /dev/sda6#/dev/sdb6       \
 #    .
 
+# Více informací naleznete v souboru partman-auto-recipe.txt dostupném
+# v balíku "debian-installer" nebo ve zdrojovém repositáři D-I.
+
 # Toto zajistí, že se partman nebude při rozdělování ptát na potvrzení.
 d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
@@ -1159,10 +1188,10 @@ d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
 </screen></informalexample>
 
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-mount-styles">
-  <title>Způsob připojení oblastí</title>
+   <sect3 id="preseed-partman-mount-styles">
+   <title>Způsob připojení oblastí</title>
 <para>
 
 Souborové systémy se obvykle připojují pomocí jedinečného
@@ -1199,6 +1228,7 @@ zaručeno, která oblast se připojí.
 #d-i partman/mount_style select uuid
 </screen></informalexample>
 
+   </sect3>
   </sect2>
 
   <sect2 id="preseed-base-installer">

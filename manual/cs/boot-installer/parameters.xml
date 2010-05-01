@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 61314 -->
+<!-- original version: 62943 -->
 
  <sect1 id="boot-parms"><title>Zaváděcí parametry</title>
 <para>
@@ -240,13 +240,8 @@ Některé architektury využívají pro instalaci v různých jazycích
 jaderný framebuffer (grafická konzole). Pokud na svém systému
 zaznamenáte symptomy jako chybové hlášky o btermu a boglu, černou
 obrazovku nebo zamrznutí instalace po několika minutách od spuštění,
-můžete framebuffer vypnout parametrem <userinput>fb=false</userinput>.
-
-</para><para arch="x86">
-
-K vypnutí framebufferu též můžete použít parametr
-<userinput>video=vga16:off</userinput>. Tyto problémy byly hlášeny na
-počítači Dell Inspiron s grafickou kartou Mobile Radeon.
+můžete framebuffer vypnout parametrem
+<userinput arch="x86">vga=normal</userinput> <userinput>fb=false</userinput>.
 
 </para><para arch="hppa">
 
@@ -407,17 +402,10 @@ Pro zakázání automatického vysunutí nastavte parametr na hodnotu
 <term>base-installer/install-recommends (recommends)</term>
 <listitem><para>
 
-Při instalaci balíků pomocí systému pro správu balíků se automaticky
-nainstalují také balíky, které jsou instalovanými balíku doporučovány.
-Doporučené balíky nejsou pro funčnost zvoleného software striktně
-vyžadovány, nicméně nějakým způsobem rozšiřují jeho funkcionalitu a v
-očích správců balíků by se měly instalovat společně.
-
-</para><para>
-
 Nastavením na hodnotu <userinput>false</userinput> se systém pro
 správu balíků nebude pokoušet o instalaci doporučených balíků jak
 během instalace, tak později v nainstalovaném systému.
+Více naleznete v kapitole <xref linkend="di-install-base"/>.
 
 </para><para>
 
@@ -451,63 +439,6 @@ Nebezpečné, není doporučeno.</emphasis>
 Tento parametr by již měl být nastaven na správnou hodnotu. Použijte
 jej pouze v případě, že během zavádění systému uvidíte chyby
 naznačující, že ramdisk nebyl nahrán celý. Hodnota je v kB.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/protocol</term>
-<listitem><para>
-
-U gtk rozhraní (alias grafického instalátoru) mohou uživatelé nastavit
-komunikační protokol mezi myší a počítačem. Podporované hodnoty
-tohoto parametru jsou<footnote><para>
-
-Více informací naleznete v manuálové stránce
-<citerefentry><refentrytitle>directfbrc</refentrytitle>
-<manvolnum>5</manvolnum></citerefentry>.
-
-</para></footnote>:
-
-<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
-<userinput>MS</userinput>, <userinput>MS3</userinput>,
-<userinput>MouseMan</userinput> a <userinput>MouseSystems</userinput>.
-Ve většině případů není třeba nic nastavovat.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/device</term>
-<listitem><para>
-
-U gtk rozhraní (alias grafického instalátoru) mohou tímto parametrem
-uživatelé určit zařízení, ke kterému je myš připojena. To se hodí
-v případech, kdy je myš připojena k sériovému portu. Například:
-<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/left</term>
-<listitem><para>
-
-U gtk rozhraní (alias grafického instalátoru) si mohou uživatelé na
-myši prohodit levé a pravé tlačítko (vhodné při ovládání levou
-rukou). Stačí nastavit tento parametr na hodnotu
-<userinput>true</userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>directfb/hw-accel</term>
-<listitem><para>
-
-U gtk rozhraní (alias grafického instalátoru) je hardwarová akcelerace
-v directfb standardně vypnutá. Pro povolení nastavte tento parametr na
-hodnotu <userinput>true</userinput>.
 
 </para></listitem>
 </varlistentry>

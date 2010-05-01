@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 59771 -->
+<!-- original version: 62875 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Zavedení z TFTP</title>
 
@@ -243,13 +243,10 @@ zabudovanými 9 pinovými sériovými porty.
 
 </para><para>
 
-Pro zavedení SS4000-E musíte nejprve přes webové rozhraní nahrát
-obraz s firmwarem poskytnutý Debianem
-(<filename>ss4000e.pkg</filename>). (Jděte přes
-<quote>administration</quote>, <quote>firmware</quote>.)  Pak připojte
-sériový port SS4000-E pomocí nullmodemového a plochého kabelu a stroj
-restartujte. Pro komunikaci se zařízením potřebujete aplikaci schopnou
-používat sériový terminál. Na &debian;u je vhodnou volbou program
+Pro zavedení SS4000-E připojte sériový port SS4000-E pomocí
+nullmodemového a plochého kabelu a stroj restartujte. Pro komunikaci
+se zařízením potřebujete aplikaci schopnou používat sériový
+terminál. Na &debian;u je vhodnou volbou program
 <command>cu</command> ze stejnojmenného balíku. Předpokládejme, že
 používáte sériový port <filename>/dev/ttyS0</filename>; pak můžete
 použít příkaz:
@@ -289,41 +286,61 @@ Na přerušení máte pouze jednu sekundu; pokud toto krátké okno
 nestihnete, jednoduše stroj vypněte, zapněte a zkuste to znovu.
 
 </para></footnote>, což zobrazí výzvu RedBootu. Zadejte následující
-příkaz:
-
-</para>
+příkazy:
 
 <informalexample><screen>
-fconfig boot_script_data
-</screen></informalexample>
-
-<para>
-
-RedBoot nyní očekává, že zadáte zaváděcí skript. Opište
-<emphasis>přesně</emphasis> následující řádky:
-
-</para>
-
-<informalexample><screen>
-fis load ramdisk.gz
-fis load zImage
+load -v -r -b 0x01800000 -m ymodem ramdisk.gz
+load -v -r -b 0x01008000 -m ymodem zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
 
-<para>
+</para><para>
 
-Skript zakončete prázdným řádkem a na výzvu odpovězte
-<userinput>y</userinput>, aby se aktualizovala konfigurace v trvalé
-paměti. Na závěr použijte příkaz <userinput>reset</userinput>, což
-restartuje stroj a zavede instalační systém. V instalaci Debianu
-můžete pokračovat přes sériový port, nebo se připojit přes SSH.
+Po každém příkazu <command>load</command> očekává systém přenos
+souboru protokolem YMODEM. Používáte-li <command>cu</command>,
+ujistěte se, že máte nainstalovaný balík <classname>lrzsz</classname>
+a stiskněte &enterkey; následovaný escape sekvencí
+<quote>~&lt;</quote> pro spuštění externího programu. Následně zadejte
+příkaz <command>sb initrd.gz</command> resp.
+<command>sb vmlinuz</command>.
 
 </para><para>
 
-Po skončení instalace není třeba měnit zaváděcí skript, protože systém
-bude nastaven tak, by si bral umístění kořenového souborového systému
-ze systémového nastavení a ne z příkazové řádky jádra. Pokud se však
-rozhodnete zaváděcí skript změnit, nemělo by to ničemu vadit.
+Alternativně je možné místo použití protokolu YMODEM nahrát jádro a
+ramdisk přes HTTP, což je dokonce rychlejší, ale vyžaduje funkční HTTP
+server. V takovém případě nejprve přepněte zavaděč do režimu RAM:
+
+<informalexample><screen>
+fis load rammode
+g
+</screen></informalexample>
+
+</para><para>
+
+Tím se stroj jakoby restartuje, ale ve skutečnosti nahraje reboot do
+RAM a restartuje odtamtud. Přeskočíte-li tento krok, systém se v tom
+následujícím zasekne u příkazu ip_address.
+
+</para><para>
+
+Zavádění opět budete muset přerušit kombinací
+<keycombo><keycap>Control</keycap> <keycap>C</keycap></keycombo>
+a na výzvu zadat:
+
+<informalexample><screen>
+ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable>
+load -v -r -b 0x01800000 -m http /initrd.gz
+load -v -r -b 0x01008000 -m http /zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+kde <replaceable>192.168.2.249</replaceable> je IP adresa
+instalovaného stroje a <replaceable>192.168.2.4</replaceable> je IP
+adresa HTTP serveru, ze kterého se stáhnou příslušné soubory.
+
+</para><para>
+
+Instalace nyní bude pokračovat jako obvykle.
 
 </para>
    </sect3>
