@@ -8,15 +8,14 @@ msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-04-19 00:12+0000\n"
-"PO-Revision-Date: 2010-03-04 20:45+0300\n"
+"PO-Revision-Date: 2010-05-01 11:33+0400\n"
 "Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms:  nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #. Tag: title
 #: boot-installer.xml:4
@@ -167,8 +166,7 @@ msgstr ""
 #: boot-installer.xml:97 boot-installer.xml:363 boot-installer.xml:831
 #: boot-installer.xml:1489 boot-installer.xml:1851
 #, no-c-format
-msgid ""
-"If you have problems booting, see <xref linkend=\"boot-troubleshooting\"/>."
+msgid "If you have problems booting, see <xref linkend=\"boot-troubleshooting\"/>."
 msgstr ""
 "При возникновении проблем с загрузкой смотрите <xref linkend=\"boot-"
 "troubleshooting\"/>."
@@ -345,12 +343,12 @@ msgstr ""
 "\"arm-s4ke-port\"> <para> Также можно использовать конвертер USB-"
 "последовательный порт. </para> </footnote>; и плоский кабель, оконеченный с "
 "одной стороны штырьковым разъёмом DB9, а с другой 10-дырочным .1\" IDC "
-"раъёмом<footnote id=\"arm-s4k-rib\"> <para> Такой кабель можно взять из "
+"разъёмом<footnote id=\"arm-s4k-rib\"> <para> Такой кабель можно взять из "
 "старого компьютера со встроенными 9-штырьковыми портами. </para> </footnote>."
 
 #. Tag: para
 #: boot-installer.xml:245
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To boot the SS4000-E, first load the Debian-provided firmware image "
 #| "(ss4000e.pkg) through the SS4000-E's web interface (go to "
@@ -371,13 +369,10 @@ msgid ""
 "computer is to be found on <filename>/dev/ttyS0</filename>, use the "
 "following command line:"
 msgstr ""
-"Чтобы загрузить SS4000-E, сначала загрузите образ микропрограммы, "
-"предоставляемый Debian (ss4000e.pkg), через веб-интерфейс SS4000-E "
-"(перейдите в <quote>administration</quote>, затем в <quote>firmware</quote>, "
-"и закачайте образ). Затем, с помощью последовательного нуль-модемного кабеля "
+"Чтобы загрузить SS4000-E с помощью последовательного нуль-модемного кабеля "
 "и плоского кабеля подключите к последовательному порту SS4000-E, и "
-"перезагрузите. Для связи с машиной нужно использовать программу-терминал на "
-"последовательном порту; в Debian GNU/Linux есть программа <command>cu</"
+"перезагрузите машину. Для связи с машиной нужно использовать программу-терминал "
+"на последовательном порту; в Debian GNU/Linux есть программа <command>cu</"
 "command> в пакете с тем же названием. Предполагая, что последовательный порт "
 "компьютера определился как <filename>/dev/ttyS0</filename>, используйте "
 "следующую командную строку:"
@@ -422,7 +417,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:273
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "At this point, hit Control-C to interrupt the boot loader<footnote id="
 #| "\"arm-s4ke-sec\"> <para> Note that you have only one second to do so; if "
@@ -435,15 +430,15 @@ msgid ""
 "this window, just powercycle the machine and try again. </para> </footnote>. "
 "This will give you the RedBoot prompt. Enter the following commands:"
 msgstr ""
-"В этом месте нажмите Control-C, чтобы прервать стартовый загрузчик<footnote "
+"В этом месте нажмите Control-C, чтобы прервать системный загрузчик<footnote "
 "id=\"arm-s4ke-sec\"> <para> Заметим, что на это у вас есть только одна "
 "секунда; если вы не успели, выключите и включите машину и попробуйте ещё "
 "раз. </para> </footnote>. Это позволит получить приглашение RedBoot. Введите "
-"следующую команду:"
+"следующие команды:"
 
 #. Tag: screen
 #: boot-installer.xml:286
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "fis load ramdisk.gz\n"
 #| "fis load zImage\n"
@@ -455,8 +450,8 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"load -v -r -b 0x01800000 -m ymodem ramdisk.gz\n"
+"load -v -r -b 0x01008000 -m ymodem zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -471,6 +466,13 @@ msgid ""
 "program, and run <command>sb initrd.gz</command> or <command>sb vmlinuz</"
 "command>."
 msgstr ""
+"После каждой команды <command>load</command> будет "
+"ждать передачи файла по протоколу YMODEM. Если используется cu "
+"(убедитесь, что установлен пакет <classname>lrzsz</classname>), то "
+"после управляющей последовательности <quote>~&lt;</quote> "
+"нажмите enter, чтобы выполнить "
+"внешнюю программу, и запустите <command>sb initrd.gz</command> "
+"или <command>sb vmlinuz</command>."
 
 #. Tag: para
 #: boot-installer.xml:297
@@ -480,6 +482,9 @@ msgid ""
 "rather than YMODEM. This is faster, but requires a working HTTP server on "
 "the network. To do so, first switch the bootloader to RAM mode:"
 msgstr ""
+"Также можно загрузить ядро и ramdisk через HTTP, а не по "
+"YMODEM. Это быстрее, но требует работающего в сети сервера HTTP. "
+"Для начала переведите системный загрузчик в режим RAM:"
 
 #. Tag: screen
 #: boot-installer.xml:303
@@ -488,6 +493,8 @@ msgid ""
 "fis load rammode\n"
 "g"
 msgstr ""
+"fis load rammode\n"
+"g"
 
 #. Tag: para
 #: boot-installer.xml:305
@@ -497,16 +504,20 @@ msgid ""
 "RAM and restarts it from there. Not doing this step will cause the system to "
 "hang in the necessary ip_address step that comes next."
 msgstr ""
+"Внешне это выглядит как перезагрузка, но на самом деле "
+"выполняется перезагрузка в RAM и происходит перезапуск "
+"оттуда. Непроведение этой операции приводит к зависанию "
+"системы в ожидании необходимого шага назначения ip_address."
 
 #. Tag: para
 #: boot-installer.xml:311
 #, no-c-format
 msgid "You will need to hit Ctrl-C again to interrupt the boot. Then:"
-msgstr ""
+msgstr "Нажмите Ctrl-C ещё раз, чтобы прервать загрузку. Затем:"
 
 #. Tag: screen
 #: boot-installer.xml:315
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "fis load ramdisk.gz\n"
 #| "fis load zImage\n"
@@ -519,8 +530,9 @@ msgid ""
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 msgstr ""
-"fis load ramdisk.gz\n"
-"fis load zImage\n"
+"ip_address -l 192.168.2.249 -h 192.168.2.4\n"
+"load -v -r -b 0x01800000 -m http /initrd.gz\n"
+"load -v -r -b 0x01008000 -m http /zImage\n"
 "exec -c \"console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000\" -r "
 "0x01800000"
 
@@ -528,7 +540,7 @@ msgstr ""
 #: boot-installer.xml:317
 #, no-c-format
 msgid "The installer will now start as usual."
-msgstr ""
+msgstr "Программа установки будет запущена как обычно."
 
 # index.docbook:572, index.docbook:1037, index.docbook:1837, index.docbook:2084, index.docbook:2388
 #. Tag: title
@@ -586,8 +598,7 @@ msgstr ""
 #. Tag: title
 #: boot-installer.xml:492
 #, no-c-format
-msgid ""
-"Booting from Linux Using <command>LILO</command> or <command>GRUB</command>"
+msgid "Booting from Linux Using <command>LILO</command> or <command>GRUB</command>"
 msgstr ""
 "Загрузка из Linux с помощью <command>LILO</command> или <command>GRUB</"
 "command>"
@@ -900,8 +911,7 @@ msgstr "Сетевая карта с сетевым BootROM"
 msgid ""
 "It could be that your Network Interface Card provides TFTP boot "
 "functionality."
-msgstr ""
-"Возможно, что сетевая карта (NIC) предоставляет возможность загрузки по TFTP."
+msgstr "Возможно, что сетевая карта (NIC) предоставляет возможность загрузки по TFTP."
 
 #. Tag: para
 #: boot-installer.xml:688
@@ -1088,7 +1098,7 @@ msgstr ""
 
 #. Tag: para
 #: boot-installer.xml:779
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "To bypass the graphical boot screen you can either blindly press "
 #| "&escapekey; to get a text boot prompt, or (equally blindly) press "
@@ -1106,13 +1116,13 @@ msgid ""
 "you will also want to add <userinput>vga=normal fb=false</userinput> to the "
 "boot prompt, as described in the help text."
 msgstr ""
-"Чтобы пропустить графическую загрузочную заставку вы можете вслепую нажать "
-"&escapekey; и получить текстовое приглащение к загрузке, или (также вслепую) "
+"Чтобы пропустить графическую заставку загрузки вы можете вслепую нажать "
+"&escapekey; и получить текстовое приглашение к загрузке, или (также вслепую) "
 "нажать <quote>H</quote> и &enterkey; для выбора пункта <quote>Help</quote>, "
 "описанного ранее. После этого, вы должны видеть то, что набираете. Чтобы "
-"программа установки не использовала фреймбуфер при установке, также вам "
-"нужно добавить в приглашение к загрузке параметр <userinput>fb=false</"
-"userinput>, который описан в справке."
+"программа установки не использовала фрейм-буфер для дальнейшей установки, "
+"также вам нужно добавить в приглашение к загрузке параметр "
+"<userinput>vga=normal fb=false</userinput>, который описан в справке."
 
 #. Tag: title
 #: boot-installer.xml:839
@@ -2169,8 +2179,7 @@ msgstr "Загрузка с карты памяти USB"
 #: boot-installer.xml:1614
 #, no-c-format
 msgid "Currently, NewWorld PowerMac systems are known to support USB booting."
-msgstr ""
-"В настоящий момент системы NewWorld PowerMac можно загружать с USB устройств."
+msgstr "В настоящий момент системы NewWorld PowerMac можно загружать с USB устройств."
 
 #. Tag: para
 #: boot-installer.xml:1620
@@ -2583,7 +2592,7 @@ msgstr "Встраиваемые устройства"
 
 #. Tag: para
 #: boot-installer.xml:1967
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Some accessibility devices are actual boards that are plugged inside the "
 #| "machine and that read text directly from the video memory. To get them to "
@@ -2600,7 +2609,8 @@ msgstr ""
 "Некоторые устройства облегчения управления представляют собой платы, которые "
 "устанавливаются внутрь компьютера и читают текст напрямую из видеопамяти. "
 "Чтобы они смогли работать, нужно выключить использование фрейм-буфера с "
-"помощью загрузочного параметра <userinput>fb=false</userinput>. Однако, это "
+"помощью загрузочного параметра<userinput arch=\"x86"
+"\">vga=normal</userinput> <userinput>fb=false</userinput>. Однако, это "
 "сократит количество доступных языков установки."
 
 #. Tag: para
@@ -2610,12 +2620,15 @@ msgid ""
 "If desired a textual version of the bootloader can be activated before "
 "adding the boot parameter by typing <userinput>h</userinput> &enterkey;."
 msgstr ""
+"Если желательно активировать текстовую версию системного "
+"загрузчика до добавления загрузочного параметра, то введите "
+"<userinput>h</userinput> &enterkey;."
 
 #. Tag: title
 #: boot-installer.xml:1983
 #, no-c-format
 msgid "High-Contrast Theme"
-msgstr "Высоко-контрастная тема"
+msgstr "Тема с высокой контрастностью"
 
 #. Tag: para
 #: boot-installer.xml:1984
@@ -3021,7 +3034,7 @@ msgstr "debian-installer/framebuffer (fb)"
 
 #. Tag: para
 #: boot-installer.xml:2234
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Some architectures use the kernel framebuffer to offer installation in a "
 #| "number of languages. If framebuffer causes a problem on your system you "
@@ -3037,9 +3050,10 @@ msgid ""
 "minutes after starting the install."
 msgstr ""
 "Чтобы предложить установку на нескольких языках на некоторых архитектурах "
-"используется фреймбуфер ядра. Если работа через фреймбуфер вызывает проблемы "
-"на вашей системе, можно выключить его параметром <userinput>fb=false</"
-"userinput>. Симптомы проблемы &mdash; сообщения об ошибках bterm или bogl, "
+"используется фрейм-буфер ядра. Если работа через фрейм-буфер вызывает проблемы "
+"на вашей системе, можно выключить его параметром <userinput arch=\"x86\">vga=normal</"
+"userinput> <userinput>fb=false</userinput>. "
+"Симптомы проблемы &mdash; сообщения об ошибках bterm или bogl, "
 "пустой экран или замирание на несколько минут в начале установки."
 
 #. Tag: para
@@ -3059,10 +3073,10 @@ msgid ""
 "installer, you can try booting with parameter <userinput>debian-installer/"
 "framebuffer=true</userinput> or <userinput>fb=true</userinput> for short."
 msgstr ""
-"Для &arch-title; поддержка фреймбуфера <emphasis>по умолчанию выключена</"
+"Для &arch-title; поддержка фрейм-буфера <emphasis>по умолчанию выключена</"
 "emphasis> из-за проблем с отображением на некоторых системах. В свою очередь "
 "это может привести к неправильному отображению на системах с нормально "
-"работающим фреймбуфером, типа графических карт ATI. Если у вас возникли "
+"работающим фрейм-буфером, типа графических карт ATI. Если у вас возникли "
 "проблемы с отображением в программе установки, можно попробовать загрузиться "
 "с параметром <userinput>debian-installer/framebuffer=true</userinput> или "
 "для краткости <userinput>fb=true</userinput>."
@@ -3802,8 +3816,7 @@ msgstr "Как изучать и может быть решить проблем
 #: boot-installer.xml:2698
 #, no-c-format
 msgid "If the CD-ROM fails to boot, try the suggestions listed below."
-msgstr ""
-"Если с CD-ROM не удаётся загрузиться, попробуйте способы указанные ниже."
+msgstr "Если с CD-ROM не удаётся загрузиться, попробуйте способы указанные ниже."
 
 #. Tag: para
 #: boot-installer.xml:2703
@@ -4212,7 +4225,7 @@ msgstr ""
 "загрузки программы установки может пропасть изображение. В этом случае может "
 "помочь добавление загрузочного параметра <userinput>vga=788</"
 "userinput><footnote> <para> Параметр <userinput>vga=788</userinput> включает "
-"фреймбуфер VESA с разрешением 800x600. Это, скорее всего, поможет, но это "
+"фрейм-буфер VESA с разрешением 800x600. Это, скорее всего, поможет, но это "
 "может быть неоптимальным разрешением вашей системы. Список поддерживаемых "
 "разрешений можно получить с помощью <userinput>vga=ask</userinput>, но "
 "заметим, что список может быть неполным. </para> </footnote>. Если это не "
@@ -4234,8 +4247,8 @@ msgstr ""
 "Если во время загрузки ядра экран выглядит странно, например, он полностью "
 "белый, чёрный или замусорен разными цветами, то ваша система, вероятно, "
 "имеет проблемную видеокарту, которая неправильно переключается в режим "
-"фреймбуфера. В этом случае, вы можете попробовать указать параметр загрузки "
-"<userinput>fb=false</userinput>, чтобы выключить фреймбуфер на консоли. Из-"
+"фрейм-буфера. В этом случае, вы можете попробовать указать параметр загрузки "
+"<userinput>fb=false</userinput>, чтобы выключить фрейм-буфер на консоли. Из-"
 "за ограничений консоли установка будет доступна только на нескольких языках. "
 "Подробней см. <xref linkend=\"boot-parms\"/>."
 
@@ -4611,111 +4624,3 @@ msgstr ""
 "ядра. Опишите шаги, которые вы делали, чтобы привести систему в проблемное "
 "состояние."
 
-#~ msgid "mouse/protocol"
-#~ msgstr "mouse/protocol"
-
-#~ msgid ""
-#~ "For the gtk frontend (graphical installer), users can set the mouse "
-#~ "protocol to be used by setting this parameter. Supported values "
-#~ "are<footnote> <para> See the man page for "
-#~ "<citerefentry><refentrytitle>directfbrc</refentrytitle> <manvolnum>5</"
-#~ "manvolnum></citerefentry> for additional information. </para> </"
-#~ "footnote>: <userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>, "
-#~ "<userinput>MS</userinput>, <userinput>MS3</userinput>, "
-#~ "<userinput>MouseMan</userinput> and <userinput>MouseSystems</userinput>. "
-#~ "In most cases the default protocol should work correctly."
-#~ msgstr ""
-#~ "С помощью этого параметра для gtk-интерфейса (графической программы "
-#~ "установки), пользователи могут задать протокол обмена с мышью, который "
-#~ "нужно использовать. Поддерживаемые значения<footnote> <para> Подробности "
-#~ "можно найти в справочной странице "
-#~ "<citerefentry><refentrytitle>directfbrc</refentrytitle> <manvolnum>5</"
-#~ "manvolnum></citerefentry>. </para> </footnote>: <userinput>PS/2</"
-#~ "userinput>, <userinput>IMPS/2</userinput>, <userinput>MS</userinput>, "
-#~ "<userinput>MS3</userinput>, <userinput>MouseMan</userinput> и "
-#~ "<userinput>MouseSystems</userinput>. В большинстве случаев используемый "
-#~ "по умолчанию протокол работает правильно."
-
-#~ msgid "mouse/device"
-#~ msgstr "mouse/device"
-
-#~ msgid ""
-#~ "For the gtk frontend (graphical installer), users can specify the mouse "
-#~ "device to be used by setting this parameter. This is mostly useful if the "
-#~ "mouse is connected to a serial port (serial mouse). Example: "
-#~ "<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>."
-#~ msgstr ""
-#~ "С помощью этого параметра для gtk-интерфейса (графической программы "
-#~ "установки), пользователи могут задать устройство мыши, которое нужно "
-#~ "использовать. В основном, это нужно, если мышь подключена к "
-#~ "последовательному порту (serial mouse). Пример: <userinput>mouse/"
-#~ "device=<replaceable>/dev/ttyS1</replaceable></userinput>."
-
-#~ msgid "mouse/left"
-#~ msgstr "mouse/left"
-
-#~ msgid ""
-#~ "For the gtk frontend (graphical installer), users can switch the mouse to "
-#~ "left-handed operation by setting this parameter to <userinput>true</"
-#~ "userinput>."
-#~ msgstr ""
-#~ "В интерфейсе gtk (графическая программа установки) пользователи могут "
-#~ "настроить мышь под левую руку, установив данный параметр равным "
-#~ "<userinput>true</userinput>."
-
-#~ msgid "directfb/hw-accel"
-#~ msgstr "directfb/hw-accel"
-
-#~ msgid ""
-#~ "For the gtk frontend (graphical installer), hardware acceleration in "
-#~ "directfb is disabled by default. Set this parameter to <userinput>true</"
-#~ "userinput> to enable it."
-#~ msgstr ""
-#~ "В интерфейсе gtk (графическая программа установки), по умолчанию "
-#~ "выключено аппаратное ускорение в directfb. Для включения установите "
-#~ "данный параметр равным <userinput>true</userinput>."
-
-#~ msgid ""
-#~ "The <userinput>video=vga16:off</userinput> argument may also be used to "
-#~ "disable the kernel's use of the framebuffer. Such problems have been "
-#~ "reported on a Dell Inspiron with Mobile Radeon card."
-#~ msgstr ""
-#~ "Аргумент <userinput>video=vga16:off</userinput> также может быть "
-#~ "использован для указания ядру не использовать фреймбуфер. Подобные "
-#~ "проблемы замечены на Dell Inspiron с картой Mobile Radeon."
-
-#~ msgid "fconfig boot_script_data"
-#~ msgstr "fconfig boot_script_data"
-
-#~ msgid ""
-#~ "RedBoot is now waiting for you to enter the boot script. Make sure to "
-#~ "<emphasis>exactly</emphasis> enter the following script:"
-#~ msgstr ""
-#~ "RedBoot теперь будет ждать от вас ввода загрузочного сценария. "
-#~ "Обязательно <emphasis>точно</emphasis> введите следующий сценарий:"
-
-#~ msgid ""
-#~ "Finish the script with an empty line, and enter <quote>y</quote> at the "
-#~ "prompt to update the non-volatile configuration. Finally, use "
-#~ "<quote>reset</quote> to restart the system, and allow it to boot "
-#~ "normally. The installer should now come up as normal. You can either "
-#~ "install Debian through the serial port, or use an SSH client to connect "
-#~ "through SSH."
-#~ msgstr ""
-#~ "Завершите сценарий пустой строкой и введите <quote>y</quote> в "
-#~ "приглашении обновить долговременную конфигурацию. Наконец, воспользуйтесь "
-#~ "<quote>reset</quote> для перезапуска, и дайте системе загрузиться обычным "
-#~ "образом. Теперь появится интерфейс обычной программы установки. Вы можете "
-#~ "установить Debian через последовательный порт, или через клиента SSH для "
-#~ "подключения по SSH."
-
-#~ msgid ""
-#~ "Note that it is not necessary to update the boot script after the "
-#~ "installation. The system will be configured to take the root device from "
-#~ "system configuration, rather than from the kernel command line. It will "
-#~ "not do any harm to do so anyway, however."
-#~ msgstr ""
-#~ "Заметим, что ненужно обновлять загрузочный сценарий после установки. "
-#~ "Система будет настроена на получение корневого устройства из системных "
-#~ "настроек, а не из строки команд ядра. Как бы то ни было, в этом нет "
-#~ "ничего плохого."
