@@ -285,8 +285,10 @@ ${Endif}
 
 ; ********************************************** Preseed vga mode
   ${If} "$user_interface" == "graphical"
-    StrCpy $preseed_cmdline "$preseed_cmdline video=vesa:ywrap,mtrr"
-  ${Endif}
+    StrCpy $preseed_cmdline "$preseed_cmdline video=vesa:ywrap,mtrr vga=788"
+  ${Else}
+    StrCpy $preseed_cmdline "$preseed_cmdline vga=normal"
+  ${EndIf}
 FunctionEnd
 
 !ifdef NOCD
@@ -646,12 +648,6 @@ Section "Installer Loader"
   StrCpy $0 "$c\win32-loader\grub.cfg"
   DetailPrint "$(generating)"
   FileOpen $0 $c\win32-loader\grub.cfg w
-  ${If} "$user_interface" == "graphical"
-    ; ** Use the best resolution supported, fallback on lower ones - Trust grub-pc on that one.
-    FileWrite $0 '\
-set gfxpayload="1024x768x32,800x600x32,640x480x32,1024x768,800x600,640x480"$\n\
-$\n'
-  ${Endif}
   FileWrite $0 "\
 linux	/win32-loader/linux $preseed_cmdline$\n\
 initrd	/win32-loader/initrd.gz$\n\
