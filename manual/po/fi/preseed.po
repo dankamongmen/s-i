@@ -1,12 +1,12 @@
 # Debian Installation Guide preseed.
-# Tapio Lehtonen <tale@debian.org>, 2006, 2008, 2009.
+# Tapio Lehtonen <tale@debian.org>, 2006, 2008-2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-03-28 00:13+0000\n"
-"PO-Revision-Date: 2009-09-09 22:01+0300\n"
+"PO-Revision-Date: 2010-05-04 23:24+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1635,7 +1635,7 @@ msgstr ""
 
 #. Tag: para
 #: preseed.xml:817
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "The parameter <classname>mirror/udeb/suite</classname> determines the "
 #| "suite for additional components for the installer. It is only useful to "
@@ -1651,12 +1651,7 @@ msgid ""
 "suite that was used to build the initrd for the installation method used for "
 "the installation. Normally the installer will automatically use the correct "
 "value and there should be no need to set this."
-msgstr ""
-"Parametri <classname>mirror/udeb/suite</classname> kertoo mistä julkaisusta "
-"asentimen lisäosat noudetaan. Tästä parametrista on hyötyä vain jos osat "
-"tosiaan noudetaan verkosta ja sen on vastattava käytetyn asennustavan initrd:"
-"n tekemisessä käytettyä julkaisua. Oletusarvona <classname>mirror/udeb/"
-"suite</classname> on sama kuin <classname>mirror/suite</classname>."
+msgstr "Parametri <classname>mirror/udeb/suite</classname> kertoo mistä julkaisusta asentimen lisäosat noudetaan. Tästä parametrista on hyötyä vain jos osat tosiaan noudetaan verkosta ja sen on vastattava käytetyn asennustavan initrd:n tekemisessä käytettyä julkaisua. Normaalisti asennin käyttää automaattisesti oikeata arvoa eikä pitäisi olla tarvetta asettaa tätä."
 
 #. Tag: screen
 #: preseed.xml:828
@@ -1727,7 +1722,7 @@ msgstr "Osiointi"
 
 #. Tag: para
 #: preseed.xml:841
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Using preseeding to partition the harddisk is very much limited to what "
 #| "is supported by <classname>partman-auto</classname>. You can choose to "
@@ -1786,14 +1781,14 @@ msgstr ""
 
 #. Tag: title
 #: preseed.xml:878
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "Partitioning"
 msgid "Partitioning example"
-msgstr "Osiointi"
+msgstr "Esimerkki osioinnista"
 
 #. Tag: screen
 #: preseed.xml:880
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# If the system has free space you can choose to only partition that "
 #| "space.\n"
@@ -1940,13 +1935,17 @@ msgstr ""
 "# ei ole käytössä.\n"
 "#d-i partman-auto/init_automatically_partition select biggest_free\n"
 "\n"
-"# Toinen tapa on määrätä mikä levy osioidaan. Laitenimi voidaan antaa \n"
-"# joko devfs- tai perinteisessä ei-devfs-muodossa.\n"
-"# Huomaa: levy on annettava, paitsi jos laitteessa on vain yksi levy.\n"
+"# Toinen tapa on määrätä mikä levy osioidaan. Jos koneessa on vain yksi \n"
+"# levy asenin käyttää sitä, muussa tapauksessa laitenimi pitää antaa \n"
+"# perinteisessä ei-devfs-muodossa (siis esim. /dev/hda tai\n"
+"# /dev/sda, ei esim /dev/discs/disc0/disc).\n"
 "# Esimerkiksi haluttaessa käyttää ensimmäistä SCSI/SATA-levyä:\n"
 "#d-i partman-auto/disk string /dev/sda\n"
 "# Lisäksi on määritettävä mitä osiointitapaa käytetään.\n"
-"# Tällä hetkellä käytettävissä on tavat: \"regular\", \"lvm\" ja \"crypto\"\n"
+"# Tällä hetkellä käytettävissä on tavat: \n"
+"# - regular: käytä laitealustan tavanomaisa osiotyyppejä\n"
+"# - lvm:     tee levyosiot käyttäen LVM:ää\n"
+"# - crypto:  käytä LVM:ää salatussa osiossa\n"
 "d-i partman-auto/method string lvm\n"
 "\n"
 "# Jos yhdellä automaattisesti osioitavista levyistä on vanha LVM-asennus,\n"
@@ -1955,7 +1954,7 @@ msgstr ""
 "d-i partman-lvm/device_remove_lvm boolean true\n"
 "# Samalla lailla ohjelmallisesti toteutetulle RAID-pakalle:\n"
 "d-i partman-md/device_remove_md boolean true\n"
-"#Vielä voidaan poistaa varmistuskysely lvm-osiolle kirjoittamisesta.\n"
+"# Vielä voidaan poistaa varmistuskysely lvm-osiolle kirjoittamisesta.\n"
 "d-i partman-lvm/confirm boolean true\n"
 "\n"
 "# Voidaan valita mikä tahansa ennalta määrätyistä osiointimallineista.\n"
@@ -1965,14 +1964,13 @@ msgstr ""
 "d-i partman-auto/choose_recipe select atomic\n"
 "\n"
 "# Tai käytä omaa mallia...\n"
-"# Mallin syntaksi on kuvattu tiedostossa devel/partman-auto-recipe.txt\n"
-"# Jos mallitiedosto saadaan d-i:n saataville, siihen voidaan viitata "
-"suoraan.\n"
+"# Jos osiointimalline on käytettävissä asentimen ympäristössä, riittää\n"
+"# kun siihen osoitetaan.\n"
 "#d-i partman-auto/expert_recipe_file string /hd-media/recipe\n"
-"\n"
-"# Jos ei saada, voidaan koko malli pistää valmiiden vastausten tiedostoon\n"
-"# yhtenä (loogisena) rivinä. Tämä esimerkki luo pienen /boot-osion,\n"
-"# sopivan sivutusosion ja loput tilasta käytetään juuriosiona:\n"
+"# Jos malline ei ole käytettävissä, voidaan malline kirjoittaa \n"
+"# valmiiden vastausten tiedostoon yhtenä (loogisena) rivinä. Tämä \n"
+"# esimerkki luo pienen /boot-ision, sopivan sivutusosion ja käyttää\n"
+"# lopun tilan juuriosiolle:\n"
 "#d-i partman-auto/expert_recipe string                         \\\n"
 "#      boot-root ::                                            \\\n"
 "#              40 50 100 ext3                                  \\\n"
@@ -1989,12 +1987,19 @@ msgstr ""
 "#              64 512 300% linux-swap                          \\\n"
 "#                      method{ swap } format{ }                \\\n"
 "#              .\n"
-"\n"
+"#\n"
+"# Mallin syntaksi on kuvattu tiedostossa partman-auto-recipe.txt,\n"
+"# joka on mukana paketissa \"debian-installer\" tai saatavilla D-I:n\n"
+"# lähdekoodivarastoalueelta. Ohjeessa dokumentoidaan myös miten \n"
+"# asetetaan tiedostojärjestelmän nimiöt, levyniteiden nimet ja\n"
+"# mitkä fyysiset levyt kuuluvat levyniteeseen.\n"
+"#\n"
 "# Tämä saa partman-moduulin tekemään osiot automaattisesti ilman\n"
 "# varmistuksia, jos sille määritettiin yksi yllä olevista tavoista.\n"
 "d-i partman-partitioning/confirm_write_new_label boolean true\n"
 "d-i partman/choose_partition select finish\n"
-"d-i partman/confirm boolean true"
+"d-i partman/confirm boolean true\n"
+"d-i partman/confirm_nooverwrite boolean true"
 
 #. Tag: title
 #: preseed.xml:884
@@ -2036,7 +2041,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:905
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# NOTE: this option is of beta release quality and should be used "
 #| "carefully\n"
@@ -2271,7 +2276,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:951
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Select the initramfs generator used to generate the initrd for 2.6 "
 #| "kernels.\n"
@@ -2296,6 +2301,11 @@ msgid ""
 "# kernel is to be installed.\n"
 "#d-i base-installer/kernel/image string linux-image-2.6-486"
 msgstr ""
+"# APT:n asetetaan olemaan asentamatta suositeltuja paketteja oletusarvona. \n"
+"# Tämän valitsimen käyttö voi johtaa epätäydelliseen järjestelmään ja \n"
+"# käyttö tulisi jättää hyvin kokeneille käyttäjille.\n"
+"#d-i base-installer/install-recommends boolean false\n"
+"#\n"
 "# Valitse initramfs:n tekevä ohjelma, jolla initrd tehdään 2.6-ytimille.\n"
 "#d-i base-installer/kernel/linux/initramfs-generators string yaird\n"
 "# Asennettava ydinkuvan sisältävä (meta)paketti. Valitse \"none\", jos\n"
@@ -2617,7 +2627,7 @@ msgstr ""
 
 #. Tag: screen
 #: preseed.xml:1070
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "#tasksel tasksel/first multiselect standard, web-server\n"
 #| "# If the desktop task is selected, install the kde and xfce desktops\n"
@@ -2668,10 +2678,6 @@ msgstr ""
 "\n"
 "# Asennetaan yksittäisiä lisäpaketteja\n"
 "#d-i pkgsel/include string openssh-server build-essential\n"
-"# Vakiona ei asenneta paketteja joita pkgsel/include:n asentamat\n"
-"# paketit vain suosittelevat (riippuvuuksissa olevat paketit asennetaan).\n"
-"# Poista tästä rivistä kommentti ja suositellutkin asennetaan.\n"
-"#d-i pkgsel/include/install-recommends boolean true\n"
 "# Päivitetäänkö paketit debootstrapin jälkeen.\n"
 "# Sallitus arvot: none, safe-upgrade, full-upgrade\n"
 "#d-i pkgsel/upgrade select none\n"
@@ -2690,7 +2696,7 @@ msgstr "Käynnistyslataimen asennus"
 
 #. Tag: screen
 #: preseed.xml:1077
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "# Grub is the default boot loader (for x86). If you want lilo installed\n"
 #| "# instead, uncomment this:\n"
@@ -2778,12 +2784,17 @@ msgstr ""
 "# ei asenneta, poista myös tästä kommentit:\n"
 "#d-i lilo-installer/skip boolean true\n"
 "\n"
+"# Muutamaa epätavallista osiointitapaa lukuun ottamatta, GRUB 2 on nyt vakio. \n"
+"# Jos vanhaa GRUB:ia jostain tietystä syystä tarvitaan, poistetaan tästä\n"
+"# kommenttimerkki:\n"
+"#d-i grub-installer/grub2_instead_of_grub_legacy boolean false\n"
+"\n"
 "# Tämä on melko turvallinen asetus. Se asentaa grubin automaattisesti\n"
 "# MBR:ään, jos koneesta ei löydy muita käyttöjärjestelmiä.\n"
 "d-i grub-installer/only_debian boolean true\n"
 "\n"
 "# Tämä saa grub-installerin asentamaan MBR:ään, jos se löytää jonkin muun\n"
-"# käyttöjärjestelmän. Turvattomampaa, koska toista ehkä osata käynnistää.\n"
+"# käyttöjärjestelmän. Vaara, koska sitä toista ei ehkä osata käynnistää.\n"
 "d-i grub-installer/with_other_os boolean true\n"
 "\n"
 "# Jos halutaan asentaa muualle kuin MBR:ään, poista kommentti ja muokkaa\n"
