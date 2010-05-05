@@ -249,7 +249,8 @@ FunctionEnd
 Function ShowKernel
   Var /GLOBAL kernel 
 !ifdef NOCD
-  ${If} $expert == true and $windows_boot_method != direct ; loadlin can only load linux
+  ${If} $expert == true
+  ${AndIf} $windows_boot_method != direct ; loadlin can only load linux
     File /oname=$PLUGINSDIR\kernel.ini	templates/binary_choice.ini
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 1" "Text" $(kernel1)
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 2" "Text" $(kernel2)
