@@ -247,6 +247,8 @@ d-i rescue/enable boolean true"
 FunctionEnd
 
 Function ShowKernel
+  Var /GLOBAL kernel 
+!ifdef NOCD
   ${If} $expert == true and $windows_boot_method != direct ; loadlin can only load linux
     File /oname=$PLUGINSDIR\kernel.ini	templates/binary_choice.ini
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 1" "Text" $(kernel1)
@@ -254,7 +256,6 @@ Function ShowKernel
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 3" "Text" $(kernel3)
     InstallOptions::dialog $PLUGINSDIR\kernel.ini
  
-    Var /GLOBAL kernel 
     ReadINIStr $0 $PLUGINSDIR\kernel.ini "Field 3" "State"
     ${If} $0 == "1"
       StrCpy $kernel kfreebsd
@@ -265,6 +266,10 @@ Function ShowKernel
     ; ** Default to GNU/Linux
     StrCpy $kernel linux
   ${Endif}
+!else
+  ; TODO: detect the CD architecture
+  StrCpy $kernel linux
+!endif
 FunctionEnd
 
 Function ShowGraphics
