@@ -51,6 +51,7 @@ LicenseData $(license)
 Page license
 Page custom ShowExpert
 Page custom ShowRescue
+Page custom ShowKernel
 Page custom ShowGraphics
 !ifdef NOCD
 Page custom ShowBranch
@@ -245,6 +246,27 @@ d-i rescue/enable boolean true"
   ${Endif}
 FunctionEnd
 
+Function ShowKernel
+  ${If} $expert == true
+    File /oname=$PLUGINSDIR\kernel.ini	templates/binary_choice.ini
+    WriteINIStr $PLUGINSDIR\kernel.ini "Field 1" "Text" $(kernel1)
+    WriteINIStr $PLUGINSDIR\kernel.ini "Field 2" "Text" $(kernel2)
+    WriteINIStr $PLUGINSDIR\kernel.ini "Field 3" "Text" $(kernel3)
+    InstallOptions::dialog $PLUGINSDIR\kernel.ini
+ 
+    Var /GLOBAL kernel 
+    ReadINIStr $0 $PLUGINSDIR\kernel.ini "Field 3" "State"
+    ${If} $0 == "1"
+      StrCpy $kernel kfreebsd
+    ${Else}
+      StrCpy $kernel linux
+    ${Endif}
+  ${Else}
+      ; ** Default to GNU/Linux
+      StrCpy $kernel linux
+  ${Endif}
+FunctionEnd
+
 Function ShowGraphics
   Var /GLOBAL user_interface
   Var /GLOBAL gtk
@@ -256,6 +278,7 @@ Function ShowGraphics
   ${If} $predefined_user_interface == ""
 !endif
     ${If} $expert == true
+     ${AndIf} $kernel == "linux"
       File /oname=$PLUGINSDIR\graphics.ini	templates/graphics.ini
       File /oname=$PLUGINSDIR\gtk.bmp	templates/gtk.bmp
       File /oname=$PLUGINSDIR\text.bmp	templates/text.bmp
@@ -269,9 +292,9 @@ Function ShowGraphics
       ${If} $0 == "1"
         StrCpy $user_interface graphical
       ${EndIf}
-    ${Else}
-	; ** Default to graphical interface
-        StrCpy $user_interface graphical
+    ${ElseIf} $kernel == linux
+      ; ** Default to graphical interface for linux
+      StrCpy $user_interface graphical
     ${Endif}
 !ifndef NOCD
   ${Else}
@@ -346,13 +369,22 @@ Function ShowBranch
 
     ; Daily images URL
     ; See http://svn.debian.org/viewsvn/d-i/trunk/scripts/daily-build-aggregator for the canonical list
-    ${If} $arch == "i386"
-      StrCpy $base_url "http://people.debian.org/~joeyh/d-i/images/daily/netboot/$gtkdebian-installer/$arch"
-    ${Else} ; We have only two arches, then Else means $arch == "amd64"
-      StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
-    ${Endif}
+    ${If} $kernel == "linux"
+      ${If} $arch == "i386"
+        StrCpy $base_url "http://people.debian.org/~joeyh/d-i/images/daily/netboot/$gtkdebian-installer/$arch"
+      ${Else} ; We have only two arches, then Else means $arch == "amd64"
+        StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
+      ${Endif}
+    ${ElseIf} $kernel == "kfreebsd"
+      StrCpy $base_url "http://d-i.debian.org/daily-images/kfreebsd-$arch/daily/monolithic"
+    ${EndIf}
   ${Else}
-    StrCpy $base_url "http://ftp.se.debian.org/debian/dists/stable/main/installer-$arch/current/images/netboot/$gtkdebian-installer/$arch"
+    ${If} $kernel == "linux"
+      StrCpy $base_url "http://ftp.se.debian.org/debian/dists/stable/main/installer-$arch/current/images/netboot/$gtkdebian-installer/$arch"
+    ${ElseIf} $kernel == "kfreebsd"
+      # TODO: CHECK THIS (no stable image so far)
+      StrCpy $base_url "http://ftp.se.debian.org/debian/dists/stable/main/installer-kfreebsd-$arch/current/images/netboot/$gtkdebian-installer/kfreebsd-$arch"
+    ${EndIf}
   ${Endif}
 FunctionEnd
 !endif
@@ -623,16 +655,29 @@ Section "Installer Loader"
     MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
     Quit
 !else
-  Push "false"
-  Push "linux"
-  Push "$INSTDIR"
-  Push "$base_url"
-  Call Download
-  Push "false"
-  Push "initrd.gz"
-  Push "$INSTDIR"
-  Push "$base_url"
-  Call Download
+  ${If} $kernel == "linux"
+    Push "false"
+    Push "linux"
+    Push "$INSTDIR"
+    Push "$base_url"
+    Call Download
+    Push "false"
+    Push "initrd.gz"
+    Push "$INSTDIR"
+    Push "$base_url"
+    Call Download
+  ${ElseIf} $kernel == "kfreebsd"
+    Push "false"
+    Push "kfreebsd.gz"
+    Push "$INSTDIR"
+    Push "$base_url"
+    Call Download
+    Push "false"
+    Push "initrd.gz"
+    Push "$INSTDIR"
+    Push "$base_url"
+    Call Download
+  ${EndIf}
 !endif
 
 ; We're about to write down our preseed line.  This would be a nice place
@@ -648,10 +693,20 @@ Section "Installer Loader"
   StrCpy $0 "$c\win32-loader\grub.cfg"
   DetailPrint "$(generating)"
   FileOpen $0 $c\win32-loader\grub.cfg w
-  FileWrite $0 "\
+  ${If} $kernel == "linux"
+    FileWrite $0 "\
 linux	/win32-loader/linux $preseed_cmdline$\n\
 initrd	/win32-loader/initrd.gz$\n\
 boot$\n"
+  ${ElseIf} $kernel == "kfreebsd"
+    FileWrite $0 "\
+kfreebsd	/win32-loader/kfreebsd.gz$\n\
+kfreebsd_module	/win32-loader/initrd.gz type=mfs_root$\n\
+set kFreeBSD.vfs.root.mountfrom=ufs:/dev/md0$\n\
+set kFreeBSD.hw.ata.ata_dma=0   # needed for qemu hard disk # TODO: delete$\n\
+set kFreeBSD.hw.ata.atapi_dma=0 # needed for qemu cd # TODO: 1$\n\
+boot$\n"
+  ${EndIf}
   FileClose $0
 
 ; ********************************************** cpio hack
@@ -681,7 +736,8 @@ attrib -r initrd.gz$\r$\n\
 gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
 "
   FileClose $0
-
+; TODO: FIX THIS FOR kFreeBSD
+${If} $kernel == "linux"
   nsExec::Exec '"$INSTDIR\cpio.bat"'
   Pop $0
   ${If} $0 != 0
@@ -689,6 +745,7 @@ gzip.exe -1 < newc_chunk >> initrd.gz$\r$\n\
     MessageBox MB_OK|MB_ICONSTOP "$(error_exec)"
     Quit
   ${Endif}
+${EndIf}
 
 ; ********************************************** Do bootloader last, because it's the most dangerous
   ${If} $windows_boot_method == ntldr

@@ -32,7 +32,7 @@ GRUB_MODULES	+= part_msdos part_gpt
 # fs
 GRUB_MODULES	+= fat ntfs ntfscomp
 # used in our grub.cfg
-GRUB_MODULES	+= search linux vbe boot
+GRUB_MODULES	+= search linux bsd vbe boot
 # might be useful for debugging
 GRUB_MODULES	+= minicmd cat cpuid chain halt help ls reboot
 

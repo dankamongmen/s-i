@@ -92,6 +92,9 @@ main (int argc, char **argv)
   langstring ("rescue1",			_("Select action:"));
   langstring ("rescue2",			_("Begin install on this computer."));
   langstring ("rescue3",			_("Repair an installed system (rescue mode)."));
+  langstring ("kernel1",			_("Select the kernel:"));
+  langstring ("kernel2",			_("GNU/Linux"));
+  langstring ("kernel3",			_("GNU/kFreeBSD"));
   langstring ("graphics1",			_("Select install mode:"));
   langstring ("graphics2",			_("Graphical install"));
   langstring ("graphics3",			_("Text install"));
