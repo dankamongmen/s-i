@@ -247,7 +247,7 @@ d-i rescue/enable boolean true"
 FunctionEnd
 
 Function ShowKernel
-  ${If} $expert == true
+  ${If} $expert == true and $windows_boot_method != direct ; loadlin can only load linux
     File /oname=$PLUGINSDIR\kernel.ini	templates/binary_choice.ini
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 1" "Text" $(kernel1)
     WriteINIStr $PLUGINSDIR\kernel.ini "Field 2" "Text" $(kernel2)
@@ -262,8 +262,8 @@ Function ShowKernel
       StrCpy $kernel linux
     ${Endif}
   ${Else}
-      ; ** Default to GNU/Linux
-      StrCpy $kernel linux
+    ; ** Default to GNU/Linux
+    StrCpy $kernel linux
   ${Endif}
 FunctionEnd
 
@@ -444,19 +444,25 @@ Function ShowCustom
 !ifndef NOCD
 
 ; ********************************************** Media-based install
-  Var /GLOBAL linux
-  Var /GLOBAL initrd
-  Var /GLOBAL g2ldr
-  Var /GLOBAL g2ldr_mbr
-  ReadINIStr $linux	$d\win32-loader.ini "installer" "$arch/$gtklinux"
-  ReadINIStr $initrd	$d\win32-loader.ini "installer" "$arch/$gtkinitrd"
-  ReadINIStr $g2ldr	$d\win32-loader.ini "grub" "g2ldr"
-  ReadINIStr $g2ldr_mbr	$d\win32-loader.ini "grub" "g2ldr.mbr"
-  StrCmp $linux		"" incomplete_ini
-  StrCmp $initrd	"" incomplete_ini
-  StrCmp $g2ldr		"" incomplete_ini
-  StrCmp $g2ldr_mbr	"" incomplete_ini
-  Goto ini_is_ok
+  ${If} $kernel == "linux"
+    Var /GLOBAL linux
+    Var /GLOBAL initrd
+    Var /GLOBAL g2ldr
+    Var /GLOBAL g2ldr_mbr
+    ReadINIStr $linux	$d\win32-loader.ini "installer" "$arch/$gtklinux"
+    ReadINIStr $initrd	$d\win32-loader.ini "installer" "$arch/$gtkinitrd"
+    ReadINIStr $g2ldr	$d\win32-loader.ini "grub" "g2ldr"
+    ReadINIStr $g2ldr_mbr	$d\win32-loader.ini "grub" "g2ldr.mbr"
+    StrCmp $linux		"" incomplete_ini
+    StrCmp $initrd	"" incomplete_ini
+    StrCmp $g2ldr		"" incomplete_ini
+    StrCmp $g2ldr_mbr	"" incomplete_ini
+    Goto ini_is_ok
+  ${ElseIf} $kernel == "kfreebsd"
+    # TODO: Check if kfreebsd will ever ship a media-based installed.
+    # If so, make sure it works here.
+    Goto incomplete_ini
+  ${EndIf}
 incomplete_ini:
   MessageBox MB_OK|MB_ICONSTOP "$(error_incomplete_ini)"
   Quit
@@ -641,19 +647,26 @@ Section "Installer Loader"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Debian-Installer Loader" "UninstallString" "$INSTDIR\uninstall.exe"
 
 !ifndef NOCD
-  ClearErrors
-  StrCpy $0 "$EXEDIR\$linux"
-  StrCpy $1 "$INSTDIR\linux"
-  CopyFiles /FILESONLY "$0" "$1"
-  IfErrors 0 +3
+  ${If} $kernel == "linux"
+    ClearErrors
+    StrCpy $0 "$EXEDIR\$linux"
+    StrCpy $1 "$INSTDIR\linux"
+    CopyFiles /FILESONLY "$0" "$1"
+    IfErrors 0 +3
+      MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
+      Quit
+    StrCpy $0 "$EXEDIR\$initrd"
+    StrCpy $1 "$INSTDIR\initrd.gz"
+    CopyFiles /FILESONLY "$0" "$1"
+    IfErrors 0 +3
+      MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
+      Quit
+  ${ElseIf} $kernel == "kfreebsd"
+    # TODO: Check if kfreebsd will ever ship a media-based installed.
+    # If so, make sure it works here.
     MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
     Quit
-  StrCpy $0 "$EXEDIR\$initrd"
-  StrCpy $1 "$INSTDIR\initrd.gz"
-  CopyFiles /FILESONLY "$0" "$1"
-  IfErrors 0 +3
-    MessageBox MB_OK|MB_ICONSTOP "$(error_copyfiles)"
-    Quit
+  ${EndIf}
 !else
   ${If} $kernel == "linux"
     Push "false"
@@ -868,8 +881,13 @@ ${EndIf}
 
 ; ********************************************** Needed for systems with compressed NTFS
   DetailPrint "$(disabling_ntfs_compression)"
-  nsExec::Exec '"compact" /u $c\g2ldr $c\g2ldr.mbr $c\grub.cfg $INSTDIR\linux $INSTDIR\initrd.gz'
+  nsExec::Exec '"compact" /u $c\g2ldr $c\g2ldr.mbr $c\grub.cfg'
   ; in my tests, uncompressing $c\grub.cfg wasn't necessary, but better be safe than sorry
+  ${If} $kernel == "linux"
+    nsExec::Exec '"compact" /u $INSTDIR\linux $INSTDIR\initrd.gz'
+  ${ElseIf} $kernel == "kfreebsd"
+    nsExec::Exec '"compact" /u $INSTDIR\kfreebsd.gz $INSTDIR\initrd.gz'
+  ${EndIf}
 
 SectionEnd
 
