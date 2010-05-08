@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61896 -->
+<!-- original version: 62798 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1730,21 +1730,54 @@ d-i clock-setup/ntp boolean true
 <para>
 
 <!--
-Using preseeding to partition the harddisk is very much limited to what is
-supported by <classname>partman-auto</classname>. You can choose to partition
+Using preseeding to partition the harddisk much limited to what is supported
+by <classname>partman-auto</classname>. You can choose to partition
 either existing free space on a disk or a whole disk. The layout of the
 disk can be determined by using a predefined recipe, a custom recipe from
-a recipe file or a recipe included in the preconfiguration file. It is
-currently not possible to partition multiple disks using preseeding.
+a recipe file or a recipe included in the preconfiguration file.
 -->
 
 Il supporto della preconfigurazione per il partizionamento è limitato
 a quanto permette <classname>partman-auto</classname>. Si può scegliere di
 partizionare lo spazio libero esistente sul disco oppure l'intero disco.
 La struttura delle partizioni sul disco può essere determinata usando
-una ricetta predefinita oppure una ricetta personalizzata in un file o
-inclusa nel file di preconfigurazione. Attualmente con la preconfigurazione
-non è possibile partizionare più di un disco.
+una ricetta predefinita oppure una ricetta personalizzata su file o
+inclusa nel file di preconfigurazione.
+
+</para><para>
+
+<!--
+Preseeding of advanced partition setups using RAID, LVM and encryption is
+supported, but not with the full flexibility possible when partitioning
+during a non-preseeded install.
+-->
+
+È supportata anche la preconfigurazione di configurazioni complesse quali
+RAID, LVM e cifratura, ma non con la stessa flessibilità di quando il
+partizionamento avviene durante un'installazione non-preconfigurata.
+
+</para><para>
+
+<!--
+The examples below only provide basic information on the use of recipes.
+For detailed information see the files
+<filename>partman-auto-recipe.txt</filename> and
+<filename>partman-auto-raid-recipe.txt</filename> included in the
+<classname>debian-installer</classname> package.
+Both files are also available from the
+<ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">&d-i; source
+repository</ulink>. Note that the supported functionality may change
+between releases.
+-->
+
+Gli esempi sottostanti forniscono solo delle informazioni di base
+sull'uso delle ricette. Per delle informazioni più dettagliate vedere
+i file <filename>partman-auto-recipe.txt</filename> e
+<filename>partman-auto-raid-recipe.txt</filename> inclusi nel pacchetto
+<classname>debian-installer</classname>. Entrambi i file sono disponibili
+anche nel <ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">repository
+dei sorgenti del &d-i;</ulink>. Notare che le funzioni supportate
+potrebbero cambiare da un rilascio all'altro.
 
 </para>
 <warning><para>
@@ -1762,6 +1795,10 @@ preconfigurazione.
 
 </para></warning>
 
+   <sect3 id="preseed-partman-example">
+   <!-- <title>Partitioning example</title> -->
+   <title>Esempio di partizionamento</title>
+
 <informalexample role="example"><screen>
 <!--
 # If the system has free space you can choose to only partition that space.
@@ -1772,22 +1809,28 @@ preconfigurazione.
 #d-i partman-auto/init_automatically_partition select biggest_free
 
 <!--
-# Alternatively, you can specify a disk to partition. The device name must
-# be given in traditional non-devfs format.
-# Note: A disk must be specified, unless the system has only one disk.
-# For example, to use the first SCSI/SATA hard disk:
+# Alternatively, you may specify a disk to partition. If the system has only
+# one disk the installer will default to using that, but otherwise the device
+# name must be given in traditional, non-devfs format (so e.g. /dev/hda or
+# /dev/sda, and not e.g. /dev/discs/disc0/disc).
 --># In alternativa è possibile specificare un disco da partizionare.
-# Il nome del dispositivo deve essere dato nel tradizionale formato
-# non-devfs.
-# Nota: è obbligatorio specificare un disco tranne nel caso che il
-# sistema abbia un disco solo.
-# Per esempio, per usare il primo disco SCSI/SATA:
+# Se il sistema dispone di un solo disco, l'installatore userà quello
+# altrimenti è necessario specificare il nome del device usando il
+# formato tradizionale, non-devfs (quindi, per esempio, /dev/hda o
+# /dev/sda ma non /dev/discs/disc0/disc).
 #d-i partman-auto/disk string /dev/sda
 <!--
 # In addition, you'll need to specify the method to use.
-# The presently available methods are: "regular", "lvm" and "crypto"
---># Inoltre è necessario specificare il metodo da usare. Quelli attualmente
-# disponibili sono "regular", "lvm" e "crypto".
+# The presently available methods are:
+# - regular: use the usual partition types for your architecture
+# - lvm:     use LVM to partition the disk
+# - crypto:  use LVM within an encrypted partition
+--># Inoltre è necessario specificare il metodo da usare. Quelli
+# disponibili sono:
+# - regular: usa i tipi di partizione più comuni per la propria
+#            architettura
+# - lvm:     usa LVM per partizionare il disco
+# - crypto:  usa LVM con all'interno una partizione cifrata
 d-i partman-auto/method string lvm
 
 <!--
@@ -1821,11 +1864,9 @@ d-i partman-auto/choose_recipe select atomic
 
 <!--
 # Or provide a recipe of your own...
-# The recipe format is documented in the file devel/partman-auto-recipe.txt.
 # If you have a way to get a recipe file into the d-i environment, you can
 # just point at it.
 --># Oppure creare una ricetta personalizzata...
-# Il formato della ricetta è documentato nel file devel/partman-auto-recipe.txt.
 # Se si ha modo di importare un file ricetta dentro l'ambiente
 # dell'installatore, è possibile semplicemente puntare a questo.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
@@ -1855,6 +1896,18 @@ d-i partman-auto/choose_recipe select atomic
 #              .
 
 <!--
+# The full recipe format is documented in the file partman-auto-recipe.txt
+# included in the 'debian-installer' package or available from D-I source
+# repository. This also documents how to specify settings such as file
+# system labels, volume group names and which physical devices to include
+# in a volume group.
+--># Il formato della ricetta è documentato nel file partman-auto-recipe.txt
+# incluso nel pacchetto "debian-installer" o disponibile nel repository
+# dei sorgenti del D-I. Nel file è anche spiegato come impostare le
+# etichette dei file system, i nomi dei gruppi di volumi e quali
+# dispositivi fisici inserire in un gruppo di volumi.
+
+<!--
 # This makes partman automatically partition without confirmation, provided
 # that you told it what to do using one of the methods above.
 --># Questo fa eseguire a partman il partizionamento automatico in base a
@@ -1862,12 +1915,13 @@ d-i partman-auto/choose_recipe select atomic
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-raid">
-  <!-- <title>Partitioning using RAID</title> -->
-  <title>Partizionamento con RAID</title>
+   <sect3 id="preseed-partman-raid">
+   <!-- <title>Partitioning using RAID</title> -->
+   <title>Partizionamento con RAID</title>
 <para>
 
 <!--
@@ -1878,9 +1932,9 @@ If you are using RAID 1, you can preseed grub to install to all devices
 used in the array; see <xref linkend="preseed-bootloader"/>.
 -->
 
-Si può usare anche la preconfigurazione per impostare le partizioni su
-array in RAID software. È supportato il RAID di livello 0, 1, 5, 6 e 10
-la creazione di array <emphasis>degradati</emphasis> e la scelta di
+È possibile usare la preconfigurazione anche per impostare le partizioni
+su array in RAID software. È supportato il RAID di livello 0, 1, 5, 6 e
+10 la creazione di array <emphasis>degradati</emphasis> e la scelta di
 dischi di scorta. Se si usa RAID 1 è possibile preconfigurare grub in
 modo da installarlo su tutti i dispositivi usati dall'array; si veda
 <xref linkend="preseed-bootloader"/>.
@@ -1905,12 +1959,7 @@ all'utente. In caso di problemi si controlli in
 
 </para></warning>
 
-<informalexample><screen>
-<!--
-# NOTE: this option is of beta release quality and should be used carefully
---># NOTA: questa funzionalità è ancora in fase beta e deve essere usata con
-# molta cautela
-
+<informalexample role="example"><screen>
 <!--
 # The method should be set to "raid".
 --># Il metodo deve essere impostato come "raid".
@@ -1941,19 +1990,20 @@ all'utente. In caso di problemi si controlli in
 <!--
 # Last you need to specify how the previously defined partitions will be
 # used in the RAID setup. Remember to use the correct partition numbers
-# for logical partitions.
+# for logical partitions. RAID levels 0, 1, 5, 6 and 10 are supported;
+# devices are separated using "#".
 # Parameters are:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# RAID levels 0, 1, 5, 6 and 10 are supported; devices are separated using "#"
 --># Infine si deve specificare come devono essere utilizzate le partizioni
-# definite in precedenza all'interno del RAID. Attenzione a usare i numeri
-# di partizione corretti per le partizioni logiche.
+# definite in precedenza all'interno del RAID. Attenzione a usare i
+# numeri di partizione corretti per le partizioni logiche. Sono
+# supportati i livelli di RAID 0, 1, 5, 6 e 10; i dispositivi devono
+# essere separati usando il carattere "#".
 # I parametri sono:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Sono supportati i livelli di RAID 0, 1, 5, 6 e 10; i dispositivi
-# devono essere separati usando il carattere "#"
+
 #d-i partman-auto-raid/recipe string \
 #    1 2 0 ext3 /                    \
 #          /dev/sda1#/dev/sdb1       \
@@ -1966,18 +2016,27 @@ all'utente. In caso di problemi si controlli in
 #    .
 
 <!--
+# For additional information see the file partman-auto-raid-recipe.txt
+# included in the 'debian-installer' package or available from D-I source
+# repository.
+--># Per ulteriori informazioni vedere il file partman-auto-raid-recipe.txt
+# incluso nel pacchetto "debian-installer" o disponibile nel repository
+# dei sorgenti del D-I.
+
+<!--
 # This makes partman automatically partition without confirmation.
 --># Questo fa in modo che partman partizioni automaticamente senza conferma.
 d-i partman-md/confirm boolean true
 d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
-  </sect2>
+   </sect3>
 
-  <sect2 id="preseed-partman-mount-styles">
-  <!-- <title>Controlling how partitions are mounted</title> -->
-  <title>Controllo del montaggio delle partizioni</title>
+   <sect3 id="preseed-partman-mount-styles">
+   <!-- <title>Controlling how partitions are mounted</title> -->
+   <title>Controllo del montaggio delle partizioni</title>
 <para>
 
 <!--
@@ -2040,6 +2099,7 @@ diventa imprevedibile.
 # filesystem prima di usare gli UUID.
 #d-i partman/mount_style select uuid
 </screen></informalexample>
+   </sect3>
   </sect2>
 
   <sect2 id="preseed-base-installer">
@@ -2402,6 +2462,15 @@ sulla riga di comando del kernel.
 --># Per evitare anche l'installazione di lilo, e quindi non installare
 # nessun boot loader, scommentare questa riga:
 #d-i lilo-installer/skip boolean true
+
+<!--
+# With a few exceptions for unusual partitioning setups, GRUB 2 is now the
+# default. If you need GRUB Legacy for some particular reason, then
+# uncomment this:
+--># Con l'eccezione di poche configurazioni non comuni, GRUB 2 è il
+# bootloader predefinito. Se per qualche motivo è necessario installare
+# GRUB Legacy, togliere il commento da questa riga: 
+#d-i grub-installer/grub2_instead_of_grub_legacy boolean false
 
 <!--
 # This is fairly safe to set, it makes grub install automatically to the MBR

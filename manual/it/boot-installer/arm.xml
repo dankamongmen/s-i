@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 59771 -->
+<!-- original version: 62875 -->
 
   <sect2 arch="arm" id="boot-tftp">
   <!-- <title>Booting from TFTP</title> -->
@@ -250,25 +250,18 @@ porte seriali con 9 poli.
 </para><para>
 
 <!--
-To boot the SS4000-E, first load the Debian-provided firmware image
-(ss4000e.pkg) through the SS4000-E's web interface (go to
-<quote>administration</quote>, then to <quote>firmware</quote>, and
-upload the image). Next,
-use your serial nullmodem cable and the ribbon cable to connect to the
-serial port of the SS4000-E, and reboot the machine. You need to use a
-serial terminal application to communicate with the machine; a good
-option on a Debian GNU/Linux is to use the <command>cu</command>
-program, in the package of the same name. Assuming the serial port on
-your computer is to be found on <filename>/dev/ttyS0</filename>, use the
-following command line:
+To boot the SS4000-E, use your serial nullmodem cable and the ribbon
+cable to connect to the serial port of the SS4000-E, and reboot the
+machine. You need to use a serial terminal application to communicate
+with the machine; a good option on a Debian GNU/Linux is to use the
+<command>cu</command> program, in the package of the same name. Assuming
+the serial port on your computer is to be found on
+<filename>/dev/ttyS0</filename>, use the following command line:
 -->
 
-Avviare il SS4000-E e caricare l'immagine del firmware fornita da Debian
-(ss4000e.pkg) tramite l'interfaccia web del SS4000-E
-(<quote>administration</quote>, poi <quote>firmware</quote> e poi fare
-l'upload dell'immagine). Dopo ciò, collegarsi alla porta seriale del
-SS4000-E usando il cavo nullmodem e il cavo piatto e riavviare la
-macchina. È necessaria un'appplicazione di emulazione del terminale per
+Per avviare il SS4000-E, collegarsi alla porta seriale del SS4000-E
+usando il cavo nullmodem e il cavo piatto poi riavviare la macchina.
+È necessaria un'applicazione di emulazione del terminale per
 comunicare con la macchina; su Debian GNU/Linux si può usare il programma
 <command>cu</command>, contenuto nell'omonimo pacchetto. Supponendo che
 la porta seriale sul proprio computer sia <filename>/dev/ttyS0</filename>,
@@ -332,67 +325,89 @@ riavviare la macchina e riprovare.
 
 <!--
 </footnote>. This will give you the RedBoot prompt. Enter the
-following command:
+following commands:
 -->
 
 </footnote>. In questo modo si accede al prompt di RedBoot, inserire
-questo comando:
+questi comandi:
 
 </para>
 
 <informalexample><screen>
-fconfig boot_script_data
-</screen></informalexample>
-
-<para>
-
-<!--
-RedBoot is now waiting for you to enter the boot script. Make sure to
-<emphasis>exactly</emphasis> enter the following script:
--->
-
-Adesso RedBoot si aspetta che venga inserito lo script d'avvio. È
-importante inserire <emphasis>esattamente</emphasis> questo script:
-
-</para>
-
-<informalexample><screen>
-fis load ramdisk.gz
-fis load zImage
+load -v -r -b 0x01800000 -m ymodem ramdisk.gz
+load -v -r -b 0x01008000 -m ymodem zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
-
-<para>
-
-<!--
-Finish the script with an empty line, and enter <quote>y</quote> at the
-prompt to update the non-volatile configuration. Finally, use
-<quote>reset</quote> to restart the system, and allow it to boot normally.
-The installer should now come up as normal. You can either install Debian
-through the serial port, or use an SSH client to connect through SSH.
--->
-
-Chiudere lo script con una riga vuota e rispondere <quote>y</quote>
-quando viene chiesto se aggiornare la configurazione non-volatile.
-Infine, usare <quote>reset</quote> per riavviare il sistema e far
-procedere l'avvio normalmente, adesso dovrebbe attivarsi l'installatore.
-Sarà possibile proseguire l'installazione di Debian tramite la porta
-seriale oppure con un client SSH collegandosi tramite SSH.
 
 </para><para>
 
 <!--
-Note that it is not necessary to update the boot script after the
-installation. The system will be configured to take the root device from
-system configuration, rather than from the kernel command line. It will
-not do any harm to do so anyway, however.
+After every <command>load</command> command, the system will expect a
+file to be transmitted using the YMODEM protocol. When using cu, make
+sure you have the package <classname>lrzsz</classname> installed, then
+hit enter, followed by the <quote>~&lt;</quote> escape sequence to start
+an external program, and run <command>sb initrd.gz</command> or
+<command>sb vmlinuz</command>.
 -->
 
-Notare che non è necessario aggiornare lo script d'avvio al termine
-dell'installazione. Il sistema rimarrà configurato in modo da prendere
-il device da usare come root dalla configurazione del sistema anziché
-della riga di comando del kernel. In ogni caso, nulla vieta di
-modificarlo.
+Dopo ogni comando <command>load</command> il sistema si aspetta che sia
+trasmesso un file usando il protocollo YMODEM. Con cu, assicurarsi che
+il pacchetto <classname>lrzsz</classname> sia installato, poi premere
+Invio, seguito dalla sequenza di escape <quote>~&lt;</quote> per avviare
+un programma esterno ed eseguire <command>sb initrd.gz</command> o
+<command>sb vmlinuz</command>.
+
+</para><para>
+
+<!--
+Alternatively, it is possible to load the kernel and ramdisk using
+HTTP rather than YMODEM. This is faster, but requires a working HTTP
+server on the network. To do so, first switch the bootloader to RAM mode:
+-->
+
+In alternativa è possibile caricare il kernel e il ramdisk usando HTTP
+anziché YMODEM. Questo metodo è più veloce ma richiede un server HTTP
+funzionante in rete. Mettere mettere in modalità RAM il bootloader:
+
+<informalexample><screen>
+fis load rammode
+g
+</screen></informalexample>
+
+</para><para>
+
+<!--
+This will seemingly restart the machine; but in reality, it loads
+reboot to RAM and restarts it from there. Not doing this step will cause
+the system to hang in the necessary ip_address step that comes next.
+-->
+
+In apparenza questo comando riavvia la macchina; in realtà carica reboot
+in RAM e riavvia da lì. Saltando questo passo il sistema si bloccherà su
+ip_address, uno dei passi successivi.
+
+</para><para>
+
+<!--
+You will need to hit Ctrl-C again to interrupt the boot. Then:
+-->
+
+È necessario premere di nuovo Ctrl-C per interrompere l'avvio. Poi:
+
+<informalexample><screen>
+ip_address -l 192.168.2.249 -h 192.168.2.4
+load -v -r -b 0x01800000 -m http /initrd.gz
+load -v -r -b 0x01008000 -m http /zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+</para><para>
+
+<!--
+The installer will now start as usual.
+-->
+
+Adesso l'Installatore partirà come al solito.
 
 </para>
    </sect3>
