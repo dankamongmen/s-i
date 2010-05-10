@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Installation Guide preseed\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-03-28 00:13+0000\n"
-"PO-Revision-Date: 2010-05-04 23:24+0300\n"
+"PO-Revision-Date: 2010-05-10 22:11+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
 "MIME-Version: 1.0\n"
@@ -1317,7 +1317,7 @@ msgid ""
 "instead, the values will need to be preseeded individually. </para> </"
 "footnote>. So alternatively the values can be preseeded individually. "
 "Language and country can also be specified as boot parameters."
-msgstr ""
+msgstr "Tämä tapa on hyvin helppo käyttää, muttei kuitenkaan mahdollista kaikkien kielen, maan ja maa-asetuston<footnote> <para> Valmis vastaus <literal>locale</literal>:lle arvona <userinput>en_NL</userinput> esimerkiksi johtaisi asennetussa järjestelmässä oletusmaa-asetustoon <literal>en_US.UTF-8</literal>. Mikäli sen sijaan halutaan esimerkiksi <literal>en_GB.UTF-8</literal>, on arvoille annettava valmis vastaus kullekin erikseen.  </para></footnote> kombinaatioiden antamista valmiilla vastauksilla. Näinollen valmiit vastaukset voidaan antaa kullekin erikseen. Kieli ja maa voidaan antaa myös käynnistysvalitsimilla."
 
 #. Tag: screen
 #: preseed.xml:716
@@ -1333,6 +1333,15 @@ msgid ""
 "# Optionally specify additional locales to be generated.\n"
 "#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 msgstr ""
+"# Valmis vastaus vain maa-asetustolle: arvon saa kieli, maa ja maa-asetusto.\n"
+"d-i debian-installer/locale string en_US\n"
+"\n"
+"# Arvot voidaan antaa jokaiselle erikseen, tämä on joustavampaa.\n"
+"#d-i debian-installer/language string en\n"
+"#d-i debian-installer/country string NL\n"
+"#d-i debian-installer/locale string en_GB.UTF-8\n"
+"# Haluttaessa voidaan määrittää lisää tuotettavia maa-asetustoja.\n"
+"#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8"
 
 #. Tag: para
 #: preseed.xml:718
@@ -1741,7 +1750,7 @@ msgid ""
 "Preseeding of advanced partition setups using RAID, LVM and encryption is "
 "supported, but not with the full flexibility possible when partitioning "
 "during a non-preseeded install."
-msgstr ""
+msgstr "Valmiit vastaukset monimutkaisemmille levyosioinneille, joissa on käytössä RAID, LVM ja salaus, on tuettu, mutta ei kaikilla ilman valmiita vastauksia tehtävän asennuksen mahdollisuuksilla."
 
 #. Tag: para
 #: preseed.xml:855
@@ -1754,7 +1763,7 @@ msgid ""
 "available from the <ulink url=\"&url-d-i-websvn;/trunk/installer/doc/devel/"
 "\">&d-i; source repository</ulink>. Note that the supported functionality "
 "may change between releases."
-msgstr ""
+msgstr "Alla olevista esimerkeistä ilmenee vain perustiedot valmiiden vastausten käytöstä. Lisätietoja löytyy tiedostoista <filename>partman-auto-recipe.txt</filename> ja <filename>partman-auto-raid-recipe.txt</filename> asennuspaketista <classname>debian-installer</classname>. Molemmat tiedostot ovat saatavilla myös <ulink url=\"&url-d-i-websvn;/trunk/installer/doc/devel/\">&d-i; lähdekoodivarastoalueelta</ulink>. Huomaa, että tuettu toiminnallisuus voi muuttua julkaisujen välillä."
 
 #. Tag: para
 #: preseed.xml:869
@@ -2933,10 +2942,3 @@ msgstr ""
 "oltava varovainen, koska valmiita vastauksia käytetään kaksi erillistä "
 "kertaa, jolloin on esimerkiksi mahdollista suorittaa preseed/early-komento "
 "toiseen kertaan heti kun verkko on käytössä."
-
-#~ msgid ""
-#~ "# Locale sets language and country.\n"
-#~ "d-i debian-installer/locale string en_US"
-#~ msgstr ""
-#~ "# Lokaali määrittää kielen ja maan.\n"
-#~ "d-i debian-installer/locale string fi_FI"
