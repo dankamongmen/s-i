@@ -48,6 +48,10 @@ ifeq ($(DEB_HOST_ARCH),sparc)
 CFLAGS += -DAT_KBD -DSPARC_KBD -DUSB_KBD 
 KEYBOARDS := at usb sparc
 endif
+ifeq ($(DEB_HOST_ARCH),sparc64)
+CFLAGS += -DAT_KBD -DSPARC_KBD -DUSB_KBD 
+KEYBOARDS := at usb sparc
+endif
 ifeq ($(DEB_HOST_ARCH),powerpc)
 CFLAGS +=  -DUSB_KBD -DAT_KBD -DAMIGA_KBD -DMAC_KBD
 KEYBOARDS := at usb amiga mac
@@ -72,6 +76,10 @@ endif
 ifeq ($(DEB_HOST_ARCH),hppa)
 CFLAGS += -DAT_KBD -DUSB_KBD
 KEYBOARDS := at usb
+endif
+ifeq ($(DEB_HOST_ARCH),sh4)
+CFLAGS += -DUSB_KBD 
+KEYBOARDS := usb
 endif
 
 TEMPLATES := debian/kbd-chooser.templates-in $(patsubst %, debian/keyboard-%.templates, $(KEYBOARDS))
