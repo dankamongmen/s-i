@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 -->
+<!-- original version: 62932 -->
 
 <para>
 
@@ -55,6 +55,211 @@ l'autopartizionamento si deve scegliere <guimenuitem>Manuale</guimenuitem>
 dal menu.
 
 </para>
+
+   <sect3 id="partman-fs">
+   <!-- <title>Supported partitioning options</title> -->
+   <title>Opzioni di partizionamento supportate</title>
+<para>
+
+<!--
+The partitioner used in &d-i; is fairly versatile. It allows to create
+many different partitioning schemes, using various partition tables,
+file systems and advanced block devices.
+-->
+
+Il programma di partizionamento usato nel &d-i; è abbastanza versatile,
+permette di creare diversi schemi di partizionamento, di usare varie
+tabelle di partizione, file system e device a blocchi.
+
+</para><para>
+
+<!--
+Exactly which options are available depends mainly on the architecture,
+but also on other factors. For example, on systems with limited internal
+memory some options may not be available.
+Defaults may vary as well. The type of partition table used by default
+can for example be different for large capacity hard disks than for
+smaller hard disks.
+Some options can only be changed when installing at medium or low debconf
+priority; at higher priorities sensible defaults will be used.
+-->
+
+Le opzioni disponibili dipendono principalmente dall'architettura ma anche
+da altri fattori. Per esempio, su sistemi con poca memoria interna alcune
+opzioni potrebbero non essere disponibili.
+Anche il comportamento predefinito potrebbe cambiare. Per esempio il tipo
+predefinito delle tabelle delle partizioni può essere diverso su un disco
+di grossa capacità rispetto a dischi più piccoli.
+Alcune opzioni possono essere modificate solo quando l'installazione
+avviene con debconf a priorità media o bassa, con le priorità più alte
+saranno usati i valori predefiniti.
+
+</para><para>
+
+<!--
+The installer supports various forms of advanced partitioning and use of
+storage devices, which in many cases can be used in combination.
+-->
+
+L'Installatore supporta varie forme avanzate di partizionamento e di
+uso di dispositivi di memorizzazione, che in molti casi possono essere
+usati in combinazione.
+
+<itemizedlist>
+  <listitem><para>
+<!--
+    <emphasis>Logical Volume Management (LVM)</emphasis>
+-->
+    <emphasis>LVM (Logical Volume Management)</emphasis>
+  </para></listitem>
+  <listitem arch="not-s390"><para>
+<!--
+    <emphasis>Software RAID</emphasis>
+-->
+    <emphasis>RAID Software</emphasis>
+  </para><para>
+<!--
+    Supported are RAID levels 0, 1, 4, 5, 6 and 10.
+-->
+    È supportato il RAID di livello 0, 1, 4, 5, 6 e 10.
+  </para></listitem>
+  <listitem><para>
+<!--
+    <emphasis>Encryption</emphasis>
+-->
+    <emphasis>Cifratura</emphasis>
+  </para></listitem>
+  <listitem arch="x86"><para>
+<!--
+    <emphasis>Serial ATA RAID</emphasis> (using <classname>dmraid</classname>)
+-->
+    <emphasis>RAID Serial ATA</emphasis> (con <classname>dmraid</classname>)
+  </para><para>
+<!--
+    Also called <quote>fake RAID</quote> or <quote>BIOS RAID</quote>.
+    Support for Serial ATA RAID is currently only available if enabled when
+    the installer is booted. Further information is available on
+    <ulink url="&url-d-i-sataraid;">our Wiki</ulink>.
+-->
+    Conosciuto anche come <quote>fake RAID</quote> o <quote>BIOS
+    RAID</quote>. Il supporto per il RAID Serial ATA è attualmente
+    disponibile solo se attivato all'avvio  dell'Installatore.
+    Ulteriori informazioni sono disponibili sul
+    <ulink url="&url-d-i-sataraid;">nostro Wiki</ulink>.
+  </para></listitem>
+  <listitem><para>
+<!--
+    <emphasis>Multipath</emphasis> (experimental)
+-->
+    <emphasis>Multipath</emphasis> (sperimentale)
+  </para><para>
+<!--
+    See <ulink url="&url-d-i-multipath;">our Wiki</ulink> for information.
+    Support for multipath is currently only available if enabled when the
+    installer is booted.
+-->
+    Vedere il <ulink url="&url-d-i-multipath;">nostro Wiki</ulink> per
+    maggiori informazioni. Attualmente il supporto per multipath è
+    disponibile solo se attivato all'avvio dell'Installatore.
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+<!--
+The following file systems are supported.
+-->
+
+Sono supportati i seguenti file system.
+
+<itemizedlist>
+  <listitem><para>
+    <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+    <emphasis>ext2</emphasis>,
+    <emphasis>ext3</emphasis>,
+    <emphasis>ext4</emphasis>
+  </para><para>
+<!--
+    The default file system selected in most cases is ext3; for
+    <filename>/boot</filename> partitions ext2 will be selected by default
+    when guided partitioning is used.
+-->
+    Nella maggior parte dei casi il file system predefinito è ext3; per
+    le partizioni <filename>/boot</filename> viene scelto ext2 quando è
+    usato il partizionamento guidato.
+  </para></listitem>
+  <listitem><para>
+<!--
+    <emphasis>jfs</emphasis> (not available on all architectures)
+-->
+    <emphasis>jfs</emphasis> (non disponibile su tutte le architetture)
+  </para></listitem>
+  <listitem><para>
+<!--
+    <emphasis>xfs</emphasis> (not available on all architectures)
+-->
+    <emphasis>xfs</emphasis> (non disponibile su tutte le architetture)
+  </para></listitem>
+  <listitem><para>
+<!--
+    <emphasis>reiserfs</emphasis> (optional; not available on all architectures)
+-->
+    <emphasis>reiserfs</emphasis> (opzionale; non disponibile su tutte
+    le architetture)
+  </para><para>
+<!--
+    Support for the Reiser file system is no longer available by default.
+    When the installer is running at medium or low debconf priority it can
+    be enabled by selecting the <classname>partman-reiserfs</classname>
+    component. Only version 3 of the file system is supported.
+-->
+    Il supporto per il file system Reiser non è più disponibile in modo
+    predefinito. È possibile attivarlo usando l'Installatore a priorità
+    media o bassa e selezionando il componente
+    <classname>partman-reiserfs</classname>. È supportata solo la versione
+    3 del file system.
+  </para></listitem>
+  <listitem arch="arm"><para>
+    <emphasis>jffs2</emphasis>
+  </para><para>
+<!--
+    Used on some systems to read flash memory. It is not possible to create
+    new jffs2 partitions.
+-->
+    Usato su alcuni sistemi per leggere le memorie flash. Non è possibile
+    creare nuove partizioni jffs2.
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>qnx4</emphasis>
+  </para><para>
+<!--
+    Existing partitions will be recognized and it is possible to assign
+    mount points for them. It is not possible to create new qnx4 partitions.
+-->
+    Le partizioni esistenti sono riconosciute ed è possibile assegnare loro
+    un punto di mount. Non è possibile creare nuove partizioni qnx4.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+  </para></listitem>
+  <listitem arch="x86;ia64"><para>
+<!--
+    <emphasis>NTFS</emphasis> (read-only)
+-->
+    <emphasis>NTFS</emphasis> (solo-lettura)
+  </para><para>
+<!--
+    Existing NTFS partitions can be resized and it is possible to assign
+    mount points for them. It is not possible to create new NTFS partitions.
+-->
+    Le partizioni NTFS esistenti possono essere ridimensionate ed è possibile
+    assegnare loro un punto di mount. Non è possibile creare nuove partizioni
+    NTFS.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3 id="partman-auto">
    <!-- <title>Guided Partitioning</title> -->
