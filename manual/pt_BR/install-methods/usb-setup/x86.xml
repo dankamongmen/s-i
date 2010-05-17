@@ -1,58 +1,65 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 -->
+<!-- original version: 61286 -->
 <!-- updated 56425:56442 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
+<!-- updated 56442:61286 by Felipe Augusto van de Wiel (faw) 2010.05.17 -->
 
    <sect3 arch="x86">
-   <title>Particionamento o pendrive USB</title>
+   <title>Particionando o pendrive USB</title>
 <para>
 
-Nós mostraremos como configurar uma memória stick para usar a primeira
-partição ao invés de todo dispositivo.
+Nós mostraremos como configurar um pendrive para usar a primeira
+partição ao invés de todo o dispositivo.
 
 </para><note><para>
 
-Como a maioria dos dispositivos stick USB vêm com uma partição
-contendo um sistema de arquivos FAT16 já configurada, você provavelmente
-não precisará reparticionar ou reformatar o stick. Se tiver que fazer
-isto de qualquer forma, use o <command>cfdisk</command> ou qualquer
-outra ferramenta de particionamento para criar a partição FAT16 e
-então crie o sistema de arquivos usando:
+Como a maioria dos dispositivos pendrive USB vêm pré-configurados com
+uma única partição FAT16, você provavelmente não precisará reparticionar
+ou reformatar o pendrive. Se tiver que fazer isto, use o
+<command>cfdisk</command> ou qualquer outra ferramenta de particionamento
+para criar uma partição FAT16<footnote>
+
+<para>
+Não esqueça de marcar a partição como inicializável (<quote>bootable
+flag</quote>).
+</para>
+
+</footnote>e então crie o sistema de arquivos usando:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
-Tenha atenção de usar o nome de dispositivo correto para o stick USB.
-O comando <command>mkdosfs</command> vem junto com o pacote da
-Debian <classname>dosfstools</classname>.
+Tome o cuidado de usar o nome de dispositivo correto para o pendrive USB.
+O comando <command>mkdosfs</command> está no pacote Debian
+<classname>dosfstools</classname>.
 
 </para></note><para>
 
-Para iniciar o kernel após a inicialização da memória stick USB,
-nós precisaremos colocar um gerenciador de partida na memória
-stick. No entanto, qualquer gerenciador de partida
-(e.g. <classname>lilo</classname>) deverá funcionar. É conveniente usar
+Para iniciar o kernel após a inicialização do pendrive USB,
+nós precisaremos colocar um gerenciador de inicialização no pendrive.
+Embora qualquer gerenciador de inicialização
+(e.g. <classname>lilo</classname>) deva funcionar, é conveniente usar
 o <classname>syslinux</classname> pois ele usa uma partição FAT16
-e pode ser configurado apenas com a edição de um arquivo de textos.
-Qualquer sistema operacional que suporte o sistema de arquivos FAT
+e pode ser reconfigurado apenas editando um arquivo texto.
+Qualquer sistema operacional que ofereça suporte a sistema de arquivos FAT
 poderá ser usado para fazer alterações na configuração do gerenciador
-de partida.
+de inicialização.
 
 </para><para>
 
-Para colocar o <classname>syslinux</classname> em uma partição FAT16 de sua
-memória stick USB, instale os pacotes <classname>syslinux</classname> e
+Para colocar o <classname>syslinux</classname> em uma partição FAT16 de
+seu pendrive USB, instale os pacotes <classname>syslinux</classname> e
 <classname>mtools</classname> em seu sistema e execute:
 
 <informalexample><screen>
 # syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
-Novamente, tenha atenção ao usar o nome de dispositivo. A partição
+Novamente, tome o cuidado de usar o nome de dispositivo correto. A partição
 não deverá estar montada ao iniciar o <command>syslinux</command>.
-Este processo grava um setor de partida na partição e cria um
+Este processo grava um setor de inicialização na partição e cria um
 arquivo <filename>ldlinux.sys</filename> que contém o código do
-gerenciador de partida.
+gerenciador de inicialização.
 
 </para>
    </sect3>
@@ -68,17 +75,17 @@ e copie os seguintes arquivos de imagem do instalador para o pendrive:
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (binário do kernel)
+<filename>vmlinuz</filename> ou <filename>linux</filename> (binário do kernel)
 
 </para></listitem>
 <listitem><para>
 
-<filename>initrd.gz</filename> (imagem inicial do disco ram)
+<filename>initrd.gz</filename> (imagem inicial <quote>ramdisk</quote>)
 
 </para></listitem>
 </itemizedlist>
 
-Você pode escolhe entre a versão tradicional ou a versão gráfica do
+Você pode escolher entre a versão tradicional ou a versão gráfica do
 instalador. A última pode ser encontrada no subdiretório
 <filename>gtk</filename>. Se você quer renomear os arquivos, por favor,
 note que o <classname>syslinux</classname> só pode processar nomes de
@@ -86,9 +93,11 @@ arquivos DOS (8.3).
 
 </para><para>
 
-Na seqüência, você deverá criar um arquivo de configuração
-<filename>syslinux.cfg</filename> que, no mínimo, deveria conter as
-duas linhas a seguir:
+Na sequência, você deverá criar um arquivo de configuração
+<filename>syslinux.cfg</filename> que, no mínimo, deverá conter as
+duas linhas a seguir (mude o nome do binário do kernel para
+<quote><filename>linux</filename></quote> se você usou uma imagem
+<filename>netboot</filename>):
 
 <informalexample><screen>
 default vmlinuz
@@ -101,9 +110,17 @@ Para o instalador gráfico você deverá adicionar
 </para><para>
 
 Se você usou uma imagem <filename>hd-media</filename>, agora você deverá
-copiar uma imagem ISO Debian (imagem <quote>businesscard</quote>,
-<quote>netinst</quote> ou CD completo; selecione uma que caiba) no pendrive.
-Quando você tiver terminado, desmonte o pendrive USB
+copiar uma imagem ISO do Debian<footnote>
+       
+<para>
+Você pode usar uma imagem <quote>businesscard</quote>, <quote>netinst</quote>
+ou CD (veja <xref linkend="official-cdrom"/>). Certifique-se de optar por uma
+que caiba. Note que a imagem
+<quote>netboot <filename>mini.iso</filename></quote> não é usável para este
+propósito.
+</para>
+
+</footnote> no pendrive. Quando você tiver terminado, desmonte o pendrive USB
 (<userinput>umount /mnt</userinput>).
 
 </para>

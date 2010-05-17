@@ -1,14 +1,15 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 -->
+<!-- original version: 57590 -->
 <!-- updated 39622:45616 by Felipe Augusto van de Wiel (faw) 2007.03.12 -->
 <!-- updated 45616:56442 by Felipe Augusto van de Wiel (faw) 2008.11.10 -->
+<!-- updated 56442:57590 by Felipe Augusto van de Wiel (faw) 2010.05.17 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>Preparando os arquivos para a inicialização usando um memory stick USB</title>
+ <title>Preparando os arquivos para a inicialização usando um pendrive USB</title>
 
 <para>
 
-Há dois métodos de instalação possível quando você está inicializando a
+Há dois métodos de instalação possíveis quando você está inicializando a
 partir de um pendrive USB. O primeiro é instalar completamente a partir
 da rede. O segundo é copiar também uma imagem de CD do pendrive USB e
 usá-la como origem para os pacotes, possivelmente em combinação com um
@@ -16,9 +17,9 @@ espelho. O segundo método é mais comum.
 
 </para><para>
 
-Para o primeiro método de instalação você terá que baixa uma imagem de
+Para o primeiro método de instalação você terá que baixar uma imagem de
 instalação do diretório <filename>netboot</filename> (no local mencionado
-em  <xref linkend="where-files"/>) e usar o <quote>método flexível</quote>,
+em <xref linkend="where-files"/>) e usar o <quote>método flexível</quote>,
 explicado abaixo, para copiar os arquivos para o pendrive USB.
 
 </para><para>
@@ -29,8 +30,8 @@ encontradas no diretório <filename>hd-media</filename> e tanto o
 podem ser usados para copiar a imagem para o pendrive USB. Para este
 método de instalação você também precisará baixar uma imagem de CD. A
 imagem de instalação e a imagem do CD devem ser baseadas na mesma
-versão do &d-i;. Se as versões não combinarem você provavelmente terá
-erros<footnote>
+versão do &d-i;. Se as versões não combinarem você provavelmente
+encontrará erros<footnote>
 
 <para>
 A mensagem de erro que possivelmente será exibida é que os módulos do
@@ -59,7 +60,7 @@ a chave de proteção de escrita.
 <warning><para>
 
 Os procedimentos descritos nesta seção destruirão qualquer coisa que já
-esteja no dispositivo. Tenha bastante certeza de que você está usando o
+esteja no dispositivo! Tenha bastante certeza de que você está usando o
 nome do dispositivo correto para seu pendrive USB. Se você usar o
 dispositivo errado, pode ser que o resultado seja a perda de toda a
 informação, por exemplo, de um disco rígido.
@@ -98,8 +99,7 @@ ou <quote>netinst CD</quote>
 
 </para><para arch="x86">
 
-Para usar esta imagem você só tem que extraí-la diretamente para o seu
-pendrive USB:
+Para usar esta imagem simplesmente extraia-a diretamente em seu pendrive USB:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt; /dev/<replaceable>sdX</replaceable>
@@ -117,7 +117,7 @@ extraia a imagem diretamente para lá:
 
 </para><para>
 
-Após isto, monte o pendrive USB
+Após isso, monte o pendrive USB
 <phrase arch="x86">(<userinput>mount
 /dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
 <phrase arch="powerpc">(<userinput>mount
@@ -125,8 +125,8 @@ Após isto, monte o pendrive USB
 que agora terá um sistema de arquivos
 <phrase arch="x86">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>
-dentro dele e copie a imagem ISO do Debian <quote>netinst</quote> ou
-<quote>businesscard</quote> para lá.
+dentro dele e copie a imagem ISO <quote>netinst</quote> ou
+<quote>businesscard</quote> do Debian para lá.
 Desmonte o pendrive USB (<userinput>umount /mnt</userinput>) e
 você terá concluído.
 
@@ -139,7 +139,7 @@ você terá concluído.
 
 Se você quiser mais flexibilidade ou apenas deseja saber o que está
 acontecendo, você deverá usar o método a seguir para colocar os
-arquivos no seu pendrive. Uma vantagem de usar este método é essa &mdash;
+arquivos no seu pendrive. Uma vantagem de usar este método é que &mdash;
 se a capacidade do seu pendrive USB for grande o suficiente &mdash; você
 tem a opção de copiar uma imagem ISO de CD inteiro para ele.
 
@@ -156,7 +156,7 @@ tem a opção de copiar uma imagem ISO de CD inteiro para ele.
 <warning><para>
 
 Se seu sistema se recusar a inicializar a partir do pendrive USB, o
-pendrive pode conter um Registro Mestre de Inicialização (<quote>MBR &ndash;
+pendrive pode conter um Registro Mestre de Inicialização (<quote>MBR &mdash;
 Master Boot Record</quote>). Para corrigir isto, use o comando
 <command>install-mbr</command> que vem no pacote <classname>mbr</classname>:
 
