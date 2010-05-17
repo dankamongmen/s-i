@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56419 -->
+<!-- original version: 62896 -->
 
   <sect2 arch="x86"><title>Arrencada des d'un CD-ROM</title>
 
@@ -157,10 +157,10 @@ l'instal·lador, tot i això, ho hauríeu de fer amb molt de compte.
 Si durant la instal·lació preteneu mantenir sense modificacions una
 partició existent al disc dur, podeu baixar el fitxer
 <filename>hd-media/initrd.gz</filename> i el nucli corresponent, i
-també copiar una imatge iso del CD al dispositiu (assegureu-vos
+també copiar una imatge iso del CD o DVD al dispositiu (assegureu-vos
 que el nom del fitxer acaba amb <literal>.iso</literal>). En aquest
 cas l'instal·lador pot arrencar del dispositiu i instal·lar des de
-la imatge del CD sense necessitar la xarxa.
+la imatge del CD o DVD sense necessitar la xarxa.
 
 </para>
 
@@ -205,20 +205,20 @@ Per a més informació vegeu les pàgines del manual
 
 El procediment pel <command>GRUB</command> és similar. Cerqueu el fitxer
 <filename>menu.lst</filename> al directori <filename>/boot/grub/</filename>
-(en algunes ocasions al directori <filename>/boot/boot/grub/</filename>)
-i afegiu-hi les línies següents:
+(en algunes ocasions <filename>/boot/boot/grub/</filename>) i afegiu-hi
+una entrada per a l'instal·lador, per exemple (assumint que
+<filename>/boot</filename> es troba a la primera partició del primer
+disc del sistema):
 
 <informalexample><screen>
 title  New Install
-kernel (hd0,0)/boot/newinstall/vmlinuz
-initrd (hd0,0)/boot/newinstall/initrd.gz
+root   (hd0,0)
+kernel /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
 </screen></informalexample>
 
-i reinicieu el sistema.
-
 </para><para>
-Recordeu que el valor de <userinput>ramdisk_size</userinput> s'hauria
-d'ajustar a la mida de la imatge initrd. A partir d'aquí no hi hauria
+A partir d'aquí no hi hauria
 d'haver cap diferència entre el <command>GRUB</command> i el
 <command>LILO</command>.
 
@@ -441,7 +441,7 @@ cegues) prémer <quote>H</quote> seguit de &enterkey; per seleccionar l'opció
 d'ajuda descrita abans. Després d'això les pulsacions de tecles es
 mostraran a l'indicador. Per a deshabilitar el framebuffer per a la resta de
 la instal·lació, haureu d'afegir també
-<userinput>fb=false</userinput> a l'indicador
+<userinput>vga=normal fb=false</userinput> a l'indicador
 d'arrencada com descriu el text d'ajuda.
 
 </para></note>

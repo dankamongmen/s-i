@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 53452 -->
+<!-- original version: 62943 -->
 
  <sect1 id="boot-parms"><title>Paràmetres d'arrencada</title>
 <para>
@@ -55,7 +55,19 @@ a l'ordinador del qual voleu arrencar, hauríeu de passar passar el
 paràmetre
 <userinput>console=<replaceable>device</replaceable></userinput>
 al nucli; <replaceable>device</replaceable> correspon al dispositiu
-sèrie, que acostuma a ser similar a <filename>ttyS0</filename>.
+sèrie, que acostuma a ser similar a <filename>ttyS0</filename><footnote>
+
+<para>
+Per a assegurar que el tipus de terminal emprat per l'instal·lador concorda
+amb el vostre emulador de terminal, podeu afegir el paràmetre
+<userinput>TERM=<replaceable>tipus</replaceable></userinput>.
+Adoneu-vos que l'instal·lador només accepta els tipus de terminal següents:
+<literal>linux</literal>, <literal>bterm</literal>, <literal>ansi</literal>,
+<literal>vt102</literal> i <literal>dumb</literal>. El valor per defecte
+per a la consola sèrie a &d-i; és <userinput>vt102</userinput>.
+</para>
+
+</footnote>.
 
 </para><para arch="sparc">
 
@@ -226,23 +238,28 @@ disponible. Els valors possibles són 1 i 2. Vegeu també <xref linkend="lowmem"
 </varlistentry>
 
 <varlistentry>
+<term>noshell</term>
+<listitem><para>
+
+Evita que l'instal·lador òbriga intèrprets interactius als terminals 2 i 3.
+Açò és útil per a instal·lacions desateses on la seguretat física siga
+limitada.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
 Algunes arquitectures utilitzen el framebuffer del nucli per oferir
 la instal·lació en diferents idiomes. Si el framebuffer us provoca
 errors al sistema, podeu deshabilitar la característica utilitzant
-el paràmetre <userinput>fb=false</userinput>. Els símptomes del
+els paràmetres <userinput arch="x86">vga=normal</userinput>
+<userinput>fb=false</userinput>. Els símptomes del
 problema són missatges d'error referents al bogl, una pantalla en blanc
 o que es quedi congelat durant uns quants minuts després d'iniciar
 la instal·lació.
-
-</para><para arch="x86">
-
-Per deshabilitar la utilització del framebuffer al nucli també podeu
-utilitzar l'argument <userinput>video=vga16:off</userinput>. La
-problemàtica relacionada amb aquest paràmetre s'ha detectat en
-ordinadors Dell Inspiron amb una targeta Mobile Radeon.
 
 </para><para arch="hppa">
 
@@ -404,6 +421,26 @@ unitat òptica després de la instal·lació inicial.
 </varlistentry>
 
 <varlistentry>
+<term>base-installer/install-recommends (recommends)</term>
+<listitem><para>
+
+Si establiu aquesta opció a <userinput>false</userinput>, es configurarà
+el sistema de gestió de paquets per a no instal·lar automàticament els
+paquets recomanats, tant durant la instal·lació com al propi sistema
+instal·lat. Vegeu també <xref linkend="di-install-base"/>.
+
+</para><para>
+
+Adoneu-vos que aquesta opció resulta en un sistema més lleuger, però
+també en la mancança de funcions que normalment esperaríeu que hi foren
+disponibles. Potser necessitareu instal·lar manualment alguns dels paquets
+recomanats per a obtenir tota la funcionalitat que desitgeu. Per tant,
+aquesta opció només hauria de ser emprada per usuaris molt experimentats.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
 <term>debian-installer/allow_unauthenticated</term>
 <listitem><para>
 
@@ -424,66 +461,6 @@ Aquest paràmetre ja hauria d'estar definit correctament allà on sigui
 necessari; torneu-lo a definir només si trobeu errors durant el procés
 d'arrencada que indiquin que no ha estat possible carregar el ramdisk
 completament. El valor està en KiB.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/protocol</term>
-<listitem><para>
-
-Amb l'instal·lador gràfic (interfície gtk) els usuaris poden indicar el 
-protocol del ratolí que s'utilitzarà donant-li valor a aquest paràmetre.
-Els valors disponibles són<footnote>
-
-<para>
-Vegeu la pàgina de manual de
-<citerefentry><refentrytitle>directfbrc</refentrytitle>
-<manvolnum>5</manvolnum></citerefentry> per obtenir informació addicional.
-</para>
-
-</footnote>:
-<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
-<userinput>MS</userinput>, <userinput>MS3</userinput>,
-<userinput>MouseMan</userinput> i <userinput>MouseSystems</userinput>.
-En la major part dels casos, el protocol per defecte hauria de funcionar 
-correctament.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/device</term>
-<listitem><para>
-
-Amb l'instal·lador gràfic (interfície gtk), els usuaris poden especificar amb
-aquest paràmetre el dispositiu de ratolí que s'utilitzarà. Això pot ser
-especialment útil si el ratolí està connectat a un port sèrie (ratolí sèrie).
-Exemple:
-<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-
-<term>mouse/left</term>
-<listitem><para>
-
-En la interfície gtk (l'instal·lador gràfic), és possible canviar el
-funcionament del ratolí per tal d'adaptar-lo a esquerrans si s'estableix
-aquest paràmetre a <userinput>true</userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>directfb/hw-accel</term>
-<listitem><para>
-
-En la interfície gtk (l'instal·lador gràfic), l'acceleració per
-maquinari amb directfb està desactivada per omissió. Establiu aquest
-paràmetre a <userinput>true</userinput> per a activar-la.
 
 </para></listitem>
 </varlistentry>
@@ -518,14 +495,30 @@ exemples concrets.
 <variablelist>
 
 <varlistentry>
+<term>debian-installer/language (idioma)</term>
+<term>debian-installer/country (país)</term>
 <term>debian-installer/locale (locale)</term>
 <listitem><para>
 
-Aquest paràmetre es pot utilitzar per determinar ambdós,
-l'idioma i el país de la instal·lació. Això només funcionarà
-si el locale està suportat a Debian. Per exemple, podeu utilitzar
-<userinput>locale=de_CH</userinput> per seleccionar l'alemany com a
-idioma i Suïssa com a país.
+Hi ha dues formes d'indicar l'idioma, país i locale a emprar per a la
+instal·lació i per al propi sistema instal·lat.
+
+</para><para>
+
+La primera i més fàcil és indicar només el paràmetre <literal>locale</literal>.
+L'idioma i el país es derivaran del seu valor. Per exemple, podeu emprar
+<userinput>locale=ca_ES</userinput> per a escollir el català com a idioma i
+Espanya com a país (s'emprarà <literal>ca_ES.UTF-8</literal> com a locale
+per defecte del sistema instal·lat). Aquesta forma té la limitació de que
+no permet especificar totes les combinacions d'idioma, país i locale.
+
+</para><para>
+
+La segona opció, més flexible, és especificar <literal>language</literal>
+(idioma) i <literal>country</literal> (país) per separat. En aquest cas
+podeu especificar un <literal>locale</literal> opcional que s'emprarà com
+a locale per defecte al sistema instal·lat. Per exemple:
+<userinput>language=ca country=AD locale=ca_ES.UTF-8</userinput>.
 
 </para></listitem>
 </varlistentry>

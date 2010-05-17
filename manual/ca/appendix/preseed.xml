@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56827 -->
+<!-- original version: 62798 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -486,11 +486,12 @@ pot ser afegir un àlies del paràmetre per vosaltres.
 
 </para><para>
 
-L'etiqueta d'arrencada <literal>auto</literal> no està definida a totes
-les arquitectures. El mateix efecte es pot aconseguir afegint dos
+L'etiqueta d'arrencada <literal>auto</literal> no està definida a tots
+els llocs. El mateix efecte es pot aconseguir afegint dos
 paràmetres <literal>auto=true priority=critical</literal> a la línia
 d'ordres del nucli. El paràmetre <literal>auto</literal> és un àlies
-d'<literal>auto-install/enable</literal> i controla el retard de les
+d'<literal>auto-install/enable</literal> i establir-lo a
+<literal>true</literal> posposa les
 preguntes del locale i del teclat fins que es tingui oportunitat de
 fer la configuració prèvia d'aquestes, mentre <literal>priority</literal>
 és un àlies per <literal>debconf/priority</literal> i donant-li el valor
@@ -521,7 +522,9 @@ mostren altres usos del sistema de preconfiguració.
 <para>
 
 Els àlies que hi ha a continuació poden ser útils quan s'utilitza la
-configuració prèvia (mode auto).
+configuració prèvia (mode auto). Adoneu-vos que es tracta d'àlies curts
+per a noms de preguntes, i que sempre cal que especifiqueu també un valor:
+per exemple, <literal>auto=true</literal> o <literal>interface=eth0</literal>.
 
 </para>
 
@@ -532,6 +535,8 @@ configuració prèvia (mode auto).
 <row><entry>auto</entry><entry>auto-install/enable</entry></row>
 <row><entry>classes</entry><entry>auto-install/classes</entry></row>
 <row><entry>fb</entry><entry>debian-installer/framebuffer</entry></row>
+<row><entry>language</entry><entry>debian-installer/language</entry></row>
+<row><entry>country</entry><entry>debian-installer/country</entry></row>
 <row><entry>locale</entry><entry>debian-installer/locale</entry></row>
 <row><entry>priority</entry><entry>debconf/priority</entry></row>
 <row><entry>file</entry><entry>preseed/file</entry></row>
@@ -712,7 +717,7 @@ com un exemple de fitxer de configuració prèvia a &urlset-example-preseed;.
 Tingueu en compte que aquest exemple es basa en una instal·lació per a una
 arquitectura Intel x86. Si l'arquitectura és diferent, alguns dels exemples
 (com la selecció del teclat i la instal·lació del carregador) poden no ser
-adients i hauran de substituir-se per ajusts de configuració adequats a
+adients i hauran de substituir-se per paràmetres de configuració adequats a
 l'arquitectura en qüestió.
 
 </para>
@@ -734,9 +739,32 @@ seleccionarà automàticament un locale vàlid amb l'idioma triat.
 Per especificar el locale com un paràmetre d'arrencada, empreu
 <userinput>locale=<replaceable>ca_ES</replaceable></userinput>.
 
+</para><para>
+
+Tot i que aquest mètode és molt fàcil d'emprar, no permet la configuració
+prèvia de totes les combinacions possibles d'idioma, país i locale<footnote>
+
+<para>
+Per exemple, configurar prèviament <literal>locale</literal> a
+<userinput>ca_ES</userinput> convertiria <literal>ca_ES.UTF-8</literal> en
+el locale per defecte del sistema instal·lat. Si per exemple preferiu
+<literal>ca_AD.UTF-8</literal> al seu lloc, haureu d'establir una
+configuració prèvia individual per a cada valor.
+</para>
+
+</footnote>. Per tant, podeu establir un configuració prèvia individual per a cada valor.
+També podeu especificar l'idioma i el país com a paràmetres d'arrencada.
+
 <informalexample role="example"><screen>
-# El locale estableix la llengua i el país.
+# La configuració prèvia només del locale estableix idioma, país i locale.
 d-i debian-installer/locale string ca_ES
+
+# També podeu configurar-los individualment per a major flexibilitat.
+#d-i debian-installer/language string ca
+#d-i debian-installer/country string ES
+#d-i debian-installer/locale string ca_AD.UTF-8
+# Podeu especificar altres locales a generar.
+#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8
 </screen></informalexample>
 
 </para><para>
@@ -813,6 +841,11 @@ xarxa.
 </para>
 
 <informalexample role="example"><screen>
+# Inhabilita completament la configuració de la xarxa. Açò és útil per a
+# instal·lacions de CD-ROM en dispositius sense connexió on les preguntes
+# sobre la xarxa, els avisos i els temps d'espera resulten molests.
+#d-i netcfg/enable boolean false
+
 # Si és possible, el netcfg escollirà una interfície que tinga un enllaç.
 # El següent evita que es mostre una llista si hi ha més d'una interfície.
 d-i netcfg/choose_interface select auto
@@ -875,6 +908,20 @@ indicar que no s'hauria d'utilitzar cap passarel·la.
 
   </sect2>
 
+  <sect2 id="preseed-network-console">
+  <title>La consola de xarxa</title>
+
+<informalexample role="example"><screen>
+# Empreu els paràmetres següents si voleu emprar el component «network-console»
+# per a instal·lar remotament mitjançant SSH. Açò només té sentit si voleu
+# continuar amb la instal·lació de forma manual.
+#d-i anna/choose_modules string network-console
+#d-i network-console/password password r00tme
+#d-i network-console/password-again password r00tme
+</screen></informalexample>
+
+  </sect2>
+
   <sect2 id="preseed-mirror">
   <title>Configuració del servidor rèplica</title>
 <para>
@@ -892,12 +939,12 @@ programes del sistema.
 </para><para>
 
 El paràmetre <classname>mirror/udeb/suite</classname> determina el conjunt
-de de components addicionals que emprarà l'instal·lador. Això només és útil
+de components addicionals que emprarà l'instal·lador. Això només és útil
 si els components es descarreguen realment des de la xarxa i han de
 correspondre amb el conjunt d'eines emprat per construir l'initrd per al
-mètode d'instal·lació emprat en la instal·lació. De manera predeterminada,
-el valor de <classname>mirror/udeb/suite</classname> és el mateix que el
-de <classname>mirror/suite</classname>.
+mètode d'instal·lació emprat en la instal·lació. Normalment l'instal·lador
+escollirà automàticament el valor correcte i no hauria de ser necessari
+establir aquest paràmetre.
 
 </para>
 
@@ -941,13 +988,30 @@ d-i clock-setup/ntp boolean true
   <title>Fer particions</title>
 <para>
 
-La configuració prèvia per fer particions de discs durs està molt limitada
+La configuració prèvia per fer particions de discs durs està limitada
 per les possibilitats oferides pel <classname>partman-auto</classname>. Podeu
 o bé partir l'espai lliure existent al disc o bé el disc sencer. La
 distribució del disc es pot determinar fent servir una recepta definida
 prèviament, una de personalitzada procedent d'un fitxer recepta, o una
-inclosa dins els fitxers de configuració prèvia. Actualment no es poden
-partir discs múltiples emprant la configuració prèvia.
+inclosa dins els fitxers de configuració prèvia.
+
+</para><para>
+
+Es poden crear configuracions prèvies amb RAID, LVM i xifrat, però no amb
+tota la flexibilitat possible de creació de particions que ofereix una
+instal·lació no preconfigurada.
+
+</para><para>
+
+Els exemples de sota només proporcionen informació bàsica de l'ús de
+receptes. Per a una informació detallada consulteu els fitxers
+<filename>partman-auto-recipe.txt</filename> i
+<filename>partman-auto-raid-recipe.txt</filename>, inclosos al paquet
+<classname>debian-installer</classname>.
+Tots dos fitxers també es troben disponibles al
+<ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">repositori de fonts
+de &d-i;</ulink>. Adoneu-vos que la funcionalitat disponible pot canviar
+d'una versió a una altra.
 
 </para>
 
@@ -959,18 +1023,26 @@ seleccione el correcte abans d'utilitzar la configuració prèvia.
 
 </para></warning>
 
+   <sect3 id="preseed-partman-example">
+   <title>Exemple de particions</title>
+
 <informalexample role="example"><screen>
 # Si el sistema disposa d'espai lliure podeu fer la partició només
-# d'aquest espai.
+# d'aquest espai. Només es tindrà en compte si «partman-auto/method»
+# no està habilitat (a sota).
 #d-i partman-auto/init_automatically_partition select biggest_free
 
-# També podeu especificar el disc que es partirà. El nom del dispositiu
-# s'ha d'indicar en el format tradicional, no en devfs.
-# Avís: Especifiqueu sempre un disc, excepte si el sistema només en té un.
+# També podeu especificar el disc que es partirà. Si el sistema només té
+# un disc l'instal·lador l'emprarà per defecte, altrament cal que indiqueu
+# el dispositiu en el format tradicional, no en el de devfs (per exemple,
+# «/dev/hda» o «/dev/sda» en lloc de «/dev/discs/disc0/disc»).
 # Per exemple, per emprar el primer disc SCSI/SATA:
 #d-i partman-auto/disk string /dev/sda
 # Addicionalment, haureu d'especificar el mètode a utilitzar.
-# Els mètodes disponibles actualment són: «regular», «lvm» i «crypto».
+# Els mètodes disponibles actualment són:
+# - regular: empra el tipus de partició típics de l'arquitectura
+# - lvm: empra LVM per a particionar el disc
+# - crypto: empra LVM a dins d'una partició xifrada
 d-i partman-auto/method string lvm
 
 # Si un dels discs que s'ha de partir automàticament conté una
@@ -989,7 +1061,6 @@ d-i partman-lvm/confirm boolean true
 d-i partman-auto/choose_recipe select atomic
 
 # O indicar-ne una pròpia...
-# El format de la recepta es descriu al fitxer devel/partman-auto-recipe.txt.
 # Si podeu obtenir un fitxer de recepta per a l'entorn de l'instal·lador,
 # podeu simplement apuntar-hi.
 #d-i partman-auto/expert_recipe_file string /hd-media/recipe
@@ -1014,17 +1085,23 @@ d-i partman-auto/choose_recipe select atomic
 #                      method{ swap } format{ }                \
 #              .
 
+# El format complet de les receptes es troba documentat al fitxer
+# «partman-auto-recipe.txt» inclós al paquet «debian-installer» i disponible
+# al repositori de fonts de l'instal·lador. També s'hi documenta com
+# especificar paràmetres com etiquetes per als sistemes de fitxers, noms
+# per als grups de volum i quins dispositius incloure en un grup de volum.
+
 # Això fa que el partman particione automàticament sense demanar confirmació,
 # amb la condició que haguéssiu dit d'utilitzar un dels mètodes de dalt.
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
-  </sect2>
-
-  <sect2 id="preseed-partman-raid">
-  <title>Fer particions amb RAID</title>
+   </sect3>
+   <sect3 id="preseed-partman-raid">
+   <title>Fer particions amb RAID</title>
 <para>
 
 També podeu utilitzar la configuració prèvia per configurar les
@@ -1047,15 +1124,13 @@ algun problema.
 
 </para></warning>
 
-<informalexample><screen>
-# AVÍS: aquesta opció està en fase beta i s'hauria d'utilitzar amb cura
-
+<informalexample role="example"><screen>
 # A «method» se li hauria de donar el valor "raid".
 #d-i partman-auto/method string raid
 # Especifica quins discs s'han de partir. Tots acabaran amb la
 # mateixa disposició, per tant tan sols funcionarà si els discs tenen
 # la mateixa mida.
-#d-i partman-auto/disk string /dev/discs/disc0/disc /dev/discs/disc1/disc
+#d-i partman-auto/disk string /dev/sda /dev/sdb
 
 # A continuació necessiteu especificar quines particions físiques
 # s'utilitzaran.
@@ -1073,30 +1148,75 @@ algun problema.
 
 # Per acabar necessiteu especificar com s'utilitzaran les particions
 # prèviament definides a al configuració del RAID. Recordeu d'utilitzar
-# els nombres de partició correctes per particions lògiques.
+# els números de partició correctes per particions lògiques. S'admeten
+# els nivells RAID 0, 1, 5, 6 i 10, separant-ne els dispositius amb «#».
 # Els paràmetres són:
 # &lt;raidtype&gt; &lt;devcount&gt; &lt;sparecount&gt; &lt;fstype&gt; &lt;mountpoint&gt; \
 #          &lt;devices&gt; &lt;sparedevices&gt;
-# Els nivells de RAID 0, 1, 5, 6 i 10 estan suportats; els dispositius es
-# separen amb "#"
+
 #d-i partman-auto-raid/recipe string \
-#    1 2 0 ext3 /                                           \
-#          /dev/discs/disc0/part1#/dev/discs/disc1/part1    \
-#    .                                                      \
-#    1 2 0 swap -                                           \
-#          /dev/discs/disc0/part5#/dev/discs/disc1/part5    \
-#    .                                                      \
-#    0 2 0 ext3 /home                                       \
-#          /dev/discs/disc0/part6#/dev/discs/disc1/part6    \
+#    1 2 0 ext3 /                    \
+#          /dev/sda1#/dev/sdb1       \
+#    .                               \
+#    1 2 0 swap -                    \
+#          /dev/sda5#/dev/sdb5       \
+#    .                               \
+#    0 2 0 ext3 /home                \
+#          /dev/sda6#/dev/sdb6       \
 #    .
+
+# Per a més informació vegeu el fitxer «partman-auto-raid-recipe.txt»
+# inclós al paquet «debian-installer» i disponible al repositori de fonts
+# de l'instal·lador.
 
 # Açò fa que el partman particione automàticament sense demanar confirmació.
 d-i partman-md/confirm boolean true
-d-i partman/confirm_write_new_label boolean true
+d-i partman-partitioning/confirm_write_new_label boolean true
 d-i partman/choose_partition select finish
 d-i partman/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
 </screen></informalexample>
 
+   </sect3>
+
+   <sect3 id="preseed-partman-mount-styles">
+   <title>Com controlar el muntatge de les particions</title>
+<para>
+
+Normalment, els sistemes de fitxers es munten emprant un identificador
+universalment únic (UUID) com a clau, el que permet que siguen muntats
+correctament encara que canvien els seus noms de dispositiu. Els UUID són
+llargs i difícils de llegir, així que l'instal·lador vos permet muntar els
+sistemes de fitxers basant-se en noms de dispositiu tradicionals o en
+etiquetes que els assigneu. Si demaneu a l'instal·lador que munte per
+etiquetes, els sistemes de fitxers que no en tinguen seran muntats pel
+seu UUID.
+
+</para><para>
+
+Els dispositius amb noms estables, com els volums lògics LVM, continuaran
+emprant llurs noms tradicionals en lloc de l'UUID.
+
+</para>
+
+<warning><para>
+
+Els noms tradicionals de dispositiu poden canviar amb l'ordre en què el
+nucli descobreix els dispositius en arrencar, causant que es munte el
+sistema de fitxers que no toca. De forma similar, es possible que les
+etiquetes coincidesquen en connectar un disc nou o una unitat USB, i
+aleshores el comportament del vostre sistema en arrencar serà aleatori.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+# Per defecte es munta per UUID, però també podeu escollir «traditional»
+# per a emprar noms tradicionals de dispositiu, o «label» per a provar amb
+# les etiquetes dels sistemes de fitxers abans de recórrer a llurs UUID.
+#d-i partman/mount_style select uuid
+</screen></informalexample>
+
+   </sect3>
   </sect2>
 
   <sect2 id="preseed-base-installer">
@@ -1110,6 +1230,11 @@ instal·lació del nucli.
 </para>
 
 <informalexample role="example"><screen>
+# Configura APT per a no instal·lar per defecte els paquets recomanats.
+# L'ús d'aquesta opció pot resultar en un sistema incomplet i només ha de
+# ser emprada per usuaris molt experimentats.
+#d-i base-installer/install-recommends boolean false
+
 # Selecciona el generador initramfs per crear els initrd per a nuclis 2.6.
 #d-i base-installer/kernel/linux/initramfs-generators string yaird
 
@@ -1147,7 +1272,7 @@ de força bruta.
 # De forma alternativa, per no crear el compte d'usuari normal.
 #d-i passwd/make-user boolean false
 
-# Contrasenya de superusuari, bé explícita
+# Contrasenya de superusuari, ben explícita
 #d-i passwd/root-password password r00tme
 #d-i passwd/root-password-again password r00tme
 # o bé xifrada fent servir una funció resum MD5.
@@ -1327,7 +1452,12 @@ que el podeu utilitzar de forma senzilla a la línia d'ordres del nucli.
 # elimineu també aquest comentari:
 #d-i lilo-installer/skip boolean true
 
-# Això, que és força segur de fer, fa qeu el grub s'instal·le automaticament
+# Amb alguna excepció per a esquemes inusuals de particionat, GRUB 2 és ara
+# el carregador per defecte. Si necessiteu l'antic GRUB per algun motiu,
+# descomenteu açò:
+#d-i grub-installer/grub2_instead_of_grub_legacy boolean false
+
+# Això, que és força segur de fer, fa que el grub s'instal·le automaticament
 # al MBR si no es detecta cap altre sistema operatiu a la màquina.
 d-i grub-installer/only_debian boolean true
 
@@ -1348,6 +1478,11 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/password-again password r00tme
 # o utilitzant xifrat amb una funció resum MD5, vegeu grub-md5-crypt(8).
 #d-i grub-installer/password-crypted password [MD5 hash]
+
+# Empreu l'opció següent per a afegir paràmetres d'arrencada addicionals
+# per al sistema instal·lat (si l'instal·lador del carregador els admet).
+# Nota: s'hi afegiran automàticament les opcions passades a l'instal·lador.
+#d-i debian-installer/add-kernel-opts string nousb
 </screen></informalexample>
 
 <para>
@@ -1427,7 +1562,12 @@ la possibilitat d'executar ordres o guions en alguns punts de la instal·lació.
 # Aquesta primera ordre s'executa tan prompte com es pot, tot just després
 # de llegir el fitxer de configuració prèvia.
 #d-i preseed/early_command string anna-install some-udeb
-
+# Aquesta ordre s'executa just abans d'iniciar l'eina de particionat.
+# Pot ser útil per a aplicar dinàmicament una configuració prèvia de l'eina
+# que depenga de l'estat dels discs (que potser no estiguen encara visibles
+# en executar «preseed/early_command»).
+#d-i partman/early_command \
+#       string debconf-set partman-auto/disk "$(list-devices disk | head -n1)"
 # Aquesta s'executa just abans que finalitzi la instal·lació, però
 # quan encara es pot usar un directori de destí /target. Podeu fer chroot
 # sobre /target i usar-lo directament, o fer servir les ordres apt-install
@@ -1460,11 +1600,18 @@ de preconfiguració.
 
 </para><para>
 
+Adoneu-vos que el propietari <quote>d-i</quote> només s'ha d'emprar per a
+variables a usar pel propi instal·lador. Per a variables corresponents als
+paquets instal·lats al sistema de destinació cal que empreu el nom del
+paquet. Vegeu la nota al peu de <xref linkend="preseed-bootparms"/>.
+
+</para><para>
+
 Si esteu preconfigurant mitjançant els paràmetres d'arrencada,
 podeu fer que l'instal·lador pregunti una qüestió en
 concret utilitzant l'operador <quote>?=</quote>, p.ex.
-<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valor</replaceable></userinput>.
-
+<userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>valor</replaceable></userinput>
+(o <userinput><replaceable>propietari</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>valor</replaceable></userinput>).
 Tingueu en compte que això només afectarà els paràmetres
 corresponents a les preguntes que realment es mostren durant el procés
 d'instal·lació, i no als paràmetres <quote>interns</quote>.
@@ -1478,9 +1625,9 @@ d'instal·lació, i no als paràmetres <quote>interns</quote>.
 <para>
 
 En un fitxer de configuració prèvia se'n poden incloure d'altres.
-Qualsevol ajust d'aquests fitxers prevaldrà sobre els dels fitxers
+Qualsevol paràmetre d'aquests fitxers prevaldrà sobre els dels fitxers
 carregats primer. Això fa possible, per exemple, indicar la configuració
-general de la xarxa a un fitxer i els ajusts més específics a altres.
+general de la xarxa a un fitxer i els paràmetres més específics a altres.
 
 </para>
 

@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56442 -->
+<!-- original version: 61286 -->
 
    <sect3 arch="x86">
    <title>Fer particions a un llapis USB</title>
@@ -13,11 +13,16 @@ partició d'aquest, en comptes del dispositiu complet.
 La major part dels llapis USB venen preconfigurats amb una única
 partició FAT16, així que en general no serà necessari tornar a partir o
 tornar a formatar-lo. Si heu de fer-ho, utilitzeu el <command>cfdisk</command>
-o qualsevol altra ferramenta per crear la partició FAT16, i aleshores
-creeu el sistema de fitxers fent:
+o qualsevol altra ferramenta per crear la partició FAT16<footnote>
+
+<para>
+Recordeu-vos d'activar l’indicador de partició arrencable <quote>bootable</quote>.
+</para>
+
+</footnote>, i aleshores creeu el sistema de fitxers fent:
 
 <informalexample><screen>
-# mkdosfs /dev/<replaceable>sda1</replaceable>
+# mkdosfs /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Aneu en compte d'utilitzar el nom del dispositiu correcte pel vostre
@@ -41,7 +46,7 @@ llapis USB, instal·leu els paquets <classname>syslinux</classname> i
 <classname>mtools</classname> al vostre sistema i executeu:
 
 <informalexample><screen>
-# syslinux /dev/<replaceable>sda1</replaceable>
+# syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Altra vegada, aneu en compte i utilitzeu el nom correcte pel dispositiu.
@@ -50,15 +55,20 @@ La partició no hauria d'estar muntada quan executeu l'ordre
 Aquest procediment escriu un sector d'arrencada a la partició i crea el fitxer
 <filename>ldlinux.sys</filename> que conté el codi del carregador d'arrencada.
 
-</para><para>
+</para>
+   </sect3>
 
-Munteu la partició (<userinput>mount /dev/sda1 /mnt</userinput>) i copieu
-els fitxers següents al llapis:
+   <sect3 arch="x86">
+   <title>Com afegir la imatge de l'instal·lador</title>
+<para>
+
+Munteu la partició (<userinput>mount /dev/<replaceable>sdX1</replaceable> /mnt</userinput>)
+i copieu els següents fitxers imatge de l'instal·lador al llapis:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (nucli binari)
+<filename>vmlinuz</filename> o <filename>linux</filename> (nucli binari)
 
 </para></listitem>
 <listitem><para>
@@ -66,32 +76,44 @@ els fitxers següents al llapis:
 <filename>initrd.gz</filename> (imatge inicial del disc ram)
 
 </para></listitem>
-<listitem><para>
-
-<filename>syslinux.cfg</filename> (fitxer de configuració del SYSLINUX)
-
-</para></listitem>
-<listitem><para>
-
-Mòduls del nucli opcionals
-
-</para></listitem>
 </itemizedlist>
 
-Si voleu canviar el nom dels fitxers, aneu en compte de que el
-<command>SYSLINUX</command> tan sols pot utilitzar nom de fitxers tipus
+Podeu escollir entre la versió normal de l'instal·lador o la seua versió
+gràfica. Podeu trobar la darrera al subdirectori <filename>gtk</filename>.
+Si voleu reanomenar els fitxers, tingueu en compte que
+<classname>syslinux</classname> només pot processar noms de fitxer de
 DOS (8.3).
 
 </para><para>
 
-
-El fitxer de configuració <filename>syslinux.cfg</filename> hauria de contenir
-les següents línies:
+A continuació heu de crear un fitxer de configuració
+<filename>syslinux.cfg</filename> que haurà de contenir com a mínim
+les dues línies següents (canvieu-hi el nom del nucli binari a
+<quote><filename>linux</filename></quote> si heu emprat una imatge
+<filename>netboot</filename>):
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
+
+Per a emprar l'instal·lador gràfic heu d'afegir
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> a la segona línia.
+
+</para><para>
+
+Si heu emprat una imatge <filename>hd-media</filename>, ara heu de copiar una
+imatge ISO de Debian<footnote>
+
+<para>
+Podeu emprar una imatge «businesscard», «netinst» o una de CD complet (vegeu
+<xref linkend="official-cdrom"/>). Assegureu-vos d'emprar-ne una que càpiga.
+Adoneu-vos que la imatge <quote>netboot <filename>mini.iso</filename></quote>
+no és vàlida per a aquest propòsit.
+</para>
+
+</footnote> al llapis. Quan hàgeu acabat, desmunteu el llapis de memòria USB
+(<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

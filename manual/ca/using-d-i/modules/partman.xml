@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 -->
+<!-- original version: 62932 -->
 
 <para>
 
@@ -32,6 +32,115 @@ corresponent. Aquesta opció s'anomena fer particions de forma
 escolliu l'opció <guimenuitem>Manual</guimenuitem> del menú.
 
 </para>
+
+   <sect3 id="partman-fs">
+   <title>Opcions per a la creació de particions</title>
+<para>
+
+L'eina de particionat emprada per &d-i; és bastant versàtil. Permet crear
+molts esquemes de particionat diferents fent servir diverses taules de
+particions, sistemes de fitxers i dispositius de blocs avançats.
+
+</para><para>
+
+Les opcions disponibles de fet depenen principalment de l'arquitectura,
+però també d'altres factors. Per exemple, en sistemes amb una memòria
+interna limitada algunes opcions no estan disponibles. Els valors per
+defecte també varien. El tipus de taula de particions emprada per defecte
+pot diferir per exemple entre discs de gran capacitat i altres de més
+menuts. Algunes opcions només poden ser canviades en instal·lar amb un
+nivell mitjà o baix de prioritat de Debconf; amb prioritats majors
+s'empraran valors per defecte adequats.
+
+</para><para>
+
+L’instal·lador ofereix diverses formes de creació avançada de partcions
+i ús de dispositius d'emmagatzematge, que a sovint poder ser combinats.
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>Gestor de volums lògics (LVM)</emphasis>
+  </para></listitem>
+  <listitem arch="not-s390"><para>
+    <emphasis>RAID per programari</emphasis>
+  </para><para>
+    S'admeten els nivells de RAID 0, 1, 4, 5, 6 i 10.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Xifrat</emphasis>
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>RAID d'ATA sèrie</emphasis> (emprant <classname>dmraid</classname>)
+  </para><para>
+    També anomenat <quote>RAID fals</quote> o <quote>RAID de BIOS</quote>.
+    De moment, la funció de RAID d'ATA sèrie només està disponible si
+    s'habilita en arrencar l'instal·lador. Podeu trobar més informació
+    <ulink url="&url-d-i-sataraid;">al nostre wiki</ulink>.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Multipath</emphasis> (experimental)
+  </para><para>
+    Vegeu <ulink url="&url-d-i-multipath;">el nostre wiki</ulink> per a més
+    informació. De moment, la funció «multipath» només està disponible si
+    s'habilita en arrencar l'instal·lador.
+  </para></listitem>
+</itemizedlist>
+
+</para><para>
+
+S'admeten els sistemes de fitxers següents.
+
+<itemizedlist>
+  <listitem><para>
+    <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+    <emphasis>ext2</emphasis>,
+    <emphasis>ext3</emphasis>,
+    <emphasis>ext4</emphasis>
+  </para><para>
+    El sistema de fitxers escollit per defecte en la majora dels casos és
+    ext3; per a la partició <filename>/boot</filename> s'escollirà ext2
+    per defecte en crear les particions de forma guiada.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>jfs</emphasis> (no disponible en totes les arquitectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>xfs</emphasis> (no disponible en totes les arquitectures)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>reiserfs</emphasis> (opcional; no disponible en totes les arquitectures)
+  </para><para>
+    El sistema de fitxers Reiser ja no està disponible per defecte. Quan
+    l'instal·lador funciona amb una prioritat mitjana o baixa de Debconf,
+    podeu habilitar-lo escollint el component
+    <classname>partman-reiserfs</classname>. Només s'admet la versió 3 del
+    protocol.
+  </para></listitem>
+  <listitem arch="arm"><para>
+    <emphasis>jffs2</emphasis>
+  </para><para>
+    S'empra en alguns sistemes per a llegir la memòria flaix. No es poden
+    crear noves particions jffs2.
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>qnx4</emphasis>
+  </para><para>
+    Se'n reconeixen les particions existents i és possible assignar-los
+    punts de muntatge. No es poden crear noves particions qnx4.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+  </para></listitem>
+  <listitem arch="x86;ia64"><para>
+    <emphasis>NTFS</emphasis> (només lectura)
+  </para><para>
+    Es pot canviar la mida de les particions NTFS existents i és possible
+    assignar-los punts de muntatge. No es poden crear noves particions NTFS.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
 
    <sect3 id="partman-auto">
    <title>Fer particions de forma guiada</title>
