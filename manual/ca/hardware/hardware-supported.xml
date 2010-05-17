@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56439 -->
+<!-- original version: 61147 -->
 
  <sect1 id="hardware-supported">
  <title>Maquinari suportat</title>
@@ -55,23 +55,21 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 
 <row>
   <entry morerows="4">ARM</entry>
-  <entry>arm</entry>
-  <entry>Netwinder i CATS</entry>
-  <entry>netwinder</entry>
-</row><row>
-  <entry>armel</entry>
-  <entry>Versatile</entry>
-  <entry>versatile</entry>
-</row><row>
-  <entry morerows="2">arm i armel</entry>
+  <entry morerows="4">armel</entry>
   <entry>Intel IOP32x</entry>
   <entry>iop32x</entry>
 </row><row>
   <entry>Intel IXP4xx</entry>
   <entry>ixp4xx</entry>
 </row><row>
+  <entry>Marvell Kirkwood</entry>
+  <entry>kirkwood</entry>
+</row><row>
   <entry>Marvell Orion</entry>
   <entry>orion5x</entry>
+</row><row>
+  <entry>Versatile</entry>
+  <entry>versatile</entry>
 </row>
 
 <row>
@@ -92,8 +90,8 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 </row>
 
 <row>
-  <entry morerows="5">MIPS (big endian)</entry>
-  <entry morerows="5">mips</entry>
+  <entry morerows="3">MIPS (big endian)</entry>
+  <entry morerows="3">mips</entry>
   <entry>SGI IP22 (Indy/Indigo 2)</entry>
   <entry>r4k-ip22</entry>
 </row><row>
@@ -105,12 +103,6 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
 </row><row>
   <entry>MIPS Malta (64 bits)</entry>
   <entry>5kc-malta</entry>
-</row><row>
-  <entry>Broadcom BCM91250A (SWARM)</entry>
-  <entry>sb1-bcm91250a</entry>
-</row><row>
-  <entry>Broadcom BCM91480B (BigSur)</entry>
-  <entry>sb1a-bcm91480b</entry>
 </row>
 
 <row>
@@ -118,12 +110,12 @@ variacions de cada arquitectura conegudes com <quote>sabors</quote>.
   <entry morerows="2">mipsel</entry>
   <entry>Cobalt</entry>
   <entry>cobalt</entry>
+ </row><row>
+  <entry>MIPS Malta (32 bits)</entry>
+  <entry>4kc-malta</entry>
 </row><row>
-  <entry>Broadcom BCM91250A (SWARM)</entry>
-  <entry>sb1-bcm91250a</entry>
-</row><row>
-  <entry>Broadcom BCM91480B (BigSur)</entry>
-  <entry>sb1a-bcm91480b</entry>
+  <entry>MIPS Malta (64 bits)</entry>
+  <entry>5kc-malta</entry>
 </row>
 
 <row>
@@ -164,17 +156,27 @@ Aquest document cobreix la instal·lació per a l'arquitectura
 altra arquitectura suportada per Debian, pegueu una ullada a les pàgines
 dels <ulink url="http://www.debian.org/ports/">ports de Debian</ulink>.
 
-</para><para condition="new-arch">
+</para>
+<caution arch="ia64"><para>
+
+L'arquitectura &arch-title; només suporta porcesadors Intel Itanium
+i no els més comuns procesadors de 64-bit de la familia EM64T (incloent
+p.e. Pentium&nbsp;D i el Core2&nbsp;Duo). Aquest sistemes són suportats
+per l'arquitectura <emphasis>amd64</emphasis> o, si preferiu un espai
+d'usuari de 32-bit, l'arquitectura <emphasis>i386</emphasis>.
+
+</para></caution>
+<para condition="new-arch">
 
 Aquesta és la primera distribució oficial de &debian; per l'arquitectura
-&arch-title;.  Ha estat suficientment provada per ser alliberada.
+&arch-title;. Ha estat suficientment provada per ser alliberada.
 Tanmateix, com que no ha estat exposada (i per tant provada pels usuaris)
 a alguna de les arquitectures, podeu trobar algunes errades. Utilitzeu el
 nostre <ulink url="&url-bts;">Sistema de seguiment d'errors</ulink> per
 informar de qualsevol problema; assegureu-vos d'anomenar el fet que
 l'error és a la plataforma &arch-title;. També pot utilitzar-se si és
 necessari la <ulink url="&url-list-subscribe;">llista de correu
-debian-&architecture;</ulink>.
+debian-&arch-listname;</ulink>.
 
 </para>
 
@@ -322,19 +324,7 @@ dels busos, targetes, monitors i dispositius senyaladors a
 
 <!-- FIXME: mention explicit graphics chips and not system names -->
 El sistema de finestres X.Org X11 tan sols està suportat als SGI Indy
-i als 02. Les plaques d'avaluació Broadcom BCM91250A i BCM91489B
-tenen ranures PCI 3.3v estàndard i suporten emulació VGA o framebuffer
-de Linux a un rang seleccionat de targetes gràfiques. Hi ha disponible una
-<ulink url="&url-bcm91250a-hardware;">llista de compatibilitats</ulink>
-per les plaques Broadcom.
-
-</para><para arch="mipsel">
-
-Les plaques d'avaluació Broadcom BCM91250A i BCM91489B tenen ranures
-PCI 3.3v estàndard i suporten emulació VGA o framebuffer de Linux a un
-rang seleccionat de targetes gràfiques. Hi ha disponible una
-<ulink url="&url-bcm91250a-hardware;">llista de compatibilitats</ulink>
-per les plaques Broadcom.
+i als O2.
 
 </para><para arch="sparc">
 
@@ -366,6 +356,7 @@ sistema.
   </sect2>
 
 &network-cards.xml;
+&accessibility-hardware.xml;
 &supported-peripherals.xml;
 
  </sect1>
