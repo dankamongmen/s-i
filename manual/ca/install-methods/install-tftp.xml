@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 56425 -->
+<!-- original version: 62454 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparació dels fitxers per a l'arrencada en xarxa TFTP</title>
@@ -55,34 +55,33 @@ SunOS 4.x, el SunOS 5.x (i.e. Solaris), i el GNU/Linux.
 
 <note arch="x86"><para>
 
-El mètode PXE d'arrencada TFTP, o entorn d'execució d'arrencada prèvia,
-requereix un servidor TFTP que permeta l'ús de <userinput>tsize</userinput>.
-En un servidor &debian;, els paquets <classname>atftpd</classname> i
-<classname>tftpd-hpa</classname> són adients; és recomanable el
-<classname>tftpd-hpa</classname>.
+Per a un servidor &debian; es recomana <classname>tftpd-hpa</classname>.
+Ha estat escrit pel mateix autor del carregador d'arrencada
+<classname>syslinux</classname> i és per tant el que menys problemes
+deuria de donar. Una bona alternativa és <classname>atftpd</classname>.
 
 </para></note>
 
 </para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
 
   <sect2 id="tftpd">
   <title>Habilitació del servidor TFTP</title>
 <para>
 
 Per a posar en marxa el servidor TFTP, assegureu-vos primer que teniu
-activat el <command>tftpd</command>. Per fer-ho, el fitxer
-<filename>/etc/inetd.conf</filename> ha de tenir quelcom semblant a la
-línia següent:
+activat el <command>tftpd</command>.
 
-<informalexample><screen>
-tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
+</para><para>
 
-Els paquets Debian solen configurar-ho per defecte correctament.
+En el cas de <classname>tftpd-hpa</classname> hi ha dues formes d'executar el
+servei. Por ser iniciat sota demanda pel dimoni <classname>inetd</classname>
+del sistema, o es pot configurar per a executar com un dimoni independent.
+El mètode a emprar és seleccionat en instal·lar el paquet i pot ser canviat
+reconfigurant aquest.
 
 </para>
 <note><para>
@@ -99,10 +98,6 @@ conseqüència.
 </para></note>
 <para>
 
-Vegeu el fitxer <filename>/etc/inetd.conf</filename> i recordeu el directori
-que s'utilitza com a paràmetre del <command>in.tftpd</command><footnote>
-
-<para>
 Totes les alternatives de l'<command>in.tftpd</command> que hi ha a Debian
 per defecte haurien d'enregistrar les peticions TFTP al registre del
 sistema. Algunes d'elles suporten un paràmetre <userinput>-v</userinput>
@@ -110,14 +105,6 @@ per mostrar una sortida més detallada.
 Es recomana que comproveu aquests missatges registrats en el cas que patiu
 problemes d'arrencada com a punt d'inici al diagnòstic de la causa dels 
 problemes.
-</para>
-
-</footnote>; ho necessitareu després.
-Si heu canviat <filename>/etc/inetd.conf</filename>, haureu de notificar-ho
-al procés <command>inetd</command> que s'està executant. En màquines Debian,
-executeu <userinput>/etc/init.d/inetd reload</userinput>; en d'altres,
-esbrineu la identitat (ID) del procés <command>inetd</command> i executeu
-<userinput>kill -HUP <replaceable>pid-d'inetd</replaceable></userinput>.
 
 </para><para arch="mips">
 
@@ -255,16 +242,6 @@ En màquines SGI, el <command>bootpd</command> proporciona el nom del
 fitxer TFTP. Es dóna o com a <userinput>bf=</userinput> en
 <filename>/etc/bootptab</filename> o com a opció
 <userinput>filename=</userinput> en <filename>/etc/dhcpd.conf</filename>.
-
-</para>
-   </sect3>
-
-   <sect3 arch="mips">
-   <title>Arrencada TFTP dels Broadcom BCM91250A i BCM91480B</title>
-<para>
-
-No cal que configureu el DHCP de manera especial perquè passareu el
-camí complet del fitxer per carregar-lo al CFE.
 
 </para>
    </sect3>
