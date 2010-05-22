@@ -175,7 +175,10 @@ check_for_firmware() {
 
 while check_missing && ask_load_firmware; do
 	# first, check if needed firmware (u)debs are available on the
-	# installation CD.
+	# PXE initrd or the installation CD.
+	if [ -d /firmware ]; then
+		check_for_firmware /firmware/*.deb /firmware/*.udeb
+	fi
 	if [ -d /cdrom/firmware ]; then
 		check_for_firmware /cdrom/firmware/*.deb /cdrom/firmware/*.udeb
 	fi
