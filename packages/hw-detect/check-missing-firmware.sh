@@ -174,7 +174,13 @@ check_for_firmware() {
 }
 
 while check_missing && ask_load_firmware; do
-	# first, look for loose firmware files on the media.
+	# first, check if needed firmware (u)debs are available on the
+	# installation CD.
+	if [ -d /cdrom/firmware ]; then
+		check_for_firmware /cdrom/firmware/*.deb /cdrom/firmware/*.udeb
+	fi
+
+	# second, look for loose firmware files on the media device.
 	if mountmedia; then
 		for file in $files; do
 			try_copy "$file"
@@ -182,6 +188,7 @@ while check_missing && ask_load_firmware; do
 		umount /media || true
 	fi
 
+	# last, look for firmware (u)debs on the media device
 	if mountmedia driver; then
 		check_for_firmware /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude
 		umount /media || true
