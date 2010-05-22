@@ -21,6 +21,7 @@ didir=$(DESTDIR)/lib/debian-installer.d
 fidir=$(DESTDIR)/usr/lib/finish-install.d
 sharedir=$(DESTDIR)/usr/share/hw-detect/
 postbaseinstallerdir=$(DESTDIR)/usr/lib/post-base-installer.d/
+prepkgseldir=$(DESTDIR)/usr/lib/pre-pkgsel.d/
 
 INSTALL=install
 INSTALL_DATA = ${INSTALL} -m 644
@@ -49,6 +50,8 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 	$(INSTALL) check-missing-firmware.sh $(bindir)/check-missing-firmware
 	$(INSTALL) -d $(postbaseinstallerdir)
 	$(INSTALL) hw-detect.post-base-installer.d/* $(postbaseinstallerdir)
+	$(INSTALL) -d $(prepkgseldir)
+	$(INSTALL) hw-detect.pre-pkgsel.d/* $(prepkgseldir)
 	$(INSTALL) -d $(hpdir)/net
 	$(INSTALL) net-hotplug.sh $(hpdir)/net/hw-detect.hotplug
 	$(INSTALL) -d $(fidir)
