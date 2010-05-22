@@ -91,7 +91,7 @@ try_copy () {
 			log "copying loose file $file from '$(dirname $f)' to '$target'"
 			mkdir -p "$target"
 			rm -f "$target/$file"
-			cp -a "$f" "$target" || true
+			cp -aL "$f" "$target" || true
 			break
 		fi
 	done
@@ -150,7 +150,7 @@ install_firmware_pkg () {
 	if echo "$1" | grep -q '\.deb$'; then
 		# cache deb for installation into /target later
 		mkdir -p /var/cache/firmware/
-		cp -a "$1" /var/cache/firmware/ || true
+		cp -aL "$1" /var/cache/firmware/ || true
 		udpkg --unpack "/var/cache/firmware/$(basename "$1")"
 	else
 		udpkg --unpack "$1"
