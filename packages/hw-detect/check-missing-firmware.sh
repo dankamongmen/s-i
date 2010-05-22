@@ -157,6 +157,9 @@ install_firmware_pkg () {
 	fi
 }
 
+# Try to load udebs (or debs) that contain the missing firmware.
+# This does not use anna because debs can have arbitrary
+# dependencies, which anna might try to install.
 check_for_firmware() {
 	echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
 	for filename in $@; do
@@ -179,9 +182,6 @@ while check_missing && ask_load_firmware; do
 		umount /media || true
 	fi
 
-	# Try to load udebs (or debs) that contain the missing firmware.
-	# This does not use anna because debs can have arbitrary
-	# dependencies, which anna might try to install.
 	if mountmedia driver; then
 		check_for_firmware /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude
 		umount /media || true
