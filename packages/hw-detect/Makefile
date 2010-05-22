@@ -1,5 +1,7 @@
 DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS 2>/dev/null)
+DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
 # Take account of old dpkg-architecture output.
 ifeq ($(DEB_HOST_ARCH_OS),)
@@ -10,6 +12,9 @@ ifeq ($(DEB_HOST_ARCH_OS),)
 endif
 
 CC = gcc
+ifneq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+export CC=$(DEB_HOST_GNU_TYPE)-gcc
+endif
 CFLAGS = -W -Wall -Os -g
 CFLAGS_ARCH = -DCPU_TEXT='"$(DEB_HOST_ARCH)"'
 
