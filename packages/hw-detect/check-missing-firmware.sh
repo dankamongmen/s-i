@@ -157,6 +157,19 @@ install_firmware_pkg () {
 	fi
 }
 
+check_for_firmware() {
+	echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
+	for filename in $@; do
+		if [ -f "$filename" ]; then
+			if check_deb_arch "$filename" && list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
+				log "installing firmware package $filename"
+				install_firmware_pkg "$filename" || true
+			fi
+		fi
+	done
+	rm -f /tmp/grepfor
+}
+
 while check_missing && ask_load_firmware; do
 	# first, look for loose firmware files on the media.
 	if mountmedia; then
@@ -170,16 +183,7 @@ while check_missing && ask_load_firmware; do
 	# This does not use anna because debs can have arbitrary
 	# dependencies, which anna might try to install.
 	if mountmedia driver; then
-		echo "$files" | sed -e 's/ /\n/g' >/tmp/grepfor
-		for filename in /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude; do
-			if [ -f "$filename" ]; then
-				if check_deb_arch "$filename" && list_deb_firmware "$filename" | grep -qf /tmp/grepfor; then
-					log "installing firmware package $filename"
-					install_firmware_pkg "$filename" || true
-				fi
-			fi
-		done
-		rm -f /tmp/grepfor
+		check_for_firmware /media/*.deb /media/*.udeb /media/*.ude /media/firmware/*.deb /media/firmware/*.udeb /media/firmware/*.ude
 		umount /media || true
 	fi
 
