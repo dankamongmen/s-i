@@ -146,12 +146,35 @@ check_deb_arch () {
 	[ "$arch" = all ] || [ "$arch" = "$(udpkg --print-architecture)" ]
 }
 
+# Remove non-accepted firmware package
+remove_pkg() {
+	pkgname="$1"
+	# Remove all files listed in /var/lib/dpkg/info/$pkgname.md5sum
+	for file in $(cut -d" " -f 2- /var/lib/dpkg/info/$pkgname.md5sum) ; do
+		rm /$file
+	done
+}
+
 install_firmware_pkg () {
 	if echo "$1" | grep -q '\.deb$'; then
 		# cache deb for installation into /target later
 		mkdir -p /var/cache/firmware/
 		cp -aL "$1" /var/cache/firmware/ || true
-		udpkg --unpack "/var/cache/firmware/$(basename "$1")"
+		filename="$(basename "$1")"
+		pkgname="$(echo $filename |cut -d_ -f1)"
+		udpkg --unpack "/var/cache/firmware/$filename"
+		if [ -f /var/lib/dpkg/info/$pkgname.preinst ] ; then
+			# Run preinst script to see if the firmware
+			# license is accepted Exit code of preinst
+			# decide if the package should be installed or
+			# not.
+			if /var/lib/dpkg/info/$pkgname.preinst ; then
+				:
+			else
+				remove_pkg "$pkgname"
+				rm "/var/cache/firmware/$filename"
+			fi
+		fi
 	else
 		udpkg --unpack "$1"
 	fi
