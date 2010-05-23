@@ -42,7 +42,7 @@ clean:
 	rm -f archdetect
 	rm -f devnames-static.gz
 
-install: install-hw-detect install-ethdetect install-disk-detect install-archdetect install-archdetect-deb
+install: install-hw-detect install-ethdetect install-disk-detect install-driver-injection-disk-detect install-archdetect install-archdetect-deb
 
 install-hw-detect: hw-detect.sh
 	$(INSTALL) -d $(bindir)
@@ -82,6 +82,10 @@ install-ethdetect: ethdetect.sh
 install-disk-detect: disk-detect.sh
 	$(INSTALL) -d $(bindir)
 	$(INSTALL) disk-detect.sh $(bindir)/disk-detect
+
+install-driver-injection-disk-detect: driver-injection-disk.sh
+	$(INSTALL) -d $(bindir)
+	$(INSTALL) driver-injection-disk.sh $(bindir)/driver-injection-disk
 
 install-archdetect: archdetect
 	$(INSTALL) -d $(bindir)
