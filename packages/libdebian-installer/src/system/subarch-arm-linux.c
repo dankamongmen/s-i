@@ -24,6 +24,7 @@ static struct map map_hardware[] = {
     { "Marvell DB-88F6281-BP Development Board", "kirkwood" },
     { "Marvell RD-88F6192-NAS Development Board", "kirkwood" },
     { "Marvell RD-88F6281 Reference Board", "kirkwood" },
+    { "Marvell GuruPlug Reference Board", "kirkwood" },
     { "Marvell OpenRD Base Board", "kirkwood" },
     { "Marvell OpenRD Client Board", "kirkwood" },
     { "Marvell SheevaPlug Reference Board", "kirkwood" },
