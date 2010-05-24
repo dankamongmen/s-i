@@ -28,6 +28,7 @@ static struct map map_hardware[] = {
     { "Marvell OpenRD Base Board", "kirkwood" },
     { "Marvell OpenRD Client Board", "kirkwood" },
     { "Marvell SheevaPlug Reference Board", "kirkwood" },
+    { "Marvell eSATA SheevaPlug Reference Board", "kirkwood" },
     { "QNAP TS-119/TS-219", "kirkwood" },
     { "QNAP TS-41x", "kirkwood" },
     { "Buffalo/Revogear Kurobox Pro", "orion5x" },
