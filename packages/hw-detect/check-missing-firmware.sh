@@ -221,7 +221,9 @@ while check_missing && ask_load_firmware; do
 	fi
 
 	# remove and reload modules so they see the new firmware
-	for module in $modules; do
+	# Sort to only reload a given module once if it ask for more
+	# than one firmware file (example iwlagn)
+	for module in $(echo $modules | tr " " "\n" | sort -u); do
 		modprobe -r $module || true
 		modprobe $module || true
 	done
