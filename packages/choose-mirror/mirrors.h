@@ -5,7 +5,7 @@
  */
 struct mirror_t {
 	char *site;
-	char *country;
+	char *country; /* NULL for GeoDNS */
 	char *root;
 };
 

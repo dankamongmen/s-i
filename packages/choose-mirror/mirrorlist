@@ -80,12 +80,13 @@ for (my $id = 0; $id < @data; $id++) {
 	}
 }
 
-# Poor man's mirror rating system: push-primary, push* (-secondary), others
+# Poor man's mirror rating system: push-primary, push* (-secondary), geodns, others
 foreach my $id (0..$#data) {
 	my $rating=0;
 	if (exists $data[$id]->{type}) {
-	        $rating=1 if $data[$id]->{type} =~ /push/i;
-                $rating=2 if $data[$id]->{type} =~ /push-primary/i;
+	        $rating=1 if $data[$id]->{type} =~ /geodns/i;
+	        $rating=2 if $data[$id]->{type} =~ /push/i;
+                $rating=3 if $data[$id]->{type} =~ /push-primary/i;
         }
 	$data[$id]->{rating}=$rating;
 }
@@ -132,13 +133,19 @@ else {
 	print OUT "static struct mirror_t mirrors_$type\[] = {\n";
 	my $q='"';
 	foreach my $id (sort { $data[$b]->{rating} <=> $data[$a]->{rating} } 0..$#data) {
-		next unless exists $data[$id]->{"archive-$type"} and
-			    exists $data[$id]->{country};
+		my $cc;
+		if (exists $data[$id]->{type} && $data[$id]->{type} =~/geodns/i) {
+			$cc='NULL';
+		}
+		else {
+			$cc=$q.$data[$id]->{country}.$q;
+		}
+		next unless exists $data[$id]->{"archive-$type"} and defined $cc;
 		if (! exists $data[$id]->{'archive-architecture'}) {
 			print STDERR "warning: missing archive-architecture for mirror ".$data[$id]->{site}."; assuming it contains all architectures.\n";
 		}
 		print OUT "\t{",
-			  join(", ", $q.$data[$id]->{site}.$q, $q.$data[$id]->{country}.$q,
+			  join(", ", $q.$data[$id]->{site}.$q, $cc,
 				$q.$data[$id]->{"archive-$type"}.$q),
 			  "},\n";
 	}

@@ -83,19 +83,21 @@ static struct mirror_t *mirror_list(void) {
 	return 0; // should never happen
 }
 
-/* Returns an array of hostnames of mirrors in the specified country. */
+/* Returns an array of hostnames of mirrors in the specified country
+ * or using GeoDNS. */
 static char **mirrors_in(char *country) {
 	static char **ret;
 	int i, j, num = 1;
 	struct mirror_t *mirrors = mirror_list();
 
 	ret = malloc(num * sizeof(char *));
-	for (i = j = 0; mirrors[i].country != NULL; i++) {
+	for (i = j = 0; mirrors[i].site != NULL; i++) {
 		if (j == num - 1) {
 			num *= 2;
 			ret = realloc(ret, num * sizeof(char*));
 		}
-		if (strcmp(mirrors[i].country, country) == 0)
+		if (! mirrors[i].country ||
+		    strcmp(mirrors[i].country, country) == 0)
 			ret[j++] = mirrors[i].site;
 	}
 	ret[j] = NULL;
