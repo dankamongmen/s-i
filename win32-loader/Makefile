@@ -39,7 +39,7 @@ GRUB_MODULES	+= minicmd cat cpuid chain halt help ls reboot
 all: win32-loader.exe g2ldr g2ldr.mbr
 
 core.img:
-	grub-mkimage -o $@ --prefix /win32-loader $(GRUB_MODULES)
+	grub-mkimage --output=$@ --prefix=/win32-loader --format=i386-pc $(GRUB_MODULES)
 
 g2ldr: /usr/lib/grub/i386-pc/g2hdr.bin core.img
 	cat $^ > $@
