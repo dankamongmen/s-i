@@ -21,6 +21,7 @@ static struct map map_hardware[] = {
     { "Freescale MX51 Babbage Board", "imx51" }, /* iMX51 reference hardware. */
     { "ADS" , "ads" }, /* Matches only ADS boards. Put any exceptions before. */
     { "Applied Data Systems" , "ads" }, /* More ADS boards. */
+    { "HP t5325 Thin Client", "kirkwood" },
     { "Marvell DB-88F6281-BP Development Board", "kirkwood" },
     { "Marvell RD-88F6192-NAS Development Board", "kirkwood" },
     { "Marvell RD-88F6281 Reference Board", "kirkwood" },
