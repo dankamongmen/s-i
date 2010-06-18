@@ -8,6 +8,10 @@ ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
 TERMNAMES += c/cons25
 endif
 
+ifeq ($(DEB_HOST_ARCH_OS),hurd)
+TERMNAMES += h/hurd
+endif
+
 TERMS = $(foreach term,$(TERMNAMES),\
           $(firstword $(wildcard /lib/terminfo/$(term)) \
                       $(wildcard /usr/share/terminfo/$(term))))
