@@ -51,6 +51,7 @@ ifeq ($(DEB_HOST_ARCH_OS),linux)
 
   ifneq (,$(filter arm armel,$(DEB_HOST_ARCH_CPU)))
     files += \
+	S40framebuffer-module-linux-armel \
 	S80anna-install-armel \
 	S99signal-status
   endif

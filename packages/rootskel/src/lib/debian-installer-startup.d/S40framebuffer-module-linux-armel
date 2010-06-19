@@ -1,0 +1,16 @@
+if [ -n "$TERM_FRAMEBUFFER_TRY" ] && \
+   [ "$(debconf-get debian-installer/framebuffer)" = true ]; then
+	echo "Trying to enable the frame buffer..."
+	if [ ! -d /sys/class/graphics/fbcon ]; then
+		modprobe -q fbcon >/dev/null 2>&1
+	fi
+
+	# Put the fb modules in the ramdisk so users can see the boot process
+	machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
+	case "$machine" in
+		"HP t5325 Thin Client" | "Marvell OpenRD Client Board" | "Marvell OpenRD Ultimate Board")
+			register-module -i xgifb
+	esac
+	register-module -i fbcon
+fi
+
