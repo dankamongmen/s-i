@@ -52,6 +52,11 @@ static struct cpu system_malta_cpu[] = {
 	{ NULL, "unknown" }
 };
 
+static struct cpu system_loongson2_cpu[] = {
+	{ "ICT Loongson-2 V0.2", "loongson-2e" },
+	{ "ICT Loongson-2 V0.3", "loongson-2f" },
+};
+
 /* add new system types here */
 
 static struct cpu system_unknown_cpu[] = {
@@ -73,6 +78,8 @@ static struct systype system_type[] = {
 	{"Broadcom BCM947XX", system_bcm_bcm947xx_cpu }, /* Broadcom based APs/NAS */
 	{"Qemu", system_qemu_cpu },
 	{"MIPS Malta", system_malta_cpu },
+	{"lemote-", system_loongson2_cpu },
+	{"dexxon-gdium-2f", system_loongson2_cpu },
 	{ NULL, system_unknown_cpu }
 };
 
