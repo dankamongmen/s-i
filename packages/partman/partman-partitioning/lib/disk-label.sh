@@ -31,7 +31,7 @@ default_disk_label () {
 		echo msdos;;
 	    ia64)
 		echo gpt;;
-	    i386|kfreebsd-i386)
+	    i386|kfreebsd-i386|hurd-i386)
 		case "$sub" in
 		    mac)
 			echo gpt;;
