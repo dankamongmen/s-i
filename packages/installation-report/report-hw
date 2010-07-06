@@ -46,7 +46,15 @@ if type prtconf >/dev/null 2>&1 ; then
 	prtconf 2>&1 | addinfo "prtconf"
 fi
 
-lsmod 2>&1 | addinfo lsmod
+# On GNU/Linux
+if type lsmod > /dev/null 2>&1 ; then
+	lsmod 2>&1 | addinfo "lsmod"
+fi
+# On GNU/kFreeBSD
+if type kldstat > /dev/null 2>&1 ; then
+	kldstat 2>&1 | addinfo "kldstat"
+fi
+
 df 2>&1 | addinfo df
 free 2>&1 | addinfo free
 
