@@ -56,10 +56,17 @@ for dev in $DEVICES/*; do
 				label=$(cat $id/label | \
 					sed 's/\(............\).*/\1/g')
 			fi
+
+			reserved=''
+			if [ -f $id/reserved_for_root ]; then
+				reserved=$(cat $id/reserved_for_root)
+			fi
+
 			code=0
 			# Ensure label is quoted correctly
 			log-output -t partman --pass-stdout \
 				mkfs.ufs ${label:+-L "$label"} \
+					 ${reserved:+-m $reserved} \
 					 $device >/dev/null || code=$?
 			sync
 			db_progress STOP
