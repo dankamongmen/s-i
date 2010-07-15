@@ -221,11 +221,15 @@ the system to hang in the necessary ip_address step that comes next.
 You will need to hit Ctrl-C again to interrupt the boot. Then:
 
 <informalexample><screen>
-ip_address -l 192.168.2.249 -h 192.168.2.4
+ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable>
 load -v -r -b 0x01800000 -m http /initrd.gz
 load -v -r -b 0x01008000 -m http /zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
+
+Where <replaceable>192.168.2.249</replaceable> is the IP address of the
+installed system and <replaceable>192.168.2.4</replaceable> the IP address
+of the HTTP server containing the kernel and ramdisk files.
 
 </para><para>
 
