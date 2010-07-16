@@ -1,4 +1,4 @@
-<!-- original version: 62875 -->
+<!-- original version: 63942 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Amorcer à partir de TFTP</title>
 &boot-installer-intro-net.xml;
@@ -219,11 +219,15 @@ Vous devez encore exécuter un Ctrl-C pour interrompre l'amorçage,
 puis :
 
 <informalexample><screen>
-ip_address -l 192.168.2.249 -h 192.168.2.4
+ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable>
 load -v -r -b 0x01800000 -m http /initrd.gz
 load -v -r -b 0x01008000 -m http /zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
+
+où <replaceable>192.168.2.249</replaceable> est l'adresse IP du
+système installé et <replaceable>192.168.2.4</replaceable> l'adresse IP
+du serveur HTTP qui possède le noyau et les fichiers pour le disque mémoire.
 
 </para>
 <para>
