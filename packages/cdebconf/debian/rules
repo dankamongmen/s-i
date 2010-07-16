@@ -28,12 +28,6 @@ ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	DEBUG_CONFIGURE_OPT=--with-debug=yes
 endif
 
-# Ugly hack to omit dependency for s390 as that has rootskel-gtk on not-for-us
-GTK_DEPENDS =
-ifneq ($(ARCH), s390)
-GTK_DEPENDS = rootskel-gtk
-endif
-
 build: build-deb build-udeb
 
 $(debbuild)/config.status:
@@ -122,7 +116,7 @@ binary-arch: install-arch
 	dh_makeshlibs -s --add-udeb=libdebconfclient0-udeb
 	dh_installdeb -s
 	dh_shlibdeps -s
-	dh_gencontrol -s -- -Vgtk:Depends="$(GTK_DEPENDS)"
+	dh_gencontrol -s
 	dh_md5sums -s
 	dh_builddeb -s
 
