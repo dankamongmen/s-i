@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-01 22:47+0000\n"
+"POT-Creation-Date: 2010-07-17 06:23+0000\n"
 "PO-Revision-Date: 2010-07-12 04:52-0300\n"
 "Last-Translator: Felipe Augusto van de Wiel (faw) <faw@debian.org>\n"
 "Language-Team: Brazilian Portuguese <debian-l10n-portuguese@lists.debian."
@@ -3341,9 +3341,13 @@ msgstr "Sistema de arquivos com \"journaling\" ext4"
 #. Type: boolean
 #. Description
 #. :sl4:
+#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
+#. Type: boolean
+#. Description
+#. :sl3:
 #: ../partman-ext3.templates:7001 ../partman-ext3.templates:8001
 #: ../partman-ext2r0.templates:9001 ../partman-ext2r0.templates:10001
-#: ../partman-ext2r0.templates:11001
+#: ../partman-ext2r0.templates:11001 ../partman-ufs.templates:6001
 msgid "Go back to the menu and correct this problem?"
 msgstr "Voltar ao menu e corrigir esse problema?"
 
@@ -3425,6 +3429,96 @@ msgstr ""
 #. Type: text
 #. Description
 #. :sl2:
+#. File system name
+#: ../partman-btrfs.templates:2001
+#, fuzzy
+#| msgid "Ext3 journaling file system"
+msgid "btrfs journaling file system"
+msgstr "Sistema de arquivos com \"journaling\" ext3"
+
+#. Type: error
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:4001
+msgid "btrfs root file system not supported without separate /boot"
+msgstr ""
+
+#. Type: error
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:4001
+#, fuzzy
+#| msgid ""
+#| "Your root file system is a JFS file system. This can cause problems with "
+#| "the boot loader used by default by this installer."
+msgid ""
+"Your root file system is a btrfs file system. This is not supported by the "
+"boot loader used by default by this installer."
+msgstr ""
+"Seu sistema de arquivos raiz é um sistema de arquivos JFS. Isso pode causar "
+"problemas com o carregador de inicialização utilizado por padrão por este "
+"instalador."
+
+#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
+#. Type: error
+#. Description
+#. :sl2:
+#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
+#. Type: boolean
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:4001 ../partman-jfs.templates:4001
+msgid ""
+"You should use a small /boot partition with another file system, such as "
+"ext3."
+msgstr ""
+"Você deveria usar uma pequena partição /boot com um outro sistema de "
+"arquivos, como o ext3."
+
+#. Type: error
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:5001
+#, fuzzy
+#| msgid "Use unsupported file system type for /boot?"
+msgid "btrfs file system not supported for /boot"
+msgstr ""
+"Usar tipo de sistema de arquivos para o qual não há suporte para /boot?"
+
+#. Type: error
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:5001
+#, fuzzy
+#| msgid ""
+#| "You have mounted a JFS file system as /boot. This is likely to cause "
+#| "problems with the boot loader used by default by this installer."
+msgid ""
+"You have mounted a btrfs file system as /boot. This is not supported by the "
+"boot loader used by default by this installer."
+msgstr ""
+"Você montou um sistema de arquivos JFS como /boot. Isso provavelmente "
+"causará problemas com o carregador de inicialização utilizado por padrão por "
+"este instalador."
+
+#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
+#. Type: error
+#. Description
+#. :sl2:
+#. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
+#. Type: boolean
+#. Description
+#. :sl2:
+#: ../partman-btrfs.templates:5001 ../partman-jfs.templates:5001
+msgid ""
+"You should use another file system, such as ext3, for the /boot partition."
+msgstr ""
+"Você deveria usar um outro sistema de arquivos, como ext3, para a partição /"
+"boot."
+
+#. Type: text
+#. Description
+#. :sl2:
 #. File system name (untranslatable in many languages)
 #: ../partman-reiserfs.templates:1001
 msgid "ReiserFS"
@@ -3468,17 +3562,6 @@ msgstr ""
 #. Type: boolean
 #. Description
 #. :sl2:
-#: ../partman-jfs.templates:4001
-msgid ""
-"You should use a small /boot partition with another file system, such as "
-"ext3."
-msgstr ""
-"Você deveria usar uma pequena partição /boot com um outro sistema de "
-"arquivos, como o ext3."
-
-#. Type: boolean
-#. Description
-#. :sl2:
 #: ../partman-jfs.templates:5001
 msgid "Use unrecommended JFS /boot file system?"
 msgstr "Usar sistema de arquivos JFS não recomendado para /boot?"
@@ -3494,16 +3577,6 @@ msgstr ""
 "Você montou um sistema de arquivos JFS como /boot. Isso provavelmente "
 "causará problemas com o carregador de inicialização utilizado por padrão por "
 "este instalador."
-
-#. Type: boolean
-#. Description
-#. :sl2:
-#: ../partman-jfs.templates:5001
-msgid ""
-"You should use another file system, such as ext3, for the /boot partition."
-msgstr ""
-"Você deveria usar um outro sistema de arquivos, como ext3, para a partição /"
-"boot."
 
 #. Type: text
 #. Description
@@ -4630,7 +4703,8 @@ msgstr ""
 "como um dispositivo em /dev. Alguns exemplos são:\n"
 " - \"(hd0)\" ou \"/dev/hda\" instalará o GRUB no registro mestre de\n"
 "   inicialização de seu primeiro disco rígido (IDE);\n"
-" - \"(hd0,1)\" ou \"/dev/hda2\" utilizará a segunda partição de seu primeiro\n"
+" - \"(hd0,1)\" ou \"/dev/hda2\" utilizará a segunda partição de seu "
+"primeiro\n"
 "   disco IDE;\n"
 " - \"(hd2,4)\" ou \"/dev/sdc5\" utilizará a primeira partição estendida de\n"
 "   seu terceiro disco (aqui SCSI);\n"
@@ -4788,8 +4862,8 @@ msgstr "Falha ao executar comando pré-configurado"
 msgid ""
 "Execution of preseeded command \"${COMMAND}\" failed with exit code ${CODE}."
 msgstr ""
-"A execução do comando pré-configurado \"${COMMAND}\" falhou com o código "
-"de saída ${CODE}."
+"A execução do comando pré-configurado \"${COMMAND}\" falhou com o código de "
+"saída ${CODE}."
 
 #. Type: title
 #. Description
@@ -4883,8 +4957,8 @@ msgid ""
 "will have to mount those yourself."
 msgstr ""
 "Após esta mensagem, um shell com ${DEVICE} montado em \"/\" lhe será "
-"fornecido. Se você precisar de outros sistemas de arquivos (como um \"/usr"
-"\" separado) você terá que montá-los manualmente."
+"fornecido. Se você precisar de outros sistemas de arquivos (como um \"/usr\" "
+"separado) você terá que montá-los manualmente."
 
 #. Type: text
 #. Description
