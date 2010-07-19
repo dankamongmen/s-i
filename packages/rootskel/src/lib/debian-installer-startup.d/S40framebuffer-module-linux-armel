@@ -6,11 +6,16 @@ if [ -n "$TERM_FRAMEBUFFER_TRY" ] && \
 	fi
 
 	# Put the fb modules in the ramdisk so users can see the boot process
-	machine=$(grep "^Hardware" /proc/cpuinfo | sed 's/Hardware\s*:\s*//')
-	case "$machine" in
-		"HP t5325 Thin Client" | "Marvell OpenRD Client Board" | "Marvell OpenRD Ultimate Board")
-			register-module -i xgifb
-	esac
-	register-module -i fbcon
+	if [ -d /sys/class/graphics/fb0 ]; then
+		if [ "$(cat /sys/class/graphics/fb0/name)" = "udlfb" ]; then
+			register-module -i udlfb
+		else
+			driver=$(basename $(readlink /sys/class/graphics/fb0/device/driver))
+			register-module -i "$driver"
+		fi
+		register-module -i fbcon
+	else
+		echo "Failed to enable frame buffer."
+	fi
 fi
 
