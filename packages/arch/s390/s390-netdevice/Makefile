@@ -19,12 +19,12 @@ STRIPTOOL=strip
 STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
 
-all: netdevice
+all: postinst
 
-netdevice: netdevice.c
+postinst: netdevice.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	$(STRIP) $@
 
 clean:
-	rm -f netdevice
+	rm -f postinst
 
