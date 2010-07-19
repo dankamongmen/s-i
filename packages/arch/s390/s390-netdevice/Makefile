@@ -12,18 +12,14 @@ LDFLAGS := -ldebconfclient -ldebian-installer -lsysfs
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 CFLAGS += -g
-STRIP = /bin/true
 else
 CFLAGS += -fomit-frame-pointer
-STRIPTOOL=strip
-STRIP = $(STRIPTOOL) --remove-section=.note --remove-section=.comment
 endif
 
 all: postinst
 
 postinst: netdevice.c
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-	$(STRIP) $@
 
 clean:
 	rm -f postinst
