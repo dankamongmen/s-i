@@ -200,7 +200,7 @@ get_default_menu_item(di_slist *list)
 		}
 		if (p->installer_menu_item < last_successful_item &&
 		    di_hash_table_lookup(seen_items, &p->p.key)) {
-			//di_log(DI_LOG_LEVEL_DEBUG, "menu item is before last_successful_item, and is not new");
+			//di_log(DI_LOG_LEVEL_DEBUG, "menu item (%d) is before last_successful_item (%d), and is not new", p->installer_menu_item, last_successful_item);
 			continue;
 		}
 		/* If menutest says this item should be default, make it so */
