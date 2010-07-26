@@ -57,6 +57,10 @@ mkdir -p /live/installer
 cd /live/installer
 zcat $IMAGE | cpio -id > /dev/null 2>&1
 
+# Bindmount installer media
+mkdir -p /live/installer/cdrom
+mount -o bind /live/image /live/installer/cdrom
+
 # Bindmount pseudo filesytem
 mount -o bind /dev /live/installer/dev
 mount -o bind /dev/pts /live/installer/dev/pts
