@@ -10,6 +10,10 @@ get_mem () {
 }
 
 check_gtk () {
+	if [ -n "$LIVE_INSTALLER_MODE" ]; then
+		return 0
+	fi
+
 	if [ -z "$TERM_FRAMEBUFFER" ] ; then
 		echo "Framebuffer not available; disabling graphical frontend" >&2
 		return 1
