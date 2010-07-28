@@ -36,6 +36,8 @@ trap 'cleanup' EXIT HUP INT QUIT TERM
 
 if [ -z $FRONTEND ] || [ -z $PRIORITY ]; then
 	/usr/share/live-installer-launcher/debconf.sh
+else
+	. /usr/share/debconf/confmodule
 fi
 
 # Source configuration found by debconf
@@ -56,6 +58,8 @@ mkdir -p /live/installer
 # Unpack the initrd
 cd /live/installer
 zcat $IMAGE | cpio -id > /dev/null 2>&1
+
+/usr/share/live-installer-launcher/debconf2.sh
 
 # Bindmount installer media
 mkdir -p /live/installer/cdrom

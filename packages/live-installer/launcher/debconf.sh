@@ -11,8 +11,6 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-db_version 2.0
-
 db_input critical live-installer-launcher/mode || true
 db_go
 
