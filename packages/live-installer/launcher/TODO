@@ -9,28 +9,3 @@ In order to work properly, live-installer-launcher needs the following udebs:
   - rootskel-gtk >= 1.20 (gui)
 
 and gnome-vfs >= 1:2.24.1-3.
-
-Bugs:
-
-  * when exiting the installer, dev can't be unmounted properly anymore because
-    it's busy, however, we do kill syslog and klog process (and when doing it
-    manually, it even works). so really strange that one.
-
-  * gui installer does not work without 'xhost +' yet (all other proper
-    invokations, e.g. 'xhost +SI:user:root' were tried and didn't work).
-
-  * hal is displaying 'no permission to mount' error when target devices are
-    mounted, the fdi thing is probably the way to go, however, it's somehow not
-    working as it should.
-
-    ---snip---
-    <?xml version="1.0" encoding="UTF-8"?> <!-- -*- SGML -*- -->
-
-    <deviceinfo version="0.2">
-      <device>
-        <match key="volume.mount_point" string="/live/installer">
-          <merge key="volume.ignore" type="bool">true</merge>
-        </match>
-      </device>
-    </deviceinfo>
-    ---snap---
