@@ -19,6 +19,8 @@ DI_KERNEL=$(basename /live/installer/lib/modules/*)
 if [ $LIVE_KERNEL != $DI_KERNEL ]; then
 	db_subst live-installer-launcher/kernel-version-mismatch/error LIVE_KERNEL "$LIVE_KERNEL"
 	db_subst live-installer-launcher/kernel-version-mismatch/error DI_KERNEL "$DI_KERNEL"
+
+	db_settitle live-installer-launcher/kernel-version-mismatch/title
 	db_input critical live-installer-launcher/kernel-version-mismatch/error || true
 	db_go
 
