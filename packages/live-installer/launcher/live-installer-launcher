@@ -2,8 +2,27 @@
 
 set -e
 
-FRONTEND=$1
-PRIORITY=$2
+DI_FRONTEND=$1
+DI_PRIORITY=$2
+
+LAUNCHER_FRONTEND=""
+TERMINAL=""
+
+prepare ()
+{
+	# Checking for x11
+	if [ -n "$DISPLAY" ]; then
+		# Checking for debconf frontend (gnome)
+		if dpkg -s libgnome2-perl > /dev/null 2>&1; then
+			LAUNCHER_FRONTEND=gnome
+		fi
+	fi
+
+	# Checking for debconf frontend (terminal fallback)
+	if [ -z $LAUNCHER_FRONTEND ]; then
+		TERMINAL="x-terminal-emulator -e"
+	fi
+}
 
 cleanup () {
 	# Stopping syslogd/klogd
@@ -34,10 +53,14 @@ cleanup () {
 # Setup cleanup function
 trap 'cleanup' EXIT HUP INT QUIT TERM
 
-if [ -z $FRONTEND ] || [ -z $PRIORITY ]; then
-	/usr/share/live-installer-launcher/debconf_mode.sh
-else
-	. /usr/share/debconf/confmodule
+prepare
+
+if [ -z $DI_FRONTEND ] || [ -z $DI_PRIORITY ]; then
+	DEBIAN_FRONTEND=$LAUNCHER_FRONTEND $TERMINAL /usr/share/live-installer-launcher/debconf_mode.sh
+fi
+
+if [ "$DI_FRONTEND" = gtk ]; then
+	xhost +local:
 fi
 
 # Source configuration found by debconf
@@ -59,7 +82,7 @@ mkdir -p /live/installer
 cd /live/installer
 zcat $IMAGE | cpio -id > /dev/null 2>&1
 
-/usr/share/live-installer-launcher/debconf_kernel.sh
+DEBIAN_FRONTEND=$LAUNCHER_FRONTEND $TERMINAL /usr/share/live-installer-launcher/debconf_kernel.sh
 
 # Bindmount installer media
 mkdir -p /live/installer/cdrom
@@ -72,10 +95,6 @@ mount -o bind /proc /live/installer/proc
 mount -o bind /sys /live/installer/sys
 mount -o bind /tmp /live/installer/tmp
 
-if [ $FRONTEND = gtk ]; then
-	xhost +local:
-fi
-
 # Preseeding shutdown command
 cat >> preseed.cfg << EOF
 # Select udeb for installation to allow exiting the installer
@@ -87,8 +106,7 @@ d-i di-utils-reboot/really_reboot boolean false
 EOF
 
 # Preseeding installer export mode
-if [ "$PRIORITY" = expert ]
-then
+if [ "$DI_PRIORITY" = expert ]; then
 
 cat >> preseed.cfg << EOF
 # Setting expert mode

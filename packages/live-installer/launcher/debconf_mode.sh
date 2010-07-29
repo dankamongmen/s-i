@@ -17,12 +17,12 @@ db_go
 db_get live-installer-launcher/mode
 MODE=$RET
 
-FRONTEND=$(echo $MODE | awk -F- '{ print $1 }')
-PRIORITY=$(echo $MODE | awk -F- '{ print $2 }')
+DI_FRONTEND=$(echo $MODE | awk -F- '{ print $1 }')
+DI_PRIORITY=$(echo $MODE | awk -F- '{ print $2 }')
 
 db_fset live-installer-launcher/mode seen false
 db_purge
 
 # Write values to temporary file that can be sourced from the parent script.
-echo "FRONTEND=$FRONTEND" > /tmp/live-installer
-echo "PRIORITY=$PRIORITY" >> /tmp/live-installer
+echo "FRONTEND=$DI_FRONTEND" > /tmp/live-installer
+echo "PRIORITY=$DI_PRIORITY" >> /tmp/live-installer
