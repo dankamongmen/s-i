@@ -40,5 +40,9 @@ ifeq ($(DEB_HOST_ARCH_OS),kfreebsd)
   files += \
   	S40term-kfreebsd
 endif
+ifeq ($(DEB_HOST_ARCH_OS),hurd)
+  files += \
+  	S40term-hurd
+endif
 
 include ../../../Makefile.inc
