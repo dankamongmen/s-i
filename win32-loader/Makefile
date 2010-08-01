@@ -14,7 +14,7 @@ else
 NSIS_CFLAGS	+= -L/usr/i586-mingw32msvc/lib/nsis -lpluginapi
 endif
 
-MAKENSIS	:= makensis -O/dev/null
+MAKENSIS	:= makensis -V3
 # Standalone version : Not linked to a website with preseed.cfg
 ifdef STANDALONE
 MAKENSIS	+= -DNOCD=yes
