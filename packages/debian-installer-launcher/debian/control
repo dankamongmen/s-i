@@ -1,0 +1,32 @@
+Source: live-installer
+Section: debian-installer
+Priority: optional
+Maintainer: Debian Install System Team <debian-boot@lists.debian.org>
+Uploaders:
+ Otavio Salvador <otavio@debian.org>, Daniel Baumann <daniel@debian.org>,
+ Chris Lamb <lamby@debian.org>
+Build-Depends:
+ debhelper (>= 7.0.50~), autoconf, automake, autotools-dev, po-debconf
+Standards-Version: 3.9.0
+Vcs-Svn: svn://svn.debian.org/d-i/trunk/packages/live-installer
+
+Package: live-installer
+XC-Package-Type: udeb
+Architecture: any
+Depends:
+ ${shlibs:Depends}, cdebconf-udeb, mounted-partitions, base-installer (>= 1.105),
+ squashfs-modules, archdetect, busybox-udeb (>= 1:1.13.3)
+Provides: kernel-installer, created-fstab, installed-base
+XB-Installer-Menu-Item: 6500
+Description: Install the system
+
+Package: live-installer-launcher
+Section: utils
+Architecture: all
+Depends: ${misc:Depends}, xterm | x-terminal-emulator, psmisc
+Description: Debian Installer desktop launcher for live systems
+ This is a desktop launcher for Debian Installer images. It is intended to be
+ used on Debian Live systems.
+ .
+ You probably do not want to install this package onto a non-live system,
+ although it will do no harm.
