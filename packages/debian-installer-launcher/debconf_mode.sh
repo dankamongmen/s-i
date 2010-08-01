@@ -11,19 +11,19 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-db_settitle live-installer-launcher/mode/title
-db_input critical live-installer-launcher/mode/text || true
+db_settitle debian-installer-launcher/mode/title
+db_input critical debian-installer-launcher/mode/text || true
 db_go
 
-db_get live-installer-launcher/mode/text
+db_get debian-installer-launcher/mode/text
 MODE=$RET
 
 DI_FRONTEND=$(echo $MODE | awk -F- '{ print $1 }')
 DI_PRIORITY=$(echo $MODE | awk -F- '{ print $2 }')
 
-db_fset live-installer-launcher/mode/text seen false
+db_fset debian-installer-launcher/mode/text seen false
 db_purge
 
 # Write values to temporary file that can be sourced from the parent script.
-echo "FRONTEND=$DI_FRONTEND" > /tmp/live-installer
-echo "PRIORITY=$DI_PRIORITY" >> /tmp/live-installer
+echo "FRONTEND=$DI_FRONTEND" > /tmp/debian-installer
+echo "PRIORITY=$DI_PRIORITY" >> /tmp/debian-installer

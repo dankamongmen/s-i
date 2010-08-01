@@ -17,11 +17,11 @@ LIVE_KERNEL=$(uname -r)
 DI_KERNEL=$(basename /live/installer/lib/modules/*)
 
 if [ $LIVE_KERNEL != $DI_KERNEL ]; then
-	db_subst live-installer-launcher/kernel-mismatch/error LIVE_KERNEL "$LIVE_KERNEL"
-	db_subst live-installer-launcher/kernel-mismatch/error DI_KERNEL "$DI_KERNEL"
+	db_subst debian-installer-launcher/kernel-mismatch/error LIVE_KERNEL "$LIVE_KERNEL"
+	db_subst debian-installer-launcher/kernel-mismatch/error DI_KERNEL "$DI_KERNEL"
 
-	db_settitle live-installer-launcher/kernel-mismatch/title
-	db_input critical live-installer-launcher/kernel-mismatch/error || true
+	db_settitle debian-installer-launcher/kernel-mismatch/title
+	db_input critical debian-installer-launcher/kernel-mismatch/error || true
 	db_go
 
 	exit 1
