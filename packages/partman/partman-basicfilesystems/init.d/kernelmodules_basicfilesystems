@@ -2,6 +2,12 @@
 
 mkdir -p /var/lib/partman
 
+if [ "`udpkg --print-os`" = hurd ]; then
+	[ -f /hurd/ext2fs ] && >/var/lib/partman/ext2
+	[ -f /hurd/fatfs ] && >/var/lib/partman/vfat
+	exit 0
+fi
+
 cat /proc/modules |
 while read module_name x; do
 	if [ "$module_name" = ext2 ]; then

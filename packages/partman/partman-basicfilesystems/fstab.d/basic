@@ -39,7 +39,9 @@ for dev in $DEVICES/*; do
 			fi
 			options=$(get_mountoptions $dev $id)
 			if [ "$mountpoint" = / ]; then
-				if [ "$options" = defaults ]; then
+				if [ "$(udpkg --print-os)" = hurd ]; then
+					: # remount-ro not supported
+				elif [ "$options" = defaults ]; then
 					options="errors=remount-ro"
 				else
 					options="${options},errors=remount-ro"
