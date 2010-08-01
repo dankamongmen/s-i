@@ -5,7 +5,6 @@ set -e
 DI_FRONTEND=$1
 DI_PRIORITY=$2
 
-LAUNCHER_FRONTEND=""
 TERMINAL=""
 
 prepare ()
@@ -14,12 +13,12 @@ prepare ()
 	if [ -n "$DISPLAY" ]; then
 		# Checking for debconf frontend (gnome)
 		if dpkg -s libgnome2-perl > /dev/null 2>&1; then
-			LAUNCHER_FRONTEND=gnome
+			export DEBIAN_FRONTEND=gnome
 		fi
 	fi
 
 	# Checking for debconf frontend (terminal fallback)
-	if [ -z $LAUNCHER_FRONTEND ]; then
+	if [ -z $DEBIAN_FRONTEND ]; then
 		TERMINAL="x-terminal-emulator -e"
 	fi
 }
@@ -56,7 +55,7 @@ trap 'cleanup' EXIT HUP INT QUIT TERM
 prepare
 
 if [ -z $DI_FRONTEND ] || [ -z $DI_PRIORITY ]; then
-	DEBIAN_FRONTEND=$LAUNCHER_FRONTEND $TERMINAL /usr/share/live-installer-launcher/debconf_mode.sh
+	$TERMINAL /usr/share/live-installer-launcher/debconf_mode.sh
 fi
 
 if [ "$DI_FRONTEND" = gtk ]; then
@@ -82,7 +81,7 @@ mkdir -p /live/installer
 cd /live/installer
 zcat $IMAGE | cpio -id > /dev/null 2>&1
 
-DEBIAN_FRONTEND=$LAUNCHER_FRONTEND $TERMINAL /usr/share/live-installer-launcher/debconf_kernel.sh
+$TERMINAL /usr/share/live-installer-launcher/debconf_kernel.sh
 
 # Bindmount installer media
 mkdir -p /live/installer/cdrom
