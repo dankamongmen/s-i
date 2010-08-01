@@ -11,16 +11,17 @@ set -e
 
 . /usr/share/debconf/confmodule
 
-db_input critical live-installer-launcher/mode || true
+db_settitle live-installer-launcher/mode/title
+db_input critical live-installer-launcher/mode/text || true
 db_go
 
-db_get live-installer-launcher/mode
+db_get live-installer-launcher/mode/text
 MODE=$RET
 
 DI_FRONTEND=$(echo $MODE | awk -F- '{ print $1 }')
 DI_PRIORITY=$(echo $MODE | awk -F- '{ print $2 }')
 
-db_fset live-installer-launcher/mode seen false
+db_fset live-installer-launcher/mode/text seen false
 db_purge
 
 # Write values to temporary file that can be sourced from the parent script.
