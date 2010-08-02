@@ -18,7 +18,11 @@ call_for_plugin()
 
 	args="$@"
 
-	${plugin}_${method} $args
+	if ! ${plugin}_${method} $args; then
+		return 1
+	fi
+
+	return 0
 }
 
 call_for_plugins()
@@ -94,5 +98,6 @@ if ! echo $PLUGINS | grep -q $PLUGIN; then
 	exit 1
 fi
 
-call_for_plugin $PLUGIN "prepare" $@
-call_for_plugin $PLUGIN "run"
+if call_for_plugin $PLUGIN "prepare" $@; then
+	call_for_plugin $PLUGIN "run"
+fi
