@@ -218,9 +218,12 @@ static di_package_dependency *check_virtual_anna (di_package *package __attribut
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: better priority", package->package, d->ptr->package);
   else if (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked)
     di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: installed", package->package, d->ptr->package);
+  else if (d->ptr->status_want == di_package_status_want_install && best->ptr->status_want != di_package_status_want_install)
+    di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): select %s: marked for installation", package->package, d->ptr->package);
 #endif
   if (!best || best->ptr->priority < d->ptr->priority ||
-      (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked))
+      (d->ptr->status >= di_package_status_unpacked && best->ptr->status < di_package_status_unpacked) ||
+      (d->ptr->status_want == di_package_status_want_install && best->ptr->status_want != di_package_status_want_install))
     return d;
 #ifdef ENABLE_EXTENSIVE_DEBUG
   di_log (DI_LOG_LEVEL_DEBUG, "resolver (%s): discard %s", package->package, d->ptr->package);
