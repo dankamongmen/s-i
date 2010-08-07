@@ -14,6 +14,18 @@ md_devnode () {
 	fi
 }
 
+# Device node to use at creation time.  This is a bit nasty as it differs
+# between mdadm metadata formats, and the only way to find out the default
+# seems to be to check mdadm's version (otherwise we break installation of
+# older releases).
+md_devnode_create () {
+	if mdadm -V 2>&1 | egrep -q '^mdadm - v([012]|3\.0)'; then
+		echo "/dev/md$1"
+	else
+		echo "/dev/md/$1"
+	fi
+}
+
 # Would this partition be allowed as a RAID physical volume?
 md_allowed () {
 	local dev=$1

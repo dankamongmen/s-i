@@ -139,7 +139,8 @@ md_create_raid0 () {
 	fi
 
 	log-output -t partman-md \
-		mdadm --create /dev/md$md_num --auto=yes --force -R -l raid0 \
+		mdadm --create "$(md_devnode_create "$md_num")" --auto=yes \
+		      --force -R -l raid0 \
 		      -n $selected $raid_devices || return $?
 	md_lock_devices "md$md_num" $raid_devices
 }
@@ -278,8 +279,8 @@ md_create_array () {
 	logger -t partman-md "RAID devices count: $dev_count"
 	logger -t partman-md "Spare devices count: $spare_count"
 	log-output -t partman-md \
-		mdadm --create /dev/md$md_num --auto=yes --force -R \
-			-l raid$level $layout \
+		mdadm --create "$(md_devnode_create "$md_num")" --auto=yes \
+			--force -R -l raid$level $layout \
 			-n $dev_count -x $spare_count $raid_devices \
 			$missing_devices $spare_devices $missing_spares || \
 		return $?
