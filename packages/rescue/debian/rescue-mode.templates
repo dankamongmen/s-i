@@ -15,9 +15,9 @@ _Description: No partitions found
 
 Template: rescue/root
 Type: select
-Choices-C: ${PARTITIONS}, none
+Choices-C: ${PARTITIONS}, assemble-raid, none
 #flag:translate!:1
-__Choices: ${PARTITIONS}, Do not use a root file system
+__Choices: ${PARTITIONS}, Assemble RAID array, Do not use a root file system
 # :sl2:
 _Description: Device to use as root file system:
  Enter a device you wish to use as your root file system. You will be able
@@ -137,3 +137,18 @@ _Description: Passphrase for ${DEVICE}:
  .
  If you don't enter anything, the volume will not be available during
  rescue operations.
+
+Template: rescue/assemble-raid
+Type: multiselect
+Choices-C: auto, ${PARTITIONS}
+#flag:translate!:2
+__Choices: Automatic, ${PARTITIONS}
+# :sl2:
+_Description: Partitions to assemble:
+ Select the partitions to assemble into a RAID array. If you select
+ "Automatic", then all devices containing RAID physical volumes will be
+ scanned and assembled.
+ .
+ Note that a RAID partition at the end of a disk may sometimes cause that
+ disk to be mistakenly detected as containing a RAID physical volume. In
+ that case, you should select the appropriate partitions individually.

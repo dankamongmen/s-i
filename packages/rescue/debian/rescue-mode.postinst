@@ -82,10 +82,7 @@ try_load_module raid5   # <=2.6.17
 try_load_module raid456 # >=2.6.18
 # mdadm will fail if /dev/md does not already exist
 mkdir -p /dev/md
-log-output -t rescue --pass-stdout \
-	   mdadm --examine --scan --config=partitions > /tmp/mdadm.conf || true
-log-output -t rescue \
-	   mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes || true
+# Don't auto-assemble; there'll be a menu entry for this.
 
 # LVM support
 try_load_module dm-mod
@@ -159,7 +156,8 @@ choose_root () {
 	db_get rescue/root
 	export RESCUE_ROOTDEV="$RET"
 	log "selected root device '$RESCUE_ROOTDEV'"
-	if [ "$RESCUE_ROOTDEV" = none ]; then
+	if [ "$RESCUE_ROOTDEV" = none ] || \
+	   [ "$RESCUE_ROOTDEV" = assemble-raid ]; then
 		umount_all
 		return
 	fi
@@ -252,12 +250,58 @@ get_menu_item () {
 	IFS="$IFS_SAVE"
 }
 
+# Assemble a RAID array.
+assemble_raid () {
+	PARTITIONS="$(list-devices partition | sort | \
+		tr '\n' , | sed 's/,$//; s/,/, /g')"
+
+	if [ "$CRYPTPARTS" ]; then
+		PARTITIONS="${PARTITIONS:+$PARTITIONS, }$CRYPTPARTS"
+	fi
+
+	if [ -z "$PARTITIONS" ]; then
+		log "no partitions found!"
+		db_input critical rescue/no-partitions
+		db_go || exit 10
+		export RESCUE_ROOTDEV=
+		return
+	fi
+	log "assemble_raid: partitions found: $PARTITIONS"
+	db_subst rescue/assemble-raid PARTITIONS "$PARTITIONS"
+	db_set rescue/assemble-raid ''
+
+	db_input critical rescue/assemble-raid
+	db_go || return 0
+	db_get rescue/assemble-raid
+	MDADM_CONFIG=
+	for raid_partition in $(echo "$RET" | sed 's/[, ][, ]*/ /g'); do
+		case $raid_partition in
+			auto)
+				MDADM_CONFIG='--config=partitions'
+				break
+				;;
+			*)
+				MDADM_CONFIG="${MDADM_CONFIG:+$MDADM_CONFIG }$raid_partition"
+				;;
+		esac
+	done
+	log-output -t rescue --pass-stdout \
+		   mdadm --examine --scan "$MDADM_CONFIG" > /tmp/mdadm.conf || true
+	log-output -t rescue \
+		   mdadm --assemble --scan --run --config=/tmp/mdadm.conf --auto=yes || true
+	scan_lvm
+}
+
 STATE=1
 while :; do
 	case $STATE in
 		1)
 			choose_root
-			STATE=2
+			if [ "$RESCUE_ROOTDEV" = assemble-raid ]; then
+				STATE=3
+			else
+				STATE=2
+			fi
 			;;
 		2)
 			prep_menu
@@ -306,6 +350,10 @@ while :; do
 					db_capb backup
 					;;
 			esac
+			;;
+		3)
+			assemble_raid
+			STATE=1
 			;;
 		*)
 			exit 10
