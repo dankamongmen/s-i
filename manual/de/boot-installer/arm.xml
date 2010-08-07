@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 62875 -->
+<!-- original version: 63942 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Booten per TFTP</title>
 
@@ -231,11 +231,15 @@ Sie müssen nochmals Strg-C drücken, um den Bootvorgang zu unterbrechen.
 Führen Sie dann folgendes aus:
  
 <informalexample><screen>
-ip_address -l 192.168.2.249 -h 192.168.2.4
+ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable>
 load -v -r -b 0x01800000 -m http /initrd.gz
 load -v -r -b 0x01008000 -m http /zImage
 exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
 </screen></informalexample>
+
+Dabei entspricht <replaceable>192.168.2.249</replaceable> der IP-Adresse
+des installierten Systems und <replaceable>192.168.2.4</replaceable> der
+IP-Adresse des HTTP-Servers, der die Kernel- und Ramdisk-Dateien enthält.
 
 </para><para>
 
