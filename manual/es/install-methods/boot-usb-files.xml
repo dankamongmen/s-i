@@ -1,100 +1,101 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 56442 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 57590 -->
 <!-- revisado por nahoo, 7 noviembre 2004 -->
 <!-- revisado por Rudy Godoy, 22 feb. 2005 -->
-<!-- revisado por Igor Támara, 16 nov. 2008 -->
+<!-- revisado por Igor TÃ¡mara, 16 nov. 2008 -->
+<!-- actualizado por elric, 11 Agosto 2010 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
- <title>Preparación de ficheros para el arranque desde un dispositivo de memoria USB</title>
+ <title>PreparaciÃ³n de ficheros para el arranque desde un dispositivo de memoria USB</title>
 
 <para>
 
-Se provee dos métodos para arrancar desde una memoria USB. El primero es
+Se provee dos mÃ©todos para arrancar desde una memoria USB. El primero es
 instalar completamente desde la red. El segundo consiste en copiar una imagen
 de CD en la memoria USB y usarla como fuente de paquetes, posiblemente en
-combinación con un sitio de réplica. El segundo es más usado.
+combinaciÃ³n con un sitio de rÃ©plica. El segundo es mÃ¡s usado.
 
 </para><para>
 
-El primer método de instalación requiere descargar una imagen de instalador
+El primer mÃ©todo de instalaciÃ³n requiere descargar una imagen de instalador
 del directorio <filename>netboot</filename>(en  el sitio mencionado en
 <xref linkend="where-files"/>) y usar la <quote>forma flexible</quote>
-que se explica más adelante para copiar los ficheros en la memoria USB.
+que se explica mÃ¡s adelante para copiar los ficheros en la memoria USB.
 
 </para><para>
 
-Las imágenes de instalación para el segundo método se encuentran en el
+Las imÃ¡genes de instalaciÃ³n para el segundo mÃ©todo se encuentran en el
 directorio <filename>hd-media</filename> y se puede usar tanto la
-<quote>forma fácil</quote> o la <quote>forma flexible</quote> para copiar
-la imagen en la memoria USB. Este método de instalación también requerirá
-descargar la imagen del CD. La imagen de instalación y la imagen del CD
+<quote>forma fÃ¡cil</quote> o la <quote>forma flexible</quote> para copiar
+la imagen en la memoria USB. Este mÃ©todo de instalaciÃ³n tambiÃ©n requerirÃ¡
+descargar la imagen del CD. La imagen de instalaciÃ³n y la imagen del CD
 deben coincidir con la version del &d-i;. Si no coinciden es muy probable
 que surjan errores<footnote>
 
 <para>
-El mensaje que se presenta más comunmente es que no se pudo encontrar los
-módulos del núcleo. Esto significa que la versión del módulo del núcleo
-udebs incluído en la imagen del CD difiere de la versión del núcleo que
-está en ejecución.
+El mensaje que se presenta mÃ¡s comunmente es que no se pudo encontrar los
+mÃ³dulos del nÃºcleo. Esto significa que la versiÃ³n del mÃ³dulo del nÃºcleo
+udebs incluÃ­do en la imagen del CD difiere de la versiÃ³n del nÃºcleo que
+estÃ¡ en ejecuciÃ³n.
 </para>
 
-</footnote> durante la instalación.
+</footnote> durante la instalaciÃ³n.
 
 </para><para>
 
-Para preparar una memoria USB, necesitará un sistema en el cual ya esté
+Para preparar una memoria USB, necesitarÃ¡ un sistema en el cual ya estÃ©
 corriendo GNU/Linux y con soporte para USB. En los sistemas GNU/Linux
-actuales la memoria USB debería reconocerse automáticamente cuando la
-inserta. Si no es así, revise que el módulo del núcleo usb-storage esté
-cargado. Cuando se inserta una memoria USB, se mapeará a un dispositivo
+actuales la memoria USB deberÃ­a reconocerse automÃ¡ticamente cuando la
+inserta. Si no es asÃ­, revise que el mÃ³dulo del nÃºcleo usb-storage estÃ©
+cargado. Cuando se inserta una memoria USB, se mapearÃ¡ a un dispositivo
 llamado <filename>/dev/sdX</filename>, en el que <quote>X</quote> es una
 letra entre la a y la z. Al ejecutar la orden <command>dmesg</command>
-debería poder visualizar a qué dispositivo se mapea la memoria USB al
+deberÃ­a poder visualizar a quÃ© dispositivo se mapea la memoria USB al
 insertarla. Para escribir en la memoria, es posible que deba quitar el
-seguro de protección contra escritura.
+seguro de protecciÃ³n contra escritura.
 
 </para>
 <warning><para>
 
-¡Los procedimientos descritos en esta sección destruirán lo que sea que haya
-en el dispositivo! Asegúrese de elegir correctamente el nombre del dispositivo
-para su memoria USB. Si usa el dispositivo incorrecto podría terminar
-perdiendo toda la información de, por ejemplo, un disco duro.
+Â¡Los procedimientos descritos en esta secciÃ³n destruirÃ¡n lo que sea que haya
+en el dispositivo! AsegÃºrese de elegir correctamente el nombre del dispositivo
+para su memoria USB. Si usa el dispositivo incorrecto podrÃ­a terminar
+perdiendo toda la informaciÃ³n de, por ejemplo, un disco duro.
 
 </para></warning>
 <para>
 
-Note que el dispositivo USB, deberá tener por lo menos una capacidad de 256 MB
+Note que el dispositivo USB, deberÃ¡ tener por lo menos una capacidad de 256 MB
 (se pueden realizar configuraciones con menos capacidad, tal como se indica en
 <xref linkend="usb-copy-flexible"/>).
 
 </para>
 
   <sect2 id="usb-copy-easy">
-  <title>Copiado de los ficheros &mdash; la forma fácil</title>
+  <title>Copiado de los ficheros &mdash; la forma fÃ¡cil</title>
 <para>
 
-Existe un fichero «todo en uno» <filename>hd-media/boot.img.gz</filename>
-que contiene todos los ficheros del instalador(incluyendo el núcleo)
+Existe un fichero Â«todo en unoÂ» <filename>hd-media/boot.img.gz</filename>
+que contiene todos los ficheros del instalador(incluyendo el nÃºcleo)
 <phrase arch="x86">al igual que <classname>syslinux</classname> y su fichero
-de configuración.</phrase>
+de configuraciÃ³n.</phrase>
 <phrase arch="powerpc">al igual que <classname>yaboot</classname> y su
-fichero de configuración.</phrase>
+fichero de configuraciÃ³n.</phrase>
 
 </para><para>
 
-Tenga en cuenta que aunque es conveniente, este método tiene una gran
-desventaja: el tamaño lógico del dispositivo se limitará a 256 MB,
+Tenga en cuenta que aunque es conveniente, este mÃ©todo tiene una gran
+desventaja: el tamaÃ±o lÃ³gico del dispositivo se limitarÃ¡ a 256 MB,
 incluso si la capacidad de la memoria USB es mayor. Si quiere contar
 con la capacidad  completa de la memoria posteriormente para un uso
-diferente, tendrá que reparticionarla y crearle un nuevo sistema de
+diferente, tendrÃ¡ que reparticionarla y crearle un nuevo sistema de
 archivos. Otra desventaja es que no puede copiar una imagen completa
-de CD en la memoria USB, solamente imágenes netinst o de tarjeta de
-presentación.
+de CD en la memoria USB, solamente imÃ¡genes netinst o de tarjeta de
+presentaciÃ³n.
 
 </para><para arch="x86">
 
-Para usar esta imagen solamente hace falta extraer directamente en la
+Para usar esta imagen sencillamente extraÃ­gala directamente en la
 memoria USB:
 
 <informalexample><screen>
@@ -103,10 +104,10 @@ memoria USB:
 
 </para><para arch="powerpc">
 
-Cree una partición del tipo «Apple_Bootstrap» en su dispositivo
+Cree una particiÃ³n del tipo Â«Apple_BootstrapÂ» en su dispositivo
 USB utilizando la orden <userinput>C</userinput> de
 <command>mac-fdisk</command> y extraiga la imagen directamente
-a éste:
+a Ã©ste:
 
 <informalexample><screen>
 # zcat boot.img.gz &gt;/dev/<replaceable>sdX2</replaceable>
@@ -114,17 +115,17 @@ a éste:
 
 </para><para>
 
-Después de esto, monte la memoria USB
+DespuÃ©s de esto, monte la memoria USB
 <phrase arch="x86">(<userinput>mount
 /dev/<replaceable>sdX</replaceable> /mnt</userinput>),</phrase>
 <phrase arch="powerpc">(<userinput>mount
 /dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
-que ahora tendrá un sistema de ficheros
+que ahora tendrÃ¡ un sistema de ficheros
 <phrase arch="x86">FAT</phrase>
 <phrase arch="powerpc">HFS</phrase>
-en ella, y copie una imagen ISO «netinst» o «bussinesscard» de Debian
+en ella, y copie una imagen ISO Â«netinstÂ» o Â«bussinesscardÂ» de Debian
 sobre la memoria USB.
-Desmonte el dispositivo USB (<userinput>umount /mnt</userinput>) y habrá
+Desmonte el dispositivo USB (<userinput>umount /mnt</userinput>) y habrÃ¡
 terminado.
 
 </para>
@@ -134,11 +135,11 @@ terminado.
   <title>Copiado de los ficheros &mdash; la forma flexible</title>
 <para>
 
-Si desea más flexibilidad o simplemente le gusta saber que ocurre,
-podría usar el siguiente método para colocar los ficheros en su
-dispositivo USB. Una ventaja de este método es que &mdash; si la 
+Si desea mÃ¡s flexibilidad o simplemente le gusta saber que ocurre,
+podrÃ­a usar el siguiente mÃ©todo para colocar los ficheros en su
+dispositivo USB. Una ventaja de este mÃ©todo es que &mdash; si la 
 capacidad de su memoria USB es lo suficientemente grande &mdash; 
-tendrá la opción de copiar una imagen completa de CD en ella.
+tendrÃ¡ la opciÃ³n de copiar una imagen completa de CD en ella.
 
 </para>
 
@@ -153,8 +154,8 @@ tendrá la opción de copiar una imagen completa de CD en ella.
 
 <warning><para>
 
-Si su sistema rehúsa arrancar desde el dispositivo USB, éste podría
-contener un registro de arranque maestro (MBR) inválido. Para
+Si su sistema rehÃºsa arrancar desde el dispositivo USB, Ã©ste podrÃ­a
+contener un registro de arranque maestro (MBR) invÃ¡lido. Para
 corregirlo, use la orden <command>install-mbr</command> del
 paquete <classname>mbr</classname>:
 
