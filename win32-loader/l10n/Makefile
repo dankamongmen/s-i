@@ -1,6 +1,6 @@
 # Add only languages really supported by NSIS there
 # For others, a PO file may be added and kept until NSIS is translated
-# Languages not yet supported by NSIS: ast bn dz kk ml vi
+# Languages not yet supported by NSIS: ast bn dz kk ml te vi
 LINGUAS= ar be bg bs ca cs de el en eo es eu fi fr ga gl he hr hu is it ja ko lt nb nl pl pt pt_BR ro ru sk sl sq sv th tr uk zh_CN zh_TW
 
 all: templates/all.nsh templates/dialog.nsh po/messages.pot
