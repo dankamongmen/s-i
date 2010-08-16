@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 35612 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 59840 -->
 <!-- traducido por jfs, 23 abril 2006 -->
+<!-- actualizado por elric, 16 agosto 2010 -->
 
   <sect2 arch="mipsel" id="boot-tftp"><title>Arrancar con TFTP</title>
 
@@ -9,29 +10,28 @@
 <para>
 
 Los equipos Cobalt, estrictamente hablando, no utilizan TFTP sino NFS
-para arrancar. Tendrá que instalar un servidor de NFS y poner los ficheros
+para arrancar. TendrÃ¡ que instalar un servidor de NFS y poner los ficheros
 del instalador en <filename>/nfsroot</filename>. Cuando arranque
-el Cobalt tendrá que pulsar al mismo tiempo los botones del cursor
-izquierda y derecha y el sistema arrancará a través de la red a través de
-NFS. Entonces mostrará distintas opciones en su pantalla. Estos son
-los dos métodos de instalación:
+el Cobalt tendrÃ¡ que pulsar al mismo tiempo los botones del cursor
+izquierda y derecha y el sistema arrancarÃ¡ a travÃ©s de la red a travÃ©s de
+NFS. Entonces mostrarÃ¡ distintas opciones en su pantalla. Estos son
+los dos mÃ©todos de instalaciÃ³n:
 
 <itemizedlist>
 <listitem><para>
 
-A través de SSH (por omisión): en este caso el instalador configurará
-la red con DHCP y arrancará un servidor SSH. Entonces mostrará una contraseña
-aleatoria y la información que necesitará para conectar (incluyendo
-el número de IP) en la pantalla LCD del equipo Cobalt. Podrá 
-iniciar la instalación cuando se conecte al equipo con un cliente SSH.
+A travÃ©s de SSH (por omisiÃ³n): en este caso el instalador configurarÃ¡
+la red con DHCP y arrancarÃ¡ un servidor SSH. Entonces mostrarÃ¡ una contraseÃ±a
+aleatoria y la informaciÃ³n que necesitarÃ¡ para conectar (incluyendo
+el nÃºmero de IP) en la pantalla LCD del equipo Cobalt. PodrÃ¡ 
+iniciar la instalaciÃ³n cuando se conecte al equipo con un cliente SSH.
 
 </para></listitem>
 <listitem><para>
 
-A través de una consola serie: Puede conectarse al puerto serie de 
-su sistema Cobalt con un cable de módem nulo (con 115200 bps) y hacer
-así su instalación. Esta opción no está disponible en los equipos 
-Qube 2700 (Qube1) ya que no tienen puerto serie.
+A travÃ©s de una consola serie: Puede conectarse al puerto serie de 
+su sistema Cobalt con un cable de mÃ³dem nulo (con 115200 bps) y hacer
+asÃ­ su instalaciÃ³n. 
 
 </para></listitem>
 </itemizedlist>
@@ -39,58 +39,18 @@ Qube 2700 (Qube1) ya que no tienen puerto serie.
 </para>
   </sect3>
 
-   <sect3>
-<!-- Note to translators: this is the same section as in mips.xml -->
-   <title>Arranque TFTP de Broadcom BCM91250A y BCM91480B</title>
-<para>
-
-En las placas de evaluación BCM91250A y BCM91480B Broadcom, tiene que cargar el
-gestor de arranque SiByl mediante TFTP, y este cargará y arrancará el
-instalador de Debian. En la mayoría de los casos, primero obtendrá una
-dirección mediante DHCP, pero también es posible configurarla estáticamente.
-Para usar DHCP, puede introducir la siguiente orden en el prompt CFE:
-
-<informalexample><screen>
-ifconfig eth0 -auto
-</screen></informalexample>
-
-Una vez que tiene la dirección IP, puede cargar SiByl con la siguiente orden:
-
-<informalexample><screen>
-boot 192.168.1.1:/boot/sibyl
-</screen></informalexample>
-
-Tiene que substituir la dirección IP de este ejemplo con la dirección IP de su
-servidor TFTP. Cuando ejecute esta orden, el instalador se cargará
-automáticamente.
-
-</para>
-</sect3>
   </sect2>
 
-  <sect2 arch="mipsel"><title>Parámetros de arranque</title>
+  <sect2 arch="mipsel"><title>ParÃ¡metros de arranque</title>
 
    <sect3>
    <title>Arranque Cobalt TFTP</title>
 <para>
 
-No podrá indicar parámetros de arranque directamente. Si quiere hacerlo
-tendrá que editar el archivo <filename>/nfsroot/default.colo</filename> en el
-servidor NFS y añadir los parámetros que desee a la variable
+No podrÃ¡ indicar parÃ¡metros de arranque directamente. Si quiere hacerlo
+tendrÃ¡ que editar el archivo <filename>/nfsroot/default.colo</filename> en el
+servidor NFS y aÃ±adir los parÃ¡metros que desee a la variable
 <replaceable>args</replaceable>.
-
-</para>
-  </sect3>
-
-   <sect3>
-<!-- Note to translators: this is the same section as in mips.xml -->
-   <title>Arranque TFTP de Broadcom BCM91250A y BCM91480B</title>
-<para>
-
-No puede pasar directamente ningún parámetro de arranque directamente desde el
-prompt CFE. En su lugar, tiene que editar el fichero
-<filename>/boot/sibyl.conf</filename> del servidor TFTP y añadir sus parámetros
-a la variable <replaceable>extra_args</replaceable>.
 
 </para>
   </sect3>
