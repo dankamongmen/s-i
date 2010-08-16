@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 43558 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 59293 -->
 <!-- revisado por nahoo, 6 noviembre 2004 -->
+<!-- actualizado por elric, 16 agosto 2010 -->
 
   <sect2 condition="supports-bootp" id="tftp-bootp">
-  <title>Configuración del servidor BOOTP</title>
+  <title>ConfiguraciÃ³n del servidor BOOTP</title>
 <para>
 
 Existen dos servidores BOOTP disponibles para GNU/Linux, el
@@ -15,23 +16,23 @@ respectivamente.
 </para><para>
 
 Para usar el <command>bootpd</command> de CMU, primero debe comentar
-(o añadir) la línea relevante en <filename>/etc/inetd.conf</filename>. En
+(o aÃ±adir) la lÃ­nea relevante en <filename>/etc/inetd.conf</filename>. En
 &debian;, puede ejecutar <userinput>update-inetd --enable
 bootps</userinput>, y luego <userinput>/etc/init.d/inetd
 reload</userinput> para hacerlo. En caso de que su servidor de BOOTP
-no se esté ejecutando en un sistema &debian;, la línea en cuestión
-deberá ser como sigue:
+no se estÃ© ejecutando en un sistema &debian;, la lÃ­nea en cuestiÃ³n
+deberÃ¡ ser como sigue:
 
 <informalexample><screen>
 bootps  dgram  udp  wait  root  /usr/sbin/bootpd  bootpd -i -t 120
 </screen></informalexample>
 
 Ahora, debe crear el fichero <filename>/etc/bootptab</filename>.
-Tiene el mismo tipo de formato familiar y críptico que los ficheros
+Tiene el mismo tipo de formato familiar y crÃ­ptico que los ficheros
 antiguos de BSD <filename>printcap</filename>, <filename>termcap</filename>,
-y <filename>disktab</filename>. Vea la página de manual de
-<filename>bootptab</filename> para más información. Para el
-<command>bootpd</command> de CMU, necesitará conocer la dirección de
+y <filename>disktab</filename>. Vea la pÃ¡gina de manual de
+<filename>bootptab</filename> para mÃ¡s informaciÃ³n. Para el
+<command>bootpd</command> de CMU, necesitarÃ¡ conocer la direcciÃ³n de
 hardware (MAC) del cliente. Este es un <filename>/etc/bootptab</filename>
 de ejemplo:
 
@@ -45,27 +46,28 @@ client:\
   ha=0123456789AB:
 </screen></informalexample>
 
-Necesitará cambiar por lo menos la opción <quote>ha</quote>, que especifica la
-dirección hardware del cliente. La opción <quote>bf</quote> especifica el fichero
-que el cliente debe recuperar a través de TFTP; para más detalles vea
+NecesitarÃ¡ cambiar por lo menos la opciÃ³n <quote>ha</quote>, que especifica la
+direcciÃ³n hardware del cliente. La opciÃ³n <quote>bf</quote> especifica el fichero
+que el cliente debe recuperar a travÃ©s de TFTP; para mÃ¡s detalles vea
 <xref linkend="tftp-images"/>.
 
 <phrase arch="mips">
-En sistemas SGI puede simplemente ingresar al monitor de órdenes y escribir
+En sistemas SGI puede simplemente ingresar al monitor de Ã³rdenes y escribir
 <userinput>printenv</userinput>. El valor de la variable
-<userinput>eaddr</userinput> es la dirección MAC de la máquina.
+<userinput>eaddr</userinput> es la direcciÃ³n MAC de la mÃ¡quina.
 </phrase>
 
 </para><para>
 
 En contraste, configurar BOOTP con <command>dhcpd</command> de ISC
-es realmente fácil, porque trata los clientes BOOTP como casos moderadamente
-especiales de clientes DHCP. Algunas arquitecturas necesitan una configuración
-compleja para arrancar clientes a través de BOOTP. Si la suya es una de
-estas, lea la sección <xref linkend="dhcpd"/>. En este caso, probablemente
-pueda continuar con sólo añadir la directiva
-<userinput>allow bootp</userinput> al bloque de configuración
-para la sub-red donde se ubique el cliente, y reiniciar
+es realmente fÃ¡cil, porque trata los clientes BOOTP como casos moderadamente
+especiales de clientes DHCP. Algunas arquitecturas necesitan una configuraciÃ³n
+compleja para arrancar clientes a travÃ©s de BOOTP. Si la suya es una de
+estas, lea la secciÃ³n <xref linkend="dhcpd"/>. De otro modo, probablemente
+pueda continuar con sÃ³lo aÃ±adir la directiva
+<userinput>allow bootp</userinput> al bloque de configuraciÃ³n
+para la sub-red donde se ubique el cliente en
+<filename>/etc/dhcp3/dhcpd.conf</filename>, y reiniciar
 <command>dhcpd</command> con <userinput>/etc/init.d/dhcpd3-server
 restart</userinput>.
 
