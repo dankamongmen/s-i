@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 51571 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 58142 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
+<!-- actualizado por elric, 17 agosto 2010 -->
 
 
  <sect1 id="linuxdevices"><title>Dispositivos en Linux</title>
@@ -8,14 +9,14 @@
 
 Linux tiene varios ficheros especiales en <filename>/dev</filename>.
 Estos ficheros se llaman ficheros de dispositivo pero no se comportan
-como los ficheros habituales. Los tipos más comúnes de ficheros de
+como los ficheros habituales. Los tipos mÃ¡s comÃºnes de ficheros de
 dispositivos son los de dispositivos de bloques o de caracer.  Estos
 ficheros son una interfaz al controlador de dispositivo (parte del
-núcleo de Linux) que a su vez le permite el acceso al hardware. Un
+nÃºcleo de Linux) que a su vez le permite el acceso al hardware. Un
 tipo de archivo de dispositivo menos frecuente son las
 <firstterm>pipe</firstterm> (N. del T., a veces traducido como
-«tubería»).  En la tabla mostrada a continuación se lista los ficheros
-de dispositivo más importantes.
+Â«tuberÃ­aÂ»).  En la tabla mostrada a continuaciÃ³n se lista los ficheros
+de dispositivo mÃ¡s importantes.
 
 </para><para>
 
@@ -44,10 +45,10 @@ de dispositivo más importantes.
   <entry>Disco duro IDE / CD-ROM en el segundo puerto IDE (Esclavo)</entry>
 </row><row>
   <entry><filename>hda1</filename></entry>
-  <entry>Primera partición del primer disco duro IDE</entry>
+  <entry>Primera particiÃ³n del primer disco duro IDE</entry>
 </row><row>
   <entry><filename>hdd15</filename></entry>
-  <entry>Decimoquinta partición del cuarto disco duro IDE</entry>
+  <entry>Decimoquinta particiÃ³n del cuarto disco duro IDE</entry>
 </row>
 </tbody></tgroup></informaltable>
 
@@ -63,17 +64,17 @@ de dispositivo más importantes.
   <entry>Disco duro SCSI con el siguiente ID SCSI (por ejemplo 2)</entry>
 </row><row>
   <entry><filename>sda1</filename></entry>
-  <entry>Primera partición del primer disco duro SCSI</entry>
+  <entry>Primera particiÃ³n del primer disco duro SCSI</entry>
 </row><row>
   <entry><filename>sdd10</filename></entry>
-  <entry>Décima partición del cuarto disco duro SCSI</entry>
+  <entry>DÃ©cima particiÃ³n del cuarto disco duro SCSI</entry>
 </row>
 </tbody></tgroup></informaltable>
 
 <informaltable><tgroup cols="2"><tbody>
 <row>
   <entry><filename>sr0</filename></entry>
-  <entry>CD-ROM SCSI con el ID SCSI más bajo</entry>
+  <entry>CD-ROM SCSI con el ID SCSI mÃ¡s bajo</entry>
 </row><row>
   <entry><filename>sr1</filename></entry>
   <entry>CD-ROM SCSI con el siguiente ID SCSI</entry>
@@ -89,27 +90,27 @@ de dispositivo más importantes.
   <entry>Puerto serie 1, COM2 en MS-DOS</entry>
 </row><row>
   <entry><filename>psaux</filename></entry>
-  <entry>Ratón de tipo PS/2</entry>
+  <entry>RatÃ³n de tipo PS/2</entry>
 </row><row>
   <entry><filename>gpmdata</filename></entry>
-  <entry>Pseudo-dispositivo, repite los datos generados por el demonio GPM (ratón)</entry>
+  <entry>Pseudo-dispositivo, repite los datos generados por el demonio GPM (ratÃ³n)</entry>
 </row>
 </tbody></tgroup></informaltable>
 
 <informaltable><tgroup cols="2"><tbody>
 <row>
   <entry><filename>cdrom</filename></entry>
-  <entry>Enlace simbólico a la unidad de CD-ROM</entry>
+  <entry>Enlace simbÃ³lico a la unidad de CD-ROM</entry>
 </row><row>
   <entry><filename>mouse</filename></entry>
-  <entry>Enlace simbólico al fichero de dispositivo del ratón</entry>
+  <entry>Enlace simbÃ³lico al fichero de dispositivo del ratÃ³n</entry>
 </row>
 </tbody></tgroup></informaltable>
 
 <informaltable><tgroup cols="2"><tbody>
 <row>
   <entry><filename>null</filename></entry>
-  <entry>Todo lo que se escriba en este dispositivo desaparecerá</entry>
+  <entry>Todo lo que se escriba en este dispositivo desaparecerÃ¡</entry>
 </row><row>
   <entry><filename>zero</filename></entry>
   <entry>Se pueden leer continuamente ceros desde este dispositivo</entry>
@@ -119,24 +120,24 @@ de dispositivo más importantes.
 </para>
 
   <sect2 arch="not-s390" id="device-mouse">
-    <title>Configurar su ratón</title>
+    <title>Configurar su ratÃ³n</title>
 
 <para>
 
-Puede usar su ratón tanto en consola de Linux (con gpm) como en el
-entorno de ventanas X. Generalmente para lograr esto sólo tiene
+Puede usar su ratÃ³n tanto en consola de Linux (con gpm) como en el
+entorno de ventanas X. Generalmente para lograr esto sÃ³lo tiene
 que instalar <filename>gpm</filename> y el servidor de X. Ambos
-deberían configurarse para utilizar como dispositivo de ratón
-<filename>/dev/input/mice</filename>. El protocolo de ratón a
+deberÃ­an configurarse para utilizar como dispositivo de ratÃ³n
+<filename>/dev/input/mice</filename>. El protocolo de ratÃ³n a
 utilizar se llama <userinput>exps2</userinput> en gpm, y
-<userinput>ExplorerPS/2</userinput> en X. Los archivos de configuración son
+<userinput>ExplorerPS/2</userinput> en X. Los archivos de configuraciÃ³n son
 <filename>/etc/gpm.conf</filename> y <filename>/etc/X11/xorg.conf</filename>
 respectivamente.
 
 </para><para>
 
-Para que su ratón funcione debe cargar algunos módulos del núcleo. 
-El ratón se detecta de forma automática en la mayoría de los casos, pero
+Para que su ratÃ³n funcione debe cargar algunos mÃ³dulos del nÃºcleo. 
+El ratÃ³n se detecta de forma automÃ¡tica en la mayorÃ­a de los casos, pero
 esto no siempre sucede en el caso de ratones serie antiguos o ratones de bus 
 <footnote>
 
@@ -147,57 +148,57 @@ con el conector de 6 pines redondo de los ratones PS/2 o el conector redondo de
 cuatro pines de los ratones ADB.
 </para>
 </footnote>, que son muy raros salvo en el caso de utilizar ordenadores antiguros.
-A continuación se resumen los módulos del núcleo necesarios para los distintos tipos
-de ratón:
+A continuaciÃ³n se resumen los mÃ³dulos del nÃºcleo necesarios para los distintos tipos
+de ratÃ³n:
 
 <informaltable><tgroup cols="2"><thead>
 <row>
   <entry>Modulo</entry>
-  <entry>Descripción</entry>
+  <entry>DescripciÃ³n</entry>
 </row>
 </thead><tbody>
 <row>
   <entry>psmouse</entry>
-  <entry>ratón PS/2 mice (debería detectarse automáticamente)</entry>
+  <entry>ratÃ³n PS/2 mice (deberÃ­a detectarse automÃ¡ticamente)</entry>
 </row>
 <row>
   <entry>usbhid</entry>
-  <entry>ratón USB (debería detectarse automáticamente)</entry>
+  <entry>ratÃ³n USB (deberÃ­a detectarse automÃ¡ticamente)</entry>
 </row>
 <row>
   <entry>sermouse</entry>
-  <entry>Para la mayoría de los ratones serie</entry>
+  <entry>Para la mayorÃ­a de los ratones serie</entry>
 </row>
 <row>
   <entry>logibm</entry>
-  <entry>Ratón de bus conectado a una tarjeta adaptadora de Logitech</entry>
+  <entry>RatÃ³n de bus conectado a una tarjeta adaptadora de Logitech</entry>
 </row>
 <row>
   <entry>inport</entry>
-  <entry>Ratón de bus conectado a una tarjeta de ATI or InPort de Microsoft</entry>
+  <entry>RatÃ³n de bus conectado a una tarjeta de ATI or InPort de Microsoft</entry>
 </row>
 </tbody></tgroup></informaltable>
 
 Debe usar la orden <command>modconf</command> (en el paquete del mismo
-nombre) para cargar un módulo para la controladora del ratón y mirar
-en la categoría <userinput>kernel/drivers/input/mouse</userinput>.
+nombre) para cargar un mÃ³dulo para la controladora del ratÃ³n y mirar
+en la categorÃ­a <userinput>kernel/drivers/input/mouse</userinput>.
 
 </para><para arch="powerpc">
-<!-- FJP 20070122: No estoy seguro si esto es válido -->
+<!-- FJP 20070122: No estoy seguro si esto es vÃ¡lido -->
 
-Los núcleos modernos le ofrecen la capacidad de emular un ratón de
-tres botones aunque su ratón solo tenga uno. Simplemente añada las
-siguientes líneas al fichero <filename>/etc/sysctl.conf</filename>.
+Los nÃºcleos modernos le ofrecen la capacidad de emular un ratÃ³n de
+tres botones aunque su ratÃ³n solo tenga uno. Simplemente aÃ±ada las
+siguientes lÃ­neas al fichero <filename>/etc/sysctl.conf</filename>.
 
 <informalexample><screen>
-# Emulación de un ratón de 3 botones
-# Activar emulación
+# EmulaciÃ³n de un ratÃ³n de 3 botones
+# Activar emulaciÃ³n
 /dev/mac_hid/mouse_button_emulation = 1
-# Hacer que el botón del medio funcione al pulsar la tecla F11
+# Hacer que el botÃ³n del medio funcione al pulsar la tecla F11
 /dev/mac_hid/mouse_button2_keycode = 87
-# Hacer que el botón derecho funcione al pulsar la tecla F12
+# Hacer que el botÃ³n derecho funcione al pulsar la tecla F12
 /dev/mac_hid/mouse_button3_keycode = 88
-# Para usar teclas diferentes, utilice showkey para saber el código de éstas.
+# Para usar teclas diferentes, utilice showkey para saber el cÃ³digo de Ã©stas.
 </screen></informalexample>
 
 </para>
@@ -208,39 +209,46 @@ siguientes líneas al fichero <filename>/etc/sysctl.conf</filename>.
  <title>Espacio en disco requerido para las tareas</title>
 <para>
 
-Una instalación estándar para i386, incluyendo todos los paquetes
-estándar y el núcleo 2.6 utilizado por omisión, ocupa
-&std-system-size; MB de espacio en disco.  Una instalación mínima base sin seleccionar la
-tarea <quote>Sistema estándar</quote> ocupará &base-system-size; MB.
+Una instalaciÃ³n estÃ¡ndar para i386, incluyendo todos los paquetes
+estÃ¡ndar y el nÃºcleo 2.6 utilizado por omisiÃ³n, ocupa
+&std-system-size; MB de espacio en disco.  Una instalaciÃ³n mÃ­nima base sin seleccionar la
+tarea <quote>Sistema estÃ¡ndar</quote> ocuparÃ¡ &base-system-size; MB.
 
 </para>
 <important><para>
 
 En ambos casos es importante tener en cuenta que este es el espacio
-<emphasis>después</emphasis> de haber terminado la instalación y
+<emphasis>despuÃ©s</emphasis> de haber terminado la instalaciÃ³n y
 de que se hayan borrado todos los ficheros temporales. Tampoco
 tiene en cuenta la cantidad utilizada por el propio sistema
-de ficheros, por ejemplo por los ficheros de «journal». Esto
-significa que hace falta bastante más disco 
-<emphasis>durante</emphasis> la instalación y durante el uso habitual
+de ficheros, por ejemplo por los ficheros de Â«journalÂ». Esto
+significa que hace falta bastante mÃ¡s disco 
+<emphasis>durante</emphasis> la instalaciÃ³n y durante el uso habitual
 del sistema.
         
 </para></important>
 <para>
 
-La siguiente tabla lista los tamaños indicados por aptitude
+La siguiente tabla lista los tamaÃ±os indicados por aptitude
 para las tareas listadas en tasksel. Tenga en cuenta que algunas tareas tienen
-componentes comunes, de modo que el tamaño total instalado para
-dos tareas juntas podría ser inferior al total obtenido al sumar
-sus tamaños individualmente.
+componentes comunes, de modo que el tamaÃ±o total instalado para
+dos tareas juntas podrÃ­a ser inferior al total obtenido al sumar
+sus tamaÃ±os individualmente.
 
 </para><para>
 
-Tenga en cuenta que tendrá que añadir los tamaños que se indican en la tabla al
-tamaño de la instalación estándar para poder determinar el tamaño de sus particiones.
-La mayoría del espacio en disco que se indica en <quote>Tamaño instalado</quote>
-acabará utilizándose de <filename>/usr</filename> y en <filename>/lib</filename>. Por otro lado, el tamaño
-que se indica en <quote>Tamaño de descarga</quote> será necesario (temporalmente)
+Por omisiÃ³n, el instalador de Debian instalarÃ¡ el entorno de escritorio GNOME,
+pero puede seleccionar otros entornos de escritorio usando uno de las
+imÃ¡genes de CD especiales, o especificando el entorno de escritorio deseado
+cuando se inicia el instalador (consulte <xref linkend="pkgsel"/>).
+
+</para><para>
+
+Tenga en cuenta que tendrÃ¡ que aÃ±adir los tamaÃ±os que se indican en la tabla al
+tamaÃ±o de la instalaciÃ³n estÃ¡ndar para poder determinar el tamaÃ±o de sus particiones.
+La mayorÃ­a del espacio en disco que se indica en <quote>TamaÃ±o instalado</quote>
+acabarÃ¡ utilizÃ¡ndose de <filename>/usr</filename> y en <filename>/lib</filename>. Por otro lado, el tamaÃ±o
+que se indica en <quote>TamaÃ±o de descarga</quote> serÃ¡ necesario (temporalmente)
 en <filename>/var</filename>.
 </para><para>
 
@@ -248,8 +256,8 @@ en <filename>/var</filename>.
 <thead>
 <row>
   <entry>Tarea</entry>
-  <entry>Tamaño instalado (MB)</entry>
-  <entry>Tamaño de descarga (MB)</entry>
+  <entry>TamaÃ±o instalado (MB)</entry>
+  <entry>TamaÃ±o de descarga (MB)</entry>
   <entry>Espacio necesario para instalar (MB)</entry>
 </row>
 </thead>
@@ -257,16 +265,40 @@ en <filename>/var</filename>.
 <tbody>
 <row>
   <entry>Entorno de escritorio</entry>
-  <entry>&task-desktop-inst;</entry>
-  <entry>&task-desktop-dl;</entry>
-  <entry>&task-desktop-tot;</entry>
+  <entry>&nbsp;</entry>
+  <entry>&nbsp;</entry>
+  <entry>&nbsp;</entry>
+</row>
+<row>
+  <entry>&nbsp;&nbsp;&bull;&nbsp;GNOME (predeterminado)</entry>
+  <entry>&task-desktop-gnome-inst;</entry>
+  <entry>&task-desktop-gnome-dl;</entry>
+  <entry>&task-desktop-gnome-tot;</entry>
+</row>
+<row>
+  <entry>&nbsp;&nbsp;&bull;&nbsp;KDE</entry>
+  <entry>&task-desktop-kde-inst;</entry>
+  <entry>&task-desktop-kde-dl;</entry>
+  <entry>&task-desktop-kde-tot;</entry>
+</row>
+<row>
+  <entry>&nbsp;&nbsp;&bull;&nbsp;Xfce</entry>
+  <entry>&task-desktop-xfce-inst;</entry>
+  <entry>&task-desktop-xfce-dl;</entry>
+  <entry>&task-desktop-xfce-tot;</entry>
+</row>
+<row>
+  <entry>&nbsp;&nbsp;&bull;&nbsp;LXDE</entry>
+  <entry>&task-desktop-lxde-inst;</entry>
+  <entry>&task-desktop-lxde-dl;</entry>
+  <entry>&task-desktop-lxde-tot;</entry>
 </row>
 
 <row>
-  <entry>Portátil<footnote>
+  <entry>PortÃ¡til<footnote>
         
          <para>
-Hay algún solape entre la tarea «Portátil» y la tarea «Entorno de escritorio». La tarea «Portátil» sólo utilizará algunos MB adicionales de espacio en disco si instala ambas.
+Hay algÃºn solape entre la tarea Â«PortÃ¡tilÂ» y la tarea Â«Entorno de escritorioÂ». La tarea Â«PortÃ¡tilÂ» sÃ³lo utilizarÃ¡ algunos MB adicionales de espacio en disco si instala ambas.
          </para>
 </footnote></entry>
   <entry>&task-laptop-inst;</entry>
@@ -319,20 +351,13 @@ Hay algún solape entre la tarea «Portátil» y la tarea «Entorno de escritorio». L
 </tbody>
 </tgroup></informaltable>
 
-<note><para>
-
-La tarea <emphasis>Entorno de escritorio</emphasis> instalará
-el entorno de escritorio de GNOME.
-
-</para></note>
-
 </para><para>
 
-Puede que <command>tasksel</command> instale automáticamente una
-<firstterm>tarea de localización</firstterm> si está realizando la instalación
-en un idioma que no sea el inglés, siempre y cuando haya una disponible para su
-idioma. Los requisitos de espacio varían por idioma pero debería, en este caso,
-tener en cuenta que podría necesitar 350 MB en total para la descarga e instalación
+Puede que <command>tasksel</command> instale automÃ¡ticamente una
+<firstterm>tarea de localizaciÃ³n</firstterm> si estÃ¡ realizando la instalaciÃ³n
+en un idioma que no sea el inglÃ©s, siempre y cuando haya una disponible para su
+idioma. Los requisitos de espacio varÃ­an por idioma pero deberÃ­a, en este caso,
+tener en cuenta que podrÃ­a necesitar 350 MB en total para la descarga e instalaciÃ³n
 de esta tarea.
 
 </para>
