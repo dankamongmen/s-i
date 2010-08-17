@@ -67,6 +67,10 @@ language_display_level() {
 		else
 			level=1
 		fi
+		# The hurd text-mode console has decent charset support
+		if [ "$TERM" = "hurd" ]; then
+			level=3
+		fi
 		# ASCII only if we are on serial console, dumb or cons25 terminal
 		# Both variables should already be set at init time
 		if [ "$TERM_TYPE" = "serial" ] || [ "$TERM" = "dumb" ] || [ "$TERM" = "cons25" ]; then
