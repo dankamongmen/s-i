@@ -50,7 +50,6 @@ if [ "$DI_LOCAL_BUILD" != 1 ]; then
         # Create header file
         echo "From: $NAME_FROM <$MAIL_FROM>" >$tmpdir/header
         echo "To: $mailaddress" >>$tmpdir/header
-#       echo "CC: elendil@planet.nl" >>$tmpdir/header
         echo "Reply-To: $NAME_FROM <$MAIL_FROM>" >>$tmpdir/header
         if [ "$BUILD_ERRORS" = "0" ]; then
             echo "Subject: [D-I Manual] Build log for $lang ($builddate)" >>$tmpdir/header
@@ -93,7 +92,7 @@ fi
 
 add-svnlog
 
-mutt -s "D-I Manual build success ($builddate)" -c elendil@planet.nl $MAIL_FROM <$mainlog
+mutt -s "D-I Manual build success ($builddate)" $MAIL_FROM <$mainlog
 
 rm -rf $tmpdir
 exit 0
