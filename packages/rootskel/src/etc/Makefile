@@ -16,7 +16,7 @@ files = \
 
 # On Hurd, /proc/mounts won't exist or will be a symlink to /etc/mtab itself.
 install-local:: $(outdir)
-ifeq ($(DEB_HOST_ARCH_OS),hurd)
+ifneq ($(DEB_HOST_ARCH_OS),hurd)
 	ln -fs /proc/mounts $(outdir)/mtab
 endif
 
