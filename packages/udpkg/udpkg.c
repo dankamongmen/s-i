@@ -54,7 +54,7 @@ static int dpkg_copyfile(const char *src, const char *dest)
 
 	if (stat(src, &srcStat) < 0) 
 	{
-		if (errno == 2) return 0; else return -1;
+		if (errno == ENOENT) return 0; else return -1;
 	}
 	if ((infd = open(src, O_RDONLY)) < 0) 
 		return -1;
