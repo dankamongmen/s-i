@@ -39,7 +39,26 @@ try_mount() {
 	return $ret
 }
 
-
+OS=$(udpkg --print-os)
+case "$OS" in
+	kfreebsd)
+		CDFS=cd9660
+		FATFS=msdosfs
+		;;
+	linux)
+		CDFS=iso9660
+		FATFS=vfat
+		;;
+	hurd)
+		CDFS=iso9660
+		FATFS=vfat
+		;;
+	*)
+		log "Unknown OS '$OS', exiting"
+		exit 0
+		
+esac
+ 
 # Is a cdrom already mounted? If so, assume it's the right one.
 mount | grep -q 'on /cdrom' && exit 0
 if [ -e /cdrom/.disk/info ]; then
@@ -60,10 +79,10 @@ while true; do
 	if db_get cdrom-detect/try-usb && [ "$RET" = true ]; then
 		devices="$(list-devices usb-partition)"
 		for device in $devices; do
-			if try_mount $device vfat; then
+			if try_mount $device $FATFS; then
 				break 2
 			fi
-			if try_mount $device iso9660; then
+			if try_mount $device $CDFS; then
 				break 2
 			fi
 		done
@@ -71,7 +90,7 @@ while true; do
 
 	devices="$(list-devices cd; list-devices maybe-usb-floppy)"
 	for device in $devices; do
-		if try_mount $device iso9660; then
+		if try_mount $device $CDFS; then
 			break 2
 		fi
 	done
@@ -136,12 +155,12 @@ while true; do
 		if [ "$module" != none ]; then
 			modprobe $module
 		fi
-		if mount -t iso9660 -o ro,exec $device /cdrom; then
-			log "CD-ROM mount succeeded: device=$device fstype=iso9660"
-			db_set cdrom-detect/cdrom_fs iso9660
+		if mount -t $CDFS -o ro,exec $device /cdrom; then
+			log "CD-ROM mount succeeded: device=$device fstype=$CDFS"
+			db_set cdrom-detect/cdrom_fs $CDFS
 			break
 		else
-			log "CD-ROM mount failed: device=$device fstype=iso9660"
+			log "CD-ROM mount failed: device=$device fstype=$CDFS"
 			fail
 		fi
 	else
