@@ -132,19 +132,41 @@ while true; do
 	db_go
 	db_get cdrom-detect/manual_config
 
-	modules=none
-	for i in $(ls -1 /lib/modules/*/kernel/drivers/cdrom/ | \
-		   sed 's/\.ko$//' | sed 's/\.o$//'); do
-		modules="$modules, $i"
-	done
-    
 	if [ "$RET" = true ]; then
-		db_subst cdrom-detect/cdrom_module choices "$modules"
-		db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
-		db_go
+		case "$OS" in
+			linux)
+				modules=none
+				for i in $(ls -1 /lib/modules/*/kernel/drivers/cdrom/ | \
+					   sed 's/\.ko$//' | sed 's/\.o$//'); do
+					modules="$modules, $i"
+				done  
 
-		db_get cdrom-detect/cdrom_module
-		module="$RET"
+				db_subst cdrom-detect/cdrom_module choices "$modules"
+				db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
+				db_go
+
+				db_get cdrom-detect/cdrom_module
+				if [ "$RET" != none ]; then
+					modprobe $RET
+				fi
+				;;
+			kfreebsd)
+				modules=none
+				for i in $(ls -1 /lib/modules/*/*.ko | \
+					   sed 's/\.ko$//'); do
+					modules="$modules, $i"
+				done
+
+				db_subst cdrom-detect/cdrom_module choices "$modules"
+				db_input critical cdrom-detect/cdrom_module || [ $? -eq 30 ]
+				db_go
+				
+				db_get cdrom-detect/cdrom_module
+				if [ "$RET" != none ]; then
+					kldload $RET
+				fi
+				;;
+		esac
 
 		db_input critical cdrom-detect/cdrom_device || [ $? -eq 30 ]
 		db_go
@@ -152,9 +174,6 @@ while true; do
 		db_get cdrom-detect/cdrom_device
 		device="$RET"
 
-		if [ "$module" != none ]; then
-			modprobe $module
-		fi
 		if mount -t $CDFS -o ro,exec $device /cdrom; then
 			log "CD-ROM mount succeeded: device=$device fstype=$CDFS"
 			db_set cdrom-detect/cdrom_fs $CDFS
