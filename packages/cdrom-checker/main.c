@@ -27,10 +27,11 @@ void detect_cdrom() {
 
 	mount = fopen("/proc/mounts", "r");
 	while(fgets(line, sizeof(line), mount) != 0) {
-		char device[1024], mpoint[1024];
-		sscanf(line, "%s %s %*s", device, mpoint);
+		char device[1024], mpoint[1024], fs[1024];
+		sscanf(line, "%s %s %s %*s", device, mpoint, fs);
 		if(strstr(mpoint, TARGET)) {
 			asprintf(&cdrom_device, "%s", device);
+			asprintf(&cdrom_fs, "%s", fs);
 			break;
 		}
 	}
@@ -38,6 +39,10 @@ void detect_cdrom() {
 	
 	if(cdrom_device == NULL) {
 		di_log(DI_LOG_LEVEL_WARNING, "Unable to detect cdrom device!");
+		exit(EXIT_SUCCESS);
+	}
+	if(cdrom_fs == NULL) {
+		di_log(DI_LOG_LEVEL_WARNING, "Unable to detect cdrom filesystem!");
 		exit(EXIT_SUCCESS);
 	}
 }
@@ -58,8 +63,8 @@ int mount_cdrom() {
 	debconf_go(debconf);
 	debconf_get(debconf, "cdrom-checker/askmount");
 	
-	asprintf(&cmd, "mount -t iso9660 %s %s -o ro 1>/dev/null 2>&1",
-		cdrom_device, TARGET);
+	asprintf(&cmd, "mount -t %s %s %s -o ro 1>/dev/null 2>&1",
+		cdrom_fs, cdrom_device, TARGET);
 	status = di_exec_shell(cmd);
         di_free(cmd);
 	if(WIFEXITED(status) && WEXITSTATUS(status) == 0)

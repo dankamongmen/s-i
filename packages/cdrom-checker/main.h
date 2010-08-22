@@ -32,6 +32,7 @@
 
 static struct debconfclient *debconf = NULL;
 char *cdrom_device = NULL;
+char *cdrom_fs = NULL;
 
 void detect_cdrom();
 int mount_cdrom();
