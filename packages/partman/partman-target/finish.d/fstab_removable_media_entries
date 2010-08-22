@@ -66,7 +66,17 @@ if [ -n "$MAPCDDEV" ]; then
 	CDDEVICES="$MAPCDDEV $CDDEVICES" # first the mounted cdrom
 fi
 
-populate_media cdrom udf,iso9660 user,noauto $CDDEVICES
+case `udpkg --print-os` in
+	linux) 
+		populate_media cdrom udf,iso9660 user,noauto $CDDEVICES
+		;;
+	kfreebsd)
+		populate_media cdrom cd9660 user,noauto $CDDEVICES
+		;;
+	hurd)
+		populate_media cdrom iso9660fs user,noauto $CDDEVICES
+		;;
+esac
 
 FDDEVICES=''
 for dev in $(list-devices floppy); do
