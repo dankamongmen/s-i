@@ -1,5 +1,5 @@
 #!/bin/sh
-# Set up filesystem as root and pivot into it.
+# Set up filesystem as root, parse the kernel arguments
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin
 exec < /dev/console > /dev/console 2> /dev/console
@@ -20,6 +20,26 @@ mount -t fdescfs fdescfs /dev/fd
 mount /proc
 ln -s /var/run/log /dev/log
 
-# Close all open files on the initrd, and run busybox init.
+# Get all kernel parameters that can be exported as environment variables
+envvars="$(kenv | egrep '^[-_/[:alnum:]]+=".*"$' || true)"
+
+# Parse kernel parameters
+init='/bin/busybox init'
+for i in $envvars ; do
+    case "$i" in
+        init="/sbin/init"|init="init")
+            # Avoid endless loop
+            : ;;
+        init=*)
+            init=${i#init=}
+            ;;
+        noshell=*)
+            sed -i '/^ttyv[12]/s/^/#/' /etc/inittab
+            ;;
+    esac
+done
+
+# Close all open files on the initrd, export kernel parameters and run
+# busybox init
 debugshell "before init"
-exec /bin/busybox init < /dev/console > /dev/console 2>&1
+eval exec env - $envvars $init < /dev/console > /dev/console 2>&1
