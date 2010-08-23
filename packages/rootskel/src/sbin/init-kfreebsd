@@ -15,9 +15,10 @@ sysctl "kern.module_path=/lib/modules/`uname -r`;/boot/kernel" > /dev/null
 
 echo "Setting up filesystem, please wait ..."
 mount -o remount,rw -t ufs /dev/md0 /
-mount -t devfs devfs /dev
-mount -t fdescfs fdescfs /dev/fd
+mount /dev
+mount /dev/fd
 mount /proc
+mount /sys
 ln -s /var/run/log /dev/log
 
 # Get all kernel parameters that can be exported as environment variables
