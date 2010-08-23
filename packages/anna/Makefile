@@ -3,6 +3,7 @@ LDFLAGS=
 OBJS=$(subst .c,.o,$(wildcard *.c))
 BIN=anna
 LIBS=-ldebconfclient -ldebian-installer
+STRIP=strip
 
 ifdef DEBUG
 CFLAGS:=$(CFLAGS) -g3 -DDODEBUG
@@ -17,7 +18,7 @@ $(BIN): $(OBJS)
 # Size optimized and stripped binary target.
 small: CFLAGS:=-Os -fomit-frame-pointer $(CFLAGS) -DSMALL
 small: clean $(BIN)
-	strip --remove-section=.comment --remove-section=.note $(BIN)
+	$(STRIP) --remove-section=.comment --remove-section=.note $(BIN)
 	ls -l $(BIN)
 
 clean:
