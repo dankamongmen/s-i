@@ -3,11 +3,16 @@ debian-installer-utils (1.79) UNRELEASED; urgency=low
   [ Aurelien Jarno ]
   * Only detect /dev/cd0 as a CD-ROM drive on GNU/kFreeBSD, to prevent
     multiple /etc/fstab entries.
+  * Mount /target/sys in chroot_setup () on GNU/KFreeBSD.
 
   [ Colin Watson ]
   * udev 152 changed the default action for 'udevadm trigger' from 'add' to
     'change'.  We really do need 'add' after installing new kernel modules,
     so specify this explicitly.
+
+  [ Jeremie Koenig ]
+  * in-target: Check for /target/sys only if /sys/devices exists, to avoid
+    enforcing it on systems without a sysfs (ie. Hurd). Closes: #592684.
 
  -- Aurelien Jarno <aurel32@debian.org>  Sun, 22 Aug 2010 22:42:25 +0200
 

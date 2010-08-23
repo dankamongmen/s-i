@@ -10,7 +10,7 @@ chroot_setup () {
 	   [ ! -d /target/proc ]; then
 		return 1
 	fi
-	if [ ! -d /target/sys ]; then
+	if [ -d /sys/devices ] && [ ! -d /target/sys ]; then
 		return 1
 	fi
 
@@ -85,6 +85,11 @@ EOF
 			# /proc/. Only mount it if not mounted already
 			if [ ! -f /target/proc/cmdline ]; then
 				mount -t procfs proc /target/proc
+			fi
+			# Some package might need sysfs mounted
+			# Only mount it if not mounted already
+			if [ ! -d /target/sys/devices ]; then
+				mount -t linsysfs sysfs /target/sys
 			fi
 		;;
 	esac
