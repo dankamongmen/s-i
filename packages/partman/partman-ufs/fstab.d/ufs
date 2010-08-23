@@ -16,6 +16,10 @@ for dev in $DEVICES/*; do
 		    ufs)
 			[ -f "$id/mountpoint" ] || continue
 			mountpoint=$(cat $id/mountpoint)
+			# due to #249322, #255135, #258117:
+			if [ "$mountpoint" = /tmp ]; then
+				rm -f $id/options/noexec
+			fi
 			options=$(get_mountoptions $dev $id)
 			if [ "$options" = defaults ]; then
 				options="rw"
