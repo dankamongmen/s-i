@@ -4,13 +4,6 @@
 . /lib/partman/lib/commit.sh
 
 do_initial_setup () {
-	# Make sure that MD support is available
-	if [ ! -e /proc/mdstat ]; then
-		db_input critical partman-md/nomd
-		db_go
-		exit 0
-	fi
-
 	# Commit the changes
 	confirm_changes partman-md || exit 0
 	commit_changes partman-md/commit_failed || exit $?

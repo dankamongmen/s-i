@@ -1,6 +1,9 @@
 # Wipes any traces of an active MD on the given device
 device_remove_md() {
 	local dev md_dev md_devs part used_parts type removed_devices confirm code
+
+	[ -f /var/lib/partman/md ] || return 0
+
 	dev="$1"
 	cd $dev
 
