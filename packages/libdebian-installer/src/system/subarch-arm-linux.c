@@ -33,6 +33,7 @@ static struct map map_hardware[] = {
     { "Marvell eSATA SheevaPlug Reference Board", "kirkwood" },
     { "QNAP TS-119/TS-219", "kirkwood" },
     { "QNAP TS-41x", "kirkwood" },
+    { "Seagate FreeAgent DockStar", "kirkwood" },
     { "Buffalo/Revogear Kurobox Pro", "orion5x" },
     { "D-Link DNS-323", "orion5x" },
     { "QNAP TS-109/TS-209", "orion5x" },
