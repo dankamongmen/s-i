@@ -17,7 +17,11 @@ addfile () {
 uname -a 2>&1 | addinfo "uname -a"
 
 if type lspci >/dev/null 2>&1; then
-	lspci -knn 2>&1 | addinfo "lspci -knn"
+        if [ "$(uname -s)" = Linux ] ; then
+		lspci -knn 2>&1 | addinfo "lspci -knn"
+	else
+		lspci -nn 2>&1 | addinfo "lspci -nn"
+	fi
 	#lspci -vnn 2>&1 | addinfo "lspci -vnn"
 else
 	addfile /proc/pci
