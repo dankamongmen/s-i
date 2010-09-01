@@ -168,22 +168,18 @@ readme_file_not_found:
 
   ; Windows version is another abort condition
   Var /GLOBAL windows_boot_method
-  ${If} ${IsNT}
-    StrCpy $windows_boot_method ntldr
-    Goto windows_version_ok
-  ${Endif}
   ${If} ${AtMostWinME}
     StrCpy $windows_boot_method direct
+    ${If} ${IsNT}
+      StrCpy $windows_boot_method ntldr
+    ${Endif}
     Goto windows_version_ok
   ${Endif}
   ${If} ${AtMostWin2003}
     StrCpy $windows_boot_method ntldr
     Goto windows_version_ok
   ${Endif}
-  ${If} ${AtMostWinVista}
-; In the default install, "system partition" is not mounted.  We need a way
-; around this before Windows 7 can be enabled.
-;  ${OrIf} ${IsWin7}
+  ${If} ${AtMostWin7}
     StrCpy $windows_boot_method bootmgr
     Goto windows_version_ok
   ${Endif}
