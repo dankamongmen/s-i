@@ -382,7 +382,7 @@ Function ShowBranch
         StrCpy $base_url "http://d-i.debian.org/daily-images/$arch/daily/netboot/$gtkdebian-installer/$arch"
       ${Endif}
     ${ElseIf} $kernel == "kfreebsd"
-      StrCpy $base_url "http://d-i.debian.org/daily-images/kfreebsd-$arch/daily/monolithic"
+      StrCpy $base_url "http://d-i.debian.org/daily-images/kfreebsd-$arch/daily/netboot/debian-installer/kfreebsd-$arch/"
     ${EndIf}
   ${Else}
     ${If} $kernel == "linux"
