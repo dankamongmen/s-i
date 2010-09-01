@@ -878,6 +878,7 @@ ${EndIf}
     ${Endif}
     nsExec::Exec '"$bcdedit" /set $0 device boot'
     nsExec::Exec '"$bcdedit" /set $0 path \g2ldr.mbr'
+    nsExec::Exec '"$bcdedit" /set $0 device partition=$c'
     nsExec::Exec '"$bcdedit" /displayorder $0 /addlast'
   ${Endif}
 
