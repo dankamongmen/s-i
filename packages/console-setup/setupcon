@@ -318,6 +318,18 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	    fi	    
 	done
     fi
+
+    STTY=""
+    [ -z "$SCREEN_WIDTH"  ] || STTY="$STTY cols $SCREEN_WIDTH"
+    [ -z "$SCREEN_HEIGHT" ] || STTY="$STTY rows $SCREEN_HEIGHT"
+
+    if [ -n "$STTY" ]
+    then
+	for console in $ACTIVE_CONSOLES; do
+	    [ -r $console ] || continue
+	    stty $STTY < $console
+	done
+    fi
 fi
 
 #-----------------------#
