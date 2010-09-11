@@ -39,6 +39,24 @@ try_mount() {
 	return $ret
 }
 
+# Set the suite and codename used by base-installer and base-config
+# to the suite/codename that is on the CD. In case there are multiple
+# suites, prefer the one in default-release.
+set_suite_and_codename() {
+	for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
+		relfile="/cdrom/dists/$dir/Release"
+		if [ -e $relfile ]; then
+			suite=$(sed -n 's/^Suite: *//p' "$relfile")
+			codename=$(sed -n 's/^Codename: *//p' "$relfile")
+			log "Detected CD with '$suite' ($codename) distribution"
+			db_set cdrom/suite "$suite"
+			db_set cdrom/codename "$codename"
+
+			break
+		fi
+	done
+}
+
 OS=$(udpkg --print-os)
 case "$OS" in
 	kfreebsd)
@@ -60,10 +78,11 @@ case "$OS" in
 esac
  
 # Is a cdrom already mounted? If so, assume it's the right one.
-mount | grep -q 'on /cdrom' && exit 0
+mount | grep -q 'on /cdrom' && set_suite_and_codename && exit 0
 if [ -e /cdrom/.disk/info ]; then
 	CDNAME=$(cat /cdrom/.disk/info)
 	log "Detected CD '$CDNAME'"
+	set_suite_and_codename
 	exit 0
 fi
 
@@ -201,21 +220,7 @@ for pooldir in /cdrom/pool/*/*; do
 done
 db_progress STOP
 
-# Set the suite and codename used by base-installer and base-config
-# to the suite/codename that is on the CD. In case there are multiple
-# suites, prefer the one in default-release.
-for dir in $(cat /etc/default-release) $(ls -1 /cdrom/dists/); do
-	relfile="/cdrom/dists/$dir/Release"
-	if [ -e $relfile ]; then
-		suite=$(sed -n 's/^Suite: *//p' "$relfile")
-		codename=$(sed -n 's/^Codename: *//p' "$relfile")
-		log "Detected CD with '$suite' ($codename) distribution"
-		db_set cdrom/suite "$suite"
-		db_set cdrom/codename "$codename"
-
-		break
-	fi
-done
+set_suite_and_codename
 
 if [ -z "$suite" ]; then
 	log "Error reading Release file; unable to determine distribution"
