@@ -122,9 +122,10 @@ split_levels() {
 		if [ $i -eq 1 ]; then
 			# Select strings without a sublevel
 			msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pofile \
-				>$lpofile.none
+				>$lpofile.none 2>/dev/null
 			# Select strings with sublevel 1 set
-			msggrep -X -E -e ":sl1:" $pofile >$lpofile.sl1
+			msggrep -X -E -e ":sl1:" $pofile \
+				>$lpofile.sl1  2>/dev/null
 			# Merge them
 			msgcat $lpofile.none $lpofile.sl1 >$lpofile
 			rm $lpofile.none $lpofile.sl1
@@ -132,9 +133,9 @@ split_levels() {
 			# Select strings with sublevel N set, but exclude any
 			# strings that also have a sublevel smaller than N set
 			# to avoid duplicates
-			msggrep -X -E -e ":sl$i:" $pofile | \
+			msggrep -X -E -e ":sl$i:" $pofile 2>/dev/null | \
 				msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
-				>$lpofile
+				>$lpofile 2>/dev/null
 		fi
 	done
 }
