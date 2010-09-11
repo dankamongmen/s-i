@@ -34,6 +34,7 @@ set -e
 #   D-I release (e.g: new package; specific to a non-release arch).
 
 # Copyright: Frans Pop <fjp@debian.org>, 2008
+# Copyright: Otavio Salvador <otavio@debian.org>, 2010
 
 # Make sure output of gettext commands are in English
 export LANG=C
@@ -150,7 +151,7 @@ rm -f stats/*
 log "Gathering the data..."
 > packages.log
 
-languages=""
+> stats/languages
 real_contents packages_list | sort | while read p_dir p_status; do
 	package=$(basename $p_dir)
 
@@ -186,8 +187,8 @@ real_contents packages_list | sort | while read p_dir p_status; do
 
 	for pofile in po/*.po; do
 		lang=$(basename $pofile .po)
-		if ! echo "$languages" | grep -q "^$lang$"; then
-			languages=${languages:+$languages$NL}$lang
+		if ! grep -q "^$lang$" ../../stats/languages; then
+			echo $lang >>../../stats/languages
 		fi
 		split_levels $pofile
 		for level in $(seq 1 $NUMLEVELS); do
@@ -208,7 +209,7 @@ echo "# This file should be updated before every official release." >> translati
 echo "# Generated on: $(date -uR)" >> translation-status
 echo "#" >> translation-status
 
-languages="$(echo "$languages" | grep -v "^en$" | sort)"
+languages="$(cat stats/languages | grep -v "^en$" | sort)"
 for lang in $languages; do
 	for level in $(seq 1 $NUMLEVELS); do
 		# Sublevels 1 and 2 are taken together
