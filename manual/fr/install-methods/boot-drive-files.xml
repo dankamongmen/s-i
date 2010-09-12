@@ -1,4 +1,4 @@
-<!-- original version: 39614 -->
+<!-- original version: 64654 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
  <title>Préparer les fichiers pour amorcer depuis un disque dur</title>
@@ -15,11 +15,6 @@ Cette technique permet une installation complète via le réseau. Cela évite to
 les manipulations pénibles des supports amovibles, comme de 
 trouver puis de graver des images de cédérom ou de manipuler un nombre élevé 
 de disquettes peu fiables.
-
-</para><para arch="x86">
-
-L'installateur ne peut être amorcé par des fichiers placés sur un système de 
-fichiers NTFS.
 
 </para><para arch="powerpc"> 
 
@@ -57,8 +52,10 @@ mémoire peut être utilisée en tant que système de fichier racine par le noya
 
 </para><para>
 
-Copiez les fichiers suivants depuis l'archive Debian sur votre disque dur, 
+Copiez les fichiers suivants de l'archive Debian sur votre disque dur, 
 par exemple dans <filename>/boot/newinstall/</filename>.
+Notez que LILO ne peut pas lire des fichiers placés sur un système de 
+fichiers NTFS.
 
 <itemizedlist>
 <listitem><para>
@@ -80,6 +77,33 @@ continuez avec la <xref linkend="boot-initrd"/>.
 </para>
   </sect2>
 
+  <sect2 arch="x86" id="files-loadlin">
+  <title>Démarrage du programme d'installation avec <command>loadlin</command></title>
+<para>
+
+Voici comment préparer le disque dur pour démarrer l'installateur
+à partir de DOS avec <command>loadlin</command>.
+
+</para><para>
+
+Copiez les fichiers suivants d'une image CD de Debian dans <filename>c:\</filename>.
+
+<itemizedlist>
+<listitem><para>
+
+<filename>/&x86-install-dir;</filename> (noyau et disque mémoire)
+
+</para></listitem>
+<listitem><para>
+
+<filename>/tools</filename> (loadlin)
+
+</para></listitem>
+
+</itemizedlist>
+
+</para>
+  </sect2>
 
   <sect2 arch="powerpc" id="files-oldworld">
  <title>Amorçage de l'installateur sur disque dur pour les Mac OldWorld</title>
