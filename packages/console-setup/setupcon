@@ -180,6 +180,9 @@ if [ "$keyboard_only" != yes ] && [ "$ACTIVE_CONSOLES" ]; then
 	    FONT=$(echo `ls /usr/share/consolefonts/$CODESET-*.psf* \
 		            /etc/console-setup/$CODESET-*.psf* 2>/dev/null`)
 	    FONT=${FONT%% *}
+	    if [ "$FONTFACE" ] || [ "$FONTSIZE" ]; then
+		echo setupcon: Warning: ignoring the FONTFACE and FONTSIZE specifications! >&2
+	    fi
 	elif [ "$FONTFACE" ] && [ "$FONTSIZE" ]; then
 	    FONT="$CODESET-$FONTFACE$FONTSIZE.psf.gz"
 	    case "$FONTSIZE" in
