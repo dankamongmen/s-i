@@ -14,11 +14,8 @@ struct map {
 
 static const char *supported_generic_subarches[] = {
     "dove",
-    /* omap4 and omap need to be this way round, since omap is a prefix of
-     * omap4.
-     */
-    "omap4",
     "omap",
+    "omap4",
     NULL
 };
 
