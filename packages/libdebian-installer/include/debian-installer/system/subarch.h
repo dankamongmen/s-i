@@ -24,6 +24,10 @@
 #ifndef DEBIAN_INSTALLER__SYSTEM__SUBARCH_H
 #define DEBIAN_INSTALLER__SYSTEM__SUBARCH_H
 
+#ifdef __ARMEL__
+#define DI_SYSTEM_SUBARCH_CAN_GUESS 1
+#endif
+
 /**
  * @addtogroup di_system_subarch
  * @{
@@ -34,6 +38,14 @@
  * "powermac_newworld".
  */
 const char *di_system_subarch_analyze (void);
+
+/**
+ * Return a string with a best-guess of the current subarchitecture
+ *
+ * Only present on armel currently, and is a stub on all other architectures
+ */
+
+const char *di_system_subarch_analyze_guess (void);
 
 /** @} */
 #endif

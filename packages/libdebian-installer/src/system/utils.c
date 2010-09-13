@@ -22,6 +22,7 @@
 
 #include <config.h>
 
+#include <debian-installer/system/subarch.h>
 #include <debian-installer/system/utils.h>
 
 #include <debian-installer/log.h>
@@ -36,4 +37,16 @@ void di_system_init (const char *_progname)
   di_log_set_handler (DI_LOG_LEVEL_MASK, di_log_handler_syslog, NULL);
 }
 
+#ifndef DI_SYSTEM_SUBARCH_CAN_GUESS
 
+/*
+ * HACK: If there's a better way to do this, we should probably use that
+ *       instead of this stub function for non armel archs
+ */
+
+const char *di_system_subarch_analyze_guess (void)
+{
+  return di_system_subarch_analyze();
+}
+
+#endif

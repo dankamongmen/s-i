@@ -3,12 +3,23 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/utsname.h>
 
 #include <debian-installer/system/subarch.h>
 
 struct map {
 	char *entry;
 	char *ret;
+};
+
+static const char *supported_generic_subarches[] = {
+    "dove",
+    /* omap4 and omap need to be this way round, since omap is a prefix of
+     * omap4.
+     */
+    "omap4",
+    "omap",
+    NULL
 };
 
 static struct map map_hardware[] = {
@@ -104,4 +115,28 @@ const char *di_system_subarch_analyze(void)
 	}
 
 	return "unknown";
+}
+
+const char *di_system_subarch_analyze_guess(void)
+{
+	struct utsname sysinfo;
+	size_t uname_release_len, i;
+
+	/* Attempt to determine subarch based on kernel release version */
+	uname(&sysinfo);
+	uname_release_len = strlen(sysinfo.release);
+
+	for (i = 0; supported_generic_subarches[i] != NULL; i++)
+	{
+		size_t subarch_len = strlen (supported_generic_subarches[i]);
+		if (!strncmp(sysinfo.release+uname_release_len-subarch_len,
+			supported_generic_subarches[i],
+			subarch_len))
+		{
+			return supported_generic_subarches[i];
+		}
+	}
+
+	/* If we get here, try falling back on the normal detection method */
+	return di_system_subarch_analyze();
 }
