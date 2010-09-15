@@ -4,26 +4,39 @@
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Preparing Files for USB Memory Stick Booting</title>
 
-<para>
+<para><para arch="x86">
 
 There are two installation methods possible when booting from USB stick.
-The first is to install completely from the network. The second is to
-also copy a CD image onto the USB stick and use that as a source for
-packages, possibly in combination with a mirror. This second method is
-the more common.
+The first is to only use the USB stick to boot the installer, and then
+install completely from the network. The second is to also copy a CD image
+onto the USB stick and use that as a source for packages, possibly in
+combination with a mirror.
+
+</para><para arch="x86">
+
+To prepare a USB stick that only boots the installer, which then proceeds
+to install entirely from the network, you'll need to download the
+<filename>mini.iso</filename> image from the <filename>netboot</filename>
+directory (at the location mentioned in <xref linkend="where-files"/>), and
+write this file directly to the USB stick, overwriting its current contents.
+
+</para><para arch="x86">
+
+For example, when using an existing GNU/Linux system, the
+<filename>mini.iso</filename> file can be written to a USB stick as follows:
+
+<informalexample><screen>
+# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+This method will work with very small USB sticks, only a few megabytes in
+size.
 
 </para><para>
 
-For the first installation method you'll need to download an installer
-image from the <filename>netboot</filename> directory (at the location
-mentioned in <xref linkend="where-files"/>) and use the
-<quote>flexible way</quote> explained below to copy the files to the USB
-stick.
-
-</para><para>
-
-Installation images for the second installation method can be found in
-the <filename>hd-media</filename> directory and either the <quote>easy
+To prepare a USB stick that installs packages from a CD image included
+on the stick, use the installer images found in the
+<filename>hd-media</filename> directory. Either the <quote>easy
 way</quote> or the <quote>flexible way</quote> can be used to copy the
 image to the USB stick. For this installation method you will also need
 to download a CD image. The installation image and the CD image must be
