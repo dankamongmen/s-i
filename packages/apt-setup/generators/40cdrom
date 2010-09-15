@@ -9,6 +9,12 @@ if [ ! -e /cdrom/.disk/base_installable ]; then
 	exit 0
 fi
 
+cd_mountable=1
+db_get cdrom-detect/hybrid || true
+if [ "$RET" = true ] || [ -d /hd-media ]; then
+	cd_mountable=""
+fi
+
 fs=iso9660
 if db_get cdrom-detect/cdrom_fs && [ "$RET" ]; then
 	fs="$RET"
@@ -19,7 +25,7 @@ if [ "$fs" != iso9660 ]; then
 fi
 
 remount_cd() {
-	if [ "$ROOT" ] && [ ! -d /hd-media ]; then
+	if [ "$ROOT" ] && [ "$cd_mountable" ]; then
 		db_get cdrom-detect/cdrom_device
 		$logoutput mount -t "$fs" -o ro,exec $RET /cdrom || true
 	fi
@@ -60,8 +66,7 @@ if [ "$ROOT" ]; then
 	chroot=chroot
 
 	# Allow apt-cdrom to manage mounting/unmounting CDs in /target
-	# (except for hd-media installs)
-	if [ ! -d /hd-media ]; then
+	if [ "$cd_mountable" ]; then
 		rm -f $ROOT/etc/apt/apt.conf.d/00NoMountCDROM
 
 		# Also removes the bind-mount in /target
@@ -77,7 +82,7 @@ if $logoutput $chroot $ROOT apt-cdrom add \
    </dev/null; then
 	cat $ROOT$tmp >> $file
 
-	if [ "$ROOT" ] && [ ! -d /hd-media ]; then
+	if [ "$ROOT" ] && [ "$cd_mountable" ]; then
 		save_label
 	fi
 else
