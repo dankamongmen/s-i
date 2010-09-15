@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 61133 -->
+<!-- original version: 64720 -->
 <!-- revisado por Steve Langasek -->
+<!-- actualizado por elric -->
 
  <sect2 id="network-cards">
  <title>Hardware de conectividad de red</title>
@@ -8,9 +9,9 @@
 <para>
 
 Casi cualquier tarjeta de interfaz de red (también llamadas «network
-interface card» o NIC, n. del t.)  que el núcleo de &arch-kernel; soporte
-estará también soportada en el sistema de instalación. Los
-controladores modulares se cargarán automáticamente por regla general.
+interface card» o NIC, n. del t.) compatible con el núcleo de &arch-kernel;
+es también compatible conel sistema de instalación. Por regla general, los
+controladores modulares se cargarán automáticamente.
 
 <phrase arch="x86">Esto incluye la mayoría de las tarjetas PCI y PCMCIA.</phrase>
 <phrase arch="i386">También se soporta muchas tarjetas ISA antiguas.</phrase>
@@ -80,22 +81,31 @@ Se soporta RDSI, pero no durante la instalación.
    <title>Tarjetas de red inalámbrica</title>
 <para>
 
-En general también se soportan las tarjetas de red inalámbricas. El núcleo
+En la mayoría de los casos, las tarjetas de red inalámbrica son compatibles. El núcleo
 oficial de &arch-kernel; soporta un número creciente de adaptadores inalámbricos,
-aunque muchos necesitan que se cargue primero su «firmware». Aunque puede hacer
-funcionar en &debian; muchos adaptadores de red inalámbricos que no se soportan
-en el núcleo oficial de &arch-kernel;, no están soportados durante el proceso de
-instalación.
+aunque muchos necesitan que se cargue primero su «firmware».
+Si el «firmware» es necesario, el instalador le pedirá que lo cargue.
+Consulte <xref linkend="loading-firmware"/> para una información detallada de
+cómo cargar «firmware» durante la instalación.
+
  
-  </para><para>
-   
-Aún se está desarrollando en el programa de instalación la posibilidad de
-utilizar una red inalámbrica durante el proceso. El hecho de que funcione (o
-no) dependerá de su tipo de adaptador y de la configuración de su punto de
-acceso.
+</para><para>
+
+Aunque puede hacer
+funcionar en &debian; muchos adaptadores de red inalámbricos que no son compatibles
+con el núcleo oficial de &arch-kernel;, no estarán disponibles durante el proceso de
+instalación.
+
+</para><para>
+
+La instalación a través de una conexión inalámbrica cifrada está limitada a WEP.
+Si su punto de acceso usa un cifrado más fuerte, no podrá usarlo durante la instalación.
+
+</para><para>
+
 En cualquier caso, puede instalar &debian; utilizando una imagen completa de CD-ROM o
-DVD si no puede utilizar ninguna otra tarjeta de red. Elija la opción
-que no configure la red e instale el sistema sólo con los paquetes
+DVD si no puede utilizar ninguna otra tarjeta de red. Rechaze la opción
+de configurar la red e instale el sistema sólo con los paquetes
 disponibles en el CD/DVD. Una vez haya hecho esto podrá instalar el
 controlador y el «firmware» que necesite después de terminar la
 instalación (después del reinicio del sistema) y configurar la red
