@@ -95,24 +95,24 @@ mkdir /cdrom 2>/dev/null || true
 while true; do
 	WRONG=
 
-	if db_get cdrom-detect/try-usb && [ "$RET" = true ]; then
-		devices="$(list-devices usb-partition)"
-		for device in $devices; do
-			if try_mount $device $FATFS; then
-				break 2
-			fi
-			if try_mount $device $CDFS; then
-				break 2
-			fi
-		done
-	fi
-
 	devices="$(list-devices cd; list-devices maybe-usb-floppy)"
 	for device in $devices; do
 		if try_mount $device $CDFS; then
 			break 2
 		fi
 	done
+	
+	devices="$(list-devices usb-partition)"
+	for device in $devices; do
+		if try_mount $device $CDFS; then
+			db_set cdrom-detect/hybrid true
+			break 2
+		fi
+		if try_mount $device $FATFS; then
+			break 2
+		fi
+	done
+
 
 	if [ "$WRONG" ]; then
 		db_input critical cdrom-detect/wrong-cd || [ $? -eq 30 ]
