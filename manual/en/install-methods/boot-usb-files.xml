@@ -19,6 +19,8 @@ to install entirely from the network, you'll need to download the
 <filename>mini.iso</filename> image from the <filename>netboot</filename>
 directory (at the location mentioned in <xref linkend="where-files"/>), and
 write this file directly to the USB stick, overwriting its current contents.
+This method will work with very small USB sticks, only a few megabytes in
+size.
 
 </para><para arch="x86">
 
@@ -27,10 +29,21 @@ For example, when using an existing GNU/Linux system, the
 
 <informalexample><screen>
 # cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+# sync
 </screen></informalexample>
 
-This method will work with very small USB sticks, only a few megabytes in
-size.
+To add firmware to a USB stick prepared in this way, obtain the necessary firmware
+files. See <xref linkend="loading-firmware"/> for more information.
+Now unplug and replug the USB stick, and two partitions should now be visible on it.
+You should mount the second of the two partitions, and unpack the firmware onto it.
+
+<informalexample><screen>
+# mount /dev/<replaceable>sdX2</replaceable> /mnt
+# cd /mnt
+# tar zxvf <replacable>/path/to/</replacable>firmware.tar.gz
+# cd /
+# umount
+</screen></informalexample>
 
 </para><para>
 
