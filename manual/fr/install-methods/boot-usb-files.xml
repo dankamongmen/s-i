@@ -1,27 +1,56 @@
-<!-- original version: 57590 -->
+<!-- original version: 64734 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
 
-<para>
+<para arch="x86">
 
-Pour amorcer à partir d'une clé USB, il existe deux méthodes. La première est de faire
-toute l'installation sur le réseau. La seconde consiste à copier une image CD sur la clé et
+Quand on veut amorcer à partir d'une clé USB, il existe deux méthodes d'installation.
+La première utilise la clé uniquement pour lancer l'installateur lui-même,
+toute l'installation se faisant ensuite sur le réseau.
+La seconde consiste à copier une image CD sur la clé et
 à utiliser cette image comme source de paquets, source qui peut se combiner avec un miroir.
 Cette deuxième méthode est la plus commune.
 
 </para>
-<para>
+<para arch="x86">
 
-Pour la première méthode, vous devez télécharger une image de l'installateur
+Pour la première méthode, vous devez télécharger l'image <filename>mini.iso</filename>
 qui se trouve dans le répertoire <filename>netboot</filename> (son adresse précise
-est mentionnée dans  <xref linkend="where-files"/>) et copier les fichiers sur la clé en
-utilisant la <quote>méthode détaillée</quote> décrite plus bas.
+est mentionnée dans  <xref linkend="where-files"/>) et copier cette image sur la clé,
+ce qui efface le contenu actuel de la clé. Cette méthode convient aux clés de petite taille
+(quelques mégaoctets).
 
+</para>
+<para arch="x86">
+
+Par exemple, avec un système GNU/Linux, vous pouvez copier l'image <filename>mini.iso</filename>
+sur la clé de cette manière :
+
+<informalexample><screen>
+# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
+
+Pour ajouter un microprogramme sur une clé ainsi préparée, vous devez récupérer les
+fichiers du microprogramme. Consultez <xref linkend="loading-firmware"/>  pour des précisions.
+Puis, vous devez débrancher la clé puis la rebrancher. Vous devez voir maintenant deux partitions
+sur la clé. Montez la deuxième partition et placez-y les fichiers du microprogramme
+de cette manière :
+
+<informalexample><screen>
+# mount /dev/<replaceable>sdX2</replaceable> /mnt
+# cd /mnt
+# tar zxvf <replacable>/path/to/</replacable>firmware.tar.gz
+# cd /
+# umount
+</screen></informalexample>
+ 
 </para>
 <para>
 
-Pour la seconde méthode, les images d'installation se trouvent dans le répertoire
+Pour la seconde méthode, la clé USB contenant une image CD qui permet l'installation de paquets,
+les images d'installation se trouvent dans le répertoire
 <filename>hd-media</filename>. Pour copier les fichiers sur la clé, vous pouvez utiliser 
 aussi bien l'une ou l'autre des méthodes décrites plus bas. Vous devez aussi
 télécharger une image CD. Les images de l'installation ainsi que l'image CD doivent être
