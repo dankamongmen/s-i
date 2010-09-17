@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
+<!-- original version: 64654 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
  <title>Dateien vorbereiten für das Booten von Festplatte</title>
@@ -15,11 +15,6 @@ Man kann eine komplette <quote>reine Netzwerk</quote>-Installation auf diese Wei
 durchführen. Dies vermeidet das ganze Theater mit den Wechselmedien,
 wie das Auffinden und Brennen von CD-Images oder den Kampf mit den
 vielen oder mit defekten Floppy-Disks.
-
-</para><para arch="x86">
-
-Der Installer kann jedoch nicht von Dateien auf einem NTFS-Dateisystem
-booten.
 
 </para><para arch="powerpc"> 
 
@@ -59,7 +54,8 @@ RAM-Disk kann vom Kernel als Root-Dateisystem genutzt werden.
 </para><para>
 
 Kopieren Sie die folgenden Dateien von einem Debian-Archiv in
-ein passendes Verzeichnis auf Ihrer Festplatte, wie z.B.
+ein passendes Verzeichnis auf Ihrer Festplatte (beachten Sie, dass
+LILO nicht von Dateien auf einem NTFS-Dateisystem booten kann), z.B. in
 <filename>/boot/newinstall/</filename>:
 
 <itemizedlist>
@@ -83,6 +79,34 @@ springen Sie zu <xref linkend="boot-initrd"/>.
 </para>
   </sect2>
 
+  <sect2 arch="x86" id="files-loadlin">
+  <title>Booten des Installers von Festplatte mittels <command>loadlin</command></title>
+<para>
+
+Dieser Abschnitt beschreibt, wie Sie Ihre Festplatte vorbereiten, um von DOS
+aus den Installer mittels <command>loadlin</command> zu starten.
+
+</para><para>
+
+Kopieren Sie die folgenden Dateien von einem Debian-CD-Image nach
+<filename>c:\</filename>:
+
+<itemizedlist>
+<listitem><para>
+
+<filename>/&x86-install-dir;</filename> (Kernel-Binärdatei und Ramdisk-Image)
+
+</para></listitem>
+<listitem><para>
+
+<filename>/tools</filename> (Hilfsprogramm loadlin)
+
+</para></listitem>
+
+</itemizedlist>
+
+</para>
+  </sect2>
 
   <sect2 arch="powerpc" id="files-oldworld">
   <title>Booten des Installers von Festplatte auf OldWorld-Macs</title>
