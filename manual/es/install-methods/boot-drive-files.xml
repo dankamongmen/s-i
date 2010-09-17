@@ -1,43 +1,39 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 39614 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 64654 -->
 <!-- revisado por nahoo, 4 noviembre 2004 -->
+<!-- revisado por elric, 8 de septiembre 2010 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
- <title>Preparación de los ficheros para arranque desde el disco duro</title>
+ <title>PreparaciÃ³n de los ficheros para arranque desde el disco duro</title>
 <para>
 
 El instalador puede arrancarse usando ficheros de arranque colocados
-en una partición existente del disco duro, ya sea cargándolos desde
+en una particiÃ³n existente del disco duro, ya sea cargÃ¡ndolos desde
 otro sistema operativo o ejecutando directamente un gestor de arranque
 desde la BIOS.
 
 </para><para>
 
-Se puede conseguir una instalación <quote>completamente a través de la red</quote>
-usando esta técnica. Esto evita todas las molestias de los medios
-extraíbles, como encontrar y quemar las imágenes de CD o batallar con
+Se puede conseguir una instalaciÃ³n <quote>completamente a travÃ©s de la red</quote>
+usando esta tÃ©cnica. Esto evita todas las molestias de los medios
+extraÃ­bles, como encontrar y quemar las imÃ¡genes de CD o batallar con
 muchos, y poco fiables, disquetes.
-
-</para><para arch="x86">
-
-El instalador no puede arrancar desde ficheros ubicados en un sistema de
-ficheros NTFS.
 
 </para><para arch="powerpc">
 
 El instalador no puede arrancar desde ficheros en un sistema de
-ficheros HFS+. MacOS System 8.1 y superiores podrían usar sistema
-de ficheros HFS+; todas las PowerMac «NewWorld» usan HFS+. Para determinar
+ficheros HFS+. MacOS System 8.1 y superiores podrÃ­an usar sistema
+de ficheros HFS+; todas las PowerMac Â«NewWorldÂ» usan HFS+. Para determinar
 si su sistema existente usa HFS+, elija <userinput>Get Info</userinput>
-para el volumen en cuestión. Los sistemas de ficheros HFS aparecen como
+para el volumen en cuestiÃ³n. Los sistemas de ficheros HFS aparecen como
 <userinput>Mac OS Standard</userinput>, mientras que los sistemas de
-ficheros HFS+ aparecen como <userinput>Mac OS Extended</userinput>. Deberá tener
-una partición HFS para intercambiar ficheros entre MacOS y Linux,
-en particular los ficheros de instalación que descargue.
+ficheros HFS+ aparecen como <userinput>Mac OS Extended</userinput>. DeberÃ¡ tener
+una particiÃ³n HFS para intercambiar ficheros entre MacOS y Linux,
+en particular los ficheros de instalaciÃ³n que descargue.
 
 </para><para arch="powerpc">
 
-Se usan diferentes programas para el arranque del sistema de instalación
+Se usan diferentes programas para el arranque del sistema de instalaciÃ³n
 desde disco duro, dependiendo de si el sistema es un modelo <quote>NewWorld</quote> u
 <quote>OldWorld</quote>.
 
@@ -48,26 +44,27 @@ desde disco duro, dependiendo de si el sistema es un modelo <quote>NewWorld</quo
   <command>GRUB</command></title>
 <para>
 
-Esta sección explica como añadir o incluso reemplazar una instalación
+Esta secciÃ³n explica como aÃ±adir o incluso reemplazar una instalaciÃ³n
 de Linux existente usando <command>LILO</command> o
 <command>GRUB</command>.
 
 </para><para>
 
 En el momento de arranque, ambos gestores soportan la carga en memoria
-no solamente el núcleo, sino también de una imagen de disco. El núcleo puede
-usar este disco RAM como sistema de ficheros raíz.
+no solamente el nÃºcleo, sino tambiÃ©n de una imagen de disco. El nÃºcleo puede
+usar este disco RAM como sistema de ficheros raÃ­z.
 
 </para><para>
 
 Copie los siguientes ficheros desde los archivos de Debian a una
-ubicación conveniente en su disco duro, por ejemplo a
-<filename>/boot/newinstall/</filename>.
+ubicaciÃ³n conveniente en su disco duro (tenga en cuenta que
+LILO no puede arrancar desde ficheros en un sistema de ficheros
+NTFS), por ejemplo a <filename>/boot/newinstall/</filename>.
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (binario del núcleo)
+<filename>vmlinuz</filename> (binario del nÃºcleo)
 
 </para></listitem>
 <listitem><para>
@@ -79,11 +76,40 @@ ubicación conveniente en su disco duro, por ejemplo a
 
 </para><para>
 
-Finalmente, para configurar el gestor de arranque continúe en
+Finalmente, para configurar el gestor de arranque continÃºe en
 <xref linkend="boot-initrd"/>.
 
 </para>
   </sect2>
+
+
+   <sect2 arch="x86" id="files-loadlin">
+  <title>Arranque del instalador desde el disco duro usando <command>loadlin</command></title>
+<para>
+
+Esta secciÃ³n explica como preparar su disco duro para arrancar el instalador
+desde DOS usando <command>loadlin</command>.
+
+</para><para>
+
+Copie los siguientes ficheros de una imagen de CD de Debian a <filename>c:\</filename>.
+
+<itemizedlist>
+<listitem><para>
+
+<filename>/&x86-install-dir;</filename> (nÃºcleo binario e imagen de disco RAM)
+
+</para></listitem>
+<listitem><para>
+
+<filename>/tools</filename> (herramienta loadlin)
+
+</para></listitem>
+
+</itemizedlist>
+
+</para>
+  </sect2> 
 
 
   <sect2 arch="powerpc" id="files-oldworld">
@@ -91,31 +117,31 @@ Finalmente, para configurar el gestor de arranque continúe en
 <para>
 
 El disquete <filename>boot-floppy-hfs</filename> usa
-<application>miBoot</application> para cargar la instalación de Linux,
+<application>miBoot</application> para cargar la instalaciÃ³n de Linux,
 pero no se puede usar <application>miBoot</application> para el arranque
 desde el disco duro. <application>BootX</application>, cargado desde MacOS,
 soporta el arranque desde ficheros ubicados en el disco duro.
-<application>BootX</application> también se puede usar para un arranque
-dual de MacOS y Linux después de finalizar la instalación de Debian.
+<application>BootX</application> tambiÃ©n se puede usar para un arranque
+dual de MacOS y Linux despuÃ©s de finalizar la instalaciÃ³n de Debian.
 Para Performa 6360, aparentemente <command>quik</command> no puede
-hacer el disco duro arrancable. Así que se necesita
+hacer el disco duro arrancable. AsÃ­ que se necesita
 <application>BootX</application> en ese modelo.
 
 </para><para>
 
-Descargue y desempaquete la distribución <application>BootX</application>
+Descargue y desempaquete la distribuciÃ³n <application>BootX</application>
 disponible en <ulink url="&url-powerpc-bootx;"></ulink>, 
 o en el directorio
 <filename>dists/woody/main/disks-powerpc/current/powermac</filename>
-de las réplicas http/ftp y los CDs oficiales de Debian. Use
+de las rÃ©plicas http/ftp y los CDs oficiales de Debian. Use
 <application>Stuffit Expander</application> para extraerlo desde su
-archivo. Dentro del paquete, existe una carpeta vacía llamada
+archivo. Dentro del paquete, existe una carpeta vacÃ­a llamada
 <filename>Linux Kernels</filename>. Descargue
 <filename>linux.bin</filename> y
 <filename>ramdisk.image.gz</filename> desde el directorio
 <filename>disks-powerpc/current/powermac</filename>, y luego ubiquelos
 en la carpeta <filename>Linux Kernels</filename>. Luego ubique la
-carpeta <filename>Linux Kernels</filename> en la carpeta «System» activa.
+carpeta <filename>Linux Kernels</filename> en la carpeta Â«SystemÂ» activa.
 
 </para>
   </sect2>
@@ -125,13 +151,13 @@ carpeta <filename>Linux Kernels</filename> en la carpeta «System» activa.
 <para>
 
 Las PowerMac NewWorld soportan arranque desde red o desde un CD-ROM
-ISO9660, así como la carga de binarios ELF directamente desde el disco
-duro. Estas máquinas arrancarán Linux directamente a través de
-<command>yaboot</command>, que soporta la carga de núcleo y disco RAM
-directamente desde una partición ext2, así como el arranque dual con
+ISO9660, asÃ­ como la carga de binarios ELF directamente desde el disco
+duro. Estas mÃ¡quinas arrancarÃ¡n Linux directamente a travÃ©s de
+<command>yaboot</command>, que soporta la carga de nÃºcleo y disco RAM
+directamente desde una particiÃ³n ext2, asÃ­ como el arranque dual con
 MacOS. El arranque del instalador desde el disco duro es particularmente
-apropiado para máquinas nuevas sin unidades de disquete.
-<command>BootX</command> no está soportado y no debe usarse en
+apropiado para mÃ¡quinas nuevas sin unidades de disquete.
+<command>BootX</command> no estÃ¡ soportado y no debe usarse en
 PowerMacs NewWorld.
 
 </para><para>
@@ -166,15 +192,15 @@ al icono del disco duro mientras presiona la tecla <keycap>option</keycap>).
 
 </para><para>
 
-Tome nota de el número de partición de la partición MacOS donde
-ubicó los ficheros. Si tiene el programa <command>pdisk</command> de
-MacOS, puede usar la orden <command>L</command> para verificar el número de partición.
-Necesitará este número de partición para la orden que escribirá
-en el cursor de «Open Firmware» cuando arranque el instalador.
+Tome nota de el nÃºmero de particiÃ³n de la particiÃ³n MacOS donde
+ubicÃ³ los ficheros. Si tiene el programa <command>pdisk</command> de
+MacOS, puede usar la orden <command>L</command> para verificar el nÃºmero de particiÃ³n.
+NecesitarÃ¡ este nÃºmero de particiÃ³n para la orden que escribirÃ¡
+en el cursor de Â«Open FirmwareÂ» cuando arranque el instalador.
 
 </para><para>
 
-Para arrancar el instalador, continúe en <xref linkend="boot-newworld"/>.
+Para arrancar el instalador, continÃºe en <xref linkend="boot-newworld"/>.
 
 </para>
   </sect2>
