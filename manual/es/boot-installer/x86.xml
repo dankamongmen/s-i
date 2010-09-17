@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- original version: 62896 -->
+<!-- original version: 64654 -->
 <!-- actualizado por rudy, 5 diciembre 2004 -->
 <!-- revisado Francisco García <franciscomanuel.garcia@hispalinux.es>, 27 enero 2005 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 <!-- revisado igortamara, 17 nov. 2008 -->
 <!-- actualizado elric, 16 agosto 2010-->
+<!-- actualizado elric, 9 septiembre 2010-->
 
-  <sect2 arch="any-x86"><title>Arranque desde un CD-ROM</title>
+  <sect2 arch="x86"><title>Arranque desde un CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
@@ -75,7 +76,7 @@ Arranca la variante <quote>bf2.4</quote>.
 -->
 
   </sect2>
-  <sect2 arch="any-x86" id="boot-win32">
+  <sect2 arch="x86" id="boot-win32">
   <title>Arranque desde Windows</title>
 <para>
 
@@ -86,53 +87,59 @@ en <xref linkend="official-cdrom"/> y <xref linkend="boot-usb-files"/>.
 </para><para>
 
 Si usa un CD o DVD de instalación, se lanzará un programa de pre-instalación
-automáticamente cuando inserta el disco.
+automáticamente cuando inserte el disco.
 En caso de que Windows no lo ejecute automáticamente, o si está usando una
 memoria USB, puede ejecutarlo manualmente accediendo al dispositivo y
 ejecutando <command>setup.exe</command>.
 
 </para><para>
 
-Después de haber iniciado el programa, se le hará una serie preliminar
+Después de haber iniciado el programa se le hará una serie preliminar
 de preguntas y el sistema estará preparado para comenzar el instalador de
 &debian;.
 
 </para>
   </sect2>
 
-<!-- FIXME the documented procedure does not exactly work, commented out
-     until fixes
-
   <sect2 arch="x86" id="install-from-dos">
-  <title>Arranque desde una partición de DOS</title>
-
-&boot-installer-intro-hd.xml;
-
+  <title>Arranque desde DOS</title>
 <para>
 
-Arranque DOS (no Windows) sin ningún controlador cargado. Para hacer
-esto, presione <keycap>F8</keycap> en el momento exacto (y opcionalmente
-elija la opción <quote>safe mode command prompt only</quote>). Ingrese en el subdirectorio
-para la variante que elija, p. ej.:
-
-<informalexample><screen>
-cd c:\install
-</screen></informalexample>.
-
-Seguidamente, ejecute <command>install.bat</command>.
-Se cargará el núcleo y después el sistema de instalación.
+Arranque DOS (no Windows). Para ello puede, por ejemplo, arrancar desde un
+disco de restauración o diagnóstico.
 
 </para><para>
 
-Por favor, tenga en cuenta que existe un problema con loadlin (#142421) que
-impide que <filename>install.bat</filename> pueda usarse con
-la variante bf2.4. El síntoma de este problema es el mensaje de error
-<computeroutput>invalid compressed format</computeroutput>.
+Si puede acceder al CD de instalación, cambie el disco actual al disco en el
+lector de discos ópticos, por ejemplo:
+
+<informalexample><screen>
+d:
+</screen></informalexample>.
+
+o compruebe que primero ha preparado el disco duro como se explica en
+<xref linkend="files-loadlin"/>, y cambie el disco actual si es necesario.
+
+</para><para>
+
+Entre en el subdirectorio de la variante que ha seleccionado, por ejemplo,
+
+<informalexample><screen>
+cd \&x86-install-dir;
+</screen></informalexample>
+
+Si prefiere usar el instalador gráfico entre en el subdirectorio
+<filename>gtk</filename>.
+
+<informalexample><screen>
+cd gtk
+</screen></informalexample>
+
+A continuación, ejecute <command>install.bat</command>.
+El núcleo se cargará y arrancará el sistema del instalador.
 
 </para>
   </sect2>
-
-END FIXME -->
 
   <sect2 arch="x86" id="boot-initrd">
   <title>Arranque desde Linux usando <command>LILO</command> o
@@ -149,7 +156,7 @@ Si intenta usar el disco duro solamente para arrancar y descargar
 todo a través de la red, deberá descargar el fichero
 <filename>netboot/debian-installer/&architecture;/initrd.gz</filename> y su
 núcleo correspondiente <filename>netboot/debian-installer/&architecture;/linux</filename>.
-Esto le permite reparticionar el disco duro desde donde arrancó el
+Esto le permite reparticionar el disco duro desde donde arranque el
 instalador, aunque debe hacerlo con cuidado.
 </para>
 
@@ -219,7 +226,7 @@ Desde este momento en adelante, no habrá diferencia entre
 </para>
   </sect2>
 
-  <sect2 arch="any-x86" condition="bootable-usb" id="usb-boot">
+  <sect2 arch="x86" condition="bootable-usb" id="usb-boot">
   <title>Arranque desde un dispositivo de memoria USB</title>
 <para>
 

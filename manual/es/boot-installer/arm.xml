@@ -1,116 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 36639 -->
+<!-- original version: 59971 -->
+<!-- revisado ikks, 02 oct. 2009 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Arrancar desde TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Arrancar desde TFTP en NetWinder</title>
-
-<para>
-
-Las máquinas NetWinder tienen dos interfaces de red: una tarjeta de
-10 Mbps compatible con NE2000 (que habitualmente se la refiere como
-<filename>eth0</filename>) y una tarjeta
-Tulip de 100 Mbps. Si utiliza la tarjeta de 100Mbps puede tener problemas
-durante la descarga de la imagen a través de TFTP por lo que se recomienda el
-uso de la interfaz de 10Mbps (el marcado como <literal>10 Base-T</literal>).
-
-</para>
-<note><para>
-
-Necesita NeTTrom 2.2.1 o superior para arrancar el sistema de
-instalación. Se recomienda la versión 2.3.3. Desgraciadamente,
-los archivos de «firmware» no se pueden descargar actualmente debido
-a problemas de licencia. Podrá encontrar nuevas imágenes en <ulink
-url="http//www.netwinder.org/"></ulink> si esta situación cambia en el futuro.
-
-</para></note>
-<para>
-
-Cuando arranque Netboot debe interrumpir el proceso de arranque durante la
-cuenta hacia atrás. Esto le permite establecer algunos valores del
-«firmware» necesarios para arrancar el instalador. En primer lugar,
-debería cargar los valores por omisión:
-
-<informalexample><screen>
-   NeTTrom command-&gt; load-defaults
-</screen></informalexample>
-
-Después, puede configurar la red asignando una dirección estática:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-    NeTTrom command-&gt; setenv eth0_ip 192.168.0.10/24
-</screen></informalexample>
-
-donde 24 es el número de conjunto de bits en la máscara de red. O bien,
-puede utilizar una dirección dinámica:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv netconfig_eth0 dhcp
-</screen></informalexample>
-
-También podría necesitar configurar los valores de
-<userinput>route1</userinput> en el servidor TFTP, si es que no está
-en la misma subred. 
-
-Si sigue los pasos de configuración indicados más abajo tendrá que
-modificar la dirección del servidor de TFTP y la ubicación
-de la imagen. Una vez hecho esto deberá guardar sus cambios en la flash.
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kerntftpserver 192.168.0.1
-    NeTTrom command-&gt; setenv kerntftpfile boot.img
-    NeTTrom command-&gt; save-all
-    NeTTrom command-&gt; setenv netconfig_eth0 flash
-</screen></informalexample>
-
-Tras esto deberá decir al «firmware» que debería arrancar la imagen TFTP:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv kernconfig tftp
-    NeTTrom command-&gt; setenv rootdev /dev/ram
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-También necesitar establecer el valor mostrado a continuación si
-quiere utilizar la consola serie para instalar su Netwinder:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram console=ttyS0,115200
-</screen></informalexample>
-
-En lugar de la consola puede utilizar un teclado o monitor para la instalación
-para lo que debe configurar:
-
-<informalexample><screen>
-    NeTTrom command-&gt; setenv cmdappend root=/dev/ram
-</screen></informalexample>
-
-Puede utilizar la orden <command>printenv</command> para revisar los valores de
-su entorno. Puede cargar la imagen una vez haya verificado que son correctos:
-
-<informalexample><screen>
-    NeTTrom command-&gt; boot
-</screen></informalexample>
-
-Si tiene problemas le recomendamos que consulte el 
-<ulink url="http://www.netwinder.org/howto/Firmware-HOWTO.html">COMO
-detallado</ulink> disponible.
-
-</para>
-  </sect3>
-
-  <sect3 arch="arm"><title>Arrancar desde TFTP en CATS</title>
-
-<para>
-
-En máquinas CATS, use <command>boot de0:</command> o similar en el
-cursor Cyclone.
-
-</para>
-   </sect3>
   </sect2>
 
 
@@ -118,12 +13,6 @@ cursor Cyclone.
 
 &boot-installer-intro-cd.xml;
 
-<para>
-
-Para arrancar desde CD-ROM desde el cursor de la consola Cyclone,
-use la orden <command>boot cd0:cats.bin</command>
-
-</para>
   </sect2>
 
 
@@ -142,7 +31,7 @@ Hay tres formas distintas de poner el «firmware» del instalador en flash:
 <para>
 
 Vaya a la sección de administración de la interfaz y elija el elemento
-del menú <literal>Upgrade</literal> («Actualización», N. del T.).
+<literal>Upgrade</literal> del menú  («Actualización», N. del T.).
 Hecho esto podrá buscar en su disco la imagen del instalador que ha
 descargado previamente. Hecho esto, pulse el botón
 <literal>Start Upgrade</literal> («Comenzar la actualización», N. del T.),
@@ -227,5 +116,120 @@ para Windows para actualizar el firmware a través de la red.
 
 </para>
     </sect4>
+   </sect3>
+
+   <sect3 arch="arm" id="boot-firmware-ss4000e">
+   <title>Arranque del SS4000-E</title>
+<para>
+
+En este momento no es posible iniciar el proceso de instalación
+sin un puerto serial debido a limitaciones del firmware del
+SS4000-E. Para arrancar el instalador, requerirá un cable
+serial nullmodem; y un computador con un puerto serial<footnote id="arm-s4ke-port">
+
+<para>
+También funcionará un convertidor USB a serial.
+</para>
+
+</footnote>; y un cable especial con un conector macho DB9 en un
+extremo y al otro una cabecera de 10 pines en una pulgada<footnote id="arm-s4k-rib">
+
+<para>
+Este tipo de cable se encuentra usualmente en computadores de escritorio
+con puertos seriales de 9 pines.
+</para>
+
+</footnote>.
+
+</para><para>
+
+Para arrancar el SS4000-E, primero cargue la imagen de firmware
+proveída por Debian(ss4000e.pkg) con la interfaz web del SS4000-E(vaya a
+<quote>administración</quote>, después a <quote>firmware</quote>, y
+suba la imagen). A continuación, use el cable serial nullmodem y el 
+cable especial para conectar el puerto del SS4000-E, acto seguido,
+reinicie la máquina. Se requiere usar una aplicación de terminal
+serial para comunicarse con la máquina; una buena opción en una
+máquina Debian GNU/Linux puede ser el programa <command>cu</command>, 
+en el paquete del mismo nombre. Asumiendo que el puerto serial
+en su computador se encuentra en <filename>/dev/ttyS0</filename>, use
+la siguiente línea :
+
+</para>
+
+<informalexample><screen>
+cu -lttyS0 -s115200
+</screen></informalexample>
+
+<para>
+
+Si está desde Windows, podría usar el programa 
+<classname>hyperterminal</classname>. Use una tasa de 115200 baudios,
+longitud de palabras de 8 bits, sin bit de parada y un bit de paridad.
+
+</para><para>
+
+Cuando la máquina arranque, verá las siguientes líneas:
+
+</para>
+
+<informalexample><screen>
+No network interfaces found
+
+EM-7210 ver.T04 2005-12-12 (For ver.AA)
+== Executing boot script in 1.000 seconds - enter ^C to abort
+</screen></informalexample>
+
+<para>
+
+En este punto use Control-C para interrumpir al cargador de
+arranque<footnote id="arm-s4ke-sec">
+
+<para>
+Tenga en cuenta que solamente tiene un segundo para hacerlo; si se
+pasa esta ventana, basta con reiniciarla desde la fuente de 
+alimentación e intentarlo de nuevo.
+</para>
+
+</footnote>. De esta forma llegará al prompt RedBoot. Aplique la
+siguiente orden:
+
+</para>
+
+<informalexample><screen>
+fconfig boot_script_data
+</screen></informalexample>
+
+<para>
+
+RedBoot aguardará para que usted le ofrezca el guión de arranque.
+Asegúrese de ingresar <emphasis>exactamente</emphasis> 
+el siguiente guión:
+
+</para>
+
+<informalexample><screen>
+fis load ramdisk.gz
+fis load zImage
+exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+</screen></informalexample>
+
+<para>
+
+Culmine el guión con una línea vacía, y teclee una <quote>y</quote> que
+le pregunta si desea actualizar la configuración no volátil. Finalmente
+use <quote>reset</quote> para reiniciar el sistema, y permítale arrancar
+normalmente. El instalador debería arrancar normalmente. Puede instalar
+Debian o bien a través del puerto serial o usar un cliente SSH para
+conectarse vía SSH.
+
+</para><para>
+
+Tenga en cuenta que no es necesario actualizar el guión de arranque después
+de la instalación. El sistema se configurará de tal forma que el dispositivo
+raíz del sistema de configuración, en lugar del que viene en la línea de
+órdenes del kernel.  De todas formas, no afectará en modo alguno hacerlo.
+
+</para>
    </sect3>
   </sect2>
