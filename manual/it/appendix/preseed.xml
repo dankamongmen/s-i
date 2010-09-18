@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64768 -->
+<!-- original version: 64778 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -403,31 +403,46 @@ e lo carica.
 For the other preseeding methods you need to tell the installer what file
 to use when you boot it. This is normally done by passing the kernel a boot
 parameter, either manually at boot time or by editing the bootloader
-configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the
-parameter to the end of the append line(s) for the kernel.
+configuration file <phrase arch="linux-any">(e.g.
+<filename>syslinux.cfg</filename>) and adding the parameter to the end of
+the append line(s) for the kernel.</phrase><phrase arch="kfreebsd-any">(e.g.
+<filename>grub.cfg</filename>) and adding the parameter as a new
+<literal>set</literal> line for the kernel.</phrase><phrase arch="hurd-any">(e.g.
+<filename>grub.cfg</filename>) and adding the parameter to the end of the
+<filename>gnumach.gz</filename> line.</phrase>
 -->
 
 Per gli altri metodi di preconfigurazione è necessario specificare durante
 l'avvio dell'installatore quale file usare. Normalmente questo può essere
 fatto passando al kernel un determinato parametro d'avvio, manualmente durante
-l'avvio oppure tramite il file di configurazione del boot loader (p.e.
-<filename>syslinux.cfg</filename>) aggiungendo il parametro alla fine delle
-righe <quote>append</quote> per il kernel.
+l'avvio oppure tramite il file di configurazione del boot loader
+<phrase arch="linux-any">(p.e. <filename>syslinux.cfg</filename>) aggiungendo
+il parametro alla fine delle righe <quote>append</quote> per il kernel.</phrase>
+<phrase arch="kfreebsd-any">(p.e. <filename>grub.cfg</filename>) aggiungendo
+il parametro in una nuova riga <literal>set</literal> per il kernel.</phrase>
+<phrase arch="hurd-any">(p.e. <filename>grub.cfg</filename>) aggiungendo il
+parametro alla fine della riga <filename>gnumach.gz</filename>.</phrase>
 
 </para><para>
 
 <!--
 If you do specify the preconfiguration file in the bootloader configuration,
 you might change the configuration so you don't need to hit enter to boot the
-installer. For syslinux this means setting the timeout to <literal>1</literal>
-in <filename>syslinux.cfg</filename>.
+installer. <phrase arch="linux-any">For syslinux this means setting the timeout
+to <literal>1</literal> in <filename>syslinux.cfg</filename>.</phrase><phrase
+arch="kfrebsd-any;hurd-any">For grub this means setting the timeout to
+<literal>0</literal> in <filename>grub.cfg</filename>.</phrase>
 -->
 
 Se si specifica un file di preconfigurazione nella configurazione del
 boot loader, è possibile modificare la configurazione in modo che non sia
-necessario premere Invio per avviare l'installazione. Con syslinux si può
-ottenere questo risultato impostando timeout a <literal>1</literal> in
-<filename>syslinux.cfg</filename>.
+necessario premere Invio per avviare l'installazione.
+<phrase arch="linux-any">Con syslinux si può ottenere questo risultato
+impostando il timeout a <literal>1</literal> in
+<filename>syslinux.cfg</filename>.</phrase>
+<phrase arch="kfrebsd-any;hurd-any">Con grub si può ottenere questo risultato
+impostando il timeout a <literal>0</literal> in
+<filename>grub.cfg</filename>.</phrase>
 
 </para><para>
 
@@ -2451,9 +2466,9 @@ sulla riga di comando del kernel.
   <title>Installazione del boot loader</title>
 <informalexample role="example"><screen>
 <!--
-# Grub is the default boot loader (for x86). If you want lilo installed
+<phrase arch="linux-any"># Grub is the default boot loader (for x86). If you want lilo installed
 # instead, uncomment this:
---># Grub è il boot loader predefinito (per x86). Invece, se si desidera
+--><phrase arch="linux-any"># Grub è il boot loader predefinito (per x86). Invece, se si desidera
 # che sia installato lilo, scommentare questa riga:
 #d-i grub-installer/skip boolean true
 <!--
@@ -2461,7 +2476,11 @@ sulla riga di comando del kernel.
 # too:
 --># Per evitare anche l'installazione di lilo, e quindi non installare
 # nessun boot loader, scommentare questa riga:
-#d-i lilo-installer/skip boolean true
+#d-i lilo-installer/skip boolean true</phrase>
+<!--
+<phrase arch="kfreebsd-any;hurd-any"># To install no bootloader, uncomment this
+--><phrase arch="kfreebsd-any;hurd-any"># Per non installare un bootloader, scommentare questa riga:
+#d-i grub-installer/skip boolean true</phrase>
 
 <!--
 # With a few exceptions for unusual partitioning setups, GRUB 2 is now the
