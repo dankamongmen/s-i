@@ -209,6 +209,7 @@ if [ -d /sys/bus/platform/devices/s3c2440-usbgadget -o \
 	
 	log "Detected S3C2410/S3C2440 SoC, loading g_ether"
 	load_module g_ether
+	register-module g_ether
 fi
 
 # If using real hotplug, re-run the rc scripts to pick up new modules.
