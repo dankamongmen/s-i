@@ -1,39 +1,18 @@
 <!-- $Id$ -->
-<!-- original version: 57590 -->
+<!-- original version: 64779 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Příprava souborů pro zavedení z USB zařízení</title>
 
-<para>
+<para arch="x86">
 
-Při zavádění instalace z USB klíčenky jsou možné dva postupy. U prvního
-se instaluje kompletně ze sítě, druhý navíc na USB klíčence obsahuje
-ISO obraz instalačního systému, který se použije jako zdroj balíků pro
-instalaci (volitelně s použitím síťového zrcadla). Druhý postup je
-běžnější.
-
-</para><para>
-
-U prvního způsobu budete muset stáhnout obraz instalátoru z adresáře
-<filename>netboot</filename> (viz kapitola <xref linkend="where-files"/>)
-a dostat jej na USB klíčenku pomocí <quote>pružné cesty</quote> popsané
-níže.
+Při zavádění instalace z USB klíčenky jsou možné dva postupy.
+U prvního se USB používá pouze pro zavedení instalačního systému
+a zbytek se instaluje kompletně ze sítě, druhý navíc na USB klíčenku
+nakopíruje ISO obraz instalačního systému, který se použije jako zdroj
+balíků pro instalaci (volitelně s použitím síťového zrcadla).
 
 </para><para>
-
-Instalační obrazy pro druhý způsob se nachází v adresáři
-<filename>hd-media</filename> a funguje pro ně jak
-<quote>jednoduchá</quote>, tak <quote>pružná</quote> cesta. Mimo to
-budete muset pro tento způsob instalace stáhnout také obraz prvního
-instalačního CD, které je založeno na stejné verzi &d-i;. Nebudou-li
-verze souhlasit, nejspíš narazíte během instalace na chyby.<footnote>
-
-<para>
-
-Nejtypičtejší chybová hláška je, že nebyly nalezeny jaderné moduly. To
-znamená, že se liší verze modulů na obrazu CD a verze běžícího jádra.
-
-</para></footnote></para><para>
 
 Pro přípravu USB zařízení budete potřebovat počítač s nainstalovaným
 GNU/Linuxem a podporou USB. Dnešní systémy GNU/Linuxu by měly USB
@@ -52,7 +31,54 @@ zařízení nachází! Před spuštěním příkazů se raději několikrát
 ujistěte, že jste zařízení zadali správně, protože i drobný překlep
 může způsobit, že si smažete data na pevném disku.
 
-</para></warning><para>
+</para></warning><para arch="x86">
+
+Pro přípravu USB klíčenky, ze které se pouze zavede instalace a zbytek
+probíhá po síti, budete muset z adresáře <filename>netboot</filename>
+stáhnout obraz <filename>mini.iso</filename> (viz kapitola
+<xref linkend="where-files"/>) a zapsat jej přímo na USB klíčenku,
+čímž přepíšete její obsah. Výhodou je, že vám bude stačit velmi malá
+klíčenka v řádech megabajtů.
+
+</para><para arch="x86">
+
+Například na systému s GNU/Linuxem můžete obraz
+<filename>mini.iso</filename> zapsat na USB klíčenku následovně:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>cat mini.iso &gt; /dev/<replaceable>sdX</replaceable></userinput>
+<prompt>#</prompt> <userinput>sync</userinput>
+</screen></informalexample>
+
+Chcete-li na takto připravenou USB klíčenku přidat firmware, získejte
+příslušné soubory soubory (viz <xref linkend="loading-firmware"/>),
+odpojte a znovu připojte USB klíčenku (měly by na ní být vidět dvě
+oblasti), připojte druhou oblast a firmware do ní rozbalte:
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>mount /dev/<replaceable>sdX2</replaceable> /mnt</userinput>
+<prompt>#</prompt> <userinput>cd /mnt</userinput>
+<prompt>#</prompt> <userinput>tar zxvf <replaceable>/cesta/k/</replaceable>firmware.tar.gz</userinput>
+<prompt>#</prompt> <userinput>cd /</userinput>
+<prompt>#</prompt> <userinput>umount</userinput>
+</screen></informalexample>
+
+</para><para>
+
+Instalační obrazy pro druhý způsob (instalace balíků z obrazu CD
+nakopírovaného na USB klíčence) se nachází v adresáři
+<filename>hd-media</filename> a funguje pro ně jak
+<quote>jednoduchá</quote>, tak <quote>pružná</quote> cesta. Mimo to
+budete muset pro tento způsob instalace stáhnout také obraz prvního
+instalačního CD, které je založeno na stejné verzi &d-i;. Nebudou-li
+verze souhlasit, nejspíš narazíte během instalace na chyby.<footnote>
+
+<para>
+
+Nejtypičtejší chybová hláška je, že nebyly nalezeny jaderné moduly. To
+znamená, že se liší verze modulů na obrazu CD a verze běžícího jádra.
+
+</para></footnote></para><para>
 
 USB klíčenka by měla mít velikost alespoň 256 MB. Menší velikosti jsou
 podporovány pouze při ruční výrobě podle <xref

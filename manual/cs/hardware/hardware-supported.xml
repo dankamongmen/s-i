@@ -1,15 +1,15 @@
 <!-- $Id$ -->
-<!-- original version: 61147 -->
+<!-- original version: 64745 -->
 
  <sect1 id="hardware-supported">
  <title>Podporovaná zařízení</title>
 <para>
 
-Debian neklade na hardware jiná omezení než ta, která jsou dána
-jádrem Linuxu a programy GNU. Tedy na libovolné počítačové architektuře,
-na kterou bylo přeneseno jádro Linuxu, knihovna libc, překladač
-<command>gcc</command> atd., a pro kterou existuje port Debianu, můžete
-Debian nainstalovat. Viz stránka s porty
+Debian neklade na hardware jiná omezení než ta, která jsou dána jádrem
+Linuxu nebo kFreeBSD a programy GNU. Tedy na libovolné počítačové
+architektuře, na kterou bylo přeneseno jádro Linuxu nebo kFreeBSD,
+knihovna libc, překladač <command>gcc</command> atd., a pro kterou
+existuje port Debianu, můžete Debian nainstalovat. Viz stránka s porty
 (<ulink url="&url-ports;"></ulink>).
 
 </para><para>
@@ -23,8 +23,8 @@ informace a uvedeme odkazy na doplňující dokumentaci.
   <sect2><title>Podporované počítačové architektury</title>
 <para>
 
-Debian GNU/Linux &release; podporuje jedenáct hlavních počítačových architektur
-a několik jejich variant.
+Debian GNU/Linux &release; podporuje jedenáct hlavních počítačových
+architektur a několik jejich variant.
 
 </para><para>
 
@@ -152,7 +152,36 @@ a několik jejich variant.
 
 </para><para>
 
-Tato verze dokumentu se zabývá instalací na architektuře
+Debian GNU/kFreeBSD &release; podporuje dvě architektury.
+
+</para><para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row>
+  <entry>Architektura</entry>
+  <entry>Označení v Debianu</entry>
+</row>
+</thead>
+
+<tbody>
+<row>
+  <entry>Intel x86</entry>
+  <entry>kfreebsd-i386</entry>
+</row>
+
+<row>
+  <entry>AMD64 &amp; Intel EM64T</entry>
+  <entry>kfreebsd-amd64</entry>
+</row>
+
+</tbody></tgroup></informaltable>
+
+</para><para>
+
+Tato verze dokumentu se zabývá instalací Debianu s jádrem
+<emphasis>&arch-kernel;</emphasis> na architektuře
 <emphasis>&arch-title;</emphasis>. Pro ostatní podporované
 architektury jsou návody na stránkách
 <ulink url="http://www.debian.org/ports/">Debian-Ports</ulink>.
@@ -160,8 +189,8 @@ architektury jsou návody na stránkách
 </para><caution arch="ia64"><para>
 
 Architektura &arch-title; podporuje pouze procesory Intel Itanium!
-Běžnější 64 bitové procesory z rodiny EM64T (např. Pentium&nbsp;D a
-Core2&nbsp;Duo) jsou podporovány architekturou
+Běžnější 64 bitové procesory z rodiny EM64T (např. Pentium&nbsp;D,
+Core2&nbsp;Duo nebo Core&nbsp;i7) jsou podporovány architekturou
 <emphasis>amd64</emphasis>, případně, pokud preferujete 32 bitové
 aplikace, architekturou <emphasis>i386</emphasis>.
 
@@ -175,7 +204,7 @@ distribuce podporující tuto architekturu, nebyla distribuce prověřena
 širokou uživatelskou základnou a proto se v ní mohou vyskytovat chyby.
 Jakékoliv problémy, prosím, nahlaste na
 <ulink url="&url-bts;">Bug Tracking System</ulink> a nezapomeňte
-napsat, že chyba se týká platformy &arch-title;.
+napsat, že chyba se týká platformy &arch-title; s jádrem &arch-kernel;.
 Také bude užitečné sledovat diskuzní list
 <ulink url="&url-list-subscribe;">debian-&arch-listname;</ulink>
 
@@ -277,14 +306,15 @@ Tato architektura umožňuje využití více procesorů &mdash;
 tzv. symetrický multiprocesing (SMP). Standardní jádro v distribuci
 Debian &release; bylo sestaveno s touto podporou, ale v závislosti na
 použitém instalačním médiu se toto jádro nemusí nainstalovat
-implicitně. Instalaci by to vadit nemělo, protože jádro bez podpory
+automaticky. Instalaci by to vadit nemělo, protože jádro bez podpory
 multiprocesingu funguje i na systému s více procesory, systém však
 bude využívat pouze první procesor.
 
 </para><para>
 
 Pro využití více procesorů se budete muset podívat, zda se
-nainstalovalo SMP jádro. <phrase arch="linux-any">Pokud ne, doinstalujte si příslušný balík.
+nainstalovalo SMP jádro. Pokud ne, doinstalujte si příslušný balík.
+<phrase arch="linux-any">
 Další možnost je sestavit si vlastní jádro operačního systému, viz
 <xref linkend="kernel-baking"/>. Pro jádro verze &kernelversion;
 zapnete podporu SMP tak, že v konfiguračním systému jádra vyberete

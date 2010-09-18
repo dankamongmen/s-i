@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 62798 -->
+<!-- original version: 64778 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -282,16 +282,34 @@ nahraje.
 U zbývajících způsobů přednastavení musíte instalátoru říci, který
 soubor má použít. Toho dosáhnete parametrem, který předáte jádru buď
 ručně při zavádění, nebo skrze soubor zavaděče
-(např. <filename>syslinux.cfg</filename>), kde na konec řádku append
-přidáte příslušné parametry.
+<phrase arch="linux-any">(např. <filename>syslinux.cfg</filename>),
+kde na konec řádku append přidáte příslušný parametr.</phrase>
+<phrase arch="kfreebsd-any">(např. <filename>grub.cfg</filename>),
+kde u definice jádra přidáte příslušný parametr na nový řádek
+<literal>set</literal>.</phrase>
+<phrase arch="hurd-any">(např. <filename>grub.cfg</filename>),
+kde přidáte příslušný parametr na konec řádku
+<filename>gnumach.gz</filename>.</phrase>
 
 </para><para>
 
 Pokud to váš zavaděč umožňuje, nemusí být od věci jej nastavit tak,
 aby nečekal se zavedením instalačního systému na stisk klávesy
-&enterkey;, ale aby dále pokračoval automaticky. V případě syslinuxu to
-znamená nastavit v souboru <filename>syslinux.cfg</filename> parametr
+&enterkey;, ale aby dále pokračoval automaticky.
+
+<phrase arch="linux-any">
+
+V případě syslinuxu to znamená nastavit v souboru
+<filename>syslinux.cfg</filename> parametr
 <userinput>timeout</userinput> na hodnotu <userinput>1</userinput>.
+
+</phrase><phrase arch="kfrebsd-any;hurd-any">
+
+V případě grubu to znamená nastavit v souboru
+<filename>grub.cfg</filename> parametr <userinput>timeout</userinput>
+na hodnotu <userinput>0</userinput>.
+
+</phrase>
 
 </para><para>
 
@@ -1452,12 +1470,18 @@ můžete jednoduše použít i na příkazové řádce jádra.
   <title>Instalace zavaděče</title>
 
 <informalexample role="example"><screen>
+<phrase arch="linux-any">
 # Výchozím zavaděčem (pro x86) je Grub. Chcete-li místo něj instalovat
 # LILO, odkomentujte následující:
 #d-i grub-installer/skip boolean true
 # Jestliže chcete přeskočit také instalaci LILA a neinstalovat žádný
 # zavaděč, odkomentujte ještě toto:
 #d-i lilo-installer/skip boolean true
+</phrase>
+<phrase arch="kfreebsd-any;hurd-any">
+# Nechcete-li instalovat zavaděč, odkomentujte následující:
+#d-i grub-installer/skip boolean true
+</phrase>
 
 # Toto je bezpečné nastavení - pokud nenalezne jiný operační systém,
 # nainstaluje Grub do MBR.
