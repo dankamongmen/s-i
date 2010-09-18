@@ -69,6 +69,8 @@ sub replace_entities {
 
 	$text =~ s/&archive-mirror;/http.us.debian.org/g;
 	$text =~ s/&releasename;/$release/g;
+	$text =~ s/&kernelpackage;/linux-image/g;
+	$text =~ s/&kernelversion;/2.6.32/g;
 	$text =~ s/&gt;/>/g;
 	$text =~ s/&lt;/</g;
 
