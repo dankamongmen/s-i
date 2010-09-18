@@ -64,6 +64,8 @@ create_profiled () {
         return 1
     }
     . arch-options/$arch
+    os=`dpkg-architecture -a$arch -qDEB_HOST_ARCH_OS 2> /dev/null`
+    . arch-options/$os
 
     # Now we source the profiling information for the current language
     if [ -f "lang-options/${language}" ]; then
