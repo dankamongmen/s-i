@@ -272,6 +272,11 @@ EOF
 	dch $dist $urgency -r "dummy"
 }
 
+# dpkg-source --before-build fails if there's no control file
+generate_control() {
+	kernel-wedge gen-control > debian/control
+}
+
 has_recent_upload() {
 	local chlog="$USOURCE/debian/changelog"
 	if ! head -n 1 $chlog | grep -q UNRELEASED; then
@@ -619,6 +624,7 @@ for uarch in $UARCHES; do
 		log "  Retrieving and extracting dependencies..."
 		if get_depends $arch; then
 			do_dch
+			generate_control
 			log "  Building udebs, please wait..."
 			if ! kernel-wedge build-arch "$arch" >../massbuild.$TYPE.$arch.log 2>&1; then
 				log "* There were errors building udebs for $arch"
