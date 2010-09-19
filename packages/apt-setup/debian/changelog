@@ -1,8 +1,17 @@
 apt-setup (1:0.47) UNRELEASED; urgency=low
 
+  [ Joey Hess ]
   * When cdrom-detect/hybrid is true, the CD is not mountable by apt,
     so behave the same as for a hd-media install.
   * Needs cdrom-detect 1.35.
+
+  [ Colin Watson ]
+  * Use chroot-setup.sh to mount /proc and /sys in the target when running
+    apt-cdrom (closes: #595903).  This would normally need di-utils 1.80;
+    but to avoid breaking d-i squeeze alpha 1 (and possibly beta 1) initrds,
+    I've temporarily copied a chunk of code from chroot-setup.sh into two
+    apt-setup generator scripts.  This should be cleaned up once
+    compatibility with older initrds is no longer necessary.
 
  -- Joey Hess <joeyh@debian.org>  Mon, 13 Sep 2010 20:40:08 -0400
 
