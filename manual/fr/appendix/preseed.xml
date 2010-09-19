@@ -1,4 +1,4 @@
-<!-- original version: 62798 -->
+<!-- original version: 64778 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -245,17 +245,22 @@ de l'initrd. L'installateur recherche ce fichier et le charge s'il est présent.
 Avec les autres méthodes de préconfiguration, vous devez dire à l'installateur
 quel fichier charger au moment de l'amorçage de l'installateur.
 On peut passer un paramètre au noyau soit au moment de l'amorçage soit en modifiant
-le fichier de configuration du programme d'amorçage (par exemple
+le fichier de configuration du programme d'amorçage <phrase arch="linux-any">(par exemple
 <filename>syslinux.cfg</filename>) et en ajoutant le paramètre à la fin des lignes
-<quote>append</quote>.
-
+<quote>append</quote>.</phrase><phrase arch="kfreebsd-any"> (par exemple
+<filename>grub.cfg</filename>) et en ajoutant le paramètre sur une nouvelle ligne
+<literal>set</literal> pour le noyau.</phrase><phrase arch="hurd-any">(par exemple
+<filename>grub.cfg</filename>) et en ajoutant le paramètre à la fin de la ligne
+<filename>gnumach.gz</filename>.</phrase>
 </para><para>
 
 Si vous avez indiqué le fichier de préconfiguration dans le fichier de configuration 
 du programme d'amorçage, il est possible de modifier la configuration pour ne pas avoir à
 appuyer sur la touche <quote>Entrée</quote> pour lancer l'installateur.
-Avec syslinux, il suffit de mettre le délai d'attente à 1 dans le fichier
-<filename>syslinux.cfg</filename>.
+<phrase arch="linux-any">Avec syslinux, il suffit de mettre le délai d'attente à 1 dans le fichier
+<filename>syslinux.cfg</filename>.</phrase><phrase arch="kfrebsd-any;hurd-any">
+Pour grub, il suffit de mettre le délai d'attente à 0
+dans le fichier <filename>grub.cfg</filename>.</phrase>
 
 </para><para>
 
@@ -1383,12 +1388,14 @@ facilement sur la ligne de commande du noyau.
   <title>Installation du programme d'amorçage</title>
 
 <informalexample role="example"><screen>
-# Grub est le programme d'amorçage par défaut (pour x86). Si vous préférez
+<phrase arch="linux-any"># Grub est le programme d'amorçage par défaut (pour x86). Si vous préférez
 # LILO, décommentez la ligne suivante :
 #d-i grub-installer/skip boolean true
 # Pour ne pas installer lilo, ni aucun autre programme d'amorçage, décommentez
 # la ligne suivante :
-#d-i lilo-installer/skip boolean true
+#d-i lilo-installer/skip boolean true</phrase>
+<phrase arch="kfreebsd-any;hurd-any"># Pour ne pas installer de programme d'amorçage, décommentez la ligne suivante.
+#d-i grub-installer/skip boolean true</phrase>
 
 # À quelques exceptions près qui concernent certains schémas inhabituels
 # de partitionnement, GRUB 2  est le programme utilisé par défaut.

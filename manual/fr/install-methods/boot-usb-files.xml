@@ -1,4 +1,4 @@
-<!-- original version: 64738 -->
+<!-- original version: 64779 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
@@ -13,12 +13,32 @@ La seconde consiste à copier une image CD sur la clé et
 Cette deuxième méthode est la plus commune.
 
 </para>
+
+<para> 
+Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
+qui gère les périphériques USB. Sur les systèmes récents, la clé devrait être
+automatiquement reconnue. Si ce n'est pas le cas, vérifiez que le module du noyau
+usb-storage est chargé. Une fois insérée, la clé sera associée à un périphérique appelé
+<filename>/dev/sdX</filename>, où le <quote>X</quote> est une lettre minuscule (a-z).
+Avec la commande <command>dmesg</command>, il est possible de savoir à quel périphérique
+la clé a été associée. Pour pouvoir écrire sur la clé, il vous faudra
+enlever la protection contre l'écriture.
+</para>
+
+<warning><para>
+Les procédures décrites dans cette section détruisent ce qui se trouve sur le périphérique.
+Faites très attention à utiliser le nom correct pour la clé USB. Si vous vous trompez et
+utilisez un autre périphérique, un disque dur par exemple, toutes les données du disque
+seront perdues.
+</para></warning>
+
 <para arch="x86">
 
-Pour la première méthode, vous devez télécharger l'image <filename>mini.iso</filename>
+Pour préparer une clé qui n'amorce que l'installateur, l'installation se faisant ensuite sur le réseau,
+vous devez télécharger l'image <filename>mini.iso</filename>
 qui se trouve dans le répertoire <filename>netboot</filename> (son adresse précise
 est mentionnée dans  <xref linkend="where-files"/>) et copier cette image sur la clé,
-ce qui efface le contenu actuel de la clé. Cette méthode convient aux clés de petite taille
+ce qui efface le contenu actuel de la clé. Cette méthode convient aux clés de très petite taille
 (quelques mégaoctets).
 
 </para>
@@ -49,40 +69,21 @@ de cette manière :
 </para>
 <para>
 
-Pour la seconde méthode, la clé USB contenant une image CD qui permet l'installation de paquets,
-les images d'installation se trouvent dans le répertoire
-<filename>hd-media</filename>. Pour copier les fichiers sur la clé, vous pouvez utiliser 
+Pour préparer une clé USB qui contient une image CD permettant l'installation de paquets,
+les images d'installation se trouvent dans le répertoire <filename>hd-media</filename>.
+Pour copier les fichiers sur la clé, vous pouvez utiliser 
 aussi bien l'une ou l'autre des méthodes décrites plus bas. Vous devez aussi
 télécharger une image CD. Les images de l'installation ainsi que l'image CD doivent être
 basées sur la même version de l'installateur. En cas de non correspondance, des erreurs <footnote>
 
 <para>
 Le message d'erreur le plus fréquent est qu'aucun module noyau ne peut être trouvé.
-Cela signifie que la version des <quote>udebs</quote>pour les modules du noyau
+Cela signifie que la version des <quote>udebs</quote> pour les modules du noyau
 dans l'image CD ne correspond pas à la version du noyau en cours d'exécution.
 </para></footnote>
 
 sont possibles.
 </para>
-
-<para> 
-Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
-qui gère les périphériques USB. Sur les systèmes récents, la clé devrait être
-automatiquement reconnue. Si ce n'est pas le cas, vérifiez que le module du noyau
-usb-storage est chargé. Une fois insérée, la clé sera associée à un périphérique appelé
-<filename>/dev/sdX</filename>, où le <quote>X</quote> est une lettre minuscule (a-z).
-Avec la commande <command>dmesg</command>, il est possible de savoir à quel périphérique
-la clé a été associée. Pour pouvoir écrire sur la clé, il vous faudra
-enlever la protection contre l'écriture.
-</para>
-
-<warning><para>
-Les procédures décrites dans cette section détruisent ce qui se trouve sur le périphérique.
-Faites très attention à utiliser le nom correct pour la clé USB. Si vous vous trompez et
-utilisez un autre périphérique, par exemple un disque dur, toutes les données du disque
-seront perdues.
-</para></warning>
-
 
 <para>
 
@@ -105,7 +106,7 @@ fichiers de l'installateur, le noyau et le programme
 <para>
 Bien que pratique, cette méthode possède un inconvénient majeur : la taille logique
 du périphérique est limitée à 256 Mo, même si la capacité de la clé est supérieure.
-Pour retrouver la taille réelle, il vous faudra repartitionner la clé et créer de nouveaux
+Pour retrouver la taille réelle, il vous faudra repartitionner la clé et créer un nouveau
 systèmes de fichiers. Il existe aussi un deuxième inconvénient : vous ne pouvez pas copier
 une image de CD complet mais seulement l'image <quote>netinst</quote> ou l'image <quote>businesscard</quote>.
 
@@ -121,7 +122,7 @@ Il vous suffit d'extraire cette image sur votre clé USB&nbsp;:
 <para arch="powerpc">
 
 Créez une partition <quote>Apple_Bootstrap</quote> sur la clé avec la commande 
-<userinput>C</userinput> de <command>mac-fdisk</command> et mettez l'image
+<userinput>C</userinput> de <command>mac-fdisk</command> et placez l'image
 avec&nbsp;:
 
 <informalexample><screen>
@@ -150,7 +151,7 @@ et voilà, c'est fait&nbsp;!
 <para>
 
 Si vous aimez la souplesse d'utilisation ou si vous voulez simplement savoir ce qui se
-passe, vous pouvez utiliser la méthode suivante pour mettre les fichiers
+passe, vous pouvez utiliser la méthode suivante pour placer les fichiers
 sur la clé. L'un des avantages de cette méthode est que, si la capacité de la clé est
 suffisante, vous pouvez copier l'image d'un disque entier. 
 </para>
