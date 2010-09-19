@@ -157,7 +157,13 @@ if [ "$RET" = true ] && ! is_system_user; then
 			apt-install sudo 2>/dev/null || $log $chroot $ROOT apt-get -q -y install sudo || true
 		fi
 		if [ -e $ROOT/etc/sudoers ]; then
-			echo "$USER ALL=(ALL) ALL" >> $ROOT/etc/sudoers
+			# Test if we can add the user to the sudo group
+			# (possible if sudo >= 1.7.2-2 is installed on the target system)
+			# If we can, do it this way, otherwise add the user to sudoers
+			# See #597239
+			if ! $log $chroot $ROOT adduser "$USER" sudo >/dev/null 2>&1; then
+				echo "$USER ALL=(ALL) ALL" >> $ROOT/etc/sudoers
+			fi
 		else
 			# sudo failed to install, system won't be usable
 			exit 1
