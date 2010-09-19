@@ -1,6 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 39614 -->
-
+<!-- original version: 64654 -->
 
  <sect1 condition="bootable-disk" id="boot-drive-files">
  <!-- <title>Preparing Files for Hard Disk Booting</title> -->
@@ -30,14 +29,6 @@ Usando questo metodo è possibile realizzare una installazione completa
 puramente da rete evitando tutte le noie dei supporti rimovibili come la
 ricerca e la masterizzazione delle immagini dei CD o la lotta con troppi
 e inaffidabili dischetti.
-
-</para><para arch="x86">
-
-<!--
-The installer cannot boot from files on an NTFS file system.
--->
-
-L'installatore non può essere avviato usando file su un filesystem NTFS.
 
 </para><para arch="powerpc">
 
@@ -107,12 +98,14 @@ essere usato come filesystem di root dal kernel.
 
 <!--
 Copy the following files from the Debian archives to a
-convenient location on your hard drive, for instance to
+convenient location on your hard drive (note that LILO
+can not boot from files on an NTFS file system), for instance to
 <filename>/boot/newinstall/</filename>.
 -->
 
 Copiare i seguenti file dagli archivi Debian in una directory del proprio
-disco fisso, per esempio <filename>/boot/newinstall/</filename>.
+disco fisso (notare che LILO non è in grado di avviare il sistema da file
+su un file system NTFS), per esempio <filename>/boot/newinstall/</filename>.
 
 <itemizedlist>
 <listitem><para>
@@ -144,6 +137,54 @@ Finally, to configure the bootloader proceed to
 
 Infine, per configurare il bootloader procedere con
 <xref linkend="boot-initrd"/>.
+
+</para>
+  </sect2>
+
+
+  <sect2 arch="x86" id="files-loadlin">
+  <!-- <title>Hard disk installer booting using <command>loadlin</command></title> -->
+  <title>Avvio dell'installatore da disco fisso con <command>loadlin</command></title>
+<para>
+
+<!--
+This section explains how to prepare your hard drive for booting the installer
+from DOS using <command>loadlin</command>.
+-->
+
+In questa sezione è spiegato come preparare il proprio disco fisso per
+avviare l'installatore da DOS usando <command>loadlin</command>.
+
+</para><para>
+
+<!--
+Copy the following files from a Debian CD image to <filename>c:\</filename>.
+-->
+
+Copiare i seguenti file dall'immagine del CD Debian in
+<filename>c:\</filename>.
+
+<itemizedlist>
+<listitem><para>
+
+<!--
+<filename>/&x86-install-dir;</filename> (kernel binary and ramdisk image)
+-->
+
+<filename>/&x86-install-dir;</filename> (binari del kernel e immagine del ramdisk)
+
+</para></listitem>
+<listitem><para>
+
+<!--
+<filename>/tools</filename> (loadlin tool)
+-->
+
+<filename>/tools</filename> (programma loadlin)
+
+</para></listitem>
+
+</itemizedlist>
 
 </para>
   </sect2>

@@ -1,86 +1,24 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 57590 -->
-
+<!-- original version: 64779 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <!-- <title>Preparing Files for USB Memory Stick Booting</title> -->
  <title>Preparazione dei file per l'avvio da chiavetta USB</title>
-<para>
+<para arch="x86">
 
 <!--
 There are two installation methods possible when booting from USB stick.
-The first is to install completely from the network. The second is to
-also copy a CD image onto the USB stick and use that as a source for
-packages, possibly in combination with a mirror. This second method is
-the more common.
+The first is to only use the USB stick to boot the installer, and then
+install completely from the network. The second is to also copy a CD image
+onto the USB stick and use that as a source for packages, possibly in
+combination with a mirror.
 -->
 
 Quando si utilizza l'avvio da una chiavetta USB sono disponibili due
-metodi d'installazione. Il primo consiste nell'installazione completa
-da rete; il secondo è copiare l'immagine di un CD sulla chiavetta USB
-e utilizzarla come sorgente per i pacchetti (se possibile insieme a un
-mirror). Il secondo metodo è quello più comune.
-
-</para><para>
-
-<!--
-For the first installation method you'll need to download an installer
-image from the <filename>netboot</filename> directory (at the location
-mentioned in <xref linkend="where-files"/>) and use the
-<quote>flexible way</quote> explained below to copy the files to the USB
-stick.
--->
-
-Con il primo metodo d'installazione è necessario scaricare l'immagine
-dell'installatore dalla directory <filename>netboot</filename> (nella
-posizione specificata in <xref linkend="where-files"/>) e utilizzare il
-<quote>modo flessibile</quote> spiegato in seguito per copiare i file
-sulla chiavetta USB.
-
-
-</para><para>
-
-<!--
-Installation images for the second installation method can be found in
-the <filename>hd-media</filename> directory and either the <quote>easy
-way</quote> or the <quote>flexible way</quote> can be used to copy the
-image to the USB stick. For this installation method you will also need
-to download a CD image. The installation image and the CD image must be
-based on the same release of &d-i;. If they do not match you are likely
-to get errors<footnote>
--->
-
-Le immagini per l'installazione con il secondo metodo possono essere
-trovate nella directory <filename>hd-media</filename> e per copiarle
-sulla chiavetta USB si può usare il <quote>modo semplice</quote> oppure
-il <quote>modo flessibile</quote>. Per questo metodo d'installazione è
-necessario anche scaricare l'immagine del CD. L'immagine per
-l'installazione e l'immagine del CD devono appartenere allo stesso
-rilascio di &d-i;; se non corrispondono, si possono avere degli
-errori<footnote>
-
-
-<para>
-
-<!--
-The error message that is most likely to be displayed is that no kernel
-modules can be found. This means that the version of the kernel module
-udebs included on the CD image is different from the version of the
-running kernel.
--->
-
-Il messaggio d'errore che più frequentemente viene mostrato è che non è
-possibile trovare i moduli del kernel. Questo vuol dire che la versione
-dei moduli del kernel negli udeb inclusi nell'immagine del CD è diversa
-dalla versione del kernel in uso.
-
-</para>
-
-<!--
-</footnote> during the installation.
--->
-
-</footnote> durante l'installazione.
+metodi d'installazione. Il primo consiste nell'uso di una chiavetta USB
+solo per avviare l'installatore e poi completare l'installazione da rete;
+il secondo è copiare l'immagine di un CD sulla chiavetta USB e utilizzarla
+come sorgente per i pacchetti (eventualmente insieme a un mirror).
 
 </para><para>
 
@@ -108,8 +46,7 @@ stata mappata la chiavetta USB usando il comando <command>dmesg</command>
 dopo averla inserita. Per scrivere sulla chiavetta potrebbe essere
 necessario disattivare la protezione dalla scrittura.
 
-</para>
-<warning><para>
+</para><warning><para>
 
 <!--
 The procedures described in this section will destroy anything already
@@ -124,8 +61,108 @@ device della chiavetta USB. Se si usa il device sbagliato, potrebbe
 accadere, per esempio, di perdere tutte le informazioni su un disco
 fisso.
 
-</para></warning>
+</para></warning><para arch="x86">
+
+<!--
+To prepare a USB stick that only boots the installer, which then proceeds
+to install entirely from the network, you'll need to download the
+<filename>mini.iso</filename> image from the <filename>netboot</filename>
+directory (at the location mentioned in <xref linkend="where-files"/>), and
+write this file directly to the USB stick, overwriting its current contents.
+This method will work with very small USB sticks, only a few megabytes in
+size.
+-->
+
+Per preparare una chiavetta USB che avvia l'installatore per poi
+proseguire l'installazione da rete è necessario scaricare l'immagine
+<filename>mini.iso</filename> dalla directory <filename>netboot</filename>
+(nella posizione specificata in <xref linkend="where-files"/>) e scriverla
+sulla chiavetta USB sovrascrivendo il contenuto attuale. Questo metodo
+funziona con le chiavette USB molto piccole, con dimensione di pochi
+megabyte.
+
+</para><para arch="x86">
+
+<!--
+For example, when using an existing GNU/Linux system, the
+<filename>mini.iso</filename> file can be written to a USB stick as follows:
+-->
+
+Per esempio, con un sistema GNU/Linux è possibile scrivere il file
+<filename>mini.iso</filename> su una chiavetta USB con:
+
+<informalexample><screen>
+# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
+
+<!--
+To add firmware to a USB stick prepared in this way, obtain the necessary firmware
+files. See <xref linkend="loading-firmware"/> for more information.
+Now unplug and replug the USB stick, and two partitions should now be visible on it.
+You should mount the second of the two partitions, and unpack the firmware onto it.
+-->
+
+Per aggiungere il firmware su una chiavetta USB preparata in questo modo
+è necessario recuperare i file con il firmware. Vedere
+<xref linkend="loading-firmware"/> per maggiori informazioni. Scollegare
+e poi ricollegare la chiavetta USB, adesso dovrebbe avere due partizioni.
+È necessario montare la seconda delle due partizioni e scompattare il
+firmware al suo interno.
+
+<informalexample><screen>
+# mount /dev/<replaceable>sdX2</replaceable> /mnt
+# cd /mnt
+# tar zxvf <replaceable>/path/to/</replaceable>firmware.tar.gz
+# cd /
+# umount
+</screen></informalexample>
+
+</para><para>
+
+<!--
+To prepare a USB stick that installs packages from a CD image included
+on the stick, use the installer images found in the
+<filename>hd-media</filename> directory. Either the <quote>easy
+way</quote> or the <quote>flexible way</quote> can be used to copy the
+image to the USB stick. For this installation method you will also need
+to download a CD image. The installation image and the CD image must be
+based on the same release of &d-i;. If they do not match you are likely
+to get errors<footnote>
+-->
+
+Per preparare una chiavetta USB che installa i pacchetti da un'immagine
+del CD copiata sulla chiavetta è necessario usare una delle immagini nella
+directory <filename>hd-media</filename>. È possibile usare uno qualsiasi
+tra il <quote>modo semplice</quote> oppure il <quote>modo flessibile</quote>
+per copiare l'immagine sulla chiavetta USB. Con questo metodo d'installazione è
+necessario anche scaricare un'immagine del CD. L'immagine per l'installazione
+e l'immagine del CD devono appartenere allo stesso rilascio di &d-i;; se non
+corrispondono, si possono verificare degli errori<footnote>
+
 <para>
+
+<!--
+The error message that is most likely to be displayed is that no kernel
+modules can be found. This means that the version of the kernel module
+udebs included on the CD image is different from the version of the
+running kernel.
+-->
+
+Il messaggio d'errore che più frequentemente viene mostrato è che non è
+possibile trovare i moduli del kernel. Questo vuol dire che la versione
+dei moduli del kernel negli udeb inclusi nell'immagine del CD è diversa
+dalla versione del kernel in uso.
+
+</para>
+
+<!--
+</footnote> during the installation.
+-->
+
+</footnote> durante l'installazione.
+
+</para><para>
 
 <!--
 Note that the USB stick should be at least 256 MB in size (smaller
