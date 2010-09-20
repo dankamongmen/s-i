@@ -1,21 +1,28 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 56442 -->
-<!-- revisado por Igor Támara, 16 nov. 2008 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 61286 -->
+<!-- revisado por Igor TÃ¡mara, 16 nov. 2008 -->
+<!-- actualizado por elric, septiembre 2010 -->
 
    <sect3 arch="x86">
    <title>Particionado de las memorias USB</title>
 
 <para>
 Le mostraremos como configurar una memoria USB para usar
-la primera partición en lugar de todo el dispositivo.
+la primera particiÃ³n en lugar de todo el dispositivo.
 
 </para><note><para>
 
-Puesto que la mayoría de memorias USB vienen con una sola partición
-FAT16 ya configurada, probablemente no tendrá que reparticionarlo o
-reformatearlo. Si aún así tiene que hacerlo, use
+Puesto que la mayorÃ­a de memorias USB vienen con una sola particiÃ³n
+FAT16 ya configurada, probablemente no tendrÃ¡ que reparticionarlo o
+reformatearlo. Si aÃºn asÃ­ tiene que hacerlo, use
 <command>cfdisk</command> o cualquier otra herramienta de particionado
-para crear la partición FAT16 y luego escriba
+para crear la particiÃ³n FAT16<footnote>
+
+<para>
+No se olvide de definir la marca de <quote>arranque</quote>.
+</para>
+
+</footnote>, y despuÃ©s cree el sistema de ficheros usando.
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -27,45 +34,45 @@ USB. La orden <command>mkdosfs</command> se encuentra en el paquete
 
 </para></note><para>
 
-Para iniciar el núcleo después de arrancar desde el dispositivo USB,
-necesitaremos colocar un gestor de arranque en él. Aunque cualquier
-gestor de arranque (como <command>lilo</command>) debería funcionar, es
+Para iniciar el nÃºcleo despuÃ©s de arrancar desde el dispositivo USB,
+necesitaremos colocar un gestor de arranque en Ã©l. Aunque cualquier
+gestor de arranque (como <command>lilo</command>) deberÃ­a funcionar, es
 conveniente usar <command>syslinux</command>, puesto que usa una
-partición FAT16 y puede reconfigurarse con sólo editar un
+particiÃ³n FAT16 y puede reconfigurarse con sÃ³lo editar un
 fichero de texto. Puede usar cualquier sistema operativo que soporte el
-sistema de ficheros FAT para hacer cambios a la configuración del
+sistema de ficheros FAT para hacer cambios a la configuraciÃ³n del
 gestor de arranque.
 
 </para><para>
 
-Para ubicar <command>syslinux</command> en la partición FAT16 de su
+Para ubicar <command>syslinux</command> en la particiÃ³n FAT16 de su
 memoria USB, instale los paquetes <classname>syslinux</classname> y
-<classname>mtools</classname> en su sistema, y escriba
+<classname>mtools</classname> en su sistema, y ejecute
 
 <informalexample><screen>
 # syslinux /dev/<replaceable>sdX1</replaceable>
 </screen></informalexample>
 
 Nuevamente, tenga cuidado de usar el nombre de dispositivo correcto. La
-partición no debe estar montada cuando ejecute <command>syslinux</command>.
-Este procedimiento escribe un sector de arranque en la partición y
-crea el fichero <filename>ldlinux.sys</filename> que contiene el código
+particiÃ³n no debe estar montada cuando ejecute <command>syslinux</command>.
+Este procedimiento escribe un sector de arranque en la particiÃ³n y
+crea el fichero <filename>ldlinux.sys</filename> que contiene el cÃ³digo
 del gestor de arranque.
 
 </para>
    </sect3>
 
    <sect3 arch="x86">
-   <title>Añadir la imagen del instalador</title>
+   <title>AÃ±adir la imagen del instalador</title>
 <para>
 
-Monte la partición (<userinput>mount /dev/sdX1 /mnt</userinput>) y
-copie los ficheros indicados a continuación al dispositivo USB:
+Monte la particiÃ³n (<userinput>mount /dev/sdX1 /mnt</userinput>) y
+copie los ficheros indicados a continuaciÃ³n al dispositivo USB:
 
 <itemizedlist>
 <listitem><para>
 
-<filename>vmlinuz</filename> (binario del núcleo)
+<filename>vmlinuz</filename> (binario del nÃºcleo)
 
 </para></listitem>
 <listitem><para>
@@ -75,7 +82,7 @@ copie los ficheros indicados a continuación al dispositivo USB:
 </para></listitem>
 </itemizedlist>
 
-Puede elegir entre la versión usual o la versión gráfica del instalador.
+Puede elegir entre la versiÃ³n usual o la versiÃ³n grÃ¡fica del instalador.
 La segunda se puede encontrar en el subdirectorio <filename>gtk</filename>.
 Si desea renombrar los ficheros, tenga en cuenta que 
 <classname>syslinux</classname> solamente puede procesar nombres de 
@@ -83,25 +90,34 @@ ficheros estilo DOS (8.3).
 
 </para><para>
 
-A continuación debe crear el fichero de configuración 
-<filename>syslinux.cfg</filename>, que como mínimo debe contener las dos 
-líneas siguientes:
+A continuaciÃ³n debe crear el fichero de configuraciÃ³n 
+<filename>syslinux.cfg</filename>, que como mÃ­nimo debe contener las dos 
+lÃ­neas siguientes (cambie el nombre del nÃºcleo binario a 
+<quote><filename>linux</filename></quote> si ha usado una imagen
+<filename>netboot</filename>):
 
 <informalexample><screen>
 default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
 
-Si usa el instalador gráfico necesitará adicionar 
-<userinput>video=vesa:ywrap,mtrr vga=788</userinput> a la segunda línea.
+Si usa el instalador grÃ¡fico necesitarÃ¡ adicionar 
+<userinput>video=vesa:ywrap,mtrr vga=788</userinput> a la segunda lÃ­nea.
 
 </para><para>
 
-Si usó una imagen <filename>hd-media</filename>, debería copiar ahora una 
-imagen ISO de Debian (businesscard, netinst o una imagen completa de CD;
-asegúrese de elegir una que quepa) en la memoria USB. Cuando haya 
-terminado, desmonte la memoria USB (<userinput>umount /mnt</userinput>).
+Si usÃ³ una imagen <filename>hd-media</filename>, deberÃ­a copiar ahora una 
+imagen ISO de Debian<footnote>
 
+<para>
+Puede usar businesscard, netinst o una imagen completa de CD (consulte
+<xref linkend="official-cdrom"/>). AseguresÃ© de elegir una que quepa.
+Tenga en cuenta que la imagen <quote><filename>mini.iso</filename> netboot</quote>
+no sirve para este propÃ³sito.
+</para>
+
+</footnote> en la memoria. Cuando haya finalizado, desmonte la memoria USB
+When you are done, (<userinput>umount /mnt</userinput>).
 
 </para>
    </sect3>

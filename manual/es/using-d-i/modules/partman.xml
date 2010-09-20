@@ -1,53 +1,166 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 61147 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 64774 -->
 <!-- Revisado por Steve Langasek -->
 <!-- Revisado por Rudy Godoy, 22 feb. 2005 -->
 <!-- Revisado por Igor Tamara, enero 2007 -->
+<!-- Actualizado por elric, Septiembre 2010 -->
 
 <para>
 
-Si no se siente a gusto particionando, o simplemente quiere conocer más
+Si no se siente a gusto particionando, o simplemente quiere conocer mÃ¡s
 detalles, lea el <xref linkend="partitioning"/>.
 
 </para>
 <warning arch="sparc"><para>
 <!-- BTS: #384653 -->
 
-El instalador puede no ser capaz de detectar el tamaño de la unidad
+El instalador puede no ser capaz de detectar el tamaÃ±o de la unidad
 correctamente si el disco ya se ha utilizado previamente con
 Solaris. No se arregla este problema creando una nueva tabla de
-particiones. Lo que sí ayuda es poner a <quote>cero</quote> los
+particiones. Lo que sÃ­ ayuda es poner a <quote>cero</quote> los
 primeros sectores de la unidad:
 
 <informalexample><screen>
 # dd if=/dev/zero of=/dev/hd<replaceable>X</replaceable> bs=512 count=2; sync
 </screen></informalexample>
 
-Tenga en cuenta que hacer esto hará que los datos que existan en el
+Tenga en cuenta que hacer esto harÃ¡ que los datos que existan en el
 disco no vuelvan a ser accesibles.
 
 </para></warning>
 <para>
 
-Primero se le dará la oportunidad de particionar automáticamente todo
-el disco o el espacio libre disponible en el disco. A esto también se
+Primero se le darÃ¡ la oportunidad de particionar automÃ¡ticamente todo
+el disco o el espacio libre disponible en el disco. A esto tambiÃ©n se
 le llama particionado <quote>guiado</quote>. Si no quiere
-autoparticionar, elija <guimenuitem>Manual</guimenuitem> en el menú.
+autoparticionar, elija <guimenuitem>Manual</guimenuitem> en el menÃº.
 
 </para>
 
-  <sect3 id="partman-auto">
+   <sect3 id="partman-fs">
+   <title>Opciones de particionado aceptados</title>
+<para>
+
+El particionador usado en &d-i; is muy versÃ¡til. Permite crear muchos
+esquemas de particionado, usar distintas tablas de particiÃ³n, sistemas
+de fichero y dispositivos de bloque avanzado.
+
+</para><para>
+
+Exactamente quÃ© opciones estÃ¡n disponibles depende principalmente
+de la arquitectura, aunque tambiÃ©n hay otros factores. Por ejemplo,
+puede que no todas las opciones estÃ©n disponibles en sistemas con
+una memoria interna limitada.
+Los valores predefinidos tambiÃ©n pueden variar. El tipo de tabla de
+particionado usado por omisiÃ³n puede ser muy distinto con discos
+duros de gran capacidad que el usado con discos duros mÃ¡s pequeÃ±os.
+Algunas opciones sÃ³lo se pueden cambiar al instalar con una prioridad
+debconf media o baja; se usarÃ¡n valores predefinidos adecuados con
+prioridades mÃ¡s altas.
+
+</para><para>
+
+El instalador permite varias formas de particionado avanzado y el uso
+de dispositivos de almacenamiento, que en la mayorÃ­a de los casos se
+pueden usar en combinaciÃ³n.
+
+<itemizedlist>
+  <listitem><para>
+    <emphasis>Gestor de VolÃºmenes LÃ³gicos (LVM)</emphasis>
+  </para></listitem>
+  <listitem arch="not-s390"><para>
+    <emphasis>Software RAID</emphasis>
+  </para><para>
+    Se aceptan los niveles de RAID 0, 1, 4, 5, 6 y 10.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Cifrado</emphasis>
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>Serial ATA RAID</emphasis> (usando <classname>dmraid</classname>)
+  </para><para>
+    TambiÃ©n llamado <quote>fake RAID</quote> (falso) o <quote>BIOS RAID</quote>.
+    En la actualidad, Serial ATA RAID sÃ³lo estÃ¡ disponible al arrancar el
+    instalador. Para mÃ¡s informaciÃ³n consulte
+    <ulink url="&url-d-i-sataraid;">nuestra wiki</ulink>.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>Multipath</emphasis> (experimental)
+  </para><para>
+    Para mÃ¡s informaciÃ³n consulte <ulink url="&url-d-i-multipath;">our Wiki</ulink>.
+    La compatiblidad con Â«multipathÂ» sÃ³lo estÃ¡ disponible si se activa al
+    arrancar el instalador.
+  </para></listitem>
+</itemizedlist>
+
+</para><para arch="linux-any">
+
+Se permiten los siguientes sistemas de fichero.
+
+<itemizedlist>
+  <listitem><para>
+    <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
+    <emphasis>ext2</emphasis>,
+    <emphasis>ext3</emphasis>,
+    <emphasis>ext4</emphasis>
+  </para><para>
+    El sistema de ficheros por omisiÃ³n seleccionado en la mayorÃ­a de los
+    casos es ext3; por omisiÃ³n, se seleccionarÃ¡ ext2 para particiones
+    <filename>/boot</filename> si se usa el particionado guiado.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>jfs</emphasis> (no disponible para todas las arquitecturas)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>xfs</emphasis> (no disponible para todas las arquitecturas)
+  </para></listitem>
+  <listitem><para>
+    <emphasis>reiserfs</emphasis> (opcional; no disponible para todas las arquitecturas)
+  </para><para>
+    El uso del sistema de ficheros Reiser no estÃ¡ disponible
+    por omisiÃ³n. Puede activarlo cuando el instalador se ejecuta con una prioridad
+    de debconf media o baja seleccionando el componente
+    <classname>partman-reiserfs</classname>. SÃ³lo se permite la versiÃ³n 3 del
+    sistema de ficheros.
+  </para></listitem>
+  <listitem arch="arm"><para>
+    <emphasis>jffs2</emphasis>
+  </para><para>
+    Usado en algunos sistemas para leer memorias flash. No es posible crear
+    particiones jffs2 nuevas.
+  </para></listitem>
+  <listitem arch="x86"><para>
+    <emphasis>qnx4</emphasis>
+  </para><para>
+    Se reconocerÃ¡n las particiones existentes, y es posible asignar a Ã©stos
+    puntos de montaje. No es posible crear particiones qnx4 nuevas.
+  </para></listitem>
+  <listitem><para>
+    <emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>
+  </para></listitem>
+  <listitem arch="x86;ia64"><para>
+    <emphasis>NTFS</emphasis> (sÃ³lo lectura)
+  </para><para>
+    Se pueden redimensionar particiones NTFS, y es posible asignar a estos
+    puntos de montaje. No es posible crear particiones NTFS nuevas.
+  </para></listitem>
+</itemizedlist>
+
+</para>
+   </sect3>
+
+   <sect3 id="partman-auto">
    <title>Particionado guiado</title>
 <para>
 
 Si elije el particionado guiado, puede tener tres opciones: crear las
-particiones directamente en el disco duro (el método clásico), utilizar el
-Gestor de Volúmenes Lógicos («Logical Volumen Manager», LVM), o
+particiones directamente en el disco duro (el mÃ©todo clÃ¡sico), utilizar el
+Gestor de VolÃºmenes LÃ³gicos (Â«Logical Volumen ManagerÂ», LVM), o
 crearlas utilizando un LVM cifrado<footnote>
 
 <para>
-El instalador cifrará el grupo de volúmenes LVM con una clave AES de
-256 bit y hace uso del soporte de <quote>dm-crypt</quote> en el núcleo.
+El instalador cifrarÃ¡ el grupo de volÃºmenes LVM con una clave AES de
+256 bit y hace uso del soporte de <quote>dm-crypt</quote> en el nÃºcleo.
 </para>
 
 </footnote>.
@@ -55,70 +168,70 @@ El instalador cifrará el grupo de volúmenes LVM con una clave AES de
 </para>
 <note><para>
 
-La opción de usar LVM (cifrado) puede no estar disponible en todas las
+La opciÃ³n de usar LVM (cifrado) puede no estar disponible en todas las
 arquitecturas.
 
 </para></note>
 <para>
 
-Cuando utilice LVM o LVM cifrado el instalador creará la mayoría de
-las particiones dentro de una partición si escoge la segunda opción,
-la ventaja de este método es que las particiones dentro de una
-partición más grande pueden cambiarse de tamaño más adelante
-relativamente fácil. 
-En el caso de LVM cifrado la partición más grande no será legible sin 
-el conocimiento de una contraseña especial, lo que da un seguridad
+Cuando utilice LVM o LVM cifrado el instalador crearÃ¡ la mayorÃ­a de
+las particiones dentro de una particiÃ³n si escoge la segunda opciÃ³n,
+la ventaja de este mÃ©todo es que las particiones dentro de una
+particiÃ³n mÃ¡s grande pueden cambiarse de tamaÃ±o mÃ¡s adelante
+relativamente fÃ¡cil. 
+En el caso de LVM cifrado la particiÃ³n mÃ¡s grande no serÃ¡ legible sin 
+el conocimiento de una contraseÃ±a especial, lo que da un seguridad
 adicional en su datos (personales).
  
 </para><para>
 
-El instalador borra automáticamente el disco escribiendo datos
-aleatorios en él antes de utilizar LVM cifrado. Esto mejora la
-seguridad (ya que hace imposible determinar qué partes del disco se
-están utilizando y también se asegura de que cualquier traza de
-instalación previa se borra). Sin embargo, esto puede llevar un tiempo
-dependiendo del tamaño de su disco.
+El instalador borra automÃ¡ticamente el disco escribiendo datos
+aleatorios en Ã©l antes de utilizar LVM cifrado. Esto mejora la
+seguridad (ya que hace imposible determinar quÃ© partes del disco se
+estÃ¡n utilizando y tambiÃ©n se asegura de que cualquier traza de
+instalaciÃ³n previa se borra). Sin embargo, esto puede llevar un tiempo
+dependiendo del tamaÃ±o de su disco.
 
 </para>
 <note><para>
 
 Si elige el particionado guiado con LVM o LVM cifrado, es posible que
 algunos cambios tengan que escribirse en el disco seleccionado
-mientras se termina la configuración de LVM. Estos cambios borran de 
+mientras se termina la configuraciÃ³n de LVM. Estos cambios borran de 
 forma permanente todos los datos que existan en el disco que haya 
-seleccionado y no podrán deshacerse más adelante. El instalador, sin 
-embargo, le pedirá que confirme estos cambios antes de escribirlos en 
+seleccionado y no podrÃ¡n deshacerse mÃ¡s adelante. El instalador, sin 
+embargo, le pedirÃ¡ que confirme estos cambios antes de escribirlos en 
 disco.
 
 </para></note>
 <para>
 
 Una vez haya elegido el particionado guiado, tanto en el caso del 
-método clásico como en el caso de LVM, se le pedirá primero que
+mÃ©todo clÃ¡sico como en el caso de LVM, se le pedirÃ¡ primero que
 seleccione el disco que quiere utilizar. Compruebe que todos sus discos
-están en la lista y, si tiene más de un disco, asegúrese de escoger el
-disco correcto. Tenga en cuenta que el orden en el que están listados
-los discos puede ser distinto del que está acostumbrado. El tamaño de
+estÃ¡n en la lista y, si tiene mÃ¡s de un disco, asegÃºrese de escoger el
+disco correcto. Tenga en cuenta que el orden en el que estÃ¡n listados
+los discos puede ser distinto del que estÃ¡ acostumbrado. El tamaÃ±o de
 los discos puede ayudarle a identificarlos.
 
 </para><para>
 
-Se borrará cualquier dato en el disco que haya seleccionado, pero
-siempre se le pedirá que confirme los cambios antes de escribirlos en
-el disco. Si ha seleccionado el método clásico de particionado podrá
+Se borrarÃ¡ cualquier dato en el disco que haya seleccionado, pero
+siempre se le pedirÃ¡ que confirme los cambios antes de escribirlos en
+el disco. Si ha seleccionado el mÃ©todo clÃ¡sico de particionado podrÃ¡
 deshacer los cambios hasta el final. Esto no es posible cuando utiliza
 LVM (cifrado).
 
 </para><para>
 
-Posteriormente podrá escoger de algunos de los esquemas listados en la
-tabla mostrada a continuación.
+Posteriormente podrÃ¡ escoger de algunos de los esquemas listados en la
+tabla mostrada a continuaciÃ³n.
 Todos los esquemas tienen sus pros y sus
-contras, algunos de éstos se discuten en <xref linkend="partitioning"/>. Si
-no está seguro, escoja el primero. Tenga en mente, que el particionado guiado
-necesita un cierto espacio libre mínimo para operar. Si no le asigna al menos
+contras, algunos de Ã©stos se discuten en <xref linkend="partitioning"/>. Si
+no estÃ¡ seguro, escoja el primero. Tenga en mente, que el particionado guiado
+necesita un cierto espacio libre mÃ­nimo para operar. Si no le asigna al menos
 un 1 GB de espacio (depende del esquema seleccionado), el particionado guiado
-fallará.
+fallarÃ¡.
 
 </para>
 
@@ -127,18 +240,18 @@ fallará.
 <thead>
 <row>
   <entry>Esquema de particionado</entry>
-  <entry>Espacio mínimo</entry>
+  <entry>Espacio mÃ­nimo</entry>
   <entry>Particiones creadas</entry>
 </row>
 </thead>
 
 <tbody>
 <row>
-  <entry>Todos los ficheros en una partición</entry>
+  <entry>Todos los ficheros en una particiÃ³n</entry>
   <entry>600 MB</entry>
   <entry><filename>/</filename>, intercambio</entry>
 </row><row>
-  <entry>Partición /home separada</entry>
+  <entry>ParticiÃ³n /home separada</entry>
   <entry>500 MB</entry>
   <entry>
     <filename>/</filename>, <filename>/home</filename>, intercambio
@@ -156,27 +269,27 @@ fallará.
 </tbody></tgroup></informaltable>
 
 <para>
-El instalador creará una partición separada para <filename>/boot</filename> si
-escoge el guiado particionado con LVM (cifrado). Todas las demás particiones,
-incluyendo la partición de intercambio, se crearán dentro de la partición LVM.
+El instalador crearÃ¡ una particiÃ³n separada para <filename>/boot</filename> si
+escoge el guiado particionado con LVM (cifrado). Todas las demÃ¡s particiones,
+incluyendo la particiÃ³n de intercambio, se crearÃ¡n dentro de la particiÃ³n LVM.
 
 </para><para arch="ia64">
 
-Si escoge el particionado automático para su sistema IA-64, habrá una
-partición adicional, con un sistema de ficheros FAT16 arrancable, para el
-gestor de arranque EFI. Además hay una opción adicional en el menú que le
-permite dar formato a los discos para establecer manualmente una partición
-como una partición de arranque EFI.
+Si escoge el particionado automÃ¡tico para su sistema IA-64, habrÃ¡ una
+particiÃ³n adicional, con un sistema de ficheros FAT16 arrancable, para el
+gestor de arranque EFI. AdemÃ¡s hay una opciÃ³n adicional en el menÃº que le
+permite dar formato a los discos para establecer manualmente una particiÃ³n
+como una particiÃ³n de arranque EFI.
 
 </para><para>
 
-Después de seleccionar un esquema, la siguiente pantalla le mostrará la nueva
-tabla de particiones, incluyendo a qué particiones se dará formato, cómo, y
-dónde se montarán.
+DespuÃ©s de seleccionar un esquema, la siguiente pantalla le mostrarÃ¡ la nueva
+tabla de particiones, incluyendo a quÃ© particiones se darÃ¡ formato, cÃ³mo, y
+dÃ³nde se montarÃ¡n.
 
 </para><para>
 
-La lista de particiones podría ser como la siguiente:
+La lista de particiones podrÃ­a ser como la siguiente:
 
 <informalexample><screen>
   IDE1 master (hda) - 6.4 GB WDC AC36400L
@@ -197,22 +310,22 @@ La lista de particiones podría ser como la siguiente:
 </screen></informalexample>
 
 Este ejemplo muestra dos discos duros IDE divididos en varias particiones, el
-primer disco tiene algo de espacio libre. Cada línea de partición está
-conformada por el número de partición, su tipo, tamaño, banderas opcionales,
+primer disco tiene algo de espacio libre. Cada lÃ­nea de particiÃ³n estÃ¡
+conformada por el nÃºmero de particiÃ³n, su tipo, tamaÃ±o, banderas opcionales,
 sistema de ficheros y punto de montaje (si fuese el caso).
-Nota: esta configuración particular no puede crearse con el particionado guiado pero sí muestra una variación que puede conseguirse utilizando el particionado manual.
+Nota: esta configuraciÃ³n particular no puede crearse con el particionado guiado pero sÃ­ muestra una variaciÃ³n que puede conseguirse utilizando el particionado manual.
 
 
 </para><para>
 
-Esto finaliza con el particionado guiado. Si está satisfecho con la tabla de
+Esto finaliza con el particionado guiado. Si estÃ¡ satisfecho con la tabla de
 particiones generada, puede elegir <guimenuitem>Finalizar el particionado y
-escribir los cambios en el disco</guimenuitem> desde el menú para implementar
-la nueva tabla de particiones (como se describe al final de esta sección). Si
+escribir los cambios en el disco</guimenuitem> desde el menÃº para implementar
+la nueva tabla de particiones (como se describe al final de esta secciÃ³n). Si
 no le gusta, puede elegir <guimenuitem>Deshacer los cambios realizados a las
 particiones</guimenuitem>, para ejecutar nuevamente el particionado guiado o
 modificar los cambios propuestos de forma manual tal y como se describe a
-continuación.
+continuaciÃ³n.
 
 </para>
    </sect3>
@@ -221,84 +334,84 @@ continuación.
    <title>Particionado manual</title>
 <para>
 
-Una pantalla similar a la mostrada anteriormente se mostrará si elige
-particionar manualmente excepto que se mostrará su partición actual sin los
-puntos de montaje. Al final de esta sección se explica cómo configurar 
-manualmente sus particiones y el uso de éstas en su sistema Debian nuevo.
+Una pantalla similar a la mostrada anteriormente se mostrarÃ¡ si elige
+particionar manualmente excepto que se mostrarÃ¡ su particiÃ³n actual sin los
+puntos de montaje. Al final de esta secciÃ³n se explica cÃ³mo configurar 
+manualmente sus particiones y el uso de Ã©stas en su sistema Debian nuevo.
 
 </para><para>
 
 Si elige un disco nuevo que no tiene ni particiones o espacio libre en
-él, se le podría ofrecer la creación de una nueva tabla de particiones (esto
-es necesario para que pueda crear nuevas particiones). Después de esto
-una nueva línea titulada <quote>ESPACIO LIBRE</quote> deberá aparecer
+Ã©l, se le podrÃ­a ofrecer la creaciÃ³n de una nueva tabla de particiones (esto
+es necesario para que pueda crear nuevas particiones). DespuÃ©s de esto
+una nueva lÃ­nea titulada <quote>ESPACIO LIBRE</quote> deberÃ¡ aparecer
 bajo el disco seleccionado.
 
 </para><para>
 
-Si elije el espacio libre, tendrá la oportunidad crear nuevas particiones. Tendrá
-que responder un conjunto de preguntas rápidas sobre su tamaño,
-tipo (primaria o lógica) y ubicación (al inicio o final del espacio libre).
-Después de esto, se le presentará una perspectiva detallada sobre su
-nueva partición. El valor principal es <guimenuitem>Utilizar
-como:</guimenuitem>, que determina si la partición tendrá un sistema
-de ficheros o se utilizará como intercambio, RAID por software, LVM, un
-sistema de ficheros cifrado, o no se utilizará. Otras opciones
+Si elije el espacio libre, tendrÃ¡ la oportunidad crear nuevas particiones. TendrÃ¡
+que responder un conjunto de preguntas rÃ¡pidas sobre su tamaÃ±o,
+tipo (primaria o lÃ³gica) y ubicaciÃ³n (al inicio o final del espacio libre).
+DespuÃ©s de esto, se le presentarÃ¡ una perspectiva detallada sobre su
+nueva particiÃ³n. El valor principal es <guimenuitem>Utilizar
+como:</guimenuitem>, que determina si la particiÃ³n tendrÃ¡ un sistema
+de ficheros o se utilizarÃ¡ como intercambio, RAID por software, LVM, un
+sistema de ficheros cifrado, o no se utilizarÃ¡. Otras opciones
 incluyen el punto de montaje, opciones de
 montaje, bandera arrancable o tipo de uso. Las opciones que se
-muestren dependen de cómo se va a utilizar la partición.
+muestren dependen de cÃ³mo se va a utilizar la particiÃ³n.
 Si no le gustan las opciones
 predeterminadas, no dude en cambiarlas a su gusto. Por ejemplo,
 si selecciona
-la opción <guimenuitem>Usar como:</guimenuitem>, puede elegir un sistema
-de ficheros distinto para esta partición, incluyendo opciones para
-usar la partición como intercambio, RAID por software, LVM, o simplemente
-no usarla. Otra característica interesante es la posibilidad de copiar
-datos desde una partición existente a ésta.
-Cuando esté satisfecho con su nueva partición, elija
-<guimenuitem>Se ha terminado de definir la partición</guimenuitem> y regresará a la
+la opciÃ³n <guimenuitem>Usar como:</guimenuitem>, puede elegir un sistema
+de ficheros distinto para esta particiÃ³n, incluyendo opciones para
+usar la particiÃ³n como intercambio, RAID por software, LVM, o simplemente
+no usarla. Otra caracterÃ­stica interesante es la posibilidad de copiar
+datos desde una particiÃ³n existente a Ã©sta.
+Cuando estÃ© satisfecho con su nueva particiÃ³n, elija
+<guimenuitem>Se ha terminado de definir la particiÃ³n</guimenuitem> y regresarÃ¡ a la
 pantalla principal de <command>partman</command>.
 
 </para><para>
 
-Si decide que desea cambiar algo en su partición, simplemente elija
-la partición, lo cual le conducirá al menú de configuración de la
-partición. Esta es la misma pantalla que cuando crea la
-partición, así que puede cambiar el mismo conjunto de opciones. Algo
-que podría no ser muy obvio a primera vista, es que puede
-redimensionar el tamaño de la partición seleccionando el elemento
-que muestra el tamaño de ésta. Los sistemas de ficheros que
-se conoce que funcionan con esta opción son por lo menos fat16, fat32,
-ext2, ext3 y «swap». Este menú también le permite eliminar una partición.
+Si decide que desea cambiar algo en su particiÃ³n, simplemente elija
+la particiÃ³n, lo cual le conducirÃ¡ al menÃº de configuraciÃ³n de la
+particiÃ³n. Esta es la misma pantalla que cuando crea la
+particiÃ³n, asÃ­ que puede cambiar el mismo conjunto de opciones. Algo
+que podrÃ­a no ser muy obvio a primera vista, es que puede
+redimensionar el tamaÃ±o de la particiÃ³n seleccionando el elemento
+que muestra el tamaÃ±o de Ã©sta. Los sistemas de ficheros que
+se conoce que funcionan con esta opciÃ³n son por lo menos fat16, fat32,
+ext2, ext3 y Â«swapÂ». Este menÃº tambiÃ©n le permite eliminar una particiÃ³n.
 
 </para><para>
 
-Asegúrese de crear al menos dos particiones: una para el sistema de ficheros
-<emphasis>raíz</emphasis> (que debe montarse en <filename>/</filename>) y otra
+AsegÃºrese de crear al menos dos particiones: una para el sistema de ficheros
+<emphasis>raÃ­z</emphasis> (que debe montarse en <filename>/</filename>) y otra
 para el <emphasis>espacio de intercambio</emphasis>. Si
-olvida montar el sistema de ficheros raíz, <command>partman</command> no le
-dejará continuar hasta que corrija esto.
+olvida montar el sistema de ficheros raÃ­z, <command>partman</command> no le
+dejarÃ¡ continuar hasta que corrija esto.
 
 </para><para arch="ia64">
 
-Si olvida seleccionar y dar formato a una partición de arranque EFI
-<command>partman</command> lo detectará y no le dejará continuar hasta que
+Si olvida seleccionar y dar formato a una particiÃ³n de arranque EFI
+<command>partman</command> lo detectarÃ¡ y no le dejarÃ¡ continuar hasta que
 habilite una.
 
 </para><para>
 
-Se pueden extender las capacidades de <command>partman</command> con módulos
-para el instalador, pero dependen de la arquitectura de su sistema. Así que si
-no están disponibles todas las funcionalidades que esperaba, compruebe que ha
-cargado todos los módulos necesarios (p. ej. <filename>partman-ext3</filename>,
+Se pueden extender las capacidades de <command>partman</command> con mÃ³dulos
+para el instalador, pero dependen de la arquitectura de su sistema. AsÃ­ que si
+no estÃ¡n disponibles todas las funcionalidades que esperaba, compruebe que ha
+cargado todos los mÃ³dulos necesarios (p. ej. <filename>partman-ext3</filename>,
 <filename>partman-xfs</filename>, o <filename>partman-lvm</filename>).
 
 </para><para>
 
-Cuando esté satisfecho con el particionado, seleccione <guimenuitem>Finalizar
-el particionado y escribir los cambios en el disco</guimenuitem> del menú de
-particionado. Se le presentará un resumen de los cambios realizados en los
-discos y se le pedirá confirmación para crear los sistemas de ficheros
+Cuando estÃ© satisfecho con el particionado, seleccione <guimenuitem>Finalizar
+el particionado y escribir los cambios en el disco</guimenuitem> del menÃº de
+particionado. Se le presentarÃ¡ un resumen de los cambios realizados en los
+discos y se le pedirÃ¡ confirmaciÃ³n para crear los sistemas de ficheros
 solicitados.
 
 </para>

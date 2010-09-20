@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- original version: 57590 -->
+<!-- original version: 64779 -->
 <!-- revisado por nahoo, 7 noviembre 2004 -->
 <!-- revisado por Rudy Godoy, 22 feb. 2005 -->
 <!-- revisado por Igor Támara, 16 nov. 2008 -->
@@ -10,22 +10,74 @@
 
 <para>
 
-Se provee dos métodos para arrancar desde una memoria USB. El primero es
+Se proveén dos métodos para arrancar desde una memoria USB. El primero es
+usar una memoria USB sólo para arrancar, y después
 instalar completamente desde la red. El segundo consiste en copiar una imagen
 de CD en la memoria USB y usarla como fuente de paquetes, posiblemente en
-combinación con un sitio de réplica. El segundo es más usado.
+combinación con un sitio de réplica.
 
 </para><para>
 
-El primer método de instalación requiere descargar una imagen de instalador
-del directorio <filename>netboot</filename>(en  el sitio mencionado en
-<xref linkend="where-files"/>) y usar la <quote>forma flexible</quote>
-que se explica más adelante para copiar los ficheros en la memoria USB.
+Para preparar una memoria USB, necesitará un sistema en el cual ya esté
+corriendo GNU/Linux y con soporte para USB. En los sistemas GNU/Linux
+actuales la memoria USB debería reconocerse automáticamente cuando la
+inserta. Si no es así, revise que el módulo del núcleo usb-storage esté
+cargado. Cuando se inserta una memoria USB, se mapeará a un dispositivo
+llamado <filename>/dev/sdX</filename>, en el que <quote>X</quote> es una
+letra entre la a y la z. Al ejecutar la orden <command>dmesg</command>
+debería poder visualizar a qué dispositivo se mapea la memoria USB al
+insertarla. Para escribir en la memoria, es posible que deba quitar el
+seguro de protección contra escritura.
+
+</para><warning><para>
+
+¡Los procedimientos descritos en esta sección destruirán lo que sea que haya
+en el dispositivo! Asegúrese de elegir correctamente el nombre del dispositivo
+para su memoria USB. Si usa el dispositivo incorrecto podría terminar
+perdiendo toda la información de, por ejemplo, un disco duro.
+
+</para></warning><para arch="x86">
+
+Para preparar una memoria USB que sólo arranque el instalador y
+después realice una instalación completa a través de la red, tendrá que
+descargar la imagen <filename>mini.iso</filename> en el directorio
+<filename>netboot</filename> (en la ubicación mencionada en
+<xref linkend="where-files"/>), y escribir este fichero directamente en
+la memoria USB, borrando el contenido actual.
+Este método funcionará con memorias USB de baja capacidad, incluso de sólo
+unos cuantos megabytes.
+
+</para><para arch="x86">
+
+Por ejemplo, si está usando un sistema GNU/Linux existente, puede
+escribir el fichero <filename>mini.iso</filename> a la memoria
+USB de la siguiente manera:
+
+<informalexample><screen>
+# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
+
+Si quiere añadir ficheros de firmware a una memoria USB preparada de
+esta manera, primero obtenga los ficheros de firmware necesarios.
+Para más información consulte <xref linkend="loading-firmware"/>.
+A continuación, desconecte y vuelva a conectar la memoria USB. Ahora
+debería ver dos particiones en eĺ. Por último, monte la segunda partición
+y desempaquete en él los ficheros de firmware.
+
+<informalexample><screen>
+# mount /dev/<replaceable>sdX2</replaceable> /mnt
+# cd /mnt
+# tar zxvf <replaceable>/path/to/</replaceable>firmware.tar.gz
+# cd /
+# umount
+</screen></informalexample>
 
 </para><para>
 
-Las imágenes de instalación para el segundo método se encuentran en el
-directorio <filename>hd-media</filename> y se puede usar tanto la
+Para preparar una memoria USV que instala los paquetes desde una imagen
+de CDROM, use las imágenes de instalación en el
+directorio <filename>hd-media</filename>. Puede usar tanto la
 <quote>forma fácil</quote> o la <quote>forma flexible</quote> para copiar
 la imagen en la memoria USB. Este método de instalación también requerirá
 descargar la imagen del CD. La imagen de instalación y la imagen del CD
@@ -42,28 +94,6 @@ está en ejecución.
 </footnote> durante la instalación.
 
 </para><para>
-
-Para preparar una memoria USB, necesitará un sistema en el cual ya esté
-corriendo GNU/Linux y con soporte para USB. En los sistemas GNU/Linux
-actuales la memoria USB debería reconocerse automáticamente cuando la
-inserta. Si no es así, revise que el módulo del núcleo usb-storage esté
-cargado. Cuando se inserta una memoria USB, se mapeará a un dispositivo
-llamado <filename>/dev/sdX</filename>, en el que <quote>X</quote> es una
-letra entre la a y la z. Al ejecutar la orden <command>dmesg</command>
-debería poder visualizar a qué dispositivo se mapea la memoria USB al
-insertarla. Para escribir en la memoria, es posible que deba quitar el
-seguro de protección contra escritura.
-
-</para>
-<warning><para>
-
-¡Los procedimientos descritos en esta sección destruirán lo que sea que haya
-en el dispositivo! Asegúrese de elegir correctamente el nombre del dispositivo
-para su memoria USB. Si usa el dispositivo incorrecto podría terminar
-perdiendo toda la información de, por ejemplo, un disco duro.
-
-</para></warning>
-<para>
 
 Note que el dispositivo USB, deberá tener por lo menos una capacidad de 256 MB
 (se pueden realizar configuraciones con menos capacidad, tal como se indica en

@@ -1,40 +1,41 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 53452 -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- original version: 64741 -->
 <!-- actualizado igortamara, 17 nov. 2008 -->
 <!-- revisado jfs, 23 feb. 2005 -->
+<!-- actualizado elric, septiembre 2010 -->
 
- <sect1 id="boot-parms"><title>Parámetros de arranque</title>
+ <sect1 id="boot-parms"><title>ParÃ¡metros de arranque</title>
 <para arch="linux-any">
 
-Los <quote>parámetros de arranque</quote> son los parámetros del núcleo
+Los <quote>parÃ¡metros de arranque</quote> son los parÃ¡metros del nÃºcleo
 de Linux que generalmente se utilizan para asegurar la
-correcta gestión de los periféricos.
-En la mayoría de los casos el núcleo puede auto-detectar toda la
-información necesaria sobre sus periféricos pero deberá ayudar un poco a su núcleo
+correcta gestiÃ³n de los perifÃ©ricos.
+En la mayorÃ­a de los casos el nÃºcleo puede auto-detectar toda la
+informaciÃ³n necesaria sobre sus perifÃ©ricos pero deberÃ¡ ayudar un poco a su nÃºcleo
 en algunos casos.
 
 </para><para>
 
-Si ésta es la primera vez que arranca su sistema lo recomendable
-es utilizar los parámetros de arranque predeterminados.
-Es decir, no defina ningún parámetro adicional.
-Observe si su sistema arranca correctamente de esta manera, probablemente
-será lo haga. Si no lo hace, podrá reiniciar más adelante
-después de buscar qué parámetros específicos necesita utilizar para
+Si Ã©sta es la primera vez que arranca su sistema lo recomendable
+es utilizar los parÃ¡metros de arranque predeterminados.
+Es decir, no defina ningÃºn parÃ¡metro adicional.
+Observe si su sistema arranca correctamente de esta manera, lo mÃ¡s
+probable es que sea asÃ­. Si no lo hace, podrÃ¡ reiniciar mÃ¡s adelante
+despuÃ©s de buscar quÃ© parÃ¡metros especÃ­ficos necesita utilizar para
 informar a su sistema del hardware del que dispone.
 
 </para><para arch="linux-any">
 
-Puede encontrar información sobre muchos de los parámetros de arranque en el
-<ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">CÓMO
-de BootPrompt</ulink>, que incluye también consejos útiles para hardware
-poco común.  Esta sección solamente contiene un resumen de los parámetros más
-importantes. Podrá consultar también algunas precauciones comunes
-más adelante en la <xref linkend="boot-troubleshooting"/>.
+Puede encontrar informaciÃ³n sobre muchos de los parÃ¡metros de arranque en el
+<ulink url="http://www.tldp.org/HOWTO/BootPrompt-HOWTO.html">CÃ“MO
+de BootPrompt</ulink>, que incluye tambiÃ©n consejos Ãºtiles para hardware
+poco comÃºn. Esta secciÃ³n solamente contiene un resumen de los parÃ¡metros mÃ¡s
+importantes. PodrÃ¡ consultar tambiÃ©n algunas precauciones comunes
+mÃ¡s adelante en la <xref linkend="boot-troubleshooting"/>.
 
 </para><para arch="linux-any">
 
-El núcleo deberá emitir el siguiente mensaje en una de las primeras etapas
+El nÃºcleo deberÃ¡ emitir el siguiente mensaje en una de las primeras etapas
 del proceso de arranque:
 
 <informalexample><screen>
@@ -42,8 +43,8 @@ Memory:<replaceable>avail</replaceable>k/<replaceable>total</replaceable>k avail
 </screen></informalexample>
 
 El valor <replaceable>total</replaceable> debe corresponder a la cantidad de RAM
-disponible, en Kilobytes. Si no corresponde al tamaño real de la RAM que tiene
-instalada en su sistema, debe usar el parámetro
+disponible, en Kilobytes. Si no se corresponde con el tamaÃ±o real de la RAM que tiene
+instalada en su sistema, deberÃ¡ usar el parÃ¡metro
 <userinput>mem=<replaceable>ram</replaceable></userinput>,
 definiendo la cantidad de memoria en <replaceable>ram</replaceable> y
 utilizando el sufijo <quote>k</quote> para indicar Kilobytes, o <quote>m</quote> para indicar Megabytes.
@@ -53,45 +54,58 @@ tanto <userinput>mem=65536k</userinput> como
 
 </para><para arch="linux-any" condition="supports-serial-console">
 
-Si arranca desde una consola serial el núcleo habitualmente la detectará
-automáticamente.  Si desea arrancar por consola serial un ordenador que
-ya tiene instalados una tarjeta de vídeo (framebuffer) y un teclado,
-deberá indicárselo al núcleo con el parámetro
+Si arranca desde una consola serial el nÃºcleo habitualmente la detectarÃ¡
+automÃ¡ticamente. Si desea arrancar por consola serial un ordenador que
+ya tiene instalados una tarjeta de vÃ­deo (framebuffer) y un teclado,
+deberÃ¡ indicÃ¡rselo al nÃºcleo con el parÃ¡metro
 <userinput>console=<replaceable>dispositivo</replaceable></userinput>,
 donde <replaceable>dispositivo</replaceable> es su dispositivo serie,
-y será generalmente parecido a <filename>ttyS0</filename>.
+y serÃ¡ generalmente parecido a <filename>ttyS0</filename><footnote>
+
+<para>
+Puede aÃ±adir el parÃ¡metro 
+<userinput>TERM=<replaceable>tipo</replaceable></userinput> para asegurar que
+el tipo de terminal usado por el instalador coincide con el emulador de
+terminal.
+Tenga en cuenta que el instalador sÃ³lo permite los siguientes tipos de
+terminal:
+<literal>linux</literal>, <literal>bterm</literal>, <literal>ansi</literal>,
+<literal>vt102</literal> y <literal>dumb</literal>. El valor por omisiÃ³n
+para una consola serial en el &d-i; es <userinput>vt102</userinput>.
+</para>
+
+</footnote>.
 
 </para><para arch="sparc">
 
 Los dispositivos serie de &arch-title; son <filename>ttya</filename> o
 <filename>ttyb</filename>.
-También puede definir en <quote>OpenPROM</quote> las variables
+TambiÃ©n puede definir en <quote>OpenPROM</quote> las variables
 <envar>input-device</envar> y
 <envar>output-device</envar> a <filename>ttya</filename>.
 
 </para>
 
-
-  <sect2 id="installer-args"><title>Parámetros del instalador de Debian</title>
+  <sect2 id="installer-args"><title>ParÃ¡metros del instalador de Debian</title>
 <para>
 
-El sistema de instalación reconoce algunos parámetros adicionales que <footnote>
+El sistema de instalaciÃ³n reconoce algunos parÃ¡metros adicionales que <footnote>
 
 <para>
-Con los núcleos actuales (kernel 2.6.9 o versiones más recientes)
-puede utilizar treinta y dos opciones de línea de órdenes y treinta y dos
-opciones de entorno. Si excede estos números el núcleo abortará.
+Con los nÃºcleos actuales (kernel 2.6.9 o versiones mÃ¡s recientes)
+puede utilizar treinta y dos opciones de lÃ­nea de Ã³rdenes y treinta y dos
+opciones de entorno. Si excede estos nÃºmeros el nÃºcleo emitirÃ¡ un fallo.
 
 </para>
 
-</footnote> pueden serle útiles.
+</footnote> pueden serle Ãºtiles.
 
 </para><para>
 
-Algunos parámetros tienen una <quote>forma abreviada</quote> que
-permite evitar las limitaciones de las opciones de línea de órdenes en
-el núcleo y hace más fácil la introducción de parámetros. Las formas
-abreviadas de los parámetros se mostrarán entre paréntesis tras la
+Algunos parÃ¡metros tienen una <quote>forma abreviada</quote> que
+permite evitar las limitaciones de las opciones de lÃ­nea de Ã³rdenes en
+el nÃºcleo y hace mÃ¡s fÃ¡cil la introducciÃ³n de parÃ¡metros. Las formas
+abreviadas de los parÃ¡metros se mostrarÃ¡n entre parÃ©ntesis tras la
 forma (normal) extendida. Los ejemplos en este manual generalmente
 utilizan la forma simplificada.
 
@@ -102,28 +116,28 @@ utilizan la forma simplificada.
 <term>debconf/priority (priority)</term>
 <listitem><para>
 
-El valor de este parámetro define la prioridad de los mensajes que se
-mostrarán durante la instalación. No se mostrará ningún mensaje de
-menor prioridad a la aquí definida.
+El valor de este parÃ¡metro define la prioridad de los mensajes que se
+mostrarÃ¡n durante la instalaciÃ³n. No se mostrarÃ¡ ningÃºn mensaje de
+menor prioridad a la aquÃ­ definida.
 
 </para><para>
 
-La instalación utiliza <userinput>priority=high</userinput>
-como valor predeterminado.  Esto significa que se mostrarán los
-mensajes de prioridades alta y crítica, pero no así los mensajes con
-prioridades media y baja. El instalador, sin embargo, ajustará esta
-prioridad si se produce algún error.
+La instalaciÃ³n utiliza <userinput>priority=high</userinput>
+como valor predeterminado. Esto significa que se mostrarÃ¡n los
+mensajes de prioridades alta y crÃ­tica, pero no asÃ­ los mensajes con
+prioridades media y baja. El instalador, sin embargo, ajustarÃ¡ esta
+prioridad si se produce algÃºn error.
 
 </para><para>
 
-Si utiliza como parámetro de arranque
-<userinput>priority=medium</userinput>, se le mostrará el menú
-del instalador y tendrá un mayor control sobre la instalación.  Si usa
-<userinput>priority=low</userinput>, se mostrarán todos los
-mensajes (esto es equivalente al método de arranque
+Si utiliza como parÃ¡metro de arranque
+<userinput>priority=medium</userinput>, se le mostrarÃ¡ el menÃº
+del instalador y tendrÃ¡ un mayor control sobre la instalaciÃ³n. Si usa
+<userinput>priority=low</userinput>, se mostrarÃ¡n todos los
+mensajes (esto es equivalente al mÃ©todo de arranque
 <emphasis>experto</emphasis>). Si utiliza
 <userinput>priority=critical</userinput>, el sistema de
-instalación mostrará solamente los mensajes críticos e intentará hacer
+instalaciÃ³n mostrarÃ¡ solamente los mensajes crÃ­ticos e intentarÃ¡ hacer
 lo correcto sin formular muchas preguntas.
 
 </para></listitem>
@@ -133,9 +147,9 @@ lo correcto sin formular muchas preguntas.
 <term>DEBIAN_FRONTEND</term>
 <listitem><para>
 
-Este parámetro de arranque controla el tipo de interfaz de usuario que
-utilizará el instalador. A continuación se muestran los posibles
-valores que puede tomar este parámetro:
+Este parÃ¡metro de arranque controla el tipo de interfaz de usuario que
+utilizarÃ¡ el instalador. A continuaciÃ³n se muestran los posibles
+valores que puede tomar este parÃ¡metro:
 
 <itemizedlist>
 <listitem>
@@ -148,14 +162,14 @@ valores que puede tomar este parámetro:
 </itemizedlist>
 
 La interfaz predeterminada es
-<userinput>DEBIAN_FRONTEND=newt</userinput>.  Si va a realizar una
-instalación a través de una consola serie puede que sea mejor utilizar
-<userinput>DEBIAN_FRONTEND=text</userinput>.  Esta opción ahora
-mismo no es muy útil ya que, por regla general, sólo dispondrá de la
-interfaz <userinput>newt</userinput> en el medio de instalación
-predeterminado. El instalador gráfico utiliza la interfaz
-<userinput>gtk</userinput> en las arquitecturas en las que está
-soportado.
+<userinput>DEBIAN_FRONTEND=newt</userinput>. Si va a realizar una
+instalaciÃ³n a travÃ©s de una consola serial puede que sea mejor utilizar
+<userinput>DEBIAN_FRONTEND=text</userinput>. Esta opciÃ³n ahora
+mismo no es muy Ãºtil ya que, por regla general, sÃ³lo dispondrÃ¡ de la
+interfaz <userinput>newt</userinput> en el medio de instalaciÃ³n
+predeterminado. El instalador grÃ¡fico utiliza la interfaz
+<userinput>gtk</userinput> en las arquitecturas en las que es
+compatible.
 
 </para></listitem>
 </varlistentry>
@@ -165,10 +179,10 @@ soportado.
 <term>BOOT_DEBUG</term>
 <listitem><para>
 
-Si establece este parámetro a dos conseguirá que el proceso de arranque del
-instalador genere registros más detallados. Si lo establece a tres obtendrá un
-intérprete de línea de órdenes en puntos estratégico del proceso de arranque
-(salga del intérprete para continuar con el proceso de arranque).
+Si establece este parÃ¡metro a dos conseguirÃ¡ que el proceso de arranque del
+instalador genere registros mÃ¡s detallados. Si lo establece a tres obtendrÃ¡ un
+intÃ©rprete de lÃ­nea de Ã³rdenes en puntos estratÃ©gico del proceso de arranque
+(salga del intÃ©rprete para continuar con el proceso de arranque).
 
 <variablelist>
 <varlistentry>
@@ -178,21 +192,21 @@ intérprete de línea de órdenes en puntos estratégico del proceso de arranque
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=1</userinput></term>
-<listitem><para>Más detallado de lo habitual.</para></listitem>
+<listitem><para>MÃ¡s detallado de lo habitual.</para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=2</userinput></term>
-<listitem><para>Incluye mucha información de depuración.</para></listitem>
+<listitem><para>Incluye mucha informaciÃ³n de depuraciÃ³n.</para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><userinput>BOOT_DEBUG=3</userinput></term>
 <listitem><para>
 
-Se ejecutan intérpretes de órdenes en diversos puntos en el proceso de
-arranque para permitir una depuración detallada. Salga del intérprete
-de órdenes para proseguir con el arranque.
+Se ejecutan intÃ©rpretes de Ã³rdenes en diversos puntos en el proceso de
+arranque para permitir una depuraciÃ³n detallada. Salga del intÃ©rprete
+de Ã³rdenes para proseguir con el arranque.
 
 </para></listitem>
 </varlistentry>
@@ -206,15 +220,15 @@ de órdenes para proseguir con el arranque.
 <term>INSTALL_MEDIA_DEV</term>
 <listitem><para>
 
-Mediante este parámetro se indica la ruta al dispositivo desde donde cargar
+Mediante este parÃ¡metro se indica la ruta al dispositivo desde dÃ³nde cargar
 el instalador. Por ejemplo,
 <userinput>INSTALL_MEDIA_DEV=/dev/floppy/0</userinput>
 
 </para><para>
 
 El disquete de arranque generalmente analiza todos las unidades
-de disquete en busca del disquete raíz. Puede modificar este comportamiento a
-través de este parámetro para que busque sólo en un dispositivo concreto.
+de disquete en busca del disquete raÃ­z. Puede modificar este comportamiento a
+travÃ©s de este parÃ¡metro para que busque sÃ³lo en un dispositivo concreto.
 
 </para></listitem>
 </varlistentry>
@@ -223,9 +237,20 @@ través de este parámetro para que busque sólo en un dispositivo concreto.
 <term>lowmem</term>
 <listitem><para>
 
-Se puede usar para forzar al insalador a un nivel lowmem más alto que el
+Se puede usar para forzar al insalador a un nivel lowmem mÃ¡s alto que el
 predeterminado por el instalador de acuerdo a la memoria disponible. Los
 valores posibles son 1 y 2, consulte <xref linkend="lowmem"/>.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>noshell</term>
+<listitem><para>
+
+Evita que el instalador ofrezca intÃ©rpretes de Ã³rdenes interactivos
+en las terminales tty2 y tty3. Ãštil para instalaciones desatentidadas
+en las que la seguridad fÃ­sica es limitada.
 
 </para></listitem>
 </varlistentry>
@@ -233,36 +258,30 @@ valores posibles son 1 y 2, consulte <xref linkend="lowmem"/>.
 <varlistentry><term>debian-installer/framebuffer (fb)</term>
 <listitem><para>
 
-En algunas arquitecturas se utiliza el framebuffer del núcleo para
-ofrecer la opción a realizar la instalación en un número diverso de idiomas.
+En algunas arquitecturas se utiliza el framebuffer del nÃºcleo para
+ofrecer la opciÃ³n a realizar la instalaciÃ³n en un nÃºmero diverso de idiomas.
 Si el uso de este dispositivo origina problemas en su
-sistema puede deshabilitar esta característica con
-el parámetro <userinput>fb=false</userinput>.
-Algunos síntomas de este problema son mensajes que traten sobre <quote>bterm</quote> o <quote>bogl</quote>,
-la aparición de una pantalla en blanco o que el sistema se quede congelado
-algunos minutos después de iniciarse la instalación.
-
-</para><para arch="x86">
-
-También puede utilizar el argumento <userinput>video=vga16:off</userinput>
-para deshabilitar el uso del núcleo framebuffer. Los problemas antes indicados se han
-observado en equipos Dell Inspiron con tarjetas Mobile Radeon.
-
+sistema puede deshabilitar esta caracterÃ­stica con
+el parÃ¡metro <userinput arch="x86">vga=normal</userinput>
+<userinput>fb=false</userinput>.
+Algunos sÃ­ntomas de este problema son mensajes que traten sobre <quote>bterm</quote> o <quote>bogl</quote>,
+la apariciÃ³n de una pantalla en blanco o que el sistema se quede congelado
+algunos minutos despuÃ©s de iniciarse la instalaciÃ³n.
 </para><para arch="hppa">
 
 Se han observado este tipo de problemas en hppa.
 
 </para><note arch="sparc"><para>
 
-El soporte de framebúfer está <emphasis>deshabilitado por
-omisión</emphasis> para &arch-title; debido a los problemas de
+El soporte de framebÃºfer estÃ¡ <emphasis>deshabilitado por
+omisiÃ³n</emphasis> para &arch-title; debido a los problemas de
 pantalla que se producen en algunos sistemas. Esto puede dar lugar a
-una presentación visual poco agradable en aquellos sistemas que no
-ofrezcan un soporte adecuado del framebúfer, como es el caso de
-aquellos sistemas con tarjetas gráficas ATI. Si tiene problemas
-visuales con el instalador puede intentar arrancar con el parámetro
+una presentaciÃ³n visual poco agradable en aquellos sistemas que no
+ofrezcan un soporte adecuado del framebÃºfer, como es el caso de
+aquellos sistemas con tarjetas grÃ¡ficas ATI. Si tiene problemas
+visuales con el instalador puede intentar arrancar con el parÃ¡metro
 <userinput>debian-installer/framebuffer=true</userinput> o
-la versión reducida <userinput>fb=true</userinput>.
+la versiÃ³n reducida <userinput>fb=true</userinput>.
 
 </para></note></listitem>
 </varlistentry>
@@ -271,10 +290,10 @@ la versión reducida <userinput>fb=true</userinput>.
 <term>debian-installer/theme (theme)</term>
 <listitem><para>
 
-Un tema determina cómo se muestra la interfaz de usuario del
+Un tema determina cÃ³mo se muestra la interfaz de usuario del
 instalador (colores, iconos, etc.). Los temas disponibles dependen de
-la interfaz. Actualmente las interfaces newt y gtk sólo tienen un tema
-denominado <quote>dark</quote> (oscuro, n. del t.) que se ha diseñado
+la interfaz. Actualmente las interfaces newt y gtk sÃ³lo tienen un tema
+denominado <quote>dark</quote> (oscuro, n. del t.) que se ha diseÃ±ado
 para aquellas personas con problemas visuales. Puede fijar este tema
 arrancando el instalador con 
 <userinput>theme=<replaceable>dark</replaceable></userinput>.
@@ -286,17 +305,17 @@ arrancando el instalador con
 <term>netcfg/disable_dhcp</term>
 <listitem><para>
 
-Por omisión, el &d-i; configura automáticamente la conexión de red a través de
-DHCP. No podrá revisar ni cambiar los valores obtenidos de esta forma,
-si la prueba tiene éxito. Sin embargo, podrá realizar la configuración
+Por omisiÃ³n, el &d-i; configura automÃ¡ticamente la conexiÃ³n de red a travÃ©s de
+DHCP. No podrÃ¡ revisar ni cambiar los valores obtenidos de esta forma,
+si la prueba tiene Ã©xito. Sin embargo, podrÃ¡ realizar la configuraciÃ³n
 de forma manual en el caso de que falle la solicitud DHCP.
 
 </para><para>
 
-Puede usar el parámetro
+Puede usar el parÃ¡metro
 <userinput>netcfg/disable_dhcp=true</userinput> para que no se lleve a
-cabo la configuración de red usando DHCP, entonces tendrá que introducir
-la información manualmente. Esto puede ser útil si tiene un
+cabo la configuraciÃ³n de red usando DHCP, entonces tendrÃ¡ que introducir
+la informaciÃ³n manualmente. Esto puede ser Ãºtil si tiene un
 servidor DHCP en su red local pero no quiere utilizarlo porque, por
 ejemplo, no proporciona valores correctos.
 
@@ -308,9 +327,9 @@ ejemplo, no proporciona valores correctos.
 <term>hw-detect/start_pcmcia</term>
 <listitem><para>
 
-Si quiere evitar que se ejecuten los servicios PCMCIA deberá definir
-este parámetro a <userinput>false</userinput>.  Algunos ordenadores
-portátiles son conocidos por tener problemas en estos casos, y puede
+Si quiere evitar que se ejecuten los servicios PCMCIA deberÃ¡ definir
+este parÃ¡metro a <userinput>false</userinput>.  Algunos ordenadores
+portÃ¡tiles son conocidos por tener problemas en estos casos, y puede
 ser recomendable deshabilitarlo.
 
 </para></listitem>
@@ -321,9 +340,9 @@ ser recomendable deshabilitarlo.
 <listitem><para>
 
 Establezca a <userinput>verdadero</userinput> para habilitar el soporte para
-discos RAID Serial ATA(también llamado ATA RAID, BIOS RAID o RAID falso) en el
+discos RAID Serial ATA(tambiÃ©n llamado ATA RAID, BIOS RAID o RAID falso) en el
 instalador.  Tenga en cuenta que este soporte en el momento es experimental.
-Puede encontrar más información en el <ulink url="&url-d-i-wiki;">Wiki del
+Puede encontrar mÃ¡s informaciÃ³n en el <ulink url="&url-d-i-wiki;">Wiki del
 Instalador de Debian</ulink>.
 
 </para></listitem>
@@ -333,8 +352,8 @@ Instalador de Debian</ulink>.
 <term>preseed/url (url)</term>
 <listitem><para>
 
-Este valor especifica la ruta de un fichero de preconfiguración que
-se descargará y utilizará para automatizar la instalación.
+Este valor especifica la ruta de un fichero de preconfiguraciÃ³n que
+se descargarÃ¡ y utilizarÃ¡ para automatizar la instalaciÃ³n.
 Vea <xref linkend="automatic-install"/>.
 
 </para></listitem>
@@ -344,21 +363,21 @@ Vea <xref linkend="automatic-install"/>.
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
-Antes de reiniciar, &d-i; expulsa automáticamente el medio óptico utilizado
-durante la instalación por omisión. Esto puede no ser necesario si el sistema
-no arranca automáticamente del CD. En algunos casos puede ser incluso indeseable,
-por ejemplo, si la unidad óptica no puede volver a insertar el medio por sí
-mismo y el usuario no está allí para hacerlo manualmente. Muchas unidades
-especiales no son capaces de recargar medios de forma automática, entre éstas
+Antes de reiniciar, &d-i; expulsa automÃ¡ticamente el medio Ã³ptico utilizado
+durante la instalaciÃ³n por omisiÃ³n. Esto puede no ser necesario si el sistema
+no arranca automÃ¡ticamente del CD. En algunos casos puede ser incluso indeseable,
+por ejemplo, si la unidad Ã³ptica no puede volver a insertar el medio por sÃ­
+mismo y el usuario no estÃ¡ allÃ­ para hacerlo manualmente. Muchas unidades
+especiales no son capaces de recargar medios de forma automÃ¡tica, entre Ã©stas
 se encuentran las denominadas <quote>slot loading</quote>, <quote>+slim-line</quote>,
 y estilo <quote>caddy</quote>.
 
 </para><para>
 
-Fíjelo al valor <userinput>false</userinput> para deshabilitar la expulsión
-automática, pero debe ser consciente de que tiene que asegurar que el sistema
-no arranca automáticamente de la unidad óptica una vez se haya realizado
-la instalación inicial y el sistema se reinicie.
+FÃ­jelo al valor <userinput>false</userinput> para deshabilitar la expulsiÃ³n
+automÃ¡tica, pero debe ser consciente de que tiene que asegurar que el sistema
+no arranca automÃ¡ticamente de la unidad Ã³ptica una vez se haya realizado
+la instalaciÃ³n inicial y el sistema se reinicie.
 </para></listitem>
 </varlistentry>
 
@@ -366,8 +385,8 @@ la instalación inicial y el sistema se reinicie.
 <term>preseed/file (file)</term>
 <listitem><para>
 
-Este valor especifica la url de un fichero de preconfiguración que
-se cargará en la instalación automática.
+Este valor especifica la url de un fichero de preconfiguraciÃ³n que
+se cargarÃ¡ en la instalaciÃ³n automÃ¡tica.
 Consulte <xref linkend="automatic-install"/>.
 
 </para></listitem>
@@ -377,12 +396,12 @@ Consulte <xref linkend="automatic-install"/>.
 <term>preseed/interactive</term>
 <listitem><para>
 
-Se se fija a <userinput>true</userinput> (verdadero), se mostrarán las
-preguntas aunque ya hayan sido preconfiguradas. Esta opción puede ser
-útil para probar o depurar un fichero de preconfiguración. Tenga 
-en cuenta que este valor no tiene ningún efecto sobre los parámetros
-que se introducen como parámetros de arranque, pero puede utilizar
-una sintaxis especial para éstos. Para más información consulte
+Se se fija a <userinput>true</userinput> (verdadero), se mostrarÃ¡n las
+preguntas aunque ya hayan sido preconfiguradas. Esta opciÃ³n puede ser
+Ãºtil para probar o depurar un fichero de preconfiguraciÃ³n. Tenga 
+en cuenta que este valor no tiene ningÃºn efecto sobre los parÃ¡metros
+que se introducen como parÃ¡metros de arranque, pero puede utilizar
+una sintaxis especial para Ã©stos. Para mÃ¡s informaciÃ³n consulte
 <xref linkend="preseed-seenflag"/>.
          
 </para></listitem>
@@ -393,8 +412,8 @@ una sintaxis especial para éstos. Para más información consulte
 <listitem><para>
 
 Demora las preguntas que se realizan normalmente antes de la
-preconfiguración hasta después de configurar la red.
-Consulte <xref linkend="preseed-auto"/> para más información de cómo
+preconfiguraciÃ³n hasta despuÃ©s de configurar la red.
+Consulte <xref linkend="preseed-auto"/> para mÃ¡s informaciÃ³n de cÃ³mo
 utilizar esto para realizar instalaciones automatizadas.
 
 </para></listitem>
@@ -404,7 +423,7 @@ utilizar esto para realizar instalaciones automatizadas.
 <term>finish-install/keep-consoles</term>
 <listitem><para>
 
-Durante las instalaciones desde una consola serial o de administración,
+Durante las instalaciones desde una consola serial o de administraciÃ³n,
 normalmente se deshabilitan las consolas virtuales(VT1 a VT6) en
 <filename>/etc/inittab</filename>.
 Establezca a <userinput>true</userinput> para evitarlo.
@@ -416,21 +435,43 @@ Establezca a <userinput>true</userinput> para evitarlo.
 <term>cdrom-detect/eject</term>
 <listitem><para>
 
-Antes de reiniciar el sistema, &d-i; expulsa automáticamente el medio
-óptico utilizado durante la instalación por omisión. Esto puede no ser
-necesario si el sistema no arranca de forma automática del CD. En
+Antes de reiniciar el sistema, &d-i; expulsa automÃ¡ticamente el medio
+Ã³ptico utilizado durante la instalaciÃ³n por omisiÃ³n. Esto puede no ser
+necesario si el sistema no arranca de forma automÃ¡tica del CD. En
 algunos casos puede incluso no ser deseable, por ejemplo, si la unidad
-óptica no puede volver a insertar el medio y el usuario no está allí
-para hacerlo manualmente. Muchas unidades de distinto tipo («slot
-loading», «slim-line» y «caddty style») no pueden recargar el medio
-automáticamente.
+Ã³ptica no puede volver a insertar el medio y el usuario no estÃ¡ allÃ­
+para hacerlo manualmente. Muchas unidades de distinto tipo (Â«slot
+loadingÂ», Â«slim-lineÂ» y Â«caddty styleÂ») no pueden recargar el medio
+automÃ¡ticamente.
 
 </para><para>
 
 Fije este valor a <userinput>false</userinput> para deshabilitar el
-expulsado automático, pero tenga en cuenta que debe asegurarse que el
-sistema no arranca de forma automática de la unidad óptica tras la
-instalación inicial.
+expulsado automÃ¡tico, pero tenga en cuenta que debe asegurarse que el
+sistema no arranca de forma automÃ¡tica de la unidad Ã³ptica tras la
+instalaciÃ³n inicial.
+
+</para></listitem>
+</varlistentry>
+
+<varlistentry>
+<term>base-installer/install-recommends (recommends)</term>
+<listitem><para>
+
+Si define esta opciÃ³n como <userinput>false</userinput>, el sistema de
+gestiÃ³n de paquetes se configurarÃ¡ para no instalar automÃ¡ticamente
+los paquetes recomendados (<quote>Recommends</quote>), bien durante la
+instalaciÃ³n y tambiÃ©n en el sistema instalado. Consulte
+<xref linkend="di-install-base"/>.
+
+</para><para>
+
+Tenga en cuenta que esta opciÃ³n permite tener un sistema mÃ¡s ligero,
+pero tambiÃ©n puede resultar en la perdida de funcionalidades que
+habitualmente el usuario espera que se ofrezcan.
+Puede que tenga instalar algunos de los paquetes recomendados para obtener
+toda la funcionalidad que espera. Por ello, sÃ³lo los usuarios muy
+experimentados deberÃ­an usar esta opciÃ³n.
 
 </para></listitem>
 </varlistentry>
@@ -439,9 +480,9 @@ instalación inicial.
 <term>debian-installer/allow_unauthenticated</term>
 <listitem><para>
 
-Por omisión, el instalador obliga a que los repositorios estén autenticados con
-una clave gpg conocida. Si se fija esta opción a <userinput>true</userinput>,
-se deshabilitará esta autenciación.  <emphasis role="bold">Aviso: inseguro, no
+Por omisiÃ³n, el instalador obliga a que los repositorios estÃ©n autenticados con
+una clave gpg conocida. Si se fija esta opciÃ³n a <userinput>true</userinput>,
+se deshabilitarÃ¡ esta autenciaciÃ³n.  <emphasis role="bold">Aviso: inseguro, no
 recomendado.</emphasis>
             
 </para></listitem>
@@ -451,81 +492,20 @@ recomendado.</emphasis>
 <term>ramdisk_size</term>
 <listitem><para>
 
-Este parámetro debería siempre estar fijado al valor correcto
-cuando es necesario. Debe fijarlo sólo si ve errores durante el
-arranque que indiquen que el disco de ram no se cargó por completo. El
+Este parÃ¡metro deberÃ­a siempre estar fijado al valor correcto
+cuando es necesario. Debe fijarlo sÃ³lo si ve errores durante el
+arranque que indiquen que el disco de ram no se cargÃ³ por completo. El
 valor se debe dar en kB.
 
 </para></listitem>
 </varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/protocol</term>
-<listitem><para>
-
-Para la interfaz gtk(instalador gráfico), los usuarios pueden
-establecer el protocolo del ratón vía este parámetro.
-Los valores soportados son<footnote>
-
-<para>
-Consulte las páginas de manual para encontrar información
-adicional acerca de
-<citerefentry><refentrytitle>directfbrc</refentrytitle>
-<manvolnum>5</manvolnum></citerefentry>.
-</para>
-
-</footnote>:
-<userinput>PS/2</userinput>, <userinput>IMPS/2</userinput>,
-<userinput>MS</userinput>, <userinput>MS3</userinput>,
-<userinput>MouseMan</userinput> y <userinput>MouseSystems</userinput>.
-En la mayoría de los casos el protocolo predeterminado debería
-funcionar correctamente.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/device</term>
-<listitem><para>
-
-Para la interfaz gtk(instalador gráfico), los ususarios pueden 
-especificar el dispositivo del ratón vía este parámetro. Es sobre
-todo útil si el ratón está conectado a un puerto serial(ratón serial).
-Ejemplo:
-<userinput>mouse/device=<replaceable>/dev/ttyS1</replaceable></userinput>.
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>mouse/left</term>
-<listitem><para>
-
-Los usuarios pueden cambiar el ratón para que opere para zurdos
-fijando este parámetro a <userinput>true</userinput> en la interfaz
-gtk (instalador gráfico).
-
-</para></listitem>
-</varlistentry>
-
-<varlistentry condition="gtk">
-<term>directfb/hw-accel</term>
-<listitem><para>
-
-La aceleración hardware en directfb está deshabilitada por omisión en
-la interfaz gtk (instalador gráfico. Debe configurar este parámetro a
-<userinput>true</userinput> si desea activarla.
-
-</para></listitem>
-</varlistentry>
-
 
 <varlistentry>
 <term>rescue/enable</term>
 <listitem><para>
 
 Fije este valor a  <userinput>true</userinput> si desea entrar en el modo de rescate
-en lugar de hacer una instalación normal. Si desea más información consulte
+en lugar de hacer una instalaciÃ³n normal. Si desea mÃ¡s informaciÃ³n consulte
 <xref linkend="rescue"/>.
 
 </para></listitem>
@@ -533,16 +513,15 @@ en lugar de hacer una instalación normal. Si desea más información consulte
 
 </variablelist>
 
-
    <sect3 id="preseed-args">
-   <title>Utilizar parámetros de arranque para responder a preguntas</title>
+   <title>Utilizar parÃ¡metros de arranque para responder a preguntas</title>
 <para>
 
 Se puede fijar un valor durante el indicador de arranque para
-cualquier pregunta que se realiza durante la instalación, con algunas
-excepciones. Realmente esto es sólo útil para algunos casos
+cualquier pregunta que se realiza durante la instalaciÃ³n, con algunas
+excepciones. Realmente esto es sÃ³lo Ãºtil para algunos casos
 concretos. Puede encontrar instrucciones generales que describen como
-hacer esto en <xref linkend="preseed-bootparms"/>. A continuación se
+hacer esto en <xref linkend="preseed-bootparms"/>. A continuaciÃ³n se
 listan algunos ejemplos.
 
 </para>
@@ -550,14 +529,31 @@ listan algunos ejemplos.
 <variablelist>
 
 <varlistentry>
+<term>debian-installer/language (language)</term>
+<term>debian-installer/country (country)</term>
 <term>debian-installer/locale (locale)</term>
 <listitem><para>
 
-Puede utilizarse para fijar tanto el idioma como el país para la
-instalación. Sólo funcionará si la localización está soportada en
-Debian. Por ejemplo, puede utilizar
-<userinput>locale=de_CH</userinput> para seleccionar alemán como 
-idioma y Suiza como país.
+Existen dos formas de definir el idioma, paÃ­s y locale a usar
+por el proceso de instalaciÃ³n y en el sistema instalado.
+
+</para><para>
+
+La primera y mÃ¡s sencilla consiste en simplemente introducir el parÃ¡metro
+<literal>locale</literal>. De su valor se derivarÃ¡n el idioma y el paÃ­s.
+Puede, por ejemplo, usar <userinput>locale=de_CH</userinput> para seleccionar
+el alemÃ¡n como idioma y Suiza como paÃ­s (se definirÃ¡
+<literal>de_CH.UTF-8</literal> como la locale predeterminada para el sistema 
+instalado). Este mÃ©todo no permite todas las combinaciones posibles de idioma, paÃ­s
+y locale.
+
+</para><para>
+
+La segunda opciÃ³n, mÃ¡s flexible, es definir <literal>language</literal>
+(idioma) y <literal>country</literal> (paÃ­s) de forma separada.
+En este caso, puede aÃ±adir <literal>locale</literal> para especificar una
+locale predeterminada para el sistema instalador. Ejemplo:
+<userinput>language=en country=DE locale=en_GB.UTF-8</userinput>.
 
 </para></listitem>
 </varlistentry>
@@ -566,13 +562,13 @@ idioma y Suiza como país.
 <term>anna/choose_modules (modules)</term>
 <listitem><para>
 
-Puede utilizarse para cargar automáticamente componentes del
-instalador que no se cargan por omisión.
-Algunos ejemplos de componentes opcionales que pueden ser útiles son
+Puede utilizarse para cargar automÃ¡ticamente componentes del
+instalador que no se cargan por omisiÃ³n.
+Algunos ejemplos de componentes opcionales que pueden ser Ãºtiles son
 <classname>openssh-client-udeb</classname> (para poder utilizar el
-programa <command>scp</command> durante la instalación))<phrase
+programa <command>scp</command> durante la instalaciÃ³n))<phrase
 arch="not-s390"> y <classname>ppp-udeb</classname> (que permite la
-configuración PPPoE)</phrase>.
+configuraciÃ³n PPPoE)</phrase>.
 
 </para></listitem>
 </varlistentry>
@@ -582,7 +578,7 @@ configuración PPPoE)</phrase>.
 <listitem><para>
 
 Puede fijar este valor a <userinput>true</userinput> si quiere
-deshabilitar DHCP y forzar la configuración estática de la red.
+deshabilitar DHCP y forzar la configuraciÃ³n estÃ¡tica de la red.
 
 </para></listitem>
 </varlistentry>
@@ -591,13 +587,13 @@ deshabilitar DHCP y forzar la configuración estática de la red.
 <term>mirror/protocol (protocol)</term>
 <listitem><para>
 
-El instalador utilizará el protocolo HTTP para descargar ficheros de
-las réplicas de Debian y no es posible cambiar a FTP en instalaciones
+El instalador utilizarÃ¡ el protocolo HTTP para descargar ficheros de
+las rÃ©plicas de Debian y no es posible cambiar a FTP en instalaciones
 que se realizan con prioridad normal. Puede forzar al instalador a
-utilizar el protocolo FTP si fija este parámetro a
-<userinput>ftp</userinput>. Tenga en cuenta que no podrá seleccionar
-una réplica ftp de una lista, tendrá que introducir el nombre del
-sistema donde está la réplica manualmente.
+utilizar el protocolo FTP si fija este parÃ¡metro a
+<userinput>ftp</userinput>. Tenga en cuenta que no podrÃ¡ seleccionar
+una rÃ©plica ftp de una lista, tendrÃ¡ que introducir el nombre del
+sistema donde estÃ¡ la rÃ©plica manualmente.
 
 </para></listitem>
 </varlistentry>
@@ -606,10 +602,10 @@ sistema donde está la réplica manualmente.
 <term>tasksel:tasksel/first (tasks)</term>
 <listitem><para>
 
-Puede utilizarse para seleccionar tareas que no están disponibles en
+Puede utilizarse para seleccionar tareas que no estÃ¡n disponibles en
 la lista interactiva de tareas, como pueda ser la tarea
 <literal>kde-desktop</literal>.
-Para más información consulte <xref linkend="pkgsel"/>.
+Para mÃ¡s informaciÃ³n consulte <xref linkend="pkgsel"/>.
 
 </para></listitem>
 </varlistentry>
@@ -619,42 +615,42 @@ Para más información consulte <xref linkend="pkgsel"/>.
    </sect3>
 
    <sect3 id="module-parms">
-   <title>Pasar parámetros a módulos del núcleo</title>
+   <title>Pasar parÃ¡metros a mÃ³dulos del nÃºcleo</title>
 <para>
 
-Puede pasar parámetros a los módulos del núcleo como se describe en la
-documentación del núcleo si los controladores están compilados dentro
-de éste. Sin embargo, no es posible pasar parámetros a los módulos
-como haría normalmente en el caso de controladores compilados como
-módulos, debido a que los módulos del núcleo se carga de una forma un
-poco distinta en la instalación a como se hace en un sistema ya
+Puede pasar parÃ¡metros a los mÃ³dulos del nÃºcleo como se describe en la
+documentaciÃ³n del nÃºcleo si los controladores estÃ¡n compilados dentro
+de Ã©ste. Sin embargo, no es posible pasar parÃ¡metros a los mÃ³dulos
+como harÃ­a normalmente en el caso de controladores compilados como
+mÃ³dulos, debido a que los mÃ³dulos del nÃºcleo se carga de una forma un
+poco distinta en la instalaciÃ³n a como se hace en un sistema ya
 instalado. Tiene que utilizar una sintaxis especial que reconoce el
-instalador. Si la utiliza, el instalador se asegurará que los
-parámetros se guarden en el fichero de configuración apropiado y se
-utilicen cuando se carguen los módulos. Los parámetros que utilice
-también se propagan de forma automática a la configuración utilizada
+instalador. Si la utiliza, el instalador se asegurarÃ¡ que los
+parÃ¡metros se guarden en el fichero de configuraciÃ³n apropiado y se
+utilicen cuando se carguen los mÃ³dulos. Los parÃ¡metros que utilice
+tambiÃ©n se propagan de forma automÃ¡tica a la configuraciÃ³n utilizada
 en el sistema instalado.
 
 </para><para>
 
-Tenga en cuenta que ahora es raro pasar parámetros a los módulos. En
-la mayor parte de las situaciones el núcleo podrá analizar el hardware
-disponible en un sistema y fijar valores por omisión correctos de esta
-forma. Existen algunas situaciones, sin embargo, en las que será
-necesario pasar parámetros manualmente.
+Tenga en cuenta que ahora es raro pasar parÃ¡metros a los mÃ³dulos. En
+la mayor parte de las situaciones el nÃºcleo podrÃ¡ analizar el hardware
+disponible en un sistema y fijar valores por omisiÃ³n correctos de esta
+forma. Existen algunas situaciones, sin embargo, en las que serÃ¡
+necesario pasar parÃ¡metros manualmente.
 
 </para><para>
 
-Debe utilizar la siguiente sintaxis para fijar parámetros para los módulos:
+Debe utilizar la siguiente sintaxis para fijar parÃ¡metros para los mÃ³dulos:
 
 <informalexample><screen>
-<replaceable>nombre_módulo</replaceable>.<replaceable>nombre_parámetro</replaceable>=<replaceable>valor</replaceable>
+<replaceable>nombre_mÃ³dulo</replaceable>.<replaceable>nombre_parÃ¡metro</replaceable>=<replaceable>valor</replaceable>
 </screen></informalexample>
 
-Si necesita pasar múltiples parámetros al mismo módulo o a distintos
-módulos sólo tiene que repetir este formato. Por ejemplo, para indicar a
+Si necesita pasar mÃºltiples parÃ¡metros al mismo mÃ³dulo o a distintos
+mÃ³dulos sÃ³lo tiene que repetir este formato. Por ejemplo, para indicar a
 una tarjeta de red 3Com antigua que utilice el conector BNC (coaxial)
-y la interrupción (IRQ) 10 debería utiliza:
+y la interrupciÃ³n (IRQ) 10 deberÃ­a utiliza:
 
 <informalexample><screen>
 3c509.xcvr=3 3c509.irq=10
@@ -664,32 +660,32 @@ y la interrupción (IRQ) 10 debería utiliza:
    </sect3>
 
    <sect3 id="module-blacklist">
-   <title>Poner módulos del núcleo en una lista negra</title>
+   <title>Poner mÃ³dulos del nÃºcleo en una lista negra</title>
 <para>
 
-Algunas veces es necesario poner un módulo en una lista negra para que
-ni el núcleo ni «udev» lo carguen automáticamente. Una razón para hacer
-esto es cuando un módulo concreto causa problemas en su hardware. El
-núcleo también puede algunas veces listar dos controladores distintos
+Algunas veces es necesario poner un mÃ³dulo en una lista negra para que
+ni el nÃºcleo ni Â«udevÂ» lo carguen automÃ¡ticamente. Una razÃ³n para hacer
+esto es cuando un mÃ³dulo concreto causa problemas en su hardware. El
+nÃºcleo tambiÃ©n puede algunas veces listar dos controladores distintos
 para el mismo dispositivo. Esto puede hacer que el dispositivo no
 funcione correctamente si los controladores entran en conflicto o si
-se carga el controlador erróneo primero.
+se carga el controlador errÃ³neo primero.
 
 </para><para>
 
-Puede poner un módulo en la lista negra con la siguiente sintaxis:
+Puede poner un mÃ³dulo en la lista negra con la siguiente sintaxis:
 
-<userinput><replaceable>nombre_módulo</replaceable>.blacklist=yes</userinput>.
-Esto hará que el módulo se ponga en la lista negra en
+<userinput><replaceable>nombre_mÃ³dulo</replaceable>.blacklist=yes</userinput>.
+Esto harÃ¡ que el mÃ³dulo se ponga en la lista negra en
 <filename>/etc/modprobe.d/blacklist.local</filename> tanto durante la
-instalación como en el sistema instalado.
+instalaciÃ³n como en el sistema instalado.
 
 </para><para>
 
-Tenga en cuenta que el sistema de instalación puede llegar a cargar el
-módulo por sí sólo. Puede evitar esto ejecutando la instalación en
-modo experto y deseleccionando el módulo de la lista de módulos que se
-muestra durante las fases de detección de hardware.
+Tenga en cuenta que el sistema de instalaciÃ³n puede llegar a cargar el
+mÃ³dulo por sÃ­ sÃ³lo. Puede evitar esto ejecutando la instalaciÃ³n en
+modo experto y deseleccionando el mÃ³dulo de la lista de mÃ³dulos que se
+muestra durante las fases de detecciÃ³n de hardware.
 
 </para>
    </sect3>

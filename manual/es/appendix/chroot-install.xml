@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- original version: 63062 -->
+<!-- original version: 64776 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 <!-- actualizado jfs, 23 marzo 2006 -->
@@ -13,9 +13,9 @@
 
 <para>
 
-Esta sección explica como instalar &debian; desde un sistema Unix o
+Esta sección explica cómo instalar &debian; desde un sistema Unix o
 Linux existente, sin usar el instalador basado en menús,
-como se explica en el resto de este manual.  Los usuarios que se
+como se explica en el resto de este manual. Los usuarios que se
 cambian a &debian; desde Red Hat, Mandrake y SuSE han solicitado este
 CÓMO de <quote>instalación cruzada</quote>. En esta sección se asume alguna
 familiaridad con la introducción de órdenes en *nix y navegación en el
@@ -52,7 +52,7 @@ pasos adicionales en la instalación y/o configuración.
   <title>Primeros pasos</title>
 <para>
 
-Reparticione el disco duro como lo necesita
+Reparticione el disco duro como desee
 con las herramientas de particionado de *nix que disponga,
 debe crear por lo menos un sistema de
 ficheros más una partición de intercambio. Necesita
@@ -95,7 +95,6 @@ nombre más adelante.
 </screen></informalexample>
 
 </para>
-
 <note><para>
 
 Deberá crear y montar manualmente los directorios que sean necesarios antes de
@@ -112,7 +111,7 @@ en particiones distintas.
 
 <command>debootstrap</command> es la herramienta que usa el instalador
 de Debian, es también la forma oficial de instalar un sistema base
-Debian.  Éste usa <command>wget</command> y <command>ar</command>,
+Debian. Éste usa <command>wget</command> y <command>ar</command>,
 pero, salvo esto, sólo
 depende de <classname>/bin/sh</classname> y algunas herramientas básicas
 de Unix/Linux<footnote>
@@ -143,8 +142,8 @@ convertir el .deb en .rpm, o descargar una versión adaptada a rpm de
 
 <para>
 
-O bien, puede usar el siguiente procedimiento para instalarlo manualmente.
-Cree un directorio temporal <quote>trabajo</quote> para extraer el .deb en él:
+Por otra parte, puede usar el siguiente procedimiento para instalarlo manualmente.
+Cree un directorio temporal <quote>trabajo</quote> para extraer el fichero «.deb» en él:
 
 <informalexample><screen>
 # mkdir trabajo
@@ -153,7 +152,7 @@ Cree un directorio temporal <quote>trabajo</quote> para extraer el .deb en él:
 
 El binario de <command>debootstrap</command> se encuentra en el archivo de
 Debian (asegúrese de elegir el fichero adecuado para su arquitectura).
-Descargue el .deb de <command>debootstrap</command> desde el almacén
+Descargue el paquete de <command>debootstrap</command> desde el almacén
 de paquetes en
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/"></ulink>,
 copie el paquete al directorio <quote>trabajo</quote> y extraiga los
@@ -242,12 +241,12 @@ ejemplo:
 <para>
 
 Llegados a este punto el directorio <filename>/dev/</filename> contiene solamente ficheros
-de dispositivos muy básicos. Es posible que necesite ficheros de dispositivo adicionales
+de dispositivo muy básicos. Es posible que necesite ficheros de dispositivo adicionales
 para llevar a cabo los pasos siguientes de la instalación. Hay varias formas
 de hacerlo y el método que vaya a usar dependerá del sistema inicial que esté
-usando para la instalación, de si desea usar un núcleo modular o no, de si
-pretende usar dispositivos de archivos dinámicos (p.ej. con
-<classname>udev</classname>) o estáticos para el nuevo sistema.
+usando para la instalación; si desea usar un núcleo modular o no, si
+pretende usar ficheros de dispositivo dinámicos (p.ej. con
+<classname>udev</classname>) o estáticos en el sistema nuevo.
 
 </para><para>
 
@@ -265,7 +264,7 @@ cree un conjunto predeterminado de ficheros de dispositivo estáticos con
 </para></listitem>
 <listitem><para>
 
-cree manualmente solamente ficheros de dispositivos específicos con
+cree manualmente sólo ficheros de dispositivos específicos con
 <command>MAKEDEV</command>
 
 </para></listitem>
@@ -274,7 +273,7 @@ cree manualmente solamente ficheros de dispositivos específicos con
 Monte <filename>/dev</filename> del sistema original encima del directorio <filename>/dev</filename>
 del sistema objetivo utilizando un enlace de montaje («bind mount», N. del T.)
 Ha de tener en cuenta que los programas de postinstalación de algunos paquetes
-pueden tratar de crear ficheros de dispositivos. Utilice esta opción con precaución.
+pueden tratar de crear ficheros de dispositivo. Utilice esta opción con precaución.
 
 </para></listitem>
 </itemizedlist>
@@ -292,10 +291,10 @@ Necesita crear <filename>/etc/fstab</filename>.
 # editor /etc/fstab
 </screen></informalexample>
 
-Este es un ejemplo que puede modificar a sus necesidades:
+Este es un ejemplo que puede modificar según sus necesidades:
 
 <informalexample><screen>
-# /etc/fstab: información estática de sistema de ficheros.
+# /etc/fstab: información estática del sistema de ficheros.
 #
 # file system    mount point   type    options                  dump pass
 /dev/XXX         /             ext3    defaults                 0    1
@@ -322,7 +321,7 @@ móntelos individualmente usando:
 </screen></informalexample>
 
 Los sistemas Debian actuales tienen puntos de montaje para medios
-removibles bajo <filename>/media</filename>, pero mantienen enlaces
+extraíbles bajo <filename>/media</filename>, pero mantienen enlaces
 simbólicos por compatibilidad en 
 <filename>/</filename>. Cree esto si los necesita, como por ejemplo:
 
@@ -490,14 +489,14 @@ de hacer cambios a la lista de fuentes.
    </sect3>
 
    <sect3>
-   <title>Configure Locales and Keyboard</title>
+   <title>Configurar la localización y el teclado</title>
 <para>
 
 
 Instale el paquete de soporte de localización
 <classname>locales</classname> y configúrelo para poder definir los
 valores de localización para usar un idioma diferente al
-inglés. Actualmente se recomienda utilizar locales UTF-8.
+inglés. Actualmente se recomienda utilizar locales codificados en UTF-8.
 
 <informalexample><screen>
 # aptitude install locales
@@ -514,7 +513,7 @@ Para configurar su teclado (si lo necesita):
 </para><para>
 
 Tenga en cuenta que no puede configurar el teclado mientras esté dentro del
-chroot, pero se configurará en el siguiente rearranque.
+chroot, pero se configurará en el siguiente reinicio.
 
 </para>
    </sect3>
@@ -532,13 +531,11 @@ disponibles con:
 # apt-cache search &kernelpackage;
 </screen></informalexample>
 
-Luego instale su elección usando el nombre del paquete.
-
 </para><para>
 
 Si va a utilizar un núcleo pre-empaquetado puede querer crear su
 propio fichero de configuración
-<filename>/etc/kernel-img.conf</filename> antes de hacerlo. Aquí hay
+<filename>/etc/kernel-img.conf</filename> antes de hacerlo. Aquí tiene
 un fichero de ejemplo:
 
 <informalexample><screen>
@@ -589,15 +586,15 @@ de su jaula Debian para hacer esto.
 
 </para><para arch="any-x86">
 
-Use <userinput>info grub</userinput> o <userinput>man
-lilo.conf</userinput> para leer las instrucciones sobre cómo
+Use <userinput>info grub</userinput> <phrase arch="x86">o <userinput>man
+lilo.conf</userinput></phrase> para leer las instrucciones sobre cómo
 configurar el gestor de arranque. Si desea mantener el sistema que
 utilizó para instalar Debian, simplemente añada una entrada para la
-instalación de Debian en el fichero <filename>menu.lst</filename> o
-<filename>lilo.conf</filename> actual. También podría copiarlo al
+instalación de Debian en el fichero <filename>menu.lst</filename><phrase arch="x86">o
+<filename>lilo.conf</filename> actual. También podría copiar <filename>lilo.conf</filename> al
 nuevo sistema y editarlo allí. Ejecute <command>lilo</command> una vez termine de editar
 el fichero (recuerde que éste usará el <filename>lilo.conf</filename>
-relativo al sistema desde el cual lo ejecute).
+relativo al sistema desde el cual lo ejecute)</phrase>.
 
 </para><para arch="any-x86">
 
@@ -611,12 +608,12 @@ sencilla como hacer:
 </screen></informalexample>
 
 La segunda orden instalará <command>grub</command> (en este caso en el
-MBR de <literal>hda</literal>). La última orden creará un
+sector de arranque de <literal>hda</literal>). La última orden creará un
 <filename>/boot/grub/menu.lst</filename> funcional.
 
 </para><para>
 
-Estos ejemplos asumen que se ha creado el fichero de dispositov 
+Estos ejemplos asumen que se ha creado el fichero de dispositivo
 <filename>/dev/hda</filename>. Existen métodos alternativos para 
 instalar <command>grub</command>,
 pero están fuera del alcance de este apéndice.
@@ -655,16 +652,16 @@ postinst_hook = update-grub
 postrm_hook   = update-grub
 </screen></informalexample>
 
-El valor de la opción <literal>do_bootloader</literal> debe estar
-fijado a <quote>yes</quote> en el caso del cargador de arranque
-<classname>lilo</classname>.
+<phrase arch="x86">El valor de la opción <literal>do_bootloader</literal> debe estar
+definido como <quote>yes</quote> en el caso del cargador de arranque
+<classname>lilo</classname>.</phrase>
 
 </para><para arch="powerpc">
 
 Puede consultar <userinput>man yaboot.conf</userinput> para obtener
 más información sobre la configuración del gestor de arranque.  Si
 desea mantener el sistema que utilizó para instalar Debian,
-simplemente añada una entrada para la instalación de Debian al
+simplemente añada una entrada para la instalación de Debian al fichero
 <filename>yaboot.conf</filename> existente.  También podrá copiarlo al
 nuevo sistema y editarlo allí. Ejecute ybin después de que finalice la
 edición (recuerde que éste usará el <filename>yaboot.conf</filename>
@@ -709,7 +706,7 @@ instalar individualmente todos los paquetes.
 
 </para><para>
 
-Despue de la instalación habrá muchos paquetes descargados en
+Después de la instalación habrá muchos paquetes descargados en
 <filename>/var/cache/apt/archives/</filename>. Puede liberar algo de
 espacio de disco ejecutando:
 

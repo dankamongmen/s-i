@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- original version: 56425 -->
+<!-- original version: 62454 -->
 <!-- revisado por nahoo, 1 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 <!-- revisado igortamara, 21 nov. 2008 -->
+<!-- actualizado elric, septiembre 2010 -->
 
  <sect1 condition="supports-tftp" id="install-tftp">
  <title>Preparación de los ficheros para el arranque a través de red usando TFTP</title>
@@ -71,24 +72,24 @@ que utilice <classname>tftpd-hpa</classname>.
 </para>
 
 &tftp-rarp.xml;
-&tftp-bootp.xml;
 &tftp-dhcp.xml;
+&tftp-bootp.xml;
 
   <sect2 id="tftpd">
   <title>Habilitar el servidor TFTP</title>
 <para>
 
 Para tener listo el servidor TFTP, primero deberá asegurarse de que
-<command>tftpd</command> está habilitado. Generalmente se hace
-añadiendo a <filename>/etc/inetd.conf</filename> algo
-similar a lo siguiente:
+la orden <command>tftpd</command> está instalada.
 
-<informalexample><screen>
-tftp dgram udp wait nobody /usr/sbin/tcpd in.tftpd /tftpboot
-</screen></informalexample>
+</para><para>
 
-Cuando se instalan los paquetes de Debian, por lo general, lo configuran
-correctamente de forma predeterminada.
+Existen dos formas de ejecutar el servicio de
+<classname>tftpd-hpa</classname>. Puede iniciarlo desde el demonio del
+sistema <classname>inetd</classname>, o lo puede configurar para que se
+inicie como un demonio independiente. El método a usar se selecciona
+durante la instalación del paquete, y se puede modificar reconfigurando
+el paquete.
 
 </para>
 <note><para>
@@ -105,11 +106,6 @@ ejemplos de configuración en esta sección si la ubicación varía.
 </para></note>
 <para>
 
-Busque en el fichero <filename>/etc/inetd.conf</filename> y recuerde
-el directorio que usa como argumento de
-<command>in.tftpd</command><footnote>
-
-<para>
 Todas las alternativas de <command>in.tftpd</command> en Debian
 deberían almacenar las solicitudes TFTP  en la registro del sistema
 de forma predeterminada.  Algunas de ellas cuentan con el argumento
@@ -117,15 +113,6 @@ de forma predeterminada.  Algunas de ellas cuentan con el argumento
 Se recomienda revisar todos los mensajes de la bitácora en caso de
 problemas al arrancar puesto que son un buen punto de partida para
 diagnosticar la causa de los errores.
-
-</para>
-</footnote>, lo necesitará más adelante. Si ha tenido que cambiar
-<filename>/etc/inetd.conf</filename>, deberá notificar al proceso
-<command>inetd</command> en ejecución que el fichero ha cambiado. En
-un sistema Debian, ejecute <userinput>/etc/init.d/inetd
-reload</userinput>; en otros sistemas, busque el ID del proceso
-<command>inetd</command>, y ejecute <userinput>kill -HUP
-<replaceable>id-de-inetd</replaceable></userinput>.
 
 </para><para arch="mips">
 
@@ -271,17 +258,7 @@ la opción <userinput>filename=</userinput> en
 </para>
    </sect3>
 
-   <sect3 arch="mips">
-   <title>Arranque TFTP en Broadcom BCM91250A y BCM91480B</title>
-<para>
-
-No necesita configurar DHCP de forma especial debido a
-que pasará la ruta completa del fichero a cargar en el «CFE».
-
-</para>
-   </sect3>
-
-  </sect2>
+     </sect2>
 
 <!-- FIXME: commented out since it seems too old to be usable and a current
             way is not known
