@@ -709,6 +709,7 @@ set_alignment(void)
 PedConstraint *
 partition_creation_constraint(const PedDevice *cdev)
 {
+        PedSector md_grain_size;
         PedConstraint *aligned, *gap_at_end, *combined;
         PedGeometry gap_at_end_geom;
         enum alignment cdev_alignment = alignment_of_device(cdev);
@@ -725,9 +726,17 @@ partition_creation_constraint(const PedDevice *cdev)
         /* We must ensure that there's a small gap at the end, since
          * otherwise MD 0.90 metadata at the end of a partition may confuse
          * mdadm into believing that both the disk and the partition
-         * represent the same RAID physical volume.
+         * represent the same RAID physical volume.  0.90 metadata is
+         * located by rounding the device size down to a 64K boundary and
+         * subtracting 64K (1.x metadata is either between 8K and 12K from
+         * the end, or at or near the start), so we round down to 64K and
+         * subtract one more sector.
          */
-        ped_geometry_init(&gap_at_end_geom, cdev, 0, cdev->length - 1);
+        md_grain_size = 65536 / cdev->sector_size;
+        if (md_grain_size == 0)
+                md_grain_size = 1;
+        ped_geometry_init(&gap_at_end_geom, cdev, 0,
+                          ped_round_down_to(cdev->length, md_grain_size) - 1);
         gap_at_end = ped_constraint_new(ped_alignment_any, ped_alignment_any,
                                         &gap_at_end_geom, &gap_at_end_geom,
                                         1, cdev->length);
