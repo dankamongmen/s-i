@@ -80,17 +80,33 @@ for (my $id = 0; $id < @data; $id++) {
 	}
 }
 
-# Poor man's mirror rating system: push-primary, push* (-secondary), geodns, others
+# Assign a rating to each mirror, so that push-primary come first, followed
+# by push-secondary. Normally that is followed by geodns, and then leaf.
+# However, if a country has no push-primary or secondary mirrors, its leaf
+# mirrors are put before geodns, since we do not want to default to a
+# geodns mirror that will likely not be in the country.
+my %cc_has_push_mirror;
 foreach my $id (0..$#data) {
+	my $cc = $data[$id]->{country};
+	if (exists $data[$id]->{type} && $data[$id]->{type} =~ /push/i) {
+		$cc_has_push_mirror{$cc}=1;
+	}
+}
+foreach my $id (0..$#data) {
+	my $cc = $data[$id]->{country};
 	my $rating=0;
 	if (exists $data[$id]->{type}) {
 	        $rating=1 if $data[$id]->{type} =~ /geodns/i;
-	        $rating=2 if $data[$id]->{type} =~ /push/i;
-                $rating=3 if $data[$id]->{type} =~ /push-primary/i;
+	        $rating=4 if $data[$id]->{type} =~ /push/i;
+                $rating=5 if $data[$id]->{type} =~ /push-primary/i;
         }
+	if (! $rating && ! $cc_has_push_mirror{$cc}) {
+		$rating=2;
+	}
 	$data[$id]->{rating}=$rating;
 }
 
+# Filter out mirrors that don't carry the target architecture.
 my @newdata;
 foreach my $id (0..$#data) {
 	if (exists $data[$id]->{'archive-architecture'} &&
