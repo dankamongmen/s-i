@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 62798 -->
+<!-- original version: 64778 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -261,16 +261,26 @@ Für alle anderen Voreinstellungsmethoden müssen Sie dem Installer beim Start
 mitteilen, welche Datei er nutzen soll. Dies wird normalerweise mit einem
 Boot-Parameter gemacht, den Sie dem Kernel beim Start angeben, entweder manuell
 zum Boot-Zeitpunkt oder indem Sie die Konfigurationsdatei des Bootloaders
-editieren (fügen Sie z.B in <filename>syslinux.cfg</filename> den Parameter
-an das Ende der <quote>append</quote>-Zeile(n) des Kernels an).
+editieren <phrase arch="linux-any">(fügen Sie z.B. in
+<filename>syslinux.cfg</filename> den Parameter
+an das Ende der <quote>append</quote>-Zeile für den Kernel
+an).</phrase><phrase arch="kfreebsd-any">(fügen Sie z.B. in
+<filename>grub.cfg</filename> den Parameter in einer neuen
+<literal>set</literal>-Zeile für den Kernel
+hinzu.</phrase><phrase arch="hurd-any">(fügen Sie z.B. in
+<filename>grub.cfg</filename> den Parameter an das Ende der
+<filename>gnumach.gz</filename>-Zeile an.</phrase>
 
 </para><para>
 
 Wenn Sie die Voreinstellungsdatei in der Bootloader-Konfiguration festlegen,
 möchten Sie vielleicht diese Konfiguration so verändern, dass Sie nicht mehr
-die Enter-Taste drücken müssen, um den Installer zu booten. In
-<filename>syslinux.cfg</filename> müssen Sie dazu den Timeout auf
-<literal>1</literal> setzen.
+die Enter-Taste drücken müssen, um den Installer zu booten.
+<phrase arch="linux-any">In <filename>syslinux.cfg</filename> müssen Sie dazu
+den Timeout auf <literal>1</literal> setzen.</phrase><phrase
+arch="kfrebsd-any;hurd-any">Bei Grub müssen Sie dazu in
+<filename>grub.cfg</filename> den Timeout auf <literal>0</literal>
+setzen.</phrase>
 
 </para><para>
 
@@ -1512,12 +1522,15 @@ verwenden können.
   <title>Installation des Bootloaders</title>
 
 <informalexample role="example"><screen>
-# Grub ist (für x86) der Standard-Bootloader. Wenn Sie stattdessen lilo
+<phrase arch="linux-any"># Grub ist (für x86) der Standard-Bootloader. Wenn Sie stattdessen lilo
 # installieren möchten, entfernen Sie hier das Kommentarzeichen:
 #d-i grub-installer/skip boolean true
 # Um auch die Installation von lilo zu unterdrücken und überhaupt keinen
 # Bootloader zu installieren, entfernen Sie auch hier das Kommentarzeichen:
-#d-i lilo-installer/skip boolean true
+#d-i lilo-installer/skip boolean true</phrase>
+<phrase arch="kfreebsd-any;hurd-any"># Um keinen Bootloader zu installieren, entfernen Sie hier das
+# Kommentarzeichen:
+#d-i grub-installer/skip boolean true</phrase>
 
 # Mit Ausnahme von einigen ungewöhnlichen Partitionierungskonfigurationen ist
 # GRUB 2 jetzt der Standard. Falls Sie aus bestimmten Gründen GRUB Legacy

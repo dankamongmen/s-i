@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 63062 -->
+<!-- original version: 64829 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian-gnu; von einem anderen Unix/Linux-System aus installieren</title>
@@ -9,8 +9,8 @@
 Dieses Kapitel beschreibt, wie man &debian-gnu; von einem vorhandenen
 Unix- oder Linux-System aus installiert, ohne den
 menügeführten Installer zu verwenden, der im Rest dieses Handbuchs
-beschrieben wird. Dieses <quote>Einmal-quer-durch-die-Installation</quote>-HowTo
-wurde erbeten von Leuten, die von Red Hat, Mandrake oder Suse zu
+beschrieben wird. Dieses <quote>Quereinsteiger-HowTo</quote>
+wurde von Leuten erbeten, die von Red Hat, Mandrake oder Suse zu
 &debian-gnu; wechseln. In diesem Kapitel gehen wir davon aus, dass Sie
 ein wenig Erfahrung mit *nix-Befehlen haben sowie mit der Navigation
 durch das Dateisystem. In diesem Abschnitt symbolisiert ein <prompt>$</prompt>
@@ -178,7 +178,8 @@ finden Sie auf <ulink url="http://www.debian.org/mirror/list"></ulink>.
 
 </para><para>
 
-Wenn Sie eine &debian-gnu;-&releasename-cap;-CD eingelegt und in <filename>/cdrom</filename>
+Wenn Sie eine &debian-gnu; &releasename-cap;-CD eingelegt und in
+<filename>/cdrom</filename>
 eingebunden haben, können Sie statt der http-URL auch eine file-URL angeben:
 <userinput>file:/cdrom/debian/</userinput>.
 
@@ -554,7 +555,7 @@ zu überprüfen, ob die eingetragenen Werte für Ihr System passend sind.
 Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
 
 <informalexample><screen>
-# aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc</replaceable>
+# aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc.deb</replaceable>
 </screen></informalexample>
 
 Wenn Sie die Datei <filename>/etc/kernel-img.conf</filename> vor der
@@ -568,7 +569,7 @@ einige Fragen gestellt, die sich darum drehen.
 <title>Den Bootloader einrichten</title>
 <para>
 
-Um Ihr &debian-gnu;-System bootfähig zu machen, richten Sie Ihren Bootloader ein,
+Um Ihr &debian-gnu;-System boot-fähig zu machen, richten Sie Ihren Bootloader ein,
 so dass er den installierten Kernel mit Ihrer neuen Root-Partition startet.
 Bedenken Sie, dass <command>debootstrap</command> keinen Bootloader installiert,
 allerdings können Sie aptitude in Ihrer Debian-chroot-Umgebung benutzen, um
@@ -576,16 +577,16 @@ dies zu erledigen.
 
 </para><para arch="any-x86">
 
-Lesen Sie <userinput>info grub</userinput> oder <userinput>man
-lilo.conf</userinput>, um Informationen über die Einrichtung des Bootloaders
+Lesen Sie <userinput>info grub</userinput><phrase arch="x86"> oder <userinput>man
+lilo.conf</userinput></phrase>, um Informationen über die Einrichtung des Bootloaders
 zu bekommen. Wenn Sie das Betriebssystem, das Sie zur Installation von Debian
 benutzt haben, behalten möchten, müssen Sie lediglich einen Eintrag zur
-vorhandenen grub-<filename>menu.lst</filename> oder zu
-<filename>lilo.conf</filename> hinzufügen. Die Datei
+vorhandenen grub-<filename>menu.lst</filename><phrase arch="x86"> oder zu
+<filename>lilo.conf</filename></phrase> hinzufügen. <phrase arch="x86">Die Datei
 <filename>lilo.conf</filename> können Sie auch auf Ihr neues Debian-System
 kopieren und dort bearbeiten. Rufen Sie danach <command>lilo</command> auf
 (bedenken Sie: lilo nutzt die <filename>lilo.conf</filename> relativ zum
-System, von dem aus Sie es aufrufen).
+System, von dem aus Sie es aufrufen).</phrase>
 
 </para><para arch="any-x86">
 
@@ -644,8 +645,10 @@ postinst_hook = update-grub
 postrm_hook   = update-grub
 </screen></informalexample>
 
-Bei Verwendung von <classname>lilo</classname> als Bootloader muss
-<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt sein.
+<phrase arch="x86">Bei Verwendung von <classname>lilo</classname> als
+Bootloader muss
+<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt
+sein.</phrase>
 
 </para><para arch="powerpc">
 
