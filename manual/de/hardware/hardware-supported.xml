@@ -1,14 +1,15 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 61147 -->
+<!-- original version: 64829 -->
 
  <sect1 id="hardware-supported">
  <title>Unterstützte Hardware</title>
 <para>
 
 Debian stellt keine zusätzlichen Anforderungen an die Hardware außer denen
-des Linux-Kernels und der GNU-Werkzeuge.
+des Linux- bzw. kFreeBSD-Kernels und der GNU-Werkzeuge.
 Daher läuft Debian auf jeder Architektur oder Plattform, auf die der
-Linux-Kernel, libc, gcc usw. portiert wurden und für die eine Debian-Portierung
+Linux- bzw. kFreeBSD-Kernel, libc, gcc usw. portiert wurden und für die
+eine Debian-Portierung
 existiert. Bitte besuchen Sie die Portierungs-Seite
 <ulink url="&url-ports;"></ulink> für weitere Informationen über
 &arch-title;-Architektur-Systeme, die mit &debian-gnu; getestet wurden.
@@ -34,7 +35,7 @@ dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 <tgroup cols="4">
 <thead>
 <row>
-  <entry>Architektur</entry><entry>Debian-Kennzeichnung</entry>
+  <entry>Architektur</entry><entry>Debian-Bezeichnung</entry>
   <entry>Unterarchitektur</entry><entry>Flavour</entry>
 </row>
 </thead>
@@ -152,8 +153,38 @@ dieser Architekturen, auch als <quote>Flavours</quote> bekannt.
 
 </para><para>
 
+Debian GNU/kFreeBSD &release; unterstützt zwei Architekturen.
+
+</para><para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row>
+  <entry>Architektur</entry><entry>Debian-Bezeichnung</entry>
+</row>
+</thead>
+
+<tbody>
+<row>
+  <entry>Intel x86-basiert</entry>
+  <entry>kfreebsd-i386</entry>
+</row>
+
+<row>
+  <entry>AMD64 &amp; Intel EM64T</entry>
+  <entry>kfreebsd-amd64</entry>
+</row>
+
+</tbody></tgroup></informaltable>
+
+</para><para>
+
 Dieses Dokument umfasst die Installation für die
-<emphasis>&arch-title;</emphasis>-Architektur. Wenn Sie Informationen über eine
+<emphasis>&arch-title;</emphasis>-Architektur bei Verwendung des
+<emphasis>&arch-kernel;</emphasis>-Kernels.
+
+Wenn Sie Informationen über eine
 der anderen von Debian unterstützten Architekturen suchen, besuchen Sie die
 <ulink url="http://www.debian.org/ports/">Debian Portierungs-Seiten</ulink>.
 
@@ -178,7 +209,9 @@ gefunden hat, könnten Sie hin und wieder auf Fehler stoßen. Verwenden Sie
 unsere
 <ulink url="&url-bts;">Fehlerdatenbank (Bug Tracking System, BTS)</ulink>, um
 Probleme zu melden; geben Sie jedoch auf jeden Fall an, dass der
-Fehler auf &arch-title; vorgekommen ist. Es könnte auch notwendig sein, die
+Fehler auf &arch-title; bei Verwendung des
+<emphasis>&arch-kernel;</emphasis>-Kernels
+vorgekommen ist. Es könnte auch notwendig sein, die
 <ulink url="&url-list-subscribe;">debian &arch-listname;-Mailingliste</ulink>
 zu kontaktieren.
 
@@ -224,9 +257,10 @@ dies ist jedoch bei normaler Systemnutzung kaum zu bemerken.
 </para><para>
 
 Um den Kernel für Single-CPU-Systeme zu optimieren, müssen Sie den
-Standard-Debian-Kernel durch einen eigenen ersetzen. <phrase arch="linux-any">Eine Erörterung dazu
-finden Sie im <xref linkend="kernel-baking"/>. Zum momentanen Zeitpunkt
-(Kernel-Version &kernelversion;) ist der Weg zum Deaktivieren von SMP
+Standard-Debian-Kernel durch einen eigenen ersetzen.
+<phrase arch="linux-any">Eine Erörterung dazu
+finden Sie im <xref linkend="kernel-baking"/>. Derzeit
+(in Kernel-Version &kernelversion;) ist der Weg zum Deaktivieren von SMP
 das Abwählen von <quote>&smp-config-option;</quote> im
 <quote>&smp-config-section;</quote>-Abschnitt der Kernel-Konfiguration.</phrase>
 
@@ -267,9 +301,10 @@ der Kernel wird dann lediglich die erste CPU verwenden.
 </para><para>
 
 Um die Vorteile von mehreren Prozessoren zu nutzen, müssen Sie den
-Standard-Debian-Kernel ersetzen. <phrase arch="linux-any">Eine Erörterung dazu finden Sie im
+Standard-Debian-Kernel ersetzen. <phrase arch="linux-any">Eine Erörterung
+dazu finden Sie im
 <xref linkend="kernel-baking"/>. Zum momentanen Zeitpunkt
-(Kernel-Version &kernelversion;) ist der Weg zum Aktivieren von SMP
+(in Kernel-Version &kernelversion;) ist der Weg zum Aktivieren von SMP
 das Auswählen von <quote>&smp-config-option;</quote> im
 <quote>&smp-config-section;</quote>-Abschnitt der Kernel-Konfiguration.</phrase>
 
@@ -298,10 +333,12 @@ ein passendes Paket auswählen und installieren.
 </para><para>
 
 Sie können auch einen eigenen benutzerspezifischen Kernel mit
-SMP-Unterstützung bauen. Zum momentanen Zeitpunkt (Kernel-Version
+SMP-Unterstützung bauen. <phrase arch="linux-any">Eine Erörterung
+dazu finden Sie im
+<xref linkend="kernel-baking"/>. Zum momentanen Zeitpunkt (in Kernel-Version
 &kernelversion;) ist der Weg zum Aktivieren von SMP das Auswählen von
 <quote>&smp-config-option;</quote> im
-<quote>&smp-config-section;</quote>-Abschnitt der Kernel-Konfiguration.
+<quote>&smp-config-section;</quote>-Abschnitt der Kernel-Konfiguration.</phrase>
 
 </para>
   </sect2>
