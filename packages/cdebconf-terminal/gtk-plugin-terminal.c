@@ -338,17 +338,27 @@ static gboolean prepare_environ(struct terminal * terminal_data)
 
 static gboolean start_command(struct terminal * terminal_data)
 {
+    gboolean ret = TRUE;
     pid_t pid;
 
+#if VTE_CHECK_VERSION(0,25,0)
+    ret = vte_terminal_fork_command_full(
+        terminal_data->terminal,
+        VTE_PTY_NO_LASTLOG | VTE_PTY_NO_UTMP | VTE_PTY_NO_WTMP,
+        "/", terminal_data->argv, terminal_data->environ,
+        G_SPAWN_CHILD_INHERITS_STDIN | G_SPAWN_SEARCH_PATH,
+        NULL, NULL, &pid, NULL);
+#else
     pid = vte_terminal_fork_command(
         terminal_data->terminal, terminal_data->command,
         terminal_data->argv, terminal_data->environ, "/",
         FALSE /* no lastlog */, FALSE /* no utmp */, FALSE /* no wtmp */);
-    if (0 == pid) {
+    if (0 == pid)
+        ret = FALSE;
+#endif
+    if (!ret)
         g_critical("vte_terminal_fork_command failed.");
-        return FALSE;
-    }
-    return TRUE;
+    return ret;
 }
 
 int cdebconf_gtk_handler_terminal(struct frontend * fe,
