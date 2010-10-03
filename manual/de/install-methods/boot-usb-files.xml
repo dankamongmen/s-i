@@ -1,29 +1,81 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 57590 -->
+<!-- original version: 64779 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Dateien vorbereiten für das Booten von einem USB-Memory-Stick</title>
 
-<para>
+<para arch="x86">
 
 Es gibt zwei mögliche Installationsmethoden, wenn Sie von USB-Stick booten.
-Die erste wäre, komplett über das Netzwerk zu installieren und die zweite,
-ebenfalls ein CD-Image auf den USB-Stick zu kopieren und dieses als
-Paketquelle zu nutzen, möglicherweise in Kombination mit einem Spiegel-Server.
-Diese zweite Methode wird üblicherweise verwendet.
+Die erste ist, den USB-Stick nur zum Booten des Installers zu verwenden und
+die eigentliche Installation komplett über Netzwerk durchzuführen. Die zweite
+Möglichkeit ist, zusätzlich ein CD-Image auf den Stick zu kopieren und
+dieses als Paketquelle zu nutzen, eventuell in Kombination mit einem
+Spiegel-Server.
 
 </para><para>
 
-Für die erste Installationsmethode müssen Sie ein Installer-Image aus dem
-<filename>netboot</filename>-Verzeichnis (von einer der in
-<xref linkend="where-files"/> angegebenen Adressen) herunterladen und
-den unten beschriebenen <quote>flexiblen Weg</quote> nutzen, um die Dateien
-auf den USB-Stick zu kopieren.
+Um den USB-Stick vorzubereiten, benötigen Sie ein System, auf dem
+GNU/Linux bereits läuft und das USB unterstützt. Auf aktuellen GNU/Linux-Systemen
+sollte der USB-Stick automatisch erkannt werden, sobald Sie ihn einstecken.
+Falls nicht, sollten Sie sicherstellen, dass das usb-storage-Kernelmodul geladen
+ist. Beim Einstecken wird dem USB-Stick ein Gerät namens
+<filename>/dev/sdX</filename> zugewiesen, wobei <quote>X</quote>
+ein Buchstabe im Bereich zwischen a und z ist. Es sollte Ihnen möglich sein zu
+erkennen, welches Gerät dem Stick zugewiesen wurde, indem Sie den Befehl
+<command>dmesg</command> ausführen, nachdem der USB-Stick eingesteckt wurde.
+Um den Stick zu beschreiben, müssen Sie eventuell noch mit dem entsprechenden
+Schalter am Stick den Schreibschutz deaktivieren.
 
+</para><warning><para>
+
+Die in diesem Abschnitt beschriebenen Methoden werden alle Daten zerstören,
+die sich bereits auf dem Gerät befinden! Versichern Sie sich, dass
+Sie den korrekten Gerätenamen (nämlich den Ihres USB-Sticks) verwenden.
+Wenn Sie einen falschen Namen verwenden, könnte dies dazu führen, dass Sie
+z.B. alle Daten auf Ihrer Festplatte verlieren!
+
+</para></warning><para arch="x86">
+
+Um einen USB-Stick vorzubereiten, der lediglich den Installer bootet, welcher
+dann wiederum die Installation komplett per Netzwerk fortführt, müssen Sie
+das <filename>mini.iso</filename>-Image aus dem
+<filename>netboot</filename>-Verzeichnis (unter der im
+<xref linkend="where-files"/> angegebenen Adresse) herunterladen und direkt
+auf den USB-Stick schreiben; dadurch wird der bisherige Inhalt des Sticks
+überschrieben. Diese Methode funktioniert auch mit sehr kleinen USB-Sticks,
+schon ein paar Megabyte reichen aus.
+
+</para><para arch="x86">
+
+Auf einem vorhandenen GNU/Linux-System kann die
+<filename>mini.iso</filename>-Datei z.B. mit folgenden Befehlen auf den
+USB-Stick geschrieben werden:
+
+<informalexample><screen>
+# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
+
+Um Firmware auf einen USB-Stick zu schreiben, der auf diese Art vorbereitet
+wurde, beschaffen Sie sich die nötigen Firmware-Dateien. Weitere Informationen
+finden Sie unter <xref linkend="loading-firmware"/>. Entfernen Sie nun den
+Stick und stecken Sie erneut ein; es sollten nun zwei Partitionen darauf
+sichtbar sein. Sie sollten die zweite der beiden Partitionen in Ihr
+Dateisystem einbinden und die Firmware darauf entpacken:
+
+<informalexample><screen>
+# mount /dev/<replaceable>sdX2</replaceable> /mnt
+# cd /mnt
+# tar zxvf <replaceable>/ihr/pfad/zu/</replaceable>firmware.tar.gz
+# cd /
+# umount
+</screen></informalexample>
 </para><para>
 
-Installations-Images für die zweite Installatiosmethode finden Sie im
-<filename>hd-media</filename>-Verzeichnis und Sie können sowohl den
+Um einen USB-Stick vorzubereiten, der Pakete aus einem auf dem Stick
+enthaltenen CD-Image installiert, verwenden Sie die Installer-Images aus dem
+<filename>hd-media</filename>-Verzeichnis. Sie können sowohl den
 <quote>einfachen</quote> wie auch den <quote>flexiblen Weg</quote>
 benutzen, um das Image auf den Stick zu kopieren. Für diese
 Installationsmethode müssen Sie auch ein CD-Image herunterladen. Das
@@ -42,33 +94,9 @@ laufenden Kernels unterscheidet.
 
 </para><para>
 
-Um den USB-Stick vorzubereiten, benötigen Sie ein System, auf dem
-GNU/Linux bereits läuft und das USB unterstützt. Auf aktuellen GNU/Linux-Systemen
-sollte der USB-Stick automatisch erkannt werden, sobald Sie ihn einstecken.
-Falls nicht, sollten Sie sicherstellen, dass das usb-storage-Kernelmodul geladen
-ist. Beim Einstecken wird dem USB-Stick ein Gerät namens
-<filename>/dev/sdX</filename> zugewiesen, wobei <quote>X</quote>
-ein Buchstabe im Bereich von a bis z ist. Es sollte Ihnen möglich sein zu
-erkennen, welches Gerät dem Stick zugewiesen wurde, indem Sie den Befehl
-<command>dmesg</command> ausführen, nachdem der USB-Stick eingesteckt wurde.
-Um den Stick zu beschreiben, müssen Sie eventuell noch mit dem entsprechenden
-Schalter den Schreibschutz deaktivieren.
-
-</para>
-<warning><para>
-
-Die hier beschriebenen Verfahren werden alle auf dem Gerät vorhandenen
-Daten zerstören! Stellen Sie auf jeden Fall sicher, dass Sie den korrekten
-Gerätenamen für den USB-Stick verwenden. Wenn Sie den falschen Gerätenamen
-benutzen, könnte das dazu führen, dass alle Dateien zum Beispiel auf einer
-Festplatte verloren gehen.
-
-</para></warning>
-<para>
-
 Beachten Sie, dass der USB-Stick mindestens 256 MB groß sein sollte
-(kleinere Setups sind bei Nutzung von <xref linkend="usb-copy-flexible"/>
-möglich).
+(kleinere Setups sind möglich, wenn Sie gemäß
+<xref linkend="usb-copy-flexible"/> vorgehen).
 
 </para>
 
@@ -78,12 +106,11 @@ möglich).
 
 Es gibt ein <quote>Alles-in-einem</quote>-Image
 <filename>hd-media/boot.img.gz</filename>, das alle Dateien des Installers
-enthält (inklusive dem Kernel)
-<phrase arch="x86">wie auch den Bootloader
-<classname>syslinux</classname> mit der zugehörigen
-Konfigurationsdatei.</phrase>
-<phrase arch="powerpc">wie auch den Bootloader
-<classname>yaboot</classname> mit der zugehörigen Konfigurationsdatei.</phrase>
+enthält (inklusive Kernel)<phrase
+arch="x86"> sowie den Bootloader <classname>syslinux</classname> mit
+der zugehörigen Konfigurationsdatei</phrase><phrase
+arch="powerpc"> sowie den Bootloader <classname>yaboot</classname> mit
+der zugehörigen Konfigurationsdatei</phrase>.
 
 </para><para>
 
