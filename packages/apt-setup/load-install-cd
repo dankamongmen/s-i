@@ -25,7 +25,7 @@ check_id() {
 cd_label=$(tail -n1 /var/lib/install-cd.id)
 db_subst apt-setup/cdrom/media-change LABEL "$cd_label"
 while ! check_id; do
-	db_input high apt-setup/cdrom/media-change || true
+	db_input critical apt-setup/cdrom/media-change || true
 	db_go || exit 10
 done
 
