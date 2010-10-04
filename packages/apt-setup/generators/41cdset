@@ -44,7 +44,7 @@ if [ "$cd_type" != full_cd ] && [ "$cd_type" != dvd ]; then
 fi
 
 get_label() {
-	$logoutput --pass-stdout $chroot $ROOT \
+	LC_ALL=C $logoutput --pass-stdout $chroot $ROOT \
 		apt-cdrom ident | head -n1 | grep "^Stored label:" | \
 		sed "s/^[^:]*: //"
 }
