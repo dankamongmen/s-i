@@ -27,12 +27,20 @@ for script in "$partsdir"/*; do
 			:
 		else
 			code="$?"
-			if [ "$code" = 10 ]; then
+			case "$code" in
+				10)
 				log "$script backed up"
 				db_progress STOP
 				exit 10
-			fi
-			log "warning: $script returned error code $code"
+				;;
+				11)
+				log "$script has asked to exit installer"
+				exit 11
+				;;
+				*)
+				log "warning: $script returned error code $code"
+				;;
+			esac
 		fi
 	else
 		log "error: Unable to execute $script"
