@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-03-28 00:13+0000\n"
+"POT-Creation-Date: 2010-10-05 18:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgid "This appendix explains how to preseed answers to questions in &d-i; to au
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:23 preseed.xml:669
+#: preseed.xml:23 preseed.xml:676
 #, no-c-format
 msgid "The configuration fragments used in this appendix are also available as an example preconfiguration file from &urlset-example-preseed;."
 msgstr ""
@@ -81,7 +81,7 @@ msgid "initrd"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:70 preseed.xml:516
+#: preseed.xml:70 preseed.xml:523
 #, no-c-format
 msgid "file"
 msgstr ""
@@ -209,23 +209,23 @@ msgstr ""
 #. Tag: para
 #: preseed.xml:252
 #, no-c-format
-msgid "For the other preseeding methods you need to tell the installer what file to use when you boot it. This is normally done by passing the kernel a boot parameter, either manually at boot time or by editing the bootloader configuration file (e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end of the append line(s) for the kernel."
+msgid "For the other preseeding methods you need to tell the installer what file to use when you boot it. This is normally done by passing the kernel a boot parameter, either manually at boot time or by editing the bootloader configuration file <phrase arch=\"linux-any\">(e.g. <filename>syslinux.cfg</filename>) and adding the parameter to the end of the append line(s) for the kernel.</phrase><phrase arch=\"kfreebsd-any\">(e.g. <filename>grub.cfg</filename>) and adding the parameter as a new <literal>set</literal> line for the kernel.</phrase><phrase arch=\"hurd-any\">(e.g. <filename>grub.cfg</filename>) and adding the parameter to the end of the <filename>gnumach.gz</filename> line.</phrase>"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:260
+#: preseed.xml:265
 #, no-c-format
-msgid "If you do specify the preconfiguration file in the bootloader configuration, you might change the configuration so you don't need to hit enter to boot the installer. For syslinux this means setting the timeout to <literal>1</literal> in <filename>syslinux.cfg</filename>."
+msgid "If you do specify the preconfiguration file in the bootloader configuration, you might change the configuration so you don't need to hit enter to boot the installer. <phrase arch=\"linux-any\">For syslinux this means setting the timeout to <literal>1</literal> in <filename>syslinux.cfg</filename>.</phrase><phrase arch=\"kfrebsd-any;hurd-any\">For grub this means setting the timeout to <literal>0</literal> in <filename>grub.cfg</filename>.</phrase>"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:267
+#: preseed.xml:274
 #, no-c-format
 msgid "To make sure the installer gets the right preconfiguration file, you can optionally specify a checksum for the file. Currently this needs to be a md5sum, and if specified it must match the preconfiguration file or the installer will refuse to use it."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:276
+#: preseed.xml:283
 #, no-c-format
 msgid ""
       "Boot parameters to specify:\n"
@@ -244,79 +244,79 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:278
+#: preseed.xml:285
 #, no-c-format
 msgid "Note that <filename>preseed/url</filename> can be shortened to just <filename>url</filename> and <filename>preseed/file</filename> to just <filename>file</filename> when they are passed as boot parameters."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:288
+#: preseed.xml:295
 #, no-c-format
 msgid "Using boot parameters to preseed questions"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:289
+#: preseed.xml:296
 #, no-c-format
 msgid "If a preconfiguration file cannot be used to preseed some steps, the install can still be fully automated, since you can pass preseed values on the command line when booting the installer."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:295
+#: preseed.xml:302
 #, no-c-format
 msgid "Boot parameters can also be used if you do not really want to use preseeding, but just want to provide an answer for a specific question. Some examples where this can be useful are documented elsewhere in this manual."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:301
+#: preseed.xml:308
 #, no-c-format
 msgid "To set a value to be used inside &d-i;, just pass <userinput><replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput> for any of the preseed variables listed in the examples in this appendix. If a value is to be used to configure packages for the target system, you will need to prepend the <firstterm>owner</firstterm><footnote> <para> The owner of a debconf variable (or template) is normally the name of the package that contains the corresponding debconf template. For variables used in the installer itself the owner is <quote>d-i</quote>. Templates and variables can have more than one owner which helps to determine whether they can be removed from the debconf database if the package is purged. </para> </footnote> of the variable as in <userinput><replaceable>owner</replaceable>:<replaceable>path/to/variable</replaceable>=<replaceable>value</replaceable></userinput>. If you don't specify the owner, the value for the variable will not be copied to the debconf database in the target system and thus remain unused during the configuration of the relevant package."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:324
+#: preseed.xml:331
 #, no-c-format
 msgid "Normally, preseeding a question in this way will mean that the question will not be asked. To set a specific default value for a question, but still have the question asked, use <quote>?=</quote> instead of <quote>=</quote> as operator. See also <xref linkend=\"preseed-seenflag\"/>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:331
+#: preseed.xml:338
 #, no-c-format
 msgid "Note that some variables that are frequently set at the boot prompt have a shorter alias. If an alias is available, it is used in the examples in this appendix instead of the full variable. The <literal>preseed/url</literal> variable for example has been aliased as <literal>url</literal>. Another example is the <literal>tasks</literal> alias, which translates to <literal>tasksel:tasksel/first</literal>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:340
+#: preseed.xml:347
 #, no-c-format
 msgid "A <quote>--</quote> in the boot options has special meaning. Kernel parameters that appear after the last <quote>--</quote> may be copied into the bootloader configuration for the installed system (if supported by the installer for the bootloader). The installer will automatically filter out any options (like preconfiguration options) that it recognizes."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:349
+#: preseed.xml:356
 #, no-c-format
 msgid "Current linux kernels (2.6.9 and later) accept a maximum of 32 command line options and 32 environment options, including any options added by default for the installer. If these numbers are exceeded, the kernel will panic (crash). (For earlier kernels, these numbers were lower.)"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:357
+#: preseed.xml:364
 #, no-c-format
 msgid "For most installations some of the default options in your bootloader configuration file, like <literal>vga=normal</literal>, may be safely removed which may allow you to add more options for preseeding."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:364
+#: preseed.xml:371
 #, no-c-format
 msgid "It may not always be possible to specify values with spaces for boot parameters, even if you delimit them with quotes."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:373
+#: preseed.xml:380
 #, no-c-format
 msgid "Auto mode"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:374
+#: preseed.xml:381
 #, no-c-format
 msgid ""
       "There are several features of Debian Installer that combine to allow fairly simple command lines at the boot prompt to result in arbitrarily complex customized automatic installs. To illustrate this, here are some examples that can be used at the boot prompt: <informalexample><screen>\n"
@@ -325,13 +325,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:391
+#: preseed.xml:398
 #, no-c-format
 msgid "The last part of that url (<literal>d-i/&releasename;/./preseed.cfg</literal>) is taken from <literal>auto-install/defaultroot</literal>. By default this includes the directory <literal>&releasename;</literal> to allow future versions to specify their own codename and let people migrate forwards in a controlled manner. The <literal>/./</literal> bit is used to indicate a root, relative to which subsequent paths can be anchored (for use in preseed/include and preseed/run). This allows files to be specified either as full URLs, paths starting with / that are thus anchored, or even paths relative to the location where the last preseed file was found. This can be used to construct more portable scripts where an entire hierarchy of scripts can be moved to a new location without breaking it, for example copying the files onto a USB stick when they started out on a web server. In this example, if the preseed file sets <literal>preseed/run</literal> to <literal>/scripts/late_command.sh</literal> then the file will be fetched from <literal>http://autoserver.example.com/d-i/&releasename;/./scripts/late_command.sh</literal>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:411
+#: preseed.xml:418
 #, no-c-format
 msgid ""
       "If there is no local DHCP or DNS infrastructure, or if you do not want to use the default path to <filename>preseed.cfg</filename>, you can still use an explicit url, and if you don't use the <literal>/./</literal> element it will be anchored to the start of the path (i.e. the third <literal>/</literal> in the URL). Here is an example that requires minimal support from the local network infrastructure: <informalexample><screen>\n"
@@ -340,25 +340,25 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:424
+#: preseed.xml:431
 #, no-c-format
 msgid "if the URL is missing a protocol, http is assumed,"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:427
+#: preseed.xml:434
 #, no-c-format
 msgid "if the hostname section contains no periods, it has the domain derived from DHCP appended to it, and"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:431
+#: preseed.xml:438
 #, no-c-format
 msgid "if there's no <literal>/</literal>'s after the hostname, then the default path is added."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:437
+#: preseed.xml:444
 #, no-c-format
 msgid ""
       "In addition to specifying the url, you can also specify settings that do not directly affect the behavior of &d-i; itself, but can be passed through to scripts specified using <literal>preseed/run</literal> in the loaded preseed file. At present, the only example of this is <literal>auto-install/classes</literal>, which has an alias <literal>classes</literal>. This can be used thus: <informalexample><screen>\n"
@@ -367,217 +367,217 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:451
+#: preseed.xml:458
 #, no-c-format
 msgid "It is of course possible to extend this concept, and if you do, it is reasonable to use the auto-install namespace for this. So one might have something like <literal>auto-install/style</literal> which is then used in your scripts. If you feel the need to do this, please mention it on the <email>debian-boot@lists.debian.org</email> mailing list so that we can avoid namespace conflicts, and perhaps add an alias for the parameter for you."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:461
+#: preseed.xml:468
 #, no-c-format
 msgid "The <literal>auto</literal> boot label is not yet defined everywhere. The same effect may be achieved by simply adding the two parameters <literal>auto=true priority=critical</literal> to the kernel command line. The <literal>auto</literal> parameter is an alias for <literal>auto-install/enable</literal> and setting it to <literal>true</literal> delays the locale and keyboard questions until after there has been a chance to preseed them, while <literal>priority</literal> is an alias for <literal>debconf/priority</literal> and setting it to <literal>critical</literal> stops any questions with a lower priority from being asked."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:475
+#: preseed.xml:482
 #, no-c-format
 msgid "Additional options that may be of interest while attempting to automate an install while using DHCP are: <literal>interface=auto netcfg/dhcp_timeout=60</literal> which makes the machine choose the first viable NIC and be more patient about getting a reply to its DHCP query."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:484
+#: preseed.xml:491
 #, no-c-format
 msgid "An extensive example of how to use this framework, including example scripts and classes, can be found on the <ulink url=\"http://hands.com/d-i/\">website of its developer</ulink>. The examples available there also show many other nice effects that can be achieved by creative use of preconfiguration."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:495
+#: preseed.xml:502
 #, no-c-format
 msgid "Aliases useful with preseeding"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:496
+#: preseed.xml:503
 #, no-c-format
 msgid "The following aliases can be useful when using (auto mode) preseeding. Note that these are simply short aliases for question names, and you always need to specify a value as well: for example, <literal>auto=true</literal> or <literal>interface=eth0</literal>."
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:509
+#: preseed.xml:516
 #, no-c-format
 msgid "auto"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:509
+#: preseed.xml:516
 #, no-c-format
 msgid "auto-install/enable"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:510
+#: preseed.xml:517
 #, no-c-format
 msgid "classes"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:510
+#: preseed.xml:517
 #, no-c-format
 msgid "auto-install/classes"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:511
+#: preseed.xml:518
 #, no-c-format
 msgid "<entry>fb</entry>"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:511
+#: preseed.xml:518
 #, no-c-format
 msgid "debian-installer/framebuffer"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:512
+#: preseed.xml:519
 #, no-c-format
 msgid "language"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:512
+#: preseed.xml:519
 #, no-c-format
 msgid "debian-installer/language"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:513
+#: preseed.xml:520
 #, no-c-format
 msgid "country"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:513
+#: preseed.xml:520
 #, no-c-format
 msgid "debian-installer/country"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:514
+#: preseed.xml:521
 #, no-c-format
 msgid "locale"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:514
+#: preseed.xml:521
 #, no-c-format
 msgid "debian-installer/locale"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:515
+#: preseed.xml:522
 #, no-c-format
 msgid "priority"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:515
+#: preseed.xml:522
 #, no-c-format
 msgid "debconf/priority"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:516
+#: preseed.xml:523
 #, no-c-format
 msgid "preseed/file"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:517
+#: preseed.xml:524
 #, no-c-format
 msgid "<entry>url</entry>"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:517
+#: preseed.xml:524
 #, no-c-format
 msgid "preseed/url"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:518
+#: preseed.xml:525
 #, no-c-format
 msgid "interface"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:518
+#: preseed.xml:525
 #, no-c-format
 msgid "netcfg/choose_interface"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:519
+#: preseed.xml:526
 #, no-c-format
 msgid "hostname&nbsp;&nbsp;&nbsp;"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:519
+#: preseed.xml:526
 #, no-c-format
 msgid "netcfg/get_hostname"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:520
+#: preseed.xml:527
 #, no-c-format
 msgid "domain"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:520
+#: preseed.xml:527
 #, no-c-format
 msgid "netcfg/get_domain"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:521
+#: preseed.xml:528
 #, no-c-format
 msgid "protocol"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:521
+#: preseed.xml:528
 #, no-c-format
 msgid "mirror/protocol"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:522
+#: preseed.xml:529
 #, no-c-format
 msgid "suite"
 msgstr ""
 
 #. Tag: entry
-#: preseed.xml:522
+#: preseed.xml:529
 #, no-c-format
 msgid "mirror/suite"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:529
+#: preseed.xml:536
 #, no-c-format
 msgid "Using a DHCP server to specify preconfiguration files"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:530
+#: preseed.xml:537
 #, no-c-format
 msgid "It's also possible to use DHCP to specify a preconfiguration file to download from the network. DHCP allows specifying a filename. Normally this is a file to netboot, but if it appears to be an URL then installation media that support network preseeding will download the file from the URL and use it as a preconfiguration file. Here is an example of how to set it up in the dhcpd.conf for version 3 of the ISC DHCP server (the dhcp3-server Debian package)."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:541
+#: preseed.xml:548
 #, no-c-format
 msgid ""
       "if substring (option vendor-class-identifier, 0, 3) = \"d-i\" {\n"
@@ -586,85 +586,85 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:543
+#: preseed.xml:550
 #, no-c-format
 msgid "Note that the above example limits this filename to DHCP clients that identify themselves as \"d-i\", so it will not affect regular DHCP clients, but only the installer. You can also put the text in a stanza for only one particular host to avoid preseeding all installs on your network."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:550
+#: preseed.xml:557
 #, no-c-format
 msgid "A good way to use the DHCP preseeding is to only preseed values specific to your network, such as the Debian mirror to use. This way installs on your network will automatically get a good mirror selected, but the rest of the installation can be performed interactively. Using DHCP preseeding to fully automate Debian installs should only be done with care."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:564
+#: preseed.xml:571
 #, no-c-format
 msgid "Creating a preconfiguration file"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:565
+#: preseed.xml:572
 #, no-c-format
 msgid "The preconfiguration file is in the format used by the <command>debconf-set-selections</command> command. The general format of a line in a preconfiguration file is:"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:571
+#: preseed.xml:578
 #, no-c-format
 msgid "&lt;owner&gt; &lt;question name&gt; &lt;question type&gt; &lt;value&gt;"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:573
+#: preseed.xml:580
 #, no-c-format
 msgid "There are a few rules to keep in mind when writing a preconfiguration file."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:580
+#: preseed.xml:587
 #, no-c-format
 msgid "Put only a single space or tab between type and value: any additional whitespace will be interpreted as belonging to the value."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:584
+#: preseed.xml:591
 #, no-c-format
 msgid "A line can be split into multiple lines by appending a backslash (<quote><literal>\\</literal></quote>) as the line continuation character. A good place to split a line is after the question name; a bad place is between type and value. Split lines will be joined into a single line with all leading/trailing whitespace condensed to a single space."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:591
+#: preseed.xml:598
 #, no-c-format
 msgid "For debconf variables (templates) used in the installer itself, the owner should be set to <quote>d-i</quote>; to preseed variables used in the installed system, the name of the package that contains the corresponding debconf template should be used. Only variables that have their owner set to something other than <quote>d-i</quote> will be propagated to the debconf database for the installed system."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:599
+#: preseed.xml:606
 #, no-c-format
 msgid "Most questions need to be preseeded using the values valid in English and not the translated values. However, there are some questions (for example in <classname>partman</classname>) where the translated values need to be used."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:605
+#: preseed.xml:612
 #, no-c-format
 msgid "Some questions take a code as value instead of the English text that is shown during installation."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:611
+#: preseed.xml:618
 #, no-c-format
 msgid "The easiest way to create a preconfiguration file is to use the example file linked in <xref linkend=\"preseed-contents\"/> as basis and work from there."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:616
+#: preseed.xml:623
 #, no-c-format
 msgid "An alternative method is to do a manual installation and then, after rebooting, use the <command>debconf-get-selections</command> from the <classname>debconf-utils</classname> package to dump both the debconf database and the installer's cdebconf database to a single file:"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:623
+#: preseed.xml:630
 #, no-c-format
 msgid ""
       "$ debconf-get-selections --installer &gt; <replaceable>file</replaceable>\n"
@@ -672,73 +672,73 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:625
+#: preseed.xml:632
 #, no-c-format
 msgid "However, a file generated in this manner will have some items that should not be preseeded, and the example file is a better starting place for most users."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:633
+#: preseed.xml:640
 #, no-c-format
 msgid "This method relies on the fact that, at the end of the installation, the installer's cdebconf database is saved to the installed system in <filename>/var/log/installer/cdebconf</filename>. However, because the database may contain sensitive information, by default the files are only readable by root."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:641
+#: preseed.xml:648
 #, no-c-format
 msgid "The directory <filename>/var/log/installer</filename> and all files in it will be deleted from your system if you purge the package <classname>installation-report</classname>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:649
+#: preseed.xml:656
 #, no-c-format
 msgid "To check possible values for questions, you can use <command>nano</command> to examine the files in <filename>/var/lib/cdebconf</filename> while an installation is in progress. View <filename>templates.dat</filename> for the raw templates and <filename>questions.dat</filename> for the current values and for the values assigned to variables."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:657
+#: preseed.xml:664
 #, no-c-format
 msgid "To check if the format of your preconfiguration file is valid before performing an install, you can use the command <command>debconf-set-selections -c <replaceable>preseed.cfg</replaceable></command>."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:668
+#: preseed.xml:675
 #, no-c-format
 msgid "Contents of the preconfiguration file (for &releasename;)"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:674
+#: preseed.xml:681
 #, no-c-format
 msgid "Note that this example is based on an installation for the Intel x86 architecture. If you are installing a different architecture, some of the examples (like keyboard selection and bootloader installation) may not be relevant and will need to be replaced by debconf settings appropriate for your architecture."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:685
+#: preseed.xml:692
 #, no-c-format
 msgid "Localization"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:686
+#: preseed.xml:693
 #, no-c-format
 msgid "Setting localization values will only work if you are using initrd preseeding. With all other methods the preconfiguration file will only be loaded after these questions have been asked."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:692
+#: preseed.xml:699
 #, no-c-format
 msgid "The locale can be used to specify both language and country and can be any combination of a language supported by &d-i; and a recognized country. If the combination does not form a valid locale, the installer will automatically select a locale that is valid for the selected language. To specify the locale as a boot parameter, use <userinput>locale=<replaceable>en_US</replaceable></userinput>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:701
+#: preseed.xml:708
 #, no-c-format
 msgid "Although this method is very easy to use, it does not allow preseeding of all possible combinations of language, country and locale<footnote> <para> Preseeding <literal>locale</literal> to <userinput>en_NL</userinput> would for example result in <literal>en_US.UTF-8</literal> as default locale for the installed system. If e.g. <literal>en_GB.UTF-8</literal> is preferred instead, the values will need to be preseeded individually. </para> </footnote>. So alternatively the values can be preseeded individually. Language and country can also be specified as boot parameters."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:716
+#: preseed.xml:723
 #, no-c-format
 msgid ""
       "# Preseeding only locale sets language, country and locale.\n"
@@ -753,13 +753,13 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:718
+#: preseed.xml:725
 #, no-c-format
 msgid "Keyboard configuration consists of selecting a keyboard architecture and a keymap. In most cases the correct keyboard architecture is selected by default, so there's normally no need to preseed it. The keymap must be known to the &d-i; for the selected keyboard architecture."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:725
+#: preseed.xml:732
 #, no-c-format
 msgid ""
       "# Keyboard selection.\n"
@@ -770,55 +770,55 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:727
+#: preseed.xml:734
 #, no-c-format
 msgid "To skip keyboard configuration, preseed <classname>console-tools/archs</classname> with <userinput>skip-config</userinput>. This will result in the kernel keymap remaining active."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:736
+#: preseed.xml:743
 #, no-c-format
 msgid "The changes in the input layer for 2.6 kernels have made the keyboard architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote> (<userinput>at</userinput>) keymap should be selected."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:746
+#: preseed.xml:753
 #, no-c-format
 msgid "Network configuration"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:747
+#: preseed.xml:754
 #, no-c-format
 msgid "Of course, preseeding the network configuration won't work if you're loading your preconfiguration file from the network. But it's great when you're booting from CD or USB stick. If you are loading preconfiguration files from the network, you can pass network config parameters by using kernel boot parameters."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:755
+#: preseed.xml:762
 #, no-c-format
 msgid "If you need to pick a particular interface when netbooting before loading a preconfiguration file from the network, use a boot parameter such as <userinput>interface=<replaceable>eth1</replaceable></userinput>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:761
+#: preseed.xml:768
 #, no-c-format
 msgid "Although preseeding the network configuration is normally not possible when using network preseeding (using <quote>preseed/url</quote>), you can use the following hack to work around that, for example if you'd like to set a static address for the network interface. The hack is to force the network configuration to run again after the preconfiguration file has been loaded by creating a <quote>preseed/run</quote> script containing the following commands:"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:771
+#: preseed.xml:778
 #, no-c-format
 msgid "killall.sh; netcfg"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:773
+#: preseed.xml:780
 #, no-c-format
 msgid "The following debconf variables are relevant for network configuration."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:779
+#: preseed.xml:786
 #, no-c-format
 msgid ""
       "# Disable network configuration entirely. This is useful for cdrom\n"
@@ -872,19 +872,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:781
+#: preseed.xml:788
 #, no-c-format
 msgid "Please note that <command>netcfg</command> will automatically determine the netmask if <classname>netcfg/get_netmask</classname> is not preseeded. In this case, the variable has to be marked as <literal>seen</literal> for automatic installations. Similarly, <command>netcfg</command> will choose an appropriate address if <classname>netcfg/get_gateway</classname> is not set. As a special case, you can set <classname>netcfg/get_gateway</classname> to <quote>none</quote> to specify that no gateway should be used."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:797
+#: preseed.xml:804
 #, no-c-format
 msgid "Network console"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:799
+#: preseed.xml:806
 #, no-c-format
 msgid ""
       "# Use the following settings if you wish to make use of the network-console\n"
@@ -896,31 +896,31 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:804
+#: preseed.xml:811
 #, no-c-format
 msgid "Mirror settings"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:805
+#: preseed.xml:812
 #, no-c-format
 msgid "Depending on the installation method you use, a mirror may be used to download additional components of the installer, to install the base system, and to set up the <filename>/etc/apt/sources.list</filename> for the installed system."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:812
+#: preseed.xml:819
 #, no-c-format
 msgid "The parameter <classname>mirror/suite</classname> determines the suite for the installed system."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:817
+#: preseed.xml:824
 #, no-c-format
 msgid "The parameter <classname>mirror/udeb/suite</classname> determines the suite for additional components for the installer. It is only useful to set this if components are actually downloaded over the network and should match the suite that was used to build the initrd for the installation method used for the installation. Normally the installer will automatically use the correct value and there should be no need to set this."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:828
+#: preseed.xml:835
 #, no-c-format
 msgid ""
       "# If you select ftp, the mirror/country string does not need to be set.\n"
@@ -937,13 +937,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:833
+#: preseed.xml:840
 #, no-c-format
 msgid "Clock and time zone setup"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:835
+#: preseed.xml:842
 #, no-c-format
 msgid ""
       "# Controls whether or not the hardware clock is set to UTC.\n"
@@ -960,43 +960,43 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:840
+#: preseed.xml:847
 #, no-c-format
 msgid "Partitioning"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:841
+#: preseed.xml:848
 #, no-c-format
 msgid "Using preseeding to partition the harddisk is limited to what is supported by <classname>partman-auto</classname>. You can choose to partition either existing free space on a disk or a whole disk. The layout of the disk can be determined by using a predefined recipe, a custom recipe from a recipe file or a recipe included in the preconfiguration file."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:849
+#: preseed.xml:856
 #, no-c-format
 msgid "Preseeding of advanced partition setups using RAID, LVM and encryption is supported, but not with the full flexibility possible when partitioning during a non-preseeded install."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:855
+#: preseed.xml:862
 #, no-c-format
 msgid "The examples below only provide basic information on the use of recipes. For detailed information see the files <filename>partman-auto-recipe.txt</filename> and <filename>partman-auto-raid-recipe.txt</filename> included in the <classname>debian-installer</classname> package. Both files are also available from the <ulink url=\"&url-d-i-websvn;/trunk/installer/doc/devel/\">&d-i; source repository</ulink>. Note that the supported functionality may change between releases."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:869
+#: preseed.xml:876
 #, no-c-format
 msgid "The identification of disks is dependent on the order in which their drivers are loaded. If there are multiple disks in the system, make very sure the correct one will be selected before using preseeding."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:878
+#: preseed.xml:885
 #, no-c-format
 msgid "Partitioning example"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:880
+#: preseed.xml:887
 #, no-c-format
 msgid ""
       "# If the system has free space you can choose to only partition that space.\n"
@@ -1071,25 +1071,25 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:884
+#: preseed.xml:891
 #, no-c-format
 msgid "Partitioning using RAID"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:885
+#: preseed.xml:892
 #, no-c-format
 msgid "You can also use preseeding to set up partitions on software RAID arrays. Supported are RAID levels 0, 1, 5, 6 and 10, creating degraded arrays and specifying spare devices. If you are using RAID 1, you can preseed grub to install to all devices used in the array; see <xref linkend=\"preseed-bootloader\"/>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:895
+#: preseed.xml:902
 #, no-c-format
 msgid "This type of automated partitioning is easy to get wrong. It is also functionality that receives relatively little testing from the developers of &d-i;. The responsibility to get the various recipes right (so they make sense and don't conflict) lies with the user. Check <filename>/var/log/syslog</filename> if you run into problems."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:905
+#: preseed.xml:912
 #, no-c-format
 msgid ""
       "# The method should be set to \"raid\".\n"
@@ -1143,31 +1143,31 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:910
+#: preseed.xml:917
 #, no-c-format
 msgid "Controlling how partitions are mounted"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:911
+#: preseed.xml:918
 #, no-c-format
 msgid "Normally, filesystems are mounted using a universally unique identifier (UUID) as a key; this allows them to be mounted properly even if their device name changes. UUIDs are long and difficult to read, so, if you prefer, the installer can mount filesystems based on the traditional device names, or based on a label you assign. If you ask the installer to mount by label, any filesystems without a label will be mounted using a UUID instead."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:920
+#: preseed.xml:927
 #, no-c-format
 msgid "Devices with stable names, such as LVM logical volumes, will continue to use their traditional names rather than UUIDs."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:927
+#: preseed.xml:934
 #, no-c-format
 msgid "Traditional device names may change based on the order in which the kernel discovers devices at boot, which may cause the wrong filesystem to be mounted. Similarly, labels are likely to clash if you plug in a new disk or a USB drive, and if that happens your system's behaviour when started will be random."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:937
+#: preseed.xml:944
 #, no-c-format
 msgid ""
       "# The default is to mount by UUID, but you can also choose \"traditional\" to\n"
@@ -1177,19 +1177,19 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:943
+#: preseed.xml:950
 #, no-c-format
 msgid "Base system installation"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:944
+#: preseed.xml:951
 #, no-c-format
 msgid "There is actually not very much that can be preseeded for this stage of the installation. The only questions asked concern the installation of the kernel."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:951
+#: preseed.xml:958
 #, no-c-format
 msgid ""
       "# Configure APT to not install recommended packages by default. Use of this\n"
@@ -1202,29 +1202,29 @@ msgid ""
       "\n"
       "# The kernel image (meta) package to be installed; \"none\" can be used if no\n"
       "# kernel is to be installed.\n"
-      "#d-i base-installer/kernel/image string linux-image-2.6-486"
+      "#d-i base-installer/kernel/image string &kernelpackage;-2.6-486"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:956
+#: preseed.xml:963
 #, no-c-format
 msgid "Account setup"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:957
+#: preseed.xml:964
 #, no-c-format
 msgid "The password for the root account and name and password for a first regular user's account can be preseeded. For the passwords you can use either clear text values or MD5 <emphasis>hashes</emphasis>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:964
+#: preseed.xml:971
 #, no-c-format
 msgid "Be aware that preseeding passwords is not completely secure as everyone with access to the preconfiguration file will have the knowledge of these passwords. Using MD5 hashes is considered slightly better in terms of security but it might also give a false sense of security as access to a MD5 hash allows for brute force attacks."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:974
+#: preseed.xml:981
 #, no-c-format
 msgid ""
       "# Skip creation of a root account (normal user account will be able to\n"
@@ -1256,37 +1256,37 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:976
+#: preseed.xml:983
 #, no-c-format
 msgid "The <classname>passwd/root-password-crypted</classname> and <classname>passwd/user-password-crypted</classname> variables can also be preseeded with <quote>!</quote> as their value. In that case, the corresponding account is disabled. This may be convenient for the root account, provided of course that an alternative method is set up to allow administrative activities or root login (for instance by using SSH key authentication or <command>sudo</command>)."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:986
+#: preseed.xml:993
 #, no-c-format
 msgid "The following command can be used to generate an MD5 hash for a password:"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:990
+#: preseed.xml:997
 #, no-c-format
 msgid "$ printf \"r00tme\" | mkpasswd -s -m md5"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:996
+#: preseed.xml:1003
 #, no-c-format
 msgid "Apt setup"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:997
+#: preseed.xml:1004
 #, no-c-format
 msgid "Setup of the <filename>/etc/apt/sources.list</filename> and basic configuration options is fully automated based on your installation method and answers to earlier questions. You can optionally add other (local) repositories."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1005
+#: preseed.xml:1012
 #, no-c-format
 msgid ""
       "# You can choose to install non-free and contrib software.\n"
@@ -1318,97 +1318,97 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1010
+#: preseed.xml:1017
 #, no-c-format
 msgid "Package selection"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1011
+#: preseed.xml:1018
 #, no-c-format
 msgid "You can choose to install any combination of tasks that are available. Available tasks as of this writing include:"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1020
+#: preseed.xml:1027
 #, no-c-format
 msgid "standard"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1023
+#: preseed.xml:1030
 #, no-c-format
 msgid "desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1026
+#: preseed.xml:1033
 #, no-c-format
 msgid "gnome-desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1029
+#: preseed.xml:1036
 #, no-c-format
 msgid "kde-desktop"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1032
+#: preseed.xml:1039
 #, no-c-format
 msgid "web-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1035
+#: preseed.xml:1042
 #, no-c-format
 msgid "print-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1038
+#: preseed.xml:1045
 #, no-c-format
 msgid "dns-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1041
+#: preseed.xml:1048
 #, no-c-format
 msgid "file-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1044
+#: preseed.xml:1051
 #, no-c-format
 msgid "mail-server"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1047
+#: preseed.xml:1054
 #, no-c-format
 msgid "sql-database"
 msgstr ""
 
 #. Tag: userinput
-#: preseed.xml:1050
+#: preseed.xml:1057
 #, no-c-format
 msgid "laptop"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1054
+#: preseed.xml:1061
 #, no-c-format
 msgid "You can also choose to install no tasks, and force the installation of a set of packages in some other way. We recommend always including the <userinput>standard</userinput> task."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1060
+#: preseed.xml:1067
 #, no-c-format
 msgid "If you want to install some individual packages in addition to packages installed by tasks, you can use the parameter <classname>pkgsel/include</classname>. The value of this parameter can be a list of packages separated by either commas or spaces, which allows it to be used easily on the kernel command line as well."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1070
+#: preseed.xml:1077
 #, no-c-format
 msgid ""
       "#tasksel tasksel/first multiselect standard, web-server\n"
@@ -1430,21 +1430,23 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1075
+#: preseed.xml:1082
 #, no-c-format
 msgid "Boot loader installation"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1077
+#: preseed.xml:1084
 #, no-c-format
 msgid ""
-      "# Grub is the default boot loader (for x86). If you want lilo installed\n"
+      "<phrase arch=\"linux-any\"># Grub is the default boot loader (for x86). If you want lilo installed\n"
       "# instead, uncomment this:\n"
       "#d-i grub-installer/skip boolean true\n"
       "# To also skip installing lilo, and install no bootloader, uncomment this\n"
       "# too:\n"
-      "#d-i lilo-installer/skip boolean true\n"
+      "#d-i lilo-installer/skip boolean true</phrase>\n"
+      "<phrase arch=\"kfreebsd-any;hurd-any\"># To install no bootloader, uncomment this\n"
+      "#d-i grub-installer/skip boolean true</phrase>\n"
       "\n"
       "# With a few exceptions for unusual partitioning setups, GRUB 2 is now the\n"
       "# default. If you need GRUB Legacy for some particular reason, then\n"
@@ -1480,19 +1482,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1079
+#: preseed.xml:1086
 #, no-c-format
 msgid "An MD5 hash for a password for <classname>grub</classname> can be generated using <command>grub-md5-crypt</command>, or using the command from the example in <xref linkend=\"preseed-account\"/>."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1089
+#: preseed.xml:1096
 #, no-c-format
 msgid "Finishing up the installation"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1091
+#: preseed.xml:1098
 #, no-c-format
 msgid ""
       "# During installations from serial console, the regular virtual consoles\n"
@@ -1515,13 +1517,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1096
+#: preseed.xml:1103
 #, no-c-format
 msgid "Preseeding other packages"
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1098
+#: preseed.xml:1105
 #, no-c-format
 msgid ""
       "# Depending on what software you choose to install, or if things go wrong\n"
@@ -1534,25 +1536,25 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1105
+#: preseed.xml:1112
 #, no-c-format
 msgid "Advanced options"
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1108
+#: preseed.xml:1115
 #, no-c-format
 msgid "Running custom commands during the installation"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1109
+#: preseed.xml:1116
 #, no-c-format
 msgid "A very powerful and flexible option offered by the preconfiguration tools is the ability to run commands or scripts at certain points in the installation."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1117
+#: preseed.xml:1124
 #, no-c-format
 msgid ""
       "# d-i preseeding is inherently not secure. Nothing in the installer checks\n"
@@ -1578,13 +1580,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1122
+#: preseed.xml:1129
 #, no-c-format
 msgid "Using preseeding to change default values"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1123
+#: preseed.xml:1130
 #, no-c-format
 msgid ""
       "It is possible to use preseeding to change the default answer for a question, but still have the question asked. To do this the <firstterm>seen</firstterm> flag must be reset to <quote>false</quote> after setting the value for a question. <informalexample><screen>\n"
@@ -1594,31 +1596,31 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1137
+#: preseed.xml:1144
 #, no-c-format
 msgid "Note that the <quote>d-i</quote> owner should only be used for variables used in the installer itself. For variables belonging to packages installed on the target system, you should use the name of that package instead. See the footnote to <xref linkend=\"preseed-bootparms\"/>."
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1144
+#: preseed.xml:1151
 #, no-c-format
 msgid "If you are preseeding using boot parameters, you can make the installer ask the corresponding question by using the <quote>?=</quote> operator, i.e. <userinput><replaceable>foo</replaceable>/<replaceable>bar</replaceable>?=<replaceable>value</replaceable></userinput> (or <userinput><replaceable>owner</replaceable>:<replaceable>foo/bar</replaceable>?=<replaceable>value</replaceable></userinput>). This will of course only have effect for parameters that correspond to questions that are actually displayed during an installation and not for <quote>internal</quote> parameters."
 msgstr ""
 
 #. Tag: title
-#: preseed.xml:1158
+#: preseed.xml:1165
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1159
+#: preseed.xml:1166
 #, no-c-format
 msgid "It is possible to include other preconfiguration files from a preconfiguration file. Any settings in those files will override pre-existing settings from files loaded earlier. This makes it possible to put, for example, general networking settings for your location in one file and more specific settings for certain configurations in other files."
 msgstr ""
 
 #. Tag: screen
-#: preseed.xml:1169
+#: preseed.xml:1176
 #, no-c-format
 msgid ""
       "# More than one file can be listed, separated by spaces; all will be\n"
@@ -1646,7 +1648,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: preseed.xml:1171
+#: preseed.xml:1178
 #, no-c-format
 msgid "It is also possible to chainload from the initrd or file preseeding phase, into network preseeding by setting preseed/url in the earlier files. This will cause network preseeding to be performed when the network comes up. You need to be careful when doing this, since there will be two distinct runs at preseeding, meaning for example that you get another chance to run the preseed/early command, the second one happening after the network comes up."
 msgstr ""
