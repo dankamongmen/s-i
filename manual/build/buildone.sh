@@ -60,7 +60,7 @@ create_profiled () {
 
     # Now we source the profiling information for the selected architecture
     [ -f "arch-options/${arch}" ] || {
-        echo "Error: unknown architecture '$arch'"
+        echo "Error: unknown architecture '$arch'" >&2
         return 1
     }
     . arch-options/$arch
@@ -257,7 +257,7 @@ rm -rf $tempdir
 rm -rf $destdir
 
 [ -d "$manual_path/$language" ] || {
-    echo "Error: unknown language '$language'"
+    echo "Error: unknown language '$language'" >&2
     exit 1
 }
 
@@ -287,7 +287,7 @@ for format in $formats ; do
         pdf)   create_pdf;;
         txt)   create_text;;
         *)
-            echo "Error: format $format unknown or not yet supported!"
+            echo "Error: format $format unknown or not yet supported!" >&2
             exit 1
             ;;
     esac
@@ -299,14 +299,14 @@ for format in $formats ; do
             ;;
         9)
             BUILD_FAIL="$BUILD_FAIL $format"
-            echo "Error: build of $format failed because of missing build dependencies" 
+            echo "Error: build of $format failed because of missing build dependencies" >&2
             if [ "$format" = "pdf" ] ; then
-                echo "Error: (make sure you have ghostscript, openjade and jadetex installed for PDF builds)" 
+                echo "Error: (make sure you have ghostscript, openjade and jadetex installed for PDF builds)" >&2
             fi
             ;;
         *)
             BUILD_FAIL="$BUILD_FAIL $format"
-            echo "Error: build of $format failed with error code $RET"
+            echo "Error: build of $format failed with error code $RET" >&2
             ;;
     esac
 done
