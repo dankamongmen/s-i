@@ -299,7 +299,10 @@ for format in $formats ; do
             ;;
         9)
             BUILD_FAIL="$BUILD_FAIL $format"
-            echo "Error: build of $format failed because of missing build dependencies"
+            echo "Error: build of $format failed because of missing build dependencies" 
+            if [ "$format" = "pdf" ] ; then
+                echo "Error: (make sure you have ghostscript, openjade and jadetex installed for PDF builds)" 
+            fi
             ;;
         *)
             BUILD_FAIL="$BUILD_FAIL $format"
