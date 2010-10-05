@@ -1,4 +1,4 @@
-<!-- original version: 64829 -->
+<!-- original version: 64898 -->
 
  <sect1 id="linux-upgrade">
  <title>Installer &debian-gnu; à partir d'un système Unix/Linux</title>
@@ -500,41 +500,13 @@ les paquets contenant des noyaux avec&nbsp;:
 
 </para>
 <para>
-Si vous comptez utiliser un noyau préalablement mis en paquet, vous pouvez d'abord créer
-un fichier de configuration <filename>/etc/kernel-img.conf</filename>.
-Voici un fichier d'exemple&nbsp;:
 
-
-<informalexample><screen>
-# Kernel image management overrides
-# See kernel-img.conf(5) for details
-do_symlinks = yes
-relative_links = yes
-do_bootloader = yes
-do_bootfloppy = no
-do_initrd = yes
-link_in_boot = no
-</screen></informalexample>
-
-</para>
-<para>
-
-Pour des informations supplémentaires sur ce fichier, consultez sa page
-de manuel qui est disponible dès que le paquet
-<classname>kernel-package</classname> est installé. Il est recommandé de vérifier
-que les valeurs correspondent bien à votre système.
-</para>
-
-<para>
 Installez alors le noyau de votre choix en utilisant son nom&nbsp;:
 
 <informalexample><screen>
 # aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
 
-Si vous n'avez pas créé de fichier <filename>/etc/kernel-img.conf</filename>
-avant l'installation d'un noyau Debian, des questions y faisant référence vous
-seront posées pendant l'installation du noyau.
 </para> 
   </sect2>
 
@@ -598,30 +570,7 @@ initrd=/initrd.img
 label=Debian
 </screen></informalexample>
 
-
 </para>
-
-<para arch="any-x86">
-
-Selon le programme d'amorçage choisi, vous pouvez apporter d'autres
-changements au fichier <filename>/etc/kernel-img.conf</filename>.
-</para>
-<para arch="any-x86">
-Pour le programme <classname>grub</classname>, vous
-pouvez mettre l'option <literal>do_bootloader</literal> à <quote>no</quote>. Pour
-mettre à jour automatiquement le fichier<filename>/boot/grub/menu.lst</filename>
-lors de la suppression ou l'installation de noyaux Debian, ajoutez ces lignes&nbsp;:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<phrase arch="x86">Pour le programme d'amorçage <classname>lilo</classname>, la valeur de 
-<literal>do_bootloader</literal> doit être <quote>yes</quote></phrase>.
-
-</para>
-
 <para arch="powerpc">
 
 Consultez le <userinput>man yaboot.conf</userinput> pour les instructions de 
