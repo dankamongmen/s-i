@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- original version: 64829 -->
+<!-- original version: 64898 -->
 <!-- revisado jfs, 21 noviembre 2004 -->
 <!-- revisado rudy, 24 feb. 2005 -->
 <!-- actualizado jfs, 23 marzo 2006 -->
@@ -533,43 +533,12 @@ disponibles con:
 
 </para><para>
 
-Si va a utilizar un núcleo pre-empaquetado puede querer crear su
-propio fichero de configuración
-<filename>/etc/kernel-img.conf</filename> antes de hacerlo. Aquí tiene
-un fichero de ejemplo:
-
-<informalexample><screen>
-# Kernel image management overrides
-# See kernel-img.conf(5) for details
-do_symlinks = yes
-relative_links = yes
-do_bootloader = yes
-do_bootfloppy = no
-do_initrd = yes
-link_in_boot = no
-</screen></informalexample>
-
-</para><para>
-
-Consulte su página de manual si quiere información detallada de este
-fichero y de las distintas opciones. La página de manual estará
-disponible una vez instale el paquete
-<classname>kernel-package</classname>. Le recomendamos que revise si
-los valores son correctos para su sistema.
-
-</para><para>
-
 Después instale el paquete del núcleo que elija utilizando el nombre
 del paquete.
 
 <informalexample><screen>
 # aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
-
-Se le harán algunas preguntas referidas a
-<filename>/etc/kernel-img.conf</filename> durante la instalación si no
-creó ese fichero antes de instalar un núcleo pre-empaquetado.
-
 
 </para>
   </sect2>
@@ -632,29 +601,6 @@ image=/vmlinuz
 initrd=/initrd.img
 label=Debian
 </screen></informalexample>
-
-</para><para arch="any-x86">
-
-Puede hacer algunos cambios a
-<filename>/etc/kernel-img.conf</filename> dependiendo del cargador de
-arranque que haya instalado.
-
-</para><para arch="any-x86">
-
-Debería fijar la opción <literal>do_bootloader</literal> a
-<quote>no</quote> en el caso de que tenga el cargador de arranque
-<classname>grub</classname>. Para actualizar automáticamente su
-<filename>/boot/grub/menu.lst</filename> cuando se instalen o eliminen
-núcleos de Debian debe añadir las siguientes líneas:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<phrase arch="x86">El valor de la opción <literal>do_bootloader</literal> debe estar
-definido como <quote>yes</quote> en el caso del cargador de arranque
-<classname>lilo</classname>.</phrase>
 
 </para><para arch="powerpc">
 
