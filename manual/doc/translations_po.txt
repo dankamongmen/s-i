@@ -154,10 +154,121 @@ There are two important conditions:
   examples, etc; you can have no 'extra' paragraphs in your translation).
 
 The first condition does not mean that everything needs to be translated!
+This means you can insert the original text, that you can correct
+in the PO files once they are generated.
 
 The conversion is fairly difficult and some checks need to be done after some
-of the steps. Full instructions for converting a translation can be found at:
-http://lists.debian.org/debian-boot/2007/07/msg00814.html.
+of the steps. The following instructions are heavily based on the mail message
+http://lists.debian.org/debian-boot/2007/07/msg00814.html, adding some caveats.
+It takes German (de) as an example for the conversion.
+
+1) Ensure the translation is _up to date_. The following command should return
+   nothing.
+   './scripts/doc-check de'
+
+2) Fix any places where you know you have deviated from the original in
+   your translation. The conversion will only work if the structure and
+   markup of the translation and original are *identical*, at least at
+   those points where the poxml utilities split out text into separate
+   strings.
+
+3) Run the following scripts:
+   './scripts/merge_xml en'  # merge English XML files per chapter
+   './scripts/update_pot'    # update POT files to match merged XML files
+   This will create your base situation for conversion. Do _not_ 'svn up'
+   after this or you may have to start from scratch.
+
+4) Merge XML files for the translation:
+   './scripts/merge_xml de'
+
+5) Run the actual conversion:
+   './scripts/create_po de'
+
+   This may result in problems mentioned in step 7.
+
+6) The previous step does not create the full msg headers needed in the PO
+   file. For that, run the following script.
+   './scripts/update_po de'
+
+7) The result will not be perfect yet. Even if the script in
+   step 5 completes successfully, you most likely do *not* yet have
+   correct PO files. You need to carefully check the *complete output* and
+   follow the instructions in the output of the conversion script for
+   anomalies, fix them in the German translation and run the conversion
+   again until there are no more anomalies. The command grep can help you
+   to find the location of the strings in the translated XML files.
+   Example: 'grep "term" -r -H de/'
+
+   Note that some of the "differences" can be quite tricky to spot. You
+   will probably have to start with the PO file and find the first point
+   where msgid and msgstr no longer match (using clues from the output of
+   the conversion script). Then check integrated original and translated
+   XML files for the cause of the problem and fix it in the *translation*.
+   The fixes can be done either in the regular German XML files, or in the
+   "merged" ones. The last will probably be slightly easier and faster as
+   it will be easier to match the errors in the PO files to the merged
+   files and you won't have to repeat step 4 anymore. 
+
+   Another source of information for structural failures in the translation
+   is the appearance of two translations for the same term in English (shown
+   in the output in step 5), as poxml reuses the first translation for the same
+   original string when it appears more than once.
+   Check carefully those messages as, at first, some will not match, and
+   will offer "wrong" translations due to the structural disparity.
+   You can use grep to search for any particular string in the translated
+   documentation or PO files, and fix it in the XML files.
+
+   Note: The "looks untranslated" test needs an update. It can
+   currently report certain strings that are translated as untranslated.
+   This is probably due to a change in the poxml tools since the scripts
+   were written.
+
+8) Repeat steps 5, 6 and 7 (or 4, 5 and 6).
+
+9) After you are happy with the conversion, run
+   '.scripts/create_xml de'
+   This will generate XML files in ./de.new (not in ./de as that directory
+   is still in SVN). This should be without any errors.
+
+   Possible errors:
+
+   First, it may show there is an "extra" tag in the XML translation that may
+   difficult the conversion from PO to XML. Again, use grep to find the
+   "offending" tag, and fix it.
+   
+   This step might also show failures during XML conversion to PO:
+
+   Another source of failure may be the gratuitous insertion of XML tags in PO
+   files during 'create_po' which *should not* be present either in msgids or
+   msgtrs. Once more, grep can assist you. It is also useful in this cases to
+   check your file against an already PO-based translation, such as pt
+   (Portuguese), in case of doubt.
+
+10) You are almost done! Before uploading, it would be wise to build the
+   translated documentation based on your new PO files. This step might show
+   other inconsistencies present in the translated XML files, or in the PO
+   files that resulted from errors in the conversion from XML to PO.
+
+   It would be better if you do this in a different copy:
+
+   'cp -r manual/ manualb && cd manualb'
+   'mv de.new de'
+   
+   and build.
+
+   Build both HTML and PDF formats, as the latter may show problems
+   that do not (apparently) affect the building for HTML format. 
+
+11) If all is correct, go back to the original "manual/" dir:
+   'svn revert -R po/pot/'
+   'svn add po/de/'
+   'svn del de'
+   'svn ci'
+   'rm -r ./integrated/ ./de.new/'
+ 
+Note
+Do *not* update POT or PO files yourself after this point! The daily build 
+scripts run by Felipe will take care of that.
 
 Note that conversions are only done rarely and that the script used may
 need updating.
@@ -168,6 +279,9 @@ If you find any errors in this file, please fix them.
 
 --------------------------------------------------------------------------
 Changelog:
+
+2010-10-05 Omar Campagne
+ - Document steps for conversion from XML to PO-based translations.
 
 2010-05-01 Tapio Lehtonen
  - Typo fixes
