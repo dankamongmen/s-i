@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64829 -->
+<!-- original version: 64898 -->
 
  <sect1 id="linux-upgrade">
  <!-- <title>Installing &debian-gnu; from a Unix/Linux System</title> -->
@@ -805,44 +805,6 @@ e un boot loader. I kernel pacchettizzati disponibili si trovano con:
 </para><para>
 
 <!--
-If you intend to use a pre-packaged kernel, you may want to create the
-configuration file <filename>/etc/kernel-img.conf</filename> before you
-do so. Here's an example file:
--->
-
-Se si intende usare un kernel pre-impacchettato, può essere consigliabile
-creare il file di configurazione <filename>/etc/kernel-img.conf</filename>
-prima dell'installazione. Questo è un esempio di configurazione:
-
-<informalexample><screen>
-# Kernel image management overrides
-# See kernel-img.conf(5) for details
-do_symlinks = yes
-relative_links = yes
-do_bootloader = yes
-do_bootfloppy = no
-do_initrd = yes
-link_in_boot = no
-</screen></informalexample>
-
-</para><para>
-
-<!--
-For detailed information about this file and the various options, consult
-its man page which will be available after installing the
-<classname>kernel-package</classname> package. We recommend that you check
-that the values are appropriate for your system.
--->
-
-Informazioni dettagliate su questo file e sulle diverse opzioni si
-possono trovare nella pagina man relativa al file, disponibile dopo
-l'installazione del pacchetto <classname>kernel-package</classname>.
-Si raccomanda di verificare che i valori riportati siano adatti al
-proprio sistema.
-
-</para><para>
-
-<!--
 Then install the kernel package of your choice using its package name.
 -->
 
@@ -852,17 +814,6 @@ del pacchetto.
 <informalexample><screen>
 # aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc</replaceable>
 </screen></informalexample>
-
-<!--
-If you did not create a <filename>/etc/kernel-img.conf</filename> before
-installing a pre-packaged kernel, you may be asked some questions during
-its installation that refer to it.
--->
-
-Se non si crea il file <filename>/etc/kernel-img.conf</filename> prima
-di installare un kernel pre-impacchettato, durante l'installazione del
-pacchetto potrebbero essere poste alcune domande che fanno riferimento
-proprio a quel file.
 
 </para>
   </sect2>
@@ -966,43 +917,6 @@ image=/vmlinuz
 initrd=/initrd.img
 label=Debian
 </screen></informalexample>
-
-</para><para arch="any-x86">
-
-<!--
-Depending on which bootloader you selected, you can now make some
-additional changes in <filename>/etc/kernel-img.conf</filename>.
--->
-
-Adesso, a seconda del bootloader prescelto, si devono fare ulteriori
-modifiche al file <filename>/etc/kernel-img.conf</filename>.
-
-</para><para arch="any-x86">
-
-<!--
-For the <classname>grub</classname> bootloader, you should
-set the <literal>do_bootloader</literal> option to <quote>no</quote>.
-And to automatically update your <filename>/boot/grub/menu.lst</filename>
-on installation or removal of Debian kernels, add the following lines:
--->
-
-Per il bootloader <classname>grub</classname> si deve impostare l'opzione
-<literal>do_bootloader</literal> a <quote>no</quote>. Per aggiornare
-automaticamente il file <filename>/boot/grub/menu.lst</filename> quando
-si installa o si rimuove un kernel Debian, aggiungere le seguenti righe:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<!--
-<phrase arch="x86">For the <classname>lilo</classname> bootloader, the value of
-<literal>do_bootloader</literal> needs to remain <quote>yes</quote>.</phrase>
--->
-
-<phrase arch="x86">Per il bootloader <classname>lilo</classname>, il valore di
-<literal>do_bootloader</literal> deve rimanere <quote>yes</quote>.</phrase>
 
 </para><para arch="powerpc">
 
