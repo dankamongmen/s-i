@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64829 -->
+<!-- original version: 64898 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian-gnu; von einem anderen Unix/Linux-System aus installieren</title>
@@ -528,39 +528,11 @@ fertig paketierte Kernel mit dem Befehl
 
 </para><para>
 
-Wenn Sie vorhaben, einen fertig paketierten Kernel zu verwenden, sollten Sie
-vielleicht vorher die Konfigurationsdatei
-<filename>/etc/kernel-img.conf</filename> erstellen. Hier eine Beispieldatei:
-
-<informalexample><screen>
-# Kernel image management overrides
-# See kernel-img.conf(5) for details
-do_symlinks = yes
-relative_links = yes
-do_bootloader = yes
-do_bootfloppy = no
-do_initrd = yes
-link_in_boot = no
-</screen></informalexample>
-
-</para><para>
-
-Detailierte Informationen über diese Datei und die verschiedenen Optionen
-finden Sie in ihrer Handbuchseite (Manpage), die nach der Installation des
-Pakets <classname>kernel-package</classname> verfügbar ist. Wir empfehlen
-zu überprüfen, ob die eingetragenen Werte für Ihr System passend sind.
-
-</para><para>
-
-Um einen Kernel Ihrer Wahl zu installieren, benutzen Sie seinen Paketnamen:
+Installieren Sie einen Kernel Ihrer Wahl, indem Sie seinen Paketnamen benutzen:
 
 <informalexample><screen>
 # aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-etc.deb</replaceable>
 </screen></informalexample>
-
-Wenn Sie die Datei <filename>/etc/kernel-img.conf</filename> vor der
-Installation eines Debian-Kernels nicht erstellt haben, werden Ihnen eventuell
-einige Fragen gestellt, die sich darum drehen.
 
  </para>
   </sect2>
@@ -625,30 +597,6 @@ image=/vmlinuz
 initrd=/initrd.img
 label=Debian
 </screen></informalexample>
-
-</para><para arch="any-x86">
-
-Abhängig davon, welchen Bootloader Sie ausgewählt haben, können Sie jetzt
-einige zusätzliche Änderungen in <filename>/etc/kernel-img.conf</filename>
-machen.
-
-</para><para arch="any-x86">
-
-Für <classname>grub</classname> als Bootloader sollten Sie die Option
-<literal>do_bootloader</literal> auf <quote>no</quote> setzen. Um Ihre
-<filename>/boot/grub/menu.lst</filename> bei Installation oder Löschung
-von Debian-Kernels automatisch aktualisieren zu lassen, fügen Sie der Datei
-die folgenden Zeilen hinzu:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<phrase arch="x86">Bei Verwendung von <classname>lilo</classname> als
-Bootloader muss
-<literal>do_bootloader</literal> auf <quote>yes</quote> gesetzt
-sein.</phrase>
 
 </para><para arch="powerpc">
 
