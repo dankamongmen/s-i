@@ -14,11 +14,11 @@ Red Hat, Mandrake, and SUSE. In this section some familiarity with
 entering *nix commands and navigating the file system is assumed. In
 this section, <prompt>$</prompt> symbolizes a command to be entered in
 the user's current system, while <prompt>#</prompt> refers to a
-command entered in the Debian chroot.
+command entered in the &debian; chroot.
 
 </para><para>
 
-Once you've got the new Debian system configured to your preference,
+Once you've got the new &debian; system configured to your preference,
 you can migrate your existing user data (if any) to it, and keep on
 rolling. This is therefore a <quote>zero downtime</quote> &debian-gnu;
 install. It's also a clever way for dealing with hardware that
@@ -31,7 +31,7 @@ media.
 
 As this is a mostly manual procedure, you should bear in mind that you
 will need to do a lot of basic configuration of the system yourself,
-which will also require more knowledge of Debian and of &arch-kernel; in general
+which will also require more knowledge of &debian; and of &arch-kernel; in general
 than performing a regular installation. You cannot expect this procedure
 to result in a system that is identical to a system from a regular
 installation. You should also keep in mind that this procedure only
@@ -65,7 +65,7 @@ To create an ext2 file system instead, omit <userinput>-j</userinput>.
 </para><para>
 
 Initialize and activate swap (substitute the partition number for
-your intended Debian swap partition):
+your intended &debian; swap partition):
 
 <informalexample><screen>
 # mkswap /dev/<replaceable>hda5</replaceable>
@@ -97,8 +97,8 @@ manually before proceding with the next stage.
   <title>Install <command>debootstrap</command></title>
 <para>
 
-The utility used by the Debian installer, and recognized as the
-official way to install a Debian base system, is
+The utility used by the &debian; installer, and recognized as the
+official way to install a &debian; base system, is
 <command>debootstrap</command>. It uses <command>wget</command> and
 <command>ar</command>, but otherwise depends only on
 <classname>/bin/sh</classname> and basic Unix/Linux tools<footnote>
@@ -135,7 +135,7 @@ manually. Make a work folder for extracting the .deb into:
 # cd work
 </screen></informalexample>
 
-The <command>debootstrap</command> binary is located in the Debian
+The <command>debootstrap</command> binary is located in the &debian;
 archive (be sure to select the proper file for your
 architecture). Download the <command>debootstrap</command> .deb from
 the <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
@@ -157,7 +157,7 @@ the files.
 <para>
 
 <command>debootstrap</command> can download the needed files directly
-from the archive when you run it. You can substitute any Debian
+from the archive when you run it. You can substitute any &debian;
 archive mirror for <userinput>&archive-mirror;/debian</userinput> in
 the command example below, preferably a mirror close to you
 network-wise. Mirrors are listed at
@@ -200,7 +200,7 @@ in the <command>debootstrap</command> command:
   <title>Configure The Base System</title>
 <para>
 
-Now you've got a real Debian system, though rather lean, on disk.
+Now you've got a real &debian; system, though rather lean, on disk.
 <command>chroot</command> into it:
 
 <informalexample><screen>
@@ -208,7 +208,7 @@ Now you've got a real Debian system, though rather lean, on disk.
 </screen></informalexample>
 
 After chrooting you may need to set the terminal definition to be
-compatible with the Debian base system, for example:
+compatible with the &debian; base system, for example:
 
 <informalexample><screen>
 # export TERM=<replaceable>xterm-color</replaceable>
@@ -298,7 +298,7 @@ file systems individually, use:
 # mount /path   # e.g.: mount /usr
 </screen></informalexample>
 
-Current Debian systems have mountpoints for removable media under
+Current &debian; systems have mountpoints for removable media under
 <filename>/media</filename>, but keep compatibility symlinks in
 <filename>/</filename>. Create these as as needed, for example:
 
@@ -517,14 +517,14 @@ Then install the kernel package of your choice using its package name.
 To make your &debian-gnu; system bootable, set up your boot loader to load
 the installed kernel with your new root partition. Note that
 <command>debootstrap</command> does not install a boot loader, though you
-can use <command>aptitude</command> inside your Debian chroot to do so.
+can use <command>aptitude</command> inside your &debian; chroot to do so.
 
 </para><para arch="any-x86">
 
 Check <userinput>info grub</userinput> <phrase arch="x86">or <userinput>man
 lilo.conf</userinput></phrase> for instructions on setting up the
-bootloader.  If you are keeping the system you used to install Debian, just
-add an entry for the Debian install to your existing grub
+bootloader.  If you are keeping the system you used to install &debian;, just
+add an entry for the &debian; install to your existing grub
 <filename>menu.lst</filename><phrase arch="x86">or <filename>lilo.conf</filename>.  For
 <filename>lilo.conf</filename>, you could also copy it to the new system and
 edit it there. After you are done editing, call <command>lilo</command>
@@ -570,7 +570,7 @@ label=Debian
 
 Check <userinput>man yaboot.conf</userinput> for instructions on
 setting up the bootloader.  If you are keeping the system you used to
-install Debian, just add an entry for the Debian install to your
+install &debian;, just add an entry for the &debian; install to your
 existing <filename>yaboot.conf</filename>.  You could also copy it to
 the new system and
 edit it there. After you are done editing, call ybin (remember it will
