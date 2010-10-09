@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: install-methods.po\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-10-05 18:28+0000\n"
-"PO-Revision-Date: 2010-09-11 12:11+0100\n"
+"PO-Revision-Date: 2010-10-09 15:00+0100\n"
 "Last-Translator: Miguel Figueiredo <elmig@debianpt.org>\n"
 "Language-Team: Portuguese <traduz@debianpt.org>\n"
 "Language: pt\n"
@@ -772,7 +772,7 @@ msgstr "Preparar Ficheiros para iniciar a partir de USB Memory Stick"
 
 #. Tag: para
 #: install-methods.xml:532
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There are two installation methods possible when booting from USB stick. "
 #| "The first is to install completely from the network. The second is to "
@@ -787,9 +787,11 @@ msgid ""
 "with a mirror."
 msgstr ""
 "Existem dois métodos de instalação possíveis ao arrancar a partir de uma "
-"'pen' USB. O primeiro é instalar tudo a partir da rede. O segundo é também "
-"copiar uma imagem de CD para a 'pen' USB e utiliza-la como fonte de pacotes, "
-"possivelmente em combinação com um 'mirror'. O segundo método é mais vulgar."
+"'pen' "
+"USB. O primeiro é utilizar a pen sub para arrancar o instalador, e depois "
+"instalar tudo a partir da rede. O segundo é copiar também uma imagem de CD "
+"para a 'pen' USB e utiliza-la como fonte de pacotes, possivelmente em "
+"combinação com um 'mirror'."
 
 #. Tag: para
 #: install-methods.xml:540
@@ -831,7 +833,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:560
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "For the first installation method you'll need to download an installer "
 #| "image from the <filename>netboot</filename> directory (at the location "
@@ -846,10 +848,14 @@ msgid ""
 "contents. This method will work with very small USB sticks, only a few "
 "megabytes in size."
 msgstr ""
-"Para o primeiro método de instalação irá necessitar de obter uma imagem do "
-"instalador a partir do directório <filename>netboot</filename> (no local "
-"mencionado em <xref linkend=\"where-files\"/>) e utilizar a <quote>forma "
-"flexível</quote> explicada abaixo para copiar ficheiros para a 'pen' USB."
+"Para preparar uma 'pen' USB que apenas arranca o instalador, e que depois "
+"prossegue com a instalação totalmente a partir da rede, vai necessitar obter "
+"a imagem <filename>mini.iso</filename> a partir do directório "
+"<filename>netboot</filename> (no local mencionado em "
+"<xref linkend=\"where-files\"/>), e escrever este ficheiro directamente na "
+"'pen' "
+"USB, sobrescrevendo o seu conteúdo actual. Este método irá funcionar com "
+"'pens' USB de capacidade reduzida, apenas com alguns megabytes."
 
 #. Tag: para
 #: install-methods.xml:570
@@ -866,6 +872,18 @@ msgid ""
 "two partitions should now be visible on it. You should mount the second of "
 "the two partitions, and unpack the firmware onto it."
 msgstr ""
+"Por exemplo, ao utilizar um sistema GNU/Linux existente, o ficheiro "
+"<filename>mini.iso</filename> pode ser escrito numa 'pen' USB da seguinte "
+"forma: "
+"<informalexample><screen>\n"
+"# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>\n"
+"# sync\n"
+"</screen></informalexample> Para acrescentar firmware a uma 'pen' USB "
+"preparada desta forma, obtenha os ficheiros de firmware necessários. Veja "
+"<xref linkend=\"loading-firmware\"/> para mais informações. De seguida "
+"retire e "
+"volte a colocar a 'pen' USB, e agora devem ser visíveis duas partições. Deve "
+"montar a segunda partição, e descompactar o firmware para lá."
 
 #. Tag: screen
 #: install-methods.xml:582
@@ -877,10 +895,15 @@ msgid ""
 "# cd /\n"
 "# umount"
 msgstr ""
+"# mount /dev/<replaceable>sdX2</replaceable> /mnt\n"
+"# cd /mnt\n"
+"# tar zxvf <replaceable>/path/to/</replaceable>firmware.tar.gz\n"
+"# cd /\n"
+"# umount"
 
 #. Tag: para
 #: install-methods.xml:584
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Installation images for the second installation method can be found in "
 #| "the <filename>hd-media</filename> directory and either the <quote>easy "
@@ -906,17 +929,17 @@ msgid ""
 "included on the CD image is different from the version of the running "
 "kernel. </para> </footnote> during the installation."
 msgstr ""
-"As imagens de instalação para o segundo método de instalação podem ser "
-"encontradas no directório <filename>hd-media</filename> e pode ser utilizada "
-"a <quote>forma fácil</quote> ou a <quote>forma flexível</quote> para copiar "
-"a imagem para a 'pen' USB. Para este método de instalação irá também "
-"necessitar de obter uma imagem de CD. A imagem de instalação e a imagem de "
-"CD têm de ser baseadas no mesmo lançamento do &d-i;. Se não coincidirem é "
-"provável que obtenha erros <footnote> <para> A mensagem de erro que é mais "
-"provável que seja mostrada é que não puderam ser encontrados módulos do "
-"kernel. Isto significa que a versão dos udebs de módulos do kernel incluidos "
-"na imagem de CD são diferentes da versão do kernel em execução. </para></"
-"footnote> durante a instalação."
+"Para preparar uma 'pen' USB que instala pacotes a partir de uma imagem de CD "
+"incluída na 'pen', utilize as imagens do instalador que se encontram no "
+"directório <filename>hd-media</filename>. Pode ser utilizada a <quote>forma "
+"fácil</quote> ou a <quote>forma flexível</quote> para copiar a imagem para a "
+"'pen' USB. Para este método de instalação irá necessitar também de obter uma "
+"imagem de CD. A imagem de instalação e a imagem de CD têm de ser baseadas no "
+"mesmo lançamento do &d-i;. Se não coincidirem é provável que obtenha erros "
+"<footnote> <para> A mensagem de erro mais provável que seja mostrada é que "
+"não puderam ser encontrados módulos do kernel. Isto significa que a versão "
+"dos udebs de módulos do kernel incluídos na imagem de CD são diferentes da "
+"versão do kernel em execução. </para></footnote> durante a instalação."
 
 #. Tag: para
 #: install-methods.xml:604
@@ -937,7 +960,7 @@ msgstr "Copiar ficheiros &mdash; a maneira simples"
 
 #. Tag: para
 #: install-methods.xml:613
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "There is an all-in-one file <filename>hd-media/boot.img.gz</filename> "
 #| "which contains all the installer files (including the kernel) <phrase "
@@ -1511,7 +1534,7 @@ msgstr ""
 
 #. Tag: para
 #: install-methods.xml:960
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Copy the following files from the Debian archives to a convenient "
 #| "location on your hard drive, for instance to <filename>/boot/newinstall/</"
@@ -1522,8 +1545,9 @@ msgid ""
 "system), for instance to <filename>/boot/newinstall/</filename>."
 msgstr ""
 "Copie os seguintes ficheiros dos arquivos Debian para uma localização "
-"conveniente no seu disco, por exemplo para a <filename>/boot/newinstall/</"
-"filename>."
+"conveniente no seu disco, (note que o LILO não consegue arrancar a partir de "
+"ficheiros num sistema de ficheiros NTFS) por exemplo para a <filename>"
+"/boot/newinstall/</filename>."
 
 #. Tag: para
 #: install-methods.xml:968
@@ -1549,18 +1573,16 @@ msgstr ""
 
 #. Tag: title
 #: install-methods.xml:990
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Hard disk installer booting using <command>LILO</command> or "
 #| "<command>GRUB</command>"
 msgid "Hard disk installer booting using <command>loadlin</command>"
-msgstr ""
-"Arrancar o Instalador de disco rígido com o <command>LILO</command> ou "
-"<command>GRUB</command>"
+msgstr "Arrancar o Instalador de disco rígido com o <command>loadlin</command>"
 
 #. Tag: para
 #: install-methods.xml:991
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "This section explains how to add to or even replace an existing linux "
 #| "installation using either <command>LILO</command> or <command>GRUB</"
@@ -1569,13 +1591,12 @@ msgid ""
 "This section explains how to prepare your hard drive for booting the "
 "installer from DOS using <command>loadlin</command>."
 msgstr ""
-"Esta secção explica como adicionar ou substituir uma instalação de Linux "
-"existente utilizando tanto o <command>LILO</command> como o <command>GRUB</"
-"command>."
+"Esta secção explica como preparar um disco rígido para arrancar o instalador "
+"a partir do DOS utilizando o <command>loadlin</command>."
 
 #. Tag: para
 #: install-methods.xml:996
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Copy the following files from the Debian archives to a convenient "
 #| "location on your hard drive, for instance to <filename>/boot/newinstall/</"
@@ -1583,24 +1604,24 @@ msgstr ""
 msgid ""
 "Copy the following files from a Debian CD image to <filename>c:\\</filename>."
 msgstr ""
-"Copie os seguintes ficheiros dos arquivos Debian para uma localização "
-"conveniente no seu disco, por exemplo para a <filename>/boot/newinstall/</"
-"filename>."
+"Copie os seguintes ficheiros de uma imagem de CD Debian para "
+"<filename>c:\\</filename>."
 
 #. Tag: para
 #: install-methods.xml:1001
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgid ""
 "<filename>/&x86-install-dir;</filename> (kernel binary and ramdisk image)"
-msgstr "<filename>initrd.gz</filename> (imagem ramdisk inicial)"
+msgstr ""
+"<filename>/&x86-install-dir;</filename> (binário do kernel e imagem ramdisk)"
 
 #. Tag: para
 #: install-methods.xml:1006
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<filename>boot.msg</filename> (optional boot message)"
 msgid "<filename>/tools</filename> (loadlin tool)"
-msgstr "<filename>boot.msg</filename> (mensagem opcional de arranque)"
+msgstr "<filename>/tools</filename> (ferramenta loadlin)"
 
 #. Tag: title
 #: install-methods.xml:1019
@@ -2456,7 +2477,7 @@ msgstr "Instalação Automática"
 
 #. Tag: para
 #: install-methods.xml:1591
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "For installing on multiple computers it's possible to do fully automatic "
 #| "installations. Debian packages intended for this include <classname>fai</"
@@ -2471,10 +2492,11 @@ msgid ""
 "\">FAI home page</ulink> for detailed information."
 msgstr ""
 "É possível fazer instalações totalmente automáticas para instalar em vários "
-"computadores. Os pacotes Debian destinados a isto incluem <classname>fai</"
-"classname> (que utiliza um servidor de instalação), <classname>replicator</"
-"classname>, <classname>systemimager</classname>, <classname>autoinstall</"
-"classname>, e o próprio instalador Debian."
+"computadores. Os pacotes Debian destinados a essa função incluem "
+"<classname>fai-quickstart</classname> (que utiliza um servidor de "
+"instalação), "
+"e o próprio Instalador Debian. Para informação detalhada veja a "
+"<ulink url=\"http://fai-project.org\">Página do FAI</ulink>."
 
 #. Tag: title
 #: install-methods.xml:1603
