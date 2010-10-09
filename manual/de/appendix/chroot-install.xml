@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64898 -->
+<!-- original version: 64916 -->
 
  <sect1 id="linux-upgrade">
  <title>&debian-gnu; von einem anderen Unix/Linux-System aus installieren</title>
@@ -16,11 +16,11 @@ ein wenig Erfahrung mit *nix-Befehlen haben sowie mit der Navigation
 durch das Dateisystem. In diesem Abschnitt symbolisiert ein <prompt>$</prompt>
 einen Befehl, der im Homeverzeichnis des Benutzers
 ausgeführt wird, während <prompt>#</prompt> bedeutet, dass das
-Kommando im Debian-chroot ausgeführt wird.
+Kommando im &debian;-chroot ausgeführt wird.
 
 </para><para>
 
-Sobald Sie das neue Debian-System nach Ihren Wünschen konfiguriert haben,
+Sobald Sie das neue &debian;-System nach Ihren Wünschen konfiguriert haben,
 können Sie Ihre eventuell vorhandenen eigenen Dateien hinüber verschieben und
 loslegen. Deswegen wird dies auch die
 <quote>zero-downtime</quote>-Installation (Installation ohne eine
@@ -35,7 +35,7 @@ nicht gut mit verschiedenen Boot- oder Installationsmedien vertragen.
 Da dies überwiegend eine manuelle Prozedur ist, sollten Sie im Hinterkopf
 behalten, dass Sie einen erheblichen Teil der grundlegenden
 Systemkonfiguration selbst erledigen müssen, was auch mehr Wissen über
-Debian und über &arch-kernel; allgemein erfordert als eine reguläre Installation.
+&debian; und über &arch-kernel; allgemein erfordert als eine reguläre Installation.
 Sie können nicht davon ausgehen, dass Sie durch diese Prozedur ein System
 erhalten, das identisch ist zu dem aus einer normalen Installation. Sie
 sollten auch bedenken, dass in dieser Prozedur nur die grundlegenden
@@ -72,7 +72,7 @@ Um stattdessen ein ext2-Dateisystem zu erzeugen, lassen Sie das
 </para><para>
 
 Initialisieren und aktivieren Sie den Swap (passen Sie die Partitionsnummer
-für Ihre geplante Debian-Swap-Partition an):
+für Ihre geplante &debian;-Swap-Partition an):
 
 <informalexample><screen>
 # mkswap /dev/<replaceable>hda5</replaceable>
@@ -82,7 +82,7 @@ für Ihre geplante Debian-Swap-Partition an):
 
 Hängen Sie eine Partition (wahrscheinlich die neue) als <filename>/mnt/debinst</filename> ins
 Dateisystem ein (das Installationsverzeichnis; es wird das
-Root-(<filename>/</filename>)-Dateisystem des neuen Debian). Der
+Root-(<filename>/</filename>)-Dateisystem des neuen &debian;). Der
 Einhängepunkt (<filename>/mnt/debinst</filename>) ist rein willkürlich
 gewählt; es wird später noch öfter darauf verwiesen.
 
@@ -105,8 +105,8 @@ und einbinden, bevor Sie mit dem nächsten Schritt weitermachen.
   <title><command>debootstrap</command> installieren</title>
 <para>
 
-Das Programm, das auch der Debian-Installer benutzt und das als offizielle
-Methode angesehen wird, ein Debian-Basissystem zu installieren, ist
+Das Programm, das auch der &debian;-Installer benutzt und das als offizielle
+Methode angesehen wird, ein &debian;-Basissystem zu installieren, ist
 <command>debootstrap</command>. Es nutzt <command>wget</command> und
 <command>ar</command>, aber ansonsten hängt es nur von
 <classname>/bin/sh</classname> und grundsätzlichen
@@ -149,7 +149,7 @@ Erstellen Sie ein Arbeitsverzeichnis, in das Sie die .deb-Pakete entpacken.
 # cd work
 </screen></informalexample>
 
-Das <command>debootstrap</command>-Binary finden Sie im Debian-Archiv
+Das <command>debootstrap</command>-Binary finden Sie im &debian;-Archiv
 (achten Sie darauf, die richtige Datei für Ihre Architektur zu verwenden).
 Laden Sie das <command>debootstrap</command>.deb aus dem
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
@@ -172,7 +172,7 @@ Binär-Dateien zu installieren.
 
 <command>debootstrap</command> kann die benötigten Dateien direkt vom
 Archiv herunterladen, wenn Sie es starten. Sie können in dem folgenden Befehl jeden
-Debian-Archivspiegel-Server statt <userinput>&archive-mirror;/debian</userinput>
+&debian;-Archivspiegel-Server statt <userinput>&archive-mirror;/debian</userinput>
 einsetzen, vorzugsweise einen Server in Ihrer Nähe. Eine Liste aller Spiegel-Server
 finden Sie auf <ulink url="http://www.debian.org/mirror/list"></ulink>.
 
@@ -215,7 +215,7 @@ ein:
   <title>Das Basissystem konfigurieren</title>
 <para>
 
-Sie haben jetzt ein echtes, aber noch etwas mageres Debian-System auf
+Sie haben jetzt ein echtes, aber noch etwas mageres &debian;-System auf
 der Festplatte. Wechseln Sie mit <command>chroot</command> hinein:
 
 <informalexample><screen>
@@ -223,7 +223,7 @@ der Festplatte. Wechseln Sie mit <command>chroot</command> hinein:
 </screen></informalexample>
 
 Danach müssen Sie unter Umständen die Definition der Terminal-Variable
-anpassen, so dass sie mit dem Debian-Basissystem kompatibel ist, zum Beispiel:
+anpassen, so dass sie mit dem &debian;-Basissystem kompatibel ist, zum Beispiel:
 
 <informalexample><screen>
 # export TERM=<replaceable>xterm-color</replaceable>
@@ -319,7 +319,7 @@ die Dateisysteme einzeln einzubinden, benutzen Sie:
 # mount /path   # z.B.: mount /usr
 </screen></informalexample>
 
-Aktuelle Debian-Systeme haben Einhängepunkte (Mountpoints) für
+Aktuelle &debian;-Systeme haben Einhängepunkte (Mountpoints) für
 Wechseldatenträger in <filename>/media</filename>, behalten aber aus
 Kompatibilitätsgründen auch symbolische Links in <filename>/</filename>.
 Erstellen Sie diese nach Bedarf, zum Beispiel mit:
@@ -544,18 +544,18 @@ Installieren Sie einen Kernel Ihrer Wahl, indem Sie seinen Paketnamen benutzen:
 Um Ihr &debian-gnu;-System boot-fähig zu machen, richten Sie Ihren Bootloader ein,
 so dass er den installierten Kernel mit Ihrer neuen Root-Partition startet.
 Bedenken Sie, dass <command>debootstrap</command> keinen Bootloader installiert,
-allerdings können Sie aptitude in Ihrer Debian-chroot-Umgebung benutzen, um
+allerdings können Sie aptitude in Ihrer &debian;-chroot-Umgebung benutzen, um
 dies zu erledigen.
 
 </para><para arch="any-x86">
 
 Lesen Sie <userinput>info grub</userinput><phrase arch="x86"> oder <userinput>man
 lilo.conf</userinput></phrase>, um Informationen über die Einrichtung des Bootloaders
-zu bekommen. Wenn Sie das Betriebssystem, das Sie zur Installation von Debian
+zu bekommen. Wenn Sie das Betriebssystem, das Sie zur Installation von &debian;
 benutzt haben, behalten möchten, müssen Sie lediglich einen Eintrag zur
 vorhandenen grub-<filename>menu.lst</filename><phrase arch="x86"> oder zu
 <filename>lilo.conf</filename></phrase> hinzufügen. <phrase arch="x86">Die Datei
-<filename>lilo.conf</filename> können Sie auch auf Ihr neues Debian-System
+<filename>lilo.conf</filename> können Sie auch auf Ihr neues &debian;-System
 kopieren und dort bearbeiten. Rufen Sie danach <command>lilo</command> auf
 (bedenken Sie: lilo nutzt die <filename>lilo.conf</filename> relativ zum
 System, von dem aus Sie es aufrufen).</phrase>
@@ -602,11 +602,11 @@ label=Debian
 
 Lesen Sie <userinput>man yaboot.conf</userinput>, um Informationen über
 die Einrichtung des Bootloaders zu bekommen. Wenn Sie das Betriebssystem, das Sie
-zur Installation von Debian benutzt haben, behalten möchten, müssen Sie
-lediglich einen Eintrag für das Debian-System zur vorhandenen
+zur Installation von &debian; benutzt haben, behalten möchten, müssen Sie
+lediglich einen Eintrag für das &debian;-System zur vorhandenen
 <filename>yaboot.conf</filename> hinzufügen.
 Sie können auch die Datei <filename>yaboot.conf</filename> auf Ihr
-neues Debian-System kopieren und dort bearbeiten. Rufen Sie danach <command>ybin</command> auf
+neues &debian;-System kopieren und dort bearbeiten. Rufen Sie danach <command>ybin</command> auf
 (bedenken Sie: ybin nutzt die <filename>yaboot.conf</filename> relativ zum
 System, von dem aus Sie es aufrufen).
 
