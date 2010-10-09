@@ -14,11 +14,11 @@ migren a &debian-gnu;. En aquesta secció es pressuposa una certa familiaritat
 amb la introducció d'ordres *nix i la navegació pel sistema de fitxers.
 En aquesta secció, <prompt>$</prompt> significa que l'ordre s'ha d'introduir
 a sistema actual de l'usuari, i <prompt>#</prompt> significa que l'ordre
-s'ha d'introduir al chroot de Debian.
+s'ha d'introduir al chroot de &debian;.
 
 </para><para>
 
-Una vegada tingueu configurat el sistema Debian a la vostra mida,
+Una vegada tingueu configurat el sistema &debian; a la vostra mida,
 podreu migrar totes les dades existents (si hi ha alguna) i continuar
 treballant. Aquesta és per tant una instal·lació &debian-gnu; amb <quote>temps
 de fora de servei zero</quote>. També és una manera intel·ligent de
@@ -31,7 +31,7 @@ diferents arrencades o mitjans d'instal·lació.
 
 Ja que aquesta és principalment una tasca manual, heu de considerar que
 haureu de fer moltes configuracions bàsiques del sistema, que requeriran
-més coneixement en general sobre Debian i &arch-kernel; que el necessari per a
+més coneixement en general sobre &debian; i &arch-kernel; que el necessari per a
 realitzar una instal·lació regular. No espereu que aquest procediment
 resulti en un sistema idèntic al que obtindríeu amb una instal·lació
 regular. També heu de tindre en compte que aquest procediment només
@@ -66,7 +66,7 @@ Si voleu crear un sistema de fitxers ext2, ometeu <userinput>-j</userinput>.
 </para><para>
 
 Inicialitzeu i activeu l'intercanvi (substituïu el nombre de la partició per
-la vostra partició d'intercanvi de Debian):
+la vostra partició d'intercanvi de &debian;):
 
 <informalexample><screen>
 # mkswap /dev/<replaceable>hda5</replaceable>
@@ -98,8 +98,8 @@ manualment abans de procedir amb la següent fase.
   <title>Instal·lar <command>debootstrap</command></title>
 <para>
 
-L'eina que utilitza l'instal·lador de Debian, i que es reconeix
-oficialment com la manera d'instal·lar un sistema base de Debian, és
+L'eina que utilitza l'instal·lador de &debian;, i que es reconeix
+oficialment com la manera d'instal·lar un sistema base de &debian;, és
 <command>debootstrap</command>. Fa ús de <command>wget</command> i
 <command>ar</command>, i per altra part tan sols depèn de
 <classname>/bin/sh</classname> i eines Unix/Linux bàsiques<footnote>
@@ -139,7 +139,7 @@ de forma manual. Creeu un directori de treball per extreure els .deb dins:
 </screen></informalexample>
 
 El binari de <command>debootstrap</command> el podeu trobar a l'arxiu de
-Debian (assegureu-vos de seleccionar l'arxiu correcte per la vostra
+&debian; (assegureu-vos de seleccionar l'arxiu correcte per la vostra
 arquitectura). Descarregueu el .deb <command>debootstrap</command> del
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
 repositori</ulink>, copieu el paquet al directori i extraieu-ne els fitxers.
@@ -201,7 +201,7 @@ a l'ordre <command>debootstrap</command>:
   <title>Configurar el sistema base</title>
 <para>
 
-Ara ja teniu un sistema Debian real al disc, això si, molt petit.
+Ara ja teniu un sistema &debian; real al disc, això si, molt petit.
 Feu <command>chroot</command>:
 
 <informalexample><screen>
@@ -209,7 +209,7 @@ Feu <command>chroot</command>:
 </screen></informalexample>
 
 Després d'entrar al chroot podríeu necessitar ajustar la definició
-de terminal per que sigui compatible amb el sistema Debian base, per
+de terminal per que sigui compatible amb el sistema &debian; base, per
 exemple:
 
 <informalexample><screen>
@@ -303,7 +303,7 @@ o bé munteu cada sistema de fitxers de forma individual:
 # mount /path   # e.g.: mount /usr
 </screen></informalexample>
 
-Els sistemes Debian tenen punts de muntatge pels dispositius extraïbles
+Els sistemes &debian; tenen punts de muntatge pels dispositius extraïbles
 a <filename>/media</filename>, però manté enllaços per raons de
 compatibilitat a <filename>/</filename>. Creeu aquests si els necessiteu,
 per exemple:
@@ -539,7 +539,7 @@ Si voleu utilitzar el <classname>grub</classname> com a carregador
 d'arrencada, podeu donar-li el valor <quote>no</quote> a l'opció
 <literal>do_bootloader</literal>. Per actualitzar automàticament el
 vostre <filename>/boot/grub/menu.lst</filename> quan instal·leu o
-esborreu un nucli de Debian, afegiu les línies següents:
+esborreu un nucli de &debian;, afegiu les línies següents:
 
 <informalexample><screen>
 postinst_hook = update-grub
@@ -579,7 +579,7 @@ l'<command>aptitude</command> dins el chroot per tal de fer-ho.
 
 Comproveu la informació de <userinput>info grub</userinput> o
 <userinput>man lilo.conf</userinput> per com configurar el carregador
-d'arrencada. Si el vostre sistema era ja Debian, afegiu una entrada per
+d'arrencada. Si el vostre sistema era ja &debian;, afegiu una entrada per
 la instal·lació al vostre fitxer existent <filename>menu.lst</filename> o
 <filename>lilo.conf</filename>. Pel <filename>lilo.conf</filename>,
 podeu copiar-lo al nou sistema i editar-lo allí. Després de editar-lo,
@@ -632,7 +632,7 @@ Pel carregador <classname>grub</classname>, hauríeu de canviar l'opció
 <literal>do_bootloader</literal> a <quote>no</quote>.
 I per configurar automàticament el
 <filename>/boot/grub/menu.lst</filename> al instal·lar o esborrar
-nuclis de Debian, afegiu les línies següents:
+nuclis de &debian;, afegiu les línies següents:
 <informalexample><screen>
 postinst_hook = update-grub
 postrm_hook   = update-grub
@@ -645,7 +645,7 @@ Pel carregador <classname>lilo</classname>, el valor de
 
 Llegiu <userinput>man yaboot.conf</userinput> per tenir més informació de
 com configurar el carregador d'arrencada. Si esteu a un sistema on
-prèviament teníeu ja instal·lat Debian, copieu el vostre fitxer ja existent
+prèviament teníeu ja instal·lat &debian;, copieu el vostre fitxer ja existent
 <filename>yaboot.conf</filename>. Podeu copiar-lo al nou sistema i
 editar-lo allí. Després d'editar-lo, executeu ybin (recordeu que utilitzarà
 el <filename>yaboot.conf</filename> relatiu al sistema des d'on l'executeu).
