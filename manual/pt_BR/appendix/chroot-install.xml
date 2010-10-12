@@ -17,11 +17,11 @@ migrando para o &debian-gnu; a partir do Red Hat, Mandrake e SUSE.
 navegação no sistema de arquivos. O símbolo <prompt>$</prompt>
 significa um comando que será executado por um usuário atual do
 sistema, enquanto <prompt>#</prompt> se refere a um comando no
-chroot do Debian.
+chroot do &debian;.
 
 </para><para>
 
-Uma vez que tiver o novo sistema Debian configurado para sua
+Uma vez que tiver o novo sistema &debian; configurado para sua
 preferência, você poderá migrar os dados existentes de usuários (se
 existirem) para ele, e mantê-lo em pleno funcionamento. Isto é
 chamada instalação do &debian-gnu; <quote>sem interrupção</quote>. Este
@@ -35,7 +35,7 @@ inicialização ou mídias de instalação.
 
 Como esse é, em sua grande maioria, um procedimento manual, tenha em mente
 que você mesmo terá que fazer várias configurações básicas do sistema, o que
-também demandará muito mais conhecimento do Debian e do &arch-kernel; em geral do
+também demandará muito mais conhecimento do &debian; e do &arch-kernel; em geral do
 que a execução de uma instalação normal. Você não pode esperar que este
 procedimento resulte em um sistema idêntico ao de uma instalação normal.
 Você deverá ter em mente que este procedimento só dá os passos básicos
@@ -70,7 +70,7 @@ a opção <userinput>-j</userinput>.
 </para><para>
 
 Inicialize e ative a partição swap (substitua o número da partição
-pela partição que deseja usar para a Debian):
+pela partição que deseja usar para a &debian;):
 
 <informalexample><screen>
  # mkswap /dev/<replaceable>hda5</replaceable>
@@ -102,8 +102,8 @@ manualmente antes de proceder para o próximo estágio.
   <title>Instalar o <command>debootstrap</command></title>
 <para>
 
-O utilitário usado pelo instalador Debian, e reconhecido como o
-método oficial de instalar um sistema base Debian, é o
+O utilitário usado pelo instalador &debian;, e reconhecido como o
+método oficial de instalar um sistema base &debian;, é o
 <command>debootstrap</command>. Ele utiliza o <command>wget</command>
 e o <command>ar</command>, mas depende somente do
 <classname>/bin/sh</classname> e de ferramentas básicas
@@ -146,7 +146,7 @@ Crie uma pasta de trabalho para extração do pacote .deb:
 </screen></informalexample>
 
 O binário <command>debootstrap</command> está localizado nos arquivos
-da Debian (se assegure de selecionar o arquivo apropriado para sua
+da &debian; (se assegure de selecionar o arquivo apropriado para sua
 arquitetura). Baixe o pacote .deb do <command>debootstrap</command> de
 <ulink url="http://ftp.debian.org/debian/pool/main/d/debootstrap/">
 pool</ulink>, copie o pacote para o diretório de trabalho e extraia
@@ -168,7 +168,7 @@ estes arquivos.
 
 O <command>debootstrap</command>, ao ser executado, pode baixar os arquivos
 necessários diretamente de um repositório. Você
-poderá substituí-lo por qualquer espelho (mirror) de arquivos da Debian ao
+poderá substituí-lo por qualquer espelho (mirror) de arquivos da &debian; ao
 invés de usar <userinput>&archive-mirror;/debian</userinput> no
 exemplo do comando abaixo, use preferivelmente um mirror mais perto
 de você em sua rede. A lista de mirrors estão disponíveis a
@@ -211,7 +211,7 @@ no comando <command>debootstrap</command>:
   <title>Configurando o Sistema Básico</title>
 <para>
 
-Agora que você tem um sistema real da Debian em seu disco, execute
+Agora que você tem um sistema real da &debian; em seu disco, execute
 o comando <command>chroot</command> dentro dele:
 
 <informalexample><screen>
@@ -219,7 +219,7 @@ o comando <command>chroot</command> dentro dele:
 </screen></informalexample>
 
 Após executar o chroot você pode precisar configurar a definição do
-terminal para ser compatível com o sistema base Debian, por exemplo:
+terminal para ser compatível com o sistema base &debian;, por exemplo:
 
 <informalexample><screen>
 # export TERM=<replaceable>xterm-color</replaceable>
@@ -311,7 +311,7 @@ ou, para montar os sistemas de arquivos individualmente, use:
  # mount /caminho  # e.g.:  mount /usr
 </screen></informalexample>
 
-Sistemas Debian atuais possuem pontos de montagem para mídias removíveis
+Sistemas &debian; atuais possuem pontos de montagem para mídias removíveis
 sob <filename>/media</filename>, mas mantém ligações simbólicas de
 compatibilidade em <filename>/</filename>. Crie-os conforme for
 necessário, por exemplo:
@@ -564,14 +564,14 @@ Para tornar seu sistema &debian-gnu; inicializável,
 ajuste seu gerenciador de partida para carregar o kernel
 instalado com sua nova partição raiz. Note que o <command>debootstrap</command>
 não instala um gerenciador de partida, no entanto você pode usar
-<command>aptitude</command> dentro do seu chroot Debian para fazê-lo.
+<command>aptitude</command> dentro do seu chroot &debian; para fazê-lo.
 
 </para><para arch="any-x86">
 
 Veja <userinput>info grub</userinput> ou <userinput>man
 lilo.conf</userinput> por instruções de como configurar um gerenciador de
-partida. Se estiver mantendo o sistema que usou para instalar a Debian,
-simplesmente adicione uma entrada para a nova instalação da Debian no seu
+partida. Se estiver mantendo o sistema que usou para instalar a &debian;,
+simplesmente adicione uma entrada para a nova instalação da &debian; no seu
 arquivo <filename>menu.lst</filename> ou <filename>lilo.conf</filename>. Para
 o <filename>lilo.conf</filename> você também precisará copiá-los para o novo
 sistema e editá-lo lá. Após terminar a edição, execute o <command>lilo</command>
@@ -626,7 +626,7 @@ Para o carregador de inicialização <classname>grub</classname>, você
 poderia definir a opção <literal>do_bootloader</literal> como
 <quote>no</quote>. E, para automaticamente atualizar o seu
 <filename>/boot/grub/menu.lst</filename> na instalação ou remoção de
-kernels Debian, adicione as seguintes linhas:
+kernels &debian;, adicione as seguintes linhas:
 
 <informalexample><screen>
 postinst_hook = update-grub
@@ -640,7 +640,7 @@ Para o carregador de inicialização <classname>lilo</classname>, o valor de
 
 Veja <userinput>man yaboot.conf</userinput> por instruções de
 como configurar seu gerenciador de partida. Se estiver
-mantendo o sistema que usou para instalar a Debian, apenas adicione
+mantendo o sistema que usou para instalar a &debian;, apenas adicione
 uma entrada no arquivo <filename>yaboot.conf</filename> Você também
 poderá copiá-lo para o novo sistema e editá-lo lá. Após terminar a
 edição, execute <command>ybin</command> (lembre-se de usar
