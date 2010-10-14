@@ -4,6 +4,27 @@ mountpoints () {
 	cut -d" " -f2 /proc/mounts | sort | uniq
 }
 
+# Make sure mtab in the chroot reflects the currently mounted partitions.
+update_mtab() {
+	mtab=/target/etc/mtab
+
+	if [ -h "$mtab" ]; then
+		logger -t $0 "warning: $mtab won't be updated since it is a symlink."
+		return 0
+	fi
+
+	egrep '^[^ ]+ /target' /proc/mounts | (
+	while read devpath mountpoint fstype options n1 n2 ; do
+		devpath=`mapdevfs $devpath || echo $devpath`
+		mountpoint="${mountpoint#/target}"
+		# mountpoint for root will be empty
+		if [ -z "$mountpoint" ] ; then
+			mountpoint="/"
+		fi
+		echo $devpath $mountpoint $fstype $options $n1 $n2
+	done ) > $mtab
+}
+
 chroot_setup () {
 	# Bail out if directories we need are not there
 	if [ ! -d /target/sbin ] || [ ! -d /target/usr/sbin ] || \
@@ -95,6 +116,8 @@ EOF
 	esac
 
 	mountpoints > /tmp/mount.post
+
+	update_mtab
 
 	# Try to enable proxy when using HTTP.
 	# What about using ftp_proxy for FTP sources?
