@@ -720,7 +720,7 @@ int main (int argc __attribute__ ((unused)), char **argv) {
 		packages = di_system_packages_status_read_file(DI_SYSTEM_DPKG_STATUSFILE, allocator);
 
 		/* tell cdebconf to save the database */
-		debconf->command(debconf, "X_SAVE", NULL);
+		debconf_x_save(debconf);
 	}
 	
 	return exit_loop != 0 ? EXIT_OK : EXIT_FAILURE;
