@@ -1,8 +1,8 @@
 <!-- $Id$ -->
-<!-- original version: 64776 -->
+<!-- original version: 64916 -->
 
  <sect1 id="linux-upgrade">
- <title>Instalace &debian;u ze stávajícího unixového/linuxového systému</title>
+ <title>Jak nainstalovat &debian-gnu; ze stávajícího unixového/linuxového systému</title>
 
 <para>
 
@@ -18,7 +18,7 @@ příkazy uvozené <prompt>#</prompt> se spouští v
 
 </para><para>
 
-Až si &debian; vyladíte k obrazu svému, můžete do něj převést stávající
+Až si &debian-gnu; vyladíte k obrazu svému, můžete do něj převést stávající
 uživatelská data a plynule přejít k nové distribuci bez zbytečných
 prostojů. Tento druh instalace je též vhodný pro systémy s podivným
 hardwarem, který jinak není podporován instalačními médii.
@@ -149,7 +149,7 @@ potřebné soubory. K instalaci souborů musíte mít rootovská práva.
 <para>
 
 <command>debootstrap</command> si umí stáhnout potřebné soubory přímo
-z debianího archivu. Aby se soubory nestahovaly přes půl Zeměkoule,
+z archivu &debian;u. Aby se soubory nestahovaly přes půl Zeměkoule,
 nahraďte v ukázce server
 <userinput>&archive-mirror;/debian</userinput> nějakým bližším.
 Seznam zrcadel naleznete v
@@ -503,40 +503,11 @@ dostupná připravená jádra:
 
 </para><para>
 
-Plánujete-li použít některé z předpřipravených jader, je dobré před
-tím vytvořit konfigurační soubor
-<filename>/etc/kernel-img.conf</filename>. Příklad:
-
-<informalexample><screen>
-# Kernel image management overrides
-# See kernel-img.conf(5) for details
-do_symlinks = yes
-relative_links = yes
-do_bootloader = yes
-do_bootfloppy = no
-do_initrd = yes
-link_in_boot = no
-</screen></informalexample>
-
-</para><para>
-
-Více informací o tomto souboru se dozvíte v jeho manuálové stránce,
-která je součástí balíku
-<classname>kernel-package</classname>. Doporučujeme hodnoty upravit
-na míru vašemu systému.
-
-</para><para>
-
-Poté nainstalujte balík vybraným jádrem.
+Poté balík s vybraným jádrem nainstalujte.
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>aptitude install &kernelpackage;-<replaceable>&kernelversion;-arch-atd</replaceable></userinput>
 </screen></informalexample>
-
-Jestliže jste před instalací jádra nevytvořili soubor
-<filename>/etc/kernel-img.conf</filename>, můžete být během instalace
-dotázáni an několik otázek, které se jinak zjistí právě z tohoto
-souboru.
 
 </para>
   </sect2>
@@ -545,7 +516,7 @@ souboru.
 <title>Nastavení zavaděče</title>
 <para>
 
-Abyste mohli zavádět svůj &debian;, nastavte v zavaděči, aby nahrál
+Abyste mohli zavádět svůj &debian-gnu;, nastavte v zavaděči, aby nahrál
 instalované jádro s novou kořenovou oblastí. Pamatujte, že
 <command>debootstrap</command> zavaděč neinstaluje, takže jej budete
 muset doinstalovat zvlášť (např. pomocí <command>aptitude</command>
@@ -599,29 +570,6 @@ image=/vmlinuz
 initrd=/initrd.img
 label=Debian
 </screen></informalexample>
-
-</para><para arch="any-x86">
-
-Podle zvoleného zavaděče nyní můžete chtít poupravit soubor
-<filename>/etc/kernel-img.conf</filename>.
-
-</para><para arch="any-x86">
-
-Pro zavaděč <classname>grub</classname> byste měli nastavit proměnnou
-<literal>do_bootloader</literal> na <quote>no</quote>. Aby se při
-instalaci nebo odstranění debianího jádra automaticky aktualizoval
-soubor <filename>/boot/grub/menu.lst</filename>, přidejte následující
-řádky:
-
-<informalexample><screen>
-postinst_hook = update-grub
-postrm_hook   = update-grub
-</screen></informalexample>
-
-<phrase arch="x86">
-U zavaděče <classname>lilo</classname> musí být hodnota proměnné
-<literal>do_bootloader</literal> nastavena na <quote>yes</quote>.
-</phrase>
 
 </para><para arch="powerpc">
 

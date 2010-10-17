@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 64778 -->
+<!-- original version: 65009 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -1143,7 +1143,11 @@ d-i partman/confirm_nooverwrite boolean true
 
 Pomocí přednastavení též můžete nastavit oblasti na polích softwarového
 RAIDu. Podporovány jsou RAID úrovně 0, 1, 5, 6 a 10, vytváření
-degradovaných polí a určení rezervních zařízení. Používáte-li RAID 1,
+degradovaných polí a určení rezervních zařízení.
+
+</para><para arch="any-x86">
+
+Používáte-li RAID 1,
 můžete podle části <xref linkend="preseed-bootloader"/> přednastavit
 grub, aby se nainstaloval do všech zařízení v poli použitých.
 
@@ -1466,7 +1470,7 @@ můžete jednoduše použít i na příkazové řádce jádra.
 
   </sect2>
 
-  <sect2 id="preseed-bootloader">
+  <sect2 id="preseed-bootloader" arch="any-x86">
   <title>Instalace zavaděče</title>
 
 <informalexample role="example"><screen>
@@ -1498,6 +1502,8 @@ d-i grub-installer/with_other_os boolean true
 #d-i grub-installer/bootdev  string (hd0,0)
 # Pro instalaci Grubu na více disků:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+# Pro instalaci na konkrétní zařízení:
+#d-i grub-installer/bootdev  string /dev/sda
 
 # Volitelné heslo pro Grub buď v čitelné podobě
 #d-i grub-installer/password password r00tme
