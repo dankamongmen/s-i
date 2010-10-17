@@ -122,7 +122,7 @@ create_html () {
         --xinclude \
         --stringparam base.dir $destdir/html/ \
         $stylesheet_html \
-        $tempdir/install.${language}.profiled.xml
+        $tempdir/install.${language}.profiled.xml 2>&1
     RET=$?; [ $RET -ne 0 ] && return $RET
 
     # Copy the custom css stylesheet to the destination directory
