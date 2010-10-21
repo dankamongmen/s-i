@@ -20,6 +20,10 @@ cd git/yaboot-installer
 git tag -d 0.20
 cd ../..
 
+# same name tag and branch is a weird thing to have in git
+cd git/base-installer
+git tag -d etch-beta1
+
 mkdir -p git/logs
 
 (
