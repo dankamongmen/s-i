@@ -43,3 +43,7 @@ if [ -n "$crashes" ]; then
 	echo "* Crashes detected: $crashes" >&2
 	exit 1
 fi
+if grep -B2 -i failed log; then
+	echo "* Failure detected, check log" >&2
+	exit 1
+fi
