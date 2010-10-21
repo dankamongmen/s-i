@@ -1,17 +1,14 @@
+commit 6451ed7b8b7c40de68d7deb84a0f26544594fc7c
+Author: Joey Hess <joey@kitenet.net>
+Date:   Wed Oct 20 18:18:26 2010 -0400
+
+    patch2, hand-applied
+
 diff --git a/src/repository.cpp b/src/repository.cpp
-index f243d24..a0e5f4c 100644
+index b7faaa7..a0e5f4c 100644
 --- a/src/repository.cpp
 +++ b/src/repository.cpp
-@@ -15,8 +15,6 @@
-  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  */
- 
--#define QT_NO_CAST_TO_ASCII 
--
- #include "repository.h"
- #include "options.h"
- #include <QTextStream>
-@@ -53,7 +51,7 @@ public:
+@@ -51,7 +51,7 @@ public:
  static ProcessCache processCache;
  
  Repository::Repository(const Rules::Repository &rule)
@@ -20,7 +17,7 @@ index f243d24..a0e5f4c 100644
  {
      foreach (Rules::Repository::Branch branchRule, rule.branches) {
          Branch branch;
-@@ -110,8 +108,8 @@ void Repository::reloadBranches()
+@@ -108,8 +108,8 @@ void Repository::reloadBranches()
      }
  }
  
@@ -31,7 +28,7 @@ index f243d24..a0e5f4c 100644
  {
      startFastImport();
      if (!branches.contains(branch)) {
-@@ -124,7 +122,10 @@ void Repository::createBranch(const QString &branch, int revnum,
+@@ -122,7 +122,10 @@ void Repository::createBranch(const QString &branch, int revnum,
          branchRef.prepend("refs/heads/");
  
      Branch &br = branches[branch];
@@ -43,7 +40,7 @@ index f243d24..a0e5f4c 100644
          QByteArray backupBranch = branchRef + '_' + QByteArray::number(revnum);
          qWarning() << branch << "already exists; backing up to" << backupBranch;
  
-@@ -140,13 +141,21 @@ void Repository::createBranch(const QString &branch, int revnum,
+@@ -138,13 +141,21 @@ void Repository::createBranch(const QString &branch, int revnum,
      if (!branches.contains(branchFrom) || !branches.value(branchFrom).created) {
          qCritical() << branch << "in repository" << name
                      << "is branching from branch" << branchFrom
@@ -70,7 +67,7 @@ index f243d24..a0e5f4c 100644
  }
  
  Repository::Transaction *Repository::newTransaction(const QString &branch, const QString &svnprefix,
-@@ -320,6 +329,7 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
+@@ -318,6 +329,7 @@ QIODevice *Repository::Transaction::addFile(const QString &path, int mode, qint6
  
  void Repository::Transaction::commit()
  {
@@ -78,7 +75,7 @@ index f243d24..a0e5f4c 100644
      processCache.touch(repository);
  
      // create the commit message
-@@ -336,6 +346,18 @@ void Repository::Transaction::commit()
+@@ -334,6 +346,18 @@ void Repository::Transaction::commit()
  
          QTextStream s(&repository->fastImport);
          s << "commit " << branchRef << endl;
@@ -125,19 +122,19 @@ index ad23559..61fb09d 100644
  
      void startFastImport();
 diff --git a/src/svn.cpp b/src/svn.cpp
-index 64463b3..03bf56f 100644
+index 04cf6bf..916a38a 100644
 --- a/src/svn.cpp
 +++ b/src/svn.cpp
 @@ -600,7 +600,7 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
                           << "is an SVN rename from"
                           << qPrintable(previous) << "rev" << rev_from;
                  return EXIT_SUCCESS;
--            } else if (0) {
-+            } else {//if (0) {
- 		/* XXX JEH this code is buggy; above change avoids it
- 		 * copying the wrong version of a branch to a tag. */
+-            } else if (0) { /* XXX HACH REMOVE JEH */
++            } else {
                  // same repository but not same branch
-@@ -617,14 +617,15 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
+                 // this means this is a plain branch
+                 qDebug() << qPrintable(repository) << ": branch"
+@@ -615,14 +615,15 @@ int SvnRevision::exportInternal(const char *key, const svn_fs_path_change_t *cha
                      return EXIT_FAILURE;
                  }
  
