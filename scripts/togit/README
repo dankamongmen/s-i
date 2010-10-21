@@ -1,19 +1,35 @@
-To use these scripts, you need to get this and build it:
+This is a work in progress. Plan:
 
-git clone git://repo.or.cz/svn-all-fast-export.git
+* Checkout svn-all-fast-export into a svn-all-fast-export subdir of
+   this "togit" directory and build it:
 
-(Apply svn-all-fast-export.patch* to it first.)
+	git clone git://repo.or.cz/svn-all-fast-export.git
 
-This is a work in progress.
+	(Apply svn-all-fast-export.patch* to it first.)
 
-Hints for building svn-all-fast-export:
+	Hints for building svn-all-fast-export:
+	
+	- Install qt4-qmake libqt4-dev libsvn-dev
+	- Run qmake to generate Makefile
+	- Run make
 
-- Install qt4-qmake libqt4-dev libsvn-dev
-- Run qmake to generate Makefile
-- Run make
+* Get a copy of d-i's svn repo from alioth, and put it in svn/d-i under
+  this "togit" directory.
 
-Verifying the conversion:
+* Run ./convert.sh (it can be restarted as problems are fixed by passing -r)
+   Output is to ./git/
+
+* Run ./finalize.sh
+
+* Run ./ignores.sh TODO remember how exactly!
+
+* Verifying the conversion:
 
   ./verify.sh init
   ./verify.sh all
 
+* Transfer git/* to /git/d-i/ on alioth, make live, prune the svn repo
+  down to the parts we will keep in svn for now, etc.
+
+* Run ./hooksetup.sh (this expects to find the repos in /git/d-i,
+   and so should probably be run on alioth, after the conversion.)
