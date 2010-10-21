@@ -62,6 +62,7 @@ mv git/autopartkit.git git/delo-installer.git git/kdetect.git \
 	git/linux-kernel-di-powerpc.git \
 	git/linux-kernel-di-s390.git \
 	git/linux-kernel-di-m68k.git \
+	git/linux-modules-di-m68k-2.6.git \
 	git/linux-kernel-di-alpha.git \
 	git/niccfg.git git/baseconfig-udeb.git \
 	git/kernel-image-di.git \
