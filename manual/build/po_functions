@@ -24,7 +24,7 @@ generate_xml () {
     sh -c "cd ..; ./scripts/update_po $lang"
     RET=$?; [ $RET -ne 0 ] && return $RET || true
 
-    sh -c "cd ..; ./scripts/create_xml $lang"
+    sh -c "cd ..; ./scripts/create_xml $lang 2>&1 | grep -v 'found empty tag para'"
     RET=$?; [ $RET -ne 0 ] && return $RET || true
 
     echo "Info: generation of XML files complete"
