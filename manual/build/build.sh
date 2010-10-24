@@ -63,7 +63,7 @@ for lang in $languages; do
                 mv ./build.out/html/* "$destination/$destsuffix"
             else
                 # Do not fail because of missing PDF support for some languages
-                mv ./build.out/install.$lang.$format "$destination/$destsuffix" || true
+                mv ./build.out/install.$lang.$format "$destination/$destsuffix" 2>/dev/null || true
             fi
         done
 
