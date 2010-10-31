@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 65009 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1943,14 +1943,21 @@ d-i partman/confirm_nooverwrite boolean true
 You can also use preseeding to set up partitions on software RAID arrays.
 Supported are RAID levels 0, 1, 5, 6 and 10, creating degraded arrays and
 specifying spare devices.
-If you are using RAID 1, you can preseed grub to install to all devices
-used in the array; see <xref linkend="preseed-bootloader"/>.
 -->
 
 È possibile usare la preconfigurazione anche per impostare le partizioni
 su array in RAID software. È supportato il RAID di livello 0, 1, 5, 6 e
 10 la creazione di array <emphasis>degradati</emphasis> e la scelta di
-dischi di scorta. Se si usa RAID 1 è possibile preconfigurare grub in
+dischi di scorta.
+
+</para><para arch="any-x86">
+
+<!--
+If you are using RAID 1, you can preseed grub to install to all devices
+used in the array; see <xref linkend="preseed-bootloader"/>.
+-->
+
+Se si usa RAID 1 è possibile preconfigurare grub in
 modo da installarlo su tutti i dispositivi usati dall'array; si veda
 <xref linkend="preseed-bootloader"/>.
 
@@ -2461,7 +2468,7 @@ sulla riga di comando del kernel.
 </screen></informalexample>
   </sect2>
 
-  <sect2 id="preseed-bootloader">
+  <sect2 id="preseed-bootloader" arch="any-x86">
   <!-- <title>Boot loader installation</title> -->
   <title>Installazione del boot loader</title>
 <informalexample role="example"><screen>
@@ -2519,6 +2526,10 @@ d-i grub-installer/with_other_os boolean true
 # To install grub to multiple disks:
 --># Per installare grub su più dischi:
 #d-i grub-installer/bootdev  string (hd0,0) (hd1,0) (hd2,0)
+<!--
+# To install to a particular device:
+--># Per installare su un device particolare:
+#d-i grub-installer/bootdev  string /dev/sda
 
 <!--
 # Optional password for grub, either in clear text
