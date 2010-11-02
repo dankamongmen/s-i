@@ -143,7 +143,6 @@ void control_read(FILE *f, struct package_t *p)
 		else if (strstr(buf, "Description: ") == buf)
 		{
 			p->description = strdup(buf+13);
-			p->long_description = strdup("");
 			read_block(f, &p->long_description);
 		}
 #ifdef SUPPORTL10N
@@ -158,7 +157,6 @@ void control_read(FILE *f, struct package_t *p)
 			buf[14] = '\0';
 			l->language = strdup(buf+12);
 			l->description = strdup(buf+16);
-			l->long_description = strdup("");
 			read_block(f, &l->long_description);
 		}
 #endif
@@ -197,7 +195,6 @@ void control_read(FILE *f, struct package_t *p)
 		}
 		else if (strcasestr(buf, "Conffiles: ") == buf)
 		{
-			p->conffiles = strdup("");
 			read_block(f, &p->conffiles);
 		}
 
