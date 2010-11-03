@@ -5,7 +5,7 @@ url_handler () {
 	while :; do
 		case $1 in
 			--url)
-				ks_preseed d-i mirror/country string 'enter information manually'
+				ks_preseed d-i mirror/country string manual
 				case $2 in
 					http://*/*)
 						protocol=http
