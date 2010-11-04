@@ -93,22 +93,26 @@ static const char *status_print(unsigned long flags)
 	return buf;
 }
 
-static int read_block(FILE *f, char **ml)
+static char *read_block(FILE *f)
 {
 	char ch;
-	char *multiple_lines = *ml;
+	char *multiple_lines = strdup("");
+	size_t len = 0;
 	char buf[BUFSIZE];
 
 	while (((ch = fgetc(f)) == ' ') && !feof(f)) {
+		size_t buflen;
+
 		fgets(buf, BUFSIZE, f);
-		multiple_lines = (char *) di_realloc(multiple_lines, strlen(multiple_lines) + strlen(buf) + 2);
-		memset(multiple_lines + strlen(multiple_lines), '\0', strlen(buf) + 2);
+		buflen = strlen(buf);
+		multiple_lines = (char *) di_realloc(multiple_lines, len + buflen + 2);
+		memset(multiple_lines + len, '\0', buflen + 2);
 		strcat(multiple_lines, " ");
 		strcat(multiple_lines, buf);
+		len += buflen + 1;
 	}
-	*ml = multiple_lines;
 	ungetc(ch, f);
-	return EXIT_SUCCESS;
+	return multiple_lines;
 }
 
 /*
@@ -143,7 +147,7 @@ void control_read(FILE *f, struct package_t *p)
 		else if (strstr(buf, "Description: ") == buf)
 		{
 			p->description = strdup(buf+13);
-			read_block(f, &p->long_description);
+			p->long_description = read_block(f);
 		}
 #ifdef SUPPORTL10N
 		else if (strstr(buf, "description-") == buf)
@@ -157,7 +161,7 @@ void control_read(FILE *f, struct package_t *p)
 			buf[14] = '\0';
 			l->language = strdup(buf+12);
 			l->description = strdup(buf+16);
-			read_block(f, &l->long_description);
+			l->long_description = read_block(f);
 		}
 #endif
 		/* This is specific to the Debian Installer. Ifdef? */
@@ -195,7 +199,7 @@ void control_read(FILE *f, struct package_t *p)
 		}
 		else if (strcasestr(buf, "Conffiles: ") == buf)
 		{
-			read_block(f, &p->conffiles);
+			p->conffiles = read_block(f);
 		}
 
 	}
