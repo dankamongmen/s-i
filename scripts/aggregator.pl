@@ -15,6 +15,7 @@ sub logpng {
 
 sub aggregate {
 	my $fh=shift;
+	my $mailfh=shift;
 	my $basename=shift;
 	
 	my $success=0;
@@ -64,6 +65,12 @@ sub aggregate {
 				print $fh "<li><b>unparsable</b> entry:</i> $line\n";
 			}
 			else {
+				if (defined $notes && length $notes) {
+					$notes="($notes)";
+				}
+				else {
+					$notes="";
+				}
 				$date=~s/[^A-Za-z0-9: ]//g; # untrusted string
 				my $shortdate=`TZ=GMT LANG=C date -d '$date' '+%b %d %H:%M'`;
 				chomp $shortdate;
@@ -73,10 +80,14 @@ sub aggregate {
 				my $unixdate=`TZ=GMT LANG=C date -d '$date' '+%s'`;
 				if (length $unixdate && 
 				    (time - $unixdate) > ($log->{frequency}+1) * 60*60*24)  {
+					print $mailfh "* OLD BUILD:    $arch $shortdate $builder $ident $notes\n";
+					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n";
 					$shortdate="<b>$shortdate</b>";
 					$old++;
 				}
 				if ($status eq 'failed') {
+					print $mailfh "* FAILED BUILD: $arch $shortdate $builder $ident $notes\n";
+					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n";
 					$status='<b>failed</b>';
 					$failed++;
 					$onefailed++;
@@ -86,12 +97,6 @@ sub aggregate {
 					$success++;
 					$onesuccess++;
 					$total++;
-				}
-				if (defined $notes && length $notes) {
-					$notes="($notes)";
-				}
-				else {
-					$notes="";
 				}
 				print $fh "<li>$arch $shortdate $builder <a href=\"".$log->{logurl}."$ident".$log->{logext}."\">$status</a> $ident $notes\n";
 			}

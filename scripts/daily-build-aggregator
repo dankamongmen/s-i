@@ -186,6 +186,7 @@ if (! defined $basename) {
 }
 
 open (OUT, ">$basename.html.new") || die "$basename.html.new: $!";
+open (MAILOUT, ">$basename.mail") || die "$basename.mail: $!";
 
 print OUT <<EOS;
 <html>
@@ -196,7 +197,15 @@ print OUT <<EOS;
 <ul>
 EOS
 
-my ($total, $failed, $success, $old) = aggregate(*OUT, $basename, @buildlist);
+print MAILOUT <<EOS;
+Debian installer build overview
+-------------------------------
+
+Failed or old builds:
+
+EOS
+
+my ($total, $failed, $success, $old) = aggregate(*OUT, *MAILOUT, $basename, @buildlist);
 
 my $date=`LANG=C TZ=GMT date`;
 chomp $date;
@@ -218,3 +227,16 @@ EOS
 
 close OUT;
 rename("$basename.html.new", "$basename.html") || die "rename: $!";
+
+print MAILOUT <<EOS;
+
+Totals: $total builds ($failed failed, $old old)
+EOS
+
+close MAILOUT;
+
+if ($failed > 0 or $old > 0) {
+	system("mail -a 'X-Daily-Build-Aggregator: $failed failed, $old old' -s 'Debian installer build: failed or old builds' debian-boot\@lists.debian.org < $basename.mail");
+}
+
+unlink("$basename.mail");
