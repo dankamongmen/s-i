@@ -80,14 +80,18 @@ sub aggregate {
 				my $unixdate=`TZ=GMT LANG=C date -d '$date' '+%s'`;
 				if (length $unixdate && 
 				    (time - $unixdate) > ($log->{frequency}+1) * 60*60*24)  {
-					print $mailfh "* OLD BUILD:    $arch $shortdate $builder $ident $notes\n";
-					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n";
+					print $mailfh "* OLD BUILD:    $arch $shortdate $builder $ident $notes\n"
+						if defined $mailfh;
+					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n"
+						if defined $mailfh;
 					$shortdate="<b>$shortdate</b>";
 					$old++;
 				}
 				if ($status eq 'failed') {
-					print $mailfh "* FAILED BUILD: $arch $shortdate $builder $ident $notes\n";
-					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n";
+					print $mailfh "* FAILED BUILD: $arch $shortdate $builder $ident $notes\n"
+						if defined $mailfh;
+					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n"
+						if defined $mailfh;
 					$status='<b>failed</b>';
 					$failed++;
 					$onefailed++;
