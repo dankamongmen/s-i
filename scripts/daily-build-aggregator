@@ -236,7 +236,7 @@ EOS
 close MAILOUT;
 
 if ($failed > 0 or $old > 0) {
-	system("mail -a 'X-Daily-Build-Aggregator: $failed failed, $old old' -s 'Debian installer build: failed or old builds' debian-boot\@lists.debian.org < $basename.mail");
+	system("mail -a 'X-Daily-Build-Aggregator: $failed failed, $old old' -a 'From: Daily build aggregator <debian-boot\@lists.debian.org>' -s 'Debian installer build: failed or old builds' debian-boot\@lists.debian.org < $basename.mail");
 }
 
 unlink("$basename.mail");
