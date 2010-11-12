@@ -1,0 +1,17 @@
+#!/bin/sh
+
+`dirname $0`/l10n/output-l10n-changes -d . > /tmp/l10n-changes
+
+while read line; do
+	if [ "$line" = "[ Updated translations ]" ]; then
+		continue
+	fi
+
+	log=`echo "$line" | cut -c 3-`
+
+	DEBFULLNAME="Updated translations" dch -t --release-heuristic changelog "$log"
+done < /tmp/l10n-changes
+
+dch -r ""
+
+debuild && debsign && debcommit --release && debrelease
