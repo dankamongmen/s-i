@@ -1,6 +1,10 @@
 #!/bin/sh
 
-`dirname $0`/l10n/output-l10n-changes -d . > /tmp/l10n-changes
+`dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > /tmp/l10n-changes
+
+if [ "$(cat /tmp/l10n-changes)" = "Cannot find the PO directory!" ]; then
+	> /tmp/l10n-changes
+fi
 
 while read line; do
 	if [ "$line" = "[ Updated translations ]" ]; then
