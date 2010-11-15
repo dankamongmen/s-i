@@ -66,11 +66,13 @@ case "$console" in
 		# Enable serial console
 		sed -i -e "s/^#T0\(.*\)ttyS.*/T$ttyline\1$console $ttyspeed $ttyterm/" \
 		    /target/etc/inittab
+		sed -i -e "s/^\(T$ttyline.*\) -8/\1/" /target/etc/inittab
 	fi
 	if [ "$upstart_tty1" ]; then
 		sed -e "s/^\(exec.*getty \).*/\1-L $console $ttyspeed $ttyterm/" \
 		    -e "s/tty1/$console/g" \
 		    "$upstart_tty1" > "$(upstart_console "$console")"
+		sed -i -e "s/^\(exec.*\) -8/\1/" "$(upstart_console "$console")"
 	fi
 
 	write_console "$rawconsole" /target/etc/securetty
@@ -120,11 +122,13 @@ if [ -e $DT_ROOT/chosen/linux,stdout-path ]; then
 			sedexp="/^#1:/i\\$console_line\\"
 			sed -i -e "$sedexp" /target/etc/inittab
 		fi
+		sed -i -e "s/^\(co:.*\) -8/\1/" /target/etc/inittab
 	fi
 	if [ "$upstart_tty1" ]; then
 		sed -e "s/^\(exec.*getty \).*/\1-L $console 9600 vt100/" \
 		    -e "s/tty1/$console/g" \
 		    "$upstart_tty1" > "$(upstart_console "$console")"
+		sed -i -e "s/^\(exec.*\) -8/\1/" "$(upstart_console "$console")"
 	fi
 fi
 
@@ -141,11 +145,13 @@ if [ -e /sys/bus/xen ]; then
 			sedexp="/^1:/i\\$console_line\\"
 			sed -i -e "$sedexp" /target/etc/inittab
 		fi
+		sed -i -e "s/^\(co:.*\) -8/\1/" /target/etc/inittab
 	fi
 	if [ "$upstart_tty1" ]; then
 		log "adding console to ${upstart_tty1#/target}"
 		sed -e "s/^\(exec.*getty \).*/\1-L $console 9600 linux/" \
 		    -e "s/tty1/$console/g" \
 		    "$upstart_tty1" > "$(upstart_console "$console")"
+		sed -i -e "s/^\(exec.*\) -8/\1/" "$(upstart_console "$console")"
 	fi
 fi
