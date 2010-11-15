@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Os -fomit-frame-pointer
-LDFLAGS = -lcrypt
+LDLIBS = -lcrypt
 
 all: gen-crypt
 
