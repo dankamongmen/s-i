@@ -153,7 +153,13 @@ auto_lvm_prepare() {
 		fi
 	done
 
+	# Change to any one of the devices - we arbitrarily pick the first -
+	# to ensure that partman-auto can detect its label.  Of course this
+	# only works if all the labels match, but that should be the case
+	# since we just initialised them all following the same rules.
+	cd "${devs%% *}"
 	decode_recipe $recipe lvm
+	cd -
 
 	# Make sure the recipe contains lvmok tags
 	if ! echo "$scheme" | grep -q lvmok; then
