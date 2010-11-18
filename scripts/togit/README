@@ -13,6 +13,8 @@ This is a work in progress. Plan:
 	- Run qmake to generate Makefile
 	- Run make
 
+* for final conversion: lock svn repo for conversion; disable l10n-sync
+
 * Get a copy of d-i's svn repo from alioth, and put it in svn/d-i under
   this "togit" directory.
 
@@ -35,6 +37,35 @@ This is a work in progress. Plan:
 * Run ./hooksetup.sh (this expects to find the repos in /git/d-i,
    and so should probably be run on alioth, after the conversion.)
 
+* Unlock svn repo.
+
+* Remove from the svn trunk packages that have been moved to git.
+
+* Add .mrconfig files to svn trunk; add svn ignores for directories
+  checked out by mr
+
 * Check everything out into a d-i tree with mr.
 
 * Finally, create .gitignore files by running ignores.sh
+
+* Remove $Id$ keywords from files where the git equvilant (a hash id)
+  doesn't make sense, and/or turn on the ident attribute in git for
+  files to enable git doing the expansion.
+
+* l10n-sync needs to be made git aware
+
+* Add support to SILENT_COMMIT and [l10n] to git hook scripts.
+  This will require some coding to get right.
+
+* Update the Vcs fields in control files.
+
+* Update docs in wiki, website, svn, etc.
+
+* All daily build operators will update their build trees to
+  use the debian-installer git repository (which is what
+  provides the installer/build/ directory).
+
+* Everyone with an existing svn checkout will see 'svn update'
+  delete most of d-i. (If they have uncommitted changes still in
+  svn, svn will complain about conflicts.) They will run
+  'mr -p checkout' to check out the git repos, and start using git.
