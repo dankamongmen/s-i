@@ -608,6 +608,7 @@ int stralign(char **strs, int count)
     size_t line_size;
     unsigned int column_width;
     unsigned int cell_width;
+    unsigned int cell_len;
     unsigned int left_pad;
     char * new_str;
 
@@ -637,13 +638,25 @@ int stralign(char **strs, int count)
                 0 == strncmp(STRALIGN_ALIGN_RIGHT, cell, 1)) {
                 cell++;
             }
-            if (NULL != next_cell) {
+            if (NULL != next_cell)
                 column_widths[j] = MAX(column_widths[j], strwidth(cell));
-                column_sizes[j] = MAX(column_sizes[j], strlen(cell));
-            } else {
+            else
                 remaining_line_widths[i] = strwidth(cell);
-                remaining_line_sizes[i] = strlen(cell);
-            }
+        }
+    }
+    for (i = 0; i < count; i++) {
+        cell = strs[i];
+        for (j = 0; j < cells_per_line[i]; j++) {
+            cell_width = strwidth(cell);
+            cell_len = strlen(cell);
+            if (j < cells_per_line[i] - 1)
+                /* one byte padding per character from maximum column width */
+                column_sizes[j] = MAX(column_sizes[j],
+                                      cell_len +
+                                      column_widths[j] - cell_width);
+            else
+                remaining_line_sizes[i] = cell_len;
+            cell = cell + cell_len + 1;
         }
     }
     max_width = 0;
@@ -657,12 +670,9 @@ int stralign(char **strs, int count)
     max_size = 0;
     for (i = 0; i < count; i++) {
         line_size = remaining_line_sizes[i];
-        line_width = remaining_line_widths[i];
         for (j = 0; j < cells_per_line[i] - 1; j++) {
             line_size += column_sizes[j] + 2 /* extra spaces */;
-            line_width += column_widths[j] + 2 /* extra spaces */;
         }
-        line_size += max_width - line_width;
         max_size = MAX(max_size, line_size);
     }
     free(column_sizes);
@@ -688,8 +698,8 @@ int stralign(char **strs, int count)
             }
             strpad(next_cell, left_pad);
             strcat(next_cell, cell);
-            strpad(next_cell, column_width);
             if (j < cells_per_line[i] - 1) {
+                strpad(next_cell, column_width);
                 next_cell += strlen(next_cell);
                 strcpy(next_cell, "  " /* extra space */);
                 next_cell += 2;
