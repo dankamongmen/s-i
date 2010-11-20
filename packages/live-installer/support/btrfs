@@ -1,0 +1,28 @@
+#!/bin/sh -e
+
+# Debian (live-initramfs, live-boot)
+PLACES="$PLACES /cdrom/live/filesystem.btrfs"
+# Ubuntu (casper)
+PLACES="$PLACES /cdrom/casper/filesystem.btrfs"
+
+btrfs_prepare() {
+	modprobe btrfs || true
+	modprobe loop || true
+
+	mkdir -p /mnt
+	umount /mnt > /dev/null 2>&1 || true
+	if ! mount -t btrfs -o loop $place /mnt; then
+		error "$place has failed to be mounted as btrfs."
+		exit 1
+	fi
+
+	cd /mnt
+}
+
+btrfs_teardown() {
+	umount -d /mnt > /dev/null 2>&1 || true
+}
+
+btrfs_count() {
+	echo `print-inodes /mnt`
+}
