@@ -94,9 +94,9 @@ msgid ""
 "the same hard disk that holds the root file system."
 msgstr ""
 "Damit Ihr Computer Debian starten kann, lädt die Firmware Ihres Itanium-"
-"Systems den Bootloader aus seiner privaten EFI-Partition der Festplatte. Der "
+"Systems den Bootloader aus der EFI-Partition der Festplatte. Der "
 "Bootloader lädt dann das Betriebssystem von derselben Partition. Eine EFI-"
-"Partition ist ein FAT16 Dateisystem mit gesetztem »Boot«-Flag. Die meisten "
+"Partition ist ein FAT16-Dateisystem mit gesetztem »Boot«-Flag. Die meisten "
 "Installationen haben die EFI-Partition in der ersten primären Partition der "
 "Festplatte, auf der sich auch das Wurzeldateisystem befindet."
 
@@ -164,7 +164,7 @@ msgid ""
 "use.  If this is not the root file system, your kernel image and the "
 "configuration file /etc/aboot.conf will be copied to that partition."
 msgstr ""
-"Aboot muss den Bootloader auf einem bootfähigen Medium mit einer ext2-"
+"Aboot muss den Bootloader auf einem boot-fähigen Medium mit einer ext2-"
 "Partition installieren. Bitte wählen die ext2-Partition, die aboot benutzen "
 "soll. Wenn dies nicht das Root-Dateisystem ist, wird Ihr Kernel-Image und "
 "die Konfigurationsdatei /etc/aboot.conf auf diese Partition kopiert."
@@ -190,8 +190,8 @@ msgid ""
 "some other way."
 msgstr ""
 "Um von der SRM-Konsole starten zu können, muss aboot und der Kernel auf eine "
-"Festplatte, die BSD-Disklabels in der Partitionstabelle benutzt, installiert "
-"werden. Ihr /boot-Verzeichnis befindet sich nicht auf einer solchen "
+"Festplatte installiert werden, die BSD-Disklabels in der Partitionstabelle "
+"benutzt. Ihr /boot-Verzeichnis befindet sich nicht auf einer solchen "
 "Festplatte. Wenn Sie fortfahren, wird es nicht möglich sein, den Computer "
 "mit aboot zu starten. Sie müssen Ihren Computer dann auf eine andere Art und "
 "Weise booten."
@@ -213,8 +213,8 @@ msgid ""
 "system, or you must have a separate ext2 partition mounted at /boot."
 msgstr ""
 "Aboot benötigt /boot auf einer ext2-Partition auf einem boot-fähigen Medium. "
-"Das bedeutet, dass entweder die Root-Partition oder eine in /boot "
-"eingebundene Partition als ext2 formatiert sein muss."
+"Das bedeutet, dass entweder die Root-Partition oder eine als /boot "
+"eingebundene Partition mit ext2 formatiert sein muss."
 
 #. Type: boolean
 #. Description
@@ -287,7 +287,8 @@ msgid ""
 msgstr ""
 "Auf Ihrem Computer wurde kein ext2-Dateisystem gefunden. Um den Linux-Kernel "
 "von der SRM-Konsole zu laden, benötigt aboot eine ext2-Partition auf einer "
-"Festplatte, die mit BSD-Disklabels partitioniert wurde."
+"Festplatte, die mit BSD-Disklabels partitioniert wurde. Sie müssen mindestens "
+"eine ext2-Partition auf Ihrem System einrichten, bevor Sie fortfahren können."
 
 #. Type: text
 #. Description
@@ -477,7 +478,7 @@ msgstr "Abbruch"
 #. in single-byte languages)
 #: ../partconf.templates:4001
 msgid "Leave the file system intact"
-msgstr "Dateisystem erhalten"
+msgstr "Dateisystem erhalten, wie es ist"
 
 #. Type: select
 #. Choices
@@ -516,7 +517,7 @@ msgid ""
 "swap space."
 msgstr ""
 "Die Partition scheint bereits ein Dateisystem zu enthalten (${FSTYPE}). Sie "
-"können das Dateisystem belassen oder ein neues Dateisystem oder Swap "
+"können das Dateisystem belassen oder ein neues Dateisystem oder Swap-Speicher "
 "erstellen."
 
 #. Type: select
@@ -596,7 +597,7 @@ msgstr ""
 #. :sl5:
 #: ../partconf.templates:9001
 msgid "Failed to unmount partitions"
-msgstr "Lösen der Einbindungen der Partitionen fehlgeschlagen"
+msgstr "Lösen der Partitionseinbindungen fehlgeschlagen"
 
 #. Type: error
 #. Description
@@ -604,14 +605,14 @@ msgstr "Lösen der Einbindungen der Partitionen fehlgeschlagen"
 #: ../partconf.templates:9001
 msgid "An unexpected error occurred while unmounting the partitions."
 msgstr ""
-"Beim Lösen der Einbindungen der Partitionen trat ein unerwarteter Fehler auf."
+"Beim Lösen der Partitionseinbindungen trat ein unerwarteter Fehler auf."
 
 #. Type: error
 #. Description
 #. :sl5:
 #: ../partconf.templates:9001
 msgid "The partition configuration process has been aborted."
-msgstr "Der Partitionskonfigurationsprozess wurde abgebrochen."
+msgstr "Der Partitions-Konfigurationsprozess wurde abgebrochen."
 
 #. Type: text
 #. Description
@@ -652,7 +653,7 @@ msgstr "Partition nach ${MOUNT} zugewiesen"
 #: ../partconf.templates:12001
 msgid "Mounting a partition on ${MOUNT} makes no sense. Please change this."
 msgstr ""
-"Es macht keinen Sinn, eine Partition nach ${MOUNT} einzubinden. Bitte ändern "
+"Es macht keinen Sinn, eine Partition als ${MOUNT} einzubinden. Bitte ändern "
 "Sie Ihre Angaben."
 
 #. Type: error
@@ -772,7 +773,7 @@ msgstr ""
 #. :sl5:
 #: ../partconf.templates:18001
 msgid "Failed to mount ${PARTITION} on ${MOUNT}"
-msgstr "Einbinden von ${PARTITION} nach ${MOUNT} fehlgeschlagen"
+msgstr "Einbinden von ${PARTITION} als ${MOUNT} fehlgeschlagen"
 
 #. Type: error
 #. Description
@@ -780,7 +781,7 @@ msgstr "Einbinden von ${PARTITION} nach ${MOUNT} fehlgeschlagen"
 #: ../partconf.templates:18001
 msgid "An error occurred when ${PARTITION} was mounted on ${MOUNT}."
 msgstr ""
-"Beim Einbinden von ${PARTITION} nach ${MOUNT} ist ein Fehler aufgetreten."
+"Beim Einbinden von ${PARTITION} als ${MOUNT} ist ein Fehler aufgetreten."
 
 #. Type: text
 #. Description
@@ -871,7 +872,7 @@ msgstr "ctc: Channel to Channel (CTC) oder ESCON-Verbindung"
 #. :sl5:
 #: ../s390-netdevice.templates:1001
 msgid "qeth: OSA-Express in QDIO mode / HiperSockets"
-msgstr "qeth: OSA-Express im QDIO mode / HiperSockets"
+msgstr "qeth: OSA-Express im QDIO-Mode / HiperSockets"
 
 #. Type: select
 #. Choices
@@ -1043,7 +1044,7 @@ msgid ""
 "Please enter the portname of your OSA-Express card. This name must be 1 to 8 "
 "characters long and must be equal on all systems accessing the same card."
 msgstr ""
-"Bitte geben Sie einen Portnamen für Ihre OSA-Express-Karte an. Der Name muss "
+"Bitte geben Sie einen Portnamen für Ihre OSA-Express-Karte an. Dieser muss "
 "zwischen 1 und 8 Zeichen haben und auf allen Systemen, die auf diese Karte "
 "zugreifen, identisch sein."
 
@@ -1056,7 +1057,7 @@ msgid ""
 "for cards with microcode level 2.10 or later or when you want to share a "
 "card."
 msgstr ""
-"Lassen Sie es leer, wenn Sie HiperSockets benutzen möchten. Dieser Parameter "
+"Lassen Sie dies leer, wenn Sie HiperSockets benutzen möchten. Dieser Parameter "
 "ist für Karten mit Microcode Level 2.10 oder später erforderlich, oder wenn "
 "Sie die Karte gemeinsam benutzen möchten."
 
@@ -1086,7 +1087,7 @@ msgstr "Bitte geben Sie einen relativen Port für diese Verbindung an."
 #. :sl5:
 #: ../s390-netdevice.templates:12001
 msgid "Use this device in layer2 mode?"
-msgstr "Das Gerät im Ebene2-Modus (layer2) verwenden?"
+msgstr "Das Gerät im Layer2-Modus verwenden?"
 
 #. Type: boolean
 #. Description
@@ -1097,9 +1098,9 @@ msgid ""
 "removed from incoming IPv4 packets. Using the card in layer2 mode will make "
 "it keep the MAC addresses of IPv4 packets."
 msgstr ""
-"Standardmäßig verwenden OSA-Express-Karten den Ebene3-Modus. In diesem Modus "
+"Standardmäßig verwenden OSA-Express-Karten den Layer3-Modus. In diesem Modus "
 "werden LLC-Header von ankommenden IPv4-Paketen entfernt. Die Verwendung "
-"dieser Karte im Ebene2-Modus sorgt dafür, dass die MAC-Adressen von IPv4-"
+"dieser Karte im Layer2-Modus sorgt dafür, dass die MAC-Adressen von IPv4-"
 "Paketen beibehalten werden."
 
 #. Type: boolean
@@ -1126,7 +1127,7 @@ msgstr "VM-Peer:"
 #: ../s390-netdevice.templates:14001
 msgid "Please enter the name of the VM peer you want to connect to."
 msgstr ""
-"Bitte geben Sie den Namen des VM-Peers an, zu dem Sie sich verbinden möchten."
+"Bitte geben Sie den Namen des VM-Peers an, mit dem Sie sich verbinden möchten."
 
 #. Type: string
 #. Description
@@ -1136,7 +1137,7 @@ msgid ""
 "If you want to connect to multiple peers, separate the names by colons, e."
 "g.  tcpip:linux1."
 msgstr ""
-"Wenn Sie sich zu mehreren Peers verbinden möchten, trennen Sie die Namen mit "
+"Wenn Sie sich mit mehreren Peers verbinden möchten, trennen Sie die Namen mit "
 "einem Doppelpunkt, z.B. tcpip:linux1."
 
 #. Type: string
