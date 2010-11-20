@@ -15,4 +15,8 @@ if [ $do_initrd ]; then
 	in-target update-initramfs -k all -u
 fi
 
+if [ -f /target/var/lib/dpkg/debian-installer-launcher.list ]; then
+	in-target apt-get --yes remove --purge debian-installer-launcher
+fi
+
 in-target apt-get --yes autoremove
