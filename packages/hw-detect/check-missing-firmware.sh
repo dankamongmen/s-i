@@ -11,6 +11,8 @@ else
 	NONINTERACTIVE=""
 fi
 
+IFACES="$@"
+
 log () {
 	logger -t check-missing-firmware "$@"
 }
@@ -32,7 +34,18 @@ get_module () {
 	fi
 }
 
+# Some modules only try to load firmware once brought up. So bring up and
+# then down any interfaces specified by ethdetect.
+upnics() {
+	for iface in $IFACES; do
+		ip link set "$iface" up || true
+		ip link set "$iface" down || true
+	done
+}
+
 check_missing () {
+	upnics
+
 	# Give modules some time to request firmware.
 	sleep 1
 	
@@ -221,7 +234,7 @@ while check_missing && ask_load_firmware; do
 	fi
 
 	# remove and reload modules so they see the new firmware
-	# Sort to only reload a given module once if it ask for more
+	# Sort to only reload a given module once if it asks for more
 	# than one firmware file (example iwlagn)
 	for module in $(echo $modules | tr " " "\n" | sort -u); do
 		modprobe -r $module || true
