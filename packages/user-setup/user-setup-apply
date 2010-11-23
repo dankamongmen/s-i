@@ -174,6 +174,8 @@ if [ "$RET" = true ] && ! is_system_user; then
 			$log $chroot $ROOT update-alternatives --set libgksu-gconf-defaults /usr/share/libgksu/debian/gconf-defaults.libgksu-sudo
 			$log $chroot $ROOT update-gconf-defaults || true
 		fi
+		# Configure aptitude to use sudo.
+		echo 'Aptitude::Get-Root-Command "sudo:/usr/bin/sudo";' > $ROOT/etc/apt/apt.conf.d/00aptitude
 	fi
 else
 	# Just in case, clear any preseeded user password from the database
