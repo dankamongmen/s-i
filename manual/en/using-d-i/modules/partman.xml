@@ -102,8 +102,42 @@ The following file systems are supported.
   <listitem arch="linux-any"><para>
     <emphasis>jfs</emphasis> (not available on all architectures)
   </para></listitem>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>ufs</emphasis>
+  </para><para>
+    The default file system is UFS.
+  </para></listitem>
   <listitem arch="linux-any"><para>
     <emphasis>xfs</emphasis> (not available on all architectures)
+  </para></listitem>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>zfs</emphasis>
+  </para><para>
+    As ZFS support in the installer is still in development, only a basic
+    subset of ZFS features are supported. Some of them can be enabled
+    manually after the initial install, but there are some caveats:
+    <itemizedlist>
+      <listitem>
+        Each ZFS pool will host only one filesystem. After install is finished,
+        more filesystems can be created on this pool by using the
+        <quote>zfs create</quote> command.
+      </listitem>
+      <listitem>
+        Each ZFS pool will be composed of exactly one partition. After install
+        is finished, a single-device ZFS pool can be converted into a multi-device
+        pool by using the <quote>zpool add</quote> command, or into a mirrored
+        pool by using the <quote>zpool attach</quote> command. However, you shouldn't
+        do this on the pool that hosts root filesystem, as it would prevent GRUB
+        from booting your system.
+      </listitem>
+      <listitem>
+        Compression is not currently supported. After the install is finished,
+        compression can be enabled by setting the <quote>compression</quote> property
+        via the <quote>zfs set</quote> command. However, if a compression algorithm
+	other than the default (lzjb) is used on the pool that hosts your root
+        filesystem, this may prevent GRUB from booting your system.
+      </listitem>
+    </itemizedlist>
   </para></listitem>
   <listitem arch="linux-any"><para>
     <emphasis>reiserfs</emphasis> (optional; not available on all architectures)
