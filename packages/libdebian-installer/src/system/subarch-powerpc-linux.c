@@ -21,7 +21,7 @@ static struct map map_generation[] = {
 static struct map map_machine[] = {
 	{ "PReP", "prep" },
 	{ "CHRP Pegasos", "chrp_pegasos" },
-	{ "EFIKA5K2 CHRP PowerPC System", "chrp_pegasos" },
+	{ "EFIKA", "chrp_pegasos" },
 	{ "CHRP IBM", "chrp_rs6k" },
 	{ "CHRP", "chrp" },
 	{ "Amiga", "amiga" },
