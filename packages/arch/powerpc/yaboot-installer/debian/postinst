@@ -244,9 +244,9 @@ OLDIFS="$IFS"
 IFS=:
 # Note that this creates a subshell, so variables set inside this loop won't
 # persist outside it.
-cat /tmp/os-probed | while read partition title label loadertype; do
+cat /tmp/os-probed | while read partition title shortlabel loadertype; do
     IFS="$OLDIFS"
-    info "probed: $partition:$title:$label:$loadertype"
+    info "probed: $partition:$title:$shortlabel:$loadertype"
     mappedpartition="$(mapdevfs "$partition")"
     debug "mapped: $mappedpartition"
     # You only get the first of each non-Linux OS here, as that's all
@@ -268,7 +268,7 @@ cat /tmp/os-probed | while read partition title label loadertype; do
 		ofbootpart="$(map_of_path "$mappedbootpart")" || continue
 		debug "OF boot partition: $ofbootpart"
 		if [ -z "$label" ]; then
-		    label="$title"
+		    label="$shortlabel"
 		fi
 		# Prepend the last part of the partition name to the label,
 		# for uniqueness and (I hope) clarity, given that we don't
