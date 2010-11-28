@@ -244,9 +244,9 @@ OLDIFS="$IFS"
 IFS=:
 # Note that this creates a subshell, so variables set inside this loop won't
 # persist outside it.
-cat /tmp/os-probed | while read partition title shortlabel loadertype; do
+cat /tmp/os-probed | while read partition title label loadertype; do
     IFS="$OLDIFS"
-    info "probed: $partition:$title:$shortlabel:$loadertype"
+    info "probed: $partition:$title:$label:$loadertype"
     mappedpartition="$(mapdevfs "$partition")"
     debug "mapped: $mappedpartition"
     # You only get the first of each non-Linux OS here, as that's all
@@ -255,10 +255,10 @@ cat /tmp/os-probed | while read partition title shortlabel loadertype; do
 	linux)
 	    IFS=:
 	    linux-boot-prober "$partition" | while read \
-		    rootpart bootpart label kernel initrd params; do
+		    rootpart bootpart oldlabel kernel initrd params; do
 		IFS="$OLDIFS"
 		info "linux-boot-probed:" \
-		     "$rootpart:$bootpart:$label:$kernel:$initrd:$params"
+		     "$rootpart:$bootpart:$oldlabel:$kernel:$initrd:$params"
 		ofrootpart="$(map_of_path "$mappedpartition")" || continue
 		debug "OF root partition: $ofrootpart"
 		# bootpart may or may not be in devfs syntax.
@@ -268,12 +268,8 @@ cat /tmp/os-probed | while read partition title shortlabel loadertype; do
 		ofbootpart="$(map_of_path "$mappedbootpart")" || continue
 		debug "OF boot partition: $ofbootpart"
 		if [ -z "$label" ]; then
-		    label="$shortlabel"
+		    label="$oldlabel"
 		fi
-		# Prepend the last part of the partition name to the label,
-		# for uniqueness and (I hope) clarity, given that we don't
-		# have a way to display a useful description in yaboot.
-		label="${mappedbootpart##*/}-$label"
 		if echo "$kernel" | grep -q '^/boot/' && \
 		   [ "$mappedbootpart" != "$mappedpartition" ]; then
 		    # separate /boot partition
