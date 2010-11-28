@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 65785 -->
 
 <para>
 
@@ -94,7 +94,7 @@ Alcune opzioni possono essere modificate solo quando l'installazione
 avviene con debconf a priorità media o bassa, con le priorità più alte
 saranno usati i valori predefiniti.
 
-</para><para>
+</para><para arch="linux-any">
 
 <!--
 The installer supports various forms of advanced partitioning and use of
@@ -164,7 +164,7 @@ usati in combinazione.
   </para></listitem>
 </itemizedlist>
 
-</para><para arch="linux-any">
+</para><para>
 
 <!--
 The following file systems are supported.
@@ -176,9 +176,9 @@ Sono supportati i seguenti file system.
   <listitem><para>
     <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
     <emphasis>ext2</emphasis>,
-    <emphasis>ext3</emphasis>,
-    <emphasis>ext4</emphasis>
-  </para><para>
+    <phrase arch="linux-any"><emphasis>ext3</emphasis>,</phrase>
+    <phrase arch="linux-any"><emphasis>ext4</emphasis></phrase>
+  </para><para arch="linux-any">
 <!--
     The default file system selected in most cases is ext3; for
     <filename>/boot</filename> partitions ext2 will be selected by default
@@ -188,19 +188,84 @@ Sono supportati i seguenti file system.
     le partizioni <filename>/boot</filename> viene scelto ext2 quando è
     usato il partizionamento guidato.
   </para></listitem>
-  <listitem><para>
+  <listitem arch="linux-any"><para>
 <!--
     <emphasis>jfs</emphasis> (not available on all architectures)
 -->
     <emphasis>jfs</emphasis> (non disponibile su tutte le architetture)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>ufs</emphasis>
+  </para><para>
+<!--
+    The default file system is UFS.
+-->
+    Il file system predefinito è UFS.
+  </para></listitem>
+  <listitem arch="linux-any"><para>
 <!--
     <emphasis>xfs</emphasis> (not available on all architectures)
 -->
     <emphasis>xfs</emphasis> (non disponibile su tutte le architetture)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>zfs</emphasis>
+  </para><para>
+<!--
+    As ZFS support in the installer is still in development, only a basic
+    subset of ZFS features are supported. Some of them can be enabled
+    manually after the initial install, but there are some caveats:
+-->
+    È in fase di sviluppo il supporto per ZFS nell'installatore, solo
+	un sottoinsieme minimo delle funzionalità di ZFS è supportato. È
+	possibile attivare manualmente alcune funzionalità dopo l'installazione
+	ma ci sono avvertimenti:
+    <itemizedlist>
+      <listitem>
+<!--
+        Each ZFS pool will host only one filesystem. After install is finished,
+        more filesystems can be created on this pool by using the
+        <quote>zfs create</quote> command.
+-->
+        Ogni pool ZFS ospiterà solo un file system. Conclusa l'installazione,
+        è possibile creare altri file system sul pool con il comando
+        <quote>zfs create</quote>.
+      </listitem>
+      <listitem>
+<!--
+        Each ZFS pool will be composed of exactly one partition. After install
+        is finished, a single-device ZFS pool can be converted into a multi-device
+        pool by using the <quote>zpool add</quote> command, or into a mirrored
+        pool by using the <quote>zpool attach</quote> command. However, you shouldn't
+        do this on the pool that hosts root filesystem, as it would prevent GRUB
+        from booting your system.
+-->
+         Ogni pool ZFS verrà composto da esattamente una partizione. Conclusa
+		 l'installazione, un pool ZFS a device-singolo può essere convertito in
+		 un pool multi-device con il comando <quote>zpool add</quote> o in un
+		 pool con mirror usando <quote>zpool attach</quote>. Purtroppo questo
+		 pool non può ospitare il file system di root perché impedirebbe a
+		 GRUB di avviare il sistema.		 
+      </listitem>
+      <listitem>
+<!--
+        Compression is not currently supported. After the install is finished,
+        compression can be enabled by setting the <quote>compression</quote> property
+        via the <quote>zfs set</quote> command. However, if a compression algorithm
+        other than the default (lzjb) is used on the pool that hosts your root
+        filesystem, this may prevent GRUB from booting your system.
+-->
+         Attualmente la compressione non è supportata. Una volta completata
+		 l'installazione è possibile attivare la compressione impostando la
+		 proprietà <quote>compression</quote> tramite il comando <quote>zfs
+		 set</quote>. Purtroppo se nel pool che ospita il proprio file
+		 system di root è usato un algoritmo di compressione diverso da
+		 quello predefinito (lzjb), GRUB potrebbe non essere capace di
+		 avviare il sistema.
+      </listitem>
+    </itemizedlist>
+  </para></listitem>
+  <listitem arch="linux-any"><para>
 <!--
     <emphasis>reiserfs</emphasis> (optional; not available on all architectures)
 -->
@@ -264,7 +329,7 @@ Sono supportati i seguenti file system.
    <sect3 id="partman-auto">
    <!-- <title>Guided Partitioning</title> -->
    <title>Partizionamento guidato</title>
-<para>
+<para arch="linux-any">
 
 <!--
 If you choose guided partitioning, you may have three options: to create
@@ -292,7 +357,7 @@ a 256 bit tramite il supporto <quote>dm-crypt</quote> del kernel.
 </footnote>.
 
 </para>
-<note><para>
+<note arch="linux-any"><para>
 
 <!--
 The option to use (encrypted) LVM may not be available on all architectures.
@@ -302,7 +367,7 @@ La possibilità di usare LVM (cifrato o no) potrebbe non essere disponibile
 su tutte le architetture.
 
 </para></note>
-<para>
+<para arch="linux-any">
 
 <!--
 When using LVM or encrypted LVM, the installer will create most
@@ -338,7 +403,7 @@ precedenti installazioni) ma può richiedere molto tempo, a seconda
 della dimensione del disco.
 
 </para>
-<note><para>
+<note arch="linux-any"><para>
 
 <!--
 If you choose guided partitioning using LVM or encrypted LVM, some changes
@@ -359,15 +424,16 @@ conferma di qualsiasi modifica prima di eseguire la scrittura sul disco.
 <para>
 
 <!--
-If you choose guided partitioning (either classic or using (encrypted)
-LVM) for a whole disk, you will first be asked to select the disk you want
+If you choose guided partitioning<phrase arch="linux-any"> (either classic or using (encrypted)
+LVM)</phrase> for a whole disk, you will first be asked to select the disk you want
 to use. Check that all your disks are listed and, if you have several disks,
 make sure you select the correct one. The order they are listed in may
 differ from what you are used to. The size of the disks may help to identify
 them.
 -->
 
-Se si sceglie il partizionamento guidato (classico, LVM o LVM cifrato)
+Se si sceglie il partizionamento guidato
+<phrase arch="linux-any">(classico, LVM o LVM cifrato)</phrase>
 dell'intero disco viene prima chiesto di scegliere il disco che si vuole
 usare, verificare che nell'elenco appaiano tutti i dischi e assicurarsi
 di scegliere quello corretto. L'ordine con cui appaiono i dischi può
@@ -379,16 +445,20 @@ può essere utile per identificare i diversi dischi.
 <!--
 Any data on the disk you select will eventually be lost, but you will always
 be asked to confirm any changes before they are written to the disk.
+<phrase arch="linux-any">
 If you have selected the classic method of partitioning, you will be able to
 undo any changes right until the end; when using (encrypted) LVM this is not
 possible.
+</phrase>
 -->
 
 Tutti i dati sul disco scelto possono andare persi, però viene richiesta la
-conferma di qualsiasi modifica prima di eseguire la scrittura sul disco. Con
+conferma di qualsiasi modifica prima di eseguire la scrittura sul disco.
+<phrase arch="linux-any">Con
 il metodo di partizionamento classico è possibile annullare qualsiasi modifica
 fino alla fine; quando si usa i metodi LVM (cifrato o no) questo non è
 possibile.
+</phrase>
 
 </para><para>
 
@@ -449,7 +519,7 @@ guidato non funziona.
 
 </tbody></tgroup></informaltable>
 
-<para>
+<para arch="linux-any">
 
 <!--
 If you choose guided partitioning using (encrypted) LVM, the installer will also create
@@ -603,14 +673,14 @@ its size, type (primary or logical), and location (beginning or end of
 the free space). After this, you will be presented with a detailed
 overview of your new partition. The main setting is <guimenuitem>Use
 as:</guimenuitem>, which determines if the partition will have a file
-system on it, or be used for swap, software RAID, LVM, an encrypted
-file system, or not be used at all. Other settings include
+system on it, or be used for swap,<phrase arch="linux-any"> software RAID, LVM, an encrypted
+file system,</phrase> or not be used at all. Other settings include
 mountpoint, mount options, and bootable flag; which settings are shown
 depends on how the partition is to be used. If you don't like the
 preselected defaults, feel free to change them to your liking. E.g. by
 selecting the option <guimenuitem>Use as:</guimenuitem>, you can
 choose a different filesystem for this partition, including options
-to use the partition for swap, software RAID, LVM, or not
+to use the partition for swap,<phrase arch="linux-any"> software RAID, LVM,</phrase> or not
 use it at all. Another nice feature is the ability to copy data from
 an existing partition onto this one.
 When you are satisfied with your new partition, select
@@ -624,15 +694,16 @@ dimensione, il tipo (primaria o logica) e la posizione (all'inizio o alla
 fine dello spazio libero). Poi è visualizzato un dettagliato resoconto della
 nuova partizione. L'opzione più importante è <guimenuitem>Usato
 come:</guimenuitem>, infatti determina se la partizione deve avere un file
-system oppure se deve essere usata come swap, in RAID software, con LVM,
-con un file system cifrato oppure se non deve essere utilizzata. Inoltre è
+system oppure se deve essere usata come swap<phrase arch="linux-any">, in RAID software, con LVM,
+con un file system cifrato</phrase> oppure se non deve essere utilizzata. Inoltre è
 possibile specificare altre opzioni come il punto di mount, le opzioni di
 mount e il flag avviabile; queste opzioni sono visualizzate in base all'uso
 che si intende fare della partizione. Se i valori predefiniti non sono di
 proprio gradimento si possono cambiare, per esempio selezionando l'opzione
 <guimenuitem>Usato come:</guimenuitem> si può cambiare il file system per
-la partizione compresa la possibilità di usare la partizione come swap,
-in RAID software, con LVM o non utilizzarla affatto. Un'altra comoda
+la partizione compresa la possibilità di usare la partizione come
+swap<phrase arch="linux-any">, in RAID software, con LVM</phrase>
+o non utilizzarla affatto. Un'altra comoda
 funzionalità è la possibilità di copiare i dati da una partizione
 esistente. Conclusa la configurazione della partizione si può selezionare
 <guimenuitem>Preparazione di questa partizione completata</guimenuitem>
@@ -688,7 +759,7 @@ Se si scorda la scelta o la formattazione una partizione d'avvio EFI,
 <command>partman</command> rileva questo errore e impedisce il proseguimento
 dell'installazione fino a quando non ne viene allocata una.
 
-</para><para>
+</para><para arch="linux-any">
 
 <!--
 Capabilities of <command>partman</command> can be extended with installer
