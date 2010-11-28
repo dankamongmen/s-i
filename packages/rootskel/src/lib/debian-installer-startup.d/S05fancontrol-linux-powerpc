@@ -1,13 +1,25 @@
-# Load fan control modules - especially for G5 (aircraft noise levels)
-modprobe -q i2c-powermac || true
-modprobe -q therm_pm72 || true
-modprobe -q windfarm_core || true
-modprobe -q windfarm_cpufreq_clamp || true
-modprobe -q windfarm_lm75_sensor || true
-modprobe -q windfarm_max6690_sensor || true
-modprobe -q windfarm_pid || true
-modprobe -q windfarm_pm81 || true
-modprobe -q windfarm_pm91 || true
-modprobe -q windfarm_smu_sat || true
-modprobe -q windfarm_pm112 || true
-modprobe -q windfarm_smu_sensors || true
+# Load fan control modules on PowerMac machines.
+MODEL="`grep model /proc/cpuinfo`"
+MODEL="${MODEL##*: }"
+case "$MODEL" in
+	PowerMac*|RackMac*)
+		modprobe -q i2c-powermac
+	;;
+esac
+case "$MODEL" in
+	RackMac3,1|PowerMac7,2|PowerMac7,3)
+		modprobe -q therm_pm72
+	;;
+	PowerMac8,1|PowerMac8,2)
+		modprobe -q windfarm_pm81
+	;;
+	PowerMac9,1)
+		modprobe -q windfarm_pm91
+	;;
+	PowerMac11,2)
+		modprobe -q windfarm_pm112
+	;;
+	PowerMac12,1)
+		modprobe -q windfarm_pm121
+	;;
+esac
