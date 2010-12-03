@@ -31,8 +31,8 @@ for dev in $DEVICES/*; do
 	close_dialog
 done
 
-# We need a root UFS filesystem
-if [ "$root_fs" != ufs ]; then
+# We need a root UFS or ZFS filesystem
+if [ "$root_fs" != ufs ] && [ "$root_fs" != zfs ]; then
 	db_set partman-ufs/root_not_ufs true
 	db_input critical partman-ufs/root_not_ufs || true
 	db_go || true
