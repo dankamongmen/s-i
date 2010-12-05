@@ -43,6 +43,24 @@ upnics() {
 	done
 }
 
+# Checks if a given module is a nic module and has an interface that
+# is up and has an IP address. Such modules should not be reloaded,
+# to avoid taking down the network after it's been configured.
+nic_is_configured() {
+	module="$1"
+
+	for iface in $(ip -o link show up | cut -d : -f 2); do
+		dir="/sys/class/net/$iface/device/driver"
+		if [ -e "$dir" ] && [ "$(basename "$(readlink "$dir")")" = "$module" ]; then
+			if ip address show scope global dev "$iface" | grep -q 'scope global'; then
+				return 0
+			fi
+		fi
+	done
+
+	return 1
+}
+
 check_missing () {
 	upnics
 
@@ -237,7 +255,9 @@ while check_missing && ask_load_firmware; do
 	# Sort to only reload a given module once if it asks for more
 	# than one firmware file (example iwlagn)
 	for module in $(echo $modules | tr " " "\n" | sort -u); do
-		modprobe -r $module || true
-		modprobe $module || true
+		if ! nic_is_configured $module; then
+			modprobe -r $module || true
+			modprobe $module || true
+		fi
 	done
 done
