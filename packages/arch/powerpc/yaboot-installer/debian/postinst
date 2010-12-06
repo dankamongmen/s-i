@@ -267,9 +267,8 @@ cat /tmp/os-probed | while read partition title label loadertype; do
 		debug "mapped boot partition: $mappedbootpart"
 		ofbootpart="$(map_of_path "$mappedbootpart")" || continue
 		debug "OF boot partition: $ofbootpart"
-		if [ -z "$label" ]; then
-		    label="$oldlabel"
-		fi
+		# Add oldlabel to os-prober provided label, if available.
+		label="$label${oldlabel:+-${oldlabel}}"
 		if echo "$kernel" | grep -q '^/boot/' && \
 		   [ "$mappedbootpart" != "$mappedpartition" ]; then
 		    # separate /boot partition
