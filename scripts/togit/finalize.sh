@@ -23,6 +23,7 @@ cd ../..
 # same name tag and branch is a weird thing to have in git
 cd git/base-installer
 git tag -d etch-beta1
+cd ../..
 
 mkdir -p git/logs
 
