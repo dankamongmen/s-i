@@ -6,7 +6,7 @@
 
 for package in casper live-boot live-boot-initramfs-tools live-config live-config-runit live-config-systemd live-config-sysvinit live-config-upstart live-initramfs; do
 	if [ -f /target/var/lib/dpkg/$package.list ]; then
-		in-target apt-get --yes remove --purge $package
+		in-target apt-get --yes purge $package
 		do_initrd=true
 	fi
 done
@@ -16,7 +16,7 @@ if [ $do_initrd ]; then
 fi
 
 if [ -f /target/var/lib/dpkg/debian-installer-launcher.list ]; then
-	in-target apt-get --yes remove --purge debian-installer-launcher
+	in-target apt-get --yes purge debian-installer-launcher
 fi
 
 in-target apt-get --yes autoremove
