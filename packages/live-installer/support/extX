@@ -8,6 +8,10 @@ PLACES="$PLACES /cdrom/casper/filesystem.ext2 /cdrom/casper/filesystem.ext3 /cdr
 extX_prepare() {
 	anna-install ${1}-modules
 
+	if [ -x /sbin/depmod ]; then
+		depmod -a > /dev/null 2>&1 || true
+	fi
+
 	modprobe $1 || true
 
 	mkdir -p /mnt
