@@ -56,6 +56,9 @@ static void process_elf_header (Elf::file *file)
 static void process_dynamics (Elf::file *file, int64_t tag)
 {
   const Elf::section_type<Elf::section_type_DYNAMIC> *section = file->get_section_DYNAMIC ();
+  if (!section)
+    return;
+
   for (std::vector<Elf::dynamic *>::const_iterator it = section->get_dynamics ().begin (); it != section->get_dynamics ().end (); ++it)
   {
     Elf::dynamic *dynamic = *it;
@@ -66,6 +69,9 @@ static void process_dynamics (Elf::file *file, int64_t tag)
 
 static void process_symbols_provided (const Elf::section_type<Elf::section_type_DYNSYM> *section)
 {
+  if (!section)
+    return;
+
   for (std::vector<Elf::symbol *>::const_iterator it = section->get_symbols ().begin (); it != section->get_symbols ().end (); ++it)
   {
     const Elf::symbol *symbol = *it;
@@ -94,6 +100,9 @@ static void process_symbols_provided (const Elf::section_type<Elf::section_type_
 
 static void process_symbols_undefined (const Elf::section_type<Elf::section_type_DYNSYM> *section)
 {
+  if (!section)
+    return;
+
   for (std::vector<Elf::symbol *>::const_iterator it = section->get_symbols ().begin (); it != section->get_symbols ().end (); ++it)
   {
     const Elf::symbol *symbol = *it;
