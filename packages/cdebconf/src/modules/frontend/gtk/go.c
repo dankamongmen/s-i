@@ -460,7 +460,7 @@ static GtkWidget * create_question_box(struct frontend * fe,
     question_box = gtk_vbox_new(FALSE /* don't make children equal */,
                                 0 /* padding */);
 
-    if (IS_QUESTION_SINGLE(fe->questions)) {
+    if (0 && IS_QUESTION_SINGLE(fe->questions)) {
         gtk_box_pack_start(GTK_BOX(container), question_box,
                            TRUE /* expand */, TRUE /* fill */,
                            0 /* padding */);
