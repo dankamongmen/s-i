@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-10-29 05:56+0000\n"
-"PO-Revision-Date: 2010-07-26 10:13+0900\n"
+"POT-Creation-Date: 2010-12-29 12:07+0000\n"
+"PO-Revision-Date: 2010-12-29 22:23+0900\n"
 "Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
 "Language: ja\n"
@@ -18,7 +18,7 @@ msgstr ""
 #: using-d-i.xml:5
 #, no-c-format
 msgid "Using the &debian; Installer"
-msgstr "&debian; Installer の使用法"
+msgstr "&debian; インストーラの使用法"
 
 #. Tag: title
 #: using-d-i.xml:7
@@ -1708,14 +1708,20 @@ msgstr "以下のファイルシステムをサポートしています。"
 #. Tag: para
 #: using-d-i.xml:1093
 #, no-c-format
+#| msgid ""
+#| "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
+#| "<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
+#| "emphasis>"
 msgid ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
-"<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
-"emphasis>"
+"<emphasis>ext2</emphasis>, <phrase arch=\"linux-any\"><emphasis>ext3</"
+"emphasis>,</phrase> <phrase arch=\"linux-any\"><emphasis>ext4</emphasis></"
+"phrase>"
 msgstr ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
-"<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
-"emphasis>"
+"<emphasis>ext2</emphasis>, <phrase arch=\"linux-any\"><emphasis>ext3</"
+"emphasis>,</phrase> <phrase arch=\"linux-any\"><emphasis>ext4</emphasis></"
+"phrase>"
 
 #. Tag: para
 #: using-d-i.xml:1098
@@ -1736,15 +1742,76 @@ msgid "<emphasis>jfs</emphasis> (not available on all architectures)"
 msgstr ""
 "<emphasis>jfs</emphasis> (全アーキテクチャで使用できるわけではありません)"
 
+#. Tag: emphasis
+#: using-d-i.xml:1107
+#, no-c-format
+#| msgid "<emphasis>NTFS</emphasis> (read-only)"
+msgid "<emphasis>ufs</emphasis>"
+msgstr "<emphasis>ufs</emphasis>"
+
 #. Tag: para
-#: using-d-i.xml:1106
+#: using-d-i.xml:1108
+#, no-c-format
+msgid "The default file system is UFS."
+msgstr "デフォルトファイルシステムは UFS です。"
+
+#. Tag: para
+#: using-d-i.xml:1111
 #, no-c-format
 msgid "<emphasis>xfs</emphasis> (not available on all architectures)"
 msgstr ""
 "<emphasis>xfs</emphasis> (全アーキテクチャで使用できるわけではありません)"
 
+#. Tag: emphasis
+#: using-d-i.xml:1115
+#, no-c-format
+#| msgid "<emphasis>NTFS</emphasis> (read-only)"
+msgid "<emphasis>zfs</emphasis>"
+msgstr "<emphasis>zfs</emphasis>"
+
 #. Tag: para
-#: using-d-i.xml:1109
+#: using-d-i.xml:1116
+#, no-c-format
+msgid ""
+"As ZFS support in the installer is still in development, only a basic subset "
+"of ZFS features are supported. Some of them can be enabled manually after "
+"the initial install, but there are some caveats:"
+msgstr ""
+
+#. Tag: listitem
+#: using-d-i.xml:1121
+#, no-c-format
+msgid ""
+"Each ZFS pool will host only one filesystem. After install is finished, more "
+"filesystems can be created on this pool by using the <quote>zfs create</"
+"quote> command."
+msgstr ""
+
+#. Tag: listitem
+#: using-d-i.xml:1126
+#, no-c-format
+msgid ""
+"Each ZFS pool will be composed of exactly one partition. After install is "
+"finished, a single-device ZFS pool can be converted into a multi-device pool "
+"by using the <quote>zpool add</quote> command, or into a mirrored pool by "
+"using the <quote>zpool attach</quote> command. However, you shouldn't do "
+"this on the pool that hosts root filesystem, as it would prevent GRUB from "
+"booting your system."
+msgstr ""
+
+#. Tag: listitem
+#: using-d-i.xml:1134
+#, no-c-format
+msgid ""
+"Compression is not currently supported. After the install is finished, "
+"compression can be enabled by setting the <quote>compression</quote> "
+"property via the <quote>zfs set</quote> command. However, if a compression "
+"algorithm other than the default (lzjb) is used on the pool that hosts your "
+"root filesystem, this may prevent GRUB from booting your system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1143
 #, no-c-format
 msgid ""
 "<emphasis>reiserfs</emphasis> (optional; not available on all architectures)"
@@ -1753,7 +1820,7 @@ msgstr ""
 "はありません)"
 
 #. Tag: para
-#: using-d-i.xml:1111
+#: using-d-i.xml:1145
 #, no-c-format
 msgid ""
 "Support for the Reiser file system is no longer available by default. When "
@@ -1767,13 +1834,13 @@ msgstr ""
 "します。"
 
 #. Tag: emphasis
-#: using-d-i.xml:1118
+#: using-d-i.xml:1152
 #, no-c-format
 msgid "jffs2"
 msgstr "jffs2"
 
 #. Tag: para
-#: using-d-i.xml:1119
+#: using-d-i.xml:1153
 #, no-c-format
 msgid ""
 "Used on some systems to read flash memory. It is not possible to create new "
@@ -1783,13 +1850,13 @@ msgstr ""
 "ティションは作成できません。"
 
 #. Tag: emphasis
-#: using-d-i.xml:1124
+#: using-d-i.xml:1158
 #, no-c-format
 msgid "qnx4"
 msgstr "qnx4"
 
 #. Tag: para
-#: using-d-i.xml:1125
+#: using-d-i.xml:1159
 #, no-c-format
 msgid ""
 "Existing partitions will be recognized and it is possible to assign mount "
@@ -1799,19 +1866,19 @@ msgstr ""
 "qnx4 パーティションは作成できません。"
 
 #. Tag: para
-#: using-d-i.xml:1129
+#: using-d-i.xml:1163
 #, no-c-format
 msgid "<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>"
 msgstr "<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>"
 
 #. Tag: para
-#: using-d-i.xml:1132
+#: using-d-i.xml:1166
 #, no-c-format
 msgid "<emphasis>NTFS</emphasis> (read-only)"
 msgstr "<emphasis>NTFS</emphasis> (読み込み専用)"
 
 #. Tag: para
-#: using-d-i.xml:1134
+#: using-d-i.xml:1168
 #, no-c-format
 msgid ""
 "Existing NTFS partitions can be resized and it is possible to assign mount "
@@ -1821,13 +1888,13 @@ msgstr ""
 "す。新しい NTFS パーティションは作成できません。"
 
 #. Tag: title
-#: using-d-i.xml:1144
+#: using-d-i.xml:1178
 #, no-c-format
 msgid "Guided Partitioning"
 msgstr "ガイドパーティション分割"
 
 #. Tag: para
-#: using-d-i.xml:1145
+#: using-d-i.xml:1179
 #, no-c-format
 msgid ""
 "If you choose guided partitioning, you may have three options: to create "
@@ -1844,7 +1911,7 @@ msgstr ""
 "サポートを利用します。</para> </footnote> を利用する方法です。"
 
 #. Tag: para
-#: using-d-i.xml:1160
+#: using-d-i.xml:1194
 #, no-c-format
 msgid ""
 "The option to use (encrypted) LVM may not be available on all architectures."
@@ -1853,7 +1920,7 @@ msgstr ""
 "わけではありません。"
 
 #. Tag: para
-#: using-d-i.xml:1165
+#: using-d-i.xml:1199
 #, no-c-format
 msgid ""
 "When using LVM or encrypted LVM, the installer will create most partitions "
@@ -1870,7 +1937,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:1174
+#: using-d-i.xml:1208
 #, no-c-format
 msgid ""
 "When using encrypted LVM, the installer will also automatically erase the "
@@ -1885,7 +1952,7 @@ msgstr ""
 "スクのサイズにより、時間がかかることがあります。"
 
 #. Tag: para
-#: using-d-i.xml:1183
+#: using-d-i.xml:1217
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using LVM or encrypted LVM, some changes "
@@ -1902,15 +1969,22 @@ msgstr ""
 "に、インストーラは変更してよいか確認してきます。"
 
 #. Tag: para
-#: using-d-i.xml:1193
-#, no-c-format
+#: using-d-i.xml:1227
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you choose guided partitioning (either classic or using (encrypted) "
+#| "LVM) for a whole disk, you will first be asked to select the disk you "
+#| "want to use. Check that all your disks are listed and, if you have "
+#| "several disks, make sure you select the correct one. The order they are "
+#| "listed in may differ from what you are used to. The size of the disks may "
+#| "help to identify them."
 msgid ""
-"If you choose guided partitioning (either classic or using (encrypted) LVM) "
-"for a whole disk, you will first be asked to select the disk you want to "
-"use. Check that all your disks are listed and, if you have several disks, "
-"make sure you select the correct one. The order they are listed in may "
-"differ from what you are used to. The size of the disks may help to identify "
-"them."
+"If you choose guided partitioning<phrase arch=\"linux-any\"> (either classic "
+"or using (encrypted) LVM)</phrase> for a whole disk, you will first be asked "
+"to select the disk you want to use. Check that all your disks are listed "
+"and, if you have several disks, make sure you select the correct one. The "
+"order they are listed in may differ from what you are used to. The size of "
+"the disks may help to identify them."
 msgstr ""
 "ディスク全体に対してガイドパーティション分割を選択した場合 (クラシックでも "
 "(暗号化) LVMでも)、まずはじめに、選択したディスクを使用してよいか尋ねられま"
@@ -1919,14 +1993,20 @@ msgstr ""
 "ます。ディスクサイズを確認の手がかりにしてください。"
 
 #. Tag: para
-#: using-d-i.xml:1202
-#, no-c-format
+#: using-d-i.xml:1236
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Any data on the disk you select will eventually be lost, but you will "
+#| "always be asked to confirm any changes before they are written to the "
+#| "disk. If you have selected the classic method of partitioning, you will "
+#| "be able to undo any changes right until the end; when using (encrypted) "
+#| "LVM this is not possible."
 msgid ""
 "Any data on the disk you select will eventually be lost, but you will always "
-"be asked to confirm any changes before they are written to the disk. If you "
-"have selected the classic method of partitioning, you will be able to undo "
-"any changes right until the end; when using (encrypted) LVM this is not "
-"possible."
+"be asked to confirm any changes before they are written to the disk. <phrase "
+"arch=\"linux-any\"> If you have selected the classic method of partitioning, "
+"you will be able to undo any changes right until the end; when using "
+"(encrypted) LVM this is not possible. </phrase>"
 msgstr ""
 "ここでついに、ディスクのすべてのデータが失われますが、ディスクに書き込む前に"
 "変更してよいか、必ず確認してきます。パーティション分割にクラシック法を選択し"
@@ -1934,7 +2014,7 @@ msgstr ""
 "せん。"
 
 #. Tag: para
-#: using-d-i.xml:1210
+#: using-d-i.xml:1246
 #, no-c-format
 msgid ""
 "Next, you will be able to choose from the schemes listed in the table below. "
@@ -1951,73 +2031,73 @@ msgstr ""
 "依存します) がなければ、ガイドパーティション分割は失敗してしまいます。"
 
 #. Tag: entry
-#: using-d-i.xml:1226
+#: using-d-i.xml:1262
 #, no-c-format
 msgid "Partitioning scheme"
 msgstr "パーティション分割方法"
 
 #. Tag: entry
-#: using-d-i.xml:1227
+#: using-d-i.xml:1263
 #, no-c-format
 msgid "Minimum space"
 msgstr "最低容量"
 
 #. Tag: entry
-#: using-d-i.xml:1228
+#: using-d-i.xml:1264
 #, no-c-format
 msgid "Created partitions"
 msgstr "作成するパーティション"
 
 #. Tag: entry
-#: using-d-i.xml:1234
+#: using-d-i.xml:1270
 #, no-c-format
 msgid "All files in one partition"
 msgstr "All files in one partition"
 
 #. Tag: entry
-#: using-d-i.xml:1235
+#: using-d-i.xml:1271
 #, no-c-format
 msgid "600MB"
 msgstr "600MB"
 
 #. Tag: entry
-#: using-d-i.xml:1236
+#: using-d-i.xml:1272
 #, no-c-format
 msgid "<filename>/</filename>, swap"
 msgstr "<filename>/</filename>, swap"
 
 #. Tag: entry
-#: using-d-i.xml:1238
+#: using-d-i.xml:1274
 #, no-c-format
 msgid "Separate /home partition"
 msgstr "Separate /home partition"
 
 #. Tag: entry
-#: using-d-i.xml:1239
+#: using-d-i.xml:1275
 #, no-c-format
 msgid "500MB"
 msgstr "500MB"
 
 #. Tag: entry
-#: using-d-i.xml:1240
+#: using-d-i.xml:1276
 #, no-c-format
 msgid "<filename>/</filename>, <filename>/home</filename>, swap"
 msgstr "<filename>/</filename>, <filename>/home</filename>, swap"
 
 #. Tag: entry
-#: using-d-i.xml:1244
+#: using-d-i.xml:1280
 #, no-c-format
 msgid "Separate /home, /usr, /var and /tmp partitions"
 msgstr "Separate /home, /usr, /var and /tmp partitions"
 
 #. Tag: entry
-#: using-d-i.xml:1245
+#: using-d-i.xml:1281
 #, no-c-format
 msgid "<entry>1GB</entry>"
 msgstr "<entry>1GB</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1246
+#: using-d-i.xml:1282
 #, no-c-format
 msgid ""
 "<filename>/</filename>, <filename>/home</filename>, <filename>/usr</"
@@ -2027,7 +2107,7 @@ msgstr ""
 "filename>, <filename>/var</filename>, <filename>/tmp</filename>, swap"
 
 #. Tag: para
-#: using-d-i.xml:1255
+#: using-d-i.xml:1291
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using (encrypted) LVM, the installer will "
@@ -2041,7 +2121,7 @@ msgstr ""
 "します。"
 
 #. Tag: para
-#: using-d-i.xml:1261
+#: using-d-i.xml:1297
 #, no-c-format
 msgid ""
 "If you choose guided partitioning for your IA-64 system, there will be an "
@@ -2055,7 +2135,7 @@ msgstr ""
 "セットアップするよう、フォーマットメニューに追加メニュー項目があります。"
 
 #. Tag: para
-#: using-d-i.xml:1269
+#: using-d-i.xml:1305
 #, no-c-format
 msgid ""
 "After selecting a scheme, the next screen will show your new partition "
@@ -2067,7 +2147,7 @@ msgstr ""
 "いった情報が含まれています。"
 
 #. Tag: para
-#: using-d-i.xml:1275
+#: using-d-i.xml:1311
 #, no-c-format
 msgid ""
 "The list of partitions might look like this: <informalexample><screen>\n"
@@ -2117,7 +2197,7 @@ msgstr ""
 "んが、手動パーティション分割で使用できる変化を示します。"
 
 #. Tag: para
-#: using-d-i.xml:1288
+#: using-d-i.xml:1324
 #, no-c-format
 msgid ""
 "This concludes the guided partitioning. If you are satisfied with the "
@@ -2138,13 +2218,13 @@ msgstr ""
 "ティション分割で修正してください。"
 
 #. Tag: title
-#: using-d-i.xml:1302
+#: using-d-i.xml:1338
 #, no-c-format
 msgid "Manual Partitioning"
 msgstr "手動パーティション分割"
 
 #. Tag: para
-#: using-d-i.xml:1303
+#: using-d-i.xml:1339
 #, no-c-format
 msgid ""
 "A similar screen to the one shown just above will be displayed if you choose "
@@ -2159,7 +2239,7 @@ msgstr ""
 "ションの使用法については、本節の残りで扱います。"
 
 #. Tag: para
-#: using-d-i.xml:1311
+#: using-d-i.xml:1347
 #, no-c-format
 msgid ""
 "If you select a pristine disk which has neither partitions nor free space on "
@@ -2173,8 +2253,27 @@ msgstr ""
 "SPACE</quote> (空き領域) という新しい行が現れます。"
 
 #. Tag: para
-#: using-d-i.xml:1319
-#, no-c-format
+#: using-d-i.xml:1355
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you select some free space, you will have the opportunity to create a "
+#| "new partition. You will have to answer a quick series of questions about "
+#| "its size, type (primary or logical), and location (beginning or end of "
+#| "the free space). After this, you will be presented with a detailed "
+#| "overview of your new partition. The main setting is <guimenuitem>Use as:</"
+#| "guimenuitem>, which determines if the partition will have a file system "
+#| "on it, or be used for swap, software RAID, LVM, an encrypted file system, "
+#| "or not be used at all. Other settings include mountpoint, mount options, "
+#| "and bootable flag; which settings are shown depends on how the partition "
+#| "is to be used. If you don't like the preselected defaults, feel free to "
+#| "change them to your liking. E.g. by selecting the option <guimenuitem>Use "
+#| "as:</guimenuitem>, you can choose a different filesystem for this "
+#| "partition, including options to use the partition for swap, software "
+#| "RAID, LVM, or not use it at all. Another nice feature is the ability to "
+#| "copy data from an existing partition onto this one. When you are "
+#| "satisfied with your new partition, select <guimenuitem>Done setting up "
+#| "the partition</guimenuitem> and you will return to <command>partman</"
+#| "command>'s main screen."
 msgid ""
 "If you select some free space, you will have the opportunity to create a new "
 "partition. You will have to answer a quick series of questions about its "
@@ -2182,15 +2281,16 @@ msgid ""
 "space). After this, you will be presented with a detailed overview of your "
 "new partition. The main setting is <guimenuitem>Use as:</guimenuitem>, which "
 "determines if the partition will have a file system on it, or be used for "
-"swap, software RAID, LVM, an encrypted file system, or not be used at all. "
-"Other settings include mountpoint, mount options, and bootable flag; which "
-"settings are shown depends on how the partition is to be used. If you don't "
-"like the preselected defaults, feel free to change them to your liking. E.g. "
-"by selecting the option <guimenuitem>Use as:</guimenuitem>, you can choose a "
-"different filesystem for this partition, including options to use the "
-"partition for swap, software RAID, LVM, or not use it at all. Another nice "
-"feature is the ability to copy data from an existing partition onto this "
-"one. When you are satisfied with your new partition, select "
+"swap,<phrase arch=\"linux-any\"> software RAID, LVM, an encrypted file "
+"system,</phrase> or not be used at all. Other settings include mountpoint, "
+"mount options, and bootable flag; which settings are shown depends on how "
+"the partition is to be used. If you don't like the preselected defaults, "
+"feel free to change them to your liking. E.g. by selecting the option "
+"<guimenuitem>Use as:</guimenuitem>, you can choose a different filesystem "
+"for this partition, including options to use the partition for swap,<phrase "
+"arch=\"linux-any\"> software RAID, LVM,</phrase> or not use it at all. "
+"Another nice feature is the ability to copy data from an existing partition "
+"onto this one. When you are satisfied with your new partition, select "
 "<guimenuitem>Done setting up the partition</guimenuitem> and you will return "
 "to <command>partman</command>'s main screen."
 msgstr ""
@@ -2211,7 +2311,7 @@ msgstr ""
 "イン画面に戻ってください。"
 
 #. Tag: para
-#: using-d-i.xml:1341
+#: using-d-i.xml:1377
 #, no-c-format
 msgid ""
 "If you decide you want to change something about your partition, simply "
@@ -2232,7 +2332,7 @@ msgstr ""
 "できます。"
 
 #. Tag: para
-#: using-d-i.xml:1352
+#: using-d-i.xml:1388
 #, no-c-format
 msgid ""
 "Be sure to create at least two partitions: one for the <emphasis>root</"
@@ -2248,7 +2348,7 @@ msgstr ""
 "に進みません。"
 
 #. Tag: para
-#: using-d-i.xml:1360
+#: using-d-i.xml:1396
 #, no-c-format
 msgid ""
 "If you forget to select and format an EFI boot partition, <command>partman</"
@@ -2259,7 +2359,7 @@ msgstr ""
 "command> がそれを検出し、行うまで先に進むことができません。"
 
 #. Tag: para
-#: using-d-i.xml:1366
+#: using-d-i.xml:1402
 #, no-c-format
 msgid ""
 "Capabilities of <command>partman</command> can be extended with installer "
@@ -2275,7 +2375,7 @@ msgstr ""
 "<filename>partman-lvm</filename>)"
 
 #. Tag: para
-#: using-d-i.xml:1374
+#: using-d-i.xml:1410
 #, no-c-format
 msgid ""
 "After you are satisfied with partitioning, select <guimenuitem>Finish "
@@ -2289,13 +2389,13 @@ msgstr ""
 "成するかどうか確認することになります。"
 
 #. Tag: title
-#: using-d-i.xml:1402
+#: using-d-i.xml:1438
 #, no-c-format
 msgid "Configuring Multidisk Devices (Software RAID)"
 msgstr "マルチディスクデバイス (ソフトウェア RAID) の設定"
 
 #. Tag: para
-#: using-d-i.xml:1403
+#: using-d-i.xml:1439
 #, no-c-format
 msgid ""
 "If you have more than one harddrive<footnote><para> To be honest, you can "
@@ -2314,7 +2414,7 @@ msgstr ""
 "firstterm> の方が有名) と呼びます。"
 
 #. Tag: para
-#: using-d-i.xml:1416
+#: using-d-i.xml:1452
 #, no-c-format
 msgid ""
 "MD is basically a bunch of partitions located on different disks and "
@@ -2328,7 +2428,7 @@ msgstr ""
 "てられる等) と同様に使用できます。"
 
 #. Tag: para
-#: using-d-i.xml:1424
+#: using-d-i.xml:1460
 #, no-c-format
 msgid ""
 "What benefits this brings depends on the type of MD device you are creating. "
@@ -2434,97 +2534,97 @@ msgstr ""
 "varlistentry> </variablelist> まとめると以下のようになります。"
 
 #. Tag: entry
-#: using-d-i.xml:1538
+#: using-d-i.xml:1574
 #, no-c-format
 msgid "Type"
 msgstr "タイプ"
 
 #. Tag: entry
-#: using-d-i.xml:1539
+#: using-d-i.xml:1575
 #, no-c-format
 msgid "Minimum Devices"
 msgstr "デバイス最小構成数"
 
 #. Tag: entry
-#: using-d-i.xml:1540
+#: using-d-i.xml:1576
 #, no-c-format
 msgid "Spare Device"
 msgstr "予備デバイス"
 
 #. Tag: entry
-#: using-d-i.xml:1541
+#: using-d-i.xml:1577
 #, no-c-format
 msgid "Survives disk failure?"
 msgstr "ディスク破損に耐えるか?"
 
 #. Tag: entry
-#: using-d-i.xml:1542
+#: using-d-i.xml:1578
 #, no-c-format
 msgid "Available Space"
 msgstr "利用可能領域"
 
 #. Tag: entry
-#: using-d-i.xml:1548
+#: using-d-i.xml:1584
 #, no-c-format
 msgid "RAID0"
 msgstr "RAID0"
 
 #. Tag: entry
-#: using-d-i.xml:1549 using-d-i.xml:1557 using-d-i.xml:1587
+#: using-d-i.xml:1585 using-d-i.xml:1593 using-d-i.xml:1623
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1550 using-d-i.xml:1551
+#: using-d-i.xml:1586 using-d-i.xml:1587
 #, no-c-format
 msgid "<entry>no</entry>"
 msgstr "<entry>no</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1552
+#: using-d-i.xml:1588
 #, no-c-format
 msgid "Size of the smallest partition multiplied by number of devices in RAID"
 msgstr "RAID にある最小パーティションのサイズ×デバイス数"
 
 #. Tag: entry
-#: using-d-i.xml:1556
+#: using-d-i.xml:1592
 #, no-c-format
 msgid "RAID1"
 msgstr "RAID1"
 
 #. Tag: entry
-#: using-d-i.xml:1558 using-d-i.xml:1566 using-d-i.xml:1577 using-d-i.xml:1588
+#: using-d-i.xml:1594 using-d-i.xml:1602 using-d-i.xml:1613 using-d-i.xml:1624
 #, no-c-format
 msgid "optional"
 msgstr "任意"
 
 #. Tag: entry
-#: using-d-i.xml:1559 using-d-i.xml:1567 using-d-i.xml:1578 using-d-i.xml:1589
+#: using-d-i.xml:1595 using-d-i.xml:1603 using-d-i.xml:1614 using-d-i.xml:1625
 #, no-c-format
 msgid "<entry>yes</entry>"
 msgstr "<entry>yes</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1560
+#: using-d-i.xml:1596
 #, no-c-format
 msgid "Size of the smallest partition in RAID"
 msgstr "RAID にある最小パーティションのサイズ"
 
 #. Tag: entry
-#: using-d-i.xml:1564
+#: using-d-i.xml:1600
 #, no-c-format
 msgid "RAID5"
 msgstr "RAID5"
 
 #. Tag: entry
-#: using-d-i.xml:1565
+#: using-d-i.xml:1601
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1568
+#: using-d-i.xml:1604
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2532,19 +2632,19 @@ msgid ""
 msgstr "RAID にある最小パーティションのサイズ×(デバイス数 - 1)"
 
 #. Tag: entry
-#: using-d-i.xml:1575
+#: using-d-i.xml:1611
 #, no-c-format
 msgid "RAID6"
 msgstr "RAID6"
 
 #. Tag: entry
-#: using-d-i.xml:1576
+#: using-d-i.xml:1612
 #, no-c-format
 msgid "<entry>4</entry>"
 msgstr "<entry>4</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1579
+#: using-d-i.xml:1615
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2552,13 +2652,13 @@ msgid ""
 msgstr "最小パーティションのサイズ×(RAID にあるデバイス数 - 2)"
 
 #. Tag: entry
-#: using-d-i.xml:1586
+#: using-d-i.xml:1622
 #, no-c-format
 msgid "RAID10"
 msgstr "RAID10"
 
 #. Tag: entry
-#: using-d-i.xml:1590
+#: using-d-i.xml:1626
 #, no-c-format
 msgid ""
 "Total of all partitions divided by the number of chunk copies (defaults to "
@@ -2566,7 +2666,7 @@ msgid ""
 msgstr "全パーティションサイズ÷チャンクのコピー数 (デフォルトは 2)"
 
 #. Tag: para
-#: using-d-i.xml:1597
+#: using-d-i.xml:1633
 #, no-c-format
 msgid ""
 "If you want to know more about Software RAID, have a look at <ulink url="
@@ -2576,7 +2676,7 @@ msgstr ""
 "raid-howto;\">Software RAID HOWTO</ulink> をご覧ください。"
 
 #. Tag: para
-#: using-d-i.xml:1602
+#: using-d-i.xml:1638
 #, no-c-format
 msgid ""
 "To create an MD device, you need to have the desired partitions it should "
@@ -2591,7 +2691,7 @@ msgstr ""
 "ニューの <command>partman</command> で行えます)"
 
 #. Tag: para
-#: using-d-i.xml:1611
+#: using-d-i.xml:1647
 #, no-c-format
 msgid ""
 "Make sure that the system can be booted with the partitioning scheme you are "
@@ -2611,7 +2711,7 @@ msgstr ""
 "filename> に RAID1 を用いる例が選択したり得ます。"
 
 #. Tag: para
-#: using-d-i.xml:1623
+#: using-d-i.xml:1659
 #, no-c-format
 msgid ""
 "Support for MD is a relatively new addition to the installer. You may "
@@ -2628,7 +2728,7 @@ msgstr ""
 "して動作させることができるかも知れません。"
 
 #. Tag: para
-#: using-d-i.xml:1632
+#: using-d-i.xml:1668
 #, no-c-format
 msgid ""
 "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> "
@@ -2649,7 +2749,7 @@ msgstr ""
 "さい。その後は選択した MD デバイスに依存します。"
 
 #. Tag: para
-#: using-d-i.xml:1645
+#: using-d-i.xml:1681
 #, no-c-format
 msgid ""
 "RAID0 is simple &mdash; you will be issued with the list of available RAID "
@@ -2660,7 +2760,7 @@ msgstr ""
 "に MD にするパーティションを選択してください。"
 
 #. Tag: para
-#: using-d-i.xml:1652
+#: using-d-i.xml:1688
 #, no-c-format
 msgid ""
 "RAID1 is a bit more tricky. First, you will be asked to enter the number of "
@@ -2679,7 +2779,7 @@ msgstr ""
 "せん。"
 
 #. Tag: para
-#: using-d-i.xml:1664
+#: using-d-i.xml:1700
 #, no-c-format
 msgid ""
 "RAID5 has a setup procedure similar to RAID1 with the exception that you "
@@ -2690,7 +2790,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:1670
+#: using-d-i.xml:1706
 #, no-c-format
 msgid ""
 "RAID6 also has a setup procedure similar to RAID1 except that at least "
@@ -2701,7 +2801,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:1676
+#: using-d-i.xml:1712
 #, no-c-format
 msgid ""
 "RAID10 again has a setup procedure similar to RAID1 except in expert mode. "
@@ -2721,7 +2821,7 @@ msgstr ""
 "は、たくさんのアクティブデバイスがなければなりません。"
 
 #. Tag: para
-#: using-d-i.xml:1690
+#: using-d-i.xml:1726
 #, no-c-format
 msgid ""
 "It is perfectly possible to have several types of MD at once. For example, "
@@ -2739,7 +2839,7 @@ msgstr ""
 "ション) で結合できます。"
 
 #. Tag: para
-#: using-d-i.xml:1699
+#: using-d-i.xml:1735
 #, no-c-format
 msgid ""
 "After you set up MD devices to your liking, you can <guimenuitem>Finish</"
@@ -2753,13 +2853,13 @@ msgstr ""
 "設定してください。"
 
 #. Tag: title
-#: using-d-i.xml:1714
+#: using-d-i.xml:1750
 #, no-c-format
 msgid "Configuring the Logical Volume Manager (LVM)"
 msgstr "論理ボリュームマネージャ (LVM) の設定"
 
 #. Tag: para
-#: using-d-i.xml:1715
+#: using-d-i.xml:1751
 #, no-c-format
 msgid ""
 "If you are working with computers at the level of system administrator or "
@@ -2775,7 +2875,7 @@ msgstr ""
 "とになります。"
 
 #. Tag: para
-#: using-d-i.xml:1723
+#: using-d-i.xml:1759
 #, no-c-format
 msgid ""
 "To avoid the described situation you can use Logical Volume Manager (LVM). "
@@ -2794,7 +2894,7 @@ msgstr ""
 "リュームグループも)、複数の物理ディスクをまたがって定義できると言うことです。"
 
 #. Tag: para
-#: using-d-i.xml:1733
+#: using-d-i.xml:1769
 #, no-c-format
 msgid ""
 "Now when you realize you need more space for your old 160GB <filename>/home</"
@@ -2815,7 +2915,7 @@ msgstr ""
 "きです。"
 
 #. Tag: para
-#: using-d-i.xml:1744
+#: using-d-i.xml:1780
 #, no-c-format
 msgid ""
 "LVM setup in &d-i; is quite simple and completely supported inside "
@@ -2832,7 +2932,7 @@ msgstr ""
 "</menuchoice> を選ぶことで行います。"
 
 #. Tag: para
-#: using-d-i.xml:1753
+#: using-d-i.xml:1789
 #, no-c-format
 msgid ""
 "When you return to the main <command>partman</command> screen, you will see "
@@ -2851,7 +2951,7 @@ msgstr ""
 "作は以下の通りです。"
 
 #. Tag: para
-#: using-d-i.xml:1764
+#: using-d-i.xml:1800
 #, no-c-format
 msgid ""
 "<guimenuitem>Display configuration details</guimenuitem>: shows LVM device "
@@ -2861,43 +2961,43 @@ msgstr ""
 "の名称やサイズなどを表示します"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1769
+#: using-d-i.xml:1805
 #, no-c-format
 msgid "Create volume group"
 msgstr "ボリュームグループの作成"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1772
+#: using-d-i.xml:1808
 #, no-c-format
 msgid "Create logical volume"
 msgstr "論理ボリュームの作成"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1775
+#: using-d-i.xml:1811
 #, no-c-format
 msgid "Delete volume group"
 msgstr "ボリュームグループの削除"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1778
+#: using-d-i.xml:1814
 #, no-c-format
 msgid "Delete logical volume"
 msgstr "論理ボリュームの削除"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1781
+#: using-d-i.xml:1817
 #, no-c-format
 msgid "Extend volume group"
 msgstr "ボリュームグループの拡張"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1784
+#: using-d-i.xml:1820
 #, no-c-format
 msgid "Reduce volume group"
 msgstr "ボリュームグループの縮小"
 
 #. Tag: para
-#: using-d-i.xml:1786
+#: using-d-i.xml:1822
 #, no-c-format
 msgid ""
 "<guimenuitem>Finish</guimenuitem>: return to the main <command>partman</"
@@ -2907,7 +3007,7 @@ msgstr ""
 "ります"
 
 #. Tag: para
-#: using-d-i.xml:1792
+#: using-d-i.xml:1828
 #, no-c-format
 msgid ""
 "Use the options in that menu to first create a volume group and then create "
@@ -2917,7 +3017,7 @@ msgstr ""
 "のメニューのオプションを使用してください。"
 
 #. Tag: para
-#: using-d-i.xml:1797
+#: using-d-i.xml:1833
 #, no-c-format
 msgid ""
 "After you return to the main <command>partman</command> screen, any created "
@@ -2928,13 +3028,13 @@ msgstr ""
 "常のボリュームと同じように表示されています (そして同じように扱えます)。"
 
 #. Tag: title
-#: using-d-i.xml:1811
+#: using-d-i.xml:1847
 #, no-c-format
 msgid "Configuring Encrypted Volumes"
 msgstr "暗号化ボリュームの設定"
 
 #. Tag: para
-#: using-d-i.xml:1812
+#: using-d-i.xml:1848
 #, no-c-format
 msgid ""
 "&d-i; allows you to set up encrypted partitions. Every file you write to "
@@ -2955,7 +3055,7 @@ msgstr ""
 "ないと、ハードディスクのデータはランダムな文字列にしか見えません。"
 
 #. Tag: para
-#: using-d-i.xml:1824
+#: using-d-i.xml:1860
 #, no-c-format
 msgid ""
 "The two most important partitions to encrypt are: the home partition, where "
@@ -2981,7 +3081,7 @@ msgstr ""
 "ションからカーネルを起動する方法がないからです。"
 
 #. Tag: para
-#: using-d-i.xml:1839
+#: using-d-i.xml:1875
 #, no-c-format
 msgid ""
 "Please note that the performance of encrypted partitions will be less than "
@@ -2995,7 +3095,7 @@ msgstr ""
 "けます。"
 
 #. Tag: para
-#: using-d-i.xml:1846
+#: using-d-i.xml:1882
 #, no-c-format
 msgid ""
 "To use encryption, you have to create a new partition by selecting some free "
@@ -3015,7 +3115,7 @@ msgstr ""
 "ティションを暗号化するオプションが追加されます。"
 
 #. Tag: para
-#: using-d-i.xml:1857
+#: using-d-i.xml:1893
 #, no-c-format
 msgid ""
 "&d-i; supports several encryption methods. The default method is "
@@ -3032,7 +3132,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:1869
+#: using-d-i.xml:1905
 #, no-c-format
 msgid ""
 "First, let's have a look at the options available when you select "
@@ -3045,13 +3145,13 @@ msgstr ""
 "デフォルト値を指定してください。セキュリティを念頭に置いて選択されています。"
 
 #. Tag: term
-#: using-d-i.xml:1879
+#: using-d-i.xml:1915
 #, no-c-format
 msgid "Encryption: <userinput>aes</userinput>"
 msgstr "Encryption: <userinput>aes</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1881
+#: using-d-i.xml:1917
 #, no-c-format
 msgid ""
 "This option lets you select the encryption algorithm (<firstterm>cipher</"
@@ -3075,13 +3175,13 @@ msgstr ""
 "り、21 世紀の機密情報を保護する標準暗号化アルゴリズムとして採用されました。"
 
 #. Tag: term
-#: using-d-i.xml:1899
+#: using-d-i.xml:1935
 #, no-c-format
 msgid "Key size: <userinput>256</userinput>"
 msgstr "Key size: <userinput>256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1901
+#: using-d-i.xml:1937
 #, no-c-format
 msgid ""
 "Here you can specify the length of the encryption key. With a larger key "
@@ -3094,13 +3194,13 @@ msgstr ""
 "影響を与えます。利用できる暗号化キーのサイズは暗号方式に依存します。"
 
 #. Tag: term
-#: using-d-i.xml:1913
+#: using-d-i.xml:1949
 #, no-c-format
 msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
 msgstr "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1915
+#: using-d-i.xml:1951
 #, no-c-format
 msgid ""
 "The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</"
@@ -3117,7 +3217,7 @@ msgstr ""
 "を推測できないようにします。"
 
 #. Tag: para
-#: using-d-i.xml:1925
+#: using-d-i.xml:1961
 #, no-c-format
 msgid ""
 "From the provided alternatives, the default <userinput>cbc-essiv:sha256</"
@@ -3130,25 +3230,25 @@ msgstr ""
 "ない、以前インストールしたシステムと互換をとる場合のみ使用してください。"
 
 #. Tag: term
-#: using-d-i.xml:1937
+#: using-d-i.xml:1973
 #, no-c-format
 msgid "Encryption key: <userinput>Passphrase</userinput>"
 msgstr "Encryption key: <userinput>Passphrase</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1939
+#: using-d-i.xml:1975
 #, no-c-format
 msgid "Here you can choose the type of the encryption key for this partition."
 msgstr "ここでは、このパーティションの暗号化キーのタイプを選択できます。"
 
 #. Tag: term
-#: using-d-i.xml:1945
+#: using-d-i.xml:1981
 #, no-c-format
 msgid "Passphrase"
 msgstr "Passphrase"
 
 #. Tag: para
-#: using-d-i.xml:1946
+#: using-d-i.xml:1982
 #, no-c-format
 msgid ""
 "The encryption key will be computed<footnote> <para> Using a passphrase as "
@@ -3161,13 +3261,13 @@ msgstr ""
 "\">LUKS</ulink> を使用して設定するという意味です。</para></footnote>します。"
 
 #. Tag: term
-#: using-d-i.xml:1961 using-d-i.xml:2054
+#: using-d-i.xml:1997 using-d-i.xml:2090
 #, no-c-format
 msgid "Random key"
 msgstr "Random key"
 
 #. Tag: para
-#: using-d-i.xml:1962
+#: using-d-i.xml:1998
 #, no-c-format
 msgid ""
 "A new encryption key will be generated from random data each time you try to "
@@ -3184,7 +3284,7 @@ msgstr ""
 "解読されないでしょう)"
 
 #. Tag: para
-#: using-d-i.xml:1971
+#: using-d-i.xml:2007
 #, no-c-format
 msgid ""
 "Random keys are useful for swap partitions because you do not need to bother "
@@ -3203,13 +3303,13 @@ msgstr ""
 "なってしまうのです。"
 
 #. Tag: term
-#: using-d-i.xml:1990 using-d-i.xml:2067
+#: using-d-i.xml:2026 using-d-i.xml:2103
 #, no-c-format
 msgid "Erase data: <userinput>yes</userinput>"
 msgstr "Erase data: <userinput>yes</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1992
+#: using-d-i.xml:2028
 #, no-c-format
 msgid ""
 "Determines whether the content of this partition should be overwritten with "
@@ -3229,7 +3329,7 @@ msgstr ""
 "データを復元できると信じられています。</para></footnote>。"
 
 #. Tag: para
-#: using-d-i.xml:2012
+#: using-d-i.xml:2048
 #, no-c-format
 msgid ""
 "If you select <menuchoice> <guimenu>Encryption method:</guimenu> "
@@ -3241,13 +3341,13 @@ msgstr ""
 "ンを提供するように変わります。"
 
 #. Tag: term
-#: using-d-i.xml:2021
+#: using-d-i.xml:2057
 #, no-c-format
 msgid "Encryption: <userinput>AES256</userinput>"
 msgstr "Encryption: <userinput>AES256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2023
+#: using-d-i.xml:2059
 #, no-c-format
 msgid ""
 "For loop-AES, unlike dm-crypt, the options for cipher and key size are "
@@ -3259,25 +3359,25 @@ msgstr ""
 "ださい。"
 
 #. Tag: term
-#: using-d-i.xml:2033
+#: using-d-i.xml:2069
 #, no-c-format
 msgid "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
 msgstr "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2035
+#: using-d-i.xml:2071
 #, no-c-format
 msgid "Here you can select the type of the encryption key for this partition."
 msgstr "ここでは、このパーティションの暗号化キーのタイプを選択できます。"
 
 #. Tag: term
-#: using-d-i.xml:2041
+#: using-d-i.xml:2077
 #, no-c-format
 msgid "Keyfile (GnuPG)"
 msgstr "Keyfile (GnuPG)"
 
 #. Tag: para
-#: using-d-i.xml:2042
+#: using-d-i.xml:2078
 #, no-c-format
 msgid ""
 "The encryption key will be generated from random data during the "
@@ -3290,19 +3390,19 @@ msgstr ""
 "は、適切なパスフレーズを入力する必要があります (後のプロセスで要求されます)。"
 
 #. Tag: para
-#: using-d-i.xml:2055
+#: using-d-i.xml:2091
 #, no-c-format
 msgid "Please see the section on random keys above."
 msgstr "前述の Random key の節をご覧ください。"
 
 #. Tag: para
-#: using-d-i.xml:2069
+#: using-d-i.xml:2105
 #, no-c-format
 msgid "Please see the the section on erasing data above."
 msgstr "前節の Erase data の節をご覧ください。"
 
 #. Tag: para
-#: using-d-i.xml:2078
+#: using-d-i.xml:2114
 #, no-c-format
 msgid ""
 "After you have selected the desired parameters for your encrypted "
@@ -3320,7 +3420,7 @@ msgstr ""
 "かかるでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:2088
+#: using-d-i.xml:2124
 #, no-c-format
 msgid ""
 "Next you will be asked to enter a passphrase for partitions configured to "
@@ -3335,7 +3435,7 @@ msgstr ""
 "前など) でないものです。"
 
 #. Tag: para
-#: using-d-i.xml:2097
+#: using-d-i.xml:2133
 #, no-c-format
 msgid ""
 "Before you input any passphrases, you should have made sure that your "
@@ -3358,7 +3458,7 @@ msgstr ""
 "トが有効でなかったのかもしれません。"
 
 #. Tag: para
-#: using-d-i.xml:2110
+#: using-d-i.xml:2146
 #, no-c-format
 msgid ""
 "If you selected to use methods other than a passphrase to create encryption "
@@ -3379,7 +3479,7 @@ msgstr ""
 "ます。暗号化するパーティションの数だけ繰り返します。"
 
 #. Tag: para
-#: using-d-i.xml:2126
+#: using-d-i.xml:2162
 #, no-c-format
 msgid ""
 "After returning to the main partitioning menu, you will see all encrypted "
@@ -3412,7 +3512,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:2139
+#: using-d-i.xml:2175
 #, no-c-format
 msgid ""
 "Pay attention to the identifiers in parentheses (<replaceable>sda2_crypt</"
@@ -3429,7 +3529,7 @@ msgstr ""
 "<xref linkend=\"mount-encrypted-volumes\"/> で扱います。"
 
 #. Tag: para
-#: using-d-i.xml:2149
+#: using-d-i.xml:2185
 #, no-c-format
 msgid ""
 "Once you are satisfied with the partitioning scheme, continue with the "
@@ -3437,13 +3537,13 @@ msgid ""
 msgstr "パーティション分割の内容に納得いったら、インストールに進んでください。"
 
 #. Tag: title
-#: using-d-i.xml:2160
+#: using-d-i.xml:2196
 #, no-c-format
 msgid "Installing the Base System"
 msgstr "基本システムのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2161
+#: using-d-i.xml:2197
 #, no-c-format
 msgid ""
 "Although this stage is the least problematic, it consumes a significant "
@@ -3456,7 +3556,7 @@ msgstr ""
 "接続しかなければ、ある程度時間がかかるかもしれません。"
 
 #. Tag: para
-#: using-d-i.xml:2174
+#: using-d-i.xml:2210
 #, no-c-format
 msgid ""
 "During installation of the base system, package unpacking and setup messages "
@@ -3472,7 +3572,7 @@ msgstr ""
 "keycap><keycap>F1</keycap></keycombo> を押してください。"
 
 #. Tag: para
-#: using-d-i.xml:2183
+#: using-d-i.xml:2219
 #, no-c-format
 msgid ""
 "The unpack/setup messages generated during this phase are also saved in "
@@ -3484,7 +3584,7 @@ msgstr ""
 "ます。"
 
 #. Tag: para
-#: using-d-i.xml:2189
+#: using-d-i.xml:2225
 #, no-c-format
 msgid ""
 "As part of the installation, a &arch-kernel; kernel will be installed. At "
@@ -3497,7 +3597,7 @@ msgstr ""
 "り低い優先度モードでは、利用可能なカーネルのリストから選ぶことができます。"
 
 #. Tag: para
-#: using-d-i.xml:2196
+#: using-d-i.xml:2232
 #, no-c-format
 msgid ""
 "When packages are installed using the package management system, it will by "
@@ -3514,7 +3614,7 @@ msgstr ""
 "同時に入っているべきパッケージです。"
 
 #. Tag: para
-#: using-d-i.xml:2206
+#: using-d-i.xml:2242
 #, no-c-format
 msgid ""
 "For technical reasons packages installed during the installation of the base "
@@ -3527,13 +3627,13 @@ msgstr ""
 "中のこの時点以降でのみ効力を発揮します。"
 
 #. Tag: title
-#: using-d-i.xml:2218
+#: using-d-i.xml:2254
 #, no-c-format
 msgid "Installing Additional Software"
 msgstr "追加ソフトウェアのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2219
+#: using-d-i.xml:2255
 #, no-c-format
 msgid ""
 "At this point you have a usable but limited system. Most users will want to "
@@ -3548,13 +3648,13 @@ msgstr ""
 "す。"
 
 #. Tag: title
-#: using-d-i.xml:2234
+#: using-d-i.xml:2270
 #, no-c-format
 msgid "Configuring apt"
 msgstr "apt の設定"
 
 #. Tag: para
-#: using-d-i.xml:2236
+#: using-d-i.xml:2272
 #, no-c-format
 msgid ""
 "One of the tools used to install packages on a &debian-gnu; system is a "
@@ -3589,7 +3689,7 @@ msgstr ""
 "理の推奨ユーティリティです。"
 
 #. Tag: para
-#: using-d-i.xml:2260
+#: using-d-i.xml:2296
 #, no-c-format
 msgid ""
 "<command>apt</command> must be configured so that it knows from where to "
@@ -3603,7 +3703,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:2267
+#: using-d-i.xml:2303
 #, no-c-format
 msgid ""
 "If you are installing at default priority, the installer will largely take "
@@ -3620,7 +3720,7 @@ msgstr ""
 "ミラーを追加します。"
 
 #. Tag: para
-#: using-d-i.xml:2276
+#: using-d-i.xml:2312
 #, no-c-format
 msgid ""
 "If you are installing at a lower priority (e.g. in expert mode), you will be "
@@ -3635,13 +3735,13 @@ msgstr ""
 "の有無を選べます。"
 
 #. Tag: title
-#: using-d-i.xml:2287
+#: using-d-i.xml:2323
 #, no-c-format
 msgid "Installing from more than one CD or DVD"
 msgstr "2 枚以上の CD/DVD でのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2289
+#: using-d-i.xml:2325
 #, no-c-format
 msgid ""
 "If you are installing from a CD or a DVD that is part of a larger set, the "
@@ -3654,7 +3754,7 @@ msgstr ""
 "ケージをインストールするため、スキャンしたくなると思います。"
 
 #. Tag: para
-#: using-d-i.xml:2296
+#: using-d-i.xml:2332
 #, no-c-format
 msgid ""
 "If you do not have any additional CDs or DVDs, that is no problem: using "
@@ -3668,7 +3768,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:2304
+#: using-d-i.xml:2340
 #, no-c-format
 msgid ""
 "Packages are included on CDs (and DVDs) in the order of their popularity. "
@@ -3681,7 +3781,7 @@ msgstr ""
 "後の CD に入っているパッケージを使用することになります。"
 
 #. Tag: para
-#: using-d-i.xml:2311
+#: using-d-i.xml:2347
 #, no-c-format
 msgid ""
 "It also means that buying or downloading and burning a full CD set is just a "
@@ -3698,7 +3798,7 @@ msgstr ""
 "のをカバーできるでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:2320
+#: using-d-i.xml:2356
 #, no-c-format
 msgid ""
 "A good rule of thumb is that for a regular desktop installation (using the "
@@ -3712,7 +3812,7 @@ msgstr ""
 "環境をすべてカバーしています。"
 
 #. Tag: para
-#: using-d-i.xml:2328
+#: using-d-i.xml:2364
 #, no-c-format
 msgid ""
 "If you do scan multiple CDs or DVDs, the installer will prompt you to "
@@ -3729,13 +3829,13 @@ msgstr ""
 "低くなります。"
 
 #. Tag: title
-#: using-d-i.xml:2341
+#: using-d-i.xml:2377
 #, no-c-format
 msgid "Using a network mirror"
 msgstr "ネットワークミラーの利用"
 
 #. Tag: para
-#: using-d-i.xml:2343
+#: using-d-i.xml:2379
 #, no-c-format
 msgid ""
 "One question that will be asked during most installs is whether or not to "
@@ -3747,7 +3847,7 @@ msgstr ""
 "が、中には例外もあります。"
 
 #. Tag: para
-#: using-d-i.xml:2349
+#: using-d-i.xml:2385
 #, no-c-format
 msgid ""
 "If you are <emphasis>not</emphasis> installing from a full CD or DVD or "
@@ -3764,7 +3864,7 @@ msgstr ""
 "literal> タスクを選択<emphasis>しない</emphasis>のが最善でしょう"
 
 #. Tag: para
-#: using-d-i.xml:2358
+#: using-d-i.xml:2394
 #, no-c-format
 msgid ""
 "If you are installing from a single full CD or using a full CD image, using "
@@ -3783,7 +3883,7 @@ msgstr ""
 "インストールは、(新しいシステムで起動した後など) 後で行うのがよいでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:2369
+#: using-d-i.xml:2405
 #, no-c-format
 msgid ""
 "If you are installing from a DVD or using a DVD image, any packages needed "
@@ -3797,7 +3897,7 @@ msgstr ""
 "ションとなります。"
 
 #. Tag: para
-#: using-d-i.xml:2376
+#: using-d-i.xml:2412
 #, no-c-format
 msgid ""
 "One advantage of adding a network mirror is that updates that have occurred "
@@ -3812,7 +3912,7 @@ msgstr ""
 "延ばすことができます。"
 
 #. Tag: para
-#: using-d-i.xml:2383
+#: using-d-i.xml:2419
 #, no-c-format
 msgid ""
 "In summary: selecting a network mirror is generally a good idea, except if "
@@ -3827,26 +3927,26 @@ msgstr ""
 "のダウンロードするデータ量は、以下に依存します。"
 
 #. Tag: para
-#: using-d-i.xml:2392
+#: using-d-i.xml:2428
 #, no-c-format
 msgid "the tasks you select in the next step of the installation,"
 msgstr "インストールの次のステップで選択するタスク。"
 
 #. Tag: para
-#: using-d-i.xml:2397
+#: using-d-i.xml:2433
 #, no-c-format
 msgid "which packages are needed for those tasks,"
 msgstr "どのパッケージがそのタスクに必要か。"
 
 #. Tag: para
-#: using-d-i.xml:2402
+#: using-d-i.xml:2438
 #, no-c-format
 msgid ""
 "which of those packages are present on the CDs or DVDs you have scanned, and"
 msgstr "そのパッケージがスキャンした CD や DVD に収録されているかどうか。"
 
 #. Tag: para
-#: using-d-i.xml:2407
+#: using-d-i.xml:2443
 #, no-c-format
 msgid ""
 "whether any updated versions of packages included on the CDs or DVDs are "
@@ -3858,7 +3958,7 @@ msgstr ""
 "意されているかどうか。"
 
 #. Tag: para
-#: using-d-i.xml:2416
+#: using-d-i.xml:2452
 #, no-c-format
 msgid ""
 "Note that the last point means that, even if you choose not to use a network "
@@ -3872,13 +3972,13 @@ msgstr ""
 "ください。"
 
 #. Tag: title
-#: using-d-i.xml:2432
+#: using-d-i.xml:2468
 #, no-c-format
 msgid "Selecting and Installing Software"
 msgstr "ソフトウェアの選択・インストール"
 
 #. Tag: para
-#: using-d-i.xml:2434
+#: using-d-i.xml:2470
 #, no-c-format
 msgid ""
 "During the installation process, you are given the opportunity to select "
@@ -3895,7 +3995,7 @@ msgstr ""
 "集中します。"
 
 #. Tag: para
-#: using-d-i.xml:2443
+#: using-d-i.xml:2479
 #, no-c-format
 msgid ""
 "So, you have the ability to choose <emphasis>tasks</emphasis> first, and "
@@ -3928,7 +4028,7 @@ msgstr ""
 "必要容量一覧があります。"
 
 #. Tag: para
-#: using-d-i.xml:2470
+#: using-d-i.xml:2506
 #, no-c-format
 msgid ""
 "Some tasks may be pre-selected based on the characteristics of the computer "
@@ -3940,7 +4040,7 @@ msgstr ""
 "選択をはずせます。全くタスクを選ばないようにもできます。"
 
 #. Tag: para
-#: using-d-i.xml:2477
+#: using-d-i.xml:2513
 #, no-c-format
 msgid ""
 "In the standard user interface of the installer, you can use the space bar "
@@ -3950,7 +4050,7 @@ msgstr ""
 "グルできます。"
 
 #. Tag: para
-#: using-d-i.xml:2483
+#: using-d-i.xml:2519
 #, no-c-format
 msgid ""
 "Unless you are using the special KDE or Xfce/LXDE CDs, the <quote>Desktop "
@@ -3960,7 +4060,7 @@ msgstr ""
 "環境</quote> タスクは、GNOME デスクトップ環境をインストールします。"
 
 #. Tag: para
-#: using-d-i.xml:2488
+#: using-d-i.xml:2524
 #, no-c-format
 msgid ""
 "It is not possible to interactively select a different desktop during the "
@@ -3981,7 +4081,7 @@ msgstr ""
 "もっと軽量な Xfce デスクトップ環境や LXDE デスクトップ環境を選択できます。"
 
 #. Tag: para
-#: using-d-i.xml:2499
+#: using-d-i.xml:2535
 #, no-c-format
 msgid ""
 "Some CD images (businesscard, netinst and DVD) also allow selection of the "
@@ -3995,7 +4095,7 @@ msgstr ""
 "environments</quote> を探してください。"
 
 #. Tag: para
-#: using-d-i.xml:2506
+#: using-d-i.xml:2542
 #, no-c-format
 msgid ""
 "Note that this will only work if the packages needed for the desired desktop "
@@ -4012,7 +4112,7 @@ msgstr ""
 "ストールがうまくいくでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:2516
+#: using-d-i.xml:2552
 #, no-c-format
 msgid ""
 "The various server tasks will install software roughly as follows. DNS "
@@ -4032,7 +4132,7 @@ msgstr ""
 "classname>。"
 
 #. Tag: para
-#: using-d-i.xml:2527
+#: using-d-i.xml:2563
 #, no-c-format
 msgid ""
 "The <quote>Standard system</quote> task will install any package that has a "
@@ -4048,7 +4148,7 @@ msgstr ""
 "にしてください。"
 
 #. Tag: para
-#: using-d-i.xml:2535
+#: using-d-i.xml:2571
 #, no-c-format
 msgid ""
 "If during language selection a default locale other than the <quote>C</"
@@ -4067,7 +4167,7 @@ msgstr ""
 "ルします。"
 
 #. Tag: para
-#: using-d-i.xml:2545
+#: using-d-i.xml:2581
 #, no-c-format
 msgid ""
 "Once you've selected your tasks, select &BTN-CONT;. At this point, "
@@ -4081,7 +4181,7 @@ msgstr ""
 "ます。"
 
 #. Tag: para
-#: using-d-i.xml:2552
+#: using-d-i.xml:2588
 #, no-c-format
 msgid ""
 "You should be aware that especially the Desktop task is very large. "
@@ -4098,7 +4198,7 @@ msgstr ""
 "ンストールを始めたら、キャンセルするオプションはありません。"
 
 #. Tag: para
-#: using-d-i.xml:2561
+#: using-d-i.xml:2597
 #, no-c-format
 msgid ""
 "Even when packages are included on the CD-ROM, the installer may still "
@@ -4115,13 +4215,13 @@ msgstr ""
 "メージを使用していると、こういったことが起こり得ます。"
 
 #. Tag: title
-#: using-d-i.xml:2576
+#: using-d-i.xml:2612
 #, no-c-format
 msgid "Making Your System Bootable"
 msgstr "システムを起動可能に"
 
 #. Tag: para
-#: using-d-i.xml:2578
+#: using-d-i.xml:2614
 #, no-c-format
 msgid ""
 "If you are installing a diskless workstation, obviously, booting off the "
@@ -4136,13 +4236,13 @@ msgstr ""
 "ください。</phrase>"
 
 #. Tag: title
-#: using-d-i.xml:2593
+#: using-d-i.xml:2629
 #, no-c-format
 msgid "Detecting other operating systems"
 msgstr "他 OS の検出"
 
 #. Tag: para
-#: using-d-i.xml:2595
+#: using-d-i.xml:2631
 #, no-c-format
 msgid ""
 "Before a boot loader is installed, the installer will attempt to probe for "
@@ -4157,7 +4257,7 @@ msgstr ""
 "できるように、このコンピュータを設定します。"
 
 #. Tag: para
-#: using-d-i.xml:2603
+#: using-d-i.xml:2639
 #, no-c-format
 msgid ""
 "Note that multiple operating systems booting on a single machine is still "
@@ -4172,13 +4272,13 @@ msgstr ""
 "す。作動しない場合は、詳細についてブートマネージャの文書を調べるべきです。"
 
 #. Tag: title
-#: using-d-i.xml:2621
+#: using-d-i.xml:2657
 #, no-c-format
 msgid "<command>palo</command>-installer"
 msgstr "<command>palo</command> インストーラ"
 
 #. Tag: para
-#: using-d-i.xml:2622
+#: using-d-i.xml:2658
 #, no-c-format
 msgid ""
 "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is "
@@ -4194,19 +4294,19 @@ msgstr ""
 "Linux パーティションを読むことができるからです。"
 
 #. Tag: para
-#: using-d-i.xml:2631
+#: using-d-i.xml:2667
 #, no-c-format
 msgid "hppa FIXME ( need more info )"
 msgstr "hppa FIXME ( もっと情報が必要 )"
 
 #. Tag: title
-#: using-d-i.xml:2643
+#: using-d-i.xml:2679
 #, no-c-format
 msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
 msgstr "ハードディスクへの <command>Grub</command> ブートローダのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2645
+#: using-d-i.xml:2681
 #, no-c-format
 msgid ""
 "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a "
@@ -4218,7 +4318,7 @@ msgstr ""
 "選んでおけばよいでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:2651
+#: using-d-i.xml:2687
 #, no-c-format
 msgid ""
 "By default, grub will be installed into the Master Boot Record (MBR), where "
@@ -4231,7 +4331,7 @@ msgstr ""
 "さい。"
 
 #. Tag: para
-#: using-d-i.xml:2657
+#: using-d-i.xml:2693
 #, no-c-format
 msgid ""
 "If you do not want to install grub, use the &BTN-GOBACK; button to get to "
@@ -4242,13 +4342,13 @@ msgstr ""
 "てください。そしてそこから、使用したいブートローダを選択してください。"
 
 #. Tag: title
-#: using-d-i.xml:2670
+#: using-d-i.xml:2706
 #, no-c-format
 msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
 msgstr "ハードディスクへの <command>LILO</command> ブートローダのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2672
+#: using-d-i.xml:2708
 #, no-c-format
 msgid ""
 "The second &architecture; boot loader is called <quote>LILO</quote>. It is "
@@ -4264,7 +4364,7 @@ msgstr ""
 "\">LILO mini-HOWTO</ulink> もご覧ください。"
 
 #. Tag: para
-#: using-d-i.xml:2682
+#: using-d-i.xml:2718
 #, no-c-format
 msgid ""
 "Currently the LILO installation will only create menu entries for other "
@@ -4278,7 +4378,7 @@ msgstr ""
 "ません。"
 
 #. Tag: para
-#: using-d-i.xml:2690
+#: using-d-i.xml:2726
 #, no-c-format
 msgid ""
 "&d-i; offers you three choices on where to install the <command>LILO</"
@@ -4288,13 +4388,13 @@ msgstr ""
 "提示します。"
 
 #. Tag: term
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid "Master Boot Record (MBR)"
 msgstr "Master Boot Record (MBR)"
 
 #. Tag: para
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid ""
 "This way the <command>LILO</command> will take complete control of the boot "
@@ -4304,13 +4404,13 @@ msgstr ""
 "す。"
 
 #. Tag: term
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, no-c-format
 msgid "new &debian; partition"
 msgstr "new &debian; partition"
 
 #. Tag: para
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, no-c-format
 msgid ""
 "Choose this if you want to use another boot manager. <command>LILO</command> "
@@ -4322,13 +4422,13 @@ msgstr ""
 "インストールし、第 2 のブートローダとして動作します。"
 
 #. Tag: term
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid "Other choice"
 msgstr "Other choice"
 
 #. Tag: para
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid ""
 "Useful for advanced users who want to install <command>LILO</command> "
@@ -4344,7 +4444,7 @@ msgstr ""
 "<phrase condition=\"lenny\">従来の名前を</phrase>使用できます。"
 
 #. Tag: para
-#: using-d-i.xml:2723
+#: using-d-i.xml:2759
 #, no-c-format
 msgid ""
 "If you can no longer boot into Windows 9x (or DOS) after this step, you'll "
@@ -4360,13 +4460,13 @@ msgstr ""
 "る、ということを意味します!"
 
 #. Tag: title
-#: using-d-i.xml:2739
+#: using-d-i.xml:2775
 #, no-c-format
 msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr "ハードディスクへの <command>ELILO</command> ブートローダのインストール"
 
 #. Tag: para
-#: using-d-i.xml:2741
+#: using-d-i.xml:2777
 #, no-c-format
 msgid ""
 "The &architecture; boot loader is called <quote>elilo</quote>. It is modeled "
@@ -4394,7 +4494,7 @@ msgstr ""
 "Boot Manager</quote> により実際に実行されます。"
 
 #. Tag: para
-#: using-d-i.xml:2757
+#: using-d-i.xml:2793
 #, no-c-format
 msgid ""
 "The <quote>elilo</quote> configuration and installation is done as the last "
@@ -4411,13 +4511,13 @@ msgstr ""
 "システムがあるディスクのパーティションを選択します。"
 
 #. Tag: title
-#: using-d-i.xml:2769
+#: using-d-i.xml:2805
 #, no-c-format
 msgid "Choose the correct partition!"
 msgstr "正しいパーティションを選択してください!"
 
 #. Tag: para
-#: using-d-i.xml:2771
+#: using-d-i.xml:2807
 #, fuzzy, no-c-format
 #| msgid ""
 #| "The criteria for selecting a partition is that it is FAT format "
@@ -4442,13 +4542,13 @@ msgstr ""
 "トして、以前の内容をすべて消去するかもしれないことを覚えておいてください!"
 
 #. Tag: title
-#: using-d-i.xml:2786
+#: using-d-i.xml:2822
 #, no-c-format
 msgid "EFI Partition Contents"
 msgstr "EFI パーティションの内容"
 
 #. Tag: para
-#: using-d-i.xml:2788
+#: using-d-i.xml:2824
 #, no-c-format
 msgid ""
 "The EFI partition is a FAT filesystem format partition on one of the hard "
@@ -4478,13 +4578,13 @@ msgstr ""
 "のファイルシステムにその他のファイルがあるかもしれません。"
 
 #. Tag: filename
-#: using-d-i.xml:2810
+#: using-d-i.xml:2846
 #, no-c-format
 msgid "elilo.conf"
 msgstr "elilo.conf"
 
 #. Tag: para
-#: using-d-i.xml:2811
+#: using-d-i.xml:2847
 #, no-c-format
 msgid ""
 "This is the configuration file read by the boot loader when it starts. It is "
@@ -4496,13 +4596,13 @@ msgstr ""
 "ピーです。"
 
 #. Tag: filename
-#: using-d-i.xml:2820
+#: using-d-i.xml:2856
 #, no-c-format
 msgid "elilo.efi"
 msgstr "elilo.efi"
 
 #. Tag: para
-#: using-d-i.xml:2821
+#: using-d-i.xml:2857
 #, no-c-format
 msgid ""
 "This is the boot loader program that the <quote>EFI Boot Manager</quote> "
@@ -4515,13 +4615,13 @@ msgstr ""
 "<guimenuitem>&debian; GNU/Linux</guimenuitem> を選択するとこれが起動します。"
 
 #. Tag: filename
-#: using-d-i.xml:2831
+#: using-d-i.xml:2867
 #, no-c-format
 msgid "initrd.img"
 msgstr "initrd.img"
 
 #. Tag: para
-#: using-d-i.xml:2832
+#: using-d-i.xml:2868
 #, no-c-format
 msgid ""
 "This is the initial root filesystem used to boot the kernel. It is a copy of "
@@ -4535,13 +4635,13 @@ msgstr ""
 "filename> で指し示す <filename>/boot</filename> にあるファイルです。"
 
 #. Tag: filename
-#: using-d-i.xml:2844
+#: using-d-i.xml:2880
 #, no-c-format
 msgid "readme.txt"
 msgstr "readme.txt"
 
 #. Tag: para
-#: using-d-i.xml:2845
+#: using-d-i.xml:2881
 #, no-c-format
 msgid ""
 "This is a small text file warning you that the contents of the directory are "
@@ -4553,13 +4653,13 @@ msgstr ""
 "する小さなテキストファイルです。"
 
 #. Tag: filename
-#: using-d-i.xml:2855
+#: using-d-i.xml:2891
 #, no-c-format
 msgid "vmlinuz"
 msgstr "vmlinuz"
 
 #. Tag: para
-#: using-d-i.xml:2856
+#: using-d-i.xml:2892
 #, no-c-format
 msgid ""
 "This is the compressed kernel itself. It is a copy of the file referenced in "
@@ -4573,13 +4673,13 @@ msgstr ""
 "るファイルです。"
 
 #. Tag: title
-#: using-d-i.xml:2876
+#: using-d-i.xml:2912
 #, no-c-format
 msgid "<command>arcboot</command>-installer"
 msgstr "<command>arcboot</command>-installer"
 
 #. Tag: para
-#: using-d-i.xml:2877
+#: using-d-i.xml:2913
 #, no-c-format
 msgid ""
 "The boot loader on SGI machines is <command>arcboot</command>. It has to be "
@@ -4623,13 +4723,13 @@ msgstr ""
 "い。"
 
 #. Tag: replaceable
-#: using-d-i.xml:2896
+#: using-d-i.xml:2932
 #, no-c-format
 msgid "scsi"
 msgstr "scsi"
 
 #. Tag: para
-#: using-d-i.xml:2897
+#: using-d-i.xml:2933
 #, no-c-format
 msgid ""
 "is the SCSI bus to be booted from, this is <userinput>0</userinput> for the "
@@ -4639,13 +4739,13 @@ msgstr ""
 "となる。"
 
 #. Tag: replaceable
-#: using-d-i.xml:2905
+#: using-d-i.xml:2941
 #, no-c-format
 msgid "disk"
 msgstr "disk"
 
 #. Tag: para
-#: using-d-i.xml:2906
+#: using-d-i.xml:2942
 #, no-c-format
 msgid ""
 "is the SCSI ID of the hard disk on which <command>arcboot</command> is "
@@ -4655,13 +4755,13 @@ msgstr ""
 "す。"
 
 #. Tag: replaceable
-#: using-d-i.xml:2914
+#: using-d-i.xml:2950
 #, no-c-format
 msgid "partnr"
 msgstr "partnr"
 
 #. Tag: para
-#: using-d-i.xml:2915
+#: using-d-i.xml:2951
 #, no-c-format
 msgid ""
 "is the number of the partition on which <filename>/etc/arcboot.conf</"
@@ -4670,13 +4770,13 @@ msgstr ""
 "<filename>/etc/arcboot.conf</filename> があるパーティションの番号を表す。"
 
 #. Tag: replaceable
-#: using-d-i.xml:2923
+#: using-d-i.xml:2959
 #, no-c-format
 msgid "config"
 msgstr "config"
 
 #. Tag: para
-#: using-d-i.xml:2924
+#: using-d-i.xml:2960
 #, no-c-format
 msgid ""
 "is the name of the configuration entry in <filename>/etc/arcboot.conf</"
@@ -4686,13 +4786,13 @@ msgstr ""
 "は <quote>linux</quote> である。"
 
 #. Tag: title
-#: using-d-i.xml:2945
+#: using-d-i.xml:2981
 #, no-c-format
 msgid "Install <command>Yaboot</command> on a Hard Disk"
 msgstr "ハードディスクへの <command>Yaboot</command> のインストール"
 
 #. Tag: para
-#: using-d-i.xml:2946
+#: using-d-i.xml:2982
 #, no-c-format
 msgid ""
 "Newer (mid 1998 and on) PowerMacs use <command>yaboot</command> as their "
@@ -4712,13 +4812,13 @@ msgstr ""
 "が &debian-gnu; を起動できるように設定されています。"
 
 #. Tag: title
-#: using-d-i.xml:2964
+#: using-d-i.xml:3000
 #, no-c-format
 msgid "Install <command>Quik</command> on a Hard Disk"
 msgstr "ハードディスクへの <command>Quik</command> のインストール"
 
 #. Tag: para
-#: using-d-i.xml:2965
+#: using-d-i.xml:3001
 #, no-c-format
 msgid ""
 "The boot loader for OldWorld Power Macintosh machines is <command>quik</"
@@ -4732,13 +4832,13 @@ msgstr ""
 "Powermac や Power Computing のクローンで動作することが知られています。"
 
 #. Tag: title
-#: using-d-i.xml:2981
+#: using-d-i.xml:3017
 #, no-c-format
 msgid "<command>zipl</command>-installer"
 msgstr "<command>zipl</command> インストーラ"
 
 #. Tag: para
-#: using-d-i.xml:2982
+#: using-d-i.xml:3018
 #, no-c-format
 msgid ""
 "The boot loader on &arch-title; is <quote>zipl</quote>. <command>ZIPL</"
@@ -4754,13 +4854,13 @@ msgstr ""
 "and Installation Commands</quote> を見てください。"
 
 #. Tag: title
-#: using-d-i.xml:2999
+#: using-d-i.xml:3035
 #, no-c-format
 msgid "Install the <command>SILO</command> Boot Loader on a Hard Disk"
 msgstr "ハードディスクへの <command>SILO</command> ブートローダのインストール"
 
 #. Tag: para
-#: using-d-i.xml:3001
+#: using-d-i.xml:3037
 #, no-c-format
 msgid ""
 "The standard &architecture; boot loader is called <quote>silo</quote>. It is "
@@ -4790,13 +4890,13 @@ msgstr ""
 "Solaris と一緒に GNU/Linux をインストールするのなら、これが便利です。"
 
 #. Tag: title
-#: using-d-i.xml:3026
+#: using-d-i.xml:3062
 #, no-c-format
 msgid "Continue Without Boot Loader"
 msgstr "ブートローダなしで継続"
 
 #. Tag: para
-#: using-d-i.xml:3028
+#: using-d-i.xml:3064
 #, no-c-format
 msgid ""
 "This option can be used to complete the installation even when no boot "
@@ -4809,7 +4909,7 @@ msgstr ""
 "るのに利用できます。"
 
 #. Tag: para
-#: using-d-i.xml:3035
+#: using-d-i.xml:3071
 #, no-c-format
 msgid ""
 "If you plan to manually configure your bootloader, you should check the name "
@@ -4831,13 +4931,13 @@ msgstr ""
 "す。"
 
 #. Tag: title
-#: using-d-i.xml:3052
+#: using-d-i.xml:3088
 #, no-c-format
 msgid "Finishing the Installation"
 msgstr "インストールの完了"
 
 #. Tag: para
-#: using-d-i.xml:3053
+#: using-d-i.xml:3089
 #, no-c-format
 msgid ""
 "This is the last step in the &debian; installation process during which the "
@@ -4848,13 +4948,13 @@ msgstr ""
 "最終段階です。ほとんどが &d-i; の後片付けです。"
 
 #. Tag: title
-#: using-d-i.xml:3066
+#: using-d-i.xml:3102
 #, no-c-format
 msgid "Setting the System Clock"
 msgstr "システム時計の設定"
 
 #. Tag: para
-#: using-d-i.xml:3068
+#: using-d-i.xml:3104
 #, no-c-format
 msgid ""
 "The installer may ask you if the computer's clock is set to UTC. Normally "
@@ -4867,7 +4967,7 @@ msgstr ""
 "れているかどうか、といったことから UTC を基準にするかどうかを判断します。"
 
 #. Tag: para
-#: using-d-i.xml:3075
+#: using-d-i.xml:3111
 #, no-c-format
 msgid ""
 "In expert mode you will always be able to choose whether or not the clock is "
@@ -4885,7 +4985,7 @@ msgstr ""
 "地時間を選択してください。</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:3086
+#: using-d-i.xml:3122
 #, no-c-format
 msgid ""
 "At this point &d-i; will also attempt to save the current time to the "
@@ -4896,13 +4996,13 @@ msgstr ""
 "す。先ほどの選択により、UTC か現地時間のどちらかで保存します。"
 
 #. Tag: title
-#: using-d-i.xml:3101
+#: using-d-i.xml:3137
 #, no-c-format
 msgid "Reboot the System"
 msgstr "システムの再起動"
 
 #. Tag: para
-#: using-d-i.xml:3103
+#: using-d-i.xml:3139
 #, no-c-format
 msgid ""
 "You will be prompted to remove the boot media (CD, floppy, etc) that you "
@@ -4913,7 +5013,7 @@ msgstr ""
 "促されます。システムはこの後、新しい &debian; システムで再起動します。"
 
 #. Tag: para
-#: using-d-i.xml:3109
+#: using-d-i.xml:3145
 #, no-c-format
 msgid ""
 "After a final prompt the system will be halted because rebooting is not "
@@ -4926,13 +5026,13 @@ msgstr ""
 "イルシステムとして選択した DASD から GNU/Linux を IPL してください。"
 
 #. Tag: title
-#: using-d-i.xml:3122
+#: using-d-i.xml:3158
 #, no-c-format
-msgid "Miscellaneous"
-msgstr "その他"
+msgid "Troubleshooting"
+msgstr "トラブルシューティング"
 
 #. Tag: para
-#: using-d-i.xml:3123
+#: using-d-i.xml:3159
 #, no-c-format
 msgid ""
 "The components listed in this section are usually not involved in the "
@@ -4943,13 +5043,13 @@ msgstr ""
 "うまく行かない時に、ユーザの助けになるようバックグラウンドで待っています。"
 
 #. Tag: title
-#: using-d-i.xml:3136
+#: using-d-i.xml:3172
 #, no-c-format
 msgid "Saving the installation logs"
 msgstr "インストールログの保存"
 
 #. Tag: para
-#: using-d-i.xml:3138
+#: using-d-i.xml:3174
 #, no-c-format
 msgid ""
 "If the installation is successful, the logfiles created during the "
@@ -4961,7 +5061,7 @@ msgstr ""
 "れています。"
 
 #. Tag: para
-#: using-d-i.xml:3145
+#: using-d-i.xml:3181
 #, no-c-format
 msgid ""
 "Choosing <guimenuitem>Save debug logs</guimenuitem> from the main menu "
@@ -4977,13 +5077,13 @@ msgstr ""
 "したいときに便利です。"
 
 #. Tag: title
-#: using-d-i.xml:3165
+#: using-d-i.xml:3201
 #, no-c-format
 msgid "Using the Shell and Viewing the Logs"
 msgstr "シェルの使用とログの参照"
 
 #. Tag: para
-#: using-d-i.xml:3167
+#: using-d-i.xml:3203
 #, no-c-format
 msgid ""
 "There are several methods you can use to get a shell while running an "
@@ -5008,14 +5108,14 @@ msgstr ""
 "keycombo> でインストーラ自体に戻ってください。"
 
 #. Tag: para
-#: using-d-i.xml:3185
+#: using-d-i.xml:3221
 #, no-c-format
 msgid "For the graphical installer see also <xref linkend=\"gtk-using\"/>."
 msgstr ""
 "グラフィカルインストーラでは、<xref linkend=\"gtk-using\"/> もご覧ください。"
 
 #. Tag: para
-#: using-d-i.xml:3189
+#: using-d-i.xml:3225
 #, no-c-format
 msgid ""
 "If you cannot switch consoles, there is also an <guimenuitem>Execute a "
@@ -5030,7 +5130,7 @@ msgstr ""
 "userinput> と入力すると、シェルを終了してインストーラに戻ります。"
 
 #. Tag: para
-#: using-d-i.xml:3197
+#: using-d-i.xml:3233
 #, no-c-format
 msgid ""
 "At this point you are booted from the RAM disk, and there is a limited set "
@@ -5048,7 +5148,7 @@ msgstr ""
 "す。"
 
 #. Tag: para
-#: using-d-i.xml:3206
+#: using-d-i.xml:3242
 #, no-c-format
 msgid ""
 "To edit and view files, use the text editor <command>nano</command>. Log "
@@ -5060,7 +5160,7 @@ msgstr ""
 "log</filename> ディレクトリにあります。"
 
 #. Tag: para
-#: using-d-i.xml:3213
+#: using-d-i.xml:3249
 #, no-c-format
 msgid ""
 "Although you can do basically anything in a shell that the available "
@@ -5072,7 +5172,7 @@ msgstr ""
 "しかありません。"
 
 #. Tag: para
-#: using-d-i.xml:3219
+#: using-d-i.xml:3255
 #, no-c-format
 msgid ""
 "Doing things manually from the shell may interfere with the installation "
@@ -5085,13 +5185,13 @@ msgstr ""
 "swap を有効にするようにし、シェルから手動で行わないようにしましょう。"
 
 #. Tag: title
-#: using-d-i.xml:3234
+#: using-d-i.xml:3271
 #, no-c-format
 msgid "Installation Over the Network"
 msgstr "ネットワーク越しのインストール"
 
 #. Tag: para
-#: using-d-i.xml:3236
+#: using-d-i.xml:3273
 #, no-c-format
 msgid ""
 "One of the more interesting components is <firstterm>network-console</"
@@ -5108,7 +5208,7 @@ msgstr ""
 "この部分は <xref linkend=\"automatic-install\"/> で自動化できます)"
 
 #. Tag: para
-#: using-d-i.xml:3246
+#: using-d-i.xml:3283
 #, no-c-format
 msgid ""
 "This component is not loaded into the main installation menu by default, so "
@@ -5130,7 +5230,7 @@ msgstr ""
 "ばれる新しいメニュー項目が表示されます。"
 
 #. Tag: para
-#: using-d-i.xml:3259
+#: using-d-i.xml:3296
 #, no-c-format
 msgid ""
 "For installations on &arch-title;, this is the default method after setting "
@@ -5140,7 +5240,7 @@ msgstr ""
 "法です。"
 
 #. Tag: para
-#: using-d-i.xml:3264
+#: using-d-i.xml:3301
 #, no-c-format
 msgid ""
 "<phrase arch=\"not-s390\">After selecting this new entry, you</phrase> "
@@ -5161,7 +5261,7 @@ msgstr ""
 "全に転送する必要があります。"
 
 #. Tag: para
-#: using-d-i.xml:3276
+#: using-d-i.xml:3313
 #, no-c-format
 msgid ""
 "Should you decide to continue with the installation locally, you can always "
@@ -5172,7 +5272,7 @@ msgstr ""
 "メニューに戻ります。そこで別のコンポーネントを選択してください。"
 
 #. Tag: para
-#: using-d-i.xml:3282
+#: using-d-i.xml:3319
 #, no-c-format
 msgid ""
 "Now let's switch to the other side of the wire. As a prerequisite, you need "
@@ -5203,7 +5303,7 @@ msgstr ""
 "認してください。"
 
 #. Tag: para
-#: using-d-i.xml:3299
+#: using-d-i.xml:3336
 #, no-c-format
 msgid ""
 "The <command>ssh</command> server in the installer uses a default "
@@ -5226,7 +5326,7 @@ msgstr ""
 "により、再接続後にインストールを再開できるかどうかが決まるでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:3312
+#: using-d-i.xml:3349
 #, no-c-format
 msgid ""
 "You may be able to avoid the connection being dropped by adding the option "
@@ -5248,7 +5348,7 @@ msgstr ""
 "用は必要最小限にするべきです。"
 
 #. Tag: para
-#: using-d-i.xml:3325
+#: using-d-i.xml:3362
 #, no-c-format
 msgid ""
 "If you install several computers in turn and they happen to have the same IP "
@@ -5271,7 +5371,7 @@ msgstr ""
 "もう一度行う必要があります。"
 
 #. Tag: para
-#: using-d-i.xml:3341
+#: using-d-i.xml:3378
 #, no-c-format
 msgid ""
 "After the login you will be presented with an initial screen where you have "
@@ -5290,7 +5390,7 @@ msgstr ""
 "べきですが、シェル用には複数のセッションを起動できます。"
 
 #. Tag: para
-#: using-d-i.xml:3351
+#: using-d-i.xml:3388
 #, no-c-format
 msgid ""
 "After you have started the installation remotely over SSH, you should not go "
@@ -5305,13 +5405,13 @@ msgstr ""
 "インストールしたシステムに何か問題が発生するかもしれません。"
 
 #. Tag: title
-#: using-d-i.xml:3371
+#: using-d-i.xml:3407
 #, no-c-format
 msgid "Loading Missing Firmware"
 msgstr "見つからないファームウェアの読み込み"
 
 #. Tag: para
-#: using-d-i.xml:3372
+#: using-d-i.xml:3408
 #, no-c-format
 msgid ""
 "As described in <xref linkend=\"hardware-firmware\"/>, some devices require "
@@ -5326,7 +5426,7 @@ msgstr ""
 "が必要になります。"
 
 #. Tag: para
-#: using-d-i.xml:3380
+#: using-d-i.xml:3416
 #, no-c-format
 msgid ""
 "If a device driver requests firmware that is not available, &d-i; will "
@@ -5344,7 +5444,7 @@ msgstr ""
 "ジュールを再読込します。"
 
 #. Tag: para
-#: using-d-i.xml:3390
+#: using-d-i.xml:3426
 #, no-c-format
 msgid ""
 "Which devices are scanned and which file systems are supported depends on "
@@ -5362,7 +5462,7 @@ msgstr ""
 "す。</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:3400
+#: using-d-i.xml:3436
 #, no-c-format
 msgid ""
 "Note that it is possible to skip loading the firmware if you know the device "
@@ -5374,7 +5474,7 @@ msgstr ""
 "にご注意ください。"
 
 #. Tag: para
-#: using-d-i.xml:3407
+#: using-d-i.xml:3443
 #, no-c-format
 msgid ""
 "Support for loading firmware is still relatively basic and is likely to be "
@@ -5390,13 +5490,13 @@ msgstr ""
 "(<xref linkend=\"submit-bug\"/> 参照) としてご報告ください。"
 
 #. Tag: title
-#: using-d-i.xml:3418
+#: using-d-i.xml:3454
 #, no-c-format
 msgid "Preparing a medium"
 msgstr "メディアの準備"
 
 #. Tag: para
-#: using-d-i.xml:3419
+#: using-d-i.xml:3455
 #, no-c-format
 msgid ""
 "Although in some cases the firmware can also be loaded from a partition on a "
@@ -5416,7 +5516,7 @@ msgstr ""
 "されている、FAT を使用するのをお勧めします。"
 
 #. Tag: para
-#: using-d-i.xml:3429
+#: using-d-i.xml:3465
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Tarballs containing current packages for the most common firmware are "
@@ -5437,7 +5537,7 @@ msgstr ""
 "スの tarball をダウンロードし、メディアのファイルシステムに展開するだけです。"
 
 #. Tag: para
-#: using-d-i.xml:3443
+#: using-d-i.xml:3479
 #, no-c-format
 msgid ""
 "If the firmware you need is not included in the tarball, you can also "
@@ -5453,7 +5553,7 @@ msgstr ""
 "ケージを含むかもしれません。"
 
 #. Tag: para
-#: using-d-i.xml:3457
+#: using-d-i.xml:3493
 #, no-c-format
 msgid ""
 "It is also possible to copy individual firmware files to the medium. Loose "
@@ -5465,13 +5565,13 @@ msgstr ""
 "から入手できます。"
 
 #. Tag: title
-#: using-d-i.xml:3466
+#: using-d-i.xml:3502
 #, no-c-format
 msgid "Firmware and the Installed System"
 msgstr "ファームウェアとインストールしたシステム"
 
 #. Tag: para
-#: using-d-i.xml:3467
+#: using-d-i.xml:3503
 #, no-c-format
 msgid ""
 "Any firmware loaded during the installation will be copied automatically to "
@@ -5489,7 +5589,7 @@ msgstr ""
 "がわずかにあります。"
 
 #. Tag: para
-#: using-d-i.xml:3476
+#: using-d-i.xml:3512
 #, no-c-format
 msgid ""
 "If the firmware was loaded from a firmware package, &d-i; will also install "
@@ -5505,7 +5605,7 @@ msgstr ""
 "できるようになると、自動的に更新するという利点があります。"
 
 #. Tag: para
-#: using-d-i.xml:3484
+#: using-d-i.xml:3520
 #, no-c-format
 msgid ""
 "If loading the firmware was skipped during the installation, the relevant "
@@ -5517,7 +5617,7 @@ msgstr ""
 "トールしたシステムで動作しないでしょう。"
 
 #. Tag: para
-#: using-d-i.xml:3491
+#: using-d-i.xml:3527
 #, no-c-format
 msgid ""
 "If the firmware was loaded from loose firmware files, the firmware copied to "
@@ -5529,6 +5629,9 @@ msgstr ""
 "ル完了後に対応したファームウェアパッケージをインストールするまで、インストー"
 "ルしたシステムにコピーしたファームウェアは、自動的に<emphasis>更新されません"
 "</emphasis>。"
+
+#~ msgid "Miscellaneous"
+#~ msgstr "その他"
 
 #~ msgid ""
 #~ "If the language has only one country associated with it, that country "

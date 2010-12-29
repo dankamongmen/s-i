@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2010-10-29 05:56+0000\n"
-"PO-Revision-Date: 2010-07-03 14:35+0900\n"
-"Last-Translator: KURASAWA Nozomu <nabetaro@debian.or.jp>\n"
+"PO-Revision-Date: 2010-12-29 21:44+0900\n"
+"Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -851,6 +851,15 @@ msgid ""
 "two partitions should now be visible on it. You should mount the second of "
 "the two partitions, and unpack the firmware onto it."
 msgstr ""
+"例えば、既存の GNU/Linux システムを用いる場合、<filename>mini.iso</filename> "
+"ファイルを以下のようにして USB メモリに書き込めます。"
+"<informalexample><screen>\n"
+"# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>\n"
+"# sync\n"
+"</screen></informalexample>必要なファームウェアを USB メモリに追加する際も同"
+"じ方法です。詳細は <xref linkend=\"loading-firmware\"/> をご覧ください。USB "
+"メモリを抜き挿しすると、パーティションがふたつ見えるはずです。2 番目のパー"
+"ティションをマウントし、ファームウェアをそこに展開してください。"
 
 #. Tag: screen
 #: install-methods.xml:582
@@ -862,6 +871,11 @@ msgid ""
 "# cd /\n"
 "# umount"
 msgstr ""
+"# mount /dev/<replaceable>sdX2</replaceable> /mnt\n"
+"# cd /mnt\n"
+"# tar zxvf <replaceable>/path/to/</replaceable>firmware.tar.gz\n"
+"# cd /\n"
+"# umount"
 
 #. Tag: para
 #: install-methods.xml:584
@@ -1516,18 +1530,17 @@ msgstr ""
 
 #. Tag: title
 #: install-methods.xml:990
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Hard disk installer booting using <command>LILO</command> or "
 #| "<command>GRUB</command>"
 msgid "Hard disk installer booting using <command>loadlin</command>"
 msgstr ""
-"<command>LILO</command> や <command>GRUB</command> を使用したハードディスクか"
-"らのインストーラの起動"
+"<command>loadlin</command> を使用したハードディスクからのインストーラの起動"
 
 #. Tag: para
 #: install-methods.xml:991
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "This section explains how to add to or even replace an existing linux "
 #| "installation using either <command>LILO</command> or <command>GRUB</"
@@ -1536,12 +1549,12 @@ msgid ""
 "This section explains how to prepare your hard drive for booting the "
 "installer from DOS using <command>loadlin</command>."
 msgstr ""
-"本節では、<command>LILO</command> や <command>GRUB</command> のどちらかを使用"
-"して、linux を追加したり、 既存の linux を交換する方法について説明します。"
+"この節では、<command>loadlin</command> を使用して、DOS からインストーラを起動"
+"するようハードディスクを準備する方法を説明します。"
 
 #. Tag: para
 #: install-methods.xml:996
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Copy the following files from the Debian archives to a convenient "
 #| "location on your hard drive, for instance to <filename>/boot/newinstall/</"
@@ -1550,23 +1563,25 @@ msgid ""
 "Copy the following directories from a &debian; CD image to <filename>c:\\</"
 "filename>."
 msgstr ""
-"以下のファイルを、 &debian; アーカイブからあなたのハードディスクの適当な場所 "
-"(例 <filename>/boot/newinstall/</filename>) にコピーしてください。"
+"以下のディレクトリを、 &debian; CD イメージから <filename>c:\\</filename> に"
+"コピーしてください。"
 
 #. Tag: para
 #: install-methods.xml:1001
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<filename>initrd.gz</filename> (initial ramdisk image)"
 msgid ""
 "<filename>/&x86-install-dir;</filename> (kernel binary and ramdisk image)"
-msgstr "<filename>initrd.gz</filename> (初期 RAM ディスクイメージ)"
+msgstr ""
+"<filename>/&x86-install-dir;</filename> (カーネルバイナリと RAM ディスクイ"
+"メージ)"
 
 #. Tag: para
 #: install-methods.xml:1006
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<filename>boot.msg</filename> (optional boot message)"
 msgid "<filename>/tools</filename> (loadlin tool)"
-msgstr "<filename>boot.msg</filename> (追加起動メッセージ)"
+msgstr "<filename>/tools</filename> (loadlin ツール)"
 
 #. Tag: title
 #: install-methods.xml:1019
@@ -2190,15 +2205,15 @@ msgid ""
 "to serve images from. However, &debian-gnu; packages may use other "
 "directories to comply with the <ulink url=\"&url-fhs-home;\">Filesystem "
 "Hierarchy Standard</ulink>. For example, <classname>tftpd-hpa</classname> by "
-"default uses <filename>/srv/tftp</filename>. You may have to adjust "
-"the configuration examples in this section accordingly."
+"default uses <filename>/srv/tftp</filename>. You may have to adjust the "
+"configuration examples in this section accordingly."
 msgstr ""
 "歴史的に TFTP サーバは、 イメージを提供するディレクトリに <filename>/"
 "tftpboot</filename> を使用します。 しかし &debian-gnu; のパッケージでは、 "
 "<ulink url=\"&url-fhs-home;\">Filesystem Hierarchy Standard</ulink> を満たす"
 "別のディレクトリを使用する可能性があります。 例えば、<classname>tftpd-hpa</"
-"classname> では <filename>/srv/tftp</filename> をデフォルトで使用しま"
-"す。 必要に応じて、本節の設定例を調整してください。"
+"classname> では <filename>/srv/tftp</filename> をデフォルトで使用します。 必"
+"要に応じて、本節の設定例を調整してください。"
 
 #. Tag: para
 #: install-methods.xml:1350
