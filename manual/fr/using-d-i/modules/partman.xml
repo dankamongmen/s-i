@@ -1,4 +1,4 @@
-<!-- original version: 649116 -->
+<!-- original version: 65785 -->
 
 <para>
 
@@ -53,7 +53,7 @@ priorité debconf est <quote>medium</quote> ou <quote>low</quote>. Pour
 les autres priorités, des valeurs par défaut pertinentes sont utilisées.
 
 </para>
-<para>
+<para arch="linux-any">
 L'installateur accepte plusieurs formes de partitionnement ainsi que
 plusieurs types de périphériques de stockage, lesquels peuvent être
 combinés.
@@ -88,7 +88,7 @@ combinés.
 </itemizedlist>
 
 </para>
-<para arch="linux-any">
+<para>
 
 Les systèmes de fichiers suivants sont reconnus :
 
@@ -96,20 +96,53 @@ Les systèmes de fichiers suivants sont reconnus :
   <listitem><para>
     <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
     <emphasis>ext2</emphasis>,
-    <emphasis>ext3</emphasis>,
-    <emphasis>ext4</emphasis>
-  </para><para>
+    <phrase arch="linux-any"><emphasis>ext3</emphasis>,</phrase>
+    <phrase arch="linux-any"><emphasis>ext4</emphasis></phrase>
+  </para><para arch="linux-any">
     Le système de fichier choisi par défaut est ext3 ; pour la partition
     <filename>/boot</filename> ext2 est choisi par défaut si le
     partionnement assisté est utilisé.
   </para></listitem>
-  <listitem><para>
+  <listitem><para arch="linux-any">
     <emphasis>jfs</emphasis> (pas disponible sur toutes les architectures)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>ufs</emphasis>
+  </para><para>
+    Le système de fichiers par défaut est UFS.
+  </para></listitem>
+  <listitem><para arch="linux-any">
     <emphasis>xfs</emphasis> (pas disponible sur toutes les architectures)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>zfs</emphasis>
+  </para><para>
+    La gestion du système ZFS est encore en phase de développement dans l'installateur.
+    Une partie seulement des fonctionnalités est implémentée. Certaines peuvent être activées après l'installation
+    initiale mais quelques points délicats sont à noter :
+    <itemizedlist>
+      <listitem><para>
+        Chaque pool ZFS  ne contient qu'un seul système de fichiers. Après l'installation,
+        d'autres systèmes de fichiers peuvent être créés pour ce pool avec la commande
+        <quote>zfs create</quote>.
+      </para></listitem>
+      <listitem><para>
+        Chaque pool ZFS est composé d'une seule partition. Après l'installation,
+        ce pool peut être converti en un pool contenant plusieurs périphériques avec la commande
+        <quote>zpool add</quote>. Il peut aussi devenir un pool en miroir avec la commande
+        <quote>zpool attach</quote>. Cependant, il vaut mieux ne pas transformer le pool qui contient
+        le système de fichiers racine car cela empêche GRUB d'amorcer le système.
+      </para></listitem>
+      <listitem><para>
+        La compression n'est pas encore possible. Après l'installation,
+        on peut activer la compression en définissant la propriété <quote>compression</quote>
+        par la commande <quote>zfs set</quote>. Mais si vous utilisez un algorithme de compression
+        différent de l'algorithme par défaut (lzjb) sur le pool qui contient
+        le système de fichiers racine, il se peut que cela empêche GRUB d'amorcer le système.
+      </para></listitem>
+    </itemizedlist>
+  </para></listitem>
+  <listitem><para arch="linux-any">
     <emphasis>reiserfs</emphasis> (optionnel ; pas disponible sur toutes les architectures)
   </para><para>
     Le système Reiser n'est plus disponible automatiquement.
@@ -151,7 +184,7 @@ Les systèmes de fichiers suivants sont reconnus :
    <sect3 id="partman-auto">
    <title>Le partitionnement assisté</title>
 
-<para>
+<para arch="linux-any">
 
 Si vous choisissez le partitionnement assisté, vous aurez le choix entre trois solutions&nbsp;:
 créer directement les partitions sur le disque (méthode classique), utiliser
@@ -162,11 +195,11 @@ ou utiliser LVM avec chiffrement <footnote>
 L'installateur chiffrera le groupe de volumes avec une clé AES 256 bits et utilisera
 la fonction <quote>dm-crypt</quote> du noyau.</para></footnote>.
 </para>
-<note><para>
+<note arch="linux-any"><para>
 Il se peut toutefois que cette dernière option ne soit pas disponible
 sur toutes les architectures.
 </para></note>
-<para>
+<para arch="linux-any">
 
 Si vous utilisez LVM ou LVM avec chiffrement, l'installateur créera
 les partitions dans une seule grande partition. L'avantage de cette méthode est la possibilité
@@ -174,7 +207,7 @@ de redimensionner facilement ces partitions. Si elle est chiffrée, la grande pa
 ne sera pas accessible sans une phrase spéciale qui sécurisera vos données.
 
 </para>
-<para>
+<para arch="linux-any">
 
 Avec LVM avec chiffrement, l'installateur effacera automatiquement le disque en y
 écrivant des données aléatoires. Cela améliore la sécurité car cela rend impossible  
@@ -182,7 +215,7 @@ de dire quelles parties du disque sont utilisées et cela efface toutes les trac
 installation précédente. Cependant cela prend du temps.
 </para>
 
-<note><para>
+<note arch="linux-any"><para>
 
 Si vous avez choisi le partitionnement assisté avec LVM ou LVM avec chiffrement,
 la table des partitions du disque choisi doit être modifiée. Ces modifications
@@ -194,8 +227,8 @@ confirmer ces modifications avant qu'elles ne soient écrites sur le disque.
 
 <para>
 
-Après avoir choisi le partitionnement assisté (soit la méthode classique,
-soit les méthodes LVM), vous devrez choisir le disque à partitionner.
+Après avoir choisi le partitionnement assisté<phrase arch="linux-any"> (soit la méthode classique,
+soit les méthodes LVM)</phrase>, vous devrez choisir le disque à partitionner.
 Vérifiez que tous les disques sont listés et choisissez le bon si vous avez plusieurs
 disques. L'ordre de la liste peut différer de celui qui vous est habituel. La taille
 des disques peut vous aider à les identifier.
@@ -204,8 +237,9 @@ des disques peut vous aider à les identifier.
 
 Les données présentes sur le disque choisi seront finalement détruites. Mais il vous
 est toujours demandé de confirmer les modifications qui doivent être apportées.
-Si vous avez choisi la méthode classique, vous pourrez annuler tout changement
+<phrase arch="linux-any">Si vous avez choisi la méthode classique, vous pourrez annuler tout changement
 jusqu'à la fin du processus. Avec les méthodes LVM, cela n'est pas possible.
+</phrase>
 </para>
 
 <para>
@@ -251,7 +285,7 @@ pas au moins 1&nbsp;GO, il échouera.
 
 </tbody></tgroup></informaltable>
 
-<para>
+<para arch="linux-any">
 
 Si vous avez choisi le partitionnement assisté avec LVM, l'installateur
 créera aussi une partition <filename>/boot</filename> distincte.
@@ -338,7 +372,7 @@ partition, son type (primaire ou logique), son début et sa fin dans
 l'espace libre. Puis la nouvelle partition sera présentée en détail.
 L'élément principal est <guimenuitem>Utiliser comme :</guimenuitem> qui indique si
 la partition possède un système de fichiers ou si elle est utilisée comme 
-partition d'échange, comme système RAID, LVM, si elle est chiffrée
+partition d'échange<phrase arch="linux-any">, comme système RAID, LVM, si elle est chiffrée,</phrase>
 ou si elle n'est pas utilisée du tout. Il y a d'autres options
 comme le point de montage, les options de montage, le drapeau d'amorçage, tout dépend de
 la manière dont elle est utilisée.
@@ -346,7 +380,7 @@ Si vous n'aimez pas les valeurs présélectionnées,
 n'hésitez pas à les changer. Par exemple, en choisissant l'option
 <guimenuitem>Utiliser comme :</guimenuitem>, vous pouvez demander un autre système de 
 fichiers ou demander d'utiliser cette partition comme partition 
-d'échange, comme partition RAID logiciel ou partition LVM, et même demander
+d'échange, <phrase arch="linux-any"> comme partition RAID logiciel ou partition LVM</phrase> et même demander
 de ne pas l'utiliser du tout. Une autre possibilité agréable est de pouvoir
 copier les données d'une partition existante sur cette partition.
 Quand vous êtes satisfait de votre nouvelle partition, choisissez
@@ -375,7 +409,7 @@ problème.
 Si vous oubliez de créer une partition amorçable EFI, 
 <command>partman</command> le détectera et vous demandera d'en créer une.
 </para>
-<para>
+<para arch="linux-any">
 
 On peut ajouter des fonctionnalités à <command>partman</command> avec des
 modules de l'installateur. Aussi, quand vous ne trouvez pas les options promises,
