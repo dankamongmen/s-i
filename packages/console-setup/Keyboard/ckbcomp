@@ -2524,8 +2524,11 @@ if (@layouts) {
 				    scalar (@consequent_values),
 				    scalar (@consequents));
 		for my $i (0 .. $#consequents) {
-		    $consequent_values[$i] =~ s/%\(/\(%/g;
-		    $consequent_values[$i] =~ s/%_/_%/g;
+                    # The purpose of the semicolons is to make %(v) and %_v
+                    # empty strings if %v is an empty string
+		    $consequent_values[$i] =~ s/%\(/\(;%/g;
+		    $consequent_values[$i] =~ s/%_/_;%/g;
+		    $consequent_values[$i] =~ s/(%[lvm](\[[1-4]\])?)/$1;/g;
 		    $consequent_values[$i] =~ s/%m/$model/g;
 		    $consequent_values[$i] =~ s/%l\[1\]/$layouts[0]/g;
 		    $consequent_values[$i] =~ s/%l\[2\]/$layouts[1]/g;
@@ -2537,7 +2540,9 @@ if (@layouts) {
 		    $consequent_values[$i] =~ s/%v\[3\]/$variants[2]/g;
 		    $consequent_values[$i] =~ s/%v\[4\]/$variants[3]/g;
 		    $consequent_values[$i] =~ s/%v/$variants[0]/g;
-		    $consequent_values[$i] =~ s/\(\)//g;
+		    $consequent_values[$i] =~ s/\(;;\)//g;
+		    $consequent_values[$i] =~ s/_;;//g;
+		    $consequent_values[$i] =~ s/;//g;
 		    if ($consequent_values[$i] =~ /^\+/) {
 			if ($consequents[$i] eq 'keycodes') {
 			    $rules_keycodes = $rules_keycodes .
