@@ -1,8 +1,31 @@
 #!/bin/sh
+# Copyright (C) 2010, 2011 Otavio Salvador <otavio@ossystems.com.br>
+# This file is licensed on GPLv3
 
+CROSSBUILD_BLACKLIST="s390-netdevice partitioner"
+
+source=`grep Source debian/control | sed 's,.*: ,,g'`
+
+# Set the architecture to use for the build
+arch=`grep Architecture debian/control | head -n 1 | sed 's,.*: ,,g'`
+if echo "$arch" | grep -q "`dpkg-architecture -qDEB_BUILD_ARCH`"; then
+	arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+else
+	arch=`echo $arch | cut -f 1 -d\ `
+	if [ "$arch" = "any" ] || [ "$arch" = "all" ]; then
+		arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+	fi
+
+	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ] &&
+		echo "$CROSSBUILD_BLACKLIST" | grep -q "$source"; then
+		echo "ERROR: '$source' package is unsafe for crossbuilding."
+		exit 1
+	fi
+fi
+
+# Handle translations
 `dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > /tmp/l10n-changes
-
-if [ "$(cat /tmp/l10n-changes)" = "Cannot find the PO directory!" ]; then
+if [ "`cat /tmp/l10n-changes`" = "Cannot find the PO directory!" ]; then
 	> /tmp/l10n-changes
 fi
 
@@ -16,6 +39,19 @@ while read line; do
 	DEBFULLNAME="Updated translations" dch -t --release-heuristic changelog "$log"
 done < /tmp/l10n-changes
 
+# "release" the version
 dch -r ""
 
-debuild && debsign && debcommit --release && debrelease
+# build, check and upload
+debuild -a$arch 2>&1 | tee /tmp/do-upload.log
+if [ "$?" = "0" ]; then
+	if grep -q "E: .* udeb: binary-from-other-architecture .*" /tmp/do-upload.log; then
+		echo "ERROR: this package is unsafe for crossbuilding."
+	else
+		debsign -a$arch && debcommit --release && debrelease -a$arch
+		exit 0
+	fi
+fi
+
+svn revert debian/changelog
+exit 1
