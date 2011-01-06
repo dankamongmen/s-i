@@ -62,6 +62,10 @@ if [ "$ROOT" ]; then
 	$logoutput umount /cdrom || true
 
 	chroot_setup
+	# Horrible hack to let us call a subprocess that also sources the
+	# confmodule, since chroot_setup tears down debconf state.
+	export DEBIAN_HAS_FRONTEND=1
+	export DEBCONF_REDIR=1
 	# Needed until after a d-i release with new enough di-utils.
 	mountpoints > /tmp/mount.post
 	trap chroot_cleanup_localmounts EXIT HUP INT QUIT TERM
