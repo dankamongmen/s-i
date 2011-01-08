@@ -4,15 +4,7 @@
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Preparing Files for USB Memory Stick Booting</title>
 
-<para arch="x86">
-
-There are two installation methods possible when booting from USB stick.
-The first is to only use the USB stick to boot the installer, and then
-install completely from the network. The second is to also copy a CD image
-onto the USB stick and use that as a source for packages, possibly in
-combination with a mirror.
-
-</para><para>
+<para>
 
 To prepare the USB stick, you will need a system where GNU/Linux is
 already running and where USB is supported. With current GNU/Linux systems
@@ -32,28 +24,32 @@ on the device! Make very sure that you use the correct device name for
 your USB stick. If you use the wrong device the result could be that all
 information on for example a hard disk could be lost.
 
-</para></warning><para arch="x86">
+</para></warning>
 
-To prepare a USB stick that only boots the installer, which then proceeds
-to install entirely from the network, you'll need to download the
-<filename>mini.iso</filename> image from the <filename>netboot</filename>
-directory (at the location mentioned in <xref linkend="where-files"/>), and
-write this file directly to the USB stick, overwriting its current contents.
-This method will work with very small USB sticks, only a few megabytes in
-size.
+  <sect2 id="usb-copy-isohybrid" condition="isohybrid-supported">
+  <title>Preparing a USB stick using a hybrid CD or DVD image</title>
+<para>
 
-</para><para arch="x86">
+Debian CD and DVD images can now be written directly a USB stick,
+which is a very easy way to make a bootable USB stick. Simply choose
+a CD or DVD image that will fit on your USB stick. See
+<xref linkend="official-cdrom"/> to get a CD or DVD image.
 
-For example, when using an existing GNU/Linux system, the
-<filename>mini.iso</filename> file can be written to a USB stick as follows:
+</para><para>
 
-<informalexample><screen>
-# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
-# sync
-</screen></informalexample>
+Alternatively, 
+for very small USB sticks, only a few megabytes in size, you can download
+the <filename>mini.iso</filename> image from the <filename>netboot</filename>
+directory (at the location mentioned in <xref linkend="where-files"/>).
+<footnote>
 
-To add firmware to a USB stick prepared in this way, obtain the necessary firmware
-files. See <xref linkend="loading-firmware"/> for more information.
+<para>
+
+A special method can be used to add firmware to the
+<filename>mini.iso</filename>. First, write the
+<filename>mini.iso</filename> to the USB stick.
+Next obtain the necessary firmware files.
+See <xref linkend="loading-firmware"/> for more information about firmware.
 Now unplug and replug the USB stick, and two partitions should now be visible on it.
 You should mount the second of the two partitions, and unpack the firmware onto it.
 
@@ -65,36 +61,36 @@ You should mount the second of the two partitions, and unpack the firmware onto 
 # umount
 </screen></informalexample>
 
-</para><para>
-
-To prepare a USB stick that installs packages from a CD image included
-on the stick, use the installer images found in the
-<filename>hd-media</filename> directory. Either the <quote>easy
-way</quote> or the <quote>flexible way</quote> can be used to copy the
-image to the USB stick. For this installation method you will also need
-to download a CD image. The installation image and the CD image must be
-based on the same release of &d-i;. If they do not match you are likely
-to get errors<footnote>
-
-<para>
-The error message that is most likely to be displayed is that no kernel
-modules can be found. This means that the version of the kernel module
-udebs included on the CD image is different from the version of the
-running kernel.
 </para>
 
-</footnote> during the installation.
+</footnote>
 
 </para><para>
 
+The CD or DVD image you choose should be written directly to the USB stick,
+overwriting its current contents. For example, when using an existing
+GNU/Linux system, the CD or DVD image file can be written to a USB stick
+as follows:
+
+<informalexample><screen>
+# cat <replaceable>debian.iso</replaceable> &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
+
+</para>
+
+  </sect2>
+
+  <sect2 id="usb-copy-easy">
+  <title>Manually copying files to the USB stick</title>
+<para>
+
+An alternative way to set up your USB stick is to manually copy
+the installer files, and also a CD image to it.
 Note that the USB stick should be at least 256 MB in size (smaller
 setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
 
-</para>
-
-  <sect2 id="usb-copy-easy">
-  <title>Copying the files &mdash; the easy way</title>
-<para>
+</para><para>
 
 There is an all-in-one file <filename>hd-media/boot.img.gz</filename>
 which contains all the installer files (including the kernel)
@@ -148,7 +144,7 @@ Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
   </sect2>
 
   <sect2 id="usb-copy-flexible">
-  <title>Copying the files &mdash; the flexible way</title>
+  <title>Manually copying files to the USB stick &mdash; the flexible way</title>
 <para>
 
 If you like more flexibility or just want to know what's going on, you
@@ -164,20 +160,4 @@ full CD ISO image to it.
 
   </sect2>
 
-  <!-- TODO: doesn't this section belong later? -->
-  <sect2 arch="x86">
-  <title>Booting the USB stick</title>
-<warning><para>
-
-If your system refuses to boot from the memory stick, the stick may
-contain an invalid master boot record (MBR). To fix this, use the
-<command>install-mbr</command> command from the package
-<classname>mbr</classname>:
-
-<informalexample><screen>
-# install-mbr /dev/<replaceable>sdX</replaceable>
-</screen></informalexample>
-
-</para></warning>
-  </sect2>
  </sect1>
