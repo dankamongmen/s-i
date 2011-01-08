@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: using-d-i.xml\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-10-29 05:56+0000\n"
+"POT-Creation-Date: 2011-01-08 16:52+0000\n"
 "PO-Revision-Date: 2009-08-28 03:36+0900\n"
 "Last-Translator: Changwoo Ryu <cwryu@debian.org>\n"
 "Language-Team: Korean <debian-l10n-korean@lists.debian.org>\n"
@@ -1741,8 +1741,9 @@ msgstr ""
 #, no-c-format
 msgid ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
-"<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
-"emphasis>"
+"<emphasis>ext2</emphasis>, <phrase arch=\"linux-any\"><emphasis>ext3</"
+"emphasis>,</phrase> <phrase arch=\"linux-any\"><emphasis>ext4</emphasis></"
+"phrase>"
 msgstr ""
 
 #. Tag: para
@@ -1764,8 +1765,20 @@ msgid "<emphasis>jfs</emphasis> (not available on all architectures)"
 msgstr ""
 "아키텍처에 따라 (암호화한) LVM을 사용하는 옵션을 사용하지 못할 수도 있습니다."
 
+#. Tag: emphasis
+#: using-d-i.xml:1107
+#, no-c-format
+msgid "<emphasis>ufs</emphasis>"
+msgstr ""
+
 #. Tag: para
-#: using-d-i.xml:1106
+#: using-d-i.xml:1108
+#, no-c-format
+msgid "The default file system is UFS."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1111
 #, fuzzy, no-c-format
 #| msgid ""
 #| "The option to use (encrypted) LVM may not be available on all "
@@ -1774,15 +1787,62 @@ msgid "<emphasis>xfs</emphasis> (not available on all architectures)"
 msgstr ""
 "아키텍처에 따라 (암호화한) LVM을 사용하는 옵션을 사용하지 못할 수도 있습니다."
 
+#. Tag: emphasis
+#: using-d-i.xml:1115
+#, no-c-format
+msgid "<emphasis>zfs</emphasis>"
+msgstr ""
+
 #. Tag: para
-#: using-d-i.xml:1109
+#: using-d-i.xml:1116
+#, no-c-format
+msgid ""
+"As ZFS support in the installer is still in development, only a basic subset "
+"of ZFS features are supported. Some of them can be enabled manually after "
+"the initial install, but there are some caveats:"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1121
+#, no-c-format
+msgid ""
+"Each ZFS pool will host only one filesystem. After install is finished, more "
+"filesystems can be created on this pool by using the <quote>zfs create</"
+"quote> command."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1126
+#, no-c-format
+msgid ""
+"Each ZFS pool will be composed of exactly one partition. After install is "
+"finished, a single-device ZFS pool can be converted into a multi-device pool "
+"by using the <quote>zpool add</quote> command, or into a mirrored pool by "
+"using the <quote>zpool attach</quote> command. However, you shouldn't do "
+"this on the pool that hosts root filesystem, as it would prevent GRUB from "
+"booting your system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1134
+#, no-c-format
+msgid ""
+"Compression is not currently supported. After the install is finished, "
+"compression can be enabled by setting the <quote>compression</quote> "
+"property via the <quote>zfs set</quote> command. However, if a compression "
+"algorithm other than the default (lzjb) is used on the pool that hosts your "
+"root filesystem, this may prevent GRUB from booting your system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1143
 #, no-c-format
 msgid ""
 "<emphasis>reiserfs</emphasis> (optional; not available on all architectures)"
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1111
+#: using-d-i.xml:1145
 #, no-c-format
 msgid ""
 "Support for the Reiser file system is no longer available by default. When "
@@ -1792,13 +1852,13 @@ msgid ""
 msgstr ""
 
 #. Tag: emphasis
-#: using-d-i.xml:1118
+#: using-d-i.xml:1152
 #, no-c-format
 msgid "jffs2"
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1119
+#: using-d-i.xml:1153
 #, no-c-format
 msgid ""
 "Used on some systems to read flash memory. It is not possible to create new "
@@ -1806,13 +1866,13 @@ msgid ""
 msgstr ""
 
 #. Tag: emphasis
-#: using-d-i.xml:1124
+#: using-d-i.xml:1158
 #, no-c-format
 msgid "qnx4"
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1125
+#: using-d-i.xml:1159
 #, no-c-format
 msgid ""
 "Existing partitions will be recognized and it is possible to assign mount "
@@ -1820,19 +1880,19 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1129
+#: using-d-i.xml:1163
 #, no-c-format
 msgid "<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>"
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1132
+#: using-d-i.xml:1166
 #, no-c-format
 msgid "<emphasis>NTFS</emphasis> (read-only)"
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:1134
+#: using-d-i.xml:1168
 #, no-c-format
 msgid ""
 "Existing NTFS partitions can be resized and it is possible to assign mount "
@@ -1840,13 +1900,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: using-d-i.xml:1144
+#: using-d-i.xml:1178
 #, no-c-format
 msgid "Guided Partitioning"
 msgstr "자동 파티션하기"
 
 #. Tag: para
-#: using-d-i.xml:1145
+#: using-d-i.xml:1179
 #, no-c-format
 msgid ""
 "If you choose guided partitioning, you may have three options: to create "
@@ -1863,7 +1923,7 @@ msgstr ""
 "footnote> 사용하는 것입니다."
 
 #. Tag: para
-#: using-d-i.xml:1160
+#: using-d-i.xml:1194
 #, no-c-format
 msgid ""
 "The option to use (encrypted) LVM may not be available on all architectures."
@@ -1871,7 +1931,7 @@ msgstr ""
 "아키텍처에 따라 (암호화한) LVM을 사용하는 옵션을 사용하지 못할 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:1165
+#: using-d-i.xml:1199
 #, no-c-format
 msgid ""
 "When using LVM or encrypted LVM, the installer will create most partitions "
@@ -1887,7 +1947,7 @@ msgstr ""
 "안전합니다."
 
 #. Tag: para
-#: using-d-i.xml:1174
+#: using-d-i.xml:1208
 #, no-c-format
 msgid ""
 "When using encrypted LVM, the installer will also automatically erase the "
@@ -1902,7 +1962,7 @@ msgstr ""
 "입니다), 디스크 크기에 따라 시간이 오래 걸릴 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:1183
+#: using-d-i.xml:1217
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using LVM or encrypted LVM, some changes "
@@ -1918,15 +1978,22 @@ msgstr ""
 "에 쓰기 전에 계속해도 좋을 지 확인 질문을 합니다."
 
 #. Tag: para
-#: using-d-i.xml:1193
-#, no-c-format
+#: using-d-i.xml:1227
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you choose guided partitioning (either classic or using (encrypted) "
+#| "LVM) for a whole disk, you will first be asked to select the disk you "
+#| "want to use. Check that all your disks are listed and, if you have "
+#| "several disks, make sure you select the correct one. The order they are "
+#| "listed in may differ from what you are used to. The size of the disks may "
+#| "help to identify them."
 msgid ""
-"If you choose guided partitioning (either classic or using (encrypted) LVM) "
-"for a whole disk, you will first be asked to select the disk you want to "
-"use. Check that all your disks are listed and, if you have several disks, "
-"make sure you select the correct one. The order they are listed in may "
-"differ from what you are used to. The size of the disks may help to identify "
-"them."
+"If you choose guided partitioning<phrase arch=\"linux-any\"> (either classic "
+"or using (encrypted) LVM)</phrase> for a whole disk, you will first be asked "
+"to select the disk you want to use. Check that all your disks are listed "
+"and, if you have several disks, make sure you select the correct one. The "
+"order they are listed in may differ from what you are used to. The size of "
+"the disks may help to identify them."
 msgstr ""
 "전체 디스크에 대해 자동 파티션 하기를 (일반적인 파티션이나 (암호화한) LVM에"
 "서) 선택했다면, 사용하려는 디스크를 선택하라는 질문을 맨 처음에 받게 됩니다. "
@@ -1935,14 +2002,20 @@ msgstr ""
 "니다. 디스크 용량으로도 어떤 디스크인지 확인할 수 있을 것입니다."
 
 #. Tag: para
-#: using-d-i.xml:1202
-#, no-c-format
+#: using-d-i.xml:1236
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Any data on the disk you select will eventually be lost, but you will "
+#| "always be asked to confirm any changes before they are written to the "
+#| "disk. If you have selected the classic method of partitioning, you will "
+#| "be able to undo any changes right until the end; when using (encrypted) "
+#| "LVM this is not possible."
 msgid ""
 "Any data on the disk you select will eventually be lost, but you will always "
-"be asked to confirm any changes before they are written to the disk. If you "
-"have selected the classic method of partitioning, you will be able to undo "
-"any changes right until the end; when using (encrypted) LVM this is not "
-"possible."
+"be asked to confirm any changes before they are written to the disk. <phrase "
+"arch=\"linux-any\"> If you have selected the classic method of partitioning, "
+"you will be able to undo any changes right until the end; when using "
+"(encrypted) LVM this is not possible. </phrase>"
 msgstr ""
 "선택한 디스크에 있는 모든 데이터를 영영 잃어버리게 될 것입니다. 하지만 디스크"
 "에 바꾼 사항을 쓰기 전에 언제나 확인 질문을 합니다. 일반적인 파티션 방법을 사"
@@ -1950,7 +2023,7 @@ msgstr ""
 "는 경우에는 취소가 불가능합니다."
 
 #. Tag: para
-#: using-d-i.xml:1210
+#: using-d-i.xml:1246
 #, no-c-format
 msgid ""
 "Next, you will be able to choose from the schemes listed in the table below. "
@@ -1967,76 +2040,76 @@ msgstr ""
 "용량은 다릅니다) 자동 파티션은 실패합니다."
 
 #. Tag: entry
-#: using-d-i.xml:1226
+#: using-d-i.xml:1262
 #, no-c-format
 msgid "Partitioning scheme"
 msgstr "파티션 방식"
 
 #. Tag: entry
-#: using-d-i.xml:1227
+#: using-d-i.xml:1263
 #, no-c-format
 msgid "Minimum space"
 msgstr "최소 공간"
 
 #. Tag: entry
-#: using-d-i.xml:1228
+#: using-d-i.xml:1264
 #, no-c-format
 msgid "Created partitions"
 msgstr "만들 파티션"
 
 # 주의: 메시지 번역과 통일
 #. Tag: entry
-#: using-d-i.xml:1234
+#: using-d-i.xml:1270
 #, no-c-format
 msgid "All files in one partition"
 msgstr "모두 한 파티션에 설치"
 
 #. Tag: entry
-#: using-d-i.xml:1235
+#: using-d-i.xml:1271
 #, no-c-format
 msgid "600MB"
 msgstr "600MB"
 
 #. Tag: entry
-#: using-d-i.xml:1236
+#: using-d-i.xml:1272
 #, no-c-format
 msgid "<filename>/</filename>, swap"
 msgstr "<filename>/</filename>, 스왑"
 
 # 주의: 메시지 번역과 통일
 #. Tag: entry
-#: using-d-i.xml:1238
+#: using-d-i.xml:1274
 #, no-c-format
 msgid "Separate /home partition"
 msgstr "/home 파티션 분리"
 
 #. Tag: entry
-#: using-d-i.xml:1239
+#: using-d-i.xml:1275
 #, no-c-format
 msgid "500MB"
 msgstr "500MB"
 
 #. Tag: entry
-#: using-d-i.xml:1240
+#: using-d-i.xml:1276
 #, no-c-format
 msgid "<filename>/</filename>, <filename>/home</filename>, swap"
 msgstr "<filename>/</filename>, <filename>/home</filename>, 스왑"
 
 # 주의: 메시지 번역과 통일
 #. Tag: entry
-#: using-d-i.xml:1244
+#: using-d-i.xml:1280
 #, no-c-format
 msgid "Separate /home, /usr, /var and /tmp partitions"
 msgstr "/home, /usr/, /var, /tmp 파티션 분리"
 
 #. Tag: entry
-#: using-d-i.xml:1245
+#: using-d-i.xml:1281
 #, no-c-format
 msgid "<entry>1GB</entry>"
 msgstr "<entry>1GB</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1246
+#: using-d-i.xml:1282
 #, no-c-format
 msgid ""
 "<filename>/</filename>, <filename>/home</filename>, <filename>/usr</"
@@ -2046,7 +2119,7 @@ msgstr ""
 "filename>, <filename>/var</filename>, <filename>/tmp</filename>, 스왑"
 
 #. Tag: para
-#: using-d-i.xml:1255
+#: using-d-i.xml:1291
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using (encrypted) LVM, the installer will "
@@ -2059,7 +2132,7 @@ msgstr ""
 "포함) LVM 파티션 안에 만듭니다."
 
 #. Tag: para
-#: using-d-i.xml:1261
+#: using-d-i.xml:1297
 #, no-c-format
 msgid ""
 "If you choose guided partitioning for your IA-64 system, there will be an "
@@ -2072,7 +2145,7 @@ msgstr ""
 "팅 파티션으로 만드는 항목이 하나 더 생깁니다."
 
 #. Tag: para
-#: using-d-i.xml:1269
+#: using-d-i.xml:1305
 #, no-c-format
 msgid ""
 "After selecting a scheme, the next screen will show your new partition "
@@ -2084,7 +2157,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: using-d-i.xml:1275
+#: using-d-i.xml:1311
 #, no-c-format
 msgid ""
 "The list of partitions might look like this: <informalexample><screen>\n"
@@ -2134,7 +2207,7 @@ msgstr ""
 "것 뿐입니다."
 
 #. Tag: para
-#: using-d-i.xml:1288
+#: using-d-i.xml:1324
 #, no-c-format
 msgid ""
 "This concludes the guided partitioning. If you are satisfied with the "
@@ -2153,13 +2226,13 @@ msgstr ""
 "준 파티션을 아래에서 설명하는 것처럼 수동으로 바꿀 수도 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:1302
+#: using-d-i.xml:1338
 #, no-c-format
 msgid "Manual Partitioning"
 msgstr "수동 파티션하기"
 
 #. Tag: para
-#: using-d-i.xml:1303
+#: using-d-i.xml:1339
 #, fuzzy, no-c-format
 #| msgid ""
 #| "A similar screen to the one shown just above will be displayed if you "
@@ -2180,7 +2253,7 @@ msgstr ""
 "사용할 지에 대해 다룹니다."
 
 #. Tag: para
-#: using-d-i.xml:1311
+#: using-d-i.xml:1347
 #, no-c-format
 msgid ""
 "If you select a pristine disk which has neither partitions nor free space on "
@@ -2193,8 +2266,27 @@ msgstr ""
 "공간</quote>이라는 줄이 해당 디스크 이름 아래에 나타납니다."
 
 #. Tag: para
-#: using-d-i.xml:1319
-#, no-c-format
+#: using-d-i.xml:1355
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you select some free space, you will have the opportunity to create a "
+#| "new partition. You will have to answer a quick series of questions about "
+#| "its size, type (primary or logical), and location (beginning or end of "
+#| "the free space). After this, you will be presented with a detailed "
+#| "overview of your new partition. The main setting is <guimenuitem>Use as:</"
+#| "guimenuitem>, which determines if the partition will have a file system "
+#| "on it, or be used for swap, software RAID, LVM, an encrypted file system, "
+#| "or not be used at all. Other settings include mountpoint, mount options, "
+#| "and bootable flag; which settings are shown depends on how the partition "
+#| "is to be used. If you don't like the preselected defaults, feel free to "
+#| "change them to your liking. E.g. by selecting the option <guimenuitem>Use "
+#| "as:</guimenuitem>, you can choose a different filesystem for this "
+#| "partition, including options to use the partition for swap, software "
+#| "RAID, LVM, or not use it at all. Another nice feature is the ability to "
+#| "copy data from an existing partition onto this one. When you are "
+#| "satisfied with your new partition, select <guimenuitem>Done setting up "
+#| "the partition</guimenuitem> and you will return to <command>partman</"
+#| "command>'s main screen."
 msgid ""
 "If you select some free space, you will have the opportunity to create a new "
 "partition. You will have to answer a quick series of questions about its "
@@ -2202,15 +2294,16 @@ msgid ""
 "space). After this, you will be presented with a detailed overview of your "
 "new partition. The main setting is <guimenuitem>Use as:</guimenuitem>, which "
 "determines if the partition will have a file system on it, or be used for "
-"swap, software RAID, LVM, an encrypted file system, or not be used at all. "
-"Other settings include mountpoint, mount options, and bootable flag; which "
-"settings are shown depends on how the partition is to be used. If you don't "
-"like the preselected defaults, feel free to change them to your liking. E.g. "
-"by selecting the option <guimenuitem>Use as:</guimenuitem>, you can choose a "
-"different filesystem for this partition, including options to use the "
-"partition for swap, software RAID, LVM, or not use it at all. Another nice "
-"feature is the ability to copy data from an existing partition onto this "
-"one. When you are satisfied with your new partition, select "
+"swap,<phrase arch=\"linux-any\"> software RAID, LVM, an encrypted file "
+"system,</phrase> or not be used at all. Other settings include mountpoint, "
+"mount options, and bootable flag; which settings are shown depends on how "
+"the partition is to be used. If you don't like the preselected defaults, "
+"feel free to change them to your liking. E.g. by selecting the option "
+"<guimenuitem>Use as:</guimenuitem>, you can choose a different filesystem "
+"for this partition, including options to use the partition for swap,<phrase "
+"arch=\"linux-any\"> software RAID, LVM,</phrase> or not use it at all. "
+"Another nice feature is the ability to copy data from an existing partition "
+"onto this one. When you are satisfied with your new partition, select "
 "<guimenuitem>Done setting up the partition</guimenuitem> and you will return "
 "to <command>partman</command>'s main screen."
 msgstr ""
@@ -2230,7 +2323,7 @@ msgstr ""
 "<command>partman</command>의 주 화면으로 돌아갑니다."
 
 #. Tag: para
-#: using-d-i.xml:1341
+#: using-d-i.xml:1377
 #, no-c-format
 msgid ""
 "If you decide you want to change something about your partition, simply "
@@ -2250,7 +2343,7 @@ msgstr ""
 "메뉴에서 파티션을 지워 버릴 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:1352
+#: using-d-i.xml:1388
 #, no-c-format
 msgid ""
 "Be sure to create at least two partitions: one for the <emphasis>root</"
@@ -2265,7 +2358,7 @@ msgstr ""
 "기 전에는 다음으로 진행하지 없습니다."
 
 #. Tag: para
-#: using-d-i.xml:1360
+#: using-d-i.xml:1396
 #, no-c-format
 msgid ""
 "If you forget to select and format an EFI boot partition, <command>partman</"
@@ -2277,7 +2370,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: using-d-i.xml:1366
+#: using-d-i.xml:1402
 #, no-c-format
 msgid ""
 "Capabilities of <command>partman</command> can be extended with installer "
@@ -2292,7 +2385,7 @@ msgstr ""
 "<filename>partman-xfs</filename>, 아니면 <filename>partman-lvm</filename>)"
 
 #. Tag: para
-#: using-d-i.xml:1374
+#: using-d-i.xml:1410
 #, no-c-format
 msgid ""
 "After you are satisfied with partitioning, select <guimenuitem>Finish "
@@ -2305,13 +2398,13 @@ msgstr ""
 "한 요약이 나타나고 이대로 파일 시스템을 만들지 확인합니다."
 
 #. Tag: title
-#: using-d-i.xml:1402
+#: using-d-i.xml:1438
 #, no-c-format
 msgid "Configuring Multidisk Devices (Software RAID)"
 msgstr "멀티디스크 장치 설정하기 (소프트웨어 RAID)"
 
 #. Tag: para
-#: using-d-i.xml:1403
+#: using-d-i.xml:1439
 #, no-c-format
 msgid ""
 "If you have more than one harddrive<footnote><para> To be honest, you can "
@@ -2330,7 +2423,7 @@ msgstr ""
 "(더 자주 쓰이는 다른 말로 <firstterm>RAID</firstterm>라고 합니다.)"
 
 #. Tag: para
-#: using-d-i.xml:1416
+#: using-d-i.xml:1452
 #, no-c-format
 msgid ""
 "MD is basically a bunch of partitions located on different disks and "
@@ -2344,7 +2437,7 @@ msgstr ""
 "포맷하고 마운트 위치를 지정하고 따위를 할 수 있습니다.)"
 
 #. Tag: para
-#: using-d-i.xml:1424
+#: using-d-i.xml:1460
 #, no-c-format
 msgid ""
 "What benefits this brings depends on the type of MD device you are creating. "
@@ -2443,97 +2536,97 @@ msgstr ""
 "varlistentry> </variablelist> 요약하면:"
 
 #. Tag: entry
-#: using-d-i.xml:1538
+#: using-d-i.xml:1574
 #, no-c-format
 msgid "Type"
 msgstr "종류"
 
 #. Tag: entry
-#: using-d-i.xml:1539
+#: using-d-i.xml:1575
 #, no-c-format
 msgid "Minimum Devices"
 msgstr "장치 최소 개수"
 
 #. Tag: entry
-#: using-d-i.xml:1540
+#: using-d-i.xml:1576
 #, no-c-format
 msgid "Spare Device"
 msgstr "예비 장치"
 
 #. Tag: entry
-#: using-d-i.xml:1541
+#: using-d-i.xml:1577
 #, no-c-format
 msgid "Survives disk failure?"
 msgstr "디스크가 망가져도 버티는지?"
 
 #. Tag: entry
-#: using-d-i.xml:1542
+#: using-d-i.xml:1578
 #, no-c-format
 msgid "Available Space"
 msgstr "사용 가능 공간"
 
 #. Tag: entry
-#: using-d-i.xml:1548
+#: using-d-i.xml:1584
 #, no-c-format
 msgid "RAID0"
 msgstr "RAID0"
 
 #. Tag: entry
-#: using-d-i.xml:1549 using-d-i.xml:1557 using-d-i.xml:1587
+#: using-d-i.xml:1585 using-d-i.xml:1593 using-d-i.xml:1623
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1550 using-d-i.xml:1551
+#: using-d-i.xml:1586 using-d-i.xml:1587
 #, no-c-format
 msgid "<entry>no</entry>"
 msgstr "<entry>아니오</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1552
+#: using-d-i.xml:1588
 #, no-c-format
 msgid "Size of the smallest partition multiplied by number of devices in RAID"
 msgstr "RAID에서 가장 작은 파티션의 크기 x 장치 개수"
 
 #. Tag: entry
-#: using-d-i.xml:1556
+#: using-d-i.xml:1592
 #, no-c-format
 msgid "RAID1"
 msgstr "RAID1"
 
 #. Tag: entry
-#: using-d-i.xml:1558 using-d-i.xml:1566 using-d-i.xml:1577 using-d-i.xml:1588
+#: using-d-i.xml:1594 using-d-i.xml:1602 using-d-i.xml:1613 using-d-i.xml:1624
 #, no-c-format
 msgid "optional"
 msgstr "옵션"
 
 #. Tag: entry
-#: using-d-i.xml:1559 using-d-i.xml:1567 using-d-i.xml:1578 using-d-i.xml:1589
+#: using-d-i.xml:1595 using-d-i.xml:1603 using-d-i.xml:1614 using-d-i.xml:1625
 #, no-c-format
 msgid "<entry>yes</entry>"
 msgstr "<entry>예</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1560
+#: using-d-i.xml:1596
 #, no-c-format
 msgid "Size of the smallest partition in RAID"
 msgstr "RAID에서 가장 작은 파티션의 크기"
 
 #. Tag: entry
-#: using-d-i.xml:1564
+#: using-d-i.xml:1600
 #, no-c-format
 msgid "RAID5"
 msgstr "RAID5"
 
 #. Tag: entry
-#: using-d-i.xml:1565
+#: using-d-i.xml:1601
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1568
+#: using-d-i.xml:1604
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2541,19 +2634,19 @@ msgid ""
 msgstr "가장 작은 파티션의 크기 x (RAID의 장치 개수 - 1)"
 
 #. Tag: entry
-#: using-d-i.xml:1575
+#: using-d-i.xml:1611
 #, no-c-format
 msgid "RAID6"
 msgstr "RAID6"
 
 #. Tag: entry
-#: using-d-i.xml:1576
+#: using-d-i.xml:1612
 #, no-c-format
 msgid "<entry>4</entry>"
 msgstr "<entry>4</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1579
+#: using-d-i.xml:1615
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2561,13 +2654,13 @@ msgid ""
 msgstr "가장 작은 파티션의 크기 x (RAID의 장치 개수 - 2)"
 
 #. Tag: entry
-#: using-d-i.xml:1586
+#: using-d-i.xml:1622
 #, no-c-format
 msgid "RAID10"
 msgstr "RAID10"
 
 #. Tag: entry
-#: using-d-i.xml:1590
+#: using-d-i.xml:1626
 #, no-c-format
 msgid ""
 "Total of all partitions divided by the number of chunk copies (defaults to "
@@ -2575,7 +2668,7 @@ msgid ""
 msgstr "전체 파티션 나누기 단위 복사물의 개수 (기본값 2)"
 
 #. Tag: para
-#: using-d-i.xml:1597
+#: using-d-i.xml:1633
 #, no-c-format
 msgid ""
 "If you want to know more about Software RAID, have a look at <ulink url="
@@ -2585,7 +2678,7 @@ msgstr ""
 "\">Software RAID HOWTO</ulink>를 읽어 보십시오."
 
 #. Tag: para
-#: using-d-i.xml:1602
+#: using-d-i.xml:1638
 #, no-c-format
 msgid ""
 "To create an MD device, you need to have the desired partitions it should "
@@ -2600,7 +2693,7 @@ msgstr ""
 "guimenuitem> </menuchoice>을 선택하십시오."
 
 #. Tag: para
-#: using-d-i.xml:1611
+#: using-d-i.xml:1647
 #, no-c-format
 msgid ""
 "Make sure that the system can be booted with the partitioning scheme you are "
@@ -2619,7 +2712,7 @@ msgstr ""
 "filename>에 RAID1을 사용하는 것도 한 가지 방법입니다."
 
 #. Tag: para
-#: using-d-i.xml:1623
+#: using-d-i.xml:1659
 #, no-c-format
 msgid ""
 "Support for MD is a relatively new addition to the installer. You may "
@@ -2636,7 +2729,7 @@ msgstr ""
 "피해갈 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:1632
+#: using-d-i.xml:1668
 #, no-c-format
 msgid ""
 "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> "
@@ -2657,7 +2750,7 @@ msgstr ""
 "했냐에 따라 달라집니다."
 
 #. Tag: para
-#: using-d-i.xml:1645
+#: using-d-i.xml:1681
 #, no-c-format
 msgid ""
 "RAID0 is simple &mdash; you will be issued with the list of available RAID "
@@ -2668,7 +2761,7 @@ msgstr ""
 "할 파티션을 선택하기만 하면 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:1652
+#: using-d-i.xml:1688
 #, no-c-format
 msgid ""
 "RAID1 is a bit more tricky. First, you will be asked to enter the number of "
@@ -2686,7 +2779,7 @@ msgstr ""
 "다고 해도, 개수가 맞아야 &d-i;가 다음으로 진행합니다."
 
 #. Tag: para
-#: using-d-i.xml:1664
+#: using-d-i.xml:1700
 #, no-c-format
 msgid ""
 "RAID5 has a setup procedure similar to RAID1 with the exception that you "
@@ -2696,7 +2789,7 @@ msgstr ""
 "파티션을 사용해야 한다는 점이 다릅니다."
 
 #. Tag: para
-#: using-d-i.xml:1670
+#: using-d-i.xml:1706
 #, no-c-format
 msgid ""
 "RAID6 also has a setup procedure similar to RAID1 except that at least "
@@ -2706,7 +2799,7 @@ msgstr ""
 "파티션을 사용해야 한다는 점이 다릅니다."
 
 #. Tag: para
-#: using-d-i.xml:1676
+#: using-d-i.xml:1712
 #, no-c-format
 msgid ""
 "RAID10 again has a setup procedure similar to RAID1 except in expert mode. "
@@ -2726,7 +2819,7 @@ msgstr ""
 "래야 모든 카피가 다른 디스크에 분배됩니다."
 
 #. Tag: para
-#: using-d-i.xml:1690
+#: using-d-i.xml:1726
 #, no-c-format
 msgid ""
 "It is perfectly possible to have several types of MD at once. For example, "
@@ -2744,7 +2837,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: using-d-i.xml:1699
+#: using-d-i.xml:1735
 #, no-c-format
 msgid ""
 "After you set up MD devices to your liking, you can <guimenuitem>Finish</"
@@ -2758,13 +2851,13 @@ msgstr ""
 "같은 속성을 부여할 수 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:1714
+#: using-d-i.xml:1750
 #, no-c-format
 msgid "Configuring the Logical Volume Manager (LVM)"
 msgstr "LVM (논리 볼륨 관리자) 설정하기"
 
 #. Tag: para
-#: using-d-i.xml:1715
+#: using-d-i.xml:1751
 #, no-c-format
 msgid ""
 "If you are working with computers at the level of system administrator or "
@@ -2779,7 +2872,7 @@ msgstr ""
 "해야 했던 경험이 있을 것입니다."
 
 #. Tag: para
-#: using-d-i.xml:1723
+#: using-d-i.xml:1759
 #, no-c-format
 msgid ""
 "To avoid the described situation you can use Logical Volume Manager (LVM). "
@@ -2798,7 +2891,7 @@ msgstr ""
 "개의 물리 파티션에 걸쳐 있을 수 있다는 점입니다."
 
 #. Tag: para
-#: using-d-i.xml:1733
+#: using-d-i.xml:1769
 #, no-c-format
 msgid ""
 "Now when you realize you need more space for your old 160GB <filename>/home</"
@@ -2817,7 +2910,7 @@ msgstr ""
 "HOWTO</ulink>를 참고하십시오."
 
 #. Tag: para
-#: using-d-i.xml:1744
+#: using-d-i.xml:1780
 #, no-c-format
 msgid ""
 "LVM setup in &d-i; is quite simple and completely supported inside "
@@ -2832,7 +2925,7 @@ msgstr ""
 "<guimenuitem>LVM의 물리 볼륨</guimenuitem>을 선택합니다."
 
 #. Tag: para
-#: using-d-i.xml:1753
+#: using-d-i.xml:1789
 #, no-c-format
 msgid ""
 "When you return to the main <command>partman</command> screen, you will see "
@@ -2850,7 +2943,7 @@ msgstr ""
 "용할 수 있는 동작만 표시합니다. 가능한 동작은:"
 
 #. Tag: para
-#: using-d-i.xml:1764
+#: using-d-i.xml:1800
 #, no-c-format
 msgid ""
 "<guimenuitem>Display configuration details</guimenuitem>: shows LVM device "
@@ -2860,43 +2953,43 @@ msgstr ""
 "크기 등을 표시합니다"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1769
+#: using-d-i.xml:1805
 #, no-c-format
 msgid "Create volume group"
 msgstr "볼륨 그룹 만들기"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1772
+#: using-d-i.xml:1808
 #, no-c-format
 msgid "Create logical volume"
 msgstr "논리 볼륨 만들기"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1775
+#: using-d-i.xml:1811
 #, no-c-format
 msgid "Delete volume group"
 msgstr "볼륨 그룹 삭제"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1778
+#: using-d-i.xml:1814
 #, no-c-format
 msgid "Delete logical volume"
 msgstr "논리 볼륨 삭제"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1781
+#: using-d-i.xml:1817
 #, no-c-format
 msgid "Extend volume group"
 msgstr "볼륨 그룹 늘이기"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1784
+#: using-d-i.xml:1820
 #, no-c-format
 msgid "Reduce volume group"
 msgstr "볼륨 그룹 줄이기"
 
 #. Tag: para
-#: using-d-i.xml:1786
+#: using-d-i.xml:1822
 #, no-c-format
 msgid ""
 "<guimenuitem>Finish</guimenuitem>: return to the main <command>partman</"
@@ -2906,7 +2999,7 @@ msgstr ""
 "아갑니다"
 
 #. Tag: para
-#: using-d-i.xml:1792
+#: using-d-i.xml:1828
 #, no-c-format
 msgid ""
 "Use the options in that menu to first create a volume group and then create "
@@ -2915,7 +3008,7 @@ msgstr ""
 "메뉴에서 이 옵션을 이용해 볼륨 그룹을 만들고 그 안에 논리 볼륨을 만드십시오."
 
 #. Tag: para
-#: using-d-i.xml:1797
+#: using-d-i.xml:1833
 #, no-c-format
 msgid ""
 "After you return to the main <command>partman</command> screen, any created "
@@ -2927,13 +3020,13 @@ msgstr ""
 "면 됩니다.)"
 
 #. Tag: title
-#: using-d-i.xml:1811
+#: using-d-i.xml:1847
 #, no-c-format
 msgid "Configuring Encrypted Volumes"
 msgstr "암호화 볼륨 설정하기"
 
 #. Tag: para
-#: using-d-i.xml:1812
+#: using-d-i.xml:1848
 #, no-c-format
 msgid ""
 "&d-i; allows you to set up encrypted partitions. Every file you write to "
@@ -2953,7 +3046,7 @@ msgstr ""
 "암호를 모르면 하드 드라이브의 데이터는 임의의 문자로 보입니다."
 
 #. Tag: para
-#: using-d-i.xml:1824
+#: using-d-i.xml:1860
 #, no-c-format
 msgid ""
 "The two most important partitions to encrypt are: the home partition, where "
@@ -2978,7 +3071,7 @@ msgstr ""
 "가능합니다."
 
 #. Tag: para
-#: using-d-i.xml:1839
+#: using-d-i.xml:1875
 #, no-c-format
 msgid ""
 "Please note that the performance of encrypted partitions will be less than "
@@ -2991,7 +3084,7 @@ msgstr ""
 "도, 암호화 방법 및 키 길이에 달려 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:1846
+#: using-d-i.xml:1882
 #, no-c-format
 msgid ""
 "To use encryption, you have to create a new partition by selecting some free "
@@ -3010,7 +3103,7 @@ msgstr ""
 "티션에 대한 몇 가지 암호화 옵션이 나오도록 바뀝니다."
 
 #. Tag: para
-#: using-d-i.xml:1857
+#: using-d-i.xml:1893
 #, no-c-format
 msgid ""
 "&d-i; supports several encryption methods. The default method is "
@@ -3026,7 +3119,7 @@ msgstr ""
 "본값을 사용하길 권합니다."
 
 #. Tag: para
-#: using-d-i.xml:1869
+#: using-d-i.xml:1905
 #, no-c-format
 msgid ""
 "First, let's have a look at the options available when you select "
@@ -3039,13 +3132,13 @@ msgstr ""
 "미 보안을 염두에 두고 기본값이 들어 있습니다."
 
 #. Tag: term
-#: using-d-i.xml:1879
+#: using-d-i.xml:1915
 #, no-c-format
 msgid "Encryption: <userinput>aes</userinput>"
 msgstr "암호화: <userinput>aes</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1881
+#: using-d-i.xml:1917
 #, no-c-format
 msgid ""
 "This option lets you select the encryption algorithm (<firstterm>cipher</"
@@ -3069,13 +3162,13 @@ msgstr ""
 "으로 <emphasis>AES</emphasis>를 선택했습니다."
 
 #. Tag: term
-#: using-d-i.xml:1899
+#: using-d-i.xml:1935
 #, no-c-format
 msgid "Key size: <userinput>256</userinput>"
 msgstr "키 크기: <userinput>256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1901
+#: using-d-i.xml:1937
 #, no-c-format
 msgid ""
 "Here you can specify the length of the encryption key. With a larger key "
@@ -3088,13 +3181,13 @@ msgstr ""
 "있는 키의 크기는 싸이퍼에 따라 다릅니다."
 
 #. Tag: term
-#: using-d-i.xml:1913
+#: using-d-i.xml:1949
 #, no-c-format
 msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
 msgstr "IV 알고리즘: <userinput>cbc-essiv:sha256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1915
+#: using-d-i.xml:1951
 #, no-c-format
 msgid ""
 "The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</"
@@ -3111,7 +3204,7 @@ msgstr ""
 "이 암호화된 데이터에 반복된 패턴을 통해 정보를 알아내지 못하게 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:1925
+#: using-d-i.xml:1961
 #, no-c-format
 msgid ""
 "From the provided alternatives, the default <userinput>cbc-essiv:sha256</"
@@ -3125,25 +3218,25 @@ msgstr ""
 "우에만 사용하십시오."
 
 #. Tag: term
-#: using-d-i.xml:1937
+#: using-d-i.xml:1973
 #, no-c-format
 msgid "Encryption key: <userinput>Passphrase</userinput>"
 msgstr "암호화 키: <userinput>암호</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1939
+#: using-d-i.xml:1975
 #, no-c-format
 msgid "Here you can choose the type of the encryption key for this partition."
 msgstr "여기서 이 파티션의 암호화 키 종류를 선택합니다."
 
 #. Tag: term
-#: using-d-i.xml:1945
+#: using-d-i.xml:1981
 #, no-c-format
 msgid "Passphrase"
 msgstr "암호"
 
 #. Tag: para
-#: using-d-i.xml:1946
+#: using-d-i.xml:1982
 #, no-c-format
 msgid ""
 "The encryption key will be computed<footnote> <para> Using a passphrase as "
@@ -3156,13 +3249,13 @@ msgstr ""
 "ulink>로 설정한다는 뜻입니다. </para></footnote>."
 
 #. Tag: term
-#: using-d-i.xml:1961 using-d-i.xml:2054
+#: using-d-i.xml:1997 using-d-i.xml:2090
 #, no-c-format
 msgid "Random key"
 msgstr "무작위 키"
 
 #. Tag: para
-#: using-d-i.xml:1962
+#: using-d-i.xml:1998
 #, no-c-format
 msgid ""
 "A new encryption key will be generated from random data each time you try to "
@@ -3179,7 +3272,7 @@ msgstr ""
 "게 무작정 추측하는 건 평생 해도 다 못 합니다.)"
 
 #. Tag: para
-#: using-d-i.xml:1971
+#: using-d-i.xml:2007
 #, no-c-format
 msgid ""
 "Random keys are useful for swap partitions because you do not need to bother "
@@ -3197,13 +3290,13 @@ msgstr ""
 "왑 파티션에 저장된 데이터를 복구할 방법이 없기 때문입니다."
 
 #. Tag: term
-#: using-d-i.xml:1990 using-d-i.xml:2067
+#: using-d-i.xml:2026 using-d-i.xml:2103
 #, no-c-format
 msgid "Erase data: <userinput>yes</userinput>"
 msgstr "데이터 지우기: <userinput>예</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1992
+#: using-d-i.xml:2028
 #, no-c-format
 msgid ""
 "Determines whether the content of this partition should be overwritten with "
@@ -3223,7 +3316,7 @@ msgstr ""
 "있다고 합니다. </para></footnote>."
 
 #. Tag: para
-#: using-d-i.xml:2012
+#: using-d-i.xml:2048
 #, no-c-format
 msgid ""
 "If you select <menuchoice> <guimenu>Encryption method:</guimenu> "
@@ -3234,13 +3327,13 @@ msgstr ""
 "을 선택하면, 메뉴가 다음 옵션이 나오도록 바뀝니다:"
 
 #. Tag: term
-#: using-d-i.xml:2021
+#: using-d-i.xml:2057
 #, no-c-format
 msgid "Encryption: <userinput>AES256</userinput>"
 msgstr "암호화: <userinput>AES256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2023
+#: using-d-i.xml:2059
 #, no-c-format
 msgid ""
 "For loop-AES, unlike dm-crypt, the options for cipher and key size are "
@@ -3252,25 +3345,25 @@ msgstr ""
 "참고하십시오."
 
 #. Tag: term
-#: using-d-i.xml:2033
+#: using-d-i.xml:2069
 #, no-c-format
 msgid "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
 msgstr "암호화 키: <userinput>키파일 (GnuPG)</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2035
+#: using-d-i.xml:2071
 #, no-c-format
 msgid "Here you can select the type of the encryption key for this partition."
 msgstr "여기서 이 파티션의 암호화 키 종류를 선택할 수 있습니다."
 
 #. Tag: term
-#: using-d-i.xml:2041
+#: using-d-i.xml:2077
 #, no-c-format
 msgid "Keyfile (GnuPG)"
 msgstr "암호화키 파일 (GnuPG)"
 
 #. Tag: para
-#: using-d-i.xml:2042
+#: using-d-i.xml:2078
 #, no-c-format
 msgid ""
 "The encryption key will be generated from random data during the "
@@ -3283,19 +3376,19 @@ msgstr ""
 "바른 암호를 입력해야 합니다. (이 과정의 뒤부분에서 암호를 물어봅니다.)"
 
 #. Tag: para
-#: using-d-i.xml:2055
+#: using-d-i.xml:2091
 #, no-c-format
 msgid "Please see the section on random keys above."
 msgstr "위의 무작위 키에 대한 부분을 참고하십시오."
 
 #. Tag: para
-#: using-d-i.xml:2069
+#: using-d-i.xml:2105
 #, no-c-format
 msgid "Please see the the section on erasing data above."
 msgstr "위의 데이터 지우기에 대한 부분을 참고하십시오."
 
 #. Tag: para
-#: using-d-i.xml:2078
+#: using-d-i.xml:2114
 #, no-c-format
 msgid ""
 "After you have selected the desired parameters for your encrypted "
@@ -3312,7 +3405,7 @@ msgstr ""
 "릴 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2088
+#: using-d-i.xml:2124
 #, no-c-format
 msgid ""
 "Next you will be asked to enter a passphrase for partitions configured to "
@@ -3327,7 +3420,7 @@ msgstr ""
 "면 (생일, 취미, 애완동물 이름, 가족이나 친척 이름 등) 안 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:2097
+#: using-d-i.xml:2133
 #, no-c-format
 msgid ""
 "Before you input any passphrases, you should have made sure that your "
@@ -3349,7 +3442,7 @@ msgstr ""
 "치를 설정하지 못한 상태일 경우에 이런 일이 일어날 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2110
+#: using-d-i.xml:2146
 #, no-c-format
 msgid ""
 "If you selected to use methods other than a passphrase to create encryption "
@@ -3370,7 +3463,7 @@ msgstr ""
 "이 과정을 암호화할 모든 파티션에 대해서 반복합니다."
 
 #. Tag: para
-#: using-d-i.xml:2126
+#: using-d-i.xml:2162
 #, no-c-format
 msgid ""
 "After returning to the main partitioning menu, you will see all encrypted "
@@ -3401,7 +3494,7 @@ msgstr ""
 "(기본값이 마음에 들지 않으면) 파일 시스템 종류를 설정하십시오."
 
 #. Tag: para
-#: using-d-i.xml:2139
+#: using-d-i.xml:2175
 #, no-c-format
 msgid ""
 "Pay attention to the identifiers in parentheses (<replaceable>sda2_crypt</"
@@ -3418,7 +3511,7 @@ msgstr ""
 "뒤의 <xref linkend=\"mount-encrypted-volumes\"/>에서 설명합니다."
 
 #. Tag: para
-#: using-d-i.xml:2149
+#: using-d-i.xml:2185
 #, no-c-format
 msgid ""
 "Once you are satisfied with the partitioning scheme, continue with the "
@@ -3426,13 +3519,13 @@ msgid ""
 msgstr "파티션 방법이 마음에 들면, 설치를 계속하십시오."
 
 #. Tag: title
-#: using-d-i.xml:2160
+#: using-d-i.xml:2196
 #, no-c-format
 msgid "Installing the Base System"
 msgstr "베이스 시스템 설치하기"
 
 #. Tag: para
-#: using-d-i.xml:2161
+#: using-d-i.xml:2197
 #, no-c-format
 msgid ""
 "Although this stage is the least problematic, it consumes a significant "
@@ -3446,7 +3539,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: using-d-i.xml:2174
+#: using-d-i.xml:2210
 #, no-c-format
 msgid ""
 "During installation of the base system, package unpacking and setup messages "
@@ -3462,7 +3555,7 @@ msgstr ""
 "keycap><keycap>F1</keycap></keycombo>을 누르십시오."
 
 #. Tag: para
-#: using-d-i.xml:2183
+#: using-d-i.xml:2219
 #, no-c-format
 msgid ""
 "The unpack/setup messages generated during this phase are also saved in "
@@ -3474,7 +3567,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: using-d-i.xml:2189
+#: using-d-i.xml:2225
 #, fuzzy, no-c-format
 #| msgid ""
 #| "As part of the installation, a Linux kernel will be installed. At the "
@@ -3492,7 +3585,7 @@ msgstr ""
 "지 커널 중에서 하나를 선택할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2196
+#: using-d-i.xml:2232
 #, no-c-format
 msgid ""
 "When packages are installed using the package management system, it will by "
@@ -3504,7 +3597,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:2206
+#: using-d-i.xml:2242
 #, no-c-format
 msgid ""
 "For technical reasons packages installed during the installation of the base "
@@ -3514,13 +3607,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: using-d-i.xml:2218
+#: using-d-i.xml:2254
 #, no-c-format
 msgid "Installing Additional Software"
 msgstr "추가 소프트웨어 설치하기"
 
 #. Tag: para
-#: using-d-i.xml:2219
+#: using-d-i.xml:2255
 #, no-c-format
 msgid ""
 "At this point you have a usable but limited system. Most users will want to "
@@ -3534,13 +3627,13 @@ msgstr ""
 "베이스 시스템 설치보다도 더 오래 걸릴 수 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:2234
+#: using-d-i.xml:2270
 #, no-c-format
 msgid "Configuring apt"
 msgstr "APT 설정하기"
 
 #. Tag: para
-#: using-d-i.xml:2236
+#: using-d-i.xml:2272
 #, no-c-format
 msgid ""
 "One of the tools used to install packages on a &debian-gnu; system is a "
@@ -3574,7 +3667,7 @@ msgstr ""
 "지 관리에 사용하길 권장합니다."
 
 #. Tag: para
-#: using-d-i.xml:2260
+#: using-d-i.xml:2296
 #, no-c-format
 msgid ""
 "<command>apt</command> must be configured so that it knows from where to "
@@ -3587,7 +3680,7 @@ msgstr ""
 "파일의 내용을 살펴보고 바꿀 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2267
+#: using-d-i.xml:2303
 #, no-c-format
 msgid ""
 "If you are installing at default priority, the installer will largely take "
@@ -3604,7 +3697,7 @@ msgstr ""
 "업데이트 서비스에 대한 미러 사이트도 추가합니다."
 
 #. Tag: para
-#: using-d-i.xml:2276
+#: using-d-i.xml:2312
 #, no-c-format
 msgid ""
 "If you are installing at a lower priority (e.g. in expert mode), you will be "
@@ -3619,13 +3712,13 @@ msgstr ""
 "의 패키지를 추가할 지도 결정할 수 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:2287
+#: using-d-i.xml:2323
 #, no-c-format
 msgid "Installing from more than one CD or DVD"
 msgstr "여러 개의 CD/DVD에서 설치하기"
 
 #. Tag: para
-#: using-d-i.xml:2289
+#: using-d-i.xml:2325
 #, no-c-format
 msgid ""
 "If you are installing from a CD or a DVD that is part of a larger set, the "
@@ -3638,7 +3731,7 @@ msgstr ""
 "그램에서 그 CD나 DVD에 들어 있는 패키지를 사용할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2296
+#: using-d-i.xml:2332
 #, no-c-format
 msgid ""
 "If you do not have any additional CDs or DVDs, that is no problem: using "
@@ -3651,7 +3744,7 @@ msgstr ""
 "에 해당하는 패키지를 설치할 수 없을 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2304
+#: using-d-i.xml:2340
 #, no-c-format
 msgid ""
 "Packages are included on CDs (and DVDs) in the order of their popularity. "
@@ -3664,7 +3757,7 @@ msgstr ""
 "지를 사용하는 사람은 거의 없습니다."
 
 #. Tag: para
-#: using-d-i.xml:2311
+#: using-d-i.xml:2347
 #, no-c-format
 msgid ""
 "It also means that buying or downloading and burning a full CD set is just a "
@@ -3680,7 +3773,7 @@ msgstr ""
 "다. 첫번째 DVD나 두번째 DVD만으로도 필요한 대부분의 패키지가 들어 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2320
+#: using-d-i.xml:2356
 #, no-c-format
 msgid ""
 "A good rule of thumb is that for a regular desktop installation (using the "
@@ -3694,7 +3787,7 @@ msgstr ""
 "할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2328
+#: using-d-i.xml:2364
 #, no-c-format
 msgid ""
 "If you do scan multiple CDs or DVDs, the installer will prompt you to "
@@ -3710,13 +3803,13 @@ msgstr ""
 "으로 읽어들이면 실패할 가능성이 줄어듭니다."
 
 #. Tag: title
-#: using-d-i.xml:2341
+#: using-d-i.xml:2377
 #, no-c-format
 msgid "Using a network mirror"
 msgstr "네트워크 미러 사용하기"
 
 #. Tag: para
-#: using-d-i.xml:2343
+#: using-d-i.xml:2379
 #, no-c-format
 msgid ""
 "One question that will be asked during most installs is whether or not to "
@@ -3727,7 +3820,7 @@ msgstr ""
 "을 받게 됩니다. 기본값을 사용해도 되지만 예외의 경우가 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2349
+#: using-d-i.xml:2385
 #, no-c-format
 msgid ""
 "If you are <emphasis>not</emphasis> installing from a full CD or DVD or "
@@ -3744,7 +3837,7 @@ msgstr ""
 "literal> 태스크를 선택하지 <emphasis>않는</emphasis> 편이 좋습니다."
 
 #. Tag: para
-#: using-d-i.xml:2358
+#: using-d-i.xml:2394
 #, no-c-format
 msgid ""
 "If you are installing from a single full CD or using a full CD image, using "
@@ -3763,7 +3856,7 @@ msgstr ""
 "패키지를 설치하는 게 좋습니다."
 
 #. Tag: para
-#: using-d-i.xml:2369
+#: using-d-i.xml:2405
 #, no-c-format
 msgid ""
 "If you are installing from a DVD or using a DVD image, any packages needed "
@@ -3776,7 +3869,7 @@ msgstr ""
 "니다. 네트워크 미러는 꼭 사용하지 않아도 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:2376
+#: using-d-i.xml:2412
 #, no-c-format
 msgid ""
 "One advantage of adding a network mirror is that updates that have occurred "
@@ -3791,7 +3884,7 @@ msgstr ""
 "을 더 오래동안 사용할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2383
+#: using-d-i.xml:2419
 #, no-c-format
 msgid ""
 "In summary: selecting a network mirror is generally a good idea, except if "
@@ -3806,26 +3899,26 @@ msgstr ""
 "그러므로 미러 사이트를 사용할 경우 다운로드할 데이터의 크기는"
 
 #. Tag: para
-#: using-d-i.xml:2392
+#: using-d-i.xml:2428
 #, no-c-format
 msgid "the tasks you select in the next step of the installation,"
 msgstr "다음 설치 단계에서 선택하는 태스크,"
 
 #. Tag: para
-#: using-d-i.xml:2397
+#: using-d-i.xml:2433
 #, no-c-format
 msgid "which packages are needed for those tasks,"
 msgstr "그 태스크에 필요한 패키지,"
 
 #. Tag: para
-#: using-d-i.xml:2402
+#: using-d-i.xml:2438
 #, no-c-format
 msgid ""
 "which of those packages are present on the CDs or DVDs you have scanned, and"
 msgstr "그 패키지 중에 사용 중인 CD/DVD에 들어 있는 패키지,"
 
 #. Tag: para
-#: using-d-i.xml:2407
+#: using-d-i.xml:2443
 #, no-c-format
 msgid ""
 "whether any updated versions of packages included on the CDs or DVDs are "
@@ -3836,7 +3929,7 @@ msgstr ""
 "반 패키지 미러이든 보안/유동 업데이트 미러이든 간에) 달려 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2416
+#: using-d-i.xml:2452
 #, no-c-format
 msgid ""
 "Note that the last point means that, even if you choose not to use a network "
@@ -3849,13 +3942,13 @@ msgstr ""
 "운로드할 수 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:2432
+#: using-d-i.xml:2468
 #, no-c-format
 msgid "Selecting and Installing Software"
 msgstr "소프트웨어 선택 및 설치"
 
 #. Tag: para
-#: using-d-i.xml:2434
+#: using-d-i.xml:2470
 #, no-c-format
 msgid ""
 "During the installation process, you are given the opportunity to select "
@@ -3871,7 +3964,7 @@ msgstr ""
 "리 마쳐서 컴퓨터를 다양한 용도로 사용할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2443
+#: using-d-i.xml:2479
 #, no-c-format
 msgid ""
 "So, you have the ability to choose <emphasis>tasks</emphasis> first, and "
@@ -3903,7 +3996,7 @@ msgstr ""
 "list\"/>에서 각 태스크마다 필요한 공간을 볼 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2470
+#: using-d-i.xml:2506
 #, no-c-format
 msgid ""
 "Some tasks may be pre-selected based on the characteristics of the computer "
@@ -3915,7 +4008,7 @@ msgstr ""
 "선택하지 않을 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2477
+#: using-d-i.xml:2513
 #, no-c-format
 msgid ""
 "In the standard user interface of the installer, you can use the space bar "
@@ -3925,7 +4018,7 @@ msgstr ""
 "택하고 해제할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2483
+#: using-d-i.xml:2519
 #, no-c-format
 msgid ""
 "Unless you are using the special KDE or Xfce/LXDE CDs, the <quote>Desktop "
@@ -3935,7 +4028,7 @@ msgstr ""
 "태스크는 그놈 데스크탑 환경을 설치합니다."
 
 #. Tag: para
-#: using-d-i.xml:2488
+#: using-d-i.xml:2524
 #, no-c-format
 msgid ""
 "It is not possible to interactively select a different desktop during the "
@@ -3956,7 +4049,7 @@ msgstr ""
 
 # 부팅 메뉴는 현재 번역되지 않으므로 "Advanced option" 및 "Alternative desktop environments"는 그대로 쓴다.
 #. Tag: para
-#: using-d-i.xml:2499
+#: using-d-i.xml:2535
 #, no-c-format
 msgid ""
 "Some CD images (businesscard, netinst and DVD) also allow selection of the "
@@ -3970,7 +4063,7 @@ msgstr ""
 "보십시오."
 
 #. Tag: para
-#: using-d-i.xml:2506
+#: using-d-i.xml:2542
 #, no-c-format
 msgid ""
 "Note that this will only work if the packages needed for the desired desktop "
@@ -3987,7 +4080,7 @@ msgstr ""
 "가 없습니다."
 
 #. Tag: para
-#: using-d-i.xml:2516
+#: using-d-i.xml:2552
 #, no-c-format
 msgid ""
 "The various server tasks will install software roughly as follows. DNS "
@@ -4006,7 +4099,7 @@ msgstr ""
 "classname>, 웹 서버: <classname>apache2</classname>."
 
 #. Tag: para
-#: using-d-i.xml:2527
+#: using-d-i.xml:2563
 #, no-c-format
 msgid ""
 "The <quote>Standard system</quote> task will install any package that has a "
@@ -4021,7 +4114,7 @@ msgstr ""
 "고 있고 정말 최소한의 시스템을 원하는 경우가 아니라면)."
 
 #. Tag: para
-#: using-d-i.xml:2535
+#: using-d-i.xml:2571
 #, no-c-format
 msgid ""
 "If during language selection a default locale other than the <quote>C</"
@@ -4039,7 +4132,7 @@ msgstr ""
 "경에 필요한 지역화 패키지도 (이러한 패키지가 있다면) 설치합니다."
 
 #. Tag: para
-#: using-d-i.xml:2545
+#: using-d-i.xml:2581
 #, no-c-format
 msgid ""
 "Once you've selected your tasks, select &BTN-CONT;. At this point, "
@@ -4052,7 +4145,7 @@ msgstr ""
 "자가 설정해야 하는 프로그램이 있으면 설치하는 중에 알려 줍니다."
 
 #. Tag: para
-#: using-d-i.xml:2552
+#: using-d-i.xml:2588
 #, no-c-format
 msgid ""
 "You should be aware that especially the Desktop task is very large. "
@@ -4068,7 +4161,7 @@ msgstr ""
 "수도 있습니다. 패키지 설치를 일단 시작하면 취소하는 방법은 없습니다."
 
 #. Tag: para
-#: using-d-i.xml:2561
+#: using-d-i.xml:2597
 #, no-c-format
 msgid ""
 "Even when packages are included on the CD-ROM, the installer may still "
@@ -4085,13 +4178,13 @@ msgstr ""
 "지를 사용하면 이런 일이 발생합니다."
 
 #. Tag: title
-#: using-d-i.xml:2576
+#: using-d-i.xml:2612
 #, no-c-format
 msgid "Making Your System Bootable"
 msgstr "시스템을 부팅 가능하게 만들기"
 
 #. Tag: para
-#: using-d-i.xml:2578
+#: using-d-i.xml:2614
 #, no-c-format
 msgid ""
 "If you are installing a diskless workstation, obviously, booting off the "
@@ -4105,13 +4198,13 @@ msgstr ""
 "\"boot-dev-select-sun\"/> 부분을 참고하십시오.</phrase>"
 
 #. Tag: title
-#: using-d-i.xml:2593
+#: using-d-i.xml:2629
 #, no-c-format
 msgid "Detecting other operating systems"
 msgstr "다른 운영 체제 검색"
 
 #. Tag: para
-#: using-d-i.xml:2595
+#: using-d-i.xml:2631
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Before a boot loader is installed, the installer will attempt to probe "
@@ -4132,7 +4225,7 @@ msgstr ""
 "정합니다."
 
 #. Tag: para
-#: using-d-i.xml:2603
+#: using-d-i.xml:2639
 #, no-c-format
 msgid ""
 "Note that multiple operating systems booting on a single machine is still "
@@ -4147,13 +4240,13 @@ msgstr ""
 "서에서 더 자세한 사항을 찾아보십시오."
 
 #. Tag: title
-#: using-d-i.xml:2621
+#: using-d-i.xml:2657
 #, no-c-format
 msgid "<command>palo</command>-installer"
 msgstr "<command>palo</command>-installer"
 
 #. Tag: para
-#: using-d-i.xml:2622
+#: using-d-i.xml:2658
 #, no-c-format
 msgid ""
 "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is "
@@ -4169,19 +4262,19 @@ msgstr ""
 "파티션을 읽을 수 있기 때문입니다."
 
 #. Tag: para
-#: using-d-i.xml:2631
+#: using-d-i.xml:2667
 #, no-c-format
 msgid "hppa FIXME ( need more info )"
 msgstr "hppa FIXME ( need more info )"
 
 #. Tag: title
-#: using-d-i.xml:2643
+#: using-d-i.xml:2679
 #, no-c-format
 msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
 msgstr "하드 디스크에 <command>GRUB</command> 부트로더 설치"
 
 #. Tag: para
-#: using-d-i.xml:2645
+#: using-d-i.xml:2681
 #, no-c-format
 msgid ""
 "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a "
@@ -4193,7 +4286,7 @@ msgstr ""
 "다."
 
 #. Tag: para
-#: using-d-i.xml:2651
+#: using-d-i.xml:2687
 #, no-c-format
 msgid ""
 "By default, grub will be installed into the Master Boot Record (MBR), where "
@@ -4205,7 +4298,7 @@ msgstr ""
 "보를 보려면 GRUB 안내서를 참고하십시오."
 
 #. Tag: para
-#: using-d-i.xml:2657
+#: using-d-i.xml:2693
 #, no-c-format
 msgid ""
 "If you do not want to install grub, use the &BTN-GOBACK; button to get to "
@@ -4216,13 +4309,13 @@ msgstr ""
 "한 다음, 사용하고 싶은 부트로더를 선택하십시오."
 
 #. Tag: title
-#: using-d-i.xml:2670
+#: using-d-i.xml:2706
 #, no-c-format
 msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
 msgstr "하드 디스크에 <command>LILO</command> 부트로더 설치"
 
 #. Tag: para
-#: using-d-i.xml:2672
+#: using-d-i.xml:2708
 #, no-c-format
 msgid ""
 "The second &architecture; boot loader is called <quote>LILO</quote>. It is "
@@ -4238,7 +4331,7 @@ msgstr ""
 "HOWTO</ulink>도 참고하십시오."
 
 #. Tag: para
-#: using-d-i.xml:2682
+#: using-d-i.xml:2718
 #, no-c-format
 msgid ""
 "Currently the LILO installation will only create menu entries for other "
@@ -4251,7 +4344,7 @@ msgstr ""
 "메뉴 항목을 수동으로 추가해야 할 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2690
+#: using-d-i.xml:2726
 #, no-c-format
 msgid ""
 "&d-i; offers you three choices on where to install the <command>LILO</"
@@ -4261,13 +4354,13 @@ msgstr ""
 "다:"
 
 #. Tag: term
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid "Master Boot Record (MBR)"
 msgstr "마스터 부트 레코드 (Master Boot Record, MBR)"
 
 #. Tag: para
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid ""
 "This way the <command>LILO</command> will take complete control of the boot "
@@ -4275,14 +4368,14 @@ msgid ""
 msgstr "이렇게 하면 <command>LILO</command>가 부팅 과정을 완전히 담당합니다."
 
 #. Tag: term
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, fuzzy, no-c-format
 #| msgid "new Debian partition"
 msgid "new &debian; partition"
 msgstr "새 데비안 파티션"
 
 #. Tag: para
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Choose this if you want to use another boot manager. <command>LILO</"
@@ -4297,13 +4390,13 @@ msgstr ""
 "는 새 데비안 파티션의 맨 앞쪽에 설치하고 보조 부트로더로 동작합니다."
 
 #. Tag: term
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid "Other choice"
 msgstr "기타"
 
 #. Tag: para
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid ""
 "Useful for advanced users who want to install <command>LILO</command> "
@@ -4316,7 +4409,7 @@ msgstr ""
 "dev/hda</filename> 혹은 <filename>/dev/sda</filename>라고 쓸 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:2723
+#: using-d-i.xml:2759
 #, fuzzy, no-c-format
 #| msgid ""
 #| "If you can no longer boot into Windows 9x (or DOS) after this step, "
@@ -4338,13 +4431,13 @@ msgstr ""
 "요합니다!"
 
 #. Tag: title
-#: using-d-i.xml:2739
+#: using-d-i.xml:2775
 #, no-c-format
 msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr "하드 디스크에 <command>ELILO</command> 부트로더 설치"
 
 #. Tag: para
-#: using-d-i.xml:2741
+#: using-d-i.xml:2777
 #, no-c-format
 msgid ""
 "The &architecture; boot loader is called <quote>elilo</quote>. It is modeled "
@@ -4371,7 +4464,7 @@ msgstr ""
 "시작하는 일을 합니다."
 
 #. Tag: para
-#: using-d-i.xml:2757
+#: using-d-i.xml:2793
 #, no-c-format
 msgid ""
 "The <quote>elilo</quote> configuration and installation is done as the last "
@@ -4387,13 +4480,13 @@ msgstr ""
 "은 디스크의 파티션입니다."
 
 #. Tag: title
-#: using-d-i.xml:2769
+#: using-d-i.xml:2805
 #, no-c-format
 msgid "Choose the correct partition!"
 msgstr "올바른 파티션을 고르십시오!"
 
 #. Tag: para
-#: using-d-i.xml:2771
+#: using-d-i.xml:2807
 #, fuzzy, no-c-format
 #| msgid ""
 #| "The criteria for selecting a partition is that it is FAT format "
@@ -4417,13 +4510,13 @@ msgstr ""
 "당 파티션을 포맷할 수도 있고, 그러면 이전의 내용이 모두 지워집니다!"
 
 #. Tag: title
-#: using-d-i.xml:2786
+#: using-d-i.xml:2822
 #, no-c-format
 msgid "EFI Partition Contents"
 msgstr "EFI 파티션 내용"
 
 #. Tag: para
-#: using-d-i.xml:2788
+#: using-d-i.xml:2824
 #, no-c-format
 msgid ""
 "The EFI partition is a FAT filesystem format partition on one of the hard "
@@ -4452,13 +4545,13 @@ msgstr ""
 "템을 업데이트하거나 다시 설정할 수도 있습니다."
 
 #. Tag: filename
-#: using-d-i.xml:2810
+#: using-d-i.xml:2846
 #, no-c-format
 msgid "elilo.conf"
 msgstr "elilo.conf"
 
 #. Tag: para
-#: using-d-i.xml:2811
+#: using-d-i.xml:2847
 #, no-c-format
 msgid ""
 "This is the configuration file read by the boot loader when it starts. It is "
@@ -4470,13 +4563,13 @@ msgstr ""
 "의 파일 이름을 바꾼 것입니다."
 
 #. Tag: filename
-#: using-d-i.xml:2820
+#: using-d-i.xml:2856
 #, no-c-format
 msgid "elilo.efi"
 msgstr "elilo.efi"
 
 #. Tag: para
-#: using-d-i.xml:2821
+#: using-d-i.xml:2857
 #, fuzzy, no-c-format
 #| msgid ""
 #| "This is the boot loader program that the <quote>EFI Boot Manager</quote> "
@@ -4495,13 +4588,13 @@ msgstr ""
 "입니다."
 
 #. Tag: filename
-#: using-d-i.xml:2831
+#: using-d-i.xml:2867
 #, no-c-format
 msgid "initrd.img"
 msgstr "initrd.img"
 
 #. Tag: para
-#: using-d-i.xml:2832
+#: using-d-i.xml:2868
 #, fuzzy, no-c-format
 #| msgid ""
 #| "This is the initial root filesystem used to boot the kernel. It is a copy "
@@ -4521,13 +4614,13 @@ msgstr ""
 "filename> 심볼릭 링크가 그 파일을 가리킵니다."
 
 #. Tag: filename
-#: using-d-i.xml:2844
+#: using-d-i.xml:2880
 #, no-c-format
 msgid "readme.txt"
 msgstr "readme.txt"
 
 #. Tag: para
-#: using-d-i.xml:2845
+#: using-d-i.xml:2881
 #, no-c-format
 msgid ""
 "This is a small text file warning you that the contents of the directory are "
@@ -4539,13 +4632,13 @@ msgstr ""
 "usr/sbin/elilo</filename>를 실행하면 없어집니다."
 
 #. Tag: filename
-#: using-d-i.xml:2855
+#: using-d-i.xml:2891
 #, no-c-format
 msgid "vmlinuz"
 msgstr "vmlinuz"
 
 #. Tag: para
-#: using-d-i.xml:2856
+#: using-d-i.xml:2892
 #, fuzzy, no-c-format
 #| msgid ""
 #| "This is the compressed kernel itself. It is a copy of the file referenced "
@@ -4564,13 +4657,13 @@ msgstr ""
 "을 가리킵니다."
 
 #. Tag: title
-#: using-d-i.xml:2876
+#: using-d-i.xml:2912
 #, no-c-format
 msgid "<command>arcboot</command>-installer"
 msgstr "<command>arcboot</command>-installer"
 
 #. Tag: para
-#: using-d-i.xml:2877
+#: using-d-i.xml:2913
 #, no-c-format
 msgid ""
 "The boot loader on SGI machines is <command>arcboot</command>. It has to be "
@@ -4613,13 +4706,13 @@ msgstr ""
 "면 시스템을 하드 디스크에서 부팅할 수 있습니다."
 
 #. Tag: replaceable
-#: using-d-i.xml:2896
+#: using-d-i.xml:2932
 #, no-c-format
 msgid "scsi"
 msgstr "scsi"
 
 #. Tag: para
-#: using-d-i.xml:2897
+#: using-d-i.xml:2933
 #, no-c-format
 msgid ""
 "is the SCSI bus to be booted from, this is <userinput>0</userinput> for the "
@@ -4629,13 +4722,13 @@ msgstr ""
 "니다"
 
 #. Tag: replaceable
-#: using-d-i.xml:2905
+#: using-d-i.xml:2941
 #, no-c-format
 msgid "disk"
 msgstr "disk"
 
 #. Tag: para
-#: using-d-i.xml:2906
+#: using-d-i.xml:2942
 #, no-c-format
 msgid ""
 "is the SCSI ID of the hard disk on which <command>arcboot</command> is "
@@ -4643,13 +4736,13 @@ msgid ""
 msgstr "<command>arcboot</command>를 설치한 하드디스크의 SCSI ID"
 
 #. Tag: replaceable
-#: using-d-i.xml:2914
+#: using-d-i.xml:2950
 #, no-c-format
 msgid "partnr"
 msgstr "partnr"
 
 #. Tag: para
-#: using-d-i.xml:2915
+#: using-d-i.xml:2951
 #, no-c-format
 msgid ""
 "is the number of the partition on which <filename>/etc/arcboot.conf</"
@@ -4657,13 +4750,13 @@ msgid ""
 msgstr "<filename>/etc/arcboot.conf</filename> 파일이 들어 있는 파티션 번호"
 
 #. Tag: replaceable
-#: using-d-i.xml:2923
+#: using-d-i.xml:2959
 #, no-c-format
 msgid "config"
 msgstr "config"
 
 #. Tag: para
-#: using-d-i.xml:2924
+#: using-d-i.xml:2960
 #, no-c-format
 msgid ""
 "is the name of the configuration entry in <filename>/etc/arcboot.conf</"
@@ -4673,13 +4766,13 @@ msgstr ""
 "은 <quote>linux</quote>입니다."
 
 #. Tag: title
-#: using-d-i.xml:2945
+#: using-d-i.xml:2981
 #, no-c-format
 msgid "Install <command>Yaboot</command> on a Hard Disk"
 msgstr "하드 디스크에 <command>yaboot</command> 설치"
 
 #. Tag: para
-#: using-d-i.xml:2946
+#: using-d-i.xml:2982
 #, no-c-format
 msgid ""
 "Newer (mid 1998 and on) PowerMacs use <command>yaboot</command> as their "
@@ -4698,13 +4791,13 @@ msgstr ""
 "크가 부팅 가능하게 되고 OpenFirmware에서 &debian-gnu; 부팅 준비가 끝납니다."
 
 #. Tag: title
-#: using-d-i.xml:2964
+#: using-d-i.xml:3000
 #, no-c-format
 msgid "Install <command>Quik</command> on a Hard Disk"
 msgstr "하드 디스크에 <command>quik</command> 설치"
 
 #. Tag: para
-#: using-d-i.xml:2965
+#: using-d-i.xml:3001
 #, no-c-format
 msgid ""
 "The boot loader for OldWorld Power Macintosh machines is <command>quik</"
@@ -4718,13 +4811,13 @@ msgstr ""
 "품에서 동작한다고 알려져 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:2981
+#: using-d-i.xml:3017
 #, no-c-format
 msgid "<command>zipl</command>-installer"
 msgstr "<command>zipl</command>-installer"
 
 #. Tag: para
-#: using-d-i.xml:2982
+#: using-d-i.xml:3018
 #, no-c-format
 msgid ""
 "The boot loader on &arch-title; is <quote>zipl</quote>. <command>ZIPL</"
@@ -4740,13 +4833,13 @@ msgstr ""
 "and Installation Commands</quote>를 보십시오."
 
 #. Tag: title
-#: using-d-i.xml:2999
+#: using-d-i.xml:3035
 #, no-c-format
 msgid "Install the <command>SILO</command> Boot Loader on a Hard Disk"
 msgstr "하드 디스크에 <command>SILO</command> 부트로더 설치"
 
 #. Tag: para
-#: using-d-i.xml:3001
+#: using-d-i.xml:3037
 #, no-c-format
 msgid ""
 "The standard &architecture; boot loader is called <quote>silo</quote>. It is "
@@ -4776,13 +4869,13 @@ msgstr ""
 "Solaris와 같이 설치할 때 유용합니다."
 
 #. Tag: title
-#: using-d-i.xml:3026
+#: using-d-i.xml:3062
 #, no-c-format
 msgid "Continue Without Boot Loader"
 msgstr "부트로더 없이 계속"
 
 #. Tag: para
-#: using-d-i.xml:3028
+#: using-d-i.xml:3064
 #, no-c-format
 msgid ""
 "This option can be used to complete the installation even when no boot "
@@ -4794,7 +4887,7 @@ msgstr ""
 "더가 필요없는 경우일 (예를 들어 기존 부트로더를 사용) 것입니다."
 
 #. Tag: para
-#: using-d-i.xml:3035
+#: using-d-i.xml:3071
 #, no-c-format
 msgid ""
 "If you plan to manually configure your bootloader, you should check the name "
@@ -4815,13 +4908,13 @@ msgstr ""
 "및 파티션도 알아야 합니다."
 
 #. Tag: title
-#: using-d-i.xml:3052
+#: using-d-i.xml:3088
 #, no-c-format
 msgid "Finishing the Installation"
 msgstr "설치 마치기"
 
 #. Tag: para
-#: using-d-i.xml:3053
+#: using-d-i.xml:3089
 #, fuzzy, no-c-format
 #| msgid ""
 #| "This is the last step in the Debian installation process during which the "
@@ -4836,13 +4929,13 @@ msgstr ""
 "정리하는 일입니다."
 
 #. Tag: title
-#: using-d-i.xml:3066
+#: using-d-i.xml:3102
 #, no-c-format
 msgid "Setting the System Clock"
 msgstr "시스템 시계 맞추기"
 
 #. Tag: para
-#: using-d-i.xml:3068
+#: using-d-i.xml:3104
 #, no-c-format
 msgid ""
 "The installer may ask you if the computer's clock is set to UTC. Normally "
@@ -4855,7 +4948,7 @@ msgstr ""
 "에, 이 질문은 보통 물어보지 않습니다."
 
 #. Tag: para
-#: using-d-i.xml:3075
+#: using-d-i.xml:3111
 #, no-c-format
 msgid ""
 "In expert mode you will always be able to choose whether or not the clock is "
@@ -4872,7 +4965,7 @@ msgstr ""
 "니다. 듀얼 부팅을 하려면 UTC가 아니라 지역별 시각으로 맞추십시오.</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:3086
+#: using-d-i.xml:3122
 #, no-c-format
 msgid ""
 "At this point &d-i; will also attempt to save the current time to the "
@@ -4883,13 +4976,13 @@ msgstr ""
 "한 사항에 따라 UTC로 저장할 수도 있고 지역별 시각으로 저장할 수도 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:3101
+#: using-d-i.xml:3137
 #, no-c-format
 msgid "Reboot the System"
 msgstr "시스템 다시 시작"
 
 #. Tag: para
-#: using-d-i.xml:3103
+#: using-d-i.xml:3139
 #, fuzzy, no-c-format
 #| msgid ""
 #| "You will be prompted to remove the boot media (CD, floppy, etc) that you "
@@ -4904,7 +4997,7 @@ msgstr ""
 "나옵니다. 그 다음에 새로 설치한 데비안 시스템으로 다시 시작합니다."
 
 #. Tag: para
-#: using-d-i.xml:3109
+#: using-d-i.xml:3145
 #, no-c-format
 msgid ""
 "After a final prompt the system will be halted because rebooting is not "
@@ -4917,13 +5010,13 @@ msgstr ""
 "선택했던 DASD에서, GNU/리눅스를 부팅하면 (IPL) 됩니다."
 
 #. Tag: title
-#: using-d-i.xml:3122
+#: using-d-i.xml:3158
 #, no-c-format
-msgid "Miscellaneous"
-msgstr "기타"
+msgid "Troubleshooting"
+msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:3123
+#: using-d-i.xml:3159
 #, no-c-format
 msgid ""
 "The components listed in this section are usually not involved in the "
@@ -4934,13 +5027,13 @@ msgstr ""
 "지만 백그라운드에서 기다리면서 잘못된 부분이 있을 때 도움이 됩니다."
 
 #. Tag: title
-#: using-d-i.xml:3136
+#: using-d-i.xml:3172
 #, no-c-format
 msgid "Saving the installation logs"
 msgstr "설치 로그 저장"
 
 #. Tag: para
-#: using-d-i.xml:3138
+#: using-d-i.xml:3174
 #, fuzzy, no-c-format
 #| msgid ""
 #| "If the installation is successful, the logfiles created during the "
@@ -4955,7 +5048,7 @@ msgstr ""
 "<filename>/var/log/installer/</filename> 파일에 자동으로 저장합니다."
 
 #. Tag: para
-#: using-d-i.xml:3145
+#: using-d-i.xml:3181
 #, no-c-format
 msgid ""
 "Choosing <guimenuitem>Save debug logs</guimenuitem> from the main menu "
@@ -4970,13 +5063,13 @@ msgstr ""
 "로그를 설치 보고서에 첨부할 때 유용합니다."
 
 #. Tag: title
-#: using-d-i.xml:3165
+#: using-d-i.xml:3201
 #, no-c-format
 msgid "Using the Shell and Viewing the Logs"
 msgstr "쉘 사용하기 및 로그 보기"
 
 #. Tag: para
-#: using-d-i.xml:3167
+#: using-d-i.xml:3203
 #, no-c-format
 msgid ""
 "There are several methods you can use to get a shell while running an "
@@ -5001,13 +5094,13 @@ msgstr ""
 "시 돌아올 수 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3185
+#: using-d-i.xml:3221
 #, no-c-format
 msgid "For the graphical installer see also <xref linkend=\"gtk-using\"/>."
 msgstr "그래픽 설치 프로그램은 <xref linkend=\"gtk-using\"/> 부분도 보십시오."
 
 #. Tag: para
-#: using-d-i.xml:3189
+#: using-d-i.xml:3225
 #, no-c-format
 msgid ""
 "If you cannot switch consoles, there is also an <guimenuitem>Execute a "
@@ -5022,7 +5115,7 @@ msgstr ""
 "userinput>를 입력해서 쉘을 닫으십시오."
 
 #. Tag: para
-#: using-d-i.xml:3197
+#: using-d-i.xml:3233
 #, no-c-format
 msgid ""
 "At this point you are booted from the RAM disk, and there is a limited set "
@@ -5039,7 +5132,7 @@ msgstr ""
 "기록같은 훌륭한 기능도 일부 들어 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3206
+#: using-d-i.xml:3242
 #, no-c-format
 msgid ""
 "To edit and view files, use the text editor <command>nano</command>. Log "
@@ -5051,7 +5144,7 @@ msgstr ""
 "에 들어 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3213
+#: using-d-i.xml:3249
 #, no-c-format
 msgid ""
 "Although you can do basically anything in a shell that the available "
@@ -5063,7 +5156,7 @@ msgstr ""
 "션입니다."
 
 #. Tag: para
-#: using-d-i.xml:3219
+#: using-d-i.xml:3255
 #, no-c-format
 msgid ""
 "Doing things manually from the shell may interfere with the installation "
@@ -5076,13 +5169,13 @@ msgstr ""
 "설치 프로그램에서 알아서 하도록 놔두고 쉘에서 직접 하지 않도록 하십시오."
 
 #. Tag: title
-#: using-d-i.xml:3234
+#: using-d-i.xml:3271
 #, no-c-format
 msgid "Installation Over the Network"
 msgstr "네트워크를 통해 설치"
 
 #. Tag: para
-#: using-d-i.xml:3236
+#: using-d-i.xml:3273
 #, no-c-format
 msgid ""
 "One of the more interesting components is <firstterm>network-console</"
@@ -5099,7 +5192,7 @@ msgstr ""
 "따라 자동화할 수 있습니다.)"
 
 #. Tag: para
-#: using-d-i.xml:3246
+#: using-d-i.xml:3283
 #, no-c-format
 msgid ""
 "This component is not loaded into the main installation menu by default, so "
@@ -5120,7 +5213,7 @@ msgstr ""
 "목이 새로 생깁니다."
 
 #. Tag: para
-#: using-d-i.xml:3259
+#: using-d-i.xml:3296
 #, no-c-format
 msgid ""
 "For installations on &arch-title;, this is the default method after setting "
@@ -5130,7 +5223,7 @@ msgstr ""
 "입니다."
 
 #. Tag: para
-#: using-d-i.xml:3264
+#: using-d-i.xml:3301
 #, fuzzy, no-c-format
 #| msgid ""
 #| "<phrase arch=\"not-s390\">After selecting this new entry, you</phrase> "
@@ -5159,7 +5252,7 @@ msgstr ""
 "할 사람에게</quote> 안전하게 전달해야 합니다."
 
 #. Tag: para
-#: using-d-i.xml:3276
+#: using-d-i.xml:3313
 #, no-c-format
 msgid ""
 "Should you decide to continue with the installation locally, you can always "
@@ -5170,7 +5263,7 @@ msgstr ""
 "인 메뉴로 돌아갈 수 있습니다. 메인 메뉴에서 다른 컴포넌트를 선택하면 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:3282
+#: using-d-i.xml:3319
 #, no-c-format
 msgid ""
 "Now let's switch to the other side of the wire. As a prerequisite, you need "
@@ -5200,7 +5293,7 @@ msgstr ""
 "핑거프린트가 표시될 것이고, 이 핑거프린트가 올바른 지 확인해야 합니다."
 
 #. Tag: para
-#: using-d-i.xml:3299
+#: using-d-i.xml:3336
 #, no-c-format
 msgid ""
 "The <command>ssh</command> server in the installer uses a default "
@@ -5224,7 +5317,7 @@ msgstr ""
 "니다."
 
 #. Tag: para
-#: using-d-i.xml:3312
+#: using-d-i.xml:3349
 #, no-c-format
 msgid ""
 "You may be able to avoid the connection being dropped by adding the option "
@@ -5246,7 +5339,7 @@ msgstr ""
 "다.) 그러니 이 옵션은 필요한 경우에만 사용해야 합니다."
 
 #. Tag: para
-#: using-d-i.xml:3325
+#: using-d-i.xml:3362
 #, no-c-format
 msgid ""
 "If you install several computers in turn and they happen to have the same IP "
@@ -5269,7 +5362,7 @@ msgstr ""
 "시 연결하면 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:3341
+#: using-d-i.xml:3378
 #, no-c-format
 msgid ""
 "After the login you will be presented with an initial screen where you have "
@@ -5288,7 +5381,7 @@ msgstr ""
 "어야 합니다. 하지만 쉘의 경우에는 여러 개를 열어도 됩니다."
 
 #. Tag: para
-#: using-d-i.xml:3351
+#: using-d-i.xml:3388
 #, no-c-format
 msgid ""
 "After you have started the installation remotely over SSH, you should not go "
@@ -5303,13 +5396,13 @@ msgstr ""
 "다."
 
 #. Tag: title
-#: using-d-i.xml:3371
+#: using-d-i.xml:3407
 #, no-c-format
 msgid "Loading Missing Firmware"
 msgstr "없는 펌웨어 읽어들이기"
 
 #. Tag: para
-#: using-d-i.xml:3372
+#: using-d-i.xml:3408
 #, no-c-format
 msgid ""
 "As described in <xref linkend=\"hardware-firmware\"/>, some devices require "
@@ -5322,7 +5415,7 @@ msgstr ""
 "가끔 기본적인 기능은 동작하고 추가적인 기능에서만 펌웨어가 필요하기도 합니다."
 
 #. Tag: para
-#: using-d-i.xml:3380
+#: using-d-i.xml:3416
 #, no-c-format
 msgid ""
 "If a device driver requests firmware that is not available, &d-i; will "
@@ -5339,7 +5432,7 @@ msgstr ""
 "입니다."
 
 #. Tag: para
-#: using-d-i.xml:3390
+#: using-d-i.xml:3426
 #, no-c-format
 msgid ""
 "Which devices are scanned and which file systems are supported depends on "
@@ -5356,7 +5449,7 @@ msgstr ""
 "다.</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:3400
+#: using-d-i.xml:3436
 #, no-c-format
 msgid ""
 "Note that it is possible to skip loading the firmware if you know the device "
@@ -5367,7 +5460,7 @@ msgstr ""
 "웨어 읽어들이기를 건너 뛸 수도 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3407
+#: using-d-i.xml:3443
 #, no-c-format
 msgid ""
 "Support for loading firmware is still relatively basic and is likely to be "
@@ -5383,13 +5476,13 @@ msgstr ""
 "참고.)"
 
 #. Tag: title
-#: using-d-i.xml:3418
+#: using-d-i.xml:3454
 #, no-c-format
 msgid "Preparing a medium"
 msgstr "미디어 준비하기"
 
 #. Tag: para
-#: using-d-i.xml:3419
+#: using-d-i.xml:3455
 #, no-c-format
 msgid ""
 "Although in some cases the firmware can also be loaded from a partition on a "
@@ -5407,7 +5500,7 @@ msgstr ""
 "입니다. (FAT는 설치 앞 단계에서도 지원하는 파일 시스템이므로.)"
 
 #. Tag: para
-#: using-d-i.xml:3429
+#: using-d-i.xml:3465
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Tarballs containing current packages for the most common firmware are "
@@ -5428,7 +5521,7 @@ msgstr ""
 "서 미디어의 파일 시스템에 풀어 놓으십시오."
 
 #. Tag: para
-#: using-d-i.xml:3443
+#: using-d-i.xml:3479
 #, no-c-format
 msgid ""
 "If the firmware you need is not included in the tarball, you can also "
@@ -5443,7 +5536,7 @@ msgstr ""
 "가 아닌 패키지도 들어 있습니다:"
 
 #. Tag: para
-#: using-d-i.xml:3457
+#: using-d-i.xml:3493
 #, no-c-format
 msgid ""
 "It is also possible to copy individual firmware files to the medium. Loose "
@@ -5454,13 +5547,13 @@ msgstr ""
 "놓은 시스템에서 가져올 수도 있고 하드웨어 공급사가 제공해 줄 수도 있습니다."
 
 #. Tag: title
-#: using-d-i.xml:3466
+#: using-d-i.xml:3502
 #, no-c-format
 msgid "Firmware and the Installed System"
 msgstr "펌웨어 및 설치한 시스템"
 
 #. Tag: para
-#: using-d-i.xml:3467
+#: using-d-i.xml:3503
 #, no-c-format
 msgid ""
 "Any firmware loaded during the installation will be copied automatically to "
@@ -5476,7 +5569,7 @@ msgstr ""
 "낮지만 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3476
+#: using-d-i.xml:3512
 #, no-c-format
 msgid ""
 "If the firmware was loaded from a firmware package, &d-i; will also install "
@@ -5491,7 +5584,7 @@ msgstr ""
 "이 있습니다."
 
 #. Tag: para
-#: using-d-i.xml:3484
+#: using-d-i.xml:3520
 #, no-c-format
 msgid ""
 "If loading the firmware was skipped during the installation, the relevant "
@@ -5502,7 +5595,7 @@ msgstr ""
 "당 장치가 설치한 시스템에서 동작하지 않을 것입니다."
 
 #. Tag: para
-#: using-d-i.xml:3491
+#: using-d-i.xml:3527
 #, no-c-format
 msgid ""
 "If the firmware was loaded from loose firmware files, the firmware copied to "
@@ -5513,6 +5606,9 @@ msgstr ""
 "펌웨어 파일에서 펌웨어를 설치한 경우, 그 펌웨어는 설치한 시스템에 복사되고 해"
 "당 펌웨어 패키지를 (패키지가 있다면) 설치하지 않는 한 자동으로 업데이트되지 "
 "<emphasis>않습니다</emphasis>."
+
+#~ msgid "Miscellaneous"
+#~ msgstr "기타"
 
 #~ msgid ""
 #~ "If the language has only one country associated with it, that country "

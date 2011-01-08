@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Installation Guide using-d-i\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2010-10-29 05:56+0000\n"
+"POT-Creation-Date: 2011-01-08 16:52+0000\n"
 "PO-Revision-Date: 2010-05-14 08:20+0300\n"
 "Last-Translator: Tapio Lehtonen <tale@debian.org>\n"
 "Language-Team: Finnish <debian-l10n-finnish@lists.debian.org>\n"
@@ -1740,11 +1740,16 @@ msgstr "Tuettuja ovat seuraavat tiedostojärjestelmät."
 
 #. Tag: para
 #: using-d-i.xml:1093
-#, no-c-format
+#, fuzzy, no-c-format
+#| msgid ""
+#| "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
+#| "<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
+#| "emphasis>"
 msgid ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
-"<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
-"emphasis>"
+"<emphasis>ext2</emphasis>, <phrase arch=\"linux-any\"><emphasis>ext3</"
+"emphasis>,</phrase> <phrase arch=\"linux-any\"><emphasis>ext4</emphasis></"
+"phrase>"
 msgstr ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
 "<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
@@ -1768,15 +1773,76 @@ msgid "<emphasis>jfs</emphasis> (not available on all architectures)"
 msgstr ""
 "<emphasis>jfs</emphasis> (ei ole käytettävissä kaikille suoritinperheille."
 
+#. Tag: emphasis
+#: using-d-i.xml:1107
+#, fuzzy, no-c-format
+#| msgid "<emphasis>NTFS</emphasis> (read-only)"
+msgid "<emphasis>ufs</emphasis>"
+msgstr "<emphasis>NTFS</emphasis> (vain luku)"
+
 #. Tag: para
-#: using-d-i.xml:1106
+#: using-d-i.xml:1108
+#, no-c-format
+msgid "The default file system is UFS."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1111
 #, no-c-format
 msgid "<emphasis>xfs</emphasis> (not available on all architectures)"
 msgstr ""
 "<emphasis>xfs</emphasis> (ei ole käytettävissä kaikille suoritinperheille)"
 
+#. Tag: emphasis
+#: using-d-i.xml:1115
+#, fuzzy, no-c-format
+#| msgid "<emphasis>NTFS</emphasis> (read-only)"
+msgid "<emphasis>zfs</emphasis>"
+msgstr "<emphasis>NTFS</emphasis> (vain luku)"
+
 #. Tag: para
-#: using-d-i.xml:1109
+#: using-d-i.xml:1116
+#, no-c-format
+msgid ""
+"As ZFS support in the installer is still in development, only a basic subset "
+"of ZFS features are supported. Some of them can be enabled manually after "
+"the initial install, but there are some caveats:"
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1121
+#, no-c-format
+msgid ""
+"Each ZFS pool will host only one filesystem. After install is finished, more "
+"filesystems can be created on this pool by using the <quote>zfs create</"
+"quote> command."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1126
+#, no-c-format
+msgid ""
+"Each ZFS pool will be composed of exactly one partition. After install is "
+"finished, a single-device ZFS pool can be converted into a multi-device pool "
+"by using the <quote>zpool add</quote> command, or into a mirrored pool by "
+"using the <quote>zpool attach</quote> command. However, you shouldn't do "
+"this on the pool that hosts root filesystem, as it would prevent GRUB from "
+"booting your system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1134
+#, no-c-format
+msgid ""
+"Compression is not currently supported. After the install is finished, "
+"compression can be enabled by setting the <quote>compression</quote> "
+"property via the <quote>zfs set</quote> command. However, if a compression "
+"algorithm other than the default (lzjb) is used on the pool that hosts your "
+"root filesystem, this may prevent GRUB from booting your system."
+msgstr ""
+
+#. Tag: para
+#: using-d-i.xml:1143
 #, no-c-format
 msgid ""
 "<emphasis>reiserfs</emphasis> (optional; not available on all architectures)"
@@ -1785,7 +1851,7 @@ msgstr ""
 "laitealustoille)"
 
 #. Tag: para
-#: using-d-i.xml:1111
+#: using-d-i.xml:1145
 #, no-c-format
 msgid ""
 "Support for the Reiser file system is no longer available by default. When "
@@ -1799,13 +1865,13 @@ msgstr ""
 "classname>. Vain tiedostojärjestelmän versio 3 on tuettu."
 
 #. Tag: emphasis
-#: using-d-i.xml:1118
+#: using-d-i.xml:1152
 #, no-c-format
 msgid "jffs2"
 msgstr "jffs2"
 
 #. Tag: para
-#: using-d-i.xml:1119
+#: using-d-i.xml:1153
 #, no-c-format
 msgid ""
 "Used on some systems to read flash memory. It is not possible to create new "
@@ -1815,13 +1881,13 @@ msgstr ""
 "mahdollista luoda uusia jffs2-osioita."
 
 #. Tag: emphasis
-#: using-d-i.xml:1124
+#: using-d-i.xml:1158
 #, no-c-format
 msgid "qnx4"
 msgstr "qnx4"
 
 #. Tag: para
-#: using-d-i.xml:1125
+#: using-d-i.xml:1159
 #, no-c-format
 msgid ""
 "Existing partitions will be recognized and it is possible to assign mount "
@@ -1831,19 +1897,19 @@ msgstr ""
 "ole mahdollista luoda uusia qnx4-osioita."
 
 #. Tag: para
-#: using-d-i.xml:1129
+#: using-d-i.xml:1163
 #, no-c-format
 msgid "<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>"
 msgstr "<emphasis>FAT16</emphasis>, <emphasis>FAT32</emphasis>"
 
 #. Tag: para
-#: using-d-i.xml:1132
+#: using-d-i.xml:1166
 #, no-c-format
 msgid "<emphasis>NTFS</emphasis> (read-only)"
 msgstr "<emphasis>NTFS</emphasis> (vain luku)"
 
 #. Tag: para
-#: using-d-i.xml:1134
+#: using-d-i.xml:1168
 #, no-c-format
 msgid ""
 "Existing NTFS partitions can be resized and it is possible to assign mount "
@@ -1853,13 +1919,13 @@ msgstr ""
 "liitoskohta. Ei ole mahdollista luoda uusia NTFS-osioita. "
 
 #. Tag: title
-#: using-d-i.xml:1144
+#: using-d-i.xml:1178
 #, no-c-format
 msgid "Guided Partitioning"
 msgstr "Ohjattu osiointi"
 
 #. Tag: para
-#: using-d-i.xml:1145
+#: using-d-i.xml:1179
 #, no-c-format
 msgid ""
 "If you choose guided partitioning, you may have three options: to create "
@@ -1876,14 +1942,14 @@ msgstr ""
 "crypt</quote>-tukea </para> </footnote>. "
 
 #. Tag: para
-#: using-d-i.xml:1160
+#: using-d-i.xml:1194
 #, no-c-format
 msgid ""
 "The option to use (encrypted) LVM may not be available on all architectures."
 msgstr "(salattu) LVM ei ehkä ole käytettävissä kaikille suoritinperheille."
 
 #. Tag: para
-#: using-d-i.xml:1165
+#: using-d-i.xml:1199
 #, no-c-format
 msgid ""
 "When using LVM or encrypted LVM, the installer will create most partitions "
@@ -1899,7 +1965,7 @@ msgstr ""
 "(henkilökohtaisille) tiedoille."
 
 #. Tag: para
-#: using-d-i.xml:1174
+#: using-d-i.xml:1208
 #, no-c-format
 msgid ""
 "When using encrypted LVM, the installer will also automatically erase the "
@@ -1915,7 +1981,7 @@ msgstr ""
 "mutta saattaa viedä jonkin aikaa, levyn koosta riippuen."
 
 #. Tag: para
-#: using-d-i.xml:1183
+#: using-d-i.xml:1217
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using LVM or encrypted LVM, some changes "
@@ -1933,15 +1999,22 @@ msgstr ""
 "levylle."
 
 #. Tag: para
-#: using-d-i.xml:1193
-#, no-c-format
+#: using-d-i.xml:1227
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you choose guided partitioning (either classic or using (encrypted) "
+#| "LVM) for a whole disk, you will first be asked to select the disk you "
+#| "want to use. Check that all your disks are listed and, if you have "
+#| "several disks, make sure you select the correct one. The order they are "
+#| "listed in may differ from what you are used to. The size of the disks may "
+#| "help to identify them."
 msgid ""
-"If you choose guided partitioning (either classic or using (encrypted) LVM) "
-"for a whole disk, you will first be asked to select the disk you want to "
-"use. Check that all your disks are listed and, if you have several disks, "
-"make sure you select the correct one. The order they are listed in may "
-"differ from what you are used to. The size of the disks may help to identify "
-"them."
+"If you choose guided partitioning<phrase arch=\"linux-any\"> (either classic "
+"or using (encrypted) LVM)</phrase> for a whole disk, you will first be asked "
+"to select the disk you want to use. Check that all your disks are listed "
+"and, if you have several disks, make sure you select the correct one. The "
+"order they are listed in may differ from what you are used to. The size of "
+"the disks may help to identify them."
 msgstr ""
 "Jos valitaan ohjattu osiointi (joko perinteinen tai (salattua) LVM:ää "
 "käyttäen) koko levylle, pyydetään ensimmäiseksi valitsemaan käytettävä levy. "
@@ -1950,14 +2023,20 @@ msgstr ""
 "poiketa totutusta. Levyjen kokoja voi käyttää apuna levyjen tunnistamisessa."
 
 #. Tag: para
-#: using-d-i.xml:1202
-#, no-c-format
+#: using-d-i.xml:1236
+#, fuzzy, no-c-format
+#| msgid ""
+#| "Any data on the disk you select will eventually be lost, but you will "
+#| "always be asked to confirm any changes before they are written to the "
+#| "disk. If you have selected the classic method of partitioning, you will "
+#| "be able to undo any changes right until the end; when using (encrypted) "
+#| "LVM this is not possible."
 msgid ""
 "Any data on the disk you select will eventually be lost, but you will always "
-"be asked to confirm any changes before they are written to the disk. If you "
-"have selected the classic method of partitioning, you will be able to undo "
-"any changes right until the end; when using (encrypted) LVM this is not "
-"possible."
+"be asked to confirm any changes before they are written to the disk. <phrase "
+"arch=\"linux-any\"> If you have selected the classic method of partitioning, "
+"you will be able to undo any changes right until the end; when using "
+"(encrypted) LVM this is not possible. </phrase>"
 msgstr ""
 "Kaikki valittavalla levyllä olevat tiedot tullaan poistamaan, mutta aina "
 "ennen muutosten kirjoittamista levylle pyydetään vahvistusta. Jos valittiin "
@@ -1965,7 +2044,7 @@ msgstr ""
 "asti; (salattua) LVM:ää käytettäessä peruminen ei ole mahdollista."
 
 #. Tag: para
-#: using-d-i.xml:1210
+#: using-d-i.xml:1246
 #, no-c-format
 msgid ""
 "Next, you will be able to choose from the schemes listed in the table below. "
@@ -1983,73 +2062,73 @@ msgstr ""
 "noin 1 Gt tilaa (riippuu mallineesta), ohjattu osiointi ei toimi."
 
 #. Tag: entry
-#: using-d-i.xml:1226
+#: using-d-i.xml:1262
 #, no-c-format
 msgid "Partitioning scheme"
 msgstr "Osioinnin mallineet"
 
 #. Tag: entry
-#: using-d-i.xml:1227
+#: using-d-i.xml:1263
 #, no-c-format
 msgid "Minimum space"
 msgstr "Vähimmäistila"
 
 #. Tag: entry
-#: using-d-i.xml:1228
+#: using-d-i.xml:1264
 #, no-c-format
 msgid "Created partitions"
 msgstr "Tehdyt osiot"
 
 #. Tag: entry
-#: using-d-i.xml:1234
+#: using-d-i.xml:1270
 #, no-c-format
 msgid "All files in one partition"
 msgstr "Kaikki tiedostot yhdessä levyosiossa"
 
 #. Tag: entry
-#: using-d-i.xml:1235
+#: using-d-i.xml:1271
 #, no-c-format
 msgid "600MB"
 msgstr "600 Mt"
 
 #. Tag: entry
-#: using-d-i.xml:1236
+#: using-d-i.xml:1272
 #, no-c-format
 msgid "<filename>/</filename>, swap"
 msgstr "<filename>/</filename>, sivutus"
 
 #. Tag: entry
-#: using-d-i.xml:1238
+#: using-d-i.xml:1274
 #, no-c-format
 msgid "Separate /home partition"
 msgstr "Erillinen /home-osio"
 
 #. Tag: entry
-#: using-d-i.xml:1239
+#: using-d-i.xml:1275
 #, no-c-format
 msgid "500MB"
 msgstr "500 Mt"
 
 #. Tag: entry
-#: using-d-i.xml:1240
+#: using-d-i.xml:1276
 #, no-c-format
 msgid "<filename>/</filename>, <filename>/home</filename>, swap"
 msgstr "<filename>/</filename>, <filename>/home</filename>, sivutus"
 
 #. Tag: entry
-#: using-d-i.xml:1244
+#: using-d-i.xml:1280
 #, no-c-format
 msgid "Separate /home, /usr, /var and /tmp partitions"
 msgstr "Erilliset /home-, /usr-, /var- ja /tmp-osiot"
 
 #. Tag: entry
-#: using-d-i.xml:1245
+#: using-d-i.xml:1281
 #, no-c-format
 msgid "<entry>1GB</entry>"
 msgstr "<entry>1 Gt</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1246
+#: using-d-i.xml:1282
 #, no-c-format
 msgid ""
 "<filename>/</filename>, <filename>/home</filename>, <filename>/usr</"
@@ -2059,7 +2138,7 @@ msgstr ""
 "filename>, <filename>/var</filename>, <filename>/tmp</filename>, sivutus"
 
 #. Tag: para
-#: using-d-i.xml:1255
+#: using-d-i.xml:1291
 #, no-c-format
 msgid ""
 "If you choose guided partitioning using (encrypted) LVM, the installer will "
@@ -2072,7 +2151,7 @@ msgstr ""
 "LVM-osion sisälle."
 
 #. Tag: para
-#: using-d-i.xml:1261
+#: using-d-i.xml:1297
 #, no-c-format
 msgid ""
 "If you choose guided partitioning for your IA-64 system, there will be an "
@@ -2086,7 +2165,7 @@ msgstr ""
 "tekemiseksi EFI-käynnistysosioksi."
 
 #. Tag: para
-#: using-d-i.xml:1269
+#: using-d-i.xml:1305
 #, no-c-format
 msgid ""
 "After selecting a scheme, the next screen will show your new partition "
@@ -2098,7 +2177,7 @@ msgstr ""
 "niiden liitoskohdat."
 
 #. Tag: para
-#: using-d-i.xml:1275
+#: using-d-i.xml:1311
 #, no-c-format
 msgid ""
 "The list of partitions might look like this: <informalexample><screen>\n"
@@ -2149,7 +2228,7 @@ msgstr ""
 "mahdollisista vaihtoehdoista."
 
 #. Tag: para
-#: using-d-i.xml:1288
+#: using-d-i.xml:1324
 #, no-c-format
 msgid ""
 "This concludes the guided partitioning. If you are satisfied with the "
@@ -2169,13 +2248,13 @@ msgstr ""
 "tehtäessä osiot itse."
 
 #. Tag: title
-#: using-d-i.xml:1302
+#: using-d-i.xml:1338
 #, no-c-format
 msgid "Manual Partitioning"
 msgstr "Tee osiot itse"
 
 #. Tag: para
-#: using-d-i.xml:1303
+#: using-d-i.xml:1339
 #, no-c-format
 msgid ""
 "A similar screen to the one shown just above will be displayed if you choose "
@@ -2190,7 +2269,7 @@ msgstr ""
 "asennettavassa &debian;-järjestelmässä."
 
 #. Tag: para
-#: using-d-i.xml:1311
+#: using-d-i.xml:1347
 #, no-c-format
 msgid ""
 "If you select a pristine disk which has neither partitions nor free space on "
@@ -2204,8 +2283,27 @@ msgstr ""
 "uusi rivi <quote>VAPAA TILA</quote>."
 
 #. Tag: para
-#: using-d-i.xml:1319
-#, no-c-format
+#: using-d-i.xml:1355
+#, fuzzy, no-c-format
+#| msgid ""
+#| "If you select some free space, you will have the opportunity to create a "
+#| "new partition. You will have to answer a quick series of questions about "
+#| "its size, type (primary or logical), and location (beginning or end of "
+#| "the free space). After this, you will be presented with a detailed "
+#| "overview of your new partition. The main setting is <guimenuitem>Use as:</"
+#| "guimenuitem>, which determines if the partition will have a file system "
+#| "on it, or be used for swap, software RAID, LVM, an encrypted file system, "
+#| "or not be used at all. Other settings include mountpoint, mount options, "
+#| "and bootable flag; which settings are shown depends on how the partition "
+#| "is to be used. If you don't like the preselected defaults, feel free to "
+#| "change them to your liking. E.g. by selecting the option <guimenuitem>Use "
+#| "as:</guimenuitem>, you can choose a different filesystem for this "
+#| "partition, including options to use the partition for swap, software "
+#| "RAID, LVM, or not use it at all. Another nice feature is the ability to "
+#| "copy data from an existing partition onto this one. When you are "
+#| "satisfied with your new partition, select <guimenuitem>Done setting up "
+#| "the partition</guimenuitem> and you will return to <command>partman</"
+#| "command>'s main screen."
 msgid ""
 "If you select some free space, you will have the opportunity to create a new "
 "partition. You will have to answer a quick series of questions about its "
@@ -2213,15 +2311,16 @@ msgid ""
 "space). After this, you will be presented with a detailed overview of your "
 "new partition. The main setting is <guimenuitem>Use as:</guimenuitem>, which "
 "determines if the partition will have a file system on it, or be used for "
-"swap, software RAID, LVM, an encrypted file system, or not be used at all. "
-"Other settings include mountpoint, mount options, and bootable flag; which "
-"settings are shown depends on how the partition is to be used. If you don't "
-"like the preselected defaults, feel free to change them to your liking. E.g. "
-"by selecting the option <guimenuitem>Use as:</guimenuitem>, you can choose a "
-"different filesystem for this partition, including options to use the "
-"partition for swap, software RAID, LVM, or not use it at all. Another nice "
-"feature is the ability to copy data from an existing partition onto this "
-"one. When you are satisfied with your new partition, select "
+"swap,<phrase arch=\"linux-any\"> software RAID, LVM, an encrypted file "
+"system,</phrase> or not be used at all. Other settings include mountpoint, "
+"mount options, and bootable flag; which settings are shown depends on how "
+"the partition is to be used. If you don't like the preselected defaults, "
+"feel free to change them to your liking. E.g. by selecting the option "
+"<guimenuitem>Use as:</guimenuitem>, you can choose a different filesystem "
+"for this partition, including options to use the partition for swap,<phrase "
+"arch=\"linux-any\"> software RAID, LVM,</phrase> or not use it at all. "
+"Another nice feature is the ability to copy data from an existing partition "
+"onto this one. When you are satisfied with your new partition, select "
 "<guimenuitem>Done setting up the partition</guimenuitem> and you will return "
 "to <command>partman</command>'s main screen."
 msgstr ""
@@ -2243,7 +2342,7 @@ msgstr ""
 "aloitusruutuun."
 
 #. Tag: para
-#: using-d-i.xml:1341
+#: using-d-i.xml:1377
 #, no-c-format
 msgid ""
 "If you decide you want to change something about your partition, simply "
@@ -2263,7 +2362,7 @@ msgstr ""
 "Osion voi myös poistaa tästä valikosta."
 
 #. Tag: para
-#: using-d-i.xml:1352
+#: using-d-i.xml:1388
 #, no-c-format
 msgid ""
 "Be sure to create at least two partitions: one for the <emphasis>root</"
@@ -2279,7 +2378,7 @@ msgstr ""
 "suostu jatkamaan ennen kuin tämä on tehty."
 
 #. Tag: para
-#: using-d-i.xml:1360
+#: using-d-i.xml:1396
 #, no-c-format
 msgid ""
 "If you forget to select and format an EFI boot partition, <command>partman</"
@@ -2291,7 +2390,7 @@ msgstr ""
 "kuin nämä on tehty."
 
 #. Tag: para
-#: using-d-i.xml:1366
+#: using-d-i.xml:1402
 #, no-c-format
 msgid ""
 "Capabilities of <command>partman</command> can be extended with installer "
@@ -2307,7 +2406,7 @@ msgstr ""
 "tai <filename>partman-lvm</filename>)."
 
 #. Tag: para
-#: using-d-i.xml:1374
+#: using-d-i.xml:1410
 #, no-c-format
 msgid ""
 "After you are satisfied with partitioning, select <guimenuitem>Finish "
@@ -2321,13 +2420,13 @@ msgstr ""
 "tiedostojärjestelmät luodaan valitulla tavalla."
 
 #. Tag: title
-#: using-d-i.xml:1402
+#: using-d-i.xml:1438
 #, no-c-format
 msgid "Configuring Multidisk Devices (Software RAID)"
 msgstr "Monilevylaitteen asetukset (ohjelmallisesti toteutettu RAID)"
 
 #. Tag: para
-#: using-d-i.xml:1403
+#: using-d-i.xml:1439
 #, no-c-format
 msgid ""
 "If you have more than one harddrive<footnote><para> To be honest, you can "
@@ -2347,7 +2446,7 @@ msgstr ""
 "<firstterm>ohjelmallisesti toteutettu RAID</firstterm>)."
 
 #. Tag: para
-#: using-d-i.xml:1416
+#: using-d-i.xml:1452
 #, no-c-format
 msgid ""
 "MD is basically a bunch of partitions located on different disks and "
@@ -2361,7 +2460,7 @@ msgstr ""
 "voi tehdä tiedostojärjestelmän, määrätä liitoskohdan, jne.)."
 
 #. Tag: para
-#: using-d-i.xml:1424
+#: using-d-i.xml:1460
 #, no-c-format
 msgid ""
 "What benefits this brings depends on the type of MD device you are creating. "
@@ -2490,97 +2589,97 @@ msgstr ""
 "Yhteenvetona:"
 
 #. Tag: entry
-#: using-d-i.xml:1538
+#: using-d-i.xml:1574
 #, no-c-format
 msgid "Type"
 msgstr "Tyyppi"
 
 #. Tag: entry
-#: using-d-i.xml:1539
+#: using-d-i.xml:1575
 #, no-c-format
 msgid "Minimum Devices"
 msgstr "Levyjä vähintään"
 
 #. Tag: entry
-#: using-d-i.xml:1540
+#: using-d-i.xml:1576
 #, no-c-format
 msgid "Spare Device"
 msgstr "Varalevy"
 
 #. Tag: entry
-#: using-d-i.xml:1541
+#: using-d-i.xml:1577
 #, no-c-format
 msgid "Survives disk failure?"
 msgstr "Toipuuko levyrikosta?"
 
 #. Tag: entry
-#: using-d-i.xml:1542
+#: using-d-i.xml:1578
 #, no-c-format
 msgid "Available Space"
 msgstr "Käytettävissä oleva tila"
 
 #. Tag: entry
-#: using-d-i.xml:1548
+#: using-d-i.xml:1584
 #, no-c-format
 msgid "RAID0"
 msgstr "RAID0"
 
 #. Tag: entry
-#: using-d-i.xml:1549 using-d-i.xml:1557 using-d-i.xml:1587
+#: using-d-i.xml:1585 using-d-i.xml:1593 using-d-i.xml:1623
 #, no-c-format
 msgid "<entry>2</entry>"
 msgstr "<entry>2</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1550 using-d-i.xml:1551
+#: using-d-i.xml:1586 using-d-i.xml:1587
 #, no-c-format
 msgid "<entry>no</entry>"
 msgstr "<entry>ei</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1552
+#: using-d-i.xml:1588
 #, no-c-format
 msgid "Size of the smallest partition multiplied by number of devices in RAID"
 msgstr "Pienimmän osion koko kertaa pakan levyjen määrä"
 
 #. Tag: entry
-#: using-d-i.xml:1556
+#: using-d-i.xml:1592
 #, no-c-format
 msgid "RAID1"
 msgstr "RAID1"
 
 #. Tag: entry
-#: using-d-i.xml:1558 using-d-i.xml:1566 using-d-i.xml:1577 using-d-i.xml:1588
+#: using-d-i.xml:1594 using-d-i.xml:1602 using-d-i.xml:1613 using-d-i.xml:1624
 #, no-c-format
 msgid "optional"
 msgstr "haluttaessa"
 
 #. Tag: entry
-#: using-d-i.xml:1559 using-d-i.xml:1567 using-d-i.xml:1578 using-d-i.xml:1589
+#: using-d-i.xml:1595 using-d-i.xml:1603 using-d-i.xml:1614 using-d-i.xml:1625
 #, no-c-format
 msgid "<entry>yes</entry>"
 msgstr "<entry>kyllä</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1560
+#: using-d-i.xml:1596
 #, no-c-format
 msgid "Size of the smallest partition in RAID"
 msgstr "Pakan pienimmän osion koko"
 
 #. Tag: entry
-#: using-d-i.xml:1564
+#: using-d-i.xml:1600
 #, no-c-format
 msgid "RAID5"
 msgstr "RAID5"
 
 #. Tag: entry
-#: using-d-i.xml:1565
+#: using-d-i.xml:1601
 #, no-c-format
 msgid "<entry>3</entry>"
 msgstr "<entry>3</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1568
+#: using-d-i.xml:1604
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2589,19 +2688,19 @@ msgstr ""
 "Pakan pienimmän osion koko kertaa (pakan levyjen määrä vähennettynä yhdellä)"
 
 #. Tag: entry
-#: using-d-i.xml:1575
+#: using-d-i.xml:1611
 #, no-c-format
 msgid "RAID6"
 msgstr "RAID6"
 
 #. Tag: entry
-#: using-d-i.xml:1576
+#: using-d-i.xml:1612
 #, no-c-format
 msgid "<entry>4</entry>"
 msgstr "<entry>4</entry>"
 
 #. Tag: entry
-#: using-d-i.xml:1579
+#: using-d-i.xml:1615
 #, no-c-format
 msgid ""
 "Size of the smallest partition multiplied by (number of devices in RAID "
@@ -2610,13 +2709,13 @@ msgstr ""
 "Pakan pienimmän osion koko kertaa (pakan levyjen määrä vähennettynä kahdella)"
 
 #. Tag: entry
-#: using-d-i.xml:1586
+#: using-d-i.xml:1622
 #, no-c-format
 msgid "RAID10"
 msgstr "RAID10"
 
 #. Tag: entry
-#: using-d-i.xml:1590
+#: using-d-i.xml:1626
 #, no-c-format
 msgid ""
 "Total of all partitions divided by the number of chunk copies (defaults to "
@@ -2625,7 +2724,7 @@ msgstr ""
 "Kaikkien osioiden määrä jaettuna kimpalekopioiden määrällä (oletusarvo kaksi)"
 
 #. Tag: para
-#: using-d-i.xml:1597
+#: using-d-i.xml:1633
 #, no-c-format
 msgid ""
 "If you want to know more about Software RAID, have a look at <ulink url="
@@ -2635,7 +2734,7 @@ msgstr ""
 "url=\"&url-software-raid-howto;\">Software RAID HOWTO</ulink>."
 
 #. Tag: para
-#: using-d-i.xml:1602
+#: using-d-i.xml:1638
 #, no-c-format
 msgid ""
 "To create an MD device, you need to have the desired partitions it should "
@@ -2651,7 +2750,7 @@ msgstr ""
 "menuchoice>."
 
 #. Tag: para
-#: using-d-i.xml:1611
+#: using-d-i.xml:1647
 #, no-c-format
 msgid ""
 "Make sure that the system can be booted with the partitioning scheme you are "
@@ -2671,7 +2770,7 @@ msgstr ""
 "<filename>/boot</filename> on RAID1."
 
 #. Tag: para
-#: using-d-i.xml:1623
+#: using-d-i.xml:1659
 #, no-c-format
 msgid ""
 "Support for MD is a relatively new addition to the installer. You may "
@@ -2689,7 +2788,7 @@ msgstr ""
 "asennuksen vaiheita komentotulkista."
 
 #. Tag: para
-#: using-d-i.xml:1632
+#: using-d-i.xml:1668
 #, no-c-format
 msgid ""
 "Next, you should choose <guimenuitem>Configure software RAID</guimenuitem> "
@@ -2711,7 +2810,7 @@ msgstr ""
 "riippuu MD-laitteelle valitusta tyypistä."
 
 #. Tag: para
-#: using-d-i.xml:1645
+#: using-d-i.xml:1681
 #, no-c-format
 msgid ""
 "RAID0 is simple &mdash; you will be issued with the list of available RAID "
@@ -2723,7 +2822,7 @@ msgstr ""
 "MD."
 
 #. Tag: para
-#: using-d-i.xml:1652
+#: using-d-i.xml:1688
 #, no-c-format
 msgid ""
 "RAID1 is a bit more tricky. First, you will be asked to enter the number of "
@@ -2741,7 +2840,7 @@ msgstr ""
 "virhe; asennin ei päästä jatkamaan ennen kuin levyjen määrät täsmäävät."
 
 #. Tag: para
-#: using-d-i.xml:1664
+#: using-d-i.xml:1700
 #, no-c-format
 msgid ""
 "RAID5 has a setup procedure similar to RAID1 with the exception that you "
@@ -2751,7 +2850,7 @@ msgstr ""
 "ainakin <emphasis>kolme</emphasis> levyosiota. "
 
 #. Tag: para
-#: using-d-i.xml:1670
+#: using-d-i.xml:1706
 #, no-c-format
 msgid ""
 "RAID6 also has a setup procedure similar to RAID1 except that at least "
@@ -2761,7 +2860,7 @@ msgstr ""
 "ainakin <emphasis>neljä</emphasis> levyosiota. "
 
 #. Tag: para
-#: using-d-i.xml:1676
+#: using-d-i.xml:1712
 #, no-c-format
 msgid ""
 "RAID10 again has a setup procedure similar to RAID1 except in expert mode. "
@@ -2781,7 +2880,7 @@ msgstr ""
 "eri levylle."
 
 #. Tag: para
-#: using-d-i.xml:1690
+#: using-d-i.xml:1726
 #, no-c-format
 msgid ""
 "It is perfectly possible to have several types of MD at once. For example, "
@@ -2799,7 +2898,7 @@ msgstr ""
 "100 Gt <filename>/home</filename>-osio)."
 
 #. Tag: para
-#: using-d-i.xml:1699
+#: using-d-i.xml:1735
 #, no-c-format
 msgid ""
 "After you set up MD devices to your liking, you can <guimenuitem>Finish</"
@@ -2814,13 +2913,13 @@ msgstr ""
 "esimerkiksi liitoskohdat."
 
 #. Tag: title
-#: using-d-i.xml:1714
+#: using-d-i.xml:1750
 #, no-c-format
 msgid "Configuring the Logical Volume Manager (LVM)"
 msgstr "Loogisten levyniteiden hallintaohjelman (LVM) asetukset"
 
 #. Tag: para
-#: using-d-i.xml:1715
+#: using-d-i.xml:1751
 #, no-c-format
 msgid ""
 "If you are working with computers at the level of system administrator or "
@@ -2836,7 +2935,7 @@ msgstr ""
 "symbolisilla linkeillä jne."
 
 #. Tag: para
-#: using-d-i.xml:1723
+#: using-d-i.xml:1759
 #, no-c-format
 msgid ""
 "To avoid the described situation you can use Logical Volume Manager (LVM). "
@@ -2856,7 +2955,7 @@ msgstr ""
 "se muodostuu) voi olla osia jotka ovat eri fyysisillä kiintolevyllä."
 
 #. Tag: para
-#: using-d-i.xml:1733
+#: using-d-i.xml:1769
 #, no-c-format
 msgid ""
 "Now when you realize you need more space for your old 160GB <filename>/home</"
@@ -2876,7 +2975,7 @@ msgstr ""
 "\">LVM HOWTO</ulink> ei vielä ole luettu siihen kannattaisi tutustua."
 
 #. Tag: para
-#: using-d-i.xml:1744
+#: using-d-i.xml:1780
 #, no-c-format
 msgid ""
 "LVM setup in &d-i; is quite simple and completely supported inside "
@@ -2893,7 +2992,7 @@ msgstr ""
 "levynide LVM:lle</guimenuitem> </menuchoice>."
 
 #. Tag: para
-#: using-d-i.xml:1753
+#: using-d-i.xml:1789
 #, no-c-format
 msgid ""
 "When you return to the main <command>partman</command> screen, you will see "
@@ -2913,7 +3012,7 @@ msgstr ""
 "Mahdolliset toiminnot ovat:"
 
 #. Tag: para
-#: using-d-i.xml:1764
+#: using-d-i.xml:1800
 #, no-c-format
 msgid ""
 "<guimenuitem>Display configuration details</guimenuitem>: shows LVM device "
@@ -2923,43 +3022,43 @@ msgstr ""
 "n rakenteen, loogisten levyniteiden nimet, koot ja muuta"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1769
+#: using-d-i.xml:1805
 #, no-c-format
 msgid "Create volume group"
 msgstr "Luo levynideryhmä"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1772
+#: using-d-i.xml:1808
 #, no-c-format
 msgid "Create logical volume"
 msgstr "Luo looginen nide"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1775
+#: using-d-i.xml:1811
 #, no-c-format
 msgid "Delete volume group"
 msgstr "Poista levynideryhmä"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1778
+#: using-d-i.xml:1814
 #, no-c-format
 msgid "Delete logical volume"
 msgstr "Poista looginen nide"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1781
+#: using-d-i.xml:1817
 #, no-c-format
 msgid "Extend volume group"
 msgstr "Kasvata levynideryhmää"
 
 #. Tag: guimenuitem
-#: using-d-i.xml:1784
+#: using-d-i.xml:1820
 #, no-c-format
 msgid "Reduce volume group"
 msgstr "Pienennä levynideryhmää"
 
 #. Tag: para
-#: using-d-i.xml:1786
+#: using-d-i.xml:1822
 #, no-c-format
 msgid ""
 "<guimenuitem>Finish</guimenuitem>: return to the main <command>partman</"
@@ -2969,7 +3068,7 @@ msgstr ""
 "pääruutuun"
 
 #. Tag: para
-#: using-d-i.xml:1792
+#: using-d-i.xml:1828
 #, no-c-format
 msgid ""
 "Use the options in that menu to first create a volume group and then create "
@@ -2979,7 +3078,7 @@ msgstr ""
 "loogisia levyniteitä."
 
 #. Tag: para
-#: using-d-i.xml:1797
+#: using-d-i.xml:1833
 #, no-c-format
 msgid ""
 "After you return to the main <command>partman</command> screen, any created "
@@ -2991,13 +3090,13 @@ msgstr ""
 "olisi samalla tavalla käsiteltäväkin)."
 
 #. Tag: title
-#: using-d-i.xml:1811
+#: using-d-i.xml:1847
 #, no-c-format
 msgid "Configuring Encrypted Volumes"
 msgstr "Salattujen levyniteiden asetukset"
 
 #. Tag: para
-#: using-d-i.xml:1812
+#: using-d-i.xml:1848
 #, no-c-format
 msgid ""
 "&d-i; allows you to set up encrypted partitions. Every file you write to "
@@ -3018,7 +3117,7 @@ msgstr ""
 "oikeaa salausavainta levyn sisältö näyttää satunnaiselta mössöltä. "
 
 #. Tag: para
-#: using-d-i.xml:1824
+#: using-d-i.xml:1860
 #, no-c-format
 msgid ""
 "The two most important partitions to encrypt are: the home partition, where "
@@ -3046,7 +3145,7 @@ msgstr ""
 "osiolta."
 
 #. Tag: para
-#: using-d-i.xml:1839
+#: using-d-i.xml:1875
 #, no-c-format
 msgid ""
 "Please note that the performance of encrypted partitions will be less than "
@@ -3059,7 +3158,7 @@ msgstr ""
 "suorituskyky, salausmenetelmä ja avaimen pituus."
 
 #. Tag: para
-#: using-d-i.xml:1846
+#: using-d-i.xml:1882
 #, no-c-format
 msgid ""
 "To use encryption, you have to create a new partition by selecting some free "
@@ -3079,7 +3178,7 @@ msgstr ""
 "asetuksia osiolle."
 
 #. Tag: para
-#: using-d-i.xml:1857
+#: using-d-i.xml:1893
 #, no-c-format
 msgid ""
 "&d-i; supports several encryption methods. The default method is "
@@ -3095,7 +3194,7 @@ msgstr ""
 "suositellaan jos ei ole pakottavaa syytä muuhun."
 
 #. Tag: para
-#: using-d-i.xml:1869
+#: using-d-i.xml:1905
 #, no-c-format
 msgid ""
 "First, let's have a look at the options available when you select "
@@ -3109,13 +3208,13 @@ msgstr ""
 "valittu tietoturvasyistä."
 
 #. Tag: term
-#: using-d-i.xml:1879
+#: using-d-i.xml:1915
 #, no-c-format
 msgid "Encryption: <userinput>aes</userinput>"
 msgstr "Salausmenetelmä: <userinput>aes</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1881
+#: using-d-i.xml:1917
 #, no-c-format
 msgid ""
 "This option lets you select the encryption algorithm (<firstterm>cipher</"
@@ -3139,13 +3238,13 @@ msgstr ""
 "vakiosalausmenetelmäksi 2000-luvulla."
 
 #. Tag: term
-#: using-d-i.xml:1899
+#: using-d-i.xml:1935
 #, no-c-format
 msgid "Key size: <userinput>256</userinput>"
 msgstr "Avaimen koko: <userinput>256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1901
+#: using-d-i.xml:1937
 #, no-c-format
 msgid ""
 "Here you can specify the length of the encryption key. With a larger key "
@@ -3158,13 +3257,13 @@ msgstr ""
 "Salausmenetelmä määrää käytettävissä olevat avaimien pituudet."
 
 #. Tag: term
-#: using-d-i.xml:1913
+#: using-d-i.xml:1949
 #, no-c-format
 msgid "IV algorithm: <userinput>cbc-essiv:sha256</userinput>"
 msgstr "IV-menetelmä: <userinput>cbc-essiv:sha256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1915
+#: using-d-i.xml:1951
 #, no-c-format
 msgid ""
 "The <firstterm>Initialization Vector</firstterm> or <firstterm>IV</"
@@ -3183,7 +3282,7 @@ msgstr ""
 "hahmoista."
 
 #. Tag: para
-#: using-d-i.xml:1925
+#: using-d-i.xml:1961
 #, no-c-format
 msgid ""
 "From the provided alternatives, the default <userinput>cbc-essiv:sha256</"
@@ -3198,25 +3297,25 @@ msgstr ""
 "käyttää uudempia salausmenetelmiä."
 
 #. Tag: term
-#: using-d-i.xml:1937
+#: using-d-i.xml:1973
 #, no-c-format
 msgid "Encryption key: <userinput>Passphrase</userinput>"
 msgstr "Salausavain: <userinput>Tunnuslause</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1939
+#: using-d-i.xml:1975
 #, no-c-format
 msgid "Here you can choose the type of the encryption key for this partition."
 msgstr "Tässä valitaan tälle osiolle käytettävän salausavaimen tyyppi."
 
 #. Tag: term
-#: using-d-i.xml:1945
+#: using-d-i.xml:1981
 #, no-c-format
 msgid "Passphrase"
 msgstr "Tunnuslause"
 
 #. Tag: para
-#: using-d-i.xml:1946
+#: using-d-i.xml:1982
 #, no-c-format
 msgid ""
 "The encryption key will be computed<footnote> <para> Using a passphrase as "
@@ -3230,13 +3329,13 @@ msgstr ""
 "kysyttävästä tunnuslauseesta."
 
 #. Tag: term
-#: using-d-i.xml:1961 using-d-i.xml:2054
+#: using-d-i.xml:1997 using-d-i.xml:2090
 #, no-c-format
 msgid "Random key"
 msgstr "Satunnainen avain"
 
 #. Tag: para
-#: using-d-i.xml:1962
+#: using-d-i.xml:1998
 #, no-c-format
 msgid ""
 "A new encryption key will be generated from random data each time you try to "
@@ -3254,7 +3353,7 @@ msgstr ""
 "ihmisen ikä.)"
 
 #. Tag: para
-#: using-d-i.xml:1971
+#: using-d-i.xml:2007
 #, no-c-format
 msgid ""
 "Random keys are useful for swap partitions because you do not need to bother "
@@ -3273,13 +3372,13 @@ msgstr ""
 "on mahdotonta (käynnistettäessä suspendin jälkeen)."
 
 #. Tag: term
-#: using-d-i.xml:1990 using-d-i.xml:2067
+#: using-d-i.xml:2026 using-d-i.xml:2103
 #, no-c-format
 msgid "Erase data: <userinput>yes</userinput>"
 msgstr "Tiedot pyyhitään: <userinput>kyllä</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:1992
+#: using-d-i.xml:2028
 #, no-c-format
 msgid ""
 "Determines whether the content of this partition should be overwritten with "
@@ -3300,7 +3399,7 @@ msgstr ""
 "taltion päälle olisi kirjoitettu montakin kertaa. </para></footnote>."
 
 #. Tag: para
-#: using-d-i.xml:2012
+#: using-d-i.xml:2048
 #, no-c-format
 msgid ""
 "If you select <menuchoice> <guimenu>Encryption method:</guimenu> "
@@ -3312,13 +3411,13 @@ msgstr ""
 "vaihtuu näyttämään seuraavat valitsimet:"
 
 #. Tag: term
-#: using-d-i.xml:2021
+#: using-d-i.xml:2057
 #, no-c-format
 msgid "Encryption: <userinput>AES256</userinput>"
 msgstr "Salaus: <userinput>AES256</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2023
+#: using-d-i.xml:2059
 #, no-c-format
 msgid ""
 "For loop-AES, unlike dm-crypt, the options for cipher and key size are "
@@ -3331,25 +3430,25 @@ msgstr ""
 "pituudesta."
 
 #. Tag: term
-#: using-d-i.xml:2033
+#: using-d-i.xml:2069
 #, no-c-format
 msgid "Encryption key: <userinput>Keyfile (GnuPG)</userinput>"
 msgstr "Salausavain: <userinput>Avaintiedosto (GnuPG)</userinput>"
 
 #. Tag: para
-#: using-d-i.xml:2035
+#: using-d-i.xml:2071
 #, no-c-format
 msgid "Here you can select the type of the encryption key for this partition."
 msgstr "Valitaan tälle osiolle käytettävän salausavaimen tyyppi."
 
 #. Tag: term
-#: using-d-i.xml:2041
+#: using-d-i.xml:2077
 #, no-c-format
 msgid "Keyfile (GnuPG)"
 msgstr "Avaintiedosto (GnuPG)"
 
 #. Tag: para
-#: using-d-i.xml:2042
+#: using-d-i.xml:2078
 #, no-c-format
 msgid ""
 "The encryption key will be generated from random data during the "
@@ -3363,19 +3462,19 @@ msgstr ""
 "asennuksen aikana)."
 
 #. Tag: para
-#: using-d-i.xml:2055
+#: using-d-i.xml:2091
 #, no-c-format
 msgid "Please see the section on random keys above."
 msgstr "Katso aiempaa lukua satunnaisavaimista."
 
 #. Tag: para
-#: using-d-i.xml:2069
+#: using-d-i.xml:2105
 #, no-c-format
 msgid "Please see the the section on erasing data above."
 msgstr "Katso aiempaa lukua tiedon pyyhkimisestä."
 
 #. Tag: para
-#: using-d-i.xml:2078
+#: using-d-i.xml:2114
 #, no-c-format
 msgid ""
 "After you have selected the desired parameters for your encrypted "
@@ -3393,7 +3492,7 @@ msgstr ""
 "Isoilla osiolla tämä saattaa kestää hyvän tovin."
 
 #. Tag: para
-#: using-d-i.xml:2088
+#: using-d-i.xml:2124
 #, no-c-format
 msgid ""
 "Next you will be asked to enter a passphrase for partitions configured to "
@@ -3409,7 +3508,7 @@ msgstr ""
 "lemmikkien nimiä, perheenjäsenten tai sukulaisten nimiä jne.)."
 
 #. Tag: para
-#: using-d-i.xml:2097
+#: using-d-i.xml:2133
 #, no-c-format
 msgid ""
 "Before you input any passphrases, you should have made sure that your "
@@ -3433,7 +3532,7 @@ msgstr ""
 "tunnuslausetta."
 
 #. Tag: para
-#: using-d-i.xml:2110
+#: using-d-i.xml:2146
 #, no-c-format
 msgid ""
 "If you selected to use methods other than a passphrase to create encryption "
@@ -3456,7 +3555,7 @@ msgstr ""
 "salattaville osioille."
 
 #. Tag: para
-#: using-d-i.xml:2126
+#: using-d-i.xml:2162
 #, no-c-format
 msgid ""
 "After returning to the main partitioning menu, you will see all encrypted "
@@ -3489,7 +3588,7 @@ msgstr ""
 "vaihdettava tiedostojärjestelmien tyyppiä jos oletusarvot eivät kelpaa."
 
 #. Tag: para
-#: using-d-i.xml:2139
+#: using-d-i.xml:2175
 #, no-c-format
 msgid ""
 "Pay attention to the identifiers in parentheses (<replaceable>sda2_crypt</"
@@ -3507,7 +3606,7 @@ msgstr ""
 "\"mount-encrypted-volumes\"/>."
 
 #. Tag: para
-#: using-d-i.xml:2149
+#: using-d-i.xml:2185
 #, no-c-format
 msgid ""
 "Once you are satisfied with the partitioning scheme, continue with the "
@@ -3515,13 +3614,13 @@ msgid ""
 msgstr "Kun osiointi on halutunlainen voidaan asennusta jatkaa."
 
 #. Tag: title
-#: using-d-i.xml:2160
+#: using-d-i.xml:2196
 #, no-c-format
 msgid "Installing the Base System"
 msgstr "Perusjärjestelmän asennus"
 
 #. Tag: para
-#: using-d-i.xml:2161
+#: using-d-i.xml:2197
 #, no-c-format
 msgid ""
 "Although this stage is the least problematic, it consumes a significant "
@@ -3535,7 +3634,7 @@ msgstr ""
 "kulua toinenkin tovi."
 
 #. Tag: para
-#: using-d-i.xml:2174
+#: using-d-i.xml:2210
 #, no-c-format
 msgid ""
 "During installation of the base system, package unpacking and setup messages "
@@ -3551,7 +3650,7 @@ msgstr ""
 "<keycombo><keycap>Vasen Alt</keycap><keycap>F1</keycap></keycombo>."
 
 #. Tag: para
-#: using-d-i.xml:2183
+#: using-d-i.xml:2219
 #, no-c-format
 msgid ""
 "The unpack/setup messages generated during this phase are also saved in "
@@ -3563,7 +3662,7 @@ msgstr ""
 "jos asennukseen käytetään sarjapäätettä."
 
 #. Tag: para
-#: using-d-i.xml:2189
+#: using-d-i.xml:2225
 #, no-c-format
 msgid ""
 "As part of the installation, a &arch-kernel; kernel will be installed. At "
@@ -3576,7 +3675,7 @@ msgstr ""
 "Käytettäessä pienempää prioriteettia ydin voidaan valita luettelosta."
 
 #. Tag: para
-#: using-d-i.xml:2196
+#: using-d-i.xml:2232
 #, no-c-format
 msgid ""
 "When packages are installed using the package management system, it will by "
@@ -3593,7 +3692,7 @@ msgstr ""
 "mielestä tavallisissa tapauksissa asentaa sovelluksen kanssa. "
 
 #. Tag: para
-#: using-d-i.xml:2206
+#: using-d-i.xml:2242
 #, no-c-format
 msgid ""
 "For technical reasons packages installed during the installation of the base "
@@ -3607,13 +3706,13 @@ msgstr ""
 "asentamisen jälkeen."
 
 #. Tag: title
-#: using-d-i.xml:2218
+#: using-d-i.xml:2254
 #, no-c-format
 msgid "Installing Additional Software"
 msgstr "Asennetaan lisää ohjelmia"
 
 #. Tag: para
-#: using-d-i.xml:2219
+#: using-d-i.xml:2255
 #, no-c-format
 msgid ""
 "At this point you have a usable but limited system. Most users will want to "
@@ -3628,13 +3727,13 @@ msgstr ""
 "tietokone tai verkkoyhteys on hidas."
 
 #. Tag: title
-#: using-d-i.xml:2234
+#: using-d-i.xml:2270
 #, no-c-format
 msgid "Configuring apt"
 msgstr "Tehdään apt:n asetukset"
 
 #. Tag: para
-#: using-d-i.xml:2236
+#: using-d-i.xml:2272
 #, no-c-format
 msgid ""
 "One of the tools used to install packages on a &debian-gnu; system is a "
@@ -3669,7 +3768,7 @@ msgstr ""
 "hallintaan."
 
 #. Tag: para
-#: using-d-i.xml:2260
+#: using-d-i.xml:2296
 #, no-c-format
 msgid ""
 "<command>apt</command> must be configured so that it knows from where to "
@@ -3683,7 +3782,7 @@ msgstr ""
 "on valmis."
 
 #. Tag: para
-#: using-d-i.xml:2267
+#: using-d-i.xml:2303
 #, no-c-format
 msgid ""
 "If you are installing at default priority, the installer will largely take "
@@ -3701,7 +3800,7 @@ msgstr ""
 "vakaata jakelua."
 
 #. Tag: para
-#: using-d-i.xml:2276
+#: using-d-i.xml:2312
 #, no-c-format
 msgid ""
 "If you are installing at a lower priority (e.g. in expert mode), you will be "
@@ -3716,13 +3815,13 @@ msgstr ""
 "<quote>contrib</quote> ja <quote>non-free</quote> -osista. "
 
 #. Tag: title
-#: using-d-i.xml:2287
+#: using-d-i.xml:2323
 #, no-c-format
 msgid "Installing from more than one CD or DVD"
 msgstr "Asennus monelta CD- tai DVD-levyltä"
 
 #. Tag: para
-#: using-d-i.xml:2289
+#: using-d-i.xml:2325
 #, no-c-format
 msgid ""
 "If you are installing from a CD or a DVD that is part of a larger set, the "
@@ -3736,7 +3835,7 @@ msgstr ""
 "olevia paketteja."
 
 #. Tag: para
-#: using-d-i.xml:2296
+#: using-d-i.xml:2332
 #, no-c-format
 msgid ""
 "If you do not have any additional CDs or DVDs, that is no problem: using "
@@ -3751,7 +3850,7 @@ msgstr ""
 "valittaviin tehtäviin kuuluvia paketteja."
 
 #. Tag: para
-#: using-d-i.xml:2304
+#: using-d-i.xml:2340
 #, no-c-format
 msgid ""
 "Packages are included on CDs (and DVDs) in the order of their popularity. "
@@ -3764,7 +3863,7 @@ msgstr ""
 "käyttävät kokoelman viimeisillä levyillä olevia paketteja."
 
 #. Tag: para
-#: using-d-i.xml:2311
+#: using-d-i.xml:2347
 #, no-c-format
 msgid ""
 "It also means that buying or downloading and burning a full CD set is just a "
@@ -3781,7 +3880,7 @@ msgstr ""
 "tai ehkä kaksi ensimmäistä DVD:tä, riittää useimmille. "
 
 #. Tag: para
-#: using-d-i.xml:2320
+#: using-d-i.xml:2356
 #, no-c-format
 msgid ""
 "A good rule of thumb is that for a regular desktop installation (using the "
@@ -3796,7 +3895,7 @@ msgstr ""
 "työpöytäympäristölle."
 
 #. Tag: para
-#: using-d-i.xml:2328
+#: using-d-i.xml:2364
 #, no-c-format
 msgid ""
 "If you do scan multiple CDs or DVDs, the installer will prompt you to "
@@ -3813,13 +3912,13 @@ msgstr ""
 "mutta numerojärjestystä käyttämällä ei niin helposti sählää."
 
 #. Tag: title
-#: using-d-i.xml:2341
+#: using-d-i.xml:2377
 #, no-c-format
 msgid "Using a network mirror"
 msgstr "Asentaminen verkossa olevalta asennuspalvelimelta"
 
 #. Tag: para
-#: using-d-i.xml:2343
+#: using-d-i.xml:2379
 #, no-c-format
 msgid ""
 "One question that will be asked during most installs is whether or not to "
@@ -3831,7 +3930,7 @@ msgstr ""
 "mutta on muutamia poikkeuksia. "
 
 #. Tag: para
-#: using-d-i.xml:2349
+#: using-d-i.xml:2385
 #, no-c-format
 msgid ""
 "If you are <emphasis>not</emphasis> installing from a full CD or DVD or "
@@ -3849,7 +3948,7 @@ msgstr ""
 "<literal>työpöytä</literal>-tehtävää. "
 
 #. Tag: para
-#: using-d-i.xml:2358
+#: using-d-i.xml:2394
 #, no-c-format
 msgid ""
 "If you are installing from a single full CD or using a full CD image, using "
@@ -3870,7 +3969,7 @@ msgstr ""
 "valikoiden. "
 
 #. Tag: para
-#: using-d-i.xml:2369
+#: using-d-i.xml:2405
 #, no-c-format
 msgid ""
 "If you are installing from a DVD or using a DVD image, any packages needed "
@@ -3884,7 +3983,7 @@ msgstr ""
 "kerrottiin. Verkossa olevan asennuspalvelimen käyttö ei ole pakollista."
 
 #. Tag: para
-#: using-d-i.xml:2376
+#: using-d-i.xml:2412
 #, no-c-format
 msgid ""
 "One advantage of adding a network mirror is that updates that have occurred "
@@ -3900,7 +3999,7 @@ msgstr ""
 "vakautta."
 
 #. Tag: para
-#: using-d-i.xml:2383
+#: using-d-i.xml:2419
 #, no-c-format
 msgid ""
 "In summary: selecting a network mirror is generally a good idea, except if "
@@ -3915,26 +4014,26 @@ msgstr ""
 "Asennuspalvelinta käytettäessä noudettavan datan määrä riippuu siis"
 
 #. Tag: para
-#: using-d-i.xml:2392
+#: using-d-i.xml:2428
 #, no-c-format
 msgid "the tasks you select in the next step of the installation,"
 msgstr "asennuksen seuraavassa vaiheessa valittavista tehtävistä"
 
 #. Tag: para
-#: using-d-i.xml:2397
+#: using-d-i.xml:2433
 #, no-c-format
 msgid "which packages are needed for those tasks,"
 msgstr "noiden tehtävien tarvitsemista paketeista"
 
 #. Tag: para
-#: using-d-i.xml:2402
+#: using-d-i.xml:2438
 #, no-c-format
 msgid ""
 "which of those packages are present on the CDs or DVDs you have scanned, and"
 msgstr "mitkä noista paketeista ovat luetuilla CD- tai DVD-levyillä ja"
 
 #. Tag: para
-#: using-d-i.xml:2407
+#: using-d-i.xml:2443
 #, no-c-format
 msgid ""
 "whether any updated versions of packages included on the CDs or DVDs are "
@@ -3946,7 +4045,7 @@ msgstr ""
 "tietoturvapäivitysten tai volatilepäivitysten palvelimelta)."
 
 #. Tag: para
-#: using-d-i.xml:2416
+#: using-d-i.xml:2452
 #, no-c-format
 msgid ""
 "Note that the last point means that, even if you choose not to use a network "
@@ -3960,13 +4059,13 @@ msgstr ""
 "palvelimella ja nämä päivitykset on otettu käyttöön."
 
 #. Tag: title
-#: using-d-i.xml:2432
+#: using-d-i.xml:2468
 #, no-c-format
 msgid "Selecting and Installing Software"
 msgstr "Ohjelmien valinta ja asentaminen"
 
 #. Tag: para
-#: using-d-i.xml:2434
+#: using-d-i.xml:2470
 #, no-c-format
 msgid ""
 "During the installation process, you are given the opportunity to select "
@@ -3983,7 +4082,7 @@ msgstr ""
 "nopeasti valmiiksi erilaisiin tehtäviin."
 
 #. Tag: para
-#: using-d-i.xml:2443
+#: using-d-i.xml:2479
 #, no-c-format
 msgid ""
 "So, you have the ability to choose <emphasis>tasks</emphasis> first, and "
@@ -4017,7 +4116,7 @@ msgstr ""
 "tehtävien tilatarpeet."
 
 #. Tag: para
-#: using-d-i.xml:2470
+#: using-d-i.xml:2506
 #, no-c-format
 msgid ""
 "Some tasks may be pre-selected based on the characteristics of the computer "
@@ -4029,7 +4128,7 @@ msgstr ""
 "Tässä kohtaa voi jopa poistaa valinnan kaikista tehtävistä."
 
 #. Tag: para
-#: using-d-i.xml:2477
+#: using-d-i.xml:2513
 #, no-c-format
 msgid ""
 "In the standard user interface of the installer, you can use the space bar "
@@ -4039,7 +4138,7 @@ msgstr ""
 "välilyöntinäppäimellä."
 
 #. Tag: para
-#: using-d-i.xml:2483
+#: using-d-i.xml:2519
 #, no-c-format
 msgid ""
 "Unless you are using the special KDE or Xfce/LXDE CDs, the <quote>Desktop "
@@ -4049,7 +4148,7 @@ msgstr ""
 "paitsi jos käytetään KDE:tä tai Xfce/LXDE:tä varten tehtyjä erikoislevyjä."
 
 #. Tag: para
-#: using-d-i.xml:2488
+#: using-d-i.xml:2524
 #, no-c-format
 msgid ""
 "It is not possible to interactively select a different desktop during the "
@@ -4071,7 +4170,7 @@ msgstr ""
 "<literal>desktop=lxde</literal>."
 
 #. Tag: para
-#: using-d-i.xml:2499
+#: using-d-i.xml:2535
 #, no-c-format
 msgid ""
 "Some CD images (businesscard, netinst and DVD) also allow selection of the "
@@ -4085,7 +4184,7 @@ msgstr ""
 "<quote>Alternative desktop environments</quote>."
 
 #. Tag: para
-#: using-d-i.xml:2506
+#: using-d-i.xml:2542
 #, no-c-format
 msgid ""
 "Note that this will only work if the packages needed for the desired desktop "
@@ -4103,7 +4202,7 @@ msgstr ""
 "otosta tai mitä tahansa muuta asennustapaa."
 
 #. Tag: para
-#: using-d-i.xml:2516
+#: using-d-i.xml:2552
 #, no-c-format
 msgid ""
 "The various server tasks will install software roughly as follows. DNS "
@@ -4123,7 +4222,7 @@ msgstr ""
 "classname>."
 
 #. Tag: para
-#: using-d-i.xml:2527
+#: using-d-i.xml:2563
 #, no-c-format
 msgid ""
 "The <quote>Standard system</quote> task will install any package that has a "
@@ -4139,7 +4238,7 @@ msgstr ""
 "jos tiedät mitä teet ja haluat todella suppean järjestelmän."
 
 #. Tag: para
-#: using-d-i.xml:2535
+#: using-d-i.xml:2571
 #, no-c-format
 msgid ""
 "If during language selection a default locale other than the <quote>C</"
@@ -4158,7 +4257,7 @@ msgstr ""
 "sitä vastaavat maa-asetustopaketit (jos niitä on saatavilla)."
 
 #. Tag: para
-#: using-d-i.xml:2545
+#: using-d-i.xml:2581
 #, no-c-format
 msgid ""
 "Once you've selected your tasks, select &BTN-CONT;. At this point, "
@@ -4172,7 +4271,7 @@ msgstr ""
 "näyttää kehotteen asennuksen aikana"
 
 #. Tag: para
-#: using-d-i.xml:2552
+#: using-d-i.xml:2588
 #, no-c-format
 msgid ""
 "You should be aware that especially the Desktop task is very large. "
@@ -4190,7 +4289,7 @@ msgstr ""
 "on alkanut."
 
 #. Tag: para
-#: using-d-i.xml:2561
+#: using-d-i.xml:2597
 #, no-c-format
 msgid ""
 "Even when packages are included on the CD-ROM, the installer may still "
@@ -4207,13 +4306,13 @@ msgstr ""
 "testattavaa jakelua näin käy jos käytetään vanhaa otosta."
 
 #. Tag: title
-#: using-d-i.xml:2576
+#: using-d-i.xml:2612
 #, no-c-format
 msgid "Making Your System Bootable"
 msgstr "Järjestelmä käynnistymään kiintolevyltä"
 
 #. Tag: para
-#: using-d-i.xml:2578
+#: using-d-i.xml:2614
 #, no-c-format
 msgid ""
 "If you are installing a diskless workstation, obviously, booting off the "
@@ -4227,13 +4326,13 @@ msgstr ""
 "verkkokäynnistystä; katso <xref linkend=\"boot-dev-select-sun\"/>.</phrase>"
 
 #. Tag: title
-#: using-d-i.xml:2593
+#: using-d-i.xml:2629
 #, no-c-format
 msgid "Detecting other operating systems"
 msgstr "Etsitään muita käyttöjärjestelmiä"
 
 #. Tag: para
-#: using-d-i.xml:2595
+#: using-d-i.xml:2631
 #, no-c-format
 msgid ""
 "Before a boot loader is installed, the installer will attempt to probe for "
@@ -4248,7 +4347,7 @@ msgstr ""
 "myös tämän käyttöjärjestelmän käynnistyminen &debian;in lisäksi."
 
 #. Tag: para
-#: using-d-i.xml:2603
+#: using-d-i.xml:2639
 #, no-c-format
 msgid ""
 "Note that multiple operating systems booting on a single machine is still "
@@ -4264,13 +4363,13 @@ msgstr ""
 "alkulatausohjelman ohjeista etsittävä lisätietoa."
 
 #. Tag: title
-#: using-d-i.xml:2621
+#: using-d-i.xml:2657
 #, no-c-format
 msgid "<command>palo</command>-installer"
 msgstr "Käynnistyslataimen <command>palo</command> asennin"
 
 #. Tag: para
-#: using-d-i.xml:2622
+#: using-d-i.xml:2658
 #, no-c-format
 msgid ""
 "The bootloader on PA-RISC is <quote>palo</quote>. <command>PALO</command> is "
@@ -4286,19 +4385,19 @@ msgstr ""
 "mahdollistaa <command>PALO</command>:n kyky lukea Linux-osioiden tiedostoja."
 
 #. Tag: para
-#: using-d-i.xml:2631
+#: using-d-i.xml:2667
 #, no-c-format
 msgid "hppa FIXME ( need more info )"
 msgstr "hppa KORJAAMUT ( tarvitaan lisätietoja )"
 
 #. Tag: title
-#: using-d-i.xml:2643
+#: using-d-i.xml:2679
 #, no-c-format
 msgid "Install the <command>Grub</command> Boot Loader on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>GRUB</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:2645
+#: using-d-i.xml:2681
 #, no-c-format
 msgid ""
 "The main &architecture; boot loader is called <quote>grub</quote>. Grub is a "
@@ -4310,7 +4409,7 @@ msgstr ""
 "aloittelijoille että vanhoille parroille."
 
 #. Tag: para
-#: using-d-i.xml:2651
+#: using-d-i.xml:2687
 #, no-c-format
 msgid ""
 "By default, grub will be installed into the Master Boot Record (MBR), where "
@@ -4322,7 +4421,7 @@ msgstr ""
 "Lisätietoja löytyy grub:n man-sivulta."
 
 #. Tag: para
-#: using-d-i.xml:2657
+#: using-d-i.xml:2693
 #, no-c-format
 msgid ""
 "If you do not want to install grub, use the &BTN-GOBACK; button to get to "
@@ -4333,13 +4432,13 @@ msgstr ""
 "päävalikkoon, ja valitse siellä haluttu käynnistyslatain."
 
 #. Tag: title
-#: using-d-i.xml:2670
+#: using-d-i.xml:2706
 #, no-c-format
 msgid "Install the <command>LILO</command> Boot Loader on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>LILO</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:2672
+#: using-d-i.xml:2708
 #, no-c-format
 msgid ""
 "The second &architecture; boot loader is called <quote>LILO</quote>. It is "
@@ -4356,7 +4455,7 @@ msgstr ""
 "howto;\">LILO mini-HOWTO</ulink>."
 
 #. Tag: para
-#: using-d-i.xml:2682
+#: using-d-i.xml:2718
 #, no-c-format
 msgid ""
 "Currently the LILO installation will only create menu entries for other "
@@ -4369,7 +4468,7 @@ msgstr ""
 "lisäämään rivit GNU/Linux- ja GNU/Hurd-järjestelmille asennuksen jälkeen."
 
 #. Tag: para
-#: using-d-i.xml:2690
+#: using-d-i.xml:2726
 #, no-c-format
 msgid ""
 "&d-i; offers you three choices on where to install the <command>LILO</"
@@ -4379,13 +4478,13 @@ msgstr ""
 "asennusapaikaksi:"
 
 #. Tag: term
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid "Master Boot Record (MBR)"
 msgstr "Pääkäynnistyslohko (MBR)"
 
 #. Tag: para
-#: using-d-i.xml:2697
+#: using-d-i.xml:2733
 #, no-c-format
 msgid ""
 "This way the <command>LILO</command> will take complete control of the boot "
@@ -4393,13 +4492,13 @@ msgid ""
 msgstr "Komento <command>LILO</command> ohjaa käynnistyksen kokonaan."
 
 #. Tag: term
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, no-c-format
 msgid "new &debian; partition"
 msgstr "uusi &debian;in osio"
 
 #. Tag: para
-#: using-d-i.xml:2704
+#: using-d-i.xml:2740
 #, no-c-format
 msgid ""
 "Choose this if you want to use another boot manager. <command>LILO</command> "
@@ -4411,13 +4510,13 @@ msgstr ""
 "toissijaisena käynnistyslataimena."
 
 #. Tag: term
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid "Other choice"
 msgstr "Muu valinta"
 
 #. Tag: para
-#: using-d-i.xml:2713
+#: using-d-i.xml:2749
 #, no-c-format
 msgid ""
 "Useful for advanced users who want to install <command>LILO</command> "
@@ -4431,7 +4530,7 @@ msgstr ""
 "<filename>/dev/sda</filename>."
 
 #. Tag: para
-#: using-d-i.xml:2723
+#: using-d-i.xml:2759
 #, no-c-format
 msgid ""
 "If you can no longer boot into Windows 9x (or DOS) after this step, you'll "
@@ -4447,13 +4546,13 @@ msgstr ""
 "käytettävä jotain muuta keinoa &debian;in käynnistämiseen!"
 
 #. Tag: title
-#: using-d-i.xml:2739
+#: using-d-i.xml:2775
 #, no-c-format
 msgid "Install the <command>ELILO</command> Boot Loader on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>ELILO</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:2741
+#: using-d-i.xml:2777
 #, no-c-format
 msgid ""
 "The &architecture; boot loader is called <quote>elilo</quote>. It is modeled "
@@ -4481,7 +4580,7 @@ msgstr ""
 "käynnistämään Linux-ytimen."
 
 #. Tag: para
-#: using-d-i.xml:2757
+#: using-d-i.xml:2793
 #, no-c-format
 msgid ""
 "The <quote>elilo</quote> configuration and installation is done as the last "
@@ -4498,13 +4597,13 @@ msgstr ""
 "tiedostojärjestelmä."
 
 #. Tag: title
-#: using-d-i.xml:2769
+#: using-d-i.xml:2805
 #, no-c-format
 msgid "Choose the correct partition!"
 msgstr "Valitse oikea levyosio!"
 
 #. Tag: para
-#: using-d-i.xml:2771
+#: using-d-i.xml:2807
 #, fuzzy, no-c-format
 #| msgid ""
 #| "The criteria for selecting a partition is that it is FAT format "
@@ -4530,13 +4629,13 @@ msgstr ""
 "tiedostojärjestelmän."
 
 #. Tag: title
-#: using-d-i.xml:2786
+#: using-d-i.xml:2822
 #, no-c-format
 msgid "EFI Partition Contents"
 msgstr "EFI-osion sisältö"
 
 #. Tag: para
-#: using-d-i.xml:2788
+#: using-d-i.xml:2824
 #, no-c-format
 msgid ""
 "The EFI partition is a FAT filesystem format partition on one of the hard "
@@ -4576,13 +4675,13 @@ msgstr ""
 "niitä kertyy järjestelmää päivitettäessä tai asetuksia muokattaessa."
 
 #. Tag: filename
-#: using-d-i.xml:2810
+#: using-d-i.xml:2846
 #, no-c-format
 msgid "elilo.conf"
 msgstr "elilo.conf"
 
 #. Tag: para
-#: using-d-i.xml:2811
+#: using-d-i.xml:2847
 #, no-c-format
 msgid ""
 "This is the configuration file read by the boot loader when it starts. It is "
@@ -4597,13 +4696,13 @@ msgstr ""
 "tiedostoihin."
 
 #. Tag: filename
-#: using-d-i.xml:2820
+#: using-d-i.xml:2856
 #, no-c-format
 msgid "elilo.efi"
 msgstr "elilo.efi"
 
 #. Tag: para
-#: using-d-i.xml:2821
+#: using-d-i.xml:2857
 #, no-c-format
 msgid ""
 "This is the boot loader program that the <quote>EFI Boot Manager</quote> "
@@ -4617,13 +4716,13 @@ msgstr ""
 "valinta."
 
 #. Tag: filename
-#: using-d-i.xml:2831
+#: using-d-i.xml:2867
 #, no-c-format
 msgid "initrd.img"
 msgstr "initrd.img"
 
 #. Tag: para
-#: using-d-i.xml:2832
+#: using-d-i.xml:2868
 #, no-c-format
 msgid ""
 "This is the initial root filesystem used to boot the kernel. It is a copy of "
@@ -4638,13 +4737,13 @@ msgstr ""
 "hakemistossa <filename>/boot</filename>."
 
 #. Tag: filename
-#: using-d-i.xml:2844
+#: using-d-i.xml:2880
 #, no-c-format
 msgid "readme.txt"
 msgstr "readme.txt"
 
 #. Tag: para
-#: using-d-i.xml:2845
+#: using-d-i.xml:2881
 #, no-c-format
 msgid ""
 "This is a small text file warning you that the contents of the directory are "
@@ -4656,13 +4755,13 @@ msgstr ""
 "elilo</filename> suoritetaan seuraavan kerran."
 
 #. Tag: filename
-#: using-d-i.xml:2855
+#: using-d-i.xml:2891
 #, no-c-format
 msgid "vmlinuz"
 msgstr "vmlinuz"
 
 #. Tag: para
-#: using-d-i.xml:2856
+#: using-d-i.xml:2892
 #, no-c-format
 msgid ""
 "This is the compressed kernel itself. It is a copy of the file referenced in "
@@ -4676,13 +4775,13 @@ msgstr ""
 "filename> osoitettu tiedosto hakemistossa <filename>/boot</filename>."
 
 #. Tag: title
-#: using-d-i.xml:2876
+#: using-d-i.xml:2912
 #, no-c-format
 msgid "<command>arcboot</command>-installer"
 msgstr "Käynnistyslataimen <command>arcboot</command> asennin"
 
 #. Tag: para
-#: using-d-i.xml:2877
+#: using-d-i.xml:2913
 #, no-c-format
 msgid ""
 "The boot loader on SGI machines is <command>arcboot</command>. It has to be "
@@ -4727,13 +4826,13 @@ msgstr ""
 "sitten <command>boot</command>."
 
 #. Tag: replaceable
-#: using-d-i.xml:2896
+#: using-d-i.xml:2932
 #, no-c-format
 msgid "scsi"
 msgstr "scsi"
 
 #. Tag: para
-#: using-d-i.xml:2897
+#: using-d-i.xml:2933
 #, no-c-format
 msgid ""
 "is the SCSI bus to be booted from, this is <userinput>0</userinput> for the "
@@ -4743,13 +4842,13 @@ msgstr ""
 "yhdysrakenteisille ohjaimille"
 
 #. Tag: replaceable
-#: using-d-i.xml:2905
+#: using-d-i.xml:2941
 #, no-c-format
 msgid "disk"
 msgstr "levy"
 
 #. Tag: para
-#: using-d-i.xml:2906
+#: using-d-i.xml:2942
 #, no-c-format
 msgid ""
 "is the SCSI ID of the hard disk on which <command>arcboot</command> is "
@@ -4757,13 +4856,13 @@ msgid ""
 msgstr "on SCSI ID sille levylle johon <command>arcboot</command> on asennettu"
 
 #. Tag: replaceable
-#: using-d-i.xml:2914
+#: using-d-i.xml:2950
 #, no-c-format
 msgid "partnr"
 msgstr "partnr"
 
 #. Tag: para
-#: using-d-i.xml:2915
+#: using-d-i.xml:2951
 #, no-c-format
 msgid ""
 "is the number of the partition on which <filename>/etc/arcboot.conf</"
@@ -4772,13 +4871,13 @@ msgstr ""
 "on sen osion numero jossa <filename>/etc/arcboot.conf</filename> sijaitsee"
 
 #. Tag: replaceable
-#: using-d-i.xml:2923
+#: using-d-i.xml:2959
 #, no-c-format
 msgid "config"
 msgstr "config"
 
 #. Tag: para
-#: using-d-i.xml:2924
+#: using-d-i.xml:2960
 #, no-c-format
 msgid ""
 "is the name of the configuration entry in <filename>/etc/arcboot.conf</"
@@ -4788,13 +4887,13 @@ msgstr ""
 "oletusarvona <quote>linux</quote>."
 
 #. Tag: title
-#: using-d-i.xml:2945
+#: using-d-i.xml:2981
 #, no-c-format
 msgid "Install <command>Yaboot</command> on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>Yaboot</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:2946
+#: using-d-i.xml:2982
 #, no-c-format
 msgid ""
 "Newer (mid 1998 and on) PowerMacs use <command>yaboot</command> as their "
@@ -4814,13 +4913,13 @@ msgstr ""
 "käynnistämään &debian-gnu;."
 
 #. Tag: title
-#: using-d-i.xml:2964
+#: using-d-i.xml:3000
 #, no-c-format
 msgid "Install <command>Quik</command> on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>Quik</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:2965
+#: using-d-i.xml:3001
 #, no-c-format
 msgid ""
 "The boot loader for OldWorld Power Macintosh machines is <command>quik</"
@@ -4835,13 +4934,13 @@ msgstr ""
 "Computingin klooneille."
 
 #. Tag: title
-#: using-d-i.xml:2981
+#: using-d-i.xml:3017
 #, no-c-format
 msgid "<command>zipl</command>-installer"
 msgstr "Käynnistyslataimen <command>zipl</command> asennin"
 
 #. Tag: para
-#: using-d-i.xml:2982
+#: using-d-i.xml:3018
 #, no-c-format
 msgid ""
 "The boot loader on &arch-title; is <quote>zipl</quote>. <command>ZIPL</"
@@ -4857,13 +4956,13 @@ msgstr ""
 "sivustolta jos haluat tietää ohjelmasta <command>ZIPL</command> enemmän."
 
 #. Tag: title
-#: using-d-i.xml:2999
+#: using-d-i.xml:3035
 #, no-c-format
 msgid "Install the <command>SILO</command> Boot Loader on a Hard Disk"
 msgstr "Asennetaan käynnistyslatain <command>SILO</command> kiintolevylle"
 
 #. Tag: para
-#: using-d-i.xml:3001
+#: using-d-i.xml:3037
 #, no-c-format
 msgid ""
 "The standard &architecture; boot loader is called <quote>silo</quote>. It is "
@@ -4894,13 +4993,13 @@ msgstr ""
 "SunOS/Solaris-asennuksen rinnalle."
 
 #. Tag: title
-#: using-d-i.xml:3026
+#: using-d-i.xml:3062
 #, no-c-format
 msgid "Continue Without Boot Loader"
 msgstr "Jatketaan ilman käynnistyslatainta"
 
 #. Tag: para
-#: using-d-i.xml:3028
+#: using-d-i.xml:3064
 #, no-c-format
 msgid ""
 "This option can be used to complete the installation even when no boot "
@@ -4913,7 +5012,7 @@ msgstr ""
 "(esim. käytetään jo asennettua käynnistyslatainta)."
 
 #. Tag: para
-#: using-d-i.xml:3035
+#: using-d-i.xml:3071
 #, no-c-format
 msgid ""
 "If you plan to manually configure your bootloader, you should check the name "
@@ -4934,13 +5033,13 @@ msgstr ""
 "osio."
 
 #. Tag: title
-#: using-d-i.xml:3052
+#: using-d-i.xml:3088
 #, no-c-format
 msgid "Finishing the Installation"
 msgstr "Päätetään asennus"
 
 #. Tag: para
-#: using-d-i.xml:3053
+#: using-d-i.xml:3089
 #, no-c-format
 msgid ""
 "This is the last step in the &debian; installation process during which the "
@@ -4951,13 +5050,13 @@ msgstr ""
 "tehtävät. Pääasiassa siistitään työn jälkiä jotka &d-i; jätti."
 
 #. Tag: title
-#: using-d-i.xml:3066
+#: using-d-i.xml:3102
 #, no-c-format
 msgid "Setting the System Clock"
 msgstr "Tehdään kellon asetukset"
 
 #. Tag: para
-#: using-d-i.xml:3068
+#: using-d-i.xml:3104
 #, no-c-format
 msgid ""
 "The installer may ask you if the computer's clock is set to UTC. Normally "
@@ -4970,7 +5069,7 @@ msgstr ""
 "käyttöjärjestelmien perusteella onko kello maailmanajassa."
 
 #. Tag: para
-#: using-d-i.xml:3075
+#: using-d-i.xml:3111
 #, no-c-format
 msgid ""
 "In expert mode you will always be able to choose whether or not the clock is "
@@ -4989,7 +5088,7 @@ msgstr ""
 "valitaan paikallinen aika.</phrase>"
 
 #. Tag: para
-#: using-d-i.xml:3086
+#: using-d-i.xml:3122
 #, no-c-format
 msgid ""
 "At this point &d-i; will also attempt to save the current time to the "
@@ -5001,13 +5100,13 @@ msgstr ""
 "tehdyn valinnan mukaiseti."
 
 #. Tag: title
-#: using-d-i.xml:3101
+#: using-d-i.xml:3137
 #, no-c-format
 msgid "Reboot the System"
 msgstr "Järjestelmän uudelleenkäynnistys"
 
 #. Tag: para
-#: using-d-i.xml:3103
+#: using-d-i.xml:3139
 #, no-c-format
 msgid ""
 "You will be prompted to remove the boot media (CD, floppy, etc) that you "
@@ -5018,7 +5117,7 @@ msgstr ""
 "jälkeen laite käynnistetään uudelleen uuteen &debian;-järjestelmään."
 
 #. Tag: para
-#: using-d-i.xml:3109
+#: using-d-i.xml:3145
 #, no-c-format
 msgid ""
 "After a final prompt the system will be halted because rebooting is not "
@@ -5032,13 +5131,13 @@ msgstr ""
 "juuritiedostojärjestelmäksi asennuksen ensimmäisten vaiheiden aikana."
 
 #. Tag: title
-#: using-d-i.xml:3122
+#: using-d-i.xml:3158
 #, no-c-format
-msgid "Miscellaneous"
-msgstr "Sekalaista"
+msgid "Troubleshooting"
+msgstr ""
 
 #. Tag: para
-#: using-d-i.xml:3123
+#: using-d-i.xml:3159
 #, no-c-format
 msgid ""
 "The components listed in this section are usually not involved in the "
@@ -5049,13 +5148,13 @@ msgstr ""
 "ovat käytettävissä jos jotain menee pieleen."
 
 #. Tag: title
-#: using-d-i.xml:3136
+#: using-d-i.xml:3172
 #, no-c-format
 msgid "Saving the installation logs"
 msgstr "Asentimen lokien tallentaminen"
 
 #. Tag: para
-#: using-d-i.xml:3138
+#: using-d-i.xml:3174
 #, no-c-format
 msgid ""
 "If the installation is successful, the logfiles created during the "
@@ -5067,7 +5166,7 @@ msgstr ""
 "installer/</filename>."
 
 #. Tag: para
-#: using-d-i.xml:3145
+#: using-d-i.xml:3181
 #, no-c-format
 msgid ""
 "Choosing <guimenuitem>Save debug logs</guimenuitem> from the main menu "
@@ -5083,13 +5182,13 @@ msgstr ""
 "tai liittää lokit asennusraporttiin."
 
 #. Tag: title
-#: using-d-i.xml:3165
+#: using-d-i.xml:3201
 #, no-c-format
 msgid "Using the Shell and Viewing the Logs"
 msgstr "Komentotulkin käyttö ja lokien lukeminen"
 
 #. Tag: para
-#: using-d-i.xml:3167
+#: using-d-i.xml:3203
 #, no-c-format
 msgid ""
 "There are several methods you can use to get a shell while running an "
@@ -5115,14 +5214,14 @@ msgstr ""
 "<keycap>F1</keycap></keycombo>."
 
 #. Tag: para
-#: using-d-i.xml:3185
+#: using-d-i.xml:3221
 #, no-c-format
 msgid "For the graphical installer see also <xref linkend=\"gtk-using\"/>."
 msgstr ""
 "Graafista asenninta käytettäessä katso myös <xref linkend=\"gtk-using\"/>."
 
 #. Tag: para
-#: using-d-i.xml:3189
+#: using-d-i.xml:3225
 #, no-c-format
 msgid ""
 "If you cannot switch consoles, there is also an <guimenuitem>Execute a "
@@ -5138,7 +5237,7 @@ msgstr ""
 "komentotulkin."
 
 #. Tag: para
-#: using-d-i.xml:3197
+#: using-d-i.xml:3233
 #, no-c-format
 msgid ""
 "At this point you are booted from the RAM disk, and there is a limited set "
@@ -5156,7 +5255,7 @@ msgstr ""
 "tekstintäydennys ja komentohistoria."
 
 #. Tag: para
-#: using-d-i.xml:3206
+#: using-d-i.xml:3242
 #, no-c-format
 msgid ""
 "To edit and view files, use the text editor <command>nano</command>. Log "
@@ -5168,7 +5267,7 @@ msgstr ""
 "filename>."
 
 #. Tag: para
-#: using-d-i.xml:3213
+#: using-d-i.xml:3249
 #, no-c-format
 msgid ""
 "Although you can do basically anything in a shell that the available "
@@ -5180,7 +5279,7 @@ msgstr ""
 "käytettäväksi jos jokin menee vikaan ja virheenjäljitykseen."
 
 #. Tag: para
-#: using-d-i.xml:3219
+#: using-d-i.xml:3255
 #, no-c-format
 msgid ""
 "Doing things manually from the shell may interfere with the installation "
@@ -5194,13 +5293,13 @@ msgstr ""
 "komentotulkissa."
 
 #. Tag: title
-#: using-d-i.xml:3234
+#: using-d-i.xml:3271
 #, no-c-format
 msgid "Installation Over the Network"
 msgstr "Etäasennus"
 
 #. Tag: para
-#: using-d-i.xml:3236
+#: using-d-i.xml:3273
 #, no-c-format
 msgid ""
 "One of the more interesting components is <firstterm>network-console</"
@@ -5217,7 +5316,7 @@ msgstr ""
 "tämän osan voi automatisoida, katso <xref linkend=\"automatic-install\"/>.)"
 
 #. Tag: para
-#: using-d-i.xml:3246
+#: using-d-i.xml:3283
 #, no-c-format
 msgid ""
 "This component is not loaded into the main installation menu by default, so "
@@ -5239,7 +5338,7 @@ msgstr ""
 "SSH:ta.</guimenuitem>."
 
 #. Tag: para
-#: using-d-i.xml:3259
+#: using-d-i.xml:3296
 #, no-c-format
 msgid ""
 "For installations on &arch-title;, this is the default method after setting "
@@ -5249,7 +5348,7 @@ msgstr ""
 "tultua tehdyksi."
 
 #. Tag: para
-#: using-d-i.xml:3264
+#: using-d-i.xml:3301
 #, no-c-format
 msgid ""
 "<phrase arch=\"not-s390\">After selecting this new entry, you</phrase> "
@@ -5271,7 +5370,7 @@ msgstr ""
 "tietoturvallisesti etäasennuksen tekevälle henkilölle."
 
 #. Tag: para
-#: using-d-i.xml:3276
+#: using-d-i.xml:3313
 #, no-c-format
 msgid ""
 "Should you decide to continue with the installation locally, you can always "
@@ -5283,7 +5382,7 @@ msgstr ""
 "toinen asentimen osa."
 
 #. Tag: para
-#: using-d-i.xml:3282
+#: using-d-i.xml:3319
 #, no-c-format
 msgid ""
 "Now let's switch to the other side of the wire. As a prerequisite, you need "
@@ -5315,7 +5414,7 @@ msgstr ""
 "on vahvistettava se oikeaksi."
 
 #. Tag: para
-#: using-d-i.xml:3299
+#: using-d-i.xml:3336
 #, no-c-format
 msgid ""
 "The <command>ssh</command> server in the installer uses a default "
@@ -5339,7 +5438,7 @@ msgstr ""
 "voiko asennusta jatkaa kun yhteys on muodostettu uudelleen."
 
 #. Tag: para
-#: using-d-i.xml:3312
+#: using-d-i.xml:3349
 #, no-c-format
 msgid ""
 "You may be able to avoid the connection being dropped by adding the option "
@@ -5361,7 +5460,7 @@ msgstr ""
 "muuten toipunut). Sitä oli siis käytettävä vain tarvittaessa."
 
 #. Tag: para
-#: using-d-i.xml:3325
+#: using-d-i.xml:3362
 #, no-c-format
 msgid ""
 "If you install several computers in turn and they happen to have the same IP "
@@ -5385,7 +5484,7 @@ msgstr ""
 "ja yrittää uudelleen."
 
 #. Tag: para
-#: using-d-i.xml:3341
+#: using-d-i.xml:3378
 #, no-c-format
 msgid ""
 "After the login you will be presented with an initial screen where you have "
@@ -5405,7 +5504,7 @@ msgstr ""
 "useampia."
 
 #. Tag: para
-#: using-d-i.xml:3351
+#: using-d-i.xml:3388
 #, no-c-format
 msgid ""
 "After you have started the installation remotely over SSH, you should not go "
@@ -5421,13 +5520,13 @@ msgstr ""
 "järjestelmä toimii huonosti."
 
 #. Tag: title
-#: using-d-i.xml:3371
+#: using-d-i.xml:3407
 #, no-c-format
 msgid "Loading Missing Firmware"
 msgstr "Puuttuvan laitetiedoston lataaminen"
 
 #. Tag: para
-#: using-d-i.xml:3372
+#: using-d-i.xml:3408
 #, no-c-format
 msgid ""
 "As described in <xref linkend=\"hardware-firmware\"/>, some devices require "
@@ -5442,7 +5541,7 @@ msgstr ""
 "lisäominaisuuksien saamiseen käyttöön."
 
 #. Tag: para
-#: using-d-i.xml:3380
+#: using-d-i.xml:3416
 #, no-c-format
 msgid ""
 "If a device driver requests firmware that is not available, &d-i; will "
@@ -5460,7 +5559,7 @@ msgstr ""
 "lib/firmware</filename>) ja laiteajuria vastaava moduuli ladataan uudelleen."
 
 #. Tag: para
-#: using-d-i.xml:3390
+#: using-d-i.xml:3426
 #, no-c-format
 msgid ""
 "Which devices are scanned and which file systems are supported depends on "
@@ -5478,7 +5577,7 @@ msgstr ""
 "laiteohjelmisto voidaan ladata myös MMC- tai SD-kortilta</phrase>."
 
 #. Tag: para
-#: using-d-i.xml:3400
+#: using-d-i.xml:3436
 #, no-c-format
 msgid ""
 "Note that it is possible to skip loading the firmware if you know the device "
@@ -5489,7 +5588,7 @@ msgstr ""
 "laite toimii ilmankin tai jos laitetta ei tarvita asennuksen aikana."
 
 #. Tag: para
-#: using-d-i.xml:3407
+#: using-d-i.xml:3443
 #, no-c-format
 msgid ""
 "Support for loading firmware is still relatively basic and is likely to be "
@@ -5506,13 +5605,13 @@ msgstr ""
 "\"submit-bug\"/>)."
 
 #. Tag: title
-#: using-d-i.xml:3418
+#: using-d-i.xml:3454
 #, no-c-format
 msgid "Preparing a medium"
 msgstr "Taltion valmistelu"
 
 #. Tag: para
-#: using-d-i.xml:3419
+#: using-d-i.xml:3455
 #, no-c-format
 msgid ""
 "Although in some cases the firmware can also be loaded from a partition on a "
@@ -5532,7 +5631,7 @@ msgstr ""
 "tuettu asennuksen ensimmäisten vaiheiden aikana."
 
 #. Tag: para
-#: using-d-i.xml:3429
+#: using-d-i.xml:3465
 #, fuzzy, no-c-format
 #| msgid ""
 #| "Tarballs containing current packages for the most common firmware are "
@@ -5553,7 +5652,7 @@ msgstr ""
 "vastaava tar-tiedosto ja pura se taltion tiedostojärjestelmään."
 
 #. Tag: para
-#: using-d-i.xml:3443
+#: using-d-i.xml:3479
 #, no-c-format
 msgid ""
 "If the firmware you need is not included in the tarball, you can also "
@@ -5570,7 +5669,7 @@ msgstr ""
 "laiteohjelmistopaketteja."
 
 #. Tag: para
-#: using-d-i.xml:3457
+#: using-d-i.xml:3493
 #, no-c-format
 msgid ""
 "It is also possible to copy individual firmware files to the medium. Loose "
@@ -5582,13 +5681,13 @@ msgstr ""
 "laitevalmistajalta."
 
 #. Tag: title
-#: using-d-i.xml:3466
+#: using-d-i.xml:3502
 #, no-c-format
 msgid "Firmware and the Installed System"
 msgstr "Laiteohjelmisto ja asennettu järjestelmä"
 
 #. Tag: para
-#: using-d-i.xml:3467
+#: using-d-i.xml:3503
 #, no-c-format
 msgid ""
 "Any firmware loaded during the installation will be copied automatically to "
@@ -5606,7 +5705,7 @@ msgstr ""
 "laiteohjelmistoa voida ladata versioerojen vuoksi."
 
 #. Tag: para
-#: using-d-i.xml:3476
+#: using-d-i.xml:3512
 #, no-c-format
 msgid ""
 "If the firmware was loaded from a firmware package, &d-i; will also install "
@@ -5622,7 +5721,7 @@ msgstr ""
 "automaattisesti jos uusi versio julkaistaan."
 
 #. Tag: para
-#: using-d-i.xml:3484
+#: using-d-i.xml:3520
 #, no-c-format
 msgid ""
 "If loading the firmware was skipped during the installation, the relevant "
@@ -5634,7 +5733,7 @@ msgstr ""
 "laiteohjelmistopaketti) on asennettu käyttäjän toimesta."
 
 #. Tag: para
-#: using-d-i.xml:3491
+#: using-d-i.xml:3527
 #, no-c-format
 msgid ""
 "If the firmware was loaded from loose firmware files, the firmware copied to "
@@ -5646,3 +5745,6 @@ msgstr ""
 "asennettuun järjestelmään kopioitu laiteohjelmisto päivity automaattisesti "
 "jos ei vastaavaa laiteohjelmistopakettia (jos sellainen on saatavilla) "
 "asenneta asennuksen valmistuttua. "
+
+#~ msgid "Miscellaneous"
+#~ msgstr "Sekalaista"
