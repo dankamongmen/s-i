@@ -1,18 +1,7 @@
-<!-- original version: 64916 -->
+<!-- original version: 66212 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <title>Préparation des fichiers pour un amorçage avec une clé USB</title>
-
-<para arch="x86">
-
-Quand on veut amorcer à partir d'une clé USB, il existe deux méthodes d'installation.
-La première utilise la clé uniquement pour lancer l'installateur lui-même,
-toute l'installation se faisant ensuite sur le réseau.
-La seconde consiste à copier une image CD sur la clé et
-à utiliser cette image comme source de paquets, source qui peut se combiner avec un miroir.
-Cette deuxième méthode est la plus commune.
-
-</para>
 
 <para> 
 Pour préparer une clé USB, vous avez besoin d'un système GNU/Linux fonctionnel
@@ -32,31 +21,29 @@ utilisez un autre périphérique, un disque dur par exemple, toutes les données
 seront perdues.
 </para></warning>
 
-<para arch="x86">
+  <sect2 id="usb-copy-isohybrid" condition="isohybrid-supported">
+  <title>Préparation d'une clé USB utilisant une image hybride (CD ou DVD)</title>
+<para>
 
-Pour préparer une clé qui n'amorce que l'installateur, l'installation se faisant ensuite sur le réseau,
-vous devez télécharger l'image <filename>mini.iso</filename>
-qui se trouve dans le répertoire <filename>netboot</filename> (son adresse précise
-est mentionnée dans  <xref linkend="where-files"/>) et copier cette image sur la clé,
-ce qui efface le contenu actuel de la clé. Cette méthode convient aux clés de très petite taille
-(quelques mégaoctets).
+Les images de Debian sur CD ou DVD peuvent être transférées directement sur une clé USB.
+C'est une méthode très simple pour rendre la clé amorçable.
+Il suffit de choisir une image qui tienne sur la clé.
+Consultez <xref linkend="official-cdrom"/> pour obtenir cette image.
 
 </para>
-<para arch="x86">
+<para>
 
-Par exemple, avec un système GNU/Linux, vous pouvez copier l'image <filename>mini.iso</filename>
-sur la clé de cette manière :
+Pour les clés de très petite taille (quelques mégaoctets), 
+vous pouvez télécharger l'image <filename>mini.iso</filename>
+qui se trouve dans le répertoire <filename>netboot</filename> (son adresse précise
+est mentionnée dans  <xref linkend="where-files"/>)<footnote>
 
-<informalexample><screen>
-# cat mini.iso &gt; /dev/<replaceable>sdX</replaceable>
-# sync
-</screen></informalexample>
-
-Pour ajouter un microprogramme sur une clé ainsi préparée, vous devez récupérer les
-fichiers du microprogramme. Consultez <xref linkend="loading-firmware"/>  pour des précisions.
-Puis, vous devez débrancher la clé puis la rebrancher. Vous devez voir maintenant deux partitions
-sur la clé. Montez la deuxième partition et placez-y les fichiers du microprogramme
-de cette manière :
+<para>
+Pour ajouter un microprogramme sur l'image <filename>mini.iso</filename>, vous
+devez d'abord transférer l'image sur la clé. Puis vous devez récupérer les
+fichiers du microprogramme. Consultez <xref linkend="loading-firmware"/> pour des précisions.
+Puis, débranchez la clé et rebranchez-la. Vous devez voir maintenant deux partitions
+sur la clé. Montez la deuxième partition et placez-y les fichiers du microprogramme.
 
 <informalexample><screen>
 # mount /dev/<replaceable>sdX2</replaceable> /mnt
@@ -65,35 +52,37 @@ de cette manière :
 # cd /
 # umount
 </screen></informalexample>
+
+</para>
+
+</footnote>.
+</para>
+<para>
+
+L'image CD ou DVD que vous avez choisie peut être transférée directement sur la clé.
+Toutes les données existantes sont détruites.
+Par exemple, avec un système GNU/Linux, vous pouvez copier l'image
+sur la clé de cette manière :
+
+<informalexample><screen>
+# cat <replaceable>debian.iso</replaceable> &gt; /dev/<replaceable>sdX</replaceable>
+# sync
+</screen></informalexample>
  
 </para>
-<para>
+  </sect2>
 
-Pour préparer une clé USB qui contient une image CD permettant l'installation de paquets,
-les images d'installation se trouvent dans le répertoire <filename>hd-media</filename>.
-Pour copier les fichiers sur la clé, vous pouvez utiliser 
-aussi bien l'une ou l'autre des méthodes décrites plus bas. Vous devez aussi
-télécharger une image CD. Les images de l'installation ainsi que l'image CD doivent être
-basées sur la même version de l'installateur. En cas de non correspondance, des erreurs <footnote>
+  <sect2 id="usb-copy-easy">
+  <title>Copie des fichiers &mdash; méthode simple</title>
 
 <para>
-Le message d'erreur le plus fréquent est qu'aucun module noyau ne peut être trouvé.
-Cela signifie que la version des <quote>udebs</quote> pour les modules du noyau
-dans l'image CD ne correspond pas à la version du noyau en cours d'exécution.
-</para></footnote>
-
-sont possibles.
-</para>
-
-<para>
-
+Vous pouvez aussi préparer votre clé vous-même en copiant les fichiers 
+de l'installateur et une image CD.
 Notez que la capacité de la clé doit être au moins égale à 256&nbsp;Mo. Pour des
 capacités inférieures, voyez <xref linkend="usb-copy-flexible"/>.
 
 </para>
 
-  <sect2 id="usb-copy-easy">
-  <title>Copie des fichiers &mdash; méthode simple</title>
 <para>
 
 Le fichier <filename>hd-media/boot.img.gz</filename> contient tous les
@@ -139,7 +128,7 @@ Montez ensuite la clé
 /dev/<replaceable>sdX2</replaceable> /mnt</userinput>),</phrase>
 qui aura maintenant un système de fichiers 
 <phrase arch="x86">FAT</phrase>
-<phrase arch="powerpc">HFS</phrase>, et copiez une image ISO de type
+<phrase arch="powerpc">HFS</phrase>, et copiez une image &debian; de type
 <quote>netinst</quote> ou <quote>businesscard</quote>.
 Démontez la clé (<userinput>umount /mnt</userinput>)
 et voilà, c'est fait&nbsp;!
@@ -161,20 +150,4 @@ suffisante, vous pouvez copier l'image d'un disque entier.
 
 </sect2>
 
-<!-- TODO: doesn't this section belong later? -->
-<sect2 arch="x86">
-   <title>Amorcer la clé USB</title>
-<warning><para>
-
-Si le système refuse de s'amorcer à partir de la clé, il se peut que le
-secteur principal d'amorçage de la clé soit défectueux. Corrigez-le avec le
-programme <command>install-mbr</command> qui se trouve dans le paquet
-<classname>mbr</classname>&nbsp;:
-
-<informalexample><screen>
-# install-mbr /dev/<replaceable>sdX</replaceable>
-</screen></informalexample>
-
-</para></warning>
-  </sect2>
  </sect1>
