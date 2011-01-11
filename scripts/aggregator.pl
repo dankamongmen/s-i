@@ -32,7 +32,9 @@ sub aggregate {
 		
 		print $fh "<li><a href=\"".$log->{url}."\">".$log->{description}."</a><br>\n";
 		if (length $log->{notes}) {
-			print $fh "Notes: ".$log->{notes}."<br>\n";
+			print $fh "<b>Notes: ".$log->{notes}."</b><br>\n";
+			print $mailfh "* ".$log->{description}.":\n".$log->{notes}."\n\n"
+				if defined $mailfh;
 		}
 		my ($basebasename)=($basename)=~m/(?:.*\/)?(.*)/;
 		print $fh "<img src=\"".logpng($log, $basebasename)."\" alt=\"graph\">\n";
@@ -81,9 +83,9 @@ sub aggregate {
 				if (length $unixdate && 
 				    (time - $unixdate) > ($log->{frequency}+1) * 60*60*24)  {
 					print $mailfh "* OLD BUILD:    $arch $shortdate $builder $ident $notes\n"
-						if defined $mailfh;
+						if defined $mailfh and not length $log->{notes};
 					print $mailfh "                $log->{logurl}$ident$log->{logext}\n\n"
-						if defined $mailfh;
+						if defined $mailfh and not length $log->{notes};
 					$shortdate="<b>$shortdate</b>";
 					$old++;
 				}
