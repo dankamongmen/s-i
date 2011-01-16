@@ -2,6 +2,12 @@ apt-setup (1:0.53) UNRELEASED; urgency=low
 
   * Support cd_type "bluray". In particular, don't prompt at high priority
     for a mirror to be configured. Closes: #609334
+  * Remove hardcoded bail out if the CD filesystem is not iso9660.
+    That seems wrong both for usb-hdd media as used by debian-live,
+    as well as for non-linux OSs (freebsd calls it cd9660).
+  * Treat usb-hdd media the same as hd-media and isohybrid, leaving
+    them mounted. Closes: #608201
+    (Needs cdrom-detect 1.38)
 
  -- Joey Hess <joeyh@debian.org>  Sun, 09 Jan 2011 14:55:21 -0400
 

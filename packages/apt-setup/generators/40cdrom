@@ -41,19 +41,19 @@ cd_mountable=1
 db_get cdrom-detect/hybrid || true
 if [ "$RET" = true ] || [ -d /hd-media ]; then
 	cd_mountable=""
-fi
-
-fs=iso9660
-if db_get cdrom-detect/cdrom_fs && [ "$RET" ]; then
-	fs="$RET"
-fi
-
-if [ "$fs" != iso9660 ]; then
-	exit 0
+else
+	db_get cdrom-detect/usb-hdd || true
+	if [ "$RET" = true ]; then
+		cd_mountable=""
+	fi
 fi
 
 remount_cd() {
 	if [ "$ROOT" ] && [ "$cd_mountable" ]; then
+		fs=iso9660
+		if db_get cdrom-detect/cdrom_fs && [ "$RET" ]; then
+			fs="$RET"
+		fi
 		db_get cdrom-detect/cdrom_device
 		$logoutput mount -t "$fs" -o ro,exec $RET /cdrom || true
 	fi
