@@ -33,10 +33,11 @@ mkdir -p $di_git/installer/build/localudebs
 	sub collect {
 		return unless length $c && length $dir;
 		return if -d "$dir/.svn"; # some dirs are still in svn
+		system("mkdir -p $dir");
 		open(OUT, ">$dir/.gitignore") || die "$dir/.gitignore: $!";
 		print OUT $c;
 		close OUT;
 		$c="";
-		system("cd $dir; git add -f .gitignore");
+		#system("cd $dir; git add -f .gitignore");
 	}
 ')
