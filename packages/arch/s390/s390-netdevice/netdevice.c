@@ -134,7 +134,6 @@ static int my_debconf_input (const char *priority, const char *template, char **
 {
 	int ret;
 
-	debconf_fset(client, template, "seen", "false");
 	debconf_input(client, priority, template);
 	ret = debconf_go(client);
 	debconf_get(client, template);
