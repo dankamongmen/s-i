@@ -158,6 +158,7 @@ static void make_fullscreen(GtkWidget * window)
     screen = gtk_window_get_screen(GTK_WINDOW(window));
     gtk_widget_set_size_request(window, gdk_screen_get_width(screen),
                                 gdk_screen_get_height(screen));
+    gtk_window_fullscreen(GTK_WINDOW(window));
 }
 
 /** Setup d-i specific bits.
