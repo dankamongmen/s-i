@@ -14,7 +14,7 @@ init() {
 }
 
 init_git() {
-	[ -e mrconfig] || make_mrconfig mrconfig $GIT
+	[ -e mrconfig ] || make_mrconfig mrconfig $GIT
 	mr -c mrconfig checkout
 }
 
