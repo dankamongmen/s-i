@@ -20,6 +20,10 @@ exec /usr/local/bin/git-commit-notice
 EOF
 	chmod 755 hooks/post-receive
 
+	cp hooks/post-update.sample hooks/post-update
+	chmod 755 hooks/post-update
+	./hooks/post-update
+
 	git config --replace-all hooks.mailinglist "debian-installer_cvs@packages.qa.debian.org"
 	git config --replace-all hooks.replyto "debian-boot@lists.debian.org"
 	# This makes the repo show up as a subproject under
