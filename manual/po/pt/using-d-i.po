@@ -2,7 +2,7 @@
 # Portuguese translation of the Debian Installer Manual
 #
 # Miguel Figueiredo <elmig@debianpt.org>, Etur, Rui Branco <freedebian@netcabo.pt>, 2005.
-# Miguel Figueiredo <elmig@debianpt.org>, 2005, 2006, 2007, 2008, 2009, 2010.
+# Miguel Figueiredo <elmig@debianpt.org>, 2005, 2006, 2007, 2008, 2009, 2010, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: using-d-i\n"
@@ -1790,7 +1790,7 @@ msgstr "São suportados os seguintes sistemas de ficheiros."
 
 #. Tag: para
 #: using-d-i.xml:1093
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
 #| "<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
@@ -1802,8 +1802,8 @@ msgid ""
 "phrase>"
 msgstr ""
 "<phrase arch=\"arm;mipsel\"><emphasis>ext2r0</emphasis>,</phrase> "
-"<emphasis>ext2</emphasis>, <emphasis>ext3</emphasis>, <emphasis>ext4</"
-"emphasis>"
+"<emphasis>ext2</emphasis>, <phrase arch=\"linux-any\"><emphasis>ext3"
+"</emphasis>,</phrase> <phrase arch=\"linux-any\"><emphasis>ext4</emphasis></phrase>"
 
 #. Tag: para
 #: using-d-i.xml:1098
@@ -1825,16 +1825,16 @@ msgstr "<emphasis>jfs</emphasis> (não disponível em todas as arquitecturas)"
 
 #. Tag: emphasis
 #: using-d-i.xml:1107
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<emphasis>NTFS</emphasis> (read-only)"
 msgid "<emphasis>ufs</emphasis>"
-msgstr "<emphasis>NTFS</emphasis> (apenas-leitura)"
+msgstr "<emphasis>ufs</emphasis>"
 
 #. Tag: para
 #: using-d-i.xml:1108
 #, no-c-format
 msgid "The default file system is UFS."
-msgstr ""
+msgstr "O sistma de ficheiros pre-definido é UFS."
 
 #. Tag: para
 #: using-d-i.xml:1111
@@ -1844,10 +1844,10 @@ msgstr "<emphasis>xfs</emphasis> (não disponível em todas as arquitecturas)"
 
 #. Tag: emphasis
 #: using-d-i.xml:1115
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid "<emphasis>NTFS</emphasis> (read-only)"
 msgid "<emphasis>zfs</emphasis>"
-msgstr "<emphasis>NTFS</emphasis> (apenas-leitura)"
+msgstr "<emphasis>zfs</emphasis>"
 
 #. Tag: para
 #: using-d-i.xml:1116
@@ -1857,6 +1857,10 @@ msgid ""
 "of ZFS features are supported. Some of them can be enabled manually after "
 "the initial install, but there are some caveats:"
 msgstr ""
+"Como o suporte a ZFS ainda está em desenvolvimento, apenas é suportado um "
+"conjunto básico de funcionalidades de ZFS. Algumas das quais podem ser "
+"habilitadas manualmente após a instalação inicial, mas existem algumas "
+"ressalvas:"
 
 #. Tag: para
 #: using-d-i.xml:1121
@@ -1866,6 +1870,9 @@ msgid ""
 "filesystems can be created on this pool by using the <quote>zfs create</"
 "quote> command."
 msgstr ""
+"Cada pool ZFS apenas irá albergar apenas um sistema de ficheiros. Após a "
+"instalação ter terminado, poderão ser criados mais sistemas de ficheiros "
+"neste pool utilizando o comando <quote>zfs create</quote>."
 
 #. Tag: para
 #: using-d-i.xml:1126
@@ -1878,6 +1885,12 @@ msgid ""
 "this on the pool that hosts root filesystem, as it would prevent GRUB from "
 "booting your system."
 msgstr ""
+"Cada pool ZFS será composto exactamente por uma partição. Após a instalação "
+"ter terminado, pode ser convertido um pool de apenas um dispositivo num pool "
+"multi-dispositivo utilizando o comando <quote>zpool add</quote>, ou num pool "
+"espelhado pelo comando <quote>zpool attach</quote>. No entanto, não deverá "
+"fazer isto no pool que alberga o sistema de ficheiros raiz, já que previne "
+"que o GRUB de arrancar o seu sistema."
 
 #. Tag: para
 #: using-d-i.xml:1134
@@ -1889,6 +1902,12 @@ msgid ""
 "algorithm other than the default (lzjb) is used on the pool that hosts your "
 "root filesystem, this may prevent GRUB from booting your system."
 msgstr ""
+"A compressão não é actualmente suportada. Após a instalação ter terminado, "
+"a compressão pode ser habilitada ao definir a propriedade <quote>compression"
+"</quote> através do comando <quote>zfs set</quote>. No entanto, se for "
+"utilizado um algoritmo de compressão além do pré-definido (lzjb) é utilizado "
+"no pool que alberga o sistema de ficheiros raiz, isto pode prevenir que o "
+"GRUB arranque o seu sistema."
 
 #. Tag: para
 #: using-d-i.xml:1143
@@ -2054,7 +2073,7 @@ msgstr ""
 
 #. Tag: para
 #: using-d-i.xml:1227
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "If you choose guided partitioning (either classic or using (encrypted) "
 #| "LVM) for a whole disk, you will first be asked to select the disk you "
@@ -2070,16 +2089,15 @@ msgid ""
 "order they are listed in may differ from what you are used to. The size of "
 "the disks may help to identify them."
 msgstr ""
-"Se escolher o particionamento guiado (quer clássico ou utilizando LVM "
-"(encriptado) para um disco inteiro, primeiro ser-lhe-á pedido para escolher "
-"o disco que quer utilizar. Se tiver vários discos verifique se todos os "
-"discos estão listados, assegure-se que escolhe o correcto. A ordem porque "
-"estão listados pode diferir do que você está acostumado. O tamanho dos "
-"discos pode ajudar a identificá-los."
+"Se escolher o particionamento guiado<phrase arch=\"linux-any\"> (quer clássico ou utilizando LVM (encriptado))</phrase> para um disco inteiro, primeiro "
+"ser-lhe-á primeiro pedido para escolher o disco que quer utilizar. Se tiver "
+"vários discos verifique se todos os discos estão listados, assegure-se que "
+"escolhe o correcto. A ordem porque estão listados pode diferir do que você "
+"está acostumado. O tamanho dos discos pode ajudar a identificá-los."
 
 #. Tag: para
 #: using-d-i.xml:1236
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "Any data on the disk you select will eventually be lost, but you will "
 #| "always be asked to confirm any changes before they are written to the "
@@ -2094,10 +2112,10 @@ msgid ""
 "(encrypted) LVM this is not possible. </phrase>"
 msgstr ""
 "Quaisquer dados no disco que escolheu eventualmente serão perdidos, mas ser-"
-"lhe-á pedido sempre para confirmar quaisquer alterações antes de serem "
-"escritas no disco. Se seleccionou o método clássico de particionamento, você "
-"poderá desfazer todas as alterações atá ao fim; quando utilizar LVM "
-"(encriptado) isto não é possível."
+"lhe-á sempre pedido para confirmar quaisquer alterações antes de serem "
+"escritas no disco. </phrase arch=\"linux-any\"> Se seleccionou o método "
+"clássico de particionamento, você poderá desfazer todas as alterações até "
+"ao fim; quando utilizar LVM (encriptado) isto não é possível. </phrase>"
 
 #. Tag: para
 #: using-d-i.xml:1246
@@ -2345,7 +2363,7 @@ msgstr ""
 
 #. Tag: para
 #: using-d-i.xml:1355
-#, fuzzy, no-c-format
+#, no-c-format
 #| msgid ""
 #| "If you select some free space, you will have the opportunity to create a "
 #| "new partition. You will have to answer a quick series of questions about "
@@ -2391,19 +2409,20 @@ msgstr ""
 "Depois desta etapa, ser-lhe-á apresentada informação detalhada acerca da sua "
 "nova partição. A opção principal é <guimenu>Utilizar como:</guimenu>, que "
 "determina se a partição irá ter um sistema de ficheiros, ou se será "
-"utilizada para swap, RAID por software, LVM, sistema de ficheiros encriptado "
-"ou não será utilizada de todo. Outras configurações incluem ponto de "
-"montagem, opções de montagem, flag de arranque; as configurações que são "
-"mostradas dependem de como a partição irá ser utilizada. Se não gostar dos "
-"valores pré-seleccionados por omissão, esteja à vontade de os mudar a seu "
-"gosto. E.g. seleccionar a opção <guimenuitem>Utilizar como:</guimenuitem>, "
-"pode escolher um sistema de ficheiros diferente para esta partição, "
-"incluindo opções para utilizar a partição para swap, RAID por software, LVM, "
-"ou não a utilizar de todo. Outra funcionalidade simpática é a possibilidade "
-"de copiar informação de uma partição já existente para esta. Quando estiver "
-"satisfeito com a sua nova partição, seleccione <guimenuitem>Preparação da "
-"Partição Terminada</guimenuitem> e regressará novamente ao ecrã principal do "
-"<command>partman</command>."
+"utilizada para swap,<phrase arch=\"linux-any\"> RAID por software, LVM, "
+"sistema de ficheiros encriptado</phrase> ou não será utilizada de todo. "
+"Outras configurações incluem ponto de montagem, opções de montagem, flag de "
+"arranque; as configurações que são mostradas dependem de como a partição irá "
+"ser utilizada. Se não gostar dos valores pré-seleccionados por omissão, "
+"esteja à vontade de os mudar a seu gosto. E.g. seleccionar a opção "
+"<guimenuitem>Utilizar como:</guimenuitem>, pode escolher um sistema de "
+"ficheiros diferente para esta partição, incluindo opções para utilizar a "
+"partição para swap,<phrase arch=\"linux-any\"> RAID por software, LVM,"
+"</phrase> ou não a utilizar de todo. Outra funcionalidade simpática é a "
+"possibilidade de copiar informação de uma partição já existente para esta. "
+"Quando estiver satisfeito com a sua nova partição, seleccione <guimenuitem>"
+"Preparação da Partição Terminada</guimenuitem> e regressará novamente ao "
+"ecrã principal do <command>partman</command>."
 
 #. Tag: para
 #: using-d-i.xml:1377
@@ -5231,7 +5250,7 @@ msgstr ""
 #: using-d-i.xml:3158
 #, no-c-format
 msgid "Troubleshooting"
-msgstr ""
+msgstr "Resolução de problemas"
 
 #. Tag: para
 #: using-d-i.xml:3159
