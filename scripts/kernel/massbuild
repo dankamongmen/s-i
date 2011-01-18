@@ -52,7 +52,6 @@ Operations starting with 'k' act on {linux,kfreebsd}-kernel-* source
 packages; those starting with 'm' on {linux,kfreebsd}-module-* packages:
  - build:   retrieve dependencies and build the udebs
  - release: show changes; after confirmation call 'debcommit --release'
-            (see svndirs(1) on how to make tagging work from a branch!)
  - clean:   remove built and temporary files
 
 If no architecture is specified, an operation will be performed for all
@@ -521,23 +520,24 @@ case $OPERATION in
 	for uarch in $UARCHES; do
 		cd $UBASE-$uarch$PF
 		log "Committing changes for $uarch..."
-		SVN_ST="$(svn st)"
-		if [ "$(echo "$SVN_ST" | egrep -q "^(\?|C)")" ]; then
+		GIT_ST="$(git status --porcelain)"
+		# These status codes indicate untracked or unmerged files.
+		if [ "$(echo "$GIT_ST" | egrep -q "^(\?|AA|DD|U|.U)")" ]; then
 			log "* Working copy is not clean; skipping"
 			cd ..; log ""; continue
 		fi
-		if [ -z "$(echo "$SVN_ST" | egrep "^M.*debian/changelog")" ]; then
+		if ! echo "$GIT_ST" | egrep "^.. debian/changelog"; then
 			log "* No changes to commit; skipping"
 			cd ..; log ""; continue
 		fi
-		svn diff
+		git diff HEAD
 		read -n 1 -s -p "Are you sure you want to commit these changes [yN]? " reply
 		echo
 		if [ "$reply" != y ] && [ "$reply" != Y ]; then
 			log "* Aborted by user"
 			cd ..; log ""; continue
 		fi
-		debcommit --release 2>&1 | tee -a $LOGFILE
+		debcommit --all --release 2>&1 | tee -a $LOGFILE
 		cd ..; log ""
 	done
 	;;
