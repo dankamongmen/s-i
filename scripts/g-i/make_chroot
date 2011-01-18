@@ -62,12 +62,12 @@ echo 'importing the Debian Archive Automatic signing key (2006)'
 gpg --keyserver pgpkeys.mit.edu --recv-key 2D230C5F
 gpg -a --export 2D230C5F | apt-key add -
 apt-get -y --allow-unauthenticated update
-apt-get -y install cvs subversion
+apt-get -y install git
 mkdir /build-di
 cd /build-di
 echo '************************************'
 echo 'checking out a copy of debian installer'
-svn co svn://svn.debian.org/svn/d-i/trunk/installer debian-installer
+git clone git://git.debian.org/d-i/debian-installer
 apt-get -y install \
     debconf dpkg-dev libdebconfclient0 libdebconfclient0-dev \
     libdebian-installer4 libdebian-installer-extra4 libdebian-installer4-dev
