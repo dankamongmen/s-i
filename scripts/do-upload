@@ -48,10 +48,10 @@ if [ "$?" = "0" ]; then
 	if grep -q "E: .* udeb: binary-from-other-architecture .*" /tmp/do-upload.log; then
 		echo "ERROR: this package is unsafe for crossbuilding."
 	else
-		debsign -a$arch && debcommit --release && debrelease -a$arch
+		debsign -a$arch && git add debian/changelog && debcommit --release && debrelease -a$arch
 		exit 0
 	fi
 fi
 
-svn revert debian/changelog
+git checkout debian/changelog
 exit 1
