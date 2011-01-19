@@ -159,43 +159,43 @@ install_deb packages libdebconfclient0 libdebconfclient0-dev
 supply_udeb packages/cdebconf
 
 # build kernel-wedge
-build packages/kernel/kernel-wedge
-install_deb packages/kernel kernel-wedge
+build packages/kernel-wedge
+install_deb packages kernel-wedge
 
 # Build all other udebs.
 if [ "$ARCH_OS" = linux ]; then
-	do_kernel packages/kernel/linux-kernel-di-$ARCH \
-		packages/kernel/linux-kernel-di-$ARCH-2.6
+	do_kernel packages/linux-kernel-di-$ARCH \
+		packages/linux-kernel-di-$ARCH-2.6
 fi
 
-do_subdir packages/partman/partman-base \
-	packages/partman/partman-auto \
-	packages/partman/partman-auto-lvm \
-	packages/partman/partman-basicfilesystems \
-	packages/partman/partman-basicmethods \
-	packages/partman/partman-ext3 \
-	packages/partman/partman-jfs \
-	packages/partman/partman-lvm \
-	packages/partman/partman-md \
-	packages/partman/partman-reiserfs \
-	packages/partman/partman-partitioning \
-	packages/partman/partman-target \
-	packages/partman/partman-xfs
+do_subdir packages/partman-base \
+	packages/partman-auto \
+	packages/partman-auto-lvm \
+	packages/partman-basicfilesystems \
+	packages/partman-basicmethods \
+	packages/partman-ext3 \
+	packages/partman-jfs \
+	packages/partman-lvm \
+	packages/partman-md \
+	packages/partman-reiserfs \
+	packages/partman-partitioning \
+	packages/partman-target \
+	packages/partman-xfs
 
 # Arch-specific partman partitioning.
 case $ARCH in
     arm|mipsel)
-	do_subdir packages/partman/partman-ext2r0
+	do_subdir packages/partman-ext2r0
 	;;
     hppa)
-	do_subdir packages/partman/partman-palo
+	do_subdir packages/partman-palo
 	;;
     i386|ia64)
-	do_subdir packages/partman/partman-efi
+	do_subdir packages/partman-efi
 	;;
     powerpc)
-	do_subdir packages/partman/partman-newworld \
-	    packages/partman/partman-prep
+	do_subdir packages/partman-newworld \
+	    packages/partman-prep
 	;;
 esac
 
@@ -250,43 +250,43 @@ esac
 # Arch dependent udebs, which may not build cleanly elsewhere.
 case $ARCH in
     amd64)
-	do_subdir packages/arch/i386/grub-installer \
-	    packages/arch/i386/lilo-installer
+	do_subdir packages/grub-installer \
+	    packages/lilo-installer
 	;;
     alpha)
-	do_subdir packages/arch/alpha/aboot-installer \
-	    packages/arch/alpha/srm-reader
+	do_subdir packages/aboot-installer \
+	    packages/srm-reader
 	;;
     hppa)
-	do_subdir packages/arch/hppa/palo-installer
+	do_subdir packages/palo-installer
 	;;
     i386)
-	do_subdir packages/arch/i386/grub-installer \
-	    packages/arch/i386/lilo-installer \
-	    packages/arch/ia64/elilo-installer
+	do_subdir packages/grub-installer \
+	    packages/lilo-installer \
+	    packages/elilo-installer
 	;;
     ia64)
-	do_subdir packages/arch/ia64/efi-reader \
-	    packages/arch/ia64/elilo-installer
+	do_subdir packages/efi-reader \
+	    packages/elilo-installer
 	;;
     mips)
-	do_subdir packages/arch/mips/arcboot-installer
+	do_subdir packages/arcboot-installer
 	;;
     mipsel)
-	do_subdir packages/arch/mipsel/colo-installer
+	do_subdir packages/colo-installer
 	;;
     powerpc)
-	do_subdir packages/arch/powerpc/yaboot-installer \
-	    packages/arch/powerpc/quik-installer \
-	    packages/arch/powerpc/prep-installer
+	do_subdir packages/yaboot-installer \
+	    packages/quik-installer \
+	    packages/prep-installer
 	;;
     s390)
-	do_subdir packages/arch/s390/s390-dasd \
-	    packages/arch/s390/s390-netdevice \
-	    packages/arch/s390/zipl-installer
+	do_subdir packages/s390-dasd \
+	    packages/s390-netdevice \
+	    packages/zipl-installer
 	;;
     sparc)
-	do_subdir packages/arch/sparc/silo-installer
+	do_subdir packages/silo-installer
 	;;
 esac
 
