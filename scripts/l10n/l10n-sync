@@ -19,6 +19,7 @@ UPDATEPO=Y
 SYNCPKGS=Y
 QUIET=N
 svn=svn
+git=git
 debconfupdatepo=debconf-updatepo
 
 if [ "$DI_L10NSYNC_LOGDIR" ] ; then
@@ -29,7 +30,7 @@ fi
 
 usage() {
 echo  "Usage:"
-echo  "$0 [--online] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--debconf-updatepo="debconf-updatepo command"] [--quiet|--nolog] <D-I repository path>"
+echo  "$0 [--online] [--keep-revision lang] [--atomic] [--atomic-updates] [--commit] [--svn="path_to_svn"] [--git="path_to_git"] [--debconf-updatepo="debconf-updatepo command"] [--quiet|--nolog] <D-I repository path>"
 echo  "    --online            : Work online (will update the local copy on"
 echo  "                          the fly)"
 echo  "    --commit            : Commit changed files (implies --online)"
@@ -43,6 +44,7 @@ echo  "                          for a given language"
 echo  "                          meant for use when switching a language"
 echo  "                          NOT RECOMMENDED in other situations"
 echo  "    --svn               : path to the svn binary"
+echo  "    --git               : path to the git binary"
 echo  "    --debconf-updatepo  : debconf-updatepo command line"
 echo  "                          (for using hacked debconf-updatepo)"
 echo  "    --merge="other_dir" : merge master files from master files"
@@ -61,6 +63,11 @@ svnerr() {
 		$svn cleanup
 	fi
 	exit 1
+}
+
+giterr() {
+	echo "Error in a GIT operation, please investigate"
+	exit 2
 }
 
 # Syntax: log_cmd [-m|-p "<message>"] command <arguments>
@@ -244,6 +251,9 @@ while $MORETODO ; do
 	"--svn="*)
 		svn=`echo $1|cut -f2 -d=`
 		;;
+	"--git="*)
+		git=`echo $1|cut -f2 -d=`
+		;;
 	"--debconf-updatepo="*)
 		debconfupdatepo=`echo $1|cut -f2 -d=`
 		;;
@@ -304,13 +314,13 @@ if [ ! -d $DI_COPY ] ; then
 	exit 1
 fi
 
-if [ ! -d $DI_COPY/packages/.svn ] ; then
-	error "No $DI_COPY/packages/.svn directory found"
+if [ ! -d $DI_COPY/packages/po/.svn ] ; then
+	error "No $DI_COPY/packages/po/.svn directory found"
 	error "$DI_COPY may not be a copy of Debian Installer SVN repository"
 	exit 1
 fi
 
-if ! grep -q "/d-i/" $DI_COPY/packages/.svn/entries ; then
+if ! grep -q "/d-i/" $DI_COPY/packages/po/.svn/entries ; then
 	error "$DI_COPY does not seem to be a complete Debian Installer SVN copy"
 	error "Please check it"
 	exit 1
@@ -336,7 +346,7 @@ for i in msgcat msgmerge msgattrib `echo ${debconfupdatepo} | awk '{print $1};'`
 done
 
 # Do not accept working on an unclean copy
-if $(svn st $DI_COPY/packages | grep -q "^C") ; then
+if $(svn st $DI_COPY/packages/po | grep -q "^C") ; then
 	error "$DI_COPY seems to contain some SVN conflict files"
 	error "Please fix this before launching the script again"
 	exit 1
@@ -388,11 +398,11 @@ else
 fi
 
 # First, update the copy of D-I repository
-cd $DI_COPY/packages
-if [ "$ONLINE" = "Y" ] ; then
-	log_cmd -p "Synchronize $DI_COPY/packages..." \
-		$svn update || svnerr
-fi
+#cd $DI_COPY
+#if [ "$ONLINE" = "Y" ] ; then
+#	log_cmd -p "Synchronize $DI_COPY/packages..." \
+#		$svn update || svnerr
+#fi
 
 # In case a merge has to be done with another directory
 # we update this directory as well
@@ -405,7 +415,7 @@ if [ -n "$MERGEDIR" ] ; then
 fi
 
 # Let's check the thing again....ceinture et bretelles as we say in French
-if $(svn st $DI_COPY/packages | grep -q "^C") ; then
+if $(svn st $DI_COPY/packages/po | grep -q "^C") ; then
 	error "$DI_COPY seems to contain some SVN conflict files"
 	error "Please fix this before lauching the script again"
 	exit 1
@@ -434,13 +444,13 @@ if [ "$UPDATEPO" = "Y" ]; then
 		cd $DI_COPY/packages/$i/debian
 		log_cmd -p "  - Run debconf-updatepo..." \
 			$debconfupdatepo
+		if [ "$COMMIT" = "Y" ] ; then
+			$git add po/templates.pot
+			log_cmd -p "  - Commit changes to git..." \
+				$git commit po/templates.pot
+			$git push
+		fi
 	done
-	if [ "$COMMIT" = "Y" ] ; then
-		cd $DI_COPY/packages
-		log_cmd -p "  - Commit changes to SVN..." \
-			$svn commit -m \"$COMMIT_MARKER Run debconf-updatepo on all packages\" || svnerr
-	fi
-
 else
 	log "- Not running debconf-updatepo for packages as requested"
 fi
@@ -647,9 +657,9 @@ fi
 log ""
 
 # Loop over D-I packages:
-# 4a) synchronize the local copy with the D-I SVN 
+# 4a) synchronize the local copy with the D-I GIT
 # 4b) update debian/po/*.po files with files in packages/po/
-# 4c) commit back the changes to D-I SVN
+# 4c) commit back the changes to D-I GIT
 log "Phase IV: update translations for D-I packages"
 if [ "$SYNCPKGS" = "Y" ]; then
 	
@@ -658,7 +668,7 @@ if [ "$SYNCPKGS" = "Y" ]; then
 		cd $DI_COPY/packages/$package/debian/po
 		if [ "$ONLINE" = "Y" ] ; then
 			log_cmd -p "  - synchronize with D-I repository..." \
-				$svn update || svnerr
+				$git pull || svnerr
 		fi
 		log "  - rebuild language files"
 		# For each language listed in packages/po, update PO files
@@ -706,19 +716,19 @@ EOF
 				# Remove temporary files
 				rm $oldfiltered $newfiltered
 			else
-				mv $lang.po.new $lang.po
-				svn add $lang.po
-				log_s1 "$package/debian/po/$lang.po" "ADDED"
+				if [ "$COMMIT" = "Y" ] ; then
+					$git add $lang.po
+					log_s1 "$package/debian/po/$lang.po" "ADDED"
+				fi
+			fi
+			if [ "$COMMIT" = "Y" ] ; then
+				$git add *.po
+				$git commit -m"$COMMIT_MARKER Commit changed/added files"
+				$git push
 			fi
 		done
 		log ""
 	done
-	
-	if [ "$COMMIT" = "Y" ] ; then
-		cd $DI_COPY/packages
-		log_cmd -p "Commit changes to SVN..." \
-			svn commit -m \"$COMMIT_MARKER Synchronising with translation files from packages/po\" || svnerr
-	fi
 else
 	log "- Not syncing D-I packages as requested"
 fi
