@@ -7,9 +7,11 @@
 
 # Run with caution!
 
+branches=$(git branch -r| awk '{print $1}')
+
 for tag in $(git tag); do if git show --pretty=raw --raw $tag | grep -q '^parent'; then : ; else
 	tree=$(git show --pretty=raw --raw $tag | grep '^tree ' | awk '{print $2}')
-	commit=$(git log --pretty="format:%T %H" -- | grep "^$tree " | awk '{print $2}'| head -n 1)
+	commit=$(git log --pretty="format:%T %H" $branches | grep "^$tree " | awk '{print $2}'| head -n 1)
 	if [ -z "$commit" ]; then
 		echo "cannot fix disconnected tag $tag in $(basename $MR_REPO)"
 	else
