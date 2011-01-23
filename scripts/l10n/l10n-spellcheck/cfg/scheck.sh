@@ -1,5 +1,5 @@
 #!/bin/sh
-export PATH=${HOME}/svn/trunk/scripts/l10n/l10n-spellcheck:$PATH
+export PATH=${HOME}/d-i/trunk/scripts/l10n/l10n-spellcheck:$PATH
 
 case "$1" in
 man)
