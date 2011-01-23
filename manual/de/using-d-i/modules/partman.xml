@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 66181 -->
 
 <para>
 
@@ -53,7 +53,7 @@ Kapazität ein anderer sein als bei kleinen Festplatten. Einige Optionen können
 nur verändert werden, wenn mit mittlerer oder niedriger Priorität installiert
 wird; bei höheren Prioritäten werden sichere Standardwerte verwendet.
 
-</para><para>
+</para><para arch="linux-any">
 
 Der Installer unterstützt verschiedene Formen der fortgeschrittenen
 Partitionierung sowie der Verwendung von Speichergeräten, die in vielen
@@ -89,7 +89,7 @@ Fällen auch kombiniert genutzt werden können.
   </para></listitem>
 </itemizedlist>
 
-</para><para arch="linux-any">
+</para><para>
 
 Die folgenden Dateisysteme werden unterstützt:
 
@@ -97,20 +97,59 @@ Die folgenden Dateisysteme werden unterstützt:
   <listitem><para>
     <phrase arch="arm;mipsel"><emphasis>ext2r0</emphasis>,</phrase>
     <emphasis>ext2</emphasis>,
-    <emphasis>ext3</emphasis>,
-    <emphasis>ext4</emphasis>
-  </para><para>
+    <phrase arch="linux-any"><emphasis>ext3</emphasis>,</phrase>
+    <phrase arch="linux-any"><emphasis>ext4</emphasis></phrase>
+  </para><para arch="linux-any">
     Das Standard-Dateisystem ist in den meisten Fällen ext3; für
     <filename>/boot</filename>-Partitionen wird bei geführter Partitionierung
     standardmäßig ext2 verwendet.
   </para></listitem>
-  <listitem><para>
+  <listitem arch="linux-any"><para>
     <emphasis>jfs</emphasis> (nicht auf allen Architekturen verfügbar)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>ufs</emphasis>
+  </para><para>
+    Das Standard-Dateisystem ist UFS.
+  </para></listitem>
+  <listitem arch="linux-any"><para>
     <emphasis>xfs</emphasis> (nicht auf allen Architekturen verfügbar)
   </para></listitem>
-  <listitem><para>
+  <listitem arch="kfreebsd-any"><para>
+    <emphasis>zfs</emphasis>
+  </para><para>
+    Da die Unterstützung für ZFS im Installer noch in der Entwicklung ist,
+    wird nur eine grundlegende Anzahl von ZFS-Funktionalitäten unterstützt.
+    Einige davon können nach der eigentlichen Installation von Hand aktiviert
+    werden, aber es gibt einige Fallstricke:
+    <itemizedlist>
+      <listitem><para>
+        Jeder ZFS-Pool wird nur ein Dateisystem beherbergen. Nach Beendigung der
+        Installation können in den Pools zusätzliche Dateisysteme mit dem
+        <quote>zfs create</quote>-Befehl erzeugt werden.
+      </para></listitem>
+      <listitem><para>
+        Jeder JFS-Pool wird aus exakt einer Partition erstellt. Nach Beendigung
+        der Installation kann solch ein Einzel-Geräte-Pool zu einem
+        Multi-Geräte-Pool konvertiert werden, indem der Befehl <quote>zpool
+        add</quote> verwendet wird. Oder er kann mit dem <quote>zpool
+        attach</quote>-Befehl in einen gespiegelten Pool konvertiert werden.
+        Allerdings sollten Sie solche Aktionen nicht auf den Pool anwenden, der
+        das root-Dateisystem beherbergt, da es GRUB davon abhalten würde, das
+        System zu booten.
+      </para></listitem>
+      <listitem><para>
+        Kompression wird derzeit nicht unterstützt. Nach Beendigung der
+        Installation kann die Kompression aktiviert werden, indem mit dem
+        <quote>zfs set</quote>-Befehl das <quote>compression</quote>-Merkmal
+        gesetzt wird. Wird allerdings ein anderer Kompressionsalgorithmus
+        als der Standard lzjb auf den Pool angewendet, der das root-Dateisystem
+        enthält, kann dies GRUB möglicherweise daran hindern, das System zu
+        booten.
+      </para></listitem>
+    </itemizedlist>
+  </para></listitem>
+  <listitem arch="linux-any"><para>
     <emphasis>reiserfs</emphasis> (optional; nicht auf allen Architekturen verfügbar)
   </para><para>
     Unterstützung für das Reiser-Dateisystem ist nicht mehr standardmäßig
@@ -149,7 +188,7 @@ Die folgenden Dateisysteme werden unterstützt:
 
    <sect3 id="partman-auto">
    <title>Geführte Partitionierung</title>
-<para>
+<para arch="linux-any">
 
 Wenn Sie Geführte Partitionierung wählen, haben Sie drei Möglichkeiten:
 Partitionen direkt auf der Festplatte erzeugen (die klassische Methode),
@@ -165,13 +204,13 @@ Der Installer verschlüsselt die LVM-Volumegruppe mittels eines
 </footnote>.
 
 </para>
-<note><para>
+<note arch="linux-any"><para>
 
 Die Option zur Nutzung von LVM (Standard oder verschlüsselt) ist
 möglicherweise nicht auf allen Architekturen verfügbar.
 
 </para></note>
-<para>
+<para arch="linux-any">
 
 Bei der Verwendung von LVM oder verschlüsseltem LVM erzeugt der Installer
 die meisten Partitionen innerhalb einer großen Partition; der Vorteil dabei
@@ -180,7 +219,7 @@ nachträglich in der Größe verändert werden können. Im Fall von verschlüsse
 LVM ist die große Partition ohne Kenntnis einer speziellen Passphrase nicht
 lesbar und bietet deshalb zusätzliche Sicherheit Ihrer (persönlichen) Daten.
 
-</para><para>
+</para><para arch="linux-any">
 
 Wenn Sie verschlüsseltes LVM verwenden, wird der Installer auch automatisch
 die Festplatte löschen, indem Zufallsdaten darauf geschrieben werden. Dies
@@ -190,9 +229,10 @@ früheren Installationen gelöscht werden), könnte aber einiges an Zeit
 benötigen, abhängig von der Größe der Festplatte.
 
 </para>
-<note><para>
+<note arch="linux-any"><para>
 
-Wenn Sie Geführte Partitionierung mittels LVM oder verschlüsseltem LVM wählen,
+Wenn Sie Geführte Partitionierung<phrase arch="linux-any"> (mittels LVM oder
+verschlüsseltem LVM)</phrase> wählen,
 müssen einige Änderungen in der Partitionstabelle auf die ausgewählten
 Festplatten geschrieben werden, während LVM eingerichtet wird. Diese Änderungen
 löschen effektiv alle Daten, die zu dieser Zeit auf den entsprechenden
@@ -215,10 +255,13 @@ kann Ihnen helfen, sie zu identifizieren.
 
 Alle Daten auf den ausgewählten Festplatten könnten verloren gehen,
 aber Sie werden immer aufgefordert, jegliche Änderungen zu bestätigen, bevor
-Sie auf die Festplatte geschrieben werden. Wenn Sie die klassische
+Sie auf die Festplatte geschrieben werden. 
+<phrase arch="linux-any">
+Wenn Sie die klassische
 Partitionierungsmethode gewählt haben, können Sie bis zuletzt alle Änderungen
 rückgängig machen; bei der Verwendung von LVM (Standard oder LVM) ist dies
 nicht möglich.
+</phrase>
 
 </para><para>
 
@@ -267,7 +310,7 @@ wird die automatische Partitionierung fehlschlagen.
 
 </tbody></tgroup></informaltable>
 
-<para>
+<para arch="linux-any">
 
 Wenn Sie Geführte Partitionierung mit LVM (Standard oder LVM) wählen,
 wird der Installer zusätzlich eine separate
@@ -363,8 +406,10 @@ Typ (primär oder logisch) und die Lage auf der Platte (am Anfang oder am Ende
 des freien Speicherbereichs) beantworten. Danach wird eine detaillierte
 Übersicht der neuen Partition angezeigt. Die wichtigste Option hier ist
 <guimenuitem>Benutzen als:</guimenuitem>, welche festlegt, ob die Partition
-ein Dateisystem enthalten soll oder als Swap, Software-RAID, LVM,
-verschlüsseltem LVM oder überhaupt nicht verwendet werden soll. Andere Einträge
+ein Dateisystem enthalten soll oder als Swap<phrase
+arch="linux-any">, Software-RAID, LVM,
+verschlüsseltem LVM </phrase>bzw. überhaupt nicht verwendet werden soll.
+Andere Einträge
 enthalten den Einhängepunkt im zukünftigen Dateisystem, Optionen zum Einbinden
 und die <quote>Boot-Flag</quote>-Markierung (ob die Partition bootfähig ist
 oder nicht). Welche Einträge angezeigt werden, hängt von der Art der Nutzung
@@ -372,8 +417,9 @@ der Partition ab. Falls Ihnen die gewählten Standardwerte nicht
 zusagen, scheuen Sie sich nicht, sie Ihren Bedürfnissen entsprechend zu ändern.
 Z.B. können Sie mittels der <guimenuitem>Benutzen als:</guimenuitem>-Option
 ein anderes Dateisystem für die Partition auswählen sowie haben die Möglichkeit,
-die Partition als Swap (um Arbeitsspeicher auf die Platte auszulagern),
-Software-RAID, LVM oder überhaupt nicht zu nutzen. Eine andere tolle Funktion
+die Partition als Swap (um Arbeitsspeicher auf die Platte auszulagern)<phrase
+arch="linux-any">, Software-RAID, LVM</phrase> oder überhaupt nicht zu nutzen.
+Eine andere tolle Funktion
 ist, Daten von einer bestehenden Partition auf die neue zu kopieren. Wenn Sie
 mit der neu erstellten Partition zufrieden sind, wählen Sie
 <guimenuitem>Anlegen der Partition beenden</guimenuitem>, um zurück zum
@@ -405,7 +451,7 @@ Falls Sie außerdem keine EFI-Boot-Partition erstellt und formatiert haben, wird
 <command>partman</command> dies ebenfalls erkennen und Sie können nicht
 fortfahren, ehe Sie eine zugewiesen haben.
 
-</para><para>
+</para><para arch="linux-any">
 
 Die Fähigkeiten von <command>partman</command> können mittels zusätzlicher
 Installer-Module noch ausgebaut werden, dies ist allerdings abhängig von Ihrer

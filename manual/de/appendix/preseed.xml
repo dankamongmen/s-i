@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 65009 -->
+<!-- original version: 66290 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -762,6 +762,11 @@ könnten einige der Beispiele (wie die Tastaturauswahl und die
 Bootloader-Installation) nicht relevant sein und müssen durch für Ihre
 Architektur passende debconf-Einstellungen ersetzt werden.
 
+</para><para>
+
+Details darüber, wie die verschiedenen Debian-Installer-Komponenten
+funktionieren, finden Sie in <xref linkend="module-details"/>.
+
 </para>
  
   <sect2 id="preseed-l10n">
@@ -1018,80 +1023,6 @@ d-i mirror/http/proxy string
 #d-i mirror/udeb/suite string testing
 </screen></informalexample>
 
-  </sect2>
-
-  <sect2 id="preseed-account">
-  <title>Einrichtung von Benutzerzugängen</title>
-<para>
-
-Das Passwort für den Superuser-Zugang (root) sowie Name und Passwort des ersten
-regulären Benutzers können voreingestellt werden. Für die Passwörter können
-Sie entweder Klartext-Werte oder MD5-<emphasis>Hashes</emphasis> verwenden.
-
-</para>
-<warning><para>
-
-Bedenken Sie, dass die Voreinstellung von Passwörtern nicht ganz sicher
-ist, da jeder, der Zugang zur Voreinstellungsdatei hat, Kenntnis von den
-Passwörtern hat. Hier MD5-Hashes zu verwenden, wird von der
-Sicherheit her betrachtet als besser angesehen, allerdings könnte Sie dies
-auch in falscher Sicherheit wiegen: der Zugriff auf einen MD5-Hash birgt
-die Gefahr von Brute-Force-Attacken.
-
-</para></warning>
-
-<informalexample role="example"><screen>
-# Das Anlegen des Root-Zugangs abbrechen (der normale Benutzer
-# bekommt dann die Möglichkeit, sudo zu benutzen)
-#d-i passwd/root-login boolean false
-# Alternativ dazu können Sie auch das Anlegen eines normalen
-# Benutzers abbrechen ...
-#d-i passwd/make-user boolean false
-
-# Root-Passwort, entweder als Klartext ...
-#d-i passwd/root-password password r00tme
-#d-i passwd/root-password-again password r00tme
-# ... oder verschlüsselt als MD5-Hash.
-#d-i passwd/root-password-crypted password [MD5 hash]
-
-# Um einen regulären Benutzerzugang zu erstellen:
-#d-i passwd/user-fullname string Debian User
-#d-i passwd/username string debian
-# Passwort des regulären Benutzers, entweder als Klartext ...
-#d-i passwd/user-password password insecure
-#d-i passwd/user-password-again password insecure
-# ... oder verschlüsselt als MD5-Hash.
-#d-i passwd/user-password-crypted password [MD5 hash]
-# Den ersten Benutzer mit der angegebenen Benutzer-ID (UID) erstellen
-# statt mit der Standard-UID.
-#d-i passwd/user-uid string 1010
-
-# Der Benutzerzugang wird zu einigen Standard-Benutzergruppen hinzugefügt.
-# Um dies zu überschreiben, benutzen Sie:
-#d-i passwd/user-default-groups string audio cdrom video
-
-</screen></informalexample>
-
-<para>
-
-Die Variablen <classname>passwd/root-password-crypted</classname> und
-<classname>passwd/user-password-crypted</classname> können auch mit
-<quote>!</quote> als Wert voreingestellt werden. In diesem Fall wird der
-entsprechende Zugang deaktiviert. Dies könnte für den root-Zugang sinnvoll
-sein, vorausgesetzt natürlich, dass alternative Möglichkeiten vorhanden sind,
-um administrative Tätigkeiten oder root-Logins zu ermöglichen (z.B. per
-Authentifizierung mit SSH-Schlüssel oder per sudo).
-
-</para><para>
-
-Der folgende Befehl kann verwendet werden, um einen MD5-Hash für ein Passwort
-zu generieren:
-
-<informalexample><screen>
-$ printf "r00tme" | mkpasswd -s -m md5
-</screen></informalexample>
-
-</para>
   </sect2>
 
   <sect2 id="preseed-time">
@@ -1392,6 +1323,80 @@ Installation des Kernels.
 
   </sect2>
 
+  <sect2 id="preseed-account">
+  <title>Einrichtung von Benutzerzugängen</title>
+<para>
+
+Das Passwort für den Superuser-Zugang (root) sowie Name und Passwort des ersten
+regulären Benutzers können voreingestellt werden. Für die Passwörter können
+Sie entweder Klartext-Werte oder MD5-<emphasis>Hashes</emphasis> verwenden.
+
+</para>
+<warning><para>
+
+Bedenken Sie, dass die Voreinstellung von Passwörtern nicht ganz sicher
+ist, da jeder, der Zugang zur Voreinstellungsdatei hat, Kenntnis von den
+Passwörtern hat. Hier MD5-Hashes zu verwenden, wird von der
+Sicherheit her betrachtet als besser angesehen, allerdings könnte Sie dies
+auch in falscher Sicherheit wiegen: der Zugriff auf einen MD5-Hash birgt
+die Gefahr von Brute-Force-Attacken.
+
+</para></warning>
+
+<informalexample role="example"><screen>
+# Das Anlegen des Root-Zugangs abbrechen (der normale Benutzer
+# bekommt dann die Möglichkeit, sudo zu benutzen)
+#d-i passwd/root-login boolean false
+# Alternativ dazu können Sie auch das Anlegen eines normalen
+# Benutzers abbrechen ...
+#d-i passwd/make-user boolean false
+
+# Root-Passwort, entweder als Klartext ...
+#d-i passwd/root-password password r00tme
+#d-i passwd/root-password-again password r00tme
+# ... oder verschlüsselt als MD5-Hash.
+#d-i passwd/root-password-crypted password [MD5 hash]
+
+# Um einen regulären Benutzerzugang zu erstellen:
+#d-i passwd/user-fullname string Debian User
+#d-i passwd/username string debian
+# Passwort des regulären Benutzers, entweder als Klartext ...
+#d-i passwd/user-password password insecure
+#d-i passwd/user-password-again password insecure
+# ... oder verschlüsselt als MD5-Hash.
+#d-i passwd/user-password-crypted password [MD5 hash]
+# Den ersten Benutzer mit der angegebenen Benutzer-ID (UID) erstellen
+# statt mit der Standard-UID.
+#d-i passwd/user-uid string 1010
+
+# Der Benutzerzugang wird zu einigen Standard-Benutzergruppen hinzugefügt.
+# Um dies zu überschreiben, benutzen Sie:
+#d-i passwd/user-default-groups string audio cdrom video
+
+</screen></informalexample>
+
+<para>
+
+Die Variablen <classname>passwd/root-password-crypted</classname> und
+<classname>passwd/user-password-crypted</classname> können auch mit
+<quote>!</quote> als Wert voreingestellt werden. In diesem Fall wird der
+entsprechende Zugang deaktiviert. Dies könnte für den root-Zugang sinnvoll
+sein, vorausgesetzt natürlich, dass alternative Möglichkeiten vorhanden sind,
+um administrative Tätigkeiten oder root-Logins zu ermöglichen (z.B. per
+Authentifizierung mit SSH-Schlüssel oder per sudo).
+
+</para><para>
+
+Der folgende Befehl kann verwendet werden, um einen MD5-Hash für ein Passwort
+zu generieren:
+
+<informalexample><screen>
+$ printf "r00tme" | mkpasswd -s -m md5
+</screen></informalexample>
+
+</para>
+  </sect2>
+
   <sect2 id="preseed-apt">
   <title>Konfiguration von Apt</title>
 <para>
@@ -1536,11 +1541,6 @@ verwenden können.
 <phrase arch="kfreebsd-any;hurd-any"># Um keinen Bootloader zu installieren, entfernen Sie hier das
 # Kommentarzeichen:
 #d-i grub-installer/skip boolean true</phrase>
-
-# Mit Ausnahme von einigen ungewöhnlichen Partitionierungskonfigurationen ist
-# GRUB 2 jetzt der Standard. Falls Sie aus bestimmten Gründen GRUB Legacy
-# verwenden müssen, entfernen Sie hier das Kommentarzeichen:
-#d-i grub-installer/grub2_instead_of_grub_legacy boolean false
 
 # Dies ist eine ziemlich sichere Einstellung; sie bewirkt, dass grub
 # automatisch in den MBR installiert wird, wenn kein anderes Betriebssystem
