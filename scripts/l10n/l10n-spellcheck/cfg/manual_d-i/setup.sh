@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # *** l10n-spellcheck.sh ***
-export LOCAL_REPOSITORY="${HOME}/svn/trunk/manual/po"
+export LOCAL_REPOSITORY="${HOME}/d-i/trunk/manual/po"
 export REFRESH_CMD="svn up ${LOCAL_REPOSITORY}"
 export OUT_DIR="/org/d-i.debian.org/www/l10n-spellcheck/manual_d-i"
 
