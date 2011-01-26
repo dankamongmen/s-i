@@ -715,19 +715,14 @@ EOF
 				fi
 				# Remove temporary files
 				rm $oldfiltered $newfiltered
-			else
-				if [ "$COMMIT" = "Y" ] ; then
-					$git add $lang.po
-					log_s1 "$package/debian/po/$lang.po" "ADDED"
-				fi
-			fi
-			if [ "$COMMIT" = "Y" ] ; then
-				$git add *.po
-				$git commit -m"$COMMIT_MARKER Commit changed/added files"
-				$git push
 			fi
 		done
 		log ""
+		if [ "$COMMIT" = "Y" ] ; then
+			$git add *.po
+			$git commit -m"$COMMIT_MARKER Commit changed/added files"
+			$git push
+		fi
 	done
 else
 	log "- Not syncing D-I packages as requested"
