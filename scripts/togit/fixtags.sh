@@ -13,7 +13,7 @@ for tag in $(git tag); do if git show --pretty=raw --raw $tag | grep -q '^parent
 	tree=$(git show --pretty=raw --raw $tag | grep '^tree ' | awk '{print $2}')
 	commit=$(git log --pretty="format:%T %H" $branches | grep "^$tree " | awk '{print $2}'| head -n 1)
 	if [ -z "$commit" ]; then
-		echo "cannot fix disconnected tag $tag in $(basename $MR_REPO)"
+		echo "cannot fix disconnected tag $tag in (tried branches $branches)"
 	else
 		name="$(git log --pretty="format:%cn" $commit^..$commit)"
 		email="$(git log --pretty="format:%ce" $commit^..$commit)"
