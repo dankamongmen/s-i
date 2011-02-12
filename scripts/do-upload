@@ -23,6 +23,11 @@ else
 	fi
 fi
 
+# Check build-depends
+if ! dpkg-checkbuilddeps; then
+	exit 1
+fi
+
 # Handle translations
 `dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > /tmp/l10n-changes
 if [ "`cat /tmp/l10n-changes`" = "Cannot find the PO directory!" ]; then
