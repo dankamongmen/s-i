@@ -90,7 +90,8 @@ memory stick, you can run it manually by accessing the device and executing
 </para><para>
 
 After the program has been started, a few preliminary questions will be
-asked and the system will be prepared to start the &debian-gnu; installer.
+asked and the system will be prepared to reboot into the &debian-gnu;
+installer.
 
 </para>
   </sect2>
@@ -199,7 +200,7 @@ For more details, refer to the
 
 </para><para>
 
-The procedure for <command>GRUB</command> is quite similar. Locate your
+The procedure for <command>GRUB1</command> is quite similar. Locate your
 <filename>menu.lst</filename> in the <filename>/boot/grub/</filename>
 directory (or sometimes <filename>/boot/boot/grub/</filename>) and add an
 entry for the installer, for example (assuming <filename>/boot</filename>
@@ -210,6 +211,22 @@ title  New Install
 root   (hd0,0)
 kernel /boot/newinstall/vmlinuz
 initrd /boot/newinstall/initrd.gz
+</screen></informalexample>
+
+</para><para>
+
+The procedure for <command>GRUB2</command> is very similar. The file is named
+<filename>grub.cfg</filename> instead of <filename>menu.lst</filename>. An entry
+for the installer would be for instance for example:
+
+<informalexample><screen>
+menuentry 'New Install' {
+insmod part_msdos
+insmod ext2
+set root='(hd0,msdos1)'
+linux /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
+}
 </screen></informalexample>
 
 </para><para>
@@ -364,8 +381,9 @@ install</quote> option may not be available.
 
 For a normal installation, select either the <quote>Install</quote> or
 the <quote>Graphical install</quote> entry  &mdash; using either the
-arrow keys on your keyboard or by typing the first (highlighted) letter
-&mdash; and press &enterkey; to boot the installer.
+arrow keys on your keyboard or by typing the first (highlighted) letter, the
+<quote>Install</quote> entry is already selected by default &mdash; and press
+&enterkey; to boot the installer.
 
 </para><para>
 
