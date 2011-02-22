@@ -445,7 +445,7 @@ if [ "$UPDATEPO" = "Y" ]; then
 		log_cmd -p "  - Run debconf-updatepo..." \
 			$debconfupdatepo
 		if [ "$COMMIT" = "Y" ] ; then
-			if $git status >/dev/null 2>&1; then
+			if ! $git status >/dev/null 2>&1; then
 				$git add po/templates.pot
 				log_cmd -p "  - Commit changes to git..." \
 					$git commit -m"$COMMIT_MARKER Update templates.pot"
@@ -721,7 +721,7 @@ EOF
 		done
 		log ""
 		if [ "$COMMIT" = "Y" ] ; then
-			if $git status >/dev/null 2>&1; then
+			if ! $git status >/dev/null 2>&1; then
 				$git add *.po
 				$git commit -m"$COMMIT_MARKER Commit changed/added files"
 				$git push
