@@ -18,6 +18,7 @@ ARCHES=""
 USE_INCOMING=""
 NO_CLEAN=""
 DO_DCH=""
+DO_P_U=""
 CHANGELOG_EXTRA=""
 DISTRIBUTION=""
 URGENCY=""
@@ -67,6 +68,8 @@ Options for 'kbuild' and 'mbuild' operations:
                changes to udeb contents or solving build errors
  --dch         update changelog; automatically adds new entry (if needed)
                and a line describing updates in dependencies used
+ --p-u         use version in the form <version>+<distribution>1 (if needed)
+               this implies --dch and required -d option
  -m <extra changelog entry>
                add additional lines in changelog; implies --dch
  -d <distribution>
@@ -115,6 +118,10 @@ while true; do
 		;;
 	    --dch)
 		DO_DCH=1
+		;;
+	    --p-u)
+		DO_DCH=1
+		DO_P_U=1
 		;;
 	    -m)
 		DO_DCH=1
@@ -234,14 +241,32 @@ add_changelog() {
 do_dch() {
 	[ "$DO_DCH" ] || return 0
 
+	# Sanity check
+	if [ "$DO_P_U" ] && [ -z "$DISTRIBUTION" ]; then
+		cat <<EOF
+
+Error: to use --p-u you need to specify the -d option and the desired
+distribution.
+EOF
+		clean_arch_tmp
+		exit 1
+	fi
+
 	local new_entry=""
+
+	local version=""
+	if [ "$DO_P_U" ]; then
+		if ! head -n 1 debian/changelog | grep -q "\+${DISTRIBUTION}[0-9]*)"; then
+			version="-v $(head -n 1 debian/changelog | sed 's,.*(\(.*\)).*,\1,g')+${DISTRIBUTION}1"
+		fi
+	fi
 
 	# Use dch's default logic to determine if we need a new changelog
 	# entry or not.
 	cat $CL_TEMP | while read CL; do
 		# Avoid duplicate entries in the changelog, but limit scope
 		if ! head -n 25 debian/changelog | grep -q "\* $CL"; then
-			dch --release-heuristic=changelog "$CL"
+			dch --release-heuristic=changelog $version "$CL"
 			new_entry=1
 		fi
         done
