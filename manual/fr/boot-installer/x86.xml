@@ -1,4 +1,4 @@
-<!-- original version:  64916 -->
+<!-- original version:  66396 -->
 
   <sect2 arch="any-x86"><title>Amorcer depuis un cédérom</title>
 
@@ -6,7 +6,7 @@
 
 <!-- We'll comment the following section until we know exact layout -->
 <!-- 
-Le cédérom n°&nbsp;1 du jeu officiel de cédéroms pour
+Le cédérom n°&nbsp;1 des cédéroms officiels de &debian; pour
       &arch-title; vous présentera une invite <prompt>boot:</prompt> sur la
       plupart des matériels. Appuyez sur <keycap>F4</keycap> pour afficher la
       liste des options du noyau disponibles à partir desquelles
@@ -77,10 +77,21 @@ Amorce la saveur «&nbsp;bf2.4&nbsp;».
   <title>Amorcer depuis Windows</title>
 
 <para>
-Pour lancer l'installateur à partir de Windows, vous devez avoir un CD-ROM/DVD-ROM ou
-une clé USB d'installation. Consultez les sections <xref linkend="official-cdrom"/>
+Pour lancer l'installateur à partir de Windows, vous devez
+
+<itemizedlist>
+<listitem><para>
+disposer d'un CD-ROM/DVD-ROM ou d'une clé USB d'installation. Consultez les sections <xref linkend="official-cdrom"/>
 et <xref linkend="boot-usb-files"/>.
-</para>
+</para></listitem>
+<listitem><para>
+
+ou télécharger un exécutable Windows autonome, disponible dans le fichier
+tools/win32-loader/stable/win32-loader.exe sur les miroirs &debian;.
+
+</para></listitem>
+</itemizedlist>
+
 
 <para>
 Quand vous insérez le CD-ROM/DVD-ROM, un programme de pré-installation doit normalement
@@ -200,7 +211,7 @@ Pour plus de précisions, référez-vous aux pages de manuel de
 </para>
 
 <para>
-La procédure pour <command>GRUB</command> est relativement similaire.
+La procédure pour <command>GRUB1</command> est relativement similaire.
 Cherchez le fichier <filename>menu.lst</filename> dans le répertoire
 <filename>/boot/grub/</filename> (parfois <filename>/boot/boot/grub/</filename>),
 et ajoutez une entrée pour l'installateur, par exemple en supposant que
@@ -214,6 +225,25 @@ initrd /boot/newinstall/initrd.gz
 </screen></informalexample>
 
 </para>
+
+<para>
+
+La procédure pour <command>GRUB2</command> est semblable. Le fichier s'appelle
+<filename>grub.cfg</filename> au lieu de <filename>menu.lst</filename>. Une entrée
+pour l'installateur pourrait être celle-ci :
+
+<informalexample><screen>
+menuentry 'New Install' {
+insmod part_msdos
+insmod ext2
+set root='(hd0,msdos1)'
+linux /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
+}
+</screen></informalexample>
+
+</para>
+
 <para>
 À partir de maintenant, il ne devrait plus y avoir de différences
 entre <command>GRUB</command> et <command>LILO</command>.
@@ -339,7 +369,7 @@ disquettes d'amorçage et même des ROM qui permettent l'amorçage par TFTP.
   <sect2 arch="x86" id="boot-screen">
 <title>L'écran d'amorçage</title>
 <para>
-Quand l'installateur démarre, apparaît un écran montrant le logo de la distribution
+Quand l'installateur démarre, apparaît un écran montrant le logo &debian;
 et un menu&nbsp;: 
 
 <informalexample><screen>
@@ -360,6 +390,7 @@ est, ou non, disponible.
 Pour une installation normale, sélectionnez l'entrée <quote>Install</quote>
 ou l'entrée <quote>Graphical install</quote> en utilisant les touches avec
 flèche du clavier ou en tapant la première lettre en surbrillance.
+L'entrée <quote>Install</quote> est pré-sélectionnée.
 Vous pouvez maintenant appuyer sur la touche &enterkey; pour
 lancer l'installateur.
 </para>
