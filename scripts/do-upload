@@ -29,9 +29,15 @@ if ! dpkg-checkbuilddeps; then
 fi
 
 # Handle translations
-`dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > /tmp/l10n-changes
-if [ "`cat /tmp/l10n-changes`" = "Cannot find the PO directory!" ]; then
-	> /tmp/l10n-changes
+l10n_changes="$(mktemp --tmpdir l10n-changes.XXXXXX)"
+cleanup () {
+	rm -f "$l10n_changes"
+}
+trap cleanup EXIT HUP INT QUIT TERM
+
+`dirname $0`/l10n/output-l10n-changes -d . 2> /dev/null > "$l10n_changes"
+if [ "`cat "$l10n_changes"`" = "Cannot find the PO directory!" ]; then
+	> "$l10n_changes"
 fi
 
 while read line; do
@@ -42,15 +48,16 @@ while read line; do
 	log=`echo "$line" | cut -c 3-`
 
 	DEBFULLNAME="Updated translations" dch -t --release-heuristic changelog "$log"
-done < /tmp/l10n-changes
+done < "$l10n_changes"
 
 # "release" the version
 dch -r ""
 
 # build, check and upload
-debuild -a$arch 2>&1 | tee /tmp/do-upload.log
+version="$(dpkg-parsechangelog | awk '/^Version:/ { print $2 }')"
+debuild -a$arch
 if [ "$?" = "0" ]; then
-	if grep -q "E: .* udeb: binary-from-other-architecture .*" /tmp/do-upload.log; then
+	if grep -q "E: .* udeb: binary-from-other-architecture .*" "../${source}_${version#*:}_${arch}.build"; then
 		echo "ERROR: this package is unsafe for crossbuilding."
 	else
 		debsign -a$arch && git add debian/changelog && debcommit --release && debrelease -a$arch
