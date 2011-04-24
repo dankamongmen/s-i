@@ -73,6 +73,11 @@ do
     elif [ -x "/usr/bin/isoquery" ]
     then
 	R=`/usr/bin/isoquery -i 639 $CSN | cut -f 4 | cut -f1 -d";"`
+	# For Uyghur, the preferred way to spell it in English is the second one in ISO-639
+	case $CSN in
+	    "ug") R="Uyghur";;
+            *) R=$CSN;;
+	 esac
     else
   
     case $CSN in
