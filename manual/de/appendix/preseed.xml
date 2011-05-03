@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66290 -->
+<!-- original version: 66519 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -311,8 +311,10 @@ Boot-Parameter, die Sie angeben müssen
 <para>
 
 Beachten Sie, dass <filename>preseed/url</filename> auch einfach mit
-<filename>url</filename> abgekürzt werden kann und
-<filename>preseed/file</filename> mit <filename>file</filename>, wenn
+<filename>url</filename> abgekürzt werden kann,
+<filename>preseed/file</filename> mit <filename>file</filename> und
+<filename>preseed/file/checksum</filename> mit
+<filename>preseed-md5</filename>, wenn
 diese Argumente als Boot-Parameter an den Kernel übergeben werden.
 
 </para>
@@ -815,7 +817,7 @@ d-i debian-installer/locale string de_DE
 #d-i debian-installer/country string NL
 #d-i debian-installer/locale string en_GB.UTF-8
 # Geben Sie optional zusätzliche Locales an, die generiert werden sollen.
-#d-i localechooser/supported-locales en_US.UTF-8, nl_NL.UTF-8
+#d-i localechooser/supported-locales multiselect en_US.UTF-8, nl_NL.UTF-8
 </screen></informalexample>
 
 </para><para>
@@ -829,7 +831,8 @@ nicht voreingestellt werden muss. Die Tastaturbelegung muss dem
 <informalexample role="example"><screen>
 # Auswahl der Tastatur.
 #d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select de
+# "keymap" ist ein Alias für console-keymaps-at
+d-i keymap select de
 d-i keyboard-configuration/xkb-keymap select de
 # Beispiel für eine andere Tastaturarchitektur.
 #d-i console-keymaps-usb/keymap select mac-usb-us

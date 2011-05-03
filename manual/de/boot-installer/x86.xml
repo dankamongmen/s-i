@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 66396 -->
 
   <sect2 arch="any-x86"><title>Von einer CD-ROM starten</title>
 
@@ -77,11 +77,25 @@ Boots the <quote>bf2.4</quote> flavor.
   <title>Von Windows aus booten</title>
 <para>
 
-Um den Installer von Windows aus zu starten, müssen Sie zunächst ein
-CD-ROM-/DVD-ROM-Image oder ein Image für eine Installation von USB-Memory-Stick
-vorbereiten (wie in <xref linkend="official-cdrom"/> und
-<xref linkend="boot-usb-files"/> beschrieben).
+Um den Installer von Windows aus zu starten, können Sie entweder
 
+<itemizedlist>
+<listitem><para>
+
+ein
+CD-ROM-/DVD-ROM-Image oder USB-Memory-Stick Installations-Image
+vorbereiten (wie in <xref linkend="official-cdrom"/> bwz.
+<xref linkend="boot-usb-files"/> beschrieben), oder
+
+</para></listitem>
+<listitem><para>
+
+ein eigenständiges Windows-Binärprogramm herunterladen, das als
+tools/win32-loader/stable/win32-loader.exe auf den &debian;-Spiegelservern
+verfügbar ist.
+
+</para></listitem>
+</itemizedlist>
 </para><para>
 
 Wenn Sie als Installationsmedium eine CD-ROM oder DVD-ROM verwenden, sollte
@@ -94,7 +108,8 @@ Programm manuell starten, indem Sie auf dem entsprechenden Laufwerk
 </para><para>
 
 Nachdem das Programm gestartet wurde, werden ein paar einleitende Fragen
-gestellt und das System wird vorbereitet, den &debian-gnu;-Installer zu starten.
+gestellt und das System wird vorbereitet, beim dann folgenden Neustart den
+&debian-gnu;-Installer zu starten.
 
 </para>
   </sect2>
@@ -208,7 +223,7 @@ Mehr Details finden Sie in den Handbuchseiten von
 
 </para><para>
 
-Für <command>grub</command> ist die Vorgehensweise ähnlich. Suchen Sie
+Für <command>grub1</command> ist die Vorgehensweise ähnlich. Suchen Sie
 die Datei <filename>menu.lst</filename> im Verzeichnis
 <filename>/boot/grub/</filename> (manchmal auch in
 <filename>/boot/boot/grub/</filename>) und fügen Sie einen Eintrag für den
@@ -221,6 +236,22 @@ title  New Install
 root   (hd0,0)
 kernel /boot/newinstall/vmlinuz
 initrd /boot/newinstall/initrd.gz
+</screen></informalexample>
+
+</para><para>
+
+Auch für <command>GRUB2</command> ist die Vorgehensweise vergleichbar. Die Datei
+heißt <filename>grub.cfg</filename> statt <filename>menu.lst</filename>.
+Ein Eintrag für den Installer würde zum Beispiel so aussehen:
+
+<informalexample><screen>
+menuentry 'New Install' {
+insmod part_msdos
+insmod ext2
+set root='(hd0,msdos1)'
+linux /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
+}
 </screen></informalexample>
 
 </para><para>
@@ -378,7 +409,8 @@ Abhängig von der Installationsmethode, die Sie nutzen, ist der Menüeintrag
 Für eine normale Installation wählen Sie entweder <quote>Install</quote>
 oder <quote>Graphical install</quote> &ndash; Sie können die Pfeiltasten
 Ihrer Tastatur dazu verwenden oder den jeweils ersten (hervorgehobenen)
-Buchstaben &ndash; drücken Sie danach &enterkey;, um den Installer zu starten.
+Buchstaben; der <quote>Install</quote>-Eintrag ist standardmäßig bereits
+markiert &ndash; drücken Sie danach &enterkey;, um den Installer zu starten.
 
 </para><para>
 
