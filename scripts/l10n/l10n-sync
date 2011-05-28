@@ -498,7 +498,7 @@ pot_master=${DI_COPY}/packages/po/template.pot
 # Temporarily restore charset header
 sed -i 's/charset=CHARSET/charset=UTF-8/g' $pot_master
 # Sanity check: template.pot should not contain incorrect sublevels
-if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
+if [ "$(LC_ALL=C.UTF-8 msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
 	error "Invalid sublevel comments detected in template.pot"
 	exit 1
 fi
@@ -516,16 +516,16 @@ for i in $LEVELS; do
 		# more than one package POT file and has no level set in one
 		# of them, but does have it set in others! The string will
 		# then end up in the highest level that is explicitly set.
-		msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pot_master >$pot_sublevel.none
+		LC_ALL=C.UTF-8 msggrep -X -E -v -e ":sl[1-$NUMLEVELS]:" $pot_master >$pot_sublevel.none
 		# Select strings with level 1 set
-		msggrep -X -E -e ":sl1:" $pot_master >$pot_sublevel.sl1
+		LC_ALL=C.UTF-8 msggrep -X -E -e ":sl1:" $pot_master >$pot_sublevel.sl1
 		# Merge them
 		msgcat $pot_sublevel.none $pot_sublevel.sl1 >$pot_sublevel.new
 		rm $pot_sublevel.none $pot_sublevel.sl1
 	else
 		# Select strings with level N set, but exclude any strings that
 		# also have a level smaller than N set to avoid duplicates
-		msggrep -X -E -e ":sl$i:" $pot_master | \
+		LC_ALL=C.UTF-8 msggrep -X -E -e ":sl$i:" $pot_master | \
 			msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
 			>$pot_sublevel.new
 	fi
