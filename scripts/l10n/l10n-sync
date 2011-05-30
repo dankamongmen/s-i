@@ -526,7 +526,7 @@ for i in $LEVELS; do
 		# Select strings with level N set, but exclude any strings that
 		# also have a level smaller than N set to avoid duplicates
 		LC_ALL=C.UTF-8 msggrep -X -E -e ":sl$i:" $pot_master | \
-			msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
+			LC_ALL=C.UTF-8 msggrep -X -E -v -e ":sl[1-$(($i - 1))]:" \
 			>$pot_sublevel.new
 	fi
 	sed -i 's/charset=UTF-8/charset=CHARSET/g' $pot_sublevel.new
