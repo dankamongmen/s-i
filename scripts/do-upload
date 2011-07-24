@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright (C) 2010, 2011 Otavio Salvador <otavio@ossystems.com.br>
 # This file is licensed on GPLv3
 
@@ -60,8 +60,35 @@ if [ "$?" = "0" ]; then
 	if grep -q "E: .* udeb: binary-from-other-architecture .*" "../${source}_${version#*:}_${arch}.build"; then
 		echo "ERROR: this package is unsafe for crossbuilding."
 	else
-		debsign -a$arch && git add debian/changelog && debcommit --release && debrelease -a$arch
-		exit 0
+		read -n 1 -s -p "Are you sure you want to commit, upload and push the package [yN]? " reply
+		echo
+		if [ "$reply" = y ] || [ "$reply" = Y ]; then
+			if debsign -a$arch; then
+				git add debian/changelog
+				if debcommit --release; then
+					if git push origin && git push origin $version; then
+						if debrelease -a$arch; then
+							exit 0
+						else
+							echo "Failed to upload the package."
+							exit 1
+						fi
+					else
+						echo "Failed to push changes to origin. Package won't be upload. Exiting..."
+						exit 1
+					fi
+				else
+					echo "Failed to run debcommit --release, exiting..."
+					exit 1
+				fi
+			else
+				echo "Failed to sign the package, existing..."
+				exit 1
+			fi
+		else
+			echo "Nothing has been commited out pushed. Package built fine though."
+			exit 0
+		fi
 	fi
 fi
 
