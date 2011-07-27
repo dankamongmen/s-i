@@ -11,7 +11,7 @@ arch=`grep Architecture debian/control | head -n 1 | sed 's,.*: ,,g'`
 if echo "$arch" | grep -q "`dpkg-architecture -qDEB_BUILD_ARCH`"; then
 	arch=`dpkg-architecture -qDEB_BUILD_ARCH`
 else
-	arch=`echo $arch | cut -f 1 -d\ `
+	arch=`echo $arch | cut -f 1 -d\  | sed 's,-any$,-i386,g'`
 	if [ "$arch" = "any" ] || [ "$arch" = "all" ]; then
 		arch=`dpkg-architecture -qDEB_BUILD_ARCH`
 	fi
