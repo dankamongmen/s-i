@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 66290 -->
+<!-- original version: 66519 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -341,7 +341,9 @@ Zaváděcí parametry:
 Pokud zadáte <filename>preseed/url</filename>
 nebo <filename>preseed/file</filename> jako zaváděcí parametr, můžete
 použít zkrácenou verzi <filename>url</filename>, resp.
-<filename>file</filename>.
+<filename>file</filename>. Obdobně lze zkrátit
+<filename>preseed/file/checksum</filename> na pouhé
+<filename>preseed-md5</filename>.
 
 </para>
   </sect2>
@@ -807,7 +809,7 @@ d-i debian-installer/locale string cs_CZ
 #d-i debian-installer/country string NL
 #d-i debian-installer/locale string en_GB.UTF-8
 # Volitelně můžete zadat další locale, která se mají vygenerovat.
-#d-i localechooser/supported-locales cs_CZ.UTF-8, en_US.UTF-8
+#d-i localechooser/supported-locales multiselect cs_CZ.UTF-8, en_US.UTF-8
 </screen></informalexample>
 
 Zadat můžete libovolnou kombinaci jazyka podporovaného v &d-i;
@@ -825,7 +827,8 @@ musí být platná v rámci daného typu a &d-i; ji musí znát.
 <informalexample role="example"><screen>
 # Výběr klávesnice.
 #d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select cz-lat2
+# keymap je alias pro console-keymaps-at
+d-i keymap select cz-lat2
 d-i keyboard-configuration/xkb-keymap select cz
 # Příklad pro jiný typ klávesnice
 #d-i console-keymaps-usb/keymap select mac-usb-us

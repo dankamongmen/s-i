@@ -1,118 +1,16 @@
 <!-- $Id$ -->
-<!-- original version: 64916 -->
+<!-- original version: 66718 -->
 
   <sect2 arch="arm" id="boot-tftp"><title>Zavedení z TFTP</title>
 
 &boot-installer-intro-net.xml;
 
-  <sect3 arch="arm"><title>Zavedení z TFTP na počítačích Netwinder</title>
-
-<para>
-
-Netwindery mají dvě síťová rozhraní: NE2000-kompatibilní kartu na
-10Mbps (obvykle <filename>eth0</filename>) a 100Mbps kartu Tulip
-(<filename>eth1</filename>). 100Mbps karta může mít problémy
-s nahráváním obrazu přes TFTP, takže raději doporučujeme použít
-pomalejší rozhraní (označené <literal>10 Base-T</literal>).
-
-</para><note><para>
-
-K zavedení instalačního systému potřebujete NeTTrom verze
-2.2.1 a pozdější, doporučená verze je 2.3.3. Z licenčních důvodů se
-však soubory s firmwarem nedají stáhnout. Pokud se situace změní,
-naleznete nové obrazy na <ulink url="http//www.netwinder.org/"></ulink>.
-
-</para></note><para>
-
-Při zavádění Netwinderu musíte během odpočítávání přerušit zaváděcí
-proces, což vám dovolí nastavit různé proměnné firmwaru, které
-potřebujete pro zavedení instalačního systému. Nejprve nahrajte
-výchozí nastavení:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>load-defaults</userinput>
-</screen></informalexample>
-
-Dále musíte nastavit síťovou adresu buď staticky:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv netconfig_eth0 flash</userinput>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv eth0_ip 192.168.0.10/24</userinput>
-</screen></informalexample>
-
-kde 24 je počet nastavených bitů v síťové masce, nebo dynamicky:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv netconfig_eth0 dhcp</userinput>
-</screen></informalexample>
-
-Pokud TFTP server není na lokální podsíti, budete možná muset upravit
-nastavení <userinput>route1</userinput>. Dále byste měli nastavit
-adresu TFTP serveru a umístění obrazu. Poté můžete uložit nastavení do
-flash paměti.
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv kerntftpserver 192.168.0.1</userinput>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv kerntftpfile boot.img</userinput>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>save-all</userinput>
-</screen></informalexample>
-
-Nyní můžete firmwaru sdělit, že má z TFTP obrazu zavést systém:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv kernconfig tftp</userinput>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv rootdev /dev/ram</userinput>
-</screen></informalexample>
-
-Používáte-li pro instalaci Netwinderu sériovou konzoli, budete také
-potřebovat následující nastavení:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv cmdappend root=/dev/ram console=ttyS0,115200</userinput>
-</screen></informalexample>
-
-Naopak pro instalace používající klávesnici a monitor musíte nastavit:
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>setenv cmdappend root=/dev/ram</userinput>
-</screen></informalexample>
-
-Nastavení proměnných můžete zkontrolovat příkazem
-<command>printenv</command>. Je-li vše v pořádku, můžete obraz zavést
-příkazem
-
-<informalexample><screen>
-<prompt>NeTTrom command-&gt;</prompt> <userinput>boot</userinput>
-</screen></informalexample>
-
-V případě jakýchkoliv problémů je k dispozici <ulink
-url="http://www.netwinder.org/howto/Firmware-HOWTO.html">podrobné
-HOWTO</ulink>.
-
-</para>
-  </sect3>
-
-  <sect3 arch="arm"><title>Zavedení z TFTP na počítačích CATS</title>
-
-<para>
-
-Na strojích CATS použijte v Cyclone promptu příkaz
-<command>boot de0:</command> (nebo podobný).
-
-</para>
-   </sect3>
   </sect2>
 
   <sect2 arch="arm"><title>Zavedení z CD-ROM</title>
 
 &boot-installer-intro-cd.xml;
 
-<para>
-
-Pro zavedení z CD-ROM zadejte v promptu Cyclone konzoly příkaz
-<command>boot cd0:cats.bin</command>
-
-</para>
   </sect2>
 
   <sect2 arch="arm" id="boot-firmware">
@@ -254,7 +152,7 @@ použít příkaz:
 </para>
 
 <informalexample><screen>
-cu -lttyS0 -s115200
+<userinput>cu -lttyS0 -s115200</userinput>
 </screen></informalexample>
 
 <para>
@@ -289,9 +187,9 @@ nestihnete, jednoduše stroj vypněte, zapněte a zkuste to znovu.
 příkazy:
 
 <informalexample><screen>
-load -v -r -b 0x01800000 -m ymodem ramdisk.gz
-load -v -r -b 0x01008000 -m ymodem zImage
-exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+<userinput>load -v -r -b 0x01800000 -m ymodem ramdisk.gz</userinput>
+<userinput>load -v -r -b 0x01008000 -m ymodem zImage</userinput>
+<userinput>exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000</userinput>
 </screen></informalexample>
 
 </para><para>
@@ -311,13 +209,13 @@ ramdisk přes HTTP, což je dokonce rychlejší, ale vyžaduje funkční HTTP
 server. V takovém případě nejprve přepněte zavaděč do režimu RAM:
 
 <informalexample><screen>
-fis load rammode
-g
+<userinput>fis load rammode</userinput>
+<userinput>g</userinput>
 </screen></informalexample>
 
 </para><para>
 
-Tím se stroj jakoby restartuje, ale ve skutečnosti nahraje reboot do
+Tím se stroj jakoby restartuje, ale ve skutečnosti nahraje redboot do
 RAM a restartuje odtamtud. Přeskočíte-li tento krok, systém se v tom
 následujícím zasekne u příkazu ip_address.
 
@@ -328,10 +226,10 @@ Zavádění opět budete muset přerušit kombinací
 a na výzvu zadat:
 
 <informalexample><screen>
-ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable>
-load -v -r -b 0x01800000 -m http /initrd.gz
-load -v -r -b 0x01008000 -m http /zImage
-exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000
+<userinput>ip_address -l <replaceable>192.168.2.249</replaceable> -h <replaceable>192.168.2.4</replaceable></userinput>
+<userinput>load -v -r -b 0x01800000 -m http /initrd.gz</userinput>
+<userinput>load -v -r -b 0x01008000 -m http /zImage</userinput>
+<userinput>exec -c "console=ttyS0,115200 rw root=/dev/ram mem=256M@0xa0000000" -r 0x01800000</userinput>
 </screen></informalexample>
 
 kde <replaceable>192.168.2.249</replaceable> je IP adresa

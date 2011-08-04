@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 64916 -->
+<!-- original version: 66601 -->
 
   <sect2 arch="any-x86"><title>Zavedení z CD-ROM</title>
 
@@ -74,9 +74,24 @@ Zavede jádro <quote>bf2.4</quote>.
   <title>Zavedení z Windows</title>
 <para>
 
-Pro zavedení instalátoru z Windows musíte nejprve získat instalační
-CD/DVD, případně USB klíčenku, jak popisují kapitoly
-<xref linkend="official-cdrom"/> a <xref linkend="boot-usb-files"/>.
+Pro zavedení instalátoru z Windows můžete buď
+
+<itemizedlist>
+<listitem><para>
+
+získat instalační CD/DVD, případně USB klíčenku, jak popisují kapitoly
+<xref linkend="official-cdrom"/> a <xref linkend="boot-usb-files"/>,
+nebo
+
+</para></listitem>
+<listitem><para>
+
+stáhnout samostatnou Windows aplikaci dostupnou na zrcadlech &debian;u
+jako <filename>tools/win32-loader/stable/win32-loader.exe</filename>
+
+</para></listitem>
+</itemizedlist>
+
 
 </para><para>
 
@@ -202,7 +217,7 @@ a restartovat počítač.
 
 </para><para>
 
-Postup pro <command>GRUB</command> je velmi podobný. Do souboru
+Postup pro <command>GRUB1</command> je velmi podobný. Do souboru
 <filename>menu.lst</filename> v adresáři
 <filename>/boot/grub/</filename> (občas též
 <filename>/boot/boot/grub/</filename>) přidejte následující záznam
@@ -220,7 +235,23 @@ a restartujte počítač.
 
 </para><para>
 
-Od teď by neměl být mezi oběma zavaděči žádný rozdíl.
+Postup pro <command>GRUB2</command> je podobný jako u předchůdce,
+jenom soubor se místo <filename>menu.lst</filename> jmenuje
+<filename>grub.cfg</filename> a změnil se jeho formát:
+
+<informalexample><screen>
+menuentry 'Instalace Debianu' {
+  insmod part_msdos
+  insmod ext2
+  set root='(hd0,msdos1)'
+  linux  /boot/newinstall/vmlinuz
+  initrd /boot/newinstall/initrd.gz
+}
+</screen></informalexample>
+
+</para><para>
+
+Od teď by neměl být mezi jednotlivými zavaděči žádný rozdíl.
 
 </para>
   </sect2>
@@ -350,8 +381,9 @@ Installer boot menu
 
 Install
 Graphical install
-Advanced options       >
+Advanced options             >
 Help
+Install with speech synthesis
 
 Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
