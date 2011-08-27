@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64664 -->
+<!-- original version: 66601 -->
 
  <sect1 id="boot-installer-accessibility" arch="not-s390">
  <!-- <title>Accessibility</title> -->
@@ -10,7 +10,8 @@
 Some users may need specific support because of e.g. some visual
 impairment.
 <phrase arch="ia64;powerpc;x86">USB braille displays are detected
-automatically, but most other</phrase>
+automatically (not serial displays connected via a serial-to-USB converter),
+but most other</phrase>
 <phrase arch="arm;hppa;mips;mipsel;sparc">Most</phrase>
 accessibility features have to be enabled manually.
 <phrase arch="x86">On machines that support it, the boot menu emits a beep
@@ -25,7 +26,8 @@ a QWERTY keyboard.
 Alcuni utenti potrebbero aver bisogno di particolari supporti perché,
 per esempio, hanno una disabilità visiva.
 <phrase arch="ia64;powerpc;x86">I display braille USB vengono
-rilevati automaticamente, ma molte altre</phrase>
+rilevati automaticamente (no i display seriali collegati con un
+convertitore seriale-USB), ma molte altre</phrase>
 <phrase arch="arm;hppa;mips;mipsel;sparc">La maggior parte delle</phrase>
 funzionalità per l'accessibilità devono essere attivate manualmente.
 <phrase arch="x86">Sulle macchine che lo permettono, il menu d'avvio
@@ -78,12 +80,12 @@ Serial braille displays cannot safely be automatically detected
 boot parameter to tell <classname>brltty</classname> which driver it
 should use. <replaceable>driver</replaceable> should be replaced by the
 two-letter driver code for your terminal (see the
-<ulink url="&url-brltty-manual;">driver code list</ulink>).
+<ulink url="&url-brltty-manual;">BRLTTY manual</ulink>).
 <replaceable>port</replaceable> should be replaced by the name of the
 serial port the display is connected to, <userinput>ttyS0</userinput> is
-the default. <replaceable>table</replaceable> is the name of the braille
-table to be used (see the <ulink url="&url-brltty-manual;">table code
-list</ulink>); the English table is the default. Note that the table can
+the default, <userinput>ttyUSB0</userinput> can be typically used when using a serial-to-USB converter. <replaceable>table</replaceable> is the name of the
+braille table to be used (see the <ulink url="&url-brltty-manual;">BRLTTY
+manual</ulink>); the English table is the default. Note that the table can
 be changed later by entering the preference menu. Documentation on key
 bindings for braille devices is available on the <ulink
 url="&url-brltty-driver-help;"><classname>brltty</classname> website</ulink>.
@@ -95,18 +97,40 @@ aggiungere il parametro d'avvio
 <userinput>brltty=<replaceable>driver</replaceable>,<replaceable>porta</replaceable>,<replaceable>tavola</replaceable></userinput>
 per indicare a <classname>brltty</classname> quale driver utilizzare.
 <replaceable>driver</replaceable> deve essere sostituito con il codice
-a due lettere del driver adatto al proprio terminale (si veda l'<ulink
-url="&url-brltty-manual;">elenco dei codici dei driver</ulink>).
+a due lettere del driver adatto al proprio terminale (si veda il 
+<ulink url="&url-brltty-manual;">manuale di BRLTTY</ulink>).
 <replaceable>porta</replaceable> deve essere sostituito dal nome della
 porta alla quale è collegato il display, il valore predefinito è
-<userinput>ttyS0</userinput>. <replaceable>tavola</replaceable> è il
-nome della tavola braille da usare (si veda l'<ulink
-url="&url-brltty-manual;">elenco dei codici delle tavole</ulink>),
+<userinput>ttyS0</userinput>, <userinput>ttyUSB0</userinput> quando si
+usa un convertore seriale-USB. <replaceable>tavola</replaceable> è il
+nome della tavola braille da usare (si veda il <ulink
+url="&url-brltty-manual;">manuale di BRLTTY</ulink>),
 la tavola predefinita è quella inglese. Notare che la tavola può essere
 cambiata in seguito tramite il menu preferenze. La documentazione sulle
 associazioni dei tasti per i dispositivi braille può essere trovata sul
 sito web di <ulink
 url="&url-brltty-driver-help;"><classname>brltty</classname></ulink>.
+
+</para>
+  </sect2>
+
+  <sect2 arch="x86">
+  <!-- <title>Software Speech Synthesis</title> -->
+  <title>Software di sintesi vocale</title>
+<para>
+
+<!--
+Support for software speech synthesis can be activated by selecting it in the
+boot menu by typing <userinput>s</userinput> &enterkey;. The first question
+(language) is spoken in english, and the remainder of installation is spoken in
+the selected language (if available in <classname>espeak</classname>).
+-->
+
+È possibile attivare il supporto per la sintesi vocale selezionandolo
+nel menu di avvio digitando <userinput>s</userinput> &enterkey;. La
+prima domanda (la lingua) è pronunciata in inglese e il resto
+dell'installazione è pronunciato nella lingua scelta (se disponibile
+in <classname>espeak</classname>).
 
 </para>
   </sect2>
@@ -201,6 +225,23 @@ theme that makes it more readable. To enable it, append the
 Gli utenti ipovedenti possono usare l'installatore con un tema a
 contrasto elevato che lo rende più leggibile. Per attivarlo, aggiungere
 <userinput>theme=dark</userinput> in coda ai parametri d'avvio.
+
+</para>
+  </sect2>
+
+  <sect2>
+  <!-- <title>Preseeding</title> -->
+  <title>Preconfiguazione</title>
+<para>
+
+<!--
+Alternatively, &debian; can be installed completely automatically by using
+preseeding. This is documented in <xref linkend="appendix-preseed"/>.
+-->
+
+È possibile installare &debian; in modo completamente automatico usando la
+preconfiguazione. Questa modalità è documentata in <xref
+linkend="appendix-preseed"/>.
 
 </para>
   </sect2>

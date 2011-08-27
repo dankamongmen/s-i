@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 66601 -->
 
   <sect2 arch="any-x86">
   <!-- <title>Booting from a CD-ROM</title> -->
@@ -108,14 +108,36 @@ Avvia la versione <quote>bf2.4</quote>.
 <para>
 
 <!--
-To start the installer from Windows, you must first obtain CD-ROM/DVD-ROM
-or USB memory stick installation media as described in
-<xref linkend="official-cdrom"/> and <xref linkend="boot-usb-files"/>.
+To start the installer from Windows, you can either
 -->
 
-Per avviare l'installatore da Windows è necessario usare come supporto per
-l'installazione un CD-ROM/DVD-ROM oppure una chiavetta USB come descritto in
-<xref linkend="official-cdrom"/> e <xref linkend="boot-usb-files"/>.
+Per avviare l'installatore da Windows è possibile usare:
+
+<itemizedlist>
+<listitem><para>
+
+<!--
+obtain CD-ROM/DVD-ROM or USB memory stick installation media as described in
+<xref linkend="official-cdrom"/> and <xref linkend="boot-usb-files"/>, or
+-->
+
+un supporto per l'installazione quale un CD-ROM/DVD-ROM oppure una
+chiavetta USB come descritto in <xref linkend="official-cdrom"/> e
+in <xref linkend="boot-usb-files"/>, oppure
+
+</para></listitem>
+<listitem><para>
+
+<!--
+download a standalone Windows executable, which is available as
+tools/win32-loader/stable/win32-loader.exe on the &debian; mirrors,
+-->
+
+scaricare un eseguibile per Windows, disponibile sui mirror &debian;
+in tools/win32-loader/stable/win32-loader.exe.
+
+</para></listitem>
+</itemizedlist>
 
 </para><para>
 
@@ -336,14 +358,14 @@ Per maggiori dettagli si consultino le pagine di manuale di
 </para><para>
 
 <!--
-The procedure for <command>GRUB</command> is quite similar. Locate your
+The procedure for <command>GRUB1</command> is quite similar. Locate your
 <filename>menu.lst</filename> in the <filename>/boot/grub/</filename>
 directory (or sometimes <filename>/boot/boot/grub/</filename>) and add an
 entry for the installer, for example (assuming <filename>/boot</filename>
 is on the first partition of the first disk in the system):
 -->
 
-La procedura per usare <command>GRUB</command> è abbastanza simile.
+La procedura per usare <command>GRUB1</command> è abbastanza simile.
 Trovare il file <filename>menu.lst</filename> nella directory
 <filename>/boot/grub/</filename> (oppure in
 <filename>/boot/boot/grub/</filename>) e aggiungere una voce per
@@ -355,6 +377,28 @@ title  New Install
 root   (hd0,0)
 kernel /boot/newinstall/vmlinuz
 initrd /boot/newinstall/initrd.gz
+</screen></informalexample>
+
+</para><para>
+
+<!--
+The procedure for <command>GRUB2</command> is very similar. The file is named
+<filename>grub.cfg</filename> instead of <filename>menu.lst</filename>. An entry
+for the installer would be for instance for example:
+-->
+
+La procedura per <command>GRUB2</command> è molto simile. Il file si chiama
+<filename>grub.cfg</filename> anziché <filename>menu.lst</filename>. Una voce
+per l'installatore potrebbe essere per esempio:
+
+<informalexample><screen>
+menuentry 'New Install' {
+insmod part_msdos
+insmod ext2
+set root='(hd0,msdos1)'
+linux /boot/newinstall/vmlinuz
+initrd /boot/newinstall/initrd.gz
+}
 </screen></informalexample>
 
 </para><para>
@@ -604,8 +648,9 @@ Installer boot menu
 
 Install
 Graphical install
-Advanced options       >
+Advanced options             >
 Help
+Install with speech synthesis
 
 Press ENTER to boot or TAB to edit a menu entry
 </screen></informalexample>
@@ -623,14 +668,16 @@ disponibile, dipende dal metodo di installazione in uso.
 <!--
 For a normal installation, select either the <quote>Install</quote> or
 the <quote>Graphical install</quote> entry  &mdash; using either the
-arrow keys on your keyboard or by typing the first (highlighted) letter
-&mdash; and press &enterkey; to boot the installer.
+arrow keys on your keyboard or by typing the first (highlighted) letter, the
+<quote>Install</quote> entry is already selected by default &mdash; and press
+&enterkey; to boot the installer.
 -->
 
 Per procedere con una installazione normale, selezionare la voce
-<quote>Installazione</quote> o <quote>Installazione grafica</quote>
-usando i tasti cursore sulla tastiera oppure il primo carattere
-(evidenziato) e premere &enterkey; per far partire l'installatore.
+<quote>Install</quote> (installazione) o <quote>Graphical install</quote>
+(installazione grafica) usando i tasti cursore sulla tastiera oppure
+il primo carattere (evidenziato), la voce <quote>Install</quote> è già
+selezionata, e premere &enterkey; per far partire l'installatore.
 
 </para><para>
 
