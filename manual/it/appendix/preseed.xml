@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66374 -->
+<!-- original version: 66519 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -490,14 +490,17 @@ Boot parameters to specify:
 
 <!--
 Note that <filename>preseed/url</filename> can be shortened to just
-<filename>url</filename> and <filename>preseed/file</filename> to just
-<filename>file</filename> when they are passed as boot parameters.
+<filename>url</filename>, <filename>preseed/file</filename> to just
+<filename>file</filename> and <filename>preseed/file/checksum</filename> to just
+<filename>preseed-md5</filename> when they are passed as boot parameters.
 -->
 
-Notare che quando <filename>preseed/url</filename> e
-<filename>preseed/file</filename> sono passati come parametri di avvio
-si possono abbreviare rispettivamente con <filename>url</filename> e
-<filename>file</filename>.
+Notare che quando <filename>preseed/url</filename>,
+<filename>preseed/file</filename> e
+<filename>preseed/file/checksum</filename> sono passati come
+parametri di avvio possono essere abbreviati rispettivamente con
+<filename>url</filename>, <filename>file</filename> e
+<filename>preseed-md5</filename>.
 
 </para>
   </sect2>
@@ -1418,13 +1421,16 @@ essere ritenuta da &d-i; valida per l'architettura della tastiera scelta.
 --># Selezione della tastiera.
 #d-i console-tools/archs select at
 <!--
-d-i console-keymaps-at/keymap select us
+# keymap is an alias for console-keymaps-at
+d-i keymap select us
 d-i keyboard-configuration/xkb-keymap select us
--->d-i console-keymaps-at/keymap select it
-d-i keyboard-configuration/xkb-keymap select it
-<!--
 # Example for a different keyboard architecture
---># Esempio con una diversa architettura della tastiera
+#d-i console-keymaps-usb/keymap select mac-usb-us
+--># keymap è un alias per console-keymaps-at
+d-i keymap select it
+d-i console-keymaps-at/keymap select it
+d-i keyboard-configuration/xkb-keymap select it
+# Esempio con una diversa architettura della tastiera
 #d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
 
