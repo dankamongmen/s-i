@@ -55,7 +55,7 @@ dch -r ""
 
 # build, check and upload
 version="$(dpkg-parsechangelog | awk '/^Version:/ { print $2 }')"
-debuild -a$arch
+debuild -a$arch -I
 if [ "$?" = "0" ]; then
 	if grep -q "E: .* udeb: binary-from-other-architecture .*" "../${source}_${version#*:}_${arch}.build"; then
 		echo "ERROR: this package is unsafe for crossbuilding."
