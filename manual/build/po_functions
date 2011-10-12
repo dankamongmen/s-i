@@ -11,7 +11,7 @@ update_templates () {
 # Check whether language uses PO files for translation
 uses_po () {
     if [ -d "../po/$lang" ] ; then
-        if [ -d "../$lang/.svn" ] ; then
+        if [ -d "../$lang/" ] && svn info "../$lang" >/dev/null 2>&1 ; then
             echo "Warning: both PO files and XML files are present; ignoring PO files"
         else
             return 0
@@ -33,7 +33,7 @@ generate_xml () {
 
 clear_xml () {
     for lang in $languages; do
-        if [ -d ../po/$lang ] && [ ! -d ../$lang/.svn ]; then
+        if [ -d ../po/$lang ] && [ ! -d ../$lang/ ] && ! svn info ../$lang/ >/dev/null 2>&1 ; then
             rm -rf ../$lang
         fi
     done
