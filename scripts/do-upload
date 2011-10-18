@@ -7,16 +7,17 @@ CROSSBUILD_BLACKLIST="s390-netdevice partitioner"
 source=`grep Source debian/control | sed 's,.*: ,,g'`
 
 # Set the architecture to use for the build
-arch=`grep Architecture debian/control | head -n 1 | sed 's,.*: ,,g'`
-if echo "$arch" | grep -q "`dpkg-architecture -qDEB_BUILD_ARCH`"; then
-	arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+pkg_arch=`grep Architecture debian/control | head -n 1 | sed 's,.*: ,,g'`
+sys_arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+if echo "$pkg_arch" | grep -q "$sys_arch"; then
+	pkg_arch="$sys_arch"
 else
-	arch=`echo $arch | cut -f 1 -d\  | sed 's,-any$,-i386,g'`
-	if [ "$arch" = "any" ] || [ "$arch" = "all" ]; then
-		arch=`dpkg-architecture -qDEB_BUILD_ARCH`
+	pkg_arch=`echo $pkg_arch | cut -f 1 -d\  | sed "s,-any$,-$sys_arch,g"`
+	if [ "$pkg_arch" = "any" ] || [ "$pkg_arch" = "all" ]; then
+		pkg_arch="$sys_arch"
 	fi
 
-	if [ "$arch" != "`dpkg-architecture -qDEB_BUILD_ARCH`" ] &&
+	if [ "$pkg_arch" != "$sys_arch" ] &&
 		echo "$CROSSBUILD_BLACKLIST" | grep -q "$source"; then
 		echo "ERROR: '$source' package is unsafe for crossbuilding."
 		exit 1
