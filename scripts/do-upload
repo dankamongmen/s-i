@@ -56,7 +56,7 @@ dch -r ""
 
 # build, check and upload
 version="$(dpkg-parsechangelog | awk '/^Version:/ { print $2 }')"
-debuild -a$arch -I
+debuild -a$pkg_arch -I
 if [ "$?" = "0" ]; then
 	if grep -q "E: .* udeb: binary-from-other-architecture .*" "../${source}_${version#*:}_${arch}.build"; then
 		echo "ERROR: this package is unsafe for crossbuilding."
@@ -64,11 +64,11 @@ if [ "$?" = "0" ]; then
 		read -n 1 -s -p "Are you sure you want to commit, upload and push the package [yN]? " reply
 		echo
 		if [ "$reply" = y ] || [ "$reply" = Y ]; then
-			if debsign -a$arch; then
+			if debsign -a$pkg_arch; then
 				git add debian/changelog
 				if debcommit --release; then
 					if git push origin && git push origin $version; then
-						if debrelease -a$arch; then
+						if debrelease -a$pkg_arch; then
 							exit 0
 						else
 							echo "Failed to upload the package."
