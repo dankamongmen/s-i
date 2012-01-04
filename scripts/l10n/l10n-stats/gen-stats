@@ -254,17 +254,6 @@ if [ "$FETCH" ]; then
 			
 #			create_dir $WD/material/packages.$dist$LEVEL/$pkg
   			mv * $WD/material/packages.$dist$LEVEL/$pkg
-			if [ "$pkg" = "newt" ]; then
-				cd $WD/material/packages.$dist$LEVEL/$pkg/
-				tar -xzf *.tar.gz
-				#cat debian/patches/05_whiptail_i18n.patch debian/patches/85_more_i18n.patch | patch -p0
-				cat debian/patches/* | patch -p0 >/dev/null
-				rm *.tar.gz
-				mv newt-* newt
-				cd newt/po/
-				make newt.pot >/dev/null
-				chmod a+r newt.pot
-			fi
 			if [ "$pkg" = "debconf" ]; then
 				cd $WD/material/packages.$dist$LEVEL/$pkg/po
 				rm debconf.pot >/dev/null 2>&1 || true
