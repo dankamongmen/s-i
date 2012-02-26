@@ -753,37 +753,23 @@ d-i debian-installer/locale string pt_BR
 
 </para><para>
 
-A configuração de teclado consiste na seleção da arquitetura do teclado e do
-mapa de teclas. Na maioria dos casos a arquitetura de teclado correta é
-selecionada por padrão, então normalmente não é necessário pré-configurar. O
-mapa de teclas deve ser conhecido pelo &d-i; para a arquitetura de teclado
-selecionada.
+A configuração de teclado consiste na seleção do mapa de teclas.
 
 <informalexample role="example"><screen>
 # Keyboard selection.
-#d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select br-latin1
-d-i keyboard-configuration/xkb-keymap select br
-# Example for a different keyboard architecture
-#d-i console-keymaps-usb/keymap select mac-usb-us
+# keymap is an alias for keyboard-configuration/xkb-keymap
+d-i keymap select br
 </screen></informalexample>
 
 </para><para>
 
 Para pular a pré-configuração de teclado, pré-configure
-<classname>console-tools/archs</classname> com
+<classname>keymap</classname> com
 <userinput>skip-config</userinput>.
 Isto resultará em manter ativo o mapa de teclas do kernel
 
 </para>
 
-<note><para>
-
-As mudanças na camada de entrada para os kernels 2.6 tornaram a arquitetura
-de teclado virtualmente obsoleta. Para os kernels 2.6 normalmente o mapa de
-teclas <quote>PC</quote> (<userinput>at</userinput>) pode ser selecionado.
-
-</para></note>
   </sect2>
 
   <sect2 id="preseed-network">

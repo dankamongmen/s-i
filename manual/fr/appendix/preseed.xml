@@ -732,37 +732,23 @@ d-i debian-installer/locale string en_US
 
 </para><para>
 
-La configuration du clavier consiste à déclarer son architecture et la carte clavier.
-La plupart du temps le type est correctement détecté et il n'y a pas besoin de
-le préconfigurer. La carte clavier doit être connue par l'installateur debian et
-être compatible avec le type du clavier.
+La configuration du clavier consiste à déclarer la carte clavier.
 
 <informalexample role="example"><screen>
 # Choix du clavier :
-#d-i console-tools/archs select at
-# keymap est un alias de console-keymaps-at
-d-i keymap select fr-latin9
-d-i keyboard-configuration/xkb-keymap select fr(latin9)
-# Choix d'une architecture différente :
-#d-i console-keymaps-usb/keymap select mac-usb-us
+# keymap est un alias de keyboard-configuration/xkb-keymap
+d-i keymap select fr(latin9)
 </screen></informalexample>
 
 </para><para>
 
 Pour éviter la configuration du clavier, préconfigurez
-<classname>console-tools/archs</classname> avec
+<classname>keymap</classname> avec
 <userinput>skip-config</userinput>.
 La carte clavier du noyau restera active.
 
 </para>
 
-<note><para>
-
-Les modifications apportées à la gestion des entrées par les noyaux 2.6 ont rendu presque
-obsolète l'architecture des claviers. Normalement, une carte clavier <quote>PC</quote>
-(<userinput>at</userinput>) devrait être sélectionnée.
-
-</para></note>
   </sect2>
 
   <sect2 id="preseed-network">

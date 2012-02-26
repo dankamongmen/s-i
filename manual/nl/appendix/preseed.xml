@@ -756,36 +756,23 @@ d-i debian-installer/locale string en_US
 
 </para><para>
 
-Keyboard configuration consists of selecting a keyboard architecture and a
-keymap. In most cases the correct keyboard architecture is selected by
-default, so there's normally no need to preseed it. The keymap must
-be known to the &d-i; for the selected keyboard architecture.
+Keyboard configuration consists of selecting a keymap.
 
 <informalexample role="example"><screen>
 # Keyboard selection.
-#d-i console-tools/archs select at
-d-i console-keymaps-at/keymap select us
-d-i keyboard-configuration/xkb-keymap select us
-# Example for a different keyboard architecture
-#d-i console-keymaps-usb/keymap select mac-usb-us
+# keymap is an alias for keyboard-configuration/xkb-keymap
+d-i keymap select us
 </screen></informalexample>
 
 </para><para>
 
 To skip keyboard configuration, preseed
-<classname>console-tools/archs</classname> with
+<classname>keymap</classname> with
 <userinput>skip-config</userinput>.
 This will result in the kernel keymap remaining active.
 
 </para>
 
-<note><para>
-
-The changes in the input layer for 2.6 kernels have made the keyboard
-architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
-(<userinput>at</userinput>) keymap should be selected.
-
-</para></note>
   </sect2>
 
   <sect2 id="preseed-network">

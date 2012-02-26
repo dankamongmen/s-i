@@ -1403,66 +1403,37 @@ d-i debian-installer/locale string it_IT
 </para><para>
 
 <!--
-Keyboard configuration consists of selecting a keyboard architecture and a
-keymap. In most cases the correct keyboard architecture is selected by
-default, so there's normally no need to preseed it. The keymap must
-be known to the &d-i; for the selected keyboard architecture.
+Keyboard configuration consists of selecting a keymap.
 -->
 
-La configurazione della tastiera consiste nella scelta di una architettura
-della tastiera e di una mappa di tastiera. Nella maggior parte dei casi
-l'architettura della tastiera viene riconosciuta automaticamente e quindi
-non è necessario farne la preconfigurazione. La mappa di tastiera deve
-essere ritenuta da &d-i; valida per l'architettura della tastiera scelta.
+La configurazione della tastiera consiste nella scelta di una mappa di tastiera.
 
 <informalexample role="example"><screen>
 <!--
 # Keyboard selection.
 --># Selezione della tastiera.
-#d-i console-tools/archs select at
 <!--
-# keymap is an alias for console-keymaps-at
+# keymap is an alias for keyboard-configuration/xkb-keymap
 d-i keymap select us
-d-i keyboard-configuration/xkb-keymap select us
-# Example for a different keyboard architecture
-#d-i console-keymaps-usb/keymap select mac-usb-us
---># keymap è un alias per console-keymaps-at
+--># keymap è un alias per keyboard-configuration/xkb-keymap
 d-i keymap select it
-d-i console-keymaps-at/keymap select it
-d-i keyboard-configuration/xkb-keymap select it
-# Esempio con una diversa architettura della tastiera
-#d-i console-keymaps-usb/keymap select mac-usb-us
 </screen></informalexample>
 
 </para><para>
 
 <!--
 To skip keyboard configuration, preseed
-<classname>console-tools/archs</classname> with
+<classname>keymap</classname> with
 <userinput>skip-config</userinput>.
 This will result in the kernel keymap remaining active.
 -->
 
 Per saltare la configurazione della tastiera si deve preconfigurare
-<classname>console-tools/archs</classname> con
+<classname>keymap</classname> con
 <userinput>skip-config</userinput>. Questo comporta che la mappa di
 tastiera del kernel rimane attiva.
 
 </para>
-<note><para>
-
-<!--
-The changes in the input layer for 2.6 kernels have made the keyboard
-architecture virtually obsolete. For 2.6 kernels normally a <quote>PC</quote>
-(<userinput>at</userinput>) keymap should be selected.
--->
-
-I cambiamenti nella gestione dell'input fatti nei kernel 2.6 hanno reso
-l'architettura della tastiera virtualmente obsoleta. Normalmente per i
-kernel 2.6 si deve selezionare una mappa di tastiera <quote>PC</quote>
-(<userinput>at</userinput>).
-
-</para></note>
   </sect2>
 
   <sect2 id="preseed-network">
