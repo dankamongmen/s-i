@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 66667 -->
+<!-- original version: 67215 -->
 
  <sect1 id="linux-upgrade">
  <title>Jak nainstalovat &debian-gnu; ze stávajícího unixového/linuxového systému</title>
@@ -228,9 +228,10 @@ Několik možných postupů:
 <itemizedlist>
 <listitem><para>
 
-Vytvořte základní sadu statických souborů zařízení příkazy:
+V chrootu vytvořte základní sadu statických souborů zařízení příkazy:
 
 <informalexample><screen>
+# apt-get install makedev
 # cd /dev
 # MAKEDEV generic
 </screen></informalexample>
@@ -527,8 +528,8 @@ uvnitř chrootovaného prostředí).
 Návod k nastavení zavaděče prozradí příkaz <userinput>info
 grub</userinput><phrase arch="x86">nebo <userinput>man
 lilo.conf</userinput></phrase>. Pokud si
-ponecháte původní operační systém, stačí do stávajícího <filename>grub
-menu.lst</filename><phrase arch="x86">nebo
+ponecháte původní operační systém, stačí do stávajícího grub2
+<filename>grub.cfg</filename><phrase arch="x86">nebo
 <filename>lilo.conf</filename> přidat příslušnou
 položku. <filename>lilo.conf</filename> si také můžete
 zkopírovat do nového systému, zde ho upravit a spustit
@@ -537,19 +538,19 @@ kterého jej spouštíte)</phrase>.
 
 </para><para arch="any-x86">
 
-Instalace a nastavení <classname>grub</classname>u není složitější
+Instalace a nastavení <classname>grub2</classname> není složitější
 než spuštění:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>aptitude install grub</userinput>
+<prompt>#</prompt> <userinput>aptitude install grub-pc</userinput>
 <prompt>#</prompt> <userinput>grub-install /dev/<replaceable>hda</replaceable></userinput>
 <prompt>#</prompt> <userinput>update-grub</userinput>
 </screen></informalexample>
 
-Druhý příkaz nainstaluje <command>grub</command> (v tomto případě do
+Druhý příkaz nainstaluje <command>grub2</command> (v tomto případě do
 hlavního zaváděcího záznamu (MBR) disku
 <literal>hda</literal>). Poslední příkaz vytvoří rozumný a funkční
-konfigurační soubor <filename>/boot/grub/menu.lst</filename>.
+konfigurační soubor <filename>/boot/grub/grub.cfg</filename>.
 
 </para><para arch="any-x86">
 
