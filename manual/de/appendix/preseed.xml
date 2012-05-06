@@ -520,7 +520,8 @@ Parameter <literal>auto=true priority=critical</literal> zur
 Kernel-Kommandozeile hinzugefügt werden. Der Parameter <literal>auto</literal>
 ist ein Alias für <literal>auto-install/enable</literal> und wenn er auf
 <literal>true</literal> gesetzt ist, werden die
-Fragen über Locale und Tastatur so weit zurückgestellt, bis eine Chance besteht,
+Fragen über Gebietsschema und Tastatur so weit zurückgestellt, bis eine Chance
+besteht,
 sie per Voreinstellung zu setzen. <literal>priority</literal> ist ein
 Alias für <literal>debconf/priority</literal>, und wenn er auf
 <literal>critical</literal> gesetzt wird, unterdrückt das alle Fragen mit
@@ -781,12 +782,12 @@ geladen, nachdem diese Fragen gestellt wurden.
 
 </para><para>
 
-Die Locale kann verwendet werden, um sowohl Sprache als auch Land anzugeben.
-Sie kann jede Kombination aus einer vom &d-i; unterstützten Sprache und einem
-anerkannten Land (jeweils als Kürzel) enthalten. Falls die angegebene Kombination
-keine gültige Locale bildet, wählt der Installer automatisch eine Locale, die 
-für die gewählte Sprache passend ist.
-Um die Locale als Boot-Parameter festzulegen, nutzen Sie
+Das Gebietsschema (Locale) kann verwendet werden, um sowohl Sprache als auch
+Land anzugeben. Es kann jede Kombination aus einer vom &d-i; unterstützten
+Sprache und einem anerkannten Land (jeweils als Kürzel) enthalten. Falls die
+angegebene Kombination kein gültiges Gebietsschema bildet, wählt der 
+Installer automatisch ein Gebietsschema, das für die gewählte Sprache passend
+ist. Um das Gebietsschema als Boot-Parameter festzulegen, nutzen Sie
 <userinput>locale=<replaceable>de_DE</replaceable></userinput>
 (Beispiel de_DE: deutsch - Deutschland).
 
@@ -794,11 +795,11 @@ Um die Locale als Boot-Parameter festzulegen, nutzen Sie
 
 Obwohl diese Methode sehr einfach zu nutzen ist, erlaubt sie nicht das
 Voreinstellen aller möglichen Kombinationen aus Sprache, Land und
-Locale<footnote>
+Gebietsschema<footnote>
 
 <para>
 Wenn zum Beispiel <literal>locale</literal> auf <userinput>en_NL</userinput>
-voreingestellt wird, würde dies zu der Standard-Locale
+voreingestellt wird, würde dies zu dem Standard-Gebietsschema
 <literal>en_US.UTF-8</literal> auf dem installierten System führen. Wenn aber
 stattdessen <literal>en_GB.UTF-8</literal> bevorzugt wird, müssen diese Werte
 individuell voreingestellt werden.
@@ -808,15 +809,16 @@ individuell voreingestellt werden.
 Sprache und Land können auch als Boot-Parameter angegeben werden.
 
 <informalexample role="example"><screen>
-# Das alleinige Voreinstellen der Locale setzt Sprache, Land und Locale.
+# Das alleinige Voreinstellen des Gebietsschemas setzt Sprache, Land und
+# Standard-Gebietsschema.
 d-i debian-installer/locale string de_DE
 
-# Die Werte können ebenfalls individuell voreingestellt werden, um flexibler
+# Die Werte können auch individuell voreingestellt werden, um flexibler
 # zu sein.
 #d-i debian-installer/language string en
 #d-i debian-installer/country string NL
 #d-i debian-installer/locale string en_GB.UTF-8
-# Geben Sie optional zusätzliche Locales an, die generiert werden sollen.
+# Geben Sie optional zusätzliche Gebietsschemata an, die generiert werden sollen.
 #d-i localechooser/supported-locales multiselect en_US.UTF-8, nl_NL.UTF-8
 </screen></informalexample>
 
