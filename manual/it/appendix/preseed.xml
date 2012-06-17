@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66810 -->
+<!-- original version: 67497 -->
 
 <!--
 Be careful with the format of this file as it is parsed to generate
@@ -1114,7 +1114,7 @@ bianchi in testa e in coda sono condensati in un solo spazio.
 <listitem><para>
 
 <!--
-  For debconf variables (templates) used in the installer itself, the
+  For debconf variables (templates) used only in the installer itself, the
   owner should be set to <quote>d-i</quote>; to preseed variables used
   in the installed system, the name of the package that contains the
   corresponding debconf template should be used. Only variables that have
@@ -1122,7 +1122,7 @@ bianchi in testa e in coda sono condensati in un solo spazio.
   propagated to the debconf database for the installed system.
 -->
 
-Le variabili debconf (modelli) usate nell'installatore stesso devono avere
+Le variabili debconf (modelli) usate solo nell'installatore stesso devono avere
 come proprietario <quote>d-i</quote>; per preconfigurare le variabili usate
 nel sistema installato, si deve usare il nome del pacchetto che contiene il
 corrispondente modello debconf. Solo le variabili che hanno un proprietario
@@ -1403,10 +1403,13 @@ d-i debian-installer/locale string it_IT
 </para><para>
 
 <!--
-Keyboard configuration consists of selecting a keymap.
+Keyboard configuration consists of selecting a keymap and (for non-latin
+keymaps) a toggle key to switch between the non-latin keymap and the US keymap.
 -->
 
-La configurazione della tastiera consiste nella scelta di una mappa di tastiera.
+La configurazione della tastiera consiste nella scelta di una mappa di
+tastiera e (per le mappe non-latine) di un tasto per passare dalla
+mappa di tastiera non-latina alla mappa US e vice versa.
 
 <informalexample role="example"><screen>
 <!--
@@ -1892,7 +1895,7 @@ For detailed information see the files
 <filename>partman-auto-raid-recipe.txt</filename> included in the
 <classname>debian-installer</classname> package.
 Both files are also available from the
-<ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">&d-i; source
+<ulink url="&url-d-i-gitweb-doc-devel;">&d-i; source
 repository</ulink>. Note that the supported functionality may change
 between releases.
 -->
@@ -1902,7 +1905,7 @@ sull'uso delle ricette. Per delle informazioni più dettagliate vedere
 i file <filename>partman-auto-recipe.txt</filename> e
 <filename>partman-auto-raid-recipe.txt</filename> inclusi nel pacchetto
 <classname>debian-installer</classname>. Entrambi i file sono disponibili
-anche nel <ulink url="&url-d-i-websvn;/trunk/installer/doc/devel/">repository
+anche nel <ulink url="&url-d-i-gitweb-doc-devel;">repository
 dei sorgenti del &d-i;</ulink>. Notare che le funzioni supportate
 potrebbero cambiare da un rilascio all'altro.
 
@@ -2745,6 +2748,22 @@ usando l'operatore <quote>?=</quote> in questo modo
 Ovviamente questo ha effetto solo sui parametri che corrispondono alle
 domande che sono effettivamente visualizzate durante l'installazione e
 non sui parametri <quote>interni</quote>.
+
+</para><para>
+
+<!--
+For more debugging information, use the boot parameter
+<classname>DEBCONF_DEBUG=5</classname>.
+This will cause <classname>debconf</classname> to print much more detail
+about the current settings of each variable and about its progress through
+each package's installation scripts.
+-->
+
+Per avere ulteriori informazioni di debug, usare il parametro di avvio
+<classname>DEBCONF_DEBUG=5</classname>; ciò provoca la stampa da parte 
+di <classname>debconf</classname> di molti più dettagli sulle attuali
+impostazioni di ciascuna variabile e sulla loro evoluzione durante
+l'esecuzione degli script di installazione del pacchetto.
 
 </para>
   </sect2>

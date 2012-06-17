@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66212 -->
+<!-- original version: 67623 -->
 
  <sect1 condition="bootable-usb" id="boot-usb-files">
  <!-- <title>Preparing Files for USB Memory Stick Booting</title> -->
@@ -120,21 +120,34 @@ firmware al suo interno.
 The CD or DVD image you choose should be written directly to the USB stick,
 overwriting its current contents. For example, when using an existing
 GNU/Linux system, the CD or DVD image file can be written to a USB stick
-as follows:
+as follows, after having made sure that the stick is unmounted:
 -->
 
-È possibile scrivere l'immagine di un CD o DVD direttamente sulla chiavetta
-USB sovrascrivendone il contenuto attuale. Per esempio, con un sistema
-GNU/Linux, è possibile scrivere il file con l'immagine del CD o DVD sulla
-chiavetta USB eseguendo:
+È possibile scrivere l'immagine di un CD o DVD direttamente sulla
+chiavetta USB sovrascrivendone il contenuto attuale. Per esempio, con
+un sistema GNU/Linux, è possibile scrivere il file con l'immagine del
+CD o DVD sulla chiavetta USB eseguendo, dopo essersi assicurati che la
+chiavetta non è montata:
 
 <informalexample><screen>
-<prompt>#</prompt> <userinput>dd if=<replaceable>debian.iso</replaceable> of=/dev/<replaceable>sdX</replaceable></userinput>
+<prompt>#</prompt> <userinput>cp <replaceable>debian.iso</replaceable> /dev/<replaceable>sdX</replaceable></userinput>
 <prompt>#</prompt> <userinput>sync</userinput>
 </screen></informalexample>
 
-</para>
+</para><important><para>
 
+<!--
+Simply writing the CD or DVD image to USB like this should work fine
+for most users. The other options below are more complex, mainly for
+people with specialised needs.
+-->
+
+La semplice scrittura dell'immagine del CD o DVD sulla USB dovrebbe
+funzionare correttamente per la maggior parte degli utenti. Le altre
+possibilità descritte in seguito sono più complesse e particolarmente
+adatte a chi ha necessità particolari.
+
+</para></important>
   </sect2>
 
   <sect2 id="usb-copy-easy">
@@ -145,13 +158,13 @@ chiavetta USB eseguendo:
 <!--
 An alternative way to set up your USB stick is to manually copy
 the installer files, and also a CD image to it.
-Note that the USB stick should be at least 256 MB in size (smaller
+Note that the USB stick should be at least 1 GB in size (smaller
 setups are possible if you follow <xref linkend="usb-copy-flexible"/>).
 -->
 
 Un metodo alternativo per preparare la chiavetta USB è copiare manualmente
 i file dell'installatore e l'immagine del CD sulla chiavetta.
-Notare che la chiavetta USB deve essere da almeno 256&nbsp;MB (è possibile
+Notare che la chiavetta USB deve essere da almeno 1&nbsp;GB (è possibile
 fare anche installazioni più piccole seguendo
 <xref linkend="usb-copy-flexible"/>).
 
@@ -177,21 +190,17 @@ file di configurazione.</phrase>
 
 <!--
 Note that, although convenient, this method does have one major
-disadvantage: the logical size of the device will be limited to 256 MB,
+disadvantage: the logical size of the device will be limited to 1 GB,
 even if the capacity of the USB stick is larger. You will need to
 repartition the USB stick and create new file systems to get its full
 capacity back if you ever want to use it for some different purpose.
-A second disadvantage is that you cannot copy a full CD image onto
-the USB stick, but only the smaller businesscard or netinst CD images.
 -->
 
 Notare che, nonostante la sua comodità, questo metodo ha lo svantaggio
-che la dimensione logica del device è limitata a 256&nbsp;MB anche
+che la dimensione logica del device è limitata a 1&nbsp;GB anche
 quando la capacità della chiavetta USB è superiore. Per poter ripristinare
 la capacità reale della chiavetta USB è necessario ripartizionarla e creare
-dei nuovi filesystem. Un altro svantaggio è che sulla chiavetta USB non è
-possibile copiare l'immagine di un CD completo, si possono copiare solo
-le immagini businesscard e netinst.
+dei nuovi filesystem.
 
 </para><para arch="x86">
 
@@ -234,7 +243,7 @@ After that, mount the USB memory stick
 which will now have
 <phrase arch="x86">a FAT filesystem</phrase>
 <phrase arch="powerpc">an HFS filesystem</phrase>
-on it, and copy a &debian; netinst or businesscard ISO image to it.
+on it, and copy a &debian; ISO image (netinst, businesscard, or full CD) to it.
 Unmount the stick (<userinput>umount /mnt</userinput>) and you are done.
 -->
 
@@ -246,8 +255,8 @@ Poi montare la chiavetta USB
 che adesso avrà
 <phrase arch="x86">un filesystem FAT,</phrase>
 <phrase arch="powerpc">un filesystem HFS,</phrase>
-e copiarci l'immagine ISO netinst o businesscard &debian;. Infine
-smontare la chiavetta (<userinput>umount /mnt</userinput>).
+e copiarci l'immagine ISO di &debian; (netinst, businesscard o un CD completo).
+Infine smontare la chiavetta (<userinput>umount /mnt</userinput>).
 
 </para>
   </sect2>
@@ -265,8 +274,8 @@ USB stick is large enough &mdash; you have the option of copying a
 full CD ISO image to it.
 -->
 
-Se si preferisce avere più flessibilità o semplicemente si vuole capire
-cosa si sta facendo si deve usare questo metodo per scrivere i file sulla
+Chi preferisce avere più flessibilità o semplicemente vuole capire
+cosa sta facendo, dovrebbe usare questo metodo per scrivere i file sulla
 chiavetta. Uno dei vantaggi di questo metodo è quello che se la chiavetta
 USB è sufficientemente capiente, è possibile copiarci l'immagine di un CD
 completo.
