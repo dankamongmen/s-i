@@ -1,4 +1,4 @@
-<!-- original version: 64916 -->
+<!-- original version: 67693 -->
 
 
   <sect2 arch="powerpc" id="boot-cd"><title>Amorcer depuis un cédérom</title>
@@ -8,15 +8,31 @@
 <para>
 
 Aujourd'hui, les seules sous-architectures &arch-title; qui peuvent
-s'amorcer depuis un cédérom sont les PReP (mais pas tous les systèmes)
+s'amorcer depuis un cédérom sont les PReP/CHRP (mais pas tous les systèmes)
 et les PowerMac NewWorld. Sur les PowerMac, appuyez sur la touche
 <keycap>c</keycap>, ou bien la combinaison des touches
 <keycap>Command</keycap>, <keycap>Option</keycap>,
 <keycap>Shift</keycap>, and <keycap>Delete</keycap>
-lors du démarrage pour amorcer sur le cédérom. 
+lors du démarrage pour amorcer sur le lecteur de CD aux réglages d'origine. 
 
 </para><para>
 
+Pour amorcer un PowerMac depuis un lecteur de CD/DVD Firewire, il faut, à l'invite
+Open Firmware (voyez <xref linkend="invoking-openfirmware"/>), saisir la 
+commande suivante :
+<informalexample><screen>
+0 &gt; boot fw/node/sbp-2/disk:,\install\yaboot
+</screen></informalexample>.
+
+Pour amorcer depuis le lecteur interne de CD/DVD,
+saisissez :
+
+<informalexample><screen>
+0 &gt; boot cd:,\install\yaboot
+</screen></informalexample>
+
+</para><para>
+ 
 Les OldWorld Powermac ne s'amorceront pas depuis un cédérom &debian;, car les 
 ordinateurs OldWorld ont besoin d'un pilote de cédérom Mac OS ROM sur le 
 cédérom, et une version libre de ce pilote n'est pas disponible. Tous les
@@ -24,21 +40,8 @@ systèmes OldWorld possèdent un lecteur de disquettes, vous devrez par
 conséquent l'utiliser pour lancer le programme d'installation, et ensuite 
 indiquer à ce programme d'utiliser le cédérom.
 
-</para><para>
-
-Si votre système ne s'amorce pas à partir d'un cédérom, vous pouvez quand 
-même l'utiliser pour installer votre système. Sur les machines NewWorld, vous 
-pouvez aussi utiliser une commande du microprogramme pour amorcer le cédérom 
-manuellement. Suivez les instructions de <xref linkend="boot-newworld"/> pour 
-amorcer depuis le disque dur à l'exception de l'utilisation du chemin vers
-<command>yaboot</command> sur le cédérom à l'invite de OF, comme&nbsp;:
-
-<informalexample><screen>
-
-0 &gt; boot cd:,\install\yaboot
-
-</screen></informalexample>
 </para>
+
   </sect2>
 
   <sect2 arch="powerpc" id="install-drive">
