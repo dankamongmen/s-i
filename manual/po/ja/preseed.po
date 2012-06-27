@@ -3,9 +3,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
-"POT-Creation-Date: 2012-03-18 02:29+0000\n"
-"PO-Revision-Date: 2012-03-21 00:26+0900\n"
-"Last-Translator: KURASAWA Nozomu <nabetaro@caldron.jp>\n"
+"POT-Creation-Date: 2012-06-26 13:45+0000\n"
+"PO-Revision-Date: 2012-06-27 07:38+0900\n"
+"Last-Translator: KURASAWA Nozomu <nabetaro@debian.or.jp>\n"
 "Language-Team: Japanese <debian-japanese@lists.debian.org>\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -135,9 +135,8 @@ msgstr "CD/DVD"
 
 #. Tag: entry
 #: preseed.xml:77 preseed.xml:78 preseed.xml:79 preseed.xml:89 preseed.xml:91
-#: preseed.xml:94 preseed.xml:95 preseed.xml:96 preseed.xml:99 preseed.xml:100
-#: preseed.xml:101 preseed.xml:104 preseed.xml:106 preseed.xml:109
-#: preseed.xml:111
+#: preseed.xml:94 preseed.xml:95 preseed.xml:99 preseed.xml:100
+#: preseed.xml:104 preseed.xml:106 preseed.xml:109 preseed.xml:111
 #, no-c-format
 msgid "<entry>yes</entry>"
 msgstr "<entry>yes</entry>"
@@ -171,6 +170,12 @@ msgid ""
 "hd-media <phrase condition=\"bootable-usb\">(including usb-stick)</phrase>"
 msgstr ""
 "hd-media <phrase condition=\"bootable-usb\">(USB メモリを含む)</phrase>"
+
+#. Tag: entry
+#: preseed.xml:96 preseed.xml:101
+#, no-c-format
+msgid "yes<footnoteref linkend=\"apx-ps-net\"/>"
+msgstr "yes<footnoteref linkend=\"apx-ps-net\"/>"
 
 #. Tag: entry
 #: preseed.xml:98
@@ -1102,8 +1107,8 @@ msgstr ""
 "インストーラ自身でのみ使用する debconf 変数 (テンプレート) では、所有者を "
 "<quote>d-i</quote> と設定しておきます。インストールしたシステムで使用する "
 "preseed 変数では、対応する debconf テンプレートを含むパッケージ名を使用するべ"
-"きです。所有者に <quote>d-i</quote> 以外が設定されている変数のみを、インス"
-"トールしたシステムの debconf データベースに伝播させます。"
+"きです。所有者が <quote>d-i</quote> ではない変数だけを、インストールしたシス"
+"テムの debconf データベースに伝播させます。"
 
 #. Tag: para
 #: preseed.xml:607
@@ -1340,12 +1345,12 @@ msgstr ""
 #: preseed.xml:731
 #, no-c-format
 msgid ""
-"Keyboard configuration consists of selecting a keymap and, for non-latin "
-"keymaps, a toggle key to switch between the non-latin keymap and the US "
+"Keyboard configuration consists of selecting a keymap and (for non-latin "
+"keymaps) a toggle key to switch between the non-latin keymap and the US "
 "keymap."
 msgstr ""
-"キーボード設定は、キーマップの選択と、非ラテンキーマップ向けに、非ラテンキー"
-"マップと US キーマップとの切り替えキー選択から成っています。"
+"キーボード設定は、キーマップの選択と、(非ラテンキーマップ向けの) 非ラテンキー"
+"マップと US キーマップとの、切り替えキーの選択から成っています。"
 
 #. Tag: screen
 #: preseed.xml:736
@@ -1453,6 +1458,10 @@ msgid ""
 "# To pick a particular interface instead:\n"
 "#d-i netcfg/choose_interface select eth1\n"
 "\n"
+"# To set a different link detection timeout (default is 3 seconds).\n"
+"# Values are interpreted as seconds.\n"
+"#di netcfg/link_detection_timeout string 10\n"
+"\n"
 "# If you have a slow dhcp server and the installer times out waiting for\n"
 "# it, this might be useful.\n"
 "#d-i netcfg/dhcp_timeout string 60\n"
@@ -1501,6 +1510,10 @@ msgstr ""
 "\n"
 "# To pick a particular interface instead:\n"
 "#d-i netcfg/choose_interface select eth1\n"
+"\n"
+"# To set a different link detection timeout (default is 3 seconds).\n"
+"# Values are interpreted as seconds.\n"
+"#di netcfg/link_detection_timeout string 10\n"
 "\n"
 "# If you have a slow dhcp server and the installer times out waiting for\n"
 "# it, this might be useful.\n"
@@ -2836,14 +2849,28 @@ msgstr ""
 "問に対応するパラメータにのみ効果を及ぼし、<quote>内部</quote>パラメータには効"
 "果を及ぼしません。"
 
+#. Tag: para
+#: preseed.xml:1161
+#, no-c-format
+msgid ""
+"For more debugging information, use the boot parameter "
+"<classname>DEBCONF_DEBUG=5</classname>. This will cause <classname>debconf</"
+"classname> to print much more detail about the current settings of each "
+"variable and about its progress through each package's installation scripts."
+msgstr ""
+"詳細なデバッグ情報を取得するためには、ブートパラメータ "
+"<classname>DEBCONF_DEBUG=5</classname> を使用してください。これにより "
+"<classname>debconf</classname> が、各変数の現在の設定と各パッケージのインス"
+"トールスクリプトの動作について、より詳細な情報を出力してくれます。"
+
 #. Tag: title
-#: preseed.xml:1165
+#: preseed.xml:1173
 #, no-c-format
 msgid "Chainloading preconfiguration files"
 msgstr "事前設定ファイルのチェーンロード"
 
 #. Tag: para
-#: preseed.xml:1166
+#: preseed.xml:1174
 #, no-c-format
 msgid ""
 "It is possible to include other preconfiguration files from a "
@@ -2858,7 +2885,7 @@ msgstr ""
 "確かな設定を指定するという使い方ができます。"
 
 #. Tag: screen
-#: preseed.xml:1176
+#: preseed.xml:1184
 #, no-c-format
 msgid ""
 "# More than one file can be listed, separated by spaces; all will be\n"
@@ -2908,7 +2935,7 @@ msgstr ""
 "#d-i preseed/run string foo.sh"
 
 #. Tag: para
-#: preseed.xml:1178
+#: preseed.xml:1186
 #, no-c-format
 msgid ""
 "It is also possible to chainload from the initrd or file preseeding phase, "
