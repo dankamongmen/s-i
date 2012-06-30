@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 67693 -->
 
   <sect2 arch="powerpc" id="boot-cd"><title>Booten von CD-ROM</title>
 
@@ -7,12 +7,29 @@
 
 <para>
 
-Im Moment unterstützen lediglich die &arch-title;-Unterarchitekturen PReP
+Im Moment unterstützen lediglich die &arch-title;-Unterarchitekturen PReP/CHRP
 (jedoch auch nicht alle Systeme) und NewWorld PowerMac das Booten von CD-ROM.
 Bei PowerMacs drücken Sie die Taste <keycap>c</keycap> oder sonst die
 Kombination <keycap>Command</keycap>, <keycap>Option</keycap>,
 <keycap>Shift</keycap> und <keycap>Delete</keycap>, um von
-CD-ROM zu starten.
+dem standardmäßig ab Werk eingebauten CD-/DVD-Laufwerk zu starten.
+
+</para><para>
+
+Um einen PowerMac von einem externen Firewire CD-/DVD-Laufwerk zu booten,
+rufen Sie zunächst den OpenFirmware-Prompt auf (Details unter
+<xref linkend="invoking-openfirmware"/>), tippen Sie dann ein:
+
+<informalexample><screen>
+0 &gt; boot fw/node/sbp-2/disk:,\install\yaboot
+</screen></informalexample>
+
+Um alternativ vom internen, standardmäßig ab Werk eingebauten
+CD-/DVD-Laufwerk zu starten, tippen Sie ein:
+
+<informalexample><screen>
+0 &gt; boot cd:,\install\yaboot
+</screen></informalexample>
 
 </para><para>
 
@@ -21,21 +38,7 @@ OldWorld-Maschinen einen MacOS-ROM-CD-Boot-Treiber auf der CD-ROM
 benötigen und eine freie Version dieses Treibers nicht verfügbar ist.
 Alle OldWorld-Systeme haben aber ein Floppy-Laufwerk, also benutzen
 Sie dieses, um den Installer zu starten und verweisen Sie ihn auf die
-CD, wenn er die Dateien benötigt.
-
-</para><para>
-
-Wenn Ihr System nicht direkt von CD-ROM starten kann, können Sie trotzdem
-die CD-ROM für die Installation nutzen. Auf NewWorld-Maschinen können
-Sie auch einen OpenFirmware-Befehl verwenden, um manuell von CD-ROM zu
-booten. Folgen Sie den Instruktionen auf <xref linkend="boot-newworld"/>,
-die beschreiben, wie Sie von Festplatte booten können, nur geben Sie
-den Pfad zum <command>yaboot</command>-Kommando auf der CD am
-OF-Prompt an, z.B.
-
-<informalexample><screen>
-0 &gt; boot cd:,\install\yaboot
-</screen></informalexample>
+CD, wenn er weitere Dateien benötigt.
 
 </para>
   </sect2>
