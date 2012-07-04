@@ -19,7 +19,13 @@ or any other partitioning tool to create a FAT16 partition<footnote>
 Don't forget to set the <quote>bootable</quote> bootable flag.
 </para>
 
-</footnote>, and then create the filesystem using:
+</footnote>, install an MBR using:
+
+<informalexample><screen>
+# install-mbr /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+and then create the filesystem using:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -95,8 +101,13 @@ default vmlinuz
 append initrd=initrd.gz
 </screen></informalexample>
 
-For the graphical installer you should add
-<userinput>vga=788</userinput> to the second line.
+For the graphical installer you should add <userinput>vga=788</userinput> to the
+second line. Other parameters can be appended as desired.
+
+</para><para>
+
+To enable the boot prompt to permit further parameter appending, add a
+<userinput>prompt 1</userinput> line.
 
 </para><para>
 
