@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66589 -->
+<!-- original version: 67791 -->
 
    <sect3 arch="x86">
    <title>Den USB-Stick partitionieren</title>
@@ -21,7 +21,13 @@ Vergessen Sie nicht, die <quote>bootable</quote>-Markierung (Boot-Flag) zu
 setzen.
 </para>
 
-</footnote>, und erstellen dann ein Dateisystem, indem Sie Folgendes eingeben:
+</footnote>, erzeugen Sie einen Master-Boot-Record (MBR), indem Sie Folgendes eingeben:
+
+<informalexample><screen>
+# install-mbr /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+und erstellen Sie dann ein Dateisystem:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -103,7 +109,13 @@ append initrd=initrd.gz
 
 Falls Sie den grafischen Installer verwenden möchten, sollten Sie
 <userinput>vga=788</userinput> zur zweiten Zeile
-hinzufügen.
+hinzufügen. Weitere Parameter können nach Wunsch hinzugefügt werden.
+
+</para><para>
+
+Um den Boot-Prompt zu aktivieren und so weitere Anpassungen der Parameter
+zuzulassen, fügen Sie eine Zeile mit dem Inhalt
+<userinput>prompt 1</userinput> hinzu.
 
 </para><para>
 
