@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 67384 -->
+<!-- original version: 67781 -->
 
 <!--
 Be carefull with the format of this file as it is parsed to generate
@@ -77,7 +77,7 @@ s kterými způsoby instalací.
   <entry>CD/DVD</entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ano<footnote id='apx-ps-net'><para>
+  <entry>ano<footnote id="apx-ps-net"><para>
 
      Ovšem pouze pokud máte přístup k síti a správně nastavíte
      <literal>preseed/url</literal>.
@@ -92,12 +92,12 @@ s kterými způsoby instalací.
   <entry>z pevného disku <phrase condition="bootable-usb">(včetně usb klíčenky)</phrase></entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ano<footnoteref linkend='apx-ps-net'/></entry>
+  <entry>ano<footnoteref linkend="apx-ps-net"/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>z disket (cd ovladače)</entry>
   <entry>ano</entry>
   <entry>ano</entry>
-  <entry>ano<footnoteref linkend='apx-ps-net'/></entry>
+  <entry>ano<footnoteref linkend="apx-ps-net"/></entry>
 </row><row condition="supports-floppy-boot">
   <entry>z disket (síťové ovladače)</entry>
   <entry>ano</entry>
@@ -887,6 +887,10 @@ d-i netcfg/choose_interface select auto
 
 # Výběr konkrétního síťového rozhraní:
 #d-i netcfg/choose_interface select eth1
+
+# Rozpoznání aktivního síťového připojení může někdy trvat déle než
+# výchozí 3 sekundy. V takovém případě pomůže zvýšení této hodnoty.
+#d-i netcfg/link_detection_timeout string 10
 
 # Máte-li pomalejší dhcp server a instalačnímu systému vyprší čas při
 # čekání na odpověď, bude užitečné následující.
@@ -1694,6 +1698,13 @@ danou otázku zobrazil. Například <userinput><replaceable>foo</replaceable>/<r
 To samozřejmě funguje jen u parametrů, kterým odpovídá nějaká otázka
 zobrazená během instalace, tj. nefunguje to pro <quote>interní</quote>
 parametry.
+
+</para><para>
+
+Pro více ladicích informací můžete použít zaváděcí parametr
+<classname>DEBCONF_DEBUG=5</classname>, který zajistí, že
+<classname>debconf</classname> bude mnohem upovídanější, co se týče
+aktuálního nastavení proměnných a postupu instalačními skripty.
 
 </para>
   </sect2>

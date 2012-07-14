@@ -1,5 +1,5 @@
 <!-- $Id$ -->
-<!-- original version: 66589 -->
+<!-- original version: 67791 -->
 
    <sect3 arch="x86">
    <title>Rozdělení USB zařízení</title>
@@ -13,7 +13,13 @@ disku<footnote><para>
 
 Nezapomeňte oblasti nastavit <quote>zaváděcí</quote> příznak.
 
-</para></footnote>. Poté vytvořte souborový systém příkazem
+</para></footnote>, nainstalujte MBR
+
+<informalexample><screen>
+<prompt>#</prompt> <userinput>install-mbr /dev/<replaceable>sdX</replaceable></userinput>
+</screen></informalexample>
+
+a vytvořte souborový systém příkazem
 
 <informalexample><screen>
 <prompt>#</prompt> <userinput>mkdosfs /dev/<replaceable>sdX1</replaceable></userinput>
@@ -89,7 +95,16 @@ append initrd=initrd.gz
 </screen></informalexample>
 
 Pro grafickou instalaci byste na druhý řádek měli přidat ještě
-parametr <userinput>vga=788</userinput>.
+parametr <userinput>vga=788</userinput> a případné další parametry.
+
+</para><para>
+
+Chcete-li povolit interaktivní přidávání parametrů při zavádění
+instalačního systému, přidejte ještě řádek:
+
+<informalexample><screen>
+prompt 1
+</screen></informalexample>
 
 </para><para>
 
