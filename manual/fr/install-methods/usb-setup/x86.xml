@@ -1,4 +1,4 @@
-<!-- original version: 66589 -->
+<!-- original version: 67825 -->
 
    <sect3 arch="x86">
    <title>Partitionner un périphérique USB</title>
@@ -18,7 +18,15 @@ programme de partitionnement pour créer cette partition <footnote>
 N'oubliez pas de positionner le drapeau <quote>bootable</quote>.
 </para>
 
-</footnote>, et saisissez&nbsp;:
+</footnote>, puis installez un MBR avec :
+
+<informalexample><screen>
+# install-mbr /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+La commande <command>install-mbr</command> se trouve dans le paquet &debian;
+<classname>mbr</classname>.  Créez maintenant le système de fichier
+avec :
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -103,6 +111,11 @@ append initrd=initrd.gz
 
 Pour l'installateur graphique, vous devez ajouter à la deuxième ligne
 le paramètre <userinput>vga=788</userinput>.
+D'autres paramètres peuvent être ajoutés.
+</para>
+<para>
+Pour que l'invite d'amorçage permette l'ajout de paramètres, créez
+une ligne <userinput>prompt 1</userinput>.
 </para>
 
 <para>
