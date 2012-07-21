@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w
+# © 2012 Cyril Brulebois <kibi@debian.org>
+#
+# Take two debian-installer versions as parameters, get the build logs
+# on all relevant architectures, and compare the packages. From there,
+# display removed/added packages, as well as updated packages.
+
+use strict;
+use File::Temp qw(tempdir);
+use Text::TabularDisplay;
+use Dpkg::Version;
+
+my ($old, $new) = @ARGV;
+
+die "Usage: $0 old-release-date new-release-date\n"
+    if not $old or not $new;
+
+die "old-release-date ($old) should be less than new-release-date ($new)"
+    if $old ge $new;
+
+sub sep() { print "\n"; }
+
+# FIXME: This is an awful way to determine release architectures.
+my $ra = `rmadison -s testing bash`;
+chomp $ra;
+$ra =~ s/^.* \| //;
+my @ra = split ', ', $ra;
+print STDERR "DEBUG: ra: @ra\n";
+
+# FIXME: Change behaviour to support incremental runs:
+#my $tempdir = tempdir( DIR => '.', CLEANUP => 0);
+my $tempdir = 'pM29tfFz_5';
+
+print STDERR "DEBUG: tempdir: $tempdir\n";
+print STDERR "\n";
+
+my $source = 'debian-installer';
+my $status;
+my @archs;
+for my $v ($old, $new) {
+    for my $a (@ra) {
+        # Skip source…
+        next if $a eq 'source';
+
+        # One can't use the return code for now (#681779):
+        # FIXME: Change behaviour to support incremental runs:
+#        `cd $tempdir && getbuildlog $source $v $a >/dev/null 2>&1`;
+        my $filename = "$tempdir/${source}_${v}_${a}.log";
+        $status->{$v}->{$a} = (-f $filename ? "$filename" : undef);
+        push @archs, $a;
+    }
+}
+
+# Uniquify:
+my %seen = ();
+@archs = grep { ! $seen{$_}++ } @archs;
+
+# Avoid long arch names:
+s/^kfreebsd-/kf-/ for (@archs);
+s/^powerpc/ppc/   for (@archs);
+
+# Build table for information only:
+my $tb = Text::TabularDisplay->new('', @archs);
+
+# Package versions:
+my %versions;
+for my $v (sort keys %{$status}) {
+    my @tb_line = ("$v");
+    for my $a (sort keys %{$status->{$v}}) {
+        push @tb_line, ($status->{$v}->{$a} ? '********' : ' no log ');
+        if ($status->{$v}->{$a}) {
+            open my $log, '<', $status->{$v}->{$a}
+                or die "Unable to open log file $status->{$v}->{$a}";
+            while (my $line = <$log>) {
+                next if $line !~ /^Get:/;
+                next if $line =~ /\b(?:InRelease|Sources|Packages|TranslationIndex|Release\.gpg|Release)\b/;
+                next if $line =~ /\(dsc|tar\)/;
+                next if $line =~ /\bTranslation-/;
+
+                # Funnily the arch doesn't appear when fetching from incoming:
+                my ($package, $arch, $version);
+                if ($line =~ /http:\/\/incoming.debian.org.*?(\S+)\s+(\S+)\s+\[.*?\]$/) {
+                    ($package, $version) = ($1, $2);
+                }
+                elsif ($line =~ /(\S+)\s+(\S+)\s+(\S+)\s+\[.*?\]$/) {
+                    ($package, $arch, $version) = ($1, $2, $3);
+                }
+                else {
+                    die "oops, unable to parse $line";
+                }
+
+                # FIXME: Decide whether not caring about binNMUs is ok:
+                $version =~ s/\+b\d+$//;
+
+                #print "$package $arch $version detected\n";
+                my $which = $v eq $old ? 'old' : 'new';
+                if (not defined $versions{$package}{$which}) {
+                    $versions{$package}{$which} = $version;
+                }
+                elsif ($versions{$package}{$which} ne $version) {
+                    $versions{$package}{$which} = $version
+                        if $which eq 'old' && version_compare($versions{$package}{$which}, $version) >= 0;
+                    $versions{$package}{$which} = $version
+                        if $which eq 'new' && version_compare($versions{$package}{$which}, $version) <= 0;
+                }
+            }
+
+            close $log
+                or die "Unable to close log file $status->{$v}->{$a}";
+        }
+    }
+    $tb->add( @tb_line );
+}
+
+print $tb->render, "\n";
+sep;
+
+# Diff old/new to build updated/removed/added lists:
+my $vtb = Text::TabularDisplay->new('Updated package', 'Old version', 'New version');
+my (@added, @removed);
+foreach my $package (sort keys %versions) {
+  if ($versions{$package}{'old'} &&
+      $versions{$package}{'new'} &&
+      $versions{$package}{'old'} ne $versions{$package}{'new'}) {
+    $vtb->add( $package, $versions{$package}{'old'}, $versions{$package}{'new'} );
+  }
+  if ($versions{$package}{'old'} &&
+      not $versions{$package}{'new'}) {
+    push @removed, $package;
+  }
+  if ($versions{$package}{'new'} &&
+      not $versions{$package}{'old'}) {
+    push @added, $package;
+  }
+}
+
+# FIXME: Should become parameters:
+my $oldkernelabi = '3.2.0-2';
+my $newkernelabi = '3.2.0-3';
+
+# Renamed isn't actually used later, but keeping it around doesn't
+# hurt:
+my @renamed;
+my @maybe_renamed = @removed;
+foreach my $p (@maybe_renamed) {
+    if ($p =~ /-$oldkernelabi-/) {
+        my $rp = $p;
+        $rp =~ s/-$oldkernelabi-/-$newkernelabi-/;
+        if (grep { $_ eq $rp } @added) {
+            @removed = grep { $_ ne $p } @removed;
+            @added = grep { $_ ne $rp } @added;
+            push @renamed, "$p → $rp";
+        }
+    }
+}
+
+# Possible diffs due to uploader's archs:
+# FIXME: Should become parameters:
+my $oldarchpattern = '(486|686-pae)';
+my $newarchpattern = 'amd64';
+@removed = grep { $_ !~ /-$oldkernelabi-$oldarchpattern-/ } @removed;
+@removed = grep { $_ !~ /-$oldkernelabi-$newarchpattern-/ } @removed;
+@added   = grep { $_ !~ /-$newkernelabi-$newarchpattern-/ } @added;
+@added   = grep { $_ !~ /-$newkernelabi-$oldarchpattern-/ } @added;
+
+print $vtb->render, "\n";
+sep;
+
+my $removed_tb = Text::TabularDisplay->new("Removed package", "Version");
+foreach my $p (@removed) {$removed_tb->add($p, $versions{$p}{old});}
+print $removed_tb->render, "\n";
+sep;
+
+my $added_tb = Text::TabularDisplay->new("Added package", "Version");
+foreach my $p (@added) {$added_tb->add($p, $versions{$p}{new});}
+print $added_tb->render, "\n";
