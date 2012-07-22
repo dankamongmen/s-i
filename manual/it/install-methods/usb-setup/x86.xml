@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 66589 -->
+<!-- original version: 67825 -->
 
    <sect3 arch="x86">
    <!-- <title>Partitioning the USB stick</title> -->
@@ -23,11 +23,12 @@ stick.  If you have to do that anyway, use <command>cfdisk</command>
 or any other partitioning tool to create a FAT16 partition<footnote>
 -->
 
-Poiché la maggior parte delle chiavette USB viene venduta con una singola
-partizione FAT16 già configurata, probabilmente non è necessario
-ripartizionare o riformattare la chiavetta. Per ripartizionare ugualmente
-la chiavetta usare <command>cfdisk</command> o un qualsiasi altro programma
-di partizionamento per creare una partizione FAT16<footnote>
+Poiché la maggior parte delle chiavette USB viene venduta con una
+singola partizione FAT16 già configurata, probabilmente non sarà
+necessario partizionare né formattare la chiavetta. Invece, se fosse
+necessario preparare la chiavetta, usare <command>cfdisk</command> o
+un qualsiasi altro programma di partizionamento per creare una
+partizione FAT16<footnote>
 
 <para>
 
@@ -40,10 +41,22 @@ Ricordarsi di attivare il flag <quote>bootable</quote>.
 </para>
 
 <!--
-</footnote>, and then create the filesystem using:
+</footnote>, install an MBR using:
 -->
 
-</footnote> e poi crearci un filesystem usando:
+</footnote>, installare un MBR con:
+
+<informalexample><screen>
+# install-mbr /dev/<replaceable>sdX</replaceable>
+</screen></informalexample>
+
+<!--
+The <command>install-mbr</command> command is contained in the
+<classname>mbr</classname> &debian; package.  Then create the filesystem using:
+-->
+
+Il comando <command>install-mbr</command> è contenuto nel pacchetto &debian;
+<classname>mbr</classname>. Infine creare il filesystem usando:
 
 <informalexample><screen>
 # mkdosfs /dev/<replaceable>sdX1</replaceable>
@@ -180,12 +193,13 @@ append initrd=initrd.gz
 </screen></informalexample>
 
 <!--
-For the graphical installer you should add
-<userinput>vga=788</userinput> to the second line.
+For the graphical installer you should add <userinput>vga=788</userinput> to the
+second line. Other parameters can be appended as desired.
 -->
 
-Per utilizzare l'installatore grafico si deve aggiungere
-<userinput>vga=788</userinput> alla seconda riga.
+Per utilizzare l'installatore grafico è necessario aggiungere
+<userinput>vga=788</userinput> alla seconda riga; è possibile
+aggiungere anche altri parametri.
 
 </para><para>
 
