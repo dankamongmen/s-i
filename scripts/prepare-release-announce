@@ -18,7 +18,10 @@ use File::Temp qw(tempdir);
 use Text::TabularDisplay;
 use Dpkg::Version;
 use Getopt::Long;
+use Storable;
+use File::Path qw(make_path);
 
+### Parameter handling:
 my $workdir = 'release-announce.tmp';
 my $old_linux_abi;
 my $new_linux_abi;
@@ -43,29 +46,56 @@ die "old-release-date ($old) should be less than new-release-date ($new)"
 
 sub sep() { print "\n"; }
 
-# FIXME: This is an awful way to determine release architectures.
+
+### Prepare working directory:
+print STDERR "DEBUG: workdir: $workdir\n";
+if (! -d $workdir) {
+    make_path($workdir)
+        or die "Unable to create working directory: $!";
+}
+
+
+### Determine release architectures:
+# FIXME: This is awful!
 my $ra = `rmadison -s testing bash`;
 chomp $ra;
 $ra =~ s/^.* \| //;
 my @ra = split ', ', $ra;
 print STDERR "DEBUG: ra: @ra\n";
-print STDERR "DEBUG: workdir: $workdir\n";
 
+
+### Download build logs:
+my $download_stamp = "$workdir/all-downloaded";
 my $source = 'debian-installer';
 my $status;
 my @archs;
-for my $v ($old, $new) {
-    for my $a (@ra) {
-        # Skip source…
-        next if $a eq 'source';
+my $status_dump = "$workdir/.status";
+my $archs_dump = "$workdir/.archs";
+if ((! -f $status_dump) or (! -f $archs_dump)) {
+    # Only download logs if needed:
+    print STDERR "DEBUG: downloading logs\n";
+    for my $v ($old, $new) {
+        for my $a (@ra) {
+            # Skip source…
+            next if $a eq 'source';
 
-        # One can't use the return code for now (#681779):
-        # FIXME: Change behaviour to support incremental runs:
-#        `cd $workdir && getbuildlog $source $v $a >/dev/null 2>&1`;
-        my $filename = "$workdir/${source}_${v}_${a}.log";
-        $status->{$v}->{$a} = (-f $filename ? "$filename" : undef);
-        push @archs, $a;
+            # One can't use the return code for now (#681779). Also,
+            # multiple logs = FAIL (#683231).
+            `cd $workdir && getbuildlog $source $v $a >/dev/null 2>&1`;
+            my $filename = "$workdir/${source}_${v}_${a}.log";
+            $status->{$v}->{$a} = (-f $filename ? "$filename" : undef);
+            push @archs, $a;
+        }
     }
+    # Remember for later use:
+    store $status, $status_dump;
+    store \@archs, $archs_dump;
+}
+else {
+    # Reload status/archs:
+    print STDERR "DEBUG: reloading cached data\n";
+    $status = retrieve($status_dump);
+    @archs = retrieve($archs_dump);
 }
 
 # Uniquify:
