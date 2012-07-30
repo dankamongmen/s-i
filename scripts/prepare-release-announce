@@ -4,11 +4,34 @@
 # Take two debian-installer versions as parameters, get the build logs
 # on all relevant architectures, and compare the packages. From there,
 # display removed/added packages, as well as updated packages.
+#
+# Example:
+#
+#   ./prepare-release-announce         \
+#     --old-linux-abi 3.2.0-2          \
+#     --new-linux-abi 3.2.0-3          \
+#     --old-linux-arch '(486|686-pae)' \
+#     --new-linux-arch 'amd64'         \
 
 use strict;
 use File::Temp qw(tempdir);
 use Text::TabularDisplay;
 use Dpkg::Version;
+use Getopt::Long;
+
+my $workdir = 'release-announce.tmp';
+my $old_linux_abi;
+my $new_linux_abi;
+my $old_linux_arch;
+my $new_linux_arch;
+
+GetOptions(
+    'workdir=s'        => \$workdir,
+    'old-linux-abi=s'  => \$old_linux_abi,
+    'new-linux-abi=s'  => \$new_linux_abi,
+    'old-linux-arch=s' => \$old_linux_arch,
+    'new-linux-arch=s' => \$new_linux_arch,
+);
 
 my ($old, $new) = @ARGV;
 
@@ -26,13 +49,7 @@ chomp $ra;
 $ra =~ s/^.* \| //;
 my @ra = split ', ', $ra;
 print STDERR "DEBUG: ra: @ra\n";
-
-# FIXME: Change behaviour to support incremental runs:
-#my $tempdir = tempdir( DIR => '.', CLEANUP => 0);
-my $tempdir = 'pM29tfFz_5';
-
-print STDERR "DEBUG: tempdir: $tempdir\n";
-print STDERR "\n";
+print STDERR "DEBUG: workdir: $workdir\n";
 
 my $source = 'debian-installer';
 my $status;
@@ -44,8 +61,8 @@ for my $v ($old, $new) {
 
         # One can't use the return code for now (#681779):
         # FIXME: Change behaviour to support incremental runs:
-#        `cd $tempdir && getbuildlog $source $v $a >/dev/null 2>&1`;
-        my $filename = "$tempdir/${source}_${v}_${a}.log";
+#        `cd $workdir && getbuildlog $source $v $a >/dev/null 2>&1`;
+        my $filename = "$workdir/${source}_${v}_${a}.log";
         $status->{$v}->{$a} = (-f $filename ? "$filename" : undef);
         push @archs, $a;
     }
@@ -123,6 +140,7 @@ foreach my $package (sort keys %versions) {
       $versions{$package}{'new'} &&
       $versions{$package}{'old'} ne $versions{$package}{'new'}) {
     $vtb->add( $package, $versions{$package}{'old'}, $versions{$package}{'new'} );
+    print STDERR $package, " ", $versions{$package}{'old'}, " ", $versions{$package}{'new'}, "\n";
   }
   if ($versions{$package}{'old'} &&
       not $versions{$package}{'new'}) {
@@ -134,34 +152,33 @@ foreach my $package (sort keys %versions) {
   }
 }
 
-# FIXME: Should become parameters:
-my $oldkernelabi = '3.2.0-2';
-my $newkernelabi = '3.2.0-3';
-
-# Renamed isn't actually used later, but keeping it around doesn't
-# hurt:
-my @renamed;
-my @maybe_renamed = @removed;
-foreach my $p (@maybe_renamed) {
-    if ($p =~ /-$oldkernelabi-/) {
-        my $rp = $p;
-        $rp =~ s/-$oldkernelabi-/-$newkernelabi-/;
-        if (grep { $_ eq $rp } @added) {
-            @removed = grep { $_ ne $p } @removed;
-            @added = grep { $_ ne $rp } @added;
-            push @renamed, "$p → $rp";
+# Try and detect renamed packages, based on a linux ABI bump:
+if ($old_linux_abi and $new_linux_abi) {
+    # @renamed isn't actually used later, but keeping it around
+    # doesn't hurt. Can be useful for later debugging.
+    my @renamed;
+    my @maybe_renamed = @removed;
+    foreach my $p (@maybe_renamed) {
+        if ($p =~ /-${old_linux_abi}-/) {
+            my $rp = $p;
+            $rp =~ s/-${old_linux_abi}-/-${new_linux_abi}-/;
+            if (grep { $_ eq $rp } @added) {
+                @removed = grep { $_ ne $p } @removed;
+                @added = grep { $_ ne $rp } @added;
+                push @renamed, "$p → $rp";
+            }
         }
     }
-}
 
-# Possible diffs due to uploader's archs:
-# FIXME: Should become parameters:
-my $oldarchpattern = '(486|686-pae)';
-my $newarchpattern = 'amd64';
-@removed = grep { $_ !~ /-$oldkernelabi-$oldarchpattern-/ } @removed;
-@removed = grep { $_ !~ /-$oldkernelabi-$newarchpattern-/ } @removed;
-@added   = grep { $_ !~ /-$newkernelabi-$newarchpattern-/ } @added;
-@added   = grep { $_ !~ /-$newkernelabi-$oldarchpattern-/ } @added;
+    # Additionally, if archs for the maintainer uploads were
+    # different, massage a bit more:
+    if ($old_linux_arch and $new_linux_arch) {
+        @removed = grep { $_ !~ /-${old_linux_abi}-${old_linux_arch}-/ } @removed;
+        @removed = grep { $_ !~ /-${old_linux_abi}-${new_linux_arch}-/ } @removed;
+        @added   = grep { $_ !~ /-${new_linux_abi}-${new_linux_arch}-/ } @added;
+        @added   = grep { $_ !~ /-${new_linux_abi}-${old_linux_arch}-/ } @added;
+    }
+}
 
 print $vtb->render, "\n";
 sep;
