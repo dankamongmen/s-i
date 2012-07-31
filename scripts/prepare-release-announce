@@ -332,6 +332,19 @@ EOF
 print $changelogs "</table>\n";
 
 
+### Extract template:
+my $template_filename = "$workdir/default.tmpl";
+if (! -f $template_filename) {
+    open my $template, '>', $template_filename
+        or die "Unable to write to $template_filename";
+    print $template $_ while (<DATA>);
+    close $template
+        or die "Unable to close $template_filename";
+    close DATA
+        or die "Unable to close DATA";
+}
+
+
 ### Detect wanted changelogs excerpts:
 foreach my $source (sort keys %sources) {
   # Skip error'd packages:
@@ -342,6 +355,7 @@ foreach my $source (sort keys %sources) {
   # "since foo to bar" means "foo is excluded, bar is included":
   my $changes = $chglog->html_str( { since => $sources{$source}{min},
                                      to    => $sources{$source}{max},
+                                     template => $template_filename,
                                    });
   print $changelogs ("<hr>\n" . $changes . "\n");
 }
@@ -356,3 +370,57 @@ close $report
 
 print STDERR "Report saved as: $report_filename\n";
 print STDERR "Changelogs saved as: $changelogs_filename\n";
+
+### Explicit end:
+exit 0;
+
+# Populating the working directory with some template is needed, so
+# let's ship it in the DATA section:
+__END__
+<!-- BEGIN: header.tmpl -->
+<h1 class="document_header">
+<a name=<TMPL_VAR NAME="SOURCE_NEWEST">>
+  Debian Changelog for <TMPL_VAR NAME="SOURCE_NEWEST"> (up to <TMPL_VAR NAME="VERSION_NEWEST">)
+</a>
+</h1>
+<ul class="navbar">
+  <li>
+    <a href="http://packages.debian.org/src:<TMPL_VAR NAME="SOURCE_NEWEST">">Package Information</a>
+  </li>
+  <li>
+    <a href="http://packages.qa.debian.org/<TMPL_VAR NAME="SOURCE_NEWEST">">Package Developer Information</a>
+  </li>
+  <li>
+    <a href="http://bugs.debian.org/src:<TMPL_VAR NAME="SOURCE_NEWEST">">Bug Information</a>
+  </li>
+</ul>
+<!-- END: header.tmpl -->
+<!-- BEGIN: content.tmpl -->
+<div id="content">
+<TMPL_LOOP NAME="CONTENT_YEARS">
+<h2 class="year_header" id="year<TMPL_VAR NAME="CONTENT_YEAR">">
+<TMPL_VAR NAME="CONTENT_YEAR">
+</h2>
+<TMPL_LOOP NAME="CONTENT_VERSIONS">
+<h3 class="entry_header" id="<TMPL_VAR NAME="CONTENT_VERSION_ID">">
+  <a class="packagelink" href="http://packages.debian.org/src:<TMPL_VAR ESCAPE="URL" NAME="CONTENT_SOURCE">"><TMPL_VAR NAME="CONTENT_SOURCE"></a>
+   (<TMPL_VAR NAME="CONTENT_VERSION">)
+  <span class="<TMPL_VAR NAME="CONTENT_DISTRIBUTION_NORM">"><TMPL_VAR NAME="CONTENT_DISTRIBUTION"></span>;
+  urgency=<span class="<TMPL_VAR NAME="CONTENT_URGENCY_NORM">"><TMPL_VAR NAME="CONTENT_URGENCY"></span>
+</h3>
+<!-- NOTE: CONTENT_CHANGES can contain HTML -->
+<pre><TMPL_VAR NAME="CONTENT_CHANGES"></pre>
+<p class="trailer">&nbsp;-- <TMPL_VAR NAME="CONTENT_MAINTAINER_NAME"> &lt;<a href="http://qa.debian.org/developer.php?login=<TMPL_VAR NAME="CONTENT_MAINTAINER_EMAIL">"><TMPL_VAR NAME="CONTENT_MAINTAINER_EMAIL"></a>&gt;&nbsp;&nbsp;<TMPL_VAR NAME="CONTENT_DATE">
+</p>
+<!-- NOTE: CONTENT_PARSE_ERROR can contain HTML -->
+<TMPL_VAR NAME="CONTENT_PARSE_ERROR">
+</TMPL_LOOP>
+</TMPL_LOOP>
+<TMPL_IF NAME="OLDFORMAT">
+<h2 class="year_header" id="oldformat">Old changelog format(s), not parsed</h2>
+<pre class="oldformat">
+<TMPL_VAR ESCAPE="HTML" NAME="OLDFORMAT_CHANGES">
+</pre>
+</TMPL_IF>
+</div>
+<!-- END: content.tmpl -->
