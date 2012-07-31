@@ -20,6 +20,7 @@ use Dpkg::Version;
 use Getopt::Long;
 use Storable;
 use File::Path qw(make_path);
+use LWP::UserAgent;
 
 ### Parameter handling:
 my $workdir = 'release-announce.tmp';
@@ -165,11 +166,13 @@ sep;
 # Diff old/new to build updated/removed/added lists:
 my $vtb = Text::TabularDisplay->new('Updated package', 'Old version', 'New version');
 my (@added, @removed);
+my @modified;
 foreach my $package (sort keys %versions) {
   if ($versions{$package}{'old'} &&
       $versions{$package}{'new'} &&
       $versions{$package}{'old'} ne $versions{$package}{'new'}) {
     $vtb->add( $package, $versions{$package}{'old'}, $versions{$package}{'new'} );
+    push @modified, [$package, $versions{$package}{'old'}, $versions{$package}{'new'}];
     print STDERR $package, " ", $versions{$package}{'old'}, " ", $versions{$package}{'new'}, "\n";
   }
   if ($versions{$package}{'old'} &&
@@ -210,6 +213,8 @@ if ($old_linux_abi and $new_linux_abi) {
     }
 }
 
+
+### Display modified, then removed, then added packages:
 print $vtb->render, "\n";
 sep;
 
@@ -221,3 +226,36 @@ sep;
 my $added_tb = Text::TabularDisplay->new("Added package", "Version");
 foreach my $p (@added) {$added_tb->add($p, $versions{$p}{new});}
 print $added_tb->render, "\n";
+
+
+### Establish binary to source mapping:
+my $ua = LWP::UserAgent->new();
+my %sources;
+my $sources_dump = "$workdir/.sources";
+if (! -f $sources_dump) {
+    print STDERR "DEBUG: looking up sources from binaries\n";
+    foreach my $line (@modified) {
+        my ($package, $old, $new) = @{$line};
+        print STDERR "DEBUG: lookup for $package ($old to $new)\n";
+        my $ping = $ua->head("http://packages.qa.debian.org/$package");
+        if ($ping->is_success) {
+            my $source = $ping->request->uri;
+            $source =~ s{.*/(.*)\.html$}{$1};
+            push @{$sources{$source}{binaries}}, "$package";
+            $sources{$source}{min} = $old
+                if not $sources{$source}{min} or
+                version_compare($sources{$source}{min}, $old) > 0;
+            $sources{$source}{max} = $new
+                if not $sources{$source}{max} or
+                version_compare($sources{$source}{max}, $new) < 0;
+        }
+        else {
+            push @{$sources{__error__}{binaries}}, "$package";
+        }
+    }
+    store \%sources, $sources_dump;
+}
+else {
+    print STDERR "DEBUG: reload binary to source mapping\n";
+    %sources = %{retrieve $sources_dump};
+}
