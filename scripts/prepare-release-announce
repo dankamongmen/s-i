@@ -53,7 +53,7 @@ die "old-release-date ($old) should be less than new-release-date ($new)"
 
 
 ### Prepare working directory:
-print STDERR "DEBUG: workdir: $workdir\n";
+print STDERR "DEBUG: working directory: $workdir\n";
 if (! -d $workdir) {
     make_path($workdir)
         or die "Unable to create working directory: $!";
@@ -69,7 +69,7 @@ my $ra = `rmadison -s testing bash`;
 chomp $ra;
 $ra =~ s/^.* \| //;
 my @ra = split ', ', $ra;
-print STDERR "DEBUG: ra: @ra\n";
+print STDERR "DEBUG: release architectures: @ra\n";
 
 
 ### Download build logs:
@@ -87,6 +87,7 @@ if ((! -f $status_dump) or (! -f $archs_dump)) {
             # Skip source…
             next if $a eq 'source';
 
+            print STDERR "DEBUG: downloading log: $source $v $a\n";
             # One can't use the return code for now (#681779). Also,
             # multiple logs = FAIL (#683231).
             `cd $workdir && getbuildlog $source $v $a >/dev/null 2>&1`;
@@ -180,7 +181,6 @@ foreach my $package (sort keys %versions) {
       $versions{$package}{'old'} ne $versions{$package}{'new'}) {
     $vtb->add( $package, $versions{$package}{'old'}, $versions{$package}{'new'} );
     push @modified, [$package, $versions{$package}{'old'}, $versions{$package}{'new'}];
-    print STDERR $package, " ", $versions{$package}{'old'}, " ", $versions{$package}{'new'}, "\n";
   }
   if ($versions{$package}{'old'} &&
       not $versions{$package}{'new'}) {
@@ -241,7 +241,7 @@ if (! -f $sources_dump) {
     print STDERR "DEBUG: looking up sources from binaries\n";
     foreach my $line (@modified) {
         my ($package, $old, $new) = @{$line};
-        print STDERR "DEBUG: lookup for $package ($old to $new)\n";
+        print STDERR "DEBUG: lookup: $package ($old to $new)\n";
         my $ping = $ua->head("http://packages.qa.debian.org/$package");
         if ($ping->is_success) {
             my $source = $ping->request->uri;
