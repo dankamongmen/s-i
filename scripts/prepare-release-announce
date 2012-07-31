@@ -24,6 +24,7 @@ use LWP::UserAgent;
 
 ### Parameter handling:
 my $workdir = 'release-announce.tmp';
+my $report_filename = 'report.txt';
 my $changelogs_filename = 'changelogs.html';
 my $old_linux_abi;
 my $new_linux_abi;
@@ -36,17 +37,17 @@ GetOptions(
     'new-linux-abi=s'  => \$new_linux_abi,
     'old-linux-arch=s' => \$old_linux_arch,
     'new-linux-arch=s' => \$new_linux_arch,
+    'report=s'         => \$report_filename,
+    'changelogs=s'     => \$changelogs_filename,
 );
 
 my ($old, $new) = @ARGV;
 
-die "Usage: $0 old-release-date new-release-date\n"
+die "Usage: $0 [options] old-release-date new-release-date\n"
     if not $old or not $new;
 
 die "old-release-date ($old) should be less than new-release-date ($new)"
     if $old ge $new;
-
-sub sep() { print "\n"; }
 
 
 ### Prepare working directory:
@@ -55,6 +56,9 @@ if (! -d $workdir) {
     make_path($workdir)
         or die "Unable to create working directory: $!";
 }
+
+open my $report, '>', $report_filename
+    or die "Unable to write to $report_filename";
 
 
 ### Determine release architectures:
@@ -161,8 +165,8 @@ for my $v (sort keys %{$status}) {
     $tb->add( @tb_line );
 }
 
-print $tb->render, "\n";
-sep;
+print $report $tb->render, "\n\n";
+
 
 # Diff old/new to build updated/removed/added lists:
 my $vtb = Text::TabularDisplay->new('Updated package', 'Old version', 'New version');
@@ -216,17 +220,15 @@ if ($old_linux_abi and $new_linux_abi) {
 
 
 ### Display modified, then removed, then added packages:
-print $vtb->render, "\n";
-sep;
+print $report $vtb->render, "\n\n";
 
 my $removed_tb = Text::TabularDisplay->new("Removed package", "Version");
 foreach my $p (@removed) {$removed_tb->add($p, $versions{$p}{old});}
-print $removed_tb->render, "\n";
-sep;
+print $report $removed_tb->render, "\n\n";
 
 my $added_tb = Text::TabularDisplay->new("Added package", "Version");
 foreach my $p (@added) {$added_tb->add($p, $versions{$p}{new});}
-print $added_tb->render, "\n";
+print $report $added_tb->render, "\n\n";
 
 
 ### Establish binary to source mapping:
@@ -263,7 +265,6 @@ else {
 
 
 ### Grab needed changelogs from packages.qa.d.o:
-$changelogs_filename = "$workdir/$changelogs_filename";
 open my $changelogs, '>', $changelogs_filename
     or die "Unable to write to $changelogs_filename";
 
@@ -344,5 +345,13 @@ foreach my $source (sort keys %sources) {
   print $changelogs ("<hr>\n" . $changes . "\n");
 }
 
+print $changelogs "</html>\n";
+
 close $changelogs
     or die "Unable to close $changelogs_filename";
+
+close $report
+    or die "Unable to close $report_filename";
+
+print STDERR "Report saved as: $report_filename\n";
+print STDERR "Changelogs saved as: $changelogs_filename\n";
