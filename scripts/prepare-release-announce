@@ -12,6 +12,7 @@
 #     --new-linux-abi 3.2.0-3          \
 #     --old-linux-arch '(486|686-pae)' \
 #     --new-linux-arch 'amd64'         \
+#     20120508 20120712
 
 use strict;
 use File::Temp qw(tempdir);
@@ -21,6 +22,7 @@ use Getopt::Long;
 use Storable;
 use File::Path qw(make_path);
 use LWP::UserAgent;
+use Parse::DebianChangelog;
 
 ### Parameter handling:
 my $workdir = 'release-announce.tmp';
@@ -331,7 +333,6 @@ print $changelogs "</table>\n";
 
 
 ### Detect wanted changelogs excerpts:
-use Parse::DebianChangelog;
 foreach my $source (sort keys %sources) {
   # Skip error'd packages:
   next if $source eq '__error__';
