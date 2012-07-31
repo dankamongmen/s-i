@@ -24,6 +24,7 @@ use LWP::UserAgent;
 
 ### Parameter handling:
 my $workdir = 'release-announce.tmp';
+my $changelogs_filename = 'changelogs.html';
 my $old_linux_abi;
 my $new_linux_abi;
 my $old_linux_arch;
@@ -259,3 +260,89 @@ else {
     print STDERR "DEBUG: reload binary to source mapping\n";
     %sources = %{retrieve $sources_dump};
 }
+
+
+### Grab needed changelogs from packages.qa.d.o:
+$changelogs_filename = "$workdir/$changelogs_filename";
+open my $changelogs, '>', $changelogs_filename
+    or die "Unable to write to $changelogs_filename";
+
+my $header = << "EOF";
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+         "http://www.w3.org/TR/html4/loose.dtd">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<h1>Changelogs which might be relevant between $old and $new</h1>
+
+<table border="1" style="border-collapse: collapse; border: 1px solid;">
+<tr>
+<th>Source package</th>
+<th>Binary packages</th>
+<th>Old version</th>
+<th>New version</th>
+</tr>
+EOF
+print $changelogs $header;
+
+foreach my $source (sort keys %sources) {
+  my $name = $source ne '__error__' ? "<a href=\"#$source\">$source</a>" : "No source/changelog match";
+
+  my $binaries = "<li>" . join("</li><li>", @{$sources{$source}{binaries}}) . "</li>";
+  my $entry = << "EOF";
+  <tr>
+  <td>$name</td>
+  <td><ul>$binaries</ul></td>
+  <td>$sources{$source}{min}</td>
+  <td>$sources{$source}{max}</td>
+  </tr>
+EOF
+  print $changelogs $entry;
+
+  # Skip error'd packages:
+  next if $source eq '__error__';
+
+  my $source_filename = "$workdir/$source.txt";
+  if (not -f $source_filename) {
+    # FIXME: This is assuming everything comes from main:
+    my $location;
+    if ($source =~ /^lib/) {
+      $location = substr($source, 0, 4) . "/" . $source;
+    }
+    else {
+      $location = substr($source, 0, 1) . "/" . $source;
+    }
+    my $response = $ua->get("http://packages.debian.org/changelogs/pool/main/$location/current/changelog");
+    if ($response->is_success) {
+      print STDERR "DEBUG: downloaded changelog: $source\n";
+      open my $file, '>', $source_filename
+        or die "Unable to open $source_filename";
+      print $file $response->content;
+      close $file
+        or die "Unable to close $source_filename";
+    }
+    else {
+      print STDERR "DEBUG: unable to download changelog: $source\n";
+    }
+  }
+}
+
+print $changelogs "</table>\n";
+
+
+### Detect wanted changelogs excerpts:
+use Parse::DebianChangelog;
+foreach my $source (sort keys %sources) {
+  # Skip error'd packages:
+  next if $source eq '__error__';
+
+  my $source_filename = "$workdir/$source.txt";
+  my $chglog = Parse::DebianChangelog->init( { infile => $source_filename } );
+  # "since foo to bar" means "foo is excluded, bar is included":
+  my $changes = $chglog->html_str( { since => $sources{$source}{min},
+                                     to    => $sources{$source}{max},
+                                   });
+  print $changelogs ("<hr>\n" . $changes . "\n");
+}
+
+close $changelogs
+    or die "Unable to close $changelogs_filename";
