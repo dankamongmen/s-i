@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: boot-installer\n"
 "Report-Msgid-Bugs-To: debian-boot@lists.debian.org\n"
 "POT-Creation-Date: 2012-07-20 14:12+0000\n"
-"PO-Revision-Date: 2012-07-28 09:40+0100\n"
+"PO-Revision-Date: 2012-08-07 09:40+0100\n"
 "Last-Translator: Joe Hansen <joedalton2@yahoo.dk>\n"
 "Language-Team: Danish <debian-l10n-danish@lists.debian.org>\n"
 "Language: da\n"
@@ -451,12 +451,14 @@ msgstr ""
 #, no-c-format
 msgid "For more details, refer to the <citerefentry><refentrytitle>initrd</refentrytitle> <manvolnum>4</manvolnum></citerefentry> and <citerefentry><refentrytitle>lilo.conf</refentrytitle> <manvolnum>5</manvolnum></citerefentry> man pages. Now run <userinput>lilo</userinput> and reboot."
 msgstr ""
+"For yderligere detaljer, så se manualsiderne <citerefentry><refentrytitle>initrd</refentrytitle> <manvolnum>4</manvolnum></citerefentry> og <citerefentry><refentrytitle>lilo.conf</refentrytitle> <manvolnum>5</manvolnum></citerefentry>. Kør nu <userinput>lilo</userinput> og genstart."
 
 #. Tag: para
 #: boot-installer.xml:478
 #, no-c-format
 msgid "The procedure for <command>GRUB1</command> is quite similar. Locate your <filename>menu.lst</filename> in the <filename>/boot/grub/</filename> directory (or sometimes <filename>/boot/boot/grub/</filename>) and add an entry for the installer, for example (assuming <filename>/boot</filename> is on the first partition of the first disk in the system):"
 msgstr ""
+"Proceduren for <command>GRUB1</command> ligner meget. Find din <filename>menu.lst</filename> i mappen <filename>/boot/grub/</filename> (eller undertiden <filename>/boot/boot/grub/</filename>) og tilføj en post for installationsprogrammet, for eksempel (antager at <filename>/boot</filename> er på den første partition på den første disk i systemet):"
 
 #. Tag: screen
 #: boot-installer.xml:486
@@ -467,12 +469,16 @@ msgid ""
 "kernel /boot/newinstall/vmlinuz\n"
 "initrd /boot/newinstall/initrd.gz"
 msgstr ""
+"title  New Install\n"
+"root   (hd0,0)\n"
+"kernel /boot/newinstall/vmlinuz\n"
+"initrd /boot/newinstall/initrd.gz"
 
 #. Tag: para
 #: boot-installer.xml:488
 #, no-c-format
 msgid "The procedure for <command>GRUB2</command> is very similar. The file is named <filename>grub.cfg</filename> instead of <filename>menu.lst</filename>. An entry for the installer would be for instance for example:"
-msgstr ""
+msgstr "Proceduren for <command>GRUB2</command> er meget lignende. Filen hedder <filename>grub.cfg</filename> i stedet for <filename>menu.lst</filename>. En post for installationsprogrammet ville for eksempel være:"
 
 #. Tag: screen
 #: boot-installer.xml:494
@@ -486,132 +492,147 @@ msgid ""
 "initrd /boot/newinstall/initrd.gz\n"
 "}"
 msgstr ""
+"menuentry 'New Install' {\n"
+"insmod part_msdos\n"
+"insmod ext2\n"
+"set root='(hd0,msdos1)'\n"
+"linux /boot/newinstall/vmlinuz\n"
+"initrd /boot/newinstall/initrd.gz\n"
+"}"
 
 #. Tag: para
 #: boot-installer.xml:496
 #, no-c-format
 msgid "From here on, there should be no difference between <command>GRUB</command> or <command>LILO</command>."
-msgstr ""
+msgstr "Herfra bør der ikke være forskel på <command>GRUB</command> eller <command>LILO</command>."
 
 #. Tag: title
 #: boot-installer.xml:505
 #, no-c-format
 msgid "Booting from USB Memory Stick"
-msgstr ""
+msgstr "Opstart fra USB-drev"
 
 #. Tag: para
 #: boot-installer.xml:506
 #, no-c-format
 msgid "Let's assume you have prepared everything from <xref linkend=\"boot-dev-select\"/> and <xref linkend=\"boot-usb-files\"/>. Now just plug your USB stick into some free USB connector and reboot the computer. The system should boot up, and unless you have used the flexible way to build the stick and not enabled it, you should be presented with the <prompt>boot:</prompt> prompt. Here you can enter optional boot arguments, or just hit &enterkey;."
 msgstr ""
+"Lad os antage, at du har forberedt alt fra <xref linkend=\"boot-dev-select\"/> og <xref linkend=\"boot-usb-files\"/>. Indsæt dit USB-drev i en ledig indgang og genstart computeren. Systemet bør starte op, og med mindre du har brugt den fleksible måde til at bygge drevet med og ikke aktiveret det, vil du blive præsenteret for prompten <prompt>boot:</prompt>. Her kan du indtaste valgfrie opstartsargumenter, eller bare trykke på &enterkey;."
 
 #. Tag: title
 #: boot-installer.xml:520 boot-installer.xml:1676
 #, no-c-format
 msgid "Booting from Floppies"
-msgstr ""
+msgstr "Opstart fra disketter"
 
 #. Tag: para
 #: boot-installer.xml:521 boot-installer.xml:1684
 #, no-c-format
 msgid "You will have already downloaded the floppy images you needed and created floppies from the images in <xref linkend=\"create-floppy\"/>."
-msgstr ""
+msgstr "Du skal have hentet disketteaftrykkene og oprettet disketter ud fra aftrykkene i <xref linkend=\"create-floppy\"/>."
 
 #. Tag: para
 #: boot-installer.xml:528
 #, no-c-format
 msgid "To boot from the installer boot floppy, place it in the primary floppy drive, shut down the system as you normally would, then turn it back on."
-msgstr ""
+msgstr "For at starte op fra installationsdisketten, så placer den i det primære diskettedrev, luk systemet ned som normalt, og tænd det så igen."
 
 #. Tag: para
 #: boot-installer.xml:534
 #, no-c-format
 msgid "For installing from an LS-120 drive (ATAPI version) with a set of floppies, you need to specify the virtual location for the floppy device. This is done with the <emphasis>root=</emphasis> boot argument, giving the device that the ide-floppy driver maps the device to. For example, if your LS-120 drive is connected as the first IDE device (master) on the second cable, you enter <userinput>install root=/dev/hdc</userinput> at the boot prompt."
 msgstr ""
+"For at installere fra et LS-120-drev (ATAPI-version) med et sæt disketter, så skal du angive den virtuelle placering for diskettedrevet. Dette gøres med opstartsargumentet <emphasis>root=</emphasis>, der skal have enheden som ide-floppy-enheden placerer enheden på. For eksempel, hvis dit LS-120-drev er forbundet som den første IDE-enhed (master) på det andet kabel, så indtaster du <userinput>install root=/dev/hdc</userinput> ved opstartsprompten."
 
 #. Tag: para
 #: boot-installer.xml:544
 #, no-c-format
 msgid "Note that on some machines, <keycombo><keycap>Control</keycap> <keycap>Alt</keycap> <keycap>Delete</keycap></keycombo> does not properly reset the machine, so a <quote>hard</quote> reboot is recommended. If you are installing from an existing operating system (e.g., from a DOS box) you don't have a choice. Otherwise, please do a hard reboot when booting."
 msgstr ""
+"Bemærk at på nogle maskiner nulstiller <keycombo><keycap>Control</keycap> <keycap>Alt</keycap> <keycap>Delete</keycap></keycombo> ikke korrekt maskinen, så en quote>hård</quote> genstart anbefales. Hvis du installerer fra et eksiterende operativsystem (f.eks. fra en DOS-boks) så har du ikke et valg. Ellers udfør en hård genstart ved opstart."
 
 #. Tag: para
 #: boot-installer.xml:553
 #, no-c-format
 msgid "The floppy disk will be accessed, and you should then see a screen that introduces the boot floppy and ends with the <prompt>boot:</prompt> prompt."
 msgstr ""
+"Disketten vil blive tilgået, og du bør se en skærm som introducerer opstartsdisketten og slutter med prompten <prompt>boot:</prompt>."
 
 #. Tag: para
 #: boot-installer.xml:559
 #, no-c-format
 msgid "Once you press &enterkey;, you should see the message <computeroutput>Loading...</computeroutput>, followed by <computeroutput>Uncompressing Linux...</computeroutput>, and then a screenfull or so of information about the hardware in your system. More information on this phase of the boot process can be found below in <xref linkend=\"kernel-msgs\"/>."
 msgstr ""
+"Når du trykker &enterkey;, bør du se beskeden <computeroutput>Loading...</computeroutput>, efterfulgt af <computeroutput>Uncompressing Linux...</computeroutput>, og så cirka en skærmfuld af information om udstyret i dit system. Yderligere information om denne fase ved opstartsprocessen kan findes nedenfor i <xref linkend=\"kernel-msgs\"/>."
 
 #. Tag: para
 #: boot-installer.xml:568
 #, no-c-format
 msgid "After booting from the boot floppy, the root floppy is requested. Insert the root floppy and press &enterkey;, and the contents are loaded into memory. The installer program <command>debian-installer</command> is automatically launched."
 msgstr ""
+"Efter opstart fra disketten, bliver du anmodt om root-diskken. Indsæt root-disketten og tryk &enterkey;, og indholdet læses ind i hukommelsen. Installationsprogrammet <command>debian-installer</command> igangsættes automatisk."
 
 #. Tag: title
 #: boot-installer.xml:578 boot-installer.xml:1108 boot-installer.xml:1249 boot-installer.xml:1303 boot-installer.xml:1621 boot-installer.xml:1730
 #, no-c-format
 msgid "Booting with TFTP"
-msgstr ""
+msgstr "Opstart med TFTP"
 
 #. Tag: para
 #: boot-installer.xml:602
 #, no-c-format
 msgid "There are various ways to do a TFTP boot on i386."
-msgstr ""
+msgstr "Der er forskellige måder at udføre en TFTP-opstart på i386."
 
 #. Tag: title
 #: boot-installer.xml:608
 #, no-c-format
 msgid "NIC or Motherboard that support PXE"
-msgstr ""
+msgstr "NIC eller bundkort som understøtter PXE"
 
 #. Tag: para
 #: boot-installer.xml:609
 #, no-c-format
 msgid "It could be that your Network Interface Card or Motherboard provides PXE boot functionality. This is a <trademark class=\"trade\">Intel</trademark> re-implementation of TFTP boot. If so, you may be able to configure your BIOS to boot from the network."
 msgstr ""
+"Det kan være at dit netværkskort eller bundkort tilbyder en PXE-opstartsfunktion. Dette er en <trademark class=\"trade\">Intel</trademark>-reimplementering af TFTP-opstart. Hvis det er tilfældet kan du måske konfigurere din BIOS til at starte op fra netværket."
 
 #. Tag: title
 #: boot-installer.xml:620
 #, no-c-format
 msgid "NIC with Network BootROM"
-msgstr ""
+msgstr "NIC med netværks-BootROM"
 
 #. Tag: para
 #: boot-installer.xml:621
 #, no-c-format
 msgid "It could be that your Network Interface Card provides TFTP boot functionality."
-msgstr ""
+msgstr "Det kan være at dit netværkskort tilbyder TFTP-opstartfunktionalitet."
 
 #. Tag: para
 #: boot-installer.xml:626
 #, no-c-format
 msgid "Let us (<email>&email-debian-boot-list;</email>) know how did you manage it. Please refer to this document."
-msgstr ""
+msgstr "Lad os (<email>&email-debian-boot-list;</email>) høre om hvordan du håndterede det. Henvis til dette dokument."
 
 #. Tag: title
 #: boot-installer.xml:634
 #, no-c-format
 msgid "Etherboot"
-msgstr ""
+msgstr "Etherboot"
 
 #. Tag: para
 #: boot-installer.xml:635
 #, no-c-format
 msgid "The <ulink url=\"http://www.etherboot.org\">etherboot project</ulink> provides bootdiskettes and even bootroms that do a TFTPboot."
 msgstr ""
+"<ulink url=\"http://www.etherboot.org\">Etherbootprojektet</ulink> tilbyder opstartsdisketter og endda bootrom'er som udfører en TFTPboot."
 
 #. Tag: title
 #: boot-installer.xml:645
 #, no-c-format
 msgid "The Boot Screen"
-msgstr ""
+msgstr "Opstartsskærmen"
 
 #. Tag: para
 #: boot-installer.xml:646
@@ -629,24 +650,38 @@ msgid ""
 "Press ENTER to boot or TAB to edit a menu entry\n"
 "</screen></informalexample> Depending on the installation method you are using, the <quote>Graphical install</quote> option may not be available. Bi-arch images additionally have a 64 bit variant for each install option, right below it, thus almost doubling the number of options."
 msgstr ""
+"Når installationsprogramemt starter op, bliver du præsneteret for en venlig grafisk skræm der viser &debian;s logo og en  menu: <informalexample><screen>\n"
+"Installer boot menu\n"
+"\n"
+"Install\n"
+"Graphical install\n"
+"Advanced options >\n"
+"Help\n"
+"Install with speech synthesis\n"
+"\n"
+"Tryk RETUR for at starte op eller TAB for at redigere et menupunkt\n"
+"</screen></informalexample> Afhængig af den valgte installationsmetode, kan <quote>Graphical install</quote> mangle. Flerarkitekturaftryk har desuden en 64-bit-variant for hver installationsmulighed, lige nedenfor, hvilket næsten fordobler antallet af muligheder."
 
 #. Tag: para
 #: boot-installer.xml:658
 #, no-c-format
 msgid "For a normal installation, select either the <quote>Install</quote> or the <quote>Graphical install</quote> entry &mdash; using either the arrow keys on your keyboard or by typing the first (highlighted) letter, the <quote>Install</quote> entry is already selected by default &mdash; and press &enterkey; to boot the installer."
 msgstr ""
+"For en normal installation, vælg enten punktet <quote>Installer</quote> eller <quote>Grafisk installation</quote> &mdash; med brug af enten piletasterne på dit tastatur eller ved at indtaste det første (fremhævede) bogstav, punktet <quote>Installer</quote> er allerede valgt som standard &mdash; og tryk på &enterkey; for at opstarte installationsprogrammet."
 
 #. Tag: para
 #: boot-installer.xml:666
 #, no-c-format
 msgid "The <quote>Advanced options</quote> entry gives access to a second menu that allows to boot the installer in expert mode, in rescue mode and for automated installs."
 msgstr ""
+"Punktet <quote>Avancerede indstillinger</quote> giver adgang til en anden menu, som giver mulighed for at opstarte installationsprogrammet i tilstanden ekspert, i redningstilstand og for automatiserede installationer."
 
 #. Tag: para
 #: boot-installer.xml:672
 #, no-c-format
 msgid "If you wish or need to add any boot parameters for either the installer or the kernel, press &tabkey;. This will display the default boot command for the selected menu entry and allow to add additional options. The help screens (see below) list some common possible options. Press &enterkey; to boot the installer with your options; pressing &escapekey; will return you to the boot menu and undo any changes you made."
 msgstr ""
+"Hvis du ønsker eller har brug for at tilføje opstartsparametre for enten installationsprogrammet ellre kernen, så tryk &tabkey;. Dette vil vise den normale opstartskommando for det valgte menupunkt og give mulighed for at tilføje yderligere indstillinger. Hjælpeskærmene (se nedenfor) viser nogle gængse indstillingsmuligheder. Tryk &enterkey; for at starte installationsprogrammet op med dine indstillinger; et tryk på &escapekey; vil returnere dig til opstartsmenuen og omgøre eventuelle ændringer du har foretaget."
 
 #. Tag: para
 #: boot-installer.xml:681
@@ -656,24 +691,30 @@ msgid ""
 "Press F1 for the help index, or ENTER to boot:\n"
 "</screen></informalexample> At this boot prompt you can either just press &enterkey; to boot the installer with default options or enter a specific boot command and, optionally, boot parameters. A number of boot parameters which might be useful can be found on the various help screens. If you do add any parameters to the boot command line, be sure to first type the boot method (the default is <userinput>install</userinput>) and a space before the first parameter (e.g., <userinput>install fb=false</userinput>)."
 msgstr ""
+"Valg af punktet <quote>Hjælp</quote> vil resultere i at den første hjælpeskærm bliver vist, hvilket giver et overblik over alle tilgængelige hjælpeskærme. Bemærkt at det ikke er muligt at returnere til opstartsmenuen efter at hjælpeskærmene er blevet vist. F3- og F4-hjælpeskærmene viser dog kommandoer som svarer til opstartsmetoderne vist i menuen. Alle hjælpeskærme har en opstartsprompt hvor opstartskommandoen kan indtastes: <informalexample><screen>\n"
+"Tryk F1 for hjælpeindeks, eller RETUR for at starte op:\n"
+"</screen></informalexample> Ved denne opstartsprompt kan du enten bare trykke &enterkey; for at igangsætte opstartsprogrammet med standardindstillinger eller indtaste en specifik opstartskommando og - valgfrit - opstartsparametre. Et antal opstartsparametere som kan være nyttige kan findes på de forskellige hjælpeskærme. Hvis du tilføjer parametre til opstartskommandolinjen, så være sikker på først at indtaste opstartsmetoden (standarden er <userinput>install</userinput>) og et mellemrum før den første parameter (f.eks. <userinput>install fb=false</userinput>)."
 
 #. Tag: para
 #: boot-installer.xml:700
 #, no-c-format
 msgid "The keyboard is assumed to have a default American English layout at this point. This means that if your keyboard has a different (language-specific) layout, the characters that appear on the screen may be different from what you'd expect when you type parameters. Wikipedia has a <ulink url=\"&url-us-keymap;\">schema of the US keyboard layout</ulink> which can be used as a reference to find the correct keys to use."
 msgstr ""
+"Tastaturet antages at have det normale amerikansk-engelske layout på dette tidspunkt. Dette betyder at hvis dit tastatur har et andet (sprogspecifik) layout, kan tegnene som skrives på skærmen være forskellige fra hvad du forventer, når du indtaster parametere. Wikipedia har et <ulink url=\"&url-us-keymap;\">skema for US-tastaturlayout</link>, som kan bruges som en reference til at finde de korrekte taster."
 
 #. Tag: para
 #: boot-installer.xml:710
 #, no-c-format
 msgid "If you are using a system that has the BIOS configured to use serial console, you may not be able to see the initial graphical splash screen upon booting the installer; you may even not see the boot menu. The same can happen if you are installing the system via a remote management device that provides a text interface to the VGA console. Examples of these devices include the text console of Compaq's <quote>integrated Lights Out</quote> (iLO) and HP's <quote>Integrated Remote Assistant</quote> (IRA)."
 msgstr ""
+"Hvis du bruger et sytsem som har BIOS'en konfigureret til at bruge seriel konsol, så kan du måske se den grafiske opstartsskærm før installationsprogrammet indlæses; du ser måske slet ikke opstartsmenuen. Det samme kan ske hvis du installerer systemet via en ekstern håndteringsenhed, som tilbyder en tekstgrænseflade til VGA-konsollen. Eksempler på disse enheder inkluderer tekstkonsollen for Compaqs  <quote>integrated Lights Out</quote> (iLO) og HP's <quote>Integrated Remote Assistant</quote> (IRA)."
 
 #. Tag: para
 #: boot-installer.xml:720
 #, no-c-format
 msgid "To bypass the graphical boot screen you can either blindly press &escapekey; to get a text boot prompt, or (equally blindly) press <quote>H</quote> followed by &enterkey; to select the <quote>Help</quote> option described above. After that your keystrokes should be echoed at the prompt. To prevent the installer from using the framebuffer for the rest of the installation, you will also want to add <userinput>vga=normal fb=false</userinput> to the boot prompt, as described in the help text."
 msgstr ""
+"For at forbigå den grafiske opstartsskærm kan du enten blindt indtaste &escapekey; for at få en tekstopstartsprompt, eller (lige så blindt) taste <quote>H</quote> efterfulgt af &enterkey; for at vælge indstillingen <quote>Hjælp</quote> beskrevet ovenfor. Herefter bør dine tastaturtryk blive gengivet på prompten. For at forhindre installationsprogramet i at bruge framebufferen i resten af installationen, skal du også tilføje <userinput>vga=normal fb=false</userinput> til opstartsprompten, som beskrevet i hjælpeteksten."
 
 #. Tag: title
 #: boot-installer.xml:780
@@ -686,72 +727,82 @@ msgstr ""
 #, no-c-format
 msgid "There are three basic variations of &debian; Install CDs. The <emphasis>Business Card</emphasis> CD has a minimal installation that will fit on the small form factor CD media. It requires a network connection in order to install the rest of the base installation and make a usable system. The <emphasis>Network Install</emphasis> CD has all of the packages for a base install but requires a network connection to a &debian; mirror site in order to install the extra packages one would want for a complete system . The set of &debian; CDs can install a complete system from the wide range of packages without needing access to the network."
 msgstr ""
+"Der er tre grundlæggende variationer af installations-cd'er for &debian;. <emphasis>Forretningskort</emphasis>-cd'en har en minimal installation, som vil passe på det lille form factor cd-medie. Det kræver et netværksforbindelse for at installere resten af det grundlæggende installation og få et brugbart system. <emphasis>Netværksinstallations</emphasis>-cd'en har alle pakkerne for en grundlæggende installation men kræver en netværksforbindelse til en &debian;-spejlside for at installere ekstra pakker der kan  udgøre et fuldstændigt system. Sættet af &debian;-cd'er kan installere et fuldstændig system fra det brede udvalg af apkker uden at kræve adgang til netværket."
 
 #. Tag: para
 #: boot-installer.xml:798
 #, no-c-format
 msgid "The IA-64 architecture uses the next generation Extensible Firmware Interface (EFI) from Intel. Unlike the traditional x86 BIOS which knows little about the boot device other than the partition table and Master Boot Record (MBR), EFI can read and write files from FAT16 or FAT32 formatted disk partitions. This simplifies the often arcane process of starting a system. The system boot loader and the EFI firmware that supports it have a full filesystem to store the files necessary for booting the machine. This means that the system disk on an IA-64 system has an additional disk partition dedicated to EFI instead of the simple MBR or boot block on more conventional systems."
 msgstr ""
+"IA-64-arkitekturen bruger den næste generations Extensible Firmware Interface (EFI) fra Intel. Til forskel fra den traditionelle x86 BIOS, som ikke kender meget til opstartsenheden udover partitionstabellen og Master Boot Record (MBR), kan EFI læse og skrive filer fra FAT16 eller FAT32-formatterede diskpartitioner. Dette forenkler den ofte omfangsrige proces ved at starte et system. Systemets opstartsindlæser og EFI-firmwaren som understøtter den har et fuldt filsystem til at gemme de nødvendige filer for opstart af maskinen. Dette betyder at systemdisken på et IA-64-system har en yderligere diskpartiiton dedikeret til EFI i stedet for den simple MBR eller opstartsblok for mere konventionelle systemer."
 
 #. Tag: para
 #: boot-installer.xml:814
 #, no-c-format
 msgid "The &debian; Installer CD contains a small EFI partition where the <command>ELILO</command> bootloader, its configuration file, the installer's kernel, and initial filesystem (initrd) are located. The running system also contains an EFI partition where the necessary files for booting the system reside. These files are readable from the EFI Shell as described below."
 msgstr ""
+"&debian;-installations-cd'en indeholder en lille EFI-partition hvor <command>ELILO</command>-opstartsindlæseren, dens konfigurationsfil, installationsprogrammets kerne og det oprindelige filsystem (initrd) er placeret. Det kørende system indeholder også en EFI-partition hvor de nødvendige filer for opstart af systemet befinder sig. Disse filer er læsbare fra EFI-skallen som beskrevet nedenfor."
 
 #. Tag: para
 #: boot-installer.xml:823
 #, no-c-format
 msgid "Most of the details of how <command>ELILO</command> actually loads and starts a system are transparent to the system installer. However, the installer must set up an EFI partition prior to installing the base system. Otherwise, the installation of <command>ELILO</command> will fail, rendering the system un-bootable. The EFI partition is allocated and formatted in the partitioning step of the installation prior to loading any packages on the system disk. The partitioning task also verifies that a suitable EFI partition is present before allowing the installation to proceed."
 msgstr ""
+"De fleste detaljer om hvordan <command>ELILO</command> faktisk indlæser og starter et system er gennemsigtige for systemets installationsprogram. Installationsprogrammet skal dog opsætte en EFI-partition før det grundlægende system installeres. Ellers vil installationen af <command>ELILO</command> mislykkes, og medføre at systemet ikke kan startes op. EFI-partitionen er placeret og formateret i partitioneringstrinet for installationen før der indlæses pakker på systemdisken. Partitioneringsopgaven verificerer også at en egnet EFI-partition er til stede før installationen får lov til at fortsætte."
 
 #. Tag: para
 #: boot-installer.xml:835
 #, no-c-format
 msgid "The EFI Boot Manager is presented as the last step of the firmware initialization. It displays a menu list from which the user can select an option. Depending on the model of system and what other software has been loaded on the system, this menu may be different from one system to another. There should be at least two menu items displayed, <command>Boot Option Maintenance Menu</command> and <command>EFI Shell (Built-in)</command>. Using the first option is preferred, however, if that option is not available or the CD for some reason does not boot with it, use the second option."
 msgstr ""
+"EFI-opstartshåndteringen præsenteres ved det sidste trin i firmware-initialiseringen. Den viser en menuliste hvorfra brugeren kan foretage et valg. Afhængig af systemmodellen og hvilke andre programmer der er blevet indlæst på systemet, kan denne menu være forskellig fra et system til et andet. Der skal være mindst to menupunkter vist, <command>Vedligeholdelsesmenu for opstartsindstillinger</command> og <command>EFI-skal (indbygget)</command>. Brug af den første indstilling foretrækkes, hvis denne indstilling ikke er tilgængelig eller cd'en af en eller anden grund ikke starter med den, så brug den anden indstilling."
 
 #. Tag: title
 #: boot-installer.xml:854
 #, no-c-format
 msgid "IMPORTANT"
-msgstr ""
+msgstr "VIGTIGT"
 
 #. Tag: para
 #: boot-installer.xml:855
 #, no-c-format
 msgid "The EFI Boot Manager will select a default boot action, typically the first menu choice, within a pre-set number of seconds. This is indicated by a countdown at the bottom of the screen. Once the timer expires and the systems starts the default action, you may have to reboot the machine in order to continue the installation. If the default action is the EFI Shell, you can return to the Boot Manager by running <command>exit</command> at the shell prompt."
 msgstr ""
+"EFI-opstartshåndteringen vil vælge en standardhandling for opstarten, typisk det første menuvalg, inden for et prædefineret antal sekunder. Dette vises med en nedtælling i bunden af skærmen. Når tidsmåleren udløber og systemet starter standardhandlingen, skal du måske genstarte maskinene for at fortsætte installationen. Hvis standardhandlingen er EFI-skallen, kan du returnere til opstartshåndteirngen ved at køre <command>exit</command> i skalprompten."
 
 #. Tag: title
 #: boot-installer.xml:867
 #, no-c-format
 msgid "Option 1: Booting from the Boot Option Maintenance Menu"
-msgstr ""
+msgstr "Valg 1: Opstart fra vedligeholdelsesmenuen for opstartsindstillinger"
 
 #. Tag: para
 #: boot-installer.xml:874
 #, no-c-format
 msgid "Insert the CD in the DVD/CD drive and reboot the machine. The firmware will display the EFI Boot Manager page and menu after it completes its system initialization."
 msgstr ""
+"Indsæt cd'en i dvd/cd-drevet og genstart maskinen. Firmwaren vil vise siden for EFI-opstartshåndteringen og menuen efter at den færdiggør dets systeminitialisering."
 
 #. Tag: para
 #: boot-installer.xml:880
 #, no-c-format
 msgid "Select <command>Boot Maintenance Menu</command> from the menu with the arrow keys and press <command>ENTER</command>. This will display a new menu."
 msgstr ""
+"Vælg <command>Menu for opstartsvedligeholdelse</command> fra menuen med piletasterne og tryk på <command>RETUR</command>. Dette vil vise en ny menu."
 
 #. Tag: para
 #: boot-installer.xml:886
 #, no-c-format
 msgid "Select <command>Boot From a File</command> from the menu with the arrow keys and press <command>ENTER</command>. This will display a list of devices probed by the firmware. You should see two menu lines containing either the label <command>Debian Inst [Acpi ...</command> or <command>Removable Media Boot</command>. If you examine the rest of the menu line, you will notice that the device and controller information should be the same."
 msgstr ""
+"Vælg <command>Start op fra en fil</command> fra menuen med piletasterne og tryk på <command>RETUR</command>. Dette vil vise en liste over enheder undersøgt af firmwaren. Du bør se to menulinjer der indeholder enten etiketten <command>Debian Inst [Acpi ...</command> eller <command>Eksternt medieopstart</command>. Hvis du undersøger resten af menulinjen, vil du bemærke at enheds- og controllerinformationen bør være ens."
 
 #. Tag: para
 #: boot-installer.xml:897
 #, no-c-format
 msgid "You can choose either of the entries that refer to the CD/DVD drive. Select your choice with the arrow keys and press <command>ENTER</command>. If you choose <command>Removable Media Boot</command> the machine will immediately start the boot load sequence. If you choose <command>Debian Inst [Acpi ...</command> instead, it will display a directory listing of the bootable portion of the CD, requiring you to proceed to the next (additional) step."
 msgstr ""
+"Du kan vælge en af punkterne som refererer til cd/dvd-drevet. Foretag dit valg med piletasterne og tryk på <command>RETUR</command>. Hvis du vælger <command>Eksternt medieopstart</command> så vil maskinen igangsætte opstartsindlæsningssekvensen. Hvis du vælger <command>Debian Inst [Acpi ...</command> i stedet for, så vil den vise en mappe over opstartsdelen af cd'en, hvor det bliver krævet at du fortsætter til næste (yderligere) trin."
 
 #. Tag: para
 #: boot-installer.xml:908
