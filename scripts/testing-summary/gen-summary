@@ -18,6 +18,7 @@ my %bin_nmu;
 my %frozen;
 my %has_debs;
 my @annotations;
+my %ages;
 
 sub markup {
 	my $text=shift;
@@ -207,6 +208,21 @@ if (open (FREEZE, "freeze")) {
 	print STDERR "failed to read frozen packages file: $!\n";
 }
 
+# Read ages, mimicking britney's computation:
+#   # britney's "day" begins at 3pm
+#   self.date_now = int(((time.time() / (60*60)) - 15) / 24)
+if (open (DATES, "Dates")) {
+	my $now = int(((time / (60*60)) - 15 ) / 24);
+	while (<DATES>) {
+		if (/^(\S+) (\S+) (\S+)$/) {
+			my ($package, $version, $days) = ($1, $2, $3);
+			$ages{$package} = $now-$days;
+		}
+	}
+} else {
+	print STDERR "failed to read Dates file: $!\n";
+}
+
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
 print "<h1>udeb testing summary</h1>\n";
@@ -246,21 +262,7 @@ foreach my $package (sort keys %seenpackages) {
 				}
 			}
 		}
-		# Looking at the file modification date may not be
-		# safe. FIXME
-		my $minage;
-		foreach my $file (@{$poolfiles{$package}{$some_arch}}) {
-			my $age=-M $mirror.$file;
-			if (defined $age && (! defined $minage || $minage > $age)) {
-				$minage=$age;
-			}
-		}
-		if (! defined $minage) {
-			$minage="unknown";
-		}
-		else {
-			$minage=int($minage);
-		}
+		my $minage = $ages{$package} || 'unknown';
 		print "<td>".$minage."</td>";
 		if (exists $frozen{$package}) {
 			print "<td align=\"center\">yes</td>";
