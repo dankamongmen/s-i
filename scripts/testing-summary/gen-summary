@@ -79,6 +79,26 @@ sub encode_str {
 	$str =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 }
 
+# Sync files from release.debian.org:
+# - dates
+unlink 'Dates';
+`wget -q http://release.debian.org/britney/data-b2/Dates`;
+# - hints
+unlink <hints/*>;
+my $hints_url = 'http://release.debian.org/britney/hints/';
+`wget -q -P hints $hints_url`;
+open my $hints_file, '<', 'hints/index.html'
+	or die "Unable to open hints file";
+while (<$hints_file>) {
+	if (m{<li><a href="(.*)">\1</a></li>}) {
+		next if $1 eq 'README' or $1 eq 'satbritney';
+		`wget -q -P hints $hints_url/$1`;
+	}
+}
+close $hints_file
+	or die "Unable to close hints file";
+
+
 foreach my $dist (@dists) {
 	foreach my $arch (@arches) {
 		my $pkgfile="$mirror/dists/$dist/main/debian-installer/binary-$arch/Packages.gz";
