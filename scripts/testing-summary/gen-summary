@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use File::Basename;
+
 my $mirror=shift || "/org/ftp.debian.org/ftp/";
 # only the arches we care about
 my @arches=qw(amd64 armel armhf i386 ia64 kfreebsd-amd64 kfreebsd-i386 mips mipsel powerpc s390 s390x sparc);
@@ -223,6 +225,51 @@ if (open (DATES, "Dates")) {
 	print STDERR "failed to read Dates file: $!\n";
 }
 
+my %normal_unblocks;
+my %udeb_unblocks;
+my %age_days;
+for my $hint_file (<hints/*>) {
+	open my $fh, '<', "$hint_file"
+		or die "Unable to open $hint_file";
+	my $hinter = basename($hint_file);
+	while (my $line = <$fh>) {
+		# Skip a bunch of things we don't care about:
+		next if $line =~ /^\s*#/;
+		next if $line =~ /^\s*$/;
+		# End here:
+		last if $line =~ /^finished/;
+		# Interesting things start here:
+		if ($line =~ /^unblock\s+(.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$normal_unblocks{$p}}, $hinter;
+			}
+			next;
+		}
+		if ($line =~ /^unblock-udeb\s+(.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$udeb_unblocks{$p}}, $hinter;
+			}
+			next;
+		}
+		if ($line =~ /^age-days (\d+) (.*)/) {
+			for my $p (split /\s+/, $2) {
+				push @{$age_days{$p}}, "$hinter: $1";
+			}
+			next;
+		}
+		if ($line =~ /^urgent (.*)/) {
+			for my $p (split /\s+/, $1) {
+				push @{$age_days{$p}}, "$hinter: U";
+			}
+			next;
+		}
+		#print "Unused: [$h] $line";
+	}
+	close $fh
+		or die "Unable to close $hint_file";
+}
+
+
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
 print "<h1>udeb testing summary</h1>\n";
@@ -231,7 +278,7 @@ print "<table border=1><tr align=left><th>source package</th><th>debs</th><th>ar
 foreach my $dist (@dists) {
 	print "<th>$dist</th>";
 }
-print "<th>age (days)</th><th>frozen</th><th>utils</th></tr>\n";
+print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>udeb-unblock</th><th>age-days</th><th>utils</th></tr>\n";
 my $numcols=5 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
@@ -245,6 +292,7 @@ foreach my $package (sort keys %seenpackages) {
 		print "<td>".archname(@{$transitions{$package}{$transition}})."</td>";
 		my $some_arch=@{$transitions{$package}{$transition}}[0];
 		my @vers;
+		my $unstable_version;
 		foreach my $dist (@dists) {
 			my $version=$packageversions{$package}{$dist}{$some_arch};
 			if (! defined $version) {
@@ -259,6 +307,7 @@ foreach my $package (sort keys %seenpackages) {
 				}
 				else {
 					print "<td><a href=\"http://packages.debian.org/changelog:$package\">$version</a></td>";
+					$unstable_version = $version;
 				}
 			}
 		}
@@ -269,6 +318,11 @@ foreach my $package (sort keys %seenpackages) {
 		} else {
 			print "<td align=\"center\"><font color=\"red\">NO</font></td>";
 		}
+
+		print "<td>" . (join('<br>', @{$normal_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
+		print "<td>" . (join('<br>', @{$udeb_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
+		print "<td>" . (join('<br>', @{$age_days{"$package/$unstable_version"}||[]})) . "</td>";
+
 		print "<td><a href=\"http://release.debian.org/migration/testing.pl?package=$package\">t</a>
                <a href=\"http://buildd.debian.org/status/package.php?p=$package\">b</a>
                <a href=\"http://packages.qa.debian.org/$package\">s</a></td>";
