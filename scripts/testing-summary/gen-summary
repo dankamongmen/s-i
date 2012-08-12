@@ -7,6 +7,14 @@ use File::Basename;
 use File::Path;
 
 my $mirror=shift || "/org/ftp.debian.org/ftp/";
+# Die now if a local mirror can't be found:
+if ($mirror =~ m{^/} and ! -d $mirror) {
+	print STDERR "The local mirror $mirror can't be found, please specify another mirror.\n";
+	print STDERR "Example for a remote mirror: $0 http://ftp.fr.debian.org/debian\n";
+	print STDERR "Example for a local  mirror: $0 /srv/mirror/debian/\n";
+	exit 1;
+}
+
 # only the arches we care about
 my @arches=qw(amd64 armel armhf i386 ia64 kfreebsd-amd64 kfreebsd-i386 mips mipsel powerpc s390 s390x sparc);
 my @dists=qw(testing unstable);
