@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use File::Basename;
+use File::Path;
 
 my $mirror=shift || "/org/ftp.debian.org/ftp/";
 # only the arches we care about
@@ -101,7 +102,17 @@ close $hints_file
 
 foreach my $dist (@dists) {
 	foreach my $arch (@arches) {
-		my $pkgfile="$mirror/dists/$dist/main/debian-installer/binary-$arch/Packages.gz";
+		my $pkgdir  = "dists/$dist/main/debian-installer/binary-$arch";
+		my $pkgfile = "$pkgdir/Packages.gz";
+		# If not a local mirror, remove a (possible) file from
+		# a previous run and download again:
+		if ($mirror !~ m{^/}) {
+			unlink $pkgfile;
+			`wget -q -P $pkgdir $mirror/$pkgfile`;
+		}
+		else {
+			$pkgfile = "$mirror/$pkgfile";
+		}
 		open(PKG, "zcat $pkgfile |") || die "cannot read $pkgfile: $!";
 		local $/="\n\n";
 		while (<PKG>) {
