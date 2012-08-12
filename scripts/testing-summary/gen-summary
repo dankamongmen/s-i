@@ -113,7 +113,7 @@ foreach my $dist (@dists) {
 					}
 					$version =~ s/\+b[1-9]$//
 				}
-				if ($dist eq 'testing' && 
+				if ($dist eq 'testing' &&
 				    exists $packageversions{$source}{$dist}{$arch} &&
 				    $packageversions{$source}{$dist}{$arch} ne $version) {
 					if (! $inconsistent{$source}) {
@@ -138,7 +138,7 @@ foreach my $dist (@dists) {
 }
 
 # Process exceptions for source packages with debs
-if (open (EXC, "deb-exceptions")) { 
+if (open (EXC, "deb-exceptions")) {
 	while (<EXC>) {
 		next if /^#/;
 		next unless length;
@@ -171,7 +171,7 @@ foreach my $package (keys %seenpackages) {
 		foreach my $key (keys %seen) {
 			$dup=1 if $seen{$key} > 1;
 		}
-		
+
 		push @{$transitions{$package}{$key}}, $arch if ! $dup && %seen;
 	}
 }
@@ -226,7 +226,7 @@ if (open (DATES, "Dates")) {
 print "<html><head><title>udeb testing summary</title></head><body>\n";
 
 print "<h1>udeb testing summary</h1>\n";
-	
+
 print "<table border=1><tr align=left><th>source package</th><th>debs</th><th>arches</th>";
 foreach my $dist (@dists) {
 	print "<th>$dist</th>";
@@ -273,9 +273,9 @@ foreach my $package (sort keys %seenpackages) {
                <a href=\"http://buildd.debian.org/status/package.php?p=$package\">b</a>
                <a href=\"http://packages.qa.debian.org/$package\">s</a></td>";
 		print "</tr>\n";
-			
+
 		foreach my $ann (@annotations) {
-			if ($package eq $ann->{package} && 
+			if ($package eq $ann->{package} &&
 			    (! exists $ann->{version} || between_versions($ann->{version}, $vers[0], $vers[1])) &&
 			    (! exists $ann->{arch} || grep $ann->{arch}, @{$transitions{$package}{$transition}}[0])) {
 				print "<tr><td></td><td colspan=".($numcols-1)."><b>$ann->{annotation}</b>";
@@ -290,7 +290,7 @@ foreach my $package (sort keys %seenpackages) {
 		}
 	}
 }
-	
+
 print "</table><hr>\n";
 
 my $date=`LANG=C TZ=GMT date`;
