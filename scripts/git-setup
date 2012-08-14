@@ -17,12 +17,12 @@ config_git_auth () {
 	runshow git config --global 'url.git+ssh://git.debian.org/git/d-i/.pushInsteadOf' 'git+ssh://git.debian.org/git/d-i/'
 }
 
-URL=$(LANG=C svn info| grep '^URL' | awk '{print $2}')
+URL=$(LANG=C git remote -v | cut -f2)
 case "$URL" in
-	svn+ssh*)
+	git@*)
 		config_git_auth
 	;;
-	svn*|http*)
+	http:*|https:*)
 		config_git_anon
 	;;
 	*)
