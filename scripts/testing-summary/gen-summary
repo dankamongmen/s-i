@@ -317,7 +317,7 @@ print "<table border=1><tr align=left><th>source package</th><th>debs</th><th>ar
 foreach my $dist (@dists) {
 	print "<th>$dist</th>";
 }
-print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>udeb-unblock</th><th>age-days</th><th>utils</th></tr>\n";
+print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>udeb-unblock</th><th>age-days</th><th>commits in git</th><th>utils</th></tr>\n";
 my $numcols=5 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
@@ -366,6 +366,14 @@ foreach my $package (sort keys %seenpackages) {
                <a href=\"http://buildd.debian.org/status/package.php?p=$package\">b</a>
                <a href=\"http://packages.qa.debian.org/$package\">s</a></td>";
 		print "</tr>\n";
+
+		my $commits = '?';
+		my $gitdir = "../../packages/$package";
+		if (-d $gitdir) {
+			my $desc = `cd $gitdir && git describe --tags`;
+			$commits = $desc =~ /-(\d+)-g/ ? $1 : 0;
+		}
+		print "<td>" . $commits . "</td>";
 
 		foreach my $ann (@annotations) {
 			if ($package eq $ann->{package} &&
