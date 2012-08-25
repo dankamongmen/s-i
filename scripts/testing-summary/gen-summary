@@ -362,9 +362,9 @@ foreach my $package (sort keys %seenpackages) {
 			print "<td align=\"center\"><font color=\"red\">NO</font></td>";
 		}
 
-		print "<td>" . (join('<br>', @{$normal_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
-		print "<td>" . (join('<br>', @{$udeb_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
-		print "<td>" . (join('<br>', @{$age_days{"$package/$unstable_version"}||[]})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $normal_unblocks{"$package/$unstable_version"}||[] : []})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $udeb_unblocks{"$package/$unstable_version"}  ||[] : []})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $age_days{"$package/$unstable_version"}       ||[] : []})) . "</td>";
 
 		print "<td><a href=\"http://release.debian.org/migration/testing.pl?package=$package\">t</a>
                <a href=\"http://buildd.debian.org/status/package.php?p=$package\">b</a>
