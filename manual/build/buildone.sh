@@ -52,7 +52,7 @@ create_profiled () {
     fi
 
     if [ -z "$manual_release" ]; then
-        manual_release="squeeze"
+        manual_release="wheezy"
     fi
     if [ -z "$manual_target" ]; then
         manual_target="for_cd"
