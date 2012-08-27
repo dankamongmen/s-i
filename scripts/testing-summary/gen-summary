@@ -252,12 +252,16 @@ if (open (FREEZE, "hints/freeze")) {
 # Read ages, mimicking britney's computation:
 #   # britney's "day" begins at 3pm
 #   self.date_now = int(((time.time() / (60*60)) - 15) / 24)
+# Beware, there might be several versions in unstable, so track the
+# version the age is specific to. The old version will be 'unknown'
+# until it's built everywhere, only the latest version appears in
+# Dates:
 if (open (DATES, "Dates")) {
 	my $now = int(((time / (60*60)) - 15 ) / 24);
 	while (<DATES>) {
 		if (/^(\S+) (\S+) (\S+)$/) {
 			my ($package, $version, $days) = ($1, $2, $3);
-			$ages{$package} = $now-$days;
+			$ages{$package}{$version} = $now-$days;
 		}
 	}
 } else {
@@ -317,8 +321,8 @@ print "<table border=1><tr align=left><th>source package</th><th>debs</th><th>ar
 foreach my $dist (@dists) {
 	print "<th>$dist</th>";
 }
-print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>udeb-unblock</th><th>age-days</th><th>utils</th></tr>\n";
-my $numcols=5 + @dists;
+print "<th>age (days)</th><th>frozen</th><th>unblock</th><th>udeb-unblock</th><th>age-days</th><th>utils</th><th>commits in git</th></tr>\n";
+my $numcols=9 + @dists;
 
 foreach my $package (sort keys %seenpackages) {
 	foreach my $transition (keys %{$transitions{$package}}) {
@@ -350,7 +354,7 @@ foreach my $package (sort keys %seenpackages) {
 				}
 			}
 		}
-		my $minage = $ages{$package} || 'unknown';
+		my $minage = defined($unstable_version)&&defined($ages{$package}{$unstable_version}) ? $ages{$package}{$unstable_version} : 'unknown';
 		print "<td>".$minage."</td>";
 		if (exists $frozen{$package}) {
 			print "<td align=\"center\">yes</td>";
@@ -358,13 +362,21 @@ foreach my $package (sort keys %seenpackages) {
 			print "<td align=\"center\"><font color=\"red\">NO</font></td>";
 		}
 
-		print "<td>" . (join('<br>', @{$normal_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
-		print "<td>" . (join('<br>', @{$udeb_unblocks{"$package/$unstable_version"}||[]})) . "</td>";
-		print "<td>" . (join('<br>', @{$age_days{"$package/$unstable_version"}||[]})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $normal_unblocks{"$package/$unstable_version"}||[] : []})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $udeb_unblocks{"$package/$unstable_version"}  ||[] : []})) . "</td>";
+		print "<td>" . (join('<br>', @{$unstable_version ? $age_days{"$package/$unstable_version"}       ||[] : []})) . "</td>";
 
 		print "<td><a href=\"http://release.debian.org/migration/testing.pl?package=$package\">t</a>
                <a href=\"http://buildd.debian.org/status/package.php?p=$package\">b</a>
                <a href=\"http://packages.qa.debian.org/$package\">s</a></td>";
+
+		my $commits = '?';
+		my $gitdir = "../../packages/$package";
+		if (-d $gitdir) {
+			my $desc = `cd $gitdir && git describe --tags`;
+			$commits = $desc =~ /-(\d+)-g/ ? $1 : 0;
+		}
+		print "<td>" . $commits . "</td>";
 		print "</tr>\n";
 
 		foreach my $ann (@annotations) {
