@@ -46,28 +46,9 @@ for lang in $languages; do
     if [ ! -d ../$lang ] && uses_po; then
         generate_xml
     fi
-    
-    for arch in $architectures; do
-        echo "Architecture: $arch"
-        if [ -n "$noarchdir" ]; then
-            destsuffix="$lang"
-        else
-            destsuffix="${arch}"
-        fi
-        ./buildone.sh "$arch" "$lang" "$formats"
-        mkdir -p "$destination/$destsuffix"
-        for format in $formats; do
-            if [ "$format" = html ]; then
-                mv -f ./build.out/html/* "$destination/$destsuffix"
-            else
-                # Do not fail because of missing PDF support for some languages
-                mv -f ./build.out/install.$lang.$format "$destination/$destsuffix/install.$format.$lang" || true
-            fi
-        done
-
-        ./clear.sh
-    done
 done
+    
+make languages="$languages" architectures="$architectures" destination="$destination" formats="$formats" web=1
 
 PRESEED="../en/appendix/preseed.xml"
 if [ -f $PRESEED ] && [ -f preseed.pl ] ; then
