@@ -36,7 +36,10 @@ if [ -z "$destdir" ]; then
     destdir="build.out"
 fi
 
-tempdir="build.tmp"
+if [ -z "$tempdir" ]; then
+    tempdir="build.tmp"
+fi
+
 dynamic="${tempdir}/dynamic.ent"
 
 create_profiled () {
@@ -227,9 +230,9 @@ create_pdf() {
 
     echo "Info: creating .pdf file..."
 
-    dvipdf $tempdir/install.${language}.dvi
+    ( cd $tempdir ; dvipdf install.${language}.dvi )
     RET=$?; [ $RET -ne 0 ] && return $RET
-    mv install.${language}.pdf $destdir/
+    mv $tempdir/install.${language}.pdf $destdir/
 
     return 0
 }

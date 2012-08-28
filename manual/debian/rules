@@ -9,6 +9,15 @@ ifeq (${SUITE},unstable)
 SUITE=wheezy
 endif
 
+ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+DEB_PARALLEL_JOBS ?= $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
+endif
+
+ifneq (,$(DEB_PARALLEL_JOBS))
+PARALLEL=-j$(DEB_PARALLEL_JOBS)
+endif
+
+
 MANTMP=$(shell pwd)/debian/manual
 
 clean:
@@ -18,7 +27,7 @@ clean:
 	rm -rf $(MANTMP)
 	dh_clean doc-base-stamp
 	rm -rf debian/installation-guide-*.doc-base.*
-	rm -rf build/build.out build/build.tmp build/build.po
+	rm -rf build/build.out* build/build.tmp* build/build.po
 
 doc-base: doc-base-stamp
 doc-base-stamp:
@@ -48,6 +57,7 @@ build-stamp:
 	-rm -rf $(MANTMP)
 	set -e && cd build && \
 	    for arch in $(ARCHS) ; do \
+		MAKEFLAGS="$(PARALLEL)" \
 		official_build=1 manual_release=$(SUITE) \
 		architectures="$$arch" languages="$(LANGS)" \
 		destination=$(MANTMP)/$$arch noarchdir=1 \
