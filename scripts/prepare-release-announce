@@ -357,7 +357,20 @@ foreach my $source (sort keys %sources) {
                                      to    => $sources{$source}{max},
                                      template => $template_filename,
                                    });
-  print $changelogs ("<hr>\n" . $changes . "\n");
+  # There are various reasons for having no entries: binaries moving
+  # between source packages; uploads to experimental getting in the
+  # way and shadowing unstable's changelogs; maybe others. Warn in
+  # those cases.
+  my @data = $chglog->data( { since => $sources{$source}{min},
+                              to    => $sources{$source}{max}
+                            });
+  if (@data) {
+    print $changelogs ("<hr>\n" . $changes . "\n");
+  }
+  else {
+    print $changelogs ("<hr>\n" . "<b>warning:</b> no changelog available for $source (from $sources{$source}{min} to $sources{$source}{max})". "\n");
+  }
+
 }
 
 print $changelogs "</html>\n";
