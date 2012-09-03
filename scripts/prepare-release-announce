@@ -28,6 +28,8 @@ use Parse::DebianChangelog;
 my $workdir = 'release-announce.tmp';
 my $report_filename = 'report.txt';
 my $changelogs_filename = 'changelogs.html';
+my $old_freebsd_abi;
+my $new_freebsd_abi;
 my $old_linux_abi;
 my $new_linux_abi;
 my $old_linux_arch;
@@ -35,6 +37,8 @@ my $new_linux_arch;
 
 GetOptions(
     'workdir=s'        => \$workdir,
+    'old-freebsd-abi=s'=> \$old_freebsd_abi,
+    'new-freebsd-abi=s'=> \$new_freebsd_abi,
     'old-linux-abi=s'  => \$old_linux_abi,
     'new-linux-abi=s'  => \$new_linux_abi,
     'old-linux-arch=s' => \$old_linux_arch,
@@ -205,7 +209,7 @@ if ($old_linux_abi and $new_linux_abi) {
             if (grep { $_ eq $rp } @added) {
                 @removed = grep { $_ ne $p } @removed;
                 @added = grep { $_ ne $rp } @added;
-                push @renamed, "$p → $rp";
+                push @renamed, "$p → $rp (linux)";
             }
         }
     }
@@ -217,6 +221,26 @@ if ($old_linux_abi and $new_linux_abi) {
         @removed = grep { $_ !~ /-${old_linux_abi}-${new_linux_arch}-/ } @removed;
         @added   = grep { $_ !~ /-${new_linux_abi}-${new_linux_arch}-/ } @added;
         @added   = grep { $_ !~ /-${new_linux_abi}-${old_linux_arch}-/ } @added;
+    }
+}
+
+# Same thing for freebsd kernels, assuming no d-i uploader will upload
+# from !linux:
+if ($old_freebsd_abi and $new_freebsd_abi) {
+    # @renamed isn't actually used later, but keeping it around
+    # doesn't hurt. Can be useful for later debugging.
+    my @renamed;
+    my @maybe_renamed = @removed;
+    foreach my $p (@maybe_renamed) {
+        if ($p =~ /-${old_freebsd_abi}-/) {
+            my $rp = $p;
+            $rp =~ s/-${old_freebsd_abi}-/-${new_freebsd_abi}-/;
+            if (grep { $_ eq $rp } @added) {
+                @removed = grep { $_ ne $p } @removed;
+                @added = grep { $_ ne $rp } @added;
+                push @renamed, "$p → $rp (freebsd)";
+            }
+        }
     }
 }
 
