@@ -237,9 +237,14 @@ as well.
   <sect2 arch="x86" id="laptops"><title>Laptops</title>
 <para>
 
-Laptops are also supported and nowadays most laptops work out of the box.
-In case a laptop contains specialized or proprietary hardware, some specific
-functions may not be supported.  To see if your particular laptop works well
+From a technical point of view, laptops are normal PCs, so all information
+regarding PC systems applies to laptops as well. Installations
+on laptops nowadays usually work out of the box, including things like
+automatically suspending the system on closing the lid and laptop specfic
+hardware buttons like those for disabling the wifi interfaces ("airplane
+mode"). Nonetheless sometimes the hardware vendors use specialized or
+proprietary hardware for some laptop-specific functions which
+might not be supported. To see if your particular laptop works well
 with GNU/Linux, see for example the
 <ulink url="&url-x86-laptop;">Linux Laptop pages</ulink>.
 
@@ -250,21 +255,16 @@ with GNU/Linux, see for example the
   <title>Multiple Processors</title>
 <para>
 
-Multiprocessor support &mdash; also called <quote>symmetric multiprocessing</quote>
-or SMP &mdash; is available for this architecture.  The standard &debian;
-&release; kernel image has been compiled with SMP support.  The standard
-kernel is also usable on non-SMP systems, but has a slight overhead which
-will cause a small reduction in performance. For normal system use this
-will hardly be noticable.
+Multiprocessor support &mdash; also called <quote>symmetric
+multiprocessing</quote> or SMP &mdash; is available for this
+architecture.  Having multiple processors in a computer was originally
+only an issue for high-end server systems but has become quite common in
+recent years even for rather low-end desktop computers and laptops with
+the introduction of so called "multi-core" processors.  These contain
+two or more processor units, called "cores", in one physical chip.
 
-</para><para>
-
-In order to optimize the kernel for single CPU systems, you'll have to
-replace the standard &debian; kernel.<phrase arch="linux-any">  You can find a discussion of how
-to do this in <xref linkend="kernel-baking"/>.  At this time
-(kernel version &kernelversion;) the way you disable SMP is to deselect
-<quote>&smp-config-option;</quote> in the <quote>&smp-config-section;</quote>
-section of the kernel config.</phrase>
+The standard &debian; &release; kernel image has been compiled with SMP support.
+It is also usable on non-SMP systems without problems.
 
 </para>
   </sect2>
@@ -280,6 +280,12 @@ The standard &debian; &release; kernel image has been compiled with
 <firstterm>SMP-alternatives</firstterm> support. This means that the kernel
 will detect the number of processors (or processor cores) and will
 automatically deactivate SMP on uniprocessor systems.
+
+Having multiple processors in a computer was originally
+only an issue for high-end server systems but has become quite common in
+recent years even for rather low-end desktop computers and laptops with
+the introduction of so called "multi-core" processors.  These contain
+two or more processor units, called "cores", in one physical chip.
 
 </para><para arch="i386">
 
@@ -298,7 +304,7 @@ multiprocessing</quote> or SMP &mdash; is available for this architecture.
 However, the standard &debian; &release; kernel image does not support
 SMP.  This should not prevent installation, since the standard,
 non-SMP kernel should boot on SMP systems; the kernel will simply use
-the first CPU.
+only the first CPU.
 
 </para><para>
 
@@ -344,19 +350,19 @@ section of the kernel config.</phrase>
   <sect2 id="gfx" arch="not-s390"><title>Graphics Card Support</title>
 <para arch="x86">
 
-You should be using a VGA-compatible display interface for the console
-terminal. Nearly every modern display card is compatible with
-VGA. Ancient standards such CGA, MDA, or HGA should also work,
-assuming you do not require X11 support.  Note that X11 is not used
-during the installation process described in this document unless the
-graphical installer was explicitly selected.
-
-</para><para>
-
 &debian;'s support for graphical interfaces is determined by the
-underlying support found in X.Org's X11 system.  Most AGP, PCI,
-PCIe, and PCI-X video cards work under X.Org.  Details on supported graphics
-buses, cards, monitors, and pointing devices can be found at
+underlying support found in X.Org's X11 system. On modern PCs,
+having a graphical display usually works out of the box. Whether
+advanced graphics card features such as 3D-hardware acceleration
+or hardware-accelerated video are available, depends on the 
+actual graphics hardware used in the system and in some cases
+on the installation of additional "firmware" images (see <xref
+linkend="hardware-firmware"/>). In very few cases there have
+been reports about hardware on which installation of additional graphics
+card firmware was required even for basic graphics support, but
+these have been rare exceptions.
+</para><para>
+Details on supported graphics cards and pointing devices can be found at
 <ulink url="&url-xorg;"></ulink>.  &debian; &release; ships
 with X.Org version &x11ver;.
 
@@ -407,6 +413,17 @@ so-called <firstterm>firmware</firstterm> or <firstterm>microcode</firstterm>
 to be loaded into the device before it can become operational. This is most
 common for network interface cards (especially wireless NICs), but for example
 some USB devices and even some hard disk controllers also require firmware.
+With many graphics cards, basic functionality is available without
+additional firmware, but the use of advanced features requires an
+appropriate firmware file to be installed in the system.
+
+</para><para>
+
+On many older devices which require firmware to work, the firmware file was
+permanently placed in an EEPROM/Flash chip on the device itself by the
+manufacturer.  Nowadays most new devices do not have the firmware embedded
+this way anymore, so the firmware file must be uploaded into the device by
+the host operating system every time the system boots.
 
 </para><para>
 
@@ -422,7 +439,7 @@ of the archive.
 However, this does not mean that such hardware cannot be used during an
 installation. Starting with &debian-gnu; 5.0, &d-i; supports loading
 firmware files or packages containing firmware from a removable medium,
-such as a floppy disk or USB stick.
+such as a USB stick.
 See <xref linkend="loading-firmware"/> for detailed information on how to
 load firmware files or packages during the installation.
 

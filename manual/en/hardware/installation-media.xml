@@ -34,26 +34,15 @@ For CHRP, floppy support is currently broken.
 
 Whenever you see <quote>CD-ROM</quote> in this manual, it applies to both
 CD-ROMs and DVD-ROMs, because both technologies are really
-the same from the operating system's point of view, except for some very
-old nonstandard CD-ROM drives which are neither SCSI nor IDE/ATAPI.
+the same from the operating system's point of view.
 
 </para></note><para>
 
-CD-ROM based installation is supported for some architectures.
-On machines which support bootable CD-ROMs, you should be able to do a
-completely
-<phrase arch="not-s390">floppy-less</phrase>
-<phrase arch="s390">tape-less</phrase>
-installation.  Even if your system doesn't
-support booting from a CD-ROM, you can use the CD-ROM in conjunction
-with the other techniques to install your system, once you've booted
-up by other means; see <xref linkend="boot-installer"/>.
+CD-ROM based installation is supported for most architectures.
 
 </para><para arch="x86">
 
-SCSI, SATA and IDE/ATAPI CD-ROMs are supported.  The <ulink
-url="&url-cd-howto;">Linux CD-ROM HOWTO</ulink> contains in-depth information
-on using CD-ROMs with Linux.
+On PCs SATA, IDE/ATAPI and SCSI CD-ROMs are supported.
 
 </para><para arch="x86">
 
@@ -78,32 +67,16 @@ entry in the firmware.
 </para>
   </sect2>
 
-  <sect2><title>Hard Disk</title>
-
-<para>
-
-Booting the installation system directly from a hard disk is another option
-for many architectures. This will require some other operating system
-to load the installer onto the hard disk.
-
-</para><para arch="sparc">
-
-Although the &arch-title; does not allow booting from SunOS
-(Solaris), you can install from a SunOS partition (UFS slices).
-
-</para>
-  </sect2>
-
   <sect2 condition="bootable-usb"><title>USB Memory Stick</title>
 
 <para>
 
-Many &debian; boxes need their floppy and/or CD-ROM drives only for
-setting up the system and for rescue purposes. If you operate some
-servers, you will probably already have thought about omitting those
-drives and using an USB memory stick for installing and (when
-necessary) for recovering the system. This is also useful for small
-systems which have no room for unnecessary drives.
+USB flash disks a.k.a. USB memory sticks have become a commonly
+used and cheap storage device. Most modern computer systems
+also allow booting the &d-i; from such a stick.
+Many modern computer systems, in particular netbooks and thin laptops, do not have
+a CD/DVD-ROM drive anymore at all and booting from USB media ist
+the standard way of installing a new operating system on them.
 
 </para>
   </sect2>
@@ -123,7 +96,14 @@ configure your system to use ISDN and PPP.
 </para><para condition="supports-tftp">
 
 You can also <emphasis>boot</emphasis> the installation system over the
-network. <phrase arch="mips;mipsel">This is the preferred installation technique
+network without needing any local media like CDs/DVDs or USB sticks.  If
+you already have a netboot-infrastructure available (i.e.  you are already
+running DHCP and TFTP services in your network), this allows an easy and fast
+deployment of a large number of machines.  Setting up the necessary
+infrastructure requires a certain level of technical experience, so this is
+not recommended for novice users.
+
+<phrase arch="mips;mipsel">This is the preferred installation technique
 for &arch-title;.</phrase>
 
 </para><para condition="supports-nfsroot">
@@ -134,6 +114,25 @@ and NFS-mounting of all local filesystems, is another option.
 </para>
   </sect2>
 
+
+  <sect2><title>Hard Disk</title>
+
+<para>
+
+Booting the installation system directly from a hard disk is another option
+for many architectures. This will require some other operating system
+to load the installer onto the hard disk. This method is only recommended
+for special cases when no other installation method is available.
+
+</para><para arch="sparc">
+
+Although the &arch-title; does not allow booting from SunOS
+(Solaris), you can install from a SunOS partition (UFS slices).
+
+</para>
+  </sect2>
+
+
   <sect2><title>Un*x or GNU system</title>
 
 <para>
@@ -143,7 +142,8 @@ If you are running another Unix-like system, you could use it to install
 manual. This kind of install may be useful for users with otherwise
 unsupported hardware or on hosts which can't afford downtime.  If you
 are interested in this technique, skip to the <xref
-linkend="linux-upgrade"/>.
+linkend="linux-upgrade"/>. This installation method is only recommended
+for advanced users when no other installation method is available.
 
 </para>
   </sect2>
@@ -152,21 +152,16 @@ linkend="linux-upgrade"/>.
 
 <para>
 
-The &debian; boot disks contain a kernel which is built to maximize the
-number of systems it runs on.  Unfortunately, this makes for a larger
-kernel, which includes many drivers that won't be used for your
-machine<phrase arch="linux-any"> (see <xref linkend="kernel-baking"/> to learn how to
-build your own kernel)</phrase>.  Support for the widest possible range of
-devices is desirable in general, to ensure that &debian; can be
-installed on the widest array of hardware.
-
+The &debian; installer contains a kernel which is built to maximize the
+number of systems it runs on.
 </para><para arch="x86">
+Generally, the &debian; installation system includes support for IDE (also
+known as PATA) drives, SATA and SCSI controllers and drives, USB, and
+FireWire.  The supported file systems include FAT, Win-32 FAT extensions
+(VFAT) and NTFS.
 
-Generally, the &debian; installation system includes support for floppies,
-IDE (also known as PATA) drives, IDE floppies, parallel port IDE devices, SATA
-and SCSI controllers and drives, USB, and FireWire.  The supported file systems
-include FAT, Win-32 FAT extensions (VFAT) and NTFS.
 
+<!--
 </para><para arch="i386">
 
 Disk interfaces that emulate the <quote>AT</quote> hard disk interface
@@ -174,6 +169,7 @@ Disk interfaces that emulate the <quote>AT</quote> hard disk interface
 SCSI disk controllers from many different manufacturers are supported. See the
 <ulink url="&url-hardware-howto;">Linux Hardware Compatibility HOWTO</ulink>
 for more details.
+-->
 
 </para><para arch="sparc">
 
