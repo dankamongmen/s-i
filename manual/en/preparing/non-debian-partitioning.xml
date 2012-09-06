@@ -28,18 +28,19 @@ If you already have an operating system on your system
 (VM, z/OS, OS/390, &hellip;)
 </phrase>
 
-and want to stick &debian; on the same disk, you will need to repartition
-the disk. &debian; requires its own hard disk partitions. It cannot be
+which uses the whole disk and you want to stick &debian; on the same disk, you will need to repartition
+it. &debian; requires its own hard disk partitions. It cannot be
 installed on Windows or MacOS partitions. It may be able to share some
 partitions with other Unix systems, but that's not covered here. At
 the very least you will need a dedicated partition for the &debian;
-root.
+root filesystem.
 
 </para><para>
 
 You can find information about your current partition setup by using
 a partitioning tool for your current operating system<phrase
-arch="any-x86">, such as fdisk or PartitionMagic</phrase><phrase
+arch="any-x86">, such as the integrated Disk Manager in Windows or fdisk in
+DOS</phrase><phrase
 arch="powerpc">, such as Drive Setup, HD Toolkit, or MacTools</phrase><phrase
 arch="s390">, such as the VM diskmap</phrase>. Partitioning tools always
 provide a way to show existing partitions without making changes.
@@ -52,65 +53,47 @@ backups before doing any repartitioning.  Using the analogy of the
 house, you would probably want to move all the furniture out of the
 way before moving a wall or you risk destroying it.
 
+</para><para>
+
+Several modern operating systems offer the ability to move and resize
+certain existing partitions without destroying their contents.  This allows
+making space for additional partitions without losing existing data.  Even
+though this works quite well in most cases, making changes to the
+partitioning of a disk is an inherently dangerous action and should only be
+done after having made a full backup of all data.
+<phrase arch="any-x86">For FAT/FAT32 and NTFS partitions as used by DOS and
+Windows systems, the ability to move and resize them losslessly is provided 
+both by &d-i; as well as by the integrated Disk Manager of Windows
+7. </phrase>
+
+<para arch="x86">
+To losslessly resize an existing FAT or NTFS partition from within &d-i;, go
+to the partitioning step, select the option for manual partitioning, select
+the partition to resize, and simply specify its new size.
+</para>
+
 </para><para arch="hppa" condition="FIXME">
 
 <emphasis>FIXME: write about HP-UX disks?</emphasis>
 
 </para><para>
 
-If your computer has more than one hard disk, you may want to dedicate
-one of the hard disks completely to &debian;. If so, you don't need to
-partition that disk before booting the installation system; the
-installer's included partitioning program can handle the job nicely.
-
-</para><para>
-
-If your machine has only one hard disk, and you would like to
-completely replace the current operating system with &debian-gnu;,
-you also can wait to partition as part of the installation process
-(<xref linkend="di-partition"/>), after you have booted the
-installation system.  However this only works if you plan to boot the
-installer system from tapes, CD-ROM or files on a connected machine.
-Consider: if you boot from files placed on the hard disk, and then
-partition that same hard disk within the installation system, thus
-erasing the boot files, you'd better hope the installation is
-successful the first time around.  At the least in this case, you
-should have some alternate means of reviving your machine like the
-original system's installation tapes or CDs.
-
-</para><para>
-
-If your machine already has multiple partitions, and enough space can
-be provided by deleting and replacing one or more of them, then you
-too can wait and use the &debian; installer's partitioning program. You
-should still read through the material below, because there may be
-special circumstances like the order of the existing partitions within
-the partition map, that force you to partition before installing
-anyway.
-
-</para><para arch="any-x86">
-
-If your machine has a FAT or NTFS filesystem, as used by DOS and Windows,
-you can wait and use &debian; installer's partitioning program to
-resize the filesystem.
-
-</para><para>
-
-If none of the above apply, you'll need to partition your hard disk before
-starting the installation to create partitionable space for
-&debian;. If some of the partitions will be owned by other operating
-systems, you should create those partitions using native operating
-system partitioning programs. We recommend that you do
-<emphasis>not</emphasis> attempt to create partitions for &debian-gnu;
-using another operating system's tools. Instead, you should just
-create the native operating system's partitions you will want to
-retain.
-
+Creating and deleting partitions can be done from within &d-i; as
+well as from an existing operating system. As a rule of thumb,
+partitions should be created by the system for which they are to
+be used, i.e. partitions to be used by &debian-gnu; should be
+created from within &d-i; and partitions to be used from another
+operating system should be created from there. &d-i; is
+capable of creating non-&arch-kernel; partitions, and partitions created
+this way usually work without problems when used in other operating
+systems, but there are a few rare corner cases in which this could
+cause problems, so if you want to be sure, use the native partitioning
+tools to create partitions for use by other operating systems.
 </para><para>
 
 If you are going to install more than one operating system on the same
 machine, you should install all other system(s) before proceeding with
-&debian; installation. Windows and other OS installations may destroy
+the &debian; installation. Windows and other OS installations may destroy
 your ability to start &debian;, or encourage you to reformat non-native
 partitions.
 
@@ -131,7 +114,10 @@ bootable.) You can delete the placeholder with the &debian; partition
 tools later during the actual install, and replace it with &arch-parttype;
 partitions.
 
-</para><para>
+</para>
+
+<!-- paragraph scheduled for removal
+<para>
 
 If you currently have one hard disk with one partition (a common setup
 for desktop computers), and you want to multi-boot the native
@@ -179,8 +165,15 @@ Boot the &debian; installer to continue installing &debian;.
 </orderedlist>
 
 </para>
+-->
+
+<!-- &nondeb-part-x86.xml; currently includes only outdated information;
+     don't use it for building the manual.
 
 &nondeb-part-x86.xml;
+
+-->
+
 &nondeb-part-sparc.xml;
 &nondeb-part-powerpc.xml;
 

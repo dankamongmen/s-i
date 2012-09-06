@@ -154,7 +154,9 @@ The manuals that come with each piece of hardware.
 The BIOS setup screens of your computer. You can view these screens
 when you start your computer by pressing a combination of keys. Check
 your manual for the combination. Often, it is the <keycap>Delete</keycap> 
-or the <keycap>F2</keycap> key.
+or the <keycap>F2</keycap> key, but some manufacturers use other keys
+or key combinations. Usually upon starting the computer there will
+be a message stating which key to press to enter the setup screen.
 
 </para></listitem>
 <listitem><para>
@@ -211,6 +213,7 @@ networking and e-mail.
   <entry>Partitions where other operating systems are installed.</entry>
 </row>
 
+<!-- 
 <row arch="not-s390">
   <entry morerows="5">Monitor</entry>
   <entry>Model and manufacturer.</entry>
@@ -222,7 +225,9 @@ networking and e-mail.
   <entry>Color depth (number of colors) supported.</entry>
 </row>
 <row arch="not-s390"><entry>Screen size.</entry></row>
+-->
 
+<!--
 <row arch="not-s390">
   <entry morerows="3">Mouse</entry>
   <entry>Type: serial, PS/2, or USB.</entry>
@@ -230,27 +235,21 @@ networking and e-mail.
 <row arch="not-s390"><entry>Port.</entry></row>
 <row arch="not-s390"><entry>Manufacturer.</entry></row>
 <row arch="not-s390"><entry>Number of buttons.</entry></row>
+-->
 
 <row arch="not-s390">
-  <entry morerows="1">Network</entry>
-  <entry>Model and manufacturer.</entry>
+  <entry morerows="0">Network interfaces</entry>
+  <entry>Type/model of available network interfaces.</entry>
 </row>
-<row arch="not-s390"><entry>Type of adapter.</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="1">Printer</entry>
+  <entry morerows="0">Printer</entry>
   <entry>Model and manufacturer.</entry>
 </row>
-<row arch="not-s390"><entry>Printing resolutions supported.</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="2">Video Card</entry>
-  <entry>Model and manufacturer.</entry>
-</row>
-<row arch="not-s390"><entry>Video RAM available.</entry></row>
-<row arch="not-s390">
-  <entry>Resolutions and color depths supported (these should be
-  checked against your monitor's capabilities).</entry>
+  <entry morerows="0">Video Card</entry>
+  <entry>Type/model and manufacturer.</entry>
 </row>
 
 <row arch="s390">
@@ -276,58 +275,132 @@ networking and e-mail.
 
 <para>
 
-Many brand name products work without trouble on &arch-kernel;. Moreover,
+Many products work without trouble on &arch-kernel;. Moreover,
 hardware support in &arch-kernel; is improving daily. However, &arch-kernel; still does
 not run as many different types of hardware as some operating systems.
 
-</para><para arch="any-x86">
+</para><para>
 
-In particular, &arch-kernel; usually cannot run hardware that requires a
-running version of Windows to work.
-
-</para><para arch="x86">
-
-Although some Windows-specific hardware can be made to run on Linux,
-doing so usually requires extra effort. In addition, Linux drivers
-for Windows-specific hardware are usually specific to one Linux
-kernel. Therefore, they can quickly become obsolete.
-
-</para><para arch="any-x86">
-
-So called win-modems are the most common type of this hardware.
-However, printers and other equipment may also be Windows-specific.
+Drivers in &arch-kernel; in most cases are not written for a certain
+"product" or "brand" from a specific manufacturer, but for a certain
+hardware/chipset, regardless of the "brand" it is used in.  Many seemingly
+different products/brands are based on the same hardware design; it is not
+uncommon that chip manufacturers provide so-called "reference designs" for
+products based on their chips which are then used by several different
+device manufactureres and sold under lots of different product or brand
+names.
 
 </para><para>
 
-You can check hardware compatibility by:
+This has advantages and disadvantages. An advantage is that a driver for one
+chipset works with lots of different products from different manufacturers,
+as long as their product is based on the same chipset.  The disadvantage is
+that it is not always easy to see which actual chipset is used in a certain
+product/brand.  Unfortunately sometimes device manufacturers change the
+hardware base of their product without changing the product name or at least
+the product version number, so that when having two items of the same
+brand/product name bought at different times, they can sometimes be based on
+two different chipsets and therefore use two different drivers or there
+might be no driver at all for one of them.
 
-<itemizedlist>
-<listitem><para>
+</para><para>
 
-Checking manufacturers' web sites for new drivers.
+For USB and PCI/PCI-Express/ExpressCard devices, a good way to find out on
+which chipset they are based ist to look at their device IDs.  All
+USB/PCI/PCI-Express/ExpressCard devices have so called "vendor" and
+"product" IDs, and the combination of these two is usually the same for any
+product based on the same chipset.
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Looking at web sites or manuals for information about emulation.
-Lesser known brands can sometimes use the drivers or settings for
-better-known ones.
+On Linux systems, these IDs can be read with the <command>lsusb</command>
+command for USB devices and with the <command>lspci -nn</command> command for
+PCI/PCI-Express/ExpressCard devices.  The vendor and product IDs are usually
+given in the form of two hexadecimal numbers, seperated by a colon, such as
+"1d6b:0001".
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Checking hardware compatibility lists for &arch-kernel; on web sites
-dedicated to your architecture.
+An example for the output of <command>lsusb</command>: "Bus 001
+Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub", whereby 1d6b is
+the vendor ID and 0002 is the product ID.
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Searching the Internet for other users' experiences.
+An example for the output of <command>lspci -nn</command> for an Ethernet
+card: "03:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. 
+RTL8111/8168B PCI Express Gigabit Ethernet controller [10ec:8168] (rev 06)". 
+The IDs are given inside the rightmost square brackets, i.e. here
+10ec is the vendor- and 8168 is the product ID.
 
-</para></listitem>
-</itemizedlist>
+</para><para>
+
+As another example, a graphics card could give the following output:
+"04:00.0 VGA compatible controller [0300]: Advanced Micro Devices [AMD] nee
+ATI RV710 [Radeon HD 4350] [1002:954f]".
+
+</para><para>
+
+On Windows systems, the IDs for a device can be found in the Windows device
+manager on the tab "details", where the vendor ID is prefixed with VEN_
+and the product ID is prefixed with DEV_.
+
+On Windows 7 systems, you have to select the property "Hardware IDs" in the
+device manager's details tab to actually see the IDs, as they are not
+displayed by default.
+
+</para><para>
+
+Searching on the internet with the vendor/product ID, "&arch-kernel;" and
+"driver" as the search terms often results in information regarding
+the driver support status for a certain chipset. If a search for the
+vendor/product ID does not yield usable results, a search for the chip
+code names, which are also often provided by lsusb and lspci
+("RTL8111"/"RTL8168B" in the network card example and "RV710" in the
+graphics card example), can help.
 
 </para>
+
+    <sect3>
+      <title>Testing hardware compatibility with a Live-System</title>
+
+<para>
+
+&debian-gnu; is also available as a so-called "live system" for certain
+architectures.  A live system is a preconfigured ready-to-use installation
+in a compressed format that can be booted and used from a read-only medium
+like a CD or DVD.  Using it by default does not create any permanent changes
+on your computer.  You can change user settings and install additional
+programs from within the live system, but all this only happens in the
+computer's RAM, i.e.  if you turn off the computer and boot the live system
+again, everything is reset to its defaults.  If you want to see whether
+your hardware is supported by &debian-gnu;, the easiest way is to run a
+&debian; live system on it and try it out.
+
+</para><para>
+
+There are a few limitations in using a live system. The first is that as
+all changes you do within the live system must be held in your computer's
+RAM, this only works on systems with enough RAM to do that, so installing
+additional large software packages may fail due to memory constraints. 
+Another limitation with regards to hardware compatibility testing is
+that the official &debian-gnu; live system contains only free components,
+i.e. there are no non-free firmware files included in it. Such non-free
+packages can of course be installed manually within the system, but there
+is no automatic detection of required firmware files like in the &d-i;,
+so installation of non-free components must be done manually if needed.
+
+</para><para>
+
+Information about the available variants of the  &debian; live images
+can be found at the <ulink url="&url-debian-live-cd;">Debian Live Images website</ulink>.
+
+</para>
+
+  
+    </sect3>
+
+
   </sect2>
 
   <sect2>
@@ -335,9 +408,10 @@ Searching the Internet for other users' experiences.
 
 <para>
 
-If your computer is connected to a network 24 hours a day (i.e., an
-Ethernet or equivalent connection &mdash; not a PPP connection), you
-should ask your network's system administrator for this information.
+If your computer is connected to a fixed network (i.e. an Ethernet or
+equivalent connection &mdash; not a dialup/PPP connection) which is
+administered by somebody else, you should ask your network's system
+administrator for this information:
 
 <itemizedlist>
 <listitem><para>
@@ -376,24 +450,39 @@ Service) server.
 
 </para><para>
 
-On the other hand, if your administrator tells you that a DHCP server
-is available and is recommended, then you don't need this information
+If the network you are connected to uses DHCP (Dynamic Host Configuration
+Protocol) for configuring network settings, you don't need this information
 because the DHCP server will provide it directly to your computer
 during the installation process.
 
+</para><para>
+
+If you have internet access via DSL or cable modem (i.e. over a cable tv
+network) and have a router (often provided preconfigured by your phone or
+catv provider) which handles your network connectivity, DHCP is usually
+available by default.
+
+
+</para><para arch="x86">
+
+As a rule of thumb: if you run a Windows system in your home network and did
+not have to manually perform any network settings there to achieve Internet
+access, network connectivity in  &debian-gnu; will also be configured
+automatically.
+
 </para><para arch="not-s390">
 
-If you use a wireless network, you should also find out:
+If you use a WLAN/WiFi network, you should find out:
 
 <itemizedlist>
 <listitem><para>
 
-ESSID of your wireless network.
+The ESSID ("network name") of your wireless network.
 
 </para></listitem>
 <listitem><para>
 
-WEP or WPA/WPA2 security key (if applicable).
+The WEP or WPA/WPA2 security key to access the network (if applicable).
 
 </para></listitem>
 </itemizedlist>
