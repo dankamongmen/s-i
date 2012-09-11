@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 67232 -->
+<!-- original version: 67993 -->
 
  <sect1 id="needed-info">
  <title>Benötigte Informationen</title>
@@ -56,7 +56,7 @@ Enthält oft nützliche Informationen zum Konfigurieren oder Verwenden Ihrer Har
 <itemizedlist arch="x86;sparc;mips;mipsel">
 <listitem arch="x86"><para> 
 
-<ulink url="&url-hardware-howto;">Linux-Hardware-Compatibility-HowTo</ulink>
+<ulink url="&url-debian-wiki-hardware;">Die Hardware-Seite im Debian Wiki</ulink>
 
 </para></listitem>
 
@@ -153,8 +153,11 @@ Die Handbücher, die mit jedem Hardware-Teil mitgeliefert werden.
 
 Das BIOS-Setup Ihres Computers. Sie gelangen in das BIOS-Setup, indem
 Sie eine Taste/Tastenkombination drücken, während der Computer startet. Sehen
-Sie in Ihrem Handbuch nach, um die passende Kombination herauszufinden. Oftmals ist es die
-<keycap>Entf</keycap>-Taste.
+Sie in Ihrem Handbuch nach, um die passende Kombination herauszufinden.
+Oftmals ist es die <keycap>Entf</keycap>- oder die <keycap>F2</keycap>-Taste,
+aber einige Hersteller verwenden ihre eigenen Tasten oder Tastenkombinationen.
+Für gewöhnlich wird beim Start des Computers ein Hinweis angezeigt, welche
+Tasten gedrückt werden müssen, um in das BIOS zu gelangen.
 
 </para></listitem>
 <listitem><para>
@@ -187,7 +190,7 @@ E-Mail verraten.
 <para>
 
 <table>
-<title>Zur Installation notwendige Hardware-Informationen</title>
+<title>Zur Installation hilfreiche Hardware-Informationen</title>
 <tgroup cols="2">
 <thead>
 <row>
@@ -210,6 +213,8 @@ E-Mail verraten.
   <entry>Partitionen, auf denen andere Betriebssysteme installiert
     sind.</entry>
 </row>
+
+<!-- 
 <row arch="not-s390">
   <entry morerows="5">Bildschirm</entry>
   <entry>Modell und Hersteller.</entry>
@@ -221,7 +226,8 @@ E-Mail verraten.
   <entry>Unterstützte Farbtiefe (Anzahl der Farben).</entry>
 </row>
 <row arch="not-s390"><entry>Bildschirmgröße.</entry></row>
-
+-->
+<!-- 
 <row arch="not-s390">
   <entry morerows="3">Maus</entry>
   <entry>Typ: seriell, PS/2 oder USB.</entry>
@@ -229,27 +235,22 @@ E-Mail verraten.
 <row arch="not-s390"><entry>Anschluss.</entry></row>
 <row arch="not-s390"><entry>Hersteller.</entry></row>
 <row arch="not-s390"><entry>Anzahl der Tasten.</entry></row>
+-->
 
 <row arch="not-s390">
-  <entry morerows="1">Netzwerk</entry>
-  <entry>Modell und Hersteller.</entry>
+  <entry morerows="1">Netzwerk-Schnittstellen</entry>
+  <entry>Typ/Modell von verfügbaren Netzwerk-Karten.</entry>
 </row>
 <row arch="not-s390"><entry>Typ des Adapters/der Karte.</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="1">Drucker</entry>
+  <entry morerows="0">Drucker</entry>
   <entry>Modell und Hersteller.</entry>
 </row>
-<row arch="not-s390"><entry>Unterstützte Druckauflösungen.</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="2">Grafikkarte</entry>
-  <entry>Modell und Hersteller.</entry>
-</row>
-<row arch="not-s390"><entry>Verfügbarer Video-Speicher.</entry></row>
-<row arch="not-s390">
-  <entry>Unterstützte Auflösungen und Farbtiefen (vergleichen Sie
-    diese Angaben mit denen Ihres Bildschirms).</entry>
+  <entry morerows="0">Grafikkarte</entry>
+  <entry>Typ/Modell und Hersteller.</entry>
 </row>
 
 <row arch="s390">
@@ -275,60 +276,138 @@ E-Mail verraten.
 
 <para>
 
-Viele Markenprodukte funktionieren problemlos unter &arch-kernel;. Zudem
+Viele Produkte funktionieren problemlos unter &arch-kernel;. Zudem
 verbessert sich die Hardware-Unterstützung für &arch-kernel; täglich.
 &arch-kernel; unterstützt jedoch nicht so viele verschiedene Typen von
 Hardware wie manches andere Betriebssystem.
 
-</para><para arch="any-x86">
+</para><para>
 
-Im Besonderen kann &arch-kernel; normalerweise keine Hardware betreiben, die
-eine laufende Windows-Version benötigt.
-
-</para><para arch="x86">
-
-Einige Windows-spezifische Hardware kann jedoch mit etwas Aufwand
-unter Linux lauffähig gemacht werden. Außerdem sind Treiber für
-Windows-spezifische Hardware meist für einen speziellen Linux-Kernel
-angepasst. Aus diesem Grund können sie schnell überholt sein.
-
-</para><para arch="any-x86">
-
-So genannte Win-Modems sind der gängigste Typ dieser Hardware.
-Drucker und andere Geräte können jedoch ebenfalls Windows-spezifisch
-sein.
+In den meisten Fällen sind Treiber unter &arch-kernel; nicht für ein bestimmtes
+Produkt oder eine bestimmte Marke eines bestimmten Herstellers
+geschrieben, sondern für einen bestimmten Hardware-Stand/Chipsatz, unabhängig von
+der Marke, in der er genutzt wird. Augenscheinlich basieren viele
+unterschiedliche Produkte/Marken auf dem gleichen Hardware-Design; es ist
+nicht unüblich, dass Chip-Hersteller sogenannte Referenz-Designs anbieten für
+Produkte, die auf ihren Chipsätzen aufbauen, die dann von mehreren verschiedenen
+Geräteherstellern genutzt und unter vielen verschiedenen Produkt- oder
+Markennamen verkauft werden.
 
 </para><para>
 
-Sie können die Hardware-Kompatibilität wie folgt überprüfen:
+Dies hat Vor- und Nachteile. Ein Vorteil ist, dass ein Treiber für einen
+Chipsatz mit vielen verschiedenen Produkten von unterschiedlichen
+Herstellern funktioniert, solange diese auf dem gleichen Chipsatz basieren.
+Der Nachteil ist, dass es nicht immer einfach ist herauszufinden, welcher
+Chipsatz letztendig in einem bestimmten Produkt verwendet ist.
+Unglücklicherweise ändern die Gerätehersteller manchmal die Hardware-Basis
+ihrer Produkte, ohne den Produktnamen zu ändern oder zumindest die Versionsnummer
+des Produktes, so dass zwei Teile mit dem gleichen Marken-/Produktnamen, die
+zu unterschiedlichen Zeiten gekauft wurden, auf unterschiedlichen Chipsätzen
+basieren können und daher unterschiedliche Treiber verwenden müssen, oder
+es gibt eventuell gar keinen Treiber für eins der beiden Geräte.
 
-<itemizedlist>
-<listitem><para>
+</para><para>
 
-Suchen Sie auf der Website des Herstellers nach (neuen) Treibern.
+Bei USB- und PCI-/PCI-Express-/ExpressCard-Geräten ist ein guter Weg, um
+herauszufinden, auf welchem Chipsatz sie basieren, die Geräte-ID zu
+überprüfen. Alle USB-/PCI-/PCI-Express-/ExpressCard-Geräte haben eine
+ID für "vendor" (Hersteller) und "product" (Produktbezeichnung),
+und die Kombination dieser beiden ist für gewöhnlich bei allen Produkten, die
+auf dem gleichen Chipsatz aufbauen, identisch.
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Suchen Sie auf Webseiten oder in Handbüchern nach Informationen über Emulationen.
-Produkte weniger bekannter Marken können manchmal die Treiber oder Einstellungen
-von besser bekannten verwenden.
+Auf Linux-Systemen können diese IDs mit dem <command>lsusb</command>-Befehl
+bei USB-Geräten und mit dem Befehl <command>lspci -nn</command> bei
+USB-/PCI-/PCI-Express-/ExpressCard-Geräten ausgelesen werden.
+Hersteller und Produkt sind gewöhnlich als zwei hexadezimale Zahlen angegeben,
+getrennt durch einen Doppelpunkt, wie z.B. "1d6b:0001".
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Durchsuchen Sie Hardware-Kompatibilitätslisten für &arch-kernel; auf Webseiten für
-Ihre Architektur.
+Ein Beispiel für die Ausgabe des Befehls <command>lsusb</command>:
+"Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub", wobei
+1d6b die Hersteller-ID und 0002 die Produkt-ID ist.
 
-</para></listitem>
-<listitem><para>
+</para><para>
 
-Suchen Sie im Internet nach Erfahrungsberichten anderer Benutzer.
+Ein Beispiel für die Ausgabe von <command>lspci -nn</command> für eine
+Ethernet-Karte: 
+"03:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. 
+RTL8111/8168B PCI Express Gigabit Ethernet controller [10ec:8168] (rev 06)".
+Die IDs werden innerhalb der eckigen Klammern ganz rechts angezeigt,
+hier ist z.B. 10ec die Hersteller-ID und 8168 die Produkt-ID.
 
-</para></listitem>
-</itemizedlist>
+</para><para>
+
+Als weiteres Beispiel könnte eine Grafikkarte folgende Ausgabe erzeugen:
+"04:00.0 VGA compatible controller [0300]: Advanced Micro Devices [AMD] nee
+ATI RV710 [Radeon HD 4350] [1002:954f]".
+
+</para><para>
+
+Auf Windows-Systemen können Sie die IDs für ein Gerät im Windows-Gerätemanager
+unter dem Reiter "Details" finden, wobei der Hersteller-ID ein VEN_ vorangestellt
+ist und der Produkt-ID ein DEV_.
+Auf Windows 7-Systemen müssen Sie die Eigenschaften "Hardware IDs" unter dem Reiter
+"Details" im Gerätemanager auswählen, um die IDs auszulesen, da diese nicht
+standardmäßig angzeigt werden.
+
+</para><para>
+
+Eine Suche im Internet mit Hersteller- und Produkt-ID, "&arch-kernel;" und
+"driver" oder "Treiber" als Suchbegriff liefert oft Informationen über den
+Stand der Treiberunterstützung für einen bestimmten Chipsatz. Falls eine Suche
+mit der Hersteller- und Produkt-ID keine nützlichen Treffer bringt, könnte
+stattdessen eine Suche nach dem Codenamen des Chips helfen, der auch oft von
+lsusb und lspci angezeigt wird (z.B. "RTL8111"/"RTL8168B" bei dem obigen
+Beispiel für die Netzwerkkarte und "RV710" für die Grafikkarte).
 
 </para>
+
+    <sect3>
+      <title>Testen der Hardware-Kompatibilität mittels eines Live-Systems</title>
+
+<para>
+
+&debian-gnu; ist für bestimmte Architekturen auch als sogenanntes
+Live-System verfügbar. Ein Live-System ist eine vorkonfigurierte, zur Nutzung
+vollständig vorbereitete Installation in einem komprimierten Format, die von
+einem nur lesbaren Medium wie einer CD oder DVD gestartet und genutzt werden
+kann. Die Verwendung führt zu keinerlei dauerhaften Änderungen auf Ihrem
+Rechner. Sie können die Benutzereinstellungen ändern und zusätzliche
+Programme aus dem Live-System heraus installieren, aber dies findet alles
+nur im RAM (Arbeitsspeicher) des Computers statt, d.h. wenn Sie den Computer
+ausschalten und das Live-System nochmals neu starten, ist wieder alles auf
+die Standardeinstellungen zurückgesetzt. Wenn Sie überprüfen möchten, ob Ihre
+Hardware von &debian-gnu; unterstützt wird, ist der einfachste Weg, darauf ein
+Live-System zu starten und es auszuprobieren.
+
+</para><para>
+
+Es gibt ein paar Einschränkungen bei der Verwendung eines Live-Systems.
+Die erste ist, dass alle Änderungen, die Sie an dem Live-System durchführen,
+im Arbeitsspeicher des Rechners gehalten werden müssen; dies funktioniert
+nur auf Systemen mit genügend RAM, so dass die Installation zusätzlicher
+großer Software-Pakete aufgrund von Speichermangel fehlschlagen könnte.
+Eine andere Einschränkung in Bezug auf das Testen der Hardware-Kompatibilität
+ist, dass offizielle &debian-gnu;-Live-Systeme nur freie Komponenten
+enthalten, sie beinhalten zum Beispiel keine nicht-freien Firmware-Dateien.
+Solche nicht-freien Pakete können natürlich manuell innerhalb des Live-Systems
+installiert werden, aber es gibt keine automatische Erkennung benötigter
+Firmware-Dateien wie im &d-i;; daher muss die Installation von nicht-freien
+Komponenten händisch erfolgen, falls nötig.
+
+</para><para>
+
+Informationen über die verfügbaren Varianten der &debian; Live-Images
+finden Sie auf der
+<ulink url="&url-debian-live-cd;">Debian Live-Website</ulink>.
+
+</para>  
+    </sect3>
+
   </sect2>
 
   <sect2>
@@ -336,10 +415,10 @@ Suchen Sie im Internet nach Erfahrungsberichten anderer Benutzer.
 
 <para>
 
-Wenn Ihr Computer rund um die Uhr mit einem Netzwerk verbunden ist
-(z.B. Ethernet oder eine gleichwertige Verbindung &ndash; keine
-PPP-(Wähl-)Verbindung), sollten Sie beim Systemadministrator des Netzwerks
-die folgenden Informationen erfragen:
+Wenn Ihr Computer fest an ein Netzwerk angeschlossen ist, das von
+jemand anderem verwalten wird, (z.B. Ethernet oder eine gleichwertige
+Verbindung &ndash; keine PPP-(Wähl-)Verbindung), sollten Sie beim
+Systemadministrator des Netzwerks die folgenden Informationen erfragen:
 
 <itemizedlist>
 <listitem><para>
@@ -379,25 +458,42 @@ verwenden sollen.
 
 </para><para>
 
-Andererseits, wenn Ihr Administrator Ihnen sagt, dass ein DHCP-Server
-verfügbar und empfohlen ist, benötigen Sie all diese Informationen
-nicht, da der DHCP-Server diese während des Installationsprozesses
-direkt an Ihren Computer weitergibt.
+Wenn in dem Netzwerk, mit dem Sie verbunden sind, DHCP (Dynamic Host
+Configuration Protocol) für die Konfiguration der Netzwerkeinstellungen
+verwendet wird, benötigen Sie all diese Informationen nicht, da der
+DHCP-Server diese während des Installationsprozesses direkt an Ihren Computer
+weitergibt.
+
+</para><para>
+
+Falls Sie über DSL oder ein Kabelmodem (z.B. über das Netz eines 
+Fernseh-Kabelanbieters) mit dem Internet verbunden sind und einen Router
+haben (häufig von Ihrem Telefon- oder Kabelanbieter vorkonfiguriert
+angeboten), der die Netzwerkverbindung bereitstellt, ist DHCP
+für gewöhnlich standardmäßig aktiviert.
+
+</para><para arch="x86">
+
+Eine Faustregel: wenn Sie in Ihrem Netzwerk zuhause einen Windows-Rechner
+betrieben haben und keine Netzwerkeinstellungen händisch durchführen mussten,
+um Zugang ins Internet zu bekommen, wird die Netzwerkverbindung in &debian-gnu;
+ebenfalls automatisch eingerichtet werden.
 
 </para><para arch="not-s390">
 
-Wenn Sie ein kabelloses Funk-Netzwerk (WLAN) verwenden, sollten Sie auch das 
-Folgende erfragen:
+Wenn Sie ein kabelloses Funk-Netzwerk (WLAN, WiFi) verwenden, sollten Sie auch
+das Folgende erfragen:
 
 <itemizedlist>
 <listitem><para>
 
-Die ESSID Ihres kabellosen Netzwerks.
+Die ESSID (den "Netzwerk-Namen") Ihres kabellosen Netzwerks.
 
 </para></listitem>
 <listitem><para>
 
-Den WEP- oder WPA/WPA2-Schlüssel (falls notwendig).
+Den WEP- oder WPA/WPA2-Schlüssel, um Zugriff auf das Netz zu bekommen (falls
+notwendig).
 
 </para></listitem>
 </itemizedlist>
@@ -406,3 +502,4 @@ Den WEP- oder WPA/WPA2-Schlüssel (falls notwendig).
   </sect2>
 
  </sect1>
+
