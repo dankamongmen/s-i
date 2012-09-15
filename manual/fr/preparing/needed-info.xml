@@ -1,4 +1,4 @@
-<!-- original version: 67232 -->
+<!-- original version: 67993 -->
 
  <sect1 id="needed-info">
  <title>Informations à connaître</title>
@@ -49,7 +49,7 @@ configuration de votre matériel.
 
 <listitem arch="x86"><para>
 
-<ulink url="&url-hardware-howto;">HOWTO sur la compatibilité des matériels avec Linux</ulink>
+<ulink url="&url-debian-wiki-hardware;">La page « Matériel » sur le wiki Debian"</ulink>
 
 </para></listitem>
 
@@ -146,7 +146,8 @@ les informations sur la configuration du BIOS de votre ordinateur.
 Vous pouvez accéder à ces écrans pendant le démarrage de l'ordinateur
 en appuyant sur une combinaison de touches. Consultez votre manuel
 pour connaître cette combinaison. Il s'agit souvent de la touche
-<keycap>Suppr</keycap>&nbsp;;
+<keycap>Suppr</keycap> ou de la touche <keycap>F2</keycap>. Le plus souvent,
+au démarrage de l'ordinateur, un message indique la touche à utiliser&nbsp;;
 
 </para></listitem>
 <listitem><para>
@@ -180,7 +181,7 @@ configuration du réseau et du courrier.
 <para>
 
 <table>
-<title>Informations sur le matériel nécessaire pour l'installation</title>
+<title>Informations sur le matériel utiles pour l'installation</title>
 <tgroup cols="2">
 <thead>
 <row>
@@ -202,6 +203,8 @@ configuration du réseau et du courrier.
   <entry>Les partitions contenant d'autres systèmes d'exploitation</entry>
 </row>
 
+<!--
+
 <row arch="not-s390">
   <entry morerows="5">Écran</entry>
   <entry>Le modèle et la marque</entry>
@@ -214,6 +217,8 @@ configuration du réseau et du courrier.
 </row>
 <row arch="not-s390"><entry>La taille de l'écran</entry></row>
 
+-->
+<!--
 <row arch="not-s390">
   <entry morerows="3">Souris</entry>
   <entry>Le type&nbsp;: série, PS/2, ou USB</entry>
@@ -221,27 +226,21 @@ configuration du réseau et du courrier.
 <row arch="not-s390"><entry>Le port</entry></row>
 <row arch="not-s390"><entry>La marque</entry></row>
 <row arch="not-s390"><entry>Le nombre de boutons</entry></row>
+-->
 
 <row arch="not-s390">
-  <entry morerows="1">Carte réseau</entry>
-  <entry>Le modèle et la marque</entry>
+  <entry morerows="0">Interfaces réseau</entry>
+  <entry>Type/modèle des interfaces réseau disponibles</entry>
 </row>
-<row arch="not-s390"><entry>Le type d'interface</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="1">Imprimante</entry>
+  <entry morerows="0">Imprimante</entry>
   <entry>Le modèle et la marque</entry>
 </row>
-<row arch="not-s390"><entry>Les résolutions d'impression acceptées</entry></row>
 
 <row arch="not-s390">
-  <entry morerows="2">Carte vidéo</entry>
+  <entry morerows="0">Carte vidéo</entry>
   <entry>Le modèle et la marque</entry>
-</row>
-<row arch="not-s390"><entry>La mémoire vidéo disponible</entry></row>
-<row arch="not-s390">
-  <entry>Les résolutions et les profondeurs de couleurs acceptées (à choisir parmi 
-   celles reconnues par le moniteur)</entry>
 </row>
 
 <row arch="s390">
@@ -268,66 +267,131 @@ configuration du réseau et du courrier.
 
 <para>
 
-Beaucoup de produits de marques fonctionnent sans problème sous &arch-kernel;.
+Beaucoup de produits fonctionnent sans problème sous &arch-kernel;.
 Et la gestion des matériels est améliorée chaque jour. Cependant,
 &arch-kernel; ne peut pas utiliser autant de matériels que d'autres
 systèmes d'exploitation.
 
-</para><para arch="any-x86">
+</para><para>
 
-En particulier, &arch-kernel; n'est pas compatible avec le matériel
-qui nécessite Windows pour fonctionner.
-
-</para><para arch="x86">
-
-Bien que Linux puisse faire fonctionner certains matériels spécifiques à
-Windows, cela demande un effort supplémentaire. D'autre part, les
-pilotes Linux pour ce type de matériel sont souvent dépendants d'une
-version du noyau et deviennent rapidement obsolètes.
-
-</para><para arch="any-x86">
-
-Les dénommés <quote>win-modems</quote> sont le cas le plus courant de ce type de
-matériel. Mais des imprimantes et d'autres périphériques peuvent
-aussi être spécifiques à Windows.
+Les pilotes pour &arch-kernel; ne sont pas écrits pour tel ou tel produit de tel
+ou tel constructeur mais pour tel matériel (puce). Beaucoup de produits apparemment différents
+sont basés sur le même matériel. Il n'est pas inhabituel que des constructeurs de puces
+fournissent de prétendues « conceptions de référence » pour des produits basés sur leurs puces
+qui sont ensuite utilisées par plusieurs constructeurs différents et vendues sous différentes
+marques.  
 
 </para><para>
 
-Voici quelques pistes pour vérifier la compatibilité de votre matériel&nbsp;:
-<itemizedlist>
-<listitem><para>
+Cette situation comporte des avantages et des désavantages. Un avantage
+est qu'un pilote de puce fonctionne pour différents produits de différents
+constructeurs. Le problème est qu'il n'est pas toujours facile de savoir quelle
+puce est réellement utilisée par tel produit. Parfois les constructeurs
+modifient le matériel d'un produit sans changer ni le nom ni la version de ce produit.
+Ainsi, deux exemplaires d'un même produit, achetés à différents moments, peuvent être
+basés sur deux puces différentes. Il se peut alors qu'aucun pilote soit disponible
+pour l'une des deux puces.
 
-chercher de nouveaux pilotes sur le site web des fabricants&nbsp;;
+</para><para>
 
-</para></listitem>
-<listitem><para>
+Pour les périphériques USB et PCI/PCI-Express/ExpressCard, un bon moyen 
+de connaître la puce utilisée est de chercher les identifiants du périphérique.
+La combinaison de ces identifiants nommés « vendor » et « product »
+est habituellement la même pour tout produit basé sur la même puce.
 
-chercher des informations concernant une possible émulation sur les sites web ou dans
-les manuels. Des marques moins connues peuvent parfois fournir des pilotes ou des réglages
-pour des marques plus connues&nbsp;;
+</para><para>
 
-</para></listitem>
-<listitem><para>
-
-vérifier les listes de matériel compatible avec &arch-kernel; sur les
-sites web dédiés à votre architecture&nbsp;;
-
-</para></listitem>
-<listitem><para>
-
-chercher sur internet l'expérience des autres utilisateurs.
-
-</para></listitem>
-</itemizedlist>
+Sur un système Linux, ces identifiants peuvent être lus par la commande
+<command>lsusb</command> pour les périphériques USB et par la commande
+<command>lspci -nn</command> pour les périphériques PCI/PCI-Express/ExpressCard.
+Ils sont généralement donnés sous la forme de deux nombres hexadécimaux, séparés par
+un deux-points, « 1d6b:0001 » par exemple.
 
 </para>
+<para>
+
+Résultat de la commande <command>lsusb</command> : "Bus 001
+Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub", où 1d6b est
+l'identifiant « vendor » et 0002 l'identifiant « product ».
+</para>
+
+<para>
+
+Résultat de la commande <command>lspci -nn</command> pour une carte Ethernet :
+"03:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. 
+RTL8111/8168B PCI Express Gigabit Ethernet controller [10ec:8168] (rev 06)". 
+Les identifiants sont donnés dans les crochets les plus à droite,
+10ec le « vendor » et 8168 le « product ».
+
+</para><para>
+
+Un exemple pour une carte graphique :
+"04:00.0 VGA compatible controller [0300]: Advanced Micro Devices [AMD] nee
+ATI RV710 [Radeon HD 4350] [1002:954f]".
+
+</para>
+<para>
+
+Sur les systèmes Windows, les identifiants d'un périphérique
+peuvent être trouvés dans le gestionnaire de périphériques, onglet « details ».
+Le « vendor » est préfixé par VEN_ et le « product » par DEV_.
+
+Sur les systèmes Windows 7, vous devez sélectionner la propriété « Hardware IDs »
+dans l'onglet « details » du gestionnaire de périphériques car ils ne sont pas
+visibles par défaut.
+
+</para>
+<para>
+
+Une recherche sur internet avec ces identifiants, &arch-kernel; et  « driver »
+donne souvent des informations sur le pilote nécessaire à telle puce.
+Si ce n'est pas le cas, une recherche peut être effectuée avec les noms des puces,
+donnés aussi par les commandes lsusb et lspci, "RTL8111"/"RTL8168B" pour la carte réseau et "RV710" 
+pour la carte graphique des précédents exemples.
+
+</para>
+
+    <sect3>
+      <title>Tester le matériel avec un système autonome</title>
+
+<para>
+
+&debian-gnu; est disponible sous forme de système autonome pour quelques
+architectures. Un système autonome est un système dans un format compressé,
+préconfiguré et utilisable immédiatement, qui peut être amorcé depuis un support en lecture seule
+comme un CD ou un DVD.  Son utilisation ne modifie pas de façon permanente votre ordinateur.
+Vous pouvez modifier des paramètres, installer des programmes etc., tout cela se passe dans la mémoire
+vive de l'ordinateur. Si vous éteignez l'ordinateur et relancez le système autonome,
+tout est remis en l'état par défaut.
+Exécuter un système autonome est un moyen trés facile de savoir si votre matériel est reconnu par &debian-gnu;.
+
+</para><para>
+
+Un système autonome impose quelques limitations. La première est que toutes les modifications
+que vous apportez doivent être contenues dans la mémoire vive de l'ordinateur.
+Il faut donc assez de mémoire et l'installation de certains logiciels peut échouer à
+cause du manque de mémoire. 
+Une autre limitation est que le système autonome officiel de &debian-gnu; ne contient
+que des éléments libres. Des microprogrammes non libres peuvent bien sûr être installés,
+mais aucune détection automatique n'est effectuée comme celle effectuée par l'installateur Debian.
+Vous devrez donc installer vous-même les composants non libres.
+
+</para><para>
+
+Des informations sur les variantes disponibles des images autonomes de &debian; se trouvent sur
+le <ulink url="&url-debian-live-cd;">site web Debian Live Images</ulink>.
+
+</para>
+  
+    </sect3>
+
   </sect2>
 
   <sect2>
   <title>Configuration du réseau</title>
 
 <para>
-Si votre machine est connectée à un réseau 24h/24 &mdash; avec une connexion Ethernet ou 
+Si votre machine est connectée à un réseau &mdash; avec une connexion Ethernet ou 
 équivalente (pas une connexion PPP) &mdash;, vous devriez demander
 à votre administrateur système les éléments suivants&nbsp;:
 
@@ -353,21 +417,37 @@ la machine de votre réseau qui servira de serveur DNS (Domain Name Service).
 </para></listitem>
 </itemizedlist>
 </para>
+
 <para>
-Si votre administrateur système vous a informé qu'un serveur DHCP était
-disponible, vous n'avez pas besoin de toutes ces informations. Le serveur
+
+Quand un serveur DHCP est disponible sur votre réseau, vous n'avez pas besoin de toutes ces informations. Le serveur
 DHCP les fournira directement pendant le processus d'installation.
+
 </para>
+
 <para>
-Pour un réseau sans fil, vous aurez besoin des informations suivantes&nbsp;:
+
+Si votre accès à internet se fait par DSL ou par un modem cable (par un réseau tv cablé),
+et si vous avez un routeur, souvent préconfiguré par le fournisseur d'accès, un serveur DHCP est habituellement 
+disponible.
+
+</para><para arch="x86">
+
+En règle générale : si vous n'avez pas eu à paramétrer le réseau pour un système Windows,
+la connexion au réseau pour &debian-gnu; sera aussi automatiquement configurée.
+
+</para>
+
+<para>
+Pour un réseau WLAN/WiFi, vous aurez besoin des informations suivantes&nbsp;:
 
 <itemizedlist>
 <listitem><para>
 
-l'ESSID du réseau sans fil&nbsp;;
+l'ESSID (nom) du réseau sans fil&nbsp;;
 </para></listitem>
 <listitem><para>
-la clé WEP ou WPA/WPA2 (si nécessaire).
+la clé WEP ou WPA/WPA2 pour accéder au réseau (si nécessaire).
 </para></listitem>
 </itemizedlist>
 
