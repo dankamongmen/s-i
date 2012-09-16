@@ -36,7 +36,7 @@ it is not dirty.
 
 If the installer fails to recognize a CD-ROM, try just running the option
 <menuchoice> <guimenuitem>Detect and mount CD-ROM</guimenuitem> </menuchoice>
-a second time. Some DMA related issues with older CD-ROM drives are known to
+a second time. Some DMA related issues with very old CD-ROM drives are known to
 be resolved in this way.
 
 </para></listitem>
@@ -65,6 +65,8 @@ Some older CD-ROM drives do not support reading from discs that were burned
 at high speeds using a modern CD writer.
 
   </para></listitem>
+
+<!--
   <listitem><para>
 
 If your system boots correctly from the CD-ROM, it does not necessarily
@@ -72,10 +74,12 @@ mean that &arch-kernel; also supports the CD-ROM (or, more correctly, the contro
 that your CD-ROM drive is connected to). 
 
   </para></listitem>
+-->
+
   <listitem><para>
 
-Some older CD-ROM drives do not work correctly if <quote>direct memory
-access</quote> (DMA) is enabled.
+Some very old CD-ROM drives do not work correctly if <quote>direct memory
+access</quote> (DMA) is enabled for them.
 
   </para></listitem>
 </itemizedlist>
@@ -91,8 +95,9 @@ If the CD-ROM fails to boot, try the suggestions listed below.
 <itemizedlist>
   <listitem><para>
 
-Check that your BIOS actually supports booting from CD-ROM (older systems
-possibly don't) and that your CD-ROM drive supports the media you are using.
+Check that your BIOS actually supports booting from CD-ROM (only an
+issue for very old systems) and that CD booting is enabled in the
+BIOS.
 
   </para></listitem>
   <listitem><para>
@@ -272,20 +277,9 @@ all due to buggy hardware or firmware floppy drivers.
 If you have problems and the kernel hangs during the boot process,
 doesn't recognize peripherals you actually have, or drives are not
 recognized properly, the first thing to check is the boot parameters,
-as discussed in <xref linkend="boot-parms"/>.
-
-</para><para>
-
-Often, problems can be solved by removing add-ons and peripherals, and
-then trying booting again.  <phrase arch="any-x86">Internal modems, sound
-cards, and Plug-n-Play devices can be especially problematic.</phrase>
-
-</para><para>
-
-If you have a large amount of memory installed in your machine, more
-than 512M, and the installer hangs when booting the kernel, you may
-need to include a boot argument to limit the amount of memory the
-kernel sees, such as <userinput>mem=512m</userinput>.
+as discussed in <xref linkend="boot-parms"/>. In some cases, malfunctions
+can be caused by missing device firmware (see <xref
+linkend="hardware-firmware"/> and <xref linkend="loading-firmware"/>).
 
 </para>
   </sect2>
@@ -324,7 +318,10 @@ known to have sound working (e.g., a live CD).
 There are some common installation problems that can be solved or avoided by
 passing certain boot parameters to the installer.
 
-</para><para>
+</para>
+
+<!-- outdated
+<para>
 
 Some systems have floppies with <quote>inverted DCLs</quote>. If you receive
 errors reading from the floppy, even when you know the floppy is good,
@@ -364,7 +361,10 @@ you should be aware that list may not be complete.
 </footnote> may help. If that does not work,
 try adding the boot parameter <userinput>fb=false</userinput>.
 
-</para><para>
+</para>
+-->
+
+<para>
 
 If your screen begins to show a weird picture while the kernel boots,
 eg. pure white, pure black or colored pixel garbage, your system may
@@ -381,7 +381,7 @@ console features. See <xref linkend="boot-parms"/> for details.
   <title>System Freeze During the PCMCIA Configuration Phase</title>
 <para>
 
-Some laptop models produced by Dell are known to crash when PCMCIA device
+Some very old laptop models produced by Dell are known to crash when PCMCIA device
 detection tries to access some hardware addresses. Other laptops may display
 similar problems. If you experience such a problem and you don't need PCMCIA
 support during the installation, you can disable PCMCIA using the
@@ -405,6 +405,7 @@ installer.
 </para>
    </sect3>
 
+<!-- outdated
    <sect3>
    <title>System Freeze while Loading USB Modules</title>
 <para>
@@ -417,6 +418,8 @@ is passing the <userinput>nousb</userinput> parameter at the boot prompt.
 
 </para>
    </sect3>
+-->
+
   </sect2>
 
   <sect2 arch="sparc" id="sparc-boot-problems">
