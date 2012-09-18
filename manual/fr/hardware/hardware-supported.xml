@@ -1,4 +1,4 @@
-<!-- original version: 67916 -->
+<!-- original version: 68012 -->
 
  <sect1 id="hardware-supported">
 <title>Matériel reconnu</title>
@@ -233,8 +233,13 @@ produit sur une plateforme &arch-title;. Et prévenez aussi la
   <sect2 arch="x86" id="laptops"><title>Portables</title>
 
 <para>
-Les ordinateurs portables fonctionnent aujourd'hui très bien avec &debian;. Quand un
-portable contient du matériel propriétaire, certaines fonctionnalités peuvent être absentes.
+D'un point de vue technique, les ordinateurs portables fonctionnent comme les autres PC et
+l'information concernant les PC s'applique aux portables. L'installation de &debian; sur un portable
+se passe très bien. Des fonctionnalités comme la suspension automatique du système à la fermeture
+du couvercle ou la reconnaissance de boutons spécifiques aux portables comme celui
+pour désactiver l'interface wifi (mode « airplane ») sont correctement installées.
+Cependant quelques constructeurs utilisent du matériel propriétaire pour certains fonctions,
+matériel qui n'est pas toujours reconnu.
 Pour vérifier que votre portable fonctionne bien avec GNU/Linux, consultez les
 <ulink url="&url-x86-laptop;">pages sur les portables sous Linux</ulink>.
 </para>
@@ -245,20 +250,16 @@ Pour vérifier que votre portable fonctionne bien avec GNU/Linux, consultez les
 
 <para>
 Cette architecture accepte les systèmes à plusieurs processeurs (<quote>symmetric multiprocessing</quote> ou SMP).
-L'image standard du noyau &debian; &release; a été compilée avec SMP. 
-Le noyau standard est utilisable aussi sur les systèmes non-SMP, avec une légère (et guère notable) perte de
-performance.
+À l'origine, sur certains serveurs haut de gamme, un système à multiples processeurs pouvait provoquer
+des problèmes. Aujourd'hui un simple ordinateur de bureau ou un portable
+possède plusieurs processeurs sous la forme d'un processeur multicœur, une puce contenant
+deux ou plus processeurs appelés cœur.
+
+L'image standard du noyau &debian; &release; a été compilée avec SMP
+mais elle parfaitement utilisable sur les systèmes non-SMP.
 
 </para>
 
-<para>
-Pour optimiser le noyau pour un seul processeur, vous devrez
-remplacer le noyau &debian; standard. <phrase arch="linux-any">Vous trouverez une
-discussion sur la façon de faire dans la <xref linkend="kernel-baking"/>. 
-Aujourd'hui (version &kernelversion; du noyau) la façon de désactiver SMP est 
-de ne pas choisir <quote>&smp-config-option;</quote> dans la section
-<quote>&smp-config-section;</quote> quand on configure le noyau.</phrase>
-</para>
 </sect2>
 
 <sect2 condition="smp-alternatives">
@@ -270,36 +271,52 @@ standard du noyau &debian; &release; a été compilée avec l'option
 <firstterm>SMP-alternatives</firstterm>. Le noyau détectera si votre système possède plusieurs
 processeurs et désactivera automatiquement la gestion SMP sur les systèmes avec un seul
 processeur.
+
+À l'origine, sur certains serveurs haut de gamme, un système à multiples processeurs pouvait provoquer
+des problèmes. Aujourd'hui un simple ordinateur de bureau ou un portable
+possède plusieurs processeurs sous la forme d'un processeur multicœur, une puce contenant
+deux ou plus processeurs appelés cœur.
+
 </para>
 
 <para arch="i386">
+
 Pour l'architecture &arch-title;, la variante 486 de l'image &debian; du noyau
 n'est pas compilée avec l'option SMP.
+
 </para>
 </sect2>
 
 <sect2 condition="supports-smp">
  <title>Processeurs multiples</title>
+
 <para>
+
 Cette architecture accepte les systèmes à plusieurs processeurs 
 (<quote>symmetric multiprocessing</quote> ou SMP). 
 Cependant, l'image standard du noyau &debian; &release; ne reconnaît pas 
 le SMP. Cela ne devrait pas empêcher l'installation, puisque le noyau non-SMP 
 devrait démarrer sur les systèmes SMP, le noyau utilisera simplement le 
 premier CPU.
+
     </para>
 <para>
+
 Afin de tirer profit de plusieurs processeurs, vous devrez remplacer le 
 noyau standard &debian;. <phrase arch="linux-any">Vous trouverez une
 discussion sur la façon de faire dans la <xref linkend="kernel-baking"/>. 
 Aujourd'hui (version &kernelversion; du noyau) la façon d'activer SMP est de 
 choisir <quote>&smp-config-option;</quote> dans la section
 <quote>&smp-config-section;</quote> quand on configure le noyau.</phrase>
+
 </para>
   </sect2>
+
 <sect2 condition="supports-smp-sometimes">
  <title>Processeurs multiples</title>
+
 <para>
+
 Cette architecture accepte les systèmes à plusieurs processeurs 
 (<quote>symmetric multiprocessing</quote> ou SMP). 
 Une image standard du noyau &debian; &release; a été compilée avec SMP.
@@ -308,7 +325,9 @@ défaut. Cela ne devrait pas empêcher l'installation, puisque le noyau non-SMP
 devrait démarrer
 sur les systèmes SMP&nbsp;; le noyau utilisera simplement le premier 
 processeur.
+
 </para><para>
+
 Afin de tirer profit de plusieurs processeurs, vous devrez vérifier que le
 noyau installé accepte le SMP ou bien vous en installerez un.
 
@@ -319,28 +338,30 @@ discussion sur la façon de faire dans la <xref linkend="kernel-baking"/>.
 Aujourd'hui (version &kernelversion; du noyau) la façon d'activer SMP est de
 choisir <quote>&smp-config-option;</quote> dans la section
 <quote>&smp-config-section;</quote> quand on configure le noyau.</phrase>
+
 </para>
 </sect2>
 
   <sect2 id="gfx" arch="not-s390">
 <title>Gestion des cartes graphiques</title>
 
-<para arch="x86">
-Vous devriez utiliser une interface graphique compatible
-VGA pour le terminal de console. Pratiquement toutes les
-cartes graphiques modernes sont compatibles VGA. Les
-anciens standards comme CGA, MDA ou HGA devraient également
-fonctionner, pour autant que vous ne vouliez pas utiliser
-X11. Il faut remarquer que X11 n'est pas utilisé durant le
-processus d'installation décrit dans ce document.
-</para>
-
 <para>
+
 &debian; reconnaît les interfaces graphiques dans la mesure où elles sont
-reconnues par le système X11 de X.Org. La plupart des
-cartes AGP, PCI, PCIe et PCI-X fonctionnent sous X.Org. Des précisions sur les bus 
-graphiques acceptés, les cartes, les moniteurs et les souris sont disponibles sur 
+reconnues par le système X11 de X.Org. Sur les ordinateurs modernes, tout environnement
+graphique fonctionne sans problème. Certaines fonctionnalités avancées des cartes graphiques
+comme l'accélération 3D ou l'accélération matérielle (<emphasis>hardware-accelerated video</emphasis>)
+dépendent parfois de la carte graphique installée et demandent l'installation de microprogrammes
+supplémentaires, voyez <xref linkend="hardware-firmware"/>.
+Dans de très rares cas, il a été noté que certain matériel demandait l'installation
+de microprogrammes même pour les fonctionnalités de base de la carte graphique.
+
+</para>
+<para>
+
+Des précisions sur les cartes graphiques acceptés et les dispositifs de pointage sont disponibles sur 
 <ulink url="&url-xorg;"></ulink>. &debian; &release; propose la version &x11ver; de X.Org.
+
 </para>
 
 <para arch="mips">
@@ -388,6 +409,17 @@ Outre la disponibilité d'un pilote, certains périphériques exigent le chargem
 <firstterm>microprogramme</firstterm> pour fonctionner. C'est le cas pour les cartes réseau
 (particulièrement les cartes réseau sans fil), mais certains périphériques USB ou certains
 contrôleurs de disque dur demandent des microprogrammes.
+Pour les cartes graphiques, les fonctionnalités de base ne demandent pas de
+microprogramme supplémentaire, contrairement aux fonctionnalités avancées 
+qui demandent l'installation sur le système d'un microprogramme spécifique.
+
+</para>
+<para>
+
+Pour beaucoup de périphériques anciens, le microprogramme était placé par le fabricant
+sur le périphérique lui-même, sur une puce EEPROM/Flash. Aujourd'hui, les périphériques
+n'embarquent plus de microprogramme de cette façon. Le microprogramme doit être
+chargé sur le périphérique par le système d'exploitation à chaque démarrage.
 
 </para>
 <para>
@@ -404,8 +436,20 @@ paquet dans la section <emphasis>non-free</emphasis> de l'archive.
 Cependant cela ne signifie pas que ce type de matériel ne puisse pas être utilisé
 pendant l'installation. À partir de &debian-gnu; 5.0, l'installateur sait charger des
 microprogrammes sous forme de simple fichier ou sous forme de paquet sur des supports
-amovibles comme une disquette ou une clé USB.
+amovibles comme une clé USB.
 Consultez <xref linkend="loading-firmware"/> pour des précisions sur la manière de télécharger
 des microprogrammes pendant l'installation.
+
 </para>
+<para>
+
+Si l'&d-i; demande un microprogramme qui n'est pas disponible ou que vous ne voulez pas
+installé un microprogramme non libre, vous pouvez continuer l'installation
+sans télécharger le microprogramme.
+Certains pilotes demandent des microprogrammes supplémentaires parce qu'ils sont nécessaires
+dans certaines circonstances, mais le périphérique fonctionnera sans sur la plupart des systèmes.
+Ainsi, cela arrive avec des cartes réseau utilisant le pilote tg3.
+
+</para>
+
 </sect1>
