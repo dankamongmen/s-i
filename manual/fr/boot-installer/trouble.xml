@@ -1,4 +1,4 @@
-<!-- original version: 66601 -->
+<!-- original version: 68014 -->
 
  <sect1 id="boot-troubleshooting">
  <title>Dysfonctionnements pendant la procédure d'installation</title>
@@ -6,11 +6,11 @@
 </para>
 
   <sect2 arch="not-s390" id="unreliable-cd">
-  <title>Fiabilité des lecteurs de cédéroms</title>
+  <title>Fiabilité des lecteurs de CD</title>
 <para>
 
 Parfois, particulièrement avec d'anciens lecteurs, l'installateur ne
-peut s'amorcer à partir d'un cédérom. Il arrive aussi, même après un amorçage
+peut s'amorcer à partir d'un CD. Il arrive aussi, même après un amorçage
 réussi, que l'installateur ne reconnaisse pas le lecteur ou bien signale des erreurs
 de lecture pendant l'installation.
 </para>
@@ -23,25 +23,25 @@ On peut tout d'abord essayer deux choses très simples&nbsp;:
 
 <itemizedlist>
 <listitem><para>
-Si le cédérom ne s'amorce pas, il faut vérifier qu'il est correctement inséré et
+Si le CD ne s'amorce pas, il faut vérifier qu'il est correctement inséré et
 qu'il n'est pas sale.
 </para></listitem>
 <listitem><para>
-Si l'installateur ne reconnaît pas le cédérom, on peut lancer une deuxième fois 
+Si l'installateur ne reconnaît pas le CD, on peut lancer une deuxième fois 
 l'option <menuchoice> <guimenuitem>Détecter et monter un CD-ROM</guimenuitem></menuchoice>.
-Certains problèmes de DMA avec les anciens lecteurs sont résolus de cette façon.
+Certains problèmes de DMA avec les très anciens lecteurs sont résolus de cette façon.
 </para></listitem>
 </itemizedlist>
 
 </para>
 <para>
 Si rien ne fonctionne, essayez les suggestions qui suivent. La plupart, mais pas toutes,
-concernent aussi bien les CD-ROM que les DVD, mais nous utilisons le terme cédérom pour
+concernent aussi bien les CD-ROM que les DVD, mais nous utilisons le terme CD pour
 simplifier.
 </para>
 
 <para>
-Si vous ne pouvez faire l'installation à partir d'un cédérom, vous pouvez essayer l'une
+Si vous ne pouvez faire l'installation à partir d'un CD, vous pouvez essayer l'une
 des autres méthodes disponibles.
 </para>
 
@@ -54,13 +54,17 @@ des autres méthodes disponibles.
 Certains lecteurs anciens ne peuvent lire des disques gravés à grande vitesse sur
 les lecteurs modernes.
 </para></listitem>
+
+<!--
 <listitem><para>
-Quand le système s'amorce correctement à partir d'un cédérom, cela ne veut pas
+Quand le système s'amorce correctement à partir d'un CD, cela ne veut pas
 nécessairement dire que &arch-kernel; reconnaisse le contrôleur auquel est connecté
-le lecteur de cédéroms.
+le lecteur de CD.
 </para></listitem>
+
+-->
 <listitem><para>
-Certains lecteurs anciens ne fonctionnent pas correctement si le DMA (<emphasis>direct memory
+Certains lecteurs très anciens ne fonctionnent pas correctement si le DMA (<emphasis>direct memory
 access</emphasis>) est activé.
 </para></listitem>
 </itemizedlist>
@@ -69,16 +73,18 @@ access</emphasis>) est activé.
 <sect3>
   <title>Comment résoudre ces problèmes ?</title>
 <para>
-Si le cédérom ne peut amorcer l'installateur, voici une liste de suggestions&nbsp;:
+Si le CD ne peut amorcer l'installateur, voici une liste de suggestions&nbsp;:
 
 <itemizedlist>
   <listitem><para>
 
-Vérifiez que le BIOS est réellement capable de gérer l'amorçage à partir d'un cédérom,
-certains anciens systèmes ne le permettent pas. Vérifiez aussi que le lecteur
-reconnaît le support que vous utilisez.
+Vérifiez que le BIOS est réellement capable de gérer l'amorçage à partir d'un CD,
+certains très anciens systèmes ne le permettent pas et que le lecteur
+est bien le périphérique d'amorçage
+.
 </para></listitem>
 <listitem><para>
+
 Si vous avez téléchargé une image ISO, vérifiez que la somme MD5 de cette image
 correspond à celle associée dans le fichier <filename>MD5SUMS</filename>. Ce fichier se trouve
 normalement là où vous avez téléchargé l'image.
@@ -88,9 +94,9 @@ $ md5sum <replaceable>debian-testing-i386-netinst.iso</replaceable>
 a20391b12f7ff22ef705cee4059c6b92  <replaceable>debian-testing-i386-netinst.iso</replaceable>
 </screen></informalexample>
 
-Vérifiez ensuite que la somme MD5 du cédérom gravé correspond aussi. La commande
+Vérifiez ensuite que la somme MD5 du CD gravé correspond aussi. La commande
 suivante devrait fonctionner. Elle utilise la taille de l'image pour lire le nombre d'octets
-sur le cédérom.
+sur le CD.
  
 <informalexample><screen>
 $ dd if=/dev/cdrom | \
@@ -107,9 +113,9 @@ a20391b12f7ff22ef705cee4059c6b92  -
 </para>
 
 <para>
-Quand le lecteur de cédérom n'est pas reconnu même après un amorçage réussi, il suffit souvent
+Quand le lecteur de CD n'est pas reconnu même après un amorçage réussi, il suffit souvent
 de recommencer pour résoudre le problème. Si vous possédez plusieurs lecteurs,
-mettez le cédérom dans l'autre lecteur. Si rien ne fonctionne ou si des erreurs de lecture
+mettez le CD dans l'autre lecteur. Si rien ne fonctionne ou si des erreurs de lecture
 sont signalées, essayez les suggestions listées ci-dessous. Une connaissance élémentaire
 de &arch-kernel; est nécessaire. Pour exécuter ces commandes, il faut passer sur la deuxième
 console virtuelle (VT2) et lancer un interpréteur de commandes.
@@ -138,12 +144,12 @@ n'a pas été reconnu ou qu'il n'est pas du tout géré. Si vous connaissez le p
 à ce contrôleur, vous pouvez le charger vous-même avec <command>modprobe</command>.
 </para></listitem>
 <listitem><para>
-Vérifiez que le lecteur de cédérom est bien listé dans le répertoire <filename>/dev/</filename>.
+Vérifiez que le lecteur de CD est bien listé dans le répertoire <filename>/dev/</filename>.
 Pour l'exemple ci-dessus, ce serait <filename>/dev/hdc</filename>.
 Il doit exister aussi un fichier <filename>/dev/cdrom</filename>.
 </para></listitem>
 <listitem><para>
-Vérifiez avec la commande <command>mount</command> que le cédérom est déjà monté.
+Vérifiez avec la commande <command>mount</command> que le CD est déjà monté.
 Si non, montez-le vous-même&nbsp;:
 
 <informalexample><screen>
@@ -170,12 +176,12 @@ $ echo -n "using_dma:0" >settings
 </screen></informalexample>
 
 Assurez-vous que vous êtes bien dans le répertoire du périphérique qui
-correspond au lecteur de cédéroms.
+correspond au lecteur de CD.
 </para></listitem>
 <listitem><para>
-Si vous rencontrez des problèmes pendant l'installation, vérifiez l'intégrité du cédérom
+Si vous rencontrez des problèmes pendant l'installation, vérifiez l'intégrité du CD
 avec l'option qui se trouve en fin du menu principal de l'installateur.
-Cette option peut aussi servir de test quand le cédérom est lu correctement.
+Cette option peut aussi servir de test quand le CD est lu correctement.
 </para></listitem>
 </itemizedlist>
 </para>
@@ -244,19 +250,10 @@ dans la <xref linkend="boot-parms"/>.
 
 </para>
 
-<para>
+<para arch="not-s390">
 
-Les problèmes sont souvent résolus en retirant périphériques et 
-extensions et en essayant de réamorcer. <phrase arch="any-x86">Modems internes, 
-cartes son et périphériques Plug'n Play sont souvent la cause des problèmes.</phrase>
-
-</para>
-<para>
-
-Si votre machine possède beaucoup de mémoire, plus de 512&nbsp;Mo, et si 
-l'installateur se bloque lors de l'amorçage du noyau, vous pouvez donner un
-paramètre d'amorçage pour limiter le total de la mémoire que le noyau devra 
-prendre en compte, par exemple <userinput>mem=512m</userinput>.
+Parfois, les dysfonctionnements proviennent de microprogrammes manquants, voyez
+see <xref linkend="hardware-firmware"/> and <xref linkend="loading-firmware"/>.
 
 </para>
   </sect2>
@@ -291,10 +288,13 @@ correctement, par exemple un CD live.
 
   <sect2 arch="x86" id="i386-boot-problems">
   <title>Problèmes communs sur &arch-title;</title>
+
 <para>
 Certains problèmes d'installation peuvent être résolus ou évités en
 passant des paramètres d'amorçage à l'installateur.
 </para>
+
+<!-- outdated
 <para>
 Certains systèmes ont un lecteur de disquettes avec
 «&nbsp;DCL inversés&nbsp;». Si vous obtenez des erreurs lors de la
@@ -329,6 +329,7 @@ sans doute pas la meilleure résolution pour votre système. Le paramètre
 mais elle n'est pas complète.</para></footnote>.
 Si cela ne fonctionne pas, on peut essayer le paramètre <userinput>fb=false</userinput>.
 </para>
+-->
 
 <para>
 Si votre écran commence à afficher une image bizarre lors des démarrages
@@ -346,7 +347,7 @@ de précisions.
 <sect3>
 <title>Le système bloque lors de la configuration des services PCMCIA</title>
 <para>
-Quelques ordinateurs portables fabriqués par Dell s'arrêtent fréquemment de
+Quelques très anciens ordinateurs portables fabriqués par Dell s'arrêtent fréquemment de
 fonctionner lorsque la détection des périphériques essaie d'accéder à certaines
 adresses matérielles. D'autres portables connaissent aussi des problèmes
 semblables. Si vous rencontrez un tel problème et si vous n'avez pas besoin de
@@ -369,6 +370,7 @@ passez ces valeurs à l'installateur.
 </para>
 </sect3>
 
+<!--
 <sect3>
 <title>Le système se bloque lors du chargement des modules USB</title>
 <para>
@@ -382,6 +384,8 @@ d'utiliser le paramètre <userinput>debian-installer/probe/usb=false</userinput>
 démarrage.
 </para>
 </sect3>
+-->
+
 </sect2>
 
  <sect2 arch="sparc" id="sparc-boot-problems">
@@ -417,11 +421,11 @@ Si vous installez X11, vous devez modifier aussi le pilote vidéo dans
 </sect3>
 
    <sect3>
-   <title>Amorçage ou installation impossibles à partir d'un cédérom</title>
+   <title>Amorçage ou installation impossibles à partir d'un CD</title>
 <para>
 
 Il est connu que certains systèmes Sparc s'amorcent difficilement par
-cédérom et, même si l'amorçage réussit, l'installation échoue parfois inexplicablement.
+CD et, même si l'amorçage réussit, l'installation échoue parfois inexplicablement.
 La plupart des problèmes ont été signalés sur des systèmes SunBlade.
 </para>
 <para>
@@ -518,7 +522,7 @@ rapport de bogue pour le paquet <classname>installation-reports</classname>,
 <informalexample><screen>
 Package: installation-reports
 
-Boot method: &lt;Comment avez-vous amorcé l'installateur ? cédérom, disquette ? réseau ?&gt;
+Boot method: &lt;Comment avez-vous amorcé l'installateur ? CD, disquette ? réseau ?&gt;
 Image version: &lt;URL complète de l'image téléchargée&gt;
 Date: &lt;Date et heure de l'installation&gt;
 
