@@ -15,19 +15,31 @@ installation is complete; see the <citerefentry>
 <refentrytitle>interfaces</refentrytitle> <manvolnum>5</manvolnum>
 </citerefentry> man page.
 
-</para><para>
+</para>
+
+<sect4 id="netcfg-automatic">
+<title>Automatic network configuration</title> 
+<para>
 
 By default, &d-i; tries to configure your computer's network
-automatically via DHCP. If the DHCP probe succeeds, you are done. If the
-probe fails, it may be caused by many factors ranging from unplugged
-network cable, to a misconfigured DHCP setup. Or maybe you don't have
-a DHCP server in your local network at all.  For further explanation,
-check the error messages on the fourth console.  In any case, you will
+automatically as far as possible.  If the automatic configuration
+fails, that may be caused by many factors ranging from an
+unplugged network cable to missing infrastructure for automatic
+configuration.  For further explanation in case of errors, check
+the error messages on the fourth console.  In any case, you will
 be asked if you want to retry, or if you want to perform a manual
-setup. DHCP servers are sometimes really slow in their responses, so
-if you are sure everything is in place, try again.
+setup.  Sometimes the network services used for autoconfiguration
+can be slow in their responses, so if you are sure everything is
+in place, simply start the autoconfiguration attempt again.
+If autoconfiguration fails repeatedly, you can instead choose
+the manual network setup.
 
-</para><para>
+</para>
+</sect4>
+
+<sect4 id="netcfg-manual">
+<title>Manual network configuration</title>
+<para>
 
 The manual network setup in turn asks you a number of questions about
 your network, notably
@@ -37,8 +49,8 @@ your network, notably
 <computeroutput>Name server addresses</computeroutput>, and a
 <computeroutput>Hostname</computeroutput>.
 Moreover, if you have a wireless network interface, you will be asked
-to provide your <computeroutput>Wireless ESSID</computeroutput> and
-a <computeroutput>WEP key</computeroutput> or
+to provide your <computeroutput>Wireless ESSID</computeroutput> 
+(<quote>wireless network name</quote>) and a <computeroutput>WEP key</computeroutput> or
 <computeroutput>WPA/WPA2 passphrase</computeroutput>.
 Fill in the answers from
 <xref linkend="needed-info"/>.
@@ -55,4 +67,26 @@ change them by editing <filename>/etc/network/interfaces</filename> once
 the system has been installed.
 
 </para></note>
+</sect4>
+
+<sect4 id="netcfg-ipv4-ipv6">
+<title>IPv4 and IPv6</title>
+<para>
+
+From &debian-gnu; 7.0 (<quote>Wheezy</quote>) onwards, &d-i; supports IPv6
+as well as the <quote>classic</quote> IPv4. All combinations of IPv4 and
+IPv6 (IPv4-only, IPv6-only and dual-stack configurations) are supported.
+
+</para><para>
+
+Autoconfiguration for IPv4 is done via DHCP (Dynamic Host Configuration
+Protocol).  Autoconfiguration for IPv6 supports stateless autoconfiguration
+using NDP (Neighbor Discovery Protocol, including recursive DNS server
+(RDNSS) assignment), stateful autoconfiguration via DHCPv6 and mixed
+stateless/stateful autoconfiguration (address configuration via NDP,
+additional parameters via DHCPv6).
+
+</para>
+</sect4>
+
    </sect3>
