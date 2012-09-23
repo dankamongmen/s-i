@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 64916 -->
+<!-- original version: 68011 -->
 
  <sect1 arch="not-s390"><title>Hardware speziell für GNU/&arch-kernel; kaufen</title>
 
@@ -39,66 +39,55 @@ Sie &arch-kernel;-freundliche Hardware-Verkäufer!
 Einige Hardware-Hersteller werden uns einfach nicht mitteilen, wie Treiber für
 ihre Hardware zu schreiben sind. Andere gewähren keinen Zugriff auf die
 Dokumentation ohne einen Geheimhaltungsvertrag, was uns davon abhalten würde,
-den &arch-kernel;-Quellcode zu veröffentlichen.
+den Quellcode des Treibers zu veröffentlichen. Treiber sind eines der
+zentralen Elemente freier Software. Da uns kein Zugang zu verwertbarer
+Dokumentation für diese Geräte gewährt wurde, werden diese unter
+&arch-kernel; einfach nicht funktionieren.
 
 </para><para>
 
-Da wir keinen Zugang zu den Dokumentationen dieser Geräte erhalten haben,
-werden Sie einfach unter &arch-kernel; nicht funktionieren. Sie können helfen, indem Sie
-die Hersteller solcher Hardware bitten, die Dokumentation zu veröffentlichen.
-Wenn genügend Leute fragen, werden sie begreifen, dass die Free Software
-Community einen wichtigen Markt darstellt.
-
-</para>
-</sect2>
-
-
-  <sect2 arch="any-x86"><title>Windows-spezifische Hardware</title>
-<para>
-
-Ein beunruhigender Trend ist die Verbreitung von Windows-spezifischen
-Modems und Druckern. In einigen Fällen werden sie speziell konstruiert,
-um mit dem Microsoft Windows-Betriebssystem zusammen zu arbeiten und tragen
-den Hinweis <quote>WinModem</quote> oder <quote>Made especially for
-Windows-based computers (speziell für Windows-basierte Computer
-entwickelt)</quote>. Das wird im Allgemeinen erreicht, indem integrierte
-Prozessoren aus der Hardware entfernt werden und die Arbeit an einen
-Windows-Treiber übergeben wird, der vom Prozessor des Rechners ausgeführt wird. Diese
-Strategie macht Hardware ein wenig billiger, aber die Einsparungen werden oft
-<emphasis>nicht</emphasis> an den Benutzer weitergegeben oder diese
-Hardware kann sogar teurer sein als gleichwertige Geräte, die ihre
-eingebettete Intelligenz behalten.
+In vielen Fällen gibt es Standards (oder zumindest De-Facto-Standards),
+die beschreiben, wie ein Betriebssytem und dessen Gerätetreiber mit einer
+bestimmten Geräteklasse kommunizieren. Alle Geräte, die sich an solch einen
+(De-Facto-)Standard halten, können mit einem einzigen generischen Gerätetreiber
+verwendet werden und es sind keine weiteren, gerätespezifischen Treiber nötig.
+Mit einigen Gerätenklassen (z.B. USB-<quote>Human Interface Devices</quote>
+wie Tastaturen, Mäusen etc. und USB-Massenspeicher-Geräten wie USB-Sticks und
+Speicherkartenlesern) funktioniert dies sehr gut und praktisch jedes in diesem
+Marktsegment verkaufte Gerät ist standard-konform.
 
 </para><para>
 
-Sie sollten Windows-spezifische Hardware aus zwei Gründen meiden. Der
-erste ist, dass die Hersteller grundsätzlich nicht die Ressourcen zur Verfügung
-stellen, um einen &arch-kernel;-Treiber zu schreiben. Im Allgemeinen sind
-die Hardware- und Software-Schnittstellen des Geräts proprietär und
-Dokumentation ist, wenn überhaupt, nicht ohne einen Geheimhaltungsvertrag
-verfügbar. Das verhindert die Verwendung für Freie Software,
-da Programmierer freier Software den Quellcode ihrer Software offen
-legen. Der zweite Grund ist, dass das Betriebssystem die Arbeit des
-eingebetteten Prozessors übernehmen muss, oftmals mit
-<emphasis>Echtzeit</emphasis>-Priorität, und der Prozessor für
-den Betrieb Ihrer Programme nicht verfügbar ist, während er diese
-Geräte ansteuert. Da der typische Windows-Benutzer nicht so intensiv
-Multi-Tasking betreibt wie ein &arch-kernel;-Benutzer, hoffen die Hersteller,
-dass der Windowsbenutzer die Belastung einfach nicht bemerkt, die
-diese Hardware der CPU auferlegt. Jedes Multi-Tasking-Betriebssystem,
-sogar Windows 2000 oder XP, leidet aber unter reduzierter Performance, wenn
-Peripherie-Hersteller mit der eingebetteten Rechenleistung ihrer Hardware
-geizen.
+In anderen Bereichen, wie z.B. bei Druckern, ist dies unglücklicherweise nicht
+der Fall. Während es viele Drucker gibt, die mit einer kleinen Menge von
+(De-Facto-)Standard-Steuersprachen bedient werden können und daher ohne
+Probleme in jedem Betriebssystem zum Laufen gebracht werden können, gibt es
+auch ziemlich viele Modelle, die nur proprietäre Steuerbefehle verstehen,
+für die keine verwertbare Dokumentation existiert. Diese können so auf einem
+freien Betriebssystem entweder gar nicht genutzt werden, oder nur mit einem
+vom Hersteller beigestellten Treiber, für den der Quellcode nicht zugänglich
+ist.
+
+</para><para>
+
+Auch wenn zum Zeitpunkt des Kaufs ein Treiber mit nicht zugänglichem Quellcode
+vom Hersteller für solche Hardware angeboten wird, ist die praktische
+Lebensdauer abhängig von der Verfügbarkeit des Treibers. Heutzutage sind die
+Produktzyklen kurz geworden und es ist nicht unüblich, dass kurze Zeit, nachdem
+der Hersteller die Produktion eines Gerätes einstellt, auch keine
+Aktualisierungen für den Treiber vom Hersteller mehr bereitgestellt werden.
+Wenn der Treiber, für den der Quellcode nicht zugänglich ist, nach einem
+System-Update nicht mehr funktioniert, wird das ansonsten perfekt
+funktionierende Gerät nutzlos, da die Treiberunterstützung fehlt, und es gibt
+nichts, was in diesem Fall dagegen getan werden könnte. Sie sollten daher von
+vornherein vermeiden, Hardware zu kaufen, die nicht quelloffen ist,
+unabhängig davon, auf welchem Betriebssystem Sie sie verwenden möchten.
 
 </para><para>
 
 Sie können helfen, diese Situation zu verbessern, indem Sie die Hersteller
-ermuntern, die Dokumentation und andere zur Programmierung ihrer
-Hardware notwendigen Ressourcen zu veröffentlichen, aber die beste Strategie
-ist einfach, diese Art Hardware zu meiden<phrase arch="linux-any">, bis
-sie im
-<ulink url="&url-hardware-howto;">Linux-Hardware-Compatibility-HowTo</ulink>
-als funktionierend aufgelistet ist</phrase>.
+ermuntern, die Dokumentation und andere für die Programmierung von Treibern
+für ihre Hardware notwendigen Ressourcen zu veröffentlichen.
 
 </para>
 </sect2>
