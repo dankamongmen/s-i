@@ -1,4 +1,4 @@
-<!-- original version: 67232 -->
+<!-- original version: 68097 -->
 
 <sect3 id="netcfg">
    <title>Configuration du réseau</title>
@@ -10,17 +10,28 @@ utiliser pour l'installation. Les autres interfaces ne seront pas configurées.
 Vous pourrez les configurer une fois l'installation terminée.
 Voyez la page du manuel <citerefentry><refentrytitle>interfaces</refentrytitle> <manvolnum>5</manvolnum></citerefentry>.
 </para>
+
+<sect4 id="netcfg-automatic">
+<title>Configuration automatique du réseau</title> 
+
 <para>
-L'installateur essaie d'abord de configurer automatiquement le réseau avec DHCP.
-Si le test DHCP réussit, tout est fait. Si le test échoue, il peut y avoir
-plusieurs raisons, un câble mal branché, un serveur DHCP mal configuré. Ou bien
-votre réseau ne possède pas de serveur DHCP. Lisez les messages d'erreur sur la
-troisième console pour d'autres explications. Dans tous les cas, on vous
-demandera si vous voulez réessayer ou si vous voulez configurer vous-même le
-réseau. Les serveurs DHCP sont parfois très lents et si vous êtes sûr que tout
-est en place, réessayez.
+
+L'installateur essaie d'abord de configurer automatiquement le réseau.
+S'il échoue, il peut y avoir plusieurs raisons, un câble mal branché, un serveur absent.
+Lisez les messages d'erreur sur la quatrième console pour des explications.
+Dans tous les cas, on vous demandera si vous voulez réessayer ou si vous voulez configurer vous-même le
+réseau. Les serveurs sont parfois très lents et si vous êtes sûr que tout
+est en place, réessayez. En cas d'échec répété, vous pouvez choisir de configurer
+vous-même le réseau.
+
 </para>
+</sect4>
+
+<sect4 id="netcfg-manual">
+<title>Configuration manuelle du réseau</title>
+
 <para>
+
 Si vous configurez vous-même le réseau, on vous demandera
 l'<computeroutput>adresse IP</computeroutput> de votre machine, le
 <computeroutput>masque réseau</computeroutput>, l'adresse de la
@@ -33,8 +44,11 @@ demandera le nom <computeroutput>ESSID</computeroutput> du réseau et la
 ou <computeroutput>la phrase secrète WPA/WPA2</computeroutput>.
 Pour ces réponses, voyez
 <xref linkend="needed-info"/>.
+
 </para>
+
 <note><para>
+
 Voici quelques précisions techniques que vous trouverez, ou non, utiles&nbsp;:
 le programme suppose que l'adresse IP du réseau est le résultat d'un
 <quote>ET logique</quote> entre l'adresse de la machine et l'adresse du
@@ -44,5 +58,27 @@ logique du masque réseau. Si vous ne connaissez aucune de ces valeurs,
 utilisez les valeurs proposées par l'installateur. Vous pourrez les
 changer quand le système aura été installé, en modifiant le fichier
 <filename>/etc/network/interfaces</filename>.
+
 </para></note>
+
+</sect4>
+
+<sect4 id="netcfg-ipv4-ipv6">
+<title>IPv4 et IPv6</title>
+
+<para>
+
+Depuis &debian-gnu; 7.0 (<quote>Wheezy</quote>), l'&d-i; sait gérer IPv6
+aussi bien que le <quote>classique</quote> IPv4. Toutes les combinaisons possibles
+d'IPv4 et IPv6 sont acceptées.
+
+</para><para>
+
+La configuration automatique pour IPv4 est faite par DHCP (Dynamic Host Configuration
+Protocol). Celle pour IPv6 utilise NDP (Neighbor Discovery Protocol) avec RDNSS (recursive DNS server)
+ou DHCPv6, ou encore un mixte des deux (configuration de l'adresse par NDP, paramètres additionnels par DHCPv6).
+
+</para>
+</sect4>
+
 </sect3>
