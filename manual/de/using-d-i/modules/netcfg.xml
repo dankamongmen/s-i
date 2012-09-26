@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 67232 -->
+<!-- original version: 68097 -->
 
    <sect3 id="netcfg">
    <title>Netzwerk-Konfiguration</title>
@@ -15,22 +15,35 @@ zusätzliche Anschlüsse konfigurieren, nachdem die Installation beendet ist;
 lesen Sie die <citerefentry><refentrytitle>interfaces</refentrytitle>
 <manvolnum>5</manvolnum> </citerefentry>-Handbuchseite.
 
-</para><para>
+</para>
 
-Standardmäßig versucht &d-i;, das Netzwerk Ihres Computers automatisch per
-DHCP zu konfigurieren. Wenn die DHCP-Anfrage erfolgreich ist, sind Sie fertig.
-Schlägt die Anfrage fehl, so kann dies durch eine Reihe von Faktoren von einem
-nicht korrekt eingesteckten Netzwerkkabel bis hin zu einem falsch
-konfigurierten DHCP-Setup ausgelöst werden. Oder vielleicht haben Sie überhaupt
-keinen DHCP-Server in Ihrem Netzwerk. Für weitere Erklärungen kontrollieren Sie
+<sect4 id="netcfg-automatic">
+<title>Automatische Konfiguration</title> 
+<para>
+
+Standardmäßig versucht &d-i;, das Netzwerk Ihres Computers soweit wie möglich
+automatisch zu konfigurieren. Wenn die automatische Konfiguration
+fehlschlägt, kann dies durch eine Reihe von Faktoren von einem
+nicht korrekt eingesteckten Netzwerkkabel bis hin zu fehlender Infrastruktur
+für solch eine automatische Konfiguration ausgelöst werden.
+Zur weiteren Diagnose kontrollieren Sie
 die Fehlermeldungen auf der vierten Konsole. Sie werden auf jeden Fall gefragt,
 ob Sie es erneut versuchen möchten, oder ob Sie die Einstellungen manuell
-vornehmen möchten. DHCP-Server sind manchmal mit ihrer Antwort extrem langsam;
-wenn Sie also sicher sind, dass alles stimmt, versuchen Sie es erneut.
+vornehmen möchten.
+Manchmal haben die Netzwerkdienste für die automatische Konfiguration
+lange Antwortzeiten; wenn Sie also sicher sind, dass alles korrekt ist,
+starten Sie die automatische Konfiguration einfach nochmal. Falls die
+automatische Konfiguration wiederholt fehlschlägt, können Sie stattdessen
+die manuelle Einrichtung wählen.
 
-</para><para>
+</para>
+</sect4>
 
-Das manuelle Netzwerk-Setup hingegen fragt Sie nach einigen Angaben über Ihr
+<sect4 id="netcfg-manual">
+<title>Manuelle Konfiguration</title>
+<para>
+
+Das manuelle Netzwerk-Setup fragt Sie nach einigen Angaben über Ihr
 Netzwerk, hauptsächlich
 <computeroutput>IP-Adresse</computeroutput>,
 <computeroutput>Netzmaske</computeroutput>,
@@ -38,7 +51,8 @@ Netzwerk, hauptsächlich
 <computeroutput>Name-Server-Adressen (DNS)</computeroutput> und
 <computeroutput>Hostname (Rechnername)</computeroutput>.
 Wenn Sie ein drahtloses Netzwerk haben, werden Sie außerdem noch
-nach der <computeroutput>Wireless ESSID</computeroutput> und dem
+nach der <computeroutput>Wireless ESSID</computeroutput>
+(dem <quote>Namen</quote> des drahtlosen Netzwerks) und dem
 <computeroutput>WEP-Schlüssel</computeroutput> bzw. der
 <computeroutput>WPA/WPA2-Passphrase</computeroutput>
 gefragt. Geben Sie hier die Angaben
@@ -54,7 +68,34 @@ Ihres Systems mit der bit-weise umgekehrten Netzmaske errechnet. Ebenso versucht
 Ihre Gateway-Adresse herauszufinden.
 Wenn Ihnen also diese Angaben nicht zur Verfügung stehen, verwenden Sie die vom
 Installer vorgeschlagenen Werte &ndash; falls notwendig, können Sie sie durch
-das Bearbeiten der Datei <filename>/etc/network/interfaces</filename> ändern.
+das Bearbeiten der Datei <filename>/etc/network/interfaces</filename> ändern,
+sobald das System installiert ist.
 
 </para></note>
+
+</sect4>
+
+<sect4 id="netcfg-ipv4-ipv6">
+<title>IPv4 und IPv6</title>
+<para>
+
+Ab &debian-gnu; 7.0 (<quote>Wheezy</quote>) unterstützt der &d-i; zusätzlich
+zum <quote>klassischen</quote> IPv4 auch IPv6. Alle Kombinationen von IPv4
+und IPv6 (nur IPv4, nur IPv6 oder eine Dual-Stack-Konfiguration, in der beide
+Protokolle parallel laufen) werden unterstützt.
+
+</para><para>
+
+Die automatische Konfiguration für IPv4 wird über DHCP (Dynamic Host
+Configuration Protocol) durchgeführt. Für IPv6 wird zustandslose (stateless)
+Autokonfiguration mittels NDP (Neighbor Discovery Protocol, inklusive
+rekursiver DNS-Server-Zuweisung (RDNSS)) unterstützt, außerdem
+zustandsbehaftete (stateful) Autokonfiguration über DHCPv6, und schließlich
+noch die gemischte Variante von zustandsloser und zustandsbehafteter
+Autokonfiguration (Adresskonfiguration über NDP, zusätzliche Parameter über
+DHCPv6).
+
+</para>
+</sect4>
+
    </sect3>
