@@ -498,7 +498,7 @@ pot_master=${DI_COPY}/packages/po/template.pot
 # Temporarily restore charset header
 sed -i 's/charset=CHARSET/charset=UTF-8/g' $pot_master
 # Sanity check: template.pot should not contain incorrect sublevels
-if [ "$(msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
+if [ "$(LC_ALL=en_US.UTF-8 msggrep -X -E -e ":sl([^1-$NUMLEVELS]|..+):" $pot_master)" ]; then
 	error "Invalid sublevel comments detected in template.pot"
 	exit 1
 fi
