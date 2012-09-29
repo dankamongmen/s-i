@@ -1,5 +1,5 @@
 <!-- retain these comments for translator revision tracking -->
-<!-- original version: 67916 -->
+<!-- original version: 68012 -->
 
  <sect1 id="hardware-supported">
  <title>Unterstützte Hardware</title>
@@ -240,10 +240,15 @@ zu kontaktieren.
   <sect2 arch="x86" id="laptops"><title>Laptops</title>
 <para>
 
-Auch Laptops werden unterstützt und heutzutage funktionieren die meisten
-<quote>out of the box</quote>, also direkt ohne manuelle Nacharbeit. Falls ein
-Laptop spezialisierte oder proprietäre Hardware enthält, werden bestimmte
-Funktionen möglicherweise nicht unterstützt. Um zu erfahren, ob ein bestimmter
+Von der technischen Seite her betrachtet sind Laptops normale PCs, daher gelten
+alle Informationen zu PC-Systemen auch für Laptops. Installationen auf Laptops
+laufen heutzutage normalerweise ohne Probleme, inklusive Dingen wie dem
+automatischen Einfrieren des Systems (Suspend) beim Schließen des Deckels
+oder Laptop-spezifischen Knöpfen wie denen zum Deaktivieren des
+Funkmoduls (<quote>Flugzeug-Modus</quote>). Trotzdem verwenden die
+Hardware-Hersteller manchmal für einige Laptop-spezifische Funktionen spezielle
+oder proprietäre Hardware, die unter Umständen nicht unterstützt wird.
+Um zu erfahren, ob ein bestimmter
 Laptop gut mit GNU/Linux funktioniert, können Sie zum Beispiel die
 <ulink url="&url-x86-laptop;">Linux-on-Laptops-Seiten</ulink> besuchen.
 
@@ -256,20 +261,15 @@ Laptop gut mit GNU/Linux funktioniert, können Sie zum Beispiel die
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
 Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
-verfügbar. Das Standard-Kernelimage in &release; wurde mit SMP-Unterstützung
-kompiliert. Dieser Kernel ist auch auf nicht-SMP-Systemen nutzbar. Zwar hat
-er einen geringen Overhead, was zu einem kleinen Verlust an Performance führt,
-dies ist jedoch bei normaler Systemnutzung kaum zu bemerken.
+verfügbar. Mehrere Prozessoren in einem Computer zu haben, war ursprünglich
+nur auf High-End-Servern ein Thema, ist aber in den letzten Jahren mit der
+Einführung sogenannter <quote>Multi-Core</quote>-Prozessoren sogar für
+Desktop-Computer der Einsteiger-Klasse üblich geworden. Diese enthalten
+zwei oder mehr Prozessoreinheiten, sogenannte <quote>Cores</quote>
+(Kerne), in einm physikalischen Chip.
 
-</para><para>
-
-Um den Kernel für Single-CPU-Systeme zu optimieren, müssen Sie den
-Standard-&debian;-Kernel durch einen eigenen ersetzen.
-<phrase arch="linux-any">Eine Erörterung dazu
-finden Sie im <xref linkend="kernel-baking"/>. Derzeit
-(in Kernel-Version &kernelversion;) ist der Weg zum Deaktivieren von SMP
-das Abwählen von <quote>&smp-config-option;</quote> im
-<quote>&smp-config-section;</quote>-Abschnitt der Kernel-Konfiguration.</phrase>
+Das Standard-Kernel-Image in &release; wurde mit SMP-Unterstützung
+kompiliert. Es ist auch auf Nicht-SMP-Systemen ohne Probleme nutzbar.
 
 </para>
   </sect2>
@@ -280,15 +280,22 @@ das Abwählen von <quote>&smp-config-option;</quote> im
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
 Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
-verfügbar. Das Standard-Kernelimage in &release; wurde mit
+verfügbar. Das Standard-Kernel-Image in &release; wurde mit
 <firstterm>SMP-alternatives</firstterm>-Unterstützung kompiliert.
 Das bedeutet, dass der Kernel die Zahl der Prozessoren (oder
 Prozessor-Kerne) erkennt und bei Ein-Prozessor-Systemen automatisch die
 SMP-Unterstützung deaktiviert.
 
+Mehrere Prozessoren in einem Computer zu haben, war ursprünglich
+nur auf High-End-Servern ein Thema, ist aber in den letzten Jahren mit der
+Einführung sogenannter <quote>Multi-Core</quote>-Prozessoren sogar für
+Desktop-Computer der Einsteiger-Klasse üblich geworden. Diese enthalten
+zwei oder mehr Prozessoreinheiten, sogenannte <quote>Cores</quote>
+(Kerne), in einm physikalischen Chip.
+
 </para><para arch="i386">
 
-Die 486-Variation des &debian;-Kernelimage-Pakets für &arch-title;
+Die 486-Variation des &debian;-Kernel-Image-Pakets für &arch-title;
 ist nicht mit SMP-Unterstützung kompiliert.
 
 </para>
@@ -300,7 +307,7 @@ ist nicht mit SMP-Unterstützung kompiliert.
 
 Mehrprozessor-Unterstützung &ndash; auch <quote>symmetrisches
 Multiprocessing (SMP)</quote> genannt &ndash; ist für diese Architektur
-verfügbar. Das Standard-Kernelimage in &release; unterstützt jedoch kein SMP.
+verfügbar. Das Standard-Kernel-Image in &release; unterstützt jedoch kein SMP.
 Das sollte eine Installation jedoch nicht verhindern, da der
 Standard-Nicht-SMP-Kernel auch auf SMP-Systemen starten müsste;
 der Kernel wird dann lediglich die erste CPU verwenden.
@@ -353,20 +360,21 @@ dazu finden Sie im
   <sect2 id="gfx" arch="not-s390"><title>Grafikkarten-Unterstützung</title>
 <para arch="x86">
 
-Sie sollten eine VGA-kompatible Grafikschnittstelle für das
-Konsolen-Terminal verwenden. Nahezu jede moderne Grafikkarte ist zu
-VGA kompatibel. Ältere Standards wie CGA, MDA oder HGA sollten ebenfalls
-funktionieren, sofern Sie keinen X11-Support benötigen. Beachten Sie,
-dass X11 während des Installationsvorgangs, wie er in diesem Dokument
-beschrieben wird, nur verwendet wird, wenn der grafische Installer
-explizit ausgewählt wurde.
+Die Unterstützung für Grafikkarten in &debian; wird bestimmt von der
+zugrundeliegenden Unterstützung im X.Org-X11-System. Auf modernen PCs
+funktioniert die grafische Anzeige normalerweise direkt ohne Probleme.
+Ob erweiterte Funktionen der Grafikkarte, wie 3D-Hardware-Beschleunigung
+oder hardware-beschleunigte Anzeige, verfügbar sind, hängt von der
+letztendig im System verwendeten Grafik-Hardware ab und manchmal ist
+die Installation von zusätzlichen <quote>Firmware</quote>-Images nötig
+(siehe <xref linkend="hardware-firmware"/>). In einigen wenigen Fällen
+gab es Berichte über Hardware, bei der auch für die grundsätzliche
+Basisfunktionalität der Grafikkarte die Installation von zusätzlicher
+Firmware erforderlich war; dies sind aber seltene Ausnahmen.
 
 </para><para>
 
-&debian;'s Unterstützung für grafische Schnittstellen hängt vom
-zugrundeliegenden Support des X.Org-X11-Systems ab. Die meisten AGP-, PCI-,
-PCIe- und PCI-X-Grafikkarten funktionieren unter X.Org. Details über unterstützte
-Grafikkarten-Bussysteme, Grafikkarten, Bildschirme und Zeigegeräte finden Sie
+Details über unterstützte Grafikkarten und Zeigegeräte finden Sie
 unter <ulink url="&url-xorg;"></ulink>. &debian-gnu; &release; enthält X.Org in
 Version &x11ver;.
 
@@ -423,6 +431,17 @@ damit es funktioniert. Dies ist überwiegend bei Netzwerkkarten (speziell
 für Drahtlos-Netzwerke/Wireless-LAN) üblich, aber es gibt zum Beispiel
 auch USB-Geräte und sogar einige Festplatten-Controller, die Firmware
 erfordern.
+Bei vielen Grafikkarten ist die grundsätzliche Basisfunktionalität ohne
+zusätzliche Firmware verfügbar, die Nutzung von erweiterter Funktionen erfordert
+jedoch, dass eine bestimmte Firmware-Datei in dem System installiert wird.  
+
+</para><para>
+
+Auf vielen älteren Geräten, die Firmware zum Betrieb erforderten, war die
+Firmware durch den Hersteller fest in einem EEPROM-/Flash-Chip auf der Karte
+selbst abgelegt. Heutzutage haben neue Geräte die Firmware nicht mehr auf diese
+Weise integriert, so dass die Firmware-Datei von dem Betriebssytem des Rechners
+bei jedem Systemstart in das Gerät geladen werden muss.
 
 </para><para>
 
@@ -438,9 +457,19 @@ in der Non-Free-Sektion des Archivs verfügbar.
 Dies bedeutet aber nicht, dass solche Hardware nicht während der
 Installation verwendet werden kann. Seit &debian-gnu; 5.0 unterstützt der
 &d-i; die Möglichkeit, Firmware-Dateien oder -Pakete von einem transportablen
-Medium (wie einer Diskette oder einem USB-Stick) nachzuladen.
+Medium (wie einem USB-Stick) nachzuladen.
 <xref linkend="loading-firmware"/> enthält detailierte Informationen, wie
 Sie die Firmware während der Installation laden können.
+
+</para><para>
+
+Wenn der &d-i; eine Firmware-Datei anfordert und Sie diese Datei nicht haben
+oder keine nicht-freie Firmware auf Ihrem System installieren möchten, können
+Sie versuchen, ohne das Laden von Firmware fortzufahren. Es gibt mehrere Fälle,
+wo der Treiber zusätzliche Firmware anfordert, da diese unter bestimmten
+Umständen nötig sein könnte, das Gerät aber auf den meisten Systemen auch ohne
+diese Firmware funktioniert (dies passiert z.B. mit bestimmten Netzwerkkarten,
+die den tg3-Treiber verwenden).
 
 </para>
  </sect1>
