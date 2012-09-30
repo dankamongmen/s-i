@@ -94,7 +94,7 @@ find ${NEW_PATH} -empty -exec rm '{}' ';'
 
 # build "index.html" with the new results
 export DIFF_DIR=${WORK_DIR}
-sh build_index.sh ${WORK_DIR}/stats.txt ${HTML_PAGE} ${WORK_DIR}/index.html
+${SCRIPTS_PATH}/build_index.sh ${WORK_DIR}/stats.txt ${HTML_PAGE} ${WORK_DIR}/index.html
 
 SAVED_STATS=`echo ${NEW}.txt | sed "s:check_:stats_:"`
 cp ${WORK_DIR}/stats.txt ${OUT_DIR}/history/${SAVED_STATS}
