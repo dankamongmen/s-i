@@ -338,7 +338,13 @@ EOF
     else {
       $location = substr($source, 0, 1) . "/" . $source;
     }
-    my $response = $ua->get("http://packages.debian.org/changelogs/pool/main/$location/current/changelog");
+    # Strip the epoch:
+    my $version = $sources{$source}{max};
+    $version =~ s/^\d+://;
+    # The 'current' symlink seems to point to the highest version
+    # available, meaning experimental in a bunch of cases, so use the
+    # 'max' version for each package:
+    my $response = $ua->get("http://packages.debian.org/changelogs/pool/main/$location/${source}_${version}/changelog");
     if ($response->is_success) {
       print STDERR "DEBUG: downloaded changelog: $source\n";
       open my $file, '>', $source_filename
@@ -348,7 +354,10 @@ EOF
         or die "Unable to close $source_filename";
     }
     else {
-      print STDERR "DEBUG: unable to download changelog: $source\n";
+      # FIXME: Would a fallback to the 'current' symlink help? One is
+      # supposed to prepare the announce right after a build, so the
+      # proper versions should be available, right?
+      print STDERR "DEBUG: unable to download changelog: ${source}_${version}\n";
     }
   }
 }
