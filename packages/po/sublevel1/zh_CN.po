@@ -27,7 +27,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2012-04-05 02:38+0800\n"
 "Last-Translator: YunQiang Su <wzssyqa@gmail.com>\n"
 "Language-Team: Chinese (simplified) <debian-l10n-chinese@lists.debian.org>\n"
@@ -2578,6 +2578,30 @@ msgstr "正在等待硬件初始化..."
 msgid "Checking for firmware..."
 msgstr "正在检查固件..."
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid "Auto-configure networking?"
+msgstr "自动配置网络吗？"
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+"网络可以通过手动输入全部信息或者使用 DHCP (或针对 IPv6 的变种)来进行配置。如"
+"果您选择了自动配置，但安装程序无法从网络中获得有效的网络配置，您仍然可以手动"
+"输入。"
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2640,6 +2664,35 @@ msgstr ""
 "您的系统有多个网络接口，请在安装过程中选择其中之一作为主网络接口。如果可能的"
 "话，安装程序会选择第一个已连接的网络接口。"
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "${iface} 的无线 ESSID："
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr "尝试寻找可用的无线网络失败。"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} 是一个无线网络接口。请输入 ${iface} 将要使用的无线网络的名称 "
+"(ESSID)。如果您希望使用任意可用的网络，请将此处置空。"
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2692,6 +2745,14 @@ msgstr "正在存储网络设置..."
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "配置网络"
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr "${essid_list} 手动输入 ESSID"
 
 #. Type: string
 #. Description
@@ -2818,6 +2879,50 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "重新设置无线网络"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr "IP 地址："
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr "IP 对计算机是唯一的，其可能是："
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr ""
+" * 句点分隔的四个数字(IPv4);\n"
+" * 冒号分隔的十六进制字符(IPv6)。"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr "您也可以在后附加一个CIDR掩码(如 “/24”)。"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr "如果您不知道应该输入什么内容，请咨询网络管理员。"
 
 #. Type: string
 #. Description
@@ -3937,7 +4042,7 @@ msgstr "正在安装基本系统"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4307,19 +4412,65 @@ msgstr "配置软件包管理器"
 msgid "Configuring apt"
 msgstr "正在配置 apt"
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "正在扫描本地软件源..."
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr "安全更新 (来自 ${SEC_HOST})"
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr "发布版本的更新(updates)："
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
-msgid "Scanning the security updates repository..."
-msgstr "正在扫描安全更新软件源..."
+#: ../apt-setup-udeb.templates:10002
+msgid "Services to use:"
+msgstr "要使用的服务："
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr ""
+"Debian 有两个为已发布版本提供更新的服务：security (安全) 和 updates (更新)。"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr "安全更新能够帮助您的系统抵御外来的攻击。强烈建议您启用这项更新服务。"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
+"发布版本更新(updates)为那些变动相对频繁，而且使用非最新版本会降低可用性的软件"
+"提供新的版本，也提供回归修复(regression fixes)。这一服务只针对稳定版 "
+"(stable) 和旧稳定版 (oldstable)。"
 
 #. Type: text
 #. Description
@@ -4735,7 +4886,7 @@ msgstr "请注意，您将不会看到所输入的密码内容。"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"

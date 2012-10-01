@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2009-03-20 00:30+0200\n"
 "Last-Translator: Nicholas Ng <nbliang@gmail.com>\n"
 "Language-Team: Translation Project Team, Kuching Open Source Community\n"
@@ -2686,6 +2686,29 @@ msgstr "Menunggu inisiasi perkakasan..."
 msgid "Checking for firmware..."
 msgstr "Pemeriksaan firmware..."
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+#, fuzzy
+#| msgid "Configure the network"
+msgid "Auto-configure networking?"
+msgstr "Kom=nfigurasikan rangkaian."
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2753,6 +2776,41 @@ msgstr ""
 "dijadikan antaramuka rangkaian utama semasa pemasangan, jika boleh, "
 "antaramuka rangkaian pertama disambung yang ditemui telah dipilih."
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "ESSID tanpa wayar untuk ${iface}"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr ""
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+#, fuzzy
+#| msgid ""
+#| "${iface} is a wireless network interface. Please enter the name (the "
+#| "ESSID) of the wireless network you would like ${iface} to use. If you "
+#| "would like to use any available network, leave this field blank."
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} adalah antaramuka rangkaian tanpa wayar. Sila masukkan nama (ESSID) "
+"atau rangkaian tanpa wayar yang anda ingin ${iface} untuk gunakan. Jika anda "
+"mahu gunakan mana-mana rangkaian yang ada, sila tinggalkan medan ini kosong."
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2807,6 +2865,14 @@ msgstr "Menyimpan konfigurasi rangkaian..."
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "Kom=nfigurasikan rangkaian."
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr ""
 
 #. Type: string
 #. Description
@@ -2938,6 +3004,54 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "Konfigurasikan semula rangkaian tanpa wayar"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr ""
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr ""
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr ""
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr ""
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+#, fuzzy
+#| msgid ""
+#| "If you don't know what to enter, consult your documentation, or leave it "
+#| "blank to not load the module."
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr ""
+"Jika anda tidak tahu apa yang perlu dimasukkan, dapatkan maklumat dari "
+"dokumentasi anda, atau biarkan ianya kosong untuk tidak memuatkan modul."
 
 #. Type: string
 #. Description
@@ -4115,7 +4229,7 @@ msgstr "Memasang sistem dasar"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4503,20 +4617,63 @@ msgstr "Mengkonfigurasi pengurus pakej"
 msgid "Configuring apt"
 msgstr "Sedang mengkonfigurasi apt..."
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "Mengimbas repositori lokal..."
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr ""
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr ""
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
+#: ../apt-setup-udeb.templates:10002
 #, fuzzy
-msgid "Scanning the security updates repository..."
-msgstr "Memindai repositori update keamanan..."
+#| msgid "NTP server to use:"
+msgid "Services to use:"
+msgstr "Server NTP untuk digunakan:"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr ""
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr ""
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
 
 #. Type: text
 #. Description
@@ -4967,7 +5124,7 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"

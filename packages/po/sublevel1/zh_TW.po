@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2012-04-03 03:09+0800\n"
 "Last-Translator: Yao Wei (魏銘廷) <mwei@lxde.org>\n"
 "Language-Team: Debian-user in Chinese [Big5] <debian-chinese-big5@lists."
@@ -2618,6 +2618,29 @@ msgstr "正在等待初始化硬體……"
 msgid "Checking for firmware..."
 msgstr "正在檢查韌體……"
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid "Auto-configure networking?"
+msgstr "要自動設定網路嗎？"
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+"您可以手動輸入網路設定，或使用 DHCP （或各種 IPv6 的方法）自動偵測網路設定。"
+"即使自動偵測網路設定失敗，您還是可以手動設定網路。"
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2681,6 +2704,35 @@ msgstr ""
 "您的系統有多個網路介面。請選擇其中之一來做為進行安裝時的主要網路介面。若可"
 "以，已指定為使用第一個被找到的已連線之網路介面。"
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "${iface} 的無線 ESSID:"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr "搜尋可用的無線網路失敗。"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} 是無線網路介面卡。請輸入 ${iface} 要用的無線網路的名稱 (ESSID)。若隨"
+"便連上哪個網路都好，此欄請留白。"
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2734,6 +2786,14 @@ msgstr "正在儲存網路設定……"
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "網路設定"
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr "${essid_list} 請手動輸入 ESSID"
 
 #. Type: string
 #. Description
@@ -2861,6 +2921,48 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "重新設定無線網路"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr "IP 位址："
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr "IP 位址專屬於你的電腦，可能是："
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr "* 句點隔開的四個數字 (IPv4)。* 冒號隔開的十六進位字元詞組 (IPv6)。"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr "你可以加上 CIDR 網路遮罩（如 \"/24\"）。"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr "若不知道要用什麼，請詢問您的網管人員。"
 
 #. Type: string
 #. Description
@@ -3986,7 +4088,7 @@ msgstr "安裝基本系統"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4356,19 +4458,64 @@ msgstr "設定套件管理程式"
 msgid "Configuring apt"
 msgstr "設定 apt"
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "正在掃瞄本機的檔案資料庫……"
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr "安全更新（來自 ${SEC_HOST}）"
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr "發行版更新"
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
-msgid "Scanning the security updates repository..."
-msgstr "正在掃瞄安全更新檔案庫……"
+#: ../apt-setup-udeb.templates:10002
+msgid "Services to use:"
+msgstr "要使用的服務："
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr "Debian 替發行版提供了兩個更新服務：「安全更新」和「發行版更新」。"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr "安全更新可以用來幫助您的系統抵禦外來的攻擊。強烈建議您能啟用這項服務。"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
+"發行版更新替一些時常更新，且若不使用最新版本可能會降低可用性的軟體提供更及時"
+"的版本，也提供新版本所引入的問題 (regression) 的修復。這項服務僅提供給 "
+"stable 及 oldstable 發行版。"
 
 #. Type: text
 #. Description
@@ -4786,7 +4933,7 @@ msgstr "請注意，您將不會看到您正在鍵入的密碼。"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"

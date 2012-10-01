@@ -53,7 +53,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2012-07-23 19:53+0200\n"
 "Last-Translator: Javier Fernández-Sanguino <jfs@debian.org>\n"
 "Language-Team:  Debian Spanish <debian-l10n-spanish@lists.debian.org>\n"
@@ -2748,6 +2748,32 @@ msgstr "Esperando a la inicialización del hardware..."
 msgid "Checking for firmware..."
 msgstr "Comprobando el firmware..."
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid "Auto-configure networking?"
+msgstr "¿Desea configurar automáticamente la red?"
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+"La red puede configurarse, bien introduciendo manualmente toda la "
+"información o bien mediante DHCP (o una variedad de métodos específicos de "
+"IPv6) para detectar automáticamente la configuración de red. Si elige DHCP y "
+"el instalador no puede encontrar una configuración que funcione de la red, "
+"se le dará oportunidad de configurar la red manualmente."
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2816,6 +2842,37 @@ msgstr ""
 "seleccionado la primera interfaz de red conectada si había alguna que lo "
 "estaba."
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "ESSID inalámbrica para ${iface}:"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr "Se produjo un fallo al intentar encontrar una red inalámbrica."
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} es una interfaz a una red inalámbrica («wireless»). Introduzca el "
+"nombre (el ESSID) de la red inalámbrica a la que quiere que se conecte "
+"${iface}. Deje el nombre en blanco si desea utilizar cualquier red que esté "
+"disponible."
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2869,6 +2926,14 @@ msgstr "Guardando la configuración de la red ..."
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "Configurar la red"
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr "${essid_list} Introducir ESSID manualmente"
 
 #. Type: string
 #. Description
@@ -3000,6 +3065,52 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "Reconfigurar la red inalámbrica"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr "Dirección IP:"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr "La dirección IP es única para su ordenador y puede ser:"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr ""
+" * cuatro bloques de números separados por puntos (IPv4);\n"
+" * bloques de caracteres hexadecimales separados por dos puntos (IPv6)."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr ""
+"También puede añadir una máscara de red CIDR al final (como por ejemplo "
+"«/24»)."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr "Consulte con su administrador de red si no sabe qué escribir aquí."
 
 #. Type: string
 #. Description
@@ -4162,7 +4273,7 @@ msgstr "Instalando el sistema base"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4532,19 +4643,70 @@ msgstr "Configurar el gestor de paquetes"
 msgid "Configuring apt"
 msgstr "Configurando apt"
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "Analizando repositorios locales..."
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr "actualizaciones de seguridad (de ${SEC_HOST})"
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr "actualizaciones de la distribución:"
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
-msgid "Scanning the security updates repository..."
-msgstr "Analizando el repositorio de actualizaciones de seguridad..."
+#: ../apt-setup-udeb.templates:10002
+msgid "Services to use:"
+msgstr "Servicios a utilizar:"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr ""
+"Debian tiene dos servicios que ofrece actualizaciones a una versión "
+"publicada: seguridad y actualizaciones de la distribución."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr ""
+"Las actualizaciones de seguridad le permiten mantener a su sistema protegido "
+"frente a ataques. Se recomienda encarecidamente que active este servicio."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
+"Las actualizaciones de la distribución ofrecen versiones más recientes de "
+"programas que tienen muchos cambios con relativa frecuencia y que si no se "
+"actualizará reduciría su utilidad. Un ejemplo de este tipo de "
+"actualizaciones son las firmas de virus de un analizador de virus. Este "
+"servicio sólo está disponible para las distribuciones estable y «oldstable»."
 
 #. Type: text
 #. Description
@@ -4988,7 +5150,7 @@ msgstr "Tenga en cuenta que no podrá ver la contraseña mientras la introduce."
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"

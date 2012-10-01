@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: debian-installer\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2012-02-26 17:13+0100\n"
 "Last-Translator: Martin Bagge / brother <brother@bsnet.se>\n"
 "Language-Team: Swedish <debian-l10n-swedish@lists.debian.org>\n"
@@ -2632,6 +2632,33 @@ msgstr "Väntar på initiering av maskinvara..."
 msgid "Checking for firmware..."
 msgstr "Letar efter fast programvara..."
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid "Auto-configure networking?"
+msgstr "Ska nätverket ställas in automatiskt?"
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+"Inställningar för nätverket kan göras antingen genom att manuellt ange alla "
+"detaljer eller genom att använda DHCP (eller olika IPv6-specifika metoder) "
+"för att hämta inställningar för nätverket automatiskt.Om du väljer DHCP men "
+"installationsprogrammet misslyckas med att hämta fungerande inställningar "
+"från en DHCP-server på ditt nätverk så kommer du att få möjlighet att ställa "
+"in nätverket manuellt."
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2698,6 +2725,36 @@ msgstr ""
 "primärt nätverksgränssnitt under tiden Debian installeras. Det första "
 "nätverksgränssnittet som hittades har markerats."
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "Trådlös ESSID för ${iface}"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr "Försöket att hitta ett tillgängligt trådlöst nätverk misslyckades."
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} är ett trådlöst nätverksgränssnitt. Ange namnet (ESSID) på det "
+"trådlösa nätverk som du vill att ${iface} ska använda. Lämna fältet tomt om "
+"vilket tillgängligt nätverk som helst duger."
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2752,6 +2809,14 @@ msgstr "Sparar inställningar för nätverket ..."
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "Konfigurera nätverket"
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr "${essid_list} Ange ESSID manuellt"
 
 #. Type: string
 #. Description
@@ -2881,6 +2946,52 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "Konfigurera om det trådlösa nätverket"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr "IP-adress:"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr "IP-adressen är unik för din dator och kan vara: "
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr ""
+" * fyra tal separerade med punkter (IPv4)\n"
+" * hexadecimalatecken åtskilda med kolon (IPv6)."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr "Du kan även välja att lägga till en CIDR nätmask (exempelvis \"/24\")."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr ""
+"Fråga din nätverksadministratör om vilka uppgifter som ska anges här om du "
+"inte vet själv."
 
 #. Type: string
 #. Description
@@ -4028,7 +4139,7 @@ msgstr "Installerar grundsystemet"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4398,19 +4509,70 @@ msgstr "Konfigurera pakethanteraren"
 msgid "Configuring apt"
 msgstr "Konfigurerar apt"
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "Söker igenom lokala förråd..."
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr "säkerhetsuppdateringar (från ${SEC_HOST})"
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr "utgåveuppdateringar"
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
-msgid "Scanning the security updates repository..."
-msgstr "Söker igenom förrådet för säkerhetsuppdateringar..."
+#: ../apt-setup-udeb.templates:10002
+msgid "Services to use:"
+msgstr "Tjänster att använda:"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr ""
+"Debian har två tjänster som tillhandahåller uppdateringar till utgåvor: "
+"security (säkerhet) och release updates (utgåveuppdateringar)."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr ""
+"Säkerhetsuppdateringar hjälper dig att hålla ditt system säkert mot "
+"attacker. Aktivering av den här tjänsten rekommenderas starkt."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
+"Utgåveuppdateringar tillhandahåller mer aktuella versioner för programvara "
+"som ändras relativt frekvent och innebörden att inte ha den senaste "
+"versionen kan minska användbarheten för programvaran. Förrådet "
+"tillhandahåller också regressionskorrigeringar. Den här tjänsten är endast "
+"tillgänglig för stabila utgåvor (\"stable\" och \"oldstable\")."
 
 #. Type: text
 #. Description
@@ -4851,7 +5013,7 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"

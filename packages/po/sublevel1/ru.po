@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-09-17 22:02+0000\n"
+"POT-Creation-Date: 2012-10-01 22:05+0000\n"
 "PO-Revision-Date: 2012-02-25 13:40+0400\n"
 "Last-Translator: Yuri Kozlov <yuray@komyakino.ru>\n"
 "Language-Team: Russian <debian-l10n-russian@lists.debian.org>\n"
@@ -2628,6 +2628,31 @@ msgstr "Ожидание завершения инициализации обо�
 msgid "Checking for firmware..."
 msgstr "Выполняется проверка микропрограммы..."
 
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid "Auto-configure networking?"
+msgstr "Настроить сеть автоматически?"
+
+#. Type: boolean
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-common.templates:2001
+msgid ""
+"Networking can be configured either by entering all the information "
+"manually, or by using DHCP (or a variety of IPv6-specific methods) to detect "
+"network settings automatically. If you choose to use autoconfiguration and "
+"the installer is unable to get a working configuration from the network, you "
+"will be given the opportunity to configure the network manually."
+msgstr ""
+"Настройки сети могут быть введены вручную или получены с помощью DHCP (или "
+"другими способами, при использовании IPv6). Если вы выберете автоматическую "
+"настройку, а программа установки не сможет получить необходимую информацию "
+"из вашей сети, то вам будет предоставлена возможность настроить сеть вручную."
+
 #. Type: string
 #. Description
 #. :sl1:
@@ -2693,6 +2718,36 @@ msgstr ""
 "который будет использован как основной во время установки. Сейчас выделен "
 "первый найденный интерфейс."
 
+#. Type: string
+#. Description
+#. :sl2:
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:6001 ../netcfg-common.templates:7001
+msgid "Wireless ESSID for ${iface}:"
+msgstr "ESSID для ${iface}:"
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid "Attempting to find an available wireless network failed."
+msgstr "Не удалось найти доступную беспроводную сеть."
+
+#. Type: string
+#. Description
+#. :sl1:
+#: ../netcfg-common.templates:7001
+msgid ""
+"${iface} is a wireless network interface. Please enter the name (the ESSID) "
+"of the wireless network you would like ${iface} to use. To connect to any "
+"available network, leave this field blank."
+msgstr ""
+"${iface} — беспроводное сетевое устройство. Введите имя (ESSID) сети, в "
+"которой будет использоваться ${iface}. Чтобы подключиться к любой доступной "
+"сети, оставьте это поле пустым."
+
 #. Type: text
 #. Description
 #. :sl2:
@@ -2747,6 +2802,14 @@ msgstr "Сохранение настроек сети ..."
 #: ../netcfg-common.templates:46001
 msgid "Configure the network"
 msgstr "Настройка сети"
+
+#. Type: select
+#. Choices
+#. Translators: please do not translate the variable essid_list
+#. :sl1:
+#: ../netcfg-common.templates:50001
+msgid "${essid_list} Enter ESSID manually"
+msgstr "${essid_list} Ввести ESSID вручную"
 
 #. Type: string
 #. Description
@@ -2877,6 +2940,53 @@ msgstr ""
 #: ../netcfg-dhcp.templates:9001
 msgid "Reconfigure the wireless network"
 msgstr "Настройка беспроводной сети"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "IP address:"
+msgstr "IP-адрес:"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "The IP address is unique to your computer and may be:"
+msgstr ""
+"IP-адрес однозначно определяет ваш компьютер и может быть задан в виде:"
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid ""
+" * four numbers separated by periods (IPv4);\n"
+" * blocks of hexadecimal characters separated by colons (IPv6)."
+msgstr ""
+" * четырёх чисел, разделённых точками (IPv4);\n"
+" * блоков шестнадцатеричных символов, разделённых двоеточиями (IPv6)."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "You can also optionally append a CIDR netmask (such as \"/24\")."
+msgstr ""
+"Также, вы можете добавить к нему маску сети в формате CIDR (например, «/24»)."
+
+#. Type: string
+#. Description
+#. IPv6
+#. :sl1:
+#: ../netcfg-static.templates:1001
+msgid "If you don't know what to use here, consult your network administrator."
+msgstr ""
+"Если вы не знаете, что вводить, обратитесь к системному администратору."
 
 #. Type: string
 #. Description
@@ -4027,7 +4137,7 @@ msgstr "Установка базовой системы"
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
-#. :sl1:
+#. :sl2:
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: text
 #. Description
@@ -4399,19 +4509,70 @@ msgstr "Настройка менеджера пакетов"
 msgid "Configuring apt"
 msgstr "Выполняется настройка apt"
 
-#. Type: text
-#. Description
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
 #. :sl1:
-#: ../apt-setup-udeb.templates:4001
-msgid "Scanning local repositories..."
-msgstr "Просмотр локальных репозиториев..."
+#: ../apt-setup-udeb.templates:10001
+msgid "security updates (from ${SEC_HOST})"
+msgstr "обновления безопасности (с ${SEC_HOST})"
 
-#. Type: text
+#. Type: multiselect
+#. Choices
+#. SEC_HOST and VOL_HOST are host names (e.g. security.debian.org)
+#. Translators: the *entire* string should be under 55 columns
+#. including host name. In short, KEEP THIS SHORT and, yes, that's tricky
+#. :sl1:
+#: ../apt-setup-udeb.templates:10001
+msgid "release updates"
+msgstr "обновления выпуска"
+
+#. Type: multiselect
 #. Description
 #. :sl1:
-#: ../apt-setup-udeb.templates:5001
-msgid "Scanning the security updates repository..."
-msgstr "Просмотр репозитория обновлений безопасности..."
+#: ../apt-setup-udeb.templates:10002
+msgid "Services to use:"
+msgstr "Активируемые сервисы:"
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Debian has two services that provide updates to releases: security and "
+"release updates."
+msgstr ""
+"Debian предоставляет два сервиса: обновления безопасности и обновления "
+"выпуска."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Security updates help to keep your system secured against attacks. Enabling "
+"this service is strongly recommended."
+msgstr ""
+"Обновления безопасности помогают сохранять неуязвимость системы. Включение "
+"этого сервиса настоятельно рекомендуется."
+
+#. Type: multiselect
+#. Description
+#. :sl1:
+#: ../apt-setup-udeb.templates:10002
+msgid ""
+"Release updates provide more current versions for software that changes "
+"relatively frequently and where not having the latest version could reduce "
+"the usability of the software. It also provides regression fixes. This "
+"service is only available for stable and oldstable releases."
+msgstr ""
+"Репозиторий обновлений выпуска содержит самые новые версии часто "
+"изменяющегося программного обеспечения, без своевременного обновления "
+"которого данное программное обеспечение теряет свою полезность. Также, сюда "
+"входят исправления повторно возникших ошибок. Данный сервис доступен только "
+"для стабильного и старого стабильного выпусков."
 
 #. Type: text
 #. Description
@@ -4853,7 +5014,7 @@ msgstr ""
 #. #-#-#-#-#  templates.pot (PACKAGE VERSION)  #-#-#-#-#
 #. Type: password
 #. Description
-#. :sl2:
+#. :sl3:
 #: ../user-setup-udeb.templates:7001 ../user-setup-udeb.templates:14001
 #: ../grub-installer.templates:9001 ../network-console.templates:5001
 msgid "Re-enter password to verify:"
